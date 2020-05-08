@@ -159,6 +159,55 @@ describe API::Todos do
       expect { get api('/todos', john_doe) }.not_to exceed_query_limit(control)
       expect(response).to have_gitlab_http_status(:ok)
     end
+
+    context 'when there is a Design Todo' do
+      let!(:design_todo) { create_todo_for_mentioned_in_design }
+
+      def create_todo_for_mentioned_in_design
+        issue = create(:issue, project: project_1)
+        create(:todo, :mentioned,
+               user: john_doe,
+               project: project_1,
+               target: create(:design, issue: issue),
+               author: create(:user),
+               note: create(:note, project: project_1, note: "I am note, hear me roar"))
+      end
+
+      def api_request
+        get api('/todos', john_doe)
+      end
+
+      before do
+        api_request
+
+        # TODO these tests are being temporarily skipped unless run in EE,
+        # as we are in the process of moving Design Management to FOSS in 13.0
+        # in steps. In the current step the routes have not yet been moved,
+        # and route helpers are called in this test through
+        # `API::Entities::DesignManagement::Design#image_url`.
+        #
+        # See https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283.
+        skip 'See https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283' unless Gitlab.ee?
+      end
+
+      specify do
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'avoids N+1 queries', :request_store do
+        control = ActiveRecord::QueryRecorder.new { api_request }
+
+        create_todo_for_mentioned_in_design
+
+        expect { api_request }.not_to exceed_query_limit(control)
+      end
+
+      it 'includes the Design Todo in the response' do
+        expect(json_response).to include(
+          a_hash_including('id' => design_todo.id)
+        )
+      end
+    end
   end
 
   describe 'POST /todos/:id/mark_as_done' do

@@ -25,6 +25,7 @@ describe Gitlab::UrlBuilder do
       :project_snippet   | ->(snippet)       { "/#{snippet.project.full_path}/snippets/#{snippet.id}" }
       :project_wiki      | ->(wiki)          { "/#{wiki.container.full_path}/-/wikis/home" }
       :ci_build          | ->(build)         { "/#{build.project.full_path}/-/jobs/#{build.id}" }
+      :design            | ->(design)        { "/#{design.project.full_path}/-/design_management/designs/#{design.id}/raw_image" }
 
       :group             | ->(group)         { "/groups/#{group.full_path}" }
       :group_milestone   | ->(milestone)     { "/groups/#{milestone.group.full_path}/-/milestones/#{milestone.iid}" }
@@ -55,6 +56,16 @@ describe Gitlab::UrlBuilder do
     with_them do
       let(:object) { build_stubbed(factory) }
       let(:path) { path_generator.call(object) }
+
+      before do
+        # TODO the tests that use the `:design` factory are being temporarily
+        # skipped unless run in EE, as we are in the process of moving
+        # Design Management to FOSS in 13.0 in steps. In the current step
+        # the routes have not yet been moved.
+        #
+        # See https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283.
+        skip 'See https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283' if factory == :design && !Gitlab.ee?
+      end
 
       it 'returns the full URL' do
         expect(subject.build(object)).to eq("#{Gitlab.config.gitlab.url}#{path}")
@@ -92,6 +103,23 @@ describe Gitlab::UrlBuilder do
         url = subject.build(snippet, raw: true)
 
         expect(url).to eq "#{Gitlab.config.gitlab.url}/snippets/#{snippet.id}/raw"
+      end
+    end
+
+    context 'when passing a DesignManagement::Design' do
+      let(:design) { build_stubbed(:design) }
+
+      it 'uses the given ref and size in the URL' do
+        # TODO this test is being temporarily skipped unless run in EE,
+        # as we are in the process of moving Design Management to FOSS in 13.0
+        # in steps. In the current step the routes have not yet been moved.
+        #
+        # See https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283.
+        skip 'See https://gitlab.com/gitlab-org/gitlab/-/issues/212566#note_327724283' unless Gitlab.ee?
+
+        url = subject.build(design, ref: 'feature', size: 'small')
+
+        expect(url).to eq "#{Settings.gitlab['url']}/#{design.project.full_path}/-/design_management/designs/#{design.id}/feature/resized_image/small"
       end
     end
 

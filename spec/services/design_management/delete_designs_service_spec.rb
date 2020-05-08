@@ -78,7 +78,7 @@ describe DesignManagement::DeleteDesignsService do
         it_behaves_like "a top-level error"
 
         it 'does not log any events' do
-          counter = ::Gitlab::UsageCounters::DesignsCounter
+          counter = ::Gitlab::UsageDataCounters::DesignsCounter
           expect { run_service rescue nil }.not_to change { counter.totals }
         end
       end
@@ -95,7 +95,7 @@ describe DesignManagement::DeleteDesignsService do
         end
 
         it 'logs a deletion event' do
-          counter = ::Gitlab::UsageCounters::DesignsCounter
+          counter = ::Gitlab::UsageDataCounters::DesignsCounter
           expect { run_service }.to change { counter.read(:delete) }.by(1)
         end
 
@@ -142,7 +142,7 @@ describe DesignManagement::DeleteDesignsService do
         end
 
         it 'logs the correct number of deletion events' do
-          counter = ::Gitlab::UsageCounters::DesignsCounter
+          counter = ::Gitlab::UsageDataCounters::DesignsCounter
           expect { run_service }.to change { counter.read(:delete) }.by(2)
         end
 

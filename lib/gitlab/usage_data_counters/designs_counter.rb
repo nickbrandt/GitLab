@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module Gitlab::UsageCounters
+module Gitlab::UsageDataCounters
   class DesignsCounter
-    extend ::Gitlab::UsageDataCounters::RedisCounter
+    extend Gitlab::UsageDataCounters::RedisCounter
 
     KNOWN_EVENTS = %w[create update delete].map(&:freeze).freeze
 
