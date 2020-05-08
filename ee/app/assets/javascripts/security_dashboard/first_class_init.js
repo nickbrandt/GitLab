@@ -1,6 +1,4 @@
 import Vue from 'vue';
-import VueApollo from 'vue-apollo';
-import createDefaultClient from '~/lib/graphql';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import FirstClassProjectSecurityDashboard from './components/first_class_project_security_dashboard.vue';
 import FirstClassGroupSecurityDashboard from './components/first_class_group_security_dashboard.vue';
@@ -11,6 +9,7 @@ import createRouter from './store/router';
 import projectsPlugin from './store/plugins/projects';
 import projectSelector from './store/plugins/project_selector';
 import syncWithRouter from './store/plugins/sync_with_router';
+import apolloProvider from './graphql/provider';
 
 const isRequired = message => {
   throw new Error(message);
@@ -35,12 +34,6 @@ export default (
       },
     });
   }
-
-  Vue.use(VueApollo);
-
-  const apolloProvider = new VueApollo({
-    defaultClient: createDefaultClient(),
-  });
 
   const props = {
     emptyStateSvgPath: el.dataset.emptyStateSvgPath,
