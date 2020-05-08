@@ -231,8 +231,10 @@ class License < ApplicationRecord
 
   after_create :reset_current
   after_destroy :reset_current
+  after_commit :reset_future_dated, on: [:create, :destroy]
 
   scope :recent, -> { reorder(id: :desc) }
+  scope :last_hundred, -> { recent.limit(100) }
 
   class << self
     def features_for_plan(plan)
@@ -268,7 +270,21 @@ class License < ApplicationRecord
     def load_license
       return unless self.table_exists?
 
-      self.order(id: :desc).limit(100).find { |license| license.valid? && license.started? }
+      self.last_hundred.find { |license| license.valid? && license.started? }
+    end
+
+    def future_dated
+      Gitlab::SafeRequestStore.fetch(:future_dated_license) { load_future_dated }
+    end
+
+    def reset_future_dated
+      Gitlab::SafeRequestStore.delete(:future_dated_license)
+    end
+
+    def future_dated_only?
+      return false if current.present?
+
+      future_dated.present?
     end
 
     def global_feature?(feature)
@@ -291,6 +307,12 @@ class License < ApplicationRecord
 
     def history
       all.sort_by { |license| [license.starts_at, license.created_at, license.expires_at] }.reverse
+    end
+
+    private
+
+    def load_future_dated
+      self.last_hundred.find { |license| license.valid? && license.future_dated? }
     end
   end
 
@@ -471,6 +493,10 @@ class License < ApplicationRecord
     starts_at <= Date.current
   end
 
+  def future_dated?
+    starts_at > Date.current
+  end
+
   private
 
   def restricted_attr(name, default = nil)
@@ -481,6 +507,10 @@ class License < ApplicationRecord
 
   def reset_current
     self.class.reset_current
+  end
+
+  def reset_future_dated
+    self.class.reset_future_dated
   end
 
   def reset_license
