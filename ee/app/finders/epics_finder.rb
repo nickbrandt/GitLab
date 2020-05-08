@@ -50,7 +50,8 @@ class EpicsFinder < IssuableFinder
   end
 
   def execute
-    raise ArgumentError, 'group_id argument is missing' unless group
+    raise ArgumentError, 'group_id argument is missing' unless params[:group_id]
+    return Epic.none unless Ability.allowed?(current_user, :read_epic, group)
 
     items = init_collection
     items = by_created_at(items)
@@ -72,19 +73,6 @@ class EpicsFinder < IssuableFinder
     sort(items)
   end
 
-  def group
-    return unless params[:group_id]
-    return @group if defined?(@group)
-
-    group = Group.find(params[:group_id])
-
-    unless Ability.allowed?(current_user, :read_epic, group)
-      raise ActiveRecord::RecordNotFound.new("Could not find a Group with ID #{params[:group_id]}")
-    end
-
-    @group = group
-  end
-
   # rubocop: disable CodeReuse/ActiveRecord
   def init_collection
     groups = if params[:iids].present?
@@ -103,6 +91,13 @@ class EpicsFinder < IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
+
+  def group
+    return unless params[:group_id]
+    return @group if defined?(@group)
+
+    @group = Group.find(params[:group_id])
+  end
 
   def starts_with_iid(items)
     return items unless params[:iid_starts_with].present?
