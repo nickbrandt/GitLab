@@ -123,7 +123,7 @@ export const receiveGroupStagesError = ({ commit }, error) => {
 
 export const setDefaultSelectedStage = ({ dispatch, getters }) => {
   const { activeStages = [] } = getters;
-  if (activeStages && activeStages.length) {
+  if (activeStages?.length) {
     const [firstActiveStage] = activeStages;
     return Promise.all([
       dispatch('setSelectedStage', firstActiveStage),

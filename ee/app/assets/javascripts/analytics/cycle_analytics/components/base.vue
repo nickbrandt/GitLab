@@ -299,9 +299,7 @@ export default {
               />
             </template>
             <template v-if="customStageFormActive" #content>
-              <div v-if="isUpdatingCustomStage">
-                <gl-loading-icon class="mt-4" size="md" />
-              </div>
+              <gl-loading-icon v-if="isUpdatingCustomStage" class="mt-4" size="md" />
               <custom-stage-form
                 v-else
                 :events="formEvents"

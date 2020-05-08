@@ -1,6 +1,7 @@
 import Api from 'ee/api';
 import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
+import httpStatusCodes from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { removeFlash, isStageNameExistsError } from '../../../utils';
 
@@ -48,7 +49,7 @@ export const receiveCreateStageSuccess = ({ commit, dispatch }, { data: { title 
 
 export const receiveCreateStageError = (
   { commit, dispatch },
-  { status = 400, errors = {}, data = {} } = {},
+  { status = httpStatusCodes.BAD_REQUEST, errors = {}, data = {} } = {},
 ) => {
   commit(types.RECEIVE_CREATE_STAGE_ERROR);
   const { name = null } = data;
@@ -75,7 +76,7 @@ export const createStage = ({ dispatch, rootState }, data) => {
       return dispatch('receiveCreateStageSuccess', { status, data: responseData });
     })
     .catch(({ response } = {}) => {
-      const { data: { message, errors } = null, status = 400 } = response;
+      const { data: { message, errors } = null, status = httpStatusCodes.BAD_REQUEST } = response;
       dispatch('receiveCreateStageError', { data, message, errors, status });
     });
 };
