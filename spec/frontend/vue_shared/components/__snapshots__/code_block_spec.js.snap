@@ -4,13 +4,10 @@ exports[`Code Block matches snapshot 1`] = `
 <pre
   class="code-block rounded"
 >
-    
   <code
     class="d-block"
   >
     test-code
   </code>
-  
-
 </pre>
 `;
