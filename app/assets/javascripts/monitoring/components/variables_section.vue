@@ -12,14 +12,23 @@ export default {
     ...mapState('monitoringDashboard', ['promVariables']),
   },
   methods: {
-    ...mapActions('monitoringDashboard', ['fetchDashboardData']),
-    refreshDashboard() {
-      updateHistory({
-        url: mergeUrlParams(this.promVariables, window.location.href),
-        title: document.title,
-      });
+    ...mapActions('monitoringDashboard', ['fetchDashboardData', 'setVariableData']),
+    refreshDashboard(event) {
+      const { name, value } = event.target;
 
-      this.fetchDashboardData();
+      if (this.promVariables[name] !== value) {
+        const changedVariable = {};
+        changedVariable[name] = value;
+
+        this.setVariableData(changedVariable);
+
+        updateHistory({
+          url: mergeUrlParams(this.promVariables, window.location.href),
+          title: document.title,
+        });
+
+        this.fetchDashboardData();
+      }
     },
   },
 };
@@ -29,10 +38,10 @@ export default {
     <div v-for="(val, key) in promVariables" :key="key" class="mb-1 pr-2 d-flex d-sm-block">
       <gl-form-group :label="key" class="mb-0 flex-grow-1">
         <gl-form-input
-          v-model="promVariables[key]"
+          :value="promVariables[key]"
           :name="key"
           @keyup.native.enter="refreshDashboard"
-          @blur="refreshDashboard"
+          @blur.native="refreshDashboard"
         />
       </gl-form-group>
     </div>

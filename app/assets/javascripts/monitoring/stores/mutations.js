@@ -172,4 +172,10 @@ export default {
   [types.SET_PROM_QUERY_VARIABLES](state, variables) {
     state.promVariables = variables;
   },
+  [types.SET_NEW_VARIABLE_DATA](state, newVariable) {
+    Object.assign(state.promVariables, {
+      ...state.promVariables,
+      ...newVariable,
+    });
+  },
 };

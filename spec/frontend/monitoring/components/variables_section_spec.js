@@ -57,6 +57,7 @@ describe('Metrics dashboard/variables section component', () => {
 
   describe('when changing the variable inputs', () => {
     const fetchDashboardData = jest.fn();
+    const setVariableData = jest.fn();
 
     beforeEach(() => {
       store = new Vuex.Store({
@@ -69,6 +70,7 @@ describe('Metrics dashboard/variables section component', () => {
             },
             actions: {
               fetchDashboardData,
+              setVariableData,
             },
           },
         },
@@ -80,9 +82,11 @@ describe('Metrics dashboard/variables section component', () => {
     it('merges the url params and refreshes the dashboard when a form input is blurred', () => {
       const firstInput = getInputAt(0);
 
+      firstInput.element.value = 'POD';
       firstInput.vm.$emit('input');
-      firstInput.vm.$emit('blur');
+      firstInput.trigger('blur');
 
+      expect(setVariableData).toHaveBeenCalled();
       expect(mergeUrlParams).toHaveBeenCalledWith(sampleVariables, window.location.href);
       expect(updateHistory).toHaveBeenCalled();
       expect(fetchDashboardData).toHaveBeenCalled();
@@ -91,12 +95,26 @@ describe('Metrics dashboard/variables section component', () => {
     it('merges the url params and refreshes the dashboard when a form input has received an enter key press', () => {
       const firstInput = getInputAt(0);
 
+      firstInput.element.value = 'POD';
       firstInput.vm.$emit('input');
       firstInput.trigger('keyup.enter');
 
+      expect(setVariableData).toHaveBeenCalled();
       expect(mergeUrlParams).toHaveBeenCalledWith(sampleVariables, window.location.href);
       expect(updateHistory).toHaveBeenCalled();
       expect(fetchDashboardData).toHaveBeenCalled();
+    });
+
+    it('does not merge the url params and refreshes the dashboard if the value entered is not different that is what currently stored', () =>{
+      const firstInput = getInputAt(0);
+
+      firstInput.vm.$emit('input');
+      firstInput.trigger('keyup.enter');
+
+      expect(setVariableData).not.toHaveBeenCalled();
+      expect(mergeUrlParams).not.toHaveBeenCalled();
+      expect(updateHistory).not.toHaveBeenCalled();
+      expect(fetchDashboardData).not.toHaveBeenCalled();
     });
   });
 });

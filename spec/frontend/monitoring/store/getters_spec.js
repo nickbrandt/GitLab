@@ -342,5 +342,12 @@ describe('Monitoring store Getters', () => {
 
       expect(variablesArray).toEqual(['label1', 'pod']);
     });
+
+    it('transforms the promVariables object to an empty array when no keys are present', () => {
+      mutations[types.SET_PROM_QUERY_VARIABLES](state, {});
+      const variablesArray = getters.getCustomVariablesArray(state);
+
+      expect(variablesArray).toEqual([]);
+    });
   });
 });
