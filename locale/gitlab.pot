@@ -1063,9 +1063,6 @@ msgstr ""
 msgid "AccessTokens|reset it"
 msgstr ""
 
-msgid "AccessibilityReport|Accessibility report artifact not found"
-msgstr ""
-
 msgid "AccessibilityReport|Failed to retrieve accessibility report"
 msgstr ""
 
