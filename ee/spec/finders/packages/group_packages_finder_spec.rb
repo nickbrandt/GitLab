@@ -2,9 +2,9 @@
 require 'spec_helper'
 
 describe Packages::GroupPackagesFinder do
-  let(:user)     { create(:user) }
-  let(:group)    { create(:group) }
-  let(:project)  { create(:project, namespace: group) }
+  let_it_be(:user)     { create(:user) }
+  let_it_be(:group)    { create(:group) }
+  let_it_be(:project)  { create(:project, namespace: group) }
   let(:another_group) { create(:group) }
 
   before do
@@ -58,6 +58,25 @@ describe Packages::GroupPackagesFinder do
 
         it { is_expected.not_to include(package_without_version) }
       end
+
+      context 'with package_name' do
+        let_it_be(:named_package) { create(:maven_package, project: project, name: 'maven') }
+        let(:params) { { package_name: package_name } }
+
+        context 'as complete name' do
+          let(:package_name) { 'maven' }
+
+          it { is_expected.to eq([named_package]) }
+        end
+
+        %w[aven mav ave].each do |filter|
+          context "for fuzzy filter #{filter}" do
+            let(:package_name) { filter }
+
+            it { is_expected.to eq([named_package]) }
+          end
+        end
+      end
     end
 
     context 'group has package of all types' do
@@ -84,6 +103,12 @@ describe Packages::GroupPackagesFinder do
       subject { described_class.new(user, group, package_type: nil).execute }
 
       it { is_expected.to match_array([package1])}
+    end
+
+    context 'with invalid package_type' do
+      let(:params) { { package_type: 'invalid_type' } }
+
+      it { expect { subject }.to raise_exception(described_class::InvalidPackageTypeError) }
     end
 
     context 'when project is public' do

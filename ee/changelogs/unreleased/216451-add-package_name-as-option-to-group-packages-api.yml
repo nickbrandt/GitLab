@@ -1,0 +1,5 @@
+---
+title: Adds package_name filter to group packages API
+merge_request: 30980
+author:
+type: added

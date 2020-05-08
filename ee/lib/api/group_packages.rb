@@ -27,12 +27,14 @@ module API
                         desc: 'Return packages sorted in `asc` or `desc` order.'
         optional :package_type, type: String, values: Packages::Package.package_types.keys,
                                 desc: 'Return packages of a certain type'
+        optional :package_name, type: String,
+                                desc: 'Return packages with this name'
       end
       get ':id/packages' do
         packages = Packages::GroupPackagesFinder.new(
           current_user,
           user_group,
-          declared(params).slice(:exclude_subgroups, :order_by, :sort, :package_type)
+          declared(params).slice(:exclude_subgroups, :order_by, :sort, :package_type, :package_name)
         ).execute
 
         present paginate(packages), with: EE::API::Entities::Package, user: current_user, group: true
