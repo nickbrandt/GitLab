@@ -1,0 +1,5 @@
+---
+title: Add GraphQL mutation for removing projects from Instance Security Dashboard
+merge_request: 30100
+author:
+type: added
