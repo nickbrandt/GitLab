@@ -2,6 +2,7 @@
 class Packages::DependencyLink < ApplicationRecord
   belongs_to :package, inverse_of: :dependency_links
   belongs_to :dependency, inverse_of: :dependency_links, class_name: 'Packages::Dependency'
+  has_one :nuget_metadatum, inverse_of: :dependency_link, class_name: 'Packages::NugetDependencyLinkMetadatum'
 
   validates :package, :dependency, presence: true
 
@@ -12,4 +13,6 @@ class Packages::DependencyLink < ApplicationRecord
 
   scope :with_dependency_type, ->(dependency_type) { where(dependency_type: dependency_type) }
   scope :includes_dependency, -> { includes(:dependency) }
+  scope :for_package, ->(package) { where(package_id: package.id) }
+  scope :preload_dependency, -> { preload(:dependency) }
 end

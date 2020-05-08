@@ -266,6 +266,16 @@ FactoryBot.define do
     package
     dependency { create(:packages_dependency) }
     dependency_type { :dependencies }
+
+    trait(:with_nuget_metadatum) do
+      after :build do |link|
+        link.nuget_metadatum = build(:nuget_dependency_link_metadatum)
+      end
+    end
+  end
+
+  factory :nuget_dependency_link_metadatum, class: 'Packages::NugetDependencyLinkMetadatum' do
+    target_framework { '.NETStandard2.0' }
   end
 
   factory :packages_tag, class: 'Packages::Tag' do
