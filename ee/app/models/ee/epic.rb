@@ -352,15 +352,15 @@ module EE
       preloaded_parent_group_and_descendants ||= parent.group.self_and_descendants
 
       if self == parent
-        errors.add :parent, 'Cannot add an epic as a child of itself'
+        errors.add :parent, 'Sorry, this epic cannot be added. An epic cannot be added to itself.'
       elsif parent.children.to_a.include?(self)
-        errors.add :parent, "This epic can't be added as it is already assigned to the parent"
+        errors.add :parent, "Sorry, this epic cannot be added. It is already assigned to the parent epic."
       elsif parent.has_ancestor?(self)
-        errors.add :parent, "This epic can't be added as it is already assigned to this epic's ancestor"
+        errors.add :parent, "Sorry, this epic cannot be added. This epic is already an ancestor of the parent epic."
       elsif !preloaded_parent_group_and_descendants.include?(group)
-        errors.add :parent, "This epic can't be added because it must belong to the same group as the parent, or subgroup of the parent epic’s group"
+        errors.add :parent, "Sorry, this epic cannot be added. An epic must belong to the same group, or subgroup, of its parent epic."
       elsif level_depth_exceeded?(parent)
-        errors.add :parent, "This epic can't be added as the maximum depth of nested epics would be exceeded"
+        errors.add :parent, "Sorry, this epic cannot be added. An epic cannot have more than #{MAX_HIERARCHY_DEPTH} ancestors."
       end
     end
 
