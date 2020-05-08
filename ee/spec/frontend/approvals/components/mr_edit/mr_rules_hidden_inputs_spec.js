@@ -95,7 +95,7 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
         factory();
 
         expect(findHiddenInputs()).toEqual(
-          jasmine.arrayContaining([
+          expect.arrayContaining([
             { name: INPUT_ID, value: '4' },
             { name: INPUT_DELETE, value: '1' },
             { name: INPUT_ID, value: '7' },
@@ -177,10 +177,14 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
           it('renders source id input', () => {
             factory();
 
-            expect(findHiddenInputs()).toContain({
-              name: INPUT_SOURCE_ID,
-              value: rule.sourceId.toString(),
-            });
+            expect(findHiddenInputs()).toEqual(
+              expect.arrayContaining([
+                {
+                  name: INPUT_SOURCE_ID,
+                  value: rule.sourceId.toString(),
+                },
+              ]),
+            );
           });
         });
       });
@@ -193,10 +197,14 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
         it('renders input to remove hidden groups', () => {
           factory();
 
-          expect(findHiddenInputs()).toContain({
-            name: INPUT_REMOVE_HIDDEN_GROUPS,
-            value: 'true',
-          });
+          expect(findHiddenInputs()).toEqual(
+            expect.arrayContaining([
+              {
+                name: INPUT_REMOVE_HIDDEN_GROUPS,
+                value: 'true',
+              },
+            ]),
+          );
         });
       });
     });

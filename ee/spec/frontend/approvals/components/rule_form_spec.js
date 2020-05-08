@@ -79,7 +79,7 @@ describe('EE Approvals RuleForm', () => {
     store = createStoreOptions(projectSettingsModule(), { projectId: TEST_PROJECT_ID });
 
     ['postRule', 'putRule', 'deleteRule', 'putFallbackRule'].forEach(actionName => {
-      spyOn(store.modules.approvals.actions, actionName);
+      jest.spyOn(store.modules.approvals.actions, actionName).mockImplementation(() => {});
     });
 
     ({ actions } = store.modules.approvals);
@@ -166,7 +166,7 @@ describe('EE Approvals RuleForm', () => {
 
           wrapper.vm.submit();
 
-          expect(actions.postRule).toHaveBeenCalledWith(jasmine.anything(), expected, undefined);
+          expect(actions.postRule).toHaveBeenCalledWith(expect.anything(), expected, undefined);
         });
       });
     });
@@ -266,7 +266,7 @@ describe('EE Approvals RuleForm', () => {
 
         wrapper.vm.submit();
 
-        expect(actions.postRule).toHaveBeenCalledWith(jasmine.anything(), expected, undefined);
+        expect(actions.postRule).toHaveBeenCalledWith(expect.anything(), expected, undefined);
       });
 
       it('adds selected approvers on selection', () => {
@@ -319,7 +319,7 @@ describe('EE Approvals RuleForm', () => {
 
         wrapper.vm.submit();
 
-        expect(actions.putRule).toHaveBeenCalledWith(jasmine.anything(), expected, undefined);
+        expect(actions.putRule).toHaveBeenCalledWith(expect.anything(), expected, undefined);
       });
     });
 
@@ -346,7 +346,7 @@ describe('EE Approvals RuleForm', () => {
 
         it('puts fallback rule', () => {
           expect(actions.putFallbackRule).toHaveBeenCalledWith(
-            jasmine.anything(),
+            expect.anything(),
             { approvalsRequired: TEST_APPROVALS_REQUIRED },
             undefined,
           );
@@ -434,8 +434,8 @@ describe('EE Approvals RuleForm', () => {
         wrapper.vm.submit();
 
         expect(actions.putRule).toHaveBeenCalledWith(
-          jasmine.anything(),
-          jasmine.objectContaining({
+          expect.anything(),
+          expect.objectContaining({
             removeHiddenGroups: false,
           }),
           undefined,
@@ -451,8 +451,8 @@ describe('EE Approvals RuleForm', () => {
           wrapper.vm.submit();
 
           expect(actions.putRule).toHaveBeenCalledWith(
-            jasmine.anything(),
-            jasmine.objectContaining({
+            expect.anything(),
+            expect.objectContaining({
               removeHiddenGroups: true,
             }),
             undefined,
@@ -533,8 +533,8 @@ describe('EE Approvals RuleForm', () => {
 
         it('posts new rule', () => {
           expect(actions.postRule).toHaveBeenCalledWith(
-            jasmine.anything(),
-            jasmine.objectContaining({
+            expect.anything(),
+            expect.objectContaining({
               approvalsRequired: TEST_APPROVALS_REQUIRED,
               users: TEST_APPROVERS.map(x => x.id),
             }),
@@ -552,7 +552,7 @@ describe('EE Approvals RuleForm', () => {
 
         it('puts fallback rule', () => {
           expect(actions.putFallbackRule).toHaveBeenCalledWith(
-            jasmine.anything(),
+            expect.anything(),
             { approvalsRequired: TEST_APPROVALS_REQUIRED },
             undefined,
           );
@@ -579,7 +579,7 @@ describe('EE Approvals RuleForm', () => {
 
         it('deletes rule', () => {
           expect(actions.deleteRule).toHaveBeenCalledWith(
-            jasmine.anything(),
+            expect.anything(),
             TEST_RULE.id,
             undefined,
           );
@@ -587,7 +587,7 @@ describe('EE Approvals RuleForm', () => {
 
         it('puts fallback rule', () => {
           expect(actions.putFallbackRule).toHaveBeenCalledWith(
-            jasmine.anything(),
+            expect.anything(),
             { approvalsRequired: TEST_APPROVALS_REQUIRED },
             undefined,
           );
@@ -605,8 +605,8 @@ describe('EE Approvals RuleForm', () => {
 
         it('puts rule', () => {
           expect(actions.putRule).toHaveBeenCalledWith(
-            jasmine.anything(),
-            jasmine.objectContaining({
+            expect.anything(),
+            expect.objectContaining({
               id: TEST_RULE.id,
               name: 'Bogus',
               approvalsRequired: TEST_APPROVALS_REQUIRED,

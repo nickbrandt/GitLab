@@ -39,7 +39,7 @@ describe('EE Approvals RuleControls', () => {
   beforeEach(() => {
     store = createStoreOptions(MREditModule());
     ({ actions } = store.modules.approvals);
-    ['requestEditRule', 'requestDeleteRule'].forEach(actionName => spyOn(actions, actionName));
+    ['requestEditRule', 'requestDeleteRule'].forEach(actionName => jest.spyOn(actions, actionName));
   });
 
   afterEach(() => {
@@ -69,7 +69,7 @@ describe('EE Approvals RuleControls', () => {
         button.vm.$emit('click');
 
         expect(store.modules.approvals.actions.requestEditRule).toHaveBeenCalledWith(
-          jasmine.anything(),
+          expect.anything(),
           TEST_RULE,
           undefined,
         );
@@ -94,7 +94,7 @@ describe('EE Approvals RuleControls', () => {
         button.vm.$emit('click');
 
         expect(store.modules.approvals.actions.requestDeleteRule).toHaveBeenCalledWith(
-          jasmine.anything(),
+          expect.anything(),
           TEST_RULE,
           undefined,
         );
