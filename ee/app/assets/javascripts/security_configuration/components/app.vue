@@ -1,14 +1,14 @@
 <script>
-import { GlLink } from '@gitlab/ui';
+import { GlLink, GlSprintf, GlTable } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
-import AutoFixSettings from './auto_fix_settings.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import AutoFixSettings from './auto_fix_settings.vue';
 
 export default {
   components: {
     GlLink,
-    Icon,
+    GlSprintf,
+    GlTable,
     AutoFixSettings,
   },
   mixins: [glFeatureFlagsMixin()],
@@ -41,33 +41,40 @@ export default {
     },
   },
   computed: {
-    headerContent() {
-      const body = __('Configure Security %{wordBreakOpportunity}and Compliance');
-      const wordBreakOpportunity = '<wbr />';
-
-      return sprintf(body, { wordBreakOpportunity }, false);
+    devopsMessage() {
+      return this.autoDevopsEnabled
+        ? __(
+            'All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project',
+          )
+        : __(
+            `The status of the table below only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd}. Once you've enabled a scan for the default branch, any subsequent feature branch you create will include the scan.`,
+          );
     },
-    callOutLink() {
+    devopsUrl() {
       return this.autoDevopsEnabled ? this.autoDevopsHelpPagePath : this.latestPipelinePath;
     },
-    calloutContent() {
-      const bodyDefault = __(`The status of the table below only applies to the default branch and
-          is based on the %{linkStart}latest pipeline%{linkEnd}.
-          Once you've enabled a scan for the default branch, any subsequent feature branch you create will include the scan.`);
-
-      const bodyAutoDevopsEnabled = __(
-        'All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project',
-      );
-
-      const body = this.autoDevopsEnabled ? bodyAutoDevopsEnabled : bodyDefault;
-
-      const linkStart = `<a href="${this.callOutLink}" target="_blank" rel="noopener">`;
-      const linkEnd = '</a>';
-
-      return sprintf(body, { linkStart, linkEnd }, false);
+    fields() {
+      return [
+        {
+          key: 'feature',
+          label: s__('SecurityConfiguration|Security Control'),
+          thClass: 'gl-text-gray-900 bg-transparent border-bottom',
+        },
+        {
+          key: 'configured',
+          label: s__('SecurityConfiguration|Status'),
+          thClass: 'gl-text-gray-900 bg-transparent border-bottom',
+          formatter: this.getStatusText,
+        },
+      ];
     },
   },
   methods: {
+    getStatusText(value) {
+      return value
+        ? s__('SecurityConfiguration|Enabled')
+        : s__('SecurityConfiguration|Not yet enabled');
+    },
     getFeatureDocumentationLinkLabel(featureName) {
       return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
         featureName,
@@ -80,73 +87,32 @@ export default {
 <template>
   <article>
     <header>
-      <h2 class="h4 my-3">
-        <span v-html="headerContent"></span>
-        <gl-link
-          target="_blank"
-          :href="helpPagePath"
-          :aria-label="__('Security configuration help link')"
-        >
-          <icon name="question" />
-        </gl-link>
-      </h2>
+      <h4 class="my-3">{{ __('Security Configuration') }}</h4>
+      <h5 class="gl-font-lg mt-5">{{ s__('SecurityConfiguration|Testing & Compliance') }}</h5>
+      <p>
+        <gl-sprintf :message="devopsMessage">
+          <template #link="{ content }">
+            <gl-link ref="pipelinesLink" :href="devopsUrl" target="_blank">{{ content }}</gl-link>
+          </template>
+        </gl-sprintf>
+      </p>
     </header>
-    <section
-      ref="callout"
-      class="bs-callout bs-callout-info mb-3 m-md-1 text-secondary"
-      v-html="calloutContent"
-    ></section>
-    <section ref="featuresTable" class="mt-0">
-      <div
-        class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2 gl-text-gray-900"
-        role="row"
-      >
-        <div class="table-section section-80">
-          {{ s__('SecurityConfiguration|Secure features') }}
+
+    <gl-table ref="securityControlTable" :items="features" :fields="fields" stacked="md">
+      <template #cell(feature)="{ item }">
+        <div class="gl-text-gray-900">{{ item.name }}</div>
+        <div>
+          {{ item.description }}
+          <gl-link
+            target="_blank"
+            :href="item.link"
+            :aria-label="getFeatureDocumentationLinkLabel(item.name)"
+          >
+            {{ __('More information') }}
+          </gl-link>
         </div>
-        <div class="table-section section-20">{{ s__('SecurityConfiguration|Status') }}</div>
-      </div>
-      <div
-        v-for="feature in features"
-        ref="featureRow"
-        :key="feature.name"
-        class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
-      >
-        <div class="d-md-flex align-items-center">
-          <div class="table-section section-80 section-wrap pr-md-3">
-            <div role="rowheader" class="table-mobile-header">
-              {{ s__('SecurityConfiguration|Feature') }}
-            </div>
-            <div class="table-mobile-content">
-              <div class="d-flex align-items-center justify-content-end justify-content-md-start">
-                <div class="text-2 gl-text-gray-900">{{ feature.name }}</div>
-              </div>
-              <div class="text-secondary">
-                {{ feature.description }}
-                <gl-link
-                  target="_blank"
-                  :href="feature.link"
-                  :aria-label="getFeatureDocumentationLinkLabel(feature.name)"
-                  >{{ __('More information') }}</gl-link
-                >
-              </div>
-            </div>
-          </div>
-          <div class="table-section section-20 section-wrap pr-md-3">
-            <div role="rowheader" class="table-mobile-header">
-              {{ s__('SecurityConfiguration|Status') }}
-            </div>
-            <div ref="featureConfigStatus" class="table-mobile-content">
-              {{
-                feature.configured
-                  ? s__('SecurityConfiguration|Enabled')
-                  : s__('SecurityConfiguration|Not yet enabled')
-              }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+      </template>
+    </gl-table>
     <auto-fix-settings v-if="glFeatures.securityAutoFix" v-bind="autoFixSettingsProps" />
   </article>
 </template>
