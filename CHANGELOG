@@ -1,5 +1,15 @@
 # Changelog for gitlab-workhorse
 
+## v8.31.0
+
+### Added
+- Add a signed field on upload requests containing all the workhorse parameters
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/490
+
+### Other
+- Add automatic changelog generation
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/484
+
 v 8.30.1
 
 - Sign artifact multipart fields in Workhorse
