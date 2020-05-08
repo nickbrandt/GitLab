@@ -28,7 +28,7 @@ RSpec.shared_examples 'publish incidents' do
 
     it 'publishes details as JSON' do
       expect(result).to be_success
-      expect(result.payload[:json_object_key]).to eq(key)
+      expect(storage_client).to receive(:upload_object).with(key, content_json)
     end
   end
 

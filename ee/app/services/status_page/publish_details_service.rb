@@ -69,8 +69,8 @@ module StatusPage
         next if existing_image_keys.include? key
 
         uploader = UploadFinder.new(@project, $~[:secret], $~[:file]).execute
-        uploader.open do |f|
-          storage_client.multipart_upload(key, f)
+        uploader.open do |open_file|
+          storage_client.multipart_upload(key, open_file)
         end
       end
     end
