@@ -1,11 +1,12 @@
 <script>
-import { GlButton, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
+import { GlButton, GlTab, GlTabs } from '@gitlab/ui';
+import IterationsList from './iterations_list.vue';
 import GroupIterationQuery from '../queries/group_iteration.query.graphql';
 
 export default {
   components: {
+    IterationsList,
     GlButton,
-    GlLoadingIcon,
     GlTab,
     GlTabs,
   },
@@ -26,63 +27,34 @@ export default {
     },
   },
   apollo: {
-    upcomingIterations: {
+    iterations: {
       query: GroupIterationQuery,
       update: data => data.group.sprints.nodes,
       variables() {
         return {
           fullPath: this.groupPath,
-          state: 'upcoming',
-        };
-      },
-    },
-    inProgressIterations: {
-      query: GroupIterationQuery,
-      update: data => data.group.sprints.nodes,
-      variables() {
-        return {
-          fullPath: this.groupPath,
-          state: 'in_progress',
-        };
-      },
-    },
-    closedIterations: {
-      query: GroupIterationQuery,
-      update: data => data.group.sprints.nodes,
-      variables() {
-        return {
-          fullPath: this.groupPath,
-          state: 'closed',
+          state: this.state,
         };
       },
     },
   },
   data() {
     return {
-      upcomingIterations: [],
-      inProgressIterations: [],
-      closedIterations: [],
+      iterations: [],
       loading: 0,
       tabIndex: 0,
     };
   },
   computed: {
-    // TODO: these need to be combined in a single query
-    iterations() {
-      return [
-        ...this.inProgressIterations,
-        ...this.upcomingIterations,
-      ];
-    },
-    query() {
+    state() {
       switch (this.tabIndex) {
         default:
         case 0:
-          return 'open';
+          return 'opened';
         case 1:
           return 'closed';
         case 2:
-          return 'all';
+          return undefined;
       }
     }
   },
@@ -95,28 +67,28 @@ export default {
       <template #title>
         {{ s__('Open') }}
       </template>
-      <div v-if="loading">
-        <gl-loading-icon size="lg" />
-      </div>
-      <ul v-else-if="iterations.length > 0" class="content-list">
-        <li v-for="iteration in iterations" :key="iteration.id" class="milestone milestone-open">
-          <strong>{{ iteration.title }}</strong>
-          <p class="text-secondary">{{ iteration.startDate }} - {{ iteration.dueDate }}</p>
-        </li>
-      </ul>
-      <div v-else class="nothing-here-block">
-        {{ __('No iterations to show') }}
-      </div>
+      <iterations-list
+        :iterations="iterations"
+        :loading="loading"
+      />
     </gl-tab>
     <gl-tab>
        <template #title>
         {{ s__('Closed') }}
       </template>
+      <iterations-list
+        :iterations="iterations"
+        :loading="loading"
+      />
     </gl-tab>
     <gl-tab>
        <template #title>
         {{ s__('All') }}
       </template>
+      <iterations-list
+        :iterations="iterations"
+        :loading="loading"
+      />
     </gl-tab>
     <template #tabs-end>
       <li class="ml-auto d-flex align-items-center">
