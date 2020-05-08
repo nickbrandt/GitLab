@@ -18,7 +18,9 @@ describe Packages::Nuget::UpdatePackageFromMetadataService do
     end
 
     it 'updates package and package file' do
-      subject
+      expect { subject }
+        .to change { Packages::Dependency.count }.by(1)
+        .and change { Packages::DependencyLink.count }.by(1)
 
       expect(package.reload.name).to eq(package_name)
       expect(package.version).to eq(package_version)
@@ -31,9 +33,40 @@ describe Packages::Nuget::UpdatePackageFromMetadataService do
       let!(:existing_package) { create(:nuget_package, project: package.project, name: package_name, version: package_version) }
 
       it 'link existing package and updates package file' do
-        expect { subject }.to change { ::Packages::Package.count }.by(-1)
+        expect { subject }
+          .to change { ::Packages::Package.count }.by(-1)
+          .and change { Packages::Dependency.count }.by(0)
+          .and change { Packages::DependencyLink.count }.by(0)
+          .and change { Packages::NugetDependencyLinkMetadatum.count }.by(0)
         expect(package_file.reload.file_name).to eq(package_file_name)
         expect(package_file.package).to eq(existing_package)
+      end
+    end
+
+    context 'with nuspec file with dependencies' do
+      let(:nuspec_filepath) { 'nuget/with_dependencies.nuspec' }
+      let(:package_name) { 'Test.Package' }
+      let(:package_version) { '3.5.2' }
+      let(:package_file_name) { 'test.package.3.5.2.nupkg' }
+
+      before do
+        allow_any_instance_of(Packages::Nuget::MetadataExtractionService)
+          .to receive(:nuspec_file)
+          .and_return(fixture_file(nuspec_filepath, dir: 'ee'))
+      end
+
+      it 'updates package and package file' do
+        expect { subject }
+          .to change { ::Packages::Package.count }.by(1)
+          .and change { Packages::Dependency.count }.by(4)
+          .and change { Packages::DependencyLink.count }.by(4)
+          .and change { Packages::NugetDependencyLinkMetadatum.count }.by(2)
+
+        expect(package.reload.name).to eq(package_name)
+        expect(package.version).to eq(package_version)
+        expect(package_file.reload.file_name).to eq(package_file_name)
+        # hard reset needed to properly reload package_file.file
+        expect(Packages::PackageFile.find(package_file.id).file.size).not_to eq 0
       end
     end
 

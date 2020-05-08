@@ -14617,6 +14617,9 @@ msgstr ""
 msgid "Package type must be Maven"
 msgstr ""
 
+msgid "Package type must be NuGet"
+msgstr ""
+
 msgid "Package was removed"
 msgstr ""
 

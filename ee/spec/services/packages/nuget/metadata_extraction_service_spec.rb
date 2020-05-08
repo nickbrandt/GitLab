@@ -10,7 +10,38 @@ describe Packages::Nuget::MetadataExtractionService do
     subject { service.execute }
 
     context 'with valid package file id' do
-      it { is_expected.to eq(package_name: 'DummyProject.DummyPackage', package_version: '1.0.0') }
+      expected_metadata = {
+        package_name: 'DummyProject.DummyPackage',
+        package_version: '1.0.0',
+        package_dependencies: [
+          {
+            name: 'Newtonsoft.Json',
+            target_framework: '.NETCoreApp3.0',
+            version: '12.0.3'
+          }
+        ]
+      }
+
+      it { is_expected.to eq(expected_metadata) }
+    end
+
+    context 'with nuspec file with dependencies' do
+      let(:nuspec_filepath) { 'nuget/with_dependencies.nuspec' }
+
+      before do
+        allow(service).to receive(:nuspec_file).and_return(fixture_file(nuspec_filepath, dir: 'ee'))
+      end
+
+      it { is_expected.to have_key(:package_dependencies) }
+
+      it 'extracts dependencies' do
+        dependencies = subject[:package_dependencies]
+
+        expect(dependencies).to include(name: 'Moqi', version: '2.5.6')
+        expect(dependencies).to include(name: 'Castle.Core')
+        expect(dependencies).to include(name: 'Test.Dependency', version: '2.3.7', target_framework: '.NETStandard2.0')
+        expect(dependencies).to include(name: 'Newtonsoft.Json', version: '12.0.3', target_framework: '.NETStandard2.0')
+      end
     end
 
     context 'with invalid package file id' do

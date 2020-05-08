@@ -48,12 +48,13 @@ module Packages
       end
 
       def update_linked_package
-        return unless package_name && package_version
-
         @package_file.package.update!(
           name: package_name,
           version: package_version
         )
+
+        ::Packages::Nuget::CreateDependencyService.new(@package_file.package, package_dependencies)
+                                                  .execute
       end
 
       def existing_package_id
@@ -73,6 +74,10 @@ module Packages
 
       def package_version
         metadata[:package_version]
+      end
+
+      def package_dependencies
+        metadata.fetch(:package_dependencies, [])
       end
 
       def metadata

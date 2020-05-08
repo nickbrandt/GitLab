@@ -1,0 +1,5 @@
+---
+title: Add NuGet dependencies extraction to the GitLab Packages Repository
+merge_request: 30618
+author:
+type: added
