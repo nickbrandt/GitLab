@@ -78,7 +78,7 @@ describe('Approvals ModalRuleCreate', () => {
       factory();
 
       const form = wrapper.find(RuleForm);
-      form.vm.submit = jasmine.createSpy('submit');
+      form.vm.submit = jest.fn();
 
       const modal = wrapper.find(GlModalVuex);
       modal.vm.$emit('ok', new Event('ok'));
