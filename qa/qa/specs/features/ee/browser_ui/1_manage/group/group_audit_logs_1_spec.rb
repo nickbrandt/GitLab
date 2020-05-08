@@ -141,14 +141,20 @@ module QA
 
     def get_audit_event_count(group)
       response = get Runtime::API::Request.new(api_client, "/groups/#{group.id}/audit_events").url
+      puts response
       parse_body(response).length
     end
 
     def wait_for_audit_events(expected_events, group)
       new_event_count = @event_count + expected_events.length
 
+      puts "****************"
+      puts "New event count #{new_event_count}"
+
       Support::Retrier.retry_until(max_duration: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME, sleep_interval: 1) do
-        get_audit_event_count(group) == new_event_count
+        current_event_count = get_audit_event_count(group)
+        puts "Current event count #{current_event_count}"
+        current_event_count == new_event_count
       end
     end
   end
