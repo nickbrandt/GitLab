@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import PreviewDropdown from 'ee/batch_comments/components/preview_dropdown.vue';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { createStore } from 'ee/mr_notes/stores';
 import '~/behaviors/markdown/render_gfm';
 import { createDraft } from '../mock_data';
@@ -29,16 +29,16 @@ describe('Batch comments publish dropdown component', () => {
   it('toggles dropdown when clicking button', done => {
     createComponent();
 
-    spyOn(vm.$store, 'dispatch').and.callThrough();
+    jest.spyOn(vm.$store, 'dispatch');
 
     vm.$el.querySelector('.review-preview-dropdown-toggle').click();
 
     expect(vm.$store.dispatch).toHaveBeenCalledWith(
       'batchComments/toggleReviewDropdown',
-      jasmine.anything(),
+      expect.anything(),
     );
 
-    setTimeout(() => {
+    setImmediate(() => {
       expect(vm.$el.classList).toContain('show');
 
       done();
@@ -50,7 +50,7 @@ describe('Batch comments publish dropdown component', () => {
 
     vm.$store.state.batchComments.showPreviewDropdown = true;
 
-    spyOn(vm.$store, 'dispatch').and.stub();
+    jest.spyOn(vm.$store, 'dispatch').mockImplementation();
 
     document.body.click();
 

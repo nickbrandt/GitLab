@@ -22,7 +22,7 @@ describe('Batch comments draft note component', () => {
       localVue,
     });
 
-    spyOn(wrapper.vm.$store, 'dispatch').and.stub();
+    jest.spyOn(wrapper.vm.$store, 'dispatch').mockImplementation();
   });
 
   afterEach(() => {
@@ -91,7 +91,7 @@ describe('Batch comments draft note component', () => {
 
   describe('deleteDraft', () => {
     it('dispatches deleteDraft', () => {
-      spyOn(window, 'confirm').and.callFake(() => true);
+      jest.spyOn(window, 'confirm').mockImplementation(() => true);
 
       const note = wrapper.find(NoteableNote);
 
