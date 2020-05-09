@@ -18,6 +18,8 @@ RSpec.shared_examples 'a blob replicator' do
     stub_current_geo_node(primary)
   end
 
+  it_behaves_like 'a replicator'
+
   describe '#handle_after_create_commit' do
     it 'creates a Geo::Event' do
       expect do
@@ -70,13 +72,26 @@ RSpec.shared_examples 'a blob replicator' do
   end
 
   describe '#consume_created_event' do
-    it 'invokes Geo::BlobDownloadService' do
-      service = double(:service)
+    context "when the blob's project is not excluded by selective sync" do
+      it 'invokes Geo::BlobDownloadService' do
+        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(false)
+        service = double(:service)
 
-      expect(service).to receive(:execute)
-      expect(::Geo::BlobDownloadService).to receive(:new).with(replicator: replicator).and_return(service)
+        expect(service).to receive(:execute)
+        expect(::Geo::BlobDownloadService).to receive(:new).with(replicator: replicator).and_return(service)
 
-      replicator.consume_event_created
+        replicator.consume_event_created
+      end
+    end
+
+    context "when the blob's project is excluded by selective sync" do
+      it 'does not invoke Geo::BlobDownloadService' do
+        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(true)
+
+        expect(::Geo::BlobDownloadService).not_to receive(:new)
+
+        replicator.consume_event_created
+      end
     end
   end
 
