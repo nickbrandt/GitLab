@@ -24,4 +24,4 @@ When you have the **Webhook URL** for your Webex Teams conversation webhook, you
 
 Your Webex Teams space will now start receiving GitLab event notifications as configured.
 
-![Webex Teams configuration](img/unify_circuit_configuration.png)
+![Webex Teams configuration](img/webex_teams_configuration.png)
