@@ -18,7 +18,7 @@ When you have the **Webhook URL** for your Webex Teams conversation webhook, you
 1. Navigate to the [Integrations page](overview.md#accessing-integrations) in your project's settings, i.e. **Project > Settings > Integrations**.
 1. Select the **Webex Teams** integration to configure it.
 1. Ensure that the **Active** checkbox is enabled.
-1. Check the checkboxes corresponding to the GitLab events you want to receive in Unify Circuit.
+1. Check the checkboxes corresponding to the GitLab events you want to receive in Webex Teams.
 1. Paste the **Webhook URL** that you copied from the Webex Teams Incoming Webhook configuration step.
 1. Configure the remaining options and click `Test settings and save changes`.
 
