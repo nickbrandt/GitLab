@@ -9,8 +9,9 @@ import UsersCache from '~/lib/utils/users_cache';
 import ResolutionAlert from './resolution_alert.vue';
 import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
 import StatusDescription from './status_description.vue';
-import { VULNERABILITY_STATE_OBJECTS, HEADER_ACTION_BUTTONS } from '../constants';
+import { VULNERABILITY_STATE_OBJECTS, FEEDBACK_TYPES, HEADER_ACTION_BUTTONS } from '../constants';
 import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
+import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 
 export default {
   name: 'VulnerabilityHeader',
@@ -19,10 +20,15 @@ export default {
     GlLoadingIcon,
     ResolutionAlert,
     VulnerabilityStateDropdown,
+    SplitButton,
     StatusDescription,
   },
 
   props: {
+    createMrUrl: {
+      type: String,
+      required: true,
+    },
     initialVulnerability: {
       type: Object,
       required: true,
@@ -59,6 +65,10 @@ export default {
     actionButtons() {
       const buttons = [];
 
+      if (this.canCreateMergeRequest) {
+        buttons.push(HEADER_ACTION_BUTTONS.mergeRequestCreation);
+      }
+
       if (!this.hasIssue) {
         buttons.push(HEADER_ACTION_BUTTONS.issueCreation);
       }
@@ -67,6 +77,17 @@ export default {
     },
     hasIssue() {
       return Boolean(this.finding.issue_feedback?.issue_iid);
+    },
+    hasRemediation() {
+      const { remediations } = this.finding;
+      return Boolean(remediations && remediations[0]?.diff?.length > 0);
+    },
+    canCreateMergeRequest() {
+      return (
+        !this.finding.merge_request_feedback?.merge_request_path &&
+        Boolean(this.createMrUrl) &&
+        this.hasRemediation
+      );
     },
     statusBoxStyle() {
       // Get the badge variant based on the vulnerability state, defaulting to 'expired'.
@@ -132,7 +153,7 @@ export default {
       axios
         .post(this.createIssueUrl, {
           vulnerability_feedback: {
-            feedback_type: 'issue',
+            feedback_type: FEEDBACK_TYPES.ISSUE,
             category: this.vulnerability.report_type,
             project_fingerprint: this.projectFingerprint,
             vulnerability_data: {
@@ -150,6 +171,32 @@ export default {
           this.isProcessingAction = false;
           createFlash(
             s__('VulnerabilityManagement|Something went wrong, could not create an issue.'),
+          );
+        });
+    },
+    createMergeRequest() {
+      this.isProcessingAction = true;
+      axios
+        .post(this.createMrUrl, {
+          vulnerability_feedback: {
+            feedback_type: FEEDBACK_TYPES.MERGE_REQUEST,
+            category: this.vulnerability.report_type,
+            project_fingerprint: this.projectFingerprint,
+            vulnerability_data: {
+              ...this.vulnerability,
+              ...this.finding,
+              category: this.vulnerability.report_type,
+              target_branch: this.pipeline.sourceBranch,
+            },
+          },
+        })
+        .then(({ data: { merge_request_path } }) => {
+          redirectTo(merge_request_path);
+        })
+        .catch(() => {
+          this.isProcessingAction = false;
+          createFlash(
+            s__('ciReport|There was an error creating the merge request. Please try again.'),
           );
         });
     },
@@ -194,8 +241,16 @@ export default {
           :initial-state="vulnerability.state"
           @change="changeVulnerabilityState"
         />
+        <split-button
+          v-if="actionButtons.length > 1"
+          :buttons="actionButtons"
+          :disabled="isProcessingAction"
+          class="js-split-button"
+          @createMergeRequest="createMergeRequest"
+          @createIssue="createIssue"
+        />
         <gl-deprecated-button
-          v-if="actionButtons.length > 0"
+          v-else-if="actionButtons.length > 0"
           class="ml-2"
           variant="success"
           category="secondary"
