@@ -10178,9 +10178,6 @@ msgstr ""
 msgid "Forks"
 msgstr ""
 
-msgid "Format"
-msgstr ""
-
 msgid "Format: %{dateFormat}"
 msgstr ""
 
@@ -25385,6 +25382,9 @@ msgid "View log"
 msgstr ""
 
 msgid "View open merge request"
+msgstr ""
+
+msgid "View page @ "
 msgstr ""
 
 msgid "View performance dashboard."
