@@ -23697,9 +23697,6 @@ msgstr ""
 msgid "VulnerabilityManagement|Confirmed %{timeago} by %{user}"
 msgstr ""
 
-msgid "VulnerabilityManagement|Create issue"
-msgstr ""
-
 msgid "VulnerabilityManagement|Detected %{timeago} in pipeline %{pipelineLink}"
 msgstr ""
 

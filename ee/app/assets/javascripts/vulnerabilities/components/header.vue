@@ -48,7 +48,7 @@ export default {
   data() {
     return {
       isLoadingVulnerability: false,
-      isCreatingIssue: false,
+      isProcessing: false,
       isLoadingUser: false,
       vulnerability: this.initialVulnerability,
       user: undefined,
@@ -56,6 +56,20 @@ export default {
   },
 
   computed: {
+    actionButtons() {
+      const buttons = [];
+      const issueButton = {
+        name: s__('ciReport|Create issue'),
+        isLoading: this.isProcessing,
+        action: 'createIssue',
+      };
+
+      if (!this.hasIssue) {
+        buttons.push(issueButton);
+      }
+
+      return buttons;
+    },
     hasIssue() {
       return Boolean(this.finding.issue_feedback?.issue_iid);
     },
@@ -95,6 +109,9 @@ export default {
   },
 
   methods: {
+    triggerClick(action) {
+      this[action]();
+    },
     changeVulnerabilityState(newState) {
       this.isLoadingVulnerability = true;
 
@@ -115,7 +132,7 @@ export default {
         });
     },
     createIssue() {
-      this.isCreatingIssue = true;
+      this.isProcessing = true;
       axios
         .post(this.createIssueUrl, {
           vulnerability_feedback: {
@@ -134,7 +151,7 @@ export default {
           redirectTo(issue_url);
         })
         .catch(() => {
-          this.isCreatingIssue = false;
+          this.isProcessing = false;
           createFlash(
             s__('VulnerabilityManagement|Something went wrong, could not create an issue.'),
           );
@@ -182,15 +199,14 @@ export default {
           @change="changeVulnerabilityState"
         />
         <gl-deprecated-button
-          v-if="!hasIssue"
-          ref="create-issue-btn"
+          v-if="actionButtons.length > 0"
           class="ml-2"
           variant="success"
           category="secondary"
-          :loading="isCreatingIssue"
-          @click="createIssue"
+          :loading="isProcessing"
+          @click="triggerClick(actionButtons[0].action)"
         >
-          {{ s__('VulnerabilityManagement|Create issue') }}
+          {{ actionButtons[0].name }}
         </gl-deprecated-button>
       </div>
     </div>
