@@ -1,0 +1,73 @@
+{
+  "details": {
+    "stages": [
+      {
+        "name": "test",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "jest",
+            "size": 2,
+            "jobs": [
+              { "name": "jest 1/2", "needs": ["frontend-fixtures"] },
+              { "name": "jest 2/2" }
+            ]
+          },
+          {
+            "name": "rspec",
+            "size": 1,
+            "jobs": [
+              { "name": "rspec" }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "prepare",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "setup-test-env pg11",
+            "size": 1,
+            "jobs": [
+              { "name": "setup-test-env pg11" }
+            ]
+          },
+          {
+            "name": "compile-assets pull-cache",
+            "size": 1,
+            "jobs": [
+              { "name": "compile-assets pull-cache" }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "post-test",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "jest-coverage",
+            "size": 1,
+            "jobs": [
+              { "name": "jest-coverage", "needs": ["jest"] }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "fixtures",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "frontend-fixtures",
+            "size": 1,
+            "jobs": [
+              { "name": "frontend-fixtures", "needs": ["setup-test-env pg11", "compile-assets pull-cache"] }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

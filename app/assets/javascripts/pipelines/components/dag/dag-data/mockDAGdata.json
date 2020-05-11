@@ -1,0 +1,66 @@
+{
+  "details": {
+    "stages": [
+      {
+        "name": "build",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "dag-job 1"
+          }
+        ]
+      },
+      {
+        "name": "test",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "dag-job 2",
+            "needs": ["dag-job 1"]
+          },
+          {
+            "name": "dag-job 3",
+            "needs": ["dag-job 1"]
+          },
+          {
+            "name": "dag-job 11"
+          }
+        ]
+      },
+      {
+        "name": "deploy",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "dag-job 4",
+            "needs": ["dag-job 2", "dag-job 1"]
+          },
+          {
+            "name": "dag-job 5",
+            "needs": ["dag-job 2", "dag-job 3"]
+          },
+          {
+            "name": "dag-job 6",
+            "needs": ["dag-job 3", "dag-job 2", "dag-job 1", "dag-job 11"]
+          },
+          {
+            "name": "dag-job 7",
+            "needs": ["dag-job 3", "dag-job 2", "dag-job 1"]
+          },
+          {
+            "name": "dag-job 8",
+            "needs": ["dag-job 3", "dag-job 2", "dag-job 1"]
+          },
+          {
+            "name": "dag-job 9",
+            "needs": ["dag-job 1"]
+          },
+          {
+            "name": "dag-job 10",
+            "needs": ["dag-job 3", "dag-job 2", "dag-job 1"]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,349 @@
+{
+  "details": {
+    "stages": [
+      {
+        "name": "prepare",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "build-qa-image"
+          },
+          {
+            "name": "setup-test-env pg10"
+          },
+          {
+            "name": "retrieve-tests-metadata"
+          },
+          {
+            "name": "setup-test-env pg11"
+          },
+          {
+            "name": "compile-assets pull-cache"
+          },
+          {
+            "name": "gitlab:assets:compile pull-cache"
+          },
+          {
+            "name": "compile-assets pull-cache as-if-foss"
+          }
+        ]
+      },
+      {
+        "name": "fixtures",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "frontend-fixtures",
+            "needs": ["setup-test-env pg11", "compile-assets pull-cache"]
+          },
+          {
+            "name": "frontend-fixtures-as-if-foss",
+            "needs": ["setup-test-env pg11", "compile-assets pull-cache"]
+          }
+        ]
+      },
+      {
+        "name": "test",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "run-dev-fixtures",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "graphql-reference-verify",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "karma",
+            "needs": ["frontend-fixtures"]
+          },
+          {
+            "name": "karma-as-if-foss",
+            "needs": ["frontend-fixtures-as-if-foss"]
+          },
+          {
+            "name": "jest",
+            "needs": ["frontend-fixtures"]
+          },
+          {
+            "name": "jest-as-if-foss",
+            "needs": ["frontend-fixtures-as-if-foss"]
+          },
+          {
+            "name": "coverage-frontend",
+            "needs": ["jest"]
+          },
+          {
+            "name": "webpack-dev-server",
+            "needs": ["setup-test-env pg11", "compile-assets pull-cache"]
+          },
+          {
+            "name": "memory-static",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "memory-on-boot",
+            "needs": ["setup-test-env pg11", "compile-assets pull-cache"]
+          },
+          {
+            "name": "qa-internal",
+            "needs": []
+          },
+          {
+            "name": "qa:internal-as-if-foss",
+            "needs": []
+          },
+          {
+            "name": "qa:selectors",
+            "needs": []
+          },
+          {
+            "name": "qa:selectors-as-if-foss",
+            "needs": []
+          },
+          {
+            "name": "rspec migration pg11",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec unit pg11",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec integration pg11",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec system pg11",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec fast_spec_helper",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "db:migrate:reset",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "db:check-schema",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "db:migrate-from-v11.11.0",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "db:rollback",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "gitlab:setup",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "rspec migration pg10",
+            "needs": [
+              "setup-test-env pg10",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec unit pg10",
+            "needs": [
+              "setup-test-env pg10",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec integration pg10",
+            "needs": [
+              "setup-test-env pg10",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec system pg10",
+            "needs": [
+              "setup-test-env pg10",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec-ee migration pg10",
+            "needs": [
+              "setup-test-env pg10",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec-ee unit pg10",
+            "needs": [
+              "setup-test-env pg10",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec-ee integration pg10",
+            "needs": [
+              "setup-test-env pg10",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "spec-ee system pg10",
+            "needs": [
+              "setup-test-env pg10",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache"
+            ]
+          },
+          {
+            "name": "rspec migration pg11-as-if-foss",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache as-if-foss"
+            ]
+          },
+          {
+            "name": "rspec integration pg11-as-if-foss",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache as-if-foss"
+            ]
+          },
+          {
+            "name": "rspec system pg11-as-if-foss",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache as-if-foss"
+            ]
+          },
+          {
+            "name": "rspec-ee migration pg11",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache as-if-foss"
+            ]
+          },
+          {
+            "name": "rspec-ee unit pg11",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache as-if-foss"
+            ]
+          },
+          {
+            "name": "rspec-ee integration pg11",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache as-if-foss"
+            ]
+          },
+          {
+            "name": "rspec-ee system pg11",
+            "needs": [
+              "setup-test-env pg11",
+              "retrieve-tests-metadata",
+              "compile-assets pull-cache as-if-foss"
+            ]
+          },
+          {
+            "name": "code_quality",
+            "needs": []
+          },
+          {
+            "name": "brakeman-sast",
+            "needs": []
+          },
+          {
+            "name": "eslint-sast",
+            "needs": []
+          },
+          {
+            "name": "nodejs-scan-sast",
+            "needs": []
+          },
+          {
+            "name": "secrets-sast",
+            "needs": []
+          },
+          {
+            "name": "dependency_scanning",
+            "needs": []
+          },
+          {
+            "name": "danger-review",
+            "needs": []
+          },
+          {
+            "name": "cache gems",
+            "needs": ["setup-test-env pg11"]
+          },
+          {
+            "name": "minimal-job",
+            "needs": []
+          },
+          {
+            "name": "lint-ci-gitlab",
+            "needs": []
+          }
+        ]
+      },
+      {
+        "name": "review-prepare",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "review-build-cng",
+            "needs": ["gitlab:assets:compile pull-cache"]
+          }
+        ]
+      },
+      {
+        "name": "qa",
+        "title": "build: passed",
+        "groups": [
+          {
+            "name": "package-and-qa",
+            "needs": ["build-qa-image", "gitlab:assets:compile pull-cache"]
+          }
+        ]
+      }
+    ]
+  }
+}
