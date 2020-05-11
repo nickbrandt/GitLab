@@ -11274,6 +11274,9 @@ msgstr ""
 msgid "ImageViewerDimensions|W"
 msgstr ""
 
+msgid "Impersonation Tokens"
+msgstr ""
+
 msgid "Impersonation has been disabled"
 msgstr ""
 
