@@ -199,7 +199,6 @@
     "postcss": "^7.0.14",
     "prettier": "1.18.2",
     "readdir-enhanced": "^2.2.4",
-    "regenerator-runtime": "^0.13.5",
     "stylelint": "^10.1.0",
     "stylelint-config-recommended": "^2.2.0",
     "stylelint-scss": "^3.9.2",
