@@ -8519,9 +8519,6 @@ msgstr ""
 msgid "Error rendering markdown preview"
 msgstr ""
 
-msgid "Error rendering query"
-msgstr ""
-
 msgid "Error saving label update."
 msgstr ""
 
@@ -12996,9 +12993,6 @@ msgid "Members with pending access to %{strong_start}%{group_name}%{strong_end}"
 msgstr ""
 
 msgid "Memory Usage"
-msgstr ""
-
-msgid "Memory limit exceeded while rendering template"
 msgstr ""
 
 msgid "Merge"
