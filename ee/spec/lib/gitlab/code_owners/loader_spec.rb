@@ -128,12 +128,36 @@ describe Gitlab::CodeOwners::Loader do
   end
 
   describe '#members' do
-    before do
-      stub_feature_flags(sectional_codeowners: false)
+    shared_examples_for "returns users for passed path" do
+      it "returns users mentioned for the passed path do" do
+        expect(loader.members).to contain_exactly(owner_1, email_owner, documentation_owner)
+      end
     end
 
-    it 'returns users mentioned for the passed path' do
-      expect(loader.members).to contain_exactly(owner_1, email_owner, documentation_owner)
+    context "when sectional_codeowners is disabled" do
+      before do
+        stub_feature_flags(sectional_codeowners: false)
+      end
+
+      it_behaves_like "returns users for passed path"
+    end
+
+    context "when sectional_codeowners is enabled" do
+      let(:codeowner_content) do
+        <<~CODEOWNERS
+        [Documentation]
+        docs/* @documentation-owner
+        docs/CODEOWNERS @owner-1 owner2@gitlab.org @owner-3 @documentation-owner
+        [Testing]
+        spec/* @test-owner @test-group @test-group/nested-group
+        CODEOWNERS
+      end
+
+      before do
+        stub_feature_flags(sectional_codeowners: true)
+      end
+
+      it_behaves_like "returns users for passed path"
     end
   end
 
