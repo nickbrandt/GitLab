@@ -2,6 +2,8 @@ SET search_path=public;
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
+CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public;
+
 CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 CREATE TABLE public.abuse_reports (
@@ -450,8 +452,8 @@ CREATE TABLE public.application_settings (
     namespace_storage_size_limit bigint DEFAULT 0 NOT NULL,
     seat_link_enabled boolean DEFAULT true NOT NULL,
     container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
-    issues_create_limit integer DEFAULT 300 NOT NULL,
     push_rule_id bigint,
+    issues_create_limit integer DEFAULT 300 NOT NULL,
     group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL,
     container_registry_vendor text DEFAULT ''::text NOT NULL,
     container_registry_version text DEFAULT ''::text NOT NULL,
@@ -1108,11 +1110,14 @@ ALTER SEQUENCE public.ci_daily_report_results_id_seq OWNED BY public.ci_daily_re
 CREATE TABLE public.ci_freeze_periods (
     id bigint NOT NULL,
     project_id bigint NOT NULL,
-    freeze_start character varying(998) NOT NULL,
-    freeze_end character varying(998) NOT NULL,
-    cron_timezone character varying(255) NOT NULL,
+    freeze_start text NOT NULL,
+    freeze_end text NOT NULL,
+    cron_timezone text NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT check_4a7939e04e CHECK ((char_length(freeze_end) <= 998)),
+    CONSTRAINT check_a92607bd2b CHECK ((char_length(freeze_start) <= 998)),
+    CONSTRAINT check_b14055adc3 CHECK ((char_length(cron_timezone) <= 255))
 );
 
 CREATE SEQUENCE public.ci_freeze_periods_id_seq
@@ -3163,6 +3168,21 @@ CREATE SEQUENCE public.group_deploy_tokens_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.group_deploy_tokens_id_seq OWNED BY public.group_deploy_tokens.id;
+
+CREATE TABLE public.group_features (
+    id bigint NOT NULL,
+    group_id bigint NOT NULL,
+    wiki_access_level integer NOT NULL
+);
+
+CREATE SEQUENCE public.group_features_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.group_features_id_seq OWNED BY public.group_features.id;
 
 CREATE TABLE public.group_group_links (
     id bigint NOT NULL,
@@ -5315,8 +5335,7 @@ CREATE TABLE public.project_settings (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     push_rule_id bigint,
-    show_default_award_emojis boolean DEFAULT true,
-    CONSTRAINT check_bde223416c CHECK ((show_default_award_emojis IS NOT NULL))
+    show_default_award_emojis boolean DEFAULT true NOT NULL
 );
 
 CREATE TABLE public.project_statistics (
@@ -7625,6 +7644,8 @@ ALTER TABLE ONLY public.group_custom_attributes ALTER COLUMN id SET DEFAULT next
 
 ALTER TABLE ONLY public.group_deploy_tokens ALTER COLUMN id SET DEFAULT nextval('public.group_deploy_tokens_id_seq'::regclass);
 
+ALTER TABLE ONLY public.group_features ALTER COLUMN id SET DEFAULT nextval('public.group_features_id_seq'::regclass);
+
 ALTER TABLE ONLY public.group_group_links ALTER COLUMN id SET DEFAULT nextval('public.group_group_links_id_seq'::regclass);
 
 ALTER TABLE ONLY public.group_import_states ALTER COLUMN group_id SET DEFAULT nextval('public.group_import_states_group_id_seq'::regclass);
@@ -8423,6 +8444,9 @@ ALTER TABLE ONLY public.group_deletion_schedules
 ALTER TABLE ONLY public.group_deploy_tokens
     ADD CONSTRAINT group_deploy_tokens_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.group_features
+    ADD CONSTRAINT group_features_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.group_group_links
     ADD CONSTRAINT group_group_links_pkey PRIMARY KEY (id);
 
@@ -8470,6 +8494,12 @@ ALTER TABLE ONLY public.issue_user_mentions
 
 ALTER TABLE ONLY public.issues
     ADD CONSTRAINT issues_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.sprints
+    ADD CONSTRAINT iteration_start_and_due_daterange_group_id_constraint EXCLUDE USING gist (group_id WITH =, daterange(start_date, due_date, '[]'::text) WITH &&) WHERE ((group_id IS NOT NULL));
+
+ALTER TABLE ONLY public.sprints
+    ADD CONSTRAINT iteration_start_and_due_daterange_project_id_constraint EXCLUDE USING gist (project_id WITH =, daterange(start_date, due_date, '[]'::text) WITH &&) WHERE ((project_id IS NOT NULL));
 
 ALTER TABLE ONLY public.jira_connect_installations
     ADD CONSTRAINT jira_connect_installations_pkey PRIMARY KEY (id);
@@ -9043,8 +9073,6 @@ CREATE INDEX commit_id_and_note_id_index ON public.commit_user_mentions USING bt
 CREATE UNIQUE INDEX design_management_designs_versions_uniqueness ON public.design_management_designs_versions USING btree (design_id, version_id);
 
 CREATE INDEX design_user_mentions_on_design_id_and_note_id_index ON public.design_user_mentions USING btree (design_id, note_id);
-
-CREATE INDEX dev_index_route_on_path_trigram ON public.routes USING gin (path public.gin_trgm_ops);
 
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_and_note_id_index ON public.epic_user_mentions USING btree (epic_id, note_id);
 
@@ -9855,6 +9883,8 @@ CREATE INDEX index_group_deletion_schedules_on_user_id ON public.group_deletion_
 CREATE INDEX index_group_deploy_tokens_on_deploy_token_id ON public.group_deploy_tokens USING btree (deploy_token_id);
 
 CREATE UNIQUE INDEX index_group_deploy_tokens_on_group_and_deploy_token_ids ON public.group_deploy_tokens USING btree (group_id, deploy_token_id);
+
+CREATE UNIQUE INDEX index_group_features_on_group_id ON public.group_features USING btree (group_id);
 
 CREATE UNIQUE INDEX index_group_group_links_on_shared_group_and_shared_with_group ON public.group_group_links USING btree (shared_group_id, shared_with_group_id);
 
@@ -11914,6 +11944,9 @@ ALTER TABLE ONLY public.requirements
 
 ALTER TABLE ONLY public.metrics_dashboard_annotations
     ADD CONSTRAINT fk_rails_345ab51043 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.group_features
+    ADD CONSTRAINT fk_rails_356514082b FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.wiki_page_slugs
     ADD CONSTRAINT fk_rails_358b46be14 FOREIGN KEY (wiki_page_meta_id) REFERENCES public.wiki_page_meta(id) ON DELETE CASCADE;
@@ -13991,6 +14024,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200508091106
 20200508140959
 20200508203901
+20200511070112
 20200511080113
 20200511083541
 20200511092246
@@ -14023,6 +14057,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200514000009
 20200514000132
 20200514000340
+20200515152649
+20200515153633
 20200515155620
 20200518091745
 20200518133123
