@@ -48,8 +48,6 @@ function createComponent({
   shallow = true,
   withStageSelected = false,
   scatterplotEnabled = true,
-  tasksByTypeChartEnabled = true,
-  customizableCycleAnalyticsEnabled = false,
   props = {},
 } = {}) {
   const func = shallow ? shallowMount : mount;
@@ -68,8 +66,6 @@ function createComponent({
     provide: {
       glFeatures: {
         cycleAnalyticsScatterplotEnabled: scatterplotEnabled,
-        tasksByTypeChart: tasksByTypeChartEnabled,
-        customizableCycleAnalytics: customizableCycleAnalyticsEnabled,
       },
     },
     ...opts,
@@ -187,6 +183,10 @@ describe('Cycle Analytics component', () => {
         displaysDurationChart(false);
       });
 
+      it('does not display the add stage button', () => {
+        expect(wrapper.find('.js-add-stage-button').exists()).toBe(false);
+      });
+
       describe('hideGroupDropDown = true', () => {
         beforeEach(() => {
           mock = new MockAdapter(axios);
@@ -208,7 +208,6 @@ describe('Cycle Analytics component', () => {
         beforeEach(() => {
           wrapper = createComponent({
             withStageSelected: true,
-            tasksByTypeChartEnabled: false,
           });
         });
 
@@ -240,29 +239,22 @@ describe('Cycle Analytics component', () => {
           displaysStageTable(true);
         });
 
-        it('does not display the add stage button', () => {
-          expect(wrapper.find('.js-add-stage-button').exists()).toBe(false);
-        });
-
-        describe('with no durationData', () => {
-          it('displays the duration chart', () => {
-            displaysDurationChart(true);
+        it('displays the add stage button', () => {
+          wrapper = createComponent({ shallow: false, withStageSelected: true });
+          return wrapper.vm.$nextTick().then(() => {
+            expect(wrapper.find('.js-add-stage-button').exists()).toBe(true);
           });
         });
 
-        describe('with durationData', () => {
-          beforeEach(() => {
-            mock = new MockAdapter(axios);
-            wrapper.vm.$store.dispatch('setDateRange', {
-              skipFetch: true,
-              startDate: mockData.startDate,
-              endDate: mockData.endDate,
-            });
+        it('displays the tasks by type chart', () => {
+          wrapper = createComponent({ shallow: false, withStageSelected: true });
+          return wrapper.vm.$nextTick().then(() => {
+            expect(wrapper.find('.js-tasks-by-type-chart').exists()).toBe(true);
           });
+        });
 
-          it('displays the duration chart', () => {
-            expect(wrapper.find(DurationChart).exists()).toBe(true);
-          });
+        it('displays the duration chart', () => {
+          displaysDurationChart(true);
         });
 
         describe('StageTable', () => {
@@ -278,7 +270,6 @@ describe('Cycle Analytics component', () => {
               },
               shallow: false,
               withStageSelected: true,
-              tasksByTypeChartEnabled: false,
             });
           });
 
@@ -346,67 +337,6 @@ describe('Cycle Analytics component', () => {
 
         it('does not display the duration chart', () => {
           displaysDurationChart(false);
-        });
-      });
-
-      describe('with customizableCycleAnalytics=true', () => {
-        beforeEach(() => {
-          mock = new MockAdapter(axios);
-          wrapper = createComponent({
-            shallow: false,
-            withStageSelected: true,
-            customizableCycleAnalyticsEnabled: true,
-            tasksByTypeChartEnabled: false,
-          });
-        });
-
-        afterEach(() => {
-          wrapper.destroy();
-          mock.restore();
-        });
-
-        it('will display the add stage button', () => {
-          expect(wrapper.find('.js-add-stage-button').exists()).toBe(true);
-        });
-      });
-
-      describe('with tasksByTypeChart=true', () => {
-        beforeEach(() => {
-          wrapper = createComponent({
-            shallow: false,
-            withStageSelected: true,
-            customizableCycleAnalyticsEnabled: false,
-            tasksByTypeChartEnabled: true,
-          });
-        });
-
-        afterEach(() => {
-          wrapper.destroy();
-        });
-
-        it('displays the tasks by type chart', () => {
-          expect(wrapper.find('.js-tasks-by-type-chart').exists()).toBe(true);
-        });
-      });
-
-      describe('with tasksByTypeChart=false', () => {
-        beforeEach(() => {
-          mock = new MockAdapter(axios);
-          wrapper = createComponent({
-            shallow: false,
-            withStageSelected: true,
-            customizableCycleAnalyticsEnabled: false,
-            tasksByTypeChartEnabled: false,
-          });
-        });
-
-        afterEach(() => {
-          wrapper.destroy();
-          mock.restore();
-        });
-
-        it('does not render the tasks by type chart', () => {
-          expect(wrapper.find('.js-tasks-by-type-chart').exists()).toBe(false);
         });
       });
     });
@@ -556,7 +486,6 @@ describe('Cycle Analytics component', () => {
       wrapper = createComponent({
         shallow: false,
         scatterplotEnabled: false,
-        tasksByTypeChartEnabled: false,
         stubs: {
           ...defaultStubs,
         },
@@ -584,7 +513,6 @@ describe('Cycle Analytics component', () => {
         wrapper = createComponent({
           shallow: false,
           scatterplotEnabled: false,
-          tasksByTypeChartEnabled: false,
           stubs: {
             ...defaultStubs,
           },

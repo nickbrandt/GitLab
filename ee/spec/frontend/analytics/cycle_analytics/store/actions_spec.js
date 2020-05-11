@@ -36,7 +36,6 @@ describe('Cycle analytics actions', () => {
       stages: [],
       featureFlags: {
         hasDurationChart: true,
-        hasTasksByTypeChart: true,
         hasDurationChartMedian: true,
       },
     };

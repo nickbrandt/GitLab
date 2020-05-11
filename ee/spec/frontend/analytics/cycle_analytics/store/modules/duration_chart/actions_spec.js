@@ -28,7 +28,6 @@ const rootState = {
   selectedGroup,
   featureFlags: {
     hasDurationChart: true,
-    hasTasksByTypeChart: true,
     hasDurationChartMedian: true,
   },
 };
