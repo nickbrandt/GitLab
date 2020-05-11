@@ -356,6 +356,44 @@ export const receiveAnnotationsFailure = ({ commit }) => commit(types.RECEIVE_AN
 
 // Dashboard manipulation
 
+export const toggleStarredValue = ({ dispatch, state, getters }) => {
+  const { selectedDashboard } = getters;
+
+  if (state.isUpdatingStarredValue) {
+    // Prevent repeating requests for the same change
+    return;
+  }
+  if (!selectedDashboard) {
+    return;
+  }
+
+  const method = selectedDashboard.starred ? 'DELETE' : 'POST';
+  const url = selectedDashboard.user_starred_path;
+  const newStarredValue = !selectedDashboard.starred;
+
+  dispatch('requestDashboardStarring');
+
+  axios({
+    url,
+    method,
+  })
+    .then(() => {
+      dispatch('recieveDashboardStarringSuccess', newStarredValue);
+    })
+    .catch(() => {
+      dispatch('recieveDashboardStarringFailure');
+    });
+};
+export const requestDashboardStarring = ({ commit }) => {
+  commit(types.REQUEST_DASHBOARD_STARRING);
+};
+export const recieveDashboardStarringSuccess = ({ commit }, newStarredValue) => {
+  commit(types.RECEIVE_DASHBOARD_STARRING_SUCCESS, newStarredValue);
+};
+export const recieveDashboardStarringFailure = ({ commit }) => {
+  commit(types.RECEIVE_DASHBOARD_STARRING_FAILURE);
+};
+
 /**
  * Set a new array of metrics to a panel group
  * @param {*} data An object containing

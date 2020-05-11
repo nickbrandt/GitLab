@@ -1,5 +1,7 @@
+import Vue from 'vue';
 import { pick } from 'lodash';
 import * as types from './mutation_types';
+import { selectedDashboard } from './getters';
 import { mapToDashboardViewModel, normalizeQueryResult } from './utils';
 import { BACKOFF_TIMEOUT } from '../../lib/utils/common_utils';
 import { endpointKeys, initialStateKeys, metricStates } from '../constants';
@@ -69,6 +71,20 @@ export default {
   [types.RECEIVE_METRICS_DASHBOARD_FAILURE](state, error) {
     state.emptyState = error ? 'unableToConnect' : 'noData';
     state.showEmptyState = true;
+  },
+
+  [types.REQUEST_DASHBOARD_STARRING](state) {
+    state.isUpdatingStarredValue = true;
+  },
+  [types.RECEIVE_DASHBOARD_STARRING_SUCCESS](state, newStarredValue) {
+    const dashboard = selectedDashboard(state);
+    const index = state.allDashboards.findIndex(d => d === dashboard);
+
+    state.isUpdatingStarredValue = false;
+    Vue.set(state.allDashboards, index, { ...dashboard, starred: newStarredValue });
+  },
+  [types.RECEIVE_DASHBOARD_STARRING_FAILURE](state) {
+    state.isUpdatingStarredValue = false;
   },
 
   /**
