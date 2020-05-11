@@ -8,7 +8,8 @@ describe GitlabSchema.types['Query'] do
       :design_management,
       :geo_node,
       :vulnerabilities,
-      :instance_security_dashboard
+      :instance_security_dashboard,
+      :vulnerabilities_count_by_day_and_severity
     ).at_least
   end
 end
