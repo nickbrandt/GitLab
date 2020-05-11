@@ -131,7 +131,7 @@ describe Projects::GrafanaApiController do
         get :metrics_dashboard, params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response).to include ({
+        expect(json_response).to include({
           'dashboard' => '{}',
           'status' => 'success'
         })
