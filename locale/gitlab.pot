@@ -13474,6 +13474,9 @@ msgstr ""
 msgid "Metrics|Refresh dashboard"
 msgstr ""
 
+msgid "Metrics|Star dashboard"
+msgstr ""
+
 msgid "Metrics|There was an error creating the dashboard."
 msgstr ""
 
@@ -13508,6 +13511,9 @@ msgid "Metrics|Unexpected deployment data response from prometheus endpoint"
 msgstr ""
 
 msgid "Metrics|Unit label"
+msgstr ""
+
+msgid "Metrics|Unstar dashboard"
 msgstr ""
 
 msgid "Metrics|Used as a title for the chart"
