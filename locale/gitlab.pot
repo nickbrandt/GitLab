@@ -1111,7 +1111,7 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-msgid "Active %{type} tokens (%{token_length})"
+msgid "Active %{type} (%{token_length})"
 msgstr ""
 
 msgid "Active Sessions"
@@ -1164,7 +1164,7 @@ msgstr ""
 msgid "Add Zoom meeting"
 msgstr ""
 
-msgid "Add a %{type} token"
+msgid "Add a %{type}"
 msgstr ""
 
 msgid "Add a GPG key"
@@ -2647,7 +2647,7 @@ msgstr ""
 msgid "Are you sure you want to reset the health check token?"
 msgstr ""
 
-msgid "Are you sure you want to revoke this %{type} token? This action cannot be undone."
+msgid "Are you sure you want to revoke this %{type}? This action cannot be undone."
 msgstr ""
 
 msgid "Are you sure you want to revoke this nickname?"
@@ -6003,7 +6003,7 @@ msgstr ""
 msgid "Copy %{proxy_url}"
 msgstr ""
 
-msgid "Copy %{type} token"
+msgid "Copy %{type}"
 msgstr ""
 
 msgid "Copy Account ID to clipboard"
@@ -6162,7 +6162,7 @@ msgstr ""
 msgid "Create %{environment}"
 msgstr ""
 
-msgid "Create %{type} token"
+msgid "Create %{type}"
 msgstr ""
 
 msgid "Create New Directory"
@@ -8099,7 +8099,7 @@ msgstr ""
 msgid "Enter the merge request title"
 msgstr ""
 
-msgid "Enter the name of your application, and we'll return a unique %{type} token."
+msgid "Enter the name of your application, and we'll return a unique %{type}."
 msgstr ""
 
 msgid "Enter your password to approve"
@@ -16084,12 +16084,6 @@ msgstr ""
 msgid "Profiles|e.g. My MacBook key"
 msgstr ""
 
-msgid "Profiles|impersonation"
-msgstr ""
-
-msgid "Profiles|personal access"
-msgstr ""
-
 msgid "Profiles|username"
 msgstr ""
 
@@ -21875,7 +21869,7 @@ msgstr ""
 msgid "This user cannot be unlocked manually from GitLab"
 msgstr ""
 
-msgid "This user has no active %{type} tokens."
+msgid "This user has no active %{type}."
 msgstr ""
 
 msgid "This user has no identities"
@@ -24840,7 +24834,7 @@ msgstr ""
 msgid "Your name"
 msgstr ""
 
-msgid "Your new %{type} token"
+msgid "Your new %{type}"
 msgstr ""
 
 msgid "Your new SCIM token"
@@ -25400,6 +25394,12 @@ msgstr ""
 msgid "image diff"
 msgstr ""
 
+msgid "impersonation token"
+msgstr ""
+
+msgid "impersonation tokens"
+msgstr ""
+
 msgid "import flow"
 msgstr ""
 
@@ -25939,6 +25939,12 @@ msgstr ""
 msgid "per day"
 msgstr ""
 
+msgid "personal access token"
+msgstr ""
+
+msgid "personal access tokens"
+msgstr ""
+
 msgid "pipeline"
 msgstr ""
 
@@ -25967,7 +25973,10 @@ msgid_plural "projects"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "project access"
+msgid "project access token"
+msgstr ""
+
+msgid "project access tokens"
 msgstr ""
 
 msgid "project avatar"

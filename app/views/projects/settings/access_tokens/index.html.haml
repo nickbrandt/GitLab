@@ -1,6 +1,7 @@
 - breadcrumb_title s_('AccessTokens|Access Tokens')
 - page_title _('Project Access Tokens')
-- type = _('project access')
+- type = _('project access token')
+- type_plural = _('project access tokens')
 - @content_class = 'limit-container-width' unless fluid_layout
 
 .row.prepend-top-default
@@ -28,5 +29,6 @@
     = render 'shared/access_tokens/table',
         active_tokens: @active_project_access_tokens,
         type: type,
+        type_plural: type_plural,
         revoke_route_helper: ->(token) { revoke_namespace_project_settings_access_token_path(id: token) },
         no_active_tokens_message: _('This project has no active access tokens.')

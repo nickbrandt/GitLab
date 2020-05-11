@@ -1,7 +1,8 @@
 - add_to_breadcrumbs 'Users', admin_users_path
 - breadcrumb_title @user.name
 - page_title 'Impersonation Tokens', @user.name, 'Users'
-- type = s_('Profiles|impersonation')
+- type = _('impersonation token')
+- type_plural = _('impersonation tokens')
 
 = render 'admin/users/head'
 
@@ -22,6 +23,7 @@
 
     = render 'shared/access_tokens/table',
         type: type,
+        type_plural: type_plural,
         impersonation: true,
         active_tokens: @active_impersonation_tokens,
         revoke_route_helper: ->(token) { revoke_admin_user_impersonation_token_path(token.user, token) }

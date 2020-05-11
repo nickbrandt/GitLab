@@ -1,10 +1,10 @@
-- title = local_assigns.fetch(:title, _('Add a %{type} token') % { type: type })
+- title = local_assigns.fetch(:title, _('Add a %{type}') % { type: type })
 - prefix = local_assigns.fetch(:prefix, :personal_access_token)
 
 %h5.prepend-top-0
   = title
 %p.profile-settings-content
-  = _("Enter the name of your application, and we'll return a unique %{type} token.") % { type: type }
+  = _("Enter the name of your application, and we'll return a unique %{type}.") % { type: type }
 
 = form_for token, as: prefix, url: path, method: :post, html: { class: 'js-requires-input' } do |f|
 
@@ -31,4 +31,4 @@
     = render 'shared/tokens/scopes_form', prefix: prefix, token: token, scopes: scopes
 
   .prepend-top-default
-    = f.submit _('Create %{type} token') % { type: type }, class: 'btn btn-success', data: { qa_selector: 'create_token_button' }
+    = f.submit _('Create %{type}') % { type: type }, class: 'btn btn-success', data: { qa_selector: 'create_token_button' }
