@@ -111,8 +111,7 @@ module EE
     #   it. This is the case when we're ready to enable a feature for anyone
     #   with the correct license.
     def beta_feature_available?(feature)
-      ::Feature.enabled?(feature, self) ||
-        (::Feature.enabled?(feature) && feature_available?(feature))
+      ::Feature.enabled?(feature) ? feature_available?(feature) : ::Feature.enabled?(feature, self)
     end
     alias_method :alpha_feature_available?, :beta_feature_available?
 
