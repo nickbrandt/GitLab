@@ -63,7 +63,7 @@ RSpec.describe AuditEvent, type: :model do
       end
     end
 
-    context 'when user does not exists anymore' do
+    context 'when user does not exist anymore' do
       subject(:event) { described_class.new(author_id: non_existing_record_id) }
 
       context 'when details contains author_name' do
