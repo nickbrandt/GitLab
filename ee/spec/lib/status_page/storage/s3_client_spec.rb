@@ -3,12 +3,12 @@
 require 'spec_helper'
 
 describe StatusPage::Storage::S3Client, :aws_s3 do
-  let(:region) { 'eu-west-1' }
-  let(:bucket_name) { 'bucket_name' }
-  let(:access_key_id) { 'key_id' }
-  let(:secret_access_key) { 'secret' }
+  let!(:region) { 'eu-west-1' }
+  let!(:bucket_name) { 'bucket_name' }
+  let!(:access_key_id) { 'key_id' }
+  let!(:secret_access_key) { 'secret' }
 
-  let(:client) do
+  let!(:client) do
     described_class.new(
       region: region, bucket_name: bucket_name, access_key_id: access_key_id,
       secret_access_key: secret_access_key
@@ -155,6 +155,72 @@ describe StatusPage::Storage::S3Client, :aws_s3 do
         stub_responses(:list_objects_v2, aws_error)
 
         msg = error_message(aws_error, prefix: key_prefix)
+        expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+      end
+    end
+  end
+
+  describe 'multipart_upload' do
+    let(:key) { '123' }
+    let(:file) { Tempfile.new('foo') }
+    let(:upload_id) { '123456789' }
+    let(:s3_client) { client.instance_variable_get(:@client) }
+
+    subject(:result) { client.multipart_upload(key, file) }
+
+    before do
+      file.open
+      file.write('hello world')
+      file.rewind
+
+      allow(s3_client).to receive(:create_multipart_upload).and_return(
+        instance_double(Aws::S3::Types::CompleteMultipartUploadOutput, { to_h: { upload_id: upload_id } })
+      )
+    end
+
+    after do
+      file.close
+    end
+
+    context 'when sucessful' do
+      before do
+        stub_responses(
+          :upload_part,
+          instance_double(Aws::S3::Types::UploadPartOutput, to_h: {})
+        )
+      end
+
+      it 'completes' do
+        expect(s3_client).to receive(:complete_multipart_upload)
+
+        result
+      end
+
+      context 'with more than one part' do
+        before do
+          stub_const("#{described_class}::MULTIPART_UPLOAD_PART_SIZE", 1.byte)
+        end
+
+        it 'completes' do
+          # Ensure size limit triggers more than one part upload
+          expect(s3_client).to receive(:upload_part).at_least(:twice)
+          expect(s3_client).to receive(:complete_multipart_upload)
+
+          result
+        end
+      end
+    end
+
+    context 'when failed' do
+      let(:aws_error) { 'SomeError' }
+
+      before do
+        stub_responses(:upload_part, aws_error)
+      end
+
+      it 'raises an error' do
+        expect(s3_client).to receive(:abort_multipart_upload)
+        msg = error_message(aws_error, key: key)
         expect { result }.to raise_error(StatusPage::Storage::Error, msg)
       end
     end

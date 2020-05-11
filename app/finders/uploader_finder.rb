@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UploadFinder
+class UploaderFinder
   def initialize(project, secret, file_path)
     @project = project
     @secret = secret

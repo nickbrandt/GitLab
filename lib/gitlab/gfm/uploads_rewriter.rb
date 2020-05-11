@@ -22,7 +22,7 @@ module Gitlab
         return @text unless needs_rewrite?
 
         @text.gsub(@pattern) do |markdown|
-          file = UploadFinder.new(@source_project, $~[:secret], $~[:file]).execute
+          file = UploaderFinder.new(@source_project, $~[:secret], $~[:file]).execute
 
           break markdown unless file.try(:exists?)
 
@@ -46,7 +46,7 @@ module Gitlab
 
       def files
         referenced_files = @text.scan(@pattern).map do
-          find_file(@source_project, $~[:secret], $~[:file])
+          UploaderFinder.new(@source_project, $~[:secret], $~[:file]).execute
         end
 
         referenced_files.compact.select(&:exists?)

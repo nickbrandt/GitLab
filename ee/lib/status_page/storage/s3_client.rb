@@ -4,6 +4,9 @@ module StatusPage
   module Storage
     # Implements a minimal AWS S3 client.
     class S3Client
+      # 5 megabytes is the minimum part size specified in the amazon SDK
+      MULTIPART_UPLOAD_PART_SIZE = 5.megabytes
+
       def initialize(region:, bucket_name:, access_key_id:, secret_access_key:)
         @bucket_name = bucket_name
         @client = Aws::S3::Client.new(
@@ -69,17 +72,20 @@ module StatusPage
       # file: An open file or file-like io object
       def multipart_upload(key, file)
         # AWS sdk v2 has upload_file which supports multipart
-        # However Gitlab::HttpIO used when objectStorage is enabled
+        # However Gitlab::HttpIO used when object storage is enabled
         # cannot be used with upload_file
         wrap_errors(key: key) do
           upload_id = client.create_multipart_upload({ bucket: bucket_name, key: key }).to_h[:upload_id]
-          parts = upload_in_parts(key, file, upload_id)
-          complete_multipart_upload(key, upload_id, parts)
+          begin
+            parts = upload_in_parts(key, file, upload_id)
+            complete_multipart_upload(key, upload_id, parts)
+          # Rescue on Exception since even on keyboard inturrupt we want to abort the upload and re-raise
+          rescue
+            # Abort clears the already uploaded parts so that they do not cost the bucket owner
+            abort_multipart_upload(key, upload_id)
+            raise
+          end
         end
-      # Rescue on Exception since even on keyboard inturrupt we want to abor the upload and re-raise
-      rescue Exception => e # rubocop:disable Lint/RescueException
-        abort_multipart_upload(key, upload_id)
-        raise e
       end
 
       private
@@ -89,21 +95,20 @@ module StatusPage
       def upload_in_parts(key, file, upload_id)
         parts = []
         part_number = 1
-        part_size = 5.megabytes
 
         file.seek(0)
         until file.eof?
           part = client.upload_part({
-            body: file.read(part_size),
+            body: file.read(MULTIPART_UPLOAD_PART_SIZE),
             bucket: bucket_name,
             key: key,
             part_number: part_number, # required
             upload_id: upload_id
           })
+
           parts << part.to_h.merge(part_number: part_number)
           part_number += 1
         end
-        file.seek(0)
 
         parts
       end

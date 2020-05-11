@@ -45,8 +45,8 @@ module StatusPage
     # Publish Images
     def publish_images(issue, user_notes)
       existing_image_keys = storage_client.list_object_keys(StatusPage::Storage.uploads_path(issue.iid))
-
       # Send all description images to s3
+
       publish_markdown_uploads(
         markdown_field: issue.description,
         issue_iid: issue.iid,
@@ -64,11 +64,12 @@ module StatusPage
     end
 
     def publish_markdown_uploads(markdown_field:, issue_iid:, existing_image_keys:)
-      markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |md|
-        key = StatusPage::Storage.upload_path(issue_iid, $~[:secret], $~[:file])
+      markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |secret, file_name|
+        key = StatusPage::Storage.upload_path(issue_iid, secret, file_name)
+
         next if existing_image_keys.include? key
 
-        uploader = UploadFinder.new(@project, $~[:secret], $~[:file]).execute
+        uploader = UploaderFinder.new(@project, secret, file_name).execute
         uploader.open do |open_file|
           storage_client.multipart_upload(key, open_file)
         end
