@@ -24721,7 +24721,7 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "projectId",
+              "name": "id",
               "description": "ID of the project to remove from the Instance Security Dashboard",
               "type": {
                 "kind": "NON_NULL",
