@@ -30,6 +30,20 @@ describe Gitlab::Insights::ProjectInsightsConfig do
 
   subject { described_class.new(project: project, insights_config: config) }
 
+  context 'filtering out invalid config entries' do
+    let(:config_with_invalid_entry) { config.merge(".projectOnly": { projects: { only: [] } }) }
+
+    subject { described_class.new(project: project, insights_config: config_with_invalid_entry) }
+
+    it 'does not include invalid entry' do
+      expect(subject.filtered_config).to eq(config)
+    end
+
+    it 'does not show notice text' do
+      expect(subject.notice_text).to eq(nil)
+    end
+  end
+
   context 'when no projects.only filter present' do
     it 'does not change the config' do
       expect(subject.filtered_config).to eq(config)
@@ -51,7 +65,7 @@ describe Gitlab::Insights::ProjectInsightsConfig do
         expect(subject.filtered_config[:item1][:charts]).to eq([chart1])
       end
 
-      it 'has notice text' do
+      it 'does not have a notice text' do
         expect(subject.notice_text).not_to eq(nil)
       end
     end

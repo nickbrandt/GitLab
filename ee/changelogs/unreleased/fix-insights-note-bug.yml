@@ -1,0 +1,5 @@
+---
+title: Fix incorrect notice text on insights page
+merge_request: 31570
+author:
+type: fixed
