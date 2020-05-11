@@ -35,7 +35,7 @@ describe 'Requirements list', :js do
 
   context 'when requirements exist for the project' do
     before do
-      visit project_requirements_path(project)
+      visit project_requirements_management_requirements_path(project)
 
       wait_for_requests
     end
@@ -245,7 +245,7 @@ describe 'Requirements list', :js do
   context 'when accessing project as guest user' do
     before do
       sign_in(user_guest)
-      visit project_requirements_path(project)
+      visit project_requirements_management_requirements_path(project)
 
       wait_for_requests
     end
