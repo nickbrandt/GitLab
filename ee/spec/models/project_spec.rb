@@ -19,6 +19,8 @@ describe Project do
     it { is_expected.to delegate_method(:shared_runners_minutes_used?).to(:shared_runners_limit_namespace) }
     it { is_expected.to delegate_method(:shared_runners_remaining_minutes_below_threshold?).to(:shared_runners_limit_namespace) }
 
+    it { is_expected.to delegate_method(:closest_gitlab_subscription).to(:namespace) }
+
     it { is_expected.to belong_to(:deleting_user) }
 
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
@@ -2599,25 +2601,6 @@ describe Project do
         expect(project.jira_import?).to be false
         expect { project.remove_import_data }.not_to change { ProjectImportData.count }
       end
-    end
-  end
-
-  describe '#gitlab_subscription' do
-    subject { project.gitlab_subscription }
-
-    let(:project) { create(:project, namespace: namespace) }
-
-    context 'has a gitlab subscription' do
-      let(:namespace) { subscription.namespace }
-      let(:subscription) { create(:gitlab_subscription) }
-
-      it { is_expected.to eq(subscription) }
-    end
-
-    context 'does not have a gitlab subscription' do
-      let(:namespace) { create(:namespace) }
-
-      it { is_expected.to be_nil }
     end
   end
 end

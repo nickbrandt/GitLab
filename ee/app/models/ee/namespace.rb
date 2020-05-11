@@ -157,6 +157,16 @@ module EE
       end || super
     end
 
+    def closest_gitlab_subscription
+      strong_memoize(:closest_gitlab_subscription) do
+        if parent_id
+          root_ancestor.gitlab_subscription
+        else
+          gitlab_subscription
+        end
+      end
+    end
+
     def plan_name_for_upgrading
       return ::Plan::FREE if trial_active?
 
