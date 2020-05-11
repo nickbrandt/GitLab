@@ -9,4 +9,4 @@
   = render partial: 'projects/mirrors/authentication_method', locals: { f: rm_f }
   .form-check.append-bottom-10
     = check_box_tag :keep_divergent_refs, '1', false, class: 'js-mirror-keep-divergent-refs form-check-input'
-    = label_tag :keep_divergent_refs, 'Keep divergent refs', class: 'form-check-label'
+    = label_tag :keep_divergent_refs, _('Keep divergent refs'), class: 'form-check-label'
