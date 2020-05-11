@@ -4,6 +4,7 @@ import Translate from '~/vue_shared/translate';
 import { __ } from '~/locale';
 import { setUrlFragment, redirectTo } from '~/lib/utils/url_utility';
 import pipelineGraph from './components/graph/graph_component.vue';
+import Dag from './components/dag.vue';
 import GraphBundleMixin from './mixins/graph_pipeline_bundle_mixin';
 import PipelinesMediator from './pipeline_details_mediator';
 import pipelineHeader from './components/header_component.vue';
@@ -142,4 +143,15 @@ export default () => {
       })
       .catch(() => {});
   }
+
+  new Vue({
+    el: '#js-pipeline-dag-vue',
+    components: {
+      Dag,
+    },
+    render(createElement) {
+      return createElement('dag');
+    },
+
+  })
 };
