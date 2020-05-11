@@ -3,6 +3,16 @@ import { startCase } from 'lodash';
 import { __ } from '~/locale';
 import { GlFormGroup, GlFormCheckbox, GlFormInput } from '@gitlab/ui';
 
+const typeWithPlaceholder = {
+  SLACK: 'slack',
+  MATTERMOST: 'mattermost',
+};
+
+const placeholderForType = {
+  [typeWithPlaceholder.SLACK]: __('Slack channels (e.g. general, development)'),
+  [typeWithPlaceholder.MATTERMOST]: __('Channel handle (e.g. town-square)'),
+};
+
 export default {
   name: 'TriggerFields',
   components: {
@@ -23,12 +33,7 @@ export default {
   },
   computed: {
     placeholder() {
-      if (this.type === 'slack') {
-        return __('Slack channels (e.g. general, development)');
-      } else if (this.type === 'mattermost') {
-        return __('Channel handle (e.g. town-square)');
-      }
-      return null;
+      return placeholderForType[this.type];
     },
   },
   methods: {
@@ -44,9 +49,14 @@ export default {
 </script>
 
 <template>
-  <gl-form-group :label="__('Trigger')" label-for="trigger-fields">
+  <gl-form-group class="gl-pt-3" :label="__('Trigger')" label-for="trigger-fields">
     <div id="trigger-fields">
-      <gl-form-group v-for="event in events" :key="event.title" :description="event.description">
+      <gl-form-group
+        v-for="event in events"
+        :key="event.title"
+        class="gl-pt-3"
+        :description="event.description"
+      >
         <input :name="checkboxName(event.name)" type="hidden" value="false" />
         <gl-form-checkbox v-model="event.value" :name="checkboxName(event.name)">
           {{ startCase(event.title) }}
