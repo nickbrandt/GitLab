@@ -1,0 +1,5 @@
+---
+title: Add license check for the 'send emails from Admin area' feature
+merge_request: 31434
+author:
+type: fixed
