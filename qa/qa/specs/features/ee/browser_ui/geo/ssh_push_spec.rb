@@ -75,7 +75,8 @@ module QA
       end
 
       context 'git-lfs commit' do
-        it "is replicated to the secondary" do
+        it "is replicated to the secondary", quarantine:
+            { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212632', type: :investigating } do
           key_title = "key for ssh tests #{Time.now.to_f}"
           file_content = 'The rendered file could not be displayed because it is stored in LFS.'
           project = nil
