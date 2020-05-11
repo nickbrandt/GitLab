@@ -1730,6 +1730,41 @@ describe Project do
 
       project.after_import
     end
+
+    context 'elasticsearch indexing disabled for this project' do
+      before do
+        expect(project).to receive(:use_elasticsearch?).and_return(false)
+      end
+
+      it 'does not index the wiki repository' do
+        expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+
+        project.after_import
+      end
+    end
+
+    context 'elasticsearch indexing enabled for this project' do
+      before do
+        expect(project).to receive(:use_elasticsearch?).and_return(true)
+      end
+
+      it 'schedules a full index of the wiki repository' do
+        expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true)
+
+        project.after_import
+      end
+
+      context 'when project is forked' do
+        before do
+          expect(project).to receive(:forked?).and_return(true)
+        end
+        it 'does not index the wiki repository' do
+          expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+
+          project.after_import
+        end
+      end
+    end
   end
 
   describe '#lfs_http_url_to_repo' do
