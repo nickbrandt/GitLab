@@ -89,7 +89,7 @@ describe('Accessibility Reports actions', () => {
         { status: 200, data: mockReport },
         localState,
         [{ type: types.RECEIVE_REPORT_SUCCESS, payload: mockReport }],
-        [],
+        [{ type: 'stopPolling' }],
         done,
       );
     });
@@ -113,7 +113,7 @@ describe('Accessibility Reports actions', () => {
         null,
         localState,
         [{ type: types.RECEIVE_REPORT_ERROR }],
-        [],
+        [{ type: 'stopPolling' }],
         done,
       );
     });

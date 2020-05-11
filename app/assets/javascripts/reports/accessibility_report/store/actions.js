@@ -54,7 +54,7 @@ export const fetchReport = ({ state, dispatch, commit }) => {
   }
 
   Visibility.change(() => {
-    if (!Visibility.hidden()) {
+    if (!Visibility.hidden() && state.isLoading) {
       dispatch('restartPolling');
     } else {
       dispatch('stopPolling');
@@ -62,14 +62,17 @@ export const fetchReport = ({ state, dispatch, commit }) => {
   });
 };
 
-export const receiveReportSuccess = ({ commit }, { status, data }) => {
+export const receiveReportSuccess = ({ commit, dispatch }, { status, data }) => {
   if (status === httpStatusCodes.OK) {
     commit(types.RECEIVE_REPORT_SUCCESS, data);
+    // Stop polling since we have the information already parsed and it won't be changing
+    dispatch('stopPolling');
   }
 };
 
-export const receiveReportError = ({ commit }) => {
+export const receiveReportError = ({ commit, dispatch }) => {
   commit(types.RECEIVE_REPORT_ERROR);
+  dispatch('stopPolling');
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
