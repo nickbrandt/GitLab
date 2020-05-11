@@ -3,7 +3,10 @@ import { GlAlert } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 
 export default {
+<<<<<<< HEAD
   // eslint-disable-next-line @gitlab/require-i18n-strings
+=======
+>>>>>>> Add DAG scaffolding
   name: 'Dag',
   components: {
     GlAlert,
@@ -20,6 +23,7 @@ export default {
       showFailureAlert: false,
     };
   },
+<<<<<<< HEAD
   computed: {
     shouldDisplayGraph() {
       return !this.showFailureAlert;
@@ -27,6 +31,11 @@ export default {
   },
   mounted() {
     const { drawGraph, reportFailure } = this;
+=======
+  mounted() {
+    const drawGraph = this.drawGraph;
+    const reportFailure = this.reportFailure;
+>>>>>>> Add DAG scaffolding
 
     if (!this.graphUrl) {
       reportFailure();
@@ -40,6 +49,14 @@ export default {
       })
       .catch(reportFailure);
   },
+<<<<<<< HEAD
+=======
+  computed: {
+    shouldDisplayGraph() {
+      return !this.showFailureAlert;
+    },
+  },
+>>>>>>> Add DAG scaffolding
   methods: {
     drawGraph(data) {
       return data;
