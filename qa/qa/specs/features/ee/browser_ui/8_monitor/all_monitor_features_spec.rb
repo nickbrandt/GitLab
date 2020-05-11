@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Monitor' do
-    describe 'with Prometheus Gitlab-managed cluster', :orchestrated, :kubernetes, :docker, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217247', type: :flaky } do
+  context 'Monitor', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217247', type: :flaky } do
+    describe 'with Prometheus Gitlab-managed cluster', :orchestrated, :kubernetes, :docker do
       before :all do
         @cluster = Service::KubernetesCluster.new.create!
         Flow::Login.sign_in
@@ -10,7 +10,7 @@ module QA
       end
 
       after :all do
-        @runner.remove_via_api!
+        @runner&.remove_via_api!
         @cluster&.remove!
       end
 
