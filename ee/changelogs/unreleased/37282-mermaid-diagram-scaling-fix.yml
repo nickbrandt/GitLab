@@ -1,0 +1,5 @@
+---
+title: Force mermaid diagrams to be scaled to fit within browser window when used in markdown
+merge_request: 25016
+author: Christopher Stryker
+type: fixed
