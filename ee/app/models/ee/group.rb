@@ -123,12 +123,12 @@ module EE
         end
 
         after_transition ready: :started do |group, _|
-          group.ldap_sync_last_sync_at = DateTime.now
+          group.ldap_sync_last_sync_at = DateTime.current
           group.save
         end
 
         after_transition started: :ready do |group, _|
-          current_time = DateTime.now
+          current_time = DateTime.current
           group.ldap_sync_last_update_at = current_time
           group.ldap_sync_last_successful_update_at = current_time
           group.ldap_sync_error = nil
@@ -136,7 +136,7 @@ module EE
         end
 
         after_transition started: :failed do |group, _|
-          group.ldap_sync_last_update_at = DateTime.now
+          group.ldap_sync_last_update_at = DateTime.current
           group.save
         end
       end

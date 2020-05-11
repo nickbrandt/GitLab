@@ -40,8 +40,8 @@ describe MergeRequest::Metrics do
     end
 
     context 'when MR is not merged' do
-      it 'is Time.now' do
-        expect(subject.review_end_at).to be_like_time(Time.now)
+      it 'is Time.current' do
+        expect(subject.review_end_at).to be_like_time(Time.current)
       end
     end
   end

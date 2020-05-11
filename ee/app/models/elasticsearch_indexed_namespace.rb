@@ -20,7 +20,7 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
 
   def self.index_first_n_namespaces_of_plan(plan, number_of_namespaces)
     indexed_namespaces = self.select(:namespace_id)
-    now = Time.now
+    now = Time.current
 
     ids = GitlabSubscription
       .with_hosted_plan(plan)

@@ -306,7 +306,7 @@ module EE
     end
 
     def admin_unsubscribe!
-      update_column :admin_email_unsubscribed_at, Time.now
+      update_column :admin_email_unsubscribed_at, Time.current
     end
 
     override :allow_password_authentication_for_web?

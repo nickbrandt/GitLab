@@ -236,7 +236,7 @@ describe User do
   end
 
   describe '#forget_me!' do
-    subject { create(:user, remember_created_at: Time.now) }
+    subject { create(:user, remember_created_at: Time.current) }
 
     it 'clears remember_created_at' do
       subject.forget_me!

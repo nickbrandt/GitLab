@@ -1077,7 +1077,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
 
   shared_examples 'timestamp parameters' do |timestamp_column, date_column|
     it 'returns the value it was assigned via UNIX timestamp' do
-      now = Time.now.beginning_of_day.utc
+      now = Time.current.beginning_of_day.utc
       subject.update_attribute(timestamp_column, now.to_i)
 
       expect(subject.public_send(date_column)).to eq(now)

@@ -246,7 +246,7 @@ class GeoNodeStatus < ApplicationRecord
     latest_event = Geo::EventLog.latest_event
     self.last_event_id = latest_event&.id
     self.last_event_date = latest_event&.created_at
-    self.last_successful_status_check_at = Time.now
+    self.last_successful_status_check_at = Time.current
 
     self.storage_shards = StorageShard.all
     self.storage_configuration_digest = StorageShard.build_digest

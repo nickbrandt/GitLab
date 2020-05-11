@@ -10,7 +10,7 @@ class Geo::DesignRegistry < Geo::BaseRegistry
   scope :pending, -> { with_state(:pending) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
-  scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.now))) }
+  scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
 
   state_machine :state, initial: :pending do
     state :started
@@ -19,7 +19,7 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     state :pending
 
     before_transition any => :started do |registry, _|
-      registry.last_synced_at = Time.now
+      registry.last_synced_at = Time.current
     end
 
     before_transition any => :pending do |registry, _|
