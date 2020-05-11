@@ -14,6 +14,7 @@ export default {
       projectsEndpoint,
       userSignedIn,
       allowSubEpics,
+      allowIssuableHealthStatus,
     },
   ) {
     state.epicsEndpoint = epicsEndpoint;
@@ -23,6 +24,7 @@ export default {
     state.projectsEndpoint = projectsEndpoint;
     state.userSignedIn = userSignedIn;
     state.allowSubEpics = allowSubEpics;
+    state.allowIssuableHealthStatus = allowIssuableHealthStatus;
   },
 
   [types.SET_INITIAL_PARENT_ITEM](state, data) {
