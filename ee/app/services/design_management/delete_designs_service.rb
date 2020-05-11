@@ -57,7 +57,7 @@ module DesignManagement
     end
 
     def counter
-      ::Gitlab::UsageCounters::DesignsCounter
+      ::Gitlab::UsageDataCounters::DesignsCounter
     end
 
     def formatted_file_list
