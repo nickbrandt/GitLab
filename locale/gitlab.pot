@@ -24951,6 +24951,9 @@ msgstr ""
 msgid "ciReport|Failed to load %{reportName} report"
 msgstr ""
 
+msgid "ciReport|Fixed"
+msgstr ""
+
 msgid "ciReport|Fixed:"
 msgstr ""
 
@@ -24967,6 +24970,9 @@ msgid "ciReport|Loading %{reportName} report"
 msgstr ""
 
 msgid "ciReport|Manage licenses"
+msgstr ""
+
+msgid "ciReport|New"
 msgstr ""
 
 msgid "ciReport|No changes to code quality"
