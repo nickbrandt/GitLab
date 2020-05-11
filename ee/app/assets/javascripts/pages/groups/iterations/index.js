@@ -1,4 +1,4 @@
-import initIterationsList from 'ee/iterations_list';
+import initIterationsList from 'ee/iterations';
 
 document.addEventListener('DOMContentLoaded', () => {
   initIterationsList();

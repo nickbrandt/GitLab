@@ -3,8 +3,13 @@ import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import Iterations from './components/iterations.vue';
+import IterationForm from './components/iteration_form.vue';
 
 Vue.use(VueApollo);
+
+const apolloProvider = new VueApollo({
+  defaultClient: createDefaultClient(),
+});
 
 export default function initIterationsList() {
   const el = document.querySelector('.js-iterations-list');
@@ -12,10 +17,6 @@ export default function initIterationsList() {
   if (!el) {
     return null;
   }
-
-  const apolloProvider = new VueApollo({
-    defaultClient: createDefaultClient(),
-  });
 
   return new Vue({
     el,
@@ -31,3 +32,24 @@ export default function initIterationsList() {
     },
   });
 };
+
+export function initIterationForm() {
+  const el = document.querySelector('.js-iteration-new');
+  
+  if (!el) {
+    return null;
+  }
+
+  return new Vue({
+    el,
+    apolloProvider,
+    render(createElement) {
+      return createElement(IterationForm, {
+        props: {
+          groupPath: el.dataset.groupFullPath,
+          previewMarkdownPath: el.dataset.previewMarkdownPath,
+        },
+      });
+    },
+  });
+}
