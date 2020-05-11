@@ -7,7 +7,7 @@ config:
     stage: test
     when: manual
     allow_failure: true
-    script: exit 1
+    script: exit 0
 
   deploy:
     stage: deploy
@@ -38,5 +38,26 @@ transitions:
         test2: manual
         deploy: created
 
-# TODO: should deploy run?
-# Further discussions: https://gitlab.com/gitlab-org/gitlab/-/issues/213080
+  - event: enqueue
+    jobs: [test2]
+    expect:
+      pipeline: running
+      stages:
+        test: running
+        deploy: created
+      jobs:
+        test1: success
+        test2: pending
+        deploy: created
+
+  - event: success
+    jobs: [test2]
+    expect:
+      pipeline: running
+      stages:
+        test: success
+        deploy: pending
+      jobs:
+        test1: success
+        test2: success
+        deploy: pending

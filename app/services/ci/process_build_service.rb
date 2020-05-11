@@ -32,11 +32,11 @@ module Ci
       when 'on_failure'
         %w[failed]
       when 'always'
-        %w[success failed skipped]
+        build.scheduling_type_dag? ? %w[success failed] : %w[success failed skipped]
       when 'manual'
-        %w[success skipped]
+        build.scheduling_type_dag? ? %w[success] : %w[success skipped]
       when 'delayed'
-        %w[success skipped]
+        build.scheduling_type_dag? ? %w[success] : %w[success skipped]
       else
         []
       end

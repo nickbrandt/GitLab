@@ -40,8 +40,3 @@ transitions:
         build: failed
         test: skipped
         deploy: skipped
-
-# TODO: What is the real expected behavior here?
-# Is `needs` keyword a requirement indicator or just a helper to build dependency tree?
-# How should it behave `when: on_failure` with `needs`?
-# Further discussions: https://gitlab.com/gitlab-org/gitlab/-/issues/213080
