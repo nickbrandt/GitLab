@@ -83,10 +83,7 @@ module Ci
 
     # Overriding scheduling_type enum's method for nil `scheduling_type`s
     def scheduling_type_dag?
-      result = super
-      return find_legacy_scheduling_type == :dag if result.nil?
-
-      result
+      scheduling_type.nil? ? find_legacy_scheduling_type == :dag : super
     end
 
     # scheduling_type column of previous builds/bridges have not been populated,
