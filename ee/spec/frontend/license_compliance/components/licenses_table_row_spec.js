@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlLink, GlSkeletonLoading, GlBadge } from '@gitlab/ui';
+import { GlLink, GlSkeletonLoading, GlBadge, GlFriendlyWrap } from '@gitlab/ui';
 import LicenseComponentLinks from 'ee/license_compliance/components/license_component_links.vue';
 import LicensesTableRow from 'ee/license_compliance/components/licenses_table_row.vue';
 import { makeLicense } from './utils';
@@ -78,6 +78,26 @@ describe('LicensesTableRow component', () => {
           title: license.name,
         }),
       );
+    });
+  });
+
+  describe('when a license has a url in name field', () => {
+    beforeEach(() => {
+      license.url = null;
+      license.name = 'https://github.com/dotnet/corefx/blob/master/LICENSE.TXT';
+
+      factory({
+        isLoading: false,
+        license,
+      });
+    });
+
+    it('renders the GlFriendlyWrap and GlLink components', () => {
+      const nameSection = findNameSeciton();
+
+      expect(nameSection.find(GlLink).exists()).toBe(true);
+      expect(nameSection.find(GlFriendlyWrap).exists()).toBe(true);
+      expect(nameSection.find(GlFriendlyWrap).props().text).toBe(license.name);
     });
   });
 
