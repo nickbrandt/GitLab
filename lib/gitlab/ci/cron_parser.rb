@@ -16,6 +16,11 @@ module Gitlab
         @cron_line.next_time(time).utc.in_time_zone(Time.zone) if @cron_line.present?
       end
 
+      def previous_time_from(time)
+        @cron_line ||= try_parse_cron(@cron, @cron_timezone)
+        @cron_line.previous_time(time).utc.in_time_zone(Time.zone) if @cron_line.present?
+      end
+
       def cron_valid?
         try_parse_cron(@cron, VALID_SYNTAX_SAMPLE_TIME_ZONE).present?
       end

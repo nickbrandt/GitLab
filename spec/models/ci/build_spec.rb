@@ -2884,6 +2884,18 @@ describe Ci::Build do
       it { is_expected.to include(deployment_variable) }
     end
 
+    context 'when build has a freeze period' do
+      let(:freeze_variable) { { key: 'CI_DEPLOY_FREEZE', value: 'true', masked: false, public: true } }
+
+      before do
+        allow_any_instance_of(Ci::FreezePeriodStatus)
+          .to receive(:execute)
+          .and_return(true)
+      end
+
+      it { is_expected.to include(freeze_variable) }
+    end
+
     context 'when project has default CI config path' do
       let(:ci_config_path) { { key: 'CI_CONFIG_PATH', value: '.gitlab-ci.yml', public: true, masked: false } }
 
