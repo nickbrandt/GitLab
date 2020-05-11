@@ -56,16 +56,20 @@ export default {
   },
 
   computed: {
+    actions() {
+      return {
+        issueCreation: {
+          name: s__('ciReport|Create issue'),
+          isLoading: this.isProcessing,
+          action: 'createIssue',
+        },
+      };
+    },
     actionButtons() {
       const buttons = [];
-      const issueButton = {
-        name: s__('ciReport|Create issue'),
-        isLoading: this.isProcessing,
-        action: 'createIssue',
-      };
 
       if (!this.hasIssue) {
-        buttons.push(issueButton);
+        buttons.push(this.actions.issueCreation);
       }
 
       return buttons;
