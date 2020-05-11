@@ -58,35 +58,31 @@ RSpec.describe VulnerabilitiesHelper do
 
     it 'has expected vulnerability properties' do
       expect(subject).to include(
-        vulnerability_json: kind_of(String),
-        project_fingerprint: vulnerability.finding.project_fingerprint,
+        timestamp: Time.now.to_i,
         create_issue_url: "/#{project.full_path}/-/vulnerability_feedback",
-        notes_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/notes",
-        discussions_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/discussions",
         has_mr: anything,
-        vulnerability_feedback_help_path: kind_of(String),
-        finding_json: kind_of(String),
         create_mr_url: "/#{project.full_path}/-/vulnerability_feedback",
-        timestamp: Time.now.to_i
+        discussions_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/discussions",
+        notes_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/notes",
+        vulnerability_feedback_help_path: kind_of(String),
+        pipeline: anything
       )
     end
   end
 
-  describe '#vulnerability_data' do
-    subject { helper.vulnerability_data(vulnerability, pipeline) }
+  describe '#vulnerability_details' do
+    subject { helper.vulnerability_details(vulnerability, pipeline) }
 
     describe 'when pipeline exists' do
       let(:pipeline) { create(:ci_pipeline) }
-      let(:pipelineData) { Gitlab::Json.parse(subject[:pipeline_json]) }
 
       include_examples 'vulnerability properties'
 
       it 'returns expected pipeline data' do
-        expect(pipelineData).to include(
-          'id' => pipeline.id,
-          'created_at' => pipeline.created_at.iso8601,
-          'url' => be_present,
-          'source_branch' => pipeline.ref
+        expect(subject[:pipeline]).to include(
+          id: pipeline.id,
+          created_at: pipeline.created_at.iso8601,
+          url: be_present
         )
       end
     end
@@ -110,11 +106,12 @@ RSpec.describe VulnerabilitiesHelper do
         description: finding.description,
         identifiers: kind_of(Array),
         issue_feedback: anything,
-        merge_request_feedback: anything,
         links: finding.links,
         location: finding.location,
         name: finding.name,
+        merge_request_feedback: anything,
         project: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder),
+        project_fingerprint: finding.project_fingerprint,
         remediations: finding.remediations,
         solution: kind_of(String),
         evidence: kind_of(String),
