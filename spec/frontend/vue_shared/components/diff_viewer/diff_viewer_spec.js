@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { GREEN_BOX_IMAGE_URL, RED_BOX_IMAGE_URL } from 'spec/test_constants';
 import diffViewer from '~/vue_shared/components/diff_viewer/diff_viewer.vue';
 
@@ -32,7 +32,7 @@ describe('DiffViewer', () => {
 
     createComponent({ ...requiredProps, projectPath: '' });
 
-    setTimeout(() => {
+    setImmediate(() => {
       expect(vm.$el.querySelector('.deleted img').getAttribute('src')).toBe(
         `//-/raw/DEF/${RED_BOX_IMAGE_URL}`,
       );
@@ -53,7 +53,7 @@ describe('DiffViewer', () => {
       oldPath: 'testold.abc',
     });
 
-    setTimeout(() => {
+    setImmediate(() => {
       expect(vm.$el.querySelector('.deleted .file-info').textContent.trim()).toContain(
         'testold.abc',
       );

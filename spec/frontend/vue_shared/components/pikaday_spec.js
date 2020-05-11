@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import datePicker from '~/vue_shared/components/pikaday.vue';
 
 describe('datePicker', () => {
@@ -20,7 +20,7 @@ describe('datePicker', () => {
   });
 
   it('should toggle when dropdown is clicked', () => {
-    const hidePicker = jasmine.createSpy();
+    const hidePicker = jest.fn();
     vm.$on('hidePicker', hidePicker);
 
     vm.$el.querySelector('.dropdown-menu-toggle').click();

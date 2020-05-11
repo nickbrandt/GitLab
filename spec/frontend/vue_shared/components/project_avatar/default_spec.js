@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { projectData } from 'spec/ide/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { projectData } from 'jest/ide/mock_data';
 import { TEST_HOST } from 'spec/test_constants';
 import { getFirstCharacterCapitalized } from '~/lib/utils/text_utility';
 import ProjectAvatarDefault from '~/vue_shared/components/project_avatar/default.vue';
@@ -48,8 +48,8 @@ describe('ProjectAvatarDefault component', () => {
 
     vm.$nextTick()
       .then(() => {
-        expect(vm.$el).toContainElement('.avatar');
-        expect(vm.$el).not.toContainElement('.identicon');
+        expect(vm.$el.querySelector('.avatar')).not.toBeNull();
+        expect(vm.$el.querySelector('.identicon')).toBeNull();
         expect(vm.$el.querySelector('img')).toHaveAttr('src', avatarUrl);
       })
       .then(done)

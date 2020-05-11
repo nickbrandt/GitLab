@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import toggleButton from '~/vue_shared/components/toggle_button.vue';
 
 describe('Toggle Button', () => {
@@ -42,7 +42,7 @@ describe('Toggle Button', () => {
         value: true,
       });
 
-      spyOn(vm, '$emit');
+      jest.spyOn(vm, '$emit').mockImplementation(() => {});
     });
 
     it('renders is checked class', () => {
@@ -72,7 +72,7 @@ describe('Toggle Button', () => {
         value: true,
         disabledInput: true,
       });
-      spyOn(vm, '$emit');
+      jest.spyOn(vm, '$emit').mockImplementation(() => {});
     });
 
     it('renders disabled button', () => {

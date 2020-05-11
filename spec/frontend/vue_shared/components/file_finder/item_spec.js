@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import { file } from 'spec/ide/helpers';
+import { file } from 'jest/ide/helpers';
 import ItemComponent from '~/vue_shared/components/file_finder/item.vue';
-import createComponent from '../../../helpers/vue_mount_component_helper';
+import createComponent from 'helpers/vue_mount_component_helper';
 
 describe('File finder item spec', () => {
   const Component = Vue.extend(ItemComponent);
@@ -75,7 +75,7 @@ describe('File finder item spec', () => {
   });
 
   it('emits event when clicked', () => {
-    spyOn(vm, '$emit');
+    jest.spyOn(vm, '$emit').mockImplementation(() => {});
 
     vm.$el.click();
 

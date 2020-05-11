@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import component from '~/vue_shared/components/filtered_search_dropdown.vue';
 
 describe('Filtered search dropdown', () => {
@@ -125,7 +125,7 @@ describe('Filtered search dropdown', () => {
 
       describe('on click create button', () => {
         it('emits createItem event with the filter', done => {
-          spyOn(vm, '$emit');
+          jest.spyOn(vm, '$emit').mockImplementation(() => {});
           vm.$nextTick(() => {
             vm.$el.querySelector('.js-dropdown-create-button').click();
 

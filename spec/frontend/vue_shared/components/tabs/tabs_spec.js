@@ -5,28 +5,23 @@ import Tab from '~/vue_shared/components/tabs/tab.vue';
 describe('Tabs component', () => {
   let vm;
 
-  beforeEach(done => {
+  beforeEach(() => {
     vm = new Vue({
       components: {
         Tabs,
         Tab,
       },
-      template: `
-        <div>
-          <tabs>
-            <tab title="Testing" active>
-              First tab
-            </tab>
-            <tab>
-              <template slot="title">Test slot</template>
-              Second tab
-            </tab>
-          </tabs>
-        </div>
-      `,
+      render(h) {
+        return h('div', [
+          h('tabs', [
+            h('tab', { attrs: { title: 'Testing', active: true } }, 'First tab'),
+            h('tab', [h('template', { slot: 'title' }, 'Test slot'), 'Second tab']),
+          ]),
+        ]);
+      },
     }).$mount();
 
-    setTimeout(done);
+    return vm.$nextTick();
   });
 
   describe('tab links', () => {
@@ -46,14 +41,12 @@ describe('Tabs component', () => {
       expect(vm.$el.querySelector('a').classList).toContain('active');
     });
 
-    it('updates active class on click', done => {
+    it('updates active class on click', () => {
       vm.$el.querySelectorAll('a')[1].click();
 
-      setTimeout(() => {
+      return vm.$nextTick(() => {
         expect(vm.$el.querySelector('a').classList).not.toContain('active');
         expect(vm.$el.querySelectorAll('a')[1].classList).toContain('active');
-
-        done();
       });
     });
   });

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import { mountComponentWithSlots } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithSlots } from 'helpers/vue_mount_component_helper';
 import dropdownButtonComponent from '~/vue_shared/components/dropdown/dropdown_button.vue';
 
 const defaultLabel = 'Select';
@@ -74,7 +74,7 @@ describe('DropdownButtonComponent', () => {
         },
       );
 
-      expect(vm.$el).not.toContainElement('.dropdown-toggle-text');
+      expect(vm.$el.querySelector('.dropdown-toggle-text')).toBeNull();
       expect(vm.$el).toHaveText('Lorem Ipsum Dolar');
     });
   });

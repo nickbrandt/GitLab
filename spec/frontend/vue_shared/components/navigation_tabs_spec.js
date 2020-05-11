@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import navigationTabs from '~/vue_shared/components/navigation_tabs.vue';
 
 describe('navigation tabs component', () => {
@@ -56,7 +56,7 @@ describe('navigation tabs component', () => {
   });
 
   it('should trigger onTabClick', () => {
-    spyOn(vm, '$emit');
+    jest.spyOn(vm, '$emit').mockImplementation(() => {});
     vm.$el.querySelector('.js-pipelines-tab-pending').click();
 
     expect(vm.$emit).toHaveBeenCalledWith('onChangeTab', 'pending');

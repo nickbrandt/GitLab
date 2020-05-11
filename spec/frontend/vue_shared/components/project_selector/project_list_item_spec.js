@@ -1,5 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { trimText } from 'spec/helpers/text_helper';
+import { trimText } from 'helpers/text_helper';
 import ProjectListItem from '~/vue_shared/components/project_selector/project_list_item.vue';
 
 const localVue = createLocalVue();
@@ -9,7 +9,7 @@ describe('ProjectListItem component', () => {
   let wrapper;
   let vm;
   let options;
-  loadJSONFixtures('static/projects.json');
+
   const project = getJSONFixture('static/projects.json')[0];
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('ProjectListItem component', () => {
     wrapper = shallowMount(Component, options);
     ({ vm } = wrapper);
 
-    spyOn(vm, '$emit');
+    jest.spyOn(vm, '$emit').mockImplementation(() => {});
     wrapper.vm.onClick();
 
     expect(wrapper.vm.$emit).toHaveBeenCalledWith('click');
@@ -95,7 +95,7 @@ describe('ProjectListItem component', () => {
   });
 
   it('prevents search query and project name XSS', () => {
-    const alertSpy = spyOn(window, 'alert');
+    const alertSpy = jest.spyOn(window, 'alert');
     options.propsData.project.name = "my-xss-pro<script>alert('XSS');</script>ject";
     options.propsData.matcher = "pro<script>alert('XSS');</script>";
 

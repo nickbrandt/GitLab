@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import ciBadge from '~/vue_shared/components/ci_badge_link.vue';
 
 describe('CI Badge Link Component', () => {
