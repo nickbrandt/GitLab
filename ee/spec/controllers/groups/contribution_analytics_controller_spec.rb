@@ -19,7 +19,7 @@ describe Groups::ContributionAnalyticsController do
       action: action,
       target: target,
       author: author,
-      created_at: Time.now)
+      created_at: Time.current)
   end
 
   def create_push_event(author, project)

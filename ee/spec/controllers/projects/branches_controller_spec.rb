@@ -18,7 +18,7 @@ describe Projects::BranchesController do
       render_views
 
       before do
-        create(:import_state, :mirror, :finished, project: project, last_successful_update_at: Time.now)
+        create(:import_state, :mirror, :finished, project: project, last_successful_update_at: Time.current)
         allow(project.repository).to receive(:diverged_from_upstream?) { true }
       end
 

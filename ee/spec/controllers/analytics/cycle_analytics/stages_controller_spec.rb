@@ -220,7 +220,7 @@ describe Analytics::CycleAnalytics::StagesController do
       subject { get :duration_chart, params: params }
 
       it 'matches the response schema' do
-        fake_result = [double(MergeRequest, duration_in_seconds: 10, finished_at: Time.now)]
+        fake_result = [double(MergeRequest, duration_in_seconds: 10, finished_at: Time.current)]
         expect_any_instance_of(Gitlab::Analytics::CycleAnalytics::DataForDurationChart).to receive(:load).and_return(fake_result)
 
         subject
