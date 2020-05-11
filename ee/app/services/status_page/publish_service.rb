@@ -35,11 +35,11 @@ module StatusPage
     attr_reader :user, :project, :issue_id
 
     def process_details
-      if issue.confidential?
-        unpublish_details
-      else
-        publish_details
-      end
+      unpublish_details? ? unpublish_details : publish_details
+    end
+
+    def unpublish_details?
+      issue.confidential?
     end
 
     def process_list
