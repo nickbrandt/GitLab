@@ -123,7 +123,6 @@ module QA
           autoload :Integrations, 'qa/ee/page/project/settings/integrations'
           autoload :Repository, 'qa/ee/page/project/settings/repository'
           autoload :PushRules, 'qa/ee/page/project/settings/push_rules'
-          autoload :CICD, 'qa/ee/page/project/settings/ci_cd'
           autoload :LicenseCompliance, 'qa/ee/page/project/settings/license_compliance'
 
           module Services
