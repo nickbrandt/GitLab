@@ -1,0 +1,6 @@
+---
+title: Fix 500 errors caused by globally searching for scopes which cannot be used without
+  Elasticsearch
+merge_request: 31508
+author:
+type: fixed

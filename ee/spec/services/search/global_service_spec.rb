@@ -169,4 +169,22 @@ describe Search::GlobalService do
       end
     end
   end
+
+  describe '#allowed_scopes' do
+    context 'when ES is used' do
+      it 'includes ES-specific scopes' do
+        expect(described_class.new(user, {}).allowed_scopes).to include('commits')
+      end
+    end
+
+    context 'when ES is not used' do
+      before do
+        stub_ee_application_setting(elasticsearch_limit_indexing: true)
+      end
+
+      it 'does not include ES-specific scopes' do
+        expect(described_class.new(user, {}).allowed_scopes).not_to include('commits')
+      end
+    end
+  end
 end
