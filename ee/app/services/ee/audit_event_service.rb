@@ -90,7 +90,7 @@ module EE
       @details = {
         failed_login: auth.upcase,
         author_name: @author.name,
-        target_details: @author,
+        target_details: @author.name,
         ip_address: ip
       }
 

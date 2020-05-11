@@ -249,6 +249,10 @@ describe AuditEventService do
       expect(event.details[:author_name]).to eq(author_name)
     end
 
+    it 'has the right target_details' do
+      expect(event.details[:target_details]).to eq(author_name)
+    end
+
     it 'has the right auth method for OAUTH' do
       oauth_service = described_class.new(author_name, nil, ip_address: ip_address, with: 'ldap')
       event = oauth_service.for_failed_login.unauth_security_event
