@@ -1,5 +1,5 @@
 .rails:needs:setup-and-assets:
-  needs: ["setup-test-env pg9", "compile-assets pull-cache"]
+  needs: ["setup-test-env pg11", "compile-assets pull-cache"]
 
 .rails-job-base:
   extends:
@@ -55,7 +55,7 @@ static-analysis:
   script:
     - scripts/static-analysis
   cache:
-    key: "ruby-2.6.6-pg9-rubocop"
+    key: "ruby-2.6.6-pg11-rubocop"
     paths:
       - vendor/ruby
       - tmp/rubocop_cache
@@ -75,7 +75,7 @@ downtime_check:
 .rspec-base:
   extends: .rails-job-base
   stage: test
-  needs: ["setup-test-env pg9", "retrieve-tests-metadata", "compile-assets pull-cache"]
+  needs: ["setup-test-env pg11", "retrieve-tests-metadata", "compile-assets pull-cache"]
   script:
     - source scripts/rspec_helpers.sh
     - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag ~level:migration"
@@ -131,9 +131,9 @@ rspec fast_spec_helper:
   extends:
     - .rails-job-base
     - .rails:rules:ee-and-foss
-    - .use-pg9
+    - .use-pg11
   stage: test
-  needs: ["setup-test-env pg9"]
+  needs: ["setup-test-env pg11"]
 
 db:migrate:reset:
   extends: .db-job-base
