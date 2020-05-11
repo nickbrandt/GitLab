@@ -451,6 +451,7 @@ project:
 - vulnerability_feedback
 - vulnerability_identifiers
 - vulnerability_scanners
+- vulnerability_stats
 - operations_feature_flags
 - operations_feature_flags_client
 - operations_feature_flags_user_lists
