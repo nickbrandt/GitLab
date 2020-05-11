@@ -10,9 +10,6 @@ export default () => ({
   isEmptyStage: false,
   errorCode: null,
 
-  isSavingCustomStage: false,
-  isCreatingCustomStage: false,
-  isEditingCustomStage: false,
   isSavingStageOrder: false,
   errorSavingStageOrder: false,
 
@@ -25,8 +22,4 @@ export default () => ({
   stages: [],
   summary: [],
   medians: {},
-
-  customStageFormEvents: [],
-  customStageFormErrors: null,
-  customStageFormInitialData: null,
 });

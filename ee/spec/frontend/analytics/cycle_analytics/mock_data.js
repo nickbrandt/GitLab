@@ -60,7 +60,7 @@ export const customizableStagesAndEvents = getJSONFixture(
 const dummyState = {};
 
 // prepare the raw stage data for our components
-mutations[types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](dummyState, customizableStagesAndEvents);
+mutations[types.RECEIVE_GROUP_STAGES_SUCCESS](dummyState, customizableStagesAndEvents.stages);
 
 export const issueStage = getStageByTitle(dummyState.stages, 'issue');
 export const planStage = getStageByTitle(dummyState.stages, 'plan');

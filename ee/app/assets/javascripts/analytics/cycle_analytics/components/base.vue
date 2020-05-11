@@ -57,22 +57,24 @@ export default {
       'isLoading',
       'isLoadingStage',
       'isEmptyStage',
-      'isSavingCustomStage',
-      'isCreatingCustomStage',
-      'isEditingCustomStage',
       'selectedGroup',
       'selectedProjects',
       'selectedStage',
       'stages',
       'summary',
       'currentStageEvents',
-      'customStageFormEvents',
       'errorCode',
       'startDate',
       'endDate',
       'medians',
-      'customStageFormErrors',
-      'customStageFormInitialData',
+    ]),
+    ...mapState('customStages', [
+      'isSavingCustomStage',
+      'isCreatingCustomStage',
+      'isEditingCustomStage',
+      'formEvents',
+      'formErrors',
+      'formInitialData',
     ]),
     ...mapGetters([
       'hasNoAccessError',
@@ -81,8 +83,8 @@ export default {
       'selectedProjectIds',
       'enableCustomOrdering',
       'cycleAnalyticsRequestParams',
-      'customStageFormActive',
     ]),
+    ...mapGetters('customStages', ['customStageFormActive']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -97,6 +99,9 @@ export default {
     },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
+    },
+    isUpdatingCustomStage() {
+      return this.isEditingCustomStage && this.isSavingCustomStage;
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -126,17 +131,19 @@ export default {
       'setSelectedGroup',
       'setSelectedProjects',
       'setSelectedStage',
-      'hideCustomStageForm',
-      'showCustomStageForm',
-      'showEditCustomStageForm',
       'setDateRange',
-      'createCustomStage',
       'updateStage',
       'removeStage',
       'setFeatureFlags',
-      'clearCustomStageFormErrors',
       'updateStage',
       'reorderStage',
+    ]),
+    ...mapActions('customStages', [
+      'hideForm',
+      'showCreateForm',
+      'showEditForm',
+      'createStage',
+      'clearFormErrors',
     ]),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
@@ -147,18 +154,18 @@ export default {
       this.fetchCycleAnalyticsData();
     },
     onStageSelect(stage) {
-      this.hideCustomStageForm();
+      this.hideForm();
       this.setSelectedStage(stage);
       this.fetchStageData(this.selectedStage.slug);
     },
     onShowAddStageForm() {
-      this.showCustomStageForm();
+      this.showCreateForm();
     },
     onShowEditStageForm(initData = {}) {
-      this.showEditCustomStageForm(initData);
+      this.showEditForm(initData);
     },
     onCreateCustomStage(data) {
-      this.createCustomStage(data);
+      this.createStage(data);
     },
     onUpdateCustomStage(data) {
       this.updateStage(data);
@@ -288,15 +295,17 @@ export default {
               />
             </template>
             <template v-if="customStageFormActive" #content>
+              <gl-loading-icon v-if="isUpdatingCustomStage" class="mt-4" size="md" />
               <custom-stage-form
-                :events="customStageFormEvents"
+                v-else
+                :events="formEvents"
                 :is-saving-custom-stage="isSavingCustomStage"
-                :initial-fields="customStageFormInitialData"
+                :initial-fields="formInitialData"
                 :is-editing-custom-stage="isEditingCustomStage"
-                :errors="customStageFormErrors"
+                :errors="formErrors"
                 @createStage="onCreateCustomStage"
                 @updateStage="onUpdateCustomStage"
-                @clearErrors="$emit('clearCustomStageFormErrors')"
+                @clearErrors="$emit('clearFormErrors')"
               />
             </template>
           </stage-table>

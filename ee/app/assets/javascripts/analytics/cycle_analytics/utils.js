@@ -18,6 +18,7 @@ import { STAGE_NAME } from './constants';
 import { toYmd } from '../shared/utils';
 
 const EVENT_TYPE_LABEL = 'label';
+const ERROR_NAME_RESERVED = 'is reserved';
 
 export const removeFlash = (type = 'alert') => {
   const flashEl = document.querySelector(`.flash-${type}`);
@@ -337,3 +338,6 @@ export const handleErrorOrRethrow = ({ action, error }) => {
   }
   action();
 };
+
+export const isStageNameExistsError = ({ status, errors }) =>
+  status === httpStatus.UNPROCESSABLE_ENTITY && errors?.name?.includes(ERROR_NAME_RESERVED);
