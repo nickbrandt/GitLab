@@ -9,6 +9,7 @@ describe 'registrations/welcome' do
     allow(view).to receive(:current_user).and_return(user)
     allow(view).to receive(:in_subscription_flow?).and_return(in_subscription_flow)
     allow(view).to receive(:in_trial_flow?).and_return(in_trial_flow)
+    allow(view).to receive(:experiment_enabled?).with(:onboarding_issues).and_return(onboarding_issues_experiment_enabled)
 
     render
   end
@@ -18,6 +19,7 @@ describe 'registrations/welcome' do
   context 'in subscription flow' do
     let(:in_subscription_flow) { true }
     let(:in_trial_flow) { false }
+    let(:onboarding_issues_experiment_enabled) { false }
 
     it { is_expected.to have_button('Continue') }
     it { is_expected.to have_selector('#progress-bar') }
@@ -27,15 +29,27 @@ describe 'registrations/welcome' do
   context 'in trial flow' do
     let(:in_subscription_flow) { false }
     let(:in_trial_flow) { true }
+    let(:onboarding_issues_experiment_enabled) { false }
 
     it { is_expected.to have_button('Continue') }
     it { is_expected.not_to have_selector('#progress-bar') }
     it { is_expected.to have_selector('label[for="user_setup_for_company"]', text: 'Who will be using this GitLab trial?') }
   end
 
-  context 'neither in subscription nor in trial flow' do
+  context 'when onboarding issues experiment is enabled' do
     let(:in_subscription_flow) { false }
     let(:in_trial_flow) { false }
+    let(:onboarding_issues_experiment_enabled) { true }
+
+    it { is_expected.to have_button('Continue') }
+    it { is_expected.to have_selector('#progress-bar') }
+    it { is_expected.to have_selector('label[for="user_setup_for_company"]', text: 'Who will be using GitLab?') }
+  end
+
+  context 'when neither in subscription nor in trial flow and onboarding issues experiment is disabled' do
+    let(:in_subscription_flow) { false }
+    let(:in_trial_flow) { false }
+    let(:onboarding_issues_experiment_enabled) { false }
 
     it { is_expected.to have_button('Get started!') }
     it { is_expected.not_to have_selector('#progress-bar') }
