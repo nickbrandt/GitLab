@@ -472,13 +472,6 @@
   :resource_boundary: :cpu
   :weight: 2
   :idempotent: 
-- :name: design_management_new_version
-  :feature_category: :design_management
-  :has_external_dependencies: 
-  :urgency: :low
-  :resource_boundary: :memory
-  :weight: 1
-  :idempotent: 
 - :name: elastic_batch_project_indexer
   :feature_category: :global_search
   :has_external_dependencies: 
