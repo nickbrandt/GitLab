@@ -276,7 +276,7 @@ describe Projects::IssuesController do
 
           note_json = json_response.first['notes'].first
 
-          expect(note_json['author']['is_gitlab_employee']).to be false
+          expect(note_json['author'].has_key?('is_gitlab_employee')).to be false
         end
       end
 
@@ -303,7 +303,13 @@ describe Projects::IssuesController do
       context 'when user is not a gitlab employee' do
         let(:email) { 'test@example.com' }
 
-        it_behaves_like 'non inclusion of gitlab employee badge'
+        it 'shows is_gitlab_employee attribute as false' do
+          subject
+
+          note_json = json_response.first['notes'].first
+
+          expect(note_json['author']['is_gitlab_employee']).to be false
+        end
 
         context 'when feature flag is disabled' do
           before do
@@ -333,15 +339,46 @@ describe Projects::IssuesController do
     end
 
     context 'changing the assignee' do
-      it 'limits the attributes exposed on the assignee' do
-        assignee = create(:user)
+      let(:assignee) { create(:user) }
+
+      before do
         project.add_developer(assignee)
         sign_in(assignee)
+      end
 
-        update_issue(issue_params: { assignee_ids: [assignee.id] })
+      context 'when the gitlab_employee_badge flag is off' do
+        it 'does not expose the is_gitlab_employee attribute on the assignee' do
+          stub_feature_flags(gitlab_employee_badge: false)
 
-        expect(json_response['assignees'].first.keys)
-          .to match_array(%w(id name username avatar_url state web_url is_gitlab_employee))
+          update_issue(issue_params: { assignee_ids: [assignee.id] })
+
+          expect(json_response['assignees'].first.keys)
+            .to match_array(%w(id name username avatar_url state web_url))
+        end
+      end
+
+      context 'when the gitlab_employee_badge flag is on but we are not on gitlab.com' do
+        it 'does not expose the is_gitlab_employee attribute on the assignee' do
+          stub_feature_flags(gitlab_employee_badge: true)
+          allow(Gitlab).to receive(:com?).and_return(false)
+
+          update_issue(issue_params: { assignee_ids: [assignee.id] })
+
+          expect(json_response['assignees'].first.keys)
+            .to match_array(%w(id name username avatar_url state web_url))
+        end
+      end
+
+      context 'when the gitlab_employee_badge flag is on and we are on gitlab.com' do
+        it 'exposes the is_gitlab_employee attribute on the assignee' do
+          stub_feature_flags(gitlab_employee_badge: true)
+          allow(Gitlab).to receive(:com?).and_return(true)
+
+          update_issue(issue_params: { assignee_ids: [assignee.id] })
+
+          expect(json_response['assignees'].first.keys)
+            .to match_array(%w(id name username avatar_url state web_url is_gitlab_employee))
+        end
       end
     end
   end

@@ -11,10 +11,7 @@
                 "properties": {
                   "is_gitlab_employee": { "type": "boolean"}
                 },
-                "additionalProperties": false,
-                "required": [
-                  "is_gitlab_employee"
-                ]
+                "additionalProperties": false
               }
             }
           }

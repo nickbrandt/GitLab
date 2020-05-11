@@ -10,7 +10,29 @@ describe IssuableSidebarExtrasEntity do
 
   subject { described_class.new(resource, request: request).as_json }
 
-  it 'exposes is_gitlab_employee field for assignees' do
-    expect(subject[:assignees].first).to include(:is_gitlab_employee)
+  context 'when the gitlab_employee_badge flag is off' do
+    it 'does not expose the is_gitlab_employee field for assignees' do
+      stub_feature_flags(gitlab_employee_badge: false)
+
+      expect(subject[:assignees].first).not_to include(:is_gitlab_employee)
+    end
+  end
+
+  context 'when the gitlab_employee_badge flag is on but we are not on gitlab.com' do
+    it 'does not expose the is_gitlab_employee field for assignees' do
+      stub_feature_flags(gitlab_employee_badge: true)
+      allow(Gitlab).to receive(:com?).and_return(false)
+
+      expect(subject[:assignees].first).not_to include(:is_gitlab_employee)
+    end
+  end
+
+  context 'when gitlab_employee_badge flag is on and we are on gitlab.com' do
+    it 'exposes is_gitlab_employee field for assignees' do
+      stub_feature_flags(gitlab_employee_badge: true)
+      allow(Gitlab).to receive(:com?).and_return(true)
+
+      expect(subject[:assignees].first).to include(:is_gitlab_employee)
+    end
   end
 end

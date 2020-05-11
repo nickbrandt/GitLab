@@ -20,8 +20,7 @@
         "avatar_url",
         "path",
         "name",
-        "username",
-        "is_gitlab_employee" 
+        "username"
       ]
     }
   ]

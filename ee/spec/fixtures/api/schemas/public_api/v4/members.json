@@ -16,7 +16,7 @@
     },
     "required": [
       "id", "name", "username", "state",
-      "web_url", "access_level", "expires_at", "avatar_url", "is_gitlab_employee"
+      "web_url", "access_level", "expires_at", "avatar_url"
     ]
   }
 }

@@ -8,9 +8,6 @@
           "properties": {
             "is_gitlab_employee": { "type": "boolean" }
           },
-          "required" : [
-            "is_gitlab_employee"
-          ],
           "additionalProperties": false
         }
       }
