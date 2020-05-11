@@ -17,8 +17,7 @@ export default {
       const { name, value } = event.target;
 
       if (this.promVariables[name] !== value) {
-        const changedVariable = {};
-        changedVariable[name] = value;
+        const changedVariable = { [name]: value };
 
         this.setVariableData(changedVariable);
 
