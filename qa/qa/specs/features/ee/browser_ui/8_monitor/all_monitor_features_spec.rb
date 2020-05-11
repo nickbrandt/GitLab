@@ -2,7 +2,7 @@
 
 module QA
   context 'Monitor' do
-    describe 'with Prometheus Gitlab-managed cluster', :orchestrated, :kubernetes, :docker do
+    describe 'with Prometheus Gitlab-managed cluster', :orchestrated, :kubernetes, :docker, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217247', type: :flaky } do
       before :all do
         @cluster = Service::KubernetesCluster.new.create!
         Flow::Login.sign_in
