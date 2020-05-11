@@ -31,6 +31,12 @@ module EE
               null: true,
               description: 'Vulnerabilities reported on the projects in the group and its subgroups',
               resolver: ::Resolvers::VulnerabilitiesResolver
+
+        field :vulnerabilities_count_by_day_and_severity,
+              ::Types::VulnerabilitiesCountByDayAndSeverityType.connection_type,
+              null: true,
+              description: 'Number of vulnerabilities per severity level, per day, for the projects in the group and its subgroups',
+              resolver: ::Resolvers::VulnerabilitiesHistoryResolver
       end
     end
   end

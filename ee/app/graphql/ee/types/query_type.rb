@@ -15,6 +15,12 @@ module EE
               description: "Vulnerabilities reported on projects on the current user's instance security dashboard",
               resolver: ::Resolvers::VulnerabilitiesResolver
 
+        field :vulnerabilities_count_by_day_and_severity,
+              ::Types::VulnerabilitiesCountByDayAndSeverityType.connection_type,
+              null: true,
+              description: "Number of vulnerabilities per severity level, per day, for the projects on the current user's instance security dashboard",
+              resolver: ::Resolvers::VulnerabilitiesHistoryResolver
+
         field :design_management, ::Types::DesignManagementType,
               null: false,
               description: 'Fields related to design management'

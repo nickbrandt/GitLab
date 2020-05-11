@@ -12,6 +12,7 @@ describe GitlabSchema.types['Group'] do
   it { expect(described_class).to have_graphql_field(:groupTimelogsEnabled) }
   it { expect(described_class).to have_graphql_field(:timelogs, complexity: 5) }
   it { expect(described_class).to have_graphql_field(:vulnerabilities) }
+  it { expect(described_class).to have_graphql_field(:vulnerabilities_count_by_day_and_severity) }
 
   describe 'timelogs field' do
     subject { described_class.fields['timelogs'] }
