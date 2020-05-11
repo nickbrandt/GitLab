@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Search for sprints
+# Search for iterations
 #
 # params - Hash
 #   project_ids: Array of project ids or single project id or ActiveRecord relation.
@@ -9,7 +9,7 @@
 #   title - Filter by title.
 #   state - Filters by state.
 
-class SprintsFinder
+class IterationsFinder
   include FinderMethods
   include TimeFrameFilter
 
@@ -20,7 +20,7 @@ class SprintsFinder
   end
 
   def execute
-    items = Sprint.all
+    items = Iteration.all
     items = by_groups_and_projects(items)
     items = by_title(items)
     items = by_search_title(items)
@@ -53,7 +53,7 @@ class SprintsFinder
   end
 
   def by_state(items)
-    Sprint.filter_by_state(items, params[:state])
+    Iteration.filter_by_state(items, params[:state])
   end
 
   # rubocop: disable CodeReuse/ActiveRecord

@@ -15,7 +15,7 @@ module Iterations
       return ::ServiceResponse.error(message: _('Operation not allowed'), http_status: 403) unless
           parent.feature_available?(:iterations) && can?(current_user, :create_iteration, parent)
 
-      iteration = parent.sprints.new(params)
+      iteration = parent.iterations.new(params)
 
       if iteration.save
         ::ServiceResponse.success(message: _('New iteration created'), payload: { iteration: iteration })
