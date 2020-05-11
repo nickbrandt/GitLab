@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Ci
-  class InstanceVariableEntity < Grape::Entity
+  class BasicVariableEntity < Grape::Entity
     expose :id
     expose :key
     expose :value
