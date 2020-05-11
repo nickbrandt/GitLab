@@ -8,7 +8,6 @@ describe Service do
       %w(
         github
         jenkins
-        jenkins_deprecated
       )
     end
 

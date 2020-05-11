@@ -7,7 +7,6 @@ module EE
     EE_SERVICE_NAMES = %w[
       github
       jenkins
-      jenkins_deprecated
     ].freeze
 
     EE_DEV_SERVICE_NAMES = %w[
