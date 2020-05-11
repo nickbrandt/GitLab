@@ -1,0 +1,5 @@
+---
+title: Avoid saving author object in audit_events table
+merge_request: 31456
+author:
+type: fixed
