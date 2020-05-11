@@ -48,11 +48,6 @@ describe RemoveDuplicateLabelsFromProject do
 
   let(:migration) { described_class.new }
 
-  before do
-    stub_const('CREATE', 1)
-    stub_const('RENAME', 2)
-  end
-
   describe 'removing full duplicates' do
     context 'when there are no duplicate labels' do
       let!(:first_label) { labels_table.create(project_label_attributes.merge(id: 1, title: "a different label")) }
@@ -62,7 +57,7 @@ describe RemoveDuplicateLabelsFromProject do
         expect { migration.up }.not_to change { backup_labels_table.count }
       end
 
-      it 'restores removed records - no change' do
+      it 'restores removed records when rolling back - no change' do
         migration.up
 
         expect { migration.down }.not_to change { labels_table.count }
@@ -70,6 +65,9 @@ describe RemoveDuplicateLabelsFromProject do
     end
 
     context 'with duplicates with no relationships' do
+      # can't use the activerecord class because the `type` makes it think it has polymorphism and should be/have a ProjectLabel subclass
+      let(:backup_labels) { ApplicationRecord.connection.execute('SELECT * from backup_labels') }
+
       let!(:first_label) { labels_table.create(project_label_attributes.merge(id: 1)) }
       let!(:second_label) { labels_table.create(project_label_attributes.merge(id: 2)) }
       let!(:third_label) { labels_table.create(project_label_attributes.merge(id: 3, title: other_title)) }
@@ -82,11 +80,8 @@ describe RemoveDuplicateLabelsFromProject do
       it 'creates the correct backup records with `create` restore_action' do
         migration.up
 
-        # can't use the activerecord class because the `type` makes it think it has polymorphism and should be/have a ProjectLabel subclass
-        backup_labels = ApplicationRecord.connection.execute('SELECT * from backup_labels')
-
-        expect(backup_labels.find { |bl| bl["id"] == 2 }).to include(second_label.attributes.merge("restore_action" => CREATE, "new_title" => nil, "created_at" => anything, "updated_at" => anything))
-        expect(backup_labels.find { |bl| bl["id"] == 4 }).to include(fourth_label.attributes.merge("restore_action" => CREATE, "new_title" => nil, "created_at" => anything, "updated_at" => anything))
+        expect(backup_labels.find { |bl| bl["id"] == 2 }).to include(second_label.attributes.merge("restore_action" => described_class::CREATE, "new_title" => nil, "created_at" => anything, "updated_at" => anything))
+        expect(backup_labels.find { |bl| bl["id"] == 4 }).to include(fourth_label.attributes.merge("restore_action" => described_class::CREATE, "new_title" => nil, "created_at" => anything, "updated_at" => anything))
       end
 
       it 'deletes all but one' do
@@ -96,7 +91,7 @@ describe RemoveDuplicateLabelsFromProject do
         expect { fourth_label.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
-      it 'restores removed records' do
+      it 'restores removed records on rollback' do
         second_label_attributes = second_label.attributes
         fourth_label_attributes = fourth_label.attributes
 
@@ -104,8 +99,8 @@ describe RemoveDuplicateLabelsFromProject do
 
         migration.down
 
-        expect(second_label.attributes).to eq(second_label_attributes)
-        expect(fourth_label.attributes).to eq(fourth_label_attributes)
+        expect(second_label.attributes).to match(second_label_attributes)
+        expect(fourth_label.attributes).to match(fourth_label_attributes)
       end
     end
 
@@ -119,10 +114,10 @@ describe RemoveDuplicateLabelsFromProject do
       end
 
       it 'does not create a backup record with `create` restore_action' do
-        expect { migration.up }.not_to change { backup_labels_table.where(restore_action: CREATE).count }
+        expect { migration.up }.not_to change { backup_labels_table.where(restore_action: described_class::CREATE).count }
       end
 
-      it 'restores removed records' do
+      it 'restores removed records when rolling back - no change' do
         migration.up
 
         expect { migration.down }.not_to change { labels_table.count }
@@ -138,7 +133,7 @@ describe RemoveDuplicateLabelsFromProject do
       let!(:label_priority_for_fourth_label) { label_priorities_table.create(label_id: fourth_label.id, project_id: project_id, priority: 2) }
 
       it 'creates a backup record with `create` restore_action for each removed record' do
-        expect { migration.up }.to change { backup_labels_table.where(restore_action: CREATE).count }.from(0).to(1)
+        expect { migration.up }.to change { backup_labels_table.where(restore_action: described_class::CREATE).count }.from(0).to(1)
       end
 
       it 'creates the correct backup records' do
@@ -147,10 +142,10 @@ describe RemoveDuplicateLabelsFromProject do
         # can't use the activerecord class because the `type` column makes it think it has polymorphism and should be/have a ProjectLabel subclass
         backup_labels = ApplicationRecord.connection.execute('SELECT * from backup_labels')
 
-        expect(backup_labels.find { |bl| bl["id"] == 3 }).to include(third_label.attributes.merge("restore_action" => CREATE, "new_title" => nil, "created_at" => anything, "updated_at" => anything))
+        expect(backup_labels.find { |bl| bl["id"] == 3 }).to include(third_label.attributes.merge("restore_action" => described_class::CREATE, "new_title" => nil, "created_at" => anything, "updated_at" => anything))
       end
 
-      it 'deletes the third record' do
+      it 'deletes the duplicate record' do
         migration.up
 
         expect { first_label.reload }.not_to raise_error
@@ -158,14 +153,13 @@ describe RemoveDuplicateLabelsFromProject do
         expect { third_label.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
-      it 'restores removed records' do
+      it 'restores removed records on rollback' do
         third_label_attributes = third_label.attributes
 
         migration.up
-
         migration.down
 
-        expect(third_label.attributes).to eq(third_label_attributes)
+        expect(third_label.attributes).to match(third_label_attributes)
       end
     end
   end
@@ -197,26 +191,18 @@ describe RemoveDuplicateLabelsFromProject do
         # can't use the activerecord class because the `type` makes it think it has polymorphism and should be/have a ProjectLabel subclass
         backup_labels = ApplicationRecord.connection.execute('SELECT * from backup_labels')
 
-        expect(backup_labels.find { |bl| bl["id"] == 2 }).to include(second_label.attributes.merge("restore_action" => RENAME, "created_at" => anything, "updated_at" => anything))
-        expect(backup_labels.find { |bl| bl["id"] == 4 }).to include(fourth_label.attributes.merge("restore_action" => RENAME, "created_at" => anything, "updated_at" => anything))
+        expect(backup_labels.find { |bl| bl["id"] == 2 }).to include(second_label.attributes.merge("restore_action" => described_class::RENAME, "created_at" => anything, "updated_at" => anything))
+        expect(backup_labels.find { |bl| bl["id"] == 4 }).to include(fourth_label.attributes.merge("restore_action" => described_class::RENAME, "created_at" => anything, "updated_at" => anything))
       end
 
-      it 'modifies the title of the second label' do
-        expect { migration.up }.to change { second_label.reload.title }.from(label_title).to(a_string_matching(/#{label_title}_duplicate/))
-      end
-
-      it 'modifies the title of the fourth label' do
-        expect { migration.up }.to change { fourth_label.reload.title }.from(other_title).to(a_string_matching(/#{other_title}_duplicate/))
-      end
-
-      it 'renames all but one' do
+      it 'modifies the titles of the partial duplicates' do
         migration.up
 
         expect(second_label.reload.title).to match(/#{label_title}_duplicate/)
         expect(fourth_label.reload.title).to match(/#{other_title}_duplicate/)
       end
 
-      it 'restores renamed records' do
+      it 'restores renamed records on rollback' do
         second_label_attributes = second_label.attributes
         fourth_label_attributes = fourth_label.attributes
 
@@ -224,8 +210,8 @@ describe RemoveDuplicateLabelsFromProject do
 
         migration.down
 
-        expect(second_label.attributes).to eq(second_label_attributes)
-        expect(fourth_label.attributes).to eq(fourth_label_attributes)
+        expect(second_label.reload.attributes).to match(second_label_attributes)
+        expect(fourth_label.reload.attributes).to match(fourth_label_attributes)
       end
     end
   end

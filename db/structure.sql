@@ -18384,7 +18384,7 @@ CREATE INDEX backup_labels_group_id_title_idx ON public.backup_labels USING btre
 
 CREATE INDEX backup_labels_project_id_idx ON public.backup_labels USING btree (project_id);
 
-CREATE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
+CREATE UNIQUE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
 
 CREATE INDEX backup_labels_template_idx ON public.backup_labels USING btree (template) WHERE template;
 
@@ -21037,7 +21037,7 @@ ALTER TABLE ONLY public.labels
     ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.backup_labels
-    ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+    ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.merge_requests
     ADD CONSTRAINT fk_7e85395a64 FOREIGN KEY (sprint_id) REFERENCES public.sprints(id) ON DELETE CASCADE;
@@ -22246,7 +22246,7 @@ ALTER TABLE ONLY public.labels
     ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.backup_labels
-    ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES public.namespaces(id);
+    ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.project_feature_usages
     ADD CONSTRAINT fk_rails_c22a50024b FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -23236,6 +23236,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200304160823
 20200304211738
 20200305020458
+20200305020459
 20200305082754
 20200305082858
 20200305121159

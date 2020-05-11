@@ -6,6 +6,8 @@ class RemoveDuplicateLabelsFromProject < ActiveRecord::Migration[6.0]
   CREATE = 1
   RENAME = 2
 
+  disable_ddl_transaction!
+
   class BackupLabel < Label
     include BulkInsertSafe
     include EachBatch
@@ -23,14 +25,13 @@ class RemoveDuplicateLabelsFromProject < ActiveRecord::Migration[6.0]
     self.table_name = 'projects'
   end
 
-  DEDUPLICATE_BATCH_SIZE = 100_000
-  RESTORE_BATCH_SIZE = 100
+  BATCH_SIZE = 100_000
 
   def up
     # Split to smaller chunks
     # Loop rather than background job, every 100,000
     # there are 45,000,000 projects in total
-    Project.each_batch(of: DEDUPLICATE_BATCH_SIZE) do |batch|
+    Project.each_batch(of: BATCH_SIZE) do |batch|
       range = batch.pluck('MIN(id)', 'MAX(id)').first
 
       remove_full_duplicates(*range)
@@ -41,27 +42,11 @@ class RemoveDuplicateLabelsFromProject < ActiveRecord::Migration[6.0]
   def down
     # we could probably make this more efficient by getting them in bulk by restore action
     # and then applying them all at the same time...
-    BackupLabel.each_batch(of: RESTORE_BATCH_SIZE) do |backup_label|
-      action = backup_label.restore_action
-      target = Label.find(backup_label.id)
+    Project.each_batch(of: BATCH_SIZE) do |batch|
+      range = batch.pluck('MIN(id)', 'MAX(id)').first
 
-      next unless target
-      next unless action
-
-      if action == RENAME
-        if target.title == backup_label.new_title
-          say "Restoring label title '#{target.title}' to backup value '#{backup_label.title}'"
-          target.update_attribute(:title, backup_label.title)
-        end
-      elsif action == CREATE
-        restored_label = Label.new(backup_label.attributes)
-        say "Restoring label from deletion with backup attributes #{backup_label.attributes}"
-
-        if restored_label.valid?
-          restored_label.save
-          backup_label.destroy
-        end
-      end
+      restore_renamed_labels(*range)
+      restore_deleted_labels(*range)
     end
   end
 
@@ -105,7 +90,7 @@ WITH data AS (
      row_number() OVER (PARTITION BY project_id, title ORDER BY id) AS row_number
   FROM labels
   WHERE project_id BETWEEN #{start_id} AND #{stop_id}
-) SELECT * from data where row_number > 1;
+) SELECT * FROM data WHERE row_number > 1;
     SQL
 
     if soft_duplicates.any?
@@ -117,5 +102,28 @@ UPDATE labels SET title = title || '_' || 'duplicate' || extract(epoch from now(
 WHERE labels.id IN (#{soft_duplicates.map { |dup| dup["id"] }.join(", ")});
       SQL
     end
+  end
+
+  def restore_renamed_labels(start_id, stop_id)
+    # the backup label IDs are not incremental, they are copied directly from the Labels table
+    ApplicationRecord.connection.execute(<<-SQL.squish)
+WITH backups AS (
+  SELECT id, title
+  FROM backup_labels
+  WHERE project_id BETWEEN #{start_id} AND #{stop_id} AND
+  restore_action = #{RENAME}
+) UPDATE labels SET title = backups.title
+FROM backups
+WHERE labels.id = backups.id;
+    SQL
+  end
+
+  def restore_deleted_labels(start_id, stop_id)
+    ActiveRecord::Base.connection.execute(<<-SQL.squish)
+INSERT INTO labels
+SELECT id, title, color, project_id, created_at, updated_at, template, description, description_html, type, group_id, cached_markdown_version FROM backup_labels
+  WHERE backup_labels.project_id BETWEEN #{start_id} AND #{stop_id}
+  AND backup_labels.restore_action = #{CREATE}
+    SQL
   end
 end
