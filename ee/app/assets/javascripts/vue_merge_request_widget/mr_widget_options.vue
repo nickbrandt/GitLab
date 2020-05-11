@@ -352,8 +352,7 @@ export default {
 
       <grouped-accessibility-reports-app
         v-if="shouldShowAccessibilityReport"
-        :base-endpoint="mr.accessibility.base_endpoint"
-        :head-endpoint="mr.accessibility.head_endpoint"
+        :endpoint="mr.accessibilityReportPath"
       />
 
       <div class="mr-widget-section">
