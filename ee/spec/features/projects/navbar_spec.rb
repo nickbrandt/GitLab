@@ -61,16 +61,14 @@ describe 'Project navbar' do
 
   context 'when packages are available' do
     before do
-      allow(Gitlab.config.packages).to receive(:enabled).and_return(true)
+      stub_config(packages: { enabled: true }, registry: { enabled: false })
       stub_licensed_features(packages: true)
 
       insert_after_nav_item(
         _('Operations'),
         new_nav_item: {
-          nav_item: _('Packages'),
-          nav_sub_items: [
-            _('List')
-          ]
+          nav_item: _('Packages & Registries'),
+          nav_sub_items: [_('Package Registry')]
         }
       )
 
@@ -78,6 +76,22 @@ describe 'Project navbar' do
     end
 
     it_behaves_like 'verified navigation bar'
+
+    context 'when container registry is available' do
+      before do
+        stub_config(registry: { enabled: true })
+
+        insert_after_sub_nav_item(
+          _('Package Registry'),
+          within: _('Packages & Registries'),
+          new_sub_nav_item_name: _('Container Registry')
+        )
+
+        visit project_path(project)
+      end
+
+      it_behaves_like 'verified navigation bar'
+    end
   end
 
   context 'when requirements is available' do

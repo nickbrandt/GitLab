@@ -141,4 +141,39 @@ describe 'Group navbar' do
 
     it_behaves_like 'verified navigation bar'
   end
+
+  context 'when packages are available' do
+    before do
+      stub_config(packages: { enabled: true }, registry: { enabled: false })
+      stub_licensed_features(packages: true)
+
+      insert_after_nav_item(
+        _('Kubernetes'),
+        new_nav_item: {
+          nav_item: _('Packages & Registries'),
+          nav_sub_items: [_('Package Registry')]
+        }
+      )
+
+      visit group_path(group)
+    end
+
+    it_behaves_like 'verified navigation bar'
+
+    context 'when container registry is available' do
+      before do
+        stub_config(registry: { enabled: true })
+
+        insert_after_sub_nav_item(
+          _('Package Registry'),
+          within: _('Packages & Registries'),
+          new_sub_nav_item_name: _('Container Registry')
+        )
+
+        visit group_path(group)
+      end
+
+      it_behaves_like 'verified navigation bar'
+    end
+  end
 end
