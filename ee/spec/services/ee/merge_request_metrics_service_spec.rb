@@ -36,7 +36,7 @@ describe EE::MergeRequestMetricsService do
 
       context 'when `store_merge_request_line_metrics` feature flag is disabled' do
         before do
-          stub_feature_flags(store_merge_request_line_metrics: { enabled: false, thing: merge_request.target_project })
+          stub_feature_flags(store_merge_request_line_metrics: false)
         end
 
         it 'does not update line counts' do

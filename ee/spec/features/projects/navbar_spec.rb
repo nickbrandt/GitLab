@@ -97,7 +97,7 @@ describe 'Project navbar' do
   context 'when requirements is available' do
     before do
       stub_licensed_features(requirements: true)
-      stub_feature_flags(requirements_management: { enabled: true, thing: project })
+      stub_feature_flags(requirements_management: true)
 
       insert_after_nav_item(
         _('Merge Requests'),

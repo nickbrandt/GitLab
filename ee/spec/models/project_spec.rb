@@ -997,7 +997,7 @@ describe Project do
 
         context 'and :ci_minutes_track_for_public_projects FF is disabled' do
           before do
-            stub_feature_flags(ci_minutes_track_for_public_projects: { enabled: false, thing: project.shared_runners_limit_namespace })
+            stub_feature_flags(ci_minutes_track_for_public_projects: false)
           end
 
           it { is_expected.to be_falsey }

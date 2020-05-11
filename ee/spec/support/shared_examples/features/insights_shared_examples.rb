@@ -80,7 +80,7 @@ RSpec.shared_examples 'Insights page' do
 
     context 'without correct license' do
       before do
-        stub_feature_flags(insights: { enabled: false, thing: entity })
+        stub_feature_flags(insights: false)
         stub_licensed_features(insights: false)
       end
 

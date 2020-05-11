@@ -29,7 +29,7 @@ RSpec.shared_examples 'an entity with alpha/beta feature support' do
 
         context 'and enabled for the entity' do
           before do
-            stub_feature_flags(insights: { enabled: true, thing: entity })
+            stub_feature_flags(insights: entity)
           end
 
           it { expect(entity.public_send(method_name, :insights)).to be_truthy }
@@ -59,7 +59,7 @@ RSpec.shared_examples 'an entity with alpha/beta feature support' do
 
         context 'and enabled for the entity' do
           before do
-            stub_feature_flags(insights: { enabled: true, thing: entity })
+            stub_feature_flags(insights: entity)
           end
 
           it { expect(entity.public_send(method_name, :insights)).to be_truthy }
