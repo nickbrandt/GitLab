@@ -1,5 +1,5 @@
 - if @project.design_management_enabled?
-  #js-design-management{ data: { project_path: @project.full_path, issue_iid: @issue.iid, issue_path: project_issue_path(@project, @issue) } }
+  .js-design-management{ data: { project_path: @project.full_path, issue_iid: @issue.iid, issue_path: project_issue_path(@project, @issue) } }
 - else
   .mt-4
     .row.empty-state
