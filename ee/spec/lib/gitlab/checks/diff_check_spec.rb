@@ -103,6 +103,71 @@ describe Gitlab::Checks::DiffCheck do
             expect(validation_result).to be_nil
           end
         end
+
+        context "when the codeowner entity is a group" do
+          let(:group) { create(:group) }
+          let(:project) { create(:project, :repository, namespace: group) }
+          let(:codeowner_content) do
+            <<~CODEOWNERS
+            *.rb @#{code_owner.username}
+            docs/CODEOWNERS @#{group.full_path}
+            *.js.coffee @#{group.full_path}
+            CODEOWNERS
+          end
+
+          before do
+            stub_feature_flags(sectional_codeowners: false)
+          end
+
+          shared_examples_for "returns nil" do
+            it "returns nil" do
+              expect(validation_result).to be_nil
+            end
+          end
+
+          shared_examples_for "returns codeowners validation message" do
+            it "returns an error message" do
+              expect(validation_result).to include("Pushes to protected branches")
+            end
+          end
+
+          context "and the project is under a subgroup" do
+            let(:subgroup) { create(:group, parent: group) }
+            let(:project) { create(:project, :repository, namespace: subgroup) }
+
+            context "and the user is part of the codeowning-group" do
+              before do
+                group.add_developer(user)
+              end
+
+              it_behaves_like "returns nil"
+            end
+
+            context "and the user is not part of the codeowning-group" do
+              it_behaves_like "returns codeowners validation message"
+            end
+
+            context "with :codeowners_match_ancestor_groups disabled" do
+              before do
+                stub_feature_flags(codeowners_match_ancestor_groups: false)
+              end
+
+              it_behaves_like "returns codeowners validation message"
+            end
+          end
+
+          context "and the user is part of the codeowning-group" do
+            before do
+              group.add_developer(user)
+            end
+
+            it_behaves_like "returns nil"
+          end
+
+          context "and the user is not part of the codeowning-group" do
+            it_behaves_like "returns codeowners validation message"
+          end
+        end
       end
 
       context "the MR doesn't contain a matching file path" do
