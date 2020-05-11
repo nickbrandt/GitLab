@@ -65,7 +65,6 @@ describe VulnerabilitiesHelper do
         has_mr: anything,
         vulnerability_feedback_help_path: kind_of(String),
         finding_json: kind_of(String),
-        source_branch: kind_of(String),
         create_mr_url: "/#{project.full_path}/-/vulnerability_feedback",
         timestamp: Time.now.to_i
       )
@@ -85,7 +84,8 @@ describe VulnerabilitiesHelper do
         expect(pipelineData).to include(
           'id' => pipeline.id,
           'created_at' => pipeline.created_at.iso8601,
-          'url' => be_present
+          'url' => be_present,
+          'source_branch' => pipeline.ref
         )
       end
     end

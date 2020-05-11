@@ -14,7 +14,6 @@ module VulnerabilitiesHelper
       has_mr: !!vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
       vulnerability_feedback_help_path: help_page_path('user/application_security/index', anchor: 'interacting-with-the-vulnerabilities'),
       finding_json: vulnerability_finding_data(vulnerability.finding).to_json,
-      source_branch: pipeline&.ref.to_s,
       create_mr_url: create_vulnerability_feedback_merge_request_path(vulnerability.finding.project),
       timestamp: Time.now.to_i
     }
@@ -26,7 +25,8 @@ module VulnerabilitiesHelper
     {
       id: pipeline.id,
       created_at: pipeline.created_at.iso8601,
-      url: pipeline_path(pipeline)
+      url: pipeline_path(pipeline),
+      source_branch: pipeline.ref
     }
   end
 
