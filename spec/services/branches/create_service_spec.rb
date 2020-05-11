@@ -24,18 +24,29 @@ describe Branches::CreateService do
       end
     end
 
-    context 'when creating a branch fails' do
+    context 'when branch already exists' do
+      let(:project) { create(:project_empty_repo) }
+
+      it 'returns an error' do
+        result = service.execute('master', 'master')
+
+        expect(result[:status]).to eq(:error)
+        expect(result[:message]).to eq('Branch already exists')
+      end
+    end
+
+    context 'when incorrect reference is provided' do
       let(:project) { create(:project_empty_repo) }
 
       before do
         allow(project.repository).to receive(:add_branch).and_return(false)
       end
 
-      it 'returns an error with the branch name' do
-        result = service.execute('my-feature', 'master')
+      it 'returns an error with reference name' do
+        result = service.execute('my-feature', 'unknown')
 
         expect(result[:status]).to eq(:error)
-        expect(result[:message]).to eq("Invalid reference name: my-feature")
+        expect(result[:message]).to eq('Invalid reference name: unknown')
       end
     end
   end
