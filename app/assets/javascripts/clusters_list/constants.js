@@ -7,6 +7,7 @@ export const CLUSTER_TYPES = {
 };
 
 export const STATUSES = {
+  default: { className: 'bg-white', title: __('Unknown') },
   disabled: { className: 'disabled', title: __('Disabled') },
   created: { className: 'bg-success', title: __('Connected') },
   unreachable: { className: 'bg-danger', title: __('Unreachable') },

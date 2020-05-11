@@ -80,6 +80,7 @@ describe('Clusters', () => {
       ${'authentication_failure'} | ${'bg-warning'} | ${2}
       ${'deleting'}               | ${null}         | ${3}
       ${'created'}                | ${'bg-success'} | ${4}
+      ${'default'}                | ${'bg-white'}   | ${5}
     `('renders a status for each cluster', ({ statusName, className, lineNumber }) => {
       const statuses = findStatuses();
       const status = statuses.at(lineNumber);

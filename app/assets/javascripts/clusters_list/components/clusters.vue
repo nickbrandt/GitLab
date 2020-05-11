@@ -54,12 +54,12 @@ export default {
   methods: {
     ...mapActions(['fetchClusters']),
     statusClass(status) {
-      const { className } = STATUSES[status];
-      return className || 'disabled';
+      const iconClass = STATUSES[status] || STATUSES.default;
+      return iconClass.className;
     },
     statusTitle(status) {
-      const { title } = STATUSES[status];
-      return sprintf(__('Status: %{title}'), { title }, false);
+      const iconTitle = STATUSES[status] || STATUSES.default;
+      return sprintf(__('Status: %{title}'), { title: iconTitle.title }, false);
     },
   },
 };
