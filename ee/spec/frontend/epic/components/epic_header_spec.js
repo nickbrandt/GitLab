@@ -133,9 +133,7 @@ describe('EpicHeaderComponent', () => {
 
       expect(actionsEl).not.toBeNull();
       expect(actionsEl.querySelector('.js-btn-epic-action')).not.toBeNull();
-      expect(actionsEl.querySelector('.js-loading-button-label').innerText.trim()).toBe(
-        'Close epic',
-      );
+      expect(actionsEl.querySelector('.js-btn-epic-action').innerText.trim()).toBe('Close epic');
     });
 
     it('renders toggle sidebar button element', () => {
