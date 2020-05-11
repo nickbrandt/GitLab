@@ -14800,6 +14800,9 @@ msgstr ""
 msgid "Packages"
 msgstr ""
 
+msgid "Packages & Registries"
+msgstr ""
+
 msgid "Page not found"
 msgstr ""
 
