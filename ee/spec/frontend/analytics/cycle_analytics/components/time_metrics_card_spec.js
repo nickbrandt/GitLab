@@ -4,6 +4,8 @@ import TimeMetricsCard from 'ee/analytics/cycle_analytics/components/time_metric
 import { group, timeMetricsData } from '../mock_data';
 import Api from 'ee/api';
 
+jest.mock('~/flash');
+
 describe('TimeMetricsCard', () => {
   const { full_path: groupPath } = group;
   let wrapper;
@@ -59,7 +61,7 @@ describe('TimeMetricsCard', () => {
 
     it('should render an error message', () => {
       expect(createFlash).toHaveBeenCalledWith(
-        'There was an error while fetching value stream analytics time metrics data.',
+        'There was an error while fetching value stream analytics time summary data.',
       );
     });
   });
