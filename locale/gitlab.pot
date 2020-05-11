@@ -2482,6 +2482,9 @@ msgstr ""
 msgid "Approved the current merge request."
 msgstr ""
 
+msgid "Approved-By"
+msgstr ""
+
 msgid "Approver"
 msgstr ""
 
