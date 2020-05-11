@@ -50,6 +50,15 @@ describe('EE Approvals MRRules', () => {
     return onTargetBranchMutationHandler();
   };
 
+  let OriginalMutationObserver;
+  beforeAll(() => {
+    OriginalMutationObserver = global.MutationObserver;
+  });
+
+  afterAll(() => {
+    global.MutationObserver = OriginalMutationObserver;
+  });
+
   beforeEach(() => {
     store = createStoreOptions(MREditModule());
     store.modules.approvals.state = {
@@ -69,10 +78,13 @@ describe('EE Approvals MRRules', () => {
   describe('when editing a MR', () => {
     const initialTargetBranch = 'master';
     let targetBranchInputElement;
-    let MutationObserverSpy;
+    let MutationObserverMock;
 
     beforeEach(() => {
-      MutationObserverSpy = jest.spyOn(global, 'MutationObserver');
+      MutationObserverMock = jest
+        .fn()
+        .mockImplementation(args => new OriginalMutationObserver(args));
+      global.MutationObserver = MutationObserverMock;
 
       targetBranchInputElement = document.createElement('input');
       targetBranchInputElement.id = 'merge_request_target_branch';
@@ -91,7 +103,7 @@ describe('EE Approvals MRRules', () => {
 
     afterEach(() => {
       targetBranchInputElement.parentNode.removeChild(targetBranchInputElement);
-      MutationObserverSpy.mockClear();
+      MutationObserverMock.mockClear();
     });
 
     it('sets the target branch data to be the same value as the target branch dropdown', () => {
@@ -103,20 +115,20 @@ describe('EE Approvals MRRules', () => {
     it('updates the target branch data when the target branch dropdown is changed', () => {
       factory();
       const newValue = setTargetBranchInputValue();
-      callTargetBranchHandler(MutationObserverSpy);
+      callTargetBranchHandler(MutationObserverMock);
       expect(wrapper.vm.targetBranch).toBe(newValue);
     });
 
     it('re-fetches rules when target branch has changed', () => {
       factory();
       setTargetBranchInputValue();
-      callTargetBranchHandler(MutationObserverSpy);
+      callTargetBranchHandler(MutationObserverMock);
       expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalled();
     });
 
     it('disconnects MutationObserver when component gets destroyed', () => {
       const mockDisconnect = jest.fn();
-      MutationObserverSpy.mockImplementation(() => ({
+      MutationObserverMock.mockImplementation(() => ({
         disconnect: mockDisconnect,
         observe: jest.fn(),
       }));
