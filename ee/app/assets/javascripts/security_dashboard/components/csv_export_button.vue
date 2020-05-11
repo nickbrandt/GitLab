@@ -5,6 +5,7 @@ import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import pollUntilComplete from '~/lib/utils/poll_until_complete';
+import download from '~/lib/utils/downloader';
 
 export const STORAGE_KEY = 'vulnerability_csv_export_popover_dismissed';
 
@@ -46,10 +47,10 @@ export default {
         .post(this.vulnerabilitiesExportEndpoint)
         .then(({ data }) => pollUntilComplete(data._links.self))
         .then(({ data }) => {
-          const anchor = document.createElement('a');
-          anchor.download = `csv-export-${formatDate(new Date(), 'isoDateTime')}.csv`;
-          anchor.href = data._links.download;
-          anchor.click();
+          download({
+            fileName: `csv-export-${formatDate(new Date(), 'isoDateTime')}.csv`,
+            url: data._links.download,
+          });
         })
         .catch(() => {
           createFlash(s__('SecurityReports|There was an error while generating the report.'));

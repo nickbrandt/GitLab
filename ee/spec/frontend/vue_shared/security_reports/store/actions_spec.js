@@ -94,6 +94,10 @@ const createDismissedVulnerability = options =>
     isDismissed: true,
   });
 
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('security reports actions', () => {
   let mockedState;
   let mock;
@@ -870,9 +874,8 @@ describe('security reports actions', () => {
 
   describe('downloadPatch', () => {
     it('creates a download link and clicks on it to download the file', () => {
-      jest.spyOn(document, 'createElement');
-      jest.spyOn(document.body, 'appendChild');
-      jest.spyOn(document.body, 'removeChild');
+      const a = { click: jest.fn() };
+      jest.spyOn(document, 'createElement').mockImplementation(() => a);
 
       downloadPatch({
         state: {
@@ -889,8 +892,10 @@ describe('security reports actions', () => {
       });
 
       expect(document.createElement).toHaveBeenCalledTimes(1);
-      expect(document.body.appendChild).toHaveBeenCalledTimes(1);
-      expect(document.body.removeChild).toHaveBeenCalledTimes(1);
+      expect(document.createElement).toHaveBeenCalledWith('a');
+      expect(a.click).toHaveBeenCalledTimes(1);
+      expect(a.download).toBe('remediation.patch');
+      expect(a.href).toContain('data:text/plain;base64');
     });
   });
 
