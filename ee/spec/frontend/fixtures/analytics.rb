@@ -203,6 +203,12 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
 
       expect(response).to be_successful
     end
+
+    it 'analytics/value_stream_analytics/time_summary.json' do
+      get(:show, params: params, format: :json)
+
+      expect(response).to be_successful
+    end
   end
 
   describe Analytics::TasksByTypeController, type: :controller do

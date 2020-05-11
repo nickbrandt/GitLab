@@ -21,12 +21,14 @@ const fixtureEndpoints = {
   stageEvents: stage => `analytics/value_stream_analytics/stages/${stage}/records.json`,
   stageMedian: stage => `analytics/value_stream_analytics/stages/${stage}/median.json`,
   recentActivityData: 'analytics/value_stream_analytics/summary.json',
+  timeMetricsData: 'analytics/value_stream_analytics/time_summary.json',
   groupLabels: 'api/group_labels.json',
 };
 
 export const endpoints = {
   groupLabels: /groups\/[A-Z|a-z|\d|\-|_]+\/-\/labels.json/,
   recentActivityData: /analytics\/value_stream_analytics\/summary/,
+  timeMetricsData: /analytics\/value_stream_analytics\/time_summary/,
   durationData: /analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/,
   stageData: /analytics\/value_stream_analytics\/stages\/\d+\/records/,
   stageMedian: /analytics\/value_stream_analytics\/stages\/\d+\/median/,
@@ -53,10 +55,7 @@ const getStageByTitle = (stages, title) =>
   stages.find(stage => stage.title && stage.title.toLowerCase().trim() === title) || {};
 
 export const recentActivityData = getJSONFixture(fixtureEndpoints.recentActivityData);
-export const timeMetricsData = [
-  { label: 'Lead time', value: '2', unit: 'days' },
-  { label: 'Cycle time', value: '1.5', unit: 'days' },
-];
+export const timeMetricsData = getJSONFixture(fixtureEndpoints.timeMetricsData);
 
 export const customizableStagesAndEvents = getJSONFixture(
   fixtureEndpoints.customizableCycleAnalyticsStagesAndEvents,
