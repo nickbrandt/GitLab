@@ -27,11 +27,13 @@ describe('History Entry', () => {
     },
   };
 
+  const notesUrl = 'security/vulnerabilities/86/notes/1272';
+
   const createWrapper = (...notes) => {
     const discussion = { notes };
 
     wrapper = shallowMount(HistoryEntry, {
-      propsData: { discussion },
+      propsData: { discussion, notesUrl },
       stubs: { EventItem },
     });
   };

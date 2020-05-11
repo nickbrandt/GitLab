@@ -16,7 +16,8 @@ describe('Vulnerability Footer', () => {
   let wrapper;
 
   const minimumProps = {
-    discussionsUrl: `/discussions`,
+    discussionsUrl: '/discussions',
+    notesUrl: 'security/vulnerabilities/86/notes/1272',
     solutionInfo: {
       hasDownload: false,
       hasMr: false,

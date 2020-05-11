@@ -15,6 +15,10 @@ export default {
       type: String,
       required: true,
     },
+    notesUrl: {
+      type: String,
+      required: true,
+    },
     feedback: {
       type: Object,
       required: false,
@@ -80,6 +84,7 @@ export default {
         v-for="discussion in discussions"
         :key="discussion.id"
         :discussion="discussion"
+        :notes-url="notesUrl"
       />
     </ul>
   </div>
