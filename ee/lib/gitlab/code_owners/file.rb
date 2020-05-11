@@ -13,7 +13,7 @@ module Gitlab
       end
 
       def parsed_data
-        @parsed_data ||= sectional_codeowners? ? get_parsed_sectional_data : get_parsed_data
+        @parsed_data ||= get_parsed_data
       end
 
       def empty?
@@ -21,10 +21,22 @@ module Gitlab
       end
 
       def entry_for_path(path)
-        return sectional_entry_for_path(path) if sectional_codeowners?
-
         path = "/#{path}" unless path.start_with?('/')
 
+        if sectional_codeowners?
+          sectional_entry_for_path(path)
+        else
+          non_sectional_entry_for_path(path)
+        end
+      end
+
+      def path
+        @blob&.path
+      end
+
+      private
+
+      def non_sectional_entry_for_path(path)
         matching_pattern = parsed_data.keys.reverse.detect do |pattern|
           path_matches?(pattern, path)
         end
@@ -33,7 +45,6 @@ module Gitlab
       end
 
       def sectional_entry_for_path(path)
-        path = "/#{path}" unless path.start_with?('/')
         matches = []
 
         parsed_data.each do |_, section_entries|
@@ -47,12 +58,6 @@ module Gitlab
         matches
       end
 
-      def path
-        @blob&.path
-      end
-
-      private
-
       def data
         if @blob && !@blob.binary?
           @blob.data
@@ -62,6 +67,14 @@ module Gitlab
       end
 
       def get_parsed_data
+        if sectional_codeowners?
+          get_parsed_sectional_data
+        else
+          get_parsed_non_sectional_data
+        end
+      end
+
+      def get_parsed_non_sectional_data
         parsed = {}
 
         data.lines.each do |line|
