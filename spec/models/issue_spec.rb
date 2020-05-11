@@ -176,7 +176,7 @@ describe Issue do
   describe '#close' do
     subject(:issue) { create(:issue, state: 'opened') }
 
-    it 'sets closed_at to Time.now when an issue is closed' do
+    it 'sets closed_at to Time.current when an issue is closed' do
       expect { issue.close }.to change { issue.closed_at }.from(nil)
     end
 
@@ -190,7 +190,7 @@ describe Issue do
 
   describe '#reopen' do
     let(:user) { create(:user) }
-    let(:issue) { create(:issue, state: 'closed', closed_at: Time.now, closed_by: user) }
+    let(:issue) { create(:issue, state: 'closed', closed_at: Time.current, closed_by: user) }
 
     it 'sets closed_at to nil when an issue is reopend' do
       expect { issue.reopen }.to change { issue.closed_at }.to(nil)
