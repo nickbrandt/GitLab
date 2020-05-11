@@ -176,7 +176,7 @@ export default {
     >
       <span class="system-note-message"> <slot></slot> </span>
       <template v-if="createdAt">
-        <span ref="actionText" class="system-note-separator">
+        <span ref="actionText" class="system-note-separator" :class="{ 'ml-1': isConfidential }">
           <template v-if="actionText">{{ actionText }}</template>
         </span>
         <a
