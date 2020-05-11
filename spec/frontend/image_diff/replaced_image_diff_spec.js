@@ -76,8 +76,8 @@ describe('ReplacedImageDiff', () => {
 
   describe('init', () => {
     beforeEach(() => {
-      spyOn(ReplacedImageDiff.prototype, 'bindEvents').and.callFake(() => {});
-      spyOn(ReplacedImageDiff.prototype, 'generateImageEls').and.callFake(() => {});
+      jest.spyOn(ReplacedImageDiff.prototype, 'bindEvents').mockImplementation(() => {});
+      jest.spyOn(ReplacedImageDiff.prototype, 'generateImageEls').mockImplementation(() => {});
 
       replacedImageDiff = new ReplacedImageDiff(element);
       replacedImageDiff.init();
@@ -140,7 +140,7 @@ describe('ReplacedImageDiff', () => {
 
   describe('generateImageEls', () => {
     beforeEach(() => {
-      spyOn(ReplacedImageDiff.prototype, 'bindEvents').and.callFake(() => {});
+      jest.spyOn(ReplacedImageDiff.prototype, 'bindEvents').mockImplementation(() => {});
 
       replacedImageDiff = new ReplacedImageDiff(element, {
         canCreateNote: false,
@@ -163,7 +163,7 @@ describe('ReplacedImageDiff', () => {
 
   describe('bindEvents', () => {
     beforeEach(() => {
-      spyOn(ImageDiff.prototype, 'bindEvents').and.callFake(() => {});
+      jest.spyOn(ImageDiff.prototype, 'bindEvents').mockImplementation(() => {});
       replacedImageDiff = new ReplacedImageDiff(element);
 
       setupViewModesEls();
@@ -176,7 +176,7 @@ describe('ReplacedImageDiff', () => {
     });
 
     it('should register click eventlistener to 2-up view mode', done => {
-      spyOn(ReplacedImageDiff.prototype, 'changeView').and.callFake(viewMode => {
+      jest.spyOn(ReplacedImageDiff.prototype, 'changeView').mockImplementation(viewMode => {
         expect(viewMode).toEqual(viewTypes.TWO_UP);
         done();
       });
@@ -186,7 +186,7 @@ describe('ReplacedImageDiff', () => {
     });
 
     it('should register click eventlistener to swipe view mode', done => {
-      spyOn(ReplacedImageDiff.prototype, 'changeView').and.callFake(viewMode => {
+      jest.spyOn(ReplacedImageDiff.prototype, 'changeView').mockImplementation(viewMode => {
         expect(viewMode).toEqual(viewTypes.SWIPE);
         done();
       });
@@ -196,7 +196,7 @@ describe('ReplacedImageDiff', () => {
     });
 
     it('should register click eventlistener to onion skin view mode', done => {
-      spyOn(ReplacedImageDiff.prototype, 'changeView').and.callFake(viewMode => {
+      jest.spyOn(ReplacedImageDiff.prototype, 'changeView').mockImplementation(viewMode => {
         expect(viewMode).toEqual(viewTypes.SWIPE);
         done();
       });
@@ -247,7 +247,7 @@ describe('ReplacedImageDiff', () => {
   describe('changeView', () => {
     beforeEach(() => {
       replacedImageDiff = new ReplacedImageDiff(element);
-      spyOn(imageDiffHelper, 'removeCommentIndicator').and.returnValue({
+      jest.spyOn(imageDiffHelper, 'removeCommentIndicator').mockReturnValue({
         removed: false,
       });
       setupImageFrameEls();
@@ -265,13 +265,12 @@ describe('ReplacedImageDiff', () => {
 
     describe('valid viewType', () => {
       beforeEach(() => {
-        jasmine.clock().install();
-        spyOn(ReplacedImageDiff.prototype, 'renderNewView').and.callFake(() => {});
+        jest.spyOn(ReplacedImageDiff.prototype, 'renderNewView').mockImplementation(() => {});
         replacedImageDiff.changeView(viewTypes.ONION_SKIN);
       });
 
       afterEach(() => {
-        jasmine.clock().uninstall();
+        jest.clearAllTimers();
       });
 
       it('should call removeCommentIndicator', () => {
@@ -287,7 +286,7 @@ describe('ReplacedImageDiff', () => {
       });
 
       it('should call renderNewView', () => {
-        jasmine.clock().tick(251);
+        jest.advanceTimersByTime(251);
 
         expect(replacedImageDiff.renderNewView).toHaveBeenCalled();
       });
@@ -300,7 +299,7 @@ describe('ReplacedImageDiff', () => {
     });
 
     it('should call renderBadges', () => {
-      spyOn(ReplacedImageDiff.prototype, 'renderBadges').and.callFake(() => {});
+      jest.spyOn(ReplacedImageDiff.prototype, 'renderBadges').mockImplementation(() => {});
 
       replacedImageDiff.renderNewView({
         removed: false,
@@ -326,14 +325,16 @@ describe('ReplacedImageDiff', () => {
       });
 
       it('should pass showCommentIndicator normalized indicator values', done => {
-        spyOn(imageDiffHelper, 'showCommentIndicator').and.callFake(() => {});
-        spyOn(imageDiffHelper, 'resizeCoordinatesToImageElement').and.callFake((imageEl, meta) => {
-          expect(meta.x).toEqual(indicator.x);
-          expect(meta.y).toEqual(indicator.y);
-          expect(meta.width).toEqual(indicator.image.width);
-          expect(meta.height).toEqual(indicator.image.height);
-          done();
-        });
+        jest.spyOn(imageDiffHelper, 'showCommentIndicator').mockImplementation(() => {});
+        jest
+          .spyOn(imageDiffHelper, 'resizeCoordinatesToImageElement')
+          .mockImplementation((imageEl, meta) => {
+            expect(meta.x).toEqual(indicator.x);
+            expect(meta.y).toEqual(indicator.y);
+            expect(meta.width).toEqual(indicator.image.width);
+            expect(meta.height).toEqual(indicator.image.height);
+            done();
+          });
         replacedImageDiff.renderNewView(indicator);
       });
 
@@ -341,13 +342,13 @@ describe('ReplacedImageDiff', () => {
         const normalized = {
           normalized: true,
         };
-        spyOn(imageDiffHelper, 'resizeCoordinatesToImageElement').and.returnValue(normalized);
-        spyOn(imageDiffHelper, 'showCommentIndicator').and.callFake(
-          (imageFrameEl, normalizedIndicator) => {
+        jest.spyOn(imageDiffHelper, 'resizeCoordinatesToImageElement').mockReturnValue(normalized);
+        jest
+          .spyOn(imageDiffHelper, 'showCommentIndicator')
+          .mockImplementation((imageFrameEl, normalizedIndicator) => {
             expect(normalizedIndicator).toEqual(normalized);
             done();
-          },
-        );
+          });
         replacedImageDiff.renderNewView(indicator);
       });
     });

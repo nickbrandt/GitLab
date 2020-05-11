@@ -44,7 +44,7 @@ describe('domHelper', () => {
     });
 
     it('should update avatar badge number', () => {
-      expect(discussionEl.querySelector('.badge').innerText).toEqual(badgeNumber.toString());
+      expect(discussionEl.querySelector('.badge').textContent).toEqual(badgeNumber.toString());
     });
   });
 
@@ -60,7 +60,7 @@ describe('domHelper', () => {
     });
 
     it('should update discussion badge number', () => {
-      expect(discussionEl.querySelector('.badge').innerText).toEqual(badgeNumber.toString());
+      expect(discussionEl.querySelector('.badge').textContent).toEqual(badgeNumber.toString());
     });
   });
 

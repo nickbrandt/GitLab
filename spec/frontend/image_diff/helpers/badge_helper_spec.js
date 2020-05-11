@@ -66,7 +66,7 @@ describe('badge helper', () => {
     });
 
     it('should set the badge text', () => {
-      expect(buttonEl.innerText).toEqual(badgeText);
+      expect(buttonEl.textContent).toEqual(badgeText);
     });
 
     it('should set the button coordinates', () => {
@@ -120,7 +120,7 @@ describe('badge helper', () => {
     });
 
     it('should update badge number', () => {
-      expect(avatarBadgeEl.innerText).toEqual(badgeNumber.toString());
+      expect(avatarBadgeEl.textContent).toEqual(badgeNumber.toString());
     });
 
     it('should remove hidden class', () => {

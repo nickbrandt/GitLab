@@ -75,7 +75,7 @@ describe('ImageDiff', () => {
 
   describe('init', () => {
     beforeEach(() => {
-      spyOn(ImageDiff.prototype, 'bindEvents').and.callFake(() => {});
+      jest.spyOn(ImageDiff.prototype, 'bindEvents').mockImplementation(() => {});
       imageDiff = new ImageDiff(element);
       imageDiff.init();
     });
@@ -97,19 +97,19 @@ describe('ImageDiff', () => {
     let imageEl;
 
     beforeEach(() => {
-      spyOn(imageDiffHelper, 'toggleCollapsed').and.callFake(() => {});
-      spyOn(imageDiffHelper, 'commentIndicatorOnClick').and.callFake(() => {});
-      spyOn(imageDiffHelper, 'removeCommentIndicator').and.callFake(() => {});
-      spyOn(ImageDiff.prototype, 'imageClicked').and.callFake(() => {});
-      spyOn(ImageDiff.prototype, 'addBadge').and.callFake(() => {});
-      spyOn(ImageDiff.prototype, 'removeBadge').and.callFake(() => {});
-      spyOn(ImageDiff.prototype, 'renderBadges').and.callFake(() => {});
+      jest.spyOn(imageDiffHelper, 'toggleCollapsed').mockImplementation(() => {});
+      jest.spyOn(imageDiffHelper, 'commentIndicatorOnClick').mockImplementation(() => {});
+      jest.spyOn(imageDiffHelper, 'removeCommentIndicator').mockImplementation(() => {});
+      jest.spyOn(ImageDiff.prototype, 'imageClicked').mockImplementation(() => {});
+      jest.spyOn(ImageDiff.prototype, 'addBadge').mockImplementation(() => {});
+      jest.spyOn(ImageDiff.prototype, 'removeBadge').mockImplementation(() => {});
+      jest.spyOn(ImageDiff.prototype, 'renderBadges').mockImplementation(() => {});
       imageEl = element.querySelector('.diff-file .js-image-frame img');
     });
 
     describe('default', () => {
       beforeEach(() => {
-        spyOn(imageUtility, 'isImageLoaded').and.returnValue(false);
+        jest.spyOn(imageUtility, 'isImageLoaded').mockReturnValue(false);
         imageDiff = new ImageDiff(element);
         imageDiff.imageEl = imageEl;
         imageDiff.bindEvents();
@@ -130,7 +130,7 @@ describe('ImageDiff', () => {
 
     describe('image not loaded', () => {
       beforeEach(() => {
-        spyOn(imageUtility, 'isImageLoaded').and.returnValue(false);
+        jest.spyOn(imageUtility, 'isImageLoaded').mockReturnValue(false);
         imageDiff = new ImageDiff(element);
         imageDiff.imageEl = imageEl;
         imageDiff.bindEvents();
@@ -146,7 +146,7 @@ describe('ImageDiff', () => {
 
     describe('canCreateNote', () => {
       beforeEach(() => {
-        spyOn(imageUtility, 'isImageLoaded').and.returnValue(false);
+        jest.spyOn(imageUtility, 'isImageLoaded').mockReturnValue(false);
         imageDiff = new ImageDiff(element, {
           canCreateNote: true,
         });
@@ -185,7 +185,7 @@ describe('ImageDiff', () => {
 
     describe('canCreateNote is false', () => {
       beforeEach(() => {
-        spyOn(imageUtility, 'isImageLoaded').and.returnValue(false);
+        jest.spyOn(imageUtility, 'isImageLoaded').mockReturnValue(false);
         imageDiff = new ImageDiff(element);
         imageDiff.imageEl = imageEl;
         imageDiff.bindEvents();
@@ -202,12 +202,12 @@ describe('ImageDiff', () => {
 
   describe('imageClicked', () => {
     beforeEach(() => {
-      spyOn(imageDiffHelper, 'getTargetSelection').and.returnValue({
+      jest.spyOn(imageDiffHelper, 'getTargetSelection').mockReturnValue({
         actual: {},
         browser: {},
       });
-      spyOn(imageDiffHelper, 'setPositionDataAttribute').and.callFake(() => {});
-      spyOn(imageDiffHelper, 'showCommentIndicator').and.callFake(() => {});
+      jest.spyOn(imageDiffHelper, 'setPositionDataAttribute').mockImplementation(() => {});
+      jest.spyOn(imageDiffHelper, 'showCommentIndicator').mockImplementation(() => {});
       imageDiff = new ImageDiff(element);
       imageDiff.imageClicked({
         detail: {
@@ -231,7 +231,7 @@ describe('ImageDiff', () => {
 
   describe('renderBadges', () => {
     beforeEach(() => {
-      spyOn(ImageDiff.prototype, 'renderBadge').and.callFake(() => {});
+      jest.spyOn(ImageDiff.prototype, 'renderBadge').mockImplementation(() => {});
       imageDiff = new ImageDiff(element);
       imageDiff.renderBadges();
     });
@@ -239,7 +239,7 @@ describe('ImageDiff', () => {
     it('should call renderBadge for each discussionEl', () => {
       const discussionEls = element.querySelectorAll('.note-container .discussion-notes .notes');
 
-      expect(imageDiff.renderBadge.calls.count()).toEqual(discussionEls.length);
+      expect(imageDiff.renderBadge.mock.calls.length).toEqual(discussionEls.length);
     });
   });
 
@@ -247,9 +247,9 @@ describe('ImageDiff', () => {
     let discussionEls;
 
     beforeEach(() => {
-      spyOn(imageDiffHelper, 'addImageBadge').and.callFake(() => {});
-      spyOn(imageDiffHelper, 'addImageCommentBadge').and.callFake(() => {});
-      spyOn(imageDiffHelper, 'generateBadgeFromDiscussionDOM').and.returnValue({
+      jest.spyOn(imageDiffHelper, 'addImageBadge').mockImplementation(() => {});
+      jest.spyOn(imageDiffHelper, 'addImageCommentBadge').mockImplementation(() => {});
+      jest.spyOn(imageDiffHelper, 'generateBadgeFromDiscussionDOM').mockReturnValue({
         browser: {},
         noteId: 'noteId',
       });
@@ -282,9 +282,9 @@ describe('ImageDiff', () => {
 
   describe('addBadge', () => {
     beforeEach(() => {
-      spyOn(imageDiffHelper, 'addImageBadge').and.callFake(() => {});
-      spyOn(imageDiffHelper, 'addAvatarBadge').and.callFake(() => {});
-      spyOn(imageDiffHelper, 'updateDiscussionBadgeNumber').and.callFake(() => {});
+      jest.spyOn(imageDiffHelper, 'addImageBadge').mockImplementation(() => {});
+      jest.spyOn(imageDiffHelper, 'addAvatarBadge').mockImplementation(() => {});
+      jest.spyOn(imageDiffHelper, 'updateDiscussionBadgeNumber').mockImplementation(() => {});
       imageDiff = new ImageDiff(element);
       imageDiff.imageFrameEl = element.querySelector('.diff-file .js-image-frame');
       imageDiff.addBadge({
@@ -320,8 +320,8 @@ describe('ImageDiff', () => {
     beforeEach(() => {
       const { imageMeta } = mockData;
 
-      spyOn(imageDiffHelper, 'updateDiscussionBadgeNumber').and.callFake(() => {});
-      spyOn(imageDiffHelper, 'updateDiscussionAvatarBadgeNumber').and.callFake(() => {});
+      jest.spyOn(imageDiffHelper, 'updateDiscussionBadgeNumber').mockImplementation(() => {});
+      jest.spyOn(imageDiffHelper, 'updateDiscussionAvatarBadgeNumber').mockImplementation(() => {});
       imageDiff = new ImageDiff(element);
       imageDiff.imageBadges = [imageMeta, imageMeta, imageMeta];
       imageDiff.imageFrameEl = element.querySelector('.diff-file .js-image-frame');
@@ -336,8 +336,8 @@ describe('ImageDiff', () => {
       it('should update next imageBadgeEl value', () => {
         const imageBadgeEls = imageDiff.imageFrameEl.querySelectorAll('.badge');
 
-        expect(imageBadgeEls[0].innerText).toEqual('1');
-        expect(imageBadgeEls[1].innerText).toEqual('2');
+        expect(imageBadgeEls[0].textContent).toEqual('1');
+        expect(imageBadgeEls[1].textContent).toEqual('2');
         expect(imageBadgeEls.length).toEqual(2);
       });
 
