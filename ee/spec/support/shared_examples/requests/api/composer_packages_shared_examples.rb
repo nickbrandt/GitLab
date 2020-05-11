@@ -42,7 +42,7 @@ RSpec.shared_examples 'rejects Composer access with unknown project id' do
     let(:project) { double(id: non_existing_record_id) }
 
     context 'as anonymous' do
-      it_behaves_like 'process PyPi api request', :anonymous, :unauthorized
+      it_behaves_like 'process PyPi api request', :anonymous, :not_found
     end
 
     context 'as authenticated user' do
