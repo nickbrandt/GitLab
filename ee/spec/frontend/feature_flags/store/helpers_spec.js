@@ -400,6 +400,7 @@ describe('feature flags helpers spec', () => {
           name: 'test',
           description: 'test description',
           version: NEW_VERSION_FLAG,
+          active: true,
           strategies: [
             {
               id: '1',
@@ -421,6 +422,7 @@ describe('feature flags helpers spec', () => {
           name: 'test',
           description: 'test description',
           version: NEW_VERSION_FLAG,
+          active: true,
           strategies_attributes: [
             {
               id: '1',
@@ -446,6 +448,7 @@ describe('feature flags helpers spec', () => {
           name: 'test',
           description: 'test description',
           version: NEW_VERSION_FLAG,
+          active: true,
           strategies: [
             {
               id: '1',
@@ -460,6 +463,7 @@ describe('feature flags helpers spec', () => {
           name: 'test',
           description: 'test description',
           version: NEW_VERSION_FLAG,
+          active: true,
           strategies_attributes: [
             {
               id: '1',
@@ -480,6 +484,7 @@ describe('feature flags helpers spec', () => {
       const result = mapStrategiesToRails({
         name: 'test',
         version: NEW_VERSION_FLAG,
+        active: true,
         strategies: [
           {
             id: '1',
@@ -493,6 +498,17 @@ describe('feature flags helpers spec', () => {
       const strategyAttrs = result.operations_feature_flag.strategies_attributes[0];
 
       expect(strategyAttrs.parameters).toEqual({ userIds: 'user1,user2,user3' });
+    });
+
+    it('preserves the value of active', () => {
+      const result = mapStrategiesToRails({
+        name: 'test',
+        version: NEW_VERSION_FLAG,
+        active: false,
+        strategies: [],
+      });
+
+      expect(result.operations_feature_flag.active).toBe(false);
     });
   });
 });

@@ -83,7 +83,7 @@ export default {
         {{ $options.translations.legacyFlagAlert }}
       </gl-alert>
       <div class="d-flex align-items-center mb-3 mt-3">
-        <gl-toggle :value="active" class="m-0 mr-3" @change="toggleActive" />
+        <gl-toggle :value="active" class="m-0 mr-3 js-feature-flag-status" @change="toggleActive" />
         <h3 class="page-title m-0">{{ title }}</h3>
       </div>
 

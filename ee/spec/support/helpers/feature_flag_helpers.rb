@@ -60,6 +60,14 @@ module FeatureFlagHelpers
     find('.js-feature-flag-edit-button')
   end
 
+  def status_toggle_button
+    find('.js-feature-flag-status button')
+  end
+
+  def expect_status_toggle_button_to_be_checked
+    expect(page).to have_css('.js-feature-flag-status button.is-checked')
+  end
+
   def expect_user_to_see_feature_flags_index_page
     expect(page).to have_css('h3.page-title', text: 'Feature Flags')
     expect(page).to have_text('All')
