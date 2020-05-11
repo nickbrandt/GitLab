@@ -515,6 +515,16 @@ module API
         present upload, with: Entities::ProjectUpload
       end
 
+      desc 'Download a file'
+      params do
+        requires :file, type: File, desc: 'The file to be downloaded'
+      end
+      post ":id/uploads" do
+        download = DownloadService.new(user_project, params[:file]).execute
+
+        present download, with: Entities::ProjectDownload
+      end
+
       desc 'Get the users list of a project' do
         success Entities::UserBasic
       end

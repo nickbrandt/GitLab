@@ -384,6 +384,14 @@ describe API::ConanPackages do
       it_behaves_like 'package download_urls'
     end
 
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/upload_urls' do
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}/packages/#{conan_package_reference}/digest"), headers: headers }
+
+      it_behaves_like 'rejects invalid recipe'
+      it_behaves_like 'rejects recipe for invalid project'
+      it_behaves_like 'package download_urls'
+    end
+
     describe 'POST /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/upload_urls' do
       let(:recipe_path) { package.conan_recipe_path }
 
