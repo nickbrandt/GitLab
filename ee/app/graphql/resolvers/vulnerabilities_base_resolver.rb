@@ -11,10 +11,10 @@ module Resolvers
 
     protected
 
-    # `vulnerable` will be a Project, Group, or InstanceSecurityDashboard
+    # `vulnerable` can be a Project, Group, or InstanceSecurityDashboard
     def vulnerable
-      # A project or group could have been loaded in batch by `BatchLoader`.
-      # At this point we need the `id` of the project or group to query for vulnerabilities, so
+      # The object could have been loaded in batch by `BatchLoader`.
+      # At this point we need the `id` of the object to query for vulnerabilities, so
       # make sure it's loaded and not `nil` before continuing.
 
       strong_memoize(:vulnerable) do

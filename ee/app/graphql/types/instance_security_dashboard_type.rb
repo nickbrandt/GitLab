@@ -11,5 +11,11 @@ module Types
           null: false,
           authorize: :read_project,
           description: 'Projects selected in Instance Security Dashboard'
+
+    field :vulnerability_grades,
+          Types::VulnerabilityGradesType,
+          null: false,
+          description: 'Represents vulnerable project counts for each grade',
+          resolver: ::Resolvers::VulnerabilityGradesResolver
   end
 end

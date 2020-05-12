@@ -41,6 +41,12 @@ module EE
               null: true,
               description: 'Number of vulnerabilities per severity level, per day, for the projects in the group and its subgroups',
               resolver: ::Resolvers::VulnerabilitiesHistoryResolver
+
+        field :vulnerability_grades,
+              ::Types::VulnerabilityGradesType,
+              null: false,
+              description: 'Represents vulnerable project counts for each grade',
+              resolver: ::Resolvers::VulnerabilityGradesResolver
       end
     end
   end

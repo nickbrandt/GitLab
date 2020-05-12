@@ -4970,6 +4970,11 @@ type Group {
   ): VulnerabilitiesCountByDayAndSeverityConnection
 
   """
+  Represents vulnerable project counts for each grade
+  """
+  vulnerabilityGrades: VulnerabilityGrades!
+
+  """
   Web URL of the group
   """
   webUrl: String!
@@ -5021,6 +5026,11 @@ type InstanceSecurityDashboard {
     """
     last: Int
   ): ProjectConnection!
+
+  """
+  Represents vulnerable project counts for each grade
+  """
+  vulnerabilityGrades: VulnerabilityGrades!
 }
 
 """
@@ -12726,6 +12736,36 @@ type VulnerabilityEdge {
 }
 
 """
+Represents vulnerability letter grades
+"""
+type VulnerabilityGrades {
+  """
+  Projects with no vulnerabilities and security scanning enabled
+  """
+  a: VulnerabilityLetterGrade!
+
+  """
+  Vulnerable projects with low severities
+  """
+  b: VulnerabilityLetterGrade!
+
+  """
+  Vulnerable projects with medium severities
+  """
+  c: VulnerabilityLetterGrade!
+
+  """
+  Vulnerable projects with high or unknown severities
+  """
+  d: VulnerabilityLetterGrade!
+
+  """
+  Vulnerable projects with critical severities
+  """
+  f: VulnerabilityLetterGrade!
+}
+
+"""
 Represents an issue link of a vulnerability.
 """
 type VulnerabilityIssueLink {
@@ -12786,6 +12826,41 @@ The type of the issue link related to a vulnerability.
 enum VulnerabilityIssueLinkType {
   CREATED
   RELATED
+}
+
+"""
+Represents vulnerable projects and count for the letter grade
+"""
+type VulnerabilityLetterGrade {
+  """
+  Number of vulnerable projects in this vulnerability letter grade
+  """
+  count: Int!
+
+  """
+  Projects in this vulnerability letter grade
+  """
+  projects(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): ProjectConnection!
 }
 
 """
