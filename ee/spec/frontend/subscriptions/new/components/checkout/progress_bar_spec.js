@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import Component from 'ee/subscriptions/new/components/checkout/progress_bar.vue';
+import Component from 'ee/registrations/components/progress_bar.vue';
 
 describe('Progress Bar', () => {
   let wrapper;
@@ -14,7 +14,7 @@ describe('Progress Bar', () => {
   const secondStep = () => wrapper.find('.bar div:nth-child(2)');
 
   beforeEach(() => {
-    createComponent({ step: 2 });
+    createComponent({ currentStep: 'b', steps: ['a', 'b'] });
   });
 
   afterEach(() => {
