@@ -87,7 +87,9 @@ describe 'CI shared runner limits' do
   end
 
   context 'when on a group related page' do
-    let!(:user_pipeline) { create(:ci_pipeline, user: user, project: project) }
+    before do
+      group.add_owner(user)
+    end
 
     where(:case_name, :percent, :remaining_minutes) do
       'warning level' | 30 | 4

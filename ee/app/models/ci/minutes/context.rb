@@ -18,11 +18,9 @@ module Ci
       end
 
       def can_see_status?
-        if project
-          user.can?(:create_pipeline, project)
-        else
-          namespace.all_pipelines.for_user(user).any?
-        end
+        return false unless level
+
+        Ability.allowed?(user, :read_ci_minutes_quota, level)
       end
 
       private

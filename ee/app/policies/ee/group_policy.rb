@@ -91,6 +91,7 @@ module EE
         enable :create_jira_connect_subscription
         enable :maintainer_access
         enable :admin_wiki
+        enable :read_ci_minutes_quota
       end
 
       rule { owner }.policy do

@@ -127,7 +127,9 @@ describe Ci::Minutes::Notification do
   context 'when at namespace level' do
     describe '#show?' do
       context 'when eligible to see notifications' do
-        let!(:user_pipeline) { create(:ci_pipeline, user: user, project: project) }
+        before do
+          group.add_owner(user)
+        end
 
         context 'with a project that has runners enabled inside namespace' do
           it_behaves_like 'queries for notifications' do

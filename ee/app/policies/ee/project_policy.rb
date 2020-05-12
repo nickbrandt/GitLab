@@ -181,6 +181,7 @@ module EE
         enable :destroy_feature_flag
         enable :admin_feature_flag
         enable :admin_feature_flags_user_lists
+        enable :read_ci_minutes_quota
       end
 
       rule { can?(:developer_access) & iterations_available }.policy do
