@@ -15,6 +15,7 @@ import boardsStoreEE from '../stores/boards_store_ee';
 import eventHub from '~/sidebar/event_hub';
 import flash from '~/flash';
 import { isScopedLabel } from '~/lib/utils/common_utils';
+import { inactiveListId } from '~/boards/constants';
 
 // NOTE: need to revisit how we handle headerHeight, because we have so many different header and footer options.
 export default {
@@ -60,7 +61,7 @@ export default {
       return boardsStoreEE.store.state.lists.find(({ id }) => id === this.activeListId);
     },
     isSidebarOpen() {
-      return this.activeListId > 0;
+      return this.activeListId !== inactiveListId;
     },
     activeListLabel() {
       return this.activeList.label;
@@ -110,7 +111,7 @@ export default {
     ...mapActions(['setActiveListId', 'updateListWipLimit']),
     closeSidebar() {
       this.edit = false;
-      this.setActiveListId(0);
+      this.setActiveListId(inactiveListId);
     },
     showInput() {
       this.edit = true;
@@ -136,7 +137,7 @@ export default {
           })
           .catch(() => {
             this.resetStateAfterUpdate();
-            this.setActiveListId(0);
+            this.setActiveListId(inactiveListId);
             flash(__('Something went wrong while updating your list settings'));
           });
       } else {
@@ -151,7 +152,7 @@ export default {
         })
         .catch(() => {
           this.resetStateAfterUpdate();
-          this.setActiveListId(0);
+          this.setActiveListId(inactiveListId);
           flash(__('Something went wrong while updating your list settings'));
         });
     },
