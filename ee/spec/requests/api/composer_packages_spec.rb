@@ -8,11 +8,12 @@ describe API::ComposerPackages do
   let_it_be(:group, reload: true) { create(:group, :public) }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
   let_it_be(:project, reload: true) { create(:project, :repository, path: 'my.project') }
+  let(:headers) { {} }
 
   describe 'GET /api/v4/group/:id/-/packages/composer/packages' do
     let(:url) { "/group/#{group.id}/-/packages/composer/packages.json" }
 
-    subject { get api(url) }
+    subject { get api(url), headers: headers }
 
     context 'with packages features enabled' do
       before do
@@ -44,16 +45,9 @@ describe API::ComposerPackages do
         end
 
         with_them do
-          let(:token) { user_token ? personal_access_token.token : 'wrong' }
-          let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
-
-          subject { get api(url), headers: headers }
-
-          before do
-            group.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+          include_context 'Composer api group access', params[:project_visibility_level], params[:user_role], params[:user_token] do
+            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
           end
-
-          it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
 
@@ -67,7 +61,7 @@ describe API::ComposerPackages do
     let(:sha) { '123' }
     let(:url) { "/group/#{group.id}/-/packages/composer/p/#{sha}.json" }
 
-    subject { get api(url) }
+    subject { get api(url), headers: headers }
 
     context 'with packages features enabled' do
       before do
@@ -99,16 +93,9 @@ describe API::ComposerPackages do
         end
 
         with_them do
-          let(:token) { user_token ? personal_access_token.token : 'wrong' }
-          let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
-
-          subject { get api(url), headers: headers }
-
-          before do
-            group.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+          include_context 'Composer api group access', params[:project_visibility_level], params[:user_role], params[:user_token] do
+            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
           end
-
-          it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
 
@@ -122,7 +109,7 @@ describe API::ComposerPackages do
     let(:package_name) { 'foobar' }
     let(:url) { "/group/#{group.id}/-/packages/composer/#{package_name}.json" }
 
-    subject { get api(url) }
+    subject { get api(url), headers: headers }
 
     context 'with packages features enabled' do
       before do
@@ -154,16 +141,9 @@ describe API::ComposerPackages do
         end
 
         with_them do
-          let(:token) { user_token ? personal_access_token.token : 'wrong' }
-          let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
-
-          subject { get api(url), headers: headers }
-
-          before do
-            group.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+          include_context 'Composer api group access', params[:project_visibility_level], params[:user_role], params[:user_token] do
+            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
           end
-
-          it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
 
@@ -210,14 +190,9 @@ describe API::ComposerPackages do
           end
 
           with_them do
-            let(:token) { user_token ? personal_access_token.token : 'wrong' }
-            let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
-
-            before do
-              project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+            include_context 'Composer api project access', params[:project_visibility_level], params[:user_role], params[:user_token] do
+              it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
             end
-
-            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
           end
         end
 
