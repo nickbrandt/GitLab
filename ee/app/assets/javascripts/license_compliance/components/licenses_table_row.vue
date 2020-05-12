@@ -59,7 +59,7 @@ export default {
             license.name
           }}</gl-link>
 
-          <gl-link v-else-if="nameIsLink" :href="license.name" target="blank">
+          <gl-link v-else-if="nameIsLink" :href="license.name" target="_blank">
             <gl-friendly-wrap :text="license.name" />
           </gl-link>
 
