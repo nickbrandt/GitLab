@@ -5698,10 +5698,16 @@ msgstr ""
 msgid "ContainerRegistry|Expiration schedule:"
 msgstr ""
 
+msgid "ContainerRegistry|Filter by name"
+msgstr ""
+
 msgid "ContainerRegistry|If you are not already logged in, you need to authenticate to the Container Registry by using your GitLab username and password. If you have %{twofaDocLinkStart}Two-Factor Authentication%{twofaDocLinkEnd} enabled, use a %{personalAccessTokensDocLinkStart}Personal Access Token%{personalAccessTokensDocLinkEnd} instead of a password."
 msgstr ""
 
 msgid "ContainerRegistry|Image ID"
+msgstr ""
+
+msgid "ContainerRegistry|Image Repositories"
 msgstr ""
 
 msgid "ContainerRegistry|Keep and protect the images that matter most."
@@ -5772,6 +5778,9 @@ msgstr ""
 msgid "ContainerRegistry|Something went wrong while updating the expiration policy."
 msgstr ""
 
+msgid "ContainerRegistry|Sorry, your filter produced no results."
+msgstr ""
+
 msgid "ContainerRegistry|Tag"
 msgstr ""
 
@@ -5821,6 +5830,9 @@ msgid "ContainerRegistry|This image has no active tags"
 msgstr ""
 
 msgid "ContainerRegistry|This image repository is scheduled for deletion"
+msgstr ""
+
+msgid "ContainerRegistry|To widen your search, change or remove the filters above."
 msgstr ""
 
 msgid "ContainerRegistry|We are having trouble connecting to Docker, which could be due to an issue with your project name or path. %{docLinkStart}More Information%{docLinkEnd}"
