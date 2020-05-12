@@ -11749,6 +11749,12 @@ msgstr ""
 msgid "Iterations"
 msgstr ""
 
+msgid "Iteration|Dates cannot overlap with other existing Iterations"
+msgstr ""
+
+msgid "Iteration|cannot be in the past"
+msgstr ""
+
 msgid "Jaeger URL"
 msgstr ""
 

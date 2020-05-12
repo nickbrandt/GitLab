@@ -1030,7 +1030,7 @@ input CreateIterationInput {
   dueDate: String
 
   """
-  The group the iteration to create will be in
+  The target group for the iteration
   """
   groupPath: ID!
 
@@ -4192,6 +4192,11 @@ type Group {
     Filter iterations by state
     """
     state: IterationState
+
+    """
+    Fuzzy search by title
+    """
+    title: String
   ): IterationConnection
 
   """

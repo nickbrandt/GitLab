@@ -16,7 +16,7 @@ module Mutations
 
       argument :group_path, GraphQL::ID_TYPE,
                required: true,
-               description: "The group the iteration to create will be in"
+               description: "The target group for the iteration"
 
       argument :title,
                GraphQL::STRING_TYPE,

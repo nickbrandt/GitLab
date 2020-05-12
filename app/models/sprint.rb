@@ -80,17 +80,17 @@ class Sprint < ApplicationRecord
   def dates_do_not_overlap
     return unless resource_parent.sprints.within_timeframe(start_date, due_date).exists?
 
-    errors.add(:base, "Dates cannot overlap with other existing Iterations")
+    errors.add(:base, s_("Iteration|Dates cannot overlap with other existing Iterations"))
   end
 
   # ensure dates are in the future
   def future_date
     if start_date_changed?
-      errors.add(:start_date, "cannot be in the past") if start_date < Date.today
+      errors.add(:start_date, s_("Iteration|cannot be in the past")) if start_date < Date.today
     end
 
     if due_date_changed?
-      errors.add(:due_date, "cannot be in the past") if due_date < Date.today
+      errors.add(:due_date, s_("Iteration|cannot be in the past")) if due_date < Date.today
     end
   end
 end

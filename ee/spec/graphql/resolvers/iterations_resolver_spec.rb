@@ -31,7 +31,7 @@ describe Resolvers::IterationsResolver do
       context 'without parameters' do
         it 'calls SprintsFinder to retrieve all iterations' do
           expect(SprintsFinder).to receive(:new)
-                                          .with(group_ids: group.id, state: 'all', start_date: nil, end_date: nil)
+                                          .with(group_ids: group.id, state: 'all', start_date: nil, end_date: nil, search_title: nil)
                                           .and_call_original
 
           resolve_group_iterations
@@ -42,12 +42,13 @@ describe Resolvers::IterationsResolver do
         it 'calls SprintsFinder with correct parameters' do
           start_date = now
           end_date = start_date + 1.hour
+          search = 'wow'
 
           expect(SprintsFinder).to receive(:new)
-                                          .with(group_ids: group.id, state: 'closed', start_date: start_date, end_date: end_date)
+                                          .with(group_ids: group.id, state: 'closed', start_date: start_date, end_date: end_date, search_title: search)
                                           .and_call_original
 
-          resolve_group_iterations(start_date: start_date, end_date: end_date, state: 'closed')
+          resolve_group_iterations(start_date: start_date, end_date: end_date, state: 'closed', title: search)
         end
       end
 
