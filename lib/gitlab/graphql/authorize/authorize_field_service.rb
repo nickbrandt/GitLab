@@ -106,8 +106,21 @@ module Gitlab
         def allowed_access?(current_user, object)
           object = object.sync if object.respond_to?(:sync)
 
-          authorizations.all? do |ability|
-            Ability.allowed?(current_user, ability, object)
+          authorizations.all? do |authorization|
+            if authorization.class.method_defined?(:call)
+              case authorization.arity
+              when 0
+                authorization.call
+              when 1
+                authorization.call(object)
+              when 2
+                authorization.call(object, current_user)
+              else
+                raise 'Given proc is invalid'
+              end
+            else
+              Ability.allowed?(current_user, authorization, object)
+            end
           end
         end
 

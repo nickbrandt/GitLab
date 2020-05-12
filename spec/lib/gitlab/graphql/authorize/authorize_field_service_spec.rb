@@ -38,6 +38,50 @@ describe Gitlab::Graphql::Authorize::AuthorizeFieldService do
 
     subject(:resolved) { service.authorized_resolve.call(presented_type, {}, context) }
 
+    context 'when a custom authorization proc is given to authorize a field' do
+      let(:field) { type_with_field(GraphQL::STRING_TYPE, -> { authorized }, 'custom auth works!').fields['testField'].to_graphql }
+
+      context 'when the proc returns false' do
+        let(:authorized) { false }
+
+        it 'does not allow access' do
+          expect(resolved).to be_nil
+        end
+      end
+
+      context 'when the proc returns true' do
+        let(:authorized) { true }
+
+        it 'allows access' do
+          expect(resolved).to eq('custom auth works!')
+        end
+      end
+    end
+
+    context 'when a custom authorization proc is given to authorize a type' do
+      let(:custom_type) { type(-> { authorized }) }
+      let(:object_in_field) { double('presented in field') }
+      let(:field) { type_with_field(custom_type, :read_field, object_in_field).fields['testField'].to_graphql }
+
+      context 'when the proc returns false' do
+        let(:authorized) { false }
+
+        it 'does not allow access' do
+          expect(resolved).to be_nil
+        end
+      end
+
+      context 'when the proc returns true' do
+        let(:authorized) { true }
+
+        it 'allows access' do
+          spy_ability_check_for(:read_field, object_in_field, passed: true)
+
+          expect(resolved).to be(object_in_field)
+        end
+      end
+    end
+
     context 'scalar types' do
       shared_examples 'checking permissions on the presented object' do
         it 'checks the abilities on the object being presented and returns the value' do
