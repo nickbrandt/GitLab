@@ -22,17 +22,7 @@ describe Resolvers::PackagesResolver do
           allow(project).to receive(:feature_available?).with(:packages).and_return(true)
         end
 
-        context 'when the user is authorized to read the packages' do
-          before do
-            project.add_reporter(user)
-          end
-
-          it { is_expected.to contain_exactly(package) }
-        end
-
-        context 'when the user is not authorized to read the package' do
-          it { is_expected.to be_nil }
-        end
+        it { is_expected.to contain_exactly(package) }
       end
 
       context 'when the project has the package feature disabled' do

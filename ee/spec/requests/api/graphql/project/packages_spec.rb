@@ -36,26 +36,36 @@ describe 'getting a package list for a project' do
     context 'when user has access to the project' do
       before do
         project.add_reporter(current_user)
+        post_graphql(query, current_user: current_user)
       end
 
-      it_behaves_like 'a working graphql query' do
-        before do
-          post_graphql(query, current_user: current_user)
-        end
-      end
+      it_behaves_like 'a working graphql query'
 
       it 'returns packages successfully' do
-        post_graphql(query, current_user: current_user)
-
-        expect(graphql_errors).to be_nil
         expect(packages_data[0]['node']['name']).to eq package.name
       end
     end
 
-    context 'when the user does not have access to the packages' do
-      it 'returns nil' do
-        post_graphql(query)
+    context 'when the user does not have access to the project/packages' do
+      before do
+        post_graphql(query, current_user: current_user)
+      end
 
+      it_behaves_like 'a working graphql query'
+
+      it 'returns nil' do
+        expect(graphql_data['project']).to be_nil
+      end
+    end
+
+    context 'when the user is not autenthicated' do
+      before do
+        post_graphql(query)
+      end
+
+      it_behaves_like 'a working graphql query'
+
+      it 'returns nil' do
         expect(graphql_data['project']).to be_nil
       end
     end
@@ -65,12 +75,13 @@ describe 'getting a package list for a project' do
     before do
       stub_licensed_features(packages: false)
       project.add_reporter(current_user)
+      post_graphql(query, current_user: current_user)
     end
 
-    it 'returns nil' do
-      post_graphql(query)
+    it_behaves_like 'a working graphql query'
 
-      expect(graphql_data['project']).to be_nil
+    it 'returns nil' do
+      expect(graphql_data['project']['packages']).to be_nil
     end
   end
 end

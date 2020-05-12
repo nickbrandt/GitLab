@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Types
-  # rubocop: disable Graphql/AuthorizeTypes
   class PackageType < BaseObject
     graphql_name 'Package'
     description 'Represents a package'
+    authorize :read_package
 
     field :id, GraphQL::ID_TYPE, null: false, description: 'The ID of the package'
     field :name, GraphQL::STRING_TYPE, null: false, description: 'The name of the package'
@@ -13,5 +13,4 @@ module Types
     field :version, GraphQL::STRING_TYPE, null: true, description: 'The version of the package'
     field :package_type, Types::PackageTypeEnum, null: false, description: 'The type of the package'
   end
-  # rubocop: enable Graphql/AuthorizeTypes
 end
