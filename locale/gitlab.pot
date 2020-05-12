@@ -11618,6 +11618,9 @@ msgstr ""
 msgid "Invalid start or end time format"
 msgstr ""
 
+msgid "Invalid status"
+msgstr ""
+
 msgid "Invalid two-factor code."
 msgstr ""
 
