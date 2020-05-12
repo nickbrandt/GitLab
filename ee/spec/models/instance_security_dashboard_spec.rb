@@ -15,7 +15,11 @@ RSpec.describe InstanceSecurityDashboard do
     user.security_dashboard_projects << [project1, project2]
   end
 
-  subject { described_class.new(user, project_ids: project_ids) }
+  subject(:dashboard) { described_class.new(user, project_ids: project_ids) }
+
+  it_behaves_like 'having vulnerability grades' do
+    let(:vulnerable) { dashboard }
+  end
 
   describe '#all_pipelines' do
     it 'returns pipelines for the projects with security reports' do

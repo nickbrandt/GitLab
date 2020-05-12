@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class InstanceSecurityDashboard
+  include VulnerabilityGrades
   extend ActiveModel::Naming
 
   delegate :full_path, to: :user
