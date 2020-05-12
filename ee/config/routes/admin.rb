@@ -30,7 +30,7 @@ namespace :admin do
   resource :application_settings, only: [] do
     get :seat_link_payload
     match :templates, via: [:get, :patch]
-    get :geo, to: "application_settings#geo_redirection"
+    get :geo, to: "geo/settings#show"
   end
 
   namespace :geo do
