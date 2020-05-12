@@ -10,6 +10,7 @@ describe 'projects/merge_requests/show.html.haml' do
 
     before do
       allow(Gitlab).to receive(:com?).and_return(true)
+      allow(user).to receive(:gitlab_employee?).and_return(true)
     end
 
     it 'renders an employee badge next to their name' do
