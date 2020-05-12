@@ -44,6 +44,7 @@ exports[`packages_list_row renders 1`] = `
          
         <gl-link-stub
           class="text-secondary"
+          data-testid="packages-row-project"
           href="/foo/bar/baz"
         >
           
@@ -52,6 +53,7 @@ exports[`packages_list_row renders 1`] = `
        
       <div
         class="d-flex align-items-center"
+        data-testid="package-type"
       >
         <gl-icon-stub
           class="text-secondary ml-2 mr-1"
@@ -88,6 +90,7 @@ exports[`packages_list_row renders 1`] = `
     <gl-button-stub
       aria-label="Remove package"
       category="primary"
+      data-testid="action-delete"
       icon="remove"
       size="medium"
       title="Remove package"

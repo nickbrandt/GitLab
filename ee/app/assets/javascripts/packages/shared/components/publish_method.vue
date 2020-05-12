@@ -1,7 +1,7 @@
 <script>
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import { GlIcon, GlLink } from '@gitlab/ui';
-import { mapGetters } from 'vuex';
+import { getCommitLink } from '../utils';
 
 export default {
   name: 'PublishMethod',
@@ -15,9 +15,13 @@ export default {
       type: Object,
       required: true,
     },
+    isGroup: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
-    ...mapGetters(['getCommitLink']),
     hasPipeline() {
       return Boolean(this.packageEntity.pipeline);
     },
@@ -25,7 +29,7 @@ export default {
       return this.packageEntity.pipeline?.sha.substring(0, 8);
     },
     linkToCommit() {
-      return this.getCommitLink(this.packageEntity);
+      return getCommitLink(this.packageEntity, this.isGroup);
     },
   },
 };

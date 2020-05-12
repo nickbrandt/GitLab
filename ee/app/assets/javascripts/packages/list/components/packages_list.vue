@@ -5,8 +5,8 @@ import Tracking from '~/tracking';
 import { s__, sprintf } from '~/locale';
 import { TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
-import PackagesListLoader from './packages_list_loader.vue';
-import PackagesListRow from './packages_list_row.vue';
+import PackagesListLoader from '../../shared/components/packages_list_loader.vue';
+import PackagesListRow from '../../shared/components/package_list_row.vue';
 
 export default {
   components: {
@@ -98,6 +98,8 @@ export default {
           v-for="packageEntity in list"
           :key="packageEntity.id"
           :package-entity="packageEntity"
+          :package-link="packageEntity._links.web_path"
+          :is-group="isGroupPage"
           @packageToDelete="setItemToBeDeleted"
         />
       </div>
