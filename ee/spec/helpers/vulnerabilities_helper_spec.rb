@@ -108,6 +108,7 @@ describe VulnerabilitiesHelper do
         description: finding.description,
         identifiers: kind_of(Array),
         issue_feedback: anything,
+        merge_request_feedback: anything,
         links: finding.links,
         location: finding.location,
         name: finding.name,
