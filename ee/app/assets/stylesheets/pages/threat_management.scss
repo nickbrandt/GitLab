@@ -1,0 +1,9 @@
+.network-policy-editor {
+  min-height: 300px;
+
+  .monaco-editor,
+  .monaco-editor-background,
+  .monaco-editor .inputarea.ime-input {
+    background-color: $gray-50;
+  }
+}
