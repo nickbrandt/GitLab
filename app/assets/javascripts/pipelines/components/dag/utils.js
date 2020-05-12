@@ -203,18 +203,19 @@ export const parseNestedData = (data) => {
 };
 
 export const createSankey = ({ width, height, nodeWidth, nodePadding }) => {
+  const paddingForLabels = 100;
   const sankeyGenerator = sankey()
     .nodeId((d) => d.name)
     .nodeAlign(sankeyLeft)
     .nodeWidth(nodeWidth)
     .nodePadding(nodePadding)
     .extent([
-      [100, 5],
-      [width - 100, height - 105],
+      [paddingForLabels, paddingForLabels],
+      [width - paddingForLabels, height - paddingForLabels],
     ]);
   return ({ nodes, links }) =>
     sankeyGenerator({
-      nodes: nodes.map((d) => Object.assign({}, d)),
-      links: links.map((d) => Object.assign({}, d)),
+      nodes: nodes.map((d) => ({ ...d })),
+      links: links.map((d) => ({ ...d })),
     });
 };

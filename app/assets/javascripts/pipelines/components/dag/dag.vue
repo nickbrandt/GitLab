@@ -16,7 +16,7 @@ import {
 export default {
   name: 'Dag',
   viewOptions: {
-    baseHeight: 200,
+    baseHeight: 300,
     baseWidth: 1000,
     minNodeHeight: 60,
     nodeWidth: 15,
@@ -216,19 +216,50 @@ export default {
         .text((d) => d.name);
     },
     labelNodes (svg, nodeData) {
+      const labelPosition = (d) => {
+        const paddingForLabels = 100;
+        const labelMargin = 8;
+        const firstCol = d.x0 <= paddingForLabels;
+        const lastCol = d.x1 >= this.width - paddingForLabels;
+
+        if (firstCol) {
+          return {
+            x: paddingForLabels - labelMargin,
+            y: (d.y1 + d.y0) / 2,
+            textAnchor: 'end',
+          }
+        }
+
+        if (lastCol) {
+          return {
+            x: (this.width - paddingForLabels) + labelMargin,
+            y: (d.y1 + d.y0) / 2,
+            textAnchor: 'start',
+          }
+        }
+
+        return {
+          x: (d.x1 + d.x0) / 2,
+          y: d.y0 - (1.5 * labelMargin),
+          textAnchor: d.x0 < this.width / 2 ? 'start' : 'end',
+        }
+
+      }
+
+
       return svg
         .append('g')
         .attr('font-family', 'sans-serif')
-        .attr('font-size', 10)
+        .attr('font-size', 12)
         .selectAll('text')
         .data(nodeData)
         .enter()
         .append('text')
         .classed('label gl-pointer-events-none', true)
-        .attr('x', (d) => (d.x0 < this.width / 2 ? d.x1 + 6 : d.x0 - 6))
-        .attr('y', (d) => (d.y1 + d.y0) / 2)
+        .attr('x', (d) => labelPosition(d).x)
+        .attr('y', (d) => labelPosition(d).y)
         .attr('dy', '0.35em')
-        .attr('text-anchor', (d) => (d.x0 < this.width / 2 ? 'start' : 'end'))
+        .attr('text-anchor', (d) => labelPosition(d).textAnchor)
         .text((d) => d.name);
   },
     createNodes (svg, nodeData) {
@@ -304,6 +335,7 @@ export default {
     position: relative;
     justify-content: flex-start;
     flex-direction: column;
+    overflow: scroll;
   }
 
   .dag-graph-container svg:not(:first-of-type) {
