@@ -110,18 +110,6 @@ describe SamlProvider do
         expect(subject).not_to be_enforced_sso
       end
 
-      context 'and feature flag is disabled' do
-        before do
-          stub_feature_flags(enforced_sso: false)
-        end
-
-        it 'is false' do
-          subject.enforced_sso = true
-
-          expect(subject).not_to be_enforced_sso
-        end
-      end
-
       it 'does not enforce SSO when the feature is unavailable' do
         stub_licensed_features(group_saml: false)
         subject.enforced_sso = true

@@ -88,12 +88,6 @@ describe Gitlab::Auth::GroupSaml::SsoEnforcer do
       end
     end
 
-    it 'allows access when the sso enforcement feature is disabled' do
-      stub_feature_flags(enforced_sso: false)
-
-      expect(subject).not_to be_access_restricted
-    end
-
     it 'prevents access when sso enforcement active but there is no session' do
       expect(subject).to be_access_restricted
     end
