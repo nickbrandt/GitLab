@@ -51,7 +51,7 @@ module QA
 
       after do
         page.visit Runtime::Scenario.gitlab_address
-        %w[enforced_sso_requires_session group_administration_nav_item].each do |flag|
+        %w[group_administration_nav_item].each do |flag|
           Runtime::Feature.remove(flag)
         end
 
