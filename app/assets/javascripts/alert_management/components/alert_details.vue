@@ -7,7 +7,7 @@ import {
   GlTab,
   GlButton,
 } from '@gitlab/ui';
-import { s__ } from '~/locale';
+import { sprintf, s__, n__, __ } from '~/locale';
 import query from '../graphql/queries/details.query.graphql';
 import { fetchPolicies } from '~/lib/graphql';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -66,6 +66,38 @@ export default {
   computed: {
     loading() {
       return this.$apollo.queries.alert.loading;
+    },
+    issueDescription() {
+      return sprintf(
+        __(
+          `%{title}
+          - Severity: %{severity}
+          - Start time: %{startTime}
+          - End time %{endTime}
+          - Tool %{tool}
+          - Service %{service}
+          - Hosts %{hosts}
+          `),
+        {
+          title: '# Summary:\n',
+          severity: `${this.error.externalUrl}\n`,
+          startTime: `\n${this.error.firstSeen}\n`,
+          endTime: `${this.error.lastSeen}\n`,
+          toll: n__('- Event', '- Events', this.error.count),
+          service: `${this.error.count}\n`,
+          hosts: n__('- User', '- Users', this.error.userCount),
+          userCount: `${this.error.userCount}\n`,
+        },
+        false,
+      );
+    },
+    issueWithParamsPath(){
+      const parameters = [
+        `issue[title]=${encodeURIComponent(alert.title)}`,
+        `issue[description]=${encodeURIComponent()}`,
+      ].join('&');
+
+      return `${this.newIssuePath}${parameters}`;
     },
   },
 };
