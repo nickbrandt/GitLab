@@ -27,9 +27,15 @@ module API
 
         get ":id/#{noteables_path}/:noteable_id/discussions" do
           noteable = find_noteable(noteable_type, params[:noteable_id])
+          notes = Discussion.notes_for_page(
+            noteable,
+            per: params[:per_page],
+            page: params[:page]
+          )
 
-          discussion_ids = paginate(noteable.discussion_ids_relation)
-          notes = readable_discussion_notes(noteable, discussion_ids)
+          # FIXME: readable_discussion_notes applied performance hints as well as access checks
+          notes = prepare_notes_for_rendering(notes)
+          notes.select { |n| n.readable_by?(current_user) }
 
           present Discussion.build_collection(notes, noteable), with: Entities::Discussion
         end

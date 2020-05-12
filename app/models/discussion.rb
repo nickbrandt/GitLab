@@ -42,6 +42,63 @@ class Discussion
     grouped_notes.values.map { |notes| build(notes, context_noteable) }
   end
 
+  # Discussions are a virtual model, and may be sourced from several different
+  # concrete models - particularly Note, but also ResourceEvent subclasses.
+  #
+  # This method allows all the notes for a page's worth of discussions to be
+  # efficiently retrieved for a particular notable.
+  # @return[Array<Note>]
+  def self.notes_for_page(noteable, per:, page:)
+    relations = []
+    relations << noteable
+      .notes
+      .group(:discussion_id)
+      .select("min(id) AS id, min(created_at) AS created_at, 'Note' as class")
+
+    # FIXME: ResourceLabelEvent has multiple items per discussion. We need to
+    # group by (created_at, user_id) since that's how discussion_id is generated
+    # from_resource_label_events = noteable.
+    #   resource_label_events.
+    #   select("id, created_at, 'ResourceLabelEvent' as class")
+
+    # Each resource event represents a discussion with a single, synthetic note.
+    # Commits don't have milestone events.
+    if noteable.respond_to?(:resource_milestone_events)
+      relations << noteable.resource_milestone_events.select("id, created_at, 'ResourceMilestoneEvent' as class")
+    end
+
+    stmt = Gitlab::SQL::Union.new(relations).to_sql # rubocop:disable Gitlab/Union
+
+    # Used in pagination
+    total_count = ActiveRecord::Base.connection.exec_query(
+      "SELECT count(1) AS count FROM (" + stmt + ") AS stmt"
+    ).to_a.first['count']
+
+    lookup = ActiveRecord::Base
+      .connection
+      .exec_query(stmt + " ORDER BY created_at ASC OFFSET #{per * page} LIMIT #{per}")
+      .to_a
+      .each_with_object(Hash.new { |h, k| h[k] = {} }) { |hsh, row| hsh[row['class']] << row['id'] }
+
+    normal_notes = Note.where(
+      discussion_id: Note.id_in(lookup['Note']).select(:discussion_id)
+    )
+
+    milestone_notes =
+      if lookup.key?('ResourceMilestoneEvent')
+        ResourceMilestoneEvent.id_in(lookup['ResourceMilestoneEvent']).map do |e|
+          MilestoneNote.from_event(event, resource: resource, resource_parent: resource_parent)
+        end
+      else
+        []
+      end
+
+    Kaminari.paginate_array(
+      normal_notes + milestone_notes,
+      total_count: total_count
+    ).page(page).per(per)
+  end
+
   def self.lazy_find(discussion_id)
     BatchLoader.for(discussion_id).batch do |discussion_ids, loader|
       results = Note.where(discussion_id: discussion_ids).fresh.to_a.group_by(&:discussion_id)
