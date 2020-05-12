@@ -55,7 +55,6 @@ export default {
       this.dismissSelectedVulnerabilities();
     },
     dismissSelectedVulnerabilities() {
-      // TODO: Batch vulnerability dismissal with https://gitlab.com/gitlab-org/gitlab/-/issues/214376
       const promises = this.selectedVulnerabilities.map(vulnerability =>
         this.$apollo.mutate({
           mutation: dismissVulnerability,
