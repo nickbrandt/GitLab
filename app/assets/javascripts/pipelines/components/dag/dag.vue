@@ -94,7 +94,7 @@ export default {
         .append('g')
         .attr('id', (d) => d.uid = uniqueId('link'))
         .style('mix-blend-mode', this.$options.viewOptions.blendMode)
-        .classed('link', true)
+        .classed('link gl-cursor-pointer', true)
     },
     appendLinks(link) {
       const strokeColor = (d, i) => {
@@ -206,7 +206,7 @@ export default {
         .data(nodeData)
         .enter()
         .append('path')
-        .classed('junction-points', true)
+        .classed('junction-points gl-cursor-pointer', true)
         .attr('id', (d) => d.uid = uniqueId('node'))
         .attr('d', (d) => this.generateJunctionPath(d))
         .attr('stroke', strokeNodes ? 'black' : this.color)
@@ -224,7 +224,7 @@ export default {
         .data(nodeData)
         .enter()
         .append('text')
-        .classed('label', true)
+        .classed('label gl-pointer-events-none', true)
         .attr('x', (d) => (d.x0 < this.width / 2 ? d.x1 + 6 : d.x0 - 6))
         .attr('y', (d) => (d.y1 + d.y0) / 2)
         .attr('dy', '0.35em')
@@ -298,7 +298,7 @@ export default {
   <div class="dag-graph-container gl-pt-9"></div>
 </template>
 
-<style scoped>
+<style>
   .dag-graph-container {
     display: flex;
     position: relative;
@@ -306,15 +306,7 @@ export default {
     flex-direction: column;
   }
 
-  .label {
-    pointer-events: none;
-  }
-
-  .link, .junction-points {
-    cursor: pointer;
-  }
-
-  svg:not(:first-of-type) {
+  .dag-graph-container svg:not(:first-of-type) {
     margin-top: 14rem;
     margin-bottom: 5rem;
   }
