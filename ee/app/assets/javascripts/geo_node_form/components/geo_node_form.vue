@@ -81,11 +81,6 @@ export default {
   <form>
     <geo-node-form-core :node-data="nodeData" />
     <section class="mt-3 pl-0 col-sm-6">
-      <gl-form-group>
-        <gl-form-checkbox id="node-primary-field" v-model="nodeData.primary">{{
-          __('This is a primary node')
-        }}</gl-form-checkbox>
-      </gl-form-group>
       <gl-form-group
         v-if="nodeData.primary"
         :label="__('Internal URL (optional)')"
