@@ -13,10 +13,10 @@ export default function() {
   initSentryErrorStackTraceApp();
   initRelatedMergeRequestsApp();
 
-  // js-design-management is currently EE-only.
+  // .js-design-management is currently EE-only.
   // This will be moved to CE as part of https://gitlab.com/gitlab-org/gitlab/-/issues/212566#frontend
   // at which point this conditional can be removed.
-  if (document.getElementById('js-design-management')) {
+  if (document.querySelector('.js-design-management')) {
     import(/* webpackChunkName: 'design_management' */ '~/design_management')
       .then(module => module.default())
       .catch(() => {});
