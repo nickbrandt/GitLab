@@ -54,7 +54,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['childrenFlags', 'userSignedIn', 'allowSubEpics']),
+    ...mapState(['childrenFlags', 'userSignedIn', 'allowSubEpics', 'allowIssuableHealthStatus']),
     itemReference() {
       return this.item.reference;
     },
@@ -121,6 +121,9 @@ export default {
     },
     isIssue() {
       return this.item.type === ChildType.Issue;
+    },
+    showHealthStatus() {
+      return this.item.healthStatus && this.allowIssuableHealthStatus;
     },
   },
   methods: {
@@ -221,17 +224,17 @@ export default {
               <gl-icon name="issues" class="mr-1" />
               {{ totalIssuesCount }}
             </span>
-            <span class="ml-2 bullet-separator">&bull;</span>
+            <span v-if="showHealthStatus" class="ml-2 bullet-separator">&bull;</span>
           </div>
 
-          <div v-if="item.healthStatus" class="item-health-status mr-2">
+          <div v-if="showHealthStatus" class="item-health-status mr-2">
             <epic-health-status v-if="isEpic" :health-status="item.healthStatus" />
             <issue-health-status v-else-if="isIssue" :health-status="item.healthStatus" />
           </div>
 
           <div class="item-meta-child d-flex align-items-center order-0 flex-wrap flex-xl-nowrap">
             <!-- This bullet is for Milestone -->
-            <span v-if="item.healthStatus && hasMilestone" class="bullet-separator mr-2"
+            <span v-if="showHealthStatus && hasMilestone" class="bullet-separator mr-2"
               >&bull;</span
             >
 
@@ -243,7 +246,7 @@ export default {
 
             <!-- This bullet is for Due Date -->
             <span
-              v-if="(hasMilestone || item.healthStatus) && item.dueDate"
+              v-if="(hasMilestone || showHealthStatus) && item.dueDate"
               class="mr-2 bullet-separator"
               >&bull;</span
             >
@@ -257,7 +260,7 @@ export default {
 
             <!-- This bullet is for Weight -->
             <span
-              v-if="(item.dueDate || hasMilestone || item.healthStatus) && item.weight"
+              v-if="(item.dueDate || hasMilestone || showHealthStatus) && item.weight"
               class="mr-2 bullet-separator"
               >&bull;</span
             >
@@ -272,9 +275,7 @@ export default {
 
           <!-- This bullet is for Assignees -->
           <span
-            v-if="
-              (item.dueDate || hasMilestone || item.healthStatus || item.weight) && hasAssignees
-            "
+            v-if="(item.dueDate || hasMilestone || showHealthStatus || item.weight) && hasAssignees"
             class="mr-2 bullet-separator"
             >&bull;</span
           >

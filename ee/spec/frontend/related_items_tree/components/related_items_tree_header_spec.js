@@ -6,7 +6,9 @@ import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_ite
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { issuableTypesMap } from 'ee/related_issues/constants';
+
 import EpicActionsSplitButton from 'ee/related_items_tree/components/epic_issue_actions_split_button.vue';
+import EpicHealthStatus from 'ee/related_items_tree/components/epic_health_status.vue';
 
 import { mockInitialConfig, mockParentItem, mockQueryResponse } from '../mock_data';
 
@@ -194,6 +196,36 @@ describe('RelatedItemsTree', () => {
 
       it('renders `Add` dropdown button', () => {
         expect(findEpicsIssuesSplitButton().isVisible()).toBe(true);
+      });
+
+      describe('when issuable-health-status feature is not available', () => {
+        beforeEach(() => {
+          wrapper.vm.$store.commit('SET_INITIAL_CONFIG', {
+            ...mockInitialConfig,
+            allowIssuableHealthStatus: false,
+          });
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('does not render health status', () => {
+          expect(wrapper.find(EpicHealthStatus).exists()).toBe(false);
+        });
+      });
+
+      describe('when issuable-health-status feature is available', () => {
+        beforeEach(() => {
+          wrapper.vm.$store.commit('SET_INITIAL_CONFIG', {
+            ...mockInitialConfig,
+            allowIssuableHealthStatus: true,
+          });
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('does not render health status', () => {
+          expect(wrapper.find(EpicHealthStatus).exists()).toBe(true);
+        });
       });
 
       it('renders issues count and gl-icon', () => {
