@@ -20,8 +20,20 @@ module Gitlab
                                       end
           end
 
-          def authorize(*permissions)
-            required_permissions.concat(permissions)
+          def custom_authorize
+            @custom_authorize.call
+          end
+
+          def has_custom_authorization?
+            @custom_authorize.present?
+          end
+
+          def authorize(*permissions, &custom_authorize)
+            if block_given?
+              @custom_authorize = custom_authorize
+            else
+              required_permissions.concat(permissions)
+            end
           end
         end
 
@@ -39,7 +51,15 @@ module Gitlab
         end
 
         def authorize!(object)
-          unless authorized_resource?(object)
+          if self.class.has_custom_authorization?
+            if self.class.custom_authorize
+              true
+            else
+              raise_resource_not_available_error!
+            end
+          elsif authorized_resource?(object)
+            true
+          else
             raise_resource_not_available_error!
           end
         end
