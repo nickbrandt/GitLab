@@ -41,8 +41,8 @@ describe StatusPage::IncidentsFinder do
       end
     end
 
-    context 'with include_confidential' do
-      let(:params) { { include_confidential: false } }
+    context 'with include_nonpublished' do
+      let(:params) { { include_nonpublished: false } }
 
       context 'for confidential issue' do
         let(:issue) { issues.fetch(:confidential) }
