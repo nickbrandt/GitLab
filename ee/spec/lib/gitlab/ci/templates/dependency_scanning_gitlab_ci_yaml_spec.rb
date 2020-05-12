@@ -8,7 +8,8 @@ describe 'Dependency-Scanning.gitlab-ci.yml' do
   describe 'the created pipeline' do
     let(:user) { create(:admin) }
     let(:default_branch) { 'master' }
-    let(:project) { create(:project, :custom_repo, files: { 'README.txt' => '' }) }
+    let(:files) { { 'README.txt' => '' } }
+    let(:project) { create(:project, :custom_repo, files: files) }
     let(:service) { Ci::CreatePipelineService.new(project, user, ref: 'master' ) }
     let(:pipeline) { service.execute!(:push) }
     let(:build_names) { pipeline.builds.pluck(:name) }
@@ -48,35 +49,49 @@ describe 'Dependency-Scanning.gitlab-ci.yml' do
         end
       end
 
-      context 'when DS_DISABLE_DIND=1' do
+      context 'when DS_DISABLE_DIND=true' do
         before do
-          create(:ci_variable, project: project, key: 'DS_DISABLE_DIND', value: '1')
+          create(:ci_variable, project: project, key: 'DS_DISABLE_DIND', value: 'true')
         end
 
         describe 'language detection' do
           using RSpec::Parameterized::TableSyntax
 
-          where(:case_name, :variables, :include_build_names) do
-            'Go'                   | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "go" }              | %w(gemnasium-dependency_scanning)
-            'Java'                 | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "java" }            | %w(gemnasium-maven-dependency_scanning)
-            'Javascript'           | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "javascript" }      | %w(gemnasium-dependency_scanning retire-js-dependency_scanning)
-            'Multiple languages'   | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "java,javascript" } | %w(gemnasium-dependency_scanning gemnasium-maven-dependency_scanning retire-js-dependency_scanning)
-            'PHP'                  | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "php" }             | %w(gemnasium-dependency_scanning)
-            'Python'               | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "python" }          | %w(gemnasium-python-dependency_scanning)
-            'Ruby'                 | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "ruby" }            | %w(bundler-audit-dependency_scanning gemnasium-dependency_scanning)
-            'Scala'                | { "CI_PROJECT_REPOSITORY_LANGUAGES" => "scala" }           | %w(gemnasium-maven-dependency_scanning)
+          where(:case_name, :files, :include_build_names) do
+            'Go'                             | { 'go.sum' => '' }                        | %w(gemnasium-dependency_scanning)
+            'Java'                           | { 'pom.xml' => '' }                       | %w(gemnasium-maven-dependency_scanning)
+            'Java Gradle'                    | { 'build.gradle' => '' }                  | %w(gemnasium-maven-dependency_scanning)
+            'Javascript'                     | { 'package.json' => '' }                  | %w(retire-js-dependency_scanning)
+            'Javascript package-lock.json'   | { 'package-lock.json' => '' }             | %w(gemnasium-dependency_scanning)
+            'Javascript yarn.lock'           | { 'yarn.lock' => '' }                     | %w(gemnasium-dependency_scanning)
+            'Javascript npm-shrinkwrap.json' | { 'npm-shrinkwrap.json' => '' }           | %w(gemnasium-dependency_scanning)
+            'Multiple languages'             | { 'pom.xml' => '', 'package.json' => '' } | %w(gemnasium-maven-dependency_scanning retire-js-dependency_scanning)
+            'PHP'                            | { 'composer.lock' => '' }                 | %w(gemnasium-dependency_scanning)
+            'Python requirements.txt'        | { 'requirements.txt' => '' }              | %w(gemnasium-python-dependency_scanning)
+            'Python requirements.pip'        | { 'requirements.pip' => '' }              | %w(gemnasium-python-dependency_scanning)
+            'Python Pipfile'                 | { 'Pipfile' => '' }                       | %w(gemnasium-python-dependency_scanning)
+            'Python Pipfile.lock'            | { 'Pipfile.lock' => '' }                  | %w(gemnasium-dependency_scanning)
+            'Python requires.txt'            | { 'requires.txt' => '' }                  | %w(gemnasium-python-dependency_scanning)
+            'Python with setup.py'           | { 'setup.py' => '' }                      | %w(gemnasium-python-dependency_scanning)
+            'Ruby Gemfile.lock'              | { 'Gemfile.lock' => '' }                  | %w(bundler-audit-dependency_scanning gemnasium-dependency_scanning)
+            'Ruby gems.locked'               | { 'gems.locked' => '' }                   | %w(gemnasium-dependency_scanning)
+            'Scala'                          | { 'build.sbt' => '' }                     | %w(gemnasium-maven-dependency_scanning)
           end
 
           with_them do
-            before do
-              variables.each do |(key, value)|
-                create(:ci_variable, project: project, key: key, value: value)
-              end
-            end
-
             it 'creates a pipeline with the expected jobs' do
               expect(build_names).to include(*include_build_names)
             end
+          end
+        end
+
+        context 'when PIP_REQUIREMENTS_FILE is defined' do
+          before do
+            create(:ci_variable, project: project, key: 'PIP_REQUIREMENTS_FILE', value: '/some/path/requirements.txt')
+          end
+
+          it 'creates a pipeline with the expected jobs' do
+            expect(build_names).to include('gemnasium-python-dependency_scanning')
           end
         end
       end
