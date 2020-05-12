@@ -36,6 +36,14 @@ describe Ci::Minutes::Context do
           expect(subject.can_see_status?).to be_falsey
         end
       end
+
+      context 'when user is not authenticated' do
+        let(:user) { nil }
+
+        it 'cannot see status' do
+          expect(subject.can_see_status?).to be_falsey
+        end
+      end
     end
   end
 
@@ -45,7 +53,7 @@ describe Ci::Minutes::Context do
     describe '#can_see_status' do
       context 'when eligible to see status' do
         before do
-          create(:ci_pipeline, user: user, project: project)
+          group.add_owner(user)
         end
 
         it 'can see status' do
@@ -54,6 +62,14 @@ describe Ci::Minutes::Context do
       end
 
       context 'when not eligible to see status' do
+        it 'cannot see status' do
+          expect(subject.can_see_status?).to be_falsey
+        end
+      end
+
+      context 'when user is not authenticated' do
+        let(:user) { nil }
+
         it 'cannot see status' do
           expect(subject.can_see_status?).to be_falsey
         end

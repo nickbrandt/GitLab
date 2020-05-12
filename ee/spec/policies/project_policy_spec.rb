@@ -1376,4 +1376,25 @@ describe ProjectPolicy do
       it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
     end
   end
+
+  describe ':read_ci_minutes_quota' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:policy) { :read_ci_minutes_quota }
+
+    where(:role, :allowed) do
+      :guest      | false
+      :reporter   | false
+      :developer  | true
+      :maintainer | true
+      :owner      | true
+      :admin      | true
+    end
+
+    with_them do
+      let(:current_user) { public_send(role) }
+
+      it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
+    end
+  end
 end
