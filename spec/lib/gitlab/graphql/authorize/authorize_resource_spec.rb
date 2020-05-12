@@ -149,64 +149,6 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
     end
   end
 
-  describe '.custom_authorize' do
-    it 'calls the stored custom auth proc' do
-      test_class = Class.new do
-        include Gitlab::Graphql::Authorize::AuthorizeResource
-
-        authorize do
-          'authorization logic!'
-        end
-      end
-
-      expect(test_class.custom_authorize).to eq('authorization logic!')
-    end
-
-    context 'when the custom auth depends on the object being authorized or current user' do
-      it 'has access to the object and user' do
-        test_class = Class.new do
-          include Gitlab::Graphql::Authorize::AuthorizeResource
-
-          authorize do |object, user|
-            object.present? && user.present?
-          end
-        end
-
-        expect(
-          test_class.custom_authorize(double(:graphql_object), double(:current_user))
-        ).to be_truthy
-      end
-    end
-  end
-
-  describe '.custom_authorize?' do
-    context 'when there is a custom auth proc' do
-      it 'returns true' do
-        test_class = Class.new do
-          include Gitlab::Graphql::Authorize::AuthorizeResource
-
-          authorize do
-            'authorization logic!'
-          end
-        end
-
-        expect(test_class).to have_custom_authorization
-      end
-    end
-
-    context 'when there is not a custom auth proc' do
-      it 'returns false' do
-        test_class = Class.new do
-          include Gitlab::Graphql::Authorize::AuthorizeResource
-
-          authorize :not_custom_auth
-        end
-
-        expect(test_class).not_to have_custom_authorization
-      end
-    end
-  end
-
   describe '#authorize!' do
     let(:object_for_auth) { double(:graphql_object) }
 
@@ -243,6 +185,34 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
             Gitlab::Graphql::Errors::ResourceNotAvailable
           )
         end
+      end
+    end
+
+    context 'when there is both custom auth and given permissions' do
+      it 'raises an error if either fails' do
+        allow(Ability).to receive(:allowed?).with('user :)', :base_authorization, object_for_auth, scope: :user) do
+          false
+        end
+
+        base_class = Class.new do
+          include Gitlab::Graphql::Authorize::AuthorizeResource
+
+          authorize :base_authorization
+        end
+
+        sub_class = Class.new(base_class) do
+          include Gitlab::Graphql::Authorize::AuthorizeResource
+
+          authorize { true }
+
+          def current_user
+            'user :)'
+          end
+        end
+
+        expect { sub_class.new.authorize!(object_for_auth) }.to raise_error(
+          Gitlab::Graphql::Errors::ResourceNotAvailable
+        )
       end
     end
   end

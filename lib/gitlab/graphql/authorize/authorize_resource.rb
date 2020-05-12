@@ -20,17 +20,9 @@ module Gitlab
                                       end
           end
 
-          def custom_authorize(object = nil, user = nil)
-            @custom_authorize.call(object, user)
-          end
-
-          def has_custom_authorization?
-            @custom_authorize.present?
-          end
-
           def authorize(*permissions, &custom_authorize)
             if block_given?
-              @custom_authorize = custom_authorize
+              required_permissions << custom_authorize
             else
               required_permissions.concat(permissions)
             end
@@ -51,15 +43,7 @@ module Gitlab
         end
 
         def authorize!(object)
-          if self.class.has_custom_authorization?
-            if self.class.custom_authorize(object, current_user)
-              true
-            else
-              raise_resource_not_available_error!
-            end
-          elsif authorized_resource?(object)
-            true
-          else
+          unless authorized_resource?(object)
             raise_resource_not_available_error!
           end
         end
@@ -75,11 +59,15 @@ module Gitlab
             raise Gitlab::Graphql::Errors::ArgumentError, "#{self.class.name} has no authorizations"
           end
 
-          self.class.required_permissions.all? do |ability|
+          self.class.required_permissions.all? do |authorization|
             # The actions could be performed across multiple objects. In which
             # case the current user is common, and we could benefit from the
             # caching in `DeclarativePolicy`.
-            Ability.allowed?(current_user, ability, object, scope: :user)
+            if authorization.class.method_defined?(:call)
+              authorization.call(object, current_user)
+            else
+              Ability.allowed?(current_user, authorization, object, scope: :user)
+            end
           end
         end
 
