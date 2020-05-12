@@ -170,10 +170,10 @@ export default {
       </span>
     </template>
     <span v-else>{{ __('A deleted user') }}</span>
-    <span class="note-headline-light note-headline-meta d-sm-inline-flex align-items-center">
+    <span class="note-headline-light note-headline-meta">
       <span class="system-note-message"> <slot></slot> </span>
       <template v-if="createdAt">
-        <span ref="actionText" class="system-note-separator ml-1">
+        <span ref="actionText" class="system-note-separator">
           <template v-if="actionText">{{ actionText }}</template>
         </span>
         <a
@@ -187,15 +187,16 @@ export default {
         </a>
         <time-ago-tooltip v-else ref="noteTimestamp" :time="createdAt" tooltip-placement="bottom" />
       </template>
-      <gl-icon
-        v-if="isConfidential"
-        ref="confidentialIndicator"
-        v-gl-tooltip:tooltipcontainer.bottom
-        name="eye-slash"
-        :size="14"
-        :title="__('Private comments are accessible by internal staff only')"
-        class="mx-1 gl-text-gray-800"
-      />
+      <template v-if="isConfidential">
+        <gl-icon
+          ref="confidentialIndicator"
+          v-gl-tooltip:tooltipcontainer.bottom
+          name="eye-slash"
+          :size="14"
+          :title="__('Private comments are accessible by internal staff only')"
+          class="mr-1 gl-text-gray-800 align-middle"
+        />
+      </template>
       <slot name="extra-controls"></slot>
       <i
         v-if="showSpinner"
