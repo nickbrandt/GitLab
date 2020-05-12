@@ -32,7 +32,7 @@ describe Boards::Issues::ListService, services: true do
     let!(:opened_issue1) { create(:labeled_issue, project: project, milestone: m1, weight: 9, title: 'Issue 1', labels: [bug]) }
     let!(:opened_issue2) { create(:labeled_issue, project: project, milestone: m2, weight: 1, title: 'Issue 2', labels: [p2]) }
     let!(:opened_issue3) { create(:labeled_issue, project: project, milestone: m2, title: 'Assigned Issue', labels: [p3]) }
-    let!(:reopened_issue1) { create(:issue, state: 'opened', project: project, title: 'Issue 3', closed_at: Time.now ) }
+    let!(:reopened_issue1) { create(:issue, state: 'opened', project: project, title: 'Issue 3', closed_at: Time.current ) }
 
     let(:list1_issue1) { create(:labeled_issue, project: project, milestone: m1, labels: [p2, development]) }
     let(:list1_issue2) { create(:labeled_issue, project: project, milestone: m2, labels: [development]) }

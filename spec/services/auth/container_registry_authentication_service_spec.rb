@@ -39,7 +39,7 @@ describe Auth::ContainerRegistryAuthenticationService do
       let(:expire_delay) { 10 }
 
       context 'for default configuration' do
-        it { expect(expires_at).not_to be_within(2.seconds).of(Time.now + expire_delay.minutes) }
+        it { expect(expires_at).not_to be_within(2.seconds).of(Time.current + expire_delay.minutes) }
       end
 
       context 'for changed configuration' do
@@ -47,7 +47,7 @@ describe Auth::ContainerRegistryAuthenticationService do
           stub_application_setting(container_registry_token_expire_delay: expire_delay)
         end
 
-        it { expect(expires_at).to be_within(2.seconds).of(Time.now + expire_delay.minutes) }
+        it { expect(expires_at).to be_within(2.seconds).of(Time.current + expire_delay.minutes) }
       end
     end
   end

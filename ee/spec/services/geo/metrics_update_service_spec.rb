@@ -11,7 +11,7 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
 
   subject { described_class.new }
 
-  let(:event_date) { Time.now.utc }
+  let(:event_date) { Time.current.utc }
 
   let(:data) do
     {

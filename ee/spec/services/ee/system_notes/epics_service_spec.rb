@@ -73,7 +73,7 @@ describe EE::SystemNotes::EpicsService do
   end
 
   describe '#change_epic_date_note' do
-    let(:timestamp) { Time.now }
+    let(:timestamp) { Time.current }
 
     context 'when start date was changed' do
       let(:noteable) { create(:epic) }

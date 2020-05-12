@@ -14,7 +14,7 @@ describe EE::MergeRequestMetricsService do
   describe '#merge' do
     let(:merge_request) { create(:merge_request, :merged) }
     let(:expected_commit_count) { 21 }
-    let(:event) { instance_double('Event', author_id: merge_request.author.id, created_at: Time.now) }
+    let(:event) { instance_double('Event', author_id: merge_request.author.id, created_at: Time.current) }
 
     it 'saves metrics with productivity_data' do
       allow(merge_request).to receive(:commits_count).and_return(expected_commit_count)

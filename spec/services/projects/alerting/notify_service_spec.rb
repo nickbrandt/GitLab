@@ -72,7 +72,7 @@ describe Projects::Alerting::NotifyService do
 
   describe '#execute' do
     let(:token) { 'invalid-token' }
-    let(:starts_at) { Time.now.change(usec: 0) }
+    let(:starts_at) { Time.current.change(usec: 0) }
     let(:service) { described_class.new(project, nil, payload) }
     let(:payload_raw) do
       {

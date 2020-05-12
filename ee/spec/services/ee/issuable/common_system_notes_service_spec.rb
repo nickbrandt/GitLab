@@ -52,7 +52,7 @@ describe Issuable::CommonSystemNotesService do
     end
 
     context 'when issuable is an epic' do
-      let(:timestamp) { Time.now }
+      let(:timestamp) { Time.current }
       let(:issuable) { create(:epic, end_date: timestamp) }
 
       subject { described_class.new(nil, user).execute(issuable, old_labels: []) }

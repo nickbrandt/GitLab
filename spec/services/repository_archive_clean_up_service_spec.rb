@@ -110,6 +110,6 @@ describe RepositoryArchiveCleanUpService do
 
   def create_temporary_files(dir, extensions, mtime)
     FileUtils.mkdir_p(dir)
-    FileUtils.touch(extensions.map { |ext| File.join(dir, "sample.#{ext}") }, mtime: Time.now - mtime)
+    FileUtils.touch(extensions.map { |ext| File.join(dir, "sample.#{ext}") }, mtime: Time.current - mtime)
   end
 end
