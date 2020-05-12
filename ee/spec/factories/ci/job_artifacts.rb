@@ -259,16 +259,6 @@ FactoryBot.define do
       end
     end
 
-    trait :deprecated_container_scanning_report do
-      file_format { :raw }
-      file_type { :container_scanning }
-
-      after(:build) do |artifact, _|
-        artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-container-scanning-report.json'), 'text/plain')
-      end
-    end
-
     trait :metrics do
       file_format { :gzip }
       file_type { :metrics }
