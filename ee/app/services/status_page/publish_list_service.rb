@@ -13,7 +13,7 @@ module StatusPage
     def process(issues)
       json = serialize(issues)
 
-      upload(object_key, json)
+      upload_json(object_key, json)
     end
 
     def serialize(issues)

@@ -14,11 +14,9 @@ module StatusPage
       publish_json_response = publish_json(issue, user_notes)
       return publish_json_response if publish_json_response.error?
 
-      image_object_keys = publish_images(issue, user_notes)
+      publish_images(issue, user_notes)
 
-      success_payload = publish_json_response.payload.merge({ image_object_keys: image_object_keys })
-
-      success(success_payload)
+      success
     end
 
     # Publish Json
@@ -46,11 +44,13 @@ module StatusPage
     def publish_images(issue, user_notes)
       existing_image_keys = storage_client.list_object_keys(StatusPage::Storage.uploads_path(issue.iid))
       # Send all description images to s3
+      total_uploads = existing_image_keys.size
 
       publish_markdown_uploads(
         markdown_field: issue.description,
         issue_iid: issue.iid,
-        existing_image_keys: existing_image_keys
+        existing_image_keys: existing_image_keys,
+        total_uploads: total_uploads
       )
 
       # Send all comment images to s3
@@ -58,13 +58,16 @@ module StatusPage
         publish_markdown_uploads(
           markdown_field: user_note.note,
           issue_iid: issue.iid,
-          existing_image_keys: existing_image_keys
+          existing_image_keys: existing_image_keys,
+          total_uploads: total_uploads
         )
       end
     end
 
-    def publish_markdown_uploads(markdown_field:, issue_iid:, existing_image_keys:)
+    def publish_markdown_uploads(markdown_field:, issue_iid:, existing_image_keys:, total_uploads:)
       markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |secret, file_name|
+        break if total_uploads >= StatusPage::Storage::MAX_IMAGE_UPLOADS
+
         key = StatusPage::Storage.upload_path(issue_iid, secret, file_name)
 
         next if existing_image_keys.include? key
@@ -72,6 +75,7 @@ module StatusPage
         uploader = UploaderFinder.new(@project, secret, file_name).execute
         uploader.open do |open_file|
           storage_client.multipart_upload(key, open_file)
+          total_uploads += 1
         end
       end
     end

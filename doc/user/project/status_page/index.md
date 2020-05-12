@@ -114,4 +114,8 @@ To change the incident status from `open` to `closed`, close the incident issue 
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/205166) in GitLab 13.0.
 
-Starting with GitLab 13.0, any file that is uploaded to incident issue descriptions or comments will be published and unpublished to the status page s3 bucket, as part of the publication flow described in the [How it works](#how-it-works) section.
+Starting with GitLab 13.0, any file that is attached to incident issue descriptions or comments will be published and unpublished to the status page storage, as part of the publication flow described in the [How it works](#how-it-works) section.
+
+### Limit
+
+Only 5000 attachments per issue will be transferred to the status page.
