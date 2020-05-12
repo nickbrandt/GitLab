@@ -148,7 +148,7 @@ module EE
       scope :aimed_for_deletion, -> (date) { where('marked_for_deletion_at <= ?', date).without_deleted }
       scope :with_repos_templates, -> { where(namespace_id: ::Gitlab::CurrentSettings.current_application_settings.custom_project_templates_group_id) }
       scope :with_groups_level_repos_templates, -> { joins("INNER JOIN namespaces ON projects.namespace_id = namespaces.custom_project_templates_group_id") }
-      scope :with_designs, -> { where(id: DesignManagement::Design.select(:project_id)) }
+      scope :with_designs, -> { where(id: ::DesignManagement::Design.select(:project_id)) }
       scope :with_deleting_user, -> { includes(:deleting_user) }
       scope :with_compliance_framework_settings, -> { preload(:compliance_framework_setting) }
       scope :has_vulnerabilities, -> { joins(:vulnerabilities).group(:id) }
