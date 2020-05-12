@@ -81,7 +81,7 @@ describe EE::SystemNotes::DesignManagementService do
         end
 
         it 'has a valid action' do
-          expect(EE::SystemNoteHelper::EE_ICON_NAMES_BY_ACTION)
+          expect(::SystemNoteHelper::ICON_NAMES_BY_ACTION)
             .to include(metadata.action)
         end
       end
