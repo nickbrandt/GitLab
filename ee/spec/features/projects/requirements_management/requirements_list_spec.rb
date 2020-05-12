@@ -184,9 +184,7 @@ describe 'Requirements list', :js do
       end
 
       it 'does not show button "New requirement"' do
-        page.within('.nav-controls') do
-          expect(page).not_to have_selector('button.js-new-requirement')
-        end
+        expect(page).not_to have_selector('.nav-controls button.js-new-requirement')
       end
 
       it 'shows list of all archived requirements' do
@@ -229,9 +227,7 @@ describe 'Requirements list', :js do
       end
 
       it 'does not show button "New requirement"' do
-        page.within('.nav-controls') do
-          expect(page).not_to have_selector('button.js-new-requirement')
-        end
+        expect(page).not_to have_selector('.nav-controls button.js-new-requirement')
       end
 
       it 'shows list of all requirements' do
@@ -251,9 +247,7 @@ describe 'Requirements list', :js do
     end
 
     it 'open tab does not show button "New requirement"' do
-      page.within('.nav-controls') do
-        expect(page).not_to have_selector('button.js-new-requirement')
-      end
+      expect(page).not_to have_selector('.nav-controls button.js-new-requirement')
     end
   end
 end

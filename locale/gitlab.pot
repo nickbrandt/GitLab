@@ -9320,9 +9320,6 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-msgid "Filter by %{issuable_type} that are currently archived."
-msgstr ""
-
 msgid "Filter by %{issuable_type} that are currently closed."
 msgstr ""
 
@@ -9336,6 +9333,12 @@ msgid "Filter by milestone name"
 msgstr ""
 
 msgid "Filter by name"
+msgstr ""
+
+msgid "Filter by requirements that are currently archived."
+msgstr ""
+
+msgid "Filter by requirements that are currently opened."
 msgstr ""
 
 msgid "Filter by status"
@@ -19164,13 +19167,13 @@ msgstr ""
 msgid "Should you ever lose your phone or access to your one time password secret, each of these recovery codes can be used one time each to regain access to your account. Please save them in a safe place, or you %{b_start}will%{b_end} lose access to your account."
 msgstr ""
 
-msgid "Show all %{issuable_type}."
-msgstr ""
-
 msgid "Show all activity"
 msgstr ""
 
 msgid "Show all members"
+msgstr ""
+
+msgid "Show all requirements."
 msgstr ""
 
 msgid "Show archived projects"
@@ -19545,6 +19548,9 @@ msgid "Something went wrong while fetching projects."
 msgstr ""
 
 msgid "Something went wrong while fetching related merge requests."
+msgstr ""
+
+msgid "Something went wrong while fetching requirements count."
 msgstr ""
 
 msgid "Something went wrong while fetching requirements list."
