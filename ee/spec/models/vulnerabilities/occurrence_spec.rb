@@ -606,4 +606,28 @@ describe Vulnerabilities::Occurrence do
 
     it { is_expected.to eql(expected_cve) }
   end
+
+  describe "#metadata" do
+    let(:occurrence) { build(:vulnerabilities_occurrence) }
+
+    subject { occurrence.metadata }
+
+    it "handles bool JSON data" do
+      allow(occurrence).to receive(:raw_metadata) { "true" }
+
+      expect(subject).to eq({})
+    end
+
+    it "handles string JSON data" do
+      allow(occurrence).to receive(:raw_metadata) { '"test"' }
+
+      expect(subject).to eq({})
+    end
+
+    it "parses JSON data" do
+      allow(occurrence).to receive(:raw_metadata) { '{ "test": true }' }
+
+      expect(subject).to eq({ "test" => true })
+    end
+  end
 end
