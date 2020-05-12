@@ -384,4 +384,41 @@ RSpec.describe Packages::Package, type: :model do
       expect(packages.pluck(:name)).to match_array([nuget_package.name, maven_package.name])
     end
   end
+
+  describe '#versions' do
+    let_it_be(:project) { create(:project) }
+    let_it_be(:package) { create(:maven_package, project: project) }
+    let_it_be(:package2) { create(:maven_package, project: project) }
+    let_it_be(:package3) { create(:maven_package, project: project, name: 'foo') }
+
+    it 'returns other package versions of the same package name belonging to the project' do
+      expect(package.versions).to contain_exactly(package2)
+    end
+
+    it 'does not return different packages' do
+      expect(package.versions).not_to include(package3)
+    end
+  end
+
+  describe '#pipeline' do
+    let_it_be(:package) { create(:maven_package) }
+
+    context 'package without pipeline' do
+      it 'returns nil if there is no pipeline' do
+        expect(package.pipeline).to be_nil
+      end
+    end
+
+    context 'package with pipeline' do
+      let_it_be(:pipeline) { create(:ci_pipeline) }
+
+      before do
+        package.create_build_info!(pipeline: pipeline)
+      end
+
+      it 'returns the pipeline' do
+        expect(package.pipeline).to eq(pipeline)
+      end
+    end
+  end
 end
