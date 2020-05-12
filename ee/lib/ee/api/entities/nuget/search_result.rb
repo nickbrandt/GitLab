@@ -14,6 +14,7 @@ module EE
           expose :verified
           expose :version
           expose :versions, using: EE::API::Entities::Nuget::SearchResultVersion
+          expose :tags
         end
       end
     end

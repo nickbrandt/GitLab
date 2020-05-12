@@ -421,4 +421,22 @@ RSpec.describe Packages::Package, type: :model do
       end
     end
   end
+
+  describe '#tag_names' do
+    let_it_be(:package) { create(:nuget_package) }
+
+    subject { package.tag_names }
+
+    it { is_expected.to eq([]) }
+
+    context 'with tags' do
+      let(:tags) { %w(tag1 tag2 tag3) }
+
+      before do
+        tags.each { |t| create(:packages_tag, name: t, package: package) }
+      end
+
+      it { is_expected.to contain_exactly(*tags) }
+    end
+  end
 end

@@ -137,6 +137,10 @@ class Packages::Package < ApplicationRecord
     build_info&.pipeline
   end
 
+  def tag_names
+    tags.pluck(:name)
+  end
+
   private
 
   def valid_conan_package_recipe

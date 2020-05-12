@@ -49,12 +49,17 @@ module API
               package_name: package.name,
               package_version: package.version,
               archive_url: archive_url_for(package),
-              summary: BLANK_STRING
+              summary: BLANK_STRING,
+              tags: tags_for(package)
             }
           end
 
           def base_path_for(package)
             api_v4_projects_packages_nuget_path(id: package.project.id)
+          end
+
+          def tags_for(package)
+            package.tag_names.join(::Packages::Tag::NUGET_TAGS_SEPARATOR)
           end
         end
       end

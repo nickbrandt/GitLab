@@ -10,6 +10,7 @@ module EE
           expose :dependencies, as: :dependencyGroups
           expose :package_name, as: :id
           expose :package_version, as: :version
+          expose :tags
           expose :archive_url, as: :packageContent
           expose :summary
         end
