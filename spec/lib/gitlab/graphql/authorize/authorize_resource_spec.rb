@@ -161,6 +161,22 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
 
       expect(test_class.custom_authorize).to eq('authorization logic!')
     end
+
+    context 'when the custom auth depends on the object being authorized or current user' do
+      it 'has access to the object and user' do
+        test_class = Class.new do
+          include Gitlab::Graphql::Authorize::AuthorizeResource
+
+          authorize do |object, user|
+            object.present? && user.present?
+          end
+        end
+
+        expect(
+          test_class.custom_authorize(double(:graphql_object), double(:current_user))
+        ).to be_truthy
+      end
+    end
   end
 
   describe '.custom_authorize?' do
@@ -201,6 +217,10 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
             include Gitlab::Graphql::Authorize::AuthorizeResource
 
             authorize { true }
+
+            def current_user
+              'user :)'
+            end
           end
 
           expect { test_class.new.authorize!(object_for_auth) }.not_to raise_error
@@ -213,6 +233,10 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
             include Gitlab::Graphql::Authorize::AuthorizeResource
 
             authorize { false }
+
+            def current_user
+              'user :)'
+            end
           end
 
           expect { test_class.new.authorize!(object_for_auth) }.to raise_error(

@@ -20,8 +20,8 @@ module Gitlab
                                       end
           end
 
-          def custom_authorize
-            @custom_authorize.call
+          def custom_authorize(object = nil, user = nil)
+            @custom_authorize.call(object, user)
           end
 
           def has_custom_authorization?
@@ -52,7 +52,7 @@ module Gitlab
 
         def authorize!(object)
           if self.class.has_custom_authorization?
-            if self.class.custom_authorize
+            if self.class.custom_authorize(object, current_user)
               true
             else
               raise_resource_not_available_error!
