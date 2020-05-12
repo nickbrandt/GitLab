@@ -9,7 +9,7 @@ import UsersCache from '~/lib/utils/users_cache';
 import ResolutionAlert from './resolution_alert.vue';
 import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
 import StatusDescription from './status_description.vue';
-import { VULNERABILITY_STATE_OBJECTS } from '../constants';
+import { VULNERABILITY_STATE_OBJECTS, HEADER_ACTION_BUTTONS } from '../constants';
 import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
 
 export default {
@@ -48,7 +48,7 @@ export default {
   data() {
     return {
       isLoadingVulnerability: false,
-      isProcessing: false,
+      isProcessingAction: false,
       isLoadingUser: false,
       vulnerability: this.initialVulnerability,
       user: undefined,
@@ -56,20 +56,11 @@ export default {
   },
 
   computed: {
-    actions() {
-      return {
-        issueCreation: {
-          name: s__('ciReport|Create issue'),
-          isLoading: this.isProcessing,
-          action: 'createIssue',
-        },
-      };
-    },
     actionButtons() {
       const buttons = [];
 
       if (!this.hasIssue) {
-        buttons.push(this.actions.issueCreation);
+        buttons.push(HEADER_ACTION_BUTTONS.issueCreation);
       }
 
       return buttons;
@@ -114,7 +105,8 @@ export default {
 
   methods: {
     triggerClick(action) {
-      this[action]();
+      const fn = this[action];
+      if (typeof fn === 'function') fn();
     },
     changeVulnerabilityState(newState) {
       this.isLoadingVulnerability = true;
@@ -136,7 +128,7 @@ export default {
         });
     },
     createIssue() {
-      this.isProcessing = true;
+      this.isProcessingAction = true;
       axios
         .post(this.createIssueUrl, {
           vulnerability_feedback: {
@@ -155,7 +147,7 @@ export default {
           redirectTo(issue_url);
         })
         .catch(() => {
-          this.isProcessing = false;
+          this.isProcessingAction = false;
           createFlash(
             s__('VulnerabilityManagement|Something went wrong, could not create an issue.'),
           );
@@ -207,7 +199,7 @@ export default {
           class="ml-2"
           variant="success"
           category="secondary"
-          :loading="isProcessing"
+          :loading="isProcessingAction"
           @click="triggerClick(actionButtons[0].action)"
         >
           {{ actionButtons[0].name }}
