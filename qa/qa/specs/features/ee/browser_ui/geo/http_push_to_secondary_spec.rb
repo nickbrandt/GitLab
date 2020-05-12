@@ -89,7 +89,8 @@ module QA
       end
 
       context 'git-lfs commit' do
-        it 'is redirected to the primary and ultimately replicated to the secondary' do
+        it 'is redirected to the primary and ultimately replicated to the secondary', quarantine:
+            { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212632', type: :investigating } do
           file_name_primary = 'README.md'
           file_name_secondary = 'README_MORE.md'
           project = nil
