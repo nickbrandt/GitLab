@@ -24,6 +24,7 @@ describe Projects::Security::WafAnomaliesController do
 
       allow_next_instance_of(::Security::WafAnomalySummaryService) do |instance|
         allow(instance).to receive(:elasticsearch_client).at_most(3).times { es_client }
+        allow(instance).to receive(:chart_above_v3?) { true }
       end
     end
 
