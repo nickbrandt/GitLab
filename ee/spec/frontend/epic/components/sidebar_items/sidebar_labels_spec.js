@@ -117,6 +117,62 @@ describe('SidebarLabelsComponent', () => {
         expect(wrapper.vm.epicContext.labels[0].id).toBe(mockLabels[0].id);
       });
     });
+
+    describe('handleUpdateSelectedLabels', () => {
+      const updatingLabel = {
+        id: 1,
+        title: 'Foo Label',
+        description: 'Foobar',
+        color: '#BADA55',
+        text_color: '#FFFFFF',
+      };
+
+      beforeEach(() => {
+        jest.spyOn(wrapper.vm, 'updateEpicLabels').mockImplementation();
+      });
+
+      it('calls action `updateEpicLabels` when there is a label to apply', () => {
+        store.state.labels = mockLabels;
+        const appliedLabel = {
+          ...updatingLabel,
+          set: true,
+        };
+
+        wrapper.vm.handleUpdateSelectedLabels([appliedLabel]);
+
+        expect(wrapper.vm.updateEpicLabels).toHaveBeenCalledWith(
+          expect.arrayContaining([appliedLabel]),
+        );
+      });
+
+      it('calls action `updateEpicLabels` when there is a label to remove', () => {
+        const removedLabel = {
+          ...updatingLabel,
+          set: false,
+        };
+
+        store.state.labels = [...mockLabels, removedLabel];
+
+        wrapper.vm.handleUpdateSelectedLabels([removedLabel]);
+
+        expect(wrapper.vm.updateEpicLabels).toHaveBeenCalledWith(
+          expect.arrayContaining([removedLabel]),
+        );
+      });
+
+      it('does not call action `updateEpicLabels` when there are no labels to apply or remove', () => {
+        const appliedLabel = {
+          ...updatingLabel,
+          set: true,
+        };
+
+        store.state.labels = [...mockLabels, appliedLabel];
+
+        wrapper.vm.handleUpdateSelectedLabels([appliedLabel]);
+
+        expect(wrapper.vm.updateEpicLabels).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe('template', () => {
