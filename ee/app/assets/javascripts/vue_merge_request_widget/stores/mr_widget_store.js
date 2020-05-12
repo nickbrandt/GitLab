@@ -122,7 +122,6 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   comparePerformanceMetrics(headMetrics, baseMetrics) {
     const headMetricsIndexed = MergeRequestStore.normalizePerformanceMetrics(headMetrics);
     const baseMetricsIndexed = MergeRequestStore.normalizePerformanceMetrics(baseMetrics);
-
     const improved = [];
     const degraded = [];
 

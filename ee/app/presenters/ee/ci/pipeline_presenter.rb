@@ -37,6 +37,13 @@ module EE
             proxy: true)
         end
       end
+
+      def degradation_threshold
+        if (job_artifact = batch_lookup_report_artifact_for_file_type(:performance)) &&
+            can?(current_user, :read_build, job_artifact.job)
+          job_artifact.job.degradation_threshold
+        end
+      end
     end
   end
 end
