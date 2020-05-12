@@ -194,10 +194,10 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     subject { described_class.with_project_alert_service_data(project_id) }
 
     let!(:cluster) { create(:cluster, :project) }
-    let(:project_id) { cluster.first_project.id }
+    let!(:project_id) { cluster.first_project.id }
 
     context 'project has alert service data' do
-      let(:alert_service) { create(:alerts_service, project: cluster.clusterable) }
+      let!(:alerts_service) { create(:alerts_service, project: cluster.clusterable) }
 
       it { is_expected.to include(cluster) }
     end
