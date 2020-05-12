@@ -1975,6 +1975,9 @@ msgstr ""
 msgid "An application called %{link_to_client} is requesting access to your GitLab account."
 msgstr ""
 
+msgid "An email notification was recently sent from the admin panel. Please wait %{wait_time_in_words} before attempting to send another message."
+msgstr ""
+
 msgid "An empty GitLab User field will add the FogBugz user's full name (e.g. \"By John Smith\") in the description of all issues and comments. It will also associate and/or assign these issues and comments with the project creator."
 msgstr ""
 
@@ -7780,6 +7783,9 @@ msgstr ""
 msgid "Email address"
 msgstr ""
 
+msgid "Email could not be sent"
+msgstr ""
+
 msgid "Email display name"
 msgstr ""
 
@@ -7793,6 +7799,9 @@ msgid "Email restrictions"
 msgstr ""
 
 msgid "Email restrictions for sign-ups"
+msgstr ""
+
+msgid "Email sent"
 msgstr ""
 
 msgid "Email the pipelines status to a list of recipients."
@@ -18857,6 +18866,12 @@ msgstr ""
 msgid "Send email"
 msgstr ""
 
+msgid "Send email notification"
+msgstr ""
+
+msgid "Send message"
+msgstr ""
+
 msgid "Send report"
 msgstr ""
 
@@ -24249,6 +24264,9 @@ msgid "You can invite another group to <strong>%{project_name}</strong>."
 msgstr ""
 
 msgid "You can move around the graph by using the arrow keys."
+msgstr ""
+
+msgid "You can notify the app / group or a project by sending them an email notification"
 msgstr ""
 
 msgid "You can now export your security dashboard to a CSV report."
