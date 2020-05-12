@@ -24,20 +24,6 @@ export const getMaxNodes = (nodes) => {
   return Math.max(...counts);
 }
 
-export const transformData = (data) => {
-  const baseLayout = createSankey({ height: 10, width: 10 })(data);
-  const cleanedNodes = removeOrphanNodes(baseLayout.nodes);
-  const maxNodesPerLayer = getMaxNodes(cleanedNodes);
-
-  return {
-    maxNodesPerLayer,
-    linksAndNodes: {
-      links: data.links,
-      nodes: cleanedNodes
-    }
-  }
-}
-
 /** transform data to give us the Sankey nodes & links
   input is:
   [stages]
