@@ -16824,6 +16824,9 @@ msgstr ""
 msgid "Promoted issue to an epic."
 msgstr ""
 
+msgid "Promotions|Burndown Charts are visual representations of the progress of completing a milestone. At a glance, you see the current state for the completion a given milestone. Without them, you would have to organize the data from the milestone and plot it yourself to have the same sense of progress."
+msgstr ""
+
 msgid "Promotions|Buy EE"
 msgstr ""
 
@@ -16839,6 +16842,9 @@ msgstr ""
 msgid "Promotions|Contact your Administrator to upgrade your license."
 msgstr ""
 
+msgid "Promotions|Dismiss burndown charts promotion"
+msgstr ""
+
 msgid "Promotions|Don't show me this again"
 msgstr ""
 
@@ -16846,6 +16852,9 @@ msgid "Promotions|Epics let you manage your portfolio of projects more efficient
 msgstr ""
 
 msgid "Promotions|Improve issues management with Issue weight and GitLab Enterprise Edition."
+msgstr ""
+
+msgid "Promotions|Improve milestones with Burndown Charts."
 msgstr ""
 
 msgid "Promotions|Learn more"
@@ -16870,6 +16879,9 @@ msgid "Promotions|Upgrade your plan"
 msgstr ""
 
 msgid "Promotions|Upgrade your plan to activate Contribution Analytics."
+msgstr ""
+
+msgid "Promotions|Upgrade your plan to improve milestones with Burndown Charts."
 msgstr ""
 
 msgid "Promotions|Weight"
