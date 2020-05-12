@@ -9,13 +9,14 @@ describe Security::WafAnomalySummaryService do
   end
 
   let(:es_client) { double(Elasticsearch::Client) }
+  let(:chart_above_v3) { true }
 
   let(:empty_response) do
     {
       'took' => 40,
       'timed_out' => false,
       '_shards' => { 'total' => 11, 'successful' => 11, 'skipped' => 0, 'failed' => 0 },
-      'hits' => { 'total' => 0, 'max_score' => 0.0, 'hits' => [] },
+      'hits' => { 'total' => { 'value' => 0, 'relation' => 'gte' }, 'max_score' => 0.0, 'hits' => [] },
       'aggregations' => {
         'counts' => {
           'buckets' => []
@@ -26,6 +27,38 @@ describe Security::WafAnomalySummaryService do
   end
 
   let(:nginx_response) do
+    empty_response.deep_merge(
+      'hits' => { 'total' => { 'value' => 3 } },
+      'aggregations' => {
+        'counts' => {
+          'buckets' => [
+            { 'key_as_string' => '2020-02-14T23:00:00.000Z', 'key' => 1575500400000, 'doc_count' => 1 },
+            { 'key_as_string' => '2020-02-15T00:00:00.000Z', 'key' => 1575504000000, 'doc_count' => 0 },
+            { 'key_as_string' => '2020-02-15T01:00:00.000Z', 'key' => 1575507600000, 'doc_count' => 0 },
+            { 'key_as_string' => '2020-02-15T08:00:00.000Z', 'key' => 1575532800000, 'doc_count' => 2 }
+          ]
+        }
+      }
+    )
+  end
+
+  let(:modsec_response) do
+    empty_response.deep_merge(
+      'hits' => { 'total' => { 'value' => 1 } },
+      'aggregations' => {
+        'counts' => {
+          'buckets' => [
+            { 'key_as_string' => '2019-12-04T23:00:00.000Z', 'key' => 1575500400000, 'doc_count' => 0 },
+            { 'key_as_string' => '2019-12-05T00:00:00.000Z', 'key' => 1575504000000, 'doc_count' => 0 },
+            { 'key_as_string' => '2019-12-05T01:00:00.000Z', 'key' => 1575507600000, 'doc_count' => 0 },
+            { 'key_as_string' => '2019-12-05T08:00:00.000Z', 'key' => 1575532800000, 'doc_count' => 1 }
+          ]
+        }
+      }
+    )
+  end
+
+  let(:nginx_response_es6) do
     empty_response.deep_merge(
       'hits' => { 'total' => 3 },
       'aggregations' => {
@@ -41,7 +74,7 @@ describe Security::WafAnomalySummaryService do
     )
   end
 
-  let(:modsec_response) do
+  let(:modsec_response_es6) do
     empty_response.deep_merge(
       'hits' => { 'total' => 1 },
       'aggregations' => {
@@ -99,6 +132,9 @@ describe Security::WafAnomalySummaryService do
         allow(environment.deployment_platform.cluster).to receive_message_chain(
           :application_elastic_stack, :elasticsearch_client
         ) { es_client }
+        allow(environment.deployment_platform.cluster).to receive_message_chain(
+          :application_elastic_stack, :chart_above_v3?
+        ) { chart_above_v3 }
       end
 
       context 'no requests' do
@@ -142,11 +178,28 @@ describe Security::WafAnomalySummaryService do
           expect(results.fetch(:anomalous_traffic)).to eq 0.33
         end
       end
+
+      context 'with legacy es6 cluster' do
+        let(:chart_above_v3) { false }
+
+        let(:nginx_results) { nginx_response_es6 }
+        let(:modsec_results) { modsec_response_es6 }
+
+        it 'returns results', :aggregate_failures do
+          results = subject.execute
+
+          expect(results.fetch(:status)).to eq :success
+          expect(results.fetch(:interval)).to eq 'day'
+          expect(results.fetch(:total_traffic)).to eq 3
+          expect(results.fetch(:anomalous_traffic)).to eq 0.33
+        end
+      end
     end
 
     context 'with review app' do
       it 'resolves transaction_id from external_url' do
         allow(subject).to receive(:elasticsearch_client) { es_client }
+        allow(subject).to receive(:chart_above_v3?) { chart_above_v3 }
 
         expect(es_client).to receive(:msearch).with(
           body: array_including(
@@ -182,6 +235,7 @@ describe Security::WafAnomalySummaryService do
         )
 
         allow(subject).to receive(:elasticsearch_client) { es_client }
+        allow(subject).to receive(:chart_above_v3?) { chart_above_v3 }
 
         expect(es_client).to receive(:msearch).with(
           body: array_including(
@@ -218,6 +272,7 @@ describe Security::WafAnomalySummaryService do
         )
 
         allow(subject).to receive(:elasticsearch_client) { es_client }
+        allow(subject).to receive(:chart_above_v3?) { chart_above_v3 }
 
         expect(es_client).to receive(:msearch).with(
           body: array_including(
