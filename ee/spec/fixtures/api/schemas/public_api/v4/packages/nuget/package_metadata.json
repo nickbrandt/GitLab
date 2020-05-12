@@ -14,6 +14,7 @@
         "id": { "type": "string" },
         "packageContent": { "type": "string" },
         "summary": { "const": "" },
+        "tags": { "type": "string" },
         "version": { "type": "string" }
       }
     }

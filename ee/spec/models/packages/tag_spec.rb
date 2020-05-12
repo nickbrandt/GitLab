@@ -34,4 +34,28 @@ RSpec.describe Packages::Tag, type: :model do
       it { is_expected.to match_array([tag2, tag3]) }
     end
   end
+
+  describe '.with_name' do
+    let_it_be(:package) { create(:package) }
+    let_it_be(:tag1) { create(:packages_tag, package: package, name: 'tag1') }
+    let_it_be(:tag2) { create(:packages_tag, package: package, name: 'tag2') }
+    let_it_be(:tag3) { create(:packages_tag, package: package, name: 'tag3') }
+    let(:name) { 'tag1' }
+
+    subject { described_class.with_name(name) }
+
+    it { is_expected.to contain_exactly(tag1) }
+
+    context 'with nil name' do
+      let(:name) { nil }
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'with multiple names' do
+      let(:name) { %w(tag1 tag3) }
+
+      it { is_expected.to contain_exactly(tag1, tag3) }
+    end
+  end
 end

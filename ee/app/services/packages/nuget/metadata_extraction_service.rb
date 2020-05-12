@@ -14,6 +14,7 @@ module Packages
 
       XPATH_DEPENDENCIES = '//xmlns:package/xmlns:metadata/xmlns:dependencies/xmlns:dependency'
       XPATH_DEPENDENCY_GROUPS = '//xmlns:package/xmlns:metadata/xmlns:dependencies/xmlns:group'
+      XPATH_TAGS = '//xmlns:package/xmlns:metadata/xmlns:tags'
 
       MAX_FILE_SIZE = 4.megabytes.freeze
 
@@ -48,6 +49,7 @@ module Packages
               .to_h
               .tap do |metadata|
                 metadata[:package_dependencies] = extract_dependencies(doc)
+                metadata[:package_tags] = extract_tags(doc)
               end
       end
 
@@ -74,6 +76,14 @@ module Packages
           name: node.attr('id'),
           version: node.attr('version')
         }.compact
+      end
+
+      def extract_tags(doc)
+        tags = doc.xpath(XPATH_TAGS).text
+
+        return [] if tags.blank?
+
+        tags.split(::Packages::Tag::NUGET_TAGS_SEPARATOR)
       end
 
       def nuspec_file
