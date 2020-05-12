@@ -186,6 +186,25 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
           )
         end
       end
+
+      context 'when the proc has an invalid number of arguments' do
+        it 'raises an invalid arity error' do
+          test_class = Class.new do
+            include Gitlab::Graphql::Authorize::AuthorizeResource
+
+            authorize { |arg1, arg2, arg3| false }
+
+            def current_user
+              'user :)'
+            end
+          end
+
+          expect { test_class.new.authorize!(object_for_auth) }.to raise_error(
+            ::Gitlab::Graphql::Authorize::AuthorizeResource::InvalidAuthorizationArity,
+            'The custom auth proc may only take up to 2 arguments: |object, current_user|'
+          )
+        end
+      end
     end
 
     context 'when there is both custom auth and given permissions' do

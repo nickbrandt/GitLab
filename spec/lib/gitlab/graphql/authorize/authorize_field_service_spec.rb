@@ -82,6 +82,17 @@ describe Gitlab::Graphql::Authorize::AuthorizeFieldService do
       end
     end
 
+    context 'when a custom authorization proc has an invalid number of arguments' do
+      let(:field) { type_with_field(GraphQL::STRING_TYPE, lambda { |arg1, arg2, arg3| authorized }).fields['testField'].to_graphql }
+
+      it 'raises an invalid arity error' do
+        expect { resolved }.to raise_error(
+          ::Gitlab::Graphql::Authorize::AuthorizeFieldService::InvalidAuthorizationArity,
+          'The custom auth proc may only take up to 2 arguments: |object, current_user|'
+        )
+      end
+    end
+
     context 'scalar types' do
       shared_examples 'checking permissions on the presented object' do
         it 'checks the abilities on the object being presented and returns the value' do

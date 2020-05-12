@@ -8,6 +8,8 @@ module Gitlab
 
         RESOURCE_ACCESS_ERROR = "The resource that you are attempting to access does not exist or you don't have permission to perform this action"
 
+        InvalidAuthorizationArity = Class.new(StandardError)
+
         class_methods do
           def required_permissions
             # If the `#authorize` call is used on multiple classes, we add the
@@ -59,15 +61,32 @@ module Gitlab
             raise Gitlab::Graphql::Errors::ArgumentError, "#{self.class.name} has no authorizations"
           end
 
+          check_permissions(object)
+        end
+
+        def check_permissions(object)
           self.class.required_permissions.all? do |authorization|
             # The actions could be performed across multiple objects. In which
             # case the current user is common, and we could benefit from the
             # caching in `DeclarativePolicy`.
             if authorization.class.method_defined?(:call)
-              authorization.call(object, current_user)
+              call_custom_authorization(authorization, object)
             else
               Ability.allowed?(current_user, authorization, object, scope: :user)
             end
+          end
+        end
+
+        def call_custom_authorization(authorization, object)
+          case authorization.arity
+          when 0
+            authorization.call
+          when 1
+            authorization.call(object)
+          when 2
+            authorization.call(object, current_user)
+          else
+            raise InvalidAuthorizationArity, 'The custom auth proc may only take up to 2 arguments: |object, current_user|'
           end
         end
 
