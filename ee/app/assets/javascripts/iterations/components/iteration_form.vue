@@ -82,7 +82,7 @@ export default {
           <div class="col-sm-10">
             <markdown-field
               :markdown-preview-path="previewMarkdownPath"
-              :can-attach-file="true"
+              :can-attach-file="false"
               :enable-autocomplete="true"
               label="Description"
               :textarea-value="description"
