@@ -3,6 +3,17 @@ type File {
   content: String!
 }
 
+type SavedContentField {
+  label: String!
+  url: String!
+}
+
+type SavedContentMeta {
+  mergeRequest: SavedContentField!
+  commit: SavedContentField!
+  branch: SavedContentField!
+}
+
 extend type Project {
   file(path: ID!): File
 }
@@ -17,4 +28,9 @@ type AppData {
 
 extend type Query {
   appData: AppData!
+  savedContentMeta: SavedContentMeta
+}
+
+extend type Mutation {
+  submitContentChanges(project: String!, sourcePath: String!, content: String!, username: String!): SavedContentMeta
 }

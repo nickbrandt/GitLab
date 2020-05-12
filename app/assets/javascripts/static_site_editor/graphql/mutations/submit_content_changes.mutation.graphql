@@ -1,0 +1,7 @@
+mutation submitContentChanges($project: ID!, $username: String!, $sourcePath: String!, $content: String!) {
+  submitContentChanges(project: $project, username: $username, sourcePath: $sourcePath, content: $content)  @client {
+    branch
+    commit
+    mergeRequest
+  }
+}
