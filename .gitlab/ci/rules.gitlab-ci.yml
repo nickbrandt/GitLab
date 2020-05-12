@@ -427,6 +427,54 @@
     - <<: *if-merge-request
       changes: *code-backstage-patterns
 
+##########################
+# Rails PostgreSQL rules #
+##########################
+
+.rails:rules:use-pg9:ee-and-foss:
+  rules:
+    - <<: *if-default-refs
+      changes: *code-backstage-patterns
+
+.rails:rules:use-pg9:ee-only:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-default-refs
+      changes: *code-backstage-patterns
+
+.rails:rules:use-pg10:ee-and-foss:
+  rules:
+    - <<: *if-master-schedule-nightly
+    - <<: *if-merge-request
+      changes: [".gitlab/ci/rails.gitlab-ci.yml"]
+
+.rails:rules:use-pg10:ee-only:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-master-schedule-nightly
+    - <<: *if-merge-request
+      changes: [".gitlab/ci/rails.gitlab-ci.yml"]
+
+.rails:rules:use-pg11:ee-and-foss:
+  rules:
+    - <<: *if-master-push
+      changes: *code-backstage-patterns
+    - <<: *if-master-schedule-2-hourly
+    - <<: *if-merge-request
+      changes: [".gitlab/ci/rails.gitlab-ci.yml"]
+
+.rails:rules:use-pg11:ee-only:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-master-push
+      changes: *code-backstage-patterns
+    - <<: *if-master-schedule-2-hourly
+    - <<: *if-merge-request
+      changes: [".gitlab/ci/rails.gitlab-ci.yml"]
+
 ##################
 # Releases rules #
 ##################
