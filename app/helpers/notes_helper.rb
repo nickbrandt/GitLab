@@ -55,7 +55,7 @@ module NotesHelper
       type: 'submit', name: 'button',
       data: diff_view_line_data(line_code, position, line_type),
       title: 'Add a comment to this line' do
-      icon('comment-o')
+      sprite_icon('comment', size: 12)
     end
   end
 
