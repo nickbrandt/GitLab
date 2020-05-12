@@ -1,19 +1,15 @@
 <script>
-import { GlButton, GlFormGroup, GlFormInput, GlFormInputGroup } from '@gitlab/ui';
+import { GlButton, GlFormInput } from '@gitlab/ui';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
 import { timeRanges } from '~/vue_shared/constants';
-import DateTimePickerInput from '~/vue_shared/components/date_time_picker/date_time_picker_input.vue';
 import createIteration from '../queries/create_iteration.mutation.graphql';
 import DueDateSelectors from '~/due_date_select';
 
 export default {
   timeRanges,
   components: {
-    DateTimePickerInput,
     GlButton,
-    GlFormGroup,
     GlFormInput,
-    GlFormInputGroup,
     MarkdownField,
   },
   props: {
@@ -27,18 +23,6 @@ export default {
       default: '',
     },
   },
-  // apollo: {
-  //   iterations: {
-  //     query: GroupIterationQuery,
-  //     update: data => data.group.sprints.nodes,
-  //     variables() {
-  //       return {
-  //         fullPath: this.groupPath,
-  //         state: this.state,
-  //       };
-  //     },
-  //   },
-  // },
   data() {
     return {
       iterations: [],
@@ -55,7 +39,7 @@ export default {
   methods: {
     save() {
       this.$apollo.mutate({
-        mutation: createIteration,     
+        mutation: createIteration,
         variables: {
           input: {
             groupPath: this.groupPath,
@@ -65,8 +49,8 @@ export default {
             dueDate: this.dueDate,
           },
         },
-      }).then((res) => {
-        console.log(res)
+      }).then(({ data, error }) => {
+        console.log(data, error)
       }).catch(e => {
         console.log(e)
       })
@@ -88,10 +72,10 @@ export default {
       <div class="col-sm-6">
         <div class="form-group row">
           <div class="col-form-label col-sm-2">
-            <label for="title">{{ __('Title') }}</label>
+            <label for="iteration-title">{{ __('Title') }}</label>
           </div>
-          <div class="col-sm-10 input-group">
-            <gl-form-input id="title" v-model="title" />
+          <div class="col-sm-10">
+            <gl-form-input id="iteration-title" v-model="title" autocomplete="off" />
           </div>
         </div>
 
@@ -132,16 +116,15 @@ export default {
             <label for="milestone_start_date">{{ __('Start date') }}</label>
           </div>
           <div class="col-sm-10">
-            <input
+            <gl-form-input
               id="milestone_start_date"
               v-model="startDate"
               class="datepicker form-control"
               :placeholder="__('Select start date')"
               autocomplete="off"
-              type="text"
               name="milestone[start_date]"
             />
-            <a class="inline float-right prepend-top-5 js-clear-start-date" href="#">{{ __('Clear start date') }}</a
+            <a class="inline float-right gl-mt-2 js-clear-start-date" href="#">{{ __('Clear start date') }}</a
             >
           </div>
         </div>
@@ -150,7 +133,7 @@ export default {
             <label for="milestone_due_date">{{ __('Due Date') }}</label>
           </div>
           <div class="col-sm-10">
-            <input
+            <gl-form-input
               id="milestone_due_date"
               v-model="dueDate"
               class="datepicker form-control"
@@ -159,19 +142,15 @@ export default {
               type="text"
               name="milestone[due_date]"
             />
-            <a class="inline float-right prepend-top-5 js-clear-due-date" href="#">{{ __('Clear due date') }}</a>
-            <div
-              class="pika-single gitlab-theme animate-picker is-hidden is-bound"
-              style="position: static; left: auto; top: auto;"
-            ></div>
+            <a class="inline float-right gl-mt-2 js-clear-due-date" href="#">{{ __('Clear due date') }}</a>
           </div>
         </div>
       </div>
     </section>
     
-    <div class="form-actions">
-      <gl-button @click="save">{{ __('Save') }}</gl-button>
-      <gl-button @click="cancel">{{ __('Cancel') }}</gl-button>
+    <div class="form-actions d-flex">
+      <gl-button variant="success" @click="save">{{ __('Save') }}</gl-button>
+      <gl-button class="ml-auto" @click="cancel">{{ __('Cancel') }}</gl-button>
     </div>
   </div>
 </template>
