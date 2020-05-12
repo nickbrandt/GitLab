@@ -53,8 +53,8 @@ module EE
       return unless show_gold_trial?(user, GOLD_TRIAL) &&
           user_default_dashboard?(user) &&
           ::Feature.enabled?(:render_dashboard_gold_trial, default_enabled: true) &&
-          has_no_trial_or_paid_plan?(user) &&
-          has_some_namespaces_with_no_trials?(user)
+          !user.owns_paid_namespace? &&
+          user.any_namespace_without_trial?
 
       render 'shared/gold_trial_callout_content'
     end
@@ -118,16 +118,6 @@ module EE
 
     def show_gold_trial_suitable_env?
       ::Gitlab.com? && !::Gitlab::Database.read_only?
-    end
-
-    def has_no_trial_or_paid_plan?(user)
-      return false if user.owns_paid_namespace?
-
-      !user.any_namespace_with_trial?
-    end
-
-    def has_some_namespaces_with_no_trials?(user)
-      user&.any_namespace_without_trial?
     end
   end
 end
