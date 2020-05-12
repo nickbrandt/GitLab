@@ -6208,7 +6208,7 @@ CREATE TABLE public.sprints (
     title_html text,
     description text,
     description_html text,
-    state_id smallint,
+    state_enum smallint,
     CONSTRAINT sprints_must_belong_to_project_or_group CHECK ((((project_id <> NULL::bigint) AND (group_id IS NULL)) OR ((group_id <> NULL::bigint) AND (project_id IS NULL)))),
     CONSTRAINT sprints_title CHECK ((char_length(title) <= 255))
 );

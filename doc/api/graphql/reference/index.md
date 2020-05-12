@@ -758,6 +758,7 @@ Represents an iteration object.
 | `title` | String! | Title of the iteration |
 | `updatedAt` | Time! | Timestamp of last iteration update |
 | `webPath` | String! | Web path of the iteration |
+| `webUrl` | String! | Web url of the iteration |
 
 ## JiraImport
 

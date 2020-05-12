@@ -9,8 +9,8 @@ describe SprintsFinder do
   let_it_be(:project_2) { create(:project, namespace: group) }
   let!(:started_group_sprint) { create(:sprint, :skip_future_date_validation, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
   let!(:upcoming_group_sprint) { create(:sprint, group: group, start_date: now + 1.day, due_date: now + 2.days) }
-  let!(:sprint_from_project_1) { create(:sprint, project: project_1, state_id: ::Sprint::STATE_ID_MAP[:upcoming], start_date: now + 2.days, due_date: now + 3.days) }
-  let!(:sprint_from_project_2) { create(:sprint, project: project_2, state_id: ::Sprint::STATE_ID_MAP[:upcoming], start_date: now + 4.days, due_date: now + 5.days) }
+  let!(:sprint_from_project_1) { create(:sprint, project: project_1, state_enum: ::Sprint::STATE_ENUM_MAP[:upcoming], start_date: now + 2.days, due_date: now + 3.days) }
+  let!(:sprint_from_project_2) { create(:sprint, project: project_2, state_enum: ::Sprint::STATE_ENUM_MAP[:upcoming], start_date: now + 4.days, due_date: now + 5.days) }
   let(:project_ids) { [project_1.id, project_2.id] }
 
   subject { described_class.new(params).execute }

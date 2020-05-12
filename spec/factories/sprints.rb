@@ -19,15 +19,15 @@ FactoryBot.define do
     end
 
     trait :upcoming do
-      state_id { Sprint::STATE_ID_MAP[:upcoming] }
+      state_enum { Sprint::STATE_ENUM_MAP[:upcoming] }
     end
 
-    trait :in_progress do
-      state_id { Sprint::STATE_ID_MAP[:in_progress] }
+    trait :started do
+      state_enum { Sprint::STATE_ENUM_MAP[:started] }
     end
 
     trait :closed do
-      state_id { Sprint::STATE_ID_MAP[:closed] }
+      state_enum { Sprint::STATE_ENUM_MAP[:closed] }
     end
 
     trait(:skip_future_date_validation) do
@@ -54,7 +54,7 @@ FactoryBot.define do
     end
 
     factory :upcoming_sprint, traits: [:upcoming]
-    factory :in_progress_sprint, traits: [:in_progress]
+    factory :started_sprint, traits: [:started]
     factory :closed_sprint, traits: [:closed]
   end
 end

@@ -67,10 +67,12 @@ describe 'Creating an Iteration' do
         post_graphql_mutation(mutation, current_user: current_user)
 
         iteration_hash = mutation_response['iteration']
-        expect(iteration_hash['title']).to eq('title')
-        expect(iteration_hash['description']).to eq('some description')
-        expect(iteration_hash['startDate']).to eq(start_date)
-        expect(iteration_hash['dueDate']).to eq(end_date)
+        aggregate_failures do
+          expect(iteration_hash['title']).to eq('title')
+          expect(iteration_hash['description']).to eq('some description')
+          expect(iteration_hash['startDate']).to eq(start_date)
+          expect(iteration_hash['dueDate']).to eq(end_date)
+        end
       end
 
       context 'when there are ActiveRecord validation errors' do

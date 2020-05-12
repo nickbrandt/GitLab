@@ -5,7 +5,7 @@ class Sprint < ApplicationRecord
 
   attr_accessor :skip_future_date_validation
 
-  STATE_ID_MAP = {
+  STATE_ENUM_MAP = {
       upcoming: 1,
       started: 2,
       closed: 3
@@ -31,7 +31,7 @@ class Sprint < ApplicationRecord
   scope :upcoming, -> { with_state(:upcoming) }
   scope :started, -> { with_state(:started) }
 
-  state_machine :state_id, initial: :upcoming do
+  state_machine :state_enum, initial: :upcoming do
     event :start do
       transition upcoming: :started
     end
@@ -40,9 +40,58 @@ class Sprint < ApplicationRecord
       transition [:upcoming, :started] => :closed
     end
 
-    state :upcoming, value: Sprint::STATE_ID_MAP[:upcoming]
-    state :started, value: Sprint::STATE_ID_MAP[:started]
-    state :closed, value: Sprint::STATE_ID_MAP[:closed]
+    state :upcoming, value: Sprint::STATE_ENUM_MAP[:upcoming]
+    state :started, value: Sprint::STATE_ENUM_MAP[:started]
+    state :closed, value: Sprint::STATE_ENUM_MAP[:closed]
+  end
+
+  # Alias to state machine .with_state_enum method
+  # This needs to be defined after the state machine block to avoid errors
+  class << self
+    alias_method :with_state, :with_state_enum
+    alias_method :with_states, :with_state_enums
+
+    def filter_by_state(sprints, state)
+      case state
+      when 'closed' then sprints.closed
+      when 'started' then sprints.started
+      when 'opened' then sprints.started.or(sprints.upcoming)
+      when 'all' then sprints
+      else sprints.upcoming
+      end
+    end
+  end
+
+  def state
+    STATE_ENUM_MAP.key(state_enum)
+  end
+
+  def state=(value)
+    self.state_enum = STATE_ENUM_MAP[value]
+  end
+
+  private
+
+  def start_or_due_dates_changed?
+    start_date_changed? || due_date_changed?
+  end
+
+  # ensure dates do not overlap with other Sprints in the same group/project
+  def dates_do_not_overlap
+    return unless resource_parent.sprints.within_timeframe(start_date, due_date).exists?
+
+    errors.add(:base, "Dates cannot overlap with other existing Iterations")
+  end
+
+  # ensure dates are in the future
+  def future_date
+    if start_date_changed?
+      errors.add(:start_date, "cannot be in the past") if start_date < Date.today
+    end
+
+    if due_date_changed?
+      errors.add(:due_date, "cannot be in the past") if due_date < Date.today
+    end
   end
 
   # Alias to state machine .with_state_id method
