@@ -18,7 +18,7 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
   end
 
   def self.registry_consistency_worker_enabled?
-    Feature.enabled?(:geo_job_artifact_registry_ssot_sync)
+    Feature.enabled?(:geo_job_artifact_registry_ssot_sync, default_enabled: true)
   end
 
   def self.finder_class
