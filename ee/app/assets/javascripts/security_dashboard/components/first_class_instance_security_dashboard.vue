@@ -7,10 +7,12 @@ import InstanceSecurityVulnerabilities from './first_class_instance_security_das
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import ProjectManager from './project_manager.vue';
+import CsvExportButton from './csv_export_button.vue';
 
 export default {
   components: {
     ProjectManager,
+    CsvExportButton,
     SecurityDashboardLayout,
     InstanceSecurityVulnerabilities,
     VulnerabilitySeverity,
@@ -38,6 +40,11 @@ export default {
       required: true,
     },
     projectListEndpoint: {
+      type: String,
+      required: true,
+    },
+
+    vulnerabilitiesExportEndpoint: {
       type: String,
       required: true,
     },
@@ -95,9 +102,10 @@ export default {
   <security-dashboard-layout>
     <template #header>
       <header class="page-title-holder flex-fill d-flex align-items-center">
-        <h2 class="page-title">{{ s__('SecurityReports|Security Dashboard') }}</h2>
+        <h2 class="page-title flex-grow">{{ s__('SecurityReports|Security Dashboard') }}</h2>
+        <csv-export-button :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint" />
         <gl-button
-          class="page-title-controls js-project-selector-toggle"
+          class="page-title-controls ml-2"
           :variant="toggleButtonProps.variant"
           @click="toggleProjectSelector"
           >{{ toggleButtonProps.text }}</gl-button
