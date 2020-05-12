@@ -182,6 +182,59 @@ export default {
       this.createClip(link);
       this.appendLinks(link);
     },
+    generateJunctionPath (d) {
+      const width = d.x1 - d.x0;
+      const halfWidth = width / 2;
+      return `
+          M ${d.x0 + width} ${d.y0 + halfWidth}
+          a ${halfWidth} ${halfWidth} 0 0 0 -${width} 0
+          v ${d.y1 - d.y0 - width}
+          a ${halfWidth} ${halfWidth} 0 0 0 ${width} 0
+          z
+          `;
+    },
+    generateNodes (svg, nodeData) {
+      const {
+        colorNodes,
+        strokeNodes,
+      } = this.$options.viewOptions;
+
+      return svg
+        .append('g')
+        .attr('stroke', '#000')
+        .selectAll('.junction-points')
+        .data(nodeData)
+        .enter()
+        .append('path')
+        .classed('junction-points', true)
+        .attr('id', (d) => d.uid = uniqueId('node'))
+        .attr('d', (d) => this.generateJunctionPath(d))
+        .attr('stroke', strokeNodes ? 'black' : this.color)
+        .attr('stroke-width', '2')
+        .attr('fill', colorNodes ? this.color : 'white')
+        .append('title')
+        .text((d) => d.name);
+    },
+    labelNodes (svg, nodeData) {
+      return svg
+        .append('g')
+        .attr('font-family', 'sans-serif')
+        .attr('font-size', 10)
+        .selectAll('text')
+        .data(nodeData)
+        .enter()
+        .append('text')
+        .classed('label', true)
+        .attr('x', (d) => (d.x0 < this.width / 2 ? d.x1 + 6 : d.x0 - 6))
+        .attr('y', (d) => (d.y1 + d.y0) / 2)
+        .attr('dy', '0.35em')
+        .attr('text-anchor', (d) => (d.x0 < this.width / 2 ? 'start' : 'end'))
+        .text((d) => d.name);
+  },
+    createNodes (svg, nodeData) {
+      this.generateNodes(svg, nodeData);
+      this.labelNodes(svg, nodeData);
+    },
 
     drawGraph(data, parseFn) {
       const {
@@ -214,8 +267,7 @@ export default {
 
       const svg = this.addSvg();
       this.createLinks(svg, layout.links);
-      // createNodes(svg, nodes, settings, color);
-
+      this.createNodes(svg, layout.nodes);
 
     },
 
@@ -243,7 +295,7 @@ export default {
 
 </script>
 <template>
-  <div class="dag-graph-container"></div>
+  <div class="dag-graph-container gl-pt-9"></div>
 </template>
 
 <style scoped>
@@ -254,29 +306,12 @@ export default {
     flex-direction: column;
   }
 
-  .annotation {
-    position: fixed;
-    padding: 1rem;
-    top: .5rem;
-    right: .5rem;
-    width: max-content;
-    background-color: white;
-  }
-
-  .shadow {
-    box-shadow: 0px 0px 8px bisque;
-  }
-
   .label {
     pointer-events: none;
   }
 
   .link, .junction-points {
     cursor: pointer;
-  }
-
-  p {
-    margin: 0;
   }
 
   svg:not(:first-of-type) {
