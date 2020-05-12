@@ -4,6 +4,7 @@ module Operations
   module FeatureFlags
     class UserList < ApplicationRecord
       include AtomicInternalId
+      include IidRoutes
 
       self.table_name = 'operations_user_lists'
 
