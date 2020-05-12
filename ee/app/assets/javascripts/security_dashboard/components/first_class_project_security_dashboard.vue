@@ -47,7 +47,8 @@ export default {
     },
     vulnerabilitiesExportEndpoint: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
   },
   data() {
