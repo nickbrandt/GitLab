@@ -29,7 +29,7 @@ export default {
 
     // just for exploration, to be removed on design decision
     categorizeBy: 'name', // category | name
-    linkType: 'start', // start | end | gradient
+    linkType: 'gradient', // start | end | gradient
     colorNodes: true,
     strokeNodes: false,
     blendMode: '',
@@ -111,19 +111,26 @@ export default {
         }
 
         const widerCorners = (d, i) => {
+          const { nodeWidth } = this.$options.viewOptions;
+
           const xValRaw = (d.source.x1 + ((i + 1) * d.width) % ((d.target.x1 - d.source.x0)));
-          const xValMin = Math.max((xValRaw + this.$options.viewOptions.nodeWidth), d.width);
+          const xValMin = Math.max((xValRaw + nodeWidth), d.width);
+          const overlapPoint = d.source.x1 + (d.target.x0 - d.source.x1);
           /**
             Math.random adds a little blur, so the  don't sit right on one another
             Increasing the value it is multipled by will increase the blur
           **/
-          const midPointX = Math.min(xValMin, (d.target.x0 - ((2 * this.$options.viewOptions.nodeWidth * Math.random()))))
+          const midPointX = Math.min(
+            xValMin,
+            (d.target.x0 - ((4 * nodeWidth * Math.random()))),
+            overlapPoint - (nodeWidth * 1.4)
+          )
 
           return d3.line()([
-            [d.source.x0, d.y0],
+            [(d.source.x0 + d.source.x1) / 2, d.y0],
             [midPointX, d.y0],
             [midPointX, d.y1],
-            [d.target.x1, d.y1],
+            [(d.target.x0 + d.target.x1) / 2, d.y1],
           ]);
         }
 
@@ -133,10 +140,10 @@ export default {
           .attr('stroke', strokeColor)
           .style('stroke-linejoin', 'round')
           // minus two to account for the rounded nodes
-          .attr('stroke-width', (d) => Math.max(1, d.width - 2));
-          // .attr('clip-path', (d) => `url(#${d.clipId})`);
+          .attr('stroke-width', (d) => Math.max(1, d.width - 2))
+          .attr('clip-path', (d) => `url(#${d.clipId})`);
     },
-    createClip() {
+    createClip(link) {
       const clip = (d) => `
         M${d.source.x0}, ${d.y1}
         V${Math.max(Math.max(d.y1, d.y0) + (d.width / 2), d.y0, d.y1)}
@@ -145,39 +152,38 @@ export default {
         H${d.source.x0}
         Z`
 
-      this.link
+      link
         .append('clipPath')
         .attr('id', (d) => (d.clipId = uniqueId('clip')))
         .append('path')
         .attr('d', clip)
     },
-    createGradient() {
-      this.gradient = this.link
+    createGradient(link) {
+      const gradient = link
         .append('linearGradient')
         .attr('id', (d) => (d.gradId = uniqueId('grad')))
         .attr('gradientUnits', 'userSpaceOnUse')
         .attr('x1', (d) => d.source.x1)
         .attr('x2', (d) => d.target.x0);
 
-      this.gradient
+      gradient
         .append('stop')
         .attr('offset', '0%')
         .attr('stop-color', (d) => this.color(d.source));
 
-      this.gradient
+      gradient
         .append('stop')
         .attr('offset', '100%')
         .attr('stop-color', (d) => this.color(d.target));
     },
     createLinks (svg, linksData) {
-      let link;
-      link = this.generateLinks(svg, linksData);
-      // this.createGradient();
-      // this.createClip();
+      const link = this.generateLinks(svg, linksData);
+      this.createGradient(link);
+      this.createClip(link);
       this.appendLinks(link);
     },
-    drawGraph(data, parseFn) {
 
+    drawGraph(data, parseFn) {
       const {
         baseWidth,
         baseHeight,
