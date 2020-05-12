@@ -1,0 +1,55 @@
+import Api from 'ee/api';
+import createFlash from '~/flash';
+import * as actions from 'ee/packages/details/store/actions';
+import * as types from 'ee/packages/details/store/mutation_types';
+import { FETCH_PACKAGE_VERSIONS_ERROR } from 'ee/packages/details/constants';
+import testAction from 'helpers/vuex_action_helper';
+import { npmPackage as packageEntity } from '../../mock_data';
+
+jest.mock('~/flash.js');
+jest.mock('ee/api.js');
+
+describe('Actions Package details store', () => {
+  beforeEach(() => {
+    Api.projectPackage = jest.fn().mockResolvedValue({ data: packageEntity });
+  });
+
+  describe('fetchPackageVersions', () => {
+    it('should fetch the package versions', done => {
+      testAction(
+        actions.fetchPackageVersions,
+        undefined,
+        { packageEntity },
+        [
+          { type: types.SET_LOADING, payload: true },
+          { type: types.SET_PACKAGE_VERSIONS, payload: packageEntity.versions },
+          { type: types.SET_LOADING, payload: false },
+        ],
+        [],
+        () => {
+          expect(Api.projectPackage).toHaveBeenCalledWith(
+            packageEntity.project_id,
+            packageEntity.id,
+          );
+          done();
+        },
+      );
+    });
+
+    it('should create flash on API error', done => {
+      Api.projectPackage = jest.fn().mockRejectedValue();
+
+      testAction(
+        actions.fetchPackageVersions,
+        undefined,
+        { packageEntity },
+        [{ type: types.SET_LOADING, payload: true }, { type: types.SET_LOADING, payload: false }],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(FETCH_PACKAGE_VERSIONS_ERROR);
+          done();
+        },
+      );
+    });
+  });
+});

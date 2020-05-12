@@ -9,6 +9,7 @@ module Packages
 
       def detail_view
         package_detail = {
+          id: @package.id,
           created_at: @package.created_at,
           name: @package.name,
           package_files: @package.package_files.map { |pf| build_package_file_view(pf) },
