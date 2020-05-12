@@ -99,82 +99,94 @@ describe PostReceive do
   describe '#process_wiki_changes' do
     let(:gl_repository) { "wiki-#{project.id}" }
 
-    it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do
-      allow(Gitlab::Geo).to receive(:primary?) { true }
-
-      expect_any_instance_of(::Geo::RepositoryUpdatedService).to receive(:execute)
+    it 'calls Git::WikiPushService#process_changes' do
+      expect_any_instance_of(::Git::WikiPushService).to receive(:process_changes)
 
       described_class.new.perform(gl_repository, key_id, base64_changes)
     end
 
-    it 'does not call Geo::RepositoryUpdatedService when not running on a Geo primary node' do
-      allow(Gitlab::Geo).to receive(:primary?) { false }
-
-      expect_any_instance_of(::Geo::RepositoryUpdatedService).not_to receive(:execute)
-
-      described_class.new.perform(gl_repository, key_id, base64_changes)
-    end
-
-    it 'triggers wiki index update when ElasticSearch is enabled and pushed to master', :elastic do
-      stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-
-      expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
-
-      described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
-    end
-
-    it 'does not trigger wiki index update when Elasticsearch is enabled and not pushed to master', :elastic do
-      stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-
-      expect_any_instance_of(ProjectWiki).not_to receive(:index_wiki_blobs)
-
-      described_class.new.perform(gl_repository, key_id, base64_changes)
-    end
-
-    context 'when limited indexing is on', :elastic do
+    context 'assuming calls to process_changes are successful' do
       before do
-        stub_ee_application_setting(
-          elasticsearch_search: true,
-          elasticsearch_indexing: true,
-          elasticsearch_limit_indexing: true
-        )
+        allow_any_instance_of(Git::WikiPushService).to receive(:process_changes)
       end
 
-      context 'when the project is not enabled specifically' do
-        it 'does not trigger wiki index update' do
-          expect_any_instance_of(ProjectWiki).not_to receive(:index_wiki_blobs)
+      it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do
+        allow(Gitlab::Geo).to receive(:primary?) { true }
 
-          described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
-        end
+        expect_any_instance_of(::Geo::RepositoryUpdatedService).to receive(:execute)
+
+        described_class.new.perform(gl_repository, key_id, base64_changes)
       end
 
-      context 'when a project is enabled specifically' do
+      it 'does not call Geo::RepositoryUpdatedService when not running on a Geo primary node' do
+        allow(Gitlab::Geo).to receive(:primary?) { false }
+
+        expect_any_instance_of(::Geo::RepositoryUpdatedService).not_to receive(:execute)
+
+        described_class.new.perform(gl_repository, key_id, base64_changes)
+      end
+
+      it 'triggers wiki index update when ElasticSearch is enabled and pushed to master', :elastic do
+        stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+
+        expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
+
+        described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
+      end
+
+      it 'does not trigger wiki index update when Elasticsearch is enabled and not pushed to master', :elastic do
+        stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+
+        expect_any_instance_of(ProjectWiki).not_to receive(:index_wiki_blobs)
+
+        described_class.new.perform(gl_repository, key_id, base64_changes)
+      end
+
+      context 'when limited indexing is on', :elastic do
         before do
-          create :elasticsearch_indexed_project, project: project
+          stub_ee_application_setting(
+            elasticsearch_search: true,
+            elasticsearch_indexing: true,
+            elasticsearch_limit_indexing: true
+          )
         end
 
-        it 'triggers wiki index update' do
-          expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
+        context 'when the project is not enabled specifically' do
+          it 'does not trigger wiki index update' do
+            expect_any_instance_of(ProjectWiki).not_to receive(:index_wiki_blobs)
 
-          described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
-        end
-      end
-
-      context 'when a group is enabled' do
-        let(:user) { create(:user) }
-        let(:group) { create(:group) }
-        let(:project) { create(:project, :wiki_repo, group: group) }
-        let(:key) { create(:key, user: user) }
-
-        before do
-          create :elasticsearch_indexed_namespace, namespace: group
-          group.add_owner(user)
+            described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
+          end
         end
 
-        it 'triggers wiki index update' do
-          expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
+        context 'when a project is enabled specifically' do
+          before do
+            create :elasticsearch_indexed_project, project: project
+          end
 
-          described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
+          it 'triggers wiki index update' do
+            expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
+
+            described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
+          end
+        end
+
+        context 'when a group is enabled' do
+          let(:user) { create(:user) }
+          let(:group) { create(:group) }
+          let(:project) { create(:project, :wiki_repo, group: group) }
+          let(:key) { create(:key, user: user) }
+
+          before do
+            create :elasticsearch_indexed_namespace, namespace: group
+            group.add_owner(user)
+          end
+
+          it 'triggers wiki index update' do
+            expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
+
+            described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
+          end
         end
       end
     end
