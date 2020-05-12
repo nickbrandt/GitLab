@@ -72,7 +72,7 @@ describe 'EE-specific admin routing' do
 
   describe Admin::ApplicationSettingsController, 'routing' do
     it 'redirects #geo to #geo_redirection' do
-      expect(get('/admin/application_settings/geo')).to route_to('admin/application_settings#geo_redirection')
+      expect(get('/admin/application_settings/geo')).to route_to('admin/geo/settings#show')
     end
 
     it 'routes to #templates' do
