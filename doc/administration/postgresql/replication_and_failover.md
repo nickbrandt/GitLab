@@ -1087,7 +1087,7 @@ To restart either service, run `gitlab-ctl restart SERVICE`
 
 For PostgreSQL, it is usually safe to restart the master node by default. Automatic failover defaults to a 1 minute timeout. Provided the database returns before then, nothing else needs to be done. To be safe, you can stop `repmgrd` on the standby nodes first with `gitlab-ctl stop repmgrd`, then start afterwards with `gitlab-ctl start repmgrd`.
 
-On the Consul server nodes, it is important to restart the Consul service in a controlled fashion. Read our [Consul documentation](../high_availability/consul.md#restarting-the-server-cluster) for instructions on how to restart the service.
+On the Consul server nodes, it is important to [restart the Consul service](../high_availability/consul.md#restart-consul) in a controlled manner.
 
 ### `gitlab-ctl repmgr-check-master` command produces errors
 
@@ -1136,7 +1136,7 @@ postgresql['trust_auth_cidr_addresses'] = %w(123.123.123.123/32 <other_cidrs>)
 
 If you're running into an issue with a component not outlined here, be sure to check the troubleshooting section of their specific documentation page.
 
-- [Consul](../high_availability/consul.md#troubleshooting)
+- [Consul](../high_availability/consul.md#troubleshooting-consul)
 - [PostgreSQL](https://docs.gitlab.com/omnibus/settings/database.html#troubleshooting)
 - [GitLab application](../high_availability/gitlab.md#troubleshooting)
 
