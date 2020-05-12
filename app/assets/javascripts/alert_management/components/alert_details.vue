@@ -5,10 +5,12 @@ import {
   GlNewDropdownItem,
   GlTabs,
   GlTab,
+  GlIcon,
   GlButton,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import query from '../graphql/queries/details.query.graphql';
+import { ALERTS_SEVERITY_LABELS } from '../constants';
 import { fetchPolicies } from '~/lib/graphql';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
@@ -22,12 +24,14 @@ export default {
     fullAlertDetailsTitle: s__('AlertManagement|Full Alert Details'),
     overviewTitle: s__('AlertManagement|Overview'),
   },
+  severityLabels: ALERTS_SEVERITY_LABELS,
   components: {
     GlLoadingIcon,
     GlNewDropdown,
     GlNewDropdownItem,
     GlTab,
     GlTabs,
+    GlIcon,
     GlButton,
   },
   mixins: [glFeatureFlagsMixin()],
@@ -71,12 +75,23 @@ export default {
 };
 </script>
 <template>
-  <div>
+  <div class="alert-management-details">
     <div v-if="loading"><gl-loading-icon size="lg" class="mt-3" /></div>
     <div
       v-if="alert"
-      class="gl-display-flex justify-content-end gl-border-b-1 gl-border-b-gray-200 gl-border-b-solid gl-p-4"
+      class="gl-display-flex justify-content-between align-items-center gl-border-b-1 gl-border-b-gray-200 gl-border-b-solid gl-p-4"
     >
+      <div
+        data-testid="severityField"
+      >
+        <gl-icon
+          class="mr-2"
+          :size="12"
+          :name="`severity-${alert.severity.toLowerCase()}`"
+          :class="`icon-${alert.severity.toLowerCase()}`"
+        />
+        {{ $options.severityLabels[alert.severity] }}
+      </div>
       <gl-button
         v-if="glFeatures.createIssueFromAlertEnabled"
         data-testid="createIssueBtn"
