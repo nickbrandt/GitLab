@@ -17,7 +17,7 @@ describe('LicensesTableRow component', () => {
 
   const findLoading = () => wrapper.find(GlSkeletonLoading);
   const findContent = () => wrapper.find('.js-license-row');
-  const findNameSeciton = () => findContent().find('.section-30');
+  const findNameSection = () => findContent().find('.section-30');
   const findComponentSection = () => findContent().find('.section-70');
 
   beforeEach(() => {
@@ -61,7 +61,7 @@ describe('LicensesTableRow component', () => {
     });
 
     it('shows name', () => {
-      const nameLink = findNameSeciton().find(GlLink);
+      const nameLink = findNameSection().find(GlLink);
 
       expect(nameLink.exists()).toBe(true);
       expect(nameLink.attributes('href')).toEqual(license.url);
@@ -93,7 +93,7 @@ describe('LicensesTableRow component', () => {
     });
 
     it('renders the GlFriendlyWrap and GlLink components', () => {
-      const nameSection = findNameSeciton();
+      const nameSection = findNameSection();
 
       expect(nameSection.find(GlLink).exists()).toBe(true);
       expect(nameSection.find(GlFriendlyWrap).exists()).toBe(true);
@@ -112,7 +112,7 @@ describe('LicensesTableRow component', () => {
     });
 
     it('does not show url link for name', () => {
-      const nameSection = findNameSeciton();
+      const nameSection = findNameSection();
 
       expect(nameSection.text()).toContain(license.name);
       expect(nameSection.find(GlLink).exists()).toBe(false);
