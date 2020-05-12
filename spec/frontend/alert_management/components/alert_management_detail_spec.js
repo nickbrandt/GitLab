@@ -76,8 +76,8 @@ describe('AlertDetails', () => {
       expect(wrapper.findAll('[data-testid="statusDropdownItem"]').length).toBe(3);
     });
 
-    it('renders a status dropdown containing three items', () => {
-      expect(wrapper.findAll('[data-testid="statusDropdownItem"]').length).toBe(3);
+    it('renders a severity icon', () => {
+      expect(wrapper.findAll('data-testid="severityField"').exists()).toBe(true);
     });
 
     describe('Create issue from alert', () => {
