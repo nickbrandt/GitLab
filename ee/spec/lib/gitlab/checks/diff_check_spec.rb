@@ -8,6 +8,12 @@ describe Gitlab::Checks::DiffCheck do
   include_context 'push rules checks context'
 
   describe '#validate!' do
+    shared_examples_for "returns codeowners validation message" do
+      it "returns an error message" do
+        expect(validation_result).to include("Pushes to protected branches")
+      end
+    end
+
     context 'no push rules active' do
       let_it_be(:push_rule) { create(:push_rule) }
 
@@ -57,22 +63,10 @@ describe Gitlab::Checks::DiffCheck do
           )
         end
 
-        context 'and the user is not listed as a codeowner' do
-          it "returns an error message" do
-            expect { diff_check.validate! }.to raise_error do |error|
-              expect(error).to be_a(Gitlab::GitAccess::ForbiddenError)
-              expect(error.message).to include("CODEOWNERS` were matched:\n- *.js.coffee")
-            end
-          end
-        end
-
-        context 'and the user is listed as a codeowner' do
-          # `user` is set as the owner of the incoming change by the shared
-          #   context found in 'push rules checks context'
-          let(:codeowner_content) { "* @#{user.username}" }
-
-          it "does not return an error message" do
-            expect { diff_check.validate! }.not_to raise_error
+        it "returns an error message" do
+          expect { diff_check.validate! }.to raise_error do |error|
+            expect(error).to be_a(Gitlab::GitAccess::ForbiddenError)
+            expect(error.message).to include("CODEOWNERS` were matched:\n- *.js.coffee")
           end
         end
       end
@@ -82,69 +76,7 @@ describe Gitlab::Checks::DiffCheck do
           subject.send(:validate_code_owners).call(["docs/CODEOWNERS", "README"])
         end
 
-        shared_examples_for "returns an error message" do
-          it "returns the expected error message" do
-            expect(validation_result).to include("Pushes to protected branches")
-          end
-        end
-
-        context "and the user is not listed as a code owner" do
-          context "for a non-web-based request" do
-            it_behaves_like "returns an error message"
-
-            it "returns an error message with newline chars" do
-              expect(validation_result).to include("\n")
-            end
-          end
-
-          context "for a web-based request" do
-            before do
-              expect(subject).to receive(:updated_from_web?).and_return(true)
-            end
-
-            it_behaves_like "returns an error message"
-
-            it "returns an error message with newline chars removed" do
-              expect(validation_result).not_to include("\n")
-            end
-          end
-        end
-
-        context "and the user is listed as a code owner" do
-          # `user` is set as the owner of the incoming change by the shared
-          #   context found in 'push rules checks context'
-          let(:codeowner_content) { "* @#{user.username}" }
-
-          it "returns nil" do
-            expect(validation_result).to be_nil
-          end
-        end
-
-        context "when the codeowner entity is a group" do
-          let(:group_a) { create(:group) }
-          let(:project) { create(:project, :repository, namespace: group_a) }
-          let(:codeowner_content) do
-            <<~CODEOWNERS
-            *.rb @#{code_owner.username}
-            docs/CODEOWNERS @#{group_a.name}
-            *.js.coffee @#{group_a.name}
-            CODEOWNERS
-          end
-
-          context "and the user is part of the codeowning-group" do
-            before do
-              group_a.add_developer(user)
-            end
-
-            it "returns nil" do
-              expect(validation_result).to be_nil
-            end
-          end
-
-          context "and the user is not part of the codeowning-group" do
-            it_behaves_like "returns an error message"
-          end
-        end
+        it_behaves_like "returns codeowners validation message"
       end
 
       context "the MR doesn't contain a matching file path" do
