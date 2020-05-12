@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import PublishButton from 'ee/batch_comments/components/publish_button.vue';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { createStore } from 'ee/batch_comments/stores';
 
 describe('Batch comments publish button component', () => {
@@ -16,7 +16,7 @@ describe('Batch comments publish button component', () => {
 
     vm = mountComponentWithStore(Component, { store, props: { shouldPublish: true } });
 
-    spyOn(vm.$store, 'dispatch').and.stub();
+    jest.spyOn(vm.$store, 'dispatch').mockImplementation();
   });
 
   afterEach(() => {

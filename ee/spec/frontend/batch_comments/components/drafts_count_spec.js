@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import DraftsCount from 'ee/batch_comments/components/drafts_count.vue';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { createStore } from 'ee/batch_comments/stores';
 
 describe('Batch comments drafts count component', () => {

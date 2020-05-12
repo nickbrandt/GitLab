@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import PreviewItem from 'ee/batch_comments/components/preview_item.vue';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { createStore } from 'ee/batch_comments/stores';
 import diffsModule from '~/diffs/store/modules';
 import notesModule from '~/notes/stores/modules';
@@ -52,7 +52,7 @@ describe('Batch comments draft preview item component', () => {
   it('scrolls to draft on click', () => {
     createComponent();
 
-    spyOn(vm.$store, 'dispatch').and.stub();
+    jest.spyOn(vm.$store, 'dispatch').mockImplementation();
 
     vm.$el.click();
 

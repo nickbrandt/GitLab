@@ -1,5 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import * as actions from 'ee/batch_comments/stores/modules/batch_comments/actions';
 import axios from '~/lib/utils/axios_utils';
 
@@ -31,7 +31,7 @@ describe('Batch comments store actions', () => {
 
   describe('saveDraft', () => {
     it('dispatches saveNote on root', () => {
-      const dispatch = jasmine.createSpy();
+      const dispatch = jest.fn();
 
       actions.saveDraft({ dispatch }, { id: 1 });
 
@@ -109,7 +109,7 @@ describe('Batch comments store actions', () => {
     });
 
     it('commits DELETE_DRAFT if no errors returned', done => {
-      const commit = jasmine.createSpy('commit');
+      const commit = jest.fn();
       const context = {
         getters,
         commit,
@@ -127,7 +127,7 @@ describe('Batch comments store actions', () => {
     });
 
     it('does not commit DELETE_DRAFT if errors returned', done => {
-      const commit = jasmine.createSpy('commit');
+      const commit = jest.fn();
       const context = {
         getters,
         commit,
@@ -156,7 +156,7 @@ describe('Batch comments store actions', () => {
     });
 
     it('commits SET_BATCH_COMMENTS_DRAFTS with returned data', done => {
-      const commit = jasmine.createSpy('commit');
+      const commit = jest.fn();
       const context = {
         getters,
         commit,
@@ -181,8 +181,8 @@ describe('Batch comments store actions', () => {
     let rootGetters;
 
     beforeEach(() => {
-      dispatch = jasmine.createSpy('dispatch');
-      commit = jasmine.createSpy('commit');
+      dispatch = jest.fn();
+      commit = jest.fn();
       getters = {
         getNotesData: { draftsPublishPath: gl.TEST_HOST, discussionsPath: gl.TEST_HOST },
       };
@@ -195,10 +195,10 @@ describe('Batch comments store actions', () => {
       actions
         .publishReview({ dispatch, commit, getters, rootGetters })
         .then(() => {
-          expect(commit.calls.argsFor(0)).toEqual(['REQUEST_PUBLISH_REVIEW']);
-          expect(commit.calls.argsFor(1)).toEqual(['RECEIVE_PUBLISH_REVIEW_SUCCESS']);
+          expect(commit.mock.calls[0]).toEqual(['REQUEST_PUBLISH_REVIEW']);
+          expect(commit.mock.calls[1]).toEqual(['RECEIVE_PUBLISH_REVIEW_SUCCESS']);
 
-          expect(dispatch.calls.argsFor(0)).toEqual(['updateDiscussionsAfterPublish']);
+          expect(dispatch.mock.calls[0]).toEqual(['updateDiscussionsAfterPublish']);
         })
         .then(done)
         .catch(done.fail);
@@ -210,8 +210,8 @@ describe('Batch comments store actions', () => {
       actions
         .publishReview({ dispatch, commit, getters, rootGetters })
         .then(() => {
-          expect(commit.calls.argsFor(0)).toEqual(['REQUEST_PUBLISH_REVIEW']);
-          expect(commit.calls.argsFor(1)).toEqual(['RECEIVE_PUBLISH_REVIEW_ERROR']);
+          expect(commit.mock.calls[0]).toEqual(['REQUEST_PUBLISH_REVIEW']);
+          expect(commit.mock.calls[1]).toEqual(['RECEIVE_PUBLISH_REVIEW_ERROR']);
         })
         .then(done)
         .catch(done.fail);
@@ -223,14 +223,14 @@ describe('Batch comments store actions', () => {
       const getters = {
         getNotesData: { draftsDiscardPath: gl.TEST_HOST },
       };
-      const commit = jasmine.createSpy('commit');
+      const commit = jest.fn();
       mock.onAny().reply(200);
 
       actions
         .discardReview({ getters, commit })
         .then(() => {
-          expect(commit.calls.argsFor(0)).toEqual(['REQUEST_DISCARD_REVIEW']);
-          expect(commit.calls.argsFor(1)).toEqual(['RECEIVE_DISCARD_REVIEW_SUCCESS']);
+          expect(commit.mock.calls[0]).toEqual(['REQUEST_DISCARD_REVIEW']);
+          expect(commit.mock.calls[1]).toEqual(['RECEIVE_DISCARD_REVIEW_SUCCESS']);
         })
         .then(done)
         .catch(done.fail);
@@ -240,14 +240,14 @@ describe('Batch comments store actions', () => {
       const getters = {
         getNotesData: { draftsDiscardPath: gl.TEST_HOST },
       };
-      const commit = jasmine.createSpy('commit');
+      const commit = jest.fn();
       mock.onAny().reply(500);
 
       actions
         .discardReview({ getters, commit })
         .then(() => {
-          expect(commit.calls.argsFor(0)).toEqual(['REQUEST_DISCARD_REVIEW']);
-          expect(commit.calls.argsFor(1)).toEqual(['RECEIVE_DISCARD_REVIEW_ERROR']);
+          expect(commit.mock.calls[0]).toEqual(['REQUEST_DISCARD_REVIEW']);
+          expect(commit.mock.calls[1]).toEqual(['RECEIVE_DISCARD_REVIEW_ERROR']);
         })
         .then(done)
         .catch(done.fail);
@@ -266,7 +266,7 @@ describe('Batch comments store actions', () => {
     });
 
     it('commits RECEIVE_DRAFT_UPDATE_SUCCESS with returned data', done => {
-      const commit = jasmine.createSpy('commit');
+      const commit = jest.fn();
       const context = {
         getters,
         commit,
@@ -284,12 +284,12 @@ describe('Batch comments store actions', () => {
     });
 
     it('calls passed callback', done => {
-      const commit = jasmine.createSpy('commit');
+      const commit = jest.fn();
       const context = {
         getters,
         commit,
       };
-      const callback = jasmine.createSpy('callback');
+      const callback = jest.fn();
       res = { id: 1 };
       mock.onAny().reply(200, res);
 
@@ -383,12 +383,12 @@ describe('Batch comments store actions', () => {
     beforeEach(() => {
       window.mrTabs = {
         currentAction: 'notes',
-        tabShown: jasmine.createSpy('tabShown'),
+        tabShown: jest.fn(),
       };
     });
 
     it('scrolls to draft item', () => {
-      const dispatch = jasmine.createSpy('dispatch');
+      const dispatch = jest.fn();
       const rootGetters = {
         getDiscussion: () => ({
           id: '1',
@@ -402,9 +402,9 @@ describe('Batch comments store actions', () => {
 
       actions.scrollToDraft({ dispatch, rootGetters }, draft);
 
-      expect(dispatch.calls.argsFor(0)).toEqual(['closeReviewDropdown']);
+      expect(dispatch.mock.calls[0]).toEqual(['closeReviewDropdown']);
 
-      expect(dispatch.calls.argsFor(1)).toEqual([
+      expect(dispatch.mock.calls[1]).toEqual([
         'expandDiscussion',
         { discussionId: '1' },
         { root: true },
