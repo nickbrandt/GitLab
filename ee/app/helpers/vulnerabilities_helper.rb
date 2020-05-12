@@ -1,27 +1,21 @@
 # frozen_string_literal: true
 
 module VulnerabilitiesHelper
-  def vulnerability_data(vulnerability, pipeline)
+  def vulnerability_details(vulnerability, pipeline)
     return unless vulnerability
 
-    {
+    result = {
+      timestamp: Time.now.to_i,
       create_issue_url: create_vulnerability_feedback_issue_path(vulnerability.finding.project),
-      id: vulnerability.id,
-      description: vulnerability.finding.description,
-      severity: vulnerability.severity,
-      confidence: vulnerability.confidence,
-      category: vulnerability.report_type,
-      state: vulnerability.state,
-      title: vulnerability.title,
-      solution: vulnerability.finding.solution,
-      identifiers: vulnerability.finding.indentifiers,
-      links: vulnerability.finding.links,
-      remediations: vulnerability.finding.remediations,
-      issue_feedback: vulnerability.finding.issue_feedback,
-      location: vulnerability.finding.location,
-      project_fingerprint: vulnerability.finding.project_fingerprint
+      has_mr: !!vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
       create_mr_url: create_vulnerability_feedback_merge_request_path(vulnerability.finding.project),
+      discussions_url: discussions_project_security_vulnerability_path(vulnerability.project, vulnerability),
+      notes_url: project_security_vulnerability_notes_path(vulnerability.project, vulnerability),
+      vulnerability_feedback_help_path: help_page_path('user/application_security/index', anchor: 'interacting-with-the-vulnerabilities'),
+      pipeline_json: vulnerability_pipeline_data(pipeline).to_json
     }
+
+    result.merge(vulnerability_data(vulnerability), vulnerability_finding_data(vulnerability.finding))
   end
 
   def vulnerability_pipeline_data(pipeline)
@@ -35,22 +29,23 @@ module VulnerabilitiesHelper
     }
   end
 
+  def vulnerability_data(vulnerability)
+    VulnerabilitySerializer.new.represent(vulnerability)
+  end
+
   def vulnerability_finding_data(finding)
     occurrence = Vulnerabilities::OccurrenceSerializer.new(current_user: current_user).represent(finding)
-    remediation = occurrence[:remediations]&.first
 
     occurrence.slice(
       :description,
       :identifiers,
+      :issue_feedback,
       :links,
       :location,
-      :name,
-      :issue_feedback,
-      :merge_request_feedback,
       :project,
-      :remediations
-    ).merge(
-      solution: remediation ? remediation['summary'] : occurrence[:solution]
+      :project_fingerprint,
+      :remediations,
+      :solution
     )
   end
 

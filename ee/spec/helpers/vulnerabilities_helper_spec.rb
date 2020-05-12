@@ -57,22 +57,20 @@ describe VulnerabilitiesHelper do
 
     it 'has expected vulnerability properties' do
       expect(subject).to include(
-        vulnerability_json: kind_of(String),
-        project_fingerprint: vulnerability.finding.project_fingerprint,
+        timestamp: Time.now.to_i,
         create_issue_url: "/#{project.full_path}/-/vulnerability_feedback",
-        notes_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/notes",
-        discussions_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/discussions",
         has_mr: anything,
-        vulnerability_feedback_help_path: kind_of(String),
-        finding_json: kind_of(String),
         create_mr_url: "/#{project.full_path}/-/vulnerability_feedback",
-        timestamp: Time.now.to_i
+        discussions_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/discussions",
+        notes_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/notes",
+        vulnerability_feedback_help_path: kind_of(String),
+        pipeline_json: kind_of(String)
       )
     end
   end
 
-  describe '#vulnerability_data' do
-    subject { helper.vulnerability_data(vulnerability, pipeline) }
+  describe '#vulnerability_details' do
+    subject { helper.vulnerability_details(vulnerability, pipeline) }
 
     describe 'when pipeline exists' do
       let(:pipeline) { create(:ci_pipeline) }
@@ -114,9 +112,9 @@ describe VulnerabilitiesHelper do
         merge_request_feedback: anything,
         links: finding.links,
         location: finding.location,
-        name: finding.name,
         project: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder),
-        remediations: finding.remediations,
+        project_fingerprint: kind_of(String),
+        remediations: nil,
         solution: kind_of(String)
       )
     end

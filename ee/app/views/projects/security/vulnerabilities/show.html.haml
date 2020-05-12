@@ -6,7 +6,7 @@
 - finding = @vulnerability.finding
 - location = finding.location
 
-#js-vulnerability-header{ data: vulnerability_data(@vulnerability, @pipeline) }
+#js-vulnerability-header{ data: vulnerability_details(@vulnerability, @pipeline) }
 
 .issue-details.issuable-details
   .detail-page-description.p-0.my-3
@@ -54,4 +54,4 @@
             - finding.identifiers.each do |identifier|
               %li= link_to identifier.name, identifier.url, target: '_blank', rel: 'noopener noreferrer'
 
-#js-vulnerability-footer{ data: vulnerability_data(@vulnerability, @pipeline) }
+#js-vulnerability-footer{ data: vulnerability_details(@vulnerability, @pipeline) }
