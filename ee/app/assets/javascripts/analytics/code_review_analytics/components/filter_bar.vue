@@ -3,6 +3,7 @@ import { mapState, mapActions } from 'vuex';
 import { GlFilteredSearch } from '@gitlab/ui';
 import { __ } from '~/locale';
 import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
+import LabelToken from '../../shared/components/tokens/label_token.vue';
 
 export default {
   components: {
@@ -19,6 +20,8 @@ export default {
       labelsPath: 'labelsPath',
       milestones: state => state.milestones.data,
       milestonesLoading: state => state.milestones.isLoading,
+      labels: state => state.labels.data,
+      labelsLoading: state => state.labels.isLoading,
     }),
     tokens() {
       return [
@@ -32,14 +35,25 @@ export default {
           symbol: '%',
           isLoading: this.milestonesLoading,
         },
+        {
+          icon: 'labels',
+          title: __('Label'),
+          type: 'label',
+          token: LabelToken,
+          labels: this.labels,
+          unique: false,
+          symbol: '~',
+          isLoading: this.labelsLoading,
+        },
       ];
     },
   },
   created() {
     this.fetchMilestones();
+    this.fetchLabels();
   },
   methods: {
-    ...mapActions('filters', ['fetchMilestones', 'setFilters']),
+    ...mapActions('filters', ['fetchMilestones', 'fetchLabels', 'setFilters']),
     processFilters(filters) {
       return filters.reduce((acc, token) => {
         const { type, value } = token;

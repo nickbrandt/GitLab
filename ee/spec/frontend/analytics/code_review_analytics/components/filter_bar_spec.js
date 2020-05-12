@@ -3,12 +3,13 @@ import Vuex from 'vuex';
 import { GlFilteredSearch } from '@gitlab/ui';
 import FilterBar from 'ee/analytics/code_review_analytics/components/filter_bar.vue';
 import createFiltersState from 'ee/analytics/code_review_analytics/store/modules/filters/state';
-import { mockMilestones } from '../mock_data';
+import { mockMilestones, mockLabels } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
 const milestoneTokenType = 'milestone';
+const labelTokenType = 'label';
 
 describe('FilteredSearchBar', () => {
   let wrapper;
@@ -29,6 +30,7 @@ describe('FilteredSearchBar', () => {
           },
           actions: {
             fetchMilestones: jest.fn(),
+            fetchLabels: jest.fn(),
             setFilters: setFiltersMock,
           },
         },
@@ -61,15 +63,19 @@ describe('FilteredSearchBar', () => {
 
   describe('when the state has data', () => {
     beforeEach(() => {
-      vuexStore = createStore({ milestones: { data: mockMilestones } });
+      vuexStore = createStore({
+        milestones: { data: mockMilestones },
+        labels: { data: mockLabels },
+      });
       wrapper = createComponent(vuexStore);
     });
 
-    it('displays the milestone token', () => {
+    it('displays the milestone and label token', () => {
       const tokens = findFilteredSearch().props('availableTokens');
 
-      expect(tokens).toHaveLength(1);
+      expect(tokens).toHaveLength(2);
       expect(tokens[0].type).toBe(milestoneTokenType);
+      expect(tokens[1].type).toBe(labelTokenType);
     });
 
     it('displays options in the milestone token', () => {
@@ -77,23 +83,33 @@ describe('FilteredSearchBar', () => {
 
       expect(milestoneToken).toHaveLength(mockMilestones.length);
     });
+
+    it('displays options in the label token', () => {
+      const { labels: labelToken } = getSearchToken(labelTokenType);
+
+      expect(labelToken).toHaveLength(mockLabels.length);
+    });
   });
 
   describe('when the user interacts', () => {
     beforeEach(() => {
-      vuexStore = createStore({ milestones: { data: mockMilestones } });
+      vuexStore = createStore({
+        milestones: { data: mockMilestones },
+        labels: { data: mockLabels },
+      });
       wrapper = createComponent(vuexStore);
     });
 
     it('clicks on the search button, setFilters is dispatched', () => {
       findFilteredSearch().vm.$emit('submit', [
         { type: 'milestone', value: { data: 'my-milestone', operator: '=' } },
+        { type: 'label', value: { data: 'my-label', operator: '=' } },
       ]);
 
       expect(setFiltersMock).toHaveBeenCalledWith(
         expect.anything(),
         {
-          label_name: undefined,
+          label_name: ['my-label'],
           milestone_title: ['my-milestone'],
         },
         undefined,

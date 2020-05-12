@@ -1,4 +1,4 @@
-export default [
+export const mockMilestones = [
   {
     id: 41,
     title: 'Sprint - Eligendi et aut pariatur ab rerum vel.',
@@ -27,4 +27,9 @@ export default [
     group_id: null,
     name: 'v4.0',
   },
+];
+
+export const mockLabels = [
+  { id: 74, title: 'Alero', color: '#6235f2', text_color: '#FFFFFF' },
+  { id: 9, title: 'Amsche', color: '#581cc8', text_color: '#FFFFFF' },
 ];

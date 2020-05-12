@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlFilteredSearchSuggestion, GlLoadingIcon } from '@gitlab/ui';
 import MilestoneToken from 'ee/analytics/shared/components/tokens/milestone_token.vue';
-import mockMilestones from './mock_data';
+import { mockMilestones } from './mock_data';
 
 describe('MilestoneToken', () => {
   let wrapper;
