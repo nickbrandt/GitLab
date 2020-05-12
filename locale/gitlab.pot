@@ -2335,12 +2335,6 @@ msgstr ""
 msgid "Any Author"
 msgstr ""
 
-msgid "Any Label"
-msgstr ""
-
-msgid "Any Milestone"
-msgstr ""
-
 msgid "Any branch"
 msgstr ""
 
@@ -2350,7 +2344,13 @@ msgstr ""
 msgid "Any encrypted tokens"
 msgstr ""
 
+msgid "Any label"
+msgstr ""
+
 msgid "Any member with Developer or higher permissions to the project."
+msgstr ""
+
+msgid "Any milestone"
 msgstr ""
 
 msgid "Any namespace"
@@ -13936,12 +13936,6 @@ msgstr ""
 msgid "No Epic"
 msgstr ""
 
-msgid "No Label"
-msgstr ""
-
-msgid "No Milestone"
-msgstr ""
-
 msgid "No Scopes"
 msgstr ""
 
@@ -14036,6 +14030,9 @@ msgid "No job log"
 msgstr ""
 
 msgid "No jobs to show"
+msgstr ""
+
+msgid "No label"
 msgstr ""
 
 msgid "No labels with such name or description"
