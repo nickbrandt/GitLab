@@ -40,6 +40,11 @@ describe('ee merge request widget options', () => {
   let mock;
   let Component;
 
+  const DEFAULT_PERFORMANCE = {
+    head_path: 'head.json',
+    base_path: 'base.json',
+  };
+
   beforeEach(() => {
     delete mrWidgetOptions.extends.el; // Prevent component mounting
 
@@ -65,7 +70,14 @@ describe('ee merge request widget options', () => {
     });
   });
 
+  const findPerformanceWidget = () => vm.$el.querySelector('.js-performance-widget');
   const findSecurityWidget = () => vm.$el.querySelector('.js-security-widget');
+
+  const setPerformance = (data = {}) => {
+    const performance = { ...DEFAULT_PERFORMANCE, ...data };
+    gl.mrWidgetData.performance = performance;
+    vm.mr.performance = performance;
+  };
 
   const VULNERABILITY_FEEDBACK_ENDPOINT = 'vulnerability_feedback_path';
 
@@ -487,13 +499,10 @@ describe('ee merge request widget options', () => {
         mock.onGet('base.json').reply(200, basePerformance);
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        vm.mr.performance = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
+        vm.mr.performance = { ...DEFAULT_PERFORMANCE };
 
         vm.$nextTick(() => {
-          expect(trimText(vm.$el.querySelector('.js-performance-widget').textContent)).toContain(
+          expect(trimText(findPerformanceWidget().textContent)).toContain(
             'Loading performance report',
           );
 
@@ -504,65 +513,91 @@ describe('ee merge request widget options', () => {
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('head.json').reply(200, headPerformance);
-        mock.onGet('base.json').reply(200, basePerformance);
+        mock.onGet(DEFAULT_PERFORMANCE.head_path).reply(200, headPerformance);
+        mock.onGet(DEFAULT_PERFORMANCE.base_path).reply(200, basePerformance);
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-
-        gl.mrWidgetData.performance = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
-        vm.mr.performance = gl.mrWidgetData.performance;
       });
 
-      it('should render provided data', done => {
-        setImmediate(() => {
-          expect(
-            trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
-          ).toEqual('Performance metrics improved on 2 points and degraded on 1 point');
-          done();
+      describe('default', () => {
+        beforeEach(() => {
+          setPerformance();
         });
-      });
 
-      describe('text connector', () => {
-        it('should only render information about fixed issues', done => {
+        it('should render provided data', done => {
           setImmediate(() => {
-            vm.mr.performanceMetrics.degraded = [];
-
-            Vue.nextTick(() => {
-              expect(
-                trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
-              ).toEqual('Performance metrics improved on 2 points');
-              done();
-            });
+            expect(
+              trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
+            ).toEqual('Performance metrics improved on 2 points and degraded on 1 point');
+            done();
           });
         });
 
-        it('should only render information about added issues', done => {
-          setImmediate(() => {
-            vm.mr.performanceMetrics.improved = [];
+        describe('text connector', () => {
+          it('should only render information about fixed issues', done => {
+            setImmediate(() => {
+              vm.mr.performanceMetrics.degraded = [];
 
-            Vue.nextTick(() => {
-              expect(
-                trimText(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
-              ).toEqual('Performance metrics degraded on 1 point');
-              done();
+              Vue.nextTick(() => {
+                expect(
+                  trimText(
+                    vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
+                  ),
+                ).toEqual('Performance metrics improved on 2 points');
+                done();
+              });
+            });
+          });
+
+          it('should only render information about added issues', done => {
+            setImmediate(() => {
+              vm.mr.performanceMetrics.improved = [];
+
+              Vue.nextTick(() => {
+                expect(
+                  trimText(
+                    vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
+                  ),
+                ).toEqual('Performance metrics degraded on 1 point');
+                done();
+              });
             });
           });
         });
       });
+
+      describe.each`
+        degradation_threshold | shouldExist
+        ${1}                  | ${true}
+        ${3}                  | ${false}
+      `(
+        'with degradation_threshold = $degradation_threshold',
+        ({ degradation_threshold, shouldExist }) => {
+          beforeEach(() => {
+            setPerformance({ degradation_threshold });
+
+            return waitForPromises();
+          });
+
+          if (shouldExist) {
+            it('should render widget when total score degradation is above threshold', () => {
+              expect(findPerformanceWidget()).toExist();
+            });
+          } else {
+            it('should not render widget when total score degradation is below threshold', () => {
+              expect(findPerformanceWidget()).not.toExist();
+            });
+          }
+        },
+      );
     });
 
     describe('with empty successful request', () => {
       beforeEach(done => {
-        mock.onGet('head.json').reply(200, []);
-        mock.onGet('base.json').reply(200, []);
+        mock.onGet(DEFAULT_PERFORMANCE.head_path).reply(200, []);
+        mock.onGet(DEFAULT_PERFORMANCE.base_path).reply(200, []);
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        gl.mrWidgetData.performance = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
+        gl.mrWidgetData.performance = { ...DEFAULT_PERFORMANCE };
         vm.mr.performance = gl.mrWidgetData.performance;
 
         // wait for network request from component watch update method
@@ -590,14 +625,11 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('head.json').reply(500, []);
-        mock.onGet('base.json').reply(500, []);
+        mock.onGet(DEFAULT_PERFORMANCE.head_path).reply(500, []);
+        mock.onGet(DEFAULT_PERFORMANCE.base_path).reply(500, []);
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        gl.mrWidgetData.performance = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
+        gl.mrWidgetData.performance = { ...DEFAULT_PERFORMANCE };
         vm.mr.performance = gl.mrWidgetData.performance;
       });
 
