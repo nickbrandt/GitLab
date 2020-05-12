@@ -3,7 +3,7 @@ import { GlButton, GlFormGroup, GlFormInput, GlFormInputGroup } from '@gitlab/ui
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
 import { timeRanges } from '~/vue_shared/constants';
 import DateTimePickerInput from '~/vue_shared/components/date_time_picker/date_time_picker_input.vue';
-import GroupIterationQuery from '../queries/group_iteration.query.graphql';
+import createIteration from '../queries/create_iteration.mutation.graphql';
 import DueDateSelectors from '~/due_date_select';
 
 export default {
@@ -43,14 +43,37 @@ export default {
     return {
       iterations: [],
       loading: 0,
-      title: '',
-      description: '',
-      startDate: '',
-      dueDate: null,
+      title: 'test',
+      description: 'test desc',
+      startDate: '2020-05-02',
+      dueDate: '2020-05-10',
     };
   },
   mounted() {
     new DueDateSelectors();
+  },
+  methods: {
+    save() {
+      this.$apollo.mutate({
+        mutation: createIteration,     
+        variables: {
+          input: {
+            groupPath: this.groupPath,
+            title: this.title,
+            description: this.description,
+            startDate: this.startDate,
+            dueDate: this.dueDate,
+          },
+        },
+      }).then((res) => {
+        console.log(res)
+      }).catch(e => {
+        console.log(e)
+      })
+    },
+    cancel() {
+      console.log('TODO');
+    }
   }
 };
 </script>
@@ -59,25 +82,22 @@ export default {
   <div>
     <div class="d-flex">
       <h3 class="page-title">{{ __('New Iteration') }}</h3>
-      <!-- TODO: util classes. canAdminIteration -->
-      <!-- <div class="milestone-buttons" v-if="true">
-        <gl-button>{{ __('Edit') }}</gl-button>
-        <gl-button variant="warning-outline">{{ __('Close iteration') }} </gl-button>
-        <gl-button variant="danger">{{ __('Delete') }} </gl-button>
-      </div> -->
     </div>
     <hr />
     <section class="row common-note-form">
       <div class="col-sm-6">
-        <gl-form-group :label="__('Title')" label-for="title" label-class="label-bold">
-          <div class="input-group">
-            <gl-form-input id="title" :value="title" />
+        <div class="form-group row">
+          <div class="col-form-label col-sm-2">
+            <label for="title">{{ __('Title') }}</label>
           </div>
-        </gl-form-group>
+          <div class="col-sm-10 input-group">
+            <gl-form-input id="title" v-model="title" />
+          </div>
+        </div>
 
         <div class="form-group row">
           <div class="col-form-label col-sm-2">
-            <label for="issue-description">{{ __('Description') }}</label>
+            <label for="description">{{ __('Description') }}</label>
           </div>
           <div class="col-sm-10">
             <markdown-field
@@ -87,10 +107,11 @@ export default {
               label="Description"
               :textarea-value="description"
               markdown-docs-path="/help/user/markdown"
+              :add-spacing-classes="false"
               class="md-area"
             >
               <textarea
-                id="issue-description"
+                id="description"
                 ref="textarea"
                 slot="textarea"
                 v-model="description"
@@ -120,7 +141,7 @@ export default {
               type="text"
               name="milestone[start_date]"
             />
-            <a class="inline float-right prepend-top-5 js-clear-start-date" href="#">Clear start date</a
+            <a class="inline float-right prepend-top-5 js-clear-start-date" href="#">{{ __('Clear start date') }}</a
             >
           </div>
         </div>
@@ -131,6 +152,7 @@ export default {
           <div class="col-sm-10">
             <input
               id="milestone_due_date"
+              v-model="dueDate"
               class="datepicker form-control"
               :placeholder="__('Select due date')"
               autocomplete="off"
@@ -146,5 +168,10 @@ export default {
         </div>
       </div>
     </section>
+    
+    <div class="form-actions">
+      <gl-button @click="save">{{ __('Save') }}</gl-button>
+      <gl-button @click="cancel">{{ __('Cancel') }}</gl-button>
+    </div>
   </div>
 </template>
