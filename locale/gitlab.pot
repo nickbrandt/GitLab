@@ -2293,6 +2293,9 @@ msgstr ""
 msgid "An issue can be a bug, a todo or a feature request that needs to be discussed in a project. Besides, issues are searchable and filterable."
 msgstr ""
 
+msgid "An unauthenticated user"
+msgstr ""
+
 msgid "An unexpected error occurred while checking the project environment."
 msgstr ""
 
