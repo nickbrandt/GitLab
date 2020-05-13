@@ -81,6 +81,7 @@ export const receiveEpicsSuccess = (
   { commit, dispatch, state, getters },
   { rawEpics, newEpic, timeframeExtended },
 ) => {
+  const epicIds = [];
   const epics = rawEpics.reduce((filteredEpics, epic) => {
     const formattedEpic = roadmapItemUtils.formatRoadmapItemDetails(
       epic,
@@ -100,10 +101,12 @@ export const receiveEpicsSuccess = (
         newEpic,
       });
       filteredEpics.push(formattedEpic);
-      commit(types.UPDATE_EPIC_IDS, formattedEpic.id);
+      epicIds.push(formattedEpic.id);
     }
     return filteredEpics;
   }, []);
+
+  commit(types.UPDATE_EPIC_IDS, epicIds);
 
   if (timeframeExtended) {
     const updatedEpics = state.epics.concat(epics);
