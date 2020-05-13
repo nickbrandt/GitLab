@@ -597,7 +597,7 @@ module Ci
       end
     end
 
-    def freeze_period_status
+    def freeze_period?
       Ci::FreezePeriodStatus.new(project_id: self.project_id).execute
     end
 
