@@ -7916,9 +7916,6 @@ msgstr ""
 msgid "Enable and configure Grafana."
 msgstr ""
 
-msgid "Enable and configure InfluxDB metrics."
-msgstr ""
-
 msgid "Enable and configure Prometheus metrics."
 msgstr ""
 
@@ -13287,9 +13284,6 @@ msgid "Metrics"
 msgstr ""
 
 msgid "Metrics - Grafana"
-msgstr ""
-
-msgid "Metrics - Influx"
 msgstr ""
 
 msgid "Metrics - Prometheus"
