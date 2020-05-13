@@ -3,4 +3,6 @@ export default () => ({
   policies: [],
   isLoadingPolicies: false,
   errorLoadingPolicies: false,
+  isUpdatingPolicy: false,
+  errorUpdatingPolicy: false,
 });

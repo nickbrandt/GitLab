@@ -4,6 +4,7 @@ import axios from '~/lib/utils/axios_utils';
 import httpStatus from '~/lib/utils/http_status';
 import createFlash from '~/flash';
 import testAction from 'helpers/vuex_action_helper';
+import { joinPaths } from '~/lib/utils/url_utility';
 
 import * as actions from 'ee/threat_monitoring/store/modules/network_policies/actions';
 import * as types from 'ee/threat_monitoring/store/modules/network_policies/mutation_types';
@@ -11,7 +12,7 @@ import getInitialState from 'ee/threat_monitoring/store/modules/network_policies
 
 import { mockPoliciesResponse } from '../../../mock_data';
 
-jest.mock('~/flash', () => jest.fn());
+jest.mock('~/flash');
 
 const networkPoliciesEndpoint = 'networkPoliciesEndpoint';
 
@@ -130,6 +131,113 @@ describe('Network Policy actions', () => {
             {
               type: types.RECEIVE_POLICIES_ERROR,
               payload: s__('NetworkPolicies|Something went wrong, unable to fetch policies'),
+            },
+          ],
+          [],
+        ));
+    });
+  });
+
+  describe('updatePolicy', () => {
+    let mock;
+    const environmentId = 3;
+    const policy = { name: 'policy', manifest: 'foo' };
+    const updatedPolicy = { name: 'policy', manifest: 'bar' };
+
+    beforeEach(() => {
+      state.policiesEndpoint = networkPoliciesEndpoint;
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock
+          .onPut(joinPaths(networkPoliciesEndpoint, policy.name), {
+            environment_id: environmentId,
+            manifest: updatedPolicy.manifest,
+          })
+          .replyOnce(httpStatus.OK, updatedPolicy);
+      });
+
+      it('should dispatch the request and success actions', () =>
+        testAction(
+          actions.updatePolicy,
+          { environmentId, policy, manifest: updatedPolicy.manifest },
+          state,
+          [
+            { type: types.REQUEST_UPDATE_POLICY },
+            {
+              type: types.RECEIVE_UPDATE_POLICY_SUCCESS,
+              payload: { policy, updatedPolicy },
+            },
+          ],
+          [],
+        ));
+    });
+
+    describe('on error', () => {
+      const error = { error: 'foo' };
+
+      beforeEach(() => {
+        mock
+          .onPut(joinPaths(networkPoliciesEndpoint, policy.name), {
+            environment_id: environmentId,
+            manifest: updatedPolicy.manifest,
+          })
+          .replyOnce(500, error);
+      });
+
+      it('should dispatch the request and error actions', () =>
+        testAction(
+          actions.updatePolicy,
+          { environmentId, policy, manifest: updatedPolicy.manifest },
+          state,
+          [
+            { type: types.REQUEST_UPDATE_POLICY },
+            { type: types.RECEIVE_UPDATE_POLICY_ERROR, payload: 'foo' },
+          ],
+          [],
+        ));
+    });
+
+    describe('with an empty endpoint', () => {
+      beforeEach(() => {
+        state.policiesEndpoint = '';
+      });
+
+      it('should dispatch RECEIVE_UPDATE_POLICY_ERROR', () =>
+        testAction(
+          actions.updatePolicy,
+          { environmentId, policy, manifest: updatedPolicy.manifest },
+          state,
+          [
+            {
+              type: types.RECEIVE_UPDATE_POLICY_ERROR,
+              payload: s__('NetworkPolicies|Something went wrong, failed to update policy'),
+            },
+          ],
+          [],
+        ));
+    });
+
+    describe('without environment id', () => {
+      it('should dispatch RECEIVE_UPDATE_POLICY_ERROR', () =>
+        testAction(
+          actions.updatePolicy,
+          {
+            environmentId: undefined,
+            policy,
+            manifest: updatedPolicy.manifest,
+          },
+          state,
+          [
+            {
+              type: types.RECEIVE_UPDATE_POLICY_ERROR,
+              payload: s__('NetworkPolicies|Something went wrong, failed to update policy'),
             },
           ],
           [],

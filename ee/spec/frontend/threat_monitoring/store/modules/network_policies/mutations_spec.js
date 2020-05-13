@@ -5,7 +5,7 @@ describe('Network Policies mutations', () => {
   let state;
 
   beforeEach(() => {
-    state = {};
+    state = { policies: [] };
   });
 
   describe(types.SET_ENDPOINT, () => {
@@ -52,6 +52,51 @@ describe('Network Policies mutations', () => {
     it('sets isLoadingPolicies to false and sets errorLoadingPolicies to true', () => {
       expect(state.isLoadingPolicies).toBe(false);
       expect(state.errorLoadingPolicies).toBe(true);
+    });
+  });
+
+  describe(types.REQUEST_UPDATE_POLICY, () => {
+    beforeEach(() => {
+      mutations[types.REQUEST_UPDATE_POLICY](state);
+    });
+
+    it('sets isUpdatingPolicy to true and sets errorUpdatingPolicy to false', () => {
+      expect(state.isUpdatingPolicy).toBe(true);
+      expect(state.errorUpdatingPolicy).toBe(false);
+    });
+  });
+
+  describe(types.RECEIVE_UPDATE_POLICY_SUCCESS, () => {
+    const policy = { id: 1, name: 'production', manifest: 'foo' };
+    const updatedPolicy = { id: 1, name: 'production', manifest: 'bar' };
+
+    beforeEach(() => {
+      state.policies.push(policy);
+      mutations[types.RECEIVE_UPDATE_POLICY_SUCCESS](state, {
+        policy,
+        updatedPolicy,
+      });
+    });
+
+    it('replaces policies with the updatedPolicy', () => {
+      expect(state.policies).not.toEqual(expect.objectContaining(policy));
+      expect(state.policies).toEqual(expect.objectContaining([updatedPolicy]));
+    });
+
+    it('sets isUpdatingPolicy to false and sets errorUpdatingPolicy to false', () => {
+      expect(state.isUpdatingPolicy).toBe(false);
+      expect(state.errorUpdatingPolicy).toBe(false);
+    });
+  });
+
+  describe(types.RECEIVE_UPDATE_POLICY_ERROR, () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_UPDATE_POLICY_ERROR](state);
+    });
+
+    it('sets isUpdatingPolicy to false and sets errorUpdatingPolicy to true', () => {
+      expect(state.isUpdatingPolicy).toBe(false);
+      expect(state.errorUpdatingPolicy).toBe(true);
     });
   });
 });
