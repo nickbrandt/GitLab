@@ -524,6 +524,7 @@ describe QuickActions::InterpretService do
               it_behaves_like 'epic relation is removed' do
                 let(:target) { epic }
               end
+
               it_behaves_like 'quick action is available', :remove_child_epic do
                 let(:target) { epic }
               end
@@ -537,6 +538,7 @@ describe QuickActions::InterpretService do
               it_behaves_like 'epic relation is removed' do
                 let(:target) { epic }
               end
+
               it_behaves_like 'quick action is available', :remove_child_epic do
                 let(:target) { epic }
               end
