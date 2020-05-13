@@ -114,13 +114,7 @@ class List {
   }
 
   newIssue(issue) {
-    this.addIssue(issue, null, 0);
-    this.issuesSize += 1;
-
-    return boardsStore
-      .newIssue(this.id, issue)
-      .then(res => res.data)
-      .then(data => this.onNewIssueResponse(issue, data));
+    return boardsStore.newListIssue(issue);
   }
 
   createIssues(data) {
