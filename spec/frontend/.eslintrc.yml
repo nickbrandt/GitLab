@@ -1,6 +1,6 @@
 ---
 extends:
-  - "plugin:@gitlab/jest"
+  - 'plugin:@gitlab/jest'
 settings:
   # We have to teach eslint-plugin-import what node modules we use
   # otherwise there is an error when it tries to resolve them
@@ -10,7 +10,7 @@ settings:
     - path
   import/resolver:
     jest:
-      jestConfigFile: "jest.config.js"
+      jestConfigFile: 'jest.config.js'
 globals:
   getJSONFixture: false
   loadFixtures: false
@@ -20,8 +20,8 @@ rules:
   jest/expect-expect:
     - off
     - assertFunctionNames:
-        - "expect*"
-        - "assert*"
-        - "testAction"
+        - 'expect*'
+        - 'assert*'
+        - 'testAction'
   jest/no-test-callback:
     - off
