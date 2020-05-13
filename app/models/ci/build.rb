@@ -591,14 +591,14 @@ module Ci
 
     def deploy_freeze_variables
       Gitlab::Ci::Variables::Collection.new.tap do |variables|
-        break variables unless freeze_period_status
+        break variables unless freeze_period?
 
         variables.append(key: 'CI_DEPLOY_FREEZE', value: 'true')
       end
     end
 
     def freeze_period?
-      Ci::FreezePeriodStatus.new(project_id: self.project_id).execute
+      Ci::FreezePeriodStatus.new(project: project).execute
     end
 
     def features

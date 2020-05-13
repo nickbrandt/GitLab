@@ -2,12 +2,12 @@
 require 'spec_helper'
 
 describe Ci::FreezePeriodStatus do
-  let_it_be(:project) { create :project }
+  let(:project) { create :project }
   # '0 23 * * 5' == "At 23:00 on Friday."", '0 7 * * 1' == "At 07:00 on Monday.""
   let(:friday_2300) { '0 23 * * 5' }
   let(:monday_0700) { '0 7 * * 1' }
 
-  subject { described_class.new(project_id: project.id).execute }
+  subject { described_class.new(project: project).execute }
 
   shared_examples 'within freeze period' do |time|
     it 'is frozen' do
@@ -32,9 +32,9 @@ describe Ci::FreezePeriodStatus do
 
     it_behaves_like 'within freeze period', Time.utc(2020, 4, 10, 23, 01)
 
-    it_behaves_like 'within freeze period', Time.utc(2020, 4, 13, 06, 59)
+    it_behaves_like 'within freeze period', Time.utc(2020, 4, 13, 6, 59)
 
-    it_behaves_like 'outside freeze period', Time.utc(2020, 4, 13, 07, 01)
+    it_behaves_like 'outside freeze period', Time.utc(2020, 4, 13, 7, 1)
   end
 
   describe 'multiple freeze periods' do
@@ -49,14 +49,14 @@ describe Ci::FreezePeriodStatus do
 
     it_behaves_like 'within freeze period', Time.utc(2020, 4, 10, 23, 29)
 
-    it_behaves_like 'within freeze period', Time.utc(2020, 4, 11, 10, 00)
+    it_behaves_like 'within freeze period', Time.utc(2020, 4, 11, 10, 0)
 
-    it_behaves_like 'within freeze period', Time.utc(2020, 4, 10, 23, 01)
+    it_behaves_like 'within freeze period', Time.utc(2020, 4, 10, 23, 1)
 
     it_behaves_like 'within freeze period', Time.utc(2020, 4, 13, 6, 59)
 
     it_behaves_like 'within freeze period', Time.utc(2020, 4, 13, 7, 59)
 
-    it_behaves_like 'outside freeze period', Time.utc(2020, 4, 13, 8, 01)
+    it_behaves_like 'outside freeze period', Time.utc(2020, 4, 13, 8, 1)
   end
 end
