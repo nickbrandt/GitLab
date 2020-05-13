@@ -1736,16 +1736,10 @@ msgstr ""
 msgid "AlertManagement|End time"
 msgstr ""
 
-msgid "AlertManagement|End time:"
-msgstr ""
-
 msgid "AlertManagement|Events"
 msgstr ""
 
-msgid "AlertManagement|Events:"
-msgstr ""
-
-msgid "AlertManagement|Full Alert Details"
+msgid "AlertManagement|Full alert details"
 msgstr ""
 
 msgid "AlertManagement|High"
@@ -1778,10 +1772,10 @@ msgstr ""
 msgid "AlertManagement|Resolved"
 msgstr ""
 
-msgid "AlertManagement|Start time"
+msgid "AlertManagement|Service"
 msgstr ""
 
-msgid "AlertManagement|Start time:"
+msgid "AlertManagement|Start time"
 msgstr ""
 
 msgid "AlertManagement|Status"
@@ -1794,6 +1788,9 @@ msgid "AlertManagement|There was an error displaying the alert. Please refresh t
 msgstr ""
 
 msgid "AlertManagement|There was an error displaying the alerts. Confirm your endpoint's configuration details to ensure alerts appear."
+msgstr ""
+
+msgid "AlertManagement|Tool"
 msgstr ""
 
 msgid "AlertManagement|Triggered"
