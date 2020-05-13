@@ -102,16 +102,51 @@ describe Gitlab::Checks::DiffCheck do
       end
 
       context "when the feature is enabled on the project" do
-        before do
-          expect(project).to receive(:branch_requires_code_owner_approval?)
-            .once.and_return(true)
+        context "updated_from_web? == false" do
+          before do
+            expect(subject).to receive(:updated_from_web?).and_return(false)
+            expect(project).to receive(:branch_requires_code_owner_approval?)
+              .once.and_return(true)
+          end
+
+          it "returns an array of Proc(s)" do
+            validations = subject.send(:path_validations)
+
+            expect(validations.any?).to be_truthy
+            expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+          end
         end
 
-        it "returns an array of Proc(s)" do
-          validations = subject.send(:path_validations)
+        context "updated_from_web? == true" do
+          before do
+            expect(subject).to receive(:updated_from_web?).and_return(true)
+          end
 
-          expect(validations.any?).to be_truthy
-          expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+          context "when skip_web_ui_code_owner_validations is disabled" do
+            before do
+              stub_feature_flags(skip_web_ui_code_owner_validations: false)
+              allow(project).to receive(:branch_requires_code_owner_approval?)
+                .once.and_return(true)
+            end
+
+            it "returns an array of Proc(s)" do
+              validations = subject.send(:path_validations)
+
+              expect(validations.any?).to be_truthy
+              expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+            end
+          end
+
+          context "when skip_web_ui_code_owner_validations is enabled" do
+            before do
+              stub_feature_flags(skip_web_ui_code_owner_validations: true)
+              expect(project).not_to receive(:branch_requires_code_owner_approval?)
+            end
+
+            it "returns an empty array" do
+              expect(subject.send(:path_validations)).to eq([])
+            end
+          end
         end
       end
     end
