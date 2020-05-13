@@ -2888,9 +2888,10 @@ describe Ci::Build do
       let(:freeze_variable) { { key: 'CI_DEPLOY_FREEZE', value: 'true', masked: false, public: true } }
 
       before do
-        allow_any_instance_of(Ci::FreezePeriodStatus)
-          .to receive(:execute)
-          .and_return(true)
+        expect_next_instance_of(Ci::FreezePeriodStatus) do |freeze_period|
+          expect(freeze_period).to receive(:execute)
+            .and_return(true)
+        end
       end
 
       it { is_expected.to include(freeze_variable) }
