@@ -217,8 +217,20 @@ export default {
         <gl-tab data-testid="fullDetailsTab" :title="$options.i18n.fullAlertDetailsTitle">
           <ul class="list-unstyled">
             <li v-for="(value, key) in alert" v-if="key !== '__typename'" :key="key">
-              <p class="py-1 my-1 gl-font-base">
-                <strong>{{ key }}: </strong> {{ value }}
+              <p class="py-1 my-1 gl-font-base text-capitalize">
+                <strong>{{ key.replace(/([A-Z])/g, ' $1').trim() }}: </strong>
+                <template v-if="key === 'severity'">
+                  <gl-icon
+                    class="gl-mr-1 align-middle"
+                    :size="12"
+                    :name="`severity-${value.toLowerCase()}`"
+                    :class="`icon-${value.toLowerCase()}`"
+                  />
+                  {{ $options.severityLabels[value] }}
+                </template>
+                <template v-if="key !== 'severity'">
+                  {{ value }}
+                </template>
               </p>
             </li>
           </ul>
