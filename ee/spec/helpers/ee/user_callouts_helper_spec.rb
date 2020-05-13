@@ -347,4 +347,26 @@ describe EE::UserCalloutsHelper do
       it { is_expected.to be_falsy }
     end
   end
+
+  describe '.show_standalone_vulnerabilities_introduction_banner?' do
+    subject { helper.show_standalone_vulnerabilities_introduction_banner? }
+
+    let(:user) { create(:user) }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+    end
+
+    context 'when the introduction banner has not been dismissed' do
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when the introduction banner was dismissed' do
+      before do
+        create(:user_callout, user: user, feature_name: described_class::STANDALONE_VULNERABILITIES_INTRODUCTION_BANNER)
+      end
+
+      it { is_expected.to be_falsy }
+    end
+  end
 end

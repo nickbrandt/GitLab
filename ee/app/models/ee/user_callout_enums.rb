@@ -17,7 +17,8 @@ module EE
           gold_trial_billings: 8,
           threat_monitoring_info: 11,
           account_recovery_regular_check: 12,
-          users_over_license_banner: 16
+          users_over_license_banner: 16,
+          standalone_vulnerabilities_introduction_banner: 17
         )
       end
     end
