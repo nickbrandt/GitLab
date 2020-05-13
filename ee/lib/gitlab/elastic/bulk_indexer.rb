@@ -35,10 +35,12 @@ module Gitlab
         else
           delete(ref)
         end
+
+        self
       end
 
       def flush
-        maybe_send_bulk(force: true).failures
+        send_bulk.failures
       end
 
       private
@@ -56,8 +58,6 @@ module Gitlab
         op = build_op(ref, proxy)
 
         submit({ index: op }, proxy.as_indexed_json)
-
-        maybe_send_bulk
       end
 
       def delete(ref)
@@ -65,8 +65,6 @@ module Gitlab
         op = build_op(ref, proxy)
 
         submit(delete: op)
-
-        maybe_send_bulk
       end
 
       def build_op(ref, proxy)
@@ -86,17 +84,27 @@ module Gitlab
       end
 
       def submit(*hashes)
-        hashes.each do |hash|
-          text = hash.to_json
+        jsons = hashes.map(&:to_json)
+        bytesize = calculate_bytesize(jsons)
 
-          body.push(text)
-          @body_size_bytes += text.bytesize + 2 # Account for newlines
+        send_bulk if will_exceed_bulk_limit?(bytesize)
+
+        body.concat(jsons)
+        @body_size_bytes += bytesize
+      end
+
+      def calculate_bytesize(jsons)
+        jsons.reduce(0) do |sum, json|
+          sum + json.bytesize + 2 # Account for newlines
         end
       end
 
-      def maybe_send_bulk(force: false)
+      def will_exceed_bulk_limit?(bytesize)
+        body_size_bytes + bytesize > bulk_limit_bytes
+      end
+
+      def send_bulk
         return self if body.empty?
-        return self if body_size_bytes < bulk_limit_bytes && !force
 
         failed_refs = try_send_bulk
 
