@@ -126,7 +126,7 @@ volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 used to store the underlying data for PostgreSQL is marked as `Delete`
 when the pods and pod claims that use the volume is deleted.
 
-This is signficant as, when you opt into the newer 8.2.1 PostgreSQL, the older 0.7.1 PostgreSQL is
+This is significant as, when you opt into the newer 8.2.1 PostgreSQL, the older 0.7.1 PostgreSQL is
 deleted causing the persistent volumes to be deleted as well.
 
 You can verify this by using the following command:
