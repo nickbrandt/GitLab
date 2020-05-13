@@ -23514,6 +23514,9 @@ msgstr ""
 msgid "Value Stream Analytics gives an overview of how much time it takes to go from idea to production in your project."
 msgstr ""
 
+msgid "ValueStreamAnalytics|%{days}d"
+msgstr ""
+
 msgid "Variable"
 msgstr ""
 

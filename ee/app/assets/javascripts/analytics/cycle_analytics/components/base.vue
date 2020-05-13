@@ -16,6 +16,7 @@ import { toYmd } from '../../shared/utils';
 import RecentActivityCard from './recent_activity_card.vue';
 import StageTableNav from './stage_table_nav.vue';
 import CustomStageForm from './custom_stage_form.vue';
+import PathNavigation from './path_navigation.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -31,6 +32,7 @@ export default {
     RecentActivityCard,
     CustomStageForm,
     StageTableNav,
+    PathNavigation,
   },
   mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
   props: {
@@ -83,6 +85,7 @@ export default {
       'selectedProjectIds',
       'enableCustomOrdering',
       'cycleAnalyticsRequestParams',
+      'pathNavigationData',
     ]),
     ...mapGetters('customStages', ['customStageFormActive']),
     shouldRenderEmptyState() {
@@ -96,6 +99,9 @@ export default {
     },
     shouldDisplayTypeOfWorkCharts() {
       return !this.hasNoAccessError && !this.isLoading;
+    },
+    shouldDsiplayPathNavigation() {
+      return this.featureFlags.hasPathNavigation && !this.hasNoAccessError;
     },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
@@ -122,6 +128,7 @@ export default {
     this.setFeatureFlags({
       hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
       hasDurationChartMedian: this.glFeatures.cycleAnalyticsScatterplotMedianEnabled,
+      hasPathNavigation: this.glFeatures.valueStreamAnalyticsPathNavigation,
     });
   },
   methods: {
@@ -198,38 +205,47 @@ export default {
       <h3>{{ __('Value Stream Analytics') }}</h3>
     </div>
     <div class="mw-100">
-      <div
-        class="mt-3 py-2 px-3 d-flex bg-gray-light border-top border-bottom flex-column flex-md-row justify-content-between"
-      >
-        <groups-dropdown-filter
-          v-if="!hideGroupDropDown"
-          class="js-groups-dropdown-filter dropdown-select"
-          :query-params="$options.groupsQueryParams"
-          :default-group="selectedGroup"
-          @selected="onGroupSelect"
-        />
-        <projects-dropdown-filter
-          v-if="shouldDisplayFilters"
-          :key="selectedGroup.id"
-          class="js-projects-dropdown-filter ml-md-1 mt-1 mt-md-0 dropdown-select"
-          :group-id="selectedGroup.id"
-          :query-params="$options.projectsQueryParams"
-          :multi-select="$options.multiProjectSelect"
-          :default-projects="selectedProjects"
-          @selected="onProjectsSelect"
-        />
-        <div
-          v-if="shouldDisplayFilters"
-          class="ml-0 ml-md-auto mt-2 mt-md-0 d-flex flex-column flex-md-row align-items-md-center justify-content-md-end"
-        >
-          <date-range
-            :start-date="startDate"
-            :end-date="endDate"
-            :max-date-range="$options.maxDateRange"
-            :include-selected-date="true"
-            class="js-daterange-picker"
-            @change="setDateRange"
+      <div class="mt-3 py-2 px-3 bg-gray-light border-top border-bottom">
+        <div v-if="shouldDsiplayPathNavigation" class="w-100 pb-2">
+          <path-navigation
+            class="js-path-navigation"
+            :loading="isLoading"
+            :stages="pathNavigationData"
+            :selected-stage="selectedStage"
+            @selected="onStageSelect"
           />
+        </div>
+        <div class="d-flex flex-column flex-md-row justify-content-between">
+          <groups-dropdown-filter
+            v-if="!hideGroupDropDown"
+            class="js-groups-dropdown-filter dropdown-select"
+            :query-params="$options.groupsQueryParams"
+            :default-group="selectedGroup"
+            @selected="onGroupSelect"
+          />
+          <projects-dropdown-filter
+            v-if="shouldDisplayFilters"
+            :key="selectedGroup.id"
+            class="js-projects-dropdown-filter ml-0 mt-1 mt-md-0 dropdown-select"
+            :group-id="selectedGroup.id"
+            :query-params="$options.projectsQueryParams"
+            :multi-select="$options.multiProjectSelect"
+            :default-projects="selectedProjects"
+            @selected="onProjectsSelect"
+          />
+          <div
+            v-if="shouldDisplayFilters"
+            class="ml-0 ml-md-auto mt-2 mt-md-0 d-flex flex-column flex-md-row align-items-md-center justify-content-md-end"
+          >
+            <date-range
+              :start-date="startDate"
+              :end-date="endDate"
+              :max-date-range="$options.maxDateRange"
+              :include-selected-date="true"
+              class="js-daterange-picker"
+              @change="setDateRange"
+            />
+          </div>
         </div>
       </div>
     </div>

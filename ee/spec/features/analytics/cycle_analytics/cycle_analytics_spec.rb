@@ -20,6 +20,7 @@ describe 'Group Value Stream Analytics', :js do
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
 
   stage_nav_selector = '.stage-nav'
+  path_nav_selector = '.js-path-navigation'
 
   3.times do |i|
     let_it_be("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
@@ -151,6 +152,21 @@ describe 'Group Value Stream Analytics', :js do
     it 'shows the date filter' do
       expect(page).to have_selector('.js-daterange-picker', visible: true)
     end
+
+    it 'does not show the path navigation' do
+      expect(page).to have_selector(path_nav_selector, visible: false)
+    end
+
+    context 'with path navigation feature flag enabled' do
+      before do
+        stub_feature_flags(value_stream_analytics_path_navigation: true)
+        select_group
+      end
+
+      it 'shows the path navigation' do
+        expect(page).to have_selector(path_nav_selector, visible: true)
+      end
+    end
   end
 
   def wait_for_stages_to_load
@@ -213,6 +229,21 @@ describe 'Group Value Stream Analytics', :js do
         %w[Issue Plan Code Test Review Staging Total].each do |item|
           string_id = "CycleAnalytics|#{item}"
           expect(stage_nav).to have_content(s_(string_id))
+        end
+      end
+    end
+
+    context 'path nav' do
+      before do
+        stub_feature_flags(value_stream_analytics_path_navigation: true)
+      end
+
+      it 'displays the default list of stages' do
+        path_nav = page.find(path_nav_selector)
+
+        %w[Issue Plan Code Test Review Staging Overview].each do |item|
+          string_id = "CycleAnalytics|#{item}"
+          expect(path_nav).to have_content(s_(string_id))
         end
       end
     end

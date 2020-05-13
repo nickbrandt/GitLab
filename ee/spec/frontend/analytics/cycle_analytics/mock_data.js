@@ -13,6 +13,7 @@ import { toYmd } from 'ee/analytics/shared/utils';
 import {
   getTasksByTypeData,
   transformRawTasksByTypeData,
+  transformStagesForPathNavigation,
 } from 'ee/analytics/cycle_analytics/utils';
 
 const fixtureEndpoints = {
@@ -92,6 +93,15 @@ export const stageMedians = defaultStages.reduce((acc, stage) => {
   };
 }, {});
 
+export const stageMediansWithNumericIds = defaultStages.reduce((acc, stage) => {
+  const { value } = getJSONFixture(fixtureEndpoints.stageMedian(stage));
+  const { id } = getStageByTitle(dummyState.stages, stage);
+  return {
+    ...acc,
+    [id]: value,
+  };
+}, {});
+
 export const endDate = new Date(2019, 0, 14);
 export const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
 
@@ -162,6 +172,12 @@ export const apiTasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_b
 
 export const rawTasksByTypeData = transformRawTasksByTypeData(apiTasksByTypeData);
 export const transformedTasksByTypeData = getTasksByTypeData(apiTasksByTypeData);
+
+export const transformedStagePathData = transformStagesForPathNavigation({
+  stages: allowedStages,
+  medians,
+  selectedStage: issueStage,
+});
 
 export const tasksByTypeData = {
   seriesNames: ['Cool label', 'Normal label'],
@@ -259,3 +275,6 @@ export const selectedProjects = [
     avatarUrl: null,
   },
 ];
+
+// Value returned from JSON fixture is 345600 for issue stage which equals 4d
+export const pathNavIssueMetric = '4d';

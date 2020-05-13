@@ -1,5 +1,13 @@
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
-import { startDate, endDate, allowedStages, selectedProjects } from '../mock_data';
+import {
+  startDate,
+  endDate,
+  allowedStages,
+  selectedProjects,
+  transformedStagePathData,
+  issueStage,
+  stageMedians,
+} from '../mock_data';
 
 let state = null;
 
@@ -156,6 +164,18 @@ describe('Cycle analytics getters', () => {
     it(`returns ${result} when isEditingCustomStage=${isEditingCustomStage} and isCreatingCustomStage=${isCreatingCustomStage}`, () => {
       const resp = getters.customStageFormActive({ isCreatingCustomStage, isEditingCustomStage });
       expect(resp).toEqual(result);
+    });
+  });
+
+  describe('pathNavigationData', () => {
+    it('returns the transformed data', () => {
+      state = {
+        stages: allowedStages,
+        medians: stageMedians,
+        selectedStage: issueStage,
+      };
+
+      expect(getters.pathNavigationData(state)).toEqual(transformedStagePathData);
     });
   });
 });
