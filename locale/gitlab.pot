@@ -8459,6 +8459,9 @@ msgstr ""
 msgid "Error creating new iteration"
 msgstr ""
 
+msgid "Error creating the snippet"
+msgstr ""
+
 msgid "Error deleting %{issuableType}"
 msgstr ""
 
@@ -8577,6 +8580,9 @@ msgid "Error updating status for all to-do items."
 msgstr ""
 
 msgid "Error updating status of to-do item."
+msgstr ""
+
+msgid "Error updating the snippet"
 msgstr ""
 
 msgid "Error uploading file"
