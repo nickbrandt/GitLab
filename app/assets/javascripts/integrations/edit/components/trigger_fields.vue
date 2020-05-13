@@ -49,7 +49,12 @@ export default {
 </script>
 
 <template>
-  <gl-form-group class="gl-pt-3" :label="__('Trigger')" label-for="trigger-fields">
+  <gl-form-group
+    class="gl-pt-3"
+    :label="__('Trigger')"
+    label-for="trigger-fields"
+    data-testid="trigger-fields-group"
+  >
     <div id="trigger-fields">
       <gl-form-group
         v-for="event in events"

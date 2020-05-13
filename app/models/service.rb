@@ -170,27 +170,6 @@ class Service < ApplicationRecord
     end
   end
 
-  def configurable_events_json
-    configurable_events.map do |event|
-      event_field_name = ServicesHelper.service_event_field_name(event)
-      result = {
-        title: event,
-        name: event_field_name,
-        value: self[event_field_name],
-        description: self.class.event_description(event)
-      }
-
-      if field = event_field(event)
-        result[:field] = {
-          name: field[:name],
-          value: public_send(field[:name]) # rubocop:disable GitlabSecurity/PublicSend
-        }
-      end
-
-      result
-    end.to_json
-  end
-
   def configurable_event_actions
     self.class.supported_event_actions
   end
