@@ -67,7 +67,7 @@ describe Gitlab::CodeOwners::Loader do
         expect(loader.entries).to contain_exactly(expected_entry, other_entry)
       end
 
-      it 'only performs 4 queries for users and groups' do
+      it 'performs 6 query for users and groups' do
         test_group = create(:group, path: 'test-group')
         test_group.add_developer(create(:user))
 
@@ -78,10 +78,10 @@ describe Gitlab::CodeOwners::Loader do
 
         # - 1 query for users
         # - 1 for the emails to later divide them across the entries
-        # - 1 for groups with joined routes and users
-        # - 1 for loading the users for the parent group
+        # - 2 for groups with joined routes and users
+        # - 2 for loading the users for the parent group(s)
         #
-        expect { loader.entries }.not_to exceed_query_limit(4)
+        expect { loader.entries }.not_to exceed_query_limit(6)
       end
     end
 
