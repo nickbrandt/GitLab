@@ -109,8 +109,8 @@ describe('FilteredSearchBar', () => {
       expect(setFiltersMock).toHaveBeenCalledWith(
         expect.anything(),
         {
-          label_name: ['my-label'],
-          milestone_title: ['my-milestone'],
+          labelNames: [{ value: 'my-label', operator: '=' }],
+          milestoneTitle: { value: 'my-milestone', operator: '=' },
         },
         undefined,
       );
@@ -124,8 +124,8 @@ describe('FilteredSearchBar', () => {
       expect(setFiltersMock).toHaveBeenCalledWith(
         expect.anything(),
         {
-          label_name: undefined,
-          milestone_title: ['milestone with spaces'],
+          labelNames: undefined,
+          milestoneTitle: { value: 'milestone with spaces', operator: '=' },
         },
         undefined,
       );
@@ -139,8 +139,8 @@ describe('FilteredSearchBar', () => {
       expect(setFiltersMock).toHaveBeenCalledWith(
         expect.anything(),
         {
-          label_name: undefined,
-          milestone_title: ['milestone with spaces'],
+          labelNames: undefined,
+          milestoneTitle: { value: 'milestone with spaces', operator: '=' },
         },
         undefined,
       );
@@ -154,8 +154,8 @@ describe('FilteredSearchBar', () => {
       expect(setFiltersMock).toHaveBeenCalledWith(
         expect.anything(),
         {
-          label_name: undefined,
-          milestone_title: ['milestone "with" spaces'],
+          labelNames: undefined,
+          milestoneTitle: { value: 'milestone "with" spaces', operator: '=' },
         },
         undefined,
       );
