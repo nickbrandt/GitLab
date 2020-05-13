@@ -12,11 +12,26 @@ module EE
         def path_validations
           validations = [super].flatten
 
-          if !updated_from_web? && project.branch_requires_code_owner_approval?(branch_name)
+          if validate_code_owners?
             validations << validate_code_owners
           end
 
           validations
+        end
+
+        def validate_code_owners?
+          return false if updated_from_web? && skip_web_ui_code_owner_validations?
+
+          project.branch_requires_code_owner_approval?(branch_name)
+        end
+
+        # To allow self-hosted installations to ignore CODEOWNERS rules when
+        # clicking Merge in the UI. By default, these rules are not skipped.
+        #
+        # Issue to remove this feature flag:
+        # https://gitlab.com/gitlab-org/gitlab/-/issues/217427
+        def skip_web_ui_code_owner_validations?
+          ::Feature.enabled?(:skip_web_ui_code_owner_validations, project)
         end
 
         def validate_code_owners
@@ -34,11 +49,13 @@ module EE
           matched_rules = loader.entries.collect { |e| "- #{e.pattern}" }
           code_owner_path = project.repository.code_owners_blob(ref: branch_name).path || "CODEOWNERS"
 
-          "Pushes to protected branches that contain changes to files that\n" \
+          msg = "Pushes to protected branches that contain changes to files that\n" \
             "match patterns defined in `#{code_owner_path}` are disabled for\n" \
             "this project. Please submit these changes via a merge request.\n\n" \
             "The following pattern(s) from `#{code_owner_path}` were matched:\n" \
             "#{matched_rules.join('\n')}\n"
+
+          updated_from_web? ? msg.tr("\n", " ") : msg
         end
 
         def validate_path_locks?
