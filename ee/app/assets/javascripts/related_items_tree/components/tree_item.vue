@@ -89,11 +89,11 @@ export default {
     <div class="list-item-body d-flex align-items-center">
       <gl-deprecated-button
         v-if="!childrenFetchInProgress && hasChildren"
-        v-gl-tooltip.hover
+        v-gl-tooltip.viewport.hover
         :title="chevronTooltip"
         :class="chevronType"
         variant="link"
-        class="btn-svg btn-tree-item-chevron"
+        class="btn-svg btn-tree-item-chevron align-self-start"
         @click="handleChevronClick"
       >
         <icon :name="chevronType" />
