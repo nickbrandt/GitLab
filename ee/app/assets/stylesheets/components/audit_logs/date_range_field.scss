@@ -8,18 +8,6 @@
     background-color: $white;
   }
 
-  .dropdown-menu-toggle {
-    // New GitLab UI inputs are 32px high, while the older inputs are 34px
-    // This can be removed once the audit log fields are converted to use GitLab UI's dropdown instead
-    padding-bottom: 5px;
-    padding-top: 5px;
-
-    .fa-chevron-down,
-    .fa-spinner {
-      top: 10px;
-    }
-  }
-
   @include media-breakpoint-down(md) {
     .dropdown-menu-toggle,
     .filter-item {
