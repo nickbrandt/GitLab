@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe API::Epics do
-  let(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, group: group) }
-  let(:label) { create(:label) }
+  let_it_be(:label) { create(:label) }
   let!(:epic) { create(:labeled_epic, group: group, labels: [label]) }
   let(:params) { nil }
 
@@ -176,6 +176,15 @@ describe API::Epics do
         get api(url), params: { author_id: user2.id }
 
         expect_paginated_array_response([epic2.id])
+      end
+
+      it 'returns epics reacted to by current user' do
+        create(:award_emoji, awardable: epic, user: user, name: 'star')
+        create(:award_emoji, awardable: epic2, user: user2, name: 'star')
+
+        get api(url, user), params: { my_reaction_emoji: 'Any', scope: 'all' }
+
+        expect_paginated_array_response([epic.id])
       end
 
       it 'returns epics matching given search string for title' do

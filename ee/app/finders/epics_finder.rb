@@ -34,6 +34,7 @@ class EpicsFinder < IssuableFinder
       start_date
       end_date
       search
+      my_reaction_emoji
     ]
   end
 
@@ -63,6 +64,7 @@ class EpicsFinder < IssuableFinder
     items = by_parent(items)
     items = by_iids(items)
     items = starts_with_iid(items)
+    items = by_my_reaction_emoji(items)
 
     # This has to be last as we use a CTE as an optimization fence
     # for counts by passing the force_cte param and enabling the
