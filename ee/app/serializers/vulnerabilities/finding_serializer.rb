@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Vulnerabilities::OccurrenceSerializer < BaseSerializer
+class Vulnerabilities::FindingSerializer < BaseSerializer
   include WithPagination
 
   entity Vulnerabilities::FindingEntity
