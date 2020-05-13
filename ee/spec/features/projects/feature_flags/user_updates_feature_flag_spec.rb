@@ -17,7 +17,7 @@ describe 'User updates feature flag', :js do
 
   context 'with a new version feature flag' do
     let!(:feature_flag) do
-      create_flag(project, 'test_flag', true, version: Operations::FeatureFlag.versions['new_version_flag'],
+      create_flag(project, 'test_flag', false, version: Operations::FeatureFlag.versions['new_version_flag'],
                   description: 'For testing')
     end
 
@@ -49,6 +49,16 @@ describe 'User updates feature flag', :js do
         expect(page).to have_text 'Percent rollout (logged in users)'
         expect(page).to have_field 'Percentage', with: '15'
         expect(page).to have_text 'All environments'
+      end
+    end
+
+    it 'user toggles the flag on' do
+      visit(edit_project_feature_flag_path(project, feature_flag))
+      status_toggle_button.click
+      click_button 'Save changes'
+
+      within_feature_flag_row(1) do
+        expect_status_toggle_button_to_be_checked
       end
     end
   end
