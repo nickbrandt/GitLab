@@ -42,9 +42,9 @@ describe('TimeMetricsCard', () => {
 
   describe('with data', () => {
     it.each`
-      metric          | value         | index
-      ${'Lead time'}  | ${'2 days'}   | ${0}
-      ${'Cycle time'} | ${'1.5 days'} | ${1}
+      metric          | value  | index
+      ${'Lead Time'}  | ${'-'} | ${0}
+      ${'Cycle Time'} | ${'-'} | ${1}
     `('Renders the $metric', ({ metric, value, index }) => {
       const card = findMetricCards().at(index);
       expect(card.html()).toContain(metric);

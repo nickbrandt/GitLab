@@ -203,6 +203,21 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
 
       expect(response).to be_successful
     end
+  end
+
+  describe Analytics::CycleAnalytics::TimeSummaryController, type: :controller do
+    render_views
+
+    let(:params) { { created_after: 3.months.ago, created_before: Time.now, group_id: group.full_path } }
+
+    before do
+      stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
+      stub_licensed_features(cycle_analytics_for_groups: true)
+
+      prepare_cycle_analytics_data
+
+      sign_in(user)
+    end
 
     it 'analytics/value_stream_analytics/time_summary.json' do
       get(:show, params: params, format: :json)
