@@ -89,7 +89,8 @@ describe Note, :elastic do
       'noteable_type',
       'noteable_id',
       'created_at',
-      'updated_at'
+      'updated_at',
+      'confidential'
     ).merge({
       'issue' => {
         'assignee_id' => issue.assignee_ids,
