@@ -7,9 +7,7 @@ class ServiceEventEntity < Grape::Entity
     event
   end
 
-  expose :name do |event|
-    event_field_name
-  end
+  expose :event_field_name, as: :name
 
   expose :value do |event|
     service[event_field_name]
@@ -37,7 +35,7 @@ class ServiceEventEntity < Grape::Entity
   end
 
   def event_field
-    service.event_field(event)
+    @event_field ||= service.event_field(event)
   end
 
   def service

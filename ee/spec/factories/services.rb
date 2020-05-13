@@ -14,13 +14,6 @@ FactoryBot.define do
     type { 'GithubService' }
   end
 
-  factory :slack_service do
-    project
-    active { true }
-    webhook { 'https://slack.service.url' }
-    type { 'SlackService' }
-  end
-
   factory :slack_slash_commands_service do
     project
     active { true }
