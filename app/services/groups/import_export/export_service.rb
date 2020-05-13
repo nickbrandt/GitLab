@@ -52,7 +52,7 @@ module Groups
       end
 
       def savers
-        [tree_exporter, file_saver]
+        [version_saver, tree_exporter, file_saver]
       end
 
       def tree_exporter
@@ -70,6 +70,10 @@ module Groups
         else
           Gitlab::ImportExport::Group::LegacyTreeSaver
         end
+      end
+
+      def version_saver
+        Gitlab::ImportExport::VersionSaver.new(shared: shared)
       end
 
       def file_saver
