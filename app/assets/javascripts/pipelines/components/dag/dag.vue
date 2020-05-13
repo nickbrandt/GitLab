@@ -1,6 +1,5 @@
 <script>
 import * as d3 from 'd3';
-import { textwrap } from 'd3-textwrap'
 import { uniqueId } from 'lodash';
 import mockDAGdata from './dag-data/mockDAGdata.json'
 import gitlabDAGdata from './dag-data/gitlabDAGdata.json'
@@ -218,49 +217,44 @@ export default {
         .text((d) => d.name);
     },
 
-    initLabelWrap () {
+    labelNodes (svg, nodeData) {
       const {
         paddingForLabels,
-        labelMargin
+        labelMargin,
+        nodePadding,
       } = this.$options.viewOptions;
 
-      return textwrap().bounds({
-        height: 60,
-        width: paddingForLabels - (2 * labelMargin),
-      })
-      .method('foreignobject');
-    },
-
-    labelNodes (svg, nodeData) {
       const labelPosition = (d) => {
-        const {
-          paddingForLabels,
-          labelMargin
-        } = this.$options.viewOptions;
-
         const firstCol = d.x0 <= paddingForLabels;
         const lastCol = d.x1 >= this.width - paddingForLabels;
 
         if (firstCol) {
           return {
-            x: paddingForLabels - labelMargin,
-            y: (d.y1 + d.y0) / 2,
-            textAnchor: 'end',
+            x: 0 + labelMargin,
+            y: d.y0,
+            height: `${d.y1 - d.y0}px`,
+            width: paddingForLabels - (2 * labelMargin),
+            textAlign: 'right',
           }
         }
 
         if (lastCol) {
           return {
             x: (this.width - paddingForLabels) + labelMargin,
-            y: (d.y1 + d.y0) / 2,
-            textAnchor: 'start',
+            y: d.y0,
+            height: `${d.y1 - d.y0}px`,
+            width: paddingForLabels - (2 * labelMargin),
+            textAlign: 'left',
           }
         }
 
         return {
           x: (d.x1 + d.x0) / 2,
-          y: d.y0 - (1.5 * labelMargin),
-          textAnchor: d.x0 < this.width / 2 ? 'start' : 'end',
+          y: d.y0 - nodePadding,
+          height: `${nodePadding}px`,
+          width: 'max-content',
+          wrapperWidth: paddingForLabels - (2 * labelMargin),
+          textAlign: d.x0 < this.width / 2 ? 'left' : 'right',
         }
 
       }
@@ -272,61 +266,40 @@ export default {
         .selectAll('text')
         .data(nodeData)
         .enter()
-        .append('text')
-        .classed('label gl-pointer-events-none', true)
-        .attr('x', (d) => labelPosition(d).x)
-        .attr('y', (d) => labelPosition(d).y)
-        .attr('dy', '0.35em')
-        .attr('text-anchor', (d) => labelPosition(d).textAnchor)
-        .text((d) => d.name);
-    },
+        .append('foreignObject')
+        .each((d, i, n) => {
+          const currentNode = n[i];
+          const {
+            height,
+            wrapperWidth,
+            width,
+            x,
+            y,
+            textAlign,
+          } = labelPosition(d);
 
-    wrapNodeLabels() {
-      const labelPosition = (d) => {
-        const {
-          paddingForLabels,
-          labelMargin
-        } = this.$options.viewOptions;
-
-        const firstCol = d.x0 <= paddingForLabels;
-        const lastCol = d.x1 >= this.width - paddingForLabels;
-
-        if (firstCol) {
-          return {
-            x: paddingForLabels - labelMargin,
-            y: (d.y1 + d.y0) / 2,
-            textAnchor: 'end',
-          }
-        }
-
-        if (lastCol) {
-          return {
-            x: (this.width - paddingForLabels) + labelMargin,
-            y: (d.y1 + d.y0) / 2,
-            textAnchor: 'start',
-          }
-        }
-
-        return {
-          x: (d.x1 + d.x0) / 2,
-          y: d.y0 - (1.5 * labelMargin),
-          textAnchor: d.x0 < this.width / 2 ? 'start' : 'end',
-        }
-
-      }
-
-      const wrap = this.initLabelWrap();
-      d3.selectAll('.label').call(wrap)
-        .style('transform', (d) => {
-          const { x, y } = labelPosition(d);
-          return `translate(${x}px, ${y}px)`;
+          return d3.select(currentNode)
+            .attr('requiredFeatures', 'http://www.w3.org/TR/SVG11/feature#Extensibility')
+            .attr('height', height)
+            .attr('width', wrapperWidth || width)
+            .attr('x', x)
+            .attr('y', y)
+            .style('overflow', 'visible')
+            .append('xhtml:div')
+            .classed('dag-label gl-pointer-events-none', true)
+            .style('height', height)
+            .style('width', width)
+            .style('text-align', textAlign)
+            .text((d) => d.name);
         });
+
     },
+
+
 
     createNodes (svg, nodeData) {
       this.generateNodes(svg, nodeData);
       this.labelNodes(svg, nodeData);
-      this.wrapNodeLabels();
     },
 
     drawGraph(data, parseFn) {
@@ -398,6 +371,13 @@ export default {
     justify-content: flex-start;
     flex-direction: column;
     overflow: scroll;
+  }
+
+  .dag-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-wrap: break-word;
   }
 
   .dag-graph-container svg:not(:first-of-type) {
