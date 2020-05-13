@@ -1,6 +1,6 @@
 # Webex Teams service
 
-The Webex Teams service sends notifications from GitLab to the conversation for which the webhook was created.
+The Webex Teams service sends notifications from GitLab to the space for which the webhook was created.
 
 ## On Webex Teams
 
