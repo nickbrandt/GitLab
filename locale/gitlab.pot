@@ -11033,6 +11033,9 @@ msgstr ""
 msgid "Hashed repository storage paths"
 msgstr ""
 
+msgid "Hashed storage can't be disabled anymore for new projects"
+msgstr ""
+
 msgid "Have your users email"
 msgstr ""
 
@@ -23262,7 +23265,7 @@ msgstr ""
 msgid "Use hashed storage"
 msgstr ""
 
-msgid "Use hashed storage paths for newly created and renamed repositories. Enable immutable, hash-based paths and repository names to store repositories on disk. This prevents repositories from having to be moved or renamed when the Repository URL changes and may improve disk I/O performance."
+msgid "Use hashed storage paths for newly created and renamed repositories. Enable immutable, hash-based paths and repository names to store repositories on disk. This prevents repositories from having to be moved or renamed when the Repository URL changes and may improve disk I/O performance. (Always enabled since 13.0)"
 msgstr ""
 
 msgid "Use one line per URI"
