@@ -167,7 +167,6 @@ module EE
       %w[
         projects/security/configuration#show
         projects/security/dashboard#index
-        projects/security/vulnerabilities#index
         projects/dependencies#index
         projects/licenses#index
         projects/threat_monitoring#show

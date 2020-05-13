@@ -47,7 +47,6 @@ describe 'Project navbar' do
           nav_item: _('Security & Compliance'),
           nav_sub_items: [
             _('Security Dashboard'),
-            _('Vulnerability List'),
             _('Configuration')
           ]
         }
