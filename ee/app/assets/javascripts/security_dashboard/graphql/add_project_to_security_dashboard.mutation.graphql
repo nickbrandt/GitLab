@@ -1,0 +1,5 @@
+mutation addProjectToSecurityDashboard($id: ID!) {
+  addProjectToSecurityDashboard(input: {id: $id}) {
+    errors
+  }
+}
