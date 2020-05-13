@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -593,8 +594,8 @@ func httpGet(t *testing.T, url string, headers map[string]string) (*http.Respons
 	return resp, string(b)
 }
 
-func httpPost(t *testing.T, url string, headers map[string]string, reqBody []byte) (*http.Response, string) {
-	req, err := http.NewRequest("POST", url, bytes.NewReader(reqBody))
+func httpPost(t *testing.T, url string, headers map[string]string, reqBody io.Reader) *http.Response {
+	req, err := http.NewRequest("POST", url, reqBody)
 	require.NoError(t, err)
 
 	for k, v := range headers {
@@ -603,12 +604,8 @@ func httpPost(t *testing.T, url string, headers map[string]string, reqBody []byt
 
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
-	defer resp.Body.Close()
 
-	b, err := ioutil.ReadAll(resp.Body)
-	require.NoError(t, err)
-
-	return resp, string(b)
+	return resp
 }
 
 func assertNginxResponseBuffering(t *testing.T, expected string, resp *http.Response, msgAndArgs ...interface{}) {
