@@ -419,6 +419,7 @@ describe Gitlab::UsageData do
                 create(:key, type: 'LDAPKey', user: user)
                 create(:group_member, ldap: true, user: user)
                 create(:cycle_analytics_group_stage)
+                create(:compliance_framework_project_setting)
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to eq(
@@ -426,16 +427,18 @@ describe Gitlab::UsageData do
                 groups: 2,
                 ldap_keys: 2,
                 ldap_users: 2,
-                users_created: 6,
-                value_stream_management_customized_group_stages: 2
+                users_created: 8,
+                value_stream_management_customized_group_stages: 2,
+                projects_with_compliance_framework: 2
               )
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:manage]).to eq(
                 events: 1,
                 groups: 1,
                 ldap_keys: 1,
                 ldap_users: 1,
-                users_created: 4,
-                value_stream_management_customized_group_stages: 2
+                users_created: 5,
+                value_stream_management_customized_group_stages: 2,
+                projects_with_compliance_framework: 2
               )
             end
           end
