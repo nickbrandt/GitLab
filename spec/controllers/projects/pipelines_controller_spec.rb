@@ -26,10 +26,6 @@ describe Projects::PipelinesController do
     context 'when using persisted stages', :request_store do
       render_views
 
-      before do
-        stub_feature_flags(ci_pipeline_persisted_stages: true)
-      end
-
       it 'returns serialized pipelines' do
         expect(::Gitlab::GitalyClient).to receive(:allow_ref_name_caching).and_call_original
 
@@ -67,10 +63,6 @@ describe Projects::PipelinesController do
     end
 
     context 'when using legacy stages', :request_store do
-      before do
-        stub_feature_flags(ci_pipeline_persisted_stages: false)
-      end
-
       it 'returns JSON with serialized pipelines' do
         get_pipelines_index_json
 
