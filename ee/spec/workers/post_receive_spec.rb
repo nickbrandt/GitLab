@@ -191,17 +191,4 @@ describe PostReceive do
       end
     end
   end
-
-  describe 'processing design changes' do
-    let(:gl_repository) { "design-#{project.id}" }
-
-    it 'does not do anything' do
-      worker = described_class.new
-
-      expect(worker).not_to receive(:process_wiki_changes)
-      expect(worker).not_to receive(:process_project_changes)
-
-      described_class.new.perform(gl_repository, key_id, base64_changes)
-    end
-  end
 end

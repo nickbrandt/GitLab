@@ -189,16 +189,6 @@ describe Issue do
     it { is_expected.to belong_to(:promoted_to_epic).class_name('Epic') }
     it { is_expected.to have_many(:resource_weight_events) }
     it { is_expected.to have_one(:status_page_published_incident) }
-
-    describe 'versions.most_recent' do
-      it 'returns the most recent version' do
-        issue = create(:issue)
-        create_list(:design_version, 2, issue: issue)
-        last_version = create(:design_version, issue: issue)
-
-        expect(issue.design_versions.most_recent).to eq(last_version)
-      end
-    end
   end
 
   it_behaves_like 'an editable mentionable with EE-specific mentions' do
