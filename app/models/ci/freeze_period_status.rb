@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class Ci::FreezePeriodStatus
+module Ci
+  class FreezePeriodStatus
   attr_reader :project
 
   def initialize(project_id:)
