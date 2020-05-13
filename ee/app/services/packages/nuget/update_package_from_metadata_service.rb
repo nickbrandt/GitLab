@@ -106,7 +106,7 @@ module Packages
 
       # used by ExclusiveLeaseGuard
       def lease_key
-        package_id = existing_package ? existing_package.id : @package_file.package.id
+        package_id = existing_package ? existing_package.id : @package_file.package_id
         "packages:nuget:update_package_from_metadata_service:package:#{package_id}"
       end
 
