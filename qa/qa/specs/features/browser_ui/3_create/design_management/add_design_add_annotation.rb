@@ -22,6 +22,8 @@ module QA
           show.add_annotation(annotation)
 
           expect(show).to have_annotation(annotation)
+
+          show.click_discussion_tab
         end
       end
     end

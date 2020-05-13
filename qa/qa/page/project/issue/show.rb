@@ -58,10 +58,15 @@ module QA
           end
 
           view 'app/views/projects/issues/_tabs.html.haml' do
-            element :designs_tab_link
-            element :designs_tab_content
             element :discussion_tab_link
             element :discussion_tab_content
+            element :designs_tab_link
+            element :designs_tab_content
+          end
+
+          def click_discussion_tab
+            click_element(:discussion_tab_link)
+            active_element?(:discussion_tab_content)
           end
 
           def click_designs_tab
