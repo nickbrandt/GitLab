@@ -1774,9 +1774,6 @@ msgstr ""
 msgid "AlertManagement|Resolved"
 msgstr ""
 
-msgid "AlertManagement|Severity"
-msgstr ""
-
 msgid "AlertManagement|Start time"
 msgstr ""
 
