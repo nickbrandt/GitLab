@@ -180,6 +180,8 @@ Multiple metrics can be displayed on the same chart if the fields **Name**, **Ty
 
 #### Query Variables
 
+##### Predefined variables
+
 GitLab supports a limited set of [CI variables](../../../ci/variables/README.md) in the Prometheus query. This is particularly useful for identifying a specific environment, for example with `ci_environment_slug`. The supported variables are:
 
 - `ci_environment_slug`
@@ -191,6 +193,12 @@ GitLab supports a limited set of [CI variables](../../../ci/variables/README.md)
 
 NOTE: **Note:**
 Variables for Prometheus queries must be lowercase.
+
+##### User defined variables
+
+[Variables can be defined](#templating-templating-properties) in a custom dashboard YAML file.
+
+##### Using variables
 
 Variables can be specified using double curly braces, such as `"{{ci_environment_slug}}"` ([added](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/20793) in GitLab 12.7).
 
@@ -303,19 +311,29 @@ If you select another branch, this branch should be merged to your **default** b
 
 Dashboards have several components:
 
+- Templating variables.
 - Panel groups, which consist of panels.
 - Panels, which support one or more metrics.
 
 The following tables outline the details of expected properties.
 
-**Dashboard properties:**
+##### **Dashboard (top-level) properties**
 
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------ |
 | `dashboard` | string | yes | Heading for the dashboard. Only one dashboard should be defined per file. |
 | `panel_groups` | array | yes | The panel groups which should be on the dashboard. |
+| `templating` | Hash | no | Top level key under which templating related options can be added. |
 
-**Panel group (`panel_groups`) properties:**
+##### **Templating (`templating`) properties**
+
+| Property | Type | Required | Description |
+| -------- | ---- | -------- | ----------- |
+| `variables` | Hash | no | Variables can be defined here. |
+
+Read the documentation on [templating](../monitoring_dashboards/templating.md).
+
+##### **Panel group (`panel_groups`) properties**
 
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------ |
@@ -323,7 +341,7 @@ The following tables outline the details of expected properties.
 | `priority` | number | optional, defaults to order in file | Order to appear on the dashboard. Higher number means higher priority, which will be higher on the page. Numbers do not need to be consecutive. |
 | `panels` | array | required | The panels which should be in the panel group. |
 
-**Panel (`panels`) properties:**
+##### **Panel (`panels`) properties**
 
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------- |
@@ -335,7 +353,7 @@ The following tables outline the details of expected properties.
 | `weight` | number | no, defaults to order in file | Order to appear within the grouping. Lower number means higher priority, which will be higher on the page. Numbers do not need to be consecutive. |
 | `metrics` | array | yes | The metrics which should be displayed in the panel. Any number of metrics can be displayed when `type` is `area-chart` or `line-chart`, whereas only 3 can be displayed when `type` is `anomaly-chart`. |
 
-**Axis (`panels[].y_axis`) properties:**
+##### **Axis (`panels[].y_axis`) properties**
 
 | Property    | Type   | Required                      | Description                                                          |
 | ----------- | ------ | ----------------------------- | -------------------------------------------------------------------- |
@@ -343,7 +361,7 @@ The following tables outline the details of expected properties.
 | `format`    | string | no, defaults to `engineering` | Unit format used. See the [full list of units](prometheus_units.md). |
 | `precision` | number | no, defaults to `2`           | Number of decimal places to display in the number.                                          |                        |
 
-**Metrics (`metrics`) properties:**
+##### **Metrics (`metrics`) properties**
 
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------ |
