@@ -31,7 +31,7 @@ export default function renderMetrics(elements) {
   if (wrapperList.length) {
     import(/* webpackChunkName: 'gfm_metrics' */ '~/monitoring/components/embeds/embed_group.vue')
       .then(EmbedGroup => {
-        const EmbedGroupComponent = Vue.extend(EmbedGroup);
+        const EmbedGroupComponent = Vue.extend(EmbedGroup.default);
 
         wrapperList.forEach(wrapper => {
           // eslint-disable-next-line no-new
