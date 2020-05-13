@@ -370,6 +370,7 @@ module EE
 
       rule { compliance_framework_available & can?(:admin_project) }.enable :admin_compliance_framework
 
+      rule { status_page_available & can?(:owner_access) }.enable :mark_issue_for_publication
       rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
     end
 
