@@ -1,5 +1,6 @@
-import { isNumber } from 'lodash';
+import { isNumber, sortBy } from 'lodash';
 import dateFormat from 'dateformat';
+import { s__, sprintf } from '~/locale';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import httpStatus from '~/lib/utils/http_status';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
@@ -12,9 +13,10 @@ import {
   getDayDifference,
   getDateInPast,
   getDateInFuture,
+  parseSeconds,
 } from '~/lib/utils/datetime_utility';
 import { dateFormats } from '../shared/constants';
-import { STAGE_NAME } from './constants';
+import { STAGE_NAME, CAPITALIZED_STAGE_NAME, PATH_HOME_ICON } from './constants';
 import { toYmd } from '../shared/utils';
 
 const EVENT_TYPE_LABEL = 'label';
@@ -341,3 +343,38 @@ export const handleErrorOrRethrow = ({ action, error }) => {
 
 export const isStageNameExistsError = ({ status, errors }) =>
   status === httpStatus.UNPROCESSABLE_ENTITY && errors?.name?.includes(ERROR_NAME_RESERVED);
+
+/**
+ * Takes the stages and median data, combined with the selected stage, to build an
+ * array which is formatted to proivde the data required for the path navigation.
+ *
+ * The stage named 'Total' is renamed to 'Overview', it's configured to have
+ * the 'home' icon - and is moved to the front of the array.
+ *
+ * @param {Array} stages - The stages available to the group / project
+ * @param {Object} medians - The median values for the stages available to the group / project
+ * @param {Object} selectedStage - The currently selected stage
+ * @returns {Array} An array of stages formatted with data required for the path navigation
+ */
+export const transformStagesForPathNavigation = ({ stages, medians, selectedStage }) => {
+  const formattedStages = stages.map(stage => {
+    const { days } = parseSeconds(medians[stage.id], {
+      daysPerWeek: 7,
+      hoursPerDay: 24,
+      limitToDays: true,
+    });
+    const isTotalStage = stage.title === CAPITALIZED_STAGE_NAME.TOTAL;
+
+    return {
+      ...stage,
+      metric: days ? sprintf(s__('ValueStreamAnalytics|%{days}d'), { days }) : null,
+      selected: stage.title === selectedStage.title,
+      title: isTotalStage ? CAPITALIZED_STAGE_NAME.OVERVIEW : stage.title,
+      icon: isTotalStage ? PATH_HOME_ICON : null,
+    };
+  });
+
+  return sortBy(formattedStages, stage =>
+    stage.title === CAPITALIZED_STAGE_NAME.OVERVIEW ? 0 : 1,
+  );
+};
