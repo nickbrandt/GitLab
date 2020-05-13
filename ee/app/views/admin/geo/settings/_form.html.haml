@@ -1,10 +1,10 @@
 - if Gitlab::Geo.license_allows?
   %section
-    .settings-header
-      %h4
-        = _('Geo Settings')
-      %p
-        = _('Geo allows you to replicate your GitLab instance to other geographical locations.')
+    %h2.page-title
+      = _('Geo Settings')
+    %p.page-subtitle.light
+      = _('Geo allows you to replicate your GitLab instance to other geographical locations.')
+
     = form_for @application_setting, url: admin_geo_settings_path, html: { class: 'fieldset-form' } do |f|
       = form_errors(@application_setting)
       %fieldset
