@@ -1,0 +1,267 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Stacked column chart component legend when inline legend layout prop is set matches the snapshot 1`] = `
+<div
+  style="padding-left: 64px;"
+>
+  <div
+    class="gl-legend-inline"
+    style=""
+  >
+    <div
+      class="gl-legend-inline-series"
+      role="button"
+      style="font-family: sans-serif; font-size: 12px;"
+    >
+      <div
+        class="gl-series-label-container gl-legend-inline-series-label"
+      >
+        <div
+          class="gl-series-label"
+        >
+          <svg
+            height="4px"
+            style="fill: #5772ff; transform: translateY(-2px); width: auto;"
+            width="16px"
+          >
+            <path
+              d="M0,0H16V4H0Z"
+            />
+          </svg>
+        </div>
+         
+        <div
+          class="gl-series-label"
+        >
+          <strong>
+            memory_1024
+          </strong>
+        </div>
+      </div>
+       
+      <span
+        class=""
+      >
+        
+          Avg: 17k · Max:
+          15
+        
+      </span>
+    </div>
+    <div
+      class="gl-legend-inline-series"
+      role="button"
+      style="font-family: sans-serif; font-size: 12px;"
+    >
+      <div
+        class="gl-series-label-container gl-legend-inline-series-label"
+      >
+        <div
+          class="gl-series-label"
+        >
+          <svg
+            height="4px"
+            style="fill: #b24800; transform: translateY(-2px); width: auto;"
+            width="16px"
+          >
+            <path
+              d="M0,0H16V4H0Z"
+            />
+          </svg>
+        </div>
+         
+        <div
+          class="gl-series-label"
+        >
+          <strong>
+            memory_1000
+          </strong>
+        </div>
+      </div>
+       
+      <span
+        class=""
+      >
+        
+          Avg: 67.5k · Max:
+          30
+        
+      </span>
+    </div>
+  </div>
+   
+  <!---->
+</div>
+`;
+
+exports[`Stacked column chart component legend when table legend layout prop is set matches the snapshot 1`] = `
+<div
+  style="padding-left: 64px;"
+>
+  <!---->
+   
+  <div
+    class="gl-legend-tabular"
+    style="font-family: sans-serif; font-size: 12px;"
+  >
+    <header
+      class="gl-legend-tabular-header"
+    >
+      <div
+        class="gl-legend-tabular-header-cell"
+      >
+        Min
+      </div>
+       
+      <div
+        class="gl-legend-tabular-header-cell"
+      >
+        Max
+      </div>
+       
+      <div
+        class="gl-legend-tabular-header-cell"
+      >
+        Avg
+      </div>
+       
+      <div
+        class="gl-legend-tabular-header-cell"
+      >
+        Current
+      </div>
+    </header>
+     
+    <section
+      class="gl-legend-tabular-body"
+    >
+      <div
+        class="gl-legend-tabular-row"
+        role="button"
+        style="font-family: sans-serif; font-size: 12px;"
+      >
+        <div
+          class="gl-legend-tabular-title-cell"
+          id="gl-chart-label-0"
+        >
+          <div
+            class="gl-series-label-container"
+            style="font-family: sans-serif; font-size: 12px;"
+          >
+            <div
+              class="gl-series-label"
+            >
+              <svg
+                height="4px"
+                style="fill: #5772ff; transform: translateY(-2px); width: auto;"
+                width="16px"
+              >
+                <path
+                  d="M0,0H16V4H0Z"
+                />
+              </svg>
+            </div>
+             
+            <div
+              class="gl-series-label"
+            >
+              <strong>
+                memory_1024
+              </strong>
+            </div>
+          </div>
+        </div>
+         
+        <!---->
+         
+        <div
+          class="gl-legend-tabular-details-cell"
+        >
+          5
+        </div>
+         
+        <div
+          class="gl-legend-tabular-details-cell"
+        >
+          15
+        </div>
+         
+        <div
+          class="gl-legend-tabular-details-cell"
+        >
+          17k
+        </div>
+         
+        <div
+          class="gl-legend-tabular-details-cell"
+        >
+          15
+        </div>
+      </div>
+      <div
+        class="gl-legend-tabular-row"
+        role="button"
+        style="font-family: sans-serif; font-size: 12px;"
+      >
+        <div
+          class="gl-legend-tabular-title-cell"
+          id="gl-chart-label-1"
+        >
+          <div
+            class="gl-series-label-container"
+            style="font-family: sans-serif; font-size: 12px;"
+          >
+            <div
+              class="gl-series-label"
+            >
+              <svg
+                height="4px"
+                style="fill: #b24800; transform: translateY(-2px); width: auto;"
+                width="16px"
+              >
+                <path
+                  d="M0,0H16V4H0Z"
+                />
+              </svg>
+            </div>
+             
+            <div
+              class="gl-series-label"
+            >
+              <strong>
+                memory_1000
+              </strong>
+            </div>
+          </div>
+        </div>
+         
+        <!---->
+         
+        <div
+          class="gl-legend-tabular-details-cell"
+        >
+          20
+        </div>
+         
+        <div
+          class="gl-legend-tabular-details-cell"
+        >
+          30
+        </div>
+         
+        <div
+          class="gl-legend-tabular-details-cell"
+        >
+          67.5k
+        </div>
+         
+        <div
+          class="gl-legend-tabular-details-cell"
+        >
+          30
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+`;

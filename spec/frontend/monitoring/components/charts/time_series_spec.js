@@ -55,6 +55,7 @@ describe('Time series component', () => {
       stubs: {
         GlPopover: true,
       },
+      attachToDocument: true,
     });
   };
 
@@ -87,19 +88,23 @@ describe('Time series component', () => {
         return wrapper.vm.$nextTick();
       });
 
-      it('allows user to override max value label text using prop', () => {
-        wrapper.setProps({ legendMaxText: 'legendMaxText' });
-
-        return wrapper.vm.$nextTick().then(() => {
-          expect(wrapper.props().legendMaxText).toBe('legendMaxText');
-        });
+      afterEach(() => {
+        wrapper.destroy();
       });
 
-      it('allows user to override average value label text using prop', () => {
-        wrapper.setProps({ legendAverageText: 'averageText' });
+      it('allows user to override legend label texts using props', () => {
+        wrapper.setProps({
+          legendMinText: 'legendMinText',
+          legendMaxText: 'legendMaxText',
+          legendAverageText: 'legendAverageText',
+          legendCurrentText: 'legendCurrentText',
+        });
 
         return wrapper.vm.$nextTick().then(() => {
-          expect(wrapper.props().legendAverageText).toBe('averageText');
+          expect(wrapper.props().legendMinText).toBe('legendMinText');
+          expect(wrapper.props().legendMaxText).toBe('legendMaxText');
+          expect(wrapper.props().legendAverageText).toBe('legendAverageText');
+          expect(wrapper.props().legendCurrentText).toBe('legendCurrentText');
         });
       });
 
@@ -735,6 +740,55 @@ describe('Time series component', () => {
             expect(color).toBe(legendColors[index]);
           });
         });
+      });
+    });
+  });
+
+  describe('legend layout', () => {
+    const findLegend = () => wrapper.find(GlChartLegend);
+
+    beforeEach(() => {
+      createWrapper(mockGraphData, mount);
+      return wrapper.vm.$nextTick();
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('should render a tabular legend layout by default', () => {
+      expect(findLegend().props('layout')).toBe('table');
+    });
+
+    describe('when inline legend layout prop is set', () => {
+      beforeEach(() => {
+        wrapper.setProps({
+          legendLayout: 'inline',
+        });
+      });
+
+      it('should render an inline legend layout', () => {
+        expect(findLegend().props('layout')).toBe('inline');
+      });
+
+      it('matches the snapshot', () => {
+        expect(findLegend().element).toMatchSnapshot();
+      });
+    });
+
+    describe('when table legend layout prop is set', () => {
+      beforeEach(() => {
+        wrapper.setProps({
+          legendLayout: 'table',
+        });
+      });
+
+      it('should render a tabular legend layout', () => {
+        expect(findLegend().props('layout')).toBe('table');
+      });
+
+      it('matches the snapshot', () => {
+        expect(findLegend().element).toMatchSnapshot();
       });
     });
   });
