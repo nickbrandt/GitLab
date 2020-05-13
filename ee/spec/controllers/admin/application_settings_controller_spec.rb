@@ -240,7 +240,7 @@ describe Admin::ApplicationSettingsController do
     end
 
     context 'when an admin user attempts a request' do
-      let_it_be(:yesterday) { Time.now.utc.yesterday.to_date }
+      let_it_be(:yesterday) { Time.current.utc.yesterday.to_date }
       let_it_be(:max_count) { 15 }
       let_it_be(:current_count) { 10 }
 

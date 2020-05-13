@@ -90,7 +90,7 @@ module EE
 
           # If the known hosts data is being set, store details about who and when
           if import_data[:ssh_known_hosts].present?
-            import_data[:ssh_known_hosts_verified_at] = Time.now
+            import_data[:ssh_known_hosts_verified_at] = Time.current
             import_data[:ssh_known_hosts_verified_by_id] = current_user.id
           end
         end
