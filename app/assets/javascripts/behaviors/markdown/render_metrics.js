@@ -4,7 +4,7 @@ import { createStore } from '~/monitoring/stores/embed_group/';
 // TODO: Handle copy-pasting - https://gitlab.com/gitlab-org/gitlab-foss/issues/64369.
 export default function renderMetrics(elements) {
   if (!elements.length) {
-    return;
+    return Promise.resolve();
   }
 
   const wrapperList = [];
@@ -28,24 +28,20 @@ export default function renderMetrics(elements) {
     element.parentNode.removeChild(element);
   });
 
-  if (wrapperList.length) {
-    import(/* webpackChunkName: 'gfm_metrics' */ '~/monitoring/components/embeds/embed_group.vue')
-      .then(EmbedGroup => {
-        const EmbedGroupComponent = Vue.extend(EmbedGroup.default);
+  return import(
+    /* webpackChunkName: 'gfm_metrics' */ '~/monitoring/components/embeds/embed_group.vue'
+  ).then(({ default: EmbedGroup }) => {
+    const EmbedGroupComponent = Vue.extend(EmbedGroup);
 
-        wrapperList.forEach(wrapper => {
-          // eslint-disable-next-line no-new
-          new EmbedGroupComponent({
-            el: wrapper,
-            store: createStore(),
-            propsData: {
-              urls: wrapper.urls,
-            },
-          });
-        });
-      })
-      .catch(() => {
-        // do nothing
+    wrapperList.forEach(wrapper => {
+      // eslint-disable-next-line no-new
+      new EmbedGroupComponent({
+        el: wrapper,
+        store: createStore(),
+        propsData: {
+          urls: wrapper.urls,
+        },
       });
-  }
+    });
+  });
 }
