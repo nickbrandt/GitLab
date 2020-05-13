@@ -29,24 +29,38 @@ NOTE: **Note:**
 `go` does not support transmitting credentials over insecure connections. The
 steps below will only work if GitLab is configured for HTTPS.
 
-GitLab's Go proxy implementation supports HTTP Basic authentication for personal
-access tokens, in addition to the usual authentication mechanisms. To configure
-Go to use HTTP Basic authentication, you must create a [personal access
-token](../../profile/personal_access_tokens.md) with the `api` or `read_api`
-scope and add it to [`~/.netrc`](https://ec.haxx.se/usingcurl/usingcurl-netrc):
+  1. Configure Go to include HTTP basic authentication credentials when fetching from the Go proxy for GitLab.
+  2. Configure Go to *not* attempt to download checksums for private GitLab projects from the public checksum database.
+
+#### Enable Request Authentication
+
+Create a [personal access token](../../profile/personal_access_tokens.md) with
+the `api` or `read_api` scope and add it to
+[`~/.netrc`](https://ec.haxx.se/usingcurl/usingcurl-netrc):
 
 ```netrc
-machine my-server
-login my-user
-password my-token
+machine <url> login <username> password <token>
 ```
 
-Replace `my-user` with your username and `my-token` with your personal access
-token. The value of `my-server` should be `gitlab.com` or the URL of your GitLab
-instance. You can optionally append a path to `my-server`, which will restrict
-the scope that the credentials will be used for. For example, `machine
-gitlab.com/my-group` will restrict the credentials to URLs starting with
-`gitlab.com/my-group`.
+`<url>` should be the URL of the GitLab instance, for example `gitlab.com`.
+`<username>` and `<token>` should be your username and the personal access
+token, respectively.
+
+#### Disable Checksum Database
+
+By default, Go will query `sum.golang.org` for module checksums. This will not
+work modules that are not public. `GONOSUMDB` can be used to disable downloading
+checksums for specific URLs. This can be permanently set with `go env -w
+GONOSUMDB=<scope>`.
+
+- `GONOSUMDB=gitlab.com/my/project` will disable checksum downloads for
+  `gitlab.com/my/project`
+- `GONOSUMDB=gitlab.com/namespace` will disable checksum downloads for all
+  projects under `gitlab.com/namespace`
+- `GONOSUMDB=gitlab.com` will disable checksum downloads for *all* modules on
+  GitLab.com
+- `GOSUMDB=off` or `GONOSUMDB=*` will *completely* disable the checksum database
+  for all modules and packages.
 
 ## Add GitLab as a Go proxy
 
@@ -104,7 +118,7 @@ website.
 
 The GitLab Go proxy will ignore modules and module versions that have an invalid
 `module` directive in their `go.mod`. Go requires that a package imported as
-`gitlab.com/my/project` can be accessed via that same URL, and that the first
+`gitlab.com/my/project` can be accessed with that same URL, and that the first
 line of `go.mod` is `module gitlab.com/my/project`. If `go.mod` names a
 different module, compilation will fail. Additionally, Go requires, for major
 versions after 1, that the name of the module have an appropriate suffix, for
