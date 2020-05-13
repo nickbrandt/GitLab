@@ -17,8 +17,6 @@ const submitContentChangesResolver = (
           },
         },
       });
-
-      return null;
     },
   );
 };

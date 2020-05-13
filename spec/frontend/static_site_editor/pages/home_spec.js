@@ -137,7 +137,7 @@ describe('static_site_editor/pages/home', () => {
     expect(findInvalidContentMessage().exists()).toBe(true);
   });
 
-  it('does not display invalid content message when content is not supported', () => {
+  it('does not display invalid content message when content is supported', () => {
     buildWrapper({ appData: { isSupportedContent: true } });
 
     expect(findInvalidContentMessage().exists()).toBe(false);
