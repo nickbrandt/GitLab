@@ -1,5 +1,5 @@
 .rails:needs:setup-and-assets:
-  needs: ["setup-test-env pg11", "compile-assets pull-cache"]
+  needs: ["setup-test-env", "compile-assets pull-cache"]
 
 .rails-job-base:
   extends:
@@ -25,7 +25,7 @@
   cache:
     policy: pull-push
 
-setup-test-env pg11:
+setup-test-env:
   extends:
     - .base-setup-test-env
     - .rails:rules:default-refs-code-backstage-qa
@@ -63,7 +63,7 @@ downtime_check:
 .rspec-base:
   extends: .rails-job-base
   stage: test
-  needs: ["setup-test-env pg11", "retrieve-tests-metadata", "compile-assets pull-cache"]
+  needs: ["setup-test-env", "retrieve-tests-metadata", "compile-assets pull-cache"]
   script:
     - source scripts/rspec_helpers.sh
     - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag ~level:migration"
@@ -121,7 +121,7 @@ rspec fast_spec_helper:
     - .rails:rules:ee-and-foss
     - .use-pg11
   stage: test
-  needs: ["setup-test-env pg11"]
+  needs: ["setup-test-env"]
 
 db:migrate:reset:
   extends: .db-job-base
@@ -192,7 +192,7 @@ rspec:coverage:
   # We cannot use needs since it would mean needing 84 jobs (since most are parallelized)
   # so we use `dependencies` here.
   dependencies:
-    - setup-test-env pg11
+    - setup-test-env
     - rspec migration pg11
     - rspec unit pg11
     - rspec integration pg11
@@ -236,7 +236,7 @@ rspec:coverage:
     - .rspec-base-ee
     - .as-if-foss
     - .use-pg11
-  needs: ["setup-test-env pg11", "retrieve-tests-metadata", "compile-assets pull-cache as-if-foss"]
+  needs: ["setup-test-env", "retrieve-tests-metadata", "compile-assets pull-cache as-if-foss"]
 
 .rspec-ee-base-pg11:
   extends:

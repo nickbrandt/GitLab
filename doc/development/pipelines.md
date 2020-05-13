@@ -210,7 +210,7 @@ graph RL;
     click 1-4 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=8356616&udv=0"
     1-5["gitlab:assets:compile pull-cache (22 minutes)"];
     click 1-5 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=6914312&udv=0"
-    1-6["setup-test-env pg11 (9.6 minutes)"];
+    1-6["setup-test-env (9.6 minutes)"];
     click 1-6 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=6914315&udv=0"
     1-7["review-stop-failed-deployment"];
     1-8["dependency_scanning"];
@@ -324,7 +324,7 @@ graph RL;
     click 1-4 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=8356616&udv=0"
     1-5["gitlab:assets:compile pull-cache (22 minutes)"];
     click 1-5 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=6914312&udv=0"
-    1-6["setup-test-env pg11 (9.6 minutes)"];
+    1-6["setup-test-env (9.6 minutes)"];
     click 1-6 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=6914315&udv=0"
     1-7["review-stop-failed-deployment"];
     1-8["dependency_scanning"];
@@ -463,7 +463,7 @@ graph RL;
     click 1-4 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=8356616&udv=0"
     1-5["gitlab:assets:compile pull-cache (22 minutes)"];
     click 1-5 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=6914312&udv=0"
-    1-6["setup-test-env pg11 (9.6 minutes)"];
+    1-6["setup-test-env (9.6 minutes)"];
     click 1-6 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=6914315&udv=0"
     1-7["review-stop-failed-deployment"];
     1-8["dependency_scanning"];

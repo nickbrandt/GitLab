@@ -32,7 +32,7 @@ update-tests-metadata:
     - .test-metadata:rules:update-tests-metadata
   stage: post-test
   dependencies:
-    - setup-test-env pg11
+    - setup-test-env
     - rspec migration pg11
     - rspec unit pg11
     - rspec integration pg11

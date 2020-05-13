@@ -5,7 +5,7 @@
     - .default-before_script
     - .use-pg11
   stage: test
-  needs: ["setup-test-env pg11"]
+  needs: ["setup-test-env"]
   variables:
     FIXTURE_PATH: "db/fixtures/development"
     SEED_CYCLE_ANALYTICS: "true"
