@@ -885,7 +885,7 @@ describe GroupPolicy do
     where(:role, :allowed) do
       :guest      | false
       :reporter   | false
-      :developer  | false
+      :developer  | true
       :maintainer | true
       :owner      | true
       :admin      | true

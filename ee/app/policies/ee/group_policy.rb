@@ -91,7 +91,6 @@ module EE
         enable :create_jira_connect_subscription
         enable :maintainer_access
         enable :admin_wiki
-        enable :read_ci_minutes_quota
       end
 
       rule { owner }.policy do
@@ -174,6 +173,7 @@ module EE
       rule { developer }.policy do
         enable :create_wiki
         enable :admin_merge_request
+        enable :read_ci_minutes_quota
       end
 
       rule { security_dashboard_enabled & developer }.enable :read_group_security_dashboard

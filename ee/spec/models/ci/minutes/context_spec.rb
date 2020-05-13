@@ -53,7 +53,7 @@ describe Ci::Minutes::Context do
     describe '#can_see_status' do
       context 'when eligible to see status' do
         before do
-          group.add_owner(user)
+          group.add_developer(user)
         end
 
         it 'can see status' do
