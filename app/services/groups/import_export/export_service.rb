@@ -65,7 +65,7 @@ module Groups
       end
 
       def tree_exporter_class
-        if ::Feature.enabled?(:group_export_ndjson, @group&.parent)
+        if ::Feature.enabled?(:group_export_ndjson, @group&.parent, default_enabled: true)
           Gitlab::ImportExport::Group::TreeSaver
         else
           Gitlab::ImportExport::Group::LegacyTreeSaver
