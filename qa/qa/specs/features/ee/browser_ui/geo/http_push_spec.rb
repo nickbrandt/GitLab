@@ -61,7 +61,7 @@ module QA
 
       context 'git-lfs commit' do
         it 'is replicated to the secondary', quarantine:
-            { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212632', type: :investigating } do
+            { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212632', type: :bug } do
           file_content = 'This is a Geo project!'
           lfs_file_display_message = 'The rendered file could not be displayed because it is stored in LFS.'
           project = nil
