@@ -25,7 +25,6 @@ describe('Selection Summary component', () => {
   const dismissButton = () => wrapper.find(GlButton);
   const dismissMessage = () => wrapper.find({ ref: 'dismiss-message' });
   const formSelect = () => wrapper.find(GlFormSelect);
-
   const createComponent = ({ props = {}, data = defaultData, mocks = defaultMocks }) => {
     if (wrapper) {
       throw new Error('Please avoid recreating components in the same spec');
