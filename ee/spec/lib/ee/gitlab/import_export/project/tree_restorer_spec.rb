@@ -81,7 +81,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
     end
 
     before do
-      setup_import_export_config('designs')
+      setup_import_export_config('complex')
       restored_project_json
     end
 
