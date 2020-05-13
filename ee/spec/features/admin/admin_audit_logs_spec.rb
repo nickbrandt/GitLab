@@ -60,16 +60,7 @@ describe 'Admin::AuditLogs', :js do
       end
 
       it 'filters by user' do
-        filter_by_type('User Events')
-
-        click_button 'Search users'
-        wait_for_requests
-
-        within '.dropdown-menu-user' do
-          click_link user.name
-        end
-
-        wait_for_requests
+        filter_for('User Events', user.name)
 
         expect(page).to have_content('Signed in with LDAP authentication')
       end
@@ -86,13 +77,7 @@ describe 'Admin::AuditLogs', :js do
       end
 
       it 'filters by group' do
-        filter_by_type('Group Events')
-
-        find('.group-item-select').click
-        wait_for_requests
-        find('.select2-results').click
-
-        find('.audit-log-table td', match: :first)
+        filter_for('Group Events', group_member.group.name)
 
         expect(page).to have_content('Added user access as Owner')
       end
@@ -110,13 +95,7 @@ describe 'Admin::AuditLogs', :js do
       end
 
       it 'filters by project' do
-        filter_by_type('Project Events')
-
-        find('.project-item-select').click
-        wait_for_requests
-        find('.select2-results').click
-
-        find('.audit-log-table td', match: :first)
+        filter_for('Project Events', project_member.project.name)
 
         expect(page).to have_content('Removed user access')
       end
@@ -155,11 +134,14 @@ describe 'Admin::AuditLogs', :js do
     end
   end
 
-  def filter_by_type(type)
-    click_button 'All Events'
+  def filter_for(type, name)
+    within '[data-qa-selector="admin_audit_log_filter"]' do
+      find('input').click
 
-    within '.dropdown-menu-type' do
       click_link type
+      click_link name
+
+      find('button[type="button"]').click
     end
 
     wait_for_requests
