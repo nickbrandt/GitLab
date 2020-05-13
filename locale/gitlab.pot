@@ -12222,6 +12222,9 @@ msgstr ""
 msgid "Last reply by"
 msgstr ""
 
+msgid "Last repository check (%{last_check_timestamp}) failed. See the 'repocheck.log' file for error messages."
+msgstr ""
+
 msgid "Last repository check run"
 msgstr ""
 
@@ -17712,6 +17715,9 @@ msgstr ""
 msgid "Repository URL"
 msgstr ""
 
+msgid "Repository check"
+msgstr ""
+
 msgid "Repository check was triggered."
 msgstr ""
 
@@ -21778,7 +21784,16 @@ msgstr ""
 msgid "This repository"
 msgstr ""
 
+msgid "This repository has never been checked."
+msgstr ""
+
 msgid "This repository is currently empty. A new Auto DevOps pipeline will be created after a new file has been pushed to a branch."
+msgstr ""
+
+msgid "This repository was last checked %{last_check_timestamp}. The check %{strong_start}failed.%{strong_end} See the 'repocheck.log' file for error messages."
+msgstr ""
+
+msgid "This repository was last checked %{last_check_timestamp}. The check passed."
 msgstr ""
 
 msgid "This runner will only run on pipelines triggered on protected branches"
