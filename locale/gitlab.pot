@@ -11291,6 +11291,9 @@ msgstr ""
 msgid "Import in progress"
 msgstr ""
 
+msgid "Import in progress. Refresh page to see newly added issues."
+msgstr ""
+
 msgid "Import issues"
 msgstr ""
 
