@@ -1188,6 +1188,9 @@ msgstr ""
 msgid "Add a homepage to your wiki that contains information about your project and GitLab will display it here instead of this message."
 msgstr ""
 
+msgid "Add a line"
+msgstr ""
+
 msgid "Add a link"
 msgstr ""
 
@@ -1273,6 +1276,9 @@ msgid "Add reaction"
 msgstr ""
 
 msgid "Add request manually"
+msgstr ""
+
+msgid "Add strikethrough text"
 msgstr ""
 
 msgid "Add system hook"
@@ -10943,6 +10949,9 @@ msgstr ""
 msgid "Header message"
 msgstr ""
 
+msgid "Headings"
+msgstr ""
+
 msgid "Health"
 msgstr ""
 
@@ -11463,6 +11472,9 @@ msgstr ""
 msgid "Incompatible options set!"
 msgstr ""
 
+msgid "Indent"
+msgstr ""
+
 msgid "Index all projects"
 msgstr ""
 
@@ -11487,10 +11499,16 @@ msgstr ""
 msgid "Input your repository URL"
 msgstr ""
 
+msgid "Insert a code block"
+msgstr ""
+
 msgid "Insert a quote"
 msgstr ""
 
 msgid "Insert code"
+msgstr ""
+
+msgid "Insert inline code"
 msgstr ""
 
 msgid "Insert suggestion"
@@ -14651,6 +14669,9 @@ msgid "OutdatedBrowser|Please install a %{browser_link_start}supported web brows
 msgstr ""
 
 msgid "OutdatedBrowser|You can provide feedback %{feedback_link_start}on this issue%{feedback_link_end} or via your usual support channels."
+msgstr ""
+
+msgid "Outdent"
 msgstr ""
 
 msgid "Overridden"
