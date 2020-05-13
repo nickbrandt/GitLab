@@ -11,10 +11,19 @@ describe API::MavenPackages do
   let_it_be(:jar_file) { package.package_files.with_file_name_like('%.jar').first }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
   let_it_be(:job) { create(:ci_build, user: user) }
+  let_it_be(:deploy_token) { create(:deploy_token, read_package_registry: true, write_package_registry: true) }
+  let_it_be(:project_deploy_token) { create(:project_deploy_token, deploy_token: deploy_token, project: project) }
 
   let(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
   let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
   let(:headers_with_token) { headers.merge('Private-Token' => personal_access_token.token) }
+
+  let(:headers_with_deploy_token) do
+    headers.merge(
+      Gitlab::Auth::AuthFinders::DEPLOY_TOKEN_HEADER => deploy_token.token
+    )
+  end
+
   let(:version) { '1.0-SNAPSHOT' }
 
   before do
@@ -78,6 +87,28 @@ describe API::MavenPackages do
     end
   end
 
+  shared_examples 'downloads with a deploy token' do
+    it 'allows download with deploy token' do
+      download_file(
+        package_file.file_name,
+        {},
+        Gitlab::Auth::AuthFinders::DEPLOY_TOKEN_HEADER => deploy_token.token
+      )
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(response.media_type).to eq('application/octet-stream')
+    end
+  end
+
+  shared_examples 'downloads with a job token' do
+    it 'allows download with job token' do
+      download_file(package_file.file_name, job_token: job.token)
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(response.media_type).to eq('application/octet-stream')
+    end
+  end
+
   describe 'GET /api/v4/packages/maven/*path/:file_name' do
     context 'a public project' do
       subject { download_file(package_file.file_name) }
@@ -123,12 +154,9 @@ describe API::MavenPackages do
         expect(response).to have_gitlab_http_status(:forbidden)
       end
 
-      it 'allows download with job token' do
-        download_file(package_file.file_name, job_token: job.token)
+      it_behaves_like 'downloads with a job token'
 
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response.media_type).to eq('application/octet-stream')
-      end
+      it_behaves_like 'downloads with a deploy token'
     end
 
     context 'private project' do
@@ -161,12 +189,9 @@ describe API::MavenPackages do
         expect(response).to have_gitlab_http_status(:forbidden)
       end
 
-      it 'allows download with job token' do
-        download_file(package_file.file_name, job_token: job.token)
+      it_behaves_like 'downloads with a job token'
 
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response.media_type).to eq('application/octet-stream')
-      end
+      it_behaves_like 'downloads with a deploy token'
     end
 
     it 'rejects request if feature is not in the license' do
@@ -254,12 +279,9 @@ describe API::MavenPackages do
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
-      it 'allows download with job token' do
-        download_file(package_file.file_name, job_token: job.token)
+      it_behaves_like 'downloads with a job token'
 
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response.media_type).to eq('application/octet-stream')
-      end
+      it_behaves_like 'downloads with a deploy token'
     end
 
     context 'private project' do
@@ -292,12 +314,9 @@ describe API::MavenPackages do
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
-      it 'allows download with job token' do
-        download_file(package_file.file_name, job_token: job.token)
+      it_behaves_like 'downloads with a job token'
 
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response.media_type).to eq('application/octet-stream')
-      end
+      it_behaves_like 'downloads with a deploy token'
     end
 
     it 'rejects request if feature is not in the license' do
@@ -375,12 +394,9 @@ describe API::MavenPackages do
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
-      it 'allows download with job token' do
-        download_file(package_file.file_name, job_token: job.token)
+      it_behaves_like 'downloads with a job token'
 
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response.media_type).to eq('application/octet-stream')
-      end
+      it_behaves_like 'downloads with a deploy token'
     end
 
     it 'rejects request if feature is not in the license' do
@@ -448,6 +464,12 @@ describe API::MavenPackages do
 
     it 'authorizes upload with job token' do
       authorize_upload(job_token: job.token)
+
+      expect(response).to have_gitlab_http_status(:ok)
+    end
+
+    it 'authorizes upload with deploy token' do
+      authorize_upload({}, headers_with_deploy_token)
 
       expect(response).to have_gitlab_http_status(:ok)
     end
@@ -529,6 +551,12 @@ describe API::MavenPackages do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(project.reload.packages.last.build_info.pipeline).to eq job.pipeline
+      end
+
+      it 'allows upload with deploy token' do
+        upload_file(params, headers_with_deploy_token)
+
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       context 'version is not correct' do
