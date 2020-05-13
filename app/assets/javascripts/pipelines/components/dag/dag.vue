@@ -1,6 +1,6 @@
 <script>
 import * as d3 from 'd3';
-
+import { textwrap } from 'd3-textwrap'
 import { uniqueId } from 'lodash';
 import mockDAGdata from './dag-data/mockDAGdata.json'
 import gitlabDAGdata from './dag-data/gitlabDAGdata.json'
@@ -21,6 +21,8 @@ export default {
     minNodeHeight: 60,
     nodeWidth: 15,
     nodePadding: 25,
+    paddingForLabels: 100,
+    labelMargin: 8,
 
     // can plausibly applied through CSS instead, TBD
     baseOpacity: 0.8,
@@ -215,10 +217,27 @@ export default {
         .append('title')
         .text((d) => d.name);
     },
+
+    initLabelWrap () {
+      const {
+        paddingForLabels,
+        labelMargin
+      } = this.$options.viewOptions;
+
+      return textwrap().bounds({
+        height: 60,
+        width: paddingForLabels - (2 * labelMargin),
+      })
+      .method('foreignobject');
+    },
+
     labelNodes (svg, nodeData) {
       const labelPosition = (d) => {
-        const paddingForLabels = 100;
-        const labelMargin = 8;
+        const {
+          paddingForLabels,
+          labelMargin
+        } = this.$options.viewOptions;
+
         const firstCol = d.x0 <= paddingForLabels;
         const lastCol = d.x1 >= this.width - paddingForLabels;
 
@@ -246,7 +265,6 @@ export default {
 
       }
 
-
       return svg
         .append('g')
         .attr('font-family', 'sans-serif')
@@ -261,10 +279,54 @@ export default {
         .attr('dy', '0.35em')
         .attr('text-anchor', (d) => labelPosition(d).textAnchor)
         .text((d) => d.name);
-  },
+    },
+
+    wrapNodeLabels() {
+      const labelPosition = (d) => {
+        const {
+          paddingForLabels,
+          labelMargin
+        } = this.$options.viewOptions;
+
+        const firstCol = d.x0 <= paddingForLabels;
+        const lastCol = d.x1 >= this.width - paddingForLabels;
+
+        if (firstCol) {
+          return {
+            x: paddingForLabels - labelMargin,
+            y: (d.y1 + d.y0) / 2,
+            textAnchor: 'end',
+          }
+        }
+
+        if (lastCol) {
+          return {
+            x: (this.width - paddingForLabels) + labelMargin,
+            y: (d.y1 + d.y0) / 2,
+            textAnchor: 'start',
+          }
+        }
+
+        return {
+          x: (d.x1 + d.x0) / 2,
+          y: d.y0 - (1.5 * labelMargin),
+          textAnchor: d.x0 < this.width / 2 ? 'start' : 'end',
+        }
+
+      }
+
+      const wrap = this.initLabelWrap();
+      d3.selectAll('.label').call(wrap)
+        .style('transform', (d) => {
+          const { x, y } = labelPosition(d);
+          return `translate(${x}px, ${y}px)`;
+        });
+    },
+
     createNodes (svg, nodeData) {
       this.generateNodes(svg, nodeData);
       this.labelNodes(svg, nodeData);
+      this.wrapNodeLabels();
     },
 
     drawGraph(data, parseFn) {
