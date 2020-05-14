@@ -1,8 +1,9 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
+import { GlAlert } from '@gitlab/ui';
 import store from '../store/index';
 import FeatureFlagForm from './form.vue';
-import { LEGACY_FLAG, NEW_VERSION_FLAG } from '../constants';
+import { LEGACY_FLAG, NEW_VERSION_FLAG, NEW_FLAG_ALERT } from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
 
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -12,6 +13,7 @@ const { mapState, mapActions } = createNamespacedHelpers('new');
 export default {
   store,
   components: {
+    GlAlert,
     FeatureFlagForm,
   },
   mixins: [featureFlagsMixin()],
@@ -29,6 +31,9 @@ export default {
       required: true,
     },
   },
+  translations: {
+    newFlagAlert: NEW_FLAG_ALERT,
+  },
   computed: {
     ...mapState(['error']),
     scopes() {
@@ -43,7 +48,10 @@ export default {
       ];
     },
     version() {
-      return this.glFeatures.featureFlagsNewVersion ? NEW_VERSION_FLAG : LEGACY_FLAG;
+      return this.hasNewVersionFlags ? NEW_VERSION_FLAG : LEGACY_FLAG;
+    },
+    hasNewVersionFlags() {
+      return this.glFeatures.featureFlagsNewVersion;
     },
     strategies() {
       return [{ name: '', parameters: {}, scopes: [] }];
@@ -60,6 +68,9 @@ export default {
 </script>
 <template>
   <div>
+    <gl-alert v-if="!hasNewVersionFlags" variant="warning" :dismissible="false" class="gl-my-5">
+      {{ $options.translations.newFlagAlert }}
+    </gl-alert>
     <h3 class="page-title">{{ s__('FeatureFlags|New feature flag') }}</h3>
 
     <div v-if="error.length" class="alert alert-danger">
