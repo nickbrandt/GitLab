@@ -23,13 +23,13 @@ Press `t` to launch the File search function when in **Issues**,
 
 Start typing what you are searching for and watch the magic happen. With the
 up/down arrows, you go up and down the results, with `Esc` you close the search
-and go back to **Files**.
+and go back to **Files**.kotlin
 
 ## How it works
 
 The File finder feature is powered by the [Fuzzy filter](https://github.com/jeancroy/fuzz-aldrin-plus) library.
 
-It implements a fuzzy search with the highlight and tries to provide intuitively
+It implements a fuzzy search with the highlight and tries to provide intuitive
 results by recognizing patterns that people use while searching.
 
 For example, consider the [GitLab FOSS repository](https://gitlab.com/gitlab-org/gitlab-foss/tree/master) and that we want to open
