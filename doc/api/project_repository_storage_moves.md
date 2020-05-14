@@ -1,8 +1,8 @@
-# Project Repository Storage Move API
+# Project repository storage move API
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/31285) in GitLab 13.0.
 
-To retrieve project repository storage moves using the API, you must [authenticate yourself](README.md#authentication) as an Administrator.
+Project repository storage can be moved. To retrieve project repository storage moves using the API, you must [authenticate yourself](README.md#authentication) as an administrator.
 
 ## Retrieve all project repository storage moves
 
@@ -11,9 +11,7 @@ GET /project_repository_storage_moves
 ```
 
 By default, `GET` requests return 20 results at a time because the API results
-are paginated.
-
-Read more on [pagination](README.md#pagination).
+are [paginated](README.md#pagination).
 
 Example request:
 
