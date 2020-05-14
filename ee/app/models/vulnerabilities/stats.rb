@@ -10,31 +10,34 @@
 # reasons.
 module Vulnerabilities
   class Stats < ApplicationRecord
-    INHERITED_COLUMNS = %w(project_id).freeze
+    STATIC_SELECT_ATTRS = ['project_id', 'COUNT(*) AS count_all'].freeze
 
     self.table_name = 'vulnerabilities'
     self.primary_key = 'project_id'
 
+    attribute :count_all, :integer, default: 0
     attribute :critical, :integer, default: 0
     attribute :high, :integer, default: 0
     attribute :medium, :integer, default: 0
     attribute :low, :integer, default: 0
+    attribute :unknown, :integer, default: 0
+    attribute :info, :integer, default: 0
 
     belongs_to :project
 
-    default_scope { select(select_statement).group(:project_id) }
+    scope :with_stats_schema, -> { select(stats_select_statement).group(:project_id) }
 
     after_initialize :readonly!
 
     class << self
-      def select_statement
-        @select_statement ||= INHERITED_COLUMNS + stats_select
+      def stats_select_statement
+        @stats_select_statement ||= STATIC_SELECT_ATTRS + stats_select
       end
 
       # Overrides ActiveRecord::ModelSchema's method to do not inherit
       # all the attributes from vulnerabilities table.
       def ignored_columns
-        Vulnerability.columns.map(&:name) - INHERITED_COLUMNS
+        Vulnerability.columns.map(&:name) - [primary_key]
       end
 
       private
@@ -46,7 +49,11 @@ module Vulnerabilities
       end
 
       def build_select_clause_for(severity, enum)
-        "COUNT(*) FILTER (WHERE severity = #{enum}) as #{severity}"
+        "COUNT(*) FILTER (WHERE severity = #{enum} AND state IN (#{active_states})) as #{severity}"
+      end
+
+      def active_states
+        @active_states ||= Vulnerability.active_state_enums.join(',')
       end
     end
   end
