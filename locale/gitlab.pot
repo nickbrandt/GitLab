@@ -19156,6 +19156,9 @@ msgstr ""
 msgid "Reports|Metrics reports failed loading results"
 msgstr ""
 
+msgid "Reports|Scanner"
+msgstr ""
+
 msgid "Reports|Severity"
 msgstr ""
 
@@ -20121,10 +20124,10 @@ msgstr ""
 msgid "SecurityReports|Remove project from dashboard"
 msgstr ""
 
-msgid "SecurityReports|Report type"
+msgid "SecurityReports|Return to dashboard"
 msgstr ""
 
-msgid "SecurityReports|Return to dashboard"
+msgid "SecurityReports|Scanner type"
 msgstr ""
 
 msgid "SecurityReports|Scan details"
@@ -26830,7 +26833,7 @@ msgstr ""
 msgid "ciReport|All projects"
 msgstr ""
 
-msgid "ciReport|All report types"
+msgid "ciReport|All scanner types"
 msgstr ""
 
 msgid "ciReport|All severities"

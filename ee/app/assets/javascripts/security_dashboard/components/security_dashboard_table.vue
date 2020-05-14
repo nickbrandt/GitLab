@@ -80,6 +80,9 @@ export default {
       <div class="table-section section-15" role="rowheader">
         {{ s__('Reports|Identifier') }}
       </div>
+      <div class="table-section section-15" role="rowheader">
+        {{ s__('Reports|Scanner') }}
+      </div>
       <div class="table-section section-20" role="rowheader"></div>
     </div>
 
