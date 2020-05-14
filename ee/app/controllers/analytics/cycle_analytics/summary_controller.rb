@@ -8,17 +8,22 @@ module Analytics
       check_feature_flag Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG
 
       before_action :load_group
+      before_action :authorize_access
       before_action :validate_params
 
       def show
-        return render_403 unless can?(current_user, :read_group_cycle_analytics, @group)
-
-        group_level = GroupLevel.new(group: @group, options: options(group_params))
-
         render json: group_level.summary
       end
 
+      def time_summary
+        render json: group_level.time_summary
+      end
+
       private
+
+      def group_level
+        @group_level ||= GroupLevel.new(group: @group, options: options(group_params))
+      end
 
       def group_params
         hash = { created_after: request_params.created_after, created_before: request_params.created_before }
@@ -41,6 +46,10 @@ module Analytics
 
       def allowed_params
         params.permit(:created_after, :created_before, project_ids: [])
+      end
+
+      def authorize_access
+        return render_403 unless can?(current_user, :read_group_cycle_analytics, @group)
       end
     end
   end
