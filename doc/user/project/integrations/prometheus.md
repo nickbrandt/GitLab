@@ -194,7 +194,7 @@ GitLab supports a limited set of [CI variables](../../../ci/variables/README.md)
 NOTE: **Note:**
 Variables for Prometheus queries must be lowercase.
 
-##### User defined variables
+##### User-defined variables
 
 [Variables can be defined](#templating-templating-properties) in a custom dashboard YAML file.
 
