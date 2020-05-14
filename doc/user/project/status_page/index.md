@@ -72,7 +72,7 @@ The incident detail page shows detailed information about a particular incident.
 - Status on the incident, including when the incident was last updated.
 - The incident title, including any emojis.
 - The description of the incident, including emojis.
-- Including any file attachments that are image type.[Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/205166) in GitLab 13.0.
+- Any file attachments provided in the incident description or comments with a valid image extension. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/205166) in GitLab 13.1.
 - A chronological ordered list of updates to the incident.
 
 ![Status Page detail](../img/status_page_detail_v12_10.png)
@@ -112,9 +112,11 @@ To change the incident status from `open` to `closed`, close the incident issue 
 
 ## Attachment storage
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/205166) in GitLab 13.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/205166) in GitLab 13.1.
 
-Starting with GitLab 13.0, any file that is attached to incident issue descriptions or comments will be published and unpublished to the status page storage, as part of the publication flow described in the [How it works](#how-it-works) section.
+Beginning with GitLab 13.1, files attached to incident issue descriptions or
+comments are published and unpublished to the status page storage as part of
+the [publication flow](#how-it-works).
 
 ### Limit
 

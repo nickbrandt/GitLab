@@ -4,8 +4,7 @@ module StatusPage
   module Storage
     # Implements a minimal AWS S3 client.
     class S3Client
-      # 5 megabytes is the minimum part size specified in the amazon SDK
-      MULTIPART_UPLOAD_PART_SIZE = 5.megabytes
+      include StatusPage::Storage::S3Helpers
 
       def initialize(region:, bucket_name:, access_key_id:, secret_access_key:)
         @bucket_name = bucket_name
@@ -71,77 +70,17 @@ module StatusPage
       # key: s3 key at which file is stored
       # file: An open file or file-like io object
       def multipart_upload(key, file)
-        # AWS sdk v2 has upload_file which supports multipart
-        # However Gitlab::HttpIO used when object storage is enabled
-        # cannot be used with upload_file
-        wrap_errors(key: key) do
-          upload_id = client.create_multipart_upload({ bucket: bucket_name, key: key }).to_h[:upload_id]
-          begin
-            parts = upload_in_parts(key, file, upload_id)
-            complete_multipart_upload(key, upload_id, parts)
-          # Rescue on Exception since even on keyboard inturrupt we want to abort the upload and re-raise
-          rescue
-            # Abort clears the already uploaded parts so that they do not cost the bucket owner
-            abort_multipart_upload(key, upload_id)
-            raise
-          end
-        end
+        StatusPage::Storage::S3Client.new(
+          client: client, bucket_name: bucket_name, key: key, open_file: file
+        ).call
       end
 
       private
 
       attr_reader :client, :bucket_name
 
-      def upload_in_parts(key, file, upload_id)
-        parts = []
-        part_number = 1
-
-        file.seek(0)
-        until file.eof?
-          part = client.upload_part({
-            body: file.read(MULTIPART_UPLOAD_PART_SIZE),
-            bucket: bucket_name,
-            key: key,
-            part_number: part_number, # required
-            upload_id: upload_id
-          })
-
-          parts << part.to_h.merge(part_number: part_number)
-          part_number += 1
-        end
-
-        parts
-      end
-
-      def complete_multipart_upload(key, upload_id, parts)
-        client.complete_multipart_upload({
-          bucket: bucket_name,
-          key: key,
-          multipart_upload: {
-            parts: parts
-          },
-          upload_id: upload_id
-        })
-      end
-
-      def abort_multipart_upload(key, upload_id)
-        if upload_id
-          client.abort_multipart_upload(
-            bucket: bucket_name,
-            key: key,
-            upload_id: upload_id
-          )
-        end
-      end
-
       def list_objects(prefix)
         client.list_objects_v2(bucket: bucket_name, prefix: prefix, max_keys: StatusPage::Storage::MAX_KEYS_PER_PAGE)
-      end
-
-      def wrap_errors(**args)
-        yield
-      rescue Aws::Errors::ServiceError => e
-        raise Error, bucket: bucket_name, error: e, **args
       end
     end
   end

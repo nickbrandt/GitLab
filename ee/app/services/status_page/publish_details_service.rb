@@ -11,8 +11,8 @@ module StatusPage
     private
 
     def process(issue, user_notes)
-      publish_json_response = publish_json(issue, user_notes)
-      return publish_json_response if publish_json_response.error?
+      response = publish_json(issue, user_notes)
+      return response if response.error?
 
       publish_images(issue, user_notes)
 
@@ -40,12 +40,11 @@ module StatusPage
       StatusPage::Storage.details_path(id)
     end
 
-    # Publish Images
     def publish_images(issue, user_notes)
       existing_image_keys = storage_client.list_object_keys(StatusPage::Storage.uploads_path(issue.iid))
-      # Send all description images to s3
       total_uploads = existing_image_keys.size
 
+      # Send all description file attachments to s3
       publish_markdown_uploads(
         markdown_field: issue.description,
         issue_iid: issue.iid,
@@ -53,7 +52,7 @@ module StatusPage
         total_uploads: total_uploads
       )
 
-      # Send all comment images to s3
+      # Send all comment file attachments to s3
       user_notes.each do |user_note|
         publish_markdown_uploads(
           markdown_field: user_note.note,

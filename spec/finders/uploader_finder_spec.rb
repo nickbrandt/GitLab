@@ -17,8 +17,9 @@ describe UploaderFinder do
 
     it 'gets the uploader' do
       allow_next_instance_of(FileUploader) do |uploader|
-        expect(uploader).to receive(:retrieve_from_store!).with(upload.path).and_return(uploader)
+        allow(uploader).to receive(:retrieve_from_store!).with(upload.path).and_return(uploader)
       end
+
       expect(subject).to be_an_instance_of(FileUploader)
       expect(subject.model).to eq(project)
       expect(subject.secret).to eq(secret)
