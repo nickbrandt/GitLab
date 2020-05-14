@@ -33,7 +33,11 @@ describe 'SAST.gitlab-ci.yml' do
         allow(License).to receive(:current).and_return(license)
       end
 
-      context 'by default' do
+      context 'when SAST_DISABLE_DIND=false' do
+        before do
+          create(:ci_variable, project: project, key: 'SAST_DISABLE_DIND', value: 'false')
+        end
+
         it 'includes orchestrator job' do
           expect(build_names).to match_array(%w[sast])
         end
@@ -49,11 +53,7 @@ describe 'SAST.gitlab-ci.yml' do
         end
       end
 
-      context 'when SAST_DISABLE_DIND=true' do
-        before do
-          create(:ci_variable, project: project, key: 'SAST_DISABLE_DIND', value: 'true')
-        end
-
+      context 'by default' do
         describe 'language detection' do
           using RSpec::Parameterized::TableSyntax
 
