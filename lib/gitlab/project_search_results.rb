@@ -20,7 +20,7 @@ module Gitlab
       when 'wiki_blobs'
         paginated_wiki_blobs(wiki_blobs(limit: limit_up_to_page(page, per_page)), page, per_page)
       when 'commits'
-        Kaminari.paginate_array(commits).page(page).per(per_page)
+        paginated_commits(page, per_page)
       when 'users'
         users.page(page).per(per_page)
       else
@@ -86,6 +86,12 @@ module Gitlab
 
     private
 
+    def paginated_commits(page, per_page)
+      results = commits(limit: limit_up_to_page(page, per_page))
+
+      Kaminari.paginate_array(results).page(page).per(per_page)
+    end
+
     def paginated_blobs(blobs, page, per_page)
       results = Kaminari.paginate_array(blobs).page(page).per(per_page)
 
@@ -139,21 +145,21 @@ module Gitlab
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    def commits
-      @commits ||= find_commits(query)
+    def commits(limit: count_limit)
+      @commits ||= find_commits(query, limit: limit)
     end
 
-    def find_commits(query)
+    def find_commits(query, limit:)
       return [] unless Ability.allowed?(@current_user, :download_code, @project)
 
-      commits = find_commits_by_message(query)
+      commits = find_commits_by_message(query, limit: limit)
       commit_by_sha = find_commit_by_sha(query)
       commits |= [commit_by_sha] if commit_by_sha
       commits
     end
 
-    def find_commits_by_message(query)
-      project.repository.find_commits_by_message(query)
+    def find_commits_by_message(query, limit:)
+      project.repository.find_commits_by_message(query, nil, nil, limit)
     end
 
     def find_commit_by_sha(query)
