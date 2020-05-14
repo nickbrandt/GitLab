@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import VueApollo from 'vue-apollo';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import * as CEMountSidebar from '~/sidebar/mount_sidebar';
 import SidebarItemEpicsSelect from './components/sidebar_item_epics_select.vue';
@@ -6,6 +7,9 @@ import SidebarStatus from './components/status/sidebar_status.vue';
 import SidebarWeight from './components/weight/sidebar_weight.vue';
 import IterationSelect from './components/iteration_select.vue';
 import SidebarStore from './stores/sidebar_store';
+import createDefaultClient from '~/lib/graphql';
+
+Vue.use(VueApollo);
 
 const mountWeightComponent = mediator => {
   const el = document.querySelector('.js-sidebar-weight-entry-point');
@@ -80,14 +84,24 @@ function mountIterationSelect() {
     return false;
   }
 
+  const apolloProvider = new VueApollo({
+    defaultClient: createDefaultClient(),
+  });
+  const { groupPath, canEdit, projectPath, issueIid } = el.dataset;
+
   return new Vue({
     el,
+    apolloProvider,
     components: {
       IterationSelect,
     },
     render: createElement =>
       createElement('iteration-select', {
         props: {
+          groupPath,
+          canEdit,
+          projectPath,
+          issueIid,
         },
       }),
   });

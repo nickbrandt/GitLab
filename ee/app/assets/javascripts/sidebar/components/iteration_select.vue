@@ -1,57 +1,209 @@
 <script>
-import { GlButton, GlLink } from '@gitlab/ui';
+import {
+  GlButton,
+  GlLink,
+  GlNewDropdown,
+  GlNewDropdownItem,
+  GlSearchBoxByType,
+  GlNewDropdownHeader,
+  GlNewDropdownDivider,
+} from '@gitlab/ui';
+import debounce from 'lodash/debounce';
+import { __ } from '~/locale';
+import Icon from '~/vue_shared/components/icon.vue';
+import groupSprintsQuery from '../queries/group_iterations.query.graphql';
+import currentSprintQuery from '../queries/issue_sprint.query.graphql';
+import setIssueIterationMutation from '../queries/set_iteration_on_issue.mutation.graphql';
+import createFlash from '~/flash';
 
 export default {
   components: {
     GlButton,
     GlLink,
+    GlNewDropdown,
+    GlNewDropdownItem,
+    GlSearchBoxByType,
+    GlNewDropdownHeader,
+    GlNewDropdownDivider,
+    Icon,
+  },
+  props: {
+    canEdit: {
+      required: true,
+      type: Boolean,
+    },
+    groupPath: {
+      required: true,
+      type: String,
+    },
+    projectPath: {
+      required: true,
+      type: String,
+    },
+    issueIid: {
+      required: true,
+      type: String,
+    },
+  },
+  apollo: {
+    currentSprint: {
+      query: currentSprintQuery,
+      variables() {
+        return {
+          fullPath: this.projectPath,
+          iid: this.issueIid,
+        };
+      },
+      update(data) {
+        if (!data) {
+          return null;
+        }
+
+        if (data.project.issues.nodes[0].sprint === null) {
+          return null;
+        }
+
+        return data.project.issues.nodes[0].sprint.id;
+      },
+    },
+    iterations: {
+      query: groupSprintsQuery,
+      variables() {
+        return {
+          fullPath: this.groupPath,
+        };
+      },
+      update(data) {
+        // if data.group.sprints.nodes.length == 0
+        return data.group.sprints.nodes; // map the ids and convert?
+      },
+    },
   },
   data() {
     return {
-      canEdit: true, // TODO: prop
-      iterationSelected: false, // TODO: probably computed based on selected item?
-      iteration: {
-        name: 'Iteration 2',
-        url: 'https://gitlab.com/iterations/3',
-      },
-    }
-  }
-}
+      searchTerm: '',
+      editing: false,
+    };
+  },
+  computed: {
+    selectedSprint() {
+      if (this.iterations) {
+        return this.iteration;
+      }
+    },
+    iteration() {
+      const iteration = this.iterations.find(({ id }) => id === this.currentSprint);
 
-// .sidebar-collapsed-icon.has-tooltip{ title: sidebar_milestone_tooltip_label(milestone), data: { container: 'body', html: 'true', placement: 'left', boundary: 'viewport' } }
-//             = icon('clock-o', 'aria-hidden': 'true')
-//             %span.milestone-title.collapse-truncated-title
-//               - if milestone.present?
-//                 = milestone[:title]
-//               - else
-//                 = _('None')
-//           .title.hide-collapsed
+      if (iteration) {
+        return iteration.title;
+      }
+    },
+  },
+  mounted() {
+    document.addEventListener('click', this.handleOffClick);
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleOffClick);
+  },
+  methods: {
+    toggleDropdown(e) {
+      // NOTE: need this here to not trigger milestone dropdown.
+      e.stopPropagation();
 
-//             = icon('spinner spin', class: 'hidden block-loading', 'aria-hidden': 'true')
-//             - if can_edit_issuable
-//               = link_to _('Edit'), '#', class: 'js-sidebar-dropdown-toggle edit-link float-right', 
-//           .value.hide-collapsed
-//             - if milestone.present?
-//               = link_to milestone[:title], milestone[:web_url], class: "bold has-tooltip", title: sidebar_milestone_remaining_days(milestone), data: { container: "body", html: 'true', boundary: 'viewport', qa_selector: 'milestone_link', qa_title: milestone[:title] }
+      this.editing = !this.editing;
+    },
+    search: debounce(function(e) {
+      this.searchTerm = e;
 
-//           .selectbox.hide-collapsed
-//             = f.hidden_field 'milestone_id', value: milestone[:id], id: nil
-//             = dropdown_tag('Milestone', options: { title: _('Assign milestone'), toggle_class: 'js-milestone-select js-extra-options', filter: true, dropdown_class: 'dropdown-menu-selectable', placeholder: _('Search milestones'), data: { show_no: true, field_name: "#{issuable_type}[milestone_id]", project_id: issuable_sidebar[:project_id], issuable_id: issuable_sidebar[:id], milestones: issuable_sidebar[:project_milestones_path], ability_name: issuable_type, issue_update: issuable_sidebar[:issuable_json_path], use_id: true, default_no: true, selected: milestone[:title], null_default: true, display: 'static' }})
+      this.$apollo.queries.iterations.refetch({
+        title: `"${e}"`,
+        fullPath: this.groupPath,
+      });
+    }, 250),
+    setIteration(iterationId) {
+      this.editing = false;
+
+      this.$apollo
+        .mutate({
+          mutation: setIssueIterationMutation,
+          variables: {
+            projectPath: this.projectPath,
+            iterationId,
+            iid: this.issueIid,
+          },
+        })
+        .then(({ data }) => {
+          const { sprint } = data.issueSetIteration.issue;
+
+          if (sprint === null) {
+            this.currentSprint = null;
+          } else {
+            this.currentSprint = sprint.id;
+          }
+        })
+        .catch(() => {
+          createFlash(__('Failed to set iteration on this issue. Please try again.'));
+        });
+    },
+    handleOffClick(event) {
+      if (!this.editing) return;
+
+      if (!this.$refs.dropdown.$el.contains(event.target)) {
+        this.toggleDropdown(event);
+      }
+    },
+    isIterationChecked(iterationId = null) {
+      return iterationId === this.currentSprint;
+    },
+  },
+};
 </script>
 
 <template>
   <div class="mt-3">
-    <div class="sidebar-collapsed-icon" b-gl-tooltip=""></div>
+    <div class="sidebar-collapsed-icon" b-gl-tooltip>
+      <icon :size="16" :aria-label="__('Iteration')" name="history" />
+      <span class="bold collapse-truncated-title">{{ selectedSprint }}</span>
+    </div>
     <div class="title hide-collapsed">
       {{ __('Iteration') }}
-      <gl-button v-if="canEdit" class="js-sidebar-dropdown-toggle edit-link float-right"
-        data-track-label="right_sidebar" data-track-property="iteration" data-track-event="click_edit_button"
+      <gl-button
+        v-if="canEdit"
+        class="js-sidebar-dropdown-toggle edit-link float-right"
+        data-track-label="right_sidebar"
+        data-track-property="iteration"
+        data-track-event="click_edit_button"
+        @click="toggleDropdown"
       >{{ __('Edit') }}</gl-button>
     </div>
     <div class="value hide-collapsed">
-      <gl-link v-if="iterationSelected" href="">Second Iteration</gl-link>
-      <span v-else class="no-value">{{ __('None') }}</span>
+      <gl-link v-if="!editing" class="bold" href>{{ selectedSprint }}</gl-link>
+      <span v-if="!editing && !currentSprint" class="no-value">{{ __('None') }}</span>
     </div>
+    <gl-new-dropdown
+      v-show="editing"
+      ref="dropdown"
+      data-toggle="dropdown"
+      :text="selectedSprint"
+      class="dropdown w-100"
+      :class="editing && 'show'"
+    >
+      <gl-new-dropdown-header>{{ __('Assign Iteration') }}</gl-new-dropdown-header>
+      <gl-new-dropdown-divider />
+      <gl-search-box-by-type :value="searchTerm" @input="search" />
+      <gl-new-dropdown-item
+        :is-checked="isIterationChecked()"
+        :active="true"
+        :is-check-item="true"
+        @click="setIteration(null)"
+      >{{ __('None') }}</gl-new-dropdown-item>
+      <gl-new-dropdown-item
+        v-for="iterationItem in iterations"
+        :key="iterationItem.id"
+        :is-check-item="true"
+        :is-checked="isIterationChecked(iterationItem.id)"
+        @click="setIteration(iterationItem.id)"
+      >{{ iterationItem.title }}</gl-new-dropdown-item>
+    </gl-new-dropdown>
   </div>
 </template>
-
