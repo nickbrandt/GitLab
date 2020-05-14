@@ -4,6 +4,8 @@ require 'spec_helper'
 
 describe 'profiles/show' do
   context 'gitlab.com organization field' do
+    let(:user) { create(:user) }
+
     before do
       assign(:user, user)
       allow(controller).to receive(:current_user).and_return(user)
@@ -12,8 +14,8 @@ describe 'profiles/show' do
     end
 
     context 'when `:gitlab_employee_badge` feature flag is enabled' do
-      context 'and when user has an `@gitlab.com` email address' do
-        let(:user) { create(:user, email: 'test@gitlab.com') }
+      context 'and when user is a gitlab team member' do
+        include_context 'gitlab team member'
 
         it 'displays the organization field as `readonly` with a `value` of `GitLab`' do
           render
@@ -22,9 +24,7 @@ describe 'profiles/show' do
         end
       end
 
-      context 'and when a user does not have an `@gitlab.com` email' do
-        let(:user) { create(:user, email: 'test@example.com') }
-
+      context 'and when a user is not a gitlab team member' do
         it 'displays an editable organization field' do
           render
 
@@ -38,8 +38,8 @@ describe 'profiles/show' do
         stub_feature_flags(gitlab_employee_badge: false)
       end
 
-      context 'and when a user has an `@gitlab.com` email' do
-        let(:user) { create(:user, email: 'test@gitlab.com') }
+      context 'and when a user is a gitlab team member' do
+        include_context 'gitlab team member'
 
         it 'displays an editable organization field' do
           render
