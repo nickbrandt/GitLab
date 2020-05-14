@@ -119,9 +119,11 @@ export default {
           v-for="issue in data"
           :key="issue.iid"
           data-testid="issue-row"
-          class="coming-soon-table gl-responsive-table-row"
+          class="gl-responsive-table-row"
         >
-          <div class="table-section section-100 gl-flex-column align-items-md-center gl-flex-wrap">
+          <div
+            class="table-section section-100 align-items-md-center gl-flex-wrap gl-white-space-normal"
+          >
             <gl-link
               data-testid="issue-title-link"
               :href="issue.webUrl"
