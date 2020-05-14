@@ -18,6 +18,7 @@ import TimeMetricsCard from './time_metrics_card.vue';
 import StageTableNav from './stage_table_nav.vue';
 import CustomStageForm from './custom_stage_form.vue';
 import PathNavigation from './path_navigation.vue';
+import MetricCard from '../../shared/components/metric_card.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -35,6 +36,7 @@ export default {
     CustomStageForm,
     StageTableNav,
     PathNavigation,
+    MetricCard,
   },
   mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
   props: {
@@ -267,12 +269,15 @@ export default {
         "
       />
       <div v-else-if="!errorCode">
-        <div class="js-recent-activity mt-3 gl-display-flex">
+        <div class="js-recent-activity gl-mt-3 gl-display-flex">
           <div class="gl-flex-fill-1 gl-pr-2">
             <time-metrics-card
+              #default="{ metrics, loading }"
               :group-path="currentGroupPath"
               :additional-params="cycleAnalyticsRequestParams"
-            />
+            >
+              <metric-card :title="__('Time')" :metrics="metrics" :is-loading="loading" />
+            </time-metrics-card>
           </div>
           <div class="gl-flex-fill-1 gl-pl-2">
             <recent-activity-card

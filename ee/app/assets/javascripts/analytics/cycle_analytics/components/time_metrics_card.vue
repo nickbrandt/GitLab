@@ -19,7 +19,7 @@ export default {
     additionalParams: {
       type: Object,
       required: false,
-      default: null,
+      default: () => ({}),
     },
   },
   data() {
@@ -40,13 +40,10 @@ export default {
     fetchData() {
       removeFlash();
       this.loading = true;
-      return Api.cycleAnalyticsTimeSummaryData(
-        this.groupPath,
-        this.additionalParams ? this.additionalParams : {},
-      )
+      return Api.cycleAnalyticsTimeSummaryData(this.groupPath, this.additionalParams)
         .then(({ data }) => {
-          this.data = data.map(({ title: label, value }) => ({
-            value: value || '-',
+          this.data = data.map(({ title: label, ...rest }) => ({
+            ...rest,
             label,
             key: slugify(label),
           }));

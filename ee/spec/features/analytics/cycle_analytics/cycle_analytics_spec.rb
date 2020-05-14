@@ -289,14 +289,14 @@ describe 'Group Value Stream Analytics', :js do
     it 'displays the lead time' do
       lead_time = page.all(card_metric_selector).first
 
-      expect(lead_time).to have_content(n_('Lead time', 'Lead time', 10))
-      expect(lead_time).to have_content('10')
+      expect(lead_time).to have_content(_('Lead Time'))
+      expect(lead_time).to have_content('-')
     end
 
     it 'displays the cycle time' do
       cycle_time = page.all(card_metric_selector)[1]
 
-      expect(cycle_time).to have_content(n_('Cycle time', 'Cycle time', 0))
+      expect(cycle_time).to have_content(_('Cycle Time'))
       expect(cycle_time).to have_content('-')
     end
   end
