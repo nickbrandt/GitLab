@@ -1,12 +1,44 @@
 # GitLab Go Proxy **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/27376) in [GitLab
-> Premium](https://about.gitlab.com/pricing/) 13.0.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/27376) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.1.
+> - It's deployed behind a feature flag, disabled by default.
+> - It's disabled on GitLab.com.
+> - It's not recommended for production use.
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-the-go-proxy). **(PREMIUM)**
 
 With the Go proxy for GitLab, every project in GitLab can be fetched with the
 [Go proxy protocol](https://proxy.golang.org/).
 
 ## Prerequisites
+
+### Enable the Go proxy
+
+The Go proxy for GitLab is under development and not ready for production use, due to
+[potential performance issues with large repositories](https://gitlab.com/gitlab-org/gitlab/-/issues/218083).
+
+It is deployed behind a feature flag that is **disabled by default**.
+
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can enable it for your instance.
+
+To enable it:
+
+```ruby
+Feature.enable(:go_proxy) # or
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:go_proxy)
+```
+
+To enable or disable it for specific projects:
+
+```ruby
+Feature.enable(:go_proxy, Project.find(1))
+Feature.disable(:go_proxy, Project.find(2))
+```
 
 ### Enable the Package Registry
 
@@ -14,23 +46,24 @@ The Package Registry is enabled for new projects by default. If you cannot find
 the **{package}** **Packages > List** entry under your project's sidebar, verify
 the following:
 
-1. Your GitLab administrator has [enabled support for the Package
-   Registry](../../../administration/packages/index.md). **(PREMIUM ONLY)**
+1. Your GitLab administrator has
+   [enabled support for the Package Registry](../../../administration/packages/index.md). **(PREMIUM ONLY)**
 1. The Package Registry is [enabled for your project](../index.md).
 
 NOTE: **Note:**
-GitLab does not display Go modules in the **Packages** section of a project.
-Only the Go proxy protocol is supported at this time, and only for modules on
-GitLab.
+GitLab does not currently display Go modules in the **Packages Registry** of a project.
+Follow [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/213770) for details.
 
 ### Fetch modules from private projects
 
 NOTE: **Note:**
 `go` does not support transmitting credentials over insecure connections. The
-steps below will only work if GitLab is configured for HTTPS.
+steps below work only if GitLab is configured for HTTPS.
 
-  1. Configure Go to include HTTP basic authentication credentials when fetching from the Go proxy for GitLab.
-  2. Configure Go to *not* attempt to download checksums for private GitLab projects from the public checksum database.
+1. Configure Go to include HTTP basic authentication credentials when fetching
+   from the Go proxy for GitLab.
+1. Configure Go to skip downloading of checksums for private GitLab projects
+   from the public checksum database.
 
 #### Enable Request Authentication
 
@@ -46,21 +79,21 @@ machine <url> login <username> password <token>
 `<username>` and `<token>` should be your username and the personal access
 token, respectively.
 
-#### Disable Checksum Database
+#### Disable checksum database queries
 
-By default, Go will query `sum.golang.org` for module checksums. This will not
-work modules that are not public. `GONOSUMDB` can be used to disable downloading
-checksums for specific URLs. This can be permanently set with `go env -w
-GONOSUMDB=<scope>`.
+Go can be configured to query a checksum database for module checksums. Go 1.13
+and later query `sum.golang.org` by default. This fails for modules that are not
+public and thus not accessible to `sum.golang.org`. To resolve this issue, set
+`GONOSUMDB` to a comma-separated list of projects or namespaces for which Go
+should not query the checksum database. For example, `go env -w
+GONOSUMDB=gitlab.com/my/project` persistently configures Go to skip checksum
+queries for the project `gitlab.com/my/project`.
 
-- `GONOSUMDB=gitlab.com/my/project` will disable checksum downloads for
-  `gitlab.com/my/project`
-- `GONOSUMDB=gitlab.com/namespace` will disable checksum downloads for all
-  projects under `gitlab.com/namespace`
-- `GONOSUMDB=gitlab.com` will disable checksum downloads for *all* modules on
-  GitLab.com
-- `GOSUMDB=off` or `GONOSUMDB=*` will *completely* disable the checksum database
-  for all modules and packages.
+Checksum database queries can be disabled for arbitrary prefixes or disabled
+entirely. However, checksum database queries are a security mechanism and as
+such they should be disabled selectively and only when necessary. `GOSUMDB=off`
+or `GONOSUMDB=*` disables checksum queries entirely. `GONOSUMDB=gitlab.com`
+disables checksum queries for all projects hosted on GitLab.com.
 
 ## Add GitLab as a Go proxy
 
@@ -74,7 +107,7 @@ The available proxy endpoints are:
 Go's use of proxies is configured with the `GOPROXY` environment variable, as a
 comma separated list of URLs. Go 1.14 adds support for comma separated list of
 URLs. Go 1.14 adds support for using `go env -w` to manage Go's environment
-variables. For example, `go env -w GOPROXY=...` writes to to `$GOPATH/env`
+variables. For example, `go env -w GOPROXY=...` writes to `$GOPATH/env`
 (which defaults to `~/.go/env`). `GOPROXY` can also be configured as a normal
 environment variable, with RC files or `export GOPROXY=...`.
 
