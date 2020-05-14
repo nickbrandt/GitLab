@@ -115,6 +115,7 @@ class License < ApplicationRecord
     dast
     dependency_scanning
     enterprise_templates
+    group_ip_restriction
     group_level_compliance_dashboard
     incident_management
     insights
@@ -123,6 +124,7 @@ class License < ApplicationRecord
     personal_access_token_expiration_policy
     prometheus_alerts
     pseudonymizer
+    release_evidence_test_artifacts
     report_approver_rules
     requirements
     sast
