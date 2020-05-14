@@ -14,12 +14,10 @@ module StatusPage
       response = publish_json(issue, user_notes)
       return response if response.error?
 
-      publish_images(issue, user_notes)
+      publish_attachments(issue, user_notes)
 
       success
     end
-
-    # Publish Json
 
     def publish_json(issue, user_notes)
       json = serialize(issue, user_notes)
@@ -40,43 +38,8 @@ module StatusPage
       StatusPage::Storage.details_path(id)
     end
 
-    def publish_images(issue, user_notes)
-      existing_image_keys = storage_client.list_object_keys(StatusPage::Storage.uploads_path(issue.iid))
-      total_uploads = existing_image_keys.size
-
-      # Send all description file attachments to s3
-      publish_markdown_uploads(
-        markdown_field: issue.description,
-        issue_iid: issue.iid,
-        existing_image_keys: existing_image_keys,
-        total_uploads: total_uploads
-      )
-
-      # Send all comment file attachments to s3
-      user_notes.each do |user_note|
-        publish_markdown_uploads(
-          markdown_field: user_note.note,
-          issue_iid: issue.iid,
-          existing_image_keys: existing_image_keys,
-          total_uploads: total_uploads
-        )
-      end
-    end
-
-    def publish_markdown_uploads(markdown_field:, issue_iid:, existing_image_keys:, total_uploads:)
-      markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |secret, file_name|
-        break if total_uploads >= StatusPage::Storage::MAX_IMAGE_UPLOADS
-
-        key = StatusPage::Storage.upload_path(issue_iid, secret, file_name)
-
-        next if existing_image_keys.include? key
-
-        uploader = UploaderFinder.new(@project, secret, file_name).execute
-        uploader.open do |open_file|
-          storage_client.multipart_upload(key, open_file)
-          total_uploads += 1
-        end
-      end
+    def publish_attachments(issue, user_notes)
+      StatusPage::PublishAttachmentsService.new(project: @project).execute(issue, user_notes)
     end
   end
 end

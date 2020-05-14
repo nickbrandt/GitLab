@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module StatusPage
+  # Publishes Attachments from incident comments and descriptions to s3
+  # Should only be called from publish details
   class PublishAttachmentsService < PublishBaseService
     private
 
@@ -44,7 +46,7 @@ module StatusPage
 
     def publish_markdown_uploads(markdown_field:, issue_iid:, total_uploads:)
       markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |secret, file_name|
-        break if total_uploads >= StatusPage::Storage::MAX_IMAGE_UPLOADS
+        break if total_uploads >= StatusPage::Storage::MAX_UPLOADS
 
         key = StatusPage::Storage.upload_path(issue_iid, secret, file_name)
 

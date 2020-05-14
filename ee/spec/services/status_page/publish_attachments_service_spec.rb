@@ -86,7 +86,7 @@ describe StatusPage::PublishAttachmentsService do
 
         context 'when exceeds upload limit' do
           before do
-            stub_const("StatusPage::Storage::MAX_IMAGE_UPLOADS", 1)
+            stub_const("StatusPage::Storage::MAX_UPLOADS", 1)
             allow(storage_client).to receive(:list_object_keys).and_return(Set[status_page_upload_path])
           end
 

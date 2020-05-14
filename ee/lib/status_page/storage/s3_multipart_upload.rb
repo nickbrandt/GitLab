@@ -24,14 +24,14 @@ module StatusPage
         # However Gitlab::HttpIO used when object storage is enabled
         # cannot be used with upload_file
         wrap_errors(key: key) do
-          upload_id = create.to_h[:upload_id]
+          upload_id = create_upload.to_h[:upload_id]
           begin
             parts = upload_part(upload_id)
-            complete(upload_id, parts)
+            complete_upload(upload_id, parts)
             # Rescue on Exception since even on keyboard inturrupt we want to abort the upload and re-raise
             # abort clears the already uploaded parts so that they do not cost the bucket owner
           rescue Exception => e # rubocop:disable Lint/RescueException
-            abort(upload_id)
+            abort_upload(upload_id)
             raise e
           end
         end
@@ -41,7 +41,7 @@ module StatusPage
 
       attr_reader :key, :file, :client, :bucket_name
 
-      def create
+      def create_upload
         client.create_multipart_upload({ bucket: bucket_name, key: key })
       end
 
@@ -66,7 +66,7 @@ module StatusPage
         parts
       end
 
-      def complete(upload_id, parts)
+      def complete_upload(upload_id, parts)
         client.complete_multipart_upload({
           bucket: bucket_name,
           key: key,
@@ -77,7 +77,7 @@ module StatusPage
         })
       end
 
-      def abort(upload_id)
+      def abort_upload(upload_id)
         client.abort_multipart_upload(
           bucket: bucket_name,
           key: key,

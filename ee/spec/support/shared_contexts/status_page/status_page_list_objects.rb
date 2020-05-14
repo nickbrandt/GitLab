@@ -22,7 +22,7 @@ RSpec.shared_context 'oversized list_objects_v2 result' do
   before do
     stub_const("StatusPage::Storage::MAX_KEYS_PER_PAGE", 2)
     stub_const("StatusPage::Storage::MAX_PAGES", 1)
-    stub_const("StatusPage::Storage::MAX_IMAGE_UPLOADS", StatusPage::Storage::MAX_PAGES * StatusPage::Storage::MAX_KEYS_PER_PAGE)
+    stub_const("StatusPage::Storage::MAX_UPLOADS", StatusPage::Storage::MAX_PAGES * StatusPage::Storage::MAX_KEYS_PER_PAGE)
     # AWS s3 client responses for list_objects is paginated
     # stub_responses allows multiple responses as arguments and they will be returned in sequence
     stub_responses(
