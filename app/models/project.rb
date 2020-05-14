@@ -842,7 +842,7 @@ class Project < ApplicationRecord
     latest_pipeline = ci_pipelines.latest_successful_for_ref(ref)
     return unless latest_pipeline
 
-    latest_pipeline.builds.latest.with_artifacts_archive.find_by(name: job_name)
+    latest_pipeline.builds.latest.with_downloadable_artifacts.find_by(name: job_name)
   end
 
   def latest_successful_build_for_sha(job_name, sha)
@@ -851,7 +851,7 @@ class Project < ApplicationRecord
     latest_pipeline = ci_pipelines.latest_successful_for_sha(sha)
     return unless latest_pipeline
 
-    latest_pipeline.builds.latest.with_artifacts_archive.find_by(name: job_name)
+    latest_pipeline.builds.latest.with_downloadable_artifacts.find_by(name: job_name)
   end
 
   def latest_successful_build_for_ref!(job_name, ref = default_branch)
