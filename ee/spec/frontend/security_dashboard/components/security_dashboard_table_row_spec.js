@@ -77,6 +77,14 @@ describe('Security Dashboard Table Row', () => {
       ).toContain(wrapper.props().vulnerability.severity);
     });
 
+    it('should render the scanner name', () => {
+      expect(
+        findContent(2)
+          .text()
+          .toLowerCase(),
+      ).toContain(wrapper.props().vulnerability.scanner.name.toLowerCase());
+    });
+
     describe('the project name', () => {
       it('should render the name', () => {
         expect(findContent(1).text()).toContain(wrapper.props().vulnerability.name);
