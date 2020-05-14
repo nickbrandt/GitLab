@@ -7995,6 +7995,15 @@ ALTER TABLE ONLY public.chat_names
 ALTER TABLE ONLY public.chat_teams
     ADD CONSTRAINT chat_teams_pkey PRIMARY KEY (id);
 
+ALTER TABLE public.ci_job_artifacts
+    ADD CONSTRAINT check_27f0f6dbab CHECK ((file_store IS NOT NULL)) NOT VALID;
+
+ALTER TABLE public.uploads
+    ADD CONSTRAINT check_5e9547379c CHECK ((store IS NOT NULL)) NOT VALID;
+
+ALTER TABLE public.lfs_objects
+    ADD CONSTRAINT check_eecfc5717d CHECK ((file_store IS NOT NULL)) NOT VALID;
+
 ALTER TABLE ONLY public.ci_build_needs
     ADD CONSTRAINT ci_build_needs_pkey PRIMARY KEY (id);
 
@@ -13795,5 +13804,11 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200511162057
 20200511162115
 20200512085150
+20200513234502
+20200513235347
+20200513235532
+20200514000009
+20200514000132
+20200514000340
 \.
 
