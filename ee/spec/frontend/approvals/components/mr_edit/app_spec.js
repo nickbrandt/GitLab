@@ -1,5 +1,7 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import { createStoreOptions } from 'ee/approvals/stores';
 import MREditModule from 'ee/approvals/stores/modules/mr_edit';
 import MREditApp from 'ee/approvals/components/mr_edit/app.vue';
@@ -12,21 +14,26 @@ localVue.use(Vuex);
 describe('EE Approvals MREditApp', () => {
   let wrapper;
   let store;
+  let axiosMock;
 
   const factory = () => {
-    wrapper = mount(localVue.extend(MREditApp), {
+    wrapper = mount(MREditApp, {
       localVue,
       store: new Vuex.Store(store),
     });
   };
 
   beforeEach(() => {
+    axiosMock = new MockAdapter(axios);
+    axiosMock.onGet('*');
+
     store = createStoreOptions(MREditModule());
     store.modules.approvals.state.hasLoaded = true;
   });
 
   afterEach(() => {
     wrapper.destroy();
+    axiosMock.restore();
   });
 
   describe('with empty rules', () => {
@@ -36,11 +43,11 @@ describe('EE Approvals MREditApp', () => {
     });
 
     it('does not render MR rules', () => {
-      expect(wrapper.find(MRRules).exists()).toBe(true);
+      expect(wrapper.find(MRRules).findAll('.js-name')).toHaveLength(0);
     });
 
     it('renders hidden inputs', () => {
-      expect(wrapper.find(MRRulesHiddenInputs).exists()).toBe(true);
+      expect(wrapper.find('.js-approval-rules').contains(MRRulesHiddenInputs)).toBe(true);
     });
   });
 
@@ -51,11 +58,11 @@ describe('EE Approvals MREditApp', () => {
     });
 
     it('renders MR rules', () => {
-      expect(wrapper.find(MRRules).exists()).toBe(true);
+      expect(wrapper.find(MRRules).findAll('.js-name')).toHaveLength(1);
     });
 
     it('renders hidden inputs', () => {
-      expect(wrapper.find(MRRulesHiddenInputs).exists()).toBe(true);
+      expect(wrapper.find('.js-approval-rules').contains(MRRulesHiddenInputs)).toBe(true);
     });
   });
 });
