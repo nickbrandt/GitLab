@@ -24,7 +24,7 @@ exports[`publish_method renders 1`] = `
    
   <gl-link-stub
     class="mr-1"
-    href="commit-link"
+    href="../commit/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
   >
     xxxxxxxx
   </gl-link-stub>

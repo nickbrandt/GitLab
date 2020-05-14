@@ -4,10 +4,9 @@ import PublishMethod from './publish_method.vue';
 import { GlButton, GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab/ui';
 import { getPackageTypeLabel } from '../../shared/utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
-import { mapState } from 'vuex';
 
 export default {
-  name: 'PackagesListRow',
+  name: 'PackageListRow',
   components: {
     GlButton,
     GlIcon,
@@ -25,11 +24,27 @@ export default {
       type: Object,
       required: true,
     },
+    packageLink: {
+      type: String,
+      required: true,
+    },
+    disableDelete: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    isGroup: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    showPackageType: {
+      type: Boolean,
+      default: true,
+      required: false,
+    },
   },
   computed: {
-    ...mapState({
-      isGroupPage: state => state.config.isGroupPage,
-    }),
     packageType() {
       return getPackageTypeLabel(this.packageEntity.package_type);
     },
@@ -40,7 +55,7 @@ export default {
       return Boolean(this.packageEntity.project_path);
     },
     deleteAvailable() {
-      return !this.isGroupPage;
+      return !this.disableDelete && !this.isGroup;
     },
   },
 };
@@ -51,7 +66,7 @@ export default {
     <div class="table-section section-50 d-flex flex-md-column justify-content-between flex-wrap">
       <div class="d-flex align-items-center mr-2">
         <gl-link
-          :href="packageEntity._links.web_path"
+          :href="packageLink"
           data-qa-selector="package_link"
           class="text-dark font-weight-bold mb-md-1"
         >
@@ -80,25 +95,25 @@ export default {
           <gl-icon name="review-list" class="text-secondary ml-2 mr-1" />
 
           <gl-link
-            ref="packages-row-project"
+            data-testid="packages-row-project"
             :href="`/${packageEntity.project_path}`"
             class="text-secondary"
             >{{ packageEntity.projectPathName }}</gl-link
           >
         </div>
 
-        <div class="d-flex align-items-center">
+        <div v-if="showPackageType" class="d-flex align-items-center" data-testid="package-type">
           <gl-icon name="package" class="text-secondary ml-2 mr-1" />
-          <span ref="package-type">{{ packageType }}</span>
+          <span>{{ packageType }}</span>
         </div>
       </div>
     </div>
 
     <div
       class="table-section d-flex flex-md-column justify-content-between align-items-md-end"
-      :class="isGroupPage ? 'section-50' : 'section-40'"
+      :class="!deleteAvailable ? 'section-50' : 'section-40'"
     >
-      <publish-method :package-entity="packageEntity" />
+      <publish-method :package-entity="packageEntity" :is-group="isGroup" />
 
       <div class="text-secondary order-0 order-md-1 mt-md-2">
         <gl-sprintf :message="__('Created %{timestamp}')">
@@ -113,7 +128,7 @@ export default {
 
     <div v-if="deleteAvailable" class="table-section section-10 d-flex justify-content-end">
       <gl-button
-        ref="action-delete"
+        data-testid="action-delete"
         icon="remove"
         category="primary"
         variant="danger"

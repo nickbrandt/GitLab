@@ -1,11 +1,7 @@
-import Vuex from 'vuex';
-import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
-import PackagesListRow from 'ee/packages/list/components/packages_list_row.vue';
+import { mount, shallowMount } from '@vue/test-utils';
+import PackagesListRow from 'ee/packages/shared/components/package_list_row.vue';
 import PackageTags from 'ee/packages/shared/components/package_tags.vue';
 import { packageList } from '../../mock_data';
-
-const localVue = createLocalVue();
-localVue.use(Vuex);
 
 describe('packages_list_row', () => {
   let wrapper;
@@ -14,36 +10,27 @@ describe('packages_list_row', () => {
   const [packageWithoutTags, packageWithTags] = packageList;
 
   const findPackageTags = () => wrapper.find(PackageTags);
-  const findProjectLink = () => wrapper.find({ ref: 'packages-row-project' });
-  const findDeleteButton = () => wrapper.find({ ref: 'action-delete' });
+  const findProjectLink = () => wrapper.find('[data-testid="packages-row-project"]');
+  const findDeleteButton = () => wrapper.find('[data-testid="action-delete"]');
+  const findPackageType = () => wrapper.find('[data-testid="package-type"]');
 
-  const mountComponent = (
-    isGroupPage = false,
+  const mountComponent = ({
+    isGroup = false,
     packageEntity = packageWithoutTags,
     shallow = true,
-  ) => {
+    showPackageType = true,
+    disableDelete = false,
+  } = {}) => {
     const mountFunc = shallow ? shallowMount : mount;
 
-    const state = {
-      config: {
-        isGroupPage,
-      },
-    };
-
-    store = new Vuex.Store({
-      state,
-      getters: {
-        getCommitLink: () => () => {
-          return 'commit-link';
-        },
-      },
-    });
-
     wrapper = mountFunc(PackagesListRow, {
-      localVue,
       store,
       propsData: {
+        packageLink: 'foo',
         packageEntity,
+        isGroup,
+        showPackageType,
+        disableDelete,
       },
     });
   };
@@ -60,7 +47,7 @@ describe('packages_list_row', () => {
 
   describe('tags', () => {
     it('renders package tags when a package has tags', () => {
-      mountComponent(false, packageWithTags);
+      mountComponent({ isGroup: false, packageEntity: packageWithTags });
 
       expect(findPackageTags().exists()).toBe(true);
     });
@@ -72,9 +59,9 @@ describe('packages_list_row', () => {
     });
   });
 
-  describe('when is isGroupPage', () => {
+  describe('when is is group', () => {
     beforeEach(() => {
-      mountComponent(true);
+      mountComponent({ isGroup: true });
     });
 
     it('has project field', () => {
@@ -86,8 +73,32 @@ describe('packages_list_row', () => {
     });
   });
 
+  describe('showPackageType', () => {
+    it('shows the type when set', () => {
+      mountComponent();
+
+      expect(findPackageType().exists()).toBe(true);
+    });
+
+    it('does not show the type when not set', () => {
+      mountComponent({ showPackageType: false });
+
+      expect(findPackageType().exists()).toBe(false);
+    });
+  });
+
+  describe('deleteAvailable', () => {
+    it('does not show when not set', () => {
+      mountComponent({ disableDelete: true });
+
+      expect(findDeleteButton().exists()).toBe(false);
+    });
+  });
+
   describe('delete event', () => {
-    beforeEach(() => mountComponent(false, packageWithoutTags, false));
+    beforeEach(() =>
+      mountComponent({ isGroup: false, packageEntity: packageWithoutTags, shallow: false }),
+    );
 
     it('emits the packageToDelete event when the delete button is clicked', () => {
       findDeleteButton().trigger('click');

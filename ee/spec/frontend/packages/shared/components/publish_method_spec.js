@@ -1,14 +1,9 @@
-import Vuex from 'vuex';
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import PublishMethod from 'ee/packages/list/components/publish_method.vue';
+import { shallowMount } from '@vue/test-utils';
+import PublishMethod from 'ee/packages/shared/components/publish_method.vue';
 import { packageList } from '../../mock_data';
-
-const localVue = createLocalVue();
-localVue.use(Vuex);
 
 describe('publish_method', () => {
   let wrapper;
-  let store;
 
   const [packageWithoutPipeline, packageWithPipeline] = packageList;
 
@@ -16,20 +11,11 @@ describe('publish_method', () => {
   const findPipelineSha = () => wrapper.find({ ref: 'pipeline-sha' });
   const findManualPublish = () => wrapper.find({ ref: 'manual-ref' });
 
-  const mountComponent = packageEntity => {
-    store = new Vuex.Store({
-      getters: {
-        getCommitLink: () => () => {
-          return 'commit-link';
-        },
-      },
-    });
-
+  const mountComponent = (packageEntity = {}, isGroup = false) => {
     wrapper = shallowMount(PublishMethod, {
-      localVue,
-      store,
       propsData: {
         packageEntity,
+        isGroup,
       },
     });
   };
