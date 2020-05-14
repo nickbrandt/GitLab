@@ -331,7 +331,7 @@ The following tables outline the details of expected properties.
 | -------- | ---- | -------- | ----------- |
 | `variables` | Hash | no | Variables can be defined here. |
 
-Read the documentation on [templating](../monitoring_dashboards/templating.md).
+Read the documentation on [templating](../metrics/dashboard/templating.md).
 
 ##### **Panel group (`panel_groups`) properties**
 
