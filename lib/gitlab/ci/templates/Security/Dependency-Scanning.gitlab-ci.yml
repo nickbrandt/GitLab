@@ -106,7 +106,6 @@ gemnasium-dependency_scanning:
           $DS_DEFAULT_ANALYZERS =~ /gemnasium([^-]|$)/
       exists:
         - 'Gemfile.lock'
-        - 'Pipfile.lock'
         - 'composer.lock'
         - 'gems.locked'
         - 'go.sum'

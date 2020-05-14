@@ -70,7 +70,6 @@ describe 'Dependency-Scanning.gitlab-ci.yml' do
             'Python requirements.txt'        | { 'requirements.txt' => '' }              | %w(gemnasium-python-dependency_scanning)
             'Python requirements.pip'        | { 'requirements.pip' => '' }              | %w(gemnasium-python-dependency_scanning)
             'Python Pipfile'                 | { 'Pipfile' => '' }                       | %w(gemnasium-python-dependency_scanning)
-            'Python Pipfile.lock'            | { 'Pipfile.lock' => '' }                  | %w(gemnasium-dependency_scanning)
             'Python requires.txt'            | { 'requires.txt' => '' }                  | %w(gemnasium-python-dependency_scanning)
             'Python with setup.py'           | { 'setup.py' => '' }                      | %w(gemnasium-python-dependency_scanning)
             'Ruby Gemfile.lock'              | { 'Gemfile.lock' => '' }                  | %w(bundler-audit-dependency_scanning gemnasium-dependency_scanning)
