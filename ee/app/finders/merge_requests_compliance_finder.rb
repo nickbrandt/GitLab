@@ -14,7 +14,7 @@ class MergeRequestsComplianceFinder < MergeRequestsFinder
     lateral = Event
       .select(:created_at, :target_id)
       .where('projects.id = project_id')
-      .merged
+      .merged_action
       .recent
       .limit(1)
       .to_sql

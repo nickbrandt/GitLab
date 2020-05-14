@@ -23,7 +23,7 @@ describe Groups::ContributionAnalyticsController do
   end
 
   def create_push_event(author, project)
-    event = create_event(author, project, nil, Event::PUSHED)
+    event = create_event(author, project, nil, :pushed)
     PushEventPayloadService.new(event, push_data).execute
   end
 
@@ -124,10 +124,10 @@ describe Groups::ContributionAnalyticsController do
     before do
       sign_in(user)
 
-      create_event(user, project, issue, Event::CLOSED)
-      create_event(user2, project, issue, Event::CLOSED)
-      create_event(user2, project, merge_request, Event::CREATED)
-      create_event(user3, project, merge_request, Event::CREATED)
+      create_event(user, project, issue, :closed)
+      create_event(user2, project, issue, :closed)
+      create_event(user2, project, merge_request, :created)
+      create_event(user3, project, merge_request, :created)
       create_push_event(user, project)
       create_push_event(user3, project)
     end
@@ -168,7 +168,7 @@ describe Groups::ContributionAnalyticsController do
       subgroup = create(:group, parent: group)
       subproject = create(:project, :repository, group: subgroup)
 
-      create_event(user, subproject, issue, Event::CLOSED)
+      create_event(user, subproject, issue, :closed)
       create_push_event(user, subproject)
 
       get :show, params: { group_id: group.path }, format: :json
@@ -184,7 +184,7 @@ describe Groups::ContributionAnalyticsController do
 
       empty_group.add_reporter(user)
 
-      create_event(user, other_project, issue, Event::CLOSED)
+      create_event(user, other_project, issue, :closed)
       create_push_event(user, other_project)
 
       get :show, params: { group_id: empty_group.path }, format: :json
