@@ -46,7 +46,6 @@ class LabelsFinder < UnionFinder
       end
     else
       if group?
-        group = params[:group] || Group.find(params[:group_id])
         label_ids << Label.where(group_id: group_ids_for(group))
       end
 
@@ -126,6 +125,10 @@ class LabelsFinder < UnionFinder
     params[:group].present? || params[:group_id].present?
   end
 
+  def group
+    strong_memoize(:group) { params[:group].presence || Group.find(params[:group_id]) }
+  end
+
   def project?
     params[:project].present? || params[:project_id].present?
   end
@@ -169,7 +172,7 @@ class LabelsFinder < UnionFinder
                   ProjectsFinder.new(params: { non_archived: true }, current_user: current_user).execute # rubocop: disable CodeReuse/Finder
                 end
 
-    @projects = @projects.in_namespace(params[:group_id]) if group?
+    @projects = @projects.in_namespace(group.id) if group?
     @projects = @projects.where(id: params[:project_ids]) if projects?
     @projects = @projects.reorder(nil)
 
