@@ -1,11 +1,10 @@
 import dateFormat from 'dateformat';
 
-export default class BurndownChartData {
-  constructor(burndownEvents, startDate, dueDate) {
+export default class BurnChartData {
+  constructor(events, startDate, dueDate) {
     this.dateFormatMask = 'yyyy-mm-dd';
     this.startDate = startDate;
     this.dueDate = dueDate;
-    this.burndownEvents = this.processRawEvents(burndownEvents);
 
     // determine when to stop burndown chart
     const today = dateFormat(Date.now(), this.dateFormatMask);
@@ -15,11 +14,63 @@ export default class BurndownChartData {
     // and dateFormat() both convert the date at midnight UTC to the browser's
     // timezone, leading to incorrect chart start and end points. Using
     // new Date('YYYY-MM-DDTHH:MM:SS') gets the user's local date at midnight.
+
     this.localStartDate = new Date(`${this.startDate}T00:00:00`);
     this.localEndDate = new Date(`${this.endDate}T00:00:00`);
+
+    this.events = this.processRawEvents(events);
   }
 
-  generate() {
+  generateBurnupTimeseries({ milestoneId } = {}) {
+    const chartData = [];
+
+    let openIssuesCount = 0;
+    let carriedIssuesCount = 0;
+
+    for (
+      let date = this.localStartDate;
+      date <= this.localEndDate;
+      date.setDate(date.getDate() + 1)
+    ) {
+      const dateString = dateFormat(date, this.dateFormatMask);
+
+      const openedIssuesToday = this.filterAndSummarizeBurndownEvents(
+        event =>
+          event.created_at === dateString &&
+          event.event_type === 'milestone' &&
+          event.milestone_id === milestoneId &&
+          event.action === 'add',
+      );
+
+      const closedIssuesToday = this.filterAndSummarizeBurndownEvents(
+        event =>
+          event.created_at === dateString &&
+          event.event_type === 'milestone' &&
+          ((event.action === 'remove' && event.milestone_id === milestoneId) ||
+            (event.action === 'add' && event.milestone_id !== milestoneId)),
+      );
+
+      openIssuesCount += openedIssuesToday.count - closedIssuesToday.count;
+
+      if (openIssuesCount + carriedIssuesCount < 0) {
+        carriedIssuesCount += openIssuesCount;
+
+        openIssuesCount = 0;
+      } else {
+        openIssuesCount += carriedIssuesCount;
+
+        carriedIssuesCount = 0;
+      }
+
+      chartData.push([dateString, openIssuesCount]);
+    }
+
+    return {
+      burnupScope: chartData,
+    };
+  }
+
+  generateBurndownTimeseries() {
     let openIssuesCount = 0;
     let openIssuesWeight = 0;
 
@@ -87,7 +138,7 @@ export default class BurndownChartData {
   }
 
   filterAndSummarizeBurndownEvents(filter) {
-    const issues = this.burndownEvents.filter(filter);
+    const issues = this.events.filter(filter);
 
     return {
       count: issues.length,
