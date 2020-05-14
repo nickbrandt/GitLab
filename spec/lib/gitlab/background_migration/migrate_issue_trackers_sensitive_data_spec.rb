@@ -6,10 +6,7 @@ describe Gitlab::BackgroundMigration::MigrateIssueTrackersSensitiveData, schema:
 
   before do
     # we need to define the classes due to encryption
-    stub_const('IssueTrackerData', Class.new(ApplicationRecord))
-    stub_const('JiraTrackerData', Class.new(ApplicationRecord))
-
-    IssueTrackerData.class_eval do
+    issue_tracker_data = Class.new(ApplicationRecord) do
       self.table_name = 'issue_tracker_data'
 
       def self.encryption_options
@@ -26,7 +23,7 @@ describe Gitlab::BackgroundMigration::MigrateIssueTrackersSensitiveData, schema:
       attr_encrypted :new_issue_url, encryption_options
     end
 
-    JiraTrackerData.class_eval do
+    jira_tracker_data = Class.new(ApplicationRecord) do
       self.table_name = 'jira_tracker_data'
 
       def self.encryption_options
@@ -43,6 +40,9 @@ describe Gitlab::BackgroundMigration::MigrateIssueTrackersSensitiveData, schema:
       attr_encrypted :username, encryption_options
       attr_encrypted :password, encryption_options
     end
+
+    stub_const('IssueTrackerData', issue_tracker_data)
+    stub_const('JiraTrackerData', jira_tracker_data)
   end
 
   let(:url) { 'http://base-url.tracker.com' }

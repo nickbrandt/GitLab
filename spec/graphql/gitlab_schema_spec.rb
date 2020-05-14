@@ -192,9 +192,7 @@ describe GitlabSchema do
       # We cannot use an anonymous class here as `GlobalID` expects `.name` not
       # to return `nil`
       before do
-        stub_const('TestGlobalId', Class.new)
-
-        TestGlobalId.class_eval do
+        test_global_id = Class.new do
           include GlobalID::Identification
           attr_accessor :id
 
@@ -202,6 +200,8 @@ describe GitlabSchema do
             @id = id
           end
         end
+
+        stub_const('TestGlobalId', test_global_id)
       end
 
       it 'falls back to a regular find' do

@@ -149,19 +149,19 @@ describe VisibilityLevelHelper do
     # This is a subset of all the permutations
     where(:requested_level, :max_allowed, :global_default_level, :restricted_levels, :expected) do
       public_vis = Gitlab::VisibilityLevel::PUBLIC
-      internal = Gitlab::VisibilityLevel::INTERNAL
+      internal_vis = Gitlab::VisibilityLevel::INTERNAL
       private_vis = Gitlab::VisibilityLevel::PRIVATE
 
       public_vis | public_vis | public_vis | [] | public_vis
-      public_vis | public_vis | public_vis | [public_vis] | internal
-      internal | public_vis | public_vis | [] | internal
-      internal | private_vis | private_vis | [] | private_vis
+      public_vis | public_vis | public_vis | [public_vis] | internal_vis
+      internal_vis | public_vis | public_vis | [] | internal_vis
+      internal_vis | private_vis | private_vis | [] | private_vis
       private_vis | public_vis | public_vis | [] | private_vis
-      public_vis | private_vis | internal | [] | private_vis
-      public_vis | internal | public_vis | [] | internal
+      public_vis | private_vis | internal_vis | [] | private_vis
+      public_vis | internal_vis | public_vis | [] | internal_vis
       public_vis | private_vis | public_vis | [] | private_vis
-      public_vis | internal | internal | [] | internal
-      public_vis | public_vis | internal | [] | public_vis
+      public_vis | internal_vis | internal_vis | [] | internal_vis
+      public_vis | public_vis | internal_vis | [] | public_vis
     end
 
     before do
