@@ -10,12 +10,10 @@ jest.mock('~/flash.js');
 jest.mock('ee/api.js');
 
 describe('Actions Package details store', () => {
-  beforeEach(() => {
-    Api.projectPackage = jest.fn().mockResolvedValue({ data: packageEntity });
-  });
-
   describe('fetchPackageVersions', () => {
     it('should fetch the package versions', done => {
+      Api.projectPackage = jest.fn().mockResolvedValue({ data: packageEntity });
+
       testAction(
         actions.fetchPackageVersions,
         undefined,
