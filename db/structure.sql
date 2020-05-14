@@ -6058,7 +6058,8 @@ CREATE TABLE public.services (
     comment_on_event_enabled boolean DEFAULT true NOT NULL,
     template boolean DEFAULT false,
     instance boolean DEFAULT false NOT NULL,
-    comment_detail smallint
+    comment_detail smallint,
+    inherit_from_id bigint
 );
 
 CREATE SEQUENCE public.services_id_seq
@@ -10570,6 +10571,8 @@ CREATE INDEX index_serverless_domain_cluster_on_pages_domain_id ON public.server
 
 CREATE INDEX index_service_desk_enabled_projects_on_id_creator_id_created_at ON public.projects USING btree (id, creator_id, created_at) WHERE (service_desk_enabled = true);
 
+CREATE INDEX index_services_on_inherit_from_id ON public.services USING btree (inherit_from_id);
+
 CREATE INDEX index_services_on_project_id_and_type ON public.services USING btree (project_id, type);
 
 CREATE INDEX index_services_on_template ON public.services USING btree (template);
@@ -11236,6 +11239,9 @@ ALTER TABLE ONLY public.merge_request_diffs
 
 ALTER TABLE ONLY public.ci_pipelines
     ADD CONSTRAINT fk_86635dbd80 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.services
+    ADD CONSTRAINT fk_868a8e7ad6 FOREIGN KEY (inherit_from_id) REFERENCES public.services(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.geo_event_log
     ADD CONSTRAINT fk_86c84214ec FOREIGN KEY (repository_renamed_event_id) REFERENCES public.geo_repository_renamed_events(id) ON DELETE CASCADE;
@@ -13797,6 +13803,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200507221434
 20200508091106
 20200511092714
+20200511115430
+20200511115431
 20200511121549
 20200511121610
 20200511121620
