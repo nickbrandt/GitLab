@@ -27,7 +27,7 @@ and go back to **Files**.
 
 ## How it works
 
-The File Finder feature is powered by the [Fuzzy filter](https://github.com/jeancroy/fuzz-aldrin-plus) library.
+The File finder feature is powered by the [Fuzzy filter](https://github.com/jeancroy/fuzz-aldrin-plus) library.
 
 It implements a fuzzy search with the highlight and tries to provide intuitively
 results by recognizing patterns that people use while searching.
