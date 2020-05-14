@@ -1,7 +1,8 @@
 <script>
 import { GlFormGroup, GlFormInput, GlSprintf } from '@gitlab/ui';
-import { __ } from '~/locale';
-import { isSafeURL } from '~/lib/utils/url_utility';
+import { mapActions, mapState } from 'vuex';
+import { validateName, validateUrl } from '../validations';
+import { VALIDATION_FIELD_KEYS } from '../constants';
 
 export default {
   name: 'GeoNodeFormCore',
@@ -16,29 +17,16 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      fieldBlurs: {
-        name: false,
-        url: false,
-      },
-      errors: {
-        name: __('Name must be between 1 and 255 characters'),
-        url: __('URL must be a valid url (ex: https://gitlab.com)'),
-      },
-    };
-  },
   computed: {
-    validName() {
-      return !(this.fieldBlurs.name && (!this.nodeData.name || this.nodeData.name.length > 255));
-    },
-    validUrl() {
-      return !(this.fieldBlurs.url && !isSafeURL(this.nodeData.url));
-    },
+    ...mapState(['formErrors']),
   },
   methods: {
-    blur(field) {
-      this.fieldBlurs[field] = true;
+    ...mapActions(['setError']),
+    checkName() {
+      this.setError({ key: VALIDATION_FIELD_KEYS.NAME, error: validateName(this.nodeData.name) });
+    },
+    checkUrl() {
+      this.setError({ key: VALIDATION_FIELD_KEYS.URL, error: validateUrl(this.nodeData.url) });
     },
   },
 };
@@ -50,8 +38,8 @@ export default {
       class="col-sm-6"
       :label="__('Name')"
       label-for="node-name-field"
-      :state="validName"
-      :invalid-feedback="errors.name"
+      :state="Boolean(formErrors.name)"
+      :invalid-feedback="formErrors.name"
     >
       <template #description>
         <gl-sprintf
@@ -72,9 +60,10 @@ export default {
       <gl-form-input
         id="node-name-field"
         v-model="nodeData.name"
+        :class="{ 'is-invalid': Boolean(formErrors.name) }"
         data-qa-selector="node_name_field"
         type="text"
-        @blur="blur('name')"
+        @input="checkName"
       />
     </gl-form-group>
     <gl-form-group
@@ -82,15 +71,16 @@ export default {
       :label="__('URL')"
       label-for="node-url-field"
       :description="__('The user-facing URL of the Geo node')"
-      :state="validUrl"
-      :invalid-feedback="errors.url"
+      :state="Boolean(formErrors.url)"
+      :invalid-feedback="formErrors.url"
     >
       <gl-form-input
         id="node-url-field"
         v-model="nodeData.url"
+        :class="{ 'is-invalid': Boolean(formErrors.url) }"
         data-qa-selector="node_url_field"
         type="text"
-        @blur="blur('url')"
+        @input="checkUrl"
       />
     </gl-form-group>
   </section>

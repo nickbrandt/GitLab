@@ -44,6 +44,7 @@ describe('GeoNodeForm Store Actions', () => {
     ${actions.requestSaveGeoNode}           | ${null}                            | ${types.REQUEST_SAVE_GEO_NODE}           | ${{ type: types.REQUEST_SAVE_GEO_NODE }}                                          | ${noCallback}
     ${actions.receiveSaveGeoNodeSuccess}    | ${null}                            | ${types.RECEIVE_SAVE_GEO_NODE_COMPLETE}  | ${{ type: types.RECEIVE_SAVE_GEO_NODE_COMPLETE }}                                 | ${visitUrlCallback}
     ${actions.receiveSaveGeoNodeError}      | ${{ message: MOCK_ERROR_MESSAGE }} | ${types.RECEIVE_SAVE_GEO_NODE_COMPLETE}  | ${{ type: types.RECEIVE_SAVE_GEO_NODE_COMPLETE }}                                 | ${flashCallback}
+    ${actions.setError}                     | ${{ key: 'name', error: 'error' }} | ${types.SET_ERROR}                       | ${{ type: types.SET_ERROR, payload: { key: 'name', error: 'error' } }}            | ${noCallback}
   `(`non-axios calls`, ({ action, data, mutationName, mutationCall, callback }) => {
     describe(action.name, () => {
       it(`should commit mutation ${mutationName}`, () => {
