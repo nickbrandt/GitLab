@@ -28,7 +28,7 @@ module Vulnerabilities
     attr_writer :sha
 
     CONFIDENCE_LEVELS = {
-      undefined: 0,
+      # undefined: 0, no longer applicable
       ignore: 1,
       unknown: 2,
       experimental: 3,
