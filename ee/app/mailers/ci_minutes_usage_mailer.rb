@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
 class CiMinutesUsageMailer < ApplicationMailer
+  helper EmailsHelper
+
+  layout 'mailer'
+
   def notify(namespace_name, recipients)
     @namespace_name = namespace_name
 
     mail(
       bcc: recipients,
-      subject: "GitLab CI Runner Minutes quota for #{namespace_name} has run out"
+      subject: "Action required: There are no remaining Pipeline minutes for #{namespace_name}"
     )
   end
 
@@ -16,8 +20,8 @@ class CiMinutesUsageMailer < ApplicationMailer
 
     mail(
       bcc: recipients,
-      subject: "GitLab CI Runner Minutes quota for #{namespace_name} has \
-                less than #{percentage_of_available_mins}% available"
+      subject: "Action required: Less than #{percentage_of_available_mins}% " \
+               "of Pipeline minutes remain for #{namespace_name}"
     )
   end
 end
