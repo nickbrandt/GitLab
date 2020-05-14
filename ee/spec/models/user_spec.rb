@@ -1174,27 +1174,6 @@ describe User do
     end
   end
 
-  describe '#organization' do
-    using RSpec::Parameterized::TableSyntax
-
-    let(:user) { build(:user, organization: 'ACME') }
-
-    subject { user.organization }
-
-    where(:gitlab_employee?, :expected_result) do
-      true  | 'GitLab'
-      false | 'ACME'
-    end
-
-    with_them do
-      before do
-        allow(user).to receive(:gitlab_employee?).and_return(gitlab_employee?)
-      end
-
-      it { is_expected.to eql(expected_result) }
-    end
-  end
-
   describe '#security_dashboard' do
     let(:user) { create(:user) }
 
