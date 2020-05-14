@@ -1,4 +1,5 @@
 const IS_EE = require('./config/helpers/is_ee_env');
+const isESLint = require('./config/helpers/is_eslint');
 
 module.exports = path => {
   const reporters = ['default'];
@@ -24,9 +25,7 @@ module.exports = path => {
 
   // workaround for eslint-import-resolver-jest only resolving in test files
   // see https://github.com/JoinColony/eslint-import-resolver-jest#note
-  const { filename: parentModuleName } = module.parent;
-  const isESLint = parentModuleName && parentModuleName.includes('/eslint-import-resolver-jest/');
-  if (isESLint) {
+  if (isESLint(module)) {
     testMatch = testMatch.map(path => path.replace('_spec.js', ''));
   }
 
