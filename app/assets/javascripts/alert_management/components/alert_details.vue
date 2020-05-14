@@ -19,7 +19,7 @@ import { fetchPolicies } from '~/lib/graphql';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { ALERTS_SEVERITY_LABELS } from '../constants';
-import updateAlertStatus from '../graphql/mutations/update_alert_status.graphql'
+import updateAlertStatus from '../graphql/mutations/update_alert_status.graphql';
 
 export default {
   statuses: {
@@ -106,21 +106,21 @@ export default {
     },
     updateAlertStatus(status) {
       this.$apollo
-      .mutate({
-        mutation: updateAlertStatus,
-        variables: {
-          iid: this.alertId,
-          status: status.toUpperCase(),
-          projectPath: this.projectPath,
-        },
-      })
-      .catch(() => {
-        createFlash(
+        .mutate({
+          mutation: updateAlertStatus,
+          variables: {
+            iid: this.alertId,
+            status: status.toUpperCase(),
+            projectPath: this.projectPath,
+          },
+        })
+        .catch(() => {
+          createFlash(
             s__(
               'AlertManagement|There was an error while updating the status of the alert. Please try again.',
             ),
-         );
-      });
+          );
+        });
     },
   },
 };
@@ -170,20 +170,24 @@ export default {
         class="gl-display-flex gl-justify-content-space-between gl-align-items-center"
       >
         <h2 data-testid="title">{{ alert.title }}</h2>
-        <gl-dropdown :text="capitalizeFirstCharacter(alert.status.toLowerCase())" class="mt-2 mb-n2" right>
+        <gl-dropdown
+          :text="capitalizeFirstCharacter(alert.status.toLowerCase())"
+          class="mt-2 mb-n2"
+          right
+        >
           <gl-dropdown-item
             v-for="(label, field) in $options.statuses"
             :key="field"
             data-testid="statusDropdownItem"
             class="gl-vertical-align-middle"
             @click="updateAlertStatus(label)"
-            >
+          >
             <span class="d-flex">
               <gl-icon
                 class="flex-shrink-0 append-right-4"
                 :class="{ invisible: label.toUpperCase() !== alert.status }"
                 name="mobile-issue-close"
-                />
+              />
               {{ label }}
             </span>
           </gl-dropdown-item>
