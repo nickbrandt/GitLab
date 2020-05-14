@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ComplianceDashboard component when there are merge requests matches the snapshot 1`] = `
+<div
+  class="compliance-dashboard"
+>
+  <header
+    class="my-3"
+  >
+    <h4>
+      Compliance Dashboard
+    </h4>
+     
+    <p>
+      Here you will find recent merge request activity
+    </p>
+  </header>
+   
+  <ul
+    class="content-list issuable-list issues-list"
+  >
+    <div
+      class="merge-request"
+    >
+      Merge request 0
+    </div>
+    <div
+      class="merge-request"
+    >
+      Merge request 1
+    </div>
+  </ul>
+   
+  <pagination-stub
+    class="my-3"
+  />
+</div>
+`;
+
+exports[`ComplianceDashboard component when there are no merge requests matches the snapshot 1`] = `
+<empty-state-stub
+  imagepath="empty.svg"
+/>
+`;
