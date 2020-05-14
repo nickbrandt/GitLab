@@ -37,4 +37,3 @@ after the implementation is merged/deployed/released.
   - Otherwise, create a new "Productivity Improvement" issue. You can re-use the description from this issue, but obviously another solution should be chosen this time.
 
 /label ~"Engineering Productivity" ~meta
-/cc @gl-quality/eng-prod
