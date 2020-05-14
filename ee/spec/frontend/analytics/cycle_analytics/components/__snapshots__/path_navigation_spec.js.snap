@@ -2,8 +2,8 @@
 
 exports[`PathNavigation matches snapshot 1`] = `
 <div
-  background-color="#fafafa"
   class="gl-path-nav"
+  data-testid="gl-path-nav"
 >
   <span
     class="gl-path-fade gl-path-fade-left"
@@ -21,7 +21,7 @@ exports[`PathNavigation matches snapshot 1`] = `
       </svg>
     </button>
   </span>
-   
+
   <ul
     class="gl-path-nav-list"
   >
@@ -32,7 +32,7 @@ exports[`PathNavigation matches snapshot 1`] = `
         class="gl-path-button gl-path-active-item-indigo"
       >
         <!---->
-        
+
         Issue
         <!---->
       </button>
@@ -44,7 +44,7 @@ exports[`PathNavigation matches snapshot 1`] = `
         class="gl-path-button"
       >
         <!---->
-        
+
         Plan
         <!---->
       </button>
@@ -56,13 +56,13 @@ exports[`PathNavigation matches snapshot 1`] = `
         class="gl-path-button"
       >
         <!---->
-        
+
         Code
         <!---->
       </button>
     </li>
   </ul>
-   
+
   <span
     class="gl-path-fade gl-path-fade-right"
     style="display: none;"
