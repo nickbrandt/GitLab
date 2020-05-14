@@ -20,7 +20,7 @@ describe('static_site_editor/graphql/resolvers/submit_content_changes', () => {
 
     return submitContentChangesResolver(
       {},
-      { path: sourcePath, project, sourcePath, content, username },
+      { input: { path: sourcePath, project, sourcePath, content, username } },
       { cache },
     ).then(() => {
       expect(cache.writeQuery).toHaveBeenCalledWith({

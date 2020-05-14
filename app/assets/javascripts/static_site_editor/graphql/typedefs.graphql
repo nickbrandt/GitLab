@@ -14,10 +14,6 @@ type SavedContentMeta {
   branch: SavedContentField!
 }
 
-extend type Project {
-  file(path: ID!): File
-}
-
 type AppData {
   isSupportedContent: Boolean!
   project: String!
@@ -26,11 +22,22 @@ type AppData {
   username: String!
 }
 
+type SubmitContentChangesInput {
+  project: String!
+  sourcePath: String!
+  content: String!
+  username: String!
+}
+
+extend type Project {
+  file(path: ID!): File
+}
+
 extend type Query {
   appData: AppData!
   savedContentMeta: SavedContentMeta
 }
 
 extend type Mutation {
-  submitContentChanges(project: String!, sourcePath: String!, content: String!, username: String!): SavedContentMeta
+  submitContentChanges(input: SubmitContentChangesInput!): SavedContentMeta
 }

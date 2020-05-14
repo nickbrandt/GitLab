@@ -194,10 +194,12 @@ describe('static_site_editor/pages/home', () => {
       expect(mutateMock).toHaveBeenCalledWith({
         mutation: submitContentChangesMutation,
         variables: {
-          content: newContent,
-          project,
-          sourcePath,
-          username,
+          input: {
+            content: newContent,
+            project,
+            sourcePath,
+            username,
+          },
         },
       });
     });

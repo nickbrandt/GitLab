@@ -74,10 +74,12 @@ export default {
         .mutate({
           mutation: submitContentChangesMutation,
           variables: {
-            project: this.appData.project,
-            username: this.appData.username,
-            sourcePath: this.appData.sourcePath,
-            content: this.content,
+            input: {
+              project: this.appData.project,
+              username: this.appData.username,
+              sourcePath: this.appData.sourcePath,
+              content: this.content,
+            },
           },
         })
         .then(() => {
