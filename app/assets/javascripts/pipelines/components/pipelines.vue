@@ -86,6 +86,10 @@ export default {
       type: String,
       required: true,
     },
+    params: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
