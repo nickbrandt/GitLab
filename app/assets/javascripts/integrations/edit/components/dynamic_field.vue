@@ -73,18 +73,17 @@ export default {
       return this.isPassword && !isEmpty(this.value);
     },
     label() {
+      const title = this.title || startCase(this.name);
+
       if (this.isNonEmptyPassword) {
         return sprintf(__('Enter new %{field_title}'), {
-          field_title: this.computedTitle,
+          password: title,
         });
       }
-      return this.computedTitle;
+      return title;
     },
     passwordRequired() {
       return isEmpty(this.value) && this.required;
-    },
-    computedTitle() {
-      return this.title || startCase(this.name);
     },
     options() {
       return this.choices.map(choice => {
@@ -100,6 +99,12 @@ export default {
     fieldName() {
       return `service[${this.name}]`;
     },
+    sharedProps() {
+      return {
+        id: this.fieldId,
+        name: this.fieldName,
+      };
+    },
   },
   created() {
     if (this.isNonEmptyPassword) {
@@ -113,29 +118,20 @@ export default {
   <gl-form-group :label="label" :label-for="fieldId" :description="help">
     <template v-if="isCheckbox">
       <input :name="fieldName" type="hidden" value="false" />
-      <gl-form-checkbox :id="fieldId" v-model="model" :name="fieldName" />
+      <gl-form-checkbox v-model="model" v-bind="sharedProps" />
     </template>
-
-    <gl-form-select
-      v-else-if="isSelect"
-      :id="fieldId"
-      v-model="model"
-      :name="fieldName"
-      :options="options"
-    />
+    <gl-form-select v-else-if="isSelect" v-model="model" v-bind="sharedProps" :options="options" />
     <gl-form-textarea
       v-else-if="isTextarea"
-      :id="fieldId"
       v-model="model"
-      :name="fieldName"
+      v-bind="sharedProps"
       :placeholder="placeholder"
       :required="required"
     />
     <gl-form-input
       v-else-if="isPassword"
-      :id="fieldId"
       v-model="model"
-      :name="fieldName"
+      v-bind="sharedProps"
       :type="type"
       autocomplete="new-password"
       :placeholder="placeholder"
@@ -143,9 +139,8 @@ export default {
     />
     <gl-form-input
       v-else
-      :id="fieldId"
       v-model="model"
-      :name="fieldName"
+      v-bind="sharedProps"
       :type="type"
       :placeholder="placeholder"
       :required="required"
