@@ -219,7 +219,16 @@ export default {
           <ul class="list-unstyled">
             <li v-for="(value, key) in alert" v-if="key !== '__typename'" :key="key">
               <p class="py-1 my-1 gl-font-base">
-                <strong>{{ capitalizeFirstCharacter(key.replace(/([A-Z])/g, ' $1').trim().toLocaleLowerCase()) }}: </strong>
+                <strong
+                  >{{
+                    capitalizeFirstCharacter(
+                      key
+                        .replace(/([A-Z])/g, ' $1')
+                        .trim()
+                        .toLocaleLowerCase(),
+                    )
+                  }}:
+                </strong>
                 <template v-if="key === 'severity'">
                   <gl-icon
                     class="gl-mr-1 align-middle"
