@@ -55,6 +55,8 @@ module EE
 
       if params.filter_by_no_epic?
         items.no_epic
+      elsif params.filter_by_any_epic?
+        items.any_epic
       else
         items.in_epics(params.epics)
       end

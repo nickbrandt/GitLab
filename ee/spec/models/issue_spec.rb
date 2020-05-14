@@ -128,6 +128,13 @@ describe Issue do
         end
       end
 
+      describe '.any_epic' do
+        it 'returns only issues with an epic assigned' do
+          expect(described_class.count).to eq 3
+          expect(described_class.any_epic).to eq [epic_issue1.issue, epic_issue2.issue]
+        end
+      end
+
       describe '.in_epics' do
         it 'returns only issues in selected epics' do
           expect(described_class.count).to eq 3
