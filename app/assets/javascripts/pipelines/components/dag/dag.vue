@@ -4,6 +4,11 @@ import { uniqueId } from 'lodash';
 import mockDAGdata from './dag-data/mockDAGdata.json'
 import gitlabDAGdata from './dag-data/gitlabDAGdata.json'
 import groupDAGdata from './dag-data/groupDAGdata.json'
+import fabioDAGone from './dag-data/fabioDAGone.json'
+import fabioDAGtwo from './dag-data/fabioDAGtwo.json'
+import shortDAGdata from './dag-data/shortDAGdata.json'
+import longDAGdata from './dag-data/longDAGdata.json'
+
 import {
   createSankey,
   getMaxNodes,
@@ -70,9 +75,31 @@ export default {
       details: { stages: nestedStages },
     } = groupDAGdata;
 
-    this.drawGraph(simplified, parseData);
-    this.drawGraph(stages, parseData);
-    this.drawGraph(nestedStages, parseNestedData);
+    const {
+      stages: longStages,
+    } = longDAGdata;
+
+    const {
+      stages: shortStages,
+    } = shortDAGdata;
+
+    const {
+      stages: fabioDepsOne,
+    } = fabioDAGone;
+
+    const {
+      stages: fabioDepsTwo,
+    } = fabioDAGtwo;
+
+    // this.drawGraph(simplified, parseData);
+    // this.drawGraph(stages, parseData);
+    // this.drawGraph(nestedStages, parseNestedData);
+
+    // this.drawGraph(longStages, parseNestedData);
+    // this.drawGraph(shortStages, parseNestedData);
+    this.drawGraph(fabioDepsOne, parseNestedData);
+    this.drawGraph(fabioDepsTwo, parseNestedData);
+
 
   },
   methods: {

@@ -3,6 +3,7 @@ import {
   sankey,
   sankeyLeft,
 } from 'd3-sankey';
+import { uniqWith, isEqual } from 'lodash';
 
 export const removeOrphanNodes = (sankeyfiedNodes) => {
   return sankeyfiedNodes.filter((node) => node.sourceLinks.length || node.targetLinks.length)
@@ -149,7 +150,7 @@ export const parseNestedData = (data) => {
         }
 
         return job.needs.map((needed) => {
-          return { source: needed, target: group.name, value: (group.size * 10), group: group.name };
+          return { source: needed.split(' ')[0], target: group.name, value: (group.size * 10), group: group.name };
         });
       })
     }).flat(2)
@@ -161,10 +162,9 @@ export const parseNestedData = (data) => {
       return acc;
     }, {});
 
-
     const getAllAncestors = (nodes) => {
       const needs = nodes
-        .map((node) => nodeDict[node].needs || '')
+        .map((node) => nodeDict[node.split(' ')[0]].needs || '')
         .flat()
         .filter(Boolean);
 
@@ -175,7 +175,18 @@ export const parseNestedData = (data) => {
       return [];
     };
 
-    return links.filter((link) => {
+    const filterByAncestors =  links.filter((link) => {
+      /*
+
+      for every link, check out it's target
+      for every target, get the target node's needs
+      then drop the current link source from that list
+
+      call a function to get all ancestors, recursively
+      is the current link's source in the list of all parents
+      then we drop this link
+
+      */
       const targetNode = link.target;
       const targetNodeNeeds = nodeDict[targetNode].jobs.map(({ needs }) => needs || []).flat();
       const targetNodeNeedsMinusSource = targetNodeNeeds.filter(
@@ -186,17 +197,8 @@ export const parseNestedData = (data) => {
       return !allAncestors.includes(link.source);
     });
 
-    /*
+    return uniqWith(filterByAncestors, isEqual);
 
-    for every link, check out it's target
-    for every target, get the target node's needs
-    then drop the current link source from that list
-
-    call a function to get all ancestors, recursively
-    is the current link's source in the list of all parents
-    then we drop this link
-
-    */
   };
 
   return { nodes, links: filteredLinks() };

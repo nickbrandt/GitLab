@@ -1,0 +1,110 @@
+{
+  "stages":[
+    {
+      "name":"build",
+      "groups":[
+        {
+          "name":"build_a",
+          "size":1,
+          "jobs":[
+            {
+              "name":"build_a"
+            }
+          ]
+        },
+        {
+          "name":"build_b",
+          "size":1,
+          "jobs":[
+            {
+              "name":"build_b"
+            }
+          ]
+        },
+        {
+          "name":"build_c",
+          "size":1,
+          "jobs":[
+            {
+              "name":"build_c"
+            }
+          ]
+        },
+        {
+          "name":"build_d",
+          "size":3,
+          "jobs":[
+            {
+              "name":"build_d 1/3"
+            },
+            {
+              "name":"build_d 2/3"
+            },
+            {
+              "name":"build_d 3/3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name":"test",
+      "groups":[
+        {
+          "name":"test_a",
+          "size":1,
+          "jobs":[
+            {
+              "name":"test_a",
+              "needs":[
+                "build_a",
+                "build_b",
+                "build_c"
+              ]
+            }
+          ]
+        },
+        {
+          "name":"test_b",
+          "size":2,
+          "jobs":[
+            {
+              "name":"test_b 1/2",
+              "needs":[
+                "build_a",
+                "build_b",
+                "build_d 1/3",
+                "build_d 2/3",
+                "build_d 3/3"
+              ]
+            },
+            {
+              "name":"test_b 2/2",
+              "needs":[
+                "build_a",
+                "build_b",
+                "build_d 1/3",
+                "build_d 2/3",
+                "build_d 3/3"
+              ]
+            }
+          ]
+        },
+        {
+          "name":"test_c",
+          "size":1,
+          "jobs":[
+            {
+              "name":"test_c",
+              "needs":[
+                "build_a",
+                "build_b",
+                "build_c"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
