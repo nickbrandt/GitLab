@@ -7128,10 +7128,16 @@ msgstr ""
 msgid "DeployTokens|Add a deploy token"
 msgstr ""
 
+msgid "DeployTokens|Allows read access to the package registry"
+msgstr ""
+
 msgid "DeployTokens|Allows read-only access to the registry images"
 msgstr ""
 
 msgid "DeployTokens|Allows read-only access to the repository"
+msgstr ""
+
+msgid "DeployTokens|Allows write access to the package registry"
 msgstr ""
 
 msgid "DeployTokens|Allows write access to the registry images"
@@ -7155,13 +7161,13 @@ msgstr ""
 msgid "DeployTokens|Deploy Tokens"
 msgstr ""
 
-msgid "DeployTokens|Deploy tokens allow access to your repository and registry images."
+msgid "DeployTokens|Deploy tokens allow access to packages, your repository, and registry images."
 msgstr ""
 
 msgid "DeployTokens|Expires"
 msgstr ""
 
-msgid "DeployTokens|Group deploy tokens allow read-only access to the repositories and registry images within the group."
+msgid "DeployTokens|Group deploy tokens allow access to the packages, repositories, and registry images within the group."
 msgstr ""
 
 msgid "DeployTokens|Name"
