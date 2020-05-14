@@ -1,14 +1,11 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
 
-const localVue = createLocalVue();
-
 describe('alerts component', () => {
-  const AlertsComponent = localVue.extend(Alerts);
   let wrapper;
 
   const mount = (propsData = {}) =>
-    shallowMount(AlertsComponent, {
+    shallowMount(Alerts, {
       propsData,
     });
 

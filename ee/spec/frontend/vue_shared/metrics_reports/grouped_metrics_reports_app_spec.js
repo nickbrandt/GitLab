@@ -8,12 +8,11 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('Grouped metrics reports app', () => {
-  const Component = localVue.extend(GroupedMetricsReportsApp);
   let wrapper;
   let mockStore;
 
   const mountComponent = () => {
-    wrapper = mount(Component, {
+    wrapper = mount(GroupedMetricsReportsApp, {
       store: mockStore,
       localVue,
       propsData: {

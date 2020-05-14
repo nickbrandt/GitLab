@@ -1,15 +1,12 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import ProjectPipeline from 'ee/vue_shared/dashboards/components/project_pipeline.vue';
-import { mockPipelineData } from '../mock_data';
-
-const localVue = createLocalVue();
+import { mockPipelineData } from 'ee_jest/vue_shared/dashboards/mock_data';
 
 describe('project pipeline component', () => {
-  const ProjectPipelineComponent = localVue.extend(ProjectPipeline);
   let wrapper;
 
   const mountComponent = (propsData = {}) =>
-    mount(ProjectPipelineComponent, {
+    mount(ProjectPipeline, {
       propsData,
     });
 

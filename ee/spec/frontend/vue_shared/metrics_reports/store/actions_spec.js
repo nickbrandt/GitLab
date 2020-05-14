@@ -8,7 +8,7 @@ import {
 } from 'ee/vue_shared/metrics_reports/store/actions';
 import * as types from 'ee/vue_shared/metrics_reports/store/mutation_types';
 import state from 'ee/vue_shared/metrics_reports/store/state';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
 
 describe('metrics reports actions', () => {
@@ -25,8 +25,8 @@ describe('metrics reports actions', () => {
   });
 
   describe('setEndpoint', () => {
-    it('should commit set endpoint', done => {
-      testAction(
+    it('should commit set endpoint', () => {
+      return testAction(
         setEndpoint,
         'path',
         mockedState,
@@ -37,14 +37,13 @@ describe('metrics reports actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
 
   describe('requestMetrics', () => {
-    it('should commit request mutation', done => {
-      testAction(
+    it('should commit request mutation', () => {
+      return testAction(
         requestMetrics,
         null,
         mockedState,
@@ -54,13 +53,12 @@ describe('metrics reports actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
 
   describe('fetchMetrics', () => {
-    it('should call metrics endpoint', done => {
+    it('should call metrics endpoint', () => {
       const data = {
         metrics: [
           {
@@ -73,7 +71,7 @@ describe('metrics reports actions', () => {
       mockedState.endpoint = endpoint;
       mock.onGet(endpoint).replyOnce(200, data);
 
-      testAction(
+      return testAction(
         fetchMetrics,
         null,
         mockedState,
@@ -87,16 +85,15 @@ describe('metrics reports actions', () => {
             type: 'receiveMetricsSuccess',
           },
         ],
-        done,
       );
     });
 
-    it('handles errors', done => {
+    it('handles errors', () => {
       const endpoint = '/mock-endpoint.json';
       mockedState.endpoint = endpoint;
       mock.onGet(endpoint).replyOnce(500);
 
-      testAction(
+      return testAction(
         fetchMetrics,
         null,
         mockedState,
@@ -109,15 +106,14 @@ describe('metrics reports actions', () => {
             type: 'receiveMetricsError',
           },
         ],
-        done,
       );
     });
   });
 
   describe('receiveMetricsSuccess', () => {
-    it('should commit request mutation', done => {
+    it('should commit request mutation', () => {
       const response = { metrics: [] };
-      testAction(
+      return testAction(
         receiveMetricsSuccess,
         response,
         mockedState,
@@ -128,14 +124,13 @@ describe('metrics reports actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
 
   describe('receiveMetricsError', () => {
-    it('should commit request mutation', done => {
-      testAction(
+    it('should commit request mutation', () => {
+      return testAction(
         receiveMetricsError,
         null,
         mockedState,
@@ -145,7 +140,6 @@ describe('metrics reports actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
