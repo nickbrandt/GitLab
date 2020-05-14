@@ -55,13 +55,8 @@ export default {
     label-for="trigger-fields"
     data-testid="trigger-fields-group"
   >
-    <div id="trigger-fields">
-      <gl-form-group
-        v-for="event in events"
-        :key="event.title"
-        class="gl-pt-3"
-        :description="event.description"
-      >
+    <div id="trigger-fields" class="gl-pt-3">
+      <gl-form-group v-for="event in events" :key="event.title" :description="event.description">
         <input :name="checkboxName(event.name)" type="hidden" value="false" />
         <gl-form-checkbox v-model="event.value" :name="checkboxName(event.name)">
           {{ startCase(event.title) }}
