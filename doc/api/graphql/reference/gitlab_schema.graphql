@@ -6895,6 +6895,11 @@ type Project {
     iid: String
 
     """
+    Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.
+    """
+    search: String
+
+    """
     Sort alerts by this criteria
     """
     sort: AlertManagementAlertSort
@@ -6933,6 +6938,11 @@ type Project {
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.
+    """
+    search: String
 
     """
     Sort alerts by this criteria
