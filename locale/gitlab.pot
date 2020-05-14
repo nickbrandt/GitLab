@@ -9722,13 +9722,13 @@ msgstr ""
 msgid "Geo"
 msgstr ""
 
-msgid "Geo Designs"
-msgstr ""
-
 msgid "Geo Nodes"
 msgstr ""
 
 msgid "Geo Nodes|Cannot remove a primary node if there is a secondary node"
+msgstr ""
+
+msgid "Geo Replication"
 msgstr ""
 
 msgid "Geo Settings"
@@ -10020,6 +10020,9 @@ msgid "Geo|Reverify"
 msgstr ""
 
 msgid "Geo|Reverify all"
+msgstr ""
+
+msgid "Geo|Review replication status, and resynchronize and reverify items with the primary node."
 msgstr ""
 
 msgid "Geo|Status"
@@ -17706,6 +17709,9 @@ msgid "Replaced all labels with %{label_references} %{label_text}."
 msgstr ""
 
 msgid "Replaces the clone URL root."
+msgstr ""
+
+msgid "Replication"
 msgstr ""
 
 msgid "Reply by email"

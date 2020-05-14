@@ -157,11 +157,11 @@ module EE
     end
 
     def resync_all_button
-      button_to(s_("Geo|Resync all"), { controller: controller_name, action: :resync_all }, class: "btn btn-default mr-2")
+      button_to(s_("Geo|Resync all"), { controller: controller_name, action: :resync_all }, class: "btn btn-default btn-md mr-2")
     end
 
     def reverify_all_button
-      button_to(s_("Geo|Reverify all"), { controller: controller_name, action: :reverify_all }, class: "btn btn-default")
+      button_to(s_("Geo|Reverify all"), { controller: controller_name, action: :reverify_all }, class: "btn btn-default btn-md")
     end
   end
 end

@@ -6,23 +6,41 @@ describe 'EE-specific admin routing' do
     let(:project_registry) { create(:geo_project_registry) }
 
     it 'routes / to #index' do
-      expect(get('/admin/geo/projects')).to route_to('admin/geo/projects#index')
+      expect(get('/admin/geo/replication/projects')).to route_to('admin/geo/projects#index')
     end
 
     it 'routes delete /:id to #destroy' do
-      expect(delete("/admin/geo/projects/#{project_registry.id}")).to route_to('admin/geo/projects#destroy', id: project_registry.to_param)
+      expect(delete("/admin/geo/replication/projects/#{project_registry.id}")).to route_to('admin/geo/projects#destroy', id: project_registry.to_param)
     end
 
     it 'routes post /:id/reverify to #reverify' do
-      expect(post("admin/geo/projects/#{project_registry.id}/reverify")).to route_to('admin/geo/projects#reverify', id: project_registry.to_param)
+      expect(post("/admin/geo/replication/projects/#{project_registry.id}/reverify")).to route_to('admin/geo/projects#reverify', id: project_registry.to_param)
     end
 
     it 'routes post /:id/resync to #resync' do
-      expect(post("admin/geo/projects/#{project_registry.id}/resync")).to route_to('admin/geo/projects#resync', id: project_registry.to_param)
+      expect(post("/admin/geo/replication/projects/#{project_registry.id}/resync")).to route_to('admin/geo/projects#resync', id: project_registry.to_param)
     end
 
     it 'routes post /:id/force_redownload to #force_redownload' do
-      expect(post("admin/geo/projects/#{project_registry.id}/force_redownload")).to route_to('admin/geo/projects#force_redownload', id: project_registry.to_param)
+      expect(post("/admin/geo/replication/projects/#{project_registry.id}/force_redownload")).to route_to('admin/geo/projects#force_redownload', id: project_registry.to_param)
+    end
+  end
+
+  describe Admin::Geo::UploadsController, 'routing' do
+    let!(:upload_registry) { create(:geo_upload_registry, :with_file, :attachment, success: true) }
+
+    it 'routes / to #index' do
+      expect(get('/admin/geo/replication/uploads')).to route_to('admin/geo/uploads#index')
+    end
+
+    it 'routes delete /:id to #destroy' do
+      expect(delete("/admin/geo/replication/uploads/#{upload_registry.id}")).to route_to('admin/geo/uploads#destroy', id: upload_registry.to_param)
+    end
+  end
+
+  describe Admin::Geo::DesignsController, 'routing' do
+    it 'routes / to #index' do
+      expect(get('/admin/geo/replication/designs')).to route_to('admin/geo/designs#index')
     end
   end
 

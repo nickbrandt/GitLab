@@ -36,26 +36,35 @@ namespace :admin do
   namespace :geo do
     get '/' => 'nodes#index'
 
+    # Old Routes Replaced in 13.0
+    get '/projects', to: redirect(path: 'admin/geo/replication/projects')
+    get '/uploads', to: redirect(path: 'admin/geo/replication/uploads')
+    get '/designs', to: redirect(path: 'admin/geo/replication/designs')
+
     resources :nodes, only: [:index, :create, :new, :edit, :update]
 
-    resources :projects, only: [:index, :destroy] do
-      member do
-        post :reverify
-        post :resync
-        post :force_redownload
+    scope '/replication' do
+      get '/', to: redirect(path: 'admin/geo/replication/projects')
+
+      resources :projects, only: [:index, :destroy] do
+        member do
+          post :reverify
+          post :resync
+          post :force_redownload
+        end
+
+        collection do
+          post :reverify_all
+          post :resync_all
+        end
       end
 
-      collection do
-        post :reverify_all
-        post :resync_all
-      end
+      resources :designs, only: [:index]
+
+      resources :uploads, only: [:index, :destroy]
     end
 
     resource :settings, only: [:show, :update]
-
-    resources :designs, only: [:index]
-
-    resources :uploads, only: [:index, :destroy]
   end
 
   namespace :elasticsearch do
