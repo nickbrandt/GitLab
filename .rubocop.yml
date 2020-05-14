@@ -27,6 +27,7 @@ AllCops:
     - 'plugins/**/*'
     - 'file_hooks/**/*'
   CacheRootDirectory: tmp
+  MaxFilesInCache: 18000
 
 Cop/AvoidKeywordArgumentsInSidekiqWorkers:
   Enabled: true
