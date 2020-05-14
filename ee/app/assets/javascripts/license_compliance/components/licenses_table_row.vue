@@ -1,5 +1,5 @@
 <script>
-import { GlLink, GlSkeletonLoading, GlBadge, GlIcon } from '@gitlab/ui';
+import { GlLink, GlSkeletonLoading, GlBadge, GlIcon, GlFriendlyWrap } from '@gitlab/ui';
 import LicenseComponentLinks from './license_component_links.vue';
 import { LICENSE_APPROVAL_CLASSIFICATION } from 'ee/vue_shared/license_compliance/constants';
 
@@ -11,6 +11,7 @@ export default {
     GlSkeletonLoading,
     GlBadge,
     GlIcon,
+    GlFriendlyWrap,
   },
   props: {
     license: {
@@ -27,6 +28,9 @@ export default {
   computed: {
     isDenied() {
       return this.license.classification === LICENSE_APPROVAL_CLASSIFICATION.DENIED;
+    },
+    nameIsLink() {
+      return this.license.name.includes('http');
     },
   },
 };
@@ -54,7 +58,14 @@ export default {
           <gl-link v-if="license.url" :href="license.url" target="_blank">{{
             license.name
           }}</gl-link>
-          <template v-else>{{ license.name }}</template>
+
+          <gl-link v-else-if="nameIsLink" :href="license.name" target="_blank">
+            <gl-friendly-wrap :text="license.name" />
+          </gl-link>
+
+          <template v-else>
+            {{ license.name }}
+          </template>
         </div>
       </div>
 
