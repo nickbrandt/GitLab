@@ -17,11 +17,11 @@
     "create_vulnerability_feedback_dismissal_path": { "type": "string" },
     "confidence" : {
       "type": "string",
-      "enum": ["undefined", "ignore", "unknown", "experimental", "low", "medium", "high", "confirmed"]
+      "enum": ["ignore", "unknown", "experimental", "low", "medium", "high", "confirmed"]
     },
     "severity" : {
       "type": "string",
-      "enum": ["undefined", "info", "unknown", "low", "medium", "high", "critical"]
+      "enum": ["info", "unknown", "low", "medium", "high", "critical"]
     },
     "report_type": {
       "type": "string",
