@@ -4106,6 +4106,11 @@ type Group {
     first: Int
 
     """
+    Return also milestones in all subgroups and subprojects
+    """
+    includeDescendants: Boolean
+
+    """
     Returns the last _n_ elements from the list.
     """
     last: Int
