@@ -790,6 +790,7 @@ describe User do
 
       let_it_be(:expired_token) { create(:personal_access_token, user: user1, expires_at: 2.days.ago) }
       let_it_be(:revoked_token) { create(:personal_access_token, user: user1, revoked: true) }
+      let_it_be(:impersonation_token) { create(:personal_access_token, :impersonation, user: user1, expires_at: 2.days.from_now) }
       let_it_be(:valid_token_and_notified) { create(:personal_access_token, user: user2, expires_at: 2.days.from_now, expire_notification_delivered: true) }
       let_it_be(:valid_token1) { create(:personal_access_token, user: user2, expires_at: 2.days.from_now) }
       let_it_be(:valid_token2) { create(:personal_access_token, user: user2, expires_at: 2.days.from_now) }

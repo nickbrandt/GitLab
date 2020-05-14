@@ -340,6 +340,7 @@ class User < ApplicationRecord
     where('EXISTS (?)',
           ::PersonalAccessToken
             .where('personal_access_tokens.user_id = users.id')
+            .without_impersonation
             .expiring_and_not_notified(at).select(1))
   end
   scope :order_recent_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'DESC')) }
