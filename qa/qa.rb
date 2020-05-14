@@ -409,6 +409,7 @@ module QA
       autoload :Breadcrumbs, 'qa/page/component/breadcrumbs'
       autoload :CiBadgeLink, 'qa/page/component/ci_badge_link'
       autoload :ClonePanel, 'qa/page/component/clone_panel'
+      autoload :DesignManagement, 'qa/page/component/design_management'
       autoload :LazyLoader, 'qa/page/component/lazy_loader'
       autoload :LegacyClonePanel, 'qa/page/component/legacy_clone_panel'
       autoload :Dropzone, 'qa/page/component/dropzone'

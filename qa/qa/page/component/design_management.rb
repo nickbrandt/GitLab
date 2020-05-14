@@ -6,7 +6,9 @@ module QA
       module DesignManagement
         extend QA::Page::PageConcern
 
-        def self.prepended(base)
+        def self.included(base)
+          super
+
           base.class_eval do
             view 'app/assets/javascripts/design_management/components/design_notes/design_discussion.vue' do
               element :design_discussion_content
