@@ -53,6 +53,10 @@ const getStageByTitle = (stages, title) =>
   stages.find(stage => stage.title && stage.title.toLowerCase().trim() === title) || {};
 
 export const recentActivityData = getJSONFixture(fixtureEndpoints.recentActivityData);
+export const timeMetricsData = [
+  { label: 'Lead time', value: '2', unit: 'days' },
+  { label: 'Cycle time', value: '1.5', unit: 'days' },
+];
 
 export const customizableStagesAndEvents = getJSONFixture(
   fixtureEndpoints.customizableCycleAnalyticsStagesAndEvents,

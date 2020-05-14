@@ -5,9 +5,9 @@ import MetricCard from 'ee/analytics/shared/components/metric_card.vue';
 const defaultProps = {
   title: 'My fancy title',
   metrics: [
-    { key: 'first_metric', value: 10, label: 'First metric' },
+    { key: 'first_metric', value: 10, label: 'First metric', unit: 'days' },
     { key: 'second_metric', value: 20, label: 'Yet another metric' },
-    { key: 'third_metric', value: null, label: 'Metric without value' },
+    { key: 'third_metric', value: null, label: 'Metric without value', unit: 'parsecs' },
   ],
   isLoading: false,
 };
@@ -91,6 +91,24 @@ describe('MetricCard', () => {
               .at(columnIndex)
               .text(),
           ).toContain(value);
+        });
+      });
+
+      describe('units', () => {
+        it(`renders when there is a value`, () => {
+          expect(
+            findMetricItem()
+              .at(0)
+              .text(),
+          ).toContain('10 days');
+        });
+
+        it(`does not render without a value`, () => {
+          expect(
+            findMetricItem()
+              .at(2)
+              .text(),
+          ).toContain('-');
         });
       });
     });
