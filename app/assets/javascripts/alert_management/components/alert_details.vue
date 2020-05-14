@@ -18,6 +18,7 @@ import query from '../graphql/queries/details.query.graphql';
 import { fetchPolicies } from '~/lib/graphql';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
 import { ALERTS_SEVERITY_LABELS } from '../constants';
 import updateAlertStatus from '../graphql/mutations/update_alert_status.graphql';
 
@@ -217,8 +218,8 @@ export default {
         <gl-tab data-testid="fullDetailsTab" :title="$options.i18n.fullAlertDetailsTitle">
           <ul class="list-unstyled">
             <li v-for="(value, key) in alert" v-if="key !== '__typename'" :key="key">
-              <p class="py-1 my-1 gl-font-base text-capitalize">
-                <strong>{{ key.replace(/([A-Z])/g, ' $1').trim() }}: </strong>
+              <p class="py-1 my-1 gl-font-base">
+                <strong>{{ capitalizeFirstCharacter(key.replace(/([A-Z])/g, ' $1').trim().toLocaleLowerCase()) }}: </strong>
                 <template v-if="key === 'severity'">
                   <gl-icon
                     class="gl-mr-1 align-middle"
