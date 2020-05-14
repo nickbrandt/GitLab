@@ -46,7 +46,7 @@ class LabelsFinder < UnionFinder
       end
     else
       if group?
-        group = Group.find(params[:group_id])
+        group = params[:group] || Group.find(params[:group_id])
         label_ids << Label.where(group_id: group_ids_for(group))
       end
 
@@ -123,7 +123,7 @@ class LabelsFinder < UnionFinder
   end
 
   def group?
-    params[:group_id].present?
+    params[:group].present? || params[:group_id].present?
   end
 
   def project?
