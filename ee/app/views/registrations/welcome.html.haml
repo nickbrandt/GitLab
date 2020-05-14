@@ -1,10 +1,11 @@
 - page_title _('Your profile')
+- onboarding_issues_experiment_enabled = experiment_enabled?(:onboarding_issues)
 
 .row.flex-grow-1.bg-gray-light
   .d-flex.flex-column.align-items-center.w-100.gl-p-3-deprecated-no-really-do-not-use-me
     .edit-profile.login-page.d-flex.flex-column.align-items-center.pt-lg-3
-      - if in_subscription_flow?
-        #progress-bar
+      - if in_subscription_flow? || onboarding_issues_experiment_enabled
+        #progress-bar{ data: { is_in_subscription_flow: in_subscription_flow?.to_s, is_onboarding_issues_experiment_enabled: onboarding_issues_experiment_enabled.to_s } }
       %h2.center= _('Welcome to GitLab.com<br>@%{name}!').html_safe % { name: html_escape(current_user.first_name) }
       %p
         .center= _('In order to personalize your experience with GitLab<br>we would like to know a bit more about you.').html_safe
@@ -30,4 +31,4 @@
         .row
           .form-group.col-sm-12.mb-0
             = button_tag class: %w[btn btn-success w-100] do
-              = in_subscription_flow? || in_trial_flow? ? _('Continue') : _('Get started!')
+              = in_subscription_flow? || in_trial_flow? || onboarding_issues_experiment_enabled ? _('Continue') : _('Get started!')
