@@ -1,5 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { trimText } from 'spec/helpers/text_helper';
+import { shallowMount } from '@vue/test-utils';
 import MRWidgetAutoMergeEnabled from '~/vue_merge_request_widget/components/states/mr_widget_auto_merge_enabled.vue';
 import {
   MWPS_MERGE_STRATEGY,
@@ -8,7 +7,6 @@ import {
 } from '~/vue_merge_request_widget/constants';
 
 describe('MRWidgetAutoMergeEnabled', () => {
-  const localVue = createLocalVue();
   let wrapper;
   let vm;
 
@@ -31,12 +29,11 @@ describe('MRWidgetAutoMergeEnabled', () => {
   };
 
   const factory = (mrUpdates = {}) => {
-    wrapper = shallowMount(localVue.extend(MRWidgetAutoMergeEnabled), {
+    wrapper = shallowMount(MRWidgetAutoMergeEnabled, {
       propsData: {
         mr: { ...mr, ...mrUpdates },
         service,
       },
-      localVue,
     });
 
     ({ vm } = wrapper);
@@ -44,6 +41,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('computed', () => {
@@ -125,7 +123,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
         mergeTrainsCount: 0,
       });
 
-      const statusText = trimText(vm.$el.querySelector('.js-status-text-after-author').innerText);
+      const statusText = wrapper.find('.js-status-text-after-author').text();
 
       expect(statusText).toBe('to start a merge train when the pipeline succeeds');
     });
@@ -136,7 +134,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
         mergeTrainsCount: 1,
       });
 
-      const statusText = trimText(vm.$el.querySelector('.js-status-text-after-author').innerText);
+      const statusText = wrapper.find('.js-status-text-after-author').text();
 
       expect(statusText).toBe('to be added to the merge train when the pipeline succeeds');
     });
@@ -144,7 +142,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
     it('should render the cancel button as "Cancel automatic merge" if MTWPS is selected', () => {
       factory({ autoMergeStrategy: MTWPS_MERGE_STRATEGY });
 
-      const cancelButtonText = trimText(vm.$el.querySelector('.js-cancel-auto-merge').innerText);
+      const cancelButtonText = wrapper.find('.js-cancel-auto-merge').text();
 
       expect(cancelButtonText).toBe('Cancel automatic merge');
     });
@@ -153,7 +151,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
   it('should render the cancel button as "Remove from merge train" if the pipeline has been added to the merge train', () => {
     factory({ autoMergeStrategy: MT_MERGE_STRATEGY });
 
-    const cancelButtonText = trimText(vm.$el.querySelector('.js-cancel-auto-merge').innerText);
+    const cancelButtonText = wrapper.find('.js-cancel-auto-merge').text();
 
     expect(cancelButtonText).toBe('Remove from merge train');
   });
