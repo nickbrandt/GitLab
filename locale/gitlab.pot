@@ -586,6 +586,9 @@ msgid_plural "(%d closed)"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "(%{linkStart}Cron syntax%{linkEnd})"
+msgstr ""
+
 msgid "(%{mrCount} merged)"
 msgstr ""
 
@@ -6417,9 +6420,6 @@ msgstr ""
 msgid "Cron Timezone"
 msgstr ""
 
-msgid "Cron syntax"
-msgstr ""
-
 msgid "Crossplane"
 msgstr ""
 
@@ -8711,13 +8711,13 @@ msgstr ""
 msgid "Every day"
 msgstr ""
 
-msgid "Every day (at 4:00am)"
+msgid "Every day (at %{time})"
 msgstr ""
 
 msgid "Every month"
 msgstr ""
 
-msgid "Every month (on the 1st at 4:00am)"
+msgid "Every month (Day %{day} at %{time})"
 msgstr ""
 
 msgid "Every three months"
@@ -8729,7 +8729,7 @@ msgstr ""
 msgid "Every week"
 msgstr ""
 
-msgid "Every week (Sundays at 4:00am)"
+msgid "Every week (%{weekday} at %{time})"
 msgstr ""
 
 msgid "Everyone"
