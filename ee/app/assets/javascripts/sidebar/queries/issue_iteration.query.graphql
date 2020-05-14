@@ -2,7 +2,7 @@ query issueSprint($fullPath: ID!, $iid: String!) {
   project(fullPath: $fullPath) {
     issues (iid: $iid, first: 1) {
       nodes {
-        sprint {
+        iteration {
           id
           title
         }

@@ -11,8 +11,8 @@ import {
 import debounce from 'lodash/debounce';
 import { __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
-import groupSprintsQuery from '../queries/group_iterations.query.graphql';
-import currentSprintQuery from '../queries/issue_sprint.query.graphql';
+import groupIterationssQuery from '../queries/group_iterations.query.graphql';
+import currentIterationQuery from '../queries/issue_iteration.query.graphql';
 import setIssueIterationMutation from '../queries/set_iteration_on_issue.mutation.graphql';
 import createFlash from '~/flash';
 
@@ -46,8 +46,8 @@ export default {
     },
   },
   apollo: {
-    currentSprint: {
-      query: currentSprintQuery,
+    currentIteration: {
+      query: currentIterationQuery,
       variables() {
         return {
           fullPath: this.projectPath,
@@ -59,15 +59,15 @@ export default {
           return null;
         }
 
-        if (data.project.issues.nodes[0].sprint === null) {
+        if (data.project.issues.nodes[0].iteration === null) {
           return null;
         }
 
-        return data.project.issues.nodes[0].sprint.id;
+        return data.project.issues.nodes[0].iteration.id;
       },
     },
     iterations: {
-      query: groupSprintsQuery,
+      query: groupIterationssQuery,
       variables() {
         return {
           fullPath: this.groupPath,
@@ -75,7 +75,7 @@ export default {
       },
       update(data) {
         // if data.group.sprints.nodes.length == 0
-        return data.group.sprints.nodes; // map the ids and convert?
+        return data.group.iterations.nodes; // map the ids and convert?
       },
     },
   },
@@ -86,13 +86,13 @@ export default {
     };
   },
   computed: {
-    selectedSprint() {
+    selectedIteration() {
       if (this.iterations) {
         return this.iteration;
       }
     },
     iteration() {
-      const iteration = this.iterations.find(({ id }) => id === this.currentSprint);
+      const iteration = this.iterations.find(({ id }) => id === this.currentIteration);
 
       if (iteration) {
         return iteration.title;
@@ -133,12 +133,12 @@ export default {
           },
         })
         .then(({ data }) => {
-          const { sprint } = data.issueSetIteration.issue;
+          const { iteration } = data.issueSetIteration.issue;
 
-          if (sprint === null) {
-            this.currentSprint = null;
+          if (iteration === null) {
+            this.currentIteration = null;
           } else {
-            this.currentSprint = sprint.id;
+            this.currentIteration = iteration.id;
           }
         })
         .catch(() => {
@@ -153,7 +153,7 @@ export default {
       }
     },
     isIterationChecked(iterationId = null) {
-      return iterationId === this.currentSprint;
+      return iterationId === this.currentIteration;
     },
   },
 };
@@ -163,7 +163,7 @@ export default {
   <div class="mt-3">
     <div class="sidebar-collapsed-icon" b-gl-tooltip>
       <icon :size="16" :aria-label="__('Iteration')" name="history" />
-      <span class="bold collapse-truncated-title">{{ selectedSprint }}</span>
+      <span class="bold collapse-truncated-title">{{ selectedIteration }}</span>
     </div>
     <div class="title hide-collapsed">
       {{ __('Iteration') }}
@@ -177,14 +177,14 @@ export default {
       >{{ __('Edit') }}</gl-button>
     </div>
     <div class="value hide-collapsed">
-      <gl-link v-if="!editing" class="bold" href>{{ selectedSprint }}</gl-link>
-      <span v-if="!editing && !currentSprint" class="no-value">{{ __('None') }}</span>
+      <gl-link v-if="!editing" class="bold" href>{{ selectedIteration }}</gl-link>
+      <span v-if="!editing && !currentIteration" class="no-value">{{ __('None') }}</span>
     </div>
     <gl-new-dropdown
       v-show="editing"
       ref="dropdown"
       data-toggle="dropdown"
-      :text="selectedSprint"
+      :text="selectedIteration"
       class="dropdown w-100"
       :class="editing && 'show'"
     >
