@@ -15,8 +15,16 @@ function matchAll(str) {
 
 describe('avatar_helper', () => {
   describe('getIdenticonBackgroundClass', () => {
-    it('returns identicon bg class from id', () => {
+    it('returns identicon bg class from id that is a number', () => {
       expect(getIdenticonBackgroundClass(1)).toEqual('bg2');
+    });
+
+    it('returns identicon bg class from id that is a string', () => {
+      expect(getIdenticonBackgroundClass('1')).toEqual('bg2');
+    });
+
+    it('returns identicon bg class from id that is a GraphQL string id', () => {
+      expect(getIdenticonBackgroundClass('gid://gitlab/Project/1')).toEqual('bg2');
     });
 
     it(`wraps around if id is bigger than ${IDENTICON_BG_COUNT}`, () => {
