@@ -157,7 +157,7 @@ export default {
         @created="onCreated"
       />
       <div class="d-flex">
-        <gl-chart-legend v-if="chart" :chart="chart" :series-info="seriesInfo" class="js-chart-legend" />
+        <gl-chart-legend v-if="chart" :chart="chart" :series-info="seriesInfo" />
         <div class="issues-analytics-legend">
           <span>{{ s__('IssuesAnalytics|Total:') }} {{ seriesTotal }}</span>
           <span>&#8226;</span>

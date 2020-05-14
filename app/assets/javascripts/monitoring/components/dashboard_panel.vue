@@ -374,6 +374,7 @@ export default {
       :graph-data="graphData"
       v-bind="$attrs"
       v-on="$listeners"
+      class="js-basic-chart"
     />
     <component
       :is="timeSeriesChartComponent"
