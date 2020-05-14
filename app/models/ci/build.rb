@@ -87,8 +87,12 @@ module Ci
 
     scope :unstarted, ->() { where(runner_id: nil) }
     scope :ignore_failures, ->() { where(allow_failure: false) }
-    scope :with_artifacts_archive, ->() do
-      where('EXISTS (?)', Ci::JobArtifact.select(1).where('ci_builds.id = ci_job_artifacts.job_id').archive)
+    scope :with_downloadable_artifacts, ->() do
+      where('EXISTS (?)',
+        Ci::JobArtifact.select(1)
+          .where('ci_builds.id = ci_job_artifacts.job_id')
+          .where(file_type: Ci::JobArtifact::DOWNLOADABLE_TYPES)
+      )
     end
 
     scope :with_existing_job_artifacts, ->(query) do
@@ -130,8 +134,8 @@ module Ci
         .includes(:metadata, :job_artifacts_metadata)
     end
 
-    scope :with_artifacts_not_expired, ->() { with_artifacts_archive.where('artifacts_expire_at IS NULL OR artifacts_expire_at > ?', Time.now) }
-    scope :with_expired_artifacts, ->() { with_artifacts_archive.where('artifacts_expire_at < ?', Time.now) }
+    scope :with_artifacts_not_expired, ->() { with_downloadable_artifacts.where('artifacts_expire_at IS NULL OR artifacts_expire_at > ?', Time.now) }
+    scope :with_expired_artifacts, ->() { with_downloadable_artifacts.where('artifacts_expire_at < ?', Time.now) }
     scope :last_month, ->() { where('created_at > ?', Date.today - 1.month) }
     scope :manual_actions, ->() { where(when: :manual, status: COMPLETED_STATUSES + %i[manual]) }
     scope :scheduled_actions, ->() { where(when: :delayed, status: COMPLETED_STATUSES + %i[scheduled]) }
