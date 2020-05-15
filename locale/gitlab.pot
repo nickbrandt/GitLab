@@ -4358,6 +4358,9 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+msgid "Close %{display_issuable_type}"
+msgstr ""
+
 msgid "Close %{tabname}"
 msgstr ""
 
@@ -17711,6 +17714,9 @@ msgstr ""
 msgid "Reopen"
 msgstr ""
 
+msgid "Reopen %{display_issuable_type}"
+msgstr ""
+
 msgid "Reopen epic"
 msgstr ""
 
@@ -17759,7 +17765,13 @@ msgstr ""
 msgid "Repo by URL"
 msgstr ""
 
+msgid "Report %{display_issuable_type} that are abusive, inappropriate or spam."
+msgstr ""
+
 msgid "Report Type: %{report_type}"
+msgstr ""
+
+msgid "Report abuse"
 msgstr ""
 
 msgid "Report abuse to admin"
@@ -22486,6 +22498,9 @@ msgid "Toggle commit description"
 msgstr ""
 
 msgid "Toggle commit list"
+msgstr ""
+
+msgid "Toggle dropdown"
 msgstr ""
 
 msgid "Toggle emoji award"
