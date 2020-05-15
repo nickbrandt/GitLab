@@ -23,7 +23,7 @@ Press `t` to launch the File search function when in **Issues**,
 
 Start typing what you are searching for and watch the magic happen. With the
 up/down arrows, you go up and down the results, with `Esc` you close the search
-and go back to **Files**.kotlin
+and go back to **Files**
 
 ## How it works
 
