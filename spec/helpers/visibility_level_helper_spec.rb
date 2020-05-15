@@ -146,12 +146,12 @@ describe VisibilityLevelHelper do
 
     using RSpec::Parameterized::TableSyntax
 
+    public_vis = Gitlab::VisibilityLevel::PUBLIC
+    internal_vis = Gitlab::VisibilityLevel::INTERNAL
+    private_vis = Gitlab::VisibilityLevel::PRIVATE
+
     # This is a subset of all the permutations
     where(:requested_level, :max_allowed, :global_default_level, :restricted_levels, :expected) do
-      public_vis = Gitlab::VisibilityLevel::PUBLIC
-      internal_vis = Gitlab::VisibilityLevel::INTERNAL
-      private_vis = Gitlab::VisibilityLevel::PRIVATE
-
       public_vis | public_vis | public_vis | [] | public_vis
       public_vis | public_vis | public_vis | [public_vis] | internal_vis
       internal_vis | public_vis | public_vis | [] | internal_vis
