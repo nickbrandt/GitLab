@@ -63,13 +63,13 @@ export default {
       const series = [
         {
           name,
-          data: data.map(d => [new Date(d[0]), d[1]]),
+          data,
         },
       ];
 
       if (series[0] && series[0].data.length >= 2) {
-        const idealStart = [new Date(this.startDate), data[0][1]];
-        const idealEnd = [new Date(this.dueDate), 0];
+        const idealStart = [this.startDate, data[0][1]];
+        const idealEnd = [this.dueDate, 0];
         const idealData = [idealStart, idealEnd];
 
         series.push({
@@ -91,6 +91,8 @@ export default {
         xAxis: {
           name: '',
           type: 'time',
+          min: this.startDate,
+          max: this.dueDate,
           axisLine: {
             show: true,
           },
@@ -141,7 +143,7 @@ export default {
     <div v-if="showTitle" class="burndown-header d-flex align-items-center">
       <h3>{{ __('Burndown chart') }}</h3>
     </div>
-    <resizable-chart-container class="burndown-chart">
+    <resizable-chart-container class="burndown-chart js-burndown-chart">
       <gl-line-chart
         slot-scope="{ width }"
         :width="width"
