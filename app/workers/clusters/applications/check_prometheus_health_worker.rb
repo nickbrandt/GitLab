@@ -16,7 +16,7 @@ module Clusters
       idempotent!
 
       def perform
-        demo_project_ids = Gitlab::Monitor::DemoProjects.oids
+        demo_project_ids = Gitlab::Monitor::DemoProjects.primary_keys
 
         clusters = Clusters::Cluster.with_application_prometheus
           .with_project_alert_service_data(demo_project_ids)

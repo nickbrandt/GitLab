@@ -6,7 +6,7 @@ module Gitlab
       DOT_COM_IDS = [14986497, 12507547].freeze
       STAGING_IDS = [4422333].freeze
 
-      def self.oids
+      def self.primary_keys
         if ::Gitlab.com?
           DOT_COM_IDS
         elsif ::Gitlab.staging?

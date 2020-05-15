@@ -7,7 +7,7 @@ describe Clusters::Applications::CheckPrometheusHealthWorker, '#perform' do
 
   it 'triggers health service' do
     cluster = create(:cluster)
-    allow(Gitlab::Monitor::DemoProjects).to receive(:oids)
+    allow(Gitlab::Monitor::DemoProjects).to receive(:primary_keys)
     allow(Clusters::Cluster).to receive(:with_application_prometheus).and_return(double(with_project_alert_service_data: [cluster]))
 
     service_instance = instance_double(Clusters::Applications::PrometheusHealthCheckService)

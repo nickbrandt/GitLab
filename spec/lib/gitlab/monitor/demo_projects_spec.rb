@@ -3,22 +3,22 @@
 require 'spec_helper'
 
 describe Gitlab::Monitor::DemoProjects do
-  describe '#oids' do
-    subject { described_class.oids }
+  describe '#primary_keys' do
+    subject { described_class.primary_keys }
 
-    it 'fetches oids when in test env' do
+    it 'fetches primary_keys when in test env' do
       project = create(:project)
 
       expect(subject).to eq([project.id])
     end
 
-    it 'fetches oids when on gitlab.com' do
+    it 'fetches primary_keys when on gitlab.com' do
       expect(Gitlab).to receive(:'com?').and_return(true)
 
       expect(subject).to eq(Gitlab::Monitor::DemoProjects::DOT_COM_IDS)
     end
 
-    it 'fetches oids when on staging' do
+    it 'fetches primary_keys when on staging' do
       expect(Gitlab).to receive(:staging?).and_return(true)
 
       expect(subject).to eq(Gitlab::Monitor::DemoProjects::STAGING_IDS)
