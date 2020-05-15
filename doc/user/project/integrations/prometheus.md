@@ -72,6 +72,25 @@ It enables you to search as you type through all environments and select the one
 
 ![Monitoring Dashboard Environments](img/prometheus_dashboard_environments_v12_8.png)
 
+##### Select a dashboard
+
+The **dashboard** dropdown box above the dashboard displays the list of all dashboards available for the project.
+It enables you to search as you type through all dashboards and select the one you're looking for.
+
+![Monitoring Dashboard select](img/prometheus_dashboard_select_v_13_0.png)
+
+##### Mark a dashboard as favorite
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/214582) in GitLab 13.0.
+
+When viewing a dashboard, click the empty **Star dashboard** **{star-o}** button to mark a
+dashboard as a favorite. Starred dashboards display a solid star **{star}** button,
+and appear at the top of the dashboard select list.
+
+To remove dashboard from the favorites list, click the solid **Unstar Dashboard** **{star}** button.
+
+![Monitoring Dashboard favorite state toggle](img/toggle_metrics_user_starred_dashboard_v13_0.png)
+
 #### About managed Prometheus deployments
 
 Prometheus is deployed into the `gitlab-managed-apps` namespace, using the [official Helm chart](https://github.com/helm/charts/tree/master/stable/prometheus). Prometheus is only accessible within the cluster, with GitLab communicating through the [Kubernetes API](https://kubernetes.io/docs/concepts/overview/kubernetes-api/).
