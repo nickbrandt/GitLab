@@ -6,6 +6,11 @@ describe PerformanceMonitoring::PrometheusDashboard do
   let(:json_content) do
     {
       "dashboard" => "Dashboard Title",
+      "templating" => {
+        "variables" => {
+          "variable1" => %w(value1 value2 value3)
+        }
+      },
       "panel_groups" => [{
         "group" => "Group Title",
         "panels" => [{
