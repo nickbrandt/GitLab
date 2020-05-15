@@ -84,4 +84,22 @@ RSpec.describe IssueLink do
       expect(described_class.inverse_link_type('is_blocked_by')).to eq 'blocks'
     end
   end
+
+  describe '.blocking_issues_for_collection' do
+    it 'returns blocking issues count grouped by issue id' do
+      issue_1 = create(:issue)
+      issue_2 = create(:issue)
+      issue_3 = create(:issue)
+      blocking_issue_1 = create(:issue, project: issue_1.project)
+      blocking_issue_2 = create(:issue, project: issue_2.project)
+      create(:issue_link, source: blocking_issue_1, target: issue_1, link_type: IssueLink::TYPE_BLOCKS)
+      create(:issue_link, source: issue_2, target: blocking_issue_1, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+      create(:issue_link, source: blocking_issue_2, target: issue_3, link_type: IssueLink::TYPE_BLOCKS)
+
+      results = described_class.blocking_issues_for_collection([blocking_issue_1, blocking_issue_2])
+
+      expect(results.find { |link| link.blocking_issue_id == blocking_issue_1.id }.count).to eq(2)
+      expect(results.find { |link| link.blocking_issue_id == blocking_issue_2.id }.count).to eq(1)
+    end
+  end
 end
