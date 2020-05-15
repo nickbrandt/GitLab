@@ -12,6 +12,7 @@ import {
   GlButton,
 } from '@gitlab/ui';
 import createFlash from '~/flash';
+import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
 import { s__ } from '~/locale';
 import query from '../graphql/queries/details.query.graphql';
 import { fetchPolicies } from '~/lib/graphql';
@@ -218,7 +219,28 @@ export default {
           <ul class="list-unstyled">
             <li v-for="(value, key) in alert" v-if="key !== '__typename'" :key="key">
               <p class="py-1 my-1 gl-font-base">
-                <strong>{{ key }}:</strong> {{ value }}
+                <strong
+                  >{{
+                    capitalizeFirstCharacter(
+                      key
+                        .replace(/([A-Z])/g, ' $1')
+                        .trim()
+                        .toLocaleLowerCase(),
+                    )
+                  }}:
+                </strong>
+                <template v-if="key === 'severity'">
+                  <gl-icon
+                    class="gl-mr-1 align-middle"
+                    :size="12"
+                    :name="`severity-${value.toLowerCase()}`"
+                    :class="`icon-${value.toLowerCase()}`"
+                  />
+                  {{ $options.severityLabels[value] }}
+                </template>
+                <template v-if="key !== 'severity'">
+                  {{ value }}
+                </template>
               </p>
             </li>
           </ul>
