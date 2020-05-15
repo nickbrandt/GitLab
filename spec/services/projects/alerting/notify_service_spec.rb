@@ -121,7 +121,7 @@ describe Projects::Alerting::NotifyService do
             expect(last_alert_attributes).to match(
               project_id: project.id,
               title: payload_raw.fetch(:title),
-              started_at: Time.parse(payload_raw.fetch(:start_time)),
+              started_at: Time.zone.parse(payload_raw.fetch(:start_time)),
               severity: payload_raw.fetch(:severity),
               status: AlertManagement::Alert::STATUSES[:triggered],
               events: 1,
@@ -154,7 +154,7 @@ describe Projects::Alerting::NotifyService do
               expect(last_alert_attributes).to match(
                 project_id: project.id,
                 title: payload_raw.fetch(:title),
-                started_at: Time.parse(payload_raw.fetch(:start_time)),
+                started_at: Time.zone.parse(payload_raw.fetch(:start_time)),
                 severity: 'critical',
                 status: AlertManagement::Alert::STATUSES[:triggered],
                 events: 1,

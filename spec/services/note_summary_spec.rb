@@ -30,13 +30,13 @@ describe NoteSummary do
     end
 
     context 'when noteable is a commit' do
-      let(:noteable) { build(:commit, system_note_timestamp: Time.at(43)) }
+      let(:noteable) { build(:commit, system_note_timestamp: Time.zone.at(43)) }
 
       it 'returns note hash specific to commit' do
         expect(create_note_summary.note).to eq(
           noteable: nil, project: project, author: user, note: 'note',
           noteable_type: 'Commit', commit_id: noteable.id,
-          created_at: Time.at(43)
+          created_at: Time.zone.at(43)
         )
       end
     end

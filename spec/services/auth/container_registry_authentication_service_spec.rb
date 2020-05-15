@@ -35,7 +35,7 @@ describe Auth::ContainerRegistryAuthenticationService do
     it { expect(payload).to include('access') }
 
     context 'a expirable' do
-      let(:expires_at) { Time.at(payload['exp']) }
+      let(:expires_at) { Time.zone.at(payload['exp']) }
       let(:expire_delay) { 10 }
 
       context 'for default configuration' do
