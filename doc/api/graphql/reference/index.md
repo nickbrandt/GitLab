@@ -1166,7 +1166,6 @@ Information about pagination in a connection.
 | `createdAt` | Time | Timestamp of when the release was created |
 | `description` | String | Description (also known as "release notes") of the release |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
-| `evidenceSha` | String | SHA of the release's evidence |
 | `name` | String | Name of the release |
 | `releasedAt` | Time | Timestamp of when the release was released |
 | `tagName` | String! | Name of the tag associated with the release |

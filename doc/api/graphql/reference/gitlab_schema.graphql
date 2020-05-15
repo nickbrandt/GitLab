@@ -8377,11 +8377,6 @@ type Release {
   descriptionHtml: String
 
   """
-  SHA of the release's evidence
-  """
-  evidenceSha: String
-
-  """
   Milestones associated to the release
   """
   milestones(
