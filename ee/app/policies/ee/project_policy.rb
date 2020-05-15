@@ -97,7 +97,7 @@ module EE
 
       with_scope :subject
       condition(:license_scanning_enabled) do
-        @subject.feature_available?(:license_scanning) || @subject.feature_available?(:license_management)
+        @subject.feature_available?(:license_scanning)
       end
 
       with_scope :subject
