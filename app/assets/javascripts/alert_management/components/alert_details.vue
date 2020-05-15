@@ -131,7 +131,7 @@ export default {
       {{ $options.i18n.errorMsg }}
     </gl-alert>
     <div v-if="loading"><gl-loading-icon size="lg" class="gl-mt-5" /></div>
-    <div v-if="alert" class="alert-management-details">
+    <div v-if="alert" class="alert-management-details gl-relative">
       <div
         class="gl-display-flex gl-justify-content-space-between gl-align-items-center gl-px-1 gl-py-6 gl-border-b-1 gl-border-b-gray-200 gl-border-b-solid"
       >
@@ -170,29 +170,29 @@ export default {
         class="gl-display-flex gl-justify-content-space-between gl-align-items-center"
       >
         <h2 data-testid="title">{{ alert.title }}</h2>
-        <gl-dropdown
-          :text="capitalizeFirstCharacter(alert.status.toLowerCase())"
-          class="mt-2 mb-n2"
-          right
-        >
-          <gl-dropdown-item
-            v-for="(label, field) in $options.statuses"
-            :key="field"
-            data-testid="statusDropdownItem"
-            class="gl-vertical-align-middle"
-            @click="updateAlertStatus(label)"
-          >
-            <span class="d-flex">
-              <gl-icon
-                class="flex-shrink-0 append-right-4"
-                :class="{ invisible: label.toUpperCase() !== alert.status }"
-                name="mobile-issue-close"
-              />
-              {{ label }}
-            </span>
-          </gl-dropdown-item>
-        </gl-dropdown>
       </div>
+      <gl-dropdown
+        :text="capitalizeFirstCharacter(alert.status.toLowerCase())"
+        class="gl-absolute gl-right-0"
+        right
+      >
+        <gl-dropdown-item
+          v-for="(label, field) in $options.statuses"
+          :key="field"
+          data-testid="statusDropdownItem"
+          class="gl-vertical-align-middle"
+          @click="updateAlertStatus(label)"
+        >
+          <span class="d-flex">
+            <gl-icon
+              class="flex-shrink-0 append-right-4"
+              :class="{ invisible: label.toUpperCase() !== alert.status }"
+              name="mobile-issue-close"
+            />
+            {{ label }}
+          </span>
+        </gl-dropdown-item>
+      </gl-dropdown>
       <gl-tabs v-if="alert" data-testid="alertDetailsTabs">
         <gl-tab data-testid="overviewTab" :title="$options.i18n.overviewTitle">
           <ul class="pl-4 mb-n1">
