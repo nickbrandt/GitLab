@@ -80,7 +80,7 @@ module Gitlab
         data.lines.each do |line|
           line = line.strip
 
-          next if skip?(line)
+          next if skip?(line) || line.match?(SECTION_HEADER_REGEX)
 
           extract_entry_and_populate_parsed_data(line, parsed)
         end

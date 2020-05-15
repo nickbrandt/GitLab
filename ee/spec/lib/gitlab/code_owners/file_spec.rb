@@ -37,6 +37,21 @@ describe Gitlab::CodeOwners::File do
       expect(owner_line('/**/LICENSE')).to include('legal', 'janedoe@gitlab.com')
     end
 
+    context "when CODEOWNERS file contains multiple sections" do
+      let(:file_content) do
+        File.read(Rails.root.join("ee", "spec", "fixtures", "sectional_codeowners_example"))
+      end
+
+      let(:patterns) { ["[Documentation]", "[Database]"] }
+      let(:paths) { ["/**/[Documentation]", "/**/[Database]"] }
+
+      it "skips section headers when parsing" do
+        expect(file.parsed_data.keys).not_to include(*paths)
+        expect(file.parsed_data.values.any? { |e| patterns.include?(e.pattern) }).to be_falsey
+        expect(file.parsed_data.values.any? { |e| e.owner_line.blank? }).to be_falsey
+      end
+    end
+
     context "when feature flag `:sectional_codeowners` is enabled" do
       using RSpec::Parameterized::TableSyntax
 
