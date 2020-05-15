@@ -87,21 +87,6 @@ describe('EpicHeaderComponent', () => {
         expect(vm.actionButtonText).toBe('Reopen epic');
       });
     });
-
-    describe('showGitlabTeamMemberBadge', () => {
-      test.each`
-        isGitlabEmployeeValue | expected
-        ${true}               | ${true}
-        ${false}              | ${false}
-      `(
-        'returns $expected when `author.isGitlabEmployee` is $isGitlabEmployeeValue',
-        ({ isGitlabEmployeeValue, expected }) => {
-          vm.$store.state.author.isGitlabEmployee = isGitlabEmployeeValue;
-
-          expect(vm.showGitlabTeamMemberBadge).toBe(expected);
-        },
-      );
-    });
   });
 
   describe('template', () => {
@@ -149,7 +134,8 @@ describe('EpicHeaderComponent', () => {
     it('renders GitLab team member badge when `author.isGitlabEmployee` is `true`', () => {
       vm.$store.state.author.isGitlabEmployee = true;
 
-      return vm.$nextTick().then(() => {
+      // Wait for dynamic imports to resolve
+      return new Promise(setImmediate).then(() => {
         expect(vm.$refs.gitlabTeamMemberBadge).not.toBeUndefined();
       });
     });
