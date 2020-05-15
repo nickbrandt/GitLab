@@ -6477,6 +6477,9 @@ msgstr ""
 msgid "CurrentUser|Start a Gold trial"
 msgstr ""
 
+msgid "CurrentUser|Upgrade"
+msgstr ""
+
 msgid "Custom CI configuration path"
 msgstr ""
 
