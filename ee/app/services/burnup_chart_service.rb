@@ -41,15 +41,7 @@ class BurnupChartService
   attr_reader :milestone, :start_date, :due_date, :end_date, :user
 
   def can_read_milestone?
-    Ability.allowed?(user, :read_milestone, milestone_parent)
-  end
-
-  def milestone_parent
-    if milestone.group_milestone?
-      milestone.group
-    else
-      milestone.project
-    end
+    Ability.allowed?(user, :read_milestone, milestone.parent)
   end
 
   def handle_added_milestone(event, assigned_milestones)
