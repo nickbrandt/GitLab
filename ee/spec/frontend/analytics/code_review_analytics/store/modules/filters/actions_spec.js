@@ -149,13 +149,16 @@ describe('Code review analytics filters actions', () => {
   });
 
   describe('setFilters', () => {
-    const selectedMilestone = 'my milestone';
-    const selectedLabels = ['first label', 'second label'];
+    const selectedMilestone = { value: 'my milestone', operator: '=' };
+    const selectedLabels = [
+      { value: 'first label', operator: '=' },
+      { value: 'second label', operator: '!=' },
+    ];
 
     it('commits the SET_FILTERS mutation', () => {
       testAction(
         actions.setFilters,
-        { milestone_title: selectedMilestone, label_name: selectedLabels },
+        { labelNames: selectedLabels, milestoneTitle: selectedMilestone },
         state,
         [
           {

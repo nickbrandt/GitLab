@@ -57,6 +57,7 @@ export default {
     processFilters(filters) {
       return filters.reduce((acc, token) => {
         const { type, value } = token;
+        const { operator } = value;
         let tokenValue = value.data;
 
         // remove wrapping double quotes which were added for token values that include spaces
@@ -71,13 +72,14 @@ export default {
           acc[type] = [];
         }
 
-        acc[type].push(tokenValue);
+        acc[type].push({ value: tokenValue, operator });
         return acc;
       }, {});
     },
     filteredSearchSubmit(filters) {
-      const { label, milestone } = this.processFilters(filters);
-      this.setFilters({ label_name: label, milestone_title: milestone });
+      const { label: labelNames, milestone } = this.processFilters(filters);
+      const milestoneTitle = milestone ? milestone[0] : null;
+      this.setFilters({ labelNames, milestoneTitle });
     },
   },
 };
