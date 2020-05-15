@@ -171,20 +171,6 @@ class Service < ApplicationRecord
     fields
   end
 
-  def global_fields_json
-    global_fields.map do |field|
-      value = send(field[:name]) # rubocop:disable GitlabSecurity/PublicSend
-      public_value =
-        if field[:type] == 'password' && value.present?
-          'true'
-        else
-          value
-        end
-
-      field.merge(value: public_value)
-    end.to_json
-  end
-
   def configurable_events
     events = self.class.supported_events
 
