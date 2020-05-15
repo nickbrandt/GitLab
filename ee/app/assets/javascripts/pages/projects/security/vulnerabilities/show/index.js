@@ -4,9 +4,9 @@ import FooterApp from 'ee/vulnerabilities/components/footer.vue';
 
 function createHeaderApp() {
   const el = document.getElementById('js-vulnerability-header');
-  const initialVulnerability = JSON.parse(el.dataset.vulnerabilityJson);
+  console.log('h el.dataset', el.dataset);
+  console.log('h Object({}, el.dataset)', { ...el.dataset });
   const pipeline = JSON.parse(el.dataset.pipelineJson);
-  const finding = JSON.parse(el.dataset.findingJson);
 
   const { projectFingerprint, createIssueUrl } = el.dataset;
 
@@ -16,8 +16,8 @@ function createHeaderApp() {
     render: h =>
       h(HeaderApp, {
         props: {
-          initialVulnerability,
-          finding,
+          initialVulnerability: { ...el.dataset },
+          finding: { ...el.dataset },
           pipeline,
           projectFingerprint,
           createIssueUrl,
@@ -28,18 +28,23 @@ function createHeaderApp() {
 
 function createFooterApp() {
   const el = document.getElementById('js-vulnerability-footer');
+  console.log('f el.dataset', el.dataset);
 
   if (!el) {
     return false;
   }
 
-  const { vulnerabilityFeedbackHelpPath, hasMr, discussionsUrl } = el.dataset;
-  const vulnerability = JSON.parse(el.dataset.vulnerabilityJson);
-  const finding = JSON.parse(el.dataset.findingJson);
-  const { issue_feedback: feedback, remediation, solution } = finding;
-  const hasDownload = Boolean(
-    vulnerability.state !== 'resolved' && remediation?.diff?.length && !hasMr,
-  );
+  const {
+    vulnerabilityFeedbackHelpPath,
+    hasMr,
+    discussionsUrl,
+    state,
+    issue_feedback: feedback,
+    remediation,
+    solution,
+  } = el.dataset;
+  const project = JSON.parse(el.dataset.project);
+  const hasDownload = Boolean(state !== 'resolved' && remediation?.diff?.length && !hasMr);
 
   const props = {
     discussionsUrl,
@@ -54,8 +59,8 @@ function createFooterApp() {
     },
     feedback,
     project: {
-      url: finding.project.full_path,
-      value: finding.project.full_name,
+      url: project.full_path,
+      value: project.full_name,
     },
   };
 

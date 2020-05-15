@@ -83,7 +83,7 @@ export default {
     'vulnerability.state': {
       immediate: true,
       handler(state) {
-        const id = this.vulnerability[`${state}_by_id`];
+        const id = this.vulnerability[`${state}ById`];
 
         if (id === undefined) return; // Don't do anything if there's no ID.
 

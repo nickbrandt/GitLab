@@ -43,7 +43,7 @@ export default {
       const { state } = this.vulnerability;
       return state === 'detected'
         ? this.pipeline.created_at
-        : this.vulnerability[`${this.vulnerability.state}_at`];
+        : this.vulnerability[`${this.vulnerability.state}At`];
     },
 
     statusText() {
