@@ -70,14 +70,9 @@ export default {
       'endDate',
       'medians',
     ]),
-    ...mapState('customStages', [
-      'isSavingCustomStage',
-      'isCreatingCustomStage',
-      'isEditingCustomStage',
-      'formEvents',
-      'formErrors',
-      'formInitialData',
-    ]),
+    // NOTE: formEvents are fetched in the same request as the list of stages (fetchGroupStagesAndEvents)
+    // so i think its ok to bind formEvents here even though its only used as a prop to the custom-stage-form
+    ...mapState('customStages', ['isCreatingCustomStage', 'formEvents']),
     ...mapGetters([
       'hasNoAccessError',
       'currentGroupPath',
@@ -105,9 +100,6 @@ export default {
     },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
-    },
-    isUpdatingCustomStage() {
-      return this.isEditingCustomStage && this.isSavingCustomStage;
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -169,6 +161,7 @@ export default {
       this.showCreateForm();
     },
     onShowEditStageForm(initData = {}) {
+      this.setSelectedStage(initData);
       this.showEditForm(initData);
     },
     onCreateCustomStage(data) {
@@ -299,7 +292,6 @@ export default {
                 :stages="activeStages"
                 :medians="medians"
                 :is-creating-custom-stage="isCreatingCustomStage"
-                :custom-stage-form-active="customStageFormActive"
                 :can-edit-stages="true"
                 :custom-ordering="enableCustomOrdering"
                 @reorderStage="onStageReorder"
@@ -311,14 +303,8 @@ export default {
               />
             </template>
             <template v-if="customStageFormActive" #content>
-              <gl-loading-icon v-if="isUpdatingCustomStage" class="mt-4" size="md" />
               <custom-stage-form
-                v-else
                 :events="formEvents"
-                :is-saving-custom-stage="isSavingCustomStage"
-                :initial-fields="formInitialData"
-                :is-editing-custom-stage="isEditingCustomStage"
-                :errors="formErrors"
                 @createStage="onCreateCustomStage"
                 @updateStage="onUpdateCustomStage"
                 @clearErrors="$emit('clearFormErrors')"

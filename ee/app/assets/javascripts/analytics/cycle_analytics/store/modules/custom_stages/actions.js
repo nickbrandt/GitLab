@@ -15,15 +15,18 @@ export const hideForm = ({ commit }) => {
 };
 
 export const showCreateForm = ({ commit }) => {
+  commit(types.SET_LOADING);
+  commit(types.SET_FORM_INITIAL_DATA);
   commit(types.SHOW_CREATE_FORM);
   removeFlash();
 };
 
 export const showEditForm = ({ commit, dispatch }, selectedStage = {}) => {
+  commit(types.SET_LOADING);
   commit(types.SET_FORM_INITIAL_DATA, selectedStage);
-  commit(types.SHOW_EDIT_FORM);
   dispatch('setSelectedStage', selectedStage, { root: true });
   dispatch('clearSavingCustomStage');
+  commit(types.SHOW_EDIT_FORM);
   removeFlash();
 };
 
