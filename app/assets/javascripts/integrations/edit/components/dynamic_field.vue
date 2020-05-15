@@ -1,5 +1,5 @@
 <script>
-import { startCase, isEmpty } from 'lodash';
+import { capitalize, lowerCase, isEmpty } from 'lodash';
 import { __, sprintf } from '~/locale';
 import { GlFormGroup, GlFormCheckbox, GlFormInput, GlFormSelect, GlFormTextarea } from '@gitlab/ui';
 
@@ -73,14 +73,15 @@ export default {
       return this.isPassword && !isEmpty(this.value);
     },
     label() {
-      const title = this.title || startCase(this.name);
-
       if (this.isNonEmptyPassword) {
         return sprintf(__('Enter new %{field_title}'), {
-          password: title,
+          field_title: this.humanizedTitle,
         });
       }
-      return title;
+      return this.humanizedTitle;
+    },
+    humanizedTitle() {
+      return this.title || capitalize(lowerCase(this.name));
     },
     passwordRequired() {
       return isEmpty(this.value) && this.required;
@@ -118,7 +119,9 @@ export default {
   <gl-form-group :label="label" :label-for="fieldId" :description="help">
     <template v-if="isCheckbox">
       <input :name="fieldName" type="hidden" value="false" />
-      <gl-form-checkbox v-model="model" v-bind="sharedProps" />
+      <gl-form-checkbox v-model="model" v-bind="sharedProps">
+        {{ humanizedTitle }}
+      </gl-form-checkbox>
     </template>
     <gl-form-select v-else-if="isSelect" v-model="model" v-bind="sharedProps" :options="options" />
     <gl-form-textarea
