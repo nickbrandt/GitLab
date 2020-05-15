@@ -10,6 +10,8 @@ export const DEPENDENCY_LIST_TYPES = {
       filter: FILTER.all,
     },
   },
+  // This is only used in tests, and will be removed in
+  // https://gitlab.com/gitlab-org/gitlab/-/issues/217734
   vulnerable: {
     namespace: 'vulnerableDependencies',
     label: s__('Dependencies|Vulnerable components'),
