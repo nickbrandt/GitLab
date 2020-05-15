@@ -121,4 +121,28 @@ describe Resolvers::BaseResolver do
       end
     end
   end
+
+  describe '#synchronized_object' do
+    let(:object) { double(foo: :the_foo) }
+
+    let(:resolver) do
+      Class.new(described_class) do
+        def resolve(**args)
+          [synchronized_object.foo]
+        end
+      end
+    end
+
+    it 'handles raw objects' do
+      expect(resolve(resolver, obj: object)).to contain_exactly(:the_foo)
+    end
+
+    it 'handles lazy objects' do
+      delayed = BatchLoader::GraphQL.for(1).batch do |_, loader|
+        loader.call(1, object)
+      end
+
+      expect(resolve(resolver, obj: delayed)).to contain_exactly(:the_foo)
+    end
+  end
 end

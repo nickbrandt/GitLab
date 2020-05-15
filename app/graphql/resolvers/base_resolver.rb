@@ -65,6 +65,17 @@ module Resolvers
       end
     end
 
+    def synchronized_object
+      strong_memoize(:synchronized_object) do
+        case object
+        when BatchLoader::GraphQL
+          object.sync
+        else
+          object
+        end
+      end
+    end
+
     def single?
       false
     end
