@@ -3,9 +3,7 @@
 - breadcrumb_title @vulnerability.id
 - page_title @vulnerability.title
 - page_description @vulnerability.description
-- finding = @vulnerability.finding
-- location = finding.location
-- vulnerability_init_details = vulnerability_details_json(@vulnerability, @pipeline)
+- vulnerability_init_details = { vulnerability: vulnerability_details_json(@vulnerability, @pipeline)}
 
 #js-vulnerability-header{ data: vulnerability_init_details }
 #js-vulnerability-details{ data: vulnerability_init_details }

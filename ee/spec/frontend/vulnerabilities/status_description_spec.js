@@ -27,32 +27,30 @@ describe('Vulnerability status description component', () => {
   const createDate = value => (value ? new Date(value) : new Date()).toISOString();
 
   const createWrapper = ({
-    vulnerability = {},
-    pipeline = {},
+    vulnerability = { pipeline: {} },
     user,
     isLoadingVulnerability = false,
     isLoadingUser = false,
   } = {}) => {
     const v = vulnerability;
-    const p = pipeline;
 
     // Automatically create the ${v.state}_at property if it doesn't exist. Otherwise, every test would need to create
     // it manually for the component to mount properly.
     if (v.state === 'detected') {
-      p.created_at = p.created_at || createDate();
+      v.pipeline.created_at = v.pipeline.created_at || createDate();
     } else {
       const propertyName = `${v.state}_at`;
       v[propertyName] = v[propertyName] || createDate();
     }
 
     wrapper = mount(StatusText, {
-      propsData: { vulnerability, pipeline, user, isLoadingVulnerability, isLoadingUser },
+      propsData: { vulnerability, user, isLoadingVulnerability, isLoadingUser },
     });
   };
 
   describe('state text', () => {
     it.each(ALL_STATES)('shows the correct string for the vulnerability state "%s"', state => {
-      createWrapper({ vulnerability: { state } });
+      createWrapper({ vulnerability: { state, pipeline: {} } });
 
       expect(wrapper.text()).toMatch(new RegExp(`^${capitalize(state)}`));
     });
@@ -62,8 +60,7 @@ describe('Vulnerability status description component', () => {
     it('uses the pipeline created date when the vulnerability state is "detected"', () => {
       const pipelineDateString = createDate('2001');
       createWrapper({
-        vulnerability: { state: 'detected' },
-        pipeline: { created_at: pipelineDateString },
+        vulnerability: { state: 'detected', pipeline: { created_at: pipelineDateString } },
       });
 
       expect(timeAgo().props('time')).toBe(pipelineDateString);
@@ -75,8 +72,11 @@ describe('Vulnerability status description component', () => {
       state => {
         const expectedDate = createDate();
         createWrapper({
-          vulnerability: { state, [`${state}_at`]: expectedDate },
-          pipeline: { created_at: 'pipeline_created_at' },
+          vulnerability: {
+            state,
+            pipeline: { created_at: 'pipeline_created_at' },
+            [`${state}_at`]: expectedDate,
+          },
         });
 
         expect(timeAgo().props('time')).toBe(expectedDate);
@@ -87,8 +87,7 @@ describe('Vulnerability status description component', () => {
   describe('pipeline link', () => {
     it('shows the pipeline link when the vulnerability state is "detected"', () => {
       createWrapper({
-        vulnerability: { state: 'detected' },
-        pipeline: { url: 'pipeline/url' },
+        vulnerability: { state: 'detected', pipeline: { url: 'pipeline/url' } },
       });
 
       expect(pipelineLink().attributes('href')).toBe('pipeline/url');
@@ -98,8 +97,7 @@ describe('Vulnerability status description component', () => {
       'does not show the pipeline link when the vulnerability state is "%s"',
       state => {
         createWrapper({
-          vulnerability: { state },
-          pipeline: { url: 'pipeline/url' },
+          vulnerability: { state, pipeline: { url: 'pipeline/url' } },
         });
 
         expect(pipelineLink().exists()).toBe(false); // The user avatar should be shown instead, those tests are handled separately.
@@ -152,7 +150,7 @@ describe('Vulnerability status description component', () => {
     });
 
     it('hides the skeleton loader and shows everything else when the vulnerability is not loading', () => {
-      createWrapper({ vulnerability: { state: 'detected' } });
+      createWrapper({ vulnerability: { state: 'detected', pipeline: {} } });
 
       expect(skeletonLoader().exists()).toBe(false);
       expect(timeAgo().exists()).toBe(true);

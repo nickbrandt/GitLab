@@ -19,10 +19,6 @@ export default {
       type: Object,
       required: true,
     },
-    pipeline: {
-      type: Object,
-      required: true,
-    },
     user: {
       type: Object,
       required: false,
@@ -42,7 +38,7 @@ export default {
     time() {
       const { state } = this.vulnerability;
       return state === 'detected'
-        ? this.pipeline.created_at
+        ? this.vulnerability.pipeline.created_at
         : this.vulnerability[`${this.vulnerability.state}_at`];
     },
 
@@ -86,9 +82,9 @@ export default {
           img-css-classes="avatar-inline"
         />
       </template>
-      <template v-if="pipeline" #pipelineLink>
-        <gl-link :href="pipeline.url" target="_blank" class="link">
-          {{ pipeline.id }}
+      <template v-if="vulnerability.pipeline" #pipelineLink>
+        <gl-link :href="vulnerability.pipeline.url" target="_blank" class="link">
+          {{ vulnerability.pipeline.id }}
         </gl-link>
       </template>
     </gl-sprintf>
