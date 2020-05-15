@@ -331,7 +331,7 @@ The following tables outline the details of expected properties.
 | -------- | ---- | -------- | ----------- |
 | `variables` | Hash | no | Variables can be defined here. |
 
-Read the documentation on [templating](../metrics/dashboard/templating.md).
+Read the documentation on [templating](#templating-variables-for-metrics-dashboards).
 
 ##### **Panel group (`panel_groups`) properties**
 
@@ -669,6 +669,106 @@ Note the following properties:
 | query_range | yes | yes | For area panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
 
 ![heatmap panel type](img/heatmap_panel_type.png)
+
+### Templating variables for metrics dashboards
+
+Templating variables can be used to make your metrics dashboard more versatile.
+
+#### Templating variable types
+
+`templating` is a top-level key in the
+[dashboard YAML](#dashboard-top-level-properties).
+Define your variables in the `variables` key, under `templating`. The value of
+the `variables` key should be a hash, and each key under `variables`
+defines a templating variable on the dashboard.
+
+A variable can be used in a Prometheus query in the same dashboard using the syntax
+described [here](#using-variables).
+
+##### `text` variable type
+
+CAUTION: **Warning:**
+This variable type is an _alpha_ feature, and is subject to change at any time
+without prior notice!
+
+For each `text` variable defined in the dashboard YAML, there will be a free text
+box on the dashboard UI, allowing you to enter a value for each variable.
+
+The `text` variable type supports a simple and a full syntax.
+
+###### Simple syntax
+
+This example creates a variable called `variable1`, with a default value
+of `default value`:
+
+```yaml
+templating:
+  variables:
+    variable1: 'default value'     # `text` type variable with `default value` as its default.
+```
+
+###### Full syntax
+
+This example creates a variable called `variable1`, with a default value of `default`.
+The label for the text box on the UI will be the value of the `label` key:
+
+```yaml
+templating:
+  variables:
+    variable1:                       # The variable name that can be used in queries.
+      label: 'Variable 1'            # (Optional) label that will appear in the UI for this text box.
+      type: text
+      options:
+        default_value: 'default'     # (Optional) default value.
+```
+
+##### `custom` variable type
+
+CAUTION: **Warning:**
+This variable type is an _alpha_ feature, and is subject to change at any time
+without prior notice!
+
+Each `custom` variable defined in the dashboard YAML creates a dropdown
+selector on the dashboard UI, allowing you to select a value for each variable.
+
+The `custom` variable type supports a simple and a full syntax.
+
+###### Simple syntax
+
+This example creates a variable called `variable1`, with a default value of `value1`.
+The dashboard UI will display a dropdown with `value1`, `value2` and `value3`
+as the choices.
+
+```yaml
+templating:
+  variables:
+    variable1: ['value1', 'value2', 'value3']
+```
+
+###### Full syntax
+
+This example creates a variable called `variable1`, with a default value of `var1_option_2`.
+The label for the text box on the UI will be the value of the `label` key.
+The dashboard UI will display a dropdown with `Option 1` and `Option 2`
+as the choices.
+
+If you select `Option 1` from the dropdown, the variable will be replaced with `value option 1`.
+Similarly, if you select `Option 2`, the variable will be replaced with `value_option_2`:
+
+```yaml
+templating:
+  variables:
+    variable1:                           # The variable name that can be used in queries.
+      label: 'Variable 1'                # (Optional) label that will appear in the UI for this dropdown.
+      type: custom
+      options:
+        values:
+        - value: 'value option 1'        # The value that will replace the variable in queries.
+          text: 'Option 1'               # (Optional) Text that will appear in the UI dropdown.
+        - value: 'value_option_2'
+          text: 'Option 2'
+          default: true                  # (Optional) This option should be the default value of this variable.
+```
 
 ### View and edit the source file of a custom dashboard
 
