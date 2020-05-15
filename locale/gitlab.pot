@@ -2315,6 +2315,9 @@ msgstr ""
 msgid "An instance-level serverless domain already exists."
 msgstr ""
 
+msgid "An issue already exists"
+msgstr ""
+
 msgid "An issue can be a bug, a todo or a feature request that needs to be discussed in a project. Besides, issues are searchable and filterable."
 msgstr ""
 
