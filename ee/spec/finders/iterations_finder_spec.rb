@@ -99,7 +99,7 @@ describe IterationsFinder do
       end
 
       it 'returns iterations which start before the timeframe' do
-        iteration = create(:iteration, :skip_future_date_validation, project: project_2, start_date: now - 5.days)
+        iteration = create(:iteration, :skip_future_date_validation, project: project_2, start_date: now - 5.days, due_date: now - 3.days)
         params.merge!(start_date: now - 3.days, end_date: now - 2.days)
 
         expect(subject).to match_array([iteration])
