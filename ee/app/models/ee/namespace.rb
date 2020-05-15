@@ -182,6 +182,10 @@ module EE
       end
     end
 
+    def ci_minutes_quota
+      @ci_minutes_quota ||= ::Ci::Minutes::Quota.new(self)
+    end
+
     def shared_runner_minutes_supported?
       !has_parent?
     end

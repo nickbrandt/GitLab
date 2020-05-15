@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 describe Ci::Minutes::Quota do
+  using RSpec::Parameterized::TableSyntax
+
   let_it_be(:namespace) do
     create(:namespace, namespace_statistics: create(:namespace_statistics))
   end
@@ -162,6 +164,36 @@ describe Ci::Minutes::Quota do
             expect(report.status).to eq :under_quota
           end
         end
+      end
+    end
+  end
+
+  describe '#monthly_percent_used' do
+    subject { quota.monthly_percent_used }
+
+    where(:limit_enabled, :monthly_limit, :purchased_limit, :minutes_used, :result, :title) do
+      false | 200 | 0   | 40  | 0   | 'limit not enabled'
+      true  | 200 | 0   | 0   | 0   | 'monthly limit set and no usage'
+      true  | 200 | 0   | 40  | 20  | 'monthly limit set and usage lower than 100%'
+      true  | 200 | 0   | 200 | 100 | 'monthly limit set and usage at 100%'
+      true  | 200 | 0   | 210 | 105 | 'monthly limit set and usage above 100%'
+      true  | 0   | 0   | 0   | 0   | 'monthly limit not set and no usage'
+      true  | 0   | 0   | 40  | 0   | 'monthly limit not set and some usage'
+      true  | 200 | 100 | 0   | 0   | 'monthly and purchased limits set and no usage'
+      true  | 200 | 100 | 40  | 20  | 'monthly and purchased limits set and low usage'
+      true  | 200 | 100 | 210 | 100 | 'usage capped to 100% and overflows into purchased minutes'
+    end
+
+    with_them do
+      before do
+        allow(namespace).to receive(:shared_runners_minutes_limit_enabled?).and_return(limit_enabled)
+        namespace.shared_runners_minutes_limit = monthly_limit
+        namespace.extra_shared_runners_minutes_limit = purchased_limit
+        namespace.namespace_statistics.shared_runners_seconds = minutes_used.minutes
+      end
+
+      it 'returns the percentage' do
+        is_expected.to eq result
       end
     end
   end
