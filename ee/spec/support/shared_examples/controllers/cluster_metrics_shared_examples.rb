@@ -191,7 +191,7 @@ RSpec.shared_examples 'cluster metrics' do
       get :metrics_dashboard, params: metrics_params, format: :json
 
       expect(response).to have_gitlab_http_status(:ok)
-      expect(json_response.keys).to contain_exactly('dashboard', 'status')
+      expect(json_response.keys).to contain_exactly('dashboard', 'status', 'metrics_data')
     end
 
     it 'is the default dashboard' do
