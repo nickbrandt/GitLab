@@ -9,19 +9,6 @@ describe('EE projectsSelector mutations', () => {
     state = createState();
   });
 
-  describe('SET_PROJECT_ENDPOINTS', () => {
-    it('sets "projectEndpoints.list" and "projectEndpoints.add"', () => {
-      const payload = { list: 'list', add: 'add' };
-
-      state.projectEndpoints = {};
-
-      mutations[types.SET_PROJECT_ENDPOINTS](state, payload);
-
-      expect(state.projectEndpoints.list).toBe(payload.list);
-      expect(state.projectEndpoints.add).toBe(payload.add);
-    });
-  });
-
   describe('SET_SEARCH_QUERY', () => {
     it('sets "searchQuery" to be the given payload', () => {
       const payload = 'searchQuery';
@@ -332,12 +319,20 @@ describe('EE projectsSelector mutations', () => {
       expect(state.projectSearchResults).toHaveLength(0);
     });
 
-    it('sets "pageInfo.total" to be 0', () => {
-      state.pageInfo.total = 1;
+    it('sets "pageInfo.endCursor" to be empty string', () => {
+      state.pageInfo.endCursor = 'abc';
 
       mutations[types.SET_MINIMUM_QUERY_MESSAGE](state);
 
-      expect(state.pageInfo.total).toBe(0);
+      expect(state.pageInfo.endCursor).toBe('');
+    });
+
+    it('sets "pageInfo.hasNextPage" to be true', () => {
+      state.pageInfo.hasNextPage = false;
+
+      mutations[types.SET_MINIMUM_QUERY_MESSAGE](state);
+
+      expect(state.pageInfo.hasNextPage).toBe(true);
     });
 
     it('sets "messages.noResults" to be false', () => {

@@ -3,10 +3,6 @@ export default () => ({
   isLoadingProjects: false,
   isAddingProjects: false,
   isRemovingProject: false,
-  projectEndpoints: {
-    list: null,
-    add: null,
-  },
   searchQuery: '',
   projects: [],
   projectSearchResults: [],
@@ -18,9 +14,7 @@ export default () => ({
   },
   searchCount: 0,
   pageInfo: {
-    page: 0,
-    nextPage: 0,
-    total: 0,
-    totalPages: 0,
+    endCursor: '',
+    hasNextPage: true,
   },
 });

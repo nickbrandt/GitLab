@@ -1,14 +1,22 @@
-import Api from '~/api';
-import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
+import { vuexApolloClient } from 'ee/security_dashboard/graphql/provider';
 import { __, s__, sprintf } from '~/locale';
-import addPageInfo from './utils/add_page_info';
 import * as types from './mutation_types';
+import { PROJECTS_PER_PAGE } from './constants';
+import getProjects from 'ee/security_dashboard/graphql/get_projects.query.graphql';
+import getInstanceSecurityDashboardProjects from 'ee/security_dashboard/graphql/get_instance_security_dashboard_projects.query.graphql';
+import addProjectToSecurityDashboard from 'ee/security_dashboard/graphql/add_project_to_security_dashboard.mutation.graphql';
+import deleteProjectFromSecurityDashboard from 'ee/security_dashboard/graphql/delete_project_from_security_dashboard.mutation.graphql';
+import { processAddProjectResponse } from './utils';
 
 const API_MINIMUM_QUERY_LENGTH = 3;
 
-const searchProjects = (searchQuery, searchOptions) =>
-  Api.projects(searchQuery, searchOptions).then(addPageInfo);
+const searchProjects = (searchQuery, pageInfo) => {
+  return vuexApolloClient.query({
+    query: getProjects,
+    variables: { search: searchQuery, first: PROJECTS_PER_PAGE, after: pageInfo.endCursor },
+  });
+};
 
 export const toggleSelectedProject = ({ commit, state }, project) => {
   const isProject = ({ id }) => id === project.id;
@@ -28,19 +36,20 @@ export const setSearchQuery = ({ commit }, query) => {
   commit(types.SET_SEARCH_QUERY, query);
 };
 
-export const setProjectEndpoints = ({ commit }, endpoints) => {
-  commit(types.SET_PROJECT_ENDPOINTS, endpoints);
-};
-
 export const addProjects = ({ state, dispatch }) => {
   dispatch('requestAddProjects');
 
-  return axios
-    .post(state.projectEndpoints.add, {
-      project_ids: state.selectedProjects.map(p => p.id),
+  const addProjectsPromises = state.selectedProjects.map(p => {
+    return vuexApolloClient
+      .mutate({ mutation: addProjectToSecurityDashboard, variables: { id: p.id } })
+      .catch(() => dispatch('receiveAddProjectsError'));
+  });
+
+  return Promise.all(addProjectsPromises)
+    .then(response => {
+      const projects = processAddProjectResponse(response, state.selectedProjects);
+      return dispatch('receiveAddProjectsSuccess', projects);
     })
-    .then(response => dispatch('receiveAddProjectsSuccess', response.data))
-    .catch(() => dispatch('receiveAddProjectsError'))
     .finally(() => dispatch('clearSearchResults'));
 };
 
@@ -94,13 +103,15 @@ export const receiveAddProjectsError = ({ commit }) => {
   createFlash(__('Something went wrong, unable to add projects to dashboard'));
 };
 
-export const fetchProjects = ({ state, dispatch }) => {
+export const fetchProjects = ({ dispatch }) => {
   dispatch('requestProjects');
 
-  return axios
-    .get(state.projectEndpoints.list)
-    .then(({ data }) => {
-      dispatch('receiveProjectsSuccess', data);
+  return vuexApolloClient
+    .query({
+      query: getInstanceSecurityDashboardProjects,
+    })
+    .then(({ data: { instanceSecurityDashboard: { projects: { nodes: projects } } } }) => {
+      dispatch('receiveProjectsSuccess', { projects });
     })
     .catch(() => dispatch('receiveProjectsError'));
 };
@@ -119,11 +130,14 @@ export const receiveProjectsError = ({ commit }) => {
   createFlash(__('Something went wrong, unable to get projects'));
 };
 
-export const removeProject = ({ dispatch }, removePath) => {
+export const removeProject = ({ dispatch }, projectId) => {
   dispatch('requestRemoveProject');
 
-  return axios
-    .delete(removePath)
+  vuexApolloClient
+    .mutate({
+      mutation: deleteProjectFromSecurityDashboard,
+      variables: { id: projectId },
+    })
     .then(() => {
       dispatch('receiveRemoveProjectSuccess');
     })
@@ -153,26 +167,36 @@ export const fetchSearchResults = ({ state, dispatch, commit }) => {
     return dispatch('setMinimumQueryMessage');
   }
 
-  return searchProjects(searchQuery)
-    .then(payload => commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, payload))
+  return searchProjects(searchQuery, state.pageInfo)
+    .then(payload => {
+      const {
+        data: {
+          projects: { nodes, pageInfo },
+        },
+      } = payload;
+      return commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, { data: nodes, pageInfo });
+    })
     .catch(() => dispatch('receiveSearchResultsError'));
 };
 
 export const fetchSearchResultsNextPage = ({ state, dispatch, commit }) => {
   const {
     searchQuery,
-    pageInfo: { totalPages, page, nextPage },
+    pageInfo: { hasNextPage, endCursor },
   } = state;
 
-  if (totalPages <= page) {
+  if (!hasNextPage) {
     return Promise.resolve();
   }
 
-  const searchOptions = { page: nextPage };
-
-  return searchProjects(searchQuery, searchOptions)
+  return searchProjects(searchQuery, { hasNextPage, endCursor })
     .then(payload => {
-      commit(types.RECEIVE_NEXT_PAGE_SUCCESS, payload);
+      const {
+        data: {
+          projects: { nodes, pageInfo },
+        },
+      } = payload;
+      commit(types.RECEIVE_NEXT_PAGE_SUCCESS, { data: nodes, pageInfo });
     })
     .catch(() => dispatch('receiveSearchResultsError'));
 };

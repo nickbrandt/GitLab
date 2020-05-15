@@ -19,11 +19,6 @@ describe('projectsSelector default state', () => {
     expect(state.isRemovingProject).toBe(false);
   });
 
-  it('has all "projectEndpoints" set to be null', () => {
-    expect(state.projectEndpoints.list).toBe(null);
-    expect(state.projectEndpoints.add).toBe(null);
-  });
-
   it('has "searchQuery" set to an empty string', () => {
     expect(state.searchQuery).toBe('');
   });

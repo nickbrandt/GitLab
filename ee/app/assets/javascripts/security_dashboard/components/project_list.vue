@@ -53,7 +53,7 @@ export default {
         >
           <project-avatar class="flex-shrink-0" :project="project" :size="32" />
           <span>
-            {{ project.name_with_namespace }}
+            {{ project.nameWithNamespace }}
           </span>
           <gl-deprecated-button
             v-gl-tooltip

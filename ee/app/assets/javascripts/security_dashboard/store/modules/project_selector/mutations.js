@@ -1,10 +1,6 @@
 import * as types from './mutation_types';
 
 export default {
-  [types.SET_PROJECT_ENDPOINTS](state, endpoints) {
-    state.projectEndpoints.add = endpoints.add;
-    state.projectEndpoints.list = endpoints.list;
-  },
   [types.SET_SEARCH_QUERY](state, query) {
     state.searchQuery = query;
   },
@@ -74,7 +70,8 @@ export default {
   },
   [types.SET_MINIMUM_QUERY_MESSAGE](state) {
     state.projectSearchResults = [];
-    state.pageInfo.total = 0;
+    state.pageInfo.endCursor = '';
+    state.pageInfo.hasNextPage = true;
 
     state.messages.noResults = false;
     state.messages.searchError = false;

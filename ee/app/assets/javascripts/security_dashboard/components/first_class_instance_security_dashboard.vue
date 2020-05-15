@@ -35,15 +35,6 @@ export default {
       type: String,
       required: true,
     },
-    projectAddEndpoint: {
-      type: String,
-      required: true,
-    },
-    projectListEndpoint: {
-      type: String,
-      required: true,
-    },
-
     vulnerabilitiesExportEndpoint: {
       type: String,
       required: true,
@@ -80,11 +71,6 @@ export default {
     },
   },
   created() {
-    this.setProjectEndpoints({
-      add: this.projectAddEndpoint,
-      list: this.projectListEndpoint,
-    });
-
     this.fetchProjects();
   },
   methods: {

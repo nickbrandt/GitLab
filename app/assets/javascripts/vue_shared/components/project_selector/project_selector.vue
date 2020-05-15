@@ -1,6 +1,6 @@
 <script>
 import { debounce } from 'lodash';
-import { GlLoadingIcon, GlSearchBoxByType, GlInfiniteScroll } from '@gitlab/ui';
+import { GlLoadingIcon, GlSearchBoxByType, GlInfiniteScroll, GlSprintf } from '@gitlab/ui';
 import ProjectListItem from './project_list_item.vue';
 
 const SEARCH_INPUT_TIMEOUT_MS = 500;
@@ -11,6 +11,7 @@ export default {
     GlLoadingIcon,
     GlSearchBoxByType,
     GlInfiniteScroll,
+    GlSprintf,
     ProjectListItem,
   },
   props: {
@@ -80,11 +81,9 @@ export default {
       @input="onInput"
     />
     <div class="d-flex flex-column">
-      <gl-loading-icon v-if="showLoadingIndicator" size="sm" class="py-2 px-4" />
       <gl-infinite-scroll
         :max-list-height="402"
         :fetched-items="projectSearchResults.length"
-        :total-items="totalResults"
         @bottomReached="bottomReached"
       >
         <div v-if="!showLoadingIndicator" slot="items" class="d-flex flex-column">
@@ -98,6 +97,15 @@ export default {
             @click="projectClicked(project)"
           />
         </div>
+        <template #default>
+          <gl-sprintf
+            v-if="projectSearchResults.length"
+            :message="__('%{searchResultsLength} items loaded')"
+          >
+            <template #searchResultsLength>{{ projectSearchResults.length }}</template>
+          </gl-sprintf>
+          <gl-loading-icon v-if="showLoadingIndicator" size="sm" class="py-2 px-4" />
+        </template>
       </gl-infinite-scroll>
       <div v-if="showNoResultsMessage" class="text-muted ml-2 js-no-results-message">
         {{ __('Sorry, no projects matched your search') }}

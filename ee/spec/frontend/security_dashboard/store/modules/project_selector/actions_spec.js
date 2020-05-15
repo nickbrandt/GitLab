@@ -1,47 +1,29 @@
-import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import createState from 'ee/security_dashboard/store/modules/project_selector/state';
+import { vuexApolloClient } from 'ee/security_dashboard/graphql/provider';
 import * as types from 'ee/security_dashboard/store/modules/project_selector/mutation_types';
 import * as actions from 'ee/security_dashboard/store/modules/project_selector/actions';
 import createFlash from '~/flash';
-import axios from '~/lib/utils/axios_utils';
 
 jest.mock('~/flash');
 
 describe('EE projectSelector actions', () => {
   const getMockProjects = n => [...Array(n).keys()].map(i => ({ id: i, name: `project-${i}` }));
 
-  const mockAddEndpoint = 'mock-add_endpoint';
-  const mockListEndpoint = 'mock-list_endpoint';
   const mockResponse = { data: 'mock-data' };
 
-  let mockAxios;
   let mockDispatchContext;
   let state;
 
   const pageInfo = {
-    page: 1,
-    nextPage: 2,
-    total: 50,
-    totalPages: 5,
-  };
-
-  const responseHeaders = {
-    'X-Next-Page': pageInfo.nextPage,
-    'X-Page': pageInfo.page,
-    'X-Total': pageInfo.total,
-    'X-Total-Pages': pageInfo.totalPages,
+    hasNextPage: true,
+    endCursor: '',
   };
 
   beforeEach(() => {
-    mockAxios = new MockAdapter(axios);
     mockDispatchContext = { dispatch: () => {}, commit: () => {}, state };
     state = createState();
-  });
-
-  afterEach(() => {
-    mockAxios.restore();
   });
 
   describe('toggleSelectedProject', () => {
@@ -83,26 +65,31 @@ describe('EE projectSelector actions', () => {
   });
 
   describe('addProjects', () => {
-    it(`posts the selected project's ids to the add-endpoint`, () => {
+    it(`makes the GraphQL mutation with the selected project's ids`, () => {
       const projectIds = ['1', '2'];
 
       state.selectedProjects = [{ id: projectIds[0], name: '1' }, { id: projectIds[1], name: '2' }];
-      state.projectEndpoints.add = mockAddEndpoint;
 
-      mockAxios.onPost(mockAddEndpoint).replyOnce(200, mockResponse);
+      const spy = jest.spyOn(vuexApolloClient, 'mutate').mockResolvedValue({
+        data: { addProjectToSecurityDashboard: { project: {} } },
+      });
 
       actions.addProjects({ state, dispatch: () => {} });
 
       return waitForPromises().then(() => {
-        const requestData = mockAxios.history.post[0].data;
-        expect(requestData).toBe(JSON.stringify({ project_ids: projectIds }));
+        expect(spy).toHaveBeenCalled();
       });
     });
 
     it('dispatches the correct actions when the request is successful', () => {
-      state.projectEndpoints.add = mockAddEndpoint;
+      const projectIds = ['1'];
+      const project = { id: projectIds[0], name: '1' };
 
-      mockAxios.onPost(mockAddEndpoint).replyOnce(200, mockResponse);
+      state.selectedProjects = [project];
+
+      jest
+        .spyOn(vuexApolloClient, 'mutate')
+        .mockResolvedValue({ data: { addProjectToSecurityDashboard: { project } } });
 
       return testAction(
         actions.addProjects,
@@ -110,22 +97,22 @@ describe('EE projectSelector actions', () => {
         state,
         [],
         [
-          {
-            type: 'requestAddProjects',
-          },
+          { type: 'requestAddProjects' },
           {
             type: 'receiveAddProjectsSuccess',
-            payload: mockResponse,
+            payload: { added: [project], invalid: [] },
           },
-          {
-            type: 'clearSearchResults',
-          },
+          { type: 'clearSearchResults' },
         ],
       );
     });
 
     it('calls addProjects error handler on error', () => {
-      mockAxios.onPost(mockAddEndpoint).replyOnce(500);
+      const projectIds = ['1', '2'];
+
+      state.selectedProjects = [{ id: projectIds[0], name: '1' }];
+
+      jest.spyOn(vuexApolloClient, 'mutate').mockRejectedValue(new Error('new error'));
 
       return testAction(
         actions.addProjects,
@@ -135,6 +122,10 @@ describe('EE projectSelector actions', () => {
         [
           { type: 'requestAddProjects' },
           { type: 'receiveAddProjectsError' },
+          {
+            type: 'receiveAddProjectsSuccess',
+            payload: { added: [], invalid: ['1'] },
+          },
           { type: 'clearSearchResults' },
         ],
       );
@@ -284,22 +275,25 @@ describe('EE projectSelector actions', () => {
   });
 
   describe('fetchProjects', () => {
-    it('calls project list endpoint', () => {
-      state.projectEndpoints.list = mockListEndpoint;
-      mockAxios.onGet(mockListEndpoint).replyOnce(200, mockResponse);
+    it('calls project query', () => {
+      jest.spyOn(vuexApolloClient, 'query').mockResolvedValue({
+        data: { instanceSecurityDashboard: { projects: { nodes: mockResponse } } },
+      });
 
       return testAction(
         actions.fetchProjects,
         null,
         state,
         [],
-        [{ type: 'requestProjects' }, { type: 'receiveProjectsSuccess', payload: mockResponse }],
+        [
+          { type: 'requestProjects' },
+          { type: 'receiveProjectsSuccess', payload: { projects: mockResponse } },
+        ],
       );
     });
 
     it('handles response errors', () => {
-      state.projectEndpoints.list = mockListEndpoint;
-      mockAxios.onGet(mockListEndpoint).replyOnce(500);
+      jest.spyOn(vuexApolloClient, 'query').mockReturnValue(Promise.reject());
 
       return testAction(
         actions.fetchProjects,
@@ -358,7 +352,9 @@ describe('EE projectSelector actions', () => {
     const mockRemovePath = 'mock-removePath';
 
     it('calls project removal path and fetches projects on success', () => {
-      mockAxios.onDelete(mockRemovePath).replyOnce(200);
+      jest.spyOn(vuexApolloClient, 'mutate').mockResolvedValue({
+        data: mockResponse,
+      });
 
       return testAction(
         actions.removeProject,
@@ -370,7 +366,7 @@ describe('EE projectSelector actions', () => {
     });
 
     it('passes off handling of project removal errors', () => {
-      mockAxios.onDelete(mockRemovePath).replyOnce(500);
+      jest.spyOn(vuexApolloClient, 'mutate').mockReturnValue(Promise.reject());
 
       return testAction(
         actions.removeProject,
@@ -501,7 +497,9 @@ describe('EE projectSelector actions', () => {
     it('dispatches the correct actions when the query is valid', () => {
       const projects = [{ id: 0, name: 'mock-name1' }];
 
-      mockAxios.onGet().replyOnce(200, projects, responseHeaders);
+      jest.spyOn(vuexApolloClient, 'query').mockResolvedValue({
+        data: { projects: { nodes: projects, pageInfo } },
+      });
       state.searchQuery = 'mock-query';
 
       return testAction(
@@ -511,7 +509,7 @@ describe('EE projectSelector actions', () => {
         [
           {
             type: types.RECEIVE_SEARCH_RESULTS_SUCCESS,
-            payload: { data: projects, headers: responseHeaders, pageInfo },
+            payload: { data: projects, pageInfo },
           },
         ],
         [
@@ -523,7 +521,7 @@ describe('EE projectSelector actions', () => {
     });
 
     it('dispatches the correct actions when the request is not successful', () => {
-      mockAxios.onGet(mockListEndpoint).replyOnce(500);
+      jest.spyOn(vuexApolloClient, 'query').mockReturnValue(Promise.reject());
 
       state.searchQuery = 'mock-query';
 
@@ -575,16 +573,18 @@ describe('EE projectSelector actions', () => {
   });
 
   describe('fetchSearchResultsNextPage', () => {
-    describe('when the current page-index is smaller than the number of total pages', () => {
+    describe('when there is a next page', () => {
       beforeEach(() => {
-        state.pageInfo.totalPages = 2;
-        state.pageInfo.page = 1;
+        state.pageInfo.hasNextPage = true;
+        state.pageInfo.endCursor = 'abc';
       });
 
       it('dispatches the "receiveNextPageSuccess" action if the request is successful', () => {
         const projects = [{ id: 0, name: 'mock-name1' }];
 
-        mockAxios.onGet().replyOnce(200, projects, responseHeaders);
+        jest.spyOn(vuexApolloClient, 'query').mockResolvedValue({
+          data: { projects: { nodes: projects, pageInfo } },
+        });
 
         return testAction(
           actions.fetchSearchResultsNextPage,
@@ -593,7 +593,7 @@ describe('EE projectSelector actions', () => {
           [
             {
               type: types.RECEIVE_NEXT_PAGE_SUCCESS,
-              payload: { data: projects, headers: responseHeaders, pageInfo },
+              payload: { data: projects, pageInfo },
             },
           ],
           [],
@@ -601,7 +601,7 @@ describe('EE projectSelector actions', () => {
       });
 
       it('dispatches the "receiveSearchResultsError" action if the request is not successful', () => {
-        mockAxios.onGet(mockListEndpoint).replyOnce(500);
+        jest.spyOn(vuexApolloClient, 'query').mockReturnValue(Promise.reject());
 
         return testAction(
           actions.fetchSearchResultsNextPage,
@@ -617,35 +617,12 @@ describe('EE projectSelector actions', () => {
       });
     });
 
-    describe('when the current page-index is equal to the number of total pages', () => {
+    describe('when there is not a next page', () => {
       it('does not commit any mutations or dispatch any actions', () => {
-        state.pageInfo.totalPages = 1;
-        state.pageInfo.page = 1;
+        state.pageInfo.hasNextPage = false;
 
         return testAction(actions.fetchSearchResultsNextPage, [], state);
       });
-    });
-  });
-
-  describe('setProjectEndpoints', () => {
-    it('commits project list and add endpoints', () => {
-      const payload = {
-        add: 'add',
-        list: 'list',
-      };
-
-      return testAction(
-        actions.setProjectEndpoints,
-        payload,
-        state,
-        [
-          {
-            type: types.SET_PROJECT_ENDPOINTS,
-            payload,
-          },
-        ],
-        [],
-      );
     });
   });
 

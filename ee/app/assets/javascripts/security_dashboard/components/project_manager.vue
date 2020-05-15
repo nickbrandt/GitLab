@@ -12,7 +12,6 @@ export default {
   },
   computed: {
     ...mapState('projectSelector', [
-      'pageInfo',
       'projects',
       'selectedProjects',
       'projectSearchResults',
@@ -42,7 +41,7 @@ export default {
       this.toggleSelectedProject(project);
     },
     projectRemoved(project) {
-      this.removeProject(project.remove_path);
+      this.removeProject(project.id);
     },
   },
 };
@@ -64,7 +63,6 @@ export default {
             :show-loading-indicator="isSearchingProjects"
             :show-minimum-search-query-message="messages.minimumQuery"
             :show-search-error-message="messages.searchError"
-            :total-results="pageInfo.total"
             @searched="searched"
             @projectClicked="projectClicked"
             @bottomReached="fetchSearchResultsNextPage"
