@@ -55,16 +55,8 @@ class EpicsFinder < IssuableFinder
     return Epic.none unless Ability.allowed?(current_user, :read_epic, group)
 
     items = init_collection
-    items = by_created_at(items)
-    items = by_updated_at(items)
-    items = by_author(items)
-    items = by_timeframe(items)
-    items = by_state(items)
-    items = by_label(items)
-    items = by_parent(items)
-    items = by_iids(items)
-    items = starts_with_iid(items)
-    items = by_my_reaction_emoji(items)
+    items = filter_items(items)
+    items = filter_negated_items(items)
 
     # This has to be last as we use a CTE as an optimization fence
     # for counts by passing the force_cte param and enabling the
@@ -94,6 +86,30 @@ class EpicsFinder < IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
+
+  def filter_items(items)
+    items = by_created_at(items)
+    items = by_updated_at(items)
+    items = by_author(items)
+    items = by_timeframe(items)
+    items = by_state(items)
+    items = by_label(items)
+    items = by_parent(items)
+    items = by_iids(items)
+    items = by_my_reaction_emoji(items)
+
+    starts_with_iid(items)
+  end
+
+  def filter_negated_items(items)
+    return items unless Feature.enabled?(:not_issuable_queries, group, default_enabled: true)
+
+    # API endpoints send in `nil` values so we test if there are any non-nil
+    return items unless not_params&.values&.any?
+
+    items = by_negated_label(items)
+    by_negated_author(items)
+  end
 
   def group
     return unless params[:group_id]
