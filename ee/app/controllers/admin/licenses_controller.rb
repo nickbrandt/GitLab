@@ -7,10 +7,10 @@ class Admin::LicensesController < Admin::ApplicationController
   respond_to :html
 
   def show
-    if @license.blank?
-      render :missing
-    else
+    if @license.present? || License.future_dated_only?
       @licenses = License.history
+    else
+      render :missing
     end
   end
 
@@ -65,6 +65,7 @@ class Admin::LicensesController < Admin::ApplicationController
   def license
     @license ||= begin
       License.reset_current
+      License.reset_future_dated
       License.current
     end
   end
