@@ -3,7 +3,7 @@ import createFlash from '~/flash';
 import { FETCH_PACKAGE_VERSIONS_ERROR } from '../constants';
 import * as types from './mutation_types';
 
-export const fetchPackageVersions = ({ commit, state }) => {
+export default ({ commit, state }) => {
   commit(types.SET_LOADING, true);
 
   const { project_id, id } = state.packageEntity;
@@ -21,5 +21,3 @@ export const fetchPackageVersions = ({ commit, state }) => {
       commit(types.SET_LOADING, false);
     });
 };
-
-export default () => {};

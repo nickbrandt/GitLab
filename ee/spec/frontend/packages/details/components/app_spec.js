@@ -32,6 +32,7 @@ localVue.use(Vuex);
 describe('PackagesApp', () => {
   let wrapper;
   let store;
+  const fetchPackageVersions = jest.fn();
 
   function createComponent({
     packageEntity = mavenPackage,
@@ -50,7 +51,7 @@ describe('PackagesApp', () => {
         npmHelpPath: 'foo',
       },
       actions: {
-        fetchPackageVersions: () => [],
+        fetchPackageVersions,
       },
       getters,
     });
@@ -177,11 +178,9 @@ describe('PackagesApp', () => {
       });
 
       it('makes api request on first click of tab', () => {
-        const apiMethodSpy = jest.spyOn(wrapper.vm, 'fetchPackageVersions');
-
         versionsTab().trigger('click');
 
-        expect(apiMethodSpy).toHaveBeenCalled();
+        expect(fetchPackageVersions).toHaveBeenCalled();
       });
     });
 

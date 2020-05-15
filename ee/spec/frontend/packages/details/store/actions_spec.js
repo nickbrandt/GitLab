@@ -1,6 +1,6 @@
 import Api from 'ee/api';
 import createFlash from '~/flash';
-import * as actions from 'ee/packages/details/store/actions';
+import fetchPackageVersions from 'ee/packages/details/store/actions';
 import * as types from 'ee/packages/details/store/mutation_types';
 import { FETCH_PACKAGE_VERSIONS_ERROR } from 'ee/packages/details/constants';
 import testAction from 'helpers/vuex_action_helper';
@@ -15,7 +15,7 @@ describe('Actions Package details store', () => {
       Api.projectPackage = jest.fn().mockResolvedValue({ data: packageEntity });
 
       testAction(
-        actions.fetchPackageVersions,
+        fetchPackageVersions,
         undefined,
         { packageEntity },
         [
@@ -38,7 +38,7 @@ describe('Actions Package details store', () => {
       Api.projectPackage = jest.fn().mockResolvedValue({ data: { packageEntity, versions: null } });
 
       testAction(
-        actions.fetchPackageVersions,
+        fetchPackageVersions,
         undefined,
         { packageEntity },
         [{ type: types.SET_LOADING, payload: true }, { type: types.SET_LOADING, payload: false }],
@@ -57,7 +57,7 @@ describe('Actions Package details store', () => {
       Api.projectPackage = jest.fn().mockRejectedValue();
 
       testAction(
-        actions.fetchPackageVersions,
+        fetchPackageVersions,
         undefined,
         { packageEntity },
         [{ type: types.SET_LOADING, payload: true }, { type: types.SET_LOADING, payload: false }],

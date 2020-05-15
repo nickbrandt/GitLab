@@ -152,7 +152,7 @@ export default {
       };
     },
     hasVersions() {
-      return Boolean(this.packageEntity.versions && this.packageEntity.versions.length);
+      return this.packageEntity.versions?.length > 0;
     },
   },
   methods: {
@@ -270,26 +270,26 @@ export default {
         title-item-class="js-versions-tab"
         @click="getPackageVersions"
       >
-        <div v-if="isLoading && !hasVersions">
+        <template v-if="isLoading && !hasVersions">
           <packages-list-loader />
-        </div>
+        </template>
 
-        <div v-else-if="hasVersions">
+        <template v-else-if="hasVersions">
           <package-list-row
             v-for="v in packageEntity.versions"
             :key="v.id"
             :package-entity="{ name: packageEntity.name, ...v }"
-            :package-link="v.id"
+            :package-link="v.id.toString()"
             :disable-delete="true"
             :show-package-type="false"
           />
-        </div>
+        </template>
 
-        <div v-else class="gl-mt-3">
+        <template v-else class="gl-mt-3">
           <p data-testid="no-versions-message">
             {{ s__('PackageRegistry|There are no other versions of this package.') }}
           </p>
-        </div>
+        </template>
       </gl-tab>
     </gl-tabs>
 
