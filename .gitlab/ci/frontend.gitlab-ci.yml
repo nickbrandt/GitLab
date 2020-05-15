@@ -319,10 +319,10 @@ webpack-dev-server:
     key:
       files:
         - yarn.lock
-        - config/webpack.vendor.config.js
-      prefix: "v2"
+      prefix: "v1"
     paths:
       - node_modules/
+      - tmp/cache/webpack-dlls/
   script:
     - source scripts/utils.sh
     - retry yarn install --frozen-lockfile
