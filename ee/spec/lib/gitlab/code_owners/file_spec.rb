@@ -59,7 +59,7 @@ describe Gitlab::CodeOwners::File do
         stub_feature_flags(sectional_codeowners: true)
       end
 
-      shared_examples_for "creates expected parsed results" do
+      shared_examples_for "creates expected parsed sectional results" do
         it "is a hash sorted by sections without duplicates" do
           data = file.parsed_data
 
@@ -117,7 +117,7 @@ describe Gitlab::CodeOwners::File do
           File.read(Rails.root.join("ee", "spec", "fixtures", "sectional_codeowners_example"))
         end
 
-        it_behaves_like "creates expected parsed results"
+        it_behaves_like "creates expected parsed sectional results"
       end
 
       context "when CODEOWNERS file contains multiple sections with mixed-case names" do
@@ -125,7 +125,7 @@ describe Gitlab::CodeOwners::File do
           File.read(Rails.root.join("ee", "spec", "fixtures", "mixed_case_sectional_codeowners_example"))
         end
 
-        it_behaves_like "creates expected parsed results"
+        it_behaves_like "creates expected parsed sectional results"
       end
     end
   end
