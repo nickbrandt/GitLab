@@ -55,7 +55,7 @@ describe Git::BranchPushService do
       end
 
       it 'runs ElasticCommitIndexerWorker' do
-        expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, oldrev, newrev)
+        expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id)
 
         subject.execute
       end
@@ -95,7 +95,7 @@ describe Git::BranchPushService do
           end
 
           it 'runs ElasticCommitIndexerWorker' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, oldrev, newrev)
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id)
 
             subject.execute
           end
@@ -110,7 +110,7 @@ describe Git::BranchPushService do
           end
 
           it 'runs ElasticCommitIndexerWorker' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, oldrev, newrev)
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id)
 
             subject.execute
           end

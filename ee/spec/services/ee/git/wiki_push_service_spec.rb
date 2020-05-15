@@ -28,7 +28,7 @@ describe Git::WikiPushService do
       end
 
       it 'triggers a wiki update' do
-        expect(project.wiki).to receive(:index_wiki_blobs).with("797823")
+        expect(project.wiki).to receive(:index_wiki_blobs)
 
         described_class.new(project, project.owner, changes: post_received.changes).execute
       end

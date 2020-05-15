@@ -40,9 +40,7 @@ module Elastic
 
       def search_commit(query, page: 1, per: 20, options: {})
         page ||= 1
-
         fields = %w(message^10 sha^5 author.name^2 author.email^2 committer.name committer.email).map {|i| "commit.#{i}"}
-
         query_with_prefix = query.split(/\s+/).map { |s| s.gsub(SHA_REGEX) { |sha| "#{sha}*" } }.join(' ')
 
         query_hash = {

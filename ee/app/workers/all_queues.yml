@@ -485,7 +485,7 @@
   :urgency: :throttled
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent: 
+  :idempotent: true
 - :name: elastic_full_index
   :feature_category: :global_search
   :has_external_dependencies: 

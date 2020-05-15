@@ -10,11 +10,9 @@ module EE
         super
 
         return unless project.use_elasticsearch?
+        return unless default_branch_changes.any?
 
-        # For all changes on the default branch (usually master) trigger an ES update
-        default_branch_changes.each do |change|
-          project.wiki.index_wiki_blobs(change[:newrev])
-        end
+        project.wiki.index_wiki_blobs
       end
     end
   end
