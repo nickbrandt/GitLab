@@ -178,11 +178,10 @@ describe('PackagesApp', () => {
 
       it('makes api request on first click of tab', () => {
         const apiMethodSpy = jest.spyOn(wrapper.vm, 'fetchPackageVersions');
+
         versionsTab().trigger('click');
 
-        return wrapper.vm.$nextTick(() => {
-          expect(apiMethodSpy).toHaveBeenCalled();
-        });
+        expect(apiMethodSpy).toHaveBeenCalled();
       });
     });
 
