@@ -145,7 +145,7 @@ one of them will be used:
   [Cluster precedence](../../instance/clusters/index.md#cluster-precedence).
 - If you have managed Prometheus applications installed on multiple Kubernetes
   clusters at the **same** level, the Prometheus application of a cluster with a
-  matching [environment scope](../../../ci/environments.md#scoping-environments-with-specs) is used.
+  matching [environment scope](../../../ci/environments/index.md#scoping-environments-with-specs) is used.
 
 ## Monitoring CI/CD Environments
 
@@ -154,7 +154,7 @@ environment which has had a successful deployment.
 
 GitLab will automatically scan the Prometheus server for metrics from known servers like Kubernetes and NGINX, and attempt to identify individual environments. The supported metrics and scan process is detailed in our [Prometheus Metrics Library documentation](prometheus_library/index.md).
 
-You can view the performance dashboard for an environment by [clicking on the monitoring button](../../../ci/environments.md#monitoring-environments).
+You can view the performance dashboard for an environment by [clicking on the monitoring button](../../../ci/environments/index.md#monitoring-environments).
 
 ### Adding custom metrics
 
@@ -882,7 +882,7 @@ receivers:
   ...
 ```
 
-In order for GitLab to associate your alerts with an [environment](../../../ci/environments.md), you need to configure a `gitlab_environment_name` label on the alerts you set up in Prometheus. The value of this should match the name of your Environment in GitLab.
+In order for GitLab to associate your alerts with an [environment](../../../ci/environments/index.md), you need to configure a `gitlab_environment_name` label on the alerts you set up in Prometheus. The value of this should match the name of your Environment in GitLab.
 
 ### Taking action on incidents **(ULTIMATE)**
 
