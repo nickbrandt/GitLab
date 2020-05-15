@@ -1034,6 +1034,19 @@ Represents a milestone.
 | `readNote` | Boolean! | Indicates the user can perform `read_note` on this resource |
 | `resolveNote` | Boolean! | Indicates the user can perform `resolve_note` on this resource |
 
+## Package
+
+Represents a package
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `createdAt` | Time! | The created date |
+| `id` | ID! | The ID of the package |
+| `name` | String! | The name of the package |
+| `packageType` | PackageTypeEnum! | The type of the package |
+| `updatedAt` | Time! | The update date |
+| `version` | String | The version of the package |
+
 ## PackageFileRegistry
 
 Represents the sync and verification state of a package file
