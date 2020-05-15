@@ -10,7 +10,9 @@ describe Gitlab::Geo::Replicator do
 
   before(:all) do
     ActiveRecord::Schema.define do
-      create_table :dummy_models
+      create_table :dummy_models, force: true do |t|
+        t.binary :verification_checksum
+      end
     end
   end
 
@@ -70,6 +72,8 @@ describe Gitlab::Geo::Replicator do
 
           with_replicator Geo::DummyReplicator
         end
+
+        DummyModel.reset_column_information
       end
 
       subject { DummyModel.new }
