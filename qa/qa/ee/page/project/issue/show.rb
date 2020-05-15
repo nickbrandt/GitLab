@@ -6,8 +6,6 @@ module QA
       module Project
         module Issue
           module Show
-            include Page::Component::DesignManagement
-
             def self.prepended(page)
               page.module_eval do
                 view 'ee/app/assets/javascripts/related_issues/components/add_issuable_form.vue' do
@@ -34,17 +32,7 @@ module QA
                   element :weight_input_field
                   element :weight_no_value_content
                 end
-
-                view 'ee/app/views/projects/issues/_discussion.html.haml' do
-                  element :designs_tab_link
-                  element :designs_tab_content
-                end
               end
-            end
-
-            def click_designs_tab
-              click_element(:designs_tab_link)
-              active_element?(:designs_tab_content)
             end
 
             def click_remove_weight_link

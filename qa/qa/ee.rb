@@ -13,7 +13,6 @@ module QA
 
     module Page
       module Component
-        autoload :DesignManagement, 'qa/ee/page/component/design_management'
         autoload :LicenseManagement, 'qa/ee/page/component/license_management'
         autoload :SecureReport, 'qa/ee/page/component/secure_report'
 
