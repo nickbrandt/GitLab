@@ -213,4 +213,46 @@ describe SamlProvider do
       end
     end
   end
+
+  describe '#last_linked_owner?' do
+    let_it_be(:user) { create(:user) }
+
+    context 'for a non-owner' do
+      it { is_expected.not_to be_last_linked_owner(user) }
+    end
+
+    context 'for a group owner' do
+      before do
+        group.add_owner(user)
+      end
+
+      context 'with saml linked' do
+        before do
+          create(:group_saml_identity, user: user, saml_provider: subject)
+        end
+
+        it { is_expected.to be_last_linked_owner(user) }
+
+        context 'another owner has SSO linked' do
+          before do
+            create(:group_saml_identity, :group_owner, saml_provider: subject)
+          end
+
+          it { is_expected.not_to be_last_linked_owner(user) }
+        end
+      end
+
+      context 'without saml linked' do
+        it { is_expected.not_to be_last_linked_owner(user) }
+
+        context 'another owner has SSO linked' do
+          before do
+            create(:group_saml_identity, :group_owner, saml_provider: subject)
+          end
+
+          it { is_expected.not_to be_last_linked_owner(user) }
+        end
+      end
+    end
+  end
 end

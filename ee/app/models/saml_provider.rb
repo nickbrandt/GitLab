@@ -41,6 +41,13 @@ class SamlProvider < ApplicationRecord
     enforced_group_managed_accounts? && super
   end
 
+  def last_linked_owner?(user)
+    return false unless group.owned_by?(user)
+    return false unless identities.for_user(user).exists?
+
+    identities.for_user(group.owners).count == 1
+  end
+
   class DefaultOptions
     include Gitlab::Routing
 
