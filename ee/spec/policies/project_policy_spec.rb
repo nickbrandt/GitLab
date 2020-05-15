@@ -660,7 +660,7 @@ describe ProjectPolicy do
   end
 
   describe 'admin_license_management' do
-    context 'without license management feature available' do
+    context 'without license scanning feature available' do
       before do
         stub_licensed_features(license_scanning: false)
       end
@@ -720,7 +720,7 @@ describe ProjectPolicy do
   end
 
   describe 'read_software_license_policy' do
-    context 'without license management feature available' do
+    context 'without license scanning feature available' do
       before do
         stub_licensed_features(license_scanning: false)
       end
