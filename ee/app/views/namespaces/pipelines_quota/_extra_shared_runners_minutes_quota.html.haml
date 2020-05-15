@@ -10,4 +10,4 @@
       = link_to icon('question-circle'), help_page_path('subscriptions/index', anchor: 'extra-shared-runners-pipeline-minutes'), target: '_blank', rel: 'noopener noreferrer'
   .col-sm-6.right
     #{namespace_extra_shared_runner_limits_percent_used(namespace)}% used
-    = namespace_shared_runner_limits_progress_bar(namespace, extra: true)
+    = namespace_extra_shared_runner_limits_progress_bar(namespace)
