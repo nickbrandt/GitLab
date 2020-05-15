@@ -14,6 +14,7 @@ namespace :analytics do
         end
       end
       resource :summary, controller: :summary, only: :show
+      get '/time_summary' => 'summary#time_summary'
     end
     get '/cycle_analytics', to: redirect('-/analytics/value_stream_analytics')
   end
