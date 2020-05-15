@@ -693,6 +693,50 @@ describe Projects::FeatureFlagsController do
       end
     end
 
+    context 'when creating a version 2 feature flag with a gitlabUserList strategy' do
+      let!(:user_list) do
+        create(:operations_feature_flag_user_list, project: project,
+               name: 'My List', user_xids: 'user1,user2')
+      end
+
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          operations_feature_flag: {
+            name: 'my_feature_flag',
+            active: true,
+            version: 'new_version_flag',
+            strategies_attributes: [{
+              name: 'gitlabUserList',
+              parameters: {},
+              user_list_id: user_list.id,
+              scopes_attributes: [{ environment_scope: 'production' }]
+            }]
+          }
+        }
+      end
+
+      it 'creates the new strategy' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies']).to match([a_hash_including({
+          'name' => 'gitlabUserList',
+          'parameters' => {},
+          'user_list' => {
+            'id' => user_list.id,
+            'iid' => user_list.iid,
+            'name' => 'My List',
+            'user_xids' => 'user1,user2'
+          },
+          'scopes' => [a_hash_including({
+            'environment_scope' => 'production'
+          })]
+        })])
+      end
+    end
+
     context 'when version parameter is invalid' do
       let(:params) do
         {
@@ -1314,6 +1358,114 @@ describe Projects::FeatureFlagsController do
           'percentage' => '30'
         })
         expect(strategy_json['scopes']).to eq([])
+      end
+
+      it 'creates a gitlabUserList strategy' do
+        user_list = create(:operations_feature_flag_user_list, project: project, name: 'My List', user_xids: 'user1,user2')
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          iid: new_version_flag.iid,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              name: 'gitlabUserList',
+              parameters: {},
+              user_list_id: user_list.id
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies']).to match([a_hash_including({
+          'id' => an_instance_of(Integer),
+          'name' => 'gitlabUserList',
+          'parameters' => {},
+          'user_list' => {
+            'id' => user_list.id,
+            'iid' => user_list.iid,
+            'name' => 'My List',
+            'user_xids' => 'user1,user2'
+          },
+          'scopes' => []
+        })])
+      end
+
+      it 'supports switching the associated user list for an existing gitlabUserList strategy' do
+        user_list = create(:operations_feature_flag_user_list, project: project, name: 'My List', user_xids: 'user1,user2')
+        strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'gitlabUserList', parameters: {}, user_list: user_list)
+        other_user_list = create(:operations_feature_flag_user_list, project: project, name: 'Other List', user_xids: 'user3')
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          iid: new_version_flag.iid,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              id: strategy.id,
+              user_list_id: other_user_list.id
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies']).to eq([{
+          'id' => strategy.id,
+          'name' => 'gitlabUserList',
+          'parameters' => {},
+          'user_list' => {
+            'id' => other_user_list.id,
+            'iid' => other_user_list.iid,
+            'name' => 'Other List',
+            'user_xids' => 'user3'
+          },
+          'scopes' => []
+        }])
+      end
+
+      it 'does not delete a user list when deleting a gitlabUserList strategy' do
+        user_list = create(:operations_feature_flag_user_list, project: project, name: 'My List', user_xids: 'user1,user2')
+        strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'gitlabUserList', parameters: {}, user_list: user_list)
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          iid: new_version_flag.iid,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              id: strategy.id,
+              _destroy: true
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies']).to eq([])
+        expect(::Operations::FeatureFlags::Strategy.count).to eq(0)
+        expect(::Operations::FeatureFlags::StrategyUserList.count).to eq(0)
+        expect(::Operations::FeatureFlags::UserList.first).to eq(user_list)
+      end
+
+      it 'returns not found when trying to create a gitlabUserList strategy with an invalid user list id' do
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          iid: new_version_flag.iid,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              name: 'gitlabUserList',
+              parameters: {},
+              user_list_id: 1
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'updates an existing strategy' do
