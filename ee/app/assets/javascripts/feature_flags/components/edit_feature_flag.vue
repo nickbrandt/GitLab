@@ -3,7 +3,7 @@ import { GlAlert, GlLoadingIcon, GlToggle } from '@gitlab/ui';
 import { createNamespacedHelpers } from 'vuex';
 import { sprintf, s__ } from '~/locale';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { LEGACY_FLAG } from '../constants';
+import { LEGACY_FLAG, NEW_FLAG_ALERT } from '../constants';
 import store from '../store/index';
 import FeatureFlagForm from './form.vue';
 
@@ -36,6 +36,7 @@ export default {
     legacyFlagAlert: s__(
       'FeatureFlags|GitLab is moving to a new way of managing feature flags, and in 13.4, this feature flag will become read-only. Please create a new feature flag.',
     ),
+    newFlagAlert: NEW_FLAG_ALERT,
   },
   computed: {
     ...mapState([
@@ -56,7 +57,10 @@ export default {
         : sprintf(s__('Edit %{name}'), { name: this.name });
     },
     deprecated() {
-      return this.glFeatures.featureFlagsNewVersion && this.version === LEGACY_FLAG;
+      return this.hasNewVersionFlags && this.version === LEGACY_FLAG;
+    },
+    hasNewVersionFlags() {
+      return this.glFeatures.featureFlagsNewVersion;
     },
   },
   created() {
@@ -76,6 +80,9 @@ export default {
 </script>
 <template>
   <div>
+    <gl-alert v-if="!hasNewVersionFlags" variant="warning" :dismissible="false" class="gl-my-5">
+      {{ $options.translations.newFlagAlert }}
+    </gl-alert>
     <gl-loading-icon v-if="isLoading" />
 
     <template v-else-if="!isLoading && !hasError">

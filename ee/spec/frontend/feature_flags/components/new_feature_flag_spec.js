@@ -1,9 +1,14 @@
 import Vuex from 'vuex';
 import { shallowMount } from '@vue/test-utils';
+import { GlAlert } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import newModule from 'ee/feature_flags/store/modules/new';
 import NewFeatureFlag from 'ee/feature_flags/components/new_feature_flag.vue';
-import { ROLLOUT_STRATEGY_ALL_USERS, DEFAULT_PERCENT_ROLLOUT } from 'ee/feature_flags/constants';
+import {
+  ROLLOUT_STRATEGY_ALL_USERS,
+  DEFAULT_PERCENT_ROLLOUT,
+  NEW_FLAG_ALERT,
+} from 'ee/feature_flags/constants';
 
 describe('New feature flag form', () => {
   let wrapper;
@@ -63,5 +68,8 @@ describe('New feature flag form', () => {
     expect(wrapper.vm.scopes).toEqual([defaultScope]);
 
     expect(wrapper.find(Form).props('scopes')).toContainEqual(defaultScope);
+  });
+  it('should alert users that feature flags are changing soon', () => {
+    expect(wrapper.find(GlAlert).text()).toBe(NEW_FLAG_ALERT);
   });
 });
