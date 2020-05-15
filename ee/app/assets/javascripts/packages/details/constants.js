@@ -1,3 +1,5 @@
+import { s__ } from '~/locale';
+
 export const TrackingLabels = {
   CODE_INSTRUCTION: 'code_instruction',
   CONAN_INSTALLATION: 'conan_installation',
@@ -35,3 +37,7 @@ export const NpmManager = {
   NPM: 'npm',
   YARN: 'yarn',
 };
+
+export const FETCH_PACKAGE_VERSIONS_ERROR = s__(
+  'PackageRegistry|Unable to fetch package version information.',
+);

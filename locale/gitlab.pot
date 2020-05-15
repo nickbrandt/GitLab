@@ -7416,6 +7416,9 @@ msgstr ""
 msgid "Destroy"
 msgstr ""
 
+msgid "Detail"
+msgstr ""
+
 msgid "Details"
 msgstr ""
 
@@ -14986,6 +14989,9 @@ msgstr ""
 msgid "PackageRegistry|There are no %{packageType} packages yet"
 msgstr ""
 
+msgid "PackageRegistry|There are no other versions of this package."
+msgstr ""
+
 msgid "PackageRegistry|There are no packages yet"
 msgstr ""
 
@@ -14996,6 +15002,9 @@ msgid "PackageRegistry|There was a problem fetching the details for this package
 msgstr ""
 
 msgid "PackageRegistry|To widen your search, change or remove the filters above."
+msgstr ""
+
+msgid "PackageRegistry|Unable to fetch package version information."
 msgstr ""
 
 msgid "PackageRegistry|Unable to load package"
@@ -23743,6 +23752,9 @@ msgid "Verify configuration"
 msgstr ""
 
 msgid "Version"
+msgstr ""
+
+msgid "Versions"
 msgstr ""
 
 msgid "Very helpful"

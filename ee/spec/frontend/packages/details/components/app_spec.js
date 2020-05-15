@@ -10,6 +10,8 @@ import NpmInstallation from 'ee/packages/details/components/npm_installation.vue
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
+import PackagesListLoader from 'ee/packages/shared/components/packages_list_loader.vue';
+import PackageListRow from 'ee/packages/shared/components/package_list_row.vue';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
 import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
 import PypiInstallation from 'ee/packages/details/components/pypi_installation.vue';
@@ -30,11 +32,16 @@ localVue.use(Vuex);
 describe('PackagesApp', () => {
   let wrapper;
   let store;
+  const fetchPackageVersions = jest.fn();
 
-  function createComponent(packageEntity = mavenPackage, packageFiles = mavenFiles) {
+  function createComponent({
+    packageEntity = mavenPackage,
+    packageFiles = mavenFiles,
+    isLoading = false,
+  } = {}) {
     store = new Vuex.Store({
       state: {
-        isLoading: false,
+        isLoading,
         packageEntity,
         packageFiles,
         canDelete: true,
@@ -42,6 +49,9 @@ describe('PackagesApp', () => {
         emptySvgPath: 'empty-illustration',
         npmPath: 'foo',
         npmHelpPath: 'foo',
+      },
+      actions: {
+        fetchPackageVersions,
       },
       getters,
     });
@@ -54,6 +64,8 @@ describe('PackagesApp', () => {
         GlDeprecatedButton: false,
         GlLink: false,
         GlModal: false,
+        GlTab: false,
+        GlTabs: false,
         GlTable: false,
       },
     });
@@ -73,6 +85,10 @@ describe('PackagesApp', () => {
   const deleteButton = () => wrapper.find('.js-delete-button');
   const deleteModal = () => wrapper.find(GlModal);
   const modalDeleteButton = () => wrapper.find({ ref: 'modal-delete-button' });
+  const versionsTab = () => wrapper.find('.js-versions-tab > a');
+  const packagesLoader = () => wrapper.find(PackagesListLoader);
+  const packagesVersionRows = () => wrapper.findAll(PackageListRow);
+  const noVersionsMessage = () => wrapper.find('[data-testid="no-versions-message"]');
 
   afterEach(() => {
     wrapper.destroy();
@@ -100,7 +116,7 @@ describe('PackagesApp', () => {
   });
 
   it('does not render package metadata for npm as npm packages do not contain metadata', () => {
-    createComponent(npmPackage, npmFiles);
+    createComponent({ packageEntity: npmPackage, packageFiles: npmFiles });
 
     expect(packageInformation(0)).toExist();
     expect(allPackageInformation()).toHaveLength(1);
@@ -124,7 +140,7 @@ describe('PackagesApp', () => {
   });
 
   it('renders a single file for an npm package as they only contain one file', () => {
-    createComponent(npmPackage, npmFiles);
+    createComponent({ packageEntity: npmPackage, packageFiles: npmFiles });
 
     expect(allFileRows()).toExist();
     expect(allFileRows()).toHaveLength(1);
@@ -155,6 +171,38 @@ describe('PackagesApp', () => {
     });
   });
 
+  describe('versions', () => {
+    describe('api call', () => {
+      beforeEach(() => {
+        createComponent();
+      });
+
+      it('makes api request on first click of tab', () => {
+        versionsTab().trigger('click');
+
+        expect(fetchPackageVersions).toHaveBeenCalled();
+      });
+    });
+
+    it('displays the loader when state is loading', () => {
+      createComponent({ isLoading: true });
+
+      expect(packagesLoader().exists()).toBe(true);
+    });
+
+    it('displays the correct version count when the package has versions', () => {
+      createComponent({ packageEntity: npmPackage });
+
+      expect(packagesVersionRows()).toHaveLength(npmPackage.versions.length);
+    });
+
+    it('displays the no versions message when there are none', () => {
+      createComponent();
+
+      expect(noVersionsMessage().exists()).toBe(true);
+    });
+  });
+
   describe('tracking', () => {
     let eventSpy;
     let utilSpy;
@@ -166,13 +214,13 @@ describe('PackagesApp', () => {
     });
 
     it('tracking category calls packageTypeToTrackCategory', () => {
-      createComponent(conanPackage);
+      createComponent({ packageEntity: conanPackage });
       expect(wrapper.vm.tracking.category).toBe(category);
       expect(utilSpy).toHaveBeenCalledWith('conan');
     });
 
     it(`delete button on delete modal call event with ${TrackingActions.DELETE_PACKAGE}`, () => {
-      createComponent(conanPackage);
+      createComponent({ packageEntity: conanPackage });
       deleteButton().trigger('click');
       return wrapper.vm.$nextTick().then(() => {
         modalDeleteButton().trigger('click');
@@ -185,7 +233,7 @@ describe('PackagesApp', () => {
     });
 
     it(`file download link call event with ${TrackingActions.PULL_PACKAGE}`, () => {
-      createComponent(conanPackage);
+      createComponent({ packageEntity: conanPackage });
       firstFileDownloadLink().trigger('click');
       expect(eventSpy).toHaveBeenCalledWith(
         category,

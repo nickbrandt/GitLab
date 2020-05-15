@@ -59,6 +59,7 @@ export const npmPackage = {
   project_id: 1,
   updated_at: '2015-12-10',
   version: '',
+  versions: [],
   _links,
   pipeline: mockPipelineInfo,
 };
