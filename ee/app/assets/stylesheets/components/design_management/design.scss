@@ -4,6 +4,10 @@
   .with-performance-bar & {
     top: 35px;
   }
+
+  .inactive {
+    opacity: 0.5;
+  }
 }
 
 .design-presentation-wrapper {
