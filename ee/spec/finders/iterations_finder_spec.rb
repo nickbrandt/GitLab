@@ -7,10 +7,10 @@ describe IterationsFinder do
   let_it_be(:group) { create(:group) }
   let_it_be(:project_1) { create(:project, namespace: group) }
   let_it_be(:project_2) { create(:project, namespace: group) }
-  let!(:started_group_iteration) { create(:iteration, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
-  let!(:upcoming_group_iteration) { create(:iteration, group: group, start_date: now + 1.day, due_date: now + 2.days) }
-  let!(:iteration_from_project_1) { create(:iteration, project: project_1, state: ::Iteration::STATE_ID_MAP[:active], start_date: now + 2.days, due_date: now + 3.days) }
-  let!(:iteration_from_project_2) { create(:iteration, project: project_2, state: ::Iteration::STATE_ID_MAP[:active], start_date: now + 4.days, due_date: now + 5.days) }
+  let!(:started_group_iteration) { create(:started_iteration, :skip_future_date_validation, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
+  let!(:upcoming_group_iteration) { create(:iteration, group: group, start_date: 1.day.from_now, due_date: 2.days.from_now) }
+  let!(:iteration_from_project_1) { create(:started_iteration, project: project_1, start_date: 2.days.from_now, due_date: 3.days.from_now) }
+  let!(:iteration_from_project_2) { create(:started_iteration, project: project_2, start_date: 4.days.from_now, due_date: 5.days.from_now) }
   let(:project_ids) { [project_1.id, project_2.id] }
 
   subject { described_class.new(params).execute }
@@ -39,7 +39,7 @@ describe IterationsFinder do
     end
 
     it 'orders iterations by due date' do
-      iteration = create(:iteration, group: group, due_date: now - 2.days)
+      iteration = create(:iteration, :skip_future_date_validation, group: group, start_date: now - 3.days, due_date: now - 2.days)
 
       expect(subject.first).to eq(iteration)
       expect(subject.second).to eq(started_group_iteration)
@@ -61,8 +61,14 @@ describe IterationsFinder do
       iteration_from_project_1.close
     end
 
-    it 'filters by active state' do
-      params[:state] = 'active'
+    it 'filters by started state' do
+      params[:state] = 'started'
+
+      expect(subject).to contain_exactly(iteration_from_project_2)
+    end
+
+    it 'filters by opened state' do
+      params[:state] = 'opened'
 
       expect(subject).to contain_exactly(upcoming_group_iteration, iteration_from_project_2)
     end
@@ -87,21 +93,21 @@ describe IterationsFinder do
 
     context 'by timeframe' do
       it 'returns iterations with start_date and due_date between timeframe' do
-        params.merge!(start_date: now - 1.day, end_date: now + 3.days)
+        params.merge!(start_date: now - 1.day, end_date: 3.days.from_now)
 
         expect(subject).to match_array([started_group_iteration, upcoming_group_iteration, iteration_from_project_1])
       end
 
       it 'returns iterations which start before the timeframe' do
-        iteration = create(:iteration, project: project_2, start_date: now - 5.days)
+        iteration = create(:iteration, :skip_future_date_validation, project: project_2, start_date: now - 5.days)
         params.merge!(start_date: now - 3.days, end_date: now - 2.days)
 
         expect(subject).to match_array([iteration])
       end
 
       it 'returns iterations which end after the timeframe' do
-        iteration = create(:iteration, project: project_2, due_date: now + 6.days)
-        params.merge!(start_date: now + 6.days, end_date: now + 7.days)
+        iteration = create(:iteration, project: project_2, start_date: 6.days.from_now, due_date: 2.weeks.from_now)
+        params.merge!(start_date: 6.days.from_now, end_date: 7.days.from_now)
 
         expect(subject).to match_array([iteration])
       end
