@@ -20,6 +20,10 @@ module Gitlab
         new(access_token_id: job.token, user_id: job.user.id)
       end
 
+      def from_deploy_token(deploy_token)
+        new(access_token_id: deploy_token.token, user_id: deploy_token.username)
+      end
+
       def decode(jwt)
         payload = JSONWebToken::HMACToken.decode(jwt, secret).first
 

@@ -80,6 +80,42 @@ describe API::Helpers::PackagesManagerClientsHelpers do
     end
   end
 
+  describe '#find_deploy_token_from_http_basic_auth' do
+    let_it_be(:deploy_token) { create(:deploy_token) }
+    let(:token) { deploy_token.token }
+    let(:headers) { { Authorization: basic_http_auth(deploy_token.username, token) } }
+
+    subject { helper.find_deploy_token_from_http_basic_auth }
+
+    before do
+      allow(helper).to receive(:headers).and_return(headers&.with_indifferent_access)
+    end
+
+    context 'with a valid Authorization header' do
+      it { is_expected.to eq deploy_token }
+    end
+
+    context 'with an invalid Authorization header' do
+      where(:headers) do
+        [
+          [{ Authorization: 'Invalid' }],
+          [{}],
+          [nil]
+        ]
+      end
+
+      with_them do
+        it { is_expected.to be nil }
+      end
+    end
+
+    context 'with an invalid token' do
+      let(:token) { 'Unknown' }
+
+      it { is_expected.to be nil }
+    end
+  end
+
   describe '#uploaded_package_file' do
     let_it_be(:params) { {} }
 

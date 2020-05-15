@@ -28,6 +28,13 @@ module EE
       end
     end
 
+    def build_jwt_from_deploy_token(deploy_token, secret: jwt_secret)
+      JSONWebToken::HMACToken.new(secret).tap do |jwt|
+        jwt['access_token'] = deploy_token.token
+        jwt['user_id'] = deploy_token.username
+      end
+    end
+
     def temp_file(package_tmp)
       upload_path = ::Packages::PackageFileUploader.workhorse_local_upload_path
       file_path = "#{upload_path}/#{package_tmp}"
