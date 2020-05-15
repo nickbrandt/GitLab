@@ -36,7 +36,7 @@ export default {
   },
   data() {
     return {
-      users: this.config.triggerAuthors,
+      users: [],
       loading: true,
     };
   },
@@ -45,16 +45,19 @@ export default {
       return this.value.data.toLowerCase();
     },
     activeUser() {
-      return this.config.triggerAuthors.find(user => {
+      return this.users.find(user => {
         return user.username.toLowerCase() === this.currentValue;
       });
     },
   },
+  created() {
+    this.fetchProjectUsers();
+  },
   methods: {
-    fetchAuthorBySearchTerm(searchTerm) {
+    fetchProjectUsers(searchTerm) {
       Api.projectUsers(this.config.projectId, searchTerm)
-        .then(res => {
-          this.users = res;
+        .then(users => {
+          this.users = users;
           this.loading = false;
         })
         .catch(err => {
@@ -64,7 +67,7 @@ export default {
         });
     },
     searchAuthors: debounce(function debounceSearch({ data }) {
-      this.fetchAuthorBySearchTerm(data);
+      this.fetchProjectUsers(data);
     }, FILTER_PIPELINES_SEARCH_DELAY),
   },
 };
@@ -72,7 +75,6 @@ export default {
 
 <template>
   <gl-filtered-search-token
-    v-if="config.triggerAuthors"
     :config="config"
     v-bind="{ ...$props, ...$attrs }"
     v-on="$listeners"
@@ -94,7 +96,7 @@ export default {
       }}</gl-filtered-search-suggestion>
       <gl-dropdown-divider />
 
-      <gl-loading-icon v-if="loading && !value" />
+      <gl-loading-icon v-if="loading" />
       <template v-else>
         <gl-filtered-search-suggestion
           v-for="user in users"

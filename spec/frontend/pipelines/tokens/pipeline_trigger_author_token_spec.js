@@ -1,3 +1,6 @@
+import Api from '~/api';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import { GlFilteredSearchToken, GlFilteredSearchSuggestion, GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import PipelineTriggerAuthorToken from '~/pipelines/components/tokens/pipeline_trigger_author_token.vue';
@@ -5,6 +8,7 @@ import { users } from '../mock_data';
 
 describe('Pipeline Trigger Author Token', () => {
   let wrapper;
+  let mock;
 
   const findFilteredSearchToken = () => wrapper.find(GlFilteredSearchToken);
   const findAllFilteredSearchSuggestions = () => wrapper.findAll(GlFilteredSearchSuggestion);
@@ -45,16 +49,27 @@ describe('Pipeline Trigger Author Token', () => {
   };
 
   beforeEach(() => {
+    mock = new MockAdapter(axios);
+
+    jest.spyOn(Api, 'projectUsers').mockResolvedValue(users);
+
     createComponent();
   });
 
   afterEach(() => {
+    mock.restore();
     wrapper.destroy();
     wrapper = null;
   });
 
   it('passes config correctly', () => {
     expect(findFilteredSearchToken().props('config')).toEqual(defaultProps.config);
+  });
+
+  it('fetches and sets project users', () => {
+    expect(Api.projectUsers).toHaveBeenCalled();
+
+    expect(wrapper.vm.users).toEqual(users);
   });
 
   describe('displays loading icon correctly', () => {
