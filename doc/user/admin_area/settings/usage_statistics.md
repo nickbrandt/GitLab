@@ -257,7 +257,6 @@ but commented out to help encourage others to add to it in the future. -->
 |projects_hipchat_active|counts||
 |projects_irker_active|counts||
 |projects_jenkins_active|counts||
-|projects_jenkins_deprecated_active|counts||
 |projects_jira_active -|counts||
 |projects_mattermost_active|counts||
 |projects_mattermost_slash_commands_active|counts||
