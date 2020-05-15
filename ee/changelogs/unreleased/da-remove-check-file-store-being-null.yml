@@ -1,0 +1,6 @@
+---
+title: Geo - Improve query to retrieve Job Artifacts, LFS Objects, and Uploads with
+  files stored locally
+merge_request: 24891
+author:
+type: performance
