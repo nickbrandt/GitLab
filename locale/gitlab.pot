@@ -9452,7 +9452,19 @@ msgstr ""
 msgid "Filter by %{issuable_type} that are currently opened."
 msgstr ""
 
+msgid "Filter by %{page_context_word} that are currently opened."
+msgstr ""
+
 msgid "Filter by commit message"
+msgstr ""
+
+msgid "Filter by issues that are currently closed."
+msgstr ""
+
+msgid "Filter by merge requests that are currently closed and unmerged."
+msgstr ""
+
+msgid "Filter by merge requests that are currently merged."
 msgstr ""
 
 msgid "Filter by milestone name"
