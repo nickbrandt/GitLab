@@ -1,5 +1,6 @@
 import { __ } from '~/locale';
 import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
+import { gray10 } from '@gitlab/ui/scss_to_js/scss_variables';
 
 export const PROJECTS_PER_PAGE = 50;
 
@@ -36,7 +37,7 @@ export const DEFAULT_STAGE_NAMES = [...Object.keys(EMPTY_STAGE_TEXT), 'total'];
 export const TASKS_BY_TYPE_SUBJECT_ISSUE = 'Issue';
 export const TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST = 'MergeRequest';
 export const TASKS_BY_TYPE_MAX_LABELS = 15;
-export const PATH_BACKGROUND_COLOR = '#fafafa'; // $gray-50 (see variables.scss)
+export const PATH_BACKGROUND_COLOR = gray10;
 
 export const TASKS_BY_TYPE_SUBJECT_FILTER_OPTIONS = {
   [TASKS_BY_TYPE_SUBJECT_ISSUE]: __('Issues'),
