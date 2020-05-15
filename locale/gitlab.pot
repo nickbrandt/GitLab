@@ -24783,6 +24783,9 @@ msgstr ""
 msgid "You will receive notifications only for comments in which you were @mentioned"
 msgstr ""
 
+msgid "You won't be able to create new projects because you have reached your project limit."
+msgstr ""
+
 msgid "You won't be able to pull or push project code via %{protocol} until you %{set_password_link} on your account"
 msgstr ""
 
