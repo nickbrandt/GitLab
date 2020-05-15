@@ -355,10 +355,6 @@ module EE
       end
     end
 
-    def organization
-      gitlab_employee? ? 'GitLab' : super
-    end
-
     def security_dashboard
       InstanceSecurityDashboard.new(self)
     end
