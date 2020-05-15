@@ -49,7 +49,7 @@ shared_examples 'expanded stack trace context' do |selected_line: nil, expected_
 end
 
 shared_examples 'error tracking show page' do
-  it 'renders the error details' do
+  it 'renders the error details', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217810' } do
     content = page.find(".content")
     nav = page.find("nav.breadcrumbs")
     header = page.find(".error-details-header")
@@ -67,11 +67,11 @@ shared_examples 'error tracking show page' do
     expect(content).to have_content('Users: 0')
   end
 
-  it 'renders the stack trace heading' do
+  it 'renders the stack trace heading', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217810' } do
     expect(page).to have_content('Stack trace')
   end
 
-  it 'renders the stack trace', :quarantine do
+  it 'renders the stack trace', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217810' } do
     event_response['entries'][0]['data']['values'][0]['stacktrace']['frames'].each do |frame|
       expect(frame['filename']).not_to be_nil
       expect(page).to have_content(frame['filename'])
