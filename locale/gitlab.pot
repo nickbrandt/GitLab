@@ -13800,6 +13800,9 @@ msgstr ""
 msgid "Multiple uploaders found: %{uploader_types}"
 msgstr ""
 
+msgid "My Awesome Group"
+msgstr ""
+
 msgid "My company or team"
 msgstr ""
 
@@ -25942,6 +25945,9 @@ msgid "mrWidget|to start a merge train when the pipeline succeeds"
 msgstr ""
 
 msgid "must be greater than start date"
+msgstr ""
+
+msgid "my-awesome-group"
 msgstr ""
 
 msgid "n/a"
