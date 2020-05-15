@@ -604,6 +604,14 @@ module Ci
       Ci::FreezePeriodStatus.new(project: project).execute
     end
 
+    def dependency_variables
+      return [] if all_dependencies.empty?
+
+      Gitlab::Ci::Variables::Collection.new.concat(
+        Ci::JobVariable.where(job: all_dependencies).dotenv_source
+      )
+    end
+
     def features
       { trace_sections: true }
     end
