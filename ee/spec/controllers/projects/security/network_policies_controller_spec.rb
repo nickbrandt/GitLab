@@ -41,7 +41,7 @@ describe Projects::Security::NetworkPoliciesController do
             expect(adapter).to(
               receive(:query)
                 .with(:packet_flow, kubernetes_namespace, "minute", 1.hour.ago.to_s, Time.current.to_s)
-                .and_return({ success: true, data: { ops_rate: [[Time.at(0).to_i, 10]], ops_total: 10 } })
+                .and_return({ success: true, data: { ops_rate: [[Time.zone.at(0).to_i, 10]], ops_total: 10 } })
             )
             subject
           end
@@ -55,14 +55,14 @@ describe Projects::Security::NetworkPoliciesController do
           let(:action_params) do
             {
               project_id: project, namespace_id: project.namespace, environment_id: environment,
-              interval:  "day", from: Time.at(0), to: Time.at(100)
+              interval:  "day", from: Time.zone.at(0), to: Time.zone.at(100)
             }
           end
 
           it 'queries with requested arguments' do
             expect(adapter).to(
               receive(:query)
-                .with(:packet_flow, kubernetes_namespace, "day", Time.at(0).to_s, Time.at(100).to_s)
+                .with(:packet_flow, kubernetes_namespace, "day", Time.zone.at(0).to_s, Time.zone.at(100).to_s)
                 .and_return({ success: true, data: {} })
             )
             subject

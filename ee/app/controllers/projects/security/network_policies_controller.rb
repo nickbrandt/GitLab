@@ -17,8 +17,8 @@ module Projects
         result = adapter.query(
           :packet_flow, environment.deployment_namespace,
           params[:interval] || "minute",
-          (Time.parse(params[:from]) rescue 1.hour.ago).to_s,
-          (Time.parse(params[:to]) rescue Time.current).to_s
+          (Time.zone.parse(params[:from]) rescue 1.hour.ago).to_s,
+          (Time.zone.parse(params[:to]) rescue Time.current).to_s
         )
 
         respond_to do |format|
