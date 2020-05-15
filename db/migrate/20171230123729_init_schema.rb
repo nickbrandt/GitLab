@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Layout/SpaceInsideHashLiteralBraces
-# rubocop:disable Layout/SpaceAroundOperators
 # rubocop:disable Metrics/AbcSize
 # rubocop:disable Migration/AddConcurrentForeignKey
 # rubocop:disable Style/WordArray
