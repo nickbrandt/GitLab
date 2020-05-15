@@ -45,7 +45,7 @@ export default {
       return this.value.data.toLowerCase();
     },
     activeUser() {
-      return this.users.find(user => {
+      return this.config.triggerAuthors.find(user => {
         return user.username.toLowerCase() === this.currentValue;
       });
     },
@@ -72,6 +72,7 @@ export default {
 
 <template>
   <gl-filtered-search-token
+    v-if="config.triggerAuthors"
     :config="config"
     v-bind="{ ...$props, ...$attrs }"
     v-on="$listeners"
@@ -93,7 +94,7 @@ export default {
       }}</gl-filtered-search-suggestion>
       <gl-dropdown-divider />
 
-      <gl-loading-icon v-if="loading" />
+      <gl-loading-icon v-if="loading && !value" />
       <template v-else>
         <gl-filtered-search-suggestion
           v-for="user in users"

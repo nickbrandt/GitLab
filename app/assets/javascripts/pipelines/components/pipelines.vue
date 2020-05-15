@@ -226,8 +226,18 @@ export default {
     },
   },
   created() {
+    const { username, ref } = this.params;
+
     this.service = new PipelinesService(this.endpoint);
     this.requestData = { page: this.page, scope: this.scope };
+
+    if (username) {
+      this.requestData.username = username;
+    }
+
+    if (ref) {
+      this.requestData.ref = ref;
+    }
   },
   methods: {
     successCallback(resp) {
@@ -310,6 +320,7 @@ export default {
       v-if="canFilterPipelines"
       :pipelines="state.pipelines"
       :project-id="projectId"
+      :params="params"
       @filterPipelines="filterPipelines"
     />
 

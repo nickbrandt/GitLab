@@ -20,6 +20,10 @@ export default {
       type: String,
       required: true,
     },
+    params: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -51,6 +55,32 @@ export default {
           projectId: this.projectId,
         },
       ];
+    },
+    paramsValue() {
+      const valueArray = [];
+      const { username, ref } = this.params;
+
+      if (username) {
+        valueArray.push({
+          type: 'username',
+          value: {
+            data: username,
+            operator: '=',
+          },
+        });
+      }
+
+      if (ref) {
+        valueArray.push({
+          type: 'ref',
+          value: {
+            data: ref,
+            operator: '=',
+          },
+        });
+      }
+
+      return valueArray;
     },
   },
   created() {
@@ -85,6 +115,7 @@ export default {
     <gl-filtered-search
       :placeholder="__('Filter pipelines')"
       :available-tokens="tokens"
+      :value="paramsValue"
       @submit="onSubmit"
     />
   </div>
