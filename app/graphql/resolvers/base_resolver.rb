@@ -3,27 +3,33 @@
 module Resolvers
   class BaseResolver < GraphQL::Schema::Resolver
     extend ::Gitlab::Utils::Override
+    include ::Gitlab::Utils::StrongMemoize
 
     def self.single
       @single ||= Class.new(self) do
+        def ready?(**args)
+          ready, early_return = super
+          [ready, select_result(early_return)]
+        end
+
         def resolve(**args)
-          super.first
+          select_result(super)
         end
 
         def single?
           true
+        end
+
+        def select_result(results)
+          results&.first
         end
       end
     end
 
     def self.last
-      @last ||= Class.new(self) do
-        def resolve(**args)
-          super.last
-        end
-
-        def single?
-          true
+      @last ||= Class.new(self.single) do
+        def select_result(results)
+          results&.last
         end
       end
     end
