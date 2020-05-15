@@ -28,4 +28,12 @@ describe Gitlab::Auth::GroupSaml::MembershipUpdater do
 
     expect(group.members.pluck(:access_level)).to eq([Gitlab::Access::MAINTAINER])
   end
+
+  it "logs an audit event" do
+    expect do
+      described_class.new(user, saml_provider).execute
+    end.to change { AuditEvent.by_entity('Group', group).count }.by(1)
+
+    expect(AuditEvent.last.details).to include(add: 'user_access', target_details: user.name, as: 'Guest')
+  end
 end

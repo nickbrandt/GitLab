@@ -71,6 +71,7 @@ describe Groups::OmniauthCallbacksController do
       it 'logs group audit event for authentication' do
         audit_event_service = instance_double(AuditEventService)
 
+        allow(AuditEventService).to receive(:new).and_call_original
         expect(AuditEventService).to receive(:new).with(user, group, with: provider)
           .and_return(audit_event_service)
         expect(audit_event_service).to receive_message_chain(:for_authentication, :security_event)
@@ -158,6 +159,17 @@ describe Groups::OmniauthCallbacksController do
           post provider, params: { group_id: group }
 
           expect(flash[:notice]).to match(/SAML for .* was added/)
+        end
+
+        it 'logs group audit event for being added to the group' do
+          audit_event_service = instance_double(AuditEventService)
+
+          expect(AuditEventService).to receive(:new).ordered.and_call_original
+          expect(AuditEventService).to receive(:new).ordered.with(user, group, action: :create)
+            .and_return(audit_event_service)
+          expect(audit_event_service).to receive_message_chain(:for_member, :security_event)
+
+          post provider, params: { group_id: group }
         end
 
         context 'with IdP initiated request' do
