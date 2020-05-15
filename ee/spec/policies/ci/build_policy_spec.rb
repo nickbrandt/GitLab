@@ -74,7 +74,13 @@ describe Ci::BuildPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it { expect_allowed(*build_permissions) }
+        context 'when admin mode enabled', :enable_admin_mode do
+          it { expect_allowed(*build_permissions) }
+        end
+
+        context 'when admin mode disabled' do
+          it { expect_disallowed(*build_permissions) }
+        end
 
         context 'when build is not from a webide pipeline' do
           let(:pipeline) { create(:ci_empty_pipeline, project: project, source: :chat) }
@@ -87,8 +93,15 @@ describe Ci::BuildPolicy do
             allow(build).to receive(:has_terminal?).and_return(false)
           end
 
-          it { expect_allowed(:read_web_ide_terminal, :update_web_ide_terminal) }
-          it { expect_disallowed(:create_build_terminal, :create_build_service_proxy) }
+          context 'when admin mode enabled', :enable_admin_mode do
+            it { expect_allowed(:read_web_ide_terminal, :update_web_ide_terminal) }
+            it { expect_disallowed(:create_build_terminal, :create_build_service_proxy) }
+          end
+
+          context 'when admin mode disabled' do
+            it { expect_disallowed(:read_web_ide_terminal, :update_web_ide_terminal) }
+            it { expect_disallowed(:create_build_terminal, :create_build_service_proxy) }
+          end
         end
 
         context 'feature flag "build_service_proxy" is disabled' do

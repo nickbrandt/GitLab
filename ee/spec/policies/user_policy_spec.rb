@@ -22,14 +22,26 @@ describe UserPolicy do
     context 'when an admin user tries to update a regular user' do
       let(:current_user) { create(:user, :admin) }
 
-      it { is_expected.to be_allowed(ability) }
+      context 'when admin mode enabled', :enable_admin_mode do
+        it { is_expected.to be_allowed(ability) }
+      end
+
+      context 'when admin mode disabled' do
+        it { is_expected.not_to be_allowed(ability) }
+      end
     end
 
     context 'when an admin user tries to update a ghost user' do
       let(:current_user) { create(:user, :admin) }
       let(:user) { create(:user, :ghost) }
 
-      it { is_expected.not_to be_allowed(ability) }
+      context 'when admin mode enabled', :enable_admin_mode do
+        it { is_expected.not_to be_allowed(ability) }
+      end
+
+      context 'when admin mode disabled' do
+        it { is_expected.not_to be_allowed(ability) }
+      end
     end
   end
 
@@ -65,7 +77,13 @@ describe UserPolicy do
         context 'for an admin user' do
           let(:current_user) { create(:admin) }
 
-          it { is_expected.to be_allowed(:update_name) }
+          context 'when admin mode enabled', :enable_admin_mode do
+            it { is_expected.to be_allowed(:update_name) }
+          end
+
+          context 'when admin mode disabled' do
+            it { is_expected.not_to be_allowed(:update_name) }
+          end
         end
       end
     end

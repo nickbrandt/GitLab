@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Analytics::CycleAnalytics::GroupLevel do
-  let_it_be(:group) { create(:group)}
+  let_it_be(:group) { create(:group) }
   let_it_be(:project) { create(:project, :repository, namespace: group) }
   let_it_be(:from_date) { 10.days.ago }
-  let_it_be(:user) { create(:user, :admin) }
+  let_it_be(:user) { create(:user) }
   let(:issue) { create(:issue, project: project, created_at: 2.days.ago) }
   let_it_be(:milestone) { create(:milestone, project: project) }
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
@@ -17,6 +17,12 @@ describe Analytics::CycleAnalytics::GroupLevel do
   end
 
   subject { described_class.new(group: group, options: { from: from_date, current_user: user }) }
+
+  before do
+    # Cannot set the owner directly when calling `create(:group)`
+    # See spec/factories/groups.rb#after(:create)
+    group.add_owner(user)
+  end
 
   describe '#permissions' do
     it 'returns true for all stages' do
