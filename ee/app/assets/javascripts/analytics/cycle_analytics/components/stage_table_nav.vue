@@ -29,10 +29,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    customStageFormActive: {
-      type: Boolean,
-      required: true,
-    },
     canEditStages: {
       type: Boolean,
       required: true,
@@ -106,7 +102,7 @@ export default {
     <add-stage-button
       v-if="canEditStages"
       :class="$options.noDragClass"
-      :active="customStageFormActive"
+      :active="isCreatingCustomStage"
       @showform="$emit('showAddStageForm')"
     />
   </ul>

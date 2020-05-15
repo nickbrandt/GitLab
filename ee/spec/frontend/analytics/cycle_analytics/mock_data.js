@@ -130,8 +130,8 @@ export const rawCustomStage = {
 
 export const medians = stageMedians;
 
-const { events: rawCustomStageEvents } = customizableStagesAndEvents;
-const camelCasedStageEvents = rawCustomStageEvents.map(deepCamelCase);
+export const rawCustomStageEvents = customizableStagesAndEvents.events;
+export const camelCasedStageEvents = rawCustomStageEvents.map(deepCamelCase);
 
 export const customStageLabelEvents = camelCasedStageEvents.filter(ev => ev.type === 'label');
 export const customStageStartEvents = camelCasedStageEvents.filter(ev => ev.canBeStartEvent);

@@ -1,4 +1,5 @@
 export default () => ({
+  isLoadingCustomStage: false,
   isSavingCustomStage: false,
   isCreatingCustomStage: false,
   isEditingCustomStage: false,

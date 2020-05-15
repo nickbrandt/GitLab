@@ -31,21 +31,26 @@ export default {
     state.formErrors = convertObjectPropsToCamelCase(errors, { deep: true });
   },
   [types.SET_FORM_INITIAL_DATA](state, rawStageData = null) {
-    state.formInitialData = extractFormFields(rawStageData);
+    state.formInitialData = rawStageData ? extractFormFields(rawStageData) : null;
   },
   [types.SET_SAVING_CUSTOM_STAGE](state) {
     state.isSavingCustomStage = true;
+  },
+  [types.SET_LOADING](state) {
+    state.isLoadingCustomStage = true;
   },
   [types.CLEAR_SAVING_CUSTOM_STAGE](state) {
     state.isSavingCustomStage = false;
   },
   [types.SHOW_CREATE_FORM](state) {
+    state.isLoadingCustomStage = false;
     state.isEditingCustomStage = false;
     state.isCreatingCustomStage = true;
     state.formInitialData = null;
     state.formErrors = null;
   },
   [types.SHOW_EDIT_FORM](state) {
+    state.isLoadingCustomStage = false;
     state.isCreatingCustomStage = false;
     state.isEditingCustomStage = true;
     state.formErrors = null;
