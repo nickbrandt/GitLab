@@ -243,17 +243,17 @@ module EE
       ::Namespace
         .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
         .include_gitlab_subscription
-        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: Plan::PAID_HOSTED_PLANS) })
+        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: ::Plan::PAID_HOSTED_PLANS) })
         .any?
     end
 
     # Returns true if the user is an Owner on any namespace currently on
     # a paid plan
-    def owns_paid_namespace?
+    def owns_paid_namespace?(plans: ::Plan::PAID_HOSTED_PLANS)
       ::Namespace
         .from("(#{namespace_union_for_owned}) #{::Namespace.table_name}")
         .include_gitlab_subscription
-        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: Plan::PAID_HOSTED_PLANS) })
+        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: plans) })
         .any?
     end
 
@@ -361,6 +361,11 @@ module EE
 
     def security_dashboard
       InstanceSecurityDashboard.new(self)
+    end
+
+    def owns_upgradeable_namespace?
+      !owns_paid_namespace?(plans: [::Plan::GOLD]) &&
+        owns_paid_namespace?(plans: [::Plan::BRONZE, ::Plan::SILVER])
     end
 
     protected

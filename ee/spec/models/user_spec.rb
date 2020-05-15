@@ -1204,4 +1204,49 @@ describe User do
       expect(security_dashboard).to be_a(InstanceSecurityDashboard)
     end
   end
+
+  describe '#owns_upgradeable_namespace?' do
+    let_it_be(:user) { create(:user) }
+
+    subject { user.owns_upgradeable_namespace? }
+
+    using RSpec::Parameterized::TableSyntax
+
+    where(:hosted_plan, :result) do
+      :bronze_plan    | true
+      :silver_plan    | true
+      :gold_plan      | false
+      :free_plan      | false
+      :default_plan   | false
+    end
+
+    with_them do
+      it 'returns the correct result for each plan on a personal namespace' do
+        plan = create(hosted_plan)
+        create(:gitlab_subscription, namespace: user.namespace, hosted_plan: plan)
+
+        expect(subject).to be result
+      end
+
+      it 'returns the correct result for each plan on a group owned by the user' do
+        create(:group_with_plan, plan: hosted_plan).add_owner(user)
+
+        expect(subject).to be result
+      end
+    end
+
+    it 'returns false when there is no subscription for the personal namespace' do
+      expect(subject).to be false
+    end
+
+    it 'returns false when the user has multiple groups and any group has gold' do
+      create(:group_with_plan, plan: :bronze_plan).add_owner(user)
+      create(:group_with_plan, plan: :silver_plan).add_owner(user)
+      create(:group_with_plan, plan: :gold_plan).add_owner(user)
+
+      user.namespace.plans.reload
+
+      expect(subject).to be false
+    end
+  end
 end
