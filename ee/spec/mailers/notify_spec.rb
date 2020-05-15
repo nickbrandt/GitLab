@@ -173,6 +173,7 @@ describe Notify do
         it_behaves_like 'an answer to an existing thread with reply-by-email enabled' do
           let(:model) { merge_request }
         end
+
         it_behaves_like 'it should show Gmail Actions View Merge request link'
         it_behaves_like 'an unsubscribeable thread'
 
@@ -236,6 +237,7 @@ describe Notify do
         it_behaves_like 'an answer to an existing thread with reply-by-email enabled' do
           let(:model) { merge_request }
         end
+
         it_behaves_like 'it should show Gmail Actions View Merge request link'
         it_behaves_like 'an unsubscribeable thread'
 
@@ -305,6 +307,7 @@ describe Notify do
         it_behaves_like 'an epic email starting a new thread with reply-by-email enabled' do
           let(:model) { epic }
         end
+
         it_behaves_like 'it should show Gmail Actions View Epic link'
         it_behaves_like 'an unsubscribeable thread'
         it_behaves_like 'having group identification headers'
@@ -362,6 +365,7 @@ describe Notify do
     it_behaves_like 'an answer to an existing thread with reply-by-email enabled' do
       let(:model) { review.merge_request }
     end
+
     it_behaves_like 'it should show Gmail Actions View Merge request link'
     it_behaves_like 'an unsubscribeable thread'
 
