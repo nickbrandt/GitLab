@@ -1,3 +1,13 @@
+/**
+ * WARNING: WIP
+ *
+ * Please do not copy from this spec or use it as an example for anything.
+ *
+ * This is in place to iteratively set up the frontend integration testing environment
+ * and will be improved upon in a later iteration.
+ *
+ * See https://gitlab.com/gitlab-org/gitlab/-/issues/208800 for more information.
+ */
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import { initIde } from '~/ide';
