@@ -141,6 +141,11 @@ export const parseNestedData = (data) => {
   // information but I'm not sure it's a problem just now
   const nodes = groups;
 
+  const nodeDict = nodes.reduce((acc, node) => {
+    acc[node.name] = node;
+    return acc;
+  }, {});
+
   const links = groups
     .map((group) => {
 
@@ -150,21 +155,21 @@ export const parseNestedData = (data) => {
         }
 
         return job.needs.map((needed) => {
-          return { source: needed.split(' ')[0], target: group.name, value: (group.size * 10), group: group.name };
+          const sourceNode = nodeDict[needed] || nodeDict[needed.split(' ')[0]];
+          return { source: sourceNode.name, target: group.name, value: (group.size * 10), group: group.name };
         });
       })
     }).flat(2)
 
 
   const filteredLinks = () => {
-    const nodeDict = nodes.reduce((acc, node) => {
-      acc[node.name] = node;
-      return acc;
-    }, {});
 
     const getAllAncestors = (nodes) => {
       const needs = nodes
-        .map((node) => nodeDict[node.split(' ')[0]].needs || '')
+        .map((node) => {
+          const nodeEntry = nodeDict[node] || nodeDict[node.split(' ')[0]];
+          return nodeEntry.needs || '';
+        })
         .flat()
         .filter(Boolean);
 

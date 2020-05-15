@@ -91,12 +91,14 @@ export default {
       stages: fabioDepsTwo,
     } = fabioDAGtwo;
 
-    // this.drawGraph(simplified, parseData);
-    // this.drawGraph(stages, parseData);
-    // this.drawGraph(nestedStages, parseNestedData);
+    this.drawGraph(simplified, parseData);
+    this.drawGraph(stages, parseData);
 
-    // this.drawGraph(longStages, parseNestedData);
-    // this.drawGraph(shortStages, parseNestedData);
+    this.drawGraph(longStages, parseNestedData);
+    this.drawGraph(nestedStages, parseNestedData);
+    //
+    this.drawGraph(longStages, parseNestedData);
+    this.drawGraph(shortStages, parseNestedData);
     this.drawGraph(fabioDepsOne, parseNestedData);
     this.drawGraph(fabioDepsTwo, parseNestedData);
 
@@ -340,6 +342,7 @@ export default {
       } = this.$options.viewOptions;
 
       const parsed = parseFn(data);
+      console.log('parsed', parsed);
       const { maxNodesPerLayer, linksAndNodes } = this.transformData(parsed);
 
       this.width = baseWidth;
