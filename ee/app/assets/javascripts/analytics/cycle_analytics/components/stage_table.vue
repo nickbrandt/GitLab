@@ -21,20 +21,8 @@ export default {
       type: Object,
       required: true,
     },
-    isLoading: {
-      type: Boolean,
-      required: true,
-    },
-    isEmptyStage: {
-      type: Boolean,
-      required: true,
-    },
     customStageFormActive: {
       type: Boolean,
-      required: true,
-    },
-    currentStageEvents: {
-      type: Array,
       required: true,
     },
     noDataSvgPath: {
@@ -48,7 +36,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['customStageFormInitialData']),
+    ...mapState('stageTable', ['isLoadingStage', 'isEmptyStage', 'currentStageEvents']),
     stageEventsHeight() {
       return `${this.stageNavHeight}px`;
     },
@@ -56,8 +44,8 @@ export default {
       return this.currentStage ? this.currentStage.title : __('Related Issues');
     },
     shouldDisplayStage() {
-      const { currentStageEvents = [], isLoading, isEmptyStage } = this;
-      return currentStageEvents.length && !isLoading && !isEmptyStage;
+      const { currentStageEvents = [], isLoadingStage, isEmptyStage } = this;
+      return currentStageEvents.length && !isLoadingStage && !isEmptyStage;
     },
     stageHeaders() {
       return [
@@ -95,7 +83,7 @@ export default {
 </script>
 <template>
   <div class="stage-panel-container">
-    <div class="card stage-panel">
+    <div else class="card stage-panel">
       <div class="card-header border-bottom-0">
         <nav class="col-headers">
           <ul>
@@ -116,7 +104,7 @@ export default {
         </nav>
         <div class="section stage-events overflow-auto" :style="{ height: stageEventsHeight }">
           <slot name="content">
-            <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
+            <gl-loading-icon v-if="isLoadingStage" class="mt-4" size="md" />
             <template v-else>
               <stage-event-list
                 v-if="shouldDisplayStage"

@@ -5,7 +5,6 @@ export default () => ({
   endDate: null,
 
   isLoading: false,
-  isLoadingStage: false,
 
   isEmptyStage: false,
   errorCode: null,
@@ -16,8 +15,6 @@ export default () => ({
   selectedGroup: null,
   selectedProjects: [],
   selectedStage: null,
-
-  currentStageEvents: [],
 
   stages: [],
   summary: [],

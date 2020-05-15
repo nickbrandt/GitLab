@@ -24,29 +24,6 @@ export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDat
   return dispatch('fetchCycleAnalyticsData');
 };
 
-export const requestStageData = ({ commit }) => commit(types.REQUEST_STAGE_DATA);
-export const receiveStageDataSuccess = ({ commit }, data) => {
-  commit(types.RECEIVE_STAGE_DATA_SUCCESS, data);
-};
-
-export const receiveStageDataError = ({ commit }) => {
-  commit(types.RECEIVE_STAGE_DATA_ERROR);
-  createFlash(__('There was an error fetching data for the selected stage'));
-};
-
-export const fetchStageData = ({ state, dispatch, getters }, slug) => {
-  const { cycleAnalyticsRequestParams = {} } = getters;
-  const {
-    selectedGroup: { fullPath },
-  } = state;
-
-  dispatch('requestStageData');
-
-  return Api.cycleAnalyticsStageEvents(fullPath, slug, cycleAnalyticsRequestParams)
-    .then(({ data }) => dispatch('receiveStageDataSuccess', data))
-    .catch(error => dispatch('receiveStageDataError', error));
-};
-
 export const requestStageMedianValues = ({ commit }) => commit(types.REQUEST_STAGE_MEDIANS);
 export const receiveStageMedianValuesSuccess = ({ commit }, data) => {
   commit(types.RECEIVE_STAGE_MEDIANS_SUCCESS, data);
@@ -117,6 +94,7 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 export const requestGroupStages = ({ commit }) => commit(types.REQUEST_GROUP_STAGES);
 
 export const receiveGroupStagesError = ({ commit }, error) => {
+  console.log('error', error);
   commit(types.RECEIVE_GROUP_STAGES_ERROR, error);
   createFlash(__('There was an error fetching value stream analytics stages.'));
 };
@@ -127,7 +105,7 @@ export const setDefaultSelectedStage = ({ dispatch, getters }) => {
     const [firstActiveStage] = activeStages;
     return Promise.all([
       dispatch('setSelectedStage', firstActiveStage),
-      dispatch('fetchStageData', firstActiveStage.slug),
+      dispatch('stageTable/fetchStageData', firstActiveStage.slug),
     ]);
   }
 

@@ -6,6 +6,7 @@ import mutations from './mutations';
 import state from './state';
 import customStages from './modules/custom_stages/index';
 import durationChart from './modules/duration_chart/index';
+import stageTable from './modules/stage_table/index';
 import typeOfWork from './modules/type_of_work/index';
 
 Vue.use(Vuex);
@@ -16,5 +17,5 @@ export default () =>
     getters,
     mutations,
     state,
-    modules: { customStages, durationChart, typeOfWork },
+    modules: { customStages, durationChart, stageTable, typeOfWork },
   });

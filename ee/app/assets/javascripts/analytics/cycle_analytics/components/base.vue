@@ -61,14 +61,11 @@ export default {
     ...mapState([
       'featureFlags',
       'isLoading',
-      'isLoadingStage',
-      'isEmptyStage',
       'selectedGroup',
       'selectedProjects',
       'selectedStage',
       'stages',
       'summary',
-      'currentStageEvents',
       'errorCode',
       'startDate',
       'endDate',
@@ -130,7 +127,6 @@ export default {
   methods: {
     ...mapActions([
       'fetchCycleAnalyticsData',
-      'fetchStageData',
       'setSelectedGroup',
       'setSelectedProjects',
       'setSelectedStage',
@@ -148,6 +144,7 @@ export default {
       'createStage',
       'clearFormErrors',
     ]),
+    ...mapActions('stageTable', ['fetchStageData']),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
@@ -295,10 +292,7 @@ export default {
             :key="stageCount"
             class="js-stage-table"
             :current-stage="selectedStage"
-            :is-loading="isLoadingStage"
-            :is-empty-stage="isEmptyStage"
             :custom-stage-form-active="customStageFormActive"
-            :current-stage-events="currentStageEvents"
             :no-data-svg-path="noDataSvgPath"
           >
             <template #nav>
