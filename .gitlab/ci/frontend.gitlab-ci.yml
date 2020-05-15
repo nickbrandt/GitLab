@@ -238,6 +238,18 @@ jest:
       junit: junit_jest.xml
   parallel: 2
 
+jest-integration:
+  extends: .frontend-job-base
+  script:
+    - date
+    - yarn jest:integration --ci
+  needs: ["frontend-fixtures"]
+  cache:
+    key: jest-integration
+    paths:
+      - tmp/cache/jest/
+    policy: pull-push
+
 jest-as-if-foss:
   extends:
     - .jest-base
