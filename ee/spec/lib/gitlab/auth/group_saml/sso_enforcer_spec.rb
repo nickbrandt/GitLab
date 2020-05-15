@@ -45,7 +45,7 @@ describe Gitlab::Auth::GroupSaml::SsoEnforcer do
 
     describe 'enforced sso expiry' do
       before do
-        stub_feature_flags(enforced_sso_requires_session: saml_provider.group)
+        stub_feature_flags(enforced_sso_expiry: saml_provider.group)
       end
 
       it 'returns true if a sign in is recently recorded' do
@@ -88,12 +88,6 @@ describe Gitlab::Auth::GroupSaml::SsoEnforcer do
       end
     end
 
-    it 'allows access when the sso enforcement feature is disabled' do
-      stub_feature_flags(enforced_sso: false)
-
-      expect(subject).not_to be_access_restricted
-    end
-
     it 'prevents access when sso enforcement active but there is no session' do
       expect(subject).to be_access_restricted
     end
@@ -109,10 +103,6 @@ describe Gitlab::Auth::GroupSaml::SsoEnforcer do
     let(:root_group) { create(:group, saml_provider: create(:saml_provider, enabled: true, enforced_sso: true)) }
 
     context 'is restricted' do
-      before do
-        stub_feature_flags(enforced_sso_requires_session: root_group)
-      end
-
       it 'for a group' do
         expect(described_class).to be_group_access_restricted(root_group)
       end
@@ -130,17 +120,10 @@ describe Gitlab::Auth::GroupSaml::SsoEnforcer do
       end
     end
 
-    context 'is not restricted' do
-      it 'for the group without configured saml_provider' do
-        group = create(:group)
-        stub_feature_flags(enforced_sso_requires_session: group)
+    context 'for a group without a saml_provider configured' do
+      let(:root_group) { create(:group) }
 
-        expect(described_class).not_to be_group_access_restricted(group)
-      end
-
-      it 'for the group without the feature flag' do
-        stub_feature_flags(enforced_sso_requires_session: false)
-
+      it 'is not restricted' do
         expect(described_class).not_to be_group_access_restricted(root_group)
       end
     end

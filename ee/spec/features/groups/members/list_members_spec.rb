@@ -52,7 +52,6 @@ describe 'Groups > Members > List members' do
     let(:session) { { active_group_sso_sign_ins: { saml_provider.id => DateTime.now } } }
 
     before do
-      stub_feature_flags(enforced_sso: true, group_saml: true)
       stub_licensed_features(group_saml: true)
       allow(Gitlab::Session).to receive(:current).and_return(session)
 

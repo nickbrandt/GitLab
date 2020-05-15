@@ -85,7 +85,7 @@ module QA
       after(:all) do
         page.visit Runtime::Scenario.gitlab_address
 
-        %w[enforced_sso enforced_sso_requires_session group_managed_accounts sign_up_on_sso group_scim group_administration_nav_item].each do |flag|
+        %w[group_managed_accounts sign_up_on_sso group_scim group_administration_nav_item].each do |flag|
           Runtime::Feature.remove(flag)
         end
 
@@ -119,7 +119,7 @@ module QA
     end
 
     def setup_and_enable_group_managed_accounts
-      %w[enforced_sso enforced_sso_requires_session group_managed_accounts sign_up_on_sso group_scim group_administration_nav_item].each do |flag|
+      %w[group_managed_accounts sign_up_on_sso group_scim group_administration_nav_item].each do |flag|
         Runtime::Feature.enable_and_verify(flag)
       end
 

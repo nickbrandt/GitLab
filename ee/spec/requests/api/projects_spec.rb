@@ -814,7 +814,6 @@ describe API::Projects do
       end
 
       before do
-        stub_feature_flags(enforced_sso_requires_session: false)
         stub_licensed_features(group_saml: true)
       end
 

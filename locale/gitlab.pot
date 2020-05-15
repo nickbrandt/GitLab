@@ -10694,9 +10694,6 @@ msgstr ""
 msgid "GroupSAML|Enforce SSO-only authentication for this group."
 msgstr ""
 
-msgid "GroupSAML|Enforce SSO-only membership for this group."
-msgstr ""
-
 msgid "GroupSAML|Enforce users to have dedicated group managed accounts for this group."
 msgstr ""
 
