@@ -2975,6 +2975,9 @@ msgstr ""
 msgid "AutoDevOps|Auto DevOps documentation"
 msgstr ""
 
+msgid "AutoDevOps|Dismiss Auto DevOps box"
+msgstr ""
+
 msgid "AutoDevOps|Enable in settings"
 msgstr ""
 
@@ -16265,6 +16268,9 @@ msgid "Project avatar"
 msgstr ""
 
 msgid "Project cannot be shared with the group it is in or one of its ancestors."
+msgstr ""
+
+msgid "Project clone URL"
 msgstr ""
 
 msgid "Project configuration, including services"
