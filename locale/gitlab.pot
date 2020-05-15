@@ -12920,6 +12920,9 @@ msgstr ""
 msgid "Make sure you're logged into the account that owns the projects you'd like to import."
 msgstr ""
 
+msgid "Make this epic confidential"
+msgstr ""
+
 msgid "Makes this issue confidential."
 msgstr ""
 
@@ -21771,6 +21774,9 @@ msgid "This environment is being re-deployed"
 msgstr ""
 
 msgid "This epic already has the maximum number of child epics."
+msgstr ""
+
+msgid "This epic and its child elements will only be visible to team members with at minimum Reporter access."
 msgstr ""
 
 msgid "This epic does not exist or you don't have sufficient permission."
