@@ -88,7 +88,8 @@ class EpicsFinder < IssuableFinder
                ::Group.groups_user_can_read_epics(related_groups, current_user, same_root: true)
              end
 
-    Epic.where(group: groups)
+    epics = Epic.where(group: groups)
+    with_confidentiality_access_check(epics, groups)
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
@@ -146,4 +147,36 @@ class EpicsFinder < IssuableFinder
     items.where(parent_id: params[:parent_id])
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  def with_confidentiality_access_check(epics, groups)
+    return epics unless Feature.enabled?(:confidential_epics_query, group)
+    return epics if can_read_all_related_groups?(groups)
+
+    epics.not_confidential_or_in_groups(groups_with_confidential_access(groups))
+  end
+
+  def groups_with_confidential_access(groups)
+    return ::Group.none unless current_user
+
+    # groups is an array, not a relation here so we have to use `map`
+    group_ids = groups.map(&:id)
+    GroupMember.by_group_ids(group_ids).by_user_id(current_user).non_guests.select(:source_id)
+  end
+
+  def can_read_all_related_groups?(groups)
+    return false unless current_user
+
+    # If a user is a member of a group, he also inherits access to all subgroups,
+    # so here we check if user is member of the top-level group (from the
+    # list of groups being requested) - this is checked by
+    # `read_confidential_epic` policy. If that's the case we don't need to
+    # check membership on subgroups.
+    #
+    # `groups` is a list of groups in the same group hierarchy, by default
+    # these should be ordered by nested level in the group hierarchy in
+    # descending order (so top-level first), except if we fetch ancestors
+    # - in that case top-level group is group's root parent
+    parent = params.fetch(:include_ancestor_groups, false) ? groups.first.root_ancestor : group
+    Ability.allowed?(current_user, :read_confidential_epic, parent)
+  end
 end

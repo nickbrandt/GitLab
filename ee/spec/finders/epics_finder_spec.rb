@@ -57,8 +57,8 @@ describe EpicsFinder do
           expect(epics).to contain_exactly(epic1, epic2, epic3)
         end
 
-        it 'does not execute more than 8 SQL queries' do
-          expect { epics.to_a }.not_to exceed_all_query_limit(8)
+        it 'does not execute more than 9 SQL queries' do
+          expect { epics.to_a }.not_to exceed_all_query_limit(9)
         end
 
         context 'sorting' do
@@ -293,6 +293,65 @@ describe EpicsFinder do
                 epics(attempt_group_search_optimizations: true, label_name: [label1.title, label2.title], search: 'filtered')
 
               expect(filtered_epics).to contain_exactly(labeled_epic)
+            end
+          end
+        end
+
+        context 'with confidential epics' do
+          let_it_be(:ancestor_group) { create(:group, :public) }
+          let_it_be(:base_group) { create(:group, :public, parent: ancestor_group) }
+          let_it_be(:base_epic1) { create(:epic, :confidential, group: base_group) }
+          let_it_be(:base_epic2) { create(:epic, group: base_group) }
+          let_it_be(:private_group1) { create(:group, :private, parent: base_group) }
+          let_it_be(:private_epic1) { create(:epic, group: private_group1) }
+          let_it_be(:private_epic2) { create(:epic, :confidential, group: private_group1) }
+          let_it_be(:public_group1) { create(:group, :public, parent: base_group) }
+          let_it_be(:public_epic1) { create(:epic, group: public_group1) }
+          let_it_be(:public_epic2) { create(:epic, :confidential, group: public_group1) }
+
+          subject { described_class.new(search_user, group_id: base_group.id).execute }
+
+          it 'returns only public epics' do
+            expect(subject).to match_array([base_epic2, public_epic1])
+          end
+
+          context 'when user is member of ancestor group' do
+            before do
+              ancestor_group.add_developer(search_user)
+            end
+
+            it 'returns all nested epics' do
+              expect(subject).to match_array([base_epic1, base_epic2, private_epic1, private_epic2, public_epic1, public_epic2])
+            end
+          end
+
+          context 'when user is member of private subgroup' do
+            before do
+              private_group1.add_developer(search_user)
+            end
+
+            it 'returns also confidential epics from this subgroup' do
+              expect(subject).to match_array([base_epic2, private_epic1, private_epic2, public_epic1])
+            end
+          end
+
+          context 'when user is member of public subgroup' do
+            before do
+              public_group1.add_developer(search_user)
+            end
+
+            it 'returns also confidential epics from this subgroup' do
+              expect(subject).to match_array([base_epic2, public_epic1, public_epic2])
+            end
+          end
+
+          context 'when confidential_epics_query is disabled' do
+            before do
+              stub_feature_flags(confidential_epics_query: false)
+            end
+
+            it 'returns also confidential epics' do
+              expect(subject).to match_array([base_epic1, base_epic2, public_epic1, public_epic2])
             end
           end
         end

@@ -28,6 +28,16 @@ describe Epic do
         expect(described_class.public_only).to eq([public_epic])
       end
     end
+
+    describe '.not_confidential_or_in_groups' do
+      it 'returns only epics which are either not confidential or in the group' do
+        confidential_epic = create(:epic, confidential: true, group: group)
+        group_epic = create(:epic, group: group)
+        create(:epic, confidential: true)
+
+        expect(described_class.not_confidential_or_in_groups(group)).to match_array([confidential_epic, group_epic])
+      end
+    end
   end
 
   describe 'validations' do
