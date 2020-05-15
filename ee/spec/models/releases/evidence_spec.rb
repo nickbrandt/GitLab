@@ -16,7 +16,7 @@ describe Releases::Evidence do
         pipeline = create(:ci_empty_pipeline, sha: release.sha, project: project)
         create(:ci_build, :test_reports, pipeline: pipeline, name: 'build_1')
 
-        expect(summary_json['test_report_artifacts']).not_to be_empty
+        expect(summary_json['report_artifacts']).not_to be_empty
         expect(summary_json).to match_schema(schema_file)
       end
     end

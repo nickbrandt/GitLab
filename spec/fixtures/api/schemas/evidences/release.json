@@ -20,7 +20,7 @@
       "type": "array",
       "items": { "$ref": "milestone.json" }
     },
-    "test_report_artifacts": {
+    "report_artifacts": {
       "type": "array",
       "items": { "$ref": "build_artifact.json" }
     }

@@ -9,9 +9,10 @@ describe Evidences::ReleaseEntity do
 
   subject { entity.as_json }
 
-  it 'has not test_report_artifacts if feature is unlicenced' do
+  it 'has not report_artifacts if feature is unlicenced' do
     stub_licensed_features(release_evidence_test_artifacts: false)
-    expect(subject).not_to have_key(:test_report_artifacts)
+
+    expect(subject).not_to have_key(:report_artifacts)
   end
 
   context "when release_evidence_test_artifacts feature is licenced" do
@@ -20,7 +21,7 @@ describe Evidences::ReleaseEntity do
     end
 
     it 'exposes empty artifacts array' do
-      expect(subject[:test_report_artifacts]).to be_empty
+      expect(subject[:report_artifacts]).to be_empty
     end
 
     context 'when there is pipeline with artifacts' do
@@ -30,7 +31,7 @@ describe Evidences::ReleaseEntity do
       let!(:build_coverage_report) { create(:ci_build, :coverage_reports, pipeline: pipeline, name: 'build_3') }
 
       it 'exposes build artifacts' do
-        expect(subject[:test_report_artifacts]).to(
+        expect(subject[:report_artifacts]).to(
           contain_exactly(
             Evidences::BuildArtifactEntity.new(build_test_report).as_json,
             Evidences::BuildArtifactEntity.new(build_coverage_report).as_json
