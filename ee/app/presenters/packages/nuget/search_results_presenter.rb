@@ -3,7 +3,7 @@
 module Packages
   module Nuget
     class SearchResultsPresenter
-      include API::Helpers::Packages::Nuget::MetadataPresenterHelpers
+      include Packages::Nuget::PresenterHelpers
       include Gitlab::Utils::StrongMemoize
 
       delegate :total_count, to: :@search

@@ -3,7 +3,7 @@
 module Packages
   module Nuget
     class PackagesMetadataPresenter
-      include API::Helpers::Packages::Nuget::MetadataPresenterHelpers
+      include Packages::Nuget::PresenterHelpers
       include Gitlab::Utils::StrongMemoize
 
       COUNT = 1.freeze

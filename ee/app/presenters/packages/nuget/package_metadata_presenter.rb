@@ -3,7 +3,7 @@
 module Packages
   module Nuget
     class PackageMetadataPresenter
-      include API::Helpers::Packages::Nuget::MetadataPresenterHelpers
+      include Packages::Nuget::PresenterHelpers
 
       def initialize(package)
         @package = package
