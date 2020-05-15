@@ -8,6 +8,8 @@ describe API::NugetPackages do
   let_it_be(:user) { create(:user) }
   let_it_be(:project, reload: true) { create(:project, :public) }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
+  let_it_be(:deploy_token) { create(:deploy_token, read_package_registry: true, write_package_registry: true) }
+  let_it_be(:project_deploy_token) { create(:project_deploy_token, deploy_token: deploy_token, project: project) }
 
   describe 'GET /api/v4/projects/:id/packages/nuget' do
     let(:url) { "/projects/#{project.id}/packages/nuget/index.json" }
@@ -56,6 +58,8 @@ describe API::NugetPackages do
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
+
+      it_behaves_like 'deploy token for package GET requests'
 
       it_behaves_like 'rejects nuget access with unknown project id'
 
@@ -114,6 +118,8 @@ describe API::NugetPackages do
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
+
+      it_behaves_like 'deploy token for package uploads'
 
       it_behaves_like 'rejects nuget access with unknown project id'
 
@@ -186,6 +192,8 @@ describe API::NugetPackages do
         end
       end
 
+      it_behaves_like 'deploy token for package uploads'
+
       it_behaves_like 'rejects nuget access with unknown project id'
 
       it_behaves_like 'rejects nuget access with invalid project id'
@@ -243,6 +251,8 @@ describe API::NugetPackages do
 
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
+
+        it_behaves_like 'deploy token for package GET requests'
 
         it_behaves_like 'rejects nuget access with unknown project id'
 
@@ -304,6 +314,8 @@ describe API::NugetPackages do
         end
       end
 
+      it_behaves_like 'deploy token for package GET requests'
+
       context 'with invalid package name' do
         let_it_be(:package_name) { 'Unkown' }
 
@@ -364,6 +376,8 @@ describe API::NugetPackages do
         end
       end
 
+      it_behaves_like 'deploy token for package GET requests'
+
       it_behaves_like 'rejects nuget access with unknown project id'
 
       it_behaves_like 'rejects nuget access with invalid project id'
@@ -422,6 +436,8 @@ describe API::NugetPackages do
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
+
+      it_behaves_like 'deploy token for package GET requests'
 
       it_behaves_like 'rejects nuget access with unknown project id'
 
@@ -489,6 +505,8 @@ describe API::NugetPackages do
           it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
         end
       end
+
+      it_behaves_like 'deploy token for package GET requests'
 
       it_behaves_like 'rejects nuget access with unknown project id'
 
