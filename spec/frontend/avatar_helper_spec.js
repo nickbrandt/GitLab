@@ -27,6 +27,10 @@ describe('avatar_helper', () => {
       expect(getIdenticonBackgroundClass('gid://gitlab/Project/1')).toEqual('bg2');
     });
 
+    it('returns identicon bg class from unparsable string', () => {
+      expect(getIdenticonBackgroundClass('gid://gitlab/')).toEqual('bg1');
+    });
+
     it(`wraps around if id is bigger than ${IDENTICON_BG_COUNT}`, () => {
       expect(getIdenticonBackgroundClass(IDENTICON_BG_COUNT + 4)).toEqual('bg5');
       expect(getIdenticonBackgroundClass(IDENTICON_BG_COUNT * 5 + 6)).toEqual('bg7');

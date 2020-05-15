@@ -1,5 +1,0 @@
----
-title: Update avatar helper to accept GraphQL id as well as database id
-merge_request: 32261
-author:
-type: added
