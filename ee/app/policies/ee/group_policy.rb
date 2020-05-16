@@ -70,6 +70,28 @@ module EE
         License.feature_available?(:cluster_health)
       end
 
+      with_scope :global
+      condition(:commit_committer_check_disabled_globally) do
+        !PushRule.global&.commit_committer_check
+      end
+
+      with_scope :global
+      condition(:reject_unsigned_commits_disabled_globally) do
+        !PushRule.global&.reject_unsigned_commits
+      end
+
+      condition(:commit_committer_check_available) do
+        @subject.feature_available?(:commit_committer_check)
+      end
+
+      condition(:reject_unsigned_commits_available) do
+        @subject.feature_available?(:reject_unsigned_commits)
+      end
+
+      condition(:push_rules_available) do
+        ::Feature.enabled?(:group_push_rules, @subject.root_ancestor) && @subject.feature_available?(:push_rules)
+      end
+
       rule { public_group | logged_in_viewable }.policy do
         enable :read_wiki
         enable :download_wiki_code
@@ -212,6 +234,26 @@ module EE
         prevent(*create_read_update_admin_destroy(:wiki))
         prevent(:download_wiki_code)
       end
+
+      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.policy do
+        enable :change_commit_committer_check
+      end
+
+      rule { commit_committer_check_available }.policy do
+        enable :read_commit_committer_check
+      end
+
+      rule { ~commit_committer_check_available }.policy do
+        prevent :change_commit_committer_check
+      end
+
+      rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
+
+      rule { reject_unsigned_commits_available }.enable :read_reject_unsigned_commits
+
+      rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
+
+      rule { can?(:maintainer_access) & push_rules_available }.enable :change_push_rules
     end
 
     override :lookup_access_level!

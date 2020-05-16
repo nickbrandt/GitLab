@@ -81,6 +81,34 @@ module EE
       end
 
       with_scope :subject
+      condition(:group_push_rules_enabled) do
+        @subject.group && ::Feature.enabled?(:group_push_rules, @subject.group.root_ancestor)
+      end
+
+      with_scope :subject
+      condition(:group_push_rule_present) do
+        group_push_rules_enabled? && subject.group.push_rule
+      end
+
+      with_scope :subject
+      condition(:reject_unsigned_commits_disabled_by_group) do
+        if group_push_rule_present?
+          !subject.group.push_rule.reject_unsigned_commits
+        else
+          true
+        end
+      end
+
+      with_scope :subject
+      condition(:commit_committer_check_disabled_by_group) do
+        if group_push_rule_present?
+          !subject.group.push_rule.commit_committer_check
+        else
+          true
+        end
+      end
+
+      with_scope :subject
       condition(:commit_committer_check_available) do
         @subject.feature_available?(:commit_committer_check)
       end
@@ -273,13 +301,13 @@ module EE
 
       rule { ~can?(:push_code) }.prevent :push_code_to_protected_branches
 
-      rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
+      rule { admin | (reject_unsigned_commits_disabled_globally & reject_unsigned_commits_disabled_by_group & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
 
       rule { reject_unsigned_commits_available }.enable :read_reject_unsigned_commits
 
       rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
 
-      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.policy do
+      rule { admin | (commit_committer_check_disabled_globally & commit_committer_check_disabled_by_group & can?(:maintainer_access)) }.policy do
         enable :change_commit_committer_check
       end
 
