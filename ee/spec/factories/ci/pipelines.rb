@@ -65,7 +65,7 @@ FactoryBot.define do
       end
     end
 
-    trait :with_license_management_feature_branch do
+    trait :with_license_scanning_feature_branch do
       status { :success }
 
       after(:build) do |pipeline, evaluator|
@@ -73,7 +73,7 @@ FactoryBot.define do
       end
     end
 
-    trait :with_corrupted_license_management_report do
+    trait :with_corrupted_license_scanning_report do
       status { :success }
 
       after(:build) do |pipeline, evaluator|

@@ -409,7 +409,7 @@ describe ApprovalMergeRequestRule do
       let(:open_merge_request) { create(:merge_request, :opened, target_project: project, source_project: project) }
       let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_scanning, project: project) }
       let(:project) { create(:project) }
-      let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
+      let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_scanning_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
       let!(:denied_policy) { create(:software_license_policy, project: project, software_license: license, classification: :denied) }
 
       before do
