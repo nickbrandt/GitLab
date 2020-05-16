@@ -15,7 +15,7 @@ describe Ci::CompareLicenseScanningReportsService do
 
     context 'when head pipeline has license scanning reports' do
       let!(:base_pipeline) { nil }
-      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_license_management_report, project: project) }
+      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_license_scanning_report, project: project) }
 
       it 'reports new licenses' do
         expect(subject[:status]).to eq(:parsed)
@@ -25,8 +25,8 @@ describe Ci::CompareLicenseScanningReportsService do
     end
 
     context 'when base and head pipelines have test reports' do
-      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_license_management_report, project: project) }
-      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_license_management_feature_branch, project: project) }
+      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_license_scanning_report, project: project) }
+      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_license_scanning_feature_branch, project: project) }
 
       it 'reports status as parsed' do
         expect(subject[:status]).to eq(:parsed)
@@ -49,8 +49,8 @@ describe Ci::CompareLicenseScanningReportsService do
     end
 
     context 'when head pipeline has corrupted license scanning reports' do
-      let!(:base_pipeline) { build(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
-      let!(:head_pipeline) { build(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
+      let!(:base_pipeline) { build(:ee_ci_pipeline, :with_corrupted_license_scanning_report, project: project) }
+      let!(:head_pipeline) { build(:ee_ci_pipeline, :with_corrupted_license_scanning_report, project: project) }
 
       it 'returns status and error message' do
         expect(subject[:status]).to eq(:error)
