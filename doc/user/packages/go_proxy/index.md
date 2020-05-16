@@ -56,7 +56,6 @@ Follow [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/213770) for de
 
 ### Fetch modules from private projects
 
-NOTE: **Note:**
 `go` does not support transmitting credentials over insecure connections. The
 steps below work only if GitLab is configured for HTTPS.
 

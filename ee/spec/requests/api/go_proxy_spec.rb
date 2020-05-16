@@ -29,7 +29,9 @@ describe API::GoProxy do
 
   before do
     project.add_developer(user)
+
     stub_licensed_features(packages: true)
+    stub_feature_flags(go_proxy_disable_gomod_validation: false)
 
     modules
   end
@@ -54,7 +56,7 @@ describe API::GoProxy do
     end
   end
 
-  shared_examples 'a missing module version list resource' do |*versions, path: ''|
+  shared_examples 'a missing module version list resource' do |path: ''|
     let(:module_name) { "#{base}#{path}" }
     let(:resource) { "list" }
 
@@ -167,6 +169,18 @@ describe API::GoProxy do
 
     context 'for the root module v2' do
       it_behaves_like 'a module version list resource', 'v2.0.0', path: '/v2'
+    end
+
+    context 'with a URL encoded relative path component' do
+      it_behaves_like 'a missing module version list resource', path: '/%2E%2E%2Fxyz'
+    end
+
+    context 'with the feature disabled' do
+      before do
+        stub_feature_flags(go_proxy: false)
+      end
+
+      it_behaves_like 'a missing module version list resource'
     end
   end
 
@@ -356,26 +370,31 @@ describe API::GoProxy do
 
       it 'returns ok with an oauth token' do
         get_resource(oauth_access_token: oauth)
+
         expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns ok with a job token' do
         get_resource(oauth_access_token: job)
+
         expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns ok with a personal access token' do
         get_resource(personal_access_token: pa_token)
+
         expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns ok with a personal access token and basic authentication' do
         get_resource(headers: build_basic_auth_header(user.username, pa_token.token))
+
         expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns unauthorized with no authentication' do
         get_resource
+
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
@@ -393,6 +412,7 @@ describe API::GoProxy do
 
       it 'returns ok with no authentication' do
         get_resource
+
         expect(response).to have_gitlab_http_status(:ok)
       end
     end
@@ -406,26 +426,31 @@ describe API::GoProxy do
     describe 'GET /projects/:id/packages/go/*module_name/@v/list' do
       it 'returns not found with a user' do
         get_resource(user)
+
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns not found with an oauth token' do
         get_resource(oauth_access_token: oauth)
+
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns not found with a job token' do
         get_resource(oauth_access_token: job)
+
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns not found with a personal access token' do
         get_resource(personal_access_token: pa_token)
+
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns unauthorized with no authentication' do
         get_resource
+
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end

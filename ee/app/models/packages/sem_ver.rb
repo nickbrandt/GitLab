@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class Packages::SemVer
-  # basic semver, but bounded (^expr$)
-  PATTERN = /\A(v?)(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.a-z0-9]+))?(?:\+([-.a-z0-9]+))?\z/i.freeze
-
   attr_accessor :major, :minor, :patch, :prerelease, :build
 
   def initialize(major = 0, minor = 0, patch = 0, prerelease = nil, build = nil, prefixed: false)
@@ -37,11 +34,11 @@ class Packages::SemVer
   end
 
   def self.match(str, prefixed: false)
-    m = PATTERN.match(str)
-    return unless m
-    return if prefixed == m[1].empty?
+    return unless str&.start_with?('v') == prefixed
 
-    m
+    str = str[1..] if prefixed
+
+    Gitlab::Regex.semver_regex.match(str)
   end
 
   def self.match?(str, prefixed: false)
@@ -52,6 +49,6 @@ class Packages::SemVer
     m = match str, prefixed: prefixed
     return unless m
 
-    new(m[2].to_i, m[3].to_i, m[4].to_i, m[5], m[6], prefixed: prefixed)
+    new(m[1].to_i, m[2].to_i, m[3].to_i, m[4], m[5], prefixed: prefixed)
   end
 end

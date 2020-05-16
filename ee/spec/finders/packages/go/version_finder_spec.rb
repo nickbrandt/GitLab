@@ -13,9 +13,14 @@ describe Packages::Go::VersionFinder do
     create :go_module_commit, :module,  project: project, tag: 'v1.0.1'
     create :go_module_commit, :package, project: project, tag: 'v1.0.2', path: 'pkg'
     create :go_module_commit, :module,  project: project, tag: 'v1.0.3', name: 'mod'
+    create :go_module_commit, :module,  project: project, tag: 'v1.0.4', name: 'bad-mod', url: 'example.com/go-lib'
     create :go_module_commit, :files,   project: project, tag: 'c1',     files: { 'y.go' => "package a\n" }
     create :go_module_commit, :module,  project: project, tag: 'c2',     name: 'v2'
     create :go_module_commit, :files,   project: project, tag: 'v2.0.0', files: { 'v2/x.go' => "package a\n" }
+  end
+
+  before do
+    stub_feature_flags(go_proxy_disable_gomod_validation: false)
   end
 
   shared_examples '#execute' do |*expected|
@@ -35,7 +40,7 @@ describe Packages::Go::VersionFinder do
     context 'for the root module' do
       let(:mod) { create :go_module, project: project }
 
-      it_behaves_like '#execute', 'v1.0.1', 'v1.0.2', 'v1.0.3'
+      it_behaves_like '#execute', 'v1.0.1', 'v1.0.2', 'v1.0.3', 'v1.0.4'
     end
 
     context 'for the package' do
@@ -47,13 +52,29 @@ describe Packages::Go::VersionFinder do
     context 'for the submodule' do
       let(:mod) { create :go_module, project: project, path: 'mod' }
 
-      it_behaves_like '#execute', 'v1.0.3'
+      it_behaves_like '#execute', 'v1.0.3', 'v1.0.4'
     end
 
     context 'for the root module v2' do
       let(:mod) { create :go_module, project: project, path: 'v2' }
 
       it_behaves_like '#execute', 'v2.0.0'
+    end
+
+    context 'for the bad module' do
+      let(:mod) { create :go_module, project: project, path: 'bad-mod' }
+
+      context 'with gomod checking enabled' do
+        it_behaves_like '#execute'
+      end
+
+      context 'with gomod checking disabled' do
+        before do
+          stub_feature_flags(go_proxy_disable_gomod_validation: true)
+        end
+
+        it_behaves_like '#execute', 'v1.0.4'
+      end
     end
   end
 

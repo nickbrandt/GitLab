@@ -58,13 +58,6 @@ describe Packages::Go::ModuleFinder do
     end
   end
 
-  context 'with a URL encoded relative path component' do
-    it_behaves_like 'an invalid path' do
-      let(:module_name) { base_url(project) + '/%2E%2E%2Fxyz' }
-      let(:expected_name) { base_url(project.namespace) + '/xyz' }
-    end
-  end
-
   context 'with many relative path components' do
     it_behaves_like 'an invalid path' do
       let(:module_name) { base_url(project) + ('/..' * 10) + '/xyz' }

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Packages::GoModule
+  include Gitlab::Utils::StrongMemoize
+
   attr_reader :project, :name, :path
 
   def initialize(project, name, path)
@@ -10,7 +12,7 @@ class Packages::GoModule
   end
 
   def versions
-    @versions ||= Packages::Go::VersionFinder.new(self).execute
+    strong_memoize(:versions) { Packages::Go::VersionFinder.new(self).execute }
   end
 
   def version_by(ref: nil, commit: nil)
@@ -40,6 +42,10 @@ class Packages::GoModule
   end
 
   def gomod_valid?(gomod)
+    if Feature.enabled?(:go_proxy_disable_gomod_validation, @project)
+      return gomod&.start_with?("module ")
+    end
+
     gomod&.split("\n", 2)&.first == "module #{@name}"
   end
 
@@ -47,8 +53,8 @@ class Packages::GoModule
 
   def version_by_name(name)
     # avoid a Gitaly call if possible
-    if defined?(@versions)
-      v = @versions.find { |v| v.name == ref }
+    if strong_memoized?(:versions)
+      v = versions.find { |v| v.name == ref }
       return v if v
     end
 
@@ -60,8 +66,8 @@ class Packages::GoModule
 
   def version_by_ref(ref)
     # reuse existing versions
-    if defined?(@versions)
-      v = @versions.find { |v| v.ref == ref }
+    if strong_memoized?(:versions)
+      v = versions.find { |v| v.ref == ref }
       return v if v
     end
 

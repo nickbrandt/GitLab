@@ -5,29 +5,31 @@ module Packages
     class ModuleFinder
       include ::API::Helpers::Packages::Go::ModuleHelpers
 
-      GITLAB_GO_URL = (Settings.build_gitlab_go_url + '/').freeze
-
       attr_reader :project, :module_name
 
       def initialize(project, module_name)
-        module_name = CGI.unescape(module_name)
         module_name = Pathname.new(module_name).cleanpath.to_s
 
         @project = project
         @module_name = module_name
       end
 
-      # rubocop: disable CodeReuse/ActiveRecord
       def execute
-        return if @module_name.blank? || !@module_name.start_with?(GITLAB_GO_URL)
+        return if @module_name.blank? || !@module_name.start_with?(gitlab_go_url)
 
-        module_path = @module_name[GITLAB_GO_URL.length..].split('/')
+        module_path = @module_name[gitlab_go_url.length..].split('/')
         project_path = project.full_path.split('/')
-        return unless module_path.take(project_path.length) == project_path
+        module_project_path = module_path.shift(project_path.length)
+        return unless module_project_path == project_path
 
-        Packages::GoModule.new(@project, @module_name, module_path.drop(project_path.length).join('/'))
+        Packages::GoModule.new(@project, @module_name, module_path.join('/'))
       end
-      # rubocop: enable CodeReuse/ActiveRecord
+
+      private
+
+      def gitlab_go_url
+        @gitlab_go_url ||= Settings.build_gitlab_go_url + '/'
+      end
     end
   end
 end

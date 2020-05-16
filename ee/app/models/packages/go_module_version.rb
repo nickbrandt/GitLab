@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Packages::GoModuleVersion
+  include Gitlab::Utils::StrongMemoize
   include ::API::Helpers::Packages::Go::ModuleHelpers
 
   VALID_TYPES = %i[ref commit pseudo].freeze
@@ -42,14 +43,15 @@ class Packages::GoModuleVersion
   end
 
   def gomod
-    @gomod ||=
-      if defined?(@blobs)
+    strong_memoize(:gomod) do
+      if strong_memoized?(:blobs)
         blob_at(@mod.path + '/go.mod')
       elsif @mod.path.empty?
         @mod.project.repository.blob_at(@commit.sha, 'go.mod')&.data
       else
         @mod.project.repository.blob_at(@commit.sha, @mod.path + '/go.mod')&.data
       end
+    end
   end
 
   def archive
@@ -57,9 +59,23 @@ class Packages::GoModuleVersion
 
     Zip::OutputStream.write_buffer do |zip|
       files.each do |file|
-        zip.put_next_entry "#{full_name}/#{file.path[suffix_len...]}"
-        zip.write blob_at(file.path)
+        zip.put_next_entry "#{full_name}/#{file[suffix_len...]}"
+        zip.write blob_at(file)
       end
+    end
+  end
+
+  def files
+    strong_memoize(:files) do
+      ls_tree.filter { |e| !excluded.any? { |n| e.start_with? n } }
+    end
+  end
+
+  def excluded
+    strong_memoize(:excluded) do
+      ls_tree
+        .filter { |f| f.end_with?('/go.mod') && f != @mod.path + '/go.mod' }
+        .map    { |f| f[0..-7] }
     end
   end
 
@@ -78,15 +94,19 @@ class Packages::GoModuleVersion
   end
 
   def blobs
-    @blobs ||= @mod.project.repository.batch_blobs(files.map { |x| [@commit.sha, x.path] })
+    strong_memoize(:blobs) { @mod.project.repository.batch_blobs(files.map { |x| [@commit.sha, x] }) }
   end
 
-  def files
-    return @files if defined?(@files)
+  def ls_tree
+    strong_memoize(:ls_tree) do
+      path =
+        if @mod.path.empty?
+          '.'
+        else
+          @mod.path
+        end
 
-    sha = @commit.sha
-    tree = @mod.project.repository.tree(sha, @mod.path, recursive: true).entries.filter { |e| e.file? }
-    nested = tree.filter { |e| e.name == 'go.mod' && !(@mod.path == '' && e.path == 'go.mod' || e.path == @mod.path + '/go.mod') }.map { |e| e.path[0..-7] }
-    @files = tree.filter { |e| !nested.any? { |n| e.path.start_with? n } }
+      @mod.project.repository.gitaly_repository_client.search_files_by_name(@commit.sha, path)
+    end
   end
 end

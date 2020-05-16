@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 module API
   class GoProxy < Grape::API
-    helpers ::API::Helpers::PackagesManagerClientsHelpers
-    helpers ::API::Helpers::Packages::BasicAuthHelpers
+    helpers ::API::Helpers::PackagesHelpers
     helpers ::API::Helpers::Packages::Go::ModuleHelpers
 
     # basic semver, except case encoded (A => !a)
@@ -13,27 +12,27 @@ module API
     before { require_packages_enabled! }
 
     helpers do
-      # support personal access tokens for HTTP Basic in addition to the usual methods
-      def find_personal_access_token
-        pa = find_personal_access_token_from_http_basic_auth
-        return pa if pa
+      def find_project!(id)
+        # based on API::Helpers::Packages::BasicAuthHelpers#authorized_project_find!
 
-        # copied from Gitlab::Auth::AuthFinders
-        token =
-          current_request.params[::Gitlab::Auth::AuthFinders::PRIVATE_TOKEN_PARAM].presence ||
-          current_request.env[::Gitlab::Auth::AuthFinders::PRIVATE_TOKEN_HEADER].presence ||
-          parsed_oauth_token
-        return unless token
+        project = find_project(id)
 
-        # Expiration, revocation and scopes are verified in `validate_access_token!`
-        PersonalAccessToken.find_by_token(token) || raise(::Gitlab::Auth::UnauthorizedError)
+        return project if project && can?(current_user, :read_project, project)
+
+        if current_user
+          not_found!('Project')
+        else
+          unauthorized!
+        end
       end
 
       def find_module
+        not_found! unless Feature.enabled?(:go_proxy, user_project)
+
         module_name = case_decode params[:module_name]
         bad_request!('Module Name') if module_name.blank?
 
-        mod = ::Packages::Go::ModuleFinder.new(authorized_user_project, module_name).execute
+        mod = ::Packages::Go::ModuleFinder.new(user_project, module_name).execute
 
         not_found! unless mod
 
@@ -55,13 +54,13 @@ module API
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
-      requires :module_name, type: String, desc: 'Module name'
+      requires :module_name, type: String, desc: 'Module name', coerce_with: ->(val) { CGI.unescape(val) }
     end
-    route_setting :authentication, job_token_allowed: true
+    route_setting :authentication, job_token_allowed: true, basic_auth_personal_access_token: true
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_read_package!(authorized_user_project)
-        authorize_packages_feature!(authorized_user_project)
+        authorize_read_package!
+        authorize_packages_feature!
       end
 
       namespace ':id/packages/go/*module_name/@v' do
@@ -110,10 +109,10 @@ module API
         get ':module_version.zip', requirements: MODULE_VERSION_REQUIREMENTS do
           ver = find_version
 
-          # TODO: Content-Type should be application/zip, see #214876
+          content_type 'application/zip'
+          env['api.format'] = :binary
           header['Content-Disposition'] = ActionDispatch::Http::ContentDisposition.format(disposition: 'attachment', filename: ver.name + '.zip')
           header['Content-Transfer-Encoding'] = 'binary'
-          content_type 'text/plain'
           status :ok
           body ver.archive.string
         end

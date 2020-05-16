@@ -75,21 +75,27 @@ FactoryBot.define do
       transient do
         name { nil }
         message { 'Add module' }
+
+        url do
+          v = "#{::Gitlab.config.gitlab.host}/#{project.path_with_namespace}"
+
+          if name
+            v + '/' + name
+          else
+            v
+          end
+        end
+
+        path do
+          if name
+            name + '/'
+          else
+            ''
+          end
+        end
       end
 
       service do
-        port = ::Gitlab.config.gitlab.port
-        host = ::Gitlab.config.gitlab.host
-        domain = case port when 80, 443 then host else "#{host}:#{port}" end
-
-        url = "#{domain}/#{project.path_with_namespace}"
-        if name.nil?
-          path = ''
-        else
-          url += '/' + name
-          path = name + '/'
-        end
-
         Files::MultiService.new(
           project,
           project.owner,

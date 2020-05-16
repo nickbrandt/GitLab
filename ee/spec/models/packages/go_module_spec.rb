@@ -3,6 +3,10 @@
 require 'spec_helper'
 
 describe Packages::GoModule, type: :model do
+  before do
+    stub_feature_flags(go_proxy_disable_gomod_validation: false)
+  end
+
   describe '#path_valid?' do
     context 'with root path' do
       let_it_be(:package) { create(:go_module) }

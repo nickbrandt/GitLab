@@ -19,7 +19,7 @@ describe Packages::GoModuleVersion, type: :model do
 
   shared_examples '#files' do |desc, *entries|
     it "returns #{desc}" do
-      actual = version.files.map { |x| x.path }.to_set
+      actual = version.files.map { |x| x }.to_set
       expect(actual).to eq(entries.to_set)
     end
   end
