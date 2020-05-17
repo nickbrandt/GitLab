@@ -16,11 +16,9 @@ Once you have a webhook URL for your Webex Teams space, you can configure GitLab
 
 1. Navigate to **Project > Settings > Integrations**.
 1. Select the **Webex Teams** integration.
-1. Ensure that the **Active** checkbox is selected.
+1. Ensure that the **Active** toggle is enabled.
 1. Select the checkboxes corresponding to the GitLab events you want to receive in Webex Teams.
-1. Paste the **Webhook URL** that you copied from the Webex Teams Incoming Webhooks app.
+1. Paste the **Webhook** URL for the Webex Teams space.
 1. Configure the remaining options and then click **Test settings and save changes**.
 
 The Webex Teams space will begin to receive all applicable GitLab events.
-
-![Webex Teams configuration](img/webex_teams_configuration.png)
