@@ -18,19 +18,89 @@ describe 'getting merge request listings nested in a project' do
 
   let(:search_params) { nil }
 
-  let(:query) do
+  def query_merge_requests(fields)
     graphql_query_for(
-      'project',
-      { 'fullPath' => project.full_path },
-      query_graphql_field('mergeRequests', search_params, [
-        query_graphql_field('nodes', nil, all_graphql_fields_for('MergeRequest', max_depth: 1))
+      :project,
+      { full_path: project.full_path },
+      query_graphql_field(:merge_requests, search_params, [
+        query_graphql_field(:nodes, nil, fields)
       ])
     )
+  end
+
+  let(:query) do
+    query_merge_requests(all_graphql_fields_for('MergeRequest', max_depth: 1))
   end
 
   it_behaves_like 'a working graphql query' do
     before do
       post_graphql(query, current_user: current_user)
+    end
+  end
+
+  # The following tests are needed to guarantee that we have correctly annotated
+  # all the gitaly calls.  Selecting combinations of fields may mask this due to
+  # memoization.
+  context 'requesting a single field' do
+    let(:fresh_mr) { create(:merge_request, :unique_branches, source_project: project) }
+    let(:search_params) { { iids: [fresh_mr.iid.to_s] } }
+
+    before do
+      project.repository.expire_branches_cache
+    end
+
+    context 'selecting any single scalar field' do
+      where(:field) do
+        scalar_fields_of('MergeRequest').map { |name| [name] }
+      end
+
+      with_them do
+        it_behaves_like 'a working graphql query' do
+          let(:query) do
+            query_merge_requests([:iid, field].uniq)
+          end
+
+          before do
+            post_graphql(query, current_user: current_user)
+          end
+
+          it 'selects the correct MR' do
+            expect(results).to contain_exactly(a_hash_including('iid' => fresh_mr.iid.to_s))
+          end
+        end
+      end
+    end
+
+    context 'selecting any single nested field' do
+      where(:field, :subfield, :is_connection) do
+        nested_fields_of('MergeRequest').flat_map do |name, field|
+          type = field_type(field)
+          is_connection = type.name.ends_with?('Connection')
+          type = field_type(type.fields['nodes']) if is_connection
+
+          type.fields
+            .select { |_, field| !nested_fields?(field) && !required_arguments?(field) }
+            .map(&:first)
+            .map { |subfield| [name, subfield, is_connection] }
+        end
+      end
+
+      with_them do
+        it_behaves_like 'a working graphql query' do
+          let(:query) do
+            fld = is_connection ? query_graphql_field(:nodes, nil, [subfield]) : subfield
+            query_merge_requests([:iid, query_graphql_field(field, nil, [fld])])
+          end
+
+          before do
+            post_graphql(query, current_user: current_user)
+          end
+
+          it 'selects the correct MR' do
+            expect(results).to contain_exactly(a_hash_including('iid' => fresh_mr.iid.to_s))
+          end
+        end
+      end
     end
   end
 
