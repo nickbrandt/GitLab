@@ -45,7 +45,7 @@ export default {
 </script>
 
 <template>
-  <div :style="panelStyle" class="multi-file-commit-panel">
+  <div :style="panelStyle">
     <slot></slot>
     <panel-resizer
       :size.sync="width"
