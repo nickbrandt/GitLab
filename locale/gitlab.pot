@@ -3722,6 +3722,9 @@ msgstr ""
 msgid "Capacity threshold"
 msgstr ""
 
+msgid "Certain user content will be moved to a system-wide \"Ghost User\" in order to maintain content for posterity. For further information, please refer to the %{link_start}user account deletion documentation.%{link_end}"
+msgstr ""
+
 msgid "Certificate"
 msgstr ""
 
@@ -26190,6 +26193,11 @@ msgstr ""
 
 msgid "personal access tokens"
 msgstr ""
+
+msgid "personal project will be removed and cannot be restored"
+msgid_plural "%d personal projects will be removed and cannot be restored"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "pipeline"
 msgstr ""
