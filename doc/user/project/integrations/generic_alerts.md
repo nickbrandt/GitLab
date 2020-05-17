@@ -41,7 +41,7 @@ You can customize the payload by sending the following parameters. All fields ar
 | `severity` | String | The severity of the alert. Must be one of `critical`, `high`, `medium`, `low`, `info`, `unknown`. Default is `critical`. |
 
 TIP: **Payload size:**
-Ensure you are within the [payload application limits](../../../administration/instance_limits.md#generic-alert-alert-json-payloads) when making your request.
+Ensure your requests are smaller than the [payload application limits](../../../administration/instance_limits.md#generic-alert-alert-json-payloads).
 
 Example request:
 

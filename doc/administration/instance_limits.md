@@ -219,7 +219,7 @@ alerts in the following ways:
 
 Prometheus alert payloads sent to the `notify.json` endpoint are limited to 1 MB in size.
 
-### Generic Alert Alert JSON payloads
+### Generic Alert JSON payloads
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/16441) in GitLab 12.4.
 
