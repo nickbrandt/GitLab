@@ -6006,6 +6006,11 @@ type MergeRequest implements Noteable {
   targetBranch: String!
 
   """
+  Indicates if the target branch of the merge request exists
+  """
+  targetBranchExists: Boolean!
+
+  """
   Target project of the merge request
   """
   targetProject: Project!

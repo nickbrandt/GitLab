@@ -16718,6 +16718,24 @@
               "deprecationReason": null
             },
             {
+              "name": "targetBranchExists",
+              "description": "Indicates if the target branch of the merge request exists",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "targetProject",
               "description": "Target project of the merge request",
               "args": [
