@@ -24,7 +24,7 @@ exports[`NetworkPolicyList component given there is a default environment with n
        
       <p>
         
-          Policies are a specification of how groups of pods are allowed to communicate with each other network endpoints.
+          Policies are a specification of how groups of pods are allowed to communicate with each other's network endpoints.
         
       </p>
        
