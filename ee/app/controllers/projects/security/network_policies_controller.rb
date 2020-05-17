@@ -17,8 +17,8 @@ module Projects
         result = adapter.query(
           :packet_flow, environment.deployment_namespace,
           params[:interval] || "minute",
-          (Time.zone.parse(params[:from]) rescue 1.hour.ago).to_s,
-          (Time.zone.parse(params[:to]) rescue Time.current).to_s
+          parse_time(params[:from], 1.hour.ago).to_s,
+          parse_time(params[:to], Time.current).to_s
         )
 
         respond_to do |format|
@@ -34,6 +34,12 @@ module Projects
       end
 
       private
+
+      def parse_time(params, fallback)
+        Time.zone.parse(params) || fallback
+      rescue
+        fallback
+      end
 
       def environment
         @environment ||= project.environments.find(params[:environment_id])
