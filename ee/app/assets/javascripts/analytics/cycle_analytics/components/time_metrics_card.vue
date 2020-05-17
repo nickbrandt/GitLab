@@ -1,6 +1,10 @@
 <script>
+import Api from 'ee/api';
+import { __ } from '~/locale';
+import createFlash from '~/flash';
+import { slugify } from '~/lib/utils/text_utility';
 import MetricCard from '../../shared/components/metric_card.vue';
-import { timeMetricsData as mockTimeMetricsData } from '../../../../../../spec/frontend/analytics/cycle_analytics/mock_data';
+import { removeFlash } from '../utils';
 
 export default {
   name: 'TimeMetricsCard',
@@ -15,7 +19,7 @@ export default {
     additionalParams: {
       type: Object,
       required: false,
-      default: null,
+      default: () => ({}),
     },
   },
   data() {
@@ -34,7 +38,24 @@ export default {
   },
   methods: {
     fetchData() {
-      this.data = mockTimeMetricsData;
+      removeFlash();
+      this.loading = true;
+      return Api.cycleAnalyticsTimeSummaryData(this.groupPath, this.additionalParams)
+        .then(({ data }) => {
+          this.data = data.map(({ title: label, ...rest }) => ({
+            ...rest,
+            label,
+            key: slugify(label),
+          }));
+        })
+        .catch(() => {
+          createFlash(
+            __('There was an error while fetching value stream analytics time summary data.'),
+          );
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
   },
   render() {

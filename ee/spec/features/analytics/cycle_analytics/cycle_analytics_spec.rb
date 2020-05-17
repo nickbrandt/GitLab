@@ -203,8 +203,13 @@ describe 'Group Value Stream Analytics', :js do
     context 'summary table', :js do
       it 'will display recent activity' do
         page.within(find('.js-recent-activity')) do
-          expect(page).to have_selector('.card-header')
           expect(page).to have_content(_('Recent Activity'))
+        end
+      end
+
+      it 'will display time metrics' do
+        page.within(find('.js-recent-activity')) do
+          expect(page).to have_content(_('Time'))
         end
       end
     end
@@ -261,14 +266,14 @@ describe 'Group Value Stream Analytics', :js do
     it_behaves_like 'group value stream analytics'
 
     it 'displays the number of issues' do
-      issue_count = page.all(card_metric_selector).first
+      issue_count = page.all(card_metric_selector)[2]
 
       expect(issue_count).to have_content(n_('New Issue', 'New Issues', 3))
       expect(issue_count).to have_content('3')
     end
 
     it 'displays the number of deploys' do
-      deploys_count = page.all(card_metric_selector)[1]
+      deploys_count = page.all(card_metric_selector)[3]
 
       expect(deploys_count).to have_content(n_('Deploy', 'Deploys', 0))
       expect(deploys_count).to have_content('-')
@@ -279,6 +284,20 @@ describe 'Group Value Stream Analytics', :js do
 
       expect(deployment_frequency).to have_content(_('Deployment Frequency'))
       expect(deployment_frequency).to have_content('-')
+    end
+
+    it 'displays the lead time' do
+      lead_time = page.all(card_metric_selector).first
+
+      expect(lead_time).to have_content(_('Lead Time'))
+      expect(lead_time).to have_content('-')
+    end
+
+    it 'displays the cycle time' do
+      cycle_time = page.all(card_metric_selector)[1]
+
+      expect(cycle_time).to have_content(_('Cycle Time'))
+      expect(cycle_time).to have_content('-')
     end
   end
 

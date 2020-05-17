@@ -8,6 +8,7 @@ import MockAdapter from 'axios-mock-adapter';
 import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
 import RecentActivityCard from 'ee/analytics/cycle_analytics/components/recent_activity_card.vue';
+import TimeMetricsCard from 'ee/analytics/cycle_analytics/components/time_metrics_card.vue';
 import PathNavigation from 'ee/analytics/cycle_analytics/components/path_navigation.vue';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import 'bootstrap';
@@ -123,6 +124,10 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(RecentActivityCard).exists()).toBe(flag);
   };
 
+  const displaysTimeMetricsCard = flag => {
+    expect(wrapper.find(TimeMetricsCard).exists()).toBe(flag);
+  };
+
   const displaysStageTable = flag => {
     expect(wrapper.find(StageTable).exists()).toBe(flag);
   };
@@ -179,8 +184,12 @@ describe('Cycle Analytics component', () => {
         displaysDateRangePicker(false);
       });
 
-      it('does not display the recent activity table', () => {
+      it('does not display the recent activity card', () => {
         displaysRecentActivityCard(false);
+      });
+
+      it('does not display the time metrics card', () => {
+        displaysTimeMetricsCard(false);
       });
 
       it('does not display the stage table', () => {
@@ -243,8 +252,12 @@ describe('Cycle Analytics component', () => {
           displaysDateRangePicker(true);
         });
 
-        it('displays the recent activity table', () => {
+        it('displays the recent activity card', () => {
           displaysRecentActivityCard(true);
+        });
+
+        it('displays the time metrics card', () => {
+          displaysTimeMetricsCard(true);
         });
 
         it('displays the stage table', () => {
@@ -352,8 +365,12 @@ describe('Cycle Analytics component', () => {
           displaysDateRangePicker(false);
         });
 
-        it('does not display the recent activity table', () => {
+        it('does not display the recent activity card', () => {
           displaysRecentActivityCard(false);
+        });
+
+        it('does not display the time metrics card', () => {
+          displaysTimeMetricsCard(false);
         });
 
         it('does not display the stage table', () => {
