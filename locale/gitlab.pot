@@ -9482,6 +9482,9 @@ msgstr ""
 msgid "Filter by issues that are currently closed."
 msgstr ""
 
+msgid "Filter by label"
+msgstr ""
+
 msgid "Filter by merge requests that are currently closed and unmerged."
 msgstr ""
 
