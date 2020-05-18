@@ -44,13 +44,13 @@ export default {
       sortable: true,
     },
     {
-      key: 'startedAt',
+      key: 'startTime',
       label: s__('AlertManagement|Start time'),
       tdClass,
       sortable: true,
     },
     {
-      key: 'endedAt',
+      key: 'endTime',
       label: s__('AlertManagement|End time'),
       tdClass,
       sortable: true,
@@ -60,7 +60,6 @@ export default {
       label: s__('AlertManagement|Alert'),
       thClass: 'w-30p',
       tdClass,
-      sortable: true,
     },
     {
       key: 'eventCount',
@@ -128,6 +127,7 @@ export default {
         return {
           projectPath: this.projectPath,
           statuses: this.statusFilter,
+          sort: this.sort,
         };
       },
       update(data) {
@@ -258,11 +258,11 @@ export default {
           </div>
         </template>
 
-        <template #cell(startedAt)="{ item }">
+        <template #cell(startTime)="{ item }">
           <time-ago v-if="item.startedAt" :time="item.startedAt" />
         </template>
 
-        <template #cell(endedAt)="{ item }">
+        <template #cell(endTime)="{ item }">
           <time-ago v-if="item.endedAt" :time="item.endedAt" />
         </template>
 
