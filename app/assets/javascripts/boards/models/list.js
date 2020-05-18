@@ -114,7 +114,7 @@ class List {
   }
 
   newIssue(issue) {
-    return boardsStore.newListIssue(issue);
+    return boardsStore.newListIssue(this, issue);
   }
 
   createIssues(data) {

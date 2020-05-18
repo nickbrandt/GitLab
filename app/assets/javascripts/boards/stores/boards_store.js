@@ -607,7 +607,7 @@ const boardsStore = {
     });
   },
 
-  newListIssue(issue) {
+  newListIssue(list, issue) {
     list.addIssue(issue, null, 0);
     list.issuesSize += 1;
 
