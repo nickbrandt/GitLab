@@ -10,7 +10,7 @@ describe AlertManagement::UpdateAlertStatusService do
     create(:alert_management_alert, :triggered)
   end
 
-  let(:service) { described_class.new(alert, user, new_status) }
+  let(:service) { described_class.new(alert, user, status: new_status, ended_at: ended_at) }
 
   describe '#execute' do
     shared_examples 'update failure' do |error_message|
@@ -25,7 +25,21 @@ describe AlertManagement::UpdateAlertStatusService do
       end
     end
 
-    let(:new_status) { Types::AlertManagement::StatusEnum.values['ACKNOWLEDGED'].value }
+    shared_examples 'updating the status' do
+      it 'returns success' do
+        expect(response).to be_success
+        expect(response.payload[:alert]).to eq(alert)
+      end
+
+      it 'updates the status' do
+        response
+        expect(alert.reload.status).to eq(new_status)
+      end
+    end
+
+    let(:status_name) { 'ACKNOWLEDGED' }
+    let(:new_status) { Types::AlertManagement::StatusEnum.values[status_name].value }
+    let(:ended_at) { 1.day.ago }
     let(:can_update) { true }
 
     subject(:response) { service.execute }
@@ -36,13 +50,26 @@ describe AlertManagement::UpdateAlertStatusService do
         .and_return(can_update)
     end
 
-    it 'returns success' do
-      expect(response).to be_success
-      expect(response.payload[:alert]).to eq(alert)
+    %w(TRIGGERED ACKNOWLEDGED IGNORED).each do |status_name|
+      describe "with #{status_name} status" do
+        it_behaves_like 'updating the status'
+
+        it 'sets ended_at to nil' do
+          response
+          expect(alert.reload.ended_at).to be_nil
+        end
+      end
     end
 
-    it 'updates the status' do
-      expect { response }.to change { alert.acknowledged? }.to(true)
+    describe 'with RESOLVED status' do
+      let(:status_name) { 'RESOLVED' }
+
+      it_behaves_like 'updating the status'
+
+      it 'sets ended_at correctly' do
+        response
+        expect(alert.reload.ended_at).to be_like_time(ended_at)
+      end
     end
 
     context 'when user has no permissions' do
