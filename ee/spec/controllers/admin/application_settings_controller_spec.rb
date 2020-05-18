@@ -157,7 +157,27 @@ describe Admin::ApplicationSettingsController do
       end
       let(:feature) { :admin_merge_request_approvers_rules }
 
-      it_behaves_like 'settings for licensed features'
+      context 'when feature flag is enabled' do
+        before do
+          stub_feature_flags(admin_merge_request_approvals_settings: true)
+        end
+
+        it_behaves_like 'settings for licensed features'
+      end
+
+      context 'when feature flag is disabled' do
+        before do
+          stub_licensed_features(feature => true)
+          stub_feature_flags(admin_merge_request_approvals_settings: false)
+        end
+
+        it 'does not update settings' do
+          attribute_names = settings.keys.map(&:to_s)
+
+          expect { put :update, params: { application_setting: settings } }
+            .not_to change { ApplicationSetting.current.reload.attributes.slice(*attribute_names) }
+        end
+      end
     end
 
     context 'required instance ci template' do
