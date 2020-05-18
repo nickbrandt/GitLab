@@ -13734,6 +13734,9 @@ msgstr ""
 msgid "Milestones| You’re about to permanently delete the milestone %{milestoneTitle}. This milestone is not currently used in any issues or merge requests."
 msgstr ""
 
+msgid "Milestones|Close Milestone"
+msgstr ""
+
 msgid "Milestones|Completed Issues (closed)"
 msgstr ""
 
@@ -13746,10 +13749,16 @@ msgstr ""
 msgid "Milestones|Failed to delete milestone %{milestoneTitle}"
 msgstr ""
 
+msgid "Milestones|Group Milestone"
+msgstr ""
+
 msgid "Milestones|Milestone %{milestoneTitle} was not found"
 msgstr ""
 
 msgid "Milestones|Ongoing Issues (open and assigned)"
+msgstr ""
+
+msgid "Milestones|Project Milestone"
 msgstr ""
 
 msgid "Milestones|Promote %{milestoneTitle} to group milestone?"
@@ -13758,7 +13767,13 @@ msgstr ""
 msgid "Milestones|Promote Milestone"
 msgstr ""
 
+msgid "Milestones|Promote to Group Milestone"
+msgstr ""
+
 msgid "Milestones|Promoting %{milestoneTitle} will make it available for all projects inside %{groupName}. Existing project milestones with the same title will be merged."
+msgstr ""
+
+msgid "Milestones|Reopen Milestone"
 msgstr ""
 
 msgid "Milestones|This action cannot be reversed."
@@ -17096,9 +17111,6 @@ msgid "Promote issue to an epic"
 msgstr ""
 
 msgid "Promote these project milestones into a group milestone."
-msgstr ""
-
-msgid "Promote to Group Milestone"
 msgstr ""
 
 msgid "Promote to group label"
