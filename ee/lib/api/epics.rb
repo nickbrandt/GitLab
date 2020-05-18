@@ -10,7 +10,6 @@ module API
     end
 
     helpers ::API::Helpers::EpicsHelpers
-    helpers ::Gitlab::IssuableMetadata
 
     params do
       requires :id, type: String, desc: 'The ID of a group'
@@ -44,7 +43,7 @@ module API
         epics = paginate(find_epics(finder_params: { group_id: user_group.id })).with_api_entity_associations
 
         # issuable_metadata is the standard used by the Todo API
-        extra_options = { issuable_metadata: issuable_meta_data(epics, 'Epic'), with_labels_details: declared_params[:with_labels_details] }
+        extra_options = { issuable_metadata: Gitlab::IssuableMetadata.new(current_user, epics).data, with_labels_details: declared_params[:with_labels_details] }
         present epics, epic_options.merge(extra_options)
       end
 
