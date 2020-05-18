@@ -6,7 +6,8 @@ class ServiceFieldEntity < Grape::Entity
   expose :type, :name, :title, :placeholder, :required, :choices, :help
 
   expose :value do |field|
-    value = service.send(field[:name]) # rubocop:disable GitlabSecurity/PublicSend
+    value = service.public_send(field[:name]) # rubocop:disable GitlabSecurity/PublicSend
+
     if field[:type] == 'password' && value.present?
       'true'
     else
@@ -15,8 +16,6 @@ class ServiceFieldEntity < Grape::Entity
   end
 
   private
-
-  alias_method :field, :object
 
   def service
     request.service
