@@ -25,10 +25,10 @@ describe('Pipeline DAG graph', () => {
       data() {
         return {
           showFailureAlert: false,
-        }
-      }
-    })
-  }
+        };
+      },
+    });
+  };
 
   afterEach(() => {
     axiosMock.restore();
@@ -64,13 +64,14 @@ describe('Pipeline DAG graph', () => {
       });
 
       it('shows the alert and not the graph', () => {
-
-        return wrapper.vm.$nextTick().then(waitForPromises).then(() => {
-          expect(getAlert().exists()).toBe(true);
-          expect(getGraph().exists()).toBe(false);
-        });
+        return wrapper.vm
+          .$nextTick()
+          .then(waitForPromises)
+          .then(() => {
+            expect(getAlert().exists()).toBe(true);
+            expect(getGraph().exists()).toBe(false);
+          });
       });
     });
   });
-
 });

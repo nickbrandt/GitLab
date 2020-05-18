@@ -11,13 +11,13 @@ export default {
     graphUrl: {
       type: String,
       required: false,
-      default: ''
-    }
+      default: '',
+    },
   },
   data() {
     return {
       showFailureAlert: false,
-    }
+    };
   },
   mounted() {
     const drawGraph = this.drawGraph;
@@ -28,8 +28,9 @@ export default {
       return;
     }
 
-    axios.get(this.graphUrl)
-      .then((response) => {
+    axios
+      .get(this.graphUrl)
+      .then(response => {
         drawGraph(response.data);
       })
       .catch(reportFailure);
@@ -40,7 +41,7 @@ export default {
     },
   },
   methods: {
-    drawGraph (data) {
+    drawGraph(data) {
       return data;
     },
     hideAlert() {
@@ -48,15 +49,14 @@ export default {
     },
     reportFailure() {
       this.showFailureAlert = true;
-    }
+    },
   },
 };
-
 </script>
 <template>
   <div>
     <gl-alert v-if="showFailureAlert" variant="danger" @dismiss="hideAlert">
-      {{__('We are currently unable to fetch data for this graph.')}}
+      {{ __('We are currently unable to fetch data for this graph.') }}
     </gl-alert>
     <div v-if="shouldDisplayGraph" data-testid="dag-graph-container">
       <!-- graph goes here -->

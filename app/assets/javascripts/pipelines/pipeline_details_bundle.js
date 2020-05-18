@@ -15,8 +15,7 @@ import axios from '~/lib/utils/axios_utils';
 
 Vue.use(Translate);
 
-const createPipelinesDetailApp = (mediator) => {
-
+const createPipelinesDetailApp = mediator => {
   // eslint-disable-next-line no-new
   new Vue({
     el: '#js-pipeline-graph-vue',
@@ -46,9 +45,9 @@ const createPipelinesDetailApp = (mediator) => {
       });
     },
   });
-}
+};
 
-const createPipelineHeaderApp = (mediator) => {
+const createPipelineHeaderApp = mediator => {
   // eslint-disable-next-line no-new
   new Vue({
     el: '#js-pipeline-header-vue',
@@ -92,7 +91,7 @@ const createPipelineHeaderApp = (mediator) => {
       });
     },
   });
-}
+};
 
 const createPipelinesTabs = () => {
   const tabsElement = document.querySelector('.pipelines-tabs');
@@ -107,7 +106,6 @@ const createPipelinesTabs = () => {
       document.querySelector('.pipelines-tabs > li > a.test-tab.active'),
     );
 
-
     if (isTestTabActive) {
       testReportsStore.dispatch(fetchReportsAction);
     } else {
@@ -121,9 +119,9 @@ const createPipelinesTabs = () => {
       tabsElement.addEventListener('click', tabClickHandler);
     }
   }
-}
+};
 
-const createTestDetails = (detailsEndpoint) => {
+const createTestDetails = detailsEndpoint => {
   // eslint-disable-next-line no-new
   new Vue({
     el: '#js-pipeline-tests-detail',
@@ -145,7 +143,7 @@ const createTestDetails = (detailsEndpoint) => {
       document.querySelector('.js-test-report-badge-counter').innerHTML = data.total_count;
     })
     .catch(() => {});
-}
+};
 
 const createDagApp = () => {
   const el = document.querySelector('#js-pipeline-dag-vue');
@@ -158,15 +156,13 @@ const createDagApp = () => {
       Dag,
     },
     render(createElement) {
-      return createElement('dag',
-      {
+      return createElement('dag', {
         props: {
-          graphUrl
-        }
+          graphUrl,
+        },
       });
     },
-
-  })
+  });
 };
 
 export default () => {
