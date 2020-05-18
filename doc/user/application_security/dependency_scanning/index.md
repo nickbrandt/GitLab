@@ -478,21 +478,15 @@ include:
 variables:
   DS_DISABLE_DIND: "true"
   DS_ANALYZER_IMAGE_PREFIX: "docker-registry.example.com/analyzers"
+  GEMNASIUM_DB_REMOTE_URL: "gitlab.example.com/gemnasium-db.git"
+  GIT_SSL_NO_VERIFY: "true"
 ```
 
 See explanations of the variables above in the [configuration section](#configuration).
 
 ### Specific settings for languages and package managers
 
-For every language and package manager, add the following to the variables section of
-`.gitlab-ci.yml`:
-
-```yaml
-GEMNASIUM_DB_REMOTE_URL: "gitlab.example.com/gemnasium-db.git"
-GIT_SSL_NO_VERIFY: "true"
-```
-
-See the following sections for additional instructions on specific languages and package managers.
+See the following sections for configuring specific languages and package managers.
 
 #### JavaScript (npm and yarn) projects
 
