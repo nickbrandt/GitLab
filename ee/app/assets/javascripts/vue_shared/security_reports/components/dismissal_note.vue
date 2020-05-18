@@ -63,9 +63,11 @@ export default {
           { pipelineLink, projectLink },
           false,
         );
-      } else if (pipelineLink && !projectLink) {
+      }
+      if (pipelineLink && !projectLink) {
         return sprintf(__('Dismissed on pipeline %{pipelineLink}'), { pipelineLink }, false);
-      } else if (!pipelineLink && projectLink) {
+      }
+      if (!pipelineLink && projectLink) {
         return sprintf(__('Dismissed at %{projectLink}'), { projectLink }, false);
       }
       return __('Dismissed');
