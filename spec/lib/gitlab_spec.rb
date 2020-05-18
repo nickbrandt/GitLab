@@ -222,7 +222,6 @@ describe Gitlab do
     end
 
     it 'is false when env is not dev or test' do
-      allow(described_class).to receive(:com?).and_return(false)
       allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('production'))
 
       expect(subject).to eq false
