@@ -829,6 +829,9 @@ msgstr ""
 msgid "<strong>%{group_name}</strong> group members"
 msgstr ""
 
+msgid "<strong>%{label_name}</strong> <span>will be permanently deleted from %{subject_name}. This cannot be undone.</span>"
+msgstr ""
+
 msgid "<strong>Deletes</strong> source branch"
 msgstr ""
 
@@ -6909,6 +6912,12 @@ msgid "Delete comment"
 msgstr ""
 
 msgid "Delete domain"
+msgstr ""
+
+msgid "Delete label"
+msgstr ""
+
+msgid "Delete label: %{label_name} ?"
 msgstr ""
 
 msgid "Delete license"
