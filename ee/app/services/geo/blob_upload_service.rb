@@ -2,8 +2,6 @@
 
 module Geo
   class BlobUploadService
-    include ExclusiveLeaseGuard
-
     attr_reader :replicable_name, :blob_id, :checksum, :replicator
 
     def initialize(replicable_name:, blob_id:, decoded_params:)
