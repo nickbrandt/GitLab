@@ -21782,6 +21782,9 @@ msgstr ""
 msgid "This commit was signed with an <strong>unverified</strong> signature."
 msgstr ""
 
+msgid "This content could not be displayed because %{reason}. You can %{options} instead."
+msgstr ""
+
 msgid "This date is after the due date, so this epic won't appear in the roadmap."
 msgstr ""
 
@@ -25540,6 +25543,9 @@ msgstr ""
 msgid "done"
 msgstr ""
 
+msgid "download it"
+msgstr ""
+
 msgid "draft"
 msgid_plural "drafts"
 msgstr[0] ""
@@ -25744,6 +25750,12 @@ msgstr ""
 msgid "issues on track"
 msgstr ""
 
+msgid "it is larger than %{limit}"
+msgstr ""
+
+msgid "it is stored as a job artifact"
+msgstr ""
+
 msgid "it is stored externally"
 msgstr ""
 
@@ -25781,6 +25793,9 @@ msgid "level: %{level}"
 msgstr ""
 
 msgid "limit of %{project_limit} reached"
+msgstr ""
+
+msgid "load it anyway"
 msgstr ""
 
 msgid "locked by %{path_lock_user_name} %{created_at}"
@@ -26458,6 +26473,9 @@ msgid "view it on GitLab"
 msgstr ""
 
 msgid "view the blob"
+msgstr ""
+
+msgid "view the source"
 msgstr ""
 
 msgid "vulnerability|Add a comment"
