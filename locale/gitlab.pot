@@ -874,6 +874,9 @@ msgstr ""
 msgid "A fork is a copy of a project.<br />Forking a repository allows you to make changes without affecting the original project."
 msgstr ""
 
+msgid "A group is a collection of several projects"
+msgstr ""
+
 msgid "A group represents your organization in GitLab."
 msgstr ""
 
@@ -8828,6 +8831,9 @@ msgstr ""
 msgid "Existing members and groups"
 msgstr ""
 
+msgid "Existing projects may be moved into a group"
+msgstr ""
+
 msgid "Existing projects will be able to use expiration policies. Avoid enabling this if an external Container Registry is being used, as there is a performance risk if many images exist on one project."
 msgstr ""
 
@@ -10674,6 +10680,9 @@ msgid "Group path is available."
 msgstr ""
 
 msgid "Group pipeline minutes were successfully reset."
+msgstr ""
+
+msgid "Group project URLs are prefixed with the group namespace"
 msgstr ""
 
 msgid "Group requires separate account"
@@ -13215,6 +13224,9 @@ msgid "Members can be added by project <i>Maintainers</i> or <i>Owners</i>"
 msgstr ""
 
 msgid "Members of <strong>%{project_name}</strong>"
+msgstr ""
+
+msgid "Members of a group may only view projects they have permission to access"
 msgstr ""
 
 msgid "Members with access to %{strong_start}%{group_name}%{strong_end}"
