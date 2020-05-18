@@ -1,0 +1,5 @@
+---
+title: Increment redis counters when usage ping disabled
+merge_request: 32403
+author:
+type: other
