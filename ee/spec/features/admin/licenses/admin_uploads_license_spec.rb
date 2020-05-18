@@ -36,7 +36,7 @@ describe "Admin uploads license" do
 
       it "installs license" do
         expect(page).to have_content("The license was successfully uploaded and will be active from #{license.starts_at}. You can see the details below.")
-        .and have_content("You have a license(s) that activates at a future date. Please see the License History table below.")
+        .and have_content("You have a license that activates at a future date. Please see the License History table below.")
       end
     end
   end
@@ -97,7 +97,7 @@ describe "Admin uploads license" do
 
             expect(page).to have_content("The license was successfully uploaded and will be active from #{license.starts_at}. You can see the details below.")
                       .and have_content(license.licensee.each_value.first)
-                      .and have_content("You have a license(s) that activates at a future date. Please see the License History table below.")
+                      .and have_content("You have a license that activates at a future date. Please see the License History table below.")
           end
         end
       end
