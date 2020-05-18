@@ -2782,6 +2782,9 @@ msgstr ""
 msgid "Assigned Merge Requests"
 msgstr ""
 
+msgid "Assigned to %{assignee_name}"
+msgstr ""
+
 msgid "Assigned to me"
 msgstr ""
 
