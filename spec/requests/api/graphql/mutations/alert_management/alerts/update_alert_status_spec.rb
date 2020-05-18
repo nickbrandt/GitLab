@@ -8,7 +8,7 @@ describe 'Setting the status of an alert' do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
   let(:alert) { create(:alert_management_alert, project: project) }
-  let(:input) { { status: 'ACKNOWLEDGED' } }
+  let(:input) { { status: 'RESOLVED', ended_at: 1.day.ago.to_s } }
 
   let(:mutation) do
     variables = {
@@ -22,6 +22,7 @@ describe 'Setting the status of an alert' do
                        alert {
                          iid
                          status
+                         endedAt
                        }
                      QL
     )
@@ -37,6 +38,10 @@ describe 'Setting the status of an alert' do
     post_graphql_mutation(mutation, current_user: user)
 
     expect(response).to have_gitlab_http_status(:success)
-    expect(mutation_response['alert']['status']).to eq(input[:status])
+    expect(mutation_response['alert']).to eq(
+      'iid' => alert.iid.to_s,
+      'status' => input[:status],
+      'endedAt' => alert.reload.ended_at.strftime('%Y-%m-%dT%H:%M:%SZ')
+    )
   end
 end

@@ -7,7 +7,8 @@ describe Mutations::AlertManagement::UpdateAlertStatus do
   let_it_be(:alert) { create(:alert_management_alert, :triggered) }
   let_it_be(:project) { alert.project }
   let(:new_status) { Types::AlertManagement::StatusEnum.values['ACKNOWLEDGED'].value }
-  let(:args) { { status: new_status, project_path: project.full_path, iid: alert.iid } }
+  let(:ended_at) { 1.hour.ago }
+  let(:args) { { status: new_status, ended_at: ended_at, project_path: project.full_path, iid: alert.iid } }
 
   specify { expect(described_class).to require_graphql_authorizations(:update_alert_management_alert) }
 
@@ -32,18 +33,13 @@ describe Mutations::AlertManagement::UpdateAlertStatus do
 
       context 'error occurs when updating' do
         it 'returns the alert with errors' do
-          # Stub an error on the alert
-          allow_next_instance_of(Resolvers::AlertManagementAlertResolver) do |resolver|
-            allow(resolver).to receive(:resolve).and_return(alert)
-          end
+          # invalidate alert
+          too_many_hosts = Array.new(AlertManagement::Alert::HOSTS_MAX_LENGTH + 1) { |_| 'host' }
+          alert.update_columns(hosts: too_many_hosts)
 
-          allow(alert).to receive(:save).and_return(false)
-          allow(alert).to receive(:errors).and_return(
-            double(full_messages: %w(foo bar))
-          )
           expect(resolve).to eq(
             alert: alert,
-            errors: ['foo and bar']
+            errors: ['Hosts hosts array is over 255 chars']
           )
         end
 

@@ -9,18 +9,22 @@ module Mutations
                required: true,
                description: 'The status to set the alert'
 
+      argument :ended_at, Types::TimeType,
+               required: false,
+               description: 'Ended time of resolved alert. Current time when omitted.'
+
       def resolve(args)
         alert = authorized_find!(project_path: args[:project_path], iid: args[:iid])
-        result = update_status(alert, args[:status])
+        result = update_status(alert, args.slice(:status, :ended_at))
 
         prepare_response(result)
       end
 
       private
 
-      def update_status(alert, status)
+      def update_status(alert, params)
         ::AlertManagement::UpdateAlertStatusService
-          .new(alert, current_user, status)
+          .new(alert, current_user, params)
           .execute
       end
 
