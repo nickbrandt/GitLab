@@ -31,5 +31,7 @@ describe Gitlab::Geo::LogCursor::Events::LfsObjectDeletedEvent, :clean_gitlab_re
 
       subject.process
     end
+
+    it_behaves_like 'logs event source info'
   end
 end

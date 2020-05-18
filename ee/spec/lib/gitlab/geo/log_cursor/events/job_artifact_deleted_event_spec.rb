@@ -72,5 +72,7 @@ describe Gitlab::Geo::LogCursor::Events::JobArtifactDeletedEvent, :clean_gitlab_
         expect { subject.process }.not_to change { File.exist?(job_artifact.file.path) }.from(true)
       end
     end
+
+    it_behaves_like 'logs event source info'
   end
 end

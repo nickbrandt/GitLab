@@ -33,7 +33,7 @@ describe Gitlab::Geo::LogCursor::Events::CacheInvalidationEvent, :clean_gitlab_r
 
       expect(::Gitlab::Logger)
         .to receive(:info)
-        .with(hash_including(data))
+        .with(hash_including(:event_id, data))
 
       subject.process
     end

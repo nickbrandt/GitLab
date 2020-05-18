@@ -52,6 +52,8 @@ describe Gitlab::Geo::LogCursor::Events::RepositoryCreatedEvent, :clean_gitlab_r
 
         subject.process
       end
+
+      it_behaves_like 'logs event source info'
     end
 
     context 'when the associated shard is not healthy' do

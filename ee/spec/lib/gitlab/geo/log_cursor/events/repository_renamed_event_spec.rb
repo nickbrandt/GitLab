@@ -39,5 +39,7 @@ describe Gitlab::Geo::LogCursor::Events::RepositoryRenamedEvent, :clean_gitlab_r
 
       subject.process
     end
+
+    it_behaves_like 'logs event source info'
   end
 end

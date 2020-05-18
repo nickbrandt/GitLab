@@ -36,6 +36,14 @@ module Gitlab
           def enqueue_job_if_shard_healthy(event)
             yield if healthy_shard_for?(event)
           end
+
+          def log_event(message, params = {})
+            logger.event_info(
+              created_at,
+              message,
+              params.merge(event_id: event.id)
+            )
+          end
         end
       end
     end
