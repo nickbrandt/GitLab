@@ -39,6 +39,20 @@ templates of the default branch will be taken into account.
 Create a new Markdown (`.md`) file inside the `.gitlab/issue_templates/`
 directory in your repository. Commit and push to your default branch.
 
+To create a Markdown file: 
+ 1. Click on the`+` button next to `master` and select "New file"
+ 1. Add the name of your issue template to the `File name` box by `master`. Make sure words are separated by underscores and that you include `.md` at the end (e.g. "feature_request.md").
+ 3. Commit and push to your default branch.
+
+If you do not have a `.gitlab/issue_templates/` directory in your repo, you'll needd to create one. 
+
+To create the `.gitlab/issue_templates/` directory: 
+ 1. Click on the`+` button next to `master` and select "New directory"
+ 1. Name this new directory .gitlab and commit to your default branch. 
+ 1. Click on the`+` button next to `master` again and select "New directory". This time, name your directory `issue_templates` and commit to your default branch. Make sure that it's spelled exactly like that with underscores. 
+
+You can check to make sure your this all worked by creating a new issue and seeing if you can "Choose a template".
+
 ## Creating merge request templates
 
 Similarly to issue templates, create a new Markdown (`.md`) file inside the
