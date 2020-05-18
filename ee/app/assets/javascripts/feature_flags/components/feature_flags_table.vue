@@ -185,7 +185,7 @@ export default {
               v-for="scope in featureFlag.scopes"
               :key="scope.id"
               v-gl-tooltip.hover="scopeTooltipText(scope)"
-              class="badge append-right-8 prepend-top-2"
+              class="badge append-right-8 gl-mt-2"
               :class="{
                 'badge-active': scope.active,
                 'badge-inactive': !scope.active,
