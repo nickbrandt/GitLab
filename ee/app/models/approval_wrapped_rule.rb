@@ -36,7 +36,7 @@ class ApprovalWrappedRule
     filter_approvers(@approval_rule.approvers)
   end
 
-  # @return [Array<User>] all approvers related to this rule
+  # @return [Array<User>] of users who have approved the merge request
   #
   # This is dynamically calculated unless it is persisted as `approved_approvers`.
   #

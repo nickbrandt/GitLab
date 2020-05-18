@@ -1637,4 +1637,51 @@ describe ApprovalState do
       end
     end
   end
+
+  describe '#optional_approvals_count' do
+    context 'when there are no optional approvals' do
+      let(:rule) { create_rule(approvals_required: 5) }
+
+      before do
+        approve_rules([rule])
+      end
+
+      it 'returns 0' do
+        expect(subject.optional_approvals_count).to eq(0)
+      end
+    end
+
+    context 'when there are no approvals' do
+      let(:rule) { create_rule(approvals_required: 5) }
+
+      it 'returns 0' do
+        expect(subject.optional_approvals_count).to eq(0)
+      end
+    end
+
+    context 'when there are only optional approvals' do
+      let(:rule) { create_rule(approvals_required: 0) }
+
+      before do
+        create(:approval, merge_request: merge_request, user: rule.users.first)
+      end
+
+      it 'returns the number of approvals' do
+        expect(subject.optional_approvals_count).to eq(1)
+      end
+    end
+
+    context 'when there are both required and optional approvals' do
+      let(:rule) { create_rule(approvals_required: 1, rule_type: :any_approver, users: [approver1, approver2]) }
+
+      before do
+        create(:approval, merge_request: merge_request, user: rule.users.first)
+        create(:approval, merge_request: merge_request, user: rule.users.second)
+      end
+
+      it 'returns the number of optional approvals' do
+        expect(subject.optional_approvals_count).to eq(1)
+      end
+    end
+  end
 end
