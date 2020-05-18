@@ -25,7 +25,7 @@ export default {
   methods: {
     valueText(metric) {
       const { value = null, unit = null } = metric;
-      if (!value) return '-';
+      if (!value || value === '-') return '-';
       return unit && value ? `${value} ${unit}` : value;
     },
   },
