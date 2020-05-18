@@ -3779,6 +3779,12 @@ msgstr ""
 msgid "Change permissions"
 msgstr ""
 
+msgid "Change status"
+msgstr ""
+
+msgid "Change subscription"
+msgstr ""
+
 msgid "Change template"
 msgstr ""
 
@@ -18619,6 +18625,9 @@ msgstr ""
 msgid "Search an environment spec"
 msgstr ""
 
+msgid "Search authors"
+msgstr ""
+
 msgid "Search branches"
 msgstr ""
 
@@ -19116,6 +19125,9 @@ msgstr ""
 msgid "Select an existing Kubernetes cluster or create a new one"
 msgstr ""
 
+msgid "Select assignee"
+msgstr ""
+
 msgid "Select branch"
 msgstr ""
 
@@ -19167,7 +19179,13 @@ msgstr ""
 msgid "Select source branch"
 msgstr ""
 
+msgid "Select status"
+msgstr ""
+
 msgid "Select strategy activation method"
+msgstr ""
+
+msgid "Select subscription"
 msgstr ""
 
 msgid "Select target branch"
