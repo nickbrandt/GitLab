@@ -31,6 +31,8 @@ describe Gitlab::Geo::LogCursor::Events::UploadDeletedEvent, :clean_gitlab_redis
 
         expect { subject.process }.to change(Geo::UploadRegistry, :count).by(-1)
       end
+
+      it_behaves_like 'logs event source info'
     end
   end
 end

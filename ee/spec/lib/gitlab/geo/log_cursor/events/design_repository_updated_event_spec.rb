@@ -63,5 +63,7 @@ describe Gitlab::Geo::LogCursor::Events::DesignRepositoryUpdatedEvent, :clean_gi
         subject.process
       end
     end
+
+    it_behaves_like 'logs event source info'
   end
 end

@@ -40,5 +40,7 @@ describe Gitlab::Geo::LogCursor::Events::HashedStorageMigratedEvent, :clean_gitl
 
       subject.process
     end
+
+    it_behaves_like 'logs event source info'
   end
 end

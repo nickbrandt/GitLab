@@ -51,5 +51,7 @@ describe Gitlab::Geo::LogCursor::Events::RepositoryDeletedEvent, :clean_gitlab_r
         end
       end
     end
+
+    it_behaves_like 'logs event source info'
   end
 end

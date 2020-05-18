@@ -142,6 +142,8 @@ describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :clean_gitlab_r
           end
         end
       end
+
+      it_behaves_like 'logs event source info'
     end
 
     context 'when associated shard is unhealthy' do

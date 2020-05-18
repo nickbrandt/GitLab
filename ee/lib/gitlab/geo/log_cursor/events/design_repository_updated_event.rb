@@ -30,8 +30,7 @@ module Gitlab
           end
 
           def log_event(job_id)
-            logger.event_info(
-              created_at,
+            super(
               'Design repository update',
               project_id: event.project_id,
               scheduled_at: Time.now,

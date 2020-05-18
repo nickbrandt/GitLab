@@ -24,8 +24,7 @@ module Gitlab
           private
 
           def log_event(job_id)
-            logger.event_info(
-              created_at,
+            super(
               'Repository update',
               project_id: event.project_id,
               source: event.source,

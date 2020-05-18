@@ -30,12 +30,12 @@ module Gitlab
           # rubocop: enable CodeReuse/ActiveRecord
 
           def log_event(job_id)
-            logger.event_info(
-              created_at,
+            super(
               'Docker Repository update',
               container_repository_id: registry.container_repository_id,
               skippable: skippable?,
-              project: registry.container_repository.project_id)
+              project: registry.container_repository.project_id,
+              job_id: job_id)
           end
         end
       end
