@@ -22439,6 +22439,9 @@ msgstr ""
 msgid "Timeout"
 msgstr ""
 
+msgid "Timeout connecting to the Google API. Please try again."
+msgstr ""
+
 msgid "Time|hr"
 msgid_plural "Time|hrs"
 msgstr[0] ""
