@@ -20,7 +20,7 @@ module Ci
       def notify_on_total_usage
         return unless namespace.shared_runners_minutes_used? && namespace.last_ci_minutes_notification_at.nil?
 
-        namespace.update_columns(last_ci_minutes_notification_at: Time.now)
+        namespace.update_columns(last_ci_minutes_notification_at: Time.current)
 
         CiMinutesUsageMailer.notify(namespace.name, recipients).deliver_later
       end
