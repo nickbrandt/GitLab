@@ -630,7 +630,9 @@ describe GroupPolicy do
     end
   end
 
-  describe 'read_group_security_dashboard' do
+  describe 'read_group_security_dashboard & create_vulnerability_export' do
+    let(:abilities) { %i(read_group_security_dashboard create_vulnerability_export) }
+
     before do
       stub_licensed_features(security_dashboard: true)
     end
@@ -638,57 +640,57 @@ describe GroupPolicy do
     context 'with admin' do
       let(:current_user) { admin }
 
-      it { is_expected.to be_allowed(:read_group_security_dashboard) }
+      it { is_expected.to be_allowed(*abilities) }
     end
 
     context 'with owner' do
       let(:current_user) { owner }
 
-      it { is_expected.to be_allowed(:read_group_security_dashboard) }
+      it { is_expected.to be_allowed(*abilities) }
     end
 
     context 'with maintainer' do
       let(:current_user) { maintainer }
 
-      it { is_expected.to be_allowed(:read_group_security_dashboard) }
+      it { is_expected.to be_allowed(*abilities) }
     end
 
     context 'with developer' do
       let(:current_user) { developer }
 
-      it { is_expected.to be_allowed(:read_group_security_dashboard) }
+      it { is_expected.to be_allowed(*abilities) }
 
       context 'when security dashboard features is not available' do
         before do
           stub_licensed_features(security_dashboard: false)
         end
 
-        it { is_expected.to be_disallowed(:read_group_security_dashboard) }
+        it { is_expected.to be_disallowed(*abilities) }
       end
     end
 
     context 'with reporter' do
       let(:current_user) { reporter }
 
-      it { is_expected.to be_disallowed(:read_group_security_dashboard) }
+      it { is_expected.to be_disallowed(*abilities) }
     end
 
     context 'with guest' do
       let(:current_user) { guest }
 
-      it { is_expected.to be_disallowed(:read_group_security_dashboard) }
+      it { is_expected.to be_disallowed(*abilities) }
     end
 
     context 'with non member' do
       let(:current_user) { create(:user) }
 
-      it { is_expected.to be_disallowed(:read_group_security_dashboard) }
+      it { is_expected.to be_disallowed(*abilities) }
     end
 
     context 'with anonymous' do
       let(:current_user) { nil }
 
-      it { is_expected.to be_disallowed(:read_group_security_dashboard) }
+      it { is_expected.to be_disallowed(*abilities) }
     end
   end
 
