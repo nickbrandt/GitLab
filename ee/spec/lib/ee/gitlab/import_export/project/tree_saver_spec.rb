@@ -35,9 +35,13 @@ describe Gitlab::ImportExport::Project::TreeSaver do
     let_it_be(:exportable_path) { 'project' }
 
     before_all do
-      Feature.enable(:project_export_as_ndjson) if ndjson_enabled
-      project.add_maintainer(user)
-      expect(project_tree_saver.save).to be true
+      RSpec::Mocks.with_temporary_scope do
+        allow(Feature).to receive(:enabled?) { true }
+        stub_feature_flags(project_export_as_ndjson: ndjson_enabled)
+        project.add_maintainer(user)
+
+        expect(project_tree_saver.save).to be true
+      end
     end
 
     let_it_be(:issue_json) { get_json(full_path, exportable_path, :issues, ndjson_enabled).first }
