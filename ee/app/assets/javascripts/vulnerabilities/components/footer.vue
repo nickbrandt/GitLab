@@ -43,13 +43,13 @@ export default {
   }),
 
   computed: {
-    discussionLookup() {
+    discussionDictionary() {
       return this.discussions.reduce((acc, discussion) => {
         acc[discussion.id] = discussion;
         return acc;
       }, {});
     },
-    noteLookup() {
+    noteDictionary() {
       return this.discussions
         .flatMap(x => x.notes)
         .reduce((acc, note) => {
@@ -126,12 +126,12 @@ export default {
     updateNotes(notes) {
       notes.forEach(note => {
         // If the note exists, update it.
-        if (this.noteLookup[note.id]) {
-          Object.assign(this.noteLookup[note.id], note);
+        if (this.noteDictionary[note.id]) {
+          Object.assign(this.noteDictionary[note.id], note);
         }
         // If the note doesn't exist, but the discussion does, add the note to the discussion.
-        else if (this.discussionLookup[note.discussion_id]) {
-          this.discussionLookup[note.discussion_id].notes.push(note);
+        else if (this.discussionDictionary[note.discussion_id]) {
+          this.discussionDictionary[note.discussion_id].notes.push(note);
         }
         // If the discussion doesn't exist, create it.
         else {
