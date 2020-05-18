@@ -1,5 +1,3 @@
-// TODO: Replace with mitt implementation for Vue3 once it has been verified
-// (https://gitlab.com/gitlab-org/gitlab/-/issues/215672)
-import Vue from 'vue';
+import createEventHub from '~/helpers/event_hub_factory';
 
-export default new Vue();
+export default createEventHub();
