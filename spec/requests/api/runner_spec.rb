@@ -2116,6 +2116,17 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
           end
         end
 
+        context 'when artifact is no longer supported' do
+          let(:params) { { artifact_type: :license_management, artifact_format: :raw } }
+
+          it' "fails to create artifact' do
+            upload_artifacts(file_upload, headers_with_token, params)
+
+            expect(response).to have_gitlab_http_status(:bad_request)
+            expect(json_response['message']).to include('Validation failed: File format is no longer supported')
+          end
+        end
+
         def upload_artifacts(file, headers = {}, params = {})
           workhorse_finalize(
             api("/jobs/#{job.id}/artifacts"),

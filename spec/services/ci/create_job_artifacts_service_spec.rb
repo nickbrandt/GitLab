@@ -177,6 +177,23 @@ describe Ci::CreateJobArtifactsService do
       end
     end
 
+    context 'when artifact type is not supported' do
+      let(:params) do
+        {
+          'artifact_type' => 'license_management',
+          'artifact_format' => 'raw'
+        }
+      end
+
+      it 'saves artifact for the given type' do
+        expect { subject }.not_to change { Ci::JobArtifact.count }
+        expect(subject).to match(
+          a_hash_including(http_status: :bad_request,
+            message: 'Validation failed: File format is no longer supported',
+            status: :error))
+      end
+    end
+
     shared_examples 'rescues object storage error' do |klass, message, expected_message|
       it "handles #{klass}" do
         allow_next_instance_of(JobArtifactUploader) do |uploader|
