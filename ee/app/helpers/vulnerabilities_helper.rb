@@ -31,10 +31,10 @@ module VulnerabilitiesHelper
   end
 
   def vulnerability_finding_data(finding)
-    occurrence = Vulnerabilities::OccurrenceSerializer.new(current_user: current_user).represent(finding)
-    remediation = occurrence[:remediations]&.first
+    finding = Vulnerabilities::FindingSerializer.new(current_user: current_user).represent(finding)
+    remediation = finding[:remediations]&.first
 
-    occurrence.slice(
+    finding.slice(
       :description,
       :identifiers,
       :links,
@@ -45,7 +45,7 @@ module VulnerabilitiesHelper
       :project,
       :remediations
     ).merge(
-      solution: remediation ? remediation['summary'] : occurrence[:solution]
+      solution: remediation ? remediation['summary'] : finding[:solution]
     )
   end
 

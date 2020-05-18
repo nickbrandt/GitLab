@@ -22,7 +22,7 @@ describe VulnerabilitiesHelper do
       :confirmed_by_id
     )
   end
-  let(:occurrence_serializer_hash) do
+  let(:finding_serializer_hash) do
     finding.slice(:description,
       :identifiers,
       :links,
@@ -46,9 +46,9 @@ describe VulnerabilitiesHelper do
       expect(VulnerabilitySerializer).to receive(:new).and_return(vulnerability_serializer_stub)
       expect(vulnerability_serializer_stub).to receive(:represent).with(vulnerability).and_return(vulnerability_serializer_hash)
 
-      occurrence_serializer_stub = instance_double("Vulnerabilities::OccurrenceSerializer")
-      expect(Vulnerabilities::OccurrenceSerializer).to receive(:new).and_return(occurrence_serializer_stub)
-      expect(occurrence_serializer_stub).to receive(:represent).with(finding).and_return(occurrence_serializer_hash)
+      finding_serializer_stub = instance_double("Vulnerabilities::FindingSerializer")
+      expect(Vulnerabilities::FindingSerializer).to receive(:new).and_return(finding_serializer_stub)
+      expect(finding_serializer_stub).to receive(:represent).with(finding).and_return(finding_serializer_hash)
     end
 
     around do |example|
