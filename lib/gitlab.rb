@@ -35,8 +35,8 @@ module Gitlab
     end
   end
 
-  STAGING_COM_URL = 'https://staging.gitlab.com'
   COM_URL = 'https://gitlab.com'
+  STAGING_COM_URL = 'https://staging.gitlab.com'
   APP_DIRS_PATTERN = %r{^/?(app|config|ee|lib|spec|\(\w*\))}.freeze
   SUBDOMAIN_REGEX = %r{\Ahttps://[a-z0-9]+\.gitlab\.com\z}.freeze
   VERSION = File.read(root.join("VERSION")).strip.freeze
@@ -78,6 +78,10 @@ module Gitlab
 
   def self.dev_env_or_com?
     Rails.env.development? || com?
+  end
+
+  def self.dev_or_test_env?
+    Rails.env.development? || Rails.env.test?
   end
 
   def self.ee?

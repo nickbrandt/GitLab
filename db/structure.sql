@@ -5283,7 +5283,8 @@ CREATE TABLE public.project_settings (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     push_rule_id bigint,
-    show_default_award_emojis boolean DEFAULT true NOT NULL
+    show_default_award_emojis boolean DEFAULT true,
+    CONSTRAINT check_bde223416c CHECK ((show_default_award_emojis IS NOT NULL))
 );
 
 CREATE TABLE public.project_statistics (
