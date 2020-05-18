@@ -154,7 +154,9 @@ export default {
       errored: false,
       isAlertDismissed: false,
       isErrorAlertDismissed: false,
+      sort: null,
       statusFilter: this.$options.statusTabs[4].filters,
+
     };
   },
   computed: {
@@ -179,6 +181,11 @@ export default {
   methods: {
     filterAlertsByStatus(tabIndex) {
       this.statusFilter = this.$options.statusTabs[tabIndex].filters;
+    },
+    fetchSortedData({ sortBy, sortDesc }) {
+      const sortDirection = sortDesc ? 'DESC' : 'ASC';
+      const sortColumn = sortBy.replace(/([A-Z])/g, '_$1').toUpperCase();
+      this.sort = `${sortColumn}_${sortDirection}`;
     },
     capitalizeFirstCharacter,
     updateAlertStatus(status, iid) {
@@ -241,7 +248,9 @@ export default {
         :busy="loading"
         stacked="md"
         :tbody-tr-class="tbodyTrClass"
+        :no-local-sorting="true"
         @row-clicked="navigateToAlertDetails"
+        @sort-changed="fetchSortedData"
       >
         <template #cell(severity)="{ item }">
           <div
