@@ -13695,6 +13695,9 @@ msgstr ""
 msgid "Milestones| You’re about to permanently delete the milestone %{milestoneTitle}. This milestone is not currently used in any issues or merge requests."
 msgstr ""
 
+msgid "Milestones|Completed Issues (closed)"
+msgstr ""
+
 msgid "Milestones|Delete milestone"
 msgstr ""
 
@@ -13707,6 +13710,9 @@ msgstr ""
 msgid "Milestones|Milestone %{milestoneTitle} was not found"
 msgstr ""
 
+msgid "Milestones|Ongoing Issues (open and assigned)"
+msgstr ""
+
 msgid "Milestones|Promote %{milestoneTitle} to group milestone?"
 msgstr ""
 
@@ -13717,6 +13723,9 @@ msgid "Milestones|Promoting %{milestoneTitle} will make it available for all pro
 msgstr ""
 
 msgid "Milestones|This action cannot be reversed."
+msgstr ""
+
+msgid "Milestones|Unstarted Issues (open and unassigned)"
 msgstr ""
 
 msgid "Minimum capacity to be available before we schedule more mirrors preemptively."
