@@ -11,7 +11,7 @@ class Groups::Analytics::CycleAnalyticsController < Groups::Analytics::Applicati
   before_action do
     push_frontend_feature_flag(:cycle_analytics_scatterplot_enabled, default_enabled: true)
     push_frontend_feature_flag(:cycle_analytics_scatterplot_median_enabled, default_enabled: true)
-    push_frontend_feature_flag(:value_stream_analytics_path_navigation)
+    push_frontend_feature_flag(:value_stream_analytics_path_navigation, @group)
   end
 
   before_action :load_group, only: :show
