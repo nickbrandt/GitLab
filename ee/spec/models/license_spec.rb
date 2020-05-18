@@ -273,6 +273,34 @@ describe License do
     end
   end
 
+  describe 'Callbacks' do
+    describe '#reset_future_dated', :request_store do
+      let!(:future_dated_license) { create(:license, data: create(:gitlab_license, starts_at: Date.current + 1.month).export) }
+
+      before do
+        described_class.future_dated
+
+        expect(Gitlab::SafeRequestStore.read(:future_dated_license)).to be_present
+      end
+
+      context 'when a license is created' do
+        it 'deletes the future_dated_license value in Gitlab::SafeRequestStore' do
+          create(:license)
+
+          expect(Gitlab::SafeRequestStore.read(:future_dated_license)).to be_nil
+        end
+      end
+
+      context 'when a license is destroyed' do
+        it 'deletes the future_dated_license value in Gitlab::SafeRequestStore' do
+          future_dated_license.destroy
+
+          expect(Gitlab::SafeRequestStore.read(:future_dated_license)).to be_nil
+        end
+      end
+    end
+  end
+
   describe "Class methods" do
     before do
       described_class.reset_current
@@ -338,7 +366,7 @@ describe License do
       end
     end
 
-    describe ".current" do
+    describe '.current' do
       context 'when licenses table does not exist' do
         it 'returns nil' do
           allow(described_class).to receive(:table_exists?).and_return(false)
@@ -347,29 +375,121 @@ describe License do
         end
       end
 
-      context "when there is no license" do
-        it "returns nil" do
-          allow(described_class).to receive(:order).and_return(double(limit: []))
+      context 'when there is no license' do
+        it 'returns nil' do
+          allow(described_class).to receive(:last_hundred).and_return([])
 
           expect(described_class.current).to be_nil
         end
       end
 
-      context "when the license is invalid" do
-        it "returns nil" do
-          allow(described_class).to receive(:order).and_return(double(limit: [license]))
+      context 'when the license is invalid' do
+        it 'returns nil' do
+          allow(described_class).to receive(:last_hundred).and_return([license])
           allow(license).to receive(:valid?).and_return(false)
 
           expect(described_class.current).to be_nil
         end
       end
 
-      context "when the license is valid" do
-        it "returns the license" do
+      context 'when the license is valid' do
+        it 'returns the license' do
           current_license = create_list(:license, 2).last
           create(:license, data: create(:gitlab_license, starts_at: Date.current + 1.month).export)
 
           expect(described_class.current).to eq(current_license)
+        end
+      end
+    end
+
+    describe '.future_dated_only?' do
+      before do
+        described_class.reset_future_dated
+      end
+
+      context 'when licenses table does not exist' do
+        it 'returns false' do
+          allow(described_class).to receive(:table_exists?).and_return(false)
+
+          expect(described_class.future_dated_only?).to be_falsey
+        end
+      end
+
+      context 'when there is no license' do
+        it 'returns false' do
+          allow(described_class).to receive(:last_hundred).and_return([])
+
+          expect(described_class.future_dated_only?).to be_falsey
+        end
+      end
+
+      context 'when the license is invalid' do
+        it 'returns false' do
+          license = build(:license, data: build(:gitlab_license, starts_at: Date.current + 1.month).export)
+
+          allow(described_class).to receive(:last_hundred).and_return([license])
+          allow(license).to receive(:valid?).and_return(false)
+
+          expect(described_class.future_dated_only?).to be_falsey
+        end
+      end
+
+      context 'when the license is valid' do
+        context 'when there is a current license' do
+          it 'returns the false' do
+            expect(described_class.future_dated_only?).to be_falsey
+          end
+        end
+
+        context 'when the license is future-dated' do
+          it 'returns the true' do
+            create(:license, data: create(:gitlab_license, starts_at: Date.current + 1.month).export)
+
+            allow(described_class).to receive(:current).and_return(nil)
+
+            expect(described_class.future_dated_only?).to be_truthy
+          end
+        end
+      end
+    end
+
+    describe '.future_dated' do
+      before do
+        described_class.reset_future_dated
+      end
+
+      context 'when licenses table does not exist' do
+        it 'returns nil' do
+          allow(described_class).to receive(:table_exists?).and_return(false)
+
+          expect(described_class.future_dated).to be_nil
+        end
+      end
+
+      context 'when there is no license' do
+        it 'returns nil' do
+          allow(described_class).to receive(:last_hundred).and_return([])
+
+          expect(described_class.future_dated).to be_nil
+        end
+      end
+
+      context 'when the license is invalid' do
+        it 'returns false' do
+          license = build(:license, data: build(:gitlab_license, starts_at: Date.current + 1.month).export)
+
+          allow(described_class).to receive(:last_hundred).and_return([license])
+          allow(license).to receive(:valid?).and_return(false)
+
+          expect(described_class.future_dated).to be_nil
+        end
+      end
+
+      context 'when the license is valid' do
+        it 'returns the true' do
+          future_dated_license = create(:license, data: create(:gitlab_license, starts_at: Date.current + 1.month).export)
+
+          expect(described_class.future_dated).to eq(future_dated_license)
         end
       end
     end
@@ -562,7 +682,7 @@ describe License do
         let(:license) { create(:license, trial: true, expired: true) }
 
         before(:all) do
-          described_class.destroy_all # rubocop: disable DestroyAll
+          described_class.delete_all
         end
 
         ::License::EES_FEATURES.each do |feature|
@@ -823,6 +943,26 @@ describe License do
       let(:gl_license) { build(:gitlab_license, starts_at: starts_at) }
 
       subject { license.started? }
+
+      it do
+        is_expected.to eq(result)
+      end
+    end
+  end
+
+  describe '#future_dated?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:starts_at, :result) do
+      Date.current - 1.month | false
+      Date.current           | false
+      Date.current + 1.month | true
+    end
+
+    with_them do
+      let(:gl_license) { build(:gitlab_license, starts_at: starts_at) }
+
+      subject { license.future_dated? }
 
       it do
         is_expected.to eq(result)

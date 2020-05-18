@@ -339,6 +339,9 @@ only. For example:
 
 ## `audit_json.log`
 
+NOTE: **Note:**
+Most log entries only exist in [GitLab Starter](https://about.gitlab.com/pricing), however a few exist in GitLab Core.
+
 This file lives in `/var/log/gitlab/gitlab-rails/audit_json.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/audit_json.log` for
 installations from source.
@@ -535,7 +538,17 @@ This file lives in `/var/log/gitlab/gitaly/current` and is produced by [runit](h
 
 This file lives in `/var/log/gitlab/gitlab-rails/grpc.log` for Omnibus GitLab packages. Native [gRPC](https://grpc.io/) logging used by Gitaly.
 
+## `puma_stderr.log` & `puma_stdout.log`
+
+This file lives in `/var/log/gitlab/puma/puma_stderr.log` and `/var/log/gitlab/puma/puma_stdout.log` for
+Omnibus GitLab packages or in `/home/git/gitlab/log/puma_stderr.log` and `/home/git/gitlab/log/puma_stdout.log`
+for installations from source.
+
 ## `unicorn_stderr.log` & `unicorn_stdout.log`
+
+NOTE: **Note:**
+Starting with GitLab 13.0, Puma is the default web server used in GitLab
+all-in-one package based installations as well as GitLab Helm chart deployments.
 
 This file lives in `/var/log/gitlab/unicorn/unicorn_stderr.log` and `/var/log/gitlab/unicorn/unicorn_stdout.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/unicorn_stderr.log` and `/home/git/gitlab/log/unicorn_stdout.log`
@@ -562,12 +575,6 @@ I, [2015-02-13T07:16:01.534501 #13379]  INFO -- : worker=1 spawned pid=13379
 I, [2015-02-13T07:16:01.534848 #13379]  INFO -- : worker=1 ready
 ```
 
-## `puma_stderr.log` & `puma_stdout.log`
-
-This file lives in `/var/log/gitlab/puma/puma_stderr.log` and `/var/log/gitlab/puma/puma_stdout.log` for
-Omnibus GitLab packages or in `/home/git/gitlab/log/puma_stderr.log` and `/home/git/gitlab/log/puma_stdout.log`
-for installations from source.
-
 ## `repocheck.log`
 
 This file lives in `/var/log/gitlab/gitlab-rails/repocheck.log` for
@@ -583,6 +590,8 @@ It logs information whenever a [repository check is run](repository_checks.md) o
 This file lives in `/var/log/gitlab/gitlab-rails/importer.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/importer.log` for
 installations from source.
+
+It logs the progress of the import process.
 
 ## `auth.log`
 
@@ -613,7 +622,7 @@ installations from source.
 GraphQL queries are recorded in that file. For example:
 
 ```json
-{"query_string":"query IntrospectionQuery{__schema {queryType { name },mutationType { name }}}...(etc)","variables":{"a":1,"b":2},"complexity":181,"depth":1,"duration":7}
+{"query_string":"query IntrospectionQuery{__schema {queryType { name },mutationType { name }}}...(etc)","variables":{"a":1,"b":2},"complexity":181,"depth":1,"duration_s":7}
 ```
 
 ## `migrations.log`
@@ -652,7 +661,7 @@ will be generated in `/var/log/gitlab/gitlab-rails/sidekiq_exporter.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/sidekiq_exporter.log` for
 installations from source.
 
-If Prometheus metrics and the Web Exporter are both enabled, Unicorn/Puma will
+If Prometheus metrics and the Web Exporter are both enabled, Puma/Unicorn will
 start a Web server and listen to the defined port (default: `8083`). Access logs
 will be generated in `/var/log/gitlab/gitlab-rails/web_exporter.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/web_exporter.log` for
@@ -736,6 +745,23 @@ Each line contains a JSON line that can be ingested by Elasticsearch. For exampl
     "lib/gitlab/import_export/relation_factory.rb:345:in `find_or_create_object!'"
   ]
 }
+```
+
+## `service_measurement.log`
+
+> Introduced in GitLab 13.0.
+
+This file lives in `/var/log/gitlab/gitlab-rails/service_measurement.log` for
+Omnibus GitLab packages or in `/home/git/gitlab/log/service_measurement.log` for
+installations from source.
+
+It contain only a single structured log with measurements for each service execution.
+It will contain measurement such as: number of sql calls, execution_time, gc_stats, memory usage, etc...
+
+For example:
+
+```json
+{ "severity":"INFO", "time":"2020-04-22T16:04:50.691Z","correlation_id":"04f1366e-57a1-45b8-88c1-b00b23dc3616","class":"Projects::ImportExport::ExportService","current_user":"John Doe","project_full_path":"group1/test-export","file_path":"/path/to/archive","gc_stats":{"count":{"before":127,"after":127,"diff":0},"heap_allocated_pages":{"before":10369,"after":10369,"diff":0},"heap_sorted_length":{"before":10369,"after":10369,"diff":0},"heap_allocatable_pages":{"before":0,"after":0,"diff":0},"heap_available_slots":{"before":4226409,"after":4226409,"diff":0},"heap_live_slots":{"before":2542709,"after":2641420,"diff":98711},"heap_free_slots":{"before":1683700,"after":1584989,"diff":-98711},"heap_final_slots":{"before":0,"after":0,"diff":0},"heap_marked_slots":{"before":2542704,"after":2542704,"diff":0},"heap_eden_pages":{"before":10369,"after":10369,"diff":0},"heap_tomb_pages":{"before":0,"after":0,"diff":0},"total_allocated_pages":{"before":10369,"after":10369,"diff":0},"total_freed_pages":{"before":0,"after":0,"diff":0},"total_allocated_objects":{"before":24896308,"after":24995019,"diff":98711},"total_freed_objects":{"before":22353599,"after":22353599,"diff":0},"malloc_increase_bytes":{"before":140032,"after":6650240,"diff":6510208},"malloc_increase_bytes_limit":{"before":25804104,"after":25804104,"diff":0},"minor_gc_count":{"before":94,"after":94,"diff":0},"major_gc_count":{"before":33,"after":33,"diff":0},"remembered_wb_unprotected_objects":{"before":34284,"after":34284,"diff":0},"remembered_wb_unprotected_objects_limit":{"before":68568,"after":68568,"diff":0},"old_objects":{"before":2404725,"after":2404725,"diff":0},"old_objects_limit":{"before":4809450,"after":4809450,"diff":0},"oldmalloc_increase_bytes":{"before":140032,"after":6650240,"diff":6510208},"oldmalloc_increase_bytes_limit":{"before":68537556,"after":68537556,"diff":0}},"time_to_finish":0.12298400001600385,"number_of_sql_calls":70,"memory_usage":"0.0 MiB","label":"process_48616"}
 ```
 
 ## `geo.log` **(PREMIUM ONLY)**

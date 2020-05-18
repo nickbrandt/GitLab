@@ -125,7 +125,7 @@ otherwise the networks will become a single point of failure.
 
 #### Architecture
 
-![PG HA Architecture](img/pg_ha_architecture.png)
+![PostgreSQL HA Architecture](img/pg_ha_architecture.png)
 
 Database nodes run two services with PostgreSQL:
 
@@ -969,7 +969,7 @@ repmgr['trust_auth_cidr_addresses'] = %w(192.168.1.44/32 db2.example.com)
 ##### MD5 Authentication
 
 If you are running on an untrusted network, repmgr can use md5 authentication
-with a [`.pgpass` file](https://www.postgresql.org/docs/9.6/libpq-pgpass.html)
+with a [`.pgpass` file](https://www.postgresql.org/docs/11/libpq-pgpass.html)
 to authenticate.
 
 You can specify by IP address, FQDN, or by subnet, using the same format as in

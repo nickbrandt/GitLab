@@ -1,7 +1,7 @@
 <script>
 import { GlDeprecatedButton, GlDropdown, GlDropdownItem } from '@gitlab/ui';
 
-const ANY_WEIGHT = 'Any Weight';
+const ANY_WEIGHT = 'Any weight';
 const NO_WEIGHT = 'None';
 
 export default {

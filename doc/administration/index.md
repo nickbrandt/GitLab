@@ -34,8 +34,8 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Install](../install/README.md): Requirements, directory structures, and installation methods.
   - [Database load balancing](database_load_balancing.md): Distribute database queries among multiple database servers. **(STARTER ONLY)**
   - [Omnibus support for log forwarding](https://docs.gitlab.com/omnibus/settings/logs.html#udp-log-shipping-gitlab-enterprise-edition-only) **(STARTER ONLY)**
-- [High Availability](reference_architectures/index.md): Configure multiple servers for scaling or high availability.
-  - [Installing GitLab HA on Amazon Web Services (AWS)](../install/aws/index.md): Set up GitLab High Availability on Amazon AWS.
+- [Reference architectures](reference_architectures/index.md): Add additional resources to support more users.
+  - [Installing GitLab on Amazon Web Services (AWS)](../install/aws/index.md): Set up GitLab on Amazon AWS.
 - [Geo](geo/replication/index.md): Replicate your GitLab instance to other geographic locations as a read-only fully operational version. **(PREMIUM ONLY)**
 - [Disaster Recovery](geo/disaster_recovery/index.md): Quickly fail-over to a different site with minimal effort in a disaster situation. **(PREMIUM ONLY)**
 - [Pivotal Tile](../install/pivotal/index.md): Deploy GitLab as a preconfigured appliance using Ops Manager (BOSH) for Pivotal Cloud Foundry. **(PREMIUM ONLY)**
@@ -79,7 +79,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 
 - [Rake tasks](../raketasks/README.md): Perform various tasks for maintenance, backups, automatic webhooks setup, and more.
   - [Backup and restore](../raketasks/backup_restore.md): Backup and restore your GitLab instance.
-- [Operations](operations/index.md): Keeping GitLab up and running (clean up Redis sessions, moving repositories, Sidekiq MemoryKiller, Unicorn).
+- [Operations](operations/index.md): Keeping GitLab up and running (clean up Redis sessions, moving repositories, Sidekiq MemoryKiller, Puma).
 - [Restart GitLab](restart_gitlab.md): Learn how to restart GitLab and its components.
 - [Invalidate Markdown cache](invalidate_markdown_cache.md): Invalidate any cached Markdown.
 
@@ -100,7 +100,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Mattermost](https://docs.gitlab.com/omnibus/gitlab-mattermost/): Integrate with [Mattermost](https://mattermost.com), an open source, private cloud workplace for web messaging.
 - [PlantUML](integration/plantuml.md): Create simple diagrams in AsciiDoc and Markdown documents
   created in snippets, wikis, and repositories.
-- [Web terminals](integration/terminal.md): Provide terminal access to your applications deployed to Kubernetes from within GitLab's CI/CD [environments](../ci/environments.md#web-terminals).
+- [Web terminals](integration/terminal.md): Provide terminal access to your applications deployed to Kubernetes from within GitLab's CI/CD [environments](../ci/environments/index.md#web-terminals).
 
 ## User settings and permissions
 
@@ -184,8 +184,6 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 
 - [GitLab Performance Monitoring](monitoring/performance/index.md):
   - [Enable Performance Monitoring](monitoring/performance/gitlab_configuration.md): Enable GitLab Performance Monitoring.
-  - [GitLab performance monitoring with InfluxDB](monitoring/performance/influxdb_configuration.md): Configure GitLab and InfluxDB for measuring performance metrics.
-  - [InfluxDB Schema](monitoring/performance/influxdb_schema.md): Measurements stored in InfluxDB.
   - [GitLab performance monitoring with Prometheus](monitoring/prometheus/index.md): Configure GitLab and Prometheus for measuring performance metrics.
   - [GitLab performance monitoring with Grafana](monitoring/performance/grafana_configuration.md): Configure GitLab to visualize time series metrics through graphs and dashboards.
   - [Request Profiling](monitoring/performance/request_profiling.md): Get a detailed profile on slow requests.

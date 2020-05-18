@@ -111,7 +111,7 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
       .permit(:name, :description, :active, :version,
               scopes_attributes: [:environment_scope, :active,
                                   strategies: [:name, parameters: [:groupId, :percentage, :userIds]]],
-             strategies_attributes: [:name, parameters: [:groupId, :percentage, :userIds], scopes_attributes: [:environment_scope]])
+             strategies_attributes: [:name, :user_list_id, parameters: [:groupId, :percentage, :userIds], scopes_attributes: [:environment_scope]])
   end
 
   def update_params
@@ -119,7 +119,8 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
           .permit(:name, :description, :active,
                   scopes_attributes: [:id, :environment_scope, :active, :_destroy,
                                       strategies: [:name, parameters: [:groupId, :percentage, :userIds]]],
-                 strategies_attributes: [:id, :name, :_destroy, parameters: [:groupId, :percentage, :userIds],
+                 strategies_attributes: [:id, :name, :user_list_id, :_destroy,
+                                         parameters: [:groupId, :percentage, :userIds],
                                          scopes_attributes: [:id, :environment_scope, :_destroy]])
   end
 

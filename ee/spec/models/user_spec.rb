@@ -1101,70 +1101,76 @@ describe User do
 
     subject { user.gitlab_employee? }
 
-    where(:email, :is_com, :expected_result) do
-      'test@gitlab.com'   | true  | true
-      'test@example.com'  | true  | false
-      'test@gitlab.com'   | false | false
-      'test@example.com'  | false | false
-    end
+    let_it_be(:gitlab_group) { create(:group, name: 'gitlab-com') }
+    let_it_be(:random_group) { create(:group, name: 'random-group') }
 
-    with_them do
-      let(:user) { build(:user, email: email) }
-
+    context 'based on group membership' do
       before do
         allow(Gitlab).to receive(:com?).and_return(is_com)
       end
 
-      it { is_expected.to be expected_result }
+      context 'when user belongs to gitlab-com group' do
+        where(:is_com, :expected_result) do
+          true  | true
+          false | false
+        end
+
+        with_them do
+          let(:user) { create(:user) }
+
+          before do
+            gitlab_group.add_user(user, Gitlab::Access::DEVELOPER)
+          end
+
+          it { is_expected.to be expected_result }
+        end
+      end
+
+      context 'when user does not belongs to gitlab-com group' do
+        where(:is_com, :expected_result) do
+          true  | false
+          false | false
+        end
+
+        with_them do
+          let(:user) { create(:user) }
+
+          before do
+            random_group.add_user(user, Gitlab::Access::DEVELOPER)
+          end
+
+          it { is_expected.to be expected_result }
+        end
+      end
     end
 
-    context 'when email is of Gitlab and is not confirmed' do
-      let(:user) { build(:user, email: 'test@gitlab.com', confirmed_at: nil) }
+    context 'based on user type' do
+      before do
+        gitlab_group.add_user(user, Gitlab::Access::DEVELOPER)
+      end
 
-      it { is_expected.to be false }
-    end
+      context 'when user is a bot' do
+        let(:user) { build(:user, user_type: :alert_bot) }
 
-    context 'when user is a bot' do
-      let(:user) { build(:user, email: 'test@gitlab.com', user_type: :alert_bot) }
+        it { is_expected.to be false }
+      end
 
-      it { is_expected.to be false }
-    end
+      context 'when user is ghost' do
+        let(:user) { build(:user, :ghost) }
 
-    context 'when user is ghost' do
-      let(:user) { build(:user, :ghost, email: 'test@gitlab.com') }
-
-      it { is_expected.to be false }
+        it { is_expected.to be false }
+      end
     end
 
     context 'when `:gitlab_employee_badge` feature flag is disabled' do
-      let(:user) { build(:user, email: 'test@gitlab.com') }
+      let(:user) { build(:user) }
 
       before do
         stub_feature_flags(gitlab_employee_badge: false)
+        gitlab_group.add_user(user, Gitlab::Access::DEVELOPER)
       end
 
       it { is_expected.to be false }
-    end
-  end
-
-  describe '#organization' do
-    using RSpec::Parameterized::TableSyntax
-
-    let(:user) { build(:user, organization: 'ACME') }
-
-    subject { user.organization }
-
-    where(:gitlab_employee?, :expected_result) do
-      true  | 'GitLab'
-      false | 'ACME'
-    end
-
-    with_them do
-      before do
-        allow(user).to receive(:gitlab_employee?).and_return(gitlab_employee?)
-      end
-
-      it { is_expected.to eql(expected_result) }
     end
   end
 
@@ -1175,6 +1181,51 @@ describe User do
 
     it 'returns an instance of InstanceSecurityDashboard for the user' do
       expect(security_dashboard).to be_a(InstanceSecurityDashboard)
+    end
+  end
+
+  describe '#owns_upgradeable_namespace?' do
+    let_it_be(:user) { create(:user) }
+
+    subject { user.owns_upgradeable_namespace? }
+
+    using RSpec::Parameterized::TableSyntax
+
+    where(:hosted_plan, :result) do
+      :bronze_plan    | true
+      :silver_plan    | true
+      :gold_plan      | false
+      :free_plan      | false
+      :default_plan   | false
+    end
+
+    with_them do
+      it 'returns the correct result for each plan on a personal namespace' do
+        plan = create(hosted_plan)
+        create(:gitlab_subscription, namespace: user.namespace, hosted_plan: plan)
+
+        expect(subject).to be result
+      end
+
+      it 'returns the correct result for each plan on a group owned by the user' do
+        create(:group_with_plan, plan: hosted_plan).add_owner(user)
+
+        expect(subject).to be result
+      end
+    end
+
+    it 'returns false when there is no subscription for the personal namespace' do
+      expect(subject).to be false
+    end
+
+    it 'returns false when the user has multiple groups and any group has gold' do
+      create(:group_with_plan, plan: :bronze_plan).add_owner(user)
+      create(:group_with_plan, plan: :silver_plan).add_owner(user)
+      create(:group_with_plan, plan: :gold_plan).add_owner(user)
+
+      user.namespace.plans.reload
+
+      expect(subject).to be false
     end
   end
 end

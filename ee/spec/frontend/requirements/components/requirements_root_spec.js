@@ -3,9 +3,9 @@ import { shallowMount } from '@vue/test-utils';
 import { GlPagination } from '@gitlab/ui';
 import * as Sentry from '@sentry/browser';
 import createFlash from '~/flash';
-import { visitUrl } from '~/lib/utils/url_utility';
 
 import RequirementsRoot from 'ee/requirements/components/requirements_root.vue';
+import RequirementsTabs from 'ee/requirements/components/requirements_tabs.vue';
 import RequirementsLoading from 'ee/requirements/components/requirements_loading.vue';
 import RequirementsEmptyState from 'ee/requirements/components/requirements_empty_state.vue';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
@@ -31,10 +31,6 @@ jest.mock('ee/requirements/constants', () => ({
 }));
 
 jest.mock('~/flash');
-jest.mock('~/lib/utils/url_utility', () => ({
-  ...jest.requireActual('~/lib/utils/url_utility'),
-  visitUrl: jest.fn(),
-}));
 
 const $toast = {
   show: jest.fn(),
@@ -42,8 +38,8 @@ const $toast = {
 
 const createComponent = ({
   projectPath = 'gitlab-org/gitlab-shell',
-  filterBy = FilterState.opened,
-  requirementsCount = mockRequirementsCount,
+  initialFilterBy = FilterState.opened,
+  initialRequirementsCount = mockRequirementsCount,
   showCreateRequirement = false,
   emptyStatePath = '/assets/illustrations/empty-state/requirements.svg',
   loading = false,
@@ -53,8 +49,8 @@ const createComponent = ({
   shallowMount(RequirementsRoot, {
     propsData: {
       projectPath,
-      filterBy,
-      requirementsCount,
+      initialFilterBy,
+      initialRequirementsCount,
       showCreateRequirement,
       emptyStatePath,
       canCreateRequirement,
@@ -67,7 +63,10 @@ const createComponent = ({
             loading,
             list: [],
             pageInfo: {},
-            count: {},
+            refetch: jest.fn(),
+          },
+          requirementsCount: {
+            ...initialRequirementsCount,
             refetch: jest.fn(),
           },
         },
@@ -81,16 +80,6 @@ describe('RequirementsRoot', () => {
   let wrapper;
 
   beforeEach(() => {
-    setFixtures(`
-      <div class="js-nav-requirements-count"></div>
-      <div class="js-nav-requirements-count-fly-out"></div>
-      <div class="js-requirements-state-filters">
-        <span class="js-opened-count"></span>
-        <span class="js-archived-count"></span>
-        <span class="js-all-count"></span>
-      </div>
-      <button class="js-new-requirement">New requirement</button>
-    `);
     wrapper = createComponent();
   });
 
@@ -99,21 +88,64 @@ describe('RequirementsRoot', () => {
   });
 
   describe('computed', () => {
-    describe('totalRequirementsForCurrentTab', () => {
-      it('returns number representing total requirements for current tab', () => {
-        expect(wrapper.vm.totalRequirementsForCurrentTab).toBe(mockRequirementsCount.OPENED);
+    describe('requirementsListEmpty', () => {
+      it('returns `false` when `$apollo.queries.requirements.loading` is true', () => {
+        const wrapperLoading = createComponent({ loading: true });
+
+        expect(wrapperLoading.vm.requirementsListEmpty).toBe(false);
+
+        wrapperLoading.destroy();
       });
 
-      it('returns 0 when `openedCount` is 0 and filterBy represents opened tab', () => {
-        wrapper.setProps({
-          filterBy: FilterState.opened,
-        });
+      it('returns `false` when `requirements.list` is empty', () => {
         wrapper.setData({
-          openedCount: 0,
+          requirements: {
+            list: [],
+          },
         });
 
         return wrapper.vm.$nextTick(() => {
-          expect(wrapper.vm.totalRequirementsForCurrentTab).toBe(0);
+          expect(wrapper.vm.requirementsListEmpty).toBe(false);
+        });
+      });
+
+      it('returns `true` when `requirementsCount` for current filterBy value is 0', () => {
+        wrapper.setData({
+          filterBy: FilterState.opened,
+          requirementsCount: {
+            OPENED: 0,
+          },
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.requirementsListEmpty).toBe(true);
+        });
+      });
+    });
+
+    describe('totalRequirementsForCurrentTab', () => {
+      it('returns number representing total requirements for current tab', () => {
+        wrapper.setData({
+          filterBy: FilterState.opened,
+          requirementsCount: {
+            OPENED: mockRequirementsCount.OPENED,
+          },
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.totalRequirementsForCurrentTab).toBe(mockRequirementsCount.OPENED);
+        });
+      });
+    });
+
+    describe('showEmptyState', () => {
+      it('returns `false` when `showCreateForm` is true', () => {
+        wrapper.setData({
+          showCreateForm: true,
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.showEmptyState).toBe(false);
         });
       });
     });
@@ -123,9 +155,9 @@ describe('RequirementsRoot', () => {
         wrapper.setData({
           requirements: {
             list: mockRequirementsOpen,
-            count: mockRequirementsCount,
             pageInfo: mockPageInfo,
           },
+          requirementsCount: mockRequirementsCount,
         });
 
         return wrapper.vm.$nextTick(() => {
@@ -137,11 +169,11 @@ describe('RequirementsRoot', () => {
         wrapper.setData({
           requirements: {
             list: [mockRequirementsOpen[0]],
-            count: {
-              ...mockRequirementsCount,
-              OPENED: 1,
-            },
             pageInfo: mockPageInfo,
+          },
+          requirementsCount: {
+            ...mockRequirementsCount,
+            OPENED: 1,
           },
         });
 
@@ -294,34 +326,6 @@ describe('RequirementsRoot', () => {
       });
     });
 
-    describe('enableOrDisableNewRequirement', () => {
-      it('disables new requirement button when called with param `{ disable: true }`', () => {
-        wrapper.vm.enableOrDisableNewRequirement({
-          disable: true,
-        });
-
-        return wrapper.vm.$nextTick(() => {
-          const newReqButton = document.querySelector('.js-new-requirement');
-
-          expect(newReqButton.getAttribute('disabled')).toBe('disabled');
-          expect(newReqButton.classList.contains('disabled')).toBe(true);
-        });
-      });
-
-      it('enables new requirement button when called with param `{ disable: false }`', () => {
-        wrapper.vm.enableOrDisableNewRequirement({
-          disable: false,
-        });
-
-        return wrapper.vm.$nextTick(() => {
-          const newReqButton = document.querySelector('.js-new-requirement');
-
-          expect(newReqButton.getAttribute('disabled')).toBeNull();
-          expect(newReqButton.classList.contains('disabled')).toBe(false);
-        });
-      });
-    });
-
     describe('handleNewRequirementClick', () => {
       it('sets `showCreateForm` prop to `true`', () => {
         wrapper.vm.handleNewRequirementClick();
@@ -380,33 +384,21 @@ describe('RequirementsRoot', () => {
         );
       });
 
-      it('calls `visitUrl` when project has no requirements and request is successful', () => {
-        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue(mockMutationResult);
-
-        wrapper.setProps({
-          requirementsCount: {
-            OPENED: 0,
-            ARCHIVED: 0,
-            ALL: 0,
-          },
-        });
-
-        return wrapper.vm.handleNewRequirementSave('foo').then(() => {
-          expect(visitUrl).toHaveBeenCalledWith('/gitlab-org/gitlab-shell/-/requirements');
-        });
-      });
-
-      it('sets `showCreateForm` and `createRequirementRequestActive` props to `false` and calls `$apollo.queries.requirements.refetch()` when request is successful', () => {
+      it('sets `showCreateForm` and `createRequirementRequestActive` props to `false` and refetches requirements count and list when request is successful', () => {
         jest
           .spyOn(wrapper.vm.$apollo, 'mutate')
           .mockReturnValue(Promise.resolve(mockMutationResult));
+        jest
+          .spyOn(wrapper.vm.$apollo.queries.requirementsCount, 'refetch')
+          .mockImplementation(jest.fn());
         jest
           .spyOn(wrapper.vm.$apollo.queries.requirements, 'refetch')
           .mockImplementation(jest.fn());
 
         return wrapper.vm.handleNewRequirementSave('foo').then(() => {
-          expect(wrapper.vm.showCreateForm).toBe(false);
+          expect(wrapper.vm.$apollo.queries.requirementsCount.refetch).toHaveBeenCalled();
           expect(wrapper.vm.$apollo.queries.requirements.refetch).toHaveBeenCalled();
+          expect(wrapper.vm.showCreateForm).toBe(false);
           expect(wrapper.vm.createRequirementRequestActive).toBe(false);
         });
       });
@@ -571,11 +563,10 @@ describe('RequirementsRoot', () => {
           });
       });
 
-      it('increments `openedCount` by 1 and decrements `archivedCount` by 1 when `params.state` is "OPENED"', () => {
-        wrapper.setData({
-          openedCount: 1,
-          archivedCount: 1,
-        });
+      it('refetches requirementsCount query when request is successful', () => {
+        jest
+          .spyOn(wrapper.vm.$apollo.queries.requirementsCount, 'refetch')
+          .mockImplementation(jest.fn());
 
         return wrapper.vm
           .handleRequirementStateChange({
@@ -583,8 +574,7 @@ describe('RequirementsRoot', () => {
             state: FilterState.opened,
           })
           .then(() => {
-            expect(wrapper.vm.openedCount).toBe(2);
-            expect(wrapper.vm.archivedCount).toBe(0);
+            expect(wrapper.vm.$apollo.queries.requirementsCount.refetch).toHaveBeenCalled();
           });
       });
 
@@ -598,23 +588,6 @@ describe('RequirementsRoot', () => {
             expect(wrapper.vm.$toast.show).toHaveBeenCalledWith(
               'Requirement REQ-1 has been reopened',
             );
-          });
-      });
-
-      it('decrements `openedCount` by 1 and increments `archivedCount` by 1 when `params.state` is "ARCHIVED"', () => {
-        wrapper.setData({
-          openedCount: 1,
-          archivedCount: 1,
-        });
-
-        return wrapper.vm
-          .handleRequirementStateChange({
-            iid: '1',
-            state: FilterState.archived,
-          })
-          .then(() => {
-            expect(wrapper.vm.openedCount).toBe(0);
-            expect(wrapper.vm.archivedCount).toBe(2);
           });
       });
 
@@ -647,9 +620,9 @@ describe('RequirementsRoot', () => {
         wrapper.setData({
           requirements: {
             list: mockRequirementsOpen,
-            count: mockRequirementsCount,
             pageInfo: mockPageInfo,
           },
+          requirementsCount: mockRequirementsCount,
         });
 
         return wrapper.vm.$nextTick();
@@ -688,8 +661,23 @@ describe('RequirementsRoot', () => {
       expect(wrapper.classes()).toContain('requirements-list-container');
     });
 
+    it('renders requirements-tabs component', () => {
+      expect(wrapper.find(RequirementsTabs).exists()).toBe(true);
+    });
+
     it('renders empty state when query results are empty', () => {
-      expect(wrapper.find(RequirementsEmptyState).exists()).toBe(true);
+      wrapper.setData({
+        requirements: {
+          list: [],
+        },
+        requirementsCount: {
+          OPENED: 0,
+        },
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.find(RequirementsEmptyState).exists()).toBe(true);
+      });
     });
 
     it('renders requirements-loading component when query results are still being loaded', () => {
@@ -724,9 +712,9 @@ describe('RequirementsRoot', () => {
       wrapper.setData({
         requirements: {
           list: mockRequirementsOpen,
-          count: mockRequirementsCount,
           pageInfo: mockPageInfo,
         },
+        requirementsCount: mockRequirementsCount,
       });
 
       return wrapper.vm.$nextTick(() => {
@@ -741,9 +729,9 @@ describe('RequirementsRoot', () => {
       wrapper.setData({
         requirements: {
           list: mockRequirementsOpen,
-          count: mockRequirementsCount,
           pageInfo: mockPageInfo,
         },
+        requirementsCount: mockRequirementsCount,
       });
 
       return wrapper.vm.$nextTick(() => {

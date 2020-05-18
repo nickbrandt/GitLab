@@ -10,12 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   initRelatedIssues();
 
-  if (document.getElementById('js-design-management')) {
-    import(/* webpackChunkName: 'design_management' */ '~/design_management')
-      .then(module => module.default())
-      .catch(() => {});
-  }
-
   // eslint-disable-next-line no-new
   new UserCallout({ className: 'js-epics-sidebar-callout' });
   // eslint-disable-next-line no-new

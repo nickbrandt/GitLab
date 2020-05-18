@@ -9,7 +9,8 @@ export default () => ({
    *  resourceId: String,
    *  pageType: String,
    *  emptyListIllustration: String,
-   *  emptyListHelpUrl: String
+   *  emptyListHelpUrl: String,
+   *  comingSoon: { projectPath: String, suggestedContributions : String } | null;
    * }
    */
   config: {},

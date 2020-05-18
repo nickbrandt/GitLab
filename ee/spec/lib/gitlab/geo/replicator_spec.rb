@@ -10,7 +10,9 @@ describe Gitlab::Geo::Replicator do
 
   before(:all) do
     ActiveRecord::Schema.define do
-      create_table :dummy_models
+      create_table :dummy_models, force: true do |t|
+        t.binary :verification_checksum
+      end
     end
   end
 
@@ -70,6 +72,8 @@ describe Gitlab::Geo::Replicator do
 
           with_replicator Geo::DummyReplicator
         end
+
+        DummyModel.reset_column_information
       end
 
       subject { DummyModel.new }
@@ -143,6 +147,34 @@ describe Gitlab::Geo::Replicator do
       context 'when given a Geo RegistriesResolver"' do
         it 'returns the corresponding Replicator class' do
           expect(described_class.for_class_name('Geo::DummyRegistriesResolver')).to eq(Geo::DummyReplicator)
+        end
+      end
+    end
+
+    describe '.for_replicable_name' do
+      context 'given a valid replicable_name' do
+        it 'returns the corresponding Replicator class' do
+          replicator_class = described_class.for_replicable_name('dummy')
+
+          expect(replicator_class).to eq(Geo::DummyReplicator)
+        end
+      end
+
+      context 'given an invalid replicable_name' do
+        it 'raises and logs NotImplementedError' do
+          expect(Gitlab::Geo::Logger).to receive(:error)
+
+          expect do
+            described_class.for_replicable_name('invalid')
+          end.to raise_error(NotImplementedError)
+        end
+      end
+
+      context 'given nil' do
+        it 'raises NotImplementedError' do
+          expect do
+            described_class.for_replicable_name('invalid')
+          end.to raise_error(NotImplementedError)
         end
       end
     end

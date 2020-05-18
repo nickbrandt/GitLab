@@ -28,6 +28,12 @@ AllCops:
     - 'file_hooks/**/*'
   CacheRootDirectory: tmp
 
+Cop/AvoidKeywordArgumentsInSidekiqWorkers:
+  Enabled: true
+  Include:
+    - 'app/workers/**/*'
+    - 'ee/app/workers/**/*'
+
 Cop/StaticTranslationDefinition:
   Enabled: true
   Exclude:
@@ -342,12 +348,7 @@ RSpec/LeakyConstantDeclaration:
   Enabled: true
   Exclude:
     - 'spec/db/schema_spec.rb'
-    - 'spec/graphql/gitlab_schema_spec.rb'
-    - 'spec/helpers/visibility_level_helper_spec.rb'
-    - 'spec/initializers/secret_token_spec.rb'
-    - 'spec/lib/declarative_policy_spec.rb'
     - 'spec/lib/feature_spec.rb'
-    - 'spec/lib/gitlab/background_migration/migrate_issue_trackers_sensitive_data_spec.rb'
     - 'spec/lib/gitlab/ci/build/credentials/factory_spec.rb'
     - 'spec/lib/gitlab/ci/config/entry/retry_spec.rb'
     - 'spec/lib/gitlab/cluster/mixins/puma_cluster_spec.rb'
@@ -369,7 +370,6 @@ RSpec/LeakyConstantDeclaration:
     - 'spec/lib/gitlab/quick_actions/dsl_spec.rb'
     - 'spec/lib/gitlab/sidekiq_middleware/client_metrics_spec.rb'
     - 'spec/lib/gitlab/sidekiq_middleware/server_metrics_spec.rb'
-    - 'spec/lib/gitlab/sidekiq_middleware_spec.rb'
     - 'spec/lib/gitlab/view/presenter/factory_spec.rb'
     - 'spec/lib/marginalia_spec.rb'
     - 'spec/lib/omni_auth/strategies/jwt_spec.rb'
@@ -378,7 +378,6 @@ RSpec/LeakyConstantDeclaration:
     - 'spec/mailers/notify_spec.rb'
     - 'spec/migrations/20191125114345_add_admin_mode_protected_path_spec.rb'
     - 'spec/migrations/encrypt_plaintext_attributes_on_application_settings_spec.rb'
-    - 'spec/migrations/cleanup_optimistic_locking_nulls_pt2_fixed_spec.rb'
     - 'spec/models/clusters/cluster_spec.rb'
     - 'spec/models/concerns/batch_destroy_dependent_associations_spec.rb'
     - 'spec/models/concerns/blocks_json_serialization_spec.rb'

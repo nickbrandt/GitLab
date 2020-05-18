@@ -179,6 +179,14 @@ module API
       end
     end
 
+    def find_tag!(tag_name)
+      if Gitlab::GitRefValidator.validate(tag_name)
+        user_project.repository.find_tag(tag_name) || not_found!('Tag')
+      else
+        render_api_error!('The tag refname is invalid', 400)
+      end
+    end
+
     # rubocop: disable CodeReuse/ActiveRecord
     def find_project_issue(iid, project_id = nil)
       project = project_id ? find_project!(project_id) : user_project
@@ -601,8 +609,8 @@ module API
       header(*Gitlab::Workhorse.send_git_archive(repository, **kwargs))
     end
 
-    def send_artifacts_entry(build, entry)
-      header(*Gitlab::Workhorse.send_artifacts_entry(build, entry))
+    def send_artifacts_entry(file, entry)
+      header(*Gitlab::Workhorse.send_artifacts_entry(file, entry))
     end
 
     # The Grape Error Middleware only has access to `env` but not `params` nor

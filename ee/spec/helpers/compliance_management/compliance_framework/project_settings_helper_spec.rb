@@ -62,4 +62,20 @@ describe ComplianceManagement::ComplianceFramework::ProjectSettingsHelper do
       it { expect(helper.compliance_framework_color(framework)).to eq(color) }
     end
   end
+
+  describe '#compliance_framework_tooltip' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:framework, :tooltip) do
+      :gdpr | 'This project is regulated by GDPR.'
+      :hipaa | 'This project is regulated by HIPAA.'
+      :pci_dss | 'This project is regulated by PCI-DSS.'
+      :soc_2 | 'This project is regulated by SOC 2.'
+      :sox | 'This project is regulated by SOX.'
+    end
+
+    with_them do
+      it { expect(helper.compliance_framework_tooltip(framework)).to eq(tooltip) }
+    end
+  end
 end

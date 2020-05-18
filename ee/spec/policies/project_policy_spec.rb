@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe ProjectPolicy do
   include ExternalAuthorizationServiceHelpers
+  include AdminModeHelper
 
   let_it_be(:owner) { create(:user) }
   let_it_be(:admin) { create(:admin) }
@@ -62,7 +63,8 @@ describe ProjectPolicy do
     it_behaves_like 'project policies as developer'
     it_behaves_like 'project policies as maintainer'
     it_behaves_like 'project policies as owner'
-    it_behaves_like 'project policies as admin'
+    it_behaves_like 'project policies as admin with admin mode'
+    it_behaves_like 'project policies as admin without admin mode'
 
     context 'auditor' do
       let(:current_user) { create(:user, :auditor) }
@@ -211,7 +213,13 @@ describe ProjectPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it { is_expected.to be_allowed(:admin_mirror) }
+        context 'when admin mode enabled', :enable_admin_mode do
+          it { is_expected.to be_allowed(:admin_mirror) }
+        end
+
+        context 'when admin mode disabled' do
+          it { is_expected.to be_disallowed(:admin_mirror) }
+        end
       end
 
       context 'with owner' do
@@ -235,7 +243,13 @@ describe ProjectPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it { is_expected.to be_allowed(:admin_mirror) }
+        context 'when admin mode enabled', :enable_admin_mode do
+          it { is_expected.to be_allowed(:admin_mirror) }
+        end
+
+        context 'when admin mode disabled' do
+          it { is_expected.to be_disallowed(:admin_mirror) }
+        end
       end
 
       context 'with owner' do
@@ -271,7 +285,13 @@ describe ProjectPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it { is_expected.to be_allowed(:admin_mirror) }
+        context 'when admin mode enabled', :enable_admin_mode do
+          it { is_expected.to be_allowed(:admin_mirror) }
+        end
+
+        context 'when admin mode disabled' do
+          it { is_expected.to be_disallowed(:admin_mirror) }
+        end
       end
 
       context 'with owner' do
@@ -327,8 +347,16 @@ describe ProjectPolicy do
         context 'as an admin' do
           let(:current_user) { admin }
 
-          it 'allows access' do
-            is_expected.to allow_action(:read_project)
+          context 'when admin mode enabled', :enable_admin_mode do
+            it 'allows access' do
+              is_expected.to allow_action(:read_project)
+            end
+          end
+
+          context 'when admin mode disabled' do
+            it 'does not allow access' do
+              is_expected.not_to allow_action(:read_project)
+            end
           end
         end
 
@@ -375,6 +403,7 @@ describe ProjectPolicy do
       before do
         allow(Gitlab::IpAddressState).to receive(:current).and_return('192.168.0.2')
         stub_licensed_features(group_ip_restriction: true)
+        group.add_developer(current_user)
       end
 
       context 'group without restriction' do
@@ -421,7 +450,13 @@ describe ProjectPolicy do
       context 'with admin' do
         let(:current_user) { admin }
 
-        it { is_expected.to be_allowed(permission) }
+        context 'when admin mode enabled', :enable_admin_mode do
+          it { is_expected.to be_allowed(permission) }
+        end
+
+        context 'when admin mode disabled' do
+          it { is_expected.to be_disallowed(permission) }
+        end
       end
 
       context 'with owner' do
@@ -506,12 +541,24 @@ describe ProjectPolicy do
       end
 
       context 'with developer or higher role' do
-        where(role: %w[admin owner maintainer developer])
+        where(role: %w[owner maintainer developer])
 
         with_them do
           let(:current_user) { public_send(role) }
 
           it { is_expected.to be_allowed(:read_threat_monitoring) }
+        end
+      end
+
+      context 'with admin' do
+        let(:current_user) { admin }
+
+        context 'when admin mode enabled', :enable_admin_mode do
+          it { is_expected.to be_allowed(:read_threat_monitoring) }
+        end
+
+        context 'when admin mode disabled' do
+          it { is_expected.to be_disallowed(:read_threat_monitoring) }
         end
       end
 
@@ -617,12 +664,18 @@ describe ProjectPolicy do
     context 'with admin' do
       let(:current_user) { admin }
 
-      it { is_expected.to be_allowed(:remove_project) }
+      context 'when admin mode enabled', :enable_admin_mode do
+        it { is_expected.to be_allowed(:remove_project) }
+      end
+
+      context 'when admin mode disabled' do
+        it { is_expected.to be_disallowed(:remove_project) }
+      end
 
       context 'who owns the project' do
         let(:project) { create(:project, :public, namespace: admin.namespace) }
 
-        it { is_expected.to be_allowed(:remove_project) }
+        it { is_expected.to be_disallowed(:remove_project) }
       end
     end
 
@@ -660,7 +713,7 @@ describe ProjectPolicy do
   end
 
   describe 'admin_license_management' do
-    context 'without license management feature available' do
+    context 'without license scanning feature available' do
       before do
         stub_licensed_features(license_scanning: false)
       end
@@ -673,7 +726,13 @@ describe ProjectPolicy do
     context 'with admin' do
       let(:current_user) { admin }
 
-      it { is_expected.to be_allowed(:admin_software_license_policy) }
+      context 'when admin mode enabled', :enable_admin_mode do
+        it { is_expected.to be_allowed(:admin_software_license_policy) }
+      end
+
+      context 'when admin mode disabled' do
+        it { is_expected.to be_disallowed(:admin_software_license_policy) }
+      end
     end
 
     context 'with owner' do
@@ -720,7 +779,7 @@ describe ProjectPolicy do
   end
 
   describe 'read_software_license_policy' do
-    context 'without license management feature available' do
+    context 'without license scanning feature available' do
       before do
         stub_licensed_features(license_scanning: false)
       end
@@ -759,7 +818,13 @@ describe ProjectPolicy do
         context 'with admin' do
           let(:current_user) { admin }
 
-          it { is_expected.to be_allowed(:read_dependencies) }
+          context 'when admin mode enabled', :enable_admin_mode do
+            it { is_expected.to be_allowed(:read_dependencies) }
+          end
+
+          context 'when admin mode disabled' do
+            it { is_expected.to be_disallowed(:read_dependencies) }
+          end
         end
 
         context 'with owner' do
@@ -826,12 +891,24 @@ describe ProjectPolicy do
       context 'with private project' do
         let(:project) { create(:project, :private, namespace: owner.namespace) }
 
-        where(role: %w[admin owner maintainer developer reporter])
+        where(role: %w[owner maintainer developer reporter])
 
         with_them do
           let(:current_user) { public_send(role) }
 
           it { is_expected.to be_allowed(:read_licenses) }
+        end
+
+        context 'with admin' do
+          let(:current_user) { admin }
+
+          context 'when admin mode enabled', :enable_admin_mode do
+            it { is_expected.to be_allowed(:read_licenses) }
+          end
+
+          context 'when admin mode disabled' do
+            it { is_expected.to be_disallowed(:read_licenses) }
+          end
         end
 
         context 'with guest' do
@@ -883,7 +960,13 @@ describe ProjectPolicy do
     context 'with admin' do
       let(:current_user) { admin }
 
-      it { is_expected.to be_allowed(:create_web_ide_terminal) }
+      context 'when admin mode enabled', :enable_admin_mode do
+        it { is_expected.to be_allowed(:create_web_ide_terminal) }
+      end
+
+      context 'when admin mode disabled' do
+        it { is_expected.to be_disallowed(:create_web_ide_terminal) }
+      end
     end
 
     context 'with owner' do
@@ -937,14 +1020,15 @@ describe ProjectPolicy do
     context 'when feature is available' do
       using RSpec::Parameterized::TableSyntax
 
-      where(:role, :allowed) do
-        :anonymous  | false
-        :guest      | false
-        :reporter   | false
-        :developer  | true
-        :maintainer | true
-        :owner      | true
-        :admin      | true
+      where(:role, :admin_mode, :allowed) do
+        :anonymous  | nil   | false
+        :guest      | nil   | false
+        :reporter   | nil   | false
+        :developer  | nil   | true
+        :maintainer | nil   | true
+        :owner      | nil   | true
+        :admin      | false | false
+        :admin      | true  | true
       end
 
       with_them do
@@ -953,6 +1037,7 @@ describe ProjectPolicy do
         before do
           stub_feature_flags(feature => true)
           stub_licensed_features(feature => true)
+          enable_admin_mode!(current_user) if admin_mode
         end
 
         it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
@@ -1041,6 +1126,46 @@ describe ProjectPolicy do
       it { is_expected.not_to be_allowed(:change_commit_committer_check) }
       it { is_expected.to be_allowed(:read_commit_committer_check) }
     end
+
+    context 'it is enabled on global level' do
+      before do
+        create(:push_rule_sample, commit_committer_check: true)
+      end
+
+      context 'when the user is a maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+        it { is_expected.to be_allowed(:read_commit_committer_check) }
+      end
+
+      context 'when the user is a developer' do
+        let(:current_user) { developer }
+
+        it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+        it { is_expected.to be_allowed(:read_commit_committer_check) }
+      end
+    end
+
+    context 'it is enabled on group level' do
+      let(:push_rule) { create(:push_rule, commit_committer_check: true) }
+      let(:group) { create(:group, push_rule: push_rule) }
+      let(:project) { create(:project, namespace_id: group.id) }
+
+      context 'when the user is a maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+        it { is_expected.to be_allowed(:read_commit_committer_check) }
+      end
+
+      context 'when the user is a developer' do
+        let(:current_user) { developer }
+
+        it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+        it { is_expected.to be_allowed(:read_commit_committer_check) }
+      end
+    end
   end
 
   context 'reject_unsigned_commits is not enabled by the current license' do
@@ -1059,18 +1184,58 @@ describe ProjectPolicy do
       stub_licensed_features(reject_unsigned_commits: true)
     end
 
-    context 'the user is a maintainer' do
+    context 'when the user is a maintainer' do
       let(:current_user) { maintainer }
 
       it { is_expected.to be_allowed(:change_reject_unsigned_commits) }
       it { is_expected.to be_allowed(:read_reject_unsigned_commits) }
     end
 
-    context 'the user is a developer' do
+    context 'when the user is a developer' do
       let(:current_user) { developer }
 
       it { is_expected.not_to be_allowed(:change_reject_unsigned_commits) }
       it { is_expected.to be_allowed(:read_reject_unsigned_commits) }
+    end
+
+    context 'it is enabled on global level' do
+      before do
+        create(:push_rule_sample, reject_unsigned_commits: true)
+      end
+
+      context 'when the user is a maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.not_to be_allowed(:change_reject_unsigned_commits) }
+        it { is_expected.to be_allowed(:read_reject_unsigned_commits) }
+      end
+
+      context 'when the user is a developer' do
+        let(:current_user) { developer }
+
+        it { is_expected.not_to be_allowed(:change_reject_unsigned_commits) }
+        it { is_expected.to be_allowed(:read_reject_unsigned_commits) }
+      end
+    end
+
+    context 'it is enabled on group level' do
+      let(:push_rule) { create(:push_rule_without_project, reject_unsigned_commits: true) }
+      let(:group) { create(:group, push_rule: push_rule) }
+      let(:project) { create(:project, namespace_id: group.id) }
+
+      context 'when the user is a maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.not_to be_allowed(:change_reject_unsigned_commits) }
+        it { is_expected.to be_allowed(:read_reject_unsigned_commits) }
+      end
+
+      context 'when the user is a developer' do
+        let(:current_user) { developer }
+
+        it { is_expected.not_to be_allowed(:change_reject_unsigned_commits) }
+        it { is_expected.to be_allowed(:read_reject_unsigned_commits) }
+      end
     end
   end
 
@@ -1082,7 +1247,13 @@ describe ProjectPolicy do
     context 'admin' do
       let(:current_user) { admin }
 
-      it { is_expected.to be_allowed(:read_group_timelogs) }
+      context 'when admin mode enabled', :enable_admin_mode do
+        it { is_expected.to be_allowed(:read_group_timelogs) }
+      end
+
+      context 'when admin mode disabled' do
+        it { is_expected.to be_disallowed(:read_group_timelogs) }
+      end
     end
 
     context 'with owner' do
@@ -1137,13 +1308,14 @@ describe ProjectPolicy do
 
     using RSpec::Parameterized::TableSyntax
 
-    where(:role, :allowed) do
-      :guest | false
-      :reporter | true
-      :developer | true
-      :maintainer | true
-      :owner | true
-      :admin | true
+    where(:role, :admin_mode, :allowed) do
+      :guest      | nil   | false
+      :reporter   | nil   | true
+      :developer  | nil   | true
+      :maintainer | nil   | true
+      :owner      | nil   | true
+      :admin      | false | false
+      :admin      | true  | true
     end
 
     with_them do
@@ -1151,6 +1323,7 @@ describe ProjectPolicy do
 
       before do
         stub_licensed_features(code_review_analytics: true)
+        enable_admin_mode!(current_user) if admin_mode
       end
 
       it { is_expected.to(allowed ? be_allowed(:read_code_review_analytics) : be_disallowed(:read_code_review_analytics)) }
@@ -1214,16 +1387,14 @@ describe ProjectPolicy do
 
     using RSpec::Parameterized::TableSyntax
     context 'with merge request approvers rules available in license' do
-      where(:role, :setting, :allowed) do
-        :guest | true | false
-        :reporter | true | false
-        :developer | true | false
-        :maintainer | false | true
-        :maintainer | true | false
-        :owner | false | true
-        :owner | true | false
-        :admin | false | true
-        :admin | true | true
+      where(:role, :admin_mode, :allowed) do
+        :guest      | nil   | false
+        :reporter   | nil   | false
+        :developer  | nil   | false
+        :maintainer | nil   | false
+        :owner      | nil   | false
+        :admin      | false | false
+        :admin      | true  | true
       end
 
       with_them do
@@ -1231,7 +1402,7 @@ describe ProjectPolicy do
 
         before do
           stub_licensed_features(admin_merge_request_approvers_rules: true)
-          stub_application_setting(setting_name => setting)
+          enable_admin_mode!(current_user) if admin_mode
         end
 
         it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
@@ -1239,16 +1410,14 @@ describe ProjectPolicy do
     end
 
     context 'with merge request approvers not available in license' do
-      where(:role, :setting, :allowed) do
-        :guest | true | false
-        :reporter | true | false
-        :developer | true | false
-        :maintainer | false | true
-        :maintainer | true | true
-        :owner | false | true
-        :owner | true | true
-        :admin | true | true
-        :admin | false | true
+      where(:role, :admin_mode, :allowed) do
+        :guest      | nil   | false
+        :reporter   | nil   | false
+        :developer  | nil   | false
+        :maintainer | nil   | true
+        :owner      | nil   | true
+        :admin      | false | false
+        :admin      | true  | true
       end
 
       with_them do
@@ -1256,7 +1425,7 @@ describe ProjectPolicy do
 
         before do
           stub_licensed_features(admin_merge_request_approvers_rules: false)
-          stub_application_setting(setting_name => setting)
+          enable_admin_mode!(current_user) if admin_mode
         end
 
         it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
@@ -1286,59 +1455,9 @@ describe ProjectPolicy do
   end
 
   describe ':modify_approvers_list' do
-    let(:setting_name) { :disable_overriding_approvers_per_merge_request }
-    let(:policy) { :modify_approvers_list }
-    let(:project) { create(:project, namespace: owner.namespace) }
-
-    using RSpec::Parameterized::TableSyntax
-    context 'with merge request approvers rules available in license' do
-      where(:role, :setting, :allowed) do
-        :guest | true | false
-        :reporter | true | false
-        :developer | true | false
-        :maintainer | false | true
-        :maintainer | true | false
-        :owner | false | true
-        :owner | true | false
-        :admin | false | true
-        :admin | true | true
-      end
-
-      with_them do
-        let(:current_user) { public_send(role) }
-
-        before do
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-          stub_application_setting(setting_name => setting)
-        end
-
-        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
-      end
-    end
-
-    context 'with merge request approvers not available in license' do
-      where(:role, :setting, :allowed) do
-        :guest | true | false
-        :reporter | true | false
-        :developer | true | false
-        :maintainer | false | true
-        :maintainer | true | true
-        :owner | false | true
-        :owner | true | true
-        :admin | true | true
-        :admin | false | true
-      end
-
-      with_them do
-        let(:current_user) { public_send(role) }
-
-        before do
-          stub_licensed_features(admin_merge_request_approvers_rules: false)
-          stub_application_setting(setting_name => setting)
-        end
-
-        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
-      end
+    it_behaves_like 'merge request rules' do
+      let(:setting_name) { :disable_overriding_approvers_per_merge_request }
+      let(:policy) { :modify_approvers_list }
     end
   end
 
@@ -1351,17 +1470,46 @@ describe ProjectPolicy do
 
     let(:policy) { :admin_compliance_framework }
 
-    where(:role, :feature_enabled, :allowed) do
-      :guest      | false | false
-      :guest      | true  | false
-      :reporter   | false | false
-      :reporter   | true  | false
-      :developer  | false | false
-      :developer  | true  | false
-      :maintainer | false | false
-      :maintainer | true  | true
-      :owner      | false | false
-      :owner      | true  | true
+    where(:role, :feature_enabled, :admin_mode, :allowed) do
+      :guest      | false | nil   | false
+      :guest      | true  | nil   | false
+      :reporter   | false | nil   | false
+      :reporter   | true  | nil   | false
+      :developer  | false | nil   | false
+      :developer  | true  | nil   | false
+      :maintainer | false | nil   | false
+      :maintainer | true  | nil   | true
+      :owner      | false | nil   | false
+      :owner      | true  | nil   | true
+      :admin      | false | false | false
+      :admin      | false | true  | false
+      :admin      | true  | false | false
+      :admin      | true  | true  | true
+    end
+
+    with_them do
+      let(:current_user) { public_send(role) }
+
+      before do
+        stub_licensed_features(compliance_framework: feature_enabled)
+        enable_admin_mode!(current_user) if admin_mode
+      end
+
+      it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
+    end
+  end
+
+  describe ':read_ci_minutes_quota' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:policy) { :read_ci_minutes_quota }
+
+    where(:role, :admin_mode, :allowed) do
+      :guest      | nil   | false
+      :reporter   | nil   | false
+      :developer  | nil   | true
+      :maintainer | nil   | true
+      :owner      | nil   | true
       :admin      | false | false
       :admin      | true  | true
     end
@@ -1370,7 +1518,7 @@ describe ProjectPolicy do
       let(:current_user) { public_send(role) }
 
       before do
-        stub_licensed_features(compliance_framework: feature_enabled)
+        enable_admin_mode!(current_user) if admin_mode
       end
 
       it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }

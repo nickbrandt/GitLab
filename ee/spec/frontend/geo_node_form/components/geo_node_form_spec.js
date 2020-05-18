@@ -29,7 +29,6 @@ describe('GeoNodeForm', () => {
   });
 
   const findGeoNodeFormCoreField = () => wrapper.find(GeoNodeFormCore);
-  const findGeoNodePrimaryField = () => wrapper.find('#node-primary-field');
   const findGeoNodeInternalUrlField = () => wrapper.find('#node-internal-url-field');
   const findGeoNodeFormCapacitiesField = () => wrapper.find(GeoNodeFormCapacities);
   const findGeoNodeObjectStorageField = () => wrapper.find('#node-object-storage-field');
@@ -42,19 +41,12 @@ describe('GeoNodeForm', () => {
     });
 
     describe.each`
-      primaryNode | showCore | showPrimary | showInternalUrl | showCapacities | showObjectStorage
-      ${true}     | ${true}  | ${true}     | ${true}         | ${true}        | ${false}
-      ${false}    | ${true}  | ${true}     | ${false}        | ${true}        | ${true}
+      primaryNode | showCore | showInternalUrl | showCapacities | showObjectStorage
+      ${true}     | ${true}  | ${true}         | ${true}        | ${false}
+      ${false}    | ${true}  | ${false}        | ${true}        | ${true}
     `(
       `conditional fields`,
-      ({
-        primaryNode,
-        showCore,
-        showPrimary,
-        showInternalUrl,
-        showCapacities,
-        showObjectStorage,
-      }) => {
+      ({ primaryNode, showCore, showInternalUrl, showCapacities, showObjectStorage }) => {
         beforeEach(() => {
           wrapper.setData({
             nodeData: { ...wrapper.vm.nodeData, primary: primaryNode },
@@ -63,10 +55,6 @@ describe('GeoNodeForm', () => {
 
         it(`it ${showCore ? 'shows' : 'hides'} the Core Field`, () => {
           expect(findGeoNodeFormCoreField().exists()).toBe(showCore);
-        });
-
-        it(`it ${showPrimary ? 'shows' : 'hides'} the Primary Field`, () => {
-          expect(findGeoNodePrimaryField().exists()).toBe(showPrimary);
         });
 
         it(`it ${showInternalUrl ? 'shows' : 'hides'} the Internal URL Field`, () => {

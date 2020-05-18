@@ -16,6 +16,7 @@ export default {
   cycleAnalyticsTasksByTypePath: '/groups/:id/-/analytics/type_of_work/tasks_by_type',
   cycleAnalyticsTopLabelsPath: '/groups/:id/-/analytics/type_of_work/tasks_by_type/top_labels',
   cycleAnalyticsSummaryDataPath: '/groups/:id/-/analytics/value_stream_analytics/summary',
+  cycleAnalyticsTimeSummaryDataPath: '/groups/:id/-/analytics/value_stream_analytics/time_summary',
   cycleAnalyticsGroupStagesAndEventsPath: '/groups/:id/-/analytics/value_stream_analytics/stages',
   cycleAnalyticsStageEventsPath:
     '/groups/:id/-/analytics/value_stream_analytics/stages/:stage_id/records',
@@ -150,6 +151,12 @@ export default {
 
   cycleAnalyticsSummaryData(groupId, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsSummaryDataPath).replace(':id', groupId);
+
+    return axios.get(url, { params });
+  },
+
+  cycleAnalyticsTimeSummaryData(groupId, params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsTimeSummaryDataPath).replace(':id', groupId);
 
     return axios.get(url, { params });
   },

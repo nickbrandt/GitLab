@@ -18,6 +18,7 @@ class Milestone < ApplicationRecord
 
   has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
+  scope :active, -> { with_state(:active) }
   scope :started, -> { active.where('milestones.start_date <= CURRENT_DATE') }
   scope :not_started, -> { active.where('milestones.start_date > CURRENT_DATE') }
   scope :not_upcoming, -> do
@@ -169,6 +170,14 @@ class Milestone < ApplicationRecord
   # https://gitlab.com/gitlab-org/gitlab/-/issues/215690
   alias_method :group_milestone?, :group_timebox?
   alias_method :project_milestone?, :project_timebox?
+
+  def parent
+    if group_milestone?
+      group
+    else
+      project
+    end
+  end
 
   private
 

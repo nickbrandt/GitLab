@@ -94,7 +94,7 @@ describe('Roadmap Vuex Actions', () => {
         },
         state,
         [
-          { type: types.UPDATE_EPIC_IDS, payload: mockRawEpic.id },
+          { type: types.UPDATE_EPIC_IDS, payload: [mockRawEpic.id] },
           {
             type: types.RECEIVE_EPICS_SUCCESS,
             payload: [
@@ -149,7 +149,7 @@ describe('Roadmap Vuex Actions', () => {
         },
         state,
         [
-          { type: types.UPDATE_EPIC_IDS, payload: mockRawEpic.id },
+          { type: types.UPDATE_EPIC_IDS, payload: [mockRawEpic.id] },
           {
             type: types.RECEIVE_EPICS_FOR_TIMEFRAME_SUCCESS,
             payload: [{ ...mockFormattedEpic, newEpic: true }],

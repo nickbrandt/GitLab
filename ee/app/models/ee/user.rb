@@ -227,33 +227,33 @@ module EE
       super || DEFAULT_GROUP_VIEW
     end
 
-    def any_namespace_with_trial?
-      ::Namespace
-        .from("(#{namespace_union_for_owned(:trial_ends_on)}) #{::Namespace.table_name}")
-        .where('trial_ends_on > ?', Time.now.utc)
-        .any?
-    end
-
+    # Returns true if the user is a Reporter or higher on any namespace
+    # that has never had a trial (now or in the past)
     def any_namespace_without_trial?
       ::Namespace
-        .from("(#{namespace_union_for_owned(:trial_ends_on)}) #{::Namespace.table_name}")
-        .where(trial_ends_on: nil)
+        .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
+        .include_gitlab_subscription
+        .where(gitlab_subscriptions: { trial_ends_on: nil })
         .any?
     end
 
+    # Returns true if the user is a Reporter or higher on any namespace
+    # currently on a paid plan
     def has_paid_namespace?
       ::Namespace
         .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
         .include_gitlab_subscription
-        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: Plan::PAID_HOSTED_PLANS) })
+        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: ::Plan::PAID_HOSTED_PLANS) })
         .any?
     end
 
-    def owns_paid_namespace?
+    # Returns true if the user is an Owner on any namespace currently on
+    # a paid plan
+    def owns_paid_namespace?(plans: ::Plan::PAID_HOSTED_PLANS)
       ::Namespace
         .from("(#{namespace_union_for_owned}) #{::Namespace.table_name}")
         .include_gitlab_subscription
-        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: Plan::PAID_HOSTED_PLANS) })
+        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: plans) })
         .any?
     end
 
@@ -348,19 +348,20 @@ module EE
     def gitlab_employee?
       strong_memoize(:gitlab_employee) do
         if ::Gitlab.com? && ::Feature.enabled?(:gitlab_employee_badge)
-          confirmed? && human? && Mail::Address.new(email).domain == "gitlab.com"
+          human? && ::Gitlab::Com.gitlab_com_group_member_id?(id)
         else
           false
         end
       end
     end
 
-    def organization
-      gitlab_employee? ? 'GitLab' : super
-    end
-
     def security_dashboard
       InstanceSecurityDashboard.new(self)
+    end
+
+    def owns_upgradeable_namespace?
+      !owns_paid_namespace?(plans: [::Plan::GOLD]) &&
+        owns_paid_namespace?(plans: [::Plan::BRONZE, ::Plan::SILVER])
     end
 
     protected

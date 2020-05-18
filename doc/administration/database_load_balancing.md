@@ -26,9 +26,9 @@ sent to the primary (unless necessary), the primary (`db3`) hardly has any load.
 
 ## Requirements
 
-For load balancing to work you will need at least PostgreSQL 9.2 or newer,
+For load balancing to work you will need at least PostgreSQL 11 or newer,
 [**MySQL is not supported**](../install/requirements.md#database). You also need to make sure that you have
-at least 1 secondary in [hot standby](https://www.postgresql.org/docs/9.6/hot-standby.html) mode.
+at least 1 secondary in [hot standby](https://www.postgresql.org/docs/11/hot-standby.html) mode.
 
 Load balancing also requires that the configured hosts **always** point to the
 primary, even after a database failover. Furthermore, the additional hosts to
@@ -166,6 +166,10 @@ queried over UDP. To overcome this issue, you can use TCP for querying by settin
 `use_tcp` to `true`.
 
 ### Forking
+
+NOTE: **Note:**
+Starting with GitLab 13.0, Puma is the default web server used in GitLab
+all-in-one package based installations as well as GitLab Helm chart deployments.
 
 If you use an application server that forks, such as Unicorn, you _have to_
 update your Unicorn configuration to start service discovery _after_ a fork.

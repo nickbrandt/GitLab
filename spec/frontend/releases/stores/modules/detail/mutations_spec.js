@@ -20,8 +20,7 @@ describe('Release detail mutations', () => {
     release = convertObjectPropsToCamelCase(originalRelease);
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.REQUEST_RELEASE, () => {
+  describe(`${types.REQUEST_RELEASE}`, () => {
     it('set state.isFetchingRelease to true', () => {
       mutations[types.REQUEST_RELEASE](state);
 
@@ -29,8 +28,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.RECEIVE_RELEASE_SUCCESS, () => {
+  describe(`${types.RECEIVE_RELEASE_SUCCESS}`, () => {
     it('handles a successful response from the server', () => {
       mutations[types.RECEIVE_RELEASE_SUCCESS](state, release);
 
@@ -44,8 +42,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.RECEIVE_RELEASE_ERROR, () => {
+  describe(`${types.RECEIVE_RELEASE_ERROR}`, () => {
     it('handles an unsuccessful response from the server', () => {
       const error = { message: 'An error occurred!' };
       mutations[types.RECEIVE_RELEASE_ERROR](state, error);
@@ -58,8 +55,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.UPDATE_RELEASE_TITLE, () => {
+  describe(`${types.UPDATE_RELEASE_TITLE}`, () => {
     it("updates the release's title", () => {
       state.release = release;
       const newTitle = 'The new release title';
@@ -69,8 +65,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.UPDATE_RELEASE_NOTES, () => {
+  describe(`${types.UPDATE_RELEASE_NOTES}`, () => {
     it("updates the release's notes", () => {
       state.release = release;
       const newNotes = 'The new release notes';
@@ -80,8 +75,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.REQUEST_UPDATE_RELEASE, () => {
+  describe(`${types.REQUEST_UPDATE_RELEASE}`, () => {
     it('set state.isUpdatingRelease to true', () => {
       mutations[types.REQUEST_UPDATE_RELEASE](state);
 
@@ -89,8 +83,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.RECEIVE_UPDATE_RELEASE_SUCCESS, () => {
+  describe(`${types.RECEIVE_UPDATE_RELEASE_SUCCESS}`, () => {
     it('handles a successful response from the server', () => {
       mutations[types.RECEIVE_UPDATE_RELEASE_SUCCESS](state, release);
 
@@ -100,8 +93,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.RECEIVE_UPDATE_RELEASE_ERROR, () => {
+  describe(`${types.RECEIVE_UPDATE_RELEASE_ERROR}`, () => {
     it('handles an unsuccessful response from the server', () => {
       const error = { message: 'An error occurred!' };
       mutations[types.RECEIVE_UPDATE_RELEASE_ERROR](state, error);
@@ -112,8 +104,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.ADD_EMPTY_ASSET_LINK, () => {
+  describe(`${types.ADD_EMPTY_ASSET_LINK}`, () => {
     it('adds a new, empty link object to the release', () => {
       state.release = release;
 
@@ -132,8 +123,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.UPDATE_ASSET_LINK_URL, () => {
+  describe(`${types.UPDATE_ASSET_LINK_URL}`, () => {
     it('updates an asset link with a new URL', () => {
       state.release = release;
 
@@ -148,8 +138,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.UPDATE_ASSET_LINK_NAME, () => {
+  describe(`${types.UPDATE_ASSET_LINK_NAME}`, () => {
     it('updates an asset link with a new name', () => {
       state.release = release;
 
@@ -164,8 +153,7 @@ describe('Release detail mutations', () => {
     });
   });
 
-  // eslint-disable-next-line jest/valid-describe
-  describe(types.REMOVE_ASSET_LINK, () => {
+  describe(`${types.REMOVE_ASSET_LINK}`, () => {
     it('removes an asset link from the release', () => {
       state.release = release;
 

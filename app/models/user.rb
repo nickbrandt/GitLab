@@ -58,6 +58,10 @@ class User < ApplicationRecord
   devise :lockable, :recoverable, :rememberable, :trackable,
          :validatable, :omniauthable, :confirmable, :registerable
 
+  # This module adds async behaviour to Devise emails
+  # and should be added after Devise modules are initialized.
+  include AsyncDeviseEmail
+
   BLOCKED_MESSAGE = "Your account has been blocked. Please contact your GitLab " \
                     "administrator if you think this is an error."
   LOGIN_FORBIDDEN = "Your account does not have the required permission to login. Please contact your GitLab " \
@@ -65,8 +69,7 @@ class User < ApplicationRecord
 
   MINIMUM_INACTIVE_DAYS = 180
 
-  ignore_column :bot_type, remove_with: '12.11', remove_after: '2020-04-22'
-
+  ignore_column :bot_type, remove_with: '13.1', remove_after: '2020-05-22'
   ignore_column :ghost, remove_with: '13.2', remove_after: '2020-06-22'
 
   # Override Devise::Models::Trackable#update_tracked_fields!
@@ -88,6 +91,9 @@ class User < ApplicationRecord
 
   # Virtual attribute for authenticating by either username or email
   attr_accessor :login
+
+  # Virtual attribute for impersonator
+  attr_accessor :impersonator
 
   #
   # Relations
@@ -249,15 +255,12 @@ class User < ApplicationRecord
   enum layout: { fixed: 0, fluid: 1 }
 
   # User's Dashboard preference
-  # Note: When adding an option, it MUST go on the end of the array.
   enum dashboard: { projects: 0, stars: 1, project_activity: 2, starred_project_activity: 3, groups: 4, todos: 5, issues: 6, merge_requests: 7, operations: 8 }
 
   # User's Project preference
-  # Note: When adding an option, it MUST go on the end of the array.
   enum project_view: { readme: 0, activity: 1, files: 2 }
 
   # User's role
-  # Note: When adding an option, it MUST go on the end of the array.
   enum role: { software_developer: 0, development_team_lead: 1, devops_engineer: 2, systems_administrator: 3, security_analyst: 4, data_analyst: 5, product_manager: 6, product_designer: 7, other: 8 }, _suffix: true
 
   delegate :path, to: :namespace, allow_nil: true, prefix: true
@@ -1687,6 +1690,10 @@ class User < ApplicationRecord
     !confirmed? && !confirmation_period_valid?
   end
 
+  def impersonated?
+    impersonator.present?
+  end
+
   protected
 
   # override, from Devise::Validatable
@@ -1741,13 +1748,6 @@ class User < ApplicationRecord
     # user is an admin and the only user in the instance, this shouldn't
     # cause too much load on the system.
     ApplicationSetting.current_without_cache&.usage_stats_set_by_user_id == self.id
-  end
-
-  # Added according to https://github.com/plataformatec/devise/blob/7df57d5081f9884849ca15e4fde179ef164a575f/README.md#activejob-integration
-  def send_devise_notification(notification, *args)
-    return true unless can?(:receive_notifications)
-
-    devise_mailer.__send__(notification, self, *args).deliver_later # rubocop:disable GitlabSecurity/PublicSend
   end
 
   def ensure_user_rights_and_limits

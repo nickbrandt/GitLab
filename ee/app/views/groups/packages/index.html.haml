@@ -2,7 +2,4 @@
 
 .row
   .col-12
-    #js-vue-packages-list{ data: { resource_id: @group.id,
-      page_type: 'groups',
-      empty_list_help_url: help_page_path('administration/packages/index'),
-      empty_list_illustration: image_path('illustrations/no-packages.svg') } }
+    #js-vue-packages-list{ data: packages_list_data('groups', @group) }

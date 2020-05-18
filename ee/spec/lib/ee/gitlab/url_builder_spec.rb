@@ -9,7 +9,6 @@ describe Gitlab::UrlBuilder do
     using RSpec::Parameterized::TableSyntax
 
     where(:factory, :path_generator) do
-      :design                | ->(design)        { "/#{design.project.full_path}/-/design_management/designs/#{design.id}/raw_image" }
       :epic                  | ->(epic)          { "/groups/#{epic.group.full_path}/-/epics/#{epic.iid}" }
       :vulnerability         | ->(vulnerability) { "/#{vulnerability.project.full_path}/-/security/vulnerabilities/#{vulnerability.id}" }
 
@@ -29,16 +28,6 @@ describe Gitlab::UrlBuilder do
 
       it 'returns only the path if only_path is set' do
         expect(subject.build(object, only_path: true)).to eq(path)
-      end
-    end
-
-    context 'when passing a DesignManagement::Design' do
-      let(:design) { build_stubbed(:design) }
-
-      it 'uses the given ref and size in the URL' do
-        url = subject.build(design, ref: 'feature', size: 'small')
-
-        expect(url).to eq "#{Settings.gitlab['url']}/#{design.project.full_path}/-/design_management/designs/#{design.id}/feature/resized_image/small"
       end
     end
   end

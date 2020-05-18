@@ -90,7 +90,7 @@ module EE
       @details = {
         failed_login: auth.upcase,
         author_name: @author.name,
-        target_details: @author,
+        target_details: @author.name,
         ip_address: ip
       }
 
@@ -127,6 +127,7 @@ module EE
     def prepare_security_event
       if admin_audit_log_enabled?
         add_security_event_admin_details!
+        add_impersonation_details!
       end
     end
 
@@ -264,8 +265,16 @@ module EE
     end
 
     def add_security_event_admin_details!
-      @details.merge!(ip_address: ip_address,
-                      entity_path: @entity.full_path)
+      @details.merge!(
+        ip_address: ip_address,
+        entity_path: @entity.full_path
+      )
+    end
+
+    def add_impersonation_details!
+      if @author.is_a?(::Gitlab::Audit::ImpersonatedAuthor)
+        @details.merge!(impersonated_by: @author.impersonated_by)
+      end
     end
 
     def custom_project_link_group_attributes(group_link)

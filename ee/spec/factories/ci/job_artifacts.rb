@@ -140,6 +140,8 @@ FactoryBot.define do
     end
 
     trait :license_management do
+      to_create { |instance| instance.save(validate: false) }
+
       file_type { :license_management }
       file_format { :raw }
 
@@ -256,16 +258,6 @@ FactoryBot.define do
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
           Rails.root.join('spec/fixtures/trace/sample_trace'), 'application/json')
-      end
-    end
-
-    trait :deprecated_container_scanning_report do
-      file_format { :raw }
-      file_type { :container_scanning }
-
-      after(:build) do |artifact, _|
-        artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-container-scanning-report.json'), 'text/plain')
       end
     end
 

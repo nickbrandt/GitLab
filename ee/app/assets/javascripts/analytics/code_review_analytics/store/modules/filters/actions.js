@@ -39,8 +39,11 @@ export const fetchLabels = ({ commit, state }) => {
     });
 };
 
-export const setFilters = ({ commit, dispatch }, { label_name, milestone_title }) => {
-  commit(types.SET_FILTERS, { selectedLabels: label_name, selectedMilestone: milestone_title });
+export const setFilters = ({ commit, dispatch }, { labelNames, milestoneTitle }) => {
+  commit(types.SET_FILTERS, {
+    selectedLabels: labelNames,
+    selectedMilestone: milestoneTitle,
+  });
 
   dispatch('mergeRequests/setPage', 1, { root: true });
   dispatch('mergeRequests/fetchMergeRequests', null, { root: true });

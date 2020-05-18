@@ -20,6 +20,10 @@ module ComplianceManagement
         compliance_framework_color_values.fetch(framework.to_sym)
       end
 
+      def compliance_framework_tooltip(framework)
+        compliance_framework_tooltip_values.fetch(framework.to_sym)
+      end
+
       private
 
       def compliance_framework_option_values
@@ -50,6 +54,15 @@ module ComplianceManagement
           soc_2: 'gl-bg-red-500',
           sox: 'gl-bg-orange-500'
         }.freeze
+      end
+
+      def compliance_framework_tooltip_values
+        @compliance_framework_tooltip_values ||=
+          compliance_framework_title_values.map { |k, v| [k, get_compliance_framework_tooltip(v)] }.to_h
+      end
+
+      def get_compliance_framework_tooltip(framework)
+        s_("ComplianceFramework|This project is regulated by %{framework}." % { framework: framework })
       end
     end
   end

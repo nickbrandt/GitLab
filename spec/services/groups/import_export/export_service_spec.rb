@@ -49,6 +49,12 @@ describe Groups::ImportExport::ExportService do
       FileUtils.rm_rf(archive_path)
     end
 
+    it 'saves the version' do
+      expect(Gitlab::ImportExport::VersionSaver).to receive(:new).and_call_original
+
+      service.execute
+    end
+
     it 'saves the models using ndjson tree saver' do
       stub_feature_flags(group_export_ndjson: true)
 
@@ -61,6 +67,14 @@ describe Groups::ImportExport::ExportService do
       stub_feature_flags(group_export_ndjson: false)
 
       expect(Gitlab::ImportExport::Group::LegacyTreeSaver).to receive(:new).and_call_original
+
+      service.execute
+    end
+
+    it 'notifies the user' do
+      expect_next_instance_of(NotificationService) do |instance|
+        expect(instance).to receive(:group_was_exported)
+      end
 
       service.execute
     end
@@ -108,15 +122,25 @@ describe Groups::ImportExport::ExportService do
 
     context 'when export fails' do
       context 'when file saver fails' do
-        it 'removes the remaining exported data' do
+        before do
           allow_next_instance_of(Gitlab::ImportExport::Saver) do |saver|
             allow(saver).to receive(:save).and_return(false)
           end
+        end
 
+        it 'removes the remaining exported data' do
           expect { service.execute }.to raise_error(Gitlab::ImportExport::Error)
 
           expect(group.import_export_upload).to be_nil
           expect(File.exist?(shared.archive_path)).to eq(false)
+        end
+
+        it 'notifies the user about failed group export' do
+          expect_next_instance_of(NotificationService) do |instance|
+            expect(instance).to receive(:group_was_not_exported)
+          end
+
+          expect { service.execute }.to raise_error(Gitlab::ImportExport::Error)
         end
       end
 

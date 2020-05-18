@@ -118,7 +118,7 @@ export default {
         ability-name="issue"
         @onLabelClick="handleLabelClick"
       >
-        {{ __('Any Label') }}
+        {{ __('Any label') }}
       </board-labels-select>
 
       <assignee-select

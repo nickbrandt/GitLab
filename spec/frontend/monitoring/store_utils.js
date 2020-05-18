@@ -1,5 +1,5 @@
 import * as types from '~/monitoring/stores/mutation_types';
-import { metricsResult, environmentData } from './mock_data';
+import { metricsResult, environmentData, dashboardGitResponse } from './mock_data';
 import { metricsDashboardPayload } from './fixture_data';
 
 export const setMetricResult = ({ $store, result, group = 0, panel = 0, metric = 0 }) => {
@@ -16,14 +16,29 @@ const setEnvironmentData = $store => {
   $store.commit(`monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`, environmentData);
 };
 
+export const setupAllDashboards = $store => {
+  $store.commit(`monitoringDashboard/${types.SET_ALL_DASHBOARDS}`, dashboardGitResponse);
+};
+
 export const setupStoreWithDashboard = $store => {
+  $store.commit(
+    `monitoringDashboard/${types.RECEIVE_METRICS_DASHBOARD_SUCCESS}`,
+    metricsDashboardPayload,
+  );
   $store.commit(
     `monitoringDashboard/${types.RECEIVE_METRICS_DASHBOARD_SUCCESS}`,
     metricsDashboardPayload,
   );
 };
 
+export const setupStoreWithVariable = $store => {
+  $store.commit(`monitoringDashboard/${types.SET_VARIABLES}`, {
+    label1: 'pod',
+  });
+};
+
 export const setupStoreWithData = $store => {
+  setupAllDashboards($store);
   setupStoreWithDashboard($store);
 
   setMetricResult({ $store, result: [], panel: 0 });

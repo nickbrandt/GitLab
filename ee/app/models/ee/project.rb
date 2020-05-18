@@ -10,14 +10,12 @@ module EE
     extend ::Gitlab::Utils::Override
     extend ::Gitlab::Cache::RequestCache
     include ::Gitlab::Utils::StrongMemoize
-    include ::EE::GitlabRoutingHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
     include IgnorableColumns
 
     GIT_LFS_DOWNLOAD_OPERATION = 'download'.freeze
 
     prepended do
       include Elastic::ProjectsSearch
-      include EE::DeploymentPlatform # rubocop: disable Cop/InjectEnterpriseEditionModule
       include EachBatch
       include InsightsFeature
       include DeprecatedApprovalsBeforeMerge
@@ -40,7 +38,6 @@ module EE
       has_one :index_status
 
       has_one :jenkins_service
-      has_one :jenkins_deprecated_service
       has_one :github_service
       has_one :gitlab_slack_application_service
 
@@ -148,7 +145,7 @@ module EE
       scope :aimed_for_deletion, -> (date) { where('marked_for_deletion_at <= ?', date).without_deleted }
       scope :with_repos_templates, -> { where(namespace_id: ::Gitlab::CurrentSettings.current_application_settings.custom_project_templates_group_id) }
       scope :with_groups_level_repos_templates, -> { joins("INNER JOIN namespaces ON projects.namespace_id = namespaces.custom_project_templates_group_id") }
-      scope :with_designs, -> { where(id: DesignManagement::Design.select(:project_id)) }
+      scope :with_designs, -> { where(id: ::DesignManagement::Design.select(:project_id)) }
       scope :with_deleting_user, -> { includes(:deleting_user) }
       scope :with_compliance_framework_settings, -> { preload(:compliance_framework_setting) }
       scope :has_vulnerabilities, -> { joins(:vulnerabilities).group(:id) }
@@ -168,7 +165,7 @@ module EE
 
       delegate :merge_pipelines_enabled, :merge_pipelines_enabled=, :merge_pipelines_enabled?, :merge_pipelines_were_disabled?, to: :ci_cd_settings
       delegate :merge_trains_enabled?, to: :ci_cd_settings
-      delegate :gitlab_subscription, to: :namespace
+      delegate :closest_gitlab_subscription, to: :namespace
 
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
@@ -303,8 +300,7 @@ module EE
     #   it. This is the case when we're ready to enable a feature for anyone
     #   with the correct license.
     def beta_feature_available?(feature)
-      ::Feature.enabled?(feature, self) ||
-        (::Feature.enabled?(feature) && feature_available?(feature))
+      ::Feature.enabled?(feature) ? feature_available?(feature) : ::Feature.enabled?(feature, self)
     end
     alias_method :alpha_feature_available?, :beta_feature_available?
 
@@ -548,7 +544,7 @@ module EE
     def disabled_services
       strong_memoize(:disabled_services) do
         [].tap do |services|
-          services.push('jenkins', 'jenkins_deprecated') unless feature_available?(:jenkins_integration)
+          services.push('jenkins') unless feature_available?(:jenkins_integration)
           services.push('github') unless feature_available?(:github_project_service_integration)
           ::Gitlab::CurrentSettings.slack_app_enabled ? services.push('slack_slash_commands') : services.push('gitlab_slack_application')
         end
@@ -596,6 +592,10 @@ module EE
       repository.log_geo_updated_event
       wiki.repository.log_geo_updated_event
       design_repository.log_geo_updated_event
+
+      # Index the wiki repository after import of non-forked projects only, the project repository is indexed
+      # in ProjectImportState so ElasticSearch will get project repository changes when mirrors are updated
+      ElasticCommitIndexerWorker.perform_async(id, nil, nil, true) if use_elasticsearch? && !forked?
     end
 
     override :import?
@@ -687,31 +687,6 @@ module EE
       packages.where(package_type: package_type).exists?
     end
 
-    def disable_overriding_approvers_per_merge_request
-      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
-
-      ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? ||
-        super
-    end
-    alias_method :disable_overriding_approvers_per_merge_request?, :disable_overriding_approvers_per_merge_request
-
-    def merge_requests_author_approval
-      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
-
-      return false if ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
-
-      super
-    end
-    alias_method :merge_requests_author_approval?, :merge_requests_author_approval
-
-    def merge_requests_disable_committers_approval
-      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
-
-      ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? ||
-        super
-    end
-    alias_method :merge_requests_disable_committers_approval?, :merge_requests_disable_committers_approval
-
     def license_compliance
       strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
     end
@@ -782,3 +757,6 @@ module EE
     end
   end
 end
+
+EE::Project.include_if_ee('::EE::GitlabRoutingHelper')
+EE::Project.include_if_ee('::EE::DeploymentPlatform')

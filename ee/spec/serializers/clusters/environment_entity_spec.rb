@@ -18,41 +18,53 @@ describe Clusters::EnvironmentEntity do
 
     subject { described_class.new(environment, request: request).as_json }
 
-    before do
-      group.add_maintainer(user)
-    end
-
-    context 'deploy board available' do
+    context 'with maintainer access' do
       before do
-        allow(group).to receive(:feature_available?).and_call_original
-        allow(group).to receive(:feature_available?).with(:cluster_deployments).and_return(true)
+        group.add_maintainer(user)
       end
 
-      it 'matches expected schema' do
-        expect(subject.with_indifferent_access).to match_schema('clusters/environment', dir: 'ee')
+      context 'deploy board available' do
+        before do
+          allow(group).to receive(:feature_available?).and_call_original
+          allow(group).to receive(:feature_available?).with(:cluster_deployments).and_return(true)
+        end
+
+        it 'matches expected schema' do
+          expect(subject.with_indifferent_access).to match_schema('clusters/environment', dir: 'ee')
+        end
+
+        it 'exposes rollout_status' do
+          expect(subject).to include(:rollout_status)
+        end
       end
 
-      it 'exposes rollout_status' do
-        expect(subject).to include(:rollout_status)
+      context 'deploy board not available' do
+        before do
+          allow(group).to receive(:feature_available?).with(:cluster_deployments).and_return(false)
+        end
+
+        it 'matches expected schema' do
+          expect(subject.with_indifferent_access).to match_schema('clusters/environment', dir: 'ee')
+        end
+
+        it 'does not expose rollout_status' do
+          expect(subject).not_to include(:rollout_status)
+        end
+      end
+
+      it 'exposes logs_path' do
+        expect(subject).to include(:logs_path)
       end
     end
 
-    context 'deploy board not available' do
+    context 'with developer access' do
       before do
-        allow(group).to receive(:feature_available?).with(:cluster_deployments).and_return(false)
+        group.add_developer(user)
       end
 
-      it 'matches expected schema' do
-        expect(subject.with_indifferent_access).to match_schema('clusters/environment', dir: 'ee')
+      it 'does not expose logs_path' do
+        expect(subject).not_to include(:logs_path)
       end
-
-      it 'does not expose rollout_status' do
-        expect(subject).not_to include(:rollout_status)
-      end
-    end
-
-    it 'exposes logs_path' do
-      expect(subject).to include(:logs_path)
     end
   end
 end

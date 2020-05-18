@@ -19,7 +19,7 @@ as the hardware requirements that are needed to install and use GitLab.
 - Scientific Linux (please use the CentOS packages and instructions)
 - Oracle Linux (please use the CentOS packages and instructions)
 
-For the installations options, see [the main installation page](README.md).
+For the installation options, see [the main installation page](README.md).
 
 ### Unsupported Linux distributions and Unix-like operating systems
 
@@ -68,9 +68,13 @@ GitLab uses [webpack](https://webpack.js.org/) to compile frontend assets, which
 version of Node.js 10.13.0.
 
 You can check which version you are running with `node -v`. If you are running
-a version older than `v10.13.0`, you need to update to a newer version. You
+a version older than `v10.13.0`, you need to update it to a newer version. You
 can find instructions to install from community maintained packages or compile
 from source at the [Node.js website](https://nodejs.org/en/download/).
+
+## Redis versions
+
+GitLab requires Redis 5.0+. Beginning in GitLab 13.0, lower versions are not supported.
 
 ## Hardware requirements
 
@@ -122,7 +126,7 @@ available when needed.
 
 Our [Memory Team](https://about.gitlab.com/handbook/engineering/development/enablement/memory/) is actively working to reduce the memory requirement.
 
-NOTE: **Note:** The 25 workers of Sidekiq will show up as separate processes in your process overview (such as `top` or `htop`) but they share the same RAM allocation since Sidekiq is a multithreaded application. Please see the section below about Unicorn workers for information about how many you need of those.
+NOTE: **Note:** The 25 workers of Sidekiq will show up as separate processes in your process overview (such as `top` or `htop`) but they share the same RAM allocation since Sidekiq is a multithreaded application. Please see the section below about Unicorn workers for information about how many you need for those.
 
 ## Database
 
@@ -139,9 +143,12 @@ MySQL/MariaDB are advised to [migrate to PostgreSQL](../update/mysql_to_postgres
 
 ### PostgreSQL Requirements
 
-As of GitLab 10.0, PostgreSQL 9.6 or newer is required, and earlier versions are
-not supported. We highly recommend users to use PostgreSQL 9.6 as this
-is the PostgreSQL version used for development and testing.
+We highly recommend users to use the minimum PostgreSQL versions specified below as these are the versions used for development and testing.
+
+GitLab version | Minimum PostgreSQL version
+-|-
+10.0 | 9.6
+12.10 | 11
 
 Users using PostgreSQL must ensure the `pg_trgm` extension is loaded into every
 GitLab database. This extension can be enabled (using a PostgreSQL super user)
@@ -167,7 +174,7 @@ If you are using [GitLab Geo](../development/geo.md):
 - The
   [tracking database](../development/geo.md#using-the-tracking-database)
   requires the
-  [postgres_fdw](https://www.postgresql.org/docs/9.6/postgres-fdw.html)
+  [postgres_fdw](https://www.postgresql.org/docs/11/postgres-fdw.html)
   extension.
 
 ```sql

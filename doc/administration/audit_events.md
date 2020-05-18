@@ -34,6 +34,12 @@ There are two kinds of events logged:
 - Instance events scoped to the whole GitLab instance, used by your Compliance team to
   perform formal audits.
 
+### Impersonation data **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/536) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.0.
+
+Impersonation is where an administrator uses credentials to perform an action as a different user.
+
 ### Group events **(STARTER)**
 
 NOTE: **Note:**
@@ -50,6 +56,7 @@ From there, you can see the following actions:
 - User sign-in via [Group SAML](../user/group/saml_sso/index.md)
 - Permissions changes of a user assigned to a group
 - Removed user from group
+- Project imported in to group
 - Project added to group and with which visibility level
 - Project removed from group
 - [Project shared with group](../user/project/members/share_project_with_groups.md)

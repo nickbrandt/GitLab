@@ -30,9 +30,11 @@ describe Gitlab::Middleware::Multipart do
       RSpec.shared_examples 'not allowing the multipart upload when package upload path is used' do
         it 'does not allow files to be uploaded' do
           with_tmp_dir('tmp/uploads', storage_path) do |dir, env|
-            # with_tmp_dir set the same workhorse_upload_path for all Uploaders,
-            # so we have to prevent JobArtifactUploader to allow the tested path
+            # with_tmp_dir sets the same workhorse_upload_path for all Uploaders,
+            # so we have to prevent JobArtifactUploader and LfsObjectUploader to
+            # allow the tested path
             allow(JobArtifactUploader).to receive(:workhorse_upload_path).and_return(Dir.tmpdir)
+            allow(LfsObjectUploader).to receive(:workhorse_upload_path).and_return(Dir.tmpdir)
 
             status, headers, body = middleware.call(env)
 

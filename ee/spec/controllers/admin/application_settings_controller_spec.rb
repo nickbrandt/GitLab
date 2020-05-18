@@ -157,7 +157,27 @@ describe Admin::ApplicationSettingsController do
       end
       let(:feature) { :admin_merge_request_approvers_rules }
 
-      it_behaves_like 'settings for licensed features'
+      context 'when feature flag is enabled' do
+        before do
+          stub_feature_flags(admin_merge_request_approvals_settings: true)
+        end
+
+        it_behaves_like 'settings for licensed features'
+      end
+
+      context 'when feature flag is disabled' do
+        before do
+          stub_licensed_features(feature => true)
+          stub_feature_flags(admin_merge_request_approvals_settings: false)
+        end
+
+        it 'does not update settings' do
+          attribute_names = settings.keys.map(&:to_s)
+
+          expect { put :update, params: { application_setting: settings } }
+            .not_to change { ApplicationSetting.current.reload.attributes.slice(*attribute_names) }
+        end
+      end
     end
 
     context 'required instance ci template' do
@@ -224,22 +244,6 @@ describe Admin::ApplicationSettingsController do
         end
       end
     end
-
-    describe 'GET #geo_redirection' do
-      subject { get :geo_redirection }
-
-      it 'redirects the user to the admin_geo_settings_url' do
-        subject
-
-        expect(response).to redirect_to(admin_geo_settings_url)
-      end
-
-      it 'fires a notice about the redirection' do
-        subject
-
-        expect(response).to set_flash[:notice]
-      end
-    end
   end
 
   describe 'GET #seat_link_payload' do
@@ -256,7 +260,7 @@ describe Admin::ApplicationSettingsController do
     end
 
     context 'when an admin user attempts a request' do
-      let_it_be(:yesterday) { Time.now.utc.yesterday.to_date }
+      let_it_be(:yesterday) { Time.current.utc.yesterday.to_date }
       let_it_be(:max_count) { 15 }
       let_it_be(:current_count) { 10 }
 

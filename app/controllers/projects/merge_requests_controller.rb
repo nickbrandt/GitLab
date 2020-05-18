@@ -14,7 +14,13 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   skip_before_action :merge_request, only: [:index, :bulk_update]
   before_action :whitelist_query_limiting, only: [:assign_related_issues, :update]
   before_action :authorize_update_issuable!, only: [:close, :edit, :update, :remove_wip, :sort]
-  before_action :authorize_read_actual_head_pipeline!, only: [:test_reports, :exposed_artifacts, :coverage_reports, :terraform_reports]
+  before_action :authorize_read_actual_head_pipeline!, only: [
+    :test_reports,
+    :exposed_artifacts,
+    :coverage_reports,
+    :terraform_reports,
+    :accessibility_reports
+  ]
   before_action :set_issuables_index, only: [:index]
   before_action :authenticate_user!, only: [:assign_related_issues]
   before_action :check_user_can_push_to_source_branch!, only: [:rebase]
@@ -26,8 +32,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     push_frontend_feature_flag(:code_navigation, @project)
     push_frontend_feature_flag(:widget_visibility_polling, @project, default_enabled: true)
     push_frontend_feature_flag(:merge_ref_head_comments, @project)
-    push_frontend_feature_flag(:diff_compare_with_head, @project)
-    push_frontend_feature_flag(:accessibility_merge_request_widget, @project)
+    push_frontend_feature_flag(:mr_commit_neighbor_nav, @project, default_enabled: true)
   end
 
   before_action do
@@ -135,6 +140,14 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   def test_reports
     reports_response(@merge_request.compare_test_reports)
+  end
+
+  def accessibility_reports
+    if @merge_request.has_accessibility_reports?
+      reports_response(@merge_request.compare_accessibility_reports)
+    else
+      head :no_content
+    end
   end
 
   def coverage_reports

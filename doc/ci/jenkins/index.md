@@ -13,6 +13,10 @@ First of all, our [Quick Start Guide](../quick_start/README.md) contains a good 
 You may also be interested in [Auto DevOps](../../topics/autodevops/index.md) which can potentially be used to build, test,
 and deploy your applications with little to no configuration needed at all.
 
+For an example of how to convert a Jenkins pipeline into a GitLab CI/CD pipeline,
+or how to use Auto DevOps to test your code automatically, watch the
+[Migrating from Jenkins to GitLab](https://www.youtube.com/watch?v=RlEVGOpYF5Y) video.
+
 For advanced CI/CD teams, [templates](#templates) can enable the reuse of pipeline configurations.
 
 Otherwise, read on for important information that will help you get the ball rolling. Welcome
@@ -39,6 +43,15 @@ things we have found that helps this:
   as-is, including any current problems, will not be enough. You need to take advantage
   of the improvements that GitLab offers, and this requires (eventually) updating
   your implementation as part of the transition.
+
+## JenkinsFile Wrapper
+
+We are building a [JenkinsFile Wrapper](https://gitlab.com/gitlab-org/jfr-container-builder/) which will allow
+you to run a complete Jenkins instance inside of a GitLab job, including plugins. This can help ease the process
+of transition, by letting you delay the migration of less urgent pipelines for a period of time.
+
+If you are interested, join our [public testing issue](https://gitlab.com/gitlab-org/gitlab/-/issues/215675) to
+If you are interested, you might be able to [help GitLab test the wrapper](https://gitlab.com/gitlab-org/gitlab/-/issues/215675).
 
 ## Important product differences
 

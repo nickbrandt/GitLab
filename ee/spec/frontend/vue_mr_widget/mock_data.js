@@ -113,7 +113,7 @@ export const headPerformance = [
     subject: '/some/other/path',
     metrics: [
       {
-        name: 'Sitespeed Score',
+        name: 'Total Score',
         value: 79,
         desiredSize: 'larger',
       },
@@ -149,7 +149,7 @@ export const basePerformance = [
     subject: '/some/other/path',
     metrics: [
       {
-        name: 'Sitespeed Score',
+        name: 'Total Score',
         value: 80,
         desiredSize: 'larger',
       },

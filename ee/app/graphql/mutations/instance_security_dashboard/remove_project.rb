@@ -7,15 +7,15 @@ module Mutations
 
       authorize :read_instance_security_dashboard
 
-      argument :project_id, GraphQL::ID_TYPE,
+      argument :id, GraphQL::ID_TYPE,
                required: true,
                description: 'ID of the project to remove from the Instance Security Dashboard'
 
-      def resolve(project_id:)
+      def resolve(id:)
         dashboard = authorized_find!
         raise_resource_not_available_error! unless dashboard.feature_available?(:security_dashboard)
 
-        result = remove_project(extract_project_id(project_id))
+        result = remove_project(extract_project_id(id))
 
         {
           errors: result.zero? ? ['The project does not belong to your dashboard or you don\'t have permission to perform this action'] : []

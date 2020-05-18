@@ -53,6 +53,7 @@ describe IssuablesHelper do
     end
 
     describe '#gitlab_team_member_badge' do
+      let(:user) { create(:user) }
       let(:issue) { build(:issue, author: user) }
 
       before do
@@ -60,7 +61,7 @@ describe IssuablesHelper do
       end
 
       context 'when `:gitlab_employee_badge` feature flag is disabled' do
-        let(:user) { build(:user, email: 'test@gitlab.com') }
+        include_context 'gitlab team member'
 
         before do
           stub_feature_flags(gitlab_employee_badge: false)
@@ -72,15 +73,13 @@ describe IssuablesHelper do
       end
 
       context 'when issue author is not a GitLab team member' do
-        let(:user) { build(:user, email: 'test@example.com') }
-
         it 'returns nil' do
           expect(helper.gitlab_team_member_badge(issue.author)).to be_nil
         end
       end
 
       context 'when issue author is a GitLab team member' do
-        let(:user) { build(:user, email: 'test@gitlab.com') }
+        include_context 'gitlab team member'
 
         it 'returns span with svg icon' do
           expect(helper.gitlab_team_member_badge(issue.author)).to have_selector('span > svg')

@@ -5,6 +5,8 @@ module EE
     module ApplicationSettingsController
       extend ::Gitlab::Utils::Override
 
+      include ::Admin::PushRulesHelper
+
       EE_VALID_SETTING_PANELS = %w(templates).freeze
 
       EE_VALID_SETTING_PANELS.each do |action|
@@ -50,7 +52,7 @@ module EE
           attrs << :updating_name_disabled_for_users
         end
 
-        if License.feature_available?(:admin_merge_request_approvers_rules)
+        if show_merge_request_approvals_settings?
           attrs += EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes
         end
 
@@ -63,11 +65,6 @@ module EE
         end
 
         attrs
-      end
-
-      def geo_redirection
-        redirect_to admin_geo_settings_url, notice: 'You were automatically redirected to <strong>Admin Area > Geo > Settings</strong><br /> '\
-                                                    'From GitLab 13.0 on, this will be the only place for Geo settings and <strong>Admin Area > Settings > Geo</strong> will be removed.'.html_safe
       end
 
       def seat_link_payload

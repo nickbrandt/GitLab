@@ -35,6 +35,10 @@ module Operations
 
       accepts_nested_attributes_for :scopes, allow_destroy: true
 
+      def user_list_id=(user_list_id)
+        self.user_list = ::Operations::FeatureFlags::UserList.find(user_list_id)
+      end
+
       private
 
       def same_project_validation

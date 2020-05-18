@@ -7,7 +7,7 @@ module Gitlab
 
       def initialize(project:, insights_config:)
         @project = project
-        @insights_config = insights_config.deep_dup
+        @insights_config = insights_config_without_invalid_entries(insights_config.deep_dup)
       end
 
       def filtered_config
@@ -32,6 +32,11 @@ module Gitlab
 
       def includes_project?(project_ids_or_paths)
         project_ids_or_paths.any? { |item| item == project.id || item == project.full_path }
+      end
+
+      # filtering out leftover YAML anchor keys
+      def insights_config_without_invalid_entries(config)
+        config.reject { |_, page_config| page_config[:title].nil? && page_config[:charts].nil? }
       end
     end
   end

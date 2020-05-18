@@ -23,29 +23,27 @@ module Ci
         end
       end
 
+      def monthly_percent_used
+        return 0 unless namespace.shared_runners_minutes_limit_enabled?
+        return 0 if monthly_minutes.zero?
+
+        100 * monthly_minutes_used.to_i / monthly_minutes
+      end
+
       # Status of any purchased minutes used.
       def purchased_minutes_report
         status = purchased_minutes_used_up? ? :over_quota : :under_quota
         Report.new(purchased_minutes_used, purchased_minutes, status)
       end
 
-      private
-
-      # TODO: maps to NamespacesHelper#namespace_shared_runner_limits_percent_used
-      # TODO: consider including this into monthly_minutes_report
-      def monthly_percent_used
-        return 0 unless namespace.shared_runners_minutes_limit_enabled?
-
-        100 * monthly_minutes_used.to_i / monthly_minutes
-      end
-
-      # TODO: maps to NamespacesHelper#namespace_extra_shared_runner_limits_percent_used
-      # TODO: consider including this into purchased_minutes_report
       def purchased_percent_used
+        return 0 unless namespace.shared_runners_minutes_limit_enabled?
         return 0 if purchased_minutes.zero?
 
         100 * purchased_minutes_used.to_i / purchased_minutes
       end
+
+      private
 
       # TODO: maps to Namespace#shared_runners_minutes_used?
       def monthly_minutes_used_up?

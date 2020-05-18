@@ -7,6 +7,8 @@ import {
   GlTooltipDirective,
   GlLink,
   GlEmptyState,
+  GlTab,
+  GlTabs,
   GlTable,
 } from '@gitlab/ui';
 import { escape } from 'lodash';
@@ -19,13 +21,15 @@ import MavenInstallation from './maven_installation.vue';
 import NpmInstallation from './npm_installation.vue';
 import NugetInstallation from './nuget_installation.vue';
 import PypiInstallation from './pypi_installation.vue';
+import PackagesListLoader from '../../shared/components/packages_list_loader.vue';
+import PackageListRow from '../../shared/components/package_list_row.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
 import { __, s__, sprintf } from '~/locale';
 import { PackageType, TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
-import { mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 export default {
   name: 'PackagesApp',
@@ -34,6 +38,8 @@ export default {
     GlEmptyState,
     GlLink,
     GlModal,
+    GlTab,
+    GlTabs,
     GlTable,
     GlIcon,
     PackageActivity,
@@ -44,6 +50,8 @@ export default {
     NpmInstallation,
     NugetInstallation,
     PypiInstallation,
+    PackagesListLoader,
+    PackageListRow,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -55,6 +63,7 @@ export default {
     ...mapState([
       'packageEntity',
       'packageFiles',
+      'isLoading',
       'canDelete',
       'destroyPath',
       'svgPath',
@@ -142,13 +151,22 @@ export default {
         category: packageTypeToTrackCategory(this.packageEntity.package_type),
       };
     },
+    hasVersions() {
+      return this.packageEntity.versions?.length > 0;
+    },
   },
   methods: {
+    ...mapActions(['fetchPackageVersions']),
     formatSize(size) {
       return numberToHumanSize(size);
     },
     cancelDelete() {
       this.$refs.deleteModal.hide();
+    },
+    getPackageVersions() {
+      if (!this.packageEntity.versions) {
+        this.fetchPackageVersions();
+      }
     },
   },
   i18n: {
@@ -197,52 +215,83 @@ export default {
       </div>
     </div>
 
-    <div class="row prepend-top-default" data-qa-selector="package_information_content">
-      <div class="col-sm-6">
-        <package-information :information="packageInformation" />
-        <package-information
-          v-if="packageMetadata"
-          :heading="packageMetadataTitle"
-          :information="packageMetadata"
-          :show-copy="true"
-        />
-      </div>
+    <gl-tabs>
+      <gl-tab :title="__('Detail')">
+        <div class="row" data-qa-selector="package_information_content">
+          <div class="col-sm-6">
+            <package-information :information="packageInformation" />
+            <package-information
+              v-if="packageMetadata"
+              :heading="packageMetadataTitle"
+              :information="packageMetadata"
+              :show-copy="true"
+            />
+          </div>
 
-      <div class="col-sm-6">
-        <component
-          :is="installationComponent"
-          v-if="installationComponent"
-          :name="packageEntity.name"
-          :registry-url="npmPath"
-          :help-url="npmHelpPath"
-        />
-      </div>
-    </div>
+          <div class="col-sm-6">
+            <component
+              :is="installationComponent"
+              v-if="installationComponent"
+              :name="packageEntity.name"
+              :registry-url="npmPath"
+              :help-url="npmHelpPath"
+            />
+          </div>
+        </div>
 
-    <package-activity />
+        <package-activity />
 
-    <gl-table
-      :fields="$options.filesTableHeaderFields"
-      :items="filesTableRows"
-      tbody-tr-class="js-file-row"
-    >
-      <template #cell(name)="items">
-        <gl-icon name="doc-code" class="space-right" />
-        <gl-link
-          :href="items.item.downloadPath"
-          class="js-file-download"
-          @click="track($options.trackingActions.PULL_PACKAGE)"
+        <gl-table
+          :fields="$options.filesTableHeaderFields"
+          :items="filesTableRows"
+          tbody-tr-class="js-file-row"
         >
-          {{ items.item.name }}
-        </gl-link>
-      </template>
+          <template #cell(name)="items">
+            <gl-icon name="doc-code" class="space-right" />
+            <gl-link
+              :href="items.item.downloadPath"
+              class="js-file-download"
+              @click="track($options.trackingActions.PULL_PACKAGE)"
+            >
+              {{ items.item.name }}
+            </gl-link>
+          </template>
 
-      <template #cell(created)="items">
-        <span v-gl-tooltip :title="tooltipTitle(items.item.created)">{{
-          timeFormatted(items.item.created)
-        }}</span>
-      </template>
-    </gl-table>
+          <template #cell(created)="items">
+            <span v-gl-tooltip :title="tooltipTitle(items.item.created)">{{
+              timeFormatted(items.item.created)
+            }}</span>
+          </template>
+        </gl-table>
+      </gl-tab>
+
+      <gl-tab
+        :title="__('Versions')"
+        title-item-class="js-versions-tab"
+        @click="getPackageVersions"
+      >
+        <template v-if="isLoading && !hasVersions">
+          <packages-list-loader />
+        </template>
+
+        <template v-else-if="hasVersions">
+          <package-list-row
+            v-for="v in packageEntity.versions"
+            :key="v.id"
+            :package-entity="{ name: packageEntity.name, ...v }"
+            :package-link="v.id.toString()"
+            :disable-delete="true"
+            :show-package-type="false"
+          />
+        </template>
+
+        <template v-else class="gl-mt-3">
+          <p data-testid="no-versions-message">
+            {{ s__('PackageRegistry|There are no other versions of this package.') }}
+          </p>
+        </template>
+      </gl-tab>
+    </gl-tabs>
 
     <gl-modal ref="deleteModal" class="js-delete-modal" modal-id="delete-modal">
       <template #modal-title>{{ $options.i18n.deleteModalTitle }}</template>

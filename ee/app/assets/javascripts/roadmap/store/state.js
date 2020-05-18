@@ -33,4 +33,5 @@ export default () => ({
   milestonesFetchInProgress: false,
   milestonesFetchFailure: false,
   milestonesFetchResultEmpty: false,
+  allowSubEpics: false,
 });

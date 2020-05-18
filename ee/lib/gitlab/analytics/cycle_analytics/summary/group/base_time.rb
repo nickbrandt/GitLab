@@ -13,7 +13,7 @@ module Gitlab
             end
 
             def value
-              @value ||= data_collector.median.days&.round(1)
+              @value ||= Gitlab::CycleAnalytics::Summary::Value::PrettyNumeric.new(data_collector.median.days&.round(1))
             end
 
             def unit

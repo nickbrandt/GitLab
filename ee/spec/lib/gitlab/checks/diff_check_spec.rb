@@ -8,6 +8,12 @@ describe Gitlab::Checks::DiffCheck do
   include_context 'push rules checks context'
 
   describe '#validate!' do
+    shared_examples_for "returns codeowners validation message" do
+      it "returns an error message" do
+        expect(validation_result).to include("Pushes to protected branches")
+      end
+    end
+
     context 'no push rules active' do
       let_it_be(:push_rule) { create(:push_rule) }
 
@@ -55,26 +61,10 @@ describe Gitlab::Checks::DiffCheck do
           )
         end
 
-        context 'and the user is not listed as a codeowner' do
-          before do
-            stub_feature_flags(sectional_codeowners: false)
-          end
-
-          it "returns an error message" do
-            expect { diff_check.validate! }.to raise_error do |error|
-              expect(error).to be_a(Gitlab::GitAccess::ForbiddenError)
-              expect(error.message).to include("CODEOWNERS` were matched:\n- *.js.coffee")
-            end
-          end
-        end
-
-        context 'and the user is listed as a codeowner' do
-          # `user` is set as the owner of the incoming change by the shared
-          #   context found in 'push rules checks context'
-          let(:codeowner_content) { "* @#{user.username}" }
-
-          it "does not return an error message" do
-            expect { diff_check.validate! }.not_to raise_error
+        it "returns an error message" do
+          expect { diff_check.validate! }.to raise_error do |error|
+            expect(error).to be_a(Gitlab::GitAccess::ForbiddenError)
+            expect(error.message).to include("CODEOWNERS` were matched:\n- *.js.coffee")
           end
         end
       end
@@ -84,25 +74,7 @@ describe Gitlab::Checks::DiffCheck do
           subject.send(:validate_code_owners).call(["docs/CODEOWNERS", "README"])
         end
 
-        context "and the user is not listed as a code owner" do
-          before do
-            stub_feature_flags(sectional_codeowners: false)
-          end
-
-          it "returns an error message" do
-            expect(validation_result).to include("Pushes to protected branches")
-          end
-        end
-
-        context "and the user is listed as a code owner" do
-          # `user` is set as the owner of the incoming change by the shared
-          #   context found in 'push rules checks context'
-          let(:codeowner_content) { "* @#{user.username}" }
-
-          it "returns nil" do
-            expect(validation_result).to be_nil
-          end
-        end
+        it_behaves_like "returns codeowners validation message"
       end
 
       context "the MR doesn't contain a matching file path" do
@@ -146,11 +118,32 @@ describe Gitlab::Checks::DiffCheck do
         context "updated_from_web? == true" do
           before do
             expect(subject).to receive(:updated_from_web?).and_return(true)
-            expect(project).not_to receive(:branch_requires_code_owner_approval?)
           end
 
-          it "returns an empty array" do
-            expect(subject.send(:path_validations)).to eq([])
+          context "when skip_web_ui_code_owner_validations is disabled" do
+            before do
+              stub_feature_flags(skip_web_ui_code_owner_validations: false)
+              allow(project).to receive(:branch_requires_code_owner_approval?)
+                .once.and_return(true)
+            end
+
+            it "returns an array of Proc(s)" do
+              validations = subject.send(:path_validations)
+
+              expect(validations.any?).to be_truthy
+              expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+            end
+          end
+
+          context "when skip_web_ui_code_owner_validations is enabled" do
+            before do
+              stub_feature_flags(skip_web_ui_code_owner_validations: true)
+              expect(project).not_to receive(:branch_requires_code_owner_approval?)
+            end
+
+            it "returns an empty array" do
+              expect(subject.send(:path_validations)).to eq([])
+            end
           end
         end
       end

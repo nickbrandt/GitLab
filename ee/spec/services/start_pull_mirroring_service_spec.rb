@@ -32,7 +32,7 @@ describe StartPullMirroringService do
     context 'when project mirror has been updated in the last 5 minutes' do
       it 'schedules next execution' do
         Timecop.freeze(Time.current) do
-          import_state.update(last_update_at: 3.minutes.ago)
+          import_state.update(last_update_at: 3.minutes.ago, last_successful_update_at: 10.minutes.ago)
 
           expect { execute }
             .to change { import_state.next_execution_timestamp }
@@ -44,7 +44,15 @@ describe StartPullMirroringService do
 
     context 'when project mirror has been updated more than 5 minutes ago' do
       before do
-        import_state.update(last_update_at: 6.minutes.ago)
+        import_state.update(last_update_at: 6.minutes.ago, last_successful_update_at: 10.minutes.ago)
+      end
+
+      it_behaves_like 'force mirror update'
+    end
+
+    context 'when project mirror has been updated in the last 5 minutes but has never been successfully updated' do
+      before do
+        import_state.update(last_update_at: 3.minutes.ago, last_successful_update_at: nil)
       end
 
       it_behaves_like 'force mirror update'

@@ -1394,4 +1394,38 @@ describe Namespace do
       end
     end
   end
+
+  describe '#closest_gitlab_subscription' do
+    subject { namespace.closest_gitlab_subscription }
+
+    context 'when there is a root ancestor' do
+      let(:namespace) { create(:namespace, parent: root) }
+
+      context 'when root has a subscription' do
+        let(:root) { create(:namespace_with_plan) }
+
+        it { is_expected.to be_a(GitlabSubscription) }
+      end
+
+      context 'when root has no subscription' do
+        let(:root) { create(:namespace) }
+
+        it { is_expected.to be_nil }
+      end
+    end
+
+    context 'when there is no root ancestor' do
+      context 'has a subscription' do
+        let(:namespace) { create(:namespace_with_plan) }
+
+        it { is_expected.to be_a(GitlabSubscription) }
+      end
+
+      context 'it has no subscription' do
+        let(:namespace) { create(:namespace) }
+
+        it { is_expected.to be_nil }
+      end
+    end
+  end
 end

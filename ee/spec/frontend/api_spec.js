@@ -379,6 +379,32 @@ describe('Api', () => {
       });
     });
 
+    describe('cycleAnalyticsTimeSummaryData', () => {
+      it('fetches value stream analytics summary data', done => {
+        const response = [
+          { value: '10.0', title: 'Lead time', unit: 'per day' },
+          { value: '2.0', title: 'Cycle Time', unit: 'per day' },
+        ];
+        const params = {
+          ...defaultParams,
+        };
+
+        const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/-/analytics/value_stream_analytics/time_summary`;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsTimeSummaryData(groupId, params)
+          .then(responseObj =>
+            expectRequestWithCorrectParameters(responseObj, {
+              response,
+              params,
+              expectedUrl,
+            }),
+          )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
     describe('cycleAnalyticsGroupStagesAndEvents', () => {
       it('fetches custom stage events and all stages', done => {
         const response = { events: [], stages: [] };

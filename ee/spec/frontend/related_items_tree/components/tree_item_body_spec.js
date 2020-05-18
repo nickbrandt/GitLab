@@ -363,6 +363,25 @@ describe('RelatedItemsTree', () => {
 
         epicWrapper.destroy();
       });
+
+      it('renders health status when feature', () => {
+        function testExistence(exists) {
+          const healthStatus = wrapper.find('.item-health-status').exists();
+
+          expect(healthStatus).toBe(exists);
+        }
+
+        testExistence(false);
+
+        wrapper.vm.$store.commit('SET_INITIAL_CONFIG', {
+          ...mockInitialConfig,
+          allowIssuableHealthStatus: true,
+        });
+
+        return wrapper.vm.$nextTick(() => {
+          testExistence(true);
+        });
+      });
     });
   });
 });

@@ -24,6 +24,8 @@ class StartPullMirroringService < BaseService
   private
 
   def update_now?(import_state)
-    import_state.last_update_at.nil? || import_state.last_update_at < INTERVAL.ago
+    import_state.last_successful_update_at.nil? ||
+      import_state.last_update_at.nil? ||
+      import_state.last_update_at < INTERVAL.ago
   end
 end

@@ -23,10 +23,10 @@ and effective _as well as_ fast.
 
 Here are some things to keep in mind regarding test performance:
 
-- `double` and `spy` are faster than `FactoryBot.build(...)`
+- `instance_double` and `spy` are faster than `FactoryBot.build(...)`
 - `FactoryBot.build(...)` and `.build_stubbed` are faster than `.create`.
 - Don't `create` an object when `build`, `build_stubbed`, `attributes_for`,
-  `spy`, or `double` will do. Database persistence is slow!
+  `spy`, or `instance_double` will do. Database persistence is slow!
 - Don't mark a feature as requiring JavaScript (through `:js` in RSpec) unless it's _actually_ required for the test
   to be valid. Headless browser testing is slow!
 
@@ -68,6 +68,8 @@ FDOC=1 bin/rspec spec/[path]/[to]/[spec].rb
   to separate phases.
 - Use `Gitlab.config.gitlab.host` rather than hard coding `'localhost'`
 - Don't assert against the absolute value of a sequence-generated attribute (see
+  [Gotchas](../gotchas.md#do-not-assert-against-the-absolute-value-of-a-sequence-generated-attribute)).
+- Avoid using `expect_any_instance_of` or `allow_any_instance_of` (see
   [Gotchas](../gotchas.md#do-not-assert-against-the-absolute-value-of-a-sequence-generated-attribute)).
 - Don't supply the `:each` argument to hooks since it's the default.
 - On `before` and `after` hooks, prefer it scoped to `:context` over `:all`
@@ -318,19 +320,41 @@ stub_feature_flags(ci_live_trace: false)
 Feature.enabled?(:ci_live_trace) # => false
 ```
 
-If you wish to set up a test where a feature flag is disabled for some
-actors and not others, you can specify this in options passed to the
-helper. For example, to disable the `ci_live_trace` feature flag for a
-specifc project:
+If you wish to set up a test where a feature flag is enabled only
+for some actors and not others, you can specify this in options
+passed to the helper. For example, to enable the `ci_live_trace`
+feature flag for a specifc project:
 
 ```ruby
 project1, project2 = build_list(:project, 2)
 
-# Feature will only be disabled for project1
-stub_feature_flags(ci_live_trace: { enabled: false, thing: project1 })
+# Feature will only be enabled for project1
+stub_feature_flags(ci_live_trace: project1)
 
-Feature.enabled?(:ci_live_trace, project1) # => false
-Feature.enabled?(:ci_live_trace, project2) # => true
+Feature.enabled?(:ci_live_trace) # => false
+Feature.enabled?(:ci_live_trace, project1) # => true
+Feature.enabled?(:ci_live_trace, project2) # => false
+```
+
+This represents an actual behavior of FlipperGate:
+
+1. You can enable an override for a specified actor to be enabled
+1. You can disable (remove) an override for a specified actor,
+   fallbacking to default state
+1. There's no way to model that you explicitly disable a specified actor
+
+```ruby
+Feature.enable(:my_feature)
+Feature.disable(:my_feature, project1)
+Feature.enabled?(:my_feature) # => true
+Feature.enabled?(:my_feature, project1) # => true
+```
+
+```ruby
+Feature.disable(:my_feature2)
+Feature.enable(:my_feature2, project1)
+Feature.enabled?(:my_feature2) # => false
+Feature.enabled?(:my_feature2, project1) # => true
 ```
 
 ### Pristine test environments

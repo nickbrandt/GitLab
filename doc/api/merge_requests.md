@@ -47,6 +47,7 @@ Parameters:
 | `view`                          | string         | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                              |
 | `labels`                        | string         | no       | Return merge requests matching a comma separated list of labels. `None` lists all merge requests with no labels. `Any` lists all merge requests with at least one label. `No+Label` (Deprecated) lists all merge requests with no labels. Predefined names are case-insensitive. |
 | `with_labels_details`           | boolean        | no       | If `true`, response will return more details for each label in labels field: `:name`, `:color`, `:description`, `:description_html`, `:text_color`. Default is `false`. Introduced in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413) |
+| `with_merge_status_recheck`     | boolean        | no       | If `true`, this projection requests (but does not guarantee) that the `merge_status` field be recalculated asynchronously. Default is `false`. Introduced in [GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/31890) |
 | `created_after`                 | datetime       | no       | Return merge requests created on or after the given time                                                               |
 | `created_before`                | datetime       | no       | Return merge requests created on or before the given time                                                              |
 | `updated_after`                 | datetime       | no       | Return merge requests updated on or after the given time                                                               |
@@ -63,6 +64,13 @@ Parameters:
 | `search`                        | string         | no       | Search merge requests against their `title` and `description`                                                          |
 | `in`                            | string         | no       | Modify the scope of the `search` attribute. `title`, `description`, or a string joining them with comma. Default is `title,description` |
 | `wip`                           | string         | no       | Filter merge requests against their `wip` status. `yes` to return *only* WIP merge requests, `no` to return *non* WIP merge requests |
+
+NOTE: **Note:**
+[Starting in GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/31890),
+listing merge requests may not proactively update the `merge_status` field
+(which also affects the `has_conflicts` field), as this can be an expensive
+operation. If you are interested in the value of these fields from this
+endpoint, set the `with_merge_status_recheck` parameter to `true` in the query.
 
 NOTE: **Note:**
 [Starting in GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/issues/29984),
@@ -227,6 +235,7 @@ Parameters:
 | `view`                          | string         | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                                      |
 | `labels`                        | string         | no       | Return merge requests matching a comma separated list of labels. `None` lists all merge requests with no labels. `Any` lists all merge requests with at least one label. `No+Label` (Deprecated) lists all merge requests with no labels. Predefined names are case-insensitive. |
 | `with_labels_details`           | boolean        | no       | If `true`, response will return more details for each label in labels field: `:name`, `:color`, `:description`, `:description_html`, `:text_color`. Default is `false`. Introduced in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413) |
+| `with_merge_status_recheck`     | boolean        | no       | If `true`, this projection requests (but does not guarantee) that the `merge_status` field be recalculated asynchronously. Default is `false`. Introduced in [GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/31890) |
 | `created_after`                 | datetime       | no       | Return merge requests created on or after the given time                                                                       |
 | `created_before`                | datetime       | no       | Return merge requests created on or before the given time                                                                      |
 | `updated_after`                 | datetime       | no       | Return merge requests updated on or after the given time                                                                       |
@@ -390,6 +399,7 @@ Parameters:
 | `view`                          | string         | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                                      |
 | `labels`                        | string         | no       | Return merge requests matching a comma separated list of labels. `None` lists all merge requests with no labels. `Any` lists all merge requests with at least one label. `No+Label` (Deprecated) lists all merge requests with no labels. Predefined names are case-insensitive. |
 | `with_labels_details`           | boolean        | no       | If `true`, response will return more details for each label in labels field: `:name`, `:color`, `:description`, `:description_html`, `:text_color`. Default is `false`. Introduced in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413)|
+| `with_merge_status_recheck`     | boolean        | no       | If `true`, this projection requests (but does not guarantee) that the `merge_status` field be recalculated asynchronously. Default is `false`. Introduced in [GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/31890) |
 | `created_after`                 | datetime       | no       | Return merge requests created on or after the given time                                                                       |
 | `created_before`                | datetime       | no       | Return merge requests created on or before the given time                                                                      |
 | `updated_after`                 | datetime       | no       | Return merge requests updated on or after the given time                                                                       |
@@ -1130,6 +1140,8 @@ PUT /projects/:id/merge_requests/:merge_request_iid
 | `assignee_ids`             | integer array | no | The ID of the user(s) to assign the MR to. Set to `0` or provide an empty value to unassign all assignees.  |
 | `milestone_id`             | integer | no       | The global ID of a milestone to assign the merge request to. Set to `0` or provide an empty value to unassign a milestone.|
 | `labels`                   | string  | no       | Comma-separated label names for a merge request. Set to an empty string to unassign all labels.                    |
+| `add_labels`               | string  | no       | Comma-separated label names to add to a merge request.                          |
+| `remove_labels`            | string  | no       | Comma-separated label names to remove from a merge request.                     |
 | `description`              | string  | no       | Description of MR. Limited to 1,048,576 characters. |
 | `state_event`              | string  | no       | New state (close/reopen)                                                        |
 | `remove_source_branch`     | boolean | no       | Flag indicating if a merge request should remove the source branch when merging |

@@ -94,26 +94,12 @@ describe 'SAML provider settings' do
         expect(login_url).to end_with "?token=#{group.reload.saml_discovery_token}"
       end
 
-      context 'enforced sso enabled', :js do
-        it 'updates the flag' do
-          stub_feature_flags(enforced_sso: true)
+      it 'updates the enforced sso setting', :js do
+        visit group_saml_providers_path(group)
 
-          visit group_saml_providers_path(group)
+        find('.js-group-saml-enforced-sso-toggle').click
 
-          find('.js-group-saml-enforced-sso-toggle').click
-
-          expect { submit }.to change { saml_provider.reload.enforced_sso }.to(true)
-        end
-      end
-
-      context 'enforced sso disabled' do
-        it 'does not update the flag' do
-          stub_feature_flags(enforced_sso: false)
-
-          visit group_saml_providers_path(group)
-
-          expect(page).not_to have_selector('.js-group-saml-enforced-sso-toggle')
-        end
+        expect { submit }.to change { saml_provider.reload.enforced_sso }.to(true)
       end
 
       context 'enforced_group_managed_accounts enabled', :js do

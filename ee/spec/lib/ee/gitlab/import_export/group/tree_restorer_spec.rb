@@ -18,10 +18,6 @@ describe Gitlab::ImportExport::Group::TreeRestorer do
     group_tree_restorer.restore
   end
 
-  after do
-    cleanup_artifacts_from_extract_archive('group_exports/light', 'ee')
-  end
-
   describe 'restore group tree' do
     context 'epics' do
       it 'has group epics' do

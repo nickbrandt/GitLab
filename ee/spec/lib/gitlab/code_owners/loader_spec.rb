@@ -71,7 +71,7 @@ describe Gitlab::CodeOwners::Loader do
         expect(loader.entries).to contain_exactly(expected_entry, other_entry)
       end
 
-      it 'only performs 3 query for users and groups' do
+      it 'performs 6 query for users and groups' do
         test_group = create(:group, path: 'test-group')
         test_group.add_developer(create(:user))
 
@@ -80,9 +80,12 @@ describe Gitlab::CodeOwners::Loader do
 
         project.invited_groups << [test_group, another_group]
 
-        # One query for users, one for the emails to later divide them across the entries
-        # one for groups with joined routes and users
-        expect { loader.entries }.not_to exceed_query_limit(3)
+        # - 1 query for users
+        # - 1 for the emails to later divide them across the entries
+        # - 2 for groups with joined routes and users
+        # - 2 for loading the users for the parent group(s)
+        #
+        expect { loader.entries }.not_to exceed_query_limit(6)
       end
     end
 
@@ -125,12 +128,36 @@ describe Gitlab::CodeOwners::Loader do
   end
 
   describe '#members' do
-    before do
-      stub_feature_flags(sectional_codeowners: false)
+    shared_examples_for "returns users for passed path" do
+      it "returns users mentioned for the passed path do" do
+        expect(loader.members).to contain_exactly(owner_1, email_owner, documentation_owner)
+      end
     end
 
-    it 'returns users mentioned for the passed path' do
-      expect(loader.members).to contain_exactly(owner_1, email_owner, documentation_owner)
+    context "when sectional_codeowners is disabled" do
+      before do
+        stub_feature_flags(sectional_codeowners: false)
+      end
+
+      it_behaves_like "returns users for passed path"
+    end
+
+    context "when sectional_codeowners is enabled" do
+      let(:codeowner_content) do
+        <<~CODEOWNERS
+        [Documentation]
+        docs/* @documentation-owner
+        docs/CODEOWNERS @owner-1 owner2@gitlab.org @owner-3 @documentation-owner
+        [Testing]
+        spec/* @test-owner @test-group @test-group/nested-group
+        CODEOWNERS
+      end
+
+      before do
+        stub_feature_flags(sectional_codeowners: true)
+      end
+
+      it_behaves_like "returns users for passed path"
     end
   end
 

@@ -4,7 +4,10 @@
 
 - epic_reference = @epic.to_reference
 - sub_epics_feature_available = @group.feature_available?(:subepics)
+- issuable_health_status_feature_available = @group.feature_available?(:issuable_health_status)
+
 - allow_sub_epics = sub_epics_feature_available ? 'true' : 'false'
+- allow_issuable_health_status = issuable_health_status_feature_available ? 'true' : 'false'
 
 - add_to_breadcrumbs _("Epics"), group_epics_path(@group)
 - breadcrumb_title epic_reference
@@ -42,6 +45,7 @@
           auto_complete_issues: 'true',
           user_signed_in: current_user.present? ? 'true' : 'false',
           allow_sub_epics: allow_sub_epics,
+          allow_issuable_health_status: allow_issuable_health_status,
           initial: issuable_initial_data(@epic).to_json } }
   - if sub_epics_feature_available
     #roadmap.tab-pane

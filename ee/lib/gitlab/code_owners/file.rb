@@ -3,6 +3,8 @@
 module Gitlab
   module CodeOwners
     class File
+      include ::Gitlab::Utils::StrongMemoize
+
       SECTION_HEADER_REGEX = /\[(.*?)\]/.freeze
 
       def initialize(blob, project = nil)
@@ -21,11 +23,11 @@ module Gitlab
       def entry_for_path(path)
         path = "/#{path}" unless path.start_with?('/')
 
-        matching_pattern = parsed_data.keys.reverse.detect do |pattern|
-          path_matches?(pattern, path)
+        if sectional_codeowners?
+          sectional_entry_for_path(path)
+        else
+          non_sectional_entry_for_path(path)
         end
-
-        parsed_data[matching_pattern].dup if matching_pattern
       end
 
       def path
@@ -33,6 +35,28 @@ module Gitlab
       end
 
       private
+
+      def non_sectional_entry_for_path(path)
+        matching_pattern = parsed_data.keys.reverse.detect do |pattern|
+          path_matches?(pattern, path)
+        end
+
+        matching_pattern ? [parsed_data[matching_pattern].dup] : []
+      end
+
+      def sectional_entry_for_path(path)
+        matches = []
+
+        parsed_data.each do |_, section_entries|
+          matching_pattern = section_entries.keys.reverse.detect do |pattern|
+            path_matches?(pattern, path)
+          end
+
+          matches << section_entries[matching_pattern].dup if matching_pattern
+        end
+
+        matches
+      end
 
       def data
         if @blob && !@blob.binary?
@@ -43,16 +67,20 @@ module Gitlab
       end
 
       def get_parsed_data
-        if Feature.enabled?(:sectional_codeowners, @project, default_enabled: false)
-          return get_parsed_sectional_data
+        if sectional_codeowners?
+          get_parsed_sectional_data
+        else
+          get_parsed_non_sectional_data
         end
+      end
 
+      def get_parsed_non_sectional_data
         parsed = {}
 
         data.lines.each do |line|
           line = line.strip
 
-          next if skip?(line)
+          next if skip?(line) || line.match?(SECTION_HEADER_REGEX)
 
           extract_entry_and_populate_parsed_data(line, parsed)
         end
@@ -139,6 +167,12 @@ module Gitlab
         flags = ::File::FNM_DOTMATCH | ::File::FNM_PATHNAME
 
         ::File.fnmatch?(pattern, path, flags)
+      end
+
+      def sectional_codeowners?
+        strong_memoize(:sectional_codeowners_check) do
+          Feature.enabled?(:sectional_codeowners, @project, default_enabled: false)
+        end
       end
     end
   end

@@ -15,6 +15,7 @@ module Ci
     ACCESSIBILITY_REPORT_FILE_TYPES = %w[accessibility].freeze
     NON_ERASABLE_FILE_TYPES = %w[trace].freeze
     TERRAFORM_REPORT_FILE_TYPES = %w[terraform].freeze
+    UNSUPPORTED_FILE_TYPES = %i[license_management].freeze
     DEFAULT_FILE_NAMES = {
       archive: nil,
       metadata: nil,
@@ -35,7 +36,8 @@ module Ci
       lsif: 'lsif.json',
       dotenv: '.env',
       cobertura: 'cobertura-coverage.xml',
-      terraform: 'tfplan.json'
+      terraform: 'tfplan.json',
+      cluster_applications: 'gl-cluster-applications.json'
     }.freeze
 
     INTERNAL_TYPES = {
@@ -49,9 +51,10 @@ module Ci
       metrics: :gzip,
       metrics_referee: :gzip,
       network_referee: :gzip,
-      lsif: :gzip,
       dotenv: :gzip,
       cobertura: :gzip,
+      cluster_applications: :gzip,
+      lsif: :zip,
 
       # All these file formats use `raw` as we need to store them uncompressed
       # for Frontend to fetch the files and do analysis
@@ -68,6 +71,24 @@ module Ci
       terraform: :raw
     }.freeze
 
+    DOWNLOADABLE_TYPES = %w[
+      accessibility
+      archive
+      cobertura
+      codequality
+      container_scanning
+      dast
+      dependency_scanning
+      dotenv
+      junit
+      license_management
+      license_scanning
+      lsif
+      metrics
+      performance
+      sast
+    ].freeze
+
     TYPE_AND_FORMAT_PAIRS = INTERNAL_TYPES.merge(REPORT_TYPES).freeze
 
     # This is required since we cannot add a default to the database
@@ -80,7 +101,8 @@ module Ci
     mount_uploader :file, JobArtifactUploader
 
     validates :file_format, presence: true, unless: :trace?, on: :create
-    validate :valid_file_format?, unless: :trace?, on: :create
+    validate :validate_supported_file_format!, on: :create
+    validate :validate_file_format!, unless: :trace?, on: :create
     before_save :set_size, if: :file_changed?
 
     update_project_statistics project_statistics_name: :build_artifacts_size
@@ -153,7 +175,8 @@ module Ci
       dotenv: 16,
       cobertura: 17,
       terraform: 18, # Transformed json
-      accessibility: 19
+      accessibility: 19,
+      cluster_applications: 20
     }
 
     enum file_format: {
@@ -181,7 +204,15 @@ module Ci
       raw: Gitlab::Ci::Build::Artifacts::Adapters::RawStream
     }.freeze
 
-    def valid_file_format?
+    def validate_supported_file_format!
+      return if Feature.disabled?(:drop_license_management_artifact, project, default_enabled: true)
+
+      if UNSUPPORTED_FILE_TYPES.include?(self.file_type&.to_sym)
+        errors.add(:base, _("File format is no longer supported"))
+      end
+    end
+
+    def validate_file_format!
       unless TYPE_AND_FORMAT_PAIRS[self.file_type&.to_sym] == self.file_format&.to_sym
         errors.add(:base, _('Invalid file format with specified file type'))
       end

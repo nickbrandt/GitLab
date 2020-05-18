@@ -1,11 +1,11 @@
 import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
+import download from '~/lib/utils/downloader';
 import pollUntilComplete from '~/lib/utils/poll_until_complete';
 import { s__, sprintf } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import toast from '~/vue_shared/plugins/global_toast';
 import * as types from './mutation_types';
-import downloadPatchHelper from './utils/download_patch_helper';
 
 /**
  * A lot of this file has duplicate actions to
@@ -445,7 +445,7 @@ export const downloadPatch = ({ state }) => {
     https://gitlab.com/gitlab-org/gitlab-ui/issues/188#note_165808493
   */
   const { vulnerability } = state.modal;
-  downloadPatchHelper(vulnerability.remediations[0].diff);
+  download({ fileData: vulnerability.remediations[0].diff, fileName: 'remediation.patch' });
   $('#modal-mrwidget-security-issue').modal('hide');
 };
 

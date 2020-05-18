@@ -209,7 +209,7 @@ class Project < ApplicationRecord
   has_many :services
   has_many :events
   has_many :milestones
-  has_many :sprints
+  has_many :iterations
   has_many :notes
   has_many :snippets, class_name: 'ProjectSnippet'
   has_many :hooks, class_name: 'ProjectHook'
@@ -330,6 +330,7 @@ class Project < ApplicationRecord
 
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature, update_only: true
+  accepts_nested_attributes_for :project_setting, update_only: true
   accepts_nested_attributes_for :import_data
   accepts_nested_attributes_for :auto_devops, update_only: true
   accepts_nested_attributes_for :ci_cd_settings, update_only: true
@@ -353,6 +354,9 @@ class Project < ApplicationRecord
     :wiki_access_level, :snippets_access_level, :builds_access_level,
     :repository_access_level, :pages_access_level, :metrics_dashboard_access_level,
     to: :project_feature, allow_nil: true
+  delegate :show_default_award_emojis, :show_default_award_emojis=,
+    :show_default_award_emojis?,
+    to: :project_setting, allow_nil: true
   delegate :scheduled?, :started?, :in_progress?, :failed?, :finished?,
     prefix: :import, to: :import_state, allow_nil: true
   delegate :no_import?, to: :import_state, allow_nil: true
@@ -526,12 +530,14 @@ class Project < ApplicationRecord
   def self.public_or_visible_to_user(user = nil, min_access_level = nil)
     min_access_level = nil if user&.admin?
 
-    if user
+    return public_to_user unless user
+
+    if user.is_a?(DeployToken)
+      user.projects
+    else
       where('EXISTS (?) OR projects.visibility_level IN (?)',
             user.authorizations_for_projects(min_access_level: min_access_level),
             Gitlab::VisibilityLevel.levels_for_user(user))
-    else
-      public_to_user
     end
   end
 
@@ -841,7 +847,7 @@ class Project < ApplicationRecord
     latest_pipeline = ci_pipelines.latest_successful_for_ref(ref)
     return unless latest_pipeline
 
-    latest_pipeline.builds.latest.with_artifacts_archive.find_by(name: job_name)
+    latest_pipeline.builds.latest.with_downloadable_artifacts.find_by(name: job_name)
   end
 
   def latest_successful_build_for_sha(job_name, sha)
@@ -850,7 +856,7 @@ class Project < ApplicationRecord
     latest_pipeline = ci_pipelines.latest_successful_for_sha(sha)
     return unless latest_pipeline
 
-    latest_pipeline.builds.latest.with_artifacts_archive.find_by(name: job_name)
+    latest_pipeline.builds.latest.with_downloadable_artifacts.find_by(name: job_name)
   end
 
   def latest_successful_build_for_ref!(job_name, ref = default_branch)
@@ -2010,6 +2016,14 @@ class Project < ApplicationRecord
       result.on_environment(environment)
     else
       result.where(environment_scope: '*')
+    end
+  end
+
+  def ci_instance_variables_for(ref:)
+    if protected_for?(ref)
+      Ci::InstanceVariable.all_cached
+    else
+      Ci::InstanceVariable.unprotected_cached
     end
   end
 

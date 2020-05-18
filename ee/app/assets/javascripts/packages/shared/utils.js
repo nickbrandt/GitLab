@@ -24,3 +24,11 @@ export const getPackageTypeLabel = packageType => {
       return null;
   }
 };
+
+export const getCommitLink = ({ project_path: projectPath, pipeline = {} }, isGroup = false) => {
+  if (isGroup) {
+    return `/${projectPath}/commit/${pipeline.sha}`;
+  }
+
+  return `../commit/${pipeline.sha}`;
+};

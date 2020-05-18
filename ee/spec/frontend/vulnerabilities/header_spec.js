@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlDeprecatedButton } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
 import waitForPromises from 'helpers/wait_for_promises';
 import UsersMockHelper from 'helpers/user_mock_data_helper';
@@ -64,7 +65,7 @@ describe('Vulnerability Header', () => {
     return user;
   };
 
-  const findCreateIssueButton = () => wrapper.find({ ref: 'create-issue-btn' });
+  const findGlDeprecatedButton = () => wrapper.find(GlDeprecatedButton);
   const findBadge = () => wrapper.find({ ref: 'badge' });
   const findResolutionAlert = () => wrapper.find(ResolutionAlert);
   const findStatusDescription = () => wrapper.find(StatusDescription);
@@ -147,54 +148,57 @@ describe('Vulnerability Header', () => {
     });
   });
 
-  describe('create issue button', () => {
-    beforeEach(createWrapper);
-
-    it('does display if there is not an issue already created', () => {
-      expect(findCreateIssueButton().exists()).toBe(true);
-    });
-
-    it('does not display if there is an issue already created', () => {
+  describe('single action button', () => {
+    it('does not display if there are no actions', () => {
       createWrapper({}, findingWithIssue);
-      expect(findCreateIssueButton().exists()).toBe(false);
+      expect(findGlDeprecatedButton().exists()).toBe(false);
     });
 
-    it('calls create issue endpoint on click and redirects to new issue', () => {
-      const issueUrl = '/group/project/issues/123';
-      const spy = jest.spyOn(urlUtility, 'redirectTo');
-      mockAxios.onPost(dataset.createIssueUrl).reply(200, {
-        issue_url: issueUrl,
+    describe('create issue', () => {
+      beforeEach(createWrapper);
+
+      it('does display if there is only one action and not an issue already created', () => {
+        expect(findGlDeprecatedButton().exists()).toBe(true);
+        expect(findGlDeprecatedButton().text()).toBe('Create issue');
       });
-      findCreateIssueButton().vm.$emit('click');
-      return waitForPromises().then(() => {
-        expect(mockAxios.history.post).toHaveLength(1);
-        const [postRequest] = mockAxios.history.post;
-        expect(postRequest.url).toBe(dataset.createIssueUrl);
-        expect(JSON.parse(postRequest.data)).toMatchObject({
-          vulnerability_feedback: {
-            feedback_type: 'issue',
-            category: defaultVulnerability.report_type,
-            project_fingerprint: dataset.projectFingerprint,
-            vulnerability_data: {
-              ...defaultVulnerability,
-              ...findingWithoutIssue,
-              category: defaultVulnerability.report_type,
-              vulnerability_id: defaultVulnerability.id,
-            },
-          },
+
+      it('calls create issue endpoint on click and redirects to new issue', () => {
+        const issueUrl = '/group/project/issues/123';
+        const spy = jest.spyOn(urlUtility, 'redirectTo');
+        mockAxios.onPost(dataset.createIssueUrl).reply(200, {
+          issue_url: issueUrl,
         });
-        expect(spy).toHaveBeenCalledWith(issueUrl);
+        findGlDeprecatedButton().vm.$emit('click');
+        return waitForPromises().then(() => {
+          expect(mockAxios.history.post).toHaveLength(1);
+          const [postRequest] = mockAxios.history.post;
+          expect(postRequest.url).toBe(dataset.createIssueUrl);
+          expect(JSON.parse(postRequest.data)).toMatchObject({
+            vulnerability_feedback: {
+              feedback_type: 'issue',
+              category: defaultVulnerability.report_type,
+              project_fingerprint: dataset.projectFingerprint,
+              vulnerability_data: {
+                ...defaultVulnerability,
+                ...findingWithoutIssue,
+                category: defaultVulnerability.report_type,
+                vulnerability_id: defaultVulnerability.id,
+              },
+            },
+          });
+          expect(spy).toHaveBeenCalledWith(issueUrl);
+        });
       });
-    });
 
-    it('shows an error message when issue creation fails', () => {
-      mockAxios.onPost(dataset.createIssueUrl).reply(500);
-      findCreateIssueButton().vm.$emit('click');
-      return waitForPromises().then(() => {
-        expect(mockAxios.history.post).toHaveLength(1);
-        expect(createFlash).toHaveBeenCalledWith(
-          'Something went wrong, could not create an issue.',
-        );
+      it('shows an error message when issue creation fails', () => {
+        mockAxios.onPost(dataset.createIssueUrl).reply(500);
+        findGlDeprecatedButton().vm.$emit('click');
+        return waitForPromises().then(() => {
+          expect(mockAxios.history.post).toHaveLength(1);
+          expect(createFlash).toHaveBeenCalledWith(
+            'Something went wrong, could not create an issue.',
+          );
+        });
       });
     });
   });

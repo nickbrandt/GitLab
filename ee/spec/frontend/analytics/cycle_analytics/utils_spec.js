@@ -16,6 +16,7 @@ import {
   flattenTaskByTypeSeries,
   orderByDate,
   toggleSelectedLabel,
+  transformStagesForPathNavigation,
 } from 'ee/analytics/cycle_analytics/utils';
 import { toYmd } from 'ee/analytics/shared/utils';
 import {
@@ -33,7 +34,12 @@ import {
   issueStage,
   rawCustomStage,
   rawTasksByTypeData,
+  allowedStages,
+  stageMediansWithNumericIds,
+  totalStage,
+  pathNavIssueMetric,
 } from './mock_data';
+import { CAPITALIZED_STAGE_NAME, PATH_HOME_ICON } from 'ee/analytics/cycle_analytics/constants';
 
 const labelEventIds = labelEvents.map(ev => ev.identifier);
 
@@ -316,6 +322,50 @@ describe('Cycle analytics utils', () => {
     });
     it('will add an id that does not exist', () => {
       expect(toggleSelectedLabel({ selectedLabelIds, value: 4 })).toEqual([1, 2, 3, 4]);
+    });
+  });
+
+  describe('transformStagesForPathNavigation', () => {
+    const stages = [...allowedStages, totalStage];
+    const response = transformStagesForPathNavigation({
+      stages,
+      medians: stageMediansWithNumericIds,
+      selectedStage: issueStage,
+    });
+
+    describe('transforms the data as expected', () => {
+      it('returns an array of stages', () => {
+        expect(Array.isArray(response)).toBe(true);
+        expect(response.length).toEqual(stages.length);
+      });
+
+      it('selects the correct stage', () => {
+        const selected = response.filter(stage => stage.selected === true)[0];
+
+        expect(selected.title).toEqual(issueStage.title);
+      });
+
+      it('includes the correct metric for the associated stage', () => {
+        const issue = response.filter(stage => stage.name === 'Issue')[0];
+
+        expect(issue.metric).toEqual(pathNavIssueMetric);
+      });
+
+      describe(`${CAPITALIZED_STAGE_NAME.OVERVIEW} stage specific changes`, () => {
+        const overview = response.filter(stage => stage.name === CAPITALIZED_STAGE_NAME.TOTAL)[0];
+
+        it(`renames '${CAPITALIZED_STAGE_NAME.TOTAL}' stage title to '${CAPITALIZED_STAGE_NAME.OVERVIEW}'`, () => {
+          expect(overview.title).toEqual(CAPITALIZED_STAGE_NAME.OVERVIEW);
+        });
+
+        it('includes the correct icon', () => {
+          expect(overview.icon).toEqual(PATH_HOME_ICON);
+        });
+
+        it(`moves the stage to the front`, () => {
+          expect(response[0]).toEqual(overview);
+        });
+      });
     });
   });
 });

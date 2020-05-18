@@ -42,9 +42,11 @@ module EE
 
       override :allowed_scopes
       def allowed_scopes
+        return super unless use_elasticsearch?
+
         strong_memoize(:ee_allowed_scopes) do
           super.tap do |ce_scopes|
-            ce_scopes.concat(%w[notes wiki_blobs blobs commits]) if ::Gitlab::CurrentSettings.elasticsearch_search?
+            ce_scopes.concat(%w[notes wiki_blobs blobs commits])
           end
         end
       end

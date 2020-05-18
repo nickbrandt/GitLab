@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 
 import { delay } from 'lodash';
 
+import createStore from 'ee/roadmap/store';
 import EpicItemComponent from 'ee/roadmap/components/epic_item.vue';
 import EpicItemContainer from 'ee/roadmap/components/epic_item_container.vue';
 
@@ -24,6 +25,8 @@ jest.mock('lodash/delay', () =>
   }),
 );
 
+let store;
+
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
@@ -37,6 +40,7 @@ const createComponent = ({
   hasFiltersApplied = false,
 }) => {
   return mount(EpicItemComponent, {
+    store,
     stubs: {
       'epic-item-container': EpicItemContainer,
       'epic-item': EpicItemComponent,
@@ -58,6 +62,7 @@ describe('EpicItemComponent', () => {
   let wrapper;
 
   beforeEach(() => {
+    store = createStore();
     wrapper = createComponent({});
   });
 

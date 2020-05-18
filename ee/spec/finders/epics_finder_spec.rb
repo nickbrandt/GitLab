@@ -3,14 +3,14 @@
 require 'spec_helper'
 
 describe EpicsFinder do
-  let(:user) { create(:user) }
-  let(:search_user) { create(:user) }
-  let(:group) { create(:group, :private) }
-  let(:another_group) { create(:group) }
-  let!(:epic1) { create(:epic, :opened, group: group, title: 'This is awesome epic', created_at: 1.week.ago) }
-  let!(:epic2) { create(:epic, :opened, group: group, created_at: 4.days.ago, author: user, start_date: 2.days.ago, end_date: 3.days.from_now) }
-  let!(:epic3) { create(:epic, :closed, group: group, description: 'not so awesome', start_date: 5.days.ago, end_date: 3.days.ago) }
-  let!(:epic4) { create(:epic, :closed, group: another_group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:search_user) { create(:user) }
+  let_it_be(:group) { create(:group, :private) }
+  let_it_be(:another_group) { create(:group) }
+  let_it_be(:epic1) { create(:epic, :opened, group: group, title: 'This is awesome epic', created_at: 1.week.ago) }
+  let_it_be(:epic2) { create(:epic, :opened, group: group, created_at: 4.days.ago, author: user, start_date: 2.days.ago, end_date: 3.days.from_now) }
+  let_it_be(:epic3) { create(:epic, :closed, group: group, description: 'not so awesome', start_date: 5.days.ago, end_date: 3.days.ago) }
+  let_it_be(:epic4) { create(:epic, :closed, group: another_group) }
 
   describe '#execute' do
     def epics(params = {})
@@ -57,8 +57,8 @@ describe EpicsFinder do
           expect(epics).to contain_exactly(epic1, epic2, epic3)
         end
 
-        it 'does not execute more than 8 SQL queries' do
-          expect { epics.to_a }.not_to exceed_all_query_limit(8)
+        it 'does not execute more than 9 SQL queries' do
+          expect { epics.to_a }.not_to exceed_all_query_limit(9)
         end
 
         context 'sorting' do
@@ -91,6 +91,15 @@ describe EpicsFinder do
           end
         end
 
+        context 'by user reaction emoji' do
+          it 'returns epics reacted to by user' do
+            create(:award_emoji, name: 'thumbsup', awardable: epic1, user: search_user )
+            create(:award_emoji, name: 'star', awardable: epic3, user: search_user )
+
+            expect(epics(my_reaction_emoji: 'star')).to contain_exactly(epic3)
+          end
+        end
+
         context 'by author' do
           it 'returns all epics authored by the given user' do
             expect(epics(author_id: user.id)).to contain_exactly(epic2)
@@ -98,8 +107,8 @@ describe EpicsFinder do
         end
 
         context 'by label' do
-          let(:label) { create(:label) }
-          let!(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
+          let_it_be(:label) { create(:label) }
+          let_it_be(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
 
           it 'returns all epics with given label' do
             expect(epics(label_name: label.title)).to contain_exactly(labeled_epic)
@@ -113,10 +122,10 @@ describe EpicsFinder do
         end
 
         context 'when subgroups are supported' do
-          let(:subgroup) { create(:group, :private, parent: group) }
-          let(:subgroup2) { create(:group, :private, parent: subgroup) }
-          let!(:subgroup_epic) { create(:epic, group: subgroup) }
-          let!(:subgroup2_epic) { create(:epic, group: subgroup2) }
+          let_it_be(:subgroup) { create(:group, :private, parent: group) }
+          let_it_be(:subgroup2) { create(:group, :private, parent: subgroup) }
+          let_it_be(:subgroup_epic) { create(:epic, group: subgroup) }
+          let_it_be(:subgroup2_epic) { create(:epic, group: subgroup2) }
 
           it 'returns all epics that belong to the given group and its subgroups' do
             expect(epics).to contain_exactly(epic1, epic2, epic3, subgroup_epic, subgroup2_epic)
@@ -220,8 +229,8 @@ describe EpicsFinder do
         end
 
         context 'by iids' do
-          let(:subgroup)  { create(:group, :private, parent: group) }
-          let!(:subepic1) { create(:epic, group: subgroup, iid: epic1.iid) }
+          let_it_be(:subgroup) { create(:group, :private, parent: group) }
+          let_it_be(:subepic1) { create(:epic, group: subgroup, iid: epic1.iid) }
 
           it 'returns the specified epics' do
             params = { iids: [epic1.iid, epic2.iid] }
@@ -237,10 +246,10 @@ describe EpicsFinder do
         end
 
         context 'when using iid starts with query' do
-          let!(:epic1) { create(:epic, :opened, group: group, iid: '11') }
-          let!(:epic2) { create(:epic, :opened, group: group, iid: '1112') }
-          let!(:epic3) { create(:epic, :closed, group: group, iid: '9978') }
-          let!(:epic4) { create(:epic, :closed, group: another_group, iid: '111') }
+          let_it_be(:epic1) { create(:epic, :opened, group: group, iid: '11') }
+          let_it_be(:epic2) { create(:epic, :opened, group: group, iid: '1112') }
+          let_it_be(:epic3) { create(:epic, :closed, group: group, iid: '9978') }
+          let_it_be(:epic4) { create(:epic, :closed, group: another_group, iid: '111') }
 
           it 'returns the expected epics if just the first two numbers are given' do
             params = { iid_starts_with: '11' }
@@ -277,13 +286,72 @@ describe EpicsFinder do
           context 'and two labels more search string are present' do
             let_it_be(:label1) { create(:label) }
             let_it_be(:label2) { create(:label) }
-            let!(:labeled_epic) { create(:labeled_epic, group: group, title: 'filtered epic', labels: [label1, label2]) }
+            let_it_be(:labeled_epic) { create(:labeled_epic, group: group, title: 'filtered epic', labels: [label1, label2]) }
 
             it 'returns correct epics' do
               filtered_epics =
                 epics(attempt_group_search_optimizations: true, label_name: [label1.title, label2.title], search: 'filtered')
 
               expect(filtered_epics).to contain_exactly(labeled_epic)
+            end
+          end
+        end
+
+        context 'with confidential epics' do
+          let_it_be(:ancestor_group) { create(:group, :public) }
+          let_it_be(:base_group) { create(:group, :public, parent: ancestor_group) }
+          let_it_be(:base_epic1) { create(:epic, :confidential, group: base_group) }
+          let_it_be(:base_epic2) { create(:epic, group: base_group) }
+          let_it_be(:private_group1) { create(:group, :private, parent: base_group) }
+          let_it_be(:private_epic1) { create(:epic, group: private_group1) }
+          let_it_be(:private_epic2) { create(:epic, :confidential, group: private_group1) }
+          let_it_be(:public_group1) { create(:group, :public, parent: base_group) }
+          let_it_be(:public_epic1) { create(:epic, group: public_group1) }
+          let_it_be(:public_epic2) { create(:epic, :confidential, group: public_group1) }
+
+          subject { described_class.new(search_user, group_id: base_group.id).execute }
+
+          it 'returns only public epics' do
+            expect(subject).to match_array([base_epic2, public_epic1])
+          end
+
+          context 'when user is member of ancestor group' do
+            before do
+              ancestor_group.add_developer(search_user)
+            end
+
+            it 'returns all nested epics' do
+              expect(subject).to match_array([base_epic1, base_epic2, private_epic1, private_epic2, public_epic1, public_epic2])
+            end
+          end
+
+          context 'when user is member of private subgroup' do
+            before do
+              private_group1.add_developer(search_user)
+            end
+
+            it 'returns also confidential epics from this subgroup' do
+              expect(subject).to match_array([base_epic2, private_epic1, private_epic2, public_epic1])
+            end
+          end
+
+          context 'when user is member of public subgroup' do
+            before do
+              public_group1.add_developer(search_user)
+            end
+
+            it 'returns also confidential epics from this subgroup' do
+              expect(subject).to match_array([base_epic2, public_epic1, public_epic2])
+            end
+          end
+
+          context 'when confidential_epics_query is disabled' do
+            before do
+              stub_feature_flags(confidential_epics_query: false)
+            end
+
+            it 'returns also confidential epics' do
+              expect(subject).to match_array([base_epic1, base_epic2, public_epic1, public_epic2])
             end
           end
         end
@@ -310,10 +378,10 @@ describe EpicsFinder do
   end
 
   describe '#row_count' do
-    let(:label) { create(:label) }
-    let(:label2) { create(:label) }
-    let!(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
-    let!(:labeled_epic2) { create(:labeled_epic, group: group, labels: [label, label2]) }
+    let_it_be(:label) { create(:label) }
+    let_it_be(:label2) { create(:label) }
+    let_it_be(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
+    let_it_be(:labeled_epic2) { create(:labeled_epic, group: group, labels: [label, label2]) }
 
     before do
       group.add_developer(search_user)

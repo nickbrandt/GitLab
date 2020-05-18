@@ -6,6 +6,7 @@ import PackageFilter from './packages_filter.vue';
 import PackageList from './packages_list.vue';
 import PackageSort from './packages_sort.vue';
 import { PACKAGE_REGISTRY_TABS } from '../constants';
+import PackagesComingSoon from '../coming_soon/packages_coming_soon.vue';
 
 export default {
   components: {
@@ -15,11 +16,13 @@ export default {
     PackageFilter,
     PackageList,
     PackageSort,
+    PackagesComingSoon,
   },
   computed: {
     ...mapState({
       emptyListIllustration: state => state.config.emptyListIllustration,
       emptyListHelpUrl: state => state.config.emptyListHelpUrl,
+      comingSoon: state => state.config.comingSoon,
       filterQuery: state => state.filterQuery,
     }),
     emptyListText() {
@@ -56,8 +59,10 @@ export default {
     tabChanged(e) {
       const selectedType = PACKAGE_REGISTRY_TABS[e];
 
-      this.setSelectedType(selectedType);
-      this.requestPackagesList();
+      if (selectedType) {
+        this.setSelectedType(selectedType);
+        this.requestPackagesList();
+      }
     },
     emptyStateTitle({ title, type }) {
       if (this.filterQuery) {
@@ -95,6 +100,14 @@ export default {
           </gl-empty-state>
         </template>
       </package-list>
+    </gl-tab>
+
+    <gl-tab v-if="comingSoon" :title="__('Coming soon')" lazy>
+      <packages-coming-soon
+        :illustration="emptyListIllustration"
+        :project-path="comingSoon.projectPath"
+        :suggested-contributions-path="comingSoon.suggestedContributions"
+      />
     </gl-tab>
   </gl-tabs>
 </template>

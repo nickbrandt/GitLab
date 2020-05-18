@@ -11,7 +11,9 @@ describe RepositoryImportWorker do
 
     project.update(import_type: 'gitlab_custom_project_template')
     project.import_state.update(jid: '123')
-    expect_any_instance_of(Projects::ImportService).to receive(:execute).and_return({ status: :error, message: error })
+    expect_next_instance_of(Projects::ImportService) do |service|
+      expect(service).to receive(:execute).and_return({ status: :error, message: error })
+    end
 
     expect do
       subject.perform(project.id)
@@ -24,8 +26,9 @@ describe RepositoryImportWorker do
     let(:project) { create(:project, :mirror, :import_scheduled) }
 
     it 'adds mirror in front of the mirror scheduler queue' do
-      expect_any_instance_of(Projects::ImportService).to receive(:execute)
-        .and_return({ status: :ok })
+      expect_next_instance_of(Projects::ImportService) do |service|
+        expect(service).to receive(:execute).and_return({ status: :ok })
+      end
 
       expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!)
 

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 6.0.2.2'
+gem 'rails', '~> 6.0.3'
 
 gem 'bootsnap', '~> 1.4.6'
 
@@ -26,7 +26,7 @@ gem 'marginalia', '~> 1.8.0'
 
 # Authentication libraries
 gem 'devise', '~> 4.6'
-gem 'doorkeeper', '~> 5.0.2'
+gem 'doorkeeper', '~> 5.0.3'
 gem 'doorkeeper-openid_connect', '~> 1.6.3'
 gem 'omniauth', '~> 1.8'
 gem 'omniauth-auth0', '~> 2.0.0'
@@ -148,8 +148,8 @@ gem 'creole', '~> 0.5.0'
 gem 'wikicloth', '0.8.1'
 gem 'asciidoctor', '~> 2.0.10'
 gem 'asciidoctor-include-ext', '~> 0.3.1', require: false
-gem 'asciidoctor-plantuml', '0.0.10'
-gem 'rouge', '~> 3.18.0'
+gem 'asciidoctor-plantuml', '~> 0.0.12'
+gem 'rouge', '~> 3.19.0'
 gem 'truncato', '~> 0.7.11'
 gem 'bootstrap_form', '~> 4.2.0'
 gem 'nokogiri', '~> 1.10.9'
@@ -230,7 +230,7 @@ gem 'discordrb-webhooks-blackst0ne', '~> 3.3', require: false
 gem 'hipchat', '~> 1.5.0'
 
 # Jira integration
-gem 'jira-ruby', '~> 1.7'
+gem 'jira-ruby', '~> 2.0.0'
 gem 'atlassian-jwt', '~> 0.2.0'
 
 # Flowdock integration
@@ -293,7 +293,7 @@ gem 'base32', '~> 0.3.0'
 gem "gitlab-license", "~> 1.0"
 
 # Protect against bruteforcing
-gem 'rack-attack', '~> 6.2.0'
+gem 'rack-attack', '~> 6.3.0'
 
 # Sentry integration
 gem 'sentry-raven', '~> 2.9'
@@ -324,7 +324,6 @@ gem 'derailed_benchmarks', require: false
 # Metrics
 group :metrics do
   gem 'method_source', '~> 0.8', require: false
-  gem 'influxdb', '~> 0.2', require: false
 
   # Prometheus
   gem 'prometheus-client-mmap', '~> 0.10.0'
@@ -481,8 +480,6 @@ gem 'countries', '~> 3.0'
 
 gem 'retriable', '~> 3.1.2'
 
-gem 'liquid', '~> 4.0'
-
 # LRU cache
 gem 'lru_redux'
 
@@ -498,3 +495,6 @@ gem 'lockbox', '~> 0.3.3'
 
 # Email validation
 gem 'valid_email', '~> 0.1'
+
+# JSON
+gem 'json', '~> 2.3.0'

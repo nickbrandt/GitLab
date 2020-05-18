@@ -12,33 +12,34 @@ module EE
         def path_validations
           validations = [super].flatten
 
-          if !updated_from_web? && project.branch_requires_code_owner_approval?(branch_name)
+          if validate_code_owners?
             validations << validate_code_owners
           end
 
           validations
         end
 
-        def validate_code_owners
-          lambda do |paths|
-            loader = ::Gitlab::CodeOwners::Loader.new(project, branch_name, paths)
+        def validate_code_owners?
+          return false if updated_from_web? && skip_web_ui_code_owner_validations?
 
-            return if loader.entries.blank?
-            return if loader.members.include?(change_access.user_access.user)
-
-            assemble_error_msg_for_codeowner_matches(loader)
-          end
+          project.branch_requires_code_owner_approval?(branch_name)
         end
 
-        def assemble_error_msg_for_codeowner_matches(loader)
-          matched_rules = loader.entries.collect { |e| "- #{e.pattern}" }
-          code_owner_path = project.repository.code_owners_blob(ref: branch_name).path || "CODEOWNERS"
+        # To allow self-hosted installations to ignore CODEOWNERS rules when
+        # clicking Merge in the UI. By default, these rules are not skipped.
+        #
+        # Issue to remove this feature flag:
+        # https://gitlab.com/gitlab-org/gitlab/-/issues/217427
+        def skip_web_ui_code_owner_validations?
+          ::Feature.enabled?(:skip_web_ui_code_owner_validations, project)
+        end
 
-          "Pushes to protected branches that contain changes to files that\n" \
-            "match patterns defined in `#{code_owner_path}` are disabled for\n" \
-            "this project. Please submit these changes via a merge request.\n\n" \
-            "The following pattern(s) from `#{code_owner_path}` were matched:\n" \
-            "#{matched_rules.join('\n')}\n"
+        def validate_code_owners
+          lambda do |paths|
+            validator = ::Gitlab::CodeOwners::Validator.new(project, branch_name, paths)
+
+            validator.execute
+          end
         end
 
         def validate_path_locks?

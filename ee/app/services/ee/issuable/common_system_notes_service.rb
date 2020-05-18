@@ -7,7 +7,7 @@ module EE
       attr_reader :issuable
 
       override :execute
-      def execute(_issuable, old_labels: [], is_update: true)
+      def execute(_issuable, old_labels: [], old_milestone: nil, is_update: true)
         super
 
         ActiveRecord::Base.no_touching do

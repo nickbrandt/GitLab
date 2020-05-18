@@ -1,14 +1,17 @@
 # Jenkins CI service **(STARTER)**
 
+NOTE: **Note:**
+This documentation focuses only on how to **configure** a Jenkins *integration* with
+GitLab. Learn how to **migrate** from Jenkins to GitLab CI/CD in our
+[Migrating from Jenkins](../ci/jenkins/index.md) documentation.
+
 From GitLab, you can trigger a Jenkins build when you push code to a repository, or when a merge
 request is created. In return, Jenkins shows the pipeline status on merge requests widgets and
 on the GitLab project's home page.
 
-To better understand GitLab's Jenkins integration, watch the following videos:
+To better understand GitLab's Jenkins integration, watch the following video:
 
 - [GitLab workflow with Jira issues and Jenkins pipelines](https://youtu.be/Jn-_fyra7xQ)
-- [Migrating from Jenkins to GitLab](https://www.youtube.com/watch?v=RlEVGOpYF5Y)
-
 Use the Jenkins integration with GitLab when:
 
 - You plan to migrate your CI from Jenkins to [GitLab CI/CD](../ci/README.md) in the future, but
@@ -99,25 +102,29 @@ Set up the Jenkins project you’re going to run your build on.
 1. Check the following checkboxes:
    - **Accepted Merge Request Events**
    - **Closed Merge Request Events**
-1. If you created a **Freestyle** project, choose Publish build status to GitLab in the Post-build Actions section.
-   If you created a **Pipeline** project, you must use a pipeline script to update the status on
-   GitLab. The following is an example pipeline script:
+1. Specify how build status is reported to GitLab:
+   - If you created a **Freestyle** project, in the **Post-build Actions** section, choose
+   **Publish build status to GitLab**.
+   - If you created a **Pipeline** project, you must use a Jenkins Pipeline script to update the status on
+   GitLab.
 
-   ```plaintext
-   pipeline {
-      agent any
+     Example Jenkins Pipeline script:
 
-      stages {
-         stage('gitlab') {
-            steps {
-               echo 'Notify GitLab'
-               updateGitlabCommitStatus name: 'build', state: 'pending'
-               updateGitlabCommitStatus name: 'build', state: 'success'
+      ```groovy
+      pipeline {
+         agent any
+
+         stages {
+            stage('gitlab') {
+               steps {
+                  echo 'Notify GitLab'
+                  updateGitlabCommitStatus name: 'build', state: 'pending'
+                  updateGitlabCommitStatus name: 'build', state: 'success'
+               }
             }
          }
       }
-   }
-   ```
+      ```
 
 ## Configure the GitLab project
 

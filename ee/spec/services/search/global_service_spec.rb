@@ -169,4 +169,44 @@ describe Search::GlobalService do
       end
     end
   end
+
+  describe '#allowed_scopes' do
+    context 'when ES is used' do
+      it 'includes ES-specific scopes' do
+        expect(described_class.new(user, {}).allowed_scopes).to include('commits')
+      end
+    end
+
+    context 'when ES is not used' do
+      before do
+        stub_ee_application_setting(elasticsearch_limit_indexing: true)
+      end
+
+      it 'does not include ES-specific scopes' do
+        expect(described_class.new(user, {}).allowed_scopes).not_to include('commits')
+      end
+    end
+  end
+
+  context 'confidential notes' do
+    let(:project) { create(:project, :public) }
+
+    context 'with notes on issues' do
+      it_behaves_like 'search notes shared examples' do
+        let(:noteable) { create :issue, project: project }
+      end
+    end
+
+    context 'with notes on merge requests' do
+      it_behaves_like 'search notes shared examples' do
+        let(:noteable) { create :merge_request, target_project: project, source_project: project }
+      end
+    end
+
+    context 'with notes on commits' do
+      it_behaves_like 'search notes shared examples' do
+        let(:noteable) { create(:commit, project: project) }
+      end
+    end
+  end
 end

@@ -123,14 +123,31 @@ describe AlertManagement::Alert do
     it { is_expected.to define_enum_for(:severity).with_values(severity_values) }
   end
 
-  describe '.for_iid' do
+  describe 'scopes' do
     let_it_be(:project) { create(:project) }
     let_it_be(:alert_1) { create(:alert_management_alert, project: project) }
-    let_it_be(:alert_2) { create(:alert_management_alert, project: project) }
+    let_it_be(:alert_2) { create(:alert_management_alert, :resolved, project: project) }
+    let_it_be(:alert_3) { create(:alert_management_alert, :ignored, project: project) }
 
-    subject { AlertManagement::Alert.for_iid(alert_1.iid) }
+    describe '.for_iid' do
+      subject { AlertManagement::Alert.for_iid(alert_1.iid) }
 
-    it { is_expected.to match_array(alert_1) }
+      it { is_expected.to match_array(alert_1) }
+    end
+
+    describe '.for_status' do
+      let(:status) { AlertManagement::Alert::STATUSES[:resolved] }
+
+      subject { AlertManagement::Alert.for_status(status) }
+
+      it { is_expected.to match_array(alert_2) }
+
+      context 'with multiple statuses' do
+        let(:status) { AlertManagement::Alert::STATUSES.values_at(:resolved, :ignored) }
+
+        it { is_expected.to match_array([alert_2, alert_3]) }
+      end
+    end
   end
 
   describe '.for_fingerprint' do
@@ -145,7 +162,50 @@ describe AlertManagement::Alert do
     it { is_expected.to contain_exactly(alert_1) }
   end
 
-  describe '.details' do
+  describe '.search' do
+    let_it_be(:alert) do
+      create(:alert_management_alert,
+        title: 'Title',
+        description: 'Desc',
+        service: 'Service',
+        monitoring_tool: 'Monitor'
+      )
+    end
+
+    subject { AlertManagement::Alert.search(query) }
+
+    context 'does not contain search string' do
+      let(:query) { 'something else' }
+
+      it { is_expected.to be_empty }
+    end
+
+    context 'title includes query' do
+      let(:query) { alert.title.upcase }
+
+      it { is_expected.to contain_exactly(alert) }
+    end
+
+    context 'description includes query' do
+      let(:query) { alert.description.upcase }
+
+      it { is_expected.to contain_exactly(alert) }
+    end
+
+    context 'service includes query' do
+      let(:query) { alert.service.upcase }
+
+      it { is_expected.to contain_exactly(alert) }
+    end
+
+    context 'monitoring tool includes query' do
+      let(:query) { alert.monitoring_tool.upcase }
+
+      it { is_expected.to contain_exactly(alert) }
+    end
+  end
+
+  describe '#details' do
     let(:payload) do
       {
         'title' => 'Details title',

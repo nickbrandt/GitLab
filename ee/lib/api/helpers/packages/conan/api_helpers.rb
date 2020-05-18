@@ -94,6 +94,16 @@ module API
             end
           end
 
+          def token
+            strong_memoize(:token) do
+              token = nil
+              token = ::Gitlab::ConanToken.from_personal_access_token(access_token) if access_token
+              token = ::Gitlab::ConanToken.from_deploy_token(deploy_token_from_request) if deploy_token_from_request
+              token = ::Gitlab::ConanToken.from_job(find_job_from_token) if find_job_from_token
+              token
+            end
+          end
+
           def download_package_file(file_type)
             authorize!(:read_package, project)
 
@@ -156,6 +166,10 @@ module API
             job.user
           end
 
+          def deploy_token_from_request
+            find_deploy_token_from_conan_jwt || find_deploy_token_from_http_basic_auth
+          end
+
           def find_job_from_token
             find_job_from_conan_jwt || find_job_from_http_basic_auth
           end
@@ -171,6 +185,18 @@ module API
             return unless token
 
             PersonalAccessToken.find_by_id_and_user_id(token.access_token_id, token.user_id)
+          end
+
+          def find_deploy_token_from_conan_jwt
+            token = decode_oauth_token_from_jwt
+
+            return unless token
+
+            deploy_token = DeployToken.active.find_by_token(token.access_token_id.to_s)
+            # note: uesr_id is not a user record id, but is the attribute set on ConanToken
+            return if token.user_id != deploy_token&.username
+
+            deploy_token
           end
 
           def find_job_from_conan_jwt

@@ -104,8 +104,11 @@ describe ::EE::Gitlab::Scim::ProvisioningService do
 
       it_behaves_like 'success response'
 
-      it 'creates the identity' do
+      it 'creates the SCIM identity' do
         expect { service.execute }.to change { ScimIdentity.count }.by(1)
+      end
+
+      it 'does not create the SAML identity' do
         expect { service.execute }.not_to change { Identity.count }
       end
     end
@@ -127,8 +130,11 @@ describe ::EE::Gitlab::Scim::ProvisioningService do
         }
       end
 
-      it 'creates the identity' do
+      it 'creates the SAML identity' do
         expect { service.execute }.to change { Identity.count }.by(1)
+      end
+
+      it 'does not create the SCIM identity' do
         expect { service.execute }.not_to change { ScimIdentity.count }
       end
 
@@ -150,6 +156,7 @@ describe ::EE::Gitlab::Scim::ProvisioningService do
     context 'when scim_identities is enabled' do
       before do
         stub_feature_flags(scim_identities: true)
+        create(:saml_provider, group: group)
       end
 
       it_behaves_like 'scim provisioning'
@@ -163,9 +170,12 @@ describe ::EE::Gitlab::Scim::ProvisioningService do
         }
       end
 
-      it 'creates the scim identity' do
+      it 'creates the SCIM identity' do
         expect { service.execute }.to change { ScimIdentity.count }.by(1)
-        expect { service.execute }.not_to change { Identity.count }
+      end
+
+      it 'creates the SAML identity' do
+        expect { service.execute }.to change { Identity.count }.by(1)
       end
 
       context 'existing user' do

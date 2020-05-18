@@ -21,10 +21,6 @@ describe JwtController do
       let!(:saml_provider) { create(:saml_provider, enforced_sso: true, group: group) }
       let!(:identity) { create(:group_saml_identity, saml_provider: saml_provider, user: user) }
 
-      before do
-        stub_feature_flags(enforced_sso_requires_session: true)
-      end
-
       it 'allows access' do
         get '/jwt/auth', params: parameters, headers: headers
 

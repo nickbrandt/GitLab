@@ -62,6 +62,9 @@ describe Gitlab::UsageData, :aggregate_failures do
         expect(count_data[:issues_using_zoom_quick_actions]).to eq(3)
         expect(count_data[:issues_with_embedded_grafana_charts_approx]).to eq(2)
         expect(count_data[:incident_issues]).to eq(4)
+        expect(count_data[:issues_created_gitlab_alerts]).to eq(1)
+        expect(count_data[:alert_bot_incident_issues]).to eq(4)
+        expect(count_data[:incident_labeled_issues]).to eq(3)
 
         expect(count_data[:clusters_enabled]).to eq(6)
         expect(count_data[:project_clusters_enabled]).to eq(4)
@@ -95,6 +98,46 @@ describe Gitlab::UsageData, :aggregate_failures do
            uploads: { enabled: nil, object_store: { enabled: false, direct_upload: true, background_upload: false, provider: "AWS" } },
            packages: { enabled: true, object_store: { enabled: false, direct_upload: false, background_upload: true, provider: "AWS" } } }
         )
+      end
+
+      context 'with existing container expiration policies' do
+        let_it_be(:disabled) { create(:container_expiration_policy, enabled: false) }
+        let_it_be(:enabled) { create(:container_expiration_policy, enabled: true) }
+
+        %i[keep_n cadence older_than].each do |attribute|
+          ContainerExpirationPolicy.send("#{attribute}_options").keys.each do |value|
+            let_it_be("container_expiration_policy_with_#{attribute}_set_to_#{value}") { create(:container_expiration_policy, attribute => value) }
+          end
+        end
+
+        let(:inactive_policies) { ::ContainerExpirationPolicy.where(enabled: false) }
+        let(:active_policies) { ::ContainerExpirationPolicy.active }
+
+        subject { described_class.data[:counts] }
+
+        it 'gathers usage data' do
+          expect(subject[:projects_with_expiration_policy_enabled]).to eq 20
+          expect(subject[:projects_with_expiration_policy_disabled]).to eq 1
+
+          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_unset]).to eq 14
+          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_1]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_5]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_10]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_25]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_50]).to eq 1
+
+          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_unset]).to eq 16
+          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_7d]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_14d]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_30d]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_90d]).to eq 1
+
+          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1d]).to eq 12
+          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_7d]).to eq 5
+          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_14d]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1month]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_3month]).to eq 1
+        end
       end
 
       it 'works when queries time out' do
@@ -174,42 +217,20 @@ describe Gitlab::UsageData, :aggregate_failures do
           expect(subject[:dependency_proxy_enabled]).to eq(Gitlab.config.dependency_proxy.enabled)
           expect(subject[:gitlab_shared_runners_enabled]).to eq(Gitlab.config.gitlab_ci.shared_runners_enabled)
           expect(subject[:web_ide_clientside_preview_enabled]).to eq(Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?)
+          expect(subject[:grafana_link_enabled]).to eq(Gitlab::CurrentSettings.grafana_enabled?)
         end
 
-        context 'with existing container expiration policies' do
-          let_it_be(:disabled) { create(:container_expiration_policy, enabled: false) }
-          let_it_be(:enabled) { create(:container_expiration_policy, enabled: true) }
-          %i[keep_n cadence older_than].each do |attribute|
-            ContainerExpirationPolicy.send("#{attribute}_options").keys.each do |value|
-              let_it_be("container_expiration_policy_with_#{attribute}_set_to_#{value}") { create(:container_expiration_policy, attribute => value) }
-            end
+        context 'with embedded grafana' do
+          it 'returns true when embedded grafana is enabled' do
+            stub_application_setting(grafana_enabled: true)
+
+            expect(subject[:grafana_link_enabled]).to eq(true)
           end
 
-          let(:inactive_policies) { ::ContainerExpirationPolicy.where(enabled: false) }
-          let(:active_policies) { ::ContainerExpirationPolicy.active }
+          it 'returns false when embedded grafana is disabled' do
+            stub_application_setting(grafana_enabled: false)
 
-          it 'gathers usage data' do
-            expect(subject[:projects_with_expiration_policy_enabled]).to eq 16
-            expect(subject[:projects_with_expiration_policy_disabled]).to eq 1
-
-            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_unset]).to eq 10
-            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_1]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_5]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_10]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_25]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_50]).to eq 1
-
-            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_unset]).to eq 12
-            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_7d]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_14d]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_30d]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_90d]).to eq 1
-
-            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1d]).to eq 12
-            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_7d]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_14d]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1month]).to eq 1
-            expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_3month]).to eq 1
+            expect(subject[:grafana_link_enabled]).to eq(false)
           end
         end
       end

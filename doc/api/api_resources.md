@@ -26,6 +26,7 @@ The following API resources are available in the project context:
 | [Custom attributes](custom_attributes.md)                           | `/projects/:id/custom_attributes` (also available for groups and users)                                                                                                                               |
 | [Dependencies](dependencies.md) **(ULTIMATE)**                      | `/projects/:id/dependencies`                                                                                                                                                                          |
 | [Deploy keys](deploy_keys.md)                                       | `/projects/:id/deploy_keys` (also available standalone)                                                                                                                                               |
+| [Freeze Periods](freeze_periods.md)                                 | `/projects/:id/freeze_periods`                                                                                                                                                                        |
 | [Deployments](deployments.md)                                       | `/projects/:id/deployments`                                                                                                                                                                           |
 | [Discussions](discussions.md) (threaded comments)                   | `/projects/:id/issues/.../discussions`, `/projects/:id/snippets/.../discussions`, `/projects/:id/merge_requests/.../discussions`, `/projects/:id/commits/.../discussions` (also available for groups) |
 | [Environments](environments.md)                                     | `/projects/:id/environments`                                                                                                                                                                          |
@@ -72,6 +73,7 @@ The following API resources are available in the project context:
 | [Search](search.md)                                                 | `/projects/:id/search` (also available for groups and standalone)                                                                                                                                     |
 | [Services](services.md)                                             | `/projects/:id/services`                                                                                                                                                                              |
 | [Tags](tags.md)                                                     | `/projects/:id/repository/tags`                                                                                                                                                                       |
+| [User-starred metrics dashboards](metrics_user_starred_dashboards.md ) | `/projects/:id/metrics/user_starred_dashboards`                                                                                                                             |
 | [Visual Review discussions](visual_review_discussions.md) **(STARTER)** | `/projects/:id/merge_requests/:merge_request_id/visual_review_discussions`                                                                                                                        |
 | [Vulnerabilities](vulnerabilities.md) **(ULTIMATE)**                | `/vulnerabilities/:id`                                                                                                                                                                       |
 | [Vulnerability exports](vulnerability_exports.md) **(ULTIMATE)**    | `/projects/:id/vulnerability_exports`                                                                                                                                                                       |
@@ -112,7 +114,8 @@ The following API resources are available outside of project and group contexts 
 
 | Resource                                           | Available endpoints                                                     |
 |:---------------------------------------------------|:------------------------------------------------------------------------|
-| [Admin Sidekiq queues](admin_sidekiq_queues.md)    | `/admin/sidekiq/queues/:queue_name`                                               |
+| [Instance-level CI/CD variables](instance_level_ci_variables.md) | `/admin/ci/variables`                                     |
+| [Admin Sidekiq queues](admin_sidekiq_queues.md)    | `/admin/sidekiq/queues/:queue_name`                                     |
 | [Appearance](appearance.md) **(CORE ONLY)**        | `/application/appearance`                                               |
 | [Applications](applications.md)                    | `/applications`                                                         |
 | [Audit Events](audit_events.md) **(PREMIUM ONLY)** | `/audit_events`                                                         |
@@ -137,6 +140,7 @@ The following API resources are available outside of project and group contexts 
 | [Notification settings](notification_settings.md)  | `/notification_settings` (also available for groups and projects)       |
 | [Pages domains](pages_domains.md)                  | `/pages/domains` (also available for projects)                          |
 | [Projects](projects.md)                            | `/users/:id/projects` (also available for projects)                     |
+| [Project Repository Storage Moves](project_repository_storage_moves.md) | `/project_repository_storage_moves`                |
 | [Runners](runners.md)                              | `/runners` (also available for projects)                                |
 | [Search](search.md)                                | `/search` (also available for groups and projects)                      |
 | [Settings](settings.md) **(CORE ONLY)**            | `/application/settings`                                                 |

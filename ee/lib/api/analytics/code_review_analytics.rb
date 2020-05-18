@@ -21,21 +21,25 @@ module API
               attempt_project_search_optimizations: true
             }
 
-            finder_options = params.slice(*MergeRequestsFinder.valid_params).merge(finder_options)
-
-            MergeRequestsFinder.new(current_user, finder_options)
+            MergeRequestsFinder.new(current_user, declared_params.merge(finder_options))
           end
+        end
+
+        params :negatable_params do
+          optional :label_name, type: Array, desc: 'Array of label names to filter by'
+          optional :milestone_title, type: String, desc: 'Milestone title to filter by'
         end
       end
 
       resource :analytics do
-        desc 'List code review information about project' do
-        end
+        desc 'List code review information about project'
         params do
           requires :project_id, type: Integer, desc: 'Project ID'
-          optional :label_name, type: Array, desc: 'Array of label names to filter by'
-          optional :milestone_title, type: String, desc: 'Milestone title to filter by'
+          use :negatable_params
           use :pagination
+          optional :not, type: Hash do
+            use :negatable_params
+          end
         end
         get 'code_review' do
           authorize! :read_code_review_analytics, project

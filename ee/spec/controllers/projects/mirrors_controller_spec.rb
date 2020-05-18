@@ -172,7 +172,7 @@ describe Projects::MirrorsController do
         expect(response).to have_gitlab_http_status(:ok)
 
         import_data = project.reload_import_data
-        expect(import_data.ssh_known_hosts_verified_at).to be_within(1.minute).of(Time.now)
+        expect(import_data.ssh_known_hosts_verified_at).to be_within(1.minute).of(Time.current)
         expect(import_data.ssh_known_hosts_verified_by).to eq(project.owner)
       end
 

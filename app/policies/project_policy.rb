@@ -84,6 +84,16 @@ class ProjectPolicy < BasePolicy
     project.merge_requests_allowing_push_to_user(user).any?
   end
 
+  desc "Deploy token with read_package_registry scope"
+  condition(:read_package_registry_deploy_token) do
+    user.is_a?(DeployToken) && user.has_access_to?(project) && user.read_package_registry
+  end
+
+  desc "Deploy token with write_package_registry scope"
+  condition(:write_package_registry_deploy_token) do
+    user.is_a?(DeployToken) && user.has_access_to?(project) && user.write_package_registry
+  end
+
   with_scope :subject
   condition(:forking_allowed) do
     @subject.feature_available?(:forking, @user)
@@ -186,6 +196,7 @@ class ProjectPolicy < BasePolicy
     enable :set_issue_updated_at
     enable :set_note_created_at
     enable :set_emails_disabled
+    enable :set_show_default_award_emojis
   end
 
   rule { can?(:guest_access) }.policy do
@@ -271,6 +282,11 @@ class ProjectPolicy < BasePolicy
     enable :read_deployment
   end
 
+  rule { ~anonymous & can?(:metrics_dashboard) }.policy do
+    enable :create_metrics_user_starred_dashboard
+    enable :read_metrics_user_starred_dashboard
+  end
+
   rule { owner | admin | guest | group_member }.prevent :request_access
   rule { ~request_access_enabled }.prevent :request_access
 
@@ -350,6 +366,10 @@ class ProjectPolicy < BasePolicy
     enable :destroy_deploy_token
     enable :read_prometheus_alerts
     enable :admin_terraform_state
+    enable :create_freeze_period
+    enable :read_freeze_period
+    enable :update_freeze_period
+    enable :destroy_freeze_period
   end
 
   rule { public_project & metrics_dashboard_allowed }.policy do
@@ -409,9 +429,25 @@ class ProjectPolicy < BasePolicy
   rule { builds_disabled | repository_disabled }.policy do
     prevent(*create_read_update_admin_destroy(:build))
     prevent(*create_read_update_admin_destroy(:pipeline_schedule))
-    prevent(*create_read_update_admin_destroy(:environment))
     prevent(*create_read_update_admin_destroy(:cluster))
     prevent(*create_read_update_admin_destroy(:deployment))
+  end
+
+  # Enabling `read_environment` specifically for the condition of `metrics_dashboard_allowed` is
+  # necessary due to the route for metrics dashboard requiring an environment id.
+  # This will be addressed in https://gitlab.com/gitlab-org/gitlab/-/issues/213833 when
+  # environments and metrics are decoupled and these rules will be removed.
+
+  rule { (builds_disabled | repository_disabled) & ~metrics_dashboard_allowed}.policy do
+    prevent(*create_read_update_admin_destroy(:environment))
+  end
+
+  rule { (builds_disabled | repository_disabled) & metrics_dashboard_allowed}.policy do
+    prevent :create_environment
+    prevent :update_environment
+    prevent :admin_environment
+    prevent :destroy_environment
+    enable :read_environment
   end
 
   # There's two separate cases when builds_disabled is true:
@@ -528,6 +564,16 @@ class ProjectPolicy < BasePolicy
     prevent :read_design
     prevent :create_design
     prevent :destroy_design
+  end
+
+  rule { read_package_registry_deploy_token }.policy do
+    enable :read_package
+    enable :read_project
+  end
+
+  rule { write_package_registry_deploy_token }.policy do
+    enable :create_package
+    enable :read_project
   end
 
   private

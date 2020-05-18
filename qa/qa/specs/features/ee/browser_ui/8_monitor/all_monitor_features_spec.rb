@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Monitor' do
-    describe 'with Prometheus Gitlab-managed cluster', :orchestrated, :kubernetes, :docker do
+  context 'Monitor', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217705', type: :flaky } do
+    describe 'with Prometheus Gitlab-managed cluster', :orchestrated, :kubernetes, :docker, :runner do
       before :all do
         @cluster = Service::KubernetesCluster.new.create!
         Flow::Login.sign_in
@@ -10,27 +10,13 @@ module QA
       end
 
       after :all do
-        @runner.remove_via_api!
+        @runner&.remove_via_api!
         @cluster&.remove!
       end
 
       before do
         Flow::Login.sign_in_unless_signed_in
         @project.visit!
-      end
-
-      it 'configures custom metrics' do
-        Page::Project::Menu.perform(&:go_to_operations_metrics)
-
-        Page::Project::Operations::Metrics::Show.perform do |metrics|
-          metrics.add_custom_metric
-        end
-
-        Page::Project::Menu.perform(&:go_to_operations_metrics)
-
-        Page::Project::Operations::Metrics::Show.perform do |metrics|
-          expect(metrics).to have_custom_metric
-        end
       end
 
       it 'allows configuration of alerts' do

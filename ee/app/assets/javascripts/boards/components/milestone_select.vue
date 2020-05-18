@@ -3,8 +3,8 @@
 import { GlLoadingIcon } from '@gitlab/ui';
 import MilestoneSelect from '~/milestone_select';
 
-const ANY_MILESTONE = 'Any Milestone';
-const NO_MILESTONE = 'No Milestone';
+const ANY_MILESTONE = 'Any milestone';
+const NO_MILESTONE = 'No milestone';
 
 export default {
   components: {

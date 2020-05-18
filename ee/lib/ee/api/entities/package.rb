@@ -29,14 +29,12 @@ module EE
 
         expose :pipeline, if: ->(package) { package.build_info }, using: Package::Pipeline
 
+        expose :versions, using: ::EE::API::Entities::PackageVersion
+
         private
 
         def project_path
           object.project.full_path
-        end
-
-        def pipeline
-          object.build_info.pipeline
         end
       end
     end

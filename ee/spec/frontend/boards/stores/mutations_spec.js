@@ -1,4 +1,5 @@
 import mutations from 'ee/boards/stores/mutations';
+import { inactiveListId } from '~/boards/constants';
 
 const expectNotImplemented = action => {
   it('is not implemented', () => {
@@ -32,7 +33,7 @@ describe('SET_ACTIVE_LIST_ID', () => {
   it('updates aciveListId to be the value that is passed', () => {
     const expectedId = 1;
     const state = {
-      activeListId: 0,
+      activeListId: inactiveListId,
     };
 
     mutations.SET_ACTIVE_LIST_ID(state, expectedId);

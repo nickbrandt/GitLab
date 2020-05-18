@@ -16,6 +16,7 @@ import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
 import updateImageDiffNoteMutation from '../../graphql/mutations/updateImageDiffNote.mutation.graphql';
+import updateActiveDiscussionMutation from '../../graphql/mutations/update_active_discussion.mutation.graphql';
 import {
   extractDiscussions,
   extractDesign,
@@ -37,6 +38,7 @@ import {
 } from '../../utils/error_messages';
 import { trackDesignDetailView } from '../../utils/tracking';
 import { DESIGNS_ROUTE_NAME } from '../../router/constants';
+import { ACTIVE_DISCUSSION_SOURCE_TYPES } from '../../constants';
 
 export default {
   components: {
@@ -259,11 +261,22 @@ export default {
       });
     },
     trackEvent() {
+      // TODO: This needs to be made aware of referers, or if it's rendered in a different context than a Issue
       trackDesignDetailView(
         'issue-design-collection',
+        'issue',
         this.$route.query.version || this.latestVersionId,
         this.isLatestVersion,
       );
+    },
+    updateActiveDiscussion(id) {
+      this.$apollo.mutate({
+        mutation: updateActiveDiscussionMutation,
+        variables: {
+          id,
+          source: ACTIVE_DISCUSSION_SOURCE_TYPES.discussion,
+        },
+      });
     },
   },
   beforeRouteEnter(to, from, next) {
@@ -274,6 +287,13 @@ export default {
   beforeRouteUpdate(to, from, next) {
     this.trackEvent();
     this.closeCommentForm();
+    // We need to reset the active discussion when opening a new design
+    this.updateActiveDiscussion();
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    // We need to reset the active discussion when moving to design list view
+    this.updateActiveDiscussion();
     next();
   },
   createImageDiffNoteMutation,
@@ -301,7 +321,7 @@ export default {
               :is-deleting="loading"
               :is-latest-version="isLatestVersion"
               v-bind="design"
-              @delete="mutate()"
+              @delete="mutate"
             />
           </template>
         </design-destroyer>
@@ -318,6 +338,7 @@ export default {
           :is-annotating="isAnnotating"
           :scale="scale"
           @openCommentForm="openCommentForm"
+          @closeCommentForm="closeCommentForm"
           @moveNote="onMoveNote"
         />
 
@@ -325,7 +346,7 @@ export default {
           <design-scaler @scale="scale = $event" />
         </div>
       </div>
-      <div class="image-notes">
+      <div class="image-notes" @click="updateActiveDiscussion()">
         <h2 class="gl-font-size-20-deprecated-no-really-do-not-use-me font-weight-bold mt-0">
           {{ issue.title }}
         </h2>
@@ -348,6 +369,7 @@ export default {
             :markdown-preview-path="markdownPreviewPath"
             @error="onDesignDiscussionError"
             @updateNoteError="onUpdateNoteError"
+            @click.native.stop="updateActiveDiscussion(discussion.notes[0].id)"
           />
           <apollo-mutation
             v-if="annotationCoordinates"

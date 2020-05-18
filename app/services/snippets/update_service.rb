@@ -48,13 +48,16 @@ module Snippets
 
       true
     rescue => e
-      # Restore old attributes
+      # Restore old attributes but re-assign changes so they're not lost
       unless snippet.previous_changes.empty?
         snippet.previous_changes.each { |attr, value| snippet[attr] = value[0] }
         snippet.save
+
+        snippet.assign_attributes(params)
       end
 
-      snippet.errors.add(:repository, 'Error updating the snippet')
+      add_snippet_repository_error(snippet: snippet, error: e)
+
       log_error(e.message)
 
       # If the commit action failed we remove it because

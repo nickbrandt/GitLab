@@ -6,11 +6,12 @@ issues:
 - assignees
 - updated_by
 - milestone
-- sprint
+- iteration
 - notes
 - resource_label_events
 - resource_weight_events
 - resource_milestone_events
+- resource_state_events
 - sent_notifications
 - sentry_issue
 - label_links
@@ -115,10 +116,11 @@ merge_requests:
 - assignee
 - updated_by
 - milestone
-- sprint
+- iteration
 - notes
 - resource_label_events
 - resource_milestone_events
+- resource_state_events
 - label_links
 - labels
 - last_edited_by
@@ -227,6 +229,7 @@ stages:
 - processables
 - builds
 - bridges
+- latest_statuses
 statuses:
 - project
 - pipeline
@@ -348,7 +351,7 @@ project:
 - labels
 - events
 - milestones
-- sprints
+- iterations
 - notes
 - snippets
 - hooks
@@ -426,7 +429,6 @@ project:
 - mirror_user
 - push_rule
 - jenkins_service
-- jenkins_deprecated_service
 - index_status
 - feature_usage
 - approval_rules

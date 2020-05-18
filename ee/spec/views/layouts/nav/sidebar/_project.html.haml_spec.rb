@@ -224,6 +224,9 @@ describe 'layouts/nav/sidebar/_project' do
   describe 'Packages' do
     let(:user) { create(:user) }
 
+    let_it_be(:package_menu_name) { 'Packages & Registries' }
+    let_it_be(:package_entry_name) { 'Package Registry' }
+
     before do
       project.team.add_developer(user)
       sign_in(user)
@@ -234,13 +237,13 @@ describe 'layouts/nav/sidebar/_project' do
       it 'packages link is visible' do
         render
 
-        expect(rendered).to have_link('Packages', href: project_packages_path(project))
+        expect(rendered).to have_link(package_menu_name, href: project_packages_path(project))
       end
 
       it 'packages list link is visible' do
         render
 
-        expect(rendered).to have_link('List', href: project_packages_path(project))
+        expect(rendered).to have_link(package_entry_name, href: project_packages_path(project))
       end
 
       it 'container registry link is visible' do
@@ -258,19 +261,19 @@ describe 'layouts/nav/sidebar/_project' do
       it 'packages list link is not visible' do
         render
 
-        expect(rendered).not_to have_link('List', href: project_packages_path(project))
+        expect(rendered).not_to have_link(package_entry_name, href: project_packages_path(project))
       end
 
       it 'top level packages link links to container registry' do
         render
 
-        expect(rendered).to have_link('Packages', href: project_container_registry_index_path(project))
+        expect(rendered).to have_link(package_menu_name, href: project_container_registry_index_path(project))
       end
 
       it 'packages top level and container registry links are visible' do
         render
 
-        expect(rendered).to have_link('Packages', href: project_container_registry_index_path(project))
+        expect(rendered).to have_link(package_menu_name, href: project_container_registry_index_path(project))
         expect(rendered).to have_link('Container Registry', href: project_container_registry_index_path(project))
       end
     end
@@ -283,8 +286,8 @@ describe 'layouts/nav/sidebar/_project' do
       it 'packages top level and list link are visible' do
         render
 
-        expect(rendered).to have_link('Packages', href: project_packages_path(project))
-        expect(rendered).to have_link('List', href: project_packages_path(project))
+        expect(rendered).to have_link(package_menu_name, href: project_packages_path(project))
+        expect(rendered).to have_link(package_entry_name, href: project_packages_path(project))
       end
 
       it 'container registry link is not visible' do
@@ -303,7 +306,7 @@ describe 'layouts/nav/sidebar/_project' do
       it 'packages top level item is not visible' do
         render
 
-        expect(rendered).not_to have_link('Packages', href: project_packages_path(project))
+        expect(rendered).not_to have_link(package_menu_name, href: project_packages_path(project))
       end
     end
   end

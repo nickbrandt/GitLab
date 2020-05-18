@@ -3,6 +3,8 @@ import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { convertToFixedRange } from '~/lib/utils/datetime_range';
+import { parseTemplatingVariables } from './variable_mapping';
+import { mergeURLVariables } from '../utils';
 import {
   gqClient,
   parseEnvironmentsResponse,
@@ -13,11 +15,7 @@ import trackDashboardLoad from '../monitoring_tracking_helper';
 import getEnvironments from '../queries/getEnvironments.query.graphql';
 import getAnnotations from '../queries/getAnnotations.query.graphql';
 import statusCodes from '../../lib/utils/http_status';
-import {
-  backOff,
-  convertObjectPropsToCamelCase,
-  isFeatureFlagEnabled,
-} from '../../lib/utils/common_utils';
+import { backOff, convertObjectPropsToCamelCase } from '../../lib/utils/common_utils';
 import { s__, sprintf } from '../../locale';
 
 import {
@@ -81,7 +79,7 @@ export const setTimeRange = ({ commit }, timeRange) => {
 };
 
 export const setVariables = ({ commit }, variables) => {
-  commit(types.SET_PROM_QUERY_VARIABLES, variables);
+  commit(types.SET_VARIABLES, variables);
 };
 
 export const filterEnvironments = ({ commit, dispatch }, searchTerm) => {
@@ -116,14 +114,7 @@ export const clearExpandedPanel = ({ commit }) => {
 export const fetchData = ({ dispatch }) => {
   dispatch('fetchEnvironmentsData');
   dispatch('fetchDashboard');
-  /**
-   * Annotations data is not yet fetched. This will be
-   * ready after the BE piece is implemented.
-   * https://gitlab.com/gitlab-org/gitlab/-/issues/211330
-   */
-  if (isFeatureFlagEnabled('metricsDashboardAnnotations')) {
-    dispatch('fetchAnnotations');
-  }
+  dispatch('fetchAnnotations');
 };
 
 // Metrics dashboard
@@ -170,6 +161,7 @@ export const receiveMetricsDashboardSuccess = ({ commit, dispatch }, { response 
 
   commit(types.SET_ALL_DASHBOARDS, all_dashboards);
   commit(types.RECEIVE_METRICS_DASHBOARD_SUCCESS, dashboard);
+  commit(types.SET_VARIABLES, mergeURLVariables(parseTemplatingVariables(dashboard.templating)));
   commit(types.SET_ENDPOINTS, convertObjectPropsToCamelCase(metrics_data));
 
   return dispatch('fetchDashboardData');
@@ -222,14 +214,17 @@ export const fetchDashboardData = ({ state, dispatch, getters }) => {
  *
  * @param {metric} metric
  */
-export const fetchPrometheusMetric = ({ commit, state }, { metric, defaultQueryParams }) => {
+export const fetchPrometheusMetric = (
+  { commit, state, getters },
+  { metric, defaultQueryParams },
+) => {
   const queryParams = { ...defaultQueryParams };
   if (metric.step) {
     queryParams.step = metric.step;
   }
 
-  if (state.promVariables.length > 0) {
-    queryParams.variables = state.promVariables;
+  if (Object.keys(state.promVariables).length > 0) {
+    queryParams.variables = getters.getCustomVariablesArray;
   }
 
   commit(types.REQUEST_METRIC_RESULT, { metricId: metric.metricId });
@@ -353,6 +348,35 @@ export const receiveAnnotationsFailure = ({ commit }) => commit(types.RECEIVE_AN
 
 // Dashboard manipulation
 
+export const toggleStarredValue = ({ commit, state, getters }) => {
+  const { selectedDashboard } = getters;
+
+  if (state.isUpdatingStarredValue) {
+    // Prevent repeating requests for the same change
+    return;
+  }
+  if (!selectedDashboard) {
+    return;
+  }
+
+  const method = selectedDashboard.starred ? 'DELETE' : 'POST';
+  const url = selectedDashboard.user_starred_path;
+  const newStarredValue = !selectedDashboard.starred;
+
+  commit(types.REQUEST_DASHBOARD_STARRING);
+
+  axios({
+    url,
+    method,
+  })
+    .then(() => {
+      commit(types.RECEIVE_DASHBOARD_STARRING_SUCCESS, newStarredValue);
+    })
+    .catch(() => {
+      commit(types.RECEIVE_DASHBOARD_STARRING_FAILURE);
+    });
+};
+
 /**
  * Set a new array of metrics to a panel group
  * @param {*} data An object containing
@@ -388,6 +412,12 @@ export const duplicateSystemDashboard = ({ state }, payload) => {
         throw s__('Metrics|There was an error creating the dashboard.');
       }
     });
+};
+
+// Variables manipulation
+
+export const updateVariableValues = ({ commit }, updatedVariable) => {
+  commit(types.UPDATE_VARIABLE_VALUES, updatedVariable);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

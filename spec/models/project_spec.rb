@@ -21,7 +21,7 @@ describe Project do
     it { is_expected.to have_many(:merge_requests) }
     it { is_expected.to have_many(:issues) }
     it { is_expected.to have_many(:milestones) }
-    it { is_expected.to have_many(:sprints) }
+    it { is_expected.to have_many(:iterations) }
     it { is_expected.to have_many(:project_members).dependent(:delete_all) }
     it { is_expected.to have_many(:users).through(:project_members) }
     it { is_expected.to have_many(:requesters).dependent(:delete_all) }
@@ -2845,7 +2845,7 @@ describe Project do
     end
 
     it 'schedules the transfer of the repository to the new storage and locks the project' do
-      expect(ProjectUpdateRepositoryStorageWorker).to receive(:perform_async).with(project.id, 'test_second_storage', repository_storage_move_id: anything)
+      expect(ProjectUpdateRepositoryStorageWorker).to receive(:perform_async).with(project.id, 'test_second_storage', anything)
 
       project.change_repository_storage('test_second_storage')
       project.save!
@@ -3135,6 +3135,45 @@ describe Project do
              partially_matched_variable,
              perfectly_matched_variable])
         end
+      end
+    end
+  end
+
+  describe '#ci_instance_variables_for' do
+    let(:project) { create(:project) }
+
+    let!(:instance_variable) do
+      create(:ci_instance_variable, value: 'secret')
+    end
+
+    let!(:protected_instance_variable) do
+      create(:ci_instance_variable, :protected, value: 'protected')
+    end
+
+    subject { project.ci_instance_variables_for(ref: 'ref') }
+
+    before do
+      stub_application_setting(
+        default_branch_protection: Gitlab::Access::PROTECTION_NONE)
+    end
+
+    context 'when the ref is not protected' do
+      before do
+        allow(project).to receive(:protected_for?).with('ref').and_return(false)
+      end
+
+      it 'contains only the CI variables' do
+        is_expected.to contain_exactly(instance_variable)
+      end
+    end
+
+    context 'when the ref is protected' do
+      before do
+        allow(project).to receive(:protected_for?).with('ref').and_return(true)
+      end
+
+      it 'contains all the variables' do
+        is_expected.to contain_exactly(instance_variable, protected_instance_variable)
       end
     end
   end
@@ -3637,6 +3676,24 @@ describe Project do
         expect(projects).to contain_exactly(public_project)
       end
     end
+
+    context 'with deploy token users' do
+      let_it_be(:private_project) { create(:project, :private) }
+
+      subject { described_class.all.public_or_visible_to_user(user) }
+
+      context 'deploy token user without project' do
+        let_it_be(:user) { create(:deploy_token) }
+
+        it { is_expected.to eq [] }
+      end
+
+      context 'deploy token user with project' do
+        let_it_be(:user) { create(:deploy_token, projects: [private_project]) }
+
+        it { is_expected.to include(private_project) }
+      end
+    end
   end
 
   describe '.ids_with_issuables_available_for' do
@@ -3760,7 +3817,7 @@ describe Project do
     end
   end
 
-  describe '.filter_by_feature_visibility' do
+  describe '.filter_by_feature_visibility', :enable_admin_mode do
     include_context 'ProjectPolicyTable context'
     include ProjectHelpers
     using RSpec::Parameterized::TableSyntax

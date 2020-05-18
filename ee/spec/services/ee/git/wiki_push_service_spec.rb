@@ -23,8 +23,12 @@ describe Git::WikiPushService do
     describe 'when changes include master ref' do
       let(:changes) { +"123456 789012 refs/heads/tést\n654321 210987 refs/tags/tag\n423423 797823 refs/heads/master" }
 
+      before do
+        allow(project.wiki.repository.raw).to receive(:raw_changes_between).once.with('423423', '797823').and_return([])
+      end
+
       it 'triggers a wiki update' do
-        expect(project.wiki).to receive(:index_wiki_blobs).with("797823")
+        expect(project.wiki).to receive(:index_wiki_blobs)
 
         described_class.new(project, project.owner, changes: post_received.changes).execute
       end
@@ -44,6 +48,7 @@ describe Git::WikiPushService do
   context 'when elasticsearch is disabled' do
     before do
       stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
+      allow(project.wiki.repository.raw).to receive(:raw_changes_between).once.with('423423', '797823').and_return([])
     end
 
     describe 'when changes include master ref' do

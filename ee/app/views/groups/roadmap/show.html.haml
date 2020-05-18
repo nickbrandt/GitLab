@@ -6,6 +6,8 @@
 - @content_class = "group-epics-roadmap"
 - breadcrumb_title _("Epics Roadmap")
 - epics_limit_feature = 'epics_limit_warning_dismissed'
+- sub_epics_feature_available = @group.feature_available?(:subepics)
+- allow_sub_epics = sub_epics_feature_available ? 'true' : 'false'
 
 - has_filters_applied = params[:label_name].present? || params[:author_username].present? || params[:search].present?
 
@@ -21,7 +23,7 @@
       %a.btn.btn-outline-warning#js-learn-more{ "href" => "https://docs.gitlab.com/ee/user/group/roadmap/" }
         = _("Learn more")
 
-  #js-roadmap{ data: { epics_path: group_epics_path(@group, format: :json), group_id: @group.id, full_path: @group.full_path, empty_state_illustration: image_path('illustrations/epics/roadmap.svg'), has_filters_applied: "#{has_filters_applied}", new_epic_endpoint: group_epics_path(@group), preset_type: roadmap_layout, epics_state: @epics_state, sorted_by: @sort } }
+  #js-roadmap{ data: { epics_path: group_epics_path(@group, format: :json), group_id: @group.id, full_path: @group.full_path, empty_state_illustration: image_path('illustrations/epics/roadmap.svg'), has_filters_applied: "#{has_filters_applied}", new_epic_endpoint: group_epics_path(@group), preset_type: roadmap_layout, epics_state: @epics_state, sorted_by: @sort, allow_sub_epics: allow_sub_epics } }
 
 - else
   = render 'shared/empty_states/roadmap'

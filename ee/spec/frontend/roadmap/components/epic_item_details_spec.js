@@ -1,5 +1,6 @@
 import { GlButton, GlIcon, GlTooltip } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
+import createStore from 'ee/roadmap/store';
 import EpicItemDetails from 'ee/roadmap/components/epic_item_details.vue';
 import eventHub from 'ee/roadmap/event_hub';
 import {
@@ -8,6 +9,8 @@ import {
   mockFormattedChildEpic2,
   mockFormattedChildEpic1,
 } from 'ee_jest/roadmap/mock_data';
+
+let store;
 
 const createComponent = ({
   epic = mockFormattedEpic,
@@ -19,6 +22,7 @@ const createComponent = ({
   isChildrenEmpty = false,
 } = {}) => {
   return shallowMount(EpicItemDetails, {
+    store,
     propsData: {
       epic,
       currentGroupId,
@@ -43,6 +47,7 @@ describe('EpicItemDetails', () => {
   let wrapper;
 
   beforeEach(() => {
+    store = createStore();
     wrapper = createComponent();
   });
 
@@ -131,6 +136,10 @@ describe('EpicItemDetails', () => {
   });
 
   describe('epic', () => {
+    beforeEach(() => {
+      store.state.allowSubEpics = true;
+    });
+
     describe('expand icon', () => {
       it('is hidden when epic has no child epics', () => {
         const epic = {
@@ -324,6 +333,12 @@ describe('EpicItemDetails', () => {
         expect(wrapper.find(GlTooltip).text()).toBe(
           '1 child epic Some child epics may be hidden due to applied filters',
         );
+      });
+
+      it('does not render if the user license does not support child epics', () => {
+        store.state.allowSubEpics = false;
+        wrapper = createComponent();
+        expect(getChildEpicsCount(wrapper).exists()).toBe(false);
       });
     });
   });

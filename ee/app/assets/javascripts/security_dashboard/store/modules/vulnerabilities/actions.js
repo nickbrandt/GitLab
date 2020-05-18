@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
-import downloadPatchHelper from 'ee/vue_shared/security_reports/store/utils/download_patch_helper';
+import download from '~/lib/utils/downloader';
 import axios from '~/lib/utils/axios_utils';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { s__, n__, sprintf } from '~/locale';
@@ -450,7 +450,7 @@ export const downloadPatch = ({ state }) => {
     https://gitlab.com/gitlab-org/gitlab-ui/issues/188#note_165808493
   */
   const { vulnerability } = state.modal;
-  downloadPatchHelper(vulnerability.remediations[0].diff);
+  download({ fileData: vulnerability.remediations[0].diff, fileName: `remediation.patch` });
   $('#modal-mrwidget-security-issue').modal('hide');
 };
 

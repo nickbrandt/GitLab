@@ -113,6 +113,14 @@ describe IssuesFinder do
             end
           end
         end
+
+        context 'filter issues with any epic' do
+          let(:params) { { epic_id: ::IssuableFinder::Params::FILTER_ANY } }
+
+          it 'returns filtered issues' do
+            expect(issues).to contain_exactly(issue_1, issue_2, issue_subepic)
+          end
+        end
       end
     end
   end

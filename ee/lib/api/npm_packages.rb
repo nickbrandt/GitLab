@@ -106,7 +106,7 @@ module API
     params do
       requires :package_name, type: String, desc: 'Package name'
     end
-    route_setting :authentication, job_token_allowed: true
+    route_setting :authentication, job_token_allowed: true, deploy_token_allowed: true
     get 'packages/npm/*package_name', format: false, requirements: NPM_ENDPOINT_REQUIREMENTS do
       package_name = params[:package_name]
 
@@ -137,7 +137,7 @@ module API
         requires :package_name, type: String, desc: 'Package name'
         requires :file_name, type: String, desc: 'Package file name'
       end
-      route_setting :authentication, job_token_allowed: true
+      route_setting :authentication, job_token_allowed: true, deploy_token_allowed: true
       get ':id/packages/npm/*package_name/-/*file_name', format: false do
         authorize_read_package!(user_project)
 
@@ -159,7 +159,7 @@ module API
         requires :package_name, type: String, desc: 'Package name'
         requires :versions, type: Hash, desc: 'Package version info'
       end
-      route_setting :authentication, job_token_allowed: true
+      route_setting :authentication, job_token_allowed: true, deploy_token_allowed: true
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!(user_project)
 

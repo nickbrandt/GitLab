@@ -15,9 +15,7 @@ describe Analytics::CycleAnalytics::SummaryController do
     sign_in(user)
   end
 
-  describe 'GET `show`' do
-    subject { get :show, params: params }
-
+  shared_examples 'summary endpoint' do
     it 'succeeds' do
       subject
 
@@ -45,5 +43,17 @@ describe Analytics::CycleAnalytics::SummaryController do
 
     include_examples 'cycle analytics data endpoint examples'
     include_examples 'group permission check on the controller level'
+  end
+
+  describe 'GET "show"' do
+    subject { get :show, params: params }
+
+    it_behaves_like 'summary endpoint'
+  end
+
+  describe 'GET "time_summary"' do
+    subject { get :time_summary, params: params }
+
+    it_behaves_like 'summary endpoint'
   end
 end

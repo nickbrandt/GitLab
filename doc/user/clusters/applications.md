@@ -1,10 +1,16 @@
+---
+stage: Configure
+group: Configure
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # GitLab Managed Apps
 
 GitLab provides **GitLab Managed Apps**, a one-click install for various applications which can
 be added directly to your configured cluster.
 
 These applications are needed for [Review Apps](../../ci/review_apps/index.md)
-and [deployments](../../ci/environments.md) when using [Auto DevOps](../../topics/autodevops/index.md).
+and [deployments](../../ci/environments/index.md) when using [Auto DevOps](../../topics/autodevops/index.md).
 
 You can install them after you
 [create a cluster](../project/clusters/add_remove_clusters.md).
@@ -499,20 +505,23 @@ Log data is automatically deleted after 30 days using [Curator](https://www.elas
 
 To enable log shipping:
 
+1. Ensure your cluster contains at least 3 nodes of instance types larger than
+   `f1-micro`, `g1-small`, or `n1-standard-1`.
 1. Navigate to **{cloud-gear}** **Operations > Kubernetes**.
 1. In **Kubernetes Cluster**, select a cluster.
 1. In the **Applications** section, find **Elastic Stack** and click **Install**.
 
 NOTE: **Note:**
-The [`stable/elastic-stack`](https://github.com/helm/charts/tree/master/stable/elastic-stack)
+The [`gitlab/elastic-stack`](https://gitlab.com/gitlab-org/charts/elastic-stack)
 chart is used to install this application with a
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/elastic_stack/values.yaml)
 file.
 
 NOTE: **Note:**
-The chart will deploy 5 Elasticsearch nodes: 2 masters, 2 data and 1 client node,
-with resource requests totalling 0.125 CPU and 4.5GB RAM. Each data node requests 1.5GB of memory,
-which makes it incompatible with clusters of `f1-micro` and `g1-small` instance types.
+The chart deploys 3 identical Elasticsearch pods which can't be colocated, and each
+require 1 CPU and 2 GB of RAM, making them incompatible with clusters containing
+fewer than 3 nodes or consisting of `f1-micro`, `g1-small`, `n1-standard-1`, or
+`*-highcpu-2` instance types.
 
 NOTE: **Note:**
 The Elastic Stack cluster application is intended as a log aggregation solution and is not related to our
@@ -531,25 +540,25 @@ Save the following to `kibana.yml`:
 elasticsearch:
   enabled: false
 
-logstash:
+filebeat:
   enabled: false
 
 kibana:
   enabled: true
-  env:
-    ELASTICSEARCH_HOSTS: http://elastic-stack-elasticsearch-client.gitlab-managed-apps.svc.cluster.local:9200
+  elasticsearchHosts: http://elastic-stack-elasticsearch-master.gitlab-managed-apps.svc.cluster.local:9200
 ```
 
 Then install it on your cluster:
 
 ```shell
-helm install --name kibana stable/elastic-stack --values kibana.yml
+helm repo add gitlab https://charts.gitlab.io
+helm install --name kibana gitlab/elastic-stack --values kibana.yml
 ```
 
 To access Kibana, forward the port to your local machine:
 
 ```shell
-kubectl port-forward svc/kibana 5601:443
+kubectl port-forward svc/kibana-kibana 5601:5601
 ```
 
 Then, you can visit Kibana at `http://localhost:5601`.
@@ -924,8 +933,8 @@ vault:
   installed: true
 ```
 
-By default you will get a basic Vault setup with no high availability nor any scalable
-storage backend. This is enough for simple testing and small scale deployments, though has limits
+By default you will get a basic Vault setup with no scalable
+storage backend. This is enough for simple testing and small-scale deployments, though has limits
 to how much it can scale, and as it is a single instance deployment, you will experience downtime
 when upgrading the Vault application.
 
@@ -1063,7 +1072,7 @@ You can check the default [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/-
 You can customize the installation of Elastic Stack by defining
 `.gitlab/managed-apps/elastic-stack/values.yaml` file in your cluster
 management project. Refer to the
-[chart](https://github.com/helm/charts/blob/master/stable/elastic-stack/values.yaml) for the
+[chart](https://gitlab.com/gitlab-org/charts/elastic-stack) for the
 available configuration options.
 
 NOTE: **Note:**

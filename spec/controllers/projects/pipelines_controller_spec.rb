@@ -195,6 +195,26 @@ describe Projects::PipelinesController do
       end
     end
 
+    context 'filter by ref' do
+      let!(:pipeline) { create(:ci_pipeline, :running, project: project, ref: 'branch-1') }
+
+      context 'when pipelines with the ref exists' do
+        it 'returns matched pipelines' do
+          get_pipelines_index_json(ref: 'branch-1')
+
+          check_pipeline_response(returned: 1, all: 1, running: 1, pending: 0, finished: 0)
+        end
+      end
+
+      context 'when no pipeline with the ref exists' do
+        it 'returns empty list' do
+          get_pipelines_index_json(ref: 'invalid-ref')
+
+          check_pipeline_response(returned: 0, all: 0, running: 0, pending: 0, finished: 0)
+        end
+      end
+    end
+
     def get_pipelines_index_json(params = {})
       get :index, params: {
                     namespace_id: project.namespace,
@@ -810,7 +830,7 @@ describe Projects::PipelinesController do
 
     context 'when feature is enabled' do
       before do
-        stub_feature_flags(junit_pipeline_view: true)
+        stub_feature_flags(junit_pipeline_view: project)
       end
 
       context 'when pipeline does not have a test report' do
@@ -858,7 +878,7 @@ describe Projects::PipelinesController do
 
       context 'when junit_pipeline_screenshots_view is enabled' do
         before do
-          stub_feature_flags(junit_pipeline_screenshots_view: { enabled: true, thing: project })
+          stub_feature_flags(junit_pipeline_screenshots_view: project)
         end
 
         context 'when test_report contains attachment and scope is with_attachment as a URL param' do
@@ -887,7 +907,7 @@ describe Projects::PipelinesController do
 
       context 'when junit_pipeline_screenshots_view is disabled' do
         before do
-          stub_feature_flags(junit_pipeline_screenshots_view: { enabled: false, thing: project })
+          stub_feature_flags(junit_pipeline_screenshots_view: false)
         end
 
         context 'when test_report contains attachment and scope is with_attachment as a URL param' do

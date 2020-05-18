@@ -16,7 +16,8 @@ module EE
           canary_deployment: 7,
           gold_trial_billings: 8,
           threat_monitoring_info: 11,
-          account_recovery_regular_check: 12
+          account_recovery_regular_check: 12,
+          users_over_license_banner: 16
         )
       end
     end

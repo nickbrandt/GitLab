@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Vulnerabilities::FindingEntity < Grape::Entity
-  include ::EE::ProjectsHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
   include RequestAwareEntity
 
   expose :id, :report_type, :name, :severity, :confidence
@@ -44,3 +43,5 @@ class Vulnerabilities::FindingEntity < Grape::Entity
     return request.current_user if request.respond_to?(:current_user)
   end
 end
+
+Vulnerabilities::FindingEntity.include_if_ee('::EE::ProjectsHelper')

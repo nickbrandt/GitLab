@@ -22,50 +22,84 @@ describe EE::NamespacesHelper do
     user_group.add_owner(user)
   end
 
-  describe '#namespace_shared_runner_limits_quota' do
-    context "when it's unlimited" do
-      before do
-        allow(user_group).to receive(:shared_runners_minutes_limit_enabled?).and_return(false)
-      end
-
-      it 'returns Unlimited for the limit section' do
-        expect(helper.namespace_shared_runner_limits_quota(user_group)).to match(%r{0 / Unlimited})
-      end
-
-      it 'returns the proper value for the used section' do
-        allow(user_group).to receive(:shared_runners_seconds).and_return(100 * 60)
-
-        expect(helper.namespace_shared_runner_limits_quota(user_group)).to match(%r{100 / Unlimited})
-      end
+  describe '#ci_minutes_progress_bar' do
+    it 'shows a green bar if percent is 0' do
+      expect(helper.ci_minutes_progress_bar(0)).to match(/success.*0%/)
     end
 
-    context "when it's limited" do
-      before do
-        allow(user_group).to receive(:shared_runners_minutes_limit_enabled?).and_return(true)
-        allow(user_group).to receive(:shared_runners_seconds).and_return(100 * 60)
+    it 'shows a green bar if percent is lower than 70' do
+      expect(helper.ci_minutes_progress_bar(69)).to match(/success.*69%/)
+    end
 
-        user_group.update!(shared_runners_minutes_limit: 500)
-      end
+    it 'shows a yellow bar if percent is 70' do
+      expect(helper.ci_minutes_progress_bar(70)).to match(/warning.*70%/)
+    end
 
-      it 'returns the proper values for used and limit sections' do
-        expect(helper.namespace_shared_runner_limits_quota(user_group)).to match(%r{100 / 500})
-      end
+    it 'shows a yellow bar if percent is higher than 70 and lower than 95' do
+      expect(helper.ci_minutes_progress_bar(94)).to match(/warning.*94%/)
+    end
+
+    it 'shows a red bar if percent is 95' do
+      expect(helper.ci_minutes_progress_bar(95)).to match(/danger.*95%/)
+    end
+
+    it 'shows a red bar if percent is higher than 100 and caps the value to 100' do
+      expect(helper.ci_minutes_progress_bar(120)).to match(/danger.*100%/)
     end
   end
 
-  describe '#namespace_extra_shared_runner_limits_quota' do
-    context 'when extra minutes are assigned' do
-      it 'returns the proper values for used and limit sections' do
-        allow(user_group).to receive(:shared_runners_seconds).and_return(50 * 60)
-        user_group.update!(extra_shared_runners_minutes_limit: 100)
+  describe '#ci_minutes_report' do
+    let(:quota) { Ci::Minutes::Quota.new(user_group) }
 
-        expect(helper.namespace_extra_shared_runner_limits_quota(user_group)).to match(%r{50 / 100})
+    describe 'rendering monthly minutes report' do
+      let(:report) { quota.monthly_minutes_report }
+
+      context "when it's unlimited" do
+        before do
+          allow(user_group).to receive(:shared_runners_minutes_limit_enabled?).and_return(false)
+        end
+
+        it 'returns Unlimited for the limit section' do
+          expect(helper.ci_minutes_report(report)).to match(%r{0 / Unlimited})
+        end
+
+        it 'returns the proper value for the used section' do
+          allow(user_group).to receive(:shared_runners_seconds).and_return(100 * 60)
+
+          expect(helper.ci_minutes_report(report)).to match(%r{100 / Unlimited})
+        end
+      end
+
+      context "when it's limited" do
+        before do
+          allow(user_group).to receive(:shared_runners_minutes_limit_enabled?).and_return(true)
+          allow(user_group).to receive(:shared_runners_seconds).and_return(100 * 60)
+
+          user_group.update!(shared_runners_minutes_limit: 500)
+        end
+
+        it 'returns the proper values for used and limit sections' do
+          expect(helper.ci_minutes_report(report)).to match(%r{100 / 500})
+        end
       end
     end
 
-    context 'when extra minutes are not assigned' do
-      it 'returns the proper values for used and limit sections' do
-        expect(helper.namespace_extra_shared_runner_limits_quota(user_group)).to match(%r{0 / 0})
+    describe 'rendering purchased minutes report' do
+      let(:report) { quota.purchased_minutes_report }
+
+      context 'when extra minutes are assigned' do
+        it 'returns the proper values for used and limit sections' do
+          allow(user_group).to receive(:shared_runners_seconds).and_return(50 * 60)
+          user_group.update!(extra_shared_runners_minutes_limit: 100)
+
+          expect(helper.ci_minutes_report(report)).to match(%r{50 / 100})
+        end
+      end
+
+      context 'when extra minutes are not assigned' do
+        it 'returns the proper values for used and limit sections' do
+          expect(helper.ci_minutes_report(report)).to match(%r{0 / 0})
+        end
       end
     end
   end

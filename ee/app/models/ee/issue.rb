@@ -21,6 +21,7 @@ module EE
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
       scope :service_desk, -> { where(author: ::User.support_bot) }
       scope :no_epic, -> { left_outer_joins(:epic_issue).where(epic_issues: { epic_id: nil }) }
+      scope :any_epic, -> { joins(:epic_issue) }
       scope :in_epics, ->(epics) do
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)

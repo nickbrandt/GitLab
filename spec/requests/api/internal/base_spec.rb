@@ -452,7 +452,7 @@ describe API::Internal::Base do
 
           context 'when gitaly_upload_pack_filter feature flag is disabled' do
             before do
-              stub_feature_flags(gitaly_upload_pack_filter: { enabled: false, thing: project })
+              stub_feature_flags(gitaly_upload_pack_filter: false)
             end
 
             it 'returns only maxInputSize and not partial clone git config' do
@@ -481,7 +481,7 @@ describe API::Internal::Base do
 
           context 'when gitaly_upload_pack_filter feature flag is disabled' do
             before do
-              stub_feature_flags(gitaly_upload_pack_filter: { enabled: false, thing: project })
+              stub_feature_flags(gitaly_upload_pack_filter: false)
             end
 
             it 'returns an empty git config' do
@@ -915,6 +915,23 @@ describe API::Internal::Base do
 
         expect(response).to have_gitlab_http_status(:not_found)
         expect(json_response['status']).to be_falsy
+      end
+    end
+
+    context 'for design repositories' do
+      let(:gl_repository) { Gitlab::GlRepository::DESIGN.identifier_for_container(project) }
+
+      it 'does not allow access' do
+        post(api('/internal/allowed'),
+             params: {
+               key_id: key.id,
+               project: project.full_path,
+               gl_repository: gl_repository,
+               secret_token: secret_token,
+               protocol: 'ssh'
+             })
+
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
   end

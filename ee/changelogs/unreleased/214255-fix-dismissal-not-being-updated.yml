@@ -1,0 +1,5 @@
+---
+title: Fix dismissal state not being updated
+merge_request: 30503
+author:
+type: fixed

@@ -146,9 +146,17 @@ module Noteable
       target_id: id
     )
   end
+
+  def after_note_created(_note)
+    # no-op
+  end
+
+  def after_note_destroyed(_note)
+    # no-op
+  end
 end
 
 Noteable.extend(Noteable::ClassMethods)
 
-Noteable::ClassMethods.prepend_if_ee('EE::Noteable::ClassMethods') # rubocop: disable Cop/InjectEnterpriseEditionModule
+Noteable::ClassMethods.prepend_if_ee('EE::Noteable::ClassMethods')
 Noteable.prepend_if_ee('EE::Noteable')

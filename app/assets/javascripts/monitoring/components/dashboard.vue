@@ -30,6 +30,7 @@ import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
 import GroupEmptyState from './group_empty_state.vue';
 import DashboardsDropdown from './dashboards_dropdown.vue';
+import VariablesSection from './variables_section.vue';
 
 import TrackEventDirective from '~/vue_shared/directives/track_event';
 import {
@@ -38,6 +39,7 @@ import {
   timeRangeFromUrl,
   panelToUrl,
   expandedPanelPayloadFromUrl,
+  convertVariablesForURL,
 } from '../utils';
 import { metricStates } from '../constants';
 import { defaultTimeRange, timeRanges } from '~/vue_shared/constants';
@@ -64,6 +66,8 @@ export default {
     EmptyState,
     GroupEmptyState,
     DashboardsDropdown,
+
+    VariablesSection,
   },
   directives: {
     GlModal: GlModalDirective,
@@ -222,14 +226,14 @@ export default {
       'allDashboards',
       'environmentsLoading',
       'expandedPanel',
+      'promVariables',
+      'isUpdatingStarredValue',
     ]),
-    ...mapGetters('monitoringDashboard', ['getMetricStates', 'filteredEnvironments']),
-    firstDashboard() {
-      return this.allDashboards.length > 0 ? this.allDashboards[0] : {};
-    },
-    selectedDashboard() {
-      return this.allDashboards.find(d => d.path === this.currentDashboard) || this.firstDashboard;
-    },
+    ...mapGetters('monitoringDashboard', [
+      'selectedDashboard',
+      'getMetricStates',
+      'filteredEnvironments',
+    ]),
     showRearrangePanelsBtn() {
       return !this.showEmptyState && this.rearrangePanelsAvailable;
     },
@@ -237,11 +241,17 @@ export default {
       return (
         this.customMetricsAvailable &&
         !this.showEmptyState &&
-        this.firstDashboard === this.selectedDashboard
+        // Custom metrics only avaialble on system dashboards because
+        // they are stored in the database. This can be improved. See:
+        // https://gitlab.com/gitlab-org/gitlab/-/issues/28241
+        this.selectedDashboard?.system_dashboard
       );
     },
     shouldShowEnvironmentsDropdownNoMatchedMsg() {
       return !this.environmentsLoading && this.filteredEnvironments.length === 0;
+    },
+    shouldShowVariablesSection() {
+      return Object.keys(this.promVariables).length > 0;
     },
   },
   watch: {
@@ -261,9 +271,9 @@ export default {
     },
     expandedPanel: {
       handler({ group, panel }) {
-        const dashboardPath = this.currentDashboard || this.firstDashboard.path;
+        const dashboardPath = this.currentDashboard || this.selectedDashboard?.path;
         updateHistory({
-          url: panelToUrl(dashboardPath, group, panel),
+          url: panelToUrl(dashboardPath, convertVariablesForURL(this.promVariables), group, panel),
           title: document.title,
         });
       },
@@ -305,6 +315,7 @@ export default {
       'filterEnvironments',
       'setExpandedPanel',
       'clearExpandedPanel',
+      'toggleStarredValue',
     ]),
     updatePanels(key, panels) {
       this.setPanelGroupMetrics({
@@ -332,8 +343,8 @@ export default {
       this.selectedTimeRange = defaultTimeRange;
     },
     generatePanelUrl(groupKey, panel) {
-      const dashboardPath = this.currentDashboard || this.firstDashboard.path;
-      return panelToUrl(dashboardPath, groupKey, panel);
+      const dashboardPath = this.currentDashboard || this.selectedDashboard?.path;
+      return panelToUrl(dashboardPath, convertVariablesForURL(this.promVariables), groupKey, panel);
     },
     hideAddMetricModal() {
       this.$refs.addMetricModal.hide();
@@ -415,6 +426,8 @@ export default {
   },
   i18n: {
     goBackLabel: s__('Metrics|Go back (Esc)'),
+    starDashboard: s__('Metrics|Star dashboard'),
+    unstarDashboard: s__('Metrics|Unstar dashboard'),
   },
 };
 </script>
@@ -433,7 +446,6 @@ export default {
           class="flex-grow-1"
           toggle-class="dropdown-menu-toggle"
           :default-branch="defaultBranch"
-          :selected-dashboard="selectedDashboard"
           @selectDashboard="selectDashboard($event)"
         />
       </div>
@@ -488,7 +500,7 @@ export default {
         <date-time-picker
           ref="dateTimePicker"
           class="flex-grow-1 show-last-dropdown"
-          data-qa-selector="show_last_dropdown"
+          data-qa-selector="range_picker_dropdown"
           :value="selectedTimeRange"
           :options="timeRanges"
           @input="onDateTimePickerInput"
@@ -512,6 +524,32 @@ export default {
       <div class="flex-grow-1"></div>
 
       <div class="d-sm-flex">
+        <div v-if="selectedDashboard" class="mb-2 mr-2 d-flex">
+          <!--
+            wrapper for tooltip as button can be `disabled`
+            https://bootstrap-vue.org/docs/components/tooltip#disabled-elements
+          -->
+          <div
+            v-gl-tooltip
+            class="flex-grow-1"
+            :title="
+              selectedDashboard.starred
+                ? $options.i18n.unstarDashboard
+                : $options.i18n.starDashboard
+            "
+          >
+            <gl-deprecated-button
+              ref="toggleStarBtn"
+              class="w-100"
+              :disabled="isUpdatingStarredValue"
+              variant="default"
+              @click="toggleStarredValue()"
+            >
+              <gl-icon :name="selectedDashboard.starred ? 'star' : 'star-o'" />
+            </gl-deprecated-button>
+          </div>
+        </div>
+
         <div v-if="showRearrangePanelsBtn" class="mb-2 mr-2 d-flex">
           <gl-deprecated-button
             :pressed="isRearrangingPanels"
@@ -561,7 +599,10 @@ export default {
           </gl-modal>
         </div>
 
-        <div v-if="selectedDashboard.can_edit" class="mb-2 mr-2 d-flex d-sm-block">
+        <div
+          v-if="selectedDashboard && selectedDashboard.can_edit"
+          class="mb-2 mr-2 d-flex d-sm-block"
+        >
           <gl-deprecated-button
             class="flex-grow-1 js-edit-link"
             :href="selectedDashboard.project_blob_path"
@@ -584,7 +625,7 @@ export default {
         </div>
       </div>
     </div>
-
+    <variables-section v-if="shouldShowVariablesSection && !showEmptyState" />
     <div v-if="!showEmptyState">
       <dashboard-panel
         v-show="expandedPanel.panel"

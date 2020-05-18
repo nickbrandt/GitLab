@@ -201,7 +201,7 @@ class ProjectsController < Projects::ApplicationController
 
     redirect_to(
       edit_project_path(@project, anchor: 'js-export-project'),
-      notice: _("Project export started. A download link will be sent by email.")
+      notice: _("Project export started. A download link will be sent by email and made available on this page.")
     )
   end
 
@@ -400,6 +400,9 @@ class ProjectsController < Projects::ApplicationController
         wiki_access_level
         pages_access_level
         metrics_dashboard_access_level
+      ],
+      project_setting_attributes: %i[
+        show_default_award_emojis
       ]
     ]
   end

@@ -19,19 +19,44 @@ RSpec.describe Packages::Tag, type: :model do
   describe '.for_packages' do
     let(:package2) { create(:package, project: project, updated_at: 2.days.ago) }
     let(:package3) { create(:package, project: project, updated_at: 1.day.ago) }
-    let(:tags_limit) { Packages::Tag::TAGS_LIMIT }
     let!(:tag1) { create(:packages_tag, package: package) }
     let!(:tag2) { create(:packages_tag, package: package2) }
     let!(:tag3) { create(:packages_tag, package: package3) }
 
-    subject { described_class.for_packages(project.packages, tags_limit) }
+    subject { described_class.for_packages(project.packages) }
 
     it { is_expected.to match_array([tag1, tag2, tag3]) }
 
     context 'with too many tags' do
-      let(:tags_limit) { 2 }
+      before do
+        stub_const('Packages::Tag::FOR_PACKAGES_TAGS_LIMIT', 2)
+      end
 
       it { is_expected.to match_array([tag2, tag3]) }
+    end
+  end
+
+  describe '.with_name' do
+    let_it_be(:package) { create(:package) }
+    let_it_be(:tag1) { create(:packages_tag, package: package, name: 'tag1') }
+    let_it_be(:tag2) { create(:packages_tag, package: package, name: 'tag2') }
+    let_it_be(:tag3) { create(:packages_tag, package: package, name: 'tag3') }
+    let(:name) { 'tag1' }
+
+    subject { described_class.with_name(name) }
+
+    it { is_expected.to contain_exactly(tag1) }
+
+    context 'with nil name' do
+      let(:name) { nil }
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'with multiple names' do
+      let(:name) { %w(tag1 tag3) }
+
+      it { is_expected.to contain_exactly(tag1, tag3) }
     end
   end
 end

@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe API::NpmPackages do
+  include EE::PackagesManagerApiSpecHelpers
+
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
   let_it_be(:project, reload: true) { create(:project, :public, namespace: group) }
@@ -10,6 +12,8 @@ describe API::NpmPackages do
   let_it_be(:token) { create(:oauth_access_token, scopes: 'api', resource_owner: user) }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
   let_it_be(:job) { create(:ci_build, user: user) }
+  let_it_be(:deploy_token) { create(:deploy_token, read_package_registry: true, write_package_registry: true) }
+  let_it_be(:project_deploy_token) { create(:project_deploy_token, deploy_token: deploy_token, project: project) }
 
   before do
     project.add_developer(user)
@@ -33,6 +37,12 @@ describe API::NpmPackages do
       get_package(package)
 
       expect(response).to have_gitlab_http_status(:forbidden)
+    end
+
+    it 'returns the package info with deploy token' do
+      get_package_with_deploy_token(package)
+
+      expect_a_valid_package_response
     end
   end
 
@@ -132,8 +142,8 @@ describe API::NpmPackages do
       expect(response).to have_gitlab_http_status(:forbidden)
     end
 
-    def get_package(package, params = {})
-      get api("/packages/npm/#{package.name}"), params: params
+    def get_package(package, params = {}, headers = {})
+      get api("/packages/npm/#{package.name}"), params: params, headers: headers
     end
 
     def get_package_with_token(package, params = {})
@@ -142,6 +152,10 @@ describe API::NpmPackages do
 
     def get_package_with_job_token(package, params = {})
       get_package(package, params.merge(job_token: job.token))
+    end
+
+    def get_package_with_deploy_token(package, params = {})
+      get_package(package, {}, build_token_auth_header(deploy_token.token))
     end
   end
 

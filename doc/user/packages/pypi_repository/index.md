@@ -26,7 +26,7 @@ by default. To enable it for existing projects, or if you want to disable it:
 1. Find the Packages feature and enable or disable it.
 1. Click on **Save changes** for the changes to take effect.
 
-You should then be able to see the **Packages** section on the left sidebar.
+You should then be able to see the **Packages & Registries** section on the left sidebar.
 
 ## Getting started
 
@@ -150,6 +150,8 @@ Package Registry**. Before we do so, we next need to set up authentication.
 
 ## Adding the GitLab PyPi Repository as a source
 
+### Authenticating with a personal access token
+
 You will need the following:
 
 - A personal access token. You can generate a [personal access token](../../../user/profile/personal_access_tokens.md) with the scope set to `api` for repository authentication.
@@ -167,6 +169,27 @@ index-servers =
 repository = https://gitlab.com/api/v4/projects/<project_id>/packages/pypi
 username = __token__
 password = <your personal access token>
+```
+
+### Authenticating with a deploy token
+
+You will need the following:
+
+- A deploy token. You can generate a [deploy token](./../../project/deploy_tokens/index.md) with the `read_package_registry` and/or `write_package_registry` scopes for repository authentication.
+- A suitable name for your source.
+- Your project ID which can be found on the home page of your project.
+
+Edit your `~/.pypirc` file and add the following:
+
+```ini
+[distutils]
+index-servers =
+    gitlab
+
+[gitlab]
+repository = https://gitlab.com/api/v4/projects/<project_id>/packages/pypi
+username = <deploy token username>
+password = <deploy token>
 ```
 
 ## Uploading packages
@@ -197,7 +220,7 @@ Uploading mypypipackage-0.0.1.tar.gz
 ```
 
 This indicates that the package was uploaded successfully. You can then navigate
-to your project's **Packages** page and see the uploaded packages.
+to your project's **Packages & Registries** page and see the uploaded packages.
 
 If you did not follow the guide above, the you'll need to ensure your package
 has been properly built and you [created a PyPi package with setuptools](https://packaging.python.org/tutorials/packaging-projects/).

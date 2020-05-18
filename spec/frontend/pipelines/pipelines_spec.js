@@ -5,8 +5,12 @@ import axios from '~/lib/utils/axios_utils';
 import waitForPromises from 'helpers/wait_for_promises';
 import PipelinesComponent from '~/pipelines/components/pipelines.vue';
 import Store from '~/pipelines/stores/pipelines_store';
-import { pipelineWithStages, stageReply, users, mockSearch } from './mock_data';
+import { pipelineWithStages, stageReply, users, mockSearch, branches } from './mock_data';
+import { RAW_TEXT_WARNING } from '~/pipelines/constants';
 import { GlFilteredSearch } from '@gitlab/ui';
+import createFlash from '~/flash';
+
+jest.mock('~/flash', () => jest.fn());
 
 describe('Pipelines', () => {
   const jsonFixtureName = 'pipelines/pipelines.json';
@@ -63,7 +67,9 @@ describe('Pipelines', () => {
   beforeEach(() => {
     mock = new MockAdapter(axios);
     pipelines = getJSONFixture(jsonFixtureName);
+
     jest.spyOn(Api, 'projectUsers').mockResolvedValue(users);
+    jest.spyOn(Api, 'branches').mockResolvedValue({ data: branches });
   });
 
   afterEach(() => {
@@ -665,21 +671,40 @@ describe('Pipelines', () => {
   });
 
   describe('Pipeline filters', () => {
+    let updateContentMock;
+
     beforeEach(() => {
       mock.onGet(paths.endpoint).reply(200, pipelines);
       createComponent();
+
+      updateContentMock = jest.spyOn(wrapper.vm, 'updateContent');
 
       return waitForPromises();
     });
 
     it('updates request data and query params on filter submit', () => {
-      const updateContentMock = jest.spyOn(wrapper.vm, 'updateContent');
-      const expectedQueryParams = { page: '1', scope: 'all', username: 'root' };
+      const expectedQueryParams = { page: '1', scope: 'all', username: 'root', ref: 'master' };
 
-      findFilteredSearch().vm.$emit('submit', [mockSearch]);
+      findFilteredSearch().vm.$emit('submit', mockSearch);
 
       expect(wrapper.vm.requestData).toEqual(expectedQueryParams);
       expect(updateContentMock).toHaveBeenCalledWith(expectedQueryParams);
+    });
+
+    it('does not add query params if raw text search is used', () => {
+      const expectedQueryParams = { page: '1', scope: 'all' };
+
+      findFilteredSearch().vm.$emit('submit', ['rawText']);
+
+      expect(wrapper.vm.requestData).toEqual(expectedQueryParams);
+      expect(updateContentMock).toHaveBeenCalledWith(expectedQueryParams);
+    });
+
+    it('displays a warning message if raw text search is used', () => {
+      findFilteredSearch().vm.$emit('submit', ['rawText']);
+
+      expect(createFlash).toHaveBeenCalledTimes(1);
+      expect(createFlash).toHaveBeenCalledWith(RAW_TEXT_WARNING, 'warning');
     });
   });
 });

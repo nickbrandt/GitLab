@@ -48,15 +48,15 @@ describe 'Scoped issue boards', :js do
           expect(page).to have_selector('.board-card', count: 1)
         end
 
-        it 'creates board filtering by No Milestone' do
-          create_board_milestone('No Milestone')
+        it 'creates board filtering by No milestone' do
+          create_board_milestone('No milestone')
 
           expect(find('.tokens-container')).to have_content("")
           expect(page).to have_selector('.board-card', count: 2)
         end
 
-        it 'creates board filtering by Any Milestone' do
-          create_board_milestone('Any Milestone')
+        it 'creates board filtering by Any milestone' do
+          create_board_milestone('Any milestone')
 
           expect(find('.tokens-container')).to have_content("")
           expect(page).to have_selector('.board-card', count: 3)
@@ -232,7 +232,7 @@ describe 'Scoped issue boards', :js do
         end
 
         it 'sets board to any milestone' do
-          update_board_milestone('Any Milestone')
+          update_board_milestone('Any milestone')
 
           expect(find('.tokens-container')).not_to have_content(milestone.title)
 

@@ -126,7 +126,7 @@ volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 used to store the underlying data for PostgreSQL is marked as `Delete`
 when the pods and pod claims that use the volume is deleted.
 
-This is signficant as, when you opt into the newer 8.2.1 PostgreSQL, the older 0.7.1 PostgreSQL is
+This is significant as, when you opt into the newer 8.2.1 PostgreSQL, the older 0.7.1 PostgreSQL is
 deleted causing the persistent volumes to be deleted as well.
 
 You can verify this by using the following command:
@@ -164,17 +164,19 @@ deleted, you can choose to retain the [persistent
 volume](#retain-persistent-volumes).
 
 TIP: **Tip:** You can also
-[scope](../../ci/environments.md#scoping-environments-with-specs) the
-`AUTO_DEVOPS_POSTGRES_CHANNEL` and `POSTGRES_VERSION` variables to
-specific environments, e.g. `staging`.
+[scope](../../ci/environments/index.md#scoping-environments-with-specs) the
+`AUTO_DEVOPS_POSTGRES_CHANNEL`, `AUTO_DEVOPS_POSTGRES_DELETE_V1` and
+`POSTGRES_VERSION` variables to specific environments, e.g. `staging`.
 
 1. Set `AUTO_DEVOPS_POSTGRES_CHANNEL` to `2`. This opts into using the
    newer 8.2.1-based PostgreSQL, and removes the older 0.7.1-based
    PostgreSQL.
-1. Set `POSTGRES_VERSION` to `9.6.16`. This is the minimum PostgreSQL
+1. Set `AUTO_DEVOPS_POSTGRES_DELETE_V1` to a non-empty value. This flag is a
+   safeguard to prevent accidental deletion of databases.
+1. Set `POSTGRES_VERSION` to `11.7`. This is the minimum PostgreSQL
    version supported.
 1. Set `PRODUCTION_REPLICAS` to `0`. For other environments, use
-   `REPLICAS` with an [environment scope](../../ci/environments.md#scoping-environments-with-specs).
+   `REPLICAS` with an [environment scope](../../ci/environments/index.md#scoping-environments-with-specs).
 1. If you have set the `DB_INITIALIZE` or `DB_MIGRATE` variables, either
    remove the variables, or rename the variables temporarily to
    `XDB_INITIALIZE` or the `XDB_MIGRATE` to effectively disable them.

@@ -40,7 +40,7 @@ describe Projects::Security::NetworkPoliciesController do
           Timecop.freeze do
             expect(adapter).to(
               receive(:query)
-                .with(:packet_flow, kubernetes_namespace, "minute", 1.hour.ago.to_s, Time.now.to_s)
+                .with(:packet_flow, kubernetes_namespace, "minute", 1.hour.ago.to_s, Time.current.to_s)
                 .and_return({ success: true, data: { ops_rate: [[Time.at(0).to_i, 10]], ops_total: 10 } })
             )
             subject
@@ -81,7 +81,7 @@ describe Projects::Security::NetworkPoliciesController do
             Timecop.freeze do
               expect(adapter).to(
                 receive(:query)
-                  .with(:packet_flow, kubernetes_namespace, "minute", 1.hour.ago.to_s, Time.now.to_s)
+                  .with(:packet_flow, kubernetes_namespace, "minute", 1.hour.ago.to_s, Time.current.to_s)
                   .and_return({ success: true, data: {} })
               )
               subject

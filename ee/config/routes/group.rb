@@ -36,6 +36,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
             end
           end
           resource :summary, controller: :summary, only: :show
+          get '/time_summary' => 'summary#time_summary'
         end
         get '/cycle_analytics', to: redirect('-/analytics/value_stream_analytics')
       end
@@ -109,6 +110,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
+    resources :iterations, only: [:index, :new, :show], constraints: { id: /\d+/ }
+
     resources :issues, only: [] do
       collection do
         post :bulk_update
@@ -142,6 +145,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         end
       end
     end
+
+    resource :push_rules, only: [:edit, :update]
 
     resource :saml_providers, path: 'saml', only: [:show, :create, :update] do
       callback_methods = Rails.env.test? ? [:get, :post] : [:post]

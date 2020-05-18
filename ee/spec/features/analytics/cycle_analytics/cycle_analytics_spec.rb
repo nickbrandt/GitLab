@@ -20,6 +20,7 @@ describe 'Group Value Stream Analytics', :js do
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
 
   stage_nav_selector = '.stage-nav'
+  path_nav_selector = '.js-path-navigation'
 
   3.times do |i|
     let_it_be("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
@@ -151,6 +152,21 @@ describe 'Group Value Stream Analytics', :js do
     it 'shows the date filter' do
       expect(page).to have_selector('.js-daterange-picker', visible: true)
     end
+
+    it 'does not show the path navigation' do
+      expect(page).to have_selector(path_nav_selector, visible: false)
+    end
+
+    context 'with path navigation feature flag enabled' do
+      before do
+        stub_feature_flags(value_stream_analytics_path_navigation: true)
+        select_group
+      end
+
+      it 'shows the path navigation' do
+        expect(page).to have_selector(path_nav_selector, visible: true)
+      end
+    end
   end
 
   def wait_for_stages_to_load
@@ -187,8 +203,13 @@ describe 'Group Value Stream Analytics', :js do
     context 'summary table', :js do
       it 'will display recent activity' do
         page.within(find('.js-recent-activity')) do
-          expect(page).to have_selector('.card-header')
           expect(page).to have_content(_('Recent Activity'))
+        end
+      end
+
+      it 'will display time metrics' do
+        page.within(find('.js-recent-activity')) do
+          expect(page).to have_content(_('Time'))
         end
       end
     end
@@ -216,6 +237,21 @@ describe 'Group Value Stream Analytics', :js do
         end
       end
     end
+
+    context 'path nav' do
+      before do
+        stub_feature_flags(value_stream_analytics_path_navigation: true)
+      end
+
+      it 'displays the default list of stages' do
+        path_nav = page.find(path_nav_selector)
+
+        %w[Issue Plan Code Test Review Staging Overview].each do |item|
+          string_id = "CycleAnalytics|#{item}"
+          expect(path_nav).to have_content(s_(string_id))
+        end
+      end
+    end
   end
 
   context 'with a group selected' do
@@ -230,14 +266,14 @@ describe 'Group Value Stream Analytics', :js do
     it_behaves_like 'group value stream analytics'
 
     it 'displays the number of issues' do
-      issue_count = page.all(card_metric_selector).first
+      issue_count = page.all(card_metric_selector)[2]
 
       expect(issue_count).to have_content(n_('New Issue', 'New Issues', 3))
       expect(issue_count).to have_content('3')
     end
 
     it 'displays the number of deploys' do
-      deploys_count = page.all(card_metric_selector)[1]
+      deploys_count = page.all(card_metric_selector)[3]
 
       expect(deploys_count).to have_content(n_('Deploy', 'Deploys', 0))
       expect(deploys_count).to have_content('-')
@@ -248,6 +284,20 @@ describe 'Group Value Stream Analytics', :js do
 
       expect(deployment_frequency).to have_content(_('Deployment Frequency'))
       expect(deployment_frequency).to have_content('-')
+    end
+
+    it 'displays the lead time' do
+      lead_time = page.all(card_metric_selector).first
+
+      expect(lead_time).to have_content(_('Lead Time'))
+      expect(lead_time).to have_content('-')
+    end
+
+    it 'displays the cycle time' do
+      cycle_time = page.all(card_metric_selector)[1]
+
+      expect(cycle_time).to have_content(_('Cycle Time'))
+      expect(cycle_time).to have_content('-')
     end
   end
 
@@ -934,22 +984,6 @@ describe 'Group Value Stream Analytics', :js do
           end
         end
       end
-    end
-
-    context 'not enabled' do
-      before do
-        stub_feature_flags(customizable_cycle_analytics: false)
-
-        select_group
-      end
-
-      context 'Add a stage button' do
-        it 'is not visible' do
-          expect(page).to have_selector('.js-add-stage-button', visible: false)
-        end
-      end
-
-      it_behaves_like 'manual ordering disabled'
     end
   end
 end

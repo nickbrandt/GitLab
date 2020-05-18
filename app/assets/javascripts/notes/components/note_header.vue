@@ -1,17 +1,12 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlIcon, GlTooltipDirective } from '@gitlab/ui';
 import timeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import GitlabTeamMemberBadge from '~/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue';
 
 export default {
   components: {
     timeAgoTooltip,
-    GitlabTeamMemberBadge,
-    GlIcon,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
+    GitlabTeamMemberBadge: () =>
+      import('ee_component/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue'),
   },
   props: {
     author: {
@@ -49,11 +44,6 @@ export default {
       required: false,
       default: true,
     },
-    isConfidential: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   data() {
     return {
@@ -71,9 +61,6 @@ export default {
     },
     hasAuthor() {
       return this.author && Object.keys(this.author).length;
-    },
-    showGitlabTeamMemberBadge() {
-      return this.author?.is_gitlab_employee;
     },
     authorLinkClasses() {
       return {
@@ -166,11 +153,11 @@ export default {
           @mouseleave="handleUsernameMouseLeave"
           ><span class="note-headline-light">@{{ author.username }}</span>
         </a>
-        <gitlab-team-member-badge v-if="showGitlabTeamMemberBadge" />
+        <gitlab-team-member-badge v-if="author && author.is_gitlab_employee" />
       </span>
     </template>
     <span v-else>{{ __('A deleted user') }}</span>
-    <span class="note-headline-light note-headline-meta d-inline-flex align-items-center">
+    <span class="note-headline-light note-headline-meta">
       <span class="system-note-message"> <slot></slot> </span>
       <template v-if="createdAt">
         <span ref="actionText" class="system-note-separator">
@@ -187,15 +174,6 @@ export default {
         </a>
         <time-ago-tooltip v-else ref="noteTimestamp" :time="createdAt" tooltip-placement="bottom" />
       </template>
-      <gl-icon
-        v-if="isConfidential"
-        ref="confidentialIndicator"
-        v-gl-tooltip:tooltipcontainer.bottom
-        name="eye-slash"
-        :size="14"
-        :title="__('Private comments are accessible by internal staff only')"
-        class="ml-1 gl-text-gray-800"
-      />
       <slot name="extra-controls"></slot>
       <i
         v-if="showSpinner"

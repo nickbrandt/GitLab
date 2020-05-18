@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
+import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
 import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import state from 'ee/vue_shared/security_reports/store/state';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
@@ -229,13 +230,27 @@ describe('Grouped security reports app', () => {
         });
       });
 
-      it('has the success icon for fixed vulnerabilities', () => {
-        const icon = wrapper.vm.$el.querySelector(
-          '.js-container-scanning~.js-plain-element .ic-status_success_borderless',
-        );
+      it.each`
+        reportType               | resolvedIssues                             | unresolvedIssues
+        ${'sast'}                | ${sastDiffSuccessMock.fixed}               | ${sastDiffSuccessMock.added}
+        ${'dependency-scanning'} | ${dependencyScanningDiffSuccessMock.fixed} | ${dependencyScanningDiffSuccessMock.added}
+        ${'container-scanning'}  | ${containerScanningDiffSuccessMock.fixed}  | ${containerScanningDiffSuccessMock.added}
+        ${'dast'}                | ${dastDiffSuccessMock.fixed}               | ${dastDiffSuccessMock.added}
+        ${'secret-scanning'}     | ${secretScanningDiffSuccessMock.fixed}     | ${secretScanningDiffSuccessMock.added}
+      `(
+        'renders a grouped-issues-list with the correct props for "$reportType" issues',
+        ({ reportType, resolvedIssues, unresolvedIssues }) => {
+          const issuesList = wrapper.find(`[data-testid="${reportType}-issues-list"]`);
 
-        expect(icon).not.toBeNull();
-      });
+          expect(issuesList.is(GroupedIssuesList)).toBe(true);
+
+          expect(issuesList.props()).toMatchObject({
+            resolvedIssues,
+            unresolvedIssues,
+            component: 'SecurityIssueBody',
+          });
+        },
+      );
     });
   });
 

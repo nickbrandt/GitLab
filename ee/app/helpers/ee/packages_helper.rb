@@ -30,5 +30,28 @@ module EE
       full_url = expose_url(api_v4_projects_packages_pypi_simple_package_name_path({ id: project_id, package_name: '' }, true))
       full_url.sub!('://', '://__token__:<your_personal_token>@')
     end
+
+    def packages_coming_soon_enabled?(resource)
+      ::Feature.enabled?(:packages_coming_soon, resource) && ::Gitlab.dev_env_or_com?
+    end
+
+    def packages_coming_soon_data(resource)
+      return unless packages_coming_soon_enabled?(resource)
+
+      {
+        project_path: ::Gitlab.com? ? 'gitlab-org/gitlab' : 'gitlab-org/gitlab-test',
+        suggested_contributions: help_page_path('user/packages/index', anchor: 'suggested-contributions')
+      }
+    end
+
+    def packages_list_data(type, resource)
+      {
+        resource_id: resource.id,
+        page_type: type,
+        empty_list_help_url: help_page_path('administration/packages/index'),
+        empty_list_illustration: image_path('illustrations/no-packages.svg'),
+        coming_soon_json: packages_coming_soon_data(resource).to_json
+      }
+    end
   end
 end

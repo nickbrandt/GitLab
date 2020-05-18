@@ -16,6 +16,7 @@
           "title": { "type": "string" },
           "totalDownloads": { "const": 0 },
           "verified": { "const": true },
+          "tags": { "type": "string" },
           "versions": {
             "type": "array",
             "items": {

@@ -3,6 +3,7 @@ import FilteredSearchManager from 'ee_else_ce/filtered_search/filtered_search_ma
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
 import store from './store';
+import transformFilters from './utils';
 
 export default class FilteredSearchCodeReviewAnalytics extends FilteredSearchManager {
   constructor() {
@@ -23,6 +24,11 @@ export default class FilteredSearchCodeReviewAnalytics extends FilteredSearchMan
    */
   updateObject = path => {
     const filters = urlParamsToObject(path);
-    store.dispatch('filters/setFilters', filters);
+    const { selectedLabels, selectedMilestone } = transformFilters(filters);
+
+    store.dispatch('filters/setFilters', {
+      labelNames: selectedLabels,
+      milestoneTitle: selectedMilestone,
+    });
   };
 }

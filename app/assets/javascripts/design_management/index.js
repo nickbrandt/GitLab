@@ -7,7 +7,7 @@ import getDesignListQuery from './graphql/queries/get_design_list.query.graphql'
 import { DESIGNS_ROUTE_NAME, ROOT_ROUTE_NAME } from './router/constants';
 
 export default () => {
-  const el = document.getElementById('js-design-management');
+  const el = document.querySelector('.js-design-management');
   const badge = document.querySelector('.js-designs-count');
   const { issueIid, projectPath, issuePath } = el.dataset;
   const router = createRouter(issuePath);
@@ -24,6 +24,11 @@ export default () => {
     data: {
       projectPath,
       issueIid,
+      activeDiscussion: {
+        __typename: 'ActiveDiscussion',
+        id: null,
+        source: null,
+      },
     },
   });
 

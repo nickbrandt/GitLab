@@ -21,8 +21,13 @@ module Security
       aggregate_results = elasticsearch_client.msearch(body: body)
       nginx_results, modsec_results = aggregate_results['responses']
 
-      nginx_total_requests = nginx_results.dig('hits', 'total').to_f
-      modsec_total_requests = modsec_results.dig('hits', 'total').to_f
+      if chart_above_v3?
+        nginx_total_requests = nginx_results.dig('hits', 'total', 'value').to_f
+        modsec_total_requests = modsec_results.dig('hits', 'total', 'value').to_f
+      else
+        nginx_total_requests = nginx_results.dig('hits', 'total').to_f
+        modsec_total_requests = modsec_results.dig('hits', 'total').to_f
+      end
 
       anomalous_traffic_count = nginx_total_requests.zero? ? 0 : (modsec_total_requests / nginx_total_requests).round(2)
 
@@ -41,10 +46,18 @@ module Security
     end
 
     def elasticsearch_client
-      @client ||= @environment.deployment_platform&.cluster&.application_elastic_stack&.elasticsearch_client
+      @elasticsearch_client ||= application_elastic_stack&.elasticsearch_client
     end
 
     private
+
+    def application_elastic_stack
+      @application_elastic_stack ||= @environment.deployment_platform&.cluster&.application_elastic_stack
+    end
+
+    def chart_above_v3?
+      application_elastic_stack.chart_above_v3?
+    end
 
     def body
       [
@@ -68,7 +81,7 @@ module Security
     # indices
     def indices
       (@from.to_date..@to.to_date).map do |day|
-        "filebeat-*-#{day.strftime('%Y.%m.%d')}"
+        chart_above_v3? ? "filebeat-*-#{day.strftime('%Y.%m.%d')}-*" : "filebeat-*-#{day.strftime('%Y.%m.%d')}"
       end
     end
 

@@ -16,7 +16,7 @@ describe GitlabSchema.types['Project'] do
   it 'includes the ee specific fields' do
     expected_fields = %w[
       service_desk_enabled service_desk_address vulnerabilities
-      requirement_states_count vulnerability_severities_count
+      requirement_states_count vulnerability_severities_count packages
     ]
 
     expect(described_class).to include_graphql_fields(*expected_fields)

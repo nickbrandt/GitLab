@@ -63,6 +63,8 @@ module Gitlab
       # rubocop: disable Metrics/AbcSize
       # rubocop: disable CodeReuse/ActiveRecord
       def system_usage_data
+        alert_bot_incident_count = count(::Issue.authored(::User.alert_bot))
+
         {
           counts: {
             assignee_lists: count(List.assignee),
@@ -112,7 +114,10 @@ module Gitlab
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
             issues_using_zoom_quick_actions: distinct_count(ZoomMeeting, :issue_id),
             issues_with_embedded_grafana_charts_approx: grafana_embed_usage_data,
-            incident_issues: count(::Issue.authored(::User.alert_bot)),
+            issues_created_gitlab_alerts: count(Issue.with_alert_management_alerts.not_authored_by(::User.alert_bot)),
+            incident_issues: alert_bot_incident_count,
+            alert_bot_incident_issues: alert_bot_incident_count,
+            incident_labeled_issues: count(::Issue.with_label_attributes(IncidentManagement::CreateIssueService::INCIDENT_LABEL)),
             keys: count(Key),
             label_lists: count(List.label),
             lfs_objects: count(LfsObject),
@@ -141,7 +146,8 @@ module Gitlab
             services_usage,
             usage_counters,
             user_preferences_usage,
-            ingress_modsecurity_usage
+            ingress_modsecurity_usage,
+            container_expiration_policies_usage
           )
         }
       end
@@ -172,7 +178,6 @@ module Gitlab
           dependency_proxy_enabled: Gitlab.config.try(:dependency_proxy)&.enabled,
           gitlab_shared_runners_enabled: alt_usage_data { Gitlab.config.gitlab_ci.shared_runners_enabled },
           gravatar_enabled: alt_usage_data { Gitlab::CurrentSettings.gravatar_enabled? },
-          influxdb_metrics_enabled: alt_usage_data { Gitlab::Metrics.influx_metrics_enabled? },
           ldap_enabled: alt_usage_data { Gitlab.config.ldap.enabled },
           mattermost_enabled: alt_usage_data { Gitlab.config.mattermost.enabled },
           omniauth_enabled: alt_usage_data { Gitlab::Auth.omniauth_enabled? },
@@ -180,32 +185,10 @@ module Gitlab
           reply_by_email_enabled: alt_usage_data { Gitlab::IncomingEmail.enabled? },
           signup_enabled: alt_usage_data { Gitlab::CurrentSettings.allow_signup? },
           web_ide_clientside_preview_enabled: alt_usage_data { Gitlab::CurrentSettings.web_ide_clientside_preview_enabled? },
-          ingress_modsecurity_enabled: Feature.enabled?(:ingress_modsecurity)
-        }.merge(features_usage_data_container_expiration_policies)
+          ingress_modsecurity_enabled: Feature.enabled?(:ingress_modsecurity),
+          grafana_link_enabled: alt_usage_data { Gitlab::CurrentSettings.grafana_enabled? }
+        }
       end
-
-      # rubocop: disable CodeReuse/ActiveRecord
-      def features_usage_data_container_expiration_policies
-        results = {}
-        start = ::Project.minimum(:id)
-        finish = ::Project.maximum(:id)
-
-        results[:projects_with_expiration_policy_disabled] = distinct_count(::ContainerExpirationPolicy.where(enabled: false), :project_id, start: start, finish: finish)
-        base = ::ContainerExpirationPolicy.active
-        results[:projects_with_expiration_policy_enabled] = distinct_count(base, :project_id, start: start, finish: finish)
-
-        %i[keep_n cadence older_than].each do |option|
-          ::ContainerExpirationPolicy.public_send("#{option}_options").keys.each do |value| # rubocop: disable GitlabSecurity/PublicSend
-            results["projects_with_expiration_policy_enabled_with_#{option}_set_to_#{value}".to_sym] = distinct_count(base.where(option => value), :project_id, start: start, finish: finish)
-          end
-        end
-
-        results[:projects_with_expiration_policy_enabled_with_keep_n_unset] = distinct_count(base.where(keep_n: nil), :project_id, start: start, finish: finish)
-        results[:projects_with_expiration_policy_enabled_with_older_than_unset] = distinct_count(base.where(older_than: nil), :project_id, start: start, finish: finish)
-
-        results
-      end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       # @return [Hash<Symbol, Integer>]
       def usage_counters
@@ -223,7 +206,8 @@ module Gitlab
           Gitlab::UsageDataCounters::CycleAnalyticsCounter,
           Gitlab::UsageDataCounters::ProductivityAnalyticsCounter,
           Gitlab::UsageDataCounters::SourceCodeCounter,
-          Gitlab::UsageDataCounters::MergeRequestCounter
+          Gitlab::UsageDataCounters::MergeRequestCounter,
+          Gitlab::UsageDataCounters::DesignsCounter
         ]
       end
 
@@ -309,6 +293,29 @@ module Gitlab
           ingress_modsecurity_not_installed: distinct_count(successful_deployments_with_cluster(::Clusters::Applications::Ingress.modsecurity_not_installed), column)
         }
       end
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      def container_expiration_policies_usage
+        results = {}
+        start = ::Project.minimum(:id)
+        finish = ::Project.maximum(:id)
+
+        results[:projects_with_expiration_policy_disabled] = distinct_count(::ContainerExpirationPolicy.where(enabled: false), :project_id, start: start, finish: finish)
+        base = ::ContainerExpirationPolicy.active
+        results[:projects_with_expiration_policy_enabled] = distinct_count(base, :project_id, start: start, finish: finish)
+
+        %i[keep_n cadence older_than].each do |option|
+          ::ContainerExpirationPolicy.public_send("#{option}_options").keys.each do |value| # rubocop: disable GitlabSecurity/PublicSend
+            results["projects_with_expiration_policy_enabled_with_#{option}_set_to_#{value}".to_sym] = distinct_count(base.where(option => value), :project_id, start: start, finish: finish)
+          end
+        end
+
+        results[:projects_with_expiration_policy_enabled_with_keep_n_unset] = distinct_count(base.where(keep_n: nil), :project_id, start: start, finish: finish)
+        results[:projects_with_expiration_policy_enabled_with_older_than_unset] = distinct_count(base.where(older_than: nil), :project_id, start: start, finish: finish)
+
+        results
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       # rubocop: disable CodeReuse/ActiveRecord
       def services_usage

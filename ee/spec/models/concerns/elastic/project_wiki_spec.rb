@@ -33,13 +33,12 @@ describe ProjectWiki, :elastic do
 
     Sidekiq::Testing.inline! do
       project.wiki.find_page('omega_page').delete
-      last_commit = project.wiki.repository.commit.sha
 
       expect_next_instance_of(Gitlab::Elastic::Indexer) do |indexer|
-        expect(indexer).to receive(:run).with(last_commit).and_call_original
+        expect(indexer).to receive(:run).and_call_original
       end
 
-      project.wiki.index_wiki_blobs(last_commit)
+      project.wiki.index_wiki_blobs
 
       ensure_elasticsearch_index!
     end

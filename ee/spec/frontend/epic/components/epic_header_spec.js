@@ -87,21 +87,6 @@ describe('EpicHeaderComponent', () => {
         expect(vm.actionButtonText).toBe('Reopen epic');
       });
     });
-
-    describe('showGitlabTeamMemberBadge', () => {
-      test.each`
-        isGitlabEmployeeValue | expected
-        ${true}               | ${true}
-        ${false}              | ${false}
-      `(
-        'returns $expected when `author.isGitlabEmployee` is $isGitlabEmployeeValue',
-        ({ isGitlabEmployeeValue, expected }) => {
-          vm.$store.state.author.isGitlabEmployee = isGitlabEmployeeValue;
-
-          expect(vm.showGitlabTeamMemberBadge).toBe(expected);
-        },
-      );
-    });
   });
 
   describe('template', () => {
@@ -133,9 +118,7 @@ describe('EpicHeaderComponent', () => {
 
       expect(actionsEl).not.toBeNull();
       expect(actionsEl.querySelector('.js-btn-epic-action')).not.toBeNull();
-      expect(actionsEl.querySelector('.js-loading-button-label').innerText.trim()).toBe(
-        'Close epic',
-      );
+      expect(actionsEl.querySelector('.js-btn-epic-action').innerText.trim()).toBe('Close epic');
     });
 
     it('renders toggle sidebar button element', () => {
@@ -151,7 +134,8 @@ describe('EpicHeaderComponent', () => {
     it('renders GitLab team member badge when `author.isGitlabEmployee` is `true`', () => {
       vm.$store.state.author.isGitlabEmployee = true;
 
-      return vm.$nextTick().then(() => {
+      // Wait for dynamic imports to resolve
+      return new Promise(setImmediate).then(() => {
         expect(vm.$refs.gitlabTeamMemberBadge).not.toBeUndefined();
       });
     });

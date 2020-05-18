@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { GlButton, GlIcon, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
 import { __, n__ } from '~/locale';
 import eventHub from '../event_hub';
@@ -43,6 +44,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(['allowSubEpics']),
     itemId() {
       return this.epic.id;
     },
@@ -154,14 +156,16 @@ export default {
           <p class="epic-timeframe" :title="timeframeString">{{ timeframeString }}</p>
         </div>
       </div>
-      <div ref="childEpicsCount" class="d-flex text-secondary text-nowrap">
-        <gl-icon name="epic" class="align-text-bottom mr-1" aria-hidden="true" />
-        <p class="m-0" :aria-label="childEpicsCountText">{{ childEpicsCount }}</p>
-      </div>
-      <gl-tooltip :target="() => $refs.childEpicsCount">
-        <span :class="{ bold: hasFiltersApplied }">{{ childEpicsCountText }}</span>
-        <span v-if="hasFiltersApplied" class="d-block">{{ childEpicsSearchText }}</span>
-      </gl-tooltip>
+      <template v-if="allowSubEpics">
+        <div ref="childEpicsCount" class="d-flex text-secondary text-nowrap">
+          <gl-icon name="epic" class="align-text-bottom mr-1" aria-hidden="true" />
+          <p class="m-0" :aria-label="childEpicsCountText">{{ childEpicsCount }}</p>
+        </div>
+        <gl-tooltip :target="() => $refs.childEpicsCount">
+          <span :class="{ bold: hasFiltersApplied }">{{ childEpicsCountText }}</span>
+          <span v-if="hasFiltersApplied" class="d-block">{{ childEpicsSearchText }}</span>
+        </gl-tooltip>
+      </template>
     </div>
   </div>
 </template>

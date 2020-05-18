@@ -59,6 +59,7 @@ export default () => ({
 
   // Create Epic Props
   newEpicTitle: '',
+  newEpicConfidential: false,
 
   // UI status flags
   epicStatusChangeInProgress: false,

@@ -2,8 +2,10 @@ import {
   packageTypeToTrackCategory,
   beautifyPath,
   getPackageTypeLabel,
+  getCommitLink,
 } from 'ee/packages/shared/utils';
 import { PackageType, TrackingCategories } from 'ee/packages/shared/constants';
+import { packageList } from '../mock_data';
 
 describe('Packages shared utils', () => {
   describe('packageTypeToTrackCategory', () => {
@@ -40,6 +42,23 @@ describe('Packages shared utils', () => {
     `(`package type`, ({ packageType, expectedResult }) => {
       it(`${packageType} should show as ${expectedResult}`, () => {
         expect(getPackageTypeLabel(packageType)).toBe(expectedResult);
+      });
+    });
+  });
+
+  describe('getCommitLink', () => {
+    it('returns a relative link when isGroup is false', () => {
+      const link = getCommitLink(packageList[0], false);
+
+      expect(link).toContain('../commit');
+    });
+
+    describe('when isGroup is true', () => {
+      it('returns an absolute link matching project path', () => {
+        const mavenPackage = packageList[0];
+        const link = getCommitLink(mavenPackage, true);
+
+        expect(link).toContain(`/${mavenPackage.project_path}/commit`);
       });
     });
   });

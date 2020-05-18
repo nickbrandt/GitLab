@@ -18,6 +18,7 @@ import {
   fetchEnvironmentsData,
   fetchDashboardData,
   fetchAnnotations,
+  toggleStarredValue,
   fetchPrometheusMetric,
   setInitialState,
   filterEnvironments,
@@ -25,7 +26,7 @@ import {
   clearExpandedPanel,
   setGettingStartedEmptyState,
   duplicateSystemDashboard,
-  setVariables,
+  updateVariableValues,
 } from '~/monitoring/stores/actions';
 import {
   gqClient,
@@ -39,6 +40,7 @@ import {
   deploymentData,
   environmentData,
   annotationsData,
+  mockTemplatingData,
   dashboardGitResponse,
   mockDashboardsErrorResponse,
 } from '../mock_data';
@@ -97,7 +99,11 @@ describe('Monitoring store actions', () => {
         null,
         state,
         [],
-        [{ type: 'fetchEnvironmentsData' }, { type: 'fetchDashboard' }],
+        [
+          { type: 'fetchEnvironmentsData' },
+          { type: 'fetchDashboard' },
+          { type: 'fetchAnnotations' },
+        ],
       );
     });
 
@@ -346,6 +352,49 @@ describe('Monitoring store actions', () => {
     });
   });
 
+  describe('Toggles starred value of current dashboard', () => {
+    const { state } = store;
+    let unstarredDashboard;
+    let starredDashboard;
+
+    beforeEach(() => {
+      state.isUpdatingStarredValue = false;
+      [unstarredDashboard, starredDashboard] = dashboardGitResponse;
+    });
+
+    describe('toggleStarredValue', () => {
+      it('performs no changes if no dashboard is selected', () => {
+        return testAction(toggleStarredValue, null, state, [], []);
+      });
+
+      it('performs no changes if already changing starred value', () => {
+        state.selectedDashboard = unstarredDashboard;
+        state.isUpdatingStarredValue = true;
+        return testAction(toggleStarredValue, null, state, [], []);
+      });
+
+      it('stars dashboard if it is not starred', () => {
+        state.selectedDashboard = unstarredDashboard;
+        mock.onPost(unstarredDashboard.user_starred_path).reply(200);
+
+        return testAction(toggleStarredValue, null, state, [
+          { type: types.REQUEST_DASHBOARD_STARRING },
+          { type: types.RECEIVE_DASHBOARD_STARRING_SUCCESS, payload: true },
+        ]);
+      });
+
+      it('unstars dashboard if it is starred', () => {
+        state.selectedDashboard = starredDashboard;
+        mock.onPost(starredDashboard.user_starred_path).reply(200);
+
+        return testAction(toggleStarredValue, null, state, [
+          { type: types.REQUEST_DASHBOARD_STARRING },
+          { type: types.RECEIVE_DASHBOARD_STARRING_FAILURE },
+        ]);
+      });
+    });
+  });
+
   describe('Set initial state', () => {
     let mockedState;
     beforeEach(() => {
@@ -394,19 +443,19 @@ describe('Monitoring store actions', () => {
     });
   });
 
-  describe('setVariables', () => {
+  describe('updateVariableValues', () => {
     let mockedState;
     beforeEach(() => {
       mockedState = storeState();
     });
-    it('should commit SET_PROM_QUERY_VARIABLES mutation', done => {
+    it('should commit UPDATE_VARIABLE_VALUES mutation', done => {
       testAction(
-        setVariables,
+        updateVariableValues,
         { pod: 'POD' },
         mockedState,
         [
           {
-            type: types.SET_PROM_QUERY_VARIABLES,
+            type: types.UPDATE_VARIABLE_VALUES,
             payload: { pod: 'POD' },
           },
         ],
@@ -526,6 +575,33 @@ describe('Monitoring store actions', () => {
       );
       expect(dispatch).toHaveBeenCalledWith('fetchDashboardData');
     });
+
+    it('stores templating variables', () => {
+      const response = {
+        ...metricsDashboardResponse.dashboard,
+        ...mockTemplatingData.allVariableTypes.dashboard,
+      };
+
+      receiveMetricsDashboardSuccess(
+        { state, commit, dispatch },
+        {
+          response: {
+            ...metricsDashboardResponse,
+            dashboard: {
+              ...metricsDashboardResponse.dashboard,
+              ...mockTemplatingData.allVariableTypes.dashboard,
+            },
+          },
+        },
+      );
+
+      expect(commit).toHaveBeenCalledWith(
+        types.RECEIVE_METRICS_DASHBOARD_SUCCESS,
+
+        response,
+      );
+    });
+
     it('sets the dashboards loaded from the repository', () => {
       const params = {};
       const response = metricsDashboardResponse;

@@ -1,15 +1,107 @@
+import { isString } from 'lodash';
 import { VARIABLE_TYPES } from '../constants';
 
 /**
  * This file exclusively deals with parsing user-defined variables
  * in dashboard yml file.
  *
- * As of 13.0, simple custom and advanced custom variables are supported.
+ * As of 13.0, simple text, advanced text, simple custom and
+ * advanced custom variables are supported.
  *
  * In the future iterations, text and query variables will be
  * supported
  *
  */
+
+/**
+ * Simple text variable is a string value only.
+ * This method parses such variables to a standard format.
+ *
+ * @param {String|Object} simpleTextVar
+ * @returns {Object}
+ */
+const textSimpleVariableParser = simpleTextVar => ({
+  type: VARIABLE_TYPES.text,
+  label: null,
+  value: simpleTextVar,
+});
+
+/**
+ * Advanced text variable is an object.
+ * This method parses such variables to a standard format.
+ *
+ * @param {Object} advTextVar
+ * @returns {Object}
+ */
+const textAdvancedVariableParser = advTextVar => ({
+  type: VARIABLE_TYPES.text,
+  label: advTextVar.label,
+  value: advTextVar.options.default_value,
+});
+
+/**
+ * Normalize simple and advanced custom variable options to a standard
+ * format
+ * @param {Object} custom variable option
+ * @returns {Object} normalized custom variable options
+ */
+const normalizeCustomVariableOptions = ({ default: defaultOpt = false, text, value }) => ({
+  default: defaultOpt,
+  text,
+  value,
+});
+
+/**
+ * Custom advanced variables are rendered as dropdown elements in the dashboard
+ * header. This method parses advanced custom variables.
+ *
+ * The default value is the option with default set to true or the first option
+ * if none of the options have default prop true.
+ *
+ * @param {Object} advVariable advance custom variable
+ * @returns {Object}
+ */
+const customAdvancedVariableParser = advVariable => {
+  const options = (advVariable?.options?.values ?? []).map(normalizeCustomVariableOptions);
+  const defaultOpt = options.find(opt => opt.default === true) || options[0];
+  return {
+    type: VARIABLE_TYPES.custom,
+    label: advVariable.label,
+    value: defaultOpt?.value,
+    options,
+  };
+};
+
+/**
+ * Simple custom variables have an array of values.
+ * This method parses such variables options to a standard format.
+ *
+ * @param {String} opt option from simple custom variable
+ * @returns {Object}
+ */
+const parseSimpleCustomOptions = opt => ({ text: opt, value: opt });
+
+/**
+ * Custom simple variables are rendered as dropdown elements in the dashboard
+ * header. This method parses simple custom variables.
+ *
+ * Simple custom variables do not have labels so its set to null here.
+ *
+ * The default value is set to the first option as the user cannot
+ * set a default value for this format
+ *
+ * @param {Array} customVariable array of options
+ * @returns {Object}
+ */
+const customSimpleVariableParser = simpleVar => {
+  const options = (simpleVar || []).map(parseSimpleCustomOptions);
+  return {
+    type: VARIABLE_TYPES.custom,
+    value: options[0].value,
+    label: null,
+    options: options.map(normalizeCustomVariableOptions),
+  };
+};
 
 /**
  * Utility method to determine if a custom variable is
@@ -19,60 +111,6 @@ import { VARIABLE_TYPES } from '../constants';
  * @returns {Boolean} true if simple, false if advanced
  */
 const isSimpleCustomVariable = customVar => Array.isArray(customVar);
-
-/**
- * Normalize simple and advanced custom variable options to a standard
- * format
- * @param {Object} custom variable option
- * @returns {Object} normalized custom variable options
- */
-const normalizeDropdownOptions = ({ default: defaultOpt = false, text, value }) => ({
-  default: defaultOpt,
-  text,
-  value,
-});
-
-/**
- * Simple custom variables have an array of values.
- * This method parses such variables options to a standard format.
- *
- * @param {String} opt option from simple custom variable
- */
-const parseSimpleDropdownOptions = opt => ({ text: opt, value: opt });
-
-/**
- * Custom advanced variables are rendered as dropdown elements in the dashboard
- * header. This method parses advanced custom variables.
- *
- * @param {Object} advVariable advance custom variable
- * @returns {Object}
- */
-const customAdvancedVariableParser = advVariable => {
-  const options = advVariable?.options?.values ?? [];
-  return {
-    type: VARIABLE_TYPES.custom,
-    label: advVariable.label,
-    options: options.map(normalizeDropdownOptions),
-  };
-};
-
-/**
- * Custom simple variables are rendered as dropdown elements in the dashboard
- * header. This method parses simple custom variables.
- *
- * Simple custom variables do not have labels so its set to null here.
- *
- * @param {Array} customVariable array of options
- * @returns {Object}
- */
-const customSimpleVariableParser = simpleVar => {
-  const options = (simpleVar || []).map(parseSimpleDropdownOptions);
-  return {
-    type: VARIABLE_TYPES.custom,
-    label: null,
-    options: options.map(normalizeDropdownOptions),
-  };
-};
 
 /**
  * This method returns a parser based on the type of the variable.
@@ -88,6 +126,10 @@ const getVariableParser = variable => {
     return customSimpleVariableParser;
   } else if (variable.type === VARIABLE_TYPES.custom) {
     return customAdvancedVariableParser;
+  } else if (variable.type === VARIABLE_TYPES.text) {
+    return textAdvancedVariableParser;
+  } else if (isString(variable)) {
+    return textSimpleVariableParser;
   }
   return () => null;
 };

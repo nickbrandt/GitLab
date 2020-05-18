@@ -24,7 +24,7 @@ GitLab checks the Dependency Scanning report, compares the found vulnerabilities
 between the source and target branches, and shows the information on the
 merge request.
 
-![Dependency Scanning Widget](img/dependency_scanning.png)
+![Dependency Scanning Widget](img/dependency_scanning_v13_0.png)
 
 The results are sorted by the severity of the vulnerability:
 
@@ -37,17 +37,16 @@ The results are sorted by the severity of the vulnerability:
 
 ## Requirements
 
-To run a Dependency Scanning job, by default, you need GitLab Runner with the
-[`docker`](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode) or
-[`kubernetes`](https://docs.gitlab.com/runner/install/kubernetes.html#running-privileged-containers-for-the-runners)
-executor running in privileged mode. If you're using the shared Runners on GitLab.com,
-this is enabled by default.
+To run Dependency Scanning jobs, by default, you need GitLab Runner with the
+[`docker`](https://docs.gitlab.com/runner/executors/docker.html) or
+[`kubernetes`](https://docs.gitlab.com/runner/install/kubernetes.html) executor.
+If you're using the shared Runners on GitLab.com, this is enabled by default.
 
 CAUTION: **Caution:**
 If you use your own Runners, make sure your installed version of Docker
 is **not** `19.03.0`. See [troubleshooting information](#error-response-from-daemon-error-processing-tar-file-docker-tar-relocation-error) for details.
 
-Privileged mode is not necessary if you've [disabled Docker in Docker for Dependency Scanning](#disabling-docker-in-docker-for-dependency-scanning)
+Beginning with GitLab 13.0, Docker privileged mode is necessary only if you've [enabled Docker-in-Docker for Dependency Scanning](#enabling-docker-in-docker).
 
 ## Supported languages and package managers
 
@@ -86,7 +85,7 @@ include:
   - template: Dependency-Scanning.gitlab-ci.yml
 ```
 
-The included template will create a `dependency_scanning` job in your CI/CD
+The included template will create Dependency Scanning jobs in your CI/CD
 pipeline and scan your project's source code for possible vulnerabilities.
 The results will be saved as a
 [Dependency Scanning report artifact](../../../ci/pipelines/job_artifacts.md#artifactsreportsdependency_scanning-ultimate)
@@ -110,23 +109,24 @@ variables:
 Because template is [evaluated before](../../../ci/yaml/README.md#include) the pipeline
 configuration, the last mention of the variable will take precedence.
 
-### Overriding the Dependency Scanning template
+### Overriding Dependency Scanning jobs
 
 CAUTION: **Deprecation:**
 Beginning in GitLab 13.0, the use of [`only` and `except`](../../../ci/yaml/README.md#onlyexcept-basic)
 is no longer supported. When overriding the template, you must use [`rules`](../../../ci/yaml/README.md#rules) instead.
 
-If you want to override the job definition, such as changing properties like
-`variables` or `dependencies`, you must declare a `dependency_scanning` job
-after the template inclusion, and specify any additional keys under it. For example:
+To override a job definition (for example, to change properties like `variables` or `dependencies`),
+declare a new job with the same name as the one to override. Place this new job after the template
+inclusion and specify any additional keys under it. For example, this disables `DS_REMEDIATE` for
+the `gemnasium` analyzer:
 
 ```yaml
 include:
   - template: Dependency-Scanning.gitlab-ci.yml
 
-dependency_scanning:
+gemnasium-dependency_scanning:
   variables:
-    CI_DEBUG_TRACE: "true"
+    DS_REMEDIATE: "false"
 ```
 
 ### Available variables
@@ -140,15 +140,16 @@ The following variables allow configuration of global dependency scanning settin
 
 | Environment variable                    | Description |
 | --------------------------------------- |------------ |
-| `DS_ANALYZER_IMAGE_PREFIX`              | Override the name of the Docker registry providing the official default images (proxy). Read more about [customizing analyzers](analyzers.md). |
+| `SECURE_ANALYZERS_PREFIX`               | Override the name of the Docker registry providing the official default images (proxy). Read more about [customizing analyzers](analyzers.md). |
+| `DS_ANALYZER_IMAGE_PREFIX`              | **DEPRECATED:** Use `SECURE_ANALYZERS_PREFIX` instead. |
 | `DS_DEFAULT_ANALYZERS`                  | Override the names of the official default images. Read more about [customizing analyzers](analyzers.md). |
-| `DS_DISABLE_DIND`                       | Disable Docker-in-Docker and run analyzers [individually](#disabling-docker-in-docker-for-dependency-scanning).|
+| `DS_DISABLE_DIND`                       | Disable Docker-in-Docker and run analyzers [individually](#enabling-docker-in-docker). This variable is `true` by default. |
 | `ADDITIONAL_CA_CERT_BUNDLE`             | Bundle of CA certs to trust. |
 | `DS_EXCLUDED_PATHS`                     | Exclude vulnerabilities from output based on the paths. A comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec`). Parent directories also match patterns. |
 
 #### Configuring Docker-in-Docker orchestrator
 
-The following variables configure the Docker-in-Docker orchestrator.
+The following variables configure the Docker-in-Docker orchestrator, and therefore are only used when the Docker-in-Docker mode is [enabled](#enabling-docker-in-docker).
 
 | Environment variable                    | Default     | Description |
 | --------------------------------------- | ----------- | ----------- |
@@ -168,7 +169,7 @@ The following variables are used for configuring specific analyzers (used for a 
 | `GEMNASIUM_DB_LOCAL_PATH`               | `gemnasium`        | `/gemnasium-db`              | Path to local Gemnasium database. |
 | `GEMNASIUM_DB_REMOTE_URL`               | `gemnasium`        | `https://gitlab.com/gitlab-org/security-products/gemnasium-db.git` | Repository URL for fetching the Gemnasium database. |
 | `GEMNASIUM_DB_REF_NAME`                 | `gemnasium`        | `master`                     | Branch name for remote repository database. `GEMNASIUM_DB_REMOTE_URL` is required. |
-| `DS_REMEDIATE`                          | `gemnasium`        | `"true"`                       | Enable automatic remediation of vulnerable dependencies.  |
+| `DS_REMEDIATE`                          | `gemnasium`        | `"true"`                     | Enable automatic remediation of vulnerable dependencies.  |
 | `PIP_INDEX_URL`                         | `gemnasium-python` | `https://pypi.org/simple`    | Base URL of Python Package Index. |
 | `PIP_EXTRA_INDEX_URL`                   | `gemnasium-python` |                              | Array of [extra URLs](https://pip.pypa.io/en/stable/reference/pip_install/#cmdoption-extra-index-url) of package indexes to use in addition to `PIP_INDEX_URL`. Comma-separated. |
 | `PIP_REQUIREMENTS_FILE`                 | `gemnasium-python` |                              | Pip requirements file to be scanned. |
@@ -176,9 +177,9 @@ The following variables are used for configuring specific analyzers (used for a 
 | `DS_PIP_DEPENDENCY_PATH`                | `gemnasium-python` |                              | Path to load Python pip dependencies from. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12412) in GitLab 12.2) |
 | `DS_PYTHON_VERSION`                     | `retire.js`        |                              | Version of Python. If set to 2, dependencies are installed using Python 2.7 instead of Python 3.6. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12296) in GitLab 12.1)|
 | `MAVEN_CLI_OPTS`                        | `gemnasium-maven`  | `"-DskipTests --batch-mode"` | List of command line arguments that will be passed to `maven` by the analyzer. See an example for [using private repositories](../index.md#using-private-maven-repos). |
-| `GRADLE_CLI_OPTS`                        | `gemnasium-maven`  | | List of command line arguments that will be passed to `gradle` by the analyzer. |
-| `SBT_CLI_OPTS`                        | `gemnasium-maven`  | | List of command-line arguments that the analyzer will pass to `sbt`. |
-| `BUNDLER_AUDIT_UPDATE_DISABLED`         | `bundler-audit`    | `"false"`                      | Disable automatic updates for the `bundler-audit` analyzer. Useful if you're running Dependency Scanning in an offline, air-gapped environment.|
+| `GRADLE_CLI_OPTS`                       | `gemnasium-maven`  |                              | List of command line arguments that will be passed to `gradle` by the analyzer. |
+| `SBT_CLI_OPTS`                          | `gemnasium-maven`  |                              | List of command-line arguments that the analyzer will pass to `sbt`. |
+| `BUNDLER_AUDIT_UPDATE_DISABLED`         | `bundler-audit`    | `"false"`                    | Disable automatic updates for the `bundler-audit` analyzer. Useful if you're running Dependency Scanning in an offline, air-gapped environment.|
 | `BUNDLER_AUDIT_ADVISORY_DB_URL`         | `bundler-audit`    | `https://github.com/rubysec/ruby-advisory-db` | URL of the advisory database used by bundler-audit. |
 | `BUNDLER_AUDIT_ADVISORY_DB_REF_NAME`    | `bundler-audit`    | `master`                     | Git ref for the advisory database specified by `BUNDLER_AUDIT_ADVISORY_DB_URL`. |
 | `RETIREJS_JS_ADVISORY_DB`               | `retire.js`        | `https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json` | Path or URL to `retire.js` JS vulnerability data file. Note that if the URL hosting the data file uses a custom SSL certificate, for example in an offline installation, you can pass the certificate in the `ADDITIONAL_CA_CERT_BUNDLE` environment variable. |
@@ -192,34 +193,26 @@ you can use the `MAVEN_CLI_OPTS` environment variable.
 
 Read more on [how to use private Maven repositories](../index.md#using-private-maven-repos).
 
-### Disabling Docker in Docker for Dependency Scanning
+### Enabling Docker-in-Docker
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12487) in GitLab Ultimate 12.5.
 
-You can avoid the need for Docker in Docker by running the individual analyzers.
-This does not require running the executor in privileged mode. For example:
+If needed, you can enable Docker-in-Docker to restore the Dependency Scanning behavior that existed
+prior to GitLab 13.0. Follow these steps to do so:
 
-```yaml
-include:
-  - template: Dependency-Scanning.gitlab-ci.yml
+1. Configure GitLab Runner with Docker-in-Docker in [privileged mode](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode).
+1. Set the `DS_DISABLE_DIND` variable to `false`:
 
-variables:
-  DS_DISABLE_DIND: "true"
-```
+   ```yaml
+   include:
+     - template: Dependency-Scanning.gitlab-ci.yml
 
-This will create individual `<analyzer-name>-dependency_scanning` jobs for each analyzer that runs in your CI/CD pipeline.
+   variables:
+     DS_DISABLE_DIND: "false"
+   ```
 
-By removing Docker-in-Docker (DIND), GitLab relies on [Linguist](https://github.com/github/linguist)
-to start relevant analyzers depending on the detected repository language(s) instead of the
-[orchestrator](https://gitlab.com/gitlab-org/security-products/dependency-scanning/). However, there
-are some differences in the way repository languages are detected between DIND and non-DIND. You can
-observe these differences by checking both Linguist and the common library. For instance, Linguist
-looks for `*.java` files to spin up the [gemnasium-maven](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium-maven)
-image, while orchestrator only looks for the existence of `pom.xml` or `build.gradle`. GitLab uses
-Linguist to detect new file types in the default branch. This means that when introducing files or
-dependencies for a new language or package manager, the corresponding scans won't be triggered in
-the merge request, and will only run on the default branch once the merge request is merged. This will be addressed by
-[#211702](https://gitlab.com/gitlab-org/gitlab/-/issues/211702).
+This creates a single `dependency_scanning` job in your CI/CD pipeline instead of multiple
+`<analyzer-name>-dependency_scanning` jobs.
 
 ## Interacting with the vulnerabilities
 
@@ -427,7 +420,7 @@ jobs to run successfully. For more information, see [Offline environments](../of
 
 Here are the requirements for using Dependency Scanning in an offline environment:
 
-- [Disable Docker-In-Docker](#disabling-docker-in-docker-for-dependency-scanning).
+- Keep Docker-In-Docker disabled (default).
 - GitLab Runner with the [`docker` or `kubernetes` executor](#requirements).
 - Docker Container Registry with locally available copies of Dependency Scanning [analyzer](https://gitlab.com/gitlab-org/security-products/analyzers) images.
 - Host an offline Git copy of the [gemnasium-db advisory database](https://gitlab.com/gitlab-org/security-products/gemnasium-db/)
@@ -476,7 +469,6 @@ include:
   - template: Dependency-Scanning.gitlab-ci.yml
 
 variables:
-  DS_DISABLE_DIND: "true"
   DS_ANALYZER_IMAGE_PREFIX: "docker-registry.example.com/analyzers"
 ```
 
@@ -595,11 +587,24 @@ ensure that it can reach your private repository. Here is an example configurati
     setuptools.ssl_support.cert_paths = ['internal.crt']
     ```
 
+## Limitations
+
+### Referencing local dependencies using a path in JavaScript projects
+
+Although dependency scanning doesn't support it, you can reference dependencies by using a
+[local path](https://docs.npmjs.com/files/package.json#local-paths) in the `package.json` for a
+JavaScript project. The dependency scan generates the following error when you use
+`file: <path/to/dependency-name>` to reference a package:
+
+```text
+ERROR: Could not find dependencies: <dependency-name>. You may need to run npm install
+```
+
 ## Troubleshooting
 
 ### Error response from daemon: error processing tar file: docker-tar: relocation error
 
-This error occurs when the Docker version used to run the SAST job is `19.03.0`.
+This error occurs when the Docker version that runs the Dependency Scanning job is `19.03.00`.
 Consider updating to Docker `19.03.1` or greater. Older versions are not
 affected. Read more in
 [this issue](https://gitlab.com/gitlab-org/gitlab/issues/13830#note_211354992 "Current SAST container fails").

@@ -143,6 +143,7 @@ module QA
         autoload :Mattermost, 'qa/scenario/test/integration/mattermost'
         autoload :ObjectStorage, 'qa/scenario/test/integration/object_storage'
         autoload :SMTP, 'qa/scenario/test/integration/smtp'
+        autoload :GitalyHA, 'qa/scenario/test/integration/gitaly_ha'
       end
 
       module Sanity
@@ -265,6 +266,11 @@ module QA
         autoload :VisibilityFeaturesPermissions, 'qa/page/project/settings/visibility_features_permissions'
         autoload :Operations, 'qa/page/project/settings/operations'
         autoload :Incidents, 'qa/page/project/settings/incidents'
+        autoload :Integrations, 'qa/page/project/settings/integrations'
+
+        module Services
+          autoload :Prometheus, 'qa/page/project/settings/services/prometheus'
+        end
       end
 
       module SubMenus
@@ -412,6 +418,8 @@ module QA
       autoload :UsersSelect, 'qa/page/component/users_select'
       autoload :Note, 'qa/page/component/note'
       autoload :ConfirmModal, 'qa/page/component/confirm_modal'
+      autoload :CustomMetric, 'qa/page/component/custom_metric'
+      autoload :DesignManagement, 'qa/page/component/design_management'
 
       module Issuable
         autoload :Common, 'qa/page/component/issuable/common'
@@ -443,6 +451,7 @@ module QA
     autoload :Shellout, 'qa/service/shellout'
     autoload :KubernetesCluster, 'qa/service/kubernetes_cluster'
     autoload :Omnibus, 'qa/service/omnibus'
+    autoload :PraefectManager, 'qa/service/praefect_manager'
 
     module ClusterProvider
       autoload :Base, 'qa/service/cluster_provider/base'

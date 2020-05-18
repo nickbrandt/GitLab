@@ -282,6 +282,8 @@ export const toggleEpicSubscription = ({ state, dispatch }) => {
  * Methods to handle Epic create from Epics index page
  */
 export const setEpicCreateTitle = ({ commit }, data) => commit(types.SET_EPIC_CREATE_TITLE, data);
+export const setEpicCreateConfidential = ({ commit }, data) =>
+  commit(types.SET_EPIC_CREATE_CONFIDENTIAL, data);
 export const requestEpicCreate = ({ commit }) => commit(types.REQUEST_EPIC_CREATE);
 export const requestEpicCreateSuccess = (_, webUrl) => visitUrl(webUrl);
 export const requestEpicCreateFailure = ({ commit }) => {
@@ -293,6 +295,7 @@ export const createEpic = ({ state, dispatch }) => {
   axios
     .post(state.endpoint, {
       title: state.newEpicTitle,
+      confidential: state.newEpicConfidential,
     })
     .then(({ data }) => {
       dispatch('requestEpicCreateSuccess', data.web_url);

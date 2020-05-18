@@ -257,7 +257,6 @@ but commented out to help encourage others to add to it in the future. -->
 |projects_hipchat_active|counts||
 |projects_irker_active|counts||
 |projects_jenkins_active|counts||
-|projects_jenkins_deprecated_active|counts||
 |projects_jira_active -|counts||
 |projects_mattermost_active|counts||
 |projects_mattermost_slash_commands_active|counts||
@@ -314,7 +313,10 @@ but commented out to help encourage others to add to it in the future. -->
 |epics|counts||
 |feature_flags|counts||
 |geo_nodes|counts||
-|incident_issues|counts||
+|incident_issues|counts|monitor|Issues created by the alert bot|
+|alert_bot_incident_issues|counts|monitor|Issues created by the alert bot|
+|incident_labeled_issues|counts|monitor|Issues with the incident label|
+|issues_created_gitlab_alerts|counts|monitor|issues created from alerts by non-alert bot users|
 |ldap_group_links|counts||
 |ldap_keys|counts||
 |ldap_users|counts||
@@ -340,7 +342,6 @@ but commented out to help encourage others to add to it in the future. -->
 |dependency_proxy_enabled|||
 |gitlab_shared_runners_enabled|||
 |gravatar_enabled|||
-|influxdb_metrics_enabled|||
 |ldap_enabled|||
 |mattermost_enabled|||
 |omniauth_enabled|||

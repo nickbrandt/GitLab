@@ -766,10 +766,10 @@
   resolved "https://registry.yarnpkg.com/@gitlab/at.js/-/at.js-1.5.5.tgz#5f6bfe6baaef360daa9b038fa78798d7a6a916b4"
   integrity sha512-282Dn3SPVsUHVDhMsXgfnv+Rzog0uxecjttxGRQvxh25es1+xvkGQFsvJfkSKJ3X1kHVkSjKf+Tt5Rra+Jhp9g==
 
-"@gitlab/eslint-plugin@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/eslint-plugin/-/eslint-plugin-3.0.0.tgz#1bf361af2e7d293cc10637d182b655328e0a9014"
-  integrity sha512-7mwJEO63GNfiSk2Jtvk0TlH2OZPCJ45lHd0s7c1+oNPUy18rquyYu0Iv/mtpwOcfnx8R2fSl0aD+d0lWDuHUNQ==
+"@gitlab/eslint-plugin@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/eslint-plugin/-/eslint-plugin-3.1.0.tgz#18e03630d10788defbb4c2d746620aec09517295"
+  integrity sha512-M5bCk5vD0d65COeYtWoc7p43bvvsT9885t6DONI7q5aQVg7GBk3J4on8XjnWTLI4dFZNQGS6aw8+PkRD8NqByQ==
   dependencies:
     babel-eslint "^10.0.3"
     eslint-config-airbnb-base "^14.0.0"
@@ -787,10 +787,10 @@
   resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.127.0.tgz#1f7ffdffe44d6a82b372535f93d78f3a895d1960"
   integrity sha512-Uv52DqkG2KwCB0VRlXUEHFZxJ/7Ql0t1YTdzICpXmDjltuUBrysFcdmWPVO6PgXQxk2ahryNsUjSOziMYTeSiw==
 
-"@gitlab/ui@14.5.0":
-  version "14.5.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-14.5.0.tgz#6fed9a5b435884fe69e499578469c8b144726c90"
-  integrity sha512-7OarJzyyeRpFRmShN7c2GBPpahBDbmOSk10ATisannbX/h9i+Z83MQ8ZDqYbM8qeRIfG/BVsnLjC8M7aSsBlPQ==
+"@gitlab/ui@14.10.0":
+  version "14.10.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-14.10.0.tgz#39c04d62c914fcefe96c7ec32fdf31b1f98f1119"
+  integrity sha512-k9w6z3/QBeUas++cH5BaozjxY4fVu+AggjGoh9QMKN5hpiGTiTPx5aQJIlOv8UX/kpUmgc4pHSWAbw30YVGGFw==
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.3.0"
@@ -983,10 +983,10 @@
     consola "^2.10.1"
     node-fetch "^2.6.0"
 
-"@rails/actioncable@^6.0.2-2":
-  version "6.0.2-2"
-  resolved "https://registry.yarnpkg.com/@rails/actioncable/-/actioncable-6.0.2-2.tgz#237907f8111707950381387c273b19ac25958408"
-  integrity sha512-0sKStf8hnberH1TKup10PJ92JT2dVqf3gf+OT4lJ7DiYSBEuDcvICHxWsyML2oWTpjUhC4kLvUJ3pXL2JJrJuQ==
+"@rails/actioncable@^6.0.3":
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/@rails/actioncable/-/actioncable-6.0.3.tgz#722b4b639936129307ddbab3a390f6bcacf3e7bc"
+  integrity sha512-I01hgqxxnOgOtJTGlq0ZsGJYiTEEiSGVEGQn3vimZSqEP1HqzyFNbzGTq14Xdyeow2yGJjygjoFF1pmtE+SQaw==
 
 "@sentry/browser@^5.10.2":
   version "5.10.2"
@@ -4384,11 +4384,6 @@ eslint-plugin-jasmine@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-jasmine/-/eslint-plugin-jasmine-4.1.0.tgz#4f6d41b1a8622348c97559cbcd29badffa74dbfa"
   integrity sha512-Vfuk2Sm1ULR7MqGjVIOOEdQWyoFBfSwvwUeo9MrajVGJB3C24c9Mmj1Cgf8Qwmf3aS2bezPt1sckpKXWpd74Dw==
-
-eslint-plugin-jest@^22.3.0:
-  version "22.3.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-22.3.0.tgz#a10f10dedfc92def774ec9bb5bfbd2fb8e1c96d2"
-  integrity sha512-P1mYVRNlOEoO5T9yTqOfucjOYf1ktmJ26NjwjH8sxpCFQa6IhBGr5TpKl3hcAAT29hOsRJVuMWmTsHoUVo9FoA==
 
 eslint-plugin-jest@^23.8.2:
   version "23.8.2"

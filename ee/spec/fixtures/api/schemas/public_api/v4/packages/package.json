@@ -4,7 +4,8 @@
     "name",
     "version",
     "package_type",
-    "_links"
+    "_links",
+    "versions"
   ],
   "properties": {
     "name": {
@@ -29,6 +30,12 @@
     },
     "created_at": {
       "type": "string"
+    },
+    "versions": {
+      "type": "array",
+      "items": {
+        "$ref": "package_version.json"
+      }
     }
   }
 }

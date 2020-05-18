@@ -35,6 +35,7 @@ describe ::Packages::Detail::PackagePresenter do
   end
   let!(:expected_package_details) do
     {
+      id: package.id,
       created_at: package.created_at,
       name: package.name,
       package_files: expected_package_files,

@@ -5,9 +5,6 @@ module EE
     module QueryType
       extend ActiveSupport::Concern
 
-      # The design management context object needs to implement #issue
-      DesignManagementObject = Struct.new(:issue)
-
       prepended do
         field :vulnerabilities,
               ::Types::VulnerabilityType.connection_type,
@@ -15,9 +12,11 @@ module EE
               description: "Vulnerabilities reported on projects on the current user's instance security dashboard",
               resolver: ::Resolvers::VulnerabilitiesResolver
 
-        field :design_management, ::Types::DesignManagementType,
-              null: false,
-              description: 'Fields related to design management'
+        field :vulnerabilities_count_by_day_and_severity,
+              ::Types::VulnerabilitiesCountByDayAndSeverityType.connection_type,
+              null: true,
+              description: "Number of vulnerabilities per severity level, per day, for the projects on the current user's instance security dashboard",
+              resolver: ::Resolvers::VulnerabilitiesHistoryResolver
 
         field :geo_node, ::Types::Geo::GeoNodeType,
               null: true,
@@ -28,10 +27,6 @@ module EE
               null: true,
               resolver: ::Resolvers::InstanceSecurityDashboardResolver,
               description: 'Fields related to Instance Security Dashboard'
-
-        def design_management
-          DesignManagementObject.new(nil)
-        end
       end
     end
   end

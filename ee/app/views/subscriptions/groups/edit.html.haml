@@ -11,10 +11,10 @@
         %p= _('You have successfully purchased a %{plan} plan subscription for %{seats}. You’ll receive a receipt via email.') % { plan: plan_title, seats: number_of_users }
     .edit-group.d-flex.flex-column.align-items-center.gl-pt-5-deprecated-no-really-do-not-use-me
       - if params[:new_user]
-        #progress-bar
-      %h2.center= _('Create a group for your organization')
+        #progress-bar{ data: { is_onboarding_issues_experiment_enabled: experiment_enabled?(:onboarding_issues).to_s } }
+      %h2.center= _('Create your group')
       %p
-        %div= _('A group represents your organization in GitLab.')
+        %div= _('A group represents your organization in GitLab. Groups allow you to manage users and collaborate across multiple projects.')
         %div= _('Your %{plan} plan will be applied to your group.' % { plan: plan_title })
 
       = form_for [:subscriptions, @group], html: { class: 'gl-show-field-errors card w-100 gl-p-3-deprecated-no-really-do-not-use-me' } do |f|
@@ -23,7 +23,7 @@
         .row
           .form-group.group-name-holder.col-sm-12
             = f.label :name, class: 'label-bold' do
-              = _('Group name (Your organization)')
+              = _('Group name (your organization)')
             = f.text_field :name, class: 'form-control',
               required: true,
               title: _('Please fill in a descriptive name for your group.'),

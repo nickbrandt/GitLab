@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import { GlLink, GlDeprecatedButton } from '@gitlab/ui';
+import { GlLink, GlButton } from '@gitlab/ui';
 import GeoReplicableItem from 'ee/geo_replicable/components/geo_replicable_item.vue';
 import store from 'ee/geo_replicable/store';
 import { ACTION_TYPES } from 'ee/geo_replicable/store/constants';
@@ -43,7 +43,7 @@ describe('GeoReplicableItem', () => {
 
   const findCard = () => wrapper.find('.card');
   const findGlLink = () => findCard().find(GlLink);
-  const findGlButton = () => findCard().find(GlDeprecatedButton);
+  const findGlButton = () => findCard().find(GlButton);
   const findCardHeader = () => findCard().find('.card-header');
   const findCardBody = () => findCard().find('.card-body');
 

@@ -76,24 +76,6 @@ describe API::Internal::Base do
     let_it_be(:key) { create(:key, user: user) }
     let(:secret_token) { Gitlab::Shell.secret_token }
 
-    context "for design repositories" do
-      let_it_be(:project) { create(:project) }
-      let(:gl_repository) { ::Gitlab::GlRepository::DESIGN.identifier_for_container(project) }
-
-      it "does not allow access" do
-        post(api("/internal/allowed"),
-             params: {
-               key_id: key.id,
-               project: project.full_path,
-               gl_repository: gl_repository,
-               secret_token: secret_token,
-               protocol: 'ssh'
-             })
-
-        expect(response).to have_gitlab_http_status(:unauthorized)
-      end
-    end
-
     context "project alias" do
       let(:project) { create(:project, :public, :repository) }
       let(:project_alias) { create(:project_alias, project: project) }

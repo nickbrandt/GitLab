@@ -2,7 +2,7 @@
 
 > - Introduced in GitLab Enterprise Edition 8.9.
 > - Using Geo in combination with
->   [High Availability](../../reference_architectures/index.md)
+>   [multi-server architectures](../../reference_architectures/index.md)
 >   is considered **Generally Available** (GA) in
 >   [GitLab Premium](https://about.gitlab.com/pricing/) 10.4.
 
@@ -110,7 +110,7 @@ The following are required to run Geo:
   The following operating systems are known to ship with a current version of OpenSSH:
   - [CentOS](https://www.centos.org) 7.4+
   - [Ubuntu](https://ubuntu.com) 16.04+
-- PostgreSQL 9.6+ with [FDW](https://www.postgresql.org/docs/9.6/postgres-fdw.html) support and [Streaming Replication](https://wiki.postgresql.org/wiki/Streaming_Replication)
+- PostgreSQL 11+ with [FDW](https://www.postgresql.org/docs/11/postgres-fdw.html) support and [Streaming Replication](https://wiki.postgresql.org/wiki/Streaming_Replication)
 - Git 2.9+
 - All nodes must run the same GitLab version.
 
@@ -134,7 +134,7 @@ The following table lists basic ports that must be open between the **primary** 
 See the full list of ports used by GitLab in [Package defaults](https://docs.gitlab.com/omnibus/package-information/defaults.html)
 
 NOTE: **Note:**
-[Web terminal](../../../ci/environments.md#web-terminals) support requires your load balancer to correctly handle WebSocket connections.
+[Web terminal](../../../ci/environments/index.md#web-terminals) support requires your load balancer to correctly handle WebSocket connections.
 When using HTTP or HTTPS proxying, your load balancer must be configured to pass through the `Connection` and `Upgrade` hop-by-hop headers. See the [web terminal](../../integration/terminal.md) integration guide for more details.
 
 NOTE: **Note:**
@@ -206,9 +206,9 @@ For information on configuring Geo, see [Geo configuration](configuration.md).
 
 For information on how to update your Geo nodes to the latest GitLab version, see [Updating the Geo nodes](updating_the_geo_nodes.md).
 
-### Configuring Geo high availability
+### Configuring Geo for multiple servers
 
-For information on configuring Geo for high availability, see [Geo High Availability](high_availability.md).
+For information on configuring Geo for multiple servers, see [Geo for multiple servers](multiple_servers.md).
 
 ### Configuring Geo with Object Storage
 

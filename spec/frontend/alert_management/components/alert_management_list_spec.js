@@ -4,15 +4,19 @@ import {
   GlTable,
   GlAlert,
   GlLoadingIcon,
-  GlNewDropdown,
-  GlBadge,
+  GlDropdown,
+  GlDropdownItem,
   GlIcon,
   GlTab,
 } from '@gitlab/ui';
+import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
+import createFlash from '~/flash';
 import AlertManagementList from '~/alert_management/components/alert_management_list.vue';
 import { ALERTS_STATUS_TABS } from '../../../../app/assets/javascripts/alert_management/constants';
-
+import updateAlertStatus from '~/alert_management/graphql/mutations/update_alert_status.graphql';
 import mockAlerts from '../mocks/alerts.json';
+
+jest.mock('~/flash');
 
 describe('AlertManagementList', () => {
   let wrapper;
@@ -21,9 +25,11 @@ describe('AlertManagementList', () => {
   const findAlerts = () => wrapper.findAll('table tbody tr');
   const findAlert = () => wrapper.find(GlAlert);
   const findLoader = () => wrapper.find(GlLoadingIcon);
-  const findStatusDropdown = () => wrapper.find(GlNewDropdown);
+  const findStatusDropdown = () => wrapper.find(GlDropdown);
   const findStatusFilterTabs = () => wrapper.findAll(GlTab);
-  const findNumberOfAlertsBadge = () => wrapper.findAll(GlBadge);
+  const findDateFields = () => wrapper.findAll(TimeAgo);
+  const findFirstStatusOption = () => findStatusDropdown().find(GlDropdownItem);
+  const findSeverityFields = () => wrapper.findAll('[data-testid="severityField"]');
 
   function mountComponent({
     props = {
@@ -43,13 +49,16 @@ describe('AlertManagementList', () => {
         ...props,
       },
       provide: {
-        glFeatures: { alertListStatusFilteringEnabled },
+        glFeatures: {
+          alertListStatusFilteringEnabled,
+        },
       },
       data() {
         return data;
       },
       mocks: {
         $apollo: {
+          mutate: jest.fn(),
           queries: {
             alerts: {
               loading,
@@ -96,15 +105,6 @@ describe('AlertManagementList', () => {
         tabs.forEach((tab, i) => {
           expect(tab.text()).toContain(ALERTS_STATUS_TABS[i].title);
         });
-      });
-
-      it('should have number of items badge along with status tab', () => {
-        expect(findNumberOfAlertsBadge().length).toEqual(ALERTS_STATUS_TABS.length);
-        expect(
-          findNumberOfAlertsBadge()
-            .at(0)
-            .text(),
-        ).toEqual(`${mockAlerts.length}`);
       });
     });
 
@@ -196,6 +196,125 @@ describe('AlertManagementList', () => {
             .find(GlIcon)
             .classes('icon-critical'),
         ).toBe(true);
+      });
+    });
+
+    it('renders severity text', () => {
+      mountComponent({
+        props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
+        data: { alerts: mockAlerts, errored: false },
+        loading: false,
+      });
+
+      expect(
+        findSeverityFields()
+          .at(0)
+          .text(),
+      ).toBe('Critical');
+    });
+
+    it('navigates to the detail page when alert row is clicked', () => {
+      mountComponent({
+        props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
+        data: { alerts: mockAlerts, errored: false },
+        loading: false,
+      });
+
+      window.location.assign = jest.fn();
+
+      findAlerts()
+        .at(0)
+        .trigger('click');
+      expect(window.location.assign).toHaveBeenCalledWith('/1527542/details');
+    });
+
+    describe('handle date fields', () => {
+      it('should display time ago dates when values provided', () => {
+        mountComponent({
+          props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
+          data: {
+            alerts: [
+              {
+                iid: 1,
+                status: 'acknowledged',
+                startedAt: '2020-03-17T23:18:14.996Z',
+                endedAt: '2020-04-17T23:18:14.996Z',
+                severity: 'high',
+              },
+            ],
+            errored: false,
+          },
+          loading: false,
+        });
+        expect(findDateFields().length).toBe(2);
+      });
+
+      it('should not display time ago dates when values not provided', () => {
+        mountComponent({
+          props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
+          data: {
+            alerts: [
+              {
+                iid: 1,
+                status: 'acknowledged',
+                startedAt: null,
+                endedAt: null,
+                severity: 'high',
+              },
+            ],
+            errored: false,
+          },
+          loading: false,
+        });
+        expect(findDateFields().exists()).toBe(false);
+      });
+    });
+  });
+
+  describe('updating the alert status', () => {
+    const iid = '1527542';
+    const mockUpdatedMutationResult = {
+      data: {
+        updateAlertStatus: {
+          errors: [],
+          alert: {
+            iid,
+            status: 'acknowledged',
+          },
+        },
+      },
+    };
+
+    beforeEach(() => {
+      mountComponent({
+        props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
+        data: { alerts: mockAlerts, errored: false },
+        loading: false,
+      });
+    });
+
+    it('calls `$apollo.mutate` with `updateAlertStatus` mutation and variables containing `iid`, `status`, & `projectPath`', () => {
+      jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue(mockUpdatedMutationResult);
+      findFirstStatusOption().vm.$emit('click');
+
+      expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith({
+        mutation: updateAlertStatus,
+        variables: {
+          iid,
+          status: 'TRIGGERED',
+          projectPath: 'gitlab-org/gitlab',
+        },
+      });
+    });
+
+    it('calls `createFlash` when request fails', () => {
+      jest.spyOn(wrapper.vm.$apollo, 'mutate').mockReturnValue(Promise.reject(new Error()));
+      findFirstStatusOption().vm.$emit('click');
+
+      setImmediate(() => {
+        expect(createFlash).toHaveBeenCalledWith(
+          'There was an error while updating the status of the alert. Please try again.',
+        );
       });
     });
   });

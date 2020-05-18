@@ -106,7 +106,7 @@ The following table lists available parameters for jobs:
 | [`when`](#when)                                    | When to run job. Also available: `when:manual` and `when:delayed`.                                                                                                                  |
 | [`environment`](#environment)                      | Name of an environment to which the job deploys. Also available: `environment:name`, `environment:url`, `environment:on_stop`, `environment:auto_stop_in` and `environment:action`. |
 | [`cache`](#cache)                                  | List of files that should be cached between subsequent runs. Also available: `cache:paths`, `cache:key`, `cache:untracked`, and `cache:policy`.                                     |
-| [`artifacts`](#artifacts)                          | List of files and directories to attach to a job on success. Also available: `artifacts:paths`, `artifacts:expose_as`, `artifacts:name`, `artifacts:untracked`, `artifacts:when`, `artifacts:expire_in`, `artifacts:reports`, `artifacts:reports:junit`, `artifacts:reports:cobertura`, and `artifacts:reports:terraform`.<br><br>In GitLab [Enterprise Edition](https://about.gitlab.com/pricing/), these are available: `artifacts:reports:codequality`, `artifacts:reports:sast`, `artifacts:reports:dependency_scanning`, `artifacts:reports:container_scanning`, `artifacts:reports:dast`, `artifacts:reports:license_management`, `artifacts:reports:performance` and `artifacts:reports:metrics`. |
+| [`artifacts`](#artifacts)                          | List of files and directories to attach to a job on success. Also available: `artifacts:paths`, `artifacts:expose_as`, `artifacts:name`, `artifacts:untracked`, `artifacts:when`, `artifacts:expire_in`, `artifacts:reports`, `artifacts:reports:junit`, `artifacts:reports:cobertura`, and `artifacts:reports:terraform`.<br><br>In GitLab [Enterprise Edition](https://about.gitlab.com/pricing/), these are available: `artifacts:reports:codequality`, `artifacts:reports:sast`, `artifacts:reports:dependency_scanning`, `artifacts:reports:container_scanning`, `artifacts:reports:dast`, `artifacts:reports:license_scanning`, `artifacts:reports:license_management` (removed in 13.0),`artifacts:reports:performance` and `artifacts:reports:metrics`. |
 | [`dependencies`](#dependencies)                    | Restrict which artifacts are passed to a specific job by providing a list of jobs to fetch artifacts from.                                                                          |
 | [`coverage`](#coverage)                            | Code coverage settings for a given job.                                                                                                                                             |
 | [`retry`](#retry)                                  | When and how many times a job can be auto-retried in case of a failure.                                                                                                             |
@@ -286,7 +286,45 @@ determine whether or not a pipeline is created. It currently accepts a single
 `rules:` key that operates similarly to [`rules:` defined within jobs](#rules),
 enabling dynamic configuration of the pipeline.
 
-The configuration options currently available for `workflow:rules` are:​
+#### `workflow:rules` templates
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/217732) in GitLab 13.0.
+
+We provide pre-made templates for use with your pipelines that set up `workflow: rules`
+for common scenarios. Usage of these will make things easier and prevent duplicate pipelines from running.
+
+The [`Branch-Pipelines` template](https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Workflows/Branch-Pipelines.gitlab-ci.yml)
+makes your pipelines run for branches and tags.
+
+Branch pipeline status will be displayed within merge requests that use that branch
+as a source, but this pipeline type does not support any features offered by
+[Merge Request Pipelines](../merge_request_pipelines/) like
+[Pipelines for Merge Results](../merge_request_pipelines/#pipelines-for-merged-results-premium)
+or [Merge Trains](../merge_request_pipelines/pipelines_for_merged_results/merge_trains/).
+Use this template if you are intentionally avoiding those features.
+
+It is [included](#include) as follows:
+
+```yaml
+include:
+  - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
+```
+
+The [`MergeRequest-Pipelines` include](https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Workflows/MergeRequest-Pipelines.gitlab-ci.yml) sets your pipelines to run for the default branch (usually `master`), tags, and
+The [`MergeRequest-Pipelines` template](https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Workflows/MergeRequest-Pipelines.gitlab-ci.yml)
+makes your pipelines run for the default branch (usually `master`), tags, and
+all types of merge request pipelines. Use this template if you use any of the
+the [Pipelines for Merge Requests features](../merge_request_pipelines/), as mentioned
+above.
+
+It is [included](#include) as follows:
+
+```yaml
+include:
+  - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
+```
+
+If you prefer to define your own rules, the configuration options currently available are:​
 
 - [`if`](#rulesif): Define a rule.
 - [`when`](#when): May be set to `always` or `never` only. If not provided, the default value is `always`​.
@@ -756,7 +794,7 @@ Note that `script: rake test` has been overwritten by `script: rake rspec`.
 
 If you do want to include the `rake test`, see [`before_script` and `after_script`](#before_script-and-after_script).
 
-`.tests` in this example is a [hidden key](#hide-jobs), but it's
+`.tests` in this example is a [hidden job](#hide-jobs), but it's
 possible to inherit from regular jobs as well.
 
 `extends` supports multi-level inheritance, however it's not recommended to
@@ -858,9 +896,25 @@ the `.template` job, and uses the `alpine` Docker image as defined in the local 
 
 `rules` allows for a list of individual rule objects to be evaluated
 *in order*, until one matches and dynamically provides attributes to the job.
-Note that `rules` can't be used in combination with `only/except` since it's intended
-to replace that functionality. If you attempt to do this the linter will return a
+
+CAUTION: **Caution:**
+`rules` can't be used in combination with `only/except` as it is a replacement for that functionality. If you attempt to do this, the linter will return a
 `key may not be used with rules` error.
+
+#### Key details when using `rules`
+
+A very important difference between `rules` and `only/except`, is that jobs defined
+with `rules` trigger merge request pipelines by default, but `only/except` jobs do not.
+This may be surprising if migrating from `only` and `except`, so new users of `rules`
+can use one of the [`workflow: rules` templates](#workflowrules-templates) to get started.
+This will ensure that the behavior is more stable as you start adding additional `rules`
+blocks, and will avoid issues like creating a duplicate, merge request (detached) pipeline.
+
+We don't recomment mixing `only/except` jobs with `rules` jobs in the same pipeline.
+It may not cause YAML errors, but debugging the exact execution behavior can be complex
+due to the different default behaviors of `only/except` and `rules`.
+
+### Rules clauses
 
 Available rule clauses include:
 
@@ -995,47 +1049,6 @@ job:
 
 In this example, if the first rule matches, then the job will have `when: manual` and `allow_failure: true`.
 
-#### Exclude jobs with `rules:` from certain pipelines
-
-Jobs with `rules:` can cause two pipelines to be created unexpectedly:
-
-- One pipeline from pushing a commit to a branch.
-- A second ["detached" pipeline for a merge request](../merge_request_pipelines/index.md).
-
-`only` and `except` jobs don't trigger merge request pipelines by default, but this
-is not the case for jobs with `rules:`, which may be surprising if migrating from `only`
-and `except` to `rules:`.
-
-If you're using `rules:` and you see two pipelines for commits to branches that have
-a merge request, you have two options:
-
-- Individually exclude each job that uses `rules:` from merge request pipelines. The
-  example below will cause the job to **not** run in *pipelines for merge requests*,
-  but it **will** run in pipelines for *new tags and pipelines running on branch refs*:
-
-  ```yaml
-  job:
-    rules:
-      - if: $CI_MERGE_REQUEST_ID
-        when: never
-      - when: manual
-    script:
-      - echo hello
-  ```
-
-- Add a global [`workflow: rules`](#workflowrules) to allow pipelines in only certain
-  situations. The example below will only run pipelines for merge requests, new tags and
-  changes to master. It will **not** run any pipelines *on any branch except master*, but
-  it will run **detached merge request pipelines** for any merge request, targeting any branch:
-
-  ```yaml
-  workflow:
-    rules:
-      - if: $CI_MERGE_REQUEST_ID
-      - if: $CI_COMMIT_TAG
-      - if: $CI_COMMIT_BRANCH == "master"
-  ```
-
 #### Complex rule clauses
 
 To conjoin `if`, `changes`, and `exists` clauses with an AND, use them in the
@@ -1067,7 +1080,9 @@ The only clauses currently available are:
 
 Keywords such as `branches` or `refs` that are currently available for
 `only`/`except` are not yet available in `rules` as they are being individually
-considered for their usage and behavior in this context.
+considered for their usage and behavior in this context. Future keyword improvements
+are being discussed in our [epic for improving `rules`](https://gitlab.com/groups/gitlab-org/-/epics/2783),
+where anyone can add suggestions or requests.
 
 #### Permitted attributes
 
@@ -1869,7 +1884,7 @@ Manual actions are a special type of job that are not executed automatically,
 they need to be explicitly started by a user. An example usage of manual actions
 would be a deployment to a production environment. Manual actions can be started
 from the pipeline, job, environment, and deployment views. Read more at the
-[environments documentation](../environments.md#configuring-manual-deployments).
+[environments documentation](../environments/index.md#configuring-manual-deployments).
 
 Manual actions can be either optional or blocking. Blocking manual actions will
 block the execution of the pipeline at the stage this action is defined in. It's
@@ -1982,7 +1997,7 @@ GitLab Runner will pick your job soon and start the job.
 
 > - Introduced in GitLab 8.9.
 > - You can read more about environments and find more examples in the
->   [documentation about environments](../environments.md).
+>   [documentation about environments](../environments/index.md).
 
 `environment` is used to define that a job deploys to a specific environment.
 If `environment` is specified and no environment under that name exists, a new
@@ -2112,7 +2127,7 @@ GitLab's web interface in order to run.
 
 Also in the example, `GIT_STRATEGY` is set to `none` so that GitLab Runner won’t
 try to check out the code after the branch is deleted when the `stop_review_app`
-job is [automatically triggered](../environments.md#automatically-stopping-an-environment).
+job is [automatically triggered](../environments/index.md#automatically-stopping-an-environment).
 
 NOTE: **Note:**
 The above example overwrites global variables. If your stop environment job depends
@@ -2148,7 +2163,7 @@ When `review_app` job is executed and a review app is created, a life period of
 the environment is set to `1 day`.
 
 For more information, see
-[the environments auto-stop documentation](../environments.md#environments-auto-stop)
+[the environments auto-stop documentation](../environments/index.md#environments-auto-stop)
 
 #### `environment:kubernetes`
 
@@ -2174,7 +2189,7 @@ environment, using the `production`
 [Kubernetes namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/).
 
 For more information, see
-[Available settings for `kubernetes`](../environments.md#configuring-kubernetes-deployments).
+[Available settings for `kubernetes`](../environments/index.md#configuring-kubernetes-deployments).
 
 NOTE: **Note:**
 Kubernetes configuration is not supported for Kubernetes clusters
@@ -2755,7 +2770,7 @@ These are the available report types:
 | [`artifacts:reports:dependency_scanning`](../pipelines/job_artifacts.md#artifactsreportsdependency_scanning-ultimate) **(ULTIMATE)** | The `dependency_scanning` report collects Dependency Scanning vulnerabilities.   |
 | [`artifacts:reports:container_scanning`](../pipelines/job_artifacts.md#artifactsreportscontainer_scanning-ultimate) **(ULTIMATE)**   | The `container_scanning` report collects Container Scanning vulnerabilities.     |
 | [`artifacts:reports:dast`](../pipelines/job_artifacts.md#artifactsreportsdast-ultimate) **(ULTIMATE)**                               | The `dast` report collects Dynamic Application Security Testing vulnerabilities. |
-| [`artifacts:reports:license_management`](../pipelines/job_artifacts.md#artifactsreportslicense_management-ultimate) **(ULTIMATE)**   | The `license_management` report collects Licenses (*deprecated*).                |
+| [`artifacts:reports:license_management`](../pipelines/job_artifacts.md#artifactsreportslicense_management-ultimate) **(ULTIMATE)**   | The `license_management` report collects Licenses (*removed from 13.0*).                |
 | [`artifacts:reports:license_scanning`](../pipelines/job_artifacts.md#artifactsreportslicense_scanning-ultimate) **(ULTIMATE)**       | The `license_scanning` report collects Licenses.                                 |
 | [`artifacts:reports:performance`](../pipelines/job_artifacts.md#artifactsreportsperformance-premium) **(PREMIUM)**                   | The `performance` report collects Performance metrics.                           |
 | [`artifacts:reports:metrics`](../pipelines/job_artifacts.md#artifactsreportsmetrics-premium) **(PREMIUM)**                           | The `metrics` report collects Metrics.                                           |
@@ -3602,7 +3617,7 @@ Read more about the various [YAML features](https://learnxinyminutes.com/docs/ya
 
 YAML has a handy feature called 'anchors', which lets you easily duplicate
 content across your document. Anchors can be used to duplicate/inherit
-properties, and is a perfect example to be used with [hidden keys](#hide-jobs)
+properties, and is a perfect example to be used with [hidden jobs](#hide-jobs)
 to provide templates for your jobs.
 
 The following example uses anchors and map merging. It will create two jobs,
@@ -3716,7 +3731,7 @@ test:mysql:
     - ruby
 ```
 
-You can see that the hidden keys are conveniently used as templates.
+You can see that the hidden jobs are conveniently used as templates.
 
 NOTE: **Note:**
 You can't use YAML anchors across multiple files when leveraging the [`include`](#include)
@@ -3814,7 +3829,7 @@ GitLab CI/CD. In the following example, `.hidden_job` will be ignored:
 ```
 
 Use this feature to ignore jobs, or use the
-[special YAML features](#special-yaml-features) and transform the hidden keys
+[special YAML features](#special-yaml-features) and transform the hidden jobs
 into templates.
 
 ## Skip Pipeline

@@ -9,6 +9,8 @@ module EE
         helpers do
           extend ::Gitlab::Utils::Override
 
+          include ::Admin::PushRulesHelper
+
           override :filter_attributes_using_license
           def filter_attributes_using_license(attrs)
             unless ::License.feature_available?(:repository_mirrors)
@@ -35,7 +37,7 @@ module EE
               attrs = attrs.except(:updating_name_disabled_for_users)
             end
 
-            unless License.feature_available?(:admin_merge_request_approvers_rules)
+            unless show_merge_request_approvals_settings?
               attrs = attrs.except(*EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes)
             end
 

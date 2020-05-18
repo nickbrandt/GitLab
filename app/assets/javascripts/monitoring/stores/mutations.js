@@ -1,5 +1,7 @@
-import pick from 'lodash/pick';
+import Vue from 'vue';
+import { pick } from 'lodash';
 import * as types from './mutation_types';
+import { selectedDashboard } from './getters';
 import { mapToDashboardViewModel, normalizeQueryResult } from './utils';
 import { BACKOFF_TIMEOUT } from '../../lib/utils/common_utils';
 import { endpointKeys, initialStateKeys, metricStates } from '../constants';
@@ -51,18 +53,6 @@ const emptyStateFromError = error => {
   return metricStates.UNKNOWN_ERROR;
 };
 
-/**
- * Maps an variables object to an array
- * @returns {Array} The custom variables array to be send to the API
- * in the format of [variable1, variable1_value]
- * @param {Object} variables - Custom variables provided by the user
- */
-
-const transformVariablesObjectArray = variables =>
-  Object.entries(variables)
-    .flat()
-    .map(encodeURIComponent);
-
 export default {
   /**
    * Dashboard panels structure and global state
@@ -81,6 +71,23 @@ export default {
   [types.RECEIVE_METRICS_DASHBOARD_FAILURE](state, error) {
     state.emptyState = error ? 'unableToConnect' : 'noData';
     state.showEmptyState = true;
+  },
+
+  [types.REQUEST_DASHBOARD_STARRING](state) {
+    state.isUpdatingStarredValue = true;
+  },
+  [types.RECEIVE_DASHBOARD_STARRING_SUCCESS](state, newStarredValue) {
+    const dashboard = selectedDashboard(state);
+    const index = state.allDashboards.findIndex(d => d === dashboard);
+
+    state.isUpdatingStarredValue = false;
+
+    // Trigger state updates in the reactivity system for this change
+    // https://vuejs.org/v2/guide/reactivity.html#For-Arrays
+    Vue.set(state.allDashboards, index, { ...dashboard, starred: newStarredValue });
+  },
+  [types.RECEIVE_DASHBOARD_STARRING_FAILURE](state) {
+    state.isUpdatingStarredValue = false;
   },
 
   /**
@@ -181,7 +188,13 @@ export default {
     state.expandedPanel.group = group;
     state.expandedPanel.panel = panel;
   },
-  [types.SET_PROM_QUERY_VARIABLES](state, variables) {
-    state.promVariables = transformVariablesObjectArray(variables);
+  [types.SET_VARIABLES](state, variables) {
+    state.promVariables = variables;
+  },
+  [types.UPDATE_VARIABLE_VALUES](state, updatedVariable) {
+    Object.assign(state.promVariables[updatedVariable.key], {
+      ...state.promVariables[updatedVariable.key],
+      value: updatedVariable.value,
+    });
   },
 };

@@ -1,0 +1,5 @@
+---
+title: Show correct last successful update timestamp
+merge_request: 32078
+author:
+type: fixed

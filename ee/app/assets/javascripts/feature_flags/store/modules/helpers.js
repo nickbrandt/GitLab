@@ -190,6 +190,7 @@ export const mapStrategiesToRails = params => ({
     name: params.name,
     description: params.description,
     version: params.version,
+    active: params.active,
     strategies_attributes: (params.strategies || []).map(s => ({
       id: s.id,
       name: s.name,

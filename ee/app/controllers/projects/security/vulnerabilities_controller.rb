@@ -8,13 +8,9 @@ module Projects
       include RendersNotes
 
       before_action :not_found, unless: -> { project.first_class_vulnerabilities_enabled? }
-      before_action :vulnerability, except: :index
+      before_action :vulnerability
 
       alias_method :vulnerable, :project
-
-      def index
-        @vulnerabilities = project.vulnerabilities.page(params[:page])
-      end
 
       def show
         pipeline = vulnerability.finding.pipelines.first

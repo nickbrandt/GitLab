@@ -3,7 +3,6 @@
 module EE
   module MergeRequestPresenter
     include ::VisibleApprovable
-    include ::EE::ProjectsHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def approvals_path
       if expose_mr_approval_path?
@@ -72,3 +71,5 @@ module EE
     end
   end
 end
+
+EE::MergeRequestPresenter.include_if_ee('::EE::ProjectsHelper')

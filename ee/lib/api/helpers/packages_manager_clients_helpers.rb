@@ -36,6 +36,16 @@ module API
         ::Ci::Build.find_by_token(token)
       end
 
+      def find_deploy_token_from_http_basic_auth
+        return unless headers
+
+        token = decode_token
+
+        return unless token
+
+        DeployToken.active.find_by_token(token)
+      end
+
       def uploaded_package_file(param_name = :file)
         uploaded_file = UploadedFile.from_params(params, param_name, ::Packages::PackageFileUploader.workhorse_local_upload_path)
         bad_request!('Missing package file!') unless uploaded_file

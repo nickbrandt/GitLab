@@ -11,7 +11,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Begin of the /-/ scope.
       # Use this scope for all new project routes.
       scope '-' do
-        resources :requirements, only: [:index]
+        namespace :requirements_management do
+          resources :requirements, only: [:index]
+        end
+
         resources :packages, only: [:index, :show, :destroy], module: :packages
         resources :package_files, only: [], module: :packages do
           member do
@@ -30,6 +33,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resource :feature_flags_client, only: [] do
           post :reset_token
         end
+        resources :feature_flags_user_lists, param: :iid, only: [:new, :edit, :show]
 
         resources :autocomplete_sources, only: [] do
           collection do
@@ -40,13 +44,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         namespace :settings do
           resource :slack, only: [:destroy, :edit, :update] do
             get :slack_auth
-          end
-        end
-
-        namespace :design_management do
-          namespace :designs, path: 'designs/:design_id(/:sha)', constraints: -> (params) { params[:sha].nil? || Gitlab::Git.commit_id?(params[:sha]) } do
-            resource :raw_image, only: :show
-            resources :resized_image, only: :show, constraints: -> (params) { DesignManagement::DESIGN_IMAGE_SIZES.include?(params[:id]) }
           end
         end
 
@@ -81,7 +78,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             end
           end
 
-          resources :vulnerabilities, only: [:show, :index] do
+          resources :vulnerabilities, only: [:show] do
             member do
               get :discussions, format: :json
             end

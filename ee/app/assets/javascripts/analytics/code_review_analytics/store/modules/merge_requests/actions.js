@@ -12,12 +12,14 @@ export const fetchMergeRequests = ({ commit, state, rootState }) => {
   const { projectId, pageInfo } = state;
 
   const { selected: milestoneTitle } = rootState.filters.milestones;
-  const { selected: labelName } = rootState.filters.labels;
+  const { selected: labelNames } = rootState.filters.labels;
 
   const params = {
     project_id: projectId,
-    milestone_title: Array.isArray(milestoneTitle) ? milestoneTitle.join('') : milestoneTitle,
-    label_name: labelName,
+    milestone_title: milestoneTitle?.operator === '=' ? milestoneTitle.value : null,
+    label_name: labelNames?.filter(l => l.operator === '=').map(l => l.value),
+    'not[label_name]': labelNames?.filter(l => l.operator === '!=').map(l => l.value),
+    'not[milestone_title]': milestoneTitle?.operator === '!=' ? milestoneTitle.value : null,
     page: pageInfo.page,
   };
 

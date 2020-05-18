@@ -11,6 +11,8 @@ module EE
       validate :sso_enforcement, if: :group
       validate :group_domain_limitations, if: :group_has_domain_limitations?
 
+      scope :by_group_ids, ->(group_ids) { where(source_id: group_ids) }
+
       scope :with_ldap_dn, -> { joins(user: :identities).where("identities.provider LIKE ?", 'ldap%') }
       scope :with_identity_provider, ->(provider) do
         joins(user: :identities).where(identities: { provider: provider })

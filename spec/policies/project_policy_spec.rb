@@ -218,16 +218,41 @@ describe ProjectPolicy do
         project.project_feature.update(builds_access_level: ProjectFeature::DISABLED)
       end
 
-      it 'disallows all permissions except pipeline when the feature is disabled' do
-        builds_permissions = [
-          :create_build, :read_build, :update_build, :admin_build, :destroy_build,
-          :create_pipeline_schedule, :read_pipeline_schedule, :update_pipeline_schedule, :admin_pipeline_schedule, :destroy_pipeline_schedule,
-          :create_environment, :read_environment, :update_environment, :admin_environment, :destroy_environment,
-          :create_cluster, :read_cluster, :update_cluster, :admin_cluster, :destroy_cluster,
-          :create_deployment, :read_deployment, :update_deployment, :admin_deployment, :destroy_deployment
-        ]
+      context 'without metrics_dashboard_allowed' do
+        before do
+          project.project_feature.update(metrics_dashboard_access_level: ProjectFeature::DISABLED)
+        end
 
-        expect_disallowed(*builds_permissions)
+        it 'disallows all permissions except pipeline when the feature is disabled' do
+          builds_permissions = [
+            :create_build, :read_build, :update_build, :admin_build, :destroy_build,
+            :create_pipeline_schedule, :read_pipeline_schedule, :update_pipeline_schedule, :admin_pipeline_schedule, :destroy_pipeline_schedule,
+            :create_environment, :read_environment, :update_environment, :admin_environment, :destroy_environment,
+            :create_cluster, :read_cluster, :update_cluster, :admin_cluster, :destroy_cluster,
+            :create_deployment, :read_deployment, :update_deployment, :admin_deployment, :destroy_deployment
+          ]
+
+          expect_disallowed(*builds_permissions)
+        end
+      end
+
+      context 'with metrics_dashboard_allowed' do
+        before do
+          project.project_feature.update(metrics_dashboard_access_level: ProjectFeature::ENABLED)
+        end
+
+        it 'disallows all permissions except pipeline and read_environment when the feature is disabled' do
+          builds_permissions = [
+            :create_build, :read_build, :update_build, :admin_build, :destroy_build,
+            :create_pipeline_schedule, :read_pipeline_schedule, :update_pipeline_schedule, :admin_pipeline_schedule, :destroy_pipeline_schedule,
+            :create_environment, :update_environment, :admin_environment, :destroy_environment,
+            :create_cluster, :read_cluster, :update_cluster, :admin_cluster, :destroy_cluster,
+            :create_deployment, :read_deployment, :update_deployment, :admin_deployment, :destroy_deployment
+          ]
+
+          expect_disallowed(*builds_permissions)
+          expect_allowed(:read_environment)
+        end
       end
     end
 
@@ -252,20 +277,49 @@ describe ProjectPolicy do
   context 'repository feature' do
     subject { described_class.new(owner, project) }
 
-    it 'disallows all permissions when the feature is disabled' do
+    before do
       project.project_feature.update(repository_access_level: ProjectFeature::DISABLED)
+    end
 
-      repository_permissions = [
-        :create_pipeline, :update_pipeline, :admin_pipeline, :destroy_pipeline,
-        :create_build, :read_build, :update_build, :admin_build, :destroy_build,
-        :create_pipeline_schedule, :read_pipeline_schedule, :update_pipeline_schedule, :admin_pipeline_schedule, :destroy_pipeline_schedule,
-        :create_environment, :read_environment, :update_environment, :admin_environment, :destroy_environment,
-        :create_cluster, :read_cluster, :update_cluster, :admin_cluster,
-        :create_deployment, :read_deployment, :update_deployment, :admin_deployment, :destroy_deployment,
-        :destroy_release
-      ]
+    context 'without metrics_dashboard_allowed' do
+      before do
+        project.project_feature.update(metrics_dashboard_access_level: ProjectFeature::DISABLED)
+      end
 
-      expect_disallowed(*repository_permissions)
+      it 'disallows all permissions when the feature is disabled' do
+        repository_permissions = [
+          :create_pipeline, :update_pipeline, :admin_pipeline, :destroy_pipeline,
+          :create_build, :read_build, :update_build, :admin_build, :destroy_build,
+          :create_pipeline_schedule, :read_pipeline_schedule, :update_pipeline_schedule, :admin_pipeline_schedule, :destroy_pipeline_schedule,
+          :create_environment, :read_environment, :update_environment, :admin_environment, :destroy_environment,
+          :create_cluster, :read_cluster, :update_cluster, :admin_cluster,
+          :create_deployment, :read_deployment, :update_deployment, :admin_deployment, :destroy_deployment,
+          :destroy_release
+        ]
+
+        expect_disallowed(*repository_permissions)
+      end
+    end
+
+    context 'with metrics_dashboard_allowed' do
+      before do
+        project.project_feature.update(metrics_dashboard_access_level: ProjectFeature::ENABLED)
+      end
+
+      it 'disallows all permissions when the feature is disabled' do
+        repository_permissions = [
+          :create_pipeline, :update_pipeline, :admin_pipeline, :destroy_pipeline,
+          :create_build, :read_build, :update_build, :admin_build, :destroy_build,
+          :create_pipeline_schedule, :read_pipeline_schedule, :update_pipeline_schedule, :admin_pipeline_schedule, :destroy_pipeline_schedule,
+          :create_environment, :update_environment, :admin_environment, :destroy_environment,
+          :create_cluster, :read_cluster, :update_cluster, :admin_cluster,
+          :create_deployment, :read_deployment, :update_deployment, :admin_deployment, :destroy_deployment,
+          :destroy_release
+        ]
+
+        expect_disallowed(*repository_permissions)
+        expect_allowed(:read_environment)
+      end
     end
   end
 
@@ -275,7 +329,8 @@ describe ProjectPolicy do
   it_behaves_like 'project policies as developer'
   it_behaves_like 'project policies as maintainer'
   it_behaves_like 'project policies as owner'
-  it_behaves_like 'project policies as admin'
+  it_behaves_like 'project policies as admin with admin mode'
+  it_behaves_like 'project policies as admin without admin mode'
 
   context 'when a public project has merge requests allowing access' do
     include ProjectForksHelper
@@ -306,7 +361,7 @@ describe ProjectPolicy do
       expect_allowed(*maintainer_abilities)
     end
 
-    it 'dissallows abilities to a maintainer if the merge request was closed' do
+    it 'disallows abilities to a maintainer if the merge request was closed' do
       target_project.add_developer(user)
       merge_request.close!
 
@@ -350,10 +405,24 @@ describe ProjectPolicy do
         expect(described_class.new(developer, project)).to be_allowed(:read_project)
       end
 
-      it 'does not check the external service for admins and allows access' do
-        expect(::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
+      context 'with an admin' do
+        context 'when admin mode is enabled', :enable_admin_mode do
+          it 'does not check the external service and allows access' do
+            expect(::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
 
-        expect(described_class.new(admin, project)).to be_allowed(:read_project)
+            expect(described_class.new(admin, project)).to be_allowed(:read_project)
+          end
+        end
+
+        context 'when admin mode is disabled' do
+          it 'checks the external service and allows access' do
+            external_service_allow_access(admin, project)
+
+            expect(::Gitlab::ExternalAuthorization).to receive(:access_allowed?)
+
+            expect(described_class.new(admin, project)).to be_allowed(:read_project)
+          end
+        end
       end
 
       it 'prevents all but seeing a public project in a list when access is denied' do
@@ -416,7 +485,13 @@ describe ProjectPolicy do
     context 'admin' do
       let(:current_user) { admin }
 
-      it { expect_allowed(:update_max_artifacts_size) }
+      context 'when admin mode is enabled', :enable_admin_mode do
+        it { expect_allowed(:update_max_artifacts_size) }
+      end
+
+      context 'when admin mode is disabled' do
+        it { expect_disallowed(:update_max_artifacts_size) }
+      end
     end
 
     %w(guest reporter developer maintainer owner).each do |role|
@@ -448,7 +523,13 @@ describe ProjectPolicy do
     context 'with admin' do
       let(:current_user) { admin }
 
-      it { is_expected.to be_allowed(:read_prometheus_alerts) }
+      context 'when admin mode is enabled', :enable_admin_mode do
+        it { is_expected.to be_allowed(:read_prometheus_alerts) }
+      end
+
+      context 'when admin mode is disabled' do
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
     end
 
     context 'with owner' do
@@ -501,6 +582,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_allowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_allowed(:create_metrics_user_starred_dashboard) }
         end
 
         context 'with guest' do
@@ -527,6 +610,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_allowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_allowed(:create_metrics_user_starred_dashboard) }
         end
 
         context 'with guest' do
@@ -535,6 +620,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_allowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_allowed(:create_metrics_user_starred_dashboard) }
         end
 
         context 'with anonymous' do
@@ -543,6 +630,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_disallowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_disallowed(:create_metrics_user_starred_dashboard) }
         end
       end
     end
@@ -557,6 +646,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_allowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_allowed(:create_metrics_user_starred_dashboard) }
         end
 
         context 'with guest' do
@@ -583,6 +674,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_allowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_allowed(:create_metrics_user_starred_dashboard) }
         end
 
         context 'with guest' do
@@ -591,6 +684,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_allowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_allowed(:create_metrics_user_starred_dashboard) }
         end
 
         context 'with anonymous' do
@@ -611,6 +706,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_allowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_allowed(:create_metrics_user_starred_dashboard) }
         end
 
         context 'with guest' do
@@ -633,6 +730,8 @@ describe ProjectPolicy do
           it { is_expected.to be_allowed(:metrics_dashboard) }
           it { is_expected.to be_allowed(:read_prometheus) }
           it { is_expected.to be_allowed(:read_deployment) }
+          it { is_expected.to be_allowed(:read_metrics_user_starred_dashboard) }
+          it { is_expected.to be_allowed(:create_metrics_user_starred_dashboard) }
         end
 
         context 'with guest' do
@@ -671,6 +770,30 @@ describe ProjectPolicy do
 
         it { is_expected.to be_disallowed(:metrics_dashboard) }
       end
+    end
+  end
+
+  context 'deploy token access' do
+    let!(:project_deploy_token) do
+      create(:project_deploy_token, project: project, deploy_token: deploy_token)
+    end
+
+    subject { described_class.new(deploy_token, project) }
+
+    context 'a deploy token with read_package_registry scope' do
+      let(:deploy_token) { create(:deploy_token, read_package_registry: true) }
+
+      it { is_expected.to be_allowed(:read_package) }
+      it { is_expected.to be_allowed(:read_project) }
+      it { is_expected.to be_disallowed(:create_package) }
+    end
+
+    context 'a deploy token with write_package_registry scope' do
+      let(:deploy_token) { create(:deploy_token, write_package_registry: true) }
+
+      it { is_expected.to be_allowed(:create_package) }
+      it { is_expected.to be_allowed(:read_project) }
+      it { is_expected.to be_disallowed(:destroy_package) }
     end
   end
 end

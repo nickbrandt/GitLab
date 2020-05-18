@@ -16,10 +16,7 @@ describe WikiPage do
   end
 
   def enable_front_matter_for(thing)
-    stub_feature_flags(Gitlab::WikiPages::FrontMatterParser::FEATURE_FLAG => {
-      thing: thing,
-      enabled: true
-    })
+    stub_feature_flags(Gitlab::WikiPages::FrontMatterParser::FEATURE_FLAG => thing)
   end
 
   describe '.group_by_directory' do
@@ -841,6 +838,20 @@ describe WikiPage do
       subject.attributes[:content] = 'test![WikiPage_Image](/uploads/abc/WikiPage_Image.png)'
 
       expect(subject.hook_attrs['content']).to eq("test![WikiPage_Image](#{Settings.gitlab.url}/uploads/abc/WikiPage_Image.png)")
+    end
+  end
+
+  describe '#version_commit_timestamp' do
+    context 'for a new page' do
+      it 'returns nil' do
+        expect(new_page.version_commit_timestamp).to be_nil
+      end
+    end
+
+    context 'for page that exists' do
+      it 'returns the timestamp of the commit' do
+        expect(existing_page.version_commit_timestamp).to eq(existing_page.version.commit.committed_date)
+      end
     end
   end
 

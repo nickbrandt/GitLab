@@ -14,6 +14,7 @@ import MrWidgetApprovals from './components/approvals/approvals.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
 import MergeTrainHelperText from './components/merge_train_helper_text.vue';
 import { MTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
+import { TOTAL_SCORE_METRIC_NAME } from 'ee/vue_merge_request_widget/stores/constants';
 
 export default {
   components: {
@@ -65,9 +66,29 @@ export default {
           (this.mr.performanceMetrics.improved && this.mr.performanceMetrics.improved.length > 0))
       );
     },
-    shouldRenderPerformance() {
+    hasPerformancePaths() {
       const { performance } = this.mr || {};
-      return performance && performance.head_path && performance.base_path;
+
+      return Boolean(performance?.head_path && performance?.base_path);
+    },
+    degradedTotalScore() {
+      return this.mr?.performanceMetrics?.degraded.find(
+        metric => metric.name === TOTAL_SCORE_METRIC_NAME,
+      );
+    },
+    hasPerformanceDegradation() {
+      const threshold = this.mr?.performance?.degradation_threshold || 0;
+
+      if (!threshold) {
+        return true;
+      }
+
+      const totalScoreDelta = this.degradedTotalScore?.delta || 0;
+
+      return threshold + totalScoreDelta <= 0;
+    },
+    shouldRenderPerformance() {
+      return this.hasPerformancePaths && this.hasPerformanceDegradation;
     },
     shouldRenderSecurityReport() {
       const { enabledReports } = this.mr;
@@ -170,7 +191,7 @@ export default {
         this.fetchCodeQuality();
       }
     },
-    shouldRenderPerformance(newVal) {
+    hasPerformancePaths(newVal) {
       if (newVal) {
         this.fetchPerformance();
       }
@@ -352,8 +373,7 @@ export default {
 
       <grouped-accessibility-reports-app
         v-if="shouldShowAccessibilityReport"
-        :base-endpoint="mr.accessibility.base_endpoint"
-        :head-endpoint="mr.accessibility.head_endpoint"
+        :endpoint="mr.accessibilityReportPath"
       />
 
       <div class="mr-widget-section">

@@ -48,6 +48,8 @@ module EE
       delegate :deleting_user, :marked_for_deletion_on, to: :deletion_schedule, allow_nil: true
       delegate :enforced_group_managed_accounts?, :enforced_sso?, to: :saml_provider, allow_nil: true
 
+      has_one :group_wiki_repository
+
       belongs_to :file_template_project, class_name: "Project"
 
       belongs_to :push_rule
@@ -349,9 +351,9 @@ module EE
 
     def predefined_push_rule
       strong_memoize(:predefined_push_rule) do
-        if push_rule.present?
-          push_rule
-        elsif has_parent?
+        next push_rule if push_rule
+
+        if has_parent?
           parent.predefined_push_rule
         else
           PushRule.global

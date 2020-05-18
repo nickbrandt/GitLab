@@ -1,4 +1,5 @@
 import { property } from 'lodash';
+import { s__ } from '~/locale';
 
 export const ROLLOUT_STRATEGY_ALL_USERS = 'default';
 export const ROLLOUT_STRATEGY_PERCENT_ROLLOUT = 'gradualRolloutUserId';
@@ -17,3 +18,7 @@ export const fetchUserIdParams = property(['parameters', 'userIds']);
 
 export const NEW_VERSION_FLAG = 'new_version_flag';
 export const LEGACY_FLAG = 'legacy_flag';
+
+export const NEW_FLAG_ALERT = s__(
+  'FeatureFlags|Feature Flags will look different in the next milestone. No action is needed, but you may notice the functionality was changed to improve the workflow.',
+);

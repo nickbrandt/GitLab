@@ -10,6 +10,11 @@ On this page, *Gitaly server* refers to a standalone node that only runs Gitaly
 and *Gitaly client* is a GitLab Rails app node that runs all other processes
 except Gitaly.
 
+CAUTION: **Caution:**
+From GitLab 13.0, using NFS for Git repositories is deprecated. In GitLab 14.0,
+support for NFS for Git repositories is scheduled to be removed. Upgrade to
+[Gitaly Cluster](praefect.md) as soon as possible.
+
 ## Architecture
 
 Here's a high-level architecture overview of how Gitaly is used.
@@ -69,7 +74,7 @@ The following list depicts what the network architecture of Gitaly is:
 - A GitLab server can use one or more Gitaly servers.
 - Gitaly addresses must be specified in such a way that they resolve
   correctly for ALL Gitaly clients.
-- Gitaly clients are: Unicorn, Sidekiq, GitLab Workhorse,
+- Gitaly clients are: Puma/Unicorn, Sidekiq, GitLab Workhorse,
   GitLab Shell, Elasticsearch Indexer, and Gitaly itself.
 - A Gitaly server must be able to make RPC calls **to itself** via its own
   `(Gitaly address, Gitaly token)` pair as specified in `/config/gitlab.yml`.
@@ -190,17 +195,17 @@ authentication](https://gitlab.com/gitlab-org/gitaly/blob/master/doc/configurati
    postgresql['enable'] = false
    redis['enable'] = false
    nginx['enable'] = false
-   unicorn['enable'] = false
+   puma['enable'] = false
    sidekiq['enable'] = false
    gitlab_workhorse['enable'] = false
    grafana['enable'] = false
 
-   # If you run a seperate monitoring node you can disable these services
+   # If you run a separate monitoring node you can disable these services
    alertmanager['enable'] = false
    prometheus['enable'] = false
 
-   # If you don't run a seperate monitoring node you can
-   # Enable Prometheus access & disable these extra services
+   # If you don't run a separate monitoring node you can
+   # enable Prometheus access & disable these extra services.
    # This makes Prometheus listen on all interfaces. You must use firewalls to restrict access to this address/port.
    # prometheus['listen_address'] = '0.0.0.0:9090'
    # prometheus['monitor_kubernetes'] = false

@@ -18,6 +18,7 @@ describe('Mutations Registry Store', () => {
         userCanDelete: '',
         emptyListIllustration: 'foo',
         emptyListHelpUrl: 'baz',
+        comingSoonJson: '{ "project_path": "gitlab-org/gitlab-test" }',
       };
 
       const expectedState = {

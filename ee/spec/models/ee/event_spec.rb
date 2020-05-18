@@ -66,7 +66,20 @@ describe Event do
 
         expect(event).to be_visible_to(member)
         expect(event).to be_visible_to(guest)
-        expect(event).to be_visible_to(admin)
+      end
+
+      context 'when admin mode enabled', :enable_admin_mode do
+        it 'is visible to admin', :aggregate_failures do
+          expect(event).to be_visible_to(admin)
+        end
+      end
+
+      context 'when admin mode disabled' do
+        # Skipped because `Group#max_member_access_for_user` needs to be migrated to use admin mode
+        # See https://gitlab.com/gitlab-org/gitlab/-/issues/207950
+        xit 'is not visible to admin', :aggregate_failures do
+          expect(event).not_to be_visible_to(admin)
+        end
       end
     end
 

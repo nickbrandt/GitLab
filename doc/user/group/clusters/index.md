@@ -1,5 +1,8 @@
 ---
 type: reference
+stage: Configure
+group: Configure
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
 # Group-level Kubernetes clusters
@@ -100,7 +103,7 @@ The domain should have a wildcard DNS configured to the Ingress IP address.
 
 When adding more than one Kubernetes cluster to your project, you need to differentiate
 them with an environment scope. The environment scope associates clusters with
-[environments](../../../ci/environments.md) similar to how the
+[environments](../../../ci/environments/index.md) similar to how the
 [environment-specific variables](../../../ci/variables/README.md#limit-the-environment-scopes-of-environment-variables)
 work.
 
@@ -154,7 +157,7 @@ The result is:
 
 ## Cluster environments **(PREMIUM)**
 
-For a consolidated view of which CI [environments](../../../ci/environments.md)
+For a consolidated view of which CI [environments](../../../ci/environments/index.md)
 are deployed to the Kubernetes cluster, see the documentation for
 [cluster environments](../../clusters/environments.md).
 

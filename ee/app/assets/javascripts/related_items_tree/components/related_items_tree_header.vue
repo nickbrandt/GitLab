@@ -16,12 +16,21 @@ export default {
     EpicActionsSplitButton,
   },
   computed: {
-    ...mapState(['parentItem', 'descendantCounts', 'healthStatus', 'allowSubEpics']),
+    ...mapState([
+      'parentItem',
+      'descendantCounts',
+      'healthStatus',
+      'allowSubEpics',
+      'allowIssuableHealthStatus',
+    ]),
     totalEpicsCount() {
       return this.descendantCounts.openedEpics + this.descendantCounts.closedEpics;
     },
     totalIssuesCount() {
       return this.descendantCounts.openedIssues + this.descendantCounts.closedIssues;
+    },
+    showHealthStatus() {
+      return this.healthStatus && this.allowIssuableHealthStatus;
     },
   },
   methods: {
@@ -81,19 +90,17 @@ export default {
           </span>
         </p>
       </gl-tooltip>
-      <div ref="countBadge" class="issue-count-badge text-secondary p-0 pr-2">
+      <div ref="countBadge" class="issue-count-badge text-secondary p-0 pr-3">
         <span v-if="allowSubEpics" class="d-inline-flex align-items-center">
           <gl-icon name="epic" class="mr-1" />
           {{ totalEpicsCount }}
-          <span class="ml-2 bullet-separator">&bull;</span>
         </span>
-        <span class="d-inline-flex align-items-center" :class="{ 'ml-2': allowSubEpics }">
+        <span class="d-inline-flex align-items-center" :class="{ 'ml-3': allowSubEpics }">
           <gl-icon name="issues" class="mr-1" />
           {{ totalIssuesCount }}
-          <span class="ml-2 bullet-separator">&bull;</span>
         </span>
       </div>
-      <epic-health-status v-if="healthStatus" :health-status="healthStatus" />
+      <epic-health-status v-if="showHealthStatus" :health-status="healthStatus" />
     </div>
     <div
       v-if="parentItem.userPermissions.adminEpic"

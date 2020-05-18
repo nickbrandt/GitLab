@@ -169,12 +169,20 @@ describe Snippets::CreateService do
           expect { subject }.not_to change { Snippet.count }
         end
 
-        it 'returns the error' do
-          expect(snippet.errors.full_messages).to include('Repository could not be created')
+        it 'returns a generic creation error' do
+          expect(snippet.errors[:repository]).to eq ['Error creating the snippet - Repository could not be created']
         end
 
         it 'does not return a snippet with an id' do
           expect(snippet.id).to be_nil
+        end
+      end
+
+      context 'when repository creation fails with invalid file name' do
+        let(:extra_opts) { { file_name: 'invalid://file/name/here' } }
+
+        it 'returns an appropriate error' do
+          expect(snippet.errors[:repository]).to eq ['Error creating the snippet - Invalid file name']
         end
       end
 
@@ -209,11 +217,11 @@ describe Snippets::CreateService do
           subject
         end
 
-        it 'returns the error' do
+        it 'returns a generic error' do
           response = subject
 
           expect(response).to be_error
-          expect(response.payload[:snippet].errors.full_messages).to eq ['foobar']
+          expect(response.payload[:snippet].errors[:repository]).to eq ['Error creating the snippet']
         end
       end
 
@@ -277,6 +285,20 @@ describe Snippets::CreateService do
       it_behaves_like 'an error service response when save fails'
       it_behaves_like 'creates repository and files'
       it_behaves_like 'after_save callback to store_mentions', ProjectSnippet
+
+      context 'when uploaded files are passed to the service' do
+        let(:extra_opts) { { files: ['foo'] } }
+
+        it 'does not move uploaded files to the snippet' do
+          expect_next_instance_of(described_class) do |instance|
+            expect(instance).to receive(:move_temporary_files).and_call_original
+          end
+
+          expect_any_instance_of(FileMover).not_to receive(:execute)
+
+          subject
+        end
+      end
     end
 
     context 'when PersonalSnippet' do
@@ -289,6 +311,51 @@ describe Snippets::CreateService do
       it_behaves_like 'an error service response when save fails'
       it_behaves_like 'creates repository and files'
       it_behaves_like 'after_save callback to store_mentions', PersonalSnippet
+
+      context 'when the snippet description contains files' do
+        include FileMoverHelpers
+
+        let(:title) { 'Title' }
+        let(:picture_secret) { SecureRandom.hex }
+        let(:text_secret) { SecureRandom.hex }
+        let(:picture_file) { "/-/system/user/#{creator.id}/#{picture_secret}/picture.jpg" }
+        let(:text_file) { "/-/system/user/#{creator.id}/#{text_secret}/text.txt" }
+        let(:files) { [picture_file, text_file] }
+        let(:description) do
+          "Description with picture: ![picture](/uploads#{picture_file}) and "\
+          "text: [text.txt](/uploads#{text_file})"
+        end
+
+        before do
+          allow(FileUtils).to receive(:mkdir_p)
+          allow(FileUtils).to receive(:move)
+        end
+
+        let(:extra_opts) { { description: description, title: title, files: files } }
+
+        it 'stores the snippet description correctly' do
+          stub_file_mover(text_file)
+          stub_file_mover(picture_file)
+
+          snippet = subject.payload[:snippet]
+
+          expected_description = "Description with picture: "\
+            "![picture](/uploads/-/system/personal_snippet/#{snippet.id}/#{picture_secret}/picture.jpg) and "\
+            "text: [text.txt](/uploads/-/system/personal_snippet/#{snippet.id}/#{text_secret}/text.txt)"
+
+          expect(snippet.description).to eq(expected_description)
+        end
+
+        context 'when there is a validation error' do
+          let(:title) { nil }
+
+          it 'does not move uploaded files to the snippet' do
+            expect_any_instance_of(described_class).not_to receive(:move_temporary_files)
+
+            subject
+          end
+        end
+      end
     end
   end
 end

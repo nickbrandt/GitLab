@@ -2,7 +2,7 @@
 require 'securerandom'
 
 module QA
-  context 'Manage', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/207741', type: :flaky } do
+  context 'Manage' do
     shared_examples 'audit event' do |expected_events|
       it 'logs audit events for UI operations' do
         sign_in
@@ -54,7 +54,7 @@ module QA
         it_behaves_like 'audit event', ["Added SSH key"]
       end
 
-      context 'Add and delete email' do
+      context 'Add and delete email', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217831', type: :bug } do
         before do
           sign_in
           new_email_address = 'new_email@example.com'

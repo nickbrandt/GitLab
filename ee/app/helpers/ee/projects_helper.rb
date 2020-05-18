@@ -137,10 +137,10 @@ module EE
       ::Gitlab.config.alternative_gitlab_kerberos_url?
     end
 
-    def can_change_push_rule?(push_rule, rule)
+    def can_change_push_rule?(push_rule, rule, context)
       return true if push_rule.global?
 
-      can?(current_user, :"change_#{rule}", @project)
+      can?(current_user, :"change_#{rule}", context)
     end
 
     def ci_cd_projects_available?
@@ -167,7 +167,6 @@ module EE
       %w[
         projects/security/configuration#show
         projects/security/dashboard#index
-        projects/security/vulnerabilities#index
         projects/dependencies#index
         projects/licenses#index
         projects/threat_monitoring#show
@@ -178,25 +177,6 @@ module EE
       show_lfs = project.lfs_enabled? ? 'including files in LFS' : ''
 
       "The total size of this project's repository #{show_lfs} will be limited to this size. 0 for unlimited. Leave empty to inherit the group/global value."
-    end
-
-    def subscription_message
-      return unless ::Gitlab.com?
-
-      ::Gitlab::ExpiringSubscriptionMessage.new(
-        subscribable: decorated_subscription,
-        signed_in: signed_in?,
-        is_admin: can?(current_user, :owner_access, @project),
-        namespace: @project.namespace
-      ).message
-    end
-
-    def decorated_subscription
-      subscription = @project.gitlab_subscription
-
-      return unless subscription
-
-      SubscriptionPresenter.new(subscription)
     end
 
     override :membership_locked?
