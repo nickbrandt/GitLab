@@ -19,18 +19,32 @@ describe('CodeReviewAnalytics utils', () => {
     });
 
     describe('when "not[label_name]" filter is present', () => {
-      it('applies the "!=" operator to the selectedLabels array', () => {
-        const filters = {
-          milestone_title: 'my-milestone',
-          label_name: ['my-label'],
-          'not[label_name]': ['another label'],
-        };
-        expect(transformFilters(filters)).toEqual({
-          selectedMilestone: { value: 'my-milestone', operator: '=' },
-          selectedLabels: [
-            { value: 'my-label', operator: '=' },
-            { value: 'another label', operator: '!=' },
-          ],
+      describe('and "label_name" filter is present', () => {
+        it('applies the "!=" operator to the selectedLabels array', () => {
+          const filters = {
+            milestone_title: 'my-milestone',
+            label_name: ['my-label'],
+            'not[label_name]': ['another label'],
+          };
+          expect(transformFilters(filters)).toEqual({
+            selectedMilestone: { value: 'my-milestone', operator: '=' },
+            selectedLabels: [
+              { value: 'my-label', operator: '=' },
+              { value: 'another label', operator: '!=' },
+            ],
+          });
+        });
+      });
+
+      describe('and "label_name" filter is missing', () => {
+        it('applies the "!=" operator to the selectedLabels array', () => {
+          const filters = {
+            'not[label_name]': ['another label'],
+          };
+          expect(transformFilters(filters)).toEqual({
+            selectedLabels: [{ value: 'another label', operator: '!=' }],
+            selectedMilestone: null,
+          });
         });
       });
     });
