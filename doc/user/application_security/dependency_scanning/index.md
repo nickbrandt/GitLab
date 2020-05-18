@@ -540,26 +540,6 @@ gemnasium-maven-dependency_scanning:
 
 This adds the self-signed certificates of your Maven repository to the Java KeyStore of the analyzer's Docker image.
 
-#### Python (pip) and Python (Pipfile) projects
-
-Add the following `pip.conf` to your repository to define your index URL and trust its self-signed
-certificate:
-
-```toml
-[global]
-index-url = https://pypi.example.com
-trusted-host = pypi.example.com
-```
-
-Add the following job section to `.gitlab-ci.yml`:
-
-```yaml
-gemnasium-python-dependency_scanning:
-  before_script:
-    - mkdir -p ~/.config/pip
-    - cp pip.conf ~/.config/pip/pip.conf
-```
-
 #### Python (setuptools)
 
 When using self-signed certificates for your private PyPi repository, no extra job configuration (aside
