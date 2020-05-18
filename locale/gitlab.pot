@@ -877,7 +877,7 @@ msgstr ""
 msgid "A group is a collection of several projects"
 msgstr ""
 
-msgid "A group represents your organization in GitLab."
+msgid "A group represents your organization in GitLab. Groups allow you to manage users and collaborate across multiple projects."
 msgstr ""
 
 msgid "A member of the abuse team will review your report as soon as possible."
@@ -6246,9 +6246,6 @@ msgstr ""
 msgid "Create a Mattermost team for this group"
 msgstr ""
 
-msgid "Create a group for your organization"
-msgstr ""
-
 msgid "Create a local proxy for storing frequently used upstream images. %{link_start}Learn more%{link_end} about dependency proxies."
 msgstr ""
 
@@ -6370,6 +6367,9 @@ msgid "Create wildcard: %{searchTerm}"
 msgstr ""
 
 msgid "Create your first page"
+msgstr ""
+
+msgid "Create your group"
 msgstr ""
 
 msgid "CreateGroup|You don’t have permission to create a subgroup in this group."
@@ -10670,7 +10670,7 @@ msgstr ""
 msgid "Group name"
 msgstr ""
 
-msgid "Group name (Your organization)"
+msgid "Group name (your organization)"
 msgstr ""
 
 msgid "Group overview"
