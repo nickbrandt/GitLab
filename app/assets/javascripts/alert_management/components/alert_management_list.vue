@@ -165,6 +165,9 @@ export default {
             projectPath: this.projectPath,
           },
         })
+        .then(() => {
+          this.$apollo.queries.alerts.refetch();
+        })
         .catch(() => {
           createFlash(
             s__(
@@ -179,7 +182,6 @@ export default {
   },
 };
 </script>
-
 <template>
   <div>
     <div v-if="alertManagementEnabled" class="alert-management-list">
