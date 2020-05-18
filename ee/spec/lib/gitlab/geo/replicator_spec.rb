@@ -150,5 +150,33 @@ describe Gitlab::Geo::Replicator do
         end
       end
     end
+
+    describe '.for_replicable_name' do
+      context 'given a valid replicable_name' do
+        it 'returns the corresponding Replicator class' do
+          replicator_class = described_class.for_replicable_name('dummy')
+
+          expect(replicator_class).to eq(Geo::DummyReplicator)
+        end
+      end
+
+      context 'given an invalid replicable_name' do
+        it 'raises and logs NotImplementedError' do
+          expect(Gitlab::Geo::Logger).to receive(:error)
+
+          expect do
+            described_class.for_replicable_name('invalid')
+          end.to raise_error(NotImplementedError)
+        end
+      end
+
+      context 'given nil' do
+        it 'raises NotImplementedError' do
+          expect do
+            described_class.for_replicable_name('invalid')
+          end.to raise_error(NotImplementedError)
+        end
+      end
+    end
   end
 end
