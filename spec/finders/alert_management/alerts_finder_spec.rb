@@ -227,13 +227,18 @@ describe AlertManagement::AlertsFinder, '#execute' do
       let_it_be(:alert) do
         create(:alert_management_alert,
           :with_fingerprint,
-          project: project,
           title: 'Title',
           description: 'Desc',
           service: 'Service',
           monitoring_tool: 'Monitor'
         )
       end
+
+      before do
+        alert.project.add_developer(current_user)
+      end
+
+      subject { described_class.new(current_user, alert.project, params).execute }
 
       context 'searching title' do
         let(:params) { { search: alert.title } }
@@ -263,6 +268,12 @@ describe AlertManagement::AlertsFinder, '#execute' do
         let(:params) { { search: alert.fingerprint } }
 
         it { is_expected.to be_empty }
+      end
+
+      context 'empty search' do
+        let(:params) { { search: ' ' } }
+
+        it { is_expected.to match_array([alert]) }
       end
     end
   end

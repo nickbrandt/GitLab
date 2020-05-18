@@ -35,7 +35,7 @@ module AlertManagement
     end
 
     def by_search(collection)
-      params[:search] ? collection.search(params[:search]) : collection
+      params[:search].present? ? collection.search(params[:search]) : collection
     end
 
     def sort(collection)
