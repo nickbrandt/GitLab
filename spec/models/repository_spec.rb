@@ -227,7 +227,7 @@ describe Repository do
         tree_builder = Rugged::Tree::Builder.new(rugged)
         tree_builder.insert({ oid: blob_id, name: "hello\x80world", filemode: 0100644 })
         tree_id = tree_builder.write
-        user = { email: "jcai@gitlab.com", time: Time.current, name: "John Cai" }
+        user = { email: "jcai@gitlab.com", time: Time.current.to_time, name: "John Cai" }
 
         Rugged::Commit.create(rugged, message: 'some commit message', parents: [rugged.head.target.oid], tree: tree_id, committer: user, author: user)
       end
