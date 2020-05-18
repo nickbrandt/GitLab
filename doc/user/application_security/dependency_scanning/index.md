@@ -571,14 +571,17 @@ ensure that it can reach your private repository. Here is an example configurati
 
 ### Referencing local dependencies using a path in JavaScript projects
 
-Although dependency scanning doesn't support it, you can reference dependencies by using a
-[local path](https://docs.npmjs.com/files/package.json#local-paths) in the `package.json` for a
-JavaScript project. The dependency scan generates the following error when you use
-`file: <path/to/dependency-name>` to reference a package:
+The [Retire.js](https://gitlab.com/gitlab-org/security-products/analyzers/retire.js) analyzer
+doesn't support dependency references made with [local paths](https://docs.npmjs.com/files/package.json#local-paths)
+in the `package.json` of JavaScript projects. The dependency scan outputs the following error for
+such references:
 
 ```text
 ERROR: Could not find dependencies: <dependency-name>. You may need to run npm install
 ```
+
+As a workaround, remove the [`retire.js`](analyzers.md#selecting-specific-analyzers) analyzer from
+[DS_DEFAULT_ANALYZERS](#configuring-dependency-scanning).
 
 ## Troubleshooting
 
