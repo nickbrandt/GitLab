@@ -5,10 +5,14 @@ module QA
     module Page
       module Group
         module Menu
-          prepend QA::Page::Group::SubMenus::Common
+          extend QA::Page::PageConcern
 
           def self.prepended(base)
+            super
+
             base.class_eval do
+              prepend QA::Page::Group::SubMenus::Common
+
               view 'ee/app/views/groups/ee/_settings_nav.html.haml' do
                 element :ldap_synchronization_link
                 element :audit_events_settings_link

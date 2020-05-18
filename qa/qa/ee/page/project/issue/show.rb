@@ -6,8 +6,12 @@ module QA
       module Project
         module Issue
           module Show
-            def self.prepended(page)
-              page.module_eval do
+            extend QA::Page::PageConcern
+
+            def self.prepended(base)
+              super
+
+              base.class_eval do
                 view 'ee/app/assets/javascripts/related_issues/components/add_issuable_form.vue' do
                   element :add_issue_button
                 end

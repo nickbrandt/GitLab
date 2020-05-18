@@ -7,10 +7,14 @@ module QA
         module Operations
           module Metrics
             module Show
+              extend QA::Page::PageConcern
+
               EXPECTED_LABEL = 'Total (GB)'
 
-              def self.prepended(page)
-                page.module_eval do
+              def self.prepended(base)
+                super
+
+                base.class_eval do
                   view 'app/assets/javascripts/monitoring/components/alert_widget_form.vue' do
                     element :alert_query_dropdown
                     element :alert_query_option

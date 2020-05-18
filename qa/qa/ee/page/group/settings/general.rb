@@ -6,11 +6,15 @@ module QA
       module Group
         module Settings
           module General
-            prepend ::QA::Page::Component::Select2
-            prepend ::QA::Page::Settings::Common
+            extend QA::Page::PageConcern
 
             def self.prepended(base)
+              super
+
               base.class_eval do
+                prepend ::QA::Page::Component::Select2
+                prepend ::QA::Page::Settings::Common
+
                 view 'ee/app/views/groups/_custom_project_templates_setting.html.haml' do
                   element :custom_project_template_select
                   element :custom_project_templates

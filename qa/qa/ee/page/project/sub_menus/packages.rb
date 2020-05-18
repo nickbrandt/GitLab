@@ -6,8 +6,10 @@ module QA
       module Project
         module SubMenus
           module Packages
-            def self.included(page)
-              page.class_eval do
+            extend QA::Page::PageConcern
+
+            def self.prepended(base)
+              base.class_eval do
                 view 'ee/app/views/layouts/nav/sidebar/_project_packages_link.html.haml' do
                   element :packages_link
                 end

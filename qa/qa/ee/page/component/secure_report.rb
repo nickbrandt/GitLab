@@ -5,8 +5,12 @@ module QA
     module Page
       module Component
         module SecureReport
-          def self.prepended(page)
-            page.module_eval do
+          extend QA::Page::PageConcern
+
+          def self.prepended(base)
+            super
+
+            base.class_eval do
               view 'ee/app/assets/javascripts/security_dashboard/components/filter.vue' do
                 element :filter_dropdown, ':data-qa-selector="qaSelector"' # rubocop:disable QA/ElementWithPattern
                 element :filter_dropdown_content

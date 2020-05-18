@@ -6,8 +6,12 @@ module QA
       module Project
         module Settings
           module Repository
-            def self.prepended(page)
-              page.module_eval do
+            extend QA::Page::PageConcern
+
+            def self.prepended(base)
+              super
+
+              base.class_eval do
                 view 'ee/app/views/projects/push_rules/_index.html.haml' do
                   element :push_rules_content
                 end

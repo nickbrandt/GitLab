@@ -5,10 +5,14 @@ module QA
     module Page
       module MergeRequest
         module Show
-          include Page::Component::LicenseManagement
+          extend QA::Page::PageConcern
 
-          def self.prepended(page)
-            page.module_eval do
+          def self.prepended(base)
+            super
+
+            base.class_eval do
+              prepend Page::Component::LicenseManagement
+
               view 'app/assets/javascripts/vue_merge_request_widget/components/states/sha_mismatch.vue' do
                 element :head_mismatch, "The source branch HEAD has recently changed." # rubocop:disable QA/ElementWithPattern
               end

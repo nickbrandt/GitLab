@@ -6,8 +6,12 @@ module QA
       module Project
         module Settings
           module ProtectedBranches
-            def self.prepended(page)
-              page.module_eval do
+            extend QA::Page::PageConcern
+
+            def self.prepended(base)
+              super
+
+              base.class_eval do
                 view 'ee/app/views/projects/protected_branches/ee/_create_protected_branch.html.haml' do
                   element :allowed_to_push_select
                   element :allowed_to_push_dropdown

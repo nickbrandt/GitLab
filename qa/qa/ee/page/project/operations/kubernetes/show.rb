@@ -7,8 +7,12 @@ module QA
         module Operations
           module Kubernetes
             module Show
-              def self.prepended(page)
-                page.module_eval do
+              extend QA::Page::PageConcern
+
+              def self.prepended(base)
+                super
+
+                base.class_eval do
                   view 'ee/app/views/clusters/clusters/_health.html.haml' do
                     element :cluster_health_section
                   end

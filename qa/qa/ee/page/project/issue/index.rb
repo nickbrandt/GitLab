@@ -6,8 +6,12 @@ module QA
       module Project
         module Issue
           module Index
-            def self.prepended(page)
-              page.module_eval do
+            extend QA::Page::PageConcern
+
+            def self.prepended(base)
+              super
+
+              base.class_eval do
                 view 'app/views/shared/issuable/_search_bar.html.haml' do
                   element :issue_filter_form, /form_tag.+class: 'filter-form / # rubocop:disable QA/ElementWithPattern
                   element :issue_filter_input, /%input.form-control.filtered-search/ # rubocop:disable QA/ElementWithPattern
