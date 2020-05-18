@@ -265,3 +265,13 @@ export const normalizeQueryResult = timeSeries => {
  * @returns {String}
  */
 export const addPrefixToCustomVariableParams = key => `variables[${key}]`;
+
+export const normalizeCustomDashboardPath = (dashboard = '') => {
+  const dashboardPrefix = '.gitlab/dashboards';
+  if (dashboard === '') {
+    return '';
+  } else if (dashboard.startsWith(dashboardPrefix)) {
+    return dashboard;
+  }
+  return `${dashboardPrefix}/${dashboard}`;
+};

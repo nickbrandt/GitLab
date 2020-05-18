@@ -68,6 +68,8 @@ module EnvironmentsHelper
     return {} unless environment
 
     {
+      'base-url'                 => environment_metrics_path(environment),
+      'custom-dashboard-base-path'    => '.gitlab/dashboards',
       'current-environment-name' => environment.name,
       'has-metrics'              => "#{environment.has_metrics?}",
       'prometheus-status'        => "#{environment.prometheus_status}",

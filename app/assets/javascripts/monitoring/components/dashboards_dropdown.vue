@@ -14,6 +14,7 @@ import {
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import DuplicateDashboardForm from './duplicate_dashboard_form.vue';
+import { CUSTOM_DASHBOARD_PAGE } from '../router/constants';
 
 const events = {
   selectDashboard: 'selectDashboard',
@@ -121,6 +122,7 @@ export default {
       this.form = form;
     },
   },
+  CUSTOM_DASHBOARD_PAGE,
 };
 </script>
 <template>
@@ -146,12 +148,19 @@ export default {
           :key="dashboard.path"
           :active="dashboard.path === selectedDashboardPath"
           active-class="is-active"
-          @click="selectDashboard(dashboard)"
         >
-          <div class="d-flex">
-            {{ dashboardDisplayName(dashboard) }}
-            <gl-icon class="text-muted ml-auto" name="star" />
-          </div>
+          <router-link
+            class="text-plain"
+            :to="{
+              name: $options.CUSTOM_DASHBOARD_PAGE,
+              params: { dashboard: dashboard.path },
+            }"
+          >
+            <div class="d-flex">
+              {{ dashboardDisplayName(dashboard) }}
+              <gl-icon class="text-muted ml-auto" name="star" />
+            </div>
+          </router-link>
         </gl-dropdown-item>
 
         <gl-dropdown-divider
@@ -164,9 +173,16 @@ export default {
           :key="dashboard.path"
           :active="dashboard.path === selectedDashboardPath"
           active-class="is-active"
-          @click="selectDashboard(dashboard)"
         >
-          {{ dashboardDisplayName(dashboard) }}
+          <router-link
+            class="text-plain"
+            :to="{
+              name: $options.CUSTOM_DASHBOARD_PAGE,
+              params: { dashboard: dashboard.path },
+            }"
+          >
+            {{ dashboardDisplayName(dashboard) }}
+          </router-link>
         </gl-dropdown-item>
       </div>
 

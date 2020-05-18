@@ -168,6 +168,10 @@ export default {
     },
   },
   watch: {
+    '$route.params.dashboard': function dashboardChanged(currentDashboard) {
+      // react to route changes...
+      this.setCurrentDashboard({ currentDashboard });
+    },
     dashboard(newDashboard) {
       try {
         const expandedPanel = expandedPanelPayloadFromUrl(newDashboard);
@@ -214,6 +218,7 @@ export default {
       'setGettingStartedEmptyState',
       'setPanelGroupMetrics',
       'setExpandedPanel',
+      'setCurrentDashboard',
       'clearExpandedPanel',
     ]),
     updatePanels(key, panels) {

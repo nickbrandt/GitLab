@@ -68,6 +68,9 @@ export default {
       state.emptyState = 'noData';
     }
   },
+  [types.SET_CURRENT_DASHBOARD](state, currentDashboard) {
+    state.currentDashboard = currentDashboard;
+  },
   [types.RECEIVE_METRICS_DASHBOARD_FAILURE](state, error) {
     state.emptyState = error ? 'unableToConnect' : 'noData';
     state.showEmptyState = true;

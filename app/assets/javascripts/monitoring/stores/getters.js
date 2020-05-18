@@ -1,5 +1,5 @@
 import { NOT_IN_DB_PREFIX } from '../constants';
-import { addPrefixToCustomVariableParams } from './utils';
+import { addPrefixToCustomVariableParams, normalizeCustomDashboardPath } from './utils';
 
 const metricsIdsInPanel = panel =>
   panel.metrics.filter(metric => metric.metricId && metric.result).map(metric => metric.metricId);
@@ -10,10 +10,10 @@ const metricsIdsInPanel = panel =>
  *
  * @param {Object} state
  */
-export const selectedDashboard = state => {
+export const selectedDashboard = (state, getters) => {
   const { allDashboards } = state;
   return (
-    allDashboards.find(d => d.path === state.currentDashboard) ||
+    allDashboards.find(d => d.path === getters.normalizedCurrentDashboard) ||
     allDashboards.find(d => d.default) ||
     null
   );
@@ -137,6 +137,9 @@ export const getCustomVariablesParams = state =>
     acc[addPrefixToCustomVariableParams(variable)] = state.variables[variable]?.value;
     return acc;
   }, {});
+
+export const normalizedCurrentDashboard = state =>
+  normalizeCustomDashboardPath(state.currentDashboard);
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
