@@ -163,37 +163,43 @@ describe AlertManagement::Alert do
   end
 
   describe '.search' do
-    let(:query) { 'rspec' }
-    let(:attribute_data) { 'RSPEC data' }
+    let_it_be(:alert) do
+      create(:alert_management_alert,
+        title: 'Title',
+        description: 'Desc',
+        service: 'Service',
+        monitoring_tool: 'Monitor'
+      )
+    end
 
     subject { AlertManagement::Alert.search(query) }
 
     context 'does not contain search string' do
-      let!(:alert) { create(:alert_management_alert) }
+      let(:query) { 'something else' }
 
       it { is_expected.to be_empty }
     end
 
     context 'title includes query' do
-      let!(:alert) { create(:alert_management_alert, title: attribute_data) }
+      let(:query) { alert.title.upcase }
 
       it { is_expected.to contain_exactly(alert) }
     end
 
     context 'description includes query' do
-      let!(:alert) { create(:alert_management_alert, description: attribute_data) }
+      let(:query) { alert.description.upcase }
 
       it { is_expected.to contain_exactly(alert) }
     end
 
     context 'service includes query' do
-      let!(:alert) { create(:alert_management_alert, service: attribute_data) }
+      let(:query) { alert.service.upcase }
 
       it { is_expected.to contain_exactly(alert) }
     end
 
     context 'monitoring tool includes query' do
-      let!(:alert) { create(:alert_management_alert, monitoring_tool: attribute_data) }
+      let(:query) { alert.monitoring_tool.upcase }
 
       it { is_expected.to contain_exactly(alert) }
     end

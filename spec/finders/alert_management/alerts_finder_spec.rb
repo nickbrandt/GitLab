@@ -224,32 +224,43 @@ describe AlertManagement::AlertsFinder, '#execute' do
     end
 
     context 'search query given' do
-      context 'searching title' do
-        let(:params) { { search: alert_1.title } }
+      let_it_be(:alert) do
+        create(:alert_management_alert,
+          :with_fingerprint,
+          project: project,
+          title: 'Title',
+          description: 'Desc',
+          service: 'Service',
+          monitoring_tool: 'Monitor'
+        )
+      end
 
-        it { is_expected.to match_array([alert_1]) }
+      context 'searching title' do
+        let(:params) { { search: alert.title } }
+
+        it { is_expected.to match_array([alert]) }
       end
 
       context 'searching description' do
-        let(:params) { { search: alert_1.description } }
+        let(:params) { { search: alert.description } }
 
-        it { is_expected.to match_array([alert_1]) }
+        it { is_expected.to match_array([alert]) }
       end
 
       context 'searching service' do
-        let(:params) { { search: alert_1.service } }
+        let(:params) { { search: alert.service } }
 
-        it { is_expected.to match_array([alert_1]) }
+        it { is_expected.to match_array([alert]) }
       end
 
       context 'searching monitoring tool' do
-        let(:params) { { search: alert_1.monitoring_tool } }
+        let(:params) { { search: alert.monitoring_tool } }
 
-        it { is_expected.to match_array([alert_1]) }
+        it { is_expected.to match_array([alert]) }
       end
 
       context 'searching something else' do
-        let(:params) { { search: alert_1.fingerprint } }
+        let(:params) { { search: alert.fingerprint } }
 
         it { is_expected.to be_empty }
       end
