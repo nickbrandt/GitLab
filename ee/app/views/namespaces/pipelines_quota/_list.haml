@@ -22,7 +22,7 @@
         - else
           = s_('UsageQuota|Current period usage')
       %div
-        = namespace_shared_runner_limits_quota(namespace)
+        = ci_minutes_report(minutes_quota.monthly_minutes_report)
         minutes
         = link_to icon('question-circle'), help_page_path('user/admin_area/settings/continuous_integration', anchor: 'shared-runners-build-minutes-quota'), target: '_blank', 'aria-label': _('Shared runners help link')
 

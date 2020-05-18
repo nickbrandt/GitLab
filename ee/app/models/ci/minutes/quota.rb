@@ -36,14 +36,14 @@ module Ci
         Report.new(purchased_minutes_used, purchased_minutes, status)
       end
 
-      private
-
-      # TODO: maps to NamespacesHelper#namespace_extra_shared_runner_limits_percent_used
       def purchased_percent_used
+        return 0 unless namespace.shared_runners_minutes_limit_enabled?
         return 0 if purchased_minutes.zero?
 
         100 * purchased_minutes_used.to_i / purchased_minutes
       end
+
+      private
 
       # TODO: maps to Namespace#shared_runners_minutes_used?
       def monthly_minutes_used_up?
