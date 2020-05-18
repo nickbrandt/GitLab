@@ -5602,6 +5602,9 @@ msgstr ""
 msgid "ComplianceFramework|SOX - Sarbanes-Oxley"
 msgstr ""
 
+msgid "ComplianceFramework|This project is regulated by %{framework}."
+msgstr ""
+
 msgid "Confidence: %{confidence}"
 msgstr ""
 
