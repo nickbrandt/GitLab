@@ -567,11 +567,13 @@ describe Projects::PipelinesController do
 
       build_stage = json_response['stages'].first
       expect(build_stage.fetch('name')).to eq 'build'
-      expect(build_stage.fetch('groups').first.fetch('jobs')).to eq [{ 'name' => 'build' }]
+      expect(build_stage.fetch('groups').first.fetch('jobs'))
+        .to eq [{ 'name' => 'build', 'scheduling_type' => 'stage' }]
 
       test_stage = json_response['stages'].last
       expect(test_stage.fetch('name')).to eq 'test'
-      expect(test_stage.fetch('groups').first.fetch('jobs')).to eq [{ 'name' => 'test', 'needs' => ['build'] }]
+      expect(test_stage.fetch('groups').first.fetch('jobs'))
+        .to eq [{ 'name' => 'test', 'scheduling_type' => 'dag', 'needs' => ['build'] }]
     end
 
     def create_build(stage, stage_idx, name, params = {})
