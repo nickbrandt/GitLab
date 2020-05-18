@@ -14,12 +14,7 @@ import axios from '~/lib/utils/axios_utils';
 
 Vue.use(Translate);
 
-export default () => {
-  const { dataset } = document.querySelector('.js-pipeline-details-vue');
-
-  const mediator = new PipelinesMediator({ endpoint: dataset.endpoint });
-
-  mediator.fetchPipeline();
+const createPipelinesDetailApp = (mediator) => {
 
   // eslint-disable-next-line no-new
   new Vue({
@@ -50,7 +45,9 @@ export default () => {
       });
     },
   });
+}
 
+const createPipelineHeaderApp = (mediator) => {
   // eslint-disable-next-line no-new
   new Vue({
     el: '#js-pipeline-header-vue',
@@ -94,7 +91,9 @@ export default () => {
       });
     },
   });
+}
 
+const createPipelinesTabs = () => {
   const tabsElement = document.querySelector('.pipelines-tabs');
   const testReportsEnabled =
     window.gon && window.gon.features && window.gon.features.junitPipelineView;
@@ -106,6 +105,7 @@ export default () => {
     const isTestTabActive = Boolean(
       document.querySelector('.pipelines-tabs > li > a.test-tab.active'),
     );
+
 
     if (isTestTabActive) {
       testReportsStore.dispatch(fetchReportsAction);
@@ -119,27 +119,40 @@ export default () => {
 
       tabsElement.addEventListener('click', tabClickHandler);
     }
-
-    // eslint-disable-next-line no-new
-    new Vue({
-      el: '#js-pipeline-tests-detail',
-      components: {
-        TestReports,
-      },
-      render(createElement) {
-        return createElement('test-reports');
-      },
-    });
-
-    axios
-      .get(dataset.testReportsCountEndpoint)
-      .then(({ data }) => {
-        if (!data.total_count) {
-          return;
-        }
-
-        document.querySelector('.js-test-report-badge-counter').innerHTML = data.total_count;
-      })
-      .catch(() => {});
   }
+}
+
+const createTestDetails = (detailsEndpoint) => {
+  // eslint-disable-next-line no-new
+  new Vue({
+    el: '#js-pipeline-tests-detail',
+    components: {
+      TestReports,
+    },
+    render(createElement) {
+      return createElement('test-reports');
+    },
+  });
+
+  axios
+    .get(detailsEndpoint)
+    .then(({ data }) => {
+      if (!data.total_count) {
+        return;
+      }
+
+      document.querySelector('.js-test-report-badge-counter').innerHTML = data.total_count;
+    })
+    .catch(() => {});
+}
+
+export default () => {
+  const { dataset } = document.querySelector('.js-pipeline-details-vue');
+  const mediator = new PipelinesMediator({ endpoint: dataset.endpoint });
+  mediator.fetchPipeline();
+
+  createPipelinesDetailApp(mediator);
+  createPipelineHeaderApp(mediator);
+  createPipelinesTabs();
+  createTestDetails(dataset.testReportsCountEndpoint);
 };
