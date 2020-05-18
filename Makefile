@@ -102,10 +102,14 @@ clean-build:
 
 .PHONY:	prepare-tests
 prepare-tests:	testdata/data/group/test.git $(EXE_ALL)
+prepare-tests:	testdata/scratch
 
 testdata/data/group/test.git:
 	$(call message,$@)
 	git clone --quiet --bare https://gitlab.com/gitlab-org/gitlab-test.git $@
+
+testdata/scratch:
+	mkdir -p testdata/scratch
 
 .PHONY: verify
 verify: lint vet detect-context check-formatting staticcheck
