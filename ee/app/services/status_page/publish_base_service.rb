@@ -2,7 +2,7 @@
 
 module StatusPage
   class PublishBaseService
-    include Gitlab::Utils::StrongMemoize
+    include StatusPage::PublicationServiceHelpers
 
     def initialize(project:)
       @project = project
@@ -71,10 +71,6 @@ module StatusPage
         .valid?
     end
 
-    def error(message, payload = {})
-      ServiceResponse.error(message: message, payload: payload)
-    end
-
     def error_limit_exceeded(key)
       error("Failed to upload #{key}: Limit exceeded")
     end
@@ -85,10 +81,6 @@ module StatusPage
 
     def error_no_storage_client
       error('No storage client available. Is the status page setting activated?')
-    end
-
-    def success(payload = {})
-      ServiceResponse.success(payload: payload)
     end
   end
 end

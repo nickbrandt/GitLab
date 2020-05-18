@@ -6,6 +6,7 @@ module StatusPage
   #
   # Use this service for publishing an incident to CDN synchronously.
   # To publish asynchronously use +StatusPage::TriggerPublishService+ instead.
+  # Called within an async job so as to run out of out of band from web requests
   #
   # This services calls:
   # * StatusPage::PublishDetailsService

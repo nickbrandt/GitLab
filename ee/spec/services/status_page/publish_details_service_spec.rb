@@ -4,10 +4,9 @@ require 'spec_helper'
 
 describe StatusPage::PublishDetailsService do
   let_it_be(:project, refind: true) { create(:project) }
-  let(:markdown_field) { 'Hello World' }
   let(:user_notes) { [] }
   let(:incident_id) { 1 }
-  let(:issue) { instance_double(Issue, notes: user_notes, description: markdown_field, iid: incident_id) }
+  let(:issue) { instance_double(Issue, notes: user_notes, description: 'Incident Occuring', iid: incident_id) }
   let(:key) { StatusPage::Storage.details_path(incident_id) }
   let(:content) { { id: incident_id } }
 
@@ -35,9 +34,10 @@ describe StatusPage::PublishDetailsService do
     context 'publishes attachments' do
       it 'sends attachements to s3' do
         allow(storage_client).to receive(:upload_object)
+        allow(storage_client).to receive(:list_object_keys).and_return([])
 
         expect_next_instance_of(StatusPage::PublishAttachmentsService) do |service|
-          expect(service).to receive(:execute).with(issue, user_notes)
+          expect(service).to receive(:execute)
         end
 
         subject

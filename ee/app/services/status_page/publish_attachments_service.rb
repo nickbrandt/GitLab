@@ -2,62 +2,75 @@
 
 module StatusPage
   # Publishes Attachments from incident comments and descriptions to s3
-  # Should only be called from publish details
-  class PublishAttachmentsService < PublishBaseService
-    private
+  # Should only be called from publish details or a service that inherits from the publish_base_service
+  class PublishAttachmentsService
+    include StatusPage::PublicationServiceHelpers
 
-    def process(issue, user_notes)
-      total_uploads = existing_keys(issue).size
-      publish_description_attachments(issue, total_uploads)
-      publish_user_note_attachments(issue, total_uploads, user_notes)
+    def initialize(project:, issue:, user_notes:, storage_client:)
+      @project = project
+      @issue = issue
+      @user_notes = user_notes
+      @storage_client = storage_client
+      @total_uploads = existing_keys.size
+    end
+
+    def execute
+      publish_description_attachments
+      publish_user_note_attachments
 
       success
     end
 
-    def publish_description_attachments(issue, total_uploads)
+    private
+
+    attr_reader :project, :issue, :user_notes, :storage_client
+
+    def publish_description_attachments
       publish_markdown_uploads(
         markdown_field: issue.description,
-        issue_iid: issue.iid,
-        total_uploads: total_uploads
+        issue_iid: issue.iid
       )
     end
 
-    def publish_user_note_attachments(issue, total_uploads, user_notes)
+    def publish_user_note_attachments
       user_notes.each do |user_note|
         publish_markdown_uploads(
           markdown_field: user_note.note,
-          issue_iid: issue.iid,
-          total_uploads: total_uploads
+          issue_iid: issue.iid
         )
       end
     end
 
-    def existing_keys(issue = nil)
-      strong_memoize(:existing_keys) do
-        storage_client.list_object_keys(
-          uploads_path(issue)
-        )
-      end
-    end
-
-    def uploads_path(issue)
-      StatusPage::Storage.uploads_path(issue.iid)
-    end
-
-    def publish_markdown_uploads(markdown_field:, issue_iid:, total_uploads:)
+    def publish_markdown_uploads(markdown_field:, issue_iid:)
       markdown_field.scan(FileUploader::MARKDOWN_PATTERN).map do |secret, file_name|
-        break if total_uploads >= StatusPage::Storage::MAX_UPLOADS
+        break if @total_uploads >= StatusPage::Storage::MAX_UPLOADS
 
         key = StatusPage::Storage.upload_path(issue_iid, secret, file_name)
-
         next if existing_keys.include? key
 
-        uploader = UploaderFinder.new(@project, secret, file_name).execute
-        uploader.open do |open_file|
-          storage_client.multipart_upload(key, open_file)
-          total_uploads += 1
-        end
+        # uploader behaves like a file with an 'open' method
+        file = UploaderFinder.new(project, secret, file_name).execute
+
+        upload_file(key, file)
       end
+    end
+
+    def upload_file(key, file)
+      file.open do |open_file|
+        # Send files to s3 storage in parts (hanles large files)
+        storage_client.multipart_upload(key, open_file)
+        @total_uploads += 1
+      end
+    end
+
+    def existing_keys
+      strong_memoize(:existing_keys) do
+        storage_client.list_object_keys(uploads_path)
+      end
+    end
+
+    def uploads_path
+      StatusPage::Storage.uploads_path(issue.iid)
     end
   end
 end

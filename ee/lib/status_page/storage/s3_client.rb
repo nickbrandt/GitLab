@@ -70,7 +70,7 @@ module StatusPage
       # key: s3 key at which file is stored
       # file: An open file or file-like io object
       def multipart_upload(key, file)
-        StatusPage::Storage::S3Client.new(
+        StatusPage::Storage::S3MultipartUpload.new(
           client: client, bucket_name: bucket_name, key: key, open_file: file
         ).call
       end

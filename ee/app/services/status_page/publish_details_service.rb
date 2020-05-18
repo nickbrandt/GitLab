@@ -39,7 +39,12 @@ module StatusPage
     end
 
     def publish_attachments(issue, user_notes)
-      StatusPage::PublishAttachmentsService.new(project: @project).execute(issue, user_notes)
+      StatusPage::PublishAttachmentsService.new(
+        project: @project,
+        issue: issue,
+        user_notes: user_notes,
+        storage_client: storage_client
+      ).execute
     end
   end
 end

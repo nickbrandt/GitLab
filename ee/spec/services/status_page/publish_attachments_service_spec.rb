@@ -3,33 +3,33 @@
 require 'spec_helper'
 
 describe StatusPage::PublishAttachmentsService do
-  let_it_be(:project, refind: true) { create(:project) }
-  let(:markdown_field) { 'Hello World' }
-  let(:user_notes) { [] }
-  let(:incident_id) { 1 }
-  let(:issue) { instance_double(Issue, notes: user_notes, description: markdown_field, iid: incident_id) }
-  let(:key) { StatusPage::Storage.details_path(incident_id) }
-  let(:content) { { id: incident_id } }
-  let(:storage_client) { instance_double(StatusPage::Storage::S3Client) }
-  let(:status_page_setting_enabled) { true }
-  let(:status_page_setting) do
-    instance_double(StatusPage::ProjectSetting, enabled?: status_page_setting_enabled,
-                    storage_client: storage_client)
-  end
-
-  let(:service) { described_class.new(project: project) }
-
-  subject(:result) { service.execute(issue, user_notes) }
-
-  before do
-    allow(project).to receive(:status_page_setting)
-      .and_return(status_page_setting)
+  RSpec.shared_context 'second file' do
+    # Setup second file
+    let(:upload_secret_2) { '9cb61a79ce884d5b681dd42728d3c159' }
+    let(:image_file_name_2) { 'tanuki_2.png' }
+    let(:upload_path_2) { "/uploads/#{upload_secret_2}/#{image_file_name_2}" }
+    let(:markdown_field) { "![tanuki](#{upload_path}) and ![tanuki_2](#{upload_path_2})" }
+    let(:status_page_upload_path_2) { StatusPage::Storage.upload_path(issue.iid, upload_secret_2, image_file_name_2) }
   end
 
   describe '#execute' do
+    let_it_be(:project, refind: true) { create(:project) }
+    let(:markdown_field) { 'Hello World' }
+    let(:user_notes) { [] }
+    let(:incident_id) { 1 }
+    let(:issue) { instance_double(Issue, notes: user_notes, description: markdown_field, iid: incident_id) }
+    let(:key) { StatusPage::Storage.details_path(incident_id) }
+    let(:content) { { id: incident_id } }
+    let(:storage_client) { instance_double(StatusPage::Storage::S3Client) }
+
+    let(:service) { described_class.new(project: project, issue: issue, user_notes: user_notes, storage_client: storage_client) }
+
+    subject { service.execute }
+
+    include_context 'stub status page enabled'
+
     context 'publishes file attachments' do
       before do
-        stub_licensed_features(status_page: true)
         allow(storage_client).to receive(:upload_object).with("data/incident/1.json", "{\"id\":1}")
         allow(storage_client).to receive(:list_object_keys).and_return(Set.new)
       end
@@ -37,8 +37,8 @@ describe StatusPage::PublishAttachmentsService do
       context 'when not in markdown' do
         it 'publishes no images' do
           expect(storage_client).not_to receive(:multipart_upload)
-          expect(result.payload).to eq({})
-          expect(result).to be_success
+          expect(subject.payload).to eq({})
+          expect(subject).to be_success
         end
       end
 
@@ -67,8 +67,8 @@ describe StatusPage::PublishAttachmentsService do
         it 'publishes description images' do
           expect(storage_client).to receive(:multipart_upload).with(status_page_upload_path, open_file).once
 
-          expect(result).to be_success
-          expect(result.payload).to eq({})
+          expect(subject).to be_success
+          expect(subject.payload).to eq({})
         end
 
         context 'user notes uploads' do
@@ -79,22 +79,24 @@ describe StatusPage::PublishAttachmentsService do
           it 'publishes images' do
             expect(storage_client).to receive(:multipart_upload).with(status_page_upload_path, open_file).once
 
-            expect(result).to be_success
-            expect(result.payload).to eq({})
+            expect(subject).to be_success
+            expect(subject.payload).to eq({})
           end
         end
 
         context 'when exceeds upload limit' do
+          include_context 'second file'
+
           before do
-            stub_const("StatusPage::Storage::MAX_UPLOADS", 1)
-            allow(storage_client).to receive(:list_object_keys).and_return(Set[status_page_upload_path])
+            stub_const("StatusPage::Storage::MAX_UPLOADS", 2)
+            allow(storage_client).to receive(:list_object_keys).and_return(Set['existing_key'])
           end
 
           it 'publishes no images' do
-            expect(storage_client).not_to receive(:multipart_upload)
+            expect(storage_client).to receive(:multipart_upload).once
 
-            expect(result).to be_success
-            expect(result.payload).to eq({})
+            expect(subject).to be_success
+            expect(subject.payload).to eq({})
           end
         end
 
@@ -106,17 +108,13 @@ describe StatusPage::PublishAttachmentsService do
           it 'publishes no images' do
             expect(storage_client).not_to receive(:multipart_upload)
 
-            expect(result).to be_success
-            expect(result.payload).to eq({})
+            expect(subject).to be_success
+            expect(subject.payload).to eq({})
           end
         end
 
         context 'when images are already in s3' do
-          let(:upload_secret_2) { '9cb61a79ce884d5b681dd42728d3c159' }
-          let(:image_file_name_2) { 'tanuki_2.png' }
-          let(:upload_path_2) { "/uploads/#{upload_secret_2}/#{image_file_name_2}" }
-          let(:markdown_field) { "![tanuki](#{upload_path}) and ![tanuki_2](#{upload_path_2})" }
-          let(:status_page_upload_path_2) { StatusPage::Storage.upload_path(issue.iid, upload_secret_2, image_file_name_2) }
+          include_context 'second file'
 
           before do
             allow(storage_client).to receive(:list_object_keys).and_return(Set[status_page_upload_path])
@@ -126,8 +124,8 @@ describe StatusPage::PublishAttachmentsService do
             expect(storage_client).to receive(:multipart_upload).with(status_page_upload_path_2, open_file).once
             expect(storage_client).not_to receive(:multipart_upload).with(status_page_upload_path, open_file)
 
-            expect(result).to be_success
-            expect(result.payload).to eq({})
+            expect(subject).to be_success
+            expect(subject.payload).to eq({})
           end
         end
       end
