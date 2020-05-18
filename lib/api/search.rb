@@ -35,6 +35,8 @@ module API
 
         results = SearchService.new(current_user, search_params).search_objects(preload_method)
 
+        Gitlab::UsageDataCounters::SearchCounter.count(:all_searches)
+
         paginate(results)
       end
 
