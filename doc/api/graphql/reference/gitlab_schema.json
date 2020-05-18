@@ -31800,6 +31800,16 @@
               "defaultValue": null
             },
             {
+              "name": "endedAt",
+              "description": "Ended time of resolved alert. Current time when omitted.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Time",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "clientMutationId",
               "description": "A unique identifier for the client performing the mutation.",
               "type": {

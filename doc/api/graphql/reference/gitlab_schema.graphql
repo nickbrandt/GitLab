@@ -10678,6 +10678,11 @@ input UpdateAlertStatusInput {
   clientMutationId: String
 
   """
+  Ended time of resolved alert. Current time when omitted.
+  """
+  endedAt: Time
+
+  """
   The iid of the alert to mutate
   """
   iid: String!
