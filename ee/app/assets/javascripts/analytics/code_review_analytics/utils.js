@@ -17,7 +17,7 @@ const transformFilters = filters => {
     'not[milestone_title]': notMilestoneTitle,
   } = filters;
 
-  let selectedLabels = labelNames?.map(label => ({ value: label, operator: '=' }));
+  let selectedLabels = labelNames?.map(label => ({ value: label, operator: '=' })) || [];
   let selectedMilestone = null;
 
   if (notLabelNames) {
