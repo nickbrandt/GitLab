@@ -33,7 +33,9 @@ describe 'Import/Export - Group Import', :js do
         find('#import-group-tab').click
 
         expect(page).to have_content 'GitLab group export'
-        attach_file('file', file)
+        attach_file(file) do
+          find('.js-filepicker-button').click
+        end
 
         expect { click_on 'Import group' }.to change { Group.count }.by 1
 
@@ -54,7 +56,9 @@ describe 'Import/Export - Group Import', :js do
         find('#import-group-tab').click
 
         fill_in :import_group_path, with: 'custom-path'
-        attach_file('file', file)
+        attach_file(file) do
+          find('.js-filepicker-button').click
+        end
 
         expect { click_on 'Import group' }.to change { Group.count }.by 1
 
@@ -86,7 +90,9 @@ describe 'Import/Export - Group Import', :js do
 
       fill_in :group_name, with: 'Test Group Import'
       find('#import-group-tab').click
-      attach_file('file', file)
+      attach_file(file) do
+        find('.js-filepicker-button').click
+      end
 
       expect { click_on 'Import group' }.not_to change { Group.count }
 

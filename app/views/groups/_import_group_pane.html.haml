@@ -42,8 +42,8 @@
   .row
     .form-group.col-sm-12
       = f.label :file, s_('GroupsNew|GitLab group export'), class: 'label-bold'
-      .form-group
-        = f.file_field :file
+      %div
+        = render 'shared/file_picker_button', f: f, field: :file, help_text: nil
 
   .row
     .form-actions.col-sm-12

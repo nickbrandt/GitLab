@@ -1,8 +1,8 @@
 import $ from 'jquery';
 import BindInOut from '~/behaviors/bind_in_out';
 import Group from '~/group';
-import initAvatarPicker from '~/avatar_picker';
 import GroupPathValidator from './group_path_validator';
+import initFilePickers from '~/file_pickers';
 
 document.addEventListener('DOMContentLoaded', () => {
   const parentId = $('#group_parent_id');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     new GroupPathValidator(); // eslint-disable-line no-new
   }
   BindInOut.initAll();
-  initAvatarPicker();
+  initFilePickers();
 
   return new Group();
 });

@@ -1,4 +1,4 @@
-import initAvatarPicker from '~/avatar_picker';
+import initFilePickers from '~/file_pickers';
 import TransferDropdown from '~/groups/transfer_dropdown';
 import initConfirmDangerModal from '~/confirm_danger_modal';
 import initSettingsPanels from '~/settings_panels';
@@ -10,7 +10,7 @@ import groupsSelect from '~/groups_select';
 import projectSelect from '~/project_select';
 
 document.addEventListener('DOMContentLoaded', () => {
-  initAvatarPicker();
+  initFilePickers();
   initConfirmDangerModal();
   initSettingsPanels();
   dirtySubmitFactory(
