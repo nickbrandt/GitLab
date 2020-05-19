@@ -577,3 +577,47 @@ Troubleshooting the GitLab Container Registry, most of the times, requires
 administration access to the GitLab server.
 
 [Read how to troubleshoot the Container Registry](../../../administration/packages/container_registry.md#troubleshooting).
+
+### Unable to change path or transfer a project
+
+If you try to change a project's path or transfer a project to a new namespace,
+you may receive one of the following errors:
+
+- "Project cannot be transferred, because tags are present in its container registry."
+- "Namespace cannot be moved because at least one project has tags in container registry."
+
+This issue occurs when the project has images in the Container Registry.
+You must delete or move these images before you can change the path or transfer
+the project.
+
+The following procedure uses these sample project names:
+
+- For the current project: `example.gitlab.com/org/build/sample_project/cr:v2.9.1`
+- For the new project: `example.gitlab.com/new_org/build/new_sample_project/cr:v2.9.1`
+
+Use your own URLs to complete the following steps:
+
+1. Download the Docker images on your computer:
+
+   ```shell
+   docker login example.gitlab.com
+   docker pull example.gitlab.com/org/build/sample_project/cr:v2.9.1
+   ```
+
+1. Rename the images to match the new project name:
+
+   ```shell
+   docker tag example.gitlab.com/org/build/sample_project/cr:v2.9.1 example.gitlab.com/new_org/build/new_sample_project/cr:v2.9.1
+   ```
+
+1. Delete the images in both projects by using the [UI](#delete-images) or [API](../../../api/packages.md#delete-a-project-package).
+   There may be a delay while the images are queued and deleted.
+1. Change the path or transfer the project by going to **Settings > General**
+   and expanding **Advanced**.
+1. Restore the images:
+
+   ```shell
+   docker push example.gitlab.com/new_org/build/new_sample_project/cr:v2.9.1
+   ```
+
+Follow [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/18383) for details.
