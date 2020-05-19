@@ -9235,8 +9235,6 @@ CREATE INDEX index_ci_builds_on_commit_id_and_type_and_name_and_ref ON public.ci
 
 CREATE INDEX index_ci_builds_on_commit_id_and_type_and_ref ON public.ci_builds USING btree (commit_id, type, ref);
 
-CREATE INDEX index_ci_builds_on_name_and_security_type_eq_ci_build ON public.ci_builds USING btree (name, id) WHERE (((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text, ('license_scanning'::character varying)::text])) AND ((type)::text = 'Ci::Build'::text));
-
 CREATE INDEX index_ci_builds_on_project_id_and_id ON public.ci_builds USING btree (project_id, id);
 
 CREATE INDEX index_ci_builds_on_project_id_and_name_and_ref ON public.ci_builds USING btree (project_id, name, ref) WHERE (((type)::text = 'Ci::Build'::text) AND ((status)::text = 'success'::text) AND ((retried = false) OR (retried IS NULL)));
@@ -10606,6 +10604,8 @@ CREATE UNIQUE INDEX index_scim_identities_on_lower_extern_uid_and_group_id ON pu
 CREATE UNIQUE INDEX index_scim_identities_on_user_id_and_group_id ON public.scim_identities USING btree (user_id, group_id);
 
 CREATE UNIQUE INDEX index_scim_oauth_access_tokens_on_group_id_and_token_encrypted ON public.scim_oauth_access_tokens USING btree (group_id, token_encrypted);
+
+CREATE INDEX index_security_ci_builds_on_name_and_id ON public.ci_builds USING btree (name, id) WHERE (((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text, ('secret_detection'::character varying)::text, ('license_scanning'::character varying)::text])) AND ((type)::text = 'Ci::Build'::text));
 
 CREATE INDEX index_self_managed_prometheus_alert_events_on_environment_id ON public.self_managed_prometheus_alert_events USING btree (environment_id);
 
@@ -13900,6 +13900,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200511220023
 20200512085150
 20200512164334
+20200512195442
 20200513160930
 20200513171959
 20200513224143
