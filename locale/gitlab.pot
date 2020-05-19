@@ -23604,6 +23604,12 @@ msgstr ""
 msgid "UserProfile|Your projects can be available publicly, internally, or privately, at your choice."
 msgstr ""
 
+msgid "UserProfile|at"
+msgstr ""
+
+msgid "UserProfile|made a private contribution"
+msgstr ""
+
 msgid "Username (optional)"
 msgstr ""
 
