@@ -79,8 +79,8 @@ describe('Security Configuration App', () => {
 
     it.each`
       configured | statusText
-      ${true}    | ${'Configured'}
-      ${false}   | ${'Not yet configured'}
+      ${true}    | ${'Enabled'}
+      ${false}   | ${'Not yet enabled'}
     `(
       `displays "$statusText" if the given feature's configuration status is: "$configured"`,
       ({ configured, statusText }) => {

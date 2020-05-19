@@ -50,9 +50,7 @@ exports[`Security Configuration App features table displays a given feature 1`] 
             <div
               class="text-2 gl-text-gray-900"
             >
-              
-                name-feature-0
-              
+              name-feature-0
             </div>
           </div>
            
@@ -89,7 +87,7 @@ exports[`Security Configuration App features table displays a given feature 1`] 
           class="table-mobile-content"
         >
           
-            Not yet configured
+            Not yet enabled
           
         </div>
       </div>
