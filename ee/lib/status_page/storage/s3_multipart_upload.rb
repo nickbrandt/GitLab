@@ -30,7 +30,8 @@ module StatusPage
             complete_upload(upload_id, parts)
             # Rescue on Exception since even on keyboard inturrupt we want to abort the upload and re-raise
             # abort clears the already uploaded parts so that they do not cost the bucket owner
-            # The status page bucket lifecycle policy will clear out any parts if this fails without an exception (power failures etc.)
+            # The status page bucket lifecycle policy will clear out unaborted parts if
+            # this fails without an exception (power failures etc.)
           rescue Exception => e # rubocop:disable Lint/RescueException
             abort_upload(upload_id)
             raise e

@@ -3,6 +3,8 @@
 module Gitlab
   module Utils
     extend self
+    # disable Cop/CustomErrorClass because recommended style causes 'already initialized constant' warning
+    class PathTraversalAttackError < StandardError; end # rubocop:disable Cop/CustomErrorClass
 
     # Ensure that the relative path will not traverse outside the base directory
     # We url decode the path to avoid passing invalid paths forward in url encoded format.
@@ -17,7 +19,7 @@ module Gitlab
           path.end_with?("#{File::SEPARATOR}..") ||
           (!allowed_absolute && Pathname.new(path).absolute?)
 
-        raise StandardError.new("Invalid path")
+        raise PathTraversalAttackError.new('Invalid path')
       end
 
       path

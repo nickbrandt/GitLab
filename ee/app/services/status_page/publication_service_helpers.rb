@@ -2,8 +2,6 @@
 
 module StatusPage
   module PublicationServiceHelpers
-    include Gitlab::Utils::StrongMemoize
-
     def error(message, payload = {})
       ServiceResponse.error(message: message, payload: payload)
     end

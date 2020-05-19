@@ -2,6 +2,7 @@
 
 module StatusPage
   class PublishBaseService
+    include Gitlab::Utils::StrongMemoize
     include StatusPage::PublicationServiceHelpers
 
     def initialize(project:)

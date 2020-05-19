@@ -22,7 +22,9 @@ module Gitlab
         return @text unless needs_rewrite?
 
         @text.gsub(@pattern) do |markdown|
-          file = UploaderFinder.new(@source_project, $~[:secret], $~[:file]).execute
+          file = find_file($~[:secret], $~[:file])
+          # No file will be returned for a path traversal
+          next if file.nil?
 
           break markdown unless file.try(:exists?)
 
@@ -46,7 +48,7 @@ module Gitlab
 
       def files
         referenced_files = @text.scan(@pattern).map do
-          UploaderFinder.new(@source_project, $~[:secret], $~[:file]).execute
+          find_file($~[:secret], $~[:file])
         end
 
         referenced_files.compact.select(&:exists?)
@@ -54,6 +56,10 @@ module Gitlab
 
       def was_embedded?(markdown)
         markdown.starts_with?("!")
+      end
+
+      def find_file(secret, file_name)
+        UploaderFinder.new(@source_project, secret, file_name).execute
       end
     end
   end

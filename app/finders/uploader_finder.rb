@@ -16,6 +16,11 @@ class UploaderFinder
     retrieve_file_state!
 
     uploader
+  rescue ::Gitlab::Utils::PathTraversalAttackError, StandardError => e
+    # Send any unexpected errors to sentry and return nil
+    Raven.capture_exception(e) unless e.is_a?(::Gitlab::Utils::PathTraversalAttackError)
+
+    nil
   end
 
   def prevent_path_traversal_attack!

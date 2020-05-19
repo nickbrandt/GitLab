@@ -15,24 +15,40 @@ describe UploaderFinder do
       upload.save
     end
 
-    it 'gets the uploader' do
-      allow_next_instance_of(FileUploader) do |uploader|
-        allow(uploader).to receive(:retrieve_from_store!).with(upload.path).and_return(uploader)
+    context 'when sucessful' do
+      before do
+        allow_next_instance_of(FileUploader) do |uploader|
+          allow(uploader).to receive(:retrieve_from_store!).with(upload.path).and_return(uploader)
+        end
       end
 
-      expect(subject).to be_an_instance_of(FileUploader)
-      expect(subject.model).to eq(project)
-      expect(subject.secret).to eq(secret)
+      it 'gets the file-like uploader' do
+        expect(subject).to be_an_instance_of(FileUploader)
+        expect(subject.model).to eq(project)
+        expect(subject.secret).to eq(secret)
+      end
     end
 
-    context 'path traversal in file name' do
+    context 'when path traversal in file name' do
       before do
         upload.path = '/uploads/11111111111111111111111111111111/../../../../../../../../../../../../../../etc/passwd)'
         upload.save
       end
 
-      it 'throws an error' do
-        expect { subject }.to raise_error(an_instance_of(StandardError).and(having_attributes(message: "Invalid path")))
+      it 'returns nil' do
+        expect(subject).to be(nil)
+      end
+    end
+
+    context 'when unexpected failure' do
+      before do
+        allow_next_instance_of(FileUploader) do |uploader|
+          allow(uploader).to receive(:retrieve_from_store!).and_raise(StandardError)
+        end
+      end
+
+      it 'returns nil when unexpected error is raised' do
+        expect(subject).to be(nil)
       end
     end
   end
