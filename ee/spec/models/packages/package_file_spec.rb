@@ -42,12 +42,12 @@ RSpec.describe Packages::PackageFile, type: :model do
 
   describe '.with_conan_package_reference' do
     let_it_be(:non_matching_package_file) { create(:package_file, :nuget) }
-    let_it_be(:package_file) { create(:conan_package_file, :conan_package) }
-    let_it_be(:reference) { package_file.conan_file_metadatum.conan_package_reference}
+    let_it_be(:metadatum) { create(:conan_file_metadatum, :package_file) }
+    let_it_be(:reference) { metadatum.conan_package_reference}
 
     it 'returns matching packages' do
       expect(described_class.with_conan_package_reference(reference))
-        .to eq([package_file])
+        .to eq([metadatum.package_file])
     end
   end
 
