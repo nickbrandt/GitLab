@@ -371,7 +371,7 @@ freeze periods, all will apply, and should they overlap, the freeze covers the
 complete overlapped period.
 
 During pipeline processing, GitLab CI creates an environment variable named
-`$CI_ENVIRONMENT_FROZEN` if the currently executing job is within a
+`$CI_DEPLOY_FREEZE` if the currently executing job is within a
 Freeze Period.
 
 To take advantage of this variable, create a `rules` entry in your
@@ -384,7 +384,7 @@ deploy_to_production:
   stage: deploy
   script: deploy_to_prod.sh
   rules:
-    - if: $CI_ENVIRONMENT_FROZEN == null
+    - if: $CI_DEPLOY_FREEZE == null
 ```
 
 <!-- ## Troubleshooting
