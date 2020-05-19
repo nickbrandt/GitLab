@@ -22,13 +22,13 @@ describe BuildArtifactEntity do
 
     it 'contains paths to the artifacts' do
       expect(subject[:path])
-        .to include "jobs/#{job.id}/artifacts/download"
+        .to include "jobs/#{job.id}/artifacts/download?file_type=archive"
 
       expect(subject[:keep_path])
-        .to include "jobs/#{job.id}/artifacts/keep"
+        .to include "jobs/#{job.id}/artifacts/keep?file_type=archive"
 
       expect(subject[:browse_path])
-        .to include "jobs/#{job.id}/artifacts/browse"
+        .to include "jobs/#{job.id}/artifacts/browse?file_type=archive"
     end
   end
 end

@@ -955,6 +955,14 @@ module Ci
       var[:value]&.to_i if var
     end
 
+    def downloadable_artifacts
+      ::Ci::JobArtifact
+        .joins(:job)
+        .where(job: self)
+        .where(file_type: Ci::JobArtifact::DOWNLOADABLE_TYPES)
+        .where('ci_builds.artifacts_expire_at IS NULL OR ci_builds.artifacts_expire_at > ?', Time.now)
+    end
+
     private
 
     def dependencies
