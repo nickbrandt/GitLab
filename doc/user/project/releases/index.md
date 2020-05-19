@@ -252,6 +252,9 @@ generate Release Evidence for an existing release. Because of this, [each releas
 can have multiple Release Evidence snapshots. You can view the Release Evidence and
 its details on the Release page.
 
+NOTE: **Note:**
+When the issue tracker is disabled, release evidence [is not collected](https://gitlab.com/gitlab-org/gitlab/-/issues/208397).
+
 Release Evidence is stored as a JSON object, so you can compare evidence by using
 commonly-available tools.
 
