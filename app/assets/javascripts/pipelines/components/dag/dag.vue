@@ -26,10 +26,7 @@ export default {
     },
   },
   mounted() {
-    const {
-      drawGraph,
-      reportFailure
-    } = this;
+    const { drawGraph, reportFailure } = this;
 
     if (!this.graphUrl) {
       reportFailure();

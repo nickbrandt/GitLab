@@ -93,7 +93,7 @@ const createPipelineHeaderApp = mediator => {
   });
 };
 
-const createPipelinesTabs = (dataset) => {
+const createPipelinesTabs = dataset => {
   const tabsElement = document.querySelector('.pipelines-tabs');
   const testReportsEnabled =
     window.gon && window.gon.features && window.gon.features.junitPipelineView;
