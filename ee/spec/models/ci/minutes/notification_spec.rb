@@ -128,7 +128,7 @@ describe Ci::Minutes::Notification do
     describe '#show?' do
       context 'when eligible to see notifications' do
         before do
-          group.add_owner(user)
+          group.add_developer(user)
         end
 
         context 'with a project that has runners enabled inside namespace' do
