@@ -374,7 +374,6 @@ RSpec/LeakyConstantDeclaration:
     - 'spec/lib/marginalia_spec.rb'
     - 'spec/lib/omni_auth/strategies/jwt_spec.rb'
     - 'spec/lib/system_check/simple_executor_spec.rb'
-    - 'spec/lib/system_check_spec.rb'
     - 'spec/mailers/notify_spec.rb'
     - 'spec/migrations/20191125114345_add_admin_mode_protected_path_spec.rb'
     - 'spec/migrations/encrypt_plaintext_attributes_on_application_settings_spec.rb'
