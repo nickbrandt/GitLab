@@ -56,6 +56,9 @@ describe('Dashboard Panel', () => {
   const findTimeChart = () => wrapper.find({ ref: 'timeSeriesChart' });
   const findTitle = () => wrapper.find({ ref: 'graphTitle' });
   const findContextualMenu = () => wrapper.find({ ref: 'contextualMenu' });
+  const findActionsDropdown = () => wrapper.find({ ref: 'actionsDropdown' });
+  const findActionsDropdownContainer = () =>
+    wrapper.find('[data-testid="actions-dropdown-container"]');
 
   const createWrapper = (props, options) => {
     wrapper = shallowMount(DashboardPanel, {
@@ -126,6 +129,10 @@ describe('Dashboard Panel', () => {
       expect(wrapper.find(MonitorEmptyChart).exists()).toBe(true);
       expect(wrapper.find(MonitorEmptyChart).isVueInstance()).toBe(true);
     });
+
+    it('does not contain a tabindex attribute', () => {
+      expect(wrapper.find(MonitorEmptyChart).contains('[tabindex]')).toBe(false);
+    });
   });
 
   describe('When graphData is null', () => {
@@ -192,6 +199,21 @@ describe('Dashboard Panel', () => {
       return wrapper.vm.$nextTick(() => {
         expect(wrapper.vm.$emit).toHaveBeenCalledWith('timerangezoom', timeRange);
       });
+    });
+
+    it('should set a tabindex for the actions dropdown', () => {
+      const actionsDropdown = findActionsDropdown();
+
+      expect(actionsDropdown.contains('[tabindex]')).toBe(true);
+    });
+
+    it('should open the actions dropdown when enter is pressed', () => {
+      const openDropdownSpy = jest.spyOn(wrapper.vm, 'openActionsDropdown').mockImplementation();
+      const container = findActionsDropdownContainer();
+
+      container.trigger('keyup.enter');
+
+      expect(openDropdownSpy).toHaveBeenCalled();
     });
 
     it('includes a default group id', () => {

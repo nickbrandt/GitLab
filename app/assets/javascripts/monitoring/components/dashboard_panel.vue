@@ -266,6 +266,9 @@ export default {
         this.$delete(this.allAlerts, alertPath);
       }
     },
+    openActionsDropdown() {
+      this.$refs.actionsDropdown.show();
+    },
   },
   panelTypes,
 };
@@ -277,6 +280,7 @@ export default {
       <h5
         ref="graphTitle"
         class="prometheus-graph-title gl-font-lg font-weight-bold text-truncate append-right-8"
+        tabindex="0"
       >
         {{ title }}
       </h5>
@@ -301,14 +305,20 @@ export default {
         ref="contextualMenu"
         data-qa-selector="prometheus_graph_widgets"
       >
-        <div class="d-flex align-items-center">
+        <div
+          data-testid="actions-dropdown-container"
+          class="d-flex align-items-center"
+          @keyup.enter="openActionsDropdown"
+        >
           <gl-dropdown
+            ref="actionsDropdown"
             v-gl-tooltip
             toggle-class="btn btn-transparent border-0"
             data-qa-selector="prometheus_widgets_dropdown"
             right
             no-caret
             :title="__('More actions')"
+            tabindex="0"
           >
             <template slot="button-content">
               <gl-icon name="ellipsis_v" class="text-secondary" />
