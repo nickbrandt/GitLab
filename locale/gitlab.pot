@@ -14971,6 +14971,9 @@ msgstr ""
 msgid "Package type must be NuGet"
 msgstr ""
 
+msgid "Package type must be PyPi"
+msgstr ""
+
 msgid "Package was removed"
 msgstr ""
 

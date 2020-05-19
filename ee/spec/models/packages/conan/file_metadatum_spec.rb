@@ -8,11 +8,7 @@ RSpec.describe Packages::Conan::FileMetadatum, type: :model do
   end
 
   describe 'validations' do
-    let(:package_file) do
-      create(:package_file,
-             file: fixture_file_upload('ee/spec/fixtures/conan/recipe_files/conanfile.py'),
-             file_name: 'conanfile.py')
-    end
+    let(:package_file) { create(:conan_package_file, :conan_recipe_file) }
 
     it { is_expected.to validate_presence_of(:package_file) }
     it { is_expected.to validate_presence_of(:recipe_revision) }
@@ -93,6 +89,17 @@ RSpec.describe Packages::Conan::FileMetadatum, type: :model do
 
           expect(conan_file_metadatum).to be_invalid
         end
+      end
+    end
+
+    describe '#conan_package_type' do
+      it 'validates package of type conan' do
+        package = build('package')
+        package_file = build('package_file', package: package)
+        conan_file_metadatum = build('conan_file_metadatum', package_file: package_file)
+
+        expect(conan_file_metadatum).not_to be_valid
+        expect(conan_file_metadatum.errors.to_a).to contain_exactly('Package type must be Conan')
       end
     end
   end

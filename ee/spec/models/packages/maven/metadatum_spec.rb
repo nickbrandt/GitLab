@@ -28,12 +28,12 @@ RSpec.describe Packages::Maven::Metadatum, type: :model do
     end
 
     describe '#maven_package_type' do
-      it "will not allow a package with a different package_type" do
+      it 'will not allow a package with a different package_type' do
         package = build('conan_package')
         maven_metadatum = build('maven_metadatum', package: package)
 
         expect(maven_metadatum).not_to be_valid
-        expect(maven_metadatum.errors.to_a).to include("Package type must be Maven")
+        expect(maven_metadatum.errors.to_a).to include('Package type must be Maven')
       end
     end
   end
