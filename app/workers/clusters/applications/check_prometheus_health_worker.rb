@@ -14,6 +14,7 @@ module Clusters
       urgency :low
 
       idempotent!
+      worker_has_external_dependencies!
 
       def perform
         demo_project_ids = Gitlab::Monitor::DemoProjects.primary_keys

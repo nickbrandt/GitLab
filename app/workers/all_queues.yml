@@ -629,7 +629,7 @@
   :tags: []
 - :name: incident_management:clusters_applications_check_prometheus_health
   :feature_category: :incident_management
-  :has_external_dependencies: 
+  :has_external_dependencies: true
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 2

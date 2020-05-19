@@ -111,7 +111,7 @@ describe Gitlab do
       expect(subject).to eq true
     end
 
-    it 'is flase when not on staging' do
+    it 'is false when not on staging' do
       stub_config_setting(url: 'https://example.gitlab.com')
 
       expect(subject).to eq false

@@ -17,7 +17,7 @@ module Gitlab
         elsif ::Gitlab.staging?
           STAGING_IDS
         elsif ::Gitlab.dev_or_test_env?
-          Project.pluck(:id) # rubocop: disable CodeReuse/ActiveRecord
+          Project.limit(100).pluck(:id) # rubocop: disable CodeReuse/ActiveRecord
         else
           []
         end
