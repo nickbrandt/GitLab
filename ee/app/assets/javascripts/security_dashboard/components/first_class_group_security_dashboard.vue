@@ -32,11 +32,15 @@ export default {
   data() {
     return {
       filters: {},
+      projects: [],
     };
   },
   methods: {
     handleFilterChange(filters) {
       this.filters = filters;
+    },
+    handleProjectsFetch(projects) {
+      this.projects = projects;
     },
   },
 };
@@ -45,13 +49,14 @@ export default {
 <template>
   <security-dashboard-layout>
     <template #header>
-      <filters @filterChange="handleFilterChange" />
+      <filters :projects="projects" @filterChange="handleFilterChange" />
     </template>
     <group-security-vulnerabilities
       :dashboard-documentation="dashboardDocumentation"
       :empty-state-svg-path="emptyStateSvgPath"
       :group-full-path="groupFullPath"
       :filters="filters"
+      @projectFetch="handleProjectsFetch"
     />
     <template #aside>
       <vulnerability-severity :endpoint="vulnerableProjectsEndpoint" />
