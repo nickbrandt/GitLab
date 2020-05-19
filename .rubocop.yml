@@ -396,8 +396,6 @@ RSpec/LeakyConstantDeclaration:
     - 'spec/services/ci/retry_build_service_spec.rb'
     - 'spec/services/clusters/applications/check_installation_progress_service_spec.rb'
     - 'spec/services/clusters/applications/check_uninstall_progress_service_spec.rb'
-    - 'spec/services/clusters/applications/check_upgrade_progress_service_spec.rb'
-    - 'spec/services/clusters/applications/ingress_modsecurity_usage_service_spec.rb'
     - 'spec/services/issues/resolve_discussions_spec.rb'
     - 'spec/services/metrics/dashboard/clone_dashboard_service_spec.rb'
     - 'spec/support/shared_contexts/spam_constants.rb'
