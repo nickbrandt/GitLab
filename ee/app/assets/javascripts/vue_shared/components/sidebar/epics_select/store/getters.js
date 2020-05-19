@@ -1,4 +1,5 @@
 import { searchBy } from '~/lib/utils/common_utils';
+import { DropdownVariant } from '../constants';
 
 /**
  * Returns array of Epics
@@ -30,6 +31,20 @@ export const groupEpics = state => {
   }
   return state.epics;
 };
+
+/**
+ * Returns boolean representing whether dropdown variant
+ * is `sidebar`
+ * @param {object} state
+ */
+export const isDropdownVariantSidebar = state => state.variant === DropdownVariant.Sidebar;
+
+/**
+ * Returns boolean representing whether dropdown variant
+ * is `standalone`
+ * @param {object} state
+ */
+export const isDropdownVariantStandalone = state => state.variant === DropdownVariant.Standalone;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

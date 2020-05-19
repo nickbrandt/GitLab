@@ -4,6 +4,7 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import $ from 'jquery';
 import { GlLoadingIcon } from '@gitlab/ui';
 
+import { __ } from '~/locale';
 import { noneEpic } from 'ee/vue_shared/constants';
 
 import createStore from './store';
@@ -16,6 +17,8 @@ import DropdownButton from './dropdown_button.vue';
 import DropdownHeader from './dropdown_header.vue';
 import DropdownSearchInput from './dropdown_search_input.vue';
 import DropdownContents from './dropdown_contents.vue';
+
+import { DropdownVariant } from './constants';
 
 export default {
   store: createStore(),
@@ -48,7 +51,8 @@ export default {
     },
     blockTitle: {
       type: String,
-      required: true,
+      required: false,
+      default: __('Epic'),
     },
     initialEpic: {
       type: Object,
@@ -58,17 +62,25 @@ export default {
       type: Boolean,
       required: true,
     },
+    variant: {
+      type: String,
+      required: false,
+      default: DropdownVariant.Sidebar,
+    },
   },
   data() {
     return {
-      showDropdown: false,
+      showDropdown: this.variant === DropdownVariant.Standalone,
     };
   },
   computed: {
     ...mapState(['epicSelectInProgress', 'epicsFetchInProgress', 'selectedEpic', 'searchQuery']),
-    ...mapGetters(['groupEpics']),
+    ...mapGetters(['isDropdownVariantSidebar', 'isDropdownVariantStandalone', 'groupEpics']),
     dropdownSelectInProgress() {
       return this.initialEpicLoading || this.epicSelectInProgress;
+    },
+    dropdownButtonTextClass() {
+      return { 'is-default': this.isDropdownVariantStandalone };
     },
   },
   watch: {
@@ -109,6 +121,7 @@ export default {
   },
   mounted() {
     this.setInitialData({
+      variant: this.variant,
       groupId: this.groupId,
       issueId: this.issueId,
       selectedEpic: this.selectedEpic,
@@ -143,13 +156,15 @@ export default {
       });
     },
     handleDropdownHidden() {
-      this.showDropdown = false;
+      this.showDropdown = this.isDropdownVariantStandalone;
     },
     handleItemSelect(epic) {
-      if (epic.id === noneEpic.id && epic.title === noneEpic.title) {
+      if (this.epicIssueId && epic.id === noneEpic.id && epic.title === noneEpic.title) {
         this.removeIssueFromEpic(this.selectedEpic);
-      } else {
+      } else if (this.issueId) {
         this.assignIssueToEpic(epic);
+      } else {
+        this.$emit('onEpicSelect', epic);
       }
     },
   },
@@ -157,25 +172,31 @@ export default {
 </script>
 
 <template>
-  <div class="block epic js-epic-block">
-    <dropdown-value-collapsed :epic="selectedEpic" />
+  <div class="js-epic-block" :class="{ 'block epic': isDropdownVariantSidebar }">
+    <dropdown-value-collapsed v-if="isDropdownVariantSidebar" :epic="selectedEpic" />
     <dropdown-title
+      v-if="isDropdownVariantSidebar"
       :can-edit="canEdit"
       :block-title="blockTitle"
       :is-loading="dropdownSelectInProgress"
       @onClickEdit="handleEditClick"
     />
-    <dropdown-value v-show="!showDropdown" :epic="selectedEpic">
+    <dropdown-value v-if="isDropdownVariantSidebar" v-show="!showDropdown" :epic="selectedEpic">
       <slot></slot>
     </dropdown-value>
-    <div v-if="canEdit" v-show="showDropdown" class="epic-dropdown-container">
+    <div
+      v-if="canEdit || isDropdownVariantStandalone"
+      v-show="showDropdown"
+      class="epic-dropdown-container"
+    >
       <div ref="dropdown" class="dropdown">
-        <dropdown-button ref="dropdownButton" />
-        <div
-          class="dropdown-menu dropdown-select
-dropdown-menu-epics dropdown-menu-selectable"
-        >
-          <dropdown-header />
+        <dropdown-button
+          ref="dropdownButton"
+          :selected-epic-title="selectedEpic.title"
+          :toggle-text-class="dropdownButtonTextClass"
+        />
+        <div class="dropdown-menu dropdown-select dropdown-menu-epics dropdown-menu-selectable">
+          <dropdown-header v-if="isDropdownVariantSidebar" />
           <dropdown-search-input @onSearchInput="setSearchQuery" />
           <dropdown-contents
             v-if="!epicsFetchInProgress"
