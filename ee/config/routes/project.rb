@@ -64,7 +64,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :summary, on: :collection
           end
 
-          resource :network_policies, only: [] do
+          resources :network_policies, only: [:index, :create, :update, :destroy] do
             get :summary, on: :collection
           end
 

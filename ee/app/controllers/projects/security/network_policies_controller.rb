@@ -5,7 +5,7 @@ module Projects
     class NetworkPoliciesController < Projects::ApplicationController
       POLLING_INTERVAL = 5_000
 
-      before_action :authorize_read_network_policies!
+      before_action :authorize_read_threat_monitoring!
       before_action :set_polling_interval, only: [:summary]
 
       def summary
@@ -33,6 +33,41 @@ module Projects
         end
       end
 
+      def index
+        response = NetworkPolicies::ResourcesService.new(environment: environment).execute
+        respond_with_service_response(response)
+      end
+
+      def create
+        policy = Gitlab::Kubernetes::NetworkPolicy.from_yaml(params[:manifest])
+        response = NetworkPolicies::DeployResourceService.new(
+          policy: policy,
+          environment: environment
+        ).execute
+
+        respond_with_service_response(response)
+      end
+
+      def update
+        policy = Gitlab::Kubernetes::NetworkPolicy.from_yaml(params[:manifest])
+        response = NetworkPolicies::DeployResourceService.new(
+          resource_name: params[:id],
+          policy: policy,
+          environment: environment
+        ).execute
+
+        respond_with_service_response(response)
+      end
+
+      def destroy
+        response = NetworkPolicies::DeleteResourceService.new(
+          resource_name: params[:id],
+          environment: environment
+        ).execute
+
+        respond_with_service_response(response)
+      end
+
       private
 
       def parse_time(params, fallback)
@@ -49,8 +84,17 @@ module Projects
         Gitlab::PollingInterval.set_header(response, interval: POLLING_INTERVAL)
       end
 
-      def authorize_read_network_policies!
+      def authorize_read_threat_monitoring!
         render_403 unless can?(current_user, :read_threat_monitoring, project)
+      end
+
+      def respond_with_service_response(response)
+        payload = response.success? ? response.payload : { error: response.message }
+        respond_to do |format|
+          format.json do
+            render status: response.http_status, json: payload
+          end
+        end
       end
     end
   end

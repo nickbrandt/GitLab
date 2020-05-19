@@ -14049,6 +14049,15 @@ msgstr ""
 msgid "Network"
 msgstr ""
 
+msgid "NetworkPolicies|Environment does not have deployment platform"
+msgstr ""
+
+msgid "NetworkPolicies|Invalid or empty policy"
+msgstr ""
+
+msgid "NetworkPolicies|Kubernetes error: %{error}"
+msgstr ""
+
 msgid "NetworkPolicies|Something went wrong, unable to fetch policies"
 msgstr ""
 
