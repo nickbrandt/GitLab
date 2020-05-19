@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -16,6 +17,7 @@ import (
 	"testing"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/labkit/log"
 
@@ -175,6 +177,14 @@ func LoadFile(t *testing.T, filePath string) string {
 		t.Fatal(err)
 	}
 	return string(content)
+}
+
+func ReadAll(t *testing.T, r io.Reader) []byte {
+	t.Helper()
+
+	b, err := ioutil.ReadAll(r)
+	require.NoError(t, err)
+	return b
 }
 
 func ParseJWT(token *jwt.Token) (interface{}, error) {

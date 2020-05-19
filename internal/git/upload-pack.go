@@ -21,13 +21,8 @@ var (
 func handleUploadPack(w *HttpResponseWriter, r *http.Request, a *api.Response) error {
 	ctx := r.Context()
 
-	// The body will consist almost entirely of 'have XXX' and 'want XXX'
-	// lines; these are about 50 bytes long. With a size limit of 10MiB, the
-	// client can send over 200,000 have/want lines.
-	sizeLimited := io.LimitReader(r.Body, 10*1024*1024)
-
 	// Prevent the client from holding the connection open indefinitely. A
-	// transfer rate of 17KiB/sec is sufficient to fill the 10MiB buffer in
+	// transfer rate of 17KiB/sec is sufficient to send 10MiB of data in
 	// ten minutes, which seems adequate. Most requests will be much smaller.
 	// This mitigates a use-after-check issue.
 	//
@@ -36,21 +31,16 @@ func handleUploadPack(w *HttpResponseWriter, r *http.Request, a *api.Response) e
 	readerCtx, cancel := context.WithTimeout(ctx, uploadPackTimeout)
 	defer cancel()
 
-	limited := helper.NewContextReader(readerCtx, sizeLimited)
-	buffer, err := helper.ReadAllTempfile(limited)
-
-	if err != nil {
-		return fmt.Errorf("ReadAllTempfile: %v", err)
-	}
-	defer buffer.Close()
-	r.Body.Close()
+	limited := helper.NewContextReader(readerCtx, r.Body)
+	cr, cw := helper.NewWriteAfterReader(limited, w)
+	defer cw.Flush()
 
 	action := getService(r)
 	writePostRPCHeader(w, action)
 
 	gitProtocol := r.Header.Get("Git-Protocol")
 
-	return handleUploadPackWithGitaly(ctx, a, buffer, w, gitProtocol)
+	return handleUploadPackWithGitaly(ctx, a, cr, cw, gitProtocol)
 }
 
 func handleUploadPackWithGitaly(ctx context.Context, a *api.Response, clientRequest io.Reader, clientResponse io.Writer, gitProtocol string) error {

@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -190,15 +191,17 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 
 	gitProtocol := "fake Git protocol"
 	resource := "/gitlab-org/gitlab-test.git/git-receive-pack"
-	resp, body := httpPost(
+	resp := httpPost(
 		t,
 		ws.URL+resource,
 		map[string]string{
 			"Content-Type": "application/x-git-receive-pack-request",
 			"Git-Protocol": gitProtocol,
 		},
-		testhelper.GitalyReceivePackResponseMock,
+		bytes.NewReader(testhelper.GitalyReceivePackResponseMock),
 	)
+	defer resp.Body.Close()
+	body := string(testhelper.ReadAll(t, resp.Body))
 
 	split := strings.SplitN(body, "\000", 2)
 	require.Len(t, split, 2)
@@ -257,6 +260,11 @@ func TestPostReceivePackProxiedToGitalyInterrupted(t *testing.T) {
 	}
 }
 
+// ReaderFunc is an adapter to turn a conforming function into an io.Reader.
+type ReaderFunc func(b []byte) (int, error)
+
+func (r ReaderFunc) Read(b []byte) (int, error) { return r(b) }
+
 func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 	for i, tc := range []struct {
 		showAllRefs bool
@@ -283,19 +291,39 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 
 			gitProtocol := "fake git protocol"
 			resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
-			resp, body := httpPost(
+
+			requestReader := bytes.NewReader(testhelper.GitalyUploadPackResponseMock)
+			var m sync.Mutex
+			requestReadFinished := false
+			resp := httpPost(
 				t,
 				ws.URL+resource,
 				map[string]string{
 					"Content-Type": "application/x-git-upload-pack-request",
 					"Git-Protocol": gitProtocol,
 				},
-				testhelper.GitalyUploadPackResponseMock,
+				ReaderFunc(func(b []byte) (int, error) {
+					n, err := requestReader.Read(b)
+					if err != nil {
+						m.Lock()
+						requestReadFinished = true
+						m.Unlock()
+					}
+					return n, err
+				}),
 			)
-
+			defer resp.Body.Close()
 			require.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 			testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 
+			m.Lock()
+			requestFinished := requestReadFinished
+			m.Unlock()
+			if !requestFinished {
+				t.Fatalf("response written before request was fully read")
+			}
+
+			body := string(testhelper.ReadAll(t, resp.Body))
 			bodySplit := strings.SplitN(body, "\000", 2)
 			require.Len(t, bodySplit, 2)
 

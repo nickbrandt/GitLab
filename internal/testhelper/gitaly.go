@@ -195,11 +195,16 @@ func (s *GitalyTestServer) PostUploadPack(stream gitalypb.SmartHTTPService_PostU
 		return err
 	}
 
-	data := []byte(strings.Join([]string{
-		jsonString,
-	}, "\000") + "\000")
+	if err := stream.Send(&gitalypb.PostUploadPackResponse{
+		Data: []byte(strings.Join([]string{jsonString}, "\000") + "\000"),
+	}); err != nil {
+		return err
+	}
 
-	// The body of the request starts in the second message
+	nSends := 0
+	// The body of the request starts in the second message. Gitaly streams PostUploadPack responses
+	// as soon as possible without reading the request completely first. We stream messages here
+	// directly back to the client to simulate the streaming of the actual implementation.
 	for {
 		req, err := stream.Recv()
 		if err != nil {
@@ -209,12 +214,12 @@ func (s *GitalyTestServer) PostUploadPack(stream gitalypb.SmartHTTPService_PostU
 			break
 		}
 
-		data = append(data, req.GetData()...)
-	}
+		if err := stream.Send(&gitalypb.PostUploadPackResponse{Data: req.GetData()}); err != nil {
+			return err
+		}
 
-	nSends, _ := sendBytes(data, 100, func(p []byte) error {
-		return stream.Send(&gitalypb.PostUploadPackResponse{Data: p})
-	})
+		nSends++
+	}
 
 	if nSends <= 1 {
 		panic("should have sent more than one message")
