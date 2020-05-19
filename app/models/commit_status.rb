@@ -148,6 +148,10 @@ class CommitStatus < ApplicationRecord
       commit_status.failure_reason = CommitStatus.failure_reasons[failure_reason]
     end
 
+    around_transition do |commit_status, &block|
+      Gitlab::OptimisticLocking.retry_lock(commit_status, nil, &block)
+    end
+
     after_transition do |commit_status, transition|
       next if transition.loopback?
       next if commit_status.processed?
