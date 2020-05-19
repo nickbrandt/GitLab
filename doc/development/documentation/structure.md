@@ -41,7 +41,7 @@ and other logical divisions such as pre- and post-deployment steps.
 To start a new document, respect the file tree and file name guidelines,
 as well as the style guidelines. Use the following template:
 
-```md
+```markdown
 <!--Follow the Style Guide when working on this document. https://docs.gitlab.com/ee/development/documentation/styleguide.html
 When done, remove all of this commented-out text, except a commented-out Troubleshooting section,
 which, if empty, can be left in place to encourage future use.-->
