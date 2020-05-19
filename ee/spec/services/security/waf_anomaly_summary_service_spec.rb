@@ -226,7 +226,7 @@ describe Security::WafAnomalySummaryService do
     context 'with time window' do
       it 'passes time frame to ElasticSearch' do
         from = 1.day.ago
-        to = Time.now
+        to = Time.current
 
         subject = described_class.new(
           environment: environment,

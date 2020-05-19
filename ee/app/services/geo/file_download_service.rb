@@ -15,7 +15,7 @@ module Geo
 
     def execute
       try_obtain_lease do
-        start_time = Time.now
+        start_time = Time.current
 
         download_result = downloader.execute
 
@@ -49,7 +49,7 @@ module Geo
         bytes_downloaded: download_result.bytes_downloaded,
         failed_before_transfer: download_result.failed_before_transfer,
         primary_missing_file: download_result.primary_missing_file,
-        download_time_s: (Time.now - start_time).to_f.round(3)
+        download_time_s: (Time.current - start_time).to_f.round(3)
       }
 
       log_info("File download", metadata)

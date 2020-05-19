@@ -14,7 +14,7 @@ describe EE::AuditEvents::BulkInsertService do
       EE::AuditEvents::RepositoryPushAuditEventService.new(user, entity, target_ref, from, to)
     end
   end
-  let(:timestamp) { Time.new(2019, 10, 10) }
+  let(:timestamp) { Time.zone.local(2019, 10, 10) }
   let(:attrs) do
     {
       author_id: user.id,

@@ -74,7 +74,7 @@ module Geo
         "#{type}_verification_checksum_sha" => checksum,
         "#{type}_verification_checksum_mismatched" => mismatch,
         "#{type}_checksum_mismatch" => mismatch.present?,
-        "last_#{type}_verification_ran_at" => Time.now,
+        "last_#{type}_verification_ran_at" => Time.current,
         "last_#{type}_verification_failure" => failure,
         "#{type}_verification_retry_count" => verification_retry_count,
         "resync_#{type}" => reverify,

@@ -75,7 +75,7 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     def download_time_in_seconds
-      (Time.now.to_f - registry.last_synced_at.to_f).round(3)
+      (Time.current.to_f - registry.last_synced_at.to_f).round(3)
     end
 
     def redownload?

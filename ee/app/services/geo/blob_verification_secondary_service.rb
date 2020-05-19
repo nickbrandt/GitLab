@@ -65,7 +65,7 @@ module Geo
         verification_checksum: checksum,
         verification_checksum_mismatched: mismatch,
         checksum_mismatch: mismatch.present?,
-        verified_at: Time.now,
+        verified_at: Time.current,
         verification_failure: failure,
         verification_retry_count: verification_retry_count,
         retry_at: resync_retry_at,

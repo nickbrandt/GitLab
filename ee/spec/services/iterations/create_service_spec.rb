@@ -20,7 +20,7 @@ describe Iterations::CreateService do
           {
               title: 'v2.1.9',
               description: 'Patch release to fix security issue',
-              start_date: Time.now.to_s,
+              start_date: Time.current.to_s,
               due_date: 1.day.from_now.to_s
           }
         end

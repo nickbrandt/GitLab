@@ -11,7 +11,7 @@ describe Ci::Minutes::BatchResetService do
         id: id,
         shared_runners_minutes_limit: 100,
         extra_shared_runners_minutes_limit: 50,
-        last_ci_minutes_notification_at: Time.now,
+        last_ci_minutes_notification_at: Time.current,
         last_ci_minutes_usage_notification_level: 30)
 
       create(:namespace_statistics, namespace: namespace, shared_runners_seconds: seconds_used)

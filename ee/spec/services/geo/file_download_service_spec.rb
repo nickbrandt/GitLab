@@ -194,7 +194,7 @@ describe Geo::FileDownloadService do
                 execute!
 
                 expect(registry.last.reload.retry_count).to eq(1)
-                expect(registry.last.retry_at > Time.now).to be_truthy
+                expect(registry.last.retry_at > Time.current).to be_truthy
               end
             end
           end
@@ -223,7 +223,7 @@ describe Geo::FileDownloadService do
                 execute!
 
                 expect(registry.last.reload.retry_count).to eq(1)
-                expect(registry.last.retry_at > Time.now).to be_truthy
+                expect(registry.last.retry_at > Time.current).to be_truthy
               end
             end
           end
@@ -315,7 +315,7 @@ describe Geo::FileDownloadService do
               execute!
 
               expect(registry_entry.reload.retry_count).to eq(4)
-              expect(registry_entry.retry_at > Time.now).to be_truthy
+              expect(registry_entry.retry_at > Time.current).to be_truthy
             end
           end
 
@@ -354,7 +354,7 @@ describe Geo::FileDownloadService do
               execute!
 
               expect(registry_entry.reload.retry_count).to eq(4)
-              expect(registry_entry.retry_at > Time.now).to be_truthy
+              expect(registry_entry.retry_at > Time.current).to be_truthy
             end
           end
 

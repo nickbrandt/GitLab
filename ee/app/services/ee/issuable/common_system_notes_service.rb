@@ -38,7 +38,7 @@ module EE
         if weight_changes_tracking_enabled?
           # Only create a resource event here if is_update is true to exclude the move issue operation.
           # ResourceEvents for moved issues are written within AttributesRewriter.
-          EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.now).execute if is_update
+          EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.current).execute if is_update
         else
           ::SystemNoteService.change_weight_note(issuable, issuable.project, current_user)
         end

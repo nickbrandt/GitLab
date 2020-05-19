@@ -125,7 +125,7 @@ describe Ci::Minutes::EmailNotificationService do
 
           context 'when last_ci_minutes_notification_at has a value' do
             before do
-              namespace.update_attribute(:last_ci_minutes_notification_at, Time.now)
+              namespace.update_attribute(:last_ci_minutes_notification_at, Time.current)
             end
 
             it 'does not notify owners' do

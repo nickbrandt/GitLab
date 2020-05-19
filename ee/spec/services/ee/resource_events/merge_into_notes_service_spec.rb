@@ -26,7 +26,7 @@ describe ResourceEvents::MergeIntoNotesService do
   let_it_be(:scoped_label_group2_1) { create(:label, project: project, title: 'key2::value') }
   let_it_be(:scoped_label_group2_2) { create(:label, project: project, title: 'key2::value2') }
   let_it_be(:scoped_label_group3_1) { create(:label, project: project, title: 'key3::value') }
-  let(:time) { Time.now }
+  let(:time) { Time.current }
 
   describe '#execute' do
     it 'squashes events with same time and author into single note but scoped labels are separated' do

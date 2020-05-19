@@ -15,8 +15,8 @@ module EE
 
       def attributes
         base_payload.merge(type: SecurityEvent.to_s,
-                           created_at: DateTime.now,
-                           updated_at: DateTime.now,
+                           created_at: DateTime.current,
+                           updated_at: DateTime.current,
                            details: @details.to_yaml)
       end
 
