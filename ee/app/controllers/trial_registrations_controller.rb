@@ -9,7 +9,6 @@ class TrialRegistrationsController < RegistrationsController
 
   before_action :check_if_gl_com
   before_action :set_redirect_url, only: [:new]
-  before_action :skip_confirmation, only: [:create]
 
   def new
   end
@@ -24,10 +23,6 @@ class TrialRegistrationsController < RegistrationsController
     else
       store_location_for(:user, target_url)
     end
-  end
-
-  def skip_confirmation
-    params[:user][:skip_confirmation] = true
   end
 
   override :sign_up_params
