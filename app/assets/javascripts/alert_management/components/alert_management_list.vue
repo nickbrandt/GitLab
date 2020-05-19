@@ -26,6 +26,7 @@ import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
 const tdClass = 'table-col d-flex d-md-table-cell align-items-center';
 const bodyTrClass =
   'gl-border-1 gl-border-t-solid gl-border-gray-100 hover-bg-blue-50 hover-gl-cursor-pointer hover-gl-border-b-solid hover-gl-border-blue-200';
+const findSortColumn = () => document.getElementsByClassName('started-at')[0];
 
 export default {
   i18n: {
@@ -46,6 +47,7 @@ export default {
     {
       key: 'startTime',
       label: s__('AlertManagement|Start time'),
+      thClass: 'started-at',
       tdClass,
       sortable: true,
     },
@@ -60,6 +62,7 @@ export default {
       label: s__('AlertManagement|Alert'),
       thClass: 'w-30p',
       tdClass,
+      sortable: false,
     },
     {
       key: 'eventCount',
@@ -154,9 +157,8 @@ export default {
       errored: false,
       isAlertDismissed: false,
       isErrorAlertDismissed: false,
-      sort: null,
+      sort: 'START_TIME_ASC',
       statusFilter: this.$options.statusTabs[4].filters,
-
     };
   },
   computed: {
@@ -178,6 +180,9 @@ export default {
       return !this.loading && this.hasAlerts ? bodyTrClass : '';
     },
   },
+  mounted() {
+    findSortColumn().ariaSort = 'ascending';
+  },
   methods: {
     filterAlertsByStatus(tabIndex) {
       this.statusFilter = this.$options.statusTabs[tabIndex].filters;
@@ -185,6 +190,9 @@ export default {
     fetchSortedData({ sortBy, sortDesc }) {
       const sortDirection = sortDesc ? 'DESC' : 'ASC';
       const sortColumn = sortBy.replace(/([A-Z])/g, '_$1').toUpperCase();
+      if(sortBy !== 'startTime') {
+        findSortColumn().ariaSort = 'none';
+      }
       this.sort = `${sortColumn}_${sortDirection}`;
     },
     capitalizeFirstCharacter,
