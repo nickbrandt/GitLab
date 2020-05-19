@@ -14519,6 +14519,9 @@ msgstr ""
 msgid "Notes|Collapse replies"
 msgstr ""
 
+msgid "Notes|Private comments are accessible by internal staff only"
+msgstr ""
+
 msgid "Notes|Show all activity"
 msgstr ""
 
