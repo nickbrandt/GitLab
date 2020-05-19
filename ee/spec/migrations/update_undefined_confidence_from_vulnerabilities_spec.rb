@@ -8,10 +8,12 @@ describe UpdateUndefinedConfidenceFromVulnerabilities, :migration do
   let(:vulnerabilities) { table(:vulnerabilities) }
   let(:identifiers) { table(:vulnerability_identifiers) }
   let(:projects) { table(:projects) }
+  let(:namespaces) { table(:namespaces) }
   let(:users) { table(:users) }
 
   before do
-    projects.create!(id: 123, namespace_id: 12, name: 'gitlab', path: 'gitlab')
+    namespace = namespaces.create!(name: 'namespace1', path: 'namespace1')
+    projects.create!(id: 123, namespace_id: namespace.id, name: 'gitlab', path: 'gitlab')
     users.create!(id: 13, email: 'author@example.com', notification_email: 'author@example.com', name: 'author', username: 'author', projects_limit: 10, state: 'active')
     stub_const("#{described_class}::BATCH_SIZE", 2)
   end

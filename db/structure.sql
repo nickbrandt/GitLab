@@ -11563,6 +11563,9 @@ ALTER TABLE ONLY public.personal_access_tokens
 ALTER TABLE ONLY public.project_settings
     ADD CONSTRAINT fk_project_settings_push_rule_id FOREIGN KEY (push_rule_id) REFERENCES public.push_rules(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY public.projects
+    ADD CONSTRAINT fk_projects_namespace_id FOREIGN KEY (namespace_id) REFERENCES public.namespaces(id) ON DELETE RESTRICT;
+
 ALTER TABLE ONLY public.protected_branch_merge_access_levels
     ADD CONSTRAINT fk_protected_branch_merge_access_levels_user_id FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
@@ -13834,6 +13837,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200506154421
 20200507221434
 20200508091106
+20200511080113
+20200511083541
 20200511092246
 20200511092505
 20200511092714
@@ -13847,6 +13852,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200511145545
 20200511162057
 20200511162115
+20200511220023
 20200512085150
 20200512164334
 20200513160930
