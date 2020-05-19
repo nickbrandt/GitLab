@@ -1,6 +1,7 @@
 <script>
 import { mapActions } from 'vuex';
 import PanelResizer from '~/vue_shared/components/panel_resizer.vue';
+import { DEFAULT_SIDEBAR_MIN_WIDTH } from '../constants';
 
 export default {
   components: {
@@ -14,7 +15,7 @@ export default {
     minSize: {
       type: Number,
       required: false,
-      default: 340,
+      default: DEFAULT_SIDEBAR_MIN_WIDTH,
     },
     side: {
       type: String,
