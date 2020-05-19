@@ -22,10 +22,11 @@ module JiraConnect
 
     def log_response(response)
       message = {
+        message: 'response from jira dev_info api',
         integration: 'JiraConnect',
         project_id: project.id,
         project_path: project.full_path,
-        response: response
+        jira_response: response&.to_json
       }
 
       if response && response['errorMessages']
