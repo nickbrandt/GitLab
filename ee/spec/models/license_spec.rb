@@ -831,28 +831,22 @@ describe License do
   end
 
   describe '#promo_feature_available?' do
-    subject { described_class.promo_feature_available?(feature) }
+    subject { described_class.promo_feature_available?(:container_scanning) }
 
-    shared_examples 'CI CD trial features' do |status|
+    context 'with promo_container_scanning disabled' do
       before do
-        stub_feature_flags(free_period_for_pull_mirroring: status)
+        stub_feature_flags(promo_container_scanning: false)
       end
 
-      License::ANY_PLAN_FEATURES.each do |feature_name|
-        context "with #{feature_name}" do
-          let(:feature) { feature_name }
+      it { is_expected.to be_falsey }
+    end
 
-          it { is_expected.to eq(status) }
-        end
+    context 'with promo_container_scanning enabled' do
+      before do
+        stub_feature_flags(promo_container_scanning: true)
       end
-    end
 
-    context 'with free_period_for_pull_mirroring enabled' do
-      it_behaves_like 'CI CD trial features', true
-    end
-
-    context 'with free_period_for_pull_mirroring disabled' do
-      it_behaves_like 'CI CD trial features', false
+      it { is_expected.to be_truthy }
     end
   end
 

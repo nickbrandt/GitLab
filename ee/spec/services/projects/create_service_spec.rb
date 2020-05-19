@@ -132,7 +132,6 @@ describe Projects::CreateService, '#execute' do
 
       context 'with checks on the namespace' do
         before do
-          stub_const('License::ANY_PLAN_FEATURES', [])
           enable_namespace_license_check!
         end
 

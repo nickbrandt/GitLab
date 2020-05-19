@@ -670,9 +670,9 @@ describe Project do
       end
 
       License::EEU_FEATURES.each do |feature_sym|
-        let(:feature) { feature_sym }
-
         context feature_sym.to_s do
+          let(:feature) { feature_sym }
+
           unless License::GLOBAL_FEATURES.include?(feature_sym)
             context "checking #{feature_sym} availability both on Global and Namespace license" do
               let(:check_namespace_plan) { true }
@@ -728,6 +728,17 @@ describe Project do
                 it 'returns false' do
                   is_expected.to eq(false)
                 end
+              end
+
+              context 'with promo feature flag' do
+                let(:allowed_on_global_license) { true }
+
+                before do
+                  project.clear_memoization(:licensed_feature_available)
+                  stub_feature_flags("promo_#{feature}" => true)
+                end
+
+                it { is_expected.to be_truthy }
               end
             end
           end
