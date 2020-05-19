@@ -380,7 +380,6 @@ RSpec/LeakyConstantDeclaration:
     - 'spec/migrations/encrypt_plaintext_attributes_on_application_settings_spec.rb'
     - 'spec/models/clusters/cluster_spec.rb'
     - 'spec/models/concerns/batch_destroy_dependent_associations_spec.rb'
-    - 'spec/models/concerns/blocks_json_serialization_spec.rb'
     - 'spec/models/concerns/bulk_insert_safe_spec.rb'
     - 'spec/models/concerns/bulk_insertable_associations_spec.rb'
     - 'spec/models/concerns/mentionable_spec.rb'
