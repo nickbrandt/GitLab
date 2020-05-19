@@ -1,0 +1,5 @@
+---
+title: Accepts ended_at time for update Alert status GraphQL mutation
+merge_request: 32452
+author:
+type: changed
