@@ -17640,6 +17640,9 @@ msgstr ""
 msgid "Registration|Your profile"
 msgstr ""
 
+msgid "Rejected (closed)"
+msgstr ""
+
 msgid "Related Deployed Jobs"
 msgstr ""
 
@@ -24253,6 +24256,9 @@ msgstr ""
 msgid "Wait for the file to load to copy its contents"
 msgstr ""
 
+msgid "Waiting for merge (open and assigned)"
+msgstr ""
+
 msgid "Waiting for performance data"
 msgstr ""
 
@@ -24583,6 +24589,9 @@ msgid "Withdraw Access Request"
 msgstr ""
 
 msgid "Won't fix / Accept risk"
+msgstr ""
+
+msgid "Work in progress (open and unassigned)"
 msgstr ""
 
 msgid "Work in progress Limit"
