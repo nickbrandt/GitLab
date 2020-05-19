@@ -11,6 +11,7 @@ RSpec.describe Packages::Package, type: :model do
     it { is_expected.to have_many(:tags).inverse_of(:package) }
     it { is_expected.to have_one(:conan_metadatum).inverse_of(:package) }
     it { is_expected.to have_one(:maven_metadatum).inverse_of(:package) }
+    it { is_expected.to have_one(:nuget_metadatum).inverse_of(:package) }
   end
 
   describe '.sort_by_attribute' do

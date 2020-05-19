@@ -12,6 +12,12 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
   let(:package_version) { '1.0.0' }
   let(:package_file_name) { 'dummyproject.dummypackage.1.0.0.nupkg' }
 
+  RSpec.shared_examples 'raising an' do |error_class|
+    it "raises an #{error_class}" do
+      expect { subject }.to raise_error(error_class)
+    end
+  end
+
   describe '#execute' do
     subject { service.execute }
 
@@ -65,8 +71,10 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
 
       it 'updates package and package file' do
         expect { subject }
-          .to change { Packages::Dependency.count }.by(1)
+          .to change { ::Packages::Package.count }.by(1)
+          .and change { Packages::Dependency.count }.by(1)
           .and change { Packages::DependencyLink.count }.by(1)
+          .and change { ::Packages::Nuget::Metadatum.count }.by(0)
 
         expect(package.reload.name).to eq(package_name)
         expect(package.version).to eq(package_version)
@@ -92,6 +100,7 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
           .and change { Packages::Dependency.count }.by(0)
           .and change { Packages::DependencyLink.count }.by(0)
           .and change { Packages::Nuget::DependencyLinkMetadatum.count }.by(0)
+          .and change { ::Packages::Nuget::Metadatum.count }.by(0)
         expect(package_file.reload.file_name).to eq(package_file_name)
         expect(package_file.package).to eq(existing_package)
       end
@@ -129,6 +138,29 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
           expect(existing_package.tags.map(&:name)).to contain_exactly(*expected_tags)
         end
       end
+
+      it 'creates nuget metadatum' do
+        expect { subject }
+          .to change { ::Packages::Package.count }.by(1)
+          .and change { ::Packages::Nuget::Metadatum.count }.by(1)
+
+        metadatum = package_file.reload.package.nuget_metadatum
+        expect(metadatum.license_url).to eq('https://opensource.org/licenses/MIT')
+        expect(metadatum.project_url).to eq('https://gitlab.com/gitlab-org/gitlab')
+        expect(metadatum.icon_url).to eq('https://opensource.org/files/osi_keyhole_300X300_90ppi_0.png')
+      end
+
+      context 'with too long url' do
+        let_it_be(:too_long_url) { "http://localhost/#{'bananas' * 50}" }
+
+        let(:metadata) { { package_name: package_name, package_version: package_version, license_url: too_long_url } }
+
+        before do
+          allow(service).to receive(:metadata).and_return(metadata)
+        end
+
+        it_behaves_like 'raising an', ::Packages::Nuget::UpdatePackageFromMetadataService::InvalidMetadataError
+      end
     end
 
     context 'with nuspec file with dependencies' do
@@ -163,9 +195,7 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
         allow_any_instance_of(Zip::File).to receive(:glob).and_return([])
       end
 
-      it 'raises an error' do
-        expect { subject }.to raise_error(::Packages::Nuget::MetadataExtractionService::ExtractionError)
-      end
+      it_behaves_like 'raising an', ::Packages::Nuget::MetadataExtractionService::ExtractionError
     end
 
     context 'with package file with a blank package name' do
@@ -173,9 +203,7 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
         allow(service).to receive(:package_name).and_return('')
       end
 
-      it 'raises an error' do
-        expect { subject }.to raise_error(::Packages::Nuget::UpdatePackageFromMetadataService::InvalidMetadataError)
-      end
+      it_behaves_like 'raising an', ::Packages::Nuget::UpdatePackageFromMetadataService::InvalidMetadataError
     end
 
     context 'with package file with a blank package version' do
@@ -183,9 +211,7 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
         allow(service).to receive(:package_version).and_return('')
       end
 
-      it 'raises an error' do
-        expect { subject }.to raise_error(::Packages::Nuget::UpdatePackageFromMetadataService::InvalidMetadataError)
-      end
+      it_behaves_like 'raising an', ::Packages::Nuget::UpdatePackageFromMetadataService::InvalidMetadataError
     end
 
     context 'with an invalid package version' do

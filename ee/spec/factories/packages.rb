@@ -47,6 +47,12 @@ FactoryBot.define do
       after :create do |package|
         create :package_file, :nuget, package: package, file_name: "#{package.name}.#{package.version}.nupkg"
       end
+
+      trait(:with_metadatum) do
+        after :build do |pkg|
+          pkg.nuget_metadatum = build(:nuget_metadatum)
+        end
+      end
     end
 
     factory :pypi_package do
@@ -240,6 +246,14 @@ FactoryBot.define do
   factory :pypi_metadatum, class: 'Packages::Pypi::Metadatum' do
     association :package, package_type: :pypi
     required_python { '>=2.7' }
+  end
+
+  factory :nuget_metadatum, class: 'Packages::Nuget::Metadatum' do
+    package { create(:nuget_package) }
+
+    license_url { 'http://www.gitlab.com' }
+    project_url { 'http://www.gitlab.com' }
+    icon_url { 'http://www.gitlab.com' }
   end
 
   factory :conan_file_metadatum, class: 'Packages::Conan::FileMetadatum' do

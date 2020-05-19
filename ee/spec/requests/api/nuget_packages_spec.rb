@@ -204,7 +204,7 @@ describe API::NugetPackages do
 
   describe 'GET /api/v4/projects/:id/packages/nuget/metadata/*package_name/index' do
     let_it_be(:package_name) { 'Dummy.Package' }
-    let_it_be(:packages) { create_list(:nuget_package, 5, name: package_name, project: project) }
+    let_it_be(:packages) { create_list(:nuget_package, 5, :with_metadatum, name: package_name, project: project) }
     let_it_be(:tags) { packages.each { |pkg| create(:packages_tag, package: pkg, name: 'test') } }
     let(:url) { "/projects/#{project.id}/packages/nuget/metadata/#{package_name}/index.json" }
 
@@ -265,7 +265,7 @@ describe API::NugetPackages do
 
   describe 'GET /api/v4/projects/:id/packages/nuget/metadata/*package_name/*package_version' do
     let_it_be(:package_name) { 'Dummy.Package' }
-    let_it_be(:package) { create(:nuget_package, name: 'Dummy.Package', project: project) }
+    let_it_be(:package) { create(:nuget_package, :with_metadatum, name: 'Dummy.Package', project: project) }
     let_it_be(:tag) { create(:packages_tag, package: package, name: 'test') }
     let(:url) { "/projects/#{project.id}/packages/nuget/metadata/#{package_name}/#{package.version}.json" }
 
@@ -448,7 +448,7 @@ describe API::NugetPackages do
   end
 
   describe 'GET /api/v4/projects/:id/packages/nuget/query' do
-    let_it_be(:package_a) { create(:nuget_package, name: 'Dummy.PackageA', project: project) }
+    let_it_be(:package_a) { create(:nuget_package, :with_metadatum, name: 'Dummy.PackageA', project: project) }
     let_it_be(:tag) { create(:packages_tag, package: package_a, name: 'test') }
     let_it_be(:packages_b) { create_list(:nuget_package, 5, name: 'Dummy.PackageB', project: project) }
     let_it_be(:packages_c) { create_list(:nuget_package, 5, name: 'Dummy.PackageC', project: project) }

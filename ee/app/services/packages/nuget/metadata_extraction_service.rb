@@ -9,7 +9,10 @@ module Packages
 
       XPATHS = {
         package_name: '//xmlns:package/xmlns:metadata/xmlns:id',
-        package_version: '//xmlns:package/xmlns:metadata/xmlns:version'
+        package_version: '//xmlns:package/xmlns:metadata/xmlns:version',
+        license_url: '//xmlns:package/xmlns:metadata/xmlns:licenseUrl',
+        project_url: '//xmlns:package/xmlns:metadata/xmlns:projectUrl',
+        icon_url: '//xmlns:package/xmlns:metadata/xmlns:iconUrl'
       }.freeze
 
       XPATH_DEPENDENCIES = '//xmlns:package/xmlns:metadata/xmlns:dependencies/xmlns:dependency'
@@ -45,8 +48,9 @@ module Packages
       def extract_metadata(file)
         doc = Nokogiri::XML(file)
 
-        XPATHS.map { |key, query| [key, doc.xpath(query).text] }
+        XPATHS.map { |key, query| [key, doc.xpath(query).text.presence] }
               .to_h
+              .compact
               .tap do |metadata|
                 metadata[:package_dependencies] = extract_dependencies(doc)
                 metadata[:package_tags] = extract_tags(doc)
