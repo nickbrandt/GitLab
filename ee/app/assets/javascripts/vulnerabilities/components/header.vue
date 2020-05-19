@@ -82,7 +82,9 @@ export default {
     },
     canDownloadPatch() {
       return (
-        this.vulnerability.state !== 'resolved' && !this.vulnerability.hasMr && this.hasRemediation
+        this.vulnerability.state !== VULNERABILITY_STATE_OBJECTS.resolved.state &&
+        !this.vulnerability.hasMr &&
+        this.hasRemediation
       );
     },
     hasIssue() {
@@ -105,7 +107,8 @@ export default {
     },
     showResolutionAlert() {
       return (
-        this.vulnerability.resolved_on_default_branch && this.vulnerability.state !== 'resolved'
+        this.vulnerability.resolved_on_default_branch &&
+        this.vulnerability.state !== VULNERABILITY_STATE_OBJECTS.resolved.state
       );
     },
   },

@@ -287,7 +287,7 @@ describe('Vulnerability Header', () => {
       });
     });
 
-    describe('can download download patch', () => {
+    describe('can download patch', () => {
       beforeEach(() => {
         createWrapper({
           finding: getFinding({ shouldShowMergeRequestButton: true }),
@@ -302,7 +302,6 @@ describe('Vulnerability Header', () => {
 
       it('emits downloadPatch when download patch button is clicked', () => {
         const glDeprecatedButton = findGlDeprecatedButton();
-        expect(glDeprecatedButton.exists()).toBe(true);
         glDeprecatedButton.vm.$emit('click');
         return wrapper.vm.$nextTick().then(() => {
           expect(download).toHaveBeenCalledWith({ fileData: diff, fileName: `remediation.patch` });
