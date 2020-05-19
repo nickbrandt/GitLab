@@ -875,6 +875,14 @@ describe Namespace do
     end
   end
 
+  shared_context 'project bot users' do
+    let(:project_bot) { create(:user, :project_bot) }
+
+    before do
+      project.add_maintainer(project_bot)
+    end
+  end
+
   describe '#billed_user_ids' do
     context 'with a user namespace' do
       let(:user) { create(:user) }
@@ -917,6 +925,12 @@ describe Namespace do
 
           it 'includes invited active users except guests to the group' do
             expect(group.billed_user_ids).to match_array([project_developer.id, developer.id])
+          end
+
+          context 'with project bot users' do
+            include_context 'project bot users'
+
+            it { expect(group.billed_user_ids).not_to include(project_bot.id) }
           end
 
           context 'when group is invited to the project' do
@@ -1033,6 +1047,12 @@ describe Namespace do
               expect(group.billed_user_ids).to match_array([guest.id, developer.id, project_guest.id, project_developer.id])
             end
 
+            context 'with project bot users' do
+              include_context 'project bot users'
+
+              it { expect(group.billed_user_ids).not_to include(project_bot.id) }
+            end
+
             context 'when group is invited to the project' do
               let(:invited_group) { create(:group) }
               let(:invited_group_developer) { create(:user) }
@@ -1124,6 +1144,12 @@ describe Namespace do
             expect(group.billable_members_count).to eq(2)
           end
 
+          context 'with project bot users' do
+            include_context 'project bot users'
+
+            it { expect(group.billable_members_count).to eq(2) }
+          end
+
           context 'when group is invited to the project' do
             let(:invited_group) { create(:group) }
 
@@ -1179,6 +1205,12 @@ describe Namespace do
 
             it 'includes invited active users to the group' do
               expect(group.billable_members_count).to eq(4)
+            end
+
+            context 'with project bot users' do
+              include_context 'project bot users'
+
+              it { expect(group.billable_members_count).to eq(4) }
             end
 
             context 'when group is invited to the project' do

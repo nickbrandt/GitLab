@@ -10101,6 +10101,8 @@ CREATE INDEX index_namespaces_on_trial_ends_on ON public.namespaces USING btree 
 
 CREATE INDEX index_namespaces_on_type_partial ON public.namespaces USING btree (type) WHERE (type IS NOT NULL);
 
+CREATE INDEX index_non_requested_project_members_on_source_id_and_type ON public.members USING btree (source_id, source_type) WHERE ((requested_at IS NULL) AND ((type)::text = 'ProjectMember'::text));
+
 CREATE UNIQUE INDEX index_note_diff_files_on_diff_note_id ON public.note_diff_files USING btree (diff_note_id);
 
 CREATE INDEX index_notes_on_author_id_and_created_at_and_id ON public.notes USING btree (author_id, created_at, id);
@@ -13864,5 +13866,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200514000009
 20200514000132
 20200514000340
+20200515155620
 \.
 
