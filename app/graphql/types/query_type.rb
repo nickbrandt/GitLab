@@ -47,6 +47,18 @@ module Types
           null: false,
           description: 'Fields related to design management'
 
+    field :users, Types::UserType.connection_type,
+          null: true,
+          resolver: Resolvers::UsersResolver,
+          description: 'Find all Users updatable by the current user',
+          authorize: :update_user
+
+    field :user, Types::UserType,
+          null: true,
+          description: 'Find a User',
+          resolver: Resolvers::UserResolver,
+          authorize: :update_user
+
     field :echo, GraphQL::STRING_TYPE, null: false,
           description: 'Text to echo back',
           resolver: Resolvers::EchoResolver

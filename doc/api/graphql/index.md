@@ -57,6 +57,8 @@ The GraphQL API includes the following queries at the root level:
 
 1. `project` : Project information, with many of its associations such as issues and merge requests.
 1. `group` : Basic group information and epics **(ULTIMATE)** are currently supported.
+1. `users` : Information about users that the currently logged in user has edit access to.
+1. `user` : Information about a particular user that the currently logged in user has edit access to.
 1. `namespace` : Within a namespace it is also possible to fetch `projects`.
 1. `currentUser`: Information about the currently logged in user.
 1. `metaData`: Metadata about GitLab and the GraphQL API.

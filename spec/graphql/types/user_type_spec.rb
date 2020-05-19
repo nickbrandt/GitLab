@@ -9,7 +9,7 @@ describe GitlabSchema.types['User'] do
 
   it 'has the expected fields' do
     expected_fields = %w[
-      id user_permissions snippets name username avatarUrl webUrl todos state
+      id user_permissions snippets name username avatarUrl webUrl todos state memberships
     ]
 
     expect(described_class).to have_graphql_fields(*expected_fields)
@@ -21,6 +21,14 @@ describe GitlabSchema.types['User'] do
     it 'returns snippets' do
       is_expected.to have_graphql_type(Types::SnippetType.connection_type)
       is_expected.to have_graphql_resolver(Resolvers::Users::SnippetsResolver)
+    end
+  end
+
+  describe 'memberships field' do
+    subject { described_class.fields['memberships'] }
+
+    it 'returns memberships' do
+      is_expected.to have_graphql_type(Types::MemberType.connection_type)
     end
   end
 end

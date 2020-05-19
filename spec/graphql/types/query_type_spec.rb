@@ -8,9 +8,9 @@ describe GitlabSchema.types['Query'] do
   end
 
   it 'has the expected fields' do
-    expected_fields = %i[project namespace group echo metadata current_user snippets design_management]
+    expected_fields = %i[project namespace group echo metadata current_user snippets design_management users user projects vulnerabilities vulnerabilitiesCountByDayAndSeverity geoNode instanceSecurityDashboard]
 
-    expect(described_class).to have_graphql_fields(*expected_fields).at_least
+    expect(described_class).to have_graphql_fields(*expected_fields)
   end
 
   describe 'namespace field' do
@@ -39,6 +39,18 @@ describe GitlabSchema.types['Query'] do
     it 'returns metadata' do
       is_expected.to have_graphql_type(Types::MetadataType)
       is_expected.to have_graphql_resolver(Resolvers::MetadataResolver)
+    end
+  end
+
+  describe 'users field' do
+    subject { described_class.fields['users'] }
+
+    it 'returns users' do
+      is_expected.to have_graphql_type(Types::UserType.connection_type)
+    end
+
+    it 'resolves users' do
+      is_expected.to have_graphql_resolver(Resolvers::UsersResolver)
     end
   end
 end
