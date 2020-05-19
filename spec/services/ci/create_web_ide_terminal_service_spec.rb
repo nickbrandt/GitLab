@@ -7,10 +7,6 @@ describe Ci::CreateWebIdeTerminalService do
   let_it_be(:user) { create(:user) }
   let(:ref) { 'master' }
 
-  before do
-    stub_licensed_features(web_ide_terminal: true)
-  end
-
   describe '#execute' do
     subject { described_class.new(project, user, ref: ref).execute }
 
@@ -101,7 +97,7 @@ describe Ci::CreateWebIdeTerminalService do
         end
 
         context 'when terminal is already running' do
-          let!(:webide_pipeline) { create(:ee_ci_pipeline, :webide, :running, project: project, user: user) }
+          let!(:webide_pipeline) { create(:ci_pipeline, :webide, :running, project: project, user: user) }
 
           it_behaves_like 'having an error', 'There is already a terminal running'
         end

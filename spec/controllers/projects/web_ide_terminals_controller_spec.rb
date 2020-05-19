@@ -15,8 +15,6 @@ describe Projects::WebIdeTerminalsController do
   let(:user) { maintainer }
 
   before do
-    stub_licensed_features(web_ide_terminal: true)
-
     project.add_maintainer(maintainer)
     project.add_developer(developer)
     project.add_reporter(reporter)
