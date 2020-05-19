@@ -34,12 +34,6 @@ describe Projects::Security::VulnerabilitiesController do
         expect(response.body).to have_text(vulnerability.title)
       end
 
-      it 'renders the file location' do
-        show_vulnerability
-
-        expect(response.body).to have_text(vulnerability.finding.location['file'])
-      end
-
       it 'renders the solution card' do
         show_vulnerability
 
