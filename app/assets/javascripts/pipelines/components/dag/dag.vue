@@ -3,6 +3,7 @@ import { GlAlert } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 
 export default {
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   name: 'Dag',
   components: {
     GlAlert,
@@ -19,9 +20,16 @@ export default {
       showFailureAlert: false,
     };
   },
+  computed: {
+    shouldDisplayGraph() {
+      return !this.showFailureAlert;
+    },
+  },
   mounted() {
-    const drawGraph = this.drawGraph;
-    const reportFailure = this.reportFailure;
+    const {
+      drawGraph,
+      reportFailure
+    } = this;
 
     if (!this.graphUrl) {
       reportFailure();
@@ -34,11 +42,6 @@ export default {
         drawGraph(response.data);
       })
       .catch(reportFailure);
-  },
-  computed: {
-    shouldDisplayGraph() {
-      return !this.showFailureAlert;
-    },
   },
   methods: {
     drawGraph(data) {

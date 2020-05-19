@@ -93,7 +93,7 @@ const createPipelineHeaderApp = mediator => {
   });
 };
 
-const createPipelinesTabs = () => {
+const createPipelinesTabs = (dataset) => {
   const tabsElement = document.querySelector('.pipelines-tabs');
   const testReportsEnabled =
     window.gon && window.gon.features && window.gon.features.junitPipelineView;
@@ -148,7 +148,6 @@ const createTestDetails = detailsEndpoint => {
 const createDagApp = () => {
   const el = document.querySelector('#js-pipeline-dag-vue');
   const graphUrl = el.dataset?.pipelineDataPath;
-  console.log(graphUrl);
   // eslint-disable-next-line no-new
   new Vue({
     el,
@@ -172,7 +171,7 @@ export default () => {
 
   createPipelinesDetailApp(mediator);
   createPipelineHeaderApp(mediator);
-  createPipelinesTabs();
+  createPipelinesTabs(dataset);
   createTestDetails(dataset.testReportsCountEndpoint);
   createDagApp();
 };
