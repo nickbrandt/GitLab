@@ -36,7 +36,7 @@ Some credentials are required to be able to run `aws` commands:
 
 1. You can now use `aws` commands in the `.gitlab-ci.yml` file of this project:
 
-   ```yml
+   ```yaml
    deploy:
      stage: deploy
      image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest # see the note below
