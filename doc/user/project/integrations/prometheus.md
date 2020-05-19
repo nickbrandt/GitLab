@@ -19,7 +19,7 @@ There are two ways to set up Prometheus integration, depending on where your app
 - For deployments on Kubernetes, GitLab can automatically [deploy and manage Prometheus](#managed-prometheus-on-kubernetes).
 - For other deployment targets, simply [specify the Prometheus server](#manual-configuration-of-prometheus).
 
-Once enabled, GitLab will automatically detect metrics from known services in the [metric library](#monitoring-cicd-environments). You can also [add your own metrics](#adding-custom-metrics).
+Once enabled, GitLab will automatically detect metrics from known services in the [metric library](../metrics/index.md). You can also [add your own metrics](../metrics/index.md#adding-custom-metrics).
 
 ## Enabling Prometheus Integration
 
@@ -62,34 +62,6 @@ will help you to quickly create a deployment:
 1. When the pipeline has run successfully, graphs will be available on the **Operations > Metrics** page.
 
 ![Monitoring Dashboard](img/prometheus_monitoring_dashboard_v12_8.png)
-
-#### Using the Metrics Dashboard
-
-##### Select an environment
-
-The **Environment** dropdown box above the dashboard displays the list of all [environments](#monitoring-cicd-environments).
-It enables you to search as you type through all environments and select the one you're looking for.
-
-![Monitoring Dashboard Environments](img/prometheus_dashboard_environments_v12_8.png)
-
-##### Select a dashboard
-
-The **dashboard** dropdown box above the dashboard displays the list of all dashboards available for the project.
-It enables you to search as you type through all dashboards and select the one you're looking for.
-
-![Monitoring Dashboard select](img/prometheus_dashboard_select_v_13_0.png)
-
-##### Mark a dashboard as favorite
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/214582) in GitLab 13.0.
-
-When viewing a dashboard, click the empty **Star dashboard** **{star-o}** button to mark a
-dashboard as a favorite. Starred dashboards display a solid star **{star}** button,
-and appear at the top of the dashboard select list.
-
-To remove dashboard from the favorites list, click the solid **Unstar Dashboard** **{star}** button.
-
-![Monitoring Dashboard favorite state toggle](img/toggle_metrics_user_starred_dashboard_v13_0.png)
 
 #### About managed Prometheus deployments
 
@@ -158,7 +130,7 @@ one of them will be used:
   [Prometheus manual configuration](#manual-configuration-of-prometheus)
   and a [managed Prometheus on Kubernetes](#managed-prometheus-on-kubernetes),
   the manual configuration takes precedence and is used to run queries from
-  [dashboards](#defining-custom-dashboards-per-project) and [custom metrics](#adding-custom-metrics).
+  [dashboards](../metrics/index.md#defining-custom-dashboards-per-project) and [custom metrics](../metrics/index.md#adding-custom-metrics).
 - If you have managed Prometheus applications installed on Kubernetes clusters
   at **different** levels (project, group, instance), the order of precedence is described in
   [Cluster precedence](../../instance/clusters/index.md#cluster-precedence).
