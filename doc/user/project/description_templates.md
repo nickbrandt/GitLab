@@ -39,19 +39,25 @@ templates of the default branch will be taken into account.
 Create a new Markdown (`.md`) file inside the `.gitlab/issue_templates/`
 directory in your repository. Commit and push to your default branch.
 
-To create a Markdown file: 
- 1. Click on the`+` button next to `master` and select "New file"
- 1. Add the name of your issue template to the `File name` box by `master`. Make sure words are separated by underscores and that you include `.md` at the end (e.g. "feature_request.md").
- 3. Commit and push to your default branch.
+To create a Markdown file:
 
-If you do not have a `.gitlab/issue_templates/` directory in your repo, you'll needd to create one. 
+ 1. Click the `+` button next to `master` and click **New file**.
+ 1. Add the name of your issue template to the **File name** text field next to `master`.
+    Make sure words are separated with underscores and that your file has the `.md` extension, for
+    example `feature_request.md`.
+ 1. Commit and push to your default branch.
 
-To create the `.gitlab/issue_templates/` directory: 
- 1. Click on the`+` button next to `master` and select "New directory"
- 1. Name this new directory .gitlab and commit to your default branch. 
- 1. Click on the`+` button next to `master` again and select "New directory". This time, name your directory `issue_templates` and commit to your default branch. Make sure that it's spelled exactly like that with underscores. 
+If you don't have a `.gitlab/issue_templates` directory in your repository, you'll need to create it.
 
-You can check to make sure your this all worked by creating a new issue and seeing if you can "Choose a template".
+To create the `.gitlab/issue_templates` directory:
+
+ 1. Click the `+` button next to `master` and select **New directory**.
+ 1. Name this new directory `.gitlab` and commit to your default branch.
+ 1. Click the `+` button next to `master` again and select **New directory**.This time, n
+ 1. Name your directory `issue_templates` and commit to your default branch.
+
+To check if this has worked correctly, [create a new issue](./issues/managing_issues.md#create-a-new-issue)
+and see if you can choose a description template.
 
 ## Creating merge request templates
 
