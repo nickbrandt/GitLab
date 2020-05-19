@@ -630,7 +630,7 @@ page), use the following phrases (based on the SVG icons):
 
 ## Quotes
 
-Valid for Markdown content only, not for frontmatter entries:
+Valid for Markdown content only, not for front matter entries:
 
 - Standard quotes: double quotes (`"`). Example: "This is wrapped in double quotes".
 - Quote within a quote: double quotes (`"`) wrap single quotes (`'`). Example: "I am 'quoting' something within a quote".
