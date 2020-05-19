@@ -1589,6 +1589,18 @@ Completion status of tasks
 | `completedCount` | Int! | Number of completed tasks |
 | `count` | Int! | Number of total tasks |
 
+## TestReport
+
+Represents a requirement test report.
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `author` | User | Author of the test report |
+| `createdAt` | Time! | Timestamp of when the test report was created |
+| `id` | ID! | ID of the test report |
+| `pipeline` | Pipeline | Pipeline that created the test report |
+| `state` | TestReportState! | State of the test report |
+
 ## Timelog
 
 | Name  | Type  | Description |

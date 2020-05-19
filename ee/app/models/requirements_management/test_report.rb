@@ -2,6 +2,8 @@
 
 module RequirementsManagement
   class TestReport < ApplicationRecord
+    include Sortable
+
     belongs_to :requirement, inverse_of: :test_reports
     belongs_to :author, inverse_of: :test_reports, class_name: 'User'
     belongs_to :pipeline, class_name: 'Ci::Pipeline'

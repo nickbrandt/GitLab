@@ -19,7 +19,7 @@ module RequirementsManagement
     belongs_to :author, inverse_of: :requirements, class_name: 'User'
     belongs_to :project, inverse_of: :requirements
 
-    has_many :test_reports, inverse_of: :requirements
+    has_many :test_reports, inverse_of: :requirement
 
     has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.requirements&.maximum(:iid) }
 
