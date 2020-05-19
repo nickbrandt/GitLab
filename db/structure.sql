@@ -288,7 +288,6 @@ CREATE TABLE public.application_settings (
     geo_status_timeout integer DEFAULT 10,
     uuid character varying,
     polling_interval_multiplier numeric DEFAULT 1.0 NOT NULL,
-    elasticsearch_experimental_indexer boolean,
     cached_markdown_version integer,
     check_namespace_plan boolean DEFAULT false NOT NULL,
     mirror_max_delay integer DEFAULT 300 NOT NULL,
@@ -13823,6 +13822,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200424101920
 20200424135319
 20200427064130
+20200428134356
 20200429001827
 20200429002150
 20200429015603
