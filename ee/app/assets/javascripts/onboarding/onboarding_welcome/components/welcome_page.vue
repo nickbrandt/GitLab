@@ -2,10 +2,10 @@
 import { GlLink } from '@gitlab/ui';
 import { __ } from '~/locale';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
-import HelpContentPopover from './../../onboarding_helper/components/help_content_popover.vue';
-import ActionPopover from './../../onboarding_helper/components/action_popover.vue';
+import HelpContentPopover from '../../onboarding_helper/components/help_content_popover.vue';
+import ActionPopover from '../../onboarding_helper/components/action_popover.vue';
 import { redirectTo } from '~/lib/utils/url_utility';
-import onboardingUtils from './../../utils';
+import onboardingUtils from '../../utils';
 
 export default {
   components: {
