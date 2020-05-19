@@ -3,20 +3,32 @@
 module Discussions
   class ResolveService < Discussions::BaseService
     def execute(one_or_more_discussions)
+      @merge_request = find_merge_request(one_or_more_discussions)
+
       Array(one_or_more_discussions).each { |discussion| resolve_discussion(discussion) }
     end
+
+    private
+
+    attr_accessor :merge_request
 
     def resolve_discussion(discussion)
       return unless discussion.can_resolve?(current_user)
 
       discussion.resolve!(current_user)
 
-      MergeRequests::ResolvedDiscussionNotificationService.new(project, current_user).execute(merge_request)
+      MergeRequests::ResolvedDiscussionNotificationService.new(project, current_user).execute(merge_request) if merge_request
       SystemNoteService.discussion_continued_in_issue(discussion, project, current_user, follow_up_issue) if follow_up_issue
     end
 
-    def merge_request
-      params[:merge_request]
+    # Prefer the Merge Request passed in the params, if present, otherwise
+    # find it through the discussion
+    def find_merge_request(one_or_more_discussions)
+      return params[:merge_request] if params[:merge_request]
+
+      discussion = one_or_more_discussions.is_a?(Array) ? one_or_more_discussions.first : one_or_more_discussions
+
+      discussion.noteable if discussion.for_merge_request?
     end
 
     def follow_up_issue

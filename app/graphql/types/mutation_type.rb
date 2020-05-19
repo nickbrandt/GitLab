@@ -13,6 +13,8 @@ module Types
     mount_mutation Mutations::AwardEmojis::Remove
     mount_mutation Mutations::AwardEmojis::Toggle
     mount_mutation Mutations::Branches::Create, calls_gitaly: true
+    mount_mutation Mutations::Discussions::Resolve, description: 'Resolves a Discusssion'
+    mount_mutation Mutations::Discussions::Unresolve, description: 'Unresolves a Discusssion'
     mount_mutation Mutations::Issues::SetConfidential
     mount_mutation Mutations::Issues::SetDueDate
     mount_mutation Mutations::Issues::Update

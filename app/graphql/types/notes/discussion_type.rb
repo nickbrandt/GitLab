@@ -16,6 +16,8 @@ module Types
       field :notes, Types::Notes::NoteType.connection_type, null: false,
             description: 'All notes in the discussion'
 
+      # consider adding resolved_at, resolved_by etc to this object
+
       # The gem we use to generate Global IDs is hard-coded to work with
       # `id` properties. To generate a GID for the `reply_id` property,
       # we must use the ::Gitlab::GlobalId module.
