@@ -79,7 +79,7 @@ change prior to merging.
 If you indeed need to change a document's location, do not remove the old
 document, but instead replace all of its content with the following:
 
-```md
+```markdown
 ---
 redirect_to: '../path/to/file/index.md'
 ---
@@ -102,7 +102,7 @@ For example, if you move `doc/workflow/lfs/index.md` to
 1. Copy `doc/workflow/lfs/index.md` to `doc/administration/lfs.md`
 1. Replace the contents of `doc/workflow/lfs/index.md` with:
 
-   ```md
+   ```markdown
    ---
    redirect_to: '../../administration/lfs.md'
    ---
