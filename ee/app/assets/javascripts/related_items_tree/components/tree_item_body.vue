@@ -186,7 +186,7 @@ export default {
           </div>
 
           <div
-            class="item-meta d-flex flex-wrap mt-xl-0 flex-xl-nowrap align-items-center border-top pb-1 pt-2 ml-4"
+            class="item-meta d-flex flex-wrap mt-xl-0 flex-xl-nowrap align-items-center pb-1 pt-2 ml-4"
           >
             <span class="mr-3">{{ itemHierarchy }}</span>
             <gl-tooltip v-if="isEpic" :target="() => $refs.countBadge">
