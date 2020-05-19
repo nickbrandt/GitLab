@@ -60,12 +60,12 @@ export default {
     {
       key: 'title',
       label: s__('AlertManagement|Alert'),
-      thClass: 'w-30p',
+      thClass: 'w-30p alert-title',
       tdClass,
       sortable: false,
     },
     {
-      key: 'eventCount',
+      key: 'eventsCount',
       label: s__('AlertManagement|Events'),
       thClass: 'text-right gl-pr-9',
       tdClass: `${tdClass} text-md-right`,
@@ -190,7 +190,7 @@ export default {
     fetchSortedData({ sortBy, sortDesc }) {
       const sortDirection = sortDesc ? 'DESC' : 'ASC';
       const sortColumn = sortBy.replace(/([A-Z])/g, '_$1').toUpperCase();
-      if(sortBy !== 'startTime') {
+      if (sortBy !== 'startTime') {
         findSortColumn().ariaSort = 'none';
       }
       this.sort = `${sortColumn}_${sortDirection}`;
@@ -281,6 +281,10 @@ export default {
 
         <template #cell(endTime)="{ item }">
           <time-ago v-if="item.endedAt" :time="item.endedAt" />
+        </template>
+
+        <template #cell(eventsCount)="{ item }">
+          {{ item.eventCount }}
         </template>
 
         <template #cell(title)="{ item }">
