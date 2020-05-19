@@ -1,6 +1,4 @@
 import Api from '~/api';
-import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import { GlFilteredSearchToken, GlFilteredSearchSuggestion, GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import PipelineBranchNameToken from '~/pipelines/components/tokens/pipeline_branch_name_token.vue';
@@ -8,7 +6,6 @@ import { branches, mockBranchesAfterMap } from '../mock_data';
 
 describe('Pipeline Branch Name Token', () => {
   let wrapper;
-  let mock;
 
   const findFilteredSearchToken = () => wrapper.find(GlFilteredSearchToken);
   const findAllFilteredSearchSuggestions = () => wrapper.findAll(GlFilteredSearchSuggestion);
@@ -50,15 +47,12 @@ describe('Pipeline Branch Name Token', () => {
   };
 
   beforeEach(() => {
-    mock = new MockAdapter(axios);
-
     jest.spyOn(Api, 'branches').mockResolvedValue({ data: branches });
 
     createComponent();
   });
 
   afterEach(() => {
-    mock.restore();
     wrapper.destroy();
     wrapper = null;
   });
