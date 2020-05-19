@@ -134,7 +134,7 @@ describe Gitlab::ImportExport::FastHashSerializer do
   end
 
   it 'has no when YML attributes but only the DB column' do
-    expect_any_instance_of(Gitlab::Ci::YamlProcessor).not_to receive(:build_attributes)
+    expect(Gitlab::Ci::YamlProcessor).not_to receive(:new)
 
     subject
   end

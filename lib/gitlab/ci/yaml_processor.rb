@@ -239,3 +239,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::Ci::YamlProcessor.prepend_if_ee('EE::Gitlab::Ci::YamlProcessor')

@@ -53,6 +53,7 @@ class License < ApplicationRecord
     board_assignee_lists
     board_milestone_lists
     ci_cd_projects
+    ci_secrets_management
     cluster_deployments
     code_owner_approval_required
     commit_committer_check

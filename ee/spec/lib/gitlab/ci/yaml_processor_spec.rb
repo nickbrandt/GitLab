@@ -204,4 +204,39 @@ describe Gitlab::Ci::YamlProcessor do
       end
     end
   end
+
+  describe 'Secrets' do
+    let(:secrets) do
+      {
+        vault: {
+          db_vault: {
+            url: 'https://db.vault.example.com',
+            auth: {
+              name: 'jwt',
+              path: 'jwt',
+              data: { role: 'production' }
+            },
+            secrets: {
+              DATABASE_CREDENTIALS: {
+                engine: { name: 'kv-v2', path: 'kv-v2' },
+                path: 'production/db',
+                fields: %w(username password),
+                strategy: 'read'
+              }
+            }
+          }
+        }
+      }
+    end
+
+    let(:config) { { deploy_to_production: { stage: 'deploy', script: ['echo'], secrets: secrets } } }
+
+    subject(:processor) { described_class.new(YAML.dump(config)) }
+
+    it "returns secrets info" do
+      options = processor.stage_builds_attributes('deploy').first.fetch(:options)
+
+      expect(options.fetch(:secrets)).to eq(secrets)
+    end
+  end
 end
