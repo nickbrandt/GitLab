@@ -78,7 +78,7 @@ describe 'Cluster Health board', :js, :kubeclient, :use_clean_rails_memory_store
         expect(page).to have_css('.prometheus-graph')
         expect(page).to have_css('.prometheus-graph-title')
         expect(page).to have_css('[_echarts_instance_]')
-        expect(page).to have_css('.gl-legend-inline')
+        expect(page).to have_content('Avg:')
       end
     end
 
