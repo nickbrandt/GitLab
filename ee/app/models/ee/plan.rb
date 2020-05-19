@@ -38,16 +38,6 @@ module EE
         EE_DEFAULT_PLANS
       end
 
-      override :default
-      def default
-        # GitLab.com default plan is `free`
-        if ::Gitlab.com?
-          free
-        else
-          super
-        end
-      end
-
       # This always returns an object if running on GitLab.com
       def free
         return unless ::Gitlab.com?
