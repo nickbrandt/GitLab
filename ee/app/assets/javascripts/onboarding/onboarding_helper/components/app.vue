@@ -3,7 +3,7 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import { redirectTo } from '~/lib/utils/url_utility';
 import Tracking from '~/tracking';
 import OnboardingHelper from './onboarding_helper.vue';
-import actionPopoverUtils from './../action_popover_utils';
+import actionPopoverUtils from '../action_popover_utils';
 import eventHub from '../event_hub';
 
 const TRACKING_CATEGORY = 'onboarding';

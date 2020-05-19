@@ -1,7 +1,7 @@
 import createState from 'ee/onboarding/onboarding_helper/store/state';
 import mutations from 'ee/onboarding/onboarding_helper/store/mutations';
 import * as types from 'ee/onboarding/onboarding_helper/store/mutation_types';
-import { mockTourData } from './../mock_data';
+import { mockTourData } from '../mock_data';
 
 describe('User onboarding helper store mutations', () => {
   let state;

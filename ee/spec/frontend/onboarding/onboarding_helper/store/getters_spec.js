@@ -1,6 +1,6 @@
 import * as getters from 'ee/onboarding/onboarding_helper/store/getters';
 import createStore from 'ee/onboarding/onboarding_helper/store/state';
-import { mockTourData } from './../mock_data';
+import { mockTourData } from '../mock_data';
 
 describe('User onboarding store getters', () => {
   let localState;

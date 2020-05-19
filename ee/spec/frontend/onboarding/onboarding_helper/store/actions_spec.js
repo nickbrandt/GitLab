@@ -15,7 +15,7 @@ import {
 } from 'ee/onboarding/onboarding_helper/store/actions';
 import { ONBOARDING_DISMISSED_COOKIE_NAME } from 'ee/onboarding/constants';
 import onboardingUtils from 'ee/onboarding/utils';
-import mockData from './../mock_data';
+import mockData from '../mock_data';
 
 describe('User onboarding helper store actions', () => {
   let state;
