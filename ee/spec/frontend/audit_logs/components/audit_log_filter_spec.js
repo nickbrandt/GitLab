@@ -2,6 +2,7 @@ import { GlFilteredSearch } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 
 import AuditLogFilter from 'ee/audit_logs/components/audit_log_filter.vue';
+import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_logs/constants';
 
 describe('AuditLogFilter', () => {
   let wrapper;
@@ -13,8 +14,11 @@ describe('AuditLogFilter', () => {
   const getAvailableTokenProps = type =>
     getAvailableTokens().filter(token => token.type === type)[0];
 
-  const initComponent = () => {
+  const initComponent = (props = {}) => {
     wrapper = shallowMount(AuditLogFilter, {
+      propsData: {
+        ...props,
+      },
       methods: {
         getFormElement: () => formElement,
       },
@@ -110,6 +114,21 @@ describe('AuditLogFilter', () => {
       expect(wrapper.find('input[name="entity_id"]').attributes().value).toEqual(
         searchTerm.value.data,
       );
+    });
+  });
+
+  describe('when enabling just a single token type', () => {
+    const type = AVAILABLE_TOKEN_TYPES[0];
+
+    beforeEach(() => {
+      initComponent({
+        enabledTokenTypes: [type],
+      });
+    });
+
+    it('only the enabled token type is available for selection', () => {
+      expect(getAvailableTokens().length).toEqual(1);
+      expect(getAvailableTokens()).toMatchObject([{ type }]);
     });
   });
 });

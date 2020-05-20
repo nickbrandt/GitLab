@@ -1,43 +1,18 @@
 <script>
 import { GlFilteredSearch } from '@gitlab/ui';
-import { s__, __ } from '~/locale';
 import { queryToObject } from '~/lib/utils/url_utility';
-import UserToken from './tokens/user_token.vue';
-import ProjectToken from './tokens/project_token.vue';
-import GroupToken from './tokens/group_token.vue';
-
-const DEFAULT_TOKEN_OPTIONS = {
-  operators: [{ value: '=', description: __('is'), default: 'true' }],
-  unique: true,
-};
-const FILTER_TOKENS = [
-  {
-    ...DEFAULT_TOKEN_OPTIONS,
-    icon: 'user',
-    title: s__('AuditLogs|User Events'),
-    type: 'User',
-    token: UserToken,
-  },
-  {
-    ...DEFAULT_TOKEN_OPTIONS,
-    icon: 'bookmark',
-    title: s__('AuditLogs|Project Events'),
-    type: 'Project',
-    token: ProjectToken,
-  },
-  {
-    ...DEFAULT_TOKEN_OPTIONS,
-    icon: 'group',
-    title: s__('AuditLogs|Group Events'),
-    type: 'Group',
-    token: GroupToken,
-  },
-];
-const ALLOWED_FILTER_TYPES = FILTER_TOKENS.map(token => token.type);
+import { FILTER_TOKENS, AVAILABLE_TOKEN_TYPES } from '../constants';
 
 export default {
   components: {
     GlFilteredSearch,
+  },
+  props: {
+    enabledTokenTypes: {
+      type: Array,
+      required: false,
+      default: () => AVAILABLE_TOKEN_TYPES,
+    },
   },
   data() {
     return {
@@ -46,18 +21,21 @@ export default {
   },
   computed: {
     searchTerm() {
-      return this.searchTerms.find(term => ALLOWED_FILTER_TYPES.includes(term.type));
+      return this.searchTerms.find(term => AVAILABLE_TOKEN_TYPES.includes(term.type));
+    },
+    enabledTokens() {
+      return FILTER_TOKENS.filter(token => this.enabledTokenTypes.includes(token.type));
     },
     filterTokens() {
       // This limits the user to search by only one of the available tokens
-      const { searchTerm } = this;
+      const { enabledTokens, searchTerm } = this;
       if (searchTerm?.type) {
-        return FILTER_TOKENS.map(token => ({
+        return enabledTokens.map(token => ({
           ...token,
           disabled: searchTerm.type !== token.type,
         }));
       }
-      return FILTER_TOKENS;
+      return enabledTokens;
     },
     id() {
       return this.searchTerm?.value?.data;
