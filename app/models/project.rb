@@ -1270,12 +1270,18 @@ class Project < ApplicationRecord
     service = find_service(services, name)
     return service if service
 
-    template = find_service(services_templates, name)
+    instance = find_service(services_instances, name)
 
-    if template
-      Service.build_from_integration(id, template)
+    if instance
+      Service.build_from_integration(id, instance)
     else
-      public_send("build_#{name}_service") # rubocop:disable GitlabSecurity/PublicSend
+      template = find_service(services_templates, name)
+
+      if template
+        Service.build_from_integration(id, template)
+      else
+        public_send("build_#{name}_service") # rubocop:disable GitlabSecurity/PublicSend
+      end
     end
   end
 
@@ -2573,7 +2579,11 @@ class Project < ApplicationRecord
   end
 
   def services_templates
-    @services_templates ||= Service.where(template: true)
+    @services_templates ||= Service.templates
+  end
+
+  def services_instances
+    @services_instances ||= Service.instances
   end
 
   def ensure_pages_metadatum
