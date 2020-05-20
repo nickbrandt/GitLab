@@ -79,7 +79,7 @@ describe('packages_list_app', () => {
     });
 
     it('includes the right content on the default tab', () => {
-      const heading = findEmptyState().find('h4');
+      const heading = findEmptyState().find('h1');
 
       expect(heading.text()).toBe('There are no packages yet');
     });

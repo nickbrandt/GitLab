@@ -20,8 +20,8 @@ exports[`packages_list_app renders 1`] = `
     >
       <template>
         <div>
-          <div
-            class="row empty-state"
+          <section
+            class="row empty-state text-center"
           >
             <div
               class="col-12"
@@ -31,7 +31,7 @@ exports[`packages_list_app renders 1`] = `
               >
                 <img
                   alt="There are no packages yet"
-                  class=""
+                  class="gl-max-w-full"
                   src="helpSvg"
                 />
               </div>
@@ -41,19 +41,15 @@ exports[`packages_list_app renders 1`] = `
               class="col-12"
             >
               <div
-                class="text-content"
+                class="text-content gl-mx-auto gl-my-0 gl-p-5"
               >
-                <h4
-                  class="center"
-                  style=""
+                <h1
+                  class="h4"
                 >
                   There are no packages yet
-                </h4>
+                </h1>
                  
-                <p
-                  class="center"
-                  style=""
-                >
+                <p>
                   <p>
                     Learn how to 
                     <a
@@ -66,16 +62,14 @@ exports[`packages_list_app renders 1`] = `
                   </p>
                 </p>
                  
-                <div
-                  class="text-center"
-                >
+                <div>
                   <!---->
                    
                   <!---->
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </template>
     </b-tab-stub>
@@ -87,8 +81,8 @@ exports[`packages_list_app renders 1`] = `
     >
       <template>
         <div>
-          <div
-            class="row empty-state"
+          <section
+            class="row empty-state text-center"
           >
             <div
               class="col-12"
@@ -98,7 +92,7 @@ exports[`packages_list_app renders 1`] = `
               >
                 <img
                   alt="There are no Conan packages yet"
-                  class=""
+                  class="gl-max-w-full"
                   src="helpSvg"
                 />
               </div>
@@ -108,19 +102,15 @@ exports[`packages_list_app renders 1`] = `
               class="col-12"
             >
               <div
-                class="text-content"
+                class="text-content gl-mx-auto gl-my-0 gl-p-5"
               >
-                <h4
-                  class="center"
-                  style=""
+                <h1
+                  class="h4"
                 >
                   There are no Conan packages yet
-                </h4>
+                </h1>
                  
-                <p
-                  class="center"
-                  style=""
-                >
+                <p>
                   <p>
                     Learn how to 
                     <a
@@ -133,16 +123,14 @@ exports[`packages_list_app renders 1`] = `
                   </p>
                 </p>
                  
-                <div
-                  class="text-center"
-                >
+                <div>
                   <!---->
                    
                   <!---->
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </template>
     </b-tab-stub>
@@ -154,8 +142,8 @@ exports[`packages_list_app renders 1`] = `
     >
       <template>
         <div>
-          <div
-            class="row empty-state"
+          <section
+            class="row empty-state text-center"
           >
             <div
               class="col-12"
@@ -165,7 +153,7 @@ exports[`packages_list_app renders 1`] = `
               >
                 <img
                   alt="There are no Maven packages yet"
-                  class=""
+                  class="gl-max-w-full"
                   src="helpSvg"
                 />
               </div>
@@ -175,19 +163,15 @@ exports[`packages_list_app renders 1`] = `
               class="col-12"
             >
               <div
-                class="text-content"
+                class="text-content gl-mx-auto gl-my-0 gl-p-5"
               >
-                <h4
-                  class="center"
-                  style=""
+                <h1
+                  class="h4"
                 >
                   There are no Maven packages yet
-                </h4>
+                </h1>
                  
-                <p
-                  class="center"
-                  style=""
-                >
+                <p>
                   <p>
                     Learn how to 
                     <a
@@ -200,16 +184,14 @@ exports[`packages_list_app renders 1`] = `
                   </p>
                 </p>
                  
-                <div
-                  class="text-center"
-                >
+                <div>
                   <!---->
                    
                   <!---->
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </template>
     </b-tab-stub>
@@ -221,8 +203,8 @@ exports[`packages_list_app renders 1`] = `
     >
       <template>
         <div>
-          <div
-            class="row empty-state"
+          <section
+            class="row empty-state text-center"
           >
             <div
               class="col-12"
@@ -232,7 +214,7 @@ exports[`packages_list_app renders 1`] = `
               >
                 <img
                   alt="There are no NPM packages yet"
-                  class=""
+                  class="gl-max-w-full"
                   src="helpSvg"
                 />
               </div>
@@ -242,19 +224,15 @@ exports[`packages_list_app renders 1`] = `
               class="col-12"
             >
               <div
-                class="text-content"
+                class="text-content gl-mx-auto gl-my-0 gl-p-5"
               >
-                <h4
-                  class="center"
-                  style=""
+                <h1
+                  class="h4"
                 >
                   There are no NPM packages yet
-                </h4>
+                </h1>
                  
-                <p
-                  class="center"
-                  style=""
-                >
+                <p>
                   <p>
                     Learn how to 
                     <a
@@ -267,16 +245,14 @@ exports[`packages_list_app renders 1`] = `
                   </p>
                 </p>
                  
-                <div
-                  class="text-center"
-                >
+                <div>
                   <!---->
                    
                   <!---->
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </template>
     </b-tab-stub>
@@ -288,8 +264,8 @@ exports[`packages_list_app renders 1`] = `
     >
       <template>
         <div>
-          <div
-            class="row empty-state"
+          <section
+            class="row empty-state text-center"
           >
             <div
               class="col-12"
@@ -299,7 +275,7 @@ exports[`packages_list_app renders 1`] = `
               >
                 <img
                   alt="There are no NuGet packages yet"
-                  class=""
+                  class="gl-max-w-full"
                   src="helpSvg"
                 />
               </div>
@@ -309,19 +285,15 @@ exports[`packages_list_app renders 1`] = `
               class="col-12"
             >
               <div
-                class="text-content"
+                class="text-content gl-mx-auto gl-my-0 gl-p-5"
               >
-                <h4
-                  class="center"
-                  style=""
+                <h1
+                  class="h4"
                 >
                   There are no NuGet packages yet
-                </h4>
+                </h1>
                  
-                <p
-                  class="center"
-                  style=""
-                >
+                <p>
                   <p>
                     Learn how to 
                     <a
@@ -334,16 +306,14 @@ exports[`packages_list_app renders 1`] = `
                   </p>
                 </p>
                  
-                <div
-                  class="text-center"
-                >
+                <div>
                   <!---->
                    
                   <!---->
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </template>
     </b-tab-stub>
@@ -355,8 +325,8 @@ exports[`packages_list_app renders 1`] = `
     >
       <template>
         <div>
-          <div
-            class="row empty-state"
+          <section
+            class="row empty-state text-center"
           >
             <div
               class="col-12"
@@ -366,7 +336,7 @@ exports[`packages_list_app renders 1`] = `
               >
                 <img
                   alt="There are no PyPi packages yet"
-                  class=""
+                  class="gl-max-w-full"
                   src="helpSvg"
                 />
               </div>
@@ -376,19 +346,15 @@ exports[`packages_list_app renders 1`] = `
               class="col-12"
             >
               <div
-                class="text-content"
+                class="text-content gl-mx-auto gl-my-0 gl-p-5"
               >
-                <h4
-                  class="center"
-                  style=""
+                <h1
+                  class="h4"
                 >
                   There are no PyPi packages yet
-                </h4>
+                </h1>
                  
-                <p
-                  class="center"
-                  style=""
-                >
+                <p>
                   <p>
                     Learn how to 
                     <a
@@ -401,16 +367,14 @@ exports[`packages_list_app renders 1`] = `
                   </p>
                 </p>
                  
-                <div
-                  class="text-center"
-                >
+                <div>
                   <!---->
                    
                   <!---->
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </template>
     </b-tab-stub>

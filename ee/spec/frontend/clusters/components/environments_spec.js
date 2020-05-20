@@ -28,11 +28,13 @@ describe('Environments', () => {
 
   it('renders an empty state if no deployments are found', () => {
     const emptyState = wrapper.find(GlEmptyState);
-    const emptyStateText =
-      'No deployments found Ensure your environment is part of the deploy stage of your CI pipeline to track deployments to your cluster.  Learn more about deploying to a cluster';
+    const emptyStateText = emptyState.text();
 
     expect(emptyState.exists()).toBe(true);
-    expect(emptyState.text()).toEqual(emptyStateText);
+    expect(emptyStateText).toContain(
+      'No deployments found Ensure your environment is part of the deploy stage of your CI pipeline to track deployments to your cluster.',
+    );
+    expect(emptyStateText).toContain('Learn more about deploying to a cluster');
   });
 
   describe('environments table', () => {
