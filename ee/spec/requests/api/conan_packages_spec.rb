@@ -433,7 +433,7 @@ describe API::ConanPackages do
         expected_response = {
           'conanfile.py':      "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanfile.py",
           'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanmanifest.txt",
-          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conan_sources.tgz"
+          'conan_sources.tgz': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conan_sources.tgz"
         }
 
         expect(response.body).to eq(expected_response.to_json)
