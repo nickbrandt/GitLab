@@ -16,7 +16,6 @@ describe MergeRequest do
   subject(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
 
   describe 'associations' do
-    it { is_expected.to have_many(:reviews).inverse_of(:merge_request) }
     it { is_expected.to have_many(:approvals).dependent(:delete_all) }
     it { is_expected.to have_many(:approvers).dependent(:delete_all) }
     it { is_expected.to have_many(:approver_users).through(:approvers) }
@@ -47,48 +46,6 @@ describe MergeRequest do
       merge_request = build(:merge_request)
 
       expect(merge_request.allows_multiple_assignees?).to be(true)
-    end
-  end
-
-  describe '#note_positions_for_paths' do
-    let(:user) { create(:user) }
-    let(:merge_request) { create(:merge_request, :with_diffs) }
-    let(:project) { merge_request.project }
-    let!(:diff_note) do
-      create(:diff_note_on_merge_request, project: project, noteable: merge_request)
-    end
-    let!(:draft_note) do
-      create(:draft_note_on_text_diff, author: user, merge_request: merge_request)
-    end
-
-    let(:file_paths) { merge_request.diffs.diff_files.map(&:file_path) }
-
-    subject do
-      merge_request.note_positions_for_paths(file_paths)
-    end
-
-    it 'returns a Gitlab::Diff::PositionCollection' do
-      expect(subject).to be_a(Gitlab::Diff::PositionCollection)
-    end
-
-    context 'when user is given' do
-      subject do
-        merge_request.note_positions_for_paths(file_paths, user)
-      end
-
-      it 'returns notes and draft notes positions' do
-        expect(subject).to match_array([draft_note.position, diff_note.position])
-      end
-    end
-
-    context 'when user is not given' do
-      subject do
-        merge_request.note_positions_for_paths(file_paths)
-      end
-
-      it 'returns notes positions' do
-        expect(subject).to match_array([diff_note.position])
-      end
     end
   end
 

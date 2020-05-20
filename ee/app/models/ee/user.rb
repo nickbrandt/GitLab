@@ -32,7 +32,6 @@ module EE
                :extra_shared_runners_minutes_limit, :extra_shared_runners_minutes_limit=,
                to: :namespace
 
-      has_many :reviews,                  foreign_key: :author_id, inverse_of: :author
       has_many :epics,                    foreign_key: :author_id
       has_many :requirements,             foreign_key: :author_id, inverse_of: :author, class_name: 'RequirementsManagement::Requirement'
       has_many :test_reports,             foreign_key: :author_id, inverse_of: :author, class_name: 'RequirementsManagement::TestReport'
