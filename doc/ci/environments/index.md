@@ -902,7 +902,7 @@ knowing the state of your current environments is only a `git fetch` away.
 In your Git configuration, append the `[remote "<your-remote>"]` block with an extra
 fetch line:
 
-```text
+```plaintext
 fetch = +refs/environments/*:refs/remotes/origin/environments/*
 ```
 
