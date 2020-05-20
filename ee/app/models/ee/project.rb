@@ -93,7 +93,8 @@ module EE
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Project', foreign_key: :source_project_id
 
       scope :with_shared_runners_limit_enabled, -> do
-        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects)
+        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects) &&
+            ::EE::Ci::Runner.has_shared_runners_with_non_zero_public_cost?
           with_shared_runners
         else
           with_shared_runners.non_public_only
