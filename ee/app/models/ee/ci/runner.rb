@@ -30,7 +30,7 @@ module EE
 
       class << self
         def has_shared_runners_with_non_zero_public_cost?
-          Rails.cache.fetch(:shared_runners_public_cost_factor, expires_in: 1.day) do
+          Rails.cache.fetch(:shared_runners_public_cost_factor, expires_in: 1.hour) do
             ::Ci::Runner.instance_type.where('public_projects_minutes_cost_factor > 0').exists?
           end
         end
