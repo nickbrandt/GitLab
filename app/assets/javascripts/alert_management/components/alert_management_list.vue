@@ -26,7 +26,7 @@ import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
 const tdClass = 'table-col d-flex d-md-table-cell align-items-center';
 const bodyTrClass =
   'gl-border-1 gl-border-t-solid gl-border-gray-100 hover-bg-blue-50 hover-gl-cursor-pointer hover-gl-border-b-solid hover-gl-border-blue-200';
-const findSortColumn = () => document.getElementsByClassName('started-at')[0];
+const findSortColumn = () => document.querySelector('.started-at');
 
 export default {
   i18n: {
@@ -67,7 +67,7 @@ export default {
     {
       key: 'eventsCount',
       label: s__('AlertManagement|Events'),
-      thClass: 'text-right gl-pr-9',
+      thClass: 'text-right gl-pr-9 w-3rem',
       tdClass: `${tdClass} text-md-right`,
       sortable: true,
     },
@@ -257,6 +257,7 @@ export default {
         stacked="md"
         :tbody-tr-class="tbodyTrClass"
         :no-local-sorting="true"
+        sort-icon-left
         @row-clicked="navigateToAlertDetails"
         @sort-changed="fetchSortedData"
       >
@@ -282,7 +283,7 @@ export default {
         <template #cell(endTime)="{ item }">
           <time-ago v-if="item.endedAt" :time="item.endedAt" />
         </template>
-
+        <!-- TODO: Remove after: https://gitlab.com/gitlab-org/gitlab/-/issues/218467 -->
         <template #cell(eventsCount)="{ item }">
           {{ item.eventCount }}
         </template>

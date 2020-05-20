@@ -84,7 +84,7 @@ describe('AlertManagementList', () => {
   const mockStartedAtCol = {};
 
   beforeEach(() => {
-    jest.spyOn(document, 'getElementsByClassName').mockReturnValue([mockStartedAtCol]);
+    jest.spyOn(document, 'querySelector').mockReturnValue(mockStartedAtCol);
     mountComponent();
   });
 
