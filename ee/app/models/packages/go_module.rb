@@ -13,8 +13,19 @@ class Packages::GoModule
     @versions ||= Packages::Go::VersionFinder.new(self).execute
   end
 
-  def find_version(name)
-    Packages::Go::VersionFinder.new(self).find(name)
+  def version_by(ref: nil, commit: nil)
+    raise ArgumentError.new 'no filter specified' unless ref || commit
+    raise ArgumentError.new 'ref and commit are mutually exclusive' if ref && commit
+
+    if commit
+      return version_by_sha(commit) if commit.is_a? String
+
+      return version_by_commit(commit)
+    end
+
+    return version_by_name(ref) if ref.is_a? String
+
+    version_by_ref(ref)
   end
 
   def path_valid?(major)
@@ -30,5 +41,43 @@ class Packages::GoModule
 
   def gomod_valid?(gomod)
     gomod&.split("\n", 2)&.first == "module #{@name}"
+  end
+
+  private
+
+  def version_by_name(name)
+    # avoid a Gitaly call if possible
+    if defined?(@versions)
+      v = @versions.find { |v| v.name == ref }
+      return v if v
+    end
+
+    ref = @project.repository.find_tag(name) || @project.repository.find_branch(name)
+    return unless ref
+
+    version_by_ref(ref)
+  end
+
+  def version_by_ref(ref)
+    # reuse existing versions
+    if defined?(@versions)
+      v = @versions.find { |v| v.ref == ref }
+      return v if v
+    end
+
+    commit = ref.dereferenced_target
+    semver = Packages::SemVer.parse(ref.name, prefixed: true)
+    Packages::GoModuleVersion.new(self, :ref, commit, ref: ref, semver: semver)
+  end
+
+  def version_by_sha(sha)
+    commit = @project.commit_by(oid: sha)
+    return unless ref
+
+    version_by_commit(commit)
+  end
+
+  def version_by_commit(commit)
+    Packages::GoModuleVersion.new(self, :commit, commit)
   end
 end

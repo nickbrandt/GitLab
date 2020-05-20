@@ -42,7 +42,14 @@ class Packages::GoModuleVersion
   end
 
   def gomod
-    @gomod ||= blob_at(@mod.path + '/go.mod')
+    @gomod ||=
+      if defined?(@blobs)
+        blob_at(@mod.path + '/go.mod')
+      elsif @mod.path.empty?
+        @mod.project.repository.blob_at(@commit.sha, 'go.mod')&.data
+      else
+        @mod.project.repository.blob_at(@commit.sha, @mod.path + '/go.mod')&.data
+      end
   end
 
   def archive
@@ -56,14 +63,11 @@ class Packages::GoModuleVersion
     end
   end
 
-  def files
-    return @files if defined?(@files)
-
-    sha = @commit.sha
-    tree = @mod.project.repository.tree(sha, @mod.path, recursive: true).entries.filter { |e| e.file? }
-    nested = tree.filter { |e| e.name == 'go.mod' && !(@mod.path == '' && e.path == 'go.mod' || e.path == @mod.path + '/go.mod') }.map { |e| e.path[0..-7] }
-    @files = tree.filter { |e| !nested.any? { |n| e.path.start_with? n } }
+  def valid?
+    @mod.path_valid?(major) && @mod.gomod_valid?(gomod)
   end
+
+  private
 
   def blob_at(path)
     return if path.nil? || path.empty?
@@ -73,15 +77,16 @@ class Packages::GoModuleVersion
     blobs.find { |x| x.path == path }&.data
   end
 
-  def valid?
-    @mod.path_valid?(major) && @mod.gomod_valid?(gomod)
+  def blobs
+    @blobs ||= @mod.project.repository.batch_blobs(files.map { |x| [@commit.sha, x.path] })
   end
 
-  private
+  def files
+    return @files if defined?(@files)
 
-  def blobs
-    return @blobs if defined?(@blobs)
-
-    @blobs = @mod.project.repository.batch_blobs(files.map { |x| [@commit.sha, x.path] })
+    sha = @commit.sha
+    tree = @mod.project.repository.tree(sha, @mod.path, recursive: true).entries.filter { |e| e.file? }
+    nested = tree.filter { |e| e.name == 'go.mod' && !(@mod.path == '' && e.path == 'go.mod' || e.path == @mod.path + '/go.mod') }.map { |e| e.path[0..-7] }
+    @files = tree.filter { |e| !nested.any? { |n| e.path.start_with? n } }
   end
 end

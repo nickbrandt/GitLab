@@ -42,7 +42,7 @@ module API
 
       def find_version
         module_version = case_decode params[:module_version]
-        ver = find_module.find_version(module_version)
+        ver = ::Packages::Go::VersionFinder.new(find_module).find(module_version)
 
         not_found! unless ver&.valid?
 
