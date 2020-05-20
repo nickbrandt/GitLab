@@ -56,7 +56,7 @@ export default {
           :id="$options.environmentFilterId"
           ref="environmentsDropdown"
           class="mb-0 d-flex"
-          toggle-class="d-flex justify-content-between"
+          toggle-class="d-flex justify-content-between text-truncate"
           :text="currentEnvironmentName"
           :disabled="isDisabled"
         >
