@@ -43,6 +43,11 @@ module Types
           resolver: Resolvers::SnippetsResolver,
           description: 'Find Snippets visible to the current user'
 
+    field :file, Types::FileType,
+          null: true,
+          resolver: Resolvers::FileResolver,
+          description: 'Find a file'
+
     field :design_management, Types::DesignManagementType,
           null: false,
           description: 'Fields related to design management'
