@@ -1,4 +1,4 @@
-- return unless show_merge_request_approvals_settings?
+- return unless License.feature_available?(:admin_merge_request_approvers_rules)
 %section.settings.merge-request-approval-settings.no-animate{ class: ('expanded' if expanded_by_default?) }
   .settings-header
     %h4

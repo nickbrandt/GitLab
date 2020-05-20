@@ -181,39 +181,7 @@ describe API::Settings, 'EE Settings' do
     end
     let(:feature) { :admin_merge_request_approvers_rules }
 
-    context 'when feature flag is enabled' do
-      before do
-        stub_feature_flags(admin_merge_request_approvals_settings: true)
-      end
-
-      it_behaves_like 'settings for licensed features'
-    end
-
-    context 'when feature flag is disabled' do
-      let(:attribute_names) { settings.keys.map(&:to_s) }
-
-      before do
-        stub_licensed_features(feature => true)
-        stub_feature_flags(admin_merge_request_approvals_settings: false)
-      end
-
-      it 'hides the attributes in the API' do
-        get api("/application/settings", admin)
-
-        expect(response).to have_gitlab_http_status(:ok)
-        attribute_names.each do |attribute|
-          expect(json_response.keys).not_to include(attribute)
-        end
-      end
-
-      it 'does not update application settings' do
-        # Make sure the settings exist before the specs
-        get api("/application/settings", admin)
-
-        expect { put api("/application/settings", admin), params: settings }
-          .not_to change { ApplicationSetting.current.reload.attributes.slice(*attribute_names) }
-      end
-    end
+    it_behaves_like 'settings for licensed features'
   end
 
   context 'updating npm packages request forwarding' do
