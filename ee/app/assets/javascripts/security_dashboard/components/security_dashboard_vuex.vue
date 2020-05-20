@@ -61,6 +61,11 @@ export default {
       required: false,
       default: () => ({}),
     },
+    securityReportSummary: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   computed: {
     ...mapState('vulnerabilities', [
@@ -163,7 +168,7 @@ export default {
       <security-dashboard-layout>
         <template #header>
           <vulnerability-count-list v-if="shouldShowCountList" />
-          <filters />
+          <filters :security-report-summary="securityReportSummary" />
         </template>
 
         <security-dashboard-table>

@@ -113,9 +113,10 @@ export default {
               class="flex-shrink-0 js-check"
               name="mobile-issue-close"
             />
-            <span :class="isSelected(option) ? 'prepend-left-4' : 'prepend-left-20'">{{
-              option.name
-            }}</span>
+            <span class="gl-white-space-nowrap gl-ml-2" :class="{ 'gl-pl-5': !isSelected(option) }">
+              {{ option.name }}
+            </span>
+            <slot v-bind="{ filter, option }"></slot>
           </span>
         </button>
       </div>

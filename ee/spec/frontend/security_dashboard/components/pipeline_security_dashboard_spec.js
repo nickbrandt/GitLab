@@ -39,6 +39,9 @@ describe('Pipeline Security Dashboard component', () => {
     wrapper = shallowMount(PipelineSecurityDashboard, {
       localVue,
       store,
+      data() {
+        return { securityReportSummary: {} };
+      },
       propsData: {
         dashboardDocumentation,
         emptyStateSvgPath,
