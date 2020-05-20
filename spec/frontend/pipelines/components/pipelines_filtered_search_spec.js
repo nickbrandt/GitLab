@@ -78,10 +78,8 @@ describe('Pipelines filtered search', () => {
 
   describe('Url query params', () => {
     const params = {
-      page: '1',
-      ref: 'master',
-      scope: 'all',
       username: 'deja.green',
+      ref: 'master',
     };
 
     beforeEach(() => {

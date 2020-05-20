@@ -65,6 +65,7 @@ describe('Pipeline Branch Name Token', () => {
     expect(Api.branches).toHaveBeenCalled();
 
     expect(wrapper.vm.branches).toEqual(mockBranchesAfterMap);
+    expect(findLoadingIcon().exists()).toBe(false);
   });
 
   describe('displays loading icon correctly', () => {

@@ -64,6 +64,7 @@ describe('Pipeline Trigger Author Token', () => {
     expect(Api.projectUsers).toHaveBeenCalled();
 
     expect(wrapper.vm.users).toEqual(users);
+    expect(findLoadingIcon().exists()).toBe(false);
   });
 
   describe('displays loading icon correctly', () => {

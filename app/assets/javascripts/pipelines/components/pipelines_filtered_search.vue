@@ -3,6 +3,7 @@ import { GlFilteredSearch } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import PipelineTriggerAuthorToken from './tokens/pipeline_trigger_author_token.vue';
 import PipelineBranchNameToken from './tokens/pipeline_branch_name_token.vue';
+import { map } from 'lodash';
 
 export default {
   components: {
@@ -46,30 +47,10 @@ export default {
       ];
     },
     paramsValue() {
-      const valueArray = [];
-      const { username, ref } = this.params;
-
-      if (username) {
-        valueArray.push({
-          type: 'username',
-          value: {
-            data: username,
-            operator: '=',
-          },
-        });
-      }
-
-      if (ref) {
-        valueArray.push({
-          type: 'ref',
-          value: {
-            data: ref,
-            operator: '=',
-          },
-        });
-      }
-
-      return valueArray;
+      return map(this.params, (val, key) => ({
+        type: key,
+        value: { data: val, operator: '=' },
+      }));
     },
   },
   methods: {
