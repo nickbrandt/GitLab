@@ -26072,6 +26072,9 @@ msgstr ""
 msgid "is not in the group enforcing Group Managed Account"
 msgstr ""
 
+msgid "is read only"
+msgstr ""
+
 msgid "is too long (%{current_value}). The maximum size is %{max_size}."
 msgstr ""
 
