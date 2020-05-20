@@ -104,6 +104,10 @@ describe ProjectsHelper do
   describe '#project_security_dashboard_config' do
     include_context 'project with owner and pipeline'
 
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+    end
+
     let(:project) { create(:project, :repository, group: group) }
 
     context 'project without pipeline' do

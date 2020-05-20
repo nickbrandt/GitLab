@@ -220,7 +220,10 @@ module EE
           ref_path: project_commits_url(project, pipeline.ref),
           pipeline_path: pipeline_url(pipeline),
           pipeline_created: pipeline.created_at.to_s(:iso8601),
-          has_pipeline_data: "true"
+          has_pipeline_data: "true",
+          user_callouts_path: user_callouts_path,
+          user_callout_id: UserCalloutsHelper::STANDALONE_VULNERABILITIES_INTRODUCTION_BANNER,
+          show_introduction_banner: show_standalone_vulnerabilities_introduction_banner?.to_s
         }.merge(project_vulnerabilities_config(project))
       end
     end
