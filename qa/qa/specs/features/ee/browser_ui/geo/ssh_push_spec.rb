@@ -21,7 +21,7 @@ module QA
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project'
+              project.description = 'Geo test project for ssh push'
             end
 
             # Perform a git push over SSH directly to the primary
@@ -75,8 +75,7 @@ module QA
       end
 
       context 'git-lfs commit' do
-        it "is replicated to the secondary", quarantine:
-            { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212632', type: :bug } do
+        it "is replicated to the secondary" do
           key_title = "key for ssh tests #{Time.now.to_f}"
           file_content = 'The rendered file could not be displayed because it is stored in LFS.'
           project = nil
@@ -91,7 +90,7 @@ module QA
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project'
+              project.description = 'Geo test project for ssh lfs push'
             end
 
             # Perform a git push over SSH directly to the primary
