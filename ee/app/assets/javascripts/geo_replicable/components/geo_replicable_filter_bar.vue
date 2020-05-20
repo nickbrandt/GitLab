@@ -3,7 +3,7 @@ import { mapActions, mapState } from 'vuex';
 import { debounce } from 'lodash';
 import { GlSearchBoxByType, GlDropdown, GlDropdownItem, GlButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
-import { DEFAULT_SEARCH_DELAY, ACTION_TYPES } from '../store/constants';
+import { DEFAULT_SEARCH_DELAY, ACTION_TYPES } from '../constants';
 
 export default {
   name: 'GeoReplicableFilterBar',
@@ -51,10 +51,8 @@ export default {
               :class="{ 'bg-secondary-100': index === currentFilterIndex }"
               @click="filterChange(index)"
             >
-              <span
-                >{{ filter.label }}
-                <span v-if="filter.label === 'All'">{{ replicableType }}</span></span
-              >
+              <span v-if="filter.label === 'All'">{{ filter.label }} {{ replicableType }}</span>
+              <span v-else>{{ filter.label }}</span>
             </gl-dropdown-item>
           </gl-dropdown>
           <gl-search-box-by-type

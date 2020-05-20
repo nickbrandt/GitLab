@@ -1,0 +1,25 @@
+query($before: String!, $after: String!) {
+  geoNode {
+    packageFileRegistries(first: 20, before: $before, after: $after) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          id
+          packageFileId
+          state
+          retryCount
+          lastSyncFailure
+          retryAt
+          lastSyncedAt
+          createdAt
+        }
+      }
+    }
+  }
+}

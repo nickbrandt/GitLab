@@ -2,8 +2,9 @@ import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlDropdown, GlDropdownItem, GlSearchBoxByType, GlButton } from '@gitlab/ui';
 import GeoReplicableFilterBar from 'ee/geo_replicable/components/geo_replicable_filter_bar.vue';
-import store from 'ee/geo_replicable/store';
-import { DEFAULT_SEARCH_DELAY } from 'ee/geo_replicable/store/constants';
+import createStore from 'ee/geo_replicable/store';
+import { DEFAULT_SEARCH_DELAY } from 'ee/geo_replicable/constants';
+import { MOCK_REPLICABLE_TYPE } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -21,7 +22,7 @@ describe('GeoReplicableFilterBar', () => {
   const createComponent = () => {
     wrapper = mount(GeoReplicableFilterBar, {
       localVue,
-      store,
+      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
       methods: {
         ...actionSpies,
       },
@@ -54,7 +55,15 @@ describe('GeoReplicableFilterBar', () => {
 
     describe('Filter options', () => {
       it('renders a dropdown item for each filterOption', () => {
-        expect(findDropdownItemsText()).toStrictEqual(wrapper.vm.filterOptions.map(n => n.label));
+        expect(findDropdownItemsText()).toStrictEqual(
+          wrapper.vm.filterOptions.map(n => {
+            if (n.label === 'All') {
+              return `${n.label} ${MOCK_REPLICABLE_TYPE}`;
+            }
+
+            return n.label;
+          }),
+        );
       });
 
       it('clicking a dropdown item calls setFilter with its index', () => {

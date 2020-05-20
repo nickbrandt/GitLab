@@ -6,10 +6,10 @@ import createState from './state';
 
 Vue.use(Vuex);
 
-const createStore = replicableType =>
+const createStore = ({ replicableType, useGraphQl }) =>
   new Vuex.Store({
     actions,
     mutations,
-    state: createState(replicableType),
+    state: createState({ replicableType, useGraphQl }),
   });
 export default createStore;
