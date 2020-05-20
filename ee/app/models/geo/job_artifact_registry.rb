@@ -33,12 +33,18 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
 
   # TODO: remove once `success` column has a default value set
   # https://gitlab.com/gitlab-org/gitlab/-/issues/214407
-  def self.insert_for_model_ids(ids)
-    records = ids.map do |id|
-      new(artifact_id: id, success: false, created_at: Time.zone.now)
+  def self.insert_for_model_ids(attrs)
+    records = attrs.map do |artifact_id, _|
+      new(artifact_id: artifact_id, success: false, created_at: Time.zone.now)
     end
 
     bulk_insert!(records, returns: :ids)
+  end
+
+  def self.delete_for_model_ids(attrs)
+    records = attrs.map do |artifact_id, _|
+      ::Geo::FileRegistryRemovalWorker.perform_async(:job_artifact, artifact_id) # rubocop:disable CodeReuse/Worker
+    end
   end
 
   def self.replication_enabled?

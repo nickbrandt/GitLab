@@ -36,6 +36,12 @@ class Geo::UploadRegistry < Geo::BaseRegistry
     bulk_insert!(records, returns: :ids)
   end
 
+  def self.delete_for_model_ids(attrs)
+    attrs.map do |file_id, file_type|
+      ::Geo::FileRegistryRemovalWorker.perform_async(file_type, file_id) # rubocop:disable CodeReuse/Worker
+    end
+  end
+
   def self.with_search(query)
     return all if query.nil?
 

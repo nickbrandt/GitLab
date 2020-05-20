@@ -26,4 +26,10 @@ class Geo::LfsObjectRegistry < Geo::BaseRegistry
   def self.has_create_events?
     false
   end
+
+  def self.delete_for_model_ids(ids)
+    ids.map do |id|
+      ::Geo::FileRegistryRemovalWorker.perform_async(:lfs, id) # rubocop:disable CodeReuse/Worker
+    end
+  end
 end
