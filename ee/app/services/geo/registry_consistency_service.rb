@@ -14,15 +14,21 @@ module Geo
       @batch_size = batch_size
     end
 
+    # @return [Boolean] whether at least one registry has been created or deleted in range
     def execute
+      # There are some edge cases to handle here:
+      #
+      # 1. When there are unused registries, but there no replicable records next_range! returns nil;
+      # 2. When the unused registry foreign key ids are greater than the last replicable record id;
+      # 3. When the unused registry foreign key ids are lower than the first replicable record id;
+      #
       range = next_range!
       return unless range
 
-      created_in_range = create_missing_in_range(range)
-      created_above = create_missing_above(end_of_batch: range.last)
+      created_in_range, deleted_in_range = handle_differences_in_range(range)
+      created_above, deleted_above = create_missing_above(end_of_batch: range.last)
 
-      created_in_range.any? ||
-        created_above.any?
+      [created_in_range, deleted_in_range, created_above, deleted_above].flatten.compact.any?
     rescue => e
       log_error("Error while backfilling #{registry_class}", e)
 
@@ -40,18 +46,6 @@ module Geo
       "registry_consistency:#{registry_class.name.parameterize}"
     end
 
-    # @return [Array] the list of IDs of created records
-    def create_missing_in_range(range)
-      untracked, _ = find_registry_differences(range)
-      return [] if untracked.empty?
-
-      created = registry_class.insert_for_model_ids(untracked)
-
-      log_created(range, untracked, created)
-
-      created
-    end
-
     def find_registry_differences(range)
       finder.find_registry_differences(range)
     end
@@ -60,12 +54,38 @@ module Geo
       @finder ||= registry_class.finder_class.new(current_node_id: Gitlab::Geo.current_node.id)
     end
 
+    def handle_differences_in_range(range)
+      untracked, unused = find_registry_differences(range)
+
+      created_in_range = create_untracked_in_range(untracked)
+      log_created(range, untracked, created_in_range)
+
+      deleted_in_range = delete_unused_in_range(unused)
+      log_deleted(range, unused, deleted_in_range)
+
+      [created_in_range, deleted_in_range]
+    end
+
+    # @return [Array] the list of IDs of created records
+    def create_untracked_in_range(untracked)
+      return [] if untracked.empty?
+
+      registry_class.insert_for_model_ids(untracked)
+    end
+
+    # @return [Array] the list of IDs of deleted records
+    def delete_unused_in_range(delete_unused_in_range)
+      return [] if delete_unused_in_range.empty?
+
+      registry_class.delete_for_model_ids(delete_unused_in_range)
+    end
+
     # This hack is used to sync new files soon after they are created.
     #
     # This is not needed for replicables that have already implemented
     # create events.
     #
-    # @param [Integer] the last ID of the batch processed in create_missing_in_range
+    # @param [Integer] the last ID of the batch processed in create_untracked_in_range
     # @return [Array] the list of IDs of created records
     def create_missing_above(end_of_batch:)
       return [] if registry_class.has_create_events?
@@ -81,7 +101,7 @@ module Geo
       start = last_id - batch_size + 1
       finish = last_id
 
-      create_missing_in_range(start..finish)
+      handle_differences_in_range(start..finish)
     end
 
     # Returns true when LoopingBatcher will soon return ranges near the end of
@@ -101,6 +121,19 @@ module Geo
           finish: range.last,
           created: created.length,
           failed_to_create: untracked.length - created.length
+        }
+      )
+    end
+
+    def log_deleted(range, unused, deleted)
+      log_info(
+        "Deleted registry entries",
+        {
+          registry_class: registry_class.name,
+          start: range.first,
+          finish: range.last,
+          deleted: deleted.length,
+          failed_to_delete: unused.length - deleted.length
         }
       )
     end
