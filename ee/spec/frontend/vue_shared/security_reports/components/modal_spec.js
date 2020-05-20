@@ -158,7 +158,7 @@ describe('Security Reports modal', () => {
         };
         propsData.modal.vulnerability.remediations = [{ diff: '123' }];
         propsData.modal.isResolved = true;
-        mountComponent(propsData);
+        mountComponent(propsData, mount);
       });
 
       it('disallows any actions in the footer', () => {
@@ -177,7 +177,7 @@ describe('Security Reports modal', () => {
       const propsData = {
         modal: createState().modal,
       };
-      mountComponent(propsData);
+      mountComponent(propsData, mount);
     });
 
     it('disallows any actions in the footer', () => {
@@ -270,7 +270,7 @@ describe('Security Reports modal', () => {
         modal: createState().modal,
       };
       propsData.modal.isResolved = true;
-      mountComponent(propsData);
+      mountComponent(propsData, mount);
     });
 
     it('disallows any actions in the footer', () => {

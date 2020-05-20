@@ -253,7 +253,7 @@ export default {
 
       <div v-if="modal.error" class="alert alert-danger">{{ modal.error }}</div>
     </slot>
-    <div slot="footer">
+    <template #footer>
       <dismissal-comment-modal-footer
         v-if="modal.isCommentingOnDismissal"
         :is-dismissed="vulnerability.isDismissed"
@@ -284,6 +284,6 @@ export default {
         @revertDismissVulnerability="$emit('revertDismissVulnerability')"
         @downloadPatch="$emit('downloadPatch')"
       />
-    </div>
+    </template>
   </modal>
 </template>
