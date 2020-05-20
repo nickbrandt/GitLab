@@ -20,22 +20,26 @@ describe Epic do
   end
 
   describe 'scopes' do
+    let_it_be(:confidential_epic) { create(:epic, confidential: true, group: group) }
+    let_it_be(:public_epic) { create(:epic, group: group) }
+
     describe '.public_only' do
       it 'only returns public epics' do
-        public_epic = create(:epic)
-        create(:epic, confidential: true)
-
         expect(described_class.public_only).to eq([public_epic])
+      end
+    end
+
+    describe '.confidential' do
+      it 'only returns confidential epics' do
+        expect(described_class.confidential).to eq([confidential_epic])
       end
     end
 
     describe '.not_confidential_or_in_groups' do
       it 'returns only epics which are either not confidential or in the group' do
-        confidential_epic = create(:epic, confidential: true, group: group)
-        group_epic = create(:epic, group: group)
         create(:epic, confidential: true)
 
-        expect(described_class.not_confidential_or_in_groups(group)).to match_array([confidential_epic, group_epic])
+        expect(described_class.not_confidential_or_in_groups(group)).to match_array([confidential_epic, public_epic])
       end
     end
   end
