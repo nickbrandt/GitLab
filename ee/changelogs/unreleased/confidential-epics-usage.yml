@@ -1,0 +1,5 @@
+---
+title: Added DB index on confidential epics column.
+merge_request: 32443
+author:
+type: other

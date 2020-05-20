@@ -156,6 +156,7 @@ module EE
           super.tap do |usage_data|
             usage_data[:counts].merge!(
               {
+                confidential_epics: count(::Epic.confidential),
                 dependency_list_usages_total: redis_usage_data { ::Gitlab::UsageCounters::DependencyList.usage_totals[:total] },
                 epics: count(::Epic),
                 feature_flags: count(Operations::FeatureFlag),

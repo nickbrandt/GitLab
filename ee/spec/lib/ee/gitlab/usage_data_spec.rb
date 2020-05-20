@@ -79,6 +79,7 @@ describe Gitlab::UsageData do
       expect(count_data[:projects]).to eq(3)
 
       expect(count_data.keys).to include(*%i(
+        confidential_epics
         container_scanning_jobs
         dast_jobs
         dependency_list_usages_total
