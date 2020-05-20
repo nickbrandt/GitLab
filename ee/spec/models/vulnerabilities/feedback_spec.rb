@@ -220,4 +220,16 @@ describe Vulnerabilities::Feedback do
       end
     end
   end
+
+  describe '#occurrence_key' do
+    let(:project_id) { 1 }
+    let(:category) { 'sast' }
+    let(:project_fingerprint) { Digest::SHA1.hexdigest('foo') }
+    let(:expected_occurrence_key) { { project_id: project_id, category: category, project_fingerprint: project_fingerprint } }
+    let(:feedback) { build(:vulnerability_feedback, expected_occurrence_key) }
+
+    subject { feedback.occurrence_key }
+
+    it { is_expected.to eq(expected_occurrence_key) }
+  end
 end

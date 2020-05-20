@@ -495,6 +495,32 @@ describe Vulnerabilities::Occurrence do
     end
   end
 
+  describe '#load_feedback' do
+    let_it_be(:project) { create(:project) }
+    let_it_be(:occurrence) do
+      create(
+        :vulnerabilities_occurrence,
+        report_type: :dependency_scanning,
+        project: project
+      )
+    end
+    let_it_be(:feedback) do
+      create(
+        :vulnerability_feedback,
+        :dependency_scanning,
+        :dismissal,
+        project: project,
+        project_fingerprint: occurrence.project_fingerprint
+      )
+    end
+
+    let(:expected_feedback) { [feedback] }
+
+    subject(:load_feedback) { occurrence.load_feedback.to_a }
+
+    it { is_expected.to eq(expected_feedback) }
+  end
+
   describe '#state' do
     before do
       create(:vulnerability, :dismissed, project: finding_with_issue.project, findings: [finding_with_issue])

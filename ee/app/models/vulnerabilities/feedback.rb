@@ -75,5 +75,13 @@ module Vulnerabilities
     def has_comment?
       comment.present? && comment_author.present?
     end
+
+    def occurrence_key
+      {
+        project_id: project_id,
+        category: category,
+        project_fingerprint: project_fingerprint
+      }
+    end
   end
 end

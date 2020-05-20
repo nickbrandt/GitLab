@@ -14,11 +14,7 @@ module Gitlab
       end
 
       def self.preload_feedback!(findings)
-        findings.each do |finding|
-          finding.dismissal_feedback
-          finding.issue_feedback
-          finding.merge_request_feedback
-        end
+        findings.each(&:load_feedback)
       end
     end
   end
