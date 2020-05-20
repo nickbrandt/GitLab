@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import HeaderApp from 'ee/vulnerabilities/components/header.vue';
 import FooterApp from 'ee/vulnerabilities/components/footer.vue';
+import createStore from 'ee/vulnerabilities/store';
 
 function createHeaderApp() {
   const el = document.getElementById('js-vulnerability-header');
@@ -61,8 +62,11 @@ function createFooterApp() {
     },
   };
 
+  const store = createStore();
+
   return new Vue({
     el,
+    store,
     render: h =>
       h(FooterApp, {
         props,
