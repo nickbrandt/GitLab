@@ -368,7 +368,6 @@ RSpec/LeakyConstantDeclaration:
     - 'spec/lib/gitlab/no_cache_headers_spec.rb'
     - 'spec/lib/gitlab/path_regex_spec.rb'
     - 'spec/lib/gitlab/quick_actions/dsl_spec.rb'
-    - 'spec/lib/gitlab/sidekiq_middleware/client_metrics_spec.rb'
     - 'spec/lib/gitlab/sidekiq_middleware/server_metrics_spec.rb'
     - 'spec/lib/gitlab/view/presenter/factory_spec.rb'
     - 'spec/lib/marginalia_spec.rb'
