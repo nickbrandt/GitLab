@@ -1,8 +1,7 @@
 import $ from 'jquery';
 import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
-import eventHub from '~/frequent_items/event_hub';
-import frequentItems from './components/app.vue';
+import eventHub from './event_hub';
 
 Vue.use(Translate);
 
@@ -17,7 +16,7 @@ const frequentItemDropdowns = [
   },
 ];
 
-const initFrequentItemDropdowns = () => {
+export default function initFrequentItemDropdowns() {
   frequentItemDropdowns.forEach(dropdown => {
     const { namespace, key } = dropdown;
     const el = document.getElementById(`js-${namespace}-dropdown`);
@@ -37,7 +36,7 @@ const initFrequentItemDropdowns = () => {
     new Vue({
       el,
       components: {
-        frequentItems,
+        FrequentItems: () => import('./components/app.vue'),
       },
       data() {
         const { dataset } = this.$options.el;
@@ -66,8 +65,4 @@ const initFrequentItemDropdowns = () => {
       },
     });
   });
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-  requestIdleCallback(initFrequentItemDropdowns);
-});
+}
