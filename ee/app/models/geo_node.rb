@@ -196,6 +196,10 @@ class GeoNode < ApplicationRecord
     geo_api_url('status')
   end
 
+  def node_api_url(node)
+    api_url("geo_nodes/#{node.id}")
+  end
+
   def snapshot_url(repository)
     url = api_url("projects/#{repository.project.id}/snapshot")
     url += "?wiki=1" if repository.repo_type.wiki?

@@ -26,6 +26,14 @@ describe Gitlab::Geo::JwtRequestDecoder do
       expect(subject.decode).to be_nil
     end
 
+    it 'decodes when node is disabled if `include_disabled!` is called first' do
+      primary_node.update_attribute(:enabled, false)
+
+      subject.include_disabled!
+
+      expect(subject.decode).to eq(data)
+    end
+
     it 'fails to decode with wrong key' do
       data = request.headers['Authorization']
 
