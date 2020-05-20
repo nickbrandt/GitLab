@@ -1,8 +1,16 @@
+#import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
+#import "ee/security_dashboard/graphql/project.fragment.graphql"
+
 query getProjects($search: String!) {
   projects(search: $search, membership: true) {
     nodes {
-      id
-      name
+      ...Project
+      avatarUrl
+      nameWithNamespace
+      path
+    }
+    pageInfo {
+      ...PageInfo
     }
   }
 }
