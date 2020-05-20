@@ -346,7 +346,7 @@ GitLab's GraphQL API is versionless, which means we maintain backwards
 compatibility with older versions of the API with every change. Rather
 than removing a field, we need to _deprecate_ the field instead. In
 future, GitLab
-[may remove deprecated fields](https://gitlab.com/gitlab-org/gitlab/issues/32292).
+[may remove deprecated fields](https://gitlab.com/gitlab-org/gitlab/-/issues/32292).
 
 Fields are deprecated using the `deprecated` property. The value
 of the property is a `Hash` of:
