@@ -506,6 +506,10 @@ class Project < ApplicationRecord
     left_outer_joins(:pages_metadatum)
       .where(project_pages_metadata: { project_id: nil })
   end
+  scope :with_api_entity_associations, -> {
+    preload(:project_feature, :route, :tags,
+            group: :ip_restrictions, namespace: [:route, :owner])
+  }
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
 

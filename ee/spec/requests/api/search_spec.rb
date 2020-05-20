@@ -68,6 +68,8 @@ describe API::Search do
         ensure_elasticsearch_index!
       end
 
+      it_behaves_like 'pagination', scope: 'merge_requests'
+
       it 'avoids N+1 queries' do
         control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'merge_requests', search: '*' } }
 
@@ -176,17 +178,6 @@ describe API::Search do
       it_behaves_like 'pagination', scope: 'issues'
     end
 
-    context 'for merge_requests scope', :sidekiq_inline do
-      before do
-        create(:merge_request, target_branch: 'feature_2', source_project: project)
-        create(:merge_request, target_branch: 'feature_3', source_project: project)
-
-        ensure_elasticsearch_index!
-      end
-
-      it_behaves_like 'pagination', scope: 'merge_requests'
-    end
-
     unless level == :project
       context 'for projects scope', :sidekiq_inline do
         before do
@@ -197,6 +188,17 @@ describe API::Search do
         end
 
         it_behaves_like 'pagination', scope: 'projects'
+
+        it 'avoids N+1 queries' do
+          control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'projects', search: '*' } }
+          create_list(:project, 3, :public, group: group)
+          create_list(:project, 4, :public)
+
+          ensure_elasticsearch_index!
+
+          # Some N+1 queries still exist
+          expect { get api(endpoint, user), params: { scope: 'projects', search: '*' } }.not_to exceed_query_limit(control.count + 4)
+        end
       end
     end
 
