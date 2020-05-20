@@ -35,6 +35,7 @@ module EE
       has_many :reviews,                  foreign_key: :author_id, inverse_of: :author
       has_many :epics,                    foreign_key: :author_id
       has_many :requirements,             foreign_key: :author_id, inverse_of: :author, class_name: 'RequirementsManagement::Requirement'
+      has_many :test_reports,             foreign_key: :author_id, inverse_of: :author, class_name: 'RequirementsManagement::TestReport'
       has_many :assigned_epics,           foreign_key: :assignee_id, class_name: "Epic"
       has_many :path_locks,               dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :vulnerability_feedback, foreign_key: :author_id, class_name: 'Vulnerabilities::Feedback'
