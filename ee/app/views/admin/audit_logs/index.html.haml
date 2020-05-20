@@ -7,10 +7,9 @@
         #js-audit-logs-filter-app
 
       .d-flex.col-lg-auto.flex-wrap.pl-lg-0
-        %form.row-content-block.second-block.d-flex.justify-content-lg-end.pb-0
-          .audit-controls.d-flex.align-items-lg-center.flex-column.flex-lg-row.col-lg-auto.px-0
-            #js-audit-logs-date-range-app
-            = render 'shared/audit_events/event_sort'
+        .audit-controls.d-flex.align-items-lg-center.flex-column.flex-lg-row.col-lg-auto.px-0
+          #js-audit-logs-date-range-app
+          #js-audit-logs-sorting-app
 
 - if @table_events.present?
   #js-audit-logs-table-app{ data: { events: @table_events.to_json, is_last_page: @events.last_page?.to_json, qa_selector: 'admin_audit_log_table' } }
