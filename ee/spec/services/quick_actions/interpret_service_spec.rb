@@ -676,10 +676,6 @@ describe QuickActions::InterpretService do
         let(:content) { '/submit_review' }
         let!(:draft_note) { create(:draft_note, note: note, merge_request: merge_request, author: current_user) }
 
-        before do
-          stub_licensed_features(batch_comments: true)
-        end
-
         it 'submits the users current review' do
           _, _, message = service.execute(content, merge_request)
 
