@@ -1,0 +1,5 @@
+---
+title: Geo - Make Geo::RegistryConsistencyWorker clean up unused registries
+merge_request: 32695
+author:
+type: added
