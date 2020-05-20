@@ -9491,6 +9491,9 @@ msgstr ""
 msgid "File name"
 msgstr ""
 
+msgid "File renamed with no changes."
+msgstr ""
+
 msgid "File sync capacity"
 msgstr ""
 
@@ -19671,6 +19674,9 @@ msgstr ""
 msgid "Show file browser"
 msgstr ""
 
+msgid "Show file contents"
+msgstr ""
+
 msgid "Show latest version"
 msgstr ""
 
@@ -23061,6 +23067,9 @@ msgstr ""
 msgid "Unable to generate new instance ID"
 msgstr ""
 
+msgid "Unable to load file contents. Try again later."
+msgstr ""
+
 msgid "Unable to load the diff"
 msgstr ""
 
@@ -23981,6 +23990,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "View file @ "
+msgstr ""
+
+msgid "View file @ %{commitSha}"
 msgstr ""
 
 msgid "View full dashboard"
