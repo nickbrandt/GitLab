@@ -37,17 +37,22 @@ export default {
   },
 
   data: () => ({
-    discussions: [],
+    discussionsDictionary: {},
     poll: null,
     lastFetchedAt: null,
   }),
 
   computed: {
-    discussionDictionary() {
-      return this.discussions.reduce((acc, discussion) => {
-        acc[discussion.id] = discussion;
-        return acc;
-      }, {});
+    discussions: {
+      get() {
+        return Object.values(this.discussionsDictionary);
+      },
+      set(newDiscussions) {
+        this.discussionsDictionary = newDiscussions.reduce((acc, discussion) => {
+          acc[discussion.id] = discussion;
+          return acc;
+        }, {});
+      },
     },
     noteDictionary() {
       return this.discussions
@@ -83,7 +88,11 @@ export default {
       axios
         .get(this.discussionsUrl)
         .then(({ data, headers: { date } }) => {
-          this.discussions = data;
+          this.discussionsDictionary = data.reduce((acc, discussion) => {
+            acc[discussion.id] = discussion;
+            return acc;
+          }, {});
+
           this.lastFetchedAt = this.dateToSeconds(date);
 
           if (!this.poll) this.createNotesPoll();
@@ -127,19 +136,26 @@ export default {
       notes.forEach(note => {
         // If the note exists, update it.
         if (this.noteDictionary[note.id]) {
-          Object.assign(this.noteDictionary[note.id], note);
+          const updatedDiscussion = this.discussionsDictionary[note.discussion_id];
+          const index = updatedDiscussion.notes.findIndex(curr => curr.id === note.id);
+          updatedDiscussion.notes.splice(index, 1, note);
+          this.$set(this.discussionsDictionary, note.discussion_id, updatedDiscussion);
         }
         // If the note doesn't exist, but the discussion does, add the note to the discussion.
-        else if (this.discussionDictionary[note.discussion_id]) {
-          this.discussionDictionary[note.discussion_id].notes.push(note);
+        else if (this.discussionsDictionary[note.discussion_id]) {
+          const updatedDiscussion = this.discussionsDictionary[note.discussion_id];
+          updatedDiscussion.notes.push(note);
+          this.$set(this.discussionsDictionary, note.discussion_id, updatedDiscussion);
         }
         // If the discussion doesn't exist, create it.
         else {
-          this.discussions.push({
+          const newDiscussions = [...this.discussions];
+          newDiscussions.push({
             id: note.discussion_id,
             reply_id: note.discussion_id,
             notes: [note],
           });
+          this.discussions = newDiscussions;
         }
       });
     },
