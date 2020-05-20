@@ -514,6 +514,87 @@ describe Project do
     end
   end
 
+  context 'merge requests related settings' do
+    shared_examples 'setting modified by application setting' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:app_setting, :project_setting, :feature_enabled, :final_setting) do
+        true     | true      | true   | true
+        false    | true      | true   | true
+        true     | false     | true   | true
+        false    | false     | true   | false
+        true     | true      | false  | true
+        false    | true      | false  | true
+        true     | false     | false  | false
+        false    | false     | false  | false
+      end
+
+      with_them do
+        let(:project) { create(:project) }
+
+        before do
+          stub_licensed_features(feature => feature_enabled)
+          stub_application_setting(application_setting => app_setting)
+          project.update(setting => project_setting)
+        end
+
+        it 'shows proper setting' do
+          expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
+        end
+      end
+    end
+
+    describe '#disable_overriding_approvers_per_merge_request' do
+      it_behaves_like 'setting modified by application setting' do
+        let(:feature) { :admin_merge_request_approvers_rules }
+        let(:setting) { :disable_overriding_approvers_per_merge_request }
+        let(:application_setting) { :disable_overriding_approvers_per_merge_request }
+      end
+    end
+
+    describe '#merge_requests_disable_committers_approval' do
+      it_behaves_like 'setting modified by application setting' do
+        let(:feature) { :admin_merge_request_approvers_rules }
+        let(:setting) { :merge_requests_disable_committers_approval }
+        let(:application_setting) { :prevent_merge_requests_committers_approval }
+      end
+    end
+
+    describe '#merge_requests_author_approval' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:app_setting, :project_setting, :feature_enabled, :final_setting) do
+        true     | true      | true   | false
+        false    | true      | true   | true
+        true     | false     | true   | false
+        false    | false     | true   | false
+        true     | true      | false  | true
+        false    | true      | false  | true
+        true     | false     | false  | false
+        false    | false     | false  | false
+      end
+
+      with_them do
+        let(:project) { create(:project) }
+        let(:feature) { :admin_merge_request_approvers_rules }
+        let(:setting) { :merge_requests_author_approval }
+        let(:application_setting) { :prevent_merge_requests_author_approval }
+
+        before do
+          stub_licensed_features(feature => feature_enabled)
+          stub_application_setting(application_setting => app_setting)
+          project.update(setting => project_setting)
+        end
+
+        it 'shows proper setting' do
+          expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
+        end
+      end
+    end
+  end
+
   describe '#has_active_hooks?' do
     context "with group hooks" do
       let(:group) { create(:group) }

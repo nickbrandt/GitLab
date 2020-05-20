@@ -55,8 +55,24 @@ module EE
       end
 
       with_scope :global
-      condition(:admin_merge_request_approvers_rules_available) do
-        License.feature_available?(:admin_merge_request_approvers_rules)
+      condition(:owner_cannot_modify_approvers_rules) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .disable_overriding_approvers_per_merge_request
+      end
+
+      with_scope :global
+      condition(:owner_cannot_modify_merge_request_author_setting) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .prevent_merge_requests_author_approval
+      end
+
+      with_scope :global
+      condition(:owner_cannot_modify_merge_request_committer_setting) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .prevent_merge_requests_committers_approval
       end
 
       with_scope :global
@@ -346,14 +362,23 @@ module EE
         prevent :read_project
       end
 
-      rule { admin_merge_request_approvers_rules_available & ~admin }.policy do
+      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
         prevent :modify_approvers_rules
-        prevent :modify_approvers_list
+      end
+
+      rule { owner_cannot_modify_merge_request_author_setting & ~admin }.policy do
         prevent :modify_merge_request_author_setting
+      end
+
+      rule { owner_cannot_modify_merge_request_committer_setting & ~admin }.policy do
         prevent :modify_merge_request_committer_setting
       end
 
       rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
+
+      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+        prevent :modify_approvers_list
+      end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
 

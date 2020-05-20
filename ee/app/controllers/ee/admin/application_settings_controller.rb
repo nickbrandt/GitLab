@@ -5,8 +5,6 @@ module EE
     module ApplicationSettingsController
       extend ::Gitlab::Utils::Override
 
-      include ::Admin::PushRulesHelper
-
       EE_VALID_SETTING_PANELS = %w(templates).freeze
 
       EE_VALID_SETTING_PANELS.each do |action|
@@ -52,7 +50,7 @@ module EE
           attrs << :updating_name_disabled_for_users
         end
 
-        if show_merge_request_approvals_settings?
+        if License.feature_available?(:admin_merge_request_approvers_rules)
           attrs += EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes
         end
 

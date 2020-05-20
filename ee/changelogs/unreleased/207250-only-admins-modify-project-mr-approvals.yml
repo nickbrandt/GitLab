@@ -1,5 +1,0 @@
----
-title: Allow only admins to modify MR approval settings at the project-level
-merge_request: 30358
-author:
-type: changed
