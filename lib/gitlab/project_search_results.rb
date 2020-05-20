@@ -37,7 +37,7 @@ module Gitlab
       when 'wiki_blobs'
         wiki_blobs_count.to_s
       when 'commits'
-        commits_count.to_s
+        formatted_limited_count(commits_count)
       else
         super
       end
@@ -72,7 +72,7 @@ module Gitlab
     end
 
     def commits_count
-      @commits_count ||= commits.count
+      @commits_count ||= commits(limit: count_limit).count
     end
 
     def single_commit_result?
@@ -145,7 +145,7 @@ module Gitlab
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    def commits(limit: count_limit)
+    def commits(limit:)
       @commits ||= find_commits(query, limit: limit)
     end
 

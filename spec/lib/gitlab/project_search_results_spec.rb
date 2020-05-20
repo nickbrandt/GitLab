@@ -34,7 +34,7 @@ describe Gitlab::ProjectSearchResults do
       'blobs'      | :limited_blobs_count    | max_limited_count
       'notes'      | :limited_notes_count    | max_limited_count
       'wiki_blobs' | :wiki_blobs_count       | '1234'
-      'commits'    | :commits_count          | '1234'
+      'commits'    | :commits_count          | max_limited_count
       'projects'   | :limited_projects_count | max_limited_count
       'unknown'    | nil                     | nil
     end
@@ -383,6 +383,19 @@ describe Gitlab::ProjectSearchResults do
         expect(results).to receive(:notes_finder).exactly(4).times.and_call_original
         expect(results.limited_notes_count).to eq(1)
       end
+    end
+  end
+
+  describe '#commits_count' do
+    let(:project) { create(:project, :public, :repository) }
+
+    it 'limits the number of commits requested' do
+      expect(project.repository)
+        .to receive(:find_commits_by_message)
+        .with(anything, anything, anything, described_class::COUNT_LIMIT)
+        .and_call_original
+
+      described_class.new(user, project, '.').commits_count
     end
   end
 
