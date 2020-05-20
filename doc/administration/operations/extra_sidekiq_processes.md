@@ -146,10 +146,10 @@ following attributes:
 - `name` - the queue name. The other attributes are typically more useful as
   they are more general, but this is available in case a particular queue needs
   to be selected.
-- `resource_boundary` - if the worker is bound by `cpu`, `memory`, or
+- `resource_boundary` - if the queue is bound by `cpu`, `memory`, or
   `unknown`. For example, the `project_export` queue is memory bound as it has
   to load data in memory before saving it for export.
-- `tags` - short-lived annotations for workers. These are expected to frequently
+- `tags` - short-lived annotations for queues. These are expected to frequently
   change from release to release, and may be removed entirely.
 
 `has_external_dependencies` is a boolean attribute: only the exact
