@@ -17,7 +17,7 @@ module QA
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project'
+              project.description = 'Geo test project for http push to 2nd'
             end
 
             # Perform a git push over HTTP directly to the primary
@@ -89,8 +89,7 @@ module QA
       end
 
       context 'git-lfs commit' do
-        it 'is redirected to the primary and ultimately replicated to the secondary', quarantine:
-            { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212632', type: :bug } do
+        it 'is redirected to the primary and ultimately replicated to the secondary' do
           file_name_primary = 'README.md'
           file_name_secondary = 'README_MORE.md'
           project = nil
@@ -99,7 +98,7 @@ module QA
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project'
+              project.description = 'Geo test project for http lfs push to 2nd'
             end
 
             # Perform a git push over HTTP directly to the primary

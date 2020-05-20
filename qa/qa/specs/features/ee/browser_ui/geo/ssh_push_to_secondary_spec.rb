@@ -22,7 +22,7 @@ module QA
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project'
+              project.description = 'Geo test project for ssh push to 2nd'
             end
 
             # Perform a git push over SSH directly to the primary
@@ -96,8 +96,7 @@ module QA
       end
 
       context 'git-lfs commit' do
-        it 'is proxied to the primary and ultimately replicated to the secondary', quarantine:
-            { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212632', type: :bug } do
+        it 'is proxied to the primary and ultimately replicated to the secondary' do
           key_title = "key for ssh tests #{Time.now.to_f}"
           file_name_primary = 'README.md'
           file_name_secondary = 'README_MORE.md'
@@ -113,7 +112,7 @@ module QA
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project'
+              project.description = 'Geo test project for ssh lfs push to 2nd'
             end
 
             # Perform a git push over SSH directly to the primary
