@@ -3,6 +3,7 @@ import createDashboardStore from './store';
 import PipelineSecurityDashboard from './components/pipeline_security_dashboard.vue';
 import { DASHBOARD_TYPES } from './store/constants';
 import { LOADING_VULNERABILITIES_ERROR_CODES } from './store/modules/vulnerabilities/constants';
+import apolloProvider from './graphql/provider';
 
 export default () => {
   const el = document.getElementById('js-security-report-app');
@@ -21,6 +22,7 @@ export default () => {
     vulnerabilityFeedbackHelpPath,
     emptyStateUnauthorizedSvgPath,
     emptyStateForbiddenSvgPath,
+    projectFullPath,
   } = el.dataset;
 
   const loadingErrorIllustrations = {
@@ -30,6 +32,7 @@ export default () => {
 
   return new Vue({
     el,
+    apolloProvider,
     store: createDashboardStore({
       dashboardType: DASHBOARD_TYPES.PIPELINE,
     }),
@@ -44,6 +47,7 @@ export default () => {
           dashboardDocumentation,
           emptyStateSvgPath,
           loadingErrorIllustrations,
+          projectFullPath,
         },
       });
     },
