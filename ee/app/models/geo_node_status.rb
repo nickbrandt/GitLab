@@ -300,7 +300,7 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def attribute_timestamp=(attr, value)
-    self[attr] = Time.at(value)
+    self[attr] = Time.zone.at(value)
   end
 
   def self.percentage_methods

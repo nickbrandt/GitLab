@@ -1114,7 +1114,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
 
       expect(result.id).to be_nil
       expect(result.attachments_count).to eq(status.attachments_count)
-      expect(result.cursor_last_event_date).to eq(Time.at(status.cursor_last_event_timestamp))
+      expect(result.cursor_last_event_date).to eq(Time.zone.at(status.cursor_last_event_timestamp))
       expect(result.storage_shards.count).to eq(Settings.repositories.storages.count)
     end
   end

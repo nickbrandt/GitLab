@@ -141,7 +141,7 @@ class PagesDomain < ApplicationRecord
   def expired?
     return false unless x509
 
-    current = Time.new
+    current = Time.current
     current < x509.not_before || x509.not_after < current
   end
 

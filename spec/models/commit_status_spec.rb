@@ -708,7 +708,7 @@ describe CommitStatus do
   end
 
   describe '#enqueue' do
-    let!(:current_time) { Time.new(2018, 4, 5, 14, 0, 0) }
+    let!(:current_time) { Time.zone.local(2018, 4, 5, 14, 0, 0) }
 
     before do
       allow(Time).to receive(:now).and_return(current_time)
