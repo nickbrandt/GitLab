@@ -24,20 +24,20 @@ module Gitlab
         @public_and_internal_projects = public_and_internal_projects
       end
 
-      def objects(scope, page: 1, per_page: DEFAULT_PER_PAGE)
+      def objects(scope, page: 1, per_page: DEFAULT_PER_PAGE, preload_method: nil)
         page = (page || 1).to_i
 
         case scope
         when 'projects'
-          eager_load(projects, page, per_page, eager: [:route, :namespace, :compliance_framework_setting])
+          eager_load(projects, page, per_page, preload_method, [:route, :namespace, :compliance_framework_setting])
         when 'issues'
-          eager_load(issues, page, per_page, eager: { project: [:route, :namespace], labels: [], timelogs: [], assignees: [] })
+          eager_load(issues, page, per_page, preload_method, project: [:route, :namespace], labels: [], timelogs: [], assignees: [])
         when 'merge_requests'
-          eager_load(merge_requests, page, per_page, eager: { target_project: [:route, :namespace] })
+          eager_load(merge_requests, page, per_page, preload_method, target_project: [:route, :namespace])
         when 'milestones'
-          eager_load(milestones, page, per_page, eager: { project: [:route, :namespace] })
+          eager_load(milestones, page, per_page, preload_method, project: [:route, :namespace])
         when 'notes'
-          eager_load(notes, page, per_page, eager: { project: [:route, :namespace] })
+          eager_load(notes, page, per_page, preload_method, project: [:route, :namespace])
         when 'blobs'
           blobs(page: page, per_page: per_page)
         when 'wiki_blobs'
@@ -166,10 +166,12 @@ module Gitlab
       private
 
       # Apply some eager loading to the `records` of an ES result object without
-      # losing pagination information
-      def eager_load(es_result, page, per_page, eager:)
+      # losing pagination information. Also, take advantage of preload method if
+      # provided by the caller.
+      def eager_load(es_result, page, per_page, preload_method, eager)
         paginated_base = es_result.page(page).per(per_page)
         relation = paginated_base.records.includes(eager) # rubocop:disable CodeReuse/ActiveRecord
+        relation = relation.public_send(preload_method) if preload_method # rubocop:disable GitlabSecurity/PublicSend
 
         Kaminari.paginate_array(
           relation,

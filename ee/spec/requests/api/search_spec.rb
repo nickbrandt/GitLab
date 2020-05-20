@@ -59,6 +59,30 @@ describe API::Search do
   end
 
   shared_examples 'elasticsearch enabled' do |level:|
+    context 'for merge_requests scope', :sidekiq_inline do
+      before do
+        create(:labeled_merge_request, target_branch: 'feature_1', source_project: project, labels: [create(:label), create(:label)])
+        create(:merge_request, target_branch: 'feature_2', source_project: project, author: create(:user))
+        create(:merge_request, target_branch: 'feature_3', source_project: project, milestone: create(:milestone, project: project))
+        create(:merge_request, target_branch: 'feature_4', source_project: project)
+        ensure_elasticsearch_index!
+      end
+
+      it 'avoids N+1 queries' do
+        control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'merge_requests', search: '*' } }
+
+        create(:labeled_merge_request, target_branch: 'feature_5', source_project: project, labels: [create(:label), create(:label)])
+        create(:merge_request, target_branch: 'feature_6', source_project: project, author: create(:user))
+        create(:merge_request, target_branch: 'feature_7', source_project: project, milestone: create(:milestone, project: project))
+        create(:merge_request, target_branch: 'feature_8', source_project: project)
+
+        ensure_elasticsearch_index!
+
+        # Some N+1 queries still exist
+        expect { get api(endpoint, user), params: { scope: 'merge_requests', search: '*' } }.not_to exceed_query_limit(control.count + 16)
+      end
+    end
+
     context 'for wiki_blobs scope', :sidekiq_might_not_need_inline do
       before do
         wiki = create(:project_wiki, project: project)

@@ -3,10 +3,9 @@
 module Gitlab
   module Elastic
     class SnippetSearchResults < Gitlab::Elastic::SearchResults
-      def objects(scope, page: 1, per_page: DEFAULT_PER_PAGE)
+      def objects(scope, page: 1, per_page: DEFAULT_PER_PAGE, preload_method: nil)
         page = (page || 1).to_i
-
-        eager_load(snippet_titles, page, per_page, eager: { project: [:route, :namespace] })
+        eager_load(snippet_titles, page, per_page, preload_method, project: [:route, :namespace])
       end
 
       def formatted_count(scope)
@@ -25,10 +24,6 @@ module Gitlab
 
       def limited_snippet_titles_count
         @limited_snippet_titles_count ||= snippet_titles.total_count
-      end
-
-      def paginated_objects(relation, page)
-        super.records
       end
     end
   end
