@@ -31,13 +31,13 @@ export default {
     emptyStateTitle() {
       return this.requirementsCount[FilterState.all]
         ? FilterStateEmptyMessage[this.filterBy]
-        : __('Requirements allow you to create criteria to check your products against.');
+        : __('With requirements, you can set criteria to check your products against.');
     },
     emptyStateDescription() {
       return !this.requirementsCount[FilterState.all]
         ? __(
-            `Requirements can be based on users, stakeholders, system, software
-             or anything else you find important to capture.`,
+            `Requirements can be based on users, stakeholders, system, software,
+            or anything else you find important to capture.`,
           )
         : null;
     },
