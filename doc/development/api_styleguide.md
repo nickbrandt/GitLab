@@ -176,7 +176,7 @@ and returns appropriate error messages to the caller method.
 
 Lastly, we register the validator using the line below:
 
-```rb
+```ruby
 Grape::Validations.register_validator(<validator name as symbol>, ::API::Helpers::CustomValidators::<YourCustomValidatorClassName>)
 ```
 
