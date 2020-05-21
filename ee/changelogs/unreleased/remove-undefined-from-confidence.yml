@@ -1,5 +1,0 @@
----
-title: Replace undefined confidence with unknown severity for occurrences
-merge_request: 31200
-author:
-type: other

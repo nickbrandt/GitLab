@@ -1,6 +1,0 @@
----
-title: Modify GraphQL mutation for removing project from Instance Security Dashboard
-  to use id instead of projectId
-merge_request: 31575
-author:
-type: changed

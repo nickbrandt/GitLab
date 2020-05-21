@@ -1,5 +1,0 @@
----
-title: Add LFS workhorse upload path to allowed upload paths
-merge_request: 31794
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: Make the ElasticCommitIndexer idempotent to enable job de-duplication.
-merge_request: 31500
-author: mbergeron
-type: performance

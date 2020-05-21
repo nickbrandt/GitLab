@@ -1,5 +1,0 @@
----
-title: Fix CI minutes notification when unauthenticated
-merge_request: 31724
-author:
-type: fixed

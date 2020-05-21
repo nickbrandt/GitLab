@@ -1,5 +1,0 @@
----
-title: Support setting threshold for browser performance degradation through CI config
-merge_request: 21824
-author:
-type: added
