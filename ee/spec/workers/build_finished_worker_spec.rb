@@ -38,7 +38,7 @@ describe BuildFinishedWorker do
       namespace.update_attribute(:shared_runners_minutes_limit, 2000)
       namespace_stats.update_attribute(:shared_runners_seconds, 2100 * 60)
 
-      expect(CiMinutesUsageMailer).to receive(:notify).once.with(namespace.name, [namespace.owner.email]).and_return(spy)
+      expect(CiMinutesUsageMailer).to receive(:notify).once.with(namespace, [namespace.owner.email]).and_return(spy)
 
       subject
     end

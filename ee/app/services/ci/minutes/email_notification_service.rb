@@ -22,7 +22,7 @@ module Ci
 
         namespace.update_columns(last_ci_minutes_notification_at: Time.current)
 
-        CiMinutesUsageMailer.notify(namespace.name, recipients).deliver_later
+        CiMinutesUsageMailer.notify(namespace, recipients).deliver_later
       end
 
       def notify_on_partial_usage
@@ -32,7 +32,7 @@ module Ci
 
         namespace.update_columns(last_ci_minutes_usage_notification_level: current_alert_level)
 
-        CiMinutesUsageMailer.notify_limit(namespace.name, recipients, current_alert_level).deliver_later
+        CiMinutesUsageMailer.notify_limit(namespace, recipients, current_alert_level).deliver_later
       end
 
       def namespace
