@@ -3,6 +3,8 @@
 module EE
   module Ci
     module Runner
+      extend ActiveSupport::Concern
+
       def tick_runner_queue
         ::Gitlab::Database::LoadBalancing::Sticking.stick(:runner, id)
 
@@ -28,7 +30,7 @@ module EE
         end
       end
 
-      class << self
+      class_methods do
         def has_shared_runners_with_non_zero_public_cost?
           Rails.cache.fetch(:shared_runners_public_cost_factor, expires_in: 1.hour) do
             ::Ci::Runner.instance_type.where('public_projects_minutes_cost_factor > 0').exists?
