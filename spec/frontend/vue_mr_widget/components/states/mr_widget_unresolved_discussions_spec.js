@@ -1,6 +1,7 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import UnresolvedDiscussions from '~/vue_merge_request_widget/components/states/unresolved_discussions.vue';
+import { TEST_HOST } from 'helpers/test_constants';
 
 describe('UnresolvedDiscussions', () => {
   const Component = Vue.extend(UnresolvedDiscussions);
@@ -14,7 +15,7 @@ describe('UnresolvedDiscussions', () => {
     beforeEach(() => {
       vm = mountComponent(Component, {
         mr: {
-          createIssueToResolveDiscussionsPath: gl.TEST_HOST,
+          createIssueToResolveDiscussionsPath: TEST_HOST,
         },
       });
     });
@@ -25,7 +26,7 @@ describe('UnresolvedDiscussions', () => {
       );
 
       expect(vm.$el.innerText).toContain('Create an issue to resolve them later');
-      expect(vm.$el.querySelector('.js-create-issue').getAttribute('href')).toEqual(gl.TEST_HOST);
+      expect(vm.$el.querySelector('.js-create-issue').getAttribute('href')).toEqual(TEST_HOST);
     });
   });
 

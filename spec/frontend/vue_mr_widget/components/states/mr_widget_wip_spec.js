@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import WorkInProgress from '~/vue_merge_request_widget/components/states/work_in_progress.vue';
 import eventHub from '~/vue_merge_request_widget/event_hub';
+import createFlash from '~/flash';
+
+jest.mock('~/flash');
 
 const createComponent = () => {
   const Component = Vue.extend(WorkInProgress);
@@ -47,9 +50,8 @@ describe('Wip', () => {
       it('should make a request to service and handle response', done => {
         const vm = createComponent();
 
-        const flashSpy = spyOnDependency(WorkInProgress, 'createFlash').and.returnValue(true);
-        spyOn(eventHub, '$emit');
-        spyOn(vm.service, 'removeWIP').and.returnValue(
+        jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
+        jest.spyOn(vm.service, 'removeWIP').mockReturnValue(
           new Promise(resolve => {
             resolve({
               data: mrObj,
@@ -58,12 +60,15 @@ describe('Wip', () => {
         );
 
         vm.handleRemoveWIP();
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.isMakingRequest).toBeTruthy();
           expect(eventHub.$emit).toHaveBeenCalledWith('UpdateWidgetData', mrObj);
-          expect(flashSpy).toHaveBeenCalledWith('The merge request can now be merged.', 'notice');
+          expect(createFlash).toHaveBeenCalledWith(
+            'The merge request can now be merged.',
+            'notice',
+          );
           done();
-        }, 333);
+        });
       });
     });
   });

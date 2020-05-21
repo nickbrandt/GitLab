@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 import component from '~/vue_merge_request_widget/components/states/mr_widget_rebase.vue';
 
@@ -105,7 +105,7 @@ describe('Merge request widget rebase component', () => {
 
   describe('methods', () => {
     it('checkRebaseStatus', done => {
-      spyOn(eventHub, '$emit');
+      jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
       vm = mountComponent(Component, {
         mr: {},
         service: {

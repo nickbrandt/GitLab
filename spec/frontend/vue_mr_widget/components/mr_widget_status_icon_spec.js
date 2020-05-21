@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import mrStatusIcon from '~/vue_merge_request_widget/components/mr_widget_status_icon.vue';
 
 describe('MR widget status icon component', () => {

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import MrWidgetAuthorTime from '~/vue_merge_request_widget/components/mr_widget_author_time.vue';
 
 describe('MrWidgetAuthorTime', () => {

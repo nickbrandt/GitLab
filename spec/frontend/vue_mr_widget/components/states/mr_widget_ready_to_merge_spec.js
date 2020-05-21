@@ -7,6 +7,15 @@ import CommitEdit from '~/vue_merge_request_widget/components/states/commit_edit
 import CommitMessageDropdown from '~/vue_merge_request_widget/components/states/commit_message_dropdown.vue';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 import { MWPS_MERGE_STRATEGY, MTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
+import { refreshUserMergeRequestCounts } from '~/commons/nav/user_merge_requests';
+import simplePoll from '~/lib/utils/simple_poll';
+
+jest.mock('~/lib/utils/simple_poll', () =>
+  jest.fn().mockImplementation(jest.requireActual('~/lib/utils/simple_poll').default),
+);
+jest.mock('~/commons/nav/user_merge_requests', () => ({
+  refreshUserMergeRequestCounts: jest.fn(),
+}));
 
 const commitMessage = 'This is the commit message';
 const squashCommitMessage = 'This is the squash commit message';
@@ -33,6 +42,7 @@ const createTestMr = customConfig => {
     targetBranch: 'master',
     preferredAutoMergeStrategy: MWPS_MERGE_STRATEGY,
     availableAutoMergeStrategies: [MWPS_MERGE_STRATEGY],
+    mergeImmediatelyDocsPath: 'path/to/merge/immediately/docs',
   };
 
   Object.assign(mr, customConfig.mr);
@@ -41,8 +51,8 @@ const createTestMr = customConfig => {
 };
 
 const createTestService = () => ({
-  merge() {},
-  poll() {},
+  merge: jest.fn(),
+  poll: jest.fn().mockResolvedValue(),
 });
 
 const createComponent = (customConfig = {}) => {
@@ -59,11 +69,9 @@ const createComponent = (customConfig = {}) => {
 
 describe('ReadyToMerge', () => {
   let vm;
-  let updateMrCountSpy;
 
   beforeEach(() => {
     vm = createComponent();
-    updateMrCountSpy = spyOnDependency(ReadyToMerge, 'refreshUserMergeRequestCounts');
   });
 
   afterEach(() => {
@@ -347,19 +355,21 @@ describe('ReadyToMerge', () => {
         });
 
       it('should handle merge when pipeline succeeds', done => {
-        spyOn(eventHub, '$emit');
-        spyOn(vm.service, 'merge').and.returnValue(returnPromise('merge_when_pipeline_succeeds'));
+        jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
+        jest
+          .spyOn(vm.service, 'merge')
+          .mockReturnValue(returnPromise('merge_when_pipeline_succeeds'));
         vm.removeSourceBranch = false;
         vm.handleMergeButtonClick(true);
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.isMakingRequest).toBeTruthy();
           expect(eventHub.$emit).toHaveBeenCalledWith('MRWidgetUpdateRequested');
 
-          const params = vm.service.merge.calls.argsFor(0)[0];
+          const params = vm.service.merge.mock.calls[0][0];
 
           expect(params).toEqual(
-            jasmine.objectContaining({
+            expect.objectContaining({
               sha: vm.mr.sha,
               commit_message: vm.mr.commitMessage,
               should_remove_source_branch: false,
@@ -367,66 +377,55 @@ describe('ReadyToMerge', () => {
             }),
           );
           done();
-        }, 333);
+        });
       });
 
       it('should handle merge failed', done => {
-        spyOn(eventHub, '$emit');
-        spyOn(vm.service, 'merge').and.returnValue(returnPromise('failed'));
+        jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
+        jest.spyOn(vm.service, 'merge').mockReturnValue(returnPromise('failed'));
         vm.handleMergeButtonClick(false, true);
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.isMakingRequest).toBeTruthy();
           expect(eventHub.$emit).toHaveBeenCalledWith('FailedToMerge', undefined);
 
-          const params = vm.service.merge.calls.argsFor(0)[0];
+          const params = vm.service.merge.mock.calls[0][0];
 
           expect(params.should_remove_source_branch).toBeTruthy();
           expect(params.auto_merge_strategy).toBeUndefined();
           done();
-        }, 333);
+        });
       });
 
       it('should handle merge action accepted case', done => {
-        spyOn(vm.service, 'merge').and.returnValue(returnPromise('success'));
-        spyOn(vm, 'initiateMergePolling');
+        jest.spyOn(vm.service, 'merge').mockReturnValue(returnPromise('success'));
+        jest.spyOn(vm, 'initiateMergePolling').mockImplementation(() => {});
         vm.handleMergeButtonClick();
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.isMakingRequest).toBeTruthy();
           expect(vm.initiateMergePolling).toHaveBeenCalled();
 
-          const params = vm.service.merge.calls.argsFor(0)[0];
+          const params = vm.service.merge.mock.calls[0][0];
 
           expect(params.should_remove_source_branch).toBeTruthy();
           expect(params.auto_merge_strategy).toBeUndefined();
           done();
-        }, 333);
+        });
       });
     });
 
     describe('initiateMergePolling', () => {
-      beforeEach(() => {
-        jasmine.clock().install();
-      });
-
-      afterEach(() => {
-        jasmine.clock().uninstall();
-      });
-
       it('should call simplePoll', () => {
-        const simplePoll = spyOnDependency(ReadyToMerge, 'simplePoll');
         vm.initiateMergePolling();
 
-        expect(simplePoll).toHaveBeenCalledWith(jasmine.any(Function), { timeout: 0 });
+        expect(simplePoll).toHaveBeenCalledWith(expect.any(Function), { timeout: 0 });
       });
 
       it('should call handleMergePolling', () => {
-        spyOn(vm, 'handleMergePolling');
+        jest.spyOn(vm, 'handleMergePolling').mockImplementation(() => {});
 
         vm.initiateMergePolling();
-
-        jasmine.clock().tick(2000);
 
         expect(vm.handleMergePolling).toHaveBeenCalled();
       });
@@ -448,9 +447,9 @@ describe('ReadyToMerge', () => {
       });
 
       it('should call start and stop polling when MR merged', done => {
-        spyOn(eventHub, '$emit');
-        spyOn(vm.service, 'poll').and.returnValue(returnPromise('merged'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
+        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('merged'));
+        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
@@ -463,26 +462,26 @@ describe('ReadyToMerge', () => {
             spc = true;
           },
         );
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.service.poll).toHaveBeenCalled();
           expect(eventHub.$emit).toHaveBeenCalledWith('MRWidgetUpdateRequested');
           expect(eventHub.$emit).toHaveBeenCalledWith('FetchActionsContent');
           expect(vm.initiateRemoveSourceBranchPolling).toHaveBeenCalled();
-          expect(updateMrCountSpy).toHaveBeenCalled();
+          expect(refreshUserMergeRequestCounts).toHaveBeenCalled();
           expect(cpc).toBeFalsy();
           expect(spc).toBeTruthy();
 
           done();
-        }, 333);
+        });
       });
 
       it('updates status box', done => {
-        spyOn(vm.service, 'poll').and.returnValue(returnPromise('merged'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('merged'));
+        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
         vm.handleMergePolling(() => {}, () => {});
 
-        setTimeout(() => {
+        setImmediate(() => {
           const statusBox = document.querySelector('.status-box');
 
           expect(statusBox.classList.contains('status-box-mr-merged')).toBeTruthy();
@@ -493,12 +492,12 @@ describe('ReadyToMerge', () => {
       });
 
       it('hides close button', done => {
-        spyOn(vm.service, 'poll').and.returnValue(returnPromise('merged'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('merged'));
+        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
         vm.handleMergePolling(() => {}, () => {});
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(document.querySelector('.btn-close').classList.contains('hidden')).toBeTruthy();
 
           done();
@@ -506,12 +505,12 @@ describe('ReadyToMerge', () => {
       });
 
       it('updates merge request count badge', done => {
-        spyOn(vm.service, 'poll').and.returnValue(returnPromise('merged'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('merged'));
+        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
         vm.handleMergePolling(() => {}, () => {});
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(document.querySelector('.js-merge-counter').textContent).toBe('0');
 
           done();
@@ -519,8 +518,8 @@ describe('ReadyToMerge', () => {
       });
 
       it('should continue polling until MR is merged', done => {
-        spyOn(vm.service, 'poll').and.returnValue(returnPromise('some_other_state'));
-        spyOn(vm, 'initiateRemoveSourceBranchPolling');
+        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('some_other_state'));
+        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
@@ -533,19 +532,18 @@ describe('ReadyToMerge', () => {
             spc = true;
           },
         );
-        setTimeout(() => {
+        setImmediate(() => {
           expect(cpc).toBeTruthy();
           expect(spc).toBeFalsy();
 
           done();
-        }, 333);
+        });
       });
     });
 
     describe('initiateRemoveSourceBranchPolling', () => {
       it('should emit event and call simplePoll', () => {
-        spyOn(eventHub, '$emit');
-        const simplePoll = spyOnDependency(ReadyToMerge, 'simplePoll');
+        jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
 
         vm.initiateRemoveSourceBranchPolling();
 
@@ -565,8 +563,8 @@ describe('ReadyToMerge', () => {
         });
 
       it('should call start and stop polling when MR merged', done => {
-        spyOn(eventHub, '$emit');
-        spyOn(vm.service, 'poll').and.returnValue(returnPromise(false));
+        jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
+        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise(false));
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
@@ -579,10 +577,10 @@ describe('ReadyToMerge', () => {
             spc = true;
           },
         );
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.service.poll).toHaveBeenCalled();
 
-          const args = eventHub.$emit.calls.argsFor(0);
+          const args = eventHub.$emit.mock.calls[0];
 
           expect(args[0]).toEqual('MRWidgetUpdateRequested');
           expect(args[1]).toBeDefined();
@@ -594,11 +592,11 @@ describe('ReadyToMerge', () => {
           expect(spc).toBeTruthy();
 
           done();
-        }, 333);
+        });
       });
 
       it('should continue polling until MR is merged', done => {
-        spyOn(vm.service, 'poll').and.returnValue(returnPromise(true));
+        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise(true));
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
@@ -611,12 +609,12 @@ describe('ReadyToMerge', () => {
             spc = true;
           },
         );
-        setTimeout(() => {
+        setImmediate(() => {
           expect(cpc).toBeTruthy();
           expect(spc).toBeFalsy();
 
           done();
-        }, 333);
+        });
       });
     });
   });

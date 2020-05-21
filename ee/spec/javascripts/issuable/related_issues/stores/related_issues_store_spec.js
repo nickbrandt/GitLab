@@ -6,7 +6,7 @@ import {
   issuable3,
   issuable4,
   issuable5,
-} from 'spec/vue_shared/components/issue/related_issuable_mock_data';
+} from 'jest/vue_shared/components/issue/related_issuable_mock_data';
 
 describe('RelatedIssuesStore', () => {
   let store;

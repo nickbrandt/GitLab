@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import mergeHelpComponent from '~/vue_merge_request_widget/components/mr_widget_merge_help.vue';
 
 describe('MRWidgetMergeHelp', () => {

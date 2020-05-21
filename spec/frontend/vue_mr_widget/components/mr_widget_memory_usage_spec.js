@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import MemoryUsage from '~/vue_merge_request_widget/components/deployment/memory_usage.vue';
 import MRWidgetService from '~/vue_merge_request_widget/services/mr_widget_service';
 
@@ -59,10 +61,18 @@ const messages = {
 describe('MemoryUsage', () => {
   let vm;
   let el;
+  let mock;
 
   beforeEach(() => {
+    mock = new MockAdapter(axios);
+    mock.onGet(`${url}.json`).reply(200);
+
     vm = createComponent();
     el = vm.$el;
+  });
+
+  afterEach(() => {
+    mock.restore();
   });
 
   describe('data', () => {
@@ -127,6 +137,9 @@ describe('MemoryUsage', () => {
 
     describe('computeGraphData', () => {
       it('should populate sparkline graph', () => {
+        // ignore BoostrapVue warnings
+        jest.spyOn(console, 'warn').mockImplementation();
+
         vm.computeGraphData(metrics, deployment_time);
         const { hasMetrics, memoryMetrics, deploymentTime, memoryFrom, memoryTo } = vm;
 
@@ -147,15 +160,15 @@ describe('MemoryUsage', () => {
         });
 
       it('should load metrics data using MRWidgetService', done => {
-        spyOn(MRWidgetService, 'fetchMetrics').and.returnValue(returnServicePromise(true));
-        spyOn(vm, 'computeGraphData');
+        jest.spyOn(MRWidgetService, 'fetchMetrics').mockReturnValue(returnServicePromise(true));
+        jest.spyOn(vm, 'computeGraphData').mockImplementation(() => {});
 
         vm.loadMetrics();
-        setTimeout(() => {
+        setImmediate(() => {
           expect(MRWidgetService.fetchMetrics).toHaveBeenCalledWith(url);
           expect(vm.computeGraphData).toHaveBeenCalledWith(metrics, deployment_time);
           done();
-        }, 333);
+        });
       });
     });
   });
@@ -182,6 +195,9 @@ describe('MemoryUsage', () => {
     });
 
     it('should show deployment memory usage when metrics are loaded', done => {
+      // ignore BoostrapVue warnings
+      jest.spyOn(console, 'warn').mockImplementation();
+
       vm.loadingMetrics = false;
       vm.hasMetrics = true;
       vm.loadFailed = false;

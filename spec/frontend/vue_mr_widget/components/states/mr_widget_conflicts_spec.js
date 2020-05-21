@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { removeBreakLine } from 'spec/helpers/text_helper';
+import { removeBreakLine } from 'helpers/text_helper';
 import ConflictsComponent from '~/vue_merge_request_widget/components/states/mr_widget_conflicts.vue';
+import { TEST_HOST } from 'helpers/test_constants';
 
 describe('MRWidgetConflicts', () => {
   let vm;
@@ -16,7 +17,7 @@ describe('MRWidgetConflicts', () => {
   }
 
   beforeEach(() => {
-    spyOn($.fn, 'popover').and.callThrough();
+    jest.spyOn($.fn, 'popover');
   });
 
   afterEach(() => {
@@ -185,7 +186,7 @@ describe('MRWidgetConflicts', () => {
         mr: {
           canMerge: true,
           canPushToSourceBranch: true,
-          conflictResolutionPath: gl.TEST_HOST,
+          conflictResolutionPath: TEST_HOST,
           sourceBranchProtected: true,
           conflictsDocsPath: '',
         },
@@ -207,7 +208,7 @@ describe('MRWidgetConflicts', () => {
         mr: {
           canMerge: true,
           canPushToSourceBranch: true,
-          conflictResolutionPath: gl.TEST_HOST,
+          conflictResolutionPath: TEST_HOST,
           sourceBranchProtected: false,
           conflictsDocsPath: '',
         },

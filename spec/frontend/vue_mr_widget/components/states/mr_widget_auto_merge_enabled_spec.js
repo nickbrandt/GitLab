@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { trimText } from 'spec/helpers/text_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { trimText } from 'helpers/text_helper';
 import autoMergeEnabledComponent from '~/vue_merge_request_widget/components/states/mr_widget_auto_merge_enabled.vue';
 import MRWidgetService from '~/vue_merge_request_widget/services/mr_widget_service';
 import eventHub from '~/vue_merge_request_widget/event_hub';
@@ -14,7 +14,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
 
   beforeEach(() => {
     const Component = Vue.extend(autoMergeEnabledComponent);
-    spyOn(eventHub, '$emit');
+    jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
 
     vm = mountComponent(Component, {
       mr: {
@@ -103,7 +103,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
         const mrObj = {
           is_new_mr_data: true,
         };
-        spyOn(vm.service, 'cancelAutomaticMerge').and.returnValue(
+        jest.spyOn(vm.service, 'cancelAutomaticMerge').mockReturnValue(
           new Promise(resolve => {
             resolve({
               data: mrObj,
@@ -112,17 +112,17 @@ describe('MRWidgetAutoMergeEnabled', () => {
         );
 
         vm.cancelAutomaticMerge();
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.isCancellingAutoMerge).toBeTruthy();
           expect(eventHub.$emit).toHaveBeenCalledWith('UpdateWidgetData', mrObj);
           done();
-        }, 333);
+        });
       });
     });
 
     describe('removeSourceBranch', () => {
       it('should set flag and call service then request main component to update the widget', done => {
-        spyOn(vm.service, 'merge').and.returnValue(
+        jest.spyOn(vm.service, 'merge').mockReturnValue(
           Promise.resolve({
             data: {
               status: MWPS_MERGE_STRATEGY,
@@ -131,7 +131,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
         );
 
         vm.removeSourceBranch();
-        setTimeout(() => {
+        setImmediate(() => {
           expect(eventHub.$emit).toHaveBeenCalledWith('MRWidgetUpdateRequested');
           expect(vm.service.merge).toHaveBeenCalledWith({
             sha,
@@ -139,7 +139,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
             should_remove_source_branch: true,
           });
           done();
-        }, 333);
+        });
       });
     });
   });

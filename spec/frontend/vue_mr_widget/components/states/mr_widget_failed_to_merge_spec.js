@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import failedToMergeComponent from '~/vue_merge_request_widget/components/states/mr_widget_failed_to_merge.vue';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 
@@ -11,9 +11,9 @@ describe('MRWidgetFailedToMerge', () => {
 
   beforeEach(() => {
     Component = Vue.extend(failedToMergeComponent);
-    spyOn(eventHub, '$emit');
-    spyOn(window, 'setInterval').and.returnValue(dummyIntervalId);
-    spyOn(window, 'clearInterval').and.stub();
+    jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
+    jest.spyOn(window, 'setInterval').mockReturnValue(dummyIntervalId);
+    jest.spyOn(window, 'clearInterval').mockImplementation();
     mr = {
       mergeError: 'Merge error happened',
     };
@@ -83,7 +83,7 @@ describe('MRWidgetFailedToMerge', () => {
 
     describe('updateTimer', () => {
       it('should update timer and emit event when timer end', () => {
-        spyOn(vm, 'refresh');
+        jest.spyOn(vm, 'refresh').mockImplementation(() => {});
 
         expect(vm.timer).toEqual(10);
 

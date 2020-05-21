@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import mergedComponent from '~/vue_merge_request_widget/components/states/mr_widget_merged.vue';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 
@@ -52,7 +52,7 @@ describe('MRWidgetMerged', () => {
       removeSourceBranch() {},
     };
 
-    spyOn(eventHub, '$emit');
+    jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
 
     vm = mountComponent(Component, { mr, service });
   });
@@ -124,7 +124,7 @@ describe('MRWidgetMerged', () => {
   describe('methods', () => {
     describe('removeSourceBranch', () => {
       it('should set flag and call service then request main component to update the widget', done => {
-        spyOn(vm.service, 'removeSourceBranch').and.returnValue(
+        jest.spyOn(vm.service, 'removeSourceBranch').mockReturnValue(
           new Promise(resolve => {
             resolve({
               data: {
@@ -135,14 +135,14 @@ describe('MRWidgetMerged', () => {
         );
 
         vm.removeSourceBranch();
-        setTimeout(() => {
-          const args = eventHub.$emit.calls.argsFor(0);
+        setImmediate(() => {
+          const args = eventHub.$emit.mock.calls[0];
 
           expect(vm.isMakingRequest).toEqual(true);
           expect(args[0]).toEqual('MRWidgetUpdateRequested');
           expect(args[1]).not.toThrow();
           done();
-        }, 333);
+        });
       });
     });
   });

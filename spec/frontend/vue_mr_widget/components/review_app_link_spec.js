@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { mockTracking, triggerEvent } from 'spec/helpers/tracking_helper';
+import { mockTracking, triggerEvent } from 'helpers/tracking_helper';
 import component from '~/vue_merge_request_widget/components/review_app_link.vue';
 import mountComponent from '../../helpers/vue_mount_component_helper';
 
@@ -42,7 +42,7 @@ describe('review app link', () => {
   });
 
   it('tracks an event when clicked', () => {
-    const spy = mockTracking('_category_', el, spyOn);
+    const spy = mockTracking('_category_', el, jest.spyOn);
     triggerEvent(el);
 
     expect(spy).toHaveBeenCalledWith('_category_', 'open_review_app', {

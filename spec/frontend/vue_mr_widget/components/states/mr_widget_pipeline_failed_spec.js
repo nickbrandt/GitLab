@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { removeBreakLine } from 'spec/helpers/text_helper';
+import { removeBreakLine } from 'helpers/text_helper';
 import PipelineFailed from '~/vue_merge_request_widget/components/states/pipeline_failed.vue';
 
 describe('PipelineFailed', () => {
