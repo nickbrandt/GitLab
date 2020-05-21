@@ -642,7 +642,7 @@ end
 For this reason, whenever you call a resolver (mainly in tests - as framework
 abstractions Resolvers should not be considered re-usable, finders are to be
 preferred), remember to call the `ready?` method and check the boolean flag
-before calling `resolve`!
+before calling `resolve`! An example can be seen in our [`GraphQLHelpers`](https://gitlab.com/gitlab-org/gitlab/-/blob/2d395f32d2efbb713f7bc861f96147a2a67e92f2/spec/support/helpers/graphql_helpers.rb#L20-27).
 
 ## Mutations
 
