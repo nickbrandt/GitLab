@@ -12,10 +12,14 @@ func TestRangesRead(t *testing.T) {
 	defer cleanup()
 
 	firstRange := Range{Line: 1, Character: 2, RefId: 3}
-	require.Equal(t, &firstRange, r.Entries[1])
+	rg, err := r.getRange(1)
+	require.NoError(t, err)
+	require.Equal(t, &firstRange, rg)
 
 	secondRange := Range{Line: 5, Character: 4, RefId: 3}
-	require.Equal(t, &secondRange, r.Entries[2])
+	rg, err = r.getRange(2)
+	require.NoError(t, err)
+	require.Equal(t, &secondRange, rg)
 }
 
 func TestSerialize(t *testing.T) {
