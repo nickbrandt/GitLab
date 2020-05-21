@@ -72,7 +72,7 @@ from [owasp.org](https://owasp.org/).
 
 - Nothing Geo-specific. Any user where `admin: true` is set in the database is
   considered an admin with super-user privileges.
-- See also: [more granular access control](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/32730)
+- See also: [more granular access control](https://gitlab.com/gitlab-org/gitlab/-/issues/18242)
   (not Geo-specific).
 - Much of Geo’s integration (database replication, for instance) must be
   configured with the application, typically by system administrators.
