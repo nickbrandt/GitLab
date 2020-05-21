@@ -16,7 +16,7 @@ describe Ci::Minutes::EmailNotificationService do
   shared_examples 'namespace with all CI minutes used' do
     context 'when usage is over the quote' do
       it 'sends the email to the owner' do
-        expect(CiMinutesUsageMailer).to receive(:notify).once.with(namespace.name, [user.email]).and_return(spy)
+        expect(CiMinutesUsageMailer).to receive(:notify).once.with(namespace, [user.email]).and_return(spy)
 
         subject
       end
@@ -117,7 +117,7 @@ describe Ci::Minutes::EmailNotificationService do
 
           it 'sends the email to all the owners' do
             expect(CiMinutesUsageMailer).to receive(:notify)
-              .with(namespace.name, match_array([user_2.email, user.email]))
+              .with(namespace, match_array([user_2.email, user.email]))
               .and_return(spy)
 
             subject
@@ -161,7 +161,7 @@ describe Ci::Minutes::EmailNotificationService do
 
       it 'notifies the the owners about it' do
         expect(CiMinutesUsageMailer).to receive(:notify_limit)
-          .with(namespace.name, array_including(user_2.email, user.email), expected_level)
+          .with(namespace, array_including(user_2.email, user.email), expected_level)
           .and_call_original
 
         notify_owners
