@@ -81,13 +81,13 @@ describe('Graph group component', () => {
         expect(wrapper.vm.caretIcon).toBe('angle-down');
       });
 
-      it('should call the collapse function when the button listen to a keyup enter trigger', () => {
-        const collapseSpy = jest.spyOn(wrapper.vm, 'collapse');
+      it('should call collapse the graph group content when enter is pressed on the caret icon', () => {
+        const graphGroupContent = findContent();
         const button = findToggleButton();
 
         button.trigger('keyup.enter');
 
-        expect(collapseSpy).toHaveBeenCalled();
+        expect(graphGroupContent.isVisible()).toBe(false);
       });
     });
 
