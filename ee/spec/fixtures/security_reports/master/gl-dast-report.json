@@ -1016,7 +1016,94 @@
             "category": "dast", 
             "confidence": "medium", 
             "cve": "10010", 
-            "description": "A cookie has been set without the HttpOnly flag, which means that the cookie can be accessed by JavaScript. If a malicious script can be run on this page then the cookie will be accessible and can be transmitted to another site. If this is a session cookie then session hijacking may be possible.", 
+            "description": "A cookie has been set without the HttpOnly flag, which means that the cookie can be accessed by JavaScript. If a malicious script can be run on this page then the cookie will be accessible and can be transmitted to another site. If this is a session cookie then session hijacking may be possible.",
+            "evidence": {
+              "request": {
+                "headers": [
+                  {
+                    "name": "Accept",
+                    "value": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                  },
+                  {
+                    "name": "Accept-Language",
+                    "value": "en-US,en;q=0.5"
+                  },
+                  {
+                    "name": "Connection",
+                    "value": "keep-alive"
+                  },
+                  {
+                    "name": "Cookie",
+                    "value": "JSESSIONID=BB38BE6D77E83FA7522D1429AA5F2EAF"
+                  },
+                  {
+                    "name": "Host",
+                    "value": "goat:8080"
+                  },
+                  {
+                    "name": "Referer",
+                    "value": "http://goat:8080/WebGoat/logout"
+                  },
+                  {
+                    "name": "Upgrade-Insecure-Requests",
+                    "value": "1"
+                  },
+                  {
+                    "name": "User-Agent",
+                    "value": "Mozilla/5.0 (X11; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0"
+                  }
+                ],
+                "method": "GET",
+                "url": "http://goat:8080/WebGoat/logout"
+              },
+              "response": {
+                "headers": [
+                  {
+                    "name": "Connection",
+                    "value": "keep-alive"
+                  },
+                  {
+                    "name": "Content-Length",
+                    "value": "0"
+                  },
+                  {
+                    "name": "Date",
+                    "value": "Thu, 07 May 2020 07:18:06 GMT"
+                  },
+                  {
+                    "name": "Gitlab-DAST-Permission",
+                    "value": "allow"
+                  },
+                  {
+                    "name": "Location",
+                    "value": "http://goat:8080/WebGoat/login"
+                  },
+                  {
+                    "name": "Server",
+                    "value": "nginx/1.17.6"
+                  },
+                  {
+                    "name": "Set-Cookie",
+                    "value": "JSESSIONID=1624E8274D30BB5A029F5A18BB7E4400; Path=/WebGoat"
+                  },
+                  {
+                    "name": "X-Content-Type-Options",
+                    "value": "nosniff"
+                  },
+                  {
+                    "name": "X-Frame-Options",
+                    "value": "DENY"
+                  },
+                  {
+                    "name": "X-XSS-Protection",
+                    "value": "1; mode=block"
+                  }
+                ],
+                "reason_phrase": "Found",
+                "status_code": 302
+              },
+              "summary": "Set-Cookie: JSESSIONID"
+            },
             "identifiers": [
                 {
                     "name": "Cookie No HttpOnly Flag", 
