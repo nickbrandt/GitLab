@@ -416,6 +416,13 @@ describe Gitlab::UsageData do
 
           context 'for manage' do
             it 'includes accurate usage_activity_by_stage data' do
+              stub_config(
+                ldap:
+                  { enabled: true, servers: ldap_server_config },
+                omniauth:
+                  { providers: omniauth_providers }
+              )
+
               for_defined_days_back do
                 user = create(:user)
                 create(:event, author: user)
@@ -433,7 +440,12 @@ describe Gitlab::UsageData do
                 ldap_users: 2,
                 users_created: 8,
                 value_stream_management_customized_group_stages: 2,
-                projects_with_compliance_framework: 2
+                projects_with_compliance_framework: 2,
+                ldap_servers: 2,
+                ldap_group_sync_enabled: true,
+                ldap_admin_sync_enabled: true,
+                omniauth_providers: ['google_oauth2'],
+                group_saml_enabled: true
               )
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:manage]).to eq(
                 events: 1,
@@ -442,8 +454,38 @@ describe Gitlab::UsageData do
                 ldap_users: 1,
                 users_created: 5,
                 value_stream_management_customized_group_stages: 2,
-                projects_with_compliance_framework: 2
+                projects_with_compliance_framework: 2,
+                ldap_servers: 2,
+                ldap_group_sync_enabled: true,
+                ldap_admin_sync_enabled: true,
+                omniauth_providers: ['google_oauth2'],
+                group_saml_enabled: true
               )
+            end
+
+            def omniauth_providers
+              [
+                OpenStruct.new(name: 'google_oauth2'),
+                OpenStruct.new(name: 'ldapmain'),
+                OpenStruct.new(name: 'group_saml')
+              ]
+            end
+
+            def ldap_server_config
+              {
+                'main' =>
+                  {
+                    'provider_name' => 'ldapmain',
+                    'group_base'    => 'ou=groups',
+                    'admin_group'   => 'my_group'
+                  },
+                'secondary' =>
+                  {
+                    'provider_name' => 'ldapsecondary',
+                    'group_base'    => nil,
+                    'admin_group'   => nil
+                  }
+              }
             end
           end
 
