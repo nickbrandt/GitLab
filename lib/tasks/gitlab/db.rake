@@ -1,7 +1,5 @@
 namespace :gitlab do
   namespace :db do
-    CUSTOM_DUMP_FILE = 'db/gitlab_structure.sql'.freeze
-
     desc 'GitLab | DB | Manually insert schema migration version'
     task :mark_migration_complete, [:version] => :environment do |_, args|
       unless args[:version]
@@ -96,15 +94,13 @@ namespace :gitlab do
 
     desc 'This dumps GitLab specific database details - it runs after db:structure:dump'
     task :dump_custom_structure do |task_name|
-      File.open(CUSTOM_DUMP_FILE, 'wb+') do |io|
-        Gitlab::Database::CustomStructure.new.dump(io)
-      end
+      Gitlab::Database::CustomStructure.new.dump
 
       # Allow this task to be called multiple times, as happens when running db:migrate:redo
       Rake::Task[task_name].reenable
     end
 
-    desc 'This loads Gitlab specific database details - runs after db:structure:dump'
+    desc 'This loads GitLab specific database details - runs after db:structure:dump'
     task :load_custom_structure do
       configuration = Rails.application.config_for(:database)
 
@@ -113,9 +109,10 @@ namespace :gitlab do
       ENV['PGPASSWORD'] = configuration['password'].to_s if configuration['password']
       ENV['PGUSER']     = configuration['username'].to_s if configuration['username']
 
-      args = ['-v', 'ON_ERROR_STOP=1', '-q', '-X', '-f', CUSTOM_DUMP_FILE]
-      args << configuration['database']
-      system('psql', *args)
+      dump_filepath = Gitlab::Database::CustomStructure.custom_dump_filepath.to_path
+      args = ['-v', 'ON_ERROR_STOP=1', '-q', '-X', '-f', dump_filepath, configuration['database']]
+
+      Kernel.system('psql', *args)
     end
 
     # Inform Rake that custom tasks should be run every time rake db:structure:dump is run

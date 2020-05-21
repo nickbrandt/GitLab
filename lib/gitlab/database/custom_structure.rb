@@ -3,10 +3,18 @@
 module Gitlab
   module Database
     class CustomStructure
-      def dump(io)
-        io << "SET search_path=public;\n\n"
+      CUSTOM_DUMP_FILE = 'db/gitlab_structure.sql'.freeze
 
-        dump_partitioned_foreign_keys(io) if partitioned_foreign_keys_exist?
+      def dump
+        File.open(self.class.custom_dump_filepath, 'wb') do |io|
+          io << "SET search_path=public;\n\n"
+
+          dump_partitioned_foreign_keys(io) if partitioned_foreign_keys_exist?
+        end
+      end
+
+      def self.custom_dump_filepath
+        Rails.root.join(CUSTOM_DUMP_FILE)
       end
 
       private
