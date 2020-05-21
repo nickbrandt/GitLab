@@ -66,7 +66,7 @@ module API
 
       namespace ':id/packages/go/*module_name/@v' do
         desc 'Get all tagged versions for a given Go module' do
-          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/list. This feature was introduced in GitLab 13.0.'
+          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/list. This feature was introduced in GitLab 13.1.'
         end
         get 'list' do
           mod = find_module
@@ -76,7 +76,7 @@ module API
         end
 
         desc 'Get information about the given module version' do
-          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.info. This feature was introduced in GitLab 13.0.'
+          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.info. This feature was introduced in GitLab 13.1.'
           success EE::API::Entities::GoModuleVersion
         end
         params do
@@ -89,7 +89,7 @@ module API
         end
 
         desc 'Get the module file of the given module version' do
-          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.mod. This feature was introduced in GitLab 13.0.'
+          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.mod. This feature was introduced in GitLab 13.1.'
         end
         params do
           requires :module_version, type: String, desc: 'Module version'
@@ -102,7 +102,7 @@ module API
         end
 
         desc 'Get a zip of the source of the given module version' do
-          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.zip. This feature was introduced in GitLab 13.0.'
+          detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.zip. This feature was introduced in GitLab 13.1.'
         end
         params do
           requires :module_version, type: String, desc: 'Module version'
