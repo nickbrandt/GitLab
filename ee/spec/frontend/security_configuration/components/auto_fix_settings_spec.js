@@ -40,6 +40,7 @@ describe('Auto-fix Settings', () => {
         containerScanningHelpPath: CONTAINER_SCANNING_HELP_PATH,
         dependencyScanningHelpPath: DEPENDENCY_SCANNING_HELP_PATH,
         toggleAutofixSettingEndpoint: TOGGLE_AUTO_FIX_ENDPOINT,
+        canToggleAutoFixSettings: true,
         ...props,
       },
     });
@@ -58,6 +59,8 @@ describe('Auto-fix Settings', () => {
     findFooter()
       .text()
       .trim();
+
+  const expectCheckboxDisabled = () => expect(findCheckbox().attributes().disabled).toBeTruthy();
 
   const toggleCheckbox = () => findCheckbox().setChecked(!wrapper.vm.autoFixEnabledLocal);
 
@@ -101,7 +104,7 @@ describe('Auto-fix Settings', () => {
   const itSendsPostRequest = () => {
     it('sends a post request and sets loading state', () => {
       expect(axiosMock.history.post).toHaveLength(1);
-      expect(findCheckbox().element.disabled).toBe(true);
+      expectCheckboxDisabled();
     });
   };
 
@@ -133,7 +136,7 @@ describe('Auto-fix Settings', () => {
             itShowsToggleSuccessState();
 
             it('resets loading state', () => {
-              expect(findCheckbox().element.disabled).toBe(false);
+              expect(findCheckbox().attributes().disabled).toBeFalsy();
             });
           });
         });
@@ -161,4 +164,17 @@ describe('Auto-fix Settings', () => {
       });
     },
   );
+
+  describe("when user isn't allowed to toggle auto-fix settings", () => {
+    beforeEach(() => {
+      createComponent({
+        canToggleAutoFixSettings: false,
+        autoFixEnabled: AUTO_FIX_ENABLED_PROPS,
+      });
+    });
+
+    it('disables the checkbox', () => {
+      expectCheckboxDisabled();
+    });
+  });
 });
