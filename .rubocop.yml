@@ -361,7 +361,6 @@ RSpec/LeakyConstantDeclaration:
     - 'spec/lib/gitlab/git/diff_collection_spec.rb'
     - 'spec/lib/gitlab/import_export/import_test_coverage_spec.rb'
     - 'spec/lib/gitlab/import_export/project/relation_factory_spec.rb'
-    - 'spec/lib/gitlab/path_regex_spec.rb'
     - 'spec/lib/gitlab/quick_actions/dsl_spec.rb'
     - 'spec/lib/marginalia_spec.rb'
     - 'spec/mailers/notify_spec.rb'
