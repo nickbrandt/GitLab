@@ -111,6 +111,19 @@ describe Prometheus::ProxyVariableSubstitutionService do
           let(:expected_query) { 'up{pod_name="{{pod_name}}"}' }
         end
       end
+
+      context 'with unused variable' do
+        let(:params_keys) do
+          {
+            query: 'avg(avg_over_time(slo_observation_status{env=~"ops|gprd", environment="{{environment2}}", stage="main", type="ci-runners"}[7d]))',
+            variables: %w(environment gprd environment2 gprd)
+          }
+        end
+
+        it_behaves_like 'success' do
+          let(:expected_query) { 'avg(avg_over_time(slo_observation_status{env=~"ops|gprd", environment="gprd", stage="main", type="ci-runners"}[7d]))' }
+        end
+      end
     end
 
     context 'gsub variable substitution tolerance for weirdness' do
