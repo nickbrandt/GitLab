@@ -608,7 +608,7 @@ This log records:
 - [Protected paths](../user/admin_area/settings/protected_paths.md) abusive requests.
 
 NOTE: **Note:**
-From [%12.1](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/62756), user ID and username are also
+From [%12.3](https://gitlab.com/gitlab-org/gitlab/-/issues/29239), user ID and username are also
 recorded on this log, if available.
 
 ## `graphql_json.log`

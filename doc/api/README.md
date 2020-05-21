@@ -58,7 +58,7 @@ Currently only API version v4 is available. Version v3 was removed in
 ## Basic usage
 
 API requests should be prefixed with `api` and the API version. The API version
-is defined in [`lib/api.rb`](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/api/api.rb). For example, the root of the v4 API
+is defined in [`lib/api.rb`](https://gitlab.com/gitlab-org/gitlab/tree/master/lib/api/api.rb). For example, the root of the v4 API
 is at `/api/v4`.
 
 Example of a valid API request using cURL:
