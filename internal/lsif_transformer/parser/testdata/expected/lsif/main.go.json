@@ -1,0 +1,80 @@
+[
+    {
+        "start_line": 7,
+        "start_char": 1,
+        "definition_path": "main.go#L4",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kn\"\u003epackage\u003c/span\u003e \u003cspan class=\"s\"\u003e\u0026#34;github.com/user/hello/morestrings\u0026#34;\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            },
+            {
+                "value": "Package morestrings implements additional functions to manipulate UTF-8 encoded strings, beyond what is provided in the standard \"strings\" package. \n\n"
+            }
+        ]
+    },
+    {
+        "start_line": 7,
+        "start_char": 13,
+        "definition_path": "morestrings/reverse.go#L12",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003efunc\u003c/span\u003e Reverse(s \u003cspan class=\"kt\"\u003estring\u003c/span\u003e) \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            },
+            {
+                "value": "This method reverses a string \n\n"
+            }
+        ]
+    },
+    {
+        "start_line": 8,
+        "start_char": 1,
+        "definition_path": "main.go#L4",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kn\"\u003epackage\u003c/span\u003e \u003cspan class=\"s\"\u003e\u0026#34;github.com/user/hello/morestrings\u0026#34;\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            },
+            {
+                "value": "Package morestrings implements additional functions to manipulate UTF-8 encoded strings, beyond what is provided in the standard \"strings\" package. \n\n"
+            }
+        ]
+    },
+    {
+        "start_line": 8,
+        "start_char": 13,
+        "definition_path": "morestrings/reverse.go#L5",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003efunc\u003c/span\u003e Func2(i \u003cspan class=\"kt\"\u003eint\u003c/span\u003e) \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    },
+    {
+        "start_line": 6,
+        "start_char": 5,
+        "definition_path": "main.go#L7",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003efunc\u003c/span\u003e main()\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    },
+    {
+        "start_line": 3,
+        "start_char": 2,
+        "definition_path": "main.go#L4",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kn\"\u003epackage\u003c/span\u003e \u003cspan class=\"s\"\u003e\u0026#34;github.com/user/hello/morestrings\u0026#34;\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            },
+            {
+                "value": "Package morestrings implements additional functions to manipulate UTF-8 encoded strings, beyond what is provided in the standard \"strings\" package. \n\n"
+            }
+        ]
+    }
+]

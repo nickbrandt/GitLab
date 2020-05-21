@@ -1,0 +1,93 @@
+[
+    {
+        "start_line": 11,
+        "start_char": 5,
+        "definition_path": "morestrings/reverse.go#L12",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003efunc\u003c/span\u003e Reverse(s \u003cspan class=\"kt\"\u003estring\u003c/span\u003e) \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            },
+            {
+                "value": "This method reverses a string \n\n"
+            }
+        ]
+    },
+    {
+        "start_line": 4,
+        "start_char": 11,
+        "definition_path": "morestrings/reverse.go#L5",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003evar\u003c/span\u003e i \u003cspan class=\"kt\"\u003eint\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    },
+    {
+        "start_line": 11,
+        "start_char": 13,
+        "definition_path": "morestrings/reverse.go#L12",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003evar\u003c/span\u003e s \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    },
+    {
+        "start_line": 12,
+        "start_char": 1,
+        "definition_path": "morestrings/reverse.go#L13",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003evar\u003c/span\u003e a \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    },
+    {
+        "start_line": 5,
+        "start_char": 1,
+        "definition_path": "morestrings/reverse.go#L6",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003evar\u003c/span\u003e b \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    },
+    {
+        "start_line": 14,
+        "start_char": 8,
+        "definition_path": "morestrings/reverse.go#L13",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003evar\u003c/span\u003e a \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    },
+    {
+        "start_line": 7,
+        "start_char": 8,
+        "definition_path": "morestrings/reverse.go#L6",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003evar\u003c/span\u003e b \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    },
+    {
+        "start_line": 4,
+        "start_char": 5,
+        "definition_path": "morestrings/reverse.go#L5",
+        "hover": [
+            {
+                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003efunc\u003c/span\u003e Func2(i \u003cspan class=\"kt\"\u003eint\u003c/span\u003e) \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "language": "go"
+            }
+        ]
+    }
+]

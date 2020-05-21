@@ -131,6 +131,8 @@ type Response struct {
 	Repository gitalypb.Repository
 	// For git-http, does the requestor have the right to view all refs?
 	ShowAllRefs bool
+	// Detects whether an artifact is used for code intelligence
+	ProcessLsif bool
 }
 
 // singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy
