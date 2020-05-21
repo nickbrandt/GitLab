@@ -1,3 +1,9 @@
+---
+stage: Growth
+group: Telemetry
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # Telemetry Guide
 
 At GitLab, we collect telemetry for the purpose of helping us build a better GitLab. Data about how GitLab is used is collected to better understand what parts of GitLab needs improvement and what features to build next. Telemetry also helps our team better understand the reasons why people use GitLab and with this knowledge we are able to make better product decisions.
