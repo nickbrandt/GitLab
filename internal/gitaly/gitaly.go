@@ -158,7 +158,9 @@ func newConnection(server Server) (*grpc.ClientConn, error) {
 			grpc_middleware.ChainStreamClient(
 				grpctracing.StreamClientTracingInterceptor(),
 				grpc_prometheus.StreamClientInterceptor,
-				grpccorrelation.StreamClientCorrelationInterceptor(),
+				grpccorrelation.StreamClientCorrelationInterceptor(
+					grpccorrelation.WithClientName("gitlab-workhorse"),
+				),
 			),
 		),
 
@@ -166,7 +168,9 @@ func newConnection(server Server) (*grpc.ClientConn, error) {
 			grpc_middleware.ChainUnaryClient(
 				grpctracing.UnaryClientTracingInterceptor(),
 				grpc_prometheus.UnaryClientInterceptor,
-				grpccorrelation.UnaryClientCorrelationInterceptor(),
+				grpccorrelation.UnaryClientCorrelationInterceptor(
+					grpccorrelation.WithClientName("gitlab-workhorse"),
+				),
 			),
 		),
 	)
