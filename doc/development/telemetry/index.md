@@ -19,7 +19,7 @@ Telemetry Guide:
 
   1. [What is Usage Ping](usage_ping.md#what-is-usage-ping)
   1. [Usage Ping payload](usage_ping.md#usage-ping-payload)
-  1. [Disabling Usage Ping](usage_ping.md#disabling-usage-ping)
+  1. [Disable Usage Ping](usage_ping.md#disable-usage-ping)
   1. [Usage Ping request flow](usage_ping.md#usage-ping-request-flow)
   1. [How Usage Ping works](usage_ping.md#how-usage-ping-works)
   1. [Implementing Usage Ping](usage_ping.md#implementing-usage-ping)
