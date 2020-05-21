@@ -55,27 +55,27 @@ namespace :gitlab do
       logger.info("Indexing snippets... " + "done".color(:green))
     end
 
-    desc "GitLab | Elasticsearch | Create empty index"
-    task :create_empty_index, [:index_name] => [:environment] do |t, args|
-      helper = Gitlab::Elastic::Helper.new(index_name: args[:index_name])
+    desc "GitLab | Elasticsearch | Create empty index and assign alias"
+    task :create_empty_index, [:target_name] => [:environment] do |t, args|
+      helper = Gitlab::Elastic::Helper.new(target_name: args[:target_name])
       helper.create_empty_index
 
-      puts "Index '#{helper.index_name}' has been created.".color(:green)
+      puts "Index and underlying alias '#{helper.target_name}' has been created.".color(:green)
     end
 
     desc "GitLab | Elasticsearch | Delete index"
-    task :delete_index, [:index_name] => [:environment] do |t, args|
-      helper = Gitlab::Elastic::Helper.new(index_name: args[:index_name])
+    task :delete_index, [:target_name] => [:environment] do |t, args|
+      helper = Gitlab::Elastic::Helper.new(target_name: args[:target_name])
 
       if helper.delete_index
-        puts "Index '#{helper.index_name}' has been deleted".color(:green)
+        puts "Index/alias '#{helper.target_name}' has been deleted".color(:green)
       else
-        puts "Index '#{helper.index_name}' was not found".color(:green)
+        puts "Index/alias '#{helper.target_name}' was not found".color(:green)
       end
     end
 
     desc "GitLab | Elasticsearch | Recreate index"
-    task :recreate_index, [:index_name] => [:environment] do |t, args|
+    task :recreate_index, [:target_name] => [:environment] do |t, args|
       Rake::Task["gitlab:elastic:delete_index"].invoke(*args)
       Rake::Task["gitlab:elastic:create_empty_index"].invoke(*args)
     end
