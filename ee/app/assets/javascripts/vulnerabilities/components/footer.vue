@@ -38,21 +38,12 @@ export default {
 
   data: () => ({
     discussionsDictionary: {},
-    poll: null,
     lastFetchedAt: null,
   }),
 
   computed: {
-    discussions: {
-      get() {
-        return Object.values(this.discussionsDictionary);
-      },
-      set(newDiscussions) {
-        this.discussionsDictionary = newDiscussions.reduce((acc, discussion) => {
-          acc[discussion.id] = discussion;
-          return acc;
-        }, {});
-      },
+    discussions() {
+      return Object.values(this.discussionsDictionary);
     },
     noteDictionary() {
       return this.discussions
@@ -136,26 +127,26 @@ export default {
       notes.forEach(note => {
         // If the note exists, update it.
         if (this.noteDictionary[note.id]) {
-          const updatedDiscussion = this.discussionsDictionary[note.discussion_id];
-          const index = updatedDiscussion.notes.findIndex(curr => curr.id === note.id);
-          updatedDiscussion.notes.splice(index, 1, note);
-          this.$set(this.discussionsDictionary, note.discussion_id, updatedDiscussion);
+          const updatedDiscussion = { ...this.discussionsDictionary[note.discussion_id] };
+          updatedDiscussion.notes = updatedDiscussion.notes.map(curr =>
+            curr.id === note.id ? note : curr,
+          );
+          this.discussionsDictionary[note.discussion_id] = updatedDiscussion;
         }
         // If the note doesn't exist, but the discussion does, add the note to the discussion.
         else if (this.discussionsDictionary[note.discussion_id]) {
-          const updatedDiscussion = this.discussionsDictionary[note.discussion_id];
+          const updatedDiscussion = { ...this.discussionsDictionary[note.discussion_id] };
           updatedDiscussion.notes.push(note);
-          this.$set(this.discussionsDictionary, note.discussion_id, updatedDiscussion);
+          this.discussionsDictionary[note.discussion_id] = updatedDiscussion;
         }
         // If the discussion doesn't exist, create it.
         else {
-          const newDiscussions = [...this.discussions];
-          newDiscussions.push({
+          const newDiscussion = {
             id: note.discussion_id,
             reply_id: note.discussion_id,
             notes: [note],
-          });
-          this.discussions = newDiscussions;
+          };
+          this.$set(this.discussionsDictionary, newDiscussion.id, newDiscussion);
         }
       });
     },

@@ -27,6 +27,11 @@ export default {
       return this.notes.filter(x => x !== this.systemNote);
     },
   },
+  watch: {
+    discussion(newDiscussion) {
+      this.notes = newDiscussion.notes;
+    },
+  },
   methods: {
     addComment(comment) {
       this.notes.push(comment);
