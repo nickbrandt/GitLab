@@ -10643,6 +10643,9 @@ msgstr ""
 msgid "Group %{group_name} was successfully created."
 msgstr ""
 
+msgid "Group '%{group_name}' is being imported."
+msgstr ""
+
 msgid "Group Audit Events"
 msgstr ""
 
@@ -10674,6 +10677,9 @@ msgid "Group URL"
 msgstr ""
 
 msgid "Group avatar"
+msgstr ""
+
+msgid "Group could not be imported: %{errors}"
 msgstr ""
 
 msgid "Group description"
@@ -23083,6 +23089,9 @@ msgid "Unable to load the diff. %{button_try_again}"
 msgstr ""
 
 msgid "Unable to load the merge request widget. Try reloading the page."
+msgstr ""
+
+msgid "Unable to process group import file"
 msgstr ""
 
 msgid "Unable to resolve"
