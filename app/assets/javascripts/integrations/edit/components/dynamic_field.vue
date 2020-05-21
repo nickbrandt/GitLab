@@ -109,17 +109,7 @@ export default {
       };
     },
     valid() {
-      if (!this.required) {
-        return true;
-      }
-      if (this.model) {
-        return true;
-      }
-      if (!this.validated) {
-        return true;
-      }
-
-      return false;
+      return !this.required || !isEmpty(this.model) || !this.validated;
     },
   },
   created() {
