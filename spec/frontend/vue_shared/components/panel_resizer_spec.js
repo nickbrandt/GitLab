@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import panelResizer from '~/vue_shared/components/panel_resizer.vue';
 
 describe('Panel Resizer component', () => {
@@ -69,12 +69,12 @@ describe('Panel Resizer component', () => {
       side: 'left',
     });
 
-    spyOn(vm, '$emit');
+    jest.spyOn(vm, '$emit').mockImplementation(() => {});
     triggerEvent('mousedown', vm.$el);
     triggerEvent('mousemove', document);
     triggerEvent('mouseup', document);
 
-    expect(vm.$emit.calls.allArgs()).toEqual([
+    expect(vm.$emit.mock.calls).toEqual([
       ['resize-start', 100],
       ['update:size', 100],
       ['resize-end', 100],

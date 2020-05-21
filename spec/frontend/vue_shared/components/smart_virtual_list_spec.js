@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { mount } from '@vue/test-utils';
 import SmartVirtualScrollList from '~/vue_shared/components/smart_virtual_list.vue';
 
 describe('Toggle Button', () => {
@@ -28,7 +28,7 @@ describe('Toggle Button', () => {
       </smart-virtual-scroll-list>`,
     });
 
-    return mountComponent(Component);
+    return mount(Component).vm;
   };
 
   afterEach(() => {

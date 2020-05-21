@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Mousetrap from 'mousetrap';
 import { file } from 'jest/ide/helpers';
-import timeoutPromise from 'spec/helpers/set_timeout_promise_helper';
+import waitForPromises from 'helpers/wait_for_promises';
 import FindFileComponent from '~/vue_shared/components/file_finder/index.vue';
 import { UP_KEY_CODE, DOWN_KEY_CODE, ENTER_KEY_CODE, ESC_KEY_CODE } from '~/lib/utils/keycodes';
 
@@ -48,7 +48,7 @@ describe('File finder item spec', () => {
         ],
       });
 
-      setTimeout(done);
+      setImmediate(done);
     });
 
     it('renders list of blobs', () => {
@@ -60,7 +60,7 @@ describe('File finder item spec', () => {
     it('filters entries', done => {
       vm.searchText = 'index';
 
-      setTimeout(() => {
+      setImmediate(() => {
         expect(vm.$el.textContent).toContain('index.js');
         expect(vm.$el.textContent).not.toContain('component.js');
 
@@ -71,7 +71,7 @@ describe('File finder item spec', () => {
     it('shows clear button when searchText is not empty', done => {
       vm.searchText = 'index';
 
-      setTimeout(() => {
+      setImmediate(() => {
         expect(vm.$el.querySelector('.dropdown-input').classList).toContain('has-value');
         expect(vm.$el.querySelector('.dropdown-input-search').classList).toContain('hidden');
 
@@ -82,11 +82,11 @@ describe('File finder item spec', () => {
     it('clear button resets searchText', done => {
       vm.searchText = 'index';
 
-      timeoutPromise()
+      waitForPromises()
         .then(() => {
           vm.$el.querySelector('.dropdown-input-clear').click();
         })
-        .then(timeoutPromise)
+        .then(waitForPromises)
         .then(() => {
           expect(vm.searchText).toBe('');
         })
@@ -95,14 +95,14 @@ describe('File finder item spec', () => {
     });
 
     it('clear button focues search input', done => {
-      spyOn(vm.$refs.searchInput, 'focus');
+      jest.spyOn(vm.$refs.searchInput, 'focus').mockImplementation(() => {});
       vm.searchText = 'index';
 
-      timeoutPromise()
+      waitForPromises()
         .then(() => {
           vm.$el.querySelector('.dropdown-input-clear').click();
         })
-        .then(timeoutPromise)
+        .then(waitForPromises)
         .then(() => {
           expect(vm.$refs.searchInput.focus).toHaveBeenCalled();
         })
@@ -114,7 +114,7 @@ describe('File finder item spec', () => {
       it('returns 1 when no filtered entries exist', done => {
         vm.searchText = 'testing 123';
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.listShowCount).toBe(1);
 
           done();
@@ -134,7 +134,7 @@ describe('File finder item spec', () => {
       it('returns 33 when entries dont exist', done => {
         vm.searchText = 'testing 123';
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.listHeight).toBe(33);
 
           done();
@@ -146,7 +146,7 @@ describe('File finder item spec', () => {
       it('returns length of filtered blobs', done => {
         vm.searchText = 'index';
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.filteredBlobsLength).toBe(1);
 
           done();
@@ -160,7 +160,7 @@ describe('File finder item spec', () => {
           vm.focusedIndex = 1;
           vm.searchText = 'test';
 
-          setTimeout(() => {
+          setImmediate(() => {
             expect(vm.focusedIndex).toBe(0);
 
             done();
@@ -173,11 +173,11 @@ describe('File finder item spec', () => {
           vm.searchText = 'test';
           vm.visible = true;
 
-          timeoutPromise()
+          waitForPromises()
             .then(() => {
               vm.visible = false;
             })
-            .then(timeoutPromise)
+            .then(waitForPromises)
             .then(() => {
               expect(vm.searchText).toBe('');
             })
@@ -189,7 +189,7 @@ describe('File finder item spec', () => {
 
     describe('openFile', () => {
       beforeEach(() => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit').mockImplementation(() => {});
       });
 
       it('closes file finder', () => {
@@ -210,11 +210,11 @@ describe('File finder item spec', () => {
         const event = new CustomEvent('keyup');
         event.keyCode = ENTER_KEY_CODE;
 
-        spyOn(vm, 'openFile');
+        jest.spyOn(vm, 'openFile').mockImplementation(() => {});
 
         vm.$refs.searchInput.dispatchEvent(event);
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.openFile).toHaveBeenCalledWith(vm.files[0]);
 
           done();
@@ -225,11 +225,11 @@ describe('File finder item spec', () => {
         const event = new CustomEvent('keyup');
         event.keyCode = ESC_KEY_CODE;
 
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit').mockImplementation(() => {});
 
         vm.$refs.searchInput.dispatchEvent(event);
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(vm.$emit).toHaveBeenCalledWith('toggle', false);
 
           done();
@@ -303,7 +303,7 @@ describe('File finder item spec', () => {
     beforeEach(done => {
       createComponent();
 
-      spyOn(vm, 'toggle');
+      jest.spyOn(vm, 'toggle').mockImplementation(() => {});
 
       vm.$nextTick(done);
     });

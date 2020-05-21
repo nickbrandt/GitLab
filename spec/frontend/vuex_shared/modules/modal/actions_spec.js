@@ -1,4 +1,4 @@
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import * as types from '~/vuex_shared/modules/modal/mutation_types';
 import * as actions from '~/vuex_shared/modules/modal/actions';
 

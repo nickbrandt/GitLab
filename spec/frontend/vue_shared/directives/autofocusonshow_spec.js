@@ -9,13 +9,21 @@ describe('AutofocusOnShow directive', () => {
   describe('with input invisible on component render', () => {
     let el;
 
-    beforeAll(() => {
+    beforeEach(() => {
       setFixtures('<div id="container" style="display: none;"><input id="inputel"/></div>');
       el = document.querySelector('#inputel');
+
+      window.IntersectionObserver = class {
+        observe = jest.fn();
+      };
+    });
+
+    afterEach(() => {
+      delete window.IntersectionObserver;
     });
 
     it('should bind IntersectionObserver on input element', () => {
-      spyOn(el, 'focus');
+      jest.spyOn(el, 'focus').mockImplementation(() => {});
 
       autofocusonshow.inserted(el);
 
@@ -27,7 +35,7 @@ describe('AutofocusOnShow directive', () => {
       el.visibilityObserver = {
         disconnect: () => {},
       };
-      spyOn(el.visibilityObserver, 'disconnect');
+      jest.spyOn(el.visibilityObserver, 'disconnect').mockImplementation(() => {});
 
       autofocusonshow.unbind(el);
 
