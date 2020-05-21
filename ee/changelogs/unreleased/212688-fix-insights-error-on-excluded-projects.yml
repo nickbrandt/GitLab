@@ -1,5 +1,0 @@
----
-title: Fix project insights page when projects.only parameter is used
-merge_request: 30988
-author:
-type: fixed

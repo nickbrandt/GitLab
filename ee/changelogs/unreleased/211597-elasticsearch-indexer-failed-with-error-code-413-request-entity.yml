@@ -1,5 +1,0 @@
----
-title: Reduce 413 errors when making bulk indexing requests to Elasticsearch
-merge_request: 31653
-author:
-type: fixed

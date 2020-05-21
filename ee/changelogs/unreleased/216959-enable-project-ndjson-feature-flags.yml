@@ -1,5 +1,0 @@
----
-title: Use data-interchange format based on .ndjson for Project import and export.
-merge_request: 31601
-author:
-type: performance
