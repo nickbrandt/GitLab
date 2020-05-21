@@ -64,4 +64,8 @@ export default {
   [mutationTypes.TOGGLE_PROMOTION_STATE]: () => {
     notImplemented();
   },
+
+  [mutationTypes.TOGGLE_EPICS_SWIMLANES]: state => {
+    state.isShowingEpicsSwimlanes = !state.isShowingEpicsSwimlanes;
+  },
 };

@@ -51,4 +51,8 @@ export default {
   togglePromotionState: () => {
     notImplemented();
   },
+
+  toggleEpicSwimlanes: ({ commit }) => {
+    commit(types.TOGGLE_EPICS_SWIMLANES);
+  },
 };
