@@ -600,7 +600,7 @@ sudo cp -R /etc/ssh/* /etc/ssh_static
 
 In `/etc/ssh/sshd_config` update the following:
 
-```bash
+```shell
 # HostKeys for protocol version 2
 HostKey /etc/ssh_static/ssh_host_rsa_key
 HostKey /etc/ssh_static/ssh_host_dsa_key
