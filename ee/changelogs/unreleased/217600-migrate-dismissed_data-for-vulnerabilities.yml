@@ -1,0 +1,5 @@
+---
+title: Migrate dismissal data to Vulnersabilities from Vulnerability Feedback
+merge_request: 32444
+author:
+type: fixed
