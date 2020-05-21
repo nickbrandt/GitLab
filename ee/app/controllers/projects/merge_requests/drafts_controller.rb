@@ -5,7 +5,6 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
 
   respond_to :json
 
-  before_action :check_draft_notes_available!, except: [:index]
   before_action :authorize_create_note!, only: [:create, :publish]
   before_action :authorize_admin_draft!, only: [:update, :destroy]
   before_action :authorize_admin_draft!, if: -> { action_name == 'publish' && params[:id].present? }
@@ -68,7 +67,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   end
 
   def draft_notes
-    return unless current_user && draft_notes_available?
+    return unless current_user
 
     strong_memoize(:draft_notes) do
       merge_request.draft_notes.authored_by(current_user)
@@ -120,21 +119,11 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
     note
   end
 
-  def draft_notes_available?
-    @project.feature_available?(:batch_comments, current_user)
-  end
-
   def authorize_admin_draft!
     access_denied! unless can?(current_user, :admin_note, draft_note)
   end
 
   def authorize_create_note!
     access_denied! unless can?(current_user, :create_note, merge_request)
-  end
-
-  def check_draft_notes_available!
-    return if draft_notes_available?
-
-    access_denied!('Draft Notes are not available with your current License')
   end
 end

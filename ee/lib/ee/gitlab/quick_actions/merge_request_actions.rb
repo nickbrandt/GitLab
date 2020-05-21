@@ -25,7 +25,7 @@ module EE
           explanation _('Submit the current review.')
           types MergeRequest
           condition do
-            quick_action_target.persisted? && quick_action_target.project.feature_available?(:batch_comments, current_user)
+            quick_action_target.persisted?
           end
           command :submit_review do
             next if params[:review_id]

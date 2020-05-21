@@ -19,7 +19,7 @@ describe Projects::MergeRequests::DraftsController do
 
   before do
     sign_in(user)
-    stub_licensed_features(batch_comments: true, multiple_merge_request_assignees: true)
+    stub_licensed_features(multiple_merge_request_assignees: true)
     stub_commonmark_sourcepos_disabled
   end
 
@@ -450,92 +450,5 @@ describe Projects::MergeRequests::DraftsController do
         expect(response).to have_gitlab_http_status(:ok)
       end
     end
-  end
-
-  shared_examples_for 'batch comments feature disabled' do
-    context 'GET #index' do
-      it 'does not return existing drafts' do
-        create_list(:draft_note, 4, merge_request: merge_request, author: user)
-
-        get :index, params: params
-
-        expect(json_response).to eq([])
-      end
-    end
-
-    context 'POST #create' do
-      it 'errors out' do
-        expect do
-          post :create, params: params.merge(draft_note: { note: 'comment' })
-        end.to change { DraftNote.count }.by(0)
-
-        expect(response).to have_gitlab_http_status(:forbidden)
-      end
-    end
-
-    context 'PUT #update' do
-      it 'errors out' do
-        draft = create(:draft_note, merge_request: merge_request, author: user)
-
-        expect do
-          put :update, params: params.merge(id: draft.id, draft_note: { note: 'comment' })
-        end.to change { DraftNote.count }.by(0)
-
-        expect(response).to have_gitlab_http_status(:forbidden)
-      end
-    end
-
-    context 'DELETE #destroy' do
-      it 'errors out' do
-        draft = create(:draft_note, merge_request: merge_request, author: user)
-
-        expect { delete :destroy, params: params.merge(id: draft.id) }.to change { DraftNote.count }.by(0)
-        expect(response).to have_gitlab_http_status(:forbidden)
-      end
-    end
-
-    context 'collection endpoints' do
-      before do
-        create_list(:draft_note, 5, merge_request: merge_request, author: user)
-      end
-
-      context 'POST #publish' do
-        it 'errors out' do
-          expect do
-            post :publish, params: params
-          end.to change { DraftNote.count }.by(0).and change { Note.count }.by(0)
-
-          expect(response).to have_gitlab_http_status(:forbidden)
-          expect(DraftNote.count).to eq(5)
-        end
-      end
-
-      context 'DELETE #discard' do
-        it 'errors out' do
-          expect do
-            delete :discard, params: params
-          end.to change { DraftNote.count }.by(0)
-
-          expect(response).to have_gitlab_http_status(:forbidden)
-          expect(DraftNote.count).to eq(5)
-        end
-      end
-    end
-  end
-
-  context 'disabled due to license' do
-    before do
-      stub_licensed_features(batch_comments: false)
-    end
-
-    it_behaves_like 'batch comments feature disabled'
-  end
-
-  context 'disabled via feature flag' do
-    before do
-      stub_feature_flags(batch_comments: false)
-    end
-
-    it_behaves_like 'batch comments feature disabled'
   end
 end
