@@ -1,16 +1,13 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlModal } from '@gitlab/ui';
 import ApprovalsAuth from 'ee/vue_merge_request_widget/components/approvals/approvals_auth.vue';
 
 const TEST_PASSWORD = 'password';
 
-const localVue = createLocalVue();
-
-// For some reason, the `localVue.nextTick` needs to be deferred
+// For some reason, the `Promise.resolve` needs to be deferred
 // or the timing doesn't work.
-const tick = () => Promise.resolve().then(localVue.nextTick);
 const waitForTick = done =>
-  tick()
+  Promise.resolve()
     .then(done)
     .catch(done.fail);
 
@@ -18,12 +15,11 @@ describe('Approval auth component', () => {
   let wrapper;
 
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(localVue.extend(ApprovalsAuth), {
+    wrapper = shallowMount(ApprovalsAuth, {
       propsData: {
         ...props,
         modalId: 'testid',
       },
-      localVue,
     });
   };
 
