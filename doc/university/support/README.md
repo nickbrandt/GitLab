@@ -47,7 +47,7 @@ Sometimes we need to upgrade customers from old versions of GitLab to latest, so
 
 - [Installation Methods](https://about.gitlab.com/install/):
   - [Omnibus](https://gitlab.com/gitlab-org/omnibus-gitlab/)
-  - [Docker](https://docs.gitlab.com/ce/install/docker.html)
+  - [Docker](../../install/docker.md)
   - [Source](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/install/installation.md)
 - Get yourself a Digital Ocean droplet, where you can install and maintain your own instance of GitLab
   - Ask in #infrastructure about this
