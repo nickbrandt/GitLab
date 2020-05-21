@@ -21,12 +21,12 @@ import getAlerts from '../graphql/queries/get_alerts.query.graphql';
 import getAlertsCountByStatus from '../graphql/queries/get_count_by_status.query.graphql';
 import { ALERTS_STATUS, ALERTS_STATUS_TABS, ALERTS_SEVERITY_LABELS } from '../constants';
 import updateAlertStatus from '../graphql/mutations/update_alert_status.graphql';
-import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
+import { capitalizeFirstCharacter, convertToSnakeCase } from '~/lib/utils/text_utility';
 
 const tdClass = 'table-col d-flex d-md-table-cell align-items-center';
 const bodyTrClass =
   'gl-border-1 gl-border-t-solid gl-border-gray-100 hover-bg-blue-50 hover-gl-cursor-pointer hover-gl-border-b-solid hover-gl-border-blue-200';
-const findSortColumn = () => document.querySelector('.started-at');
+const findDefaultSortColumn = () => document.querySelector('.js-started-at');
 
 export default {
   i18n: {
@@ -47,7 +47,7 @@ export default {
     {
       key: 'startTime',
       label: s__('AlertManagement|Start time'),
-      thClass: 'started-at',
+      thClass: 'js-started-at',
       tdClass,
       sortable: true,
     },
@@ -181,7 +181,7 @@ export default {
     },
   },
   mounted() {
-    findSortColumn().ariaSort = 'ascending';
+    findDefaultSortColumn().ariaSort = 'ascending';
   },
   methods: {
     filterAlertsByStatus(tabIndex) {
@@ -189,9 +189,10 @@ export default {
     },
     fetchSortedData({ sortBy, sortDesc }) {
       const sortDirection = sortDesc ? 'DESC' : 'ASC';
-      const sortColumn = sortBy.replace(/([A-Z])/g, '_$1').toUpperCase();
+      const sortColumn = convertToSnakeCase(sortBy).toUpperCase();
+
       if (sortBy !== 'startTime') {
-        findSortColumn().ariaSort = 'none';
+        findDefaultSortColumn().ariaSort = 'none';
       }
       this.sort = `${sortColumn}_${sortDirection}`;
     },

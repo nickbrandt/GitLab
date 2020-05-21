@@ -292,7 +292,7 @@ describe('AlertManagementList', () => {
     beforeEach(() => {
       mountComponent({
         props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
-        data: { alerts: mockAlerts, errored: false, sort: 'START_TIME_ASC' },
+        data: { alerts: mockAlerts, errored: false, sort: 'START_TIME_ASC', alertsCount },
         loading: false,
       });
     });
