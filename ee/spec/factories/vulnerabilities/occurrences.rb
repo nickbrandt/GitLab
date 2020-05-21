@@ -13,8 +13,8 @@ FactoryBot.define do
     after(:build) do |finding, evaluator|
       if evaluator.summary
         raw_metadata = Gitlab::Json.parse(finding.raw_metadata)
-        raw_metadata.delete("solution")
-        raw_metadata["remediations"] = [
+        raw_metadata.delete('solution')
+        raw_metadata['remediations'] = [
           {
             summary: evaluator.summary
           }
@@ -38,25 +38,35 @@ FactoryBot.define do
     metadata_version { 'sast:1.0' }
     raw_metadata do
       {
-        description: "The cipher does not provide data integrity update 1",
-        message: "The cipher does not provide data integrity",
-        cve: "818bf5dacb291e15d9e6dc3c5ac32178:CIPHER",
-        solution: "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
+        description: 'The cipher does not provide data integrity update 1',
+        message: 'The cipher does not provide data integrity',
+        cve: '818bf5dacb291e15d9e6dc3c5ac32178:CIPHER',
+        solution: 'GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.',
         location: {
-          file: "maven/src/main/java/com/gitlab/security_products/tests/App.java",
+          file: 'maven/src/main/java/com/gitlab/security_products/tests/App.java',
           start_line: 29,
           end_line: 29,
-          class: "com.gitlab.security_products.tests.App",
-          method: "insecureCypher"
+          class: 'com.gitlab.security_products.tests.App',
+          method: 'insecureCypher'
         },
         links: [
           {
-            name: "Cipher does not check for integrity first?",
-            url: "https://crypto.stackexchange.com/questions/31428/pbewithmd5anddes-cipher-does-not-check-for-integrity-first"
+            name: 'Cipher does not check for integrity first?',
+            url: 'https://crypto.stackexchange.com/questions/31428/pbewithmd5anddes-cipher-does-not-check-for-integrity-first'
           }
         ],
         evidence: {
-          summary: 'Credit card detected'
+          summary: 'Credit card detected',
+          request: {
+            headers: [{ name: 'Accept', value: '*/*' }],
+            method: 'GET',
+            url: 'http://goat:8080/WebGoat/logout'
+          },
+          response: {
+            headers: [{ name: 'Content-Length', value: '0' }],
+            reason_phrase: 'OK',
+            status_code: 200
+          }
         }
       }.to_json
     end
@@ -97,7 +107,7 @@ FactoryBot.define do
         raw_metadata.delete(:solution)
         raw_metadata[:remediations] = [
           {
-            summary: "Use GCM mode which includes HMAC in the resulting encrypted data, providing integrity of the result."
+            summary: 'Use GCM mode which includes HMAC in the resulting encrypted data, providing integrity of the result.'
           }
         ]
         finding.raw_metadata = raw_metadata.to_json

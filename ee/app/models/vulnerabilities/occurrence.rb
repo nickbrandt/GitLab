@@ -255,7 +255,19 @@ module Vulnerabilities
     end
 
     def evidence
-      metadata.dig('evidence', 'summary')
+      {
+        summary: metadata.dig('evidence', 'summary'),
+        request: {
+          headers: metadata.dig('evidence', 'request', 'headers') || [],
+          method: metadata.dig('evidence', 'request', 'method'),
+          url: metadata.dig('evidence', 'request', 'url')
+        },
+        response: {
+          headers: metadata.dig('evidence', 'response', 'headers') || [],
+          status_code: metadata.dig('evidence', 'response', 'status_code'),
+          reason_phrase: metadata.dig('evidence', 'response', 'reason_phrase')
+        }
+      }
     end
 
     def message

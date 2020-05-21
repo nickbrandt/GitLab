@@ -55,7 +55,7 @@ describe Vulnerabilities::FindingEntity do
       expect(subject).to include(:scanner, :project, :identifiers)
       expect(subject).to include(:dismissal_feedback, :issue_feedback)
       expect(subject).to include(:description, :links, :location, :remediations, :solution, :evidence)
-      expect(subject).to include(:blob_path)
+      expect(subject).to include(:blob_path, :request, :response)
     end
 
     context 'when not allowed to admin vulnerability feedback' do
