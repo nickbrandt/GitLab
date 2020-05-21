@@ -39,14 +39,15 @@ describe('Vulnerability Details', () => {
     expect(getText('title')).toBe(vulnerability.title);
     expect(getText('description')).toBe(finding.description);
     expect(wrapper.find(SeverityBadge).props('severity')).toBe(vulnerability.severity);
-    expect(getText('confidence')).toBe(`Confidence: ${vulnerability.confidence}`);
     expect(getText('reportType')).toBe(`Report Type: ${vulnerability.report_type}`);
 
-    expect(getById('image').exists()).toBeFalsy();
-    expect(getById('os').exists()).toBeFalsy();
-    expect(getById('file').exists()).toBeFalsy();
-    expect(getById('class').exists()).toBeFalsy();
-    expect(getById('method').exists()).toBeFalsy();
+    expect(getById('image').exists()).toBe(false);
+    expect(getById('os').exists()).toBe(false);
+    expect(getById('file').exists()).toBe(false);
+    expect(getById('class').exists()).toBe(false);
+    expect(getById('method').exists()).toBe(false);
+    expect(getById('evidence').exists()).toBe(false);
+    expect(getById('scanner').exists()).toBe(false);
     expect(getAllById('link')).toHaveLength(0);
     expect(getAllById('identifier')).toHaveLength(0);
   });
@@ -69,6 +70,11 @@ describe('Vulnerability Details', () => {
   it('shows the finding method if it exists', () => {
     createWrapper({ location: { file: 'file', method: 'method name' } });
     expect(getText('method')).toBe(`Method: method name`);
+  });
+
+  it('shows the evidence if it exists', () => {
+    createWrapper({ evidence: 'some evidence' });
+    expect(getText('evidence')).toBe(`Evidence: some evidence`);
   });
 
   it('shows the links if they exist', () => {
@@ -136,6 +142,35 @@ describe('Vulnerability Details', () => {
       expect(file().attributes('target')).toBe('_blank');
       expect(file().attributes('href')).toBe('blob.txt#L24');
       expect(file().text()).toBe('test.txt:24');
+    });
+  });
+
+  describe('scanner', () => {
+    const link = () => getById('scannerSafeLink');
+    const scannerText = () => getById('scanner').text();
+
+    it('shows the scanner name only but no link', () => {
+      createWrapper({ scanner: { name: 'some scanner' } });
+      expect(scannerText()).toBe('Scanner: some scanner');
+      expect(link().vm.$el instanceof HTMLSpanElement).toBe(true);
+    });
+
+    it('shows the scanner name and version but no link', () => {
+      createWrapper({ scanner: { name: 'some scanner', version: '1.2.3' } });
+      expect(scannerText()).toBe('Scanner: some scanner (version 1.2.3)');
+      expect(link().vm.$el instanceof HTMLSpanElement).toBe(true);
+    });
+
+    it('shows the scanner name only with a link', () => {
+      createWrapper({ scanner: { name: 'some scanner', url: '//link' } });
+      expect(scannerText()).toBe('Scanner: some scanner');
+      expect(link().props('href')).toBe('//link');
+    });
+
+    it('shows the scanner name and version with a link', () => {
+      createWrapper({ scanner: { name: 'some scanner', version: '1.2.3', url: '//link' } });
+      expect(scannerText()).toBe('Scanner: some scanner (version 1.2.3)');
+      expect(link().props('href')).toBe('//link');
     });
   });
 });

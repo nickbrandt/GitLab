@@ -1,11 +1,12 @@
 <script>
-import { GlLink } from '@gitlab/ui';
+import { GlLink, GlSprintf } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
+import SafeLink from 'ee/vue_shared/components/safe_link.vue';
 import DetailItem from './detail_item.vue';
 
 export default {
   name: 'VulnerabilityDetails',
-  components: { GlLink, SeverityBadge, DetailItem },
+  components: { GlLink, SeverityBadge, DetailItem, SafeLink, GlSprintf },
   props: {
     vulnerability: {
       type: Object,
@@ -20,6 +21,9 @@ export default {
     location() {
       return this.finding.location || {};
     },
+    scanner() {
+      return this.finding.scanner || {};
+    },
     fileText() {
       return (this.location.file || '') + (this.lineNumber ? `:${this.lineNumber}` : '');
     },
@@ -29,6 +33,9 @@ export default {
     lineNumber() {
       const { start_line: start, end_line: end } = this.location;
       return end > start ? `${start}-${end}` : start;
+    },
+    scannerUrl() {
+      return this.scanner.url || '';
     },
   },
 };
@@ -44,11 +51,33 @@ export default {
       <detail-item :sprintf-message="__('%{labelStart}Severity:%{labelEnd} %{severity}')">
         <severity-badge :severity="vulnerability.severity" class="gl-display-inline ml-1" />
       </detail-item>
-      <detail-item :sprintf-message="__('%{labelStart}Confidence:%{labelEnd} %{confidence}')"
-        >{{ vulnerability.confidence }}
+      <detail-item
+        v-if="finding.evidence"
+        :sprintf-message="__('%{labelStart}Evidence:%{labelEnd} %{evidence}')"
+        >{{ finding.evidence }}
       </detail-item>
       <detail-item :sprintf-message="__('%{labelStart}Report Type:%{labelEnd} %{reportType}')"
         >{{ vulnerability.report_type }}
+      </detail-item>
+      <detail-item
+        v-if="scanner.name"
+        :sprintf-message="__('%{labelStart}Scanner:%{labelEnd} %{scanner}')"
+      >
+        <safe-link
+          :href="scannerUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="scannerSafeLink"
+        >
+          <gl-sprintf
+            v-if="scanner.version"
+            :message="s__('Vulnerability|%{scannerName} (version %{scannerVersion})')"
+          >
+            <template #scannerName>{{ scanner.name }}</template>
+            <template #scannerVersion>{{ scanner.version }}</template>
+          </gl-sprintf>
+          <template v-else>{{ scanner.name }}</template>
+        </safe-link>
       </detail-item>
       <detail-item
         v-if="location.image"

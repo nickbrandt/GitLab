@@ -43,7 +43,9 @@ module VulnerabilitiesHelper
       :issue_feedback,
       :merge_request_feedback,
       :project,
-      :remediations
+      :remediations,
+      :evidence,
+      :scanner
     ).merge(
       solution: remediation ? remediation['summary'] : finding[:solution]
     )
