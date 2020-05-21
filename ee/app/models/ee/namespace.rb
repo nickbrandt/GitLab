@@ -364,6 +364,9 @@ module EE
     end
 
     def find_or_create_subscription
+      # do not generate subscriptions for non-gitlab-com installations
+      return unless ::Gitlab.com?
+
       # Hosted subscriptions are only available for root groups for now.
       return if parent_id
 

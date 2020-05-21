@@ -1,0 +1,5 @@
+---
+title: Do not generate gitlab_subscriptions fornon-gitlab-com installs
+merge_request: 32483
+author:
+type: fixed
