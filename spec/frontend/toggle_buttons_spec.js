@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import setupToggleButtons from '~/toggle_buttons';
-import getSetTimeoutPromise from './helpers/set_timeout_promise_helper';
+import waitForPromises from './helpers/wait_for_promises';
 
 function generateMarkup(isChecked = true) {
   return `
@@ -31,19 +31,16 @@ describe('ToggleButtons', () => {
       expect(wrapper.querySelector('.js-project-feature-toggle-input').value).toEqual('true');
     });
 
-    it('should toggle to unchecked when clicked', done => {
+    it('should toggle to unchecked when clicked', () => {
       const wrapper = setupFixture(true);
       const toggleButton = wrapper.querySelector('.js-project-feature-toggle');
 
       toggleButton.click();
 
-      getSetTimeoutPromise()
-        .then(() => {
-          expect(toggleButton.classList.contains('is-checked')).toEqual(false);
-          expect(wrapper.querySelector('.js-project-feature-toggle-input').value).toEqual('false');
-        })
-        .then(done)
-        .catch(done.fail);
+      return waitForPromises().then(() => {
+        expect(toggleButton.classList.contains('is-checked')).toEqual(false);
+        expect(wrapper.querySelector('.js-project-feature-toggle-input').value).toEqual('false');
+      });
     });
   });
 
@@ -58,24 +55,21 @@ describe('ToggleButtons', () => {
       expect(wrapper.querySelector('.js-project-feature-toggle-input').value).toEqual('false');
     });
 
-    it('should toggle to checked when clicked', done => {
+    it('should toggle to checked when clicked', () => {
       const wrapper = setupFixture(false);
       const toggleButton = wrapper.querySelector('.js-project-feature-toggle');
 
       toggleButton.click();
 
-      getSetTimeoutPromise()
-        .then(() => {
-          expect(toggleButton.classList.contains('is-checked')).toEqual(true);
-          expect(wrapper.querySelector('.js-project-feature-toggle-input').value).toEqual('true');
-        })
-        .then(done)
-        .catch(done.fail);
+      return waitForPromises().then(() => {
+        expect(toggleButton.classList.contains('is-checked')).toEqual(true);
+        expect(wrapper.querySelector('.js-project-feature-toggle-input').value).toEqual('true');
+      });
     });
   });
 
-  it('should emit `trigger-change` event', done => {
-    const changeSpy = jasmine.createSpy('changeEventHandler');
+  it('should emit `trigger-change` event', () => {
+    const changeSpy = jest.fn();
     const wrapper = setupFixture(false);
     const toggleButton = wrapper.querySelector('.js-project-feature-toggle');
     const input = wrapper.querySelector('.js-project-feature-toggle-input');
@@ -84,16 +78,13 @@ describe('ToggleButtons', () => {
 
     toggleButton.click();
 
-    getSetTimeoutPromise()
-      .then(() => {
-        expect(changeSpy).toHaveBeenCalled();
-      })
-      .then(done)
-      .catch(done.fail);
+    return waitForPromises().then(() => {
+      expect(changeSpy).toHaveBeenCalled();
+    });
   });
 
   describe('clickCallback', () => {
-    it('should show loading indicator while waiting', done => {
+    it('should show loading indicator while waiting', () => {
       const isChecked = true;
       const clickCallback = (newValue, toggleButton) => {
         const input = toggleButton.querySelector('.js-project-feature-toggle-input');
@@ -107,15 +98,12 @@ describe('ToggleButtons', () => {
         expect(input.value).toEqual('true');
 
         // After the callback finishes, check that the loading state is gone
-        getSetTimeoutPromise()
-          .then(() => {
-            expect(toggleButton.classList.contains('is-checked')).toEqual(false);
-            expect(toggleButton.classList.contains('is-loading')).toEqual(false);
-            expect(toggleButton.disabled).toEqual(false);
-            expect(input.value).toEqual('false');
-          })
-          .then(done)
-          .catch(done.fail);
+        return waitForPromises().then(() => {
+          expect(toggleButton.classList.contains('is-checked')).toEqual(false);
+          expect(toggleButton.classList.contains('is-loading')).toEqual(false);
+          expect(toggleButton.disabled).toEqual(false);
+          expect(input.value).toEqual('false');
+        });
       };
 
       const wrapper = setupFixture(isChecked, clickCallback);
