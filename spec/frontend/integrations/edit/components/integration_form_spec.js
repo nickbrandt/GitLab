@@ -111,8 +111,9 @@ describe('IntegrationForm', () => {
         const dynamicFields = wrapper.findAll(DynamicField);
 
         expect(dynamicFields).toHaveLength(2);
-        expect(dynamicFields.at(0).props()).toMatchObject(fields[0]);
-        expect(dynamicFields.at(1).props()).toMatchObject(fields[1]);
+        dynamicFields.wrappers.forEach((field, index) => {
+          expect(field.props()).toMatchObject(fields[index]);
+        });
       });
     });
   });
