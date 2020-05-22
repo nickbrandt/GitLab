@@ -174,7 +174,28 @@ describe API::MergeRequestApprovals do
       expect(rule_response['name']).to eq('foo')
       expect(rule_response['approvers'][0]['username']).to eq(approver.username)
       expect(rule_response['approved_by'][0]['username']).to eq(approver.username)
-      expect(rule_response['source_rule']).to eq(nil)
+      expect(rule_response['source_rule']).to be_nil
+      expect(rule_response['section']).to be_nil
+    end
+
+    context "when rule has a section" do
+      let(:rule) do
+        create(
+          :code_owner_rule,
+          merge_request: merge_request,
+          approvals_required: 2,
+          name: "foo",
+          section: "Example Section"
+        )
+      end
+
+      it "exposes the value of section when set" do
+        get api(url, user)
+
+        rule_response = json_response["rules"].first
+
+        expect(rule_response["section"]).to eq(rule.section)
+      end
     end
 
     context 'when target_branch is specified' do

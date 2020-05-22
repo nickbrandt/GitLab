@@ -98,6 +98,7 @@ describe API::MergeRequestApprovalRules do
         expect(rules.first['name']).to eq(mr_approval_rule.name)
         expect(rules.first['approvals_required']).to eq(mr_approval_rule.approvals_required)
         expect(rules.first['rule_type']).to eq(mr_approval_rule.rule_type)
+        expect(rules.first['section']).to be_nil
         expect(rules.first['contains_hidden_groups']).to eq(false)
         expect(rules.first['source_rule']).to be_nil
         expect(rules.first['eligible_approvers']).to match([hash_including('id' => approver.id)])
