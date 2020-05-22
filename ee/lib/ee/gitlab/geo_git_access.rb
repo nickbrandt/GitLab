@@ -10,6 +10,12 @@ module EE
 
       GEO_SERVER_DOCS_URL = 'https://docs.gitlab.com/ee/administration/geo/replication/using_a_geo_server.html'.freeze
 
+      protected
+
+      def project_or_wiki
+        project
+      end
+
       private
 
       def custom_action_for(cmd)
@@ -59,18 +65,18 @@ module EE
       def geo_primary_url_to_repo
         case protocol
         when 'ssh'
-          geo_primary_ssh_url_to_repo(container)
+          geo_primary_ssh_url_to_repo(project_or_wiki)
         else
-          geo_primary_http_url_to_repo(container)
+          geo_primary_http_url_to_repo(project_or_wiki)
         end
       end
 
       def primary_http_repo_url
-        geo_primary_http_url_to_repo(container)
+        geo_primary_http_url_to_repo(project_or_wiki)
       end
 
       def primary_ssh_url_to_repo
-        geo_primary_ssh_url_to_repo(container)
+        geo_primary_ssh_url_to_repo(project_or_wiki)
       end
 
       def current_replication_lag_message
