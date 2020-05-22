@@ -2,8 +2,8 @@
 
 module RuboCop
   module Cop
-    # Cop that blacklists the injecting of EE specific modules anywhere but on
-    # the last line of a file. It allows multiple EE injections as long as they're all at the end.
+    # Cop that blacklists the injecting of EE specific modules before any lines which are not already injecting another module.
+    # It allows multiple module injections as long as they're all at the end.
     class InjectEnterpriseEditionModule < RuboCop::Cop::Cop
       INVALID_LINE = 'Injecting EE modules must be done on the last line of this file' \
           ', outside of any class or module definitions'
@@ -18,7 +18,9 @@ module RuboCop
 
       DISALLOW_METHODS = Set.new(%i[include extend prepend]).freeze
 
-      CHECK_LINE_METHODS_REGEXP = Regexp.union((CHECK_LINE_METHODS + DISALLOW_METHODS).map(&:to_s) + [/^\s*(#.*|$)/]).freeze
+      COMMENT_OR_EMPTY_LINE = /^\s*(#.*|$)/.freeze
+
+      CHECK_LINE_METHODS_REGEXP = Regexp.union((CHECK_LINE_METHODS + DISALLOW_METHODS).map(&:to_s) + [COMMENT_OR_EMPTY_LINE]).freeze
 
       def ee_const?(node)
         line = node.location.expression.source_line
@@ -43,17 +45,9 @@ module RuboCop
         line = node.location.line
         buffer = node.location.expression.source_buffer
         last_line = buffer.last_line
-
-        # We allow multiple includes, extends and prepends as long as they're all ath the end.
-        allowed_line = true
-        index_line = last_line - line + 1
-        content = buffer.source.split("\n")
-
-        while index_line > 0 && allowed_line
-          line_content = content[-index_line]
-          allowed_line = CHECK_LINE_METHODS_REGEXP.match?(line_content)
-          index_line -= 1
-        end
+        lines = buffer.source.split("\n")
+        # We allow multiple includes, extends and prepends as long as they're all at the end.
+        allowed_line = (line...last_line).all? { |i| CHECK_LINE_METHODS_REGEXP.match?(lines[i - 1]) }
 
         if allowed_line
           ignore_node(node)
