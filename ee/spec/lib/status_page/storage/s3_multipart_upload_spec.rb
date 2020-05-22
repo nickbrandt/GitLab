@@ -15,18 +15,21 @@ describe StatusPage::Storage::S3MultipartUpload, :aws_s3 do
     )
   end
 
-  describe 'multipart_upload' do
+  describe '#call' do
     let(:key) { '123' }
-    let(:file) { Tempfile.new('foo') }
+    let(:file) do
+      Tempfile.new('foo').tap do |file|
+        file.open
+        file.write('hello world')
+        file.rewind
+      end
+    end
+
     let(:upload_id) { '123456789' }
 
     subject(:result) { described_class.new(client: s3_client, bucket_name: bucket_name, key: key, open_file: file).call }
 
     before do
-      file.open
-      file.write('hello world')
-      file.rewind
-
       stub_responses(
         :create_multipart_upload,
         instance_double(Aws::S3::Types::CreateMultipartUploadOutput, { to_h: { upload_id: upload_id } })
@@ -74,9 +77,10 @@ describe StatusPage::Storage::S3MultipartUpload, :aws_s3 do
           stub_responses(:upload_part, aws_error)
         end
 
-        it 'raises an error' do
-          expect(s3_client).to receive(:abort_multipart_upload)
+        it 'aborts the upload and raises an error' do
           msg = error_message(aws_error, key: key)
+
+          expect(s3_client).to receive(:abort_multipart_upload)
           expect { result }.to raise_error(StatusPage::Storage::Error, msg)
         end
       end
@@ -87,9 +91,10 @@ describe StatusPage::Storage::S3MultipartUpload, :aws_s3 do
           stub_responses(:complete_multipart_upload, aws_error)
         end
 
-        it 'raises an error' do
-          expect(s3_client).to receive(:abort_multipart_upload)
+        it 'aborts the upload and raises an error' do
           msg = error_message(aws_error, key: key)
+
+          expect(s3_client).to receive(:abort_multipart_upload)
           expect { result }.to raise_error(StatusPage::Storage::Error, msg)
         end
       end

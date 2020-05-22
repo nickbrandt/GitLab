@@ -4,7 +4,7 @@ module StatusPage
   module Storage
     # Implements a minimal AWS S3 client.
     class S3Client
-      include StatusPage::Storage::S3Helpers
+      include StatusPage::Storage::WrapsStorageErrors
 
       def initialize(region:, bucket_name:, access_key_id:, secret_access_key:)
         @bucket_name = bucket_name

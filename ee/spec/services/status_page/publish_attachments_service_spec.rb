@@ -71,6 +71,17 @@ describe StatusPage::PublishAttachmentsService do
           expect(subject.payload).to eq({})
         end
 
+        context 'when upload to storage throws an error' do
+          it 'returns an error response' do
+            storage_error = StatusPage::Storage::Error.new(bucket: '', error: StandardError.new)
+            # no raise to mimic prod behavior
+            allow(Gitlab::ErrorTracking).to receive(:track_and_raise_for_dev_exception)
+            allow(storage_client).to receive(:multipart_upload).and_raise(storage_error)
+
+            expect(subject.error?).to be true
+          end
+        end
+
         context 'user notes uploads' do
           let(:user_note) { instance_double(Note, note: markdown_field) }
           let(:user_notes) { [user_note] }

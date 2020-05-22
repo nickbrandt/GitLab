@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module StatusPage
-  module PublicationServiceHelpers
+  module PublicationServiceResponses
+    extend ActiveSupport::Concern
+
     def error(message, payload = {})
       ServiceResponse.error(message: message, payload: payload)
     end

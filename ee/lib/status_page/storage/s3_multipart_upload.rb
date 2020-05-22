@@ -4,7 +4,7 @@ module StatusPage
   module Storage
     # Implements multipart upload in s3
     class S3MultipartUpload
-      include StatusPage::Storage::S3Helpers
+      include StatusPage::Storage::WrapsStorageErrors
       # 5 megabytes is the minimum part size specified in the amazon SDK
       MULTIPART_UPLOAD_PART_SIZE = 5.megabytes
 
@@ -28,7 +28,7 @@ module StatusPage
           begin
             parts = upload_part(upload_id)
             complete_upload(upload_id, parts)
-            # Rescue on Exception since even on keyboard inturrupt we want to abort the upload and re-raise
+            # Rescue on Exception since even on keyboard interrupt we want to abort the upload and re-raise
             # abort clears the already uploaded parts so that they do not cost the bucket owner
             # The status page bucket lifecycle policy will clear out unaborted parts if
             # this fails without an exception (power failures etc.)

@@ -14,7 +14,8 @@ module StatusPage
       response = publish_json(issue, user_notes)
       return response if response.error?
 
-      publish_attachments(issue, user_notes)
+      response = publish_attachments(issue, user_notes)
+      return response if response.error?
 
       success
     end
@@ -39,12 +40,18 @@ module StatusPage
     end
 
     def publish_attachments(issue, user_notes)
+      return success unless attachements_enabled?
+
       StatusPage::PublishAttachmentsService.new(
         project: @project,
         issue: issue,
         user_notes: user_notes,
         storage_client: storage_client
       ).execute
+    end
+
+    def attachements_enabled?
+      Feature.enabled?(:status_page_attachments, @project, default_enabled: true)
     end
   end
 end

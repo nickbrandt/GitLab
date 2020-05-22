@@ -4,8 +4,8 @@ module StatusPage
   # Publishes Attachments from incident comments and descriptions to s3
   # Should only be called from publish details or a service that inherits from the publish_base_service
   class PublishAttachmentsService
-    include Gitlab::Utils::StrongMemoize
-    include StatusPage::PublicationServiceHelpers
+    include ::Gitlab::Utils::StrongMemoize
+    include ::StatusPage::PublicationServiceResponses
 
     def initialize(project:, issue:, user_notes:, storage_client:)
       @project = project
@@ -13,11 +13,14 @@ module StatusPage
       @user_notes = user_notes
       @storage_client = storage_client
       @total_uploads = existing_keys.size
+      @has_errors = false
     end
 
     def execute
       publish_description_attachments
       publish_user_note_attachments
+
+      return file_upload_error if @has_errors
 
       success
     end
@@ -60,10 +63,11 @@ module StatusPage
         storage_client.multipart_upload(key, open_file)
         @total_uploads += 1
       end
-    rescue Error => e
-      # Continue uploading other files if one fails
-      # But report the failure to Sentry
-      Raven.capture_exception(e)
+    rescue StatusPage::Storage::Error => e
+      # In production continue uploading other files if one fails But report the failure to Sentry
+      # raise errors in development and test
+      @has_errors = true
+      Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
     end
 
     def existing_keys
@@ -83,6 +87,10 @@ module StatusPage
     def find_file(secret, file_name)
       # Uploader object behaves like a file with an 'open' method
       UploaderFinder.new(project, secret, file_name).execute
+    end
+
+    def file_upload_error
+      error('One or more files did not upload properly')
     end
   end
 end

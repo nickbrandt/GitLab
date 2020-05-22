@@ -15,7 +15,7 @@ describe UploaderFinder do
       upload.save
     end
 
-    context 'when sucessful' do
+    context 'when successful' do
       before do
         allow_next_instance_of(FileUploader) do |uploader|
           allow(uploader).to receive(:retrieve_from_store!).with(upload.path).and_return(uploader)
@@ -48,7 +48,7 @@ describe UploaderFinder do
       end
 
       it 'returns nil when unexpected error is raised' do
-        expect(subject).to be(nil)
+        expect { subject }.to raise_error(StandardError)
       end
     end
   end

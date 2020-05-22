@@ -2,7 +2,7 @@
 
 module StatusPage
   module Storage
-    module S3Helpers
+    module WrapsStorageErrors
       def wrap_errors(**args)
         yield
       rescue Aws::Errors::ServiceError => e
