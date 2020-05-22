@@ -173,11 +173,14 @@ the following parameters:
 }
 ```
 
+Also you must use Basic authorization using `client_id` and `client_secret` values
+to authenticate the client that performs a request.
+
 Example cURL request:
 
 ```shell
 echo 'grant_type=password&username=<your_username>&password=<your_password>' > auth.txt
-curl --data "@auth.txt" --request POST "https://gitlab.example.com/oauth/token"
+curl --data "@auth.txt" --user client_id:client_secret --request POST "https://gitlab.example.com/oauth/token"
 ```
 
 Then, you'll receive the access token back in the response:
