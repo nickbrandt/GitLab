@@ -7,9 +7,9 @@ describe QuickActions::InterpretService do
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }
-  let(:group) { create(:group) }
-  let(:project) { create(:project, :repository, :public, group: group) }
-  let(:issue) { create(:issue, project: project) }
+  let_it_be_with_refind(:group) { create(:group) }
+  let_it_be_with_refind(:project) { create(:project, :repository, :public, group: group) }
+  let_it_be_with_reload(:issue) { create(:issue, project: project) }
   let(:service) { described_class.new(project, current_user) }
 
   before do
@@ -206,6 +206,110 @@ describe QuickActions::InterpretService do
           _, updates = service.execute("/reassign @#{current_user.username}", issue)
 
           expect(updates[:assignee_ids]).to match_array([current_user.id])
+        end
+      end
+    end
+
+    context 'iteration command' do
+      let_it_be(:iteration) { create(:iteration, group: group) }
+
+      let(:content) { "/iteration #{iteration.to_reference(project)}" }
+
+      context 'when iterations are enabled' do
+        before do
+          stub_licensed_features(iterations: true)
+        end
+
+        context 'when iteration exists' do
+          it 'assigns an iteration to an issue' do
+            _, updates, message = service.execute(content, issue)
+
+            expect(updates).to eq(iteration: iteration)
+            expect(message).to eq("Set the iteration to #{iteration.to_reference}.")
+          end
+
+          context 'when the user does not have enough permissions' do
+            before do
+              allow(current_user).to receive(:can?).with(:use_quick_actions).and_return(true)
+              allow(current_user).to receive(:can?).with(:admin_issue, project).and_return(false)
+            end
+
+            it 'returns empty message' do
+              _, updates, message = service.execute(content, issue)
+
+              expect(updates).to be_empty
+              expect(message).to be_empty
+            end
+          end
+        end
+
+        context 'when iteration does not exist' do
+          let(:content) { "/iteration none" }
+
+          it 'returns empty message' do
+            _, updates, message = service.execute(content, issue)
+
+            expect(updates).to be_empty
+            expect(message).to be_empty
+          end
+        end
+      end
+
+      context 'when iterations are disabled' do
+        before do
+          stub_licensed_features(iterations: false)
+        end
+
+        it 'does not recognize /iteration' do
+          _, updates = service.execute(content, issue)
+
+          expect(updates).to be_empty
+        end
+      end
+    end
+
+    context 'remove_iteration command' do
+      let_it_be(:iteration) { create(:iteration, group: group) }
+
+      let(:content) { '/remove_iteration' }
+
+      context 'when iterations are enabled' do
+        before do
+          stub_licensed_features(iterations: true)
+          issue.update!(iteration: iteration)
+        end
+
+        it 'removes an assigned iteration from an issue' do
+          _, updates, message = service.execute(content, issue)
+
+          expect(updates).to eq(iteration: nil)
+          expect(message).to eq("Removed #{iteration.to_reference} iteration.")
+        end
+
+        context 'when the user does not have enough permissions' do
+          before do
+            allow(current_user).to receive(:can?).with(:use_quick_actions).and_return(true)
+            allow(current_user).to receive(:can?).with(:admin_issue, project).and_return(false)
+          end
+
+          it 'returns empty message' do
+            _, updates, message = service.execute(content, issue)
+
+            expect(updates).to be_empty
+            expect(message).to be_empty
+          end
+        end
+      end
+
+      context 'when iterations are disabled' do
+        before do
+          stub_licensed_features(iterations: false)
+        end
+
+        it 'does not recognize /remove_iteration' do
+          _, updates = service.execute(content, issue)
+
+          expect(updates).to be_empty
         end
       end
     end
