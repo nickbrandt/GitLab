@@ -10,6 +10,10 @@ RSpec.shared_examples 'thread comments' do |resource_name|
   let(:comments_selector) { '.timeline > .note.timeline-entry' }
   let(:comment) { 'My comment' }
 
+  before do
+    stub_feature_flags(track_resource_state_change_events: false)
+  end
+
   it 'clicking "Comment" will post a comment' do
     expect(page).to have_selector toggle_selector
 
