@@ -13,6 +13,18 @@ module EE
 
         super
       end
+
+      override :permitted_attrs
+      def permitted_attrs(type)
+        case type
+        when 'issue'
+          super.push(:health_status)
+        when 'epic'
+          super.push(:assignee_id)
+        else
+          super
+        end
+      end
     end
   end
 end

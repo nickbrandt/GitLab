@@ -40,13 +40,7 @@ module Issuable
     private
 
     def permitted_attrs(type)
-      attrs = %i(state_event milestone_id assignee_id assignee_ids add_label_ids remove_label_ids subscription_event)
-
-      if type == 'issue'
-        attrs.push(:assignee_ids)
-      else
-        attrs.push(:assignee_id)
-      end
+      %i(state_event assignee_ids milestone_id add_label_ids remove_label_ids subscription_event)
     end
 
     def find_issuables(parent, model_class, ids)
