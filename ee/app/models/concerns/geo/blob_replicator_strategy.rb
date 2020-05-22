@@ -21,6 +21,8 @@ module Geo
 
     # Called by Gitlab::Geo::Replicator#consume
     def consume_event_created(**params)
+      return if excluded_by_selective_sync?
+
       download
     end
 
