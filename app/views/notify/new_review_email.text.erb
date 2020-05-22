@@ -1,4 +1,6 @@
-<%= "Merge request #{merge_request_url(@merge_request)} was reviewed by #{sanitize_name(@author_name)}" %>
+<% mr_url = merge_request_url(@merge_request) %>
+<% mr_author_name = sanitize_name(@author_name) %>
+<%= _('Merge request %{mr_link} was reviewed by %{mr_author}') % { mr_link: mr_url, mr_author: mr_author_name } %>
 
 --
 <% @notes.each_with_index do |note, index| %>

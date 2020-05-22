@@ -214,10 +214,10 @@ describe DraftNotes::PublishService do
 
       create(:draft_note, merge_request: merge_request,
                           author: user,
-                          note: "thanks\n/assign #{user.to_reference} #{other_user.to_reference}")
+                          note: "thanks\n/assign #{other_user.to_reference}")
 
       expect { publish }.to change { DraftNote.count }.by(-1).and change { Note.count }.by(2)
-      expect(merge_request.reload.assignees).to match_array([user, other_user])
+      expect(merge_request.reload.assignees).to match_array([other_user])
       expect(merge_request.notes.last).to be_system
     end
 

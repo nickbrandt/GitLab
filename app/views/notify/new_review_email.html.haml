@@ -6,10 +6,9 @@
           %tbody
             %tr
               %td{ style: "color:#333333;border-bottom:1px solid #ededed;font-size:15px;font-weight:bold;line-height:1.4;padding: 20px 0;" }
-                Merge request
-                = link_to(@merge_request.to_reference(@project), project_merge_request_url(@project, @merge_request))
-                was reviewed by
-                = link_to(@author_name, user_url(@author))
+                - mr_link = link_to(@merge_request.to_reference(@project), project_merge_request_url(@project, @merge_request))
+                - mr_author_link = link_to(@author_name, user_url(@author))
+                = _('Merge request %{mr_link} was reviewed by %{mr_author}').html_safe % { mr_link: mr_link, mr_author: mr_author_link }
             %tr
               %td{ style: "overflow:hidden;font-size:14px;line-height:1.4;display:grid;" }
                 - @notes.each do |note|

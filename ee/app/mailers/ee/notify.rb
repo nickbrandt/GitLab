@@ -12,7 +12,6 @@ module EE
       include ::Emails::AdminNotification
       include ::Emails::ServiceDesk
       include ::Emails::Epics
-      include ::Emails::Reviews
     end
 
     attr_reader :group
