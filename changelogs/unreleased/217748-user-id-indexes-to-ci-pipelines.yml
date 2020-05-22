@@ -1,0 +1,5 @@
+---
+title: Add user_id indexes to ci_pipelines
+merge_request: 32687
+author:
+type: performance
