@@ -289,7 +289,7 @@ module Ci
       ensure_runner_queue_value == value if value.present?
     end
 
-    def update_cached_info(values)
+    def heartbeat(values)
       values = values&.slice(:version, :revision, :platform, :architecture, :ip_address) || {}
       values[:contacted_at] = Time.current
 
