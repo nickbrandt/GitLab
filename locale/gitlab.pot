@@ -22915,6 +22915,9 @@ msgstr ""
 msgid "Transfer project"
 msgstr ""
 
+msgid "TransferGroup|Cannot transfer group to one of its subgroup."
+msgstr ""
+
 msgid "TransferGroup|Cannot update the path because there are projects under this group that contain Docker images in their Container Registry. Please remove the images from your projects first and try again."
 msgstr ""
 
