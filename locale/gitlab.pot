@@ -6933,6 +6933,9 @@ msgstr ""
 msgid "Define a custom pattern with cron syntax"
 msgstr ""
 
+msgid "Define custom rules for what constitutes spam, independent of Akismet"
+msgstr ""
+
 msgid "Define environments in the deploy stage(s) in <code>.gitlab-ci.yml</code> to track deployments here."
 msgstr ""
 
@@ -8053,6 +8056,9 @@ msgid "Enable SAML authentication for this group"
 msgstr ""
 
 msgid "Enable Seat Link"
+msgstr ""
+
+msgid "Enable Spam Check via external API endpoint"
 msgstr ""
 
 msgid "Enable access to Grafana"
@@ -23084,6 +23090,9 @@ msgid "URL must be a valid url (ex: https://gitlab.com)"
 msgstr ""
 
 msgid "URL must start with %{codeStart}http://%{codeEnd}, %{codeStart}https://%{codeEnd}, or %{codeStart}ftp://%{codeEnd}"
+msgstr ""
+
+msgid "URL of the external Spam Check endpoint"
 msgstr ""
 
 msgid "URL of the external storage that will serve the repository static objects (e.g. archives, blobs, ...)."
