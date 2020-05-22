@@ -47,7 +47,7 @@ describe('Graph group component', () => {
     });
 
     it('should contain a tab index for the collapse button', () => {
-      const groupToggle = wrapper.find('.js-graph-group-toggle');
+      const groupToggle = findToggleButton();
 
       expect(groupToggle.contains('[tabindex]')).toBe(true);
     });
