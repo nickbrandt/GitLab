@@ -134,18 +134,18 @@ module Elastic
         # anonymous users.
         # Pick private, internal and public projects the user is a member of.
         # Pick all private projects for admins & auditors.
-        conditions = [pick_projects_by_membership(project_ids, user, features)]
+        conditions = pick_projects_by_membership(project_ids, user, features)
 
         if public_and_internal_projects
           # Skip internal projects for anonymous and external users.
           # Others are given access to all internal projects. Admins & auditors
           # get access to internal projects where the feature is private.
-          conditions << pick_projects_by_visibility(Project::INTERNAL, user, features) if user && !user.external?
+          conditions += pick_projects_by_visibility(Project::INTERNAL, user, features) if user && !user.external?
 
           # All users, including anonymous, can access public projects.
           # Admins & auditors get access to public projects where the feature is
           # private.
-          conditions << pick_projects_by_visibility(Project::PUBLIC, user, features)
+          conditions += pick_projects_by_visibility(Project::PUBLIC, user, features)
         end
 
         { should: conditions }
@@ -161,9 +161,9 @@ module Elastic
       def pick_projects_by_membership(project_ids, user, features = nil)
         if features.nil?
           if project_ids == :any
-            return { term: { visibility_level: Project::PRIVATE } }
+            return [{ term: { visibility_level: Project::PRIVATE } }]
           else
-            return { terms: { id: project_ids } }
+            return [{ terms: { id: project_ids } }]
           end
         end
 
@@ -202,7 +202,7 @@ module Elastic
       # Always denies access to projects when the features are disabled - even to
       # admins & auditors - as stale child documents may be present.
       def limit_by_feature(condition, features, include_members_only:)
-        return condition unless features
+        return [condition] unless features
 
         features = Array(features)
 
