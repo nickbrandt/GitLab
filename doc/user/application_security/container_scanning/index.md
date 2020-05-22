@@ -117,9 +117,6 @@ push it to the Container Registry, and run Container Scanning:
 variables:
   DOCKER_DRIVER: overlay2
 
-services:
-  - docker:19.03.8-dind
-
 stages:
   - build
   - test
@@ -127,6 +124,8 @@ stages:
 build:
   image: docker:stable
   stage: build
+  services:
+    - docker:19.03.8-dind
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
   script:
@@ -286,14 +285,13 @@ this with a pipeline means you won't have to do it manually each time. You can u
 ```yaml
 image: docker:stable
 
-services:
-  - docker:19.03.8-dind
-
 stages:
   - build
 
 build_latest_vulnerabilities:
   stage: build
+  services:
+    - docker:19.03.8-dind
   script:
     - docker pull arminc/clair-db:latest
     - docker tag arminc/clair-db:latest $CI_REGISTRY/namespace/clair-vulnerabilities-db
