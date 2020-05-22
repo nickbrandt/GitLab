@@ -89,6 +89,10 @@ module QA
         super
       end
 
+      def has_file?(file_path)
+        repository_tree.any? { |file| file[:path] == file_path }
+      end
+
       def api_get_path
         "/projects/#{CGI.escape(path_with_namespace)}"
       end
@@ -111,6 +115,10 @@ module QA
 
       def api_repository_branches_path
         "#{api_get_path}/repository/branches"
+      end
+
+      def api_repository_tree_path
+        "#{api_get_path}/repository/tree"
       end
 
       def api_pipelines_path
@@ -153,11 +161,9 @@ module QA
           raise ResourceUpdateFailedError, "Could not change repository storage to #{new_storage}. Request returned (#{response.code}): `#{response}`."
         end
 
-        wait_until do
-          reload!
-
-          api_response[:repository_storage] == new_storage
-        end
+        wait_until(sleep_interval: 1) { Runtime::API::RepositoryStorageMoves.has_status?(self, 'finished') }
+      rescue Support::Repeater::RepeaterConditionExceededError
+        raise Runtime::API::RepositoryStorageMoves::RepositoryStorageMovesError, 'Timed out while waiting for the repository storage move to finish'
       end
 
       def import_status
@@ -185,8 +191,11 @@ module QA
       end
 
       def repository_branches
-        response = get Runtime::API::Request.new(api_client, api_repository_branches_path).url
-        parse_body(response)
+        parse_body(get(Runtime::API::Request.new(api_client, api_repository_branches_path).url))
+      end
+
+      def repository_tree
+        parse_body(get(Runtime::API::Request.new(api_client, api_repository_tree_path).url))
       end
 
       def pipelines
