@@ -3490,7 +3490,7 @@ script:
 
 The configurtion above will result in `git fetch` being called this way:
 
-```bash
+```shell
 git fetch origin $REFSPECS --depth 50  --prune
 ```
 
