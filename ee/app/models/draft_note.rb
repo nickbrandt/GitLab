@@ -28,6 +28,8 @@ class DraftNote < ApplicationRecord
 
   scope :authored_by, ->(u) { where(author_id: u.id) }
 
+  delegate :file_path, :file_hash, :file_identifier_hash, to: :diff_file, allow_nil: true
+
   def self.positions
     where.not(position: nil)
       .select(:position)
@@ -88,18 +90,6 @@ class DraftNote < ApplicationRecord
 
   def line_code
     @line_code ||= diff_file&.line_code_for_position(original_position)
-  end
-
-  def file_hash
-    return unless diff_file
-
-    Digest::SHA1.hexdigest(diff_file.file_path)
-  end
-
-  def file_path
-    return unless diff_file
-
-    diff_file.file_path
   end
 
   def publish_params

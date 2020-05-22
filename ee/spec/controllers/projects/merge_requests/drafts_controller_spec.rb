@@ -79,6 +79,7 @@ describe Projects::MergeRequests::DraftsController do
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['position']).to be_present
       expect(json_response['file_hash']).to be_present
+      expect(json_response['file_identifier_hash']).to be_present
       expect(json_response['line_code']).to match(/\w+_\d+_\d+/)
       expect(json_response['note_html']).to eq('<p dir="auto">This is a unpublished comment</p>')
     end
