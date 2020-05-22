@@ -57,9 +57,11 @@ describe('ThreatMonitoringApp component', () => {
   const findWafSection = () => wrapper.find({ ref: 'wafSection' });
   const findNetworkPolicySection = () => wrapper.find({ ref: 'networkPolicySection' });
   const findEmptyState = () => wrapper.find({ ref: 'emptyState' });
+  const findNetworkPolicyTab = () => wrapper.find({ ref: 'networkPolicyTab' });
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe.each([-1, NaN, Math.PI])(
@@ -114,6 +116,28 @@ describe('ThreatMonitoringApp component', () => {
 
     it('renders the network policy section', () => {
       expect(findNetworkPolicySection().element).toMatchSnapshot();
+    });
+
+    it('does not render the network policy tab', () => {
+      expect(findNetworkPolicyTab().exists()).toBe(false);
+    });
+
+    describe('given the networkPolicyManagement feature flag is enabled', () => {
+      beforeEach(() => {
+        factory({
+          options: {
+            provide: {
+              glFeatures: {
+                networkPolicyManagement: true,
+              },
+            },
+          },
+        });
+      });
+
+      it('renders the network policy tab', () => {
+        expect(findNetworkPolicyTab().element).toMatchSnapshot();
+      });
     });
 
     describe('dismissing the alert', () => {

@@ -16,6 +16,16 @@ const environmentsEndpoint = 'environmentsEndpoint';
 const wafStatisticsEndpoint = 'wafStatisticsEndpoint';
 const networkPolicyStatisticsEndpoint = 'networkPolicyStatisticsEndpoint';
 
+const stubFeatureFlags = features => {
+  beforeEach(() => {
+    window.gon.features = features;
+  });
+
+  afterEach(() => {
+    delete window.gon.features;
+  });
+};
+
 describe('Threat Monitoring actions', () => {
   let state;
 
@@ -209,6 +219,23 @@ describe('Threat Monitoring actions', () => {
           { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
         ],
       ));
+
+    describe('given the networkPolicyManagement feature flag is enabled', () => {
+      stubFeatureFlags({ networkPolicyManagement: true });
+
+      it('commits the SET_CURRENT_ENVIRONMENT_ID mutation and dispatches WAF, Network Policy statistics fetch actions and policy fetch action', () =>
+        testAction(
+          actions.setCurrentEnvironmentId,
+          environmentId,
+          state,
+          [{ type: types.SET_CURRENT_ENVIRONMENT_ID, payload: environmentId }],
+          [
+            { type: 'threatMonitoringWaf/fetchStatistics', payload: null },
+            { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
+            { type: 'networkPolicies/fetchPolicies', payload: environmentId },
+          ],
+        ));
+    });
   });
 
   describe('setCurrentTimeWindow', () => {
