@@ -12188,6 +12188,12 @@ msgstr ""
 msgid "It's you"
 msgstr ""
 
+msgid "Iteration changed to"
+msgstr ""
+
+msgid "Iteration removed"
+msgstr ""
+
 msgid "Iterations"
 msgstr ""
 
@@ -25965,10 +25971,10 @@ msgstr ""
 msgid "exceeds the limit of %{bytes} bytes for directory name \"%{dirname}\""
 msgstr ""
 
-msgid "expired on %{milestone_due_date}"
+msgid "expired on %{timebox_due_date}"
 msgstr ""
 
-msgid "expires on %{milestone_due_date}"
+msgid "expires on %{timebox_due_date}"
 msgstr ""
 
 msgid "external_url"
@@ -26743,10 +26749,10 @@ msgstr ""
 msgid "started a discussion on %{design_link}"
 msgstr ""
 
-msgid "started on %{milestone_start_date}"
+msgid "started on %{timebox_start_date}"
 msgstr ""
 
-msgid "starts on %{milestone_start_date}"
+msgid "starts on %{timebox_start_date}"
 msgstr ""
 
 msgid "stuck"

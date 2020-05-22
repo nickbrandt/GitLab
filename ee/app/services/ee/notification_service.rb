@@ -61,6 +61,14 @@ module EE
       mailer.project_mirror_user_changed_email(new_mirror_user.id, deleted_user_name, project.id).deliver_later
     end
 
+    def removed_iteration_issue(issue, current_user)
+      removed_iteration_resource_email(issue, current_user)
+    end
+
+    def changed_iteration_issue(issue, new_iteration, current_user)
+      changed_iteration_resource_email(issue, new_iteration, current_user)
+    end
+
     private
 
     def send_new_review_notification(review)
@@ -106,6 +114,30 @@ module EE
       return unless issue.subscribed?(support_bot, issue.project)
 
       mailer.service_desk_new_note_email(issue.id, note.id).deliver_later
+    end
+
+    def removed_iteration_resource_email(target, current_user)
+      recipients = ::NotificationRecipients::BuildService.build_recipients(
+        target,
+        current_user,
+        action: 'removed_iteration'
+      )
+
+      recipients.each do |recipient|
+        mailer.removed_iteration_issue_email(recipient.user.id, target.id, current_user.id).deliver_later
+      end
+    end
+
+    def changed_iteration_resource_email(target, iteration, current_user)
+      recipients = ::NotificationRecipients::BuildService.build_recipients(
+        target,
+        current_user,
+        action: 'changed_iteration'
+      )
+
+      recipients.each do |recipient|
+        mailer.changed_iteration_issue_email(recipient.user.id, target.id, iteration, current_user.id).deliver_later
+      end
     end
 
     def epic_status_change_email(target, current_user, status)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EE
-  module MilestonesHelper
+  module TimeboxesHelper
     def burndown_chart(milestone)
       if milestone.supports_burndown_charts?
         issues = milestone.issues_visible_to_user(current_user)

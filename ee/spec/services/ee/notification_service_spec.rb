@@ -328,6 +328,159 @@ describe EE::NotificationService, :mailer do
     end
   end
 
+  describe 'issues' do
+    let(:group) { create(:group) }
+    let(:project) { create(:project, :public, namespace: group) }
+    let(:assignee) { create(:user) }
+
+    let(:issue) { create :issue, project: project, assignees: [assignee], description: 'cc @participant @unsubscribed_mentioned' }
+
+    let(:notification) { NotificationService.new }
+
+    before do
+      build_group_members(group)
+
+      add_users_with_subscription(group, issue)
+      reset_delivered_emails!
+    end
+
+    around do |example|
+      perform_enqueued_jobs { example.run }
+    end
+
+    shared_examples 'altered iteration notification on issue' do
+      it 'sends the email to the correct people' do
+        should_email(subscriber_to_new_iteration)
+        issue.assignees.each do |a|
+          should_email(a)
+        end
+        should_email(@u_watcher)
+        should_email(@u_guest_watcher)
+        should_email(@u_participant_mentioned)
+        should_email(@subscriber)
+        should_email(@subscribed_participant)
+        should_email(@watcher_and_subscriber)
+        should_not_email(@u_guest_custom)
+        should_not_email(@u_committer)
+        should_not_email(@unsubscriber)
+        should_not_email(@u_participating)
+        should_not_email(@u_lazy_participant)
+        should_not_email(issue.author)
+        should_not_email(@u_disabled)
+        should_not_email(@u_custom_global)
+        should_not_email(@u_mentioned)
+      end
+    end
+
+    describe '#removed_iteration_issue' do
+      let(:mailer_method) { :removed_iteration_issue_email }
+
+      context do
+        let(:iteration) { create(:iteration, group: group, issues: [issue]) }
+        let!(:subscriber_to_new_iteration) { create(:user) { |u| issue.toggle_subscription(u, project) } }
+
+        it_behaves_like 'altered iteration notification on issue' do
+          before do
+            notification.removed_iteration_issue(issue, issue.author)
+          end
+        end
+
+        it_behaves_like 'project emails are disabled' do
+          let(:notification_target)  { issue }
+          let(:notification_trigger) { notification.removed_iteration_issue(issue, issue.author) }
+        end
+      end
+
+      context 'confidential issues' do
+        let(:author) { create(:user) }
+        let(:assignee) { create(:user) }
+        let(:non_member) { create(:user) }
+        let(:member) { create(:user) }
+        let(:guest) { create(:user) }
+        let(:admin) { create(:admin) }
+        let(:confidential_issue) { create(:issue, :confidential, project: project, title: 'Confidential issue', author: author, assignees: [assignee]) }
+        let(:iteration) { create(:iteration, project: project, issues: [confidential_issue]) }
+
+        it "emails subscribers of the issue's iteration that can read the issue" do
+          project.add_developer(member)
+          project.add_guest(guest)
+
+          confidential_issue.subscribe(non_member, project)
+          confidential_issue.subscribe(author, project)
+          confidential_issue.subscribe(assignee, project)
+          confidential_issue.subscribe(member, project)
+          confidential_issue.subscribe(guest, project)
+          confidential_issue.subscribe(admin, project)
+
+          reset_delivered_emails!
+
+          notification.removed_iteration_issue(confidential_issue, @u_disabled)
+
+          should_not_email(non_member)
+          should_not_email(guest)
+          should_email(author)
+          should_email(assignee)
+          should_email(member)
+          should_email(admin)
+        end
+      end
+    end
+
+    describe '#changed_iteration_issue' do
+      let(:mailer_method) { :changed_iteration_issue_email }
+
+      context do
+        let(:new_iteration) { create(:iteration, project: project, issues: [issue]) }
+        let!(:subscriber_to_new_iteration) { create(:user) { |u| issue.toggle_subscription(u, project) } }
+
+        it_behaves_like 'altered iteration notification on issue' do
+          before do
+            notification.changed_iteration_issue(issue, new_iteration, issue.author)
+          end
+        end
+
+        it_behaves_like 'project emails are disabled' do
+          let(:notification_target)  { issue }
+          let(:notification_trigger) { notification.changed_iteration_issue(issue, new_iteration, issue.author) }
+        end
+      end
+
+      context 'confidential issues' do
+        let(:author) { create(:user) }
+        let(:assignee) { create(:user) }
+        let(:non_member) { create(:user) }
+        let(:member) { create(:user) }
+        let(:guest) { create(:user) }
+        let(:admin) { create(:admin) }
+        let(:confidential_issue) { create(:issue, :confidential, project: project, title: 'Confidential issue', author: author, assignees: [assignee]) }
+        let(:new_iteration) { create(:iteration, project: project, issues: [confidential_issue]) }
+
+        it "emails subscribers of the issue's iteration that can read the issue" do
+          project.add_developer(member)
+          project.add_guest(guest)
+
+          confidential_issue.subscribe(non_member, project)
+          confidential_issue.subscribe(author, project)
+          confidential_issue.subscribe(assignee, project)
+          confidential_issue.subscribe(member, project)
+          confidential_issue.subscribe(guest, project)
+          confidential_issue.subscribe(admin, project)
+
+          reset_delivered_emails!
+
+          notification.changed_iteration_issue(confidential_issue, new_iteration, @u_disabled)
+
+          should_not_email(non_member)
+          should_not_email(guest)
+          should_email(author)
+          should_email(assignee)
+          should_email(member)
+          should_email(admin)
+        end
+      end
+    end
+  end
+
   describe 'epics' do
     let_it_be(:group) { create(:group, :private) }
     let_it_be(:epic) { create(:epic, group: group) }
