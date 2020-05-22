@@ -8,6 +8,20 @@ describe Gitlab::Geo::Replication::BaseTransfer do
   let_it_be(:primary_node) { create(:geo_node, :primary) }
   let_it_be(:secondary_node) { create(:geo_node) }
 
+  describe '#resource_url' do
+    subject do
+      described_class.new(file_type: 'design_management/design_v432x230', file_id: 1,
+                          filename: Tempfile.new, expected_checksum: nil, request_data: nil)
+    end
+
+    context 'when file type contains /' do
+      it 'returns escaped url' do
+        url = subject.resource_url
+        expect(url).to include('design_management%2Fdesign_v432x230')
+      end
+    end
+  end
+
   describe '#can_transfer?' do
     subject do
       described_class.new(file_type: :avatar, file_id: 1, filename: Tempfile.new,
