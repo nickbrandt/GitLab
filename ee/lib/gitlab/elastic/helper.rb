@@ -36,7 +36,7 @@ module Gitlab
         settings = {}
         mappings = {}
 
-        new_index_name = with_alias ? "#{target_name}-#{Time.now.strftime("%Y%m%d-%H%M%S")}" : target_name
+        new_index_name = with_alias ? "#{target_name}-#{Time.now.strftime("%Y%m%d-%H%M")}" : target_name
 
         [
           Project,
