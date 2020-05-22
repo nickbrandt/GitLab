@@ -37,7 +37,7 @@ Note the following properties:
 | type | string | no | Type of panel to be rendered. Optional for area panel types |
 | query_range | string | required | For area panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
 
-![area panel chart](img/prometheus_dashboard_area_panel_type_v12_8.png)
+![area panel chart](../../integrations/img/prometheus_dashboard_area_panel_type_v12_8.png)
 
 Starting in [version 12.8](https://gitlab.com/gitlab-org/gitlab/issues/202696), the y-axis values will automatically scale according to the data. Previously, it always started from 0.
 
@@ -81,7 +81,7 @@ Note the following properties:
 | type | string | required | Must be `anomaly-chart` for anomaly panel types |
 | query_range | yes | required | For anomaly panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) in every metric. |
 
-![anomaly panel type](img/prometheus_dashboard_anomaly_panel_type.png)
+![anomaly panel type](../../integrations/img/prometheus_dashboard_anomaly_panel_type.png)
 
 ## Bar chart
 
@@ -110,7 +110,7 @@ Note the following properties:
 | `type` | string | yes | Type of panel to be rendered. For bar chart types, set to `bar` |
 | `query_range` | yes | yes | For bar chart, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries)
 
-![bar chart panel type](img/prometheus_dashboard_bar_chart_panel_type_v12.10.png)
+![bar chart panel type](../../integrations/img/prometheus_dashboard_bar_chart_panel_type_v12.10.png)
 
 ## Column chart
 
@@ -137,7 +137,7 @@ Note the following properties:
 | type | string | yes | Type of panel to be rendered. For column panel types, set to `column` |
 | query_range | yes | yes | For column panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
 
-![anomaly panel type](img/prometheus_dashboard_column_panel_type.png)
+![anomaly panel type](../../integrations/img/prometheus_dashboard_column_panel_type.png)
 
 ## Stacked column
 
@@ -170,7 +170,7 @@ panel_groups:
 
 ```
 
-![stacked column panel type](img/prometheus_dashboard_stacked_column_panel_type_v12_8.png)
+![stacked column panel type](../../integrations/img/prometheus_dashboard_stacked_column_panel_type_v12_8.png)
 
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------ |
@@ -202,7 +202,7 @@ Note the following properties:
 | type | string | yes | Type of panel to be rendered. For single stat panel types, set to `single-stat` |
 | query | string | yes | For single stat panel types, you must use an [instant query](https://prometheus.io/docs/prometheus/latest/querying/api/#instant-queries) |
 
-![single stat panel type](img/prometheus_dashboard_single_stat_panel_type.png)
+![single stat panel type](../../integrations/img/prometheus_dashboard_single_stat_panel_type.png)
 
 ## Percentile based results
 
@@ -254,4 +254,4 @@ Note the following properties:
 | type | string | yes | Type of panel to be rendered. For heatmap panel types, set to `heatmap` |
 | query_range | yes | yes | For area panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
 
-![heatmap panel type](img/heatmap_panel_type.png)
+![heatmap panel type](../../integrations/img/heatmap_panel_type.png)

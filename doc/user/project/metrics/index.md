@@ -9,7 +9,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 Once configured, GitLab will attempt to retrieve performance metrics for any
 environment which has had a successful deployment.
 
-GitLab will automatically scan the Prometheus server for metrics from known servers like Kubernetes and NGINX, and attempt to identify individual environments. The supported metrics and scan process is detailed in our [Prometheus Metrics Library documentation](prometheus_library/index.md).
+GitLab will automatically scan the Prometheus server for metrics from known servers like Kubernetes and NGINX, and attempt to identify individual environments. The supported metrics and scan process is detailed in our [Prometheus Metrics Library documentation](../integrations/prometheus_library/index.md).
 
 You can view the performance dashboard for an environment by [clicking on the monitoring button](../../../ci/environments/index.md#monitoring-environments).
 
@@ -20,14 +20,14 @@ You can view the performance dashboard for an environment by [clicking on the mo
 The **Environment** dropdown box above the dashboard displays the list of all [environments](#monitoring-cicd-environments).
 It enables you to search as you type through all environments and select the one you're looking for.
 
-![Monitoring Dashboard Environments](img/prometheus_dashboard_environments_v12_8.png)
+![Monitoring Dashboard Environments](../integrations/img/prometheus_dashboard_environments_v12_8.png)
 
 ### Select a dashboard
 
 The **dashboard** dropdown box above the dashboard displays the list of all dashboards available for the project.
 It enables you to search as you type through all dashboards and select the one you're looking for.
 
-![Monitoring Dashboard select](img/prometheus_dashboard_select_v_13_0.png)
+![Monitoring Dashboard select](../integrations/img/prometheus_dashboard_select_v_13_0.png)
 
 ### Mark a dashboard as favorite
 
@@ -39,7 +39,7 @@ and appear at the top of the dashboard select list.
 
 To remove dashboard from the favorites list, click the solid **Unstar Dashboard** **{star}** button.
 
-![Monitoring Dashboard favorite state toggle](img/toggle_metrics_user_starred_dashboard_v13_0.png)
+![Monitoring Dashboard favorite state toggle](../integrations/img/toggle_metrics_user_starred_dashboard_v13_0.png)
 
 ### Adding custom metrics
 
@@ -51,7 +51,7 @@ Custom metrics can be monitored by adding them on the monitoring dashboard page.
 - A [connected Kubernetes cluster](../clusters/add_remove_clusters.md) with the environment scope of `*` is used and [Prometheus installed on the cluster](#enabling-prometheus-integration)
 - Prometheus is [manually configured](#manual-configuration-of-prometheus).
 
-![Add New Metric](img/prometheus_add_metric.png)
+![Add New Metric](../integrations/img/prometheus_add_metric.png)
 
 A few fields are required:
 
@@ -114,7 +114,7 @@ http://gitlab.com/<user>/<project>/-/environments/<environment_id>/metrics?dashb
 
 You can edit existing additional custom metrics by clicking the **{ellipsis_v}** **More actions** dropdown and selecting **Edit metric**.
 
-![Edit metric](img/prometheus_dashboard_edit_metric_link_v_12_9.png)
+![Edit metric](../integrations/img/prometheus_dashboard_edit_metric_link_v_12_9.png)
 
 #### Dynamic labels
 
@@ -132,7 +132,7 @@ metrics:
 
 This may render a legend like this:
 
-![repeated legend label chart](img/prometheus_dashboard_repeated_label.png)
+![repeated legend label chart](../integrations/img/prometheus_dashboard_repeated_label.png)
 
 For labels to be more explicit, using variables that reflect time series labels is a good practice. The variables will be replaced by the values of the time series labels when the legend is rendered:
 
@@ -146,7 +146,7 @@ metrics:
 
 The resulting rendered legend will look like this:
 
-![legend with label variables](img/prometheus_dashboard_label_variables.png)
+![legend with label variables](../integrations/img/prometheus_dashboard_label_variables.png)
 
 There is also a shorthand value for dynamic dashboard labels that make use of only one time series label:
 
@@ -160,7 +160,7 @@ metrics:
 
 This works by lowercasing the value of `label` and, if there are more words separated by spaces, replacing those spaces with an underscore (`_`). The transformed value is then checked against the labels of the time series returned by the Prometheus query. If a time series label is found that is equal to the transformed value, then the label value will be used and rendered in the legend like this:
 
-![legend with label shorthand variable](img/prometheus_dashboard_label_variable_shorthand.png)
+![legend with label shorthand variable](../integrations/img/prometheus_dashboard_label_variable_shorthand.png)
 
 ## View and edit the source file of a custom dashboard
 
@@ -173,7 +173,7 @@ When viewing a custom dashboard of a project, you can view the original
 
 From each of the panels in the dashboard, you can access the context menu by clicking the **{ellipsis_v}** **More actions** dropdown box above the upper right corner of the panel to take actions related to the chart's data.
 
-![Context Menu](img/panel_context_menu_v13_0.png)
+![Context Menu](../integrations/img/panel_context_menu_v13_0.png)
 
 The options are:
 
@@ -198,7 +198,7 @@ its description.
 You can create annotations by making requests to the
 [Metrics dashboard annotations API](../../../api/metrics_dashboard_annotations.md)
 
-![Annotations UI](img/metrics_dashboard_annotations_ui_v13.0.png)
+![Annotations UI](../integrations/img/metrics_dashboard_annotations_ui_v13.0.png)
 
 ## Expand panel
 
@@ -237,7 +237,7 @@ Data from Prometheus charts on the metrics dashboard can be downloaded as CSV.
 
 ### Managed Prometheus instances
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-custom-metrics), and 11.3 for [library metrics](prometheus_library/metrics.md).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-custom-metrics), and 11.3 for [library metrics](../integrations/prometheus_library/metrics.md).
 
 For managed Prometheus instances using auto configuration, alerts for metrics [can be configured](#adding-custom-metrics) directly in the performance dashboard.
 
@@ -248,7 +248,7 @@ To set an alert:
 1. Set threshold and operator.
 1. Click **Add** to save and activate the alert.
 
-![Adding an alert](img/prometheus_alert.png)
+![Adding an alert](../integrations/img/prometheus_alert.png)
 
 To remove the alert, click back on the alert icon for the desired metric, and click **Delete**.
 
@@ -259,7 +259,7 @@ To remove the alert, click back on the alert icon for the desired metric, and cl
 
 For manually configured Prometheus servers, a notify endpoint is provided to use with Prometheus webhooks. If you have manual configuration enabled, an **Alerts** section is added to **Settings > Integrations > Prometheus**. This contains the *URL* and *Authorization Key*. The **Reset Key** button will invalidate the key and generate a new one.
 
-![Prometheus service configuration of Alerts](img/prometheus_service_alerts.png)
+![Prometheus service configuration of Alerts](../integrations/img/prometheus_service_alerts.png)
 
 To send GitLab alert notifications, copy the *URL* and *Authorization Key* into the [`webhook_configs`](https://prometheus.io/docs/alerting/configuration/#webhook_config) section of your Prometheus Alertmanager configuration:
 
@@ -317,7 +317,7 @@ Developers can view the performance impact of their changes within the merge
 request workflow.
 
 NOTE: **Note:**
-Requires [Kubernetes](prometheus_library/kubernetes.md) metrics.
+Requires [Kubernetes](../integrations/prometheus_library/kubernetes.md) metrics.
 
 When a source branch has been deployed to an environment, a sparkline and
 numeric comparison of the average memory consumption will appear. On the
@@ -332,7 +332,7 @@ to show the new environments this revision has been deployed to.
 Performance data will be available for the duration it is persisted on the
 Prometheus server.
 
-![Merge Request with Performance Impact](img/merge_request_performance.png)
+![Merge Request with Performance Impact](../integrations/img/merge_request_performance.png)
 
 ## Embedding metric charts within GitLab Flavored Markdown
 
@@ -346,21 +346,21 @@ This can be useful if you are sharing an application incident or performance
 metrics to others and want to have relevant information directly available.
 
 NOTE: **Note:**
-Requires [Kubernetes](prometheus_library/kubernetes.md) metrics.
+Requires [Kubernetes](../integrations/prometheus_library/kubernetes.md) metrics.
 
 To display metric charts, include a link of the form `https://<root_url>/<project>/-/environments/<environment_id>/metrics`:
 
-![Embedded Metrics Markdown](img/embedded_metrics_markdown_v12_8.png)
+![Embedded Metrics Markdown](../integrations/img/embedded_metrics_markdown_v12_8.png)
 
 GitLab unfurls the link as an embedded metrics panel:
 
-![Embedded Metrics Rendered](img/embedded_metrics_rendered_v12_8.png)
+![Embedded Metrics Rendered](../integrations/img/embedded_metrics_rendered_v12_8.png)
 
 You can also embed a single chart. To get a link to a chart, click the
 **{ellipsis_v}** **More actions** menu in the upper right corner of the chart,
 and select **Copy link to chart**, as shown in this example:
 
-![Copy Link To Chart](img/copy_link_to_chart_v12_10.png)
+![Copy Link To Chart](../integrations/img/copy_link_to_chart_v12_10.png)
 
 The following requirements must be met for the metric to unfurl:
 
@@ -372,11 +372,11 @@ The following requirements must be met for the metric to unfurl:
 
  If all of the above are true, then the metric will unfurl as seen below:
 
-![Embedded Metrics](img/view_embedded_metrics_v12_10.png)
+![Embedded Metrics](../integrations/img/view_embedded_metrics_v12_10.png)
 
 Metric charts may also be hidden:
 
-![Show Hide](img/hide_embedded_metrics_v12_10.png)
+![Show Hide](../integrations/img/hide_embedded_metrics_v12_10.png)
 
 You can open the link directly into your browser for a [detailed view of the data](#expand-panel).
 
@@ -384,7 +384,7 @@ You can open the link directly into your browser for a [detailed view of the dat
 
 It is also possible to embed either the default dashboard metrics or individual metrics in issue templates. For charts to render side-by-side, links to the entire metrics dashboard or individual metrics should be separated by either a comma or a space.
 
-![Embedded Metrics in issue templates](img/embed_metrics_issue_template.png)
+![Embedded Metrics in issue templates](../integrations/img/embed_metrics_issue_template.png)
 
 ## Embedding metrics based on alerts in incident issues
 
@@ -419,7 +419,7 @@ The following requirements must be met for the metric to unfurl:
 
  If the above requirements are met, then the metric will unfurl as seen below.
 
-![Embedded Cluster Metric in issue descriptions](img/prometheus_cluster_health_embed_v12_9.png)
+![Embedded Cluster Metric in issue descriptions](../integrations/img/prometheus_cluster_health_embed_v12_9.png)
 
 ## Embedding Grafana charts
 
@@ -431,7 +431,7 @@ It is possible to embed live [Grafana](https://docs.gitlab.com/omnibus/settings/
 
 The sharing dialog within Grafana provides the link, as highlighted below.
 
-![Grafana Direct Linked Rendered Image](img/grafana_live_embed.png)
+![Grafana Direct Linked Rendered Image](../integrations/img/grafana_live_embed.png)
 
 NOTE: **Note:**
 For this embed to display correctly, the Grafana instance must be available to the target user, either as a public dashboard, or on the same network.
@@ -444,7 +444,7 @@ Copy the link and add an image tag as [inline HTML](../../markdown.md#inline-htm
 
 This will render like so:
 
-![Grafana dashboard embedded preview](img/grafana_embedded.png)
+![Grafana dashboard embedded preview](../integrations/img/grafana_embedded.png)
 
 ### Embedding charts via integration with Grafana HTTP API
 
@@ -457,7 +457,7 @@ Prerequisites for embedding from a Grafana instance:
 1. The datasource must be a Prometheus instance.
 1. The datasource must be proxyable, so the HTTP Access setting should be set to `Server`.
 
-![HTTP Proxy Access](img/http_proxy_access_v12_5.png)
+![HTTP Proxy Access](../integrations/img/http_proxy_access_v12_5.png)
 
 #### Setting up the Grafana integration
 
@@ -471,12 +471,12 @@ Prerequisites for embedding from a Grafana instance:
 #### Generating a link to a chart
 
 1. In Grafana, navigate to the dashboard you wish to embed a panel from.
-   ![Grafana Metric Panel](img/grafana_panel_v12_5.png)
+   ![Grafana Metric Panel](../integrations/img/grafana_panel_v12_5.png)
 1. In the upper-left corner of the page, select a specific value for each variable required for the queries in the chart.
-   ![Select Query Variables](img/select_query_variables_v12_5.png)
+   ![Select Query Variables](../integrations/img/select_query_variables_v12_5.png)
 1. In Grafana, click on a panel's title, then click **Share** to open the panel's sharing dialog to the **Link** tab. If you click the _dashboard's_ share panel instead, GitLab will attempt to embed the first supported panel on the dashboard (if available).
 1. If your Prometheus queries use Grafana's custom template variables, ensure that the "Template variables" option is toggled to **On**. Of Grafana global template variables, only `$__interval`, `$__from`, and `$__to` are currently supported. Toggle **On** the "Current time range" option to specify the time range of the chart. Otherwise, the default range will be the last 8 hours.
-   ![Grafana Sharing Dialog](img/grafana_sharing_dialog_v12_5.png)
+   ![Grafana Sharing Dialog]../integrations/(../integrations/img/grafana_sharing_dialog_v12_5.png)
 1. Click **Copy** to copy the URL to the clipboard.
 1. In GitLab, paste the URL into a Markdown field and save. The chart will take a few moments to render.
-   ![GitLab Rendered Grafana Panel](img/rendered_grafana_embed_v12_5.png)
+   ![GitLab Rendered Grafana Panel](../integrations/img/rendered_grafana_embed_v12_5.png)

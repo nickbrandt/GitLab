@@ -141,7 +141,7 @@ Read the documentation on [templating](#templating-variables-for-metrics-dashboa
 | Property    | Type   | Required                      | Description                                                          |
 | ----------- | ------ | ----------------------------- | -------------------------------------------------------------------- |
 | `name`      | string | no, but highly encouraged     | Y-Axis label for the panel. Replaces `y_label` if set.               |
-| `format`    | string | no, defaults to `engineering` | Unit format used. See the [full list of units](prometheus_units.md). |
+| `format`    | string | no, defaults to `engineering` | Unit format used. See the [full list of units](../../integrations/prometheus_units.md). |
 | `precision` | number | no, defaults to `2`           | Number of decimal places to display in the number.                                          |                        |
 
 ### **Metrics (`metrics`) properties**
@@ -158,7 +158,7 @@ Read the documentation on [templating](#templating-variables-for-metrics-dashboa
 ## Troubleshooting
 
 When troubleshooting issues with a managed Prometheus app, it is often useful to
-[view the Prometheus UI](../../../development/prometheus.md#access-the-ui-of-a-prometheus-managed-application-in-kubernetes).
+[view the Prometheus UI](../../../../development/prometheus.md#access-the-ui-of-a-prometheus-managed-application-in-kubernetes).
 
 ## "No data found" error on Metrics dashboard page
 
@@ -167,6 +167,6 @@ If the "No data found" screen continues to appear, it could be due to:
 - No successful deployments have occurred to this environment.
 - Prometheus does not have performance data for this environment, or the metrics
   are not labeled correctly. To test this, connect to the Prometheus server and
-  [run a query](prometheus_library/kubernetes.md#metrics-supported), replacing `$CI_ENVIRONMENT_SLUG`
+  [run a query](../../integrations/prometheus_library/kubernetes.md#metrics-supported), replacing `$CI_ENVIRONMENT_SLUG`
   with the name of your environment.
-- You may need to re-add the GitLab predefined common metrics. This can be done by running the [import common metrics Rake task](../../../administration/raketasks/maintenance.md#import-common-metrics).
+- You may need to re-add the GitLab predefined common metrics. This can be done by running the [import common metrics Rake task](../../../../administration/raketasks/maintenance.md#import-common-metrics).
