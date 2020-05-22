@@ -575,7 +575,7 @@ This snippet links to `<wiki_root>/miscellaneous.md`:
 
 ### Embedding metrics in GitLab Flavored Markdown
 
-Metric charts can be embedded within GitLab Flavored Markdown. See [Embedding Metrics within GitLab flavored Markdown](../user/project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown) for more details.
+Metric charts can be embedded within GitLab Flavored Markdown. See [Embedding Metrics within GitLab flavored Markdown](../user/project/metrics/index.md#embedding-metric-charts-within-gitlab-flavored-markdown) for more details.
 
 ## Standard Markdown and extensions in GitLab
 

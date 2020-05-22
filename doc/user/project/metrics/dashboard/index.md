@@ -18,7 +18,7 @@ dashboard.
 
 NOTE: **Note:**
 The metrics as defined below do not support alerts, unlike
-[custom metrics](#adding-custom-metrics).
+[custom metrics](../index.md#adding-custom-metrics).
 
 ### Adding a new dashboard to your project
 
@@ -114,7 +114,7 @@ The following tables outline the details of expected properties.
 | -------- | ---- | -------- | ----------- |
 | `variables` | Hash | no | Variables can be defined here. |
 
-Read the documentation on [templating](#templating-variables-for-metrics-dashboards).
+Read the documentation on [templating](variables.md#templating-variables-for-metrics-dashboards).
 
 ### **Panel group (`panel_groups`) properties**
 
@@ -132,7 +132,7 @@ Read the documentation on [templating](#templating-variables-for-metrics-dashboa
 | `title` | string | yes | Heading for the panel. |
 | `y_label` | string | no, but highly encouraged | Y-Axis label for the panel. |
 | `y_axis` | string | no | Y-Axis configuration for the panel. |
-| `max_value` | number | no | Denominator value used for calculating [percentile based results](#percentile-based-results) |
+| `max_value` | number | no | Denominator value used for calculating [percentile based results](panels.md#percentile-based-results) |
 | `weight` | number | no, defaults to order in file | Order to appear within the grouping. Lower number means higher priority, which will be higher on the page. Numbers do not need to be consecutive. |
 | `metrics` | array | yes | The metrics which should be displayed in the panel. Any number of metrics can be displayed when `type` is `area-chart` or `line-chart`, whereas only 3 can be displayed when `type` is `anomaly-chart`. |
 
@@ -148,7 +148,7 @@ Read the documentation on [templating](#templating-variables-for-metrics-dashboa
 
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------ |
-| `id` | string | no | Used for associating dashboard metrics with database records. Must be unique across dashboard configuration files. Required for [alerting](#setting-up-alerts-for-prometheus-metrics) (support not yet enabled, see [relevant issue](https://gitlab.com/gitlab-org/gitlab/-/issues/27980)). |
+| `id` | string | no | Used for associating dashboard metrics with database records. Must be unique across dashboard configuration files. Required for [alerting](../index.md#setting-up-alerts-for-prometheus-metrics) (support not yet enabled, see [relevant issue](https://gitlab.com/gitlab-org/gitlab/-/issues/27980)). |
 | `unit` | string | yes | Defines the unit of the query's return data. |
 | `label` | string | no, but highly encouraged | Defines the legend-label for the query. Should be unique within the panel's metrics. Can contain time series labels as interpolated variables. |
 | `query` | string | yes if `query_range` is not defined | Defines the Prometheus query to be used to populate the chart/panel. If defined, the `query` endpoint of the [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) will be utilized. |

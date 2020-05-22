@@ -18,7 +18,7 @@ members to the group in order to give them maintainer access to the project.
 This project is used to self monitor your GitLab instance. Metrics are not yet
 fully integrated, and the dashboard does not aggregate any data on Omnibus installations. GitLab plans
 to provide integrated self-monitoring metrics in a future release. You can
-currently use the project to configure your own [custom metrics](../../../user/project/integrations/prometheus.md#adding-custom-metrics) using
+currently use the project to configure your own [custom metrics](../../../user/project/metrics/index.md#adding-custom-metrics) using
 metrics exposed by the [GitLab exporter](../prometheus/gitlab_metrics.md#metrics-available).
 
 ## Creating the self monitoring project
@@ -52,18 +52,18 @@ you should
 
 ## Taking action on Prometheus alerts **(ULTIMATE)**
 
-You can [add a webhook](../../../user/project/integrations/prometheus.md#external-prometheus-instances)
+You can [add a webhook](../../../user/project/metrics/index.md#external-prometheus-instances)
 to the Prometheus config in order for GitLab to receive notifications of any alerts.
 
 Once the webhook is setup, you can
-[take action on incoming alerts](../../../user/project/integrations/prometheus.md#taking-action-on-incidents-ultimate).
+[take action on incoming alerts](../../../user/project/metrics/index.md#taking-action-on-incidents-ultimate).
 
 ## Adding custom metrics to the self monitoring project
 
 You can add custom metrics in the self monitoring project by:
 
-1. [Duplicating](../../../user/project/integrations/prometheus.md#duplicating-a-gitlab-defined-dashboard) the default dashboard.
-1. [Editing](../../../user/project/integrations/prometheus.md#view-and-edit-the-source-file-of-a-custom-dashboard) the newly created dashboard file and configuring it with [dashboard YAML properties](../../../user/project/integrations/prometheus.md#dashboard-yaml-properties).
+1. [Duplicating](../../../user/project/metrics/dashboard/index.md#duplicating-a-gitlab-defined-dashboard) the default dashboard.
+1. [Editing](../../../user/project/metrics/index.md#view-and-edit-the-source-file-of-a-custom-dashboard) the newly created dashboard file and configuring it with [dashboard YAML properties](../../../user/project/metrics/dashboard/index.md#dashboard-yaml-properties).
 
 ## Troubleshooting
 

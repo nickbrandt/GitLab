@@ -48,8 +48,8 @@ To remove dashboard from the favorites list, click the solid **Unstar Dashboard*
 
 Custom metrics can be monitored by adding them on the monitoring dashboard page. Once saved, they will be displayed on the environment performance dashboard provided that either:
 
-- A [connected Kubernetes cluster](../clusters/add_remove_clusters.md) with the environment scope of `*` is used and [Prometheus installed on the cluster](#enabling-prometheus-integration)
-- Prometheus is [manually configured](#manual-configuration-of-prometheus).
+- A [connected Kubernetes cluster](../clusters/add_remove_clusters.md) with the environment scope of `*` is used and [Prometheus installed on the cluster](../integrations/prometheus.md#enabling-prometheus-integration)
+- Prometheus is [manually configured](../integrations/prometheus.md#manual-configuration-of-prometheus).
 
 ![Add New Metric](../integrations/img/prometheus_add_metric.png)
 
@@ -81,7 +81,7 @@ Variables for Prometheus queries must be lowercase.
 
 #### User-defined variables
 
-[Variables can be defined](#templating-templating-properties) in a custom dashboard YAML file.
+[Variables can be defined](dashboard/index.md#templating-templating-properties) in a custom dashboard YAML file.
 
 #### Using variables
 
@@ -390,7 +390,7 @@ It is also possible to embed either the default dashboard metrics or individual 
 
 For [GitLab-managed alerting rules](#setting-up-alerts-for-prometheus-metrics), the issue will include an embedded chart for the query corresponding to the alert. The chart displays an hour of data surrounding the starting point of the incident, 30 minutes before and after.
 
-For [manually configured Prometheus instances](#manual-configuration-of-prometheus), a chart corresponding to the query can be included if these requirements are met:
+For [manually configured Prometheus instances](../integrations/prometheus.md#manual-configuration-of-prometheus), a chart corresponding to the query can be included if these requirements are met:
 
 - The alert corresponds to an environment managed through GitLab.
 - The alert corresponds to a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries).

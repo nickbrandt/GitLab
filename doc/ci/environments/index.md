@@ -852,7 +852,7 @@ Add a [button to the Monitoring dashboard](../../user/project/operations/linking
 
 #### Embedding metrics in GitLab Flavored Markdown
 
-Metric charts can be embedded within GitLab Flavored Markdown. See [Embedding Metrics within GitLab Flavored Markdown](../../user/project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown) for more details.
+Metric charts can be embedded within GitLab Flavored Markdown. See [Embedding Metrics within GitLab Flavored Markdown](../../user/project/metrics/index.md#embedding-metric-charts-within-gitlab-flavored-markdown) for more details.
 
 ### Web terminals
 

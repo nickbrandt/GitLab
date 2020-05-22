@@ -269,7 +269,7 @@ database: gitlabhq_production
 
 Sometimes you may need to re-import the common metrics that power the Metrics dashboards.
 
-This could be as a result of [updating existing metrics](../../development/prometheus_metrics.md#update-existing-metrics), or as a [troubleshooting measure](../../user/project/integrations/prometheus.md#troubleshooting).
+This could be as a result of [updating existing metrics](../../development/prometheus_metrics.md#update-existing-metrics), or as a [troubleshooting measure](../../user/project/metrics/dashboard/index.md#troubleshooting).
 
 To re-import the metrics you can run:
 

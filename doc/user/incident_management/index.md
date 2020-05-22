@@ -20,9 +20,9 @@ You can enable or disable Incident Management features in your project's
 **{settings}** **Settings > Operations > Incidents**. Issues can be created for
 each alert triggered, and separate email notifications can be sent to users with
 [Developer permissions](../permissions.md). Appropriately configured alerts include an
-[embedded chart](../project/integrations/prometheus.md#embedding-metrics-based-on-alerts-in-incident-issues)
+[embedded chart](../project/metrics/index.md#embedding-metrics-based-on-alerts-in-incident-issues)
 for the query corresponding to the alert. You can also configure GitLab to
-[close issues](../project/integrations/prometheus.md#taking-action-on-incidents-ultimate)
+[close issues](../project/metrics/index.md#taking-action-on-incidents-ultimate)
 when you receive notification that the alert is resolved.
 
 ![Incident Management Settings](img/incident_management_settings.png)
@@ -37,7 +37,7 @@ information about the alerts to help you diagnose the source of the alerts.
    the incident.
 1. Select the template from the **Issue Template** dropdown.
    You can create your own [issue templates](../project/description_templates.md#creating-issue-templates)
-   to [use within Incident Management](../project/integrations/prometheus.md#taking-action-on-incidents-ultimate).
+   to [use within Incident Management](../project/metrics/index.md#taking-action-on-incidents-ultimate).
 1. Click **Save changes**.
 
 ## Notify developers of alerts
@@ -51,8 +51,8 @@ of the alert, and a link for more information.
 
 You can set up Prometheus alerts in:
 
-- [GitLab-managed Prometheus](../project/integrations/prometheus.md#setting-up-alerts-for-prometheus-metrics) installations.
-- [Self-managed Prometheus](../project/integrations/prometheus.md#external-prometheus-instances) installations.
+- [GitLab-managed Prometheus](../project/metrics/index.md#setting-up-alerts-for-prometheus-metrics) installations.
+- [Self-managed Prometheus](../project/metrics/index.md#external-prometheus-instances) installations.
 
 Prometheus alerts are created by the special Alert Bot user. You can't remove this
 user, but it does not count toward your license limit.
@@ -69,11 +69,11 @@ You can embed metrics anywhere GitLab Markdown is used, such as descriptions,
 comments on issues, and merge requests. Embedding metrics helps you share them
 when discussing incidents or performance issues. You can output the dashboard directly
 into any issue, merge request, epic, or any other Markdown text field in GitLab
-by [copying and pasting the link to the metrics dashboard](../project/integrations/prometheus.md#embedding-gitlab-managed-kubernetes-metrics).
+by [copying and pasting the link to the metrics dashboard](../project/metrics/index.md#embedding-gitlab-managed-kubernetes-metrics).
 
 You can embed both
-[GitLab-hosted metrics](../project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown) and
-[Grafana metrics](../project/integrations/prometheus.md#embedding-grafana-charts)
+[GitLab-hosted metrics](../project/metrics/index.md#embedding-metric-charts-within-gitlab-flavored-markdown) and
+[Grafana metrics](../project/metrics/index.md#embedding-grafana-charts)
 in incidents and issue templates.
 
 ### Context menu
@@ -85,7 +85,7 @@ upper right corner of the panel. The options are:
 
 - [View logs](#view-logs-from-metrics-panel).
 - **Download CSV** - Data from embedded charts can be
-  [downloaded as CSV](../project/integrations/prometheus.md#downloading-data-as-csv).
+  [downloaded as CSV](../project/metrics/index.md#downloading-data-as-csv).
 
 #### View logs from metrics panel
 
@@ -93,7 +93,7 @@ upper right corner of the panel. The options are:
 > - [Moved](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25455) to [GitLab Core](https://about.gitlab.com/pricing/) 12.9.
 
 Viewing logs from a metrics panel can be useful if you're triaging an application
-incident and need to [explore logs](../project/integrations/prometheus.md#view-logs-ultimate)
+incident and need to [explore logs](../project/metrics/index.md#view-logs-ultimate)
 from across your application. These logs help you understand what is affecting
 your application's performance and resolve any problems.
 

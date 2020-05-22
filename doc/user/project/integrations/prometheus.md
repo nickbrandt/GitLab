@@ -130,7 +130,7 @@ one of them will be used:
   [Prometheus manual configuration](#manual-configuration-of-prometheus)
   and a [managed Prometheus on Kubernetes](#managed-prometheus-on-kubernetes),
   the manual configuration takes precedence and is used to run queries from
-  [dashboards](../metrics/index.md#defining-custom-dashboards-per-project) and [custom metrics](../metrics/index.md#adding-custom-metrics).
+  [dashboards](../metrics/dashboard/index.md#defining-custom-dashboards-per-project) and [custom metrics](../metrics/index.md#adding-custom-metrics).
 - If you have managed Prometheus applications installed on Kubernetes clusters
   at **different** levels (project, group, instance), the order of precedence is described in
   [Cluster precedence](../../instance/clusters/index.md#cluster-precedence).
