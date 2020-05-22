@@ -40,11 +40,6 @@ export default {
       })
       .catch(reportFailure);
   },
-  computed: {
-    shouldDisplayGraph() {
-      return !this.showFailureAlert;
-    },
-  },
   methods: {
     drawGraph(data) {
       return data;

@@ -1,51 +1,48 @@
-import * as d3 from 'd3';
 import { sankey, sankeyLeft } from 'd3-sankey';
 import { uniqWith, isEqual } from 'lodash';
 
-/**
-  The following functions are the main engine in transforming the data as
-  received from the endpoint into the format the d3 graph expects.
+/*
+    The following functions are the main engine in transforming the data as
+    received from the endpoint into the format the d3 graph expects.
 
-  Input is of the form:
-  [stages]
-    stages: {name, groups}
-      groups: [{ name, size, jobs }]
-        name is a group name; in the case that the group has one job, it is
-          also the job name
-        size is the number of parallel jobs
-        jobs: [{ name, needs}]
-          job name is either the same as the group name or group x/y
+    Input is of the form:
+    [stages]
+      stages: {name, groups}
+        groups: [{ name, size, jobs }]
+          name is a group name; in the case that the group has one job, it is
+            also the job name
+          size is the number of parallel jobs
+          jobs: [{ name, needs}]
+            job name is either the same as the group name or group x/y
 
-  Output is of the form:
-  { nodes: [node], links: [link] }
-    node: { name, category }, + unused info passed through
-    link: { source, target, value }, with source & target being node names
-      and value being a constant
+    Output is of the form:
+    { nodes: [node], links: [link] }
+      node: { name, category }, + unused info passed through
+      link: { source, target, value }, with source & target being node names
+        and value being a constant
 
-  We create nodes, create links, and then dedupe the links, so that in the case where
-  job 4 depends on job 1 and job 2, and job 2 depends on job 1, we show only a single link
-  from job 1 to job 2 then another from job 2 to job 4.
+    We create nodes, create links, and then dedupe the links, so that in the case where
+    job 4 depends on job 1 and job 2, and job 2 depends on job 1, we show only a single link
+    from job 1 to job 2 then another from job 2 to job 4.
 
-  CREATE NODES
-  stage.name -> node.category
-  stage.group.name -> node.name (this is the group name if there are parallel jobs)
-  stage.group.jobs -> node.jobs
-  stage.group.size -> node.size
+    CREATE NODES
+    stage.name -> node.category
+    stage.group.name -> node.name (this is the group name if there are parallel jobs)
+    stage.group.jobs -> node.jobs
+    stage.group.size -> node.size
 
-  CREATE LINKS
-  stages.groups.name -> target
-  stages.groups.needs.each -> source (source is the name of the group, not the parallel job)
-  10 -> value (constant)
-**/
+    CREATE LINKS
+    stages.groups.name -> target
+    stages.groups.needs.each -> source (source is the name of the group, not the parallel job)
+    10 -> value (constant)
+  */
 
 export const createNodes = data => {
-  return data
-    .map(({ groups }, idx, stages) => {
-      return groups.map(group => {
-        return { ...group, category: stages[idx].name };
-      });
-    })
-    .flat();
+  return data.flatMap(({ groups, name }) => {
+    return groups.map(group => {
+      return { ...group, category: name };
+    });
+  });
 };
 
 export const createNodeDict = nodes => {
@@ -110,24 +107,24 @@ export const getAllAncestors = (nodes, nodeDict) => {
 };
 
 export const filterByAncestors = (links, nodeDict) =>
-  links.filter(link => {
+  links.filter(({ target, source }) => {
     /*
 
-  for every link, check out it's target
-  for every target, get the target node's needs
-  then drop the current link source from that list
+    for every link, check out it's target
+    for every target, get the target node's needs
+    then drop the current link source from that list
 
-  call a function to get all ancestors, recursively
-  is the current link's source in the list of all parents?
-  then we drop this link
+    call a function to get all ancestors, recursively
+    is the current link's source in the list of all parents?
+    then we drop this link
 
   */
-    const targetNode = link.target;
+    const targetNode = target;
     const targetNodeNeeds = nodeDict[targetNode].needs;
-    const targetNodeNeedsMinusSource = targetNodeNeeds.filter(need => need !== link.source);
+    const targetNodeNeedsMinusSource = targetNodeNeeds.filter(need => need !== source);
 
     const allAncestors = getAllAncestors(targetNodeNeedsMinusSource, nodeDict);
-    return !allAncestors.includes(link.source);
+    return !allAncestors.includes(source);
   });
 
 export const parseData = data => {
@@ -139,14 +136,14 @@ export const parseData = data => {
   return { nodes, links };
 };
 
-/**
-  createSankey calls the d3 layout to generate the relationships and positioning
-  values for the nodes and links in the graph.
-**/
+/*
+    createSankey calls the d3 layout to generate the relationships and positioning
+    values for the nodes and links in the graph.
+  */
 
 export const createSankey = ({ width, height, nodeWidth, nodePadding, paddingForLabels }) => {
   const sankeyGenerator = sankey()
-    .nodeId(d => d.name)
+    .nodeId(({ name }) => name)
     .nodeAlign(sankeyLeft)
     .nodeWidth(nodeWidth)
     .nodePadding(nodePadding)
@@ -161,17 +158,17 @@ export const createSankey = ({ width, height, nodeWidth, nodePadding, paddingFor
     });
 };
 
-/**
+/*
   The number of nodes in the most populous generation drives the height of the graph.
-**/
+*/
 
 export const getMaxNodes = nodes => {
-  const counts = nodes.reduce((acc, currentNode) => {
-    if (!acc[currentNode.layer]) {
-      acc[currentNode.layer] = 0;
+  const counts = nodes.reduce((acc, { layer }) => {
+    if (!acc[layer]) {
+      acc[layer] = 0;
     }
 
-    acc[currentNode.layer] += 1;
+    acc[layer] += 1;
 
     return acc;
   }, []);
@@ -179,11 +176,11 @@ export const getMaxNodes = nodes => {
   return Math.max(...counts);
 };
 
-/**
+/*
   Because we cannot know if a node is part of a relationship until after we
   generate the links with createSankey, this function is used after the first call
   to find nodes that have no relations.
-**/
+*/
 
 export const removeOrphanNodes = sankeyfiedNodes => {
   return sankeyfiedNodes.filter(node => node.sourceLinks.length || node.targetLinks.length);

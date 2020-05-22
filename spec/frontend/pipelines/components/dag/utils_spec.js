@@ -8,7 +8,7 @@ import {
   getMaxNodes,
 } from '~/pipelines/components/dag/utils';
 
-import mockGraphData from './mock-data.js';
+import mockGraphData from './mock_data';
 
 describe('DAG visualization parsing utilities', () => {
   const { nodes, nodeDict } = createNodesStructure(mockGraphData.stages);
@@ -71,7 +71,7 @@ describe('DAG visualization parsing utilities', () => {
 
     const dedupedLinks = [{ source: 'job1', target: 'job2' }, { source: 'job2', target: 'job4' }];
 
-    const nodeDict = {
+    const nodeLookup = {
       job1: {
         name: 'job1',
       },
@@ -87,14 +87,12 @@ describe('DAG visualization parsing utilities', () => {
     };
 
     it('dedupes links', () => {
-      expect(filterByAncestors(allLinks, nodeDict)).toMatchObject(dedupedLinks);
+      expect(filterByAncestors(allLinks, nodeLookup)).toMatchObject(dedupedLinks);
     });
   });
 
   describe('parseData parent function', () => {
     it('returns an object containing a list of nodes and links', () => {
-      const parsed = parseData(mockGraphData.stages);
-
       // an array of nodes exist and the values are defined
       expect(parsed).toHaveProperty('nodes');
       expect(Array.isArray(parsed.nodes)).toBe(true);

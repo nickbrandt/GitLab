@@ -1,8 +1,8 @@
-/**
+/*
   It is important that the simple base include parallel jobs
   as well as non-parallel jobs with spaces in the name to prevent
   us relying on spaces as an indicator.
-**/
+*/
 export default {
   stages: [
     {
