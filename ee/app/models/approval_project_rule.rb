@@ -37,6 +37,10 @@ class ApprovalProjectRule < ApplicationRecord
     nil
   end
 
+  def section
+    nil
+  end
+
   def apply_report_approver_rules_to(merge_request)
     report_type = report_type_for(self)
     rule = merge_request
