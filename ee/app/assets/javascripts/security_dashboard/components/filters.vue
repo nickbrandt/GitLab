@@ -4,11 +4,13 @@ import { n__ } from '~/locale';
 import { camelCase } from 'lodash';
 import DashboardFilter from './filter.vue';
 import GlToggleVuex from '~/vue_shared/components/gl_toggle_vuex.vue';
+import UrlSync from '~/vue_shared/components/url_sync.vue';
 
 export default {
   components: {
     DashboardFilter,
     GlToggleVuex,
+    UrlSync,
   },
   props: {
     securityReportSummary: {
@@ -81,5 +83,6 @@ export default {
         />
       </div>
     </div>
+    <url-sync query="visibleFilters" />
   </div>
 </template>
