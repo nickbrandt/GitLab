@@ -20,7 +20,7 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
   scope :never, -> { where(last_synced_at: nil) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
-  scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.now))) }
+  scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
   scope :ordered, -> { order(:id) }
 
   state_machine :state, initial: :pending do
@@ -30,7 +30,7 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
     state :failed, value: STATE_VALUES[:failed]
 
     before_transition any => :started do |registry, _|
-      registry.last_synced_at = Time.now
+      registry.last_synced_at = Time.current
     end
 
     before_transition any => :pending do |registry, _|

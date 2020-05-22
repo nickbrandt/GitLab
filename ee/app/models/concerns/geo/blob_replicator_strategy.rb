@@ -61,7 +61,7 @@ module Geo
 
       model_record.update!(
         verification_checksum: checksum,
-        verified_at: Time.now,
+        verified_at: Time.current,
         verification_failure: failure,
         verification_retry_at: retry_at,
         verification_retry_count: retry_count

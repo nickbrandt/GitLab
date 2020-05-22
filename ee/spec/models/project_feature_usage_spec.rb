@@ -29,7 +29,7 @@ describe ProjectFeatureUsage, type: :model do
         subject.log_jira_dvcs_integration_usage
 
         expect(subject.jira_dvcs_server_last_sync_at).to be_nil
-        expect(subject.jira_dvcs_cloud_last_sync_at).to be_like_time(Time.now)
+        expect(subject.jira_dvcs_cloud_last_sync_at).to be_like_time(Time.current)
       end
     end
 
@@ -37,7 +37,7 @@ describe ProjectFeatureUsage, type: :model do
       Timecop.freeze do
         subject.log_jira_dvcs_integration_usage(cloud: false)
 
-        expect(subject.jira_dvcs_server_last_sync_at).to be_like_time(Time.now)
+        expect(subject.jira_dvcs_server_last_sync_at).to be_like_time(Time.current)
         expect(subject.jira_dvcs_cloud_last_sync_at).to be_nil
       end
     end

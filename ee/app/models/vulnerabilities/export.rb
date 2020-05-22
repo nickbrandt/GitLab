@@ -40,11 +40,11 @@ module Vulnerabilities
       state :failed
 
       before_transition created: :running do |export|
-        export.started_at = Time.now
+        export.started_at = Time.current
       end
 
       before_transition any => [:finished, :failed] do |export|
-        export.finished_at = Time.now
+        export.finished_at = Time.current
       end
     end
 

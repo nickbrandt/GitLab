@@ -345,7 +345,7 @@ describe Epic do
   end
 
   it_behaves_like 'within_timeframe scope' do
-    let_it_be(:now) { Time.now }
+    let_it_be(:now) { Time.current }
     let_it_be(:group) { create(:group) }
     let_it_be(:resource_1) { create(:epic, group: group, start_date: now - 1.day, end_date: now + 1.day) }
     let_it_be(:resource_2) { create(:epic, group: group, start_date: now + 2.days, end_date: now + 3.days) }
@@ -458,7 +458,7 @@ describe Epic do
   describe '#close' do
     subject(:epic) { create(:epic, state: 'opened') }
 
-    it 'sets closed_at to Time.now when an epic is closed' do
+    it 'sets closed_at to Time.current when an epic is closed' do
       expect { epic.close }.to change { epic.closed_at }.from(nil)
     end
 
@@ -468,7 +468,7 @@ describe Epic do
   end
 
   describe '#reopen' do
-    subject(:epic) { create(:epic, state: 'closed', closed_at: Time.now, closed_by: user) }
+    subject(:epic) { create(:epic, state: 'closed', closed_at: Time.current, closed_by: user) }
 
     it 'sets closed_at to nil when an epic is reopend' do
       expect { epic.reopen }.to change { epic.closed_at }.to(nil)

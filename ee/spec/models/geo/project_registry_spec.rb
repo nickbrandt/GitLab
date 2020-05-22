@@ -284,7 +284,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
 
   describe '#repository_sync_due?' do
     where(:last_synced_at, :resync, :retry_at, :expected) do
-      now = Time.now
+      now = Time.current
       past = now - 1.year
       future = now + 1.year
 
@@ -313,13 +313,13 @@ describe Geo::ProjectRegistry, :geo_fdw do
         )
       end
 
-      it { expect(registry.repository_sync_due?(Time.now)).to eq(expected) }
+      it { expect(registry.repository_sync_due?(Time.current)).to eq(expected) }
     end
   end
 
   describe '#wiki_sync_due?' do
     where(:last_synced_at, :resync, :retry_at, :expected) do
-      now = Time.now
+      now = Time.current
       past = now - 1.year
       future = now + 1.year
 
@@ -348,7 +348,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
         )
       end
 
-      it { expect(registry.wiki_sync_due?(Time.now)).to eq(expected) }
+      it { expect(registry.wiki_sync_due?(Time.current)).to eq(expected) }
     end
   end
 
@@ -405,7 +405,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
       it 'sets last_repository_synced_at to now' do
         subject.start_sync!(type)
 
-        expect(subject.last_repository_synced_at).to be_like_time(Time.now)
+        expect(subject.last_repository_synced_at).to be_like_time(Time.current)
       end
 
       context 'when repository_retry_count is nil' do
@@ -423,7 +423,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
       it 'sets last_wiki_synced_at to now' do
         subject.start_sync!(type)
 
-        expect(subject.last_wiki_synced_at).to be_like_time(Time.now)
+        expect(subject.last_wiki_synced_at).to be_like_time(Time.current)
       end
 
       context 'when wiki_retry_count is nil' do
@@ -456,7 +456,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
         Timecop.freeze do
           subject.finish_sync!(type)
 
-          expect(subject.reload.last_repository_successful_sync_at).to be_within(1).of(Time.now)
+          expect(subject.reload.last_repository_successful_sync_at).to be_within(1).of(Time.current)
         end
       end
 
@@ -551,7 +551,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
         Timecop.freeze do
           subject.finish_sync!(type)
 
-          expect(subject.reload.last_wiki_successful_sync_at).to be_within(1).of(Time.now)
+          expect(subject.reload.last_wiki_successful_sync_at).to be_within(1).of(Time.current)
         end
       end
 
@@ -645,7 +645,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
 
         subject.fail_sync!(type, message, error)
 
-        expect(subject.repository_retry_at > Time.now).to be(true)
+        expect(subject.repository_retry_at > Time.current).to be(true)
       end
 
       it 'ensures repository_retry_at is capped at one hour' do
@@ -730,7 +730,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
 
         subject.fail_sync!(type, message, error)
 
-        expect(subject.wiki_retry_at > Time.now).to be(true)
+        expect(subject.wiki_retry_at > Time.current).to be(true)
       end
 
       it 'ensures wiki_retry_at is capped at one hour' do
@@ -840,7 +840,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
                         repository_retry_count: 1,
                         repository_verification_retry_count: 1)
 
-        subject.repository_updated!(event.source, Time.now)
+        subject.repository_updated!(event.source, Time.current)
       end
 
       it 'resets sync state' do
@@ -851,7 +851,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
           force_to_redownload_repository: nil,
           last_repository_sync_failure: nil,
           repository_missing_on_primary: nil,
-          resync_repository_was_scheduled_at: be_within(1.minute).of(Time.now)
+          resync_repository_was_scheduled_at: be_within(1.minute).of(Time.current)
         )
       end
 
@@ -878,7 +878,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
                         wiki_retry_count: 1,
                         wiki_verification_retry_count: 1)
 
-        subject.repository_updated!(event.source, Time.now)
+        subject.repository_updated!(event.source, Time.current)
       end
 
       it 'resets sync state' do
@@ -889,7 +889,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
           force_to_redownload_wiki: nil,
           last_wiki_sync_failure: nil,
           wiki_missing_on_primary: nil,
-          resync_wiki_was_scheduled_at: be_within(1.minute).of(Time.now)
+          resync_wiki_was_scheduled_at: be_within(1.minute).of(Time.current)
         )
       end
 
@@ -1098,7 +1098,7 @@ describe Geo::ProjectRegistry, :geo_fdw do
 
     context 'when repository has successfully synced' do
       it 'returns true' do
-        registry = create(:geo_project_registry, last_repository_successful_sync_at: Time.now)
+        registry = create(:geo_project_registry, last_repository_successful_sync_at: Time.current)
 
         expect(registry.repository_has_successfully_synced?).to be_truthy
       end

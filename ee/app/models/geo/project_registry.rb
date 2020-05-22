@@ -68,8 +68,8 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
 
   def self.retry_due
     where(
-      arel_table[:repository_retry_at].lt(Time.now)
-        .or(arel_table[:wiki_retry_at].lt(Time.now))
+      arel_table[:repository_retry_at].lt(Time.current)
+        .or(arel_table[:wiki_retry_at].lt(Time.current))
         .or(arel_table[:repository_retry_at].eq(nil))
         .or(arel_table[:wiki_retry_at].eq(nil))
     )
@@ -180,7 +180,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
       repository_checksum_mismatch: false,
       last_repository_verification_failure: nil,
       repository_verification_retry_count: nil,
-      resync_repository_was_scheduled_at: Time.now,
+      resync_repository_was_scheduled_at: Time.current,
       repository_retry_count: nil,
       repository_retry_at: nil
     )
@@ -223,7 +223,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     ensure_valid_type!(type)
 
     update!(
-      "last_#{type}_synced_at" => Time.now,
+      "last_#{type}_synced_at" => Time.current,
       "#{type}_retry_count" => retry_count(type))
   end
 
@@ -235,7 +235,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     ensure_valid_type!(type)
     update!(
       # Indicate that the sync succeeded (but separately mark as synced atomically)
-      "last_#{type}_successful_sync_at" => Time.now,
+      "last_#{type}_successful_sync_at" => Time.current,
       "#{type}_retry_count" => nil,
       "#{type}_retry_at" => nil,
       "force_to_redownload_#{type}" => false,
@@ -404,7 +404,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   #
   # This operation happens only in the database and the resync will be triggered after by the cron job
   def flag_repository_for_resync!
-    repository_updated!(:repository, Time.now)
+    repository_updated!(:repository, Time.current)
   end
 
   # Flag the repository to perform a full re-download
