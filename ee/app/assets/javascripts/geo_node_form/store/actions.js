@@ -64,3 +64,5 @@ export const saveGeoNode = ({ dispatch }, node) => {
       dispatch('receiveSaveGeoNodeError', response.data);
     });
 };
+
+export const setError = ({ commit }, { key, error }) => commit(types.SET_ERROR, { key, error });
