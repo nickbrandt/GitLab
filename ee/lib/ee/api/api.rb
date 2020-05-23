@@ -38,6 +38,7 @@ module EE
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages
+        mount ::API::GoProxy
         mount ::API::MergeTrains
         mount ::API::ProjectPackages
         mount ::API::GroupPackages
