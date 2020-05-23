@@ -1,4 +1,4 @@
-import createComponent from 'spec/boards/board_list_common_spec';
+import createComponent from 'jest/boards/board_list_helper';
 
 describe('BoardList Component', () => {
   let mock;
