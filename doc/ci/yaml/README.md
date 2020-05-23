@@ -3833,6 +3833,7 @@ the use of the `SAMPLE_VARIABLE` variable:
 # global variables
 variables: &global-variables
   SAMPLE_VARIABLE: sample_variable_value
+  ANOTHER_SAMPLE_VARIABLE: another_sample_variable_value
 
 # a job that needs to set the GIT_STRATEGY variable, yet depend on global variables
 job_no_git_strategy:
