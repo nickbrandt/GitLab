@@ -3857,7 +3857,7 @@ lines where the job is defined:
 #    - run test
 ```
 
-you can instead start its name with a dot (`.`) and it won't be processed by
+You can instead start its name with a dot (`.`) and it won't be processed by
 GitLab CI/CD. In the following example, `.hidden_job` will be ignored:
 
 ```yaml
