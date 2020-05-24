@@ -1215,6 +1215,9 @@ msgstr ""
 msgid "Add a bullet list"
 msgstr ""
 
+msgid "Add a comment to this line"
+msgstr ""
+
 msgid "Add a general comment to this %{noteableDisplayName}."
 msgstr ""
 

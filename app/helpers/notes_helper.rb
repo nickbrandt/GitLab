@@ -54,7 +54,7 @@ module NotesHelper
       class: 'add-diff-note js-add-diff-note-button',
       type: 'submit', name: 'button',
       data: diff_view_line_data(line_code, position, line_type),
-      title: 'Add a comment to this line' do
+      title: _('Add a comment to this line') do
       sprite_icon('comment', size: 12)
     end
   end
