@@ -87,11 +87,7 @@ describe Projects::Releases::EvidencesController do
       let_it_be(:project) { create(:project, :repository, :public) }
       let_it_be(:issue) { create(:issue, project: project) }
       let_it_be(:milestone) { create(:milestone, project: project, issues: [issue]) }
-      let_it_be(:release) { create(:release, project: project, tag: tag_name, milestones: [milestone]) }
-
-      before do
-        create(:evidence, release: release)
-      end
+      let_it_be(:release) { create(:release, :with_evidence, project: project, tag: tag_name, milestones: [milestone]) }
 
       shared_examples_for 'does not show the issue in evidence' do
         it do
