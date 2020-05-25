@@ -190,7 +190,7 @@ module Vulnerabilities
     end
 
     def load_feedback
-      BatchLoader.for(occurrence_key).batch do |occurrence_keys, loader|
+      BatchLoader.for(occurrence_key).batch(replace_methods: false) do |occurrence_keys, loader|
         project_ids = occurrence_keys.map { |key| key[:project_id] }
         categories = occurrence_keys.map { |key| key[:category] }
         fingerprints = occurrence_keys.map { |key| key[:project_fingerprint] }
