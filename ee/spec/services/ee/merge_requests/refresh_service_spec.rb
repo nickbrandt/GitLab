@@ -95,19 +95,38 @@ describe MergeRequests::RefreshService do
         subject
       end
 
-      context 'when :sectional_codeowners is disabled' do
-        before do
-          stub_feature_flags(sectional_codeowners: false)
+      context "creating approval_rules" do
+        shared_examples_for 'creates an approval rule based on current diff' do
+          it "creates expected approval rules" do
+            expect(another_merge_request.approval_rules.size).to eq(approval_rules_size)
+            expect(another_merge_request.approval_rules.first.rule_type).to eq('code_owner')
+          end
         end
 
-        it 'creates an approval rule based on current diff' do
-          file = File.read(Rails.root.join('ee', 'spec', 'fixtures', 'codeowners_example'))
+        before do
           project.repository.create_file(owner, 'CODEOWNERS', file, { branch_name: 'test', message: 'codeowners' })
 
           subject
+        end
 
-          expect(another_merge_request.approval_rules.size).to eq(3)
-          expect(another_merge_request.approval_rules.first.rule_type).to eq('code_owner')
+        context 'with a non-sectional codeowners file' do
+          let_it_be(:file) do
+            File.read(Rails.root.join('ee', 'spec', 'fixtures', 'codeowners_example'))
+          end
+
+          it_behaves_like 'creates an approval rule based on current diff' do
+            let(:approval_rules_size) { 3 }
+          end
+        end
+
+        context 'with a sectional codeowners file' do
+          let_it_be(:file) do
+            File.read(Rails.root.join('ee', 'spec', 'fixtures', 'sectional_codeowners_example'))
+          end
+
+          it_behaves_like 'creates an approval rule based on current diff' do
+            let(:approval_rules_size) { 4 }
+          end
         end
       end
 
