@@ -50,6 +50,10 @@ module Projects
 
       def update
         policy = Gitlab::Kubernetes::NetworkPolicy.from_yaml(params[:manifest])
+        unless params[:enabled].nil?
+          params[:enabled] ? policy.enable : policy.disable
+        end
+
         response = NetworkPolicies::DeployResourceService.new(
           resource_name: params[:id],
           policy: policy,

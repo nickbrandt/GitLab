@@ -9,7 +9,7 @@ describe Projects::Security::NetworkPoliciesController do
   let_it_be(:project) { create(:project, :public, :repository, group: group) }
   let_it_be(:environment) { create(:environment, :with_review_app, project: project) }
 
-  let_it_be(:action_params) { { project_id: project, namespace_id: project.namespace, environment_id: environment } }
+  let_it_be(:action_params) { { project_id: project, namespace_id: project.namespace, environment_id: environment.id } }
 
   shared_examples 'CRUD service errors' do
     context 'with a error service response' do
@@ -239,8 +239,9 @@ describe Projects::Security::NetworkPoliciesController do
   end
 
   describe 'PUT #update' do
-    subject { put :update, params: action_params.merge(id: 'example-policy', manifest: manifest), format: :json }
+    subject { put :update, params: action_params.merge(id: 'example-policy', manifest: manifest, enabled: enabled), as: :json }
 
+    let(:enabled) { nil }
     let(:service) { instance_double('NetworkPolicies::DeployResourceService', execute: ServiceResponse.success(payload: policy)) }
     let(:policy) do
       Gitlab::Kubernetes::NetworkPolicy.new(
@@ -289,6 +290,34 @@ describe Projects::Security::NetworkPoliciesController do
       end
 
       include_examples 'CRUD service errors'
+
+      context 'with enabled param' do
+        let(:enabled) { true }
+
+        before do
+          allow(Gitlab::Kubernetes::NetworkPolicy).to receive(:new) { policy }
+        end
+
+        it 'enables policy and responds with success' do
+          expect(policy).to receive(:enable)
+
+          subject
+
+          expect(response).to have_gitlab_http_status(:success)
+        end
+
+        context 'with enabled=false' do
+          let(:enabled) { false }
+
+          it 'disables policy and responds with success' do
+            expect(policy).to receive(:disable)
+
+            subject
+
+            expect(response).to have_gitlab_http_status(:success)
+          end
+        end
+      end
     end
 
     context 'with unauthorized user' do
