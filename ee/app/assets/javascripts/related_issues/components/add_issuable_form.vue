@@ -33,6 +33,11 @@ export default {
       required: false,
       default: () => ({}),
     },
+    isLinkedIssueBlock: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     isSubmitting: {
       type: Boolean,
       required: false,
@@ -83,9 +88,6 @@ export default {
     };
   },
   computed: {
-    isIssue() {
-      return this.issuableType === issuableTypesMap.ISSUE;
-    },
     isSubmitButtonDisabled() {
       return (
         (this.inputValue.length === 0 && this.pendingReferences.length === 0) || this.isSubmitting
@@ -126,7 +128,7 @@ export default {
 
 <template>
   <form @submit.prevent="onFormSubmit">
-    <template v-if="isIssue">
+    <template v-if="isLinkedIssueBlock">
       <gl-form-group
         :label="__('The current issue')"
         label-for="linked-issue-type-radio"

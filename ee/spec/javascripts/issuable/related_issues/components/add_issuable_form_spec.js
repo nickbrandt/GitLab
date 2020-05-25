@@ -113,6 +113,41 @@ describe('AddIssuableForm', () => {
         });
       });
 
+      it('does not show radio inputs', () => {
+        expect(findRadioInputs(wrapper).length).toBe(0);
+      });
+    });
+
+    describe('when issuable type is "epic"', () => {
+      beforeEach(() => {
+        wrapper = shallowMount(AddIssuableForm, {
+          propsData: {
+            inputValue: '',
+            issuableType: issuableTypesMap.EPIC,
+            pathIdSeparator,
+            pendingReferences: [],
+          },
+        });
+      });
+
+      it('does not show radio inputs', () => {
+        expect(findRadioInputs(wrapper).length).toBe(0);
+      });
+    });
+
+    describe('when it is a Linked Issues form', () => {
+      beforeEach(() => {
+        wrapper = mount(AddIssuableForm, {
+          propsData: {
+            inputValue: '',
+            isLinkedIssueBlock: true,
+            issuableType: issuableTypesMap.ISSUE,
+            pathIdSeparator,
+            pendingReferences: [],
+          },
+        });
+      });
+
       it('shows radio inputs to allow categorisation of blocking issues', () => {
         expect(findRadioInputs(wrapper).length).toBeGreaterThan(0);
       });
@@ -200,23 +235,6 @@ describe('AddIssuableForm', () => {
             done();
           });
         });
-      });
-    });
-
-    describe('when issuable type is "epic"', () => {
-      beforeEach(() => {
-        wrapper = shallowMount(AddIssuableForm, {
-          propsData: {
-            inputValue: '',
-            issuableType: issuableTypesMap.EPIC,
-            pathIdSeparator,
-            pendingReferences: [],
-          },
-        });
-      });
-
-      it('does not show radio inputs', () => {
-        expect(findRadioInputs(wrapper).length).toBe(0);
       });
     });
   });

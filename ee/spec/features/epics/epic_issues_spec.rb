@@ -244,5 +244,14 @@ describe 'Epic Issues', :js do
         expect(page).to have_selector('li.js-item-type-issue', count: 3)
       end
     end
+
+    it 'user does not see the linked issues part of the form when they click "Add an existing issue"' do
+      find(".related-items-tree-container .js-add-epics-issues-button").click
+      find('.related-items-tree-container .js-add-epics-issues-button .dropdown-item', text: 'Add an existing issue').click
+
+      expect(page).not_to have_content("The current issue")
+      expect(page).not_to have_content("is blocked by")
+      expect(page).not_to have_content("the following issue(s)")
+    end
   end
 end
