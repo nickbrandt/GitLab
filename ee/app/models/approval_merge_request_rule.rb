@@ -67,6 +67,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   def self.find_or_create_code_owner_rule(merge_request, entry)
     merge_request.approval_rules.code_owner.where(name: entry.pattern).first_or_create do |rule|
+      rule.section = entry.section
       rule.rule_type = :code_owner
       rule.code_owner = true # deprecated, replaced with `rule_type: :code_owner`
     end
