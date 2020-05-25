@@ -85,6 +85,7 @@ module EE
                 numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 365 }
 
       after_commit :update_personal_access_tokens_lifetime, if: :saved_change_to_max_personal_access_token_lifetime?
+      after_commit :resume_elasticsearch_indexing
     end
 
     class_methods do
@@ -203,6 +204,13 @@ module EE
     end
     alias_method :elasticsearch_indexing?, :elasticsearch_indexing
 
+    def elasticsearch_pause_indexing
+      return false unless elasticsearch_pause_indexing_column_exists?
+
+      super
+    end
+    alias_method :elasticsearch_pause_indexing?, :elasticsearch_pause_indexing
+
     def elasticsearch_search
       return false unless elasticsearch_search_column_exists?
 
@@ -310,6 +318,12 @@ module EE
       end
     end
 
+    def resume_elasticsearch_indexing
+      return false unless saved_changes['elasticsearch_pause_indexing'] == [true, false]
+
+      ElasticIndexingControlWorker.perform_async
+    end
+
     def update_personal_access_tokens_lifetime
       return unless max_personal_access_token_lifetime.present? && License.feature_available?(:personal_access_token_expiration_policy)
 
@@ -330,6 +344,10 @@ module EE
 
     def elasticsearch_indexing_column_exists?
       ::Gitlab::Database.cached_column_exists?(:application_settings, :elasticsearch_indexing)
+    end
+
+    def elasticsearch_pause_indexing_column_exists?
+      ::Gitlab::Database.cached_column_exists?(:application_settings, :elasticsearch_pause_indexing)
     end
 
     def elasticsearch_search_column_exists?

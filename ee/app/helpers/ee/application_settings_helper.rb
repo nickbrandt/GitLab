@@ -26,6 +26,7 @@ module EE
         :elasticsearch_aws_region,
         :elasticsearch_aws_secret_access_key,
         :elasticsearch_indexing,
+        :elasticsearch_pause_indexing,
         :elasticsearch_max_bulk_concurrency,
         :elasticsearch_max_bulk_size_mb,
         :elasticsearch_replicas,

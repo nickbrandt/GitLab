@@ -2,6 +2,7 @@
 
 class ElasticCommitIndexerWorker
   include ApplicationWorker
+  prepend Elastic::IndexingControl
 
   feature_category :global_search
   sidekiq_options retry: 2

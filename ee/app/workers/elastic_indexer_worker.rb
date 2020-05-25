@@ -3,6 +3,7 @@
 class ElasticIndexerWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include Elasticsearch::Model::Client::ClassMethods
+  prepend Elastic::IndexingControl
 
   sidekiq_options retry: 2
   feature_category :global_search

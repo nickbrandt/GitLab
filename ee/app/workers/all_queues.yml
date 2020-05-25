@@ -500,6 +500,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: elastic_indexing_control
+  :feature_category: :global_search
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
 - :name: elastic_namespace_indexer
   :feature_category: :global_search
   :has_external_dependencies: 
