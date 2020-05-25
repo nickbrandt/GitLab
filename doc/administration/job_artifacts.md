@@ -210,7 +210,7 @@ The connection settings match those provided by [Fog](https://github.com/fog), a
 | `openstack_username` | OpenStack username | |
 | `openstack_api_key` | OpenStack API key  | |
 | `openstack_temp_url_key` | OpenStack key for generating temporary urls | |
-| `openstack_auth_url` | OpenStack authentication endpont | |
+| `openstack_auth_url` | OpenStack authentication endpoint | |
 | `openstack_region` | OpenStack region | |
 | `openstack_tenant_id` | OpenStack tenant ID |
 
