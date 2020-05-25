@@ -38,10 +38,15 @@ class Projects::MergeRequests::DiffsController < Projects::MergeRequests::Applic
   end
 
   def diffs_metadata
-    diffs = @compare.diffs(diff_options)
+    cache_key = "#{@merge_request.project.id}::#{@merge_request.id}::#{@merge_request.diff_head_sha}"
+    diff_results = Rails.cache.fetch(cache_key, expires_in: 1.day) do
+      diffs = @compare.diffs(diff_options)
 
-    render json: DiffsMetadataSerializer.new(project: @merge_request.project)
-                   .represent(diffs, additional_attributes)
+      DiffsMetadataSerializer.new(project: @merge_request.project)
+        .represent(diffs, additional_attributes).as_json
+    end
+
+    render json: diff_results
   end
 
   private
