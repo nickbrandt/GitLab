@@ -16,16 +16,6 @@ module EE
             job_activity_limit_exceeded: 22
           )
         end
-
-        override :sources
-        def sources
-          super.merge(webide: 9)
-        end
-
-        override :config_sources
-        def config_sources
-          super.merge(webide_source: 3)
-        end
       end
     end
   end

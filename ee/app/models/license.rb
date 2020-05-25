@@ -132,7 +132,6 @@ class License < ApplicationRecord
     subepics
     threat_monitoring
     tracing
-    web_ide_terminal
   ]
   EEU_FEATURES.freeze
 

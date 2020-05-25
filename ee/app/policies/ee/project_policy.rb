@@ -329,14 +329,6 @@ module EE
         end
       end
 
-      condition(:web_ide_terminal_available) do
-        @subject.feature_available?(:web_ide_terminal)
-      end
-
-      condition(:build_service_proxy_enabled) do
-        ::Feature.enabled?(:build_service_proxy, @subject)
-      end
-
       condition(:needs_new_sso_session) do
         ::Gitlab::Auth::GroupSaml::SsoEnforcer.group_access_restricted?(subject.group)
       end
@@ -379,10 +371,6 @@ module EE
       rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
         prevent :modify_approvers_list
       end
-
-      rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
-
-      rule { build_service_proxy_enabled }.enable :build_service_proxy_enabled
 
       rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
 
