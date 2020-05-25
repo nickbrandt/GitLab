@@ -41,10 +41,10 @@ module Gitlab
       def license_usage_data
         {
           recorded_at: Time.now, # should be calculated very first
-          uuid: alt_usage_data { Gitlab::CurrentSettings.uuid },
-          hostname: alt_usage_data { Gitlab.config.gitlab.host },
-          version: alt_usage_data { Gitlab::VERSION },
-          installation_type: alt_usage_data { installation_type },
+          uuid: Gitlab::CurrentSettings.uuid,
+          hostname: Gitlab.config.gitlab.host,
+          version: Gitlab::VERSION,
+          installation_type: installation_type,
           active_user_count: count(User.active),
           edition: 'CE'
         }
@@ -174,19 +174,19 @@ module Gitlab
 
       def features_usage_data_ce
         {
-          container_registry_enabled: alt_usage_data { Gitlab.config.registry.enabled },
+          container_registry_enabled: Gitlab.config.registry.enabled,
           dependency_proxy_enabled: Gitlab.config.try(:dependency_proxy)&.enabled,
-          gitlab_shared_runners_enabled: alt_usage_data { Gitlab.config.gitlab_ci.shared_runners_enabled },
-          gravatar_enabled: alt_usage_data { Gitlab::CurrentSettings.gravatar_enabled? },
-          ldap_enabled: alt_usage_data { Gitlab.config.ldap.enabled },
-          mattermost_enabled: alt_usage_data { Gitlab.config.mattermost.enabled },
-          omniauth_enabled: alt_usage_data { Gitlab::Auth.omniauth_enabled? },
-          prometheus_metrics_enabled: alt_usage_data { Gitlab::Metrics.prometheus_metrics_enabled? },
-          reply_by_email_enabled: alt_usage_data { Gitlab::IncomingEmail.enabled? },
-          signup_enabled: alt_usage_data { Gitlab::CurrentSettings.allow_signup? },
-          web_ide_clientside_preview_enabled: alt_usage_data { Gitlab::CurrentSettings.web_ide_clientside_preview_enabled? },
+          gitlab_shared_runners_enabled: Gitlab.config.gitlab_ci.shared_runners_enabled,
+          gravatar_enabled: Gitlab::CurrentSettings.gravatar_enabled?,
+          ldap_enabled: Gitlab.config.ldap.enabled,
+          mattermost_enabled: Gitlab.config.mattermost.enabled,
+          omniauth_enabled: Gitlab::Auth.omniauth_enabled?,
+          prometheus_metrics_enabled: Gitlab::Metrics.prometheus_metrics_enabled?,
+          reply_by_email_enabled: Gitlab::IncomingEmail.enabled?,
+          signup_enabled:  Gitlab::CurrentSettings.allow_signup?,
+          web_ide_clientside_preview_enabled: Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?,
           ingress_modsecurity_enabled: Feature.enabled?(:ingress_modsecurity),
-          grafana_link_enabled: alt_usage_data { Gitlab::CurrentSettings.grafana_enabled? }
+          grafana_link_enabled: Gitlab::CurrentSettings.grafana_enabled?
         }
       end
 
@@ -213,19 +213,19 @@ module Gitlab
 
       def components_usage_data
         {
-          git: { version: alt_usage_data { Gitlab::Git.version } },
+          git: { version: Gitlab::Git.version },
           gitaly: {
-            version: alt_usage_data { Gitaly::Server.all.first.server_version },
+            version: Gitaly::Server.all.first.server_version,
             servers: alt_usage_data { Gitaly::Server.count },
-            filesystems: alt_usage_data { Gitaly::Server.filesystems }
+            filesystems: Gitaly::Server.filesystems
           },
           gitlab_pages: {
-            enabled: alt_usage_data { Gitlab.config.pages.enabled },
-            version: alt_usage_data { Gitlab::Pages::VERSION }
+            enabled: Gitlab.config.pages.enabled,
+            version: Gitlab::Pages::VERSION
           },
           database: {
-            adapter: alt_usage_data { Gitlab::Database.adapter_name },
-            version: alt_usage_data { Gitlab::Database.version }
+            adapter: Gitlab::Database.adapter_name,
+            version: Gitlab::Database.version
           },
           app_server: { type: app_server_type }
         }
