@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
 import BoardListSelector from 'ee/boards/components/boards_list_selector/';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
-import { mockAssigneesList } from 'spec/boards/mock_data';
+import { mockAssigneesList } from 'jest/boards/mock_data';
 import { TEST_HOST } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
 import boardsStore from '~/boards/stores/boards_store';
@@ -58,7 +58,7 @@ describe('BoardListSelector', () => {
       });
 
       it('does not call axios.get when store.state.assignees is not empty', done => {
-        spyOn(axios, 'get').and.returnValue(Promise.resolve());
+        jest.spyOn(axios, 'get').mockReturnValue(Promise.resolve());
         boardsStore.state.assignees = mockAssigneesList;
 
         vm.loadList()
@@ -87,13 +87,13 @@ describe('BoardListSelector', () => {
 
     describe('handleItemClick', () => {
       it('creates new list in a store instance', () => {
-        spyOn(vm.store, 'new');
+        jest.spyOn(vm.store, 'new').mockImplementation(() => {});
         const assignee = mockAssigneesList[0];
 
         expect(vm.store.findList('title', assignee.name)).not.toBeDefined();
         vm.handleItemClick(assignee);
 
-        expect(vm.store.new).toHaveBeenCalledWith(jasmine.any(Object));
+        expect(vm.store.new).toHaveBeenCalledWith(expect.any(Object));
       });
     });
   });
