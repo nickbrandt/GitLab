@@ -78,6 +78,8 @@ module GraphqlHelpers
   end
 
   def graphql_mutation(name, input, fields = nil, &block)
+    raise ArgumentError, 'Please pass either `fields` parameter or a block to `#graphql_mutation`, but not both.' if fields.present? && block_given?
+
     mutation_name = GraphqlHelpers.fieldnamerize(name)
     input_variable_name = "$#{input_variable_name_for_mutation(name)}"
     mutation_field = GitlabSchema.mutation.fields[mutation_name]
