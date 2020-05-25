@@ -35,12 +35,12 @@ module EE
           end
         end
 
-        override :wiki_url
-        def wiki_url(object, **options)
-          if object.container.is_a?(Group)
+        override :wiki_page_url
+        def wiki_page_url(wiki, page, **options)
+          if wiki.container.is_a?(Group)
             # TODO: Use the new route for group wikis once we add it.
             # https://gitlab.com/gitlab-org/gitlab/-/issues/211360
-            instance.group_canonical_url(object.container, **options) + "/-/wikis/#{::Wiki::HOMEPAGE}"
+            instance.group_canonical_url(wiki.container, **options) + "/-/wikis/#{page.to_param}"
           else
             super
           end
