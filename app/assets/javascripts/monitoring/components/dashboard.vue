@@ -145,6 +145,7 @@ export default {
     return {
       selectedTimeRange: timeRangeFromUrl() || defaultTimeRange,
       isRearrangingPanels: false,
+      originalDocumentTitle: document.title,
     };
   },
   computed: {
@@ -185,6 +186,9 @@ export default {
         });
       },
       deep: true,
+    },
+    selectedDashboard(dashboard) {
+      this.prependToDocumentTitle(dashboard?.display_name);
     },
   },
   created() {
@@ -251,6 +255,11 @@ export default {
     collapseGroup(groupKey) {
       // Collapse group if no data is available
       return !this.getMetricStates(groupKey).includes(metricStates.OK);
+    },
+    prependToDocumentTitle(text) {
+      if (text) {
+        document.title = `${text} · ${this.originalDocumentTitle}`;
+      }
     },
     onTimeRangeZoom({ start, end }) {
       updateHistory({
