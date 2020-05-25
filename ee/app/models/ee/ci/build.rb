@@ -12,6 +12,7 @@ module EE
 
       LICENSED_PARSER_FEATURES = {
         sast: :sast,
+        secret_detection: :secret_detection,
         dependency_scanning: :dependency_scanning,
         container_scanning: :container_scanning,
         dast: :dast

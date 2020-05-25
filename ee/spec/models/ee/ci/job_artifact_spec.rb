@@ -56,9 +56,10 @@ describe EE::Ci::JobArtifact do
     subject { Ci::JobArtifact.security_reports }
 
     context 'when there is a security report' do
-      let!(:artifact) { create(:ee_ci_job_artifact, :sast) }
+      let!(:sast_artifact) { create(:ee_ci_job_artifact, :sast) }
+      let!(:secret_detection_artifact) { create(:ee_ci_job_artifact, :secret_detection) }
 
-      it { is_expected.to eq([artifact]) }
+      it { is_expected.to eq([sast_artifact, secret_detection_artifact]) }
     end
 
     context 'when there are no security reports' do
