@@ -242,7 +242,7 @@ export default {
           @newDateSelected="newDateSelected"
           @hidePicker="stopEditing"
         />
-        <span v-else class="d-flex value-content prepend-left-2">
+        <span v-else class="d-flex value-content gl-ml-1">
           <template v-if="dateFixed">
             <span>{{ dateFixedWords }}</span>
             <icon
@@ -283,7 +283,7 @@ export default {
           @click="toggleDateType(false)"
         />
         <span class="prepend-left-5">{{ __('Inherited:') }}</span>
-        <span class="value-content prepend-left-2">{{ dateFromMilestonesWords }}</span>
+        <span class="value-content gl-ml-1">{{ dateFromMilestonesWords }}</span>
         <icon
           v-if="isDateInvalid && !selectedDateIsFixed"
           v-popover="dateInvalidPopoverOptions"

@@ -62,7 +62,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
       </span>
        
       <span
-        class="d-flex value-content prepend-left-2"
+        class="d-flex value-content gl-ml-1"
       >
         <span
           class="no-value"
@@ -91,7 +91,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
       </span>
        
       <span
-        class="value-content prepend-left-2"
+        class="value-content gl-ml-1"
       >
         None
       </span>
