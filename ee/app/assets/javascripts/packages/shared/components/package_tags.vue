@@ -89,7 +89,7 @@ export default {
       v-gl-tooltip
       variant="muted"
       :title="moreTagsTooltip"
-      class="d-none d-md-flex prepend-left-4"
+      class="d-none d-md-flex gl-ml-2"
       ><gl-sprintf :message="__('+%{tags} more')">
         <template #tags>
           {{ moreTagsDisplay }}
@@ -101,7 +101,7 @@ export default {
       v-if="moreTagsDisplay && hideLabel"
       ref="moreBadge"
       variant="muted"
-      class="d-md-none prepend-left-4"
+      class="d-md-none gl-ml-2"
       >{{ tagsDisplay }}</gl-badge
     >
   </div>
