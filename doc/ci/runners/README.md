@@ -419,3 +419,25 @@ You can find the IP address of a Runner for a specific project by:
 1. On the details page you should see a row for "IP Address"
 
 ![specific Runner IP address](img/specific_runner_ip_address.png)
+
+## Shared Runners Cost Factors
+
+> Available for GitLab.com Admin only
+
+Cost Factor is a multiplier for every CI minute being counted towards the Usage Quota.  
+`Public` Cost Factor is applied to `public` projects jobs, `Private` Cost Factor is applied to `private` and `internal` projects jobs.
+
+For example, if `Public` Cost Factor of the Runner is set to `0.0`, it would NOT count the time spent executing jobs for `public` projects towards the Usage Quota at all.  
+Similarly, if `Private` Cost Factor of the Runner is set to `1.0`, it would count every minute spent executing jobs for `private`/`internal` projects without applying any additional multiplier to the time spent.  
+Setting a value, different from `0.0` and `1.0`, could be used to adjust the "price" of a particular runner.
+
+It is possible to adjust Cost Factors for the particular runner:  
+
+1. Navigate to **Admin > Runners**
+1. Find the Runner you wish to update
+1. Click edit on the Runner
+1. Edit Cost Factor fields and save the changes
+
+Cost Factors are stored in the `ci_runners` DB table, in `public_projects_minutes_cost_factor` and `private_projects_minutes_cost_factor` fields.  
+
+Default Cost Factors values are `public_projects_minutes_cost_factor=0.0` and `private_projects_minutes_cost_factor=1.0`.
