@@ -4,8 +4,10 @@ FactoryBot.define do
   factory :dependency, class: 'Hash' do
     sequence(:name) { |n| "library#{n}" }
     packager { 'Ruby (Bundler)' }
+    package_manager { 'Ruby (Bundler)' }
     version { '1.8.0' }
     licenses { [] }
+    vulnerabilities { [] }
     sequence(:location) do |n|
       {
         blob_path: "/some_project/path/File_#{n}.lock",

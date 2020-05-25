@@ -288,17 +288,21 @@ describe Ci::Pipeline do
 
     context 'when pipeline has a build with dependency list reports' do
       let!(:build) { create(:ee_ci_build, :success, :dependency_list, pipeline: pipeline, project: project) }
+      let!(:build1) { create(:ee_ci_build, :success, :dependency_scanning, pipeline: pipeline, project: project) }
       let!(:build2) { create(:ee_ci_build, :success, :license_scanning, pipeline: pipeline, project: project) }
 
       it 'returns a dependency list report with collected data' do
-        expect(subject.dependencies.count).to eq(21)
-        expect(subject.dependencies[0][:name]).to eq('mini_portile2')
-        expect(subject.dependencies[0][:licenses]).not_to be_empty
+        mini_portile2 = subject.dependencies.find { |x| x[:name] == 'mini_portile2' }
+
+        expect(subject.dependencies.count).to eq(24)
+        expect(mini_portile2[:name]).not_to be_empty
+        expect(mini_portile2[:licenses]).not_to be_empty
       end
 
       context 'when builds are retried' do
         before do
           build.update(retried: true)
+          build1.update(retried: true)
         end
 
         it 'does not take retried builds into account' do
