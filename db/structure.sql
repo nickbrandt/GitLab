@@ -891,6 +891,21 @@ CREATE SEQUENCE public.ci_build_needs_id_seq
 
 ALTER SEQUENCE public.ci_build_needs_id_seq OWNED BY public.ci_build_needs.id;
 
+CREATE TABLE public.ci_build_report_results (
+    build_id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL
+);
+
+CREATE SEQUENCE public.ci_build_report_results_build_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.ci_build_report_results_build_id_seq OWNED BY public.ci_build_report_results.build_id;
+
 CREATE TABLE public.ci_build_trace_chunks (
     id bigint NOT NULL,
     build_id integer NOT NULL,
@@ -7383,6 +7398,8 @@ ALTER TABLE ONLY public.chat_teams ALTER COLUMN id SET DEFAULT nextval('public.c
 
 ALTER TABLE ONLY public.ci_build_needs ALTER COLUMN id SET DEFAULT nextval('public.ci_build_needs_id_seq'::regclass);
 
+ALTER TABLE ONLY public.ci_build_report_results ALTER COLUMN build_id SET DEFAULT nextval('public.ci_build_report_results_build_id_seq'::regclass);
+
 ALTER TABLE ONLY public.ci_build_trace_chunks ALTER COLUMN id SET DEFAULT nextval('public.ci_build_trace_chunks_id_seq'::regclass);
 
 ALTER TABLE ONLY public.ci_build_trace_section_names ALTER COLUMN id SET DEFAULT nextval('public.ci_build_trace_section_names_id_seq'::regclass);
@@ -8063,6 +8080,9 @@ ALTER TABLE public.lfs_objects
 
 ALTER TABLE ONLY public.ci_build_needs
     ADD CONSTRAINT ci_build_needs_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.ci_build_report_results
+    ADD CONSTRAINT ci_build_report_results_pkey PRIMARY KEY (build_id);
 
 ALTER TABLE ONLY public.ci_build_trace_chunks
     ADD CONSTRAINT ci_build_trace_chunks_pkey PRIMARY KEY (id);
@@ -9227,6 +9247,8 @@ CREATE UNIQUE INDEX index_chat_names_on_user_id_and_service_id ON public.chat_na
 CREATE UNIQUE INDEX index_chat_teams_on_namespace_id ON public.chat_teams USING btree (namespace_id);
 
 CREATE UNIQUE INDEX index_ci_build_needs_on_build_id_and_name ON public.ci_build_needs USING btree (build_id, name);
+
+CREATE INDEX index_ci_build_report_results_on_project_id ON public.ci_build_report_results USING btree (project_id);
 
 CREATE UNIQUE INDEX index_ci_build_trace_chunks_on_build_id_and_chunk_index ON public.ci_build_trace_chunks USING btree (build_id, chunk_index);
 
@@ -11649,6 +11671,9 @@ ALTER TABLE ONLY public.events
 ALTER TABLE ONLY public.ip_restrictions
     ADD CONSTRAINT fk_rails_04a93778d5 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.ci_build_report_results
+    ADD CONSTRAINT fk_rails_056d298d48 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.ci_daily_build_group_report_results
     ADD CONSTRAINT fk_rails_0667f7608c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -11717,6 +11742,9 @@ ALTER TABLE ONLY public.diff_note_positions
 
 ALTER TABLE ONLY public.users_security_dashboard_projects
     ADD CONSTRAINT fk_rails_150cd5682c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.ci_build_report_results
+    ADD CONSTRAINT fk_rails_16cb1ff064 FOREIGN KEY (build_id) REFERENCES public.ci_builds(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.project_deploy_tokens
     ADD CONSTRAINT fk_rails_170e03cbaf FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -13968,5 +13996,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200526164947
 20200527094322
 20200527095401
+20200527151413
+20200527152116
+20200527152657
 \.
 
