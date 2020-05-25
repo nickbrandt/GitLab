@@ -56,9 +56,9 @@ class DiffFileBaseEntity < Grape::Entity
   expose :blob, using: BlobEntity
 
   expose :can_modify_blob do |diff_file|
-    merge_request = options[:merge_request]
-
     next unless diff_file.blob
+
+    merge_request = options[:merge_request]
 
     if merge_request&.source_project && current_user
       can_modify_blob?(diff_file.blob, merge_request.source_project, merge_request.source_branch_exists? ? merge_request.source_branch : merge_request.target_branch)
