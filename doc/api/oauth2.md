@@ -173,8 +173,8 @@ the following parameters:
 }
 ```
 
-Also you must use Basic authorization using `client_id` and `client_secret` values
-to authenticate the client that performs a request.
+Also you must use HTTP Basic authentication using the `client_id` and`client_secret`
+values to authenticate the client that performs a request.
 
 Example cURL request:
 
