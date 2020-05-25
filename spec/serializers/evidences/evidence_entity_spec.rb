@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Evidences::EvidenceEntity do
   let_it_be(:project) { create(:project) }
   let(:release) { create(:release, project: project) }
-  let(:evidence) { build(:evidence) }
+  let(:evidence) { build(:evidence, release: release) }
   let(:entity) { described_class.new(evidence) }
   let(:schema_file) { 'evidences/evidence' }
 
@@ -21,7 +21,7 @@ describe Evidences::EvidenceEntity do
 
     context 'when a milestone has no issue associated with it' do
       it 'creates a valid JSON object' do
-        expect(milestone.issues).to be_empty
+        expect(subject[:release][:milestones].first[:issues]).to be_empty
         expect(subject.to_json).to match_schema(schema_file)
       end
     end
@@ -30,7 +30,7 @@ describe Evidences::EvidenceEntity do
       let(:milestone) { create(:milestone, project: project, description: nil) }
 
       it 'creates a valid JSON object' do
-        expect(milestone.description).to be_nil
+        expect(subject[:release][:milestones].first[:description]).to be_nil
         expect(subject.to_json).to match_schema(schema_file)
       end
     end
@@ -39,7 +39,7 @@ describe Evidences::EvidenceEntity do
       let(:milestone) { create(:milestone, project: project, due_date: nil) }
 
       it 'creates a valid JSON object' do
-        expect(milestone.due_date).to be_nil
+        expect(subject[:release][:milestones].first[:due_date]).to be_nil
         expect(subject.to_json).to match_schema(schema_file)
       end
     end
@@ -53,7 +53,7 @@ describe Evidences::EvidenceEntity do
         end
 
         it 'creates a valid JSON object' do
-          expect(milestone.issues.first.description).to be_nil
+          expect(subject[:release][:milestones].first[:issues].first[:title]).to be_present
           expect(subject.to_json).to match_schema(schema_file)
         end
       end
@@ -62,7 +62,7 @@ describe Evidences::EvidenceEntity do
 
   context 'when a release is not associated to any milestone' do
     it 'creates a valid JSON object' do
-      expect(release.milestones).to be_empty
+      expect(subject[:release][:milestones]).to be_empty
       expect(subject.to_json).to match_schema(schema_file)
     end
   end
