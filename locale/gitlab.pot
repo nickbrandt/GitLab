@@ -11622,6 +11622,9 @@ msgstr ""
 msgid "Import an exported GitLab project"
 msgstr ""
 
+msgid "Import failed due to a GitHub error: %{original}"
+msgstr ""
+
 msgid "Import from"
 msgstr ""
 
