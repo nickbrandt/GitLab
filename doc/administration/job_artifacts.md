@@ -404,6 +404,8 @@ In these and other cases, you'll need to identify the projects most responsible
 for disk space usage, figure out what types of artifacts are using the most
 space, and in some cases, manually delete job artifacts to reclaim disk space.
 
+One possible first step is to [clean up _orphaned_ artifact files](../raketasks/cleanup.md#remove-orphan-artifact-files).
+
 #### List projects by total size of job artifacts stored
 
 List the top 20 projects, sorted by the total size of job artifacts stored, by
