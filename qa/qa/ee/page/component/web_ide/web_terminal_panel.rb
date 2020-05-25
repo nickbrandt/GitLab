@@ -20,11 +20,11 @@ module QA
                   element :terminal_tab_button, %q(:data-qa-selector="`${tab.title.toLowerCase()}_tab_button`") # rubocop:disable QA/ElementWithPattern
                 end
 
-                view 'ee/app/assets/javascripts/ide/components/terminal/empty_state.vue' do
+                view 'app/assets/javascripts/ide/components/terminal/empty_state.vue' do
                   element :start_web_terminal_button
                 end
 
-                view 'ee/app/assets/javascripts/ide/components/terminal/terminal.vue' do
+                view 'app/assets/javascripts/ide/components/terminal/terminal.vue' do
                   element :loading_container
                   element :terminal_screen
                 end
