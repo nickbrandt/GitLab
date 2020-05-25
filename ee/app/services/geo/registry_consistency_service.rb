@@ -16,12 +16,6 @@ module Geo
 
     # @return [Boolean] whether at least one registry has been created or deleted in range
     def execute
-      # There are some edge cases to handle here:
-      #
-      # 1. When there are unused registries, but there no replicable records next_range! returns nil;
-      # 2. When the unused registry foreign key ids are greater than the last replicable record id;
-      # 3. When the unused registry foreign key ids are lower than the first replicable record id;
-      #
       range = next_range!
       return unless range
 
@@ -39,7 +33,7 @@ module Geo
 
     # @return [Range] the next range of a batch of records
     def next_range!
-      Gitlab::LoopingBatcher.new(model_class, key: batcher_key, batch_size: batch_size).next_range!
+      Gitlab::LoopingBatcher.new(registry_class, key: batcher_key, batch_size: batch_size).next_range!
     end
 
     def batcher_key
@@ -89,6 +83,7 @@ module Geo
     # @return [Array] the list of IDs of created records
     def create_missing_above(end_of_batch:)
       return [] if registry_class.has_create_events?
+      return [] unless model_class.any?
 
       last_id = model_class.last.id
 

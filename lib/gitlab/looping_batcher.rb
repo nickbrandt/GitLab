@@ -14,15 +14,17 @@ module Gitlab
     # @param [String] key to identify the cursor. Note, cursor is already unique
     #   per table.
     # @param [Integer] batch_size to limit the number of records in a batch
-    def initialize(model_class, key:, batch_size: 1000)
-      @model_class = model_class
+    def initialize(registry_class, key:, batch_size: 1000)
+      @model_class = registry_class::MODEL_CLASS
+      @model_foreign_key = registry_class::MODEL_FOREIGN_KEY
+      @registry_class = registry_class
       @key = key
       @batch_size = batch_size
     end
 
     # @return [Range] a range of IDs. `nil` if 0 records at or after the cursor.
     def next_range!
-      return unless @model_class.any?
+      # return unless @model_class.any?
 
       batch_first_id = cursor_id
 
@@ -34,6 +36,8 @@ module Gitlab
 
     private
 
+    attr_reader :model_class, :model_foreign_key, :registry_class, :key, :batch_size
+
     # @private
     #
     # Get the last ID of the batch. Increment the cursor or reset it if at end.
@@ -41,9 +45,17 @@ module Gitlab
     # @param [Integer] batch_first_id the first ID of the batch
     # @return [Integer] batch_last_id the last ID of the batch (not the table)
     def get_batch_last_id(batch_first_id)
-      batch_last_id, more_rows = run_query(@model_class.table_name, @model_class.primary_key, batch_first_id, @batch_size)
+      model_class_last_id, more_records = get_model_batch_last_id(batch_first_id)
+      registry_class_last_id, more_registries = get_registry_batch_last_id(batch_first_id)
 
-      if more_rows
+      batch_last_id =
+        if !more_records && more_registries
+          registry_class_last_id
+        else
+          model_class_last_id
+        end
+
+      if more_records || more_registries
         increment_batch(batch_last_id)
       else
         reset if batch_first_id > 1
@@ -52,23 +64,44 @@ module Gitlab
       batch_last_id
     end
 
-    def run_query(table, primary_key, batch_first_id, batch_size)
+    def get_model_batch_last_id(batch_first_id)
       sql = <<~SQL
-        SELECT MAX(batch.id) AS batch_last_id,
+        SELECT MAX(batch.#{model_class.primary_key}) AS batch_last_id,
         EXISTS (
-          SELECT #{primary_key}
-          FROM #{table}
-          WHERE #{primary_key} > MAX(batch.id)
+          SELECT #{model_class.primary_key}
+          FROM #{model_class.table_name}
+          WHERE #{model_class.primary_key} > MAX(batch.#{model_class.primary_key})
         ) AS more_rows
         FROM (
-          SELECT #{primary_key}
-          FROM #{table}
-          WHERE #{primary_key} >= #{batch_first_id}
-          ORDER BY #{primary_key}
+          SELECT #{model_class.primary_key}
+          FROM #{model_class.table_name}
+          WHERE #{model_class.primary_key} >= #{batch_first_id}
+          ORDER BY #{model_class.primary_key}
           LIMIT #{batch_size}) AS batch;
       SQL
 
-      result = ActiveRecord::Base.connection.exec_query(sql).first
+      result = model_class.connection.exec_query(sql).first
+
+      [result["batch_last_id"], result["more_rows"]]
+    end
+
+    def get_registry_batch_last_id(batch_first_id)
+      sql = <<~SQL
+        SELECT MAX(batch.#{model_foreign_key}) AS batch_last_id,
+        EXISTS (
+          SELECT #{model_foreign_key}
+          FROM #{registry_class.table_name}
+          WHERE #{model_foreign_key} > #{batch_first_id}
+        ) AS more_rows
+        FROM (
+          SELECT #{model_foreign_key}
+          FROM #{registry_class.table_name}
+          WHERE #{model_foreign_key} > #{batch_first_id}
+          ORDER BY #{model_foreign_key}
+          LIMIT #{batch_size}) AS batch;
+      SQL
+
+      result = registry_class.connection.exec_query(sql).first
 
       [result["batch_last_id"], result["more_rows"]]
     end
@@ -93,7 +126,7 @@ module Gitlab
     end
 
     def cache_key
-      @cache_key ||= "#{self.class.name.parameterize}:#{@model_class.name.parameterize}:#{@key}:cursor_id"
+      @cache_key ||= "#{self.class.name.parameterize}:#{registry_class.name.parameterize}:#{key}:cursor_id"
     end
   end
 end

@@ -2,16 +2,59 @@
 
 require 'spec_helper'
 
-describe Gitlab::LoopingBatcher, :use_clean_rails_memory_store_caching do
+describe Gitlab::LoopingBatcher, :geo, :use_clean_rails_memory_store_caching do
   describe '#next_range!' do
     let(:model_class) { LfsObject }
+    let(:model_foreign_key) { registry_class::MODEL_FOREIGN_KEY }
+    let(:registry_class) { Geo::LfsObjectRegistry }
+    let(:registry_class_factory) { registry_class.underscore.tr('/', '_').to_sym }
     let(:key) { 'looping_batcher_spec' }
     let(:batch_size) { 2 }
 
-    subject { described_class.new(model_class, key: key, batch_size: batch_size).next_range! }
+    subject { described_class.new(registry_class, key: key, batch_size: batch_size).next_range! }
 
     context 'when there are no records' do
       it { is_expected.to be_nil }
+    end
+
+    context 'when there are no records but there are unused registries' do
+      let!(:registries) { create_list(registry_class_factory, 3) }
+
+      context 'when it has never been called before' do
+        it { is_expected.to be_a Range }
+
+        it 'starts from the beginning' do
+          expect(subject.first).to eq(1)
+        end
+
+        it 'ends at a full batch' do
+          expect(subject.last).to eq(registries.second.public_send(model_foreign_key))
+        end
+
+        context 'when the batch size is greater than the number of registries' do
+          let(:batch_size) { 5 }
+
+          it 'ends at the last ID' do
+            expect(subject.last).to eq(registries.last.public_send(model_foreign_key))
+          end
+        end
+      end
+
+      context 'when it was called before' do
+        before do
+          described_class.new(registry_class, key: key, batch_size: batch_size).next_range!
+        end
+
+        it { is_expected.to be_nil }
+
+        context 'if cache is cleared' do
+          it 'starts from the beginning' do
+            Rails.cache.clear
+
+            expect(subject).to eq(1..registries.second.public_send(model_foreign_key))
+          end
+        end
+      end
     end
 
     context 'when there are records' do
@@ -40,7 +83,7 @@ describe Gitlab::LoopingBatcher, :use_clean_rails_memory_store_caching do
       context 'when it was called before' do
         context 'when the previous batch included the end of the table' do
           before do
-            described_class.new(model_class, key: key, batch_size: model_class.count).next_range!
+            described_class.new(registry_class, key: key, batch_size: model_class.count).next_range!
           end
 
           it 'starts from the beginning' do
@@ -50,7 +93,7 @@ describe Gitlab::LoopingBatcher, :use_clean_rails_memory_store_caching do
 
         context 'when the previous batch did not include the end of the table' do
           before do
-            described_class.new(model_class, key: key, batch_size: model_class.count - 1).next_range!
+            described_class.new(registry_class, key: key, batch_size: model_class.count - 1).next_range!
           end
 
           it 'starts after the previous batch' do
@@ -59,10 +102,52 @@ describe Gitlab::LoopingBatcher, :use_clean_rails_memory_store_caching do
         end
 
         context 'if cache is cleared' do
+          before do
+            described_class.new(registry_class, key: key, batch_size: batch_size).next_range!
+          end
+
           it 'starts from the beginning' do
             Rails.cache.clear
 
             expect(subject).to eq(1..records.second.id)
+          end
+        end
+      end
+    end
+
+    context 'when there are records and unused registries with foreign key greather than last record id' do
+      let!(:records) { create_list(model_class.underscore, 3) }
+      let(:unused_registry_foreign_key_id) { records.last.id }
+      let!(:registry) { create(registry_class_factory, model_foreign_key => unused_registry_foreign_key_id) }
+
+      before do
+        model_class.where(id: unused_registry_foreign_key_id).delete_all
+      end
+
+      context 'when it has never been called before' do
+        it { is_expected.to be_a Range }
+
+        it 'starts from the beginning' do
+          expect(subject.first).to eq(1)
+        end
+
+        it 'ends at the last registry foreign key ID' do
+          expect(subject.last).to eq(unused_registry_foreign_key_id)
+        end
+      end
+
+      context 'when it was called before' do
+        before do
+          described_class.new(registry_class, key: key, batch_size: batch_size).next_range!
+        end
+
+        it { is_expected.to be_nil }
+
+        context 'if cache is cleared' do
+          it 'starts from the beginning' do
+            Rails.cache.clear
+
+            expect(subject).to eq(1..unused_registry_foreign_key_id)
           end
         end
       end
