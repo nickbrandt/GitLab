@@ -4,6 +4,8 @@ module StatusPage
   module Storage
     # Implements a minimal AWS S3 client.
     class S3Client
+      include StatusPage::Storage::WrapsStorageErrors
+
       def initialize(region:, bucket_name:, access_key_id:, secret_access_key:)
         @bucket_name = bucket_name
         @client = Aws::S3::Client.new(
@@ -56,11 +58,21 @@ module StatusPage
       def list_object_keys(prefix)
         wrap_errors(prefix: prefix) do
           list_objects(prefix).reduce(Set.new) do |objects, (response, index)|
-            break objects if objects.size >= StatusPage::Storage::MAX_IMAGE_UPLOADS
+            break objects if objects.size >= StatusPage::Storage::MAX_UPLOADS
 
             objects | response.contents.map(&:key)
           end
         end
+      end
+
+      # Stores +file+ as +key+ in storage using multipart upload
+      #
+      # key: s3 key at which file is stored
+      # file: An open file or file-like io object
+      def multipart_upload(key, file)
+        StatusPage::Storage::S3MultipartUpload.new(
+          client: client, bucket_name: bucket_name, key: key, open_file: file
+        ).call
       end
 
       private
@@ -69,12 +81,6 @@ module StatusPage
 
       def list_objects(prefix)
         client.list_objects_v2(bucket: bucket_name, prefix: prefix, max_keys: StatusPage::Storage::MAX_KEYS_PER_PAGE)
-      end
-
-      def wrap_errors(**args)
-        yield
-      rescue Aws::Errors::ServiceError => e
-        raise Error, bucket: bucket_name, error: e, **args
       end
     end
   end

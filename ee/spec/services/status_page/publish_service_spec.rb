@@ -26,8 +26,8 @@ describe StatusPage::PublishService do
     describe 'publish details' do
       context 'when upload succeeds' do
         it 'uploads incident details and list' do
-          expect_to_upload_details(issue)
-          expect_to_upload_list
+          expect_to_publish_details(error?: false, success?: true)
+          expect_to_publish_list(error?: false, success?: true)
 
           expect(result).to be_success
         end
@@ -47,7 +47,7 @@ describe StatusPage::PublishService do
 
       context 'when unpublish succeeds' do
         it 'unpublishes incident details and uploads incident list' do
-          expect_to_unpublish(error?: false)
+          expect_to_unpublish(error?: false, success?: true)
           expect_to_upload_list
 
           expect(result).to be_success
@@ -65,11 +65,11 @@ describe StatusPage::PublishService do
 
     describe 'publish list' do
       context 'when upload fails' do
-        it 'returns error and skip list upload' do
-          expect_to_upload_details(issue)
-          expect_to_upload_list(status: 404)
+        it 'returns error response' do
+          expect_to_publish_details(error?: false, success?: true)
+          expect_to_publish_list(error?: true, success?: false)
 
-          expect { result }.to raise_error(StatusPage::Storage::Error)
+          expect(result.error?).to be(true)
         end
       end
     end
@@ -96,8 +96,20 @@ describe StatusPage::PublishService do
   private
 
   def expect_to_unpublish(**response_kwargs)
+    stub_service_called(StatusPage::UnpublishDetailsService, **response_kwargs)
+  end
+
+  def expect_to_publish_details(**response_kwargs)
+    stub_service_called(StatusPage::PublishDetailsService, **response_kwargs)
+  end
+
+  def expect_to_publish_list(**response_kwargs)
+    stub_service_called(StatusPage::PublishListService, **response_kwargs)
+  end
+
+  def stub_service_called(klass, **response_kwargs)
     service_response = double(**response_kwargs)
-    expect_next_instance_of(StatusPage::UnpublishDetailsService) do |service|
+    expect_next_instance_of(klass) do |service|
       expect(service).to receive(:execute).and_return(service_response)
     end
 
@@ -106,10 +118,6 @@ describe StatusPage::PublishService do
 
   def expect_to_upload_details(issue, **kwargs)
     stub_aws_request(:put, StatusPage::Storage.details_path(issue.iid), **kwargs)
-  end
-
-  def expect_to_delete_details(issue, **kwargs)
-    stub_aws_request(:delete, StatusPage::Storage.details_path(issue.iid), **kwargs)
   end
 
   def expect_to_upload_list(**kwargs)

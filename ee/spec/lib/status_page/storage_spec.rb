@@ -29,7 +29,7 @@ describe StatusPage::Storage do
 
   it 'MAX_KEYS_PER_PAGE times MAX_PAGES establishes upload limit' do
     # spec intended to fail if page related MAX constants change
-    # In order to ensure change to documented MAX_IMAGE_UPLOADS is considered
+    # In order to ensure change to documented MAX_UPLOADS is considered
     expect(StatusPage::Storage::MAX_KEYS_PER_PAGE * StatusPage::Storage::MAX_PAGES).to eq(5000)
   end
 end

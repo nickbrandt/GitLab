@@ -135,7 +135,7 @@ describe StatusPage::Storage::S3Client, :aws_s3 do
       include_context 'oversized list_objects_v2 result'
 
       it 'returns result at max size' do
-        expect(result.count).to eq(StatusPage::Storage::MAX_IMAGE_UPLOADS)
+        expect(result.count).to eq(StatusPage::Storage::MAX_UPLOADS)
       end
     end
 
