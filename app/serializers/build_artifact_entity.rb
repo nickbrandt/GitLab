@@ -23,6 +23,10 @@ class BuildArtifactEntity < Grape::Entity
     fast_browse_project_job_artifacts_path(project, job)
   end
 
+  expose :locked, if: -> (*) { job.job_artifacts_archive.present? } do |job|
+    job.job_artifacts_archive.locked?
+  end
+
   private
 
   alias_method :job, :object

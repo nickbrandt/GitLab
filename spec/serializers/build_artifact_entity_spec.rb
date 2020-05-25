@@ -30,5 +30,9 @@ describe BuildArtifactEntity do
       expect(subject[:browse_path])
         .to include "jobs/#{job.id}/artifacts/browse"
     end
+
+    it 'exposes locked information about artifact' do
+      expect(subject).to include(:locked)
+    end
   end
 end

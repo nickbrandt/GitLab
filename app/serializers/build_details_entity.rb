@@ -46,6 +46,10 @@ class BuildDetailsEntity < JobEntity
     expose :expired, if: -> (*) { build.artifacts_expire_at.present? } do |build|
       build.artifacts_expired?
     end
+
+    expose :locked, if: -> (*) { build.job_artifacts_archive.present? } do |build|
+      build.job_artifacts_archive.locked?
+    end
   end
 
   expose :report_artifacts,
