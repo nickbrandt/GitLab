@@ -93,21 +93,18 @@ export default {
 
 <template>
   <rules :rules="rules">
-    <template
-      slot="thead"
-      slot-scope="{ name, members, approvalsRequired, branches, glFeaturesScopedApprovalRules }"
-    >
+    <template slot="thead" slot-scope="{ name, members, approvalsRequired, branches }">
       <tr class="d-none d-sm-table-row">
         <th class="w-25">{{ hasNamedRule ? name : members }}</th>
         <th :class="settings.allowMultiRule ? 'w-50 d-none d-sm-table-cell' : 'w-75'">
           <span v-if="hasNamedRule">{{ members }}</span>
         </th>
-        <th v-if="glFeaturesScopedApprovalRules && settings.allowMultiRule">{{ branches }}</th>
+        <th v-if="settings.allowMultiRule">{{ branches }}</th>
         <th>{{ approvalsRequired }}</th>
         <th></th>
       </tr>
     </template>
-    <template slot="tbody" slot-scope="{ rules, glFeaturesScopedApprovalRules }">
+    <template slot="tbody" slot-scope="{ rules }">
       <template v-for="(rule, index) in rules">
         <empty-rule
           v-if="rule.ruleType === 'any_approver'"
@@ -125,7 +122,7 @@ export default {
           <td class="js-members" :class="settings.allowMultiRule ? 'd-none d-sm-table-cell' : null">
             <user-avatar-list :items="rule.approvers" :img-size="24" empty-text="" />
           </td>
-          <td v-if="glFeaturesScopedApprovalRules && settings.allowMultiRule" class="js-branches">
+          <td v-if="settings.allowMultiRule" class="js-branches">
             <rule-branches :rule="rule" />
           </td>
           <td class="js-approvals-required">

@@ -121,25 +121,6 @@ describe ApprovalRules::ParamsFilteringService do
               )
             end
           end
-
-          context 'when scoped_approval_rules feature is disabled' do
-            before do
-              stub_feature_flags(scoped_approval_rules: false)
-            end
-
-            it 'does not add inapplicable user defined rules' do
-              params = service.execute
-              approval_rules_attrs = params[:approval_rules_attributes]
-
-              aggregate_failures do
-                expect(approval_rules_attrs.size).to eq(1)
-                expect(approval_rules_attrs.first).to include(
-                  name: another_source_rule.name,
-                  approval_project_rule_id: another_source_rule.id
-                )
-              end
-            end
-          end
         end
 
         context 'when multiple_approval_rules feature is not available' do

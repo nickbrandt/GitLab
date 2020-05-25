@@ -131,7 +131,7 @@ module ApprovalRules
     # `master` rule should be available.
     def append_user_defined_inapplicable_rules(source_rule_ids)
       return if updating?
-      return unless project.scoped_approval_rules_enabled? && project.multiple_approval_rules_available?
+      return unless project.multiple_approval_rules_available?
 
       project
         .visible_user_defined_inapplicable_rules(params[:target_branch])

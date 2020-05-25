@@ -1,7 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
 import { GlDeprecatedButton } from '@gitlab/ui';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import RuleInput from './mr_edit/rule_input.vue';
 import EmptyRuleName from './empty_rule_name.vue';
 import RuleBranches from './rule_branches.vue';
@@ -13,7 +12,6 @@ export default {
     RuleBranches,
     GlDeprecatedButton,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     rule: {
       type: Object,
@@ -40,7 +38,7 @@ export default {
   },
   computed: {
     showProtectedBranch() {
-      return this.glFeatures.scopedApprovalRules && !this.isMrEdit && this.allowMultiRule;
+      return !this.isMrEdit && this.allowMultiRule;
     },
   },
   methods: {

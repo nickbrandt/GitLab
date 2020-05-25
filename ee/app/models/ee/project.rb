@@ -333,10 +333,6 @@ module EE
         feature_available?(:github_project_service_integration)
     end
 
-    def scoped_approval_rules_enabled?
-      ::Feature.enabled?(:scoped_approval_rules, self, default_enabled: true)
-    end
-
     def service_desk_enabled
       ::EE::Gitlab::ServiceDesk.enabled?(project: self) && super
     end

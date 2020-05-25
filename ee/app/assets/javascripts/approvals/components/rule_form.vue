@@ -2,7 +2,6 @@
 import { mapState, mapActions } from 'vuex';
 import { groupBy, isNumber } from 'lodash';
 import { sprintf, __ } from '~/locale';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ApproversList from './approvers_list.vue';
 import ApproversSelect from './approvers_select.vue';
 import BranchesSelect from './branches_select.vue';
@@ -18,7 +17,6 @@ export default {
     ApproversSelect,
     BranchesSelect,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     initRule: {
       type: Object,
@@ -150,7 +148,7 @@ export default {
       };
     },
     showProtectedBranch() {
-      return this.glFeatures.scopedApprovalRules && !this.isMrEdit && this.settings.allowMultiRule;
+      return !this.isMrEdit && this.settings.allowMultiRule;
     },
   },
   watch: {
