@@ -590,28 +590,22 @@ describe Ci::Build do
   describe '#artifacts?' do
     subject { build.artifacts? }
 
-    context 'artifacts archive does not exist' do
-      let(:build) { create(:ci_build) }
-
-      it { is_expected.to be_falsy }
-    end
-
-    context 'artifacts archive exists' do
-      let(:build) { create(:ci_build, :artifacts) }
-
-      it { is_expected.to be_truthy }
-
-      context 'is expired' do
-        let(:build) { create(:ci_build, :artifacts, :expired) }
+    context 'when new artifacts are used' do
+      context 'artifacts archive does not exist' do
+        let(:build) { create(:ci_build) }
 
         it { is_expected.to be_falsy }
+      end
 
-        context 'is locked' do
-          before do
-            build.job_artifacts_archive.update(locked: true)
-          end
+      context 'artifacts archive exists' do
+        let(:build) { create(:ci_build, :artifacts) }
 
-          it { is_expected.to be_truthy }
+        it { is_expected.to be_truthy }
+
+        context 'is expired' do
+          let(:build) { create(:ci_build, :artifacts, :expired) }
+
+          it { is_expected.to be_falsy }
         end
       end
     end
@@ -636,14 +630,6 @@ describe Ci::Build do
       end
 
       it { is_expected.to be_truthy }
-
-      context 'is locked' do
-        before do
-          create(:ci_job_artifact, :archive, job: build, locked: true)
-        end
-
-        it { is_expected.to be_falsey }
-      end
     end
 
     context 'is not expired' do
@@ -2265,16 +2251,6 @@ describe Ci::Build do
 
         it 'has expiring artifacts' do
           expect(build).to have_expiring_archive_artifacts
-        end
-
-        context 'and job artifacts are locked' do
-          before do
-            archive.update(locked: true)
-          end
-
-          it 'does not have expiring artifacts' do
-            expect(build).not_to have_expiring_archive_artifacts
-          end
         end
       end
 

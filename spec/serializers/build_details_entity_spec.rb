@@ -190,7 +190,7 @@ describe BuildDetailsEntity do
       let!(:report) { create(:ci_job_artifact, :codequality, job: build) }
 
       it 'exposes artifact details' do
-        expect(subject[:artifact].keys).to include(:download_path, :browse_path, :keep_path, :expire_at, :expired, :locked)
+        expect(subject[:artifact].keys).to include(:download_path, :browse_path, :keep_path, :expire_at, :expired)
       end
     end
   end
