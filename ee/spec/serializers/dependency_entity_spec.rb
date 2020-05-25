@@ -28,7 +28,7 @@ describe DependencyEntity do
           project.add_developer(user)
         end
 
-        it { is_expected.to eq(dependency) }
+        it { is_expected.to eq(dependency.except(:package_manager)) }
       end
 
       context 'with reporter' do
@@ -37,7 +37,7 @@ describe DependencyEntity do
         end
 
         it 'includes license info and not vulnerabilities' do
-          is_expected.to eq(dependency.except(:vulnerabilities))
+          is_expected.to eq(dependency.except(:vulnerabilities, :package_manager))
         end
       end
     end
@@ -48,7 +48,7 @@ describe DependencyEntity do
       end
 
       it 'does not include licenses and vulnerabilities' do
-        is_expected.to eq(dependency.except(:vulnerabilities, :licenses))
+        is_expected.to eq(dependency.except(:vulnerabilities, :licenses, :package_manager))
       end
     end
   end

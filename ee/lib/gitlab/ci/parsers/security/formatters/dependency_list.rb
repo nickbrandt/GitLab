@@ -20,7 +20,7 @@ module Gitlab
                   path:      file_path
                 },
                 version:  dependency['version'],
-                vulnerabilities: collect_vulnerabilities(vulnerabilities, dependency, file_path),
+                vulnerabilities: formatted_vulnerabilities(vulnerabilities),
                 licenses: []
               }
             end
@@ -67,19 +67,13 @@ module Gitlab
               end
             end
 
-            def collect_vulnerabilities(vulnerabilities, dependency, file_path)
-              dependency_location = location(dependency, file_path)
+            # we know that Parsers::Security::DependencyList parses one vulnerability at a time
+            # however, to keep interface compability with rest of the code and have MVC we return array
+            # even tough we know that array's size will be 1
+            def formatted_vulnerabilities(vulnerabilities)
+              return [] if vulnerabilities.blank?
 
-              vulnerabilities
-                .select { |vulnerability| vulnerability['location'] == dependency_location }
-                .map { |vulnerability| formatted_vulnerability(vulnerability) }
-            end
-
-            def formatted_vulnerability(vulnerability)
-              {
-                name: vulnerability['message'],
-                severity: vulnerability['severity'].downcase
-              }
+              [{ name: vulnerabilities['message'], severity: vulnerabilities['severity'].downcase }]
             end
           end
         end
