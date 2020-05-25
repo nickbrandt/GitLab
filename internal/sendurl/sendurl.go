@@ -148,6 +148,9 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
+	// fix issue #267, where Content-Length was set prior to injection
+	w.Header().Del("Content-Length")
+
 	// copy response headers and body, except the headers from preserveHeaderKeys
 	for key, value := range resp.Header {
 		if !preserveHeaderKeys[key] {
