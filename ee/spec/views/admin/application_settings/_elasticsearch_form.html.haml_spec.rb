@@ -18,6 +18,7 @@ describe 'admin/application_settings/_elasticsearch_form' do
 
     before do
       allow(Gitlab::CurrentSettings).to(receive(:elasticsearch_indexing?)).and_return(es_indexing)
+      allow(Gitlab::CurrentSettings).to(receive(:elasticsearch_pause_indexing?)).and_return(true)
     end
 
     context 'indexing is enabled' do
@@ -28,6 +29,13 @@ describe 'admin/application_settings/_elasticsearch_form' do
 
         expect(rendered).to have_css('a.btn-success', text: button_text)
       end
+
+      it 'renders an enabled pause checkbox' do
+        render
+
+        expect(rendered).to have_css('input[id=application_setting_elasticsearch_pause_indexing]')
+        expect(rendered).not_to have_css('input[id=application_setting_elasticsearch_pause_indexing][disabled="disabled"]')
+      end
     end
 
     context 'indexing is disabled' do
@@ -37,6 +45,12 @@ describe 'admin/application_settings/_elasticsearch_form' do
         render
 
         expect(rendered).not_to have_css('a.btn-success', text: button_text)
+      end
+
+      it 'renders a disabled pause checkbox' do
+        render
+
+        expect(rendered).to have_css('input[id=application_setting_elasticsearch_pause_indexing][disabled="disabled"]')
       end
     end
   end

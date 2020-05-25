@@ -33,6 +33,15 @@
                   = link_to _('Index all projects'), admin_elasticsearch_enqueue_index_path,
                       class: ['btn', 'btn-success'], method: :post
 
+          .card-body
+            .form-group
+              .form-check
+                = f.check_box :elasticsearch_pause_indexing, class: 'form-check-input', data: { qa_selector: 'pause_checkbox' }, disabled: !Gitlab::CurrentSettings.elasticsearch_indexing?
+                = f.label :elasticsearch_pause_indexing, class: 'form-check-label' do
+                  Pause Elasticsearch indexing
+                .form-text.text-muted
+                  = _('Changes are still tracked. Useful for cluster/index migrations.')
+
           .form-group
             .form-check
               = f.check_box :elasticsearch_search, class: 'form-check-input', data: { qa_selector: 'search_checkbox' }
