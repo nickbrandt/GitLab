@@ -60,9 +60,9 @@ describe "Admin views license" do
         expect(highlighted_license_row).to have_content(license.licensee[:email])
         expect(highlighted_license_row).to have_content(license.licensee[:company])
         expect(highlighted_license_row).to have_content(license.plan.capitalize)
-        expect(highlighted_license_row).to have_content(license.created_at)
-        expect(highlighted_license_row).to have_content(license.starts_at)
-        expect(highlighted_license_row).to have_content(license.expires_at)
+        expect(highlighted_license_row).to have_content(I18n.l(license.created_at, format: :with_timezone))
+        expect(highlighted_license_row).to have_content(I18n.l(license.starts_at))
+        expect(highlighted_license_row).to have_content(I18n.l(license.expires_at))
         expect(highlighted_license_row).to have_content(license.restrictions[:active_user_count])
       end
     end
@@ -114,9 +114,9 @@ describe "Admin views license" do
         expect(license_history_row).to have_content(license.licensee[:email])
         expect(license_history_row).to have_content(license.licensee[:company])
         expect(license_history_row).to have_content(license.plan.capitalize)
-        expect(license_history_row).to have_content(license.created_at)
-        expect(license_history_row).to have_content(license.starts_at)
-        expect(license_history_row).to have_content(license.expires_at)
+        expect(license_history_row).to have_content(I18n.l(license.created_at, format: :with_timezone))
+        expect(license_history_row).to have_content(I18n.l(license.starts_at))
+        expect(license_history_row).to have_content(I18n.l(license.expires_at))
         expect(license_history_row).to have_content(license.restrictions[:active_user_count])
       end
     end

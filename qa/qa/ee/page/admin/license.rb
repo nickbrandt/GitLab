@@ -10,7 +10,10 @@ module QA
           end
 
           view 'ee/app/views/admin/licenses/show.html.haml' do
-            element :license_upload_link, "link_to 'Upload New License'" # rubocop:disable QA/ElementWithPattern
+            element :license_upload_link
+          end
+
+          view 'ee/app/views/admin/licenses/_info.html.haml' do
             element :remove_license_link
           end
 
