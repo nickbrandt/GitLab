@@ -14291,10 +14291,13 @@ msgstr ""
 msgid "Network"
 msgstr ""
 
+msgid "NetworkPolicies|Choose whether to enforce this policy."
+msgstr ""
+
 msgid "NetworkPolicies|Define this policy's location, conditions and actions."
 msgstr ""
 
-msgid "NetworkPolicies|Enabled"
+msgid "NetworkPolicies|Enforcement status"
 msgstr ""
 
 msgid "NetworkPolicies|Environment does not have deployment platform"

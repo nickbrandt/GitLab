@@ -44,6 +44,7 @@ export const updatePolicy = ({ state, commit }, { environmentId, policy }) => {
     .put(joinPaths(state.policiesEndpoint, policy.name), {
       environment_id: environmentId,
       manifest: policy.manifest,
+      enabled: policy.isEnabled,
     })
     .then(({ data }) => {
       commit(types.RECEIVE_UPDATE_POLICY_SUCCESS, {
