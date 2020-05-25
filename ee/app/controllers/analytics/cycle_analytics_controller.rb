@@ -6,15 +6,15 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
   check_feature_flag Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG
   increment_usage_counter Gitlab::UsageDataCounters::CycleAnalyticsCounter, :views, only: :show
 
+  before_action :load_group, only: :show
+  before_action :load_project, only: :show
+  before_action :build_request_params, only: :show
+
   before_action do
     push_frontend_feature_flag(:cycle_analytics_scatterplot_enabled, default_enabled: true)
     push_frontend_feature_flag(:cycle_analytics_scatterplot_median_enabled, default_enabled: true)
     push_frontend_feature_flag(:value_stream_analytics_path_navigation, @group)
   end
-
-  before_action :load_group, only: :show
-  before_action :load_project, only: :show
-  before_action :build_request_params, only: :show
 
   def build_request_params
     @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(allowed_params.merge(group: @group), current_user: current_user)
