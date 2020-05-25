@@ -5,8 +5,7 @@
     "browse_path": { "type": "string"},
     "keep_path": { "type": "string"},
     "expired": { "type": "boolean" },
-    "expire_at": { "type": "string", "format": "date-time" },
-    "locked": { "type": "boolean" }
+    "expire_at": { "type": "string", "format": "date-time" }
   },
   "additionalProperties": false
 }
