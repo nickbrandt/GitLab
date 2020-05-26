@@ -44,6 +44,10 @@ module EE
       epics_service(epic, user).issue_epic_change(issue)
     end
 
+    def change_iteration(noteable, author, iteration)
+      issuables_service(noteable, noteable.project, author).change_iteration(iteration)
+    end
+
     # Called when the merge request is approved by user
     #
     # noteable - Noteable object
