@@ -106,7 +106,6 @@ module EE
       %i[
         mirror
         mirror_trigger_builds
-        mirror_user_id
       ]
     end
 
