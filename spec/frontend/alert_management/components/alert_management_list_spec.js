@@ -137,7 +137,7 @@ describe('AlertManagementList', () => {
         findAlerts()
           .at(0)
           .classes(),
-      ).not.toContain('hover-bg-blue-50');
+      ).not.toContain('gl-hover-bg-blue-50');
     });
 
     it('error state', () => {
@@ -154,7 +154,7 @@ describe('AlertManagementList', () => {
         findAlerts()
           .at(0)
           .classes(),
-      ).not.toContain('hover-bg-blue-50');
+      ).not.toContain('gl-hover-bg-blue-50');
     });
 
     it('empty state', () => {
@@ -171,7 +171,7 @@ describe('AlertManagementList', () => {
         findAlerts()
           .at(0)
           .classes(),
-      ).not.toContain('hover-bg-blue-50');
+      ).not.toContain('gl-hover-bg-blue-50');
     });
 
     it('has data state', () => {
@@ -187,7 +187,7 @@ describe('AlertManagementList', () => {
         findAlerts()
           .at(0)
           .classes(),
-      ).toContain('hover-bg-blue-50');
+      ).toContain('gl-hover-bg-blue-50');
     });
 
     it('displays status dropdown', () => {

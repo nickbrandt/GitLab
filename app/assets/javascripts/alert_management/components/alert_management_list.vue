@@ -25,7 +25,7 @@ import { capitalizeFirstCharacter, convertToSnakeCase } from '~/lib/utils/text_u
 
 const tdClass = 'table-col d-flex d-md-table-cell align-items-center';
 const bodyTrClass =
-  'gl-border-1 gl-border-t-solid gl-border-gray-100 hover-bg-blue-50 hover-gl-cursor-pointer hover-gl-border-b-solid hover-gl-border-blue-200';
+  'gl-border-1 gl-border-t-solid gl-border-gray-100 gl-hover-bg-blue-50 gl-hover-cursor-pointer gl-hover-border-b-solid gl-hover-border-blue-200';
 const findDefaultSortColumn = () => document.querySelector('.js-started-at');
 
 export default {
