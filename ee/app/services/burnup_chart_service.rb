@@ -9,6 +9,7 @@ class BurnupChartService
   WEIGHT = 'value'.freeze
   ACTION = 'action'.freeze
   ISSUE_ID = 'issue_id'.freeze
+  STATE = 'value'.freeze
 
   def initialize(milestone:, user:)
     @user = user
@@ -64,7 +65,7 @@ class BurnupChartService
   end
 
   def all_events
-    [milestone_events, weight_events]
+    [milestone_events, weight_events, state_events]
   end
 
   def weight_events
@@ -77,6 +78,11 @@ class BurnupChartService
       .select('\'milestone\' as event_type, created_at, milestone_id as value, action, issue_id')
   end
 
+  def state_events
+    ResourceStateEvent.by_issue_ids_and_created_at_earlier_or_equal_to(relevant_issue_ids, end_time)
+      .select('\'state\' as event_type, created_at, state as value, null as action, issue_id')
+  end
+
   def create_burnup_graph_event_by(event, assigned_milestones)
     {
       event_type: event[EVENT_TYPE],
@@ -84,8 +90,15 @@ class BurnupChartService
       action: action_of(event),
       milestone_id: milestone_id_of(event, assigned_milestones),
       issue_id: event[ISSUE_ID],
-      weight: weight_of(event)
+      weight: weight_of(event),
+      state: state_of(event)
     }
+  end
+
+  def state_of(event)
+    return unless state_event?(event)
+
+    ResourceStateEvent.states.key(event[STATE])
   end
 
   def action_of(event)
@@ -111,6 +124,8 @@ class BurnupChartService
   end
 
   def milestone_id_of(event, assigned_milestones)
+    return unless milestone_event?(event)
+
     if remove_milestone?(event) && event[MILESTONE_ID].nil?
       return assigned_milestones[event[ISSUE_ID]]
     end
@@ -132,6 +147,10 @@ class BurnupChartService
 
   def milestone_event?(event)
     event[EVENT_TYPE] == 'milestone'
+  end
+
+  def state_event?(event)
+    event[EVENT_TYPE] == 'state'
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
