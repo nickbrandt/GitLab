@@ -39,6 +39,7 @@ describe 'OAuth tokens' do
     context 'when user does not have 2FA enabled' do
       # NOTE: using ROPS grant flow without client credentials will be deprecated
       # and removed in the next version of Doorkeeper.
+      # See https://gitlab.com/gitlab-org/gitlab/-/issues/219137
       context 'when no client credentials provided' do
         it 'creates an access token' do
           user = create(:user)
@@ -64,7 +65,8 @@ describe 'OAuth tokens' do
 
         context 'with invalid credentials' do
           it 'does not create an access token' do
-            # NOTE: remove this after update to Doorkeeper 5.5 or newer
+            # NOTE: remove this after update to Doorkeeper 5.5 or newer, see
+            # https://gitlab.com/gitlab-org/gitlab/-/issues/219137
             pending 'Enable this example after upgrading Doorkeeper to 5.5 or newer'
 
             user = create(:user)
