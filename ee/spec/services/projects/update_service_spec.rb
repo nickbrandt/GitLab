@@ -6,26 +6,48 @@ describe Projects::UpdateService, '#execute' do
   include EE::GeoHelpers
 
   let(:user) { create(:user) }
+  let(:admin) { create(:user, :admin) }
   let(:project) { create(:project, :repository, creator: user, namespace: user.namespace) }
 
   context 'repository mirror' do
-    let!(:opts) do
-      {
-      }
-    end
+    let(:opts) { { mirror: true, import_url: 'http://foo.com' } }
 
     before do
       stub_licensed_features(repository_mirrors: true)
     end
 
-    it 'forces an import job' do
-      opts = {
-        import_url: 'http://foo.com',
-        mirror: true,
-        mirror_user_id: user.id,
-        mirror_trigger_builds: true
-      }
+    it 'sets mirror attributes' do
+      result = update_project(project, user, opts)
 
+      expect(result).to eq(status: :success)
+      expect(project).to have_attributes(opts)
+      expect(project.mirror_user).to eq(user)
+    end
+
+    it 'does not touch mirror_user_id for non-mirror changes' do
+      result = update_project(project, user, description: 'anything')
+
+      expect(result).to eq(status: :success)
+      expect(project.mirror_user).to be_nil
+    end
+
+    it 'forbids non-admins from setting mirror_user_id explicitly' do
+      project.team.add_maintainer(admin)
+      result = update_project(project, user, opts.merge(mirror_user_id: admin.id))
+
+      expect(result).to eq(status: :error, message: 'Mirror user is invalid')
+      expect(project.mirror_user).to be_nil
+    end
+
+    it 'allows admins to set mirror_user_id' do
+      project.team.add_maintainer(admin)
+      result = update_project(project, admin, opts.merge(mirror_user_id: user.id))
+
+      expect(result).to eq(status: :success)
+      expect(project.mirror_user).to eq(user)
+    end
+
+    it 'forces an import job' do
       expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
       update_project(project, user, opts)
