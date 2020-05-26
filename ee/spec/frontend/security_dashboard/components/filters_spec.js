@@ -1,34 +1,51 @@
-import Vue from 'vue';
-import component from 'ee/security_dashboard/components/filters.vue';
+import Vuex from 'vuex';
+import Filters from 'ee/security_dashboard/components/filters.vue';
 import createStore from 'ee/security_dashboard/store';
-import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { mount, createLocalVue } from '@vue/test-utils';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('Filter component', () => {
-  let vm;
-  const store = createStore();
-  const Component = Vue.extend(component);
+  let wrapper;
+  let store;
+
+  const findReportTypeFilter = () => wrapper.find('.js-filter-report_type');
+
+  const createWrapper = (props = {}) => {
+    wrapper = mount(Filters, {
+      localVue,
+      store,
+      propsData: {
+        ...props,
+      },
+    });
+  };
+
+  beforeEach(() => {
+    store = createStore();
+  });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
   describe('severity', () => {
     beforeEach(() => {
-      vm = mountComponentWithStore(Component, { store });
+      createWrapper();
     });
 
     it('should display all filters', () => {
-      expect(vm.$el.querySelectorAll('.js-filter')).toHaveLength(3);
+      expect(wrapper.findAll('.js-filter')).toHaveLength(3);
     });
 
     it('should display "Hide dismissed vulnerabilities" toggle', () => {
-      expect(vm.$el.querySelectorAll('.js-toggle')).toHaveLength(1);
+      expect(wrapper.findAll('.js-toggle')).toHaveLength(1);
     });
   });
 
   describe('Report type', () => {
-    const findReportTypeFilter = () => vm.$el.querySelector('.js-filter-report_type');
-
     it.each`
       dastProps                                                  | string
       ${{ vulnerabilitiesCount: 0, scannedResourcesCount: 123 }} | ${'(0 vulnerabilities, 123 urls scanned)'}
@@ -39,15 +56,12 @@ describe('Filter component', () => {
       ${{ vulnerabilitiesCount: 0 }}                             | ${'(0 vulnerabilities)'}
       ${{ scannedResourcesCount: 0 }}                            | ${'(0 urls scanned)'}
     `('shows security report summary $string', ({ dastProps, string }) => {
-      vm = mountComponentWithStore(Component, {
-        store,
-        props: {
-          securityReportSummary: {
-            dast: dastProps,
-          },
+      createWrapper({
+        securityReportSummary: {
+          dast: dastProps,
         },
       });
-      expect(findReportTypeFilter().textContent).toContain(string);
+      expect(findReportTypeFilter().text()).toContain(string);
     });
   });
 });
