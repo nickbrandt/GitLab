@@ -52,6 +52,15 @@ describe MergeRequests::ApprovalService do
         service.execute(merge_request)
       end
 
+      it 'creates approve MR event' do
+        expect_next_instance_of(EventCreateService) do |instance|
+          expect(instance).to receive(:approve_mr)
+            .with(merge_request, user)
+        end
+
+        service.execute(merge_request)
+      end
+
       context 'with remaining approvals' do
         it 'fires an approval webhook' do
           expect(merge_request).to receive(:approvals_left).and_return(5)
@@ -97,8 +106,8 @@ describe MergeRequests::ApprovalService do
           end
 
           it 'schedules RefreshApprovalsData' do
-            expect(Analytics::CodeReviewMetricsWorker)
-              .to receive(:perform_async).with('Analytics::RefreshApprovalsData', merge_request.id, {})
+            expect(::Analytics::RefreshApprovalsData)
+              .to receive_message_chain(:new, :execute)
 
             service.execute(merge_request)
           end
@@ -110,7 +119,7 @@ describe MergeRequests::ApprovalService do
           end
 
           it 'does not schedule for RefreshApprovalsData' do
-            expect(Analytics::CodeReviewMetricsWorker).not_to receive(:perform_async)
+            expect(::Analytics::RefreshApprovalsData).not_to receive(:new)
 
             service.execute(merge_request)
           end

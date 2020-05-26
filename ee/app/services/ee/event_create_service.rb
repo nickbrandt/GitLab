@@ -13,5 +13,9 @@ module EE
     def reopen_epic(epic, current_user)
       create_record_event(epic, current_user, ::Event::REOPENED)
     end
+
+    def approve_mr(merge_request, current_user)
+      create_record_event(merge_request, current_user, ::Event::APPROVED)
+    end
   end
 end
