@@ -1262,6 +1262,36 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
   end
 
+  describe 'package files secondary counters' do
+    context 'when package registries available' do
+      before do
+        create(:package_file_registry, :failed)
+        create(:package_file_registry, :failed)
+        create(:package_file_registry, :synced)
+      end
+
+      it 'returns the right number of failed and synced repos' do
+        expect(subject.package_files_failed_count).to eq(2)
+        expect(subject.package_files_synced_count).to eq(1)
+      end
+
+      it 'returns the percent of synced package files' do
+        expect(subject.package_files_synced_in_percentage).to be_within(0.01).of(33.33)
+      end
+    end
+
+    context 'when no package registries available' do
+      it 'returns 0' do
+        expect(subject.package_files_failed_count).to eq(0)
+        expect(subject.package_files_synced_count).to eq(0)
+      end
+
+      it 'returns 0' do
+        expect(subject.package_files_synced_in_percentage).to eq(0)
+      end
+    end
+  end
+
   describe '#load_data_from_current_node' do
     context 'on the primary' do
       before do

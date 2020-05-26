@@ -36,6 +36,8 @@ FactoryBot.define do
       wikis_checksum_failed_count { 55 }
       package_files_count { 585 }
       package_files_checksummed_count { 585 }
+      package_files_failed_count { 3 }
+      package_files_synced_count { 585 }
       package_files_checksum_failed_count { 585 }
       repositories_verified_count { 501 }
       repositories_verification_failed_count { 100 }
