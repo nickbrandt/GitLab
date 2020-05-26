@@ -10,6 +10,26 @@ describe 'Query' do
   let_it_be(:developer) { create(:user) }
   let(:current_user) { developer }
 
+  describe '.users' do
+    let(:query) { graphql_query_for(:users, nil, 'nodes { id }') }
+
+    before do
+      post_graphql(query)
+    end
+
+    it_behaves_like 'a working graphql query'
+  end
+
+  describe '.user' do
+    let(:query) { graphql_query_for(:user, { id: current_user.id }, 'id') }
+
+    before do
+      post_graphql(query)
+    end
+
+    it_behaves_like 'a working graphql query'
+  end
+
   describe '.designManagement' do
     include DesignManagementTestHelpers
 

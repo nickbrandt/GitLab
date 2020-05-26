@@ -31,5 +31,11 @@ module Types
           null: true,
           description: 'Snippets authored by the user',
           resolver: Resolvers::Users::SnippetsResolver
+
+    field :memberships,
+          Types::MemberType.connection_type,
+          null: true,
+          description: 'All memberships of a user (e.g. Projects, Groups, Namespaces, etc.)',
+          method: :members
   end
 end
