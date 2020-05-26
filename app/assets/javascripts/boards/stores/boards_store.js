@@ -686,6 +686,11 @@ const boardsStore = {
   clearMultiSelect() {
     this.multiSelect.list = [];
   },
+
+  removeAllIssueAssignees(issue) {
+    issue.assignees = [];
+  },
+
   refreshIssueData(issue, obj) {
     issue.id = obj.id;
     issue.iid = obj.iid;
