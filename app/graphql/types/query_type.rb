@@ -50,8 +50,7 @@ module Types
     field :users, Types::UserType.connection_type,
           null: true,
           resolver: Resolvers::UsersResolver,
-          description: 'Find all Users updatable by the current user',
-          authorize: :update_user
+          description: 'Find all Users updatable by the current user'
 
     field :user, Types::UserType,
           null: true,
