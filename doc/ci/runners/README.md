@@ -429,7 +429,10 @@ Cost Factor is a multiplier for every CI minute being counted towards the Usage 
 
 For example, if `Public` Cost Factor of the Runner is set to `0.0`, it would NOT count the time spent executing jobs for `public` projects towards the Usage Quota at all.  
 Similarly, if `Private` Cost Factor of the Runner is set to `1.0`, it would count every minute spent executing jobs for `private`/`internal` projects without applying any additional multiplier to the time spent.  
-Setting a value, different from `0.0` and `1.0`, could be used to adjust the "price" of a particular runner.
+
+Setting a value, different from `0.0` and `1.0`, could be used to adjust the "price" of a particular runner.  
+For instance, setting the multiplier to `2.0` will make each physical minute to consume 2 minutes from the quota.  
+Setting the multiplier to `0.5` will make each physical minute to consume only 30 seconds from the quota.  
 
 It is possible to adjust Cost Factors for the particular runner:  
 
