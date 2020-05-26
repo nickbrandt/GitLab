@@ -1,6 +1,10 @@
 import { generateConanRecipe, generatePackageInfo } from 'ee/packages/details/utils';
-import { conanPackage, mavenPackage, npmPackage } from '../mock_data';
-import { generateConanInformation, generateStandardPackageInformation } from './mock_data';
+import { conanPackage, mavenPackage, npmPackage, nugetPackage } from '../mock_data';
+import {
+  generateConanInformation,
+  generateStandardPackageInformation,
+  generateNugetInformation,
+} from './mock_data';
 
 describe('Package detail utils', () => {
   describe('generating information', () => {
@@ -51,6 +55,16 @@ describe('Package detail utils', () => {
         const info = generatePackageInfo(mavenPackage);
 
         expect(info).toEqual(mavenInformation);
+      });
+    });
+
+    describe('nuget packages', () => {
+      const nugetInformation = generateNugetInformation(nugetPackage);
+
+      it('correctly generates the nuget information', () => {
+        const info = generatePackageInfo(nugetPackage);
+
+        expect(info).toEqual(nugetInformation);
       });
     });
   });

@@ -120,6 +120,8 @@ export const nugetPackage = {
   dependency_links: Object.values(dependencyLinks),
   nuget_metadatum: {
     icon_url: 'fake-icon',
+    project_url: 'project-foo-url',
+    license_url: 'license-foo-url',
   },
 };
 

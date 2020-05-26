@@ -1,30 +1,30 @@
 import { shallowMount } from '@vue/test-utils';
 import PackageInformation from 'ee/packages/details/components/information.vue';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
+import { GlLink } from '@gitlab/ui';
 
 describe('PackageInformation', () => {
   let wrapper;
 
-  const defaultProps = {
-    information: [
-      {
-        label: 'Information one',
-        value: 'Information value one',
-      },
-      {
-        label: 'Information two',
-        value: 'Information value two',
-      },
-      {
-        label: 'Information three',
-        value: 'Information value three',
-      },
-    ],
-  };
+  const gitlabLink = 'https://gitlab.com';
+  const testInformation = [
+    {
+      label: 'Information one',
+      value: 'Information value one',
+    },
+    {
+      label: 'Information two',
+      value: 'Information value two',
+    },
+    {
+      label: 'Information three',
+      value: 'Information value three',
+    },
+  ];
 
   function createComponent(props = {}) {
     const propsData = {
-      ...defaultProps,
+      information: testInformation,
       ...props,
     };
 
@@ -40,6 +40,7 @@ describe('PackageInformation', () => {
     informationSelector()
       .at(index)
       .text();
+  const informationLink = () => wrapper.find(GlLink);
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
@@ -66,10 +67,28 @@ describe('PackageInformation', () => {
   it('renders the supplied information', () => {
     createComponent();
 
-    expect(informationSelector()).toHaveLength(3);
-    expect(informationRowText(0)).toContain('one');
-    expect(informationRowText(1)).toContain('two');
-    expect(informationRowText(2)).toContain('three');
+    expect(informationSelector()).toHaveLength(testInformation.length);
+    expect(informationRowText(0)).toContain(testInformation[0].value);
+    expect(informationRowText(1)).toContain(testInformation[1].value);
+    expect(informationRowText(2)).toContain(testInformation[2].value);
+  });
+
+  it('renders a link when the information is of type link', () => {
+    createComponent({
+      information: [
+        {
+          label: 'Information link',
+          value: gitlabLink,
+          type: 'link',
+        },
+      ],
+    });
+
+    const link = informationLink();
+
+    expect(link.exists()).toBe(true);
+    expect(link.text()).toBe(gitlabLink);
+    expect(link.attributes('href')).toBe(gitlabLink);
   });
 
   describe('copy button', () => {
@@ -82,10 +101,10 @@ describe('PackageInformation', () => {
     it('does render when the prop is set and has correct text set', () => {
       createComponent({ showCopy: true });
 
-      expect(copyButton()).toHaveLength(3);
-      expect(copyButton().at(0).vm.text).toBe(defaultProps.information[0].value);
-      expect(copyButton().at(1).vm.text).toBe(defaultProps.information[1].value);
-      expect(copyButton().at(2).vm.text).toBe(defaultProps.information[2].value);
+      expect(copyButton()).toHaveLength(testInformation.length);
+      expect(copyButton().at(0).vm.text).toBe(testInformation[0].value);
+      expect(copyButton().at(1).vm.text).toBe(testInformation[1].value);
+      expect(copyButton().at(2).vm.text).toBe(testInformation[2].value);
     });
   });
 });
