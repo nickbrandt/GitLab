@@ -227,6 +227,8 @@ func (u *upstream) configureRoutes() {
 
 		// Project Import via UI upload acceleration
 		route("POST", importPattern+`gitlab_project`, upload.Accelerate(api, signingProxy)),
+		// Group Import via UI upload acceleration
+		route("POST", importPattern+`gitlab_group`, upload.Accelerate(api, signingProxy)),
 
 		// Explicitly proxy API requests
 		route("", apiPattern, proxy),
