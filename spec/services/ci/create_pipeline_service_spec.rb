@@ -970,66 +970,107 @@ describe Ci::CreatePipelineService do
     end
 
     context 'with release' do
-      shared_examples_for 'a successful release pipeline' do
-        before do
-          stub_feature_flags(ci_release_generation: true)
-          stub_ci_pipeline_yaml_file(YAML.dump(config))
-        end
+      let(:tag_name) { nil }
+      let(:config) do
+        {
+          'release-job': {
+            script: ["make changelog | tee release_changelog.txt"],
+            release: {
+              tag_name: tag_name,
+              name: "Release $CI_TAG_NAME",
+              description: "./release_changelog.txt"
+            }
+          }
+        }
+      end
 
+      before do
+        stub_feature_flags(ci_release_generation: true)
+        stub_ci_pipeline_yaml_file(YAML.dump(config))
+      end
+
+      shared_examples_for 'a successful release pipeline' do
         it 'is valid config' do
-          pipeline = execute_service
+          pipeline = execute_service(ref: 'v1.0.0')
           build = pipeline.builds.first
+
           expect(pipeline).to be_kind_of(Ci::Pipeline)
           expect(pipeline).to be_valid
           expect(pipeline.yaml_errors).not_to be_present
           expect(pipeline).to be_persisted
           expect(build).to be_kind_of(Ci::Build)
-          expect(build.options).to eq(config[:release].except(:stage, :only).with_indifferent_access)
+          expect(build.options).to eq(config[:"release-job"].except(:stage, :only).with_indifferent_access)
           expect(build).to be_persisted
         end
       end
 
-      context 'simple example' do
-        it_behaves_like 'a successful release pipeline' do
-          let(:config) do
-            {
-              release: {
-                script: ["make changelog | tee release_changelog.txt"],
-                release: {
-                  tag_name: "v0.06",
-                  description: "./release_changelog.txt"
-                }
-              }
-            }
-          end
+      shared_examples_for 'an unsuccessful release pipeline' do |error_message|
+        it "returns error about incorrect configuration" do
+          pipeline = execute_service
+
+          expect(pipeline).to be_kind_of(Ci::Pipeline)
+          expect(pipeline).to be_persisted
+          expect(pipeline.builds.any?).to be false
+          expect(pipeline.status).to eq('failed')
+          expect(pipeline.yaml_errors).to include error_message
         end
       end
 
+      context 'simple example' do
+        let(:tag_name) { "v0.06" }
+
+        it_behaves_like 'a successful release pipeline'
+      end
+
       context 'example with all release metadata' do
-        it_behaves_like 'a successful release pipeline' do
-          let(:config) do
-            {
+        let(:config) do
+          {
+            'release-job': {
+              script: ["make changelog | tee release_changelog.txt"],
               release: {
-                script: ["make changelog | tee release_changelog.txt"],
-                release: {
-                  name: "Release $CI_TAG_NAME",
-                  tag_name: "v0.06",
-                  description: "./release_changelog.txt",
-                  assets: {
-                    links: [
-                      {
-                        name: "cool-app.zip",
-                        url: "http://my.awesome.download.site/1.0-$CI_COMMIT_SHORT_SHA.zip"
-                      },
-                      {
-                        url: "http://my.awesome.download.site/1.0-$CI_COMMIT_SHORT_SHA.exe"
-                      }
-                    ]
-                  }
+                name: "Release $CI_TAG_NAME",
+                tag_name: "v0.06",
+                description: "./release_changelog.txt",
+                assets: {
+                  links: [
+                    {
+                      name: "cool-app.zip",
+                      url: "http://my.awesome.download.site/1.0-$CI_COMMIT_SHORT_SHA.zip"
+                    },
+                    {
+                      url: "http://my.awesome.download.site/1.0-$CI_COMMIT_SHORT_SHA.exe"
+                    }
+                  ]
                 }
               }
             }
-          end
+          }
+        end
+
+        it_behaves_like 'a successful release pipeline'
+      end
+
+      context 'with $CI_COMMIT_TAG' do
+        let(:tag_name) { '$CI_COMMIT_TAG' }
+
+        context 'without tags' do
+          it_behaves_like 'an unsuccessful release pipeline', 'jobs:release-job release tags containing $CI_COMMIT_TAG can only be specified when building tags'
+        end
+
+        context 'with tags' do
+          it_behaves_like 'a successful release pipeline'
+        end
+      end
+
+      context 'suffixed with $CI_COMMIT_TAG' do
+        let(:tag_name) { 'version$CI_COMMIT_TAG' }
+
+        context 'without tags' do
+          it_behaves_like 'an unsuccessful release pipeline', 'jobs:release-job release tags containing $CI_COMMIT_TAG can only be specified when building tags'
+        end
+
+        context 'with tags' do
+          it_behaves_like 'a successful release pipeline'
         end
       end
     end

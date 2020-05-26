@@ -16,6 +16,7 @@ module Gitlab
                   project: project,
                   sha: @pipeline.sha,
                   user: current_user,
+                  pipeline: @pipeline,
                   parent_pipeline: parent_pipeline
                 }
               )

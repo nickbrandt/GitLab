@@ -16,6 +16,9 @@ module Gitlab
       end
 
       def initialize(config, opts = {})
+        @pipeline = opts[:pipeline]
+        opts.delete :pipeline
+
         @ci_config = Gitlab::Ci::Config.new(config, **opts)
         @config = @ci_config.to_hash
 
@@ -144,6 +147,7 @@ module Gitlab
           validate_job_needs!(name, job)
           validate_dynamic_child_pipeline_dependencies!(name, job)
           validate_job_environment!(name, job)
+          validate_release_tag!(name, job)
         end
       end
 
@@ -234,6 +238,12 @@ module Gitlab
 
         unless on_stop_job[:environment][:action] == 'stop'
           raise ValidationError, "#{name} job: on_stop job #{on_stop} needs to have action stop defined"
+        end
+      end
+
+      def validate_release_tag!(name, job)
+        if !@pipeline.tag? && job.dig(:release, :tag_name)&.include?('$CI_COMMIT_TAG')
+          raise ValidationError, "jobs:#{name} release tags containing $CI_COMMIT_TAG can only be specified when building tags"
         end
       end
     end
