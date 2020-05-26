@@ -66,7 +66,7 @@ class ListIssue {
   }
 
   removeAllAssignees() {
-    this.assignees = [];
+    boardsStore.removeAllIssueAssignees(this);
   }
 
   addMilestone(milestone) {
