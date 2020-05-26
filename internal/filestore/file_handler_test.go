@@ -275,6 +275,32 @@ func TestSaveFile(t *testing.T) {
 	}
 }
 
+func TestSaveFileWithWorkhorseClient(t *testing.T) {
+	s3Creds, s3Config, sess, ts := test.SetupS3(t)
+	defer ts.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	remoteObject := "tmp/test-file/1"
+	opts := filestore.SaveFileOpts{
+		RemoteID:           "test-file",
+		Deadline:           testDeadline(),
+		UseWorkhorseClient: true,
+		RemoteTempObjectID: remoteObject,
+		ObjectStorageConfig: filestore.ObjectStorageConfig{
+			Provider:      "AWS",
+			S3Credentials: s3Creds,
+			S3Config:      s3Config,
+		},
+	}
+
+	_, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, &opts)
+	require.NoError(t, err)
+
+	test.S3ObjectExists(t, sess, s3Config, remoteObject, test.ObjectContent)
+}
+
 func TestSaveMultipartInBodyFailure(t *testing.T) {
 	assert := assert.New(t)
 

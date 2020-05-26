@@ -11,6 +11,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
+	"gitlab.com/gitlab-org/labkit/log"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 )
@@ -115,7 +117,16 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 		}
 	}()
 
-	if opts.IsMultipart() {
+	useS3Client := opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsAWS() && opts.ObjectStorageConfig.IsValid()
+
+	if useS3Client {
+		remoteWriter, err = objectstore.NewS3Object(ctx, opts.RemoteTempObjectID, opts.ObjectStorageConfig.S3Credentials, opts.ObjectStorageConfig.S3Config, opts.Deadline)
+		if err != nil {
+			return nil, err
+		}
+
+		writers = append(writers, remoteWriter)
+	} else if opts.IsMultipart() {
 		remoteWriter, err = objectstore.NewMultipart(ctx, opts.PresignedParts, opts.PresignedCompleteMultipart, opts.PresignedAbortMultipart, opts.PresignedDelete, opts.PutHeaders, opts.Deadline, opts.PartSize)
 		if err != nil {
 			return nil, err
@@ -153,6 +164,24 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 	if size != -1 && size != fh.Size {
 		return nil, SizeError(fmt.Errorf("expected %d bytes but got only %d", size, fh.Size))
 	}
+
+	logger := log.WithContextFields(ctx, log.Fields{
+		"copied_bytes":     fh.Size,
+		"is_local":         opts.IsLocal(),
+		"is_multipart":     opts.IsMultipart(),
+		"is_remote":        opts.IsRemote(),
+		"remote_id":        opts.RemoteID,
+		"temp_file_prefix": opts.TempFilePrefix,
+		"use_s3_client":    useS3Client,
+	})
+
+	if opts.IsLocal() {
+		logger = logger.WithField("local_temp_path", opts.LocalTempPath)
+	} else if useS3Client {
+		logger = logger.WithField("remote_temp_object", opts.RemoteTempObjectID)
+	}
+
+	logger.Info("saved file")
 
 	fh.hashes = hashes.finish()
 
