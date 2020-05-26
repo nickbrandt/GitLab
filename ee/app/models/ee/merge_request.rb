@@ -15,14 +15,12 @@ module EE
       include DeprecatedApprovalsBeforeMerge
       include UsageStatistics
 
-      has_many :reviews, inverse_of: :merge_request
       has_many :approvals, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approved_by_users, through: :approvals, source: :user
       has_many :approvers, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_users, through: :approvers, source: :user
       has_many :approver_groups, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approval_rules, class_name: 'ApprovalMergeRequestRule', inverse_of: :merge_request
-      has_many :draft_notes
       has_one :merge_train, inverse_of: :merge_request, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
       has_many :blocks_as_blocker,
@@ -148,18 +146,6 @@ module EE
       hidden.delete_if(&:merged?) unless include_merged
 
       hidden.count
-    end
-
-    override :note_positions_for_paths
-    def note_positions_for_paths(file_paths, user = nil)
-      return super unless user
-
-      positions = draft_notes
-        .authored_by(user)
-        .positions
-        .select { |pos| file_paths.include?(pos.file_path) }
-
-      super.concat(positions)
     end
 
     def enabled_reports
