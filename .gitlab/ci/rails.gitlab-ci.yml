@@ -41,7 +41,7 @@ setup-test-env:
 static-analysis:
   extends:
     - .rails-job-base
-    - .rails:rules:default-refs-code-backstage-qa
+    - .rails:rules:default-refs-code-backstage-qa-docs
     - .rails:needs:setup-and-assets
   stage: test
   variables:

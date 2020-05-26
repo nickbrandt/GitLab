@@ -417,6 +417,13 @@
     - <<: *if-default-refs
       changes: *code-backstage-qa-patterns
 
+.rails:rules:default-refs-code-backstage-qa-docs:
+  rules:
+    - <<: *if-default-refs
+      changes: *code-backstage-qa-patterns
+    - <<: *if-default-refs
+      changes: *docs-patterns
+
 .rails:rules:ee-only:
   rules:
     - <<: *if-not-ee
