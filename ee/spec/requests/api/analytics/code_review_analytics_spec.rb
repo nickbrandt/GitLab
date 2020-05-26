@@ -64,6 +64,16 @@ describe API::Analytics::CodeReviewAnalytics do
           expect(json_response.map { |mr| mr['id'] }).to match_array([merge_request_1.id])
         end
       end
+
+      context 'with any label filter present' do
+        let(:query_params) { super().merge(label_name: ['Any']) }
+
+        it 'applies filter' do
+          api_call
+
+          expect(json_response.map { |mr| mr['id'] }).to match_array([merge_request_2.id, merge_request_3.id])
+        end
+      end
     end
 
     context 'when user has no authorization' do
