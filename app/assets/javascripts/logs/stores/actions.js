@@ -2,7 +2,7 @@ import { backOff } from '~/lib/utils/common_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 import { convertToFixedRange } from '~/lib/utils/datetime_range';
-import { TOKEN_TYPE_POD_NAME } from '../constants';
+import { TOKEN_TYPE_POD_NAME, tracking } from '../constants';
 import trackLogs from '../logs_tracking_helper';
 
 import * as types from './mutation_types';
@@ -82,22 +82,22 @@ export const showFilteredLogs = ({ dispatch, commit }, filters = []) => {
   commit(types.SET_CURRENT_POD_NAME, podName);
   commit(types.SET_SEARCH, search);
 
-  dispatch('fetchLogs', 'used_search_bar');
+  dispatch('fetchLogs', tracking.USED_SEARCH_BAR);
 };
 
 export const showPodLogs = ({ dispatch, commit }, podName) => {
   commit(types.SET_CURRENT_POD_NAME, podName);
-  dispatch('fetchLogs', 'pod_log_changed');
+  dispatch('fetchLogs', tracking.POD_LOG_CHANGED);
 };
 
 export const setTimeRange = ({ dispatch, commit }, timeRange) => {
   commit(types.SET_TIME_RANGE, timeRange);
-  dispatch('fetchLogs', 'time_range_set');
+  dispatch('fetchLogs', tracking.TIME_RANGE_SET);
 };
 
 export const showEnvironment = ({ dispatch, commit }, environmentName) => {
   commit(types.SET_PROJECT_ENVIRONMENT, environmentName);
-  dispatch('fetchLogs', 'enviroment_selected');
+  dispatch('fetchLogs', tracking.ENVIRONMENT_SELECTED);
 };
 
 /**
@@ -112,24 +112,21 @@ export const fetchEnvironments = ({ commit, dispatch }, environmentsPath) => {
     .get(environmentsPath)
     .then(({ data }) => {
       commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, data.environments);
-      dispatch('fetchLogs', 'environment_selected');
+      dispatch('fetchLogs', tracking.ENVIRONMENT_SELECTED);
     })
     .catch(() => {
       commit(types.RECEIVE_ENVIRONMENTS_DATA_ERROR);
     });
 };
 
-export const fetchLogs = ({ commit, state }, label) => {
+export const fetchLogs = ({ commit, state }, trackingLabel) => {
   commit(types.REQUEST_LOGS_DATA);
 
   return requestLogsUntilData({ commit, state })
     .then(({ data }) => {
       const { pod_name, pods, logs, cursor } = data;
       if (logs && logs.length > 0) {
-        trackLogs({
-          label,
-          value: 1,
-        });
+        trackLogs(trackingLabel);
       }
       commit(types.RECEIVE_LOGS_DATA_SUCCESS, { logs, cursor });
       commit(types.SET_CURRENT_POD_NAME, pod_name);
