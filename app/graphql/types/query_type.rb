@@ -55,8 +55,7 @@ module Types
     field :user, Types::UserType,
           null: true,
           description: 'Find a User',
-          resolver: Resolvers::UserResolver,
-          authorize: :update_user
+          resolver: Resolvers::UserResolver
 
     field :echo, GraphQL::STRING_TYPE, null: false,
           description: 'Text to echo back',
