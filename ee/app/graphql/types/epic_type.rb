@@ -121,7 +121,7 @@ module Types
     field :issues,
           Types::EpicIssueType.connection_type,
           null: true,
-          complexity: 2,
+          complexity: 5,
           description: 'A list of issues associated with the epic',
           resolver: Resolvers::EpicIssuesResolver
 
