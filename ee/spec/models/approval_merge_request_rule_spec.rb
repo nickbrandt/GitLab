@@ -17,7 +17,7 @@ describe ApprovalMergeRequestRule do
     end
 
     it 'is invalid when name not unique within rule type and merge request' do
-      is_expected.to validate_uniqueness_of(:name).scoped_to([:merge_request_id, :rule_type])
+      is_expected.to validate_uniqueness_of(:name).scoped_to([:merge_request_id, :rule_type, :section])
     end
 
     context 'approval_project_rule is set' do

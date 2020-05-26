@@ -26,7 +26,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   scope :code_owner_approval_optional, -> { code_owner.where(approvals_required: 0) }
   scope :code_owner_approval_required, -> { code_owner.where('approvals_required > 0') }
 
-  validates :name, uniqueness: { scope: [:merge_request_id, :rule_type] }
+  validates :name, uniqueness: { scope: [:merge_request_id, :rule_type, :section] }
   validates :rule_type, uniqueness: { scope: :merge_request_id, message: proc { _('any-approver for the merge request already exists') } }, if: :any_approver?
   validates :report_type, presence: true, if: :report_approver?
   # Temporary validations until `code_owner` can be dropped in favor of `rule_type`
