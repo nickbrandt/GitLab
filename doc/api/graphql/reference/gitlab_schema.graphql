@@ -11601,6 +11601,11 @@ type Vulnerability {
   title: String
 
   """
+  Number of user notes attached to the vulnerability
+  """
+  userNotesCount: Int!
+
+  """
   Permissions for the current user on the resource
   """
   userPermissions: VulnerabilityPermissions!
