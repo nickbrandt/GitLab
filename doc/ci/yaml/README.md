@@ -1038,6 +1038,10 @@ You can use [`allow_failure: true`](#allow_failure) within `rules:` to allow a j
 wait for action, without stopping the pipeline itself. All jobs using `rules:` default to `allow_failure: false`
 if `allow_failure:` is not defined.
 
+The rule-level `rules:allow_failure` option overrides the job-level
+[`allow_failure`](#allow_failure) option, and is only applied when the job is
+triggered by the particular rule.
+
 ```yaml
 job:
   script: "echo Hello, Rules!"
@@ -3478,7 +3482,7 @@ If `GIT_FETCH_EXTRA_FLAGS` is:
 
 - Not specified, `git fetch` flags default to `--prune --quiet` along with the default flags.
 - Given the value `none`, `git fetch` is executed only with the default flags.
-  
+
 For example, the default flags are `--prune --quiet`, so you can make `git fetch` more verbose by overriding this with just `--prune`:
 
 ```yaml
