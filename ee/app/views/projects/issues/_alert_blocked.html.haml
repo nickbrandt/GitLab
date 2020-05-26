@@ -10,6 +10,6 @@
       = _('This issue is currently blocked by the following issues: %{issues}.').html_safe % { issues: blocked_by_issues_links }
     .gl-alert-actions
       = link_to _("Yes, close issue"), close_issuable_path(issue), rel: 'nofollow', method: '',
-                class: "btn btn-close-anyway gl-alert-action btn-warning btn-md gl-button", title: _("Yes, close issue")
+                class: "btn btn-close-anyway gl-alert-action btn-warning btn-md gl-button", title: _("Yes, close issue"), 'data-close-reopen-url' => close_issuable_path(issue)
       %button.btn.gl-alert-action.btn-warning.btn-md.gl-button.btn-secondary
         = s_('Cancel')
