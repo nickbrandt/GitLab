@@ -1,7 +1,7 @@
 <script>
-import { GlButton, GlForm, GlFormCheckbox, GlFormInput } from '@gitlab/ui';
+import { GlButton, GlDatepicker, GlForm, GlFormCheckbox, GlFormInput } from '@gitlab/ui';
 import createFlash from '~/flash';
-import { visitUrl, joinPaths } from '~/lib/utils/url_utility';
+import { visitUrl } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
 import createEpic from '../queries/createEpic.mutation.graphql';
@@ -9,6 +9,7 @@ import createEpic from '../queries/createEpic.mutation.graphql';
 export default {
   components: {
     GlButton,
+    GlDatepicker,
     GlForm,
     GlFormCheckbox,
     GlFormInput,
@@ -35,6 +36,8 @@ export default {
       confidential: false,
       description: '',
       title: '',
+      dueDateFixed: null,
+      startDateFixed: null,
       loading: false,
     };
   },
@@ -52,6 +55,10 @@ export default {
               title: this.title,
               description: this.description,
               confidential: this.confidential,
+              startDateFixed: this.startDateFixed,
+              startDateIsFixed: Boolean(this.startDateFixed),
+              dueDateFixed: this.dueDateFixed,
+              dueDateIsFixed: Boolean(this.dueDateFixed),
             },
           },
         })
@@ -70,6 +77,12 @@ export default {
         .finally(() => {
           this.loading = false;
         });
+    },
+    updateDueDate(val) {
+      this.dueDateFixed = val;
+    },
+    updateStartDate(val) {
+      this.startDateFixed = val;
     },
   },
 };
@@ -135,12 +148,58 @@ export default {
           }}</gl-form-checkbox>
         </div>
       </div>
-
-      <div class="form-group row">
-        <div class="col-form-label col-sm-2">
-          <label for="epic-title">{{ __('Labels') }}</label>
+      <hr />
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group row">
+            <div class="col-form-label col-md-2 col-lg-4">
+              <label for="epic-title">{{ __('Labels') }}</label>
+            </div>
+            <div class="col-md-8 col-sm-10"></div>
+          </div>
         </div>
-        <div class="col-sm-8"></div>
+        <div class="col-md-6">
+          <div class="form-group row">
+            <div class="col-form-label col-md-2 col-lg-4">
+              <label for="epic-start-date">{{ __('Start date') }}</label>
+            </div>
+            <div class="col-md-8 col-sm-10">
+              <div class="issuable-form-select-holder gl-mr-2">
+                <gl-datepicker v-model="startDateFixed" />
+              </div>
+              <a
+                v-show="startDateFixed"
+                class="gl-white-space-nowrap js-clear-start-date"
+                href="#"
+                @click="updateStartDate(null)"
+                >{{ __('Clear start date') }}</a
+              >
+              <span class="block gl-text-gray-400">{{
+                __('An empty date will inherit from milestone dates')
+              }}</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-form-label col-md-2 col-lg-4">
+              <label for="epic-due-date">{{ __('Due Date') }}</label>
+            </div>
+            <div class="col-md-8 col-sm-10">
+              <div class="issuable-form-select-holder gl-mr-2">
+                <gl-datepicker v-model="dueDateFixed" />
+              </div>
+              <a
+                v-show="dueDateFixed"
+                class="gl-white-space-nowrap js-clear-due-date"
+                href="#"
+                @click="updateDueDate(null)"
+                >{{ __('Clear due date') }}</a
+              >
+              <span class="block gl-text-gray-400">{{
+                __('An empty date will inherit from milestone dates')
+              }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </gl-form>
 
