@@ -242,7 +242,7 @@ module Gitlab
       end
 
       def validate_release_tag!(name, job)
-        if !@pipeline&.tag? && job.dig(:release, :tag_name)&.include?('$CI_COMMIT_TAG')
+        if @pipeline && !@pipeline&.tag? && job.dig(:release, :tag_name)&.include?('$CI_COMMIT_TAG')
           raise ValidationError, "jobs:#{name} release tags containing $CI_COMMIT_TAG can only be specified when building tags"
         end
       end
