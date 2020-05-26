@@ -21,6 +21,8 @@ module Packages
         }
 
         package_detail[:maven_metadatum] = @package.maven_metadatum if @package.maven_metadatum
+        package_detail[:nuget_metadatum] = @package.nuget_metadatum if @package.nuget_metadatum
+        package_detail[:dependency_links] = @package.dependency_links.map { |dl| build_dependency_links(dl) } if @package.dependency_links
         package_detail[:pipeline] = build_pipeline_info(@package.build_info.pipeline) if @package.build_info
 
         package_detail
@@ -56,6 +58,14 @@ module Packages
         {
           avatar_url: user.avatar_url,
           name: user.name
+        }
+      end
+
+      def build_dependency_links(link)
+        {
+          name: link.dependency.name,
+          version_pattern: link.dependency.version_pattern,
+          target_framework: link.nuget_metadatum.target_framework
         }
       end
     end

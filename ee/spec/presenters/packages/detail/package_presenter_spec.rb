@@ -43,7 +43,8 @@ describe ::Packages::Detail::PackagePresenter do
       project_id: package.project_id,
       tags: package.tags.as_json,
       updated_at: package.updated_at,
-      version: package.version
+      version: package.version,
+      dependency_links: []
     }
   end
 
@@ -62,6 +63,17 @@ describe ::Packages::Detail::PackagePresenter do
       let!(:package) { create(:npm_package, project: project) }
 
       it 'returns details without pipeline' do
+        expect(presenter.detail_view).to eq expected_package_details
+      end
+    end
+
+    context 'with nuget_metadatum' do
+      let_it_be(:package) { create(:nuget_package, project: project) }
+      let_it_be(:nuget_metadatum) { create(:nuget_metadatum, package: package) }
+
+      it 'returns nuget_metadatum' do
+        expected_package_details[:nuget_metadatum] = nuget_metadatum
+
         expect(presenter.detail_view).to eq expected_package_details
       end
     end
@@ -86,6 +98,23 @@ describe ::Packages::Detail::PackagePresenter do
 
     it 'returns nil when there is not a user' do
       expect(presenter.build_user_info(nil)).to eq nil
+    end
+  end
+
+  context 'build_dependency_links' do
+    let_it_be(:package) { create(:nuget_package, project: project) }
+    let_it_be(:dependency_link) { create(:packages_dependency_link, package: package) }
+    let_it_be(:nuget_dependency) { create(:nuget_dependency_link_metadatum, dependency_link: dependency_link) }
+    let_it_be(:expected_link) do
+      {
+        name: dependency_link.dependency.name,
+        version_pattern: dependency_link.dependency.version_pattern,
+        target_framework: nuget_dependency.target_framework
+      }
+    end
+
+    it 'returns correct dependency data for nuget packages' do
+      expect(presenter.build_dependency_links(dependency_link)).to eq expected_link
     end
   end
 end
