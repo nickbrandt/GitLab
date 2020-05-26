@@ -6806,7 +6806,6 @@ CREATE TABLE public.users (
     auditor boolean DEFAULT false NOT NULL,
     require_two_factor_authentication_from_group boolean DEFAULT false NOT NULL,
     two_factor_grace_period integer DEFAULT 48 NOT NULL,
-    ghost boolean,
     last_activity_on date,
     notified_of_own_activity boolean,
     preferred_language character varying,
@@ -10826,8 +10825,6 @@ CREATE INDEX index_users_on_email_trigram ON public.users USING gin (email publi
 
 CREATE INDEX index_users_on_feed_token ON public.users USING btree (feed_token);
 
-CREATE INDEX index_users_on_ghost ON public.users USING btree (ghost);
-
 CREATE INDEX index_users_on_group_view ON public.users USING btree (group_view);
 
 CREATE INDEX index_users_on_incoming_email_token ON public.users USING btree (incoming_email_token);
@@ -10844,7 +10841,7 @@ CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING bt
 
 CREATE INDEX index_users_on_state ON public.users USING btree (state);
 
-CREATE INDEX index_users_on_state_and_user_type_internal ON public.users USING btree (state, user_type) WHERE (ghost IS NOT TRUE);
+CREATE INDEX index_users_on_state_and_user_type ON public.users USING btree (state, user_type);
 
 CREATE UNIQUE INDEX index_users_on_static_object_token ON public.users USING btree (static_object_token);
 
@@ -13925,5 +13922,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200515155620
 20200519115908
 20200519171058
+20200525114553
+20200525121014
 \.
 
