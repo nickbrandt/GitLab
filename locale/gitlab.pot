@@ -189,6 +189,11 @@ msgid_plural "%d more comments"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d personal project will be removed and cannot be restored."
+msgid_plural "%d personal projects will be removed and cannot be restored."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d project"
 msgid_plural "%d projects"
 msgstr[0] ""
@@ -26572,11 +26577,6 @@ msgstr ""
 
 msgid "personal access tokens"
 msgstr ""
-
-msgid "personal project will be removed and cannot be restored"
-msgid_plural "%d personal projects will be removed and cannot be restored"
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "pipeline"
 msgstr ""
