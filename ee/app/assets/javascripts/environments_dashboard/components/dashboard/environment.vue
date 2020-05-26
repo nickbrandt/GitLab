@@ -1,6 +1,6 @@
 <script>
 import { escape, isEmpty } from 'lodash';
-import { GlTooltipDirective, GlLink, GlBadge } from '@gitlab/ui';
+import { GlTooltipDirective, GlLink, GlDeprecatedBadge as GlBadge } from '@gitlab/ui';
 import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
 import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
 import { STATUS_FAILED } from 'ee/vue_shared/dashboards/constants';

@@ -1,5 +1,11 @@
 <script>
-import { GlLink, GlSkeletonLoading, GlBadge, GlIcon, GlFriendlyWrap } from '@gitlab/ui';
+import {
+  GlLink,
+  GlSkeletonLoading,
+  GlDeprecatedBadge as GlBadge,
+  GlIcon,
+  GlFriendlyWrap,
+} from '@gitlab/ui';
 import LicenseComponentLinks from './license_component_links.vue';
 import { LICENSE_APPROVAL_CLASSIFICATION } from 'ee/vue_shared/license_compliance/constants';
 

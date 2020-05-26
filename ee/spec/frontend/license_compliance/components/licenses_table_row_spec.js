@@ -1,5 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlLink, GlSkeletonLoading, GlBadge, GlFriendlyWrap } from '@gitlab/ui';
+import {
+  GlLink,
+  GlSkeletonLoading,
+  GlDeprecatedBadge as GlBadge,
+  GlFriendlyWrap,
+} from '@gitlab/ui';
 import LicenseComponentLinks from 'ee/license_compliance/components/license_component_links.vue';
 import LicensesTableRow from 'ee/license_compliance/components/licenses_table_row.vue';
 import { makeLicense } from './utils';

@@ -1,5 +1,5 @@
 <script>
-import { GlBadge } from '@gitlab/ui';
+import { GlDeprecatedBadge as GlBadge } from '@gitlab/ui';
 import { __ } from '~/locale';
 import GeoNodeForm from './geo_node_form.vue';
 

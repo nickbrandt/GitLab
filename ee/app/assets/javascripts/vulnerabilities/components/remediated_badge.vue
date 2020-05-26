@@ -1,5 +1,5 @@
 <script>
-import { GlBadge, GlPopover } from '@gitlab/ui';
+import { GlDeprecatedBadge as GlBadge, GlPopover } from '@gitlab/ui';
 
 export default {
   name: 'RemediatedBadge',
