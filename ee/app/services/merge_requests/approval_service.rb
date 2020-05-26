@@ -13,10 +13,9 @@ module MergeRequests
 
       if save_approval(approval)
         merge_request.reset_approval_cache!
-
+        create_event(merge_request)
         create_approval_note(merge_request)
         mark_pending_todos_as_done(merge_request)
-        calculate_approvals_metrics(merge_request)
 
         if merge_request.approvals_left.zero?
           notification_service.async.approve_mr(merge_request, current_user)
@@ -51,7 +50,16 @@ module MergeRequests
     def calculate_approvals_metrics(merge_request)
       return unless merge_request.project.feature_available?(:code_review_analytics)
 
-      ::Analytics::RefreshApprovalsData.new(merge_request).execute_async
+      ::Analytics::RefreshApprovalsData.new(merge_request).execute
+    end
+
+    def create_event(merge_request)
+      # Making sure MergeRequest::Metrics updates are in sync with
+      # Event creation.
+      Event.transaction do
+        event_service.approve_mr(merge_request, current_user)
+        calculate_approvals_metrics(merge_request)
+      end
     end
   end
 end
