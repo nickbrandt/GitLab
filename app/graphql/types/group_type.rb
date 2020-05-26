@@ -69,7 +69,7 @@ module Types
     field :label,
           Types::LabelType,
           null: true,
-          description: 'Labels available on this group' do
+          description: 'A label available on this group' do
             argument :title, GraphQL::STRING_TYPE,
               required: true,
               description: 'The title of the label'

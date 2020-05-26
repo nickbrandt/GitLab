@@ -246,7 +246,7 @@ module Types
     field :label,
           Types::LabelType,
           null: true,
-          description: 'Labels available on this project' do
+          description: 'A label available on this project' do
             argument :title, GraphQL::STRING_TYPE,
               required: true,
               description: 'The title of the label'

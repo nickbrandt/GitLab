@@ -4653,7 +4653,7 @@ type Group {
   ): IterationConnection
 
   """
-  Labels available on this group
+  A label available on this group
   """
   label(
     """
@@ -8404,7 +8404,7 @@ type Project {
   jobsEnabled: Boolean
 
   """
-  Labels available on this project
+  A label available on this project
   """
   label(
     """

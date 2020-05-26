@@ -12822,7 +12822,7 @@
             },
             {
               "name": "label",
-              "description": "Labels available on this group",
+              "description": "A label available on this group",
               "args": [
                 {
                   "name": "title",
@@ -24724,7 +24724,7 @@
             },
             {
               "name": "label",
-              "description": "Labels available on this project",
+              "description": "A label available on this project",
               "args": [
                 {
                   "name": "title",
