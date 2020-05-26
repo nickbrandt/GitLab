@@ -167,10 +167,9 @@ class ApprovalState
     end
   end
 
-  def optional_approvals_count
-    strong_memoize(:optional_approvals_count) do
-      wrapped_approval_rules.sum { |rule| [0, rule.approved_approvers.count - rule.approvals_required].max }
-    end
+  # This is the required + optional approval count
+  def total_approvals_count
+    approvals.size
   end
 
   private
