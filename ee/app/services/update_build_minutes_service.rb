@@ -6,7 +6,7 @@ class UpdateBuildMinutesService < BaseService
     return unless build.complete?
     return unless build.duration&.positive?
 
-    if ::Feature.enabled?(:ci_minutes_track_for_public_projects, namespace)
+    if ::Feature.enabled?(:ci_minutes_track_for_public_projects, namespace, default_enabled: true)
       count_projects_based_on_cost_factors(build)
     else
       legacy_count_non_public_projects(build)

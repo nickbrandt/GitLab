@@ -28,7 +28,7 @@ module EE
       def builds_for_shared_runner
         return super unless shared_runner_build_limits_feature_enabled?
 
-        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects)
+        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects, default_enabled: true)
           enforce_minutes_based_on_cost_factors(super)
         else
           legacy_enforce_minutes_for_non_public_projects(super)
