@@ -12204,9 +12204,6 @@ msgstr ""
 msgid "Jira Issue Import"
 msgstr ""
 
-msgid "Jira import feature is disabled."
-msgstr ""
-
 msgid "Jira import is already running."
 msgstr ""
 
