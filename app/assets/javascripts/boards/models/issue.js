@@ -60,9 +60,7 @@ class ListIssue {
   }
 
   removeAssignee(removeAssignee) {
-    if (removeAssignee) {
-      this.assignees = this.assignees.filter(assignee => assignee.id !== removeAssignee.id);
-    }
+    boardsStore.removeIssueAssignee(this, removeAssignee);
   }
 
   removeAllAssignees() {
