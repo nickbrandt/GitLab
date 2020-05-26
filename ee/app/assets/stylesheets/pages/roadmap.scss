@@ -547,3 +547,14 @@ html.group-epics-roadmap-html {
     }
   }
 }
+
+.milestone-item-type {
+  .gl-icon {
+    padding-right: $gl-spacing-scale-1;
+  }
+}
+
+.milestone-item-date {
+  color: $gray-700;
+  padding-top: $gl-spacing-scale-1;
+}

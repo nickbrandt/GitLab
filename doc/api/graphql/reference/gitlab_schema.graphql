@@ -6729,9 +6729,19 @@ type Milestone {
   dueDate: Time
 
   """
+  Indicates if milestone is at group level
+  """
+  groupMilestone: Boolean!
+
+  """
   ID of the milestone
   """
   id: ID!
+
+  """
+  Indicates if milestone is at project level
+  """
+  projectMilestone: Boolean!
 
   """
   Timestamp of the milestone start date
@@ -6742,6 +6752,11 @@ type Milestone {
   State of the milestone
   """
   state: MilestoneStateEnum!
+
+  """
+  Indicates if milestone is at subgroup level
+  """
+  subgroupMilestone: Boolean!
 
   """
   Title of the milestone

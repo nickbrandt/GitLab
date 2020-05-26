@@ -1029,9 +1029,12 @@ Represents a milestone.
 | `createdAt` | Time! | Timestamp of milestone creation |
 | `description` | String | Description of the milestone |
 | `dueDate` | Time | Timestamp of the milestone due date |
+| `groupMilestone` | Boolean! | Indicates if milestone is at group level |
 | `id` | ID! | ID of the milestone |
+| `projectMilestone` | Boolean! | Indicates if milestone is at project level |
 | `startDate` | Time | Timestamp of the milestone start date |
 | `state` | MilestoneStateEnum! | State of the milestone |
+| `subgroupMilestone` | Boolean! | Indicates if milestone is at subgroup level |
 | `title` | String! | Title of the milestone |
 | `updatedAt` | Time! | Timestamp of last milestone update |
 | `webPath` | String! | Web path of the milestone |

@@ -608,6 +608,7 @@ describe('Roadmap Vuex Actions', () => {
         state: mockState.milestonessState,
         startDate: '2017-11-1',
         dueDate: '2018-6-30',
+        includeDescendants: true,
       };
     });
 

@@ -267,6 +267,7 @@ export const fetchGroupMilestones = (
       presetType,
       timeframe: defaultTimeframe || timeframe,
     }),
+    includeDescendants: true,
     ...filterParams,
   };
 
