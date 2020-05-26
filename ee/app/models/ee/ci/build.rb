@@ -37,15 +37,7 @@ module EE
       end
 
       def shared_runners_minutes_limit_enabled?
-        if ::Feature.enabled?(:ci_minutes_track_for_public_projects, project.shared_runners_limit_namespace, default_enabled: true)
-          project.shared_runners_minutes_limit_enabled? && runner&.minutes_cost_factor(project.visibility_level)&.positive?
-        else
-          legacy_shared_runners_minutes_limit_enabled?
-        end
-      end
-
-      def legacy_shared_runners_minutes_limit_enabled?
-        runner && runner.instance_type? && project.shared_runners_minutes_limit_enabled?
+        project.shared_runners_minutes_limit_enabled? && runner&.minutes_cost_factor(project.visibility_level)&.positive?
       end
 
       def stick_build_if_status_changed

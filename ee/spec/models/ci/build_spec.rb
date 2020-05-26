@@ -80,14 +80,6 @@ describe Ci::Build do
     end
 
     it_behaves_like 'depends on runner presence and type'
-
-    context 'and :ci_minutes_track_for_public_projects FF is disabled' do
-      before do
-        stub_feature_flags(ci_minutes_track_for_public_projects: false)
-      end
-
-      it_behaves_like 'depends on runner presence and type'
-    end
   end
 
   context 'updates pipeline minutes' do

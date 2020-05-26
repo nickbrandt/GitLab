@@ -28,11 +28,7 @@ module EE
       def builds_for_shared_runner
         return super unless shared_runner_build_limits_feature_enabled?
 
-        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects, default_enabled: true)
-          enforce_minutes_based_on_cost_factors(super)
-        else
-          legacy_enforce_minutes_for_non_public_projects(super)
-        end
+        enforce_minutes_based_on_cost_factors(super)
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
@@ -43,15 +39,6 @@ module EE
         enforce_limits_relation = ::Ci::Build.where('EXISTS (?)', builds_check_limit)
 
         relation.merge(visibility_relation.or(enforce_limits_relation))
-      end
-      # rubocop: enable CodeReuse/ActiveRecord
-
-      # rubocop: disable CodeReuse/ActiveRecord
-      def legacy_enforce_minutes_for_non_public_projects(relation)
-        # select projects which have allowed number of shared runner minutes or are public
-        relation
-          .where("projects.visibility_level=? OR (#{builds_check_limit.to_sql})=1", # rubocop:disable GitlabSecurity/SqlInjection
-                ::Gitlab::VisibilityLevel::PUBLIC)
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
