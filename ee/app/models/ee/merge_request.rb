@@ -124,10 +124,6 @@ module EE
       project.feature_available?(:multiple_merge_request_assignees)
     end
 
-    def supports_weight?
-      false
-    end
-
     def visible_blocking_merge_requests(user)
       Ability.merge_requests_readable_by_user(blocking_merge_requests, user)
     end
