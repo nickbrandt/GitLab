@@ -217,6 +217,10 @@ describe Issues::UpdateService do
       let(:execute) { update_issue(params) }
       let(:issue_id) { execute&.id }
 
+      before do
+        create(:status_page_published_incident, issue: issue)
+      end
+
       context 'when update succeeds' do
         let(:params) { { title: 'New title' } }
 

@@ -12,13 +12,6 @@ module EE
         super
       end
 
-      override :after_create
-      def after_create(issue)
-        super
-
-        StatusPage.trigger_publish(project, current_user, issue)
-      end
-
       def handle_issue_epic_link(issue)
         return unless params.key?(:epic)
 

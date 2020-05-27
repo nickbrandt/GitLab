@@ -10,9 +10,9 @@
 #
 #     finder = StatusPage::IncidentsFinder.new(project_id: project_id)
 #
-#     # A single issue which includes confidential issues by default)
+#     # A single issue which includes unpublished issues by default)
 #     issue = finder.find_by_id(issue_id)
-#     # Find a "public only" issue
+#     # Find a published issue
 #     issue = finder.find_by_id(issue_id, include_nonpublished: false)
 #
 #     # Most recent 20 non-confidential issues
@@ -53,7 +53,7 @@ module StatusPage
     end
 
     def published_only(issues)
-      issues.public_only
+      issues.on_status_page
     end
 
     def by_project(issues)

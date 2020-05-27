@@ -90,24 +90,14 @@ describe Issue do
     end
 
     describe '.on_status_page' do
-      context 'with public issue and private issue' do
-        let_it_be(:status_page_setting) { create(:status_page_setting, enabled: true) }
-        let_it_be(:public_issue) { create(:issue, project: status_page_setting.project) }
-        let_it_be(:private_issue) { create(:issue, :confidential, project: status_page_setting.project) }
+      let_it_be(:status_page_setting) { create(:status_page_setting, :enabled) }
+      let_it_be(:project) { status_page_setting.project }
+      let_it_be(:published_issue) { create(:issue, :published, project: project) }
+      let_it_be(:confidential_issue) { create(:issue, :published, :confidential, project: project) }
+      let_it_be(:nonpublished_issue) { create(:issue, project: project) }
 
-        it { expect(Issue.on_status_page.count).to eq(1) }
-        it { expect(Issue.on_status_page.first).to eq(public_issue) }
-      end
-
-      context 'with project status page settings enabled and disabled' do
-        let_it_be(:status_page_setting_enabled) { create(:status_page_setting, enabled: true) }
-        let_it_be(:status_page_setting_disabled) { create(:status_page_setting, enabled: false) }
-        let_it_be(:issue_with_enabled_project) { create(:issue, project: status_page_setting_enabled.project) }
-        let_it_be(:issue_with_disabled_project) { create(:issue, project: status_page_setting_disabled.project) }
-
-        it { expect(Issue.on_status_page.count).to eq(1) }
-        it { expect(Issue.on_status_page.first).to eq(issue_with_enabled_project) }
-      end
+      it { expect(Issue.on_status_page.count).to eq(1) }
+      it { expect(Issue.on_status_page.first).to eq(published_issue) }
     end
 
     context 'epics' do

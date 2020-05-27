@@ -40,7 +40,7 @@ module StatusPage
     end
 
     def unpublish_details?
-      issue.confidential?
+      issue.confidential? || !issue.status_page_published_incident
     end
 
     def process_list

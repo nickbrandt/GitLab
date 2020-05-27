@@ -134,6 +134,24 @@ module EE
 
             ::IterationsFinder.new(params.merge(project_ids: [project.id], group_ids: group_ids)).execute
           end
+
+          desc _('Publish to status page')
+          explanation _('Publishes this issue to the associated status page.')
+          types Issue
+          condition do
+            StatusPage::MarkForPublicationService.publishable?(project, current_user, quick_action_target)
+          end
+          command :publish do
+            if StatusPage.mark_for_publication(project, current_user, quick_action_target).success?
+              # Ideally, we want to use `StatusPage.trigger_publish` instead of dispatching a worker.
+              # See https://gitlab.com/gitlab-org/gitlab/-/issues/219266
+              StatusPage::PublishWorker.perform_async(current_user.id, project.id, quick_action_target.id)
+
+              @execution_message[:publish] = _('Issue published on status page.')
+            else
+              @execution_message[:publish] = _('Failed to publish issue on status page.')
+            end
+          end
         end
       end
     end
