@@ -76,7 +76,7 @@ For example, the following metadata would be at the beginning of a product
 documentation page whose content is primarily associated with the Audit Events
 feature:
 
-```md
+```yaml
 ---
 stage: Monitor
 group: APM
