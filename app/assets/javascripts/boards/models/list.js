@@ -201,16 +201,7 @@ class List {
   }
 
   removeIssue(removeIssue) {
-    this.issues = this.issues.filter(issue => {
-      const matchesRemove = removeIssue.id === issue.id;
-
-      if (matchesRemove) {
-        this.issuesSize -= 1;
-        issue.removeLabel(this.label);
-      }
-
-      return !matchesRemove;
-    });
+    return boardsStore.removeListIssues(this, removeIssue);
   }
 
   getTypeInfo(type) {
