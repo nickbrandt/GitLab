@@ -109,7 +109,7 @@ module Gitlab
           object = object.sync if object.respond_to?(:sync)
 
           authorizations.all? do |authorization|
-            if authorization.class.method_defined?(:call)
+            if authorization.is_a?(Proc)
               authorization.call(object, current_user) == true
             else
               Ability.allowed?(current_user, authorization, object)
