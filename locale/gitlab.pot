@@ -2219,9 +2219,6 @@ msgstr ""
 msgid "An error occurred while loading chart data"
 msgstr ""
 
-msgid "An error occurred while loading clusters"
-msgstr ""
-
 msgid "An error occurred while loading commit signatures"
 msgstr ""
 
@@ -5415,6 +5412,9 @@ msgid "ClusterIntergation|Select key pair"
 msgstr ""
 
 msgid "ClusterIntergation|Select service role"
+msgstr ""
+
+msgid "Clusters|An error occurred while loading clusters"
 msgstr ""
 
 msgid "Code"
