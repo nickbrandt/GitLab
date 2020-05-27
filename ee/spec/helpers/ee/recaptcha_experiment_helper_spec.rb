@@ -44,7 +44,7 @@ describe RecaptchaExperimentHelper, type: :helper do
         with_them do
           before do
             # Enable feature to 50% of actors
-            Feature.get(feature_name).enable_percentage_of_actors(50)
+            Feature.enable_percentage_of_actors(feature_name, 50)
           end
 
           it "returns expected_result" do

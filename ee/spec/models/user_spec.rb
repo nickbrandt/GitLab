@@ -977,7 +977,7 @@ describe User do
           end
 
           it 'returns true when 100% control percentage is provided' do
-            Feature.get(:discover_security_control).enable_percentage_of_time(100)
+            Feature.enable_percentage_of_time(:discover_security_control, 100)
 
             expect(experiment_user.ab_feature_enabled?(:discover_security)).to eq(true)
             expect(experiment_user.user_preference.feature_filter_type).to eq(UserPreference::FEATURE_FILTER_EXPERIMENT)

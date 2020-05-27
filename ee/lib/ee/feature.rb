@@ -29,6 +29,30 @@ module EE
         log_geo_event(key)
       end
 
+      override :enable_percentage_of_time
+      def enable_percentage_of_time(key, percentage)
+        super
+        log_geo_event(key)
+      end
+
+      override :disable_percentage_of_time
+      def disable_percentage_of_time(key)
+        super
+        log_geo_event(key)
+      end
+
+      override :enable_percentage_of_actors
+      def enable_percentage_of_actors(key, percentage)
+        super
+        log_geo_event(key)
+      end
+
+      override :disable_percentage_of_actors
+      def disable_percentage_of_actors(key)
+        super
+        log_geo_event(key)
+      end
+
       private
 
       def log_geo_event(key)

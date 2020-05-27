@@ -55,8 +55,8 @@ describe OnboardingExperimentHelper, type: :helper do
 
           context 'and experiment_growth_onboarding has been set' do
             it 'checks if feature is enabled for current_user' do
-              feature = Feature.get(described_class::EXPERIMENT_GROWTH_ONBOARDING_FEATURE_NAME)
-              feature.enable_percentage_of_actors(50)
+              Feature.enable_percentage_of_actors(
+                described_class::EXPERIMENT_GROWTH_ONBOARDING_FEATURE_NAME, 50)
 
               expect(helper.allow_access_to_onboarding?).to eq(true)
             end
