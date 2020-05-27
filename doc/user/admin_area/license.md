@@ -118,10 +118,9 @@ wish to use paid features on GitLab.com, a separate subscription may be
 
 ### Users exceed license limit upon renewal
 
-If you've added new users to your GitLab instance prior to renewal you may need to 
+If you've added new users to your GitLab instance prior to renewal you may need to
 purchase additional seats to cover those users. If this is the case and a license
 without enough users is uploaded a message is displayed prompting you to purchase
 additional users. More information on how to determine the required number of users
 and how to add additional seats can be found in the
 [licensing FAQ](https://about.gitlab.com/pricing/licensing-faq/).
-
