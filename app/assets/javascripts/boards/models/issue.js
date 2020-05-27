@@ -36,7 +36,7 @@ class ListIssue {
   }
 
   findLabel(findLabel) {
-    return this.labels.find(label => label.id === findLabel.id);
+    return boardsStore.findIssueLabel(this, findLabel);
   }
 
   removeLabel(removeLabel) {
