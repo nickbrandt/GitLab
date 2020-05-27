@@ -607,6 +607,15 @@ const boardsStore = {
     });
   },
 
+  newListIssue(list, issue) {
+    list.addIssue(issue, null, 0);
+    list.issuesSize += 1;
+
+    return this.newIssue(list.id, issue)
+      .then(res => res.data)
+      .then(data => list.onNewIssueResponse(issue, data));
+  },
+
   getBacklog(data) {
     return axios.get(
       mergeUrlParams(
