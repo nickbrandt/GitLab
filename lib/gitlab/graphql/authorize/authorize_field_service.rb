@@ -110,23 +110,12 @@ module Gitlab
 
           authorizations.all? do |authorization|
             if authorization.class.method_defined?(:call)
-              call_custom_authorization(authorization, object, current_user)
+              authorization.call(object, current_user) == true
             else
               Ability.allowed?(current_user, authorization, object)
             end
           end
         end
-
-        def call_custom_authorization(authorization, object, current_user)
-          case authorization.arity
-          when 0
-            authorization.call
-          when 1
-            authorization.call(object)
-          when 2
-            authorization.call(object, current_user)
-          else
-            raise InvalidAuthorizationArity, 'The custom auth proc may only take up to 2 arguments: |object, current_user|'
           end
         end
 
