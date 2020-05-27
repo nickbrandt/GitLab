@@ -133,6 +133,10 @@ const boardsStore = {
       path: '',
     });
   },
+
+  findIssueLabel(issue, findLabel) {
+    return issue.labels.find(label => label.id === findLabel.id);
+  },
   addListIssue(list, issue, listFrom, newIndex) {
     let moveBeforeId = null;
     let moveAfterId = null;
