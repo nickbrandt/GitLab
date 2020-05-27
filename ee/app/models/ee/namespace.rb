@@ -153,7 +153,7 @@ module EE
           subscription = find_or_create_subscription
           subscription&.hosted_plan
         end
-      end || super
+      end || fallback_plan
     end
 
     def closest_gitlab_subscription
@@ -324,6 +324,14 @@ module EE
     end
 
     private
+
+    def fallback_plan
+      if ::Gitlab.com?
+        ::Plan.free
+      else
+        ::Plan.default
+      end
+    end
 
     def validate_shared_runner_minutes_support
       return if shared_runner_minutes_supported?
