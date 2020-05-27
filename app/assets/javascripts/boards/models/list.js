@@ -182,7 +182,7 @@ class List {
   }
 
   findIssue(id) {
-    return this.issues.find(issue => issue.id === id);
+    return boardsStore.findListIssue(this, id);
   }
 
   removeMultipleIssues(removeIssues) {

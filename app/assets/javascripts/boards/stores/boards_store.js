@@ -177,6 +177,10 @@ const boardsStore = {
       }
     }
   },
+  findListIssue(list, id) {
+    return list.issues.find(issue => issue.id === id);
+  },
+
   welcomeIsHidden() {
     return parseBoolean(Cookies.get('issue_board_welcome_hidden'));
   },
