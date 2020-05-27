@@ -6,11 +6,6 @@ module EE
   module NotificationService
     extend ::Gitlab::Utils::Override
 
-    # Notify users on new review in system
-    def new_review(review)
-      send_new_review_notification(review)
-    end
-
     # When we add approvers to a merge request we should send an email to:
     #
     #  * the new approvers
@@ -70,14 +65,6 @@ module EE
     end
 
     private
-
-    def send_new_review_notification(review)
-      recipients = ::NotificationRecipients::BuildService.build_new_review_recipients(review)
-
-      recipients.each do |recipient|
-        mailer.new_review_email(recipient.user.id, review.id).deliver_later
-      end
-    end
 
     def add_mr_approvers_email(merge_request, approvers, current_user)
       approvers.each do |approver|

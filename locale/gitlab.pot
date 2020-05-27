@@ -13495,6 +13495,9 @@ msgstr ""
 msgid "Merge request %{iid} authored by %{authorName}"
 msgstr ""
 
+msgid "Merge request %{mr_link} was reviewed by %{mr_author}"
+msgstr ""
+
 msgid "Merge request approvals"
 msgstr ""
 
