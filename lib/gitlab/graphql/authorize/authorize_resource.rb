@@ -69,7 +69,7 @@ module Gitlab
             # The actions could be performed across multiple objects. In which
             # case the current user is common, and we could benefit from the
             # caching in `DeclarativePolicy`.
-            if authorization.class.method_defined?(:call)
+            if authorization.is_a?(Proc)
               call_custom_authorization(authorization, object)
             else
               Ability.allowed?(current_user, authorization, object, scope: :user)
