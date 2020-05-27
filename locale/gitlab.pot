@@ -8981,6 +8981,9 @@ msgstr ""
 msgid "Expand up"
 msgstr ""
 
+msgid "Experienced"
+msgstr ""
+
 msgid "Expiration"
 msgstr ""
 
@@ -12200,6 +12203,12 @@ msgstr ""
 msgid "Iteration|cannot be more than 500 years in the future"
 msgstr ""
 
+msgid "I’m familiar with the basics of project management and DevOps."
+msgstr ""
+
+msgid "I’m not very familiar with the basics of project management and DevOps."
+msgstr ""
+
 msgid "Jaeger URL"
 msgstr ""
 
@@ -14778,6 +14787,9 @@ msgid "Nov"
 msgstr ""
 
 msgid "November"
+msgstr ""
+
+msgid "Novice"
 msgstr ""
 
 msgid "Now you can access the merge request navigation tabs at the top, where they’re easier to find."
@@ -19830,7 +19842,13 @@ msgstr ""
 msgid "Show latest version"
 msgstr ""
 
+msgid "Show me everything"
+msgstr ""
+
 msgid "Show me how"
+msgstr ""
+
+msgid "Show me more advanced stuff"
 msgstr ""
 
 msgid "Show only direct members"
@@ -24607,10 +24625,19 @@ msgstr ""
 msgid "Welcome to the Guided GitLab Tour"
 msgstr ""
 
+msgid "Welcome to the guided GitLab tour"
+msgstr ""
+
 msgid "Welcome to your Issue Board!"
 msgstr ""
 
 msgid "What are you searching for?"
+msgstr ""
+
+msgid "What describes you best?"
+msgstr ""
+
+msgid "What’s your experience level?"
 msgstr ""
 
 msgid "When a deployment job is successful, skip older deployment jobs that are still pending"
