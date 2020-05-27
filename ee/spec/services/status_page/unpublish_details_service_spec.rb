@@ -27,6 +27,10 @@ describe StatusPage::UnpublishDetailsService do
 
       allow(project).to receive(:status_page_setting)
         .and_return(status_page_setting)
+
+      allow(StatusPage::PublishedIncident).to receive(:find_by)
+        .with(issue: issue)
+        .and_return(nil)
     end
 
     context 'when deletion succeeds' do
@@ -45,6 +49,12 @@ describe StatusPage::UnpublishDetailsService do
       it 'returns service success' do
         expect(result).to be_success
         expect(result.payload).to eq(object_key: key)
+      end
+
+      it 'untracks the issue' do
+        expect(StatusPage::PublishedIncident).to receive(:untrack).with(issue)
+
+        result
       end
     end
 

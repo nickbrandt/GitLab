@@ -9244,6 +9244,9 @@ msgstr ""
 msgid "Failed to protect the environment"
 msgstr ""
 
+msgid "Failed to publish issue on status page."
+msgstr ""
+
 msgid "Failed to remove a Zoom meeting"
 msgstr ""
 
@@ -12086,6 +12089,9 @@ msgid "Issue label"
 msgstr ""
 
 msgid "Issue or Merge Request ID is required"
+msgstr ""
+
+msgid "Issue published on status page."
 msgstr ""
 
 msgid "Issue template (optional)"
@@ -17566,6 +17572,12 @@ msgid "Public pipelines"
 msgstr ""
 
 msgid "Public projects Minutes cost factor"
+msgstr ""
+
+msgid "Publish to status page"
+msgstr ""
+
+msgid "Publishes this issue to the associated status page."
 msgstr ""
 
 msgid "Pull"

@@ -26,7 +26,7 @@ module EE
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)
       end
-      scope :on_status_page, -> { joins(project: :status_page_setting).where(status_page_settings: { enabled: true }).public_only }
+      scope :on_status_page, -> { joins(:status_page_published_incident).public_only }
       scope :counts_by_health_status, -> { reorder(nil).group(:health_status).count }
       scope :with_health_status, -> { where.not(health_status: nil) }
 

@@ -67,6 +67,7 @@ module StatusPage
 
       return if changes.none?
       return if issue.confidential? && changes.exclude?('confidential')
+      return unless issue.status_page_published_incident
 
       issue.id
     end

@@ -5,7 +5,7 @@ require 'spec_helper'
 describe StatusPage::PublishService do
   let_it_be(:user) { create(:user) }
   let_it_be(:project, refind: true) { create(:project) }
-  let_it_be(:issue) { create(:issue, project: project) }
+  let_it_be(:issue) { create(:issue, :published, project: project) }
   let_it_be(:settings) { create(:status_page_setting, :enabled, project: project) }
   let(:user_can_publish) { true }
 
