@@ -201,7 +201,6 @@ describe Banzai::Filter::IterationReferenceFilter do
     it 'points to referenced project iteration page' do
       expect(result.css('a').first.attr('href'))
         .to eq(urls.project_iteration_url(another_project, iteration))
-                                                         .project_iteration_url(another_project, iteration)
     end
 
     it 'link has valid text' do
