@@ -18,9 +18,6 @@ export default {
   [types.RECEIVE_ADD_PROJECTS_SUCCESS](state) {
     state.isAddingProjects = false;
   },
-  [types.RECEIVE_ADD_PROJECTS_ERROR](state) {
-    state.isAddingProjects = false;
-  },
   [types.REQUEST_REMOVE_PROJECT](state) {
     state.isRemovingProject = true;
   },

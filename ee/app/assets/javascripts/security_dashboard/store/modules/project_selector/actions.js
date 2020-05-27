@@ -42,7 +42,7 @@ export const addProjects = ({ state, dispatch }) => {
   const addProjectsPromises = state.selectedProjects.map(p => {
     return vuexApolloClient
       .mutate({ mutation: addProjectToSecurityDashboard, variables: { id: p.id } })
-      .catch(() => dispatch('receiveAddProjectsError'));
+      .catch(() => {});
   });
 
   return Promise.all(addProjectsPromises)
@@ -95,12 +95,6 @@ export const receiveAddProjectsSuccess = ({ commit, dispatch, state }, data) => 
   if (added.length) {
     dispatch('fetchProjects');
   }
-};
-
-export const receiveAddProjectsError = ({ commit }) => {
-  commit(types.RECEIVE_ADD_PROJECTS_ERROR);
-
-  createFlash(__('Something went wrong, unable to add projects to dashboard'));
 };
 
 export const fetchProjects = ({ dispatch }) => {

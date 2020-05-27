@@ -77,16 +77,6 @@ describe('EE projectsSelector mutations', () => {
     });
   });
 
-  describe('RECEIVE_ADD_PROJECTS_ERROR', () => {
-    it('sets "isAddingProjects" to be true', () => {
-      state.isAddingProjects = true;
-
-      mutations[types.RECEIVE_ADD_PROJECTS_ERROR](state);
-
-      expect(state.isAddingProjects).toBe(false);
-    });
-  });
-
   describe('REQUEST_REMOVE_PROJECT', () => {
     it('sets "isRemovingProjects" to be true', () => {
       state.isRemovingProject = false;

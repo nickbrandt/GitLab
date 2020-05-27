@@ -121,7 +121,6 @@ describe('EE projectSelector actions', () => {
         [],
         [
           { type: 'requestAddProjects' },
-          { type: 'receiveAddProjectsError' },
           {
             type: 'receiveAddProjectsSuccess',
             payload: { added: [], invalid: ['1'] },
@@ -232,30 +231,6 @@ describe('EE projectSelector actions', () => {
           `Unable to add ${invalidProject1.name}, ${invalidProject2.name}, and ${invalidProject3.name}`,
         );
       });
-    });
-  });
-
-  describe('receiveAddProjectsError', () => {
-    it('commits RECEIVE_ADD_PROJECTS_ERROR', () =>
-      testAction(
-        actions.receiveAddProjectsError,
-        null,
-        state,
-        [
-          {
-            type: types.RECEIVE_ADD_PROJECTS_ERROR,
-          },
-        ],
-        [],
-      ));
-
-    it('shows error message', () => {
-      actions.receiveAddProjectsError(mockDispatchContext);
-
-      expect(createFlash).toHaveBeenCalledTimes(1);
-      expect(createFlash).toHaveBeenCalledWith(
-        'Something went wrong, unable to add projects to dashboard',
-      );
     });
   });
 
