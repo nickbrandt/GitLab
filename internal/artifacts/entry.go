@@ -112,7 +112,9 @@ func waitCatFile(cmd *exec.Cmd) error {
 		return nil
 	}
 
-	if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusEntryNotFound {
+	st, ok := helper.ExitStatus(err)
+
+	if ok && (st == zipartifacts.CodeArchiveNotFound || st == zipartifacts.CodeEntryNotFound) {
 		return os.ErrNotExist
 	}
 	return fmt.Errorf("wait for %v to finish: %v", cmd.Args, err)

@@ -3,6 +3,7 @@ package main
 import (
 	"archive/zip"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -42,7 +43,7 @@ func main() {
 
 	fileName, err := zipartifacts.DecodeFileEntry(encodedFileName)
 	if err != nil {
-		fatalError(fmt.Errorf("decode entry %q: %v", encodedFileName, err))
+		fatalError(fmt.Errorf("decode entry %q", encodedFileName), err)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -50,30 +51,26 @@ func main() {
 
 	archive, err := zipartifacts.OpenArchive(ctx, archivePath)
 	if err != nil {
-		oaError := fmt.Errorf("OpenArchive: %v", err)
-		if err == zipartifacts.ErrArchiveNotFound {
-			notFoundError(oaError)
-		}
-		fatalError(oaError)
+		fatalError(errors.New("open archive"), err)
 	}
 
 	file := findFileInZip(fileName, archive)
 	if file == nil {
-		notFoundError(fmt.Errorf("find %q in %q: not found", fileName, scrubbedArchivePath))
+		fatalError(fmt.Errorf("find %q in %q: not found", fileName, scrubbedArchivePath), zipartifacts.ErrorCode[zipartifacts.CodeEntryNotFound])
 	}
 	// Start decompressing the file
 	reader, err := file.Open()
 	if err != nil {
-		fatalError(fmt.Errorf("open %q in %q: %v", fileName, scrubbedArchivePath, err))
+		fatalError(fmt.Errorf("open %q in %q", fileName, scrubbedArchivePath), err)
 	}
 	defer reader.Close()
 
 	if _, err := fmt.Printf("%d\n", file.UncompressedSize64); err != nil {
-		fatalError(fmt.Errorf("write file size: %v", err))
+		fatalError(fmt.Errorf("write file size invalid"), err)
 	}
 
 	if _, err := io.Copy(os.Stdout, reader); err != nil {
-		fatalError(fmt.Errorf("write %q from %q to stdout: %v", fileName, scrubbedArchivePath, err))
+		fatalError(fmt.Errorf("write %q from %q to stdout", fileName, scrubbedArchivePath), err)
 	}
 }
 
@@ -86,16 +83,14 @@ func findFileInZip(fileName string, archive *zip.Reader) *zip.File {
 	return nil
 }
 
-func printError(err error) {
-	fmt.Fprintf(os.Stderr, "%s: %v", progName, err)
-}
+func fatalError(contextErr error, statusErr error) {
+	code := zipartifacts.ExitCodeByError(statusErr)
 
-func fatalError(err error) {
-	printError(err)
-	os.Exit(1)
-}
+	fmt.Fprintf(os.Stderr, "%s error: %v - %v, code: %d\n", progName, statusErr, contextErr, code)
 
-func notFoundError(err error) {
-	printError(err)
-	os.Exit(zipartifacts.StatusEntryNotFound)
+	if code > 0 {
+		os.Exit(code)
+	} else {
+		os.Exit(1)
+	}
 }

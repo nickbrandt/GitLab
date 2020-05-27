@@ -1,5 +1,11 @@
 # Changelog for gitlab-workhorse
 
+## v8.32.1
+
+### Security
+- Limit memory footprint of a command that generates ZIP artifacts metadata
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
+
 ## v8.32.0
 
 ### Added
@@ -7,6 +13,12 @@
   https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/492
 - Delay PostUploadPack response until request is fully read
   https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/494  
+
+## v8.31.1
+
+### Security
+- Limit memory footprint of a command that generates ZIP artifacts metadata
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
 
 ## v8.31.0
 
@@ -17,6 +29,12 @@
 ### Other
 - Add automatic changelog generation
   https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/484
+
+## v8.30.2
+
+### Security
+- Limit memory footprint of a command that generates ZIP artifacts metadata
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
 
 v 8.30.1
 
@@ -42,6 +60,16 @@ v 8.27.0
 v 8.26.0
 
 - Add route for project imports direct upload via UI !470
+
+## v8.25.3
+
+### Security
+- Limit memory footprint of a command that generates ZIP artifacts metadata
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
+
+### Other
+- Add automatic changelog generation
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/484
 
 v 8.25.2
 
