@@ -50,7 +50,7 @@ describe ::Packages::Detail::PackagePresenter do
 
   context 'detail_view' do
     context 'with build_info' do
-      let!(:package) { create(:npm_package, :with_build, project: project) }
+      let_it_be(:package) { create(:npm_package, :with_build, project: project) }
 
       it 'returns details with pipeline' do
         expected_package_details[:pipeline] = pipeline_info
@@ -60,7 +60,7 @@ describe ::Packages::Detail::PackagePresenter do
     end
 
     context 'without build info' do
-      let!(:package) { create(:npm_package, project: project) }
+      let_it_be(:package) { create(:npm_package, project: project) }
 
       it 'returns details without pipeline' do
         expect(presenter.detail_view).to eq expected_package_details
@@ -77,44 +77,24 @@ describe ::Packages::Detail::PackagePresenter do
         expect(presenter.detail_view).to eq expected_package_details
       end
     end
-  end
 
-  it 'build_package_file_view returns correct file data' do
-    package_files_result = package.package_files.map { |pf| presenter.build_package_file_view(pf) }
+    context 'with dependency_links' do
+      let_it_be(:package) { create(:nuget_package, project: project) }
+      let_it_be(:dependency_link) { create(:packages_dependency_link, package: package) }
+      let_it_be(:nuget_dependency) { create(:nuget_dependency_link_metadatum, dependency_link: dependency_link) }
+      let_it_be(:expected_link) do
+        {
+          name: dependency_link.dependency.name,
+          version_pattern: dependency_link.dependency.version_pattern,
+          target_framework: nuget_dependency.target_framework
+        }
+      end
 
-    expect(package_files_result).to eq expected_package_files
-  end
+      it 'returns the correct dependency link' do
+        expected_package_details[:dependency_links] = [expected_link]
 
-  context 'build_pipeline_info' do
-    it 'returns correct data when there is pipeline_info' do
-      expect(presenter.build_pipeline_info(package.build_info.pipeline)).to eq pipeline_info
-    end
-  end
-
-  context 'build_user_info' do
-    it 'returns correct data when there is a user' do
-      expect(presenter.build_user_info(package.build_info.pipeline.user)).to eq user_info
-    end
-
-    it 'returns nil when there is not a user' do
-      expect(presenter.build_user_info(nil)).to eq nil
-    end
-  end
-
-  context 'build_dependency_links' do
-    let_it_be(:package) { create(:nuget_package, project: project) }
-    let_it_be(:dependency_link) { create(:packages_dependency_link, package: package) }
-    let_it_be(:nuget_dependency) { create(:nuget_dependency_link_metadatum, dependency_link: dependency_link) }
-    let_it_be(:expected_link) do
-      {
-        name: dependency_link.dependency.name,
-        version_pattern: dependency_link.dependency.version_pattern,
-        target_framework: nuget_dependency.target_framework
-      }
-    end
-
-    it 'returns correct dependency data for nuget packages' do
-      expect(presenter.build_dependency_links(dependency_link)).to eq expected_link
+        expect(presenter.detail_view).to eq expected_package_details
+      end
     end
   end
 end

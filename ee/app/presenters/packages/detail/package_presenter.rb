@@ -22,11 +22,13 @@ module Packages
 
         package_detail[:maven_metadatum] = @package.maven_metadatum if @package.maven_metadatum
         package_detail[:nuget_metadatum] = @package.nuget_metadatum if @package.nuget_metadatum
-        package_detail[:dependency_links] = @package.dependency_links.map { |dl| build_dependency_links(dl) } if @package.dependency_links
+        package_detail[:dependency_links] = @package.dependency_links.map { |dl| build_dependency_links(dl) }
         package_detail[:pipeline] = build_pipeline_info(@package.build_info.pipeline) if @package.build_info
 
         package_detail
       end
+
+      private
 
       def build_package_file_view(package_file)
         {
@@ -65,8 +67,8 @@ module Packages
         {
           name: link.dependency.name,
           version_pattern: link.dependency.version_pattern,
-          target_framework: link.nuget_metadatum.target_framework
-        }
+          target_framework: link.nuget_metadatum&.target_framework
+        }.compact
       end
     end
   end
