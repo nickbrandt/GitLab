@@ -29,7 +29,7 @@ module EE
           end
 
           params :optional_update_params_ee do
-            optional :mirror_user_id, type: Integer, desc: 'User responsible for all the activity surrounding a pull mirror event'
+            optional :mirror_user_id, type: Integer, desc: 'User responsible for all the activity surrounding a pull mirror event. Can only be set by admins'
             optional :only_mirror_protected_branches, type: Grape::API::Boolean, desc: 'Only mirror protected branches'
             optional :mirror_overwrites_diverged_branches, type: Grape::API::Boolean, desc: 'Pull mirror overwrites diverged branches'
             optional :import_url, type: String, desc: 'URL from which the project is imported'

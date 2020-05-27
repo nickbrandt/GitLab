@@ -6,6 +6,9 @@ describe API::Scim do
   let(:user) { create(:user) }
   let(:scim_token) { create(:scim_oauth_access_token, group: group) }
 
+  let_it_be(:password) { 'secret_pass' }
+  let_it_be(:access_token) { 'secret_token' }
+
   before do
     stub_licensed_features(group_allowed_email_domains: true, group_saml: true)
 
@@ -23,6 +26,16 @@ describe API::Scim do
 
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
+    end
+  end
+
+  shared_examples 'filtered params in errors' do
+    it 'does not expose the password in error response' do
+      expect(json_response.fetch('detail')).to include("\"password\"=>\"[FILTERED]\"")
+    end
+
+    it 'does not expose the access token in error response' do
+      expect(json_response.fetch('detail')).to include("\"access_token\"=>\"[FILTERED]\"")
     end
   end
 
@@ -102,8 +115,22 @@ describe API::Scim do
           emails: [
             { primary: true, type: 'work', value: 'work@example.com' }
           ],
-          name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' }
+          name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' },
+          access_token: access_token,
+          password: password
         }.to_query
+      end
+
+      context 'when a provisioning error occurs' do
+        before do
+          allow_next_instance_of(::EE::Gitlab::Scim::ProvisioningService) do |instance|
+            allow(instance).to receive(:execute).and_return(::EE::Gitlab::Scim::ProvisioningResponse.new(status: :error))
+          end
+
+          post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+        end
+
+        it_behaves_like 'filtered params in errors'
       end
 
       context 'without an existing user' do
@@ -319,7 +346,9 @@ describe API::Scim do
           active: nil,
           userName: 'username',
           emails: [{ primary: true, type: 'work', value: 'work@example.com' }],
-          name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' }
+          name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' },
+          access_token: access_token,
+          password: password
         }.to_query
       end
       context 'without an existing user' do
@@ -341,7 +370,7 @@ describe API::Scim do
         end
       end
 
-      context 'existing user' do
+      context 'existing user with group saml identity' do
         before do
           old_user = create(:user, email: 'work@example.com')
 
@@ -358,6 +387,20 @@ describe API::Scim do
         it 'has the user external ID' do
           expect(json_response['id']).to eq('test_uid')
         end
+      end
+
+      context 'existing user without a group saml identity' do
+        before do
+          create(:user, email: 'work@example.com')
+
+          post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+        end
+
+        it 'responds with 409' do
+          expect(response).to have_gitlab_http_status(:conflict)
+        end
+
+        it_behaves_like 'filtered params in errors'
       end
     end
 
