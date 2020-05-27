@@ -12340,6 +12340,9 @@ msgstr ""
 msgid "Jira project: %{importProject}"
 msgstr ""
 
+msgid "Jira service not configured."
+msgstr ""
+
 msgid "JiraService| on branch %{branch_link}"
 msgstr ""
 
