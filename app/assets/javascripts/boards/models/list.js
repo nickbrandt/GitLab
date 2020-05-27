@@ -93,10 +93,7 @@ class List {
   }
 
   update() {
-    const collapsed = !this.isExpanded;
-    return boardsStore.updateList(this.id, this.position, collapsed).catch(() => {
-      // TODO: handle request error
-    });
+    return boardsStore.updateListFunc(this);
   }
 
   nextPage() {
