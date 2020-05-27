@@ -26,7 +26,7 @@ module EE
               authorize! :admin_project, user_project
               check_audit_events_available!(user_project)
             end
-  
+
             desc 'Get a list of audit events in this project.' do
               success EE::API::Entities::AuditEvent
             end
@@ -37,7 +37,6 @@ module EE
               use :pagination
             end
             get '/' do
-
               level = ::Gitlab::Audit::Levels::Project.new(project: user_project)
               audit_events = AuditLogFinder.new(
                 level: level,
@@ -46,7 +45,7 @@ module EE
 
               present paginate(audit_events), with: EE::API::Entities::AuditEvent
             end
-  
+
             desc 'Get a specific audit event in this project.' do
               success EE::API::Entities::AuditEvent
             end
@@ -59,7 +58,6 @@ module EE
               # rubocop: enable CodeReuse/ActiveRecord
 
               present audit_event, with: EE::API::Entities::AuditEvent
-
             end
           end
         end
