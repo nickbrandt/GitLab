@@ -537,6 +537,13 @@ const boardsStore = {
     });
   },
 
+  updateListFunc(list) {
+    const collapsed = !list.isExpanded;
+    return this.updateList(list.id, list.position, collapsed).catch(() => {
+      // TODO: handle request error
+    });
+  },
+
   destroyList(id) {
     return axios.delete(`${this.state.endpoints.listsEndpoint}/${id}`);
   },
