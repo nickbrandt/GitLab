@@ -60,7 +60,7 @@ export default {
         'd-flex': this.tagCount === 1,
         'd-md-flex': this.tagCount > 1,
         'append-right-4': index !== this.tagsToRender.length - 1,
-        'prepend-left-8': !this.hideLabel && index === 0,
+        'gl-ml-3': !this.hideLabel && index === 0,
       };
     },
   },

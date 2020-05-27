@@ -29,7 +29,7 @@ export default {
       <span>{{ __('Edit') }}</span>
     </gl-deprecated-button>
     <gl-deprecated-button
-      class="prepend-left-8 btn btn-inverted"
+      class="gl-ml-3 btn btn-inverted"
       variant="danger"
       @click="requestDeleteRule(rule)"
     >
