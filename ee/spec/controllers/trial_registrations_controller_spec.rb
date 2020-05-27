@@ -71,10 +71,10 @@ describe TrialRegistrationsController do
         allow(Gitlab).to receive(:com?).and_return(true)
       end
 
-      it 'marks the account as confirmed' do
+      it 'marks the account as unconfirmed' do
         post :create, params: { user: user_params }
 
-        expect(User.last).to be_confirmed
+        expect(User.last).not_to be_confirmed
       end
 
       context 'derivation of name' do

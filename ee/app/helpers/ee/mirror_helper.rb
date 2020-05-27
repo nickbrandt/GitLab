@@ -29,7 +29,7 @@ module EE
     end
 
     def options_for_mirror_user
-      options_from_collection_for_select(default_mirror_users, :id, :name, @project.mirror_user_id || current_user.id)
+      options_from_collection_for_select([current_user], :id, :name, current_user.id)
     end
 
     def mirrored_repositories_count(project = @project)

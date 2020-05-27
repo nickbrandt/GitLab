@@ -43,12 +43,9 @@ module EE
 
           def verify_mirror_attrs!(project, attrs)
             unless can?(current_user, :admin_mirror, project)
-              attrs.delete(:mirror)
-              attrs.delete(:mirror_user_id)
-              attrs.delete(:mirror_trigger_builds)
-              attrs.delete(:only_mirror_protected_branches)
-              attrs.delete(:mirror_overwrites_diverged_branches)
-              attrs.delete(:import_data_attributes)
+              ::Projects::UpdateService::PULL_MIRROR_ATTRIBUTES.each do |attr_name|
+                attrs.delete(attr_name)
+              end
             end
           end
 
