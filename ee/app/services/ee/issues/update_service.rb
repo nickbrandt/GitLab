@@ -21,7 +21,28 @@ module EE
         result
       end
 
+      override :handle_changes
+      def handle_changes(issue, _options)
+        super
+
+        handle_iteration_change(issue)
+      end
+
       private
+
+      def handle_iteration_change(issue)
+        return unless issue.previous_changes.include?('sprint_id')
+
+        send_iteration_change_notification(issue)
+      end
+
+      def send_iteration_change_notification(issue)
+        if issue.iteration.nil?
+          notification_service.async.removed_iteration_issue(issue, current_user)
+        else
+          notification_service.async.changed_iteration_issue(issue, issue.iteration, current_user)
+        end
+      end
 
       def handle_promotion(issue)
         return unless params.delete(:promote_to_epic)
