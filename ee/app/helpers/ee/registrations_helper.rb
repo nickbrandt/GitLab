@@ -12,6 +12,10 @@ module EE
       redirect_path == new_trial_path
     end
 
+    def in_invitation_flow?
+      redirect_path&.starts_with?('/-/invites/')
+    end
+
     def setup_for_company_label_text
       if in_subscription_flow?
         _('Who will be using this GitLab subscription?')

@@ -5,6 +5,7 @@ require 'spec_helper'
 describe 'Welcome screen', :js do
   let_it_be(:user) { create(:user) }
 
+  let(:in_invitation_flow) { false }
   let(:in_subscription_flow) { false }
   let(:part_of_onboarding_issues_experiment) { false }
 
@@ -12,6 +13,7 @@ describe 'Welcome screen', :js do
     before do
       allow(Gitlab).to receive(:com?).and_return(true)
       gitlab_sign_in(user)
+      allow_any_instance_of(EE::RegistrationsHelper).to receive(:in_invitation_flow?).and_return(in_invitation_flow)
       allow_any_instance_of(EE::RegistrationsHelper).to receive(:in_subscription_flow?).and_return(in_subscription_flow)
       stub_experiment_for_user(onboarding_issues: part_of_onboarding_issues_experiment)
 
@@ -36,6 +38,14 @@ describe 'Welcome screen', :js do
 
       it 'shows the progress bar with the correct steps' do
         expect(page).to have_content('1. Your profile 2. Your GitLab group 3. Your first project')
+      end
+
+      context 'when in the invitation flow' do
+        let(:in_invitation_flow) { true }
+
+        it 'does not show the progress bar' do
+          expect(page).not_to have_content('1. Your profile')
+        end
       end
     end
 
