@@ -1,0 +1,5 @@
+---
+title: Display warning for issues moved from service desk on frontend
+merge_request: 31803
+author:
+type: fixed
