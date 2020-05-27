@@ -98,6 +98,24 @@ module ServicesHelper
     end
   end
 
+  def trigger_events_for_service
+    return [] unless Feature.enabled?(:integration_form_refactor, @project)
+
+    ServiceEventSerializer.new(service: @service).represent(@service.configurable_events).to_json
+  end
+
+  def fields_for_service
+    return [] unless Feature.enabled?(:integration_form_refactor, @project)
+
+    ServiceFieldSerializer.new(service: @service).represent(@service.global_fields).to_json
+  end
+
+  def show_service_trigger_events
+    return false if @service.is_a?(JiraService) || Feature.enabled?(:integration_form_refactor, @project)
+
+    @service.configurable_events.present?
+  end
+
   extend self
 end
 
