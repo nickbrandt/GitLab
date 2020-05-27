@@ -612,6 +612,15 @@ const boardsStore = {
     });
   },
 
+  moveListIssues(list, issue, oldIndex, newIndex, moveBeforeId, moveAfterId) {
+    list.issues.splice(oldIndex, 1);
+    list.issues.splice(newIndex, 0, issue);
+
+    this.moveIssue(issue.id, null, null, moveBeforeId, moveAfterId).catch(() => {
+      // TODO: handle request error
+    });
+  },
+
   moveMultipleIssues({ ids, fromListId, toListId, moveBeforeId, moveAfterId }) {
     return axios.put(this.generateMultiDragPath(this.state.endpoints.boardId), {
       from_list_id: fromListId,
