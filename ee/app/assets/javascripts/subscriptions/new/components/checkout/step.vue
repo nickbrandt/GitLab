@@ -61,7 +61,7 @@ export default {
     <div class="card">
       <div v-show="isActive" @keyup.enter="nextStep">
         <slot name="body" :active="isActive"></slot>
-        <gl-form-group v-if="nextStepButtonText" class="prepend-top-8 gl-mb-0">
+        <gl-form-group v-if="nextStepButtonText" class="gl-mt-3 gl-mb-0">
           <gl-deprecated-button variant="success" :disabled="!isValid" @click="nextStep">
             {{ nextStepButtonText }}
           </gl-deprecated-button>
