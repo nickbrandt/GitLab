@@ -22388,6 +22388,9 @@ msgstr ""
 msgid "This project does not belong to a group and can therefore not make use of group Runners."
 msgstr ""
 
+msgid "This project does not have %{service_desk_link_start}Service Desk%{service_desk_link_end} enabled, so the user who created the issue will no longer receive email notifications about new activity."
+msgstr ""
+
 msgid "This project does not have a wiki homepage yet"
 msgstr ""
 
