@@ -16,8 +16,28 @@ exports[`AuditLogApp when initialized matches the snapshot 1`] = `
         class="col-lg-auto flex-fill form-group align-items-lg-center pr-lg-8"
       >
         <div
-          class="audit-log-filter"
-        />
+          class="input-group bg-white flex-grow-1"
+          data-qa-selector="admin_audit_log_filter"
+        >
+          <gl-filtered-search-stub
+            availabletokens="[object Object],[object Object],[object Object]"
+            class="gl-h-32 w-100"
+            clearbuttontitle="Clear"
+            close-button-title="Close"
+            placeholder="Search"
+            value=""
+          />
+           
+          <input
+            name="entity_type"
+            type="hidden"
+          />
+           
+          <input
+            name="entity_id"
+            type="hidden"
+          />
+        </div>
       </div>
        
       <div

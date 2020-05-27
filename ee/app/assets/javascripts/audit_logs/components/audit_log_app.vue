@@ -26,6 +26,10 @@ export default {
       required: false,
       default: false,
     },
+    enabledTokenTypes: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
@@ -51,7 +55,7 @@ export default {
         class="filter-form d-flex justify-content-between audit-controls row"
       >
         <div class="col-lg-auto flex-fill form-group align-items-lg-center pr-lg-8">
-          <AuditLogFilter />
+          <AuditLogFilter v-bind="{ enabledTokenTypes }" />
         </div>
         <div class="d-flex col-lg-auto flex-wrap pl-lg-0">
           <div
