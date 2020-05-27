@@ -40,7 +40,17 @@ module Issuable
     private
 
     def permitted_attrs(type)
-      %i(state_event assignee_ids milestone_id add_label_ids remove_label_ids subscription_event)
+      attrs = %i(state_event milestone_id add_label_ids remove_label_ids subscription_event)
+
+      issuable_specific_attrs(type, attrs)
+    end
+
+    def issuable_specific_attrs(type, attrs)
+      if type == 'issue' || type == 'merge_request'
+        attrs.push(:assignee_ids)
+      else
+        attrs.push(:assignee_id)
+      end
     end
 
     def find_issuables(parent, model_class, ids)

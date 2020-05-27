@@ -5,71 +5,97 @@ require 'spec_helper'
 describe Issuable::BulkUpdateService do
   let_it_be(:user)  { create(:user) }
   let_it_be(:group) { create(:group) }
+  let_it_be(:project1) { create(:project, :repository, group: group) }
+  let_it_be(:project2) { create(:project, :repository, group: group) }
+
+  subject { described_class.new(parent, user, params).execute(type) }
+
+  shared_examples 'updates issuables attribute' do |attribute|
+    it 'succeeds and returns the correct number of issuables updated' do
+      expect(subject[:success]).to be_truthy
+      expect(subject[:count]).to eq(issuables.count)
+      issuables.each do |issuable|
+        expect(issuable.reload.send(attribute)).to eq(new_value)
+      end
+    end
+  end
+
+  shared_examples 'does not update issuables attribute' do |attribute|
+    it 'does not update issuables' do
+      issuables.each do |issuable|
+        expect { subject }.not_to change { issuable.send(attribute) }
+      end
+    end
+  end
 
   context 'with issues' do
-    subject { described_class.new(parent, user, params).execute('issue') }
+    let_it_be(:type) { 'issue' }
+    let_it_be(:parent) { group }
+    let(:issue1) { create(:issue, project: project1, health_status: :at_risk, epic: epic) }
+    let(:issue2) { create(:issue, project: project2, health_status: :at_risk, epic: epic) }
+    let(:epic) { create(:epic, group: group) }
+    let(:epic2) { create(:epic, group: group) }
+    let(:issuables) { [issue1, issue2] }
 
-    let_it_be(:project1) { create(:project, :repository, group: group) }
-    let_it_be(:project2) { create(:project, :repository, group: group) }
-    let_it_be(:issue1) { create(:issue, project: project1) }
-    let_it_be(:issue2) { create(:issue, project: project2) }
-    let_it_be(:issue3) { create(:issue, project: project1) }
+    before do
+      group.add_reporter(user)
+    end
 
-    describe 'updating health status' do
-      shared_examples 'updates health status' do
-        it 'succeeds and returns the correct number of issues updated' do
+    context 'updating health status and epic' do
+      let(:params) do
+        {
+          issuable_ids: issuables.map(&:id),
+          health_status: :on_track,
+          epic: epic2
+        }
+      end
+
+      context 'when features are enabled' do
+        before do
+          stub_licensed_features(epics: true, issuable_health_status: true)
+        end
+
+        it 'succeeds and returns the correct number of issuables updated' do
           expect(subject[:success]).to be_truthy
-          expect(subject[:count]).to eq(2)
-          issues.each do |issue|
-            expect(issue.reload.health_status).to eq("on_track")
+          expect(subject[:count]).to eq(issuables.count)
+          issuables.each do |issuable|
+            issuable.reload
+            expect(issuable.epic).to eq(epic2)
+            expect(issuable.health_status).to eq('on_track')
           end
         end
       end
 
-      context 'when issuable_health_status feature is disabled' do
-        let_it_be(:parent) { project1 }
-        let_it_be(:issues) { [issue1, issue2] }
-        let_it_be(:params) { { issuable_ids: issues.map(&:id), health_status: 1 } }
-
+      context 'when features are disabled' do
         before do
-          group.add_reporter(user)
-          stub_licensed_features(issuable_health_status: false)
+          stub_licensed_features(epics: false, issuable_health_status: false)
         end
 
-        it 'does not update health status' do
-          issues.each do |issue|
-            expect { subject }.not_to change { issue.health_status }
-          end
-        end
+        it_behaves_like 'does not update issuables attribute', :health_status
+        it_behaves_like 'does not update issuables attribute', :epic
       end
 
-      context 'when issuable_health_status feature is enabled' do
-        let(:issues) { [issue1, issue3] }
-        let(:params) { { issuable_ids: issues.map(&:id), health_status: 1 } }
-
+      context 'when user can not update issues' do
         before do
-          group.add_reporter(user)
-          stub_licensed_features(issuable_health_status: true)
+          group.add_guest(user)
         end
 
-        context 'with issuables at the project level' do
-          let(:parent) { project1 }
+        it_behaves_like 'does not update issuables attribute', :health_status
+        it_behaves_like 'does not update issuables attribute', :epic
+      end
 
-          it_behaves_like 'updates health status'
-        end
+      context 'when user can not admin epic' do
+        let(:epic3) { create(:epic, group: create(:group)) }
+        let(:params) { { issuable_ids: issuables.map(&:id), epic: epic3 } }
 
-        context 'with issuables at the group level' do
-          let(:parent) { group }
-          let(:issues) { [issue1, issue2] }
-
-          it_behaves_like 'updates health status'
-        end
+        it_behaves_like 'does not update issuables attribute', :epic
       end
     end
   end
 
   context 'with epics' do
-    subject { described_class.new(group, user, params).execute('epic') }
+    let_it_be(:type) { 'epic' }
+    let_it_be(:parent) { group }
 
     let(:epic1) { create(:epic, group: group, labels: [label1]) }
     let(:epic2) { create(:epic, group: group, labels: [label1]) }
@@ -95,14 +121,9 @@ describe Issuable::BulkUpdateService do
       end
 
       context 'when epics are enabled' do
-        it 'updates epic labels' do
-          expect(subject[:success]).to be_truthy
-          expect(subject[:count]).to eq(issuables.count)
+        let(:new_value) { [label2, label3] }
 
-          issuables.each do |issuable|
-            expect(issuable.reload.labels).to eq([label2, label3])
-          end
-        end
+        it_behaves_like 'updates issuables attribute', :labels
       end
 
       context 'when epics are disabled' do
@@ -110,11 +131,7 @@ describe Issuable::BulkUpdateService do
           stub_licensed_features(epics: false)
         end
 
-        it 'does not update labels' do
-          issuables.each do |issuable|
-            expect { subject }.not_to change { issuable.labels }
-          end
-        end
+        it_behaves_like 'does not update issuables attribute', :labels
       end
 
       context 'when issuable_ids contain external epics' do
@@ -132,13 +149,5 @@ describe Issuable::BulkUpdateService do
         end
       end
     end
-  end
-
-  def bulk_update(parent, issuables, extra_params = {})
-    bulk_update_params = extra_params
-      .reverse_merge(issuable_ids: Array(issuables).map(&:id).join(','))
-
-    type = Array(issuables).first.model_name.param_key
-    Issuable::BulkUpdateService.new(parent, user, bulk_update_params).execute(type)
   end
 end

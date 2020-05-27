@@ -14,16 +14,11 @@ module EE
         super
       end
 
-      override :permitted_attrs
-      def permitted_attrs(type)
-        case type
-        when 'issue'
-          super.push(:health_status)
-        when 'epic'
-          super.push(:assignee_id)
-        else
-          super
-        end
+      override :issuable_specific_attrs
+      def issuable_specific_attrs(type, attrs)
+        return super unless type == 'issue'
+
+        super.push(:health_status, :epic)
       end
     end
   end
