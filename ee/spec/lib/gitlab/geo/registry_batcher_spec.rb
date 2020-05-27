@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::LoopingBatcher, :geo, :use_clean_rails_memory_store_caching do
+describe Gitlab::Geo::RegistryBatcher, :geo, :use_clean_rails_memory_store_caching do
   describe '#next_range!' do
     let(:model_class) { LfsObject }
     let(:model_foreign_key) { registry_class::MODEL_FOREIGN_KEY }
@@ -17,7 +17,7 @@ describe Gitlab::LoopingBatcher, :geo, :use_clean_rails_memory_store_caching do
       it { is_expected.to be_nil }
     end
 
-    context 'when there are no records but there are unused registries' do
+    context 'when there are no records but there are orphaned registries' do
       let!(:registries) { create_list(registry_class_factory, 3) }
 
       context 'when it has never been called before' do
@@ -115,13 +115,13 @@ describe Gitlab::LoopingBatcher, :geo, :use_clean_rails_memory_store_caching do
       end
     end
 
-    context 'when there are records and unused registries with foreign key greather than last record id' do
+    context 'when there are records and orphaned registries with foreign key greater than last record id' do
       let!(:records) { create_list(model_class.underscore, 3) }
-      let(:unused_registry_foreign_key_id) { records.last.id }
-      let!(:registry) { create(registry_class_factory, model_foreign_key => unused_registry_foreign_key_id) }
+      let(:orphaned_registry_foreign_key_id) { records.last.id }
+      let!(:registry) { create(registry_class_factory, model_foreign_key => orphaned_registry_foreign_key_id) }
 
       before do
-        model_class.where(id: unused_registry_foreign_key_id).delete_all
+        model_class.where(id: orphaned_registry_foreign_key_id).delete_all
       end
 
       context 'when it has never been called before' do
@@ -132,7 +132,7 @@ describe Gitlab::LoopingBatcher, :geo, :use_clean_rails_memory_store_caching do
         end
 
         it 'ends at the last registry foreign key ID' do
-          expect(subject.last).to eq(unused_registry_foreign_key_id)
+          expect(subject.last).to eq(orphaned_registry_foreign_key_id)
         end
       end
 
@@ -147,7 +147,7 @@ describe Gitlab::LoopingBatcher, :geo, :use_clean_rails_memory_store_caching do
           it 'starts from the beginning' do
             Rails.cache.clear
 
-            expect(subject).to eq(1..unused_registry_foreign_key_id)
+            expect(subject).to eq(1..orphaned_registry_foreign_key_id)
           end
         end
       end

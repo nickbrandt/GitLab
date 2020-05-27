@@ -33,7 +33,7 @@ module Geo
 
     # @return [Range] the next range of a batch of records
     def next_range!
-      Gitlab::LoopingBatcher.new(registry_class, key: batcher_key, batch_size: batch_size).next_range!
+      Gitlab::Geo::RegistryBatcher.new(registry_class, key: batcher_key, batch_size: batch_size).next_range!
     end
 
     def batcher_key
