@@ -138,12 +138,7 @@ class List {
   }
 
   moveIssue(issue, oldIndex, newIndex, moveBeforeId, moveAfterId) {
-    this.issues.splice(oldIndex, 1);
-    this.issues.splice(newIndex, 0, issue);
-
-    boardsStore.moveIssue(issue.id, null, null, moveBeforeId, moveAfterId).catch(() => {
-      // TODO: handle request error
-    });
+    boardsStore.moveListIssues(this, issue, oldIndex, newIndex, moveBeforeId, moveAfterId);
   }
 
   moveMultipleIssues({ issues, oldIndicies, newIndex, moveBeforeId, moveAfterId }) {
