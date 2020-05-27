@@ -148,7 +148,7 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
-	// fix issue #267, where Content-Length was set prior to injection
+	// Prevent Go from adding a Content-Length header automatically
 	w.Header().Del("Content-Length")
 
 	// copy response headers and body, except the headers from preserveHeaderKeys
@@ -165,7 +165,7 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 
 	if err != nil {
 		sendURLRequestsRequestFailed.Inc()
-		helper.Fail500(w, r, fmt.Errorf("SendURL: Copy response: %v", err))
+		helper.LogError(r, fmt.Errorf("SendURL: Copy response: %v", err))
 		return
 	}
 

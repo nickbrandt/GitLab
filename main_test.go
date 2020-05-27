@@ -15,6 +15,8 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -367,21 +369,58 @@ func TestArtifactsGetSingleFile(t *testing.T) {
 }
 
 func TestSendURLForArtifacts(t *testing.T) {
-	fileContents := "12345678901234567890\n"
+	expectedBody := strings.Repeat("CONTENT!", 1024)
 
-	server := httptest.NewServer(http.FileServer(http.Dir("testdata")))
-	defer server.Close()
+	regularHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Length", strconv.Itoa(len(expectedBody)))
+		w.Write([]byte(expectedBody))
+	})
 
-	// We manually created this txt file in the gitlab-workhorse Git repository
-	url := server.URL + "/test-file.txt"
-	jsonParams := fmt.Sprintf(`{"URL":%q}`, url)
+	chunkedHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Transfer-Encoding", "chunked")
+		w.Write([]byte(expectedBody))
+	})
 
-	resourcePath := `/namespace/project/builds/123/artifacts/file/download`
-	resp, body, err := doSendDataRequest(resourcePath, "send-url", jsonParams)
-	require.NoError(t, err)
+	rawHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hj, ok := w.(http.Hijacker)
+		require.Equal(t, true, ok)
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resourcePath)
-	assert.Equal(t, fileContents, string(body), "GET %q: response body", resourcePath)
+		conn, buf, err := hj.Hijack()
+		require.NoError(t, err)
+		defer conn.Close()
+		defer buf.Flush()
+
+		fmt.Fprint(buf, "HTTP/1.1 200 OK\r\nContent-Type: application/zip\r\n\r\n")
+		fmt.Fprint(buf, expectedBody)
+	})
+
+	for _, tc := range []struct {
+		name             string
+		handler          http.Handler
+		transferEncoding []string
+		contentLength    int
+	}{
+		{"No content-length, chunked TE", chunkedHandler, []string{"chunked"}, -1},    // Case 3 in https://tools.ietf.org/html/rfc7230#section-3.3.2
+		{"Known content-length, identity TE", regularHandler, nil, len(expectedBody)}, // Case 5 in https://tools.ietf.org/html/rfc7230#section-3.3.2
+		{"No content-length, identity TE", rawHandler, []string{"chunked"}, -1},       // Case 7 in https://tools.ietf.org/html/rfc7230#section-3.3.2
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			server := httptest.NewServer(tc.handler)
+			defer server.Close()
+
+			jsonParams := fmt.Sprintf(`{"URL":%q}`, server.URL)
+
+			resourcePath := `/namespace/project/builds/123/artifacts/file/download`
+			resp, body, err := doSendDataRequest(resourcePath, "send-url", jsonParams)
+			require.NoError(t, err)
+
+			require.Equal(t, http.StatusOK, resp.StatusCode, "GET %q: status code", resourcePath)
+			require.Equal(t, int64(tc.contentLength), resp.ContentLength, "GET %q: Content-Length", resourcePath)
+			require.Equal(t, tc.transferEncoding, resp.TransferEncoding, "GET %q: Transfer-Encoding", resourcePath)
+			require.Equal(t, expectedBody, string(body), "GET %q: response body", resourcePath)
+			assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resourcePath)
+		})
+	}
 }
 
 func TestApiContentTypeBlock(t *testing.T) {
