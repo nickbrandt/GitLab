@@ -193,6 +193,8 @@ Then, you'll receive the access token back in the response:
 }
 ```
 
+By default, the scope of the access token is `api`, which provides complete read/write access.
+
 For testing, you can use the `oauth2` Ruby gem:
 
 ```ruby
