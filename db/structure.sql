@@ -442,11 +442,11 @@ CREATE TABLE public.application_settings (
     group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL,
     container_registry_vendor text DEFAULT ''::text NOT NULL,
     container_registry_version text DEFAULT ''::text NOT NULL,
-    repository_storages_weighted jsonb DEFAULT '{}'::jsonb NOT NULL,
     container_registry_features text[] DEFAULT '{}'::text[] NOT NULL,
     spam_check_endpoint_url text,
     spam_check_endpoint_enabled boolean DEFAULT false NOT NULL,
     elasticsearch_pause_indexing boolean DEFAULT false NOT NULL,
+    repository_storages_weighted jsonb DEFAULT '{}'::jsonb NOT NULL,
     CONSTRAINT check_d03919528d CHECK ((char_length(container_registry_vendor) <= 255)),
     CONSTRAINT check_d820146492 CHECK ((char_length(spam_check_endpoint_url) <= 255)),
     CONSTRAINT check_e5aba18f02 CHECK ((char_length(container_registry_version) <= 255))
@@ -1978,9 +1978,9 @@ CREATE TABLE public.container_expiration_policies (
     updated_at timestamp with time zone NOT NULL,
     next_run_at timestamp with time zone,
     name_regex character varying(255),
-    cadence character varying(12) DEFAULT '7d'::character varying NOT NULL,
-    older_than character varying(12),
-    keep_n integer,
+    cadence character varying(12) DEFAULT '1d'::character varying NOT NULL,
+    older_than character varying(12) DEFAULT '90d'::character varying,
+    keep_n integer DEFAULT 10,
     enabled boolean DEFAULT true NOT NULL,
     name_regex_keep text,
     CONSTRAINT container_expiration_policies_name_regex_keep CHECK ((char_length(name_regex_keep) <= 255))
@@ -4486,6 +4486,21 @@ CREATE SEQUENCE public.operations_feature_flags_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.operations_feature_flags_id_seq OWNED BY public.operations_feature_flags.id;
+
+CREATE TABLE public.operations_feature_flags_issues (
+    id bigint NOT NULL,
+    feature_flag_id bigint NOT NULL,
+    issue_id bigint NOT NULL
+);
+
+CREATE SEQUENCE public.operations_feature_flags_issues_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.operations_feature_flags_issues_id_seq OWNED BY public.operations_feature_flags_issues.id;
 
 CREATE TABLE public.operations_scopes (
     id bigint NOT NULL,
@@ -7685,6 +7700,8 @@ ALTER TABLE ONLY public.operations_feature_flags ALTER COLUMN id SET DEFAULT nex
 
 ALTER TABLE ONLY public.operations_feature_flags_clients ALTER COLUMN id SET DEFAULT nextval('public.operations_feature_flags_clients_id_seq'::regclass);
 
+ALTER TABLE ONLY public.operations_feature_flags_issues ALTER COLUMN id SET DEFAULT nextval('public.operations_feature_flags_issues_id_seq'::regclass);
+
 ALTER TABLE ONLY public.operations_scopes ALTER COLUMN id SET DEFAULT nextval('public.operations_scopes_id_seq'::regclass);
 
 ALTER TABLE ONLY public.operations_strategies ALTER COLUMN id SET DEFAULT nextval('public.operations_strategies_id_seq'::regclass);
@@ -8542,6 +8559,9 @@ ALTER TABLE ONLY public.operations_feature_flag_scopes
 
 ALTER TABLE ONLY public.operations_feature_flags_clients
     ADD CONSTRAINT operations_feature_flags_clients_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.operations_feature_flags_issues
+    ADD CONSTRAINT operations_feature_flags_issues_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.operations_feature_flags
     ADD CONSTRAINT operations_feature_flags_pkey PRIMARY KEY (id);
@@ -10193,6 +10213,8 @@ CREATE INDEX index_on_users_name_lower ON public.users USING btree (lower((name)
 
 CREATE INDEX index_open_project_tracker_data_on_service_id ON public.open_project_tracker_data USING btree (service_id);
 
+CREATE INDEX index_operations_feature_flags_issues_on_issue_id ON public.operations_feature_flags_issues USING btree (issue_id);
+
 CREATE UNIQUE INDEX index_operations_feature_flags_on_project_id_and_iid ON public.operations_feature_flags USING btree (project_id, iid);
 
 CREATE UNIQUE INDEX index_operations_feature_flags_on_project_id_and_name ON public.operations_feature_flags USING btree (project_id, name);
@@ -10206,6 +10228,8 @@ CREATE INDEX index_operations_strategies_user_lists_on_user_list_id ON public.op
 CREATE UNIQUE INDEX index_operations_user_lists_on_project_id_and_iid ON public.operations_user_lists USING btree (project_id, iid);
 
 CREATE UNIQUE INDEX index_operations_user_lists_on_project_id_and_name ON public.operations_user_lists USING btree (project_id, name);
+
+CREATE UNIQUE INDEX index_ops_feature_flags_issues_on_feature_flag_id_and_issue_id ON public.operations_feature_flags_issues USING btree (feature_flag_id, issue_id);
 
 CREATE UNIQUE INDEX index_ops_strategies_user_lists_on_strategy_id_and_user_list_id ON public.operations_strategies_user_lists USING btree (strategy_id, user_list_id);
 
@@ -10647,9 +10671,9 @@ CREATE INDEX index_services_on_type ON public.services USING btree (type);
 
 CREATE INDEX index_services_on_type_and_id_and_template_when_active ON public.services USING btree (type, id, template) WHERE (active = true);
 
-CREATE UNIQUE INDEX index_services_on_type_and_instance ON public.services USING btree (type, instance) WHERE (instance IS TRUE);
+CREATE UNIQUE INDEX index_services_on_type_and_instance_partial ON public.services USING btree (type, instance) WHERE (instance = true);
 
-CREATE UNIQUE INDEX index_services_on_type_and_template ON public.services USING btree (type, template) WHERE (template IS TRUE);
+CREATE UNIQUE INDEX index_services_on_type_and_template_partial ON public.services USING btree (type, template) WHERE (template = true);
 
 CREATE UNIQUE INDEX index_shards_on_name ON public.shards USING btree (name);
 
@@ -12111,6 +12135,9 @@ ALTER TABLE ONLY public.geo_hashed_storage_migrated_events
 ALTER TABLE ONLY public.plan_limits
     ADD CONSTRAINT fk_rails_69f8b6184f FOREIGN KEY (plan_id) REFERENCES public.plans(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.operations_feature_flags_issues
+    ADD CONSTRAINT fk_rails_6a8856ca4f FOREIGN KEY (feature_flag_id) REFERENCES public.operations_feature_flags(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.prometheus_alerts
     ADD CONSTRAINT fk_rails_6d9b283465 FOREIGN KEY (environment_id) REFERENCES public.environments(id) ON DELETE CASCADE;
 
@@ -12665,6 +12692,9 @@ ALTER TABLE ONLY public.ci_runner_namespaces
 
 ALTER TABLE ONLY public.requirements_management_test_reports
     ADD CONSTRAINT fk_rails_fb3308ad55 FOREIGN KEY (requirement_id) REFERENCES public.requirements(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.operations_feature_flags_issues
+    ADD CONSTRAINT fk_rails_fb4d2a7cb1 FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.board_project_recent_visits
     ADD CONSTRAINT fk_rails_fb6fc419cb FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
@@ -13932,7 +13962,11 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200515155620
 20200519115908
 20200519171058
+20200519194042
 20200525114553
 20200525121014
+20200526120714
+20200526164946
+20200526164947
 \.
 

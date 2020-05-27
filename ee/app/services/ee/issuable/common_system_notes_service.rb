@@ -7,11 +7,12 @@ module EE
       attr_reader :issuable
 
       override :execute
-      def execute(_issuable, old_labels: [], old_milestone: nil, is_update: true)
+      def execute(issuable, old_labels: [], old_milestone: nil, is_update: true)
         super
 
         ActiveRecord::Base.no_touching do
           handle_weight_change(is_update)
+          handle_iteration_change
 
           if is_update
             handle_date_change_note
@@ -30,6 +31,12 @@ module EE
         if issuable.previous_changes.include?('end_date')
           ::SystemNoteService.change_epic_date_note(issuable, current_user, 'finish date', issuable['end_date'])
         end
+      end
+
+      def handle_iteration_change
+        return unless issuable.previous_changes.include?('sprint_id')
+
+        ::SystemNoteService.change_iteration(issuable, current_user, issuable.iteration)
       end
 
       def handle_weight_change(is_update)

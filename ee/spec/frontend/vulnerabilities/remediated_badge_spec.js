@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlBadge, GlPopover } from '@gitlab/ui';
+import { GlDeprecatedBadge as GlBadge, GlPopover } from '@gitlab/ui';
 import RemediatedBadge from 'ee/vulnerabilities/components/remediated_badge.vue';
 
 const POPOVER_TITLE = 'Vulnerability remediated. Review before resolving.';

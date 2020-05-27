@@ -27,7 +27,7 @@ export const initFirstClassVulnerabilityFilters = projects => {
       selection: new Set([ALL]),
     },
     {
-      name: s__('SecurityReports|Report type'),
+      name: s__('Reports|Scanner'),
       id: 'reportType',
       options: [BASE_FILTERS.report_type, ...parseOptions(REPORT_TYPES)],
       selection: new Set([ALL]),

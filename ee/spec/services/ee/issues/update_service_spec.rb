@@ -71,6 +71,33 @@ describe Issues::UpdateService do
       end
     end
 
+    context 'assigning iteration' do
+      before do
+        stub_licensed_features(iterations: true)
+        group.add_maintainer(user)
+      end
+
+      context 'group iterations' do
+        it 'creates a system note' do
+          group_iteration = create(:iteration, group: group)
+
+          expect do
+            update_issue(iteration: group_iteration)
+          end.to change { Note.system.count }.by(1)
+        end
+      end
+
+      context 'project iterations' do
+        it 'creates a system note' do
+          project_iteration = create(:iteration, project: project)
+
+          expect do
+            update_issue(iteration: project_iteration)
+          end.to change { Note.system.count }.by(1)
+        end
+      end
+    end
+
     context 'assigning epic' do
       before do
         stub_licensed_features(epics: true)

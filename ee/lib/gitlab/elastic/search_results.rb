@@ -29,7 +29,7 @@ module Gitlab
 
         case scope
         when 'projects'
-          eager_load(projects, page, per_page, preload_method, [:route, :namespace, :compliance_framework_setting])
+          eager_load(projects, page, per_page, preload_method, [:route, :namespace])
         when 'issues'
           eager_load(issues, page, per_page, preload_method, project: [:route, :namespace], labels: [], timelogs: [], assignees: [])
         when 'merge_requests'

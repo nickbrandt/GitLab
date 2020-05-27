@@ -43,6 +43,10 @@ export default {
       }
       return location && (location.image || location.file || location.path);
     },
+    vulnerabilityScanner() {
+      const { scanner } = this.vulnerability;
+      return scanner?.name;
+    },
     isDismissed() {
       return Boolean(this.vulnerability.dismissal_feedback);
     },
@@ -132,6 +136,13 @@ export default {
             {{ vulnerabilityNamespace }}
           </small>
         </template>
+      </div>
+    </div>
+
+    <div class="table-section section-15">
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Scanner') }}</div>
+      <div class="table-mobile-content">
+        {{ vulnerabilityScanner }}
       </div>
     </div>
 

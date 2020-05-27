@@ -9,5 +9,6 @@ FactoryBot.modify do
       action { Event::CREATED }
       project { nil }
     end
+    trait(:approved) { action { Event::APPROVED } }
   end
 end

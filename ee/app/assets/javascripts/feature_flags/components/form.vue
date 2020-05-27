@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { memoize, isString, cloneDeep, isNumber } from 'lodash';
 import {
   GlDeprecatedButton,
-  GlBadge,
+  GlDeprecatedBadge as GlBadge,
   GlTooltip,
   GlTooltipDirective,
   GlFormTextarea,

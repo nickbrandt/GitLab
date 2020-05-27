@@ -117,6 +117,7 @@ describe Project do
     it { is_expected.to have_many(:jira_imports) }
     it { is_expected.to have_many(:metrics_users_starred_dashboards).inverse_of(:project) }
     it { is_expected.to have_many(:repository_storage_moves) }
+    it { is_expected.to have_many(:reviews).inverse_of(:project) }
 
     it_behaves_like 'model with repository' do
       let_it_be(:container) { create(:project, :repository, path: 'somewhere') }
@@ -2833,48 +2834,6 @@ describe Project do
       expect { project.set_repository_writable! }
         .to change(project, :repository_read_only)
         .from(true).to(false)
-    end
-  end
-
-  describe '#change_repository_storage' do
-    let(:project) { create(:project, :repository) }
-    let(:read_only_project) { create(:project, :repository, repository_read_only: true) }
-
-    before do
-      stub_storage_settings('test_second_storage' => { 'path' => 'tmp/tests/extra_storage' })
-    end
-
-    it 'schedules the transfer of the repository to the new storage and locks the project' do
-      expect(ProjectUpdateRepositoryStorageWorker).to receive(:perform_async).with(project.id, 'test_second_storage', anything)
-
-      project.change_repository_storage('test_second_storage')
-      project.save!
-
-      expect(project).to be_repository_read_only
-      expect(project.repository_storage_moves.last).to have_attributes(
-        source_storage_name: "default",
-        destination_storage_name: "test_second_storage"
-      )
-    end
-
-    it "doesn't schedule the transfer if the repository is already read-only" do
-      expect(ProjectUpdateRepositoryStorageWorker).not_to receive(:perform_async)
-
-      read_only_project.change_repository_storage('test_second_storage')
-      read_only_project.save!
-    end
-
-    it "doesn't lock or schedule the transfer if the storage hasn't changed" do
-      expect(ProjectUpdateRepositoryStorageWorker).not_to receive(:perform_async)
-
-      project.change_repository_storage(project.repository_storage)
-      project.save!
-
-      expect(project).not_to be_repository_read_only
-    end
-
-    it 'throws an error if an invalid repository storage is provided' do
-      expect { project.change_repository_storage('unknown') }.to raise_error(ArgumentError)
     end
   end
 

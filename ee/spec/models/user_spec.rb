@@ -21,7 +21,6 @@ describe User do
   describe 'associations' do
     subject { build(:user) }
 
-    it { is_expected.to have_many(:reviews) }
     it { is_expected.to have_many(:vulnerability_feedback) }
     it { is_expected.to have_many(:path_locks).dependent(:destroy) }
     it { is_expected.to have_many(:users_security_dashboard_projects) }
@@ -564,6 +563,42 @@ describe User do
 
     context 'when user has no linked managing group' do
       it { is_expected.to eq false }
+    end
+  end
+
+  describe '#managed_by?' do
+    let(:group) { create :group }
+    let(:owner) { create :user }
+    let(:member1) { create :user }
+    let(:member2) { create :user }
+
+    before do
+      group.add_owner(owner)
+      group.add_developer(member1)
+      group.add_developer(member2)
+    end
+
+    context 'when a normal user account' do
+      it 'returns false' do
+        expect(member1.managed_by?(owner)).to be_falsey
+        expect(member1.managed_by?(member2)).to be_falsey
+      end
+    end
+
+    context 'when a group managed account' do
+      let(:group) { create :group_with_managed_accounts }
+
+      before do
+        member1.update(managing_group: group)
+      end
+
+      it 'returns true with group managed account owner' do
+        expect(member1.managed_by?(owner)).to be_truthy
+      end
+
+      it 'returns false with a regular user account' do
+        expect(member1.managed_by?(member2)).to be_falsey
+      end
     end
   end
 
