@@ -747,6 +747,9 @@ msgstr ""
 msgid "0 for unlimited"
 msgstr ""
 
+msgid "0 for unlimited, only effective with remote storage enabled."
+msgstr ""
+
 msgid "1 %{type} addition"
 msgid_plural "%{count} %{type} additions"
 msgstr[0] ""
@@ -13544,6 +13547,9 @@ msgstr ""
 msgid "Maximum field length"
 msgstr ""
 
+msgid "Maximum import size (MB)"
+msgstr ""
+
 msgid "Maximum job timeout"
 msgstr ""
 
@@ -13581,6 +13587,9 @@ msgid "Maximum size limit for each repository."
 msgstr ""
 
 msgid "Maximum size of Elasticsearch bulk indexing requests."
+msgstr ""
+
+msgid "Maximum size of import files."
 msgstr ""
 
 msgid "Maximum size of individual attachments in comments."

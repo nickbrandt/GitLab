@@ -458,6 +458,7 @@ CREATE TABLE public.application_settings (
     spam_check_endpoint_enabled boolean DEFAULT false NOT NULL,
     elasticsearch_pause_indexing boolean DEFAULT false NOT NULL,
     repository_storages_weighted jsonb DEFAULT '{}'::jsonb NOT NULL,
+    max_import_size integer DEFAULT 50 NOT NULL,
     CONSTRAINT check_d03919528d CHECK ((char_length(container_registry_vendor) <= 255)),
     CONSTRAINT check_d820146492 CHECK ((char_length(spam_check_endpoint_url) <= 255)),
     CONSTRAINT check_e5aba18f02 CHECK ((char_length(container_registry_version) <= 255))
@@ -13796,6 +13797,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200527151413
 20200527152116
 20200527152657
+20200527211000
 20200528054112
 20200528123703
 20200528125905
