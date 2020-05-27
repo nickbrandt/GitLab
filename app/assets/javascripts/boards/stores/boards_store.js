@@ -616,6 +616,12 @@ const boardsStore = {
     );
   },
 
+  addIssueAssignee(issue, assignee) {
+    if (!issue.findAssignee(assignee)) {
+      issue.assignees.push(new ListAssignee(assignee));
+    }
+  },
+
   bulkUpdate(issueIds, extraData = {}) {
     const data = {
       update: Object.assign(extraData, {

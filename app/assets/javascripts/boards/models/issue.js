@@ -50,9 +50,7 @@ class ListIssue {
   }
 
   addAssignee(assignee) {
-    if (!this.findAssignee(assignee)) {
-      this.assignees.push(new ListAssignee(assignee));
-    }
+    boardsStore.addIssueAssignee(this, assignee);
   }
 
   findAssignee(findAssignee) {
