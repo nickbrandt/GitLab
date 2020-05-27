@@ -129,7 +129,7 @@ describe API::Search do
 
       context 'filters' do
         it 'by filename' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon filename:PROCESS.md' }
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* filename:PROCESS.md' }
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.size).to eq(1)
@@ -137,7 +137,7 @@ describe API::Search do
         end
 
         it 'by path' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon path:markdown' }
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* path:markdown' }
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.size).to eq(1)
@@ -147,7 +147,7 @@ describe API::Search do
         end
 
         it 'by extension' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon extension:md' }
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* extension:md' }
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.size).to eq(3)

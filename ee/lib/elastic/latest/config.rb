@@ -35,7 +35,7 @@ module Elastic
               code_analyzer: {
                 type: 'custom',
                 tokenizer: 'whitespace',
-                filter: %w(code edgeNGram_filter lowercase asciifolding)
+                filter: %w(code lowercase asciifolding)
               },
               code_search_analyzer: {
                 type: 'custom',
@@ -60,11 +60,6 @@ module Elastic
                   '\.([^.]+)(?=\.|\s|\Z)', # separate terms on periods
                   '\/?([^\/]+)(?=\/|\b)' # separate path terms (like/this/one)
                 ]
-              },
-              edgeNGram_filter: {
-                type: 'edgeNGram',
-                min_gram: 2,
-                max_gram: 40
               }
             },
             tokenizer: {
