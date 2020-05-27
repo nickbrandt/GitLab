@@ -3,14 +3,14 @@
 require 'spec_helper'
 
 describe Prometheus::ProxyVariableSubstitutionService do
+  let_it_be(:environment) { create(:environment) }
+  let(:params_keys) { { query: 'up{environment="{{ci_environment_slug}}"}' } }
+  let(:params) { ActionController::Parameters.new(params_keys).permit! }
+
+  subject { described_class.new(environment, params) }
+
   describe '#execute' do
-    let_it_be(:environment) { create(:environment) }
-
-    let(:params_keys) { { query: 'up{environment="{{ci_environment_slug}}"}' } }
-    let(:params) { ActionController::Parameters.new(params_keys).permit! }
     let(:result) { subject.execute }
-
-    subject { described_class.new(environment, params) }
 
     shared_examples 'success' do
       it 'replaces variables with values' do
@@ -87,7 +87,7 @@ describe Prometheus::ProxyVariableSubstitutionService do
         end
       end
 
-      context 'with invalid variables parameter' do
+      context 'with variables parameter as invalid array' do
         let(:params_keys) do
           {
             query: 'up{pod_name="{{pod_name}}"}',
@@ -95,8 +95,20 @@ describe Prometheus::ProxyVariableSubstitutionService do
           }
         end
 
-        it_behaves_like 'error', 'Optional parameter "variables" must be an ' \
-          'array of keys and values. Ex: [key1, value1, key2, value2]'
+        it_behaves_like 'error', 'Optional parameter "variables" must be an array ' \
+        'of keys and values or a Hash. Ex: variables=[key1, value1, key2, value2] or variables[key1]=value1'
+      end
+
+      context 'with variables in invalid format' do
+        let(:params_keys) do
+          {
+            query: 'up{pod_name="{{pod_name}}"}',
+            variables: 'a'
+          }
+        end
+
+        it_behaves_like 'error', 'Optional parameter "variables" must be an array ' \
+        'of keys and values or a Hash. Ex: variables=[key1, value1, key2, value2] or variables[key1]=value1'
       end
 
       context 'with nil variables' do
@@ -109,6 +121,19 @@ describe Prometheus::ProxyVariableSubstitutionService do
 
         it_behaves_like 'success' do
           let(:expected_query) { 'up{pod_name="{{pod_name}}"}' }
+        end
+      end
+
+      context 'with variables as hash' do
+        let(:params_keys) do
+          {
+            query: 'up{pod_name="{{pod_name}}"}',
+            variables: { 'pod_name' => pod_name }
+          }
+        end
+
+        it_behaves_like 'success' do
+          let(:expected_query) { "up{pod_name=\"#{pod_name}\"}" }
         end
       end
     end
@@ -186,6 +211,17 @@ describe Prometheus::ProxyVariableSubstitutionService do
           let(:expected_query) { "up{env=#{environment.slug},other_env={{env_slug}}}" }
         end
       end
+    end
+  end
+
+  describe '#variables_hash' do
+    it 'raises error when variables is not array or hash' do
+      subject.instance_variable_set(:@params, variables: 'text')
+
+      expect { subject.send(:variables_hash) }.to raise_exception(
+        described_class::VARIABLES_FORMAT_ERROR,
+        'variables parameter is somehow not an array or hash!'
+      )
     end
   end
 end
