@@ -1,5 +1,5 @@
 <script>
-import { GlBadge, GlTabs, GlTab, GlLink } from '@gitlab/ui';
+import { GlDeprecatedBadge as GlBadge, GlTabs, GlTab, GlLink } from '@gitlab/ui';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
 import Icon from '~/vue_shared/components/icon.vue';

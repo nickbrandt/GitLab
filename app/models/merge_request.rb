@@ -88,6 +88,9 @@ class MergeRequest < ApplicationRecord
   has_many :deployments,
     through: :deployment_merge_requests
 
+  has_many :draft_notes
+  has_many :reviews, inverse_of: :merge_request
+
   KNOWN_MERGE_PARAMS = [
     :auto_merge_strategy,
     :should_remove_source_branch,
@@ -541,13 +544,21 @@ class MergeRequest < ApplicationRecord
     merge_request_diffs.where.not(id: merge_request_diff.id)
   end
 
-  # Overwritten in EE
-  def note_positions_for_paths(paths, _user = nil)
+  def note_positions_for_paths(paths, user = nil)
     positions = notes.new_diff_notes.joins(:note_diff_file)
       .where('note_diff_files.old_path IN (?) OR note_diff_files.new_path IN (?)', paths, paths)
       .positions
 
-    Gitlab::Diff::PositionCollection.new(positions, diff_head_sha)
+    collection = Gitlab::Diff::PositionCollection.new(positions, diff_head_sha)
+
+    return collection unless user
+
+    positions = draft_notes
+      .authored_by(user)
+      .positions
+      .select { |pos| paths.include?(pos.file_path) }
+
+    collection.concat(positions)
   end
 
   def preloads_discussion_diff_highlighting?
@@ -1566,6 +1577,10 @@ class MergeRequest < ApplicationRecord
 
   def recent_visible_deployments
     deployments.visible.includes(:environment).order(id: :desc).limit(10)
+  end
+
+  def banzai_render_context(field)
+    super.merge(label_url_method: :project_merge_requests_url)
   end
 
   private

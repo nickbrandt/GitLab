@@ -31,4 +31,24 @@ describe API::Entities::Member do
       expect(entity_representation.keys).not_to include(:group_saml_identity)
     end
   end
+
+  context 'when current user is allowed to manage user' do
+    before do
+      allow(member.user).to receive(:managed_by?).and_return(true)
+    end
+
+    it 'exposes email' do
+      expect(entity_representation.keys).to include(:email)
+    end
+  end
+
+  context 'when current user is not allowed to manage user' do
+    before do
+      allow(member.user).to receive(:managed_by?).and_return(false)
+    end
+
+    it 'does not expose email' do
+      expect(entity_representation.keys).not_to include(:email)
+    end
+  end
 end

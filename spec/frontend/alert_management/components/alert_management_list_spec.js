@@ -8,7 +8,7 @@ import {
   GlDropdownItem,
   GlIcon,
   GlTab,
-  GlBadge,
+  GlDeprecatedBadge as GlBadge,
 } from '@gitlab/ui';
 import { visitUrl } from '~/lib/utils/url_utility';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
@@ -142,7 +142,7 @@ describe('AlertManagementList', () => {
         findAlerts()
           .at(0)
           .classes(),
-      ).not.toContain('hover-bg-blue-50');
+      ).not.toContain('gl-hover-bg-blue-50');
     });
 
     it('error state', () => {
@@ -159,7 +159,7 @@ describe('AlertManagementList', () => {
         findAlerts()
           .at(0)
           .classes(),
-      ).not.toContain('hover-bg-blue-50');
+      ).not.toContain('gl-hover-bg-blue-50');
     });
 
     it('empty state', () => {
@@ -176,7 +176,7 @@ describe('AlertManagementList', () => {
         findAlerts()
           .at(0)
           .classes(),
-      ).not.toContain('hover-bg-blue-50');
+      ).not.toContain('gl-hover-bg-blue-50');
     });
 
     it('has data state', () => {
@@ -192,7 +192,7 @@ describe('AlertManagementList', () => {
         findAlerts()
           .at(0)
           .classes(),
-      ).toContain('hover-bg-blue-50');
+      ).toContain('gl-hover-bg-blue-50');
     });
 
     it('displays status dropdown', () => {
@@ -297,7 +297,7 @@ describe('AlertManagementList', () => {
     beforeEach(() => {
       mountComponent({
         props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
-        data: { alerts: mockAlerts, errored: false, sort: 'START_TIME_ASC', alertsCount },
+        data: { alerts: mockAlerts, errored: false, sort: 'STARTED_AT_ASC', alertsCount },
         loading: false,
       });
     });

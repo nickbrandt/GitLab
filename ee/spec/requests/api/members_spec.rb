@@ -3,6 +3,221 @@
 require 'spec_helper'
 
 describe API::Members do
+  context 'group members endpoint for group managed accounts' do
+    let(:group) { create(:group) }
+    let(:owner) { create(:user) }
+
+    before do
+      group.add_owner(owner)
+    end
+
+    include_context "group managed account with group members"
+
+    subject do
+      get api(url, owner)
+      json_response
+    end
+
+    describe "GET /groups/:id/members" do
+      let(:url) { "/groups/#{group.id}/members" }
+
+      it_behaves_like 'members response with exposed emails' do
+        let(:emails) { gma_member.email }
+      end
+
+      it_behaves_like 'members response with hidden emails' do
+        let(:emails) { member.email }
+      end
+    end
+
+    describe "GET /groups/:id/members/:user_id" do
+      let(:url) { "/groups/#{group.id}/members/#{user_id}" }
+
+      context 'with group managed account member' do
+        let(:user_id) { gma_member.id }
+
+        it_behaves_like 'member response with exposed email' do
+          let(:email) { gma_member.email }
+        end
+      end
+
+      context 'with a regular member' do
+        let(:user_id) { member.id }
+
+        it_behaves_like 'member response with hidden email'
+      end
+    end
+
+    describe "GET /groups/:id/members/all" do
+      include_context "child group with group managed account members"
+
+      context 'parent group' do
+        let(:url) { "/groups/#{group.id}/members/all" }
+
+        it_behaves_like 'members response with exposed emails' do
+          let(:emails) { gma_member.email }
+        end
+
+        it_behaves_like 'members response with hidden emails' do
+          let(:emails) { member.email }
+        end
+      end
+
+      context 'child group' do
+        let(:url) { "/groups/#{child_group.id}/members/all" }
+
+        it_behaves_like 'members response with exposed emails' do
+          let(:emails) { [gma_member.email, child_gma_member.email] }
+        end
+
+        it_behaves_like 'members response with hidden emails' do
+          let(:emails) { [member.email, child_member.email] }
+        end
+      end
+    end
+
+    describe "GET /groups/:id/members/all/:user_id" do
+      include_context "child group with group managed account members"
+
+      let(:url) { "/groups/#{child_group.id}/members/all/#{user_id}" }
+
+      context 'with group managed account member' do
+        let(:user_id) { gma_member.id }
+
+        it_behaves_like 'member response with exposed email' do
+          let(:email) { gma_member.email }
+        end
+      end
+
+      context 'with regular member' do
+        let(:user_id) { member.id }
+
+        it_behaves_like 'member response with hidden email'
+      end
+
+      context 'with group managed account child group member' do
+        let(:user_id) { child_gma_member.id }
+
+        it_behaves_like 'member response with exposed email' do
+          let(:email) { child_gma_member.email }
+        end
+      end
+
+      context 'with child group regular member' do
+        let(:user_id) { child_member.id }
+
+        it_behaves_like 'member response with hidden email'
+      end
+    end
+  end
+
+  context 'project members endpoint for group managed accounts' do
+    let(:group) { create(:group) }
+    let(:owner) { create(:user) }
+    let(:project) { create(:project, group: group) }
+
+    before do
+      group.add_owner(owner)
+    end
+
+    include_context "group managed account with project members"
+
+    subject do
+      get api(url, owner)
+      json_response
+    end
+
+    describe "GET /projects/:id/members" do
+      let(:url) { "/projects/#{project.id}/members" }
+
+      it_behaves_like 'members response with exposed emails' do
+        let(:emails) { gma_member.email }
+      end
+
+      it_behaves_like 'members response with hidden emails' do
+        let(:emails) { member.email }
+      end
+    end
+
+    describe "GET /projects/:id/members/:user_id" do
+      let(:url) { "/projects/#{project.id}/members/#{user_id}" }
+
+      context 'with group managed account member' do
+        let(:user_id) { gma_member.id }
+
+        it_behaves_like 'member response with exposed email' do
+          let(:email) { gma_member.email }
+        end
+      end
+
+      context 'with a regular member' do
+        let(:user_id) { member.id }
+
+        it_behaves_like 'member response with hidden email'
+      end
+    end
+
+    describe "GET /project/:id/members/all" do
+      include_context "child project with group managed account members"
+
+      context 'parent group project' do
+        let(:url) { "/projects/#{project.id}/members/all" }
+
+        it_behaves_like 'members response with exposed emails' do
+          let(:emails) { gma_member.email }
+        end
+
+        it_behaves_like 'members response with hidden emails' do
+          let(:emails) { member.email }
+        end
+      end
+
+      context 'child group project' do
+        let(:url) { "/projects/#{child_project.id}/members/all" }
+
+        it_behaves_like 'members response with exposed emails' do
+          let(:emails) { [child_gma_member.email] }
+        end
+
+        it_behaves_like 'members response with hidden emails' do
+          let(:emails) { [member.email, child_member.email] }
+        end
+      end
+    end
+
+    describe "GET /projects/:id/members/all/:user_id" do
+      include_context "child project with group managed account members"
+
+      let(:url) { "/projects/#{child_project.id}/members/all/#{user_id}" }
+
+      context 'with group managed account member' do
+        let(:user_id) { gma_member.id }
+
+        it_behaves_like 'member response with hidden email'
+      end
+
+      context 'with regular member' do
+        let(:user_id) { member.id }
+
+        it_behaves_like 'member response with hidden email'
+      end
+
+      context 'with group managed account child group member' do
+        let(:user_id) { child_gma_member.id }
+
+        it_behaves_like 'member response with exposed email' do
+          let(:email) { child_gma_member.email }
+        end
+      end
+
+      context 'with child group regular member' do
+        let(:user_id) { child_member.id }
+
+        it_behaves_like 'member response with hidden email'
+      end
+    end
+  end
+
   context 'without LDAP' do
     let(:group) { create(:group) }
     let(:owner) { create(:user) }

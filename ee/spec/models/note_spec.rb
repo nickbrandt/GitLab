@@ -91,10 +91,6 @@ describe Note do
     end
   end
 
-  describe 'associations' do
-    it { is_expected.to belong_to(:review).inverse_of(:notes) }
-  end
-
   describe 'scopes' do
     describe '.with_suggestions' do
       it 'returns the correct note' do

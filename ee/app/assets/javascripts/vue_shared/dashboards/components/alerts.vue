@@ -59,7 +59,7 @@ export default {
         class="align-text-bottom js-dashboard-alerts-icon"
         name="warning"
       />
-      <span class="js-alert-count text-secondary prepend-left-4"> {{ alertCount }} </span>
+      <span class="js-alert-count text-secondary gl-ml-2"> {{ alertCount }} </span>
       <span v-if="lastAlert" class="text-secondary">{{ alertText }}</span>
     </div>
   </div>

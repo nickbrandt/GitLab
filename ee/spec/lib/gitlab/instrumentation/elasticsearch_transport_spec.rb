@@ -1,0 +1,60 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+
+# We don't want to interact with Elasticsearch in GitLab FOSS so we test
+# this in ee/ only. The code exists in FOSS and won't do anything.
+
+describe ::Gitlab::Instrumentation::ElasticsearchTransport, :elastic, :request_store do
+  describe '.increment_request_count' do
+    it 'increases the request count by 1' do
+      expect { described_class.increment_request_count }.to change(described_class, :get_request_count).by(1)
+    end
+  end
+
+  describe '.add_duration' do
+    it 'does not lose precision while adding' do
+      ::Gitlab::SafeRequestStore.clear!
+
+      precision = 1.0 / (10**::Gitlab::InstrumentationHelper::DURATION_PRECISION)
+      2.times { described_class.add_duration(0.4 * precision) }
+
+      # 2 * 0.4 should be 0.8 and get rounded to 1
+      expect(described_class.query_time).to eq(1 * precision)
+    end
+  end
+
+  describe '.add_call_details' do
+    before do
+      stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+      allow(::Gitlab::PerformanceBar).to receive(:enabled_for_request?).and_return(true)
+    end
+
+    it 'parses and tracks the call details' do
+      ensure_elasticsearch_index!
+
+      ::Gitlab::SafeRequestStore.clear!
+
+      create(:issue, title: "new issue")
+      ensure_elasticsearch_index!
+
+      request = ::Gitlab::Instrumentation::ElasticsearchTransport.detail_store.first
+      expect(request[:method]).to eq("POST")
+      expect(request[:path]).to eq("_bulk")
+    end
+  end
+end
+
+describe ::Gitlab::Instrumentation::ElasticsearchTransportInterceptor, :elastic, :request_store do
+  before do
+    allow(::Gitlab::PerformanceBar).to receive(:enabled_for_request?).and_return(true)
+  end
+
+  it 'tracks any requests via the Elasticsearch client' do
+    ensure_elasticsearch_index!
+
+    expect(::Gitlab::Instrumentation::ElasticsearchTransport.get_request_count).to be > 0
+    expect(::Gitlab::Instrumentation::ElasticsearchTransport.query_time).to be > 0
+    expect(::Gitlab::Instrumentation::ElasticsearchTransport.detail_store).not_to be_empty
+  end
+end

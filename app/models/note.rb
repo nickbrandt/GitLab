@@ -72,6 +72,7 @@ class Note < ApplicationRecord
   belongs_to :author, class_name: "User"
   belongs_to :updated_by, class_name: "User"
   belongs_to :last_edited_by, class_name: 'User'
+  belongs_to :review, inverse_of: :notes
 
   has_many :todos
 
@@ -350,8 +351,10 @@ class Note < ApplicationRecord
     self.special_role = Note::SpecialRole::FIRST_TIME_CONTRIBUTOR
   end
 
-  def confidential?
-    confidential || noteable.try(:confidential?)
+  def confidential?(include_noteable: false)
+    return true if confidential
+
+    include_noteable && noteable.try(:confidential?)
   end
 
   def editable?
@@ -520,7 +523,7 @@ class Note < ApplicationRecord
   end
 
   def banzai_render_context(field)
-    super.merge(noteable: noteable, system_note: system?)
+    super.merge(noteable: noteable, system_note: system?, label_url_method: noteable_label_url_method)
   end
 
   def retrieve_upload(_identifier, paths)
@@ -602,6 +605,10 @@ class Note < ApplicationRecord
     return unless noteable
 
     errors.add(:base, _('Maximum number of comments exceeded')) if noteable.notes.count >= Noteable::MAX_NOTES_LIMIT
+  end
+
+  def noteable_label_url_method
+    for_merge_request? ? :project_merge_requests_url : :project_issues_url
   end
 end
 

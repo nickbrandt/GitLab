@@ -7,7 +7,7 @@ import {
   GlIcon,
   GlTab,
   GlTabs,
-  GlBadge,
+  GlDeprecatedBadge as GlBadge,
   GlAlert,
 } from '@gitlab/ui';
 import { LICENSE_LIST } from '../store/constants';

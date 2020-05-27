@@ -1,5 +1,10 @@
 <script>
-import { GlBadge, GlDeprecatedButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import {
+  GlDeprecatedBadge as GlBadge,
+  GlDeprecatedButton,
+  GlLoadingIcon,
+  GlTooltipDirective,
+} from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 

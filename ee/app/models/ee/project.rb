@@ -47,7 +47,6 @@ module EE
       has_one :status_page_setting, inverse_of: :project, class_name: 'StatusPage::ProjectSetting'
       has_one :compliance_framework_setting, class_name: 'ComplianceManagement::ComplianceFramework::ProjectSettings', inverse_of: :project
 
-      has_many :reviews, inverse_of: :project
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_users, through: :approvers, source: :user
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -192,6 +191,8 @@ module EE
     end
 
     class_methods do
+      extend ::Gitlab::Utils::Override
+
       def search_by_visibility(level)
         where(visibility_level: ::Gitlab::VisibilityLevel.string_options[level])
       end
@@ -205,6 +206,11 @@ module EE
         # project_key is not indexed for now
         # see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24063#note_282435524 for details
         joins(:service_desk_setting).find_by('service_desk_settings.project_key' => key)
+      end
+
+      override :with_web_entity_associations
+      def with_web_entity_associations
+        super.preload(:compliance_framework_setting)
       end
     end
 
