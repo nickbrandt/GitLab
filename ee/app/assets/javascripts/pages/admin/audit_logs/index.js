@@ -4,7 +4,7 @@ import AuditLogApp from 'ee/audit_logs/components/audit_log_app.vue';
 
 document.addEventListener('DOMContentLoaded', () => {
   const el = document.querySelector('#js-audit-log-app');
-  const { events, isLastPage, formPath } = el.dataset;
+  const { events, isLastPage, formPath, enabledTokenTypes } = el.dataset;
 
   // eslint-disable-next-line no-new
   new Vue({
@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         props: {
           events: JSON.parse(events),
           isLastPage: parseBoolean(isLastPage),
+          enabledTokenTypes: JSON.parse(enabledTokenTypes),
           formPath,
         },
       }),

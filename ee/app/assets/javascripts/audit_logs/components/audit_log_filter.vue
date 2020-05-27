@@ -2,6 +2,7 @@
 import { GlFilteredSearch } from '@gitlab/ui';
 import { queryToObject } from '~/lib/utils/url_utility';
 import { FILTER_TOKENS, AVAILABLE_TOKEN_TYPES } from '../constants';
+import { availableTokensValidator } from '../validators';
 
 export default {
   components: {
@@ -12,6 +13,7 @@ export default {
       type: Array,
       required: false,
       default: () => AVAILABLE_TOKEN_TYPES,
+      validator: availableTokensValidator,
     },
   },
   data() {
