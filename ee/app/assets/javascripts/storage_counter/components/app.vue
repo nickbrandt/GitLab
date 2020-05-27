@@ -60,7 +60,7 @@ export default {
       <div class="row py-0">
         <div class="col-sm-12">
           <strong>{{ s__('UsageQuota|Storage usage:') }}</strong>
-          <span class="js-total-usage">
+          <span data-testid="total-usage">
             {{ namespace.totalUsage }}
             <gl-link
               :href="helpPagePath"
