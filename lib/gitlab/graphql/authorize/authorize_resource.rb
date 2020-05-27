@@ -70,23 +70,12 @@ module Gitlab
             # case the current user is common, and we could benefit from the
             # caching in `DeclarativePolicy`.
             if authorization.is_a?(Proc)
-              call_custom_authorization(authorization, object)
+              authorization.call(object, current_user) == true
             else
               Ability.allowed?(current_user, authorization, object, scope: :user)
             end
           end
         end
-
-        def call_custom_authorization(authorization, object)
-          case authorization.arity
-          when 0
-            authorization.call
-          when 1
-            authorization.call(object)
-          when 2
-            authorization.call(object, current_user)
-          else
-            raise InvalidAuthorizationArity, 'The custom auth proc may only take up to 2 arguments: |object, current_user|'
           end
         end
 
