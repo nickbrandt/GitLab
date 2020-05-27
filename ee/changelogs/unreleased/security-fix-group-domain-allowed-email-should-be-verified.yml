@@ -1,6 +1,0 @@
----
-title: Allow only users with a verified email to be member of a group when the group
-  has restricted membership based on email domain
-merge_request:
-author:
-type: security
