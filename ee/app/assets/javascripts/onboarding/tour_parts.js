@@ -468,7 +468,7 @@ const INVITE_COLLEAGUES_TOUR = [
     forUrl: ({ createdProjectPath }) => new RegExp(`${createdProjectPath}/edit$`, ''),
     getHelpContent: null,
     actionPopover: {
-      selector: '#js-onboarding-settings-members-link',
+      selector: '#js-onboarding-members-link',
       text: sprintf(
         s__('UserOnboardingTour|Awesome! Now click on %{emphasisStart}Members%{emphasisEnd}.'),
         {

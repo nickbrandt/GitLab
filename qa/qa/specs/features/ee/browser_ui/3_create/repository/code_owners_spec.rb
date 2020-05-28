@@ -28,8 +28,8 @@ module QA
         end
         @project.visit!
 
-        Page::Project::Menu.perform(&:go_to_members_settings)
-        Page::Project::Settings::Members.perform do |members_page|
+        Page::Project::Menu.perform(&:click_members)
+        Page::Project::Members.perform do |members_page|
           members_page.add_member(@user.username)
           members_page.add_member(@user2.username)
         end

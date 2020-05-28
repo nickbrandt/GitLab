@@ -39,8 +39,8 @@ module QA
         before do
           project.visit!
 
-          Page::Project::Menu.perform(&:go_to_members_settings)
-          Page::Project::Settings::Members.perform do |members|
+          Page::Project::Menu.perform(&:click_members)
+          Page::Project::Members.perform do |members|
             members.add_member(user.username)
           end
         end
