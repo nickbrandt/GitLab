@@ -63,6 +63,77 @@ describe 'getting a requirement list for a project' do
       end
     end
 
+    describe 'filtering' do
+      let_it_be(:filter_project) { create(:project, :public) }
+      let_it_be(:other_project) { create(:project, :public) }
+      let_it_be(:other_user) { create(:user, username: 'number8wire') }
+      let_it_be(:requirement1) { create(:requirement, project: filter_project, author: current_user, title: 'solve the halting problem') }
+      let_it_be(:requirement2) { create(:requirement, project: filter_project, author: other_user, title: 'something about kubernetes') }
+
+      before do
+        post_graphql(query, current_user: current_user)
+      end
+
+      let(:requirements_data) { graphql_data['project']['requirements']['nodes'] }
+      let(:params) { "" }
+
+      let(:query) do
+        graphql_query_for(
+          'project',
+          { 'fullPath' => filter_project.full_path },
+          <<~REQUIREMENTS
+            requirements#{params} {
+              nodes {
+                id
+              }
+            }
+          REQUIREMENTS
+        )
+      end
+
+      it_behaves_like 'a working graphql query'
+
+      def match_single_result(requirement)
+        expect(requirements_data[0]['id']).to eq requirement.to_global_id.to_s
+      end
+
+      context 'when given single author param' do
+        let(:params) { '(authorUsername: "number8wire")' }
+
+        it 'returns filtered requirements' do
+          expect(graphql_errors).to be_nil
+          match_single_result(requirement2)
+        end
+      end
+
+      context 'when given multiple author param' do
+        let(:params) { '(authorUsername: ["number8wire", "someotheruser"])' }
+
+        it 'returns filtered requirements' do
+          expect(graphql_errors).to be_nil
+          match_single_result(requirement2)
+        end
+      end
+
+      context 'when given search param' do
+        let(:params) { '(search: "halting")' }
+
+        it 'returns filtered requirements' do
+          expect(graphql_errors).to be_nil
+          match_single_result(requirement1)
+        end
+      end
+
+      context 'when given author and search params' do
+        let(:params) { '(search: "kubernetes", authorUsername: "number8wire")' }
+
+        it 'returns filtered requirements' do
+          expect(graphql_errors).to be_nil
+          match_single_result(requirement2)
+        end
+      end
+    end
+
     describe 'sorting and pagination' do
       let(:start_cursor) { graphql_data['project']['requirements']['pageInfo']['startCursor'] }
       let(:end_cursor) { graphql_data['project']['requirements']['pageInfo']['endCursor'] }

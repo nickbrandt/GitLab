@@ -4,7 +4,7 @@ module Types
   module RequirementsManagement
     class RequirementType < BaseObject
       graphql_name 'Requirement'
-      description 'Represents a requirement.'
+      description 'Represents a requirement'
 
       authorize :read_requirement
 
