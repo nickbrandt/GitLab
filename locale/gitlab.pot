@@ -13715,6 +13715,9 @@ msgstr ""
 msgid "Metrics::Dashboard::Annotation|You are not authorized to delete this annotation"
 msgstr ""
 
+msgid "Metrics::Dashboard::Annotation|can't be before starting_at time"
+msgstr ""
+
 msgid "Metrics::UsersStarredDashboards|Dashboard with requested path can not be found"
 msgstr ""
 
