@@ -6407,6 +6407,9 @@ msgstr ""
 msgid "Create issue"
 msgstr ""
 
+msgid "Create iteration"
+msgstr ""
+
 msgid "Create lists from labels. Issues with that label appear in that list."
 msgstr ""
 
@@ -23328,6 +23331,9 @@ msgid "Unable to process group import file"
 msgstr ""
 
 msgid "Unable to resolve"
+msgstr ""
+
+msgid "Unable to save iteration. Please try again"
 msgstr ""
 
 msgid "Unable to save your changes. Please try again."
