@@ -5675,6 +5675,9 @@ msgstr ""
 msgid "ComplianceFramework|This project is regulated by %{framework}."
 msgstr ""
 
+msgid "Confidence"
+msgstr ""
+
 msgid "Confidence: %{confidence}"
 msgstr ""
 
@@ -15416,6 +15419,9 @@ msgstr ""
 msgid "Paste your public SSH key, which is usually contained in the file '~/.ssh/id_ed25519.pub' or '~/.ssh/id_rsa.pub' and begins with 'ssh-ed25519' or 'ssh-rsa'. Don't use your private SSH key."
 msgstr ""
 
+msgid "Patch to apply"
+msgstr ""
+
 msgid "Path"
 msgstr ""
 
@@ -17850,6 +17856,9 @@ msgstr ""
 msgid "Remediated: needs review"
 msgstr ""
 
+msgid "Remediations"
+msgstr ""
+
 msgid "Remember me"
 msgstr ""
 
@@ -19741,6 +19750,9 @@ msgstr ""
 msgid "Settings to prevent self-approval across all projects in the instance. Only an administrator can modify these settings."
 msgstr ""
 
+msgid "Severity"
+msgstr ""
+
 msgid "Severity: %{severity}"
 msgstr ""
 
@@ -20065,6 +20077,9 @@ msgid "Snippets|Optionally add a description about what your snippet does or how
 msgstr ""
 
 msgid "Snowplow"
+msgstr ""
+
+msgid "Solution"
 msgstr ""
 
 msgid "Some child epics may be hidden due to applied filters"
