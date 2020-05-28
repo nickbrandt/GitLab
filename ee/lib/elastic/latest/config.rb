@@ -16,6 +16,9 @@ module Elastic
         index: {
           number_of_shards: Elastic::AsJSON.new { Gitlab::CurrentSettings.elasticsearch_shards },
           number_of_replicas: Elastic::AsJSON.new { Gitlab::CurrentSettings.elasticsearch_replicas },
+          highlight: {
+            max_analyzed_offset: 1.megabyte
+          },
           codec: 'best_compression',
           analysis: {
             analyzer: {
