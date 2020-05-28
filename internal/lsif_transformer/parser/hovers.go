@@ -12,7 +12,7 @@ type Offset struct {
 }
 
 type Hovers struct {
-	Offsets       map[string]*Offset
+	Offsets       map[Id]*Offset
 	File          *os.File
 	CurrentOffset int
 }
@@ -22,18 +22,18 @@ type RawResult struct {
 }
 
 type RawData struct {
-	Id     string    `json:"id"`
+	Id     Id        `json:"id"`
 	Result RawResult `json:"result"`
 }
 
 type HoverRef struct {
-	ResultSetId string `json:"outV"`
-	HoverId     string `json:"inV"`
+	ResultSetId Id `json:"outV"`
+	HoverId     Id `json:"inV"`
 }
 
 type ResultSetRef struct {
-	ResultSetId string `json:"outV"`
-	RefId       string `json:"inV"`
+	ResultSetId Id `json:"outV"`
+	RefId       Id `json:"inV"`
 }
 
 func NewHovers(tempDir string) (*Hovers, error) {
@@ -43,7 +43,7 @@ func NewHovers(tempDir string) (*Hovers, error) {
 	}
 
 	return &Hovers{
-		Offsets:       make(map[string]*Offset),
+		Offsets:       make(map[Id]*Offset),
 		File:          file,
 		CurrentOffset: 0,
 	}, nil
@@ -68,7 +68,7 @@ func (h *Hovers) Read(label string, line []byte) error {
 	return nil
 }
 
-func (h *Hovers) For(refId string) json.RawMessage {
+func (h *Hovers) For(refId Id) json.RawMessage {
 	offset, ok := h.Offsets[refId]
 	if !ok || offset == nil {
 		return nil

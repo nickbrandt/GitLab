@@ -23,9 +23,9 @@ func TestRead(t *testing.T) {
 	require.NoError(t, d.Read(createLine("3", "document", "file:///Users/nested/folder/file.rb")))
 	require.NoError(t, d.Read(createLine("4", "document", "file:///Users/wrong/file.rb")))
 
-	require.Equal(t, d.Entries["2"], "file.rb")
-	require.Equal(t, d.Entries["3"], "folder/file.rb")
-	require.Equal(t, d.Entries["4"], "file:///Users/wrong/file.rb")
+	require.Equal(t, d.Entries[2], "file.rb")
+	require.Equal(t, d.Entries[3], "folder/file.rb")
+	require.Equal(t, d.Entries[4], "file:///Users/wrong/file.rb")
 }
 
 func TestReadContainsLine(t *testing.T) {
@@ -37,5 +37,5 @@ func TestReadContainsLine(t *testing.T) {
 
 	require.NoError(t, d.Read(line))
 
-	require.Equal(t, []string{"2", "3"}, d.DocRanges["1"])
+	require.Equal(t, []Id{2, 3}, d.DocRanges[1])
 }
