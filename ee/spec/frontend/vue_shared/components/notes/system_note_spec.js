@@ -16,8 +16,8 @@ describe('system note component', () => {
     mock.onGet('/path/to/diff').replyOnce(200, diffData);
   }
 
-  function mockDeleteDiff() {
-    mock.onDelete('/path/to/diff/1').replyOnce(200);
+  function mockDeleteDiff(statusCode = 200) {
+    mock.onDelete('/path/to/diff/1').replyOnce(statusCode);
   }
 
   const findBlankBtn = () => wrapper.find('.note-headline-light .btn-blank');
@@ -108,7 +108,29 @@ describe('system note component', () => {
       })
       .then(() => waitForPromises())
       .then(() => {
+        const deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
+        expect(deleteButton.exists()).toBe(false);
         expect(findDescriptionVersion().text()).toContain('Deleted');
+        done();
+      });
+  });
+
+  it('click on delete icon button does not delete description diff if the delete request fails', done => {
+    mockFetchDiff();
+    mockDeleteDiff(503);
+    const button = findBlankBtn();
+    button.trigger('click');
+    return wrapper.vm
+      .$nextTick()
+      .then(() => waitForPromises())
+      .then(() => {
+        const deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
+        deleteButton.trigger('click');
+      })
+      .then(() => waitForPromises())
+      .then(() => {
+        const deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
+        expect(deleteButton.exists()).toBe(true);
         done();
       });
   });
