@@ -7,7 +7,6 @@ import UrlTableCell from './url_table_cell.vue';
 const TABLE_HEADER_CLASSES = 'bg-transparent border-bottom p-3';
 
 export default {
-  name: 'LogsTable',
   components: {
     GlTable,
     GlPagination,

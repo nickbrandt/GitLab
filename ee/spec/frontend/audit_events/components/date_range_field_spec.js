@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlDaterangePicker } from '@gitlab/ui';
 
-import DateRangeField from 'ee/audit_logs/components/date_range_field.vue';
+import DateRangeField from 'ee/audit_events/components/date_range_field.vue';
 import { parsePikadayDate } from '~/lib/utils/datetime_utility';
 
 describe('DateRangeField component', () => {

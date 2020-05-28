@@ -1,10 +1,10 @@
 import { GlFilteredSearch } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 
-import AuditLogFilter from 'ee/audit_logs/components/audit_log_filter.vue';
-import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_logs/constants';
+import AuditEventsFilter from 'ee/audit_events/components/audit_events_filter.vue';
+import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_events/constants';
 
-describe('AuditLogFilter', () => {
+describe('AuditEventsFilter', () => {
   let wrapper;
   const formElement = document.createElement('form');
   formElement.submit = jest.fn();
@@ -15,7 +15,7 @@ describe('AuditLogFilter', () => {
     getAvailableTokens().filter(token => token.type === type)[0];
 
   const initComponent = (props = {}) => {
-    wrapper = shallowMount(AuditLogFilter, {
+    wrapper = shallowMount(AuditEventsFilter, {
       propsData: {
         ...props,
       },

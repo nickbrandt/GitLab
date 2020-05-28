@@ -17,7 +17,6 @@ const SORTING_OPTIONS = [
 ];
 
 export default {
-  name: 'SortingField',
   components: {
     GlNewDropdown,
     GlNewDropdownHeader,

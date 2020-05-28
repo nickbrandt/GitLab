@@ -5,7 +5,6 @@ import { parsePikadayDate, pikadayToString } from '~/lib/utils/datetime_utility'
 import { queryToObject } from '~/lib/utils/url_utility';
 
 export default {
-  name: 'DateRangeField',
   components: {
     GlDaterangePicker,
   },
