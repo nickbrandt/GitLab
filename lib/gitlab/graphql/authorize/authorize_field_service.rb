@@ -116,8 +116,6 @@ module Gitlab
             end
           end
         end
-          end
-        end
 
         # Returns the singular type for relay connections.
         # This will be the type class of edges.node

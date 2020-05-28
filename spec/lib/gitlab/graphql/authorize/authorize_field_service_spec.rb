@@ -39,7 +39,8 @@ describe Gitlab::Graphql::Authorize::AuthorizeFieldService do
     subject(:resolved) { service.authorized_resolve.call(presented_type, {}, context) }
 
     context 'when a custom authorization proc is given to authorize a field' do
-      let(:field) { type_with_field(GraphQL::STRING_TYPE, -> { authorized }, 'custom auth works!').fields['testField'].to_graphql }
+      let(:authorization) { -> (_obj, _user) { authorized } }
+      let(:field) { type_with_field(GraphQL::STRING_TYPE, authorization, 'custom auth works!').fields['testField'].to_graphql }
 
       context 'when the proc returns false' do
         let(:authorized) { false }
@@ -59,7 +60,7 @@ describe Gitlab::Graphql::Authorize::AuthorizeFieldService do
     end
 
     context 'when a custom authorization proc is given to authorize a type' do
-      let(:custom_type) { type(-> { authorized }) }
+      let(:custom_type) { type(-> (_obj, _user) { authorized }) }
       let(:object_in_field) { double('presented in field') }
       let(:field) { type_with_field(custom_type, :read_field, object_in_field).fields['testField'].to_graphql }
 
@@ -79,17 +80,6 @@ describe Gitlab::Graphql::Authorize::AuthorizeFieldService do
 
           expect(resolved).to be(object_in_field)
         end
-      end
-    end
-
-    context 'when a custom authorization proc has an invalid number of arguments' do
-      let(:field) { type_with_field(GraphQL::STRING_TYPE, lambda { |arg1, arg2, arg3| authorized }).fields['testField'].to_graphql }
-
-      it 'raises an invalid arity error' do
-        expect { resolved }.to raise_error(
-          ::Gitlab::Graphql::Authorize::AuthorizeFieldService::InvalidAuthorizationArity,
-          'The custom auth proc may only take up to 2 arguments: |object, current_user|'
-        )
       end
     end
 
