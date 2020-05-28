@@ -1419,6 +1419,9 @@ msgstr ""
 msgid "Admin Area"
 msgstr ""
 
+msgid "Admin Note"
+msgstr ""
+
 msgid "Admin Overview"
 msgstr ""
 
