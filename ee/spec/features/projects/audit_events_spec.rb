@@ -108,7 +108,7 @@ describe 'Projects > Audit Events', :js do
     end
 
     it "appears in the project's audit events" do
-      visit project_settings_members_path(project)
+      visit project_project_members_path(project)
 
       project_member = project.project_member(pete)
 
