@@ -172,7 +172,7 @@ export default {
       <div v-if="showActionButtons" slot="actionButtons" class="append-right-default">
         <a
           v-if="licenseManagementSettingsPath"
-          :class="{ 'append-right-8': fullReportPath }"
+          :class="{ 'gl-mr-3': fullReportPath }"
           :href="licenseManagementSettingsPath"
           class="btn btn-default btn-sm js-manage-licenses"
         >

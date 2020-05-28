@@ -44,7 +44,7 @@ export default {
 
 <template>
   <div v-if="hasSeverityBadge" class="severity-badge text-left text-nowrap gl-text-gray-900">
-    <span :class="className"><gl-icon :name="iconName" :size="12" class="append-right-8"/></span
+    <span :class="className"><gl-icon :name="iconName" :size="12" class="gl-mr-3"/></span
     >{{ severityTitle }}
   </div>
 </template>
