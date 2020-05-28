@@ -37,18 +37,46 @@ describe Gitlab::CodeOwners::Validator do
     allow(project.repository).to receive(:code_owners_blob).and_return(codeowner_blob)
   end
 
+  shared_examples_for "finds no errors" do
+    it "returns nil" do
+      expect(subject.execute).to be_nil
+    end
+  end
+
   describe "#execute" do
-    context "when paths match entries in the codeowners file" do
-      it "returns an error message" do
-        expect(subject.execute).to include("Pushes to protected branches")
+    context "when the branch does not require code owner approval" do
+      before do
+        expect(project).to receive(:branch_requires_code_owner_approval?)
+        .and_return(false)
+      end
+
+      context "when paths match entries in the codeowners file" do
+        it_behaves_like "finds no errors"
+      end
+
+      context "when paths do not match entries in the codeowners file" do
+        let(:paths) { "not/a/matching/path" }
+
+        it_behaves_like "finds no errors"
       end
     end
 
-    context "when paths do not match entries in the codeowners file" do
-      let(:paths) { "not/a/matching/path" }
+    context "when the branch requires code owner approval" do
+      before do
+        expect(project).to receive(:branch_requires_code_owner_approval?)
+        .and_return(true)
+      end
 
-      it "returns nil" do
-        expect(subject.execute).to be_nil
+      context "when paths match entries in the codeowners file" do
+        it "returns an error message" do
+          expect(subject.execute).to include("Pushes to protected branches")
+        end
+      end
+
+      context "when paths do not match entries in the codeowners file" do
+        let(:paths) { "not/a/matching/path" }
+
+        it_behaves_like "finds no errors"
       end
     end
   end
