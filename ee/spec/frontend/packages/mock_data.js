@@ -92,6 +92,13 @@ export const conanPackage = {
   _links,
 };
 
+export const dependencyLinks = [
+  { name: 'Moqi', version_pattern: '2.5.6' },
+  { name: 'Castle.Core', version_pattern: '' },
+  { name: 'Test.Dependency', version_pattern: '2.3.7', target_framework: '.NETStandard2.0' },
+  { name: 'Newtonsoft.Json', version_pattern: '12.0.3', target_framework: '.NETStandard2.0' },
+];
+
 export const nugetPackage = {
   created_at: '2015-12-10',
   id: 4,
@@ -102,6 +109,7 @@ export const nugetPackage = {
   tags: [],
   updated_at: '2015-12-10',
   version: '1.0.0',
+  dependency_links: dependencyLinks,
 };
 
 export const pypiPackage = {
