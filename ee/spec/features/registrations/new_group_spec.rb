@@ -7,6 +7,7 @@ describe 'New group screen', :js do
 
   before do
     gitlab_sign_in(user)
+    stub_experiment_for_user(onboarding_issues: true)
     visit new_users_sign_up_group_path
   end
 
@@ -14,7 +15,6 @@ describe 'New group screen', :js do
 
   it 'shows the progress bar with the correct steps' do
     expect(subject).to have_content('Create your group')
-
     expect(subject).to have_content('1. Your profile 2. Your GitLab group 3. Your first project')
   end
 end

@@ -2,8 +2,9 @@
 
 require 'spec_helper'
 
-describe Registrations::GroupsController do
+describe Registrations::ProjectsController do
   let_it_be(:user) { create(:user) }
+  let_it_be(:namespace) { create(:group, path: 'group-path') }
 
   describe 'GET #new' do
     subject { get :new }
@@ -19,13 +20,21 @@ describe Registrations::GroupsController do
         stub_experiment_for_user(onboarding_issues: true)
       end
 
-      it { is_expected.to have_gitlab_http_status(:ok) }
-      it { is_expected.to render_template(:new) }
+      it { is_expected.to have_gitlab_http_status(:not_found) }
 
-      context 'user without the ability to create a group' do
-        let(:user) { create(:user, can_create_group: false) }
+      context 'with a namespace in the URL' do
+        subject { get :new, params: { namespace_id: namespace.id } }
 
         it { is_expected.to have_gitlab_http_status(:not_found) }
+
+        context 'with sufficient access' do
+          before do
+            namespace.add_owner(user)
+          end
+
+          it { is_expected.to have_gitlab_http_status(:ok) }
+          it { is_expected.to render_template(:new) }
+        end
       end
 
       context 'with the experiment not enabled for user' do
@@ -39,9 +48,9 @@ describe Registrations::GroupsController do
   end
 
   describe 'POST #create' do
-    subject { post :create, params: { group: params } }
+    subject { post :create, params: { project: params } }
 
-    let(:params) { { name: 'Group name', path: 'group-path', visibility_level: Gitlab::VisibilityLevel::PRIVATE } }
+    let(:params) { { namespace_id: namespace.id, name: 'Project name', path: 'project-path', visibility_level: Gitlab::VisibilityLevel::PRIVATE } }
 
     context 'with an unauthenticated user' do
       it { is_expected.to have_gitlab_http_status(:redirect) }
@@ -50,23 +59,23 @@ describe Registrations::GroupsController do
 
     context 'with an authenticated user' do
       before do
+        namespace.add_owner(user)
         sign_in(user)
         stub_experiment_for_user(onboarding_issues: true)
       end
 
-      it 'creates a group' do
-        expect { subject }.to change { Group.count }.by(1)
+      it 'creates a project' do
+        expect { subject }.to change { Project.count }.by(1)
       end
 
       it { is_expected.to have_gitlab_http_status(:redirect) }
-      it { is_expected.to redirect_to(new_users_sign_up_project_path(namespace_id: user.groups.last.id)) }
+      it { is_expected.to redirect_to('/group-path/project-path') }
 
-      context 'when the group cannot be saved' do
+      context 'when the project cannot be saved' do
         let(:params) { { name: '', path: '' } }
 
-        it 'does not create a group' do
-          expect { subject }.not_to change { Group.count }
-          expect(assigns(:group).errors).not_to be_blank
+        it 'does not create a project' do
+          expect { subject }.not_to change { Project.count }
         end
 
         it { is_expected.to have_gitlab_http_status(:ok) }
