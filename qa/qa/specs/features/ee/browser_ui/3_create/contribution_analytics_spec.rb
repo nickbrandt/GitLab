@@ -2,7 +2,7 @@
 
 module QA
   context 'Create' do
-    describe 'Contribution Analytics' do
+    describe 'Contribution Analytics', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/219323', type: :bug } do
       let(:group) do
         Resource::Group.fabricate_via_api! do |group|
           group.path = "contribution_analytics-#{SecureRandom.hex(8)}"
