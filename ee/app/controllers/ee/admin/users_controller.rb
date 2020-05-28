@@ -33,7 +33,6 @@ module EE
 
       def allowed_user_params
         super + [
-          :note,
           namespace_attributes: [
             :id,
             :shared_runners_minutes_limit,
