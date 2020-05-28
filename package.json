@@ -211,8 +211,9 @@
     "bootstrap-vue": "https://docs.gitlab.com/ee/development/fe_guide/dependencies.md#bootstrapvue"
   },
   "resolutions": {
-    "vue-jest/ts-jest": "24.0.0",
-    "monaco-editor": "0.18.1"
+    "chokidar": "^3.4.0",
+    "monaco-editor": "0.18.1",
+    "vue-jest/ts-jest": "24.0.0"
   },
   "engines": {
     "node": ">=10.13.0",
