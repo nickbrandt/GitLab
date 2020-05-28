@@ -11,6 +11,7 @@ import (
 	"syscall"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
@@ -53,7 +54,7 @@ func (a *artifactsUploadProcessor) generateMetadataFromZip(ctx context.Context, 
 	}
 
 	zipMd := exec.CommandContext(ctx, "gitlab-zip-metadata", fileName)
-	zipMd.Stderr = os.Stderr
+	zipMd.Stderr = log.ContextLogger(ctx).Writer()
 	zipMd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	zipMd.Stdout = metaWriter
 
