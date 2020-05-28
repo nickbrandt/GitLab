@@ -1,5 +1,0 @@
----
-title: Gather gitlab-zip-cat/metadata stderr and log output in the current context
-merge_request: 498
-author: Georges-Etienne Legendre
-type: fixed

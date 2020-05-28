@@ -1,5 +1,16 @@
 # Changelog for gitlab-workhorse
 
+## v8.33.0
+
+### Added
+- Add routes for Group import via the UI
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/493
+
+### Fixed
+- Gather gitlab-zip-cat/metadata stderr and log output in the current context
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/498
+  Contributed by Georges-Etienne Legendre
+
 ## v8.32.1
 
 ### Security
