@@ -1630,10 +1630,6 @@ class User < ApplicationRecord
     super.presence || build_user_detail
   end
 
-  def todos_limited_to(ids)
-    todos.where(id: ids)
-  end
-
   def pending_todo_for(target)
     todos.find_by(target: target, state: :pending)
   end

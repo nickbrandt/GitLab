@@ -44,7 +44,7 @@ module MergeRequests
     end
 
     def mark_pending_todos_as_done(merge_request)
-      todo_service.mark_pending_todos_as_done(merge_request, current_user)
+      todo_service.resolve_todos_for_target(merge_request, current_user)
     end
 
     def calculate_approvals_metrics(merge_request)
