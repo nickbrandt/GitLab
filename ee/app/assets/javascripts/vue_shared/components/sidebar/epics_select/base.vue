@@ -74,7 +74,13 @@ export default {
     };
   },
   computed: {
-    ...mapState(['epicSelectInProgress', 'epicsFetchInProgress', 'selectedEpic', 'searchQuery']),
+    ...mapState([
+      'epicSelectInProgress',
+      'epicsFetchInProgress',
+      'selectedEpic',
+      'searchQuery',
+      'selectedEpicIssueId',
+    ]),
     ...mapGetters(['isDropdownVariantSidebar', 'isDropdownVariantStandalone', 'groupEpics']),
     dropdownSelectInProgress() {
       return this.initialEpicLoading || this.epicSelectInProgress;
@@ -99,6 +105,7 @@ export default {
      */
     initialEpic() {
       this.setSelectedEpic(this.initialEpic);
+      this.setSelectedEpicIssueId(this.epicIssueId);
     },
     /**
      * Initial Epic is loaded via separate Sidebar store
@@ -106,6 +113,7 @@ export default {
      */
     initialEpicLoading() {
       this.setSelectedEpic(this.initialEpic);
+      this.setSelectedEpicIssueId(this.epicIssueId);
     },
     /**
      * Check if `searchQuery` presence has yielded any matching
@@ -136,6 +144,7 @@ export default {
       'setIssueId',
       'setSearchQuery',
       'setSelectedEpic',
+      'setSelectedEpicIssueId',
       'fetchEpics',
       'assignIssueToEpic',
       'removeIssueFromEpic',
@@ -159,7 +168,7 @@ export default {
       this.showDropdown = this.isDropdownVariantStandalone;
     },
     handleItemSelect(epic) {
-      if (this.epicIssueId && epic.id === noneEpic.id && epic.title === noneEpic.title) {
+      if (this.selectedEpicIssueId && epic.id === noneEpic.id && epic.title === noneEpic.title) {
         this.removeIssueFromEpic(this.selectedEpic);
       } else if (this.issueId) {
         this.assignIssueToEpic(epic);
