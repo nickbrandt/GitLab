@@ -74,6 +74,11 @@ describe Gitlab::Checks::DiffCheck do
           subject.send(:validate_code_owners).call(["docs/CODEOWNERS", "README"])
         end
 
+        before do
+          expect(project).to receive(:branch_requires_code_owner_approval?)
+            .at_least(:once).and_return(true)
+        end
+
         it_behaves_like "returns codeowners validation message"
       end
 
