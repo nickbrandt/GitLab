@@ -21,7 +21,7 @@ describe LdapAllGroupsSyncWorker do
 
     context 'without a license key' do
       before do
-        License.destroy_all # rubocop: disable DestroyAll
+        License.destroy_all # rubocop: disable Cop/DestroyAll
       end
 
       it 'does not sync all groups' do

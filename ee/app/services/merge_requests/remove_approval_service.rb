@@ -11,7 +11,7 @@ module MergeRequests
 
       currently_approved = merge_request.approved?
 
-      if approval.destroy_all # rubocop: disable DestroyAll
+      if approval.destroy_all # rubocop: disable Cop/DestroyAll
         merge_request.reset_approval_cache!
         create_note(merge_request)
 

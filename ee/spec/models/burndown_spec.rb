@@ -112,7 +112,7 @@ describe Burndown do
 
     context "when all closed issues do not have closed events" do
       before do
-        Event.where(target: milestone.issues, action: :closed).destroy_all # rubocop: disable DestroyAll
+        Event.where(target: milestone.issues, action: :closed).destroy_all # rubocop: disable Cop/DestroyAll
       end
 
       it "considers closed_at as milestone start date" do
@@ -137,7 +137,7 @@ describe Burndown do
 
     context "when one but not all closed issues does not have a closed event" do
       it "sets attribute accurate to false" do
-        Event.where(target: milestone.issues.closed.first, action: :closed).destroy_all # rubocop: disable DestroyAll
+        Event.where(target: milestone.issues.closed.first, action: :closed).destroy_all # rubocop: disable Cop/DestroyAll
         burndown = described_class.new(milestone.issues_visible_to_user(user), milestone.start_date, milestone.due_date)
 
         aggregate_failures do
