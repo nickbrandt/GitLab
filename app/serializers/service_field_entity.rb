@@ -6,6 +6,7 @@ class ServiceFieldEntity < Grape::Entity
   expose :type, :name, :title, :placeholder, :required, :choices, :help
 
   expose :value do |field|
+    # field[:name] is not user input and so can assume is safe
     value = service.public_send(field[:name]) # rubocop:disable GitlabSecurity/PublicSend
 
     if field[:type] == 'password' && value.present?

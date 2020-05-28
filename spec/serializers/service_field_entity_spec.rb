@@ -17,8 +17,9 @@ describe ServiceFieldEntity do
 
       context 'field with type text' do
         let(:field) { service.global_fields.find { |field| field[:name] == 'username' } }
-        let(:expected_hash) do
-          {
+
+        it 'exposes correct attributes' do
+          expected_hash = {
             type: 'text',
             name: 'username',
             title: 'Username or Email',
@@ -28,9 +29,7 @@ describe ServiceFieldEntity do
             help: nil,
             value: 'jira_username'
           }
-        end
 
-        it 'exposes correct attributes' do
           is_expected.to eq(expected_hash)
         end
       end
@@ -38,8 +37,8 @@ describe ServiceFieldEntity do
       context 'field with type password' do
         let(:field) { service.global_fields.find { |field| field[:name] == 'password' } }
 
-        let(:expected_hash) do
-          {
+        it 'exposes correct attributes but hides password' do
+          expected_hash = {
             type: 'password',
             name: 'password',
             title: 'Password or API token',
@@ -49,9 +48,7 @@ describe ServiceFieldEntity do
             help: nil,
             value: 'true'
           }
-        end
 
-        it 'exposes correct attributes but hides password' do
           is_expected.to eq(expected_hash)
         end
       end
@@ -62,8 +59,9 @@ describe ServiceFieldEntity do
 
       context 'field with type checkbox' do
         let(:field) { service.global_fields.find { |field| field[:name] == 'send_from_committer_email' } }
-        let(:expected_hash) do
-          {
+
+        it 'exposes correct attributes' do
+          expected_hash = {
             type: 'checkbox',
             name: 'send_from_committer_email',
             title: 'Send from committer',
@@ -72,9 +70,7 @@ describe ServiceFieldEntity do
             choices: nil,
             value: true
           }
-        end
 
-        it 'exposes correct attributes' do
           is_expected.to include(expected_hash)
           expect(subject[:help]).to include("Send notifications from the committer's email address if the domain is part of the domain GitLab is running on")
         end
@@ -82,8 +78,9 @@ describe ServiceFieldEntity do
 
       context 'field with type select' do
         let(:field) { service.global_fields.find { |field| field[:name] == 'branches_to_be_notified' } }
-        let(:expected_hash) do
-          {
+
+        it 'exposes correct attributes' do
+          expected_hash = {
             type: 'select',
             name: 'branches_to_be_notified',
             title: nil,
@@ -93,9 +90,7 @@ describe ServiceFieldEntity do
             help: nil,
             value: nil
           }
-        end
 
-        it 'exposes correct attributes' do
           is_expected.to eq(expected_hash)
         end
       end

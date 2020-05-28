@@ -11,7 +11,7 @@
   .js-vue-integration-settings{ data: { show_active: @service.show_active_box?.to_s, activated: (@service.active || @service.new_record?).to_s, type: @service.to_param, merge_request_events: @service.merge_requests_events.to_s,
 commit_events: @service.commit_events.to_s, enable_comments: @service.comment_on_event_enabled.to_s, comment_detail: @service.comment_detail, trigger_events: trigger_events_for_service, fields: fields_for_service } }
 
-  - if show_service_trigger_events
+  - if show_service_trigger_events?
     .form-group.row
       %label.col-form-label.col-sm-2= _('Trigger')
 
@@ -32,6 +32,6 @@ commit_events: @service.commit_events.to_s, enable_comments: @service.comment_on
             %p.text-muted
               = @service.class.event_description(event)
 
-  - if Feature.disabled?(:integration_form_refactor, @project)
+  - unless integration_form_refactor?
     - @service.global_fields.each do |field|
       = render 'shared/field', form: form, field: field
