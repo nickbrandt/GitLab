@@ -300,7 +300,7 @@ describe Projects::MergeRequests::DraftsController do
     it 'publishes a draft note with quick actions and applies them' do
       project.add_developer(user2)
       create(:draft_note, merge_request: merge_request, author: user,
-                          note: "/assign #{user.to_reference} #{user2.to_reference}")
+                          note: "/assign #{user2.to_reference}")
 
       expect(merge_request.assignees).to be_empty
 
@@ -308,7 +308,7 @@ describe Projects::MergeRequests::DraftsController do
         .and change { DraftNote.count }.by(-1)
 
       expect(response).to have_gitlab_http_status(:ok)
-      expect(merge_request.reload.assignee_ids).to match_array([user.id, user2.id])
+      expect(merge_request.reload.assignee_ids).to match_array([user2.id])
       expect(Note.last.system?).to be true
     end
 
