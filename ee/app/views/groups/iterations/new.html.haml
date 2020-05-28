@@ -2,7 +2,4 @@
 - breadcrumb_title _("New")
 - page_title _("Iterations")
 
-%h3.page-title
-  = _("New Iteration")
-
-.js-iteration-new{ data: { group_full_path: @group.full_path } }
+.js-iteration-new{ data: { group_full_path: @group.full_path, preview_markdown_path: preview_markdown_path(@group), iterations_list_path: group_iterations_path(@group) } }
