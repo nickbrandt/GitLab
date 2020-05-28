@@ -152,7 +152,7 @@ class GeoNodeStatus < ApplicationRecord
   def self.alternative_status_store_accessor(attr_names)
     attr_names.each do |attr_name|
       define_method(attr_name) do
-        status[attr_name] || read_attribute(attr_name)
+        status[attr_name].nil? ? read_attribute(attr_name) : status[attr_name].to_i
       end
 
       define_method("#{attr_name}=") do |val|

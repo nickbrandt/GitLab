@@ -46,7 +46,7 @@ module Gitlab
 
         # @return [String] URL to download the resource from
         def resource_url
-          Gitlab::Geo.primary_node.geo_transfers_url(file_type, file_id.to_s)
+          Gitlab::Geo.primary_node.geo_transfers_url(url_encode(file_type), file_id.to_s)
         end
 
         # Returns Result object with success boolean and number of bytes downloaded.

@@ -1294,5 +1294,13 @@ describe GeoNodeStatus, :geo, :geo_fdw do
         end
       end
     end
+
+    context 'status counters are converted into integers' do
+      it 'returns integer value' do
+        subject.status = { "projects_count" => "10" }
+
+        expect(subject.projects_count).to eq 10
+      end
+    end
   end
 end
