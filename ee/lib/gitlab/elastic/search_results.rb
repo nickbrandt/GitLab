@@ -43,7 +43,7 @@ module Gitlab
         when 'wiki_blobs'
           wiki_blobs(page: page, per_page: per_page)
         when 'commits'
-          commits(page: page, per_page: per_page)
+          commits(page: page, per_page: per_page, preload_method: preload_method)
         when 'users'
           users.page(page).per(per_page)
         else
@@ -270,7 +270,7 @@ module Gitlab
       # hitting ES twice for any page that's not page 1, and that's something we want to avoid.
       #
       # It is safe to memoize the page we get here because this method is _always_ called before `#commits_count`
-      def commits(page: 1, per_page: DEFAULT_PER_PAGE)
+      def commits(page: 1, per_page: DEFAULT_PER_PAGE, preload_method: nil)
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:commits) do
@@ -282,7 +282,8 @@ module Gitlab
             query,
             page: (page || 1).to_i,
             per_page: per_page,
-            options: options
+            options: options,
+            preload_method: preload_method
           )
         end
       end

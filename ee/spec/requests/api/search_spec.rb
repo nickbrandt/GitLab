@@ -102,7 +102,7 @@ RSpec.describe API::Search do
       it_behaves_like 'pagination', scope: 'wiki_blobs'
     end
 
-    context 'for commits scope', :sidekiq_might_not_need_inline do
+    context 'for commits scope', :sidekiq_inline do
       before do
         project.repository.index_commits_and_blobs
         ensure_elasticsearch_index!
@@ -113,6 +113,20 @@ RSpec.describe API::Search do
       it_behaves_like 'response is correct', schema: 'public_api/v4/commits_details', size: 2
 
       it_behaves_like 'pagination', scope: 'commits'
+
+      it 'avoids N+1 queries' do
+        control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'commits', search: 'folder' } }
+
+        project_2 = create(:project, :public, :repository, :wiki_repo, name: 'awesome project 2')
+        project_3 = create(:project, :public, :repository, :wiki_repo, name: 'awesome project 3')
+        project_2.repository.index_commits_and_blobs
+        project_3.repository.index_commits_and_blobs
+
+        ensure_elasticsearch_index!
+
+        # Some N+1 queries still exist
+        expect { get api(endpoint, user), params: { scope: 'commits', search: 'folder' } }.not_to exceed_query_limit(control.count + 2)
+      end
     end
 
     context 'for blobs scope', :sidekiq_might_not_need_inline do

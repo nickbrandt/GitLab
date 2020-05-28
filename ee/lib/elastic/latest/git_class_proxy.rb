@@ -181,7 +181,7 @@ module Elastic
       # Wrap returned results into GitLab model objects and paginate
       #
       # @return [Kaminari::PaginatableArray]
-      def elastic_search_and_wrap(query, type:, page: 1, per: 20, options: {}, &blk)
+      def elastic_search_and_wrap(query, type:, page: 1, per: 20, options: {}, preload_method: nil, &blk)
         response = elastic_search(
           query,
           type: type,
@@ -190,17 +190,19 @@ module Elastic
           options: options
         )[type.pluralize.to_sym][:results]
 
-        items, total_count = yield_each_search_result(response, type, &blk)
+        items, total_count = yield_each_search_result(response, type, preload_method, &blk)
 
         # Before "map" we had a paginated array so we need to recover it
         offset = per * ((page || 1) - 1)
         Kaminari.paginate_array(items, total_count: total_count, limit: per, offset: offset)
       end
 
-      def yield_each_search_result(response, type)
+      def yield_each_search_result(response, type, preload_method)
         # Avoid one SELECT per result by loading all projects into a hash
         project_ids = response.map { |result| project_id_for_commit_or_blob(result, type) }.uniq
-        projects = Project.with_route.id_in(project_ids).index_by(&:id)
+        projects = Project.with_route.id_in(project_ids)
+        projects = projects.public_send(preload_method) if preload_method # rubocop:disable GitlabSecurity/PublicSend
+        projects = projects.index_by(&:id)
         total_count = response.total_count
 
         items = response.map do |result|
