@@ -2,6 +2,7 @@ package artifacts
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"mime"
@@ -43,7 +44,7 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
-	err := unpackFileFromZip(params.Archive, params.Entry, w.Header(), w)
+	err := unpackFileFromZip(r.Context(), params.Archive, params.Entry, w.Header(), w)
 
 	if os.IsNotExist(err) {
 		http.NotFound(w, r)
@@ -60,7 +61,7 @@ func detectFileContentType(fileName string) string {
 	return contentType
 }
 
-func unpackFileFromZip(archivePath, encodedFilename string, headers http.Header, output io.Writer) error {
+func unpackFileFromZip(ctx context.Context, archivePath, encodedFilename string, headers http.Header, output io.Writer) error {
 	fileName, err := zipartifacts.DecodeFileEntry(encodedFilename)
 	if err != nil {
 		return err
@@ -71,7 +72,7 @@ func unpackFileFromZip(archivePath, encodedFilename string, headers http.Header,
 		"ARCHIVE_PATH="+archivePath,
 		"ENCODED_FILE_NAME="+encodedFilename,
 	)
-	catFile.Stderr = os.Stderr
+	catFile.Stderr = log.ContextLogger(ctx).Writer()
 	catFile.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	stdout, err := catFile.StdoutPipe()
 	if err != nil {
