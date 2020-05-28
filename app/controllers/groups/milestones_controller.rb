@@ -6,7 +6,7 @@ class Groups::MilestonesController < Groups::ApplicationController
   before_action :milestone, only: [:edit, :show, :update, :merge_requests, :participants, :labels, :destroy]
   before_action :authorize_admin_milestones!, only: [:edit, :new, :create, :update, :destroy]
   before_action do
-    push_frontend_feature_flag(:burnup_charts)
+    push_frontend_feature_flag(:burnup_charts, @group)
   end
 
   def index
