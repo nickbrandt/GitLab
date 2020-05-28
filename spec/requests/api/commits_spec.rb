@@ -299,6 +299,34 @@ describe API::Commits do
     end
   end
 
+  shared_examples_for "returns a 403 from a codeowners violation" do
+    let(:error_msg) { "CodeOwners error msg" }
+
+    before do
+      allow(ProtectedBranch)
+        .to receive(:branch_requires_code_owner_approval?)
+        .with(project, branch).and_return(code_owner_approval_required)
+    end
+
+    it "creates a new validator with expected parameters" do
+      expect(Gitlab::CodeOwners::Validator)
+        .to receive(:new).with(project, branch, Array(paths)).and_call_original
+
+      post api(url, user), params: params
+    end
+
+    it "returns 403" do
+      expect_next_instance_of(Gitlab::CodeOwners::Validator) do |validator|
+        expect(validator).to receive(:execute).and_return(error_msg)
+      end
+
+      post api(url, user), params: params
+
+      expect(response).to have_gitlab_http_status(:forbidden)
+      expect(json_response["message"]).to include(error_msg)
+    end
+  end
+
   describe "POST /projects/:id/repository/commits" do
     let!(:url) { "/projects/#{project_id}/repository/commits" }
 
@@ -369,6 +397,17 @@ describe API::Commits do
         expect(::Gitlab::UsageDataCounters::WebIdeCounter).not_to receive(:increment_commits_count)
 
         post api(url, user), params: valid_c_params
+      end
+
+      context "a new file that matches a codeowner entry" do
+        context "when codeowners are required" do
+          it_behaves_like "returns a 403 from a codeowners violation" do
+            let(:code_owner_approval_required) { true }
+            let(:params) { valid_c_params }
+            let(:branch) { valid_c_params[:branch] }
+            let(:paths)  { valid_c_params[:actions].first[:file_path] }
+          end
+        end
       end
 
       context 'a new file in project repo' do
@@ -641,6 +680,15 @@ describe API::Commits do
         expect(json_response['title']).to eq(message)
       end
 
+      context "a deleted file that matches a codeowner entry" do
+        it_behaves_like "returns a 403 from a codeowners violation" do
+          let(:code_owner_approval_required) { true }
+          let(:params) { valid_d_params }
+          let(:branch) { valid_d_params[:branch] }
+          let(:paths)  { valid_d_params[:actions].first[:file_path] }
+        end
+      end
+
       it 'returns a 400 bad request if file does not exist' do
         post api(url, user), params: invalid_d_params
 
@@ -684,6 +732,18 @@ describe API::Commits do
 
         expect(response).to have_gitlab_http_status(:created)
         expect(json_response['title']).to eq(message)
+      end
+
+      context "a moved file that matches a codeowner entry" do
+        it_behaves_like "returns a 403 from a codeowners violation" do
+          let(:code_owner_approval_required) { true }
+          let(:params) { valid_m_params }
+          let(:branch) { valid_m_params[:branch] }
+          let(:paths) do
+            action = valid_m_params[:actions].first
+            [action[:file_path], action[:previous_path]]
+          end
+        end
       end
 
       it 'returns a 400 bad request if file does not exist' do
