@@ -37,6 +37,12 @@ Additionally, you can integrate milestones with GitLab's [Releases feature](../r
 - **Group milestones** can be assigned to any issue or merge request of any project in that group. Navigate to **Issues > Milestones** in a group to view the group milestone list.
 - All milestones you have access to can also be viewed in the dashboard milestones list. Click on **Milestones** on the top navigation bar to view both project milestones and group milestones you have access to.
 
+[Project Milestones API](https://docs.gitlab.com/ee/api/milestones.html)
+[Group Milestones API](https://docs.gitlab.com/ee/api/group_milestones.html)
+
+>**Note:**
+The group milestone will return only the group milestones in the UI.  Both group and project milestones will show, however the project milestones will be only for the group you are viewing.
+
 ## Creating milestones
 
 >**Note:**
