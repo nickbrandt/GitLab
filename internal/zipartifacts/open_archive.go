@@ -29,6 +29,7 @@ var httpClient = &http.Client{
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 10 * time.Second,
 		ResponseHeaderTimeout: 30 * time.Second,
+		DisableCompression:    true,
 	})),
 }
 
