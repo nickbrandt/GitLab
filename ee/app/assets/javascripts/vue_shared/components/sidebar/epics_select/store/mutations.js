@@ -24,6 +24,10 @@ export default {
     state.selectedEpic = selectedEpic;
   },
 
+  [types.SET_SELECTED_EPIC_ISSUE_ID](state, selectedEpicIssueId) {
+    state.selectedEpicIssueId = selectedEpicIssueId;
+  },
+
   [types.REQUEST_EPICS](state) {
     state.epicsFetchInProgress = true;
   },
