@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
-import UrlTableCell from 'ee/audit_logs/components/url_table_cell.vue';
+import UrlTableCell from 'ee/audit_events/components/url_table_cell.vue';
 
 describe('UrlTableCell component', () => {
   it('should show the link if the URL is provided', () => {

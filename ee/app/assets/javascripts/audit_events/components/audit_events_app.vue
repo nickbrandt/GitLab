@@ -1,15 +1,15 @@
 <script>
-import AuditLogFilter from './audit_log_filter.vue';
+import AuditEventsFilter from './audit_events_filter.vue';
 import DateRangeField from './date_range_field.vue';
 import SortingField from './sorting_field.vue';
-import LogsTable from './logs_table.vue';
+import AuditEventsTable from './audit_events_table.vue';
 
 export default {
   components: {
-    AuditLogFilter,
+    AuditEventsFilter,
     DateRangeField,
     SortingField,
-    LogsTable,
+    AuditEventsTable,
   },
   props: {
     formPath: {
@@ -55,18 +55,18 @@ export default {
         class="filter-form d-flex justify-content-between audit-controls row"
       >
         <div class="col-lg-auto flex-fill form-group align-items-lg-center pr-lg-8">
-          <AuditLogFilter v-bind="{ enabledTokenTypes }" />
+          <audit-events-filter v-bind="{ enabledTokenTypes }" />
         </div>
         <div class="d-flex col-lg-auto flex-wrap pl-lg-0">
           <div
             class="audit-controls d-flex align-items-lg-center flex-column flex-lg-row col-lg-auto px-0"
           >
-            <DateRangeField v-if="formElement" :form-element="formElement" />
-            <SortingField />
+            <date-range-field v-if="formElement" :form-element="formElement" />
+            <sorting-field />
           </div>
         </div>
       </form>
     </div>
-    <LogsTable v-bind="{ events, isLastPage }" />
+    <audit-events-table v-bind="{ events, isLastPage }" />
   </div>
 </template>

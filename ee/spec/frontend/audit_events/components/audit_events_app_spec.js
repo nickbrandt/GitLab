@@ -1,19 +1,19 @@
 import { shallowMount } from '@vue/test-utils';
 
-import AuditLogApp from 'ee/audit_logs/components/audit_log_app.vue';
-import DateRangeField from 'ee/audit_logs/components/date_range_field.vue';
-import LogsTable from 'ee/audit_logs/components/logs_table.vue';
-import AuditLogFilter from 'ee/audit_logs/components/audit_log_filter.vue';
-import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_logs/constants';
+import AuditEventsApp from 'ee/audit_events/components/audit_events_app.vue';
+import DateRangeField from 'ee/audit_events/components/date_range_field.vue';
+import AuditEventsTable from 'ee/audit_events/components/audit_events_table.vue';
+import AuditEventsFilter from 'ee/audit_events/components/audit_events_filter.vue';
+import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_events/constants';
 
-describe('AuditLogApp', () => {
+describe('AuditEventsApp', () => {
   let wrapper;
 
   const events = [{ foo: 'bar' }];
   const enabledTokenTypes = AVAILABLE_TOKEN_TYPES;
 
   const initComponent = (props = {}) => {
-    wrapper = shallowMount(AuditLogApp, {
+    wrapper = shallowMount(AuditEventsApp, {
       propsData: {
         formPath: 'form/path',
         isLastPage: true,
@@ -23,7 +23,7 @@ describe('AuditLogApp', () => {
         ...props,
       },
       stubs: {
-        AuditLogFilter,
+        AuditEventsFilter,
       },
     });
   };
@@ -48,11 +48,11 @@ describe('AuditLogApp', () => {
     });
 
     it('passes its events property to the logs table', () => {
-      expect(wrapper.find(LogsTable).props('events')).toEqual(events);
+      expect(wrapper.find(AuditEventsTable).props('events')).toEqual(events);
     });
 
     it('passes its avilable token types to the logs filter', () => {
-      expect(wrapper.find(AuditLogFilter).props('enabledTokenTypes')).toEqual(enabledTokenTypes);
+      expect(wrapper.find(AuditEventsFilter).props('enabledTokenTypes')).toEqual(enabledTokenTypes);
     });
   });
 });

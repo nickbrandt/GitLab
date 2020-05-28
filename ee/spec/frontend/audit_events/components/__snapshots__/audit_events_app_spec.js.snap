@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AuditLogApp when initialized matches the snapshot 1`] = `
+exports[`AuditEventsApp when initialized matches the snapshot 1`] = `
 <div
   dataqaselector="qa_selector"
 >
@@ -46,17 +46,17 @@ exports[`AuditLogApp when initialized matches the snapshot 1`] = `
         <div
           class="audit-controls d-flex align-items-lg-center flex-column flex-lg-row col-lg-auto px-0"
         >
-          <daterangefield-stub
+          <date-range-field-stub
             formelement="[object HTMLFormElement]"
           />
            
-          <sortingfield-stub />
+          <sorting-field-stub />
         </div>
       </div>
     </form>
   </div>
    
-  <logstable-stub
+  <audit-events-table-stub
     events="[object Object]"
     islastpage="true"
   />

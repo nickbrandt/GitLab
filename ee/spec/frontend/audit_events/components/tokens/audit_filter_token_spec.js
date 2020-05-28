@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import httpStatusCodes from '~/lib/utils/http_status';
 import createFlash from '~/flash';
 
-import AuditFilterToken from 'ee/audit_logs/components/tokens/shared/audit_filter_token.vue';
+import AuditFilterToken from 'ee/audit_events/components/tokens/shared/audit_filter_token.vue';
 
 jest.mock('~/flash');
 

@@ -3,7 +3,7 @@ import { GlNewDropdownItem } from '@gitlab/ui';
 
 import * as urlUtils from '~/lib/utils/url_utility';
 
-import SortingField from 'ee/audit_logs/components/sorting_field.vue';
+import SortingField from 'ee/audit_events/components/sorting_field.vue';
 
 describe('SortingField component', () => {
   let wrapper;

@@ -1,16 +1,16 @@
 import { mount } from '@vue/test-utils';
 import { GlPagination, GlTable } from '@gitlab/ui';
 
-import LogsTable from 'ee/audit_logs/components/logs_table.vue';
+import AuditEventsTable from 'ee/audit_events/components/audit_events_table.vue';
 import createEvents from '../mock_data';
 
 const EVENTS = createEvents();
 
-describe('LogsTable component', () => {
+describe('AuditEventsTable component', () => {
   let wrapper;
 
   const createComponent = (props = {}) => {
-    return mount(LogsTable, {
+    return mount(AuditEventsTable, {
       propsData: {
         events: EVENTS,
         isLastPage: false,
