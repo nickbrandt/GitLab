@@ -55,6 +55,13 @@ FactoryBot.define do
       last_successful_status_check_timestamp { 2.minutes.ago }
       version { Gitlab::VERSION }
       revision { Gitlab.revision }
+      attachments_replication_enabled { true }
+      container_repositories_replication_enabled { false }
+      design_repositories_replication_enabled { true }
+      job_artifacts_replication_enabled { false }
+      lfs_objects_replication_enabled { true }
+      repositories_replication_enabled { true }
+      repository_verification_enabled { true }
     end
 
     trait :unhealthy do

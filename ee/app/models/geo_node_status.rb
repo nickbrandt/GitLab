@@ -11,10 +11,6 @@ class GeoNodeStatus < ApplicationRecord
 
   attr_accessor :storage_shards
 
-  attr_accessor :attachments_replication_enabled, :lfs_objects_replication_enabled, :job_artifacts_replication_enabled,
-                :container_repositories_replication_enabled, :design_repositories_replication_enabled, :repositories_replication_enabled,
-                :repository_verification_enabled
-
   # Prometheus metrics, no need to store them in the database
   attr_accessor :event_log_max_id, :repository_created_max_id, :repository_updated_max_id,
                 :repository_deleted_max_id, :repository_renamed_max_id, :repositories_changed_max_id,
@@ -35,16 +31,21 @@ class GeoNodeStatus < ApplicationRecord
   alias_attribute :cursor_last_event_timestamp, :cursor_last_event_date_timestamp
 
   RESOURCE_STATUS_FIELDS = %w(
+    repository_verification_enabled
+    repositories_replication_enabled
     repositories_synced_count
     repositories_failed_count
+    lfs_objects_replication_enabled
     lfs_objects_count
     lfs_objects_synced_count
     lfs_objects_failed_count
+    attachments_replication_enabled
     attachments_count
     attachments_synced_count
     attachments_failed_count
     wikis_synced_count
     wikis_failed_count
+    job_artifacts_replication_enabled
     job_artifacts_count
     job_artifacts_synced_count
     job_artifacts_failed_count
@@ -64,10 +65,12 @@ class GeoNodeStatus < ApplicationRecord
     repositories_retrying_verification_count
     wikis_retrying_verification_count
     projects_count
+    container_repositories_replication_enabled
     container_repositories_count
     container_repositories_synced_count
     container_repositories_failed_count
     container_repositories_registry_count
+    design_repositories_replication_enabled
     design_repositories_count
     design_repositories_synced_count
     design_repositories_failed_count
@@ -81,6 +84,7 @@ class GeoNodeStatus < ApplicationRecord
   # Be sure to keep this consistent with Prometheus naming conventions
   PROMETHEUS_METRICS = {
     db_replication_lag_seconds: 'Database replication lag (seconds)',
+    repository_verification_enabled: 'Boolean denoting if verification is enabled for Repositories',
     repositories_replication_enabled: 'Boolean denoting if replication is enabled for Repositories',
     repositories_count: 'Total number of repositories available on primary',
     repositories_synced_count: 'Number of repositories synced on secondary',
@@ -233,13 +237,16 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def initialize_feature_flags
-    self.attachments_replication_enabled = Geo::UploadRegistry.replication_enabled?
-    self.container_repositories_replication_enabled = Geo::ContainerRepositoryRegistry.replication_enabled?
-    self.design_repositories_replication_enabled = Geo::DesignRegistry.replication_enabled?
-    self.job_artifacts_replication_enabled = Geo::JobArtifactRegistry.replication_enabled?
-    self.lfs_objects_replication_enabled = Geo::LfsObjectRegistry.replication_enabled?
-    self.repositories_replication_enabled = Geo::ProjectRegistry.replication_enabled?
     self.repository_verification_enabled = Gitlab::Geo.repository_verification_enabled?
+
+    if Gitlab::Geo.secondary?
+      self.attachments_replication_enabled = Geo::UploadRegistry.replication_enabled?
+      self.container_repositories_replication_enabled = Geo::ContainerRepositoryRegistry.replication_enabled?
+      self.design_repositories_replication_enabled = Geo::DesignRegistry.replication_enabled?
+      self.job_artifacts_replication_enabled = Geo::JobArtifactRegistry.replication_enabled?
+      self.lfs_objects_replication_enabled = Geo::LfsObjectRegistry.replication_enabled?
+      self.repositories_replication_enabled = Geo::ProjectRegistry.replication_enabled?
+    end
   end
 
   def update_cache!

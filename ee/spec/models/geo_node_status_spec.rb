@@ -34,13 +34,14 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
 
   describe '#update_cache!' do
     it 'writes a cache' do
+      status = described_class.new
+
       rails_cache = double
       allow(Rails).to receive(:cache).and_return(rails_cache)
-      allow(rails_cache).to receive(:fetch).with('flipper:persisted_names', expires_in: 1.minute).and_return([described_class.cache_key])
 
       expect(rails_cache).to receive(:write).with(described_class.cache_key, kind_of(Hash))
 
-      described_class.new.update_cache!
+      status.update_cache!
     end
   end
 
