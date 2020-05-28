@@ -23,7 +23,7 @@ describe 'projects/issues/show' do
           project.add_developer(user)
         end
 
-        it 'shows "Closed (moved)" if an issue has been moved' do
+        it 'shows "Closed (moved)" if an issue has been moved and closed' do
           render
 
           expect(rendered).to have_selector('.status-box-issue-closed:not(.hidden)', text: 'Closed (moved)')
