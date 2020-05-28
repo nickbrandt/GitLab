@@ -33,6 +33,7 @@ describe ::Packages::Detail::PackagePresenter do
       }
     }
   end
+  let!(:dependency_links) { [] }
   let!(:expected_package_details) do
     {
       id: package.id,
@@ -44,17 +45,16 @@ describe ::Packages::Detail::PackagePresenter do
       tags: package.tags.as_json,
       updated_at: package.updated_at,
       version: package.version,
-      dependency_links: []
+      dependency_links: dependency_links
     }
   end
 
   context 'detail_view' do
     context 'with build_info' do
       let_it_be(:package) { create(:npm_package, :with_build, project: project) }
+      let(:expected_package_details) { super().merge(pipeline: pipeline_info) }
 
       it 'returns details with pipeline' do
-        expected_package_details[:pipeline] = pipeline_info
-
         expect(presenter.detail_view).to eq expected_package_details
       end
     end
@@ -70,10 +70,9 @@ describe ::Packages::Detail::PackagePresenter do
     context 'with nuget_metadatum' do
       let_it_be(:package) { create(:nuget_package, project: project) }
       let_it_be(:nuget_metadatum) { create(:nuget_metadatum, package: package) }
+      let(:expected_package_details) { super().merge(nuget_metadatum: nuget_metadatum) }
 
       it 'returns nuget_metadatum' do
-        expected_package_details[:nuget_metadatum] = nuget_metadatum
-
         expect(presenter.detail_view).to eq expected_package_details
       end
     end
@@ -89,10 +88,9 @@ describe ::Packages::Detail::PackagePresenter do
           target_framework: nuget_dependency.target_framework
         }
       end
+      let_it_be(:dependency_links) { [expected_link] }
 
       it 'returns the correct dependency link' do
-        expected_package_details[:dependency_links] = [expected_link]
-
         expect(presenter.detail_view).to eq expected_package_details
       end
     end

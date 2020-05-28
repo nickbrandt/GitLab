@@ -22,7 +22,7 @@ module Packages
 
         package_detail[:maven_metadatum] = @package.maven_metadatum if @package.maven_metadatum
         package_detail[:nuget_metadatum] = @package.nuget_metadatum if @package.nuget_metadatum
-        package_detail[:dependency_links] = @package.dependency_links.map { |dl| build_dependency_links(dl) }
+        package_detail[:dependency_links] = @package.dependency_links.map(&method(:build_dependency_links))
         package_detail[:pipeline] = build_pipeline_info(@package.build_info.pipeline) if @package.build_info
 
         package_detail
