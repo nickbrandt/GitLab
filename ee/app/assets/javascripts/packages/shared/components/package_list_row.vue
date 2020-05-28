@@ -75,7 +75,7 @@ export default {
 
         <package-tags
           v-if="packageEntity.tags && packageEntity.tags.length"
-          class="prepend-left-8"
+          class="gl-ml-3"
           :tags="packageEntity.tags"
           hide-label
           :tag-display-limit="1"

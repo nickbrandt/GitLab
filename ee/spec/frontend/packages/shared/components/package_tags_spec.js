@@ -73,7 +73,7 @@ describe('PackageTags', () => {
     it('shows tag badge when there is only one', () => {
       createComponent([mockTags[0]]);
 
-      const expectedStyle = [...defaultStyle, 'd-flex', 'prepend-left-8'];
+      const expectedStyle = [...defaultStyle, 'd-flex', 'gl-ml-3'];
 
       expect(
         tagBadges()
@@ -105,7 +105,7 @@ describe('PackageTags', () => {
       const allBadges = tagBadges();
 
       expect(allBadges.at(0).classes()).toEqual(
-        expect.arrayContaining([...expectedStyleWithAppend, 'prepend-left-8']),
+        expect.arrayContaining([...expectedStyleWithAppend, 'gl-ml-3']),
       );
       expect(allBadges.at(1).classes()).toEqual(expect.arrayContaining(expectedStyleWithAppend));
       expect(allBadges.at(2).classes()).toEqual(expect.arrayContaining(expectedStyleWithAppend));
