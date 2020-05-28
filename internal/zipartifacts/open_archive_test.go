@@ -53,3 +53,16 @@ func TestOpenHTTPArchive(t *testing.T) {
 	require.NoError(t, err, "read zip entry contents")
 	require.Equal(t, contents, string(actualContents), "compare zip entry contents")
 }
+
+func TestOpenHTTPArchiveNotSendingAcceptEncodingHeader(t *testing.T) {
+	requestHandler := func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, "GET", r.Method)
+		require.Nil(t, r.Header["Accept-Encoding"])
+		w.WriteHeader(http.StatusOK)
+	}
+
+	srv := httptest.NewServer(http.HandlerFunc(requestHandler))
+	defer srv.Close()
+
+	OpenArchive(context.Background(), srv.URL)
+}
