@@ -1,3 +1,4 @@
+import mutationsCE from '~/boards/stores/mutations';
 import * as mutationTypes from './mutation_types';
 
 const notImplemented = () => {
@@ -6,6 +7,7 @@ const notImplemented = () => {
 };
 
 export default {
+  ...mutationsCE,
   [mutationTypes.TOGGLE_LABELS]: state => {
     state.isShowingLabels = !state.isShowingLabels;
   },

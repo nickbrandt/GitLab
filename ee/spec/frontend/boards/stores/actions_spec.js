@@ -95,6 +95,10 @@ describe('toggleEpicSwimlanes', () => {
   it('should commit mutation TOGGLE_EPICS_SWIMLANES', done => {
     const state = {
       isShowingEpicsSwimlanes: true,
+      endpoints: {
+        fullPath: 'gitlab-org',
+        boardId: 1,
+      },
     };
 
     testAction(
