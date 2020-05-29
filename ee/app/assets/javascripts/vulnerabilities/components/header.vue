@@ -224,6 +224,7 @@ export default {
   <div>
     <resolution-alert
       v-if="showResolutionAlert"
+      :vulnerability-id="vulnerability.id"
       :default-branch-name="vulnerability.project_default_branch"
     />
     <div class="detail-page-header">
