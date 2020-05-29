@@ -93,3 +93,25 @@ describe('RECEIVE_REMOVE_BOARD_ERROR', () => {
 describe('TOGGLE_PROMOTION_STATE', () => {
   expectNotImplemented(mutations.TOGGLE_PROMOTION_STATE);
 });
+
+describe('TOGGLE_EPICS_SWIMLANES', () => {
+  it('toggles isShowingEpicsSwimlanes from true to false', () => {
+    const state = {
+      isShowingEpicsSwimlanes: true,
+    };
+
+    mutations.TOGGLE_EPICS_SWIMLANES(state);
+
+    expect(state.isShowingEpicsSwimlanes).toBe(false);
+  });
+
+  it('toggles isShowingEpicsSwimlanes from false to true', () => {
+    const state = {
+      isShowingEpicsSwimlanes: false,
+    };
+
+    mutations.TOGGLE_EPICS_SWIMLANES(state);
+
+    expect(state.isShowingEpicsSwimlanes).toBe(true);
+  });
+});

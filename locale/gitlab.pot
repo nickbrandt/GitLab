@@ -10799,6 +10799,9 @@ msgstr ""
 msgid "Group avatar"
 msgstr ""
 
+msgid "Group by:"
+msgstr ""
+
 msgid "Group could not be imported: %{errors}"
 msgstr ""
 
@@ -14538,6 +14541,9 @@ msgid "No files found."
 msgstr ""
 
 msgid "No forks are available to you."
+msgstr ""
+
+msgid "No grouping"
 msgstr ""
 
 msgid "No job log"

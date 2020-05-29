@@ -74,6 +74,32 @@ describe 'issue boards', :js do
     end
   end
 
+  context 'swimlanes dropdown' do
+    context 'feature flag on' do
+      before do
+        stub_feature_flags(boards_with_swimlanes: true)
+      end
+
+      it 'shows Group by dropdown' do
+        visit_board_page
+
+        expect(page).to have_css('.board-swimlanes-toggle-wrapper')
+      end
+    end
+
+    context 'feature flag off' do
+      before do
+        stub_feature_flags(boards_with_swimlanes: false)
+      end
+
+      it 'does not show Group by dropdown' do
+        visit_board_page
+
+        expect(page).not_to have_css('.board-swimlanes-toggle-wrapper')
+      end
+    end
+  end
+
   context 'total weight' do
     let!(:label) { create(:label, project: project, name: 'Label 1') }
     let!(:list) { create(:list, board: board, label: label, position: 0) }
