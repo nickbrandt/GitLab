@@ -1040,10 +1040,10 @@
     "@sentry/types" "5.10.0"
     tslib "^1.9.3"
 
-"@sourcegraph/code-host-integration@0.0.47":
-  version "0.0.47"
-  resolved "https://registry.yarnpkg.com/@sourcegraph/code-host-integration/-/code-host-integration-0.0.47.tgz#ad1b5aa70f90c9f46e8b7e4152602ab0ecc26c5a"
-  integrity sha512-2HtYcsch9PO/UUegA1p5fFjy0AMM35Hq8dsFJ9tkbqIQZcys2zW+giaXJVfforR6kxYPFo3otkqPD4Vpyi48pg==
+"@sourcegraph/code-host-integration@0.0.48":
+  version "0.0.48"
+  resolved "https://registry.yarnpkg.com/@sourcegraph/code-host-integration/-/code-host-integration-0.0.48.tgz#327bd04182e8a9a8daabebc6f2b50c8186b19514"
+  integrity sha512-O4jQyfYmmZaZahLj2BbqjEh7MarQRhZHYdWhL4D3CdUGH4y3XOTGCmVHWEFb23UaV/izze1XoGDxbQeAnps7EA==
 
 "@toast-ui/editor@^2.0.1":
   version "2.0.1"
