@@ -6,16 +6,16 @@
 > - If you are a Community Edition or Starter user, consider using a cloud hosted solution.
 > - This document will not cover installations from source.
 >
-> - If HA setup is not what you were looking for, see the [database configuration document](https://docs.gitlab.com/omnibus/settings/database.html)
+> - If a setup with replication and failover is not what you were looking for, see the [database configuration document](https://docs.gitlab.com/omnibus/settings/database.html)
 >   for the Omnibus GitLab packages.
 >
-> Please read this document fully before attempting to configure PostgreSQL HA
-> for GitLab.
+> Please read this document fully before attempting to configure PostgreSQL with
+> replication and failover for GitLab.
 
 ## Architecture
 
-The Omnibus GitLab recommended configuration for a PostgreSQL high availability
-cluster requires:
+The Omnibus GitLab recommended configuration for a PostgreSQL cluster with
+replication and failover requires:
 
 - A minimum of three database nodes.
 - A minimum of three `Consul` server nodes.
@@ -254,7 +254,7 @@ When installing the GitLab package, do not supply `EXTERNAL_URL` value.
    attempt to register them as primary node
 
    ```ruby
-   # HA setting to specify if a node should attempt to be master on initialization
+   # Specify if a node should attempt to be master on initialization
    repmgr['master_on_initialization'] = false
    ```
 
@@ -692,7 +692,7 @@ added to primary node, noted above. In addition, append the following
 configuration:
 
 ```ruby
-# HA setting to specify if a node should attempt to be master on initialization
+# Specify if a node should attempt to be master on initialization
 repmgr['master_on_initialization'] = false
 ```
 
@@ -844,7 +844,7 @@ On secondary nodes, edit `/etc/gitlab/gitlab.rb` and add all the information add
 to primary node, noted above. In addition, append the following configuration
 
 ```ruby
-# HA setting to specify if a node should attempt to be master on initialization
+# Specify if a node should attempt to be master on initialization
 repmgr['master_on_initialization'] = false
 ```
 
