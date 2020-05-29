@@ -76,6 +76,12 @@ class CommitStatus < ApplicationRecord
     merge(or_conditions)
   end
 
+  scope :select_with_has_dag_dependent, -> (attrs) do
+    has_dag_dependent = Ci::BuildNeed.scoped_dependent_build.select('TRUE').limit(1).to_sql
+
+    select(*attrs, "(#{has_dag_dependent}) AS has_dag_dependent")
+  end
+
   # We use `CommitStatusEnums.failure_reasons` here so that EE can more easily
   # extend this `Hash` with new values.
   enum_with_nil failure_reason: ::CommitStatusEnums.failure_reasons

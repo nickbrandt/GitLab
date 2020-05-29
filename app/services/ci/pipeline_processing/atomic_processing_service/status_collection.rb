@@ -85,7 +85,7 @@ module Ci
           end
 
           result = Gitlab::Ci::Status::Composite
-            .new(statuses)
+            .new(statuses, with_has_dag_dependent: true)
             .status
           result || 'success'
         end
@@ -123,16 +123,15 @@ module Ci
           # Since we need to reprocess everything
           # we can fetch all of them and do processing
           # ourselves.
+
           strong_memoize(:all_statuses) do
-            raw_statuses = pipeline
+            pipeline
               .statuses
               .latest
               .ordered_by_stage
-              .pluck(*STATUSES_COLUMNS)
-
-            raw_statuses.map do |row|
-              STATUSES_COLUMNS.zip(row).to_h
-            end
+              .select_with_has_dag_dependent(STATUSES_COLUMNS)
+              .map(&:attributes)
+              .map(&:symbolize_keys)
           end
         end
         # rubocop: enable CodeReuse/ActiveRecord

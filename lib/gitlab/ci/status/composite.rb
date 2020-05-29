@@ -7,7 +7,7 @@ module Gitlab
         include Gitlab::Utils::StrongMemoize
 
         # This class accepts an array of arrays/hashes/or objects
-        def initialize(all_statuses, with_allow_failure: true)
+        def initialize(all_statuses, with_allow_failure: true, with_has_dag_dependent: false)
           unless all_statuses.respond_to?(:pluck)
             raise ArgumentError, "all_statuses needs to respond to `.pluck`"
           end
@@ -15,6 +15,7 @@ module Gitlab
           @status_set = Set.new
           @status_key = 0
           @allow_failure_key = 1 if with_allow_failure
+          @has_dag_dependent_key = 2 if with_has_dag_dependent
 
           consume_all_statuses(all_statuses)
         end
@@ -86,6 +87,7 @@ module Gitlab
         def consume_all_statuses(all_statuses)
           columns = []
           columns[@status_key] = :status
+          columns[@has_dag_dependent_key] = :has_dag_dependent if @has_dag_dependent_key
           columns[@allow_failure_key] = :allow_failure if @allow_failure_key
 
           all_statuses
@@ -116,9 +118,15 @@ module Gitlab
         end
 
         def ignored_status?(status)
+          ignorable_statuses = if @has_dag_dependent_key && status[@has_dag_dependent_key]
+                                 HasStatus::EXCLUDE_IGNORED_STATUSES - ['manual']
+                               else
+                                 HasStatus::EXCLUDE_IGNORED_STATUSES
+                               end
+
           @allow_failure_key &&
             status[@allow_failure_key] &&
-            HasStatus::EXCLUDE_IGNORED_STATUSES.include?(status[@status_key])
+            ignorable_statuses.include?(status[@status_key])
         end
       end
     end
