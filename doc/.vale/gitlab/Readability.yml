@@ -1,0 +1,10 @@
+---
+# Displays the Flesch-Kincaid readability level.
+#
+# For a list of all options, see https://errata-ai.github.io/vale/styles/
+extends: readability
+message: "Flesch-Kincaid reading level for this page is too high: %s"
+level: suggestion
+grade: 13
+metrics:
+  - Flesch-Kincaid
