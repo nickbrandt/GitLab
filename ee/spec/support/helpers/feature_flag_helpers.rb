@@ -33,7 +33,7 @@ module FeatureFlagHelpers
   end
 
   def within_strategy_row(index)
-    within ".feature-flags-form > fieldset > div:nth-child(#{index + 3})" do
+    within ".feature-flags-form > fieldset > div[data-testid='feature-flag-strategies'] > div:nth-child(#{index})" do
       yield
     end
   end
