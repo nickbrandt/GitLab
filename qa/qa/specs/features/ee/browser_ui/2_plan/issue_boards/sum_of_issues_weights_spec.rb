@@ -31,7 +31,7 @@ module QA
       end
 
       it 'shows the sum of issues weights in the board list\'s header' do
-        EE::Page::Component::IssueBoard::Show.perform do |show|
+        Page::Component::IssueBoard::Show.perform do |show|
           expect(show.boards_list_header_with_index(1)).to have_content(weight_for_issue_1 + weight_for_issue_2)
         end
       end

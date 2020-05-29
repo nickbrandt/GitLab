@@ -439,6 +439,10 @@ module QA
         autoload :Common, 'qa/page/component/issuable/common'
       end
 
+      module IssueBoard
+        autoload :Show, 'qa/page/component/issue_board/show'
+      end
+
       module WebIDE
         autoload :Alert, 'qa/page/component/web_ide/alert'
 
