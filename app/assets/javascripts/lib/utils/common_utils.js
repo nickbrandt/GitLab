@@ -718,6 +718,8 @@ export const convertObjectProps = (conversionFunction, obj = {}, options = {}) =
       } else {
         acc[conversionFunction(prop)] = convertObjectProps(conversionFunction, val, options);
       }
+    } else if (isObjParameterArray) {
+      acc[prop] = val;
     } else {
       acc[conversionFunction(prop)] = val;
     }
