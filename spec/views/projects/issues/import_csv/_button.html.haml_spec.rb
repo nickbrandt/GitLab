@@ -5,7 +5,7 @@ require 'spec_helper'
 describe 'projects/issues/import_csv/_button' do
   include Devise::Test::ControllerHelpers
 
-  context 'when the user is not an admin' do
+  context 'when the user does not have edit permissions' do
     before do
       render
     end
@@ -19,10 +19,15 @@ describe 'projects/issues/import_csv/_button' do
     end
   end
 
-  context 'when the user is an admin' do
+  context 'when the user has edit permissions' do
+    let(:project) { create(:project) }
+    let(:current_user) { create(:user, maintainer_projects: [project]) }
+
     before do
-      allow(view).to receive(:can?).and_return(true)
       allow(view).to receive(:project_import_jira_path).and_return('import/jira')
+      allow(view).to receive(:current_user).and_return(current_user)
+
+      assign(:project, project)
 
       render
     end
