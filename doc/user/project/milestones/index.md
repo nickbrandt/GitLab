@@ -60,15 +60,23 @@ A permission level of [Developer or higher](../../permissions.md) is required to
 
 ### New project milestone
 
-To create a **project milestone**, navigate to **{issues}** **Issues > Milestones** in the project.
+To create a **project milestone**:
 
-Click the **New milestone** button. Enter the title, an optional description, an optional start date, and an optional due date. Click **Create milestone** to create the milestone.
+1. In a project, go to **{issues}** **Issues > Milestones**.
+1. Click **New milestone**.
+1. Enter the title, an optional description, an optional start date, and an optional due date.
+1. Click **New milestone**.
 
 ![New project milestone](img/milestones_new_project_milestone.png)
 
 ### New group milestone
 
-To create a **group milestone**, follow similar steps from above to project milestones. Navigate to **{issues}** **Issues > Milestones** in the group and create it from there.
+To create a **group milestone**:
+
+1. In a group, go to **{issues}** **Issues > Milestones**.
+1. Click **New milestone**.
+1. Enter the title, an optional description, an optional start date, and an optional due date.
+1. Click **New milestone**.
 
 ![New group milestone](img/milestones_new_group_milestone.png)
 
@@ -77,7 +85,11 @@ To create a **group milestone**, follow similar steps from above to project mile
 NOTE: **Note:**
 A permission level of [Developer or higher](../../permissions.md) is required to edit milestones.
 
-You can update a milestone by navigating to **{issues}** **Issues > Milestones** in the project or group and clicking the **Edit** button.
+To edit a milestone:
+
+1. In a project or group, go to **{issues}** **Issues > Milestones**.
+1. Click a milestone's title.
+1. Click **Edit**.
 
 You can delete a milestone by clicking the **Delete** button.
 
