@@ -110,7 +110,7 @@ describe 'Admin::AuditLogs', :js do
       it 'shows only 2 days old events' do
         visit admin_audit_logs_path(created_after: 4.days.ago.to_date, created_before: 2.days.ago.to_date)
 
-        find('.audit-log-table td', match: :first)
+        find('[data-testid="audit-events-table"] td', match: :first)
 
         expect(page).not_to have_content(audit_event_1.present.date)
         expect(page).to have_content(audit_event_2.present.date)
@@ -120,7 +120,7 @@ describe 'Admin::AuditLogs', :js do
       it 'shows only yesterday events' do
         visit admin_audit_logs_path(created_after: 2.days.ago.to_date)
 
-        find('.audit-log-table td', match: :first)
+        find('[data-testid="audit-events-table"] td', match: :first)
 
         expect(page).not_to have_content(audit_event_1.present.date)
         expect(page).not_to have_content(audit_event_2.present.date)
