@@ -64,13 +64,6 @@ module Geo
           .joins(inner_join_restricted_lfs_objects)
       end
 
-      def lfs_object_registries
-        return Geo::LfsObjectRegistry.all unless selective_sync?
-
-        Gitlab::Geo::Fdw::LfsObjectRegistryQueryBuilder.new
-          .for_lfs_objects(lfs_objects)
-      end
-
       def projects
         return Geo::Fdw::Project.all unless selective_sync?
 
