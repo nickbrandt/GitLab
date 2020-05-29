@@ -10,6 +10,7 @@ module Gitlab
       end
 
       def execute
+        return unless @project.branch_requires_code_owner_approval?(@branch_name)
         return if loader.entries.blank?
 
         assemble_error_msg_for_codeowner_matches
