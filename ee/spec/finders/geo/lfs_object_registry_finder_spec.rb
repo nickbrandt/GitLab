@@ -35,241 +35,77 @@ RSpec.describe Geo::LfsObjectRegistryFinder, :geo_fdw do
 
   context 'counts all the things' do
     describe '#count_syncable' do
-      before do
-        allow_next_instance_of(LfsObjectsProject) do |instance|
-          allow(instance).to receive(:update_project_statistics).and_return(nil)
-        end
+      it 'counts registries for LFS objects' do
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-        create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
-        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
-      end
-
-      it 'counts LFS objects' do
         expect(subject.count_syncable).to eq 8
-      end
-
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-        it 'counts LFS objects' do
-          expect(subject.count_syncable).to eq 2
-        end
-      end
-
-      context 'with selective sync by shard' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-        it 'counts LFS objects' do
-          expect(subject.count_syncable).to eq 2
-        end
-      end
-
-      context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage_only) }
-
-        it 'counts LFS objects ignoring remote objects' do
-          expect(subject.count_syncable).to eq 5
-        end
       end
     end
 
     describe '#count_registry' do
-      before do
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_3.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_4.id)
-        create(:geo_upload_registry, :avatar)
-
-        allow_next_instance_of(LfsObjectsProject) do |instance|
-          allow(instance).to receive(:update_project_statistics).and_return(nil)
-        end
-
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-        create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
-        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_remote_1)
-      end
-
       it 'counts registries for LFS objects' do
-        expect(subject.count_registry).to eq 4
-      end
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-        it 'does not apply the selective sync restriction' do
-          expect(subject.count_registry).to eq 4
-        end
-      end
-
-      context 'with selective sync by shard' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-        it 'does not apply the selective sync restriction' do
-          expect(subject.count_registry).to eq 4
-        end
-      end
-
-      context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage_only) }
-
-        it 'counts registries for LFS objects' do
-          expect(subject.count_registry).to eq 4
-        end
+        expect(subject.count_registry).to eq 8
       end
     end
 
     describe '#count_synced' do
-      before do
+      it 'counts registries that has been synced' do
         create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
         create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-        allow_next_instance_of(LfsObjectsProject) do |instance|
-          allow(instance).to receive(:update_project_statistics).and_return(nil)
-        end
-
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-        create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
-        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
-      end
-
-      it 'counts LFS objects that has been synced' do
-        expect(subject.count_synced).to eq 4
-      end
-
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-        before do
-          allow_next_instance_of(LfsObjectsProject) do |instance|
-            allow(instance).to receive(:update_project_statistics).and_return(nil)
-          end
-        end
-
-        it 'counts LFS objects that has been synced' do
-          expect(subject.count_synced).to eq 1
-        end
-      end
-
-      context 'with selective sync by shard' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-        it 'counts LFS objects that has been synced' do
-          expect(subject.count_synced).to eq 1
-        end
-      end
-
-      context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage_only) }
-
-        it 'counts LFS objects that has been synced ignoring remote objects' do
-          expect(subject.count_synced).to eq 3
-        end
-      end
-
-      context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage_only) }
-
-        it 'counts LFS objects that has been synced, ignoring remotes' do
-          expect(subject.count_synced).to eq 3
-        end
+        expect(subject.count_synced).to eq 3
       end
     end
 
     describe '#count_failed' do
-      before do
+      it 'counts registries that sync has failed' do
         create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id)
-        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_3.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_4.id)
-        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_5.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
         create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-        allow_next_instance_of(LfsObjectsProject) do |instance|
-          allow(instance).to receive(:update_project_statistics).and_return(nil)
-        end
-
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
-        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
-      end
-
-      it 'counts LFS objects that sync has failed' do
-        expect(subject.count_failed).to eq 4
-      end
-
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-        it 'counts LFS objects that sync has failed' do
-          expect(subject.count_failed).to eq 1
-        end
-      end
-
-      context 'with selective sync by shard' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-        it 'counts LFS objects that sync has failed' do
-          expect(subject.count_failed).to eq 1
-        end
-      end
-
-      context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage_only) }
-
-        it 'counts LFS objects that sync has failed, ignoring remotes' do
-          expect(subject.count_failed).to eq 3
-        end
+        expect(subject.count_failed).to eq 3
       end
     end
 
     describe '#count_synced_missing_on_primary' do
-      before do
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id)
+      it 'counts registries that have been synced and are missing on the primary, excluding not synced ones' do
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
-        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_3.id, missing_on_primary: true)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-        allow_next_instance_of(LfsObjectsProject) do |instance|
-          allow(instance).to receive(:update_project_statistics).and_return(nil)
-        end
-
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
-        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
-      end
-
-      it 'counts LFS objects that have been synced and are missing on the primary, excluding not synced ones' do
-        expect(subject.count_synced_missing_on_primary).to eq 2
-      end
-
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-        it 'counts LFS objects that has been synced' do
-          expect(subject.count_synced_missing_on_primary).to eq 1
-        end
-      end
-
-      context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage_only) }
-
-        it 'counts LFS objects that have been synced and are missing on the primary, excluding not synced ones' do
-          expect(subject.count_synced_missing_on_primary).to eq 1
-        end
+        expect(subject.count_synced_missing_on_primary).to eq 3
       end
     end
   end
@@ -444,283 +280,177 @@ RSpec.describe Geo::LfsObjectRegistryFinder, :geo_fdw do
     end
 
     describe '#find_never_synced_registries' do
-      let!(:registry_lfs_object_1) { create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_1.id) }
-      let!(:registry_lfs_object_2) { create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_2.id) }
-      let!(:registry_lfs_object_3) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_3.id) }
-      let!(:registry_lfs_object_4) { create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id) }
-      let!(:registry_lfs_object_remote_1) { create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_1.id) }
-
       it 'returns registries for LFS objects that have never been synced' do
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        registry_lfs_object_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        registry_lfs_object_remote_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
+
         registries = subject.find_never_synced_registries(batch_size: 10)
 
-        expect(registries).to match_ids(registry_lfs_object_1, registry_lfs_object_2, registry_lfs_object_remote_1)
+        expect(registries).to match_ids(registry_lfs_object_3, registry_lfs_object_remote_3)
+      end
+
+      it 'excludes except_ids' do
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        registry_lfs_object_remote_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
+
+        registries = subject.find_unsynced(batch_size: 10, except_ids: [lfs_object_3.id])
+
+        expect(registries).to match_ids(registry_lfs_object_remote_3)
       end
     end
 
     describe '#find_unsynced' do
-      before do
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id)
-        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_3.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_4.id)
+      it 'returns registries for LFS objects that have never been synced' do
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        registry_lfs_object_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        registry_lfs_object_remote_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-        allow_next_instance_of(LfsObjectsProject) do |instance|
-          allow(instance).to receive(:update_project_statistics).and_return(nil)
-        end
+        registries = subject.find_unsynced(batch_size: 10)
 
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-        create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
-        create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_3)
-        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_4)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
-      end
-
-      it 'returns LFS objects without an entry on the tracking database' do
-        lfs_objects = subject.find_unsynced(batch_size: 10)
-
-        expect(lfs_objects).to match_ids(lfs_object_2, lfs_object_5,
-                                         lfs_object_remote_1, lfs_object_remote_2, lfs_object_remote_3)
-      end
-
-      it 'excludes LFS objects without an entry on the tracking database' do
-        lfs_objects = subject.find_unsynced(batch_size: 10, except_ids: [lfs_object_2.id])
-
-        expect(lfs_objects).to match_ids(lfs_object_5, lfs_object_remote_1,
-                                         lfs_object_remote_2, lfs_object_remote_3)
-      end
-
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-        it 'returns LFS objects without an entry on the tracking database' do
-          lfs_objects = subject.find_unsynced(batch_size: 10)
-
-          expect(lfs_objects).to match_ids(lfs_object_2)
-        end
-      end
-
-      context 'with selective sync by shard' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-        it 'counts LFS objects that sync has failed' do
-          lfs_objects = subject.find_unsynced(batch_size: 10)
-
-          expect(lfs_objects).to match_ids(lfs_object_5)
-        end
-      end
-
-      context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage_only) }
-
-        it 'returns LFS objects without an entry on the tracking database' do
-          lfs_objects = subject.find_unsynced(batch_size: 10)
-
-          expect(lfs_objects).to match_ids(lfs_object_2, lfs_object_5)
-        end
-      end
-    end
-
-    describe '#find_migrated_local' do
-      it 'returns LFS objects remotely and successfully synced locally' do
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
-
-        lfs_objects = subject.find_migrated_local(batch_size: 10)
-
-        expect(lfs_objects).to match_ids(lfs_object_remote_1)
-      end
-
-      it 'excludes LFS objects stored remotely, but not synced yet' do
-        create(:lfs_object, :object_storage)
-
-        lfs_objects = subject.find_migrated_local(batch_size: 10)
-
-        expect(lfs_objects).to be_empty
-      end
-
-      it 'excludes synced LFS objects that are stored locally' do
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id)
-
-        lfs_objects = subject.find_migrated_local(batch_size: 10)
-
-        expect(lfs_objects).to be_empty
+        expect(registries).to match_ids(registry_lfs_object_3, registry_lfs_object_remote_3)
       end
 
       it 'excludes except_ids' do
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
-        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        registry_lfs_object_remote_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-        lfs_objects = subject.find_migrated_local(batch_size: 10, except_ids: [lfs_object_remote_1.id])
+        registries = subject.find_unsynced(batch_size: 10, except_ids: [lfs_object_3.id])
 
-        expect(lfs_objects).to match_ids(lfs_object_remote_2)
-      end
-
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-        before do
-          allow_next_instance_of(LfsObjectsProject) do |instance|
-            allow(instance).to receive(:update_project_statistics).and_return(nil)
-          end
-
-          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_remote_1)
-          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_remote_2)
-          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_1)
-          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_remote_3)
-        end
-
-        it 'returns LFS objects remotely and successfully synced locally' do
-          create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id)
-          create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_3.id)
-
-          lfs_objects = subject.find_migrated_local(batch_size: 10)
-
-          expect(lfs_objects).to match_ids(lfs_object_remote_2)
-        end
-      end
-
-      context 'with selective sync by shard' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-        before do
-          allow_next_instance_of(LfsObjectsProject) do |instance|
-            allow(instance).to receive(:update_project_statistics).and_return(nil)
-          end
-
-          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_remote_1)
-          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_remote_2)
-          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_remote_3)
-        end
-
-        it 'returns LFS objects remotely and successfully synced locally' do
-          create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
-          create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id)
-
-          lfs_objects = subject.find_migrated_local(batch_size: 10)
-
-          expect(lfs_objects).to match_ids(lfs_object_remote_2)
-        end
-      end
-
-      context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage_only) }
-
-        it 'returns LFS objects remotely and successfully synced locally' do
-          create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
-
-          lfs_objects = subject.find_migrated_local(batch_size: 10)
-
-          expect(lfs_objects).to match_ids(lfs_object_remote_1)
-        end
+        expect(registries).to match_ids(registry_lfs_object_remote_3)
       end
     end
 
-    describe '#find_retryable_failed_registries' do
-      let!(:registry_lfs_object_1) { create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id) }
-      let!(:registry_lfs_object_2) { create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_2.id) }
-      let!(:registry_lfs_object_3) { create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_3.id, retry_at: 1.day.from_now) }
-      let!(:registry_lfs_object_4) { create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id, retry_at: 1.day.from_now) }
-      let!(:registry_lfs_object_remote_1) { create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id) }
+    # describe '#find_migrated_local' do
+    #   it 'returns LFS objects remotely and successfully synced locally' do
+    #     create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
 
+    #     lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+    #     expect(lfs_objects).to match_ids(lfs_object_remote_1)
+    #   end
+
+    #   it 'excludes LFS objects stored remotely, but not synced yet' do
+    #     create(:lfs_object, :object_storage)
+
+    #     lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+    #     expect(lfs_objects).to be_empty
+    #   end
+
+    #   it 'excludes synced LFS objects that are stored locally' do
+    #     create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id)
+
+    #     lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+    #     expect(lfs_objects).to be_empty
+    #   end
+
+    #   it 'excludes except_ids' do
+    #     create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
+    #     create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id)
+
+    #     lfs_objects = subject.find_migrated_local(batch_size: 10, except_ids: [lfs_object_remote_1.id])
+
+    #     expect(lfs_objects).to match_ids(lfs_object_remote_2)
+    #   end
+
+    #   context 'with object storage sync disabled' do
+    #     let(:secondary) { create(:geo_node, :local_storage_only) }
+
+    #     it 'returns LFS objects remotely and successfully synced locally' do
+    #       create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
+
+    #       lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+    #       expect(lfs_objects).to match_ids(lfs_object_remote_1)
+    #     end
+    #   end
+    # end
+
+    describe '#find_retryable_failed_registries' do
       it 'returns registries for LFS objects that have failed to sync' do
+        registry_lfs_object_1 = create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        registry_lfs_object_4 = create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        registry_lfs_object_remote_1 = create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
+
         registries = subject.find_retryable_failed_registries(batch_size: 10)
 
-        expect(registries).to match_ids(registry_lfs_object_1, registry_lfs_object_2, registry_lfs_object_remote_1)
+        expect(registries).to match_ids(registry_lfs_object_1, registry_lfs_object_4, registry_lfs_object_remote_1)
       end
 
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
+      it 'excludes except_ids' do
+        registry_lfs_object_1 = create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        registry_lfs_object_remote_1 = create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-        before do
-          allow_next_instance_of(LfsObjectsProject) do |instance|
-            allow(instance).to receive(:update_project_statistics).and_return(nil)
-          end
+        registries = subject.find_retryable_failed_registries(batch_size: 10, except_ids: [lfs_object_4.id])
 
-          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_1)
-          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
-          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_3)
-          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_4)
-        end
-
-        it 'returns registries for LFS objects that have failed to sync' do
-          registries = subject.find_retryable_failed_registries(batch_size: 10)
-
-          expect(registries).to match_ids(registry_lfs_object_2)
-        end
-      end
-
-      context 'with selective sync by shard' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-        before do
-          allow_next_instance_of(LfsObjectsProject) do |instance|
-            allow(instance).to receive(:update_project_statistics).and_return(nil)
-          end
-
-          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_1)
-          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
-          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_3)
-          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
-        end
-
-        it 'returns registries for LFS objects that have failed to sync' do
-          registries = subject.find_retryable_failed_registries(batch_size: 10)
-
-          expect(registries).to match_ids(registry_lfs_object_1)
-        end
+        expect(registries).to match_ids(registry_lfs_object_1, registry_lfs_object_remote_1)
       end
     end
 
     describe '#find_retryable_synced_missing_on_primary_registries' do
-      let!(:registry_lfs_object_1) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id, missing_on_primary: true, retry_at: nil) }
-      let!(:registry_lfs_object_2) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true, retry_at: 1.day.from_now) }
-      let!(:registry_lfs_object_3) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_3.id, missing_on_primary: true, retry_at: 1.day.ago) }
-      let!(:registry_lfs_object_4) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_4.id, missing_on_primary: true, retry_at: nil) }
-      let!(:registry_lfs_object_5) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: false) }
-
       it 'returns registries for LFS objects that have been synced and are missing on the primary' do
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        registry_lfs_object_2 = create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        registry_lfs_object_5 = create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
+
         registries = subject.find_retryable_synced_missing_on_primary_registries(batch_size: 10)
 
-        expect(registries).to match_ids(registry_lfs_object_1, registry_lfs_object_3, registry_lfs_object_4)
+        expect(registries).to match_ids(registry_lfs_object_2, registry_lfs_object_5)
       end
 
-      context 'with selective sync by namespace' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
+      it 'excludes except_ids' do
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
+        registry_lfs_object_2 = create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
+        create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
+        create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
+        create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-        before do
-          allow_next_instance_of(LfsObjectsProject) do |instance|
-            allow(instance).to receive(:update_project_statistics).and_return(nil)
-          end
+        registries = subject.find_retryable_synced_missing_on_primary_registries(batch_size: 10, except_ids: [lfs_object_5.id])
 
-          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
-          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
-        end
-
-        it 'returns registries for LFS objects that have been synced and are missing on the primary' do
-          registries = subject.find_retryable_synced_missing_on_primary_registries(batch_size: 10)
-
-          expect(registries).to match_ids(registry_lfs_object_1)
-        end
-      end
-
-      context 'with selective sync by shard' do
-        let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-        before do
-          allow_next_instance_of(LfsObjectsProject) do |instance|
-            allow(instance).to receive(:update_project_statistics).and_return(nil)
-          end
-
-          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
-          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_3)
-          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
-        end
-
-        it 'returns registries for LFS objects that have been synced and are missing on the primary' do
-          registries = subject.find_retryable_synced_missing_on_primary_registries(batch_size: 10)
-
-          expect(registries).to match_ids(registry_lfs_object_3, registry_lfs_object_4)
-        end
+        expect(registries).to match_ids(registry_lfs_object_2)
       end
     end
   end
