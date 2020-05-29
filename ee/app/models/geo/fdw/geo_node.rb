@@ -45,25 +45,6 @@ module Geo
           .joins(inner_join_restricted_job_artifacts)
       end
 
-      def lfs_objects
-        return Geo::Fdw::LfsObject.all unless selective_sync?
-
-        query = Geo::Fdw::LfsObjectsProject.project_id_in(projects).select(:lfs_object_id)
-        cte = Gitlab::SQL::CTE.new(:restricted_lfs_objects, query)
-        fdw_lfs_object_table = Geo::Fdw::LfsObject.arel_table
-
-        inner_join_restricted_lfs_objects =
-          cte.table
-            .join(fdw_lfs_object_table, Arel::Nodes::InnerJoin)
-            .on(cte.table[:lfs_object_id].eq(fdw_lfs_object_table[:id]))
-            .join_sources
-
-        Geo::Fdw::LfsObject
-          .with(cte.to_arel)
-          .from(cte.table)
-          .joins(inner_join_restricted_lfs_objects)
-      end
-
       def projects
         return Geo::Fdw::Project.all unless selective_sync?
 
