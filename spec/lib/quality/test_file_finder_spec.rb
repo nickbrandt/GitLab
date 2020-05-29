@@ -45,8 +45,9 @@ describe Quality::TestFileFinder do
 
     context 'when given a test file' do
       let(:file) { 'spec/lib/banzai/color_parser_spec.rb' }
+      let(:test_files) { ['spec/lib/banzai/color_parser_spec.rb'] }
 
-      it_behaves_like 'not finding a matching test file'
+      it_behaves_like 'finding matching test files'
     end
 
     context 'when given an ee app file' do
@@ -71,9 +72,17 @@ describe Quality::TestFileFinder do
     end
 
     context 'when given an ee test file' do
-      let(:file) { 'ee/spec/lib/banzai/color_parser_spec.rb' }
+      let(:file) { 'ee/spec/models/container_registry/event_spec.rb' }
+      let(:test_files) { ['ee/spec/models/container_registry/event_spec.rb'] }
 
-      it_behaves_like 'not finding a matching test file'
+      it_behaves_like 'finding matching test files'
+    end
+
+    context 'when given an ee module test file' do
+      let(:file) { 'ee/spec/models/ee/appearance_spec.rb' }
+      let(:test_files) { ['ee/spec/models/ee/appearance_spec.rb', 'spec/models/appearance_spec.rb'] }
+
+      it_behaves_like 'finding matching test files'
     end
 
     context 'with foss_test_only: true' do
