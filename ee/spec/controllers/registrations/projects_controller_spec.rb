@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Registrations::ProjectsController do
   let_it_be(:user) { create(:user) }
-  let_it_be(:namespace) { create(:group, path: 'group-path') }
+  let_it_be(:namespace) { create(:group) }
 
   describe 'GET #new' do
     subject { get :new }
@@ -50,7 +50,7 @@ describe Registrations::ProjectsController do
   describe 'POST #create' do
     subject { post :create, params: { project: params } }
 
-    let(:params) { { namespace_id: namespace.id, name: 'Project name', path: 'project-path', visibility_level: Gitlab::VisibilityLevel::PRIVATE } }
+    let(:params) { { namespace_id: namespace.id, name: 'New project', path: 'project-path', visibility_level: Gitlab::VisibilityLevel::PRIVATE } }
 
     context 'with an unauthenticated user' do
       it { is_expected.to have_gitlab_http_status(:redirect) }
@@ -64,12 +64,15 @@ describe Registrations::ProjectsController do
         stub_experiment_for_user(onboarding_issues: true)
       end
 
-      it 'creates a project' do
-        expect { subject }.to change { Project.count }.by(1)
-      end
+      it 'creates a new project, a "Learn GitLab" project and redirects to the experience level page' do
+        expect { subject }.to change { namespace.projects.pluck(:name) }.from([]).to(['New project', s_('Learn GitLab')])
 
-      it { is_expected.to have_gitlab_http_status(:redirect) }
-      it { is_expected.to redirect_to('/group-path/project-path') }
+        Sidekiq::Worker.drain_all
+
+        expect(subject).to have_gitlab_http_status(:redirect)
+        expect(subject).to redirect_to(users_sign_up_experience_level_path)
+        expect(namespace.projects.find_by_name(s_('Learn GitLab'))).to be_import_finished
+      end
 
       context 'when the project cannot be saved' do
         let(:params) { { name: '', path: '' } }
