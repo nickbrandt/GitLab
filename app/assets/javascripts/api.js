@@ -52,7 +52,7 @@ const Api = {
   environmentsPath: '/api/:version/projects/:id/environments',
   rawFilePath: '/api/:version/projects/:id/repository/files/:path/raw',
 
-  group(groupId, callback) {
+  group(groupId, callback = () => {}) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
     return axios.get(url).then(({ data }) => {
       callback(data);
