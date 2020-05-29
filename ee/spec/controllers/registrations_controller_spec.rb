@@ -53,4 +53,38 @@ describe RegistrationsController do
       expect(subject).to render_template(:checkout)
     end
   end
+
+  describe '#update_registration' do
+    before do
+      sign_in(create(:user))
+    end
+
+    subject { patch :update_registration, params: { user: { role: 'software_developer', setup_for_company: false } } }
+
+    it { is_expected.to redirect_to dashboard_projects_path }
+
+    context 'when part of the onboarding issues experiment' do
+      before do
+        stub_experiment_for_user(onboarding_issues: true)
+      end
+
+      it { is_expected.to redirect_to new_users_sign_up_group_path }
+
+      context 'when in subscription flow' do
+        before do
+          allow(controller.helpers).to receive(:in_subscription_flow?).and_return(true)
+        end
+
+        it { is_expected.not_to redirect_to new_users_sign_up_group_path }
+      end
+
+      context 'when in invitation flow' do
+        before do
+          allow(controller.helpers).to receive(:in_invitation_flow?).and_return(true)
+        end
+
+        it { is_expected.not_to redirect_to new_users_sign_up_group_path }
+      end
+    end
+  end
 end
