@@ -63,5 +63,11 @@ describe 'admin Geo Sidebar', :js, :geo do
         let(:path) { admin_geo_uploads_path }
       end
     end
+
+    describe 'visiting geo package files' do
+      it_behaves_like 'active sidebar link', 'Replication' do
+        let(:path) { admin_geo_package_files_path }
+      end
+    end
   end
 end
