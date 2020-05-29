@@ -843,11 +843,11 @@ Related links can be added to the top of your metrics dashboard, which can be us
 navigating between dashboards or external services. The links will open in the same tab.
 
 The `url` attribute is required for the link but the `title` attribute is optional; if the `title`
-is missing then the full address of the url will be displayed.
+is missing then the full address of the URL will be displayed.
 
 ![Links UI](img/related_links_v13_1.png)
 
-##### Links Syntax
+#### Links Syntax
 
 ```yaml
 links:
