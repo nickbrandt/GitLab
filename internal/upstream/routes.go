@@ -279,7 +279,7 @@ func (u *upstream) configureRoutes() {
 }
 
 func createUploadPreparers(cfg config.Config) uploadPreparers {
-	defaultPreparer := &upload.DefaultPreparer{}
+	defaultPreparer := upload.NewObjectStoragePreparer(cfg)
 
 	return uploadPreparers{
 		artifacts: defaultPreparer,

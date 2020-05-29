@@ -14,6 +14,7 @@ import (
 
 	"gitlab.com/gitlab-org/gitaly/proto/go/gitalypb"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
@@ -74,6 +75,11 @@ type MultipartUploadParams struct {
 	AbortURL string
 }
 
+type ObjectStorageParams struct {
+	Provider string
+	S3Config config.S3Config
+}
+
 type RemoteObject struct {
 	// GetURL is an S3 GetObject URL
 	GetURL string
@@ -85,12 +91,18 @@ type RemoteObject struct {
 	CustomPutHeaders bool
 	// PutHeaders are HTTP headers (e.g. Content-Type) to be sent with StoreURL
 	PutHeaders map[string]string
+	// Whether to ignore Rails pre-signed URLs and have Workhorse directly access object storage provider
+	UseWorkhorseClient bool
+	// Remote, temporary object name where Rails will move to the final destination
+	RemoteTempObjectID string
 	// ID is a unique identifier of object storage upload
 	ID string
 	// Timeout is a number that represents timeout in seconds for sending data to StoreURL
 	Timeout int
 	// MultipartUpload contains presigned URLs for S3 MultipartUpload
 	MultipartUpload *MultipartUploadParams
+	// Object storage config for Workhorse client
+	ObjectStorage *ObjectStorageParams
 }
 
 type Response struct {
