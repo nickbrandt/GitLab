@@ -42,7 +42,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: true),
           security_scan(:dependency_scanning, configured: true),
-          security_scan(:license_scanning, configured: true)
+          security_scan(:license_scanning, configured: true),
+          security_scan(:secret_detection, configured: true)
         )
       end
     end
@@ -62,7 +63,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: false),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_scanning, configured: false)
+          security_scan(:license_scanning, configured: false),
+          security_scan(:secret_detection, configured: false)
         )
       end
     end
@@ -80,6 +82,7 @@ describe Projects::Security::ConfigurationPresenter do
       before do
         create(:ci_build, :sast, pipeline: pipeline)
         create(:ci_build, :dast, pipeline: pipeline)
+        create(:ci_build, :secret_detection, pipeline: pipeline)
       end
 
       it 'uses the latest default branch pipeline to determine whether a security job is configured' do
@@ -88,7 +91,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_scanning, configured: false)
+          security_scan(:license_scanning, configured: false),
+          security_scan(:secret_detection, configured: true)
         )
       end
 
@@ -102,7 +106,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_scanning, configured: false)
+          security_scan(:license_scanning, configured: false),
+          security_scan(:secret_detection, configured: false)
         )
       end
 
@@ -122,7 +127,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_scanning, configured: false)
+          security_scan(:license_scanning, configured: false),
+          security_scan(:secret_detection, configured: false)
         )
       end
 
@@ -134,7 +140,8 @@ describe Projects::Security::ConfigurationPresenter do
           security_scan(:sast, configured: true),
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
-          security_scan(:license_scanning, configured: true)
+          security_scan(:license_scanning, configured: true),
+          security_scan(:secret_detection, configured: true)
         )
       end
 

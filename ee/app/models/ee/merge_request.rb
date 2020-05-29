@@ -182,10 +182,20 @@ module EE
       !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.sast_reports))
     end
 
+    def has_secret_detection_reports?
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.secret_detection_reports))
+    end
+
     def compare_sast_reports(current_user)
       return missing_report_error("SAST") unless has_sast_reports?
 
       compare_reports(::Ci::CompareSastReportsService, current_user)
+    end
+
+    def compare_secret_detection_reports(current_user)
+      return missing_report_error("secret detection") unless has_secret_detection_reports?
+
+      compare_reports(::Ci::CompareSecretDetectionReportsService, current_user)
     end
 
     def has_dast_reports?

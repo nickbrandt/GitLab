@@ -12,6 +12,16 @@ FactoryBot.define do
       end
     end
 
+    trait :secret_detection do
+      file_type { :secret_detection }
+      file_format { :raw }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-secret-detection-report.json'), 'application/json')
+      end
+    end
+
     trait :dast do
       file_format { :raw }
       file_type { :dast }
@@ -116,6 +126,16 @@ FactoryBot.define do
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
           Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-sast-report.json'), 'application/json')
+      end
+    end
+
+    trait :secret_detection_feature_branch do
+      file_format { :raw }
+      file_type { :secret_detection }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-secret-detection-report.json'), 'application/json')
       end
     end
 

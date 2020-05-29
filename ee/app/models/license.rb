@@ -127,6 +127,7 @@ class License < ApplicationRecord
     report_approver_rules
     requirements
     sast
+    secret_detection
     security_dashboard
     status_page
     subepics

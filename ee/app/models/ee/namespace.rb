@@ -294,6 +294,7 @@ module EE
 
     def store_security_reports_available?
       feature_available?(:sast) ||
+      feature_available?(:secret_detection) ||
       feature_available?(:dependency_scanning) ||
       feature_available?(:container_scanning) ||
       feature_available?(:dast)

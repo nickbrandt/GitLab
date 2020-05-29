@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :ee_ci_pipeline, class: 'Ci::Pipeline', parent: :ci_pipeline do
-    %i[container_scanning dast dependency_list dependency_scanning license_management license_scanning sast].each do |report_type|
+    %i[container_scanning dast dependency_list dependency_scanning license_management license_scanning sast secret_detection].each do |report_type|
       trait "with_#{report_type}_report".to_sym do
         status { :success }
 
@@ -49,6 +49,14 @@ FactoryBot.define do
 
       after(:build) do |pipeline, evaluator|
         pipeline.builds << build(:ee_ci_build, :sast_feature_branch, pipeline: pipeline, project: pipeline.project)
+      end
+    end
+
+    trait :with_secret_detection_feature_branch do
+      status { :success }
+
+      after(:build) do |pipeline, evaluator|
+        pipeline.builds << build(:ee_ci_build, :secret_detection_feature_branch, pipeline: pipeline, project: pipeline.project)
       end
     end
 
