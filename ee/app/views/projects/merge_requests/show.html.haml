@@ -1,8 +1,5 @@
 = render_ce "projects/merge_requests/show"
 
-- if batch_comments_enabled?
-  #js-review-bar
-
 = javascript_tag nonce: true do
   :plain
     // Append static, server-generated data not included in merge request entity (EE-Only)
