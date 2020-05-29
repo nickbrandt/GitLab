@@ -155,7 +155,7 @@ RSpec.describe SubscriptionsController do
             group.save
             subject
 
-            expect(response.body).to include({ name: [Gitlab::Regex.group_name_regex_message] }.to_json)
+            expect(Gitlab::Json.parse(response.body)['name']).to match_array([Gitlab::Regex.group_name_regex_message, HtmlSafetyValidator.error_message])
           end
         end
       end
