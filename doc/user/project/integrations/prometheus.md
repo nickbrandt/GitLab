@@ -378,15 +378,23 @@ The following tables outline the details of expected properties.
 | ------ | ------ | ------ | ------ |
 | `dashboard` | string | yes | Heading for the dashboard. Only one dashboard should be defined per file. |
 | `panel_groups` | array | yes | The panel groups which should be on the dashboard. |
-| `templating` | Hash | no | Top level key under which templating related options can be added. |
+| `templating` | hash | no | Top level key under which templating related options can be added. |
+| `links` | array | no | Add links to display on the dashboard. |
 
 ##### **Templating (`templating`) properties**
 
 | Property | Type | Required | Description |
 | -------- | ---- | -------- | ----------- |
-| `variables` | Hash | no | Variables can be defined here. |
+| `variables` | hash | no | Variables can be defined here. |
 
 Read the documentation on [templating](#templating-variables-for-metrics-dashboards).
+
+##### **Links (`links`) properties**
+
+| Property | Type | Required | Description |
+| -------- | ---- | -------- | ----------- |
+| `url` | string | yes | The address of the link. |
+| `title` | string | no | Display title for the link. |
 
 ##### **Panel group (`panel_groups`) properties**
 
