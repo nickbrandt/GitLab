@@ -61,7 +61,7 @@ func init() {
 	prometheus.MustRegister(multipartFiles)
 }
 
-func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, preauth *api.Response, filter MultipartFormProcessor) error {
+func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, preauth *api.Response, filter MultipartFormProcessor, opts *filestore.SaveFileOpts) error {
 	// Create multipart reader
 	reader, err := r.MultipartReader()
 	if err != nil {
@@ -100,7 +100,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, pr
 		}
 
 		if p.FileName() != "" {
-			err = rew.handleFilePart(r.Context(), name, p)
+			err = rew.handleFilePart(r.Context(), name, p, opts)
 		} else {
 			err = rew.copyPart(r.Context(), name, p)
 		}
@@ -113,7 +113,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, pr
 	return nil
 }
 
-func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipart.Part) error {
+func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipart.Part, opts *filestore.SaveFileOpts) error {
 	multipartFiles.WithLabelValues(rew.filter.Name()).Inc()
 
 	filename := p.FileName()
@@ -122,7 +122,6 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 		return fmt.Errorf("illegal filename: %q", filename)
 	}
 
-	opts := filestore.GetOpts(rew.preauth)
 	opts.TempFilePrefix = filename
 
 	var inputReader io.Reader

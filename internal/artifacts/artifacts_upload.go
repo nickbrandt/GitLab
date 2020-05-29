@@ -141,10 +141,15 @@ func (a *artifactsUploadProcessor) Name() string {
 	return "artifacts"
 }
 
-func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
+func UploadArtifacts(myAPI *api.API, h http.Handler, p upload.Preparer) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		mg := &artifactsUploadProcessor{opts: filestore.GetOpts(a), SavedFileTracker: upload.SavedFileTracker{Request: r}}
+		opts, _, err := p.Prepare(a)
+		if err != nil {
+			helper.Fail500(w, r, fmt.Errorf("UploadArtifacts: error preparing file storage options"))
+			return
+		}
 
-		upload.HandleFileUploads(w, r, h, a, mg)
+		mg := &artifactsUploadProcessor{opts: opts, SavedFileTracker: upload.SavedFileTracker{Request: r}}
+		upload.HandleFileUploads(w, r, h, a, mg, opts)
 	}, "/authorize")
 }

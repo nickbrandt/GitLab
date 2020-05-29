@@ -154,7 +154,7 @@ func testUploadArtifacts(t *testing.T, contentType, url string, body io.Reader) 
 	testhelper.ConfigureSecret()
 	apiClient := api.NewAPI(parsedURL, "123", roundTripper)
 	proxyClient := proxy.NewProxy(parsedURL, "123", roundTripper)
-	UploadArtifacts(apiClient, proxyClient).ServeHTTP(response, httpRequest)
+	UploadArtifacts(apiClient, proxyClient, &upload.DefaultPreparer{}).ServeHTTP(response, httpRequest)
 	return response
 }
 
