@@ -396,6 +396,8 @@ Read the documentation on [templating](#templating-variables-for-metrics-dashboa
 | `url` | string | yes | The address of the link. |
 | `title` | string | no | Display title for the link. |
 
+Read the documentation on [links](#add-related-links-to-custom-dashboards).
+
 ##### **Panel group (`panel_groups`) properties**
 
 | Property | Type | Required | Description |
@@ -831,6 +833,28 @@ templating:
         - value: 'value_option_2'
           text: 'Option 2'
           default: true                  # (Optional) This option should be the default value of this variable.
+```
+
+### Add related links to custom dashboards
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216385) in GitLab 13.1.
+
+Related links can be added to the top of your metrics dashboard, which can be used for quickly
+navigating between dashboards or external services. The links will open in the same tab.
+
+The `url` attribute is required for the link but the `title` attribute is optional; if the `title`
+is missing then the full address of the url will be displayed.
+
+![Links UI](img/related_links_v13_1.png)
+
+##### Links Syntax
+
+```yaml
+links:
+  - title: GitLab.com
+    url: https://gitlab.com
+  - title: GitLab Documentation
+    url: https://docs.gitlab.com
 ```
 
 ### View and edit the source file of a custom dashboard
