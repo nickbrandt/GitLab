@@ -6,7 +6,7 @@ module Geo
 
     LEASE_TIMEOUT = 8.hours.freeze
 
-    # It's possible that LfsObject or Ci::JobArtifact record does not exists anymore
+    # It's possible that LfsObject or Ci::JobArtifact record does not exist anymore
     # In this case, you need to pass file_path parameter explicitly
     #
     def initialize(object_type, object_db_id, file_path = nil)
