@@ -61,6 +61,7 @@ describe 'Dependency-Scanning.gitlab-ci.yml' do
             'Go'                             | { 'go.sum' => '' }                        | %w(gemnasium-dependency_scanning)
             'Java'                           | { 'pom.xml' => '' }                       | %w(gemnasium-maven-dependency_scanning)
             'Java Gradle'                    | { 'build.gradle' => '' }                  | %w(gemnasium-maven-dependency_scanning)
+            'Java Gradle Kotlin DSL'         | { 'build.gradle.kts' => '' }              | %w(gemnasium-maven-dependency_scanning)
             'Javascript'                     | { 'package.json' => '' }                  | %w(retire-js-dependency_scanning)
             'Javascript package-lock.json'   | { 'package-lock.json' => '' }             | %w(gemnasium-dependency_scanning)
             'Javascript yarn.lock'           | { 'yarn.lock' => '' }                     | %w(gemnasium-dependency_scanning)
