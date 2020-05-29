@@ -12,7 +12,7 @@ query group(
   $state: [VulnerabilityState!]
 ) {
   group(fullPath: $fullPath) {
-    projects(hasVulnerabilities: true) {
+    projects(includeSubgroups: true, hasVulnerabilities: true) {
       nodes {
         ...Project
       }
