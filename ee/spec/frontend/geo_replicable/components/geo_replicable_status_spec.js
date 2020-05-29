@@ -1,14 +1,15 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import store from 'ee/geo_replicable/store';
+import createStore from 'ee/geo_replicable/store';
 import GeoReplicableStatus from 'ee/geo_replicable/components/geo_replicable_status.vue';
 import {
   FILTER_STATES,
   STATUS_ICON_NAMES,
   STATUS_ICON_CLASS,
   DEFAULT_STATUS,
-} from 'ee/geo_replicable/store/constants';
+} from 'ee/geo_replicable/constants';
 import Icon from '~/vue_shared/components/icon.vue';
+import { MOCK_REPLICABLE_TYPE } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -23,7 +24,7 @@ describe('GeoReplicableStatus', () => {
   const createComponent = () => {
     wrapper = mount(GeoReplicableStatus, {
       localVue,
-      store,
+      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
       propsData,
     });
   };

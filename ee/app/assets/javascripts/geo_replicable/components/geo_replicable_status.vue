@@ -1,5 +1,5 @@
 <script>
-import { STATUS_ICON_NAMES, STATUS_ICON_CLASS, DEFAULT_STATUS } from '../store/constants';
+import { STATUS_ICON_NAMES, STATUS_ICON_CLASS, DEFAULT_STATUS } from '../constants';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {

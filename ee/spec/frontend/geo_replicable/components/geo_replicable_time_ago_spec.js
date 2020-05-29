@@ -1,8 +1,9 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import store from 'ee/geo_replicable/store';
+import createStore from 'ee/geo_replicable/store';
 import GeoReplicableTimeAgo from 'ee/geo_replicable/components/geo_replicable_time_ago.vue';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
+import { MOCK_REPLICABLE_TYPE } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -19,7 +20,7 @@ describe('GeoReplicableTimeAgo', () => {
   const createComponent = () => {
     wrapper = mount(GeoReplicableTimeAgo, {
       localVue,
-      store,
+      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
       propsData,
     });
   };

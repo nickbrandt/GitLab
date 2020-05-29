@@ -1,14 +1,22 @@
-import { FILTER_STATES } from './constants';
+import { FILTER_STATES } from '../constants';
 
-const createState = replicableType => ({
+const createState = ({ replicableType, useGraphQl }) => ({
   replicableType,
-  useGraphQl: false,
+  useGraphQl,
   isLoading: false,
 
   replicableItems: [],
-  totalReplicableItems: 0,
-  pageSize: 0,
-  currentPage: 1,
+  paginationData: {
+    // GraphQL
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: '',
+    endCursor: '',
+    // RESTful
+    total: 0,
+    perPage: 0,
+    page: 1,
+  },
 
   searchFilter: '',
   currentFilterIndex: 0,
