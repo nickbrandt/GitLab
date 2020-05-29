@@ -29,9 +29,9 @@ type Preparer interface {
 	Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error)
 }
 
-type defaultPreparer struct{}
+type DefaultPreparer struct{}
 
-func (s *defaultPreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error) {
+func (s *DefaultPreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error) {
 	return filestore.GetOpts(a), nil, nil
 }
 
@@ -39,10 +39,6 @@ func (s *defaultPreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, Ver
 // uploading it.
 // Providing an Preparer allows to customize the upload process
 func BodyUploader(rails PreAuthorizer, h http.Handler, p Preparer) http.Handler {
-	if p == nil {
-		p = &defaultPreparer{}
-	}
-
 	return rails.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		opts, verifier, err := p.Prepare(a)
 		if err != nil {

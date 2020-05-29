@@ -29,7 +29,7 @@ func TestBodyUploader(t *testing.T) {
 
 	body := strings.NewReader(fileContent)
 
-	resp := testUpload(&rails{}, nil, echoProxy(t, fileLen), body)
+	resp := testUpload(&rails{}, &alwaysLocalPreparer{}, echoProxy(t, fileLen), body)
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
 	uploadEcho, err := ioutil.ReadAll(resp.Body)
@@ -63,7 +63,7 @@ func TestBodyUploaderCustomVerifier(t *testing.T) {
 }
 
 func TestBodyUploaderAuthorizationFailure(t *testing.T) {
-	testNoProxyInvocation(t, http.StatusUnauthorized, &rails{unauthorized: true}, nil)
+	testNoProxyInvocation(t, http.StatusUnauthorized, &rails{unauthorized: true}, &alwaysLocalPreparer{})
 }
 
 func TestBodyUploaderErrors(t *testing.T) {

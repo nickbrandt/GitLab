@@ -23,8 +23,7 @@ type MultipartFormProcessor interface {
 	Name() string
 }
 
-func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, preauth *api.Response, filter MultipartFormProcessor) {
-	opts := filestore.GetOpts(preauth)
+func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, preauth *api.Response, filter MultipartFormProcessor, opts *filestore.SaveFileOpts) {
 	if !opts.IsLocal() && !opts.IsRemote() {
 		helper.Fail500(w, r, fmt.Errorf("handleFileUploads: missing destination storage"))
 		return
@@ -35,7 +34,7 @@ func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, p
 	defer writer.Close()
 
 	// Rewrite multipart form data
-	err := rewriteFormFilesFromMultipart(r, writer, preauth, filter)
+	err := rewriteFormFilesFromMultipart(r, writer, preauth, filter, opts)
 	if err != nil {
 		switch err {
 		case ErrInjectedClientParam:
