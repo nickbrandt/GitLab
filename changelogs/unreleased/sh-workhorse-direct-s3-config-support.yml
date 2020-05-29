@@ -1,0 +1,5 @@
+---
+title: Add configuration to support an S3 client inside Workhorse
+merge_request: 516
+author:
+type: other
