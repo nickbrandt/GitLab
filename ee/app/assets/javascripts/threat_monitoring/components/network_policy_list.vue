@@ -1,16 +1,20 @@
 <script>
-import { mapState } from 'vuex';
-import { GlTable, GlEmptyState } from '@gitlab/ui';
+import { mapState, mapActions } from 'vuex';
+import { GlTable, GlEmptyState, GlDrawer, GlButton } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { getTimeago } from '~/lib/utils/datetime_utility';
 import { setUrlFragment } from '~/lib/utils/url_utility';
 import EnvironmentPicker from './environment_picker.vue';
+import NetworkPolicyEditor from './network_policy_editor.vue';
 
 export default {
   components: {
     GlTable,
     GlEmptyState,
+    GlDrawer,
+    GlButton,
     EnvironmentPicker,
+    NetworkPolicyEditor,
   },
   props: {
     documentationPath: {
@@ -18,20 +22,65 @@ export default {
       required: true,
     },
   },
+  data() {
+    return { selectedPolicyName: null, initialManifest: null };
+  },
   computed: {
-    ...mapState('networkPolicies', ['policies', 'isLoadingPolicies']),
+    ...mapState('networkPolicies', ['policies', 'isLoadingPolicies', 'isUpdatingPolicy']),
+    ...mapState('threatMonitoring', ['currentEnvironmentId']),
     documentationFullPath() {
       return setUrlFragment(this.documentationPath, 'container-network-policy');
     },
+    hasSelectedPolicy() {
+      return Boolean(this.selectedPolicyName);
+    },
+    selectedPolicy() {
+      if (!this.hasSelectedPolicy) return null;
+
+      return this.policies.find(policy => policy.name === this.selectedPolicyName);
+    },
+    hasPolicyChanges() {
+      return this.hasSelectedPolicy && this.selectedPolicy.manifest !== this.initialManifest;
+    },
   },
   methods: {
+    ...mapActions('networkPolicies', ['updatePolicy']),
     getTimeAgoString(creationTimestamp) {
       return getTimeago().format(creationTimestamp);
     },
+    presentPolicyDrawer(rows) {
+      if (rows.length === 0) return;
+
+      const [selectedPolicy] = rows;
+      this.selectedPolicyName = selectedPolicy?.name;
+      this.initialManifest = selectedPolicy?.manifest;
+    },
+    deselectPolicy() {
+      this.selectedPolicyName = null;
+
+      const bTable = this.$refs.policiesTable.$children[0];
+      bTable.clearSelected();
+    },
+    savePolicy() {
+      return this.updatePolicy({
+        environmentId: this.currentEnvironmentId,
+        policy: this.selectedPolicy,
+      }).then(() => {
+        this.initialManifest = this.selectedPolicy.manifest;
+      });
+    },
   },
   fields: [
-    { key: 'name', label: s__('NetworkPolicies|Name'), thClass: 'w-75 font-weight-bold' },
-    { key: 'status', label: s__('NetworkPolicies|Status'), thClass: 'font-weight-bold' },
+    {
+      key: 'name',
+      label: s__('NetworkPolicies|Name'),
+      thClass: 'w-75 font-weight-bold',
+    },
+    {
+      key: 'status',
+      label: s__('NetworkPolicies|Status'),
+      thClass: 'font-weight-bold',
+    },
     {
       key: 'creationTimestamp',
       label: s__('NetworkPolicies|Last modified'),
@@ -41,6 +90,7 @@ export default {
   emptyStateDescription: s__(
     `NetworkPolicies|Policies are a specification of how groups of pods are allowed to communicate with each other network endpoints.`,
   ),
+  headerHeight: process.env.NODE_ENV === 'development' ? '75px' : '40px',
 };
 </script>
 
@@ -62,6 +112,11 @@ export default {
       thead-class="gl-text-gray-900 border-bottom"
       tbody-class="gl-text-gray-900"
       show-empty
+      hover
+      selectable
+      select-mode="single"
+      selected-variant="primary"
+      @row-selected="presentPolicyDrawer"
     >
       <template #cell(status)>
         {{ s__('NetworkPolicies|Enabled') }}
@@ -83,5 +138,38 @@ export default {
         </slot>
       </template>
     </gl-table>
+
+    <gl-drawer
+      ref="editorDrawer"
+      :z-index="252"
+      :open="hasSelectedPolicy"
+      :header-height="$options.headerHeight"
+      @close="deselectPolicy"
+    >
+      <template #header>
+        <div>
+          <h3 class="gl-mb-3">{{ selectedPolicy.name }}</h3>
+          <div>
+            <gl-button ref="cancelButton" @click="deselectPolicy">{{ __('Cancel') }}</gl-button>
+            <gl-button
+              ref="applyButton"
+              category="primary"
+              variant="success"
+              :loading="isUpdatingPolicy"
+              :disabled="!hasPolicyChanges"
+              @click="savePolicy"
+              >{{ __('Apply changes') }}</gl-button
+            >
+          </div>
+        </div>
+      </template>
+      <template>
+        <div v-if="hasSelectedPolicy">
+          <h5>{{ s__('NetworkPolicies|Policy definition') }}</h5>
+          <p>{{ s__("NetworkPolicies|Define this policy's location, conditions and actions.") }}</p>
+          <network-policy-editor ref="policyEditor" v-model="selectedPolicy.manifest" />
+        </div>
+      </template>
+    </gl-drawer>
   </div>
 </template>
