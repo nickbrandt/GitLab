@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module API
-  class EpicLinks < Grape::API
+  class EpicLinks < Grape::API::Instance
     include ::Gitlab::Utils::StrongMemoize
 
     before do

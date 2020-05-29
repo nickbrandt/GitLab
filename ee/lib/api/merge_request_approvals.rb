@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module API
-  class MergeRequestApprovals < ::Grape::API
+  class MergeRequestApprovals < ::Grape::API::Instance
     before { authenticate_non_get! }
-
-    ARRAY_COERCION_LAMBDA = ->(val) { val.empty? ? [] : Array.wrap(val) }
 
     helpers do
       def present_approval(merge_request)
@@ -109,8 +107,10 @@ module API
           success ::EE::API::Entities::ApprovalState
         end
         params do
-          requires :approver_ids, type: Array[String], coerce_with: ARRAY_COERCION_LAMBDA, desc: 'Array of User IDs to set as approvers.'
-          requires :approver_group_ids, type: Array[String], coerce_with: ARRAY_COERCION_LAMBDA, desc: 'Array of Group IDs to set as approvers.'
+          requires :approver_ids, type: Array[Integer], coerce_with: Validations::Types::CommaSeparatedToIntegerArray.coerce,
+            desc: 'Array of User IDs to set as approvers.'
+          requires :approver_group_ids, type: Array[Integer], coerce_with: Validations::Types::CommaSeparatedToIntegerArray.coerce,
+            desc: 'Array of Group IDs to set as approvers.'
         end
         put 'approvers' do
           Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/8883')
