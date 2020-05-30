@@ -97,14 +97,14 @@ func (h *Hovers) addData(line []byte) error {
 		return err
 	}
 
-	codeHovers := []*CodeHover{}
+	codeHovers := []*codeHover{}
 	for _, rawContent := range rawData.Result.Contents {
-		codeHover, err := NewCodeHover(rawContent)
+		c, err := newCodeHover(rawContent)
 		if err != nil {
 			return err
 		}
 
-		codeHovers = append(codeHovers, codeHover)
+		codeHovers = append(codeHovers, c)
 	}
 
 	codeHoversData, err := json.Marshal(codeHovers)
