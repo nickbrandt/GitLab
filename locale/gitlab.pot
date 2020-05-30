@@ -14546,6 +14546,9 @@ msgstr ""
 msgid "Merge request dependencies"
 msgstr ""
 
+msgid "Merge request was scheduled to merge after pipeline succeeds"
+msgstr ""
+
 msgid "Merge requests"
 msgstr ""
 
@@ -28912,6 +28915,9 @@ msgid "vulnerability|Undo dismiss"
 msgstr ""
 
 msgid "vulnerability|dismissed"
+msgstr ""
+
+msgid "was scheduled to merge after pipeline succeeds by"
 msgstr ""
 
 msgid "wiki page"
