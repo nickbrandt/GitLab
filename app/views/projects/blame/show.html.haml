@@ -1,4 +1,4 @@
-- project_duration = age_map_duration(@blame_groups, @project)
+- project_duration = age_map_duration(@blame.groups, @project)
 - page_title "Blame", @blob.path, @ref
 - sprite_icon = sprite_icon('doc-versions', size: 16, css_class: 'doc-versions align-text-bottom')
 - link_icon = icon("link")
@@ -19,7 +19,7 @@
     .table-responsive.file-content.blame.code.js-syntax-highlight
       %table
         - current_line = 1
-        - @blame_groups.each do |blame_group|
+        - @blame.groups.each do |blame_group|
           - commit = blame_group[:commit]
 
           - author_avatars[commit.id] ||= author_avatar(commit, size: 36, has_tooltip: false)
