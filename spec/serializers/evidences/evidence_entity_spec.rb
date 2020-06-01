@@ -6,10 +6,9 @@ describe Evidences::EvidenceEntity do
   let_it_be(:project) { create(:project) }
   let(:release) { create(:release, project: project) }
   let(:evidence) { build(:evidence, release: release) }
-  let(:entity) { described_class.new(evidence) }
   let(:schema_file) { 'evidences/evidence' }
 
-  subject { entity.as_json }
+  subject { described_class.new(evidence).as_json }
 
   it 'exposes the expected fields' do
     expect(subject.keys).to contain_exactly(:release)
