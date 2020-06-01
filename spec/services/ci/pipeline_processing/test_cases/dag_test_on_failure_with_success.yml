@@ -29,12 +29,12 @@ transitions:
   - event: success
     jobs: [build]
     expect:
-      pipeline: success
+      pipeline: running
       stages:
         build: success
         test: skipped
-        deploy: skipped
+        deploy: pending
       jobs:
         build: success
         test: skipped
-        deploy: skipped
+        deploy: pending

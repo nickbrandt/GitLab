@@ -37,9 +37,10 @@ module Ci
 
         # This methods gets composite status for processables with given names
         def status_for_names(names, dag:)
-          name_statuses = all_statuses_by_name.slice(*names)
+          name_statuses = all_statuses_by_name.slice(*names).values
+          dependency_tree_statuses = status_for_dependency_tree(name_statuses)
 
-          status_for_array(name_statuses.values, dag: dag)
+          status_for_array(name_statuses + dependency_tree_statuses, dag: dag)
         end
 
         # This methods gets composite status for processables before given stage
@@ -136,6 +137,25 @@ module Ci
           end
         end
         # rubocop: enable CodeReuse/ActiveRecord
+
+        def status_for_dependency_tree(name_statuses)
+          return [] unless Gitlab::Ci::Features.dependency_tree_for_dag?
+
+          name_statuses.map do |status|
+            # If the status is success of can be ignore, we don't need to fetch its dependencies.
+            # Besides, it leads to wrong calculations when using `when:on_failure`.
+            next if status[:status] == 'success' || ignored_status?(status)
+
+            {
+              status: status_for_prior_stage_position(status[:stage_idx]),
+              allow_failure: false
+            }
+          end.compact.uniq
+        end
+
+        def ignored_status?(status)
+          status[:allow_failure] && HasStatus::EXCLUDE_IGNORED_STATUSES.include?(status[:status])
+        end
       end
     end
   end

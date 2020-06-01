@@ -41,6 +41,10 @@ module Gitlab
       def self.release_generation_enabled?
         ::Feature.enabled?(:ci_release_generation)
       end
+
+      def self.dependency_tree_for_dag?
+        ::Feature.enabled?(:ci_dependency_tree_for_dag)
+      end
     end
   end
 end

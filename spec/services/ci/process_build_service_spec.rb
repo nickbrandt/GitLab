@@ -140,8 +140,8 @@ describe Ci::ProcessBuildService, '#execute' do
     context 'when current status is skipped' do
       let(:current_status) { 'skipped' }
 
-      it 'skips the build' do
-        expect { subject }.to change { build.status }.to('skipped')
+      it 'enqueues the build' do
+        expect { subject }.to change { build.status }.to('pending')
       end
     end
   end
