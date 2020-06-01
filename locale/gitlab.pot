@@ -24430,6 +24430,9 @@ msgstr ""
 msgid "View the performance dashboard at"
 msgstr ""
 
+msgid "View users statistics"
+msgstr ""
+
 msgid "Viewing commit"
 msgstr ""
 
@@ -25636,6 +25639,12 @@ msgid "Your first project"
 msgstr ""
 
 msgid "Your groups"
+msgstr ""
+
+msgid "Your instance has %{remaining_user_count} users remaining of the %{total_user_count} included in your subscription. You can add more users than the number included in your license, and we will include the overage in your next bill."
+msgstr ""
+
+msgid "Your instance is approaching its licensed user count"
 msgstr ""
 
 msgid "Your issues are being imported. Once finished, you'll get a confirmation email."
