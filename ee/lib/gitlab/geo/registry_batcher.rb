@@ -2,8 +2,9 @@
 
 module Gitlab
   module Geo
-    # Returns an ID range within a table so it can be iterated over. Repeats from
-    # the beginning after it reaches the end.
+    # Returns an ID range to allow iteration over a registry table and its
+    # source replicable table. Repeats from the beginning after it reaches
+    # the end.
     #
     # Used by Geo in particular to iterate over a replicable and its registry
     # table.
@@ -93,11 +94,18 @@ module Gitlab
 
       # @private
       #
-      # This method is used to remove orphaned registries where the foreign key
-      # IDs are greather than last replicable ID. The difference here is that
-      # we need to check against the foreign key IDS not the registry ID and
-      # for the existence of more rows to check we need to check against the
-      # the first ID of the batch.
+      # Get the last ID of the of the batch (not the table) for the registry
+      # and check if there are more rows in the table.
+      #
+      # This query differs from the replicable query by:
+      #
+      # - We check against the foreign key IDs not the registry IDs;
+      # - In the where clause of the more_rows part, we use greater
+      #   than or equal. This allows the batcher to switch to the
+      #   registry table while getting the last ID of the batch
+      #   when the previous batch included the end of the replicable
+      #   table but there are orphaned registries where the foreign key
+      #   ids are higher than the last replicable id;
       #
       # @param [Integer] batch_first_id the first ID of the batch
       # @return [Integer, Boolean] A tuple with the the last ID of the batch (not the table),
@@ -108,12 +116,12 @@ module Gitlab
           EXISTS (
             SELECT #{model_foreign_key}
             FROM #{registry_class.table_name}
-            WHERE #{model_foreign_key} > #{batch_first_id}
+            WHERE #{model_foreign_key} >= MAX(batch.#{model_foreign_key})
           ) AS more_rows
           FROM (
             SELECT #{model_foreign_key}
             FROM #{registry_class.table_name}
-            WHERE #{model_foreign_key} > #{batch_first_id}
+            WHERE #{model_foreign_key} >= #{batch_first_id}
             ORDER BY #{model_foreign_key}
             LIMIT #{batch_size}) AS batch;
         SQL

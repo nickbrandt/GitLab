@@ -41,13 +41,29 @@ describe Gitlab::Geo::RegistryBatcher, :geo, :use_clean_rails_memory_store_cachi
       end
 
       context 'when it was called before' do
-        before do
-          described_class.new(registry_class, key: key, batch_size: batch_size).next_range!
+        context 'when the previous batch included the end of the table' do
+          before do
+            described_class.new(registry_class, key: key, batch_size: registry_class.count).next_range!
+          end
+
+          it { is_expected.to be_nil }
         end
 
-        it { is_expected.to be_nil }
+        context 'when the previous batch did not include the end of the table' do
+          before do
+            described_class.new(registry_class, key: key, batch_size: registry_class.count - 1).next_range!
+          end
+
+          it 'starts after the previous batch' do
+            expect(subject).to eq(registries.last.public_send(model_foreign_key)..registries.last.public_send(model_foreign_key))
+          end
+        end
 
         context 'if cache is cleared' do
+          before do
+            described_class.new(registry_class, key: key, batch_size: batch_size).next_range!
+          end
+
           it 'starts from the beginning' do
             Rails.cache.clear
 
