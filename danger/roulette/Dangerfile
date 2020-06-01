@@ -36,10 +36,10 @@ Please consider creating a merge request to
 for them.
 MARKDOWN
 
-NO_REVIEWER = 'No reviewer available'.freeze
-NO_MAINTAINER = 'No maintainer available'.freeze
+OPTIONAL_REVIEW_TEMPLATE = "%{role} review is optional for %{category}".freeze
+NOT_AVAILABLE_TEMPLATE = 'No %{role} available'.freeze
 
-Spin = Struct.new(:reviewer, :maintainer)
+Spin = Struct.new(:reviewer, :maintainer, :optional)
 
 def spin_role_for_category(team, role, project, category)
   team.select do |member|
@@ -61,11 +61,26 @@ def spin_for_category(team, project, category, branch_name)
   reviewer = roulette.spin_for_person(reviewers + traintainers + traintainers, random: random)
   maintainer = roulette.spin_for_person(maintainers, random: random)
 
-  Spin.new(reviewer, maintainer)
+  Spin.new(reviewer, maintainer).tap do |spin|
+    if [:qa, :test].include?(category)
+      spin.optional = :maintainer
+    end
+  end
 end
 
-def markdown_row_for_category(category, reviewer, maintainer)
-  "| #{helper.label_for_category(category)} | #{reviewer&.markdown_name || NO_REVIEWER} | #{maintainer&.markdown_name || NO_MAINTAINER} |"
+def note_for_category_role(category, role, spin)
+  if spin.optional == role
+    return OPTIONAL_REVIEW_TEMPLATE % { role: role.capitalize, category: helper.label_for_category(category) }
+  end
+
+  spin.public_send(role)&.markdown_name || NOT_AVAILABLE_TEMPLATE % { role: role } # rubocop:disable GitlabSecurity/PublicSend
+end
+
+def markdown_row_for_category(category, spin)
+  reviewer_note = note_for_category_role(category, :reviewer, spin)
+  maintainer_note = note_for_category_role(category, :maintainer, spin)
+
+  "| #{helper.label_for_category(category)} | #{reviewer_note} | #{maintainer_note} |"
 end
 
 changes = helper.changes_by_category
@@ -78,43 +93,42 @@ categories = changes.keys - [:unknown]
 categories << :database if gitlab.mr_labels.include?('database') && !categories.include?(:database)
 
 if changes.any?
-  # Strip leading and trailing CE/EE markers
-  canonical_branch_name =
-    roulette.canonical_branch_name(gitlab.mr_json['source_branch'])
+  project = helper.project_name
 
   team =
     begin
-      roulette.project_team(helper.project_name)
+      roulette.project_team(project)
     rescue => err
       warn("Reviewer roulette failed to load team data: #{err.message}")
       []
     end
 
-  project = helper.project_name
-  unknown = changes.fetch(:unknown, [])
+  # Strip leading and trailing CE/EE markers
+  canonical_branch_name =
+    roulette.canonical_branch_name(gitlab.mr_json['source_branch'])
+
   spin_per_category = categories.each_with_object({}) do |category, memo|
     memo[category] = spin_for_category(team, project, category, canonical_branch_name)
   end
 
   rows = spin_per_category.map do |category, spin|
-    reviewer = spin.reviewer
-    maintainer = spin.maintainer
-
     case category
     when :test
-      if reviewer.nil?
+      if spin.reviewer.nil?
         # Fetch an already picked backend reviewer, or pick one otherwise
-        reviewer = spin_per_category[:backend]&.reviewer || spin_for_category(team, project, :backend, canonical_branch_name).reviewer
+        spin.reviewer = spin_per_category[:backend]&.reviewer || spin_for_category(team, project, :backend, canonical_branch_name).reviewer
       end
     when :engineering_productivity
-      if maintainer.nil?
+      if spin.maintainer.nil?
         # Fetch an already picked backend maintainer, or pick one otherwise
-        maintainer = spin_per_category[:backend]&.maintainer || spin_for_category(team, project, :backend, canonical_branch_name).maintainer
+        spin.maintainer = spin_per_category[:backend]&.maintainer || spin_for_category(team, project, :backend, canonical_branch_name).maintainer
       end
     end
 
-    markdown_row_for_category(category, reviewer, maintainer)
+    markdown_row_for_category(category, spin)
   end
+
+  unknown = changes.fetch(:unknown, [])
 
   markdown(MESSAGE)
   markdown(CATEGORY_TABLE_HEADER + rows.join("\n")) unless rows.empty?
