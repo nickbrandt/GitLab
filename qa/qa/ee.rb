@@ -187,7 +187,6 @@ module QA
     module Resource
       autoload :License, 'qa/ee/resource/license'
       autoload :Epic, 'qa/ee/resource/epic'
-      autoload :ProjectMilestone, 'qa/ee/resource/project_milestone'
       autoload :GroupLabel, 'qa/ee/resource/group_label.rb'
 
       module Board
