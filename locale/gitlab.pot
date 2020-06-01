@@ -26901,6 +26901,9 @@ msgstr ""
 msgid "resolved the corresponding error and closed the issue."
 msgstr ""
 
+msgid "revised"
+msgstr ""
+
 msgid "score"
 msgstr ""
 
@@ -27031,6 +27034,9 @@ msgid "updated %{timeAgo}"
 msgstr ""
 
 msgid "updated %{time_ago}"
+msgstr ""
+
+msgid "uploaded"
 msgstr ""
 
 msgid "uploads"
