@@ -1,5 +1,4 @@
 %tr
-  - commit = blame_group[:commit]
   %td.blame-commit{ class: age_map_class }
     .commit
       = author_avatar
@@ -13,7 +12,7 @@
       .light
         = commit_author_link
         committed
-        #{time_ago_with_tooltip(commit.committed_date)}
+        #{time_ago_tooltip}
   %td.line-numbers
     - line_count = blame_group[:lines].count
     - (current_line...(current_line + line_count)).each do |i|
