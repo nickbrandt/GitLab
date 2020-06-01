@@ -72,7 +72,7 @@ module Types
           description: 'A label available on this group' do
             argument :title, GraphQL::STRING_TYPE,
               required: true,
-              description: 'The title of the label'
+              description: 'Title of the label'
           end
 
     def label(title:)

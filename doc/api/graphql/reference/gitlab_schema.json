@@ -12826,7 +12826,7 @@
               "args": [
                 {
                   "name": "title",
-                  "description": "The title of the label",
+                  "description": "Title of the label",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -24728,7 +24728,7 @@
               "args": [
                 {
                   "name": "title",
-                  "description": "The title of the label",
+                  "description": "Title of the label",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,

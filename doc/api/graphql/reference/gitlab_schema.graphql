@@ -4657,7 +4657,7 @@ type Group {
   """
   label(
     """
-    The title of the label
+    Title of the label
     """
     title: String!
   ): Label
@@ -8408,7 +8408,7 @@ type Project {
   """
   label(
     """
-    The title of the label
+    Title of the label
     """
     title: String!
   ): Label
