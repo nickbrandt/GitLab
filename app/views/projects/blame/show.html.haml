@@ -12,17 +12,18 @@
       %table
         - current_line = 1
         - @blame.groups.each do |blame_group|
-          - commit = blame_group[:commit]
+          - commit_id = blame_group[:commit].id
+          - commit_data = @blame.commit_data(commit_id)
 
           = render 'blame_group',
             blame_group: blame_group,
             current_line: current_line,
             link_icon: link_icon,
-            author_avatar: @blame.author_avatar_for(commit.id),
-            age_map_class: @blame.age_map_class_for(commit.id),
-            commit_link: @blame.commit_link_for(commit.id),
-            commit_author_link: @blame.commit_author_link_for(commit.id),
-            project_blame_link: @blame.project_blame_link_for(commit.id),
-            time_ago_tooltip: @blame.time_ago_tooltip_for(commit.id)
+            author_avatar: commit_data.author_avatar,
+            age_map_class: commit_data.age_map_class,
+            commit_link: commit_data.commit_link,
+            commit_author_link: commit_data.commit_author_link,
+            project_blame_link: commit_data.project_blame_link,
+            time_ago_tooltip: commit_data.time_ago_tooltip
 
           - current_line += blame_group[:lines].count

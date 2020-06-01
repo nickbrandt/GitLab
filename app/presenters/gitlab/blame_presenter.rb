@@ -14,6 +14,14 @@ module Gitlab
 
     presents :blame
 
+    CommitData = Struct.new(
+      :author_avatar,
+      :age_map_class,
+      :commit_link,
+      :commit_author_link,
+      :project_blame_link,
+      :time_ago_tooltip)
+
     def initialize(subject, **attributes)
       super
 
@@ -24,47 +32,26 @@ module Gitlab
       @groups ||= blame.groups
     end
 
-    def author_avatar_for(commit_id)
-      @author_avatars[commit_id]
-    end
-
-    def age_map_class_for(commit_id)
-      @age_map_classes[commit_id]
-    end
-
-    def commit_link_for(commit_id)
-      @commit_links[commit_id]
-    end
-
-    def commit_author_link_for(commit_id)
-      @commit_author_links[commit_id]
-    end
-
-    def project_blame_link_for(commit_id)
-      @project_blame_links[commit_id]
-    end
-
-    def time_ago_tooltip_for(commit_id)
-      @time_ago_tooltips[commit_id]
+    def commit_data(id)
+      @commits[id]
     end
 
     private
 
     def precalculate_data_by_commit!
-      @author_avatars = {}
-      @age_map_classes = {}
-      @commit_links = {}
-      @commit_author_links = {}
-      @project_blame_links = {}
-      @time_ago_tooltips = {}
+      unique_commits = groups.map { |g| g[:commit] }.uniq
 
-      groups.map { |g| g[:commit] }.uniq.each do |commit|
-        @author_avatars[commit.id] ||= author_avatar(commit, size: 36, has_tooltip: false)
-        @age_map_classes[commit.id] ||= age_map_class(commit.committed_date, project_duration)
-        @commit_links[commit.id] ||= link_to commit.title, project_commit_path(project, commit.id), class: "cdark", title: commit.title
-        @commit_author_links[commit.id] ||= commit_author_link(commit, avatar: false)
-        @time_ago_tooltips[commit.id] ||= time_ago_with_tooltip(commit.committed_date)
-        @project_blame_links[commit.id] ||= project_blame_link(commit)
+     @commits = unique_commits.each_with_object({}) do |commit, h|
+        data = CommitData.new
+
+        data.author_avatar = author_avatar(commit, size: 36, has_tooltip: false)
+        data.age_map_class = age_map_class(commit.committed_date, project_duration)
+        data.commit_link = link_to commit.title, project_commit_path(project, commit.id), class: "cdark", title: commit.title
+        data.commit_author_link = commit_author_link(commit, avatar: false)
+        data.project_blame_link = project_blame_link(commit)
+        data.time_ago_tooltip = time_ago_with_tooltip(commit.committed_date)
+
+        h[commit.id] = data
       end
     end
 
