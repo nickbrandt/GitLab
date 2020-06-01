@@ -116,13 +116,15 @@ module QA
 
         module Settings
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
+          autoload :Main, 'qa/ee/page/project/settings/main'
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
           autoload :MergeRequest, 'qa/ee/page/project/settings/merge_request'
+          autoload :MergeRequestApprovals, 'qa/ee/page/project/settings/merge_request_approvals'
           autoload :Integrations, 'qa/ee/page/project/settings/integrations'
           autoload :Repository, 'qa/ee/page/project/settings/repository'
           autoload :PushRules, 'qa/ee/page/project/settings/push_rules'
-          autoload :CICD, 'qa/ee/page/project/settings/ci_cd.rb'
-          autoload :LicenseCompliance, 'qa/ee/page/project/settings/license_compliance.rb'
+          autoload :CICD, 'qa/ee/page/project/settings/ci_cd'
+          autoload :LicenseCompliance, 'qa/ee/page/project/settings/license_compliance'
 
           module Services
             autoload :Jenkins, 'qa/ee/page/project/settings/services/jenkins'
