@@ -58,16 +58,14 @@ module Gitlab
       @project_blame_links = {}
       @time_ago_tooltips = {}
 
-      groups.each do |blame_group|
-        commit = blame_group[:commit]
-
+      groups.map { |g| g[:commit] }.uniq.each do |commit|
         @author_avatars[commit.id] ||= author_avatar(commit, size: 36, has_tooltip: false)
         @age_map_classes[commit.id] ||= age_map_class(commit.committed_date, project_duration)
         @commit_links[commit.id] ||= link_to commit.title, project_commit_path(project, commit.id), class: "cdark", title: commit.title
         @commit_author_links[commit.id] ||= commit_author_link(commit, avatar: false)
         @time_ago_tooltips[commit.id] ||= time_ago_with_tooltip(commit.committed_date)
         @project_blame_links[commit.id] ||= project_blame_link(commit)
-        end
+      end
     end
 
     def project_blame_link(commit)
