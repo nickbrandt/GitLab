@@ -5,7 +5,7 @@ require_dependency 'api/validations/validators/limit'
 module API
   module Terraform
     class State < Grape::API
-      include ::Gitlab::Utils::StrongMemoize
+      helpers ::API::Helpers::TerraformHelpers
 
       default_format :json
 
@@ -23,12 +23,6 @@ module API
           params do
             requires :name, type: String, desc: 'The name of a Terraform state'
             optional :ID, type: String, limit: 255, desc: 'Terraform state lock ID'
-          end
-
-          helpers do
-            def remote_state_handler
-              ::Terraform::RemoteStateHandler.new(user_project, current_user, name: params[:name], lock_id: params[:ID])
-            end
           end
 
           desc 'Get a terraform state by its name'
