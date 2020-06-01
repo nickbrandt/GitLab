@@ -21,6 +21,6 @@ class Projects::BlameController < Projects::ApplicationController
     @environment = EnvironmentsFinder.new(@project, current_user, environment_params).execute.last
 
     @blame = Gitlab::Blame.new(@blob, @commit)
-    @blame = Gitlab::View::Presenter::Factory.new(@blame, project: @project).fabricate!
+    @blame = Gitlab::View::Presenter::Factory.new(@blame, project: @project, path: @path).fabricate!
   end
 end

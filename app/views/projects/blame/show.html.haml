@@ -1,11 +1,5 @@
 - page_title "Blame", @blob.path, @ref
-- sprite_icon = sprite_icon('doc-versions', size: 16, css_class: 'doc-versions align-text-bottom')
 - link_icon = icon("link")
-
-- commit_links = {}
-- commit_author_links = {}
-- project_blame_links = {}
-- time_ago_tooltips = {}
 
 #blob-content-holder.tree-holder
   = render "projects/blob/breadcrumb", blob: @blob, blame: true
@@ -20,30 +14,15 @@
         - @blame.groups.each do |blame_group|
           - commit = blame_group[:commit]
 
-          - commit_links[commit.id] ||= link_to commit.title, project_commit_path(@project, commit.id), class: "cdark", title: commit.title
-          - commit_author_links[commit.id] ||= commit_author_link(commit, avatar: false)
-          - time_ago_tooltips[commit.id] ||= time_ago_with_tooltip(commit.committed_date)
-
-          - previous_commit_id = commit.parent_id
-
-          - project_blame_links[commit.id] ||= begin
-            - if previous_commit_id
-              - link_to project_blame_path(@project, tree_join(previous_commit_id, @path)),
-                        title: _('View blame prior to this change'),
-                        aria: { label: _('View blame prior to this change') },
-                        data: { toggle: 'tooltip', placement: 'right', container: 'body' } do
-                - sprite_icon
-
-
           = render 'blame_group',
             blame_group: blame_group,
             current_line: current_line,
             link_icon: link_icon,
             author_avatar: @blame.author_avatar_for_commit(commit.id),
             age_map_class: @blame.age_map_class_for_commit(commit.id),
-            commit_link: commit_links[commit.id],
-            commit_author_link: commit_author_links[commit.id],
-            project_blame_link: project_blame_links[commit.id],
-            time_ago_tooltip: time_ago_tooltips[commit.id]
+            commit_link: @blame.commit_link_for_commit(commit.id),
+            commit_author_link: @blame.commit_author_link_for_commit(commit.id),
+            project_blame_link: @blame.project_blame_link_for_commit(commit.id),
+            time_ago_tooltip: @blame.time_ago_tooltip_for_commit(commit.id)
 
           - current_line += blame_group[:lines].count
