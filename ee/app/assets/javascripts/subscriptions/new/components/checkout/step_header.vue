@@ -21,7 +21,7 @@ export default {
   <div class="d-flex">
     <icon
       v-show="isFinished"
-      class="checkmark append-right-8"
+      class="checkmark gl-mr-3"
       :size="18"
       :aria-label="title"
       name="check-circle"

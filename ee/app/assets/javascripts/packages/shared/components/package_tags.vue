@@ -70,7 +70,7 @@ export default {
 <template>
   <div class="d-flex align-items-center">
     <div v-if="!hideLabel" ref="tagLabel" class="d-flex align-items-center">
-      <gl-icon name="labels" class="append-right-8" />
+      <gl-icon name="labels" class="gl-mr-3" />
       <strong class="js-tags-count">{{ tagsDisplay }}</strong>
     </div>
 
