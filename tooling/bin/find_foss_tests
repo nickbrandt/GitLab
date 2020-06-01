@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require_relative '../lib/gitlab/popen'
-require_relative '../lib/quality/test_file_finder'
+require_relative '../../lib/gitlab/popen'
+require_relative '../lib/tooling/test_file_finder'
 
 output_file = ARGV.shift
 
@@ -19,7 +20,7 @@ end
 changed_files = git_diff.stdout.split("\n")
 
 tests_to_run = changed_files.flat_map do |file|
-  test_files = Quality::TestFileFinder.new(file, foss_test_only: true).test_files
+  test_files = Tooling::TestFileFinder.new(file, foss_test_only: true).test_files
   test_files.select { |f| File.exist?(f) }
 end
 

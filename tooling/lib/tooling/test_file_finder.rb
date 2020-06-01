@@ -3,7 +3,7 @@
 require 'ostruct'
 require 'set'
 
-module Quality
+module Tooling
   class TestFileFinder
     RUBY_EXTENSION = '.rb'
     EE_PREFIX = 'ee/'
@@ -43,6 +43,7 @@ module Quality
       OpenStruct.new.tap do |foss|
         foss.app = %r{^app/(.+)\.rb$}
         foss.lib = %r{^lib/(.+)\.rb$}
+        foss.tooling = %r{^(tooling/lib/.+)\.rb$}
         foss.spec = %r{^spec/(.+)_spec.rb$}
         foss.spec_dir = 'spec'
       end
@@ -55,6 +56,10 @@ module Quality
 
       if (match = context.lib&.match(file))
         result << "#{context.spec_dir}/lib/#{match[1]}_spec.rb"
+      end
+
+      if (match = context.tooling&.match(file))
+        result << "#{context.spec_dir}/#{match[1]}_spec.rb"
       end
 
       if context.spec&.match(file)

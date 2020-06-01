@@ -451,7 +451,7 @@
     - <<: *if-not-ee
       when: never
     - <<: *if-not-canonical-namespace
-        when: never
+      when: never
     - <<: *if-merge-request
       changes: *code-backstage-patterns
 
