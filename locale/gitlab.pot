@@ -20467,6 +20467,12 @@ msgstr ""
 msgid "Sort direction"
 msgstr ""
 
+msgid "Sort direction: Ascending"
+msgstr ""
+
+msgid "Sort direction: Descending"
+msgstr ""
+
 msgid "SortOptions|Access level, ascending"
 msgstr ""
 
@@ -22055,6 +22061,9 @@ msgid "There was a problem fetching project branches."
 msgstr ""
 
 msgid "There was a problem fetching project users."
+msgstr ""
+
+msgid "There was a problem fetching users."
 msgstr ""
 
 msgid "There was a problem refreshing the data, please try again"
