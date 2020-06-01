@@ -17,7 +17,7 @@ FactoryBot.define do
 
     trait :with_evidence do
       after(:create) do |release, _|
-        ::Releases::CreateEvidenceService.new(release).execute
+        create(:evidence, release: release)
       end
     end
 
