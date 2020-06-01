@@ -10,11 +10,15 @@
   }
 }
 
-.issues-analytics-loading {
-  padding-top: $header-height * 2;
-}
-
 .issues-analytics-legend {
   font-size: $gl-font-size-small;
   color: $gl-text-color-secondary;
+}
+
+.issue-title {
+  max-width: px-to-rem(350px);
+}
+
+.milestone-title {
+  max-width: px-to-rem(75px);
 }
