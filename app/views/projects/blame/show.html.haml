@@ -4,6 +4,7 @@
 - link_icon = icon("link")
 - author_avatars = {}
 - age_map_classes = {}
+- commit_links = {}
 
 #blob-content-holder.tree-holder
   = render "projects/blob/breadcrumb", blob: @blob, blame: true
@@ -19,6 +20,7 @@
           - commit = blame_group[:commit]
           - author_avatars[commit.id] ||= author_avatar(commit, size: 36, has_tooltip: false)
           - age_map_classes[commit.id] ||= age_map_class(commit.committed_date, project_duration)
+          - commit_links[commit.id] ||= link_to commit.title, project_commit_path(@project, commit.id), class: "cdark", title: commit.title
 
           = render 'blame_group',
             blame_group: blame_group,
@@ -26,6 +28,7 @@
             sprite_icon: sprite_icon,
             link_icon: link_icon,
             author_avatar: author_avatars[commit.id],
-            age_map_class: age_map_classes[commit.id]
+            age_map_class: age_map_classes[commit.id],
+            commit_link: commit_links[commit.id]
 
           - current_line += blame_group[:lines].count
