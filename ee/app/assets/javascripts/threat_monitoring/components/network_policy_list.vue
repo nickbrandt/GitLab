@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlTable, GlEmptyState, GlDrawer, GlButton } from '@gitlab/ui';
+import { GlTable, GlEmptyState, GlDrawer, GlButton, GlAlert, GlSprintf, GlLink } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { getTimeago } from '~/lib/utils/datetime_utility';
 import { setUrlFragment } from '~/lib/utils/url_utility';
@@ -13,6 +13,9 @@ export default {
     GlEmptyState,
     GlDrawer,
     GlButton,
+    GlAlert,
+    GlSprintf,
+    GlLink,
     EnvironmentPicker,
     NetworkPolicyEditor,
   },
@@ -41,6 +44,9 @@ export default {
     },
     hasPolicyChanges() {
       return this.hasSelectedPolicy && this.selectedPolicy.manifest !== this.initialManifest;
+    },
+    hasAutoDevopsPolicy() {
+      return this.policies.some(policy => policy.isAutodevops);
     },
   },
   methods: {
@@ -88,7 +94,10 @@ export default {
     },
   ],
   emptyStateDescription: s__(
-    `NetworkPolicies|Policies are a specification of how groups of pods are allowed to communicate with each other network endpoints.`,
+    `NetworkPolicies|Policies are a specification of how groups of pods are allowed to communicate with each other's network endpoints.`,
+  ),
+  autodevopsNoticeDescription: s__(
+    `NetworkPolicies|If you are using Auto DevOps, your %{monospacedStart}auto-deploy-values.yaml%{monospacedEnd} file will not be updated if you change a policy in this section. Auto DevOps users should make changes by following the %{linkStart}Container Network Policy documentation%{linkEnd}.`,
   ),
   headerHeight: process.env.NODE_ENV === 'development' ? '75px' : '40px',
 };
@@ -96,6 +105,24 @@ export default {
 
 <template>
   <div>
+    <div class="mb-2">
+      <gl-alert
+        v-if="hasAutoDevopsPolicy"
+        data-testid="autodevopsAlert"
+        variant="info"
+        :dismissible="false"
+      >
+        <gl-sprintf :message="$options.autodevopsNoticeDescription">
+          <template #monospaced="{ content }">
+            <span class="monospace">{{ content }}</span>
+          </template>
+          <template #link="{ content }">
+            <gl-link :href="documentationFullPath">{{ content }}</gl-link>
+          </template>
+        </gl-sprintf>
+      </gl-alert>
+    </div>
+
     <div class="pt-3 px-3 bg-gray-light">
       <div class="row">
         <environment-picker ref="environmentsPicker" />

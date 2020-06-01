@@ -36,6 +36,7 @@ describe('NetworkPolicyList component', () => {
   const findPolicyEditor = () => wrapper.find({ ref: 'policyEditor' });
   const findApplyButton = () => wrapper.find({ ref: 'applyButton' });
   const findCancelButton = () => wrapper.find({ ref: 'cancelButton' });
+  const findAutodevopsAlert = () => wrapper.find('[data-testid="autodevopsAlert"]');
 
   beforeEach(() => {
     factory({});
@@ -70,6 +71,10 @@ describe('NetworkPolicyList component', () => {
       expect(editorDrawer.exists()).toBe(true);
       expect(editorDrawer.props('open')).toBe(true);
     });
+  });
+
+  it('does not render autodevops alert', () => {
+    expect(findAutodevopsAlert().exists()).toBe(false);
   });
 
   describe('given there is a selected policy', () => {
@@ -145,6 +150,21 @@ describe('NetworkPolicyList component', () => {
 
     it('shows the table empty state', () => {
       expect(findTableEmptyState().element).toMatchSnapshot();
+    });
+  });
+
+  describe('given autodevops selected policy', () => {
+    beforeEach(() => {
+      const policies = mockPoliciesResponse;
+      policies[0].isAutodevops = true;
+      factory({
+        state: { policies },
+        data: () => ({ selectedPolicyName: 'policy' }),
+      });
+    });
+
+    it('renders autodevops alert', () => {
+      expect(findAutodevopsAlert().exists()).toBe(true);
     });
   });
 });
