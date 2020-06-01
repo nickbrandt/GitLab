@@ -1,5 +1,22 @@
 # Changelog for gitlab-workhorse
 
+## v8.34.0
+
+### Added
+- Support Workhorse directly uploading files to S3
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/466
+
+### Fixed
+- Disable compression for open archive
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/508
+  Contributed by Georges-Etienne Legendre
+
+### Other
+- Add configuration to support an S3 client inside Workhorse
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/516
+- Refactor Preparer and SaveFileOpts handling
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/515
+
 ## v8.33.0
 
 ### Added
