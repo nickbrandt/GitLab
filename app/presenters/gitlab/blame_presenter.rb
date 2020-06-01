@@ -14,14 +14,6 @@ module Gitlab
 
     presents :blame
 
-    CommitData = Struct.new(
-      :author_avatar,
-      :age_map_class,
-      :commit_link,
-      :commit_author_link,
-      :project_blame_link,
-      :time_ago_tooltip)
-
     def initialize(subject, **attributes)
       super
 
@@ -37,6 +29,14 @@ module Gitlab
     end
 
     private
+
+    CommitData = Struct.new(
+      :author_avatar,
+      :age_map_class,
+      :commit_link,
+      :commit_author_link,
+      :project_blame_link,
+      :time_ago_tooltip)
 
     def precalculate_data_by_commit!
       unique_commits = groups.map { |g| g[:commit] }.uniq

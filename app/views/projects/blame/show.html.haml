@@ -19,11 +19,6 @@
             blame_group: blame_group,
             current_line: current_line,
             link_icon: link_icon,
-            author_avatar: commit_data.author_avatar,
-            age_map_class: commit_data.age_map_class,
-            commit_link: commit_data.commit_link,
-            commit_author_link: commit_data.commit_author_link,
-            project_blame_link: commit_data.project_blame_link,
-            time_ago_tooltip: commit_data.time_ago_tooltip
+            commit_data: commit_data
 
           - current_line += blame_group[:lines].count
