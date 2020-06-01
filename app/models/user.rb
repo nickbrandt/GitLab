@@ -509,6 +509,38 @@ class User < ApplicationRecord
       by_any_email(email, confirmed: confirmed).take
     end
 
+    # Returns a relation containing all users with emails for given emails
+    # where non-confirmed emails are included and private commit emails are skiped
+    # or names where username and name is searched for exact match
+    #
+    #
+    # @param emails [String, Array<String>] email addresses to check
+    # @param names [String, Array<String>] names to check in username and name
+    def by_emails_or_names(jira_pairs)
+      sql = <<~SQL
+        WITH jira_users(name, email) AS (VALUES #{jira_pairs})
+          SELECT DISTINCT users.id AS user_id,
+            (CASE
+             WHEN ((jira_users.email = users.email) OR (jira_users.email = emails.email))
+             THEN 3
+             WHEN (jira_users.name = lower(users.username))
+             THEN 2
+             WHEN (jira_users.name = lower(users.name))
+             THEN 1
+            END)
+            AS match_score, jira_users.name as jira_name, jira_users.email as jira_email
+          FROM users
+          LEFT JOIN emails ON (users.id = emails.user_id)
+          JOIN jira_users ON (jira_users.name = lower(users.username))
+            OR (jira_users.name = lower(users.name))
+            OR (jira_users.email = users.email)
+            OR (jira_users.email = emails.email)
+          ORDER BY match_score DESC;
+      SQL
+
+      ActiveRecord::Base.connection.execute(sql)
+    end
+
     # Returns a relation containing all the users for the given email addresses
     #
     # @param emails [String, Array<String>] email addresses to check
