@@ -41,7 +41,7 @@ module Gitlab
     def precalculate_data_by_commit!
       unique_commits = groups.map { |g| g[:commit] }.uniq
 
-     @commits = unique_commits.each_with_object({}) do |commit, h|
+      @commits = unique_commits.each_with_object({}) do |commit, h|
         data = CommitData.new
 
         data.author_avatar = author_avatar(commit, size: 36, has_tooltip: false)
