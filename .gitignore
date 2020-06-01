@@ -92,4 +92,4 @@ webpack-dev-server.json
 /.nvimrc
 .solargraph.yml
 apollo.config.js
-matching_foss_tests.txt
+/tmp/matching_foss_tests.txt
