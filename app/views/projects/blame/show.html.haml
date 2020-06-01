@@ -3,6 +3,7 @@
 - sprite_icon = sprite_icon('doc-versions', size: 16, css_class: 'doc-versions align-text-bottom')
 - link_icon = icon("link")
 - author_avatars = {}
+- age_map_classes = {}
 
 #blob-content-holder.tree-holder
   = render "projects/blob/breadcrumb", blob: @blob, blame: true
@@ -17,13 +18,14 @@
         - @blame_groups.each do |blame_group|
           - commit = blame_group[:commit]
           - author_avatars[commit.id] ||= author_avatar(commit, size: 36, has_tooltip: false)
+          - age_map_classes[commit.id] ||= age_map_class(commit.committed_date, project_duration)
 
           = render 'blame_group',
             blame_group: blame_group,
             current_line: current_line,
-            project_duration: project_duration,
             sprite_icon: sprite_icon,
             link_icon: link_icon,
-            author_avatar: author_avatars[commit.id]
+            author_avatar: author_avatars[commit.id],
+            age_map_class: age_map_classes[commit.id]
 
           - current_line += blame_group[:lines].count
