@@ -1,0 +1,5 @@
+---
+title: Improve regex for geo auth keys checker
+merge_request: 33447
+author:
+type: fixed
