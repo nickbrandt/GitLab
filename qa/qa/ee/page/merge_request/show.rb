@@ -7,6 +7,8 @@ module QA
         module Show
           extend QA::Page::PageConcern
 
+          ApprovalConditionsError = Class.new(RuntimeError)
+
           def self.prepended(base)
             super
 
@@ -99,7 +101,10 @@ module QA
           end
 
           def approvals_required_from
-            approvals_content.match(/approvals? from (.*)/)[1]
+            match = approvals_content.match(/approvals? from (.*)/)
+            raise(ApprovalConditionsError, 'The expected approval conditions were not found.') unless match
+
+            match[1]
           end
 
           def approved?
@@ -293,7 +298,7 @@ module QA
           end
 
           def merge_via_merge_train
-            raise ElementNotFound, "Not ready to merge" unless ready_to_merge?
+            wait_until_ready_to_merge
 
             click_element(:merge_button, text: "Start merge train")
 
