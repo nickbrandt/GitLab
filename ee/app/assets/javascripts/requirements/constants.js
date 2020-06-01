@@ -11,6 +11,25 @@ export const FilterStateEmptyMessage = {
   ARCHIVED: __('There are no archived requirements'),
 };
 
+export const AvailableSortOptions = [
+  {
+    id: 1,
+    title: __('Created date'),
+    sortDirection: {
+      descending: 'created_desc',
+      ascending: 'created_asc',
+    },
+  },
+  {
+    id: 2,
+    title: __('Last updated'),
+    sortDirection: {
+      descending: 'updated_desc',
+      ascending: 'updated_asc',
+    },
+  },
+];
+
 export const DEFAULT_PAGE_SIZE = 20;
 
 export const MAX_TITLE_LENGTH = 255;

@@ -3,4 +3,5 @@ import recentSearchesStorageKeysCE from '~/filtered_search/recent_searches_stora
 export default {
   ...recentSearchesStorageKeysCE,
   epics: 'epics-recent-searches',
+  requirements: 'requirements-recent-searches',
 };

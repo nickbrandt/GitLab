@@ -5,6 +5,9 @@ query projectRequirements(
   $lastPageSize: Int
   $prevPageCursor: String = ""
   $nextPageCursor: String = ""
+  $authorUsernames: [String!] = []
+  $search: String = ""
+  $sortBy: Sort = created_desc
 ) {
   project(fullPath: $projectPath) {
     requirements(
@@ -12,8 +15,10 @@ query projectRequirements(
       last: $lastPageSize
       after: $nextPageCursor
       before: $prevPageCursor
-      sort: created_desc
       state: $state
+      authorUsername: $authorUsernames
+      search: $search
+      sort: $sortBy
     ) {
       nodes {
         iid
@@ -33,6 +38,8 @@ query projectRequirements(
         }
       }
       pageInfo {
+        hasPreviousPage
+        hasNextPage
         startCursor
         endCursor
       }

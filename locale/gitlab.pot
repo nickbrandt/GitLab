@@ -6575,6 +6575,9 @@ msgstr ""
 msgid "Created by me"
 msgstr ""
 
+msgid "Created date"
+msgstr ""
+
 msgid "Created issue %{issueLink}"
 msgstr ""
 
@@ -19165,6 +19168,9 @@ msgid "Search projects"
 msgstr ""
 
 msgid "Search projects..."
+msgstr ""
+
+msgid "Search requirements"
 msgstr ""
 
 msgid "Search users"
