@@ -9,7 +9,10 @@ module Gitlab
         InvalidPeriodLimitError = Class.new(BaseReducerError)
 
         VALID_PERIOD = %w[day week month].freeze
-        VALID_PERIOD_FIELD = %i[created_at].freeze
+        VALID_PERIOD_FIELDS = {
+          issue: %i[created_at closed_at],
+          merge_request: %i[created_at merged_at]
+        }.with_indifferent_access.freeze
 
         def initialize(issuables, period:, period_limit:, period_field: :created_at)
           super(issuables)
@@ -42,8 +45,8 @@ module Gitlab
             raise InvalidPeriodError, "Invalid value for `period`: `#{period}`. Allowed values are #{VALID_PERIOD}!"
           end
 
-          unless VALID_PERIOD_FIELD.include?(period_field)
-            raise InvalidPeriodFieldError, "Invalid value for `period_field`: `#{period_field}`. Allowed values are #{VALID_PERIOD_FIELD}!"
+          unless VALID_PERIOD_FIELDS[issuable_type].include?(period_field)
+            raise InvalidPeriodFieldError, "Invalid value for `period_field`: `#{period_field}`. Allowed values are #{VALID_PERIOD_FIELDS[issuable_type]}!"
           end
 
           unless period_limit > 0

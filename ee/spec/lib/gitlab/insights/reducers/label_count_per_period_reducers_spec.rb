@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Insights::Reducers::LabelCountPerPeriodReducer do
-  include_context 'Insights reducers context'
+  include_context 'Insights issues reducer context'
 
   def find_issuables(project, query)
     Gitlab::Insights::Finders::IssuableFinder.new(project, nil, query: query).find
