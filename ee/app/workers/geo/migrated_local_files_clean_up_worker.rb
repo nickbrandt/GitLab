@@ -37,22 +37,11 @@ module Geo
     end
 
     def find_migrated_local_objects(batch_size:)
-      lfs_object_ids = find_migrated_local_lfs_objects_ids(batch_size: batch_size)
       attachment_ids = find_migrated_local_attachments_ids(batch_size: batch_size)
       job_artifact_ids = find_migrated_local_job_artifacts_ids(batch_size: batch_size)
 
-      take_batch(lfs_object_ids, attachment_ids, job_artifact_ids)
+      take_batch(attachment_ids, job_artifact_ids)
     end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def find_migrated_local_lfs_objects_ids(batch_size:)
-      return [] unless lfs_objects_object_store_enabled?
-
-      lfs_objects_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(:lfs))
-                        .pluck(Geo::Fdw::LfsObject.arel_table[:id])
-                        .map { |id| ['lfs', id] }
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local_attachments_ids(batch_size:)
@@ -85,17 +74,12 @@ module Geo
       FileUploader.object_store_enabled?
     end
 
-    def lfs_objects_object_store_enabled?
-      LfsObjectUploader.object_store_enabled?
-    end
-
     def job_artifacts_object_store_enabled?
       JobArtifactUploader.object_store_enabled?
     end
 
     def object_store_enabled?
       attachments_object_store_enabled? ||
-        lfs_objects_object_store_enabled? ||
         job_artifacts_object_store_enabled?
     end
 
@@ -105,10 +89,6 @@ module Geo
 
     def attachments_finder
       @attachments_finder ||= AttachmentRegistryFinder.new(current_node_id: current_node.id)
-    end
-
-    def lfs_objects_finder
-      @lfs_objects_finder ||= LfsObjectRegistryFinder.new(current_node_id: current_node.id)
     end
 
     def job_artifacts_finder

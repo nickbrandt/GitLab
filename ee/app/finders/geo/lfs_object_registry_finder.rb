@@ -44,7 +44,7 @@ module Geo
     #
     # @return [Array] the first element is an Array of untracked IDs, and the second element is an Array of tracked IDs that are unused
     def find_registry_differences(range)
-      source_ids = lfs_objects..id_in(range).pluck_primary_key
+      source_ids = lfs_objects.id_in(range).pluck_primary_key
       tracked_ids = syncable.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
@@ -77,16 +77,6 @@ module Geo
         .limit(batch_size)
     end
     alias_method :find_unsynced, :find_never_synced_registries
-    # rubocop:enable CodeReuse/ActiveRecord
-
-    # rubocop:disable CodeReuse/ActiveRecord
-    def find_migrated_local(batch_size:, except_ids: [])
-      all_lfs_objects
-        .inner_join_registry
-        .with_files_stored_remotely
-        .id_not_in(except_ids)
-        .limit(batch_size)
-    end
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop:disable CodeReuse/ActiveRecord
