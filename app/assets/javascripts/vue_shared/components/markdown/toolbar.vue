@@ -1,9 +1,10 @@
 <script>
 /* eslint-disable @gitlab/vue-require-i18n-strings */
-import { GlLink, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton, GlLink, GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {
+    GlButton,
     GlLink,
     GlLoadingIcon,
   },
@@ -35,18 +36,14 @@ export default {
   <div class="comment-toolbar clearfix">
     <div class="toolbar-text">
       <template v-if="!hasQuickActionsDocsPath && markdownDocsPath">
-        <gl-link :href="markdownDocsPath" target="_blank" tabindex="-1">{{
+        <gl-link :href="markdownDocsPath" target="_blank">{{
           __('Markdown is supported')
         }}</gl-link>
       </template>
       <template v-if="hasQuickActionsDocsPath && markdownDocsPath">
-        <gl-link :href="markdownDocsPath" target="_blank" tabindex="-1">{{
-          __('Markdown')
-        }}</gl-link>
+        <gl-link :href="markdownDocsPath" target="_blank">{{ __('Markdown') }}</gl-link>
         and
-        <gl-link :href="quickActionsDocsPath" target="_blank" tabindex="-1">{{
-          __('quick actions')
-        }}</gl-link>
+        <gl-link :href="quickActionsDocsPath" target="_blank">{{ __('quick actions') }}</gl-link>
         are supported
       </template>
     </div>
@@ -67,13 +64,13 @@ export default {
           {{ __('attach a new file') }}
         </button>
       </span>
-      <button class="markdown-selector button-attach-file btn-link" tabindex="-1" type="button">
+      <gl-button class="markdown-selector button-attach-file" variant="link">
         <i class="fa fa-file-image-o toolbar-button-icon" aria-hidden="true"></i
         ><span class="text-attach-file">{{ __('Attach a file') }}</span>
-      </button>
-      <button class="btn btn-default btn-sm hide button-cancel-uploading-files" type="button">
+      </gl-button>
+      <gl-button class="btn btn-default btn-sm hide button-cancel-uploading-files" variant="link">
         {{ __('Cancel') }}
-      </button>
+      </gl-button>
     </span>
   </div>
 </template>
