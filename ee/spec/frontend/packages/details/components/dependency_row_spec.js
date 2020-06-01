@@ -5,7 +5,7 @@ import { dependencyLinks } from '../../mock_data';
 describe('DependencyRow', () => {
   let wrapper;
 
-  const [withoutFramework, withoutVersion, fullLink] = dependencyLinks;
+  const { withoutFramework, withoutVersion, fullLink } = dependencyLinks;
 
   function createComponent({ dependencyLink = fullLink } = {}) {
     wrapper = shallowMount(DependencyRow, {
