@@ -525,12 +525,12 @@ describe API::Projects do
 
   describe 'GET projects/:id/audit_events' do
     let_it_be(:user) { create(:user) }
-    let_it_be(:project) { create(:project, namespace: user.namespace) }
+    let_it_be(:project) { create(:project, :public, namespace: user.namespace) }
     let(:path) { "/projects/#{project.id}/audit_events" }
 
     context 'when authenticated, as a user' do
-      it '403 response' do
-        get api(path, create(:user))
+      it_behaves_like '403 response' do
+        let(:request) { get api(path, create(:user)) }
       end
     end
 
@@ -620,14 +620,14 @@ describe API::Projects do
 
   describe 'GET projects/:id/audit_events/:audit_event_id' do
     let_it_be(:user) { create(:user) }
-    let_it_be(:project) { create(:project, namespace: user.namespace) }
+    let_it_be(:project) { create(:project, :public, namespace: user.namespace) }
     let(:path) { "/projects/#{project.id}/audit_events/#{project_audit_event.id}" }
 
     let_it_be(:project_audit_event) { create(:project_audit_event, created_at: Date.new(2000, 1, 10), entity_id: project.id) }
 
     context 'when authenticated, as a user' do
-      it '403 response' do
-        get api(path, create(:user))
+      it_behaves_like '403 response' do
+        let(:request) { get api(path, create(:user)) }
       end
     end
 
@@ -665,8 +665,8 @@ describe API::Projects do
           context 'invalid audit_event_id' do
             let(:path) { "/projects/#{project.id}/audit_events/an-invalid-id" }
 
-            it '400 response' do
-              get api(path, user)
+            it_behaves_like '400 response' do
+              let(:request) { get api(path, user) }
             end
           end
 
