@@ -10,7 +10,7 @@ class RepositoryUpdateMirrorWorker # rubocop:disable Scalability/IdempotentWorke
   feature_category :source_code_management
 
   # Retry not necessary. It will try again at the next update interval.
-  sidekiq_options retry: false, status_expiration: StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION
+  sidekiq_options retry: false, status_expiration: Gitlab::Import::StuckImportJob::IMPORT_JOBS_EXPIRATION
 
   attr_accessor :project, :repository, :current_user
 
