@@ -1,0 +1,10 @@
+[redis]
+URL = "unix:/home/git/gitlab/redis/redis.socket"
+
+[object_storage]
+  enabled = false
+  provider = "AWS"
+
+[object_storage.s3]
+  aws_access_key_id = "YOUR AWS ACCESS KEY"
+  aws_secret_access_key = "YOUR AWS SECRET ACCESS KEY"
