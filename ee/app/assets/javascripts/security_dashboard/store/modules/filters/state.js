@@ -14,7 +14,7 @@ export default () => ({
       selection: new Set([BASE_FILTERS.severity.id]),
     },
     {
-      name: s__('SecurityReports|Scanner type'),
+      name: s__('SecurityReports|Report type'),
       id: 'report_type',
       options: [BASE_FILTERS.report_type, ...optionsObjectToArray(REPORT_TYPES)],
       hidden: false,

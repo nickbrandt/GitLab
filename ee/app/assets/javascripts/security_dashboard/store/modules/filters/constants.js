@@ -8,7 +8,7 @@ export const BASE_FILTERS = {
     id: ALL,
   },
   report_type: {
-    name: s__('ciReport|All scanner types'),
+    name: s__('ciReport|All report types'),
     id: ALL,
   },
   project_id: {
