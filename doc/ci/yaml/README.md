@@ -920,7 +920,7 @@ can use one of the [`workflow: rules` templates](#workflowrules-templates) to ge
 This will ensure that the behavior is more stable as you start adding additional `rules`
 blocks, and will avoid issues like creating a duplicate, merge request (detached) pipeline.
 
-We don't recomment mixing `only/except` jobs with `rules` jobs in the same pipeline.
+We don't recommend mixing `only/except` jobs with `rules` jobs in the same pipeline.
 It may not cause YAML errors, but debugging the exact execution behavior can be complex
 due to the different default behaviors of `only/except` and `rules`.
 
