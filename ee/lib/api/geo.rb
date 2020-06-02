@@ -22,16 +22,15 @@ module API
 
       params do
         requires :replicable_name, type: String, desc: 'Replicable name (eg. package_file)'
-        requires :id, type: Integer, desc: 'The model ID that needs to be transferred'
+        requires :replicable_id, type: Integer, desc: 'The replicable ID that needs to be transferred'
       end
-      get 'retrieve/:replicable_name/:id' do
+      get 'retrieve/:replicable_name/:replicable_id' do
         check_gitlab_geo_request_ip!
-        authorize_geo_transfer!(replicable_name: params[:replicable_name], id: params[:id])
+        params_sym = params.symbolize_keys
+        authorize_geo_transfer!(params_sym)
 
         decoded_params = geo_jwt_decoder.decode
-        service = ::Geo::BlobUploadService.new(replicable_name: params[:replicable_name],
-                                               blob_id: params[:id],
-                                               decoded_params: decoded_params)
+        service = ::Geo::BlobUploadService.new(**params_sym, decoded_params: decoded_params)
         response = service.execute
 
         if response[:code] == :ok
