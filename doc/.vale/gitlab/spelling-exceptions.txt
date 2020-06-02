@@ -102,6 +102,7 @@ Facebook
 failover
 failovers
 failsafe
+fastlane
 favicon
 firewalled
 Flawfinder
