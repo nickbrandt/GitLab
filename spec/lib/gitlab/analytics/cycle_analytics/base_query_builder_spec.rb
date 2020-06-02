@@ -28,17 +28,17 @@ describe Gitlab::Analytics::CycleAnalytics::BaseQueryBuilder do
   end
 
   describe 'date range parameters' do
-    context 'when filters by only the `from` parameter' do
+    context 'when filters by only the `created_after` parameter' do
       before do
-        params[:from] = 4.months.ago
+        params[:created_after] = 4.months.ago
       end
 
       it { expect(records.size).to eq(2) }
     end
 
-    context 'when filters by both `from` and `to` parameters' do
+    context 'when filters by both `created_after` and `created_before` parameters' do
       before do
-        params.merge!(from: 4.months.ago, to: 2.months.ago)
+        params.merge!(created_after: 4.months.ago, created_before: 2.months.ago)
       end
 
       it { expect(records.size).to eq(1) }
@@ -46,7 +46,7 @@ describe Gitlab::Analytics::CycleAnalytics::BaseQueryBuilder do
 
     context 'invalid date range is provided' do
       before do
-        params.merge!(from: 1.month.ago, to: 10.months.ago)
+        params.merge!(created_after: 1.month.ago, created_before: 10.months.ago)
       end
 
       it { expect(records.size).to eq(0) }
@@ -57,7 +57,7 @@ describe Gitlab::Analytics::CycleAnalytics::BaseQueryBuilder do
     other_mr = create(:merge_request, source_project: create(:project), allow_broken: true, created_at: 2.months.ago)
     other_mr.metrics.update!(merged_at: 1.month.ago)
 
-    params[:from] = 1.year.ago
+    params[:created_after] = 1.year.ago
 
     expect(records.size).to eq(2)
   end

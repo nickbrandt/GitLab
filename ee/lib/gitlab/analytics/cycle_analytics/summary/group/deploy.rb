@@ -22,9 +22,9 @@ module Gitlab
             def deployments_count
               @deployments_count ||= begin
                                        deployments = Deployment.joins(:project).merge(Project.inside_path(group.full_path))
-                                       deployments = deployments.where(projects: { id: options[:projects] }) if options[:projects]
-                                       deployments = deployments.where("deployments.created_at > ?", options[:from])
-                                       deployments = deployments.where("deployments.created_at < ?", options[:to]) if options[:to]
+                                       deployments = deployments.where(projects: { id: options[:projects] }) if options[:projects].present?
+                                       deployments = deployments.where("deployments.created_at > ?", options[:created_after])
+                                       deployments = deployments.where("deployments.created_at < ?", options[:created_before]) if options[:created_before]
                                        deployments.success.count
                                      end
             end

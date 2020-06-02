@@ -14,7 +14,7 @@ describe Gitlab::Analytics::CycleAnalytics::RecordsFetcher do
     Gitlab::Analytics::CycleAnalytics::DataCollector.new(
       stage: stage,
       params: {
-        from: 1.year.ago,
+        created_after: 1.year.ago,
         current_user: user
       }
     ).records_fetcher.serialized_records

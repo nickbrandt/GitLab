@@ -17,14 +17,10 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
   end
 
   def build_request_params
-    @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(allowed_params.merge(group: @group), current_user: current_user)
+    @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(allowed_params.merge(current_user: current_user, group: @group))
   end
 
   def allowed_params
-    params.permit(
-      :created_after,
-      :created_before,
-      project_ids: []
-    )
+    params.permit(*Gitlab::Analytics::CycleAnalytics::RequestParams::STRONG_PARAMS_DEFINITION)
   end
 end

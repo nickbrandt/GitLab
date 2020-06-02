@@ -44,11 +44,8 @@ module Gitlab
         end
 
         def build_finder_params(params)
-          {}.tap do |finder_params|
-            finder_params[:current_user] = params[:current_user]
-
+          params.dup.tap do |finder_params|
             add_parent_model_params!(finder_params)
-            add_time_range_params!(finder_params, params[:from], params[:to])
           end
         end
 
@@ -56,11 +53,6 @@ module Gitlab
           raise(ArgumentError, "unknown parent_class: #{parent_class}") unless parent_class.eql?(Project)
 
           finder_params[:project_id] = stage.parent_id
-        end
-
-        def add_time_range_params!(finder_params, from, to)
-          finder_params[:created_after] = from || 30.days.ago
-          finder_params[:created_before] = to if to
         end
       end
     end

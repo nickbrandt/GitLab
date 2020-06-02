@@ -16,7 +16,7 @@ module CycleAnalyticsParams
   end
 
   def options(params)
-    @options ||= { from: start_date(params), current_user: current_user }.merge(date_range(params))
+    @options ||= { created_after: start_date(params), current_user: current_user }.merge(date_range(params))
   end
 
   def start_date(params)
@@ -32,8 +32,8 @@ module CycleAnalyticsParams
 
   def date_range(params)
     {}.tap do |date_range_params|
-      date_range_params[:from] = to_utc_time(params[:created_after]).beginning_of_day if params[:created_after]
-      date_range_params[:to] = to_utc_time(params[:created_before]).end_of_day if params[:created_before]
+      date_range_params[:created_after] = to_utc_time(params[:created_after]).beginning_of_day if params[:created_after]
+      date_range_params[:created_before] = to_utc_time(params[:created_before]).end_of_day if params[:created_before]
     end.compact
   end
 

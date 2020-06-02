@@ -11,28 +11,35 @@ module Gitlab
         MAX_RANGE_DAYS = 180.days.freeze
         DEFAULT_DATE_RANGE = 29.days # 30 including Date.today
 
+        STRONG_PARAMS_DEFINITION = [
+          :created_before,
+          :created_after,
+          :author_username,
+          :milestone_title,
+          label_name: [].freeze,
+          assignee_username: [].freeze,
+          project_ids: [].freeze
+        ].freeze
+
         attr_writer :project_ids
 
         attribute :created_after, :datetime
         attribute :created_before, :datetime
 
-        attr_accessor :group
-
-        attr_reader :current_user
+        attr_accessor :group, :author_username, :milestone_title, :label_name, :assignee_username, :current_user
 
         validates :created_after, presence: true
         validates :created_before, presence: true
+        validates :current_user, presence: true
 
         validate :validate_created_before
         validate :validate_date_range
 
-        def initialize(params = {}, current_user:)
+        def initialize(params = {})
           super(params)
 
           self.created_before = (self.created_before || Time.now).at_end_of_day
           self.created_after  = (created_after || default_created_after).at_beginning_of_day
-
-          @current_user = current_user
         end
 
         def project_ids
@@ -46,6 +53,19 @@ module Gitlab
             attrs[:created_before] = created_before.to_date.iso8601
             attrs[:projects] = group_projects(project_ids) if group && project_ids.any?
           end
+        end
+
+        def to_data_collector_params
+          {
+            current_user: current_user,
+            created_after: created_after,
+            created_before: created_before,
+            project_ids: project_ids,
+            assignee_username: assignee_username,
+            author_username: author_username,
+            milestone_title: milestone_title,
+            label_name: label_name
+          }
         end
 
         private

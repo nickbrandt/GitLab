@@ -16,13 +16,16 @@ describe Gitlab::Analytics::CycleAnalytics::RequestParams do
 
   let(:project_ids) { root_group_projects.collect(&:id) }
   let(:params) do
-    { created_after: '2019-01-01',
+    {
+      created_after: '2019-01-01',
       created_before: '2019-03-01',
       project_ids: [2, 3],
-      group: root_group }
+      group: root_group,
+      current_user: user
+    }
   end
 
-  subject { described_class.new(params, current_user: user) }
+  subject { described_class.new(params) }
 
   before do
     root_group.add_owner(user)

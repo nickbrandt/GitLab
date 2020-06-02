@@ -68,16 +68,14 @@ module Analytics
       end
 
       def request_params
-        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params, current_user: current_user)
+        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params.merge(current_user: current_user))
       end
 
       def data_collector
-        @data_collector ||= Gitlab::Analytics::CycleAnalytics::DataCollector.new(stage: stage, params: {
-          current_user: current_user,
-          from: request_params.created_after,
-          to: request_params.created_before,
-          project_ids: request_params.project_ids
-        })
+        @data_collector ||= Gitlab::Analytics::CycleAnalytics::DataCollector.new(
+          stage: stage,
+          params: request_params.to_data_collector_params
+        )
       end
 
       def stage
@@ -116,7 +114,7 @@ module Analytics
       end
 
       def data_collector_params
-        params.permit(:created_before, :created_after, project_ids: [])
+        params.permit(*Gitlab::Analytics::CycleAnalytics::RequestParams::STRONG_PARAMS_DEFINITION)
       end
 
       def update_params

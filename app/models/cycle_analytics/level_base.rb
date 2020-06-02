@@ -21,7 +21,12 @@ module CycleAnalytics
     end
 
     def [](stage_name)
-      Gitlab::CycleAnalytics::Stage[stage_name].new(options: options)
+      # passing params down to legacy cycle analytics (to be cleaned up)
+      legacy_options = options.dup
+      legacy_options[:from] ||= legacy_options.delete(:created_after)
+      legacy_options[:to] ||= legacy_options.delete(:created_before)
+
+      Gitlab::CycleAnalytics::Stage[stage_name].new(options: legacy_options)
     end
   end
 end

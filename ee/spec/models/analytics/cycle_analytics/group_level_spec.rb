@@ -12,11 +12,18 @@ describe Analytics::CycleAnalytics::GroupLevel do
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
 
+  let(:options) do
+    Gitlab::Analytics::CycleAnalytics::RequestParams.new(
+      created_after: from_date,
+      current_user: user
+    ).to_data_collector_params
+  end
+
   around do |example|
     Timecop.freeze { example.run }
   end
 
-  subject { described_class.new(group: group, options: { from: from_date, current_user: user }) }
+  subject { described_class.new(group: group, options: options) }
 
   before do
     # Cannot set the owner directly when calling `create(:group)`

@@ -27,18 +27,13 @@ module Gitlab
             # rubocop: disable CodeReuse/ActiveRecord
             def issues_count
               issues = IssuesFinder.new(current_user, finder_params).execute
-              issues = issues.where(projects: { id: options[:projects] }) if options[:projects]
+              issues = issues.where(projects: { id: options[:projects] }) if options[:projects].present?
               issues.count
             end
             # rubocop: enable CodeReuse/ActiveRecord
 
             def finder_params
-              {
-                group_id: group.id,
-                include_subgroups: true,
-                created_after: options[:from],
-                created_before: options[:to]
-              }.compact
+              { group_id: group.id, include_subgroups: true }.merge(options.except(:projects)).compact
             end
           end
         end

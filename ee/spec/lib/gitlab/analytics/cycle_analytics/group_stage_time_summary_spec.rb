@@ -6,18 +6,26 @@ describe Gitlab::Analytics::CycleAnalytics::GroupStageTimeSummary do
   let_it_be(:project) { create(:project, :repository, namespace: group) }
   let_it_be(:project_2) { create(:project, :repository, namespace: group) }
   let_it_be(:user) { create(:user, :admin) }
-  let(:from) { 1.day.ago }
-  let(:to) { nil }
+  let(:created_after) { 1.day.ago }
+  let(:created_before) { nil }
 
-  subject { described_class.new(group, options: { from: from, to: to, current_user: user }).data }
+  let(:options) do
+    Gitlab::Analytics::CycleAnalytics::RequestParams.new(
+      created_after: created_after,
+      created_before: created_before,
+      current_user: user
+    ).to_data_collector_params
+  end
+
+  subject { described_class.new(group, options: options).data }
 
   around do |example|
     Timecop.freeze { example.run }
   end
 
   describe '#lead_time' do
-    context 'with `from` date' do
-      let(:from) { 6.days.ago }
+    context 'with `created_after` date' do
+      let(:created_after) { 6.days.ago }
 
       before do
         create(:closed_issue, project: project, created_at: 1.day.ago, closed_at: Time.zone.now)
@@ -46,9 +54,9 @@ describe Gitlab::Analytics::CycleAnalytics::GroupStageTimeSummary do
       context 'with projects specified in options' do
         before do
           create(:closed_issue, created_at: 3.days.ago, closed_at: Time.zone.now, project: create(:project, namespace: group))
-        end
 
-        subject { described_class.new(group, options: { from: from, current_user: user, projects: [project.id, project_2.id] }).data }
+          options[:projects] = [project.id, project_2.id]
+        end
 
         it 'finds the lead time of issues from those projects' do
           # Median of 1, 2, 4, not including new issue
@@ -56,18 +64,20 @@ describe Gitlab::Analytics::CycleAnalytics::GroupStageTimeSummary do
         end
       end
 
-      context 'when `from` and `to` parameters are provided' do
-        let(:from) { 3.days.ago }
-        let(:to) { Time.zone.now }
+      context 'when `created_after` and `created_before` parameters are provided' do
+        before do
+          options[:created_after] = 3.days.ago
+          options[:created_before] = 1.day.from_now
+        end
 
         it 'finds the lead time of issues from 3 days ago' do
-          expect(subject.first[:value]).to eq('1.5')
+          expect(subject.first[:value]).to eq('2.0')
         end
       end
     end
 
     context 'with other projects' do
-      let(:from) { 4.days.ago }
+      let(:created_after) { 4.days.ago }
 
       before do
         create(:closed_issue, created_at: 1.day.ago, closed_at: Time.zone.now, project: create(:project, namespace: create(:group)))
@@ -85,8 +95,8 @@ describe Gitlab::Analytics::CycleAnalytics::GroupStageTimeSummary do
   describe '#cycle_time' do
     let(:created_at) { 6.days.ago }
 
-    context 'with `from` date' do
-      let(:from) { 7.days.ago }
+    context 'with `created_after` date' do
+      let(:created_after) { 7.days.ago }
 
       before do
         issue_1 = create(:closed_issue, project: project, closed_at: Time.zone.now, created_at: created_at)
@@ -123,9 +133,9 @@ describe Gitlab::Analytics::CycleAnalytics::GroupStageTimeSummary do
         before do
           issue_4 = create(:closed_issue, created_at: created_at, closed_at: Time.zone.now, project: create(:project, namespace: group))
           issue_4.metrics.update!(first_mentioned_in_commit_at: 3.days.ago)
-        end
 
-        subject { described_class.new(group, options: { from: from, current_user: user, projects: [project.id, project_2.id] }).data }
+          options[:projects] = [project.id, project_2.id]
+        end
 
         it 'finds the cycle time of issues from those projects' do
           # Median of 1, 2, 4, not including new issue
@@ -133,12 +143,12 @@ describe Gitlab::Analytics::CycleAnalytics::GroupStageTimeSummary do
         end
       end
 
-      context 'when `from` and `to` parameters are provided' do
-        let(:from) { 5.days.ago }
-        let(:to) { 2.days.ago }
-        let(:created_at) { from }
+      context 'when `created_after` and `created_before` parameters are provided' do
+        let(:created_after) { 5.days.ago }
+        let(:created_before) { 2.days.ago }
+        let(:created_at) { created_after }
 
-        it 'finds the cycle time of issues created between `from` and `to`' do
+        it 'finds the cycle time of issues created between `created_after` and `created_before`' do
           # Median of 1, 2, 4
           expect(subject.second[:value]).to eq('2.0')
         end
@@ -146,8 +156,8 @@ describe Gitlab::Analytics::CycleAnalytics::GroupStageTimeSummary do
     end
 
     context 'with other projects' do
-      let(:from) { 4.days.ago }
-      let(:created_at) { from }
+      let(:created_after) { 4.days.ago }
+      let(:created_at) { created_after }
 
       before do
         issue_1 = create(:closed_issue, created_at: created_at, closed_at: Time.zone.now, project: create(:project, namespace: create(:group)))

@@ -7,8 +7,8 @@ module Gitlab
       #   stage - an instance of CycleAnalytics::ProjectStage or CycleAnalytics::GroupStage
       #   params:
       #     current_user: an instance of User
-      #     from: DateTime
-      #     to: DateTime
+      #     created_fter: DateTime
+      #     created_before: DateTime
       class DataCollector
         include Gitlab::Utils::StrongMemoize
 

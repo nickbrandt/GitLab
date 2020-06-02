@@ -11,9 +11,10 @@ module CycleAnalytics
     end
 
     def summary
+      # support legacy project level cycle analytics params
       @summary ||= ::Gitlab::CycleAnalytics::StageSummary.new(project,
-                                                              from: options[:from],
-                                                              to: options[:to],
+                                                              from: options[:created_after],
+                                                              to: options[:created_before],
                                                               current_user: options[:current_user]).data
     end
 

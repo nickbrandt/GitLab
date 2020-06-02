@@ -33,7 +33,7 @@ describe Gitlab::Analytics::CycleAnalytics::BaseQueryBuilder do
         group: group
       })
 
-      result = described_class.new(stage: stage, params: { current_user: user }).build
+      result = described_class.new(stage: stage, params: { current_user: user, created_after: 1.month.ago }).build
 
       expect(result).to contain_exactly(issue_in_project, issue_in_subgroup_project)
     end
@@ -57,7 +57,7 @@ describe Gitlab::Analytics::CycleAnalytics::BaseQueryBuilder do
         group: group
       })
 
-      result = described_class.new(stage: stage, params: { current_user: user }).build
+      result = described_class.new(stage: stage, params: { current_user: user, created_after: 1.month.ago }).build
 
       expect(result).to contain_exactly(mr_in_project, mr_in_subgroup_project)
     end

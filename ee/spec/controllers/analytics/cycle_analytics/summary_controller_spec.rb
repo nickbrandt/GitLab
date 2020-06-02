@@ -23,14 +23,6 @@ describe Analytics::CycleAnalytics::SummaryController do
       expect(response).to match_response_schema('analytics/cycle_analytics/summary', dir: 'ee')
     end
 
-    it 'omits `projects` parameter if it is not given' do
-      expect(Analytics::CycleAnalytics::GroupLevel).to receive(:new).with(group: group, options: hash_excluding(:projects)).and_call_original
-
-      subject
-
-      expect(response).to be_successful
-    end
-
     it 'contains `projects` parameter' do
       params[:project_ids] = [-1]
 

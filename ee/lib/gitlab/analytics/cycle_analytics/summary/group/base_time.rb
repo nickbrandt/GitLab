@@ -41,8 +41,8 @@ module Gitlab
               Gitlab::Analytics::CycleAnalytics::DataCollector.new(
                 stage: stage,
                 params: {
-                  from: @options[:from],
-                  to: @options[:to] || DateTime.now,
+                  created_after: @options[:from],
+                  created_before: @options[:to] || DateTime.now,
                   project_ids: @options[:projects],
                   current_user: @current_user
                 }

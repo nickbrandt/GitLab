@@ -19,7 +19,7 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
   # `create_data_for_end_event`. For each stage we create 3 records with a fixed
   # durations (10, 5, 15 days) in order to easily generalize the test cases.
   shared_examples 'custom cycle analytics stage' do
-    let(:data_collector) { described_class.new(stage: stage, params: { from: Time.new(2019), to: Time.new(2020), current_user: user }) }
+    let(:data_collector) { described_class.new(stage: stage, params: { created_after: Time.new(2019), created_before: Time.new(2020), current_user: user }) }
 
     before do
       # takes 10 days
@@ -393,10 +393,11 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
       end
     end
 
-    context 'when `project_ids` parameter is given' do
+    context 'when additional filter parameters are given' do
       let(:group) { create(:group) }
       let(:project1) { create(:project, :repository, group: group) }
       let(:project2) { create(:project, :repository, group: group) }
+      let(:data_collector) { described_class.new(stage: stage, params: data_collector_params) }
 
       let(:stage) do
         Analytics::CycleAnalytics::GroupStage.new(
@@ -407,13 +408,14 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         )
       end
 
-      let(:data_collector) do
-        described_class.new(stage: stage, params: {
-          from: Time.new(2019, 1, 1),
-          project_ids: [project2.id],
+      let(:data_collector_params) do
+        {
+          created_after: Time.new(2019, 1, 1),
           current_user: user
-        })
+        }
       end
+
+      subject { data_collector.records_fetcher.serialized_records }
 
       before do
         group.add_user(user, GroupMember::MAINTAINER)
@@ -427,13 +429,53 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         end
       end
 
-      it 'filters for the given `project_ids`' do
-        items = data_collector.records_fetcher.serialized_records
-        expect(items.size).to eq(1)
+      context 'when `project_ids` is given' do
+        before do
+          data_collector_params[:project_ids] = [project2.id]
+        end
 
-        merge_request = project2.merge_requests.first
-        expect(items.first[:title]).to eq(merge_request.title)
-        expect(items.first[:iid]).to eq(merge_request.iid.to_s)
+        it 'filters items' do
+          expect(subject.size).to eq(1)
+
+          merge_request = project2.merge_requests.first
+          expect(subject.first[:title]).to eq(merge_request.title)
+          expect(subject.first[:iid]).to eq(merge_request.iid.to_s)
+        end
+      end
+
+      context 'when `assignee_username` is given' do
+        let(:mr) { project1.merge_requests.first }
+        let(:assignee) { create(:user) }
+
+        before do
+          mr.assignees << assignee
+
+          data_collector_params[:assignee_username] = [assignee.username]
+        end
+
+        it 'filters items' do
+          expect(subject.size).to eq(1)
+
+          expect(subject.first[:iid]).to eq(mr.iid.to_s)
+        end
+      end
+
+      context 'when `author_username` is given' do
+        let(:mr) { project1.merge_requests.first }
+        let(:author) { create(:user) }
+
+        before do
+          mr.author = author
+          mr.save!
+
+          data_collector_params[:author_username] = author.username
+        end
+
+        it 'filters items' do
+          expect(subject.size).to eq(1)
+
+          expect(subject.first[:iid]).to eq(mr.iid.to_s)
+        end
       end
     end
   end
