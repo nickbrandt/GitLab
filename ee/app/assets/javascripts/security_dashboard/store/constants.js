@@ -14,6 +14,7 @@ export const REPORT_TYPES = {
   dast: s__('ciReport|DAST'),
   dependency_scanning: s__('ciReport|Dependency Scanning'),
   sast: s__('ciReport|SAST'),
+  secret_detection: s__('ciReport|Secret Detection'),
 };
 
 export const DASHBOARD_TYPES = {
