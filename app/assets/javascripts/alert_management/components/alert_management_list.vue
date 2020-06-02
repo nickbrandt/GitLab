@@ -189,7 +189,7 @@ export default {
       errored: false,
       isAlertDismissed: false,
       isErrorAlertDismissed: false,
-      sort: 'STARTED_AT_ASC',
+      sort: 'STARTED_AT_DESC',
       statusFilter: [],
       filteredByStatus: '',
       pagination: initialPaginationState,
@@ -229,6 +229,9 @@ export default {
   },
   mounted() {
     this.trackPageViews();
+    if(this.alertManagementEnabled) {
+      findDefaultSortColumn().ariaSort = 'descending';
+    }
   },
   methods: {
     filterAlertsByStatus(tabIndex) {
@@ -345,7 +348,6 @@ export default {
         :tbody-tr-class="tbodyTrClass"
         :no-local-sorting="true"
         sort-icon-left
-        sort-by="startedAt"
         @row-clicked="navigateToAlertDetails"
         @sort-changed="fetchSortedData"
       >
