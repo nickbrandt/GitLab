@@ -75,7 +75,7 @@ RSpec.describe Gitlab::Geo::Replication::LfsDownloader, :geo do
             expect(result).to have_attributes(
               success: false,
               failed_before_transfer: true,
-              reason: 'Skipping transfer as this secondary node is not configured to store Lfs on Object Storage'
+              reason: 'Skipping transfer as this secondary node is not configured to store lfs on Object Storage'
             )
           end
         end
@@ -93,7 +93,7 @@ RSpec.describe Gitlab::Geo::Replication::LfsDownloader, :geo do
         expect(result).to have_attributes(
           success: false,
           failed_before_transfer: true,
-          reason: "Skipping transfer as the Lfs (ID = #{unknown_id}) could not be found"
+          reason: "Skipping transfer as the lfs (ID = #{unknown_id}) could not be found"
         )
       end
     end
