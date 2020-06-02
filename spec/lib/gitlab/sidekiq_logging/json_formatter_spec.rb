@@ -42,6 +42,12 @@ describe Gitlab::SidekiqLogging::JSONFormatter do
       expect(subject).to eq(expected_output)
     end
 
+    it 'removes jobstr from the hash' do
+      hash_input[:jobstr] = 'job string'
+
+      expect(subject).not_to include('jobstr')
+    end
+
     context 'when the job args are bigger than the maximum allowed' do
       it 'keeps args from the front until they exceed the limit' do
         half_limit = Gitlab::Utils::LogLimitedArray::MAXIMUM_ARRAY_LENGTH / 2

@@ -18,6 +18,9 @@ module Gitlab
         when String
           output[:message] = data
         when Hash
+          # jobstr is redundant and can include information we wanted to
+          # exclude (like arguments)
+          data.delete(:jobstr)
           convert_to_iso8601!(data)
           convert_retry_to_integer!(data)
           stringify_args!(data)
