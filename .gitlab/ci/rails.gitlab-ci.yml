@@ -331,11 +331,10 @@ rspec foss-impact:
   extends:
     - .rspec-base
     - .as-if-foss
-    - .rails:rules:ee-canonical-mr-only
+    - .rails:rules:ee-mr-only
     - .use-pg11
   script:
-    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - install_gitlab_gem
     - run_timed_command "scripts/gitaly-test-build"
     - run_timed_command "scripts/gitaly-test-spawn"
     - source scripts/rspec_helpers.sh
