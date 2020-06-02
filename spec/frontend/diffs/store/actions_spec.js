@@ -174,9 +174,18 @@ describe('DiffsStoreActions', () => {
   });
 
   describe('fetchDiffFilesBatch', () => {
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
     it('should fetch batch diff files', done => {
       const endpointBatch = '/fetch/diffs_batch';
-      const mock = new MockAdapter(axios);
       const res1 = { diff_files: [], pagination: { next_page: 2 } };
       const res2 = { diff_files: [], pagination: {} };
       mock
@@ -219,10 +228,7 @@ describe('DiffsStoreActions', () => {
           { type: types.SET_RETRIEVING_BATCHES, payload: false },
         ],
         [],
-        () => {
-          mock.restore();
-          done();
-        },
+        done,
       );
     });
 
@@ -234,7 +240,6 @@ describe('DiffsStoreActions', () => {
       'should make a request with the view parameter "$viewStyle" when the batchEndpoint already contains "$otherView"',
       ({ viewStyle, otherView }) => {
         const endpointBatch = '/fetch/diffs_batch';
-        const mock = new MockAdapter(axios);
 
         fetchDiffFilesBatch({
           commit: () => {},
@@ -247,7 +252,6 @@ describe('DiffsStoreActions', () => {
           .then(() => {
             expect(mock.history.get[0].url).toContain(`view=${viewStyle}`);
             expect(mock.history.get[0].url).not.toContain(`view=${otherView}`);
-            mock.restore();
           })
           .catch(() => {});
       },
@@ -322,9 +326,18 @@ describe('DiffsStoreActions', () => {
     });
 
     describe('fetchDiffFilesBatch', () => {
+      let mock;
+
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+      });
+
+      afterEach(() => {
+        mock.restore();
+      });
+
       it('should fetch batch diff files', done => {
         const endpointBatch = '/fetch/diffs_batch';
-        const mock = new MockAdapter(axios);
         const res1 = { diff_files: [], pagination: { next_page: 2 } };
         const res2 = { diff_files: [], pagination: {} };
         mock
@@ -347,10 +360,7 @@ describe('DiffsStoreActions', () => {
             { type: types.SET_RETRIEVING_BATCHES, payload: false },
           ],
           [],
-          () => {
-            mock.restore();
-            done();
-          },
+          done,
         );
       });
 
@@ -363,7 +373,6 @@ describe('DiffsStoreActions', () => {
         'should use the endpoint $requestUrl if the endpointBatch in state includes `$querystrings` as a querystring',
         ({ querystrings, requestUrl }) => {
           const endpointBatch = '/fetch/diffs_batch';
-          const mock = new MockAdapter(axios);
 
           fetchDiffFilesBatch({
             commit: () => {},
@@ -374,7 +383,6 @@ describe('DiffsStoreActions', () => {
           })
             .then(() => {
               expect(mock.history.get[0].url).toEqual(requestUrl);
-              mock.restore();
             })
             .catch(() => {});
         },
