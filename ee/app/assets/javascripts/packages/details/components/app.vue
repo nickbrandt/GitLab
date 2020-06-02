@@ -291,11 +291,9 @@ export default {
           />
         </template>
 
-        <template v-else>
-          <p class="gl-mt-3" data-testid="no-dependencies-message">
-            {{ s__('PackageRegistry|This NuGet package has no dependencies.') }}
-          </p>
-        </template>
+        <p v-else class="gl-mt-3" data-testid="no-dependencies-message">
+          {{ s__('PackageRegistry|This NuGet package has no dependencies.') }}
+        </p>
       </gl-tab>
 
       <gl-tab
@@ -318,11 +316,9 @@ export default {
           />
         </template>
 
-        <template v-else>
-          <p class="gl-mt-3" data-testid="no-versions-message">
-            {{ s__('PackageRegistry|There are no other versions of this package.') }}
-          </p>
-        </template>
+        <p v-else class="gl-mt-3" data-testid="no-versions-message">
+          {{ s__('PackageRegistry|There are no other versions of this package.') }}
+        </p>
       </gl-tab>
     </gl-tabs>
 
