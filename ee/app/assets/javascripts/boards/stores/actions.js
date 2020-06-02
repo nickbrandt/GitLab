@@ -22,10 +22,14 @@ const fetchEpicsSwimlanes = ({ endpoints }) => {
     boardId: `gid://gitlab/Board/${boardId}`,
   };
 
-  return gqlClient.query({
-    query,
-    variables,
-  });
+  return gqlClient
+    .query({
+      query,
+      variables,
+    })
+    .then(({ data }) => {
+      return data;
+    });
 };
 
 export default {
@@ -72,8 +76,23 @@ export default {
     notImplemented();
   },
 
-  toggleEpicSwimlanes: ({ state, commit }) => {
+  toggleEpicSwimlanes: ({ state, commit, dispatch }) => {
     commit(types.TOGGLE_EPICS_SWIMLANES);
-    fetchEpicsSwimlanes(state);
+
+    if (state.isShowingEpicsSwimlanes) {
+      fetchEpicsSwimlanes(state)
+        .then(swimlanes => {
+          dispatch('receiveSwimlanesSuccess', swimlanes);
+        })
+        .catch(() => dispatch('receiveSwimlanesFailure'));
+    }
+  },
+
+  receiveSwimlanesSuccess: ({ commit }, swimlanes) => {
+    commit(types.RECEIVE_SWIMLANES_SUCCESS, swimlanes);
+  },
+
+  receiveSwimlanesFailure: ({ commit }) => {
+    commit(types.RECEIVE_SWIMLANES_FAILURE);
   },
 };

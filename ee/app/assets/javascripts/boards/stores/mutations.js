@@ -69,5 +69,16 @@ export default {
 
   [mutationTypes.TOGGLE_EPICS_SWIMLANES]: state => {
     state.isShowingEpicsSwimlanes = !state.isShowingEpicsSwimlanes;
+    state.epicsSwimlanesFetchInProgress = true;
+  },
+
+  [mutationTypes.RECEIVE_SWIMLANES_SUCCESS]: (state, swimlanes) => {
+    state.epicsSwimlanes = swimlanes;
+    state.epicsSwimlanesFetchInProgress = false;
+  },
+
+  [mutationTypes.RECEIVE_SWIMLANES_FAILURE]: state => {
+    state.epicsSwimlanesFetchFailure = true;
+    state.epicsSwimlanesFetchInProgress = false;
   },
 };

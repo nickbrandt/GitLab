@@ -20,9 +20,9 @@
 #board-app.boards-app.position-relative{ "v-cloak" => "true", data: board_data, ":class" => "{ 'is-compact': detailIssueVisible }" }
   = render 'shared/issuable/search_bar', type: :boards, board: board
 
-  - if Feature.enabled?(:boards_with_swimlanes)
-    %boards-lists{ "v-cloak" => "true",
-      "ref" => "boards_lists",
+  - if Feature.enabled?(:boards_with_swimlanes, current_board_parent)
+    %board-content{ "v-cloak" => "true",
+      "ref" => "board_content",
       ":lists" => "state.lists",
       ":can-admin-list" => can_admin_list,
       ":group-id" => group_id,

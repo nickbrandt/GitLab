@@ -4,7 +4,7 @@ import { mapActions } from 'vuex';
 
 import 'ee_else_ce/boards/models/issue';
 import 'ee_else_ce/boards/models/list';
-import BoardsLists from '~/boards/components/boards_lists.vue';
+import BoardContent from '~/boards/components/board_content.vue';
 import BoardSidebar from 'ee_else_ce/boards/components/board_sidebar';
 import initNewListDropdown from 'ee_else_ce/boards/components/new_list_dropdown';
 import boardConfigToggle from 'ee_else_ce/boards/config_toggle';
@@ -79,7 +79,7 @@ export default () => {
   issueBoardsApp = new Vue({
     el: $boardApp,
     components: {
-      BoardsLists,
+      BoardContent,
       Board: () =>
         window?.gon?.features?.sfcIssueBoards
           ? import('ee_else_ce/boards/components/board_column.vue')
