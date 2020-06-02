@@ -16,7 +16,7 @@ describe Releases::Evidence do
     milestone.issues << issue
     release.milestones << milestone
 
-    ::Releases::CreateEvidenceService.new(release).execute
+    ::Releases::CreateEvidenceService.new(release, pipeline: nil).execute
     evidence = release.evidences.last
 
     expect(evidence.read_attribute(:summary)["release"]["milestones"].first["issues"].first["title"]).to be_present

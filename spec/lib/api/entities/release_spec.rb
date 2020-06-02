@@ -10,7 +10,7 @@ describe API::Entities::Release do
   let(:entity) { described_class.new(release, current_user: user).as_json }
 
   before do
-    ::Releases::CreateEvidenceService.new(release).execute
+    ::Releases::CreateEvidenceService.new(release, pipeline: nil).execute
   end
 
   describe 'evidences' do

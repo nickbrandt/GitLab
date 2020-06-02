@@ -6,7 +6,7 @@ describe CreateEvidenceWorker do
   let(:release) { create(:release) }
 
   it 'creates a new Evidence record' do
-    expect_next_instance_of(::Releases::CreateEvidenceService, release) do |service|
+    expect_next_instance_of(::Releases::CreateEvidenceService, release, pipeline: nil) do |service|
       expect(service).to receive(:execute).and_call_original
     end
 

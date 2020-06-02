@@ -10,6 +10,6 @@ class CreateEvidenceWorker # rubocop:disable Scalability/IdempotentWorker
     release = Release.find_by_id(release_id)
     return unless release
 
-    ::Releases::CreateEvidenceService.new(release).execute
+    ::Releases::CreateEvidenceService.new(release, pipeline: nil).execute
   end
 end

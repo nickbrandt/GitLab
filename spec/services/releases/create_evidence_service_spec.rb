@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Releases::CreateEvidenceService do
   let_it_be(:project) { create(:project) }
   let(:release) { create(:release, project: project) }
-  let(:service) { described_class.new(release) }
+  let(:service) { described_class.new(release, pipeline: nil) }
 
   it 'creates evidence' do
     expect { service.execute }.to change { release.reload.evidences.count }.by(1)

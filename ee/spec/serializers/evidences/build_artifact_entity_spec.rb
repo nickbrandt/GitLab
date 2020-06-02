@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Evidences::BuildArtifactEntity do
   include Gitlab::Routing
+
   let(:build) { create(:ci_build, :artifacts, name: 'build_1') }
   let(:entity) { described_class.new(build) }
 

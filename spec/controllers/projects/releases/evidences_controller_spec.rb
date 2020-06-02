@@ -48,7 +48,7 @@ RSpec.describe Projects::Releases::EvidencesController do
     end
 
     before do
-      ::Releases::CreateEvidenceService.new(release).execute
+      ::Releases::CreateEvidenceService.new(release, pipeline: nil).execute
 
       sign_in(user)
     end
