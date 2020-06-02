@@ -1,10 +1,11 @@
-query GroupIteration($groupPath: ID!, $id: ID!) {
+query GroupIteration($groupPath: ID!) {
   group(fullPath: $groupPath) {
-    iterations(id: $id, first: 1) {
+    iterations(first: 1) {
       nodes {
         title
         state
         id
+        description
         webPath
         startDate
         dueDate
