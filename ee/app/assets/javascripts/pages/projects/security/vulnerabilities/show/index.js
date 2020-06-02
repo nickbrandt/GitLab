@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import HeaderApp from 'ee/vulnerabilities/components/header.vue';
 import DetailsApp from 'ee/vulnerabilities/components/details.vue';
 import FooterApp from 'ee/vulnerabilities/components/footer.vue';
@@ -22,12 +23,11 @@ function createHeaderApp() {
 
 function createDetailsApp() {
   const el = document.getElementById('js-vulnerability-details');
-  const vulnerability = JSON.parse(el.dataset.vulnerabilityJson);
-  const finding = JSON.parse(el.dataset.findingJson);
+  const vulnerability = JSON.parse(el.dataset.vulnerability);
 
   return new Vue({
     el,
-    render: h => h(DetailsApp, { props: { vulnerability, finding } }),
+    render: h => h(DetailsApp, { props: { vulnerability } }),
   });
 }
 
@@ -39,15 +39,16 @@ function createFooterApp() {
   }
 
   const {
-    vulnerability_feedback_help_path: vulnerabilityFeedbackHelpPath,
-    has_mr: hasMr,
-    discussions_url: discussionsUrl,
+    vulnerabilityFeedbackHelpPath,
+    hasMr,
+    discussionsUrl,
     state,
-    issue_feedback: feedback,
+    issueFeedback: feedback,
+    notesUrl,
     project,
     remediations,
     solution,
-  } = JSON.parse(el.dataset.vulnerability);
+  } = convertObjectPropsToCamelCase(JSON.parse(el.dataset.vulnerability));
 
   const remediation = remediations?.length ? remediations[0] : null;
   const hasDownload = Boolean(

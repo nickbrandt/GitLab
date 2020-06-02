@@ -11,16 +11,12 @@ describe('Vulnerability Details', () => {
     severity: 'bad severity',
     confidence: 'high confidence',
     report_type: 'nice report_type',
+    description: 'vulnerability description',
   };
 
-  const finding = {
-    description: 'finding description',
-  };
-
-  const createWrapper = findingOverrides => {
+  const createWrapper = vulnerabilityOverrides => {
     const propsData = {
-      vulnerability,
-      finding: { ...finding, ...findingOverrides },
+      vulnerability: { ...vulnerability, ...vulnerabilityOverrides },
     };
 
     wrapper = mount(VulnerabilityDetails, { propsData });
@@ -37,7 +33,7 @@ describe('Vulnerability Details', () => {
   it('shows the properties that should always be shown', () => {
     createWrapper();
     expect(getText('title')).toBe(vulnerability.title);
-    expect(getText('description')).toBe(finding.description);
+    expect(getText('description')).toBe(vulnerability.description);
     expect(wrapper.find(SeverityBadge).props('severity')).toBe(vulnerability.severity);
     expect(getText('reportType')).toBe(`Report Type: ${vulnerability.report_type}`);
 
@@ -62,12 +58,12 @@ describe('Vulnerability Details', () => {
     expect(getText('namespace')).toBe(`Namespace: linux`);
   });
 
-  it('shows the finding class if it exists', () => {
+  it('shows the vulnerability class if it exists', () => {
     createWrapper({ location: { file: 'file', class: 'class name' } });
     expect(getText('class')).toBe(`Class: class name`);
   });
 
-  it('shows the finding method if it exists', () => {
+  it('shows the vulnerability method if it exists', () => {
     createWrapper({ location: { file: 'file', method: 'method name' } });
     expect(getText('method')).toBe(`Method: method name`);
   });
@@ -89,7 +85,7 @@ describe('Vulnerability Details', () => {
     });
   });
 
-  it('shows the finding identifiers if they exist', () => {
+  it('shows the vulnerability identifiers if they exist', () => {
     createWrapper({
       identifiers: [{ url: '0', name: '00' }, { url: '1', name: '11' }, { url: '2', name: '22' }],
     });
