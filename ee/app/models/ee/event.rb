@@ -15,15 +15,9 @@ module EE
       scope :epics, -> { where(target_type: 'Epic') }
     end
 
-    override :capability
-    def capability
-      @capability ||= begin
-                        if epic? || epic_note?
-                          :read_epic
-                        else
-                          super
-                        end
-                      end
+    override :capabilities
+    def capabilities
+      super.merge(read_epic: %i[epic? epic_note?])
     end
 
     override :action_name
