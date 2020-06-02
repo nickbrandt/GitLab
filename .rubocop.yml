@@ -274,6 +274,9 @@ Cop/ActiveRecordAssociationReload:
     - 'spec/**/*'
     - 'ee/spec/**/*'
 
+Gitlab/AvoidFeatureGet:
+  Enabled: true
+
 Naming/PredicateName:
   Enabled: true
   Exclude:
