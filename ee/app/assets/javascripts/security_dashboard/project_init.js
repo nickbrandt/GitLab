@@ -1,6 +1,4 @@
 import Vue from 'vue';
-import createRouter from './store/router';
-import syncWithRouter from './store/plugins/sync_with_router';
 import createStore from './store';
 import { DASHBOARD_TYPES } from './store/constants';
 import ProjectSecurityDashboard from './components/project_security_dashboard.vue';
@@ -40,16 +38,13 @@ export default () => {
     });
   }
 
-  const router = createRouter();
   const store = createStore({
     dashboardType: DASHBOARD_TYPES.PROJECT,
-    plugins: [syncWithRouter(router)],
   });
 
   return new Vue({
     el: securityTab,
     store,
-    router,
     render(createElement) {
       return createElement(ProjectSecurityDashboard, {
         props,
