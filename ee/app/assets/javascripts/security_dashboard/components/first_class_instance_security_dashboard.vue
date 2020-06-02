@@ -118,6 +118,8 @@ export default {
           >{{ toggleButtonProps.text }}</gl-button
         >
       </header>
+    </template>
+    <template #sticky>
       <filters
         v-if="shouldShowDashboard"
         :projects="graphqlProjectList"
