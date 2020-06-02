@@ -25831,6 +25831,9 @@ msgstr ""
 msgid "branch name"
 msgstr ""
 
+msgid "build pipeline reference mismatch"
+msgstr ""
+
 msgid "by"
 msgstr ""
 
