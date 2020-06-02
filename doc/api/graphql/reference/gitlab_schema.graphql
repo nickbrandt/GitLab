@@ -7040,6 +7040,11 @@ type MetricsDashboard {
   Path to a file with the dashboard definition
   """
   path: String
+
+  """
+  Dashboard schema validation warnings
+  """
+  schemaValidationWarnings: [String!]
 }
 
 type MetricsDashboardAnnotation {
