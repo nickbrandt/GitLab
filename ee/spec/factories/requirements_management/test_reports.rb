@@ -4,7 +4,10 @@ FactoryBot.define do
   factory :test_report, class: 'RequirementsManagement::TestReport' do
     author
     requirement
-    pipeline factory: :ci_pipeline
+    build factory: :ci_build
+    after(:build) do |report|
+      report.pipeline = report.build&.pipeline
+    end
     state { :passed }
   end
 end
