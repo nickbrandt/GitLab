@@ -12,7 +12,7 @@ module Gitlab
         end
 
         class Result
-          attr_reader :success, :bytes_downloaded, :primary_missing_file, :failed_before_transfer
+          attr_reader :success, :bytes_downloaded, :primary_missing_file, :failed_before_transfer, :reason
 
           def self.from_transfer_result(transfer_result)
             Result.new(success: transfer_result.success,
@@ -20,18 +20,19 @@ module Gitlab
                        bytes_downloaded: transfer_result.bytes_downloaded)
           end
 
-          def initialize(success:, bytes_downloaded:, primary_missing_file: false, failed_before_transfer: false)
+          def initialize(success:, bytes_downloaded:, reason: nil, primary_missing_file: false, failed_before_transfer: false)
             @success = success
             @bytes_downloaded = bytes_downloaded
             @primary_missing_file = primary_missing_file
             @failed_before_transfer = failed_before_transfer
+            @reason = reason
           end
         end
 
         private
 
-        def fail_before_transfer
-          Result.new(success: false, bytes_downloaded: 0, failed_before_transfer: true)
+        def fail_before_transfer(reason: nil)
+          Result.new(success: false, bytes_downloaded: 0, reason: reason, failed_before_transfer: true)
         end
 
         def missing_on_primary
