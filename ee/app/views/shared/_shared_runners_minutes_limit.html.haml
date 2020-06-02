@@ -1,5 +1,5 @@
-- notification = ::Ci::Minutes::Notification.new(current_user, local_assigns.dig(:project), local_assigns.dig(:namespace))
-- return unless notification.show?
+- notification = ::Ci::Minutes::Notification.new(local_assigns.dig(:project), local_assigns.dig(:namespace))
+- return unless notification.show?(current_user)
 
 %div{ class: [(classes if defined? classes)] }
   .shared-runner-quota-message.gl-pt-5.gl-pb-3

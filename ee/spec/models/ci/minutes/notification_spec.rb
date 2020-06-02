@@ -42,7 +42,7 @@ describe Ci::Minutes::Notification do
         end
 
         it 'has warning notification' do
-          expect(subject.show?).to be_truthy
+          expect(subject.show?(user)).to be_truthy
           expect(subject.text).to match(/.*\shas 30% or less Shared Runner Pipeline minutes remaining/)
           expect(subject.style).to eq :warning
         end
@@ -54,7 +54,7 @@ describe Ci::Minutes::Notification do
         end
 
         it 'has danger notification' do
-          expect(subject.show?).to be_truthy
+          expect(subject.show?(user)).to be_truthy
           expect(subject.text).to match(/.*\shas 5% or less Shared Runner Pipeline minutes remaining/)
           expect(subject.style).to eq :danger
         end
@@ -66,7 +66,7 @@ describe Ci::Minutes::Notification do
         end
 
         it 'has warning notification' do
-          expect(subject.show?).to be_truthy
+          expect(subject.show?(user)).to be_truthy
           expect(subject.text).to match(/.*\shas 30% or less Shared Runner Pipeline minutes remaining/)
           expect(subject.style).to eq :warning
         end
@@ -76,7 +76,7 @@ describe Ci::Minutes::Notification do
         let(:group) { create(:group, :with_used_build_minutes_limit) }
 
         it 'has exceeded notification' do
-          expect(subject.show?).to be_truthy
+          expect(subject.show?(user)).to be_truthy
           expect(subject.text).to match(/.*\shas exceeded its pipeline minutes quota/)
           expect(subject.style).to eq :danger
         end
@@ -92,9 +92,7 @@ describe Ci::Minutes::Notification do
 
     context 'when not permitted to see notifications' do
       it 'has no notifications set' do
-        expect(subject.show?).to be_falsey
-        expect(subject.text).to be_nil
-        expect(subject.style).to be_nil
+        expect(subject.show?(user)).to be_falsey
       end
     end
   end
@@ -108,18 +106,26 @@ describe Ci::Minutes::Notification do
 
         it_behaves_like 'queries for notifications' do
           subject do
-            threshold = described_class.new(user, injected_project, nil)
-            threshold.show?
+            threshold = described_class.new(injected_project, nil)
+            threshold.show?(user)
           end
         end
 
         it_behaves_like 'has notifications' do
-          subject { described_class.new(user, injected_project, nil) }
+          subject { described_class.new(injected_project, nil) }
         end
       end
 
       it_behaves_like 'not eligible to see notifications' do
-        subject { described_class.new(user, injected_project, nil) }
+        subject { described_class.new(injected_project, nil) }
+      end
+
+      context 'when user is not authenticated' do
+        let(:user) { nil }
+
+        it_behaves_like 'not eligible to see notifications' do
+          subject { described_class.new(injected_project, nil) }
+        end
       end
     end
   end
@@ -134,26 +140,34 @@ describe Ci::Minutes::Notification do
         context 'with a project that has runners enabled inside namespace' do
           it_behaves_like 'queries for notifications' do
             subject do
-              threshold = described_class.new(user, nil, injected_group)
-              threshold.show?
+              threshold = described_class.new(nil, injected_group)
+              threshold.show?(user)
             end
           end
 
           it_behaves_like 'has notifications' do
-            subject { described_class.new(user, nil, injected_group) }
+            subject { described_class.new(nil, injected_group) }
           end
         end
 
         context 'with no projects that have runners enabled inside namespace' do
           it_behaves_like 'not eligible to see notifications' do
             let(:shared_runners_enabled) { false }
-            subject { described_class.new(user, nil, injected_group) }
+            subject { described_class.new(nil, injected_group) }
           end
         end
       end
 
       it_behaves_like 'not eligible to see notifications' do
-        subject { described_class.new(user, nil, injected_group) }
+        subject { described_class.new(nil, injected_group) }
+      end
+
+      context 'when user is not authenticated' do
+        let(:user) { nil }
+
+        it_behaves_like 'not eligible to see notifications' do
+          subject { described_class.new(injected_project, nil) }
+        end
       end
     end
   end
