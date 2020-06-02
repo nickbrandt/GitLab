@@ -48,16 +48,16 @@ module Gitlab
 
         def check_preconditions
           unless resource.present?
-            return fail_before_transfer(reason: "Skipping transfer as the #{object_type.to_s.humanize(capitalize: false)} (ID = #{object_db_id}) could not be found")
+            return skip_transfer_error(reason: "Skipping transfer as the #{object_type.to_s.humanize(capitalize: false)} (ID = #{object_db_id}) could not be found")
           end
 
           unless local_store?
             unless sync_object_storage_enabled?
-              return fail_before_transfer(reason: "Skipping transfer as this secondary node is not allowed to replicate content on Object Storage")
+              return skip_transfer_error(reason: "Skipping transfer as this secondary node is not allowed to replicate content on Object Storage")
             end
 
             unless object_store_enabled?
-              return fail_before_transfer(reason: "Skipping transfer as this secondary node is not configured to store #{object_type.to_s.humanize(capitalize: false)} on Object Storage")
+              return skip_transfer_error(reason: "Skipping transfer as this secondary node is not configured to store #{object_type.to_s.humanize(capitalize: false)} on Object Storage")
             end
           end
 
@@ -84,11 +84,11 @@ module Gitlab
           Gitlab::Geo.current_node.sync_object_storage
         end
 
-        def fail_before_transfer(reason: nil)
+        def skip_transfer_error(reason: nil)
           Result.new(success: false, bytes_downloaded: 0, reason: reason, failed_before_transfer: true)
         end
 
-        def missing_on_primary
+        def missing_on_primary_error
           Result.new(success: true, bytes_downloaded: 0, primary_missing_file: true)
         end
       end
