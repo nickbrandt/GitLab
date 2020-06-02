@@ -5,7 +5,7 @@
 module Gitlab
   module ContributionAnalytics
     class DataCollector
-      EVENT_TYPES = %i[push issues_created issues_closed merge_requests_created merge_requests_merged total_events].freeze
+      EVENT_TYPES = %i[push issues_created issues_closed merge_requests_created merge_requests_merged merge_requests_approved total_events].freeze
 
       attr_reader :group, :from
 
@@ -44,6 +44,12 @@ module Gitlab
         end
       end
 
+      def merge_requests_approved_by_author_count
+        all_counts.each_with_object({}) do |(event, count), hash|
+          hash[event.author_id] = count if event.merge_request? && event.approved_action?
+        end
+      end
+
       def total_events_by_author_count
         all_counts.each_with_object({}) do |(event, count), hash|
           hash[event.author_id] ||= 0
@@ -69,6 +75,10 @@ module Gitlab
 
       def total_merge_requests_merged_count
         all_counts.sum { |event, count| event.merge_request? && event.merged_action? ? count : 0 }
+      end
+
+      def total_merge_requests_approved_count
+        all_counts.sum { |event, count| event.merge_request? && event.approved_action? ? count : 0 }
       end
 
       def total_issues_created_count
@@ -103,6 +113,7 @@ module Gitlab
           issues_closed: issues_closed_by_author_count,
           merge_requests_created: merge_requests_created_by_author_count,
           merge_requests_merged: merge_requests_merged_by_author_count,
+          merge_requests_approved: merge_requests_approved_by_author_count,
           total_events: total_events_by_author_count
         }
       end
@@ -113,7 +124,7 @@ module Gitlab
       def base_query
         Event
           .where(action: :pushed).or(
-            Event.where(target_type: [::MergeRequest.name, ::Issue.name], action: [:created, :closed, :merged])
+            Event.where(target_type: [::MergeRequest.name, ::Issue.name], action: [:created, :closed, :merged, :approved])
           )
           .where(Event.arel_table[:created_at].gteq(from))
           .joins(:project)
