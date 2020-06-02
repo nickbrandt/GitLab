@@ -7487,9 +7487,6 @@ msgstr ""
 msgid "DesignManagement|%{filename} did not change."
 msgstr ""
 
-msgid "DesignManagement|Add designs"
-msgstr ""
-
 msgid "DesignManagement|Adding a design with the same filename replaces the file in a new version."
 msgstr ""
 
@@ -7572,6 +7569,9 @@ msgid "DesignManagement|The maximum number of designs allowed to be uploaded is 
 msgstr ""
 
 msgid "DesignManagement|To enable design management, you'll need to  %{requirements_link_start}meet the requirements%{requirements_link_end}. If you need help, reach out to our %{support_link_start}support team%{support_link_end} for assistance."
+msgstr ""
+
+msgid "DesignManagement|Upload designs"
 msgstr ""
 
 msgid "DesignManagement|Upload skipped."
