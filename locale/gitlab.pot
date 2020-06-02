@@ -3695,6 +3695,9 @@ msgstr ""
 msgid "Can override approvers and approvals required per merge request"
 msgstr ""
 
+msgid "Can't create snippet: %{err}"
+msgstr ""
+
 msgid "Can't edit as source branch was deleted"
 msgstr ""
 
