@@ -123,20 +123,21 @@ describe Gitlab::GitalyClient::CommitService do
   describe '#diff_stats' do
     let(:left_commit_id) { 'master' }
     let(:right_commit_id) { 'cfe32cf61b73a0d5e9f13e774abde7ff789b1660' }
-    let(:response_value) { [double(stats: stat)] }
-    let(:stat) { double }
 
     it 'sends an RPC request and returns the stats' do
       request = Gitaly::DiffStatsRequest.new(repository: repository_message,
                                              left_commit_id: left_commit_id,
                                              right_commit_id: right_commit_id)
 
+      diff_stat_response = Gitaly::DiffStatsResponse.new(
+        stats: [{ additions: 1, deletions: 2, path: 'test' }])
+
       expect_any_instance_of(Gitaly::DiffService::Stub).to receive(:diff_stats)
-        .with(request, kind_of(Hash)).and_return(response_value)
+        .with(request, kind_of(Hash)).and_return([diff_stat_response])
 
       returned_value = described_class.new(repository).diff_stats(left_commit_id, right_commit_id)
 
-      expect(returned_value).to eq([stat])
+      expect(returned_value).to eq(diff_stat_response.stats)
     end
   end
 
