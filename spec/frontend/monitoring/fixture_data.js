@@ -1,5 +1,7 @@
+import { stateAndPropsFromDataset } from '~/monitoring/utils';
 import { mapToDashboardViewModel } from '~/monitoring/stores/utils';
 import { metricStates } from '~/monitoring/constants';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { metricsResult } from './mock_data';
 
@@ -8,6 +10,12 @@ export const metricsDashboardResponse = getJSONFixture(
   'metrics_dashboard/environment_metrics_dashboard.json',
 );
 export const metricsDashboardPayload = metricsDashboardResponse.dashboard;
+
+export const datasetState = stateAndPropsFromDataset(
+  convertObjectPropsToCamelCase(metricsDashboardResponse.metrics_data),
+);
+export const dashboardProps = datasetState.dataProps;
+
 export const metricsDashboardViewModel = mapToDashboardViewModel(metricsDashboardPayload);
 
 export const metricsDashboardPanelCount = 22;

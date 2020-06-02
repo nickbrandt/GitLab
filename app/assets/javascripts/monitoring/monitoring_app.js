@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { GlToast } from '@gitlab/ui';
-import { parseBoolean } from '~/lib/utils/common_utils';
+import { stateAndPropsFromDataset } from '~/monitoring/utils';
+import Dashboard from '~/monitoring/components/dashboard.vue';
 import { getParameterValues } from '~/lib/utils/url_utility';
 import { createStore } from './stores';
 import createRouter from './router';
@@ -12,48 +13,22 @@ export default (props = {}) => {
 
   if (el && el.dataset) {
     const [currentDashboard] = getParameterValues('dashboard');
+    const { initState, dataProps } = stateAndPropsFromDataset({ currentDashboard, ...el.dataset });
 
-    const {
-      deploymentsEndpoint,
-      dashboardEndpoint,
-      dashboardsEndpoint,
-      projectPath,
-      logsPath,
-      currentEnvironmentName,
-      dashboardTimezone,
-      metricsDashboardBasePath,
-      customDashboardBasePath,
-      ...dataProps
-    } = el.dataset;
-
-    const store = createStore({
-      currentDashboard,
-      deploymentsEndpoint,
-      dashboardEndpoint,
-      dashboardsEndpoint,
-      dashboardTimezone,
-      projectPath,
-      logsPath,
-      currentEnvironmentName,
-      customDashboardBasePath,
-    });
-
-    // HTML attributes are always strings, parse other types.
-    dataProps.hasMetrics = parseBoolean(dataProps.hasMetrics);
-    dataProps.customMetricsAvailable = parseBoolean(dataProps.customMetricsAvailable);
-    dataProps.prometheusAlertsAvailable = parseBoolean(dataProps.prometheusAlertsAvailable);
-
-    const router = createRouter(metricsDashboardBasePath);
+    const router = createRouter(initState.metricsDashboardBasePath);
 
     // eslint-disable-next-line no-new
     new Vue({
       el,
-      store,
       router,
-      data() {
-        return {
-          dashboardProps: { ...dataProps, ...props },
-        };
+      store: createStore(initState),
+      render(createElement) {
+        return createElement(Dashboard, {
+          props: {
+            ...dataProps,
+            ...props,
+          },
+        });
       },
       template: `<router-view :dashboardProps="dashboardProps"/>`,
     });

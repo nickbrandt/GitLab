@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`monitoring/utils stateAndPropsFromDataset initial monitoring data from fixture should match snapshot 1`] = `
+Object {
+  "dataProps": Object {
+    "alertsEndpoint": "/namespace1/project1/prometheus/alerts.json?environment_id=1",
+    "clustersPath": "/namespace1/project1/-/clusters",
+    "customMetricsAvailable": true,
+    "customMetricsPath": "/namespace1/project1/prometheus/metrics",
+    "defaultBranch": "master",
+    "documentationPath": "/help/administration/monitoring/prometheus/index.md",
+    "emptyGettingStartedSvgPath": "/images/illustrations/monitoring/getting_started.svg",
+    "emptyLoadingSvgPath": "/images/illustrations/monitoring/loading.svg",
+    "emptyNoDataSmallSvgPath": "/images/illustrations/chart-empty-state-small.svg",
+    "emptyNoDataSvgPath": "/images/illustrations/monitoring/no_data.svg",
+    "emptyUnableToConnectSvgPath": "/images/illustrations/monitoring/unable_to_connect.svg",
+    "environmentState": "available",
+    "externalDashboardUrl": null,
+    "hasMetrics": false,
+    "metricsEndpoint": "/namespace1/project1/-/environments/1/additional_metrics.json",
+    "prometheusAlertsAvailable": true,
+    "prometheusStatus": "",
+    "settingsPath": "/namespace1/project1/-/services/prometheus/edit",
+    "tagsPath": "/namespace1/project1/-/tags",
+    "validateQueryPath": "/namespace1/project1/prometheus/metrics/validate_query",
+  },
+  "initState": Object {
+    "currentEnvironmentName": "environment1",
+    "customDashboardBasePath": undefined,
+    "dashboardEndpoint": "/namespace1/project1/-/environments/1/metrics_dashboard.json",
+    "dashboardTimezone": undefined,
+    "dashboardsEndpoint": "/namespace1/project1/-/performance_monitoring/dashboards.json",
+    "deploymentsEndpoint": "/namespace1/project1/-/environments/1/deployments.json",
+    "logsPath": "/namespace1/project1/-/logs?environment_name=environment1",
+    "metricsDashboardBasePath": undefined,
+    "projectPath": "/namespace1/project1",
+  },
+}
+`;

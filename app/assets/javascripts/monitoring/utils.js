@@ -5,12 +5,53 @@ import {
   removeParams,
   updateHistory,
 } from '~/lib/utils/url_utility';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import {
   timeRangeParamNames,
   timeRangeFromParams,
   timeRangeToParams,
 } from '~/lib/utils/datetime_range';
 import { VARIABLE_PREFIX } from './constants';
+
+/**
+ * Extracts the initial state and props from HTML dataset
+ * and places them in separate objects to setup bundle.
+ * @param {*} dataset
+ */
+export const stateAndPropsFromDataset = (dataset = {}) => {
+  const {
+    customDashboardBasePath,
+    currentEnvironmentName,
+    dashboardEndpoint,
+    dashboardsEndpoint,
+    dashboardTimezone,
+    deploymentsEndpoint,
+    projectPath,
+    logsPath,
+    metricsDashboardBasePath,
+    ...dataProps
+  } = dataset;
+
+  // HTML attributes are always strings, parse other types.
+  dataProps.hasMetrics = parseBoolean(dataProps.hasMetrics);
+  dataProps.customMetricsAvailable = parseBoolean(dataProps.customMetricsAvailable);
+  dataProps.prometheusAlertsAvailable = parseBoolean(dataProps.prometheusAlertsAvailable);
+
+  return {
+    initState: {
+      customDashboardBasePath,
+      currentEnvironmentName,
+      dashboardEndpoint,
+      dashboardsEndpoint,
+      dashboardTimezone,
+      deploymentsEndpoint,
+      projectPath,
+      logsPath,
+      metricsDashboardBasePath,
+    },
+    dataProps,
+  };
+};
 
 /**
  * List of non time range url parameters
