@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe TrialsController do
+RSpec.describe TrialsController do
   shared_examples 'an authenticated endpoint' do |verb, action|
     it 'redirects to login page' do
       send(verb, action)

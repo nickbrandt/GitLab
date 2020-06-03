@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Analytics::AnalyticsController do
+RSpec.describe Analytics::AnalyticsController do
   let(:user) { create(:user) }
 
   before do

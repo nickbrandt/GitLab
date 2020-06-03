@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Analytics::IssuesAnalyticsController do
+RSpec.describe Projects::Analytics::IssuesAnalyticsController do
   it_behaves_like 'issues analytics controller' do
     let_it_be(:user)  { create(:user) }
     let_it_be(:group) { create(:group) }

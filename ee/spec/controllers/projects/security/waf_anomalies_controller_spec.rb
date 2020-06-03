@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Security::WafAnomaliesController do
+RSpec.describe Projects::Security::WafAnomaliesController do
   let_it_be(:group) { create(:group) }
   let_it_be(:user) { create(:user) }
 

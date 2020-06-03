@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Explore::OnboardingController do
+RSpec.describe Explore::OnboardingController do
   let(:user) { create(:user, username: 'gitlab-org') }
 
   before do

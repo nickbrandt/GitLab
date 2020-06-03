@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::IssuesController do
+RSpec.describe Groups::IssuesController do
   let(:user)      { create(:user) }
   let(:group)     { create(:group, :public) }
   let(:project)   { create(:project_empty_repo, :public, namespace: group) }

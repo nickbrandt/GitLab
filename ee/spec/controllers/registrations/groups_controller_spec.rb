@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Registrations::GroupsController do
+RSpec.describe Registrations::GroupsController do
   let_it_be(:user) { create(:user) }
 
   describe 'GET #new' do

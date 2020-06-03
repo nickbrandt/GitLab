@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Oauth::ApplicationsController do
+RSpec.describe Oauth::ApplicationsController do
   let(:user) { create(:user) }
 
   context 'project members' do

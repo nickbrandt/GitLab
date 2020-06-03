@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::InsightsController do
+RSpec.describe Groups::InsightsController do
   let_it_be(:parent_group) { create(:group, :private) }
   let_it_be(:nested_group) { create(:group, :private, parent: parent_group) }
   let_it_be(:project) { create(:project, :private) }

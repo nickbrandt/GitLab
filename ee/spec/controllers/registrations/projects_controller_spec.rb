@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Registrations::ProjectsController do
+RSpec.describe Registrations::ProjectsController do
   let_it_be(:user) { create(:user) }
   let_it_be(:namespace) { create(:group, path: 'group-path') }
 

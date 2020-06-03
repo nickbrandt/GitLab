@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::FeatureFlagsController do
+RSpec.describe Projects::FeatureFlagsController do
   include Gitlab::Routing
   include FeatureFlagHelpers
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::Analytics::CycleAnalyticsController do
+RSpec.describe Groups::Analytics::CycleAnalyticsController do
   let(:group) { create(:group) }
   let(:user) { create(:user) }
 

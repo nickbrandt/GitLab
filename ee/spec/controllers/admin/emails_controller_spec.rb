@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::EmailsController, :clean_gitlab_redis_shared_state do
+RSpec.describe Admin::EmailsController, :clean_gitlab_redis_shared_state do
   include ExclusiveLeaseHelpers
 
   let_it_be(:admin) { create(:admin) }

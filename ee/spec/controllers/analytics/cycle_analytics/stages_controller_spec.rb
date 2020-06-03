@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Analytics::CycleAnalytics::StagesController do
+RSpec.describe Analytics::CycleAnalytics::StagesController do
   let_it_be(:user) { create(:user) }
   let_it_be(:group, refind: true) { create(:group) }
   let(:params) { { group_id: group.full_path } }

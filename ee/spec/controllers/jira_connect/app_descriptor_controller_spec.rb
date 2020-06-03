@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe JiraConnect::AppDescriptorController do
+RSpec.describe JiraConnect::AppDescriptorController do
   describe '#show' do
     it 'returns JSON app descriptor' do
       get :show

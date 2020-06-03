@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Security::DashboardController do
+RSpec.describe Projects::Security::DashboardController do
   let_it_be(:group)   { create(:group) }
   let_it_be(:project) { create(:project, :repository, :public, namespace: group) }
   let_it_be(:user)    { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Oauth::Jira::AuthorizationsController do
+RSpec.describe Oauth::Jira::AuthorizationsController do
   describe 'GET new' do
     it 'redirects to OAuth authorization with correct params' do
       get :new, params: { client_id: 'client-123', redirect_uri: 'http://example.com/' }

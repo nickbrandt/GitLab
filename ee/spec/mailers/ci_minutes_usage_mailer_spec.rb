@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe CiMinutesUsageMailer do
+RSpec.describe CiMinutesUsageMailer do
   include EmailSpec::Matchers
 
   let(:namespace) { create(:group) }

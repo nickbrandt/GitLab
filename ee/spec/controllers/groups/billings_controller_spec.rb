@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::BillingsController do
+RSpec.describe Groups::BillingsController do
   let(:user)  { create(:user) }
   let(:group) { create(:group, :private) }
 
