@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Analytics::CycleAnalytics::Stages::DeleteService do
+RSpec.describe Analytics::CycleAnalytics::Stages::DeleteService do
   let_it_be(:group, refind: true) { create(:group) }
   let_it_be(:user, refind: true) { create(:user) }
   let_it_be(:stage, refind: true) { create(:cycle_analytics_group_stage, group: group) }

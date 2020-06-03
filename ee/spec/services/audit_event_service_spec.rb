@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AuditEventService do
+RSpec.describe AuditEventService do
   let(:project) { create(:project) }
   let(:user) { create(:user, current_sign_in_ip: '192.168.68.104') }
   let(:project_member) { create(:project_member, user: user, expires_at: 1.day.from_now) }

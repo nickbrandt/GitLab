@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Ci::DestroyPipelineService do
+RSpec.describe ::Ci::DestroyPipelineService do
   let(:project) { create(:project) }
   let!(:pipeline) { create(:ci_pipeline, project: project) }
   let(:user) { project.owner }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe PreviewMarkdownService do
+RSpec.describe PreviewMarkdownService do
   context 'preview epic text with quick action' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }

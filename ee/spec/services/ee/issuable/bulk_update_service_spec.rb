@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Issuable::BulkUpdateService do
+RSpec.describe Issuable::BulkUpdateService do
   let_it_be(:user)  { create(:user) }
   let_it_be(:group) { create(:group) }
   let_it_be(:project1) { create(:project, :repository, group: group) }

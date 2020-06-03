@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalRules::ParamsFilteringService do
+RSpec.describe ApprovalRules::ParamsFilteringService do
   let(:service) { described_class.new(merge_request, user, params) }
   let(:project_member) { create(:user) }
   let(:outsider) { create(:user) }

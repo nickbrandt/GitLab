@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe VulnerableProjectEntity do
+RSpec.describe VulnerableProjectEntity do
   let(:project) { create(:project) }
   let(:vulnerable_project) { ::Security::VulnerableProjectPresenter.new(project) }
 

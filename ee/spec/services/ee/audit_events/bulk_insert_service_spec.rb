@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::AuditEvents::BulkInsertService do
+RSpec.describe EE::AuditEvents::BulkInsertService do
   let(:user) { create(:user) }
   let(:entity) { create(:project) }
   let(:entity_type) { 'Project' }

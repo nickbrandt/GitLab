@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe UserAnalyticsEntity do
+RSpec.describe UserAnalyticsEntity do
   let(:user) { build_stubbed(:user) }
   let(:events) do
     {

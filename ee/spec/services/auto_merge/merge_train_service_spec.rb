@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AutoMerge::MergeTrainService do
+RSpec.describe AutoMerge::MergeTrainService do
   include ExclusiveLeaseHelpers
 
   let_it_be(:project) { create(:project, :repository) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProtectedBranches::CreateService do
+RSpec.describe ProtectedBranches::CreateService do
   include ProjectForksHelper
 
   let(:source_project) { create(:project) }

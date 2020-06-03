@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Users::DestroyService do
+RSpec.describe Users::DestroyService do
   let(:current_user) { create(:admin) }
 
   subject(:service) { described_class.new(current_user) }

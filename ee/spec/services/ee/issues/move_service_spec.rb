@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Issues::MoveService do
+RSpec.describe Issues::MoveService do
   let(:user) { create(:user) }
   let(:old_project) { create(:project) }
   let(:new_project) { create(:project, group: create(:group)) }

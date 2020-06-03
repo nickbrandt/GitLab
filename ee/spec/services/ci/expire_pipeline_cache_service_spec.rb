@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::ExpirePipelineCacheService do
+RSpec.describe Ci::ExpirePipelineCacheService do
   let(:pipeline) { create(:ci_empty_pipeline) }
 
   subject { described_class.new }

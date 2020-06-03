@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Analytics::CycleAnalytics::Stages::CreateService do
+RSpec.describe Analytics::CycleAnalytics::Stages::CreateService do
   let_it_be(:group, refind: true) { create(:group) }
   let_it_be(:user, refind: true) { create(:user) }
   let(:params) { { name: 'my stage', start_event_identifier: :merge_request_created, end_event_identifier: :merge_request_merged } }

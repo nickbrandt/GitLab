@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state do
+RSpec.describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state do
   include ProjectForksHelper
 
   describe '#execute' do

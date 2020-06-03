@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Notes::CreateService do
+RSpec.describe Notes::CreateService do
   context 'note with commands' do
     context 'for issues' do
       let(:project) { create(:project) }

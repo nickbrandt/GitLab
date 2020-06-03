@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::Minutes::EmailNotificationService do
+RSpec.describe Ci::Minutes::EmailNotificationService do
   shared_examples 'namespace with available CI minutes' do
     context 'when usage is below the quote' do
       it 'does not send the email' do

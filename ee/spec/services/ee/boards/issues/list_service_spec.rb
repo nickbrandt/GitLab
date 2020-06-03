@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Boards::Issues::ListService, services: true do
+RSpec.describe Boards::Issues::ListService, services: true do
   describe '#execute' do
     let(:user)    { create(:user) }
     let(:group) { create(:group) }

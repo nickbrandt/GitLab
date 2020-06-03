@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::ScannerEntity do
+RSpec.describe Vulnerabilities::ScannerEntity do
   let(:scanner) { create(:vulnerabilities_scanner) }
 
   let(:entity) do

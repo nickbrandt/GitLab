@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Analytics::CycleAnalytics::Stages::ListService do
+RSpec.describe Analytics::CycleAnalytics::Stages::ListService do
   let_it_be(:group, refind: true) { create(:group) }
   let_it_be(:user) { create(:user) }
   let(:stages) { subject.payload[:stages] }

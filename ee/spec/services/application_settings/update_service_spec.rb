@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApplicationSettings::UpdateService do
+RSpec.describe ApplicationSettings::UpdateService do
   let(:user)    { create(:user) }
   let(:setting) { ApplicationSetting.create_from_defaults }
   let(:service) { described_class.new(setting, user, opts) }

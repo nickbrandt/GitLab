@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Issuable::CommonSystemNotesService do
+RSpec.describe Issuable::CommonSystemNotesService do
   let(:user) { create(:user) }
   let(:project) { create(:project) }
   let(:issuable) { create(:issue) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::CompareLicenseScanningReportsService do
+RSpec.describe Ci::CompareLicenseScanningReportsService do
   let(:service) { described_class.new(project, nil) }
   let(:project) { build(:project, :repository) }
 

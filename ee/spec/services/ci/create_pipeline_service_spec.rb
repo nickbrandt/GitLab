@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::CreatePipelineService, '#execute' do
+RSpec.describe Ci::CreatePipelineService, '#execute' do
   let_it_be(:namespace) { create(:namespace) }
   let_it_be(:gold_plan) { create(:gold_plan) }
   let_it_be(:plan_limits) { create(:plan_limits, plan: gold_plan) }

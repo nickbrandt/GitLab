@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::HistoryEntity do
+RSpec.describe Vulnerabilities::HistoryEntity do
   let(:project) { create(:project) }
   let(:time) { Time.zone.parse('2018-11-10') }
 

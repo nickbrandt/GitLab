@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe BurnupChartService do
+RSpec.describe BurnupChartService do
   let_it_be(:user) { create(:user) }
   let_it_be(:other_user) { create(:user) }
 
