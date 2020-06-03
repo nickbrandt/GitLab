@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Atlassian::JiraConnect::Serializers::RepositoryEntity do
+RSpec.describe Atlassian::JiraConnect::Serializers::RepositoryEntity do
   subject do
     project = create(:project, :repository)
     commits = [project.commit]

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::API::Entities::Analytics::CodeReview::MergeRequest do
+RSpec.describe EE::API::Entities::Analytics::CodeReview::MergeRequest do
   subject(:entity_representation) { described_class.new(merge_request).as_json }
 
   let(:merge_request) do

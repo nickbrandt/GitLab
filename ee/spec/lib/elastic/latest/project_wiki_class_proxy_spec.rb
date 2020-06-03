@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Elastic::Latest::ProjectWikiClassProxy do
+RSpec.describe Elastic::Latest::ProjectWikiClassProxy do
   let_it_be(:project) { create(:project, :wiki_repo) }
 
   subject { described_class.new(project.wiki.repository) }

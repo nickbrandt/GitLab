@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::API::Entities::Nuget::PackageMetadataCatalogEntry do
+RSpec.describe EE::API::Entities::Nuget::PackageMetadataCatalogEntry do
   let(:entry) do
     {
       json_url: 'http://sandbox.com/json/package',

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Helpers::PackagesHelpers do
+RSpec.describe API::Helpers::PackagesHelpers do
   let_it_be(:helper) { Class.new.include(described_class).new }
   let_it_be(:project) { create(:project) }
 

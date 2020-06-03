@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Audit::ProjectChangesAuditor do
+RSpec.describe EE::Audit::ProjectChangesAuditor do
   describe '.audit_changes' do
     let(:user) { create(:user) }
     let(:project) do

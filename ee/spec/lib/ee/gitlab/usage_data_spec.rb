@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::UsageData do
+RSpec.describe Gitlab::UsageData do
   include UsageDataHelpers
 
   before do

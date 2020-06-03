@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Analytics::CycleAnalytics::DataCollector do
+RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
   let_it_be(:user) { create(:user) }
 
   around do |example|

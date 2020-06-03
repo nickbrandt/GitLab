@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Atlassian::JiraConnect::Client do
+RSpec.describe Atlassian::JiraConnect::Client do
   include StubRequests
 
   subject { described_class.new('https://gitlab-test.atlassian.net', 'sample_secret') }

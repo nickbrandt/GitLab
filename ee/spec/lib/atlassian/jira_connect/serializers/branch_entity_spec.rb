@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Atlassian::JiraConnect::Serializers::BranchEntity do
+RSpec.describe Atlassian::JiraConnect::Serializers::BranchEntity do
   let(:project) { create(:project, :repository) }
   let(:branch) { project.repository.find_branch('improve/awesome') }
 

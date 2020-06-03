@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Analytics::CycleAnalytics::RequestParams do
+RSpec.describe Gitlab::Analytics::CycleAnalytics::RequestParams do
   let_it_be(:user) { create(:user) }
   let_it_be(:root_group) { create(:group) }
   let_it_be(:sub_group) { create(:group, parent: root_group) }

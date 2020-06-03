@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Audit::GroupChangesAuditor do
+RSpec.describe EE::Audit::GroupChangesAuditor do
   describe '.audit_changes' do
     let!(:user) { create(:user) }
     let!(:group) { create(:group, visibility_level: 0) }

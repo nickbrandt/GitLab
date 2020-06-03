@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Audit::Details do
+RSpec.describe Audit::Details do
   let(:user) { create(:user) }
 
   describe '.humanize' do

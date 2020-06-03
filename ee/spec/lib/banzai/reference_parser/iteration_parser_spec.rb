@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Banzai::ReferenceParser::IterationParser do
+RSpec.describe Banzai::ReferenceParser::IterationParser do
   include ReferenceParserHelpers
 
   let(:project) { create(:project, :public) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Banzai::Filter::IterationReferenceFilter do
+RSpec.describe Banzai::Filter::IterationReferenceFilter do
   include FilterSpecHelper
 
   let(:parent_group) { create(:group, :public) }

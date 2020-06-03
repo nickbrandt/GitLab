@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Constraints::JiraEncodedUrlConstrainer do
+RSpec.describe Constraints::JiraEncodedUrlConstrainer do
   let(:namespace_id) { 'group' }
   let(:project_id) { 'project' }
   let(:path) { "/#{namespace_id}/#{project_id}" }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Gitlab::ServiceDesk do
+RSpec.describe EE::Gitlab::ServiceDesk do
   before do
     stub_licensed_features(service_desk: true)
     allow(::Gitlab::IncomingEmail).to receive(:enabled?).and_return(true)
