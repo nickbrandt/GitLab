@@ -23,6 +23,12 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary d
         expect(subject.first[:value]).to eq('2')
       end
 
+      it 'returns the localized title' do
+        Gitlab::I18n.with_locale(:ru) do
+          expect(subject.first[:title]).to eq(n_('New Issue', 'New Issues', 2))
+        end
+      end
+
       context 'with subgroups' do
         before do
           Timecop.freeze(5.days.from_now) { create(:issue, project: create(:project, namespace: create(:group, parent: group))) }
@@ -78,6 +84,12 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary d
 
       it "finds the number of deploys made created after it" do
         expect(subject.second[:value]).to eq('2')
+      end
+
+      it 'returns the localized title' do
+        Gitlab::I18n.with_locale(:ru) do
+          expect(subject.second[:title]).to eq(n_('Deploy', 'Deploys', 2))
+        end
       end
 
       context 'with subgroups' do
