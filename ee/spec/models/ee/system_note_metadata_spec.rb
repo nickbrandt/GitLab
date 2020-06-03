@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::SystemNoteMetadata do
+RSpec.describe EE::SystemNoteMetadata do
   %i[
     vulnerability_confirmed vulnerability_dismissed vulnerability_resolved
   ].each do |action|

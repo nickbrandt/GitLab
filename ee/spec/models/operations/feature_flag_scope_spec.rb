@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Operations::FeatureFlagScope do
+RSpec.describe Operations::FeatureFlagScope do
   describe 'associations' do
     it { is_expected.to belong_to(:feature_flag) }
   end

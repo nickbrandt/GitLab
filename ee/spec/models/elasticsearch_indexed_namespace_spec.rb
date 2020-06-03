@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ElasticsearchIndexedNamespace do
+RSpec.describe ElasticsearchIndexedNamespace do
   before do
     stub_ee_application_setting(elasticsearch_indexing: true)
   end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApproverMigrateHook do
+RSpec.describe ApproverMigrateHook do
   def members(rule)
     rule.users.reload + rule.groups.reload
   end

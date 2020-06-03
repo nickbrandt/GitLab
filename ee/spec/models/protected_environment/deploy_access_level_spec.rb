@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe ProtectedEnvironment::DeployAccessLevel do
+RSpec.describe ProtectedEnvironment::DeployAccessLevel do
   describe 'associations' do
     it { is_expected.to belong_to(:protected_environment) }
     it { is_expected.to belong_to(:user) }

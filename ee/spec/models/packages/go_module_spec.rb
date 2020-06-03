@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::GoModule, type: :model do
+RSpec.describe Packages::GoModule, type: :model do
   before do
     stub_feature_flags(go_proxy_disable_gomod_validation: false)
   end

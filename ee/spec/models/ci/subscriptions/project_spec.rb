@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::Subscriptions::Project do
+RSpec.describe Ci::Subscriptions::Project do
   let(:upstream_project) { create(:project, :public) }
 
   describe 'Relations' do

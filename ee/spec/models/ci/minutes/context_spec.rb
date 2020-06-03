@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::Minutes::Context do
+RSpec.describe Ci::Minutes::Context do
   let_it_be(:group) { create(:group) }
   let(:project) { build(:project, namespace: group) }
 

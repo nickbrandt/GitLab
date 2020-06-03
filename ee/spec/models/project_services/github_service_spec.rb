@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GithubService do
+RSpec.describe GithubService do
   let(:project) { create(:project) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
   let(:pipeline_sample_data) { Gitlab::DataBuilder::Pipeline.build(pipeline) }

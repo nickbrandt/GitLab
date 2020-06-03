@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Event do
+RSpec.describe Event do
   describe '#visible_to_user?' do
     let_it_be(:non_member) { create(:user) }
     let_it_be(:member) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe PersonalAccessToken do
+RSpec.describe PersonalAccessToken do
   describe 'scopes' do
     let_it_be(:expired_token) { create(:personal_access_token, expires_at: 1.day.ago) }
     let_it_be(:valid_token) { create(:personal_access_token, expires_at: 1.day.from_now) }

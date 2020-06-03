@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::JobArtifactRegistry, :geo do
+RSpec.describe Geo::JobArtifactRegistry, :geo do
   include EE::GeoHelpers
 
   it_behaves_like 'a BulkInsertSafe model', Geo::JobArtifactRegistry do

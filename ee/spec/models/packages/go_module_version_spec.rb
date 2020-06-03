@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::GoModuleVersion, type: :model do
+RSpec.describe Packages::GoModuleVersion, type: :model do
   let_it_be(:user) { create :user }
   let_it_be(:project) { create :project_empty_repo, creator: user, path: 'my-go-lib' }
   let_it_be(:mod) { create :go_module, project: project }

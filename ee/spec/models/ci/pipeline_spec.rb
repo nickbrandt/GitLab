@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::Pipeline do
+RSpec.describe Ci::Pipeline do
   using RSpec::Parameterized::TableSyntax
 
   let(:user) { create(:user) }

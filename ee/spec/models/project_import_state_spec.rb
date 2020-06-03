@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProjectImportState, type: :model do
+RSpec.describe ProjectImportState, type: :model do
   describe 'Project import job' do
     let(:project) { import_state.project }
 

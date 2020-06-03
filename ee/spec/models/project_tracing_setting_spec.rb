@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProjectTracingSetting do
+RSpec.describe ProjectTracingSetting do
   describe '#external_url' do
     let_it_be(:project) { create(:project) }
 

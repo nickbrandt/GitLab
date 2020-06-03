@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProtectedBranch do
+RSpec.describe ProtectedBranch do
   subject { create(:protected_branch) }
 
   let(:project) { subject.project }

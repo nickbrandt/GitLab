@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe IssueLink do
+RSpec.describe IssueLink do
   describe 'Associations' do
     it { is_expected.to belong_to(:source).class_name('Issue') }
     it { is_expected.to belong_to(:target).class_name('Issue') }

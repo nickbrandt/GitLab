@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GeoNode, :request_store, :geo, type: :model do
+RSpec.describe GeoNode, :request_store, :geo, type: :model do
   using RSpec::Parameterized::TableSyntax
   include ::EE::GeoHelpers
 

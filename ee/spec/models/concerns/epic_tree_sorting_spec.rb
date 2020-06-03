@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicTreeSorting do
+RSpec.describe EpicTreeSorting do
   let_it_be(:group) { create(:group) }
   let_it_be(:base_epic) { create(:epic, group: group) }
   let!(:epic_issue1) { create(:epic_issue, epic: base_epic, relative_position: 10) }

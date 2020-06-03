@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Ci::JobArtifact do
+RSpec.describe EE::Ci::JobArtifact do
   include EE::GeoHelpers
 
   describe '#destroy' do
