@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Elastic::Indexer do
+RSpec.describe Gitlab::Elastic::Indexer do
   include StubENV
 
   before do

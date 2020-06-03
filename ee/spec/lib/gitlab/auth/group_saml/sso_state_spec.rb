@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::GroupSaml::SsoState do
+RSpec.describe Gitlab::Auth::GroupSaml::SsoState do
   let(:saml_provider_id) { 10 }
 
   subject { described_class.new(saml_provider_id) }

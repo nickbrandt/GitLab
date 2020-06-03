@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Gitlab::ConanToken do
+RSpec.describe Gitlab::ConanToken do
   let(:base_secret) { SecureRandom.base64(64) }
 
   let(:jwt_secret) do

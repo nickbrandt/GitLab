@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Reports::Security::AggregatedReport do
+RSpec.describe Gitlab::Ci::Reports::Security::AggregatedReport do
   subject { described_class.new(reports, occurrences) }
 
   let(:reports) { build_list(:ci_reports_security_report, 1) }

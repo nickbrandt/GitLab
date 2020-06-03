@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'License-Scanning.gitlab-ci.yml' do
+RSpec.describe 'License-Scanning.gitlab-ci.yml' do
   subject(:template) { Gitlab::Template::GitlabCiYmlTemplate.find('License-Scanning') }
 
   describe 'the created pipeline' do

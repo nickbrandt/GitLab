@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Database::LoadBalancing do
+RSpec.describe Gitlab::Database::LoadBalancing do
   describe '.proxy' do
     context 'when configured' do
       before do

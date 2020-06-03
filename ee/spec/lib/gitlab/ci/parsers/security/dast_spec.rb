@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Security::Dast do
+RSpec.describe Gitlab::Ci::Parsers::Security::Dast do
   using RSpec::Parameterized::TableSyntax
 
   describe '#parse!' do

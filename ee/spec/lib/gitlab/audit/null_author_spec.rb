@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Audit::NullAuthor do
+RSpec.describe Gitlab::Audit::NullAuthor do
   subject { described_class }
 
   describe '.for' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Reports::Security::Locations::ContainerScanning do
+RSpec.describe Gitlab::Ci::Reports::Security::Locations::ContainerScanning do
   let(:params) do
     {
       image: 'registry.gitlab.com/my/project:latest',

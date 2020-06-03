@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Dependency-Scanning.gitlab-ci.yml' do
+RSpec.describe 'Dependency-Scanning.gitlab-ci.yml' do
   subject(:template) { Gitlab::Template::GitlabCiYmlTemplate.find('Dependency-Scanning') }
 
   describe 'the created pipeline' do

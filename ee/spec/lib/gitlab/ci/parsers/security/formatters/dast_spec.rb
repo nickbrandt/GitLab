@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
+RSpec.describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
   let(:formatter) { described_class.new(parsed_report) }
 
   let(:parsed_report) do
