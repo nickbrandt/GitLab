@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Boards::Lists::ListService do
+RSpec.describe Boards::Lists::ListService do
   describe '#execute' do
     shared_examples 'list service for board with assignee lists' do
       let!(:assignee_list) { build(:user_list, board: board).tap { |l| l.save(validate: false) } }

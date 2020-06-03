@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Applications::CreateService do
+RSpec.describe ::Applications::CreateService do
   let(:user) { create(:user) }
   let(:params) { attributes_for(:application) }
   let(:request) { ActionController::TestRequest.new({ remote_ip: "127.0.0.1" }, ActionController::TestSession.new, nil) }

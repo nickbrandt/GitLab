@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Dashboard::Operations::ListService do
+RSpec.describe Dashboard::Operations::ListService do
   let(:subject) { described_class.new(user).execute }
   let(:dashboard_project) { subject.first }
 

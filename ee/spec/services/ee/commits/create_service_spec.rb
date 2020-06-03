@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Commits::CreateService do
+RSpec.describe Commits::CreateService do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::AuditEvents::ProtectedBranchAuditEventService do
+RSpec.describe EE::AuditEvents::ProtectedBranchAuditEventService do
   let(:protected_branch) { create(:protected_branch, :no_one_can_push) }
   let(:merge_level) { 'Maintainers' }
   let(:push_level) { 'No one' }

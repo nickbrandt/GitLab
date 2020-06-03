@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalRules::CreateService do
+RSpec.describe ApprovalRules::CreateService do
   let(:project) { create(:project) }
   let(:user) { project.creator }
 

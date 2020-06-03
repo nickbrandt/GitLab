@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::CompareSastReportsService do
+RSpec.describe Ci::CompareSastReportsService do
   let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
   let(:project) { build(:project, :repository) }

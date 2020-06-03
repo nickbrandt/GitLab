@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Analytics::CycleAnalytics::Stages::UpdateService do
+RSpec.describe Analytics::CycleAnalytics::Stages::UpdateService do
   let_it_be(:group, refind: true) { create(:group) }
   let_it_be(:user, refind: true) { create(:user) }
   let(:default_stages) { Gitlab::Analytics::CycleAnalytics::DefaultStages.all }

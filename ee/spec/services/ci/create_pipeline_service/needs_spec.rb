@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::CreatePipelineService do
+RSpec.describe Ci::CreatePipelineService do
   subject(:execute) { service.execute(:push) }
 
   let_it_be(:downstream_project) { create(:project, name: 'project', namespace: create(:namespace, name: 'some')) }

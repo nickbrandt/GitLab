@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Boards::DestroyService do
+RSpec.describe Boards::DestroyService do
   describe '#execute' do
     let(:project) { create(:project) }
     let(:group) { create(:group) }

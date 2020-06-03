@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Issues::UpdateService do
+RSpec.describe Issues::UpdateService do
   let(:group) { create(:group) }
   let(:project) { create(:project, group: group) }
   let(:issue) { create(:issue, project: project) }

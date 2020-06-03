@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::FindingEntity do
+RSpec.describe Vulnerabilities::FindingEntity do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
 

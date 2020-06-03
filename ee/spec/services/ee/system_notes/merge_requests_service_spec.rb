@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::SystemNotes::MergeRequestsService do
+RSpec.describe ::SystemNotes::MergeRequestsService do
   let(:author) { create(:user) }
   let(:project) { create(:project) }
   let(:noteable) { create(:merge_request, source_project: project) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::PipelineBridgeStatusService do
+RSpec.describe Ci::PipelineBridgeStatusService do
   let(:user) { build(:user) }
   let(:project) { build(:project) }
   let(:pipeline) { build(:ci_pipeline, project: project) }

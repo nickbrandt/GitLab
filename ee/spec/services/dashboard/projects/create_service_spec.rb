@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Dashboard::Projects::CreateService do
+RSpec.describe Dashboard::Projects::CreateService do
   let(:user) { create(:user) }
   let(:service) { described_class.new(user, user.ops_dashboard_projects, feature: :operations_dashboard) }
   let(:project) { create(:project) }

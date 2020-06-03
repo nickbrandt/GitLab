@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::ScanEntity do
+RSpec.describe Vulnerabilities::ScanEntity do
   let(:scan) { build(:security_scan, scanned_resources_count: 10) }
   let(:request) { double('request') }
 
