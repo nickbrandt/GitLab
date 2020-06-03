@@ -1,0 +1,5 @@
+---
+title: Add codeowner validation checks to branch authorization in Commit REST API
+merge_request: 33748
+author:
+type: changed
