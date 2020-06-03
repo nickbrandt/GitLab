@@ -153,7 +153,7 @@ describe EpicIssues::CreateService do
           end
 
           context 'when an issue link is given' do
-            subject { assign_issue([IssuesHelper.url_for_issue(issue.iid, issue.project)]) }
+            subject { assign_issue([Gitlab::Routing.url_helpers.namespace_project_issue_url(namespace_id: issue.project.namespace, project_id: issue.project, id: issue.iid)])}
 
             include_examples 'returns success'
           end
@@ -163,7 +163,7 @@ describe EpicIssues::CreateService do
             let(:project2) { create(:project, group: subgroup) }
             let(:issue) { create(:issue, project: project2) }
 
-            subject { assign_issue([IssuesHelper.url_for_issue(issue.iid, issue.project)]) }
+            subject { assign_issue([Gitlab::Routing.url_helpers.namespace_project_issue_url(namespace_id: issue.project.namespace, project_id: issue.project, id: issue.iid)])}
 
             include_examples 'returns success'
           end
