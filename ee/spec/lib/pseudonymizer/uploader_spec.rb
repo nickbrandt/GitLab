@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Pseudonymizer::Uploader do
+RSpec.describe Pseudonymizer::Uploader do
   let(:base_dir) { Dir.mktmpdir }
   let(:options) do
     Pseudonymizer::Options.new(

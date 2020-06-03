@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AllowedEmailDomain do
+RSpec.describe AllowedEmailDomain do
   describe 'relations' do
     it { is_expected.to belong_to(:group) }
   end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Metrics::Samplers::GlobalSearchSampler do
+RSpec.describe Gitlab::Metrics::Samplers::GlobalSearchSampler do
   subject { described_class.new }
 
   describe '#interval' do

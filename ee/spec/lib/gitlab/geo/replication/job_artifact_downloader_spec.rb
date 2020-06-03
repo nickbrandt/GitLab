@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::Replication::JobArtifactDownloader, :geo do
+RSpec.describe Gitlab::Geo::Replication::JobArtifactDownloader, :geo do
   let(:job_artifact) { create(:ci_job_artifact) }
 
   describe '#execute' do

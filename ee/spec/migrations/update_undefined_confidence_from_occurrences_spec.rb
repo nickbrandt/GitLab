@@ -4,7 +4,7 @@ require 'spec_helper'
 
 require Rails.root.join('db', 'post_migrate', '20200506085748_update_undefined_confidence_from_occurrences.rb')
 
-describe UpdateUndefinedConfidenceFromOccurrences, :migration do
+RSpec.describe UpdateUndefinedConfidenceFromOccurrences, :migration do
   let(:vulnerabilities) { table(:vulnerability_occurrences) }
   let(:identifiers) { table(:vulnerability_identifiers) }
   let(:scanners) { table(:vulnerability_scanners) }

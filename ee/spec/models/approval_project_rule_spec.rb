@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalProjectRule do
+RSpec.describe ApprovalProjectRule do
   subject { create(:approval_project_rule) }
 
   describe 'validations' do

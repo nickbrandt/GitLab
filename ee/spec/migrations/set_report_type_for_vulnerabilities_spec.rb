@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191105094625_set_report_type_for_vulnerabilities.rb')
 
-describe SetReportTypeForVulnerabilities do
+RSpec.describe SetReportTypeForVulnerabilities do
   let(:confidence_levels) do
     { undefined: 0, ignore: 1, unknown: 2, experimental: 3, low: 4, medium: 5, high: 6, confirmed: 7 }
   end

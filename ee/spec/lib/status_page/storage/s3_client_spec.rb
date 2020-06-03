@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::Storage::S3Client, :aws_s3 do
+RSpec.describe StatusPage::Storage::S3Client, :aws_s3 do
   let(:region) { 'eu-west-1' }
   let(:bucket_name) { 'bucket_name' }
   let(:access_key_id) { 'key_id' }

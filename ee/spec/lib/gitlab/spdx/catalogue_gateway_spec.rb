@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::SPDX::CatalogueGateway do
+RSpec.describe Gitlab::SPDX::CatalogueGateway do
   include StubRequests
 
   describe "#fetch" do

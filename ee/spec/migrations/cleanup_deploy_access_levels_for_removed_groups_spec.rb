@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191125024005_cleanup_deploy_access_levels_for_removed_groups.rb')
 
-describe CleanupDeployAccessLevelsForRemovedGroups do
+RSpec.describe CleanupDeployAccessLevelsForRemovedGroups do
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:groups) { table(:namespaces) }

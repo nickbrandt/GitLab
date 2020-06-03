@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Regex do
+RSpec.describe Gitlab::Regex do
   describe '.conan_file_name_regex' do
     subject { described_class.conan_file_name_regex }
 

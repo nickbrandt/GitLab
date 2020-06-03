@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::Replication::LfsDownloader, :geo do
+RSpec.describe Gitlab::Geo::Replication::LfsDownloader, :geo do
   let(:lfs_object) { create(:lfs_object) }
 
   describe '#execute' do

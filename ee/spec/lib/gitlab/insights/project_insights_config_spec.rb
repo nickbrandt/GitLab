@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Insights::ProjectInsightsConfig do
+RSpec.describe Gitlab::Insights::ProjectInsightsConfig do
   let_it_be(:project) { create(:project) }
   let(:chart1) { { title: 'chart 1', description: 'description 1' } }
   let(:chart2) { { title: 'chart 2', description: 'description 2' } }

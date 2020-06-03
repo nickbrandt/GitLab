@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20200207185149_schedule_fix_orphan_promoted_issues.rb')
 
-describe ScheduleFixOrphanPromotedIssues do
+RSpec.describe ScheduleFixOrphanPromotedIssues do
   let(:projects) { table(:projects) }
   let(:notes) { table(:notes) }
   let(:project1) { projects.create!(namespace_id: 99) }

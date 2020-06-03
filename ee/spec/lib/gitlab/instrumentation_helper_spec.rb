@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::InstrumentationHelper do
+RSpec.describe Gitlab::InstrumentationHelper do
   describe '.add_instrumentation_data', :request_store do
     let(:payload) { {} }
 

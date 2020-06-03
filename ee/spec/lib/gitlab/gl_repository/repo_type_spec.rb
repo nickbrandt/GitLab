@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::GlRepository::RepoType do
+RSpec.describe Gitlab::GlRepository::RepoType do
   describe Gitlab::GlRepository::WIKI do
     context 'group wiki' do
       let_it_be(:group) { create(:group) }

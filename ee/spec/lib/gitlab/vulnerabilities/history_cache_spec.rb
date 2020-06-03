@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Vulnerabilities::HistoryCache do
+RSpec.describe Gitlab::Vulnerabilities::HistoryCache do
   describe '#fetch', :use_clean_rails_memory_store_caching do
     shared_examples 'the history cache when given an expected Vulnerable' do
       let(:project) { create(:project, :public, namespace: group) }

@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'rake_helper'
 
-describe SystemCheck::Geo::FdwSchemaUpToDateCheck, :geo do
+RSpec.describe SystemCheck::Geo::FdwSchemaUpToDateCheck, :geo do
   describe '#skip?' do
     it 'skips when Geo is disabled' do
       allow(Gitlab::Geo).to receive(:enabled?) { false }
