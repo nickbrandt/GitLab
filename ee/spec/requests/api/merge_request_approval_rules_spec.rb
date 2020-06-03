@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::MergeRequestApprovalRules do
+RSpec.describe API::MergeRequestApprovalRules do
   let_it_be(:user) { create(:user) }
   let_it_be(:other_user) { create(:user) }
   let_it_be(:project) { create(:project, :public, :repository, creator: user, namespace: user.namespace) }

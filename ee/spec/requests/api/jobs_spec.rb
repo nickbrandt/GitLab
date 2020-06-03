@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Jobs do
+RSpec.describe API::Jobs do
   let_it_be(:project) do
     create(:project, :repository, public_builds: false)
   end

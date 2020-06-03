@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequestWidgetEntity do
+RSpec.describe MergeRequestWidgetEntity do
   include ProjectForksHelper
 
   let_it_be(:user) { create(:user) }

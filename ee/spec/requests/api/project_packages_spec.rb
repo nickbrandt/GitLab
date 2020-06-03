@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::ProjectPackages do
+RSpec.describe API::ProjectPackages do
   let(:user) { create(:user) }
   let_it_be(:project) { create(:project, :public) }
   let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Repositories do
+RSpec.describe API::Repositories do
   let(:project) { create(:project, :repository) }
 
   describe "GET /projects/:id/repository/archive(.:format)?:sha" do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Users do
+RSpec.describe API::Users do
   let(:user)  { create(:user) }
   let(:admin) { create(:admin) }
 

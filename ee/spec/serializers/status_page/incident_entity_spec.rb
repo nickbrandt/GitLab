@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::IncidentEntity do
+RSpec.describe StatusPage::IncidentEntity do
   let_it_be(:user) { create(:user) }
 
   let_it_be(:issue, reload: true) do

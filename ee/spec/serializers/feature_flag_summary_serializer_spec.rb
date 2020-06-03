@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe FeatureFlagSummarySerializer do
+RSpec.describe FeatureFlagSummarySerializer do
   let(:serializer) { described_class.new(project: project, current_user: user) }
   let(:user) { create(:user) }
   let(:project) { create(:project) }

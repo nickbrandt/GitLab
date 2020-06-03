@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe LicenseScanningReportLicenseEntity do
+RSpec.describe LicenseScanningReportLicenseEntity do
   include LicenseScanningReportHelper
 
   let(:user) { build(:user) }

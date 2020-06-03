@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe FeatureFlagsClientSerializer do
+RSpec.describe FeatureFlagsClientSerializer do
   let(:project) { create(:project) }
   let(:feature_flags_client) { project.create_operations_feature_flags_client! }
   let(:serializer) { described_class.new }

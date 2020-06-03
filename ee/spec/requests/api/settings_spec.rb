@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Settings, 'EE Settings' do
+RSpec.describe API::Settings, 'EE Settings' do
   include StubENV
 
   let(:user) { create(:user) }

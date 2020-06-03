@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe LicensesListSerializer do
+RSpec.describe LicensesListSerializer do
   describe '#to_json' do
     subject do
       described_class.new(project: project, user: user)

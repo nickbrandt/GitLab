@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Triggers do
+RSpec.describe API::Triggers do
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository, :auto_devops, creator: user) }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::NpmPackages do
+RSpec.describe API::NpmPackages do
   include EE::PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create(:user) }

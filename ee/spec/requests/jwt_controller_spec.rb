@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe JwtController do
+RSpec.describe JwtController do
   context 'authenticating against container registry' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::IssuesController do
+RSpec.describe Projects::IssuesController do
   let_it_be(:issue) { create(:issue) }
   let_it_be(:group) { create(:group) }
   let_it_be(:project) { issue.project }

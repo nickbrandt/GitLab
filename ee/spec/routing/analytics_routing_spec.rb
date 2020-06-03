@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Analytics' do
+RSpec.describe 'Analytics' do
   include Warden::Test::Helpers
 
   it 'redirects to sign_in if user is not authenticated' do
