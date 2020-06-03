@@ -48,7 +48,6 @@ describe('AlertManagementList', () => {
   const findAssignees = () => wrapper.findAll('[data-testid="assigneesField"]');
   const findSeverityFields = () => wrapper.findAll('[data-testid="severityField"]');
   const findSeverityColumnHeader = () => wrapper.findAll('th').at(0);
-  const findStartTimeColumnHeader = () => wrapper.findAll('th').at(1);
   const findPagination = () => wrapper.find(GlPagination);
   const alertsCount = {
     open: 14,
@@ -333,7 +332,12 @@ describe('AlertManagementList', () => {
     beforeEach(() => {
       mountComponent({
         props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
-        data: { alerts: { list: mockAlerts }, errored: false, sort: 'STARTED_AT_ASC', alertsCount },
+        data: {
+          alerts: { list: mockAlerts },
+          errored: false,
+          sort: 'STARTED_AT_DESC',
+          alertsCount,
+        },
         loading: false,
         stubs: { GlTable },
       });
@@ -350,14 +354,11 @@ describe('AlertManagementList', () => {
     });
 
     it('updates the `ariaSort` attribute so the sort icon appears in the proper column', () => {
-      expect(findStartTimeColumnHeader().attributes('aria-sort')).toBe('ascending');
+      expect(mockStartedAtCol.ariaSort).toEqual('descending');
 
       findSeverityColumnHeader().trigger('click');
 
-      wrapper.vm.$nextTick(() => {
-        expect(findStartTimeColumnHeader().attributes('aria-sort')).toBe('none');
-        expect(findSeverityColumnHeader().attributes('aria-sort')).toBe('ascending');
-      });
+      expect(mockStartedAtCol.ariaSort).toEqual('none');
     });
   });
 

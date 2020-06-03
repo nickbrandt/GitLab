@@ -229,7 +229,7 @@ export default {
   },
   mounted() {
     this.trackPageViews();
-    if(this.alertManagementEnabled) {
+    if (this.alertManagementEnabled) {
       findDefaultSortColumn().ariaSort = 'descending';
     }
   },
