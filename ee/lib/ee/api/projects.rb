@@ -21,6 +21,48 @@ module EE
               render_api_error!(result[:message], 400)
             end
           end
+          segment ':id/audit_events' do
+            before do
+              authorize! :admin_project, user_project
+              check_audit_events_available!(user_project)
+            end
+
+            desc 'Get a list of audit events in this project.' do
+              success EE::API::Entities::AuditEvent
+            end
+            params do
+              optional :created_after, type: DateTime, desc: 'Return audit events created after the specified time'
+              optional :created_before, type: DateTime, desc: 'Return audit events created before the specified time'
+
+              use :pagination
+            end
+            get '/' do
+              level = ::Gitlab::Audit::Levels::Project.new(project: user_project)
+              audit_events = AuditLogFinder.new(
+                level: level,
+                params: audit_log_finder_params
+              ).execute
+
+              present paginate(audit_events), with: EE::API::Entities::AuditEvent
+            end
+
+            desc 'Get a specific audit event in this project.' do
+              success EE::API::Entities::AuditEvent
+            end
+            params do
+              requires :audit_event_id, type: Integer, desc: 'The ID of the audit event'
+            end
+            get '/:audit_event_id' do
+              level = ::Gitlab::Audit::Levels::Project.new(project: user_project)
+              # rubocop: disable CodeReuse/ActiveRecord
+              # This is not `find_by!` from ActiveRecord
+              audit_event = AuditLogFinder.new(level: level, params: audit_log_finder_params)
+                .find_by!(id: params[:audit_event_id])
+              # rubocop: enable CodeReuse/ActiveRecord
+
+              present audit_event, with: EE::API::Entities::AuditEvent
+            end
+          end
         end
 
         helpers do
@@ -47,6 +89,14 @@ module EE
                 attrs.delete(attr_name)
               end
             end
+          end
+
+          def check_audit_events_available!(project)
+            forbidden! unless project.feature_available?(:audit_events)
+          end
+
+          def audit_log_finder_params
+            params.slice(:created_after, :created_before)
           end
 
           override :delete_project
