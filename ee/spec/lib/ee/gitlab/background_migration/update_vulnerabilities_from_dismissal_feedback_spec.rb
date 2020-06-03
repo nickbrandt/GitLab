@@ -17,20 +17,19 @@ describe Gitlab::BackgroundMigration::UpdateVulnerabilitiesFromDismissalFeedback
   let(:confidence) { Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:medium] }
   let(:report_type) { Vulnerabilities::Occurrence::REPORT_TYPES[:sast] }
 
-  let!(:user) { users.create!(id: 13, email: 'author@example.com', username: 'author', projects_limit: 10) }
-  let!(:project) { projects.create!(id: 123, namespace_id: namespace.id, name: 'gitlab', path: 'gitlab') }
+  let!(:user) { users.create!(email: 'author@example.com', username: 'author', projects_limit: 10) }
+  let!(:project) { projects.create!(namespace_id: namespace.id, name: 'gitlab', path: 'gitlab') }
 
   let(:namespace) do
-    namespaces.create!(id: 12, name: 'namespace', path: '/path', description: 'description')
+    namespaces.create!(name: 'namespace', path: '/path', description: 'description')
   end
 
   let(:scanner) do
-    scanners.create!(id: 6, project_id: project.id, external_id: 'clair', name: 'Security Scanner')
+    scanners.create!(project_id: project.id, external_id: 'clair', name: 'Security Scanner')
   end
 
   let(:identifier) do
-    identifiers.create!(id: 7,
-      project_id: 123,
+    identifiers.create!(project_id: project.id,
       fingerprint: 'd432c2ad2953e8bd587a3a43b3ce309b5b0154c7',
       external_type: 'SECURITY_ID',
       external_id: 'SECURITY_0',
@@ -39,11 +38,11 @@ describe Gitlab::BackgroundMigration::UpdateVulnerabilitiesFromDismissalFeedback
 
   context 'vulnerability has been dismissed' do
     let!(:vulnerability) { vulnerabilities.create!(vuln_params) }
-    let!(:pipeline) { pipelines.create!(id: 234, project_id: project.id, ref: 'master', sha: 'adf43c3a', status: :success, user_id: user.id) }
+    let!(:pipeline) { pipelines.create!(project_id: project.id, ref: 'master', sha: 'adf43c3a', status: :success, user_id: user.id) }
 
     let!(:vulnerability_occurrence) do
       vulnerability_occurrences.create!(
-        id: 1, report_type: vulnerability.report_type, name: 'finding_1',
+        report_type: vulnerability.report_type, name: 'finding_1',
         primary_identifier_id: identifier.id, uuid: 'abc', project_fingerprint: 'abc123',
         location_fingerprint: 'abc456', project_id: project.id, scanner_id: scanner.id, severity: severity,
         confidence: confidence, metadata_version: 'sast:1.0', raw_metadata: '{}', vulnerability_id: vulnerability.id)
@@ -74,7 +73,7 @@ describe Gitlab::BackgroundMigration::UpdateVulnerabilitiesFromDismissalFeedback
     end
 
     context 'project is archived' do
-      let!(:project) { projects.create!(id: 123, namespace_id: namespace.id, name: 'gitlab', path: 'gitlab', archived: true) }
+      let!(:project) { projects.create!(namespace_id: namespace.id, name: 'gitlab', path: 'gitlab', archived: true) }
 
       it 'vulnerability dismissed_by_id should remain nil' do
         expect(vulnerability.dismissed_by_id).to eq(nil)
@@ -90,7 +89,7 @@ describe Gitlab::BackgroundMigration::UpdateVulnerabilitiesFromDismissalFeedback
     end
 
     context 'project is set to be deleted' do
-      let!(:project) { projects.create!(id: 123, namespace_id: namespace.id, name: 'gitlab', path: 'gitlab', pending_delete: true) }
+      let!(:project) { projects.create!(namespace_id: namespace.id, name: 'gitlab', path: 'gitlab', pending_delete: true) }
 
       it 'vulnerability dismissed_by_id should remain nil' do
         expect(vulnerability.dismissed_by_id).to eq(nil)
@@ -107,7 +106,7 @@ describe Gitlab::BackgroundMigration::UpdateVulnerabilitiesFromDismissalFeedback
   end
 
   context 'has not been dismissed' do
-    let!(:vulnerability) { vulnerabilities.create!(vuln_params.merge({state: 1})) }
+    let!(:vulnerability) { vulnerabilities.create!(vuln_params.merge({ state: 1 })) }
 
     it 'vulnerability should not have a dismissed_by_id' do
       expect(vulnerability.dismissed_by_id).to be_nil

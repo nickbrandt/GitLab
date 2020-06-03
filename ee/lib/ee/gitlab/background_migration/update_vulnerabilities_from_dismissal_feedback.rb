@@ -23,7 +23,6 @@ module EE
           return unless project
           return if project.archived? || project.pending_delete?
 
-          #binding.pry
           update_vulnerability_from_dismissal_feedback(project.id)
         end
 
