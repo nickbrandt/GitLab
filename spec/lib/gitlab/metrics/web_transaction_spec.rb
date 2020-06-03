@@ -5,10 +5,11 @@ require 'spec_helper'
 RSpec.describe Gitlab::Metrics::WebTransaction do
   let(:env) { {} }
   let(:transaction) { described_class.new(env) }
-  let(:prometheus_metric) { double("prometheus metric") }
+  let(:prometheus_metric) { instance_double(Prometheus::Client::Metric, base_labels: {}) }
 
   before do
-    allow(described_class).to receive(:transaction_metric).and_return(prometheus_metric)
+    allow(described_class).to receive(:prometheus_metric).and_return(prometheus_metric)
+    allow(transaction).to receive(:observe)
   end
 
   describe '#duration' do
@@ -50,22 +51,6 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
       method = transaction.method_call_for('Foo#bar', :Foo, '#bar')
 
       expect(method).to be_an_instance_of(Gitlab::Metrics::MethodCall)
-    end
-  end
-
-  describe '#increment' do
-    it 'increments a counter' do
-      expect(prometheus_metric).to receive(:increment).with({}, 1)
-
-      transaction.increment(:time, 1)
-    end
-  end
-
-  describe '#set' do
-    it 'sets a value' do
-      expect(prometheus_metric).to receive(:set).with({}, 10)
-
-      transaction.set(:number, 10)
     end
   end
 
@@ -144,6 +129,8 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
   end
 
   describe '#add_event' do
+    let(:prometheus_metric) { instance_double(Prometheus::Client::Counter, :increment, base_labels: {}) }
+
     it 'adds a metric' do
       expect(prometheus_metric).to receive(:increment)
 

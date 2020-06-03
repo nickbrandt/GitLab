@@ -9,9 +9,9 @@ RSpec.describe Gitlab::Metrics::Methods do
     let(:docstring) { 'description' }
     let(:metric_name) { :sample_metric }
 
-    describe "#define_#{metric_type}" do
+    describe "#define_metrics" do
       define_method(:call_define_metric_method) do |**args|
-        subject.__send__("define_#{metric_type}", metric_name, **args)
+        subject.__send__(:define_metric, metric_type, metric_name, **args)
       end
 
       context 'metrics access method not defined' do
@@ -55,11 +55,11 @@ RSpec.describe Gitlab::Metrics::Methods do
       end
     end
 
-    describe "#fetch_#{metric_type}" do
+    describe "#fetch_metric" do
       let(:null_metric) { Gitlab::Metrics::NullMetric.instance }
 
       define_method(:call_fetch_metric_method) do |**args|
-        subject.__send__("fetch_#{metric_type}", metric_name, **args)
+        subject.__send__(:fetch_metric, metric_type, metric_name, **args)
       end
 
       context "when #{metric_type} is not cached" do

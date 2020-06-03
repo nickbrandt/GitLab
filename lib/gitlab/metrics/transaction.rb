@@ -13,13 +13,31 @@ module Gitlab
 
       THREAD_KEY = :_gitlab_metrics_transaction
 
+      SMALL_BUCKETS = [0.1, 0.25, 0.5, 1.0, 2.5, 5.0].freeze
+      BIG_BUCKETS = [100, 1000, 10000, 100000, 1000000, 10000000].freeze
+
       # The series to store events (e.g. Git pushes) in.
       EVENT_SERIES = 'events'
 
       attr_reader :method
 
-      def self.current
-        Thread.current[THREAD_KEY]
+      class << self
+        def current
+          Thread.current[THREAD_KEY]
+        end
+
+        def prometheus_metric(name, type, &block)
+          fetch_metric(type, name) do
+            # set default metric options
+            docstring "#{name.to_s.humanize} #{type}"
+            multiprocess_mode :livesum if type == :gauge
+            buckets SMALL_BUCKETS if type == :histogram
+
+            evaluate(&block)
+            # always filter sensitive labels and merge with base ones
+            base_labels base_labels.without(*FILTERED_LABELS).merge(BASE_LABELS)
+          end
+        end
       end
 
       def initialize
@@ -56,9 +74,11 @@ module Gitlab
         @memory_after = System.memory_usage_rss
         @finished_at = System.monotonic_time
 
-        self.class.gitlab_transaction_cputime_seconds.observe(labels, thread_cpu_duration)
-        self.class.gitlab_transaction_duration_seconds.observe(labels, duration)
-        self.class.gitlab_transaction_allocated_memory_bytes.observe(labels, allocated_memory * 1024.0)
+        observe(:cputime_seconds, thread_cpu_duration)
+        observe(:duration_seconds, duration)
+        observe(:allocated_memory_bytes, allocated_memory * 1024.0) do
+          buckets BIG_BUCKETS
+        end
 
         Thread.current[THREAD_KEY] = nil
       end
@@ -71,8 +91,12 @@ module Gitlab
       # event_name - The name of the event (e.g. "git_push").
       # tags - A set of tags to attach to the event.
       def add_event(event_name, tags = {})
-        filtered_tags = filter_tags(tags)
-        self.class.transaction_metric(event_name, :counter, prefix: 'event_', tags: filtered_tags).increment(filtered_tags.merge(labels))
+        event_name = "gitlab_transaction_event_#{event_name}_total".to_sym
+        metric = self.class.prometheus_metric(event_name, :counter) do
+          base_labels tags
+        end
+
+        metric.increment(tags.without(*FILTERED_LABELS).merge(labels))
       end
 
       # Returns a MethodCall object for the given name.
@@ -84,52 +108,65 @@ module Gitlab
         method
       end
 
-      def increment(name, value, use_prometheus = true)
-        self.class.transaction_metric(name, :counter).increment(labels, value) if use_prometheus
+      # Increment counter metric
+      #
+      # It will initialize the metric if metric is not found
+      #
+      # block - if provided can be used to initialize metric with custom options (docstring, labels, with_feature)
+      #
+      # Example:
+      # ```
+      # transaction.increment(:mestric_name, 1, { docstring: 'Custom title', base_labels: {sane: 'yes'} } ) do
+      #
+      # transaction.increment(:mestric_name, 1) do
+      #   docstring 'Custom title'
+      #   base_labels { sane: 'yes' }
+      # end
+      # ```
+      def increment(name, value = 1, &block)
+        counter = self.class.prometheus_metric(name, :counter, &block)
+
+        counter.increment(counter.base_labels, value)
       end
 
-      def set(name, value, use_prometheus = true)
-        self.class.transaction_metric(name, :gauge).set(labels, value) if use_prometheus
+      # Set gauge metric
+      #
+      # It will initialize the metric if metric is not found
+      #
+      # block - if provided, it can be used to initialize metric with custom options (docstring, labels, with_feature, multiprocess_mode)
+      #
+      # Example:
+      # ```
+      # transaction.set(:mestric_name, 1) do
+      #   multiprocess_mode :all
+      # end
+      # ```
+      def set(name, value, &block)
+        gauge = self.class.prometheus_metric(name, :gauge, &block)
+
+        gauge.set(gauge.base_labels, value)
+      end
+
+      # Observe histogram metric
+      #
+      # It will initialize the metric if metric is not found
+      #
+      # block - if provided, it can be used to initialize metric with custom options (docstring, labels, with_feature, buckets)
+      #
+      # Example:
+      # ```
+      # transaction.observe(:mestric_name, 1) do
+      #   buckets [100, 1000, 10000, 100000, 1000000, 10000000]
+      # end
+      # ```
+      def observe(name, value, &block)
+        histogram = self.class.prometheus_metric(name, :histogram, &block)
+
+        histogram.observe(histogram.base_labels, value)
       end
 
       def labels
         BASE_LABELS
-      end
-
-      define_histogram :gitlab_transaction_cputime_seconds do
-        docstring 'Transaction thread cputime'
-        base_labels BASE_LABELS
-        buckets [0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
-      end
-
-      define_histogram :gitlab_transaction_duration_seconds do
-        docstring 'Transaction duration'
-        base_labels BASE_LABELS
-        buckets [0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
-      end
-
-      define_histogram :gitlab_transaction_allocated_memory_bytes do
-        docstring 'Transaction allocated memory bytes'
-        base_labels BASE_LABELS
-        buckets [100, 1000, 10000, 100000, 1000000, 10000000]
-      end
-
-      def self.transaction_metric(name, type, prefix: nil, tags: {})
-        metric_name = "gitlab_transaction_#{prefix}#{name}_total".to_sym
-        fetch_metric(type, metric_name) do
-          docstring "Transaction #{prefix}#{name} #{type}"
-          base_labels tags.merge(BASE_LABELS)
-
-          if type == :gauge
-            multiprocess_mode :livesum
-          end
-        end
-      end
-
-      private
-
-      def filter_tags(tags)
-        tags.without(*FILTERED_LABELS)
       end
     end
   end

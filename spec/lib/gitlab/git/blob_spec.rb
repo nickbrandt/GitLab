@@ -10,34 +10,64 @@ RSpec.describe Gitlab::Git::Blob, :seed_helper do
 
   describe 'initialize' do
     let(:blob) { Gitlab::Git::Blob.new(name: 'test') }
+    let(:transaction) { Gitlab::Metrics::WebTransaction.new( {} ) }
+
+    before do
+      allow(::Gitlab::Metrics::Transaction).to receive(:current).and_return(transaction)
+    end
 
     it 'handles nil data' do
-      expect(described_class).not_to receive(:gitlab_blob_size)
+      expect(blob).not_to receive(:record_metric_blob_size)
 
       expect(blob.name).to eq('test')
       expect(blob.size).to eq(nil)
       expect(blob.loaded_size).to eq(nil)
     end
 
-    it 'records blob size' do
-      expect(described_class).to receive(:gitlab_blob_size).and_call_original
+    context 'with size' do
+      let(:blob1) { Gitlab::Git::Blob.new(name: 'test', size: 4, data: 'abcd') }
 
-      Gitlab::Git::Blob.new(name: 'test', size: 4, data: 'abcd')
+      it 'observes gitlab_blob_size' do
+        expect(transaction)
+          .to receive(:observe).with(:gitlab_blob_size, a_kind_of(Numeric))
+
+        blob1
+      end
     end
 
     context 'when untruncated' do
-      it 'attempts to record gitlab_blob_truncated_false' do
-        expect(described_class).to receive(:gitlab_blob_truncated_false).and_call_original
+      let(:blob) { Gitlab::Git::Blob.new(name: 'test', size: 4, data: 'abcd') }
 
-        Gitlab::Git::Blob.new(name: 'test', size: 4, data: 'abcd')
+      it 'doesnt increment :gitlab_blob_truncated_true counter' do
+        expect(transaction)
+          .not_to receive(:increment).with(:gitlab_blob_truncated_true)
+
+        blob
+      end
+
+      it 'increment :gitlab_blob_truncated_false counter' do
+        expect(transaction)
+          .to receive(:increment).with(:gitlab_blob_truncated_false)
+
+        blob
       end
     end
 
     context 'when truncated' do
-      it 'attempts to record gitlab_blob_truncated_true' do
-        expect(described_class).to receive(:gitlab_blob_truncated_true).and_call_original
+      let(:blob) { Gitlab::Git::Blob.new(name: 'test', size: 40, data: 'abcd') }
 
-        Gitlab::Git::Blob.new(name: 'test', size: 40, data: 'abcd')
+      it 'increment :gitlab_blob_truncated_true counter' do
+        expect(transaction)
+          .to receive(:increment).with(:gitlab_blob_truncated_true)
+
+        blob
+      end
+
+      it 'doesnt increment :gitlab_blob_truncated_false counter' do
+        expect(transaction)
+          .not_to receive(:increment).with(:gitlab_blob_truncated_false)
+
+        blob
       end
     end
   end
@@ -636,20 +666,6 @@ RSpec.describe Gitlab::Git::Blob, :seed_helper do
       it 'returns false' do
         expect(untruncated_blob.truncated?).to be_falsey
       end
-    end
-  end
-
-  describe 'metrics' do
-    it 'defines :gitlab_blob_truncated_true counter' do
-      expect(described_class).to respond_to(:gitlab_blob_truncated_true)
-    end
-
-    it 'defines :gitlab_blob_truncated_false counter' do
-      expect(described_class).to respond_to(:gitlab_blob_truncated_false)
-    end
-
-    it 'defines :gitlab_blob_size histogram' do
-      expect(described_class).to respond_to(:gitlab_blob_size)
     end
   end
 
