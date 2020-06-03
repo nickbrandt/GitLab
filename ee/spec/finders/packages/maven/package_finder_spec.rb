@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe ::Packages::Maven::PackageFinder do
+RSpec.describe ::Packages::Maven::PackageFinder do
   let(:user)    { create(:user) }
   let(:group)   { create(:group) }
   let(:project) { create(:project, namespace: group) }

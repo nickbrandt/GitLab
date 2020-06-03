@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Tracings Content Security Policy' do
+RSpec.describe 'Tracings Content Security Policy' do
   let_it_be(:user) { create(:user) }
   let(:project) { create(:project) }
 

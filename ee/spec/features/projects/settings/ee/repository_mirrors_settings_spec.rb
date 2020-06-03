@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Project settings > [EE] repository' do
+RSpec.describe 'Project settings > [EE] repository' do
   include Select2Helper
 
   let(:user) { create(:user) }

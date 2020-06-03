@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Welcome screen', :js do
+RSpec.describe 'Welcome screen', :js do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
 

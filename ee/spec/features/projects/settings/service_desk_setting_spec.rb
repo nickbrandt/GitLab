@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Service Desk Setting', :js do
+RSpec.describe 'Service Desk Setting', :js do
   let(:project) { create(:project_empty_repo, :private, service_desk_enabled: false) }
   let(:presenter) { project.present(current_user: user) }
   let(:user) { create(:user) }

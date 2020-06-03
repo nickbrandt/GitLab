@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Packages::PackagesFinder do
+RSpec.describe ::Packages::PackagesFinder do
   let_it_be(:project) { create(:project) }
   let_it_be(:maven_package) { create(:maven_package, project: project, created_at: 2.days.ago, name: 'maven', version: '2.0.0') }
   let_it_be(:conan_package) { create(:conan_package, project: project, created_at: 1.day.ago, name: 'conan', version: '1.0.0') }

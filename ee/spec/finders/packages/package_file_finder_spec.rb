@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::PackageFileFinder do
+RSpec.describe Packages::PackageFileFinder do
   let_it_be(:package) { create(:maven_package) }
   let_it_be(:package_file) { package.package_files.first }
   let(:package_file_name) { package_file.file_name }

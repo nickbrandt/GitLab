@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::DesignUpdatedRecentlyFinder, :geo, :geo_fdw do
+RSpec.describe Geo::DesignUpdatedRecentlyFinder, :geo, :geo_fdw do
   include EE::GeoHelpers
 
   describe '#execute' do

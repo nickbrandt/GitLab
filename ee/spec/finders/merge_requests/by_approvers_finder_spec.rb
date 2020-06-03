@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::ByApproversFinder do
+RSpec.describe MergeRequests::ByApproversFinder do
   let(:group_user) { create(:user) }
   let(:second_group_user) { create(:user) }
   let(:group) do

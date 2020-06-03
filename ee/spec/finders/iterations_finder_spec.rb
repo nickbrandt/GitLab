@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe IterationsFinder do
+RSpec.describe IterationsFinder do
   let(:now) { Time.now }
   let_it_be(:group) { create(:group) }
   let_it_be(:project_1) { create(:project, namespace: group) }

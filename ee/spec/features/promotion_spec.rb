@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Promotions', :js do
+RSpec.describe 'Promotions', :js do
   let(:admin) { create(:admin) }
   let(:user) { create(:user) }
   let(:otherdeveloper) { create(:user, name: 'TheOtherDeveloper') }

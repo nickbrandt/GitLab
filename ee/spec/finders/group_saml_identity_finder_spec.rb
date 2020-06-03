@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GroupSamlIdentityFinder do
+RSpec.describe GroupSamlIdentityFinder do
   include Gitlab::Routing
 
   let(:user) { create(:user) }
