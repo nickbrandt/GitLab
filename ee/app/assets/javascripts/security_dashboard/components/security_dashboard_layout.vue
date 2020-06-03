@@ -1,15 +1,11 @@
 <script>
 export default {
-  stickyHeight: process.env.NODE_ENV === 'development' ? '75px' : '40px',
   computed: {
     hasHeaderSlot() {
       return Boolean(this.$slots.header);
     },
     hasStickySlot() {
       return Boolean(this.$slots.sticky);
-    },
-    stickyClasses() {
-      return this.hasStickySlot ? ['position-sticky', 'gl-z-index-2'] : [];
     },
     hasAsideSlot() {
       return Boolean(this.$slots.aside);
@@ -24,7 +20,7 @@ export default {
       <slot name="header"></slot>
     </header>
 
-    <section v-if="hasStickySlot" :class="stickyClasses" :style="{ top: $options.stickyHeight }">
+    <section v-if="hasStickySlot" class="position-sticky gl-z-index-2 security_dashboard_filters">
       <slot name="sticky"></slot>
     </section>
 

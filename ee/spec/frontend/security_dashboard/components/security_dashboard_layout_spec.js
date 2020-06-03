@@ -17,6 +17,7 @@ describe('Security Dashboard Layout component', () => {
   const findArticle = () => wrapper.find('article');
   const findHeader = () => wrapper.find('header');
   const findAside = () => wrapper.find('aside');
+  const findStickySection = () => wrapper.find('section');
 
   afterEach(() => {
     wrapper.destroy();
@@ -30,10 +31,11 @@ describe('Security Dashboard Layout component', () => {
     });
 
     it.each`
-      element      | exists
-      ${'article'} | ${true}
-      ${'header'}  | ${false}
-      ${'aside'}   | ${false}
+      element              | exists
+      ${'article'}         | ${true}
+      ${'header'}          | ${false}
+      ${'aside'}           | ${false}
+      ${'section section'} | ${false}
     `('should find that $element exists is $exists', ({ element, exists }) => {
       expect(wrapper.find(element).exists()).toBe(exists);
     });
@@ -60,10 +62,11 @@ describe('Security Dashboard Layout component', () => {
     });
 
     it.each`
-      element      | exists
-      ${'article'} | ${true}
-      ${'header'}  | ${true}
-      ${'aside'}   | ${false}
+      element              | exists
+      ${'article'}         | ${true}
+      ${'header'}          | ${true}
+      ${'aside'}           | ${false}
+      ${'section section'} | ${false}
     `('should find that $element exists is $exists', ({ element, exists }) => {
       expect(wrapper.find(element).exists()).toBe(exists);
     });
@@ -80,6 +83,36 @@ describe('Security Dashboard Layout component', () => {
       expect(header.find(DummyComponent).exists()).toBe(true);
     });
   });
+  describe('with the sticky section and main slots', () => {
+    beforeEach(() => {
+      createWrapper({
+        default: DummyComponent,
+        sticky: DummyComponent,
+      });
+    });
+
+    it.each`
+      element              | exists
+      ${'article'}         | ${true}
+      ${'header'}          | ${false}
+      ${'aside'}           | ${false}
+      ${'section section'} | ${true}
+    `('should find that $element exists is $exists', ({ element, exists }) => {
+      expect(wrapper.find(element).exists()).toBe(exists);
+    });
+
+    it('should render the dummy component in the main section', () => {
+      const article = findArticle();
+
+      expect(article.find(DummyComponent).exists()).toBe(true);
+    });
+
+    it('should render the dummy component in the sticky section', () => {
+      const section = findStickySection();
+
+      expect(section.find(DummyComponent).exists()).toBe(true);
+    });
+  });
 
   describe('with the aside and main slots', () => {
     beforeEach(() => {
@@ -90,10 +123,11 @@ describe('Security Dashboard Layout component', () => {
     });
 
     it.each`
-      element      | exists
-      ${'article'} | ${true}
-      ${'header'}  | ${false}
-      ${'aside'}   | ${true}
+      element              | exists
+      ${'article'}         | ${true}
+      ${'header'}          | ${false}
+      ${'aside'}           | ${true}
+      ${'section section'} | ${false}
     `('should find that $element exists is $exists', ({ element, exists }) => {
       expect(wrapper.find(element).exists()).toBe(exists);
     });
