@@ -1,5 +1,5 @@
 <script>
-import { GlBadge, GlButton, GlIcon } from '@gitlab/ui';
+import { GlBadge, GlIcon, GlNewDropdown, GlNewDropdownItem } from '@gitlab/ui';
 import dateFormat from 'dateformat';
 import { __ } from '~/locale';
 import query from '../queries/group_iteration.query.graphql';
@@ -7,8 +7,9 @@ import query from '../queries/group_iteration.query.graphql';
 export default {
   components: {
     GlBadge,
-    GlButton,
     GlIcon,
+    GlNewDropdown,
+    GlNewDropdownItem,
   },
   apollo: {
     iteration: {
@@ -41,6 +42,16 @@ export default {
       type: String,
       required: true,
     },
+    canEdit: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    editIterationPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -56,14 +67,14 @@ export default {
         case 'closed':
           return {
             text: __('Closed'),
-            style: 'danger',
+            variant: 'danger',
           };
         case 'expired':
-          return { text: __('Past due'), style: 'warning' };
+          return { text: __('Past due'), variant: 'warning' };
         case 'upcoming':
-          return { text: __('Upcoming'), style: 'secondary' };
+          return { text: __('Upcoming'), variant: 'neutral' };
         default:
-          return { text: __('Open'), style: 'success' };
+          return { text: __('Open'), variant: 'success' };
       }
     },
   },
@@ -79,9 +90,22 @@ export default {
         {{ status.text }}
       </gl-badge>
       <span class="gl-ml-4">{{ iteration.startDate | date }} – {{ iteration.dueDate | date }}</span>
-      <gl-button v-if="false" variant="link" class="gl-ml-auto gl-text-secondary">
-        <gl-icon name="ellipsis_v" />
-      </gl-button>
+      <gl-new-dropdown
+        v-if="canEdit"
+        variant="link"
+        toggle-class="gl-text-decoration-none gl-border-0! gl-shadow-none!"
+        class="gl-ml-auto gl-text-secondary"
+        right
+        no-caret
+      >
+        <template #button-content>
+          <gl-icon name="ellipsis_v" /><span class="sr-only">{{ __('Actions') }}</span>
+        </template>
+        <gl-new-dropdown-item :href="editIterationPath">{{
+          __('Edit iteration')
+        }}</gl-new-dropdown-item>
+        <gl-new-dropdown-item>{{ __('Delete iteration') }}</gl-new-dropdown-item>
+      </gl-new-dropdown>
     </div>
     <h3 class="page-title">{{ iteration.title }}</h3>
     <div v-html="iteration.description"></div>
