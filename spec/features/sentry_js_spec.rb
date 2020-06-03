@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'Sentry' do
-  let(:sentry_path) { '/sentry.chunk.js' }
+  let(:sentry_regex_path) { '\/sentry.*\.chunk\.js' }
 
   it 'does not load sentry if sentry is disabled' do
     allow(Gitlab.config.sentry).to receive(:enabled).and_return(false)
@@ -22,7 +22,7 @@ RSpec.describe 'Sentry' do
 
   def has_requested_sentry
     page.all('script', visible: false).one? do |elm|
-      elm[:src] =~ /#{sentry_path}$/
+      elm[:src] =~ /#{sentry_regex_path}$/
     end
   end
 end
