@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Sentry' do
+RSpec.describe 'Sentry' do
   let(:sentry_path) { '/sentry.chunk.js' }
 
   it 'does not load sentry if sentry is disabled' do
