@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['TestReport'] do
+RSpec.describe GitlabSchema.types['TestReport'] do
   fields = %i[id state pipeline author created_at]
 
   it { expect(described_class.graphql_name).to eq('TestReport') }

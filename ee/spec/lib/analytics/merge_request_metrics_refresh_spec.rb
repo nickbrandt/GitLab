@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Analytics::MergeRequestMetricsRefresh do
+RSpec.describe Analytics::MergeRequestMetricsRefresh do
   subject { calculator_class.new(merge_request) }
 
   let(:calculator_class) do

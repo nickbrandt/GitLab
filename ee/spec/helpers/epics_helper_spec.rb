@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicsHelper, type: :helper do
+RSpec.describe EpicsHelper, type: :helper do
   include ApplicationHelper
 
   describe '#epic_endpoint_query_params' do

@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe EE::IssuesHelper do
+RSpec.describe EE::IssuesHelper do
   let(:project) { create(:project) }
   let(:issue) { create :issue, project: project }
 

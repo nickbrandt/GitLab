@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SearchHelper do
+RSpec.describe SearchHelper do
   describe '#search_filter_input_options' do
     let(:options) { helper.search_filter_input_options(:issues) }
 

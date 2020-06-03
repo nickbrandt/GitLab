@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['Query'] do
+RSpec.describe GitlabSchema.types['Query'] do
   specify do
     expect(described_class).to have_graphql_fields(
       :geo_node,

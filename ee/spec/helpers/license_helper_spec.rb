@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe LicenseHelper do
+RSpec.describe LicenseHelper do
   def stub_default_url_options(host: "localhost", protocol: "http", port: nil, script_name: '')
     url_options = { host: host, protocol: protocol, port: port, script_name: script_name }
     allow(Rails.application.routes).to receive(:default_url_options).and_return(url_options)

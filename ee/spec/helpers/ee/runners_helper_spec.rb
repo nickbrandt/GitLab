@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe EE::RunnersHelper do
+RSpec.describe EE::RunnersHelper do
   let_it_be(:user) { create(:user) }
 
   before do

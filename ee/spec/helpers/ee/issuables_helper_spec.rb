@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe IssuablesHelper do
+RSpec.describe IssuablesHelper do
   let_it_be(:user) { create(:user) }
 
   describe '#issuable_initial_data' do

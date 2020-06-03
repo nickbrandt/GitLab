@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::IncidentsFinder do
+RSpec.describe StatusPage::IncidentsFinder do
   let_it_be(:project) { create(:project) }
 
   let_it_be(:issues) do

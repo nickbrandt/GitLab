@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::TodosHelper do
+RSpec.describe ::TodosHelper do
   describe '#todo_types_options' do
     it 'includes options for an epic todo' do
       expect(helper.todo_types_options).to include(

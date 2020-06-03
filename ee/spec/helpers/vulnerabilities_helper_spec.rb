@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe VulnerabilitiesHelper do
+RSpec.describe VulnerabilitiesHelper do
   let_it_be(:user) { build(:user) }
   let_it_be(:vulnerability) { create(:vulnerability, :with_findings, title: "My vulnerability") }
   let_it_be(:project) { vulnerability.project }

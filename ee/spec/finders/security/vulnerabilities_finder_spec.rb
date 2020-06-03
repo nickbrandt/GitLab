@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::VulnerabilitiesFinder do
+RSpec.describe Security::VulnerabilitiesFinder do
   let_it_be(:project) { create(:project) }
 
   let_it_be(:vulnerability1) do

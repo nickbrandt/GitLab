@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe LicenseMonitoringHelper do
+RSpec.describe LicenseMonitoringHelper do
   let_it_be(:admin) { create(:admin) }
   let_it_be(:user) { create(:user) }
   let_it_be(:license_seats_limit) { 10 }

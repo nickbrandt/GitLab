@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SubscriptionsHelper do
+RSpec.describe SubscriptionsHelper do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:raw_plan_data) do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProjectsHelper do
+RSpec.describe ProjectsHelper do
   let(:project) { create(:project) }
 
   before do

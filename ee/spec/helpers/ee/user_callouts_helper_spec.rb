@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe EE::UserCalloutsHelper do
+RSpec.describe EE::UserCalloutsHelper do
   describe '.render_enable_hashed_storage_warning' do
     context 'when we should show the enable warning' do
       it 'renders the enable warning' do

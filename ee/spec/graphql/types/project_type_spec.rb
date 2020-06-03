@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['Project'] do
+RSpec.describe GitlabSchema.types['Project'] do
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { create(:user) }
   let_it_be(:vulnerability) { create(:vulnerability, project: project, severity: :high) }
