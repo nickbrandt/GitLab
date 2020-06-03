@@ -193,7 +193,6 @@ export default {
 
       <gl-empty-state
         v-else
-        class="js-empty-state"
         :title="$options.emptyDashboardHeader"
         :svg-path="emptyDashboardSvgPath"
       >
