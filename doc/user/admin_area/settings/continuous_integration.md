@@ -143,6 +143,8 @@ Once that time passes, the jobs will be archived and no longer able to be
 retried. Make it empty to never expire jobs. It has to be no less than 1 day,
 for example: <code>15 days</code>, <code>1 month</code>, <code>2 years</code>.
 
+As of June 22, 2020 the [value is set](../../gitlab_com/index.md#gitlab-cicd) to 3 months on GitLab.com. Jobs created before that date will be archived after September 22, 2020.
+
 ## Default CI configuration path
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/18073) in GitLab 12.5.
