@@ -6,10 +6,6 @@ module QA
       module Project
         module Milestone
           class Show < ::QA::Page::Base
-            view 'ee/app/views/shared/milestones/_burndown.html.haml' do
-              element :burndown_chart
-            end
-
             view 'ee/app/views/shared/milestones/_weight.html.haml' do
               element :total_issue_weight_value
             end
