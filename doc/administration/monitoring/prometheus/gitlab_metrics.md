@@ -193,8 +193,6 @@ They all have these labels:
     1. `ActiveRecord::Base` is the main database connection.
     1. `Geo::TrackingBase` is the connection to the Geo tracking database, if
        enabled.
-    1. `Gitlab::Database::LoadBalancing::Host` is a connection used by [database
-       load balancing](../../database_load_balancing.md), if enabled.
 1. `host` - the host name used to connect to the database.
 1. `port` - the port used to connect to the database.
 
