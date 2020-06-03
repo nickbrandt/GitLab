@@ -6,8 +6,6 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      include UsageStatistics
-
       scope :issues, -> { where(target_type: 'Issue') }
       scope :merge_requests, -> { where(target_type: 'MergeRequest') }
       scope :totals_by_author, -> { group(:author_id).count }
