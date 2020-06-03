@@ -982,6 +982,16 @@ describe User do
             expect(experiment_user.ab_feature_enabled?(:discover_security)).to eq(true)
             expect(experiment_user.user_preference.feature_filter_type).to eq(UserPreference::FEATURE_FILTER_EXPERIMENT)
           end
+
+          it 'returns false if flipper returns nil for non-existing feature' do
+            # The following setup ensures that if the Feature interface changes
+            # it does not break any user-facing screens
+            allow(Feature).to receive(:get).with(:discover_security).and_return(nil)
+            allow(Feature).to receive(:enabled?).and_return(true)
+            allow(Feature).to receive(:get).with(:discover_security_control).and_return(nil)
+
+            expect(experiment_user.ab_feature_enabled?(:discover_security)).to eq(false)
+          end
         end
       end
     end
