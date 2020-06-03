@@ -29,9 +29,21 @@ module EE
           end
 
           def extracted_paths
-            return unless params[:actions]
+            return paths_from_actions_param if params[:actions]
+            return paths_from_sha_param if params[:sha]
+          end
 
-            params[:actions].flat_map { |entry| [entry[:file_path], entry[:previous_path]] }.compact.uniq
+          def paths_from_actions_param
+            params[:actions].flat_map do |entry|
+              [entry[:file_path], entry[:previous_path]]
+            end.compact.uniq
+          end
+
+          def paths_from_sha_param
+            commit = user_project.commit(params[:sha])
+            return unless commit
+
+            commit.raw_deltas.flat_map { |diff| [diff.new_path, diff.old_path] }.uniq
           end
         end
       end
