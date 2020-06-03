@@ -1327,18 +1327,17 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
 
     context 'backward compatibility when counters stored in separate columns' do
       describe '#projects_count' do
-        it 'counts the number of projects' do
+        it 'returns data from the deprecated field if it is not defined in the status field' do
           subject.write_attribute(:projects_count, 10)
           subject.status = {}
 
           expect(subject.projects_count).to eq 10
         end
 
-        it 'sets data in both ways, deprecated and the new one' do
+        it 'sets data in the new status field' do
           subject.projects_count = 10
 
           expect(subject.projects_count).to eq 10
-          expect(subject.read_attribute(:projects_count)).to eq 10
         end
 
         it 'uses column counters when calculates percents using attr_in_percentage' do
@@ -1356,6 +1355,14 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
         subject.status = { "projects_count" => "10" }
 
         expect(subject.projects_count).to eq 10
+      end
+    end
+
+    context 'status booleans are converted into booleans' do
+      it 'returns boolean value' do
+        subject.status = { "repositories_replication_enabled" => "true" }
+
+        expect(subject.repositories_replication_enabled).to eq true
       end
     end
   end
