@@ -91,10 +91,7 @@ describe('AlertManagementList', () => {
     });
   }
 
-  const mockStartedAtCol = {};
-
   beforeEach(() => {
-    jest.spyOn(document, 'querySelector').mockReturnValue(mockStartedAtCol);
     mountComponent();
   });
 
@@ -351,14 +348,6 @@ describe('AlertManagementList', () => {
       findSeverityColumnHeader().trigger('click');
 
       expect(wrapper.vm.$data.sort).toBe('SEVERITY_DESC');
-    });
-
-    it('updates the `ariaSort` attribute so the sort icon appears in the proper column', () => {
-      expect(mockStartedAtCol.ariaSort).toEqual('descending');
-
-      findSeverityColumnHeader().trigger('click');
-
-      expect(mockStartedAtCol.ariaSort).toEqual('none');
     });
   });
 
