@@ -32,17 +32,19 @@ exports[`dashboard should match the snapshot 1`] = `
     
     </h1>
      
-    <gl-deprecated-button-stub
-      class="js-add-projects-button btn btn-success"
+    <gl-button-stub
+      category="tertiary"
+      class="js-add-projects-button"
+      icon=""
       role="button"
-      size="md"
+      size="medium"
       tabindex="0"
-      variant="secondary"
+      variant="success"
     >
       
       Add projects
     
-    </gl-deprecated-button-stub>
+    </gl-button-stub>
   </div>
    
   <p
@@ -63,51 +65,10 @@ exports[`dashboard should match the snapshot 1`] = `
   <div
     class="prepend-top-default"
   >
-    <div
-      class="row prepend-top-20 text-center"
-    >
-      <div
-        class="col-12 d-flex justify-content-center svg-content"
-      >
-        <img
-          class="js-empty-state-svg col-12 prepend-top-20"
-          src="/assets/illustrations/operations-dashboard_empty.svg"
-        />
-      </div>
-       
-      <h4
-        class="js-title col-12 prepend-top-20"
-      >
-        
-        Add a project to the dashboard
-      
-      </h4>
-       
-      <div
-        class="col-12 d-flex justify-content-center"
-      >
-        <span
-          class="js-sub-title mw-460 text-tertiary text-left"
-        >
-          
-          The environments dashboard provides a summary of each project's environments' status, including pipeline and alert statuses.
-        
-        </span>
-      </div>
-       
-      <div
-        class="col-12"
-      >
-        <a
-          class="js-documentation-link btn btn-primary prepend-top-default append-bottom-default"
-          href="/help/user/operations_dashboard/index.html"
-        >
-          
-          View documentation
-        
-        </a>
-      </div>
-    </div>
+    <gl-empty-state-stub
+      svgpath="/assets/illustrations/operations-dashboard_empty.svg"
+      title="Add a project to the dashboard"
+    />
   </div>
 </div>
 `;
