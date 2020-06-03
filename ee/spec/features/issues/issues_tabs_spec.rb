@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Issue page tabs', :js do
+RSpec.describe 'Issue page tabs', :js do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public) }
   let(:issue) { create(:issue, author: user, assignees: [user], project: project) }

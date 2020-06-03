@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Groups > Audit Events', :js do
+RSpec.describe 'Groups > Audit Events', :js do
   let(:user) { create(:user) }
   let(:pete) { create(:user, name: 'Pete') }
   let(:group) { create(:group) }

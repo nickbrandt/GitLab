@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'User views all merge requests' do
+RSpec.describe 'User views all merge requests' do
   let!(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
   let(:project) { create(:project, :public, approvals_before_merge: 1) }
   let(:user) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'admin Geo Nodes', :js, :geo do
+RSpec.describe 'admin Geo Nodes', :js, :geo do
   let!(:geo_node) { create(:geo_node) }
 
   def expect_fields(node_fields)

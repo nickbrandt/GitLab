@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Group iterations' do
+RSpec.describe 'Group iterations' do
   let_it_be(:title_selector) { 'iteration-title' }
   let_it_be(:description_selector) { '#iteration-description' }
   let_it_be(:start_date_selector) { '#iteration-start-date' }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Operations dropdown navbar EE' do
+RSpec.describe 'Operations dropdown navbar EE' do
   let(:user) { create(:user) }
   let(:project) { create(:project) }
 

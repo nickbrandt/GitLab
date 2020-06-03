@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Group navbar' do
+RSpec.describe 'Group navbar' do
   include NavbarStructureHelper
   include WaitForRequests
 

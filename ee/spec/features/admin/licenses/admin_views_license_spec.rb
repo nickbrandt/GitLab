@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe "Admin views license" do
+RSpec.describe "Admin views license" do
   let_it_be(:admin) { create(:admin) }
 
   before do

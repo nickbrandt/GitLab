@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'admin Geo Uploads', :js, :geo do
+RSpec.describe 'admin Geo Uploads', :js, :geo do
   let!(:geo_node) { create(:geo_node) }
   let!(:synced_registry) { create(:geo_upload_registry, :with_file, :attachment, success: true) }
 

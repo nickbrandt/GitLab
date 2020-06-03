@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'GFM autocomplete', :js do
+RSpec.describe 'GFM autocomplete', :js do
   let(:user) { create(:user, name: '💃speciąl someone💃', username: 'someone.special') }
   let(:group) { create(:group) }
   let(:label) { create(:group_label, group: group, title: 'special+') }

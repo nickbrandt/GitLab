@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Cluster Health board', :js, :kubeclient, :use_clean_rails_memory_store_caching, :sidekiq_inline do
+RSpec.describe 'Cluster Health board', :js, :kubeclient, :use_clean_rails_memory_store_caching, :sidekiq_inline do
   include KubernetesHelpers
   include PrometheusHelpers
 

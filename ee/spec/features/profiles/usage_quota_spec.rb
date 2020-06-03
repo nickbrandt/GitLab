@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Profile > Usage Quota' do
+RSpec.describe 'Profile > Usage Quota' do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:user, reload: true) { create(:user) }

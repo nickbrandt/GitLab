@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'CodeReviewAnalytics Filtered Search', :js do
+RSpec.describe 'CodeReviewAnalytics Filtered Search', :js do
   include FilteredSearchHelpers
 
   let(:user) { create(:user) }

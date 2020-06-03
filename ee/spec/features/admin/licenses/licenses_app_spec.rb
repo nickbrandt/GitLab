@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe "Licenses app", :js do
+RSpec.describe "Licenses app", :js do
   let(:admin) { create(:admin) }
   let!(:licenses) do
     [

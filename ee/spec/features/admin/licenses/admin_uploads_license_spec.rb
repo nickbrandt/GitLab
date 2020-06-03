@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe "Admin uploads license" do
+RSpec.describe "Admin uploads license" do
   let_it_be(:admin) { create(:admin) }
 
   before do

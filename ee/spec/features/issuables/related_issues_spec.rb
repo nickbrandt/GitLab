@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Related issues', :js do
+RSpec.describe 'Related issues', :js do
   let(:user) { create(:user) }
   let(:project) { create(:project_empty_repo, :public) }
   let(:project_b) { create(:project_empty_repo, :public) }

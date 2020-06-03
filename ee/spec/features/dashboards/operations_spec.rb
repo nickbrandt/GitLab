@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Dashboard operations', :js do
+RSpec.describe 'Dashboard operations', :js do
   it 'displays information about the last pipeline to an authenticated developer on the project' do
     stub_licensed_features(operations_dashboard: true)
     user = create(:user)

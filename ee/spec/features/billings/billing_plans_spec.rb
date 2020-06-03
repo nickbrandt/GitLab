@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Billing plan pages', :feature do
+RSpec.describe 'Billing plan pages', :feature do
   include StubRequests
 
   let(:user) { create(:user) }

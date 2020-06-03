@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'User Onboarding' do
+RSpec.describe 'User Onboarding' do
   include MobileHelpers
 
   let(:user) { create(:user) }

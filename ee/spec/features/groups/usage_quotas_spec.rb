@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Groups > Usage Quotas' do
+RSpec.describe 'Groups > Usage Quotas' do
   let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
   let!(:project) { create(:project, namespace: group, shared_runners_enabled: true) }

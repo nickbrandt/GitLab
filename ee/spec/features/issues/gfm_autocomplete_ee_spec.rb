@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'GFM autocomplete EE', :js do
+RSpec.describe 'GFM autocomplete EE', :js do
   let(:user) { create(:user, name: '💃speciąl someone💃', username: 'someone.special') }
   let(:another_user) { create(:user, name: 'another user', username: 'another.user') }
   let(:project) { create(:project) }

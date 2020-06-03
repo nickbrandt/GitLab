@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Group Dependency Proxy' do
+RSpec.describe 'Group Dependency Proxy' do
   let(:developer) { create(:user) }
   let(:reporter) { create(:user) }
   let(:group) { create(:group) }
