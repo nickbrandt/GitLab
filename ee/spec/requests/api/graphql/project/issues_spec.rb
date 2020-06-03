@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'getting an issue list for a project' do
+RSpec.describe 'getting an issue list for a project' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Creating an Iteration' do
+RSpec.describe 'Creating an Iteration' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }

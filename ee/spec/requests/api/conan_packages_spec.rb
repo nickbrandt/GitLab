@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::ConanPackages do
+RSpec.describe API::ConanPackages do
   include WorkhorseHelpers
   include EE::PackagesManagerApiSpecHelpers
 

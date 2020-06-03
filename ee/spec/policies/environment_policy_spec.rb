@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe EnvironmentPolicy do
+RSpec.describe EnvironmentPolicy do
   using RSpec::Parameterized::TableSyntax
 
   let(:project) { create(:project, :repository) }

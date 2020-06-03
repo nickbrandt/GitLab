@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Add an issue to an Epic' do
+RSpec.describe 'Add an issue to an Epic' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }

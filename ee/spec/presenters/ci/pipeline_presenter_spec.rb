@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::PipelinePresenter do
+RSpec.describe Ci::PipelinePresenter do
   let_it_be(:project, reload: true) { create(:project) }
   let_it_be(:pipeline, reload: true) { create(:ee_ci_pipeline, project: project) }
 

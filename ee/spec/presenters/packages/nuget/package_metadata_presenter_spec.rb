@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::PackageMetadataPresenter do
+RSpec.describe Packages::Nuget::PackageMetadataPresenter do
   let_it_be(:package) { create(:nuget_package, :with_metadatum) }
   let_it_be(:tag1) { create(:packages_tag, name: 'tag1', package: package) }
   let_it_be(:tag2) { create(:packages_tag, name: 'tag2', package: package) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::EpicLinks do
+RSpec.describe API::EpicLinks do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:epic) { create(:epic, group: group) }

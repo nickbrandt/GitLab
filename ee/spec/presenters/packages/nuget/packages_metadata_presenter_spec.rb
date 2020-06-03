@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::PackagesMetadataPresenter do
+RSpec.describe Packages::Nuget::PackagesMetadataPresenter do
   let_it_be(:packages) { create_list(:nuget_package, 5, :with_metadatum, name: 'Dummy.Package') }
   let_it_be(:presenter) { described_class.new(packages) }
 

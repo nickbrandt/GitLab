@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::Scan do
+RSpec.describe Security::Scan do
   describe 'associations' do
     it { is_expected.to belong_to(:build) }
     it { is_expected.to have_one(:pipeline).through(:build).class_name('Ci::Pipeline') }

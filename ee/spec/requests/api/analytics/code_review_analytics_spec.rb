@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Analytics::CodeReviewAnalytics do
+RSpec.describe API::Analytics::CodeReviewAnalytics do
   let_it_be(:group) { create(:group, :private) }
   let_it_be(:project) { create(:project, namespace: group) }
   let(:current_user) { reporter }

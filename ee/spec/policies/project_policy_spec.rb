@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProjectPolicy do
+RSpec.describe ProjectPolicy do
   include ExternalAuthorizationServiceHelpers
   include AdminModeHelper
 

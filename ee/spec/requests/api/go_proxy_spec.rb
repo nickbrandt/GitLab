@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::GoProxy do
+RSpec.describe API::GoProxy do
   include EE::PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create :user }

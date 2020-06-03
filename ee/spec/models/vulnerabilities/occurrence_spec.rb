@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::Occurrence do
+RSpec.describe Vulnerabilities::Occurrence do
   it { is_expected.to define_enum_for(:confidence) }
   it { is_expected.to define_enum_for(:report_type) }
   it { is_expected.to define_enum_for(:severity) }

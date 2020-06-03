@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequestPolicy do
+RSpec.describe MergeRequestPolicy do
   include ProjectForksHelper
 
   let_it_be(:guest) { create(:user) }

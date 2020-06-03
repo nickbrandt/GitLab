@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::Export do
+RSpec.describe Vulnerabilities::Export do
   it { is_expected.to define_enum_for(:format) }
 
   describe 'associations' do

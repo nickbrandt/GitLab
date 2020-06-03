@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AuditEventPresenter do
+RSpec.describe AuditEventPresenter do
   include Gitlab::Routing.url_helpers
 
   let(:details) do

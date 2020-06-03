@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::IssueLink do
+RSpec.describe Vulnerabilities::IssueLink do
   describe 'associations and fields' do
     it { is_expected.to belong_to(:vulnerability) }
     it { is_expected.to belong_to(:issue) }

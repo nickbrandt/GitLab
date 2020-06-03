@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::SearchResultsPresenter do
+RSpec.describe Packages::Nuget::SearchResultsPresenter do
   let_it_be(:project) { create(:project) }
   let_it_be(:package_a) { create(:nuget_package, :with_metadatum, project: project, name: 'DummyPackageA') }
   let_it_be(:tag1) { create(:packages_tag, package: package_a, name: 'tag1') }
