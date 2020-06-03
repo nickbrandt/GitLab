@@ -19361,6 +19361,9 @@ msgstr ""
 msgid "SecurityReports|Status"
 msgstr ""
 
+msgid "SecurityReports|The rating \"unknown\" indicates that the underlying scanner doesn’t contain or provide a severity rating."
+msgstr ""
+
 msgid "SecurityReports|The security dashboard displays the latest security findings for projects you wish to monitor. Select \"Edit dashboard\" to add and remove projects."
 msgstr ""
 
