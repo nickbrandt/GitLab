@@ -2,8 +2,11 @@ import { mount } from '@vue/test-utils';
 import createStore from 'ee/threat_monitoring/store';
 import NetworkPolicyList from 'ee/threat_monitoring/components/network_policy_list.vue';
 import { GlTable } from '@gitlab/ui';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { mockPoliciesResponse } from '../mock_data';
+
+const mockData = mockPoliciesResponse.map(policy => convertObjectPropsToCamelCase(policy));
 
 describe('NetworkPolicyList component', () => {
   let store;
@@ -13,7 +16,7 @@ describe('NetworkPolicyList component', () => {
     store = createStore();
     Object.assign(store.state.networkPolicies, {
       isLoadingPolicies: false,
-      policies: mockPoliciesResponse,
+      policies: mockData,
       ...state,
     });
 
@@ -34,6 +37,7 @@ describe('NetworkPolicyList component', () => {
   const findTableEmptyState = () => wrapper.find({ ref: 'tableEmptyState' });
   const findEditorDrawer = () => wrapper.find({ ref: 'editorDrawer' });
   const findPolicyEditor = () => wrapper.find({ ref: 'policyEditor' });
+  const findPolicyToggle = () => wrapper.find('[data-testid="policyToggle"]');
   const findApplyButton = () => wrapper.find({ ref: 'applyButton' });
   const findCancelButton = () => wrapper.find({ ref: 'cancelButton' });
   const findAutodevopsAlert = () => wrapper.find('[data-testid="autodevopsAlert"]');
@@ -82,7 +86,8 @@ describe('NetworkPolicyList component', () => {
       factory({
         data: () => ({
           selectedPolicyName: 'policy',
-          initialManifest: mockPoliciesResponse[0].manifest,
+          initialManifest: mockData[0].manifest,
+          initialEnforcementStatus: mockData[0].isEnabled,
         }),
       });
     });
@@ -96,7 +101,13 @@ describe('NetworkPolicyList component', () => {
     it('renders network policy editor with manifest', () => {
       const policyEditor = findPolicyEditor();
       expect(policyEditor.exists()).toBe(true);
-      expect(policyEditor.props('value')).toBe(mockPoliciesResponse[0].manifest);
+      expect(policyEditor.props('value')).toBe(mockData[0].manifest);
+    });
+
+    it('renders network policy toggle', () => {
+      const policyToggle = findPolicyToggle();
+      expect(policyToggle.exists()).toBe(true);
+      expect(policyToggle.props('value')).toBe(mockData[0].isEnabled);
     });
 
     it('renders disabled apply button', () => {
@@ -133,8 +144,20 @@ describe('NetworkPolicyList component', () => {
 
         expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/updatePolicy', {
           environmentId: -1,
-          policy: mockPoliciesResponse[0],
+          policy: mockData[0],
         });
+      });
+    });
+
+    describe('given there is a policy enforcement status change', () => {
+      beforeEach(() => {
+        findPolicyToggle().vm.$emit('change', false);
+      });
+
+      it('renders enabled apply button', () => {
+        const applyButton = findApplyButton();
+        expect(applyButton.exists()).toBe(true);
+        expect(applyButton.props('disabled')).toBe(false);
       });
     });
   });
