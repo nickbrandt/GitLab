@@ -15,6 +15,10 @@ class BuildkiteService < CiService
 
   after_save :compose_service_hook, if: :activated?
 
+  def self.supported_events
+    %w(push merge_request tag_push)
+  end
+
   def webhook_url
     "#{buildkite_endpoint('webhook')}/deliver/#{webhook_token}"
   end
@@ -22,7 +26,7 @@ class BuildkiteService < CiService
   def compose_service_hook
     hook = service_hook || build_service_hook
     hook.url = webhook_url
-    hook.enable_ssl_verification = !!enable_ssl_verification
+    hook.enable_ssl_verification = true
     hook.save
   end
 
@@ -49,7 +53,7 @@ class BuildkiteService < CiService
   end
 
   def description
-    'Continuous integration and deployments'
+    'Buildkite is a platform for running fast, secure, and scalable continuous integration pipelines on your own infrastructure'
   end
 
   def self.to_param
@@ -60,15 +64,15 @@ class BuildkiteService < CiService
     [
       { type: 'text',
         name: 'token',
-        placeholder: 'Buildkite project GitLab token', required: true },
+        title: 'Integration Token',
+        help: 'This token will be provided when you create a Buildkite pipeline with a GitLab repository',
+        required: true },
 
       { type: 'text',
         name: 'project_url',
-        placeholder: "#{ENDPOINT}/example/project", required: true },
-
-      { type: 'checkbox',
-        name: 'enable_ssl_verification',
-        title: "Enable SSL verification" }
+        title: 'Pipeline URL',
+        placeholder: "#{ENDPOINT}/acme-inc/test-pipeline",
+        required: true }
     ]
   end
 
