@@ -484,7 +484,7 @@ RSpec.describe API::MavenPackages do
   end
 
   describe 'PUT /api/v4/projects/:id/packages/maven/*path/:file_name' do
-    let(:file_upload) { fixture_file_upload('ee/spec/fixtures/maven/my-app-1.0-20180724.124855-1.jar') }
+    let(:file_upload) { fixture_file_upload('spec/fixtures/packages/maven/my-app-1.0-20180724.124855-1.jar') }
 
     before do
       # by configuring this path we allow to pass temp file from any path
