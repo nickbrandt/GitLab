@@ -92,7 +92,7 @@ export default {
       <span class="gl-ml-4">{{ iteration.startDate | date }} – {{ iteration.dueDate | date }}</span>
       <gl-new-dropdown
         v-if="canEdit"
-        variant="link"
+        variant="default"
         toggle-class="gl-text-decoration-none gl-border-0! gl-shadow-none!"
         class="gl-ml-auto gl-text-secondary"
         right
@@ -104,7 +104,9 @@ export default {
         <gl-new-dropdown-item :href="editIterationPath">{{
           __('Edit iteration')
         }}</gl-new-dropdown-item>
-        <gl-new-dropdown-item>{{ __('Delete iteration') }}</gl-new-dropdown-item>
+        <gl-new-dropdown-item
+          ><span class="text-danger">{{ __('Delete iteration') }}</span></gl-new-dropdown-item
+        >
       </gl-new-dropdown>
     </div>
     <h3 class="page-title">{{ iteration.title }}</h3>

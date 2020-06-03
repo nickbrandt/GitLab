@@ -3,9 +3,11 @@
 class Groups::IterationsController < Groups::ApplicationController
   before_action :check_iterations_available!
   before_action :authorize_show_iteration!, only: [:index, :show]
-  before_action :authorize_create_iteration!, only: :new
+  before_action :authorize_create_iteration!, only: [:new, :edit]
 
   def index; end
+  
+  def edit; end
 
   def show; end
 
