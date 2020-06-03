@@ -79,7 +79,6 @@ module QA
     autoload :User, 'qa/resource/user'
     autoload :ProjectMilestone, 'qa/resource/project_milestone'
     autoload :Members, 'qa/resource/members'
-    autoload :Wiki, 'qa/resource/wiki'
     autoload :File, 'qa/resource/file'
     autoload :Fork, 'qa/resource/fork'
     autoload :SSHKey, 'qa/resource/ssh_key'
@@ -110,6 +109,10 @@ module QA
 
     module Settings
       autoload :HashedStorage, 'qa/resource/settings/hashed_storage'
+    end
+
+    module Wiki
+      autoload :ProjectPage, 'qa/resource/wiki/project_page'
     end
   end
 
@@ -326,7 +329,6 @@ module QA
 
       module Wiki
         autoload :Edit, 'qa/page/project/wiki/edit'
-        autoload :New, 'qa/page/project/wiki/new'
         autoload :Show, 'qa/page/project/wiki/show'
         autoload :GitAccess, 'qa/page/project/wiki/git_access'
       end

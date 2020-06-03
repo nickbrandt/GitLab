@@ -25,17 +25,17 @@ module QA
               project.description = 'Geo project for wiki ssh spec'
             end
 
-            wiki = Resource::Wiki.fabricate! do |wiki|
+            wiki = Resource::Wiki::ProjectPage.fabricate_via_api! do |wiki|
               wiki.project = project
               wiki.title = wiki_title
               wiki.content = wiki_content
-              wiki.message = 'First commit'
             end
 
+            wiki.visit!
             validate_content(wiki_content)
 
             # Perform a git push over SSH directly to the primary
-            Resource::Repository::WikiPush.fabricate! do |push|
+            pushed_wiki = Resource::Repository::WikiPush.fabricate! do |push|
               push.ssh_key = key
               push.wiki = wiki
               push.file_name = 'Home.md'
@@ -43,7 +43,7 @@ module QA
               push.commit_message = 'Update Home.md'
             end
 
-            Page::Project::Menu.perform(&:click_wiki)
+            pushed_wiki.visit!
             validate_content(push_content)
           end
 
@@ -85,7 +85,7 @@ module QA
 
       def validate_content(content)
         Page::Project::Wiki::Show.perform do |show|
-          expect(show.wiki_text).to have_content(content)
+          expect(show).to have_content(content)
         end
       end
     end

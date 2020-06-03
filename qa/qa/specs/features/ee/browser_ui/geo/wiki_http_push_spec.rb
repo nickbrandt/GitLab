@@ -17,23 +17,23 @@ module QA
               project.description = 'Geo project for wiki repo test'
             end
 
-            wiki = Resource::Wiki.fabricate! do |wiki|
+            wiki = Resource::Wiki::ProjectPage.fabricate_via_api! do |wiki|
               wiki.project = project
               wiki.title = wiki_title
               wiki.content = wiki_content
-              wiki.message = 'First commit'
             end
 
+            wiki.visit!
             expect(page).to have_content(wiki_content)
 
-            Resource::Repository::WikiPush.fabricate! do |push|
+            push = Resource::Repository::WikiPush.fabricate! do |push|
               push.wiki = wiki
               push.file_name = 'Home.md'
               push.file_content = push_content
               push.commit_message = 'Update Home.md'
             end
 
-            Page::Project::Menu.perform(&:click_wiki)
+            push.visit!
             expect(page).to have_content(push_content)
           end
 
@@ -57,8 +57,7 @@ module QA
             Page::Project::Menu.perform(&:click_wiki)
 
             Page::Project::Wiki::Show.perform do |show|
-              expect(page).to have_content(wiki_title)
-              expect(page).to have_content(push_content)
+              expect(show).to have_content(push_content)
             end
           end
         end

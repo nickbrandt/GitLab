@@ -24,13 +24,13 @@ module QA
             project.description = 'Geo project for wiki ssh spec'
           end
 
-          wiki = Resource::Wiki.fabricate! do |wiki|
+          wiki = Resource::Wiki::ProjectPage.fabricate_via_api! do |wiki|
             wiki.project = project
             wiki.title = wiki_title
             wiki.content = wiki_content
-            wiki.message = 'First commit'
           end
 
+          wiki.visit!
           validate_content(wiki_content)
         end
       end
@@ -85,11 +85,10 @@ module QA
           # Remove ssh:// from the URI to ensure we can match accurately
           # as ssh:// can appear depending on how GitLab is configured.
           ssh_uri = wiki.repository_ssh_location.git_uri.to_s.gsub(%r{ssh://}, '')
-
           expect(push.output).to match(%r{This request to a Geo secondary node will be forwarded to the.*Geo primary node:.*#{ssh_uri}}m)
 
           # Validate git push worked and new content is visible
-          Page::Project::Menu.perform(&:click_wiki)
+          push.visit!
 
           Page::Project::Wiki::Show.perform do |show|
             show.wait_for_repository_replication_with(push_content)
@@ -102,7 +101,7 @@ module QA
 
       def validate_content(content)
         Page::Project::Wiki::Show.perform do |show|
-          expect(show.wiki_text).to have_content(content)
+          expect(show).to have_content(content)
         end
       end
     end
