@@ -1,3 +1,10 @@
+---
+stage: Create
+group: Gitaly
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+type: reference
+---
+
 # Gitaly
 
 [Gitaly](https://gitlab.com/gitlab-org/gitaly) is the service that
