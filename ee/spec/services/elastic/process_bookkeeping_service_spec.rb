@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Elastic::ProcessBookkeepingService, :clean_gitlab_redis_shared_state do
+RSpec.describe Elastic::ProcessBookkeepingService, :clean_gitlab_redis_shared_state do
   around do |example|
     described_class.with_redis do |redis|
       @redis = redis

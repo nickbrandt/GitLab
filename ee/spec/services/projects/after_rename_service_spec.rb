@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::AfterRenameService do
+RSpec.describe Projects::AfterRenameService do
   include EE::GeoHelpers
 
   describe '#execute' do

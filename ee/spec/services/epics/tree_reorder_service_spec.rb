@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Epics::TreeReorderService do
+RSpec.describe Epics::TreeReorderService do
   describe '#execute' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }

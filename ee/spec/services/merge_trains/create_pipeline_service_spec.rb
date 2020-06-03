@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeTrains::CreatePipelineService do
+RSpec.describe MergeTrains::CreatePipelineService do
   let(:project) { create(:project, :repository, :auto_devops) }
   let_it_be(:maintainer) { create(:user) }
   let(:service) { described_class.new(project, maintainer) }

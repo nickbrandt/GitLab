@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Maven::FindOrCreatePackageService do
+RSpec.describe Packages::Maven::FindOrCreatePackageService do
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { create(:user) }
   let_it_be(:app_name) { 'my-app' }

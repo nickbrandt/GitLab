@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe IssueLinks::CreateService do
+RSpec.describe IssueLinks::CreateService do
   describe '#execute' do
     let(:namespace) { create :namespace }
     let(:project) { create :project, namespace: namespace }

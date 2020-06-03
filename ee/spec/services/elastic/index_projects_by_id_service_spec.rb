@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Elastic::IndexProjectsByIdService do
+RSpec.describe Elastic::IndexProjectsByIdService do
   describe '#execute' do
     it 'schedules index workers' do
       Sidekiq::Testing.fake! do

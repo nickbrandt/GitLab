@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::UpdateService, '#execute' do
+RSpec.describe Groups::UpdateService, '#execute' do
   let!(:user) { create(:user) }
   let!(:group) { create(:group, :public) }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::MetadataExtractionService do
+RSpec.describe Packages::Nuget::MetadataExtractionService do
   let(:package_file) { create(:nuget_package).package_files.first }
   let(:service) { described_class.new(package_file.id) }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe IssueLinks::DestroyService do
+RSpec.describe IssueLinks::DestroyService do
   describe '#execute' do
     let(:project) { create(:project) }
     let(:user) { create(:user) }

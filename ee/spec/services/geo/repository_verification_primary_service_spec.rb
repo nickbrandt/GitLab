@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::RepositoryVerificationPrimaryService do
+RSpec.describe Geo::RepositoryVerificationPrimaryService do
   include EE::GeoHelpers
 
   let(:project) { create(:project) }

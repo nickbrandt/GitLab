@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Elastic::MetricsUpdateService, :prometheus do
+RSpec.describe Elastic::MetricsUpdateService, :prometheus do
   subject { described_class.new }
 
   before do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe FeatureFlags::DisableService do
+RSpec.describe FeatureFlags::DisableService do
   include FeatureFlagHelpers
 
   let_it_be(:user) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Epics::DescendantCountService do
+RSpec.describe Epics::DescendantCountService do
   let_it_be(:group) { create(:group, :public)}
   let_it_be(:subgroup) { create(:group, :private, parent: group)}
   let_it_be(:user) { create(:user) }

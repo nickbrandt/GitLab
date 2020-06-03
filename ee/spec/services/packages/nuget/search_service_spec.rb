@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Nuget::SearchService do
+RSpec.describe Packages::Nuget::SearchService do
   let_it_be(:project) { create(:project) }
   let_it_be(:package_a) { create(:nuget_package, project: project, name: 'DummyPackageA') }
   let_it_be(:packages_b) { create_list(:nuget_package, 5, project: project, name: 'DummyPackageB') }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Npm::CreatePackageService do
+RSpec.describe Packages::Npm::CreatePackageService do
   let(:namespace) {create(:namespace)}
   let(:project) { create(:project, namespace: namespace) }
   let(:user) { create(:user) }

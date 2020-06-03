@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::FileDownloadService do
+RSpec.describe Geo::FileDownloadService do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 

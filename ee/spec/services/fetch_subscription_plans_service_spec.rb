@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe FetchSubscriptionPlansService do
+RSpec.describe FetchSubscriptionPlansService do
   describe '#execute' do
     let(:endpoint_url) { 'https://customers.gitlab.com/gitlab_plans' }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe NetworkPolicies::ResourcesService do
+RSpec.describe NetworkPolicies::ResourcesService do
   let(:service) { NetworkPolicies::ResourcesService.new(environment: environment) }
   let(:environment) { instance_double('Environment', deployment_platform: platform, deployment_namespace: 'namespace') }
   let(:platform) { instance_double('Clusters::Platforms::Kubernetes', kubeclient: kubeclient) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe FeatureFlags::UpdateService do
+RSpec.describe FeatureFlags::UpdateService do
   let(:project) { create(:project) }
   let(:developer) { create(:user) }
   let(:reporter) { create(:user) }

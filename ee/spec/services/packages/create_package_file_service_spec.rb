@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::CreatePackageFileService do
+RSpec.describe Packages::CreatePackageFileService do
   let(:package) { create(:maven_package) }
 
   describe '#execute' do
