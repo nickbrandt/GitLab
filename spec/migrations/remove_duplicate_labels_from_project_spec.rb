@@ -92,15 +92,15 @@ describe RemoveDuplicateLabelsFromProject do
       end
 
       it 'restores removed records on rollback' do
-        second_label_attributes = second_label.attributes
-        fourth_label_attributes = fourth_label.attributes
+        second_label_attributes = modified_attributes(second_label)
+        fourth_label_attributes = modified_attributes(fourth_label)
 
         migration.up
 
         migration.down
 
-        expect(second_label.attributes).to match(second_label_attributes)
-        expect(fourth_label.attributes).to match(fourth_label_attributes)
+        expect(second_label.attributes).to include(second_label_attributes)
+        expect(fourth_label.attributes).to include(fourth_label_attributes)
       end
     end
 
@@ -154,12 +154,12 @@ describe RemoveDuplicateLabelsFromProject do
       end
 
       it 'restores removed records on rollback' do
-        third_label_attributes = third_label.attributes
+        third_label_attributes = modified_attributes(third_label)
 
         migration.up
         migration.down
 
-        expect(third_label.attributes).to match(third_label_attributes)
+        expect(third_label.attributes).to include(third_label_attributes)
       end
     end
   end
@@ -203,16 +203,20 @@ describe RemoveDuplicateLabelsFromProject do
       end
 
       it 'restores renamed records on rollback' do
-        second_label_attributes = second_label.attributes
-        fourth_label_attributes = fourth_label.attributes
+        second_label_attributes = modified_attributes(second_label)
+        fourth_label_attributes = modified_attributes(fourth_label)
 
         migration.up
 
         migration.down
 
-        expect(second_label.reload.attributes).to match(second_label_attributes)
-        expect(fourth_label.reload.attributes).to match(fourth_label_attributes)
+        expect(second_label.reload.attributes).to include(second_label_attributes)
+        expect(fourth_label.reload.attributes).to include(fourth_label_attributes)
       end
     end
+  end
+
+  def modified_attributes(label)
+    label.attributes.except('created_at', 'updated_at')
   end
 end

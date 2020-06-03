@@ -19398,7 +19398,7 @@ CREATE INDEX index_labels_on_group_id_and_title ON public.labels USING btree (gr
 
 CREATE INDEX index_labels_on_project_id ON public.labels USING btree (project_id);
 
-CREATE UNIQUE INDEX index_labels_on_project_id_and_title ON public.labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
+CREATE UNIQUE INDEX index_labels_on_project_id_and_title_unique ON public.labels USING btree (project_id, title) WHERE (group_id IS NULL);
 
 CREATE INDEX index_labels_on_template ON public.labels USING btree (template) WHERE template;
 

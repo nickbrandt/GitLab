@@ -10,12 +10,12 @@ class AddUniquenessIndexToLabelTitleAndProject < ActiveRecord::Migration[6.0]
   PROJECT_AND_TITLE = [:project_id, :title]
 
   def up
-    remove_concurrent_index :labels, PROJECT_AND_TITLE if index_exists? :labels, PROJECT_AND_TITLE
-    add_concurrent_index :labels, PROJECT_AND_TITLE, where: "labels.group_id = null", unique: true
+    add_concurrent_index :labels, PROJECT_AND_TITLE, where: "labels.group_id IS NULL", unique: true, name: "index_labels_on_project_id_and_title_unique"
+    remove_concurrent_index :labels, PROJECT_AND_TITLE, name: "index_labels_on_project_id_and_title"
   end
 
   def down
-    remove_concurrent_index :labels, PROJECT_AND_TITLE if index_exists? :labels, PROJECT_AND_TITLE
-    add_concurrent_index :labels, PROJECT_AND_TITLE, where: "labels.group_id = null", unique: false
+    add_concurrent_index :labels, PROJECT_AND_TITLE, where: "labels.group_id IS NULL", unique: false, name: "index_labels_on_project_id_and_title"
+    remove_concurrent_index :labels, PROJECT_AND_TITLE, name: "index_labels_on_project_id_and_title_unique"
   end
 end

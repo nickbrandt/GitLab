@@ -9,9 +9,6 @@ class RemoveDuplicateLabelsFromProject < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   class BackupLabel < Label
-    include BulkInsertSafe
-    include EachBatch
-
     self.table_name = 'backup_labels'
   end
 
@@ -85,7 +82,7 @@ WHERE labels.id IN (#{duplicate_labels.map { |dup| dup["id"] }.join(", ")});
 WITH data AS (
   SELECT
      *,
-     title || '_' || 'duplicate' || extract(epoch from now()) AS new_title,
+     title || '_' || 'duplicate' || id AS new_title,
      #{RENAME} AS restore_action,
      row_number() OVER (PARTITION BY project_id, title ORDER BY id) AS row_number
   FROM labels
