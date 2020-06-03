@@ -20,6 +20,10 @@ class AlertsService < Service
     url_helpers.project_alerts_notify_url(project, format: :json)
   end
 
+  def incoming_email_address
+    Gitlab::AlertManagement::IncomingEmail.email_address(project)
+  end
+
   def json_fields
     super + %w(token)
   end

@@ -1,3 +1,8 @@
+
+%p
+  Email address:
+  %pre= @service.incoming_email_address
+
 .js-alerts-service-settings{ data: { activated: @service.activated?.to_s,
   form_path: scoped_integration_path(@service),
   authorization_key: @service.token,

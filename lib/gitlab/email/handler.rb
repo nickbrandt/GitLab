@@ -12,7 +12,8 @@ module Gitlab
           CreateNoteHandler,
           CreateIssueHandler,
           UnsubscribeHandler,
-          CreateMergeRequestHandler
+          CreateMergeRequestHandler,
+          Gitlab::AlertManagement::IncomingEmail::CreateAlertHandler
         ]
       end
 
