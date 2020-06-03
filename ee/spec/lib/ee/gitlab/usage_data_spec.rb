@@ -3,8 +3,10 @@
 require 'spec_helper'
 
 describe Gitlab::UsageData do
+  include UsageDataHelpers
+
   before do
-    allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+    stub_usage_data_connections
   end
 
   describe '.data' do
