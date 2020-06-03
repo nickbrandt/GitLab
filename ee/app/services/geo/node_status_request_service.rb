@@ -17,7 +17,13 @@ module Geo
     end
 
     def payload(status)
-      status.attributes.except('id')
+      # RESOURCE_STATUS_FIELDS is excluded since that data would be duplicated
+      # in the payload as top-level attributes as well attributes nested in the
+      # new status field. We can remove this exclusion when we remove those
+      # deprecated columns from the geo_node_statuses table.
+      excluded_keys = GeoNodeStatus::RESOURCE_STATUS_FIELDS + ['id']
+
+      status.attributes.except(*excluded_keys)
     end
   end
 end
