@@ -78,4 +78,29 @@ describe Vulnerabilities::IssueLink do
       end
     end
   end
+
+  describe '.by_link_type' do
+    let_it_be(:created_issue_link) { create(:vulnerabilities_issue_link, :created) }
+    let_it_be(:related_issue_link) { create(:vulnerabilities_issue_link, :related) }
+
+    subject { described_class.by_link_type(link_type).to_a }
+
+    context 'when the given argument is `nil`' do
+      let(:link_type) { nil }
+
+      it { is_expected.to match_array([created_issue_link, related_issue_link]) }
+    end
+
+    context 'when the given argument is an uppercase string enum value' do
+      let(:link_type) { 'CREATED' }
+
+      it { is_expected.to match_array([created_issue_link]) }
+    end
+
+    context 'when the given argument is an uppercase symbol enum value' do
+      let(:link_type) { :RELATED }
+
+      it { is_expected.to match_array([related_issue_link]) }
+    end
+  end
 end

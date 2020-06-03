@@ -12233,6 +12233,11 @@ type Vulnerability {
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    Filter issue links by link type
+    """
+    linkType: [VulnerabilityIssueLinkType!]
   ): VulnerabilityIssueLinkConnection!
 
   """
