@@ -107,6 +107,7 @@ module EE
           email_additional_text: nil,
           lock_memberships_to_ldap: false,
           max_personal_access_token_lifetime: nil,
+          enforce_pat_expiration: true,
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],
           mirror_max_capacity: Settings.gitlab['mirror_max_capacity'],
           mirror_max_delay: Settings.gitlab['mirror_max_delay'],

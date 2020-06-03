@@ -42,6 +42,7 @@ module EE
         :help_text,
         :lock_memberships_to_ldap,
         :max_personal_access_token_lifetime,
+        :enforce_pat_expiration,
         :pseudonymizer_enabled,
         :repository_size_limit,
         :seat_link_enabled,

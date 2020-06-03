@@ -19,6 +19,10 @@ module PersonalAccessTokensHelper
     License.feature_available?(:personal_access_token_expiration_policy)
   end
 
+  def enforce_pat_expiration_feature_available?
+    PersonalAccessToken.enforce_pat_expiration_feature_available?
+  end
+
   private
 
   def instance_level_personal_access_token_expiration_policy_enabled?
