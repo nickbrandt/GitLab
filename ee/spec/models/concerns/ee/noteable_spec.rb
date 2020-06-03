@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Noteable do
+RSpec.describe EE::Noteable do
   subject(:klazz) { Class.new { include Noteable } }
 
   describe '.replyable_types' do

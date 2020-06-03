@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe IssuablesAnalytics do
+RSpec.describe IssuablesAnalytics do
   describe '#data' do
     let(:project) { create(:project, :empty_repo) }
 

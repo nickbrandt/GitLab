@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalState do
+RSpec.describe ApprovalState do
   def create_rule(additional_params = {})
     default_approver = create(:user)
     params = additional_params.reverse_merge(merge_request: merge_request, users: [default_approver])

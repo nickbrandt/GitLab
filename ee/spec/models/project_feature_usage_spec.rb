@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProjectFeatureUsage, type: :model do
+RSpec.describe ProjectFeatureUsage, type: :model do
   describe '.jira_dvcs_integrations_enabled_count' do
     it 'returns count of projects with Jira DVCS Cloud enabled' do
       create(:project).feature_usage.log_jira_dvcs_integration_usage

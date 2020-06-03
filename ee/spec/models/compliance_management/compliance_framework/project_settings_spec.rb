@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ComplianceManagement::ComplianceFramework::ProjectSettings do
+RSpec.describe ComplianceManagement::ComplianceFramework::ProjectSettings do
   let(:known_frameworks) { ComplianceManagement::ComplianceFramework::ProjectSettings.frameworks.keys }
 
   subject { build :compliance_framework_project_setting }

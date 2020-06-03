@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Note do
+RSpec.describe Note do
   include ::EE::GeoHelpers
 
   it_behaves_like 'an editable mentionable with EE-specific mentions' do

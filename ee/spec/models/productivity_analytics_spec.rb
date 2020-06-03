@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProductivityAnalytics do
+RSpec.describe ProductivityAnalytics do
   describe 'metrics data' do
     subject(:analytics) { described_class.new(merge_requests: finder_mrs, sort: custom_sort) }
 

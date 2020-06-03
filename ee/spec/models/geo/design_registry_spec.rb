@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::DesignRegistry, :geo do
+RSpec.describe Geo::DesignRegistry, :geo do
   it_behaves_like 'a BulkInsertSafe model', Geo::DesignRegistry do
     let(:valid_items_for_bulk_insertion) { build_list(:geo_design_registry, 10, created_at: Time.zone.now) }
     let(:invalid_items_for_bulk_insertion) { [] } # class does not have any validations defined

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Clusters::Cluster do
+RSpec.describe Clusters::Cluster do
   it { is_expected.to include_module(HasEnvironmentScope) }
 
   describe 'validation' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GeoNodeStatus, :geo, :geo_fdw do
+RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   include ::EE::GeoHelpers
 
   let!(:primary) { create(:geo_node, :primary) }

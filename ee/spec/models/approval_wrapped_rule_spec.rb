@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalWrappedRule do
+RSpec.describe ApprovalWrappedRule do
   using RSpec::Parameterized::TableSyntax
 
   let(:merge_request) { create(:merge_request) }

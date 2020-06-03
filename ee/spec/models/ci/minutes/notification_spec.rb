@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::Minutes::Notification do
+RSpec.describe Ci::Minutes::Notification do
   let_it_be(:user) { create(:user) }
   let(:shared_runners_enabled) { true }
   let!(:project) { create(:project, :repository, namespace: group, shared_runners_enabled: shared_runners_enabled) }

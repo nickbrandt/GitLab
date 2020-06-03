@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Ci::Minutes::Quota do
+RSpec.describe Ci::Minutes::Quota do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:namespace) do

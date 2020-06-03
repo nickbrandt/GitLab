@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe HistoricalData do
+RSpec.describe HistoricalData do
   before do
     (1..12).each do |i|
       described_class.create!(date: Date.new(2014, i, 1), active_user_count: i * 100)

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Operations::FeatureFlags::UserList do
+RSpec.describe Operations::FeatureFlags::UserList do
   subject { create(:operations_feature_flag_user_list) }
 
   describe 'validations' do

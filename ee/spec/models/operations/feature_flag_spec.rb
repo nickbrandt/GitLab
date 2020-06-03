@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Operations::FeatureFlag do
+RSpec.describe Operations::FeatureFlag do
   include FeatureFlagHelpers
 
   subject { create(:operations_feature_flag) }

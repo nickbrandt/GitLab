@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe InstanceSecurityDashboard do
+RSpec.describe InstanceSecurityDashboard do
   let_it_be(:project1) { create(:project) }
   let_it_be(:project2) { create(:project) }
   let_it_be(:pipeline1) { create(:ci_pipeline, project: project1) }

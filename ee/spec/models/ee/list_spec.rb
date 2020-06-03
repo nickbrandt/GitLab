@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe List do
+RSpec.describe List do
   let(:board) { create(:board) }
 
   describe 'relationships' do

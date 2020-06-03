@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GroupWikiRepository do
+RSpec.describe GroupWikiRepository do
   describe 'associations' do
     it { is_expected.to belong_to(:shard) }
     it { is_expected.to belong_to(:group) }

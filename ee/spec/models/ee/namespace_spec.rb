@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Namespace do
+RSpec.describe Namespace do
   include EE::GeoHelpers
 
   let(:namespace) { create(:namespace) }

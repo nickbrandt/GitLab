@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProjectImportData do
+RSpec.describe ProjectImportData do
   using RSpec::Parameterized::TableSyntax
 
   let(:import_url) { 'ssh://example.com' }

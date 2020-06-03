@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::ProtectedRefAccess do
+RSpec.describe EE::ProtectedRefAccess do
   included_in_classes = [ProtectedBranch::MergeAccessLevel,
                          ProtectedBranch::PushAccessLevel,
                          ProtectedTag::CreateAccessLevel]

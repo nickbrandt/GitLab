@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::SeatLinkData do
+RSpec.describe Gitlab::SeatLinkData do
   subject do
     described_class.new(
       date: date,
