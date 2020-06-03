@@ -6665,6 +6665,9 @@ msgstr ""
 msgid "Custom range"
 msgstr ""
 
+msgid "Custom range (UTC)"
+msgstr ""
+
 msgid "CustomCycleAnalytics|Add a stage"
 msgstr ""
 
@@ -23475,6 +23478,9 @@ msgid "URL of the external storage that will serve the repository static objects
 msgstr ""
 
 msgid "URL or request ID"
+msgstr ""
+
+msgid "UTC"
 msgstr ""
 
 msgid "Unable to apply suggestions to a deleted line."
