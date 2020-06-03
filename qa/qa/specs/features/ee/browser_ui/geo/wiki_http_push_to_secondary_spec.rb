@@ -20,13 +20,13 @@ module QA
             project.description = 'Geo test project'
           end
 
-          wiki = Resource::Wiki.fabricate! do |wiki|
+          wiki = Resource::Wiki::ProjectPage.fabricate_via_api! do |wiki|
             wiki.project = project
             wiki.title = 'Geo wiki'
             wiki.content = wiki_content
-            wiki.message = 'First wiki commit'
           end
 
+          wiki.visit!
           expect(wiki).to have_content(wiki_content)
 
           # Perform a git push over HTTP directly to the primary
@@ -90,7 +90,7 @@ module QA
           expect(push.output).to match(/warning: redirecting to #{absolute_path}/)
 
           # Validate git push worked and new content is visible
-          Page::Project::Menu.perform(&:click_wiki)
+          push.visit!
 
           Page::Project::Wiki::Show.perform do |show|
             show.wait_for_repository_replication_with(push_content_secondary)
