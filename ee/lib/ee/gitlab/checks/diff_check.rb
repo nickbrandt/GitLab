@@ -82,7 +82,7 @@ module EE
 
         def file_name_validation
           lambda do |diff|
-            if (diff.renamed_file || diff.new_file) && blacklisted_regex = push_rule.filename_blacklisted?(diff.new_path)
+            if (diff.renamed_file || diff.new_file) && blacklisted_regex = push_rule.filename_denylisted?(diff.new_path)
               return unless blacklisted_regex.present?
 
               "File name #{diff.new_path} was blacklisted by the pattern #{blacklisted_regex}."

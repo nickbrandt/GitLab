@@ -78,7 +78,7 @@ class PushRule < ApplicationRecord
     data_match?(email, author_email_regex)
   end
 
-  def filename_blacklisted?(file_path)
+  def filename_denylisted?(file_path)
     regex_list = []
     regex_list.concat(FILES_DENYLIST) if prevent_secrets
     regex_list << file_name_regex if file_name_regex
