@@ -1,3 +1,10 @@
+---
+stage: Verify
+group: Continuous Integration
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+type: reference
+---
+
 # New CI job permissions model
 
 > Introduced in GitLab 8.12.
@@ -178,7 +185,7 @@ git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/<user>/<mydependent
 ```
 
 It can also be used for system-wide authentication
-(only do this in a docker container, it will overwrite ~/.netrc):
+(only do this in a Docker container, it will overwrite ~/.netrc):
 
 ```shell
 echo -e "machine gitlab.com\nlogin gitlab-ci-token\npassword ${CI_JOB_TOKEN}" > ~/.netrc

@@ -13,7 +13,7 @@
 module Security
   class SecurityJobsFinder < JobsFinder
     def self.allowed_job_types
-      [:sast, :dast, :dependency_scanning, :container_scanning]
+      [:sast, :dast, :dependency_scanning, :container_scanning, :secret_detection]
     end
   end
 end

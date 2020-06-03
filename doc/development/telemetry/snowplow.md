@@ -127,7 +127,7 @@ Below is an example of `data-track-*` attributes assigned to a button:
 />
 ```
 
-Event listeners are bound at the document level to handle click events on or within elements with these data attributes. This allows for them to be properly handled on rerendering and changes to the DOM, but it's important to know that because of the way these events are bound, click events shouldn't be stopped from propagating up the DOM tree. If for any reason click events are being stopped from propagating, you'll need to implement your own listeners and follow the instructions in [Tracking in raw JavaScript](#tracking-in-raw-javascript).
+Event listeners are bound at the document level to handle click events on or within elements with these data attributes. This allows for them to be properly handled on re-rendering and changes to the DOM, but it's important to know that because of the way these events are bound, click events shouldn't be stopped from propagating up the DOM tree. If for any reason click events are being stopped from propagating, you'll need to implement your own listeners and follow the instructions in [Tracking in raw JavaScript](#tracking-in-raw-javascript).
 
 Below is a list of supported `data-track-*` attributes:
 
@@ -219,7 +219,7 @@ button.addEventListener('click', () => {
 
 ### Tests and test helpers
 
-In Jest particularly in vue tests, you can use the following:
+In Jest particularly in Vue tests, you can use the following:
 
 ```javascript
 import { mockTracking } from 'helpers/tracking_helper';
@@ -336,10 +336,10 @@ Snowplow Inspector Chrome Extension is a browser extension for testing frontend 
 
 Snowplow Micro is a very small version of a full Snowplow data collection pipeline: small enough that it can be launched by a test suite. Events can be recorded into Snowplow Micro just as they can a full Snowplow pipeline. Micro then exposes an API that can be queried.
 
-Snowplow Micro is a docker-based solution for testing frontend and backend events in a local development environment. You need to modify GDK using the instructions below to set this up.
+Snowplow Micro is a Docker-based solution for testing frontend and backend events in a local development environment. You need to modify GDK using the instructions below to set this up.
 
 - Read [Introducing Snowplow Micro](https://snowplowanalytics.com/blog/2019/07/17/introducing-snowplow-micro/)
-- Look at the [Snowplow Micro repo](https://github.com/snowplow-incubator/snowplow-micro)
+- Look at the [Snowplow Micro repository](https://github.com/snowplow-incubator/snowplow-micro)
 - Watch our [installation guide recording](https://www.youtube.com/watch?v=OX46fo_A0Ag)
 
 1. Install [Snowplow Micro](https://github.com/snowplow-incubator/snowplow-micro)

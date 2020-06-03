@@ -132,6 +132,9 @@ describe Vulnerabilities::Occurrence do
 
         create_list(:vulnerabilities_occurrence, 1,
           pipelines: [pipeline], project: project, report_type: :dast, severity: :low)
+
+        create_list(:vulnerabilities_occurrence, 2,
+          pipelines: [pipeline], project: project, report_type: :secret_detection, severity: :critical)
       end
     end
 
@@ -145,7 +148,7 @@ describe Vulnerabilities::Occurrence do
       let(:range) { 3.days }
 
       it 'returns expected counts for occurrences' do
-        first, second = subject
+        first, second, third = subject
 
         expect(first.day).to eq(date_2)
         expect(first.severity).to eq('low')
@@ -153,6 +156,9 @@ describe Vulnerabilities::Occurrence do
         expect(second.day).to eq(date_2)
         expect(second.severity).to eq('medium')
         expect(second.count).to eq(1)
+        expect(third.day).to eq(date_2)
+        expect(third.severity).to eq('critical')
+        expect(third.count).to eq(2)
       end
     end
 
@@ -160,7 +166,7 @@ describe Vulnerabilities::Occurrence do
       let(:range) { 4.days }
 
       it 'returns expected counts for occurrences' do
-        first, second, third = subject
+        first, second, third, forth = subject
 
         expect(first.day).to eq(date_1)
         expect(first.severity).to eq('high')
@@ -171,12 +177,16 @@ describe Vulnerabilities::Occurrence do
         expect(third.day).to eq(date_2)
         expect(third.severity).to eq('medium')
         expect(third.count).to eq(1)
+        expect(forth.day).to eq(date_2)
+        expect(forth.severity).to eq('critical')
+        expect(forth.count).to eq(2)
       end
     end
   end
 
   describe '.by_report_types' do
     let!(:vulnerability_sast) { create(:vulnerabilities_occurrence, report_type: :sast) }
+    let!(:vulnerability_secret_detection) { create(:vulnerabilities_occurrence, report_type: :secret_detection) }
     let!(:vulnerability_dast) { create(:vulnerabilities_occurrence, report_type: :dast) }
     let!(:vulnerability_depscan) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning) }
 
@@ -191,10 +201,10 @@ describe Vulnerabilities::Occurrence do
     end
 
     context 'with array of params' do
-      let(:param) { [1, 3] }
+      let(:param) { [1, 3, 4] }
 
       it 'returns found records' do
-        is_expected.to contain_exactly(vulnerability_dast, vulnerability_depscan)
+        is_expected.to contain_exactly(vulnerability_dast, vulnerability_depscan, vulnerability_secret_detection)
       end
     end
 

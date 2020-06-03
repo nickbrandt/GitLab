@@ -25,7 +25,7 @@ describe SourcegraphDecorator do
   end
 
   before do
-    Feature.get(:sourcegraph).enable(feature_enabled)
+    stub_feature_flags(sourcegraph: feature_enabled)
 
     stub_application_setting(sourcegraph_url: sourcegraph_url, sourcegraph_enabled: sourcegraph_enabled, sourcegraph_public_only: sourcegraph_public_only)
 
@@ -34,10 +34,6 @@ describe SourcegraphDecorator do
     Gon.clear
 
     sign_in user if user
-  end
-
-  after do
-    Feature.get(:sourcegraph).disable
   end
 
   subject do

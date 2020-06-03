@@ -73,25 +73,25 @@ describe('PackageTags', () => {
     it('shows tag badge when there is only one', () => {
       createComponent([mockTags[0]]);
 
-      const expectedStyle = [...defaultStyle, 'd-block', 'prepend-left-8'];
+      const expectedStyle = [...defaultStyle, 'd-flex', 'gl-ml-3'];
 
       expect(
         tagBadges()
           .at(0)
           .classes(),
-      ).toEqual(expectedStyle);
+      ).toEqual(expect.arrayContaining(expectedStyle));
     });
 
     it('shows tag badge for medium or heigher resolutions', () => {
       createComponent(mockTags);
 
-      const expectedStyle = [...defaultStyle, 'd-md-block'];
+      const expectedStyle = [...defaultStyle, 'd-md-flex'];
 
       expect(
         tagBadges()
           .at(1)
           .classes(),
-      ).toEqual(expectedStyle);
+      ).toEqual(expect.arrayContaining(expectedStyle));
     });
 
     it('correctly prepends left and appends right when there is more than one tag', () => {
@@ -99,15 +99,17 @@ describe('PackageTags', () => {
         tagDisplayLimit: 4,
       });
 
-      const expectedStyleWithoutAppend = [...defaultStyle, 'd-md-block'];
+      const expectedStyleWithoutAppend = [...defaultStyle, 'd-md-flex'];
       const expectedStyleWithAppend = [...expectedStyleWithoutAppend, 'append-right-4'];
 
       const allBadges = tagBadges();
 
-      expect(allBadges.at(0).classes()).toEqual([...expectedStyleWithAppend, 'prepend-left-8']);
-      expect(allBadges.at(1).classes()).toEqual(expectedStyleWithAppend);
-      expect(allBadges.at(2).classes()).toEqual(expectedStyleWithAppend);
-      expect(allBadges.at(3).classes()).toEqual(expectedStyleWithoutAppend);
+      expect(allBadges.at(0).classes()).toEqual(
+        expect.arrayContaining([...expectedStyleWithAppend, 'gl-ml-3']),
+      );
+      expect(allBadges.at(1).classes()).toEqual(expect.arrayContaining(expectedStyleWithAppend));
+      expect(allBadges.at(2).classes()).toEqual(expect.arrayContaining(expectedStyleWithAppend));
+      expect(allBadges.at(3).classes()).toEqual(expect.arrayContaining(expectedStyleWithoutAppend));
     });
   });
 });

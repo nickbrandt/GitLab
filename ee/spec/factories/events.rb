@@ -6,8 +6,10 @@ FactoryBot.modify do
       group
       author(factory: :user)
       target(factory: :epic)
-      action { Event::CREATED }
+      action { :created }
       project { nil }
     end
+
+    trait(:approved) { action { :approved } }
   end
 end

@@ -82,28 +82,6 @@ describe('Clusters', () => {
     });
   });
 
-  describe('showToken', () => {
-    it('should update token field type', () => {
-      cluster.showTokenButton.click();
-
-      expect(cluster.tokenField.getAttribute('type')).toEqual('text');
-
-      cluster.showTokenButton.click();
-
-      expect(cluster.tokenField.getAttribute('type')).toEqual('password');
-    });
-
-    it('should update show token button text', () => {
-      cluster.showTokenButton.click();
-
-      expect(cluster.showTokenButton.textContent).toEqual('Hide');
-
-      cluster.showTokenButton.click();
-
-      expect(cluster.showTokenButton.textContent).toEqual('Show');
-    });
-  });
-
   describe('checkForNewInstalls', () => {
     const INITIAL_APP_MAP = {
       helm: { status: null, title: 'Helm Tiller' },
@@ -290,13 +268,18 @@ describe('Clusters', () => {
 
       cluster.store.state.applications[applicationId].status = INSTALLABLE;
 
+      const params = {};
+      if (applicationId === 'knative') {
+        params.hostname = 'test-example.com';
+      }
+
       // eslint-disable-next-line promise/valid-params
       cluster
-        .installApplication({ id: applicationId })
+        .installApplication({ id: applicationId, params })
         .then(() => {
           expect(cluster.store.state.applications[applicationId].status).toEqual(INSTALLING);
           expect(cluster.store.state.applications[applicationId].requestReason).toEqual(null);
-          expect(cluster.service.installApplication).toHaveBeenCalledWith(applicationId, undefined);
+          expect(cluster.service.installApplication).toHaveBeenCalledWith(applicationId, params);
           done();
         })
         .catch();

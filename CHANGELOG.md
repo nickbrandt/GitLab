@@ -2,6 +2,38 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 13.0.3 (2020-05-29)
+
+### Fixed (8 changes, 1 of them is from the community)
+
+- Fixed redirection to project snippets. !32530
+- Fix Geo replication for design thumbnails. !32703
+- Fix 404s downloading build artifacts. !32741
+- Fix Auto DevOps manual rollout jobs not being allowed to fail. !32865
+- Update deprecated routes in irker integration. !32923 (Marc Jeanmougin)
+- Change format of variables parameter in Prometheus proxy API for metrics dashboard. !33062
+- Fix issue and MR API performance regression when Markdown cache is stale. !33235
+- Fix close issue when user created the issue. !33294
+
+
+## 13.0.1 (2020-05-27)
+
+### Security (12 changes)
+
+- Add an extra validation to Static Site Editor payload.
+- Hide EKS secret key in admin integrations settings.
+- Added data integrity check before updating a deploy key.
+- Display only verified emails on notifications and profile page.
+- Require confirmed email address for GitLab OAuth authentication.
+- Kubernetes cluster details page no longer exposes Service Token.
+- Fix confirming unverified emails with soft email confirmation flow enabled.
+- Disallow user to control PUT request using mermaid markdown in issue description.
+- Check forked project permissions before allowing fork.
+- Limit memory footprint of a command that generates ZIP artifacts metadata.
+- Fix file enuming using Group Import.
+- Prevent XSS in the monitoring dashboard.
+
+
 ## 13.0.0 (2020-05-22)
 
 ### Removed (20 changes, 5 of them are from the community)
@@ -571,6 +603,34 @@ entry.
 - Use visitUrl in Alert management. !32414
 
 
+## 12.10.8 (2020-05-28)
+
+### Fixed (2 changes)
+
+- Fix Geo replication for design thumbnails. !32703
+- Fix 404s downloading build artifacts. !32741
+
+
+## 12.10.7 (2020-05-27)
+
+### Security (14 changes)
+
+- Add an extra validation to Static Site Editor payload.
+- Hide EKS secret key in admin integrations settings.
+- Added data integrity check before updating a deploy key.
+- Display only verified emails on notifications and profile page.
+- Disable caching on repo/blobs/[sha]/raw endpoint.
+- Require confirmed email address for GitLab OAuth authentication.
+- Kubernetes cluster details page no longer exposes Service Token.
+- Fix confirming unverified emails with soft email confirmation flow enabled.
+- Disallow user to control PUT request using mermaid markdown in issue description.
+- Check forked project permissions before allowing fork.
+- Limit memory footprint of a command that generates ZIP artifacts metadata.
+- Fix file enuming using Group Import.
+- Prevent XSS in the monitoring dashboard.
+- Use `gsub` instead of the Ruby `%` operator to perform variable substitution in Prometheus proxy API.
+
+
 ## 12.10.6 (2020-05-15)
 
 ### Fixed (5 changes)
@@ -1069,6 +1129,25 @@ entry.
 - Add Gitlab User-Agent to ContainerRegistry::Client. !29294 (Sashi Kumar)
 - Improve error message in DAST CI template. !29388
 - Remove store_mentions! in Snippets::CreateService. !29581 (Sashi Kumar)
+
+
+## 12.9.8 (2020-05-27)
+
+### Security (13 changes)
+
+- Hide EKS secret key in admin integrations settings.
+- Added data integrity check before updating a deploy key.
+- Display only verified emails on notifications and profile page.
+- Disable caching on repo/blobs/[sha]/raw endpoint.
+- Require confirmed email address for GitLab OAuth authentication.
+- Kubernetes cluster details page no longer exposes Service Token.
+- Fix confirming unverified emails with soft email confirmation flow enabled.
+- Disallow user to control PUT request using mermaid markdown in issue description.
+- Check forked project permissions before allowing fork.
+- Limit memory footprint of a command that generates ZIP artifacts metadata.
+- Fix file enuming using Group Import.
+- Prevent XSS in the monitoring dashboard.
+- Use `gsub` instead of the Ruby `%` operator to perform variable substitution in Prometheus proxy API.
 
 
 ## 12.9.6 (2020-05-05)

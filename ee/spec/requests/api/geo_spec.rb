@@ -38,7 +38,7 @@ describe API::Geo do
     end
   end
 
-  describe 'GET /geo/retrieve/:replicable/:id' do
+  describe 'GET /geo/retrieve/:replicable_name/:replicable_id' do
     before do
       stub_current_geo_node(secondary_node)
     end
@@ -84,7 +84,7 @@ describe API::Geo do
       end
 
       it 'responds with 401 with mismatched params in auth headers' do
-        wrong_headers = Gitlab::Geo::TransferRequest.new({ replicable_name: 'wrong', id: 1234 }).headers
+        wrong_headers = Gitlab::Geo::TransferRequest.new({ replicable_name: 'wrong', replicable_id: 1234 }).headers
 
         get api("/geo/retrieve/#{replicator.replicable_name}/#{resource.id}"), headers: wrong_headers
 
@@ -92,7 +92,7 @@ describe API::Geo do
       end
 
       it 'responds with 404 when resource is not found' do
-        model_not_found_header = Gitlab::Geo::TransferRequest.new({ replicable_name: replicator.replicable_name, id: 1234 }).headers
+        model_not_found_header = Gitlab::Geo::TransferRequest.new({ replicable_name: replicator.replicable_name, replicable_id: 1234 }).headers
 
         get api("/geo/retrieve/#{replicator.replicable_name}/1234"), headers: model_not_found_header
 

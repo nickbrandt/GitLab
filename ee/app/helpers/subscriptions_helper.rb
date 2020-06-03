@@ -34,6 +34,7 @@ module SubscriptionsHelper
       plan_id: params[:plan_id],
       namespace_id: params[:namespace_id],
       new_user: new_user?.to_s,
+      onboarding_issues_experiment_enabled: experiment_enabled?(:onboarding_issues).to_s,
       group_data: group_data.to_json
     }
   end

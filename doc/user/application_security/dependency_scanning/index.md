@@ -1,5 +1,8 @@
 ---
 type: reference, howto
+stage: Secure
+group: Composition Analysis
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
 # Dependency Scanning **(ULTIMATE)**
@@ -49,6 +52,9 @@ is **not** `19.03.0`. See [troubleshooting information](#error-response-from-dae
 Beginning with GitLab 13.0, Docker privileged mode is necessary only if you've [enabled Docker-in-Docker for Dependency Scanning](#enabling-docker-in-docker).
 
 ## Supported languages and package managers
+
+GitLab relies on [`rules`](../../../ci/yaml/README.md#rules) to start relevant analyzers depending on the languages detected in the repository.
+The current detection logic limits the maximum search depth to two levels. For example, the `gemnasium-dependency_scanning` job is enabled if a repository contains either a `Gemfile` or `api/Gemfile` file, but not if the only supported dependency file is `api/client/Gemfile`.
 
 The following languages and dependency managers are supported.
 
@@ -543,7 +549,7 @@ As a workaround, remove the [`retire.js`](analyzers.md#selecting-specific-analyz
 
 ## Troubleshooting
 
-### Error response from daemon: error processing tar file: docker-tar: relocation error
+### `Error response from daemon: error processing tar file: docker-tar: relocation error`
 
 This error occurs when the Docker version that runs the Dependency Scanning job is `19.03.00`.
 Consider updating to Docker `19.03.1` or greater. Older versions are not

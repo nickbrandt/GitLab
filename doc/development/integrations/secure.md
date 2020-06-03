@@ -15,7 +15,7 @@ scanner, as well as requirements and guidelines for the Docker image.
 
 ## Job definition
 
-This section desribes several important fields to add to the security scanner's job
+This section describes several important fields to add to the security scanner's job
 definition file. Full documentation on these and other available fields can be viewed
 in the [CI documentation](../../ci/yaml/README.md#image).
 
@@ -69,7 +69,7 @@ For example, here is the definition of a SAST job that generates a file named `g
 and uploads it as a SAST report:
 
 ```yaml
-mysec_sast_scanning:
+mysec_sast:
   image: registry.gitlab.com/secure/mysec
   artifacts:
     reports:
@@ -89,9 +89,9 @@ for variables such as `DEPENDENCY_SCANNING_DISABLED`, `CONTAINER_SCANNING_DISABL
 disable running the custom scanner.
 
 GitLab also defines a `CI_PROJECT_REPOSITORY_LANGUAGES` variable, which provides the list of
-languages in the repo. Depending on this value, your scanner may or may not do something different.
+languages in the repository. Depending on this value, your scanner may or may not do something different.
 Language detection currently relies on the [`linguist`](https://github.com/github/linguist) Ruby gem.
-See [GitLab CI/CD prefined variables](../../ci/variables/predefined_variables.md#variables-reference).
+See [GitLab CI/CD predefined variables](../../ci/variables/predefined_variables.md#variables-reference).
 
 #### Policy checking example
 
@@ -139,7 +139,7 @@ might also help with keeping the image small.
 
 As documented in the [Docker Official Images](https://github.com/docker-library/official-images#tags-and-aliases) project,
 it is strongly encouraged that version number tags be given aliases which allows the user to easily refer to the "most recent" release of a particular series.
-See also [Docker Tagging: Best practices for tagging and versioning docker images](https://docs.microsoft.com/en-us/archive/blogs/stevelasker/docker-tagging-best-practices-for-tagging-and-versioning-docker-images).
+See also [Docker Tagging: Best practices for tagging and versioning Docker images](https://docs.microsoft.com/en-us/archive/blogs/stevelasker/docker-tagging-best-practices-for-tagging-and-versioning-docker-images).
 
 ## Command line
 

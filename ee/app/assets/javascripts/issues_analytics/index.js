@@ -9,7 +9,13 @@ export default () => {
 
   if (!el) return null;
 
-  const { endpoint, noDataEmptyStateSvgPath, filtersEmptyStateSvgPath } = el.dataset;
+  const {
+    endpoint,
+    noDataEmptyStateSvgPath,
+    filtersEmptyStateSvgPath,
+    issuesApiEndpoint,
+    issuesPageEndpoint,
+  } = el.dataset;
 
   // Set default filters from URL
   store.dispatch('issueAnalytics/setFilters', window.location.search);
@@ -31,6 +37,8 @@ export default () => {
           filterBlockEl,
           noDataEmptyStateSvgPath,
           filtersEmptyStateSvgPath,
+          issuesApiEndpoint,
+          issuesPageEndpoint,
         },
       });
     },

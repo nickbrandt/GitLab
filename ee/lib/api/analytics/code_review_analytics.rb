@@ -5,8 +5,6 @@ module API
     class CodeReviewAnalytics < Grape::API
       include PaginationParams
 
-      helpers ::Gitlab::IssuableMetadata
-
       helpers do
         def project
           @project ||= find_project!(params[:project_id])
@@ -49,7 +47,7 @@ module API
           present merge_requests,
                   with: EE::API::Entities::Analytics::CodeReview::MergeRequest,
                   current_user: current_user,
-                  issuable_metadata: issuable_meta_data(merge_requests, 'MergeRequest', current_user)
+                  issuable_metadata: Gitlab::IssuableMetadata.new(current_user, merge_requests).data
         end
       end
     end

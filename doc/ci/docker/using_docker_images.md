@@ -1,4 +1,7 @@
 ---
+stage: Verify
+group: Runner
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: concepts, howto
 ---
 
@@ -727,6 +730,9 @@ To configure access for `aws_account_id.dkr.ecr.region.amazonaws.com`, follow th
 
 1. Make sure `docker-credential-ecr-login` is available in GitLab Runner's `$PATH`.
 
+1. Have any of the following [AWS credentials setup](https://github.com/awslabs/amazon-ecr-credential-helper#aws-credentials).
+   Make sure that GitLab Runner can access the credentials.
+
 1. Make GitLab Runner use it. There are two ways to accomplish this. Either:
 
    - Create a [variable](../variables/README.md#gitlab-cicd-environment-variables)
@@ -740,6 +746,18 @@ To configure access for `aws_account_id.dkr.ecr.region.amazonaws.com`, follow th
        }
      }
      ```
+
+     This configures Docker to use the credential helper for a specific registry.
+
+     or
+
+     ```json
+     {
+       "credsStore": "ecr-login"
+     }
+     ```
+
+     This configures Docker to use the credential helper for all Amazon ECR registries.
 
    - Or, if you are running self-managed Runners,
      add the above JSON to `${GITLAB_RUNNER_HOME}/.docker/config.json`.

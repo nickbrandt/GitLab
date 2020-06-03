@@ -4,7 +4,7 @@ module Types
   module RequirementsManagement
     class RequirementType < BaseObject
       graphql_name 'Requirement'
-      description 'Represents a requirement.'
+      description 'Represents a requirement'
 
       authorize :read_requirement
 
@@ -22,9 +22,13 @@ module Types
       field :project, ProjectType, null: false,
             description: 'Project to which the requirement belongs',
             resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchModelLoader.new(Project, obj.project_id).find }
-      field :author, Types::UserType, null: false,
+      field :author, UserType, null: false,
             description: 'Author of the requirement',
             resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchModelLoader.new(User, obj.author_id).find }
+
+      field :test_reports, TestReportType.connection_type, null: true, complexity: 5,
+            description: 'Test reports of the requirement',
+            resolver: Resolvers::RequirementsManagement::TestReportsResolver
 
       field :created_at, Types::TimeType, null: false,
             description: 'Timestamp of when the requirement was created'

@@ -31,7 +31,7 @@ export default {
 <template>
   <installation-tabs :tracking-label="$options.trackingLabel">
     <template #installation>
-      <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Conan Command') }}</p>
+      <p class="gl-mt-3 font-weight-bold">{{ s__('PackageRegistry|Conan Command') }}</p>
       <code-instruction
         :instruction="conanInstallationCommand"
         :copy-text="s__('PackageRegistry|Copy Conan Command')"
@@ -41,7 +41,7 @@ export default {
     </template>
 
     <template #setup>
-      <p class="prepend-top-8 font-weight-bold">
+      <p class="gl-mt-3 font-weight-bold">
         {{ s__('PackageRegistry|Add Conan Remote') }}
       </p>
       <code-instruction

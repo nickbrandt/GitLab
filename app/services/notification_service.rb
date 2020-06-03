@@ -68,10 +68,10 @@ class NotificationService
 
   # Notify a user when a previously unknown IP or device is used to
   # sign in to their account
-  def unknown_sign_in(user, ip)
+  def unknown_sign_in(user, ip, time)
     return unless user.can?(:receive_notifications)
 
-    mailer.unknown_sign_in_email(user, ip).deliver_later
+    mailer.unknown_sign_in_email(user, ip, time).deliver_later
   end
 
   # When create an issue we should send an email to:
@@ -555,6 +555,15 @@ class NotificationService
     return true unless notifiable?(current_user, :mention, group: group)
 
     mailer.group_was_not_exported_email(current_user, group, errors).deliver_later
+  end
+
+  # Notify users on new review in system
+  def new_review(review)
+    recipients = NotificationRecipients::BuildService.build_new_review_recipients(review)
+
+    recipients.each do |recipient|
+      mailer.new_review_email(recipient.user.id, review.id).deliver_later
+    end
   end
 
   protected

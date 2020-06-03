@@ -186,6 +186,35 @@ describe Issue do
 
       expect { issue.close }.to change { issue.state_id }.from(open_state).to(closed_state)
     end
+
+    context 'when there is an associated Alert Management Alert' do
+      context 'when alert can be resolved' do
+        let!(:alert) { create(:alert_management_alert, project: issue.project, issue: issue) }
+
+        it 'resolves an alert' do
+          expect { issue.close }.to change { alert.reload.resolved? }.to(true)
+        end
+      end
+
+      context 'when alert cannot be resolved' do
+        let!(:alert) { create(:alert_management_alert, :with_validation_errors, project: issue.project, issue: issue) }
+
+        before do
+          allow(Gitlab::AppLogger).to receive(:warn).and_call_original
+        end
+
+        it 'writes a warning into the log' do
+          issue.close
+
+          expect(Gitlab::AppLogger).to have_received(:warn).with(
+            message: 'Cannot resolve an associated Alert Management alert',
+            issue_id: issue.id,
+            alert_id: alert.id,
+            alert_errors: { hosts: ['hosts array is over 255 chars'] }
+          )
+        end
+      end
+    end
   end
 
   describe '#reopen' do
@@ -1083,6 +1112,17 @@ describe Issue do
       labeled_issue = create(:labeled_issue, project: label.project, labels: [label])
 
       expect(subject).not_to include(labeled_issue)
+    end
+  end
+
+  describe 'banzai_render_context' do
+    let(:project) { build(:project_empty_repo) }
+    let(:issue) { build :issue, project: project }
+
+    subject(:context) { issue.banzai_render_context(:title) }
+
+    it 'sets the label_url_method in the context' do
+      expect(context[:label_url_method]).to eq(:project_issues_url)
     end
   end
 end

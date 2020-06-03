@@ -90,3 +90,20 @@ describe('updateIssueWeight', () => {
 describe('togglePromotionState', () => {
   expectNotImplemented(actions.updateIssueWeight);
 });
+
+describe('toggleEpicSwimlanes', () => {
+  it('should commit mutation TOGGLE_EPICS_SWIMLANES', done => {
+    const state = {
+      isShowingEpicsSwimlanes: true,
+    };
+
+    testAction(
+      actions.toggleEpicSwimlanes,
+      null,
+      state,
+      [{ type: types.TOGGLE_EPICS_SWIMLANES }],
+      [],
+      done,
+    );
+  });
+});

@@ -22,6 +22,8 @@ describe MergeRequest do
     it { is_expected.to belong_to(:iteration) }
     it { is_expected.to have_many(:resource_milestone_events) }
     it { is_expected.to have_many(:resource_state_events) }
+    it { is_expected.to have_many(:draft_notes) }
+    it { is_expected.to have_many(:reviews).inverse_of(:merge_request) }
 
     context 'for forks' do
       let!(:project) { create(:project) }
@@ -721,10 +723,14 @@ describe MergeRequest do
   end
 
   describe '#note_positions_for_paths' do
+    let(:user) { create(:user) }
     let(:merge_request) { create(:merge_request, :with_diffs) }
     let(:project) { merge_request.project }
     let!(:diff_note) do
       create(:diff_note_on_merge_request, project: project, noteable: merge_request)
+    end
+    let!(:draft_note) do
+      create(:draft_note_on_text_diff, author: user, merge_request: merge_request)
     end
 
     let(:file_paths) { merge_request.diffs.diff_files.map(&:file_path) }
@@ -756,6 +762,26 @@ describe MergeRequest do
 
       it 'returns no positions' do
         expect(subject.to_a).to be_empty
+      end
+    end
+
+    context 'when user is given' do
+      subject do
+        merge_request.note_positions_for_paths(file_paths, user)
+      end
+
+      it 'returns notes and draft notes positions' do
+        expect(subject).to match_array([draft_note.position, diff_note.position])
+      end
+    end
+
+    context 'when user is not given' do
+      subject do
+        merge_request.note_positions_for_paths(file_paths)
+      end
+
+      it 'returns notes positions' do
+        expect(subject).to match_array([diff_note.position])
       end
     end
   end
@@ -1625,14 +1651,6 @@ describe MergeRequest do
       let(:merge_request) { create(:merge_request, :with_accessibility_reports, source_project: project) }
 
       it { is_expected.to be_truthy }
-
-      context 'when feature flag is disabled' do
-        before do
-          stub_feature_flags(accessibility_report_view: false)
-        end
-
-        it { is_expected.to be_falsey }
-      end
     end
 
     context 'when head pipeline does not have accessibility reports' do
@@ -2605,7 +2623,7 @@ describe MergeRequest do
 
       context 'with no discussions' do
         before do
-          merge_request.notes.destroy_all # rubocop: disable DestroyAll
+          merge_request.notes.destroy_all # rubocop: disable Cop/DestroyAll
         end
 
         it 'returns true' do
@@ -3898,6 +3916,17 @@ describe MergeRequest do
       count = ActiveRecord::QueryRecorder.new { merge_request.predefined_variables }.count
 
       expect(count).to eq(0)
+    end
+  end
+
+  describe 'banzai_render_context' do
+    let(:project) { build(:project_empty_repo) }
+    let(:merge_request) { build :merge_request, target_project: project, source_project: project }
+
+    subject(:context) { merge_request.banzai_render_context(:title) }
+
+    it 'sets the label_url_method in the context' do
+      expect(context[:label_url_method]).to eq(:project_merge_requests_url)
     end
   end
 end

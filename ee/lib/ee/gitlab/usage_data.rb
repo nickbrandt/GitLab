@@ -39,8 +39,8 @@ module EE
 
         override :uncached_data
         def uncached_data
-          time_period = { created_at: 28.days.ago..Time.current }
-          usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, time_period)
+          usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, default_time_period)
+
           super
             .merge(usage_activity_by_stage)
             .merge(usage_activity_by_stage_monthly)
@@ -60,9 +60,9 @@ module EE
 
         def features_usage_data_ee
           {
-            elasticsearch_enabled: alt_usage_data { ::Gitlab::CurrentSettings.elasticsearch_search? },
-            license_trial_ends_on: alt_usage_data { License.trial_ends_on },
-            geo_enabled: alt_usage_data { ::Gitlab::Geo.enabled? }
+            elasticsearch_enabled: alt_usage_data(fallback: nil) { ::Gitlab::CurrentSettings.elasticsearch_search? },
+            license_trial_ends_on: alt_usage_data(fallback: nil) { License.trial_ends_on },
+            geo_enabled: alt_usage_data(fallback: nil) { ::Gitlab::Geo.enabled? }
           }
         end
 

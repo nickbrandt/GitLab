@@ -26,6 +26,7 @@ describe Gitlab::SidekiqConfig do
       queues = described_class.expand_queues(%w[cronjob])
 
       expect(queues).to include('cronjob:stuck_import_jobs')
+      expect(queues).to include('cronjob:jira_import_stuck_jira_import_jobs')
       expect(queues).to include('cronjob:stuck_merge_jobs')
     end
 

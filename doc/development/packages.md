@@ -65,10 +65,14 @@ The current state of existing package registries availability is:
 | NPM             | No - [open issue](https://gitlab.com/gitlab-org/gitlab/-/issues/36853) | Yes | No - [open issue](https://gitlab.com/gitlab-org/gitlab/-/issues/36853) |
 | NuGet           | Yes | No - [open issue](https://gitlab.com/gitlab-org/gitlab/-/issues/36423) | No |
 | PyPI            | Yes | No | No |
+| Go              | Yes | No - [open issue](https://gitlab.com/gitlab-org/gitlab/-/issues/213900) | No - [open-issue](https://gitlab.com/gitlab-org/gitlab/-/issues/213902) |
+| Composer | Yes | Yes | No |
 
 NOTE: **Note:** NPM is currently a hybrid of the instance level and group level.
 It is using the top-level group or namespace as the defining portion of the name
 (for example, `@my-group-name/my-package-name`).
+
+**Note:** Composer package naming scope is Instance Level.
 
 ### Naming conventions
 

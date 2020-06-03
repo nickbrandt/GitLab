@@ -79,6 +79,7 @@ describe Project do
     it { is_expected.to have_many(:ci_refs) }
     it { is_expected.to have_many(:builds) }
     it { is_expected.to have_many(:build_trace_section_names)}
+    it { is_expected.to have_many(:build_report_results) }
     it { is_expected.to have_many(:runner_projects) }
     it { is_expected.to have_many(:runners) }
     it { is_expected.to have_many(:variables) }
@@ -117,6 +118,7 @@ describe Project do
     it { is_expected.to have_many(:jira_imports) }
     it { is_expected.to have_many(:metrics_users_starred_dashboards).inverse_of(:project) }
     it { is_expected.to have_many(:repository_storage_moves) }
+    it { is_expected.to have_many(:reviews).inverse_of(:project) }
 
     it_behaves_like 'model with repository' do
       let_it_be(:container) { create(:project, :repository, path: 'somewhere') }
@@ -2836,48 +2838,6 @@ describe Project do
     end
   end
 
-  describe '#change_repository_storage' do
-    let(:project) { create(:project, :repository) }
-    let(:read_only_project) { create(:project, :repository, repository_read_only: true) }
-
-    before do
-      stub_storage_settings('test_second_storage' => { 'path' => 'tmp/tests/extra_storage' })
-    end
-
-    it 'schedules the transfer of the repository to the new storage and locks the project' do
-      expect(ProjectUpdateRepositoryStorageWorker).to receive(:perform_async).with(project.id, 'test_second_storage', anything)
-
-      project.change_repository_storage('test_second_storage')
-      project.save!
-
-      expect(project).to be_repository_read_only
-      expect(project.repository_storage_moves.last).to have_attributes(
-        source_storage_name: "default",
-        destination_storage_name: "test_second_storage"
-      )
-    end
-
-    it "doesn't schedule the transfer if the repository is already read-only" do
-      expect(ProjectUpdateRepositoryStorageWorker).not_to receive(:perform_async)
-
-      read_only_project.change_repository_storage('test_second_storage')
-      read_only_project.save!
-    end
-
-    it "doesn't lock or schedule the transfer if the storage hasn't changed" do
-      expect(ProjectUpdateRepositoryStorageWorker).not_to receive(:perform_async)
-
-      project.change_repository_storage(project.repository_storage)
-      project.save!
-
-      expect(project).not_to be_repository_read_only
-    end
-
-    it 'throws an error if an invalid repository storage is provided' do
-      expect { project.change_repository_storage('unknown') }.to raise_error(ArgumentError)
-    end
-  end
-
   describe '#pushes_since_gc' do
     let(:project) { create(:project) }
 
@@ -4302,8 +4262,7 @@ describe Project do
 
   describe '#auto_devops_enabled?' do
     before do
-      allow(Feature).to receive(:enabled?).and_call_original
-      Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(0)
+      Feature.enable_percentage_of_actors(:force_autodevops_on_by_default, 0)
     end
 
     let_it_be(:project, reload: true) { create(:project) }
@@ -4505,8 +4464,7 @@ describe Project do
     let_it_be(:project, reload: true) { create(:project) }
 
     before do
-      allow(Feature).to receive(:enabled?).and_call_original
-      Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(0)
+      Feature.enable_percentage_of_actors(:force_autodevops_on_by_default, 0)
     end
 
     context 'when explicitly disabled' do
@@ -4552,7 +4510,7 @@ describe Project do
         before do
           create(:project_auto_devops, project: project, enabled: false)
 
-          Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(100)
+          Feature.enable_percentage_of_actors(:force_autodevops_on_by_default, 100)
         end
 
         it 'does not have auto devops implicitly disabled' do
@@ -6037,99 +5995,6 @@ describe Project do
       it 'returns latest jira import by created_at' do
         expect(project.jira_imports.pluck(:id)).to eq([jira_import3.id, jira_import2.id, jira_import1.id])
         expect(project.latest_jira_import).to eq(jira_import1)
-      end
-    end
-  end
-
-  describe '#validate_jira_import_settings!' do
-    include JiraServiceHelper
-
-    let_it_be(:project, reload: true) { create(:project) }
-
-    shared_examples 'raise Jira import error' do |message|
-      it 'returns error' do
-        expect { subject }.to raise_error(Projects::ImportService::Error, message)
-      end
-    end
-
-    shared_examples 'jira configuration base checks' do
-      context 'when Jira service was not setup' do
-        it_behaves_like 'raise Jira import error', 'Jira integration not configured.'
-      end
-
-      context 'when Jira service exists' do
-        let!(:jira_service) { create(:jira_service, project: project, active: true) }
-
-        context 'when Jira connection is not valid' do
-          before do
-            WebMock.stub_request(:get, 'https://jira.example.com/rest/api/2/serverInfo')
-              .to_raise(JIRA::HTTPError.new(double(message: 'Some failure.')))
-          end
-
-          it_behaves_like 'raise Jira import error', 'Unable to connect to the Jira instance. Please check your Jira integration configuration.'
-        end
-      end
-    end
-
-    before do
-      stub_jira_service_test
-    end
-
-    context 'without user param' do
-      subject { project.validate_jira_import_settings! }
-
-      it_behaves_like 'jira configuration base checks'
-
-      context 'when jira connection is valid' do
-        let!(:jira_service) { create(:jira_service, project: project, active: true) }
-
-        it 'does not return any error' do
-          expect { subject }.not_to raise_error
-        end
-      end
-    end
-
-    context 'with user param provided' do
-      let_it_be(:user) { create(:user) }
-
-      subject { project.validate_jira_import_settings!(user: user) }
-
-      context 'when user has permission to run import' do
-        before do
-          project.add_maintainer(user)
-        end
-
-        it_behaves_like 'jira configuration base checks'
-      end
-
-      context 'when user does not have permissions to run the import' do
-        before do
-          create(:jira_service, project: project, active: true)
-
-          project.add_developer(user)
-        end
-
-        it_behaves_like 'raise Jira import error', 'You do not have permissions to run the import.'
-      end
-
-      context 'when user has permission to run import' do
-        before do
-          project.add_maintainer(user)
-        end
-
-        let!(:jira_service) { create(:jira_service, project: project, active: true) }
-
-        context 'when issues feature is disabled' do
-          let_it_be(:project, reload: true) { create(:project, :issues_disabled) }
-
-          it_behaves_like 'raise Jira import error', 'Cannot import because issues are not available in this project.'
-        end
-
-        context 'when everything is ok' do
-          it 'does not return any error' do
-            expect { subject }.not_to raise_error
-          end
-        end
       end
     end
   end

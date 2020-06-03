@@ -333,7 +333,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/pipelines/[0-9]+$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/pipelines/[0-9]+$`, ''),
     getHelpContent: () => [
       {
         text: sprintf(
@@ -385,7 +385,7 @@ const GUIDED_GITLAB_TOUR = [
 
 const CREATE_PROJECT_TOUR = [
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/pipelines/[0-9]+$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/pipelines/[0-9]+$`, ''),
     getHelpContent: null,
     actionPopover: {
       selector: '#js-onboarding-new-project-link',
@@ -468,7 +468,7 @@ const INVITE_COLLEAGUES_TOUR = [
     forUrl: ({ createdProjectPath }) => new RegExp(`${createdProjectPath}/edit$`, ''),
     getHelpContent: null,
     actionPopover: {
-      selector: '#js-onboarding-settings-members-link',
+      selector: '#js-onboarding-members-link',
       text: sprintf(
         s__('UserOnboardingTour|Awesome! Now click on %{emphasisStart}Members%{emphasisEnd}.'),
         {

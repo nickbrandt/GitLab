@@ -2,7 +2,14 @@ import { shallowMount, mount } from '@vue/test-utils';
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlAlert, GlBadge } from '@gitlab/ui';
+import {
+  GlEmptyState,
+  GlLoadingIcon,
+  GlTab,
+  GlTabs,
+  GlAlert,
+  GlDeprecatedBadge as GlBadge,
+} from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import setWindowLocation from 'helpers/set_window_location_helper';
 

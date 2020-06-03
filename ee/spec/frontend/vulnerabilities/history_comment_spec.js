@@ -14,7 +14,10 @@ describe('History Comment', () => {
 
   const createWrapper = comment => {
     wrapper = mount(HistoryComment, {
-      propsData: { comment },
+      propsData: {
+        comment,
+        notesUrl: '/notes',
+      },
     });
   };
 

@@ -1,0 +1,5 @@
+---
+title: Add requirements filtering on author username and search by title
+merge_request: 31857
+author:
+type: added

@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Admin::ApplicationSettingsController do
   include StubENV
+  include UsageDataHelpers
 
   let(:group) { create(:group) }
   let(:project) { create(:project, namespace: group) }
@@ -16,7 +17,7 @@ describe Admin::ApplicationSettingsController do
 
   describe 'GET #usage_data with no access' do
     before do
-      allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+      stub_usage_data_connections
       sign_in(user)
     end
 
@@ -29,7 +30,7 @@ describe Admin::ApplicationSettingsController do
 
   describe 'GET #usage_data' do
     before do
-      allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+      stub_usage_data_connections
       sign_in(admin)
     end
 
@@ -157,6 +158,46 @@ describe Admin::ApplicationSettingsController do
       Admin::ApplicationSettingsController::VALID_SETTING_PANELS.each do |valid_action|
         it_behaves_like 'renders correct panels' do
           let(:action) { valid_action }
+        end
+      end
+    end
+  end
+
+  describe 'PATCH #integrations' do
+    before do
+      stub_feature_flags(instance_level_integrations: false)
+      sign_in(admin)
+    end
+
+    describe 'EKS integration' do
+      let(:application_setting) { ApplicationSetting.current }
+      let(:settings_params) do
+        {
+          eks_integration_enabled: '1',
+          eks_account_id: '123456789012',
+          eks_access_key_id: 'dummy access key',
+          eks_secret_access_key: 'dummy secret key'
+        }
+      end
+
+      it 'updates EKS settings' do
+        patch :integrations, params: { application_setting: settings_params }
+
+        expect(application_setting.eks_integration_enabled).to be_truthy
+        expect(application_setting.eks_account_id).to eq '123456789012'
+        expect(application_setting.eks_access_key_id).to eq 'dummy access key'
+        expect(application_setting.eks_secret_access_key).to eq 'dummy secret key'
+      end
+
+      context 'secret access key is blank' do
+        let(:settings_params) { { eks_secret_access_key: '' } }
+
+        it 'does not update the secret key' do
+          application_setting.update!(eks_secret_access_key: 'dummy secret key')
+
+          patch :integrations, params: { application_setting: settings_params }
+
+          expect(application_setting.reload.eks_secret_access_key).to eq 'dummy secret key'
         end
       end
     end

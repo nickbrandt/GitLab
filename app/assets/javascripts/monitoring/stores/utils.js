@@ -3,6 +3,7 @@ import createGqClient, { fetchPolicies } from '~/lib/graphql';
 import { SUPPORTED_FORMATS } from '~/lib/utils/unit_format';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import { NOT_IN_DB_PREFIX } from '../constants';
+import { isSafeURL } from '~/lib/utils/url_utility';
 
 export const gqClient = createGqClient(
   {},
@@ -138,6 +139,23 @@ const mapYAxisToViewModel = ({
 };
 
 /**
+ * Maps a link to its view model, expects an url and
+ * (optionally) a title.
+ *
+ * Unsafe URLs are ignored.
+ *
+ * @param {Object} Link
+ * @returns {Object} Link object with a `title` and `url`.
+ *
+ */
+const mapLinksToViewModel = ({ url = null, title = '' } = {}) => {
+  return {
+    title: title || String(url),
+    url: url && isSafeURL(url) ? String(url) : '#',
+  };
+};
+
+/**
  * Maps a metrics panel to its view model
  *
  * @param {Object} panel - Metrics panel
@@ -152,6 +170,7 @@ const mapPanelToViewModel = ({
   y_label,
   y_axis = {},
   metrics = [],
+  links = [],
   max_value,
 }) => {
   // Both `x_axis.name` and `x_label` are supported for now
@@ -171,6 +190,7 @@ const mapPanelToViewModel = ({
     yAxis,
     xAxis,
     maxValue: max_value,
+    links: links.map(mapLinksToViewModel),
     metrics: mapToMetricsViewModel(metrics, yAxis.name),
   };
 };
@@ -229,3 +249,19 @@ export const normalizeQueryResult = timeSeries => {
 
   return normalizedResult;
 };
+
+/**
+ * Custom variables defined in the dashboard yml file are
+ * eventually passed over the wire to the backend Prometheus
+ * API proxy.
+ *
+ * This method adds a prefix to the URL param keys so that
+ * the backend can differential these variables from the other
+ * variables.
+ *
+ * This is currently only used by getters/getCustomVariablesParams
+ *
+ * @param {String} key Variable key that needs to be prefixed
+ * @returns {String}
+ */
+export const addPrefixToCustomVariableParams = key => `variables[${key}]`;

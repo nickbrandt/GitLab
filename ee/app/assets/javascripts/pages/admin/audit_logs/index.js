@@ -1,22 +1,3 @@
-import Vue from 'vue';
-import { parseBoolean } from '~/lib/utils/common_utils';
-import AuditLogApp from 'ee/audit_logs/components/audit_log_app.vue';
+import initAuditEvents from 'ee/audit_events/init_audit_events';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const el = document.querySelector('#js-audit-log-app');
-  const { events, isLastPage, formPath } = el.dataset;
-
-  // eslint-disable-next-line no-new
-  new Vue({
-    el,
-    name: 'AuditLogApp',
-    render: createElement =>
-      createElement(AuditLogApp, {
-        props: {
-          events: JSON.parse(events),
-          isLastPage: parseBoolean(isLastPage),
-          formPath,
-        },
-      }),
-  });
-});
+initAuditEvents('#js-audit-log-app');

@@ -21,7 +21,7 @@ module EE
       strong_memoize(:show_out_of_ci_minutes_notification) do
         next unless project&.persisted? || namespace&.persisted?
 
-        ::Ci::Minutes::Notification.new(current_user, project, namespace).show?
+        ::Ci::Minutes::Notification.new(project, namespace).show?(current_user)
       end
     end
   end

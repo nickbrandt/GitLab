@@ -71,8 +71,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         namespace :settings do
-          get :members, to: redirect("%{namespace_id}/%{project_id}/-/project_members")
-
           resource :ci_cd, only: [:show, :update], controller: 'ci_cd' do
             post :reset_cache
             put :reset_registration_token
@@ -201,7 +199,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resources :starrers, only: [:index]
         resources :forks, only: [:index, :new, :create]
-        resources :group_links, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
+        resources :group_links, only: [:create, :update, :destroy], constraints: { id: /\d+/ }
 
         resource :import, only: [:new, :create, :show]
         resource :avatar, only: [:show, :destroy]
@@ -317,6 +315,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         draw :issues
         draw :merge_requests
+        draw :pipelines
 
         # The wiki and repository routing contains wildcard characters so
         # its preferable to keep it below all other project routes
@@ -381,17 +380,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       post 'alerts/notify', to: 'alerting/notifications#create'
-
-      # Unscoped route. It will be replaced with redirect to /-/pipelines/
-      # Issue https://gitlab.com/gitlab-org/gitlab/issues/118849
-      draw :pipelines
-
-      # To ensure an old unscoped routing is used for the UI we need to
-      # add prefix 'as' to the scope routing and place it below original routing.
-      # Issue https://gitlab.com/gitlab-org/gitlab/issues/118849
-      scope '-', as: 'scoped' do
-        draw :pipelines
-      end
 
       draw :legacy_builds
 
@@ -488,6 +476,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Deprecated unscoped routing.
       # Issue https://gitlab.com/gitlab-org/gitlab/issues/118849
       scope as: 'deprecated' do
+        draw :pipelines
         draw :repository
       end
 

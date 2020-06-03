@@ -99,7 +99,13 @@ module EE
         end
       end
 
-      with_scope :subject
+      condition(:can_change_reject_unsigned_commits) do
+        admin? ||
+          (can?(:maintainer_access) &&
+            reject_unsigned_commits_disabled_globally? &&
+            reject_unsigned_commits_disabled_by_group?)
+      end
+
       condition(:commit_committer_check_disabled_by_group) do
         if group_push_rule_present?
           !subject.group.push_rule.commit_committer_check
@@ -111,6 +117,13 @@ module EE
       with_scope :subject
       condition(:commit_committer_check_available) do
         @subject.feature_available?(:commit_committer_check)
+      end
+
+      condition(:can_change_commit_commiter_check) do
+        admin? ||
+          (can?(:maintainer_access) &&
+            commit_committer_check_disabled_globally? &&
+            commit_committer_check_disabled_by_group?)
       end
 
       with_scope :subject
@@ -301,23 +314,17 @@ module EE
 
       rule { ~can?(:push_code) }.prevent :push_code_to_protected_branches
 
-      rule { admin | (reject_unsigned_commits_disabled_globally & reject_unsigned_commits_disabled_by_group & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
+      rule { can_change_reject_unsigned_commits }.enable :change_reject_unsigned_commits
 
       rule { reject_unsigned_commits_available }.enable :read_reject_unsigned_commits
 
       rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
 
-      rule { admin | (commit_committer_check_disabled_globally & commit_committer_check_disabled_by_group & can?(:maintainer_access)) }.policy do
-        enable :change_commit_committer_check
-      end
+      rule { can_change_commit_commiter_check }.enable :change_commit_committer_check
 
-      rule { commit_committer_check_available }.policy do
-        enable :read_commit_committer_check
-      end
+      rule { commit_committer_check_available }.enable :read_commit_committer_check
 
-      rule { ~commit_committer_check_available }.policy do
-        prevent :change_commit_committer_check
-      end
+      rule { ~commit_committer_check_available }.prevent :change_commit_committer_check
 
       rule { owner | reporter }.enable :build_read_project
 

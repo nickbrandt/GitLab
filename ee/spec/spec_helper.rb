@@ -17,7 +17,7 @@ RSpec.configure do |config|
   end
 
   config.before(:all) do
-    License.destroy_all # rubocop: disable DestroyAll
+    License.destroy_all # rubocop: disable Cop/DestroyAll
     TestLicense.init
   end
 

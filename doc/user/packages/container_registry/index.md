@@ -26,7 +26,7 @@ have its own space to store its Docker images.
 
 You can read more about Docker Registry at <https://docs.docker.com/registry/introduction/>.
 
-![Container Registry repositories](img/container_registry_repositories_v13_0.png)
+![Container Registry repositories](img/container_registry_repositories_v13_1.png)
 
 ## Enable the Container Registry for your project
 
@@ -62,7 +62,7 @@ for both projects and groups.
 
 Navigate to your project's **{package}** **Packages & Registries > Container Registry**.
 
-![Container Registry project repositories](img/container_registry_repositories_with_quickstart_v13_0.png)
+![Container Registry project repositories](img/container_registry_repositories_with_quickstart_v13_1.png)
 
 This view will:
 
@@ -77,7 +77,7 @@ This view will:
 
 Navigate to your groups's **{package}** **Packages & Registries > Container Registry**.
 
-![Container Registry group repositories](img/container_registry_group_repositories_v13_0.png)
+![Container Registry group repositories](img/container_registry_group_repositories_v13_1.png)
 
 This view will:
 
@@ -243,7 +243,7 @@ For private and internal projects:
 
 ### Container Registry examples with GitLab CI/CD
 
-If you're using docker-in-docker on your Runners, this is how your `.gitlab-ci.yml`
+If you're using Docker-in-Docker on your Runners, this is how your `.gitlab-ci.yml`
 should look similar to this:
 
 ```yaml
@@ -258,7 +258,7 @@ build:
     - docker push $CI_REGISTRY/group/project/image:latest
 ```
 
-You can also make use of [other variables](../../../ci/variables/README.md) to avoid hardcoding:
+You can also make use of [other variables](../../../ci/variables/README.md) to avoid hard-coding:
 
 ```yaml
 build:
@@ -350,11 +350,11 @@ or [Kubernetes](https://docs.gitlab.com/runner/executors/kubernetes.html) execut
 make sure that [`pull_policy`](https://docs.gitlab.com/runner/executors/docker.html#how-pull-policies-work)
 is set to `always`.
 
-### Using a docker-in-docker image from your Container Registry
+### Using a Docker-in-Docker image from your Container Registry
 
-If you want to use your own Docker images for docker-in-docker, there are a few
+If you want to use your own Docker images for Docker-in-Docker, there are a few
 things you need to do in addition to the steps in the
-[docker-in-docker](../../../ci/docker/using_docker_build.md#use-docker-in-docker-workflow-with-docker-executor) section:
+[Docker-in-Docker](../../../ci/docker/using_docker_build.md#use-docker-in-docker-workflow-with-docker-executor) section:
 
 1. Update the `image` and `service` to point to your registry.
 1. Add a service [alias](../../../ci/yaml/README.md#servicesalias).

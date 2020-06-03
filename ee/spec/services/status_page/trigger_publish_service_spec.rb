@@ -19,7 +19,7 @@ describe StatusPage::TriggerPublishService do
     subject { service.execute }
 
     describe 'triggered by issue' do
-      let_it_be(:triggered_by, reload: true) { create(:issue, project: project) }
+      let_it_be(:triggered_by, reload: true) { create(:issue, :published, project: project) }
       let(:issue_id) { triggered_by.id }
 
       using RSpec::Parameterized::TableSyntax
@@ -53,6 +53,16 @@ describe StatusPage::TriggerPublishService do
         end
       end
 
+      context 'when a non-published issue changes' do
+        let(:triggered_by) { create(:issue, project: project) }
+
+        include_examples 'no trigger status page publish' do
+          before do
+            triggered_by.update!(title: 'changed')
+          end
+        end
+      end
+
       context 'when closing an issue' do
         include_examples 'trigger status page publish' do
           before do
@@ -65,7 +75,7 @@ describe StatusPage::TriggerPublishService do
 
       context 'when reopening an issue' do
         include_examples 'trigger status page publish' do
-          let_it_be(:triggered_by) { create(:issue, :closed, project: project) }
+          let_it_be(:triggered_by) { create(:issue, :closed, :published, project: project) }
 
           before do
             triggered_by.reopen!
@@ -203,7 +213,7 @@ describe StatusPage::TriggerPublishService do
     end
 
     context 'with eligable triggered_by' do
-      let_it_be(:triggered_by) { create(:issue, project: project) }
+      let_it_be(:triggered_by) { create(:issue, :published, project: project) }
       let(:issue_id) { triggered_by.id }
 
       context 'when eligable' do

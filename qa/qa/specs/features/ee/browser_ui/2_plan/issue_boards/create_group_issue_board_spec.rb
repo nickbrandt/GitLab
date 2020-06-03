@@ -18,7 +18,7 @@ module QA
       end
 
       it 'creates a group issue board via the GUI' do
-        EE::Page::Component::IssueBoard::Show.perform do |show|
+        Page::Component::IssueBoard::Show.perform do |show|
           new_board = "Board-#{SecureRandom.hex(4)}"
 
           show.create_new_board(new_board)

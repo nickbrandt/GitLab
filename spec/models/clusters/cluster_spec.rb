@@ -172,6 +172,41 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
   end
 
+  describe '.with_application_prometheus' do
+    subject { described_class.with_application_prometheus }
+
+    let!(:cluster) { create(:cluster) }
+
+    context 'cluster has prometheus application' do
+      let!(:application) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
+
+      it { is_expected.to include(cluster) }
+    end
+
+    context 'cluster does not have prometheus application' do
+      let(:cluster) { create(:cluster) }
+
+      it { is_expected.not_to include(cluster) }
+    end
+  end
+
+  describe '.with_project_alert_service_data' do
+    subject { described_class.with_project_alert_service_data(project_id) }
+
+    let!(:cluster) { create(:cluster, :project) }
+    let!(:project_id) { cluster.first_project.id }
+
+    context 'project has alert service data' do
+      let!(:alerts_service) { create(:alerts_service, project: cluster.clusterable) }
+
+      it { is_expected.to include(cluster) }
+    end
+
+    context 'project has no alert service data' do
+      it { is_expected.not_to include(cluster) }
+    end
+  end
+
   describe '.for_project_namespace' do
     subject { described_class.for_project_namespace(namespace_id) }
 
@@ -573,19 +608,12 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
 
     context 'when applications are created' do
-      let!(:helm) { create(:clusters_applications_helm, cluster: cluster) }
-      let!(:ingress) { create(:clusters_applications_ingress, cluster: cluster) }
-      let!(:cert_manager) { create(:clusters_applications_cert_manager, cluster: cluster) }
-      let!(:crossplane) { create(:clusters_applications_crossplane, cluster: cluster) }
-      let!(:prometheus) { create(:clusters_applications_prometheus, cluster: cluster) }
-      let!(:runner) { create(:clusters_applications_runner, cluster: cluster) }
-      let!(:jupyter) { create(:clusters_applications_jupyter, cluster: cluster) }
-      let!(:knative) { create(:clusters_applications_knative, cluster: cluster) }
-      let!(:elastic_stack) { create(:clusters_applications_elastic_stack, cluster: cluster) }
-      let!(:fluentd) { create(:clusters_applications_fluentd, cluster: cluster) }
+      let(:cluster) { create(:cluster, :with_all_applications) }
 
-      it 'returns a list of created applications' do
-        is_expected.to contain_exactly(helm, ingress, cert_manager, crossplane, prometheus, runner, jupyter, knative, elastic_stack, fluentd)
+      it 'returns a list of created applications', :aggregate_failures do
+        is_expected.to have_attributes(size: described_class::APPLICATIONS.size)
+        is_expected.to all(be_kind_of(::Clusters::Concerns::ApplicationCore))
+        is_expected.to all(be_persisted)
       end
     end
   end
@@ -611,33 +639,13 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
 
     context 'when application is persisted' do
-      let!(:helm) { create(:clusters_applications_helm, cluster: cluster) }
-      let!(:ingress) { create(:clusters_applications_ingress, cluster: cluster) }
-      let!(:cert_manager) { create(:clusters_applications_cert_manager, cluster: cluster) }
-      let!(:crossplane) { create(:clusters_applications_crossplane, cluster: cluster) }
-      let!(:prometheus) { create(:clusters_applications_prometheus, cluster: cluster) }
-      let!(:runner) { create(:clusters_applications_runner, cluster: cluster) }
-      let!(:jupyter) { create(:clusters_applications_jupyter, cluster: cluster) }
-      let!(:knative) { create(:clusters_applications_knative, cluster: cluster) }
-      let!(:elastic_stack) { create(:clusters_applications_elastic_stack, cluster: cluster) }
-      let!(:fluentd) { create(:clusters_applications_fluentd, cluster: cluster) }
+      let(:cluster) { create(:cluster, :with_all_applications) }
 
       it 'returns the persisted application', :aggregate_failures do
-        {
-          Clusters::Applications::Helm => helm,
-          Clusters::Applications::Ingress => ingress,
-          Clusters::Applications::CertManager => cert_manager,
-          Clusters::Applications::Crossplane => crossplane,
-          Clusters::Applications::Prometheus => prometheus,
-          Clusters::Applications::Runner => runner,
-          Clusters::Applications::Jupyter => jupyter,
-          Clusters::Applications::Knative => knative,
-          Clusters::Applications::ElasticStack => elastic_stack,
-          Clusters::Applications::Fluentd => fluentd
-        }.each do |application_class, expected_object|
+        described_class::APPLICATIONS.each_value do |application_class|
           application = cluster.find_or_build_application(application_class)
 
-          expect(application).to eq(expected_object)
+          expect(application).to be_kind_of(::Clusters::Concerns::ApplicationCore)
           expect(application).to be_persisted
         end
       end

@@ -48,7 +48,6 @@ class License < ApplicationRecord
     adjourned_deletion_for_projects_and_groups
     admin_audit_log
     auditor_user
-    batch_comments
     blocking_merge_requests
     board_assignee_lists
     board_milestone_lists
@@ -76,6 +75,7 @@ class License < ApplicationRecord
     geo
     github_project_service_integration
     group_allowed_email_domains
+    group_ip_restriction
     group_project_templates
     group_saml
     issues_analytics
@@ -115,7 +115,6 @@ class License < ApplicationRecord
     dast
     dependency_scanning
     enterprise_templates
-    group_ip_restriction
     group_level_compliance_dashboard
     incident_management
     insights
@@ -127,6 +126,7 @@ class License < ApplicationRecord
     report_approver_rules
     requirements
     sast
+    secret_detection
     security_dashboard
     status_page
     subepics

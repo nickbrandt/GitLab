@@ -142,6 +142,7 @@ describe ApplicationSetting do
       # and we want to make sure we're still testing
       # should_check_namespace_plan? method through the test-suite (see
       # https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/18461#note_69322821).
+      allow(Rails).to receive_message_chain(:env, :development?).and_return(false)
       allow(Rails).to receive_message_chain(:env, :test?).and_return(false)
     end
 

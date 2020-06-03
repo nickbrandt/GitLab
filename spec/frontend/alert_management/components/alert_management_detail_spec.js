@@ -1,31 +1,25 @@
 import { mount, shallowMount } from '@vue/test-utils';
-import { GlAlert, GlLoadingIcon, GlDropdownItem, GlTable } from '@gitlab/ui';
+import { GlAlert, GlLoadingIcon, GlTable } from '@gitlab/ui';
 import AlertDetails from '~/alert_management/components/alert_details.vue';
-import updateAlertStatus from '~/alert_management/graphql/mutations/update_alert_status.graphql';
 import createIssueQuery from '~/alert_management/graphql/mutations/create_issue_from_alert.graphql';
-import createFlash from '~/flash';
 import { joinPaths } from '~/lib/utils/url_utility';
-
+import {
+  trackAlertsDetailsViewsOptions,
+  ALERTS_SEVERITY_LABELS,
+} from '~/alert_management/constants';
+import Tracking from '~/tracking';
 import mockAlerts from '../mocks/alerts.json';
 
 const mockAlert = mockAlerts[0];
-jest.mock('~/flash');
 
 describe('AlertDetails', () => {
   let wrapper;
   const projectPath = 'root/alerts';
   const projectIssuesPath = 'root/alerts/-/issues';
 
-  const findStatusDropdownItem = () => wrapper.find(GlDropdownItem);
   const findDetailsTable = () => wrapper.find(GlTable);
 
-  function mountComponent({
-    data,
-    alertManagementCreateAlertIssue = false,
-    loading = false,
-    mountMethod = shallowMount,
-    stubs = {},
-  } = {}) {
+  function mountComponent({ data, loading = false, mountMethod = shallowMount, stubs = {} } = {}) {
     wrapper = mountMethod(AlertDetails, {
       propsData: {
         alertId: 'alertId',
@@ -34,9 +28,6 @@ describe('AlertDetails', () => {
       },
       data() {
         return { alert: { ...mockAlert }, ...data };
-      },
-      provide: {
-        glFeatures: { alertManagementCreateAlertIssue },
       },
       mocks: {
         $apollo: {
@@ -88,6 +79,12 @@ describe('AlertDetails', () => {
         expect(wrapper.find('[data-testid="fullDetailsTab"]').exists()).toBe(true);
       });
 
+      it('renders severity', () => {
+        expect(wrapper.find('[data-testid="severity"]').text()).toBe(
+          ALERTS_SEVERITY_LABELS[mockAlert.severity],
+        );
+      });
+
       it('renders a title', () => {
         expect(wrapper.find('[data-testid="title"]').text()).toBe(mockAlert.title);
       });
@@ -125,69 +122,54 @@ describe('AlertDetails', () => {
     });
 
     describe('Create issue from alert', () => {
-      describe('createIssueFromAlertEnabled feature flag enabled', () => {
-        it('should display "View issue" button that links the issue page when issue exists', () => {
-          const issueIid = '3';
-          mountComponent({
-            alertManagementCreateAlertIssue: true,
-            data: { alert: { ...mockAlert, issueIid } },
-          });
-          expect(findViewIssueBtn().exists()).toBe(true);
-          expect(findViewIssueBtn().attributes('href')).toBe(
-            joinPaths(projectIssuesPath, issueIid),
-          );
-          expect(findCreateIssueBtn().exists()).toBe(false);
+      it('should display "View issue" button that links the issue page when issue exists', () => {
+        const issueIid = '3';
+        mountComponent({
+          data: { alert: { ...mockAlert, issueIid } },
         });
+        expect(findViewIssueBtn().exists()).toBe(true);
+        expect(findViewIssueBtn().attributes('href')).toBe(joinPaths(projectIssuesPath, issueIid));
+        expect(findCreateIssueBtn().exists()).toBe(false);
+      });
 
-        it('should display "Create issue" button when issue doesn\'t exist yet', () => {
-          const issueIid = null;
-          mountComponent({
-            mountMethod: mount,
-            alertManagementCreateAlertIssue: true,
-            data: { alert: { ...mockAlert, issueIid } },
-          });
-          expect(findViewIssueBtn().exists()).toBe(false);
-          expect(findCreateIssueBtn().exists()).toBe(true);
+      it('should display "Create issue" button when issue doesn\'t exist yet', () => {
+        const issueIid = null;
+        mountComponent({
+          mountMethod: mount,
+          data: { alert: { ...mockAlert, issueIid } },
         });
+        expect(findViewIssueBtn().exists()).toBe(false);
+        expect(findCreateIssueBtn().exists()).toBe(true);
+      });
 
-        it('calls `$apollo.mutate` with `createIssueQuery`', () => {
-          const issueIid = '10';
-          jest
-            .spyOn(wrapper.vm.$apollo, 'mutate')
-            .mockResolvedValue({ data: { createAlertIssue: { issue: { iid: issueIid } } } });
+      it('calls `$apollo.mutate` with `createIssueQuery`', () => {
+        const issueIid = '10';
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockResolvedValue({ data: { createAlertIssue: { issue: { iid: issueIid } } } });
 
-          findCreateIssueBtn().trigger('click');
-          expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith({
-            mutation: createIssueQuery,
-            variables: {
-              iid: mockAlert.iid,
-              projectPath,
-            },
-          });
-        });
-
-        it('shows error alert when issue creation fails ', () => {
-          const errorMsg = 'Something went wrong';
-          mountComponent({
-            mountMethod: mount,
-            alertManagementCreateAlertIssue: true,
-            data: { alert: { ...mockAlert, alertIid: 1 } },
-          });
-
-          jest.spyOn(wrapper.vm.$apollo, 'mutate').mockRejectedValue(errorMsg);
-          findCreateIssueBtn().trigger('click');
-
-          setImmediate(() => {
-            expect(findIssueCreationAlert().text()).toBe(errorMsg);
-          });
+        findCreateIssueBtn().trigger('click');
+        expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith({
+          mutation: createIssueQuery,
+          variables: {
+            iid: mockAlert.iid,
+            projectPath,
+          },
         });
       });
 
-      describe('createIssueFromAlertEnabled feature flag disabled', () => {
-        it('should not display a View or Create issue button', () => {
-          mountComponent({ alertManagementCreateAlertIssue: false });
-          expect(findCreateIssueBtn().exists()).toBe(false);
-          expect(findViewIssueBtn().exists()).toBe(false);
+      it('shows error alert when issue creation fails ', () => {
+        const errorMsg = 'Something went wrong';
+        mountComponent({
+          mountMethod: mount,
+          data: { alert: { ...mockAlert, alertIid: 1 } },
+        });
+
+        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockRejectedValue(errorMsg);
+        findCreateIssueBtn().trigger('click');
+
+        setImmediate(() => {
+          expect(findIssueCreationAlert().text()).toBe(errorMsg);
         });
       });
     });
@@ -230,15 +212,15 @@ describe('AlertDetails', () => {
 
       describe('individual header fields', () => {
         describe.each`
-          severity    | createdAt                     | monitoringTool | result
-          ${'MEDIUM'} | ${'2020-04-17T23:18:14.996Z'} | ${null}        | ${'Medium • Reported now'}
-          ${'INFO'}   | ${'2020-04-17T23:18:14.996Z'} | ${'Datadog'}   | ${'Info • Reported now by Datadog'}
+          createdAt                     | monitoringTool | result
+          ${'2020-04-17T23:18:14.996Z'} | ${null}        | ${'Alert Reported now'}
+          ${'2020-04-17T23:18:14.996Z'} | ${'Datadog'}   | ${'Alert Reported now by Datadog'}
         `(
-          `When severity=$severity, createdAt=$createdAt, monitoringTool=$monitoringTool`,
-          ({ severity, createdAt, monitoringTool, result }) => {
+          `When createdAt=$createdAt, monitoringTool=$monitoringTool`,
+          ({ createdAt, monitoringTool, result }) => {
             beforeEach(() => {
               mountComponent({
-                data: { alert: { ...mockAlert, severity, createdAt, monitoringTool } },
+                data: { alert: { ...mockAlert, createdAt, monitoringTool } },
                 mountMethod: mount,
                 stubs,
               });
@@ -253,19 +235,9 @@ describe('AlertDetails', () => {
     });
   });
 
-  describe('updating the alert status', () => {
-    const mockUpdatedMutationResult = {
-      data: {
-        updateAlertStatus: {
-          errors: [],
-          alert: {
-            status: 'acknowledged',
-          },
-        },
-      },
-    };
-
+  describe('Snowplow tracking', () => {
     beforeEach(() => {
+      jest.spyOn(Tracking, 'event');
       mountComponent({
         props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
         data: { alert: mockAlert },
@@ -273,29 +245,9 @@ describe('AlertDetails', () => {
       });
     });
 
-    it('calls `$apollo.mutate` with `updateAlertStatus` mutation and variables containing `iid`, `status`, & `projectPath`', () => {
-      jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue(mockUpdatedMutationResult);
-      findStatusDropdownItem().vm.$emit('click');
-
-      expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith({
-        mutation: updateAlertStatus,
-        variables: {
-          iid: 'alertId',
-          status: 'TRIGGERED',
-          projectPath,
-        },
-      });
-    });
-
-    it('calls `createFlash` when request fails', () => {
-      jest.spyOn(wrapper.vm.$apollo, 'mutate').mockReturnValue(Promise.reject(new Error()));
-      findStatusDropdownItem().vm.$emit('click');
-
-      setImmediate(() => {
-        expect(createFlash).toHaveBeenCalledWith(
-          'There was an error while updating the status of the alert. Please try again.',
-        );
-      });
+    it('should track alert details page views', () => {
+      const { category, action } = trackAlertsDetailsViewsOptions;
+      expect(Tracking.event).toHaveBeenCalledWith(category, action);
     });
   });
 });

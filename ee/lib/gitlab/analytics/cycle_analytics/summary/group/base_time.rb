@@ -43,7 +43,8 @@ module Gitlab
                 params: {
                   from: @options[:from],
                   to: @options[:to] || DateTime.now,
-                  project_ids: @options[:projects]
+                  project_ids: @options[:projects],
+                  current_user: @current_user
                 }
               )
             end

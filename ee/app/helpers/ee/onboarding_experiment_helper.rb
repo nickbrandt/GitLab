@@ -15,19 +15,8 @@ module EE
 
     def experiment_enabled_for_user?
       return true unless current_user
-      # If EXPERIMENT_GROWTH_ONBOARDING_FEATURE_NAME is not set, we should return
-      # true which means available for all
-      return true unless onboarding_sign_up_experiment_set?
 
-      ::Feature.enabled?(EXPERIMENT_GROWTH_ONBOARDING_FEATURE_NAME, current_user)
-    end
-
-    def onboarding_sign_up_experiment_set?
-      ::Feature.persisted?(onboarding_sign_up_experiment_feature)
-    end
-
-    def onboarding_sign_up_experiment_feature
-      ::Feature.get(EXPERIMENT_GROWTH_ONBOARDING_FEATURE_NAME)
+      ::Feature.enabled?(EXPERIMENT_GROWTH_ONBOARDING_FEATURE_NAME, current_user, default_enabled: true)
     end
   end
 end

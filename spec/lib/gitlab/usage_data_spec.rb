@@ -6,8 +6,7 @@ describe Gitlab::UsageData, :aggregate_failures do
   include UsageDataHelpers
 
   before do
-    allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
-
+    stub_usage_data_connections
     stub_object_store_settings
   end
 
@@ -114,30 +113,33 @@ describe Gitlab::UsageData, :aggregate_failures do
           end
         end
 
+        let_it_be('container_expiration_policy_with_keep_n_set_to_null') { create(:container_expiration_policy, keep_n: nil) }
+        let_it_be('container_expiration_policy_with_older_than_set_to_null') { create(:container_expiration_policy, older_than: nil) }
+
         let(:inactive_policies) { ::ContainerExpirationPolicy.where(enabled: false) }
         let(:active_policies) { ::ContainerExpirationPolicy.active }
 
         subject { described_class.data[:counts] }
 
         it 'gathers usage data' do
-          expect(subject[:projects_with_expiration_policy_enabled]).to eq 20
+          expect(subject[:projects_with_expiration_policy_enabled]).to eq 22
           expect(subject[:projects_with_expiration_policy_disabled]).to eq 1
 
-          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_unset]).to eq 14
+          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_unset]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_1]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_5]).to eq 1
-          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_10]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_10]).to eq 16
           expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_25]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_keep_n_set_to_50]).to eq 1
 
-          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_unset]).to eq 16
+          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_unset]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_7d]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_14d]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_30d]).to eq 1
-          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_90d]).to eq 1
+          expect(subject[:projects_with_expiration_policy_enabled_with_older_than_set_to_90d]).to eq 18
 
-          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1d]).to eq 12
-          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_7d]).to eq 5
+          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1d]).to eq 18
+          expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_7d]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_14d]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_1month]).to eq 1
           expect(subject[:projects_with_expiration_policy_enabled_with_cadence_set_to_3month]).to eq 1
@@ -242,9 +244,10 @@ describe Gitlab::UsageData, :aggregate_failures do
       describe '#components_usage_data' do
         subject { described_class.components_usage_data }
 
-        it 'gathers components usage data' do
-          expect(Gitlab::UsageData).to receive(:app_server_type).and_return('server_type')
-          expect(subject[:app_server][:type]).to eq('server_type')
+        it 'gathers basic components usage data' do
+          stub_runtime(:puma)
+
+          expect(subject[:app_server][:type]).to eq('puma')
           expect(subject[:gitlab_pages][:enabled]).to eq(Gitlab.config.pages.enabled)
           expect(subject[:gitlab_pages][:version]).to eq(Gitlab::Pages::VERSION)
           expect(subject[:git][:version]).to eq(Gitlab::Git.version)
@@ -252,8 +255,95 @@ describe Gitlab::UsageData, :aggregate_failures do
           expect(subject[:database][:version]).to eq(Gitlab::Database.version)
           expect(subject[:gitaly][:version]).to be_present
           expect(subject[:gitaly][:servers]).to be >= 1
+          expect(subject[:gitaly][:clusters]).to be >= 0
           expect(subject[:gitaly][:filesystems]).to be_an(Array)
           expect(subject[:gitaly][:filesystems].first).to be_a(String)
+        end
+
+        def stub_runtime(runtime)
+          allow(Gitlab::Runtime).to receive(:identify).and_return(runtime)
+        end
+      end
+
+      describe '#topology_usage_data' do
+        subject { described_class.topology_usage_data }
+
+        before do
+          # this pins down time shifts when benchmarking durations
+          allow(Process).to receive(:clock_gettime).and_return(0)
+        end
+
+        context 'when embedded Prometheus server is enabled' do
+          before do
+            expect(Gitlab::Prometheus::Internal).to receive(:prometheus_enabled?).and_return(true)
+            expect(Gitlab::Prometheus::Internal).to receive(:uri).and_return('http://prom:9090')
+          end
+
+          it 'contains a topology element' do
+            allow_prometheus_queries
+
+            expect(subject).to have_key(:topology)
+          end
+
+          context 'tracking node metrics' do
+            it 'contains node level metrics for each instance' do
+              expect_prometheus_api_to receive(:aggregate)
+                .with(func: 'avg', metric: 'node_memory_MemTotal_bytes', by: 'instance')
+                .and_return({
+                  'instance1' => 512,
+                  'instance2' => 1024
+                })
+
+              expect(subject[:topology]).to eq({
+                duration_s: 0,
+                nodes: [
+                  {
+                    node_memory_total_bytes: 512
+                  },
+                  {
+                    node_memory_total_bytes: 1024
+                  }
+                ]
+              })
+            end
+          end
+
+          context 'and no results are found' do
+            it 'does not report anything' do
+              expect_prometheus_api_to receive(:aggregate).and_return({})
+
+              expect(subject[:topology]).to eq({
+                duration_s: 0,
+                nodes: []
+              })
+            end
+          end
+
+          context 'and a connection error is raised' do
+            it 'does not report anything' do
+              expect_prometheus_api_to receive(:aggregate).and_raise('Connection failed')
+
+              expect(subject[:topology]).to eq({ duration_s: 0 })
+            end
+          end
+        end
+
+        context 'when embedded Prometheus server is disabled' do
+          it 'does not report anything' do
+            expect(subject[:topology]).to eq({ duration_s: 0 })
+          end
+        end
+
+        def expect_prometheus_api_to(receive_matcher)
+          expect_next_instance_of(Gitlab::PrometheusClient) do |client|
+            expect(client).to receive_matcher
+          end
+        end
+
+        def allow_prometheus_queries
+          allow_next_instance_of(Gitlab::PrometheusClient) do |client|
+            allow(client).to receive(:aggregate).and_return({})
+          end
         end
       end
 
@@ -570,5 +660,28 @@ describe Gitlab::UsageData, :aggregate_failures do
     end
 
     it_behaves_like 'usage data execution'
+  end
+
+  describe '#merge_requests_usage_data' do
+    let(:time_period) { { created_at: 2.days.ago..Time.current } }
+    let(:merge_request) { create(:merge_request) }
+    let(:other_user) { create(:user) }
+    let(:another_user) { create(:user) }
+
+    before do
+      create(:event, target: merge_request, author: merge_request.author, created_at: 1.day.ago)
+      create(:event, target: merge_request, author: merge_request.author, created_at: 1.hour.ago)
+      create(:event, target: merge_request, author: merge_request.author, created_at: 3.days.ago)
+      create(:event, target: merge_request, author: other_user, created_at: 1.day.ago)
+      create(:event, target: merge_request, author: other_user, created_at: 1.hour.ago)
+      create(:event, target: merge_request, author: other_user, created_at: 3.days.ago)
+      create(:event, target: merge_request, author: another_user, created_at: 4.days.ago)
+    end
+
+    it 'returns the distinct count of users using merge requests (via events table) within the specified time period' do
+      expect(described_class.merge_requests_usage_data(time_period)).to eq(
+        merge_requests_users: 2
+      )
+    end
   end
 end

@@ -50,11 +50,11 @@ needs several Gems that have native extensions.
 
 ### Go versions
 
-The minimum required Go version is 1.12.
+The minimum required Go version is 1.13.
 
 ### Git versions
 
-GitLab 11.11 and higher only supports Git 2.21.x and newer, and
+GitLab 11.11 and higher only supports Git 2.24.x and newer, and
 [dropped support for older versions](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/54255).
 
 ### Node.js versions
@@ -288,10 +288,11 @@ You can provide feedback [on this issue](https://gitlab.com/gitlab-org/gitlab/-/
 
 GitLab supports the following web browsers:
 
-- Firefox
-- Chrome/Chromium
-- Safari
-- Microsoft Edge
+- [Mozilla Firefox](https://www.mozilla.org/firefox/new/)
+- [Google Chrome](https://www.google.com/chrome/)
+- [Chromium](https://www.chromium.org/getting-involved/dev-channel)
+- [Apple Safari](https://www.apple.com/safari/)
+- [Microsoft Edge](https://www.microsoft.com/edge)
 - Internet Explorer 11 (until May 2020)
 
 For the listed web browsers, GitLab supports:

@@ -1,3 +1,9 @@
+---
+stage: Plan
+group: Project Management
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # Projects API
 
 ## Project visibility level
@@ -1198,7 +1204,7 @@ PUT /projects/:id
 | `approvals_before_merge` | integer | no | **(STARTER)** How many approvers should approve merge request by default |
 | `external_authorization_classification_label` | string | no | **(PREMIUM)** The classification label for the project |
 | `mirror` | boolean | no | **(STARTER)** Enables pull mirroring in a project |
-| `mirror_user_id` | integer | no | **(STARTER)** User responsible for all the activity surrounding a pull mirror event |
+| `mirror_user_id` | integer | no | **(STARTER)** User responsible for all the activity surrounding a pull mirror event. Can only be set by admins. |
 | `mirror_trigger_builds` | boolean | no | **(STARTER)** Pull mirroring triggers builds |
 | `only_mirror_protected_branches` | boolean | no | **(STARTER)** Only mirror protected branches |
 | `mirror_overwrites_diverged_branches` | boolean | no | **(STARTER)** Pull mirror overwrites diverged branches |
@@ -1851,7 +1857,7 @@ The `file=` parameter must point to a file on your filesystem and be preceded
 by `@`. For example:
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "file=@dk.png" https://gitlab.example.com/api/v4/projects/5/uploads
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "file=@dk.png" "https://gitlab.example.com/api/v4/projects/5/uploads"
 ```
 
 Returned object:
@@ -1898,7 +1904,7 @@ DELETE /projects/:id/share/:group_id
 | `group_id` | integer | yes | The ID of the group |
 
 ```shell
-curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/share/17
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/share/17"
 ```
 
 ## Hooks
@@ -2064,7 +2070,7 @@ GET /projects
 | `sort` | string | no | Return requests sorted in `asc` or `desc` order |
 
 ```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects?search=test
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects?search=test"
 ```
 
 ## Start the Housekeeping task for a Project
@@ -2224,7 +2230,7 @@ POST /projects/:id/mirror/pull
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/mirror/pull
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/:id/mirror/pull"
 ```
 
 ## Project badges

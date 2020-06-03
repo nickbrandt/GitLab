@@ -165,6 +165,11 @@ class ApprovalState
     end
   end
 
+  # This is the required + optional approval count
+  def total_approvals_count
+    approvals.size
+  end
+
   private
 
   attr_reader :target_branch

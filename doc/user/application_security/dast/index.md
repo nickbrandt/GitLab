@@ -145,7 +145,14 @@ the site during a scan could lead to inaccurate results.
 
 ### Authentication
 
-It's also possible to authenticate the user before performing the DAST checks:
+It's also possible to authenticate the user before performing the DAST checks.
+
+Create masked variables to pass the credentials that DAST will use.
+To create masked variables for the username and password, see [Create a custom variable in the UI](../../../ci/variables/README.md#create-a-custom-variable-in-the-ui).
+Note that the key of the username variable must be `DAST_USERNAME`
+and the key of the password variable must be `DAST_PASSWORD`.
+
+Other variables that are related to authenticated scans are:
 
 ```yaml
 include:
@@ -154,8 +161,6 @@ include:
 variables:
   DAST_WEBSITE: https://example.com
   DAST_AUTH_URL: https://example.com/sign-in
-  DAST_USERNAME: john.doe@example.com
-  DAST_PASSWORD: john-doe-password
   DAST_USERNAME_FIELD: session[user] # the name of username field at the sign-in HTML form
   DAST_PASSWORD_FIELD: session[password] # the name of password field at the sign-in HTML form
   DAST_AUTH_EXCLUDE_URLS: http://example.com/sign-out,http://example.com/sign-out-2 # optional, URLs to skip during the authenticated scan; comma-separated, no spaces in between
@@ -466,7 +471,7 @@ DAST can be [configured](#customizing-the-dast-settings) using environment varia
 | `DAST_INCLUDE_ALPHA_VULNERABILITIES` | no | Include alpha passive and active scan rules. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
 | `DAST_USE_AJAX_SPIDER` | no | Use the AJAX spider in addition to the traditional spider, useful for crawling sites that require JavaScript. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
 | `DAST_ZAP_CLI_OPTIONS` | no | ZAP Server command-line options. For example, `-Xmx3072m` would set the Java maximum memory allocation pool size. |
-| `DAST_ZAP_GENERATE_CONFIG` | no | Generate sample ZAP config file for use with `DAST_ZAP_CONFIG_FILE`. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
+| `DAST_ZAP_GENERATE_CONFIG` | no | The file name of the generated sample ZAP config file for use with `DAST_ZAP_CONFIG_FILE`. |
 | `DAST_ZAP_CONFIG_FILE` | no | Name of config file used to determine thresholds of vulnerability rules. |
 | `DAST_ZAP_CONFIG_URL` | no | URL of config file used to determine thresholds of vulnerability rules. |
 

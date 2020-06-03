@@ -134,7 +134,7 @@ Make sure you have the right version of Git installed:
 # Install Git
 sudo apt-get install -y git-core
 
-# Make sure Git is version 2.26.2 or higher (minimal supported version is 2.22.0)
+# Make sure Git is version 2.26.2 or higher (minimal supported version is 2.24.0)
 git --version
 ```
 
@@ -142,7 +142,7 @@ Starting with GitLab 12.0, Git is required to be compiled with `libpcre2`.
 Find out if that's the case:
 
 ```shell
-ldd $(which git) | grep pcre2
+ldd $(command -v git) | grep pcre2
 ```
 
 The output should contain `libpcre2-8.so.0`.
@@ -216,10 +216,9 @@ The Ruby interpreter is required to run GitLab.
   dropped support for Ruby 2.5.x.
 
 The use of Ruby version managers such as [RVM](https://rvm.io/), [rbenv](https://github.com/rbenv/rbenv) or [chruby](https://github.com/postmodern/chruby) with GitLab
-in production, frequently leads to hard to diagnose problems. For example,
-GitLab Shell is called from OpenSSH, and having a version manager can prevent
-pushing and pulling over SSH. Version managers are not supported and we strongly
-advise everyone to follow the instructions below to use a system Ruby.
+in production, frequently leads to hard to diagnose problems. Version managers
+are not supported and we strongly advise everyone to follow the instructions
+below to use a system Ruby.
 
 Linux distributions generally have older versions of Ruby available, so these
 instructions are designed to install Ruby from the official source code.
@@ -234,9 +233,9 @@ Download Ruby and compile it:
 
 ```shell
 mkdir /tmp/ruby && cd /tmp/ruby
-curl --remote-name --progress https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.gz
-echo '1416ce288fb8bfeae07a12b608540318c9cace71  ruby-2.6.5.tar.gz' | shasum -c - && tar xzf ruby-2.6.5.tar.gz
-cd ruby-2.6.5
+curl --remote-name --progress https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.gz
+echo '2d78048e293817f38d4ede4ebc7873013e97bb0b  ruby-2.6.6.tar.gz' | shasum -c - && tar xzf ruby-2.6.6.tar.gz
+cd ruby-2.6.6
 
 ./configure --disable-install-rdoc
 make
@@ -565,8 +564,8 @@ If you want to use Kerberos for user authentication, omit `kerberos` in the `--w
 GitLab Shell is an SSH access and repository management software developed specially for GitLab.
 
 ```shell
-# Run the installation task for gitlab-shell (replace `REDIS_URL` if needed):
-sudo -u git -H bundle exec rake gitlab:shell:install REDIS_URL=unix:/var/run/redis/redis.sock RAILS_ENV=production SKIP_STORAGE_VALIDATION=true
+# Run the installation task for gitlab-shell:
+sudo -u git -H bundle exec rake gitlab:shell:install RAILS_ENV=production
 
 # By default, the gitlab-shell config is generated from your main GitLab config.
 # You can review (and modify) the gitlab-shell config as follows:
@@ -578,13 +577,6 @@ If you want to use HTTPS, see [Using HTTPS](#using-https) for the additional ste
 
 NOTE: **Note:**
 Make sure your hostname can be resolved on the machine itself by either a proper DNS record or an additional line in `/etc/hosts` ("127.0.0.1 hostname"). This might be necessary, for example, if you set up GitLab behind a reverse proxy. If the hostname cannot be resolved, the final installation check will fail with `Check GitLab API access: FAILED. code: 401` and pushing commits will be rejected with `[remote rejected] master -> master (hook declined)`.
-
-NOTE: **Note:**
-GitLab Shell application startup time can be greatly reduced by disabling RubyGems. This can be done in several ways:
-
-- Export `RUBYOPT=--disable-gems` environment variable for the processes.
-- Compile Ruby with `configure --disable-rubygems` to disable RubyGems by default. Not recommended for system-wide Ruby.
-- Omnibus GitLab [replaces the *shebang* line of the `gitlab-shell/bin/*` scripts](https://gitlab.com/gitlab-org/omnibus-gitlab/-/merge_requests/1707).
 
 ### Install GitLab Workhorse
 

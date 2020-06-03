@@ -24,6 +24,7 @@ describe Ci::Build do
   it { is_expected.to have_many(:needs) }
   it { is_expected.to have_many(:sourced_pipelines) }
   it { is_expected.to have_many(:job_variables) }
+  it { is_expected.to have_many(:report_results) }
 
   it { is_expected.to have_one(:deployment) }
   it { is_expected.to have_one(:runner_session) }
@@ -871,6 +872,22 @@ describe Ci::Build do
       let(:build) { create(:ci_build, :artifacts) }
 
       it { is_expected.to be_truthy }
+    end
+  end
+
+  describe '#has_test_reports?' do
+    subject { build.has_test_reports? }
+
+    context 'when build has a test report' do
+      let(:build) { create(:ci_build, :test_reports) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when build does not have a test report' do
+      let(:build) { create(:ci_build) }
+
+      it { is_expected.to be_falsey }
     end
   end
 
@@ -2285,7 +2302,7 @@ describe Ci::Build do
       let(:predefined_variables) do
         [
           { key: 'CI_PIPELINE_ID', value: pipeline.id.to_s, public: true, masked: false },
-          { key: 'CI_PIPELINE_URL', value: project.web_url + "/pipelines/#{pipeline.id}", public: true, masked: false },
+          { key: 'CI_PIPELINE_URL', value: project.web_url + "/-/pipelines/#{pipeline.id}", public: true, masked: false },
           { key: 'CI_JOB_ID', value: build.id.to_s, public: true, masked: false },
           { key: 'CI_JOB_URL', value: project.web_url + "/-/jobs/#{build.id}", public: true, masked: false },
           { key: 'CI_JOB_TOKEN', value: 'my-token', public: false, masked: true },

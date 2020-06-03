@@ -536,6 +536,14 @@ describe GeoNode, :request_store, :geo, type: :model do
     end
   end
 
+  describe '#geo_retrieve_url' do
+    let(:retrieve_url) { "https://localhost:3000/gitlab/api/#{api_version}/geo/retrieve/package_file/1" }
+
+    it 'returns api url based on node uri' do
+      expect(new_node.geo_retrieve_url(replicable_name: :package_file, replicable_id: 1)).to eq(retrieve_url)
+    end
+  end
+
   describe '#geo_transfers_url' do
     let(:transfers_url) { "https://localhost:3000/gitlab/api/#{api_version}/geo/transfers/lfs/1" }
 

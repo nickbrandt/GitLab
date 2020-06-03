@@ -3,8 +3,10 @@
 require 'spec_helper'
 
 describe Gitlab::UsageData do
+  include UsageDataHelpers
+
   before do
-    allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+    stub_usage_data_connections
   end
 
   describe '.data' do
@@ -50,9 +52,9 @@ describe Gitlab::UsageData do
       # Status Page
       create(:status_page_setting, project: projects[0], enabled: true)
       create(:status_page_setting, project: projects[1], enabled: false)
-      # 1 public issue on 1 projects with status page enabled
+      # 1 published issue on 1 projects with status page enabled
       create(:issue, project: projects[0])
-      create(:issue, :confidential, project: projects[0])
+      create(:issue, :published, project: projects[0])
     end
 
     subject { described_class.data }

@@ -1,6 +1,7 @@
 <script>
 import { GlLink } from '@gitlab/ui';
 import Project from './project.vue';
+import UsageGraph from './usage_graph.vue';
 import query from '../queries/storage.graphql';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -10,6 +11,7 @@ export default {
     Project,
     GlLink,
     Icon,
+    UsageGraph,
   },
   props: {
     namespacePath: {
@@ -41,6 +43,7 @@ export default {
           data.namespace.rootStorageStatistics && data.namespace.rootStorageStatistics.storageSize
             ? numberToHumanSize(data.namespace.rootStorageStatistics.storageSize)
             : 'N/A',
+        rootStorageStatistics: data.namespace.rootStorageStatistics,
       }),
     },
   },
@@ -53,22 +56,28 @@ export default {
 </script>
 <template>
   <div>
-    <div class="pipeline-quota container-fluid">
-      <div class="row">
-        <div class="col-sm-6">
-          <strong>{{ s__('UsageQuota|Usage since') }}</strong>
-          <div>
-            <span class="js-total-usage">
-              {{ namespace.totalUsage }}
-              <gl-link
-                :href="helpPagePath"
-                target="_blank"
-                :aria-label="__('Usage quotas help link')"
-              >
-                <icon name="question" :size="12" />
-              </gl-link>
-            </span>
-          </div>
+    <div class="pipeline-quota container-fluid py-4 px-2 m-0">
+      <div class="row py-0">
+        <div class="col-sm-12">
+          <strong>{{ s__('UsageQuota|Storage usage:') }}</strong>
+          <span data-testid="total-usage">
+            {{ namespace.totalUsage }}
+            <gl-link
+              :href="helpPagePath"
+              target="_blank"
+              :aria-label="s__('UsageQuota|Usage quotas help link')"
+            >
+              <icon name="question" :size="12" />
+            </gl-link>
+          </span>
+        </div>
+      </div>
+      <div class="row py-0">
+        <div class="col-sm-12">
+          <usage-graph
+            v-if="namespace.rootStorageStatistics"
+            :root-storage-statistics="namespace.rootStorageStatistics"
+          />
         </div>
       </div>
     </div>

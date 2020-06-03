@@ -157,7 +157,7 @@ export default {
   <div class="inline">
     <gl-deprecated-button
       v-gl-modal="modalId"
-      class="btn btn-default btn-sm prepend-left-8 js-review-button"
+      class="btn btn-default btn-sm gl-ml-3 js-review-button"
       :class="cssClass"
       type="button"
     >

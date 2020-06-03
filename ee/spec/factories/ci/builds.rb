@@ -6,7 +6,7 @@ FactoryBot.define do
       failure_reason { Ci::Build.failure_reasons[:protected_environment_failure] }
     end
 
-    %i[codequality container_scanning dast dependency_scanning license_management license_scanning performance sast].each do |report_type|
+    %i[codequality container_scanning dast dependency_scanning license_management license_scanning performance sast secret_detection].each do |report_type|
       trait "legacy_#{report_type}".to_sym do
         success
         artifacts
@@ -51,6 +51,12 @@ FactoryBot.define do
     trait :sast_feature_branch do
       after(:build) do |build|
         build.job_artifacts << create(:ee_ci_job_artifact, :sast_feature_branch, job: build)
+      end
+    end
+
+    trait :secret_detection_feature_branch do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :secret_detection_feature_branch, job: build)
       end
     end
 

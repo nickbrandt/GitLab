@@ -67,7 +67,7 @@ This example shows how to run Code Quality on your code by using GitLab CI/CD an
 
 First, you need GitLab Runner configured:
 
-- For the [docker-in-docker workflow](../../../ci/docker/using_docker_build.md#use-docker-in-docker-workflow-with-docker-executor).
+- For the [Docker-in-Docker workflow](../../../ci/docker/using_docker_build.md#use-docker-in-docker-workflow-with-docker-executor).
 - With enough disk space to handle generated Code Quality files. For example on the [GitLab project](https://gitlab.com/gitlab-org/gitlab) the files are approximately 7 GB.
 
 Once you set up the Runner, include the CodeQuality template in your CI config:
@@ -120,7 +120,7 @@ This information will be automatically extracted and shown right in the merge re
 
 CAUTION: **Caution:**
 On self-managed instances, if a malicious actor compromises the Code Quality job
-definition they will be able to execute privileged docker commands on the Runner
+definition they will be able to execute privileged Docker commands on the Runner
 host. Having proper access control policies mitigates this attack vector by
 allowing access only to trusted actors.
 
@@ -129,9 +129,8 @@ allowing access only to trusted actors.
 CAUTION: **Caution:**
 Before GitLab 11.5, Code Quality job and artifact had to be named specifically to
 automatically extract report data and show it in the merge request widget. While these
-old job definitions are still maintained they have been deprecated and may be removed
-in the next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
-configuration to reflect that change.
+old job definitions are still maintained they have been deprecated and are no longer supported on GitLab 12.0 or higher.
+You are advised to update your `.gitlab-ci.yml` configuration to reflect that change.
 
 For GitLab 11.5 and later, the job should look like:
 

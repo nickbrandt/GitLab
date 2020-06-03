@@ -77,10 +77,14 @@ module GraphqlHelpers
     QUERY
   end
 
-  def graphql_mutation(name, input, fields = nil)
+  def graphql_mutation(name, input, fields = nil, &block)
+    raise ArgumentError, 'Please pass either `fields` parameter or a block to `#graphql_mutation`, but not both.' if fields.present? && block_given?
+
     mutation_name = GraphqlHelpers.fieldnamerize(name)
     input_variable_name = "$#{input_variable_name_for_mutation(name)}"
     mutation_field = GitlabSchema.mutation.fields[mutation_name]
+
+    fields = yield if block_given?
     fields ||= all_graphql_fields_for(mutation_field.type.to_graphql)
 
     query = <<~MUTATION
@@ -149,7 +153,15 @@ module GraphqlHelpers
   end
 
   def wrap_fields(fields)
-    fields = Array.wrap(fields).join("\n")
+    fields = Array.wrap(fields).map do |field|
+      case field
+      when Symbol
+        GraphqlHelpers.fieldnamerize(field)
+      else
+        field
+      end
+    end.join("\n")
+
     return unless fields.present?
 
     <<~FIELDS

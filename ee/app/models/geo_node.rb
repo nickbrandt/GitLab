@@ -179,7 +179,7 @@ class GeoNode < ApplicationRecord
   #
   # @param [String] replicable_name
   # @param [Integer] replicable_id
-  def geo_retrieve_url(replicable_name, replicable_id)
+  def geo_retrieve_url(replicable_name:, replicable_id:)
     geo_api_url("retrieve/#{replicable_name}/#{replicable_id}")
   end
 

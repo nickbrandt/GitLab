@@ -4,8 +4,9 @@ export const MAX_WINDOW_HEIGHT_COMPACT = 750;
 export const MAX_TITLE_LENGTH = 50;
 export const MAX_BODY_LENGTH = 72;
 
-export const LEFT_SIDEBAR_INIT_WIDTH = 340;
-export const DEFAULT_SIDEBAR_MIN_WIDTH = 340;
+export const SIDEBAR_INIT_WIDTH = 340;
+export const SIDEBAR_MIN_WIDTH = 340;
+export const SIDEBAR_NAV_WIDTH = 60;
 
 // File view modes
 export const FILE_VIEW_MODE_EDITOR = 'editor';
@@ -56,6 +57,7 @@ export const rightSidebarViews = {
   jobsDetail: { name: 'jobs-detail', keepAlive: false },
   mergeRequestInfo: { name: 'merge-request-info', keepAlive: true },
   clientSidePreview: { name: 'clientside', keepAlive: false },
+  terminal: { name: 'terminal', keepAlive: true },
 };
 
 export const stageKeys = {

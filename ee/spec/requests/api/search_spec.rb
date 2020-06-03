@@ -129,7 +129,7 @@ describe API::Search do
 
       context 'filters' do
         it 'by filename' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon filename:PROCESS.md' }
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* filename:PROCESS.md' }
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.size).to eq(1)
@@ -137,7 +137,7 @@ describe API::Search do
         end
 
         it 'by path' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon path:markdown' }
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* path:markdown' }
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.size).to eq(1)
@@ -147,7 +147,7 @@ describe API::Search do
         end
 
         it 'by extension' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon extension:md' }
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* extension:md' }
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.size).to eq(3)
@@ -160,19 +160,21 @@ describe API::Search do
 
     context 'for issues scope', :sidekiq_inline do
       before do
-        create_list(:issue, 4, project: project)
+        create_list(:issue, 2, project: project)
         ensure_elasticsearch_index!
       end
 
       it 'avoids N+1 queries' do
         control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'issues', search: '*' } }
 
-        new_issues = create_list(:issue, 4, project: project)
+        create_list(:issue, 2, project: project)
+        create_list(:issue, 2, project: create(:project, group: group))
+        create_list(:issue, 2)
 
         ensure_elasticsearch_index!
 
         # Some N+1 queries still exist
-        expect { get api(endpoint, user), params: { scope: 'issues', search: '*' } }.not_to exceed_query_limit(control.count + new_issues.count * 4)
+        expect { get api(endpoint, user), params: { scope: 'issues', search: '*' } }.not_to exceed_query_limit(control.count + 2)
       end
 
       it_behaves_like 'pagination', scope: 'issues'

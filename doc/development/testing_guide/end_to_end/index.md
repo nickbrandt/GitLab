@@ -86,7 +86,7 @@ subgraph "gitlab-qa-mirror pipeline"
 1. The result of the GitLab QA pipeline is being
    propagated upstream, through Omnibus, back to the GitLab merge request.
 
-Please note, we plan to [add more specific information](https://gitlab.com/gitlab-org/quality/team-tasks/issues/156)
+Please note, we plan to [add more specific information](https://gitlab.com/gitlab-org/quality/team-tasks/-/issues/156)
 about the tests included in each job/scenario that runs in `gitlab-qa-mirror`.
 
 #### With Pipeline for Merged Results
@@ -155,7 +155,7 @@ See [Review Apps](../review_apps.md) for more details about Review Apps.
 
 If you are not [testing code in a merge request](#testing-code-in-merge-requests),
 there are two main options for running the tests. If you simply want to run
-the existing tests against a live GitLab instance or against a pre-built docker image
+the existing tests against a live GitLab instance or against a pre-built Docker image
 you can use the [GitLab QA orchestrator](https://gitlab.com/gitlab-org/gitlab-qa/tree/master/README.md). See also [examples
 of the test scenarios you can run via the orchestrator](https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/what_tests_can_be_run.md#examples).
 
@@ -191,5 +191,5 @@ Continued reading:
 
 You can ask question in the `#quality` channel on Slack (GitLab internal) or
 you can find an issue you would like to work on in
-[the `gitlab` issue tracker](https://gitlab.com/gitlab-org/gitlab/issues?label_name%5B%5D=QA&label_name%5B%5D=test), or
-[the `gitlab-qa` issue tracker](https://gitlab.com/gitlab-org/gitlab-qa/issues?label_name%5B%5D=new+scenario).
+[the `gitlab` issue tracker](https://gitlab.com/gitlab-org/gitlab/-/issues?label_name%5B%5D=QA&label_name%5B%5D=test), or
+[the `gitlab-qa` issue tracker](https://gitlab.com/gitlab-org/gitlab-qa/-/issues?label_name%5B%5D=new+scenario).

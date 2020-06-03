@@ -62,7 +62,7 @@ have to adhere to various internal requirements (for example, org. compliance, v
 In cases where a strategic user has a requirement to test a feature before it is
 officially released, we can offer to create a Release Candidate (RC) version that will
 include the specific feature. This should be needed only in extreme cases, and can be requested for
-consideration by raising an issue in the [release/tasks](https://gitlab.com/gitlab-org/release/tasks/issues/new?issuable_template=Backporting-request) issue tracker.
+consideration by raising an issue in the [release/tasks](https://gitlab.com/gitlab-org/release/tasks/-/issues/new?issuable_template=Backporting-request) issue tracker.
 It is important to note that the Release Candidate will also contain other features and changes as
 it is not possible to easily isolate a specific feature (similar reasons as noted above). The
 Release Candidate will be no different than any code that is deployed to GitLab.com or is publicly
@@ -95,7 +95,7 @@ For instance, if we release `11.2.1` with a fix for a severe bug introduced in
 `11.0.0`, we could backport the fix to a new `11.0.x`, and `11.1.x` patch release.
 
 To request backporting to more than one stable release for consideration, raise an issue in the
-[release/tasks](https://gitlab.com/gitlab-org/release/tasks/issues/new?issuable_template=Backporting-request) issue tracker.
+[release/tasks](https://gitlab.com/gitlab-org/release/tasks/-/issues/new?issuable_template=Backporting-request) issue tracker.
 
 ### Security releases
 
@@ -171,11 +171,10 @@ Please see the table below for some examples:
 
 | Latest stable version | Your version | Recommended upgrade path | Note |
 | --------------------- | ------------ | ------------------------ | ---- |
-| 9.4.5                 | 8.13.4       | `8.13.4` -> `8.17.7` -> `9.4.5`                          | `8.17.7` is the last version in version `8` |
-| 10.1.4                | 8.13.4       | `8.13.4 -> 8.17.7 -> 9.5.10 -> 10.1.4`                   | `8.17.7` is the last version in version `8`, `9.5.10` is the last version in version `9` |
 | 11.3.4                | 8.13.4       | `8.13.4` -> `8.17.7` -> `9.5.10` -> `10.8.7` -> `11.3.4` | `8.17.7` is the last version in version `8`, `9.5.10` is the last version in version `9`, `10.8.7` is the last version in version `10` |
 | 12.5.10               | 11.3.4       | `11.3.4` -> `11.11.8` -> `12.0.12` -> `12.5.10`            | `11.11.8` is the last version in version `11`. `12.0.x` [is a required step](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/23211#note_272842444). |
 | 12.8.5                | 9.2.6       | `9.2.6` -> `9.5.10` -> `10.8.7` -> `11.11.8` -> `12.0.12` -> `12.8.5` | Four intermediate versions are required: the final 9.5, 10.8, 11.11 releases, plus 12.0. |
+| 13.2.0                | 11.5.0      | `11.5.0` -> `11.11.8` -> `12.0.12` -> `12.10.6` -> `13.0.0` -> `13.2.0` | Five intermediate versions are required: the final 11.11, 12.0, 12.10 releases, plus 13.0. |
 
 NOTE: **Note:**
 Instructions for installing a specific version of GitLab or downloading the package locally for installation can be found at [GitLab Repositories](https://packages.gitlab.com/gitlab).

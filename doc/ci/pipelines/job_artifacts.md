@@ -1,4 +1,7 @@
 ---
+stage: Verify
+group: Continuous Integration
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 disqus_identifier: 'https://docs.gitlab.com/ee/user/project/pipelines/job_artifacts.html'
 type: reference, howto
 ---
@@ -137,9 +140,10 @@ third party ports for other languages like JavaScript, Python, Ruby, and so on.
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/207528) in GitLab 13.0.
 > - Requires [GitLab Runner](https://docs.gitlab.com/runner/) 11.5 and above.
 
-The `terraform` report obtains a Terraform `tfplan.json` file. The collected Terraform
+The `terraform` report obtains a Terraform `tfplan.json` file. [JQ processing required to remove creds](../../user/infrastructure/index.md#output-terraform-plan-information-into-a-merge-request). The collected Terraform
 plan report will be uploaded to GitLab as an artifact and will be automatically shown
-in merge requests.
+in merge requests. For more information, see
+[Output `terraform plan` information into a merge request](../../user/infrastructure/index.md#output-terraform-plan-information-into-a-merge-request).
 
 #### `artifacts:reports:codequality` **(STARTER)**
 

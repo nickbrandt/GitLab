@@ -11,6 +11,7 @@ import {
   GlTabs,
   GlTab,
   GlBadge,
+  GlPagination,
 } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
@@ -19,14 +20,29 @@ import { fetchPolicies } from '~/lib/graphql';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 import getAlerts from '../graphql/queries/get_alerts.query.graphql';
 import getAlertsCountByStatus from '../graphql/queries/get_count_by_status.query.graphql';
-import { ALERTS_STATUS, ALERTS_STATUS_TABS, ALERTS_SEVERITY_LABELS } from '../constants';
+import {
+  ALERTS_STATUS_TABS,
+  ALERTS_SEVERITY_LABELS,
+  DEFAULT_PAGE_SIZE,
+  trackAlertListViewsOptions,
+  trackAlertStatusUpdateOptions,
+} from '../constants';
 import updateAlertStatus from '../graphql/mutations/update_alert_status.graphql';
-import { capitalizeFirstCharacter, convertToSnakeCase } from '~/lib/utils/text_utility';
+import { convertToSnakeCase } from '~/lib/utils/text_utility';
+import Tracking from '~/tracking';
 
 const tdClass = 'table-col d-flex d-md-table-cell align-items-center';
 const bodyTrClass =
-  'gl-border-1 gl-border-t-solid gl-border-gray-100 hover-bg-blue-50 hover-gl-cursor-pointer hover-gl-border-b-solid hover-gl-border-blue-200';
+  'gl-border-1 gl-border-t-solid gl-border-gray-100 gl-hover-bg-blue-50 gl-hover-cursor-pointer gl-hover-border-b-solid gl-hover-border-blue-200';
 const findDefaultSortColumn = () => document.querySelector('.js-started-at');
+
+const initialPaginationState = {
+  currentPage: 1,
+  prevPageCursor: '',
+  nextPageCursor: '',
+  firstPageSize: DEFAULT_PAGE_SIZE,
+  lastPageSize: null,
+};
 
 export default {
   i18n: {
@@ -45,14 +61,14 @@ export default {
       sortable: true,
     },
     {
-      key: 'startTime',
+      key: 'startedAt',
       label: s__('AlertManagement|Start time'),
       thClass: 'js-started-at',
       tdClass,
       sortable: true,
     },
     {
-      key: 'endTime',
+      key: 'endedAt',
       label: s__('AlertManagement|End time'),
       tdClass,
       sortable: true,
@@ -65,11 +81,16 @@ export default {
       sortable: false,
     },
     {
-      key: 'eventsCount',
+      key: 'eventCount',
       label: s__('AlertManagement|Events'),
       thClass: 'text-right gl-pr-9 w-3rem',
       tdClass: `${tdClass} text-md-right`,
       sortable: true,
+    },
+    {
+      key: 'assignees',
+      label: s__('AlertManagement|Assignees'),
+      tdClass,
     },
     {
       key: 'status',
@@ -80,9 +101,9 @@ export default {
     },
   ],
   statuses: {
-    [ALERTS_STATUS.TRIGGERED]: s__('AlertManagement|Triggered'),
-    [ALERTS_STATUS.ACKNOWLEDGED]: s__('AlertManagement|Acknowledged'),
-    [ALERTS_STATUS.RESOLVED]: s__('AlertManagement|Resolved'),
+    TRIGGERED: s__('AlertManagement|Triggered'),
+    ACKNOWLEDGED: s__('AlertManagement|Acknowledged'),
+    RESOLVED: s__('AlertManagement|Resolved'),
   },
   severityLabels: ALERTS_SEVERITY_LABELS,
   statusTabs: ALERTS_STATUS_TABS,
@@ -99,6 +120,7 @@ export default {
     GlTabs,
     GlTab,
     GlBadge,
+    GlPagination,
   },
   props: {
     projectPath: {
@@ -131,10 +153,20 @@ export default {
           projectPath: this.projectPath,
           statuses: this.statusFilter,
           sort: this.sort,
+          firstPageSize: this.pagination.firstPageSize,
+          lastPageSize: this.pagination.lastPageSize,
+          prevPageCursor: this.pagination.prevPageCursor,
+          nextPageCursor: this.pagination.nextPageCursor,
         };
       },
       update(data) {
-        return data.project?.alertManagementAlerts?.nodes;
+        const { alertManagementAlerts: { nodes: list = [], pageInfo = {} } = {} } =
+          data.project || {};
+
+        return {
+          list,
+          pageInfo,
+        };
       },
       error() {
         this.errored = true;
@@ -157,8 +189,10 @@ export default {
       errored: false,
       isAlertDismissed: false,
       isErrorAlertDismissed: false,
-      sort: 'START_TIME_ASC',
-      statusFilter: this.$options.statusTabs[4].filters,
+      sort: 'STARTED_AT_ASC',
+      statusFilter: [],
+      filteredByStatus: '',
+      pagination: initialPaginationState,
     };
   },
   computed: {
@@ -174,29 +208,45 @@ export default {
       return this.$apollo.queries.alerts.loading;
     },
     hasAlerts() {
-      return this.alerts?.length;
+      return this.alerts?.list?.length;
     },
     tbodyTrClass() {
       return !this.loading && this.hasAlerts ? bodyTrClass : '';
     },
+    showPaginationControls() {
+      return Boolean(this.prevPage || this.nextPage);
+    },
+    alertsForCurrentTab() {
+      return this.alertsCount ? this.alertsCount[this.filteredByStatus.toLowerCase()] : 0;
+    },
+    prevPage() {
+      return Math.max(this.pagination.currentPage - 1, 0);
+    },
+    nextPage() {
+      const nextPage = this.pagination.currentPage + 1;
+      return nextPage > Math.ceil(this.alertsForCurrentTab / DEFAULT_PAGE_SIZE) ? null : nextPage;
+    },
   },
   mounted() {
-    findDefaultSortColumn().ariaSort = 'ascending';
+    this.trackPageViews();
   },
   methods: {
     filterAlertsByStatus(tabIndex) {
-      this.statusFilter = this.$options.statusTabs[tabIndex].filters;
+      this.resetPagination();
+      const { filters, status } = this.$options.statusTabs[tabIndex];
+      this.statusFilter = filters;
+      this.filteredByStatus = status;
     },
     fetchSortedData({ sortBy, sortDesc }) {
       const sortDirection = sortDesc ? 'DESC' : 'ASC';
       const sortColumn = convertToSnakeCase(sortBy).toUpperCase();
 
-      if (sortBy !== 'startTime') {
+      if (sortBy !== 'startedAt') {
         findDefaultSortColumn().ariaSort = 'none';
       }
+      this.resetPagination();
       this.sort = `${sortColumn}_${sortDirection}`;
     },
-    capitalizeFirstCharacter,
     updateAlertStatus(status, iid) {
       this.$apollo
         .mutate({
@@ -208,8 +258,10 @@ export default {
           },
         })
         .then(() => {
+          this.trackStatusUpdate(status);
           this.$apollo.queries.alerts.refetch();
           this.$apollo.queries.alertsCount.refetch();
+          this.resetPagination();
         })
         .catch(() => {
           createFlash(
@@ -221,6 +273,40 @@ export default {
     },
     navigateToAlertDetails({ iid }) {
       return visitUrl(joinPaths(window.location.pathname, iid, 'details'));
+    },
+    trackPageViews() {
+      const { category, action } = trackAlertListViewsOptions;
+      Tracking.event(category, action);
+    },
+    trackStatusUpdate(status) {
+      const { category, action, label } = trackAlertStatusUpdateOptions;
+      Tracking.event(category, action, { label, property: status });
+    },
+    getAssignees(assignees) {
+      // TODO: Update to show list of assignee(s) after https://gitlab.com/gitlab-org/gitlab/-/issues/218405
+      return assignees?.length > 0 ? assignees[0]?.username : s__('AlertManagement|Unassigned');
+    },
+    handlePageChange(page) {
+      const { startCursor, endCursor } = this.alerts.pageInfo;
+
+      if (page > this.pagination.currentPage) {
+        this.pagination = {
+          ...initialPaginationState,
+          nextPageCursor: endCursor,
+          currentPage: page,
+        };
+      } else {
+        this.pagination = {
+          lastPageSize: DEFAULT_PAGE_SIZE,
+          firstPageSize: null,
+          prevPageCursor: startCursor,
+          nextPageCursor: '',
+          currentPage: page,
+        };
+      }
+    },
+    resetPagination() {
+      this.pagination = initialPaginationState;
     },
   },
 };
@@ -251,7 +337,7 @@ export default {
       </h4>
       <gl-table
         class="alert-management-table mt-3"
-        :items="alerts"
+        :items="alerts ? alerts.list : []"
         :fields="$options.fields"
         :show-empty="true"
         :busy="loading"
@@ -259,6 +345,7 @@ export default {
         :tbody-tr-class="tbodyTrClass"
         :no-local-sorting="true"
         sort-icon-left
+        sort-by="startedAt"
         @row-clicked="navigateToAlertDetails"
         @sort-changed="fetchSortedData"
       >
@@ -277,15 +364,15 @@ export default {
           </div>
         </template>
 
-        <template #cell(startTime)="{ item }">
+        <template #cell(startedAt)="{ item }">
           <time-ago v-if="item.startedAt" :time="item.startedAt" />
         </template>
 
-        <template #cell(endTime)="{ item }">
+        <template #cell(endedAt)="{ item }">
           <time-ago v-if="item.endedAt" :time="item.endedAt" />
         </template>
-        <!-- TODO: Remove after: https://gitlab.com/gitlab-org/gitlab/-/issues/218467 -->
-        <template #cell(eventsCount)="{ item }">
+
+        <template #cell(eventCount)="{ item }">
           {{ item.eventCount }}
         </template>
 
@@ -293,12 +380,14 @@ export default {
           <div class="gl-max-w-full text-truncate">{{ item.title }}</div>
         </template>
 
+        <template #cell(assignees)="{ item }">
+          <div class="gl-max-w-full text-truncate" data-testid="assigneesField">
+            {{ getAssignees(item.assignees) }}
+          </div>
+        </template>
+
         <template #cell(status)="{ item }">
-          <gl-dropdown
-            :text="capitalizeFirstCharacter(item.status.toLowerCase())"
-            class="w-100"
-            right
-          >
+          <gl-dropdown :text="$options.statuses[item.status]" class="w-100" right>
             <gl-dropdown-item
               v-for="(label, field) in $options.statuses"
               :key="field"
@@ -324,6 +413,16 @@ export default {
           <gl-loading-icon size="lg" color="dark" class="mt-3" />
         </template>
       </gl-table>
+
+      <gl-pagination
+        v-if="showPaginationControls"
+        :value="pagination.currentPage"
+        :prev-page="prevPage"
+        :next-page="nextPage"
+        align="center"
+        class="gl-pagination prepend-top-default"
+        @input="handlePageChange"
+      />
     </div>
     <gl-empty-state
       v-else

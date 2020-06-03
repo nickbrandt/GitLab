@@ -141,8 +141,8 @@ describe('Network Policy actions', () => {
   describe('updatePolicy', () => {
     let mock;
     const environmentId = 3;
-    const policy = { name: 'policy', manifest: 'foo' };
-    const updatedPolicy = { name: 'policy', manifest: 'bar' };
+    const policy = { name: 'policy', manifest: 'foo', isEnabled: true };
+    const updatedPolicy = { name: 'policy', manifest: 'bar', isEnabled: true };
 
     beforeEach(() => {
       state.policiesEndpoint = networkPoliciesEndpoint;
@@ -158,7 +158,8 @@ describe('Network Policy actions', () => {
         mock
           .onPut(joinPaths(networkPoliciesEndpoint, policy.name), {
             environment_id: environmentId,
-            manifest: updatedPolicy.manifest,
+            manifest: policy.manifest,
+            enabled: policy.isEnabled,
           })
           .replyOnce(httpStatus.OK, updatedPolicy);
       });
@@ -166,7 +167,7 @@ describe('Network Policy actions', () => {
       it('should dispatch the request and success actions', () =>
         testAction(
           actions.updatePolicy,
-          { environmentId, policy, manifest: updatedPolicy.manifest },
+          { environmentId, policy },
           state,
           [
             { type: types.REQUEST_UPDATE_POLICY },
@@ -186,7 +187,8 @@ describe('Network Policy actions', () => {
         mock
           .onPut(joinPaths(networkPoliciesEndpoint, policy.name), {
             environment_id: environmentId,
-            manifest: updatedPolicy.manifest,
+            manifest: policy.manifest,
+            enabled: policy.isEnabled,
           })
           .replyOnce(500, error);
       });
@@ -194,7 +196,7 @@ describe('Network Policy actions', () => {
       it('should dispatch the request and error actions', () =>
         testAction(
           actions.updatePolicy,
-          { environmentId, policy, manifest: updatedPolicy.manifest },
+          { environmentId, policy },
           state,
           [
             { type: types.REQUEST_UPDATE_POLICY },
@@ -212,7 +214,7 @@ describe('Network Policy actions', () => {
       it('should dispatch RECEIVE_UPDATE_POLICY_ERROR', () =>
         testAction(
           actions.updatePolicy,
-          { environmentId, policy, manifest: updatedPolicy.manifest },
+          { environmentId, policy },
           state,
           [
             {
@@ -231,7 +233,6 @@ describe('Network Policy actions', () => {
           {
             environmentId: undefined,
             policy,
-            manifest: updatedPolicy.manifest,
           },
           state,
           [

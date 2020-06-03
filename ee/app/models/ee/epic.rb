@@ -240,10 +240,6 @@ module EE
       nil
     end
 
-    def supports_weight?
-      false
-    end
-
     def upcoming?
       start_date&.future?
     end

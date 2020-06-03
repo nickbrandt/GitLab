@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AuditEventsApp when initialized matches the snapshot 1`] = `
+<div>
+  <div
+    class="row-content-block second-block pb-0"
+  >
+    <form
+      class="filter-form d-flex justify-content-between audit-controls row"
+      method="GET"
+      path="form/path"
+    >
+      <div
+        class="col-lg-auto flex-fill form-group align-items-lg-center pr-lg-8"
+      >
+        <div
+          class="input-group bg-white flex-grow-1"
+          data-qa-selector="filter_qa_selector"
+          data-testid="audit-events-filter"
+        >
+          <gl-filtered-search-stub
+            availabletokens="[object Object],[object Object],[object Object]"
+            class="gl-h-32 w-100"
+            clearbuttontitle="Clear"
+            close-button-title="Close"
+            placeholder="Search"
+            value=""
+          />
+           
+          <input
+            name="entity_type"
+            type="hidden"
+          />
+           
+          <input
+            name="entity_id"
+            type="hidden"
+          />
+        </div>
+      </div>
+       
+      <div
+        class="d-flex col-lg-auto flex-wrap pl-lg-0"
+      >
+        <div
+          class="audit-controls d-flex align-items-lg-center flex-column flex-lg-row col-lg-auto px-0"
+        >
+          <date-range-field-stub
+            formelement="[object HTMLFormElement]"
+          />
+           
+          <sorting-field-stub />
+        </div>
+      </div>
+    </form>
+  </div>
+   
+  <audit-events-table-stub
+    events="[object Object]"
+    islastpage="true"
+    qaselector="table_qa_selector"
+  />
+</div>
+`;

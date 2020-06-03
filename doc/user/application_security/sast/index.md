@@ -517,7 +517,6 @@ registry.gitlab.com/gitlab-org/security-products/analyzers/bandit:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/brakeman:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/eslint:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/flawfinder:2
-registry.gitlab.com/gitlab-org/security-products/analyzers/go-ast-scanner:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/gosec:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/kubesec:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/nodejs-scan:2
@@ -557,7 +556,7 @@ security reports without requiring internet access.
 
 ## Troubleshooting
 
-### Error response from daemon: error processing tar file: docker-tar: relocation error
+### `Error response from daemon: error processing tar file: docker-tar: relocation error`
 
 This error occurs when the Docker version that runs the SAST job is `19.03.0`.
 Consider updating to Docker `19.03.1` or greater. Older versions are not

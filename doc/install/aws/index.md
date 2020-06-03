@@ -59,8 +59,6 @@ Here's a list of the AWS services we will use, with links to pricing information
   Redis configuration. See the
   [Amazon ElastiCache pricing](https://aws.amazon.com/elasticache/pricing/).
 
-NOTE: **Note:** Please note that while we will be using EBS for storage, we do not recommend using EFS as it may negatively impact GitLab's performance. You can review the [relevant documentation](../../administration/high_availability/nfs.md#avoid-using-awss-elastic-file-system-efs) for more details.
-
 ## Create an IAM EC2 instance role and profile
 
 As we'll be using [Amazon S3 object storage](#amazon-s3-object-storage), our EC2 instances need to have read, write, and list permissions for our S3 buckets. To avoid embedding AWS keys in our GitLab config, we'll make use of an [IAM Role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) to allow our GitLab instance with this access. We'll need to create an IAM policy to attach to our IAM role:
@@ -237,7 +235,9 @@ On the EC2 dashboard, look for Load Balancer in the left navigation bar:
 1. Click **Assign Security Groups** and select **Create a new security group**, give it a name
    (we'll use `gitlab-loadbalancer-sec-group`) and description, and allow both HTTP and HTTPS traffic
    from anywhere (`0.0.0.0/0, ::/0`). Also allow SSH traffic from a single IP address or an IP address range in CIDR notation.
-1. Click **Configure Security Settings** and select an SSL/TLS certificate from ACM or upload a certificate to IAM.
+1. Click **Configure Security Settings** and set the following:
+   1. Select an SSL/TLS certificate from ACM or upload a certificate to IAM.
+   1. Under **Select a Cipher**, pick a predefined security policy from the dropdown. You can see a breakdown of [Predefined SSL Security Policies for Classic Load Balancers](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html) in the AWS docs. Check the GitLab codebase for a list of [supported SSL ciphers and protocols](https://gitlab.com/gitlab-org/gitlab/-/blob/9ee7ad433269b37251e0dd5b5e00a0f00d8126b4/lib/support/nginx/gitlab-ssl#L97-99).
 1. Click **Configure Health Check** and set up a health check for your EC2 instances.
    1. For **Ping Protocol**, select HTTP.
    1. For **Ping Port**, enter 80.
@@ -561,7 +561,7 @@ Let's create an EC2 instance where we'll install Gitaly:
 1. Click **Review and launch** followed by **Launch** if you're happy with your settings.
 1. Finally, acknowledge that you have access to the selected private key file or create a new one. Click **Launch Instances**.
 
-  > **Optional:** Instead of storing configuration _and_ repository data on the root volume, you can also choose to add an additional EBS volume for repository storage. Follow the same guidance as above. See the [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/).
+NOTE: **Optional:** Instead of storing configuration _and_ repository data on the root volume, you can also choose to add an additional EBS volume for repository storage. Follow the same guidance as above. See the [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/). We do not recommend using EFS as it may negatively impact GitLab’s performance. You can review the [relevant documentation](../../administration/high_availability/nfs.md#avoid-using-awss-elastic-file-system-efs) for more details.
 
 Now that we have our EC2 instance ready, follow the [documentation to install GitLab and set up Gitaly on its own server](../../administration/gitaly/index.md#running-gitaly-on-its-own-server). Perform the client setup steps from that document on the [GitLab instance we created](#install-gitlab) above.
 

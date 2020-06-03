@@ -21,6 +21,7 @@ describe StatusPage::MarkForPublicationService do
     shared_examples 'does not track the incident' do
       specify { expect { subject }.not_to change { ::StatusPage::PublishedIncident.count } }
       specify { expect { subject }.not_to change { issue.notes.count } }
+      specify { expect(subject).to be_error }
     end
 
     context 'when license is not available' do
@@ -47,6 +48,7 @@ describe StatusPage::MarkForPublicationService do
       context 'when issue is publishable' do
         specify { expect { subject }.to change { ::StatusPage::PublishedIncident.count }.by(1) }
         specify { expect { subject }.to change { issue.notes.count }.by(1) }
+        specify { expect(subject).to be_success }
       end
 
       context 'when issue is confidential' do
@@ -65,6 +67,22 @@ describe StatusPage::MarkForPublicationService do
         let(:service) { described_class.new(project, create(:user), issue) }
 
         it_behaves_like 'does not track the incident'
+      end
+
+      context 'when an error occurs' do
+        let(:error) { RuntimeError.new('Error!') }
+
+        before do
+          allow(::SystemNoteService).to receive(:publish_issue_to_status_page).and_raise(error)
+        end
+
+        it_behaves_like 'does not track the incident'
+
+        it 'reports the error to sentry' do
+          expect(Gitlab::ErrorTracking).to receive(:track_exception).with(error)
+
+          subject
+        end
       end
     end
   end

@@ -1,4 +1,7 @@
 ---
+stage: Verify
+group: Testing
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: reference
 ---
 
@@ -242,6 +245,9 @@ following command:
 
 ```ruby
 Feature.enable(:junit_pipeline_view)
+
+# Enable the feature for a specific project
+Feature.enable(:junit_pipeline_view, Project.find(<your-project-id-here>))
 ```
 
 ## Viewing JUnit screenshots on GitLab

@@ -156,7 +156,8 @@ $subscriptions-full-width-lg: 541px;
   }
 
   .edit-group,
-  .edit-profile {
+  .edit-profile,
+  .new-project {
     max-width: 400px;
 
     .bar {
@@ -169,6 +170,20 @@ $subscriptions-full-width-lg: 541px;
 
     .field_with_errors {
       display: inline;
+    }
+
+    .project-import {
+      h5 {
+        display: none;
+      }
+
+      .import-buttons {
+        justify-content: center;
+
+        .btn {
+          width: 288px;
+        }
+      }
     }
   }
 }

@@ -16,7 +16,7 @@ module IntegrationsActions
 
   def update
     saved = integration.update(service_params[:service])
-    overwrite = ActiveRecord::Type::Boolean.new.cast(params[:overwrite])
+    overwrite = Gitlab::Utils.to_boolean(params[:overwrite])
 
     respond_to do |format|
       format.html do
@@ -34,6 +34,10 @@ module IntegrationsActions
         render json: serialize_as_json, status: status
       end
     end
+  end
+
+  def custom_integration_projects
+    Project.with_custom_integration_compared_to(integration).page(params[:page]).per(20)
   end
 
   def test

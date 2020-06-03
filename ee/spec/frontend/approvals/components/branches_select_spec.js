@@ -38,7 +38,6 @@ describe('Branches Select', () => {
 
   const search = (term = '') => {
     $input.select2('search', term);
-    jest.runAllTimers();
   };
 
   beforeEach(() => {
@@ -48,7 +47,6 @@ describe('Branches Select', () => {
   });
 
   afterEach(() => {
-    jest.clearAllTimers();
     wrapper.destroy();
   });
 

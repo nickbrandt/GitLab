@@ -39,6 +39,7 @@ module Ci
     has_one :resource, class_name: 'Ci::Resource', inverse_of: :build
     has_many :trace_sections, class_name: 'Ci::BuildTraceSection'
     has_many :trace_chunks, class_name: 'Ci::BuildTraceChunk', foreign_key: :build_id
+    has_many :report_results, class_name: 'Ci::BuildReportResult', inverse_of: :build
 
     has_many :job_artifacts, class_name: 'Ci::JobArtifact', foreign_key: :job_id, dependent: :destroy, inverse_of: :job # rubocop:disable Cop/ActiveRecordDependent
     has_many :job_variables, class_name: 'Ci::JobVariable', foreign_key: :job_id
@@ -687,6 +688,10 @@ module Ci
       job_artifacts.any?
     end
 
+    def has_test_reports?
+      job_artifacts.test_reports.exists?
+    end
+
     def has_old_trace?
       old_trace.present?
     end
@@ -757,13 +762,13 @@ module Ci
 
     # and use that for `ExpireBuildInstanceArtifactsWorker`?
     def erase_erasable_artifacts!
-      job_artifacts.erasable.destroy_all # rubocop: disable DestroyAll
+      job_artifacts.erasable.destroy_all # rubocop: disable Cop/DestroyAll
     end
 
     def erase(opts = {})
       return false unless erasable?
 
-      job_artifacts.destroy_all # rubocop: disable DestroyAll
+      job_artifacts.destroy_all # rubocop: disable Cop/DestroyAll
       erase_trace!
       update_erased!(opts[:erased_by])
     end

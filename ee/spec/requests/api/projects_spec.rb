@@ -739,7 +739,6 @@ describe API::Projects do
         {
           mirror: true,
           import_url: import_url,
-          mirror_user_id: user.id,
           mirror_trigger_builds: true,
           only_mirror_protected_branches: true,
           mirror_overwrites_diverged_branches: true
@@ -760,7 +759,9 @@ describe API::Projects do
 
         it 'updates mirror related attributes when user is admin' do
           admin = create(:admin)
-          mirror_params[:mirror_user_id] = admin.id
+          unrelated_user = create(:user)
+
+          mirror_params[:mirror_user_id] = unrelated_user.id
           project.add_maintainer(admin)
 
           expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
@@ -771,7 +772,7 @@ describe API::Projects do
           expect(project.reload).to have_attributes(
             mirror: true,
             import_url: import_url,
-            mirror_user_id: admin.id,
+            mirror_user_id: unrelated_user.id,
             mirror_trigger_builds: true,
             only_mirror_protected_branches: true,
             mirror_overwrites_diverged_branches: true

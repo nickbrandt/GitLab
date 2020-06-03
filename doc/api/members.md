@@ -31,8 +31,8 @@ GET /projects/:id/members
 | `user_ids`   | array of integers | no     | Filter the results on the given user IDs |
 
 ```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/members
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/members
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/:id/members"
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/:id/members"
 ```
 
 Example response:
@@ -59,6 +59,7 @@ Example response:
     "web_url": "http://192.168.1.8:3000/root",
     "expires_at": "2012-10-22T14:13:35Z",
     "access_level": 30,
+    "email": "john@example.com",
     "group_saml_identity": {
       "extern_uid":"ABC-1234567890",
       "provider": "group_saml",
@@ -88,8 +89,8 @@ GET /projects/:id/members/all
 | `user_ids`   | array of integers | no     | Filter the results on the given user IDs |
 
 ```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/members/all
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/members/all
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/:id/members/all"
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/:id/members/all"
 ```
 
 Example response:
@@ -116,6 +117,7 @@ Example response:
     "web_url": "http://192.168.1.8:3000/root",
     "expires_at": "2012-10-22T14:13:35Z",
     "access_level": 30
+    "email": "john@example.com",
     "group_saml_identity": {
       "extern_uid":"ABC-1234567890",
       "provider": "group_saml",
@@ -151,8 +153,8 @@ GET /projects/:id/members/:user_id
 | `user_id` | integer | yes   | The user ID of the member |
 
 ```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/members/:user_id
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/members/:user_id
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/:id/members/:user_id"
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/:id/members/:user_id"
 ```
 
 Example response:
@@ -188,8 +190,8 @@ GET /projects/:id/members/all/:user_id
 | `user_id` | integer | yes   | The user ID of the member |
 
 ```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/members/all/:user_id
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/members/all/:user_id
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/:id/members/all/:user_id"
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/:id/members/all/:user_id"
 ```
 
 Example response:
@@ -225,8 +227,8 @@ POST /projects/:id/members
 | `expires_at` | string | no | A date string in the format YEAR-MONTH-DAY |
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --data "user_id=1&access_level=30" https://gitlab.example.com/api/v4/groups/:id/members
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --data "user_id=1&access_level=30" https://gitlab.example.com/api/v4/projects/:id/members
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --data "user_id=1&access_level=30" "https://gitlab.example.com/api/v4/groups/:id/members"
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --data "user_id=1&access_level=30" "https://gitlab.example.com/api/v4/projects/:id/members"
 ```
 
 Example response:
@@ -262,8 +264,8 @@ PUT /projects/:id/members/:user_id
 | `expires_at` | string | no | A date string in the format YEAR-MONTH-DAY |
 
 ```shell
-curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/members/:user_id?access_level=40
-curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/members/:user_id?access_level=40
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/:id/members/:user_id?access_level=40"
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/:id/members/:user_id?access_level=40"
 ```
 
 Example response:
@@ -299,7 +301,7 @@ POST /groups/:id/members/:user_id/override
 | `user_id` | integer | yes   | The user ID of the member |
 
 ```shell
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/:id/members/:user_id/override
+curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/groups/:id/members/:user_id/override"
 ```
 
 Example response:
@@ -335,7 +337,7 @@ DELETE /groups/:id/members/:user_id/override
 | `user_id` | integer | yes   | The user ID of the member |
 
 ```shell
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/:id/members/:user_id/override
+curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/groups/:id/members/:user_id/override"
 ```
 
 Example response:
@@ -369,8 +371,8 @@ DELETE /projects/:id/members/:user_id
 | `user_id` | integer | yes   | The user ID of the member |
 
 ```shell
-curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/members/:user_id
-curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/members/:user_id
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/:id/members/:user_id"
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/:id/members/:user_id"
 ```
 
 ## Give a group access to a project

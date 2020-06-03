@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { memoize, isString, cloneDeep, isNumber } from 'lodash';
 import {
   GlDeprecatedButton,
-  GlBadge,
+  GlDeprecatedBadge as GlBadge,
   GlTooltip,
   GlTooltipDirective,
   GlFormTextarea,
@@ -305,7 +305,7 @@ export default {
             </div>
           </div>
         </div>
-        <template v-if="filteredStrategies.length > 0">
+        <div v-if="filteredStrategies.length > 0" data-testid="feature-flag-strategies">
           <strategy
             v-for="(strategy, index) in filteredStrategies"
             :key="strategy.id"
@@ -316,7 +316,7 @@ export default {
             @change="onFormStrategyChange($event, index)"
             @delete="deleteStrategy(strategy)"
           />
-        </template>
+        </div>
         <div v-else class="flex justify-content-center border-top py-4 w-100">
           <span>{{ $options.translations.noStrategiesText }}</span>
         </div>

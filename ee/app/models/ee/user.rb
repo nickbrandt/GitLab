@@ -32,7 +32,6 @@ module EE
                :extra_shared_runners_minutes_limit, :extra_shared_runners_minutes_limit=,
                to: :namespace
 
-      has_many :reviews,                  foreign_key: :author_id, inverse_of: :author
       has_many :epics,                    foreign_key: :author_id
       has_many :requirements,             foreign_key: :author_id, inverse_of: :author, class_name: 'RequirementsManagement::Requirement'
       has_many :test_reports,             foreign_key: :author_id, inverse_of: :author, class_name: 'RequirementsManagement::TestReport'
@@ -300,6 +299,10 @@ module EE
       managing_group.present?
     end
 
+    def managed_by?(user)
+      self.group_managed_account? && self.managing_group.owned_by?(user)
+    end
+
     override :ldap_sync_time
     def ldap_sync_time
       ::Gitlab.config.ldap['sync_time']
@@ -334,7 +337,7 @@ module EE
       filter = user_preference.feature_filter_type.presence || 0
 
       # We use a 2nd feature flag for control as enabled and percentage_of_time for chatops
-      flipper_feature = ::Feature.get((feature.to_s + '_control').to_sym)
+      flipper_feature = ::Feature.get((feature.to_s + '_control').to_sym) # rubocop:disable Gitlab/AvoidFeatureGet
       percentage ||= flipper_feature.gate_values[:percentage_of_time] || 0 if flipper_feature
       return false if percentage <= 0
 

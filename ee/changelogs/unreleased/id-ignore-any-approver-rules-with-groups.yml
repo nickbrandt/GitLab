@@ -1,0 +1,5 @@
+---
+title: Fix creating merge requests with approval rules
+merge_request: 33582
+author:
+type: fixed

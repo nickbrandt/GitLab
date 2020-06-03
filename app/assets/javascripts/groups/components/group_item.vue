@@ -104,7 +104,7 @@ export default {
       <gl-loading-icon
         v-if="group.isChildrenLoading"
         size="lg"
-        class="d-none d-sm-inline-flex flex-shrink-0 append-right-8"
+        class="d-none d-sm-inline-flex flex-shrink-0 gl-mr-3"
       />
       <div
         :class="{ 'd-sm-flex': !group.isChildrenLoading }"
@@ -117,12 +117,12 @@ export default {
       </div>
       <div class="group-text-container d-flex flex-fill align-items-center">
         <div class="group-text flex-grow-1 flex-shrink-1">
-          <div class="d-flex align-items-center flex-wrap title namespace-title append-right-8">
+          <div class="d-flex align-items-center flex-wrap title namespace-title gl-mr-3">
             <a
               v-tooltip
               :href="group.relativePath"
               :title="group.fullName"
-              class="no-expand prepend-top-8 append-right-8"
+              class="no-expand gl-mt-3 gl-mr-3 gl-text-gray-900!"
               data-placement="bottom"
               >{{
                 // ending bracket must be by closing tag to prevent
@@ -133,9 +133,9 @@ export default {
             <item-stats-value
               :icon-name="visibilityIcon"
               :title="visibilityTooltip"
-              css-class="item-visibility d-inline-flex align-items-center prepend-top-8 append-right-4 text-secondary"
+              css-class="item-visibility d-inline-flex align-items-center gl-mt-3 append-right-4 text-secondary"
             />
-            <span v-if="group.permission" class="user-access-role prepend-top-8">
+            <span v-if="group.permission" class="user-access-role gl-mt-3">
               {{ group.permission }}
             </span>
           </div>

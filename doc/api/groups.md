@@ -400,7 +400,7 @@ The `projects` and `shared_projects` attributes in the response are deprecated a
 To get the details of all projects within a group, use either the [list a group's projects](#list-a-groups-projects) or the [list a group's shared projects](#list-a-groups-shared-projects) endpoint.
 
 ```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/4"
 ```
 
 This endpoint returns:
@@ -578,10 +578,22 @@ Additional response parameters:
 }
 ```
 
+Users on GitLab [Silver, Premium, or higher](https://about.gitlab.com/pricing/) will also see
+the `marked_for_deletion_on` attribute:
+
+```json
+{
+  "id": 4,
+  "description": "Aliquid qui quis dignissimos distinctio ut commodi voluptas est.",
+  "marked_for_deletion_on": "2020-04-03",
+  ...
+}
+```
+
 When adding the parameter `with_projects=false`, projects will not be returned.
 
 ```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4?with_projects=false
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/4?with_projects=false"
 ```
 
 Example response:
@@ -674,7 +686,7 @@ Parameters:
 | `project_id` | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4/projects/56
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/4/projects/56"
 ```
 
 ## Update group

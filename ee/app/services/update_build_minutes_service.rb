@@ -6,11 +6,7 @@ class UpdateBuildMinutesService < BaseService
     return unless build.complete?
     return unless build.duration&.positive?
 
-    if ::Feature.enabled?(:ci_minutes_track_for_public_projects, namespace)
-      count_projects_based_on_cost_factors(build)
-    else
-      legacy_count_non_public_projects(build)
-    end
+    count_projects_based_on_cost_factors(build)
   end
 
   private
@@ -26,16 +22,6 @@ class UpdateBuildMinutesService < BaseService
 
     NamespaceStatistics.update_counters(namespace_statistics,
       shared_runners_seconds: duration_with_cost_factor)
-  end
-
-  def legacy_count_non_public_projects(build)
-    return if project.public?
-
-    ProjectStatistics.update_counters(project_statistics,
-      shared_runners_seconds: build.duration)
-
-    NamespaceStatistics.update_counters(namespace_statistics,
-      shared_runners_seconds: build.duration)
   end
 
   def namespace_statistics

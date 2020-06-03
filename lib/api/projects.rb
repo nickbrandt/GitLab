@@ -444,6 +444,8 @@ module API
 
         not_found!("Source Project") unless fork_from_project
 
+        authorize! :fork_project, fork_from_project
+
         result = ::Projects::ForkService.new(fork_from_project, current_user).execute(user_project)
 
         if result
@@ -500,7 +502,9 @@ module API
         link = user_project.project_group_links.find_by(group_id: params[:group_id])
         not_found!('Group Link') unless link
 
-        destroy_conditionally!(link)
+        destroy_conditionally!(link) do
+          ::Projects::GroupLinks::DestroyService.new(user_project, current_user).execute(link)
+        end
       end
       # rubocop: enable CodeReuse/ActiveRecord
 

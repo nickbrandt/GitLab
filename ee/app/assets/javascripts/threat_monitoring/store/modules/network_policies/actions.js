@@ -33,8 +33,8 @@ const commitUpdatePolicyError = (commit, payload) => {
   createFlash(error);
 };
 
-export const updatePolicy = ({ state, commit }, { environmentId, policy, manifest }) => {
-  if (!state.policiesEndpoint || !environmentId || !manifest) {
+export const updatePolicy = ({ state, commit }, { environmentId, policy }) => {
+  if (!state.policiesEndpoint || !environmentId || !policy) {
     return commitUpdatePolicyError(commit);
   }
 
@@ -43,7 +43,8 @@ export const updatePolicy = ({ state, commit }, { environmentId, policy, manifes
   return axios
     .put(joinPaths(state.policiesEndpoint, policy.name), {
       environment_id: environmentId,
-      manifest,
+      manifest: policy.manifest,
+      enabled: policy.isEnabled,
     })
     .then(({ data }) => {
       commit(types.RECEIVE_UPDATE_POLICY_SUCCESS, {

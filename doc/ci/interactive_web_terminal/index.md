@@ -1,4 +1,7 @@
 ---
+stage: Verify
+group: Runner
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: reference
 ---
 
@@ -31,7 +34,7 @@ Two things need to be configured for the interactive web terminal to work:
 NOTE: **Note:**
 Interactive web terminals are not yet supported by
 [`gitlab-runner` Helm chart](https://docs.gitlab.com/charts/charts/gitlab/gitlab-runner/index.html),
-but support [is planned](https://gitlab.com/gitlab-org/charts/gitlab-runner/issues/79).
+but support [is planned](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/issues/79).
 
 ## Debugging a running job
 

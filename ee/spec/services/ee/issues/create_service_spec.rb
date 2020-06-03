@@ -89,22 +89,5 @@ describe Issues::CreateService do
     it_behaves_like 'new issuable with scoped labels' do
       let(:parent) { project }
     end
-
-    describe 'publish to status page' do
-      let(:execute) { service.execute }
-      let(:issue_id) { execute&.id }
-
-      context 'when creation succeeds' do
-        let_it_be(:params) { { title: 'New title' } }
-
-        include_examples 'trigger status page publish'
-      end
-
-      context 'when creation fails' do
-        let_it_be(:params) { { title: nil } }
-
-        include_examples 'no trigger status page publish'
-      end
-    end
   end
 end

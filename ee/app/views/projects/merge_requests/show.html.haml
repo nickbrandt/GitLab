@@ -1,8 +1,5 @@
 = render_ce "projects/merge_requests/show"
 
-- if batch_comments_enabled?
-  #js-review-bar
-
 = javascript_tag nonce: true do
   :plain
     // Append static, server-generated data not included in merge request entity (EE-Only)
@@ -10,6 +7,7 @@
     window.gl.mrWidgetData.is_geo_secondary_node = '#{Gitlab::Geo.secondary?}' === 'true';
     window.gl.mrWidgetData.geo_secondary_help_path = '#{help_page_path("administration/geo/replication/configuration.md")}';
     window.gl.mrWidgetData.sast_help_path = '#{help_page_path("user/application_security/sast/index")}';
+    window.gl.mrWidgetData.secret_detection_help_path = '#{help_page_path("user/application_security/secret_detection/index")}';
     window.gl.mrWidgetData.container_scanning_help_path = '#{help_page_path("user/application_security/container_scanning/index")}';
     window.gl.mrWidgetData.dast_help_path = '#{help_page_path("user/application_security/dast/index")}';
     window.gl.mrWidgetData.dependency_scanning_help_path = '#{help_page_path("user/application_security/dependency_scanning/index")}';

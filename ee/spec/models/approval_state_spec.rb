@@ -1607,4 +1607,17 @@ describe ApprovalState do
       end
     end
   end
+
+  describe '#total_approvals_count' do
+    let(:rule) { create_rule(approvals_required: 1, rule_type: :any_approver, users: [approver1]) }
+
+    before do
+      create(:approval, merge_request: merge_request, user: rule.users.first)
+      create(:approval, merge_request: merge_request, user: approver2)
+    end
+
+    it 'returns the total number of approvals (required + optional)' do
+      expect(subject.total_approvals_count).to eq(2)
+    end
+  end
 end

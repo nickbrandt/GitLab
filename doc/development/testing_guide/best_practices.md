@@ -35,11 +35,18 @@ Here are some things to keep in mind regarding test performance:
 To run RSpec tests:
 
 ```shell
-# run all tests
+# run test for a file
+bin/rspec spec/models/project_spec.rb
+
+# run test for the example on line 10 on that file
+bin/rspec spec/models/project_spec.rb:10
+
+# run tests matching the example name has that string
+bin/rspec spec/models/project_spec.rb -e associations
+
+# run all tests, will take hours for GitLab codebase!
 bin/rspec
 
-# run test for path
-bin/rspec spec/[path]/[to]/[spec].rb
 ```
 
 Use [Guard](https://github.com/guard/guard) to continuously monitor for changes and only run matching tests:
@@ -355,6 +362,60 @@ Feature.disable(:my_feature2)
 Feature.enable(:my_feature2, project1)
 Feature.enabled?(:my_feature2) # => false
 Feature.enabled?(:my_feature2, project1) # => true
+```
+
+#### `stub_feature_flags` vs `Feature.enable*`
+
+It is preferred to use `stub_feature_flags` for enabling feature flags
+in testing environment. This method provides a simple and well described
+interface for a simple use-cases.
+
+However, in some cases a more complex behaviors needs to be tested,
+like a feature flag percentage rollouts. This can be achieved using
+the `.enable_percentage_of_time` and `.enable_percentage_of_actors`
+
+```ruby
+# Good: feature needs to be explicitly disabled, as it is enabled by default if not defined
+stub_feature_flags(my_feature: false)
+stub_feature_flags(my_feature: true)
+stub_feature_flags(my_feature: project)
+stub_feature_flags(my_feature: [project, project2])
+
+# Bad
+Feature.enable(:my_feature_2)
+
+# Good: enable my_feature for 50% of time
+Feature.enable_percentage_of_time(:my_feature_3, 50)
+
+# Good: enable my_feature for 50% of actors/gates/things
+Feature.enable_percentage_of_actors(:my_feature_4, 50)
+```
+
+Each feature flag that has a defined state will be persisted
+for test execution time:
+
+```ruby
+Feature.persisted_names.include?('my_feature') => true
+Feature.persisted_names.include?('my_feature_2') => true
+Feature.persisted_names.include?('my_feature_3') => true
+Feature.persisted_names.include?('my_feature_4') => true
+```
+
+#### Stubbing gate
+
+It is required that a gate that is passed as an argument to `Feature.enabled?`
+and `Feature.disabled?` is an object that includes `FeatureGate`.
+
+In specs you can use a `stub_feature_flag_gate` method that allows you to have
+quickly your custom gate:
+
+```ruby
+gate = stub_feature_flag_gate('CustomActor')
+
+stub_feature_flags(ci_live_trace: gate)
+
+Feature.enabled?(:ci_live_trace) # => false
+Feature.enabled?(:ci_live_trace, gate) # => true
 ```
 
 ### Pristine test environments

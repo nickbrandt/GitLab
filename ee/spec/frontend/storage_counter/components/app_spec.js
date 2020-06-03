@@ -52,7 +52,7 @@ describe('Storage counter app', () => {
       wrapper.vm
         .$nextTick()
         .then(() => {
-          expect(wrapper.find('.js-total-usage').text()).toContain(
+          expect(wrapper.find("[data-testid='total-usage']").text()).toContain(
             withRootStorageStatistics.totalUsage,
           );
         })
@@ -70,7 +70,7 @@ describe('Storage counter app', () => {
       wrapper.vm
         .$nextTick()
         .then(() => {
-          expect(wrapper.find('.js-total-usage').text()).toContain('N/A');
+          expect(wrapper.find("[data-testid='total-usage']").text()).toContain('N/A');
         })
         .then(done)
         .catch(done.fail);

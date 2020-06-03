@@ -43,6 +43,7 @@ module QA
 
     module API
       autoload :Client, 'qa/runtime/api/client'
+      autoload :RepositoryStorageMoves, 'qa/runtime/api/repository_storage_moves'
       autoload :Request, 'qa/runtime/api/request'
     end
 
@@ -79,7 +80,6 @@ module QA
     autoload :User, 'qa/resource/user'
     autoload :ProjectMilestone, 'qa/resource/project_milestone'
     autoload :Members, 'qa/resource/members'
-    autoload :Wiki, 'qa/resource/wiki'
     autoload :File, 'qa/resource/file'
     autoload :Fork, 'qa/resource/fork'
     autoload :SSHKey, 'qa/resource/ssh_key'
@@ -89,6 +89,7 @@ module QA
     autoload :ProjectSnippet, 'qa/resource/project_snippet'
     autoload :UserGPG, 'qa/resource/user_gpg'
     autoload :Visibility, 'qa/resource/visibility'
+    autoload :ProjectSnippet, 'qa/resource/project_snippet'
 
     module KubernetesCluster
       autoload :Base, 'qa/resource/kubernetes_cluster/base'
@@ -109,6 +110,10 @@ module QA
 
     module Settings
       autoload :HashedStorage, 'qa/resource/settings/hashed_storage'
+    end
+
+    module Wiki
+      autoload :ProjectPage, 'qa/resource/wiki/project_page'
     end
   end
 
@@ -228,6 +233,7 @@ module QA
       autoload :Show, 'qa/page/project/show'
       autoload :Activity, 'qa/page/project/activity'
       autoload :Menu, 'qa/page/project/menu'
+      autoload :Members, 'qa/page/project/members'
 
       module Branches
         autoload :Show, 'qa/page/project/branches/show'
@@ -264,7 +270,6 @@ module QA
         autoload :CiVariables, 'qa/page/project/settings/ci_variables'
         autoload :Runners, 'qa/page/project/settings/runners'
         autoload :MergeRequest, 'qa/page/project/settings/merge_request'
-        autoload :Members, 'qa/page/project/settings/members'
         autoload :MirroringRepositories, 'qa/page/project/settings/mirroring_repositories'
         autoload :VisibilityFeaturesPermissions, 'qa/page/project/settings/visibility_features_permissions'
 
@@ -325,7 +330,6 @@ module QA
 
       module Wiki
         autoload :Edit, 'qa/page/project/wiki/edit'
-        autoload :New, 'qa/page/project/wiki/new'
         autoload :Show, 'qa/page/project/wiki/show'
         autoload :GitAccess, 'qa/page/project/wiki/git_access'
       end
@@ -437,8 +441,16 @@ module QA
         autoload :Common, 'qa/page/component/issuable/common'
       end
 
+      module IssueBoard
+        autoload :Show, 'qa/page/component/issue_board/show'
+      end
+
       module WebIDE
         autoload :Alert, 'qa/page/component/web_ide/alert'
+
+        module Modal
+          autoload :CreateNewFile, 'qa/page/component/web_ide/modal/create_new_file'
+        end
       end
 
       module Project

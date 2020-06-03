@@ -37,7 +37,7 @@ export default {
 <template>
   <installation-tabs :tracking-label="$options.trackingLabel">
     <template #installation>
-      <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Maven XML') }}</p>
+      <p class="gl-mt-3 font-weight-bold">{{ s__('PackageRegistry|Maven XML') }}</p>
       <p>
         <gl-sprintf :message="$options.i18n.xmlText">
           <template #code="{ content }">

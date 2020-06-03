@@ -1,5 +1,9 @@
 import { __ } from '~/locale';
-import { generateToolbarItem } from './toolbar_service';
+import { generateToolbarItem } from './editor_service';
+
+export const CUSTOM_EVENTS = {
+  openAddImageModal: 'gl_openAddImageModal',
+};
 
 /* eslint-disable @gitlab/require-i18n-strings */
 const TOOLBAR_ITEM_CONFIGS = [
@@ -20,6 +24,7 @@ const TOOLBAR_ITEM_CONFIGS = [
   { isDivider: true },
   { icon: 'dash', command: 'HR', tooltip: __('Add a line') },
   { icon: 'table', event: 'openPopupAddTable', classes: 'tui-table', tooltip: __('Add a table') },
+  { icon: 'doc-image', event: CUSTOM_EVENTS.openAddImageModal, tooltip: __('Insert an image') },
   { isDivider: true },
   { icon: 'code', command: 'Code', tooltip: __('Insert inline code') },
 ];

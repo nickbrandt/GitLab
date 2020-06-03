@@ -24,7 +24,7 @@ exports[`NetworkPolicyList component given there is a default environment with n
        
       <p>
         
-          Policies are a specification of how groups of pods are allowed to communicate with each other network endpoints.
+          Policies are a specification of how groups of pods are allowed to communicate with each other's network endpoints.
         
       </p>
        
@@ -55,9 +55,10 @@ exports[`NetworkPolicyList component renders policies table 1`] = `
 <table
   aria-busy="false"
   aria-colcount="3"
-  aria-describedby="__BVID__39__caption_"
-  class="table b-table gl-table b-table-stacked-md"
-  id="__BVID__39"
+  aria-describedby="__BVID__41__caption_"
+  aria-multiselectable="false"
+  class="table b-table gl-table table-hover b-table-stacked-md b-table-selectable b-table-select-single"
+  id="__BVID__41"
   role="table"
 >
   <!---->
@@ -103,8 +104,10 @@ exports[`NetworkPolicyList component renders policies table 1`] = `
   >
     <!---->
     <tr
+      aria-selected="false"
       class=""
       role="row"
+      tabindex="0"
     >
       <td
         aria-colindex="1"

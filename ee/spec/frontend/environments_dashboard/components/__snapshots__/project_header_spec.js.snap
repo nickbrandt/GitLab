@@ -18,14 +18,14 @@ exports[`Project Header matches the snapshot 1`] = `
       href="/hello"
     >
       <span
-        class="js-namespace append-right-8"
+        class="js-namespace gl-mr-3"
       >
          hello 
       </span>
     </gl-link-stub>
      
     <span
-      class="append-right-8"
+      class="gl-mr-3"
     >
       &gt;
     </span>
@@ -40,7 +40,7 @@ exports[`Project Header matches the snapshot 1`] = `
       class="js-project-link text-secondary"
     >
       <span
-        class="js-name append-right-8"
+        class="js-name gl-mr-3"
       >
          world 
       </span>

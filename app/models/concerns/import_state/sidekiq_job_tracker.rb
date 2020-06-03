@@ -5,6 +5,9 @@ module ImportState
     extend ActiveSupport::Concern
 
     included do
+      scope :with_jid, -> { where.not(jid: nil) }
+      scope :without_jid, -> { where(jid: nil) }
+
       # Refreshes the expiration time of the associated import job ID.
       #
       # This method can be used by asynchronous importers to refresh the status,
@@ -12,7 +15,7 @@ module ImportState
       def refresh_jid_expiration
         return unless jid
 
-        Gitlab::SidekiqStatus.set(jid, StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION)
+        Gitlab::SidekiqStatus.set(jid, Gitlab::Import::StuckImportJob::IMPORT_JOBS_EXPIRATION)
       end
 
       def self.jid_by(project_id:, status:)

@@ -180,6 +180,8 @@ class User < ApplicationRecord
   has_one :user_highest_role
   has_one :user_canonical_email
 
+  has_many :reviews, foreign_key: :author_id, inverse_of: :author
+
   #
   # Validations
   #
@@ -236,9 +238,10 @@ class User < ApplicationRecord
     if previous_changes.key?('email')
       # Grab previous_email here since previous_changes changes after
       # #update_emails_with_primary_email and #update_notification_email are called
+      previous_confirmed_at = previous_changes.key?('confirmed_at') ? previous_changes['confirmed_at'][0] : confirmed_at
       previous_email = previous_changes[:email][0]
 
-      update_emails_with_primary_email(previous_email)
+      update_emails_with_primary_email(previous_confirmed_at, previous_email)
       update_invalid_gpg_signatures
 
       if previous_email == notification_email
@@ -340,6 +343,7 @@ class User < ApplicationRecord
     where('EXISTS (?)',
           ::PersonalAccessToken
             .where('personal_access_tokens.user_id = users.id')
+            .without_impersonation
             .expiring_and_not_notified(at).select(1))
   end
   scope :order_recent_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'DESC')) }
@@ -714,7 +718,7 @@ class User < ApplicationRecord
         otp_grace_period_started_at: nil,
         otp_backup_codes:            nil
       )
-      self.u2f_registrations.destroy_all # rubocop: disable DestroyAll
+      self.u2f_registrations.destroy_all # rubocop: disable Cop/DestroyAll
     end
   end
 
@@ -754,15 +758,15 @@ class User < ApplicationRecord
   end
 
   def owns_notification_email
-    return if temp_oauth_email?
+    return if new_record? || temp_oauth_email?
 
-    errors.add(:notification_email, _("is not an email you own")) unless all_emails.include?(notification_email)
+    errors.add(:notification_email, _("is not an email you own")) unless verified_emails.include?(notification_email)
   end
 
   def owns_public_email
     return if public_email.blank?
 
-    errors.add(:public_email, _("is not an email you own")) unless all_emails.include?(public_email)
+    errors.add(:public_email, _("is not an email you own")) unless verified_emails.include?(public_email)
   end
 
   def owns_commit_email
@@ -810,13 +814,15 @@ class User < ApplicationRecord
   # By using an `after_commit` instead of `after_update`, we avoid the recursive callback
   # scenario, though it then requires us to use the `previous_changes` hash
   # rubocop: disable CodeReuse/ServiceClass
-  def update_emails_with_primary_email(previous_email)
+  def update_emails_with_primary_email(previous_confirmed_at, previous_email)
     primary_email_record = emails.find_by(email: email)
     Emails::DestroyService.new(self, user: self).execute(primary_email_record) if primary_email_record
 
     # the original primary email was confirmed, and we want that to carry over.  We don't
     # have access to the original confirmation values at this point, so just set confirmed_at
-    Emails::CreateService.new(self, user: self, email: previous_email).execute(confirmed_at: confirmed_at)
+    Emails::CreateService.new(self, user: self, email: previous_email).execute(confirmed_at: previous_confirmed_at)
+
+    update_columns(confirmed_at: primary_email_record.confirmed_at) if primary_email_record&.confirmed_at
   end
   # rubocop: enable CodeReuse/ServiceClass
 
@@ -1200,16 +1206,18 @@ class User < ApplicationRecord
     all_emails
   end
 
-  def all_public_emails
-    all_emails(include_private_email: false)
-  end
-
-  def verified_emails
+  def verified_emails(include_private_email: true)
     verified_emails = []
     verified_emails << email if primary_email_verified?
-    verified_emails << private_commit_email
+    verified_emails << private_commit_email if include_private_email
     verified_emails.concat(emails.confirmed.pluck(:email))
     verified_emails
+  end
+
+  def public_verified_emails
+    emails = verified_emails(include_private_email: false)
+    emails << email unless temp_oauth_email?
+    emails.uniq
   end
 
   def any_email?(check_email)
@@ -1626,10 +1634,6 @@ class User < ApplicationRecord
 
   def user_detail
     super.presence || build_user_detail
-  end
-
-  def todos_limited_to(ids)
-    todos.where(id: ids)
   end
 
   def pending_todo_for(target)

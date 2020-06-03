@@ -15,6 +15,7 @@ import PackageListRow from 'ee/packages/shared/components/package_list_row.vue';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
 import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
 import PypiInstallation from 'ee/packages/details/components/pypi_installation.vue';
+import DependencyRow from 'ee/packages/details/components/dependency_row.vue';
 import {
   conanPackage,
   mavenPackage,
@@ -89,6 +90,10 @@ describe('PackagesApp', () => {
   const packagesLoader = () => wrapper.find(PackagesListLoader);
   const packagesVersionRows = () => wrapper.findAll(PackageListRow);
   const noVersionsMessage = () => wrapper.find('[data-testid="no-versions-message"]');
+  const dependenciesTab = () => wrapper.find('.js-dependencies-tab > a');
+  const dependenciesCountBadge = () => wrapper.find('[data-testid="dependencies-badge"]');
+  const noDependenciesMessage = () => wrapper.find('[data-testid="no-dependencies-message"]');
+  const dependencyRows = () => wrapper.findAll(DependencyRow);
 
   afterEach(() => {
     wrapper.destroy();
@@ -200,6 +205,45 @@ describe('PackagesApp', () => {
       createComponent();
 
       expect(noVersionsMessage().exists()).toBe(true);
+    });
+  });
+
+  describe('dependency links', () => {
+    it('does not show the dependency links for a non nuget package', () => {
+      createComponent();
+
+      expect(dependenciesTab().exists()).toBe(false);
+    });
+
+    it('shows the dependencies tab with 0 count when a nuget package with no dependencies', () => {
+      createComponent({
+        packageEntity: {
+          ...nugetPackage,
+          dependency_links: [],
+        },
+      });
+
+      return wrapper.vm.$nextTick(() => {
+        const dependenciesBadge = dependenciesCountBadge();
+
+        expect(dependenciesTab().exists()).toBe(true);
+        expect(dependenciesBadge.exists()).toBe(true);
+        expect(dependenciesBadge.text()).toBe('0');
+        expect(noDependenciesMessage().exists()).toBe(true);
+      });
+    });
+
+    it('renders the correct number of dependency rows for a nuget package', () => {
+      createComponent({ packageEntity: nugetPackage });
+
+      return wrapper.vm.$nextTick(() => {
+        const dependenciesBadge = dependenciesCountBadge();
+
+        expect(dependenciesTab().exists()).toBe(true);
+        expect(dependenciesBadge.exists()).toBe(true);
+        expect(dependenciesBadge.text()).toBe(nugetPackage.dependency_links.length.toString());
+        expect(dependencyRows()).toHaveLength(nugetPackage.dependency_links.length);
+      });
     });
   });
 

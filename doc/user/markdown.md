@@ -1,3 +1,9 @@
+---
+stage: Plan
+group: Project Management
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # GitLab Markdown
 
 This Markdown guide is **valid only for GitLab's internal Markdown rendering system for entries and files**.
@@ -436,7 +442,7 @@ In addition to this, links to some objects are also recognized and formatted. So
 
 - Comments on issues: `"https://gitlab.com/gitlab-org/gitlab/-/issues/1234#note_101075757"`, which will be rendered as `#1234 (note1)`
 - The issues designs tab: `"https://gitlab.com/gitlab-org/gitlab/-/issues/1234/designs"`, which will be rendered as `#1234 (designs)`.
-  **(PREMIUM)**
+- Links to individual designs: `"https://gitlab.com/gitlab-org/gitlab/-/issues/1234/designs/layout.png"`, which will be rendered as `#1234[layout.png]`.
 
 ### Task lists
 
@@ -1427,7 +1433,9 @@ Example:
 Additionally, you can choose the alignment of text within columns by adding colons (`:`)
 to the sides of the "dash" lines in the second row. This will affect every cell in the column.
 
-> Note that the headers are always right aligned [within GitLab itself](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/user/markdown.md#tables).
+NOTE: **Note:**
+[Within GitLab itself](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/user/markdown.md#tables),
+the headers are always left-aligned in Chrome and Firefox, and centered in Safari.
 
 ```markdown
 | Left Aligned | Centered | Right Aligned | Left Aligned | Centered | Right Aligned |

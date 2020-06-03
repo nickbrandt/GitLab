@@ -1,0 +1,5 @@
+---
+title: Fix GraphQL query to fetch vulnerable projects of subgroups
+merge_request: 33410
+author:
+type: fixed

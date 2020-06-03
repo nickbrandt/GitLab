@@ -33,6 +33,7 @@ class Project < ApplicationRecord
   include OptionallySearch
   include FromUnion
   include IgnorableColumns
+  include Integration
   extend Gitlab::Cache::RequestCache
 
   extend Gitlab::ConfigHelper
@@ -291,6 +292,7 @@ class Project < ApplicationRecord
   has_many :builds, class_name: 'Ci::Build', inverse_of: :project, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_many :build_trace_section_names, class_name: 'Ci::BuildTraceSectionName'
   has_many :build_trace_chunks, class_name: 'Ci::BuildTraceChunk', through: :builds, source: :trace_chunks
+  has_many :build_report_results, class_name: 'Ci::BuildReportResult', inverse_of: :project
   has_many :job_artifacts, class_name: 'Ci::JobArtifact'
   has_many :runner_projects, class_name: 'Ci::RunnerProject', inverse_of: :project
   has_many :runners, through: :runner_projects, source: :runner, class_name: 'Ci::Runner'
@@ -329,6 +331,7 @@ class Project < ApplicationRecord
   has_many :repository_storage_moves, class_name: 'ProjectRepositoryStorageMove'
 
   has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
+  has_many :reviews, inverse_of: :project
 
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature, update_only: true
@@ -444,7 +447,7 @@ class Project < ApplicationRecord
   scope :archived, -> { where(archived: true) }
   scope :non_archived, -> { where(archived: false) }
   scope :for_milestones, ->(ids) { joins(:milestones).where('milestones.id' => ids).distinct }
-  scope :with_push, -> { joins(:events).where('events.action = ?', Event::PUSHED) }
+  scope :with_push, -> { joins(:events).merge(Event.pushed_action) }
   scope :with_project_feature, -> { joins('LEFT JOIN project_features ON projects.id = project_features.project_id') }
   scope :inc_routes, -> { includes(:route, namespace: :route) }
   scope :with_statistics, -> { includes(:statistics) }
@@ -508,6 +511,7 @@ class Project < ApplicationRecord
     left_outer_joins(:pages_metadatum)
       .where(project_pages_metadata: { project_id: nil })
   end
+
   scope :with_api_entity_associations, -> {
     preload(:project_feature, :route, :tags,
             group: :ip_restrictions, namespace: [:route, :owner])
@@ -526,6 +530,10 @@ class Project < ApplicationRecord
 
   # Used by Projects::CleanupService to hold a map of rewritten object IDs
   mount_uploader :bfg_object_map, AttachmentUploader
+
+  def self.with_web_entity_associations
+    preload(:project_feature, :route, :creator, :group, namespace: [:route, :owner])
+  end
 
   def self.eager_load_namespace_and_owner
     includes(namespace: :owner)
@@ -893,17 +901,6 @@ class Project < ApplicationRecord
 
   def jira_import_status
     latest_jira_import&.status || 'initial'
-  end
-
-  def validate_jira_import_settings!(user: nil)
-    raise Projects::ImportService::Error, _('Jira integration not configured.') unless jira_service&.active?
-
-    if user
-      raise Projects::ImportService::Error, _('Cannot import because issues are not available in this project.') unless feature_available?(:issues, user)
-      raise Projects::ImportService::Error, _('You do not have permissions to run the import.') unless user.can?(:admin_project, self)
-    end
-
-    raise Projects::ImportService::Error, _('Unable to connect to the Jira instance. Please check your Jira integration configuration.') unless jira_service.test(nil)[:success]
   end
 
   def human_import_status_name
@@ -2070,21 +2067,6 @@ class Project < ApplicationRecord
     with_lock do
       update_column(:repository_read_only, false)
     end
-  end
-
-  def change_repository_storage(new_repository_storage_key)
-    return if repository_read_only?
-    return if repository_storage == new_repository_storage_key
-
-    raise ArgumentError unless ::Gitlab.config.repositories.storages.key?(new_repository_storage_key)
-
-    storage_move = repository_storage_moves.create!(
-      source_storage_name: repository_storage,
-      destination_storage_name: new_repository_storage_key
-    )
-    storage_move.schedule!
-
-    self.repository_read_only = true
   end
 
   def pushes_since_gc

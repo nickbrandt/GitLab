@@ -244,6 +244,7 @@ module.exports = {
         loader: 'file-loader',
         options: {
           name: '[name].[contenthash:8].[ext]',
+          esModule: false,
         },
       },
     ],
@@ -328,9 +329,6 @@ module.exports = {
 
     // automatically configure monaco editor web workers
     new MonacoWebpackPlugin(),
-
-    // prevent pikaday from including moment.js
-    new webpack.IgnorePlugin(/moment/, /pikaday/),
 
     // fix legacy jQuery plugins which depend on globals
     new webpack.ProvidePlugin({

@@ -6,6 +6,7 @@ import { addDelimiter } from './lib/utils/text_utility';
 import flash from './flash';
 import CreateMergeRequestDropdown from './create_merge_request_dropdown';
 import IssuablesHelper from './helpers/issuables_helper';
+import { joinPaths } from '~/lib/utils/url_utility';
 import { __ } from './locale';
 
 export default class Issue {
@@ -13,6 +14,16 @@ export default class Issue {
     if ($('a.btn-close').length) this.initIssueBtnEventListeners();
 
     if ($('.js-close-blocked-issue-warning').length) this.initIssueWarningBtnEventListener();
+
+    if ($('.js-alert-moved-from-service-desk-warning').length) {
+      const trimmedPathname = window.location.pathname.slice(1);
+      this.alertMovedFromServiceDeskDismissedKey = joinPaths(
+        trimmedPathname,
+        'alert-issue-moved-from-service-desk-dismissed',
+      );
+
+      this.initIssueMovedFromServiceDeskDismissHandler();
+    }
 
     Issue.$btnNewBranch = $('#new-branch');
     Issue.createMrDropdownWrap = document.querySelector('.create-mr-dropdown-wrap');
@@ -89,9 +100,10 @@ export default class Issue {
   initIssueBtnEventListeners() {
     const issueFailMessage = __('Unable to update this issue at this time.');
 
-    return $(document).on(
+    // NOTE: data attribute seems unnecessary but is actually necessary
+    return $('.js-issuable-buttons[data-action="close-reopen"]').on(
       'click',
-      '.js-issuable-actions a.btn-close, .js-issuable-actions a.btn-reopen, a.btn-close-anyway',
+      'a.btn-close, a.btn-reopen, a.btn-close-anyway',
       e => {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -109,6 +121,7 @@ export default class Issue {
           this.disableCloseReopenButton($button);
 
           const url = $button.attr('href');
+
           return axios
             .put(url)
             .then(({ data }) => {
@@ -164,6 +177,21 @@ export default class Issue {
       e.preventDefault();
       e.stopImmediatePropagation();
       this.toggleWarningAndCloseButton();
+    });
+  }
+
+  initIssueMovedFromServiceDeskDismissHandler() {
+    const alertMovedFromServiceDeskWarning = $('.js-alert-moved-from-service-desk-warning');
+
+    if (!localStorage.getItem(this.alertMovedFromServiceDeskDismissedKey)) {
+      alertMovedFromServiceDeskWarning.show();
+    }
+
+    alertMovedFromServiceDeskWarning.on('click', '.js-close', e => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      alertMovedFromServiceDeskWarning.remove();
+      localStorage.setItem(this.alertMovedFromServiceDeskDismissedKey, true);
     });
   }
 

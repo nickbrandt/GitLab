@@ -1,12 +1,17 @@
-import { shallowMount } from '@vue/test-utils';
-
+import { mount } from '@vue/test-utils';
 import { GlLink } from '@gitlab/ui';
 import SecurityConfigurationApp from 'ee/security_configuration/components/app.vue';
+import stubChildren from 'helpers/stub_children';
 
 describe('Security Configuration App', () => {
   let wrapper;
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(SecurityConfigurationApp, {
+    wrapper = mount(SecurityConfigurationApp, {
+      stubs: {
+        ...stubChildren(SecurityConfigurationApp),
+        GlTable: false,
+        GlSprintf: false,
+      },
       propsData: {
         features: [],
         autoDevopsEnabled: false,
@@ -23,28 +28,19 @@ describe('Security Configuration App', () => {
     wrapper.destroy();
   });
 
-  const generateFeatures = n =>
-    [...Array(n).keys()].map(i => ({
+  const generateFeatures = n => {
+    return [...Array(n).keys()].map(i => ({
       name: `name-feature-${i}`,
       description: `description-feature-${i}`,
       link: `link-feature-${i}`,
+      configured: i % 2 === 0,
     }));
+  };
 
-  const getHelpLink = () => wrapper.find('header').find(GlLink);
-  const getNotification = () => wrapper.find({ ref: 'callout' });
-  const getPipelinesLink = () => getNotification().find('a');
-  const getFeaturesTable = () => wrapper.find({ ref: 'featuresTable' });
-  const getFeatureConfigStatus = () => wrapper.find({ ref: 'featureConfigStatus' });
+  const getPipelinesLink = () => wrapper.find({ ref: 'pipelinesLink' });
+  const getFeaturesTable = () => wrapper.find({ ref: 'securityControlTable' });
 
   describe('header', () => {
-    it('displays a link to the given help page', () => {
-      const helpPagePath = 'http://foo';
-
-      createComponent({ helpPagePath });
-
-      expect(getHelpLink().attributes('href')).toBe(helpPagePath);
-    });
-
     it.each`
       autoDevopsEnabled | expectedUrl
       ${true}           | ${'http://autoDevopsHelpPagePath'}
@@ -55,41 +51,28 @@ describe('Security Configuration App', () => {
         createComponent({ autoDevopsEnabled });
 
         expect(getPipelinesLink().attributes('href')).toBe(expectedUrl);
-        expect(getPipelinesLink().attributes('rel')).toBe('noopener');
+        expect(getPipelinesLink().attributes('target')).toBe('_blank');
       },
     );
   });
 
   describe('features table', () => {
-    it('displays a row for each given feature', () => {
+    it('passes the expected data to the GlTable', () => {
       const features = generateFeatures(5);
 
       createComponent({ features });
 
-      expect(wrapper.findAll({ ref: 'featureRow' })).toHaveLength(5);
+      expect(getFeaturesTable().classes('b-table-stacked-md')).toBeTruthy();
+      const rows = getFeaturesTable().findAll('tbody tr');
+      expect(rows).toHaveLength(5);
+
+      for (let i = 0; i < features.length; i += 1) {
+        const [feature, status] = rows.at(i).findAll('td').wrappers;
+        expect(feature.text()).toMatch(features[i].name);
+        expect(feature.text()).toMatch(features[i].description);
+        expect(feature.find(GlLink).attributes('href')).toBe(features[i].link);
+        expect(status.text()).toMatch(features[i].configured ? 'Enabled' : 'Not yet enabled');
+      }
     });
-
-    it('displays a given feature', () => {
-      const features = generateFeatures(1);
-
-      createComponent({ features });
-
-      expect(getFeaturesTable().element).toMatchSnapshot();
-    });
-
-    it.each`
-      configured | statusText
-      ${true}    | ${'Enabled'}
-      ${false}   | ${'Not yet enabled'}
-    `(
-      `displays "$statusText" if the given feature's configuration status is: "$configured"`,
-      ({ configured, statusText }) => {
-        const features = [{ configured }];
-
-        createComponent({ features });
-
-        expect(getFeatureConfigStatus().text()).toBe(statusText);
-      },
-    );
   });
 });

@@ -7,6 +7,8 @@ module QA
         module Show
           extend QA::Page::PageConcern
 
+          ApprovalConditionsError = Class.new(RuntimeError)
+
           def self.prepended(base)
             super
 
@@ -15,27 +17,6 @@ module QA
 
               view 'app/assets/javascripts/vue_merge_request_widget/components/states/sha_mismatch.vue' do
                 element :head_mismatch, "The source branch HEAD has recently changed." # rubocop:disable QA/ElementWithPattern
-              end
-
-              view 'ee/app/assets/javascripts/batch_comments/components/publish_button.vue' do
-                element :submit_review
-              end
-
-              view 'ee/app/assets/javascripts/batch_comments/components/review_bar.vue' do
-                element :review_bar
-                element :discard_review
-                element :modal_delete_pending_comments
-              end
-
-              view 'app/assets/javascripts/notes/components/note_form.vue' do
-                element :unresolve_review_discussion_checkbox
-                element :resolve_review_discussion_checkbox
-                element :start_review
-                element :comment_now
-              end
-
-              view 'ee/app/assets/javascripts/batch_comments/components/preview_dropdown.vue' do
-                element :review_preview_toggle
               end
 
               view 'ee/app/views/projects/merge_requests/_code_owner_approval_rules.html.haml' do
@@ -99,7 +80,10 @@ module QA
           end
 
           def approvals_required_from
-            approvals_content.match(/approvals? from (.*)/)[1]
+            match = approvals_content.match(/approvals? from (.*)/)
+            raise(ApprovalConditionsError, 'The expected approval conditions were not found.') unless match
+
+            match[1]
           end
 
           def approved?
@@ -116,49 +100,6 @@ module QA
             click_element :approve_button
 
             find_element :approve_button, text: "Revoke approval"
-          end
-
-          def start_review
-            click_element :start_review
-
-            # After clicking the button, wait for it to disappear
-            # before moving on to the next part of the test
-            has_no_element? :start_review
-          end
-
-          def comment_now
-            click_element :comment_now
-
-            # After clicking the button, wait for it to disappear
-            # before moving on to the next part of the test
-            has_no_element? :comment_now
-          end
-
-          def submit_pending_reviews
-            within_element :review_bar do
-              click_element :review_preview_toggle
-              click_element :submit_review
-
-              # After clicking the button, wait for it to disappear
-              # before moving on to the next part of the test
-              has_no_element? :submit_review
-            end
-          end
-
-          def discard_pending_reviews
-            within_element :review_bar do
-              click_element :discard_review
-            end
-            click_element :modal_delete_pending_comments
-          end
-
-          def resolve_review_discussion
-            scroll_to_element :start_review
-            check_element :resolve_review_discussion_checkbox
-          end
-
-          def unresolve_review_discussion
-            check_element :unresolve_review_discussion_checkbox
           end
 
           def expand_license_report
@@ -293,7 +234,7 @@ module QA
           end
 
           def merge_via_merge_train
-            raise ElementNotFound, "Not ready to merge" unless ready_to_merge?
+            wait_until_ready_to_merge
 
             click_element(:merge_button, text: "Start merge train")
 

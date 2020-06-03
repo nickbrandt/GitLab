@@ -65,22 +65,22 @@ export default {
       </template>
       <section>
         <div class="d-flex align-items-center my-1">
-          <div class="mr-2 bg-transparent gl-shim-w-5 gl-shim-h-2"></div>
+          <div class="mr-2 bg-transparent gl-w-5 gl-h-2"></div>
           <span class="flex-grow-1 mr-3">{{ __('Total') }}</span>
           <span class="font-weight-bold">{{ itemValue.totalCount.toLocaleString() }}</span>
         </div>
         <div class="d-flex align-items-center my-2">
-          <div class="mr-2 bg-success-500 gl-shim-w-5 gl-shim-h-2"></div>
+          <div class="mr-2 bg-success-500 gl-w-5 gl-h-2"></div>
           <span class="flex-grow-1 mr-3">{{ __('Synced') }}</span>
           <span class="font-weight-bold">{{ itemValue.successCount.toLocaleString() }}</span>
         </div>
         <div class="d-flex align-items-center my-2">
-          <div class="mr-2 bg-secondary-200 gl-shim-w-5 gl-shim-h-2"></div>
+          <div class="mr-2 bg-secondary-200 gl-w-5 gl-h-2"></div>
           <span class="flex-grow-1 mr-3">{{ __('Queued') }}</span>
           <span class="font-weight-bold">{{ queuedCount.toLocaleString() }}</span>
         </div>
         <div class="d-flex align-items-center my-2">
-          <div class="mr-2 bg-danger-500 gl-shim-w-5 gl-shim-h-2"></div>
+          <div class="mr-2 bg-danger-500 gl-w-5 gl-h-2"></div>
           <span class="flex-grow-1 mr-3">{{ __('Failed') }}</span>
           <span class="font-weight-bold">{{ itemValue.failureCount.toLocaleString() }}</span>
         </div>

@@ -34,7 +34,7 @@ function createFooterApp() {
     return false;
   }
 
-  const { vulnerabilityFeedbackHelpPath, hasMr, discussionsUrl } = el.dataset;
+  const { vulnerabilityFeedbackHelpPath, hasMr, discussionsUrl, notesUrl } = el.dataset;
   const vulnerability = JSON.parse(el.dataset.vulnerabilityJson);
   const finding = JSON.parse(el.dataset.findingJson);
   const { issue_feedback: feedback, remediation, solution } = finding;
@@ -44,6 +44,7 @@ function createFooterApp() {
 
   const props = {
     discussionsUrl,
+    notesUrl,
     solutionInfo: {
       solution,
       remediation,

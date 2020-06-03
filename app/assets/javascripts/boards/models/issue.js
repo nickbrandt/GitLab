@@ -36,7 +36,7 @@ class ListIssue {
   }
 
   findLabel(findLabel) {
-    return this.labels.find(label => label.id === findLabel.id);
+    return boardsStore.findIssueLabel(this, findLabel);
   }
 
   removeLabel(removeLabel) {
@@ -50,9 +50,7 @@ class ListIssue {
   }
 
   addAssignee(assignee) {
-    if (!this.findAssignee(assignee)) {
-      this.assignees.push(new ListAssignee(assignee));
-    }
+    boardsStore.addIssueAssignee(this, assignee);
   }
 
   findAssignee(findAssignee) {
@@ -60,13 +58,11 @@ class ListIssue {
   }
 
   removeAssignee(removeAssignee) {
-    if (removeAssignee) {
-      this.assignees = this.assignees.filter(assignee => assignee.id !== removeAssignee.id);
-    }
+    boardsStore.removeIssueAssignee(this, removeAssignee);
   }
 
   removeAllAssignees() {
-    this.assignees = [];
+    boardsStore.removeAllIssueAssignees(this);
   }
 
   addMilestone(milestone) {

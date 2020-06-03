@@ -1,4 +1,7 @@
 ---
+stage: Verify
+group: Continuous Integration
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: reference
 ---
 
@@ -16,6 +19,13 @@ that can be reused in different scripts.
 
 Variables are useful for customizing your jobs in GitLab CI/CD.
 When you use variables, you don't have to hard-code values.
+
+For more information about advanced use of GitLab CI/CD:
+
+- Get to productivity faster with these [7 advanced GitLab CI workflow hacks](https://about.gitlab.com/webcast/7cicd-hacks/)
+  shared by GitLab engineers.
+- Learn how the Cloud Native Computing Foundation (CNCF) [eliminates the complexity](https://about.gitlab.com/customers/cncf/)
+  of managing projects across many cloud providers with GitLab CI/CD.
 
 ## Predefined environment variables
 
@@ -242,19 +252,48 @@ In most cases `bash` or `sh` is used to execute the job script.
 
 To access environment variables, use the syntax for your Runner's [shell](https://docs.gitlab.com/runner/executors/).
 
-| Shell                | Usage           |
-|----------------------|-----------------|
-| bash/sh              | `$variable`     |
-| windows batch        | `%variable%`    |
-| PowerShell           | `$env:variable` |
+| Shell                | Usage                                    |
+|----------------------|------------------------------------------|
+| bash/sh              | `$variable`                              |
+| PowerShell           | `$env:variable` (primary) or `$variable` |
+| Windows Batch        | `%variable%`                             |
 
-To access environment variables in bash, prefix the variable name with (`$`):
+### Bash
+
+To access environment variables in **bash**, prefix the variable name with (`$`):
 
 ```yaml
 job_name:
   script:
     - echo $CI_JOB_ID
 ```
+
+### PowerShell
+
+To access environment variables in a **Windows PowerShell** environment, prefix
+the variable name with (`$env:`). For environment variables set by GitLab CI, including those set by [`variables`](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/ci/yaml/README.md#variables)
+parameter, they can also be accessed by prefixing the variable name with (`$`)
+as of [GitLab Runner 1.0.0](https://gitlab.com/gitlab-org/gitlab-runner/-/commit/abc44bb158008cd3a49c0d8173717c38dadb29ae#47afd7e8f12afdb8f0246262488f24e6dd071a22).
+System set environment variables however must be accessed using (`$env:`).
+
+```yaml
+job_name:
+  script:
+    - echo $env:CI_JOB_ID
+    - echo $CI_JOB_ID
+    - echo $env:PATH
+```
+
+In [some cases](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/4115#note_157692820)
+environment variables may need to be surrounded by quotes to expand properly:
+
+```yaml
+job_name:
+  script:
+    - D:\\qislsf\\apache-ant-1.10.5\\bin\\ant.bat "-DsosposDailyUsr=$env:SOSPOS_DAILY_USR" portal_test
+```
+
+### Windows Batch
 
 To access environment variables in **Windows Batch**, surround the variable
 with (`%`):
@@ -265,23 +304,18 @@ job_name:
     - echo %CI_JOB_ID%
 ```
 
-To access environment variables in a **Windows PowerShell** environment, prefix
-the variable name with (`$env:`):
+### List all environment variables
 
-```yaml
-job_name:
-  script:
-    - echo $env:CI_JOB_ID
-```
-
-You can also list all environment variables with the `export` command,
-but be aware that this will also expose the values of all the variables
+You can also list all environment variables with the `export` command in Bash
+or `dir env:` command in PowerShell.
+Be aware that this will also expose the values of all the variables
 you set, in the job log:
 
 ```yaml
 job_name:
   script:
     - export
+    # - 'dir env:' # use this for PowerShell
 ```
 
 Example values:
@@ -377,9 +411,8 @@ script:
 
 You can define per-project or per-group variables
 that are set in the pipeline environment. Group-level variables are stored out of
-the repository (not in `.gitlab-ci.yml`) and are securely passed to GitLab Runner
-making them available during a pipeline run. It's the **recommended method** to
-use for storing things like passwords, SSH keys, and credentials.
+the repository (not in `.gitlab-ci.yml`) and are securely passed to GitLab Runner,
+which makes them available during a pipeline run. For Premium users who do **not** use an external key store or who use GitLab's [integration with HashiCorp Vault](../examples/authenticating-with-hashicorp-vault/index.md), we recommend using group environment variables to store secrets like passwords, SSH keys, and credentials.
 
 Group-level variables can be added by:
 
@@ -468,7 +501,8 @@ variables, depending on where they are defined.
 
 The order of precedence for variables is (from highest to lowest):
 
-1. [Trigger variables](../triggers/README.md#making-use-of-trigger-variables) or [scheduled pipeline variables](../pipelines/schedules.md#using-variables).
+1. [Trigger variables](../triggers/README.md#making-use-of-trigger-variables), [scheduled pipeline variables](../pipelines/schedules.md#using-variables),
+   and [manual pipeline run variables](#override-a-variable-by-manually-running-a-pipeline).
 1. Project-level [variables](#custom-environment-variables) or [protected variables](#protect-a-custom-variable).
 1. Group-level [variables](#group-level-environment-variables) or [protected variables](#protect-a-custom-variable).
 1. [Inherited environment variables](#inherit-environment-variables).
@@ -487,8 +521,10 @@ variables take precedence over those defined in `.gitlab-ci.yml`.
 
 ## Unsupported variables
 
-There are cases where some variables cannot be used in the context of a
-`.gitlab-ci.yml` definition (for example under `script`). Read more about which variables are [not supported](where_variables_can_be_used.md).
+Variable names are limited by the underlying shell used to execute scripts (see [available shells](https://docs.gitlab.com/runner/shells/index.html).
+Each shell has its own unique set of reserved variable names.
+You will also want to keep in mind the [scope of environment variables](where_variables_can_be_used.md) to ensure a variable is defined in the scope
+in which you wish to use it.
 
 ## Where variables can be used
 
@@ -644,7 +680,7 @@ Below you can find supported syntax reference:
    which means that it is defined and non-empty, you can simply use
    variable name as an expression, like `$STAGING`. If `$STAGING` variable
    is defined, and is non empty, expression will evaluate to truth.
-   `$STAGING` value needs to a string, with length higher than zero.
+   `$STAGING` value needs to be a string, with length higher than zero.
    Variable that contains only whitespace characters is not an empty variable.
 
 1. Pattern matching (introduced in GitLab 11.0)

@@ -361,10 +361,10 @@ group :development, :test do
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
 
-  gem 'gitlab-styles', '~> 3.2.0', require: false
+  gem 'gitlab-styles', '~> 4.2.0', require: false
   # Pin these dependencies, otherwise a new rule could break the CI pipelines
-  gem 'rubocop', '~> 0.74.0'
-  gem 'rubocop-performance', '~> 1.4.1'
+  gem 'rubocop', '~> 0.82.0'
+  gem 'rubocop-performance', '~> 1.5.2'
   gem 'rubocop-rspec', '~> 1.37.0'
 
   gem 'scss_lint', '~> 0.56.0', require: false
@@ -402,7 +402,6 @@ group :test do
 
   gem 'shoulda-matchers', '~> 4.0.1', require: false
   gem 'email_spec', '~> 2.2.0'
-  gem 'json-schema', '~> 2.8.0'
   gem 'webmock', '~> 3.5.1'
   gem 'rails-controller-testing'
   gem 'concurrent-ruby', '~> 1.1'
@@ -453,7 +452,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC protocol definitions
-gem 'gitaly', '~> 13.0.0.pre.rc1'
+gem 'gitaly', '~> 13.1.0.pre.rc1'
 
 gem 'grpc', '~> 1.24.0'
 
@@ -497,3 +496,4 @@ gem 'valid_email', '~> 0.1'
 
 # JSON
 gem 'json', '~> 2.3.0'
+gem 'json-schema', '~> 2.8.0'

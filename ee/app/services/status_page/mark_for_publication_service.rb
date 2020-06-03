@@ -3,6 +3,13 @@
 module StatusPage
   # Marks an issue as published.
   class MarkForPublicationService
+    def self.publishable?(project, user, issue)
+      project.status_page_setting&.enabled? &&
+        user&.can?(:mark_issue_for_publication, project) &&
+        !issue.confidential? &&
+        !issue.status_page_published_incident
+    end
+
     def initialize(project, user, issue)
       @project = project
       @user = user
@@ -10,29 +17,26 @@ module StatusPage
     end
 
     def execute
-      return unless status_page_enabled?
-      return unless can_publish?
-      return unless publishable_issue?
+      return error('Issue cannot be published') unless publishable?
 
-      track_incident
-      add_system_note
+      PublishedIncident.transaction do
+        track_incident
+        add_system_note
+      end
+
+      ServiceResponse.success
+    rescue StandardError => e
+      Gitlab::ErrorTracking.track_exception(e)
+
+      error(e.message)
     end
 
     private
 
     attr_reader :user, :project, :issue
 
-    def can_publish?
-      user&.can?(:mark_issue_for_publication, project)
-    end
-
-    def status_page_enabled?
-      project.status_page_setting&.enabled?
-    end
-
-    def publishable_issue?
-      !issue.confidential? &&
-        !issue.status_page_published_incident
+    def publishable?
+      self.class.publishable?(project, user, issue)
     end
 
     def add_system_note
@@ -41,6 +45,10 @@ module StatusPage
 
     def track_incident
       PublishedIncident.track(issue)
+    end
+
+    def error(message)
+      ServiceResponse.error(message: message)
     end
   end
 end

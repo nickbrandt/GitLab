@@ -3,6 +3,11 @@ query getStorageCounter($fullPath: ID!) {
     id
     rootStorageStatistics {
       storageSize
+      repositorySize
+      lfsObjectsSize
+      buildArtifactsSize
+      packagesSize
+      wikiSize
     }
     projects(includeSubgroups: true) {
       edges {

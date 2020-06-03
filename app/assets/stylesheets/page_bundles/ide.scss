@@ -282,7 +282,6 @@ $ide-commit-header-height: 48px;
 .multi-file-commit-panel {
   display: flex;
   position: relative;
-  width: 340px;
   padding: 0;
   background-color: var(--ide-background, $gray-light);
 
@@ -874,13 +873,11 @@ $ide-commit-header-height: 48px;
 }
 
 .ide-sidebar {
-  width: auto;
   min-width: 60px;
 }
 
 .ide-right-sidebar {
   .multi-file-commit-panel-inner {
-    width: 350px;
     padding: $grid-size 0;
     background-color: var(--ide-highlight-background, $white);
     border-right: 1px solid var(--ide-border-color, $white-dark);
@@ -890,6 +887,7 @@ $ide-commit-header-height: 48px;
     padding-bottom: 0;
   }
 
+  .ide-right-sidebar-terminal,
   .ide-right-sidebar-clientside {
     padding: 0;
   }
@@ -1155,5 +1153,24 @@ $ide-commit-header-height: 48px;
 
   .folder-icon {
     fill: var(--ide-text-color-secondary, $gl-text-color-secondary);
+  }
+}
+
+.ide-terminal {
+  @include ide-trace-view();
+
+  .terminal-wrapper {
+    background: $black;
+    color: $gray-darkest;
+    overflow: hidden;
+  }
+
+  .xterm {
+    height: 100%;
+    padding: $grid-size;
+  }
+
+  .xterm-viewport {
+    overflow-y: auto;
   }
 }

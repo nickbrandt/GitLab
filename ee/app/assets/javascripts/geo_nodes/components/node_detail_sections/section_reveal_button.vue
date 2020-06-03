@@ -33,6 +33,6 @@ export default {
 <template>
   <button class="btn-link d-flex align-items-center" type="button" @click="onClickButton">
     <icon :size="16" :name="toggleButtonIcon" />
-    <span class="prepend-left-8">{{ buttonTitle }}</span>
+    <span class="gl-ml-3">{{ buttonTitle }}</span>
   </button>
 </template>

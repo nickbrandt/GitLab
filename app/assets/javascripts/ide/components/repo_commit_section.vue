@@ -14,20 +14,20 @@ export default {
     tooltip,
   },
   computed: {
-    ...mapState(['changedFiles', 'stagedFiles', 'lastCommitMsg', 'unusedSeal']),
+    ...mapState(['changedFiles', 'stagedFiles', 'lastCommitMsg']),
     ...mapState('commit', ['commitMessage', 'submitCommitLoading']),
-    ...mapGetters(['lastOpenedFile', 'hasChanges', 'someUncommittedChanges', 'activeFile']),
+    ...mapGetters(['lastOpenedFile', 'someUncommittedChanges', 'activeFile']),
     ...mapGetters('commit', ['discardDraftButtonDisabled']),
     showStageUnstageArea() {
-      return Boolean(this.someUncommittedChanges || this.lastCommitMsg || !this.unusedSeal);
+      return Boolean(this.someUncommittedChanges || this.lastCommitMsg);
     },
     activeFileKey() {
       return this.activeFile ? this.activeFile.key : null;
     },
   },
   watch: {
-    hasChanges() {
-      if (!this.hasChanges) {
+    someUncommittedChanges() {
+      if (!this.someUncommittedChanges) {
         this.updateActivityBarView(leftSidebarViews.edit.name);
       }
     },
@@ -67,6 +67,6 @@ export default {
         icon-name="unstaged"
       />
     </template>
-    <empty-state v-if="unusedSeal" />
+    <empty-state v-else />
   </div>
 </template>

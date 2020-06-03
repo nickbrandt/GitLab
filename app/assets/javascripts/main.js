@@ -32,11 +32,11 @@ import initFrequentItemDropdowns from './frequent_items';
 import initBreadcrumbs from './breadcrumb';
 import initUsagePingConsent from './usage_ping_consent';
 import initPerformanceBar from './performance_bar';
-import initSearchAutocomplete from './search_autocomplete';
+import initGlobalSearchInput from './global_search_input';
 import GlFieldErrors from './gl_field_errors';
 import initUserPopovers from './user_popovers';
 import initBroadcastNotifications from './broadcast_notification';
-import PersistentUserCallout from './persistent_user_callout';
+import initPersistentUserCallouts from './persistent_user_callouts';
 import { initUserTracking } from './tracking';
 import { __ } from './locale';
 
@@ -108,14 +108,9 @@ function deferredInitialisation() {
   initUserPopovers();
   initBroadcastNotifications();
   initFrequentItemDropdowns();
+  initPersistentUserCallouts();
 
-  const recoverySettingsCallout = document.querySelector('.js-recovery-settings-callout');
-  PersistentUserCallout.factory(recoverySettingsCallout);
-
-  const usersOverLicenseCallout = document.querySelector('.js-users-over-license-callout');
-  PersistentUserCallout.factory(usersOverLicenseCallout);
-
-  if (document.querySelector('.search')) initSearchAutocomplete();
+  if (document.querySelector('.search')) initGlobalSearchInput();
 
   addSelectOnFocusBehaviour('.js-select-on-focus');
 

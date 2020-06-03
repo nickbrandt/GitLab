@@ -1,4 +1,7 @@
 ---
+stage: Verify
+group: Continuous Integration
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 disqus_identifier: 'https://docs.gitlab.com/ee/user/project/pipelines/settings.html'
 type: reference, howto
 ---
@@ -297,6 +300,16 @@ https://example.gitlab.com/<namespace>/<project>/badges/<branch>/coverage.svg?st
 ```
 
 ![Badge flat square style](https://gitlab.com/gitlab-org/gitlab-foss/badges/master/coverage.svg?job=coverage&style=flat-square)
+
+### Custom badge text
+
+The text for a badge can be customized. This can be useful to differentiate between multiple coverage jobs that run in the same pipeline. Customize the badge text and width by adding the `key_text=custom_text` and `key_width=custom_key_width` parameters to the URL:
+
+```plaintext
+https://gitlab.com/gitlab-org/gitlab-foss/badges/master/coverage.svg?job=karma&key_text=Frontend+Coverage&key_width=100
+```
+
+![Badge with custom text and width](https://gitlab.com/gitlab-org/gitlab-foss/badges/master/coverage.svg?job=karma&key_text=Frontend+Coverage&key_width=100)
 
 ## Environment Variables
 

@@ -1,4 +1,7 @@
 ---
+stage: Verify
+group: Continuous Integration
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: reference
 ---
 
@@ -165,7 +168,7 @@ The next step is to configure a Runner so that it picks the pending jobs.
 ## Configuring a Runner
 
 In GitLab, Runners run the jobs that you define in `.gitlab-ci.yml`. A Runner
-can be a virtual machine, a VPS, a bare-metal machine, a docker container or
+can be a virtual machine, a VPS, a bare-metal machine, a Docker container or
 even a cluster of containers. GitLab and the Runners communicate through an API,
 so the only requirement is that the Runner's machine has network access to the
 GitLab server.

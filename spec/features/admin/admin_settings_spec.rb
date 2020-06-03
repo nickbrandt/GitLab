@@ -5,6 +5,7 @@ require 'spec_helper'
 describe 'Admin updates settings', :clean_gitlab_redis_shared_state, :do_not_mock_admin_mode do
   include StubENV
   include TermsHelper
+  include UsageDataHelpers
 
   let(:admin) { create(:admin) }
 
@@ -277,6 +278,19 @@ describe 'Admin updates settings', :clean_gitlab_redis_shared_state, :do_not_moc
       end
     end
 
+    context 'Repository page' do
+      it 'Change Repository storage settings' do
+        visit repository_admin_application_settings_path
+
+        page.within('.as-repository-storage') do
+          fill_in 'application_setting_repository_storages_weighted_default', with: 50
+          click_button 'Save changes'
+        end
+
+        expect(current_settings.repository_storages_weighted_default).to be 50
+      end
+    end
+
     context 'Reporting page' do
       it 'Change Spam settings' do
         visit reporting_admin_application_settings_path
@@ -340,7 +354,7 @@ describe 'Admin updates settings', :clean_gitlab_redis_shared_state, :do_not_moc
       end
 
       it 'loads usage ping payload on click', :js do
-        allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+        stub_usage_data_connections
 
         page.within('#js-usage-settings') do
           expected_payload_content = /(?=.*"uuid")(?=.*"hostname")/m

@@ -34,7 +34,7 @@ export default {
 
 <template>
   <div v-if="issue.hiddenCount" class="p-3 d-flex align-items-center">
-    <icon class="append-right-8" name="eye-slash" aria-hidden="true" />
+    <icon class="gl-mr-3" name="eye-slash" aria-hidden="true" />
     {{ hiddenBlockingMRsText }}
   </div>
   <related-issuable-item

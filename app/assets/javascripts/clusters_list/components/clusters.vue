@@ -1,6 +1,12 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlBadge, GlLink, GlLoadingIcon, GlPagination, GlTable } from '@gitlab/ui';
+import {
+  GlDeprecatedBadge as GlBadge,
+  GlLink,
+  GlLoadingIcon,
+  GlPagination,
+  GlTable,
+} from '@gitlab/ui';
 import tooltip from '~/vue_shared/directives/tooltip';
 import { CLUSTER_TYPES, STATUSES } from '../constants';
 import { __, sprintf } from '~/locale';
@@ -37,17 +43,17 @@ export default {
           key: 'environment_scope',
           label: __('Environment scope'),
         },
-        // Wait for backend to send these fields
+        {
+          key: 'node_size',
+          label: __('Nodes'),
+        },
+        // Fields are missing calculation methods and not ready to display
         // {
-        //  key: 'size',
-        //  label: __('Size'),
-        // },
-        // {
-        //  key: 'cpu',
+        //  key: 'node_cpu',
         //  label: __('Total cores (vCPUs)'),
         // },
         // {
-        //  key: 'memory',
+        //  key: 'node_memory',
         //  label: __('Total memory (GB)'),
         // },
         {
@@ -105,6 +111,14 @@ export default {
           ></div>
         </div>
       </template>
+
+      <template #cell(node_size)="{ item }">
+        <span v-if="item.nodes">{{ item.nodes.length }}</span>
+        <small v-else class="gl-font-sm gl-font-style-italic gl-text-gray-400">{{
+          __('Unknown')
+        }}</small>
+      </template>
+
       <template #cell(cluster_type)="{value}">
         <gl-badge variant="light">
           {{ value }}

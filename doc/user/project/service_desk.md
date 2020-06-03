@@ -1,3 +1,9 @@
+---
+stage: Plan
+group: Certify
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # Service Desk **(STARTER)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/149) in [GitLab Premium](https://about.gitlab.com/pricing/) 9.1.
@@ -171,7 +177,7 @@ To turn on the feature, ask a GitLab administrator with Rails console access to 
 command:
 
 ```ruby
-Feature.enable(service_desk_email)
+Feature.enable(:service_desk_email)
 ```
 
 The configuration options are the same as for configuring
