@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 module API
   class GoProxy < Grape::API
+    helpers Gitlab::Golang
     helpers ::API::Helpers::PackagesHelpers
-    helpers ::API::Helpers::Packages::Go::ModuleHelpers
 
     # basic semver, except case encoded (A => !a)
     MODULE_VERSION_REGEX = /v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.!a-z0-9]+))?(?:\+([-.!a-z0-9]+))?/.freeze
@@ -12,6 +12,20 @@ module API
     before { require_packages_enabled! }
 
     helpers do
+      def case_decode(str)
+        # Converts "github.com/!azure" to "github.com/Azure"
+        #
+        # From `go help goproxy`:
+        #
+        # > To avoid problems when serving from case-sensitive file systems,
+        # > the <module> and <version> elements are case-encoded, replacing
+        # > every uppercase letter with an exclamation mark followed by the
+        # > corresponding lower-case letter: github.com/Azure encodes as
+        # > github.com/!azure.
+
+        str.gsub(/![[:alpha:]]/) { |s| s[1..].upcase }
+      end
+
       def find_project!(id)
         # based on API::Helpers::Packages::BasicAuthHelpers#authorized_project_find!
 

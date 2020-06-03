@@ -7,8 +7,8 @@ module Gitlab
 
       private
 
-      BASE64 = /(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?/.freeze
-      REGEX = Regexp.new("^(?<name>#{NAME.source})\\s+(?<version>#{SEMVER.source})(\/go.mod)?\\s+h1:(?<checksum>#{BASE64.source})$", NAME.options).freeze
+      BASE64 = Gitlab::Regex.base64_regex
+      REGEX = Regexp.new("^\\s*(?<name>#{NAME.source})\\s+(?<version>v#{SEMVER.source})(\/go.mod)?\\s+h1:(?<checksum>#{BASE64.source})\\s*$", NAME.options).freeze
 
       # rubocop: disable CodeReuse/ActiveRecord
       def link_dependencies

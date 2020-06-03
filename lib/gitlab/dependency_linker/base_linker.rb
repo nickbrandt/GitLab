@@ -63,10 +63,6 @@ module Gitlab
         "https://github.com/#{name}"
       end
 
-      def pkg_go_dev_url(name)
-        "https://pkg.go.dev/#{name}"
-      end
-
       def link_tag(name, url)
         sanitize(
           %{<a href="#{ERB::Util.html_escape_once(url)}" rel="nofollow noreferrer noopener" target="_blank">#{ERB::Util.html_escape_once(name)}</a>},

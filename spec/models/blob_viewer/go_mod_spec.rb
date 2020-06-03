@@ -23,7 +23,7 @@ describe BlobViewer::GoMod do
 
   describe '#package_url' do
     it 'returns the package URL' do
-      expect(subject.package_url).to eq("#{Gitlab.config.gitlab.protocol}://#{Settings.build_gitlab_go_url}/#{project.full_path}")
+      expect(subject.package_url).to eq("#{Gitlab.config.gitlab.protocol}://#{Settings.build_gitlab_go_url}/#{project.full_path}/")
     end
 
     context 'when the homepage has an invalid URL' do

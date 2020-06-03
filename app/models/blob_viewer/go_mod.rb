@@ -3,6 +3,15 @@
 module BlobViewer
   class GoMod < DependencyManager
     include ServerSide
+    include Gitlab::Utils::StrongMemoize
+
+    MODULE_REGEX = /
+      \A (?# beginning of file)
+      module\s+ (?# module directive)
+      (?<name>.*?) (?# module name)
+      \s*(?:\/\/.*)? (?# comment)
+      (?:\n|\z) (?# newline or end of file)
+    /x.freeze
 
     self.file_types = %i(go_mod go_sum)
 
@@ -19,21 +28,16 @@ module BlobViewer
     end
 
     def package_name
-      return if blob.name != 'go.mod'
-      return @package_name unless @package_name.nil?
-      return unless blob.data.starts_with? 'module '
+      strong_memoize(:package_name) do
+        next if blob.name != 'go.mod'
+        next unless match = MODULE_REGEX.match(blob.data)
 
-      @package_name ||= blob.data.partition("\n").first[7..]
+        match[:name]
+      end
     end
 
     def package_url
-      return unless Gitlab::UrlSanitizer.valid?("https://#{package_name}")
-
-      if package_name.starts_with? Settings.build_gitlab_go_url + '/'
-        "#{Gitlab.config.gitlab.protocol}://#{package_name}"
-      else
-        "https://pkg.go.dev/#{package_name}"
-      end
+      Gitlab::Golang.package_url(package_name)
     end
   end
 end
