@@ -20,6 +20,13 @@ that can be reused in different scripts.
 Variables are useful for customizing your jobs in GitLab CI/CD.
 When you use variables, you don't have to hard-code values.
 
+For more information about advanced use of GitLab CI/CD:
+
+- Get to productivity faster with these [7 advanced GitLab CI workflow hacks](https://about.gitlab.com/webcast/7cicd-hacks/)
+  shared by GitLab engineers.
+- Learn how the Cloud Native Computing Foundation (CNCF) [eliminates the complexity](https://about.gitlab.com/customers/cncf/)
+  of managing projects across many cloud providers with GitLab CI/CD.
+
 ## Predefined environment variables
 
 GitLab CI/CD has a [default set of predefined variables](predefined_variables.md)
@@ -404,9 +411,8 @@ script:
 
 You can define per-project or per-group variables
 that are set in the pipeline environment. Group-level variables are stored out of
-the repository (not in `.gitlab-ci.yml`) and are securely passed to GitLab Runner
-making them available during a pipeline run. It's the **recommended method** to
-use for storing things like passwords, SSH keys, and credentials.
+the repository (not in `.gitlab-ci.yml`) and are securely passed to GitLab Runner,
+which makes them available during a pipeline run. For Premium users who do **not** use an external key store or who use GitLab's [integration with HashiCorp Vault](../examples/authenticating-with-hashicorp-vault/index.md), we recommend using group environment variables to store secrets like passwords, SSH keys, and credentials.
 
 Group-level variables can be added by:
 
@@ -515,8 +521,10 @@ variables take precedence over those defined in `.gitlab-ci.yml`.
 
 ## Unsupported variables
 
-There are cases where some variables cannot be used in the context of a
-`.gitlab-ci.yml` definition (for example under `script`). Read more about which variables are [not supported](where_variables_can_be_used.md).
+Variable names are limited by the underlying shell used to execute scripts (see [available shells](https://docs.gitlab.com/runner/shells/index.html).
+Each shell has its own unique set of reserved variable names.
+You will also want to keep in mind the [scope of environment variables](where_variables_can_be_used.md) to ensure a variable is defined in the scope
+in which you wish to use it.
 
 ## Where variables can be used
 

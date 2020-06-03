@@ -159,6 +159,33 @@ describe ApprovalRules::ParamsFilteringService do
           expect(rule[:name]).to eq('All Members')
         end
       end
+
+      # A test case for https://gitlab.com/gitlab-org/gitlab/-/issues/208978#note_353379792
+      # Approval project rules with any_approver type have groups, but they shouldn't
+      context 'any approver rule from a project rule' do
+        let(:can_update_approvers?) { true }
+        let(:approval_rules_attributes) do
+          [
+            { user_ids: [""], group_ids: [""], approval_project_rule_id: approval_rule.id }
+          ]
+        end
+
+        context 'and the project rule has hidden groups' do
+          let(:approval_rule) do
+            create(:approval_project_rule, project: project, rule_type: :any_approver).tap do |rule|
+              rule.groups << create(:group, :private)
+            end
+          end
+
+          it 'sets rule type for the rules attributes' do
+            params = service.execute
+            rule = params[:approval_rules_attributes].first
+
+            expect(rule[:rule_type]).to eq(:any_approver)
+            expect(rule[:name]).to eq('All Members')
+          end
+        end
+      end
     end
 
     context 'update' do

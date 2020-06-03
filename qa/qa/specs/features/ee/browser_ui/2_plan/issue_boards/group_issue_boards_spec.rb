@@ -28,7 +28,7 @@ module QA
       end
 
       it 'shows multiple group boards in the boards dropdown menu' do
-        EE::Page::Component::IssueBoard::Show.perform do |show|
+        Page::Component::IssueBoard::Show.perform do |show|
           show.click_boards_dropdown_button
 
           expect(show.boards_dropdown_content).to have_content(board_1)

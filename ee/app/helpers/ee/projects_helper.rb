@@ -25,27 +25,11 @@ module EE
       ]
     end
 
-    # rubocop: disable Metrics/CyclomaticComplexity
     override :get_project_nav_tabs
     def get_project_nav_tabs(project, current_user)
       nav_tabs = super
 
-      if can?(current_user, :read_project_security_dashboard, @project)
-        nav_tabs << :security
-        nav_tabs << :security_configuration
-      end
-
-      if can?(current_user, :read_dependencies, @project)
-        nav_tabs << :dependencies
-      end
-
-      if can?(current_user, :read_licenses, project)
-        nav_tabs << :licenses
-      end
-
-      if can?(current_user, :read_threat_monitoring, project)
-        nav_tabs << :threat_monitoring
-      end
+      nav_tabs += get_project_security_nav_tabs(project, current_user)
 
       if ::Gitlab.config.packages.enabled &&
           project.feature_available?(:packages) &&
@@ -71,7 +55,6 @@ module EE
 
       nav_tabs
     end
-    # rubocop: enable Metrics/CyclomaticComplexity
 
     override :tab_ability_map
     def tab_ability_map
@@ -285,6 +268,31 @@ module EE
 
     def show_compliance_framework_badge?(project)
       project&.compliance_framework_setting&.present?
+    end
+
+    private
+
+    def get_project_security_nav_tabs(project, current_user)
+      nav_tabs = []
+
+      if can?(current_user, :read_project_security_dashboard, project)
+        nav_tabs << :security
+        nav_tabs << :security_configuration
+      end
+
+      if can?(current_user, :read_dependencies, project)
+        nav_tabs << :dependencies
+      end
+
+      if can?(current_user, :read_licenses, project)
+        nav_tabs << :licenses
+      end
+
+      if can?(current_user, :read_threat_monitoring, project)
+        nav_tabs << :threat_monitoring
+      end
+
+      nav_tabs
     end
   end
 end

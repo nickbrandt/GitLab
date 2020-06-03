@@ -54,7 +54,7 @@ export default {
   <div class="grid-row d-flex flex-grow-1 flex-column flex-sm-column flex-md-column flex-lg-row">
     <div class="grid-cell header-cell">
       <span class="icon-wrapper">
-        <icon v-if="header.icon" class="append-right-8" :name="header.icon" aria-hidden="true" />
+        <icon v-if="header.icon" class="gl-mr-3" :name="header.icon" aria-hidden="true" />
         {{ header.title }}
       </span>
     </div>

@@ -11,13 +11,16 @@ describe('AuditEventsApp', () => {
 
   const events = [{ foo: 'bar' }];
   const enabledTokenTypes = AVAILABLE_TOKEN_TYPES;
+  const filterQaSelector = 'filter_qa_selector';
+  const tableQaSelector = 'table_qa_selector';
 
   const initComponent = (props = {}) => {
     wrapper = shallowMount(AuditEventsApp, {
       propsData: {
         formPath: 'form/path',
         isLastPage: true,
-        dataQaSelector: 'qa_selector',
+        filterQaSelector,
+        tableQaSelector,
         enabledTokenTypes,
         events,
         ...props,
@@ -51,8 +54,16 @@ describe('AuditEventsApp', () => {
       expect(wrapper.find(AuditEventsTable).props('events')).toEqual(events);
     });
 
-    it('passes its avilable token types to the logs filter', () => {
+    it('passes the tables QA selector to the logs table', () => {
+      expect(wrapper.find(AuditEventsTable).props('qaSelector')).toEqual(tableQaSelector);
+    });
+
+    it('passes its available token types to the logs filter', () => {
       expect(wrapper.find(AuditEventsFilter).props('enabledTokenTypes')).toEqual(enabledTokenTypes);
+    });
+
+    it('passes the filters QA selector to the logs filter', () => {
+      expect(wrapper.find(AuditEventsFilter).props('qaSelector')).toEqual(filterQaSelector);
     });
   });
 });

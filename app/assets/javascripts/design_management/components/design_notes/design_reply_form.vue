@@ -103,11 +103,13 @@ export default {
           @keydown.meta.enter="submitForm"
           @keydown.ctrl.enter="submitForm"
           @keyup.esc.stop="cancelComment"
+          @blur="$emit('onBlur')"
         >
         </textarea>
       </template>
     </markdown-field>
-    <div class="note-form-actions d-flex justify-content-between">
+    <slot name="resolveCheckbox"></slot>
+    <div class="note-form-actions gl-display-flex gl-justify-content-space-between">
       <gl-deprecated-button
         ref="submitButton"
         :disabled="!hasValue || isSaving"

@@ -141,8 +141,8 @@ describe('Network Policy actions', () => {
   describe('updatePolicy', () => {
     let mock;
     const environmentId = 3;
-    const policy = { name: 'policy', manifest: 'foo' };
-    const updatedPolicy = { name: 'policy', manifest: 'bar' };
+    const policy = { name: 'policy', manifest: 'foo', isEnabled: true };
+    const updatedPolicy = { name: 'policy', manifest: 'bar', isEnabled: true };
 
     beforeEach(() => {
       state.policiesEndpoint = networkPoliciesEndpoint;
@@ -159,6 +159,7 @@ describe('Network Policy actions', () => {
           .onPut(joinPaths(networkPoliciesEndpoint, policy.name), {
             environment_id: environmentId,
             manifest: policy.manifest,
+            enabled: policy.isEnabled,
           })
           .replyOnce(httpStatus.OK, updatedPolicy);
       });
@@ -187,6 +188,7 @@ describe('Network Policy actions', () => {
           .onPut(joinPaths(networkPoliciesEndpoint, policy.name), {
             environment_id: environmentId,
             manifest: policy.manifest,
+            enabled: policy.isEnabled,
           })
           .replyOnce(500, error);
       });

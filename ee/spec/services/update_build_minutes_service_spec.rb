@@ -71,18 +71,6 @@ describe UpdateBuildMinutesService do
             .to eq((build.duration.to_i * 1.234).to_i)
         end
       end
-
-      context 'when :ci_minutes_track_for_public_projects FF is disabled' do
-        before do
-          stub_feature_flags(ci_minutes_track_for_public_projects: false)
-        end
-
-        it "does not create/update statistics" do
-          subject
-
-          expect(namespace.namespace_statistics).to be_nil
-        end
-      end
     end
 
     context 'for specific runner' do

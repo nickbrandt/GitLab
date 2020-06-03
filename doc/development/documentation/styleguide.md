@@ -325,6 +325,9 @@ tenses, words, and phrases:
 - Avoid using the word *currently* when talking about the product or its
   features. The documentation describes the product as it is, and not as it
   will be at some indeterminate point in the future.
+- Don't use profanity or obscenities. Doing so may negatively affect other
+  users and contributors, which is contrary to GitLab's value of
+  [diversity and inclusion](https://about.gitlab.com/handbook/values/#diversity-inclusion).
 
 ### Word usage clarifications
 
@@ -1365,7 +1368,35 @@ versions back, you can consider removing the text if it's irrelevant or confusin
 For example, if the current major version is 12.x, version text referencing versions of GitLab 8.x
 and older are candidates for removal if necessary for clearer or cleaner docs.
 
-## Product badges
+## Products and features
+
+Refer to the information in this section when describing products and features
+within the GitLab product documentation.
+
+### Avoid line breaks in names
+
+When entering a product or feature name that includes a space (such as
+GitLab Community Edition) or even other companies' products (such as
+Amazon Web Services), be sure to not split the product or feature name across
+lines with an inserted line break. Splitting product or feature names across
+lines makes searching for these items more difficult, and can cause problems if
+names change.
+
+For example, the followng Markdown content is *not* formatted correctly:
+
+```markdown
+When entering a product or feature name that includes a space (such as GitLab
+Community Edition), don't split the product or feature name across lines.
+```
+
+Instead, it should appear similar to the following:
+
+```markdown
+When entering a product or feature name that includes a space (such as
+GitLab Community Edition), don't split the product or feature name across lines.
+```
+
+### Product badges
 
 When a feature is available in EE-only tiers, add the corresponding tier according to the
 feature availability:
@@ -1405,7 +1436,7 @@ For example:
 The absence of tiers' mentions mean that the feature is available in GitLab Core,
 GitLab.com Free, and all higher tiers.
 
-### How it works
+#### How it works
 
 Introduced by [!244](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/244),
 the special markup `**(STARTER)**` will generate a `span` element to trigger the

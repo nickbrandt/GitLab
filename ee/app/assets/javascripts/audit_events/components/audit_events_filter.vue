@@ -15,6 +15,11 @@ export default {
       default: () => AVAILABLE_TOKEN_TYPES,
       validator: availableTokensValidator,
     },
+    qaSelector: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -70,7 +75,11 @@ export default {
 </script>
 
 <template>
-  <div class="input-group bg-white flex-grow-1" data-qa-selector="admin_audit_log_filter">
+  <div
+    class="input-group bg-white flex-grow-1"
+    data-testid="audit-events-filter"
+    :data-qa-selector="qaSelector"
+  >
     <gl-filtered-search
       v-model="searchTerms"
       :placeholder="__('Search')"

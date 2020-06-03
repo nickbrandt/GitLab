@@ -1,6 +1,9 @@
 Akismet
 Alertmanager
 Algolia
+allowlist
+allowlisting
+allowlists
 Ansible
 Anthos
 API
@@ -9,6 +12,7 @@ architected
 Artifactory
 Asana
 Asciidoctor
+Assembla
 Atlassian
 Auth0
 Authentiq
@@ -28,6 +32,7 @@ autoscaling
 awardable
 Axios
 Azure
+B-tree
 backport
 backported
 backporting
@@ -56,6 +61,7 @@ CAS
 CentOS
 Chatops
 Citrix
+Citus
 clonable
 Cloudwatch
 Cobertura
@@ -75,12 +81,16 @@ crosslinking
 crosslinks
 Crossplane
 CrowdIn
+datetime
 Debian
 deduplicate
 deduplicated
 deduplicates
 deduplicating
 deduplication
+denylist
+denylisting
+denylists
 deprovision
 deprovisioned
 deprovisioning
@@ -97,11 +107,13 @@ Dreamweaver
 Elasticsearch
 enablement
 enqueued
+Excon
 expirable
 Facebook
 failover
 failovers
 failsafe
+fastlane
 favicon
 firewalled
 Flawfinder
@@ -110,6 +122,7 @@ Fluentd
 Forgerock
 Gantt
 Gemnasium
+gettext
 Git
 Gitaly
 Gitea
@@ -125,6 +138,7 @@ Gradle
 Grafana
 gravatar
 Gzip
+Haml
 hardcode
 hardcoded
 hardcodes
@@ -164,6 +178,7 @@ kanbans
 Karma
 Kerberos
 Kibana
+Kinesis
 Knative
 Kramdown
 Kubernetes
@@ -172,6 +187,7 @@ Laravel
 LDAP
 Libravatar
 Lograge
+Logstash
 lookahead
 lookaheads
 lookbehind
@@ -185,6 +201,10 @@ Markdown
 markdownlint
 Mattermost
 mbox
+memoization
+memoize
+memoized
+memoizing
 mergeable
 Microsoft
 middleware
@@ -199,9 +219,12 @@ misconfiguration
 misconfigurations
 misconfiguring
 mitigations
+mixin
+mixins
 mockup
 mockups
 ModSecurity
+mutex
 nameserver
 nameservers
 namespace
@@ -209,6 +232,7 @@ namespaced
 namespaces
 Nanoc
 NGINX
+Nokogiri
 npm
 Nurtch
 OAuth
@@ -217,6 +241,7 @@ offboarded
 offboarding
 offboards
 OmniAuth
+onboarding
 OpenID
 OpenShift
 Packagist
@@ -228,6 +253,8 @@ Pipfiles
 Piwik
 PgBouncer
 plaintext
+Poedit
+pooler
 PostgreSQL
 precompile
 preconfigure
@@ -273,6 +300,7 @@ relicensing
 remediations
 Repmgr
 Repmgrd
+repurposing
 requeue
 requeued
 requeues
@@ -291,6 +319,7 @@ reverified
 reverifies
 reverify
 Rubix
+Rubocop
 runbook
 runbooks
 runit
@@ -298,11 +327,13 @@ runtime
 runtimes
 Salesforce
 SAML
+sandboxing
 sbt
 Sendmail
 Sentry
 serverless
 Sidekiq
+Sisense
 sharding
 shfmt
 Shibboleth
@@ -313,12 +344,16 @@ serializing
 Sitespeed
 Slack
 Slony
+smartcard
+smartcards
 SMTP
 Sobelow
+Sourcegraph
 spidering
 Splunk
 SpotBugs
 SSH
+Stackdriver
 storable
 strace
 strikethrough
@@ -398,6 +433,7 @@ unpublished
 unpublishes
 unpublishing
 unreferenced
+unreplicated
 unresolve
 unresolved
 unresolving
@@ -423,6 +459,7 @@ upvotes
 validator
 validators
 vendored
+versionless
 virtualized
 virtualizing
 Vue
@@ -430,6 +467,7 @@ Vuex
 walkthrough
 walkthroughs
 WebdriverIO
+Webex
 webpack
 webserver
 whitepaper

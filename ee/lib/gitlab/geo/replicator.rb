@@ -92,6 +92,18 @@ module Gitlab
         raise e
       end
 
+      # Given the output of a replicator's `replicable_params`, reinstantiate
+      # the replicator instance
+      #
+      # @param [String] replicable_name of a replicator instance
+      # @param [Integer] replicable_id of a replicator instance
+      # @return [Geo::Replicator] replicator instance
+      def self.for_replicable_params(replicable_name:, replicable_id:)
+        replicator_class = for_replicable_name(replicable_name)
+
+        replicator_class.new(model_record_id: replicable_id)
+      end
+
       def self.checksummed
         model.checksummed
       end
@@ -127,7 +139,7 @@ module Gitlab
       # @param [Integer] model_record_id
       def initialize(model_record: nil, model_record_id: nil)
         @model_record = model_record
-        @model_record_id = model_record_id
+        @model_record_id = model_record_id || model_record&.id
       end
 
       # Instance of the replicable model
@@ -231,6 +243,14 @@ module Gitlab
 
           model_record.project_id
         end
+      end
+
+      # Return exactly the data needed by `for_replicable_params` to
+      # reinstantiate this Replicator elsewhere.
+      #
+      # @return [Hash] the replicable name and ID
+      def replicable_params
+        { replicable_name: replicable_name, replicable_id: model_record_id }
       end
 
       protected

@@ -652,7 +652,7 @@
   :idempotent: 
   :tags: []
 - :name: status_page_publish
-  :feature_category: :status_page
+  :feature_category: :incident_management
   :has_external_dependencies: true
   :urgency: :low
   :resource_boundary: :unknown

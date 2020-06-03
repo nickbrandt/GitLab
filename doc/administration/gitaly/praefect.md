@@ -1,4 +1,7 @@
 ---
+stage: Create
+group: Gitaly
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: reference
 ---
 
@@ -318,15 +321,6 @@ application server, or a Gitaly node.
      }
    }
    ```
-
-1. Enable the database replication queue:
-
-   ```ruby
-   praefect['postgres_queue_enabled'] = true
-   ```
-
-   In the next release, database replication queue will be enabled by default.
-   See [issue #2615](https://gitlab.com/gitlab-org/gitaly/-/issues/2615).
 
 1. Enable automatic failover by editing `/etc/gitlab/gitlab.rb`:
 

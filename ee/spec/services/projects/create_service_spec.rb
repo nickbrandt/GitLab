@@ -223,66 +223,58 @@ describe Projects::CreateService, '#execute' do
       end
     end
 
-    context 'group push rules' do
-      before do
-        stub_licensed_features(push_rules: true)
+    context 'when there are no push rules' do
+      it 'does not create push rule' do
+        expect(create_project(user, opts).push_rule).to be_nil
+      end
+    end
+  end
+
+  context 'group push rules' do
+    before do
+      stub_licensed_features(push_rules: true)
+    end
+
+    context 'project created within a group' do
+      let(:group) { create(:group) }
+      let(:opts) do
+        {
+          name: "GitLab",
+          namespace_id: group.id
+        }
       end
 
-      context 'project created within a group' do
-        let(:group) { create(:group) }
-        let(:opts) do
-          {
-            name: "GitLab",
-            namespace_id: group.id
-          }
-        end
+      before do
+        group.add_owner(user)
+      end
+
+      context 'when group has push rule defined' do
+        let(:group_push_rule) { create(:push_rule_without_project, force_push_regex: 'testing me') }
 
         before do
-          group.add_owner(user)
+          group.update!(push_rule: group_push_rule)
         end
 
-        context 'when group has push rule defined' do
-          let(:push_rule) { create(:push_rule_without_project, force_push_regex: 'testing me') }
+        it 'creates push rule from group push rule' do
+          project = create_project(user, opts)
+          project_push_rule = project.push_rule
+
+          expect(project_push_rule).to have_attributes(
+            force_push_regex: group_push_rule.force_push_regex,
+            deny_delete_tag: group_push_rule.deny_delete_tag,
+            delete_branch_regex: group_push_rule.delete_branch_regex,
+            commit_message_regex: group_push_rule.commit_message_regex,
+            is_sample: false
+          )
+          expect(project.project_setting.push_rule_id).to eq(project_push_rule.id)
+        end
+
+        context 'when feature flag is switched off' do
+          let!(:sample) { create(:push_rule_sample) }
 
           before do
-            group.update!(push_rule: push_rule)
-            group.add_owner(user)
+            stub_feature_flags(group_push_rules: false)
           end
-
-          it 'creates push rule from group push rule' do
-            project = create_project(user, opts)
-            project_push_rule = project.push_rule
-
-            expect(project_push_rule).to have_attributes(
-              force_push_regex: push_rule.force_push_regex,
-              deny_delete_tag: push_rule.deny_delete_tag,
-              delete_branch_regex: push_rule.delete_branch_regex,
-              commit_message_regex: push_rule.commit_message_regex,
-              is_sample: false
-            )
-            expect(project.project_setting.push_rule_id).to eq(project_push_rule.id)
-          end
-
-          context 'when feature flag is switched off' do
-            let!(:sample) { create(:push_rule_sample) }
-
-            before do
-              stub_feature_flags(group_push_rules: false)
-            end
-
-            it 'creates push rule from sample' do
-              expect(create_project(user, opts).push_rule).to have_attributes(
-                force_push_regex: sample.force_push_regex,
-                deny_delete_tag: sample.deny_delete_tag,
-                delete_branch_regex: sample.delete_branch_regex,
-                commit_message_regex: sample.commit_message_regex
-              )
-            end
-          end
-        end
-
-        context 'when group has not push rule defined' do
-          let!(:sample) { create(:push_rule_sample) }
 
           it 'creates push rule from sample' do
             expect(create_project(user, opts).push_rule).to have_attributes(
@@ -294,11 +286,18 @@ describe Projects::CreateService, '#execute' do
           end
         end
       end
-    end
 
-    context 'when there are no push rules' do
-      it 'does not create push rule' do
-        expect(create_project(user, opts).push_rule).to be_nil
+      context 'when group does not have push rule defined' do
+        let!(:sample) { create(:push_rule_sample) }
+
+        it 'creates push rule from sample' do
+          expect(create_project(user, opts).push_rule).to have_attributes(
+            force_push_regex: sample.force_push_regex,
+            deny_delete_tag: sample.deny_delete_tag,
+            delete_branch_regex: sample.delete_branch_regex,
+            commit_message_regex: sample.commit_message_regex
+          )
+        end
       end
     end
   end

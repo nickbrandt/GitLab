@@ -139,6 +139,7 @@ RSpec.configure do |config|
   config.include IdempotentWorkerHelper, type: :worker
   config.include RailsHelpers
   config.include SidekiqMiddleware
+  config.include StubActionCableConnection, type: :channel
 
   if ENV['CI'] || ENV['RETRIES']
     # This includes the first try, i.e. tests will be run 4 times before failing.
@@ -194,6 +195,10 @@ RSpec.configure do |config|
       Gitlab::Git::RuggedImpl::Repository::FEATURE_FLAGS.each do |flag|
         stub_feature_flags(flag => enable_rugged)
       end
+
+      # Disable the usage of file_identifier_hash by default until it is ready
+      # See https://gitlab.com/gitlab-org/gitlab/-/issues/33867
+      stub_feature_flags(file_identifier_hash: false)
 
       allow(Gitlab::GitalyClient).to receive(:can_use_disk?).and_return(enable_rugged)
     end

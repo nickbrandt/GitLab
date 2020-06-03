@@ -39,6 +39,7 @@ module Ci
     has_one :resource, class_name: 'Ci::Resource', inverse_of: :build
     has_many :trace_sections, class_name: 'Ci::BuildTraceSection'
     has_many :trace_chunks, class_name: 'Ci::BuildTraceChunk', foreign_key: :build_id
+    has_many :report_results, class_name: 'Ci::BuildReportResult', inverse_of: :build
 
     has_many :job_artifacts, class_name: 'Ci::JobArtifact', foreign_key: :job_id, dependent: :destroy, inverse_of: :job # rubocop:disable Cop/ActiveRecordDependent
     has_many :job_variables, class_name: 'Ci::JobVariable', foreign_key: :job_id
@@ -685,6 +686,10 @@ module Ci
 
     def has_job_artifacts?
       job_artifacts.any?
+    end
+
+    def has_test_reports?
+      job_artifacts.test_reports.exists?
     end
 
     def has_old_trace?

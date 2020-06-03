@@ -40,6 +40,10 @@ export default {
       type: String,
       required: true,
     },
+    canToggleAutoFixSettings: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     // In this first iteration, the auto-fix settings is toggled for all features at once via a
@@ -51,6 +55,11 @@ export default {
       isChecked: autoFixEnabled,
       autoFixStatusLoading: false,
     };
+  },
+  computed: {
+    hasAutoFixDisabled() {
+      return !this.canToggleAutoFixSettings || this.autoFixStatusLoading;
+    },
   },
   methods: {
     toggleAutoFix(enabled) {
@@ -94,11 +103,7 @@ export default {
       </gl-link>
     </h4>
     <gl-card>
-      <gl-form-checkbox
-        v-model="isChecked"
-        :disabled="autoFixStatusLoading"
-        @change="toggleAutoFix"
-      >
+      <gl-form-checkbox v-model="isChecked" :disabled="hasAutoFixDisabled" @change="toggleAutoFix">
         {{
           __('Automatically create merge requests for vulnerabilities that have fixes available.')
         }}

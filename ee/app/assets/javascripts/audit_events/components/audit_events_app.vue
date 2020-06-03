@@ -30,6 +30,16 @@ export default {
       type: Array,
       required: true,
     },
+    filterQaSelector: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+    tableQaSelector: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -55,7 +65,7 @@ export default {
         class="filter-form d-flex justify-content-between audit-controls row"
       >
         <div class="col-lg-auto flex-fill form-group align-items-lg-center pr-lg-8">
-          <audit-events-filter v-bind="{ enabledTokenTypes }" />
+          <audit-events-filter v-bind="{ enabledTokenTypes, qaSelector: filterQaSelector }" />
         </div>
         <div class="d-flex col-lg-auto flex-wrap pl-lg-0">
           <div
@@ -67,6 +77,6 @@ export default {
         </div>
       </form>
     </div>
-    <audit-events-table v-bind="{ events, isLastPage }" />
+    <audit-events-table v-bind="{ events, isLastPage, qaSelector: tableQaSelector }" />
   </div>
 </template>

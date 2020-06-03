@@ -77,9 +77,6 @@ export default {
       <div class="table-section flex-grow-1" role="rowheader">
         {{ s__('Reports|Vulnerability') }}
       </div>
-      <div class="table-section section-15" role="rowheader">
-        {{ s__('Reports|Scanner') }}
-      </div>
       <div class="table-section section-20" role="rowheader"></div>
     </div>
 

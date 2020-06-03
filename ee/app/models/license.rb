@@ -48,7 +48,6 @@ class License < ApplicationRecord
     adjourned_deletion_for_projects_and_groups
     admin_audit_log
     auditor_user
-    batch_comments
     blocking_merge_requests
     board_assignee_lists
     board_milestone_lists
@@ -127,6 +126,7 @@ class License < ApplicationRecord
     report_approver_rules
     requirements
     sast
+    secret_detection
     security_dashboard
     status_page
     subepics

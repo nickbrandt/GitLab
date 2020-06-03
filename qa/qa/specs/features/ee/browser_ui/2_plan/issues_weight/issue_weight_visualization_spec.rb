@@ -8,7 +8,7 @@ module QA
       end
 
       let(:milestone) do
-        QA::EE::Resource::ProjectMilestone.fabricate_via_api!
+        Resource::ProjectMilestone.fabricate_via_api!
       end
 
       let(:weight) { 1000 }

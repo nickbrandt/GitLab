@@ -17,6 +17,11 @@ export default function init() {
     toggleAutofixSettingEndpoint,
   } = el.dataset;
 
+  // When canToggleAutoFixSettings is false in the backend, it is undefined in the frontend,
+  // and when it's true in the backend, it comes in as an empty string in the frontend. The next
+  // line ensures that we cast it to a boolean.
+  const canToggleAutoFixSettings = el.dataset.canToggleAutoFixSettings !== undefined;
+
   return new Vue({
     el,
     components: {
@@ -36,6 +41,7 @@ export default function init() {
             autoFixUserPath,
             containerScanningHelpPath,
             dependencyScanningHelpPath,
+            canToggleAutoFixSettings,
             toggleAutofixSettingEndpoint,
           },
         },

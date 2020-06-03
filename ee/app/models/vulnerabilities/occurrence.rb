@@ -53,7 +53,8 @@ module Vulnerabilities
       sast: 0,
       dependency_scanning: 1,
       container_scanning: 2,
-      dast: 3
+      dast: 3,
+      secret_detection: 4
     }.with_indifferent_access.freeze
 
     enum confidence: CONFIDENCE_LEVELS, _prefix: :confidence

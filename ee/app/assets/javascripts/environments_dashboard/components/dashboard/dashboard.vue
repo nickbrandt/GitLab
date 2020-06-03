@@ -2,12 +2,13 @@
 import { isEmpty } from 'lodash';
 import { mapState, mapActions } from 'vuex';
 import {
+  GlButton,
+  GlDashboardSkeleton,
+  GlEmptyState,
+  GlLink,
   GlModal,
   GlModalDirective,
-  GlDeprecatedButton,
-  GlDashboardSkeleton,
   GlSprintf,
-  GlLink,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
@@ -31,14 +32,15 @@ export default {
   viewDocumentationButton: s__('View documentation'),
 
   components: {
-    GlModal,
-    GlDashboardSkeleton,
-    GlDeprecatedButton,
-    GlSprintf,
-    GlLink,
-    ProjectSelector,
     Environment,
+    GlButton,
+    GlDashboardSkeleton,
+    GlEmptyState,
+    GlLink,
+    GlModal,
+    GlSprintf,
     ProjectHeader,
+    ProjectSelector,
   },
   directives: {
     'gl-modal': GlModalDirective,
@@ -153,12 +155,9 @@ export default {
       <h1 class="js-dashboard-title page-title text-nowrap flex-fill">
         {{ $options.dashboardHeader }}
       </h1>
-      <gl-deprecated-button
-        v-gl-modal="$options.modalId"
-        class="js-add-projects-button btn btn-success"
-      >
+      <gl-button v-gl-modal="$options.modalId" class="js-add-projects-button" variant="success">
         {{ $options.addProjectsButton }}
-      </gl-deprecated-button>
+      </gl-button>
     </div>
     <p class="mt-2 mb-4 js-page-limits-message">
       <gl-sprintf
@@ -189,28 +188,27 @@ export default {
           </div>
         </div>
       </div>
-      <div v-else-if="!isLoadingProjects" class="row prepend-top-20 text-center">
-        <div class="col-12 d-flex justify-content-center svg-content">
-          <img :src="emptyDashboardSvgPath" class="js-empty-state-svg col-12 prepend-top-20" />
-        </div>
-        <h4 class="js-title col-12 prepend-top-20">
-          {{ $options.emptyDashboardHeader }}
-        </h4>
-        <div class="col-12 d-flex justify-content-center">
-          <span class="js-sub-title mw-460 text-tertiary text-left">
-            {{ $options.emptyDashboardDocs }}
-          </span>
-        </div>
-        <div class="col-12">
-          <a
-            :href="emptyDashboardHelpPath"
-            class="js-documentation-link btn btn-primary prepend-top-default append-bottom-default"
-          >
-            {{ $options.viewDocumentationButton }}
-          </a>
-        </div>
-      </div>
-      <gl-dashboard-skeleton v-else />
+
+      <gl-dashboard-skeleton v-else-if="isLoadingProjects" />
+
+      <gl-empty-state
+        v-else
+        :title="$options.emptyDashboardHeader"
+        :svg-path="emptyDashboardSvgPath"
+      >
+        <template #description>
+          {{ $options.emptyDashboardDocs }}
+          <gl-link :href="emptyDashboardHelpPath" class="js-documentation-link">{{
+            $options.viewDocumentationButton
+          }}</gl-link
+          >.
+        </template>
+        <template #actions>
+          <gl-button v-gl-modal="$options.modalId" variant="success" class="js-add-projects-button">
+            {{ s__('ModalButton|Add projects') }}
+          </gl-button>
+        </template>
+      </gl-empty-state>
     </div>
   </div>
 </template>

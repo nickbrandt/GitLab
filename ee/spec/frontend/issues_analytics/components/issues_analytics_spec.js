@@ -3,6 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import Vuex from 'vuex';
 import { TEST_HOST } from 'helpers/test_constants';
 import IssuesAnalytics from 'ee/issues_analytics/components/issues_analytics.vue';
+import IssuesAnalyticsTable from 'ee/issues_analytics/components/issues_analytics_table.vue';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { createStore } from 'ee/issues_analytics/stores';
@@ -26,6 +27,8 @@ describe('Issues Analytics component', () => {
       setFixtures('<div id="mock-filter"></div>');
       const propsData = data || {
         endpoint: TEST_HOST,
+        issuesApiEndpoint: `${TEST_HOST}/api/issues`,
+        issuesPageEndpoint: `${TEST_HOST}/issues`,
         filterBlockEl: document.querySelector('#mock-filter'),
         noDataEmptyStateSvgPath: 'svg',
         filtersEmptyStateSvgPath: 'svg',
@@ -100,5 +103,9 @@ describe('Issues Analytics component', () => {
       expect(findEmptyState().exists()).toBe(true);
       expect(wrapper.vm.showFiltersEmptyState).toBe(true);
     });
+  });
+
+  it('renders the issues table', () => {
+    expect(wrapper.find(IssuesAnalyticsTable).exists()).toBe(true);
   });
 });

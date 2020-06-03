@@ -2,15 +2,12 @@
 
 module Geo
   class BlobUploadService
-    attr_reader :replicable_name, :blob_id, :checksum, :replicator
+    attr_reader :checksum, :replicator
 
-    def initialize(replicable_name:, blob_id:, decoded_params:)
-      @replicable_name = replicable_name
-      @blob_id = blob_id
+    def initialize(replicable_name:, replicable_id:, decoded_params:)
       @checksum = decoded_params.delete(:checksum)
 
-      replicator_klass = Gitlab::Geo::Replicator.for_replicable_name(replicable_name)
-      @replicator = replicator_klass.new(model_record_id: blob_id)
+      @replicator = Gitlab::Geo::Replicator.for_replicable_params(replicable_name: replicable_name, replicable_id: replicable_id)
     end
 
     def execute

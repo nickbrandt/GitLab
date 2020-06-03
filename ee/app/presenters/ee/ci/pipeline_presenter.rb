@@ -22,9 +22,10 @@ module EE
         return false unless can?(current_user, :read_vulnerability, pipeline.project)
 
         batch_lookup_report_artifact_for_file_type(:sast) ||
-          batch_lookup_report_artifact_for_file_type(:dependency_scanning) ||
-          batch_lookup_report_artifact_for_file_type(:dast) ||
-          batch_lookup_report_artifact_for_file_type(:container_scanning)
+        batch_lookup_report_artifact_for_file_type(:secret_detection) ||
+        batch_lookup_report_artifact_for_file_type(:dependency_scanning) ||
+        batch_lookup_report_artifact_for_file_type(:dast) ||
+        batch_lookup_report_artifact_for_file_type(:container_scanning)
       end
 
       def downloadable_path_for_report_type(file_type)

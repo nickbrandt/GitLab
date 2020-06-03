@@ -921,7 +921,7 @@ button.mini-pipeline-graph-dropdown-toggle {
 
 
       .ci-status-icon {
-        @extend .append-right-8;
+        @include gl-mr-3;
 
         position: relative;
 

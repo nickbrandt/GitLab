@@ -13,7 +13,7 @@ describe Geo::EventService do
 
   describe '#execute' do
     before do
-      resource_url = primary.geo_retrieve_url('package_file', model_record.id.to_s)
+      resource_url = primary.geo_retrieve_url(replicable_name: 'package_file', replicable_id: model_record.id.to_s)
       content = model_record.file.open
       File.unlink(model_record.file.path)
       stub_request(:get, resource_url).to_return(status: 200, body: content)

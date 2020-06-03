@@ -13,6 +13,13 @@ module EE
 
         super
       end
+
+      override :issuable_specific_attrs
+      def issuable_specific_attrs(type, attrs)
+        return super unless type == 'issue'
+
+        super.push(:health_status, :epic)
+      end
     end
   end
 end

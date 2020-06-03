@@ -27,6 +27,7 @@ AllCops:
     - 'plugins/**/*'
     - 'file_hooks/**/*'
   CacheRootDirectory: tmp
+  MaxFilesInCache: 18000
 
 Cop/AvoidKeywordArgumentsInSidekiqWorkers:
   Enabled: true
@@ -251,8 +252,6 @@ GitlabSecurity/PublicSend:
 Gitlab/DuplicateSpecLocation:
   Exclude:
     - ee/spec/lib/gitlab/gl_repository_spec.rb
-    - ee/spec/services/merge_requests/refresh_service_spec.rb
-    - ee/spec/services/ee/merge_requests/refresh_service_spec.rb
 
 Cop/InjectEnterpriseEditionModule:
   Enabled: true
@@ -273,6 +272,9 @@ Cop/ActiveRecordAssociationReload:
   Exclude:
     - 'spec/**/*'
     - 'ee/spec/**/*'
+
+Gitlab/AvoidFeatureGet:
+  Enabled: true
 
 Naming/PredicateName:
   Enabled: true

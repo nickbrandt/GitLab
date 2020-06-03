@@ -11,8 +11,7 @@ module Geo
     idempotent!
 
     def perform(replicable_name, replicable_id)
-      replicator_class = ::Gitlab::Geo::Replicator.for_replicable_name(replicable_name)
-      replicator = replicator_class.new(model_record_id: replicable_id)
+      replicator = ::Gitlab::Geo::Replicator.for_replicable_params(replicable_name: replicable_name, replicable_id: replicable_id)
 
       replicator.calculate_checksum!
     rescue ActiveRecord::RecordNotFound

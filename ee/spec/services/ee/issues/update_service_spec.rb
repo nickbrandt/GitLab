@@ -81,7 +81,7 @@ describe Issues::UpdateService do
           end
         end
 
-        context 'when weight is integer' do
+        context 'when weight is float' do
           it 'rounds the value down' do
             expect { update_issue(weight: 1.8) }.to change { issue.weight }.to(1)
           end

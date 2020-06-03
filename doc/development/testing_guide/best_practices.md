@@ -35,11 +35,18 @@ Here are some things to keep in mind regarding test performance:
 To run RSpec tests:
 
 ```shell
-# run all tests
+# run test for a file
+bin/rspec spec/models/project_spec.rb
+
+# run test for the example on line 10 on that file
+bin/rspec spec/models/project_spec.rb:10
+
+# run tests matching the example name has that string
+bin/rspec spec/models/project_spec.rb -e associations
+
+# run all tests, will take hours for GitLab codebase!
 bin/rspec
 
-# run test for path
-bin/rspec spec/[path]/[to]/[spec].rb
 ```
 
 Use [Guard](https://github.com/guard/guard) to continuously monitor for changes and only run matching tests:
@@ -357,7 +364,7 @@ Feature.enabled?(:my_feature2) # => false
 Feature.enabled?(:my_feature2, project1) # => true
 ```
 
-#### `stub_feature_flags` vs `Feature.get/enable`
+#### `stub_feature_flags` vs `Feature.enable*`
 
 It is preferred to use `stub_feature_flags` for enabling feature flags
 in testing environment. This method provides a simple and well described
@@ -378,10 +385,10 @@ stub_feature_flags(my_feature: [project, project2])
 Feature.enable(:my_feature_2)
 
 # Good: enable my_feature for 50% of time
-Feature.get(:my_feature_3).enable_percentage_of_time(50)
+Feature.enable_percentage_of_time(:my_feature_3, 50)
 
 # Good: enable my_feature for 50% of actors/gates/things
-Feature.get(:my_feature_4).enable_percentage_of_actors(50)
+Feature.enable_percentage_of_actors(:my_feature_4, 50)
 ```
 
 Each feature flag that has a defined state will be persisted

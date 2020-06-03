@@ -13,6 +13,7 @@ module EE
     ACCOUNT_RECOVERY_REGULAR_CHECK = 'account_recovery_regular_check'
     USERS_OVER_LICENSE_BANNER = 'users_over_license_banner'
     STANDALONE_VULNERABILITIES_INTRODUCTION_BANNER = 'standalone_vulnerabilities_introduction_banner'
+    ACTIVE_USER_COUNT_THRESHOLD = 'active_user_count_threshold'
 
     def show_canary_deployment_callout?(project)
       !user_dismissed?(CANARY_DEPLOYMENT) &&

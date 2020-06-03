@@ -1,0 +1,5 @@
+---
+title: Add Elasticsearch metrics in Rack middleware
+merge_request: 33233
+author:
+type: added
