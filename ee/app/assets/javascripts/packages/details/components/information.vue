@@ -38,7 +38,7 @@ export default {
     <ul class="content-list">
       <li v-for="(item, index) in information" :key="index">
         <span class="text-secondary">{{ item.label }}</span>
-        <div class="pull-right">
+        <div class="pull-right w-75 gl-text-right">
           <gl-link v-if="item.type === 'link'" :href="item.value" target="_blank">
             {{ item.value }}
           </gl-link>
