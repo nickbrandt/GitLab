@@ -109,10 +109,14 @@ namespace :gitlab do
       ENV['PGPASSWORD'] = configuration['password'].to_s if configuration['password']
       ENV['PGUSER']     = configuration['username'].to_s if configuration['username']
 
+      command = 'psql'
       dump_filepath = Gitlab::Database::CustomStructure.custom_dump_filepath.to_path
       args = ['-v', 'ON_ERROR_STOP=1', '-q', '-X', '-f', dump_filepath, configuration['database']]
 
-      Kernel.system('psql', *args)
+      unless Kernel.system(command, *args)
+        raise "failed to execute:\n#{command} #{args.join(' ')}\n\n" \
+          "Please ensure `#{command}` is installed in your PATH and has proper permissions.\n\n"
+      end
     end
 
     # Inform Rake that custom tasks should be run every time rake db:structure:dump is run

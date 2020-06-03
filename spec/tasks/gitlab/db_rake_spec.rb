@@ -128,13 +128,22 @@ describe 'gitlab:db namespace rake task' do
     let_it_be(:custom_load_task) { 'gitlab:db:load_custom_structure' }
     let_it_be(:custom_filepath) { Pathname.new('db/directory') }
 
-    it 'use the psql command to load the custom structure file' do
+    it 'uses the psql command to load the custom structure file' do
       expect(Gitlab::Database::CustomStructure).to receive(:custom_dump_filepath).and_return(custom_filepath)
 
       expect(Kernel).to receive(:system)
-        .with('psql', any_args, custom_filepath.to_path, db_config['database'])
+        .with('psql', any_args, custom_filepath.to_path, db_config['database']).and_return(true)
 
       run_rake_task(custom_load_task)
+    end
+
+    it 'raises an error when the call to the psql command fails' do
+      expect(Gitlab::Database::CustomStructure).to receive(:custom_dump_filepath).and_return(custom_filepath)
+
+      expect(Kernel).to receive(:system)
+        .with('psql', any_args, custom_filepath.to_path, db_config['database']).and_return(nil)
+
+      expect { run_rake_task(custom_load_task) }.to raise_error(/failed to execute:\s*psql/)
     end
   end
 

@@ -3,10 +3,12 @@
 module Gitlab
   module Database
     class CustomStructure
-      CUSTOM_DUMP_FILE = 'db/gitlab_structure.sql'.freeze
+      CUSTOM_DUMP_FILE = 'db/gitlab_structure.sql'
 
       def dump
         File.open(self.class.custom_dump_filepath, 'wb') do |io|
+          io << "-- this file tracks custom GitLab data, such as foreign keys referencing partitioned tables\n"
+          io << "-- more details can be found in the issue: https://gitlab.com/gitlab-org/gitlab/-/issues/201872\n"
           io << "SET search_path=public;\n\n"
 
           dump_partitioned_foreign_keys(io) if partitioned_foreign_keys_exist?

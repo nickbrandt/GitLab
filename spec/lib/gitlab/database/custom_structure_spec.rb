@@ -5,6 +5,14 @@ require 'spec_helper'
 describe Gitlab::Database::CustomStructure do
   let_it_be(:structure) { described_class.new }
   let_it_be(:filepath) { Rails.root.join(described_class::CUSTOM_DUMP_FILE) }
+  let_it_be(:file_header) do
+    <<~DATA
+      -- this file tracks custom GitLab data, such as foreign keys referencing partitioned tables
+      -- more details can be found in the issue: https://gitlab.com/gitlab-org/gitlab/-/issues/201872
+      SET search_path=public;
+    DATA
+  end
+
   let(:io) { StringIO.new }
 
   before do
@@ -15,7 +23,7 @@ describe Gitlab::Database::CustomStructure do
     it 'dumps a valid structure file' do
       structure.dump
 
-      expect(io.string).to eq("SET search_path=public;\n\n")
+      expect(io.string).to eq("#{file_header}\n")
     end
   end
 
@@ -33,8 +41,7 @@ describe Gitlab::Database::CustomStructure do
       structure.dump
 
       expect(io.string).to eq(<<~DATA)
-        SET search_path=public;
-
+        #{file_header}
         COPY partitioned_foreign_keys (id, cascade_delete, from_table, from_column, to_table, to_column) FROM STDIN;
         #{first_fk.id}\ttrue\tissues\tproject_id\tprojects\tid
         #{second_fk.id}\tfalse\tissues\tmoved_to_id\tissues\tid
@@ -48,8 +55,7 @@ describe Gitlab::Database::CustomStructure do
       structure.dump
 
       expect(io.string).to eq(<<~DATA)
-        SET search_path=public;
-
+        #{file_header}
         COPY partitioned_foreign_keys (id, cascade_delete, from_table, from_column, to_table, to_column) FROM STDIN;
         #{second_fk.id}\tfalse\tissues\tmoved_to_id\tissues\tid
         \\.
