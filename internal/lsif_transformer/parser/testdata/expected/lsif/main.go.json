@@ -5,7 +5,21 @@
         "definition_path": "main.go#L4",
         "hover": [
             {
-                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kn\"\u003epackage\u003c/span\u003e \u003cspan class=\"s\"\u003e\u0026#34;github.com/user/hello/morestrings\u0026#34;\u003c/span\u003e\u003c/span\u003e",
+                "tokens": [
+                    [
+                        {
+                            "class": "kn",
+                            "value": "package"
+                        },
+                        {
+                            "value": " "
+                        },
+                        {
+                            "class": "s",
+                            "value": "\"github.com/user/hello/morestrings\""
+                        }
+                    ]
+                ],
                 "language": "go"
             },
             {
@@ -19,7 +33,28 @@
         "definition_path": "morestrings/reverse.go#L12",
         "hover": [
             {
-                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003efunc\u003c/span\u003e Reverse(s \u003cspan class=\"kt\"\u003estring\u003c/span\u003e) \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "tokens": [
+                    [
+                        {
+                            "class": "kd",
+                            "value": "func"
+                        },
+                        {
+                            "value": " Reverse(s "
+                        },
+                        {
+                            "class": "kt",
+                            "value": "string"
+                        },
+                        {
+                            "value": ") "
+                        },
+                        {
+                            "class": "kt",
+                            "value": "string"
+                        }
+                    ]
+                ],
                 "language": "go"
             },
             {
@@ -33,7 +68,21 @@
         "definition_path": "main.go#L4",
         "hover": [
             {
-                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kn\"\u003epackage\u003c/span\u003e \u003cspan class=\"s\"\u003e\u0026#34;github.com/user/hello/morestrings\u0026#34;\u003c/span\u003e\u003c/span\u003e",
+                "tokens": [
+                    [
+                        {
+                            "class": "kn",
+                            "value": "package"
+                        },
+                        {
+                            "value": " "
+                        },
+                        {
+                            "class": "s",
+                            "value": "\"github.com/user/hello/morestrings\""
+                        }
+                    ]
+                ],
                 "language": "go"
             },
             {
@@ -47,7 +96,28 @@
         "definition_path": "morestrings/reverse.go#L5",
         "hover": [
             {
-                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003efunc\u003c/span\u003e Func2(i \u003cspan class=\"kt\"\u003eint\u003c/span\u003e) \u003cspan class=\"kt\"\u003estring\u003c/span\u003e\u003c/span\u003e",
+                "tokens": [
+                    [
+                        {
+                            "class": "kd",
+                            "value": "func"
+                        },
+                        {
+                            "value": " Func2(i "
+                        },
+                        {
+                            "class": "kt",
+                            "value": "int"
+                        },
+                        {
+                            "value": ") "
+                        },
+                        {
+                            "class": "kt",
+                            "value": "string"
+                        }
+                    ]
+                ],
                 "language": "go"
             }
         ]
@@ -58,7 +128,17 @@
         "definition_path": "main.go#L7",
         "hover": [
             {
-                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kd\"\u003efunc\u003c/span\u003e main()\u003c/span\u003e",
+                "tokens": [
+                    [
+                        {
+                            "class": "kd",
+                            "value": "func"
+                        },
+                        {
+                            "value": " main()"
+                        }
+                    ]
+                ],
                 "language": "go"
             }
         ]
@@ -69,7 +149,21 @@
         "definition_path": "main.go#L4",
         "hover": [
             {
-                "value": "\u003cspan class=\"line\" lang=\"go\"\u003e\u003cspan class=\"kn\"\u003epackage\u003c/span\u003e \u003cspan class=\"s\"\u003e\u0026#34;github.com/user/hello/morestrings\u0026#34;\u003c/span\u003e\u003c/span\u003e",
+                "tokens": [
+                    [
+                        {
+                            "class": "kn",
+                            "value": "package"
+                        },
+                        {
+                            "value": " "
+                        },
+                        {
+                            "class": "s",
+                            "value": "\"github.com/user/hello/morestrings\""
+                        }
+                    ]
+                ],
                 "language": "go"
             },
             {
