@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Jira referenced paths', type: :request do
+RSpec.describe 'Jira referenced paths', type: :request do
   using RSpec::Parameterized::TableSyntax
 
   let(:user) { create(:user) }

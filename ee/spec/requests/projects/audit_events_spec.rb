@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'view audit events' do
+RSpec.describe 'view audit events' do
   describe 'GET /:namespace/:project/-/audit_events' do
     let_it_be(:project) { create(:project, :repository) }
     let_it_be(:user) { project.owner }

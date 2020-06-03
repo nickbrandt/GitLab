@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe JobEntity do
+RSpec.describe JobEntity do
   using RSpec::Parameterized::TableSyntax
 
   let(:user) { create(:user) }

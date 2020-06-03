@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Rack Attack EE throttles' do
+RSpec.describe 'Rack Attack EE throttles' do
   include RackAttackSpecHelpers
 
   let(:project) { create(:project) }

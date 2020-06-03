@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Group routing', "routing" do
+RSpec.describe 'Group routing', "routing" do
   include RSpec::Rails::RoutingExampleGroup
 
   describe 'subgroup "boards"' do

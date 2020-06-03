@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe DependencyEntity do
+RSpec.describe DependencyEntity do
   describe '#as_json' do
     subject { described_class.represent(dependency, request: request).as_json }
 

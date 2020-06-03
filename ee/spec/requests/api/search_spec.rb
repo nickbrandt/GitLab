@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Search do
+RSpec.describe API::Search do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
   let(:project) { create(:project, :public, :repository, :wiki_repo, name: 'awesome project', group: group) }

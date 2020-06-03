@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Unleash do
+RSpec.describe API::Unleash do
   include FeatureFlagHelpers
 
   let_it_be(:project) { create(:project) }

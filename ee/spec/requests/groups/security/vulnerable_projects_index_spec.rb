@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'GET /groups/*group_id/-/security/projects' do
+RSpec.describe 'GET /groups/*group_id/-/security/projects' do
   let(:group) { create(:group) }
   let(:user) { create(:user) }
 

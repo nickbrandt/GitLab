@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Git HTTP requests' do
+RSpec.describe 'Git HTTP requests' do
   include GitHttpHelpers
   include WorkhorseHelpers
 

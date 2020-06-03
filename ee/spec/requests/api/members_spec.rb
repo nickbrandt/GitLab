@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Members do
+RSpec.describe API::Members do
   context 'group members endpoint for group managed accounts' do
     let(:group) { create(:group) }
     let(:owner) { create(:user) }

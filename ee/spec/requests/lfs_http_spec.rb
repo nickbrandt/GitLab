@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Git LFS API and storage' do
+RSpec.describe 'Git LFS API and storage' do
   include WorkhorseHelpers
 
   let(:user) { create(:user) }

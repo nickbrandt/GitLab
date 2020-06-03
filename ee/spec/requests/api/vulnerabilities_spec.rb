@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Vulnerabilities do
+RSpec.describe API::Vulnerabilities do
   include AccessMatchersForRequest
 
   before do

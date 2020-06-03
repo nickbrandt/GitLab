@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe 'EE-specific project routing' do
+RSpec.describe 'EE-specific project routing' do
   before do
     allow(Project).to receive(:find_by_full_path).with('gitlab/gitlabhq', any_args).and_return(true)
   end

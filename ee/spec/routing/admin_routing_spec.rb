@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'EE-specific admin routing' do
+RSpec.describe 'EE-specific admin routing' do
   describe Admin::Geo::ProjectsController, 'routing' do
     let(:project_registry) { create(:geo_project_registry) }
 

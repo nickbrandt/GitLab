@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Projects do
+RSpec.describe API::Projects do
   include ExternalAuthorizationServiceHelpers
 
   let(:user) { create(:user) }

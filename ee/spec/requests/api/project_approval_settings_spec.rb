@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::ProjectApprovalSettings do
+RSpec.describe API::ProjectApprovalSettings do
   let_it_be(:group) { create(:group_with_members) }
   let_it_be(:user) { create(:user) }
   let_it_be(:user2) { create(:user) }

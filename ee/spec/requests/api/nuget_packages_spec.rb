@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::NugetPackages do
+RSpec.describe API::NugetPackages do
   include WorkhorseHelpers
   include EE::PackagesManagerApiSpecHelpers
 
