@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::ConfirmService do
+RSpec.describe Vulnerabilities::ConfirmService do
   include AccessMatchersGeneric
 
   before do

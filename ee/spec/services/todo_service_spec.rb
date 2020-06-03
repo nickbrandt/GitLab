@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe TodoService do
+RSpec.describe TodoService do
   let(:author) { create(:user, username: 'author') }
   let(:non_member) { create(:user, username: 'non_member') }
   let(:member) { create(:user, username: 'member') }

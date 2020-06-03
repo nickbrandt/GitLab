@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::MarkForDeletionService do
+RSpec.describe Projects::MarkForDeletionService do
   let(:user) { create(:user) }
   let(:marked_for_deletion_at) { nil }
   let(:project) do

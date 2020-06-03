@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'layouts/application' do
+RSpec.describe 'layouts/application' do
   let_it_be(:user) { create(:user) }
 
   before do

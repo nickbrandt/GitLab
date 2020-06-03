@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ElasticIndexerWorker, :elastic do
+RSpec.describe ElasticIndexerWorker, :elastic do
   subject { described_class.new }
 
   # Create admin user and search globally to avoid dealing with permissions in

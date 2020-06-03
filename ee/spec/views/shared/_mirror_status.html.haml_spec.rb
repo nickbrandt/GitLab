@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'shared/_mirror_status.html.haml' do
+RSpec.describe 'shared/_mirror_status.html.haml' do
   include ApplicationHelper
 
   context 'when mirror has not updated yet' do

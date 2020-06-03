@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::PublishDetailsService do
+RSpec.describe StatusPage::PublishDetailsService do
   include ::StatusPage::PublicationServiceResponses
 
   let_it_be(:project, refind: true) { create(:project) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Search::ProjectService do
+RSpec.describe Search::ProjectService do
   include SearchResultHelpers
   include ProjectHelpers
   using RSpec::Parameterized::TableSyntax

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'layouts/header/_current_user_dropdown' do
+RSpec.describe 'layouts/header/_current_user_dropdown' do
   let_it_be(:user) { create(:user) }
 
   describe 'Buy CI Minutes link in user dropdown' do

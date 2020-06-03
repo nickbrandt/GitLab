@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::UpdateMirrorService do
+RSpec.describe Projects::UpdateMirrorService do
   let(:project) do
     create(:project, :repository, :mirror, import_url: Project::UNKNOWN_IMPORT_URL, only_mirror_protected_branches: false)
   end

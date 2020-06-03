@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::PublishListService do
+RSpec.describe StatusPage::PublishListService do
   let_it_be(:project, refind: true) { create(:project) }
   let(:issues) { [instance_double(Issue)] }
   let(:key) { StatusPage::Storage.list_path }

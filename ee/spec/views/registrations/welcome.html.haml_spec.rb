@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'registrations/welcome' do
+RSpec.describe 'registrations/welcome' do
   let_it_be(:user) { User.new }
 
   before do

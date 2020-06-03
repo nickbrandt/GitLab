@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::TriggerPublishService do
+RSpec.describe StatusPage::TriggerPublishService do
   let_it_be(:user) { create(:user) }
   let_it_be(:project, refind: true) { create(:project, :repository) }
 

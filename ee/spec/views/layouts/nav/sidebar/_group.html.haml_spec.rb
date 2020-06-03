@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'layouts/nav/sidebar/_group' do
+RSpec.describe 'layouts/nav/sidebar/_group' do
   before do
     assign(:group, group)
   end

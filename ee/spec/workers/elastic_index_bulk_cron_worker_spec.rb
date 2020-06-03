@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ElasticIndexBulkCronWorker do
+RSpec.describe ElasticIndexBulkCronWorker do
   include ExclusiveLeaseHelpers
   describe '.perform' do
     context 'indexing is not paused' do

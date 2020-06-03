@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::DesignRepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cache do
+RSpec.describe Geo::DesignRepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cache do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
