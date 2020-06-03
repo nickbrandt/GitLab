@@ -1,13 +1,6 @@
 <script>
 import { cloneDeep } from 'lodash';
-import {
-  GlDeprecatedBadge as GlBadge,
-  GlIcon,
-  GlLink,
-  GlButton,
-  GlSkeletonLoading,
-  GlTable,
-} from '@gitlab/ui';
+import { GlBadge, GlIcon, GlLink, GlButton, GlSkeletonLoading, GlTable } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import DependencyLicenseLinks from './dependency_license_links.vue';
 import DependencyVulnerabilities from './dependency_vulnerabilities.vue';
@@ -130,13 +123,10 @@ export default {
     </template>
 
     <template #cell(isVulnerable)="{ item, toggleDetails }">
-      <!-- This badge usage will be simplified by
-        https://gitlab.com/gitlab-org/gitlab/-/merge_requests/28356 -->
       <gl-badge
         v-if="item.vulnerabilities.length"
         variant="warning"
         href="#"
-        class="d-inline-flex align-items-center bg-warning-100 text-warning-700 bold"
         @click.native="toggleDetails"
       >
         <gl-icon name="warning" class="text-warning-500 mr-1" />
