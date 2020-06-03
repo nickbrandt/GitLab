@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe LdapAllGroupsSyncWorker do
+RSpec.describe LdapAllGroupsSyncWorker do
   let(:subject) { described_class.new }
 
   before do

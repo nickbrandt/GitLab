@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe HistoricalDataWorker do
+RSpec.describe HistoricalDataWorker do
   subject { described_class.new }
 
   describe '#perform' do

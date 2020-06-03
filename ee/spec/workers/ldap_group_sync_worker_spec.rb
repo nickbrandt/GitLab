@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe LdapGroupSyncWorker do
+RSpec.describe LdapGroupSyncWorker do
   include LdapHelpers
   let(:subject) { described_class.new }
   let(:group) { create(:group) }

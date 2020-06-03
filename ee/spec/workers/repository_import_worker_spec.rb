@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe RepositoryImportWorker do
+RSpec.describe RepositoryImportWorker do
   let(:project) { create(:project, :import_scheduled) }
 
   it 'updates the error on custom project template Import/Export' do

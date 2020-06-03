@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe JiraConnect::SyncBranchWorker do
+RSpec.describe JiraConnect::SyncBranchWorker do
   describe '#perform' do
     let_it_be(:project) { create(:project, :repository) }
     let(:project_id) { project.id }

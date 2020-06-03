@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe JiraConnect::SyncMergeRequestWorker do
+RSpec.describe JiraConnect::SyncMergeRequestWorker do
   describe '#perform' do
     let(:merge_request) { create(:merge_request) }
     let(:merge_request_id) { merge_request.id }
