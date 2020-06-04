@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Scoped issue boards', :js do
+RSpec.describe 'Scoped issue boards', :js do
   include FilteredSearchHelpers
 
   let(:user) { create(:user) }

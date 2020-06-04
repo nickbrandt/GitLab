@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'admin Geo Replication Nav', :js, :geo do
+RSpec.describe 'admin Geo Replication Nav', :js, :geo do
   include ::EE::GeoHelpers
   include StubENV
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Epic Issues', :js do
+RSpec.describe 'Epic Issues', :js do
   include DragTo
 
   let(:user) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Show users over license banner', :js do
+RSpec.describe 'Show users over license banner', :js do
   include StubRequests
 
   let_it_be(:admin) { create(:admin) }

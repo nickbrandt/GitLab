@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Service Desk Issue Tracker', :js do
+RSpec.describe 'Service Desk Issue Tracker', :js do
   let(:project) { create(:project, :private, service_desk_enabled: true) }
   let(:user) { create(:user) }
 

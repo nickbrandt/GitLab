@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Profile > Account' do
+RSpec.describe 'Profile > Account' do
   let(:user) { create(:user) }
 
   before do

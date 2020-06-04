@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Display approaching user count limit banner', :js do
+RSpec.describe 'Display approaching user count limit banner', :js do
   let_it_be(:admin) { create(:admin) }
   let_it_be(:user) { create(:user) }
   let_it_be(:license_seats_limit) { 10 }

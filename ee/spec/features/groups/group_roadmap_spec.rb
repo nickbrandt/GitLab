@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'group epic roadmap', :js do
+RSpec.describe 'group epic roadmap', :js do
   include FilteredSearchHelpers
   include MobileHelpers
 

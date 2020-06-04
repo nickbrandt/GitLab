@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Issue weight', :js do
+RSpec.describe 'Issue weight', :js do
   let(:project) { create(:project, :public) }
 
   it 'shows weight on issue list row' do

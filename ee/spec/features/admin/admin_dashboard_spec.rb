@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Admin Dashboard' do
+RSpec.describe 'Admin Dashboard' do
   describe 'Users statistic' do
     let_it_be(:users_statistics) { create(:users_statistics) }
 

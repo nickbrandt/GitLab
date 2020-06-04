@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'CI shared runner limits' do
+RSpec.describe 'CI shared runner limits' do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:user) { create(:user) }

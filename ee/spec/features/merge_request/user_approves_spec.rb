@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 # TODO: https://gitlab.com/gitlab-org/gitlab/issues/9430
-xdescribe 'Merge request > User approves', :js do
+RSpec.xdescribe 'Merge request > User approves', :js do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }
   let(:merge_request) { create(:merge_request, source_project: project) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Issues > User uses EE quick actions', :js do
+RSpec.describe 'Issues > User uses EE quick actions', :js do
   include Spec::Support::Helpers::Features::NotesHelpers
 
   describe 'issue-only commands' do
