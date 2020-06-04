@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::RegistrationsHelper do
+RSpec.describe EE::RegistrationsHelper do
   using RSpec::Parameterized::TableSyntax
 
   describe '#in_subscription_flow?' do

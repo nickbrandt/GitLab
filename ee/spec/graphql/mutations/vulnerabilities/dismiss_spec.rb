@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Mutations::Vulnerabilities::Dismiss do
+RSpec.describe Mutations::Vulnerabilities::Dismiss do
   let(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
 
   describe '#resolve' do

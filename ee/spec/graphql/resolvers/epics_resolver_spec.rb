@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Resolvers::EpicsResolver do
+RSpec.describe Resolvers::EpicsResolver do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }

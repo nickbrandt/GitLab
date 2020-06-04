@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ComplianceManagement::ComplianceFramework::ProjectSettingsHelper do
+RSpec.describe ComplianceManagement::ComplianceFramework::ProjectSettingsHelper do
   describe '#compliance_framework_options' do
     it 'has all the options' do
       expect(helper.compliance_framework_options).to contain_exactly(

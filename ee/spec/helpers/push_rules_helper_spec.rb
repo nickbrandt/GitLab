@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe PushRulesHelper do
+RSpec.describe PushRulesHelper do
   let(:global_push_rule) { create(:push_rule_sample) }
   let(:push_rule) { create(:push_rule) }
   let(:admin) { create(:admin) }

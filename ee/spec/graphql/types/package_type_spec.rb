@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['Package'] do
+RSpec.describe GitlabSchema.types['Package'] do
   it { expect(described_class.graphql_name).to eq('Package') }
 
   it 'includes all the package fields' do

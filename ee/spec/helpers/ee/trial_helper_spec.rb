@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::TrialHelper do
+RSpec.describe EE::TrialHelper do
   using RSpec::Parameterized::TableSyntax
 
   describe '#show_trial_errors?' do

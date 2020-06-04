@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AuditEventsHelper do
+RSpec.describe AuditEventsHelper do
   describe '#human_text' do
     let(:target_type) { 'User' }
     let(:details) do

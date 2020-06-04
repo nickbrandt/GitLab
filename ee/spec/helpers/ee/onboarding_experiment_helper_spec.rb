@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe OnboardingExperimentHelper, type: :helper do
+RSpec.describe OnboardingExperimentHelper, type: :helper do
   using RSpec::Parameterized::TableSyntax
 
   describe '.allow_access_to_onboarding?' do

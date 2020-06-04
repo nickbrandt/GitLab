@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EventsHelper do
+RSpec.describe EventsHelper do
   describe '#event_note_target_url' do
     subject { helper.event_note_target_url(event) }
 

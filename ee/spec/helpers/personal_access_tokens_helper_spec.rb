@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe PersonalAccessTokensHelper do
+RSpec.describe PersonalAccessTokensHelper do
   let(:group) do
     build(:group, max_personal_access_token_lifetime: group_level_max_personal_access_token_lifetime)
   end

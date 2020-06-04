@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ClustersHelper do
+RSpec.describe ClustersHelper do
   shared_examples 'feature availablilty' do |feature|
     before do
       # clusterable is provided as a `helper_method`

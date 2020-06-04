@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::SecurityJobsFinder do
+RSpec.describe Security::SecurityJobsFinder do
   it_behaves_like ::Security::JobsFinder, described_class.allowed_job_types
 
   describe "#execute" do

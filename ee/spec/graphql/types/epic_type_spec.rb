@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['Epic'] do
+RSpec.describe GitlabSchema.types['Epic'] do
   let(:fields) do
     %i[
       id iid title description confidential state group parent author labels

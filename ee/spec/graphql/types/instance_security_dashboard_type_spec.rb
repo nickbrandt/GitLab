@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['InstanceSecurityDashboard'] do
+RSpec.describe GitlabSchema.types['InstanceSecurityDashboard'] do
   let_it_be(:project) { create(:project) }
   let_it_be(:other_project) { create(:project) }
   let_it_be(:user) { create(:user, security_dashboard_projects: [project]) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::EmailsHelper, :clean_gitlab_redis_shared_state do
+RSpec.describe Admin::EmailsHelper, :clean_gitlab_redis_shared_state do
   include ExclusiveLeaseHelpers
 
   let(:lease_key) { Admin::EmailService::LEASE_KEY }

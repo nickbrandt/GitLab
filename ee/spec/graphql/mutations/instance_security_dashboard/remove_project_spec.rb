@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Mutations::InstanceSecurityDashboard::RemoveProject do
+RSpec.describe Mutations::InstanceSecurityDashboard::RemoveProject do
   let(:mutation) { described_class.new(object: nil, context: { current_user: current_user }, field: nil) }
 
   describe '#resolve' do

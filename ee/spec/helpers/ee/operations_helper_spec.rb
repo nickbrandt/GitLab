@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe OperationsHelper do
+RSpec.describe OperationsHelper do
   describe '#status_page_settings_data' do
     let_it_be(:user) { create(:user) }
     let_it_be(:project) { create(:project, :private) }

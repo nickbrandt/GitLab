@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Resolvers::TimelogResolver do
+RSpec.describe Resolvers::TimelogResolver do
   include GraphqlHelpers
 
   context "within a group" do

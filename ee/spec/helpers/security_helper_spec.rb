@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SecurityHelper do
+RSpec.describe SecurityHelper do
   describe '#instance_security_dashboard_data' do
     before do
       stub_feature_flags(first_class_vulnerabilities: true)

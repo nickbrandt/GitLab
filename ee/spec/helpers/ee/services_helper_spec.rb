@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::ServicesHelper do
+RSpec.describe EE::ServicesHelper do
   let(:controller_class) do
     Class.new(ActionController::Base) do
       include EE::ServicesHelper
