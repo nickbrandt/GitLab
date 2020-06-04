@@ -7,6 +7,7 @@ import { s__ } from '~/locale';
 import { getMonthNames } from '~/lib/utils/datetime_utility';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import IssuesAnalyticsTable from './issues_analytics_table.vue';
+import { transformIssuesApiEndpoint } from '../utils';
 
 export default {
   components: {
@@ -111,7 +112,7 @@ export default {
     },
     issuesTableEndpoints() {
       return {
-        api: `${this.issuesApiEndpoint}${this.appliedFilters}`,
+        api: transformIssuesApiEndpoint(`${this.issuesApiEndpoint}${this.appliedFilters}`),
         issuesPage: this.issuesPageEndpoint,
       };
     },
