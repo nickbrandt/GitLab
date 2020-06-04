@@ -7,6 +7,8 @@ import {
   normalizeHeaders,
   convertObjectPropsToCamelCase,
 } from '~/lib/utils/common_utils';
+import packageFilesQuery from '../graphql/package_files.query.graphql';
+import { gqClient } from '../utils';
 import * as types from './mutation_types';
 import { FILTER_STATES } from './constants';
 
@@ -26,6 +28,28 @@ export const receiveReplicableItemsError = ({ state, commit }) => {
 export const fetchReplicableItems = ({ state, dispatch }) => {
   dispatch('requestReplicableItems');
 
+  return state.useGraphQl
+    ? dispatch('fetchReplicableItemsGraphQl')
+    : dispatch('fetchReplicableItemsRestful');
+};
+
+export const fetchReplicableItemsGraphQl = ({ dispatch }) => {
+  gqClient
+    .query({
+      query: packageFilesQuery,
+    })
+    .then(res => {
+      const registries = res.data.geoNode.packageFileRegistries;
+      const data = registries.edges.map(e => e.node);
+
+      dispatch('receiveReplicableItemsSuccess', { data });
+    })
+    .catch(() => {
+      dispatch('receiveReplicableItemsError');
+    });
+};
+
+export const fetchReplicableItemsRestful = ({ state, dispatch }) => {
   const { filterOptions, currentFilterIndex, currentPage, searchFilter } = state;
 
   const statusFilter = currentFilterIndex ? filterOptions[currentFilterIndex] : filterOptions[0];

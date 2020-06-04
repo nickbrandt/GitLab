@@ -11,7 +11,7 @@ localVue.use(Vuex);
 
 describe('GeoReplicableItem', () => {
   let wrapper;
-  const mockReplicable = MOCK_BASIC_FETCH_DATA_MAP.data[0];
+  const mockReplicable = MOCK_BASIC_FETCH_DATA_MAP[0];
 
   const actionSpies = {
     initiateReplicableSync: jest.fn(),

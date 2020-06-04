@@ -1,16 +1,21 @@
 import testAction from 'helpers/vuex_action_helper';
 import flash from '~/flash';
 import toast from '~/vue_shared/plugins/global_toast';
+import { normalizeHeaders, parseIntPagination } from '~/lib/utils/common_utils';
 import Api from 'ee/api';
 import * as actions from 'ee/geo_replicable/store/actions';
 import * as types from 'ee/geo_replicable/store/mutation_types';
 import createState from 'ee/geo_replicable/store/state';
 import { ACTION_TYPES } from 'ee/geo_replicable/store/constants';
+import { gqClient } from 'ee/geo_replicable/utils';
+import packageFilesQuery from 'ee/geo_replicable/graphql/package_files.query.graphql';
 import {
   MOCK_BASIC_FETCH_DATA_MAP,
   MOCK_BASIC_FETCH_RESPONSE,
   MOCK_BASIC_POST_RESPONSE,
   MOCK_REPLICABLE_TYPE,
+  MOCK_RESTFUL_PAGINATION_DATA,
+  MOCK_BASIC_GRAPHQL_QUERY_RESPONSE,
 } from '../mock_data';
 
 jest.mock('~/flash');
@@ -40,9 +45,14 @@ describe('GeoReplicable Store Actions', () => {
     it('should commit mutation RECEIVE_REPLICABLE_ITEMS_SUCCESS', done => {
       testAction(
         actions.receiveReplicableItemsSuccess,
-        MOCK_BASIC_FETCH_DATA_MAP,
+        { data: MOCK_BASIC_FETCH_DATA_MAP, pagination: MOCK_RESTFUL_PAGINATION_DATA },
         state,
-        [{ type: types.RECEIVE_REPLICABLE_ITEMS_SUCCESS, payload: MOCK_BASIC_FETCH_DATA_MAP }],
+        [
+          {
+            type: types.RECEIVE_REPLICABLE_ITEMS_SUCCESS,
+            payload: { data: MOCK_BASIC_FETCH_DATA_MAP, pagination: MOCK_RESTFUL_PAGINATION_DATA },
+          },
+        ],
         [],
         done,
       );
@@ -65,6 +75,95 @@ describe('GeoReplicable Store Actions', () => {
   });
 
   describe('fetchReplicableItems', () => {
+    describe('with graphql', () => {
+      beforeEach(() => {
+        state.useGraphQl = true;
+      });
+
+      it('calls fetchReplicableItemsGraphQl', done => {
+        testAction(
+          actions.fetchReplicableItems,
+          null,
+          state,
+          [],
+          [{ type: 'requestReplicableItems' }, { type: 'fetchReplicableItemsGraphQl' }],
+          done,
+        );
+      });
+    });
+
+    describe('without graphql', () => {
+      beforeEach(() => {
+        state.useGraphQl = false;
+      });
+
+      it('calls fetchReplicableItemsRestful', done => {
+        testAction(
+          actions.fetchReplicableItems,
+          null,
+          state,
+          [],
+          [{ type: 'requestReplicableItems' }, { type: 'fetchReplicableItemsRestful' }],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('fetchReplicableItemsGraphQl', () => {
+    describe('on success', () => {
+      const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
+      const data = registries.edges.map(e => e.node);
+
+      beforeEach(() => {
+        jest.spyOn(gqClient, 'query').mockResolvedValue({
+          data: MOCK_BASIC_GRAPHQL_QUERY_RESPONSE,
+        });
+      });
+
+      it('should call gqClient with no before/after variables', () => {
+        testAction(
+          actions.fetchReplicableItemsGraphQl,
+          null,
+          state,
+          [],
+          [
+            {
+              type: 'receiveReplicableItemsSuccess',
+              payload: { data },
+            },
+          ],
+          () => {
+            expect(gqClient.query).toHaveBeenCalledWith({
+              query: packageFilesQuery,
+            });
+          },
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        jest.spyOn(gqClient, 'query').mockRejectedValue();
+      });
+
+      it('should dispatch the request and error actions', done => {
+        testAction(
+          actions.fetchReplicableItemsGraphQl,
+          null,
+          state,
+          [],
+          [{ type: 'receiveReplicableItemsError' }],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('fetchReplicableItemsRestful', () => {
+    const normalizedHeaders = normalizeHeaders(MOCK_BASIC_FETCH_RESPONSE.headers);
+    const pagination = parseIntPagination(normalizedHeaders);
+
     describe('on success', () => {
       beforeEach(() => {
         jest.spyOn(Api, 'getGeoReplicableItems').mockResolvedValue(MOCK_BASIC_FETCH_RESPONSE);
@@ -79,13 +178,19 @@ describe('GeoReplicable Store Actions', () => {
 
         it('should call getGeoReplicableItems with default queryParams', () => {
           testAction(
-            actions.fetchReplicableItems,
+            actions.fetchReplicableItemsRestful,
             {},
             state,
             [],
             [
-              { type: 'requestReplicableItems' },
-              { type: 'receiveReplicableItemsSuccess', payload: MOCK_BASIC_FETCH_DATA_MAP },
+              {
+                type: 'receiveReplicableItemsSuccess',
+                payload: {
+                  data: MOCK_BASIC_FETCH_DATA_MAP,
+                  perPage: pagination.perPage,
+                  total: pagination.total,
+                },
+              },
             ],
             () => {
               expect(Api.getGeoReplicableItems).toHaveBeenCalledWith(
@@ -106,13 +211,19 @@ describe('GeoReplicable Store Actions', () => {
 
         it('should call getGeoReplicableItems with default queryParams', () => {
           testAction(
-            actions.fetchReplicableItems,
+            actions.fetchReplicableItemsRestful,
             {},
             state,
             [],
             [
-              { type: 'requestReplicableItems' },
-              { type: 'receiveReplicableItemsSuccess', payload: MOCK_BASIC_FETCH_DATA_MAP },
+              {
+                type: 'receiveReplicableItemsSuccess',
+                payload: {
+                  data: MOCK_BASIC_FETCH_DATA_MAP,
+                  perPage: pagination.perPage,
+                  total: pagination.total,
+                },
+              },
             ],
             () => {
               expect(Api.getGeoReplicableItems).toHaveBeenCalledWith(MOCK_REPLICABLE_TYPE, {
@@ -133,11 +244,11 @@ describe('GeoReplicable Store Actions', () => {
 
       it('should dispatch the request and error actions', done => {
         testAction(
-          actions.fetchReplicableItems,
+          actions.fetchReplicableItemsRestful,
           {},
           state,
           [],
-          [{ type: 'requestReplicableItems' }, { type: 'receiveReplicableItemsError' }],
+          [{ type: 'receiveReplicableItemsError' }],
           done,
         );
       });
