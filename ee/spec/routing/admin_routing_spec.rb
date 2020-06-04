@@ -44,6 +44,12 @@ RSpec.describe 'EE-specific admin routing' do
     end
   end
 
+  describe Admin::Geo::PackageFilesController, 'routing' do
+    it 'routes / to #index' do
+      expect(get('/admin/geo/replication/package_files')).to route_to('admin/geo/package_files#index')
+    end
+  end
+
   describe Admin::Geo::NodesController, 'routing' do
     let(:geo_node) { create(:geo_node) }
 
