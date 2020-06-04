@@ -6,6 +6,7 @@ import FirstClassGroupSecurityDashboard from './components/first_class_group_sec
 import FirstClassInstanceSecurityDashboard from './components/first_class_instance_security_dashboard.vue';
 import UnavailableState from './components/unavailable_state.vue';
 import createStore from './store';
+import createRouter from './router';
 import projectsPlugin from './store/plugins/projects';
 import projectSelector from './store/plugins/project_selector';
 import apolloProvider from './graphql/provider';
@@ -62,6 +63,7 @@ export default (
     props.vulnerabilitiesExportEndpoint = el.dataset.vulnerabilitiesExportEndpoint;
   }
 
+  const router = createRouter();
   const store = createStore({
     dashboardType,
     plugins: [projectSelector, projectsPlugin],
@@ -70,6 +72,7 @@ export default (
   return new Vue({
     el,
     store,
+    router,
     apolloProvider,
     render(createElement) {
       return createElement(component, { props });
