@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Gitlab::GlRepository::Identifier do
   let_it_be(:group) { create(:group) }
 
+  # GitLab Starter feature
   context 'group wiki' do
     it_behaves_like 'parsing gl_repository identifier' do
       let(:record_id) { group.id }
