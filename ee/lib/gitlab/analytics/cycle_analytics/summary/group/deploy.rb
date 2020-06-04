@@ -9,7 +9,7 @@ module Gitlab
             include Gitlab::CycleAnalytics::GroupProjectsProvider
 
             def title
-              n_('Deploy', 'Deploys', value)
+              n_('Deploy', 'Deploys', value.to_i)
             end
 
             def value
