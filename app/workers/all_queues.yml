@@ -1147,6 +1147,14 @@
   :weight: 2
   :idempotent: 
   :tags: []
+- :name: create_evidence_with_pipeline
+  :feature_category: :release_evidence
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 2
+  :idempotent: 
+  :tags: []
 - :name: create_note_diff_file
   :feature_category: :source_code_management
   :has_external_dependencies: 
