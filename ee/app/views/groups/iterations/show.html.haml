@@ -2,4 +2,4 @@
 - breadcrumb_title params[:id]
 - page_title _("Iterations")
 
-.js-iteration{ data: { group_path: @group.full_path, iteration_id: params[:id], can_edit: can?(current_user, :admin_iteration, @group).to_s, edit_iteration_path: edit_group_iteration_path(@group.id, params[:id]) } }
+.js-iteration{ data: { group_path: @group.full_path, iteration_id: params[:id], can_edit: can?(current_user, :admin_iteration, @group).to_s, edit_iteration_path: edit_group_iteration_path(@group, params[:id]) } }

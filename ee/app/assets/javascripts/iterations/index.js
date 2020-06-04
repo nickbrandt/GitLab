@@ -33,6 +33,24 @@ export function initIterationForm() {
   });
 }
 
+export function initEditIterationForm() {
+  const el = document.querySelector('.js-iteration-edit');
+
+  return new Vue({
+    el,
+    apolloProvider,
+    render(createElement) {
+      return createElement(IterationForm, {
+        props: {
+          groupPath: el.dataset.groupFullPath,
+          previewMarkdownPath: el.dataset.previewMarkdownPath,
+          iterationsListPath: el.dataset.iterationsListPath,
+        },
+      });
+    },
+  });
+}
+
 export function initIterationReport() {
   const el = document.querySelector('.js-iteration');
 

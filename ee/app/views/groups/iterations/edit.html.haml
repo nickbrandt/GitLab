@@ -2,4 +2,4 @@
 - breadcrumb_title _("New")
 - page_title _("Iterations")
 
-.js-iteration-new{ data: { group_full_path: @group.full_path, preview_markdown_path: preview_markdown_path(@group), iterations_list_path: group_iterations_path(@group) } }
+.js-iteration-edit{ data: { group_full_path: @group.full_path, preview_markdown_path: preview_markdown_path(@group), iterations_list_path: group_iteration_path(@group, params[:id]) } }
