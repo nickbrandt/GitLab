@@ -5,7 +5,7 @@ module Resolvers
     class IssueLinksResolver < BaseResolver
       type Types::Vulnerability::IssueLinkType, null: true
 
-      argument :link_type, [Types::Vulnerability::IssueLinkTypeEnum],
+      argument :link_type, Types::Vulnerability::IssueLinkTypeEnum,
                required: false,
                description: 'Filter issue links by link type'
 
