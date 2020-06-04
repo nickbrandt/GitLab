@@ -186,16 +186,19 @@ describe Gitlab::ErrorTracking do
 
     context 'with sidekiq args' do
       it 'ensures extra.sidekiq.args is a string' do
-        extra = { sidekiq: { 'args' => [1, { 'id' => 2, 'name' => 'hello' }, 'some-value', 'another-value'] } }
+        extra = { sidekiq: { 'class' => 'PostReceive', 'args' => [1, { 'id' => 2, 'name' => 'hello' }, 'some-value', 'another-value'] } }
 
         expect(Gitlab::ErrorTracking::Logger).to receive(:error).with(
-          hash_including({ 'extra.sidekiq' => { 'args' => ['1', '{"id"=>2, "name"=>"hello"}', 'some-value', 'another-value'] } }))
+          hash_including({ 'extra.sidekiq' => { 'class' => 'PostReceive', 'args' => ['1', '{"id"=>2, "name"=>"hello"}', 'some-value', 'another-value'] } }))
 
         described_class.track_exception(exception, extra)
       end
 
       it 'filters sensitive arguments before sending' do
         extra = { sidekiq: { 'class' => 'UnknownWorker', 'args' => ['sensitive string', 1, 2] } }
+
+        expect(Gitlab::ErrorTracking::Logger).to receive(:error).with(
+          hash_including('extra.sidekiq' => { 'class' => 'UnknownWorker', 'args' => ['[FILTERED]', '1', '2'] }))
 
         described_class.track_exception(exception, extra)
 

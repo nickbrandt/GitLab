@@ -28,6 +28,13 @@ module Gitlab
           end
         end
 
+        def self.loggable_arguments(args, klass)
+          Gitlab::Utils::LogLimitedArray
+            .log_limited_array(filter_arguments(args, klass))
+            .map(&:to_s)
+            .to_a
+        end
+
         def process(value, key = nil)
           sidekiq = value.dig(:extra, :sidekiq)
 

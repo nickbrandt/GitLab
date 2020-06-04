@@ -43,6 +43,18 @@ RSpec.describe Gitlab::ErrorTracking::Processor::SidekiqProcessor do
     end
   end
 
+  describe '.loggable_arguments' do
+    it 'filters and limits the arguments, then converts to strings' do
+      half_limit = Gitlab::Utils::LogLimitedArray::MAXIMUM_ARRAY_LENGTH / 2
+      args = [[1, 2], 'a' * half_limit, 'b' * half_limit, 'c' * half_limit, 'd']
+
+      stub_const('LoggableArguments', double(loggable_arguments: [0, 1, 3, 4]))
+
+      expect(described_class.loggable_arguments(args, 'LoggableArguments'))
+        .to eq(['[1, 2]', 'a' * half_limit, '[FILTERED]', '...'])
+    end
+  end
+
   describe '#process' do
     context 'when there is Sidekiq data' do
       shared_examples 'Sidekiq arguments' do |args_in_job_hash: true|
