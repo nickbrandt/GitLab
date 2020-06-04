@@ -26,7 +26,7 @@ class PushRule < ApplicationRecord
 
   before_update :convert_to_re2
 
-  FILES_BLACKLIST = YAML.load_file(Rails.root.join('ee/lib/gitlab/checks/files_blacklist.yml'))
+  FILES_DENYLIST = YAML.load_file(Rails.root.join('ee/lib/gitlab/checks/files_denylist.yml'))
   SETTINGS_WITH_GLOBAL_DEFAULT = %i[
     reject_unsigned_commits
     commit_committer_check
@@ -78,9 +78,9 @@ class PushRule < ApplicationRecord
     data_match?(email, author_email_regex)
   end
 
-  def filename_blacklisted?(file_path)
+  def filename_denylisted?(file_path)
     regex_list = []
-    regex_list.concat(FILES_BLACKLIST) if prevent_secrets
+    regex_list.concat(FILES_DENYLIST) if prevent_secrets
     regex_list << file_name_regex if file_name_regex
 
     regex_list.find { |regex| data_match?(file_path, regex) }
