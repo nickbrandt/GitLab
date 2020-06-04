@@ -7,6 +7,9 @@ module EE
 
       prepended do
         helpers do
+          extend ::Gitlab::Utils::Override
+
+          override :authorize_push_to_branch!
           def authorize_push_to_branch!(branch)
             super
 
