@@ -1,0 +1,5 @@
+---
+title: Use Keys::CreateService to create ssh keys for a user
+merge_request: 33859
+author: Rajendra Kadam
+type: fixed
