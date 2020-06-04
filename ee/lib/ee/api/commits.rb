@@ -13,10 +13,10 @@ module EE
           def authorize_push_to_branch!(branch)
             super
 
-            codeowners_check_result = check_against_codeowners(user_project, branch, extracted_paths)
+            codeowners_error = check_against_codeowners(user_project, branch, extracted_paths)
 
-            if codeowners_check_result
-              forbidden!(codeowners_check_result)
+            if codeowners_error.present?
+              forbidden!(codeowners_error)
             end
           end
 
