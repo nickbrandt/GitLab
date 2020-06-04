@@ -10,6 +10,18 @@ module EE
         params[:epic_id].present?
       end
 
+      def iterations?
+        params[:iteration_id].present?
+      end
+
+      def filter_by_no_iteration?
+        params[:iteration_id].to_s.downcase == ::IssuableFinder::Params::FILTER_NONE
+      end
+
+      def filter_by_any_iteration?
+        params[:iteration_id].to_s.downcase == ::IssuableFinder::Params::FILTER_ANY
+      end
+
       def filter_by_no_epic?
         params[:epic_id].to_s.downcase == ::IssuableFinder::Params::FILTER_NONE
       end
@@ -49,6 +61,10 @@ module EE
         else
           params[:epic_id]
         end
+      end
+
+      def iterations
+        params[:iteration_id]
       end
     end
   end

@@ -18,7 +18,8 @@ module EE
     override :filter_items
     def filter_items(items)
       issues = by_weight(super)
-      by_epic(issues)
+      issues = by_epic(issues)
+      by_iteration(issues)
     end
 
     private
@@ -59,6 +60,18 @@ module EE
         items.any_epic
       else
         items.in_epics(params.epics)
+      end
+    end
+
+    def by_iteration(items)
+      return items unless params.iterations?
+
+      if params.filter_by_no_iteration?
+        items.no_iteration
+      elsif params.filter_by_any_iteration?
+        items.any_iteration
+      else
+        items.in_iterations(params.iterations)
       end
     end
   end

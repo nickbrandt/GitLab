@@ -21,6 +21,7 @@ class IterationsFinder
 
   def execute
     items = Iteration.all
+    items = by_id(items)
     items = by_groups_and_projects(items)
     items = by_title(items)
     items = by_search_title(items)
@@ -34,6 +35,14 @@ class IterationsFinder
 
   def by_groups_and_projects(items)
     items.for_projects_and_groups(params[:project_ids], params[:group_ids])
+  end
+
+  def by_id(items)
+    if  params[:id]
+      items.with_id(params[:id])
+    else
+      items
+    end
   end
 
   def by_title(items)
