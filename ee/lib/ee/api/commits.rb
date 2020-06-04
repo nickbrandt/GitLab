@@ -21,7 +21,6 @@ module EE
           end
 
           def check_against_codeowners(project, branch, paths)
-            return unless ::ProtectedBranch.branch_requires_code_owner_approval?(project, branch)
             return unless paths
 
             codeowners_violations = ::Gitlab::CodeOwners::Validator.new(project, branch, paths).execute
