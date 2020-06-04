@@ -15,6 +15,7 @@ exceptions:
   - ASCII
   - AWS
   - CNAME
+  - CPU
   - CSS
   - CSV
   - DNS
