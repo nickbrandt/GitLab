@@ -14,6 +14,7 @@ import { getTimeago } from '~/lib/utils/datetime_utility';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 
 import RequirementForm from './requirement_form.vue';
+import RequirementStatusBadge from './requirement_status_badge.vue';
 
 import { FilterState } from '../constants';
 
@@ -26,6 +27,7 @@ export default {
     GlIcon,
     GlLoadingIcon,
     RequirementForm,
+    RequirementStatusBadge,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -36,9 +38,16 @@ export default {
       type: Object,
       required: true,
       validator: value =>
-        ['iid', 'state', 'userPermissions', 'title', 'createdAt', 'updatedAt', 'author'].every(
-          prop => value[prop],
-        ),
+        [
+          'iid',
+          'state',
+          'userPermissions',
+          'title',
+          'createdAt',
+          'updatedAt',
+          'author',
+          'testReports',
+        ].every(prop => value[prop]),
     },
     showUpdateForm: {
       type: Boolean,
@@ -81,6 +90,12 @@ export default {
     },
     author() {
       return this.requirement.author;
+    },
+    testReport() {
+      return this.requirement.testReports.nodes[0];
+    },
+    showIssuableMetaActions() {
+      return Boolean(this.canUpdate || this.canArchive || this.testReport);
     },
   },
   methods: {
@@ -131,8 +146,8 @@ export default {
           <div class="issue-title title">
             <span class="issue-title-text">{{ requirement.title }}</span>
           </div>
-          <div class="issuable-info">
-            <span class="issuable-authored d-none d-sm-inline-block">
+          <div class="issuable-info d-none d-sm-inline-block">
+            <span class="issuable-authored">
               <span
                 v-gl-tooltip:tooltipcontainer.bottom
                 :title="tooltipTitle(requirement.createdAt)"
@@ -143,10 +158,27 @@ export default {
                 <span class="author">{{ author.name }}</span>
               </gl-link>
             </span>
+            <span
+              v-gl-tooltip:tooltipcontainer.bottom
+              :title="tooltipTitle(requirement.updatedAt)"
+              class="issuable-updated-at"
+              >&middot; {{ updatedAt }}</span
+            >
           </div>
+          <requirement-status-badge
+            v-if="testReport"
+            :test-report="testReport"
+            class="d-block d-sm-none"
+          />
         </div>
         <div class="issuable-meta">
-          <ul v-if="canUpdate || canArchive" class="controls flex-column flex-sm-row">
+          <ul v-if="showIssuableMetaActions" class="controls flex-column flex-sm-row">
+            <requirement-status-badge
+              v-if="testReport"
+              :test-report="testReport"
+              element-type="li"
+              class="d-none d-sm-block"
+            />
             <li v-if="canUpdate && !isArchived" class="requirement-edit d-sm-block">
               <gl-deprecated-button
                 v-gl-tooltip
@@ -180,13 +212,6 @@ export default {
               >
             </li>
           </ul>
-          <div class="float-right issuable-updated-at d-none d-sm-inline-block">
-            <span
-              v-gl-tooltip:tooltipcontainer.bottom
-              :title="tooltipTitle(requirement.updatedAt)"
-              >{{ updatedAt }}</span
-            >
-          </div>
         </div>
       </div>
     </div>
