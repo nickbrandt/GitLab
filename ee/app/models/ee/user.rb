@@ -58,6 +58,8 @@ module EE
       has_many :smartcard_identities
       has_many :scim_identities
 
+      has_many :board_preferences, class_name: 'BoardUserPreference', inverse_of: :user
+
       belongs_to :managing_group, class_name: 'Group', optional: true, inverse_of: :managed_users
 
       scope :not_managed, ->(group: nil) {

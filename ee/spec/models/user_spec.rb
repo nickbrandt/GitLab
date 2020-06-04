@@ -25,6 +25,7 @@ RSpec.describe User do
     it { is_expected.to have_many(:path_locks).dependent(:destroy) }
     it { is_expected.to have_many(:users_security_dashboard_projects) }
     it { is_expected.to have_many(:security_dashboard_projects) }
+    it { is_expected.to have_many(:board_preferences) }
   end
 
   describe 'nested attributes' do
