@@ -52,7 +52,7 @@ module Projects
             dependency_scanning: true,
             container_scanning: true
           }.to_json,
-          can_toggle_auto_fix_settings: true, # To be replaced with the real value in https://gitlab.com/gitlab-org/gitlab/-/merge_requests/32783
+          can_toggle_auto_fix_settings: auto_fix_permission,
           auto_fix_user_path: '/' # TODO: real link will be updated with https://gitlab.com/gitlab-org/gitlab/-/issues/215669
         }
       end

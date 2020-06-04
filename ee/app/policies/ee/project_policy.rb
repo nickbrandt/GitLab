@@ -279,6 +279,7 @@ module EE
         enable :admin_feature_flags_client
         enable :modify_approvers_rules
         enable :modify_approvers_list
+        enable :modify_auto_fix_setting
         enable :modify_merge_request_author_setting
         enable :modify_merge_request_committer_setting
       end
@@ -331,6 +332,8 @@ module EE
       rule { ~admin & owner & owner_cannot_destroy_project }.prevent :remove_project
 
       rule { archived }.policy do
+        prevent :modify_auto_fix_setting
+
         READONLY_FEATURES_WHEN_ARCHIVED.each do |feature|
           prevent(*::ProjectPolicy.create_update_admin_destroy(feature))
         end

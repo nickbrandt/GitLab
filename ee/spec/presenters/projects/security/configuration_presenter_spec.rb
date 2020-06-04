@@ -14,7 +14,7 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
   end
 
   describe '#to_h' do
-    subject { described_class.new(project).to_h }
+    subject { described_class.new(project, auto_fix_permission: true).to_h }
 
     it 'includes links to auto devops and secure product docs' do
       expect(subject[:auto_devops_help_page_path]).to eq(help_page_path('topics/autodevops/index'))
@@ -34,6 +34,10 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
 
       it 'reports that auto devops is enabled' do
         expect(subject[:auto_devops_enabled]).to be_truthy
+      end
+
+      it 'reports auto_fix permissions' do
+        expect(subject[:can_toggle_auto_fix_settings]).to be_truthy
       end
 
       it 'reports that all security jobs are configured' do
