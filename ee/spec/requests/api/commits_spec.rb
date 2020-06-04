@@ -145,4 +145,22 @@ describe API::Commits do
       end
     end
   end
+
+  describe 'POST :id/repository/commits/:sha/revery' do
+    let(:commit) { project.commit('7d3b0f7cff5f37573aea97cebfd5692ea1689924') }
+    let(:commit_id) { commit.id }
+    let(:branch) { 'master' }
+    let(:route) { "/projects/#{project_id}/repository/commits/#{commit_id}/revert" }
+
+    subject(:request) { post api(route, user), params: { branch: branch } }
+
+    context "a file in the revert commit matches a codeowner entry" do
+      context "when codeowners are required" do
+        it_behaves_like "returns a 403 from a codeowners violation" do
+          let(:code_owner_approval_required) { true }
+          let(:paths) { commit.raw_deltas.flat_map { |diff| [diff.new_path, diff.old_path] }.uniq }
+        end
+      end
+    end
+  end
 end
