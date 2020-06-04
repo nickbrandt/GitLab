@@ -1,7 +1,0 @@
-.security_dashboard_filters {
-  top: $header-height;
-
-  .with-performance-bar & {
-    top: $header-height + $performance-bar-height;
-  }
-}
