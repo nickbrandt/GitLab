@@ -41,7 +41,9 @@ describe ProjectPolicy do
         admin_vulnerability_issue_link read_merge_train
       ]
     end
-    let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
+    let(:additional_maintainer_permissions) do
+      %i[push_code_to_protected_branches admin_feature_flags_client modify_auto_fix_setting]
+    end
     let(:auditor_permissions) do
       %i[
         download_code download_wiki_code read_project read_board read_list
