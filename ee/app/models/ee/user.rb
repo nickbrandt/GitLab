@@ -338,7 +338,7 @@ module EE
 
       # We use a 2nd feature flag for control as enabled and percentage_of_time for chatops
       flipper_feature = ::Feature.get((feature.to_s + '_control').to_sym) # rubocop:disable Gitlab/AvoidFeatureGet
-      percentage ||= flipper_feature.gate_values[:percentage_of_time] || 0 if flipper_feature
+      percentage ||= flipper_feature&.percentage_of_time_value || 0
       return false if percentage <= 0
 
       if filter == UserPreference::FEATURE_FILTER_UNKNOWN
