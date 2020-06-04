@@ -1,5 +1,5 @@
 ---
-title: Allow CI_JOB_TOKEN to be used for authentication to Terraform state API
+title: Allow CI_JOB_TOKEN for authenticating to the Terraform state API
 merge_request: 33550
 author:
 type: added
