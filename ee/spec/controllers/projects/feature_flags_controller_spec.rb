@@ -7,15 +7,17 @@ RSpec.describe Projects::FeatureFlagsController do
   include FeatureFlagHelpers
 
   let_it_be(:project) { create(:project) }
+  let_it_be(:developer) { create(:user) }
+  let_it_be(:reporter) { create(:user) }
   let(:user) { developer }
-  let(:developer) { create(:user) }
-  let(:reporter) { create(:user) }
   let(:feature_enabled) { true }
 
-  before do
+  before_all do
     project.add_developer(developer)
     project.add_reporter(reporter)
+  end
 
+  before do
     sign_in(user)
     stub_licensed_features(feature_flags: feature_enabled)
   end
