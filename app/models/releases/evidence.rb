@@ -7,7 +7,7 @@ module Releases
 
     belongs_to :release, inverse_of: :evidences
 
-    default_scope { order(created_at: :asc) }
+    default_scope { order(created_at: :asc) } # rubocop:disable Cop/DefaultScope
 
     sha_attribute :summary_sha
     alias_attribute :collected_at, :created_at
