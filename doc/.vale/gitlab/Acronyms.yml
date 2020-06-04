@@ -40,6 +40,7 @@ exceptions:
   - POST
   - PUT
   - RSA
+  - RSS
   - SAML
   - SCP
   - SCSS
@@ -51,6 +52,7 @@ exceptions:
   - TIP
   - TLS
   - TODO
+  - UNIX
   - URI
   - URL
   - VPC
