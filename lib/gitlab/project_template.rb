@@ -46,7 +46,7 @@ module Gitlab
         ProjectTemplate.new('android', 'Android', _('A ready-to-go template for use with Android apps.'), 'https://gitlab.com/gitlab-org/project-templates/android', 'illustrations/logos/android.svg'),
         ProjectTemplate.new('gomicro', 'Go Micro', _('Go Micro is a framework for micro service development.'), 'https://gitlab.com/gitlab-org/project-templates/go-micro', 'illustrations/logos/gomicro.svg'),
         ProjectTemplate.new('gatsby', 'Pages/Gatsby', _('Everything you need to create a GitLab Pages site using Gatsby.'), 'https://gitlab.com/pages/gatsby'),
-        ProjectTemplate.new('hugo', 'Pages/Hugo', _('Everything you need to create a GitLab Pages site using Hugo.'), 'https://gitlab.com/pages/hugo'),
+        ProjectTemplate.new('hugo', 'Pages/Hugo', _('Everything you need to create a GitLab Pages site using Hugo.'), 'https://gitlab.com/pages/hugo', 'illustrations/logos/hugo.svg'),
         ProjectTemplate.new('jekyll', 'Pages/Jekyll', _('Everything you need to create a GitLab Pages site using Jekyll.'), 'https://gitlab.com/pages/jekyll', 'illustrations/logos/jekyll.svg'),
         ProjectTemplate.new('plainhtml', 'Pages/Plain HTML', _('Everything you need to create a GitLab Pages site using plain HTML.'), 'https://gitlab.com/pages/plain-html'),
         ProjectTemplate.new('gitbook', 'Pages/GitBook', _('Everything you need to create a GitLab Pages site using GitBook.'), 'https://gitlab.com/pages/gitbook', 'illustrations/logos/gitbook.svg'),
