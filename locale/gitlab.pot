@@ -20161,6 +20161,14 @@ msgid_plural "Showing %d events"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Showing %{count} of %{total} projects"
+msgstr ""
+
+msgid "Showing %{count} project"
+msgid_plural "Showing %{count} projects"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Showing %{limit} of %{total_count} issues. "
 msgstr ""
 
