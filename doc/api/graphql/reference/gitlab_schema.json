@@ -17303,6 +17303,28 @@
               "deprecationReason": null
             },
             {
+              "name": "allProjects",
+              "description": "List of all Jira projects fetched through Jira REST API. Latest Jira Server API version ([8.9.0](https://docs.atlassian.com/software/jira/docs/api/REST/8.9.0/)) compatible.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "JiraProject",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "projects",
               "description": "List of Jira projects fetched through Jira REST API",
               "args": [
