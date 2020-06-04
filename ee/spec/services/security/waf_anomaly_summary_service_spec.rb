@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::WafAnomalySummaryService do
+RSpec.describe Security::WafAnomalySummaryService do
   let(:environment) { create(:environment, :with_review_app, environment_type: 'review') }
   let!(:cluster) do
     create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [environment.project])

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Prometheus::Alerts::NotifyService do
+RSpec.describe Projects::Prometheus::Alerts::NotifyService do
   let_it_be(:project, reload: true) { create(:project) }
 
   let(:service) { described_class.new(project, nil, payload) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::StoreReportService, '#execute' do
+RSpec.describe Security::StoreReportService, '#execute' do
   let(:user) { create(:user) }
   let(:artifact) { create(:ee_ci_job_artifact, report_type) }
   let(:project) { artifact.project }

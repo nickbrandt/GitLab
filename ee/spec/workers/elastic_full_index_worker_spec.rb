@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ElasticFullIndexWorker do
+RSpec.describe ElasticFullIndexWorker do
   subject { described_class.new }
 
   before do

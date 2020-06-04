@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ElasticIndexingControlWorker do
+RSpec.describe ElasticIndexingControlWorker do
   subject { described_class.new }
 
   describe '#perform' do

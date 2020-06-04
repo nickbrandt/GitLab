@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'groups/edit.html.haml' do
+RSpec.describe 'groups/edit.html.haml' do
   let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
 

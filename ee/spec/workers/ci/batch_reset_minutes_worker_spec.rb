@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::BatchResetMinutesWorker do
+RSpec.describe Ci::BatchResetMinutesWorker do
   let(:worker) { described_class.new }
 
   describe '#perform' do

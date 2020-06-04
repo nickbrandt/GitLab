@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe UpdateBuildMinutesService do
+RSpec.describe UpdateBuildMinutesService do
   describe '#perform' do
     let(:namespace) { create(:namespace, shared_runners_minutes_limit: 100) }
     let(:project) { create(:project, :public, namespace: namespace) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'layouts/nav/sidebar/_analytics' do
+RSpec.describe 'layouts/nav/sidebar/_analytics' do
   it_behaves_like 'has nav sidebar'
 
   context 'top-level items' do

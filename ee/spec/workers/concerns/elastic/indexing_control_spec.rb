@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Elastic::IndexingControl do
+RSpec.describe Elastic::IndexingControl do
   let!(:project) { create(:project, :repository) }
 
   let(:worker) do

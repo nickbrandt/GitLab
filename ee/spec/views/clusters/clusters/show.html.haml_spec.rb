@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'clusters/clusters/show' do
+RSpec.describe 'clusters/clusters/show' do
   let_it_be(:user) { create(:user) }
 
   shared_examples 'cluster health section' do

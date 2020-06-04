@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe BuildFinishedWorker do
+RSpec.describe BuildFinishedWorker do
   let(:ci_runner) { create(:ci_runner) }
   let(:build) { create(:ee_ci_build, :success, runner: ci_runner) }
   let(:project) { build.project }
