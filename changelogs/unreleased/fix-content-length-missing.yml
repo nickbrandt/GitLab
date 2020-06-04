@@ -1,5 +1,0 @@
----
-title: Fix Content-Length set prior to SendUrl injection
-merge_request: 496
-author: Georges-Etienne Legendre
-type: fixed

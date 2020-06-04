@@ -1,5 +1,12 @@
 # Changelog for gitlab-workhorse
 
+## v8.35.0
+
+### Fixed
+- Fix Content-Length set prior to SendUrl injection
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/496
+  Contributed by Georges-Etienne Legendre
+
 ## v8.34.0
 
 ### Added
