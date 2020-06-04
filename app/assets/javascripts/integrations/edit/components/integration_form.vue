@@ -17,6 +17,11 @@ export default {
       type: Object,
       required: true,
     },
+    helpHtml: {
+      type: String,
+      required: false,
+      default: null,
+    },
     showActive: {
       type: Boolean,
       required: true,
@@ -54,5 +59,16 @@ export default {
     <jira-trigger-fields v-if="isJira" v-bind="triggerFieldsProps" />
     <trigger-fields v-else-if="triggerEvents.length" :events="triggerEvents" :type="type" />
     <dynamic-field v-for="field in fields" :key="field.name" v-bind="field" />
+    <div class="row">
+      <div class="col-sm-4">
+        <div v-html="helpHtml"></div>
+      </div>
+      <div class="col-sm-8">
+        <active-toggle v-if="showActive" v-bind="activeToggleProps" />
+        <jira-trigger-fields v-if="isJira" v-bind="triggerFieldsProps" />
+        <trigger-fields v-else-if="triggerEvents.length" :events="triggerEvents" :type="type" />
+        <dynamic-field v-for="field in fields" :key="field.name" v-bind="field" />
+      </div>
+    </div>
   </div>
 </template>

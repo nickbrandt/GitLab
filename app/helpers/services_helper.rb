@@ -97,6 +97,7 @@ module ServicesHelper
 
   def integration_form_data(integration)
     {
+      help_html: markdown(integration.help),
       show_active: integration.show_active_box?.to_s,
       activated: (integration.active || integration.new_record?).to_s,
       type: integration.to_param,
@@ -105,7 +106,10 @@ module ServicesHelper
       enable_comments: integration.comment_on_event_enabled.to_s,
       comment_detail: integration.comment_detail,
       trigger_events: trigger_events_for_service(integration),
-      fields: fields_for_service(integration)
+      fields: fields_for_service(integration),
+      cancel_path: scoped_integrations_path,
+      can_test: integration.can_test?.to_s,
+      test_path: scoped_test_integration_path(integration)
     }
   end
 

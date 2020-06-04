@@ -15,7 +15,14 @@ export default el => {
     return result;
   }
 
-  const { type, commentDetail, triggerEvents, fields, ...booleanAttributes } = el.dataset;
+  const {
+    type,
+    commentDetail,
+    triggerEvents,
+    fields,
+    helpHtml,
+    ...booleanAttributes
+  } = el.dataset;
   const {
     showActive,
     activated,
@@ -32,6 +39,7 @@ export default el => {
           activeToggleProps: {
             initialActivated: activated,
           },
+          helpHtml,
           showActive,
           type,
           triggerFieldsProps: {

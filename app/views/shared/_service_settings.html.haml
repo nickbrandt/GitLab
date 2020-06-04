@@ -2,10 +2,6 @@
 
 - if lookup_context.template_exists?('help', "projects/services/#{integration.to_param}", true)
   = render "projects/services/#{integration.to_param}/help", subject: integration
-- elsif integration.help.present?
-  .info-well
-    .well-segment
-      = markdown integration.help
 
 .service-settings
   .js-vue-integration-settings{ data: integration_form_data(integration) }
