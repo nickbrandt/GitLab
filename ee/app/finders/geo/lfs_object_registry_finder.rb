@@ -49,8 +49,14 @@ module Geo
     #
     # @return [Array] the first element is an Array of untracked IDs, and the second element is an Array of tracked IDs that are unused
     def find_registry_differences(range)
-      source_ids = lfs_objects(fdw: false).where(id: range).pluck_primary_key # rubocop:disable CodeReuse/ActiveRecord
-      tracked_ids = Geo::LfsObjectRegistry.pluck_model_ids_in_range(range)
+      source_ids =
+        lfs_objects(fdw: false)
+            .id_in(range)
+            .pluck_primary_key
+
+      tracked_ids =
+        Geo::LfsObjectRegistry
+            .pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
       unused_tracked_ids = tracked_ids - source_ids

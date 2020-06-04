@@ -30,4 +30,8 @@ class Geo::BaseRegistry < Geo::TrackingBase
 
     bulk_insert!(records, returns: :ids)
   end
+
+  def self.delete_for_model_ids(ids)
+    raise NotImplementedError, "#{self.class} does not implement #{__method__}"
+  end
 end

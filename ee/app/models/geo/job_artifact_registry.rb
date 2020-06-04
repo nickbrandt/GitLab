@@ -25,6 +25,10 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
     ::Geo::JobArtifactRegistryFinder
   end
 
+  def self.delete_worker_class
+    ::Geo::FileRegistryRemovalWorker
+  end
+
   # When false, RegistryConsistencyService will frequently check the end of the
   # table to quickly handle new replicables.
   def self.has_create_events?
@@ -33,12 +37,18 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
 
   # TODO: remove once `success` column has a default value set
   # https://gitlab.com/gitlab-org/gitlab/-/issues/214407
-  def self.insert_for_model_ids(ids)
-    records = ids.map do |id|
-      new(artifact_id: id, success: false, created_at: Time.zone.now)
+  def self.insert_for_model_ids(artifact_ids)
+    records = artifact_ids.map do |artifact_id|
+      new(artifact_id: artifact_id, success: false, created_at: Time.zone.now)
     end
 
     bulk_insert!(records, returns: :ids)
+  end
+
+  def self.delete_for_model_ids(artifact_ids)
+    artifact_ids.map do |artifact_id|
+      delete_worker_class.perform_async(:job_artifact, artifact_id)
+    end
   end
 
   def self.replication_enabled?
