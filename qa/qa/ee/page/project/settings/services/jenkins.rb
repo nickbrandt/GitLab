@@ -14,7 +14,7 @@ module QA
                 element :password_field, 'data: { qa_selector: "#{name.downcase.gsub' # rubocop:disable QA/ElementWithPattern
               end
 
-              view 'app/helpers/services_helper.rb' do
+              view 'app/assets/javascripts/integrations/edit/components/integration_form.vue' do
                 element :save_changes_button
               end
 

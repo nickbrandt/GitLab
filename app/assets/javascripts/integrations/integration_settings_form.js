@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import axios from '../lib/utils/axios_utils';
-import { serializeForm } from '~/lib/utils/forms';
 import flash from '../flash';
 import { __ } from '~/locale';
 import initForm from './edit';
@@ -18,7 +17,6 @@ export default class IntegrationSettingsForm {
     // Form Child Elements
     this.$submitBtn = this.$form.find('button[type="submit"]');
     this.$submitBtnLoader = this.$submitBtn.find('.js-btn-spinner');
-    this.$submitBtnLabel = this.$submitBtn.find('.js-btn-label');
   }
 
   init() {
@@ -30,7 +28,13 @@ export default class IntegrationSettingsForm {
     });
 
     eventHub.$on('test', () => {
-      this.testSettings(serializeForm(this.$form[0]));
+      if (this.$form.get(0).checkValidity()) {
+        // eslint-disable-next-line no-jquery/no-serialize
+        this.testSettings(this.$form.serialize());
+      } else {
+        eventHub.$emit('validateForm');
+        eventHub.$emit('testComplete');
+      }
     });
 
     // Bind Event Listeners
@@ -70,25 +74,11 @@ export default class IntegrationSettingsForm {
    * Change Form's validation enforcement based on service status (active/inactive)
    */
   toggleServiceState() {
-    this.toggleSubmitBtnLabel();
     if (this.formActive) {
       this.$form.removeAttr('novalidate');
     } else if (!this.$form.attr('novalidate')) {
       this.$form.attr('novalidate', 'novalidate');
     }
-  }
-
-  /**
-   * Toggle Submit button label based on Integration status and ability to test service
-   */
-  toggleSubmitBtnLabel() {
-    let btnLabel = __('Save changes');
-
-    if (this.formActive && this.canTestService) {
-      btnLabel = __('Test settings and save changes');
-    }
-
-    this.$submitBtnLabel.text(btnLabel);
   }
 
   /**
@@ -102,6 +92,7 @@ export default class IntegrationSettingsForm {
     if (saveTestActive) {
       this.$submitBtn.disable();
       this.$submitBtnLoader.removeClass('hidden');
+      eventHub.$emit('testComplete');
     } else {
       this.$submitBtn.enable();
       this.$submitBtnLoader.addClass('hidden');

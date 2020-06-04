@@ -53,7 +53,7 @@ RSpec.describe 'User activates GitHub Service' do
           headers: { 'Content-Type' => 'application/json' }
         )
 
-        click_button 'Test settings and save changes'
+        click_link 'Test settings'
 
         expect(page).to have_content('GitHub activated.')
       end
