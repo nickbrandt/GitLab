@@ -120,6 +120,14 @@ module Gitlab
         model.count
       end
 
+      def self.synced_count
+        registry_class.synced.count
+      end
+
+      def self.failed_count
+        registry_class.failed.count
+      end
+
       # @example Given `Geo::PackageFileRegistryFinder`, this returns
       #   `::Geo::PackageFileReplicator`
       # @example Given `Resolver::Geo::PackageFileRegistriesResolver`, this
