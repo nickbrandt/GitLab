@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe RepositoryPushAuditEventWorker do
+RSpec.describe RepositoryPushAuditEventWorker do
   describe '#perform' do
     let(:project) { create(:project, :repository) }
     let(:user) { create(:user) }

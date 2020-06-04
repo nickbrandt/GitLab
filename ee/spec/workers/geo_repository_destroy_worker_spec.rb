@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GeoRepositoryDestroyWorker do
+RSpec.describe GeoRepositoryDestroyWorker do
   describe '#perform' do
     it 'delegates project removal to Geo::RepositoryDestroyService' do
       project = create(:project)

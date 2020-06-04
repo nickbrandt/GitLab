@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StoreSecurityScansWorker do
+RSpec.describe StoreSecurityScansWorker do
   describe '#perform' do
     context 'build has security reports' do
       let(:build) { create(:ci_build, :dast) }

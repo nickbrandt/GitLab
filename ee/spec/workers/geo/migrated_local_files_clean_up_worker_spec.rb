@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw, :use_sql_query_cache_for_tracking_db do
+RSpec.describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw, :use_sql_query_cache_for_tracking_db do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker do
+RSpec.describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker do
   subject { described_class.new }
 
   let!(:user)                { create(:user) }
