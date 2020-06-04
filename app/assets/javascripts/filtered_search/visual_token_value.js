@@ -136,16 +136,21 @@ export default class VisualTokenValue {
     const container = tokenValueContainer;
     const element = tokenValueElement;
     const value = this.tokenValue;
+    let emojiModule;
 
     return (
-      import(/* webpackChunkName: 'emoji' */ '../emoji')
+      import(/* webpackChunkName: 'emoji' */ '~/emoji')
         .then(Emoji => {
-          if (!Emoji.isEmojiNameValid(value)) {
+          emojiModule = Emoji;
+          return Emoji.initEmojiMap();
+        })
+        .then(() => {
+          if (!emojiModule.isEmojiNameValid(value)) {
             return;
           }
 
           container.dataset.originalValue = value;
-          element.innerHTML = Emoji.glEmojiTag(value);
+          element.innerHTML = emojiModule.glEmojiTag(value);
         })
         // ignore error and leave emoji name in the search bar
         .catch(() => {})

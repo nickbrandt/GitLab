@@ -619,10 +619,19 @@ export class AwardsHandler {
 let awardsHandlerPromise = null;
 export default function loadAwardsHandler(reload = false) {
   if (!awardsHandlerPromise || reload) {
-    awardsHandlerPromise = import(/* webpackChunkName: 'emoji' */ './emoji').then(Emoji => {
-      const awardsHandler = new AwardsHandler(Emoji);
-      awardsHandler.bindEvents();
-      return awardsHandler;
+    awardsHandlerPromise = new Promise((resolve, reject) => {
+      let emojiModule;
+      import(/* webpackChunkName: 'emoji' */ '~/emoji')
+        .then(Emoji => {
+          emojiModule = Emoji;
+          return Emoji.initEmojiMap();
+        })
+        .then(() => {
+          const awardsHandler = new AwardsHandler(emojiModule);
+          awardsHandler.bindEvents();
+          resolve(awardsHandler);
+        })
+        .catch(() => reject);
     });
   }
   return awardsHandlerPromise;

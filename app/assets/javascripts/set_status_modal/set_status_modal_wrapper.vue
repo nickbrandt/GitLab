@@ -64,16 +64,21 @@ export default {
       const emojiAutocomplete = new GfmAutoComplete();
       emojiAutocomplete.setup($(this.$refs.statusMessageField), { emojis: true });
 
+      let emojiModule;
       import(/* webpackChunkName: 'emoji' */ '~/emoji')
         .then(Emoji => {
+          emojiModule = Emoji;
+          return Emoji.initEmojiMap();
+        })
+        .then(() => {
           if (this.emoji) {
-            this.emojiTag = Emoji.glEmojiTag(this.emoji);
+            this.emojiTag = emojiModule.glEmojiTag(this.emoji);
           }
           this.noEmoji = this.emoji === '';
-          this.defaultEmojiTag = Emoji.glEmojiTag('speech_balloon');
+          this.defaultEmojiTag = emojiModule.glEmojiTag('speech_balloon');
 
           this.emojiMenu = new EmojiMenuInModal(
-            Emoji,
+            emojiModule,
             toggleEmojiMenuButtonSelector,
             emojiMenuClass,
             this.setEmoji,

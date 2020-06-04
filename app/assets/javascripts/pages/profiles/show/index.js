@@ -55,17 +55,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  let emojiModule;
   import(/* webpackChunkName: 'emoji' */ '~/emoji')
     .then(Emoji => {
+      emojiModule = Emoji;
+      return Emoji.initEmojiMap();
+    })
+    .then(() => {
       const emojiMenu = new EmojiMenu(
-        Emoji,
+        emojiModule,
         toggleEmojiMenuButtonSelector,
         'js-status-emoji-menu',
         selectEmojiCallback,
       );
       emojiMenu.bindEvents();
 
-      const defaultEmojiTag = Emoji.glEmojiTag(defaultStatusEmoji);
+      const defaultEmojiTag = emojiModule.glEmojiTag(defaultStatusEmoji);
       statusMessageField.addEventListener('input', () => {
         const hasStatusMessage = statusMessageField.value.trim() !== '';
         const statusEmoji = findStatusEmoji();

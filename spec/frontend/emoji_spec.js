@@ -1,4 +1,6 @@
-import { glEmojiTag } from '~/emoji';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
+import { initEmojiMap, glEmojiTag, EMOJI_VERSION } from '~/emoji';
 import isEmojiUnicodeSupported, {
   isFlagEmoji,
   isRainbowFlagEmoji,
@@ -7,6 +9,7 @@ import isEmojiUnicodeSupported, {
   isHorceRacingSkinToneComboEmoji,
   isPersonZwjEmoji,
 } from '~/emoji/support/is_emoji_unicode_supported';
+import installGlEmojiElement from '~/behaviors/gl_emoji';
 
 const emptySupportMap = {
   personZwj: false,
@@ -50,15 +53,27 @@ const emojiFixtureMap = {
   },
 };
 
-function markupToDomElement(markup) {
+async function markupToDomElement(markup, enforceUnicodeRedering) {
   const div = document.createElement('div');
   div.innerHTML = markup;
-  return div.firstElementChild;
+  document.body.appendChild(div);
+
+  const glEmojiElementFromMarkup = div.firstElementChild;
+
+  const glEmojiElement = document.createElement('gl-emoji');
+  glEmojiElementFromMarkup.getAttributeNames().forEach(name => {
+    glEmojiElement.setAttribute(name, glEmojiElementFromMarkup.getAttribute(name));
+  });
+  // We need to call the function directly as the normal setup in Jest doesn't work
+  glEmojiElement.initialize(enforceUnicodeRedering);
+  await glEmojiElement.updateComplete;
+
+  return glEmojiElement;
 }
 
-function testGlEmojiImageFallback(element, name, src) {
+function testGlEmojiImageFallback(element, name) {
   expect(element.tagName.toLowerCase()).toBe('img');
-  expect(element.getAttribute('src')).toBe(src);
+  expect(element.getAttribute('src')).toBe(`/-/emojis/${EMOJI_VERSION}/${name}.png`);
   expect(element.getAttribute('title')).toBe(`:${name}:`);
   expect(element.getAttribute('alt')).toBe(`:${name}:`);
 }
@@ -72,8 +87,7 @@ function testGlEmojiElement(element, name, unicodeVersion, unicodeMoji, options 
   const opts = { ...defaults, ...options };
   expect(element.tagName.toLowerCase()).toBe('gl-emoji');
   expect(element.dataset.name).toBe(name);
-  expect(element.dataset.fallbackSrc.length).toBeGreaterThan(0);
-  expect(element.dataset.unicodeVersion).toBe(unicodeVersion);
+  expect(element.dataset.uni).toBe(unicodeVersion);
 
   const fallbackSpriteClass = `emoji-${name}`;
   if (opts.sprite) {
@@ -86,7 +100,7 @@ function testGlEmojiElement(element, name, unicodeVersion, unicodeMoji, options 
 
   if (opts.forceFallback && !opts.sprite) {
     // Check for image fallback
-    testGlEmojiImageFallback(element.firstElementChild, name, element.dataset.fallbackSrc);
+    testGlEmojiImageFallback(element.firstElementChild, name);
   } else {
     // Otherwise make sure things are still unicode text
     expect(element.textContent.trim()).toBe(unicodeMoji);
@@ -94,11 +108,38 @@ function testGlEmojiElement(element, name, unicodeVersion, unicodeMoji, options 
 }
 
 describe('gl_emoji', () => {
+  beforeAll(() => {
+    installGlEmojiElement();
+  });
+
+  let mock;
+  const emojiData = getJSONFixture('emojis/emojis.json');
+
+  beforeEach(done => {
+    mock = new MockAdapter(axios);
+    mock.onGet(`/-/emojis/${EMOJI_VERSION}/emojis.json`).reply(200, emojiData);
+
+    initEmojiMap()
+      .then(() => {
+        done();
+      })
+      .catch(e => {
+        done();
+      });
+  });
+
+  afterEach(() => {
+    mock.restore();
+
+    document.body.innerHTML = '';
+  });
+
   describe('glEmojiTag', () => {
-    it('bomb emoji', () => {
+    it('bomb emoji', async () => {
       const emojiKey = 'bomb';
       const markup = glEmojiTag(emojiFixtureMap[emojiKey].name);
-      const glEmojiElement = markupToDomElement(markup);
+      const glEmojiElement = await markupToDomElement(markup, true);
+
       testGlEmojiElement(
         glEmojiElement,
         emojiFixtureMap[emojiKey].name,
@@ -107,12 +148,12 @@ describe('gl_emoji', () => {
       );
     });
 
-    it('bomb emoji with image fallback', () => {
+    it('bomb emoji with image fallback', async () => {
       const emojiKey = 'bomb';
       const markup = glEmojiTag(emojiFixtureMap[emojiKey].name, {
         forceFallback: true,
       });
-      const glEmojiElement = markupToDomElement(markup);
+      const glEmojiElement = await markupToDomElement(markup);
       testGlEmojiElement(
         glEmojiElement,
         emojiFixtureMap[emojiKey].name,
@@ -124,12 +165,12 @@ describe('gl_emoji', () => {
       );
     });
 
-    it('bomb emoji with sprite fallback readiness', () => {
+    it('bomb emoji with sprite fallback readiness', async () => {
       const emojiKey = 'bomb';
       const markup = glEmojiTag(emojiFixtureMap[emojiKey].name, {
         sprite: true,
       });
-      const glEmojiElement = markupToDomElement(markup);
+      const glEmojiElement = await markupToDomElement(markup);
       testGlEmojiElement(
         glEmojiElement,
         emojiFixtureMap[emojiKey].name,
@@ -141,13 +182,13 @@ describe('gl_emoji', () => {
       );
     });
 
-    it('bomb emoji with sprite fallback', () => {
+    it('bomb emoji with sprite fallback', async () => {
       const emojiKey = 'bomb';
       const markup = glEmojiTag(emojiFixtureMap[emojiKey].name, {
         forceFallback: true,
         sprite: true,
       });
-      const glEmojiElement = markupToDomElement(markup);
+      const glEmojiElement = await markupToDomElement(markup);
       testGlEmojiElement(
         glEmojiElement,
         emojiFixtureMap[emojiKey].name,
@@ -160,11 +201,12 @@ describe('gl_emoji', () => {
       );
     });
 
-    it('question mark when invalid emoji name given', () => {
+    it('question mark when invalid emoji name given', async () => {
       const name = 'invalid_emoji';
       const emojiKey = 'grey_question';
       const markup = glEmojiTag(name);
-      const glEmojiElement = markupToDomElement(markup);
+      const glEmojiElement = await markupToDomElement(markup, true);
+
       testGlEmojiElement(
         glEmojiElement,
         emojiFixtureMap[emojiKey].name,
@@ -173,13 +215,13 @@ describe('gl_emoji', () => {
       );
     });
 
-    it('question mark with image fallback when invalid emoji name given', () => {
+    it('question mark with image fallback when invalid emoji name given', async () => {
       const name = 'invalid_emoji';
       const emojiKey = 'grey_question';
       const markup = glEmojiTag(name, {
         forceFallback: true,
       });
-      const glEmojiElement = markupToDomElement(markup);
+      const glEmojiElement = await markupToDomElement(markup);
       testGlEmojiElement(
         glEmojiElement,
         emojiFixtureMap[emojiKey].name,
