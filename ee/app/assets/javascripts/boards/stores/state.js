@@ -4,4 +4,7 @@ export default () => ({
   ...createStateCE(),
 
   isShowingEpicsSwimlanes: false,
+  epicsSwimlanesFetchInProgress: false,
+  epicsSwimlanesFetchFailure: false,
+  epicsSwimlanes: {},
 });
