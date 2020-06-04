@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Nuget::PackageFinder do
+RSpec.describe Packages::Nuget::PackageFinder do
   let_it_be(:package1) { create(:nuget_package) }
   let_it_be(:project) { package1.project }
   let_it_be(:package2) { create(:nuget_package, name: package1.name, version: '2.0.0', project: project) }

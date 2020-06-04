@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe ::Packages::Npm::PackageFinder do
+RSpec.describe ::Packages::Npm::PackageFinder do
   let(:package) { create(:npm_package) }
   let(:project) { package.project }
   let(:package_name) { package.name }

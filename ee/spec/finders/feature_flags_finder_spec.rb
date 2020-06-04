@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe FeatureFlagsFinder do
+RSpec.describe FeatureFlagsFinder do
   include FeatureFlagHelpers
 
   let(:finder) { described_class.new(project, user, params) }

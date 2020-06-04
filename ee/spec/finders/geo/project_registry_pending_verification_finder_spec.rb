@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::ProjectRegistryPendingVerificationFinder, :geo, :geo_fdw do
+RSpec.describe Geo::ProjectRegistryPendingVerificationFinder, :geo, :geo_fdw do
   describe '#execute' do
     let(:node) { create(:geo_node) }
 

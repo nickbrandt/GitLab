@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AuditLogFinder do
+RSpec.describe AuditLogFinder do
   let_it_be(:group) { create(:group) }
   let_it_be(:subgroup) { create(:group, parent: group) }
   let_it_be(:project) { create(:project, namespace: group) }

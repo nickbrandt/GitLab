@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GroupMembersFinder do
+RSpec.describe GroupMembersFinder do
   subject(:finder) { described_class.new(group) }
 
   let(:group) { create :group }

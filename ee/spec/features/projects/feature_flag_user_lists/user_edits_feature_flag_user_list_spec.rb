@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'User edits feature flag user list', :js do
+RSpec.describe 'User edits feature flag user list', :js do
   let_it_be(:project) { create(:project) }
   let_it_be(:developer) { create(:user) }
 

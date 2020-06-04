@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::JobArtifactRegistryFinder, :geo_fdw do
+RSpec.describe Geo::JobArtifactRegistryFinder, :geo_fdw do
   include ::EE::GeoHelpers
 
   # Using let() instead of set() because set() does not work properly

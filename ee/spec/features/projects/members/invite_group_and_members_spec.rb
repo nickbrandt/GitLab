@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Project > Members > Invite group and members', :js do
+RSpec.describe 'Project > Members > Invite group and members', :js do
   include Select2Helper
   include ActionView::Helpers::DateHelper
 

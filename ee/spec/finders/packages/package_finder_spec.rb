@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Packages::PackageFinder do
+RSpec.describe ::Packages::PackageFinder do
   let_it_be(:project) { create(:project) }
   let_it_be(:maven_package) { create(:maven_package, project: project) }
 

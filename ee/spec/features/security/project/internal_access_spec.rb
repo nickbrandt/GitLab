@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe '[EE] Internal Project Access' do
+RSpec.describe '[EE] Internal Project Access' do
   include AccessMatchers
 
   let_it_be(:project) { create(:project, :internal, :repository) }

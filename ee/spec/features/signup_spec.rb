@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Signup on EE' do
+RSpec.describe 'Signup on EE' do
   let(:user_attrs) { attributes_for(:user) }
 
   context 'for Gitlab.com' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'New group screen', :js do
+RSpec.describe 'New group screen', :js do
   let_it_be(:user) { create(:user) }
 
   before do

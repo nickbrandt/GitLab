@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe "User creates issue", :js do
+RSpec.describe "User creates issue", :js do
   let(:project) { create(:project_empty_repo, :public) }
   let(:user) { create(:user) }
 

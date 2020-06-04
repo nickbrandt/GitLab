@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'EE > Projects > Settings > User manages approval rule settings' do
+RSpec.describe 'EE > Projects > Settings > User manages approval rule settings' do
   let(:project) { create(:project) }
   let(:user) { project.owner }
   let(:path) { edit_project_path(project) }

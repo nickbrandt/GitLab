@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'User activates GitHub Service' do
+RSpec.describe 'User activates GitHub Service' do
   include_context 'project service activation'
 
   context 'without a license' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe RequirementsManagement::RequirementsFinder do
+RSpec.describe RequirementsManagement::RequirementsFinder do
   let_it_be(:project) { create(:project) }
   let_it_be(:project_user) { create(:user, username: 'projectusername').tap { |u| project.add_developer(u) } }
   let_it_be(:other_user) { create(:user, username: 'otheruser123') }

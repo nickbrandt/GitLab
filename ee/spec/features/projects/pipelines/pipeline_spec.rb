@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Pipeline', :js do
+RSpec.describe 'Pipeline', :js do
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository) }
 

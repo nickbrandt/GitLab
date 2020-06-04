@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Responses' do
+RSpec.describe 'Responses' do
   it 'Shows a friendly message' do
     visit survey_responses_path
 

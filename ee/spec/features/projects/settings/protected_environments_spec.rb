@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Protected Environments' do
+RSpec.describe 'Protected Environments' do
   let(:project) { create(:project, :repository) }
   let(:user) { create(:user) }
   let(:environments) { %w(production development staging test) }
