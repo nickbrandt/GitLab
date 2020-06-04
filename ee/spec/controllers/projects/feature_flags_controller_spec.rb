@@ -1427,6 +1427,39 @@ RSpec.describe Projects::FeatureFlagsController do
         }])
       end
 
+      it 'automatically dissociates the user list when switching the type of an existing gitlabUserList strategy' do
+        user_list = create(:operations_feature_flag_user_list, project: project, name: 'My List', user_xids: 'user1,user2')
+        strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'gitlabUserList', parameters: {}, user_list: user_list)
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          iid: new_version_flag.iid,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              id: strategy.id,
+              name: 'gradualRolloutUserId',
+              parameters: {
+                groupId: 'default',
+                percentage: '25'
+              }
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies']).to eq([{
+          'id' => strategy.id,
+          'name' => 'gradualRolloutUserId',
+          'parameters' => {
+            'groupId' => 'default',
+            'percentage' => '25'
+          },
+          'scopes' => []
+        }])
+      end
+
       it 'does not delete a user list when deleting a gitlabUserList strategy' do
         user_list = create(:operations_feature_flag_user_list, project: project, name: 'My List', user_xids: 'user1,user2')
         strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'gitlabUserList', parameters: {}, user_list: user_list)
