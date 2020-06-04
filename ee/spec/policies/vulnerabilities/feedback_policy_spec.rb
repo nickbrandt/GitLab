@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::FeedbackPolicy do
+RSpec.describe Vulnerabilities::FeedbackPolicy do
   include ExternalAuthorizationServiceHelpers
 
   let(:current_user) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::Scanner do
+RSpec.describe Vulnerabilities::Scanner do
   describe 'associations' do
     it { is_expected.to have_many(:occurrences).class_name('Vulnerabilities::Occurrence') }
     it { is_expected.to belong_to(:project) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Query.vulnerabilities.location' do
+RSpec.describe 'Query.vulnerabilities.location' do
   include GraphqlHelpers
 
   subject { graphql_data.dig('vulnerabilities', 'nodes') }

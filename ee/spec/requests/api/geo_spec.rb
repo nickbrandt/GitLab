@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Geo do
+RSpec.describe API::Geo do
   include TermsHelper
   include ApiHelpers
   include ::EE::GeoHelpers

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Security::ConfigurationPresenter do
+RSpec.describe Projects::Security::ConfigurationPresenter do
   include Gitlab::Routing.url_helpers
 
   let(:project) { create(:project, :repository) }

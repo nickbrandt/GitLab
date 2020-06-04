@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe RequirementsManagement::TestReport do
+RSpec.describe RequirementsManagement::TestReport do
   describe 'associations' do
     subject { build(:test_report) }
 

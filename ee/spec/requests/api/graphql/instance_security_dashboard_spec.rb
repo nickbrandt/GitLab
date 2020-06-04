@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Query.instanceSecurityDashboard.projects' do
+RSpec.describe 'Query.instanceSecurityDashboard.projects' do
   include GraphqlHelpers
 
   let_it_be(:project) { create(:project) }

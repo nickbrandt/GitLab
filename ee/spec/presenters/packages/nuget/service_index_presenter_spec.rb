@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Packages::Nuget::ServiceIndexPresenter do
+RSpec.describe ::Packages::Nuget::ServiceIndexPresenter do
   let_it_be(:project) { create(:project) }
   let_it_be(:presenter) { described_class.new(project) }
 

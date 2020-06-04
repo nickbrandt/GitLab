@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ContainerExpirationPolicyPolicy do
+RSpec.describe ContainerExpirationPolicyPolicy do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:user) { create(:user) }

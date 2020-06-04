@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Packages::Detail::PackagePresenter do
+RSpec.describe ::Packages::Detail::PackagePresenter do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project, creator: user) }
   let_it_be(:package) { create(:npm_package, :with_build, project: project) }

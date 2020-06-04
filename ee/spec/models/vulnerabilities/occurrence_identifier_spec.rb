@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::OccurrenceIdentifier do
+RSpec.describe Vulnerabilities::OccurrenceIdentifier do
   describe 'associations' do
     it { is_expected.to belong_to(:identifier).class_name('Vulnerabilities::Identifier') }
     it { is_expected.to belong_to(:occurrence).class_name('Vulnerabilities::Occurrence') }

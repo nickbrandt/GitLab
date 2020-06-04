@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GroupPolicy do
+RSpec.describe GroupPolicy do
   include_context 'GroupPolicy context'
 
   context 'when epics feature is disabled' do

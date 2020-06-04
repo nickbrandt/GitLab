@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Upload do
+RSpec.describe Upload do
   include EE::GeoHelpers
 
   describe '#destroy' do

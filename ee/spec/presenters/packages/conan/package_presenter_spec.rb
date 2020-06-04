@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Packages::Conan::PackagePresenter do
+RSpec.describe ::Packages::Conan::PackagePresenter do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
   let_it_be(:conan_package_reference) { '123456789'}

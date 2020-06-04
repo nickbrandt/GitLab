@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe IdentityProviderPolicy do
+RSpec.describe IdentityProviderPolicy do
   subject(:policy) { described_class.new(user, :a_provider) }
 
   describe '#rules' do

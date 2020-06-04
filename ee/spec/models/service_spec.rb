@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Service do
+RSpec.describe Service do
   describe 'Available services' do
     let(:ee_services) do
       %w(

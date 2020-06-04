@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::IssueLinkPolicy do
+RSpec.describe Vulnerabilities::IssueLinkPolicy do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project, namespace: user.namespace) }
   let(:vulnerability) { create(:vulnerability, project: project) }

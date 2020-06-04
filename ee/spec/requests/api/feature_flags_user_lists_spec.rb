@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::FeatureFlagsUserLists do
+RSpec.describe API::FeatureFlagsUserLists do
   let_it_be(:project) { create(:project) }
   let_it_be(:developer) { create(:user) }
   let_it_be(:reporter) { create(:user) }

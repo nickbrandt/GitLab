@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Epics do
+RSpec.describe API::Epics do
   let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, group: group) }

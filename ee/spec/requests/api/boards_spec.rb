@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Boards do
+RSpec.describe API::Boards do
   let_it_be(:user) { create(:user) }
   let_it_be(:board_parent) { create(:project, :public, creator_id: user.id, namespace: user.namespace ) }
   let_it_be(:milestone) { create(:milestone, project: board_parent) }

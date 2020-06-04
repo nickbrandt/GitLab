@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Clusters::ClusterPresenter do
+RSpec.describe Clusters::ClusterPresenter do
   include Gitlab::Routing.url_helpers
 
   describe '#health_data' do
