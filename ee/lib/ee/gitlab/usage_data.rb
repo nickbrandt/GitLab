@@ -256,15 +256,15 @@ module EE
             projects_imported_from_github: distinct_count(::Project.github_imported.where(time_period), :creator_id),
             projects_with_repositories_enabled: distinct_count(::Project.with_repositories_enabled.where(time_period),
                                                                :creator_id,
-                                                               start: user_minimum,
-                                                               finish: user_maximum),
-            protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id, start: user_minimum, finish: user_maximum),
+                                                               start: user_minimum_id,
+                                                               finish: user_maximum_id),
+            protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id, start: user_minimum_id, finish: user_maximum_id),
             remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
             snippets: distinct_count(::Snippet.where(time_period), :author_id),
             suggestions: distinct_count(::Note.with_suggestions.where(time_period),
                                         :author_id,
-                                        start: user_minimum,
-                                        finish: user_maximum)
+                                        start: user_minimum_id,
+                                        finish: user_maximum_id)
           }
         end
 
@@ -377,8 +377,8 @@ module EE
         private
 
         def distinct_count_service_desk_enabled_projects(time_period)
-          project_creator_id_start = user_minimum
-          project_creator_id_finish = user_maximum
+          project_creator_id_start = user_minimum_id
+          project_creator_id_finish = user_maximum_id
 
           distinct_count(::Project.service_desk_enabled.where(time_period), :creator_id, start: project_creator_id_start, finish: project_creator_id_finish)
         end
