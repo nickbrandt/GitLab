@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'benchmark/ips'
 
-describe Gitlab::Ci::Reports::DependencyList::Report do
+RSpec.describe Gitlab::Ci::Reports::DependencyList::Report do
   let(:report) { described_class.new }
 
   describe '#add_dependency' do

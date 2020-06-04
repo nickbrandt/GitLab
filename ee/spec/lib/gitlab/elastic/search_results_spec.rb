@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inline do
+RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inline do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end

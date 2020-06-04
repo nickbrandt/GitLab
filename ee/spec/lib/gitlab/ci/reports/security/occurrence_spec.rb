@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Reports::Security::Occurrence do
+RSpec.describe Gitlab::Ci::Reports::Security::Occurrence do
   describe '#initialize' do
     subject { described_class.new(**params) }
 

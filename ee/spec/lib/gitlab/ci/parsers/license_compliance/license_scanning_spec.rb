@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
+RSpec.describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
   describe '#parse!' do
     let(:report) { Gitlab::Ci::Reports::LicenseScanning::Report.new }
 

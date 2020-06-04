@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Elastic::GroupSearchResults do
+RSpec.describe Gitlab::Elastic::GroupSearchResults do
   subject(:results) { described_class.new(user, nil, nil, group, query, nil) }
 
   let_it_be(:user) { create(:user) }

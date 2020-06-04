@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::GroupSaml::GmaMembershipEnforcer do
+RSpec.describe Gitlab::Auth::GroupSaml::GmaMembershipEnforcer do
   include ProjectForksHelper
 
   let_it_be(:group) { create(:group_with_managed_accounts, :private) }

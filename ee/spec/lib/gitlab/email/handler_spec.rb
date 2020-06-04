@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Email::Handler do
+RSpec.describe Gitlab::Email::Handler do
   before do
     stub_incoming_email_setting(enabled: true, address: "incoming+%{key}@appmail.adventuretime.ooo")
     stub_config_setting(host: 'localhost')

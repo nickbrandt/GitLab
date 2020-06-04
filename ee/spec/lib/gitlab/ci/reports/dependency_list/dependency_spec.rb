@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Reports::DependencyList::Dependency do
+RSpec.describe Gitlab::Ci::Reports::DependencyList::Dependency do
   let(:dependency_nokogiri) { build(:dependency, :nokogiri, :with_vulnerabilities) }
 
   context 'initialize' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::Smartcard::LdapCertificate do
+RSpec.describe Gitlab::Auth::Smartcard::LdapCertificate do
   let(:certificate_header) { 'certificate' }
   let(:openssl_certificate_store) { instance_double(OpenSSL::X509::Store) }
   let(:user_build_service) { instance_double(Users::BuildService) }

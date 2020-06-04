@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::ExpiringSubscriptionMessage do
+RSpec.describe Gitlab::ExpiringSubscriptionMessage do
   include ActionView::Helpers::SanitizeHelper
 
   describe 'message' do

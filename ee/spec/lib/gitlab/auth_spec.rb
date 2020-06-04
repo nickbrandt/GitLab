@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth do
+RSpec.describe Gitlab::Auth do
   let(:gl_auth) { described_class }
   let!(:user) do
     create(:user,

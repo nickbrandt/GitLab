@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Elastic::Client do
+RSpec.describe Gitlab::Elastic::Client do
   let(:creds_valid_response) do
     '{
       "Code": "Success",

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::Fdw::UploadRegistryQueryBuilder, :geo, :geo_fdw do
+RSpec.describe Gitlab::Geo::Fdw::UploadRegistryQueryBuilder, :geo, :geo_fdw do
   let(:project) { create(:project) }
   let(:upload_1) { create(:upload, :issuable_upload, model: project) }
   let(:upload_2) { create(:upload, :issuable_upload, model: project) }

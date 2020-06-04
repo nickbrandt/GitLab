@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Reports::Security::Reports do
+RSpec.describe Gitlab::Ci::Reports::Security::Reports do
   let(:commit_sha) { '20410773a37f49d599e5f0d45219b39304763538' }
   let(:security_reports) { described_class.new(commit_sha) }
   let(:artifact) { create(:ee_ci_job_artifact, :sast) }
