@@ -31,6 +31,8 @@ module Gitlab
           config.sanitize_http_headers = %w[Authorization Private-Token]
           config.tags = { program: Gitlab.process_name }
           config.before_send = method(:before_send)
+
+          yield config if block_given?
         end
       end
 
