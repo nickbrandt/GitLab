@@ -1,5 +1,21 @@
 # frozen_string_literal: true
 
+RSpec.shared_examples 'Composer package creation' do |user_type, status, add_member = true|
+  context "for user type #{user_type}" do
+    before do
+      group.send("add_#{user_type}", user) if add_member && user_type != :anonymous
+      project.send("add_#{user_type}", user) if add_member && user_type != :anonymous
+    end
+
+    it 'creates package files' do
+      expect { subject }
+          .to change { project.packages.composer.count }.by(1)
+
+      expect(response).to have_gitlab_http_status(status)
+    end
+  end
+end
+
 RSpec.shared_examples 'process Composer api request' do |user_type, status, add_member = true|
   context "for user type #{user_type}" do
     before do

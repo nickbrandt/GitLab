@@ -86,6 +86,7 @@ module API
       params do
         optional :branch, type: String, desc: 'The name of the branch'
         optional :tag, type: String, desc: 'The name of the tag'
+        exactly_one_of :tag, :branch
       end
 
       namespace ':id/packages/composer' do
@@ -93,12 +94,16 @@ module API
           authorize_create_package!(authorized_user_project)
 
           if params[:branch].present?
-            find_branch!(params[:branch])
+            params[:branch] = find_branch!(params[:branch])
           elsif params[:tag].present?
-            find_tag!(params[:tag])
+            params[:tag] = find_tag!(params[:tag])
           else
             bad_request!
           end
+
+          ::Packages::Composer::CreatePackageService
+            .new(authorized_user_project, current_user, declared_params)
+            .execute
 
           created!
         end
