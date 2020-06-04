@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Config do
+RSpec.describe Gitlab::Ci::Config do
   let(:template_name) { 'test_template' }
   let(:template_repository) { create(:project, :custom_repo, files: { "gitlab-ci/#{template_name}.yml" => template_yml }) }
 

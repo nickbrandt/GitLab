@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::API::Entities::Nuget::Metadatum do
+RSpec.describe EE::API::Entities::Nuget::Metadatum do
   let(:metadatum) do
     {
       project_url: 'http://sandbox.com/project',

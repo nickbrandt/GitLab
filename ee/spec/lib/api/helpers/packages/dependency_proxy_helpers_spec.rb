@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Helpers::Packages::DependencyProxyHelpers do
+RSpec.describe API::Helpers::Packages::DependencyProxyHelpers do
   let_it_be(:helper) { Class.new.include(described_class).new }
 
   describe 'redirect_registry_request' do

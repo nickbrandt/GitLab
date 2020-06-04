@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Analytics::CycleAnalytics::BaseQueryBuilder do
+RSpec.describe Gitlab::Analytics::CycleAnalytics::BaseQueryBuilder do
   let_it_be(:group) { create(:group) }
   let_it_be(:subgroup) { create(:group, parent: group) }
   let_it_be(:project_in_group) { create(:project, :repository, group: group) }

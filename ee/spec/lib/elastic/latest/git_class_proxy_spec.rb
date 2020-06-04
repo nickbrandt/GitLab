@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Elastic::Latest::GitClassProxy do
+RSpec.describe Elastic::Latest::GitClassProxy do
   let_it_be(:project) { create(:project, :repository) }
   let(:included_class) { Elastic::Latest::RepositoryClassProxy }
 

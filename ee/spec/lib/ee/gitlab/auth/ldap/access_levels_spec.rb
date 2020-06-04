@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Gitlab::Auth::Ldap::AccessLevels do
+RSpec.describe EE::Gitlab::Auth::Ldap::AccessLevels do
   describe '#set' do
     let(:access_levels) { described_class.new }
     let(:dns) do

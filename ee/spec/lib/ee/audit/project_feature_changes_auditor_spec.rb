@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Audit::ProjectFeatureChangesAuditor do
+RSpec.describe EE::Audit::ProjectFeatureChangesAuditor do
   describe '#execute' do
     let!(:user) { create(:user) }
     let!(:project) { create(:project, :pages_enabled, visibility_level: 0) }

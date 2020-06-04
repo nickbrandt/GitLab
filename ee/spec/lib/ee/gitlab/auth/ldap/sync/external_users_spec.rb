@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Gitlab::Auth::Ldap::Sync::ExternalUsers do
+RSpec.describe EE::Gitlab::Auth::Ldap::Sync::ExternalUsers do
   include LdapHelpers
 
   describe '#update_permissions' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Gitlab::Auth::Ldap::Group do
+RSpec.describe EE::Gitlab::Auth::Ldap::Group do
   include LdapHelpers
 
   before do
