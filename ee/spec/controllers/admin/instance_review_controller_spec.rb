@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::InstanceReviewController do
+RSpec.describe Admin::InstanceReviewController do
   include UsageDataHelpers
 
   let(:admin) { create(:admin) }

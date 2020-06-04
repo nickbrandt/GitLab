@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::ClustersController do
+RSpec.describe Projects::ClustersController do
   let_it_be(:project) { create(:project) }
 
   it_behaves_like 'cluster metrics' do

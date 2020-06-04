@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::ThreatMonitoringController do
+RSpec.describe Projects::ThreatMonitoringController do
   let_it_be(:project) { create(:project, :repository, :private) }
   let_it_be(:user) { create(:user) }
 

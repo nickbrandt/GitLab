@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::ClustersController do
+RSpec.describe Groups::ClustersController do
   include AccessMatchersForController
 
   let_it_be(:group) { create(:group) }

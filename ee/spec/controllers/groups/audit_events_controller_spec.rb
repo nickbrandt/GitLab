@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::AuditEventsController do
+RSpec.describe Groups::AuditEventsController do
   let(:user) { create(:user) }
   let(:owner) { create(:user) }
   let(:group) { create(:group, :private) }

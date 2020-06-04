@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::Security::ComplianceDashboardsController do
+RSpec.describe Groups::Security::ComplianceDashboardsController do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::Security::VulnerableProjectsController do
+RSpec.describe Groups::Security::VulnerableProjectsController do
   let(:group) { create(:group) }
   let(:user) { create(:user) }
 

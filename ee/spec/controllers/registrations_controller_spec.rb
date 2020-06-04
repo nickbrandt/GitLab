@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe RegistrationsController do
+RSpec.describe RegistrationsController do
   describe '#create' do
     context 'when the user opted-in' do
       let(:user_params) { { user: attributes_for(:user, email_opted_in: '1') } }

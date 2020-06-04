@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SurveyResponsesController do
+RSpec.describe SurveyResponsesController do
   describe 'GET #index' do
     subject { get :index, params: params }
 

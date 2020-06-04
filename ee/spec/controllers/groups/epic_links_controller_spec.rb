@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::EpicLinksController do
+RSpec.describe Groups::EpicLinksController do
   let(:group) { create(:group, :public) }
   let(:parent_epic) { create(:epic, group: group) }
   let(:epic1) { create(:epic, group: group) }

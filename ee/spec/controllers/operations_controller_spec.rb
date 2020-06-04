@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe OperationsController do
+RSpec.describe OperationsController do
   include Rails.application.routes.url_helpers
 
   let(:user) { create(:user) }

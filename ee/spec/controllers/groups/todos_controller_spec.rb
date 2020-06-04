@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::TodosController do
+RSpec.describe Groups::TodosController do
   let(:user)   { create(:user) }
   let(:group)  { create(:group, :private) }
   let(:epic)   { create(:epic, group: group) }

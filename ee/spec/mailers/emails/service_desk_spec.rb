@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'email_spec'
 
-describe Emails::ServiceDesk do
+RSpec.describe Emails::ServiceDesk do
   include EmailSpec::Helpers
   include EmailSpec::Matchers
   include EmailHelpers

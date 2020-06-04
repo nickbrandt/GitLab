@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::AuditEventsController do
+RSpec.describe Projects::AuditEventsController do
   let(:user) { create(:user) }
   let(:maintainer) { create(:user) }
   let(:project) { create(:project, :private) }

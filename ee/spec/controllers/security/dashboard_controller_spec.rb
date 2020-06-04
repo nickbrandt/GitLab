@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::DashboardController do
+RSpec.describe Security::DashboardController do
   describe 'GET #show' do
     it_behaves_like Security::ApplicationController do
       let(:security_application_controller_child_action) do

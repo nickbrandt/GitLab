@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::EpicsController do
+RSpec.describe Groups::EpicsController do
   let(:group) { create(:group, :private) }
   let(:epic) { create(:epic, group: group) }
   let(:user)  { create(:user) }

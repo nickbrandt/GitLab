@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::TracingsController do
+RSpec.describe Projects::TracingsController do
   let_it_be(:user) { create(:user) }
 
   describe 'GET show' do

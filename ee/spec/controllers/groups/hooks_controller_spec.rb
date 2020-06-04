@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::HooksController do
+RSpec.describe Groups::HooksController do
   let(:user)  { create(:user) }
   let(:group) { create(:group) }
 

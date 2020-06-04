@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::EnvironmentsController do
+RSpec.describe Projects::EnvironmentsController do
   include KubernetesHelpers
 
   let_it_be(:user) { create(:user) }

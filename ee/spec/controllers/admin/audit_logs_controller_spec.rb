@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::AuditLogsController do
+RSpec.describe Admin::AuditLogsController do
   let(:admin) { create(:admin) }
 
   describe 'GET #index' do

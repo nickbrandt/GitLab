@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::AutocompleteSourcesController do
+RSpec.describe Groups::AutocompleteSourcesController do
   let(:user) { create(:user) }
   let(:group) { create(:group, :private) }
   let!(:epic) { create(:epic, group: group) }

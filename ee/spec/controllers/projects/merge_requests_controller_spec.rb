@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-shared_examples 'approvals' do
+RSpec.shared_examples 'approvals' do
   let!(:approver) { create(:user) }
   let!(:approval_rule) { create(:approval_project_rule, project: project, users: [approver, user], approvals_required: 2) }
 
@@ -90,7 +90,7 @@ shared_examples 'approvals' do
   end
 end
 
-shared_examples 'authorize read pipeline' do
+RSpec.shared_examples 'authorize read pipeline' do
   context 'public project with private builds' do
     let(:comparison_status) { {} }
     let(:project) { create(:project, :public, :builds_private) }
@@ -113,7 +113,7 @@ shared_examples 'authorize read pipeline' do
   end
 end
 
-describe Projects::MergeRequestsController do
+RSpec.describe Projects::MergeRequestsController do
   include ProjectForksHelper
 
   let(:project)       { create(:project, :repository) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::UsersController do
+RSpec.describe Admin::UsersController do
   let(:admin) { create(:admin) }
   let(:user) { create(:user) }
 

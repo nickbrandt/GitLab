@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::PushRulesController do
+RSpec.describe Projects::PushRulesController do
   let(:project) { create(:project, push_rule: create(:push_rule, prevent_secrets: false)) }
   let(:user) { create(:user) }
 

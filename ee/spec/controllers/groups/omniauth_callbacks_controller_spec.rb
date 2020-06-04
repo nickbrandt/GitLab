@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::OmniauthCallbacksController do
+RSpec.describe Groups::OmniauthCallbacksController do
   include LoginHelpers
   include ForgeryProtection
 

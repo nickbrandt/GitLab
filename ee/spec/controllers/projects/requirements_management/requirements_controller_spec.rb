@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::RequirementsManagement::RequirementsController do
+RSpec.describe Projects::RequirementsManagement::RequirementsController do
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { create(:user) }
 
