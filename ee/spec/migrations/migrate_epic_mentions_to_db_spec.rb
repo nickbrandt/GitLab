@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191115115043_migrate_epic_mentions_to_db')
 
-describe MigrateEpicMentionsToDb, :migration do
+RSpec.describe MigrateEpicMentionsToDb, :migration do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:epics) { table(:epics) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::SubscriptionPortal::Client do
+RSpec.describe Gitlab::SubscriptionPortal::Client do
   let(:http_response) { nil }
   let(:httparty_response) do
     double(code: http_response.code, response: http_response, body: {}, parsed_response: {})

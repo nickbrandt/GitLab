@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Jira::Dvcs do
+RSpec.describe Gitlab::Jira::Dvcs do
   describe '.encode_slash' do
     it 'replaces slash character' do
       expect(described_class.encode_slash('a/b/c')).to eq('a@b@c')

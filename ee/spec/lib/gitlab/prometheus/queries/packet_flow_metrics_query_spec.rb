@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Prometheus::Queries::PacketFlowMetricsQuery do
+RSpec.describe Gitlab::Prometheus::Queries::PacketFlowMetricsQuery do
   let(:namespace) { 'query-12345678-production' }
   let(:query_response) do
     [

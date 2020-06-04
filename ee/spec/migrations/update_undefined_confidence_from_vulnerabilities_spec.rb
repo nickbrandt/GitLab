@@ -4,7 +4,7 @@ require 'spec_helper'
 
 require Rails.root.join('db', 'post_migrate', '20200511092714_update_undefined_confidence_from_vulnerabilities.rb')
 
-describe UpdateUndefinedConfidenceFromVulnerabilities, :migration do
+RSpec.describe UpdateUndefinedConfidenceFromVulnerabilities, :migration do
   let(:vulnerabilities) { table(:vulnerabilities) }
   let(:identifiers) { table(:vulnerability_identifiers) }
   let(:projects) { table(:projects) }

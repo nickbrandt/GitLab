@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::ServiceDeskEmail do
+RSpec.describe Gitlab::ServiceDeskEmail do
   describe '.enabled?' do
     context 'when service_desk_email is enabled and address is set' do
       before do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Jira::Middleware do
+RSpec.describe Gitlab::Jira::Middleware do
   let(:app) { double(:app) }
   let(:middleware) { described_class.new(app) }
   let(:jira_user_agent) { 'Jira DVCS Connector Vertigo/5.0.0-D20170810T012915' }

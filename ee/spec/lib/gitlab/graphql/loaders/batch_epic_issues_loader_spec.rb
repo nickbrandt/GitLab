@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Graphql::Loaders::BatchEpicIssuesLoader do
+RSpec.describe Gitlab::Graphql::Loaders::BatchEpicIssuesLoader do
   describe '#find' do
     let_it_be(:user) { create(:user) }
     let_it_be(:group) { create(:group) }

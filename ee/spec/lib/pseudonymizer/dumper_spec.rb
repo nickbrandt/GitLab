@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Pseudonymizer::Dumper do
+RSpec.describe Pseudonymizer::Dumper do
   let!(:project) { create(:project) }
   let(:base_dir) { Dir.mktmpdir }
   let(:options) do

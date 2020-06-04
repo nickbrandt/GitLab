@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Vulnerabilities::Summary do
+RSpec.describe Gitlab::Vulnerabilities::Summary do
   let(:group) { create(:group) }
   let(:project1) { create(:project, :public, namespace: group) }
   let(:project2) { create(:project, :public, namespace: group) }
