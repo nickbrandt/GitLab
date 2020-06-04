@@ -20,12 +20,15 @@ export default el => {
     commentDetail,
     triggerEvents,
     fields,
+    cancelPath,
+    testPath,
     helpHtml,
     ...booleanAttributes
   } = el.dataset;
   const {
     showActive,
     activated,
+    canTest,
     commitEvents,
     mergeRequestEvents,
     enableComments,
@@ -39,6 +42,9 @@ export default el => {
           activeToggleProps: {
             initialActivated: activated,
           },
+          cancelPath,
+          canTest,
+          testPath,
           helpHtml,
           showActive,
           type,

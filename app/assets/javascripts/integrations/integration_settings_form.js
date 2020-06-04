@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import axios from '../lib/utils/axios_utils';
+import { serializeForm } from '~/lib/utils/forms';
 import flash from '../flash';
 import { __ } from '~/locale';
 import initForm from './edit';
@@ -26,6 +27,10 @@ export default class IntegrationSettingsForm {
     eventHub.$on('toggle', active => {
       this.formActive = active;
       this.handleServiceToggle();
+    });
+
+    eventHub.$on('test', () => {
+      this.testSettings(serializeForm(this.$form[0]));
     });
 
     // Bind Event Listeners
