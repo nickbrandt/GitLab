@@ -33,6 +33,7 @@ module Prometheus
       return ServiceResponse.error(message: 'Invalid environment') unless environment
 
       create_alerts
+      schedule_prometheus_update
 
       ServiceResponse.success
     end
@@ -48,6 +49,13 @@ module Prometheus
         next unless metric
 
         create_alert(alert: alert_hash, metric: metric)
+      end
+    end
+
+    def schedule_prometheus_update
+      project.all_clusters.with_application_prometheus.each do |cluster|
+        application = cluster.application_prometheus
+        ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
       end
     end
 

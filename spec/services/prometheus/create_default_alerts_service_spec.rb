@@ -45,6 +45,27 @@ describe Prometheus::CreateDefaultAlertsService do
            .by(expected_alerts.size)
         end
 
+        it 'does not schedule an update to prometheus' do
+          expect(::Clusters::Applications::ScheduleUpdateService).not_to receive(:new)
+          execute
+        end
+
+        context 'cluster with prometheus exists' do
+          let!(:cluster) do
+            cluster = create(:cluster, :with_installed_prometheus)
+            cluster.projects << project
+            cluster
+          end
+
+          it 'schedules an update to prometheus' do
+            expect_next_instance_of(::Clusters::Applications::ScheduleUpdateService) do |instance|
+              expect(instance).to receive(:execute)
+            end
+
+            execute
+          end
+        end
+
         context 'multiple environments' do
           let!(:production) { create(:environment, project: project, name: 'production') }
 
