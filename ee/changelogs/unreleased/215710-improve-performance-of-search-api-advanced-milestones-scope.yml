@@ -1,0 +1,5 @@
+---
+title: Fix N+1 queries for Elastic Search milestones scope.
+merge_request: 33327
+author:
+type: performance
