@@ -802,7 +802,7 @@ templating:
 
 ###### Full syntax
 
-This example creates a variable called `variable1`, with a default value of `var1_option_2`.
+This example creates a variable called `variable1`, with a default value of `value_option_2`.
 The label for the text box on the UI will be the value of the `label` key.
 The dashboard UI will display a dropdown with `Option 1` and `Option 2`
 as the choices.
