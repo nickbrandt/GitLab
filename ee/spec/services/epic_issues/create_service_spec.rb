@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicIssues::CreateService do
+RSpec.describe EpicIssues::CreateService do
   describe '#execute' do
     let(:group) { create(:group) }
     let(:epic) { create(:epic, group: group) }

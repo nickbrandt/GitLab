@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::FileRegistryRemovalService, :geo do
+RSpec.describe Geo::FileRegistryRemovalService, :geo do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 

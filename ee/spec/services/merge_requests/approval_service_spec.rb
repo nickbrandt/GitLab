@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::ApprovalService do
+RSpec.describe MergeRequests::ApprovalService do
   describe '#execute' do
     let(:user)          { create(:user) }
     let(:merge_request) { create(:merge_request) }

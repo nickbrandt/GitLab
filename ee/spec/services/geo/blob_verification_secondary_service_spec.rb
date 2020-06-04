@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::BlobVerificationSecondaryService, :geo do
+RSpec.describe Geo::BlobVerificationSecondaryService, :geo do
   include ::EE::GeoHelpers
 
   let(:secondary) { create(:geo_node) }

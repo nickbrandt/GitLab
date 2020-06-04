@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeTrains::RefreshMergeRequestService do
+RSpec.describe MergeTrains::RefreshMergeRequestService do
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:maintainer) { create(:user) }
   let(:service) { described_class.new(project, maintainer, require_recreate: require_recreate) }

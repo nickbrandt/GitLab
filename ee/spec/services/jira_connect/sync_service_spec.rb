@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe JiraConnect::SyncService do
+RSpec.describe JiraConnect::SyncService do
   describe '#execute' do
     let_it_be(:project) { create(:project, :repository) }
     let(:branches) { [project.repository.find_branch('master')] }

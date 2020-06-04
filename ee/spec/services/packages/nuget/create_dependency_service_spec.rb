@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Nuget::CreateDependencyService do
+RSpec.describe Packages::Nuget::CreateDependencyService do
   let_it_be(:package, reload: true) { create(:nuget_package) }
 
   describe '#execute' do

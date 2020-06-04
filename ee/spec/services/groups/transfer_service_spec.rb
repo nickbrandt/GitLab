@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::TransferService, '#execute' do
+RSpec.describe Groups::TransferService, '#execute' do
   let(:user) { create(:user) }
   let(:group) { create(:group, :public) }
   let(:project) { create(:project, :public, namespace: group) }

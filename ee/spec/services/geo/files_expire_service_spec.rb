@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::FilesExpireService, :geo, :geo_fdw do
+RSpec.describe Geo::FilesExpireService, :geo, :geo_fdw do
   let(:project) { create(:project, :legacy_storage) }
   let!(:old_full_path) { project.full_path }
 

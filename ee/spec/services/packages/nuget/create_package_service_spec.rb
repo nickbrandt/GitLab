@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Nuget::CreatePackageService do
+RSpec.describe Packages::Nuget::CreatePackageService do
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { create(:user) }
   let_it_be(:params) { {} }

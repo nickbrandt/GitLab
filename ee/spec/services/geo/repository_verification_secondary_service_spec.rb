@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::RepositoryVerificationSecondaryService, :geo do
+RSpec.describe Geo::RepositoryVerificationSecondaryService, :geo do
   include ::EE::GeoHelpers
 
   shared_examples 'verify checksums for repositories/wikis' do |type|

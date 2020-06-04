@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::RemoveApprovalService do
+RSpec.describe MergeRequests::RemoveApprovalService do
   describe '#execute' do
     let(:user) { create(:user) }
     let(:project) { create(:project, approvals_before_merge: 1) }

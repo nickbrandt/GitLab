@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Elastic::IndexRecordService, :elastic do
+RSpec.describe Elastic::IndexRecordService, :elastic do
   subject { described_class.new }
 
   # Create admin user and search globally to avoid dealing with permissions in
