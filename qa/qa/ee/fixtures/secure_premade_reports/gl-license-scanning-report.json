@@ -1,42 +1,39 @@
 {
-    "licenses": [
-        {
-            "count": 1,
-            "name": "WTFPL"
-        },
-        {
-            "count": 1,
-            "name": "MIT"
-        }
+    "version": "2.0",
+    "licenses": [{
+      "id": "WTFPL",
+      "name": "WTFPL",
+      "url": "http://www.wtfpl.net/",
+      "count": 1
+    },
+      {
+        "id": "MIT",
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+        "count": 1
+      }
     ],
-    "dependencies": [
-        {
-            "license": {
-                "name": "MIT",
-                "url": "http://opensource.org/licenses/mit-license"
-            },
-            "dependency": {
-                "name": "actioncable",
-                "url": "http://rubyonrails.org",
-                "description": "WebSocket framework for Rails.",
-                "paths": [
-                    "."
-                ]
-            }
-        },
-        {
-            "license": {
-                "name": "WTFPL",
-                "url": "http://www.wtfpl.net/"
-            },
-            "dependency": {
-                "name": "wtfpl_init",
-                "url": "https://rubygems.org/gems/wtfpl_init",
-                "description": "Download WTFPL license file and rename to LICENSE.md or something",
-                "paths": [
-                    "."
-                ]
-            }
-        }
+    "dependencies": [{
+      "name": "wtfpl_init",
+      "licenses": [
+        "WTFPL"
+      ],
+      "url": "https://rubygems.org/gems/wtfpl_init",
+      "description": "Download WTFPL license file and rename to LICENSE.md or something",
+      "paths": [
+        "."
+      ]
+    },
+      {
+        "name": "actioncable",
+        "licenses": [
+          "MIT"
+        ],
+        "url": "http://rubyonrails.org",
+        "description": "WebSocket framework for Rails.",
+        "paths": [
+          "."
+        ]
+      }
     ]
-}
+  }
