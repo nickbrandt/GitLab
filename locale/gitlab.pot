@@ -12100,6 +12100,9 @@ msgstr ""
 msgid "Invite \"%{trimmed}\" by email"
 msgstr ""
 
+msgid "Invite Members"
+msgstr ""
+
 msgid "Invite group"
 msgstr ""
 
