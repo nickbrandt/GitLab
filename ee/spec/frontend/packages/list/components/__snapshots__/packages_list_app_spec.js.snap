@@ -49,16 +49,17 @@ exports[`packages_list_app renders 1`] = `
                 </h1>
                  
                 <p>
-                  <p>
-                    Learn how to 
-                    <a
-                      href="helpUrl"
-                      target="_blank"
-                    >
-                      publish and share your packages
-                    </a>
-                     with GitLab.
-                  </p>
+                  Learn how to 
+                  <b-link-stub
+                    class="gl-link"
+                    event="click"
+                    href="helpUrl"
+                    routertag="a"
+                    target="_blank"
+                  >
+                    publish and share your packages
+                  </b-link-stub>
+                   with GitLab.
                 </p>
                  
                 <div>
@@ -109,16 +110,17 @@ exports[`packages_list_app renders 1`] = `
                 </h1>
                  
                 <p>
-                  <p>
-                    Learn how to 
-                    <a
-                      href="helpUrl"
-                      target="_blank"
-                    >
-                      publish and share your packages
-                    </a>
-                     with GitLab.
-                  </p>
+                  Learn how to 
+                  <b-link-stub
+                    class="gl-link"
+                    event="click"
+                    href="helpUrl"
+                    routertag="a"
+                    target="_blank"
+                  >
+                    publish and share your packages
+                  </b-link-stub>
+                   with GitLab.
                 </p>
                  
                 <div>
@@ -169,16 +171,17 @@ exports[`packages_list_app renders 1`] = `
                 </h1>
                  
                 <p>
-                  <p>
-                    Learn how to 
-                    <a
-                      href="helpUrl"
-                      target="_blank"
-                    >
-                      publish and share your packages
-                    </a>
-                     with GitLab.
-                  </p>
+                  Learn how to 
+                  <b-link-stub
+                    class="gl-link"
+                    event="click"
+                    href="helpUrl"
+                    routertag="a"
+                    target="_blank"
+                  >
+                    publish and share your packages
+                  </b-link-stub>
+                   with GitLab.
                 </p>
                  
                 <div>
@@ -229,16 +232,17 @@ exports[`packages_list_app renders 1`] = `
                 </h1>
                  
                 <p>
-                  <p>
-                    Learn how to 
-                    <a
-                      href="helpUrl"
-                      target="_blank"
-                    >
-                      publish and share your packages
-                    </a>
-                     with GitLab.
-                  </p>
+                  Learn how to 
+                  <b-link-stub
+                    class="gl-link"
+                    event="click"
+                    href="helpUrl"
+                    routertag="a"
+                    target="_blank"
+                  >
+                    publish and share your packages
+                  </b-link-stub>
+                   with GitLab.
                 </p>
                  
                 <div>
@@ -289,16 +293,17 @@ exports[`packages_list_app renders 1`] = `
                 </h1>
                  
                 <p>
-                  <p>
-                    Learn how to 
-                    <a
-                      href="helpUrl"
-                      target="_blank"
-                    >
-                      publish and share your packages
-                    </a>
-                     with GitLab.
-                  </p>
+                  Learn how to 
+                  <b-link-stub
+                    class="gl-link"
+                    event="click"
+                    href="helpUrl"
+                    routertag="a"
+                    target="_blank"
+                  >
+                    publish and share your packages
+                  </b-link-stub>
+                   with GitLab.
                 </p>
                  
                 <div>
@@ -349,16 +354,17 @@ exports[`packages_list_app renders 1`] = `
                 </h1>
                  
                 <p>
-                  <p>
-                    Learn how to 
-                    <a
-                      href="helpUrl"
-                      target="_blank"
-                    >
-                      publish and share your packages
-                    </a>
-                     with GitLab.
-                  </p>
+                  Learn how to 
+                  <b-link-stub
+                    class="gl-link"
+                    event="click"
+                    href="helpUrl"
+                    routertag="a"
+                    target="_blank"
+                  >
+                    publish and share your packages
+                  </b-link-stub>
+                   with GitLab.
                 </p>
                  
                 <div>
