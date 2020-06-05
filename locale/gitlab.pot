@@ -26235,6 +26235,9 @@ msgstr ""
 msgid "commit %{commit_id}"
 msgstr ""
 
+msgid "committed"
+msgstr ""
+
 msgid "confidentiality|You are going to turn off the confidentiality. This means <strong>everyone</strong> will be able to see and leave a comment on this issue."
 msgstr ""
 
