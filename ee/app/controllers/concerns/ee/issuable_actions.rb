@@ -9,8 +9,10 @@ module EE
       weight
     ].freeze
 
-    override :permitted_keys
-    def permitted_keys
+    private
+
+    override :bulk_update_permitted_keys
+    def bulk_update_permitted_keys
       @permitted_keys ||= (super + EE_PERMITTED_KEYS).freeze
     end
   end
