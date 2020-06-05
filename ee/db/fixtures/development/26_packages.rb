@@ -129,7 +129,7 @@ class Gitlab::Seeder::Packages
   end
 
   def fixture_path(package_type, file)
-    Rails.root.join('ee', 'spec', 'fixtures', package_type, file)
+    Rails.root.join('spec', 'fixtures', 'packages', package_type, file)
   end
 
   def with_cloned_fixture_file(package_type, file)
