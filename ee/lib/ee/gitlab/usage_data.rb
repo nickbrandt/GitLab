@@ -363,7 +363,10 @@ module EE
           }
 
           SECURE_PRODUCT_TYPES.each do |secure_type, attribs|
-            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
+            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period),
+                                                                          :user_id,
+                                                                          start: user_minimum_id,
+                                                                          finish: user_maximum_id)
           end
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
