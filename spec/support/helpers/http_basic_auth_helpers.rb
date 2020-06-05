@@ -11,6 +11,10 @@ module HttpBasicAuthHelpers
     basic_auth_header(Ci::Build::CI_REGISTRY_USER, job.token)
   end
 
+  def client_basic_auth_header(client)
+    basic_auth_header(client.uid, client.secret)
+  end
+
   def basic_auth_header(username, password)
     {
       'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(
