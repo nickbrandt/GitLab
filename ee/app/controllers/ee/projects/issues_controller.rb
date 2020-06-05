@@ -11,6 +11,10 @@ module EE
 
         before_action :check_service_desk_available!, only: [:service_desk]
         before_action :whitelist_query_limiting_ee, only: [:update]
+
+        before_action do
+          push_frontend_feature_flag(:save_issuable_health_status, project.group, default_enabled: true)
+        end
       end
 
       override :issue_except_actions

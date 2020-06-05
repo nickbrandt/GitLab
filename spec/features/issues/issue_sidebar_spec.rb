@@ -13,7 +13,6 @@ describe 'Issue Sidebar' do
   let!(:xss_label) { create(:label, project: project, title: '&lt;script&gt;alert("xss");&lt;&#x2F;script&gt;') }
 
   before do
-    stub_feature_flags(save_issuable_health_status: false)
     sign_in(user)
   end
 
