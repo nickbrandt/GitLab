@@ -56,8 +56,20 @@ RSpec.describe Import::BitbucketController do
 
   describe "GET status" do
     before do
-      @repo = double(slug: 'vim', owner: 'asd', full_name: 'asd/vim', "valid?" => true)
+      @repo = double(name: 'vim', slug: 'vim', owner: 'asd', full_name: 'asd/vim', clone_url: "http://test.host/demo/url.git", "valid?" => true)
       assign_session_tokens
+      stub_feature_flags(new_import_ui: false)
+    end
+
+    it_behaves_like 'import controller with new_import_ui feature flag' do
+      before do
+        allow(controller).to receive(:provider_url).and_return('http://demobitbucket.org')
+      end
+
+      let(:repo) { @repo }
+      let(:repo_id) { @repo.full_name }
+      let(:import_source) { @repo.full_name }
+      let(:provider_name) { 'bitbucket' }
     end
 
     it "assigns variables" do

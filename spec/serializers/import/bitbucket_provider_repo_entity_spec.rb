@@ -1,0 +1,25 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+
+describe Import::BitbucketProviderRepoEntity do
+  let(:repo_data) do
+    {
+      "name" => "repo_name",
+      "full_name" => "owner/repo_name",
+      "links" => {
+        "clone" => [
+          {
+            "href" => "https://bitbucket.org/owner/repo_name",
+            "name" => "https"
+          }
+        ]
+      }
+    }
+  end
+  let(:repo) { Bitbucket::Representation::Repo.new(repo_data) }
+
+  subject { described_class.new(repo).as_json }
+
+  it_behaves_like 'exposes required fields for import entity'
+end

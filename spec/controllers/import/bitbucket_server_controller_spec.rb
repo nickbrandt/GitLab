@@ -33,7 +33,7 @@ RSpec.describe Import::BitbucketServerController do
     let(:project_name) { "my-project_123" }
 
     before do
-      allow(controller).to receive(:bitbucket_client).and_return(client)
+      allow(controller).to receive(:client).and_return(client)
       repo = double(name: project_name)
       allow(client).to receive(:repo).with(project_key, repo_slug).and_return(repo)
       assign_session_tokens
@@ -139,12 +139,20 @@ RSpec.describe Import::BitbucketServerController do
     let(:repos) { instance_double(BitbucketServer::Collection) }
 
     before do
-      allow(controller).to receive(:bitbucket_client).and_return(client)
+      allow(controller).to receive(:client).and_return(client)
 
       @repo = double(slug: 'vim', project_key: 'asd', full_name: 'asd/vim', "valid?" => true, project_name: 'asd', browse_url: 'http://test', name: 'vim')
       @invalid_repo = double(slug: 'invalid', project_key: 'foobar', full_name: 'asd/foobar', "valid?" => false, browse_url: 'http://bad-repo')
       @created_repo = double(slug: 'created', project_key: 'existing', full_name: 'group/created', "valid?" => true, browse_url: 'http://existing')
       assign_session_tokens
+      stub_feature_flags(new_import_ui: false)
+    end
+
+    it_behaves_like 'import controller with new_import_ui feature flag' do
+      let(:repo) { @repo }
+      let(:repo_id) { @repo.full_name }
+      let(:import_source) { @repo.browse_url }
+      let(:provider_name) { 'bitbucket_server' }
     end
 
     it 'assigns repository categories' do

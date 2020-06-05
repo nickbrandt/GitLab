@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Import::BitbucketServerController < Import::BaseController
+  extend ::Gitlab::Utils::Override
+
   include ActionView::Helpers::SanitizeHelper
 
   before_action :verify_bitbucket_server_import_enabled
@@ -24,7 +26,7 @@ class Import::BitbucketServerController < Import::BaseController
   end
 
   def create
-    repo = bitbucket_client.repo(@project_key, @repo_slug)
+    repo = client.repo(@project_key, @repo_slug)
 
     unless repo
       return render json: { errors: _("Project %{project_repo} could not be found") % { project_repo: "#{@project_key}/#{@repo_slug}" } }, status: :unprocessable_entity
@@ -38,7 +40,7 @@ class Import::BitbucketServerController < Import::BaseController
       project = Gitlab::BitbucketServerImport::ProjectCreator.new(@project_key, @repo_slug, repo, project_name, target_namespace, current_user, credentials).execute
 
       if project.persisted?
-        render json: ProjectSerializer.new.represent(project)
+        render json: ProjectSerializer.new.represent(project, serializer: :import)
       else
         render json: { errors: project_save_error(project) }, status: :unprocessable_entity
       end
@@ -59,7 +61,16 @@ class Import::BitbucketServerController < Import::BaseController
 
   # rubocop: disable CodeReuse/ActiveRecord
   def status
-    @collection = bitbucket_client.repos(page_offset: page_offset, limit: limit_per_page, filter: sanitized_filter_param)
+    if Feature.enabled?(:new_import_ui)
+      begin
+        return super
+      rescue BitbucketServer::Connection::ConnectionError => error
+        render json: { error: _("Unable to connect to server: %{error}") % { error: error } }, status: :unprocessable_entity
+        return
+      end
+    end
+
+    @collection = client.repos(page_offset: page_offset, limit: limit_per_page, filter: sanitized_filter_param)
     @repos, @incompatible_repos = @collection.partition { |repo| repo.valid? }
 
     # Use the import URL to filter beyond what BaseService#find_already_added_projects
@@ -78,6 +89,38 @@ class Import::BitbucketServerController < Import::BaseController
     render json: find_jobs('bitbucket_server')
   end
 
+  def realtime_changes
+    super
+  end
+
+  protected
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  override :importable_repos
+  def importable_repos
+    # Use the import URL to filter beyond what BaseService#find_already_added_projects
+    already_added_projects = filter_added_projects('bitbucket_server', bitbucket_repos.map(&:browse_url))
+    already_added_projects_names = already_added_projects.pluck(:import_source)
+
+    bitbucket_repos.reject { |repo| already_added_projects_names.include?(repo.browse_url) || !repo.valid? }
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
+
+  override :incompatible_repos
+  def incompatible_repos
+    bitbucket_repos.reject { |repo| repo.valid? }
+  end
+
+  override :provider_name
+  def provider_name
+    :bitbucket_server
+  end
+
+  override :provider_url
+  def provider_url
+    session[bitbucket_server_url_key]
+  end
+
   private
 
   # rubocop: disable CodeReuse/ActiveRecord
@@ -86,8 +129,12 @@ class Import::BitbucketServerController < Import::BaseController
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
-  def bitbucket_client
-    @bitbucket_client ||= BitbucketServer::Client.new(credentials)
+  def client
+    @client ||= BitbucketServer::Client.new(credentials)
+  end
+
+  def bitbucket_repos
+    @bitbucket_repos ||= client.repos(page_offset: page_offset, limit: limit_per_page, filter: sanitized_filter_param).to_a
   end
 
   def validate_import_params
