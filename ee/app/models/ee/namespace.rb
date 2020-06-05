@@ -20,8 +20,6 @@ module EE
     LICENSE_PLANS_TO_NAMESPACE_PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.invert.freeze
     PLANS = (NAMESPACE_PLANS_TO_LICENSE_PLANS.keys + [Plan::FREE]).freeze
 
-    CI_USAGE_ALERT_LEVELS = [30, 5].freeze
-
     prepended do
       include EachBatch
 
@@ -54,6 +52,8 @@ module EE
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         :extra_shared_runners_minutes, to: :namespace_statistics, allow_nil: true
+
+      delegate :email, to: :owner, allow_nil: true, prefix: true
 
       # Opportunistically clear the +file_template_project_id+ if invalid
       before_validation :clear_file_template_project_id

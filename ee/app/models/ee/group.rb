@@ -370,6 +370,10 @@ module EE
       end
     end
 
+    def owners_emails
+      owners.pluck(:email)
+    end
+
     private
 
     def custom_project_templates_group_allowed
