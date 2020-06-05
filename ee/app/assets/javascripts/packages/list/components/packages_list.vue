@@ -46,7 +46,7 @@ export default {
       return s__('PackageRegistry|Delete package');
     },
     deletePackageName() {
-      return this.itemToBeDeleted?.name || '';
+      return this.itemToBeDeleted?.name ?? '';
     },
     tracking() {
       const category = this.itemToBeDeleted
