@@ -25923,6 +25923,9 @@ msgstr ""
 msgid "ago"
 msgstr ""
 
+msgid "alert"
+msgstr ""
+
 msgid "allowed to fail"
 msgstr ""
 
