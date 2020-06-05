@@ -15121,6 +15121,15 @@ msgstr ""
 msgid "On track"
 msgstr ""
 
+msgid "OnDemandScans|Create new DAST scan"
+msgstr ""
+
+msgid "OnDemandScans|On-demand Scans"
+msgstr ""
+
+msgid "OnDemandScans|Schedule or run scans immediately against target sites. Currently available on-demand scan type: DAST. %{helpLinkStart}More information%{helpLinkEnd}"
+msgstr ""
+
 msgid "Onboarding"
 msgstr ""
 
