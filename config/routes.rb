@@ -48,9 +48,7 @@ Rails.application.routes.draw do
   scope path: '/users/sign_up', module: :registrations, as: :users_sign_up do
     get :welcome
     patch :update_registration
-    devise_scope :user do
-      resource :experience_level, only: [:show, :update]
-    end
+    resource :experience_level, only: [:show, :update]
 
     Gitlab.ee do
       resources :groups, only: [:new, :create]
