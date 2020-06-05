@@ -1,9 +1,11 @@
 <script>
+import { GlIntersectionObserver } from '@gitlab/ui';
 import Visibility from 'visibilityjs';
 import { __, s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
-import { visitUrl } from '../../lib/utils/url_utility';
-import Poll from '../../lib/utils/poll';
+import { visitUrl } from '~/lib/utils/url_utility';
+import Poll from '~/lib/utils/poll';
+import Icon from '~/vue_shared/components/icon.vue';
 import eventHub from '../event_hub';
 import Service from '../services/index';
 import Store from '../stores';
@@ -12,10 +14,12 @@ import descriptionComponent from './description.vue';
 import editedComponent from './edited.vue';
 import formComponent from './form.vue';
 import PinnedLinks from './pinned_links.vue';
-import recaptchaModalImplementor from '../../vue_shared/mixins/recaptcha_modal_implementor';
+import recaptchaModalImplementor from '~/vue_shared/mixins/recaptcha_modal_implementor';
 
 export default {
   components: {
+    GlIntersectionObserver,
+    Icon,
     descriptionComponent,
     titleComponent,
     editedComponent,
@@ -68,6 +72,11 @@ export default {
     issuableRef: {
       type: String,
       required: true,
+    },
+    issuableStatus: {
+      type: String,
+      required: false,
+      default: '',
     },
     initialTitleHtml: {
       type: String,
@@ -162,6 +171,7 @@ export default {
       state: store.state,
       showForm: false,
       templatesRequested: false,
+      isStickyHeaderShowing: false,
     };
   },
   computed: {
@@ -195,6 +205,18 @@ export default {
     },
     defaultErrorMessage() {
       return sprintf(s__('Error updating %{issuableType}'), { issuableType: this.issuableType });
+    },
+    isOpenStatus() {
+      return this.issuableStatus === 'opened';
+    },
+    statusIcon() {
+      return this.isOpenStatus ? 'issue-open-m' : 'mobile-issue-close';
+    },
+    statusText() {
+      return this.isOpenStatus ? __('Open') : __('Closed');
+    },
+    shouldShowStickyHeader() {
+      return this.isStickyHeaderShowing && this.issuableType === 'issue';
     },
   },
   created() {
@@ -349,6 +371,14 @@ export default {
           );
         });
     },
+
+    hideStickyHeader() {
+      this.isStickyHeaderShowing = false;
+    },
+
+    showStickyHeader() {
+      this.isStickyHeaderShowing = true;
+    },
   },
 };
 </script>
@@ -385,10 +415,39 @@ export default {
         :title-text="state.titleText"
         :show-inline-edit-button="showInlineEditButton"
       />
+
+      <gl-intersection-observer @appear="hideStickyHeader" @disappear="showStickyHeader">
+        <transition name="slide">
+          <div
+            v-if="shouldShowStickyHeader"
+            class="issue-sticky-header gl-fixed gl-z-index-2 gl-bg-white gl-border-1 gl-border-b-solid gl-border-b-gray-200 gl-py-3"
+          >
+            <div
+              class="issue-sticky-header-text gl-display-flex gl-align-items-center gl-mx-auto gl-px-5"
+            >
+              <p
+                class="issuable-status-box status-box gl-my-0"
+                :class="[isOpenStatus ? 'status-box-open' : 'status-box-issue-closed']"
+              >
+                <icon :name="statusIcon" class="gl-display-block d-sm-none gl-h-6!" />
+                <span class="gl-display-none d-sm-block">{{ statusText }}</span>
+              </p>
+              <p
+                class="gl-font-weight-bold gl-overflow-hidden gl-white-space-nowrap gl-text-overflow-ellipsis gl-my-0"
+                :title="state.titleText"
+              >
+                {{ state.titleText }}
+              </p>
+            </div>
+          </div>
+        </transition>
+      </gl-intersection-observer>
+
       <pinned-links
         :zoom-meeting-url="zoomMeetingUrl"
         :published-incident-url="publishedIncidentUrl"
       />
+
       <description-component
         v-if="state.descriptionHtml"
         :can-update="canUpdate"
@@ -401,6 +460,7 @@ export default {
         :lock-version="state.lock_version"
         @taskListUpdateFailed="updateStoreState"
       />
+
       <edited-component
         v-if="hasUpdated"
         :updated-at="state.updatedAt"
@@ -410,3 +470,15 @@ export default {
     </div>
   </div>
 </template>
+
+<style>
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.5s;
+}
+
+.slide-enter,
+.slide-leave-to {
+  transform: translateY(-100%);
+}
+</style>

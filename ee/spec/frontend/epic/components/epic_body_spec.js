@@ -15,6 +15,11 @@ describe('EpicBodyComponent', () => {
   let mock;
 
   beforeEach(() => {
+    window.IntersectionObserver = class {
+      disconnect = jest.fn();
+      observe = jest.fn();
+    };
+
     mock = new MockAdapter(axios);
     mock.onGet(`${TEST_HOST}/realtime_changes`).reply(200, initialRequest);
 
@@ -29,6 +34,7 @@ describe('EpicBodyComponent', () => {
   });
 
   afterEach(() => {
+    delete window.IntersectionObserver;
     mock.restore();
     vm.$destroy();
   });
