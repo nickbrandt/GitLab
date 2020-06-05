@@ -39,11 +39,9 @@ module EE
 
         override :uncached_data
         def uncached_data
-          usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, default_time_period)
-
           super
             .merge(usage_activity_by_stage)
-            .merge(usage_activity_by_stage_monthly)
+            .merge(usage_activity_by_stage(:usage_activity_by_stage_monthly, default_time_period))
             .merge(recording_ee_finish_data)
         end
 
