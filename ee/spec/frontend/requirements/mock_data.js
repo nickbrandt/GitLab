@@ -72,3 +72,15 @@ export const mockPageInfo = {
   startCursor: 'eyJpZCI6IjI1IiwiY3JlYXRlZF9hdCI6IjIwMjAtMDMtMzEgMTM6MzI6MTQgVVRDIn0',
   endCursor: 'eyJpZCI6IjIxIiwiY3JlYXRlZF9hdCI6IjIwMjAtMDMtMzEgMTM6MzE6MTUgVVRDIn0',
 };
+
+export const mockFilters = [
+  {
+    type: 'author_username',
+    value: { data: 'root' },
+  },
+  {
+    type: 'author_username',
+    value: { data: 'john.doe' },
+  },
+  'foo',
+];

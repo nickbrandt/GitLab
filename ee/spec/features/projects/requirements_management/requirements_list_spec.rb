@@ -236,6 +236,21 @@ RSpec.describe 'Requirements list', :js do
         end
       end
     end
+
+    context 'filtered search' do
+      it 'shows filtered search input field' do
+        page.within('.vue-filtered-search-bar-container') do
+          expect(page).to have_selector('input.gl-filtered-search-term-input')
+        end
+      end
+
+      it 'shows sort dropdown' do
+        page.within('.vue-filtered-search-bar-container') do
+          expect(page).to have_selector('.gl-new-dropdown button.gl-dropdown-toggle')
+          expect(page).to have_selector('.gl-new-dropdown ul.dropdown-menu', visible: false)
+        end
+      end
+    end
   end
 
   context 'when accessing project as guest user' do
