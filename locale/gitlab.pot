@@ -8248,6 +8248,9 @@ msgstr ""
 msgid "Enable header and footer in emails"
 msgstr ""
 
+msgid "Enable integration"
+msgstr ""
+
 msgid "Enable maintenance mode"
 msgstr ""
 
