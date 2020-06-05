@@ -24,6 +24,7 @@ module Banzai
       end
 
       def call
+        ref_pattern = Project.markdown_reference_pattern
         ref_pattern_start = /\A#{ref_pattern}\z/
 
         nodes.each do |node|
@@ -82,7 +83,7 @@ module Banzai
         refs = Set.new
 
         nodes.each do |node|
-          node.to_html.scan(ref_pattern) do
+          node.to_html.scan(Project.markdown_reference_pattern) do
             refs << "#{$~[:namespace]}/#{$~[:project]}"
           end
         end
@@ -110,10 +111,6 @@ module Banzai
 
       def link_tag(url, data, link_content, title)
         %(<a href="#{url}" #{data} class="#{link_class}" title="#{escape_once(title)}">#{link_content}</a>)
-      end
-
-      def ref_pattern
-        @ref_pattern ||= Project.markdown_reference_pattern
       end
     end
   end
