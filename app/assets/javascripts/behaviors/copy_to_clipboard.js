@@ -39,7 +39,15 @@ function genericError(e) {
 }
 
 export default function initCopyToClipboard() {
-  const clipboard = new Clipboard('[data-clipboard-target], [data-clipboard-text]');
+  const clipboard = new Clipboard('[data-clipboard-target], [data-clipboard-text]', {
+    text(trigger) {
+      const text = trigger.getAttribute('data-clipboard-text');
+      if (text) return text;
+
+      const target = trigger.getAttribute('data-clipboard-target');
+      return document.querySelector(target).textContent;
+    },
+  });
   clipboard.on('success', genericSuccess);
   clipboard.on('error', genericError);
 
