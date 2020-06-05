@@ -83,7 +83,7 @@ module Spam
           email: user.email,
           username: user.username
         },
-        user_in_project: user.authorized_for_project?(project)
+        user_in_project: user.authorized_project?(project)
       })
     end
 

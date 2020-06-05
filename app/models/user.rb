@@ -1067,12 +1067,6 @@ class User < ApplicationRecord
     user_highest_role&.highest_access_level || Gitlab::Access::NO_ACCESS
   end
 
-  def authorized_for_project?(project)
-    return false unless project
-
-    project_authorizations.where(project_id: project.id).exists?
-  end
-
   def accessible_deploy_keys
     DeployKey.from_union([
       DeployKey.where(id: project_deploy_keys.select(:deploy_key_id)),
