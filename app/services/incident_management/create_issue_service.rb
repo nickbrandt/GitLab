@@ -13,8 +13,8 @@ module IncidentManagement
       DESCRIPTION
     }.freeze
 
-    def initialize(project, params, user = User.alert_bot)
-      super(project, user, params)
+    def initialize(project, params)
+      super(project, User.alert_bot, params)
     end
 
     def execute
