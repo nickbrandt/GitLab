@@ -38,7 +38,12 @@ export default {
 <template>
   <div v-if="glFeatures.integrationFormRefactor">
     <gl-form-group :label="__('Enable integration')" label-for="service[active]">
-      <gl-toggle v-model="activated" name="service[active]" @change="onToggle" />
+      <gl-toggle
+        v-model="activated"
+        name="service[active]"
+        class="gl-display-block gl-line-height-0"
+        @change="onToggle"
+      />
     </gl-form-group>
   </div>
   <div v-else>
