@@ -129,6 +129,9 @@ export const mockRawEpic = {
     openedEpics: 3,
     closedEpics: 2,
   },
+  group: {
+    fullPath: '/groups/gitlab-org/marketing/',
+  },
 };
 
 export const mockFormattedChildEpic1 = {
@@ -203,6 +206,9 @@ export const mockFormattedEpic = {
     closedEpics: 2,
   },
   isChildEpic: false,
+  group: {
+    fullPath: '/groups/gitlab-org/marketing/',
+  },
 };
 
 export const rawEpics = [
