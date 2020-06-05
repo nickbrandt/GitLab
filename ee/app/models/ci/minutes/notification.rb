@@ -29,6 +29,18 @@ module Ci
         contextual_map.dig(stage, :style)
       end
 
+      def no_remaining_minutes?
+        stage == :exceeded
+      end
+
+      def running_out?
+        [:danger, :warning].include?(stage)
+      end
+
+      def stage_percentage
+        PERCENTAGES[stage]
+      end
+
       private
 
       attr_reader :context, :stage

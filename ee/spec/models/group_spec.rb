@@ -430,7 +430,7 @@ RSpec.describe Group do
 
     context 'group with associated push_rules record' do
       context 'with its own push rule' do
-        let(:push_rule) { create(:push_rule )}
+        let(:push_rule) { create(:push_rule) }
 
         it 'returns its own push rule' do
           group.update(push_rule: push_rule)
@@ -940,5 +940,17 @@ RSpec.describe Group do
         expect(subject).to be_nil
       end
     end
+  end
+
+  describe '#owners_emails' do
+    let(:user) { create(:user, email: 'bob@example.com') }
+
+    before do
+      group.add_owner(user)
+    end
+
+    subject { group.owners_emails }
+
+    it { is_expected.to match([user.email]) }
   end
 end
