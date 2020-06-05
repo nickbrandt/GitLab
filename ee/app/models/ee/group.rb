@@ -217,8 +217,7 @@ module EE
     end
 
     def group_project_template_available?
-      feature_available?(:group_project_templates) ||
-        (custom_project_templates_group_id? && Time.zone.now <= GroupsWithTemplatesFinder::CUT_OFF_DATE)
+      feature_available?(:group_project_templates)
     end
 
     def actual_size_limit
