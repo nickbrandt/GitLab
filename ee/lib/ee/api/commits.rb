@@ -23,11 +23,7 @@ module EE
           def check_against_codeowners(project, branch, paths)
             return unless paths
 
-            codeowners_violations = ::Gitlab::CodeOwners::Validator.new(project, branch, paths).execute
-
-            return unless codeowners_violations
-
-            codeowners_violations
+            ::Gitlab::CodeOwners::Validator.new(project, branch, paths).execute
           end
 
           def extracted_paths
