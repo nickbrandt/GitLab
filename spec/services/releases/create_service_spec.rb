@@ -250,6 +250,24 @@ describe Releases::CreateService do
         expect { subject }.to change(Releases::Evidence, :count).by(1)
       end
 
+      context 'when old evidence_pipeline is passed to service' do
+        let!(:old_pipeline) { create(:ci_empty_pipeline, sha: sha, project: project) }
+        let!(:new_pipeline) { create(:ci_empty_pipeline, sha: sha, project: project) }
+        let(:params) do
+          super().merge(
+            evidence_pipeline: old_pipeline
+          )
+        end
+
+        it 'uses the old pipeline for evidence', :sidekiq_inline do
+          expect_next_instance_of(Releases::CreateEvidenceService, anything, pipeline: old_pipeline) do |service|
+            expect(service).to receive(:execute).and_call_original
+          end
+
+          expect { subject }.to change(Releases::Evidence, :count).by(1)
+        end
+      end
+
       it 'pipeline is still being used for evidence if new pipeline is being created for tag', :sidekiq_inline do
         pipeline = create(:ci_empty_pipeline, sha: sha, project: project)
 

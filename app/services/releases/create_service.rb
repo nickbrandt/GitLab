@@ -77,6 +77,9 @@ module Releases
     end
 
     def find_evidence_pipeline
+      # TODO: remove this with the release creation moved to it's own form https://gitlab.com/gitlab-org/gitlab/-/issues/214245
+      return params[:evidence_pipeline] if params[:evidence_pipeline]
+
       sha = existing_tag&.dereferenced_target&.sha
       sha ||= repository.commit(ref)&.sha
 
