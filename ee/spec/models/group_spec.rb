@@ -554,22 +554,11 @@ RSpec.describe Group do
           is_expected.to be true
         end
 
-        it 'returns true for groups with group template already set within grace period' do
+        it 'returns false for groups with group template already set but not in proper plan' do
           group.update!(custom_project_templates_group_id: create(:group, parent: group).id)
           group.reload
 
-          Timecop.freeze(GroupsWithTemplatesFinder::CUT_OFF_DATE - 1.day) do
-            is_expected.to be true
-          end
-        end
-
-        it 'returns false for groups with group template already set after grace period' do
-          group.update!(custom_project_templates_group_id: create(:group, parent: group).id)
-          group.reload
-
-          Timecop.freeze(GroupsWithTemplatesFinder::CUT_OFF_DATE + 1.day) do
-            is_expected.to be false
-          end
+          is_expected.to be false
         end
       end
 
