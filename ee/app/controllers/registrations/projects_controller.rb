@@ -16,7 +16,7 @@ module Registrations
 
       if @project.saved?
         create_learn_gitlab_project
-        redirect_to users_sign_up_experience_level_path
+        redirect_to users_sign_up_experience_level_path(namespace_path: @project.namespace.to_param)
       else
         render :new
       end
