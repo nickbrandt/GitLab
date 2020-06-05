@@ -20,7 +20,11 @@ export default {
       <slot name="header"></slot>
     </header>
 
-    <section v-if="hasStickySlot" class="position-sticky gl-z-index-2 security_dashboard_filters">
+    <section
+      v-if="hasStickySlot"
+      data-testid="sticky-section"
+      class="position-sticky gl-z-index-2 security_dashboard_filters"
+    >
       <slot name="sticky"></slot>
     </section>
 

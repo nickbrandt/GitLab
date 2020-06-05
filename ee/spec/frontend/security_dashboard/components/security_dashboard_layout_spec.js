@@ -4,6 +4,7 @@ import SecurityDashboardLayout from 'ee/security_dashboard/components/security_d
 describe('Security Dashboard Layout component', () => {
   let wrapper;
   const SMALLER_SECTION_CLASS = 'col-xl-7';
+  const STICKY_SECTION_SELECTOR = '[data-testid="sticky-section"]';
 
   const DummyComponent = {
     name: 'dummy-component',
@@ -17,7 +18,7 @@ describe('Security Dashboard Layout component', () => {
   const findArticle = () => wrapper.find('article');
   const findHeader = () => wrapper.find('header');
   const findAside = () => wrapper.find('aside');
-  const findStickySection = () => wrapper.find('section');
+  const findStickySection = () => wrapper.find(STICKY_SECTION_SELECTOR);
 
   afterEach(() => {
     wrapper.destroy();
@@ -31,11 +32,11 @@ describe('Security Dashboard Layout component', () => {
     });
 
     it.each`
-      element              | exists
-      ${'article'}         | ${true}
-      ${'header'}          | ${false}
-      ${'aside'}           | ${false}
-      ${'section section'} | ${false}
+      element                    | exists
+      ${'article'}               | ${true}
+      ${'header'}                | ${false}
+      ${'aside'}                 | ${false}
+      ${STICKY_SECTION_SELECTOR} | ${false}
     `('should find that $element exists is $exists', ({ element, exists }) => {
       expect(wrapper.find(element).exists()).toBe(exists);
     });
@@ -62,11 +63,11 @@ describe('Security Dashboard Layout component', () => {
     });
 
     it.each`
-      element              | exists
-      ${'article'}         | ${true}
-      ${'header'}          | ${true}
-      ${'aside'}           | ${false}
-      ${'section section'} | ${false}
+      element                    | exists
+      ${'article'}               | ${true}
+      ${'header'}                | ${true}
+      ${'aside'}                 | ${false}
+      ${STICKY_SECTION_SELECTOR} | ${false}
     `('should find that $element exists is $exists', ({ element, exists }) => {
       expect(wrapper.find(element).exists()).toBe(exists);
     });
@@ -92,11 +93,11 @@ describe('Security Dashboard Layout component', () => {
     });
 
     it.each`
-      element              | exists
-      ${'article'}         | ${true}
-      ${'header'}          | ${false}
-      ${'aside'}           | ${false}
-      ${'section section'} | ${true}
+      element                    | exists
+      ${'article'}               | ${true}
+      ${'header'}                | ${false}
+      ${'aside'}                 | ${false}
+      ${STICKY_SECTION_SELECTOR} | ${true}
     `('should find that $element exists is $exists', ({ element, exists }) => {
       expect(wrapper.find(element).exists()).toBe(exists);
     });
@@ -123,11 +124,11 @@ describe('Security Dashboard Layout component', () => {
     });
 
     it.each`
-      element              | exists
-      ${'article'}         | ${true}
-      ${'header'}          | ${false}
-      ${'aside'}           | ${true}
-      ${'section section'} | ${false}
+      element                    | exists
+      ${'article'}               | ${true}
+      ${'header'}                | ${false}
+      ${'aside'}                 | ${true}
+      ${STICKY_SECTION_SELECTOR} | ${false}
     `('should find that $element exists is $exists', ({ element, exists }) => {
       expect(wrapper.find(element).exists()).toBe(exists);
     });
