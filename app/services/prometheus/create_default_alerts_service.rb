@@ -53,7 +53,11 @@ module Prometheus
     end
 
     def schedule_prometheus_update
-      project.all_clusters.with_application_prometheus.each do |cluster|
+      clusters = project.all_clusters
+      clusters = clusters.with_application_prometheus
+      clusters = clusters.with_deployment_in_environment(environment)
+
+      clusters.each do |cluster|
         application = cluster.application_prometheus
         ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
       end
