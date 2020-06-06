@@ -207,6 +207,24 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
   end
 
+  describe '.with_project_alert_service_data' do
+    subject { described_class.with_deployment_in_environment(environment) }
+
+    let(:project) { create(:project, :repository) }
+    let!(:cluster) { create(:cluster, projects: [project]) }
+    let!(:environment) { create(:environment) }
+
+    context 'deployment in environment' do
+      let!(:deployment) { create(:deployment, cluster: cluster, environment: environment, sha: cluster.project.commit.id) }
+
+      it { is_expected.to include(cluster) }
+    end
+
+    context 'no deployment in environment' do
+      it { is_expected.not_to include(cluster) }
+    end
+  end
+
   describe '.for_project_namespace' do
     subject { described_class.for_project_namespace(namespace_id) }
 
