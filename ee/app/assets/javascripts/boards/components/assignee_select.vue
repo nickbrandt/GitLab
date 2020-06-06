@@ -1,4 +1,5 @@
 <script>
+import '~/gl_dropdown';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import UsersSelect from '~/users_select';

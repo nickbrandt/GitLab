@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import MockAdapater from 'axios-mock-adapter';
 import MilestoneSelect from 'ee/boards/components/milestone_select.vue';
-import { boardObj } from 'spec/boards/mock_data';
+import { boardObj } from 'jest/boards/mock_data';
 import axios from '~/lib/utils/axios_utils';
 import IssuableContext from '~/issuable_context';
 
@@ -45,7 +45,7 @@ describe('Milestone select component', () => {
       },
     }).$mount('.test-container');
 
-    setTimeout(done);
+    setImmediate(done);
   });
 
   describe('canEdit', () => {
@@ -103,15 +103,18 @@ describe('Milestone select component', () => {
         mock.restore();
       });
 
-      it('sets Any milestone', done => {
+      it('sets Any milestone', async done => {
         vm.board.milestone_id = 0;
         vm.$el.querySelector('.edit-link').click();
 
-        setTimeout(() => {
+        await vm.$nextTick();
+        jest.runOnlyPendingTimers();
+
+        setImmediate(() => {
           vm.$el.querySelectorAll('li a')[0].click();
         });
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(activeDropdownItem(0)).toEqual('Any milestone');
           expect(selectedText()).toEqual('Any milestone');
           done();
@@ -121,11 +124,13 @@ describe('Milestone select component', () => {
       it('sets No milestone', done => {
         vm.$el.querySelector('.edit-link').click();
 
-        setTimeout(() => {
+        jest.runOnlyPendingTimers();
+
+        setImmediate(() => {
           vm.$el.querySelectorAll('li a')[1].click();
         });
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(activeDropdownItem(0)).toEqual('No milestone');
           expect(selectedText()).toEqual('No milestone');
           done();
@@ -135,11 +140,13 @@ describe('Milestone select component', () => {
       it('sets milestone', done => {
         vm.$el.querySelector('.edit-link').click();
 
-        setTimeout(() => {
+        jest.runOnlyPendingTimers();
+
+        setImmediate(() => {
           vm.$el.querySelectorAll('li a')[4].click();
         });
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(activeDropdownItem(0)).toEqual('first milestone');
           expect(selectedText()).toEqual('first milestone');
           expect(vm.board.milestone).toEqual(milestone);

@@ -2,7 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
 
 import AssigneeSelect from 'ee/boards/components/assignee_select.vue';
-import { boardObj } from 'spec/boards/mock_data';
+import { boardObj } from 'jest/boards/mock_data';
 
 import axios from '~/lib/utils/axios_utils';
 import boardsStore from '~/boards/stores/boards_store';
@@ -51,7 +51,7 @@ describe('Assignee select component', () => {
       },
     }).$mount('.test-container');
 
-    setTimeout(done);
+    setImmediate(done);
   });
 
   describe('canEdit', () => {
@@ -100,10 +100,12 @@ describe('Assignee select component', () => {
       it('sets assignee', done => {
         vm.$el.querySelector('.edit-link').click();
 
-        setTimeout(() => {
+        jest.runOnlyPendingTimers();
+
+        setImmediate(() => {
           vm.$el.querySelectorAll('li a')[2].click();
 
-          setTimeout(() => {
+          setImmediate(() => {
             expect(activeDropdownItem(0)).toEqual('second assignee');
             expect(vm.board.assignee).toEqual(assignee2);
             done();
