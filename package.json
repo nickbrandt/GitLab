@@ -101,7 +101,7 @@
     "katex": "^0.10.0",
     "lodash": "^4.17.15",
     "marked": "^0.3.12",
-    "mermaid": "^8.5.1",
+    "mermaid": "^8.5.2",
     "mersenne-twister": "1.1.0",
     "mitt": "^1.2.0",
     "monaco-editor": "^0.18.1",
