@@ -2,6 +2,11 @@
 
 module Keys
   class CreateService < ::Keys::BaseService
+    def initialize(current_user, params = {})
+      @current_user, @params, @user = current_user, params, params.delete(:user)
+      @ip_address = @params.delete(:ip_address)
+    end
+
     def execute
       key = user.keys.create(params)
       notification_service.new_key(key) if key.persisted?
