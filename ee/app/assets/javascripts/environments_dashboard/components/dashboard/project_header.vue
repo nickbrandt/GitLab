@@ -33,7 +33,7 @@ export default {
 
 <template>
   <div
-    class="d-flex align-items-center page-title-holder text-secondary justify-content-between pb-2"
+    class="d-flex align-items-center page-title-holder text-secondary justify-content-between pb-2 mb-3"
   >
     <div class="d-flex align-items-center">
       <project-avatar :project="project.namespace" :size="20" class="flex-shrink-0" />

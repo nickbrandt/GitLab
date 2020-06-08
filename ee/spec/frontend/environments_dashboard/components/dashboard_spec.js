@@ -76,14 +76,14 @@ describe('dashboard', () => {
 
     it('renders the message', () => {
       expect(trimText(message.text())).toBe(
-        'This dashboard displays a maximum of 7 projects and 3 environments per project. Read more.',
+        'This dashboard displays a maximum of 7 projects and 3 environments per project. More information',
       );
     });
 
     it('includes the correct documentation link in the message', () => {
       const helpLink = message.find(GlLink);
 
-      expect(helpLink.text()).toBe('Read more.');
+      expect(helpLink.text()).toBe('More information');
       expect(helpLink.attributes('href')).toBe(propsData.environmentsDashboardHelpPath);
       expect(helpLink.attributes('rel')).toBe('noopener noreferrer');
     });
