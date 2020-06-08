@@ -136,7 +136,6 @@ module Clusters
       conditions = { projects: { alerts_service: [:data] } }
       includes(conditions).joins(conditions).where(projects: { id: project_ids })
     end
-    scope :with_deployment_in_environment, -> (environment) { joins(:deployments).merge(Deployment.for_environment(environment)) }
 
     def self.ancestor_clusters_for_clusterable(clusterable, hierarchy_order: :asc)
       return [] if clusterable.is_a?(Instance)

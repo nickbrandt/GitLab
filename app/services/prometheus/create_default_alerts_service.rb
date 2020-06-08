@@ -53,14 +53,13 @@ module Prometheus
     end
 
     def schedule_prometheus_update
-      clusters = project.all_clusters
-      clusters = clusters.with_application_prometheus
-      clusters = clusters.with_deployment_in_environment(environment)
+      return unless prometheus_application
 
-      clusters.each do |cluster|
-        application = cluster.application_prometheus
-        ::Clusters::Applications::ScheduleUpdateService.new(application, project).execute
-      end
+      ::Clusters::Applications::ScheduleUpdateService.new(prometheus_application, project).execute
+    end
+
+    def prometheus_application
+      environment.cluster_prometheus_adapter
     end
 
     def metrics_by_identifier

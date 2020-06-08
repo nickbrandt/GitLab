@@ -51,23 +51,14 @@ describe Prometheus::CreateDefaultAlertsService do
         end
 
         context 'cluster with prometheus exists' do
-          let!(:cluster) { create(:cluster, :with_installed_prometheus, projects: [project]) }
+          let!(:cluster) { create(:cluster, :with_installed_prometheus, :provided_by_user, projects: [project]) }
 
-          it 'does not schedule an update to prometheus' do
-            expect(::Clusters::Applications::ScheduleUpdateService).not_to receive(:new)
-            execute
-          end
-
-          context 'deployment to relevant environment' do
-            let!(:deployment) { create(:deployment, cluster: cluster, environment: environment, sha: project.commit.id) }
-
-            it 'schedules an update to prometheus' do
-              expect_next_instance_of(::Clusters::Applications::ScheduleUpdateService) do |instance|
-                expect(instance).to receive(:execute)
-              end
-
-              execute
+          it 'schedules an update to prometheus' do
+            expect_next_instance_of(::Clusters::Applications::ScheduleUpdateService) do |instance|
+              expect(instance).to receive(:execute)
             end
+
+            execute
           end
         end
 
