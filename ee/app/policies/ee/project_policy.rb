@@ -396,6 +396,7 @@ module EE
 
       rule { requirements_available & reporter }.policy do
         enable :create_requirement
+        enable :create_requirement_test_report
         enable :admin_requirement
         enable :update_requirement
       end

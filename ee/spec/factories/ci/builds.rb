@@ -121,5 +121,11 @@ FactoryBot.define do
         end
       end
     end
+
+    trait :requirements_report do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :requirements, job: build)
+      end
+    end
   end
 end

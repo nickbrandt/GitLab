@@ -407,6 +407,40 @@ RSpec.describe Ci::Build do
     end
   end
 
+  describe '#collect_requirements_reports!' do
+    subject { job.collect_requirements_reports!(requirements_report) }
+
+    let(:requirements_report) { Gitlab::Ci::Reports::RequirementsManagement::Report.new }
+
+    context 'when there is a requirements report' do
+      before do
+        create(:ee_ci_job_artifact, :requirements, job: job, project: job.project)
+      end
+
+      context 'when requirements are available' do
+        before do
+          stub_licensed_features(requirements: true)
+        end
+
+        it 'parses blobs and adds the results to the report' do
+          expect { subject }.to change { requirements_report.requirements.count }.from(0).to(1)
+        end
+      end
+
+      context 'when requirements are not available' do
+        before do
+          stub_licensed_features(requirements: false)
+        end
+
+        it 'does not parse requirements report' do
+          subject
+
+          expect(requirements_report.requirements.count).to eq(0)
+        end
+      end
+    end
+  end
+
   describe '#retryable?' do
     subject { build.retryable? }
 

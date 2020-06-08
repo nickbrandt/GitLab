@@ -116,6 +116,16 @@ module EE
         metrics_report
       end
 
+      def collect_requirements_reports!(requirements_report)
+        return requirements_report unless project.feature_available?(:requirements)
+
+        each_report(::Ci::JobArtifact::REQUIREMENTS_REPORT_FILE_TYPES) do |file_type, blob, report_artifact|
+          ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, requirements_report)
+        end
+
+        requirements_report
+      end
+
       def retryable?
         !merge_train_pipeline? && super
       end

@@ -9,6 +9,7 @@ module EE
       ::Ci::Minutes::EmailNotificationService.new(build.project.reset).execute if ::Gitlab.com?
 
       StoreSecurityScansWorker.perform_async(build.id)
+      RequirementsManagement::ProcessRequirementsReportsWorker.perform_async(build.id)
 
       super
     end
