@@ -15,22 +15,48 @@ RSpec.describe 'Admin updates EE-only settings' do
 
   context 'Geo settings' do
     context 'when the license has Geo feature' do
-      it 'hides JS alert' do
-        visit admin_geo_settings_path
-        expect(page).not_to have_content("Geo is only available for users who have at least a Premium license.")
-      end
-
-      it 'allows users to change Geo settings' do
-        visit admin_geo_settings_path
-        page.within('section') do
-          fill_in 'Connection timeout', with: 15
-          fill_in 'Allowed Geo IP', with: '192.34.34.34'
-          click_button 'Save changes'
+      context 'when enable_geo_settings_form_js is false' do
+        before do
+          stub_feature_flags(enable_geo_settings_form_js: false)
+          visit admin_geo_settings_path
         end
 
-        expect(current_settings.geo_status_timeout).to eq(15)
-        expect(current_settings.geo_node_allowed_ips).to eq('192.34.34.34')
-        expect(page).to have_content 'Application settings saved successfully'
+        it 'hides JS alert' do
+          expect(page).not_to have_content("Geo is only available for users who have at least a Premium license.")
+        end
+
+        it 'renders HAML form instead of JS' do
+          expect(page).not_to have_css("#js-geo-settings-form")
+          expect(page).to have_css(".geo-haml-form")
+        end
+
+        it 'allows users to change Geo settings' do
+          page.within('section') do
+            fill_in 'Connection timeout', with: 15
+            fill_in 'Allowed Geo IP', with: '192.34.34.34'
+            click_button 'Save changes'
+          end
+
+          expect(current_settings.geo_status_timeout).to eq(15)
+          expect(current_settings.geo_node_allowed_ips).to eq('192.34.34.34')
+          expect(page).to have_content 'Application settings saved successfully'
+        end
+      end
+
+      context 'when enable_geo_settings_form_js is true' do
+        before do
+          stub_feature_flags(enable_geo_settings_form_js: true)
+          visit admin_geo_settings_path
+        end
+
+        it 'hides JS alert' do
+          expect(page).not_to have_content("Geo is only available for users who have at least a Premium license.")
+        end
+
+        it 'renders JS form instead of HAML' do
+          expect(page).to have_css("#js-geo-settings-form")
+          expect(page).not_to have_css(".geo-haml-form")
+        end
       end
     end
 
