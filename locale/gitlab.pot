@@ -1151,6 +1151,9 @@ msgstr ""
 msgid "Action to take when receiving an alert."
 msgstr ""
 
+msgid "Actions"
+msgstr ""
+
 msgid "Activate"
 msgstr ""
 
@@ -7072,6 +7075,9 @@ msgstr ""
 msgid "Delete domain"
 msgstr ""
 
+msgid "Delete iteration"
+msgstr ""
+
 msgid "Delete label"
 msgstr ""
 
@@ -7988,6 +7994,9 @@ msgid "Edit identity for %{user_name}"
 msgstr ""
 
 msgid "Edit issues"
+msgstr ""
+
+msgid "Edit iteration"
 msgstr ""
 
 msgid "Edit public deploy key"

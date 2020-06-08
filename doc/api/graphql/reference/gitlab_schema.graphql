@@ -4565,6 +4565,11 @@ type Group {
     iids: [String!]
 
     """
+    Iterations applied to the issue
+    """
+    iterationId: [ID]
+
+    """
     Labels applied to this issue
     """
     labelName: [String]
@@ -4629,6 +4634,11 @@ type Group {
     Returns the first _n_ elements from the list.
     """
     first: Int
+
+    """
+    The ID of the Iteration to look up
+    """
+    id: ID
 
     """
     Returns the last _n_ elements from the list.
@@ -8188,6 +8198,11 @@ type Project {
     iids: [String!]
 
     """
+    Iterations applied to the issue
+    """
+    iterationId: [ID]
+
+    """
     Labels applied to this issue
     """
     labelName: [String]
@@ -8281,6 +8296,11 @@ type Project {
     List of IIDs of issues. For example, [1, 2]
     """
     iids: [String!]
+
+    """
+    Iterations applied to the issue
+    """
+    iterationId: [ID]
 
     """
     Labels applied to this issue

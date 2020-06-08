@@ -38,7 +38,7 @@ class IterationsFinder
   end
 
   def by_id(items)
-    if  params[:id]
+    if params[:id]
       items.with_id(params[:id])
     else
       items
