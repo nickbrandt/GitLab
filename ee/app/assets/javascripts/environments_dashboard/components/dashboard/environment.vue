@@ -127,7 +127,7 @@ export default {
 
     <div :class="cardClasses" class="dashboard-card-body card-body">
       <div v-if="lastDeployment" class="row">
-        <div class="col-1 align-self-center">
+        <div class="col-1 align-self-center px-3">
           <user-avatar-link
             v-if="user"
             :link-href="user.path"
@@ -162,7 +162,7 @@ export default {
         </div>
 
         <div
-          class="col-sm-4 mt-0 pl-5 pl-sm-0 offset-1 offset-sm-0 text-sm-right align-self-center col-12 d-sm-block"
+          class="col-sm-3 mt-0 pl-6 pr-0 pl-sm-0 offset-1 offset-sm-0 text-sm-right align-self-center col-12 d-sm-block"
         >
           <time-ago
             v-if="shouldShowTimeAgo"

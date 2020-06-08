@@ -127,7 +127,7 @@ export default {
 </script>
 
 <template>
-  <div class="operations-dashboard">
+  <div class="environments-dashboard">
     <gl-modal
       :modal-id="$options.modalId"
       :title="$options.addProjectsModalHeader"
@@ -169,21 +169,21 @@ export default {
       >
         <template #readMoreLink>
           <gl-link :href="environmentsDashboardHelpPath" target="_blank" rel="noopener noreferrer">
-            {{ s__('EnvironmentsDashboard|Read more.') }}
+            {{ s__('EnvironmentsDashboard|More information') }}
           </gl-link>
         </template>
       </gl-sprintf>
     </p>
     <div class="prepend-top-default">
-      <div v-if="projects.length" class="dashboard-cards">
-        <div v-for="project in projects" :key="project.id" class="column prepend-top-default">
+      <div v-if="projects.length">
+        <div v-for="project in projects" :key="project.id">
           <project-header :project="project" @remove="removeProject" />
-          <div class="row">
+          <div class="row prepend-top-default no-gutters mx-n2">
             <environment
               v-for="environment in project.environments"
               :key="environment.id"
               :environment="environment"
-              class="col-12 col-md-6 col-xl-4 px-2 prepend-top-default"
+              class="col-12 col-md-6 col-xl-4 px-2"
             />
           </div>
         </div>

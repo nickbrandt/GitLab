@@ -2,7 +2,7 @@
 
 exports[`dashboard should match the snapshot 1`] = `
 <div
-  class="operations-dashboard"
+  class="environments-dashboard"
 >
   <gl-modal-stub
     modalclass=""
@@ -57,7 +57,7 @@ exports[`dashboard should match the snapshot 1`] = `
       target="_blank"
     >
       
-          Read more.
+          More information
         
     </gl-link-stub>
   </p>

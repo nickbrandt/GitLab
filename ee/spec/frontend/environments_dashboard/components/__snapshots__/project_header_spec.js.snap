@@ -2,7 +2,7 @@
 
 exports[`Project Header matches the snapshot 1`] = `
 <div
-  class="d-flex align-items-center page-title-holder text-secondary justify-content-between pb-2"
+  class="d-flex align-items-center page-title-holder text-secondary justify-content-between pb-2 mb-3"
 >
   <div
     class="d-flex align-items-center"
