@@ -7,7 +7,7 @@ RSpec.describe EE::API::Entities::Nuget::PackageMetadataCatalogEntry do
     {
       json_url: 'http://sandbox.com/json/package',
       authors: 'Authors',
-      dependencies: [],
+      dependency_groups: [],
       package_name: 'PackageTest',
       package_version: '1.2.3',
       tags: 'tag1 tag2 tag3',
