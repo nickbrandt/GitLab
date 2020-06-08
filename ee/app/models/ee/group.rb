@@ -32,8 +32,7 @@ module EE
       has_one :dependency_proxy_setting, class_name: 'DependencyProxy::GroupSetting'
       has_many :dependency_proxy_blobs, class_name: 'DependencyProxy::Blob'
 
-      has_one :allowed_email_domain
-      accepts_nested_attributes_for :allowed_email_domain, allow_destroy: true, reject_if: :all_blank
+      has_many :allowed_email_domains, -> { order(id: :asc) }, autosave: true
 
       # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
@@ -171,6 +170,12 @@ module EE
       ip_restrictions.map(&:range).join(",")
     end
 
+    def allowed_email_domains_list
+      return if allowed_email_domains.empty?
+
+      allowed_email_domains.domain_names.join(",")
+    end
+
     def human_ldap_access
       ::Gitlab::Access.options_with_owner.key(ldap_access)
     end
@@ -240,10 +245,10 @@ module EE
       root_ancestor.ip_restrictions
     end
 
-    def root_ancestor_allowed_email_domain
-      return allowed_email_domain if parent_id.nil?
+    def root_ancestor_allowed_email_domains
+      return allowed_email_domains if parent_id.nil?
 
-      root_ancestor.allowed_email_domain
+      root_ancestor.allowed_email_domains
     end
 
     # Overrides a method defined in `::EE::Namespace`

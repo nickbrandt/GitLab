@@ -7,6 +7,22 @@ RSpec.describe AllowedEmailDomain do
     it { is_expected.to belong_to(:group) }
   end
 
+  describe '.domain_names' do
+    subject { described_class.domain_names }
+
+    let(:domains) { ['gitlab.com', 'acme.com'] }
+
+    before do
+      domains.each do |domain|
+        create(:allowed_email_domain, domain: domain)
+      end
+    end
+
+    it 'returns the array of domain names' do
+      expect(subject).to match_array(domains)
+    end
+  end
+
   describe 'validations' do
     it { is_expected.to validate_presence_of(:domain) }
     it { is_expected.to validate_presence_of(:group_id) }
