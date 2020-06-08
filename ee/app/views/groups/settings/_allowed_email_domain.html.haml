@@ -2,9 +2,14 @@
 
 %h5= _('Restrict membership by email')
 
-= f.fields_for :allowed_email_domain do |allowed_email_domain_form|
-  .form-group
-    = allowed_email_domain_form.text_field :domain, class: 'form-control', placeholder: _('Enter domain')
-    .form-text.text-muted
-      - read_more_link = link_to(_('Read more'), help_page_path('user/group/index', anchor: 'allowed-domain-restriction-premium-only'))
-      = _('Only users with an email address in this domain can be added to the group.<br>Example: <code>gitlab.com</code>. Some common domains are not allowed. %{read_more_link}.').html_safe % { read_more_link: read_more_link }
+.form-group
+  = f.text_field :allowed_email_domains_list, class: 'form-control', placeholder: _('Enter domain')
+  .form-text.text-muted
+    - read_more_link = link_to(_('Read more'), help_page_path('user/group/index', anchor: 'allowed-domain-restriction-premium'))
+    = _('Only verified users with an email address in any of these domains can be added to the group.')
+    %br
+    = _('Multiple domains are supported with comma delimiters.')
+    %br
+    = _('Example: <code>acme.com,acme.co.in,acme.uk</code>.').html_safe
+    %br
+    = _('Some common domains are not allowed. %{read_more_link}.').html_safe % { read_more_link: read_more_link }

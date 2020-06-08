@@ -16,6 +16,7 @@ RSpec.describe Group do
     it { is_expected.to have_many(:dependency_proxy_blobs) }
     it { is_expected.to have_many(:cycle_analytics_stages) }
     it { is_expected.to have_many(:ip_restrictions) }
+    it { is_expected.to have_many(:allowed_email_domains) }
     it { is_expected.to have_one(:dependency_proxy_setting) }
     it { is_expected.to have_one(:deletion_schedule) }
     it { is_expected.to have_one(:group_wiki_repository) }
@@ -416,6 +417,62 @@ RSpec.describe Group do
       it 'returns a comma separated string of ranges of its ip_restriction records' do
         expect(group.ip_restriction_ranges).to eq('192.168.0.0/24,10.0.0.0/8')
       end
+    end
+  end
+
+  describe '#root_ancestor_ip_restrictions' do
+    let(:root_group) { create(:group) }
+    let!(:ip_restriction) { create(:ip_restriction, group: root_group) }
+
+    it 'returns the ip restrictions configured for the root group' do
+      nested_group = create(:group, parent: root_group)
+      deep_nested_group = create(:group, parent: nested_group)
+      very_deep_nested_group = create(:group, parent: deep_nested_group)
+
+      expect(root_group.root_ancestor_ip_restrictions).to contain_exactly(ip_restriction)
+      expect(nested_group.root_ancestor_ip_restrictions).to contain_exactly(ip_restriction)
+      expect(deep_nested_group.root_ancestor_ip_restrictions).to contain_exactly(ip_restriction)
+      expect(very_deep_nested_group.root_ancestor_ip_restrictions).to contain_exactly(ip_restriction)
+    end
+  end
+
+  describe '#allowed_email_domains_list' do
+    subject { group.allowed_email_domains_list }
+
+    context 'group with no associated allowed_email_domains records' do
+      it 'returns nil' do
+        expect(subject).to be_nil
+      end
+    end
+
+    context 'group with associated allowed_email_domains records' do
+      let(:domains) { ['acme.com', 'twitter.com'] }
+
+      before do
+        domains.each do |domain|
+          create(:allowed_email_domain, group: group, domain: domain)
+        end
+      end
+
+      it 'returns a comma separated string of domains of its allowed_email_domains records' do
+        expect(subject).to eq(domains.join(","))
+      end
+    end
+  end
+
+  describe '#root_ancestor_allowed_email_domains' do
+    let(:root_group) { create(:group) }
+    let!(:allowed_email_domain) { create(:allowed_email_domain, group: root_group) }
+
+    it 'returns the email domain restrictions configured for the root group' do
+      nested_group = create(:group, parent: root_group)
+      deep_nested_group = create(:group, parent: nested_group)
+      very_deep_nested_group = create(:group, parent: deep_nested_group)
+
+      expect(root_group.root_ancestor_allowed_email_domains).to contain_exactly(allowed_email_domain)
+      expect(nested_group.root_ancestor_allowed_email_domains).to contain_exactly(allowed_email_domain)
+      expect(deep_nested_group.root_ancestor_allowed_email_domains).to contain_exactly(allowed_email_domain)
+      expect(very_deep_nested_group.root_ancestor_allowed_email_domains).to contain_exactly(allowed_email_domain)
     end
   end
 

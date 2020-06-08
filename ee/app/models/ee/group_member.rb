@@ -32,7 +32,7 @@ module EE
     end
 
     def group_has_domain_limitations?
-      group.feature_available?(:group_allowed_email_domains) && group.root_ancestor_allowed_email_domain.present?
+      group.feature_available?(:group_allowed_email_domains) && group_allowed_email_domains.any?
     end
 
     def group_domain_limitations
@@ -56,15 +56,15 @@ module EE
     end
 
     def validate_users_email
-      return if group_allowed_email_domain.email_matches_domain?(user.email)
+      return if matches_at_least_one_group_allowed_email_domain?(user.email)
 
-      errors.add(:user, email_no_match_email_domain(user.email))
+      errors.add(:user, email_does_not_match_any_allowed_domains(user.email))
     end
 
     def validate_invitation_email
-      return if group_allowed_email_domain.email_matches_domain?(invite_email)
+      return if matches_at_least_one_group_allowed_email_domain?(invite_email)
 
-      errors.add(:invite_email, email_no_match_email_domain(invite_email))
+      errors.add(:invite_email, email_does_not_match_any_allowed_domains(invite_email))
     end
 
     def group_saml_identity
@@ -79,16 +79,23 @@ module EE
 
     private
 
-    def email_no_match_email_domain(email)
-      _("email '%{email}' does not match the allowed domain of '%{email_domain}'" % { email: email, email_domain: group_allowed_email_domain.domain })
+    def email_does_not_match_any_allowed_domains(email)
+      _("email '%{email}' does not match the allowed domains of %{email_domains}" %
+        { email: email, email_domains: ::Gitlab::Utils.to_exclusive_sentence(group_allowed_email_domains.map(&:domain)) })
     end
 
     def email_not_verified
       _("email '%{email}' is not a verified email." % { email: user.email })
     end
 
-    def group_allowed_email_domain
-      group.root_ancestor_allowed_email_domain
+    def group_allowed_email_domains
+      group.root_ancestor_allowed_email_domains
+    end
+
+    def matches_at_least_one_group_allowed_email_domain?(email)
+      group_allowed_email_domains.any? do |allowed_email_domain|
+        allowed_email_domain.email_matches_domain?(email)
+      end
     end
   end
 end
