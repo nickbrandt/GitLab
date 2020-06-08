@@ -25,6 +25,7 @@ describe('New feature flag form', () => {
         endpoint: 'feature_flags.json',
         path: '/feature_flags',
         environmentsEndpoint: 'environments.json',
+        projectId: '8',
       },
       store,
     });
@@ -71,5 +72,9 @@ describe('New feature flag form', () => {
   });
   it('should alert users that feature flags are changing soon', () => {
     expect(wrapper.find(GlAlert).text()).toBe(NEW_FLAG_ALERT);
+  });
+
+  it('should pass in the project ID', () => {
+    expect(wrapper.find(Form).props('projectId')).toBe('8');
   });
 });
