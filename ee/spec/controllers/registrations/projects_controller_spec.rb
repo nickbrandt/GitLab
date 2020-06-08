@@ -64,7 +64,7 @@ RSpec.describe Registrations::ProjectsController do
         stub_experiment_for_user(onboarding_issues: true)
       end
 
-      it 'creates a new project, a "Learn GitLab" project and redirects to the experience level page' do
+      it 'creates a new project, a "Learn GitLab" project, sets a cookie and redirects to the experience level page' do
         expect { subject }.to change { namespace.projects.pluck(:name) }.from([]).to(['New project', s_('Learn GitLab')])
 
         Sidekiq::Worker.drain_all
@@ -72,6 +72,7 @@ RSpec.describe Registrations::ProjectsController do
         expect(subject).to have_gitlab_http_status(:redirect)
         expect(subject).to redirect_to(users_sign_up_experience_level_path)
         expect(namespace.projects.find_by_name(s_('Learn GitLab'))).to be_import_finished
+        expect(cookies[:onboarding_issues_settings]).not_to be_nil
       end
 
       context 'when the project cannot be saved' do
