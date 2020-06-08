@@ -57,9 +57,6 @@ export default {
     hasEmptyState() {
       return Boolean(!this.isJobSetUp || this.isJobFailed);
     },
-    hasLicensePolicyList() {
-      return Boolean(this.glFeatures.licensePolicyList);
-    },
     licenseCount() {
       return this.pageInfo.total;
     },
@@ -134,8 +131,7 @@ export default {
       <template v-else>{{ s__('Licenses|Specified policies in this project') }}</template>
     </header>
 
-    <!-- TODO: Remove feature flag -->
-    <template v-if="hasLicensePolicyList">
+    <template>
       <gl-tabs v-model="tabIndex" content-class="pt-0">
         <gl-tab data-testid="licensesTab">
           <template #title>
@@ -157,8 +153,5 @@ export default {
       </gl-tabs>
     </template>
 
-    <template v-else>
-      <detected-licenses-table class="mt-3" />
-    </template>
   </div>
 </template>

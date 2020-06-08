@@ -164,7 +164,7 @@ describe('Project Licenses', () => {
     });
   });
 
-  describe('when licensePolicyList feature flag is enabled', () => {
+  describe('when page is shown', () => {
     beforeEach(() => {
       createComponent({
         state: {
@@ -173,11 +173,6 @@ describe('Project Licenses', () => {
             jobPath: '/',
             generatedAt: '',
             status: REPORT_STATUS.ok,
-          },
-        },
-        options: {
-          provide: {
-            glFeatures: { licensePolicyList: true },
           },
         },
       });
@@ -231,9 +226,6 @@ describe('Project Licenses', () => {
               pageInfo: 1,
             },
             options: {
-              provide: {
-                glFeatures: { licensePolicyList: true },
-              },
               mount: true,
             },
           });
@@ -274,9 +266,6 @@ describe('Project Licenses', () => {
             pageInfo,
           },
           options: {
-            provide: {
-              glFeatures: { licensePolicyList: true },
-            },
             mount: true,
           },
         });
@@ -335,42 +324,4 @@ describe('Project Licenses', () => {
     });
   });
 
-  describe('when licensePolicyList feature flag is disabled', () => {
-    beforeEach(() => {
-      createComponent({
-        state: {
-          initialized: true,
-          reportInfo: {
-            jobPath: '/',
-            generatedAt: '',
-            status: REPORT_STATUS.ok,
-          },
-        },
-        options: {
-          provide: {
-            glFeatures: { licensePolicyList: false },
-          },
-        },
-      });
-    });
-
-    it('only renders the "Detected in project" table', () => {
-      expect(wrapper.find(DetectedLicensesTable).exists()).toBe(true);
-      expect(wrapper.find(LicenseManagement).exists()).toBe(false);
-    });
-
-    it('renders no "Policies" table', () => {
-      expect(wrapper.find(GlTabs).exists()).toBe(false);
-      expect(wrapper.find(GlTab).exists()).toBe(false);
-    });
-
-    it('renders the pipeline info', () => {
-      expect(wrapper.find(PipelineInfo).exists()).toBe(true);
-    });
-
-    it('renders no tabs', () => {
-      expect(wrapper.find(GlTabs).exists()).toBe(false);
-      expect(wrapper.find(GlTab).exists()).toBe(false);
-    });
-  });
 });
