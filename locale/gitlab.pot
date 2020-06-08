@@ -6675,6 +6675,9 @@ msgstr ""
 msgid "CurrentUser|Upgrade"
 msgstr ""
 
+msgid "Custom Attributes"
+msgstr ""
+
 msgid "Custom CI configuration path"
 msgstr ""
 
