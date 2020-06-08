@@ -8417,9 +8417,6 @@ msgstr ""
 msgid "Enter your password to approve"
 msgstr ""
 
-msgid "Enter zen mode"
-msgstr ""
-
 msgid "Environment"
 msgstr ""
 
@@ -12884,6 +12881,9 @@ msgid "Leave project"
 msgstr ""
 
 msgid "Leave the \"File type\" and \"Delivery method\" options on their default values."
+msgstr ""
+
+msgid "Leave zen mode"
 msgstr ""
 
 msgid "Let's Encrypt does not accept emails on example.com"
