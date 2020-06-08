@@ -32,37 +32,109 @@ module QA
         page.visit Runtime::Scenario.gitlab_address
 
         set_ip_address_restriction_to(ip_address)
-
-        Flow::Login.sign_in(as: @user)
       end
 
       context 'when restricted by another ip address' do
         let(:ip_address) { get_next_ip_address(fetch_current_ip_address) }
 
-        it 'denies access' do
-          @group.sandbox.visit!
-          expect(page).to have_text('Page Not Found')
-          page.go_back
+        context 'via the UI' do
+          it 'denies access' do
+            Flow::Login.sign_in(as: @user)
 
-          @group.visit!
-          expect(page).to have_text('Page Not Found')
-          page.go_back
+            @group.sandbox.visit!
+            expect(page).to have_text('Page Not Found')
+            page.go_back
+
+            @group.visit!
+            expect(page).to have_text('Page Not Found')
+            page.go_back
+          end
+        end
+
+        context 'via the API' do
+          before do
+            @api_client ||= Runtime::API::Client.new(:gitlab, user: @user)
+          end
+
+          it 'denies access' do
+            request = create_request("/groups/#{@sandbox_group.id}")
+            response = get request.url
+            expect(response.code).to eq(404)
+
+            request = create_request("/groups/#{@group.id}")
+            response = get request.url
+            expect(response.code).to eq(404)
+          end
+        end
+
+        # Note: If you run this test against GDK make sure you've enabled sshd
+        # See: https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/run_qa_against_gdk.md
+        context 'via the SSH' do
+          let(:key) { Resource::SSHKey.fabricate_via_api! }
+
+          it 'denies access' do
+            Flow::Login.sign_in
+
+            expect { push_a_project_with_ssh_key(key) }.to raise_error(QA::Git::Repository::RepositoryCommandError, /fatal: Could not read from remote repository/)
+          end
         end
       end
 
       context 'when restricted by user\'s ip address' do
         let(:ip_address) { fetch_current_ip_address }
 
-        it 'allows access' do
-          @group.sandbox.visit!
-          expect(page).to have_text(@group.sandbox.path)
+        context 'via the UI' do
+          it 'allows access' do
+            Flow::Login.sign_in(as: @user)
 
-          @group.visit!
-          expect(page).to have_text(@group.path)
+            @group.sandbox.visit!
+            expect(page).to have_text(@group.sandbox.path)
+
+            @group.visit!
+            expect(page).to have_text(@group.path)
+          end
+        end
+
+        context 'via the API' do
+          before do
+            @api_client ||= Runtime::API::Client.new(:gitlab, user: @user)
+          end
+
+          it 'allows access' do
+            request = create_request("/groups/#{@sandbox_group.id}")
+            response = get request.url
+            expect(response.code).to eq(200)
+
+            request = create_request("/groups/#{@group.id}")
+            response = get request.url
+            expect(response.code).to eq(200)
+          end
+        end
+
+        # Note: If you run this test against GDK make sure you've enabled sshd
+        # See: https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/run_qa_against_gdk.md
+        context 'via the SSH' do
+          let(:key) { Resource::SSHKey.fabricate_via_api! }
+
+          it 'allows access' do
+            Flow::Login.sign_in
+
+            expect { push_a_project_with_ssh_key(key) }.not_to raise_error
+          end
         end
       end
 
       private
+
+      def push_a_project_with_ssh_key(key)
+        Resource::Repository::ProjectPush.fabricate! do |push|
+          push.group = @sandbox_group
+          push.ssh_key = key
+          push.file_name = 'README.md'
+          push.file_content = '# Test Use SSH Key'
+          push.commit_message = 'Add README.md'
+        end
+      end
 
       def set_ip_address_restriction_to(ip_address)
         Flow::Login.while_signed_in_as_admin do
@@ -101,6 +173,10 @@ module QA
             edit.click_save_changes_button
           end
         end
+      end
+
+      def create_request(api_endpoint)
+        Runtime::API::Request.new(@api_client, api_endpoint)
       end
     end
   end
