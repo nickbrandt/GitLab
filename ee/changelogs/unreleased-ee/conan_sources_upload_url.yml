@@ -1,5 +1,0 @@
----
-title: "Fix Conan upload URL for conan_sources.tgz"
-merge_request: 32664
-author: Zach Hilman
-type: fixed
