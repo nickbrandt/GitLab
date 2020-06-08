@@ -3,8 +3,9 @@
 module Keys
   class CreateService < ::Keys::BaseService
     def initialize(current_user, params = {})
-      @current_user, @params, @user = current_user, params, params.delete(:user)
+      @current_user, @params = current_user, params
       @ip_address = @params.delete(:ip_address)
+      @user = params.delete(:user) || current_user
     end
 
     def execute
