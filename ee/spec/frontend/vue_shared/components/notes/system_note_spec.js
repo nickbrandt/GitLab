@@ -24,6 +24,9 @@ describe('system note component', () => {
 
   const findDescriptionVersion = () => wrapper.find('.description-version');
 
+  const findDeleteDescriptionVersionButton = () =>
+    wrapper.find({ ref: 'deleteDescriptionVersionButton' });
+
   beforeEach(() => {
     props = {
       note: {
@@ -95,45 +98,28 @@ describe('system note component', () => {
   });
 
   describe('click on delete icon button', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       mockFetchDiff();
       const button = findBlankBtn();
       button.trigger('click');
-      return wrapper.vm
-        .$nextTick()
-        .then(() => waitForPromises())
-        .then(() => {
-          done();
-        });
+      return waitForPromises();
     });
 
-    it('does not delete description diff if the delete request fails', done => {
+    it('does not delete description diff if the delete request fails', () => {
       mockDeleteDiff(503);
-      let deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
-      deleteButton.trigger('click');
-      return wrapper.vm
-        .$nextTick()
-        .then(() => waitForPromises())
-        .then(() => {
-          deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
-          expect(deleteButton.exists()).toBe(true);
-          done();
-        });
+      findDeleteDescriptionVersionButton().trigger('click');
+      return waitForPromises().then(() => {
+        expect(findDeleteDescriptionVersionButton().exists()).toBe(true);
+      });
     });
 
-    it('deletes description diff if the delete request succeeds', done => {
+    it('deletes description diff if the delete request succeeds', () => {
       mockDeleteDiff();
-      let deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
-      deleteButton.trigger('click');
-      return wrapper.vm
-        .$nextTick()
-        .then(() => waitForPromises())
-        .then(() => {
-          deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
-          expect(deleteButton.exists()).toBe(false);
-          expect(findDescriptionVersion().text()).toContain('Deleted');
-          done();
-        });
+      findDeleteDescriptionVersionButton().trigger('click');
+      return waitForPromises().then(() => {
+        expect(findDeleteDescriptionVersionButton().exists()).toBe(false);
+        expect(findDescriptionVersion().text()).toContain('Deleted');
+      });
     });
   });
 });
