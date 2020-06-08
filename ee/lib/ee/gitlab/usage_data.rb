@@ -274,7 +274,7 @@ module EE
             groups: distinct_count(::GroupMember.where(time_period), :user_id),
             ldap_keys: distinct_count(::LDAPKey.where(time_period), :user_id),
             ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id),
-            users_created: count(::User.where(time_period)),
+            users_created: count(::User.where(time_period), start: user_minimum_id, finish: user_maximum_id),
             value_stream_management_customized_group_stages: count(::Analytics::CycleAnalytics::GroupStage.where(custom: true)),
             projects_with_compliance_framework: count(::ComplianceManagement::ComplianceFramework::ProjectSettings),
             ldap_servers: ldap_available_servers.size,
