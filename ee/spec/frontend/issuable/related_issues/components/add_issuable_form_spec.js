@@ -36,6 +36,11 @@ describe('AddIssuableForm', () => {
   let wrapper;
 
   afterEach(() => {
+    // Jest doesn't blur an item even if it is destroyed,
+    // so blur the input manually after each test
+    const input = findFormInput(wrapper);
+    if (input) input.blur();
+
     wrapper.destroy();
   });
 
@@ -178,7 +183,7 @@ describe('AddIssuableForm', () => {
 
       describe('when the form is submitted', () => {
         it('emits an event with a "relates_to" link type when the "relates to" radio input selected', done => {
-          spyOn(wrapper.vm, '$emit');
+          jest.spyOn(wrapper.vm, '$emit').mockImplementation(() => {});
 
           wrapper.vm.linkedIssueType = linkedIssueTypesMap.RELATES_TO;
           wrapper.vm.onFormSubmit();
@@ -193,7 +198,7 @@ describe('AddIssuableForm', () => {
         });
 
         it('emits an event with a "blocks" link type when the "blocks" radio input selected', done => {
-          spyOn(wrapper.vm, '$emit');
+          jest.spyOn(wrapper.vm, '$emit').mockImplementation(() => {});
 
           wrapper.vm.linkedIssueType = linkedIssueTypesMap.BLOCKS;
           wrapper.vm.onFormSubmit();
@@ -208,7 +213,7 @@ describe('AddIssuableForm', () => {
         });
 
         it('emits an event with a "is_blocked_by" link type when the "is blocked by" radio input selected', done => {
-          spyOn(wrapper.vm, '$emit');
+          jest.spyOn(wrapper.vm, '$emit').mockImplementation(() => {});
 
           wrapper.vm.linkedIssueType = linkedIssueTypesMap.IS_BLOCKED_BY;
           wrapper.vm.onFormSubmit();
