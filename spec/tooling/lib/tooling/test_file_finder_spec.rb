@@ -54,11 +54,11 @@ RSpec.describe Tooling::TestFileFinder do
       end
     end
 
-    context 'when given a module file in ee/' do
+    context 'when given an ee extension module file' do
       let(:file) { 'ee/app/models/ee/user.rb' }
 
-      it 'returns the matching ee/ module test file and the ee/ model test file' do
-        test_files = ['ee/spec/models/ee/user_spec.rb', 'spec/app/models/user_spec.rb']
+      it 'returns the matching ee/ class test file, ee extension module test file and the foss class test file' do
+        test_files = ['ee/spec/models/user_spec.rb', 'ee/spec/models/ee/user_spec.rb', 'spec/app/models/user_spec.rb']
         expect(subject.test_files).to contain_exactly(*test_files)
       end
     end

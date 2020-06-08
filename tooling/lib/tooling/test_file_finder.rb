@@ -48,6 +48,7 @@ module Tooling
       TestFileMatcher.new do |matcher|
         unless foss_test_only
           matcher.associate(%r{^#{EE_PREFIX}app/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}_spec.rb" }
+          matcher.associate(%r{^#{EE_PREFIX}app/(.*\/)ee/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}#{match[2]}_spec.rb" }
           matcher.associate(%r{^#{EE_PREFIX}lib/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/lib/#{match[1]}_spec.rb" }
           matcher.associate(%r{^#{EE_PREFIX}spec/(.+)_spec.rb$}) { |match| match[0] }
         end
