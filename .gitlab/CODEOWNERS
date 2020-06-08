@@ -51,8 +51,8 @@
 
 # Code Owners
 #
-/ee/lib/gitlab/code_owners/ @reprazent @kerrizor
-/doc/user/project/code_owners.md @reprazent @kerrizor
+/ee/lib/gitlab/code_owners/ @reprazent @kerrizor @garyh
+/doc/user/project/code_owners.md @reprazent @kerrizor @garyh
 
 # Quality owned files
 /qa/ @gl-quality
