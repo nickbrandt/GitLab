@@ -6636,6 +6636,9 @@ msgstr ""
 msgid "Creates branch '%{branch_name}' and a merge request to resolve this issue."
 msgstr ""
 
+msgid "Creating"
+msgstr ""
+
 msgid "Creating epic"
 msgstr ""
 
