@@ -11697,6 +11697,9 @@ msgstr ""
 msgid "Import all compatible projects"
 msgstr ""
 
+msgid "Import all compatible repositories"
+msgstr ""
+
 msgid "Import all projects"
 msgstr ""
 
@@ -11884,6 +11887,9 @@ msgid "Incompatible Project"
 msgstr ""
 
 msgid "Incompatible options set!"
+msgstr ""
+
+msgid "Incompatible project"
 msgstr ""
 
 msgid "Indent"
