@@ -280,11 +280,13 @@ describe Service do
 
     describe '.build_from_integration' do
       context 'when integration is invalid' do
-        it 'sets service to inactive when integration is invalid' do
-          template = build(:prometheus_service, template: true, active: true, properties: {})
-          template.save(validate: false)
+        let(:integration) do
+          build(:prometheus_service, :template, active: true, properties: {})
+            .tap { |integration| integration.save(validate: false) }
+        end
 
-          service = described_class.build_from_integration(project.id, template)
+        it 'sets service to inactive' do
+          service = described_class.build_from_integration(project.id, integration)
 
           expect(service).to be_valid
           expect(service.active).to be false
@@ -292,9 +294,9 @@ describe Service do
       end
 
       context 'when integration is an instance' do
-        subject(:integration) { create(:jira_service, :instance) }
+        let(:integration) { create(:jira_service, :instance) }
 
-        it 'sets service inherit from integration' do
+        it 'sets inherit_from_id from integration' do
           service = described_class.build_from_integration(project.id, integration)
 
           expect(service.inherit_from_id).to eq(integration.id)
