@@ -53,6 +53,7 @@ RSpec.describe StatusPage::UnpublishDetailsService do
 
       it 'untracks the issue' do
         expect(StatusPage::PublishedIncident).to receive(:untrack).with(issue)
+        expect(StatusPage::UsageDataCounters::IncidentCounter).to receive(:count).with(:unpublishes).once
 
         result
       end

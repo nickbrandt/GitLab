@@ -98,6 +98,14 @@ RSpec.describe Issue do
 
       it { expect(Issue.on_status_page.count).to eq(1) }
       it { expect(Issue.on_status_page.first).to eq(published_issue) }
+
+      context 'with status page disabled' do
+        before do
+          status_page_setting.update!(enabled: false)
+        end
+
+        it { expect(Issue.on_status_page.count).to eq(0) }
+      end
     end
 
     context 'epics' do

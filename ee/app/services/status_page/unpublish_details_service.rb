@@ -14,6 +14,7 @@ module StatusPage
 
     def process(issue)
       PublishedIncident.untrack(issue)
+      ::StatusPage::UsageDataCounters::IncidentCounter.count(:unpublishes)
 
       # Delete the incident prior to deleting images to avoid broken links
       json_key = json_object_key(issue)

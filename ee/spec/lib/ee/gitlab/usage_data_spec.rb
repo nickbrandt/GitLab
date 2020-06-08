@@ -55,6 +55,7 @@ RSpec.describe Gitlab::UsageData do
       # 1 published issue on 1 projects with status page enabled
       create(:issue, project: projects[0])
       create(:issue, :published, project: projects[0])
+      create(:issue, :published, project: projects[1])
     end
 
     subject { described_class.data }
@@ -111,8 +112,10 @@ RSpec.describe Gitlab::UsageData do
         projects_with_tracing_enabled
         sast_jobs
         secret_detection_jobs
-        status_page_projects
+        status_page_incident_publishes
+        status_page_incident_unpublishes
         status_page_issues
+        status_page_projects
         user_preferences_group_overview_details
         user_preferences_group_overview_security_dashboard
         template_repositories
