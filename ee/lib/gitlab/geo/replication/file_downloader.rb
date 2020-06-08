@@ -11,12 +11,6 @@ module Gitlab
       class FileDownloader < BaseDownloader
         private
 
-        def check_preconditions
-          return missing_on_primary_error if resource && resource.model.nil?
-
-          super
-        end
-
         def local_store?
           resource.local?
         end

@@ -98,25 +98,6 @@ RSpec.describe Gitlab::Geo::Replication::FileDownloader, :geo do
         )
       end
     end
-
-    context 'when the upload parent object does not exist' do
-      let(:upload) { create(:upload) }
-
-      subject(:downloader) { described_class.new(:avatar, upload.id) }
-
-      before do
-        upload.update_columns(model_id: nil, model_type: nil)
-      end
-
-      it 'returns a result indicating a failure before a transfer was attempted' do
-        result = downloader.execute
-
-        expect(result).to have_attributes(
-          success: true,
-          primary_missing_file: true # FIXME: https://gitlab.com/gitlab-org/gitlab/-/issues/220855
-        )
-      end
-    end
   end
 
   def stub_geo_file_transfer(file_type, upload)

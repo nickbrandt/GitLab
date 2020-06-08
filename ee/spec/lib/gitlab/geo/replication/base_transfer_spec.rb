@@ -11,7 +11,8 @@ RSpec.describe Gitlab::Geo::Replication::BaseTransfer do
   describe '#resource_url' do
     subject do
       described_class.new(file_type: 'design_management/design_v432x230', file_id: 1,
-                          filename: Tempfile.new, expected_checksum: nil, request_data: nil)
+                          filename: Tempfile.new, expected_checksum: nil,
+                          request_data: nil, resource: nil)
     end
 
     context 'when file type contains /' do
@@ -25,7 +26,7 @@ RSpec.describe Gitlab::Geo::Replication::BaseTransfer do
   describe '#can_transfer?' do
     subject do
       described_class.new(file_type: :avatar, file_id: 1, filename: Tempfile.new,
-                          expected_checksum: nil, request_data: nil)
+                          expected_checksum: nil, request_data: nil, resource: nil)
     end
 
     before do
@@ -51,7 +52,7 @@ RSpec.describe Gitlab::Geo::Replication::BaseTransfer do
     context 'when destination filename is a directory' do
       it 'returns false' do
         subject = described_class.new(file_type: :avatar, file_id: 1, filename: Dir::Tmpname.tmpdir,
-                                      expected_checksum: nil, request_data: nil)
+                                      expected_checksum: nil, request_data: nil, resource: nil)
 
         expect(subject.can_transfer?).to be_falsey
       end
@@ -60,7 +61,8 @@ RSpec.describe Gitlab::Geo::Replication::BaseTransfer do
     context 'when no filename is informed' do
       it 'returns true' do
         subject = described_class.new(file_type: :avatar, file_id: 1,
-                                      expected_checksum: nil, request_data: nil)
+                                      expected_checksum: nil, request_data: nil,
+                                      resource: nil)
 
         expect(subject.can_transfer?).to be_truthy
       end

@@ -87,10 +87,6 @@ module Gitlab
         def skip_transfer_error(reason: nil)
           Result.new(success: false, bytes_downloaded: 0, reason: reason, failed_before_transfer: true)
         end
-
-        def missing_on_primary_error
-          Result.new(success: true, bytes_downloaded: 0, primary_missing_file: true)
-        end
       end
     end
   end

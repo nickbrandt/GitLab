@@ -82,17 +82,13 @@ RSpec.describe Geo::FileDownloadService do
       stub_exclusive_lease("file_download_service:#{file_type}:#{file.id}",
         timeout: Geo::FileDownloadService::LEASE_TIMEOUT)
 
+      stub_transfer_result(bytes_downloaded: 100, success: true, primary_missing_file: true)
+
       file.update_column(:model_id, 22222) # Not-existing record
     end
 
-    it 'marks upload as successful and missing_on_primary' do
-      expect(Gitlab::Geo::Logger).to receive(:info).with(hash_including(:message,
-                                                                        :download_time_s,
-                                                                        download_success: true,
-                                                                        bytes_downloaded: 0,
-                                                                        primary_missing_file: true)).and_call_original
-
-      expect { download_service.execute }.to change { registry.synced.missing_on_primary.count }.by(1)
+    it 'does not raise an error' do
+      expect { download_service.execute }.not_to raise_error
     end
   end
 
