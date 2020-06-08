@@ -47,7 +47,8 @@ module EE
           performance: %i[merge_request_performance_metrics],
           license_management: %i[license_scanning],
           license_scanning: %i[license_scanning],
-          metrics: %i[metrics_reports]
+          metrics: %i[metrics_reports],
+          requirements: %i[requirements]
         }.freeze
 
         state_machine :status do

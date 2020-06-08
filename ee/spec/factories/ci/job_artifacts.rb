@@ -332,5 +332,15 @@ FactoryBot.define do
         artifact.file = fixture_file_upload(path, 'application/json')
       end
     end
+
+    trait :requirements do
+      file_format { :raw }
+      file_type { :requirements }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/requirements_management/report.json'), 'application/json')
+      end
+    end
   end
 end

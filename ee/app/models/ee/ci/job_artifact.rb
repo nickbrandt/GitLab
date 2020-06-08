@@ -19,6 +19,7 @@ module EE
       SAST_REPORT_TYPES = %w[sast].freeze
       SECRET_DETECTION_REPORT_TYPES = %w[secret_detection].freeze
       DAST_REPORT_TYPES = %w[dast].freeze
+      REQUIREMENTS_REPORT_FILE_TYPES = %w[requirements].freeze
 
       scope :project_id_in, ->(ids) { where(project_id: ids) }
       scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }

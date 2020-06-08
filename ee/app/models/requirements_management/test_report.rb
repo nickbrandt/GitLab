@@ -3,6 +3,7 @@
 module RequirementsManagement
   class TestReport < ApplicationRecord
     include Sortable
+    include BulkInsertSafe
 
     belongs_to :requirement, inverse_of: :test_reports
     belongs_to :author, inverse_of: :test_reports, class_name: 'User'
@@ -13,6 +14,27 @@ module RequirementsManagement
     validate :validate_pipeline_reference
 
     enum state: { passed: 1 }
+
+    scope :for_user_build, ->(user_id, build_id) { where(author_id: user_id, build_id: build_id) }
+
+    def self.persist_all_requirement_reports_as_passed(build)
+      reports = []
+      timestamp = Time.current
+      build.project.requirements.opened.select(:id).find_each do |requirement|
+        reports << new(
+          requirement_id: requirement.id,
+          # pipeline_reference will be removed:
+          # https://gitlab.com/gitlab-org/gitlab/-/issues/219999
+          pipeline_id: build.pipeline_id,
+          build_id: build.id,
+          author_id: build.user_id,
+          created_at: timestamp,
+          state: :passed
+        )
+      end
+
+      bulk_insert!(reports)
+    end
 
     private
 

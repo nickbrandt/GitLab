@@ -62,5 +62,11 @@ RSpec.describe BuildFinishedWorker do
         subject
       end
     end
+
+    it 'processes requirements reports' do
+      expect(RequirementsManagement::ProcessRequirementsReportsWorker).to receive(:perform_async)
+
+      subject
+    end
   end
 end
