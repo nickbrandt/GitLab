@@ -89,3 +89,13 @@ export const getRequestData = {
 };
 
 export const rotateData = { token: 'oP6sCNRqtRHmpy1gw2-F' };
+
+export const userList = {
+  name: 'test_users',
+  user_xids: 'user3,user4,user5',
+  id: 2,
+  iid: 2,
+  project_id: 1,
+  created_at: '2020-02-04T08:13:10.507Z',
+  updated_at: '2020-02-04T08:13:10.507Z',
+};

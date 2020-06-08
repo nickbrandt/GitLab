@@ -15,6 +15,7 @@ export default () => {
           endpoint: el.dataset.endpoint,
           path: el.dataset.featureFlagsPath,
           environmentsEndpoint: el.dataset.environmentsEndpoint,
+          projectId: el.dataset.projectId,
         },
       });
     },
