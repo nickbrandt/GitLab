@@ -46,6 +46,11 @@ export default {
       required: false,
       default: '',
     },
+    approvalsApiPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     canManageLicenses: {
       type: Boolean,
       required: true,
@@ -94,18 +99,31 @@ export default {
     },
   },
   mounted() {
-    const { apiUrl, canManageLicenses, licensesApiPath } = this;
+    const { apiUrl, canManageLicenses, licensesApiPath, approvalsApiPath } = this;
 
     this.setAPISettings({
       apiUrlManageLicenses: apiUrl,
       canManageLicenses,
       licensesApiPath,
+      approvalsApiPath,
     });
 
     this.fetchParsedLicenseReport();
+
+    /* 
+      If we render this widget from the "License" tab in the pipeline view,
+      then we don't fetch the approvals since we aren't in the Merge request context.
+    */
+    if (approvalsApiPath) {
+      this.fetchLicenseCheckApprovalRule();
+    }
   },
   methods: {
-    ...mapActions(LICENSE_MANAGEMENT, ['setAPISettings', 'fetchParsedLicenseReport']),
+    ...mapActions(LICENSE_MANAGEMENT, [
+      'setAPISettings',
+      'fetchParsedLicenseReport',
+      'fetchLicenseCheckApprovalRule',
+    ]),
   },
 };
 </script>

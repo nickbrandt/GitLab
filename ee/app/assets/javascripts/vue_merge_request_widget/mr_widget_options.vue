@@ -12,6 +12,7 @@ import { n__, s__, __, sprintf } from '~/locale';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
 import MrWidgetApprovals from './components/approvals/approvals.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
+import MrWidgetPolicyViolation from './components/states/mr_widget_policy_violation.vue';
 import MergeTrainHelperText from './components/merge_train_helper_text.vue';
 import { MTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 
@@ -21,6 +22,7 @@ export default {
     MrWidgetLicenses,
     MrWidgetApprovals,
     MrWidgetGeoSecondaryNode,
+    MrWidgetPolicyViolation,
     BlockingMergeRequestsReport,
     GroupedSecurityReportsApp,
     GroupedMetricsReportsApp,
@@ -358,6 +360,7 @@ export default {
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"
         :api-url="mr.licenseScanning.managed_licenses_path"
+        :approvals-api-path="mr.apiApprovalsPath"
         :licenses-api-path="licensesApiPath"
         :pipeline-path="mr.pipeline.path"
         :can-manage-licenses="mr.licenseScanning.can_manage_licenses"

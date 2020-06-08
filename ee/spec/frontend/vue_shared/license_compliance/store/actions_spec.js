@@ -10,6 +10,7 @@ import axios from '~/lib/utils/axios_utils';
 
 describe('License store actions', () => {
   const apiUrlManageLicenses = `${TEST_HOST}/licenses/management`;
+  const approvalsApiPath = `${TEST_HOST}/approvalsApiPath`;
   const licensesApiPath = `${TEST_HOST}/licensesApiPath`;
 
   let axiosMock;
@@ -26,6 +27,7 @@ describe('License store actions', () => {
     state = {
       ...createState(),
       apiUrlManageLicenses,
+      approvalsApiPath,
       currentLicenseInModal: approvedLicense,
     };
     licenseId = approvedLicense.id;
@@ -474,6 +476,122 @@ describe('License store actions', () => {
           { type: 'requestManagedLicenses' },
           { type: 'receiveManagedLicensesError', payload: expect.any(Error) },
         ],
+      )
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('fetchLicenseCheckApprovalRule ', () => {
+    it('dispatches request/receive with detected approval rule', done => {
+      const APPROVAL_RULE_RESPONSE = {
+        approval_rules_left: [{ name: 'License-Check' }],
+      };
+
+      axiosMock.onGet(approvalsApiPath).replyOnce(200, APPROVAL_RULE_RESPONSE);
+
+      testAction(
+        actions.fetchLicenseCheckApprovalRule,
+        null,
+        state,
+        [],
+        [
+          { type: 'requestLicenseCheckApprovalRule' },
+          {
+            type: 'receiveLicenseCheckApprovalRuleSuccess',
+            payload: { hasLicenseCheckApprovalRule: true },
+          },
+        ],
+        done,
+      );
+    });
+
+    it('dispatches request/receive without detected approval rule', done => {
+      const APPROVAL_RULE_RESPONSE = {
+        approval_rules_left: [{ name: 'Another Approval Rule' }],
+      };
+
+      axiosMock.onGet(approvalsApiPath).replyOnce(200, APPROVAL_RULE_RESPONSE);
+
+      testAction(
+        actions.fetchLicenseCheckApprovalRule,
+        null,
+        state,
+        [],
+        [
+          { type: 'requestLicenseCheckApprovalRule' },
+          {
+            type: 'receiveLicenseCheckApprovalRuleSuccess',
+            payload: { hasLicenseCheckApprovalRule: false },
+          },
+        ],
+        done,
+      );
+    });
+
+    it('dispatches request/receive on error', done => {
+      const error = new Error('Request failed with status code 500');
+      axiosMock.onGet(approvalsApiPath).replyOnce(500);
+
+      testAction(
+        actions.fetchLicenseCheckApprovalRule,
+        null,
+        state,
+        [],
+        [
+          { type: 'requestLicenseCheckApprovalRule' },
+          { type: 'receiveLicenseCheckApprovalRuleError', payload: error },
+        ],
+        done,
+      );
+    });
+  });
+
+  describe('requestLicenseCheckApprovalRule', () => {
+    it('commits REQUEST_LICENSE_CHECK_APPROVAL_RULE', done => {
+      testAction(
+        actions.requestLicenseCheckApprovalRule,
+        null,
+        state,
+        [{ type: mutationTypes.REQUEST_LICENSE_CHECK_APPROVAL_RULE }],
+        [],
+      )
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('receiveLicenseCheckApprovalRuleSuccess', () => {
+    it('commits REQUEST_LICENSE_CHECK_APPROVAL_RULE', done => {
+      const hasLicenseCheckApprovalRule = true;
+
+      testAction(
+        actions.receiveLicenseCheckApprovalRuleSuccess,
+        { hasLicenseCheckApprovalRule },
+        state,
+        [
+          {
+            type: mutationTypes.RECEIVE_LICENSE_CHECK_APPROVAL_RULE_SUCCESS,
+            payload: { hasLicenseCheckApprovalRule },
+          },
+        ],
+        [],
+      )
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('receiveLicenseCheckApprovalRuleError', () => {
+    it('commits RECEIVE_LICENSE_CHECK_APPROVAL_RULE_ERROR', done => {
+      const error = new Error('Error');
+
+      testAction(
+        actions.receiveLicenseCheckApprovalRuleError,
+        error,
+        state,
+        [{ type: mutationTypes.RECEIVE_LICENSE_CHECK_APPROVAL_RULE_ERROR, payload: error }],
+        [],
       )
         .then(done)
         .catch(done.fail);

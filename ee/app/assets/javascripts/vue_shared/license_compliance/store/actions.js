@@ -111,6 +111,37 @@ export const receiveSetLicenseApprovalError = ({ commit }, error) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL_ERROR, error);
 };
 
+export const fetchLicenseCheckApprovalRule = ({ dispatch, state }) => {
+  dispatch('requestLicenseCheckApprovalRule');
+
+  axios
+    .get(state.approvalsApiPath)
+    .then(({ data }) => {
+      const hasLicenseCheckApprovalRule = Boolean(
+        data.approval_rules_left.find(rule => {
+          return rule.name === 'License-Check';
+        }),
+      );
+
+      dispatch('receiveLicenseCheckApprovalRuleSuccess', { hasLicenseCheckApprovalRule });
+    })
+    .catch(error => {
+      dispatch('receiveLicenseCheckApprovalRuleError', error);
+    });
+};
+
+export const requestLicenseCheckApprovalRule = ({ commit }) => {
+  commit(types.REQUEST_LICENSE_CHECK_APPROVAL_RULE);
+};
+
+export const receiveLicenseCheckApprovalRuleSuccess = ({ commit }, rule) => {
+  commit(types.RECEIVE_LICENSE_CHECK_APPROVAL_RULE_SUCCESS, rule);
+};
+
+export const receiveLicenseCheckApprovalRuleError = ({ commit }, error) => {
+  commit(types.RECEIVE_LICENSE_CHECK_APPROVAL_RULE_ERROR, error);
+};
+
 export const setIsAdmin = ({ commit }, payload) => {
   commit(types.SET_IS_ADMIN, payload);
 };

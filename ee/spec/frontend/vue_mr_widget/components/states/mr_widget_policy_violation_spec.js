@@ -1,0 +1,32 @@
+import { shallowMount } from '@vue/test-utils';
+import MrWidgetPolicyViolation from 'ee/vue_merge_request_widget/components/states/mr_widget_policy_violation.vue';
+
+describe('EE MrWidgetPolicyViolation', () => {
+  let wrapper;
+
+  const findButton = () => wrapper.find('button');
+
+  const createComponent = () => {
+    wrapper = shallowMount(MrWidgetPolicyViolation, {});
+  };
+
+  afterEach(() => {
+    wrapper.destroy();
+    wrapper = null;
+  });
+
+  describe('when shown', () => {
+    beforeEach(() => {
+      createComponent();
+    });
+
+    it('shows the disabled merge button', () => {
+      expect(wrapper.text()).toContain('Merge');
+      expect(findButton().attributes().disabled).toBe('disabled');
+    });
+
+    it('shows the disabled reason', () => {
+      expect(wrapper.text()).toContain('You can only merge once the denied license is removed');
+    });
+  });
+});
