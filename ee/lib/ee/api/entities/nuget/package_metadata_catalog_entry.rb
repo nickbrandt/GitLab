@@ -7,7 +7,7 @@ module EE
         class PackageMetadataCatalogEntry < Grape::Entity
           expose :json_url, as: :@id
           expose :authors
-          expose :dependencies, as: :dependencyGroups
+          expose :dependency_groups, as: :dependencyGroups, using: EE::API::Entities::Nuget::DependencyGroup
           expose :package_name, as: :id
           expose :package_version, as: :version
           expose :tags
