@@ -252,4 +252,39 @@ RSpec.describe PersonalAccessToken do
       it { expect(subject).to be result }
     end
   end
+
+  shared_context 'write to cache' do
+    let_it_be(:pat) { create(:personal_access_token) }
+    let_it_be(:cache_keys) { %w(token_expired_rotation token_expiring_rotation) }
+
+    before do
+      cache_keys.each do |key|
+        Rails.cache.write(['users', pat.user.id, key], double)
+      end
+    end
+  end
+
+  describe '#revoke', :use_clean_rails_memory_store_caching do
+    include_context 'write to cache'
+
+    it 'clears cache on revoke access' do
+      pat.revoke!
+
+      cache_keys.each do |key|
+        expect(Rails.cache.read(['users', pat.user.id, key])).to be_nil
+      end
+    end
+  end
+
+  describe 'after create callback', :use_clean_rails_memory_store_caching do
+    include_context 'write to cache'
+
+    it 'clears cache for the user' do
+      create(:personal_access_token, user_id: pat.user_id)
+
+      cache_keys.each do |key|
+        expect(Rails.cache.read(['users', pat.user.id, key])).to be_nil
+      end
+    end
+  end
 end
