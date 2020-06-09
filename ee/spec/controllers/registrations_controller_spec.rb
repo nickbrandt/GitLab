@@ -59,7 +59,7 @@ RSpec.describe RegistrationsController do
       sign_in(create(:user))
     end
 
-    subject { patch :update_registration, params: { user: { role: 'software_developer', setup_for_company: false } } }
+    subject(:update_registration) { patch :update_registration, params: { user: { role: 'software_developer', setup_for_company: 'false' } } }
 
     it { is_expected.to redirect_to dashboard_projects_path }
 
@@ -84,6 +84,55 @@ RSpec.describe RegistrationsController do
         end
 
         it { is_expected.not_to redirect_to new_users_sign_up_group_path }
+      end
+    end
+
+    describe 'tracking for the onboarding issues experiment' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:on_gitlab_com, :experiment_enabled, :in_subscription_flow, :in_invitation_flow, :experiment_enabled_for_user, :expected_tracking) do
+        false | false | false | false | true  | nil
+        false | false | false | true  | true  | nil
+        false | false | true  | false | true  | nil
+        false | false | true  | true  | true  | nil
+        false | true  | false | false | true  | nil
+        false | true  | false | true  | true  | nil
+        false | true  | true  | false | true  | nil
+        false | true  | true  | true  | true  | nil
+        true  | false | false | false | true  | nil
+        true  | false | false | true  | true  | nil
+        true  | false | true  | false | true  | nil
+        true  | false | true  | true  | true  | nil
+        true  | true  | false | false | true  | 'experimental_group'
+        true  | true  | false | false | false | 'control_group'
+        true  | true  | false | true  | true  | nil
+        true  | true  | true  | false | true  | nil
+        true  | true  | true  | true  | true  | nil
+      end
+
+      with_them do
+        before do
+          allow(::Gitlab).to receive(:com?).and_return(on_gitlab_com)
+          stub_experiment(onboarding_issues: experiment_enabled)
+          allow(controller.helpers).to receive(:in_subscription_flow?).and_return(in_subscription_flow)
+          allow(controller.helpers).to receive(:in_invitation_flow?).and_return(in_invitation_flow)
+          stub_experiment_for_user(onboarding_issues: experiment_enabled_for_user)
+        end
+
+        it 'tracks when appropriate' do
+          if expected_tracking
+            expect(Gitlab::Tracking).to receive(:event).with(
+              'Growth::Conversion::Experiment::OnboardingIssues',
+              'signed_up',
+              label: anything,
+              property: expected_tracking
+            )
+          else
+            expect(Gitlab::Tracking).not_to receive(:event)
+          end
+
+          update_registration
+        end
       end
     end
   end
