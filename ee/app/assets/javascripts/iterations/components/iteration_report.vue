@@ -2,6 +2,7 @@
 import { GlBadge, GlIcon, GlNewDropdown, GlNewDropdownItem } from '@gitlab/ui';
 import dateFormat from 'dateformat';
 import { __ } from '~/locale';
+import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import query from '../queries/group_iteration.query.graphql';
 
 export default {
@@ -12,17 +13,28 @@ export default {
     GlNewDropdownItem,
   },
   apollo: {
-    iteration: {
+    group: {
       query,
       variables() {
         return {
           groupPath: this.groupPath,
-          id: this.iterationId,
+          id: getIdFromGraphQLId(this.iterationId),
         };
       },
       update(data, errors) {
-        // console.log(errors);
-        return data.group.iterations.nodes[0];
+        if (errors) {
+          return {};
+        }
+
+        const iteration = data.group.iterations.nodes[0] || {
+          title: __('Iteration not found'),
+          state: 'upcoming',
+        };
+
+        return {
+          iteration,
+          issues: data.group.issues.nodes,
+        };
       },
     },
   },
@@ -58,10 +70,19 @@ export default {
       title: '',
       startDate: '',
       dueDate: '',
-      iteration: {},
+      group: {
+        iteration: {},
+        issues: [],
+      },
     };
   },
   computed: {
+    iteration() {
+      return this.group.iteration;
+    },
+    issues() {
+      return this.group.issues;
+    },
     status() {
       switch (this.iteration.state) {
         case 'closed':
@@ -111,5 +132,6 @@ export default {
     </div>
     <h3 class="page-title">{{ iteration.title }}</h3>
     <div v-html="iteration.description"></div>
+    <div v-for="issue in issues" :key="issue.title">{{ issue.assignes }}</div>
   </div>
 </template>

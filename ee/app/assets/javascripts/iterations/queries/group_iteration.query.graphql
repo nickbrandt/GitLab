@@ -1,6 +1,6 @@
-query GroupIteration($groupPath: ID!) {
+query GroupIteration($groupPath: ID!, $id: ID!) {
   group(fullPath: $groupPath) {
-    iterations(last: 1) {
+    iterations(id: $id) {
       nodes {
         title
         state
@@ -9,6 +9,19 @@ query GroupIteration($groupPath: ID!) {
         webPath
         startDate
         dueDate
+      }
+    }
+    issues(iterationId: [$id]) {
+      nodes {
+        title
+        iid
+        webUrl
+        assignees {
+          nodes {
+            name
+            username
+          }
+        }
       }
     }
   }
