@@ -25,9 +25,16 @@ module Registrations
     private
 
     def create_learn_gitlab_project
-      File.open(learn_gitlab_template_path) do |archive|
-        ::Projects::GitlabProjectsImportService.new(current_user, namespace_id: @project.namespace_id, file: archive, name: s_('Learn GitLab')).execute
+      learn_gitlab_project = File.open(learn_gitlab_template_path) do |archive|
+        ::Projects::GitlabProjectsImportService.new(
+          current_user,
+          namespace_id: @project.namespace_id,
+          file: archive,
+          name: s_('Learn GitLab')
+        ).execute
       end
+
+      cookies[:onboarding_issues_settings] = { 'groups#show' => true, 'projects#show' => true, 'issues#index' => true }.to_json if learn_gitlab_project.saved?
     end
 
     def learn_gitlab_template_path
