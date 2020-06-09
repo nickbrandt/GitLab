@@ -96,6 +96,33 @@ RSpec.describe Gitlab::UrlBuilder do
       end
     end
 
+    context 'when passing a Snippet blob' do
+      let_it_be(:personal_snippet) { create(:personal_snippet, :repository) }
+      let_it_be(:project_snippet)  { create(:project_snippet, :repository) }
+      let(:blob)                   { snippet.blobs.first }
+      let(:ref)                    { blob.repository.root_ref }
+
+      context 'for a PersonalSnippet' do
+        let(:snippet) { personal_snippet }
+
+        it 'returns a raw snippet blob URL' do
+          url = subject.build(blob)
+
+          expect(url).to eq "#{Gitlab.config.gitlab.url}/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}"
+        end
+      end
+
+      context 'for a ProjectSnippet' do
+        let(:snippet) { project_snippet }
+
+        it 'returns a raw snippet blob URL' do
+          url = subject.build(blob)
+
+          expect(url).to eq "#{Gitlab.config.gitlab.url}/#{snippet.project.full_path}/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}"
+        end
+      end
+    end
+
     context 'when passing a Wiki' do
       let(:wiki) { build_stubbed(:project_wiki) }
 

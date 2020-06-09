@@ -17,6 +17,11 @@ module API
       expose :file_name do |snippet|
         snippet.file_name_on_repo || snippet.file_name
       end
+      expose :blobs, as: :files, using: Entities::SnippetBlob, if: ->(snippet, options) { snippet_multiple_files?(snippet, options[:current_user]) }
+
+      def snippet_multiple_files?(snippet, current_user)
+        ::Feature.enabled?(:snippet_multiple_files, current_user) && snippet.repository_exists?
+      end
     end
   end
 end
