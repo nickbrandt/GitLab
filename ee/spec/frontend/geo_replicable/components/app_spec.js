@@ -89,8 +89,9 @@ describe('GeoReplicableApp', () => {
 
       describe('with replicableItems', () => {
         beforeEach(() => {
-          wrapper.vm.$store.state.replicableItems = MOCK_BASIC_FETCH_DATA_MAP.data;
-          wrapper.vm.$store.state.totalReplicableItems = MOCK_BASIC_FETCH_DATA_MAP.total;
+          wrapper.vm.$store.state.replicableItems = MOCK_BASIC_FETCH_DATA_MAP;
+          wrapper.vm.$store.state.totalReplicableItems =
+            wrapper.vm.$store.state.replicableItems.length;
         });
 
         it('shows replicable items', () => {

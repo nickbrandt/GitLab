@@ -2,6 +2,7 @@ import { FILTER_STATES } from './constants';
 
 const createState = replicableType => ({
   replicableType,
+  useGraphQl: false,
   isLoading: false,
 
   replicableItems: [],

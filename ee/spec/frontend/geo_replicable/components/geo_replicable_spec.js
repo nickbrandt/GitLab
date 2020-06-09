@@ -70,7 +70,7 @@ describe('GeoReplicable', () => {
 
     describe('GeoReplicableItem', () => {
       beforeEach(() => {
-        wrapper.vm.$store.state.replicableItems = MOCK_BASIC_FETCH_DATA_MAP.data;
+        wrapper.vm.$store.state.replicableItems = MOCK_BASIC_FETCH_DATA_MAP;
       });
 
       it('renders an instance for each replicableItem in the store', () => {
