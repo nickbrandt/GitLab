@@ -13,6 +13,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         module: :groups,
         as: :group,
         constraints: { group_id: Gitlab::PathRegex.full_namespace_route_regex }) do
+    draw :wiki
+
     resources :group_members, only: [], concerns: :access_requestable do
       patch :override, on: :member
     end
