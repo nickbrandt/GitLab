@@ -667,6 +667,18 @@ describe('RequirementsRoot', () => {
           `http://localhost/?page=1&state=opened&search=foo&sort=created_desc&author_username%5B%5D=root&author_username%5B%5D=john.doe`,
         );
       });
+
+      it('updates props `textSearch` and `authorUsernames` with empty values when passed filters param is empty', () => {
+        wrapper.setData({
+          authorUsernames: ['foo'],
+          textSearch: 'bar',
+        });
+
+        wrapper.vm.handleFilterRequirements([]);
+
+        expect(wrapper.vm.authorUsernames).toEqual([]);
+        expect(wrapper.vm.textSearch).toBe('');
+      });
     });
 
     describe('handleSortRequirements', () => {
