@@ -40,7 +40,7 @@ export default {
           detailsPath: `${this.node.url}admin/geo/projects`,
         },
         {
-          itemEnabled: this.nodeDetails.repositories.enabled,
+          itemEnabled: this.nodeDetails.wikis.enabled,
           itemTitle: s__('GeoNodes|Wikis'),
           itemValue: this.nodeDetails.wikis,
           itemValueType: VALUE_TYPE.GRAPH,
