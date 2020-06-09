@@ -4,6 +4,7 @@ import { GlAvatar, GlIcon, GlLink, GlSprintf, GlTooltipDirective } from '@gitlab
 import PackageTags from '../../shared/components/package_tags.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
+import { __ } from '~/locale';
 
 export default {
   name: 'PackageTitle',
@@ -28,6 +29,9 @@ export default {
       return numberToHumanSize(this.packageFiles.reduce((acc, p) => acc + p.size, 0));
     },
   },
+  i18n: {
+    packageInfo: __('v%{version} published %{timeAgo}'),
+  },
 };
 </script>
 
@@ -49,7 +53,7 @@ export default {
 
         <div class="gl-display-flex gl-align-items-center text-secondary">
           <gl-icon name="eye" class="gl-mr-3" />
-          <gl-sprintf message="v%{version} published %{timeAgo}">
+          <gl-sprintf :message="$options.i18n.packageInfo">
             <template #version>
               {{ packageEntity.version }}
             </template>

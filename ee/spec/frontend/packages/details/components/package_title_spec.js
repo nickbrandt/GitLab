@@ -68,11 +68,17 @@ describe('PackageTitle', () => {
   });
 
   describe('package icon', () => {
+    const fakeSrc = 'a-fake-src';
+
     it('shows an icon when provided one from vuex', () => {
-      const fakeSrc = 'a-fake-src';
       createComponent({ icon: fakeSrc });
 
       expect(packageIcon().exists()).toBe(true);
+    });
+
+    it('has the correct src attribute', () => {
+      createComponent({ icon: fakeSrc });
+
       expect(packageIcon().props('src')).toBe(fakeSrc);
     });
 
