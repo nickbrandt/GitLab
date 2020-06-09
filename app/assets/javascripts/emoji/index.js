@@ -126,10 +126,8 @@ export function glEmojiTag(inputName, options) {
   return `
     <gl-emoji
       ${classAttribute}
-      data-name="${name}"
       ${fallbackSpriteAttribute}
       ${forceFallbackAttribute}
-    >
-    </gl-emoji>
+      data-name="${name}"></gl-emoji>
   `;
 }

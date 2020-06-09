@@ -19,10 +19,7 @@ exports[`vue_shared/components/awards_list default matches snapshot 1`] = `
     
       <gl-emoji
         data-name="thumbsup"
-      >
-        
-    
-      </gl-emoji>
+      />
       
   
     </span>
@@ -48,10 +45,7 @@ exports[`vue_shared/components/awards_list default matches snapshot 1`] = `
     
       <gl-emoji
         data-name="thumbsdown"
-      >
-        
-    
-      </gl-emoji>
+      />
       
   
     </span>
@@ -77,10 +71,7 @@ exports[`vue_shared/components/awards_list default matches snapshot 1`] = `
     
       <gl-emoji
         data-name="smile"
-      >
-        
-    
-      </gl-emoji>
+      />
       
   
     </span>
@@ -106,10 +97,7 @@ exports[`vue_shared/components/awards_list default matches snapshot 1`] = `
     
       <gl-emoji
         data-name="ok_hand"
-      >
-        
-    
-      </gl-emoji>
+      />
       
   
     </span>
@@ -135,10 +123,7 @@ exports[`vue_shared/components/awards_list default matches snapshot 1`] = `
     
       <gl-emoji
         data-name="cactus"
-      >
-        
-    
-      </gl-emoji>
+      />
       
   
     </span>
@@ -164,10 +149,7 @@ exports[`vue_shared/components/awards_list default matches snapshot 1`] = `
     
       <gl-emoji
         data-name="a"
-      >
-        
-    
-      </gl-emoji>
+      />
       
   
     </span>
@@ -193,10 +175,7 @@ exports[`vue_shared/components/awards_list default matches snapshot 1`] = `
     
       <gl-emoji
         data-name="b"
-      >
-        
-    
-      </gl-emoji>
+      />
       
   
     </span>

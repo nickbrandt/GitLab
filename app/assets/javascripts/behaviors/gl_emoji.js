@@ -13,7 +13,7 @@ class GlEmoji extends HTMLElement {
     const { fallbackSpriteClass, fallbackSrc, forceFallback } = this.dataset;
     let { name, unicodeVersion } = this.dataset;
 
-    initEmojiMap()
+    return initEmojiMap()
       .then(() => {
         if (!unicodeVersion) {
           const emojiInfo = getEmojiInfo(name);
