@@ -1,5 +1,0 @@
----
-title: Renaming TAGS_LIMIT constant to FOR_PACKAGES_TAGS_LIMIT
-merge_request: 31858
-author: Ashutosh Kumar Singh
-type: change
