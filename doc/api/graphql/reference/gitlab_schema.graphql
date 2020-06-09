@@ -11155,7 +11155,7 @@ type Snippet implements Noteable {
   """
   The owner of the snippet
   """
-  author: User!
+  author: User
 
   """
   Snippet blob
