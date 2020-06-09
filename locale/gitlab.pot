@@ -11666,6 +11666,9 @@ msgstr ""
 msgid "Health information can be retrieved from the following endpoints. More information is available"
 msgstr ""
 
+msgid "Health status"
+msgstr ""
+
 msgid "HealthCheck|Access token is"
 msgstr ""
 
@@ -15261,6 +15264,9 @@ msgid "No starrers matched your search"
 msgstr ""
 
 msgid "No start date"
+msgstr ""
+
+msgid "No status"
 msgstr ""
 
 msgid "No template"
