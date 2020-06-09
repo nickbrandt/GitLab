@@ -1,5 +1,0 @@
----
-title: De-expose requirement test report `pipeline` field from GraphQL
-merge_request: 34112
-author:
-type: changed

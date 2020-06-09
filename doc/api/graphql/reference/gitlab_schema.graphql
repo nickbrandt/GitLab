@@ -11433,11 +11433,6 @@ type TestReport {
   id: ID!
 
   """
-  Pipeline that created the test report
-  """
-  pipeline: Pipeline
-
-  """
   State of the test report
   """
   state: TestReportState!
