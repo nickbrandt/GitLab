@@ -4,8 +4,8 @@ import Vuex from 'vuex';
 import Project from 'ee/operations/components/dashboard/project.vue';
 import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
 import createStore from 'ee/vue_shared/dashboards/store';
-import timeoutPromise from 'spec/helpers/set_timeout_promise_helper';
-import { trimText } from 'spec/helpers/text_helper';
+import waitForPromises from 'helpers/wait_for_promises';
+import { trimText } from 'helpers/text_helper';
 import axios from '~/lib/utils/axios_utils';
 import { mockProjectData, mockText } from '../../mock_data';
 
@@ -15,13 +15,12 @@ localVue.use(Vuex);
 describe('dashboard component', () => {
   const mockAddEndpoint = 'mock-addPath';
   const mockListEndpoint = 'mock-listPath';
-  const DashboardComponent = localVue.extend(Dashboard);
   const store = createStore();
   let wrapper;
   let mockAxios;
 
   const mountComponent = () =>
-    mount(DashboardComponent, {
+    mount(Dashboard, {
       store,
       localVue,
       propsData: {
@@ -67,26 +66,25 @@ describe('dashboard component', () => {
     });
 
     describe('when a project is added', () => {
-      it('immediately requests the project list again', done => {
+      it('immediately requests the project list again', () => {
         mockAxios.reset();
         mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: mockProjectData(2) });
         mockAxios.onPost(mockAddEndpoint).replyOnce(200, { added: [1], invalid: [] });
-        wrapper.vm
+
+        return wrapper.vm
           .$nextTick()
           .then(() => {
             wrapper.vm.projectClicked({ id: 1 });
           })
-          .then(timeoutPromise)
+          .then(waitForPromises)
           .then(() => {
             wrapper.vm.onOk();
           })
-          .then(timeoutPromise)
+          .then(waitForPromises)
           .then(() => {
             expect(store.state.projects.length).toEqual(2);
             expect(wrapper.findAll(Project).length).toEqual(2);
-            done();
-          })
-          .catch(done.fail);
+          });
       });
     });
   });
@@ -104,7 +102,7 @@ describe('dashboard component', () => {
       it('includes a dashboard project component for each project', () => {
         const projectComponents = wrapper.findAll(Project);
 
-        expect(projectComponents.length).toBe(projectCount);
+        expect(projectComponents).toHaveLength(projectCount);
       });
 
       it('passes each project to the dashboard project component', () => {
@@ -115,7 +113,7 @@ describe('dashboard component', () => {
       });
 
       it('dispatches setProjects when projects changes', () => {
-        const dispatch = spyOn(wrapper.vm.$store, 'dispatch');
+        const dispatch = jest.spyOn(wrapper.vm.$store, 'dispatch').mockImplementation(() => {});
         const projects = mockProjectData(3);
 
         wrapper.vm.projects = projects;
@@ -124,20 +122,17 @@ describe('dashboard component', () => {
       });
 
       describe('when a project is removed', () => {
-        it('immediately requests the project list again', done => {
+        it('immediately requests the project list again', () => {
           mockAxios.reset();
           mockAxios.onDelete(store.state.projects[0].remove_path).reply(200);
           mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: [] });
 
           wrapper.find('button.js-remove-button').vm.$emit('click');
 
-          timeoutPromise()
-            .then(() => {
-              expect(store.state.projects.length).toEqual(0);
-              expect(wrapper.findAll(Project).length).toEqual(0);
-              done();
-            })
-            .catch(done.fail);
+          return waitForPromises().then(() => {
+            expect(store.state.projects.length).toEqual(0);
+            expect(wrapper.findAll(Project).length).toEqual(0);
+          });
         });
       });
     });
@@ -148,69 +143,64 @@ describe('dashboard component', () => {
         store.state.selectedProjects = mockProjectData(1);
       });
 
-      it('clears state when adding a valid project', done => {
+      it('clears state when adding a valid project', () => {
         mockAxios.onPost(mockAddEndpoint).replyOnce(200, { added: [1], invalid: [] });
-        wrapper.vm
+
+        return wrapper.vm
           .$nextTick()
           .then(() => {
             wrapper.vm.onOk();
           })
-          .then(timeoutPromise)
+          .then(waitForPromises)
           .then(() => {
-            expect(store.state.projectSearchResults.length).toEqual(0);
-            expect(store.state.selectedProjects.length).toEqual(0);
-            done();
-          })
-          .catch(done.fail);
+            expect(store.state.projectSearchResults).toHaveLength(0);
+            expect(store.state.selectedProjects).toHaveLength(0);
+          });
       });
 
-      it('clears state when adding an invalid project', done => {
+      it('clears state when adding an invalid project', () => {
         mockAxios.onPost(mockAddEndpoint).replyOnce(200, { added: [], invalid: [1] });
-        wrapper.vm
+
+        return wrapper.vm
           .$nextTick()
           .then(() => {
             wrapper.vm.onOk();
           })
-          .then(timeoutPromise)
+          .then(waitForPromises)
           .then(() => {
-            expect(store.state.projectSearchResults.length).toEqual(0);
-            expect(store.state.selectedProjects.length).toEqual(0);
-            done();
-          })
-          .catch(done.fail);
+            expect(store.state.projectSearchResults).toHaveLength(0);
+            expect(store.state.selectedProjects).toHaveLength(0);
+          });
       });
 
-      it('clears state when canceled', done => {
-        wrapper.vm
+      it('clears state when canceled', () => {
+        return wrapper.vm
           .$nextTick()
           .then(() => {
             wrapper.vm.onCancel();
           })
-          .then(timeoutPromise)
+          .then(waitForPromises)
           .then(() => {
-            expect(store.state.projectSearchResults.length).toEqual(0);
-            expect(store.state.selectedProjects.length).toEqual(0);
-            done();
-          })
-          .catch(done.fail);
+            expect(store.state.projectSearchResults).toHaveLength(0);
+            expect(store.state.selectedProjects).toHaveLength(0);
+          });
       });
 
-      it('clears state on error', done => {
+      it('clears state on error', () => {
         mockAxios.onPost(mockAddEndpoint).replyOnce(500, {});
-        wrapper.vm
+
+        return wrapper.vm
           .$nextTick()
           .then(() => {
-            expect(store.state.projectSearchResults.length).not.toEqual(0);
-            expect(store.state.selectedProjects.length).not.toEqual(0);
+            expect(store.state.projectSearchResults.length).not.toBe(0);
+            expect(store.state.selectedProjects.length).not.toBe(0);
             wrapper.vm.onOk();
           })
-          .then(timeoutPromise)
+          .then(waitForPromises)
           .then(() => {
-            expect(store.state.projectSearchResults.length).toEqual(0);
-            expect(store.state.selectedProjects.length).toEqual(0);
-            done();
-          })
-          .catch(done.fail);
+            expect(store.state.projectSearchResults).toHaveLength(0);
+            expect(store.state.selectedProjects).toHaveLength(0);
+          });
       });
     });
 
