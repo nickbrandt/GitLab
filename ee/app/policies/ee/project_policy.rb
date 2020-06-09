@@ -368,7 +368,7 @@ module EE
         prevent :owner_access
       end
 
-      rule { ip_enforcement_prevents_access }.policy do
+      rule { ip_enforcement_prevents_access & ~admin }.policy do
         prevent :read_project
       end
 
