@@ -25,6 +25,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Use this scope for all new project routes.
       scope '-' do
         get 'archive/*id', constraints: { format: Gitlab::PathRegex.archive_formats_regex, id: /.+?/ }, to: 'repositories#archive', as: 'archive'
+        get 'd', to: 'metrics_dashboard#metrics_dashboard_page', as: :metrics_dashboard_page
 
         resources :artifacts, only: [:index, :destroy]
 
