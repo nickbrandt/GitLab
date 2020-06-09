@@ -1,6 +1,6 @@
 import { __ } from '~/locale';
 import { formatDate } from '~/lib/utils/datetime_utility';
-import { TrackingActions } from './constants';
+import { TrackingActions, InformationType } from './constants';
 import { PackageType } from '../shared/constants';
 import { orderBy } from 'lodash';
 
@@ -53,7 +53,7 @@ export function generatePackageInfo(packageEntity = {}) {
         order: 3,
         label: __('Project URL'),
         value: projectUrl,
-        type: 'link',
+        type: InformationType.LINK,
       });
     }
 
@@ -62,7 +62,7 @@ export function generatePackageInfo(packageEntity = {}) {
         order: 4,
         label: __('License URL'),
         value: licenseUrl,
-        type: 'link',
+        type: InformationType.LINK,
       });
     }
   }
