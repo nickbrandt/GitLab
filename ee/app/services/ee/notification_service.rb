@@ -38,6 +38,14 @@ module EE
       end
     end
 
+    def mirror_was_disabled(project, deleted_user_name)
+      return if project.emails_disabled?
+
+      owners_and_maintainers_without_invites(project).each do |recipient|
+        mailer.mirror_was_disabled_email(project.id, recipient.user.id, deleted_user_name).deliver_later
+      end
+    end
+
     def new_epic(epic)
       new_resource_email(epic, :new_epic_email)
     end
