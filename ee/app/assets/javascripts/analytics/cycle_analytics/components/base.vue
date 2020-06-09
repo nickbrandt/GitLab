@@ -19,6 +19,7 @@ import StageTableNav from './stage_table_nav.vue';
 import CustomStageForm from './custom_stage_form.vue';
 import PathNavigation from './path_navigation.vue';
 import MetricCard from '../../shared/components/metric_card.vue';
+import FilterBar from './filter_bar.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -37,6 +38,7 @@ export default {
     StageTableNav,
     PathNavigation,
     MetricCard,
+    FilterBar,
   },
   mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
   props: {
@@ -54,6 +56,14 @@ export default {
     },
     hideGroupDropDown: {
       type: Boolean,
+      required: true,
+    },
+    milestonesPath: {
+      type: String,
+      required: true,
+    },
+    labelsPath: {
+      type: String,
       required: true,
     },
   },
@@ -119,12 +129,25 @@ export default {
     stageCount() {
       return this.activeStages.length;
     },
+    hasProject() {
+      return this.selectedProjectIds.length;
+    },
   },
   mounted() {
+    const {
+      glFeatures: {
+        cycleAnalyticsScatterplotEnabled: hasDurationChart,
+        cycleAnalyticsScatterplotMedianEnabled: hasDurationChartMedian,
+        valueStreamAnalyticsPathNavigation: hasPathNavigation,
+        valueStreamAnalyticsFilterBar: hasFilterBar,
+      },
+    } = this;
+
     this.setFeatureFlags({
-      hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
-      hasDurationChartMedian: this.glFeatures.cycleAnalyticsScatterplotMedianEnabled,
-      hasPathNavigation: this.glFeatures.valueStreamAnalyticsPathNavigation,
+      hasDurationChart,
+      hasDurationChartMedian,
+      hasPathNavigation,
+      hasFilterBar,
     });
   },
   methods: {
@@ -231,6 +254,11 @@ export default {
             :multi-select="$options.multiProjectSelect"
             :default-projects="selectedProjects"
             @selected="onProjectsSelect"
+          />
+          <filter-bar
+            v-if="featureFlags.hasFilterBar"
+            class="js-filter-bar filtered-search-box mx-2 gl-display-none"
+            :disabled="!hasProject"
           />
           <div
             v-if="shouldDisplayFilters"

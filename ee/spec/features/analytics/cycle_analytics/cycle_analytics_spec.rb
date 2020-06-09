@@ -159,7 +159,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
     end
 
     it 'does not show the filter bar' do
-      expect(page).to have_selector(filter_bar_selector, visible: false)
+      expect(page).not_to have_selector(filter_bar_selector)
     end
 
     context 'with path navigation feature flag enabled' do
@@ -180,7 +180,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
       end
 
       it 'shows the filter bar' do
-        expect(page).to have_selector(filter_bar_selector, visible: true)
+        expect(page).to have_selector(filter_bar_selector, visible: :hidden)
       end
     end
   end
