@@ -306,49 +306,31 @@ RSpec.describe ApplicationSetting do
         end
 
         describe '#elasticsearch_indexes_project?' do
-          shared_examples 'examples for #elasticsearch_indexes_project?' do
-            context 'when project is in a subgroup' do
-              let(:root_group) { create(:group) }
-              let(:subgroup) { create(:group, parent: root_group) }
-              let(:project) { create(:project, group: subgroup) }
+          context 'when project is in a subgroup' do
+            let(:root_group) { create(:group) }
+            let(:subgroup) { create(:group, parent: root_group) }
+            let(:project) { create(:project, group: subgroup) }
 
-              before do
-                create(:elasticsearch_indexed_namespace, namespace: root_group)
-              end
-
-              it 'allows project to be indexed' do
-                expect(setting.elasticsearch_indexes_project?(project)).to be(true)
-              end
+            before do
+              create(:elasticsearch_indexed_namespace, namespace: root_group)
             end
 
-            context 'when project is in a namespace' do
-              let(:namespace) { create(:namespace) }
-              let(:project) { create(:project, namespace: namespace) }
-
-              before do
-                create(:elasticsearch_indexed_namespace, namespace: namespace)
-              end
-
-              it 'allows project to be indexed' do
-                expect(setting.elasticsearch_indexes_project?(project)).to be(true)
-              end
+            it 'allows project to be indexed' do
+              expect(setting.elasticsearch_indexes_project?(project)).to be(true)
             end
           end
 
-          context 'when optimized_elasticsearch_indexes_project feature flag is on' do
+          context 'when project is in a namespace' do
+            let(:namespace) { create(:namespace) }
+            let(:project) { create(:project, namespace: namespace) }
+
             before do
-              stub_feature_flags(optimized_elasticsearch_indexes_project: true)
+              create(:elasticsearch_indexed_namespace, namespace: namespace)
             end
 
-            include_examples 'examples for #elasticsearch_indexes_project?'
-          end
-
-          context 'when optimized_elasticsearch_indexes_project feature flag is off' do
-            before do
-              stub_feature_flags(optimized_elasticsearch_indexes_project: false)
+            it 'allows project to be indexed' do
+              expect(setting.elasticsearch_indexes_project?(project)).to be(true)
             end
-
-            include_examples 'examples for #elasticsearch_indexes_project?'
           end
         end
       end
