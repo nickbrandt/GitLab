@@ -121,6 +121,10 @@ module EE
       project&.feature_available?(:issue_weights)
     end
 
+    def can_assign_epic?(user)
+      user&.can?(:admin_epic, project.group)
+    end
+
     def related_issues(current_user, preload: nil)
       related_issues = ::Issue
         .select(['issues.*', 'issue_links.id AS issue_link_id',

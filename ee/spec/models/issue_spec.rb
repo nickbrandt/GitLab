@@ -678,4 +678,49 @@ RSpec.describe Issue do
       it { is_expected.to be_falsey }
     end
   end
+
+  describe '#can_assign_epic?' do
+    let(:user)    { create(:user) }
+    let(:group)   { create(:group) }
+    let(:project) { create(:project, group: group) }
+    let(:issue)   { create(:issue, project: project) }
+
+    subject { issue.can_assign_epic?(user) }
+
+    context 'when epics feature is available' do
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      context 'when a user is not a project member' do
+        it 'returns false' do
+          expect(subject).to be_falsey
+        end
+      end
+
+      context 'when a user is a project member' do
+        it 'returns false' do
+          project.add_developer(user)
+
+          expect(subject).to be_falsey
+        end
+      end
+
+      context 'when a user is a group member' do
+        it 'returns true' do
+          group.add_developer(user)
+
+          expect(subject).to be_truthy
+        end
+      end
+    end
+
+    context 'when epics feature is not available' do
+      it 'returns false' do
+        group.add_developer(user)
+
+        expect(subject).to be_falsey
+      end
+    end
+  end
 end
