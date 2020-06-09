@@ -1,0 +1,5 @@
+---
+title: Harden security ci build job queries
+merge_request: 33966
+author:
+type: performance
