@@ -361,5 +361,5 @@ rspec foss-impact:
     paths:
       - tmp/matching_foss_tests.txt
       - tmp/capybara/
-# EE: Merge Request pipelines
+# EE: Canonical MR pipelines
 ##################################################

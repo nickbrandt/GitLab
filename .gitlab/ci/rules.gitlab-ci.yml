@@ -40,6 +40,9 @@
 .if-merge-request-title-update-caches: &if-merge-request-title-update-caches
   if: '$CI_MERGE_REQUEST_TITLE =~ /UPDATE CACHE/'
 
+.if-merge-request-title-skip-foss-impact: &if-merge-request-title-skip-foss-impact
+  if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP FOSS-IMPACT/'
+
 .if-security-merge-request: &if-security-merge-request
   if: '$CI_PROJECT_NAMESPACE == "gitlab-org/security" && $CI_MERGE_REQUEST_IID'
 
@@ -430,6 +433,8 @@
 .rails:rules:ee-mr-only:
   rules:
     - <<: *if-not-ee
+      when: never
+    - <<: *if-merge-request-title-skip-foss-impact
       when: never
     - <<: *if-security-merge-request
       changes: *code-backstage-patterns
