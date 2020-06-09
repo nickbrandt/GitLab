@@ -1,17 +1,32 @@
 <script>
-import { GlAlert } from '@gitlab/ui';
+import { GlAlert, GlLink, GlSprintf } from '@gitlab/ui';
+import { isEmpty } from 'lodash';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
 import DagGraph from './dag_graph.vue';
-import { DEFAULT, PARSE_FAILURE, LOAD_FAILURE, UNSUPPORTED_DATA } from './constants';
+import DagAnnotations from './dag_annotations.vue';
+import { getLiveLinks } from './interactions';
+import {
+  DEFAULT,
+  IS_HIGHLIGHTED,
+  PARSE_FAILURE,
+  LOAD_FAILURE,
+  UNSUPPORTED_DATA,
+  ADD_NOTE,
+  REMOVE_NOTE,
+  REPLACE_NOTES,
+} from './constants';
 import { parseData } from './parsing_utils';
 
 export default {
   // eslint-disable-next-line @gitlab/require-i18n-strings
   name: 'Dag',
   components: {
+    DagAnnotations,
     DagGraph,
     GlAlert,
+    GlLink,
+    GlSprintf,
   },
   props: {
     graphUrl: {
@@ -22,7 +37,9 @@ export default {
   },
   data() {
     return {
+      annotationsMap: {},
       showFailureAlert: false,
+      showBetaInfo: true,
       failureType: null,
       graphData: null,
     };
@@ -34,6 +51,11 @@ export default {
     [DEFAULT]: __('An unknown error occurred while loading this graph.'),
   },
   computed: {
+    betaMessage() {
+      return __(
+        'This feature is currently in beta. We invite you to %{linkStart}give feedback%{linkEnd}.',
+      );
+    },
     failure() {
       switch (this.failureType) {
         case LOAD_FAILURE:
@@ -58,6 +80,9 @@ export default {
           };
       }
     },
+    shouldDisplayAnnotations() {
+      return !(isEmpty(this.annotationsMap));
+    },
     shouldDisplayGraph() {
       return Boolean(!this.showFailureAlert && this.graphData);
     },
@@ -78,6 +103,9 @@ export default {
       .catch(() => reportFailure(LOAD_FAILURE));
   },
   methods: {
+    addAnnotationToMap({ uid, source, target }) {
+      this.$set(this.annotationsMap, uid, { source,  target })
+    },
     processGraphData(data) {
       let parsed;
 
@@ -98,10 +126,35 @@ export default {
     hideAlert() {
       this.showFailureAlert = false;
     },
+    hideBetaInfo() {
+      this.showBetaInfo = false;
+    },
+    removeAnnotationFromMap({ uid }) {
+      this.$delete(this.annotationsMap, uid);
+    },
     reportFailure(type) {
       this.showFailureAlert = true;
       this.failureType = type;
     },
+    updateAnnotation ({ type, data }) {
+      switch (type) {
+        case ADD_NOTE:
+          data.forEach(item => {
+            this.addAnnotationToMap(item);
+          })
+          break;
+        case REMOVE_NOTE:
+          data.forEach((item) => {
+            this.removeAnnotationFromMap(item);
+          });
+          break;
+        case REPLACE_NOTES:
+          this.annotationsMap = data;
+          break;
+        default:
+          return;
+      }
+    }
   },
 };
 </script>
@@ -110,6 +163,28 @@ export default {
     <gl-alert v-if="showFailureAlert" :variant="failure.variant" @dismiss="hideAlert">
       {{ failure.text }}
     </gl-alert>
-    <dag-graph v-if="shouldDisplayGraph" :graph-data="graphData" @onFailure="reportFailure" />
+
+    <gl-alert v-if="showBetaInfo" @dismiss="hideBetaInfo">
+      <gl-sprintf :message="betaMessage">
+        <template #link="{ content }">
+          <gl-link href="https://gitlab.com/gitlab-org/gitlab/-/issues/220368" target="_blank">
+            {{ content }}
+          </gl-link>
+        </template>
+      </gl-sprintf>
+    </gl-alert>
+    <div class="gl-relative">
+      <dag-annotations
+        v-if="shouldDisplayAnnotations"
+        class='gl-min-h-7 gl-py-4'
+        :annotations="annotationsMap"
+      />
+      <dag-graph
+        v-if="shouldDisplayGraph"
+        :graph-data="graphData"
+        @on-failure="reportFailure"
+        @update-annotation="updateAnnotation"
+      />
+    </div>
   </div>
 </template>
