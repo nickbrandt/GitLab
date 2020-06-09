@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -77,5 +78,29 @@ func TestMarkdown(t *testing.T) {
 	c, err := newCodeHover(json.RawMessage(value))
 
 	require.NoError(t, err)
-	require.Equal(t, "This method reverses a string \n\n", c.Value)
+	require.Equal(t, "This method reverses a string \n\n", c.TruncatedValue.Value)
+}
+
+func TestTruncatedValue(t *testing.T) {
+	value := strings.Repeat("a", 500)
+	rawValue, err := json.Marshal(value)
+	require.NoError(t, err)
+
+	c, err := newCodeHover(rawValue)
+	require.NoError(t, err)
+
+	require.Equal(t, value[0:maxValueSize], c.TruncatedValue.Value)
+	require.True(t, c.TruncatedValue.Truncated)
+}
+
+func TestTruncatingMultiByteChars(t *testing.T) {
+	value := strings.Repeat("ಅ", 500)
+	rawValue, err := json.Marshal(value)
+	require.NoError(t, err)
+
+	c, err := newCodeHover(rawValue)
+	require.NoError(t, err)
+
+	symbolSize := 3
+	require.Equal(t, value[0:maxValueSize*symbolSize], c.TruncatedValue.Value)
 }
