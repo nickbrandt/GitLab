@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     hasProjectUrl() {
-      return this.project?.value && this.project?.url;
+      return Boolean(this.project?.value && this.project?.url);
     },
     eventText() {
       if (this.hasProjectUrl) {

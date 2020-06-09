@@ -4,7 +4,7 @@ import HistoryEntry from 'ee/vulnerabilities/components/history_entry.vue';
 import VulnerabilitiesEventBus from 'ee/vulnerabilities/components/vulnerabilities_event_bus';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
-import { TEST_HOST } from 'helpers/test_constants';
+import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
@@ -27,11 +27,13 @@ describe('Vulnerability Footer', () => {
       vulnerabilityFeedbackHelpPath:
         '/help/user/application_security/index#interacting-with-the-vulnerabilities',
     },
-    project: {
-      url: '/root/security-reports',
-      value: 'Administrator / Security Reports',
-    },
+    finding: {},
     notesUrl: '/notes',
+  };
+
+  const project = {
+    full_path: '/root/security-reports',
+    full_name: 'Administrator / Security Reports',
   };
 
   const solutionInfoProp = {
@@ -42,19 +44,6 @@ describe('Vulnerability Footer', () => {
     solution: 'Upgrade to fixed version.\n',
     vulnerabilityFeedbackHelpPath:
       '/help/user/application_security/index#interacting-with-the-vulnerabilities',
-  };
-
-  const feedbackProps = {
-    author: {},
-    branch: null,
-    category: 'container_scanning',
-    created_at: '2020-03-18T00:10:49.527Z',
-    feedback_type: 'issue',
-    id: 36,
-    issue_iid: 22,
-    issue_url: `${TEST_HOST}/root/security-reports/-/issues/22`,
-    project_fingerprint: 'f7319ea35fc016e754e9549dd89b338aea4c72cc',
-    project_id: 19,
   };
 
   const createWrapper = (props = minimumProps) => {
@@ -91,19 +80,29 @@ describe('Vulnerability Footer', () => {
     });
   });
 
-  describe('issue history', () => {
-    it('does show issue history when there is one', () => {
-      createWrapper({ ...minimumProps, feedback: feedbackProps });
-      expect(wrapper.contains(IssueNote)).toBe(true);
-      expect(wrapper.find(IssueNote).props()).toMatchObject({
-        feedback: feedbackProps,
-        project: minimumProps.project,
+  describe.each`
+    type               | prop                        | component
+    ${'issue'}         | ${'issue_feedback'}         | ${IssueNote}
+    ${'merge request'} | ${'merge_request_feedback'} | ${MergeRequestNote}
+  `('$type note', ({ prop, component }) => {
+    // The object itself does not matter, we just want to make sure it's passed to the issue note.
+    const feedback = {};
+
+    it('shows issue note when an issue exists for the vulnerability', () => {
+      createWrapper({ ...minimumProps, finding: { project, [prop]: feedback } });
+      expect(wrapper.contains(component)).toBe(true);
+      expect(wrapper.find(component).props()).toMatchObject({
+        feedback,
+        project: {
+          url: project.full_path,
+          value: project.full_name,
+        },
       });
     });
 
-    it('does not show issue history when there is not one', () => {
+    it('does not show issue note when there is no issue for the vulnerability', () => {
       createWrapper();
-      expect(wrapper.contains(IssueNote)).toBe(false);
+      expect(wrapper.contains(component)).toBe(false);
     });
   });
 
