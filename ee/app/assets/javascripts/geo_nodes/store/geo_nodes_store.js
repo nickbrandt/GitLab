@@ -137,6 +137,11 @@ export default class GeoNodesStore {
         successCount: rawNodeDetails.design_repositories_synced_count || 0,
         failureCount: rawNodeDetails.design_repositories_failed_count || 0,
       },
+      packageFiles: {
+        totalCount: rawNodeDetails.package_files_count || 0,
+        successCount: rawNodeDetails.package_files_synced_count || 0,
+        failureCount: rawNodeDetails.package_files_failed_count || 0,
+      },
       attachments: {
         enabled: rawNodeDetails.attachments_replication_enabled,
         totalCount: rawNodeDetails.attachments_count || 0,
