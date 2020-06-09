@@ -43,6 +43,10 @@ class Import::BaseController < ApplicationController
 
   private
 
+  def filter_attribute
+    :name
+  end
+
   def sanitized_filter_param
     @filter ||= sanitize(params[:filter])
   end

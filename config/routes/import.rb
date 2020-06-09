@@ -25,6 +25,7 @@ namespace :import do
     get :status
     get :callback
     get :jobs
+    get :realtime_changes
   end
 
   resource :bitbucket, only: [:create], controller: :bitbucket do

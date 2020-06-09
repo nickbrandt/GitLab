@@ -193,13 +193,19 @@ class Import::BitbucketServerController < Import::BaseController
   end
 
   def bitbucket_connection_error(error)
+    flash[:alert] = _("Unable to connect to server: %{error}") % { error: error }
+    clear_session_data
+
     respond_to do |format|
       format.json do
-        render json: { error: _("Unable to connect to server: %{error}") % { error: error } }, status: :unprocessable_entity
+        render json: {
+          error: {
+            message: _("Unable to connect to server: %{error}") % { error: error },
+            redirect: new_import_bitbucket_server_path
+          }
+        }, status: :unprocessable_entity
       end
       format.html do
-        flash[:alert] = _("Unable to connect to server: %{error}") % { error: error }
-        clear_session_data
         redirect_to new_import_bitbucket_server_path
       end
     end
