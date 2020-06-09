@@ -9335,7 +9335,7 @@ msgstr ""
 msgid "Failed to load error details from Sentry."
 msgstr ""
 
-msgid "Failed to load errors from Sentry. Error message: %{errorMessage}"
+msgid "Failed to load errors from Sentry."
 msgstr ""
 
 msgid "Failed to load group activity metrics. Please try again."
