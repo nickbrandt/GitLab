@@ -5,13 +5,13 @@ require 'spec_helper'
 describe Import::BitbucketProviderRepoEntity do
   let(:repo_data) do
     {
-      "name" => "repo_name",
-      "full_name" => "owner/repo_name",
-      "links" => {
-        "clone" => [
+      'name' => 'repo_name',
+      'full_name' => 'owner/repo_name',
+      'links' => {
+        'clone' => [
           {
-            "href" => "https://bitbucket.org/owner/repo_name",
-            "name" => "https"
+            'href' => 'https://bitbucket.org/owner/repo_name',
+            'name' => 'https'
           }
         ]
       }
@@ -21,5 +21,14 @@ describe Import::BitbucketProviderRepoEntity do
 
   subject { described_class.new(repo).as_json }
 
-  it_behaves_like 'exposes required fields for import entity'
+  it_behaves_like 'exposes required fields for import entity' do
+    let(:expected_values) do
+      {
+        id: 'owner/repo_name',
+        full_name: 'owner/repo_name',
+        sanitized_name: 'repo_name',
+        provider_link: 'https://bitbucket.org/owner/repo_name'
+      }
+    end
+  end
 end

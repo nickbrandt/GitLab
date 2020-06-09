@@ -9,6 +9,8 @@ class Import::BitbucketServerController < Import::BaseController
   before_action :bitbucket_auth, except: [:new, :configure]
   before_action :validate_import_params, only: [:create]
 
+  rescue_from BitbucketServer::Connection::ConnectionError, with: :bitbucket_connection_error
+
   # As a basic sanity check to prevent URL injection, restrict project
   # repository input and repository slugs to allowed characters. For Bitbucket:
   #
@@ -61,14 +63,7 @@ class Import::BitbucketServerController < Import::BaseController
 
   # rubocop: disable CodeReuse/ActiveRecord
   def status
-    if Feature.enabled?(:new_import_ui)
-      begin
-        return super
-      rescue BitbucketServer::Connection::ConnectionError => error
-        render json: { error: _("Unable to connect to server: %{error}") % { error: error } }, status: :unprocessable_entity
-        return
-      end
-    end
+    return super if Feature.enabled?(:new_import_ui)
 
     @collection = client.repos(page_offset: page_offset, limit: limit_per_page, filter: sanitized_filter_param)
     @repos, @incompatible_repos = @collection.partition { |repo| repo.valid? }
@@ -78,10 +73,6 @@ class Import::BitbucketServerController < Import::BaseController
     already_added_projects_names = @already_added_projects.pluck(:import_source)
 
     @repos.reject! { |repo| already_added_projects_names.include?(repo.browse_url) }
-  rescue BitbucketServer::Connection::ConnectionError => error
-    flash[:alert] = _("Unable to connect to server: %{error}") % { error: error }
-    clear_session_data
-    redirect_to new_import_bitbucket_server_path
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
@@ -199,5 +190,18 @@ class Import::BitbucketServerController < Import::BaseController
 
   def sanitized_filter_param
     sanitize(params[:filter])
+  end
+
+  def bitbucket_connection_error(error)
+    respond_to do |format|
+      format.json do
+        render json: { error: _("Unable to connect to server: %{error}") % { error: error } }, status: :unprocessable_entity
+      end
+      format.html do
+        flash[:alert] = _("Unable to connect to server: %{error}") % { error: error }
+        clear_session_data
+        redirect_to new_import_bitbucket_server_path
+      end
+    end
   end
 end

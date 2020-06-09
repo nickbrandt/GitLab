@@ -3,10 +3,6 @@
 class Import::GithubishProviderRepoEntity < Import::BaseProviderRepoEntity
   include ImportHelper
 
-  expose :owner_name, override: true do |provider_repo, options|
-    owner_name(provider_repo, options[:provider])
-  end
-
   expose :sanitized_name, override: true do |provider_repo|
     sanitize_project_name(provider_repo[:name])
   end

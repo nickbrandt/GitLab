@@ -24,9 +24,7 @@ class Import::BitbucketController < Import::BaseController
 
   # rubocop: disable CodeReuse/ActiveRecord
   def status
-    if Feature.enabled?(:new_import_ui)
-      return super
-    end
+    return super if Feature.enabled?(:new_import_ui)
 
     bitbucket_client = Bitbucket::Client.new(credentials)
     repos = bitbucket_client.repos(filter: sanitized_filter_param)

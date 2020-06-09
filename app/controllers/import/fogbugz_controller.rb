@@ -50,9 +50,7 @@ class Import::FogbugzController < Import::BaseController
       return redirect_to new_import_fogbugz_path
     end
 
-    if Feature.enabled?(:new_import_ui)
-      return super
-    end
+    return super if Feature.enabled?(:new_import_ui)
 
     @repos = client.repos
 

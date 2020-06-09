@@ -2,24 +2,20 @@
 
 RSpec.shared_examples 'exposes required fields for import entity' do
   describe 'exposes required fields' do
-    it 'exposes id' do
-      expect(subject).to include(:id)
+    it 'correctly exposes id' do
+      expect(subject[:id]).to eql(expected_values[:id])
     end
 
-    it 'exposes full name' do
-      expect(subject).to include(:full_name)
+    it 'correctly exposes full name' do
+      expect(subject[:full_name]).to eql(expected_values[:full_name])
     end
 
-    it 'exposes owner name' do
-      expect(subject).to include(:owner_name)
+    it 'correctly exposes sanitized name' do
+      expect(subject[:sanitized_name]).to eql(expected_values[:sanitized_name])
     end
 
-    it 'exposes sanitized name' do
-      expect(subject).to include(:sanitized_name)
-    end
-
-    it 'exposes provider link' do
-      expect(subject).to include(:provider_link)
+    it 'correctly exposes provider link' do
+      expect(subject[:provider_link]).to eql(expected_values[:provider_link])
     end
   end
 end

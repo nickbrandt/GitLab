@@ -56,7 +56,7 @@ RSpec.describe Import::BitbucketController do
 
   describe "GET status" do
     before do
-      @repo = double(name: 'vim', slug: 'vim', owner: 'asd', full_name: 'asd/vim', clone_url: "http://test.host/demo/url.git", "valid?" => true)
+      @repo = double(name: 'vim', slug: 'vim', owner: 'asd', full_name: 'asd/vim', clone_url: 'http://test.host/demo/url.git', 'valid?' => true)
       assign_session_tokens
       stub_feature_flags(new_import_ui: false)
     end

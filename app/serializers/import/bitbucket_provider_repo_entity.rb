@@ -7,10 +7,6 @@ class Import::BitbucketProviderRepoEntity < Import::BaseProviderRepoEntity
     repo.full_name
   end
 
-  expose :owner_name, override: true do |repo|
-    repo.owner
-  end
-
   expose :sanitized_name, override: true do |repo|
     repo.name.gsub(/[^\s\w.-]/, '')
   end
