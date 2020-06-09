@@ -87,9 +87,25 @@ module Gitlab
             unless ensure_destination_path_exists
               return failure_result(reason: 'Skipping transfer as we cannot create the destination directory')
             end
+          else
+            unless sync_object_storage_enabled?
+              return failure_result(reason: 'Skipping transfer as this secondary node is not allowed to replicate content on Object Storage')
+            end
+
+            unless object_store_enabled?
+              return failure_result(reason: "Skipping transfer as this secondary node is not configured to store #{replicator.replicable_name} on Object Storage")
+            end
           end
 
           nil
+        end
+
+        def sync_object_storage_enabled?
+          Gitlab::Geo.current_node.sync_object_storage
+        end
+
+        def object_store_enabled?
+          carrierwave_uploader.class.object_store_enabled?
         end
 
         def absolute_path
