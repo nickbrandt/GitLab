@@ -21,6 +21,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
 
   stage_nav_selector = '.stage-nav'
   path_nav_selector = '.js-path-navigation'
+  filter_bar_selector = '.js-filter-bar'
 
   3.times do |i|
     let_it_be("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
@@ -157,6 +158,10 @@ RSpec.describe 'Group Value Stream Analytics', :js do
       expect(page).to have_selector(path_nav_selector, visible: false)
     end
 
+    it 'does not show the filter bar' do
+      expect(page).to have_selector(filter_bar_selector, visible: false)
+    end
+
     context 'with path navigation feature flag enabled' do
       before do
         stub_feature_flags(value_stream_analytics_path_navigation: true)
@@ -165,6 +170,17 @@ RSpec.describe 'Group Value Stream Analytics', :js do
 
       it 'shows the path navigation' do
         expect(page).to have_selector(path_nav_selector, visible: true)
+      end
+    end
+
+    context 'with filter bar feature flag enabled' do
+      before do
+        stub_feature_flags(value_stream_analytics_filter_bar: true)
+        select_group
+      end
+
+      it 'shows the filter bar' do
+        expect(page).to have_selector(filter_bar_selector, visible: true)
       end
     end
   end
