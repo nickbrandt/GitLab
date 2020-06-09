@@ -16,7 +16,6 @@ export default () => {
   } = el.dataset;
 
   const initialData = buildCycleAnalyticsInitialData(el.dataset);
-
   const store = createStore();
   store.dispatch('initializeCycleAnalytics', initialData);
 
