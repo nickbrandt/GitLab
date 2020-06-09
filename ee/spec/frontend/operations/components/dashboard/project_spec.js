@@ -11,11 +11,10 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('project component', () => {
-  const ProjectComponent = localVue.extend(Project);
   let wrapper;
 
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(ProjectComponent, {
+    wrapper = shallowMount(Project, {
       store,
       localVue,
       propsData: {
