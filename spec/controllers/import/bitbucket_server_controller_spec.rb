@@ -153,6 +153,7 @@ RSpec.describe Import::BitbucketServerController do
       let(:repo_id) { @repo.full_name }
       let(:import_source) { @repo.browse_url }
       let(:provider_name) { 'bitbucket_server' }
+      let(:client_repos_field) { :repos }
     end
 
     it 'assigns repository categories' do

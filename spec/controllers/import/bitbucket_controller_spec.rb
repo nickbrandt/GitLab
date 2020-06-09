@@ -70,6 +70,7 @@ RSpec.describe Import::BitbucketController do
       let(:repo_id) { @repo.full_name }
       let(:import_source) { @repo.full_name }
       let(:provider_name) { 'bitbucket' }
+      let(:client_repos_field) { :repos }
     end
 
     it "assigns variables" do

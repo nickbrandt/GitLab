@@ -13,7 +13,7 @@ RSpec.shared_examples 'import controller with new_import_ui feature flag' do
 
     it "returns variables for json request" do
       project = create(:project, import_type: provider_name, creator_id: user.id)
-      stub_client(repos: [repo])
+      stub_client(client_repos_field => [repo])
 
       get :status, format: :json
 
@@ -25,7 +25,7 @@ RSpec.shared_examples 'import controller with new_import_ui feature flag' do
 
     it "does not show already added project" do
       project = create(:project, import_type: provider_name, namespace: user.namespace, import_status: :finished, import_source: import_source)
-      stub_client(repos: [repo], orgs: [])
+      stub_client(client_repos_field => [repo])
 
       get :status, format: :json
 

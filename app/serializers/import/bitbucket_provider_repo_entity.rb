@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Import::BitbucketProviderRepoEntity < Import::BaseProviderRepoEntity
-  include ImportHelper
-
   expose :id, override: true do |repo|
     repo.full_name
   end

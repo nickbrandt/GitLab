@@ -90,6 +90,7 @@ RSpec.describe Import::FogbugzController do
       let(:repo_id) { @repo.id }
       let(:import_source) { @repo.name }
       let(:provider_name) { 'fogbugz' }
+      let(:client_repos_field) { :repos }
     end
 
     it 'assigns variables' do
