@@ -3,10 +3,13 @@
 require 'spec_helper'
 
 describe Registrations::ExperienceLevelsController do
+  let_it_be(:namespace) { create(:group, path: 'group-path' ) }
   let_it_be(:user) { create(:user) }
 
+  let(:params) { { namespace_path: namespace.to_param } }
+
   describe 'GET #show' do
-    subject { get :show }
+    subject { get :show, params: params }
 
     context 'with an unauthenticated user' do
       it { is_expected.to have_gitlab_http_status(:redirect) }
@@ -34,10 +37,6 @@ describe Registrations::ExperienceLevelsController do
 
   describe 'PUT/PATCH #update' do
     subject { patch :update, params: params }
-
-    let_it_be(:namespace) { create(:group, path: 'group-path' ) }
-
-    let(:params) { {} }
 
     context 'with an unauthenticated user' do
       it { is_expected.to have_gitlab_http_status(:redirect) }
@@ -72,15 +71,15 @@ describe Registrations::ExperienceLevelsController do
         end
 
         context 'when an expected experience level is sent' do
-          let(:params) { { experience_level: :novice } }
+          let(:params) { super().merge(experience_level: :novice) }
 
           it 'sets the user’s experience level' do
-            expect { subject }.to change { user.reload.experience_level }.to('novice')
+            expect { subject }.to change { user.reload.experience_level }.from(nil).to('novice')
           end
         end
 
         context 'when an unexpected experience level is sent' do
-          let(:params) { { experience_level: :nonexistent } }
+          let(:params) { super().merge(experience_level: :nonexistent) }
 
           it 'raises an exception' do
             expect { subject }.to raise_error(ArgumentError, "'nonexistent' is not a valid experience_level")
@@ -88,15 +87,15 @@ describe Registrations::ExperienceLevelsController do
         end
 
         context 'when a namespace_path is sent' do
-          let(:params) { { namespace_path: namespace.to_param } }
-
           it { is_expected.to have_gitlab_http_status(:redirect) }
           it { is_expected.to redirect_to(group_path(namespace)) }
         end
 
         context 'when no namespace_path is sent' do
+          let(:params) { super().merge(namespace_path: nil) }
+
           it { is_expected.to have_gitlab_http_status(:redirect) }
-          it { is_expected.to redirect_to(user_path(user)) }
+          it { is_expected.to redirect_to(root_path) }
         end
       end
 
