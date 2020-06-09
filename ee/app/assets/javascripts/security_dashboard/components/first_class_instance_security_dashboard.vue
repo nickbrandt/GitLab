@@ -75,7 +75,6 @@ export default {
     toggleButtonProps() {
       return this.showProjectSelector
         ? {
-            variant: 'success',
             text: s__('SecurityReports|Return to dashboard'),
           }
         : {
