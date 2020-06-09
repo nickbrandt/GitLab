@@ -57,7 +57,7 @@ export default {
 </script>
 
 <template>
-  <div class="md">
+  <div class="md" data-qa-selector="vulnerability_details">
     <h1 class="mt-3 mb-2 border-bottom-0" data-testid="title">{{ vulnerability.title }}</h1>
     <h3 class="mt-0">{{ __('Description') }}</h3>
     <p data-testid="description">{{ finding.description }}</p>

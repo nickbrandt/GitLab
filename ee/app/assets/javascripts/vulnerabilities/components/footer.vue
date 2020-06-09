@@ -153,7 +153,7 @@ export default {
 };
 </script>
 <template>
-  <div>
+  <div data-qa-selector="vulnerability_footer">
     <solution-card v-if="hasSolution" v-bind="solutionInfo" />
 
     <div v-if="finding.issue_feedback || finding.merge_request_feedback" class="card">
