@@ -44,7 +44,7 @@ describe ProjectPolicy do
       update_commit_status create_build update_build create_pipeline
       update_pipeline create_merge_request_from create_wiki push_code
       resolve_note create_container_image update_container_image destroy_container_image daily_statistics
-      create_environment update_environment create_deployment update_deployment create_release update_release
+      create_environment update_environment create_deployment update_deployment create_release update_release destroy_release
       create_metrics_dashboard_annotation delete_metrics_dashboard_annotation update_metrics_dashboard_annotation
     ]
   end
