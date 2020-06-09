@@ -16,6 +16,10 @@ module Trigger
     %w[gitlab gitlab-ee].include?(ENV['CI_PROJECT_NAME'])
   end
 
+  def self.security?
+    %r{\Agitlab-org/security(\z|/)}.match?(ENV['CI_PROJECT_NAMESPACE'])
+  end
+
   def self.non_empty_variable_value(variable)
     variable_value = ENV[variable]
 
@@ -143,6 +147,7 @@ module Trigger
       {
         'GITLAB_VERSION' => Trigger.non_empty_variable_value('CI_MERGE_REQUEST_SOURCE_BRANCH_SHA') || ENV['CI_COMMIT_SHA'],
         'ALTERNATIVE_SOURCES' => 'true',
+        'SECURITY_SOURCES' => Trigger.security? ? 'true' : 'false',
         'ee' => Trigger.ee? ? 'true' : 'false',
         'QA_BRANCH' => ENV['QA_BRANCH'] || 'master'
       }
