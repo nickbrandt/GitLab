@@ -20471,6 +20471,9 @@ msgstr ""
 msgid "Select due date"
 msgstr ""
 
+msgid "Select epic"
+msgstr ""
+
 msgid "Select file"
 msgstr ""
 

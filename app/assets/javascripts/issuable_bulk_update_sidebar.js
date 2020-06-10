@@ -8,6 +8,7 @@ import issueStatusSelect from './issue_status_select';
 import subscriptionSelect from './subscription_select';
 import LabelsSelect from './labels_select';
 import issueableEventHub from './issuables_list/eventhub';
+import EpicSelect from 'ee_else_ce/vue_shared/components/sidebar/epics_select/epics_select_bundle';
 
 const HIDDEN_CLASS = 'hidden';
 const DISABLED_CONTENT_CLASS = 'disabled-content';
@@ -70,6 +71,9 @@ export default class IssuableBulkUpdateSidebar {
           HealthStatusSelect();
         })
         .catch(() => {});
+    }
+    if (EpicSelect) {
+      EpicSelect();
     }
   }
 
