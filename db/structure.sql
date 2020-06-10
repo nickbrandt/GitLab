@@ -8121,6 +8121,9 @@ ALTER TABLE ONLY public.chat_names
 ALTER TABLE ONLY public.chat_teams
     ADD CONSTRAINT chat_teams_pkey PRIMARY KEY (id);
 
+ALTER TABLE public.design_management_designs
+    ADD CONSTRAINT check_07155e2715 CHECK ((char_length((filename)::text) <= 255)) NOT VALID;
+
 ALTER TABLE public.ci_job_artifacts
     ADD CONSTRAINT check_27f0f6dbab CHECK ((file_store IS NOT NULL)) NOT VALID;
 
@@ -13839,6 +13842,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200528125905
 20200528171933
 20200601210148
+20200602013900
+20200602013901
 20200603073101
 20200604143628
 \.
