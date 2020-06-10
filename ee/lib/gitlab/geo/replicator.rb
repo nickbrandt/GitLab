@@ -17,7 +17,12 @@ module Gitlab
       CLASS_SUFFIXES = %w(RegistryFinder RegistriesResolver).freeze
 
       attr_reader :model_record_id
+
       delegate :model, to: :class
+
+      class << self
+        delegate :find_unsynced_registries, :find_failed_registries, to: :registry_class
+      end
 
       # Declare supported event
       #

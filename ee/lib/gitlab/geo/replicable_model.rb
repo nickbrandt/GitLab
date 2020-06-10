@@ -24,12 +24,24 @@ module Gitlab
         def with_replicator(klass)
           raise ArgumentError, 'Must be a class inheriting from Gitlab::Geo::Replicator' unless klass < ::Gitlab::Geo::Replicator
 
+          Gitlab::Geo::ReplicableModel.add_replicator(klass)
+
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
             define_method :replicator do
               @_replicator ||= klass.new(model_record: self)
             end
           RUBY
         end
+      end
+
+      def self.add_replicator(klass)
+        @_replicators ||= []
+        @_replicators << klass
+      end
+
+      def self.replicators
+        @_replicators ||= []
+        @_replicators.filter { |replicator| const_defined?(replicator.to_s) }
       end
 
       # Geo Replicator

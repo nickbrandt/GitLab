@@ -4,6 +4,8 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
   include ::Delay
   include ShaAttribute
 
+  MODEL_FOREIGN_KEY = :package_file_id
+
   def self.declarative_policy_class
     'Geo::RegistryPolicy'
   end
@@ -20,6 +22,7 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
   scope :never, -> { where(last_synced_at: nil) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
+  scope :pending, -> { with_state(:pending) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
   scope :ordered, -> { order(:id) }
 
