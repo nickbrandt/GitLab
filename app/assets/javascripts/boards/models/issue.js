@@ -64,10 +64,7 @@ class ListIssue {
   }
 
   addMilestone(milestone) {
-    const miletoneId = this.milestone ? this.milestone.id : null;
-    if (IS_EE && milestone.id !== miletoneId) {
-      this.milestone = new ListMilestone(milestone);
-    }
+    boardsStore.addIssueMilestone(this, milestone);
   }
 
   removeMilestone(removeMilestone) {
