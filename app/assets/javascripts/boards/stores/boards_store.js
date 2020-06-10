@@ -769,6 +769,13 @@ const boardsStore = {
     issue.assignees = [];
   },
 
+  addIssueMilestone(issue, milestone) {
+    const miletoneId = issue.milestone ? issue.milestone.id : null;
+    if (IS_EE && milestone.id !== miletoneId) {
+      issue.milestone = new ListMilestone(milestone);
+    }
+  },
+
   refreshIssueData(issue, obj) {
     issue.id = obj.id;
     issue.iid = obj.iid;
