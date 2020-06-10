@@ -107,13 +107,13 @@ export const receiveEpicsSuccess = (
   }, []);
 
   commit(types.UPDATE_EPIC_IDS, epicIds);
+  dispatch('initItemChildrenFlags', { epics });
 
   if (timeframeExtended) {
     const updatedEpics = state.epics.concat(epics);
     sortEpics(updatedEpics, state.sortedBy);
     commit(types.RECEIVE_EPICS_FOR_TIMEFRAME_SUCCESS, updatedEpics);
   } else {
-    dispatch('initItemChildrenFlags', { epics });
     commit(types.RECEIVE_EPICS_SUCCESS, epics);
   }
 };

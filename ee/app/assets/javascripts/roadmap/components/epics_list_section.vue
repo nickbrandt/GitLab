@@ -54,7 +54,7 @@ export default {
   computed: {
     ...mapState(['bufferSize', 'epicIid', 'childrenEpics', 'childrenFlags', 'epicIds']),
     emptyRowContainerVisible() {
-      return this.epics.length < this.bufferSize;
+      return this.displayedEpics.length < this.bufferSize;
     },
     sectionContainerStyles() {
       return {

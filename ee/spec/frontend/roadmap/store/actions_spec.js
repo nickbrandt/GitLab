@@ -155,7 +155,21 @@ describe('Roadmap Vuex Actions', () => {
             payload: [{ ...mockFormattedEpic, newEpic: true }],
           },
         ],
-        [],
+        [
+          {
+            type: 'initItemChildrenFlags',
+            payload: {
+              epics: [
+                {
+                  ...mockFormattedEpic,
+                  startDateOutOfRange: true,
+                  endDateOutOfRange: false,
+                  newEpic: true,
+                },
+              ],
+            },
+          },
+        ],
       );
     });
   });
