@@ -462,16 +462,18 @@ export default {
     },
     handleFilterRequirements(filters = []) {
       const authors = [];
+      let textSearch = '';
 
       filters.forEach(filter => {
         if (typeof filter === 'string') {
-          this.textSearch = filter;
+          textSearch = filter;
         } else if (filter.value.data !== ANY_AUTHOR) {
           authors.push(filter.value.data);
         }
       });
 
       this.authorUsernames = [...authors];
+      this.textSearch = textSearch;
       this.currentPage = 1;
       this.prevPageCursor = '';
       this.nextPageCursor = '';
