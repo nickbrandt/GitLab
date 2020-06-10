@@ -3,6 +3,9 @@
 module Analytics
   module CycleAnalytics
     class StagesController < Analytics::ApplicationController
+      include CycleAnalyticsParams
+      extend ::Gitlab::Utils::Override
+
       check_feature_flag Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG
 
       before_action :load_group
@@ -58,26 +61,11 @@ module Analytics
 
       private
 
-      def validate_params
-        if request_params.invalid?
-          render(
-            json: { message: 'Invalid parameters', errors: request_params.errors },
-            status: :unprocessable_entity
-          )
-        end
-      end
-
-      def request_params
-        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params, current_user: current_user)
-      end
-
       def data_collector
-        @data_collector ||= Gitlab::Analytics::CycleAnalytics::DataCollector.new(stage: stage, params: {
-          current_user: current_user,
-          from: request_params.created_after,
-          to: request_params.created_before,
-          project_ids: request_params.project_ids
-        })
+        @data_collector ||= Gitlab::Analytics::CycleAnalytics::DataCollector.new(
+          stage: stage,
+          params: request_params.to_data_collector_params
+        )
       end
 
       def stage
@@ -115,8 +103,9 @@ module Analytics
         end
       end
 
-      def data_collector_params
-        params.permit(:created_before, :created_after, project_ids: [])
+      override :all_cycle_analytics_params
+      def all_cycle_analytics_params
+        super.merge({ group: @group })
       end
 
       def update_params

@@ -22,30 +22,7 @@ module Analytics
       private
 
       def group_level
-        @group_level ||= GroupLevel.new(group: @group, options: options(group_params))
-      end
-
-      def group_params
-        hash = { created_after: request_params.created_after, created_before: request_params.created_before }
-        hash[:project_ids] = request_params.project_ids if request_params.project_ids.any?
-        hash
-      end
-
-      def validate_params
-        if request_params.invalid?
-          render(
-            json: { message: 'Invalid parameters', errors: request_params.errors },
-            status: :unprocessable_entity
-          )
-        end
-      end
-
-      def request_params
-        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(allowed_params, current_user: current_user)
-      end
-
-      def allowed_params
-        params.permit(:created_after, :created_before, project_ids: [])
+        @group_level ||= GroupLevel.new(group: @group, options: options(request_params.to_data_collector_params))
       end
 
       def authorize_access
