@@ -3799,6 +3799,9 @@ msgstr ""
 msgid "Can override approvers and approvals required per merge request"
 msgstr ""
 
+msgid "Can't apply as this line has changed or the suggestion already matches its content."
+msgstr ""
+
 msgid "Can't create snippet: %{err}"
 msgstr ""
 
@@ -22558,7 +22561,7 @@ msgstr ""
 msgid "This also resolves all related threads"
 msgstr ""
 
-msgid "This also resolves the thread"
+msgid "This also resolves the discussion"
 msgstr ""
 
 msgid "This application was created by %{link_to_owner}."
