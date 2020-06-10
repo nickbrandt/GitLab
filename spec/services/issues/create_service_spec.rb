@@ -272,7 +272,7 @@ describe Issues::CreateService do
 
           levels.each do |level|
             it "removes not authorized assignee when project is #{Gitlab::VisibilityLevel.level_name(level)}" do
-              project.update(visibility_level: level)
+              project.update!(visibility_level: level)
               opts = { title: 'Title', description: 'Description', assignee_ids: [assignee.id] }
 
               issue = described_class.new(project, user, opts).execute

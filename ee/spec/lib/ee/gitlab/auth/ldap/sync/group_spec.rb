@@ -200,7 +200,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         it 'converts an existing membership access request to a real member' do
           group.add_owner(create(:user))
           access_requester = group.request_access(user)
-          access_requester.update(access_level: ::Gitlab::Access::MAINTAINER)
+          access_requester.update!(access_level: ::Gitlab::Access::MAINTAINER)
           # Validate that the user is properly created as a requester first.
           expect(group.requesters.pluck(:id)).to include(access_requester.id)
 
@@ -243,7 +243,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         end
 
         it 'does not alter an ldap member that has a permission override' do
-          group.members.create(
+          group.members.create!(
             user: user,
             access_level: ::Gitlab::Access::MAINTAINER,
             ldap: true,
@@ -313,7 +313,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
 
         before do
-          group.update(parent: parent_group)
+          group.update!(parent: parent_group)
           parent_group.add_maintainer(user)
         end
 
@@ -334,7 +334,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         end
 
         it "does not alter an ldap member that has a permission override" do
-          group.members.create(
+          group.members.create!(
             user: user,
             access_level: ::Gitlab::Access::OWNER,
             ldap: true,
@@ -353,7 +353,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
 
         before do
-          group.update(parent: parent_group)
+          group.update!(parent: parent_group)
           parent_group.add_reporter(user)
         end
 
@@ -374,7 +374,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         end
 
         it "does not alter an ldap member that has a permission override" do
-          group.members.create(
+          group.members.create!(
             user: user,
             access_level: ::Gitlab::Access::OWNER,
             ldap: true,
@@ -394,17 +394,17 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         let(:access_requester) { parent_group.request_access(user) }
 
         before do
-          group.update(parent: parent_group)
+          group.update!(parent: parent_group)
           parent_group.add_owner(create(:user))
         end
 
         it 'does not propagate the access level of the pending access request' do
-          group.members.create(
+          group.members.create!(
             user: user,
             access_level: ::Gitlab::Access::DEVELOPER,
             ldap: true
           )
-          access_requester.update(access_level: ::Gitlab::Access::MAINTAINER)
+          access_requester.update!(access_level: ::Gitlab::Access::MAINTAINER)
 
           sync_group.update_permissions
 
@@ -420,7 +420,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         let(:ldap_group1) { ldap_group_entry(user_dn('other_user')) }
 
         before do
-          group.update(parent: parent_group)
+          group.update!(parent: parent_group)
           parent_group.add_maintainer(user)
         end
 
@@ -442,13 +442,13 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         before do
           group1.add_reporter(user)
 
-          group2.update(parent: group1)
+          group2.update!(parent: group1)
           group2.add_maintainer(user)
 
-          group3.update(parent: group2)
+          group3.update!(parent: group2)
           # no specific permission for user in group3
 
-          group.update(parent: group3)
+          group.update!(parent: group3)
         end
 
         it "applies the permission inherited from the closest ancestor when it's higher" do
@@ -475,13 +475,13 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         it 'does not revert the overrides' do
           create(:identity, user: user1, extern_uid: user_dn(user1.username))
           create(:identity, user: user2, extern_uid: user_dn(user2.username).upcase)
-          group.members.create(
+          group.members.create!(
             user: user1,
             access_level: ::Gitlab::Access::MAINTAINER,
             ldap: true,
             override: true
           )
-          group.members.create(
+          group.members.create!(
             user: user2,
             access_level: ::Gitlab::Access::OWNER,
             ldap: true,

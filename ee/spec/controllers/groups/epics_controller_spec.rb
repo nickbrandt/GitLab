@@ -83,7 +83,7 @@ RSpec.describe Groups::EpicsController do
 
         context 'when epics_sort is present' do
           it 'update epics_sort with current value' do
-            user.user_preference.update(epics_sort: 'created_desc')
+            user.user_preference.update!(epics_sort: 'created_desc')
 
             get :index, params: { group_id: group, sort: 'start_date_asc' }
 

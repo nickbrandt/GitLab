@@ -723,7 +723,7 @@ describe API::Issues do
         let(:parent_group) { create(:group) }
 
         before do
-          group.update(parent_id: parent_group.id)
+          group.update!(parent_id: parent_group.id)
           group_closed_issue.reload
         end
 

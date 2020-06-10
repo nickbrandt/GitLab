@@ -103,7 +103,7 @@ describe Gitlab::Auth::Ldap::User do
       existing_user = create(:omniauth_user, email: 'john@example.com', provider: 'twitter')
       expect(existing_user.identities.count).to be(1)
 
-      ldap_user.save
+      ldap_user.save!
       expect(ldap_user.gl_user.identities.count).to be(2)
 
       # Expect that find_by provider only returns a single instance of an identity and not an Enumerable
@@ -121,7 +121,7 @@ describe Gitlab::Auth::Ldap::User do
       end
 
       it 'creates the user' do
-        ldap_user.save
+        ldap_user.save!
 
         expect(gl_user).to be_persisted
       end
@@ -133,7 +133,7 @@ describe Gitlab::Auth::Ldap::User do
       end
 
       it 'creates and confirms the user anyway' do
-        ldap_user.save
+        ldap_user.save!
 
         expect(gl_user).to be_persisted
         expect(gl_user).to be_confirmed
@@ -146,7 +146,7 @@ describe Gitlab::Auth::Ldap::User do
       end
 
       it 'creates the user' do
-        ldap_user.save
+        ldap_user.save!
 
         expect(gl_user).to be_persisted
       end
@@ -203,7 +203,7 @@ describe Gitlab::Auth::Ldap::User do
         end
 
         it do
-          ldap_user.save
+          ldap_user.save!
           expect(gl_user).to be_valid
           expect(gl_user).not_to be_blocked
         end
@@ -215,7 +215,7 @@ describe Gitlab::Auth::Ldap::User do
         end
 
         it do
-          ldap_user.save
+          ldap_user.save!
           expect(gl_user).to be_valid
           expect(gl_user).to be_blocked
         end
@@ -224,7 +224,7 @@ describe Gitlab::Auth::Ldap::User do
 
     context 'sign-in' do
       before do
-        ldap_user.save
+        ldap_user.save!
         ldap_user.gl_user.activate
       end
 
@@ -234,7 +234,7 @@ describe Gitlab::Auth::Ldap::User do
         end
 
         it do
-          ldap_user.save
+          ldap_user.save!
           expect(gl_user).to be_valid
           expect(gl_user).not_to be_blocked
         end
@@ -246,7 +246,7 @@ describe Gitlab::Auth::Ldap::User do
         end
 
         it do
-          ldap_user.save
+          ldap_user.save!
           expect(gl_user).to be_valid
           expect(gl_user).not_to be_blocked
         end

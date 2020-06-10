@@ -37,7 +37,7 @@ describe Gitlab::ImportExport::SnippetRepoSaver do
           aggregate_failures do
             expect(snippet.repository).not_to receive(:bundle_to_disk)
 
-            bundler.save
+            bundler.save!
 
             expect(Dir.empty?(bundle_path)).to be_truthy
           end

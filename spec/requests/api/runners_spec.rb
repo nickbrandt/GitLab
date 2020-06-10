@@ -968,7 +968,7 @@ describe API::Runners do
       end
 
       it 'does not enable locked runner' do
-        project_runner2.update(locked: true)
+        project_runner2.update!(locked: true)
 
         expect do
           post api("/projects/#{project.id}/runners", user), params: { runner_id: project_runner2.id }

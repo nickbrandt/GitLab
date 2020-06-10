@@ -60,7 +60,7 @@ describe GrafanaIntegration do
 
     context 'with grafana integration enabled' do
       it 'returns nil' do
-        grafana_integration.update(enabled: false)
+        grafana_integration.update!(enabled: false)
 
         expect(grafana_integration.client).to be(nil)
       end

@@ -63,7 +63,7 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
   end
 
   it 'merge_requests/merge_request_of_current_user.html' do
-    merge_request.update(author: admin)
+    merge_request.update!(author: admin)
 
     render_merge_request(merge_request)
   end

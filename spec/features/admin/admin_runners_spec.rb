@@ -339,7 +339,7 @@ describe "Admin Runners" do
         let(:runner) { create(:ci_runner, :instance) }
 
         before do
-          @project1.destroy
+          @project1.destroy!
           visit admin_runner_path(runner)
         end
 

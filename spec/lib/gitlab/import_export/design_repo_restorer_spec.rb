@@ -24,7 +24,7 @@ describe Gitlab::ImportExport::DesignRepoRestorer do
         allow(instance).to receive(:storage_path).and_return(export_path)
       end
 
-      bundler.save
+      bundler.save!
     end
 
     after do

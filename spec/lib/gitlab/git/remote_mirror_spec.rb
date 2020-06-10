@@ -16,7 +16,7 @@ describe Gitlab::Git::RemoteMirror do
         .to receive(:update_remote_mirror)
         .with(ref_name, ['master'], ssh_key: 'KEY', known_hosts: 'KNOWN HOSTS', keep_divergent_refs: true)
 
-      remote_mirror.update
+      remote_mirror.update!
     end
 
     it 'wraps gitaly errors' do

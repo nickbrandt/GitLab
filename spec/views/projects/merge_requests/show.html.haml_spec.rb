@@ -12,7 +12,7 @@ describe 'projects/merge_requests/show.html.haml' do
   describe 'merge request assignee sidebar' do
     context 'when assignee is allowed to merge' do
       it 'does not show a warning icon' do
-        closed_merge_request.update(assignee_id: user.id)
+        closed_merge_request.update!(assignee_id: user.id)
         project.add_maintainer(user)
         assign(:issuable_sidebar, serialize_issuable_sidebar(user, project, closed_merge_request))
 
@@ -45,8 +45,8 @@ describe 'projects/merge_requests/show.html.haml' do
 
   context 'when the merge request is open' do
     it 'closes the merge request if the source project does not exist' do
-      closed_merge_request.update(state: 'open')
-      forked_project.destroy
+      closed_merge_request.update!(state: 'open')
+      forked_project.destroy!
       # Reload merge request so MergeRequest#source_project turns to `nil`
       closed_merge_request.reload
       preload_view_requirements

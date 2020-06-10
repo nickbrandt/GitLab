@@ -47,7 +47,7 @@ describe Projects::AlertManagementHelper do
 
       context 'when alerts service is inactive' do
         it 'disables alert management' do
-          alerts_service.update(active: false)
+          alerts_service.update!(active: false)
 
           expect(data).to include(
             'alert-management-enabled' => 'false'

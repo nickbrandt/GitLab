@@ -391,7 +391,7 @@ RSpec.describe 'Scoped issue boards', :js do
       let!(:list) { create(:list, board: board, label: project_label, position: 0) }
 
       it 'removes issues milestone when removing from the board' do
-        board.update(milestone: milestone, assignee: user)
+        board.update!(milestone: milestone, assignee: user)
         visit project_boards_path(project)
         wait_for_requests
 

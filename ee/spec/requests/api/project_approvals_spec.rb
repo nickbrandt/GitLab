@@ -70,7 +70,7 @@ RSpec.describe API::ProjectApprovals do
           project.merge_requests_author_approval = false
           project.merge_requests_disable_committers_approval = true
           project.require_password_to_approve = false
-          project.save
+          project.save!
 
           settings = {
             approvals_before_merge: 4,
@@ -88,7 +88,7 @@ RSpec.describe API::ProjectApprovals do
 
         it 'only shows approver groups that are visible to the current user' do
           private_group = create(:group, :private)
-          project.approver_groups.create(group: private_group)
+          project.approver_groups.create!(group: private_group)
 
           post api(url, current_user), params: { approvals_before_merge: 3 }
 
@@ -179,7 +179,7 @@ RSpec.describe API::ProjectApprovals do
 
     shared_examples_for 'a user with access' do
       it 'removes all approvers if no params are given' do
-        project.approvers.create(user: approver)
+        project.approvers.create!(user: approver)
 
         expect do
           put api(url, current_user), params: { approver_ids: [], approver_group_ids: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }
@@ -192,7 +192,7 @@ RSpec.describe API::ProjectApprovals do
 
       context 'when sending form-encoded data' do
         it 'removes all approvers if no params are given' do
-          project.approvers.create(user: approver)
+          project.approvers.create!(user: approver)
 
           expect do
             put api(url, current_user), params: { approver_ids: '', approver_group_ids: '' }
@@ -205,7 +205,7 @@ RSpec.describe API::ProjectApprovals do
       end
 
       it 'sets approvers and approver groups' do
-        project.approvers.create(user: approver)
+        project.approvers.create!(user: approver)
 
         expect do
           put api(url, current_user), params: { approver_ids: [approver.id], approver_group_ids: [group.id] }
@@ -222,7 +222,7 @@ RSpec.describe API::ProjectApprovals do
 
       it 'only shows approver groups that are visible to the current user' do
         private_group = create(:group, :private)
-        project.approvers.create(user: approver)
+        project.approvers.create!(user: approver)
 
         expect do
           put api(url, current_user), params: { approver_ids: [approver.id], approver_group_ids: [private_group.id] }
@@ -249,7 +249,7 @@ RSpec.describe API::ProjectApprovals do
 
     context 'as a random user' do
       it 'returns 403' do
-        project.approvers.create(user: approver)
+        project.approvers.create!(user: approver)
 
         expect do
           put api(url, user2), params: { approver_ids: [], approver_group_ids: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }

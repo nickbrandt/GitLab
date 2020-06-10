@@ -32,7 +32,7 @@ describe UploaderFinder do
     context 'when path traversal in file name' do
       before do
         upload.path = '/uploads/11111111111111111111111111111111/../../../../../../../../../../../../../../etc/passwd)'
-        upload.save
+        upload.save!
       end
 
       it 'returns nil' do

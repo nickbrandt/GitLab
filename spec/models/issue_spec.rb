@@ -315,7 +315,7 @@ describe Issue do
     end
 
     it 'returns true for a user that is the author of an issue' do
-      issue.update(author: user)
+      issue.update!(author: user)
 
       expect(issue.assignee_or_author?(user)).to be_truthy
     end
@@ -584,7 +584,7 @@ describe Issue do
       expect(user2.assigned_open_issues_count).to eq(0)
 
       issue.assignees = [user2]
-      issue.save
+      issue.save!
 
       expect(user1.assigned_open_issues_count).to eq(0)
       expect(user2.assigned_open_issues_count).to eq(1)

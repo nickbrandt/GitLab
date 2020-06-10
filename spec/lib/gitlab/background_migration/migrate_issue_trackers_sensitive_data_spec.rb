@@ -173,7 +173,7 @@ describe Gitlab::BackgroundMigration::MigrateIssueTrackersSensitiveData, schema:
 
   context 'with redmine service already with data fields' do
     let!(:service) do
-      services.create(id: 14, type: 'RedmineService', title: nil, properties: tracker_properties_no_url.to_json, category: 'issue_tracker').tap do |service|
+      services.create!(id: 14, type: 'RedmineService', title: nil, properties: tracker_properties_no_url.to_json, category: 'issue_tracker').tap do |service|
         IssueTrackerData.create!(service_id: service.id, project_url: url, new_issue_url: new_issue_url, issues_url: issues_url)
       end
     end
@@ -187,7 +187,7 @@ describe Gitlab::BackgroundMigration::MigrateIssueTrackersSensitiveData, schema:
 
   context 'with custom issue tracker which has data fields record inconsistent with properties field' do
     let!(:service) do
-      services.create(id: 15, type: 'CustomIssueTrackerService', title: 'Existing title', properties: jira_properties.to_json, category: 'issue_tracker').tap do |service|
+      services.create!(id: 15, type: 'CustomIssueTrackerService', title: 'Existing title', properties: jira_properties.to_json, category: 'issue_tracker').tap do |service|
         IssueTrackerData.create!(service_id: service.id, project_url: 'http://other_url', new_issue_url: 'http://other_url/new_issue', issues_url: 'http://other_url/issues')
       end
     end
@@ -209,7 +209,7 @@ describe Gitlab::BackgroundMigration::MigrateIssueTrackersSensitiveData, schema:
 
   context 'with Jira service which has data fields record inconsistent with properties field' do
     let!(:service) do
-      services.create(id: 16, type: 'CustomIssueTrackerService', description: 'Existing description', properties: jira_properties.to_json, category: 'issue_tracker').tap do |service|
+      services.create!(id: 16, type: 'CustomIssueTrackerService', description: 'Existing description', properties: jira_properties.to_json, category: 'issue_tracker').tap do |service|
         JiraTrackerData.create!(service_id: service.id, url: 'http://other_jira_url')
       end
     end

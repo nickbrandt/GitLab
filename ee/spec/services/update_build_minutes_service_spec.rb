@@ -31,7 +31,7 @@ RSpec.describe UpdateBuildMinutesService do
 
       context 'when statistics are created' do
         before do
-          project.statistics.update(shared_runners_seconds: 100)
+          project.statistics.update!(shared_runners_seconds: 100)
           namespace.create_namespace_statistics(shared_runners_seconds: 100)
         end
 

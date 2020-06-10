@@ -118,7 +118,7 @@ RSpec.describe 'User updates wiki page' do
       end
 
       it 'shows the error message' do
-        wiki_page.update(content: 'Update')
+        wiki_page.update!(content: 'Update')
 
         click_button('Save changes')
 

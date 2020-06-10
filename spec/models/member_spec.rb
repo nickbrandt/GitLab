@@ -600,7 +600,7 @@ describe Member do
       user    = create(:user)
       member  = project.add_reporter(user)
 
-      member.destroy
+      member.destroy!
 
       expect(user.authorized_projects).not_to include(project)
     end

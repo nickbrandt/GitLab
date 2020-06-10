@@ -276,7 +276,7 @@ describe Snippet do
         project = create(:project)
 
         project.project_feature
-          .update(snippets_access_level: ProjectFeature::PRIVATE)
+          .update!(snippets_access_level: ProjectFeature::PRIVATE)
 
         snippet = create(:project_snippet, project: project)
 
@@ -292,7 +292,7 @@ describe Snippet do
         project = create(:project)
 
         project.project_feature
-          .update(snippets_access_level: ProjectFeature::PRIVATE)
+          .update!(snippets_access_level: ProjectFeature::PRIVATE)
 
         create(:project_snippet, project: project)
 
@@ -306,7 +306,7 @@ describe Snippet do
       project = create(:project)
 
       project.project_feature
-        .update(snippets_access_level: ProjectFeature::ENABLED)
+        .update!(snippets_access_level: ProjectFeature::ENABLED)
 
       snippet = create(:project_snippet, project: project)
       snippets = described_class.only_include_projects_with_snippets_enabled
@@ -339,7 +339,7 @@ describe Snippet do
         user = create(:user)
 
         project.project_feature
-          .update(snippets_access_level: ProjectFeature::ENABLED)
+          .update!(snippets_access_level: ProjectFeature::ENABLED)
 
         create(:project_snippet, :public, project: project)
 
@@ -362,7 +362,7 @@ describe Snippet do
         project = create(:project, :public)
 
         project.project_feature
-          .update(snippets_access_level: ProjectFeature::ENABLED)
+          .update!(snippets_access_level: ProjectFeature::ENABLED)
 
         user = create(:user)
         snippet = create(:project_snippet, :public, project: project)
@@ -380,7 +380,7 @@ describe Snippet do
         project = create(:project, :private)
 
         project.project_feature
-          .update(snippets_access_level: ProjectFeature::ENABLED)
+          .update!(snippets_access_level: ProjectFeature::ENABLED)
 
         create(:project_snippet, :public, project: project)
 
@@ -392,7 +392,7 @@ describe Snippet do
         snippet = create(:project_snippet, :public, project: project)
 
         project.project_feature
-          .update(snippets_access_level: ProjectFeature::PUBLIC)
+          .update!(snippets_access_level: ProjectFeature::PUBLIC)
 
         create(:project_snippet, :private, project: project)
 
@@ -639,7 +639,7 @@ describe Snippet do
 
       context 'when snippet_repository does not exist' do
         it 'creates a snippet_repository' do
-          snippet.snippet_repository.destroy
+          snippet.snippet_repository.destroy!
           snippet.reload
 
           expect do

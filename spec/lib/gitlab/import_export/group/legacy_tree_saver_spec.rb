@@ -31,7 +31,7 @@ describe Gitlab::ImportExport::Group::LegacyTreeSaver do
     # ^ These are specific for the Group::LegacyTreeSaver
     context 'JSON' do
       let(:saved_group_json) do
-        group_tree_saver.save
+        group_tree_saver.save!
         group_json(group_tree_saver.full_path)
       end
 

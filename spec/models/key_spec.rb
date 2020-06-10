@@ -202,7 +202,7 @@ describe Key, :mailer do
 
         expect(AuthorizedKeysWorker).to receive(:perform_async).with(:remove_key, key.shell_id)
 
-        key.destroy
+        key.destroy!
       end
     end
 
@@ -222,7 +222,7 @@ describe Key, :mailer do
 
         expect(AuthorizedKeysWorker).not_to receive(:perform_async)
 
-        key.destroy
+        key.destroy!
       end
     end
   end

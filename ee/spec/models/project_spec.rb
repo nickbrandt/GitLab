@@ -370,7 +370,7 @@ RSpec.describe Project do
       end
 
       it 'returns empty if next_execution_timestamp is in the future' do
-        import_state.update(next_execution_timestamp: timestamp + 2.minutes)
+        import_state.update!(next_execution_timestamp: timestamp + 2.minutes)
 
         expect(described_class.mirrors_to_sync(timestamp)).to be_empty
       end
@@ -395,7 +395,7 @@ RSpec.describe Project do
       end
 
       it 'returns empty if next_execution_timestamp is in the future' do
-        project.import_state.update(next_execution_timestamp: timestamp + 2.minutes)
+        project.import_state.update!(next_execution_timestamp: timestamp + 2.minutes)
 
         expect(described_class.mirrors_to_sync(timestamp)).to be_empty
       end
@@ -539,7 +539,7 @@ RSpec.describe Project do
         before do
           stub_licensed_features(feature => feature_enabled)
           stub_application_setting(application_setting => app_setting)
-          project.update(setting => project_setting)
+          project.update!(setting => project_setting)
         end
 
         it 'shows proper setting' do
@@ -588,7 +588,7 @@ RSpec.describe Project do
         before do
           stub_licensed_features(feature => feature_enabled)
           stub_application_setting(application_setting => app_setting)
-          project.update(setting => project_setting)
+          project.update!(setting => project_setting)
         end
 
         it 'shows proper setting' do
@@ -727,7 +727,7 @@ RSpec.describe Project do
     end
 
     it "returns false" do
-      project.namespace.update(share_with_group_lock: true)
+      project.namespace.update!(share_with_group_lock: true)
       expect(project.allowed_to_share_with_group?).to be_falsey
     end
   end
@@ -893,7 +893,7 @@ RSpec.describe Project do
 
       expect(RepositoryRemoveRemoteWorker).to receive(:perform_async).with(project.id, ::Repository::MIRROR_REMOTE).and_call_original
 
-      project.update(import_url: "http://test.com")
+      project.update!(import_url: "http://test.com")
     end
   end
 
@@ -2318,7 +2318,7 @@ RSpec.describe Project do
 
       expect(project).to receive(:create_import_state)
 
-      project.update(mirror: true, mirror_user: project.owner, import_url: 'http://foo.com')
+      project.update!(mirror: true, mirror_user: project.owner, import_url: 'http://foo.com')
     end
   end
 
@@ -2560,7 +2560,7 @@ RSpec.describe Project do
 
     before do
       stub_ee_application_setting(custom_project_templates_group_id: group2.id)
-      group2.update(custom_project_templates_group_id: group2_sub2.id)
+      group2.update!(custom_project_templates_group_id: group2_sub2.id)
       create(:project, group: group1)
 
       create_list(:project, 2, group: group2)

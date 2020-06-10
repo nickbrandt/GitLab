@@ -15,9 +15,9 @@ describe API::GroupMilestones do
   end
 
   def setup_for_group
-    context_group.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+    context_group.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
     context_group.add_developer(user)
-    public_project.update(namespace: context_group)
+    public_project.update!(namespace: context_group)
     context_group.reload
   end
 end

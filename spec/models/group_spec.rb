@@ -432,7 +432,7 @@ describe Group do
       before do
         parent_group = create(:group)
         create(:group_member, :owner, group: parent_group)
-        group.update(parent: parent_group)
+        group.update!(parent: parent_group)
       end
 
       it { expect(group.last_owner?(@members[:owner])).to be_falsy }

@@ -106,7 +106,7 @@ describe TodoService do
       end
 
       it 'creates correct todos for each valid user based on the type of mention' do
-        issue.update(description: directly_addressed_and_mentioned)
+        issue.update!(description: directly_addressed_and_mentioned)
 
         service.new_issue(issue, author)
 
@@ -170,7 +170,7 @@ describe TodoService do
       end
 
       it 'creates a todo for each valid user not included in skip_users based on the type of mention' do
-        issue.update(description: directly_addressed_and_mentioned)
+        issue.update!(description: directly_addressed_and_mentioned)
 
         service.update_issue(issue, author, skip_users)
 
@@ -239,7 +239,7 @@ describe TodoService do
 
       context 'issues with a task list' do
         it 'does not create todo when tasks are marked as completed' do
-          issue.update(description: "- [x] Task 1\n- [X] Task 2 #{mentions}")
+          issue.update!(description: "- [x] Task 1\n- [X] Task 2 #{mentions}")
 
           service.update_issue(issue, author)
 
@@ -252,7 +252,7 @@ describe TodoService do
         end
 
         it 'does not create directly addressed todo when tasks are marked as completed' do
-          addressed_issue.update(description: "#{directly_addressed}\n- [x] Task 1\n- [x] Task 2\n")
+          addressed_issue.update!(description: "#{directly_addressed}\n- [x] Task 1\n- [x] Task 2\n")
 
           service.update_issue(addressed_issue, author)
 
@@ -265,7 +265,7 @@ describe TodoService do
         end
 
         it 'does not raise an error when description not change' do
-          issue.update(title: 'Sample')
+          issue.update!(title: 'Sample')
 
           expect { service.update_issue(issue, author) }.not_to raise_error
         end
@@ -375,7 +375,7 @@ describe TodoService do
       end
 
       it 'creates a todo for each valid user based on the type of mention' do
-        note.update(note: directly_addressed_and_mentioned)
+        note.update!(note: directly_addressed_and_mentioned)
 
         service.new_note(note, john_doe)
 
@@ -605,7 +605,7 @@ describe TodoService do
       end
 
       it 'creates a todo for each valid user based on the type of mention' do
-        mr_assigned.update(description: directly_addressed_and_mentioned)
+        mr_assigned.update!(description: directly_addressed_and_mentioned)
 
         service.new_merge_request(mr_assigned, author)
 
@@ -637,7 +637,7 @@ describe TodoService do
       end
 
       it 'creates a todo for each valid user not included in skip_users based on the type of mention' do
-        mr_assigned.update(description: directly_addressed_and_mentioned)
+        mr_assigned.update!(description: directly_addressed_and_mentioned)
 
         service.update_merge_request(mr_assigned, author, skip_users)
 
@@ -683,7 +683,7 @@ describe TodoService do
 
       context 'with a task list' do
         it 'does not create todo when tasks are marked as completed' do
-          mr_assigned.update(description: "- [x] Task 1\n- [X] Task 2 #{mentions}")
+          mr_assigned.update!(description: "- [x] Task 1\n- [X] Task 2 #{mentions}")
 
           service.update_merge_request(mr_assigned, author)
 
@@ -697,7 +697,7 @@ describe TodoService do
         end
 
         it 'does not create directly addressed todo when tasks are marked as completed' do
-          addressed_mr_assigned.update(description: "#{directly_addressed}\n- [x] Task 1\n- [X] Task 2")
+          addressed_mr_assigned.update!(description: "#{directly_addressed}\n- [x] Task 1\n- [X] Task 2")
 
           service.update_merge_request(addressed_mr_assigned, author)
 
@@ -711,7 +711,7 @@ describe TodoService do
         end
 
         it 'does not raise an error when description not change' do
-          mr_assigned.update(title: 'Sample')
+          mr_assigned.update!(title: 'Sample')
 
           expect { service.update_merge_request(mr_assigned, author) }.not_to raise_error
         end
@@ -804,7 +804,7 @@ describe TodoService do
       end
 
       it 'creates a pending todo for each merge_participant' do
-        mr_unassigned.update(merge_when_pipeline_succeeds: true, merge_user: admin)
+        mr_unassigned.update!(merge_when_pipeline_succeeds: true, merge_user: admin)
         service.merge_request_became_unmergeable(mr_unassigned)
 
         merge_participants.each do |participant|
@@ -902,7 +902,7 @@ describe TodoService do
     end
 
     it 'creates a todo for each valid user not included in skip_users based on the type of mention' do
-      note.update(note: directly_addressed_and_mentioned)
+      note.update!(note: directly_addressed_and_mentioned)
 
       service.update_note(note, author, skip_users)
 

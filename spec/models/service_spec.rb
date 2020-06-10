@@ -425,7 +425,7 @@ describe Service do
 
     it "returns false when the property has been assigned a new value then saved" do
       service.bamboo_url = 'http://example.com'
-      service.save
+      service.save!
       expect(service.bamboo_url_changed?).to be_falsy
     end
   end
@@ -465,7 +465,7 @@ describe Service do
 
     it "returns false when the property has been assigned a new value then saved" do
       service.bamboo_url = 'http://example.com'
-      service.save
+      service.save!
       expect(service.bamboo_url_changed?).to be_falsy
     end
   end
@@ -505,7 +505,7 @@ describe Service do
 
     it "returns nil when the property has been assigned a new value then saved" do
       service.bamboo_url = 'http://example.com'
-      service.save
+      service.save!
       expect(service.bamboo_url_was).to be_nil
     end
   end

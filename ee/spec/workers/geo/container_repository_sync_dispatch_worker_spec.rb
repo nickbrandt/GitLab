@@ -36,7 +36,7 @@ RSpec.describe Geo::ContainerRepositorySyncDispatchWorker, :geo, :geo_fdw, :use_
     create(:container_repository)
 
     secondary.enabled = false
-    secondary.save
+    secondary.save!
 
     expect(Geo::ContainerRepositorySyncWorker).not_to receive(:perform_async)
 

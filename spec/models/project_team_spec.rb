@@ -263,7 +263,7 @@ describe ProjectTeam do
       context 'when project is shared with group' do
         before do
           group = create(:group)
-          project.project_group_links.create(
+          project.project_group_links.create!(
             group: group,
             group_access: Gitlab::Access::DEVELOPER)
 
@@ -405,7 +405,7 @@ describe ProjectTeam do
       project.add_guest(promoted_guest)
       project.add_guest(guest)
 
-      project.project_group_links.create(
+      project.project_group_links.create!(
         group: group,
         group_access: Gitlab::Access::DEVELOPER
       )
@@ -414,7 +414,7 @@ describe ProjectTeam do
       group.add_developer(group_developer)
       group.add_developer(second_developer)
 
-      project.project_group_links.create(
+      project.project_group_links.create!(
         group: second_group,
         group_access: Gitlab::Access::MAINTAINER
       )

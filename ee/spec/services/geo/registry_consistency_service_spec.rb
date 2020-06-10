@@ -62,7 +62,7 @@ RSpec.describe Geo::RegistryConsistencyService, :geo, :use_clean_rails_memory_st
         end
 
         it 'does not exceed batch size' do
-          not_expected = create(model_class_factory)
+          not_expected = create!(model_class_factory)
 
           subject.execute
 

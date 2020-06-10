@@ -848,7 +848,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
           context 'when user is admin' do
             it 'returns right set of milestones' do
-              user.update(admin: true)
+              user.update!(admin: true)
               public_project.project_feature.update!(merge_requests_access_level: ProjectFeature::PRIVATE)
               public_project.project_feature.update!(issues_access_level: ProjectFeature::PRIVATE)
               internal_project.project_feature.update!(issues_access_level: ProjectFeature::DISABLED)

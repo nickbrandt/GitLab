@@ -36,7 +36,7 @@ describe Gitlab::ImportExport::Project::TreeSaver do
 
           project_tree_saver = described_class.new(project: project, current_user: user, shared: shared)
 
-          project_tree_saver.save
+          project_tree_saver.save!
         end
       end
 
@@ -321,7 +321,7 @@ describe Gitlab::ImportExport::Project::TreeSaver do
         context 'when has no permission' do
           before do
             group.add_developer(user)
-            project_tree_saver.save
+            project_tree_saver.save!
           end
 
           it 'does not export group members' do
@@ -333,7 +333,7 @@ describe Gitlab::ImportExport::Project::TreeSaver do
           before do
             group.add_maintainer(user)
 
-            project_tree_saver.save
+            project_tree_saver.save!
           end
 
           it 'does not export group members' do
@@ -345,7 +345,7 @@ describe Gitlab::ImportExport::Project::TreeSaver do
           before do
             group.add_owner(user)
 
-            project_tree_saver.save
+            project_tree_saver.save!
           end
 
           it 'exports group members as group owner' do
@@ -396,7 +396,7 @@ describe Gitlab::ImportExport::Project::TreeSaver do
       it 'has no when YML attributes but only the DB column' do
         expect_any_instance_of(Gitlab::Ci::YamlProcessor).not_to receive(:build_attributes)
 
-        project_tree_saver.save
+        project_tree_saver.save!
       end
     end
   end
@@ -434,7 +434,7 @@ describe Gitlab::ImportExport::Project::TreeSaver do
     merge_request = create(:merge_request, source_project: project, milestone: milestone)
 
     ci_build = create(:ci_build, project: project, when: nil)
-    ci_build.pipeline.update(project: project)
+    ci_build.pipeline.update!(project: project)
     create(:commit_status, project: project, pipeline: ci_build.pipeline)
 
     create(:milestone, project: project)

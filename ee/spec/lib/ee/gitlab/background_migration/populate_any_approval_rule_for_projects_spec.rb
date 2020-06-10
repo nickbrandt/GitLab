@@ -11,7 +11,7 @@ RSpec.describe Gitlab::BackgroundMigration::PopulateAnyApprovalRuleForProjects, 
   def create_project(id, params = {})
     params.merge!(id: id, namespace_id: namespace.id)
 
-    projects.create(params)
+    projects.create!(params)
   end
 
   before do
@@ -22,7 +22,7 @@ RSpec.describe Gitlab::BackgroundMigration::PopulateAnyApprovalRuleForProjects, 
 
     # Test filtering already migrated rows
     project_with_any_approver_rule = create_project(4, approvals_before_merge: 3)
-    approval_project_rules.create(id: 4,
+    approval_project_rules.create!(id: 4,
       project_id: project_with_any_approver_rule.id,
       approvals_required: 3,
       rule_type: ApprovalProjectRule.rule_types[:any_approver],
@@ -30,7 +30,7 @@ RSpec.describe Gitlab::BackgroundMigration::PopulateAnyApprovalRuleForProjects, 
 
     # Test filtering MRs with existing rules
     project_with_regular_rule = create_project(5, approvals_before_merge: 3)
-    approval_project_rules.create(id: 5,
+    approval_project_rules.create!(id: 5,
       project_id: project_with_regular_rule.id,
       approvals_required: 3,
       rule_type: ApprovalProjectRule.rule_types[:regular],

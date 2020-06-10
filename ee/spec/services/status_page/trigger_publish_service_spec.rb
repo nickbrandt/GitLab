@@ -223,7 +223,7 @@ RSpec.describe StatusPage::TriggerPublishService do
       context 'when status page is missing' do
         include_examples 'no trigger status page publish' do
           before do
-            project.status_page_setting.destroy
+            project.status_page_setting.destroy!
             project.reload
           end
         end

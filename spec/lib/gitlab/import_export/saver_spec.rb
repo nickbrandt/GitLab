@@ -29,14 +29,14 @@ describe Gitlab::ImportExport::Saver do
   it 'saves the repo using object storage' do
     stub_uploads_object_storage(ImportExportUploader)
 
-    subject.save
+    subject.save!
 
     expect(ImportExportUpload.find_by(project: project).export_file.url)
       .to match(%r[\/uploads\/-\/system\/import_export_upload\/export_file.*])
   end
 
   it 'removes tmp files' do
-    subject.save
+    subject.save!
 
     expect(FileUtils).to have_received(:rm_rf).with(base_path)
     expect(Dir.exist?(base_path)).to eq(false)

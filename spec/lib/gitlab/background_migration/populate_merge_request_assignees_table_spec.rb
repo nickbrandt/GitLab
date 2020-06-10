@@ -24,7 +24,7 @@ describe Gitlab::BackgroundMigration::PopulateMergeRequestAssigneesTable, schema
                   source_branch: 'mr name',
                   title: "mr name#{id}")
 
-    merge_requests.create(params)
+    merge_requests.create!(params)
   end
 
   before do

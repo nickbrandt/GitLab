@@ -10,12 +10,12 @@ describe Gitlab::BackgroundMigration::MigrateStageIndex, schema: 20180420080616 
   let(:jobs) { table(:ci_builds) }
 
   before do
-    namespaces.create(id: 10, name: 'gitlab-org', path: 'gitlab-org')
+    namespaces.create!(id: 10, name: 'gitlab-org', path: 'gitlab-org')
     projects.create!(id: 11, namespace_id: 10, name: 'gitlab', path: 'gitlab')
     pipelines.create!(id: 12, project_id: 11, ref: 'master', sha: 'adf43c3a')
 
-    stages.create(id: 100, project_id: 11, pipeline_id: 12, name: 'build')
-    stages.create(id: 101, project_id: 11, pipeline_id: 12, name: 'test')
+    stages.create!(id: 100, project_id: 11, pipeline_id: 12, name: 'build')
+    stages.create!(id: 101, project_id: 11, pipeline_id: 12, name: 'test')
 
     jobs.create!(id: 121, commit_id: 12, project_id: 11,
                  stage_idx: 2, stage_id: 100)

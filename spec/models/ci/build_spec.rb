@@ -572,12 +572,12 @@ describe Ci::Build do
       it { is_expected.to be_truthy }
 
       it 'that is inactive' do
-        runner.update(active: false)
+        runner.update!(active: false)
         is_expected.to be_falsey
       end
 
       it 'that is not online' do
-        runner.update(contacted_at: nil)
+        runner.update!(contacted_at: nil)
         is_expected.to be_falsey
       end
 
@@ -2696,8 +2696,8 @@ describe Ci::Build do
       end
 
       before do
-        build.update(tag: false)
-        pipeline.update(tag: false)
+        build.update!(tag: false)
+        pipeline.update!(tag: false)
       end
 
       it { is_expected.to include(branch_variable) }
@@ -2709,8 +2709,8 @@ describe Ci::Build do
       end
 
       before do
-        build.update(tag: true)
-        pipeline.update(tag: true)
+        build.update!(tag: true)
+        pipeline.update!(tag: true)
       end
 
       it { is_expected.to include(tag_variable) }

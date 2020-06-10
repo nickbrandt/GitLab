@@ -11,7 +11,7 @@ module JiraServiceHelper
     password = 'my-secret-password'
     jira_issue_transition_id = '1'
 
-    jira_tracker.update(
+    jira_tracker.update!(
       title: title, url: url, username: username, password: password,
       jira_issue_transition_id: jira_issue_transition_id, active: true
     )

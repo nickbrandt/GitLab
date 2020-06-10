@@ -40,7 +40,7 @@ describe 'CycleAnalytics#plan' do
       branch_name = generate(:branch)
       label = create(:label)
       issue = create(:issue, project: project)
-      issue.update(label_ids: [label.id])
+      issue.update!(label_ids: [label.id])
       create_commit_referencing_issue(issue, branch_name: branch_name)
 
       create_merge_request_closing_issue(user, project, issue, source_branch: branch_name)

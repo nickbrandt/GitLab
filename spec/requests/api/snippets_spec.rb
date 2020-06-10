@@ -112,7 +112,7 @@ describe API::Snippets do
     end
 
     it 'returns 404 for invalid snippet id' do
-      snippet.destroy
+      snippet.destroy!
 
       get api("/snippets/#{snippet.id}/raw", author)
 
@@ -185,7 +185,7 @@ describe API::Snippets do
     end
 
     it 'returns 404 for invalid snippet id' do
-      private_snippet.destroy
+      private_snippet.destroy!
 
       get api("/snippets/#{private_snippet.id}", admin)
 

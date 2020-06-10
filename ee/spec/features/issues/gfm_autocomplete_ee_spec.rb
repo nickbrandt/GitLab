@@ -16,7 +16,7 @@ RSpec.describe 'GFM autocomplete EE', :js do
     let(:issue_assignee) { create(:issue, project: project) }
 
     before do
-      issue_assignee.update(assignees: [user])
+      issue_assignee.update!(assignees: [user])
 
       sign_in(user)
       visit project_issue_path(project, issue_assignee)

@@ -238,7 +238,7 @@ RSpec.describe Projects::NotesController do
 
     before do
       project.update_attribute(:visibility_level, project_visibility)
-      project.project_feature.update(merge_requests_access_level: merge_requests_access_level)
+      project.project_feature.update!(merge_requests_access_level: merge_requests_access_level)
       sign_in(user)
     end
 

@@ -40,9 +40,9 @@ describe Gitlab::BackgroundMigration::FixCrossProjectLabelLinks, schema: 2018070
     it 'updates only cross-project label links which exist in the local project or group' do
       create_resource(target_type, 1, 1)
       create_resource(target_type, 2, 3)
-      labels_table.create(id: 3, title: 'bug', color: 'red', project_id: 3, type: 'ProjectLabel')
-      link = label_links_table.create(label_id: 2, target_type: target_type, target_id: 1)
-      link2 = label_links_table.create(label_id: 3, target_type: target_type, target_id: 2)
+      labels_table.create!(id: 3, title: 'bug', color: 'red', project_id: 3, type: 'ProjectLabel')
+      link = label_links_table.create!(label_id: 2, target_type: target_type, target_id: 1)
+      link2 = label_links_table.create!(label_id: 3, target_type: target_type, target_id: 2)
 
       subject.perform(1, 100)
 
@@ -51,9 +51,9 @@ describe Gitlab::BackgroundMigration::FixCrossProjectLabelLinks, schema: 2018070
     end
 
     it 'ignores cross-project label links if label color is different' do
-      labels_table.create(id: 3, title: 'bug', color: 'green', group_id: 20, type: 'GroupLabel')
+      labels_table.create!(id: 3, title: 'bug', color: 'green', group_id: 20, type: 'GroupLabel')
       create_resource(target_type, 1, 1)
-      link = label_links_table.create(label_id: 3, target_type: target_type, target_id: 1)
+      link = label_links_table.create!(label_id: 3, target_type: target_type, target_id: 1)
 
       subject.perform(1, 100)
 
@@ -61,9 +61,9 @@ describe Gitlab::BackgroundMigration::FixCrossProjectLabelLinks, schema: 2018070
     end
 
     it 'ignores cross-project label links if label name is different' do
-      labels_table.create(id: 3, title: 'bug1', color: 'red', group_id: 20, type: 'GroupLabel')
+      labels_table.create!(id: 3, title: 'bug1', color: 'red', group_id: 20, type: 'GroupLabel')
       create_resource(target_type, 1, 1)
-      link = label_links_table.create(label_id: 3, target_type: target_type, target_id: 1)
+      link = label_links_table.create!(label_id: 3, target_type: target_type, target_id: 1)
 
       subject.perform(1, 100)
 
@@ -72,15 +72,15 @@ describe Gitlab::BackgroundMigration::FixCrossProjectLabelLinks, schema: 2018070
 
     context 'with nested group' do
       before do
-        namespaces_table.create(id: 11, type: 'Group', name: 'subgroup1', path: 'group1/subgroup1', parent_id: 10)
-        projects_table.create(id: 2, name: 'subproject1', path: 'group1/subgroup1/subproject1', namespace_id: 11)
+        namespaces_table.create!(id: 11, type: 'Group', name: 'subgroup1', path: 'group1/subgroup1', parent_id: 10)
+        projects_table.create!(id: 2, name: 'subproject1', path: 'group1/subgroup1/subproject1', namespace_id: 11)
         create_resource(target_type, 1, 2)
       end
 
       it 'ignores label links referencing ancestor group labels' do
-        labels_table.create(id: 4, title: 'bug', color: 'red', project_id: 2, type: 'ProjectLabel')
-        label_links_table.create(label_id: 4, target_type: target_type, target_id: 1)
-        link = label_links_table.create(label_id: 1, target_type: target_type, target_id: 1)
+        labels_table.create!(id: 4, title: 'bug', color: 'red', project_id: 2, type: 'ProjectLabel')
+        label_links_table.create!(label_id: 4, target_type: target_type, target_id: 1)
+        link = label_links_table.create!(label_id: 1, target_type: target_type, target_id: 1)
 
         subject.perform(1, 100)
 
@@ -88,7 +88,7 @@ describe Gitlab::BackgroundMigration::FixCrossProjectLabelLinks, schema: 2018070
       end
 
       it 'checks also issues and MRs in subgroups' do
-        link = label_links_table.create(label_id: 2, target_type: target_type, target_id: 1)
+        link = label_links_table.create!(label_id: 2, target_type: target_type, target_id: 1)
 
         subject.perform(1, 100)
 

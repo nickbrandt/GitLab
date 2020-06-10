@@ -80,7 +80,7 @@ RSpec.describe GithubService do
     let(:properties) { subject.reload.properties.symbolize_keys }
 
     it 'does not overwrite existing integrations' do
-      subject.update(service_params.slice(:properties))
+      subject.update!(service_params.slice(:properties))
 
       expect(properties).to match(service_params[:properties])
       expect(subject.static_context).to be_nil

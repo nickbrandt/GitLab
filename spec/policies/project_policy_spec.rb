@@ -104,7 +104,7 @@ describe ProjectPolicy do
     subject { described_class.new(owner, project) }
 
     before do
-      project.project_feature.destroy
+      project.project_feature.destroy!
       project.reload
     end
 

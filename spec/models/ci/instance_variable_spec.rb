@@ -20,7 +20,7 @@ describe Ci::InstanceVariable do
 
     before do
       stub_feature_flags(ci_instance_level_variables_limit: false)
-      plan_limits.update(described_class.limit_name => 1)
+      plan_limits.update!(described_class.limit_name => 1)
       create(:ci_instance_variable)
     end
 
@@ -73,7 +73,7 @@ describe Ci::InstanceVariable do
     it 'resets the cache when records are deleted' do
       expect(described_class.all_cached).to contain_exactly(protected_variable, unprotected_variable)
 
-      protected_variable.destroy
+      protected_variable.destroy!
 
       expect(described_class.all_cached).to contain_exactly(unprotected_variable)
     end

@@ -286,7 +286,7 @@ describe API::ProjectImport do
     it 'returns the import status and the error if failed' do
       project = create(:project, :import_failed)
       project.add_maintainer(user)
-      project.import_state.update(last_error: 'error')
+      project.import_state.update!(last_error: 'error')
 
       get api("/projects/#{project.id}/import", user)
 

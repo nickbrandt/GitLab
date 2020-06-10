@@ -60,7 +60,7 @@ RSpec.describe API::MergeRequestApprovals do
     it 'retrieves the approval status' do
       project.add_developer(approver)
       project.add_developer(create(:user))
-      merge_request.approvals.create(user: approver)
+      merge_request.approvals.create!(user: approver)
       rule.users << approver
       rule.groups << group
 
@@ -105,7 +105,7 @@ RSpec.describe API::MergeRequestApprovals do
       before do
         private_group = create(:group, :private)
         private_group.add_developer(create(:user))
-        merge_request.approver_groups.create(group: private_group)
+        merge_request.approver_groups.create!(group: private_group)
       end
 
       it 'hides private group' do
@@ -156,7 +156,7 @@ RSpec.describe API::MergeRequestApprovals do
 
     before do
       project.add_developer(approver)
-      merge_request.approvals.create(user: approver)
+      merge_request.approvals.create!(user: approver)
       rule.users << approver
     end
 
@@ -249,7 +249,7 @@ RSpec.describe API::MergeRequestApprovals do
 
     before do
       project.add_developer(approver)
-      merge_request.approvals.create(user: approver)
+      merge_request.approvals.create!(user: approver)
       rule.users << approver
     end
 
@@ -365,8 +365,8 @@ RSpec.describe API::MergeRequestApprovals do
         end
 
         it 'removes approvers not in the payload' do
-          merge_request.approvers.create(user: approver)
-          merge_request.approver_groups.create(group: group)
+          merge_request.approvers.create!(user: approver)
+          merge_request.approver_groups.create!(group: group)
 
           expect do
             put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvers", current_user),
@@ -380,8 +380,8 @@ RSpec.describe API::MergeRequestApprovals do
 
         context 'when sending form-encoded data' do
           it 'removes approvers not in the payload' do
-            merge_request.approvers.create(user: approver)
-            merge_request.approver_groups.create(group: group)
+            merge_request.approvers.create!(user: approver)
+            merge_request.approver_groups.create!(group: group)
 
             expect do
               put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvers", current_user),
@@ -397,7 +397,7 @@ RSpec.describe API::MergeRequestApprovals do
 
       it 'only shows approver groups that are visible to current user' do
         private_group = create(:group, :private)
-        merge_request.approver_groups.create(group: private_group)
+        merge_request.approver_groups.create!(group: private_group)
 
         put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvers", current_user),
           params: { approver_ids: [approver.id], approver_group_ids: [private_group.id, group.id] }
@@ -507,8 +507,8 @@ RSpec.describe API::MergeRequestApprovals do
 
       context 'when project requires force auth for approval' do
         before do
-          project.update(require_password_to_approve: true)
-          approver.update(password: 'password')
+          project.update!(require_password_to_approve: true)
+          approver.update!(password: 'password')
         end
 
         it 'does not approve the merge request with no password' do
@@ -535,7 +535,7 @@ RSpec.describe API::MergeRequestApprovals do
 
       it 'only shows group approvers visible to the user' do
         private_group = create(:group, :private)
-        merge_request.approver_groups.create(group: private_group)
+        merge_request.approver_groups.create!(group: private_group)
 
         approve
 
@@ -556,8 +556,8 @@ RSpec.describe API::MergeRequestApprovals do
         project.add_developer(approver)
         project.add_developer(unapprover)
         project.add_developer(create(:user))
-        merge_request.approvals.create(user: approver)
-        merge_request.approvals.create(user: unapprover)
+        merge_request.approvals.create!(user: approver)
+        merge_request.approvals.create!(user: unapprover)
         rule.users = [approver, unapprover]
       end
 
@@ -577,7 +577,7 @@ RSpec.describe API::MergeRequestApprovals do
 
       it 'only shows group approvers visible to the user' do
         private_group = create(:group, :private)
-        merge_request.approver_groups.create(group: private_group)
+        merge_request.approver_groups.create!(group: private_group)
 
         post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/unapprove", unapprover)
 

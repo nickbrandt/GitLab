@@ -206,7 +206,7 @@ describe 'getting user information' do
 
     context 'the user is private' do
       before do
-        user.update(private_profile: true)
+        user.update!(private_profile: true)
         post_graphql(query, current_user: current_user)
       end
 

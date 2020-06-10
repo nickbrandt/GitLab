@@ -23,7 +23,7 @@ end
 RSpec.shared_examples 'secondary counters' do |registry_factory_name|
   before do
     create(registry_factory_name, :synced)
-    create(registry_factory_name)
+    create!(registry_factory_name)
     create(registry_factory_name, :failed)
   end
 

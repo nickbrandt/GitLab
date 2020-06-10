@@ -146,7 +146,7 @@ RSpec.describe 'Global elastic search', :elastic, :sidekiq_inline do
 
       ensure_elasticsearch_index!
 
-      project_2.destroy
+      project_2.destroy!
 
       visit dashboard_projects_path
 

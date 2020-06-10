@@ -165,8 +165,8 @@ RSpec.describe Notify do
         subject { described_class.approved_merge_request_email(recipient.id, merge_request.id, last_approver.id) }
 
         before do
-          merge_request.approvals.create(user: assignee)
-          merge_request.approvals.create(user: last_approver)
+          merge_request.approvals.create!(user: assignee)
+          merge_request.approvals.create!(user: last_approver)
         end
 
         it_behaves_like 'a multiple recipients email'

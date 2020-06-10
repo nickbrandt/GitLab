@@ -18,8 +18,8 @@ describe Gitlab::BitbucketServerImport::Importer do
       data: { project_key: project_key, repo_slug: repo_slug },
       credentials: { base_uri: 'http://my-bitbucket', user: 'bitbucket', password: 'test' }
     )
-    data.save
-    project.save
+    data.save!
+    project.save!
   end
 
   describe '#import_repository' do

@@ -261,8 +261,8 @@ RSpec.describe Ci::Pipeline do
 
       context 'when builds are retried' do
         before do
-          build_1.update(retried: true)
-          build_2.update(retried: true)
+          build_1.update!(retried: true)
+          build_2.update!(retried: true)
         end
 
         it 'does not take retried builds into account' do
@@ -300,8 +300,8 @@ RSpec.describe Ci::Pipeline do
 
       context 'when builds are retried' do
         before do
-          build.update(retried: true)
-          build1.update(retried: true)
+          build.update!(retried: true)
+          build1.update!(retried: true)
         end
 
         it 'does not take retried builds into account' do

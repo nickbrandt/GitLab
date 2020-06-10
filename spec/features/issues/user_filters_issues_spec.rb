@@ -18,7 +18,7 @@ describe 'User filters issues' do
     @issue = Issue.find_by(title: 'foobar')
     @issue.milestone = create(:milestone, project: project)
     @issue.assignees = []
-    @issue.save
+    @issue.save!
   end
 
   let(:issue) { @issue }

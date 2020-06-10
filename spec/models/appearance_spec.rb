@@ -15,7 +15,7 @@ describe Appearance do
       create(:appearance)
 
       new_row = build(:appearance)
-      new_row.save
+      new_row.save!
 
       expect(new_row.valid?).to eq(false)
     end
@@ -39,7 +39,7 @@ describe Appearance do
     end
 
     it 'returns the path when the upload has been orphaned' do
-      appearance.send(logo_type).upload.destroy
+      appearance.send(logo_type).upload.destroy!
       appearance.reload
 
       expect(appearance.send("#{logo_type}_path")).to eq(expected_path)

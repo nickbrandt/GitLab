@@ -160,9 +160,9 @@ describe Gitlab::Ci::Ansi2json::Style do
     with_them do
       it 'change the style' do
         style = described_class.new
-        style.update(initial_state)
+        style.update!(initial_state)
 
-        style.update(ansi_commands)
+        style.update!(ansi_commands)
 
         expect(style.to_s).to eq(result)
       end

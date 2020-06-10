@@ -106,7 +106,7 @@ describe Issues::UpdateService, :mailer do
 
         [issue, issue1, issue2].each do |issue|
           issue.move_to_end
-          issue.save
+          issue.save!
         end
 
         opts[:move_between_ids] = [issue1.id, issue2.id]
@@ -294,7 +294,7 @@ describe Issues::UpdateService, :mailer do
       end
 
       it 'does not update assignee_id with unauthorized users' do
-        project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+        project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
         update_issue(confidential: true)
         non_member = create(:user)
         original_assignees = issue.assignees
@@ -403,7 +403,7 @@ describe Issues::UpdateService, :mailer do
         it 'sends notifications for subscribers of changed milestone', :sidekiq_might_not_need_inline do
           issue.milestone = create(:milestone, project: project)
 
-          issue.save
+          issue.save!
 
           perform_enqueued_jobs do
             update_issue(milestone_id: "")
@@ -416,7 +416,7 @@ describe Issues::UpdateService, :mailer do
         it 'clears milestone issue counters cache' do
           issue.milestone = create(:milestone, project: project)
 
-          issue.save
+          issue.save!
 
           expect_next_instance_of(Milestones::IssuesCountService, issue.milestone) do |service|
             expect(service).to receive(:delete_cache).and_call_original
@@ -711,7 +711,7 @@ describe Issues::UpdateService, :mailer do
 
         context 'for a label assigned to an issue' do
           it 'removes the label' do
-            issue.update(labels: [label])
+            issue.update!(labels: [label])
 
             expect(result.label_ids).to be_empty
           end
@@ -760,7 +760,7 @@ describe Issues::UpdateService, :mailer do
         levels.each do |level|
           it "does not update with unauthorized assignee when project is #{Gitlab::VisibilityLevel.level_name(level)}" do
             assignee = create(:user)
-            project.update(visibility_level: level)
+            project.update!(visibility_level: level)
             feature_visibility_attr = :"#{issue.model_name.plural}_access_level"
             project.project_feature.update_attribute(feature_visibility_attr, ProjectFeature::PRIVATE)
 

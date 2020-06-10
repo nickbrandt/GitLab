@@ -24,7 +24,7 @@ describe Gitlab::ShardHealthCache, :clean_gitlab_redis_cache do
 
     it 'replaces the existing set' do
       new_set = %w(test me more)
-      described_class.update(new_set)
+      described_class.update!(new_set)
 
       expect(described_class.cached_healthy_shards).to match_array(new_set)
     end

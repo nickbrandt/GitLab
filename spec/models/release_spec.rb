@@ -25,10 +25,10 @@ RSpec.describe Release do
     context 'when a release exists in the database without a name' do
       it 'does not require name' do
         existing_release_without_name = build(:release, project: project, author: user, name: nil)
-        existing_release_without_name.save(validate: false)
+        existing_release_without_name.save!(validate: false)
 
         existing_release_without_name.description = "change"
-        existing_release_without_name.save
+        existing_release_without_name.save!
         existing_release_without_name.reload
 
         expect(existing_release_without_name).to be_valid

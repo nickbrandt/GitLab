@@ -1323,7 +1323,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
       end
 
       it 'returns the environments count grouped by state with zero value' do
-        environment2.update(state: 'stopped')
+        environment2.update!(state: 'stopped')
         expect(project.environments.count_by_state).to eq({ stopped: 3, available: 0 })
       end
     end

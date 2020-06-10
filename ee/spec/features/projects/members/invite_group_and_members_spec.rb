@@ -148,7 +148,7 @@ RSpec.describe 'Project > Members > Invite group and members', :js do
 
       context 'when the root_group has "Share with group lock" and membership lock enabled' do
         before do
-          root_group.update(share_with_group_lock: true, membership_lock: true)
+          root_group.update!(share_with_group_lock: true, membership_lock: true)
           subgroup.reload
         end
 

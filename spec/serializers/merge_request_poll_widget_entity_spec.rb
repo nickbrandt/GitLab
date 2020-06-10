@@ -214,7 +214,7 @@ describe MergeRequestPollWidgetEntity do
 
       context 'when is not up to date' do
         it 'returns nil' do
-          pipeline.update(sha: "not up to date")
+          pipeline.update!(sha: "not up to date")
 
           expect(subject[:pipeline]).to eq(nil)
         end

@@ -20,7 +20,7 @@ RSpec.describe Operations::FeatureFlagScope do
       end
 
       it 'validates uniqueness of environment scope' do
-        new_feature_flag_scope.save
+        new_feature_flag_scope.save!
 
         expect(new_feature_flag_scope.errors[:environment_scope])
           .to include("(#{existing_feature_flag_scope.environment_scope})" \
@@ -33,7 +33,7 @@ RSpec.describe Operations::FeatureFlagScope do
       let!(:scope_default) { feature_flag.default_scope }
 
       it 'keeps default scope intact' do
-        scope_default.update(environment_scope: 'review/*')
+        scope_default.update!(environment_scope: 'review/*')
 
         expect(scope_default.errors[:environment_scope])
           .to include("cannot be changed from default scope")
@@ -55,14 +55,14 @@ RSpec.describe Operations::FeatureFlagScope do
         allow(scope).to receive(:strategies).and_return(nil)
 
         scope.active = false
-        scope.save
+        scope.save!
 
         expect(scope.errors[:strategies]).to be_empty
       end
 
       it 'validates multiple strategies' do
         feature_flag = create(:operations_feature_flag)
-        scope = described_class.create(feature_flag: feature_flag,
+        scope = described_class.create!(feature_flag: feature_flag,
                                        environment_scope: 'production', active: true,
                                        strategies: [{ name: "default", parameters: {} },
                                                     { name: "invalid", parameters: {} }])
@@ -78,7 +78,7 @@ RSpec.describe Operations::FeatureFlagScope do
           scope = create(:operations_feature_flag_scope)
 
           scope.strategies = invalid_value
-          scope.save
+          scope.save!
 
           expect(scope.errors[:strategies]).to eq(['must be an array of strategy hashes'])
         end
@@ -102,7 +102,7 @@ RSpec.describe Operations::FeatureFlagScope do
         with_them do
           it 'must be one of "default", "gradualRolloutUserId", or "userWithId"' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag,
+            scope = described_class.create!(feature_flag: feature_flag,
                                            environment_scope: 'production', active: true,
                                            strategies: [{ name: name, parameters: params }])
 
@@ -115,7 +115,7 @@ RSpec.describe Operations::FeatureFlagScope do
         context 'when the strategy name is gradualRolloutUserId' do
           it 'must have parameters' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag,
+            scope = described_class.create!(feature_flag: feature_flag,
                                            environment_scope: 'production', active: true,
                                            strategies: [{ name: 'gradualRolloutUserId' }])
 
@@ -129,7 +129,7 @@ RSpec.describe Operations::FeatureFlagScope do
           with_them do
             it 'must have valid parameters for the strategy' do
               feature_flag = create(:operations_feature_flag)
-              scope = described_class.create(feature_flag: feature_flag,
+              scope = described_class.create!(feature_flag: feature_flag,
                                              environment_scope: 'production', active: true,
                                              strategies: [{ name: 'gradualRolloutUserId',
                                                             parameters: invalid_parameters }])
@@ -140,7 +140,7 @@ RSpec.describe Operations::FeatureFlagScope do
 
           it 'allows the parameters in any order' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag,
+            scope = described_class.create!(feature_flag: feature_flag,
                                            environment_scope: 'production', active: true,
                                            strategies: [{ name: 'gradualRolloutUserId',
                                                           parameters: { percentage: '10', groupId: 'mygroup' } }])
@@ -157,7 +157,7 @@ RSpec.describe Operations::FeatureFlagScope do
             with_them do
               it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
                 feature_flag = create(:operations_feature_flag)
-                scope = described_class.create(feature_flag: feature_flag,
+                scope = described_class.create!(feature_flag: feature_flag,
                                                environment_scope: 'production', active: true,
                                                strategies: [{ name: 'gradualRolloutUserId',
                                                               parameters: { groupId: 'mygroup', percentage: invalid_value } }])
@@ -172,7 +172,7 @@ RSpec.describe Operations::FeatureFlagScope do
             with_them do
               it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
                 feature_flag = create(:operations_feature_flag)
-                scope = described_class.create(feature_flag: feature_flag,
+                scope = described_class.create!(feature_flag: feature_flag,
                                                environment_scope: 'production', active: true,
                                                strategies: [{ name: 'gradualRolloutUserId',
                                                               parameters: { groupId: 'mygroup', percentage: valid_value } }])
@@ -190,7 +190,7 @@ RSpec.describe Operations::FeatureFlagScope do
             with_them do
               it 'must be a string value of up to 32 lowercase characters' do
                 feature_flag = create(:operations_feature_flag)
-                scope = described_class.create(feature_flag: feature_flag,
+                scope = described_class.create!(feature_flag: feature_flag,
                                                environment_scope: 'production', active: true,
                                                strategies: [{ name: 'gradualRolloutUserId',
                                                               parameters: { groupId: invalid_value, percentage: '40' } }])
@@ -205,7 +205,7 @@ RSpec.describe Operations::FeatureFlagScope do
             with_them do
               it 'must be a string value of up to 32 lowercase characters' do
                 feature_flag = create(:operations_feature_flag)
-                scope = described_class.create(feature_flag: feature_flag,
+                scope = described_class.create!(feature_flag: feature_flag,
                                                environment_scope: 'production', active: true,
                                                strategies: [{ name: 'gradualRolloutUserId',
                                                               parameters: { groupId: valid_value, percentage: '40' } }])
@@ -219,7 +219,7 @@ RSpec.describe Operations::FeatureFlagScope do
         context 'when the strategy name is userWithId' do
           it 'must have parameters' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag,
+            scope = described_class.create!(feature_flag: feature_flag,
                                            environment_scope: 'production', active: true,
                                            strategies: [{ name: 'userWithId' }])
 
@@ -232,7 +232,7 @@ RSpec.describe Operations::FeatureFlagScope do
           with_them do
             it 'must have valid parameters for the strategy' do
               feature_flag = create(:operations_feature_flag)
-              scope = described_class.create(feature_flag: feature_flag,
+              scope = described_class.create!(feature_flag: feature_flag,
                                              environment_scope: 'production', active: true,
                                              strategies: [{ name: 'userWithId', parameters: invalid_parameters }])
 
@@ -250,7 +250,7 @@ RSpec.describe Operations::FeatureFlagScope do
             with_them do
               it 'is valid with a string of comma separated values' do
                 feature_flag = create(:operations_feature_flag)
-                scope = described_class.create(feature_flag: feature_flag,
+                scope = described_class.create!(feature_flag: feature_flag,
                                                environment_scope: 'production', active: true,
                                                strategies: [{ name: 'userWithId', parameters: { userIds: valid_value } }])
 
@@ -266,7 +266,7 @@ RSpec.describe Operations::FeatureFlagScope do
             with_them do
               it 'is invalid' do
                 feature_flag = create(:operations_feature_flag)
-                scope = described_class.create(feature_flag: feature_flag,
+                scope = described_class.create!(feature_flag: feature_flag,
                                                environment_scope: 'production', active: true,
                                                strategies: [{ name: 'userWithId', parameters: { userIds: invalid_value } }])
 
@@ -281,7 +281,7 @@ RSpec.describe Operations::FeatureFlagScope do
         context 'when the strategy name is default' do
           it 'must have parameters' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag,
+            scope = described_class.create!(feature_flag: feature_flag,
                                            environment_scope: 'production', active: true,
                                            strategies: [{ name: 'default' }])
 
@@ -294,7 +294,7 @@ RSpec.describe Operations::FeatureFlagScope do
           with_them do
             it 'must be empty' do
               feature_flag = create(:operations_feature_flag)
-              scope = described_class.create(feature_flag: feature_flag,
+              scope = described_class.create!(feature_flag: feature_flag,
                                              environment_scope: 'production', active: true,
                                              strategies: [{ name: 'default',
                                                             parameters: invalid_value }])
@@ -305,7 +305,7 @@ RSpec.describe Operations::FeatureFlagScope do
 
           it 'must be empty' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag,
+            scope = described_class.create!(feature_flag: feature_flag,
                                            environment_scope: 'production', active: true,
                                            strategies: [{ name: 'default',
                                                           parameters: {} }])

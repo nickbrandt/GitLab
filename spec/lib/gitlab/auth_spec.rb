@@ -160,13 +160,13 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
         end
 
         it 'recognises user token' do
-          build.update(user: create(:user))
+          build.update!(user: create(:user))
 
           expect(subject).to eq(Gitlab::Auth::Result.new(build.user, build.project, :build, described_class.build_authentication_abilities))
         end
 
         it 'fails with blocked user token' do
-          build.update(user: create(:user, :blocked))
+          build.update!(user: create(:user, :blocked))
 
           expect(subject).to eq(Gitlab::Auth::Result.new(nil, nil, nil, nil))
         end
@@ -186,7 +186,7 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
 
     it 'recognizes other ci services' do
       project.create_drone_ci_service(active: true)
-      project.drone_ci_service.update(token: 'token')
+      project.drone_ci_service.update!(token: 'token')
 
       expect(gl_auth.find_for_git_client('drone-ci-token', 'token', project: project, ip: 'ip')).to eq(Gitlab::Auth::Result.new(nil, project, :ci, described_class.build_authentication_abilities))
     end

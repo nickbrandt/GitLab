@@ -454,7 +454,7 @@ RSpec.describe Gitlab::GitAccess do
             project.add_role(user, role)
           end
 
-          protected_branch.save
+          protected_branch.save!
 
           aggregate_failures do
             matrix.each do |action, allowed|
@@ -480,7 +480,7 @@ RSpec.describe Gitlab::GitAccess do
           create(:project_group_link, role, group: group,
                                             project: project)
 
-          protected_branch.save
+          protected_branch.save!
 
           aggregate_failures do
             matrix.each do |action, allowed|

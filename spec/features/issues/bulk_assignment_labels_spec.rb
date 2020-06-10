@@ -259,8 +259,8 @@ describe 'Issues > Labels bulk assignment' do
         before do
           issue1.milestone = milestone
           issue2.milestone = milestone
-          issue1.save
-          issue2.save
+          issue1.save!
+          issue2.save!
           issue1.labels << bug
           issue2.labels << feature
 

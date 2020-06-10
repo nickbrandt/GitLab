@@ -37,7 +37,7 @@ RSpec.describe Profiles::EmailsController do
     let(:email_params) { { email: "add_email@example.com" } }
 
     it 'resends an email confirmation' do
-      email = user.emails.create(email: 'add_email@example.com')
+      email = user.emails.create!(email: 'add_email@example.com')
 
       expect { put(:resend_confirmation_instructions, params: { id: email }) }.to change { ActionMailer::Base.deliveries.size }
       expect(ActionMailer::Base.deliveries.last.to).to eq [email_params[:email]]

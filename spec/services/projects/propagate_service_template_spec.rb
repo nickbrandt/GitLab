@@ -31,7 +31,7 @@ describe Projects::PropagateServiceTemplate do
     end
 
     it 'creates services for a project that has another service' do
-      BambooService.create(
+      BambooService.create!(
         template: true,
         active: true,
         project: project,
@@ -51,7 +51,7 @@ describe Projects::PropagateServiceTemplate do
     end
 
     it 'does not create the service if it exists already' do
-      other_service = BambooService.create(
+      other_service = BambooService.create!(
         template: true,
         active: true,
         properties: {

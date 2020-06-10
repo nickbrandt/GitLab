@@ -490,7 +490,7 @@ RSpec.describe Group do
         let(:push_rule) { create(:push_rule) }
 
         it 'returns its own push rule' do
-          group.update(push_rule: push_rule)
+          group.update!(push_rule: push_rule)
 
           expect(group.predefined_push_rule).to eq(push_rule)
         end

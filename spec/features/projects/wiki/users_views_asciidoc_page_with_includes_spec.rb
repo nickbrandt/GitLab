@@ -34,8 +34,8 @@ RSpec.describe 'User views AsciiDoc page with includes', :js do
 
     context 'when there are multiple versions of the wiki pages' do
       before do
-        included_wiki_page.update(message: 'updated included file', content: 'Updated content from the included page')
-        wiki_page.update(message: 'updated wiki page', content: "Updated content from the main page.\ninclude::included_page.asciidoc[]")
+        included_wiki_page.update!(message: 'updated included file', content: 'Updated content from the included page')
+        wiki_page.update!(message: 'updated wiki page', content: "Updated content from the main page.\ninclude::included_page.asciidoc[]")
       end
 
       let(:latest_version_id) { wiki_page.versions.first.id }

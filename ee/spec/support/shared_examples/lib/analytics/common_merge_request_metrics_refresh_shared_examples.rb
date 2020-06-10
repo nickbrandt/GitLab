@@ -36,7 +36,7 @@ RSpec.shared_examples 'common merge request metric refresh for' do |metric_name|
 
   context 'when no merge request metric is present' do
     before do
-      merge_request.metrics.destroy
+      merge_request.metrics.destroy!
       merge_request.reload
     end
 

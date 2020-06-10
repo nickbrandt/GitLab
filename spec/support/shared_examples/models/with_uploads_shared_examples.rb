@@ -27,7 +27,7 @@ RSpec.shared_examples 'model with uploads' do |supports_fileuploads|
         it 'deletes local files' do
           expect_any_instance_of(Uploads::Local).to receive(:delete_keys).with(uploads.map(&:absolute_path))
 
-          model_object.destroy
+          model_object.destroy!
         end
       end
 
@@ -42,7 +42,7 @@ RSpec.shared_examples 'model with uploads' do |supports_fileuploads|
           expected_array = array_including(*uploads.map(&:path))
           expect_any_instance_of(Uploads::Fog).to receive(:delete_keys).with(expected_array)
 
-          model_object.destroy
+          model_object.destroy!
         end
       end
     end

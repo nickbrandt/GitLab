@@ -49,7 +49,7 @@ describe Gitlab::Auth::OAuth::User do
         create(:omniauth_user, extern_uid: 'my-uid', provider: provider)
         stub_omniauth_config(allow_single_sign_on: [provider], external_providers: [provider])
 
-        oauth_user.save
+        oauth_user.save!
 
         expect(gl_user).to be_valid
         expect(gl_user.external).to be_falsey
@@ -65,7 +65,7 @@ describe Gitlab::Auth::OAuth::User do
         it 'creates the user' do
           stub_omniauth_config(allow_single_sign_on: [provider])
 
-          oauth_user.save
+          oauth_user.save!
 
           expect(gl_user).to be_persisted
         end
@@ -79,7 +79,7 @@ describe Gitlab::Auth::OAuth::User do
         it 'creates and confirms the user anyway' do
           stub_omniauth_config(allow_single_sign_on: [provider])
 
-          oauth_user.save
+          oauth_user.save!
 
           expect(gl_user).to be_persisted
           expect(gl_user).to be_confirmed
@@ -94,7 +94,7 @@ describe Gitlab::Auth::OAuth::User do
         it 'creates the user' do
           stub_omniauth_config(allow_single_sign_on: [provider])
 
-          oauth_user.save
+          oauth_user.save!
 
           expect(gl_user).to be_persisted
         end
@@ -103,7 +103,7 @@ describe Gitlab::Auth::OAuth::User do
       it 'marks user as having password_automatically_set' do
         stub_omniauth_config(allow_single_sign_on: [provider], external_providers: [provider])
 
-        oauth_user.save
+        oauth_user.save!
 
         expect(gl_user).to be_persisted
         expect(gl_user).to be_password_automatically_set
@@ -113,7 +113,7 @@ describe Gitlab::Auth::OAuth::User do
         context 'provider is marked as external' do
           it 'marks user as external' do
             stub_omniauth_config(allow_single_sign_on: [provider], external_providers: [provider])
-            oauth_user.save
+            oauth_user.save!
             expect(gl_user).to be_valid
             expect(gl_user.external).to be_truthy
           end
@@ -123,7 +123,7 @@ describe Gitlab::Auth::OAuth::User do
           it 'does not mark external user as internal' do
             create(:omniauth_user, extern_uid: 'my-uid', provider: provider, external: true)
             stub_omniauth_config(allow_single_sign_on: [provider], external_providers: ['facebook'])
-            oauth_user.save
+            oauth_user.save!
             expect(gl_user).to be_valid
             expect(gl_user.external).to be_truthy
           end
@@ -133,9 +133,9 @@ describe Gitlab::Auth::OAuth::User do
           context 'when adding a new OAuth identity' do
             it 'does not promote an external user to internal' do
               user = create(:user, email: 'john@mail.com', external: true)
-              user.identities.create(provider: provider, extern_uid: uid)
+              user.identities.create!(provider: provider, extern_uid: uid)
 
-              oauth_user.save
+              oauth_user.save!
               expect(gl_user).to be_valid
               expect(gl_user.external).to be_truthy
             end
@@ -148,7 +148,7 @@ describe Gitlab::Auth::OAuth::User do
           end
 
           it "creates a user from Omniauth" do
-            oauth_user.save
+            oauth_user.save!
 
             expect(gl_user).to be_valid
             identity = gl_user.identities.first
@@ -163,7 +163,7 @@ describe Gitlab::Auth::OAuth::User do
           end
 
           it "creates a user from Omniauth" do
-            oauth_user.save
+            oauth_user.save!
 
             expect(gl_user).to be_valid
             identity = gl_user.identities.first
@@ -232,7 +232,7 @@ describe Gitlab::Auth::OAuth::User do
               before do
                 allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(ldap_user)
 
-                oauth_user.save
+                oauth_user.save!
               end
 
               it "creates a user with dual LDAP and omniauth identities" do
@@ -271,7 +271,7 @@ describe Gitlab::Auth::OAuth::User do
               it "adds the omniauth identity to the LDAP account" do
                 allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(ldap_user)
 
-                oauth_user.save
+                oauth_user.save!
 
                 expect(gl_user).to be_valid
                 expect(gl_user.username).to eql 'john'
@@ -293,7 +293,7 @@ describe Gitlab::Auth::OAuth::User do
                 allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(nil)
                 allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_email).and_return(ldap_user)
 
-                oauth_user.save
+                oauth_user.save!
 
                 identities_as_hash = gl_user.identities.map { |id| { provider: id.provider, extern_uid: id.extern_uid } }
                 expect(identities_as_hash).to match_array(result_identities(dn, uid))
@@ -305,7 +305,7 @@ describe Gitlab::Auth::OAuth::User do
                   allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_email).and_return(nil)
                   allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_dn).and_return(ldap_user)
 
-                  oauth_user.save
+                  oauth_user.save!
 
                   identities_as_hash = gl_user.identities.map { |id| { provider: id.provider, extern_uid: id.extern_uid } }
                   expect(identities_as_hash).to match_array(result_identities(dn, uid))
@@ -326,7 +326,7 @@ describe Gitlab::Auth::OAuth::User do
               end
 
               it 'does not save the identity' do
-                oauth_user.save
+                oauth_user.save!
 
                 identities_as_hash = gl_user.identities.map { |id| { provider: id.provider, extern_uid: id.extern_uid } }
                 expect(identities_as_hash).to match_array([{ provider: 'twitter', extern_uid: uid }])
@@ -346,7 +346,7 @@ describe Gitlab::Auth::OAuth::User do
               it 'creates a user favoring the LDAP username and strips email domain' do
                 allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_uid).and_return(ldap_user)
 
-                oauth_user.save
+                oauth_user.save!
 
                 expect(gl_user).to be_valid
                 expect(gl_user.username).to eql 'johndoe'
@@ -379,7 +379,7 @@ describe Gitlab::Auth::OAuth::User do
           end
 
           it do
-            oauth_user.save
+            oauth_user.save!
             expect(gl_user).to be_valid
             expect(gl_user).not_to be_blocked
           end
@@ -391,7 +391,7 @@ describe Gitlab::Auth::OAuth::User do
           end
 
           it do
-            oauth_user.save
+            oauth_user.save!
             expect(gl_user).to be_valid
             expect(gl_user).to be_blocked
           end
@@ -417,7 +417,7 @@ describe Gitlab::Auth::OAuth::User do
             end
 
             it do
-              oauth_user.save
+              oauth_user.save!
               expect(gl_user).to be_valid
               expect(gl_user).not_to be_blocked
             end
@@ -431,7 +431,7 @@ describe Gitlab::Auth::OAuth::User do
             end
 
             it do
-              oauth_user.save
+              oauth_user.save!
               expect(gl_user).to be_valid
               expect(gl_user).to be_blocked
             end
@@ -449,7 +449,7 @@ describe Gitlab::Auth::OAuth::User do
             end
 
             it do
-              oauth_user.save
+              oauth_user.save!
               expect(gl_user).to be_valid
               expect(gl_user).not_to be_blocked
             end
@@ -463,7 +463,7 @@ describe Gitlab::Auth::OAuth::User do
             end
 
             it do
-              oauth_user.save
+              oauth_user.save!
               expect(gl_user).to be_valid
               expect(gl_user).not_to be_blocked
             end
@@ -473,7 +473,7 @@ describe Gitlab::Auth::OAuth::User do
 
       context 'sign-in' do
         before do
-          oauth_user.save
+          oauth_user.save!
           oauth_user.gl_user.activate
         end
 
@@ -483,7 +483,7 @@ describe Gitlab::Auth::OAuth::User do
           end
 
           it do
-            oauth_user.save
+            oauth_user.save!
             expect(gl_user).to be_valid
             expect(gl_user).not_to be_blocked
           end
@@ -495,7 +495,7 @@ describe Gitlab::Auth::OAuth::User do
           end
 
           it do
-            oauth_user.save
+            oauth_user.save!
             expect(gl_user).to be_valid
             expect(gl_user).not_to be_blocked
           end
@@ -509,7 +509,7 @@ describe Gitlab::Auth::OAuth::User do
           end
 
           it do
-            oauth_user.save
+            oauth_user.save!
             expect(gl_user).to be_valid
             expect(gl_user).not_to be_blocked
           end
@@ -523,7 +523,7 @@ describe Gitlab::Auth::OAuth::User do
           end
 
           it do
-            oauth_user.save
+            oauth_user.save!
             expect(gl_user).to be_valid
             expect(gl_user).not_to be_blocked
           end
@@ -586,7 +586,7 @@ describe Gitlab::Auth::OAuth::User do
 
     context 'when collision with existing user' do
       it 'generates the username with a counter' do
-        oauth_user.save
+        oauth_user.save!
         oauth_user2 = described_class.new(OmniAuth::AuthHash.new(uid: 'my-uid2', provider: provider, info: { nickname: 'johngitlab-ETC@othermail.com', email: 'john@othermail.com' }))
 
         expect(oauth_user2.gl_user.username).to eq('johngitlab-ETC1')

@@ -12,9 +12,9 @@ describe BackfillProjectSettings, :sidekiq, schema: 20200114113341 do
     before do
       stub_const("#{described_class}::BATCH_SIZE", 2)
 
-      projects.create(id: 1, namespace_id: namespace.id)
-      projects.create(id: 2, namespace_id: namespace.id)
-      projects.create(id: 3, namespace_id: namespace.id)
+      projects.create!(id: 1, namespace_id: namespace.id)
+      projects.create!(id: 2, namespace_id: namespace.id)
+      projects.create!(id: 3, namespace_id: namespace.id)
     end
 
     it 'schedules BackfillProjectSettings background jobs' do

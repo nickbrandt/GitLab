@@ -195,7 +195,7 @@ RSpec.describe Projects::MergeRequestsController do
 
         before do
           project.add_developer(new_approver)
-          project.update(disable_overriding_approvers_per_merge_request: true)
+          project.update!(disable_overriding_approvers_per_merge_request: true)
         end
 
         it 'does not update approvals_before_merge' do
@@ -364,7 +364,7 @@ RSpec.describe Projects::MergeRequestsController do
 
         before do
           upstream.add_developer(user)
-          upstream.update(approvals_before_merge: 2)
+          upstream.update!(approvals_before_merge: 2)
         end
 
         it_behaves_like 'approvals_before_merge param'
@@ -375,7 +375,7 @@ RSpec.describe Projects::MergeRequestsController do
 
         before do
           project.add_developer(user)
-          project.update(approvals_before_merge: 0)
+          project.update!(approvals_before_merge: 0)
         end
 
         it_behaves_like 'approvals_before_merge param'

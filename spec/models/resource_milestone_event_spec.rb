@@ -57,7 +57,7 @@ describe ResourceMilestoneEvent, type: :model do
     [Issue, MergeRequest].each do |klass|
       expected_results_for_actions.each do |action, expected_result|
         it "is #{expected_result} for action #{action} on #{klass.name.underscore}" do
-          model = create(klass.name.underscore)
+          model = create!(klass.name.underscore)
           key = model.class.name.underscore
           event = build(described_class.name.underscore.to_sym, key => model, action: action)
 

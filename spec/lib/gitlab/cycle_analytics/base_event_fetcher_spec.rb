@@ -42,7 +42,7 @@ describe Gitlab::CycleAnalytics::BaseEventFetcher do
       issue = create(:issue, project: project, created_at: 2.days.ago)
       milestone = create(:milestone, project: project)
 
-      issue.update(milestone: milestone)
+      issue.update!(milestone: milestone)
       create_merge_request_closing_issue(user, project, issue)
     end
   end

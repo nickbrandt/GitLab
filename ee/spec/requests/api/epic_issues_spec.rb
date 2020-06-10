@@ -34,8 +34,8 @@ RSpec.describe API::EpicIssues do
         end
 
         it 'returns 404 not found error for a user without permissions to see the group' do
-          project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-          group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          group.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
           get api(url, user)
 
@@ -90,8 +90,8 @@ RSpec.describe API::EpicIssues do
         end
 
         it 'returns 404 not found error for a user without permissions to see the group' do
-          project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-          group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          group.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
           post api(url, user)
 
@@ -175,8 +175,8 @@ RSpec.describe API::EpicIssues do
         end
 
         it 'returns 404 not found error for a user without permissions to see the group' do
-          project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-          group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          group.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
           delete api(url, user)
 
@@ -260,8 +260,8 @@ RSpec.describe API::EpicIssues do
         end
 
         it 'returns 404 not found error for a user without permissions to see the group' do
-          project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-          group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          group.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
           put api(url, user)
 
           expect(response).to have_gitlab_http_status(:not_found)

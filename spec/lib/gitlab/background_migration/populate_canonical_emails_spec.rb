@@ -79,7 +79,7 @@ describe Gitlab::BackgroundMigration::PopulateCanonicalEmails, :migration, schem
         projects_limit: 0
     }
 
-    users.create(default_attributes.merge!(attributes))
+    users.create!(default_attributes.merge!(attributes))
   end
 
   def canonical_emails(user_id: nil)

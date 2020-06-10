@@ -229,7 +229,7 @@ RSpec.describe Epic do
       end
 
       it 'returns false when total depth after adding would exceed limit' do
-        root_epic.update(parent: create(:epic, group: group))
+        root_epic.update!(parent: create(:epic, group: group))
         create(:epic, group: group, parent: child_epic1)
 
         epic.parent = parent_epic
@@ -602,7 +602,7 @@ RSpec.describe Epic do
 
     before do
       epic.description = ref_text
-      epic.save
+      epic.save!
     end
 
     it 'creates new system notes for cross references' do

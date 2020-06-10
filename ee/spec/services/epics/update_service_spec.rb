@@ -201,7 +201,7 @@ RSpec.describe Epics::UpdateService do
 
         before do
           group.add_developer(mentioned1)
-          epic.update(description: "FYI: #{group.to_reference}")
+          epic.update!(description: "FYI: #{group.to_reference}")
         end
 
         context 'when the group is public' do

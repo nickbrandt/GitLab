@@ -43,7 +43,7 @@ RSpec.describe Projects::CycleAnalyticsController do
       before do
         issue = create(:issue, project: project, created_at: 4.days.ago)
         milestone = create(:milestone, project: project, created_at: 5.days.ago)
-        issue.update(milestone: milestone)
+        issue.update!(milestone: milestone)
 
         create_merge_request_closing_issue(user, project, issue)
       end

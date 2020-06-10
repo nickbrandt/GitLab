@@ -470,7 +470,7 @@ RSpec.describe ApprovalState do
         create_rule(users: [approver1, approver2])
         create_rule(users: [approver1])
 
-        merge_request.approvals.create(user: approver2)
+        merge_request.approvals.create!(user: approver2)
 
         expect(subject.unactioned_approvers).to contain_exactly(approver1)
       end
@@ -1181,7 +1181,7 @@ RSpec.describe ApprovalState do
         create_rule(users: [approver1, approver2])
         create_rule(users: [approver1])
 
-        merge_request.approvals.create(user: approver2)
+        merge_request.approvals.create!(user: approver2)
 
         expect(subject.unactioned_approvers).to contain_exactly(approver1)
       end

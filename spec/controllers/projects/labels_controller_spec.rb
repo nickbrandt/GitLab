@@ -60,7 +60,7 @@ RSpec.describe Projects::LabelsController do
       end
 
       it 'does not include group labels when project does not belong to a group' do
-        project.update(namespace: create(:namespace))
+        project.update!(namespace: create(:namespace))
 
         list_labels
 

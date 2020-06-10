@@ -72,7 +72,7 @@ RSpec.shared_examples 'protected environments access' do |developer_access = tru
 
         with_them do
           before do
-            protected_environment.deploy_access_levels.create(user: user)
+            protected_environment.deploy_access_levels.create!(user: user)
 
             update_user_access(access_level, admin_mode, user, project)
           end

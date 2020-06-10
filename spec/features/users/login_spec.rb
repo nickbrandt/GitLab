@@ -232,7 +232,7 @@ describe 'Login' do
           expect(codes.size).to eq 10
 
           # Ensure the generated codes get saved
-          user.save
+          user.save!
         end
 
         context 'with valid code' do

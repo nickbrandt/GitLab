@@ -145,7 +145,7 @@ describe DiffNote do
               end
 
               it 'creates a diff note file' do
-                subject.save
+                subject.save!
                 expect(subject.note_diff_file).to be_present
               end
             end
@@ -179,7 +179,7 @@ describe DiffNote do
               end
 
               it 'creates a diff note file' do
-                subject.save
+                subject.save!
                 expect(subject.reload.note_diff_file).to be_present
               end
             end
@@ -522,7 +522,7 @@ describe DiffNote do
       it "does not update the position" do
         expect(subject).not_to receive(:update_position)
 
-        subject.save
+        subject.save!
       end
     end
 

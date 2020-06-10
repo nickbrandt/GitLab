@@ -334,7 +334,7 @@ describe API::Deployments do
 
     context 'as a maintainer' do
       it 'returns a 403 when updating a deployment with a build' do
-        deploy.update(deployable: build)
+        deploy.update!(deployable: build)
 
         put(
           api("/projects/#{project.id}/deployments/#{deploy.id}", user),
@@ -383,7 +383,7 @@ describe API::Deployments do
       end
 
       it 'returns a 403 when updating a deployment with a build' do
-        deploy.update(deployable: build)
+        deploy.update!(deployable: build)
 
         put(
           api("/projects/#{project.id}/deployments/#{deploy.id}", developer),

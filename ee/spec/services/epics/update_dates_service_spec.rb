@@ -134,7 +134,7 @@ RSpec.describe Epics::UpdateDatesService do
       context 'single milestone' do
         before do
           epic_issue1 = create(:epic_issue, epic: epic)
-          epic_issue1.issue.update(milestone: milestone1, project: project)
+          epic_issue1.issue.update!(milestone: milestone1, project: project)
         end
 
         context 'complete start and due dates' do

@@ -38,7 +38,7 @@ RSpec.describe ElasticIndexerWorker, :elastic do
 
     with_them do
       it 'calls record indexing' do
-        object = create(type)
+        object = create!(type)
 
         expect_next_instance_of(Elastic::IndexRecordService) do |service|
           expect(service).to receive(:execute).with(object, true, {}).and_return(true)
@@ -51,7 +51,7 @@ RSpec.describe ElasticIndexerWorker, :elastic do
         object = nil
 
         Sidekiq::Testing.disable! do
-          object = create(type)
+          object = create!(type)
 
           if type != :project
             # You cannot find anything in the index if it's parent project is
@@ -61,7 +61,7 @@ RSpec.describe ElasticIndexerWorker, :elastic do
 
           subject.perform("index", name, object.id, object.es_id)
           ensure_elasticsearch_index!
-          object.destroy
+          object.destroy!
         end
 
         expect do

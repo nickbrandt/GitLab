@@ -100,8 +100,8 @@ describe Deployments::AfterCreateService do
       end
 
       before do
-        environment.update(name: 'review-apps/master')
-        job.update(environment: 'review-apps/$CI_COMMIT_REF_NAME')
+        environment.update!(name: 'review-apps/master')
+        job.update!(environment: 'review-apps/$CI_COMMIT_REF_NAME')
       end
 
       it 'does not create a new environment' do
@@ -241,7 +241,7 @@ describe Deployments::AfterCreateService do
         end
 
         it 'does not raise errors if the merge request does not have a metrics record' do
-          merge_request.metrics.destroy
+          merge_request.metrics.destroy!
 
           expect(merge_request.reload.metrics).to be_nil
           expect { service.execute }.not_to raise_error

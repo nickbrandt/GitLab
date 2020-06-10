@@ -7,7 +7,7 @@ describe Gitlab::BackgroundMigration::SetConfidentialNoteEventsOnServices, schem
 
   describe '#perform' do
     it 'migrates services where note_events is true' do
-      service = services.create(confidential_note_events: nil, note_events: true)
+      service = services.create!(confidential_note_events: nil, note_events: true)
 
       subject.perform(service.id, service.id)
 
@@ -15,7 +15,7 @@ describe Gitlab::BackgroundMigration::SetConfidentialNoteEventsOnServices, schem
     end
 
     it 'ignores services where note_events is false' do
-      service = services.create(confidential_note_events: nil, note_events: false)
+      service = services.create!(confidential_note_events: nil, note_events: false)
 
       subject.perform(service.id, service.id)
 
@@ -23,7 +23,7 @@ describe Gitlab::BackgroundMigration::SetConfidentialNoteEventsOnServices, schem
     end
 
     it 'ignores services where confidential_note_events has already been set' do
-      service = services.create(confidential_note_events: false, note_events: true)
+      service = services.create!(confidential_note_events: false, note_events: true)
 
       subject.perform(service.id, service.id)
 

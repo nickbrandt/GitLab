@@ -303,7 +303,7 @@ describe ContainerRepository do
 
       before do
         group.parent = test_group
-        group.save
+        group.save!
       end
 
       it { is_expected.to contain_exactly(repository, another_repository) }

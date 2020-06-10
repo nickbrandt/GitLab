@@ -670,7 +670,7 @@ RSpec.describe MergeRequest do
         end
 
         it 'is mergeable when approved' do
-          merge_request.approvals.create(user: user)
+          merge_request.approvals.create!(user: user)
 
           expect(merge_request.mergeable_with_quick_action?(developer, last_diff_sha: mr_sha)).to be_truthy
         end
@@ -703,7 +703,7 @@ RSpec.describe MergeRequest do
       before do
         allow(subject).to receive(:mergeable_state?).and_return(true)
 
-        subject.target_project.update(approvals_before_merge: 1)
+        subject.target_project.update!(approvals_before_merge: 1)
         project.add_developer(user)
       end
 
@@ -712,7 +712,7 @@ RSpec.describe MergeRequest do
       end
 
       it 'return true if approved' do
-        subject.approvals.create(user: user)
+        subject.approvals.create!(user: user)
 
         expect(subject.mergeable?).to be_truthy
       end

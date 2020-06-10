@@ -176,12 +176,12 @@ RSpec.describe EE::NotificationService, :mailer do
       project.add_maintainer(@subscribed_participant)
       project.add_maintainer(@watcher_and_subscriber)
 
-      merge_request.subscriptions.create(user: @unsubscribed_mentioned, subscribed: false)
-      merge_request.subscriptions.create(user: @subscriber, subscribed: true)
-      merge_request.subscriptions.create(user: @subscribed_participant, subscribed: true)
-      merge_request.subscriptions.create(user: @unsubscriber, subscribed: false)
+      merge_request.subscriptions.create!(user: @unsubscribed_mentioned, subscribed: false)
+      merge_request.subscriptions.create!(user: @subscriber, subscribed: true)
+      merge_request.subscriptions.create!(user: @subscribed_participant, subscribed: true)
+      merge_request.subscriptions.create!(user: @unsubscriber, subscribed: false)
       # Make the watcher a subscriber to detect dupes
-      merge_request.subscriptions.create(user: @watcher_and_subscriber, subscribed: true)
+      merge_request.subscriptions.create!(user: @watcher_and_subscriber, subscribed: true)
     end
   end
 
@@ -580,7 +580,7 @@ RSpec.describe EE::NotificationService, :mailer do
       end
 
       it 'sends notification to watcher and a participator' do
-        epic.subscriptions.create(user: participating, subscribed: true)
+        epic.subscriptions.create!(user: participating, subscribed: true)
 
         execute
 
@@ -657,12 +657,12 @@ RSpec.describe EE::NotificationService, :mailer do
     create(:group_member, group: group, user: @watcher_and_subscriber)
     create(:group_member, group: group, user: @unsubscribed_mentioned)
 
-    issuable.subscriptions.create(user: @unsubscribed_mentioned, subscribed: false)
-    issuable.subscriptions.create(user: @subscriber, subscribed: true)
-    issuable.subscriptions.create(user: @subscribed_participant, subscribed: true)
-    issuable.subscriptions.create(user: @unsubscriber, subscribed: false)
+    issuable.subscriptions.create!(user: @unsubscribed_mentioned, subscribed: false)
+    issuable.subscriptions.create!(user: @subscriber, subscribed: true)
+    issuable.subscriptions.create!(user: @subscribed_participant, subscribed: true)
+    issuable.subscriptions.create!(user: @unsubscriber, subscribed: false)
     # Make the watcher a subscriber to detect dupes
-    issuable.subscriptions.create(user: @watcher_and_subscriber, subscribed: true)
+    issuable.subscriptions.create!(user: @watcher_and_subscriber, subscribed: true)
   end
 
   context 'Merge Requests' do
@@ -791,12 +791,12 @@ RSpec.describe EE::NotificationService, :mailer do
         project.add_maintainer(user)
       end
 
-      issuable.subscriptions.create(user: @unsubscribed_mentioned, project: project, subscribed: false)
-      issuable.subscriptions.create(user: @subscriber, project: project, subscribed: true)
-      issuable.subscriptions.create(user: @subscribed_participant, project: project, subscribed: true)
-      issuable.subscriptions.create(user: @unsubscriber, project: project, subscribed: false)
+      issuable.subscriptions.create!(user: @unsubscribed_mentioned, project: project, subscribed: false)
+      issuable.subscriptions.create!(user: @subscriber, project: project, subscribed: true)
+      issuable.subscriptions.create!(user: @subscribed_participant, project: project, subscribed: true)
+      issuable.subscriptions.create!(user: @unsubscriber, project: project, subscribed: false)
       # Make the watcher a subscriber to detect dupes
-      issuable.subscriptions.create(user: @watcher_and_subscriber, project: project, subscribed: true)
+      issuable.subscriptions.create!(user: @watcher_and_subscriber, project: project, subscribed: true)
     end
   end
 end

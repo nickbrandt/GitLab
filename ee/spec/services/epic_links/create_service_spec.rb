@@ -124,7 +124,7 @@ RSpec.describe EpicLinks::CreateService do
                   # epic_to_add -> epic1 -> epic2 -> epic
                   epic1 = create(:epic, group: group, parent: epic_to_add)
                   epic2 = create(:epic, group: group, parent: epic1)
-                  epic.update(parent: epic2)
+                  epic.update!(parent: epic2)
                 end
 
                 include_examples 'returns an error'
@@ -149,7 +149,7 @@ RSpec.describe EpicLinks::CreateService do
                 epic3 = create(:epic, group: group, parent: epic2)
                 epic4 = create(:epic, group: group, parent: epic3)
 
-                epic.update(parent: epic4)
+                epic.update!(parent: epic4)
               end
 
               let(:expected_error) { "This epic can't be added because the parent is already at the maximum depth from its most distant ancestor" }
@@ -165,7 +165,7 @@ RSpec.describe EpicLinks::CreateService do
               before do
                 epic1 = create(:epic, group: group)
 
-                epic.update(parent: epic1) # epic is on level 2
+                epic.update!(parent: epic1) # epic is on level 2
 
                 # epic_to_add has 3 children (level 4 including epic_to_add)
                 # that would mean level 6 after relating epic_to_add on epic
@@ -202,8 +202,8 @@ RSpec.describe EpicLinks::CreateService do
               let(:expected_code) { 409 }
 
               before do
-                epic_to_add.update(parent: epic)
-                another_epic.update(parent: epic)
+                epic_to_add.update!(parent: epic)
+                another_epic.update!(parent: epic)
               end
 
               include_examples 'returns an error'
@@ -213,7 +213,7 @@ RSpec.describe EpicLinks::CreateService do
               before do
                 epic1 = create(:epic, group: group)
 
-                epic.update(parent: epic1) # epic is on level 2
+                epic.update!(parent: epic1) # epic is on level 2
 
                 # epic_to_add has 3 children (level 4 including epic_to_add)
                 # that would mean level 6 after relating epic_to_add on epic

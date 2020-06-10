@@ -134,7 +134,7 @@ describe 'Edit Project Settings' do
       it 'renders 200 if user is member of group' do
         group = create(:group)
         project.group = group
-        project.save
+        project.save!
 
         group.add_owner(member)
 

@@ -39,7 +39,7 @@ describe LfsObjectsProject do
       expect(ProjectCacheWorker).to receive(:perform_async)
         .with(project.id, [], [:lfs_objects_size])
 
-      subject.destroy
+      subject.destroy!
     end
   end
 end

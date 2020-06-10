@@ -230,7 +230,7 @@ describe Projects::UpdateService do
       end
 
       it 'handles empty project feature attributes' do
-        project.project_feature.update(wiki_access_level: ProjectFeature::DISABLED)
+        project.project_feature.update!(wiki_access_level: ProjectFeature::DISABLED)
 
         result = update_project(project, user, { name: 'test1' })
 
@@ -241,7 +241,7 @@ describe Projects::UpdateService do
 
     context 'when enabling a wiki' do
       it 'creates a wiki' do
-        project.project_feature.update(wiki_access_level: ProjectFeature::DISABLED)
+        project.project_feature.update!(wiki_access_level: ProjectFeature::DISABLED)
         TestEnv.rm_storage_dir(project.repository_storage, project.wiki.path)
 
         result = update_project(project, user, project_feature_attributes: { wiki_access_level: ProjectFeature::ENABLED })
@@ -252,7 +252,7 @@ describe Projects::UpdateService do
       end
 
       it 'logs an error and creates a metric when wiki can not be created' do
-        project.project_feature.update(wiki_access_level: ProjectFeature::DISABLED)
+        project.project_feature.update!(wiki_access_level: ProjectFeature::DISABLED)
 
         expect_any_instance_of(ProjectWiki).to receive(:wiki).and_raise(ProjectWiki::CouldNotCreateWikiError)
         expect_any_instance_of(described_class).to receive(:log_error).with("Could not create wiki for #{project.full_name}")

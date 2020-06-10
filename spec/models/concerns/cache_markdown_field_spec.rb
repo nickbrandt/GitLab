@@ -295,7 +295,7 @@ describe CacheMarkdownField, :clean_gitlab_redis_cache do
       let(:thing) do
         # This forces the record to have outdated HTML. We can't use `create` because the `before_create` hook
         # would re-render the HTML to the latest version
-        klass.create.tap do |thing|
+        klass.create!.tap do |thing|
           thing.update_columns(description: markdown, description_html: old_html, cached_markdown_version: old_version)
         end
       end
@@ -303,7 +303,7 @@ describe CacheMarkdownField, :clean_gitlab_redis_cache do
       it 'correctly updates cached HTML even if refresh_markdown_cache is called before updating the attribute' do
         thing.refresh_markdown_cache
 
-        thing.update(description: updated_markdown)
+        thing.update!(description: updated_markdown)
 
         expect(thing.description_html).to eq(updated_html)
       end

@@ -31,18 +31,18 @@ describe Route do
     context 'after update' do
       it 'calls #create_redirect_for_old_path' do
         expect(route).to receive(:create_redirect_for_old_path)
-        route.update(path: 'foo')
+        route.update!(path: 'foo')
       end
 
       it 'calls #delete_conflicting_redirects' do
         expect(route).to receive(:delete_conflicting_redirects)
-        route.update(path: 'foo')
+        route.update!(path: 'foo')
       end
     end
 
     context 'after create' do
       it 'calls #delete_conflicting_redirects' do
-        route.destroy
+        route.destroy!
         new_route = described_class.new(source: group, path: group.path)
         expect(new_route).to receive(:delete_conflicting_redirects)
         new_route.save!
@@ -102,7 +102,7 @@ describe Route do
         let!(:conflicting_redirect3) { route.create_redirect('gitlab-org') }
 
         it 'deletes the conflicting redirects' do
-          route.update(path: 'bar')
+          route.update!(path: 'bar')
 
           expect(RedirectRoute.exists?(path: 'bar/test')).to be_falsey
           expect(RedirectRoute.exists?(path: 'bar/test/foo')).to be_falsey
@@ -113,7 +113,7 @@ describe Route do
 
     context 'name update' do
       it 'updates children routes with new path' do
-        route.update(name: 'bar')
+        route.update!(name: 'bar')
 
         expect(described_class.exists?(name: 'bar')).to be_truthy
         expect(described_class.exists?(name: 'bar / test')).to be_truthy

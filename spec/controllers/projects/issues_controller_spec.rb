@@ -43,7 +43,7 @@ RSpec.describe Projects::IssuesController do
         let(:issue) { create(:issue, project: new_project) }
 
         before do
-          project.route.destroy
+          project.route.destroy!
           new_project.redirect_routes.create!(path: project.full_path)
           new_project.add_developer(user)
         end
@@ -610,7 +610,7 @@ RSpec.describe Projects::IssuesController do
 
         issue.update!(last_edited_by: deleted_user, last_edited_at: Time.current)
 
-        deleted_user.destroy
+        deleted_user.destroy!
         sign_in(user)
       end
 
@@ -1711,7 +1711,7 @@ RSpec.describe Projects::IssuesController do
       before do
         sign_in(user)
 
-        project.route.destroy
+        project.route.destroy!
         new_project.redirect_routes.create!(path: project.full_path)
         new_project.add_developer(user)
       end

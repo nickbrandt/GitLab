@@ -482,7 +482,7 @@ RSpec.describe Issue do
       end
 
       it 'positions issues even when after and before positions are the same' do
-        issue1.update relative_position: issue.relative_position
+        issue1.update! relative_position: issue.relative_position
 
         new_issue.move_between(issue, issue1)
 
@@ -491,7 +491,7 @@ RSpec.describe Issue do
       end
 
       it 'positions issues between other two if distance is 1' do
-        issue1.update relative_position: issue.relative_position + 1
+        issue1.update! relative_position: issue.relative_position + 1
 
         new_issue.move_between(issue, issue1)
 
@@ -500,8 +500,8 @@ RSpec.describe Issue do
       end
 
       it 'positions issue in the middle of other two if distance is big enough' do
-        issue.update relative_position: 6000
-        issue1.update relative_position: 10000
+        issue.update! relative_position: 6000
+        issue1.update! relative_position: 10000
 
         new_issue.move_between(issue, issue1)
 
@@ -509,7 +509,7 @@ RSpec.describe Issue do
       end
 
       it 'positions issue closer to the middle if we are at the very top' do
-        issue1.update relative_position: 6000
+        issue1.update! relative_position: 6000
 
         new_issue.move_between(nil, issue1)
 
@@ -517,8 +517,8 @@ RSpec.describe Issue do
       end
 
       it 'positions issue closer to the middle if we are at the very bottom' do
-        issue.update relative_position: 6000
-        issue1.update relative_position: nil
+        issue.update! relative_position: 6000
+        issue1.update! relative_position: nil
 
         new_issue.move_between(issue, nil)
 
@@ -526,8 +526,8 @@ RSpec.describe Issue do
       end
 
       it 'positions issue in the middle of other two if distance is not big enough' do
-        issue.update relative_position: 100
-        issue1.update relative_position: 400
+        issue.update! relative_position: 100
+        issue1.update! relative_position: 400
 
         new_issue.move_between(issue, issue1)
 
@@ -535,8 +535,8 @@ RSpec.describe Issue do
       end
 
       it 'positions issue in the middle of other two is there is no place' do
-        issue.update relative_position: 100
-        issue1.update relative_position: 101
+        issue.update! relative_position: 100
+        issue1.update! relative_position: 101
 
         new_issue.move_between(issue, issue1)
 
@@ -544,10 +544,10 @@ RSpec.describe Issue do
       end
 
       it 'uses rebalancing if there is no place' do
-        issue.update relative_position: 100
-        issue1.update relative_position: 101
+        issue.update! relative_position: 100
+        issue1.update! relative_position: 101
         issue2 = create(:issue, relative_position: 102, project: project)
-        new_issue.update relative_position: 103
+        new_issue.update! relative_position: 103
 
         new_issue.move_between(issue1, issue2)
         new_issue.save!
@@ -557,10 +557,10 @@ RSpec.describe Issue do
       end
 
       it 'positions issue right if we pass none-sequential parameters' do
-        issue.update relative_position: 99
-        issue1.update relative_position: 101
+        issue.update! relative_position: 99
+        issue1.update! relative_position: 101
         issue2 = create(:issue, relative_position: 102, project: project)
-        new_issue.update relative_position: 103
+        new_issue.update! relative_position: 103
 
         new_issue.move_between(issue, issue2)
         new_issue.save!

@@ -30,7 +30,7 @@ RSpec.describe Elastic::IndexRecordService, :elastic do
 
     with_them do
       it 'indexes new records' do
-        object = create(type)
+        object = create!(type)
 
         Sidekiq::Testing.disable! do
           if type != :project
@@ -53,7 +53,7 @@ RSpec.describe Elastic::IndexRecordService, :elastic do
         object = nil
 
         Sidekiq::Testing.disable! do
-          object = create(type)
+          object = create!(type)
 
           if type != :project
             # You cannot find anything in the index if it's parent project is
@@ -62,7 +62,7 @@ RSpec.describe Elastic::IndexRecordService, :elastic do
           end
 
           expect(subject.execute(object, true)).to eq(true)
-          object.update(attribute => "new")
+          object.update!(attribute => "new")
         end
 
         expect do
@@ -72,7 +72,7 @@ RSpec.describe Elastic::IndexRecordService, :elastic do
       end
 
       it 'ignores Elasticsearch::Transport::Transport::Errors::NotFound errors' do
-        object = create(type)
+        object = create!(type)
 
         allow(object.__elasticsearch__).to receive(:index_document).and_raise(Elasticsearch::Transport::Transport::Errors::NotFound)
 

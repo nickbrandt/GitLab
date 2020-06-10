@@ -137,7 +137,7 @@ RSpec.describe Groups::RunnersController do
       end
 
       it 'marks the runner as active, ticks the queue, and redirects' do
-        runner.update(active: false)
+        runner.update!(active: false)
 
         expect do
           post :resume, params: params
@@ -154,7 +154,7 @@ RSpec.describe Groups::RunnersController do
       end
 
       it 'responds 404 and does not activate the runner' do
-        runner.update(active: false)
+        runner.update!(active: false)
 
         expect do
           post :resume, params: params
@@ -173,7 +173,7 @@ RSpec.describe Groups::RunnersController do
       end
 
       it 'marks the runner as inactive, ticks the queue, and redirects' do
-        runner.update(active: true)
+        runner.update!(active: true)
 
         expect do
           post :pause, params: params
@@ -190,7 +190,7 @@ RSpec.describe Groups::RunnersController do
       end
 
       it 'responds 404 and does not update the runner or queue' do
-        runner.update(active: true)
+        runner.update!(active: true)
 
         expect do
           post :pause, params: params

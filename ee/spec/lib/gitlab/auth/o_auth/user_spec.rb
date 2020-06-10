@@ -27,7 +27,7 @@ RSpec.describe Gitlab::Auth::OAuth::User do
 
       stub_ldap_person_find_by_uid(uid, ldap_entry)
 
-      oauth_user.save
+      oauth_user.save!
     end
 
     it 'links the LDAP person to the GitLab user' do

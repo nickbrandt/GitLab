@@ -335,7 +335,7 @@ describe NotificationService, :mailer do
           context 'by note' do
             before do
               note.author = @u_lazy_participant
-              note.save
+              note.save!
             end
 
             it { expect { subject }.not_to have_enqueued_email(@u_lazy_participant.id, note.id, mail: "note_issue_email") }
@@ -348,7 +348,7 @@ describe NotificationService, :mailer do
           note.project.namespace_id = group.id
           group.add_user(@u_watcher, GroupMember::MAINTAINER)
           group.add_user(@u_custom_global, GroupMember::MAINTAINER)
-          note.project.save
+          note.project.save!
 
           @u_watcher.notification_settings_for(note.project).participating!
           @u_watcher.notification_settings_for(group).global!
@@ -1591,7 +1591,7 @@ describe NotificationService, :mailer do
 
           before do
             merge_request.author = participant
-            merge_request.save
+            merge_request.save!
             notification.new_merge_request(merge_request, @u_disabled)
           end
 
@@ -2457,7 +2457,7 @@ describe NotificationService, :mailer do
             before do
               group = create(:group)
 
-              project.update(group: group)
+              project.update!(group: group)
 
               create(:email, :confirmed, user: u_custom_notification_enabled, email: group_notification_email)
               create(:notification_setting, user: u_custom_notification_enabled, source: group, notification_email: group_notification_email)
@@ -2493,7 +2493,7 @@ describe NotificationService, :mailer do
             before do
               group = create(:group)
 
-              project.update(group: group)
+              project.update!(group: group)
               create(:email, :confirmed, user: u_member, email: group_notification_email)
               create(:notification_setting, user: u_member, source: group, notification_email: group_notification_email)
             end
@@ -2553,7 +2553,7 @@ describe NotificationService, :mailer do
         context 'when the creator has no read_build access' do
           before do
             pipeline = create_pipeline(u_member, :failed)
-            project.update(public_builds: false)
+            project.update!(public_builds: false)
             project.team.truncate
             notification.pipeline_finished(pipeline)
           end
@@ -2587,7 +2587,7 @@ describe NotificationService, :mailer do
             before do
               group = create(:group)
 
-              project.update(group: group)
+              project.update!(group: group)
               create(:email, :confirmed, user: u_member, email: group_notification_email)
               create(:notification_setting, user: u_member, source: group, notification_email: group_notification_email)
             end
@@ -2953,7 +2953,7 @@ describe NotificationService, :mailer do
   # with different notification settings
   def build_group(project, visibility: :public)
     group = create_nested_group(visibility)
-    project.update(namespace_id: group.id)
+    project.update!(namespace_id: group.id)
 
     # Group member: global=disabled, group=watch
     @g_watcher ||= create_user_with_notification(:watch, 'group_watcher', project.group)
@@ -3018,11 +3018,11 @@ describe NotificationService, :mailer do
   end
 
   def add_user_subscriptions(issuable)
-    issuable.subscriptions.create(user: @unsubscribed_mentioned, project: project, subscribed: false)
-    issuable.subscriptions.create(user: @subscriber, project: project, subscribed: true)
-    issuable.subscriptions.create(user: @subscribed_participant, project: project, subscribed: true)
-    issuable.subscriptions.create(user: @unsubscriber, project: project, subscribed: false)
+    issuable.subscriptions.create!(user: @unsubscribed_mentioned, project: project, subscribed: false)
+    issuable.subscriptions.create!(user: @subscriber, project: project, subscribed: true)
+    issuable.subscriptions.create!(user: @subscribed_participant, project: project, subscribed: true)
+    issuable.subscriptions.create!(user: @unsubscriber, project: project, subscribed: false)
     # Make the watcher a subscriber to detect dupes
-    issuable.subscriptions.create(user: @watcher_and_subscriber, project: project, subscribed: true)
+    issuable.subscriptions.create!(user: @watcher_and_subscriber, project: project, subscribed: true)
   end
 end

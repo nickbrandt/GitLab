@@ -126,8 +126,8 @@ RSpec.describe 'Epics through GroupQuery' do
           end
 
           it 'returns a nil group for a user without permissions to see the group' do
-            project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-            group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+            project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+            group.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
             post_graphql(query, current_user: user)
 

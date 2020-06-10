@@ -88,7 +88,7 @@ RSpec.describe 'Updating an epic tree' do
 
             before do
               other_epic = create(:epic, group: group)
-              epic2.update(parent: other_epic)
+              epic2.update!(parent: other_epic)
             end
 
             it 'updates the epics relative positions and updates the parent' do
@@ -166,7 +166,7 @@ RSpec.describe 'Updating an epic tree' do
 
           before do
             other_epic = create(:epic, group: group)
-            epic_issue2.update(epic: other_epic)
+            epic_issue2.update!(epic: other_epic)
           end
 
           it "updates the epic's relative positions and parent" do

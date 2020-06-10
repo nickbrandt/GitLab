@@ -586,7 +586,7 @@ RSpec.describe ApplicationSetting do
       it "doesn't call the update lifetime service" do
         expect(::PersonalAccessTokens::Instance::UpdateLifetimeService).not_to receive(:new)
 
-        setting.save
+        setting.save!
       end
     end
 
@@ -601,7 +601,7 @@ RSpec.describe ApplicationSetting do
           expect(service).to receive(:execute)
         end
 
-        setting.save
+        setting.save!
       end
     end
   end

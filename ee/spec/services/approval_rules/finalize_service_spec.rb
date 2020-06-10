@@ -65,7 +65,7 @@ RSpec.describe ApprovalRules::FinalizeService do
 
         shared_examples 'idempotent approval tests' do |rule_type|
           before do
-            project_rule.destroy
+            project_rule.destroy!
 
             rule = create(:approval_project_rule, project: project, name: 'another rule', approvals_required: 2, rule_type: rule_type)
             rule.users = [user1]

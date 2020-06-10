@@ -287,7 +287,7 @@ describe 'GFM autocomplete', :js do
     let(:unassigned_user) { create(:user) }
 
     before do
-      issue_assignee.update(assignees: [user])
+      issue_assignee.update!(assignees: [user])
 
       project.add_maintainer(unassigned_user)
     end

@@ -363,7 +363,7 @@ describe WikiPage do
 
     context "with valid attributes" do
       it "saves the wiki page" do
-        subject.create(attributes)
+        subject.create!(attributes)
 
         expect(wiki.find_page("Index")).not_to be_nil
       end
@@ -373,13 +373,13 @@ describe WikiPage do
       end
 
       it 'saves the wiki page with message' do
-        subject.create(attributes)
+        subject.create!(attributes)
 
         expect(wiki.find_page("Index").message).to eq 'Custom Commit Message'
       end
 
       it 'if the title is preceded by a / it is removed' do
-        subject.create(attributes.merge(title: '/New Page'))
+        subject.create!(attributes.merge(title: '/New Page'))
 
         expect(wiki.find_page('New Page')).not_to be_nil
       end
@@ -387,7 +387,7 @@ describe WikiPage do
 
     context "with invalid attributes" do
       it 'does not create the page' do
-        subject.create(title: '')
+        subject.create!(title: '')
 
         expect(wiki.find_page('New Page')).to be_nil
       end
@@ -402,7 +402,7 @@ describe WikiPage do
 
       context "with valid attributes" do
         it "saves the wiki page" do
-          subject.create(attributes)
+          subject.create!(attributes)
 
           expect(wiki.find_page(title)).not_to be_nil
         end
@@ -417,7 +417,7 @@ describe WikiPage do
       subject { create(:wiki_page, wiki: wiki, title: title) }
 
       it 'updates the content of the page' do
-        subject.update(content: 'new content')
+        subject.update!(content: 'new content')
         page = wiki.find_page(title)
 
         expect([subject.content, page.content]).to all(eq('new content'))
@@ -436,7 +436,7 @@ describe WikiPage do
       it "updates the content of the page" do
         new_content = "new content"
 
-        subject.update(content: new_content)
+        subject.update!(content: new_content)
         page = wiki.find_page('test page')
 
         expect([subject.content, page.content]).to all(eq("new content"))
@@ -445,7 +445,7 @@ describe WikiPage do
       it "updates the title of the page" do
         new_title = "Index v.1.2.4"
 
-        subject.update(title: new_title)
+        subject.update!(title: new_title)
         page = wiki.find_page(new_title)
 
         expect([subject.title, page.title]).to all(eq(new_title))
@@ -456,7 +456,7 @@ describe WikiPage do
           it 'updates the wiki-page front-matter' do
             title = subject.title
             content = subject.content
-            subject.update(front_matter: { slugs: ['x'] })
+            subject.update!(front_matter: { slugs: ['x'] })
             page = wiki.find_page(title)
 
             expect([subject, page]).to all(
@@ -489,7 +489,7 @@ describe WikiPage do
 
           it 'does not update the front-matter' do
             content = subject.content
-            subject.update(front_matter: { slugs: ['x'] })
+            subject.update!(front_matter: { slugs: ['x'] })
 
             page = wiki.find_page(subject.title)
 
@@ -508,7 +508,7 @@ describe WikiPage do
         it 'updates the wiki-page front-matter and content together' do
           title = subject.title
           content = 'totally new content'
-          subject.update(content: content, front_matter: { slugs: ['x'] })
+          subject.update!(content: content, front_matter: { slugs: ['x'] })
           page = wiki.find_page(title)
 
           expect([subject, page]).to all(
@@ -793,7 +793,7 @@ describe WikiPage do
     end
 
     it 'returns true for updated wiki page' do
-      subject.update(content: "Updated content")
+      subject.update!(content: "Updated content")
       updated_page = wiki.find_page(existing_page.slug)
 
       expect(updated_page).not_to be_nil
@@ -835,7 +835,7 @@ describe WikiPage do
     it 'is changed after page updated' do
       last_commit_sha_before_update = subject.last_commit_sha
 
-      subject.update(content: "new content")
+      subject.update!(content: "new content")
       page = wiki.find_page('test page')
 
       expect(page.last_commit_sha).not_to eq last_commit_sha_before_update

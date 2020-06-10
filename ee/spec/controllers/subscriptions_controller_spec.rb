@@ -142,7 +142,7 @@ RSpec.describe SubscriptionsController do
         let(:group) { Group.new(path: 'foo') }
 
         it 'returns the errors in json format' do
-          group.save
+          group.save!
           subject
 
           expect(response.body).to include({ name: ["can't be blank"] }.to_json)
@@ -152,7 +152,7 @@ RSpec.describe SubscriptionsController do
           let(:group) { Group.new(path: 'foo', name: '<script>alert("attack")</script>') }
 
           it 'returns the errors in json format' do
-            group.save
+            group.save!
             subject
 
             expect(response.body).to include({ name: [Gitlab::Regex.group_name_regex_message] }.to_json)

@@ -63,7 +63,7 @@ describe Gitlab::ImportExport::SnippetsRepoRestorer do
       let!(:snippet2) { create(:project_snippet, project: project, author: user) }
 
       before do
-        exporter.save
+        exporter.save!
 
         expect(File.exist?(bundle_path(snippet1))).to be true
         expect(File.exist?(bundle_path(snippet2))).to be false
@@ -77,7 +77,7 @@ describe Gitlab::ImportExport::SnippetsRepoRestorer do
       let!(:snippet2) { create(:project_snippet, :repository, project: project, author: user) }
 
       before do
-        exporter.save
+        exporter.save!
 
         expect(File.exist?(bundle_path(snippet1))).to be true
         expect(File.exist?(bundle_path(snippet2))).to be true

@@ -44,7 +44,7 @@ describe Groups::ImportExport::ImportService do
     before do
       stub_feature_flags(group_import_ndjson: false)
 
-      ImportExportUpload.create(group: group, import_file: import_file)
+      ImportExportUpload.create!(group: group, import_file: import_file)
 
       allow(Gitlab::Import::Logger).to receive(:build).and_return(import_logger)
       allow(import_logger).to receive(:error)
@@ -86,7 +86,7 @@ describe Groups::ImportExport::ImportService do
       subject { service.execute }
 
       before do
-        ImportExportUpload.create(group: group, import_file: import_file)
+        ImportExportUpload.create!(group: group, import_file: import_file)
 
         allow(Gitlab::Import::Logger).to receive(:build).and_return(import_logger)
         allow(import_logger).to receive(:error)
@@ -197,7 +197,7 @@ describe Groups::ImportExport::ImportService do
       subject { service.execute }
 
       before do
-        ImportExportUpload.create(group: group, import_file: import_file)
+        ImportExportUpload.create!(group: group, import_file: import_file)
 
         allow(Gitlab::Import::Logger).to receive(:build).and_return(import_logger)
         allow(import_logger).to receive(:error)

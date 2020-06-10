@@ -60,7 +60,7 @@ describe Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService do
       before do
         stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
 
-        application_setting.update(allow_local_requests_from_web_hooks_and_services: true)
+        application_setting.update!(allow_local_requests_from_web_hooks_and_services: true)
       end
 
       shared_examples 'has prometheus service' do |listen_address|

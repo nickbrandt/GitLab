@@ -90,7 +90,7 @@ describe 'Profile > Personal Access Tokens', :js do
     end
 
     it "removes expired tokens from 'active' section" do
-      personal_access_token.update(expires_at: 5.days.ago)
+      personal_access_token.update!(expires_at: 5.days.ago)
       visit profile_personal_access_tokens_path
 
       expect(page).to have_selector(".settings-message")

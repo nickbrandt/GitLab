@@ -844,7 +844,7 @@ describe QuickActions::InterpretService do
         end
 
         it 'returns the unassign message for all the assignee if content contains /unassign' do
-          issue.update(assignee_ids: [developer.id, developer2.id])
+          issue.update!(assignee_ids: [developer.id, developer2.id])
           _, _, message = service.execute(content, issue)
 
           expect(message).to eq("Removed assignees #{developer.to_reference} and #{developer2.to_reference}.")
@@ -860,7 +860,7 @@ describe QuickActions::InterpretService do
         end
 
         it 'returns the unassign message for all the assignee if content contains /unassign' do
-          merge_request.update(assignee_ids: [developer.id, developer2.id])
+          merge_request.update!(assignee_ids: [developer.id, developer2.id])
           _, _, message = service.execute(content, merge_request)
 
           expect(message).to eq("Removed assignees #{developer.to_reference} and #{developer2.to_reference}.")

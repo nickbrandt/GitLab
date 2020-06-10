@@ -35,7 +35,7 @@ RSpec.describe EE::ResourceEvents::ChangeWeightService do
   context 'when there is no existing weight event record' do
     before do
       ResourceWeightEvent.delete_all
-      issue.update(weight: 5, updated_at: 10.seconds.ago)
+      issue.update!(weight: 5, updated_at: 10.seconds.ago)
     end
 
     it 'creates the expected event records' do

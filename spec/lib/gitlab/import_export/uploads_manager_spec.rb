@@ -31,13 +31,13 @@ describe Gitlab::ImportExport::UploadsManager do
       end
 
       it 'does not cause errors' do
-        manager.save
+        manager.save!
 
         expect(shared.errors).to be_empty
       end
 
       it 'copies the file in the correct location when there is an upload' do
-        manager.save
+        manager.save!
 
         expect(File).to exist(exported_file_path)
       end
@@ -56,7 +56,7 @@ describe Gitlab::ImportExport::UploadsManager do
         end
 
         it 'excludes orphaned upload files' do
-          manager.save
+          manager.save!
 
           expect(File).not_to exist(exported_orphan_path)
         end
@@ -68,7 +68,7 @@ describe Gitlab::ImportExport::UploadsManager do
         end
 
         it 'does not cause errors' do
-          manager.save
+          manager.save!
 
           expect(shared.errors).to be_empty
         end

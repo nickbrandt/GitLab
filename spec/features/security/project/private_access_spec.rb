@@ -392,7 +392,7 @@ RSpec.describe "Private Project Access" do
     context 'when public buils are disabled' do
       before do
         project.public_builds = false
-        project.save
+        project.save!
       end
 
       it { is_expected.to be_denied_for(:guest).of(project) }

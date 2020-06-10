@@ -60,7 +60,7 @@ RSpec.describe Groups::EpicLinksController do
 
       context 'when user does not have access to epic' do
         it 'returns 404 status' do
-          group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+          group.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
           subject
 
@@ -118,8 +118,8 @@ RSpec.describe Groups::EpicLinksController do
 
   describe 'PUT #update' do
     before do
-      epic1.update(parent: parent_epic)
-      epic2.update(parent: parent_epic)
+      epic1.update!(parent: parent_epic)
+      epic2.update!(parent: parent_epic)
     end
 
     let(:move_before_epic) { epic2 }

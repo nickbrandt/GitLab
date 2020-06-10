@@ -282,9 +282,9 @@ describe MergeRequestsFinder do
           let(:group_milestone) { create(:milestone, group: group) }
 
           before do
-            project2.update(namespace: group)
-            merge_request2.update(milestone: group_milestone)
-            merge_request3.update(milestone: group_milestone)
+            project2.update!(namespace: group)
+            merge_request2.update!(milestone: group_milestone)
+            merge_request3.update!(milestone: group_milestone)
           end
 
           it 'returns merge requests assigned to that group milestone' do

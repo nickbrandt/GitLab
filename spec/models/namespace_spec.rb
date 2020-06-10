@@ -276,7 +276,7 @@ describe Namespace do
       end
 
       it "moves dir if path changed" do
-        namespace.update(path: namespace.full_path + '_new')
+        namespace.update!(path: namespace.full_path + '_new')
 
         expect(gitlab_shell.repository_exists?(project.repository_storage, "#{namespace.path}/#{project.path}.git")).to be_truthy
       end
@@ -304,7 +304,7 @@ describe Namespace do
             end
             expect(Gitlab::ErrorTracking).to receive(:should_raise_for_dev?).and_return(false) # like prod
 
-            namespace.update(path: namespace.full_path + '_new')
+            namespace.update!(path: namespace.full_path + '_new')
           end
         end
       end
@@ -421,7 +421,7 @@ describe Namespace do
 
       it "repository directory remains unchanged if path changed" do
         before_disk_path = project.disk_path
-        namespace.update(path: namespace.full_path + '_new')
+        namespace.update!(path: namespace.full_path + '_new')
 
         expect(before_disk_path).to eq(project.disk_path)
         expect(gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
@@ -436,7 +436,7 @@ describe Namespace do
       let!(:legacy_project_in_subgroup) { create(:project, :legacy_storage, :repository, namespace: subgroup, name: 'foo3') }
 
       it 'updates project full path in .git/config' do
-        parent.update(path: 'mygroup_new')
+        parent.update!(path: 'mygroup_new')
 
         expect(project_rugged(project_in_parent_group).config['gitlab.fullpath']).to eq "mygroup_new/#{project_in_parent_group.path}"
         expect(project_rugged(hashed_project_in_subgroup).config['gitlab.fullpath']).to eq "mygroup_new/mysubgroup/#{hashed_project_in_subgroup.path}"
@@ -448,7 +448,7 @@ describe Namespace do
         repository_hashed_project_in_subgroup = create(:project_repository, project: hashed_project_in_subgroup)
         repository_legacy_project_in_subgroup = create(:project_repository, project: legacy_project_in_subgroup)
 
-        parent.update(path: 'mygroup_moved')
+        parent.update!(path: 'mygroup_moved')
 
         expect(repository_project_in_parent_group.reload.disk_path).to eq "mygroup_moved/#{project_in_parent_group.path}"
         expect(repository_hashed_project_in_subgroup.reload.disk_path).to eq hashed_project_in_subgroup.disk_path
@@ -481,7 +481,7 @@ describe Namespace do
       it 'renames its dirs when deleted' do
         allow(GitlabShellWorker).to receive(:perform_in)
 
-        namespace.destroy
+        namespace.destroy!
 
         expect(File.exist?(deleted_path_in_dir)).to be(true)
       end
@@ -489,7 +489,7 @@ describe Namespace do
       it 'schedules the namespace for deletion' do
         expect(GitlabShellWorker).to receive(:perform_in).with(5.minutes, :rm_namespace, repository_storage, deleted_path)
 
-        namespace.destroy
+        namespace.destroy!
       end
 
       context 'in sub-groups' do
@@ -503,7 +503,7 @@ describe Namespace do
         it 'renames its dirs when deleted' do
           allow(GitlabShellWorker).to receive(:perform_in)
 
-          child.destroy
+          child.destroy!
 
           expect(File.exist?(deleted_path_in_dir)).to be(true)
         end
@@ -511,7 +511,7 @@ describe Namespace do
         it 'schedules the namespace for deletion' do
           expect(GitlabShellWorker).to receive(:perform_in).with(5.minutes, :rm_namespace, repository_storage, deleted_path)
 
-          child.destroy
+          child.destroy!
         end
       end
     end
@@ -524,7 +524,7 @@ describe Namespace do
 
         expect(File.exist?(path_in_dir)).to be(false)
 
-        namespace.destroy
+        namespace.destroy!
 
         expect(File.exist?(deleted_path_in_dir)).to be(false)
       end
@@ -867,7 +867,7 @@ describe Namespace do
       it 'returns the path before last save' do
         group = create(:group)
 
-        group.update(parent: nil)
+        group.update!(parent: nil)
 
         expect(group.full_path_before_last_save).to eq(group.path_before_last_save)
       end
@@ -878,7 +878,7 @@ describe Namespace do
         group = create(:group, parent: nil)
         parent = create(:group)
 
-        group.update(parent: parent)
+        group.update!(parent: parent)
 
         expect(group.full_path_before_last_save).to eq("#{group.path_before_last_save}")
       end
@@ -889,7 +889,7 @@ describe Namespace do
         parent = create(:group)
         group = create(:group, parent: parent)
 
-        group.update(parent: nil)
+        group.update!(parent: nil)
 
         expect(group.full_path_before_last_save).to eq("#{parent.full_path}/#{group.path}")
       end
@@ -901,7 +901,7 @@ describe Namespace do
         group = create(:group, parent: parent)
         new_parent = create(:group)
 
-        group.update(parent: new_parent)
+        group.update!(parent: new_parent)
 
         expect(group.full_path_before_last_save).to eq("#{parent.full_path}/#{group.path}")
       end

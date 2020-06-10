@@ -103,7 +103,7 @@ RSpec.describe Projects::MilestonesController do
 
       context 'with a single group ancestor' do
         before do
-          project.update(namespace: group)
+          project.update!(namespace: group)
           get :index, params: { namespace_id: project.namespace.id, project_id: project.id }, format: :json
         end
 
@@ -120,7 +120,7 @@ RSpec.describe Projects::MilestonesController do
         let!(:subgroup_milestone) { create(:milestone, group: subgroup) }
 
         before do
-          project.update(namespace: subgroup)
+          project.update!(namespace: subgroup)
           get :index, params: { namespace_id: project.namespace.id, project_id: project.id }, format: :json
         end
 
@@ -240,7 +240,7 @@ RSpec.describe Projects::MilestonesController do
       end
 
       it 'renders 404' do
-        project.update(namespace: user.namespace)
+        project.update!(namespace: user.namespace)
 
         post :promote, params: { namespace_id: project.namespace.id, project_id: project.id, id: milestone.iid }
 
@@ -259,7 +259,7 @@ RSpec.describe Projects::MilestonesController do
       before do
         project.add_guest(guest_user)
         sign_in(guest_user)
-        issue.update(assignee_ids: issue_assignee.id)
+        issue.update!(assignee_ids: issue_assignee.id)
       end
 
       context "when issue is not confidential" do

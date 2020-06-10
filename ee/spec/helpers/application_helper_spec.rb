@@ -125,7 +125,7 @@ RSpec.describe ApplicationHelper do
         end
 
         it 'returns paths for autocomplete_sources_controller including epics for group projects' do
-          object.update(group: create(:group))
+          object.update!(group: create(:group))
 
           expect_autocomplete_data_sources(object, noteable_type, [:members, :issues, :mergeRequests, :labels, :milestones, :commands, :snippets, :epics])
         end

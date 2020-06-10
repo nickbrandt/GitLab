@@ -59,7 +59,7 @@ RSpec.describe Issuable::CommonSystemNotesService do
 
       before do
         issuable.assign_attributes(start_date: timestamp, end_date: nil)
-        issuable.save
+        issuable.save!
       end
 
       it 'creates 2 system notes with the correct content' do

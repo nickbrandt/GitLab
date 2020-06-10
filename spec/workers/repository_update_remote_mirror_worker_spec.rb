@@ -26,7 +26,7 @@ describe RepositoryUpdateRemoteMirrorWorker, :clean_gitlab_redis_shared_state do
     end
 
     it 'does not do anything if the mirror was already updated' do
-      remote_mirror.update(last_update_started_at: Time.now, update_status: :finished)
+      remote_mirror.update!(last_update_started_at: Time.now, update_status: :finished)
 
       expect(Projects::UpdateRemoteMirrorService).not_to receive(:new)
 

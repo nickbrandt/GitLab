@@ -312,7 +312,7 @@ RSpec.describe TodoService do
     context 'an approver has lost access to the project' do
       before do
         create(:approver, user: non_member, target: project)
-        project.members.find_by(user_id: non_member.id).destroy
+        project.members.find_by(user_id: non_member.id).destroy!
       end
 
       describe '#new_merge_request' do

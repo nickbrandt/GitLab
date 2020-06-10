@@ -41,7 +41,7 @@ RSpec.describe Oauth::AuthorizationsController do
         end
 
         it 'deletes session.user_return_to and redirects when skip authorization' do
-          application.update(trusted: true)
+          application.update!(trusted: true)
           request.session['user_return_to'] = 'http://example.com'
 
           get :new, params: params

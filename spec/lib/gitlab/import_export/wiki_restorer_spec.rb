@@ -21,7 +21,7 @@ describe Gitlab::ImportExport::WikiRestorer do
     before do
       allow(Gitlab::ImportExport).to receive(:storage_path).and_return(export_path)
 
-      bundler.save
+      bundler.save!
     end
 
     after do

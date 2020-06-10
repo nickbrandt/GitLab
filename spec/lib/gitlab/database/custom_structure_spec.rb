@@ -48,7 +48,7 @@ describe Gitlab::Database::CustomStructure do
         \\.
       DATA
 
-      first_fk.destroy
+      first_fk.destroy!
       io.truncate(0)
       io.rewind
 

@@ -14,23 +14,23 @@ describe Gitlab::BackgroundMigration::RemoveRestrictedTodos, schema: 20180704204
   let(:todo_params) { { author_id: 1, target_type: 'Issue', action: 1, state: :pending } }
 
   before do
-    users.create(id: 1, email: 'user@example.com', projects_limit: 10)
-    users.create(id: 2, email: 'reporter@example.com', projects_limit: 10)
-    users.create(id: 3, email: 'guest@example.com', projects_limit: 10)
+    users.create!(id: 1, email: 'user@example.com', projects_limit: 10)
+    users.create!(id: 2, email: 'reporter@example.com', projects_limit: 10)
+    users.create!(id: 3, email: 'guest@example.com', projects_limit: 10)
 
     projects.create!(id: 1, name: 'project-1', path: 'project-1', visibility_level: 0, namespace_id: 1)
     projects.create!(id: 2, name: 'project-2', path: 'project-2', visibility_level: 0, namespace_id: 1)
 
-    issues.create(id: 1, project_id: 1)
-    issues.create(id: 2, project_id: 2)
+    issues.create!(id: 1, project_id: 1)
+    issues.create!(id: 2, project_id: 2)
 
-    project_authorizations.create(user_id: 2, project_id: 2, access_level: 20) # reporter
-    project_authorizations.create(user_id: 3, project_id: 2, access_level: 10) # guest
+    project_authorizations.create!(user_id: 2, project_id: 2, access_level: 20) # reporter
+    project_authorizations.create!(user_id: 3, project_id: 2, access_level: 10) # guest
 
-    todos.create(todo_params.merge(user_id: 1, project_id: 1, target_id: 1)) # out of project ids range
-    todos.create(todo_params.merge(user_id: 1, project_id: 2, target_id: 2)) # non member
-    todos.create(todo_params.merge(user_id: 2, project_id: 2, target_id: 2)) # reporter
-    todos.create(todo_params.merge(user_id: 3, project_id: 2, target_id: 2)) # guest
+    todos.create!(todo_params.merge(user_id: 1, project_id: 1, target_id: 1)) # out of project ids range
+    todos.create!(todo_params.merge(user_id: 1, project_id: 2, target_id: 2)) # non member
+    todos.create!(todo_params.merge(user_id: 2, project_id: 2, target_id: 2)) # reporter
+    todos.create!(todo_params.merge(user_id: 3, project_id: 2, target_id: 2)) # guest
   end
 
   subject { described_class.new.perform(2, 5) }
@@ -42,11 +42,11 @@ describe Gitlab::BackgroundMigration::RemoveRestrictedTodos, schema: 20180704204
 
     context 'with a confidential issue' do
       it 'removes todos of users without project access and guests for confidential issues' do
-        issues.create(id: 3, project_id: 2, confidential: true)
-        issues.create(id: 4, project_id: 1, confidential: true) # not in the batch
-        todos.create(todo_params.merge(user_id: 3, project_id: 2, target_id: 3))
-        todos.create(todo_params.merge(user_id: 2, project_id: 2, target_id: 3))
-        todos.create(todo_params.merge(user_id: 1, project_id: 1, target_id: 4))
+        issues.create!(id: 3, project_id: 2, confidential: true)
+        issues.create!(id: 4, project_id: 1, confidential: true) # not in the batch
+        todos.create!(todo_params.merge(user_id: 3, project_id: 2, target_id: 3))
+        todos.create!(todo_params.merge(user_id: 2, project_id: 2, target_id: 3))
+        todos.create!(todo_params.merge(user_id: 1, project_id: 1, target_id: 4))
 
         expect { subject }.to change { Todo.count }.from(7).to(5)
       end
@@ -66,16 +66,16 @@ describe Gitlab::BackgroundMigration::RemoveRestrictedTodos, schema: 20180704204
 
     context 'with confidential issues' do
       before do
-        users.create(id: 4, email: 'author@example.com', projects_limit: 10)
-        users.create(id: 5, email: 'assignee@example.com', projects_limit: 10)
-        issues.create(id: 3, project_id: 2, confidential: true, author_id: 4)
-        assignees.create(user_id: 5, issue_id: 3)
+        users.create!(id: 4, email: 'author@example.com', projects_limit: 10)
+        users.create!(id: 5, email: 'assignee@example.com', projects_limit: 10)
+        issues.create!(id: 3, project_id: 2, confidential: true, author_id: 4)
+        assignees.create!(user_id: 5, issue_id: 3)
 
-        todos.create(todo_params.merge(user_id: 1, project_id: 2, target_id: 3)) # to be deleted
-        todos.create(todo_params.merge(user_id: 2, project_id: 2, target_id: 3)) # authorized user
-        todos.create(todo_params.merge(user_id: 3, project_id: 2, target_id: 3)) # to be deleted guest
-        todos.create(todo_params.merge(user_id: 4, project_id: 2, target_id: 3)) # conf issue author
-        todos.create(todo_params.merge(user_id: 5, project_id: 2, target_id: 3)) # conf issue assignee
+        todos.create!(todo_params.merge(user_id: 1, project_id: 2, target_id: 3)) # to be deleted
+        todos.create!(todo_params.merge(user_id: 2, project_id: 2, target_id: 3)) # authorized user
+        todos.create!(todo_params.merge(user_id: 3, project_id: 2, target_id: 3)) # to be deleted guest
+        todos.create!(todo_params.merge(user_id: 4, project_id: 2, target_id: 3)) # conf issue author
+        todos.create!(todo_params.merge(user_id: 5, project_id: 2, target_id: 3)) # conf issue assignee
       end
 
       it 'removes confidential issue todos for non authorized users' do
@@ -86,8 +86,8 @@ describe Gitlab::BackgroundMigration::RemoveRestrictedTodos, schema: 20180704204
     context 'features visibility restrictions' do
       before do
         todo_params.merge!(project_id: 2, user_id: 1, target_id: 3)
-        todos.create(todo_params.merge(user_id: 1, target_id: 3, target_type: 'MergeRequest'))
-        todos.create(todo_params.merge(user_id: 1, target_id: 3, target_type: 'Commit'))
+        todos.create!(todo_params.merge(user_id: 1, target_id: 3, target_type: 'MergeRequest'))
+        todos.create!(todo_params.merge(user_id: 1, target_id: 3, target_type: 'Commit'))
       end
 
       context 'when issues are restricted to project members' do

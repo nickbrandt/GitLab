@@ -395,7 +395,7 @@ RSpec.describe Notes::QuickActionsService do
 
         context 'when issue was already promoted' do
           it 'does not promote issue' do
-            issue.update(promoted_to_epic_id: epic.id)
+            issue.update!(promoted_to_epic_id: epic.id)
 
             expect { execute(note) }.not_to change { Epic.count }
           end

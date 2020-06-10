@@ -316,7 +316,7 @@ RSpec.describe ApprovalMergeRequestRule do
 
     context 'when project merge_requests_author_approval is true' do
       it 'contains author' do
-        merge_request.project.update(merge_requests_author_approval: true)
+        merge_request.project.update!(merge_requests_author_approval: true)
 
         expect(subject.approvers).to contain_exactly(merge_request.author)
       end

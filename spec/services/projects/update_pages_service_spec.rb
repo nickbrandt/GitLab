@@ -71,14 +71,14 @@ describe Projects::UpdatePagesService do
         expect(project.pages_metadatum).to be_deployed
         expect(project.pages_deployed?).to be_truthy
 
-        project.destroy
+        project.destroy!
 
         expect(project.pages_deployed?).to be_falsey
         expect(ProjectPagesMetadatum.find_by_project_id(project)).to be_nil
       end
 
       it 'fails if sha on branch is not latest' do
-        build.update(ref: 'feature')
+        build.update!(ref: 'feature')
 
         expect(execute).not_to eq(:success)
         expect(project.pages_metadatum).not_to be_deployed
@@ -181,7 +181,7 @@ describe Projects::UpdatePagesService do
   it 'fails to remove project pages when no pages is deployed' do
     expect(PagesWorker).not_to receive(:perform_in)
     expect(project.pages_deployed?).to be_falsey
-    project.destroy
+    project.destroy!
   end
 
   it 'fails if no artifacts' do

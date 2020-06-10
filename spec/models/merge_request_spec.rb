@@ -311,7 +311,7 @@ describe MergeRequest do
       let(:sha) { 'b83d6e391c22777fca1ed3012fce84f633d7fed0' }
 
       it 'returns empty requests' do
-        latest_merge_request_diff = merge_request.merge_request_diffs.create
+        latest_merge_request_diff = merge_request.merge_request_diffs.create!
 
         MergeRequestDiffCommit.where(
           merge_request_diff_id: latest_merge_request_diff,
@@ -703,7 +703,7 @@ describe MergeRequest do
 
     context 'when there are MR diffs' do
       it 'delegates to the MR diffs' do
-        merge_request.save
+        merge_request.save!
 
         expect(merge_request.merge_request_diff).to receive(:raw_diffs).with(hash_including(options)).and_call_original
 
@@ -845,20 +845,20 @@ describe MergeRequest do
 
     context 'when there are MR diffs' do
       it 'returns the correct count' do
-        merge_request.save
+        merge_request.save!
 
         expect(merge_request.diff_size).to eq('105')
       end
 
       it 'returns the correct overflow count' do
         allow(Commit).to receive(:max_diff_options).and_return(max_files: 2)
-        merge_request.save
+        merge_request.save!
 
         expect(merge_request.diff_size).to eq('2+')
       end
 
       it 'does not perform highlighting' do
-        merge_request.save
+        merge_request.save!
 
         expect(Gitlab::Diff::Highlight).not_to receive(:new)
 
@@ -1171,7 +1171,7 @@ describe MergeRequest do
     end
 
     it "can't remove a root ref" do
-      subject.update(source_branch: 'master', target_branch: 'feature')
+      subject.update!(source_branch: 'master', target_branch: 'feature')
 
       expect(subject.can_remove_source_branch?(user)).to be_falsey
     end
@@ -1986,7 +1986,7 @@ describe MergeRequest do
 
       context 'with a branch having no difference' do
         before do
-          subject.update(target_branch: 'branch-merged')
+          subject.update!(target_branch: 'branch-merged')
           subject.reload # make sure commits were not cached
         end
 
@@ -2525,7 +2525,7 @@ describe MergeRequest do
     context 'when it is only allowed to merge when build is green' do
       context 'and a failed pipeline is associated' do
         before do
-          pipeline.update(status: 'failed', sha: subject.diff_head_sha)
+          pipeline.update!(status: 'failed', sha: subject.diff_head_sha)
           allow(subject).to receive(:head_pipeline) { pipeline }
         end
 
@@ -2534,7 +2534,7 @@ describe MergeRequest do
 
       context 'and a successful pipeline is associated' do
         before do
-          pipeline.update(status: 'success', sha: subject.diff_head_sha)
+          pipeline.update!(status: 'success', sha: subject.diff_head_sha)
           allow(subject).to receive(:head_pipeline) { pipeline }
         end
 
@@ -2543,7 +2543,7 @@ describe MergeRequest do
 
       context 'and a skipped pipeline is associated' do
         before do
-          pipeline.update(status: 'skipped', sha: subject.diff_head_sha)
+          pipeline.update!(status: 'skipped', sha: subject.diff_head_sha)
           allow(subject).to receive(:head_pipeline) { pipeline }
         end
 
@@ -2788,7 +2788,7 @@ describe MergeRequest do
     before do
       # Update merge_request_diff so that #diff_refs will return commit.diff_refs
       allow(subject).to receive(:create_merge_request_diff) do
-        subject.merge_request_diffs.create(
+        subject.merge_request_diffs.create!(
           base_commit_sha: commit.parent_id,
           start_commit_sha: commit.parent_id,
           head_commit_sha: commit.sha
@@ -3029,7 +3029,7 @@ describe MergeRequest do
         end
 
         it 'returns false if the merge request is merged' do
-          merge_request.update(state: 'merged')
+          merge_request.update!(state: 'merged')
 
           expect(merge_request.reload.reopenable?).to be_falsey
         end

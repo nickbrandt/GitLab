@@ -52,8 +52,8 @@ RSpec.shared_examples 'a class that supports relative positioning' do
 
   describe '#prev_relative_position' do
     it 'returns previous position if there is an item above' do
-      item1.update(relative_position: 5)
-      item2.update(relative_position: 15)
+      item1.update!(relative_position: 5)
+      item2.update!(relative_position: 15)
 
       expect(item2.prev_relative_position).to eq item1.relative_position
     end
@@ -65,8 +65,8 @@ RSpec.shared_examples 'a class that supports relative positioning' do
 
   describe '#next_relative_position' do
     it 'returns next position if there is an item below' do
-      item1.update(relative_position: 5)
-      item2.update(relative_position: 15)
+      item1.update!(relative_position: 5)
+      item2.update!(relative_position: 15)
 
       expect(item1.next_relative_position).to eq item2.relative_position
     end
@@ -89,9 +89,9 @@ RSpec.shared_examples 'a class that supports relative positioning' do
       let(:item3) { create(factory, default_params) }
 
       before do
-        item1.update(relative_position: 1000)
-        item2.update(relative_position: 1001)
-        item3.update(relative_position: 1002)
+        item1.update!(relative_position: 1000)
+        item2.update!(relative_position: 1001)
+        item3.update!(relative_position: 1002)
       end
 
       it 'moves items correctly' do
@@ -115,9 +115,9 @@ RSpec.shared_examples 'a class that supports relative positioning' do
       let(:item3) { create(factory, default_params) }
 
       before do
-        item1.update(relative_position: 1000)
-        item2.update(relative_position: 1001)
-        item3.update(relative_position: 1002)
+        item1.update!(relative_position: 1000)
+        item2.update!(relative_position: 1001)
+        item3.update!(relative_position: 1002)
       end
 
       it 'moves items correctly' do
@@ -169,7 +169,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'positions items even when after and before positions are the same' do
-      item2.update relative_position: item1.relative_position
+      item2.update! relative_position: item1.relative_position
 
       new_item.move_between(item1, item2)
 
@@ -178,7 +178,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'positions items between other two if distance is 1' do
-      item2.update relative_position: item1.relative_position + 1
+      item2.update! relative_position: item1.relative_position + 1
 
       new_item.move_between(item1, item2)
 
@@ -187,8 +187,8 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'positions item in the middle of other two if distance is big enough' do
-      item1.update relative_position: 6000
-      item2.update relative_position: 10000
+      item1.update! relative_position: 6000
+      item2.update! relative_position: 10000
 
       new_item.move_between(item1, item2)
 
@@ -196,7 +196,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'positions item closer to the middle if we are at the very top' do
-      item2.update relative_position: 6000
+      item2.update! relative_position: 6000
 
       new_item.move_between(nil, item2)
 
@@ -204,9 +204,9 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'positions item closer to the middle if we are at the very bottom' do
-      new_item.update relative_position: 1
-      item1.update relative_position: 6000
-      item2.destroy
+      new_item.update! relative_position: 1
+      item1.update! relative_position: 6000
+      item2.destroy!
 
       new_item.move_between(item1, nil)
 
@@ -214,8 +214,8 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'positions item in the middle of other two if distance is not big enough' do
-      item1.update relative_position: 100
-      item2.update relative_position: 400
+      item1.update! relative_position: 100
+      item2.update! relative_position: 400
 
       new_item.move_between(item1, item2)
 
@@ -223,8 +223,8 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'positions item in the middle of other two is there is no place' do
-      item1.update relative_position: 100
-      item2.update relative_position: 101
+      item1.update! relative_position: 100
+      item2.update! relative_position: 101
 
       new_item.move_between(item1, item2)
 
@@ -232,10 +232,10 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'uses rebalancing if there is no place' do
-      item1.update relative_position: 100
-      item2.update relative_position: 101
+      item1.update! relative_position: 100
+      item2.update! relative_position: 101
       item3 = create_item(relative_position: 102)
-      new_item.update relative_position: 103
+      new_item.update! relative_position: 103
 
       new_item.move_between(item2, item3)
       new_item.save!
@@ -245,10 +245,10 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'positions item right if we pass none-sequential parameters' do
-      item1.update relative_position: 99
-      item2.update relative_position: 101
+      item1.update! relative_position: 99
+      item2.update! relative_position: 101
       item3 = create_item(relative_position: 102)
-      new_item.update relative_position: 103
+      new_item.update! relative_position: 103
 
       new_item.move_between(item1, item3)
       new_item.save!

@@ -86,7 +86,7 @@ RSpec.describe 'Admin Mode Login', :clean_gitlab_redis_shared_state, :do_not_moc
               expect(codes.size).to eq 10
 
               # Ensure the generated codes get saved
-              user.save
+              user.save!
             end
 
             context 'with valid code' do

@@ -279,7 +279,7 @@ shared_examples 'pages settings editing' do
 
   describe 'HTTPS settings', :https_pages_enabled do
     before do
-      project.namespace.update(owner: user)
+      project.namespace.update!(owner: user)
 
       allow_any_instance_of(Project).to receive(:pages_deployed?) { true }
     end
@@ -348,7 +348,7 @@ shared_examples 'pages settings editing' do
       let(:pipeline) do
         commit_sha = project.commit('HEAD').sha
 
-        project.ci_pipelines.create(
+        project.ci_pipelines.create!(
           ref: 'HEAD',
           sha: commit_sha,
           source: :push,

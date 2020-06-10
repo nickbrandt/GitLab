@@ -31,7 +31,7 @@ module QA
             mirror_settings.authentication_method = 'Password'
             mirror_settings.password = Runtime::User.admin_password
             mirror_settings.mirror_repository
-            mirror_settings.update source_project_uri
+            mirror_settings.update! source_project_uri
           end
         end
 

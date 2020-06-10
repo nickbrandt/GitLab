@@ -660,7 +660,7 @@ describe Ci::Runner do
 
       before do
         runner.tick_runner_queue
-        runner.destroy
+        runner.destroy!
       end
 
       it 'cleans up the queue' do

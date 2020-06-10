@@ -19,7 +19,7 @@ describe Upload do
       it 'schedules checksum calculation' do
         stub_const('UploadChecksumWorker', spy)
 
-        upload = described_class.create(
+        upload = described_class.create!(
           path: __FILE__,
           size: described_class::CHECKSUM_THRESHOLD + 1.kilobyte,
           model: build_stubbed(:user),
@@ -55,7 +55,7 @@ describe Upload do
         it 'calls delete_file!' do
           is_expected.to receive(:delete_file!)
 
-          subject.destroy
+          subject.destroy!
         end
       end
     end

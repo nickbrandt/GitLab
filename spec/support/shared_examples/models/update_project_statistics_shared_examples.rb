@@ -103,7 +103,7 @@ RSpec.shared_examples 'UpdateProjectStatistics' do
         expect(ProjectStatistics)
           .not_to receive(:increment_statistic)
 
-        project.update(pending_delete: true)
+        project.update!(pending_delete: true)
         project.destroy!
       end
 
@@ -111,7 +111,7 @@ RSpec.shared_examples 'UpdateProjectStatistics' do
         expect(Namespaces::ScheduleAggregationWorker)
           .not_to receive(:perform_async)
 
-        project.update(pending_delete: true)
+        project.update!(pending_delete: true)
         project.destroy!
       end
     end

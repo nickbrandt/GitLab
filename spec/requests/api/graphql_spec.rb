@@ -110,7 +110,7 @@ describe 'GraphQL' do
 
       context 'when the personal access token has no api scope' do
         it 'does not log the user in' do
-          token.update(scopes: [:read_user])
+          token.update!(scopes: [:read_user])
 
           post_graphql(query, headers: { 'PRIVATE-TOKEN' => token.token })
 

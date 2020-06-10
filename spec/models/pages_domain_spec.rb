@@ -95,7 +95,7 @@ describe PagesDomain do
     let(:domain) { build(:pages_domain) }
 
     it 'saves validity time' do
-      domain.save
+      domain.save!
 
       expect(domain.certificate_valid_not_before).to be_like_time(Time.zone.parse("2020-03-16 14:20:34 UTC"))
       expect(domain.certificate_valid_not_after).to be_like_time(Time.zone.parse("2220-01-28 14:20:34 UTC"))
@@ -152,7 +152,7 @@ describe PagesDomain do
 
       context 'when certificate is already saved' do
         it "doesn't add error to certificate" do
-          domain.save(validate: false)
+          domain.save!(validate: false)
 
           domain.valid?
 

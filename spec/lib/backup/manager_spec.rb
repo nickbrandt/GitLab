@@ -364,7 +364,7 @@ describe Backup::Manager do
 
       # the Fog mock only knows about directories we create explicitly
       connection = ::Fog::Storage.new(Gitlab.config.backup.upload.connection.symbolize_keys)
-      connection.directories.create(key: Gitlab.config.backup.upload.remote_directory)
+      connection.directories.create!(key: Gitlab.config.backup.upload.remote_directory)
     end
 
     context 'target path' do
@@ -405,7 +405,7 @@ describe Backup::Manager do
         )
 
         connection = ::Fog::Storage.new(Gitlab.config.backup.upload.connection.symbolize_keys)
-        connection.directories.create(key: Gitlab.config.backup.upload.remote_directory)
+        connection.directories.create!(key: Gitlab.config.backup.upload.remote_directory)
       end
 
       it 'does not attempt to set ACL' do

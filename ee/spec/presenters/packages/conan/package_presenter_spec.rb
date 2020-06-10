@@ -93,7 +93,7 @@ RSpec.describe ::Packages::Conan::PackagePresenter do
         before do
           [info_file, manifest_file, package_file].each do |file|
             file.conan_file_metadatum.conan_package_reference = alternative_reference
-            file.save
+            file.save!
           end
         end
 

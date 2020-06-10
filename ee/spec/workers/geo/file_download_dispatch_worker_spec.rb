@@ -37,7 +37,7 @@ RSpec.describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw, :use_sql_query_c
     create(:lfs_object, :with_file)
 
     secondary.enabled = false
-    secondary.save
+    secondary.save!
 
     expect(Geo::FileDownloadWorker).not_to receive(:perform_async)
 

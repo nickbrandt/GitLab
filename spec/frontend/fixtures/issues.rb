@@ -47,7 +47,7 @@ describe Projects::IssuesController, '(JavaScript fixtures)', type: :controller 
 
   it 'issues/issue_with_comment.html' do
     issue = create(:issue, project: project)
-    create(:note, project: project, noteable: issue, note: '- [ ] Task List Item').save
+    create(:note, project: project, noteable: issue, note: '- [ ] Task List Item').save!
     render_issue(issue)
   end
 

@@ -293,7 +293,7 @@ RSpec.describe License do
 
       context 'when a license is destroyed' do
         it 'deletes the future_dated_license value in Gitlab::SafeRequestStore' do
-          future_dated_license.destroy
+          future_dated_license.destroy!
 
           expect(Gitlab::SafeRequestStore.read(:future_dated_license)).to be_nil
         end
@@ -814,7 +814,7 @@ RSpec.describe License do
         before do
           gl_license.restrictions = { trial: true }
           gl_license.expires_at = Date.tomorrow
-          ApplicationSetting.current.update license_trial_ends_on: yesterday
+          ApplicationSetting.current.update! license_trial_ends_on: yesterday
         end
 
         it 'does not update existing trial setting' do

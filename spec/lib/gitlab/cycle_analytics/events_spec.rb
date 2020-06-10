@@ -350,7 +350,7 @@ describe 'cycle analytics events' do
 
   def setup(context)
     milestone = create(:milestone, project: project)
-    context.update(milestone: milestone)
+    context.update!(milestone: milestone)
     mr = create_merge_request_closing_issue(user, project, context, commit_message: "References #{context.to_reference}")
 
     ProcessCommitWorker.new.perform(project.id, user.id, mr.commits.last.to_hash)

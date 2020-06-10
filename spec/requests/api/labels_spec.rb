@@ -114,7 +114,7 @@ describe API::Labels do
 
       expect(label).not_to be_nil
 
-      label.priorities.create(project: label.project, priority: 1)
+      label.priorities.create!(project: label.project, priority: 1)
       label.save!
 
       request_params = {
@@ -134,7 +134,7 @@ describe API::Labels do
       expect(label).not_to be_nil
       label_id = spec_params[:name] || spec_params[:label_id]
 
-      label.priorities.create(project: label.project, priority: 1)
+      label.priorities.create!(project: label.project, priority: 1)
       label.save!
 
       request_params = {
@@ -386,7 +386,7 @@ describe API::Labels do
     it 'returns 409 if label already exists in group' do
       group = create(:group)
       group_label = create(:group_label, group: group)
-      project.update(group: group)
+      project.update!(group: group)
 
       post api("/projects/#{project.id}/labels", user),
            params: {

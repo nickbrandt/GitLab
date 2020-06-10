@@ -262,7 +262,7 @@ RSpec.describe Gitlab::Auth::Ldap::Access do
         it 'does not performs the membership update for existing users' do
           user.created_at = Time.now - 10.minutes
           user.last_credential_check_at = Time.now
-          user.save
+          user.save!
 
           expect(LdapGroupLink).not_to receive(:where)
           expect(LdapGroupSyncWorker).not_to receive(:perform_async)
@@ -356,7 +356,7 @@ RSpec.describe Gitlab::Auth::Ldap::Access do
 
       it 'updates existing Kerberos identity in GitLab if Active Directory has a different one' do
         allow_any_instance_of(EE::Gitlab::Auth::Ldap::Person).to receive_messages(kerberos_principal: 'otherlogin@BAR.COM')
-        user.identities.build(provider: 'kerberos', extern_uid: 'mylogin@FOO.COM').save
+        user.identities.build(provider: 'kerberos', extern_uid: 'mylogin@FOO.COM').save!
 
         expect { access.update_user }.not_to change(user.identities.where(provider: 'kerberos'), :count)
         expect(user.identities.where(provider: 'kerberos').last.extern_uid).to eq('otherlogin@BAR.COM')
@@ -364,7 +364,7 @@ RSpec.describe Gitlab::Auth::Ldap::Access do
 
       it 'does not remove Kerberos identities from GitLab if they are none in the LDAP provider' do
         allow_any_instance_of(EE::Gitlab::Auth::Ldap::Person).to receive_messages(kerberos_principal: nil)
-        user.identities.build(provider: 'kerberos', extern_uid: 'otherlogin@BAR.COM').save
+        user.identities.build(provider: 'kerberos', extern_uid: 'otherlogin@BAR.COM').save!
 
         expect { access.update_user }.not_to change(user.identities.where(provider: 'kerberos'), :count)
         expect(user.identities.where(provider: 'kerberos').last.extern_uid).to eq('otherlogin@BAR.COM')

@@ -23,7 +23,7 @@ describe Gitlab::BackgroundMigration::FixUserProjectRouteNames, schema: 20190620
   end
 
   it "updates the route for a project if it did not match the user's name" do
-    route = routes.create(
+    route = routes.create!(
       id: 1,
       path: "#{user.username}/#{project.path}",
       source_id: project.id,
@@ -37,7 +37,7 @@ describe Gitlab::BackgroundMigration::FixUserProjectRouteNames, schema: 20190620
   end
 
   it 'updates the route for a project if the name was nil' do
-    route = routes.create(
+    route = routes.create!(
       id: 1,
       path: "#{user.username}/#{project.path}",
       source_id: project.id,
@@ -51,7 +51,7 @@ describe Gitlab::BackgroundMigration::FixUserProjectRouteNames, schema: 20190620
   end
 
   it 'does not update routes that were are out of the range' do
-    route = routes.create(
+    route = routes.create!(
       id: 6,
       path: "#{user.username}/#{project.path}",
       source_id: project.id,
@@ -64,14 +64,14 @@ describe Gitlab::BackgroundMigration::FixUserProjectRouteNames, schema: 20190620
   end
 
   it 'does not update routes for projects in groups owned by the user' do
-    group = namespaces.create(
+    group = namespaces.create!(
       owner_id: user.id,
       name: 'A group',
       path: 'a-path',
       type: ''
     )
-    project = projects.create(namespace_id: group.id, name: 'Project Name')
-    route = routes.create(
+    project = projects.create!(namespace_id: group.id, name: 'Project Name')
+    route = routes.create!(
       id: 1,
       path: "#{group.path}/#{project.path}",
       source_id: project.id,
@@ -84,7 +84,7 @@ describe Gitlab::BackgroundMigration::FixUserProjectRouteNames, schema: 20190620
   end
 
   it 'does not update routes for namespaces' do
-    route = routes.create(
+    route = routes.create!(
       id: 1,
       path: namespace.path,
       source_id: namespace.id,

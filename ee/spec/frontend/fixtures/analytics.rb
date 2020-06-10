@@ -61,8 +61,8 @@ RSpec.describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   end
 
   def update_metrics
-    issue_1.metrics.update(first_added_to_board_at: 3.days.ago, first_mentioned_in_commit_at: 2.days.ago)
-    issue_2.metrics.update(first_added_to_board_at: 2.days.ago, first_mentioned_in_commit_at: 1.day.ago)
+    issue_1.metrics.update!(first_added_to_board_at: 3.days.ago, first_mentioned_in_commit_at: 2.days.ago)
+    issue_2.metrics.update!(first_added_to_board_at: 2.days.ago, first_mentioned_in_commit_at: 1.day.ago)
 
     mr_1.metrics.update!({
       merged_at: 5.days.ago,

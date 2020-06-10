@@ -1416,7 +1416,7 @@ describe Notify do
       stub_config_setting(email_subject_suffix: 'A Nice Suffix')
       perform_enqueued_jobs do
         user.email = "new-email@mail.com"
-        user.save
+        user.save!
       end
     end
 

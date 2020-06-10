@@ -107,7 +107,7 @@ RSpec.describe Epics::TreeReorderService do
           context 'when object being moved is from another epic' do
             before do
               other_epic = create(:epic, group: group)
-              epic_issue2.update(epic: other_epic)
+              epic_issue2.update!(epic: other_epic)
             end
 
             context 'when the new_parent_id has not been provided' do
@@ -169,8 +169,8 @@ RSpec.describe Epics::TreeReorderService do
             let(:another_epic) { create(:epic, group: another_group) }
 
             before do
-              epic_issue1.update(epic: another_epic)
-              epic_issue2.update(epic: another_epic)
+              epic_issue1.update!(epic: another_epic)
+              epic_issue2.update!(epic: another_epic)
             end
 
             context 'when new_parent_id is not provided' do
@@ -233,8 +233,8 @@ RSpec.describe Epics::TreeReorderService do
 
             before do
               other_group.add_developer(user)
-              epic.update(group: other_group)
-              epic2.update(parent: epic1)
+              epic.update!(group: other_group)
+              epic2.update!(parent: epic1)
             end
 
             it_behaves_like 'error for the tree update', "This epic can't be added because it must belong to the same group as the parent, or subgroup of the parent epic’s group"
@@ -253,8 +253,8 @@ RSpec.describe Epics::TreeReorderService do
             let(:another_epic) { create(:epic, group: another_group) }
 
             before do
-              epic1.update(group: another_group, parent: another_epic)
-              epic2.update(group: another_group, parent: another_epic)
+              epic1.update!(group: another_group, parent: another_epic)
+              epic2.update!(group: another_group, parent: another_epic)
             end
 
             it_behaves_like 'error for the tree update', 'You don\'t have permissions to move the objects.'

@@ -25,11 +25,11 @@ RSpec.shared_examples 'a valid diff note with after commit callback' do
       it 'fallback to fetch file from repository' do
         expect_any_instance_of(::Gitlab::Diff::Position).to receive(:diff_file).with(project.repository)
 
-        subject.save
+        subject.save!
       end
 
       it 'creates a diff note file' do
-        subject.save
+        subject.save!
 
         expect(subject.reload.note_diff_file).to be_present
       end

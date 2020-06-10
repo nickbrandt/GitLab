@@ -108,7 +108,7 @@ describe RemoteMirror, :mailer do
 
         expect(RepositoryRemoveRemoteWorker).to receive(:perform_async).with(mirror.project.id, mirror.remote_name).and_call_original
 
-        mirror.update(url: 'http://test.com')
+        mirror.update!(url: 'http://test.com')
       end
     end
   end
@@ -288,7 +288,7 @@ describe RemoteMirror, :mailer do
 
     context 'with remote mirroring disabled' do
       it 'returns nil' do
-        remote_mirror.update(enabled: false)
+        remote_mirror.update!(enabled: false)
 
         expect(remote_mirror.sync).to be_nil
       end
@@ -377,7 +377,7 @@ describe RemoteMirror, :mailer do
     let(:remote_mirror) { create(:project, :repository, :remote_mirror).remote_mirrors.first }
 
     it 'resets all the columns when URL changes' do
-      remote_mirror.update(last_error: Time.current,
+      remote_mirror.update!(last_error: Time.current,
                            last_update_at: Time.current,
                            last_successful_update_at: Time.current,
                            update_status: 'started',
@@ -416,7 +416,7 @@ describe RemoteMirror, :mailer do
 
     context 'when remote mirror has status failed' do
       it 'returns false when last update started after the timestamp' do
-        remote_mirror.update(update_status: 'failed')
+        remote_mirror.update!(update_status: 'failed')
 
         expect(remote_mirror.updated_since?(timestamp)).to be false
       end
@@ -432,7 +432,7 @@ describe RemoteMirror, :mailer do
                              updated_at: 25.hours.ago)
       project = mirror.project
       project.pending_delete = true
-      project.save
+      project.save!
       mirror.reload
 
       expect(mirror.sync).to be_nil

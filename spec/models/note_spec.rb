@@ -125,7 +125,7 @@ describe Note do
         expect(note).to receive(:notify_after_destroy).and_call_original
         expect(note.noteable).to receive(:after_note_destroyed).with(note)
 
-        note.destroy
+        note.destroy!
       end
 
       it 'does not error if noteable is nil' do
@@ -196,8 +196,8 @@ describe Note do
 
     describe 'read' do
       before do
-        @p1.project_members.create(user: @u2, access_level: ProjectMember::GUEST)
-        @p2.project_members.create(user: @u3, access_level: ProjectMember::GUEST)
+        @p1.project_members.create!(user: @u2, access_level: ProjectMember::GUEST)
+        @p2.project_members.create!(user: @u3, access_level: ProjectMember::GUEST)
       end
 
       it { expect(Ability.allowed?(@u1, :read_note, @p1)).to be_falsey }
@@ -207,8 +207,8 @@ describe Note do
 
     describe 'write' do
       before do
-        @p1.project_members.create(user: @u2, access_level: ProjectMember::DEVELOPER)
-        @p2.project_members.create(user: @u3, access_level: ProjectMember::DEVELOPER)
+        @p1.project_members.create!(user: @u2, access_level: ProjectMember::DEVELOPER)
+        @p2.project_members.create!(user: @u3, access_level: ProjectMember::DEVELOPER)
       end
 
       it { expect(Ability.allowed?(@u1, :create_note, @p1)).to be_falsey }
@@ -218,9 +218,9 @@ describe Note do
 
     describe 'admin' do
       before do
-        @p1.project_members.create(user: @u1, access_level: ProjectMember::REPORTER)
-        @p1.project_members.create(user: @u2, access_level: ProjectMember::MAINTAINER)
-        @p2.project_members.create(user: @u3, access_level: ProjectMember::MAINTAINER)
+        @p1.project_members.create!(user: @u1, access_level: ProjectMember::REPORTER)
+        @p1.project_members.create!(user: @u2, access_level: ProjectMember::MAINTAINER)
+        @p2.project_members.create!(user: @u3, access_level: ProjectMember::MAINTAINER)
       end
 
       it { expect(Ability.allowed?(@u1, :admin_note, @p1)).to be_falsey }
@@ -841,7 +841,7 @@ describe Note do
         expect(Banzai::Renderer).to receive(:cacheless_render_field)
           .with(note, :note, { skip_project_check: false }).and_return(html)
 
-        note.save
+        note.save!
       end
 
       it 'creates a note' do
@@ -856,7 +856,7 @@ describe Note do
         expect(Banzai::Renderer).to receive(:cacheless_render_field)
           .with(note, :note, { skip_project_check: true }).and_return(html)
 
-        note.save
+        note.save!
       end
 
       it 'creates a note' do

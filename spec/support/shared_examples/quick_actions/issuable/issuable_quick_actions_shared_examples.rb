@@ -228,7 +228,7 @@ RSpec.shared_examples 'issuable quick actions' do
 
   before do
     project.add_developer(old_assignee)
-    issuable.update(assignees: [old_assignee])
+    issuable.update!(assignees: [old_assignee])
   end
 
   context 'when user can update issuable' do

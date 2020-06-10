@@ -432,7 +432,7 @@ describe "Admin::Users" do
       end
 
       it 'displays the correct status for an unverified email address' do
-        user.update(confirmed_at: nil, unconfirmed_email: user.email)
+        user.update!(confirmed_at: nil, unconfirmed_email: user.email)
         visit admin_user_path(user)
 
         expect(page).to have_content("#{user.email} Unverified")

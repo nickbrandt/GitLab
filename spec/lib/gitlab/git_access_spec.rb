@@ -684,7 +684,7 @@ describe Gitlab::GitAccess do
             project.add_role(user, role)
           end
 
-          protected_branch.save
+          protected_branch.save!
 
           aggregate_failures do
             matrix.each do |action, allowed|

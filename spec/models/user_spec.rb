@@ -142,7 +142,7 @@ describe User do
           truncated_bio = 'a' * 255
 
           user.bio = invalid_bio
-          user.save(validate: false)
+          user.save!(validate: false)
 
           expect(user.user_detail.bio).to eq(truncated_bio)
         end
@@ -602,7 +602,7 @@ describe User do
         it 'does not accept not verified emails' do
           email = create(:email)
           user = email.user
-          user.update(notification_email: email.email)
+          user.update!(notification_email: email.email)
 
           expect(user).to be_invalid
         end
@@ -612,7 +612,7 @@ describe User do
         it 'accepts verified emails' do
           email = create(:email, :confirmed, email: 'test@test.com')
           user = email.user
-          user.update(public_email: email.email)
+          user.update!(public_email: email.email)
 
           expect(user).to be_valid
         end
@@ -620,7 +620,7 @@ describe User do
         it 'does not accept not verified emails' do
           email = create(:email)
           user = email.user
-          user.update(public_email: email.email)
+          user.update!(public_email: email.email)
 
           expect(user).to be_invalid
         end
@@ -1108,7 +1108,7 @@ describe User do
           let(:secondary) { create(:email, :confirmed, email: 'secondary@example.com', user: user) }
 
           before do
-            user.emails.create(email_attrs)
+            user.emails.create!(email_attrs)
             user.tap { |u| u.update!(notification_email: email_attrs[:email]) }.reload
           end
 
@@ -1262,7 +1262,7 @@ describe User do
     let!(:accessible_deploy_keys_project) { create(:deploy_keys_project, project: project) }
 
     before do
-      public_deploy_keys_project.deploy_key.update(public: true)
+      public_deploy_keys_project.deploy_key.update!(public: true)
       project.add_developer(user)
     end
 
@@ -1352,7 +1352,7 @@ describe User do
       it 'receives callback when external changes' do
         expect(user).to receive(:ensure_user_rights_and_limits)
 
-        user.update(external: false)
+        user.update!(external: false)
       end
 
       it 'ensures correct rights and limits for user' do
@@ -1369,7 +1369,7 @@ describe User do
       it 'receives callback when external changes' do
         expect(user).to receive(:ensure_user_rights_and_limits)
 
-        user.update(external: true)
+        user.update!(external: true)
       end
 
       it 'ensures correct rights and limits for user' do
@@ -2457,12 +2457,12 @@ describe User do
       expect(user.starred?(project1)).to be_truthy
       expect(user.starred?(project2)).to be_truthy
 
-      star1.destroy
+      star1.destroy!
 
       expect(user.starred?(project1)).to be_falsey
       expect(user.starred?(project2)).to be_truthy
 
-      star2.destroy
+      star2.destroy!
 
       expect(user.starred?(project1)).to be_falsey
       expect(user.starred?(project2)).to be_falsey
@@ -2867,7 +2867,7 @@ describe User do
 
       expect(user.authorized_projects).to include(project)
 
-      member.destroy
+      member.destroy!
 
       expect(user.authorized_projects).not_to include(project)
     end
@@ -2892,7 +2892,7 @@ describe User do
 
       expect(user2.authorized_projects).to include(project)
 
-      project.destroy
+      project.destroy!
 
       expect(user2.authorized_projects).not_to include(project)
     end
@@ -2906,7 +2906,7 @@ describe User do
 
       expect(user.authorized_projects).to include(project)
 
-      group.destroy
+      group.destroy!
 
       expect(user.authorized_projects).not_to include(project)
     end
@@ -3789,7 +3789,7 @@ describe User do
             end
 
             it 'adds the namespace errors to the user' do
-              user.update(username: new_username)
+              user.update!(username: new_username)
 
               expect(user.errors.full_messages.first).to eq('Username has already been taken')
             end

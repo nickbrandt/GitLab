@@ -26,7 +26,7 @@ describe WebHook do
 
       it 'strips :url before saving it' do
         hook.url = ' https://example.com '
-        hook.save
+        hook.save!
 
         expect(hook.url).to eq('https://example.com')
       end
@@ -45,14 +45,14 @@ describe WebHook do
 
       it 'gets rid of whitespace' do
         hook.push_events_branch_filter = ' branch '
-        hook.save
+        hook.save!
 
         expect(hook.push_events_branch_filter).to eq('branch')
       end
 
       it 'stores whitespace only as empty' do
         hook.push_events_branch_filter = ' '
-        hook.save
+        hook.save!
 
         expect(hook.push_events_branch_filter).to eq('')
       end

@@ -7,7 +7,7 @@ describe Gitlab::BackgroundMigration::SetConfidentialNoteEventsOnWebhooks, schem
 
   describe '#perform' do
     it 'migrates hooks where note_events is true' do
-      hook = web_hooks.create(confidential_note_events: nil, note_events: true)
+      hook = web_hooks.create!(confidential_note_events: nil, note_events: true)
 
       subject.perform(hook.id, hook.id)
 
@@ -15,7 +15,7 @@ describe Gitlab::BackgroundMigration::SetConfidentialNoteEventsOnWebhooks, schem
     end
 
     it 'ignores hooks where note_events is false' do
-      hook = web_hooks.create(confidential_note_events: nil, note_events: false)
+      hook = web_hooks.create!(confidential_note_events: nil, note_events: false)
 
       subject.perform(hook.id, hook.id)
 
@@ -23,7 +23,7 @@ describe Gitlab::BackgroundMigration::SetConfidentialNoteEventsOnWebhooks, schem
     end
 
     it 'ignores hooks where confidential_note_events has already been set' do
-      hook = web_hooks.create(confidential_note_events: false, note_events: true)
+      hook = web_hooks.create!(confidential_note_events: false, note_events: true)
 
       subject.perform(hook.id, hook.id)
 

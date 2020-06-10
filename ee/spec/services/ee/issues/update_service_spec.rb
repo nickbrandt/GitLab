@@ -72,7 +72,7 @@ RSpec.describe Issues::UpdateService do
       context 'updating weight' do
         before do
           project.add_maintainer(user)
-          issue.update(weight: 3)
+          issue.update!(weight: 3)
         end
 
         context 'when weight is integer' do

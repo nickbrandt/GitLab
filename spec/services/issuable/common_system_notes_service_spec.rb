@@ -19,7 +19,7 @@ describe Issuable::CommonSystemNotesService do
 
       before do
         issuable.labels << label
-        issuable.save
+        issuable.save!
       end
 
       it 'creates a resource label event' do
@@ -80,7 +80,7 @@ describe Issuable::CommonSystemNotesService do
     subject { described_class.new(project, user).execute(issuable, old_labels: [], is_update: false) }
 
     it 'does not create system note for title and description' do
-      issuable.save
+      issuable.save!
 
       expect { subject }.not_to change { issuable.notes.count }
     end
@@ -89,7 +89,7 @@ describe Issuable::CommonSystemNotesService do
       label = create(:label, project: project)
 
       issuable.labels << label
-      issuable.save
+      issuable.save!
 
       expect { subject }.to change { issuable.resource_label_events.count }.from(0).to(1)
 
@@ -105,7 +105,7 @@ describe Issuable::CommonSystemNotesService do
         stub_feature_flags(track_resource_milestone_change_events: false)
 
         issuable.milestone = create(:milestone, project: project)
-        issuable.save
+        issuable.save!
       end
 
       it 'creates a system note for milestone set' do
@@ -137,7 +137,7 @@ describe Issuable::CommonSystemNotesService do
 
     it 'creates a system note for due_date set' do
       issuable.due_date = Date.today
-      issuable.save
+      issuable.save!
 
       expect { subject }.to change { issuable.notes.count }.from(0).to(1)
       expect(issuable.notes.last.note).to match('changed due date')

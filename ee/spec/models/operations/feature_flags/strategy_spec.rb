@@ -20,7 +20,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         with_them do
           it 'skips parameters validation' do
             feature_flag = create(:operations_feature_flag, project: project)
-            strategy = described_class.create(feature_flag: feature_flag,
+            strategy = described_class.create!(feature_flag: feature_flag,
                                               name: invalid_name, parameters: { bad: 'params' })
 
             expect(strategy.errors[:name]).to eq(['strategy name is invalid'])
@@ -37,7 +37,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         with_them do
           it 'must have valid parameters for the strategy' do
             feature_flag = create(:operations_feature_flag, project: project)
-            strategy = described_class.create(feature_flag: feature_flag,
+            strategy = described_class.create!(feature_flag: feature_flag,
                                               name: 'gradualRolloutUserId', parameters: invalid_parameters)
 
             expect(strategy.errors[:parameters]).to eq(['parameters are invalid'])
@@ -46,7 +46,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
 
         it 'allows the parameters in any order' do
           feature_flag = create(:operations_feature_flag, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'gradualRolloutUserId',
                                             parameters: { percentage: '10', groupId: 'mygroup' })
 
@@ -62,7 +62,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
           with_them do
             it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
               feature_flag = create(:operations_feature_flag, project: project)
-              strategy = described_class.create(feature_flag: feature_flag,
+              strategy = described_class.create!(feature_flag: feature_flag,
                                                 name: 'gradualRolloutUserId',
                                                 parameters: { groupId: 'mygroup', percentage: invalid_value })
 
@@ -76,7 +76,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
           with_them do
             it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
               feature_flag = create(:operations_feature_flag, project: project)
-              strategy = described_class.create(feature_flag: feature_flag,
+              strategy = described_class.create!(feature_flag: feature_flag,
                                                 name: 'gradualRolloutUserId',
                                                 parameters: { groupId: 'mygroup', percentage: valid_value })
 
@@ -93,7 +93,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
           with_them do
             it 'must be a string value of up to 32 lowercase characters' do
               feature_flag = create(:operations_feature_flag, project: project)
-              strategy = described_class.create(feature_flag: feature_flag,
+              strategy = described_class.create!(feature_flag: feature_flag,
                                                 name: 'gradualRolloutUserId',
                                                 parameters: { groupId: invalid_value, percentage: '40' })
 
@@ -107,7 +107,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
           with_them do
             it 'must be a string value of up to 32 lowercase characters' do
               feature_flag = create(:operations_feature_flag, project: project)
-              strategy = described_class.create(feature_flag: feature_flag,
+              strategy = described_class.create!(feature_flag: feature_flag,
                                                 name: 'gradualRolloutUserId',
                                                 parameters: { groupId: valid_value, percentage: '40' })
 
@@ -124,7 +124,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         with_them do
           it 'must have valid parameters for the strategy' do
             feature_flag = create(:operations_feature_flag, project: project)
-            strategy = described_class.create(feature_flag: feature_flag,
+            strategy = described_class.create!(feature_flag: feature_flag,
                                               name: 'userWithId', parameters: invalid_parameters)
 
             expect(strategy.errors[:parameters]).to eq(['parameters are invalid'])
@@ -141,7 +141,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
           with_them do
             it 'is valid with a string of comma separated values' do
               feature_flag = create(:operations_feature_flag, project: project)
-              strategy = described_class.create(feature_flag: feature_flag,
+              strategy = described_class.create!(feature_flag: feature_flag,
                                                 name: 'userWithId', parameters: { userIds: valid_value })
 
               expect(strategy.errors[:parameters]).to be_empty
@@ -156,7 +156,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
           with_them do
             it 'is invalid' do
               feature_flag = create(:operations_feature_flag, project: project)
-              strategy = described_class.create(feature_flag: feature_flag,
+              strategy = described_class.create!(feature_flag: feature_flag,
                                                 name: 'userWithId', parameters: { userIds: invalid_value })
 
               expect(strategy.errors[:parameters]).to include(
@@ -174,7 +174,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         with_them do
           it 'must be empty' do
             feature_flag = create(:operations_feature_flag, project: project)
-            strategy = described_class.create(feature_flag: feature_flag,
+            strategy = described_class.create!(feature_flag: feature_flag,
                                               name: 'default',
                                               parameters: invalid_value)
 
@@ -184,7 +184,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
 
         it 'must be empty' do
           feature_flag = create(:operations_feature_flag, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'default',
                                             parameters: {})
 
@@ -199,7 +199,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         with_them do
           it 'must be empty' do
             feature_flag = create(:operations_feature_flag, project: project)
-            strategy = described_class.create(feature_flag: feature_flag,
+            strategy = described_class.create!(feature_flag: feature_flag,
                                               name: 'gitlabUserList',
                                               parameters: invalid_value)
 
@@ -209,7 +209,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
 
         it 'must be empty' do
           feature_flag = create(:operations_feature_flag, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'gitlabUserList',
                                             parameters: {})
 
@@ -223,7 +223,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         it 'is valid when associated with a user list' do
           feature_flag = create(:operations_feature_flag, project: project)
           user_list = create(:operations_feature_flag_user_list, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'gitlabUserList',
                                             user_list: user_list,
                                             parameters: {})
@@ -233,7 +233,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
 
         it 'is invalid without a user list' do
           feature_flag = create(:operations_feature_flag, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'gitlabUserList',
                                             parameters: {})
 
@@ -244,7 +244,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
           other_project = create(:project)
           feature_flag = create(:operations_feature_flag, project: project)
           user_list = create(:operations_feature_flag_user_list, project: other_project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'gitlabUserList',
                                             user_list: user_list,
                                             parameters: {})
@@ -257,7 +257,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         it 'is invalid when associated with a user list' do
           feature_flag = create(:operations_feature_flag, project: project)
           user_list = create(:operations_feature_flag_user_list, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'default',
                                             user_list: user_list,
                                             parameters: {})
@@ -267,7 +267,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
 
         it 'is valid without a user list' do
           feature_flag = create(:operations_feature_flag, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'default',
                                             parameters: {})
 
@@ -279,7 +279,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         it 'is invalid when associated with a user list' do
           feature_flag = create(:operations_feature_flag, project: project)
           user_list = create(:operations_feature_flag_user_list, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'userWithId',
                                             user_list: user_list,
                                             parameters: { userIds: 'user1' })
@@ -289,7 +289,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
 
         it 'is valid without a user list' do
           feature_flag = create(:operations_feature_flag, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'userWithId',
                                             parameters: { userIds: 'user1' })
 
@@ -301,7 +301,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
         it 'is invalid when associated with a user list' do
           feature_flag = create(:operations_feature_flag, project: project)
           user_list = create(:operations_feature_flag_user_list, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'gradualRolloutUserId',
                                             user_list: user_list,
                                             parameters: { groupId: 'default', percentage: '10' })
@@ -311,7 +311,7 @@ RSpec.describe Operations::FeatureFlags::Strategy do
 
         it 'is valid without a user list' do
           feature_flag = create(:operations_feature_flag, project: project)
-          strategy = described_class.create(feature_flag: feature_flag,
+          strategy = described_class.create!(feature_flag: feature_flag,
                                             name: 'gradualRolloutUserId',
                                             parameters: { groupId: 'default', percentage: '10' })
 

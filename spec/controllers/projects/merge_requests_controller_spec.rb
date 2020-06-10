@@ -81,7 +81,7 @@ RSpec.describe Projects::MergeRequestsController do
         render_views
 
         it 'renders merge request page' do
-          merge_request.merge_request_diff.destroy
+          merge_request.merge_request_diff.destroy!
 
           go(format: :html)
 
@@ -111,7 +111,7 @@ RSpec.describe Projects::MergeRequestsController do
         let(:new_project) { create(:project) }
 
         before do
-          project.route.destroy
+          project.route.destroy!
           new_project.redirect_routes.create!(path: project.full_path)
           new_project.add_developer(user)
         end
@@ -399,7 +399,7 @@ RSpec.describe Projects::MergeRequestsController do
 
     context 'when the merge request is not mergeable' do
       before do
-        merge_request.update(title: "WIP: #{merge_request.title}")
+        merge_request.update!(title: "WIP: #{merge_request.title}")
 
         post :merge, params: base_params
       end
@@ -439,7 +439,7 @@ RSpec.describe Projects::MergeRequestsController do
 
       context 'when squash is passed as 1' do
         it 'updates the squash attribute on the MR to true' do
-          merge_request.update(squash: false)
+          merge_request.update!(squash: false)
           merge_with_sha(squash: '1')
 
           expect(merge_request.reload.squash).to be_truthy
@@ -448,7 +448,7 @@ RSpec.describe Projects::MergeRequestsController do
 
       context 'when squash is passed as 0' do
         it 'updates the squash attribute on the MR to false' do
-          merge_request.update(squash: true)
+          merge_request.update!(squash: true)
           merge_with_sha(squash: '0')
 
           expect(merge_request.reload.squash).to be_falsey
@@ -1465,7 +1465,7 @@ RSpec.describe Projects::MergeRequestsController do
   describe 'POST remove_wip' do
     before do
       merge_request.title = merge_request.wip_title
-      merge_request.save
+      merge_request.save!
 
       post :remove_wip,
         params: {

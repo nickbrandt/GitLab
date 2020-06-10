@@ -36,7 +36,7 @@ describe Gitlab::ImportExport::LfsRestorer do
           )
         end
 
-        saver.save
+        saver.save!
 
         project.lfs_objects.delete_all
       end

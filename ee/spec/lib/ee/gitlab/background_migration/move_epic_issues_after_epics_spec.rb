@@ -78,7 +78,7 @@ RSpec.describe Gitlab::BackgroundMigration::MoveEpicIssuesAfterEpics, schema: 20
 
     context 'when there are no epic_issues' do
       it 'runs correctly' do
-        epics.create(epic_params.merge(iid: 3, relative_position: 500))
+        epics.create!(epic_params.merge(iid: 3, relative_position: 500))
 
         expect(subject.perform(1, 10)).to be_zero
       end

@@ -31,7 +31,7 @@ RSpec.describe 'CI shared runner limits' do
         end
 
         before do
-          group.update(shared_runners_minutes_limit: 20)
+          group.update!(shared_runners_minutes_limit: 20)
           allow_any_instance_of(EE::Namespace).to receive(:shared_runners_remaining_minutes).and_return(remaining_minutes)
         end
 
@@ -104,7 +104,7 @@ RSpec.describe 'CI shared runner limits' do
         end
 
         before do
-          group.update(shared_runners_minutes_limit: 20)
+          group.update!(shared_runners_minutes_limit: 20)
           allow_any_instance_of(EE::Namespace).to receive(:shared_runners_remaining_minutes).and_return(remaining_minutes)
         end
 

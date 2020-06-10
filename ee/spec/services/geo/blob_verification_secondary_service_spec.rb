@@ -52,7 +52,7 @@ RSpec.describe Geo::BlobVerificationSecondaryService, :geo do
 
     it 'does not verify the checksum if the current checksum matches' do
       package_file.assign_attributes(verification_checksum: '62fc1ec4ce60')
-      registry.update(verification_checksum: '62fc1ec4ce60')
+      registry.update!(verification_checksum: '62fc1ec4ce60')
 
       expect(package_file).not_to receive(:calculate_checksum!)
 
@@ -96,7 +96,7 @@ RSpec.describe Geo::BlobVerificationSecondaryService, :geo do
       end
 
       it 'ensures the next retry time is capped properly' do
-        registry.update(retry_count: 30)
+        registry.update!(retry_count: 30)
 
         service.execute
 
@@ -128,7 +128,7 @@ RSpec.describe Geo::BlobVerificationSecondaryService, :geo do
       end
 
       it 'ensures the next retry time is capped properly' do
-        registry.update(retry_count: 30)
+        registry.update!(retry_count: 30)
 
         service.execute
 

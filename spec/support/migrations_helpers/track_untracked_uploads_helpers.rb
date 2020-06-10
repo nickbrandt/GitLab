@@ -10,7 +10,7 @@ module MigrationsHelpers
     FIXTURE_CHECKSUM = 'b804383982bb89b00e828e3f44c038cc991d3d1768009fc39ba8e2c081b9fb75'.freeze
 
     def create_or_update_appearance(logo: false, header_logo: false)
-      appearance = appearances.first_or_create(title: 'foo', description: 'bar', logo: (UPLOAD_FILENAME if logo), header_logo: (UPLOAD_FILENAME if header_logo))
+      appearance = appearances.first_or_create!(title: 'foo', description: 'bar', logo: (UPLOAD_FILENAME if logo), header_logo: (UPLOAD_FILENAME if header_logo))
 
       add_upload(appearance, 'Appearance', 'logo', 'AttachmentUploader') if logo
       add_upload(appearance, 'Appearance', 'header_logo', 'AttachmentUploader') if header_logo
@@ -20,7 +20,7 @@ module MigrationsHelpers
 
     def create_group(avatar: false)
       index = unique_index(:group)
-      group = namespaces.create(name: "group#{index}", path: "group#{index}", avatar: (UPLOAD_FILENAME if avatar))
+      group = namespaces.create!(name: "group#{index}", path: "group#{index}", avatar: (UPLOAD_FILENAME if avatar))
 
       add_upload(group, 'Group', 'avatar', 'AvatarUploader') if avatar
 
@@ -28,7 +28,7 @@ module MigrationsHelpers
     end
 
     def create_note(attachment: false)
-      note = notes.create(attachment: (UPLOAD_FILENAME if attachment))
+      note = notes.create!(attachment: (UPLOAD_FILENAME if attachment))
 
       add_upload(note, 'Note', 'attachment', 'AttachmentUploader') if attachment
 
@@ -37,8 +37,8 @@ module MigrationsHelpers
 
     def create_project(avatar: false)
       group = create_group
-      project = projects.create(namespace_id: group.id, path: "project#{unique_index(:project)}", avatar: (UPLOAD_FILENAME if avatar))
-      routes.create(path: "#{group.path}/#{project.path}", source_id: project.id, source_type: 'Project') # so Project.find_by_full_path works
+      project = projects.create!(namespace_id: group.id, path: "project#{unique_index(:project)}", avatar: (UPLOAD_FILENAME if avatar))
+      routes.create!(path: "#{group.path}/#{project.path}", source_id: project.id, source_type: 'Project') # so Project.find_by_full_path works
 
       add_upload(project, 'Project', 'avatar', 'AvatarUploader') if avatar
 
@@ -46,7 +46,7 @@ module MigrationsHelpers
     end
 
     def create_user(avatar: false)
-      user = users.create(email: "foo#{unique_index(:user)}@bar.com", avatar: (UPLOAD_FILENAME if avatar), projects_limit: 100)
+      user = users.create!(email: "foo#{unique_index(:user)}@bar.com", avatar: (UPLOAD_FILENAME if avatar), projects_limit: 100)
 
       add_upload(user, 'User', 'avatar', 'AvatarUploader') if avatar
 

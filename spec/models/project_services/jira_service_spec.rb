@@ -202,7 +202,7 @@ describe JiraService do
               it 'resets password if url changed' do
                 service
                 service.url = 'http://jira_edited.example.com'
-                service.save
+                service.save!
 
                 expect(service.reload.url).to eq('http://jira_edited.example.com')
                 expect(service.password).to be_nil
@@ -211,7 +211,7 @@ describe JiraService do
               it 'does not reset password if url "changed" to the same url as before' do
                 service.title = 'aaaaaa'
                 service.url = 'http://jira.example.com'
-                service.save
+                service.save!
 
                 expect(service.reload.url).to eq('http://jira.example.com')
                 expect(service.password).not_to be_nil
@@ -219,7 +219,7 @@ describe JiraService do
 
               it 'resets password if url not changed but api url added' do
                 service.api_url = 'http://jira_edited.example.com/rest/api/2'
-                service.save
+                service.save!
 
                 expect(service.reload.api_url).to eq('http://jira_edited.example.com/rest/api/2')
                 expect(service.password).to be_nil
@@ -228,7 +228,7 @@ describe JiraService do
               it 'does not reset password if new url is set together with password, even if it\'s the same password' do
                 service.url = 'http://jira_edited.example.com'
                 service.password = password
-                service.save
+                service.save!
 
                 expect(service.password).to eq(password)
                 expect(service.url).to eq('http://jira_edited.example.com')
@@ -237,14 +237,14 @@ describe JiraService do
               it 'resets password if url changed, even if setter called multiple times' do
                 service.url = 'http://jira1.example.com/rest/api/2'
                 service.url = 'http://jira1.example.com/rest/api/2'
-                service.save
+                service.save!
 
                 expect(service.password).to be_nil
               end
 
               it 'does not reset password if username changed' do
                 service.username = 'some_name'
-                service.save
+                service.save!
 
                 expect(service.reload.password).to eq(password)
               end
@@ -252,7 +252,7 @@ describe JiraService do
               it 'does not reset password if password changed' do
                 service.url = 'http://jira_edited.example.com'
                 service.password = 'new_password'
-                service.save
+                service.save!
 
                 expect(service.reload.password).to eq('new_password')
               end
@@ -260,7 +260,7 @@ describe JiraService do
               it 'does not reset password if the password is touched and same as before' do
                 service.url = 'http://jira_edited.example.com'
                 service.password = password
-                service.save
+                service.save!
 
                 expect(service.reload.password).to eq(password)
               end
@@ -277,20 +277,20 @@ describe JiraService do
 
               it 'resets password if api url changed' do
                 service.api_url = 'http://jira_edited.example.com/rest/api/2'
-                service.save
+                service.save!
 
                 expect(service.password).to be_nil
               end
 
               it 'does not reset password if url changed' do
                 service.url = 'http://jira_edited.example.com'
-                service.save
+                service.save!
 
                 expect(service.password).to eq(password)
               end
 
               it 'resets password if api url set to empty' do
-                service.update(api_url: '')
+                service.update!(api_url: '')
 
                 expect(service.reload.password).to be_nil
               end
@@ -307,7 +307,7 @@ describe JiraService do
             it 'saves password if new url is set together with password' do
               service.url = 'http://jira_edited.example.com/rest/api/2'
               service.password = 'password'
-              service.save
+              service.save!
               expect(service.reload.password).to eq('password')
               expect(service.reload.url).to eq('http://jira_edited.example.com/rest/api/2')
             end
@@ -390,7 +390,7 @@ describe JiraService do
         allow_any_instance_of(JIRA::Resource::Issue).to receive(:key).and_return('JIRA-123')
         allow(JIRA::Resource::Remotelink).to receive(:all).and_return([])
 
-        @jira_service.save
+        @jira_service.save!
 
         project_issues_url = 'http://jira.example.com/rest/api/2/issue/JIRA-123'
         @transitions_url   = 'http://jira.example.com/rest/api/2/issue/JIRA-123/transitions'
@@ -679,7 +679,7 @@ describe JiraService do
       end
 
       it 'gets Jira project with API URL if set' do
-        jira_service.update(api_url: 'http://jira.api.com')
+        jira_service.update!(api_url: 'http://jira.api.com')
 
         expect(test_settings('jira.api.com')).to eq(success: true, result: { 'url' => 'http://url' })
       end

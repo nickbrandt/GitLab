@@ -38,8 +38,8 @@ describe 'forked project import' do
       allow(instance).to receive(:storage_path).and_return(export_path)
     end
 
-    saver.save
-    repo_saver.save
+    saver.save!
+    repo_saver.save!
 
     repo_restorer.restore
     restorer.restore

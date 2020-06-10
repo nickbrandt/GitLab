@@ -212,7 +212,7 @@ describe BulkInsertableAssociations do
   private
 
   def save_with_bulk_inserts(entity, bangify: true)
-    BulkInsertableAssociations.with_bulk_insert { bangify ? entity.save! : entity.save }
+    BulkInsertableAssociations.with_bulk_insert { bangify ? entity.save! : entity.save! }
   end
 
   def build_items(parent:, relation: :bulk_foos, count: 10)

@@ -16,7 +16,7 @@ RSpec.describe ScheduleProjectAnyApprovalRuleMigration do
       approvals_before_merge: 2
     }
 
-    projects.create(default_options.merge(options))
+    projects.create!(default_options.merge(options))
   end
 
   it 'correctly schedules background migrations' do

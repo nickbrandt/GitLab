@@ -185,7 +185,7 @@ describe Gitlab::Database::PartitioningMigrationHelpers::TableManagementHelpers 
         expect(first_copy.attributes).to eq(first_todo.attributes)
         expect(second_copy.attributes).to eq(second_todo.attributes)
 
-        first_todo.update(state_event: 'done', commit_id: 'abc123', updated_at: timestamp + 1.second)
+        first_todo.update!(state_event: 'done', commit_id: 'abc123', updated_at: timestamp + 1.second)
 
         expect(model.count).to eq(2)
         expect(first_copy.reload.attributes).to eq(first_todo.attributes)
@@ -200,7 +200,7 @@ describe Gitlab::Database::PartitioningMigrationHelpers::TableManagementHelpers 
 
         expect(model.count).to eq(2)
 
-        first_todo.destroy
+        first_todo.destroy!
 
         expect(model.count).to eq(1)
         expect(model.find_by_id(first_todo.id)).to be_nil

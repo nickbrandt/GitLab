@@ -56,10 +56,10 @@ describe ScheduleLinkLfsObjectsProjects, :migration, :sidekiq do
     stub_const("#{described_class.name}::BATCH_SIZE", 2)
 
     # Create links between projects
-    fork_network_members.create(fork_network_id: fork_network.id, project_id: source_project.id, forked_from_project_id: nil)
-    fork_network_members.create(fork_network_id: fork_network.id, project_id: project.id, forked_from_project_id: source_project.id)
-    fork_network_members.create(fork_network_id: another_fork_network.id, project_id: another_source_project.id, forked_from_project_id: nil)
-    fork_network_members.create(fork_network_id: another_fork_network.id, project_id: another_project.id, forked_from_project_id: another_fork_network.root_project_id)
+    fork_network_members.create!(fork_network_id: fork_network.id, project_id: source_project.id, forked_from_project_id: nil)
+    fork_network_members.create!(fork_network_id: fork_network.id, project_id: project.id, forked_from_project_id: source_project.id)
+    fork_network_members.create!(fork_network_id: another_fork_network.id, project_id: another_source_project.id, forked_from_project_id: nil)
+    fork_network_members.create!(fork_network_id: another_fork_network.id, project_id: another_project.id, forked_from_project_id: another_fork_network.root_project_id)
   end
 
   it 'schedules background migration to link LFS objects' do

@@ -28,7 +28,7 @@ describe Gitlab::MarkdownCache::ActiveRecord::Extension do
 
     before do
       thing.title = thing.title
-      thing.save
+      thing.save!
     end
 
     it { expect(thing.title).to eq(markdown) }
@@ -42,7 +42,7 @@ describe Gitlab::MarkdownCache::ActiveRecord::Extension do
 
     before do
       thing.title = updated_markdown
-      thing.save
+      thing.save!
     end
 
     it { expect(thing.title_html).to eq(updated_html) }
@@ -53,9 +53,9 @@ describe Gitlab::MarkdownCache::ActiveRecord::Extension do
     it do
       expect(thing).to receive(:refresh_markdown_cache).once
       thing.title = ''
-      thing.save
+      thing.save!
       thing.title = ''
-      thing.save
+      thing.save!
     end
   end
 
@@ -63,9 +63,9 @@ describe Gitlab::MarkdownCache::ActiveRecord::Extension do
     it do
       expect(thing).to receive(:refresh_markdown_cache).once
       thing.title = '[//]: # (This is also a comment.)'
-      thing.save
+      thing.save!
       thing.title = '[//]: # (This is also a comment.)'
-      thing.save
+      thing.save!
     end
   end
 
@@ -74,7 +74,7 @@ describe Gitlab::MarkdownCache::ActiveRecord::Extension do
 
     before do
       thing.state_id = 2
-      thing.save
+      thing.save!
     end
 
     it { expect(thing.state_id).to eq(2) }
@@ -99,7 +99,7 @@ describe Gitlab::MarkdownCache::ActiveRecord::Extension do
       thing.project = :new_project
       allow(Banzai::Renderer).to receive(:cacheless_render_field).and_return(updated_html)
 
-      thing.save
+      thing.save!
 
       expect(thing.title_html).to eq(updated_html)
       expect(thing.description_html).to eq(updated_html)
@@ -110,7 +110,7 @@ describe Gitlab::MarkdownCache::ActiveRecord::Extension do
       thing.author = :new_author
       allow(Banzai::Renderer).to receive(:cacheless_render_field).and_return(updated_html)
 
-      thing.save
+      thing.save!
 
       expect(thing.title_html).to eq(updated_html)
       expect(thing.description_html).to eq(updated_html)

@@ -2621,7 +2621,7 @@ describe Ci::Pipeline, :mailer do
       project.add_developer(pipeline.user)
 
       pipeline.user.global_notification_setting
-        .update(level: 'custom', failed_pipeline: true, success_pipeline: true)
+        .update!(level: 'custom', failed_pipeline: true, success_pipeline: true)
 
       perform_enqueued_jobs do
         pipeline.enqueue

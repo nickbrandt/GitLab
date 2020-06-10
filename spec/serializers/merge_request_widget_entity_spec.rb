@@ -188,7 +188,7 @@ describe MergeRequestWidgetEntity do
 
     it 'returns a blank rebase_path' do
       allow(merge_request).to receive(:should_be_rebased?).and_return(true)
-      forked_project.destroy
+      forked_project.destroy!
       merge_request.reload
 
       entity = described_class.new(merge_request, request: request).as_json

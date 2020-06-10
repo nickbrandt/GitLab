@@ -12,9 +12,9 @@ describe Gitlab::BackgroundMigration::BackfillProjectSettings, schema: 202001141
 
   describe '#perform' do
     it 'creates settings for all projects in range' do
-      projects.create(id: 5, namespace_id: namespace.id)
-      projects.create(id: 7, namespace_id: namespace.id)
-      projects.create(id: 8, namespace_id: namespace.id)
+      projects.create!(id: 5, namespace_id: namespace.id)
+      projects.create!(id: 7, namespace_id: namespace.id)
+      projects.create!(id: 8, namespace_id: namespace.id)
 
       subject.perform(5, 7)
 

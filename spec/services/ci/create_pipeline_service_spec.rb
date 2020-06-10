@@ -246,7 +246,7 @@ describe Ci::CreatePipelineService do
         end
 
         it 'cancel created outdated pipelines', :sidekiq_might_not_need_inline do
-          pipeline_on_previous_commit.update(status: 'created')
+          pipeline_on_previous_commit.update!(status: 'created')
           pipeline
 
           expect(pipeline_on_previous_commit.reload).to have_attributes(status: 'canceled', auto_canceled_by_id: pipeline.id)

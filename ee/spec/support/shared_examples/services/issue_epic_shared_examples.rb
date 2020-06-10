@@ -46,7 +46,7 @@ RSpec.shared_examples 'issue with epic_id parameter' do
       before do
         subgroup = create(:group, parent: group)
         create(:epic, group: subgroup)
-        project.update(group: subgroup)
+        project.update!(group: subgroup)
       end
 
       it 'creates epic issue link' do

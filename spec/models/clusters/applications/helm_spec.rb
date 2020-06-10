@@ -24,7 +24,7 @@ describe Clusters::Applications::Helm do
         next if application_name == 'helm'
 
         it "is false when #{application_name} is installed" do
-          cluster_application = create("clusters_applications_#{application_name}".to_sym)
+          cluster_application = create!("clusters_applications_#{application_name}".to_sym)
 
           helm = cluster_application.cluster.application_helm
 

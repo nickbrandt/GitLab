@@ -86,7 +86,7 @@ describe 'Merge requests > User mass updates', :js do
     describe 'unset milestone' do
       before do
         merge_request.milestone = milestone
-        merge_request.save
+        merge_request.save!
         visit project_merge_requests_path(project)
       end
 

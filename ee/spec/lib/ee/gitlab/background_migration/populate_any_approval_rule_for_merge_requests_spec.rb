@@ -18,7 +18,7 @@ RSpec.describe Gitlab::BackgroundMigration::PopulateAnyApprovalRuleForMergeReque
                   source_branch: 'mr name',
                   title: "mr name#{id}")
 
-    merge_requests.create(params)
+    merge_requests.create!(params)
   end
 
   before do
@@ -29,12 +29,12 @@ RSpec.describe Gitlab::BackgroundMigration::PopulateAnyApprovalRuleForMergeReque
 
     # Test filtering already migrated rows
     create_merge_request(4, approvals_before_merge: 3)
-    approval_merge_request_rules.create(id: 4,
+    approval_merge_request_rules.create!(id: 4,
       merge_request_id: 4, approvals_required: 3, rule_type: 4, name: ApprovalRuleLike::ALL_MEMBERS)
 
     # Test filtering MRs with existing rules
     create_merge_request(5, approvals_before_merge: 3)
-    approval_merge_request_rules.create(id: 5,
+    approval_merge_request_rules.create!(id: 5,
       merge_request_id: 5, approvals_required: 3, rule_type: 1, name: 'Regular rules')
 
     create_merge_request(6, approvals_before_merge: 5)

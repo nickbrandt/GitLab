@@ -613,7 +613,7 @@ describe MergeRequests::RefreshService do
         before do
           stub_feature_flags(track_resource_state_change_events: state_tracking_enabled)
 
-          @fork_project.destroy
+          @fork_project.destroy!
           service.new(@project, @user).execute(@oldrev, @newrev, 'refs/heads/feature')
           reload_mrs
         end

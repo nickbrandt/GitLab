@@ -258,7 +258,7 @@ RSpec.describe API::MavenPackages do
 
     context 'internal project' do
       before do
-        group.group_member(user).destroy
+        group.group_member(user).destroy!
         project.update!(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
       end
 

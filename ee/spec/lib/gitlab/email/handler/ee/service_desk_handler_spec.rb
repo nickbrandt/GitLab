@@ -121,7 +121,7 @@ RSpec.describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
         context 'and template cannot be found' do
           before do
             service = ServiceDeskSetting.new(project_id: project.id, issue_template_key: 'unknown')
-            service.save(validate: false)
+            service.save!(validate: false)
           end
 
           it 'does not append template text to issue description' do

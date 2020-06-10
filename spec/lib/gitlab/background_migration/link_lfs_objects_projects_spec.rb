@@ -57,7 +57,7 @@ describe Gitlab::BackgroundMigration::LinkLfsObjectsProjects, :migration, schema
     stub_const("#{described_class}::BATCH_SIZE", 2)
 
     # Create links between projects
-    fork_network_members.create(fork_network_id: fork_network.id, project_id: source_project.id, forked_from_project_id: nil)
+    fork_network_members.create!(fork_network_id: fork_network.id, project_id: source_project.id, forked_from_project_id: nil)
 
     [project, partially_linked_project, fully_linked_project].each do |p|
       fork_network_members.create(
@@ -67,13 +67,13 @@ describe Gitlab::BackgroundMigration::LinkLfsObjectsProjects, :migration, schema
       )
     end
 
-    fork_network_members.create(fork_network_id: another_fork_network.id, project_id: another_source_project.id, forked_from_project_id: nil)
-    fork_network_members.create(fork_network_id: another_fork_network.id, project_id: another_project.id, forked_from_project_id: another_fork_network.root_project_id)
+    fork_network_members.create!(fork_network_id: another_fork_network.id, project_id: another_source_project.id, forked_from_project_id: nil)
+    fork_network_members.create!(fork_network_id: another_fork_network.id, project_id: another_project.id, forked_from_project_id: another_fork_network.root_project_id)
 
     # Links LFS objects to some projects
-    lfs_objects_projects.create(lfs_object_id: lfs_object.id, project_id: fully_linked_project.id)
-    lfs_objects_projects.create(lfs_object_id: another_lfs_object.id, project_id: fully_linked_project.id)
-    lfs_objects_projects.create(lfs_object_id: lfs_object.id, project_id: partially_linked_project.id)
+    lfs_objects_projects.create!(lfs_object_id: lfs_object.id, project_id: fully_linked_project.id)
+    lfs_objects_projects.create!(lfs_object_id: another_lfs_object.id, project_id: fully_linked_project.id)
+    lfs_objects_projects.create!(lfs_object_id: lfs_object.id, project_id: partially_linked_project.id)
   end
 
   context 'when there are LFS objects to be linked' do
@@ -96,8 +96,8 @@ describe Gitlab::BackgroundMigration::LinkLfsObjectsProjects, :migration, schema
     before do
       # Links LFS objects to all projects
       projects.all.each do |p|
-        lfs_objects_projects.create(lfs_object_id: lfs_object.id, project_id: p.id)
-        lfs_objects_projects.create(lfs_object_id: another_lfs_object.id, project_id: p.id)
+        lfs_objects_projects.create!(lfs_object_id: lfs_object.id, project_id: p.id)
+        lfs_objects_projects.create!(lfs_object_id: another_lfs_object.id, project_id: p.id)
       end
     end
 

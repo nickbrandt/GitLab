@@ -186,7 +186,7 @@ describe WikiPage::Meta do
       #    an old slug that = canonical_slug
       different_slug = generate(:sluggified_title)
       create(:wiki_page_meta, project: project, canonical_slug: different_slug)
-        .slugs.create(slug: wiki_page.slug)
+        .slugs.create!(slug: wiki_page.slug)
     end
 
     shared_examples 'metadata examples' do

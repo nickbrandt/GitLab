@@ -107,7 +107,7 @@ RSpec.describe Epics::IssuePromoteService do
         context 'when issue was already promoted' do
           it 'raises error' do
             epic = create(:epic, group: group)
-            issue.update(promoted_to_epic_id: epic.id)
+            issue.update!(promoted_to_epic_id: epic.id)
 
             expect { subject.execute(issue) }
               .to raise_error(Epics::IssuePromoteService::PromoteError, /already promoted/)

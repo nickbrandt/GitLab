@@ -39,7 +39,7 @@ RSpec.shared_examples 'inherited access level as a member of entity' do
     it "shows an error if the member can't be updated" do
       entity.add_maintainer(user)
 
-      member.update(access_level: Gitlab::Access::REPORTER)
+      member.update!(access_level: Gitlab::Access::REPORTER)
 
       expect(member.errors.full_messages).to eq(["Access level should be greater than or equal to Developer inherited membership from group #{parent_entity.name}"])
     end

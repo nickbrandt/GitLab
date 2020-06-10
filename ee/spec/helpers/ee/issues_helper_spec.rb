@@ -78,7 +78,7 @@ RSpec.describe EE::IssuesHelper do
 
     before do
       allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).and_return(true)
-      old_issue.update(moved_to: new_issue)
+      old_issue.update!(moved_to: new_issue)
     end
 
     it 'is true when moved issue project has service desk disabled' do

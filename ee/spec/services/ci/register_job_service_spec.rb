@@ -81,8 +81,8 @@ RSpec.describe Ci::RegisterJobService do
 
             context 'and public projects cost factor is > 0' do
               before do
-                project.update(visibility_level: Project::PUBLIC)
-                shared_runner.update(public_projects_minutes_cost_factor: 1.1)
+                project.update!(visibility_level: Project::PUBLIC)
+                shared_runner.update!(public_projects_minutes_cost_factor: 1.1)
               end
 
               it_behaves_like 'does not return a build', 11
@@ -145,7 +145,7 @@ RSpec.describe Ci::RegisterJobService do
         context 'and namespace limit lower than global limit' do
           before do
             stub_application_setting(shared_runners_minutes: 10)
-            project.namespace.update(shared_runners_minutes_limit: 5)
+            project.namespace.update!(shared_runners_minutes_limit: 5)
           end
 
           it_behaves_like 'does not return a build', 6
@@ -154,7 +154,7 @@ RSpec.describe Ci::RegisterJobService do
         context 'and namespace limit higher than global limit' do
           before do
             stub_application_setting(shared_runners_minutes: 5)
-            project.namespace.update(shared_runners_minutes_limit: 10)
+            project.namespace.update!(shared_runners_minutes_limit: 10)
           end
 
           it_behaves_like 'returns a build', 6
@@ -177,9 +177,9 @@ RSpec.describe Ci::RegisterJobService do
         context 'and usage above the limit on root namespace' do
           before do
             # limit is ignored on subnamespace
-            group.update(shared_runners_minutes_limit: 20)
+            group.update!(shared_runners_minutes_limit: 20)
 
-            root_ancestor.update(shared_runners_minutes_limit: 10)
+            root_ancestor.update!(shared_runners_minutes_limit: 10)
             root_ancestor.create_namespace_statistics(
               shared_runners_seconds: 60 * 11)
           end

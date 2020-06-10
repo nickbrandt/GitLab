@@ -45,7 +45,7 @@ describe DraftNotes::DestroyService do
         allow_any_instance_of(DraftNote).to receive_message_chain(:diff_file, :unfolded?) { true }
         expect(merge_request).to receive_message_chain(:diffs, :clear_cache)
 
-        destroy
+        destroy!
       end
     end
   end

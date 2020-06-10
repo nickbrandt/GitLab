@@ -1244,7 +1244,7 @@ RSpec.describe User do
 
     with_them do
       it 'returns the correct result for each plan on a personal namespace' do
-        plan = create(hosted_plan)
+        plan = create!(hosted_plan)
         create(:gitlab_subscription, namespace: user.namespace, hosted_plan: plan)
 
         expect(subject).to be result

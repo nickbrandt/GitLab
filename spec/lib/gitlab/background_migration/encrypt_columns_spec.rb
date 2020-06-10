@@ -26,7 +26,7 @@ describe Gitlab::BackgroundMigration::EncryptColumns, schema: 20180910115836 do
 
   describe '#perform' do
     it 'encrypts columns for the specified range' do
-      hooks = web_hooks.create([plaintext_attrs] * 5).sort_by(&:id)
+      hooks = web_hooks.create!([plaintext_attrs] * 5).sort_by(&:id)
 
       # Encrypt all but the first and last rows
       subject.perform(model, [:token, :url], hooks[1].id, hooks[3].id)
@@ -59,7 +59,7 @@ describe Gitlab::BackgroundMigration::EncryptColumns, schema: 20180910115836 do
         'url' => 'url'
       }
 
-      hook = web_hooks.create(values)
+      hook = web_hooks.create!(values)
 
       subject.perform(model, [:token, :url], hook.id, hook.id)
 

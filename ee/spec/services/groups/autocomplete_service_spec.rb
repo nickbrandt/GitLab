@@ -149,8 +149,8 @@ RSpec.describe Groups::AutocompleteService do
       let(:public_subgroup) { create(:group, :public, parent: public_group) }
 
       before do
-        group_milestone.update(group: public_group)
-        subgroup_milestone.update(group: public_subgroup)
+        group_milestone.update!(group: public_group)
+        subgroup_milestone.update!(group: public_subgroup)
       end
 
       it 'returns milestones from groups and subgroups' do
