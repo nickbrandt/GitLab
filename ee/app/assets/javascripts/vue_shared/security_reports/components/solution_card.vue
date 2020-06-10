@@ -26,11 +26,6 @@ export default {
       default: false,
       required: false,
     },
-    hasRemediation: {
-      type: Boolean,
-      default: false,
-      required: false,
-    },
     vulnerabilityFeedbackHelpPath: {
       type: String,
       default: '',
@@ -53,13 +48,10 @@ export default {
       );
     },
     showCreateMergeRequestMsg() {
-      return !this.hasMr && this.hasRemediation && this.hasDownload;
+      return !this.hasMr && Boolean(this.remediation) && this.hasDownload;
     },
     showLearnAboutRemedationMsg() {
-      if (this.hasMr) {
-        return false;
-      }
-      return true;
+      return !this.hasMr;
     },
     showMsg() {
       return (

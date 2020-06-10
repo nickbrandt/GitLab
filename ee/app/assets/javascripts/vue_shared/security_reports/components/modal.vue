@@ -84,9 +84,6 @@ export default {
     isResolved() {
       return Boolean(this.modal.isResolved);
     },
-    hasRemediation() {
-      return Boolean(this.remediation);
-    },
     project() {
       return this.modal.project;
     },
@@ -207,7 +204,6 @@ export default {
         :solution="solution"
         :remediation="remediation"
         :has-mr="vulnerability.hasMergeRequest"
-        :has-remediation="hasRemediation"
         :has-download="canDownloadPatchForThisVulnerability"
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       />
