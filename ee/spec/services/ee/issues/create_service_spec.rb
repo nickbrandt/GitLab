@@ -84,11 +84,20 @@ RSpec.describe Issues::CreateService do
             end
           end
 
-          context 'when adding an issue to confidential epic' do
-            let(:confidential_epic) { create(:epic, group: group, confidential: true) }
-
-            it 'creates a confidential issue' do
+          context 'when adding a public issue to confidential epic' do
+            it 'creates confidential child issue' do
+              confidential_epic = create(:epic, group: group, confidential: true)
               params = { title: 'confidential issue', epic_id: confidential_epic.id }
+
+              issue = described_class.new(project, user, params).execute
+
+              expect(issue.confidential).to eq(true)
+            end
+          end
+
+          context 'when adding a confidential issue to public epic' do
+            it 'creates a confidential child issue' do
+              params = { title: 'confidential issue', epic_id: epic.id, confidential: true }
 
               issue = described_class.new(project, user, params).execute
 
