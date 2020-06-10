@@ -18,7 +18,7 @@ module EE
         epic = params.delete(:epic)
 
         if epic
-          issue.confidential = epic.confidential?
+          issue.confidential = true if epic.confidential?
 
           EpicIssues::CreateService.new(epic, current_user, { target_issuable: issue }).execute
         else
