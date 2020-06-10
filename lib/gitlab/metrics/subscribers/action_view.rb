@@ -25,6 +25,7 @@ module Gitlab
             buckets [0.001, 0.01, 0.1, 1, 10.0]
             with_feature :prometheus_metrics_view_instrumentation
           end
+
           current_transaction.increment(:gitlab_transaction_view_duration_total, event.duration)
         end
 

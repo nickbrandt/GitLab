@@ -4,7 +4,7 @@ module Gitlab
   module Metrics
     # Class for tracking timing information about method calls
     class MethodCall
-      attr_reader :real_time, :cpu_time, :call_count, :labels, :transaction
+      attr_reader :real_time, :cpu_time, :call_count
 
       # name - The full name of the method (including namespace) such as
       #        `User#sign_in`.
@@ -50,6 +50,10 @@ module Gitlab
       def above_threshold?
         real_time.in_milliseconds >= ::Gitlab::Metrics.method_call_threshold
       end
+
+      private
+
+      attr_reader :labels, :transaction
     end
   end
 end

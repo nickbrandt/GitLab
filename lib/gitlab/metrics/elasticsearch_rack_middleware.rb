@@ -27,6 +27,7 @@ module Gitlab
         transaction.increment(:http_elasticsearch_requests_total, request_count) do
           docstring 'Amount of calls to Elasticsearch servers during web requests'
         end
+
         transaction.observe(:http_elasticsearch_requests_duration_seconds, query_time) do
           docstring 'Query time for Elasticsearch servers during web requests'
           buckets HISTOGRAM_BUCKETS

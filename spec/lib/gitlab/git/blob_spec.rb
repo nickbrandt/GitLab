@@ -45,7 +45,7 @@ RSpec.describe Gitlab::Git::Blob, :seed_helper do
         blob
       end
 
-      it 'increment :gitlab_blob_truncated_false counter' do
+      it 'increments :gitlab_blob_truncated_false counter' do
         expect(transaction)
           .to receive(:increment).with(:gitlab_blob_truncated_false)
 

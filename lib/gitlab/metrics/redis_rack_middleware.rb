@@ -25,6 +25,7 @@ module Gitlab
         transaction.increment(:http_redis_requests_total, request_count) do
           docstring 'Amount of calls to Redis servers during web requests'
         end
+
         transaction.observe(:http_redis_requests_duration_seconds, query_time) do
           docstring 'Query time for Redis servers during web requests'
           buckets Gitlab::Instrumentation::Redis::QUERY_TIME_BUCKETS

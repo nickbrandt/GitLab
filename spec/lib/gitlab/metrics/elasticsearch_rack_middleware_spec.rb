@@ -9,8 +9,6 @@ RSpec.describe Gitlab::Metrics::ElasticsearchRackMiddleware do
   let(:transaction) { Gitlab::Metrics::WebTransaction.new(env) }
 
   describe '#call' do
-    # let(:counter) { instance_double(Prometheus::Client::Counter, increment: nil) }
-    # let(:histogram) { instance_double(Prometheus::Client::Histogram, observe: nil) }
     let(:elasticsearch_query_time) { 0.1 }
     let(:elasticsearch_requests_count) { 2 }
 
