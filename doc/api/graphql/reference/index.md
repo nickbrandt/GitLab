@@ -1603,6 +1603,7 @@ Represents a snippet entry
 | ---   |  ---- | ----------  |
 | `author` | User! | The owner of the snippet |
 | `blob` | SnippetBlob! | Snippet blob |
+| `blobs` | SnippetBlob! => Array | Snippet blobs |
 | `createdAt` | Time! | Timestamp this snippet was created |
 | `description` | String | Description of the snippet |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
