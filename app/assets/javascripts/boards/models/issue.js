@@ -46,7 +46,7 @@ class ListIssue {
   }
 
   removeLabels(labels) {
-    labels.forEach(this.removeLabel.bind(this));
+    boardsStore.removeIssueLabels(this, labels);
   }
 
   addAssignee(assignee) {

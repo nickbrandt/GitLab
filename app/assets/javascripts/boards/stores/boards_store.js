@@ -689,6 +689,10 @@ const boardsStore = {
     }
   },
 
+  removeIssueLabels(issue, labels) {
+    labels.forEach(issue.removeLabel.bind(issue));
+  },
+
   bulkUpdate(issueIds, extraData = {}) {
     const data = {
       update: Object.assign(extraData, {
