@@ -12,7 +12,7 @@ RSpec.describe API::ConanPackages do
 
   let(:base_secret) { SecureRandom.base64(64) }
   let(:auth_token) { personal_access_token.token }
-  let(:job) { create(:ci_build, user: user) }
+  let(:job) { create(:ci_build, user: user, status: :running) }
   let(:job_token) { job.token }
   let(:deploy_token) { create(:deploy_token, read_package_registry: true, write_package_registry: true) }
   let(:project_deploy_token) { create(:project_deploy_token, deploy_token: deploy_token, project: project) }
@@ -89,6 +89,14 @@ RSpec.describe API::ConanPackages do
 
     it 'responds with 401 Unauthorized when invalid JWT is provided' do
       get api('/packages/conan/v1/ping'), headers: build_token_auth_header('invalid-jwt')
+
+      expect(response).to have_gitlab_http_status(:unauthorized)
+    end
+
+    it 'responds with 401 Unauthorized when the job is not running' do
+      job.update!(status: :failed)
+      jwt = build_jwt_from_job(job)
+      get api('/packages/conan/v1/ping'), headers: build_token_auth_header(jwt.encoded)
 
       expect(response).to have_gitlab_http_status(:unauthorized)
     end
