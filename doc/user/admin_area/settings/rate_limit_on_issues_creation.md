@@ -14,7 +14,7 @@ For example, requests using the
 [Projects::IssuesController#create](https://gitlab.com/gitlab-org/gitlab/raw/master/app/controllers/projects/issues_controller.rb)
 action exceeding a rate of 300 per minute are blocked. Access to the endpoint is allowed after one minute.
 
-![Rate limits on issues creation](img/rate_limit_on_issues_creation.png)
+![Rate limits on issues creation](img/rate_limit_on_issues_creation_v13_1.png)
 
 This limit is:
 
