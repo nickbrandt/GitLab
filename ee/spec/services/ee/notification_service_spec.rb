@@ -307,6 +307,125 @@ describe EE::NotificationService, :mailer do
     end
   end
 
+  describe 'mirror was disabled' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:project) { create(:project) }
+    let(:deleted_username) { 'deleted_user_name' }
+
+    context 'when the project has invited members' do
+      let!(:project_member) { create(:project_member, :invited, project: project) }
+
+      it 'sends email' do
+        expect(Notify).to receive(:mirror_was_disabled_email).with(project.id, project.owner.id, deleted_username).and_call_original
+
+        subject.mirror_was_disabled(project, deleted_username)
+      end
+
+      it_behaves_like 'project emails are disabled' do
+        let(:notification_target)  { project }
+        let(:notification_trigger) { subject.mirror_was_disabled(project, deleted_username) }
+
+        around do |example|
+          perform_enqueued_jobs { example.run }
+        end
+      end
+    end
+
+    context 'when user is owner' do
+      it 'sends email' do
+        expect(Notify).to receive(:mirror_was_disabled_email).with(project.id, project.owner.id, deleted_username).and_call_original
+
+        subject.mirror_was_disabled(project, deleted_username)
+      end
+
+      it_behaves_like 'project emails are disabled' do
+        let(:notification_target)  { project }
+        let(:notification_trigger) { subject.mirror_was_disabled(project, deleted_username) }
+
+        around do |example|
+          perform_enqueued_jobs { example.run }
+        end
+      end
+
+      context 'when owner is blocked' do
+        it 'does not send email' do
+          project.owner.block!
+
+          expect(Notify).not_to receive(:mirror_was_disabled_email)
+
+          subject.mirror_was_disabled(project, deleted_username)
+        end
+
+        context 'when project belongs to group' do
+          it 'does not send email to the blocked owner' do
+            blocked_user = create(:user, :blocked)
+
+            group = create(:group, :public)
+            group.add_owner(blocked_user)
+            group.add_owner(user)
+
+            project = create(:project, namespace: group)
+
+            expect(Notify).not_to receive(:mirror_was_disabled_email).with(project.id, blocked_user.id, deleted_username).and_call_original
+            expect(Notify).to receive(:mirror_was_disabled_email).with(project.id, user.id, deleted_username).and_call_original
+
+            subject.mirror_was_disabled(project, deleted_username)
+          end
+        end
+      end
+    end
+
+    context 'when user is maintainer' do
+      it 'sends email' do
+        project.add_maintainer(user)
+
+        expect(Notify).to receive(:mirror_was_disabled_email).with(project.id, project.owner.id, deleted_username).and_call_original
+        expect(Notify).to receive(:mirror_was_disabled_email).with(project.id, user.id, deleted_username).and_call_original
+
+        subject.mirror_was_disabled(project, deleted_username)
+      end
+    end
+
+    context 'when user is not owner nor maintainer' do
+      it 'does not send email' do
+        project.add_developer(user)
+
+        expect(Notify).not_to receive(:mirror_was_disabled_email).with(project.id, user.id, deleted_username).and_call_original
+        expect(Notify).to receive(:mirror_was_disabled_email).with(project.id, project.creator.id, deleted_username).and_call_original
+
+        subject.mirror_was_disabled(project, deleted_username)
+      end
+
+      context 'when user is group owner' do
+        it 'sends email' do
+          group = create(:group, :public) do |group|
+            group.add_owner(user)
+          end
+
+          project = create(:project, namespace: group)
+
+          expect(Notify).to receive(:mirror_was_disabled_email).with(project.id, user.id, deleted_username).and_call_original
+
+          subject.mirror_was_disabled(project, deleted_username)
+        end
+      end
+
+      context 'when user is group maintainer' do
+        it 'sends email' do
+          group = create(:group, :public) do |group|
+            group.add_maintainer(user)
+          end
+
+          project = create(:project, namespace: group)
+
+          expect(Notify).to receive(:mirror_was_disabled_email).with(project.id, user.id, deleted_username).and_call_original
+
+          subject.mirror_was_disabled(project, deleted_username)
+        end
+      end
+    end
+  end
+
   context 'mirror user changed' do
     let(:mirror_user) { create(:user) }
     let(:project) { create(:project, :mirror, mirror_user_id: mirror_user.id) }
