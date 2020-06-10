@@ -1,5 +1,5 @@
 ---
-title: Use Keys::CreateService to create ssh keys for a user
+title: Record audit event when creating a new SSH Key via the API
 merge_request: 33859
 author: Rajendra Kadam
 type: fixed
