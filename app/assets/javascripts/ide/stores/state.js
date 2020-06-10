@@ -12,7 +12,7 @@ export default () => ({
   loading: false,
   openFiles: [],
   trees: {},
-  projects: {},
+  project: null,
   panelResizing: false,
   entries: {},
   viewer: viewerTypes.edit,

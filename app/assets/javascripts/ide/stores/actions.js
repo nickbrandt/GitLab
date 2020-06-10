@@ -66,7 +66,6 @@ export const createTempEntry = (
 
   commit(types.CREATE_TMP_ENTRY, {
     data,
-    projectId: state.currentProjectId,
     branchId: state.currentBranchId,
   });
 
@@ -261,20 +260,20 @@ export const renameEntry = ({ dispatch, commit, state, getters }, { path, name, 
   dispatch('triggerFilesChange');
 };
 
-export const getBranchData = ({ commit, state }, { projectId, branchId, force = false } = {}) =>
+export const getBranchData = ({ commit, state }, { branchId, force = false } = {}) =>
   new Promise((resolve, reject) => {
-    const currentProject = state.projects[projectId];
+    const projectId = state.currentProjectId;
+    const currentProject = state.project;
     if (!currentProject || !currentProject.branches[branchId] || force) {
       service
         .getBranchData(projectId, branchId)
         .then(({ data }) => {
           const { id } = data.commit;
           commit(types.SET_BRANCH, {
-            projectPath: projectId,
             branchName: branchId,
             branch: data,
           });
-          commit(types.SET_BRANCH_WORKING_REFERENCE, { projectId, branchId, reference: id });
+          commit(types.SET_BRANCH_WORKING_REFERENCE, { branchId, reference: id });
           resolve(data);
         })
         .catch(e => {

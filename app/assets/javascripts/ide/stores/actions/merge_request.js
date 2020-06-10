@@ -2,20 +2,19 @@ import flash from '~/flash';
 import { __ } from '~/locale';
 import service from '../../services';
 import * as types from '../mutation_types';
-import { leftSidebarViews, PERMISSION_READ_MR } from '../../constants';
+import { leftSidebarViews } from '../../constants';
 
-export const getMergeRequestsForBranch = (
-  { commit, state, getters },
-  { projectId, branchId } = {},
-) => {
-  if (!getters.findProjectPermissions(projectId)[PERMISSION_READ_MR]) {
+export const getMergeRequestsForBranch = ({ commit, state, getters }, { branchId } = {}) => {
+  const projectId = state.currentProjectId;
+
+  if (!getters.canReadMergeRequests) {
     return Promise.resolve();
   }
 
   return service
     .getProjectMergeRequests(`${projectId}`, {
       source_branch: branchId,
-      source_project_id: state.projects[projectId].id,
+      source_project_id: state.project.id,
       order_by: 'created_at',
       per_page: 1,
     })
@@ -24,7 +23,6 @@ export const getMergeRequestsForBranch = (
         const currentMR = data[0];
 
         commit(types.SET_MERGE_REQUEST, {
-          projectPath: projectId,
           mergeRequestId: currentMR.iid,
           mergeRequest: currentMR,
         });
@@ -47,15 +45,16 @@ export const getMergeRequestsForBranch = (
 
 export const getMergeRequestData = (
   { commit, dispatch, state },
-  { projectId, mergeRequestId, targetProjectId = null, force = false } = {},
+  { mergeRequestId, targetProjectId = null, force = false } = {},
 ) =>
   new Promise((resolve, reject) => {
-    if (!state.projects[projectId].mergeRequests[mergeRequestId] || force) {
+    const projectId = state.currentProjectId;
+
+    if (!state.project.mergeRequests[mergeRequestId] || force) {
       service
         .getProjectMergeRequestData(targetProjectId || projectId, mergeRequestId)
         .then(({ data }) => {
           commit(types.SET_MERGE_REQUEST, {
-            projectPath: projectId,
             mergeRequestId,
             mergeRequest: data,
           });
@@ -70,26 +69,27 @@ export const getMergeRequestData = (
                 dispatch('setErrorMessage', null),
               ),
             actionText: __('Please try again'),
-            actionPayload: { projectId, mergeRequestId, force },
+            actionPayload: { mergeRequestId, force },
           });
           reject(new Error(`Merge Request not loaded ${projectId}`));
         });
     } else {
-      resolve(state.projects[projectId].mergeRequests[mergeRequestId]);
+      resolve(state.project.mergeRequests[mergeRequestId]);
     }
   });
 
 export const getMergeRequestChanges = (
   { commit, dispatch, state },
-  { projectId, mergeRequestId, targetProjectId = null, force = false } = {},
+  { mergeRequestId, targetProjectId = null, force = false } = {},
 ) =>
   new Promise((resolve, reject) => {
-    if (!state.projects[projectId].mergeRequests[mergeRequestId].changes.length || force) {
+    const projectId = state.currentProjectId;
+
+    if (!state.project.mergeRequests[mergeRequestId].changes.length || force) {
       service
         .getProjectMergeRequestChanges(targetProjectId || projectId, mergeRequestId)
         .then(({ data }) => {
           commit(types.SET_MERGE_REQUEST_CHANGES, {
-            projectPath: projectId,
             mergeRequestId,
             changes: data,
           });
@@ -103,27 +103,28 @@ export const getMergeRequestChanges = (
                 dispatch('setErrorMessage', null),
               ),
             actionText: __('Please try again'),
-            actionPayload: { projectId, mergeRequestId, force },
+            actionPayload: { mergeRequestId, force },
           });
           reject(new Error(`Merge Request Changes not loaded ${projectId}`));
         });
     } else {
-      resolve(state.projects[projectId].mergeRequests[mergeRequestId].changes);
+      resolve(state.project.mergeRequests[mergeRequestId].changes);
     }
   });
 
 export const getMergeRequestVersions = (
   { commit, dispatch, state },
-  { projectId, mergeRequestId, targetProjectId = null, force = false } = {},
+  { mergeRequestId, targetProjectId = null, force = false } = {},
 ) =>
   new Promise((resolve, reject) => {
-    if (!state.projects[projectId].mergeRequests[mergeRequestId].versions.length || force) {
+    const projectId = state.currentProjectId;
+
+    if (!state.project.mergeRequests[mergeRequestId].versions.length || force) {
       service
         .getProjectMergeRequestVersions(targetProjectId || projectId, mergeRequestId)
         .then(res => res.data)
         .then(data => {
           commit(types.SET_MERGE_REQUEST_VERSIONS, {
-            projectPath: projectId,
             mergeRequestId,
             versions: data,
           });
@@ -137,21 +138,20 @@ export const getMergeRequestVersions = (
                 dispatch('setErrorMessage', null),
               ),
             actionText: __('Please try again'),
-            actionPayload: { projectId, mergeRequestId, force },
+            actionPayload: { mergeRequestId, force },
           });
           reject(new Error(`Merge Request Versions not loaded ${projectId}`));
         });
     } else {
-      resolve(state.projects[projectId].mergeRequests[mergeRequestId].versions);
+      resolve(state.project.mergeRequests[mergeRequestId].versions);
     }
   });
 
 export const openMergeRequest = (
   { dispatch, state, getters },
-  { projectId, targetProjectId, mergeRequestId } = {},
+  { targetProjectId, mergeRequestId } = {},
 ) =>
   dispatch('getMergeRequestData', {
-    projectId,
     targetProjectId,
     mergeRequestId,
   })
@@ -159,13 +159,11 @@ export const openMergeRequest = (
       dispatch('setCurrentBranchId', mr.source_branch);
 
       return dispatch('getBranchData', {
-        projectId,
         branchId: mr.source_branch,
       }).then(() => {
-        const branch = getters.findBranch(projectId, mr.source_branch);
+        const branch = getters.findBranch(mr.source_branch);
 
         return dispatch('getFiles', {
-          projectId,
           branchId: mr.source_branch,
           ref: branch.commit.id,
         });
@@ -173,14 +171,12 @@ export const openMergeRequest = (
     })
     .then(() =>
       dispatch('getMergeRequestVersions', {
-        projectId,
         targetProjectId,
         mergeRequestId,
       }),
     )
     .then(() =>
       dispatch('getMergeRequestChanges', {
-        projectId,
         targetProjectId,
         mergeRequestId,
       }),

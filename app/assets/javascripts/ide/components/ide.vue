@@ -35,7 +35,7 @@ export default {
       'viewer',
       'fileFindVisible',
       'emptyStateSvgPath',
-      'currentProjectId',
+      'project',
       'errorMessage',
       'loading',
     ]),
@@ -145,7 +145,7 @@ export default {
           </div>
         </template>
       </div>
-      <right-pane v-if="currentProjectId" />
+      <right-pane v-if="project" />
     </div>
     <ide-status-bar />
     <new-modal ref="newModal" />

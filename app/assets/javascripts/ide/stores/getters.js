@@ -13,39 +13,12 @@ export const addedFiles = state => state.changedFiles.filter(f => f.tempFile);
 
 export const modifiedFiles = state => state.changedFiles.filter(f => !f.tempFile);
 
-export const projectsWithTrees = state =>
-  Object.keys(state.projects).map(projectId => {
-    const project = state.projects[projectId];
+export const currentMergeRequest = state =>
+  state.project?.mergeRequests?.[state.currentMergeRequestId];
 
-    return {
-      ...project,
-      branches: Object.keys(project.branches).map(branchId => {
-        const branch = project.branches[branchId];
+export const currentProject = state => state.project;
 
-        return {
-          ...branch,
-          tree: state.trees[branch.treeId],
-        };
-      }),
-    };
-  });
-
-export const currentMergeRequest = state => {
-  if (
-    state.projects[state.currentProjectId] &&
-    state.projects[state.currentProjectId].mergeRequests
-  ) {
-    return state.projects[state.currentProjectId].mergeRequests[state.currentMergeRequestId];
-  }
-  return null;
-};
-
-export const findProject = state => projectId => state.projects[projectId];
-
-export const currentProject = (state, getters) => getters.findProject(state.currentProjectId);
-
-export const emptyRepo = state =>
-  state.projects[state.currentProjectId] && state.projects[state.currentProjectId].empty_repo;
+export const emptyRepo = state => state.project?.empty_repo;
 
 export const currentTree = state =>
   state.trees[`${state.currentProjectId}/${state.currentBranchId}`];
@@ -102,14 +75,9 @@ export const lastCommit = (state, getters) => {
   return branch ? branch.commit : null;
 };
 
-export const findBranch = (state, getters) => (projectId, branchId) => {
-  const project = getters.findProject(projectId);
+export const findBranch = state => branchId => state.project?.branches[branchId];
 
-  return project && project.branches[branchId];
-};
-
-export const currentBranch = (state, getters) =>
-  getters.findBranch(state.currentProjectId, state.currentBranchId);
+export const currentBranch = (state, getters) => getters.findBranch(state.currentBranchId);
 
 export const branchName = (_state, getters) => getters.currentBranch && getters.currentBranch.name;
 
@@ -147,17 +115,16 @@ export const getDiffInfo = (state, getters) => path => {
   };
 };
 
-export const findProjectPermissions = (state, getters) => projectId =>
-  getters.findProject(projectId)?.userPermissions || {};
+export const projectPermissions = state => state.project?.userPermissions || {};
 
 export const canReadMergeRequests = (state, getters) =>
-  Boolean(getters.findProjectPermissions(state.currentProjectId)[PERMISSION_READ_MR]);
+  Boolean(getters.projectPermissions[PERMISSION_READ_MR]);
 
 export const canCreateMergeRequests = (state, getters) =>
-  Boolean(getters.findProjectPermissions(state.currentProjectId)[PERMISSION_CREATE_MR]);
+  Boolean(getters.projectPermissions[PERMISSION_CREATE_MR]);
 
 export const canPushCode = (state, getters) =>
-  Boolean(getters.findProjectPermissions(state.currentProjectId)[PERMISSION_PUSH_CODE]);
+  Boolean(getters.projectPermissions[PERMISSION_PUSH_CODE]);
 
 export const entryExists = state => path =>
   Boolean(state.entries[path] && !state.entries[path].deleted);

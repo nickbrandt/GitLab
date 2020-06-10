@@ -6,21 +6,19 @@ export default {
       currentProjectId,
     });
   },
-  [types.SET_PROJECT](state, { projectPath, project }) {
-    // Add client side properties
+  [types.SET_PROJECT](state, project) {
     Object.assign(project, {
-      tree: [],
       branches: {},
       mergeRequests: {},
       active: true,
     });
 
     Object.assign(state, {
-      projects: { ...state.projects, [projectPath]: project },
+      project,
     });
   },
-  [types.TOGGLE_EMPTY_STATE](state, { projectPath, value }) {
-    Object.assign(state.projects[projectPath], {
+  [types.TOGGLE_EMPTY_STATE](state, { value }) {
+    Object.assign(state.project, {
       empty_repo: value,
     });
   },

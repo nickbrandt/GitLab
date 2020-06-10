@@ -33,7 +33,8 @@ export const handleTreeEntryAction = ({ commit, dispatch }, row) => {
   dispatch('showTreeEntry', row.path);
 };
 
-export const setDirectoryData = ({ state, commit }, { projectId, branchId, treeList }) => {
+export const setDirectoryData = ({ state, commit }, { branchId, treeList }) => {
+  const projectId = state.currentProjectId;
   const selectedTree = state.trees[`${projectId}/${branchId}`];
 
   commit(types.SET_DIRECTORY_DATA, {
@@ -48,14 +49,15 @@ export const setDirectoryData = ({ state, commit }, { projectId, branchId, treeL
 
 export const getFiles = ({ state, commit, dispatch }, payload = {}) =>
   new Promise((resolve, reject) => {
-    const { projectId, branchId, ref = branchId } = payload;
+    const projectId = state.currentProjectId;
+    const { branchId, ref = branchId } = payload;
 
     if (
       !state.trees[`${projectId}/${branchId}`] ||
       (state.trees[`${projectId}/${branchId}`].tree &&
         state.trees[`${projectId}/${branchId}`].tree.length === 0)
     ) {
-      const selectedProject = state.projects[projectId];
+      const selectedProject = state.project;
 
       commit(types.CREATE_TREE, { treePath: `${projectId}/${branchId}` });
       service
@@ -71,7 +73,7 @@ export const getFiles = ({ state, commit, dispatch }, payload = {}) =>
 
           // Defer setting the directory data because this triggers some intense rendering.
           // The entries is all we need to load the file editor.
-          defer(() => dispatch('setDirectoryData', { projectId, branchId, treeList }));
+          defer(() => dispatch('setDirectoryData', { branchId, treeList }));
 
           resolve();
         })
@@ -81,7 +83,7 @@ export const getFiles = ({ state, commit, dispatch }, payload = {}) =>
             action: actionPayload =>
               dispatch('getFiles', actionPayload).then(() => dispatch('setErrorMessage', null)),
             actionText: __('Please try again'),
-            actionPayload: { projectId, branchId },
+            actionPayload: { branchId },
           });
           reject(e);
         });

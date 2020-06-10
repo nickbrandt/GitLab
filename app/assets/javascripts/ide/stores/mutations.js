@@ -58,7 +58,9 @@ export default {
       entries,
     });
   },
-  [types.CREATE_TMP_ENTRY](state, { data, projectId, branchId }) {
+  [types.CREATE_TMP_ENTRY](state, { data, branchId }) {
+    const projectId = state.currentProjectId;
+
     Object.keys(data.entries).reduce((acc, key) => {
       const entry = data.entries[key];
       const foundEntry = state.entries[key];
@@ -164,9 +166,6 @@ export default {
   },
   [types.SET_LINKS](state, links) {
     Object.assign(state, { links });
-  },
-  [types.CLEAR_PROJECTS](state) {
-    Object.assign(state, { projects: {}, trees: {} });
   },
   [types.RESET_OPEN_FILES](state) {
     Object.assign(state, { openFiles: [] });

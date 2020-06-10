@@ -6,8 +6,10 @@ export default {
       currentBranchId,
     });
   },
-  [types.SET_BRANCH](state, { projectPath, branchName, branch }) {
-    Object.assign(state.projects[projectPath], {
+  [types.SET_BRANCH](state, { branchName, branch }) {
+    const projectPath = state.currentProjectId;
+
+    Object.assign(state.project, {
       branches: {
         [branchName]: {
           ...branch,
@@ -18,19 +20,19 @@ export default {
       },
     });
   },
-  [types.SET_BRANCH_WORKING_REFERENCE](state, { projectId, branchId, reference }) {
-    if (!state.projects[projectId].branches[branchId]) {
-      Object.assign(state.projects[projectId].branches, {
+  [types.SET_BRANCH_WORKING_REFERENCE](state, { branchId, reference }) {
+    if (!state.project.branches[branchId]) {
+      Object.assign(state.project.branches, {
         [branchId]: {},
       });
     }
 
-    Object.assign(state.projects[projectId].branches[branchId], {
+    Object.assign(state.project.branches[branchId], {
       workingReference: reference,
     });
   },
-  [types.SET_BRANCH_COMMIT](state, { projectId, branchId, commit }) {
-    Object.assign(state.projects[projectId].branches[branchId], {
+  [types.SET_BRANCH_COMMIT](state, { branchId, commit }) {
+    Object.assign(state.project.branches[branchId], {
       commit,
     });
   },

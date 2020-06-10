@@ -28,7 +28,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['currentBranchId', 'currentProjectId']),
+    ...mapState(['currentBranchId']),
     ...mapGetters(['currentProject', 'lastCommit', 'currentMergeRequest']),
     ...mapState('pipelines', ['latestPipeline']),
   },

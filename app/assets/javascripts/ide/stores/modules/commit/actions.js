@@ -67,7 +67,6 @@ export const updateFilesAfterCommit = ({ commit, dispatch, rootState, rootGetter
   commit(
     rootTypes.SET_BRANCH_WORKING_REFERENCE,
     {
-      projectId: rootState.currentProjectId,
       branchId: rootState.currentBranchId,
       reference: data.id,
     },
@@ -140,7 +139,6 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
         commit(
           rootTypes.TOGGLE_EMPTY_STATE,
           {
-            projectPath: rootState.currentProjectId,
             value: false,
           },
           { root: true },
@@ -208,7 +206,6 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
           dispatch(
             'refreshLastCommitData',
             {
-              projectId: rootState.currentProjectId,
               branchId: rootState.currentBranchId,
             },
             { root: true },

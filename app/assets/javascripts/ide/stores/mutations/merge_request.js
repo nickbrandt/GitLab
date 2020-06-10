@@ -6,10 +6,10 @@ export default {
       currentMergeRequestId,
     });
   },
-  [types.SET_MERGE_REQUEST](state, { projectPath, mergeRequestId, mergeRequest }) {
-    const existingMergeRequest = state.projects[projectPath].mergeRequests[mergeRequestId] || {};
+  [types.SET_MERGE_REQUEST](state, { mergeRequestId, mergeRequest }) {
+    const existingMergeRequest = state.project.mergeRequests[mergeRequestId] || {};
 
-    Object.assign(state.projects[projectPath], {
+    Object.assign(state.project, {
       mergeRequests: {
         [mergeRequestId]: {
           ...mergeRequest,
@@ -22,13 +22,13 @@ export default {
       },
     });
   },
-  [types.SET_MERGE_REQUEST_CHANGES](state, { projectPath, mergeRequestId, changes }) {
-    Object.assign(state.projects[projectPath].mergeRequests[mergeRequestId], {
+  [types.SET_MERGE_REQUEST_CHANGES](state, { mergeRequestId, changes }) {
+    Object.assign(state.project.mergeRequests[mergeRequestId], {
       changes,
     });
   },
-  [types.SET_MERGE_REQUEST_VERSIONS](state, { projectPath, mergeRequestId, versions }) {
-    Object.assign(state.projects[projectPath].mergeRequests[mergeRequestId], {
+  [types.SET_MERGE_REQUEST_VERSIONS](state, { mergeRequestId, versions }) {
+    Object.assign(state.project.mergeRequests[mergeRequestId], {
       versions,
       baseCommitSha: versions.length ? versions[0].base_commit_sha : null,
     });

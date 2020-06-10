@@ -5,41 +5,42 @@ import service from '../../services';
 import api from '../../../api';
 import * as types from '../mutation_types';
 
-export const getProjectData = ({ commit, state }, { namespace, projectId, force = false } = {}) =>
-  new Promise((resolve, reject) => {
-    if (!state.projects[`${namespace}/${projectId}`] || force) {
-      commit(types.TOGGLE_LOADING, { entry: state });
-      service
-        .getProjectData(namespace, projectId)
-        .then(res => res.data)
-        .then(data => {
-          commit(types.TOGGLE_LOADING, { entry: state });
-          commit(types.SET_PROJECT, { projectPath: `${namespace}/${projectId}`, project: data });
-          commit(types.SET_CURRENT_PROJECT, `${namespace}/${projectId}`);
-          resolve(data);
-        })
-        .catch(() => {
-          flash(
-            __('Error loading project data. Please try again.'),
-            'alert',
-            document,
-            null,
-            false,
-            true,
-          );
-          reject(new Error(`Project not loaded ${namespace}/${projectId}`));
-        });
-    } else {
-      resolve(state.projects[`${namespace}/${projectId}`]);
-    }
-  });
+export const getProjectData = ({ commit, state }, { namespace, projectId } = {}) => {
+  if (state.project && state.currentProjectId === `${namespace}/${projectId}`) {
+    return Promise.resolve();
+  }
 
-export const refreshLastCommitData = ({ commit }, { projectId, branchId } = {}) =>
+  commit(types.TOGGLE_LOADING, { entry: state });
+
+  return service
+    .getProjectData(namespace, projectId)
+    .then(res => res.data)
+    .then(data => {
+      commit(types.TOGGLE_LOADING, { entry: state });
+      commit(types.SET_PROJECT, data);
+      commit(types.SET_CURRENT_PROJECT, `${namespace}/${projectId}`);
+    })
+    .catch(() => {
+      flash(
+        __('Error loading project data. Please try again.'),
+        'alert',
+        document,
+        null,
+        false,
+        true,
+      );
+      throw new Error(`Project not loaded ${namespace}/${projectId}`);
+    });
+};
+
+export const refreshLastCommitData = ({ state, commit }) => {
+  const projectId = state.currentProjectId;
+  const branchId = state.currentBranchId;
+
   service
     .getBranchData(projectId, branchId)
     .then(({ data }) => {
       commit(types.SET_BRANCH_COMMIT, {
-        projectId,
         branchId,
         commit: data.commit,
       });
@@ -47,6 +48,7 @@ export const refreshLastCommitData = ({ commit }, { projectId, branchId } = {}) 
     .catch(() => {
       flash(__('Error loading last commit.'), 'alert', document, null, false, true);
     });
+};
 
 export const createNewBranchFromDefault = ({ state, dispatch, getters }, branch) =>
   api
@@ -82,7 +84,8 @@ export const showBranchNotFoundError = ({ dispatch }, branchId) => {
   });
 };
 
-export const loadEmptyBranch = ({ commit, state }, { projectId, branchId }) => {
+export const loadEmptyBranch = ({ commit, state }, { branchId }) => {
+  const projectId = state.currentProjectId;
   const treePath = `${projectId}/${branchId}`;
   const currentTree = state.trees[`${projectId}/${branchId}`];
 
@@ -117,29 +120,26 @@ export const loadFile = ({ dispatch, state }, { basePath }) => {
   }
 };
 
-export const loadBranch = ({ dispatch, getters, state }, { projectId, branchId }) => {
-  const currentProject = state.projects[projectId];
+export const loadBranch = ({ dispatch, getters, state }, { branchId }) => {
+  const currentProject = state.project;
 
   if (currentProject?.branches?.[branchId]) {
     return Promise.resolve();
   } else if (getters.emptyRepo) {
-    return dispatch('loadEmptyBranch', { projectId, branchId });
+    return dispatch('loadEmptyBranch', { branchId });
   }
 
   return dispatch('getBranchData', {
-    projectId,
     branchId,
   })
     .then(() => {
       dispatch('getMergeRequestsForBranch', {
-        projectId,
         branchId,
       });
 
-      const branch = getters.findBranch(projectId, branchId);
+      const branch = getters.findBranch(branchId);
 
       return dispatch('getFiles', {
-        projectId,
         branchId,
         ref: branch.commit.id,
       });
@@ -150,10 +150,10 @@ export const loadBranch = ({ dispatch, getters, state }, { projectId, branchId }
     });
 };
 
-export const openBranch = ({ dispatch }, { projectId, branchId, basePath }) => {
+export const openBranch = ({ state, dispatch }, { branchId, basePath }) => {
   dispatch('setCurrentBranchId', branchId);
 
-  return dispatch('loadBranch', { projectId, branchId })
+  return dispatch('loadBranch', { branchId })
     .then(() => dispatch('loadFile', { basePath }))
     .catch(
       () =>
@@ -161,7 +161,7 @@ export const openBranch = ({ dispatch }, { projectId, branchId, basePath }) => {
           sprintf(
             __('An error occurred while getting files for - %{branchId}'),
             {
-              branchId: `<strong>${escape(projectId)}/${escape(branchId)}</strong>`,
+              branchId: `<strong>${escape(state.currentProjectId)}/${escape(branchId)}</strong>`,
             },
             false,
           ),
