@@ -6259,13 +6259,7 @@ type JiraService implements Service {
   active: Boolean
 
   """
-  List of all Jira projects fetched through Jira REST API. Latest Jira Server API version
-  ([8.9.0](https://docs.atlassian.com/software/jira/docs/api/REST/8.9.0/)) compatible.
-  """
-  allProjects: [JiraProject!]
-
-  """
-  List of Jira projects fetched through Jira REST API
+  List of all Jira projects fetched through Jira REST API
   """
   projects(
     """
