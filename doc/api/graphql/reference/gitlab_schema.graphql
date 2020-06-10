@@ -11248,6 +11248,11 @@ type Snippet implements Noteable {
   blob: SnippetBlob!
 
   """
+  Snippet blobs
+  """
+  blobs: [SnippetBlob!]!
+
+  """
   Timestamp this snippet was created
   """
   createdAt: Time!
