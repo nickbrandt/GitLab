@@ -2,10 +2,10 @@
 
 require 'spec_helper'
 
-RSpec.describe Ci::CompareSastReportsService do
+describe Ci::CompareSastReportsService do
+  let_it_be(:project) { create(:project, :repository) }
   let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
-  let(:project) { build(:project, :repository) }
 
   before do
     stub_licensed_features(container_scanning: true)
