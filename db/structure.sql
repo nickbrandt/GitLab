@@ -9450,7 +9450,7 @@ CREATE INDEX index_ci_pipelines_on_project_idandrefandiddesc ON public.ci_pipeli
 
 CREATE INDEX index_ci_pipelines_on_status ON public.ci_pipelines USING btree (status);
 
-CREATE INDEX index_ci_pipelines_on_user_id_and_created_at ON public.ci_pipelines USING btree (user_id, created_at);
+CREATE INDEX index_ci_pipelines_on_user_id_and_created_at_and_source ON public.ci_pipelines USING btree (user_id, created_at, source);
 
 CREATE INDEX index_ci_refs_on_last_updated_by_pipeline_id ON public.ci_refs USING btree (last_updated_by_pipeline_id);
 
@@ -13835,5 +13835,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200601210148
 20200603073101
 20200604143628
+20200608075553
 \.
 
