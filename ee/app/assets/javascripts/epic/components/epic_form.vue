@@ -1,8 +1,9 @@
 <script>
 import { GlButton, GlDatepicker, GlForm, GlFormCheckbox, GlFormInput } from '@gitlab/ui';
+import { visitUrl, joinPaths } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
-import { visitUrl } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
+import LabelsSelectVue from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
 import createEpic from '../queries/createEpic.mutation.graphql';
 
@@ -14,6 +15,7 @@ export default {
     GlFormCheckbox,
     GlFormInput,
     MarkdownField,
+    LabelsSelectVue,
   },
   props: {
     groupPath: {
@@ -32,7 +34,7 @@ export default {
   },
   data() {
     return {
-      labelIds: [],
+      labels: [],
       confidential: false,
       description: '',
       title: '',
@@ -41,7 +43,15 @@ export default {
       loading: false,
     };
   },
+  computed: {
+    labelIds() {
+      return this.labels.map(label => label.id);
+    },
+  },
   methods: {
+    groupUrl(path) {
+      return joinPaths('/groups', this.groupPath, '/-/', path);
+    },
     save() {
       this.loading = true;
 
@@ -50,7 +60,7 @@ export default {
           mutation: createEpic,
           variables: {
             input: {
-              addLabelIds: this.labels,
+              addLabelIds: this.labelIds,
               groupPath: this.groupPath,
               title: this.title,
               description: this.description,
@@ -83,6 +93,17 @@ export default {
     },
     updateStartDate(val) {
       this.startDateFixed = val;
+    },
+    handleUpdateSelectedLabels(labels) {
+      const ids = [];
+      const allLabels = [...labels, ...this.labels];
+
+      this.labels = allLabels.filter(label => {
+        const exists = ids.includes(label.id);
+        ids.push(label.id);
+
+        return !exists && label.set;
+      });
     },
   },
 };
@@ -155,7 +176,26 @@ export default {
             <div class="col-form-label col-md-2 col-lg-4">
               <label for="epic-title">{{ __('Labels') }}</label>
             </div>
-            <div class="col-md-8 col-sm-10"></div>
+            <div class="col-md-8 col-sm-10">
+              <div class="issuable-form-select-holder">
+                <labels-select-vue
+                  :allow-label-edit="false"
+                  :allow-label-create="true"
+                  :allow-multiselect="true"
+                  :allow-scoped-labels="false"
+                  :selected-labels="labels"
+                  :labels-fetch-path="
+                    groupUrl('labels.json?include_ancestor_groups=true&only_group_labels=true')
+                  "
+                  :labels-manage-path="groupUrl('labels')"
+                  :labels-filter-base-path="groupUrl('epics')"
+                  variant="standalone"
+                  class="block labels js-labels-block"
+                  @updateSelectedLabels="handleUpdateSelectedLabels"
+                  >{{ __('None') }}</labels-select-vue
+                >
+              </div>
+            </div>
           </div>
         </div>
         <div class="col-md-6">

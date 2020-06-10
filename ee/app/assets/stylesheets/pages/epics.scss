@@ -81,3 +81,38 @@
 .tooltip .tooltip-inner .milestone-date-range {
   color: $gl-text-color-tertiary;
 }
+.labels-select-wrapper.is-standalone {
+  @include gl-bg-white;
+  @include gl-font-regular;
+  @include gl-font-base;
+  @include gl-line-height-normal;
+  @include gl-py-3;
+  @include gl-px-4;
+  @include gl-h-auto;
+  @include gl-text-left;
+  @include gl-border-none;
+  @include gl-inset-border-1-gray-400;
+  @include gl-rounded-base;
+  @include gl-white-space-nowrap;
+
+  .labels-select-dropdown-button {
+    @include gl-bg-none;
+    @include gl-border-none;
+    @include gl-shadow-none;
+    @include gl-p-0;
+
+    .gl-button-text {
+      @include gl-text-gray-700;
+      @include gl-display-flex;
+      @include gl-justify-content-space-between;
+      @include gl-w-full;
+    }
+  }
+
+  .labels-select-dropdown-contents {
+    @include gl-left-0;
+    @include gl-shadow-x0-y2-b4-s0;
+
+    top: 100%;
+  }
+}
