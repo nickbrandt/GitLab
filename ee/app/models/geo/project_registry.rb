@@ -5,6 +5,9 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   include ::EachBatch
   include ::ShaAttribute
 
+  MODEL_CLASS = ::Project
+  MODEL_FOREIGN_KEY = :project_id
+
   REGISTRY_TYPES = %i{repository wiki}.freeze
   RETRIES_BEFORE_REDOWNLOAD = 5
 
@@ -37,6 +40,16 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
 
   def self.pluck_project_key
     where(nil).pluck(:project_id)
+  end
+
+  def self.find_registry_differences(range)
+    source_ids = Gitlab::Geo.current_node.projects.id_in(range).pluck_primary_key
+    tracked_ids = self.pluck_model_ids_in_range(range)
+
+    untracked_ids = source_ids - tracked_ids
+    unused_tracked_ids = tracked_ids - source_ids
+
+    [untracked_ids, unused_tracked_ids]
   end
 
   def self.failed
