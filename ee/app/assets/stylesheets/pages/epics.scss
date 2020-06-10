@@ -81,6 +81,16 @@
 .tooltip .tooltip-inner .milestone-date-range {
   color: $gl-text-color-tertiary;
 }
+
+.md-area.gfm-form {
+  @include gl-rounded-base;
+  @include gl-border-gray-400;
+
+  &.is-focused {
+    border-color: $gray-900;
+  }
+}
+
 .labels-select-wrapper.is-standalone {
   @include gl-bg-white;
   @include gl-font-regular;

@@ -26,7 +26,12 @@ export default {
       type: String,
       required: true,
     },
-    previewMarkdownPath: {
+    markdownPreviewPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    markdownDocsPath: {
       type: String,
       required: false,
       default: '',
@@ -118,7 +123,7 @@ export default {
         <div class="col-form-label col-sm-2">
           <label for="epic-title">{{ __('Title') }}</label>
         </div>
-        <div class="col-sm-8">
+        <div class="col-sm-10">
           <gl-form-input
             id="epic-title"
             v-model="title"
@@ -135,13 +140,14 @@ export default {
         </div>
         <div class="col-sm-10">
           <markdown-field
-            :markdown-preview-path="previewMarkdownPath"
+            :markdown-preview-path="markdownPreviewPath"
+            :markdown-docs-path="markdownDocsPath"
+            :can-suggest="false"
+            :can-attach-file="true"
             :enable-autocomplete="true"
-            label="Description"
-            :textarea-value="description"
-            markdown-docs-path="/help/user/markdown"
-            quick-actions-docs-path="/help/user/project/quick_actions"
             :add-spacing-classes="false"
+            :textarea-value="description"
+            :label="__('Description')"
             class="md-area"
           >
             <template #textarea>
@@ -160,7 +166,7 @@ export default {
         </div>
       </div>
 
-      <div class="form-group row">
+      <div class="form-group row gl-mt-7">
         <div class="col-sm-10 offset-sm-2">
           <gl-form-checkbox v-model="confidential">{{
             __(
@@ -171,7 +177,7 @@ export default {
       </div>
       <hr />
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-lg-6">
           <div class="form-group row">
             <div class="col-form-label col-md-2 col-lg-4">
               <label for="epic-title">{{ __('Labels') }}</label>
@@ -198,7 +204,7 @@ export default {
             </div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-lg-6">
           <div class="form-group row">
             <div class="col-form-label col-md-2 col-lg-4">
               <label for="epic-start-date">{{ __('Start date') }}</label>
@@ -243,8 +249,14 @@ export default {
       </div>
     </gl-form>
 
-    <div class="form-actions gl-display-flex">
-      <gl-button :loading="loading" data-testid="save-epic" variant="success" @click="save">
+    <div class="footer-block row-content-block gl-display-flex">
+      <gl-button
+        :loading="loading"
+        data-testid="save-epic"
+        variant="success"
+        :disabled="!title"
+        @click="save"
+      >
         {{ __('Create epic') }}
       </gl-button>
       <gl-button class="ml-auto" data-testid="cancel-epic" :href="groupEpicsPath">{{
