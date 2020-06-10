@@ -154,34 +154,38 @@ RSpec.describe 'Group Value Stream Analytics', :js do
       expect(page).to have_selector('.js-daterange-picker', visible: true)
     end
 
-    it 'does not show the path navigation' do
-      expect(page).to have_selector(path_nav_selector, visible: false)
+    it 'shows the path navigation' do
+      expect(page).to have_selector(path_nav_selector)
+    end
+
+    it 'shows the filter bar' do
+      expect(page).to have_selector(filter_bar_selector, visible: false)
+    end
+  end
+
+  context 'with path navigation feature flag disabled' do
+    before do
+      stub_feature_flags(value_stream_analytics_path_navigation: false)
+
+      visit analytics_cycle_analytics_path
+      select_group
+    end
+
+    it 'shows the path navigation' do
+      expect(page).not_to have_selector(path_nav_selector)
+    end
+  end
+
+  context 'with filter bar feature flag disabled' do
+    before do
+      stub_feature_flags(value_stream_analytics_filter_bar: false)
+
+      visit analytics_cycle_analytics_path
+      select_group
     end
 
     it 'does not show the filter bar' do
       expect(page).not_to have_selector(filter_bar_selector)
-    end
-
-    context 'with path navigation feature flag enabled' do
-      before do
-        stub_feature_flags(value_stream_analytics_path_navigation: true)
-        select_group
-      end
-
-      it 'shows the path navigation' do
-        expect(page).to have_selector(path_nav_selector, visible: true)
-      end
-    end
-
-    context 'with filter bar feature flag enabled' do
-      before do
-        stub_feature_flags(value_stream_analytics_filter_bar: true)
-        select_group
-      end
-
-      it 'shows the filter bar' do
-        expect(page).to have_selector(filter_bar_selector, visible: :hidden)
-      end
     end
   end
 
