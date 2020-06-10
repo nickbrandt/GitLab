@@ -275,6 +275,20 @@ const boardsStore = {
       return !matchesRemove;
     });
   },
+  removeListMultipleIssues(list, removeIssues) {
+    const ids = removeIssues.map(issue => issue.id);
+
+    list.issues = list.issues.filter(issue => {
+      const matchesRemove = ids.includes(issue.id);
+
+      if (matchesRemove) {
+        list.issuesSize -= 1;
+        issue.removeLabel(list.label);
+      }
+
+      return !matchesRemove;
+    });
+  },
 
   startMoving(list, issue) {
     Object.assign(this.moving, { list, issue });
