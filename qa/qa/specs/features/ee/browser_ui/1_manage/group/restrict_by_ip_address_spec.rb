@@ -18,6 +18,16 @@ module QA
           group.sandbox = @sandbox_group
         end
 
+        @project = Resource::Project.fabricate_via_api! do |project|
+          project.group = @group
+          project.name =  'project-in-ip-restricted-group'
+          project.initialize_with_readme = true
+        end
+
+        @project.add_member(@user)
+
+        @api_client = Runtime::API::Client.new(:gitlab, user: @user)
+
         enable_plan_on_group(@sandbox_group.path, "Gold") if Runtime::Env.dot_com?
       end
 
@@ -52,10 +62,6 @@ module QA
         end
 
         context 'via the API' do
-          before do
-            @api_client ||= Runtime::API::Client.new(:gitlab, user: @user)
-          end
-
           it 'denies access' do
             request = create_request("/groups/#{@sandbox_group.id}")
             response = get request.url
@@ -70,11 +76,14 @@ module QA
         # Note: If you run this test against GDK make sure you've enabled sshd
         # See: https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/run_qa_against_gdk.md
         context 'via the SSH' do
-          let(:key) { Resource::SSHKey.fabricate_via_api! }
+          let(:key) do
+            Resource::SSHKey.fabricate_via_api! do |ssh_key|
+              ssh_key.api_client = @api_client
+              ssh_key.title = "ssh key for allowed ip restricted access #{Time.now.to_f}"
+            end
+          end
 
           it 'denies access' do
-            Flow::Login.sign_in
-
             expect { push_a_project_with_ssh_key(key) }.to raise_error(QA::Git::Repository::RepositoryCommandError, /fatal: Could not read from remote repository/)
           end
         end
@@ -96,10 +105,6 @@ module QA
         end
 
         context 'via the API' do
-          before do
-            @api_client ||= Runtime::API::Client.new(:gitlab, user: @user)
-          end
-
           it 'allows access' do
             request = create_request("/groups/#{@sandbox_group.id}")
             response = get request.url
@@ -114,11 +119,14 @@ module QA
         # Note: If you run this test against GDK make sure you've enabled sshd
         # See: https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/run_qa_against_gdk.md
         context 'via the SSH' do
-          let(:key) { Resource::SSHKey.fabricate_via_api! }
+          let(:key) do
+            Resource::SSHKey.fabricate_via_api! do |ssh_key|
+              ssh_key.api_client = @api_client
+              ssh_key.title = "ssh key for allowed ip restricted access #{Time.now.to_f}"
+            end
+          end
 
           it 'allows access' do
-            Flow::Login.sign_in
-
             expect { push_a_project_with_ssh_key(key) }.not_to raise_error
           end
         end
@@ -128,11 +136,10 @@ module QA
 
       def push_a_project_with_ssh_key(key)
         Resource::Repository::ProjectPush.fabricate! do |push|
+          push.project = @project
           push.group = @sandbox_group
           push.ssh_key = key
-          push.file_name = 'README.md'
-          push.file_content = '# Test Use SSH Key'
-          push.commit_message = 'Add README.md'
+          push.branch_name = "new_branch_#{SecureRandom.hex(8)}"
         end
       end
 
