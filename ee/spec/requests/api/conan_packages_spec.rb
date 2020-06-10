@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::ConanPackages do
+RSpec.describe API::ConanPackages do
   include WorkhorseHelpers
   include EE::PackagesManagerApiSpecHelpers
 
@@ -419,9 +419,7 @@ describe API::ConanPackages do
 
       let(:params) do
         { "conanfile.py": 24,
-          "conanmanifext.txt": 123,
-          "conan_sources.tgz": 523,
-          "conan_export.tgz": 432 }
+          "conanmanifext.txt": 123 }
       end
 
       subject { post api("/packages/conan/v1/conans/#{recipe_path}/upload_urls"), params: params, headers: headers }
@@ -433,9 +431,7 @@ describe API::ConanPackages do
 
         expected_response = {
           'conanfile.py':      "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanfile.py",
-          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanmanifest.txt",
-          'conan_sources.tgz': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conan_sources.tgz",
-          'conan_export.tgz': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conan_export.tgz"
+          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanmanifest.txt"
         }
 
         expect(response.body).to eq(expected_response.to_json)

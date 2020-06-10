@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Reset namespace pipeline minutes' do
+RSpec.describe 'Reset namespace pipeline minutes' do
   let(:admin) { create(:admin) }
 
   before do

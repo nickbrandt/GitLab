@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::RepositoriesCleanUpWorker, :geo, :geo_fdw do
+RSpec.describe Geo::RepositoriesCleanUpWorker, :geo, :geo_fdw do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 

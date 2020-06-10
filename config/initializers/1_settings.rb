@@ -451,9 +451,9 @@ Settings.cron_jobs['trending_projects_worker']['job_class'] = 'TrendingProjectsW
 Settings.cron_jobs['remove_unreferenced_lfs_objects_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['remove_unreferenced_lfs_objects_worker']['cron'] ||= '20 0 * * *'
 Settings.cron_jobs['remove_unreferenced_lfs_objects_worker']['job_class'] = 'RemoveUnreferencedLfsObjectsWorker'
-Settings.cron_jobs['stuck_import_jobs_worker'] ||= Settingslogic.new({})
-Settings.cron_jobs['stuck_import_jobs_worker']['cron'] ||= '15 * * * *'
-Settings.cron_jobs['stuck_import_jobs_worker']['job_class'] = 'StuckImportJobsWorker'
+Settings.cron_jobs['import_stuck_project_import_jobs'] ||= Settingslogic.new({})
+Settings.cron_jobs['import_stuck_project_import_jobs']['cron'] ||= '15 * * * *'
+Settings.cron_jobs['import_stuck_project_import_jobs']['job_class'] = 'Gitlab::Import::StuckProjectImportJobsWorker'
 Settings.cron_jobs['jira_import_stuck_jira_import_jobs'] ||= Settingslogic.new({})
 Settings.cron_jobs['jira_import_stuck_jira_import_jobs']['cron'] ||= '* 0/15 * * *'
 Settings.cron_jobs['jira_import_stuck_jira_import_jobs']['job_class'] = 'Gitlab::JiraImport::StuckJiraImportJobsWorker'
@@ -481,6 +481,9 @@ Settings.cron_jobs['issue_due_scheduler_worker']['job_class'] = 'IssueDueSchedul
 Settings.cron_jobs['prune_web_hook_logs_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['prune_web_hook_logs_worker']['cron'] ||= '0 */1 * * *'
 Settings.cron_jobs['prune_web_hook_logs_worker']['job_class'] = 'PruneWebHookLogsWorker'
+Settings.cron_jobs['metrics_dashboard_schedule_annotations_prune_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['metrics_dashboard_schedule_annotations_prune_worker']['cron'] ||= '0 1 * * *'
+Settings.cron_jobs['metrics_dashboard_schedule_annotations_prune_worker']['job_class'] = 'Metrics::Dashboard::ScheduleAnnotationsPruneWorker'
 Settings.cron_jobs['schedule_migrate_external_diffs_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['schedule_migrate_external_diffs_worker']['cron'] ||= '15 * * * *'
 Settings.cron_jobs['schedule_migrate_external_diffs_worker']['job_class'] = 'ScheduleMigrateExternalDiffsWorker'
@@ -510,6 +513,9 @@ Gitlab.ee do
   Settings.cron_jobs['geo_file_download_dispatch_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['geo_file_download_dispatch_worker']['cron'] ||= '*/1 * * * *'
   Settings.cron_jobs['geo_file_download_dispatch_worker']['job_class'] ||= 'Geo::FileDownloadDispatchWorker'
+  Settings.cron_jobs['geo_registry_sync_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['geo_registry_sync_worker']['cron'] ||= '*/1 * * * *'
+  Settings.cron_jobs['geo_registry_sync_worker']['job_class'] ||= 'Geo::RegistrySyncWorker'
   Settings.cron_jobs['geo_metrics_update_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['geo_metrics_update_worker']['cron'] ||= '*/1 * * * *'
   Settings.cron_jobs['geo_metrics_update_worker']['job_class'] ||= 'Geo::MetricsUpdateWorker'
@@ -723,6 +729,7 @@ Settings.webpack.dev_server['port']    ||= 3808
 # ActionCable settings
 #
 Settings['action_cable'] ||= Settingslogic.new({})
+Settings.action_cable['in_app'] ||= false
 Settings.action_cable['worker_pool_size'] ||= 4
 
 #

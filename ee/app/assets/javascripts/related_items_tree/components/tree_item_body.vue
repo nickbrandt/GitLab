@@ -151,7 +151,7 @@ export default {
     >
       <div class="item-contents d-flex align-items-center flex-wrap flex-grow-1 flex-xl-nowrap">
         <div class="item-title-wrapper flex-grow-1 mr-2">
-          <div class="item-title d-flex mb-0 pt-1 pb-2">
+          <div class="item-title d-flex mb-0 pt-1 pb-1">
             <gl-icon
               ref="stateIconMd"
               class="d-block mr-2"
@@ -180,13 +180,13 @@ export default {
               :aria-label="item.title"
               :title="item.title"
               :href="computedPath"
-              class="sortable-link ws-normal"
+              class="sortable-link ws-normal gl-font-weight-bold"
               >{{ item.title }}</gl-link
             >
           </div>
 
           <div
-            class="item-meta d-flex flex-wrap mt-xl-0 flex-xl-nowrap align-items-center pb-1 pt-2 ml-4"
+            class="item-meta d-flex flex-wrap mt-xl-0 flex-xl-nowrap align-items-center pb-1 pt-1 ml-4"
           >
             <span class="mr-3">{{ itemHierarchy }}</span>
             <gl-tooltip v-if="isEpic" :target="() => $refs.countBadge">

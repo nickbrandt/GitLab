@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::MetadataExtractionService do
+RSpec.describe Packages::Nuget::MetadataExtractionService do
   let(:package_file) { create(:nuget_package).package_files.first }
   let(:service) { described_class.new(package_file.id) }
 
@@ -28,11 +28,11 @@ describe Packages::Nuget::MetadataExtractionService do
 
     context 'with nuspec file' do
       before do
-        allow(service).to receive(:nuspec_file).and_return(fixture_file(nuspec_filepath, dir: 'ee'))
+        allow(service).to receive(:nuspec_file).and_return(fixture_file(nuspec_filepath))
       end
 
       context 'with dependencies' do
-        let(:nuspec_filepath) { 'nuget/with_dependencies.nuspec' }
+        let(:nuspec_filepath) { 'packages/nuget/with_dependencies.nuspec' }
 
         it { is_expected.to have_key(:package_dependencies) }
 
@@ -47,17 +47,17 @@ describe Packages::Nuget::MetadataExtractionService do
       end
 
       context 'with a nuspec file with metadata' do
-        let(:nuspec_filepath) { 'nuget/with_metadata.nuspec' }
+        let(:nuspec_filepath) { 'packages/nuget/with_metadata.nuspec' }
 
         it { expect(subject[:package_tags].sort).to eq(%w(foo bar test tag1 tag2 tag3 tag4 tag5).sort) }
       end
     end
 
     context 'with a nuspec file with metadata' do
-      let_it_be(:nuspec_filepath) { 'nuget/with_metadata.nuspec' }
+      let_it_be(:nuspec_filepath) { 'packages/nuget/with_metadata.nuspec' }
 
       before do
-        allow(service).to receive(:nuspec_file).and_return(fixture_file(nuspec_filepath, dir: 'ee'))
+        allow(service).to receive(:nuspec_file).and_return(fixture_file(nuspec_filepath))
       end
 
       it { expect(subject[:license_url]).to eq('https://opensource.org/licenses/MIT') }

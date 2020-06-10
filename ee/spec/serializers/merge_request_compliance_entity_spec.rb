@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequestComplianceEntity do
+RSpec.describe MergeRequestComplianceEntity do
   include Gitlab::Routing
 
   let_it_be(:project) { create(:project) }

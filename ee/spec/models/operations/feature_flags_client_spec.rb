@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Operations::FeatureFlagsClient do
+RSpec.describe Operations::FeatureFlagsClient do
   subject { create(:operations_feature_flags_client) }
 
   describe 'associations' do

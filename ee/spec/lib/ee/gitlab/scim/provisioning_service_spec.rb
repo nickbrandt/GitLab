@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::EE::Gitlab::Scim::ProvisioningService do
+RSpec.describe ::EE::Gitlab::Scim::ProvisioningService do
   describe '#execute' do
     let(:group) { create(:group) }
     let(:service) { described_class.new(group, service_params) }

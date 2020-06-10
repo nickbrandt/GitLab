@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GithubService do
+RSpec.describe GithubService do
   let(:project) { create(:project) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
   let(:pipeline_sample_data) { Gitlab::DataBuilder::Pipeline.build(pipeline) }
@@ -296,23 +296,6 @@ describe GithubService do
       pipeline
 
       expect(subject.can_test?).to eq true
-    end
-  end
-
-  describe '#test_data' do
-    let(:user) { project.owner }
-    let(:test_data) { subject.test_data(project, user) }
-
-    it 'raises error if no pipeline found' do
-      project.ci_pipelines.delete_all
-
-      expect { test_data }.to raise_error 'Please set up a pipeline on your repository.'
-    end
-
-    it 'generates data for latest pipeline' do
-      pipeline
-
-      expect(test_data[:object_kind]).to eq 'pipeline'
     end
   end
 

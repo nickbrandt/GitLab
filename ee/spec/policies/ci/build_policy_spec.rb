@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Ci::BuildPolicy do
+RSpec.describe Ci::BuildPolicy do
   using RSpec::Parameterized::TableSyntax
 
   let(:project) { create(:project, :repository) }

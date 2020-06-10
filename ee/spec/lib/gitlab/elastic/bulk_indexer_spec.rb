@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Elastic::BulkIndexer, :elastic do
+RSpec.describe Gitlab::Elastic::BulkIndexer, :elastic do
   let_it_be(:issue) { create(:issue) }
   let_it_be(:other_issue) { create(:issue, project: issue.project) }
 

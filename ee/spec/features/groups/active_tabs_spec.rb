@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Group active tab' do
+RSpec.describe 'Group active tab' do
   let(:user) { create :user }
   let(:group) { create(:group) }
 

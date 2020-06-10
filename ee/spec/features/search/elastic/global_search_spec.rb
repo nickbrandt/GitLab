@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Global elastic search', :elastic, :sidekiq_inline do
+RSpec.describe 'Global elastic search', :elastic, :sidekiq_inline do
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository, :wiki_repo, namespace: user.namespace) }
 
@@ -265,7 +265,7 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
   end
 end
 
-describe 'Global elastic search redactions', :elastic do
+RSpec.describe 'Global elastic search redactions', :elastic do
   it_behaves_like 'a redacted search results page' do
     let(:search_path) { explore_root_path }
   end

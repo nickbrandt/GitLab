@@ -119,11 +119,9 @@ export default {
           v-for="issue in data"
           :key="issue.iid"
           data-testid="issue-row"
-          class="gl-responsive-table-row"
+          class="gl-responsive-table-row gl-flex-direction-column gl-align-items-baseline"
         >
-          <div
-            class="table-section section-100 align-items-md-center gl-flex-wrap gl-white-space-normal"
-          >
+          <div class="table-section section-100 gl-white-space-normal text-truncate">
             <gl-link
               data-testid="issue-title-link"
               :href="issue.webUrl"
@@ -132,8 +130,10 @@ export default {
             >
               {{ issue.title }}
             </gl-link>
+          </div>
 
-            <div class="gl-display-flex gl-text-gray-600 gl-mt-5">
+          <div class="table-section section-100 gl-white-space-normal mt-md-3">
+            <div class="gl-display-flex gl-text-gray-600">
               <gl-icon name="issues" class="gl-mr-2" />
               <gl-link
                 data-testid="issue-id-link"

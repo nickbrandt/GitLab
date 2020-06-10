@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::CodeOwners::File do
+RSpec.describe Gitlab::CodeOwners::File do
   include FakeBlobHelpers
 
   let(:project) { build(:project) }

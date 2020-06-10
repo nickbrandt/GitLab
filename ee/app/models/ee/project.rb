@@ -46,6 +46,7 @@ module EE
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
       has_one :status_page_setting, inverse_of: :project, class_name: 'StatusPage::ProjectSetting'
       has_one :compliance_framework_setting, class_name: 'ComplianceManagement::ComplianceFramework::ProjectSettings', inverse_of: :project
+      has_one :security_setting, class_name: 'ProjectSecuritySetting'
 
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_users, through: :approvers, source: :user
@@ -90,8 +91,7 @@ module EE
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Project', foreign_key: :source_project_id
 
       scope :with_shared_runners_limit_enabled, -> do
-        if ::Feature.enabled?(:ci_minutes_enforce_quota_for_public_projects, default_enabled: true) &&
-            ::Ci::Runner.has_shared_runners_with_non_zero_public_cost?
+        if ::Ci::Runner.has_shared_runners_with_non_zero_public_cost?
           with_shared_runners
         else
           with_shared_runners.non_public_only
@@ -282,17 +282,7 @@ module EE
     end
 
     def shared_runners_minutes_limit_enabled?
-      if ::Feature.enabled?(:ci_minutes_track_for_public_projects, shared_runners_limit_namespace, default_enabled: true)
-        shared_runners_enabled? &&
-          shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
-      else
-        legacy_shared_runners_minutes_limit_enabled?
-      end
-    end
-
-    def legacy_shared_runners_minutes_limit_enabled?
-      !public? && shared_runners_enabled? &&
-        shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
+      shared_runners_enabled? && shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
     end
 
     # This makes the feature disabled by default, in contrary to how

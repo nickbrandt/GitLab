@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe UpdateBuildMinutesService do
+RSpec.describe UpdateBuildMinutesService do
   describe '#perform' do
     let(:namespace) { create(:namespace, shared_runners_minutes_limit: 100) }
     let(:project) { create(:project, :public, namespace: namespace) }
@@ -69,18 +69,6 @@ describe UpdateBuildMinutesService do
 
           expect(namespace.namespace_statistics.reload.shared_runners_seconds)
             .to eq((build.duration.to_i * 1.234).to_i)
-        end
-      end
-
-      context 'when :ci_minutes_track_for_public_projects FF is disabled' do
-        before do
-          stub_feature_flags(ci_minutes_track_for_public_projects: false)
-        end
-
-        it "does not create/update statistics" do
-          subject
-
-          expect(namespace.namespace_statistics).to be_nil
         end
       end
     end

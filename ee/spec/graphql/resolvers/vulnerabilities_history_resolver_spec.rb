@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Resolvers::VulnerabilitiesHistoryResolver do
+RSpec.describe Resolvers::VulnerabilitiesHistoryResolver do
   include GraphqlHelpers
 
   subject { resolve(described_class, obj: group, args: args, ctx: { current_user: user }) }

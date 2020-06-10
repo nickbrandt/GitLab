@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary do
+RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary do
   let(:group) { create(:group) }
   let(:project) { create(:project, :repository, namespace: group) }
   let(:project_2) { create(:project, :repository, namespace: group) }
@@ -23,6 +23,12 @@ describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary do
         expect(subject.first[:value]).to eq('2')
       end
 
+      it 'returns the localized title' do
+        Gitlab::I18n.with_locale(:ru) do
+          expect(subject.first[:title]).to eq(n_('New Issue', 'New Issues', 2))
+        end
+      end
+
       context 'with subgroups' do
         before do
           Timecop.freeze(5.days.from_now) { create(:issue, project: create(:project, namespace: create(:group, parent: group))) }
@@ -42,6 +48,35 @@ describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary do
 
         it 'finds issues from those projects' do
           expect(subject.first[:value]).to eq('2')
+        end
+      end
+
+      context 'with `assignee_username` filter' do
+        let(:assignee) { create(:user) }
+
+        before do
+          issue = project.issues.last
+          issue.assignees << assignee
+        end
+
+        subject { described_class.new(group, options: { from: Time.now, current_user: user, assignee_username: [assignee.username] }).data }
+
+        it 'finds issues from those projects' do
+          expect(subject.first[:value]).to eq('1')
+        end
+      end
+
+      context 'with `author_username` filter' do
+        let(:author) { create(:user) }
+
+        before do
+          project.issues.last.update!(author: author)
+        end
+
+        subject { described_class.new(group, options: { from: Time.now, current_user: user, author_username: [author.username] }).data }
+
+        it 'finds issues from those projects' do
+          expect(subject.first[:value]).to eq('1')
         end
       end
 
@@ -78,6 +113,12 @@ describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary do
 
       it "finds the number of deploys made created after it" do
         expect(subject.second[:value]).to eq('2')
+      end
+
+      it 'returns the localized title' do
+        Gitlab::I18n.with_locale(:ru) do
+          expect(subject.second[:title]).to eq(n_('Deploy', 'Deploys', 2))
+        end
       end
 
       context 'with subgroups' do

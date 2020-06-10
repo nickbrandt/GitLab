@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::VulnerableProjectsFinder do
+RSpec.describe Security::VulnerableProjectsFinder do
   describe '#execute' do
     let(:projects) { Project.all }
     let!(:safe_project) { create(:project) }

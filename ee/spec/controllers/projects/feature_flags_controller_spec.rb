@@ -2,20 +2,22 @@
 
 require 'spec_helper'
 
-describe Projects::FeatureFlagsController do
+RSpec.describe Projects::FeatureFlagsController do
   include Gitlab::Routing
   include FeatureFlagHelpers
 
   let_it_be(:project) { create(:project) }
+  let_it_be(:developer) { create(:user) }
+  let_it_be(:reporter) { create(:user) }
   let(:user) { developer }
-  let(:developer) { create(:user) }
-  let(:reporter) { create(:user) }
   let(:feature_enabled) { true }
 
-  before do
+  before_all do
     project.add_developer(developer)
     project.add_reporter(reporter)
+  end
 
+  before do
     sign_in(user)
     stub_licensed_features(feature_flags: feature_enabled)
   end
@@ -1420,6 +1422,39 @@ describe Projects::FeatureFlagsController do
             'iid' => other_user_list.iid,
             'name' => 'Other List',
             'user_xids' => 'user3'
+          },
+          'scopes' => []
+        }])
+      end
+
+      it 'automatically dissociates the user list when switching the type of an existing gitlabUserList strategy' do
+        user_list = create(:operations_feature_flag_user_list, project: project, name: 'My List', user_xids: 'user1,user2')
+        strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'gitlabUserList', parameters: {}, user_list: user_list)
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          iid: new_version_flag.iid,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              id: strategy.id,
+              name: 'gradualRolloutUserId',
+              parameters: {
+                groupId: 'default',
+                percentage: '25'
+              }
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies']).to eq([{
+          'id' => strategy.id,
+          'name' => 'gradualRolloutUserId',
+          'parameters' => {
+            'groupId' => 'default',
+            'percentage' => '25'
           },
           'scopes' => []
         }])

@@ -23,8 +23,38 @@ describe User do
   describe 'delegations' do
     it { is_expected.to delegate_method(:path).to(:namespace).with_prefix }
 
+    it { is_expected.to delegate_method(:notes_filter_for).to(:user_preference) }
+    it { is_expected.to delegate_method(:set_notes_filter).to(:user_preference) }
+
+    it { is_expected.to delegate_method(:first_day_of_week).to(:user_preference) }
+    it { is_expected.to delegate_method(:first_day_of_week=).to(:user_preference).with_arguments(:args) }
+
+    it { is_expected.to delegate_method(:timezone).to(:user_preference) }
+    it { is_expected.to delegate_method(:timezone=).to(:user_preference).with_arguments(:args) }
+
+    it { is_expected.to delegate_method(:time_display_relative).to(:user_preference) }
+    it { is_expected.to delegate_method(:time_display_relative=).to(:user_preference).with_arguments(:args) }
+
+    it { is_expected.to delegate_method(:time_format_in_24h).to(:user_preference) }
+    it { is_expected.to delegate_method(:time_format_in_24h=).to(:user_preference).with_arguments(:args) }
+
+    it { is_expected.to delegate_method(:show_whitespace_in_diffs).to(:user_preference) }
+    it { is_expected.to delegate_method(:show_whitespace_in_diffs=).to(:user_preference).with_arguments(:args) }
+
     it { is_expected.to delegate_method(:tab_width).to(:user_preference) }
-    it { is_expected.to delegate_method(:tab_width=).to(:user_preference).with_arguments(5) }
+    it { is_expected.to delegate_method(:tab_width=).to(:user_preference).with_arguments(:args) }
+
+    it { is_expected.to delegate_method(:sourcegraph_enabled).to(:user_preference) }
+    it { is_expected.to delegate_method(:sourcegraph_enabled=).to(:user_preference).with_arguments(:args) }
+
+    it { is_expected.to delegate_method(:setup_for_company).to(:user_preference) }
+    it { is_expected.to delegate_method(:setup_for_company=).to(:user_preference).with_arguments(:args) }
+
+    it { is_expected.to delegate_method(:render_whitespace_in_code).to(:user_preference) }
+    it { is_expected.to delegate_method(:render_whitespace_in_code=).to(:user_preference).with_arguments(:args) }
+
+    it { is_expected.to delegate_method(:job_title).to(:user_detail).allow_nil }
+    it { is_expected.to delegate_method(:job_title=).to(:user_detail).with_arguments(:args).allow_nil }
   end
 
   describe 'associations' do
@@ -2845,10 +2875,10 @@ describe User do
     it "includes projects shared with user's group" do
       user    = create(:user)
       project = create(:project, :private)
-      group   = create(:group)
-
-      group.add_reporter(user)
-      project.project_group_links.create(group: group)
+      group   = create(:group) do |group|
+        group.add_reporter(user)
+      end
+      create(:project_group_link, group: group, project: project)
 
       expect(user.authorized_projects).to include(project)
     end

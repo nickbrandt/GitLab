@@ -2,11 +2,12 @@
 
 require 'spec_helper'
 
-describe VulnerabilitiesHelper do
+RSpec.describe VulnerabilitiesHelper do
   let_it_be(:user) { build(:user) }
-  let_it_be(:vulnerability) { create(:vulnerability, :with_findings, title: "My vulnerability") }
-  let_it_be(:project) { vulnerability.project }
-  let_it_be(:finding) { vulnerability.finding }
+  let_it_be(:project) { create(:project, :repository, :public) }
+  let_it_be(:pipeline) { create(:ci_pipeline, :success, project: project) }
+  let_it_be(:finding) { create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high) }
+  let_it_be(:vulnerability) { create(:vulnerability, title: "My vulnerability", project: project, findings: [finding]) }
   let(:vulnerability_serializer_hash) do
     vulnerability.slice(
       :id,
@@ -102,9 +103,7 @@ describe VulnerabilitiesHelper do
   end
 
   describe '#vulnerability_finding_data' do
-    let(:finding) { build(:vulnerabilities_occurrence) }
-
-    subject { helper.vulnerability_finding_data(finding) }
+    subject { helper.vulnerability_finding_data(vulnerability) }
 
     it 'returns finding information' do
       expect(subject).to match(
@@ -119,43 +118,18 @@ describe VulnerabilitiesHelper do
         remediations: finding.remediations,
         solution: kind_of(String)
       )
-    end
-  end
 
-  describe '#vulnerability_file_link' do
-    let(:project) { create(:project, :repository, :public) }
-    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-    let(:finding) { create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high) }
-    let(:vulnerability) { create(:vulnerability, findings: [finding], project: project) }
-
-    subject { helper.vulnerability_file_link(vulnerability) }
-
-    it 'returns a link to the vulnerability file location' do
-      expect(subject).to include(
-        vulnerability.finding.location['file'],
-        "#{vulnerability.finding.location['start_line']}",
-        vulnerability.finding.pipelines&.last&.sha
-      )
+      expect(subject[:location]['blob_path']).to match(kind_of(String))
     end
 
-    context 'when vulnerability is not linked to a commit' do
-      it 'uses the default branch' do
-        vulnerability.finding.pipelines = []
-        vulnerability.finding.save
-
-        expect(subject).to include(
-          vulnerability.project.default_branch
-        )
+    context 'when there is no file' do
+      before do
+        vulnerability.finding.location['file'] = nil
+        vulnerability.finding.location.delete('blob_path')
       end
-    end
 
-    context 'when vulnerability is not on a specific line' do
-      it 'does not include a reference to the line number' do
-        vulnerability.finding.location['start_line'] = nil
-        vulnerability.finding.save
-
-        expect(subject).not_to include('#L')
-        expect(subject).not_to match(/#{vulnerability.finding.location['file']}:\d*/)
+      it 'does not have a blob_path if there is no file' do
+        expect(subject[:location]).not_to have_key('blob_path')
       end
     end
   end

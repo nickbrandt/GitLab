@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::RepositoryDestroyService do
+RSpec.describe Geo::RepositoryDestroyService do
   include ::EE::GeoHelpers
 
   let_it_be(:secondary) { create(:geo_node) }

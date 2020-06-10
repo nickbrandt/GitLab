@@ -2,6 +2,14 @@
   @include media-breakpoint-up(sm) {
     padding-left: $gl-sidebar-padding;
   }
+
+  .issue-title {
+    max-width: px-to-rem(350px);
+  }
+
+  .milestone-title {
+    max-width: px-to-rem(75px);
+  }
 }
 
 .issues-analytics-chart {
@@ -13,12 +21,4 @@
 .issues-analytics-legend {
   font-size: $gl-font-size-small;
   color: $gl-text-color-secondary;
-}
-
-.issue-title {
-  max-width: px-to-rem(350px);
-}
-
-.milestone-title {
-  max-width: px-to-rem(75px);
 }

@@ -263,7 +263,7 @@ n_("%{project_name}", "%d projects selected", count) % { project_name: 'GitLab' 
 A namespace is a way to group translations that belong together. They provide context to our translators by adding a prefix followed by the bar symbol (`|`). For example:
 
 ```ruby
-_('Namespace|Translated string')
+'Namespace|Translated string'
 ```
 
 A namespace provide the following benefits:
@@ -306,7 +306,7 @@ const dateFormat = createDateTimeFormat({ year: 'numeric', month: 'long', day: '
 console.log(dateFormat.format(new Date('2063-04-05'))) // April 5, 2063
 ```
 
-This makes use of [`Intl.DateTimeFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat).
+This makes use of [`Intl.DateTimeFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat).
 
 - In Ruby/HAML, we have two ways of adding format to dates and times:
 

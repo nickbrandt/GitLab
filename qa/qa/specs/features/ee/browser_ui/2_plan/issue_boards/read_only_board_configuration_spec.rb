@@ -25,7 +25,7 @@ module QA
       end
 
       it 'shows board configuration to user without edit permission' do
-        EE::Page::Component::IssueBoard::Show.perform do |show|
+        Page::Component::IssueBoard::Show.perform do |show|
           show.click_boards_config_button
 
           expect(show.board_scope_modal).to be_visible

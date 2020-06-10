@@ -616,6 +616,7 @@ Supported applications:
 - [Fluentd](#install-fluentd-using-gitlab-cicd)
 - [Knative](#install-knative-using-gitlab-cicd)
 - [PostHog](#install-posthog-using-gitlab-cicd)
+- [Prometheus](#install-prometheus-using-gitlab-cicd)
 
 ### Usage
 
@@ -793,7 +794,7 @@ posthog:
 ```
 
 You can customize the installation of PostHog by defining `.gitlab/managed-apps/posthog/values.yaml`
-in your cluster management project. Refer to the [Configuration section of the PostHog chart's readme](https://github.com/PostHog/charts/tree/master/charts/posthog)
+in your cluster management project. Refer to the [Configuration section of the PostHog chart's README](https://github.com/PostHog/charts/tree/master/charts/posthog)
 for the available configuration options.
 
 NOTE: **Note:**
@@ -828,6 +829,28 @@ redis:
 NOTE: **Note:**
 Support for the PostHog managed application is provided by the PostHog team.
 If you run into issues, please [open a support ticket](https://github.com/PostHog/posthog/issues/new/choose) directly.
+
+### Install Prometheus using GitLab CI/CD
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25138) in GitLab 12.8.
+
+[Prometheus](https://prometheus.io/docs/introduction/overview/) is an
+open-source monitoring and alerting system for supervising your
+deployed applications.
+
+To install Prometheus into the `gitlab-managed-apps` namespace of your cluster,
+define the `.gitlab/managed-apps/config.yaml` file with:
+
+```yaml
+prometheus:
+  installed: true
+```
+
+You can customize the installation of Prometheus by defining
+`.gitlab/managed-apps/prometheus/values.yaml` in your cluster management
+project. Refer to the
+[Configuration section of the Prometheus chart's README](https://github.com/helm/charts/tree/master/stable/prometheus#configuration)
+for the available configuration options.
 
 ### Install GitLab Runner using GitLab CI/CD
 
@@ -907,10 +930,10 @@ Major upgrades might require additional setup steps, please consult
 the official [upgrade guide](https://docs.cilium.io/en/stable/install/upgrade/) for more
 information.
 
-By default, Cilium will drop all non-whitelisted packets upon policy
+By default, Cilium will drop all disallowed packets upon policy
 deployment. The audit mode is scheduled for release in
 [Cilium 1.8](https://github.com/cilium/cilium/pull/9970). In the audit
-mode, non-whitelisted packets will not be dropped, and audit
+mode, disallowed packets will not be dropped, and audit
 notifications will be generated instead. GitLab provides alternative Docker
 images for Cilium with the audit patch included. You can switch to the
 custom build and enable the audit mode by adding the following to
@@ -990,17 +1013,17 @@ when upgrading the Vault application.
 
 To optimally use Vault in a production environment, it's ideal to have a good understanding
 of the internals of Vault and how to configure it. This can be done by reading the
-[the Vault documentation](https://www.vaultproject.io/docs/internals/) as well as
+[the Vault documentation](https://www.vaultproject.io/docs/internals) as well as
 the Vault Helm chart [`values.yaml` file](https://github.com/hashicorp/vault-helm/blob/v0.3.3/values.yaml).
 
 At a minimum you will likely set up:
 
-- A [seal](https://www.vaultproject.io/docs/configuration/seal/) for extra encryption
+- A [seal](https://www.vaultproject.io/docs/configuration/seal) for extra encryption
   of the master key.
-- A [storage backend](https://www.vaultproject.io/docs/configuration/storage/) that is
+- A [storage backend](https://www.vaultproject.io/docs/configuration/storage) that is
   suitable for environment and storage security requirements.
-- [HA Mode](https://www.vaultproject.io/docs/concepts/ha/).
-- [The Vault UI](https://www.vaultproject.io/docs/configuration/ui/).
+- [HA Mode](https://www.vaultproject.io/docs/concepts/ha).
+- [The Vault UI](https://www.vaultproject.io/docs/configuration/ui).
 
 The following is an example values file (`.gitlab/managed-apps/vault/values.yaml`)
 that configures Google Key Management Service for auto-unseal, using a Google Cloud Storage backend, enabling
@@ -1103,7 +1126,7 @@ available configuration options.
 
 ### Install Elastic Stack using GitLab CI/CD
 
-> [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/45) in GitLab 12.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25138) in GitLab 12.8.
 
 Elastic Stack is installed using GitLab CI/CD by defining configuration in
 `.gitlab/managed-apps/config.yaml`.

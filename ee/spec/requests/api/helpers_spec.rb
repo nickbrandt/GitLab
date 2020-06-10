@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Helpers do
+RSpec.describe API::Helpers do
   include API::APIGuard::HelperMethods
   include described_class
 

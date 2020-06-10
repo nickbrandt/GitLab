@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::JobsController do
+RSpec.describe Projects::JobsController do
   describe 'GET #show', :clean_gitlab_redis_shared_state do
     context 'when requesting JSON' do
       let_it_be(:user) { create(:user) }

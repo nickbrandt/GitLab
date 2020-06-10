@@ -1,3 +1,10 @@
+---
+stage: Enablement
+group: Geo
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+type: howto
+---
+
 # Disaster Recovery (Geo) **(PREMIUM ONLY)**
 
 Geo replicates your database, your Git repositories, and few other assets.
@@ -60,7 +67,7 @@ must disable the **primary** node.
 
    NOTE: **Note:**
    (**Ubuntu 14.04 LTS**) If you are using an older version of Ubuntu
-   or any other distro based on the Upstart init system, you can prevent GitLab
+   or any other distribution based on the Upstart init system, you can prevent GitLab
    from starting if the machine reboots by doing the following:
 
    ```shell

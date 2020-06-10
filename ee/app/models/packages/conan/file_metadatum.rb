@@ -18,8 +18,8 @@ class Packages::Conan::FileMetadatum < ApplicationRecord
 
   enum conan_file_type: { recipe_file: 1, package_file: 2 }
 
-  RECIPE_FILES = %w[conanfile.py conanmanifest.txt conan_sources.tgz conan_export.tgz].freeze
-  PACKAGE_FILES = %w[conaninfo.txt conanmanifest.txt conan_package.tgz].freeze
+  RECIPE_FILES = ::Gitlab::Regex::Packages::CONAN_RECIPE_FILES
+  PACKAGE_FILES = ::Gitlab::Regex::Packages::CONAN_PACKAGE_FILES
   PACKAGE_BINARY = 'conan_package.tgz'
 
   private

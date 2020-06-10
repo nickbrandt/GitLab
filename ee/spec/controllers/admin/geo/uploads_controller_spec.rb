@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::Geo::UploadsController, :geo do
+RSpec.describe Admin::Geo::UploadsController, :geo do
   include EE::GeoHelpers
 
   let_it_be(:admin) { create(:admin) }

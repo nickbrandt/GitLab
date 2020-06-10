@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ElasticNamespaceIndexerWorker, :elastic do
+RSpec.describe ElasticNamespaceIndexerWorker, :elastic do
   subject { described_class.new }
 
   before do

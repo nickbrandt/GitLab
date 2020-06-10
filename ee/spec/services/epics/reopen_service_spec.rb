@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Epics::ReopenService do
+RSpec.describe Epics::ReopenService do
   let(:group) { create(:group, :internal) }
   let(:user) { create(:user) }
   let(:epic) { create(:epic, group: group, state: :closed, closed_at: Date.today, closed_by: user) }

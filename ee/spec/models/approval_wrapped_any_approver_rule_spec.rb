@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalWrappedAnyApproverRule do
+RSpec.describe ApprovalWrappedAnyApproverRule do
   let(:merge_request) { create(:merge_request) }
 
   subject { described_class.new(merge_request, rule) }

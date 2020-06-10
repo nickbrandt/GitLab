@@ -11,7 +11,7 @@ It is **not** valid for the [GitLab documentation website](https://docs.gitlab.c
 or [GitLab's main website](https://about.gitlab.com), as they both use
 [Kramdown](https://kramdown.gettalong.org) as their Markdown engine. The documentation
 website uses an extended Kramdown gem, [GitLab Kramdown](https://gitlab.com/gitlab-org/gitlab_kramdown).
-Consult the [GitLab Kramdown Guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/)
+Consult the [GitLab Kramdown Guide](https://about.gitlab.com/handbook/markdown-guide/)
 for a complete Kramdown reference.
 
 NOTE: **Note:** We encourage you to view this document as [rendered by GitLab itself](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/user/markdown.md).
@@ -1017,7 +1017,7 @@ You can also use raw HTML in your Markdown, and it will usually work pretty well
 
 See the documentation for HTML::Pipeline's [SanitizationFilter](https://github.com/jch/html-pipeline/blob/v2.12.3/lib/html/pipeline/sanitization_filter.rb#L42)
 class for the list of allowed HTML tags and attributes. In addition to the default
-`SanitizationFilter` whitelist, GitLab allows `span`, `abbr`, `details` and `summary` elements.
+`SanitizationFilter` allowlist, GitLab allows `span`, `abbr`, `details` and `summary` elements.
 
 ```html
 <dl>
@@ -1108,6 +1108,11 @@ These details <em>will</em> remain <strong>hidden</strong> until expanded.
 ---
 
 Markdown inside these tags is supported as well.
+
+NOTE: **Note:**
+If your Markdown isn't rendering correctly, try adding
+`{::options parse_block_html="true" /}` to the top of the page, and add
+`markdown="span"` to the opening summary tag like this: `<summary markdown="span">`.
 
 Remember to leave a blank line after the `</summary>` tag and before the `</details>` tag,
 as shown in the example:
@@ -1433,7 +1438,9 @@ Example:
 Additionally, you can choose the alignment of text within columns by adding colons (`:`)
 to the sides of the "dash" lines in the second row. This will affect every cell in the column.
 
-> Note that the headers are always right aligned [within GitLab itself](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/user/markdown.md#tables).
+NOTE: **Note:**
+[Within GitLab itself](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/user/markdown.md#tables),
+the headers are always left-aligned in Chrome and Firefox, and centered in Safari.
 
 ```markdown
 | Left Aligned | Centered | Right Aligned | Left Aligned | Centered | Right Aligned |

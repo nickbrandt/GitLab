@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ClearNamespaceSharedRunnersMinutesService do
+RSpec.describe ClearNamespaceSharedRunnersMinutesService do
   describe '#execute' do
     subject { described_class.new(namespace).execute }
 

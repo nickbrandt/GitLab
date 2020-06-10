@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Mutations::Issues::SetIteration do
+RSpec.describe Mutations::Issues::SetIteration do
   let(:issue) { create(:issue) }
   let(:user) { create(:user) }
 

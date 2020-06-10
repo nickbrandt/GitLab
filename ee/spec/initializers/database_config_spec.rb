@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Database config initializer for GitLab EE' do
+RSpec.describe 'Database config initializer for GitLab EE' do
   subject do
     load Rails.root.join('config/initializers/database_config.rb')
   end

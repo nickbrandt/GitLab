@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'New project screen', :js do
+RSpec.describe 'New project screen', :js do
   let_it_be(:user) { create(:user) }
   let_it_be(:namespace) { create(:group) }
   let(:in_subscription_flow) { false }

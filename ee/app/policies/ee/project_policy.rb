@@ -137,6 +137,12 @@ module EE
       end
 
       with_scope :subject
+      condition(:on_demand_scans_enabled) do
+        ::Feature.enabled?(:security_on_demand_scans_feature_flag, project) &&
+        @subject.feature_available?(:security_on_demand_scans)
+      end
+
+      with_scope :subject
       condition(:license_scanning_enabled) do
         @subject.feature_available?(:license_scanning)
       end
@@ -236,6 +242,8 @@ module EE
 
       rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
 
+      rule { on_demand_scans_enabled & can?(:developer_access) }.enable :read_on_demand_scans
+
       rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
 
       rule { can?(:read_vulnerability) }.policy do
@@ -279,6 +287,7 @@ module EE
         enable :admin_feature_flags_client
         enable :modify_approvers_rules
         enable :modify_approvers_list
+        enable :modify_auto_fix_setting
         enable :modify_merge_request_author_setting
         enable :modify_merge_request_committer_setting
       end
@@ -331,6 +340,8 @@ module EE
       rule { ~admin & owner & owner_cannot_destroy_project }.prevent :remove_project
 
       rule { archived }.policy do
+        prevent :modify_auto_fix_setting
+
         READONLY_FEATURES_WHEN_ARCHIVED.each do |feature|
           prevent(*::ProjectPolicy.create_update_admin_destroy(feature))
         end
@@ -357,7 +368,7 @@ module EE
         prevent :owner_access
       end
 
-      rule { ip_enforcement_prevents_access }.policy do
+      rule { ip_enforcement_prevents_access & ~admin }.policy do
         prevent :read_project
       end
 
@@ -385,6 +396,7 @@ module EE
 
       rule { requirements_available & reporter }.policy do
         enable :create_requirement
+        enable :create_requirement_test_report
         enable :admin_requirement
         enable :update_requirement
       end

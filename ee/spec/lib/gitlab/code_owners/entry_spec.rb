@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Gitlab::CodeOwners::Entry do
+RSpec.describe Gitlab::CodeOwners::Entry do
   subject(:entry) do
     described_class.new(
       "/**/file",

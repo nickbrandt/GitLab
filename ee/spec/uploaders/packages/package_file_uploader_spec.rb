@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::PackageFileUploader do
+RSpec.describe Packages::PackageFileUploader do
   let(:package_file) { create(:package_file, :xml) }
   let(:uploader) { described_class.new(package_file, :file) }
   let(:path) { Gitlab.config.packages.storage_path }

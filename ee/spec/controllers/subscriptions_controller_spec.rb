@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SubscriptionsController do
+RSpec.describe SubscriptionsController do
   let_it_be(:user) { create(:user) }
 
   describe 'GET #new' do

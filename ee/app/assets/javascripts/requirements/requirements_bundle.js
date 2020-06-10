@@ -44,6 +44,9 @@ export default () => {
         page,
         next,
         prev,
+        textSearch,
+        authorUsernames,
+        sortBy,
         projectPath,
         emptyStatePath,
         opened,
@@ -60,6 +63,9 @@ export default () => {
 
       return {
         initialFilterBy: stateFilterBy,
+        initialTextSearch: textSearch,
+        initialAuthorUsernames: authorUsernames ? JSON.parse(authorUsernames) : [],
+        initialSortBy: sortBy,
         initialRequirementsCount: {
           OPENED,
           ARCHIVED,
@@ -79,6 +85,9 @@ export default () => {
         props: {
           projectPath: this.projectPath,
           initialFilterBy: this.initialFilterBy,
+          initialTextSearch: this.initialTextSearch,
+          initialAuthorUsernames: this.initialAuthorUsernames,
+          initialSortBy: this.initialSortBy,
           initialRequirementsCount: this.initialRequirementsCount,
           page: parseInt(this.page, 10) || 1,
           prev: this.prev,

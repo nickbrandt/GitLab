@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::Pipeline::PostProcessPipeline do
+RSpec.describe StatusPage::Pipeline::PostProcessPipeline do
   describe '.filters' do
     let(:expected_filters) do
       [StatusPage::Filter::MentionAnonymizationFilter] +

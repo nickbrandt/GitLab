@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SyncSeatLinkRequestWorker, type: :worker do
+RSpec.describe SyncSeatLinkRequestWorker, type: :worker do
   describe '#perform' do
     subject do
       described_class.new.perform('2020-01-01', '123', 5, 4)

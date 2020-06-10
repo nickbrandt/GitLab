@@ -2,7 +2,7 @@
 
 require('spec_helper')
 
-describe ProjectsController do
+RSpec.describe ProjectsController do
   include ExternalAuthorizationServiceHelpers
   include ProjectForksHelper
 
@@ -39,6 +39,27 @@ describe ProjectsController do
             expect(response).to have_gitlab_http_status(:not_found)
             expect(response).not_to render_template('new')
           end
+        end
+      end
+
+      context 'with the new_create_project_ui experiment enabled and the user is part of the control group' do
+        before do
+          stub_experiment(new_create_project_ui: true)
+          stub_experiment_for_user(new_create_project_ui: false)
+          allow_any_instance_of(described_class).to receive(:experimentation_subject_id).and_return('uuid')
+        end
+
+        it 'passes the right tracking parameters to the frontend' do
+          get(:new)
+
+          expect(Gon.tracking_data).to eq(
+            {
+              category: 'Manage::Import::Experiment::NewCreateProjectUi',
+              action: 'click_tab',
+              label: 'uuid',
+              property: 'control_group'
+            }
+          )
         end
       end
     end
@@ -1159,14 +1180,13 @@ describe ProjectsController do
     end
 
     shared_examples 'rate limits project export endpoint' do
+      before do
+        allow(Gitlab::ApplicationRateLimiter)
+          .to receive(:increment)
+          .and_return(Gitlab::ApplicationRateLimiter.rate_limits["project_#{action}".to_sym][:threshold] + 1)
+      end
+
       it 'prevents requesting project export' do
-        exportable_project = create(:project)
-        exportable_project.add_maintainer(user)
-
-        post action, params: { namespace_id: exportable_project.namespace, id: exportable_project }
-
-        expect(response).to have_gitlab_http_status(:found)
-
         post action, params: { namespace_id: project.namespace, id: project }
 
         expect(response.body).to eq('This endpoint has been requested too many times. Try again later.')
@@ -1228,9 +1248,9 @@ describe ProjectsController do
 
         context 'when the endpoint receives requests above the limit', :clean_gitlab_redis_cache do
           before do
-            allow(::Gitlab::ApplicationRateLimiter)
-              .to receive(:throttled?)
-              .and_return(true)
+            allow(Gitlab::ApplicationRateLimiter)
+              .to receive(:increment)
+              .and_return(Gitlab::ApplicationRateLimiter.rate_limits[:project_download_export][:threshold] + 1)
           end
 
           it 'prevents requesting project export' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Audit::UnauthenticatedAuthor do
+RSpec.describe Gitlab::Audit::UnauthenticatedAuthor do
   describe '#initialize' do
     it 'sets correct attributes' do
       expect(described_class.new(name: 'Peppa Pig'))

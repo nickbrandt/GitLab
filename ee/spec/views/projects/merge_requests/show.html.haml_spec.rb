@@ -2,7 +2,11 @@
 
 require 'spec_helper'
 
-describe 'projects/merge_requests/show.html.haml' do
+RSpec.describe 'projects/merge_requests/show.html.haml' do
+  before do
+    allow(view).to receive(:experiment_enabled?).and_return(false)
+  end
+
   include_context 'merge request show action'
 
   context 'when merge request is created by a GitLab team member' do

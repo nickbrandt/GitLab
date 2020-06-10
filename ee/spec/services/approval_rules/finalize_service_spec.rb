@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalRules::FinalizeService do
+RSpec.describe ApprovalRules::FinalizeService do
   let(:project) { create(:project, :repository) }
   let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
 

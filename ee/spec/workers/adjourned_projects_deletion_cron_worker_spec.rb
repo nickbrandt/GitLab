@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AdjournedProjectsDeletionCronWorker do
+RSpec.describe AdjournedProjectsDeletionCronWorker do
   describe "#perform" do
     subject(:worker) { described_class.new }
 

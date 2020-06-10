@@ -30,6 +30,10 @@ export default {
       type: String,
       required: true,
     },
+    projectId: {
+      type: String,
+      required: true,
+    },
   },
   translations: {
     newFlagAlert: NEW_FLAG_ALERT,
@@ -78,6 +82,7 @@ export default {
     </div>
 
     <feature-flag-form
+      :project-id="projectId"
       :cancel-path="path"
       :submit-text="s__('FeatureFlags|Create feature flag')"
       :scopes="scopes"

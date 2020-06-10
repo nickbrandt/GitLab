@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Projects > Merge Requests > User edits a merge request' do
+RSpec.describe 'Projects > Merge Requests > User edits a merge request' do
   let(:user) { create(:user) }
 
   before do

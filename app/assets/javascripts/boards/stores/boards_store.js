@@ -1,4 +1,4 @@
-/* eslint-disable no-shadow, no-param-reassign */
+/* eslint-disable no-shadow, no-param-reassign,consistent-return */
 /* global List */
 
 import $ from 'jquery';
@@ -22,6 +22,7 @@ import ListLabel from '../models/label';
 import ListAssignee from '../models/assignee';
 import ListMilestone from '../models/milestone';
 
+const PER_PAGE = 20;
 const boardsStore = {
   disabled: false,
   timeTracking: {
@@ -42,6 +43,7 @@ const boardsStore = {
   },
   detail: {
     issue: {},
+    list: {},
   },
   moving: {
     issue: {},
@@ -73,6 +75,7 @@ const boardsStore = {
     this.filter.path = getUrlParamsArray().join('&');
     this.detail = {
       issue: {},
+      list: {},
     };
   },
   showPage(page) {
@@ -137,6 +140,17 @@ const boardsStore = {
   findIssueLabel(issue, findLabel) {
     return issue.labels.find(label => label.id === findLabel.id);
   },
+
+  goToNextPage(list) {
+    if (list.issuesSize > list.issues.length) {
+      if (list.issues.length / PER_PAGE >= 1) {
+        list.page += 1;
+      }
+
+      return list.getIssues(false);
+    }
+  },
+
   addListIssue(list, issue, listFrom, newIndex) {
     let moveBeforeId = null;
     let moveAfterId = null;
@@ -254,6 +268,20 @@ const boardsStore = {
   removeListIssues(list, removeIssue) {
     list.issues = list.issues.filter(issue => {
       const matchesRemove = removeIssue.id === issue.id;
+
+      if (matchesRemove) {
+        list.issuesSize -= 1;
+        issue.removeLabel(list.label);
+      }
+
+      return !matchesRemove;
+    });
+  },
+  removeListMultipleIssues(list, removeIssues) {
+    const ids = removeIssues.map(issue => issue.id);
+
+    list.issues = list.issues.filter(issue => {
+      const matchesRemove = ids.includes(issue.id);
 
       if (matchesRemove) {
         list.issuesSize -= 1;
@@ -670,11 +698,20 @@ const boardsStore = {
       ),
     );
   },
+  removeIssueLabel(issue, removeLabel) {
+    if (removeLabel) {
+      issue.labels = issue.labels.filter(label => removeLabel.id !== label.id);
+    }
+  },
 
   addIssueAssignee(issue, assignee) {
     if (!issue.findAssignee(assignee)) {
       issue.assignees.push(new ListAssignee(assignee));
     }
+  },
+
+  removeIssueLabels(issue, labels) {
+    labels.forEach(issue.removeLabel.bind(issue));
   },
 
   bulkUpdate(issueIds, extraData = {}) {
@@ -749,12 +786,23 @@ const boardsStore = {
     }
   },
 
+  findIssueAssignee(issue, findAssignee) {
+    return issue.assignees.find(assignee => assignee.id === findAssignee.id);
+  },
+
   clearMultiSelect() {
     this.multiSelect.list = [];
   },
 
   removeAllIssueAssignees(issue) {
     issue.assignees = [];
+  },
+
+  addIssueMilestone(issue, milestone) {
+    const miletoneId = issue.milestone ? issue.milestone.id : null;
+    if (IS_EE && milestone.id !== miletoneId) {
+      issue.milestone = new ListMilestone(milestone);
+    }
   },
 
   refreshIssueData(issue, obj) {

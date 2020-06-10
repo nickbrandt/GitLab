@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import axios from '~/lib/utils/axios_utils';
+import Flash from '~/flash';
 
 import { GlLoadingIcon } from '@gitlab/ui';
 import { joinPaths, redirectTo } from '~/lib/utils/url_utility';
@@ -10,6 +11,7 @@ import SnippetVisibilityEdit from '~/snippets/components/snippet_visibility_edit
 import SnippetBlobEdit from '~/snippets/components/snippet_blob_edit.vue';
 import TitleField from '~/vue_shared/components/form/title.vue';
 import FormFooterActions from '~/vue_shared/components/form/form_footer_actions.vue';
+import { SNIPPET_CREATE_MUTATION_ERROR, SNIPPET_UPDATE_MUTATION_ERROR } from '~/snippets/constants';
 
 import UpdateSnippetMutation from '~/snippets/mutations/updateSnippet.mutation.graphql';
 import CreateSnippetMutation from '~/snippets/mutations/createSnippet.mutation.graphql';
@@ -27,6 +29,8 @@ jest.mock('~/lib/utils/url_utility', () => ({
     .mockReturnValue('contentApiURL'),
 }));
 
+jest.mock('~/flash');
+
 let flashSpy;
 
 const contentMock = 'Foo Bar';
@@ -34,6 +38,7 @@ const rawPathMock = '/foo/bar';
 const rawProjectPathMock = '/project/path';
 const newlyEditedSnippetUrl = 'http://foo.bar';
 const apiError = { message: 'Ufff' };
+const mutationError = 'Bummer';
 
 const defaultProps = {
   snippetGid: 'gid://gitlab/PersonalSnippet/42',
@@ -56,10 +61,26 @@ describe('Snippet Edit app', () => {
     },
   });
 
+  const resolveMutateWithErrors = jest.fn().mockResolvedValue({
+    data: {
+      updateSnippet: {
+        errors: [mutationError],
+        snippet: {
+          webUrl: newlyEditedSnippetUrl,
+        },
+      },
+      createSnippet: {
+        errors: [mutationError],
+        snippet: null,
+      },
+    },
+  });
+
   const rejectMutation = jest.fn().mockRejectedValue(apiError);
 
   const mutationTypes = {
     RESOLVE: resolveMutate,
+    RESOLVE_WITH_ERRORS: resolveMutateWithErrors,
     REJECT: rejectMutation,
   };
 
@@ -280,6 +301,35 @@ describe('Snippet Edit app', () => {
         });
       });
 
+      it.each`
+        newSnippet | projectPath           | mutationName
+        ${true}    | ${rawProjectPathMock} | ${'CreateSnippetMutation with projectPath'}
+        ${true}    | ${''}                 | ${'CreateSnippetMutation without projectPath'}
+        ${false}   | ${rawProjectPathMock} | ${'UpdateSnippetMutation with projectPath'}
+        ${false}   | ${''}                 | ${'UpdateSnippetMutation without projectPath'}
+      `(
+        'does not redirect to snippet view if the seemingly successful' +
+          ' $mutationName response contains errors',
+        ({ newSnippet, projectPath }) => {
+          createComponent({
+            data: {
+              newSnippet,
+            },
+            props: {
+              ...defaultProps,
+              projectPath,
+            },
+            mutationRes: mutationTypes.RESOLVE_WITH_ERRORS,
+          });
+
+          wrapper.vm.handleFormSubmit();
+          return waitForPromises().then(() => {
+            expect(redirectTo).not.toHaveBeenCalled();
+            expect(flashSpy).toHaveBeenCalledWith(mutationError);
+          });
+        },
+      );
+
       it('flashes an error if mutation failed', () => {
         createComponent({
           mutationRes: mutationTypes.REJECT,
@@ -290,6 +340,26 @@ describe('Snippet Edit app', () => {
           expect(flashSpy).toHaveBeenCalledWith(apiError);
         });
       });
+
+      it.each`
+        isNew    | status        | expectation
+        ${true}  | ${`new`}      | ${SNIPPET_CREATE_MUTATION_ERROR.replace('%{err}', '')}
+        ${false} | ${`existing`} | ${SNIPPET_UPDATE_MUTATION_ERROR.replace('%{err}', '')}
+      `(
+        `renders the correct error message if mutation fails for $status snippet`,
+        ({ isNew, expectation }) => {
+          createComponent({
+            data: {
+              newSnippet: isNew,
+            },
+            mutationRes: mutationTypes.REJECT,
+          });
+          wrapper.vm.handleFormSubmit();
+          return waitForPromises().then(() => {
+            expect(Flash).toHaveBeenCalledWith(expect.stringContaining(expectation));
+          });
+        },
+      );
     });
   });
 });

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Groups::PushRulesController do
+RSpec.describe Groups::PushRulesController do
   let_it_be(:group) { create(:group, :private) }
   let_it_be(:user) { create(:user) }
 

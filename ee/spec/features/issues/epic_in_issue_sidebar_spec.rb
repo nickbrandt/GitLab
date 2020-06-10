@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Epic in issue sidebar', :js do
+RSpec.describe 'Epic in issue sidebar', :js do
   let(:user) { create(:user) }
   let(:group) { create(:group, :public) }
   let(:epic1) { create(:epic, group: group, title: 'Foo') }

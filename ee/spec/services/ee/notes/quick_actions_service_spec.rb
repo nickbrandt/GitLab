@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Notes::QuickActionsService do
+RSpec.describe Notes::QuickActionsService do
   let(:group)   { create(:group) }
   let(:project) { create(:project, group: group) }
   let(:user) { create(:user) }

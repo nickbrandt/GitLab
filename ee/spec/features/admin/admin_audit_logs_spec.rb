@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Admin::AuditLogs', :js do
+RSpec.describe 'Admin::AuditLogs', :js do
   include Select2Helper
 
   let(:user) { create(:user) }

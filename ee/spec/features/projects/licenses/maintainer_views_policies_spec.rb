@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'EE > Projects > Licenses > Maintainer views policies', :js do
+RSpec.describe 'EE > Projects > Licenses > Maintainer views policies', :js do
   let_it_be(:project) { create(:project) }
   let_it_be(:maintainer) do
     create(:user).tap do |user|

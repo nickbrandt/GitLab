@@ -2,7 +2,6 @@
 
 class Packages::GoModuleVersion
   include Gitlab::Utils::StrongMemoize
-  include ::API::Helpers::Packages::Go::ModuleHelpers
 
   VALID_TYPES = %i[ref commit pseudo].freeze
 

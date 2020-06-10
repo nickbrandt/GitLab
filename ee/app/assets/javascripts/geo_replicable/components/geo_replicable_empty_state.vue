@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import { GlEmptyState } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 
@@ -19,7 +19,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['replicableType']),
+    ...mapGetters(['replicableTypeName']),
     linkText() {
       return sprintf(
         s__(
@@ -38,7 +38,7 @@ export default {
 
 <template>
   <gl-empty-state
-    :title="sprintf(__('There are no %{replicableType} to show'), { replicableType })"
+    :title="sprintf(__('There are no %{replicableTypeName} to show'), { replicableTypeName })"
     :svg-path="geoReplicableEmptySvgPath"
   >
     <template #description>

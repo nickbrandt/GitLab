@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Plan do
+RSpec.describe Plan do
   describe '#paid?' do
     subject { plan.paid? }
 

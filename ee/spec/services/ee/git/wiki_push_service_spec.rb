@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Git::WikiPushService do
+RSpec.describe Git::WikiPushService do
   include RepoHelpers
 
   let(:gl_repository) { "wiki-#{project.id}" }

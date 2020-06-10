@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::GroupPackagesFinder do
+RSpec.describe Packages::GroupPackagesFinder do
   let_it_be(:user)     { create(:user) }
   let_it_be(:group)    { create(:group) }
   let_it_be(:project)  { create(:project, namespace: group) }

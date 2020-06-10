@@ -196,7 +196,7 @@ see the documentation.
 ## Auto Review Apps
 
 This is an optional step, since many projects don't have a Kubernetes cluster
-available. If the [requirements](index.md#requirements) are not met, the job is
+available. If the [requirements](requirements.md) are not met, the job is
 silently skipped.
 
 [Review Apps](../../ci/review_apps/index.md) are temporary application environments based on the
@@ -297,7 +297,7 @@ Any performance differences between the source and target branches are also
 ## Auto Deploy
 
 This is an optional step, since many projects don't have a Kubernetes cluster
-available. If the [requirements](index.md#requirements) are not met, the job is skipped.
+available. If the [requirements](requirements.md) are not met, the job is skipped.
 
 After a branch or merge request is merged into the project's default branch (usually
 `master`), Auto Deploy deploys the application to a `production` environment in
@@ -497,7 +497,7 @@ traffic within a local namespace, and from the `gitlab-managed-apps`
 namespace. All other inbound connections are blocked. Outbound
 traffic (for example, to the Internet) is not affected by the default policy.
 
-You can also provide a custom [policy specification](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#networkpolicyspec-v1-networking-k8s-io)
+You can also provide a custom [policy specification](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 in the `.gitlab/auto-deploy-values.yaml` file, for example:
 
 ```yaml
@@ -598,7 +598,7 @@ GitLab provides some initial alerts for you after you install Prometheus:
 
 To use Auto Monitoring:
 
-1. [Install and configure the requirements](index.md#requirements).
+1. [Install and configure the Auto DevOps requirements](requirements.md).
 1. [Enable Auto DevOps](index.md#enablingdisabling-auto-devops), if you haven't done already.
 1. Navigate to your project's **{rocket}** **CI/CD > Pipelines** and click **Run Pipeline**.
 1. After the pipeline finishes successfully, open the

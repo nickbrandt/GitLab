@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Issues::CreateService do
+RSpec.describe Issues::CreateService do
   let_it_be(:group) { create(:group) }
   let(:project) { create(:project, group: group) }
   let(:user) { create(:user) }
@@ -61,6 +61,7 @@ describe Issues::CreateService do
 
               expect(issue).to be_persisted
               expect(issue.epic).to eq(epic)
+              expect(issue.confidential).to eq(false)
             end
           end
 
@@ -80,6 +81,18 @@ describe Issues::CreateService do
               expect(issue.epic).to eq(epic)
               expect(epic.reload.start_date).to eq(milestone.start_date)
               expect(epic.due_date).to eq(milestone.due_date)
+            end
+          end
+
+          context 'when adding an issue to confidential epic' do
+            let(:confidential_epic) { create(:epic, group: group, confidential: true) }
+
+            it 'creates a confidential issue' do
+              params = { title: 'confidential issue', epic_id: confidential_epic.id }
+
+              issue = described_class.new(project, user, params).execute
+
+              expect(issue.confidential).to eq(true)
             end
           end
         end

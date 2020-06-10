@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Boards::ListsController do
+RSpec.describe Boards::ListsController do
   let_it_be(:group)  { create(:group, :private) }
   let_it_be(:board)  { create(:board, group: group) }
   let_it_be(:user)   { create(:user) }

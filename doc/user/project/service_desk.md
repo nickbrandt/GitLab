@@ -68,7 +68,8 @@ If you have the correct access and a Premium license, you have the option to set
 Follow these steps to do so:
 
 1. [Set up incoming email](../../administration/incoming_email.md#set-it-up) for the GitLab instance.
-   This must support [email sub-addressing](../../administration/incoming_email.md#email-sub-addressing).
+     - We recommend using [email sub-addressing](../../administration/incoming_email.md#email-sub-addressing),
+     but in GitLab 11.7 and later you can also use [catch-all mailboxes](../../administration/incoming_email.md#catch-all-mailbox).
 1. Navigate to your project's **Settings > General** and locate the **Service Desk** section.
 1. Enable the **Activate Service Desk** toggle. This reveals a unique email address to email issues
    to the project. These issues will be [confidential](issues/confidential_issues.md), so they will
@@ -172,12 +173,12 @@ As a result, a new Service Desk issue is created from this email in the `mygroup
 
 #### Enable custom email address
 
-This feature comes with the `service_desk_email` feature flag disabled by default.
+This feature comes with the `service_desk_custom_address` feature flag disabled by default.
 To turn on the feature, ask a GitLab administrator with Rails console access to run the following
 command:
 
 ```ruby
-Feature.enable(:service_desk_email)
+Feature.enable(:service_desk_custom_address)
 ```
 
 The configuration options are the same as for configuring

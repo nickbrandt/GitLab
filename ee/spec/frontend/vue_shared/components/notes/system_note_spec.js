@@ -16,13 +16,16 @@ describe('system note component', () => {
     mock.onGet('/path/to/diff').replyOnce(200, diffData);
   }
 
-  function mockDeleteDiff() {
-    mock.onDelete('/path/to/diff/1').replyOnce(200);
+  function mockDeleteDiff(statusCode = 200) {
+    mock.onDelete('/path/to/diff/1').replyOnce(statusCode);
   }
 
   const findBlankBtn = () => wrapper.find('.note-headline-light .btn-blank');
 
   const findDescriptionVersion = () => wrapper.find('.description-version');
+
+  const findDeleteDescriptionVersionButton = () =>
+    wrapper.find({ ref: 'deleteDescriptionVersionButton' });
 
   beforeEach(() => {
     props = {
@@ -94,22 +97,29 @@ describe('system note component', () => {
       });
   });
 
-  it('click on delete icon button deletes description diff', done => {
-    mockFetchDiff();
-    mockDeleteDiff();
-    const button = findBlankBtn();
-    button.trigger('click');
-    return wrapper.vm
-      .$nextTick()
-      .then(() => waitForPromises())
-      .then(() => {
-        const deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
-        deleteButton.trigger('click');
-      })
-      .then(() => waitForPromises())
-      .then(() => {
-        expect(findDescriptionVersion().text()).toContain('Deleted');
-        done();
+  describe('click on delete icon button', () => {
+    beforeEach(() => {
+      mockFetchDiff();
+      const button = findBlankBtn();
+      button.trigger('click');
+      return waitForPromises();
+    });
+
+    it('does not delete description diff if the delete request fails', () => {
+      mockDeleteDiff(503);
+      findDeleteDescriptionVersionButton().trigger('click');
+      return waitForPromises().then(() => {
+        expect(findDeleteDescriptionVersionButton().exists()).toBe(true);
       });
+    });
+
+    it('deletes description diff if the delete request succeeds', () => {
+      mockDeleteDiff();
+      findDeleteDescriptionVersionButton().trigger('click');
+      return waitForPromises().then(() => {
+        expect(findDeleteDescriptionVersionButton().exists()).toBe(false);
+        expect(findDescriptionVersion().text()).toContain('Deleted');
+      });
+    });
   });
 });

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::PipelineVulnerabilitiesFinder do
+RSpec.describe Security::PipelineVulnerabilitiesFinder do
   def disable_deduplication
     allow(::Security::MergeReportsService).to receive(:new) do |*args|
       instance_double('NoDeduplicationMergeReportsService', execute: args.last)

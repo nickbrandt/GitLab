@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Security::Common do
+RSpec.describe Gitlab::Ci::Parsers::Security::Common do
   describe '#parse!' do
     let(:artifact) { build(:ee_ci_job_artifact, :dependency_scanning) }
     let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, 'sha', 2.weeks.ago) }

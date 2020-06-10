@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicsFinder do
+RSpec.describe EpicsFinder do
   let_it_be(:user) { create(:user) }
   let_it_be(:search_user) { create(:user) }
   let_it_be(:group) { create(:group, :private) }
@@ -57,8 +57,8 @@ describe EpicsFinder do
           expect(epics).to contain_exactly(epic1, epic2, epic3)
         end
 
-        it 'does not execute more than 9 SQL queries' do
-          expect { epics.to_a }.not_to exceed_all_query_limit(9)
+        it 'does not execute more than 8 SQL queries' do
+          expect { epics.to_a }.not_to exceed_all_query_limit(8)
         end
 
         context 'sorting' do
@@ -169,18 +169,18 @@ describe EpicsFinder do
             end
           end
 
-          it 'does not execute more than 14 SQL queries' do
-            expect { epics.to_a }.not_to exceed_all_query_limit(14)
+          it 'does not execute more than 12 SQL queries' do
+            expect { epics.to_a }.not_to exceed_all_query_limit(12)
           end
 
-          it 'does not execute more than 15 SQL queries when checking namespace plans' do
+          it 'does not execute more than 13 SQL queries when checking namespace plans' do
             allow(Gitlab::CurrentSettings)
               .to receive(:should_check_namespace_plan?)
               .and_return(true)
 
             create(:gitlab_subscription, :gold, namespace: group)
 
-            expect { epics.to_a }.not_to exceed_all_query_limit(15)
+            expect { epics.to_a }.not_to exceed_all_query_limit(13)
           end
         end
 

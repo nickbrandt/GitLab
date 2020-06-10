@@ -1,9 +1,13 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlEmptyState } from '@gitlab/ui';
-import store from 'ee/geo_replicable/store';
+import createStore from 'ee/geo_replicable/store';
 import GeoReplicableEmptyState from 'ee/geo_replicable/components/geo_replicable_empty_state.vue';
-import { MOCK_GEO_REPLICATION_SVG_PATH, MOCK_GEO_TROUBLESHOOTING_LINK } from '../mock_data';
+import {
+  MOCK_GEO_REPLICATION_SVG_PATH,
+  MOCK_GEO_TROUBLESHOOTING_LINK,
+  MOCK_REPLICABLE_TYPE,
+} from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -19,7 +23,7 @@ describe('GeoReplicableEmptyState', () => {
   const createComponent = () => {
     wrapper = shallowMount(GeoReplicableEmptyState, {
       localVue,
-      store,
+      store: createStore(MOCK_REPLICABLE_TYPE),
       propsData,
     });
   };

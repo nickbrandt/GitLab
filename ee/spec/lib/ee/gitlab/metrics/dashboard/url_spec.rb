@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Metrics::Dashboard::Url do
+RSpec.describe Gitlab::Metrics::Dashboard::Url do
   describe '#clusters_regex' do
     let(:url) do
       Gitlab::Routing.url_helpers.namespace_project_cluster_url(

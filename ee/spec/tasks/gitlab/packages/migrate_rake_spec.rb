@@ -2,7 +2,7 @@
 
 require 'rake_helper'
 
-describe 'gitlab:packages namespace rake task' do
+RSpec.describe 'gitlab:packages namespace rake task' do
   before :all do
     Rake.application.rake_require 'tasks/gitlab/packages/migrate'
   end

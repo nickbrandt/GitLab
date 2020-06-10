@@ -2,7 +2,9 @@
 
 require 'spec_helper'
 
-describe Admin::InstanceReviewController do
+RSpec.describe Admin::InstanceReviewController do
+  include UsageDataHelpers
+
   let(:admin) { create(:admin) }
 
   before do
@@ -17,8 +19,8 @@ describe Admin::InstanceReviewController do
 
     context 'with usage ping enabled' do
       before do
-        allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
         stub_application_setting(usage_ping_enabled: true)
+        stub_usage_data_connections
         ::Gitlab::UsageData.data(force_refresh: true)
         subject
       end

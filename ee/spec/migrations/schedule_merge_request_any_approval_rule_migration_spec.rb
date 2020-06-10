@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20190905091831_schedule_merge_request_any_approval_rule_migration.rb')
 
-describe ScheduleMergeRequestAnyApprovalRuleMigration do
+RSpec.describe ScheduleMergeRequestAnyApprovalRuleMigration do
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:namespace) { namespaces.create(name: 'gitlab', path: 'gitlab-org') }

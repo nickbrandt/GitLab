@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'New Epic', :js do
+RSpec.describe 'New Epic', :js do
   let(:user) { create(:user) }
   let(:group) { create(:group, :public) }
 

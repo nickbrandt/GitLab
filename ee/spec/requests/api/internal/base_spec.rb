@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::Internal::Base do
+RSpec.describe API::Internal::Base do
   include EE::GeoHelpers
 
   let_it_be(:primary_url) { 'http://primary.example.com' }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Epics::IssuePromoteService do
+RSpec.describe Epics::IssuePromoteService do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, group: group) }

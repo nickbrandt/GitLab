@@ -5,7 +5,7 @@ require 'spec_helper'
 # We don't want to interact with Elasticsearch in GitLab FOSS so we test
 # this in ee/ only. The code exists in FOSS and won't do anything.
 
-describe ::Gitlab::Instrumentation::ElasticsearchTransport, :elastic, :request_store do
+RSpec.describe ::Gitlab::Instrumentation::ElasticsearchTransport, :elastic, :request_store do
   describe '.increment_request_count' do
     it 'increases the request count by 1' do
       expect { described_class.increment_request_count }.to change(described_class, :get_request_count).by(1)
@@ -45,7 +45,7 @@ describe ::Gitlab::Instrumentation::ElasticsearchTransport, :elastic, :request_s
   end
 end
 
-describe ::Gitlab::Instrumentation::ElasticsearchTransportInterceptor, :elastic, :request_store do
+RSpec.describe ::Gitlab::Instrumentation::ElasticsearchTransportInterceptor, :elastic, :request_store do
   before do
     allow(::Gitlab::PerformanceBar).to receive(:enabled_for_request?).and_return(true)
   end

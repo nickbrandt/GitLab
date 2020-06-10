@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'getting group information' do
+RSpec.describe 'getting group information' do
   include GraphqlHelpers
 
   let(:user) { create(:user) }

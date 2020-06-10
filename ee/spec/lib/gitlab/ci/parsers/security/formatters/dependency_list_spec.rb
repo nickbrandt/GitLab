@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
+RSpec.describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
   let(:formatter) { described_class.new(project, sha) }
   let(:project) { create(:project) }
   let(:sha) { '4242424242424242' }

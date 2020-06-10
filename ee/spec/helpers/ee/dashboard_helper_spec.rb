@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe DashboardHelper, type: :helper do
+RSpec.describe DashboardHelper, type: :helper do
   let(:user) { build(:user) }
 
   describe '#dashboard_nav_links' do

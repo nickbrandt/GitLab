@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SyncSeatLinkWorker, type: :worker do
+RSpec.describe SyncSeatLinkWorker, type: :worker do
   describe '#perform' do
     context 'when current, paid license is active' do
       let(:utc_time) { Time.utc(2020, 3, 12, 12, 00) }

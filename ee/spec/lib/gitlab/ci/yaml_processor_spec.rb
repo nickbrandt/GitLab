@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::YamlProcessor do
+RSpec.describe Gitlab::Ci::YamlProcessor do
   describe 'Bridge Needs' do
     let(:config) do
       {

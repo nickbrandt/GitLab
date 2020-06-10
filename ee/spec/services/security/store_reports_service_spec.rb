@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::StoreReportsService do
+RSpec.describe Security::StoreReportsService do
   let(:user) { create(:user) }
   let(:group)   { create(:group) }
   let(:project) { create(:project, :public, namespace: group) }

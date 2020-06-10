@@ -2,7 +2,7 @@
 
 require 'rake_helper'
 
-describe 'gitlab:elastic namespace rake tasks', :elastic do
+RSpec.describe 'gitlab:elastic namespace rake tasks', :elastic do
   before do
     Rake.application.rake_require 'tasks/gitlab/elastic'
     stub_ee_application_setting(elasticsearch_indexing: true)

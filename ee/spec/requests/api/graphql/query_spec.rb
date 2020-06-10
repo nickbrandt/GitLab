@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Query' do
+RSpec.describe 'Query' do
   include GraphqlHelpers
 
   describe '.vulnerabilitiesCountByDayAndSeverity' do

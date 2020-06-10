@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'issue boards', :js do
+RSpec.describe 'issue boards', :js do
   include DragTo
 
   let(:user) { create(:user) }

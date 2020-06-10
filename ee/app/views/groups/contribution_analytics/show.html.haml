@@ -8,8 +8,8 @@
   .sub-header-block
     .float-right
       .dropdown.inline
-        %button.dropdown-toggle.btn{ type: 'button', 'data-toggle' => 'dropdown' }
-          = icon('calendar-o')
+        %button.dropdown-toggle.btn.gl-text-gray-700{ type: 'button', 'data-toggle' => 'dropdown' }
+          = sprite_icon('calendar')
           %b.caret
         %ul.dropdown-menu.dropdown-menu-right
           %li
@@ -45,7 +45,7 @@
     - mr_created_count = @data_collector.total_merge_requests_created_count
     - mr_merged_count = @data_collector.total_merge_requests_merged_count
     - if mr_created_count > 0 || mr_merged_count > 0
-      = s_('ContributionAnalytics|<strong>%{created_count}</strong> created, <strong>%{accepted_count}</strong> accepted.').html_safe % { created_count: mr_created_count, accepted_count: mr_merged_count }
+      = s_('ContributionAnalytics|<strong>%{created_count}</strong> created, <strong>%{merged_count}</strong> merged.').html_safe % { created_count: mr_created_count, merged_count: mr_merged_count }
     - else
       = s_('ContributionAnalytics|No merge requests for the selected time period.')
 

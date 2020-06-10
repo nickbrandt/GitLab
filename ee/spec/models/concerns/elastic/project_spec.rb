@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Project, :elastic do
+RSpec.describe Project, :elastic do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end

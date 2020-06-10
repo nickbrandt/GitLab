@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::GroupSaml::FailureHandler do
+RSpec.describe Gitlab::Auth::GroupSaml::FailureHandler do
   include Gitlab::Routing
 
   let(:parent_handler) { double }

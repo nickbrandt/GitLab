@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::NugetPackages do
+RSpec.describe API::NugetPackages do
   include WorkhorseHelpers
   include EE::PackagesManagerApiSpecHelpers
 
@@ -203,12 +203,18 @@ describe API::NugetPackages do
   end
 
   describe 'GET /api/v4/projects/:id/packages/nuget/metadata/*package_name/index' do
+    include_context 'with expected presenters dependency groups'
+
     let_it_be(:package_name) { 'Dummy.Package' }
     let_it_be(:packages) { create_list(:nuget_package, 5, :with_metadatum, name: package_name, project: project) }
     let_it_be(:tags) { packages.each { |pkg| create(:packages_tag, package: pkg, name: 'test') } }
     let(:url) { "/projects/#{project.id}/packages/nuget/metadata/#{package_name}/index.json" }
 
     subject { get api(url) }
+
+    before do
+      packages.each { |pkg| create_dependencies_for(pkg) }
+    end
 
     context 'with packages features enabled' do
       before do
@@ -264,12 +270,18 @@ describe API::NugetPackages do
   end
 
   describe 'GET /api/v4/projects/:id/packages/nuget/metadata/*package_name/*package_version' do
+    include_context 'with expected presenters dependency groups'
+
     let_it_be(:package_name) { 'Dummy.Package' }
     let_it_be(:package) { create(:nuget_package, :with_metadatum, name: 'Dummy.Package', project: project) }
     let_it_be(:tag) { create(:packages_tag, package: package, name: 'test') }
     let(:url) { "/projects/#{project.id}/packages/nuget/metadata/#{package_name}/#{package.version}.json" }
 
     subject { get api(url) }
+
+    before do
+      create_dependencies_for(package)
+    end
 
     context 'with packages features enabled' do
       before do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SoftwareLicense do
+RSpec.describe SoftwareLicense do
   subject { build(:software_license) }
 
   describe 'validations' do

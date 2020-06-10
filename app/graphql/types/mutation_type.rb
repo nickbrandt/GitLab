@@ -26,6 +26,7 @@ module Types
     mount_mutation Mutations::MergeRequests::SetWip, calls_gitaly: true
     mount_mutation Mutations::MergeRequests::SetAssignees
     mount_mutation Mutations::Metrics::Dashboard::Annotations::Create
+    mount_mutation Mutations::Metrics::Dashboard::Annotations::Delete
     mount_mutation Mutations::Notes::Create::Note, calls_gitaly: true
     mount_mutation Mutations::Notes::Create::DiffNote, calls_gitaly: true
     mount_mutation Mutations::Notes::Create::ImageDiffNote, calls_gitaly: true
@@ -47,8 +48,10 @@ module Types
     mount_mutation Mutations::Snippets::Create
     mount_mutation Mutations::Snippets::MarkAsSpam
     mount_mutation Mutations::JiraImport::Start
+    mount_mutation Mutations::JiraImport::ImportUsers
     mount_mutation Mutations::DesignManagement::Upload, calls_gitaly: true
     mount_mutation Mutations::DesignManagement::Delete, calls_gitaly: true
+    mount_mutation Mutations::ContainerExpirationPolicies::Update
   end
 end
 

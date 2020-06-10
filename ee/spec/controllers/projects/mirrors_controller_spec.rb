@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::MirrorsController do
+RSpec.describe Projects::MirrorsController do
   include ReactiveCachingHelpers
 
   describe 'setting up a remote mirror' do

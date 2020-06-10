@@ -93,6 +93,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
         resources :dependencies, only: [:index]
         resources :licenses, only: [:index, :create, :update]
+        resources :on_demand_scans, only: [:index], controller: :on_demand_scans
       end
       # End of the /-/ scope.
 

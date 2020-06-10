@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Projects > Settings > Packages', :js do
+RSpec.describe 'Projects > Settings > Packages', :js do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::UpdateBlocksService do
+RSpec.describe MergeRequests::UpdateBlocksService do
   describe '.extract_params!' do
     it 'removes and reformats merge request params' do
       mr_params = {

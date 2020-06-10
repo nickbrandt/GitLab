@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::SearchResults do
+RSpec.describe Gitlab::SearchResults do
   let(:user) { build(:user) }
 
   let_it_be(:compliance_project) { create(:project, :with_compliance_framework, name: 'foo') }

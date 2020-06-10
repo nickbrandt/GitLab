@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicIssue do
+RSpec.describe EpicIssue do
   describe 'validations' do
     let(:epic) { build(:epic) }
     let(:confidential_epic) { build(:epic, :confidential) }

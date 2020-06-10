@@ -1,0 +1,5 @@
+---
+title: Adds a new Dependencies tab for NuGet packages on the package details page
+merge_request: 33303
+author:
+type: added

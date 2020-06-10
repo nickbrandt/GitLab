@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::Minutes::BatchResetService do
+RSpec.describe Ci::Minutes::BatchResetService do
   let(:service) { described_class.new }
 
   describe '#execute!' do

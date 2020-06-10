@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Snippet, :elastic do
+RSpec.describe Snippet, :elastic do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end

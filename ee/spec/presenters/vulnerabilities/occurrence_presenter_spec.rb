@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::OccurrencePresenter do
+RSpec.describe Vulnerabilities::OccurrencePresenter do
   let(:presenter) { described_class.new(occurrence) }
   let(:occurrence) { build_stubbed(:vulnerabilities_occurrence) }
 

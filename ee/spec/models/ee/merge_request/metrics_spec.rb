@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequest::Metrics do
+RSpec.describe MergeRequest::Metrics do
   describe '#review_start_at' do
     it 'is the earliest date from first_comment_at, first_approved_at or first_reassigned_at' do
       subject.first_approved_at = 1.hour.ago

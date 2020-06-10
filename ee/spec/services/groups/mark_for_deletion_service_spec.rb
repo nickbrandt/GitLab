@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::MarkForDeletionService do
+RSpec.describe Groups::MarkForDeletionService do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
 

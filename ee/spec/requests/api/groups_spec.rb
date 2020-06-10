@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Groups do
+RSpec.describe API::Groups do
   include GroupAPIHelpers
 
   let_it_be(:group, reload: true) { create(:group) }

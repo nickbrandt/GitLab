@@ -7,16 +7,16 @@ FactoryBot.define do
     type { 'GitlabSlackApplicationService' }
   end
 
-  factory :github_service do
-    project
-    active { true }
-    token { 'github-token' }
-    type { 'GithubService' }
-  end
-
   factory :slack_slash_commands_service do
     project
     active { true }
     type { 'SlackSlashCommandsService' }
+  end
+
+  factory :github_service do
+    project
+    type { 'GithubService' }
+    active { true }
+    token { 'github-token' }
   end
 end

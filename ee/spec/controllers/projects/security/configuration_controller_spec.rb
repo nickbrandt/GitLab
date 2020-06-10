@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Security::ConfigurationController do
+RSpec.describe Projects::Security::ConfigurationController do
   let(:group)   { create(:group) }
   let(:project) { create(:project, :repository, namespace: group) }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::RefreshService do
+RSpec.describe MergeRequests::RefreshService do
   include ProjectForksHelper
   include ProjectHelpers
 
@@ -209,6 +209,232 @@ describe MergeRequests::RefreshService do
             service.execute(oldrev, newrev, "refs/heads/#{source_branch}")
           end.not_to change { merge_request.pipelines_for_merge_request.count }
         end
+      end
+    end
+
+    context 'when user is approver' do
+      let_it_be(:user) { create(:user) }
+
+      let(:merge_request) do
+        create(:merge_request,
+          source_project: project,
+          source_branch: 'master',
+          target_branch: 'feature',
+          target_project: project,
+          merge_when_pipeline_succeeds: true,
+          merge_user: user)
+      end
+
+      let(:forked_project) { fork_project(project, user, repository: true) }
+      let(:forked_merge_request) do
+        create(:merge_request,
+          source_project: forked_project,
+          source_branch: 'master',
+          target_branch: 'feature',
+          target_project: project)
+      end
+
+      let(:commits) { merge_request.commits }
+      let(:oldrev) { commits.last.id }
+      let(:newrev) { commits.first.id }
+      let(:approver) { create(:user) }
+
+      before do
+        group.add_owner(user)
+
+        merge_request.approvals.create(user_id: user.id)
+        forked_merge_request.approvals.create(user_id: user.id)
+
+        project.add_developer(approver)
+
+        perform_enqueued_jobs do
+          merge_request.update(approver_ids: [approver].map(&:id).join(','))
+          forked_merge_request.update(approver_ids: [approver].map(&:id).join(','))
+        end
+      end
+
+      def approval_todos(merge_request)
+        Todo.where(action: Todo::APPROVAL_REQUIRED, target: merge_request)
+      end
+
+      context 'push to origin repo source branch' do
+        let(:notification_service) { spy('notification_service') }
+
+        before do
+          allow(service).to receive(:execute_hooks)
+          allow(NotificationService).to receive(:new) { notification_service }
+        end
+
+        it 'resets approvals' do
+          service.execute(oldrev, newrev, 'refs/heads/master')
+          reload_mrs
+
+          expect(merge_request.approvals).to be_empty
+          expect(forked_merge_request.approvals).not_to be_empty
+          expect(approval_todos(merge_request).map(&:user)).to contain_exactly(approver)
+          expect(approval_todos(forked_merge_request)).to be_empty
+        end
+      end
+
+      context 'push to origin repo target branch' do
+        context 'when all MRs to the target branch had diffs' do
+          before do
+            service.execute(oldrev, newrev, 'refs/heads/feature')
+            reload_mrs
+          end
+
+          it 'does not reset approvals' do
+            expect(merge_request.approvals).not_to be_empty
+            expect(forked_merge_request.approvals).not_to be_empty
+            expect(approval_todos(merge_request)).to be_empty
+            expect(approval_todos(forked_merge_request)).to be_empty
+          end
+        end
+      end
+
+      context 'push to fork repo source branch' do
+        let(:service) { described_class.new(forked_project, user) }
+
+        def refresh
+          allow(service).to receive(:execute_hooks)
+          service.execute(oldrev, newrev, 'refs/heads/master')
+          reload_mrs
+        end
+
+        context 'open fork merge request' do
+          it 'resets approvals', :sidekiq_might_not_need_inline do
+            refresh
+
+            expect(merge_request.approvals).not_to be_empty
+            expect(forked_merge_request.approvals).to be_empty
+            expect(approval_todos(merge_request)).to be_empty
+            expect(approval_todos(forked_merge_request).map(&:user)).to contain_exactly(approver)
+          end
+        end
+
+        context 'closed fork merge request' do
+          before do
+            forked_merge_request.close!
+          end
+
+          it 'resets approvals', :sidekiq_might_not_need_inline do
+            refresh
+
+            expect(merge_request.approvals).not_to be_empty
+            expect(forked_merge_request.approvals).to be_empty
+            expect(approval_todos(merge_request)).to be_empty
+            expect(approval_todos(forked_merge_request)).to be_empty
+          end
+        end
+      end
+
+      context 'push to fork repo target branch' do
+        describe 'changes to merge requests' do
+          before do
+            described_class.new(forked_project, user).execute(oldrev, newrev, 'refs/heads/feature')
+            reload_mrs
+          end
+
+          it 'does not reset approvals', :sidekiq_might_not_need_inline do
+            expect(merge_request.approvals).not_to be_empty
+            expect(forked_merge_request.approvals).not_to be_empty
+            expect(approval_todos(merge_request)).to be_empty
+            expect(approval_todos(forked_merge_request)).to be_empty
+          end
+        end
+      end
+
+      context 'push to origin repo target branch after fork project was removed' do
+        before do
+          forked_project.destroy
+          service.execute(oldrev, newrev, 'refs/heads/feature')
+          reload_mrs
+        end
+
+        it 'does not reset approvals' do
+          expect(merge_request.approvals).not_to be_empty
+          expect(forked_merge_request.approvals).not_to be_empty
+          expect(approval_todos(merge_request)).to be_empty
+          expect(approval_todos(forked_merge_request)).to be_empty
+        end
+      end
+
+      context 'resetting approvals if they are enabled' do
+        context 'when approvals_before_merge is disabled' do
+          before do
+            project.update(approvals_before_merge: 0)
+            allow(service).to receive(:execute_hooks)
+            service.execute(oldrev, newrev, 'refs/heads/master')
+            reload_mrs
+          end
+
+          it 'resets approvals' do
+            expect(merge_request.approvals).to be_empty
+            expect(approval_todos(merge_request).map(&:user)).to contain_exactly(approver)
+          end
+        end
+
+        context 'when reset_approvals_on_push is disabled' do
+          before do
+            project.update(reset_approvals_on_push: false)
+            allow(service).to receive(:execute_hooks)
+            service.execute(oldrev, newrev, 'refs/heads/master')
+            reload_mrs
+          end
+
+          it 'does not reset approvals' do
+            expect(merge_request.approvals).not_to be_empty
+            expect(approval_todos(merge_request)).to be_empty
+          end
+        end
+
+        context 'when the rebase_commit_sha on the MR matches the pushed SHA' do
+          before do
+            merge_request.update(rebase_commit_sha: newrev)
+            allow(service).to receive(:execute_hooks)
+            service.execute(oldrev, newrev, 'refs/heads/master')
+            reload_mrs
+          end
+
+          it 'does not reset approvals' do
+            expect(merge_request.approvals).not_to be_empty
+            expect(approval_todos(merge_request)).to be_empty
+          end
+        end
+
+        context 'when there are approvals' do
+          context 'closed merge request' do
+            before do
+              merge_request.close!
+              allow(service).to receive(:execute_hooks)
+              service.execute(oldrev, newrev, 'refs/heads/master')
+              reload_mrs
+            end
+
+            it 'resets the approvals' do
+              expect(merge_request.approvals).to be_empty
+              expect(approval_todos(merge_request)).to be_empty
+            end
+          end
+
+          context 'opened merge request' do
+            before do
+              allow(service).to receive(:execute_hooks)
+              service.execute(oldrev, newrev, 'refs/heads/master')
+              reload_mrs
+            end
+
+            it 'resets the approvals' do
+              expect(merge_request.approvals).to be_empty
+              expect(approval_todos(merge_request).map(&:user)).to contain_exactly(approver)
+            end
+          end
+        end
+      end
+
+      def reload_mrs
+        merge_request.reload
+        forked_merge_request.reload
       end
     end
   end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::ApplicationContext do
+RSpec.describe Gitlab::ApplicationContext do
   describe '#to_lazy_hash' do
     let(:user) { build(:user) }
     let(:project) { build(:project) }

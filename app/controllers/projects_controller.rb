@@ -34,6 +34,12 @@ class ProjectsController < Projects::ApplicationController
   # Project Export Rate Limit
   before_action :export_rate_limit, only: [:export, :download_export, :generate_new_export]
 
+  # Experiments
+  before_action only: [:new, :create] do
+    frontend_experimentation_tracking_data(:new_create_project_ui, 'click_tab')
+    push_frontend_feature_flag(:new_create_project_ui) if experiment_enabled?(:new_create_project_ui)
+  end
+
   layout :determine_layout
 
   def index
@@ -310,8 +316,8 @@ class ProjectsController < Projects::ApplicationController
       render 'projects/empty' if @project.empty_repo?
     else
       if can?(current_user, :read_wiki, @project)
-        @project_wiki = @project.wiki
-        @wiki_home = @project_wiki.find_page('home', params[:version_id])
+        @wiki = @project.wiki
+        @wiki_home = @wiki.find_page('home', params[:version_id])
       elsif @project.feature_available?(:issues, current_user)
         @issues = issuables_collection.page(params[:page])
         @issuable_meta_data = Gitlab::IssuableMetadata.new(current_user, @issues).data
@@ -484,7 +490,7 @@ class ProjectsController < Projects::ApplicationController
 
     project_scope = params[:action] == :download_export ? @project : nil
 
-    if rate_limiter.throttled?(prefixed_action, scope: [current_user, prefixed_action, project_scope].compact)
+    if rate_limiter.throttled?(prefixed_action, scope: [current_user, project_scope].compact)
       rate_limiter.log_request(request, "#{prefixed_action}_request_limit".to_sym, current_user)
 
       render plain: _('This endpoint has been requested too many times. Try again later.'), status: :too_many_requests

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSubscription do
+RSpec.describe GitlabSubscription do
   %i[free_plan bronze_plan silver_plan gold_plan early_adopter_plan].each do |plan|
     let_it_be(plan) { create(plan) }
   end

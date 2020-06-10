@@ -3726,7 +3726,7 @@ describe Project do
       context 'when feature is private' do
         let(:project) { create(:project, :public, :merge_requests_private) }
 
-        context 'when user does not has access to the feature' do
+        context 'when user does not have access to the feature' do
           it 'does not return projects with the project feature private' do
             is_expected.not_to include(project)
           end
@@ -4262,7 +4262,7 @@ describe Project do
 
   describe '#auto_devops_enabled?' do
     before do
-      Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(0)
+      Feature.enable_percentage_of_actors(:force_autodevops_on_by_default, 0)
     end
 
     let_it_be(:project, reload: true) { create(:project) }
@@ -4464,7 +4464,7 @@ describe Project do
     let_it_be(:project, reload: true) { create(:project) }
 
     before do
-      Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(0)
+      Feature.enable_percentage_of_actors(:force_autodevops_on_by_default, 0)
     end
 
     context 'when explicitly disabled' do
@@ -4510,7 +4510,7 @@ describe Project do
         before do
           create(:project_auto_devops, project: project, enabled: false)
 
-          Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(100)
+          Feature.enable_percentage_of_actors(:force_autodevops_on_by_default, 100)
         end
 
         it 'does not have auto devops implicitly disabled' do
@@ -4809,6 +4809,32 @@ describe Project do
           project.execute_hooks(data, :merge_request_hooks)
         end
       end.not_to raise_error # Sidekiq::Worker::EnqueueFromTransactionError
+    end
+  end
+
+  describe '#execute_services' do
+    let(:service) { create(:slack_service, push_events: true, merge_requests_events: false, active: true) }
+
+    it 'executes services with the specified scope' do
+      data = 'any data'
+
+      expect(SlackService).to receive(:allocate).and_wrap_original do |method|
+        method.call.tap do |instance|
+          expect(instance).to receive(:async_execute).with(data).once
+        end
+      end
+
+      service.project.execute_services(data, :push_hooks)
+    end
+
+    it 'does not execute services that don\'t match the specified scope' do
+      expect(SlackService).not_to receive(:allocate).and_wrap_original do |method|
+        method.call.tap do |instance|
+          expect(instance).not_to receive(:async_execute)
+        end
+      end
+
+      service.project.execute_services(anything, :merge_request_hooks)
     end
   end
 
@@ -5995,99 +6021,6 @@ describe Project do
       it 'returns latest jira import by created_at' do
         expect(project.jira_imports.pluck(:id)).to eq([jira_import3.id, jira_import2.id, jira_import1.id])
         expect(project.latest_jira_import).to eq(jira_import1)
-      end
-    end
-  end
-
-  describe '#validate_jira_import_settings!' do
-    include JiraServiceHelper
-
-    let_it_be(:project, reload: true) { create(:project) }
-
-    shared_examples 'raise Jira import error' do |message|
-      it 'returns error' do
-        expect { subject }.to raise_error(Projects::ImportService::Error, message)
-      end
-    end
-
-    shared_examples 'jira configuration base checks' do
-      context 'when Jira service was not setup' do
-        it_behaves_like 'raise Jira import error', 'Jira integration not configured.'
-      end
-
-      context 'when Jira service exists' do
-        let!(:jira_service) { create(:jira_service, project: project, active: true) }
-
-        context 'when Jira connection is not valid' do
-          before do
-            WebMock.stub_request(:get, 'https://jira.example.com/rest/api/2/serverInfo')
-              .to_raise(JIRA::HTTPError.new(double(message: 'Some failure.')))
-          end
-
-          it_behaves_like 'raise Jira import error', 'Unable to connect to the Jira instance. Please check your Jira integration configuration.'
-        end
-      end
-    end
-
-    before do
-      stub_jira_service_test
-    end
-
-    context 'without user param' do
-      subject { project.validate_jira_import_settings! }
-
-      it_behaves_like 'jira configuration base checks'
-
-      context 'when jira connection is valid' do
-        let!(:jira_service) { create(:jira_service, project: project, active: true) }
-
-        it 'does not return any error' do
-          expect { subject }.not_to raise_error
-        end
-      end
-    end
-
-    context 'with user param provided' do
-      let_it_be(:user) { create(:user) }
-
-      subject { project.validate_jira_import_settings!(user: user) }
-
-      context 'when user has permission to run import' do
-        before do
-          project.add_maintainer(user)
-        end
-
-        it_behaves_like 'jira configuration base checks'
-      end
-
-      context 'when user does not have permissions to run the import' do
-        before do
-          create(:jira_service, project: project, active: true)
-
-          project.add_developer(user)
-        end
-
-        it_behaves_like 'raise Jira import error', 'You do not have permissions to run the import.'
-      end
-
-      context 'when user has permission to run import' do
-        before do
-          project.add_maintainer(user)
-        end
-
-        let!(:jira_service) { create(:jira_service, project: project, active: true) }
-
-        context 'when issues feature is disabled' do
-          let_it_be(:project, reload: true) { create(:project, :issues_disabled) }
-
-          it_behaves_like 'raise Jira import error', 'Cannot import because issues are not available in this project.'
-        end
-
-        context 'when everything is ok' do
-          it 'does not return any error' do
-            expect { subject }.not_to raise_error
-          end
-        end
       end
     end
   end

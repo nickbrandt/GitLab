@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-shared_examples_for 'snippet editor' do
+RSpec.shared_examples_for 'snippet editor' do
   before do
     stub_feature_flags(snippets_vue: false)
     stub_feature_flags(snippets_edit_vue: false)
@@ -176,11 +176,13 @@ shared_examples_for 'snippet editor' do
       click_link('Internal')
 
       expect(page).to have_content('My Snippet Title')
+      created_snippet = Snippet.last
+      expect(created_snippet.visibility_level).to eq(Gitlab::VisibilityLevel::INTERNAL)
     end
   end
 end
 
-describe 'User creates snippet', :js do
+RSpec.describe 'User creates snippet', :js do
   include DropzoneHelper
 
   let_it_be(:user) { create(:user) }

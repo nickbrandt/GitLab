@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::Analytics::ProductivityAnalyticsController do
+RSpec.describe Groups::Analytics::ProductivityAnalyticsController do
   let_it_be(:current_user) { create(:user) }
   let_it_be(:group) { create :group }
 

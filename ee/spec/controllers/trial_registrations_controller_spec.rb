@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe TrialRegistrationsController do
+RSpec.describe TrialRegistrationsController do
   describe '#new' do
     let(:user) { create(:user) }
 

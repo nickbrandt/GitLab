@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Epics::UpdateService do
+RSpec.describe Epics::UpdateService do
   let(:group) { create(:group, :internal) }
   let(:user) { create(:user) }
   let(:epic) { create(:epic, group: group) }

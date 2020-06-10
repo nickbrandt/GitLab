@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe NamespacePolicy do
+RSpec.describe NamespacePolicy do
   let(:owner) { build_stubbed(:user) }
   let(:namespace) { build_stubbed(:namespace, owner: owner) }
   let(:owner_permissions) { [:create_projects, :admin_namespace, :read_namespace] }

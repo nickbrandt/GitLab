@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Epic aggregates (count and weight)' do
+RSpec.describe 'Epic aggregates (count and weight)' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Issuable do
+RSpec.describe EE::Issuable do
   describe "Validation" do
     context 'general validations' do
       subject { build(:epic) }

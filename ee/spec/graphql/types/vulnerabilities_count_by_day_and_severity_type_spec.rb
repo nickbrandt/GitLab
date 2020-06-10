@@ -2,6 +2,6 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['VulnerabilitiesCountByDayAndSeverity'] do
+RSpec.describe GitlabSchema.types['VulnerabilitiesCountByDayAndSeverity'] do
   it { expect(described_class).to have_graphql_fields(:count, :day, :severity) }
 end

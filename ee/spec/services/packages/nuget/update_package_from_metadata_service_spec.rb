@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_shared_state do
+RSpec.describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_shared_state do
   include ExclusiveLeaseHelpers
 
   let(:package) { create(:nuget_package) }
@@ -111,13 +111,13 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
     end
 
     context 'with a nuspec file with metadata' do
-      let(:nuspec_filepath) { 'nuget/with_metadata.nuspec' }
+      let(:nuspec_filepath) { 'packages/nuget/with_metadata.nuspec' }
       let(:expected_tags) { %w(foo bar test tag1 tag2 tag3 tag4 tag5) }
 
       before do
         allow_any_instance_of(Packages::Nuget::MetadataExtractionService)
           .to receive(:nuspec_file)
-          .and_return(fixture_file(nuspec_filepath, dir: 'ee'))
+          .and_return(fixture_file(nuspec_filepath))
       end
 
       it 'creates tags' do
@@ -164,7 +164,7 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
     end
 
     context 'with nuspec file with dependencies' do
-      let(:nuspec_filepath) { 'nuget/with_dependencies.nuspec' }
+      let(:nuspec_filepath) { 'packages/nuget/with_dependencies.nuspec' }
       let(:package_name) { 'Test.Package' }
       let(:package_version) { '3.5.2' }
       let(:package_file_name) { 'test.package.3.5.2.nupkg' }
@@ -172,7 +172,7 @@ describe Packages::Nuget::UpdatePackageFromMetadataService, :clean_gitlab_redis_
       before do
         allow_any_instance_of(Packages::Nuget::MetadataExtractionService)
           .to receive(:nuspec_file)
-          .and_return(fixture_file(nuspec_filepath, dir: 'ee'))
+          .and_return(fixture_file(nuspec_filepath))
       end
 
       it 'updates package and package file' do

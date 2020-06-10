@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GroupClusterablePresenter do
+RSpec.describe GroupClusterablePresenter do
   include Gitlab::Routing.url_helpers
 
   let_it_be(:user) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::CreateService do
+RSpec.describe MergeRequests::CreateService do
   include ProjectForksHelper
 
   let(:project) { create(:project, :repository) }

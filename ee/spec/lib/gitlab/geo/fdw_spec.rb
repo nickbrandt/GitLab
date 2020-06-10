@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::Fdw, :geo do
+RSpec.describe Gitlab::Geo::Fdw, :geo do
   describe '.enabled?' do
     it 'returns false when Geo secondary database is not configured' do
       allow(Gitlab::Geo).to receive(:geo_database_configured?).and_return(false)

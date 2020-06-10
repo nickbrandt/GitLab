@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalMergeRequestRule do
+RSpec.describe ApprovalMergeRequestRule do
   let(:merge_request) { create(:merge_request) }
 
   subject { create(:approval_merge_request_rule, merge_request: merge_request) }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Pypi::CreatePackageService do
+RSpec.describe Packages::Pypi::CreatePackageService do
   include EE::PackagesManagerApiSpecHelpers
 
   let_it_be(:project) { create(:project) }

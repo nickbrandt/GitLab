@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Kubernetes::RolloutStatus do
+RSpec.describe Gitlab::Kubernetes::RolloutStatus do
   include KubernetesHelpers
 
   let(:track) { nil }

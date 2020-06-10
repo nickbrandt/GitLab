@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe License do
+RSpec.describe License do
   let(:gl_license) { build(:gitlab_license) }
   let(:license)    { build(:license, data: gl_license.export) }
 

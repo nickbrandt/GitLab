@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['BoardList'] do
+RSpec.describe GitlabSchema.types['BoardList'] do
   it 'has specific fields' do
     expected_fields = %w[milestone max_issue_count max_issue_weight assignee]
 

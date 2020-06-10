@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::Replicator do
+RSpec.describe Gitlab::Geo::Replicator do
   include ::EE::GeoHelpers
 
   let_it_be(:primary_node) { create(:geo_node, :primary) }
@@ -29,6 +29,10 @@ describe Gitlab::Geo::Replicator do
       Geo::DummyReplicator.class_eval do
         event :test
         event :another_test
+
+        def self.model
+          ::DummyModel
+        end
 
         protected
 
@@ -224,7 +228,7 @@ describe Gitlab::Geo::Replicator do
 
       # We cannot infer parent project, so parent_project_id should be overridden.
       context 'when model_record does not respond to project_id' do
-        let(:model_record) { double(:model_record) }
+        let(:model_record) { double(:model_record, id: 555) }
 
         it 'raises NotImplementedError' do
           expect { replicator.parent_project_id }.to raise_error(NotImplementedError)
@@ -233,10 +237,65 @@ describe Gitlab::Geo::Replicator do
 
       # We assume project_id to be the parent project.
       context 'when model_record responds to project_id' do
-        let(:model_record) { double(:model_record, project_id: 1234) }
+        let(:model_record) { double(:model_record, id: 555, project_id: 1234) }
 
         it 'does not error' do
           expect(replicator.parent_project_id).to eq(1234)
+        end
+      end
+    end
+
+    describe '.for_replicable_params' do
+      it 'returns the corresponding Replicator instance' do
+        replicator = described_class.for_replicable_params(replicable_name: 'dummy', replicable_id: 123456)
+
+        expect(replicator).to be_a(Geo::DummyReplicator)
+        expect(replicator.model_record_id).to eq(123456)
+      end
+    end
+
+    describe '.replicable_params' do
+      it 'returns a Hash of data needed to reinstantiate the Replicator' do
+        replicator = Geo::DummyReplicator.new(model_record_id: 123456)
+
+        expect(replicator.replicable_params).to eq(replicable_name: 'dummy', replicable_id: 123456)
+      end
+    end
+
+    describe '#initialize' do
+      subject(:replicator) { Geo::DummyReplicator.new(**args) }
+
+      let(:model_record) { double('DummyModel instance', id: 1234) }
+
+      context 'given model_record' do
+        let(:args) { { model_record: model_record } }
+
+        it 'sets model_record' do
+          expect(replicator.model_record).to eq(model_record)
+        end
+
+        it 'sets model_record_id' do
+          expect(replicator.model_record_id).to eq(1234)
+        end
+      end
+
+      context 'given model_record_id' do
+        let(:args) { { model_record_id: 1234 } }
+
+        before do
+          model = double('DummyModel')
+          # These two stubs are needed because `#model_record` instantiates the
+          # defined `.model` class.
+          allow(Geo::DummyReplicator).to receive(:model).and_return(model)
+          allow(model).to receive(:find).with(1234).and_return(model_record)
+        end
+
+        it 'sets model_record' do
+          expect(replicator.model_record).to eq(model_record)
+        end
+
+        it 'sets model_record_id' do
+          expect(replicator.model_record_id).to eq(1234)
         end
       end
     end

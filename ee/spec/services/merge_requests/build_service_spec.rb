@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::BuildService do
+RSpec.describe MergeRequests::BuildService do
   let(:source_project) { project }
   let(:target_project) { project }
   let(:user) { create(:user) }

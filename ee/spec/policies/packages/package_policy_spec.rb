@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::PackagePolicy do
+RSpec.describe Packages::PackagePolicy do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
   let_it_be(:package) { create(:package, project: project) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::NpmPackages do
+RSpec.describe API::NpmPackages do
   include EE::PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create(:user) }
@@ -409,7 +409,7 @@ describe API::NpmPackages do
     end
 
     def upload_params(package_name:, package_version: '1.0.1', file: 'npm/payload.json')
-      Gitlab::Json.parse(fixture_file(file, dir: 'ee')
+      Gitlab::Json.parse(fixture_file("packages/#{file}")
           .gsub('@root/npm-test', package_name)
           .gsub('1.0.1', package_version))
     end

@@ -15,4 +15,5 @@ class Packages::DependencyLink < ApplicationRecord
   scope :includes_dependency, -> { includes(:dependency) }
   scope :for_package, ->(package) { where(package_id: package.id) }
   scope :preload_dependency, -> { preload(:dependency) }
+  scope :preload_nuget_metadatum, -> { preload(:nuget_metadatum) }
 end

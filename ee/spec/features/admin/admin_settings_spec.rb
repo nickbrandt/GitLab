@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Admin updates EE-only settings' do
+RSpec.describe 'Admin updates EE-only settings' do
   include StubENV
 
   before do

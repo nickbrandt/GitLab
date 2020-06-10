@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::FeatureFlags do
+RSpec.describe API::FeatureFlags do
   include FeatureFlagHelpers
 
   let(:project) { create(:project, :repository) }
@@ -238,7 +238,7 @@ describe API::FeatureFlags do
   end
 
   describe 'POST /projects/:id/feature_flags' do
-    def default_scope
+    def scope_default
       {
         environment_scope: '*',
         active: false,
@@ -253,7 +253,7 @@ describe API::FeatureFlags do
     let(:params) do
       {
         name: 'awesome-feature',
-        scopes: [default_scope]
+        scopes: [scope_default]
       }
     end
 
@@ -328,7 +328,7 @@ describe API::FeatureFlags do
           name: 'awesome-feature',
           description: 'this is awesome',
           scopes: [
-            default_scope,
+            scope_default,
             scope_with_user_with_id
           ]
         }

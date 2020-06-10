@@ -28,15 +28,15 @@ module Gitlab
         end
       end
 
-      def create_empty_index(with_alias: true)
+      def create_empty_index(with_alias: true, options: {})
         if index_exists?
           raise "Index under '#{target_name}' already exists, use `recreate_index` to recreate it."
         end
 
+        new_index_name = with_alias ? "#{target_name}-#{Time.now.strftime("%Y%m%d-%H%M")}" : target_name
+
         settings = {}
         mappings = {}
-
-        new_index_name = with_alias ? "#{target_name}-#{Time.now.strftime("%Y%m%d-%H%M")}" : target_name
 
         [
           Project,
@@ -51,6 +51,9 @@ module Gitlab
           settings.deep_merge!(klass.__elasticsearch__.settings.to_hash)
           mappings.deep_merge!(klass.__elasticsearch__.mappings.to_hash)
         end
+
+        settings.merge!(options[:settings]) if options[:settings]
+        mappings.merge!(options[:mappings]) if options[:mappings]
 
         create_index_options = {
           index: new_index_name,

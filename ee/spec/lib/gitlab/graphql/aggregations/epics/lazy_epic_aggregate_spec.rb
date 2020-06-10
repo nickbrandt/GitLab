@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
+RSpec.describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
   include_context 'includes EpicAggregate constants'
 
   let(:query_ctx) do

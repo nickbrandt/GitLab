@@ -2,12 +2,10 @@
 
 require 'spec_helper'
 
-describe API::GroupPackages do
+RSpec.describe API::GroupPackages do
   let_it_be(:group) { create(:group, :public) }
   let_it_be(:project) { create(:project, :public, namespace: group, name: 'project A') }
-  let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
-  let!(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
-  let(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   subject { get api(url) }
 
@@ -21,6 +19,8 @@ describe API::GroupPackages do
       end
 
       context 'with sorting' do
+        let_it_be(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
+        let_it_be(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
         let(:package3) { create(:maven_package, project: project, version: '1.1.1', name: 'zzz') }
 
         before do
@@ -64,6 +64,9 @@ describe API::GroupPackages do
       end
 
       context 'with private group' do
+        let!(:package1) { create(:package, project: project) }
+        let!(:package2) { create(:package, project: project) }
+
         let(:group) { create(:group, :private) }
         let(:subgroup) { create(:group, :private, parent: group) }
         let(:project) { create(:project, :private, namespace: group) }
@@ -107,6 +110,9 @@ describe API::GroupPackages do
       end
 
       context 'with public group' do
+        let_it_be(:package1) { create(:package, project: project) }
+        let_it_be(:package2) { create(:package, project: project) }
+
         context 'with unauthenticated user' do
           it_behaves_like 'returns packages', :group, :no_type
         end
@@ -123,8 +129,10 @@ describe API::GroupPackages do
       end
 
       context 'with pagination params' do
-        let!(:package3) { create(:npm_package, project: project) }
-        let!(:package4) { create(:npm_package, project: project) }
+        let_it_be(:package1) { create(:package, project: project) }
+        let_it_be(:package2) { create(:package, project: project) }
+        let_it_be(:package3) { create(:npm_package, project: project) }
+        let_it_be(:package4) { create(:npm_package, project: project) }
 
         it_behaves_like 'returns paginated packages'
       end

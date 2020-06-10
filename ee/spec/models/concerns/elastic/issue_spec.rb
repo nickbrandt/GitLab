@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Issue, :elastic do
+RSpec.describe Issue, :elastic do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end

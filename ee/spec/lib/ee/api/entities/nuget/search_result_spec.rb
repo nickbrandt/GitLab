@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::API::Entities::Nuget::SearchResult do
+RSpec.describe EE::API::Entities::Nuget::SearchResult do
   let(:search_result) do
     {
       type: 'Package',

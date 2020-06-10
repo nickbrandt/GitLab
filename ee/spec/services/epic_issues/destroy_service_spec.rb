@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicIssues::DestroyService do
+RSpec.describe EpicIssues::DestroyService do
   describe '#execute' do
     let(:user) { create(:user) }
     let(:group) { create(:group, :public) }

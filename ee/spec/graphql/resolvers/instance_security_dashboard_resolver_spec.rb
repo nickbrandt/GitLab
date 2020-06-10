@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Resolvers::InstanceSecurityDashboardResolver do
+RSpec.describe Resolvers::InstanceSecurityDashboardResolver do
   include GraphqlHelpers
 
   describe '#resolve' do

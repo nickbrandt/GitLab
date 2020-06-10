@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Search do
+RSpec.describe API::Search do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
   let(:project) { create(:project, :public, :repository, :wiki_repo, name: 'awesome project', group: group) }
@@ -212,6 +212,16 @@ describe API::Search do
       end
 
       it_behaves_like 'pagination', scope: 'milestones'
+
+      it 'avoids N+1 queries' do
+        control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'milestones', search: '*' } }
+        create_list(:milestone, 3, project: project)
+        create_list(:milestone, 2, project: create(:project, :public))
+
+        ensure_elasticsearch_index!
+
+        expect { get api(endpoint, user), params: { scope: 'milestones', search: '*' } }.not_to exceed_query_limit(control.count)
+      end
     end
 
     context 'for users scope', :sidekiq_inline do

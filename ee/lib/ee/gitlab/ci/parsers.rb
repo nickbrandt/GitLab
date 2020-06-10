@@ -16,7 +16,8 @@ module EE
                 dast: ::Gitlab::Ci::Parsers::Security::Dast,
                 sast: ::Gitlab::Ci::Parsers::Security::Sast,
                 secret_detection: ::Gitlab::Ci::Parsers::Security::SecretDetection,
-                metrics: ::Gitlab::Ci::Parsers::Metrics::Generic
+                metrics: ::Gitlab::Ci::Parsers::Metrics::Generic,
+                requirements: ::Gitlab::Ci::Parsers::RequirementsManagement::Requirement
             })
           end
         end

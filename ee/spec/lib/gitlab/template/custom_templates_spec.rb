@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe "Custom file template classes" do
+RSpec.describe "Custom file template classes" do
   files = {
     'Dockerfile/foo.dockerfile' => 'CustomDockerfileTemplate Foo',
     'Dockerfile/bar.dockerfile' => 'CustomDockerfileTemplate Bar',

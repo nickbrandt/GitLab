@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::FileRegistryFinder, :geo, :geo_fdw do
+RSpec.describe Geo::FileRegistryFinder, :geo, :geo_fdw do
   include ::EE::GeoHelpers
 
   context 'with abstract methods' do

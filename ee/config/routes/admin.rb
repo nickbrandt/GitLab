@@ -60,6 +60,7 @@ namespace :admin do
       end
 
       resources :designs, only: [:index]
+      resources :package_files, only: [:index]
 
       resources :uploads, only: [:index, :destroy]
     end

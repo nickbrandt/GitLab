@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Audit::Changes do
+RSpec.describe Audit::Changes do
   subject(:foo_instance) { Class.new { include Audit::Changes }.new }
 
   describe '.audit_changes' do

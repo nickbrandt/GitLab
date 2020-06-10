@@ -2,8 +2,11 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::PackagesMetadataPresenter do
-  let_it_be(:packages) { create_list(:nuget_package, 5, :with_metadatum, name: 'Dummy.Package') }
+RSpec.describe Packages::Nuget::PackagesMetadataPresenter do
+  include_context 'with expected presenters dependency groups'
+
+  let_it_be(:project) { create(:project) }
+  let_it_be(:packages) { create_list(:nuget_package, 5, :with_metadatum, name: 'Dummy.Package', project: project) }
   let_it_be(:presenter) { described_class.new(packages) }
 
   describe '#count' do
@@ -20,6 +23,8 @@ describe Packages::Nuget::PackagesMetadataPresenter do
     before do
       packages.each do |pkg|
         tag_names.each { |tag| create(:packages_tag, package: pkg, name: tag) }
+
+        create_dependencies_for(pkg)
       end
     end
 
@@ -49,7 +54,7 @@ describe Packages::Nuget::PackagesMetadataPresenter do
         catalog_entry = pkg[:catalog_entry]
         %i[json_url archive_url package_name package_version].each { |field| expect(catalog_entry[field]).not_to be_blank }
         %i[authors summary].each { |field| expect(catalog_entry[field]).to be_blank }
-        expect(catalog_entry[:dependencies]).to eq []
+        expect(catalog_entry[:dependency_groups]).to eq(expected_dependency_groups(project.id, catalog_entry[:package_name], catalog_entry[:package_version]))
         expect(catalog_entry[:tags].split(::Packages::Tag::NUGET_TAGS_SEPARATOR)).to contain_exactly('tag1', 'tag2')
 
         %i[project_url license_url icon_url].each do |field|

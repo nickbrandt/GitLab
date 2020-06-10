@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SamlProvider do
+RSpec.describe SamlProvider do
   let(:group) { create(:group) }
 
   subject(:saml_provider) { create(:saml_provider, group: group) }

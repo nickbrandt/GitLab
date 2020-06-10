@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Analytics::GroupActivityAnalytics do
+RSpec.describe API::Analytics::GroupActivityAnalytics do
   let_it_be(:group) { create(:group, :private) }
 
   let_it_be(:reporter) do

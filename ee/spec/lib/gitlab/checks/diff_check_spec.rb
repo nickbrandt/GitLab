@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Checks::DiffCheck do
+RSpec.describe Gitlab::Checks::DiffCheck do
   include FakeBlobHelpers
 
   include_context 'push rules checks context'

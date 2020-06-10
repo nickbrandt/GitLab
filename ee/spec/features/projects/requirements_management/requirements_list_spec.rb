@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Requirements list', :js do
+RSpec.describe 'Requirements list', :js do
   let_it_be(:user) { create(:user) }
   let_it_be(:user_guest) { create(:user) }
   let_it_be(:project) { create(:project, :repository) }
@@ -233,6 +233,21 @@ describe 'Requirements list', :js do
       it 'shows list of all requirements' do
         page.within('.requirements-list-container .requirements-list') do
           expect(page).to have_selector('li.requirement', count: 4)
+        end
+      end
+    end
+
+    context 'filtered search' do
+      it 'shows filtered search input field' do
+        page.within('.vue-filtered-search-bar-container') do
+          expect(page).to have_selector('input.gl-filtered-search-term-input')
+        end
+      end
+
+      it 'shows sort dropdown' do
+        page.within('.vue-filtered-search-bar-container') do
+          expect(page).to have_selector('.gl-new-dropdown button.gl-dropdown-toggle')
+          expect(page).to have_selector('.gl-new-dropdown ul.dropdown-menu', visible: false)
         end
       end
     end

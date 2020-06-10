@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Resolvers::VulnerabilitiesResolver do
+RSpec.describe Resolvers::VulnerabilitiesResolver do
   include GraphqlHelpers
 
   describe '#resolve' do

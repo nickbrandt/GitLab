@@ -15,17 +15,23 @@ module EE
       def handle_issue_epic_link(issue)
         return unless params.key?(:epic)
 
-        epic_param = params.delete(:epic)
+        epic = params.delete(:epic)
 
-        if epic_param
-          EpicIssues::CreateService.new(epic_param, current_user, { target_issuable: issue }).execute
+        if epic
+          issue.confidential = epic.confidential?
+
+          EpicIssues::CreateService.new(epic, current_user, { target_issuable: issue }).execute
         else
-          link = EpicIssue.find_by_issue_id(issue.id)
-
-          return unless link
-
-          EpicIssues::DestroyService.new(link, current_user).execute
+          destroy_epic_link(issue)
         end
+      end
+
+      def destroy_epic_link(issue)
+        link = EpicIssue.find_by_issue_id(issue.id)
+
+        return unless link
+
+        EpicIssues::DestroyService.new(link, current_user).execute
       end
     end
   end

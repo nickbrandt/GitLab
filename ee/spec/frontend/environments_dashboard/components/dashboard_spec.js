@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlDeprecatedButton, GlModal, GlSprintf, GlLink } from '@gitlab/ui';
+import { GlButton, GlEmptyState, GlModal, GlSprintf, GlLink } from '@gitlab/ui';
 import createStore from 'ee/vue_shared/dashboards/store/index';
 import state from 'ee/vue_shared/dashboards/store/state';
 import component from 'ee/environments_dashboard/components/dashboard/dashboard.vue';
@@ -63,6 +63,10 @@ describe('dashboard', () => {
     expect(wrapper.find('.js-dashboard-title').text()).toBe('Environments Dashboard');
   });
 
+  it('should render the empty state component', () => {
+    expect(wrapper.find(GlEmptyState).exists()).toBe(true);
+  });
+
   describe('page limits information message', () => {
     let message;
 
@@ -72,14 +76,14 @@ describe('dashboard', () => {
 
     it('renders the message', () => {
       expect(trimText(message.text())).toBe(
-        'This dashboard displays a maximum of 7 projects and 3 environments per project. Read more.',
+        'This dashboard displays a maximum of 7 projects and 3 environments per project. More information',
       );
     });
 
     it('includes the correct documentation link in the message', () => {
       const helpLink = message.find(GlLink);
 
-      expect(helpLink.text()).toBe('Read more.');
+      expect(helpLink.text()).toBe('More information');
       expect(helpLink.attributes('href')).toBe(propsData.environmentsDashboardHelpPath);
       expect(helpLink.attributes('rel')).toBe('noopener noreferrer');
     });
@@ -89,7 +93,7 @@ describe('dashboard', () => {
     let button;
 
     beforeEach(() => {
-      button = wrapper.find(GlDeprecatedButton);
+      button = wrapper.find(GlButton);
     });
 
     it('is labelled correctly', () => {
@@ -132,7 +136,7 @@ describe('dashboard', () => {
 
     describe('project selector modal', () => {
       beforeEach(() => {
-        wrapper.find(GlDeprecatedButton).trigger('click');
+        wrapper.find(GlButton).trigger('click');
         return wrapper.vm.$nextTick();
       });
 

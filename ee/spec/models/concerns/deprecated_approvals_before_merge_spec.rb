@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe DeprecatedApprovalsBeforeMerge do
+RSpec.describe DeprecatedApprovalsBeforeMerge do
   shared_examples 'with approvals before merge deprecated' do
     context 'updating approvals_before_merge' do
       it 'creates any_approver rule' do

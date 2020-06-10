@@ -1,3 +1,10 @@
+---
+stage: Enablement
+group: Geo
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+type: howto
+---
+
 # Geo Troubleshooting **(PREMIUM ONLY)**
 
 Setting up Geo requires careful attention to details and sometimes it's easy to
@@ -535,7 +542,7 @@ or `gitlab-ctl promote-to-primary-node`, either:
 
   ```ruby
   Rails.application.load_tasks; nil
-  Gitlab::Geo.expire_cache_keys!([:primary_node, :current_node])
+  Gitlab::Geo.expire_cache!
   Rake::Task['geo:set_secondary_as_primary'].invoke
   ```
 

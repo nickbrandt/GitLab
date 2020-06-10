@@ -15,7 +15,7 @@ module Gitlab
             end
 
             def title
-              n_('New Issue', 'New Issues', value)
+              n_('New Issue', 'New Issues', value.to_i)
             end
 
             def value
@@ -27,18 +27,19 @@ module Gitlab
             # rubocop: disable CodeReuse/ActiveRecord
             def issues_count
               issues = IssuesFinder.new(current_user, finder_params).execute
-              issues = issues.where(projects: { id: options[:projects] }) if options[:projects]
+              issues = issues.where(projects: { id: options[:projects] }) if options[:projects].present?
               issues.count
             end
             # rubocop: enable CodeReuse/ActiveRecord
 
             def finder_params
-              {
-                group_id: group.id,
-                include_subgroups: true,
-                created_after: options[:from],
-                created_before: options[:to]
-              }.compact
+              options.dup.tap do |hash|
+                hash.delete(:projects)
+                hash[:created_after] = hash.delete(:from)
+                hash[:created_before] = hash.delete(:to)
+                hash[:group_id] = group.id
+                hash[:include_subgroups] = true
+              end
             end
           end
         end

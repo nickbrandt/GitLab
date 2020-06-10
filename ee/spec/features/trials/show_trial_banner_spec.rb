@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Show trial banner', :js do
+RSpec.describe 'Show trial banner', :js do
   include StubRequests
 
   let!(:user) { create(:user) }

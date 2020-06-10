@@ -16,6 +16,7 @@ import DashboardsDropdown from '~/monitoring/components/dashboards_dropdown.vue'
 import EmptyState from '~/monitoring/components/empty_state.vue';
 import GroupEmptyState from '~/monitoring/components/group_empty_state.vue';
 import DashboardPanel from '~/monitoring/components/dashboard_panel.vue';
+import LinksSection from '~/monitoring/components/links_section.vue';
 import { createStore } from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
 import {
@@ -24,6 +25,7 @@ import {
   setMetricResult,
   setupStoreWithData,
   setupStoreWithVariable,
+  setupStoreWithLinks,
 } from '../store_utils';
 import { environmentData, dashboardGitResponse, propsData } from '../mock_data';
 import { metricsDashboardViewModel, metricsDashboardPanelCount } from '../fixture_data';
@@ -36,8 +38,9 @@ describe('Dashboard', () => {
   let wrapper;
   let mock;
 
+  const findDashboardHeader = () => wrapper.find(DashboardHeader);
   const findEnvironmentsDropdown = () =>
-    wrapper.find(DashboardHeader).find({ ref: 'monitorEnvironmentsDropdown' });
+    findDashboardHeader().find({ ref: 'monitorEnvironmentsDropdown' });
   const findAllEnvironmentsDropdownItems = () => findEnvironmentsDropdown().findAll(GlDropdownItem);
   const setSearchTerm = searchTerm => {
     store.commit(`monitoringDashboard/${types.SET_ENVIRONMENTS_FILTER}`, searchTerm);
@@ -482,6 +485,21 @@ describe('Dashboard', () => {
     });
   });
 
+  describe('links section', () => {
+    beforeEach(() => {
+      createShallowWrapper({ hasMetrics: true });
+      setupStoreWithData(store);
+      setupStoreWithLinks(store);
+
+      return wrapper.vm.$nextTick();
+    });
+
+    it('shows the links section', () => {
+      expect(wrapper.vm.shouldShowLinksSection).toBe(true);
+      expect(wrapper.find(LinksSection)).toExist();
+    });
+  });
+
   describe('single panel expands to "full screen" mode', () => {
     const findExpandedPanel = () => wrapper.find({ ref: 'expandedPanel' });
 
@@ -805,6 +823,57 @@ describe('Dashboard', () => {
     });
   });
 
+  describe('dashboard timezone', () => {
+    const setupWithTimezone = value => {
+      store = createStore({ dashboardTimezone: value });
+      setupStoreWithData(store);
+      createShallowWrapper({ hasMetrics: true });
+      return wrapper.vm.$nextTick;
+    };
+
+    describe('local timezone is enabled by default', () => {
+      beforeEach(() => {
+        return setupWithTimezone();
+      });
+
+      it('shows the data time picker in local timezone', () => {
+        expect(
+          findDashboardHeader()
+            .find(DateTimePicker)
+            .props('utc'),
+        ).toBe(false);
+      });
+    });
+
+    describe('when LOCAL timezone is enabled', () => {
+      beforeEach(() => {
+        return setupWithTimezone('LOCAL');
+      });
+
+      it('shows the data time picker in local timezone', () => {
+        expect(
+          findDashboardHeader()
+            .find(DateTimePicker)
+            .props('utc'),
+        ).toBe(false);
+      });
+    });
+
+    describe('when UTC timezone is enabled', () => {
+      beforeEach(() => {
+        return setupWithTimezone('UTC');
+      });
+
+      it('shows the data time picker in UTC format', () => {
+        expect(
+          findDashboardHeader()
+            .find(DateTimePicker)
+            .props('utc'),
+        ).toBe(true);
+      });
+    });
+  });
+
   describe('cluster health', () => {
     beforeEach(() => {
       createShallowWrapper({ hasMetrics: true, showHeader: false });
@@ -847,6 +916,62 @@ describe('Dashboard', () => {
       return wrapper.vm.$nextTick().then(() => {
         expect(findEditLink().exists()).toBe(true);
         expect(findEditLink().attributes('href')).toBe(dashboard.project_blob_path);
+      });
+    });
+  });
+
+  describe('document title', () => {
+    const originalTitle = 'Original Title';
+    const defaultDashboardName = dashboardGitResponse[0].display_name;
+
+    beforeEach(() => {
+      document.title = originalTitle;
+      createShallowWrapper({ hasMetrics: true });
+    });
+
+    afterAll(() => {
+      document.title = '';
+    });
+
+    it('is prepended with default dashboard name by default', () => {
+      setupAllDashboards(store);
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(document.title.startsWith(`${defaultDashboardName} · `)).toBe(true);
+      });
+    });
+
+    it('is prepended with dashboard name if path is known', () => {
+      const dashboard = dashboardGitResponse[1];
+      const currentDashboard = dashboard.path;
+
+      setupAllDashboards(store, currentDashboard);
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(document.title.startsWith(`${dashboard.display_name} · `)).toBe(true);
+      });
+    });
+
+    it('is prepended with default dashboard name is path is not known', () => {
+      setupAllDashboards(store, 'unknown/path');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(document.title.startsWith(`${defaultDashboardName} · `)).toBe(true);
+      });
+    });
+
+    it('is not modified when dashboard name is not provided', () => {
+      const dashboard = { ...dashboardGitResponse[1], display_name: null };
+      const currentDashboard = dashboard.path;
+
+      store.commit(`monitoringDashboard/${types.SET_ALL_DASHBOARDS}`, [dashboard]);
+
+      store.commit(`monitoringDashboard/${types.SET_INITIAL_STATE}`, {
+        currentDashboard,
+      });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(document.title).toBe(originalTitle);
       });
     });
   });

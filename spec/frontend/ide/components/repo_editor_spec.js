@@ -94,13 +94,28 @@ describe('RepoEditor', () => {
   });
 
   describe('when file is markdown', () => {
-    beforeEach(done => {
-      vm.file.previewMode = {
-        id: 'markdown',
-        previewTitle: 'Preview Markdown',
-      };
+    let mock;
 
-      vm.$nextTick(done);
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+      mock.onPost(/(.*)\/preview_markdown/).reply(200, {
+        body: '<p>testing 123</p>',
+      });
+
+      Vue.set(vm, 'file', {
+        ...vm.file,
+        projectId: 'namespace/project',
+        path: 'sample.md',
+        content: 'testing 123',
+      });
+
+      vm.$store.state.entries[vm.file.path] = vm.file;
+
+      return vm.$nextTick();
+    });
+
+    afterEach(() => {
+      mock.restore();
     });
 
     it('renders an Edit and a Preview Tab', done => {
@@ -114,49 +129,9 @@ describe('RepoEditor', () => {
         done();
       });
     });
-  });
-
-  describe('when file is markdown and viewer mode is review', () => {
-    let mock;
-
-    beforeEach(done => {
-      mock = new MockAdapter(axios);
-
-      vm.file.projectId = 'namespace/project';
-      vm.file.previewMode = {
-        id: 'markdown',
-        previewTitle: 'Preview Markdown',
-      };
-      vm.file.content = 'testing 123';
-      vm.$store.state.viewer = 'diff';
-
-      mock.onPost(/(.*)\/preview_markdown/).reply(200, {
-        body: '<p>testing 123</p>',
-      });
-
-      vm.$nextTick(done);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
-    it('renders an Edit and a Preview Tab', done => {
-      Vue.nextTick(() => {
-        const tabs = vm.$el.querySelectorAll('.ide-mode-tabs .nav-links li');
-
-        expect(tabs.length).toBe(2);
-        expect(tabs[0].textContent.trim()).toBe('Review');
-        expect(tabs[1].textContent.trim()).toBe('Preview Markdown');
-
-        done();
-      });
-    });
 
     it('renders markdown for tempFile', done => {
       vm.file.tempFile = true;
-      vm.file.path = `${vm.file.path}.md`;
-      vm.$store.state.entries[vm.file.path] = vm.file;
 
       vm.$nextTick()
         .then(() => {
@@ -170,6 +145,20 @@ describe('RepoEditor', () => {
         })
         .then(done)
         .catch(done.fail);
+    });
+
+    describe('when not in edit mode', () => {
+      beforeEach(async () => {
+        await vm.$nextTick();
+
+        vm.$store.state.currentActivityView = leftSidebarViews.review.name;
+
+        return vm.$nextTick();
+      });
+
+      it('shows no tabs', () => {
+        expect(vm.$el.querySelectorAll('.ide-mode-tabs .nav-links a')).toHaveLength(0);
+      });
     });
   });
 
@@ -525,6 +514,14 @@ describe('RepoEditor', () => {
       );
     };
 
+    const watchState = watched =>
+      new Promise(resolve => {
+        const unwatch = vm.$store.watch(watched, () => {
+          unwatch();
+          resolve();
+        });
+      });
+
     beforeEach(() => {
       setFileName('bar.md');
 
@@ -552,7 +549,6 @@ describe('RepoEditor', () => {
           path: 'foo/foo.png',
           type: 'blob',
           content: 'Zm9v',
-          base64: true,
           binary: true,
           rawPath: 'data:image/png;base64,Zm9v',
         });
@@ -562,7 +558,10 @@ describe('RepoEditor', () => {
     it("adds a markdown image tag to the file's contents", () => {
       pasteImage();
 
-      return waitForPromises().then(() => {
+      // Pasting an image does a lot of things like using the FileReader API,
+      // so, waitForPromises isn't very reliable (and causes a flaky spec)
+      // Read more about state.watch: https://vuex.vuejs.org/api/#watch
+      return watchState(s => s.entries['foo/bar.md'].content).then(() => {
         expect(vm.file.content).toBe('hello world\n![foo.png](./foo.png)');
       });
     });

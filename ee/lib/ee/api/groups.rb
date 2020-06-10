@@ -134,6 +134,7 @@ module EE
             break not_found! unless user_group.feature_available?(:adjourned_deletion_for_projects_and_groups)
 
             result = ::Groups::RestoreService.new(user_group, current_user).execute
+            user_group.preload_shared_group_links
 
             if result[:status] == :success
               present user_group, with: ::API::Entities::GroupDetail, current_user: current_user

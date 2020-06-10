@@ -2,8 +2,11 @@ import { slugify } from '~/lib/utils/text_utility';
 import createGqClient, { fetchPolicies } from '~/lib/graphql';
 import { SUPPORTED_FORMATS } from '~/lib/utils/unit_format';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
-import { NOT_IN_DB_PREFIX } from '../constants';
-import { isSafeURL } from '~/lib/utils/url_utility';
+import { parseTemplatingVariables } from './variable_mapping';
+import { NOT_IN_DB_PREFIX, linkTypes } from '../constants';
+import { DATETIME_RANGE_TYPES } from '~/lib/utils/constants';
+import { timeRangeToParams, getRangeType } from '~/lib/utils/datetime_range';
+import { isSafeURL, mergeUrlParams } from '~/lib/utils/url_utility';
 
 export const gqClient = createGqClient(
   {},
@@ -145,12 +148,13 @@ const mapYAxisToViewModel = ({
  * Unsafe URLs are ignored.
  *
  * @param {Object} Link
- * @returns {Object} Link object with a `title` and `url`.
+ * @returns {Object} Link object with a `title`, `url` and `type`
  *
  */
-const mapLinksToViewModel = ({ url = null, title = '' } = {}) => {
+const mapLinksToViewModel = ({ url = null, title = '', type } = {}) => {
   return {
     title: title || String(url),
+    type,
     url: url && isSafeURL(url) ? String(url) : '#',
   };
 };
@@ -191,7 +195,7 @@ const mapPanelToViewModel = ({
     xAxis,
     maxValue: max_value,
     links: links.map(mapLinksToViewModel),
-    metrics: mapToMetricsViewModel(metrics, yAxis.name),
+    metrics: mapToMetricsViewModel(metrics),
   };
 };
 
@@ -210,6 +214,66 @@ const mapToPanelGroupViewModel = ({ group = '', panels = [] }, i) => {
 };
 
 /**
+ * Convert dashboard time range to Grafana
+ * dashboards time range.
+ *
+ * @param {Object} timeRange
+ * @returns {Object}
+ */
+export const convertToGrafanaTimeRange = timeRange => {
+  const timeRangeType = getRangeType(timeRange);
+  if (timeRangeType === DATETIME_RANGE_TYPES.fixed) {
+    return {
+      from: new Date(timeRange.start).getTime(),
+      to: new Date(timeRange.end).getTime(),
+    };
+  } else if (timeRangeType === DATETIME_RANGE_TYPES.rolling) {
+    const { seconds } = timeRange.duration;
+    return {
+      from: `now-${seconds}s`,
+      to: 'now',
+    };
+  }
+  // fallback to returning the time range as is
+  return timeRange;
+};
+
+/**
+ * Convert dashboard time ranges to other supported
+ * link formats.
+ *
+ * @param {Object} timeRange metrics dashboard time range
+ * @param {String} type type of link
+ * @returns {String}
+ */
+export const convertTimeRanges = (timeRange, type) => {
+  if (type === linkTypes.GRAFANA) {
+    return convertToGrafanaTimeRange(timeRange);
+  }
+  return timeRangeToParams(timeRange);
+};
+
+/**
+ * Adds dashboard-related metadata to the user-defined links.
+ *
+ * As of %13.1, metadata only includes timeRange but in the
+ * future more info will be added to the links.
+ *
+ * @param {Object} metadata
+ * @returns {Function}
+ */
+export const addDashboardMetaDataToLink = metadata => link => {
+  let modifiedLink = { ...link };
+  if (metadata.timeRange) {
+    modifiedLink = {
+      ...modifiedLink,
+      url: mergeUrlParams(convertTimeRanges(metadata.timeRange, link.type), link.url),
+    };
+  }
+  return modifiedLink;
+};
+
+/**
  * Maps a dashboard json object to its view model
  *
  * @param {Object} dashboard - Dashboard object
@@ -217,13 +281,33 @@ const mapToPanelGroupViewModel = ({ group = '', panels = [] }, i) => {
  * @param {Array} dashboard.panel_groups - Panel groups array
  * @returns {Object}
  */
-export const mapToDashboardViewModel = ({ dashboard = '', panel_groups = [] }) => {
+export const mapToDashboardViewModel = ({
+  dashboard = '',
+  templating = {},
+  links = [],
+  panel_groups = [],
+}) => {
   return {
     dashboard,
+    variables: parseTemplatingVariables(templating),
+    links: links.map(mapLinksToViewModel),
     panelGroups: panel_groups.map(mapToPanelGroupViewModel),
   };
 };
 
+/**
+ * Processes a single Range vector, part of the result
+ * of type `matrix` in the form:
+ *
+ * {
+ *   "metric": { "<label_name>": "<label_value>", ... },
+ *   "values": [ [ <unix_time>, "<sample_value>" ], ... ]
+ * },
+ *
+ * See https://prometheus.io/docs/prometheus/latest/querying/api/#range-vectors
+ *
+ * @param {*} timeSeries
+ */
 export const normalizeQueryResult = timeSeries => {
   let normalizedResult = {};
 

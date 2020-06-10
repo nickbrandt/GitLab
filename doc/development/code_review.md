@@ -314,7 +314,7 @@ experience, refactors the existing code). Then:
   - For non-mandatory suggestions, decorate with (non-blocking) so the author knows they can
     optionally resolve within the merge request or follow-up at a later stage.
 - After a round of line notes, it can be helpful to post a summary note such as
-  "LGTM :thumbsup:", or "Just a couple things to address."
+  "Looks good to me", or "Just a couple things to address."
 - Assign the merge request to the author if changes are required following your
   review.
 
@@ -381,7 +381,7 @@ Merge Results against the latest `master` at the time of the pipeline creation.
 
 One of the most difficult things during code review is finding the right
 balance in how deep the reviewer can interfere with the code created by a
-reviewee.
+author.
 
 - Learning how to find the right balance takes time; that is why we have
   reviewers that become maintainers after some time spent on reviewing merge
@@ -389,7 +389,7 @@ reviewee.
 - Finding bugs and improving code style is important, but thinking about good
   design is important as well. Building abstractions and good design is what
   makes it possible to hide complexity and makes future changes easier.
-- Asking the reviewee to change the design sometimes means the complete rewrite
+- Asking the author to change the design sometimes means the complete rewrite
   of the contributed code. It's usually a good idea to ask another maintainer or
   reviewer before doing it, but have the courage to do it when you believe it is
   important.
@@ -402,7 +402,7 @@ reviewee.
 - There is a difference in doing things right and doing things right now.
   Ideally, we should do the former, but in the real world we need the latter as
   well. A good example is a security fix which should be released as soon as
-  possible. Asking the reviewee to do the major refactoring in the merge
+  possible. Asking the author to do the major refactoring in the merge
   request that is an urgent fix should be avoided.
 - Doing things well today is usually better than doing something perfectly
   tomorrow. Shipping a kludge today is usually worse than doing something well
@@ -502,7 +502,7 @@ Properties of customer critical merge requests:
 - The DRI will assign the `customer-critical-merge-request` label to the merge request.
 - It is required that the reviewer(s) and maintainer(s) involved with a customer critical merge request are engaged as soon as this decision is made.
 - It is required to prioritize work for those involved on a customer critical merge request so that they have the time available necessary to focus on it.
-- It is required to adhere to GitLab [values](https://about.gitlab.com/handbook/values.md) and processes when working on customer critical merge requests, taking particular note of family and friends first/work second, definition of done, iteration, and release when it's ready.
+- It is required to adhere to GitLab [values](https://about.gitlab.com/handbook/values/) and processes when working on customer critical merge requests, taking particular note of family and friends first/work second, definition of done, iteration, and release when it's ready.
 - Customer critical merge requests are required to not reduce security, introduce data-loss risk, reduce availability, nor break existing functionality per the process for [prioritizing technical decisions](https://about.gitlab.com/handbook/engineering/#prioritizing-technical-decisions.md).
 - On customer critical requests, it is _recommended_ that those involved _consider_ coordinating synchronously (Zoom, Slack) in addition to asynchronously (merge requests comments) if they believe this will reduce elapsed time to merge even though this _may_ sacrifice [efficiency](https://about.gitlab.com/company/culture/all-remote/asynchronous/#evaluating-efficiency.md).
 - After a customer critical merge request is merged, a retrospective must be completed with the intention of reducing the frequency of future customer critical merge requests.

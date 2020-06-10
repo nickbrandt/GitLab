@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Projects > Audit Events', :js do
+RSpec.describe 'Projects > Audit Events', :js do
   let(:user) { create(:user) }
   let(:pete) { create(:user, name: 'Pete') }
   let(:project) { create(:project, :repository, namespace: user.namespace) }

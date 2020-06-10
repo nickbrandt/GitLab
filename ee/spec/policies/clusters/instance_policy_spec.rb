@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Clusters::InstancePolicy, :enable_admin_mode do
+RSpec.describe Clusters::InstancePolicy, :enable_admin_mode do
   let(:user) { build(:admin) }
   let(:instance) { Clusters::Instance.new }
 

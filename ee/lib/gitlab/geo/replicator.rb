@@ -17,7 +17,12 @@ module Gitlab
       CLASS_SUFFIXES = %w(RegistryFinder RegistriesResolver).freeze
 
       attr_reader :model_record_id
+
       delegate :model, to: :class
+
+      class << self
+        delegate :find_unsynced_registries, :find_failed_registries, to: :registry_class
+      end
 
       # Declare supported event
       #
@@ -92,6 +97,18 @@ module Gitlab
         raise e
       end
 
+      # Given the output of a replicator's `replicable_params`, reinstantiate
+      # the replicator instance
+      #
+      # @param [String] replicable_name of a replicator instance
+      # @param [Integer] replicable_id of a replicator instance
+      # @return [Geo::Replicator] replicator instance
+      def self.for_replicable_params(replicable_name:, replicable_id:)
+        replicator_class = for_replicable_name(replicable_name)
+
+        replicator_class.new(model_record_id: replicable_id)
+      end
+
       def self.checksummed
         model.checksummed
       end
@@ -106,6 +123,14 @@ module Gitlab
 
       def self.primary_total_count
         model.count
+      end
+
+      def self.synced_count
+        registry_class.synced.count
+      end
+
+      def self.failed_count
+        registry_class.failed.count
       end
 
       # @example Given `Geo::PackageFileRegistryFinder`, this returns
@@ -127,7 +152,7 @@ module Gitlab
       # @param [Integer] model_record_id
       def initialize(model_record: nil, model_record_id: nil)
         @model_record = model_record
-        @model_record_id = model_record_id
+        @model_record_id = model_record_id || model_record&.id
       end
 
       # Instance of the replicable model
@@ -231,6 +256,14 @@ module Gitlab
 
           model_record.project_id
         end
+      end
+
+      # Return exactly the data needed by `for_replicable_params` to
+      # reinstantiate this Replicator elsewhere.
+      #
+      # @return [Hash] the replicable name and ID
+      def replicable_params
+        { replicable_name: replicable_name, replicable_id: model_record_id }
       end
 
       protected

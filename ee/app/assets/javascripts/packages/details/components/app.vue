@@ -1,5 +1,6 @@
 <script>
 import {
+  GlBadge,
   GlDeprecatedButton,
   GlIcon,
   GlModal,
@@ -10,8 +11,8 @@ import {
   GlTab,
   GlTabs,
   GlTable,
+  GlSprintf,
 } from '@gitlab/ui';
-import { escape } from 'lodash';
 import Tracking from '~/tracking';
 import PackageActivity from './activity.vue';
 import PackageInformation from './information.vue';
@@ -23,10 +24,11 @@ import NugetInstallation from './nuget_installation.vue';
 import PypiInstallation from './pypi_installation.vue';
 import PackagesListLoader from '../../shared/components/packages_list_loader.vue';
 import PackageListRow from '../../shared/components/package_list_row.vue';
+import DependencyRow from './dependency_row.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
-import { __, s__, sprintf } from '~/locale';
+import { __, s__ } from '~/locale';
 import { PackageType, TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
 import { mapActions, mapState } from 'vuex';
@@ -34,6 +36,7 @@ import { mapActions, mapState } from 'vuex';
 export default {
   name: 'PackagesApp',
   components: {
+    GlBadge,
     GlDeprecatedButton,
     GlEmptyState,
     GlLink,
@@ -42,6 +45,7 @@ export default {
     GlTabs,
     GlTable,
     GlIcon,
+    GlSprintf,
     PackageActivity,
     PackageInformation,
     PackageTitle,
@@ -52,6 +56,7 @@ export default {
     PypiInstallation,
     PackagesListLoader,
     PackageListRow,
+    DependencyRow,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -91,20 +96,6 @@ export default {
     },
     canDeletePackage() {
       return this.canDelete && this.destroyPath;
-    },
-    deleteModalDescription() {
-      return sprintf(
-        s__(
-          `PackageRegistry|You are about to delete version %{boldStart}%{version}%{boldEnd} of %{boldStart}%{name}%{boldEnd}. Are you sure?`,
-        ),
-        {
-          version: escape(this.packageEntity.version),
-          name: escape(this.packageEntity.name),
-          boldStart: '<b>',
-          boldEnd: '</b>',
-        },
-        false,
-      );
     },
     packageInformation() {
       return generatePackageInfo(this.packageEntity);
@@ -154,6 +145,12 @@ export default {
     hasVersions() {
       return this.packageEntity.versions?.length > 0;
     },
+    packageDependencies() {
+      return this.packageEntity.dependency_links || [];
+    },
+    showDependencies() {
+      return this.packageEntity.package_type === PackageType.NUGET;
+    },
   },
   methods: {
     ...mapActions(['fetchPackageVersions']),
@@ -171,6 +168,9 @@ export default {
   },
   i18n: {
     deleteModalTitle: s__(`PackageRegistry|Delete Package Version`),
+    deleteModalContent: s__(
+      `PackageRegistry|You are about to delete version %{version} of %{name}. Are you sure?`,
+    ),
   },
   filesTableHeaderFields: [
     {
@@ -265,6 +265,27 @@ export default {
         </gl-table>
       </gl-tab>
 
+      <gl-tab v-if="showDependencies" title-item-class="js-dependencies-tab">
+        <template #title>
+          <span>{{ __('Dependencies') }}</span>
+          <gl-badge size="sm" data-testid="dependencies-badge">{{
+            packageDependencies.length
+          }}</gl-badge>
+        </template>
+
+        <template v-if="packageDependencies.length > 0">
+          <dependency-row
+            v-for="(dep, index) in packageDependencies"
+            :key="index"
+            :dependency="dep"
+          />
+        </template>
+
+        <p v-else class="gl-mt-3" data-testid="no-dependencies-message">
+          {{ s__('PackageRegistry|This NuGet package has no dependencies.') }}
+        </p>
+      </gl-tab>
+
       <gl-tab
         :title="__('Versions')"
         title-item-class="js-versions-tab"
@@ -285,17 +306,23 @@ export default {
           />
         </template>
 
-        <template v-else class="gl-mt-3">
-          <p data-testid="no-versions-message">
-            {{ s__('PackageRegistry|There are no other versions of this package.') }}
-          </p>
-        </template>
+        <p v-else class="gl-mt-3" data-testid="no-versions-message">
+          {{ s__('PackageRegistry|There are no other versions of this package.') }}
+        </p>
       </gl-tab>
     </gl-tabs>
 
     <gl-modal ref="deleteModal" class="js-delete-modal" modal-id="delete-modal">
       <template #modal-title>{{ $options.i18n.deleteModalTitle }}</template>
-      <p v-html="deleteModalDescription"></p>
+      <gl-sprintf :message="$options.i18n.deleteModalContent">
+        <template #version>
+          <strong>{{ packageEntity.version }}</strong>
+        </template>
+
+        <template #name>
+          <strong>{{ packageEntity.name }}</strong>
+        </template>
+      </gl-sprintf>
 
       <div slot="modal-footer" class="w-100">
         <div class="float-right">

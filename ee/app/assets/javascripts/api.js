@@ -308,43 +308,36 @@ export default {
     return axios.put(`${url}/${node.id}`, node);
   },
 
-  fetchFeatureFlagUserLists(version, id) {
-    const url = Api.buildUrl(this.featureFlagUserLists)
-      .replace(':version', version)
-      .replace(':id', id);
+  fetchFeatureFlagUserLists(id) {
+    const url = Api.buildUrl(this.featureFlagUserLists).replace(':id', id);
 
     return axios.get(url);
   },
 
-  createFeatureFlagUserList(version, id, list) {
-    const url = Api.buildUrl(this.featureFlagUserLists)
-      .replace(':version', version)
-      .replace(':id', id);
+  createFeatureFlagUserList(id, list) {
+    const url = Api.buildUrl(this.featureFlagUserLists).replace(':id', id);
 
     return axios.post(url, list);
   },
 
-  fetchFeatureFlagUserList(version, id, listIid) {
+  fetchFeatureFlagUserList(id, listIid) {
     const url = Api.buildUrl(this.featureFlagUserList)
-      .replace(':version', version)
       .replace(':id', id)
       .replace(':list_iid', listIid);
 
     return axios.get(url);
   },
 
-  updateFeatureFlagUserList(version, id, list) {
+  updateFeatureFlagUserList(id, list) {
     const url = Api.buildUrl(this.featureFlagUserList)
-      .replace(':version', version)
       .replace(':id', id)
       .replace(':list_iid', list.iid);
 
     return axios.put(url, list);
   },
 
-  deleteFeatureFlagUserList(version, id, listIid) {
+  deleteFeatureFlagUserList(id, listIid) {
     const url = Api.buildUrl(this.featureFlagUserList)
-      .replace(':version', version)
       .replace(':id', id)
       .replace(':list_iid', listIid);
 

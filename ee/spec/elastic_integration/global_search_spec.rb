@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'GlobalSearch', :elastic do
+RSpec.describe 'GlobalSearch', :elastic do
   let(:features) { %i(issues merge_requests repository builds wiki snippets) }
   let(:admin) { create :user, admin: true }
   let(:auditor) {create :user, auditor: true }

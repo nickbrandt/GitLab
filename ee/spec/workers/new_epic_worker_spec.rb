@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe NewEpicWorker do
+RSpec.describe NewEpicWorker do
   describe '#perform' do
     let(:worker) { described_class.new }
 

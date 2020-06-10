@@ -20,12 +20,12 @@ that can be reused in different scripts.
 Variables are useful for customizing your jobs in GitLab CI/CD.
 When you use variables, you don't have to hard-code values.
 
-For more information about advanced use of GitLab CI/CD:
-
-- Get to productivity faster with these [7 advanced GitLab CI workflow hacks](https://about.gitlab.com/webcast/7cicd-hacks/)
-  shared by GitLab engineers.
-- Learn how the Cloud Native Computing Foundation (CNCF) [eliminates the complexity](https://about.gitlab.com/customers/cncf/)
-  of managing projects across many cloud providers with GitLab CI/CD.
+> For more information about advanced use of GitLab CI/CD:
+>
+> - <i class="fa fa-youtube-play youtube" aria-hidden="true"></i>&nbsp;Get to productivity faster with these [7 advanced GitLab CI workflow hacks](https://about.gitlab.com/webcast/7cicd-hacks/)
+>   shared by GitLab engineers.
+> - <i class="fa fa-youtube-play youtube" aria-hidden="true"></i>&nbsp;Learn how the Cloud Native Computing Foundation (CNCF) [eliminates the complexity](https://about.gitlab.com/customers/cncf/)
+>   of managing projects across many cloud providers with GitLab CI/CD.
 
 ## Predefined environment variables
 
@@ -159,7 +159,7 @@ For variables with the type **File**, the Runner creates an environment variable
 For the value, the Runner writes the variable value to a temporary file and uses this path.
 
 You can use tools like [the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html)
-and [kubectl](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable)
+and [`kubectl`](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable)
 to customize your configuration by using **File** type variables.
 
 In the past, a common pattern was to read the value of a CI variable, save it in a file, and then
@@ -566,7 +566,7 @@ then be available as environment variables on the running application
 container.
 
 CAUTION: **Caution:**
-Variables with multiline values are not currently supported due to
+Variables with multi-line values are not currently supported due to
 limitations with the current Auto DevOps scripting environment.
 
 ### Override a variable by manually running a pipeline
@@ -648,8 +648,8 @@ Below you can find supported syntax reference:
 
    It sometimes happens that you want to check whether a variable is defined
    or not. To do that, you can compare a variable to `null` keyword, like
-   `$VARIABLE == null`. This expression is going to evaluate to truth if
-   variable is not defined when `==` is used, or to falsey if `!=` is used.
+   `$VARIABLE == null`. This expression evaluates to true if
+   variable is not defined when `==` is used, or to false if `!=` is used.
 
 1. Checking for an empty variable
 

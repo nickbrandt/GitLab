@@ -95,6 +95,13 @@ describe GitlabSchema.types['Project'] do
     it { is_expected.to have_graphql_resolver(Resolvers::EnvironmentsResolver) }
   end
 
+  describe 'members field' do
+    subject { described_class.fields['projectMembers'] }
+
+    it { is_expected.to have_graphql_type(Types::ProjectMemberType.connection_type) }
+    it { is_expected.to have_graphql_resolver(Resolvers::ProjectMembersResolver) }
+  end
+
   describe 'boards field' do
     subject { described_class.fields['boards'] }
 
@@ -132,4 +139,6 @@ describe GitlabSchema.types['Project'] do
 
     it { is_expected.to have_graphql_type(Types::ContainerExpirationPolicyType) }
   end
+
+  it_behaves_like 'a GraphQL type with labels'
 end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::TransferService do
+RSpec.describe Projects::TransferService do
   include EE::GeoHelpers
 
   let_it_be(:user) { create(:user) }

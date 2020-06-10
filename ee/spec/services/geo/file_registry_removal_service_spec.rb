@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::FileRegistryRemovalService do
+RSpec.describe Geo::FileRegistryRemovalService, :geo do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -35,7 +35,22 @@ describe Geo::FileRegistryRemovalService do
         end.to change { File.exist?(file_path) }.from(true).to(false)
       end
 
-      it 'registry when file was deleted successfully' do
+      it 'deletes registry entry' do
+        expect do
+          service.execute
+        end.to change(Geo::UploadRegistry, :count).by(-1)
+      end
+    end
+
+    shared_examples 'removes registry entry' do
+      subject(:service) { described_class.new(registry.file_type, registry.file_id) }
+
+      before do
+        stub_exclusive_lease("file_registry_removal_service:#{registry.file_type}:#{registry.file_id}",
+          timeout: Geo::FileRegistryRemovalService::LEASE_TIMEOUT)
+      end
+
+      it 'deletes registry entry' do
         expect do
           service.execute
         end.to change(Geo::UploadRegistry, :count).by(-1)
@@ -56,7 +71,22 @@ describe Geo::FileRegistryRemovalService do
         end.to change { File.exist?(file_path) }.from(true).to(false)
       end
 
-      it 'registry when file was deleted successfully' do
+      it 'deletes registry entry' do
+        expect do
+          service.execute
+        end.to change(Geo::JobArtifactRegistry, :count).by(-1)
+      end
+    end
+
+    shared_examples 'removes artifact registry' do
+      subject(:service) { described_class.new('job_artifact', registry.artifact_id) }
+
+      before do
+        stub_exclusive_lease("file_registry_removal_service:job_artifact:#{registry.artifact_id}",
+          timeout: Geo::FileRegistryRemovalService::LEASE_TIMEOUT)
+      end
+
+      it 'deletes registry entry' do
         expect do
           service.execute
         end.to change(Geo::JobArtifactRegistry, :count).by(-1)
@@ -77,7 +107,22 @@ describe Geo::FileRegistryRemovalService do
         end.to change { File.exist?(file_path) }.from(true).to(false)
       end
 
-      it 'registry when file was deleted successfully' do
+      it 'deletes registry entry' do
+        expect do
+          service.execute
+        end.to change(Geo::LfsObjectRegistry, :count).by(-1)
+      end
+    end
+
+    shared_examples 'removes LFS object registry' do
+      subject(:service) { described_class.new('lfs', registry.lfs_object_id) }
+
+      before do
+        stub_exclusive_lease("file_registry_removal_service:lfs:#{registry.lfs_object_id}",
+          timeout: Geo::FileRegistryRemovalService::LEASE_TIMEOUT)
+      end
+
+      it 'deletes registry entry' do
         expect do
           service.execute
         end.to change(Geo::LfsObjectRegistry, :count).by(-1)
@@ -97,7 +142,17 @@ describe Geo::FileRegistryRemovalService do
           lfs_object.update_column(:file_store, LfsObjectUploader::Store::REMOTE)
         end
 
-        it_behaves_like 'removes LFS object'
+        context 'with object storage enabled' do
+          it_behaves_like 'removes LFS object'
+        end
+
+        context 'with object storage disabled' do
+          before do
+            stub_lfs_object_storage(enabled: false)
+          end
+
+          it_behaves_like 'removes LFS object registry'
+        end
       end
 
       context 'no lfs_object record' do
@@ -107,6 +162,16 @@ describe Geo::FileRegistryRemovalService do
 
         it_behaves_like 'removes LFS object' do
           subject(:service) { described_class.new('lfs', registry.lfs_object_id, file_path) }
+        end
+      end
+
+      context 'with orphaned registry' do
+        before do
+          lfs_object.delete
+        end
+
+        it_behaves_like 'removes LFS object registry' do
+          subject(:service) { described_class.new('lfs', registry.lfs_object_id) }
         end
       end
     end
@@ -127,6 +192,25 @@ describe Geo::FileRegistryRemovalService do
         it_behaves_like 'removes artifact'
       end
 
+      context 'migrated to object storage' do
+        before do
+          stub_artifacts_object_storage
+          job_artifact.update_column(:file_store, LfsObjectUploader::Store::REMOTE)
+        end
+
+        context 'with object storage enabled' do
+          it_behaves_like 'removes artifact'
+        end
+
+        context 'with object storage disabled' do
+          before do
+            stub_artifacts_object_storage(enabled: false)
+          end
+
+          it_behaves_like 'removes artifact registry'
+        end
+      end
+
       context 'no job artifact record' do
         before do
           job_artifact.delete
@@ -134,6 +218,16 @@ describe Geo::FileRegistryRemovalService do
 
         it_behaves_like 'removes artifact' do
           subject(:service) { described_class.new('job_artifact', registry.artifact_id, file_path) }
+        end
+      end
+
+      context 'with orphaned registry' do
+        before do
+          job_artifact.delete
+        end
+
+        it_behaves_like 'removes artifact registry' do
+          subject(:service) { described_class.new('job_artifact', registry.artifact_id) }
         end
       end
     end
@@ -151,7 +245,17 @@ describe Geo::FileRegistryRemovalService do
           upload.update_column(:store, AvatarUploader::Store::REMOTE)
         end
 
-        it_behaves_like 'removes'
+        context 'with object storage enabled' do
+          it_behaves_like 'removes'
+        end
+
+        context 'with object storage disabled' do
+          before do
+            stub_uploads_object_storage(AvatarUploader, enabled: false)
+          end
+
+          it_behaves_like 'removes registry entry'
+        end
       end
     end
 
@@ -168,24 +272,17 @@ describe Geo::FileRegistryRemovalService do
           upload.update_column(:store, AttachmentUploader::Store::REMOTE)
         end
 
-        it_behaves_like 'removes'
-      end
-    end
-
-    context 'with file' do
-      let!(:upload) { create(:user, :with_avatar).avatar.upload }
-      let!(:registry) { create(:geo_upload_registry, :avatar, file_id: upload.id) }
-      let!(:file_path) { upload.retrieve_uploader.file.path }
-
-      it_behaves_like 'removes'
-
-      context 'migrated to object storage' do
-        before do
-          stub_uploads_object_storage(AvatarUploader)
-          upload.update_column(:store, AvatarUploader::Store::REMOTE)
+        context 'with object storage enabled' do
+          it_behaves_like 'removes'
         end
 
-        it_behaves_like 'removes'
+        context 'with object storage disabled' do
+          before do
+            stub_uploads_object_storage(AttachmentUploader, enabled: false)
+          end
+
+          it_behaves_like 'removes registry entry'
+        end
       end
     end
 
@@ -208,7 +305,17 @@ describe Geo::FileRegistryRemovalService do
           upload.update_column(:store, NamespaceFileUploader::Store::REMOTE)
         end
 
-        it_behaves_like 'removes'
+        context 'with object storage enabled' do
+          it_behaves_like 'removes'
+        end
+
+        context 'with object storage disabled' do
+          before do
+            stub_uploads_object_storage(NamespaceFileUploader, enabled: false)
+          end
+
+          it_behaves_like 'removes registry entry'
+        end
       end
     end
 
@@ -222,15 +329,23 @@ describe Geo::FileRegistryRemovalService do
       let!(:registry) { create(:geo_upload_registry, :personal_file, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
-      it_behaves_like 'removes'
-
       context 'migrated to object storage' do
         before do
           stub_uploads_object_storage(PersonalFileUploader)
           upload.update_column(:store, PersonalFileUploader::Store::REMOTE)
         end
 
-        it_behaves_like 'removes'
+        context 'with object storage enabled' do
+          it_behaves_like 'removes'
+        end
+
+        context 'with object storage disabled' do
+          before do
+            stub_uploads_object_storage(PersonalFileUploader, enabled: false)
+          end
+
+          it_behaves_like 'removes registry entry'
+        end
       end
     end
 
@@ -249,10 +364,20 @@ describe Geo::FileRegistryRemovalService do
       context 'migrated to object storage' do
         before do
           stub_uploads_object_storage(FaviconUploader)
-          upload.update_column(:store, PersonalFileUploader::Store::REMOTE)
+          upload.update_column(:store, FaviconUploader::Store::REMOTE)
         end
 
-        it_behaves_like 'removes'
+        context 'with object storage enabled' do
+          it_behaves_like 'removes'
+        end
+
+        context 'with object storage disabled' do
+          before do
+            stub_uploads_object_storage(FaviconUploader, enabled: false)
+          end
+
+          it_behaves_like 'removes registry entry'
+        end
       end
     end
   end

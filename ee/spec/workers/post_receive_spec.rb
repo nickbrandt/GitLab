@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe PostReceive do
+RSpec.describe PostReceive do
   let(:changes) { "123456 789012 refs/heads/tést\n654321 210987 refs/tags/tag" }
   let(:changes_with_master) { "#{changes}\n423423 797823 refs/heads/master" }
   let(:wrongly_encoded_changes) { changes.encode("ISO-8859-1").force_encoding("UTF-8") }

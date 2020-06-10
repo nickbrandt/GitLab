@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::SecurityFeaturesHelper do
+RSpec.describe Groups::SecurityFeaturesHelper do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:group, refind: true) { create(:group) }

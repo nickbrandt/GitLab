@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::V3::Github do
+RSpec.describe API::V3::Github do
   let(:user) { create(:user) }
   let(:unauthorized_user) { create(:user) }
   let(:admin) { create(:user, :admin) }

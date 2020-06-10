@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::ProjectRegistry, :geo_fdw do
+RSpec.describe Geo::ProjectRegistry, :geo_fdw do
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 

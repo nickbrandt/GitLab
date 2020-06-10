@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::Renderer do
+RSpec.describe StatusPage::Renderer do
   describe '.markdown' do
     it 'delegates to MarkupHelper.markdown_field' do
       object = Object.new

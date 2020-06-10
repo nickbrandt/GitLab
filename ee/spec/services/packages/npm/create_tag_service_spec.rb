@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Npm::CreateTagService do
+RSpec.describe Packages::Npm::CreateTagService do
   let(:package) { create(:npm_package) }
   let(:tag_name) { 'test-tag' }
 

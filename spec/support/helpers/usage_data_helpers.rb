@@ -163,6 +163,11 @@ module UsageDataHelpers
       object_store
     ).freeze
 
+  def stub_usage_data_connections
+    allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+    allow(Gitlab::Prometheus::Internal).to receive(:prometheus_enabled?).and_return(false)
+  end
+
   def stub_object_store_settings
     allow(Settings).to receive(:[]).with('artifacts')
       .and_return(
@@ -214,5 +219,17 @@ module UsageDataHelpers
            'background_upload' => true,
            'proxy_download' => false } }
       )
+  end
+
+  def expect_prometheus_api_to(*receive_matchers)
+    expect_next_instance_of(Gitlab::PrometheusClient) do |client|
+      receive_matchers.each { |m| expect(client).to m }
+    end
+  end
+
+  def allow_prometheus_queries
+    allow_next_instance_of(Gitlab::PrometheusClient) do |client|
+      allow(client).to receive(:aggregate).and_return({})
+    end
   end
 end

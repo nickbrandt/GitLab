@@ -450,6 +450,7 @@ class ProjectPolicy < BasePolicy
   rule { repository_disabled }.policy do
     prevent :push_code
     prevent :download_code
+    prevent :build_download_code
     prevent :fork_project
     prevent :read_commit_status
     prevent :read_pipeline
@@ -566,6 +567,14 @@ class ProjectPolicy < BasePolicy
   rule { can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
 
   rule { build_service_proxy_enabled }.enable :build_service_proxy_enabled
+
+  rule { can?(:download_code) }.policy do
+    enable :read_repository_graphs
+  end
+
+  rule { can?(:read_build) & can?(:read_pipeline) }.policy do
+    enable :read_build_report_results
+  end
 
   private
 

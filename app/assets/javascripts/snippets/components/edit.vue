@@ -11,7 +11,11 @@ import FormFooterActions from '~/vue_shared/components/form/form_footer_actions.
 import UpdateSnippetMutation from '../mutations/updateSnippet.mutation.graphql';
 import CreateSnippetMutation from '../mutations/createSnippet.mutation.graphql';
 import { getSnippetMixin } from '../mixins/snippets';
-import { SNIPPET_VISIBILITY_PRIVATE } from '../constants';
+import {
+  SNIPPET_VISIBILITY_PRIVATE,
+  SNIPPET_CREATE_MUTATION_ERROR,
+  SNIPPET_UPDATE_MUTATION_ERROR,
+} from '../constants';
 import SnippetBlobEdit from './snippet_blob_edit.vue';
 import SnippetVisibilityEdit from './snippet_visibility_edit.vue';
 import SnippetDescriptionEdit from './snippet_description_edit.vue';
@@ -98,7 +102,11 @@ export default {
       this.fileName = newName;
     },
     flashAPIFailure(err) {
-      Flash(sprintf(__("Can't update snippet: %{err}"), { err }));
+      const defaultErrorMsg = this.newSnippet
+        ? SNIPPET_CREATE_MUTATION_ERROR
+        : SNIPPET_UPDATE_MUTATION_ERROR;
+      Flash(sprintf(defaultErrorMsg, { err }));
+      this.isUpdating = false;
     },
     onNewSnippetFetched() {
       this.newSnippet = true;
@@ -147,11 +155,11 @@ export default {
           const errors = baseObj?.errors;
           if (errors.length) {
             this.flashAPIFailure(errors[0]);
+          } else {
+            redirectTo(baseObj.snippet.webUrl);
           }
-          redirectTo(baseObj.snippet.webUrl);
         })
         .catch(e => {
-          this.isUpdating = false;
           this.flashAPIFailure(e);
         });
     },
@@ -179,7 +187,7 @@ export default {
       <title-field
         :id="titleFieldId"
         v-model="snippet.title"
-        data-qa-selector="snippet_title"
+        data-qa-selector="snippet_title_field"
         required
         :autofocus="true"
       />
@@ -208,7 +216,7 @@ export default {
             variant="success"
             :disabled="updatePrevented"
             data-qa-selector="submit_button"
-            @click="handleFormSubmit"
+            @click.prevent="handleFormSubmit"
             >{{ saveButtonLabel }}</gl-button
           >
         </template>

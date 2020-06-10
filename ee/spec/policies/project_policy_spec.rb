@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ProjectPolicy do
+RSpec.describe ProjectPolicy do
   include ExternalAuthorizationServiceHelpers
   include AdminModeHelper
 
@@ -41,7 +41,9 @@ describe ProjectPolicy do
         admin_vulnerability_issue_link read_merge_train
       ]
     end
-    let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
+    let(:additional_maintainer_permissions) do
+      %i[push_code_to_protected_branches admin_feature_flags_client modify_auto_fix_setting]
+    end
     let(:auditor_permissions) do
       %i[
         download_code download_wiki_code read_project read_board read_list
@@ -425,6 +427,14 @@ describe ProjectPolicy do
           let(:range) { '10.0.0.0/8' }
 
           it { is_expected.to be_disallowed(:read_project) }
+
+          context 'with admin enabled', :enable_admin_mode do
+            it { is_expected.to be_allowed(:read_project) }
+          end
+
+          context 'with admin disabled' do
+            it { is_expected.to be_disallowed(:read_project) }
+          end
         end
       end
 

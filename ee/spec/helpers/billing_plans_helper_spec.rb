@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe BillingPlansHelper do
+RSpec.describe BillingPlansHelper do
   describe '#current_plan?' do
     it 'returns true when current_plan' do
       plan = Hashie::Mash.new(purchase_link: { action: 'current_plan' })

@@ -2,10 +2,13 @@ inherit_gem:
   gitlab-styles:
     - rubocop-default.yml
 
-inherit_from: .rubocop_todo.yml
 require:
   - ./rubocop/rubocop
   - rubocop-rspec
+
+inherit_from:
+  - .rubocop_todo.yml
+  - ./rubocop/rubocop-migrations.yml
 
 inherit_mode:
   merge:
@@ -27,6 +30,7 @@ AllCops:
     - 'plugins/**/*'
     - 'file_hooks/**/*'
   CacheRootDirectory: tmp
+  MaxFilesInCache: 18000
 
 Cop/AvoidKeywordArgumentsInSidekiqWorkers:
   Enabled: true
@@ -178,6 +182,9 @@ Rails/ApplicationRecord:
     - ee/db/**/*.rb
     - ee/spec/**/*.rb
 
+Cop/DefaultScope:
+  Enabled: true
+
 Rails/FindBy:
   Enabled: true
   Include:
@@ -249,10 +256,7 @@ GitlabSecurity/PublicSend:
     - 'ee/spec/**/*'
 
 Gitlab/DuplicateSpecLocation:
-  Exclude:
-    - ee/spec/lib/gitlab/gl_repository_spec.rb
-    - ee/spec/services/merge_requests/refresh_service_spec.rb
-    - ee/spec/services/ee/merge_requests/refresh_service_spec.rb
+  Enabled: true
 
 Cop/InjectEnterpriseEditionModule:
   Enabled: true
@@ -273,6 +277,9 @@ Cop/ActiveRecordAssociationReload:
   Exclude:
     - 'spec/**/*'
     - 'ee/spec/**/*'
+
+Gitlab/AvoidFeatureGet:
+  Enabled: true
 
 Naming/PredicateName:
   Enabled: true
@@ -443,3 +450,12 @@ Rails/TimeZone:
     - 'spec/models/**/*'
     - 'ee/app/models/**/*'
     - 'ee/spec/models/**/*'
+
+# WIP: See https://gitlab.com/gitlab-org/gitlab/-/issues/220040
+Rails/SaveBang:
+  Enabled: true
+  Include:
+    - 'spec/**/*.rb'
+    - 'ee/spec/**/*.rb'
+    - 'qa/spec/**/*.rb'
+    - 'qa/qa/specs/**/*.rb'

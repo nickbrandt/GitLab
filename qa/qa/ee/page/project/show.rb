@@ -25,9 +25,17 @@ module QA
             wait_until(max_duration: max_wait) { yield }
           end
 
+          def wait_for_import_start
+            wait_until(sleep_interval: 1) do
+              has_text?('Import in progress')
+            end
+          end
+
           def wait_for_import_success
+            wait_for_import_start
+
             wait_until(max_duration: 120, sleep_interval: 1) do
-              has_text?('The project was successfully imported.')
+              has_no_text?('Import in progress')
             end
           end
         end

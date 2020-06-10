@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe NetworkPolicies::DeleteResourceService do
+RSpec.describe NetworkPolicies::DeleteResourceService do
   let(:service) { NetworkPolicies::DeleteResourceService.new(resource_name: 'policy', environment: environment) }
   let(:environment) { instance_double('Environment', deployment_platform: platform, deployment_namespace: 'namespace') }
   let(:platform) { instance_double('Clusters::Platforms::Kubernetes', kubeclient: kubeclient) }

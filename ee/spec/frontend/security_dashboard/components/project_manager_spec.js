@@ -1,5 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { merge } from 'lodash';
 
 import createDefaultState from 'ee/security_dashboard/store/modules/project_selector/state';
 
@@ -42,8 +43,7 @@ describe('Project Manager component', () => {
             isUpdatingProjects: jest.fn().mockReturnValue(isUpdatingProjects),
           },
           state: {
-            ...createDefaultState(),
-            ...state,
+            ...merge(createDefaultState(), state),
           },
         },
       },
@@ -155,11 +155,11 @@ describe('Project Manager component', () => {
     });
 
     it('passes the list of projects to the project-list component', () => {
-      const projects = [{}];
+      const projects = [{ foo: true }];
 
       factory({ state: { projects } });
 
-      expect(getProjectList().props('projects')).toBe(projects);
+      expect(getProjectList().props('projects')).toEqual(projects);
     });
 
     it.each([false, true])(

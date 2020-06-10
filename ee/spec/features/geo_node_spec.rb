@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'GEO Nodes', :geo do
+RSpec.describe 'GEO Nodes', :geo do
   include ::EE::GeoHelpers
 
   let_it_be(:user) { create(:user) }

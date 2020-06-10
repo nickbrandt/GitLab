@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::GitlabRoutingHelper do
+RSpec.describe EE::GitlabRoutingHelper do
   include ProjectsHelper
   include ApplicationSettingsHelper
 

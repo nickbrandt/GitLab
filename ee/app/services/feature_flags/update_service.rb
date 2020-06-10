@@ -14,6 +14,12 @@ module FeatureFlags
       ActiveRecord::Base.transaction do
         feature_flag.assign_attributes(params)
 
+        feature_flag.strategies.each do |strategy|
+          if strategy.name_changed? && strategy.name_was == ::Operations::FeatureFlags::Strategy::STRATEGY_GITLABUSERLIST
+            strategy.user_list = nil
+          end
+        end
+
         audit_event = audit_event(feature_flag)
 
         if feature_flag.save

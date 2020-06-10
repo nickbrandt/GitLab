@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ElasticBatchProjectIndexerWorker do
+RSpec.describe ElasticBatchProjectIndexerWorker do
   subject(:worker) { described_class.new }
 
   let(:projects) { create_list(:project, 2) }

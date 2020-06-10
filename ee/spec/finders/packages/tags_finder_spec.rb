@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::TagsFinder do
+RSpec.describe Packages::TagsFinder do
   let(:package) { create(:npm_package) }
   let(:project) { package.project }
   let!(:tag1) { create(:packages_tag, package: package) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Namespaces do
+RSpec.describe API::Namespaces do
   let(:admin) { create(:admin) }
   let(:user) { create(:user) }
   let!(:group1) { create(:group, name: 'test.test-group.2') }
@@ -342,14 +342,27 @@ describe API::Namespaces do
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(gitlab_subscription.reload.seats).to eq(150)
+          expect(gitlab_subscription.max_seats_used).to eq(0)
           expect(gitlab_subscription.plan_name).to eq('silver')
           expect(gitlab_subscription.plan_title).to eq('Silver')
         end
 
-        it 'is sucessful using full_path when namespace path contains dots' do
-          put api("/namespaces/#{namespace.full_path}/gitlab_subscription", admin), params: params
+        it 'is successful using full_path when namespace path contains dots' do
+          do_put(namespace.id, admin, params)
 
           expect(response).to have_gitlab_http_status(:ok)
+        end
+
+        it 'does not clear out existing data because of defaults' do
+          gitlab_subscription.update!(seats: 20, max_seats_used: 42)
+
+          do_put(namespace.id, admin, params.except(:seats))
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(gitlab_subscription.reload).to have_attributes(
+            seats: 20,
+            max_seats_used: 42
+          )
         end
       end
     end

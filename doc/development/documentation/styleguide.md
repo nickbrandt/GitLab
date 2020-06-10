@@ -96,7 +96,7 @@ Having a knowledge base in any form that is separate from the documentation woul
 
 All GitLab documentation is written using [Markdown](https://en.wikipedia.org/wiki/Markdown).
 
-The [documentation website](https://docs.gitlab.com) uses GitLab Kramdown as its Markdown rendering engine. For a complete Kramdown reference, see the [GitLab Markdown Kramdown Guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/).
+The [documentation website](https://docs.gitlab.com) uses GitLab Kramdown as its Markdown rendering engine. For a complete Kramdown reference, see the [GitLab Markdown Kramdown Guide](https://about.gitlab.com/handbook/markdown-guide/).
 
 The [`gitlab-kramdown`](https://gitlab.com/gitlab-org/gitlab_kramdown)
 Ruby gem will support all [GFM markup](../../user/markdown.md) in the future. That is,
@@ -728,6 +728,7 @@ We include guidance for links in the following categories:
 - How to set up [criteria](#basic-link-criteria) for configuring a link.
 - What to set up when [linking to a `help`](../documentation/index.md#linking-to-help) page.
 - How to set up [links to internal documentation](#links-to-internal-documentation) for cross-references.
+- How to set up [links to external documentation](#links-to-external-documentation) for authoritative sources.
 - When to use [links requiring permissions](#links-requiring-permissions).
 - How to set up a [link to a video](#link-to-video).
 - How to [include links with version text](#text-for-documentation-requiring-version-text).
@@ -779,6 +780,12 @@ To link to internal documentation:
 
 NOTE: **Note**:
 Using the Markdown extension is necessary for the [`/help`](index.md#gitlab-help) section of GitLab.
+
+### Links to external documentation
+
+When describing interactions with external software, it's often helpful to include links to external
+documentation. When possible, make sure that you are linking to an **authoritative** source.
+For example, if you're describing a feature in Microsoft's Active Directory, include a link to official Microsoft documentation.
 
 ### Links requiring permissions
 
@@ -1049,7 +1056,7 @@ of language classes available.
 | `xml`                   |                                                                              |
 | `yaml`                  | Alias: `yml`.                                                                |
 
-For a complete reference on code blocks, check the [Kramdown guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/#code-blocks).
+For a complete reference on code blocks, check the [Kramdown guide](https://about.gitlab.com/handbook/markdown-guide/#code-blocks).
 
 ## GitLab SVG icons
 
@@ -1368,7 +1375,35 @@ versions back, you can consider removing the text if it's irrelevant or confusin
 For example, if the current major version is 12.x, version text referencing versions of GitLab 8.x
 and older are candidates for removal if necessary for clearer or cleaner docs.
 
-## Product badges
+## Products and features
+
+Refer to the information in this section when describing products and features
+within the GitLab product documentation.
+
+### Avoid line breaks in names
+
+When entering a product or feature name that includes a space (such as
+GitLab Community Edition) or even other companies' products (such as
+Amazon Web Services), be sure to not split the product or feature name across
+lines with an inserted line break. Splitting product or feature names across
+lines makes searching for these items more difficult, and can cause problems if
+names change.
+
+For example, the followng Markdown content is *not* formatted correctly:
+
+```markdown
+When entering a product or feature name that includes a space (such as GitLab
+Community Edition), don't split the product or feature name across lines.
+```
+
+Instead, it should appear similar to the following:
+
+```markdown
+When entering a product or feature name that includes a space (such as
+GitLab Community Edition), don't split the product or feature name across lines.
+```
+
+### Product badges
 
 When a feature is available in EE-only tiers, add the corresponding tier according to the
 feature availability:
@@ -1408,7 +1443,7 @@ For example:
 The absence of tiers' mentions mean that the feature is available in GitLab Core,
 GitLab.com Free, and all higher tiers.
 
-### How it works
+#### How it works
 
 Introduced by [!244](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/244),
 the special markup `**(STARTER)**` will generate a `span` element to trigger the
@@ -1695,9 +1730,8 @@ Use `%2F` for slashes (`/`).
 #### Pass arrays to API calls
 
 The GitLab API sometimes accepts arrays of strings or integers. For example, to
-restrict the sign-up e-mail domains of a GitLab instance to `*.example.com` and
-`example.net`, you would do something like this:
+exclude specific users when requesting a list of users for a project, you would do something like this:
 
 ```shell
-curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --data "domain_whitelist[]=*.example.com" --data "domain_whitelist[]=example.net" https://gitlab.example.com/api/v4/application/settings
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --data "skip_users[]=<user_id>" --data "skip_users[]=<user_id>" https://gitlab.example.com/api/v4/projects/<project_id>/users
 ```

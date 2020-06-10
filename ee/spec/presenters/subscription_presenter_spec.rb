@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SubscriptionPresenter do
+RSpec.describe SubscriptionPresenter do
   let(:subscription) { create(:gitlab_subscription) }
   let(:presenter) { described_class.new(subscription, {}) }
 

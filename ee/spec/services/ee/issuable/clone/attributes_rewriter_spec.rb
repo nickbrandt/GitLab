@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Issuable::Clone::AttributesRewriter do
+RSpec.describe Issuable::Clone::AttributesRewriter do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, group: group) }

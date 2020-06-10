@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'admin Geo Sidebar', :js, :geo do
+RSpec.describe 'admin Geo Sidebar', :js, :geo do
   include ::EE::GeoHelpers
   include StubENV
 
@@ -61,6 +61,12 @@ describe 'admin Geo Sidebar', :js, :geo do
     describe 'visiting geo uploads' do
       it_behaves_like 'active sidebar link', 'Replication' do
         let(:path) { admin_geo_uploads_path }
+      end
+    end
+
+    describe 'visiting geo package files' do
+      it_behaves_like 'active sidebar link', 'Replication' do
+        let(:path) { admin_geo_package_files_path }
       end
     end
   end

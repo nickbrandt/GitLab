@@ -1,0 +1,5 @@
+---
+title: Remove license management from CI/CD settings
+merge_request: 31553
+author:
+type: changed

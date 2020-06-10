@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Reports::Security::Locations::SecretDetection do
+RSpec.describe Gitlab::Ci::Reports::Security::Locations::SecretDetection do
   let(:params) do
     {
       file_path: 'src/main/App.java',

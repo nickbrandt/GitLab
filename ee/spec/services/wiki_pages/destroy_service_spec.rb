@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe WikiPages::DestroyService do
+RSpec.describe WikiPages::DestroyService do
   let(:user)    { create(:user) }
   let(:page)    { create(:wiki_page) }
 

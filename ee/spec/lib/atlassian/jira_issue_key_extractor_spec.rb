@@ -2,7 +2,7 @@
 
 require 'fast_spec_helper'
 
-describe Atlassian::JiraIssueKeyExtractor do
+RSpec.describe Atlassian::JiraIssueKeyExtractor do
   describe '.has_keys?' do
     subject { described_class.has_keys?(string) }
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Clusters::EnvironmentEntity do
+RSpec.describe Clusters::EnvironmentEntity do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
   let_it_be(:project, refind: true) { create(:project, group: group) }

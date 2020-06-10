@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::ElasticsearchController do
+RSpec.describe Admin::ElasticsearchController do
   let(:admin) { create(:admin) }
 
   describe 'POST #enqueue_index' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Group do
+RSpec.describe Group do
   let(:group) { create(:group) }
 
   it { is_expected.to include_module(EE::Group) }
@@ -16,6 +16,7 @@ describe Group do
     it { is_expected.to have_many(:dependency_proxy_blobs) }
     it { is_expected.to have_many(:cycle_analytics_stages) }
     it { is_expected.to have_many(:ip_restrictions) }
+    it { is_expected.to have_many(:allowed_email_domains) }
     it { is_expected.to have_one(:dependency_proxy_setting) }
     it { is_expected.to have_one(:deletion_schedule) }
     it { is_expected.to have_one(:group_wiki_repository) }
@@ -419,6 +420,62 @@ describe Group do
     end
   end
 
+  describe '#root_ancestor_ip_restrictions' do
+    let(:root_group) { create(:group) }
+    let!(:ip_restriction) { create(:ip_restriction, group: root_group) }
+
+    it 'returns the ip restrictions configured for the root group' do
+      nested_group = create(:group, parent: root_group)
+      deep_nested_group = create(:group, parent: nested_group)
+      very_deep_nested_group = create(:group, parent: deep_nested_group)
+
+      expect(root_group.root_ancestor_ip_restrictions).to contain_exactly(ip_restriction)
+      expect(nested_group.root_ancestor_ip_restrictions).to contain_exactly(ip_restriction)
+      expect(deep_nested_group.root_ancestor_ip_restrictions).to contain_exactly(ip_restriction)
+      expect(very_deep_nested_group.root_ancestor_ip_restrictions).to contain_exactly(ip_restriction)
+    end
+  end
+
+  describe '#allowed_email_domains_list' do
+    subject { group.allowed_email_domains_list }
+
+    context 'group with no associated allowed_email_domains records' do
+      it 'returns nil' do
+        expect(subject).to be_nil
+      end
+    end
+
+    context 'group with associated allowed_email_domains records' do
+      let(:domains) { ['acme.com', 'twitter.com'] }
+
+      before do
+        domains.each do |domain|
+          create(:allowed_email_domain, group: group, domain: domain)
+        end
+      end
+
+      it 'returns a comma separated string of domains of its allowed_email_domains records' do
+        expect(subject).to eq(domains.join(","))
+      end
+    end
+  end
+
+  describe '#root_ancestor_allowed_email_domains' do
+    let(:root_group) { create(:group) }
+    let!(:allowed_email_domain) { create(:allowed_email_domain, group: root_group) }
+
+    it 'returns the email domain restrictions configured for the root group' do
+      nested_group = create(:group, parent: root_group)
+      deep_nested_group = create(:group, parent: nested_group)
+      very_deep_nested_group = create(:group, parent: deep_nested_group)
+
+      expect(root_group.root_ancestor_allowed_email_domains).to contain_exactly(allowed_email_domain)
+      expect(nested_group.root_ancestor_allowed_email_domains).to contain_exactly(allowed_email_domain)
+      expect(deep_nested_group.root_ancestor_allowed_email_domains).to contain_exactly(allowed_email_domain)
+      expect(very_deep_nested_group.root_ancestor_allowed_email_domains).to contain_exactly(allowed_email_domain)
+    end
+  end
+
   describe '#predefined_push_rule' do
     context 'group with no associated push_rules record' do
       let!(:sample) { create(:push_rule_sample) }
@@ -430,7 +487,7 @@ describe Group do
 
     context 'group with associated push_rules record' do
       context 'with its own push rule' do
-        let(:push_rule) { create(:push_rule )}
+        let(:push_rule) { create(:push_rule) }
 
         it 'returns its own push rule' do
           group.update(push_rule: push_rule)
@@ -554,22 +611,11 @@ describe Group do
           is_expected.to be true
         end
 
-        it 'returns true for groups with group template already set within grace period' do
+        it 'returns false for groups with group template already set but not in proper plan' do
           group.update!(custom_project_templates_group_id: create(:group, parent: group).id)
           group.reload
 
-          Timecop.freeze(GroupsWithTemplatesFinder::CUT_OFF_DATE - 1.day) do
-            is_expected.to be true
-          end
-        end
-
-        it 'returns false for groups with group template already set after grace period' do
-          group.update!(custom_project_templates_group_id: create(:group, parent: group).id)
-          group.reload
-
-          Timecop.freeze(GroupsWithTemplatesFinder::CUT_OFF_DATE + 1.day) do
-            is_expected.to be false
-          end
+          is_expected.to be false
         end
       end
 
@@ -951,5 +997,17 @@ describe Group do
         expect(subject).to be_nil
       end
     end
+  end
+
+  describe '#owners_emails' do
+    let(:user) { create(:user, email: 'bob@example.com') }
+
+    before do
+      group.add_owner(user)
+    end
+
+    subject { group.owners_emails }
+
+    it { is_expected.to match([user.email]) }
   end
 end

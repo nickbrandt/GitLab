@@ -33,6 +33,7 @@ describe('Edit feature flag form', () => {
         endpoint: `${TEST_HOST}/feature_flags.json`,
         path: '/feature_flags',
         environmentsEndpoint: 'environments.json',
+        projectId: '8',
       },
       store,
       provide: {

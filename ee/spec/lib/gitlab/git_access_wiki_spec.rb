@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::GitAccessWiki do
+RSpec.describe Gitlab::GitAccessWiki do
   let(:user) { create(:user) }
   let(:project) { create(:project, :wiki_repo) }
   let(:changes) { ['6f6d7e7ed 570e7b2ab refs/heads/master'] }

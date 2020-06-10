@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'rake_helper'
 
-describe SystemCheck::Geo::FdwEnabledCheck, :geo do
+RSpec.describe SystemCheck::Geo::FdwEnabledCheck, :geo do
   describe '#skip?' do
     subject { described_class.new.skip? }
 

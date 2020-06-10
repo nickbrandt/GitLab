@@ -15,22 +15,22 @@
 - [🎬 GraphQL at GitLab: Deep Dive](../api_graphql_styleguide.md#deep-dive) (video) by Nick Thomas
   - An overview of the history of GraphQL at GitLab (not frontend-specific)
 - [🎬 GitLab Feature Walkthrough with GraphQL and Vue Apollo](https://www.youtube.com/watch?v=6yYp2zB7FrM) (video) by Natalia Tepluhina
-  - A real-life example of implmenting a frontend feature in GitLab using GraphQL
+  - A real-life example of implementing a frontend feature in GitLab using GraphQL
 - [🎬 History of client-side GraphQL at GitLab](https://www.youtube.com/watch?v=mCKRJxvMnf0) (video) Illya Klymov and Natalia Tepluhina
 - [🎬 From Vuex to Apollo](https://www.youtube.com/watch?v=9knwu87IfU8) (video) by Natalia Tepluhina
   - A useful overview of when Apollo might be a better choice than Vuex, and how one could go about the transition
-- [🛠 Vuex-> Apollo Migration: a proof-of-concept project](https://gitlab.com/ntepluhina/vuex-to-apollo/blob/master/README.md)
+- [🛠 Vuex -> Apollo Migration: a proof-of-concept project](https://gitlab.com/ntepluhina/vuex-to-apollo/blob/master/README.md)
   - A collection of examples that show the possible approaches for state management with Vue+GraphQL+(Vuex or Apollo) apps
 
 ### Libraries
 
-We use [Apollo](https://www.apollographql.com/) (specifically [Apollo Client](https://www.apollographql.com/docs/react/)) and [Vue Apollo](https://github.com/Akryum/vue-apollo/)
+We use [Apollo](https://www.apollographql.com/) (specifically [Apollo Client](https://www.apollographql.com/docs/react/)) and [Vue Apollo](https://github.com/vuejs/vue-apollo)
 when using GraphQL for frontend development.
 
 If you are using GraphQL within a Vue application, the [Usage in Vue](#usage-in-vue) section
 can help you learn how to integrate Vue Apollo.
 
-For other usecases, check out the [Usage outside of Vue](#usage-outside-of-vue) section.
+For other use cases, check out the [Usage outside of Vue](#usage-outside-of-vue) section.
 
 ### Tooling
 
@@ -153,7 +153,7 @@ new Vue({
 });
 ```
 
-Read more about [Vue Apollo](https://github.com/vuejs/vue-apollo) in the [Vue Apollo documentation](https://vue-apollo.netlify.com/guide/).
+Read more about [Vue Apollo](https://github.com/vuejs/vue-apollo) in the [Vue Apollo documentation](https://vue-apollo.netlify.app/guide/).
 
 ### Local state with Apollo
 
@@ -265,7 +265,7 @@ const defaultClient = createDefaultClient(
 
 Now every single time on attempt to fetch a version, our client will fetch `id` and `sha` from the remote API endpoint and will assign our hardcoded values to `author` and `createdAt` version properties. With this data, frontend developers are able to work on UI part without being blocked by backend. When actual response is added to the API, a custom local resolver can be removed fast and the only change to query/fragment is `@client` directive removal.
 
-Read more about local state management with Apollo in the [Vue Apollo documentation](https://vue-apollo.netlify.com/guide/local-state.html#local-state).
+Read more about local state management with Apollo in the [Vue Apollo documentation](https://vue-apollo.netlify.app/guide/local-state.html#local-state).
 
 ### Using with Vuex
 
@@ -650,7 +650,7 @@ When [using Vuex](#Using-with-Vuex), disable the cache when:
 
 - The data is being cached elsewhere
 - The use case does not need caching
-if the data is being cached elsewhere, or if there is simply no need for it for the given usecase.
+if the data is being cached elsewhere, or if there is simply no need for it for the given use case.
 
 ```javascript
 import createDefaultClient from '~/lib/graphql';

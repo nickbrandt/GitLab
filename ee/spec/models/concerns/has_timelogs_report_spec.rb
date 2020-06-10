@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe HasTimelogsReport do
+RSpec.describe HasTimelogsReport do
   let(:user)      { create(:user) }
   let(:group)     { create(:group) }
   let(:issue)     { create(:issue, project: create(:project, :public, group: group)) }

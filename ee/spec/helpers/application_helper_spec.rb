@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApplicationHelper do
+RSpec.describe ApplicationHelper do
   include EE::GeoHelpers
 
   describe '#read_only_message', :geo do

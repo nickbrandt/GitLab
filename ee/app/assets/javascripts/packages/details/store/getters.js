@@ -1,4 +1,5 @@
 import { generateConanRecipe } from '../utils';
+import { PackageType } from '../../shared/constants';
 import { getPackageTypeLabel } from '../../shared/utils';
 import { NpmManager } from '../constants';
 
@@ -8,6 +9,14 @@ export const packagePipeline = ({ packageEntity }) => {
 
 export const packageTypeDisplay = ({ packageEntity }) => {
   return getPackageTypeLabel(packageEntity.package_type);
+};
+
+export const packageIcon = ({ packageEntity }) => {
+  if (packageEntity.package_type === PackageType.NUGET) {
+    return packageEntity.nuget_metadatum?.icon_url || null;
+  }
+
+  return null;
 };
 
 export const conanInstallationCommand = ({ packageEntity }) => {

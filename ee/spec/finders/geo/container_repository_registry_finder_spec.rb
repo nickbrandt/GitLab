@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Geo::ContainerRepositoryRegistryFinder, :geo, :geo_fdw do
+RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo, :geo_fdw do
   include ::EE::GeoHelpers
 
   let!(:secondary) { create(:geo_node) }

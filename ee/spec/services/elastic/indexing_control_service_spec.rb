@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Elastic::IndexingControlService, :clean_gitlab_redis_shared_state do
+RSpec.describe Elastic::IndexingControlService, :clean_gitlab_redis_shared_state do
   let(:worker_class) do
     Class.new do
       def self.name

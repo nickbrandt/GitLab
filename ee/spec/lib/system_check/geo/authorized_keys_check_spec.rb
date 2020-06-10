@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'rake_helper'
 
-describe SystemCheck::Geo::AuthorizedKeysCheck do
+RSpec.describe SystemCheck::Geo::AuthorizedKeysCheck do
   describe '#multi_check' do
     subject { described_class.new }
 

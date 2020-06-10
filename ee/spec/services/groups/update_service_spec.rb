@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::UpdateService, '#execute' do
+RSpec.describe Groups::UpdateService, '#execute' do
   let!(:user) { create(:user) }
   let!(:group) { create(:group, :public) }
 
@@ -227,7 +227,8 @@ describe Groups::UpdateService, '#execute' do
   end
 
   context 'setting allowed email domain' do
-    let(:group) { create(:group) }
+    let(:group) { create(:group, :private) }
+    let(:user) { create(:user, email: 'admin@gitlab.com') }
 
     subject { update_group(group, user, params) }
 
@@ -238,15 +239,59 @@ describe Groups::UpdateService, '#execute' do
     context 'when allowed_email_domain already exists' do
       let!(:allowed_domain) { create(:allowed_email_domain, group: group, domain: 'gitlab.com') }
 
-      context 'empty allowed_email_domain param' do
-        let(:params) { { allowed_email_domain_attributes: { id: allowed_domain.id, domain: '' } } }
+      context 'allowed_email_domains_list param is not specified' do
+        let(:params) { {} }
 
-        it 'deletes ip restriction' do
-          expect(group.allowed_email_domain.domain).to eql('gitlab.com')
+        it 'does not call EE::AllowedEmailDomains::UpdateService#execute' do
+          expect_any_instance_of(EE::AllowedEmailDomains::UpdateService).not_to receive(:execute)
 
           subject
+        end
+      end
 
-          expect(group.reload.allowed_email_domain).to be_nil
+      context 'allowed_email_domains_list param is blank' do
+        let(:params) { { allowed_email_domains_list: '' } }
+
+        context 'as a group owner' do
+          before do
+            group.add_owner(user)
+          end
+
+          it 'calls EE::AllowedEmailDomains::UpdateService#execute' do
+            expect_any_instance_of(EE::AllowedEmailDomains::UpdateService).to receive(:execute)
+
+            subject
+          end
+
+          it 'update is successful' do
+            expect(subject).to eq(true)
+          end
+
+          it 'deletes existing allowed_email_domain record' do
+            expect { subject }.to change { group.reload.allowed_email_domains.size }.from(1).to(0)
+          end
+        end
+
+        context 'as a normal user' do
+          it 'calls EE::AllowedEmailDomains::UpdateService#execute' do
+            expect_any_instance_of(EE::AllowedEmailDomains::UpdateService).to receive(:execute)
+
+            subject
+          end
+
+          it 'update is not successful' do
+            expect(subject).to eq(false)
+          end
+
+          it 'registers an error' do
+            subject
+
+            expect(group.errors[:allowed_email_domains]).to include('cannot be changed by you')
+          end
+
+          it 'does not delete existing allowed_email_domain record' do
+            expect { subject }.not_to change { group.reload.allowed_email_domains.size }
+          end
         end
       end
     end

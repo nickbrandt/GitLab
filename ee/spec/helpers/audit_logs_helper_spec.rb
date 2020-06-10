@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AuditLogsHelper do
+RSpec.describe AuditLogsHelper do
   using RSpec::Parameterized::TableSyntax
 
   describe '#admin_audit_log_token_types' do

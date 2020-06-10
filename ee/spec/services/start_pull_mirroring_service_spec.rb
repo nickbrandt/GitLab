@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StartPullMirroringService do
+RSpec.describe StartPullMirroringService do
   let(:project) { create(:project) }
   let(:import_state) { create(:import_state, project: project) }
   let(:user) { create(:user) }

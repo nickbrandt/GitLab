@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Update list limit metrics' do
+RSpec.describe 'Update list limit metrics' do
   include GraphqlHelpers
 
   let_it_be(:group) { create(:group, :private) }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'EE-specific admin routing' do
+RSpec.describe 'EE-specific admin routing' do
   describe Admin::Geo::ProjectsController, 'routing' do
     let(:project_registry) { create(:geo_project_registry) }
 
@@ -41,6 +41,12 @@ describe 'EE-specific admin routing' do
   describe Admin::Geo::DesignsController, 'routing' do
     it 'routes / to #index' do
       expect(get('/admin/geo/replication/designs')).to route_to('admin/geo/designs#index')
+    end
+  end
+
+  describe Admin::Geo::PackageFilesController, 'routing' do
+    it 'routes / to #index' do
+      expect(get('/admin/geo/replication/package_files')).to route_to('admin/geo/package_files#index')
     end
   end
 

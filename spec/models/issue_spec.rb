@@ -21,6 +21,9 @@ describe Issue do
     it { is_expected.to have_one(:alert_management_alert) }
     it { is_expected.to have_many(:resource_milestone_events) }
     it { is_expected.to have_many(:resource_state_events) }
+    it { is_expected.to have_and_belong_to_many(:prometheus_alert_events) }
+    it { is_expected.to have_and_belong_to_many(:self_managed_prometheus_alert_events) }
+    it { is_expected.to have_many(:prometheus_alerts) }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do
@@ -185,6 +188,35 @@ describe Issue do
       closed_state = described_class.available_states[:closed]
 
       expect { issue.close }.to change { issue.state_id }.from(open_state).to(closed_state)
+    end
+
+    context 'when there is an associated Alert Management Alert' do
+      context 'when alert can be resolved' do
+        let!(:alert) { create(:alert_management_alert, project: issue.project, issue: issue) }
+
+        it 'resolves an alert' do
+          expect { issue.close }.to change { alert.reload.resolved? }.to(true)
+        end
+      end
+
+      context 'when alert cannot be resolved' do
+        let!(:alert) { create(:alert_management_alert, :with_validation_errors, project: issue.project, issue: issue) }
+
+        before do
+          allow(Gitlab::AppLogger).to receive(:warn).and_call_original
+        end
+
+        it 'writes a warning into the log' do
+          issue.close
+
+          expect(Gitlab::AppLogger).to have_received(:warn).with(
+            message: 'Cannot resolve an associated Alert Management alert',
+            issue_id: issue.id,
+            alert_id: alert.id,
+            alert_errors: { hosts: ['hosts array is over 255 chars'] }
+          )
+        end
+      end
     end
   end
 

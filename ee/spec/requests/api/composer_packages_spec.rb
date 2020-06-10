@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::ComposerPackages do
+RSpec.describe API::ComposerPackages do
   include EE::PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create(:user) }
   let_it_be(:group, reload: true) { create(:group, :public) }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
-  let_it_be(:project, reload: true) { create(:project, :repository, path: 'my.project') }
+  let_it_be(:project, reload: true) { create(:project, :custom_repo, files: { 'composer.json' => '{ "name": "package-name" }' } ) }
   let(:headers) { {} }
 
   describe 'GET /api/v4/group/:id/-/packages/composer/packages' do
@@ -157,6 +157,10 @@ describe API::ComposerPackages do
     let(:url) { "/projects/#{project.id}/packages/composer" }
     let(:params) { {} }
 
+    before(:all) do
+      project.repository.add_tag(user, 'v1.2.99', 'master')
+    end
+
     subject { post api(url), headers: headers, params: params }
 
     shared_examples 'composer package publish' do
@@ -169,7 +173,7 @@ describe API::ComposerPackages do
           using RSpec::Parameterized::TableSyntax
 
           where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
-            'PUBLIC'  | :developer  | true  | true  | 'process Composer api request' | :created
+            'PUBLIC'  | :developer  | true  | true  | 'Composer package creation'    | :created
             'PUBLIC'  | :guest      | true  | true  | 'process Composer api request' | :forbidden
             'PUBLIC'  | :developer  | true  | false | 'process Composer api request' | :unauthorized
             'PUBLIC'  | :guest      | true  | false | 'process Composer api request' | :unauthorized
@@ -178,7 +182,7 @@ describe API::ComposerPackages do
             'PUBLIC'  | :developer  | false | false | 'process Composer api request' | :unauthorized
             'PUBLIC'  | :guest      | false | false | 'process Composer api request' | :unauthorized
             'PUBLIC'  | :anonymous  | false | true  | 'process Composer api request' | :unauthorized
-            'PRIVATE' | :developer  | true  | true  | 'process Composer api request' | :created
+            'PRIVATE' | :developer  | true  | true  | 'Composer package creation'    | :created
             'PRIVATE' | :guest      | true  | true  | 'process Composer api request' | :forbidden
             'PRIVATE' | :developer  | true  | false | 'process Composer api request' | :unauthorized
             'PRIVATE' | :guest      | true  | false | 'process Composer api request' | :unauthorized
@@ -214,7 +218,7 @@ describe API::ComposerPackages do
 
     context 'with a tag' do
       context 'with an existing branch' do
-        let(:params) { { tag: 'v1.0.0' } }
+        let(:params) { { tag: 'v1.2.99' } }
 
         it_behaves_like 'composer package publish'
       end
@@ -233,7 +237,7 @@ describe API::ComposerPackages do
 
     context 'with a branch' do
       context 'with an existing branch' do
-        let(:params) { { branch: 'feature' } }
+        let(:params) { { branch: 'master' } }
 
         it_behaves_like 'composer package publish'
       end

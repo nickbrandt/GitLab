@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::ImportExport::ExportService do
+RSpec.describe Projects::ImportExport::ExportService do
   describe '#execute' do
     context 'project templates' do
       let_it_be(:group) { create(:group, :private) }

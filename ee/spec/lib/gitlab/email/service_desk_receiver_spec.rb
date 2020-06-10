@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Email::ServiceDeskReceiver do
+RSpec.describe Gitlab::Email::ServiceDeskReceiver do
   let(:email) { fixture_file('emails/service_desk_custom_address.eml', dir: 'ee') }
   let(:receiver) { described_class.new(email) }
 

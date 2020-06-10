@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Vulnerabilities::UserNotesCountService, :use_clean_rails_memory_store_caching do
+RSpec.describe Vulnerabilities::UserNotesCountService, :use_clean_rails_memory_store_caching do
   let_it_be(:vulnerability) { create(:vulnerability) }
 
   subject { described_class.new(vulnerability) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Iterations::CreateService do
+RSpec.describe Iterations::CreateService do
   shared_examples 'iterations create service' do
     let_it_be(:user) { create(:user) }
 

@@ -136,10 +136,10 @@ module EE
       return false unless elasticsearch_indexing?
       return true unless elasticsearch_limit_indexing?
 
-      return optimized_elasticsearch_indexes_project?(project) unless ::Feature.enabled?(:elasticsearch_indexes_project_cache, default_enabled: true)
+      return elasticsearch_limited_project_exists?(project) unless ::Feature.enabled?(:elasticsearch_indexes_project_cache, default_enabled: true)
 
       ::Gitlab::Elastic::ElasticsearchEnabledCache.fetch(:project, project.id) do
-        optimized_elasticsearch_indexes_project?(project)
+        elasticsearch_limited_project_exists?(project)
       end
     end
 
@@ -298,24 +298,19 @@ module EE
 
     private
 
-    def optimized_elasticsearch_indexes_project?(project)
-      if ::Feature.enabled?(:optimized_elasticsearch_indexes_project, default_enabled: true)
-        indexed_namespaces = ::Gitlab::ObjectHierarchy
-          .new(::Namespace.where(id: project.namespace_id))
-          .base_and_ancestors
-          .joins(:elasticsearch_indexed_namespace)
+    def elasticsearch_limited_project_exists?(project)
+      indexed_namespaces = ::Gitlab::ObjectHierarchy
+        .new(::Namespace.where(id: project.namespace_id))
+        .base_and_ancestors
+        .joins(:elasticsearch_indexed_namespace)
 
-        indexed_namespaces = ::Project.where('EXISTS (?)', indexed_namespaces)
-        indexed_projects = ::Project.where('EXISTS (?)', ElasticsearchIndexedProject.where(project_id: project.id))
+      indexed_namespaces = ::Project.where('EXISTS (?)', indexed_namespaces)
+      indexed_projects = ::Project.where('EXISTS (?)', ElasticsearchIndexedProject.where(project_id: project.id))
 
-        ::Project
-          .from("(SELECT) as projects") # SELECT from "nothing" since the EXISTS queries have all the conditions.
-          .merge(indexed_namespaces.or(indexed_projects))
-          .exists?
-      else
-        # old behavior
-        elasticsearch_limited_projects.exists?(project.id)
-      end
+      ::Project
+        .from("(SELECT) as projects") # SELECT from "nothing" since the EXISTS queries have all the conditions.
+        .merge(indexed_namespaces.or(indexed_projects))
+        .exists?
     end
 
     def resume_elasticsearch_indexing

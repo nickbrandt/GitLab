@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::CIDR do
+RSpec.describe Gitlab::CIDR do
   using RSpec::Parameterized::TableSyntax
 
   context 'validation' do

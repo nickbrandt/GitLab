@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Boards::UpdateService, services: true do
+RSpec.describe Boards::UpdateService, services: true do
   describe '#execute' do
     let(:project) { create(:project, group: group) }
     let(:group) { create(:group) }

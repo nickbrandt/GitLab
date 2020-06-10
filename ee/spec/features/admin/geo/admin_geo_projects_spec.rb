@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'admin Geo Projects', :js, :geo do
+RSpec.describe 'admin Geo Projects', :js, :geo do
   let!(:geo_node) { create(:geo_node) }
   let!(:synced_registry) { create(:geo_project_registry, :synced, :repository_verified) }
   let!(:sync_pending_registry) { create(:geo_project_registry, :synced, :repository_dirty) }

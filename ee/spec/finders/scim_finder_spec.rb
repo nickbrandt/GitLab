@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ScimFinder do
+RSpec.describe ScimFinder do
   let(:group) { create(:group) }
   let(:unused_params) { double }
 

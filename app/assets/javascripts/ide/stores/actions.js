@@ -7,7 +7,6 @@ import * as types from './mutation_types';
 import { decorateFiles } from '../lib/files';
 import { stageKeys } from '../constants';
 import service from '../services';
-import router from '../ide_router';
 import eventHub from '../eventhub';
 
 export const redirectToUrl = (self, url) => visitUrl(url);
@@ -20,10 +19,6 @@ export const discardAllChanges = ({ state, commit, dispatch }) => {
   commit(types.REMOVE_ALL_CHANGES_FILES);
 };
 
-export const closeAllFiles = ({ state, dispatch }) => {
-  state.openFiles.forEach(file => dispatch('closeFile', file));
-};
-
 export const setResizingStatus = ({ commit }, resizing) => {
   commit(types.SET_RESIZING_STATUS, resizing);
 };
@@ -34,7 +29,6 @@ export const createTempEntry = (
     name,
     type,
     content = '',
-    base64 = false,
     binary = false,
     rawPath = '',
     openFile = true,
@@ -65,7 +59,6 @@ export const createTempEntry = (
     type,
     tempFile: true,
     content,
-    base64,
     binary,
     rawPath,
   });
@@ -97,7 +90,6 @@ export const addTempImage = ({ dispatch, getters }, { name, rawPath = '' }) =>
     name: getters.getAvailableFileName(name),
     type: 'blob',
     content: rawPath.split('base64,')[1],
-    base64: true,
     binary: true,
     rawPath,
     openFile: false,
@@ -262,7 +254,7 @@ export const renameEntry = ({ dispatch, commit, state, getters }, { path, name, 
     }
 
     if (newEntry.opened) {
-      router.push(`/project${newEntry.url}`);
+      dispatch('router/push', `/project${newEntry.url}`, { root: true });
     }
   }
 

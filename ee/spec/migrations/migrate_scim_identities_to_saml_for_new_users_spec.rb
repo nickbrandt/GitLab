@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20200506154421_migrate_scim_identities_to_saml_for_new_users.rb')
 
-describe MigrateScimIdentitiesToSamlForNewUsers, :migration do
+RSpec.describe MigrateScimIdentitiesToSamlForNewUsers, :migration do
   let(:group1) { table(:namespaces).create!(name: 'group1', path: 'group1') }
   let(:group2) { table(:namespaces).create!(name: 'group2', path: 'group2') }
   let(:saml_provider1) { table(:saml_providers).create!(enabled: true, group_id: group1.id, certificate_fingerprint: '123abc', sso_url: 'https://sso1.example.com') }

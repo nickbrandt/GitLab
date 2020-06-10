@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::Ldap::Person do
+RSpec.describe Gitlab::Auth::Ldap::Person do
   include LdapHelpers
 
   let(:entry) { ldap_user_entry('john.doe') }
@@ -15,6 +15,13 @@ describe Gitlab::Auth::Ldap::Person do
     it 'appends EE-specific attributes' do
       stub_ldap_config(sync_ssh_keys: 'sshPublicKey')
       expect(described_class.ldap_attributes(ldap_adapter.config)).to include('sshPublicKey')
+    end
+
+    it 'appends first and last name attributes' do
+      stub_ldap_config(options: { 'attributes' => { 'first_name' => 'name', 'last_name' => 'surname' } })
+
+      expect(described_class.ldap_attributes(ldap_adapter.config)).to include('name')
+      expect(described_class.ldap_attributes(ldap_adapter.config)).to include('surname')
     end
   end
 
@@ -91,7 +98,9 @@ describe Gitlab::Auth::Ldap::Person do
           'attributes'   => {
             'name'       => 'cn',
             'email'      => 'mail',
-            'username'   => %w(uid mail memberof)
+            'username'   => %w(uid mail),
+            'first_name' => 'name',
+            'last_name'  => 'surname'
           },
           'sync_ssh_keys' => value
         }
@@ -100,7 +109,7 @@ describe Gitlab::Auth::Ldap::Person do
 
     let(:config) { Gitlab::Auth::Ldap::Config.new('ldapmain') }
     let(:ldap_attributes) { described_class.ldap_attributes(config) }
-    let(:expected_attributes) { %w(dn cn uid mail memberof) }
+    let(:expected_attributes) { %w(dn cn uid mail memberof name surname) }
 
     it 'includes a real attribute name' do
       stub_sync_ssh_keys('my-ssh-attribute')

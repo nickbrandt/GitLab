@@ -9,7 +9,7 @@ module Gitlab
             include Gitlab::CycleAnalytics::GroupProjectsProvider
 
             def title
-              n_('Deploy', 'Deploys', value)
+              n_('Deploy', 'Deploys', value.to_i)
             end
 
             def value
@@ -22,7 +22,7 @@ module Gitlab
             def deployments_count
               @deployments_count ||= begin
                                        deployments = Deployment.joins(:project).merge(Project.inside_path(group.full_path))
-                                       deployments = deployments.where(projects: { id: options[:projects] }) if options[:projects]
+                                       deployments = deployments.where(projects: { id: options[:projects] }) if options[:projects].present?
                                        deployments = deployments.where("deployments.created_at > ?", options[:from])
                                        deployments = deployments.where("deployments.created_at < ?", options[:to]) if options[:to]
                                        deployments.success.count

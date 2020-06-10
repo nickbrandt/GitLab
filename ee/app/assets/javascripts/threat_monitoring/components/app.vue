@@ -3,7 +3,6 @@ import { mapActions } from 'vuex';
 import { GlAlert, GlEmptyState, GlIcon, GlLink, GlPopover, GlTabs, GlTab } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ThreatMonitoringFilters from './threat_monitoring_filters.vue';
 import ThreatMonitoringSection from './threat_monitoring_section.vue';
 import NetworkPolicyList from './network_policy_list.vue';
@@ -22,7 +21,6 @@ export default {
     ThreatMonitoringSection,
     NetworkPolicyList,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     defaultEnvironmentId: {
       type: Number,
@@ -194,11 +192,7 @@ export default {
           documentation-anchor="container-network-policy"
         />
       </gl-tab>
-      <gl-tab
-        v-if="glFeatures.networkPolicyManagement"
-        ref="networkPolicyTab"
-        :title="s__('ThreatMonitoring|Policies')"
-      >
+      <gl-tab ref="networkPolicyTab" :title="s__('ThreatMonitoring|Policies')">
         <network-policy-list :documentation-path="documentationPath" />
       </gl-tab>
     </gl-tabs>

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SearchController, type: :request do
+RSpec.describe SearchController, type: :request do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
   let_it_be(:project) { create(:project, :public, :repository, :wiki_repo, name: 'awesome project', group: group) }

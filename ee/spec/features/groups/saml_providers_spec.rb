@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'SAML provider settings' do
+RSpec.describe 'SAML provider settings' do
   include CookieHelper
 
   let(:user) { create(:user) }

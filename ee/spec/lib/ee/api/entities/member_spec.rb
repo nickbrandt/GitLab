@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Entities::Member do
+RSpec.describe API::Entities::Member do
   subject(:entity_representation) { described_class.new(member).as_json }
 
   let(:member) { build_stubbed(:group_member) }

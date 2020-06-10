@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe JiraConnect::EventsController do
+RSpec.describe JiraConnect::EventsController do
   describe '#installed' do
     subject do
       post :installed, params: {

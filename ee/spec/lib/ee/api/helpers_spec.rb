@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::API::Helpers do
+RSpec.describe EE::API::Helpers do
   include Rack::Test::Methods
 
   let(:helper) do

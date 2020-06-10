@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::AutocompleteService do
+RSpec.describe Groups::AutocompleteService do
   let!(:group) { create(:group, :nested, :private, avatar: fixture_file_upload('spec/fixtures/dk.png')) }
   let!(:sub_group) { create(:group, :private, parent: group) }
   let(:user) { create(:user) }

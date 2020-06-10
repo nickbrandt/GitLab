@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::ProjectsController, :geo do
+RSpec.describe Admin::ProjectsController, :geo do
   include EE::GeoHelpers
 
   let!(:project_registry) { create(:geo_project_registry) }

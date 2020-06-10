@@ -13,7 +13,7 @@ module JiraImport
     end
 
     def execute
-      project.validate_jira_import_settings!(user: user)
+      Gitlab::JiraImport.validate_project_settings!(project, user: user)
 
       return ServiceResponse.success(payload: nil) if users.blank?
 
@@ -22,6 +22,8 @@ module JiraImport
     rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ECONNREFUSED, URI::InvalidURIError, JIRA::HTTPError, OpenSSL::SSL::SSLError => error
       Gitlab::ErrorTracking.track_exception(error, project_id: project.id, request: url)
       ServiceResponse.error(message: "There was an error when communicating to Jira: #{error.message}")
+    rescue Projects::ImportService::Error => error
+      ServiceResponse.error(message: error.message)
     end
 
     private

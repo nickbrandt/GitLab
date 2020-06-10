@@ -103,6 +103,11 @@ export default {
       isLoading: true,
     };
   },
+  computed: {
+    shouldDisplayTable() {
+      return this.issues.length;
+    },
+  },
   created() {
     this.fetchIssues();
   },
@@ -141,7 +146,7 @@ export default {
 <template>
   <gl-loading-icon v-if="isLoading" size="md" />
   <gl-table
-    v-else
+    v-else-if="shouldDisplayTable"
     :fields="$options.tableHeaderFields"
     :items="issues"
     stacked="sm"

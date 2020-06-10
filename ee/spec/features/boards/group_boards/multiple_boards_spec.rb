@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Multiple Issue Boards', :js do
+RSpec.describe 'Multiple Issue Boards', :js do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group, :public) }
   let_it_be(:planning) { create(:group_label, group: group, name: 'Planning') }

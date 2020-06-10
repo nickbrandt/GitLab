@@ -2,31 +2,10 @@
 
 require 'spec_helper'
 
-describe LicenseHelper do
+RSpec.describe LicenseHelper do
   def stub_default_url_options(host: "localhost", protocol: "http", port: nil, script_name: '')
     url_options = { host: host, protocol: protocol, port: port, script_name: script_name }
     allow(Rails.application.routes).to receive(:default_url_options).and_return(url_options)
-  end
-
-  describe '#license_message' do
-    let(:license) { double(:license) }
-    let(:message_mock) { double(:message_mock) }
-
-    before do
-      allow(License).to receive(:current).and_return(license)
-    end
-
-    it 'calls Gitlab::ExpiringSubscriptionMessage to get expiring message' do
-      expect(Gitlab::ExpiringSubscriptionMessage).to receive(:new).with(
-        subscribable: license,
-        signed_in: true,
-        is_admin: false
-      ).and_return(message_mock)
-
-      expect(message_mock).to receive(:message)
-
-      license_message(signed_in: true, is_admin: false)
-    end
   end
 
   describe '#api_license_url' do

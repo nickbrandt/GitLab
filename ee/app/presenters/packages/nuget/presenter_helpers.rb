@@ -6,7 +6,8 @@ module Packages
       include ::API::Helpers::RelatedResourcesHelpers
 
       BLANK_STRING = ''
-      EMPTY_ARRAY = [].freeze
+      PACKAGE_DEPENDENCY_GROUP = 'PackageDependencyGroup'
+      PACKAGE_DEPENDENCY = 'PackageDependency'
 
       private
 
@@ -42,7 +43,7 @@ module Packages
         {
           json_url: json_url_for(package),
           authors: BLANK_STRING,
-          dependencies: EMPTY_ARRAY,
+          dependency_groups: dependency_groups_for(package),
           package_name: package.name,
           package_version: package.version,
           archive_url: archive_url_for(package),
@@ -50,6 +51,46 @@ module Packages
           tags: tags_for(package),
           metadatum: metadatum_for(package)
         }
+      end
+
+      def dependency_groups_for(package)
+        base_nuget_id = "#{json_url_for(package)}#dependencyGroup"
+
+        dependency_links_grouped_by_target_framework(package).map do |target_framework, dependency_links|
+          nuget_id = target_framework_nuget_id(base_nuget_id, target_framework)
+          {
+            id: nuget_id,
+            type: PACKAGE_DEPENDENCY_GROUP,
+            target_framework: target_framework,
+            dependencies: dependencies_for(nuget_id, dependency_links)
+          }.compact
+        end
+      end
+
+      def dependency_links_grouped_by_target_framework(package)
+        package
+          .dependency_links
+          .includes_dependency
+          .preload_nuget_metadatum
+          .group_by { |dependency_link| dependency_link.nuget_metadatum&.target_framework }
+      end
+
+      def dependencies_for(nuget_id, dependency_links)
+        return [] if dependency_links.empty?
+
+        dependency_links.map do |dependency_link|
+          dependency = dependency_link.dependency
+          {
+            id: "#{nuget_id}/#{dependency.name.downcase}",
+            type: PACKAGE_DEPENDENCY,
+            name: dependency.name,
+            range: dependency.version_pattern
+          }
+        end
+      end
+
+      def target_framework_nuget_id(base_nuget_id, target_framework)
+        target_framework.blank? ? base_nuget_id : "#{base_nuget_id}/#{target_framework.downcase}"
       end
 
       def metadatum_for(package)

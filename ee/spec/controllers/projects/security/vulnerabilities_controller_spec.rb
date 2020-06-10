@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Security::VulnerabilitiesController do
+RSpec.describe Projects::Security::VulnerabilitiesController do
   let_it_be(:group)   { create(:group) }
   let_it_be(:project) { create(:project, :repository, :public, namespace: group) }
   let_it_be(:user)    { create(:user) }
@@ -32,12 +32,6 @@ describe Projects::Security::VulnerabilitiesController do
         expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:show)
         expect(response.body).to have_text(vulnerability.title)
-      end
-
-      it 'renders the file location' do
-        show_vulnerability
-
-        expect(response.body).to have_text(vulnerability.finding.location['file'])
       end
 
       it 'renders the solution card' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe UserAnalyticsEntity do
+RSpec.describe UserAnalyticsEntity do
   let(:user) { build_stubbed(:user) }
   let(:events) do
     {
@@ -11,6 +11,7 @@ describe UserAnalyticsEntity do
       issues_closed: {},
       merge_requests_created: {},
       merge_requests_merged: {},
+      merge_requests_approved: {},
       total_events: {}
     }
   end
@@ -23,7 +24,7 @@ describe UserAnalyticsEntity do
   end
 
   [:push, :issues_created, :issues_closed, :merge_requests_created,
-   :merge_requests_merged, :total_events].each do |event_type|
+   :merge_requests_merged, :merge_requests_approved, :total_events].each do |event_type|
     it "fetches #{event_type} events for the user from the request" do
       events[event_type] = { user.id => 42 }
 

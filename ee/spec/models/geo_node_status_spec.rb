@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GeoNodeStatus, :geo, :geo_fdw do
+RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   include ::EE::GeoHelpers
 
   let!(:primary) { create(:geo_node, :primary) }
@@ -244,9 +244,9 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create(:geo_upload_registry, :failed)
       create(:geo_upload_registry, :avatar)
       create(:geo_upload_registry, file_type: :attachment)
-      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
+      create(:geo_lfs_object_registry, :failed)
 
-      create(:geo_lfs_object_registry, :with_lfs_object)
+      create(:geo_lfs_object_registry)
 
       expect(subject.lfs_objects_synced_count).to eq(1)
     end
@@ -258,9 +258,9 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create(:geo_upload_registry, :failed)
       create(:geo_upload_registry, :avatar, missing_on_primary: true)
       create(:geo_upload_registry, file_type: :attachment, missing_on_primary: true)
-      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
+      create(:geo_lfs_object_registry, :failed)
 
-      create(:geo_lfs_object_registry, :with_lfs_object, missing_on_primary: true)
+      create(:geo_lfs_object_registry, missing_on_primary: true)
 
       expect(subject.lfs_objects_synced_missing_on_primary_count).to eq(1)
     end
@@ -272,39 +272,26 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create(:geo_upload_registry, :failed)
       create(:geo_upload_registry, :avatar, :failed)
       create(:geo_upload_registry, :failed, file_type: :attachment)
-      create(:geo_lfs_object_registry, :with_lfs_object)
+      create(:geo_lfs_object_registry)
 
-      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
+      create(:geo_lfs_object_registry, :failed)
 
       expect(subject.lfs_objects_failed_count).to eq(1)
     end
   end
 
   describe '#lfs_objects_synced_in_percentage' do
-    let(:lfs_object_project) { create(:lfs_objects_project, project: project_1) }
-
-    before do
-      allow(ProjectCacheWorker).to receive(:perform_async).and_return(true)
-
-      create(:lfs_objects_project, project: project_1)
-      create_list(:lfs_objects_project, 2, project: project_3)
-    end
-
-    it 'returns 0 when no objects are available' do
+    it 'returns 0 when there are no registries' do
       expect(subject.lfs_objects_synced_in_percentage).to eq(0)
     end
 
-    it 'returns the right percentage with no group restrictions' do
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_project.lfs_object_id)
+    it 'returns the right percentage' do
+      create(:geo_lfs_object_registry)
+      create(:geo_lfs_object_registry, :failed)
+      create(:geo_lfs_object_registry, :never_synced)
+      create(:geo_lfs_object_registry, :never_synced)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(25)
-    end
-
-    it 'returns the right percentage with group restrictions' do
-      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_project.lfs_object_id)
-
-      expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(50)
     end
   end
 
@@ -1259,6 +1246,36 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create(:package_file, :jar, :checksum_failure)
 
       expect(subject.package_files_checksummed_in_percentage).to be_within(0.0001).of(75)
+    end
+  end
+
+  describe 'package files secondary counters' do
+    context 'when package registries available' do
+      before do
+        create(:package_file_registry, :failed)
+        create(:package_file_registry, :failed)
+        create(:package_file_registry, :synced)
+      end
+
+      it 'returns the right number of failed and synced repos' do
+        expect(subject.package_files_failed_count).to eq(2)
+        expect(subject.package_files_synced_count).to eq(1)
+      end
+
+      it 'returns the percent of synced package files' do
+        expect(subject.package_files_synced_in_percentage).to be_within(0.01).of(33.33)
+      end
+    end
+
+    context 'when no package registries available' do
+      it 'returns 0' do
+        expect(subject.package_files_failed_count).to eq(0)
+        expect(subject.package_files_synced_count).to eq(0)
+      end
+
+      it 'returns 0' do
+        expect(subject.package_files_synced_in_percentage).to eq(0)
+      end
     end
   end
 

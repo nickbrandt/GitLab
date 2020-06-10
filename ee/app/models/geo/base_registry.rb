@@ -30,4 +30,25 @@ class Geo::BaseRegistry < Geo::TrackingBase
 
     bulk_insert!(records, returns: :ids)
   end
+
+  def self.delete_for_model_ids(ids)
+    raise NotImplementedError, "#{self.class} does not implement #{__method__}"
+  end
+
+  def self.find_unsynced_registries(batch_size:, except_ids: [])
+    pending
+      .model_id_not_in(except_ids)
+      .limit(batch_size)
+  end
+
+  def self.find_failed_registries(batch_size:, except_ids: [])
+    failed
+      .retry_due
+      .model_id_not_in(except_ids)
+      .limit(batch_size)
+  end
+
+  def model_record_id
+    read_attribute(self.class::MODEL_FOREIGN_KEY)
+  end
 end

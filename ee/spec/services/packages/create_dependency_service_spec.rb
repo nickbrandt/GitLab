@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::CreateDependencyService do
+RSpec.describe Packages::CreateDependencyService do
   describe '#execute' do
     let_it_be(:namespace) {create(:namespace)}
     let_it_be(:version) { '1.0.1' }
     let_it_be(:package_name) { "@#{namespace.path}/my-app".freeze }
 
     context 'when packages are published' do
-      let(:json_file) { 'npm/payload.json' }
+      let(:json_file) { 'packages/npm/payload.json' }
       let(:params) do
-        Gitlab::Json.parse(fixture_file(json_file, dir: 'ee')
+        Gitlab::Json.parse(fixture_file(json_file)
                 .gsub('@root/npm-test', package_name)
                 .gsub('1.0.1', version))
                 .with_indifferent_access
@@ -37,7 +37,7 @@ describe Packages::CreateDependencyService do
       end
 
       context 'with repeated packages' do
-        let(:json_file) { 'npm/payload_with_duplicated_packages.json' }
+        let(:json_file) { 'packages/npm/payload_with_duplicated_packages.json' }
 
         it 'creates dependencies and links' do
           expect(Packages::Dependency)

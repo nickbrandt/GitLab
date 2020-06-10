@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191114173624_set_resolved_state_on_vulnerabilities.rb')
 
-describe SetResolvedStateOnVulnerabilities do
+RSpec.describe SetResolvedStateOnVulnerabilities do
   let(:confidence_levels) do
     { undefined: 0, ignore: 1, unknown: 2, experimental: 3, low: 4, medium: 5, high: 6, confirmed: 7 }
   end

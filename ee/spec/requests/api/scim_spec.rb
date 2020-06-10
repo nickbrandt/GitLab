@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::Scim do
+RSpec.describe API::Scim do
   let(:user) { create(:user) }
   let(:scim_token) { create(:scim_oauth_access_token, group: group) }
 

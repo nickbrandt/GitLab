@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::FileDownloadService do
+RSpec.describe Geo::FileDownloadService do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -120,10 +120,14 @@ describe Geo::FileDownloadService do
     context 'for a new file' do
       context 'when the downloader fails before attempting a transfer' do
         it 'logs that the download failed before attempting a transfer' do
-          result = double(:result, success: false, bytes_downloaded: 0, primary_missing_file: false, failed_before_transfer: true)
+          result = double(:result, success: false, bytes_downloaded: 0, primary_missing_file: false, failed_before_transfer: true, reason: 'Something went wrong')
           downloader = double(:downloader, execute: result)
-          expect(download_service).to receive(:downloader).and_return(downloader)
-          expect(Gitlab::Geo::Logger).to receive(:info).with(hash_including(:message, :download_time_s, download_success: false, bytes_downloaded: 0, failed_before_transfer: true)).and_call_original
+          allow(download_service).to receive(:downloader).and_return(downloader)
+
+          expect(Gitlab::Geo::Logger)
+            .to receive(:info)
+            .with(hash_including(:message, :download_time_s, download_success: false, reason: 'Something went wrong', bytes_downloaded: 0, failed_before_transfer: true))
+            .and_call_original
 
           execute!
         end

@@ -7,8 +7,9 @@ class Event < ApplicationRecord
   include DeleteWithLimit
   include CreatedAtFilterable
   include Gitlab::Utils::StrongMemoize
+  include UsageStatistics
 
-  default_scope { reorder(nil) }
+  default_scope { reorder(nil) } # rubocop:disable Cop/DefaultScope
 
   ACTIONS = HashWithIndifferentAccess.new(
     created:    1,
@@ -75,7 +76,7 @@ class Event < ApplicationRecord
   # Callbacks
   after_create :reset_project_activity
   after_create :set_last_repository_updated_at, if: :push_action?
-  after_create :track_user_interacted_projects
+  after_create ->(event) { UserInteractedProject.track(event) }
 
   # Scopes
   scope :recent, -> { reorder(id: :desc) }
@@ -149,7 +150,9 @@ class Event < ApplicationRecord
   def visible_to_user?(user = nil)
     return false unless capability.present?
 
-    Ability.allowed?(user, capability, permission_object)
+    capability.all? do |rule|
+      Ability.allowed?(user, rule, permission_object)
+    end
   end
 
   def resource_parent
@@ -361,34 +364,30 @@ class Event < ApplicationRecord
 
   protected
 
-  # rubocop:disable Metrics/CyclomaticComplexity
-  # rubocop:disable Metrics/PerceivedComplexity
-  #
-  # TODO Refactor this method so we no longer need to disable the above cops
-  # https://gitlab.com/gitlab-org/gitlab/-/issues/216879.
   def capability
     @capability ||= begin
-                      if push_action? || commit_note?
-                        :download_code
-                      elsif membership_changed? || created_project_action?
-                        :read_project
-                      elsif issue? || issue_note?
-                        :read_issue
-                      elsif merge_request? || merge_request_note?
-                        :read_merge_request
-                      elsif personal_snippet_note? || project_snippet_note?
-                        :read_snippet
-                      elsif milestone?
-                        :read_milestone
-                      elsif wiki_page?
-                        :read_wiki
-                      elsif design_note? || design?
-                        :read_design
-                      end
-                    end
+      capabilities.flat_map do |ability, syms|
+        if syms.any? { |sym| send(sym) } # rubocop: disable GitlabSecurity/PublicSend
+          [ability]
+        else
+          []
+        end
+      end
+    end
   end
-  # rubocop:enable Metrics/CyclomaticComplexity
-  # rubocop:enable Metrics/PerceivedComplexity
+
+  def capabilities
+    {
+      download_code: %i[push_action? commit_note?],
+      read_project: %i[membership_changed? created_project_action?],
+      read_issue: %i[issue? issue_note?],
+      read_merge_request: %i[merge_request? merge_request_note?],
+      read_snippet: %i[personal_snippet_note? project_snippet_note?],
+      read_milestone: %i[milestone?],
+      read_wiki: %i[wiki_page?],
+      read_design: %i[design_note? design?]
+    }
+  end
 
   private
 
@@ -428,13 +427,6 @@ class Event < ApplicationRecord
     Project.unscoped.where(id: project_id)
       .where("last_repository_updated_at < ? OR last_repository_updated_at IS NULL", REPOSITORY_UPDATED_AT_INTERVAL.ago)
       .update_all(last_repository_updated_at: created_at)
-  end
-
-  def track_user_interacted_projects
-    # Note the call to .available? is due to earlier migrations
-    # that would otherwise conflict with the call to .track
-    # (because the table does not exist yet).
-    UserInteractedProject.track(self) if UserInteractedProject.available?
   end
 
   def design_action_names

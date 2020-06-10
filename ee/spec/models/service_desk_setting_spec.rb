@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ServiceDeskSetting do
+RSpec.describe ServiceDeskSetting do
   describe 'validations' do
     subject(:service_desk_setting) { create(:service_desk_setting) }
 

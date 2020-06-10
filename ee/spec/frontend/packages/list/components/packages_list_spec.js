@@ -123,15 +123,6 @@ describe('packages_list', () => {
       mountComponent();
     });
 
-    it('shows the correct deletePackageDescription', () => {
-      expect(wrapper.vm.deletePackageDescription).toEqual('');
-
-      wrapper.setData({ itemToBeDeleted: { name: 'foo', version: '1.0.10-beta' } });
-      expect(wrapper.vm.deletePackageDescription).toMatchInlineSnapshot(
-        `"You are about to delete <b>foo:1.0.10-beta</b>, this operation is irreversible, are you sure?"`,
-      );
-    });
-
     it('setItemToBeDeleted sets itemToBeDeleted and open the modal', () => {
       const mockModalShow = jest.spyOn(wrapper.vm.$refs.packageListDeleteModal, 'show');
       const item = last(wrapper.vm.list);

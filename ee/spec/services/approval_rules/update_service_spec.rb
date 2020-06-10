@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ApprovalRules::UpdateService do
+RSpec.describe ApprovalRules::UpdateService do
   let(:project) { create(:project) }
   let(:user) { project.creator }
   let(:approval_rule) { target.approval_rules.create(name: 'foo', approvals_required: 2) }

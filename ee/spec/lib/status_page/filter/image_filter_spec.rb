@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::Filter::ImageFilter do
+RSpec.describe StatusPage::Filter::ImageFilter do
   include FilterSpecHelper
 
   describe '.call' do

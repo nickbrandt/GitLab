@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::PackagesHelper do
+RSpec.describe EE::PackagesHelper do
   let_it_be(:base_url) { "#{Gitlab.config.gitlab.url}/api/v4/" }
   let_it_be(:project) { create(:project) }
 

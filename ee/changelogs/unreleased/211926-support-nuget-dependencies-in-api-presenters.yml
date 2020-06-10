@@ -1,0 +1,5 @@
+---
+title: Support nuget dependencies in the API
+merge_request: 33389
+author:
+type: fixed

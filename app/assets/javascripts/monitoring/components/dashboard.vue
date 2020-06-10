@@ -147,6 +147,7 @@ export default {
     return {
       selectedTimeRange: timeRangeFromUrl() || defaultTimeRange,
       isRearrangingPanels: false,
+      originalDocumentTitle: document.title,
     };
   },
   computed: {
@@ -191,6 +192,9 @@ export default {
         });
       },
       deep: true,
+    },
+    selectedDashboard(dashboard) {
+      this.prependToDocumentTitle(dashboard?.display_name);
     },
   },
   created() {
@@ -258,12 +262,20 @@ export default {
       // Collapse group if no data is available
       return !this.getMetricStates(groupKey).includes(metricStates.OK);
     },
+    prependToDocumentTitle(text) {
+      if (text) {
+        document.title = `${text} · ${this.originalDocumentTitle}`;
+      }
+    },
     onTimeRangeZoom({ start, end }) {
       updateHistory({
         url: mergeUrlParams({ start, end }, window.location.href),
         title: document.title,
       });
       this.selectedTimeRange = { start, end };
+      // keep the current dashboard time range
+      // in sync with the Vuex store
+      this.setTimeRange(this.selectedTimeRange);
     },
     onExpandPanel(group, panel) {
       this.setExpandedPanel({ group, panel });

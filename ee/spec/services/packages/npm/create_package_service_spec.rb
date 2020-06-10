@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Npm::CreatePackageService do
+RSpec.describe Packages::Npm::CreatePackageService do
   let(:namespace) {create(:namespace)}
   let(:project) { create(:project, namespace: namespace) }
   let(:user) { create(:user) }
   let(:version) { '1.0.1' }
 
   let(:params) do
-    Gitlab::Json.parse(fixture_file('npm/payload.json', dir: 'ee')
+    Gitlab::Json.parse(fixture_file('packages/npm/payload.json')
         .gsub('@root/npm-test', package_name)
         .gsub('1.0.1', version)).with_indifferent_access
       .merge!(override)

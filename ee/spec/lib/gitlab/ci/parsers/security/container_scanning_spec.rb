@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Security::ContainerScanning do
+RSpec.describe Gitlab::Ci::Parsers::Security::ContainerScanning do
   let(:parser) { described_class.new }
   let(:project) { artifact.project }
   let(:pipeline) { artifact.job.pipeline }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Issue promotion', :js do
+RSpec.describe 'Issue promotion', :js do
   include Spec::Support::Helpers::Features::NotesHelpers
 
   let(:group) { create(:group) }

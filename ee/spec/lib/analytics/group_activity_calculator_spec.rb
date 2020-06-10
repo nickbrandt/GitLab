@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Analytics::GroupActivityCalculator do
+RSpec.describe Analytics::GroupActivityCalculator do
   subject { described_class.new(group, current_user) }
 
   let_it_be(:group) { create(:group) }

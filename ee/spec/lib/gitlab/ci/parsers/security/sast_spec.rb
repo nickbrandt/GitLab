@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Security::Sast do
+RSpec.describe Gitlab::Ci::Parsers::Security::Sast do
   describe '#parse!' do
     subject(:parser) { described_class.new }
 

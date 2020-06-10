@@ -209,9 +209,18 @@ GitLab supports a limited set of [CI variables](../../../ci/variables/README.md)
 - `ci_project_namespace`
 - `ci_project_path`
 - `ci_environment_name`
+- `__range`
 
 NOTE: **Note:**
 Variables for Prometheus queries must be lowercase.
+
+###### __range
+
+The `__range` variable is useful in Prometheus
+[range vector selectors](https://prometheus.io/docs/prometheus/latest/querying/basics/#range-vector-selectors).
+Its value is the total number of seconds in the dashboard's time range.
+For example, if the dashboard time range is set to 8 hours, the value of
+`__range` is `28800s`.
 
 ##### User-defined variables
 
@@ -326,6 +335,35 @@ new branch.
 If you select your **default** branch, the new dashboard becomes immediately available.
 If you select another branch, this branch should be merged to your **default** branch first.
 
+#### Dashboard YAML syntax validation
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/33202) in GitLab 13.1.
+
+To confirm your dashboard definition contains valid YAML syntax:
+
+1. Navigate to **{doc-text}** **Repository > Files**.
+1. Navigate to your dashboard file in your repository.
+1. Review the information pane about the file, displayed above the file contents.
+
+Files with valid syntax display **Metrics Dashboard YAML definition is valid**,
+and files with invalid syntax display **Metrics Dashboard YAML definition is invalid**.
+
+![Metrics Dashboard_YAML_syntax_validation](img/prometheus_dashboard_yaml_validation_v13_1.png)
+
+When **Metrics Dashboard YAML definition is invalid** at least one of the following messages is displayed:
+
+1. `dashboard: can't be blank` [learn more](#dashboard-top-level-properties)
+1. `panel_groups: can't be blank` [learn more](#dashboard-top-level-properties)
+1. `group: can't be blank` [learn more](#panel-group-panel_groups-properties)
+1. `panels: can't be blank` [learn more](#panel-group-panel_groups-properties)
+1. `metrics: can't be blank` [learn more](#panel-panels-properties)
+1. `title: can't be blank` [learn more](#panel-panels-properties)
+1. `query: can't be blank` [learn more](#metrics-metrics-properties)
+1. `query_range: can't be blank` [learn more](#metrics-metrics-properties)
+1. `unit: can't be blank` [learn more](#metrics-metrics-properties)
+
+Metrics Dashboard YAML definition validation information is also available as a [GraphQL API field](../../../api/graphql/reference/index.md#metricsdashboard)
+
 #### Dashboard YAML properties
 
 Dashboards have several components:
@@ -342,15 +380,25 @@ The following tables outline the details of expected properties.
 | ------ | ------ | ------ | ------ |
 | `dashboard` | string | yes | Heading for the dashboard. Only one dashboard should be defined per file. |
 | `panel_groups` | array | yes | The panel groups which should be on the dashboard. |
-| `templating` | Hash | no | Top level key under which templating related options can be added. |
+| `templating` | hash | no | Top level key under which templating related options can be added. |
+| `links` | array | no | Add links to display on the dashboard. |
 
 ##### **Templating (`templating`) properties**
 
 | Property | Type | Required | Description |
 | -------- | ---- | -------- | ----------- |
-| `variables` | Hash | no | Variables can be defined here. |
+| `variables` | hash | yes | Variables can be defined here. |
 
 Read the documentation on [templating](#templating-variables-for-metrics-dashboards).
+
+##### **Links (`links`) properties**
+
+| Property | Type | Required | Description |
+| -------- | ---- | -------- | ----------- |
+| `url` | string | yes | The address of the link. |
+| `title` | string | no | Display title for the link. |
+
+Read the documentation on [links](#add-related-links-to-custom-dashboards).
 
 ##### **Panel group (`panel_groups`) properties**
 
@@ -766,7 +814,7 @@ templating:
 
 ###### Full syntax
 
-This example creates a variable called `variable1`, with a default value of `var1_option_2`.
+This example creates a variable called `variable1`, with a default value of `value_option_2`.
 The label for the text box on the UI will be the value of the `label` key.
 The dashboard UI will display a dropdown with `Option 1` and `Option 2`
 as the choices.
@@ -787,6 +835,28 @@ templating:
         - value: 'value_option_2'
           text: 'Option 2'
           default: true                  # (Optional) This option should be the default value of this variable.
+```
+
+### Add related links to custom dashboards
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216385) in GitLab 13.1.
+
+Related links can be added to the top of your metrics dashboard, which can be used for quickly
+navigating between dashboards or external services. The links will open in the same tab.
+
+The `url` attribute is required for the link but the `title` attribute is optional; if the `title`
+is missing then the full address of the URL will be displayed.
+
+![Links UI](img/related_links_v13_1.png)
+
+#### Links Syntax
+
+```yaml
+links:
+  - title: GitLab.com
+    url: https://gitlab.com
+  - title: GitLab Documentation
+    url: https://docs.gitlab.com
 ```
 
 ### View and edit the source file of a custom dashboard
@@ -826,6 +896,14 @@ You can create annotations by making requests to the
 [Metrics dashboard annotations API](../../../api/metrics_dashboard_annotations.md)
 
 ![Annotations UI](img/metrics_dashboard_annotations_ui_v13.0.png)
+
+#### Retention policy
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/211433) in GitLab 13.01.
+
+To avoid excessive storage space consumption by stale annotations, records attached
+to time periods older than two weeks are removed daily. This recurring background
+job runs at 1:00 a.m. local server time.
 
 ### Expand panel
 
@@ -902,6 +980,9 @@ receivers:
 ```
 
 In order for GitLab to associate your alerts with an [environment](../../../ci/environments/index.md), you need to configure a `gitlab_environment_name` label on the alerts you set up in Prometheus. The value of this should match the name of your Environment in GitLab.
+
+NOTE: **Note**
+In GitLab versions 13.1 and greater, you can configure your manually configured Prometheus server to use the [Generic alerts integration](generic_alerts.md).
 
 ### Taking action on incidents **(ULTIMATE)**
 

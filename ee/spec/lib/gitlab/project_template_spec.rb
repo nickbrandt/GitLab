@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::ProjectTemplate do
+RSpec.describe Gitlab::ProjectTemplate do
   describe '.all' do
     context 'when `enterprise_templates` feature is not licensed' do
       before do

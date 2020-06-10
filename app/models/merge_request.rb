@@ -104,7 +104,7 @@ class MergeRequest < ApplicationRecord
   after_create :ensure_merge_request_diff
   after_update :clear_memoized_shas
   after_update :reload_diff_if_branch_changed
-  after_save :ensure_metrics, unless: :importing?
+  after_commit :ensure_metrics, on: [:create, :update], unless: :importing?
   after_commit :expire_etag_cache, unless: :importing?
 
   # When this attribute is true some MR validation is ignored
@@ -877,7 +877,7 @@ class MergeRequest < ApplicationRecord
 
     check_service = MergeRequests::MergeabilityCheckService.new(self)
 
-    if async && Feature.enabled?(:async_merge_request_check_mergeability, project, default_enabled: true)
+    if async
       check_service.async_execute
     else
       check_service.execute(retry_lease: false)

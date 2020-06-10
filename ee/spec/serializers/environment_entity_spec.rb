@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EnvironmentEntity do
+RSpec.describe EnvironmentEntity do
   include KubernetesHelpers
 
   let(:user) { create(:user) }

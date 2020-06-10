@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Operations::UpdateService do
+RSpec.describe Projects::Operations::UpdateService do
   let_it_be(:user) { create(:user) }
 
   let(:project) { create(:project) }

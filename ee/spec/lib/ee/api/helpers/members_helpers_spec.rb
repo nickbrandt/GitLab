@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe EE::API::Helpers::MembersHelpers do
+RSpec.describe EE::API::Helpers::MembersHelpers do
   subject(:members_helpers) { Class.new.include(described_class).new }
 
   before do

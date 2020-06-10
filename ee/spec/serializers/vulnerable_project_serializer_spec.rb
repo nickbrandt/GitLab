@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe VulnerableProjectSerializer do
+RSpec.describe VulnerableProjectSerializer do
   let(:project) { create(:project) }
   let(:serializer) { described_class.new(project: project, current_user: user) }
   let(:user) { create(:user) }

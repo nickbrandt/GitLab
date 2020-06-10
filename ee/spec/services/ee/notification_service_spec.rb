@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::NotificationService, :mailer do
+RSpec.describe EE::NotificationService, :mailer do
   include EmailSpec::Matchers
   include NotificationHelpers
 

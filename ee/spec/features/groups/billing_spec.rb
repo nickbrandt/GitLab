@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Groups > Billing', :js do
+RSpec.describe 'Groups > Billing', :js do
   include StubRequests
 
   let!(:user)        { create(:user) }

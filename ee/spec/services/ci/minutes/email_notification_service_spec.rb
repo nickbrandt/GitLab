@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::Minutes::EmailNotificationService do
+RSpec.describe Ci::Minutes::EmailNotificationService do
   shared_examples 'namespace with available CI minutes' do
     context 'when usage is below the quote' do
       it 'does not send the email' do
@@ -32,12 +32,6 @@ describe Ci::Minutes::EmailNotificationService do
     create(:namespace_statistics, namespace: namespace, shared_runners_seconds: ci_minutes_used * 60)
   end
 
-  let(:gitlab_dot_com) { true }
-
-  before do
-    allow(Gitlab).to receive(:com?).and_return(gitlab_dot_com)
-  end
-
   describe '#execute' do
     let(:extra_ci_minutes) { 0 }
     let(:namespace) do
@@ -45,17 +39,6 @@ describe Ci::Minutes::EmailNotificationService do
     end
 
     subject { described_class.new(project).execute }
-
-    context 'when it is not GitLab.com' do
-      let(:gitlab_dot_com) { false }
-      let(:ci_minutes_used) { 2500 }
-
-      it 'does not send the email to all the owners' do
-        expect(CiMinutesUsageMailer).not_to receive(:notify)
-
-        subject
-      end
-    end
 
     context 'with a personal namespace' do
       before do
@@ -169,8 +152,6 @@ describe Ci::Minutes::EmailNotificationService do
     end
 
     before do
-      stub_const("EE::Namespace::CI_USAGE_ALERT_LEVELS", [30, 5])
-
       namespace.add_owner(user)
       namespace.add_owner(user_2)
     end
@@ -182,16 +163,7 @@ describe Ci::Minutes::EmailNotificationService do
     end
 
     context 'when available minutes have reached the first level of alert' do
-      context 'when it is not GitLab.com' do
-        let(:gitlab_dot_com) { false }
-        let(:ci_minutes_used) { 1500 }
-
-        it_behaves_like 'no notification is sent'
-      end
-
       context 'when quota is unlimited' do
-        # Gitlab.com? => true is required in order to excercise the notification
-        let(:gitlab_dot_com) { true }
         let(:ci_minutes_used) { 1500 }
 
         before do

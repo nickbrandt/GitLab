@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SourcegraphDecorator do
+RSpec.describe SourcegraphDecorator do
   let_it_be(:enabled_user) { create(:user, sourcegraph_enabled: true) }
   let_it_be(:disabled_user) { create(:user, sourcegraph_enabled: false) }
   let_it_be(:public_project) { create(:project, :public) }
@@ -34,10 +34,6 @@ describe SourcegraphDecorator do
     Gon.clear
 
     sign_in user if user
-  end
-
-  after do
-    Feature.get(:sourcegraph).disable
   end
 
   subject do

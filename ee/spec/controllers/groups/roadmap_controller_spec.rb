@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Groups::RoadmapController do
+RSpec.describe Groups::RoadmapController do
   let(:group) { create(:group, :private) }
   let(:epic)  { create(:epic, group: group) }
   let(:user)  { create(:user) }

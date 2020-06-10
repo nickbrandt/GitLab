@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe CiMinutesUsageMailer do
+RSpec.describe CiMinutesUsageMailer do
   include EmailSpec::Matchers
 
   let(:namespace) { create(:group) }
@@ -16,27 +16,43 @@ describe CiMinutesUsageMailer do
   end
 
   describe '#notify' do
-    it_behaves_like 'mail format' do
-      let(:subject_text) do
-        "Action required: There are no remaining Pipeline minutes for #{namespace.name}"
+    let(:subject_text) do
+      "Action required: There are no remaining Pipeline minutes for #{namespace.name}"
+    end
+
+    let(:body_text) { "has run out of Shared Runner Pipeline minutes" }
+
+    subject { described_class.notify(namespace, recipients) }
+
+    context 'when it is a group' do
+      it_behaves_like 'mail format'
+    end
+
+    context 'when it is a namespace' do
+      it_behaves_like 'mail format' do
+        let(:namespace) { create(:namespace) }
       end
-
-      let(:body_text) { "has run out of Shared Runner Pipeline minutes" }
-
-      subject { described_class.notify(namespace, recipients) }
     end
   end
 
   describe '#notify_limit' do
-    it_behaves_like 'mail format' do
-      let(:percent) { 30 }
-      let(:subject_text) do
-        "Action required: Less than #{percent}% of Pipeline minutes remain for #{namespace.name}"
+    let(:percent) { 30 }
+    let(:subject_text) do
+      "Action required: Less than #{percent}% of Pipeline minutes remain for #{namespace.name}"
+    end
+
+    let(:body_text) { "has #{percent}% or less Shared Runner Pipeline minutes" }
+
+    subject { described_class.notify_limit(namespace, recipients, percent) }
+
+    context 'when it is a group' do
+      it_behaves_like 'mail format'
+    end
+
+    context 'when it is a namespace' do
+      it_behaves_like 'mail format' do
+        let(:namespace) { create(:namespace) }
       end
-
-      let(:body_text) { "has #{percent}% or less Shared Runner Pipeline minutes" }
-
-      subject { described_class.notify_limit(namespace, recipients, percent) }
     end
   end
 end

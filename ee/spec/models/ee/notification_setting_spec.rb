@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe NotificationSetting do
+RSpec.describe NotificationSetting do
   describe '.email_events' do
     subject { described_class.email_events(target) }
 

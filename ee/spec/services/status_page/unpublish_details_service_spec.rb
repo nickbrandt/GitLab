@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::UnpublishDetailsService do
+RSpec.describe StatusPage::UnpublishDetailsService do
   let_it_be(:project, refind: true) { create(:project) }
   let(:issue) { instance_double(Issue, iid: incident_id) }
   let(:incident_id) { 1 }

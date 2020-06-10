@@ -37,15 +37,7 @@ module EE
       end
 
       def shared_runners_minutes_limit_enabled?
-        if ::Feature.enabled?(:ci_minutes_track_for_public_projects, project.shared_runners_limit_namespace, default_enabled: true)
-          project.shared_runners_minutes_limit_enabled? && runner&.minutes_cost_factor(project.visibility_level)&.positive?
-        else
-          legacy_shared_runners_minutes_limit_enabled?
-        end
-      end
-
-      def legacy_shared_runners_minutes_limit_enabled?
-        runner && runner.instance_type? && project.shared_runners_minutes_limit_enabled?
+        project.shared_runners_minutes_limit_enabled? && runner&.minutes_cost_factor(project.visibility_level)&.positive?
       end
 
       def stick_build_if_status_changed
@@ -122,6 +114,16 @@ module EE
         end
 
         metrics_report
+      end
+
+      def collect_requirements_reports!(requirements_report)
+        return requirements_report unless project.feature_available?(:requirements)
+
+        each_report(::Ci::JobArtifact::REQUIREMENTS_REPORT_FILE_TYPES) do |file_type, blob, report_artifact|
+          ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, requirements_report)
+        end
+
+        requirements_report
       end
 
       def retryable?

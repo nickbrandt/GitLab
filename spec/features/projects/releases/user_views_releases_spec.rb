@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'User views releases', :js do
+RSpec.describe 'User views releases', :js do
   let_it_be(:project) { create(:project, :repository, :private) }
   let_it_be(:release) { create(:release, project: project, name: 'The first release' ) }
   let_it_be(:maintainer) { create(:user) }
@@ -80,7 +80,7 @@ describe 'User views releases', :js do
 
     context 'with a tag containing a slash' do
       it 'sees the release' do
-        release = create :release, :with_evidence, project: project, tag: 'debian/2.4.0-1'
+        release = create :release, project: project, tag: 'debian/2.4.0-1'
         visit project_releases_path(project)
 
         expect(page).to have_content(release.name)

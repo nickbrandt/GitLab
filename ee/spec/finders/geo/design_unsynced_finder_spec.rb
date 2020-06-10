@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::DesignUnsyncedFinder, :geo, :geo_fdw do
+RSpec.describe Geo::DesignUnsyncedFinder, :geo, :geo_fdw do
   include EE::GeoHelpers
 
   describe '#execute' do

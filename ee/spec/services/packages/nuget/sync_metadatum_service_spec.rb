@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::SyncMetadatumService do
+RSpec.describe Packages::Nuget::SyncMetadatumService do
   let_it_be(:package, reload: true) { create(:nuget_package) }
   let_it_be(:metadata) do
     {

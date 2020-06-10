@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Promotions', :js do
+RSpec.describe 'Promotions', :js do
   let(:admin) { create(:admin) }
   let(:user) { create(:user) }
   let(:otherdeveloper) { create(:user, name: 'TheOtherDeveloper') }
@@ -11,6 +11,11 @@ describe 'Promotions', :js do
   let(:milestone) { create(:milestone, project: project, start_date: Date.today, due_date: 7.days.from_now) }
   let!(:issue) { create(:issue, project: project, author: user) }
   let(:otherproject) { create(:project, :repository, namespace: otherdeveloper.namespace) }
+
+  before do
+    stub_feature_flags promotion_issue_weight_trial_cta: false,
+                       promotion_issue_weight_session_dismiss: false
+  end
 
   describe 'if you have a license' do
     before do
@@ -336,6 +341,41 @@ describe 'Promotions', :js do
 
       expect(page).to have_selector('.js-weight-sidebar-callout')
       expect(page).to have_selector('.promotion-issue-sidebar-message', visible: false)
+    end
+
+    context 'when checking namespace plans' do
+      before do
+        stub_application_setting(check_namespace_plan: true)
+
+        group.add_owner(user)
+      end
+
+      it 'appears on the page', :js do
+        visit project_issue_path(project, issue)
+        wait_for_requests
+
+        find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
+
+        expect(find('.issue-weights-upgrade-cta')).to have_content 'Upgrade your plan'
+        expect(find('.js-close.js-close-callout.tr-issue-weights-dont-show-me-again')).to have_content "Don't show me this again"
+      end
+
+      context 'when promotion feature flags are enabled' do
+        before do
+          stub_feature_flags promotion_issue_weight_trial_cta: true,
+                             promotion_issue_weight_session_dismiss: true
+        end
+
+        it 'appears on the page', :js do
+          visit project_issue_path(project, issue)
+          wait_for_requests
+
+          find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
+
+          expect(find('.issue-weights-trial-cta')).to have_content 'Try it for free'
+          expect(find('.js-close-callout.js-close-session.tr-issue-weights-not-now-cta')).to have_content 'Not now, thanks!'
+        end
+      end
     end
   end
 

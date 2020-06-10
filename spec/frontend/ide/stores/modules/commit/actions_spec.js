@@ -1,10 +1,10 @@
-import { resetStore, file } from 'jest/ide/helpers';
+import { file } from 'jest/ide/helpers';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { visitUrl } from '~/lib/utils/url_utility';
 import { createStore } from '~/ide/stores';
 import service from '~/ide/services';
-import router from '~/ide/ide_router';
+import { createRouter } from '~/ide/ide_router';
 import eventHub from '~/ide/eventhub';
 import consts from '~/ide/stores/modules/commit/constants';
 import * as mutationTypes from '~/ide/stores/modules/commit/mutation_types';
@@ -13,17 +13,20 @@ import { commitActionTypes, PERMISSION_CREATE_MR } from '~/ide/constants';
 import testAction from '../../../../helpers/vuex_action_helper';
 
 jest.mock('~/lib/utils/url_utility', () => ({
+  ...jest.requireActual('~/lib/utils/url_utility'),
   visitUrl: jest.fn(),
-  joinPaths: jest.requireActual('~/lib/utils/url_utility').joinPaths,
 }));
 
 const TEST_COMMIT_SHA = '123456789';
-const store = createStore();
 
 describe('IDE commit module actions', () => {
   let mock;
+  let store;
+  let router;
 
   beforeEach(() => {
+    store = createStore();
+    router = createRouter(store);
     gon.api_version = 'v1';
     mock = new MockAdapter(axios);
     jest.spyOn(router, 'push').mockImplementation();
@@ -34,7 +37,6 @@ describe('IDE commit module actions', () => {
   afterEach(() => {
     delete gon.api_version;
     mock.restore();
-    resetStore(store);
   });
 
   describe('updateCommitMessage', () => {

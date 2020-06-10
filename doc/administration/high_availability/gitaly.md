@@ -1,4 +1,7 @@
 ---
+stage: Create
+group: Gitaly
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: reference
 ---
 
@@ -11,7 +14,7 @@ This document is relevant for [scalable and highly available setups](../referenc
 
 ## Running Gitaly on its own server
 
-See [Running Gitaly on its own server](../gitaly/index.md#running-gitaly-on-its-own-server)
+See [Run Gitaly on its own server](../gitaly/index.md#run-gitaly-on-its-own-server)
 in Gitaly documentation.
 
 Continue configuration of other components by going back to the

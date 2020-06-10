@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'trials/_skip_trial.html.haml' do
+RSpec.describe 'trials/_skip_trial.html.haml' do
   include ApplicationHelper
 
   context 'without glm_source' do

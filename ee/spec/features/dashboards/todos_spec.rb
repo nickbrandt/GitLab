@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Dashboard todos' do
+RSpec.describe 'Dashboard todos' do
   let_it_be(:user) { create(:user) }
   let(:page_path) { dashboard_todos_path }
 

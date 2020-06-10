@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::MergeRequestApprovals do
+RSpec.describe API::MergeRequestApprovals do
   let_it_be(:user) { create(:user) }
   let_it_be(:user2) { create(:user) }
   let_it_be(:admin) { create(:user, :admin) }

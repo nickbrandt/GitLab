@@ -2,7 +2,9 @@
 
 require 'spec_helper'
 
-describe Packages::Nuget::PackageMetadataPresenter do
+RSpec.describe Packages::Nuget::PackageMetadataPresenter do
+  include_context 'with expected presenters dependency groups'
+
   let_it_be(:package) { create(:nuget_package, :with_metadatum) }
   let_it_be(:tag1) { create(:packages_tag, name: 'tag1', package: package) }
   let_it_be(:tag2) { create(:packages_tag, name: 'tag2', package: package) }
@@ -27,13 +29,17 @@ describe Packages::Nuget::PackageMetadataPresenter do
   describe '#catalog_entry' do
     subject { presenter.catalog_entry }
 
+    before do
+      create_dependencies_for(package)
+    end
+
     it 'returns an entry structure' do
       entry = subject
 
       expect(entry).to be_a Hash
       %i[json_url archive_url].each { |field| expect(entry[field]).not_to be_blank }
       %i[authors summary].each { |field| expect(entry[field]).to be_blank }
-      expect(entry[:dependencies]).to eq []
+      expect(entry[:dependency_groups]).to eq expected_dependency_groups(package.project_id, package.name, package.version)
       expect(entry[:package_name]).to eq package.name
       expect(entry[:package_version]).to eq package.version
       expect(entry[:tags].split(::Packages::Tag::NUGET_TAGS_SEPARATOR)).to contain_exactly('tag1', 'tag2')

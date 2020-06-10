@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::SyncReportsToApprovalRulesService, '#execute' do
+RSpec.describe Security::SyncReportsToApprovalRulesService, '#execute' do
   let(:merge_request) { create(:merge_request) }
   let(:project) { merge_request.project }
   let(:pipeline) { create(:ee_ci_pipeline, :success, project: project, merge_requests_as_head_pipeline: [merge_request]) }

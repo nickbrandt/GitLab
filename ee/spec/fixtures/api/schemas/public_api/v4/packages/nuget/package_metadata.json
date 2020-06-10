@@ -10,7 +10,6 @@
       "properties": {
         "@id": { "type": "string" },
         "authors": { "const": "" },
-        "dependencyGroups": { "const": [] },
         "id": { "type": "string" },
         "packageContent": { "type": "string" },
         "summary": { "const": "" },
@@ -18,7 +17,11 @@
         "projectUrl": { "type": "string" },
         "licenseUrl": { "type": "string" },
         "iconUrl": { "type": "string" },
-        "version": { "type": "string" }
+        "version": { "type": "string" },
+        "dependencyGroups": {
+          "type": "array",
+          "items": { "$ref": "./dependency_group.json" }
+        }
       }
     }
   }

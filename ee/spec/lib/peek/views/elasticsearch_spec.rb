@@ -5,7 +5,7 @@ require 'spec_helper'
 # We don't want to interact with Elasticsearch in GitLab FOSS so we test
 # this in ee/ only. The code exists in FOSS and won't do anything.
 
-describe Peek::Views::Elasticsearch, :elastic, :request_store do
+RSpec.describe Peek::Views::Elasticsearch, :elastic, :request_store do
   before do
     allow(::Gitlab::PerformanceBar).to receive(:enabled_for_request?).and_return(true)
     ensure_elasticsearch_index!

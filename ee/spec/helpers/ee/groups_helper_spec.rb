@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GroupsHelper do
+RSpec.describe GroupsHelper do
   using RSpec::Parameterized::TableSyntax
 
   let(:owner) { create(:user, group_view: :security_dashboard) }

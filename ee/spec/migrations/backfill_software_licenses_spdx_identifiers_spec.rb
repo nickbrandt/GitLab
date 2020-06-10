@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20190917173107_backfill_software_licenses_spdx_identifiers.rb')
 
-describe BackfillSoftwareLicensesSpdxIdentifiers do
+RSpec.describe BackfillSoftwareLicensesSpdxIdentifiers do
   let(:software_licenses) { table(:software_licenses) }
 
   describe '#up' do

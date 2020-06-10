@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Vulnerabilities::SummaryCache do
+RSpec.describe Gitlab::Vulnerabilities::SummaryCache do
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, namespace: group) }
   let(:project_cache_key) { described_class.new(group, project.id).send(:cache_key) }

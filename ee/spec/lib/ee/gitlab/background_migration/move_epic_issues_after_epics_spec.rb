@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::MoveEpicIssuesAfterEpics, schema: 20190926180443 do
+RSpec.describe Gitlab::BackgroundMigration::MoveEpicIssuesAfterEpics, schema: 20190926180443 do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }

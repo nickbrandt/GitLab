@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::MirrorsController do
+RSpec.describe Projects::MirrorsController do
   let(:project) do
     create(:project, :repository,
            mirror: true,

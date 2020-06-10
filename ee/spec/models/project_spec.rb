@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Project do
+RSpec.describe Project do
   include ProjectForksHelper
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
@@ -27,6 +27,7 @@ describe Project do
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
     it { is_expected.to have_one(:status_page_setting).class_name('StatusPage::ProjectSetting') }
     it { is_expected.to have_one(:compliance_framework_setting).class_name('ComplianceManagement::ComplianceFramework::ProjectSettings') }
+    it { is_expected.to have_one(:security_setting).class_name('ProjectSecuritySetting') }
 
     it { is_expected.to have_many(:path_locks) }
     it { is_expected.to have_many(:vulnerability_feedback) }
@@ -214,22 +215,6 @@ describe Project do
         let(:public_cost_factor) { 0.0 }
 
         it 'return projects with any visibility levels except public' do
-          public_project_with_shared_runners = create(:project, :public, shared_runners_enabled: true)
-          internal_project_with_shared_runners = create(:project, :internal, shared_runners_enabled: true)
-          private_project_with_shared_runners = create(:project, :private, shared_runners_enabled: true)
-
-          expect(described_class.with_shared_runners_limit_enabled).not_to include(public_project_with_shared_runners)
-          expect(described_class.with_shared_runners_limit_enabled).to include(internal_project_with_shared_runners)
-          expect(described_class.with_shared_runners_limit_enabled).to include(private_project_with_shared_runners)
-        end
-      end
-
-      context 'and :ci_minutes_enforce_quota_for_public_projects FF is disabled' do
-        before do
-          stub_feature_flags(ci_minutes_enforce_quota_for_public_projects: false)
-        end
-
-        it 'does not return public projects' do
           public_project_with_shared_runners = create(:project, :public, shared_runners_enabled: true)
           internal_project_with_shared_runners = create(:project, :internal, shared_runners_enabled: true)
           private_project_with_shared_runners = create(:project, :private, shared_runners_enabled: true)
@@ -1024,14 +1009,6 @@ describe Project do
         end
 
         it { is_expected.to be_truthy }
-
-        context 'and :ci_minutes_track_for_public_projects FF is disabled' do
-          before do
-            stub_feature_flags(ci_minutes_track_for_public_projects: false)
-          end
-
-          it { is_expected.to be_falsey }
-        end
       end
 
       context 'for internal project' do

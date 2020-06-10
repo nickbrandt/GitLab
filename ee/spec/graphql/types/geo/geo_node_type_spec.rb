@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['GeoNode'] do
+RSpec.describe GitlabSchema.types['GeoNode'] do
   it { expect(described_class).to require_graphql_authorizations(:read_geo_node) }
 
   it 'has the expected fields' do

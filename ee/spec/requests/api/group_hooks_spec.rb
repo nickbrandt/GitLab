@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::GroupHooks do
+RSpec.describe API::GroupHooks do
   let(:group_admin) { create(:user) }
   let(:non_admin_user) { create(:user) }
   let(:group) { create(:group) }

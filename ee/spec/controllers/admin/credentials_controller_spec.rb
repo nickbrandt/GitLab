@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::CredentialsController do
+RSpec.describe Admin::CredentialsController do
   describe 'GET #index' do
     context 'admin user' do
       before do

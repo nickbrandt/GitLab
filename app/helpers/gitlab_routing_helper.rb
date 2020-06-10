@@ -162,8 +162,8 @@ module GitlabRoutingHelper
   # against the arguments. We can speed this up 10x by generating the strings directly.
 
   # /*namespace_id/:project_id/-/jobs/:job_id/artifacts/download(.:format)
-  def fast_download_project_job_artifacts_path(project, job)
-    expose_fast_artifacts_path(project, job, :download)
+  def fast_download_project_job_artifacts_path(project, job, params = {})
+    expose_fast_artifacts_path(project, job, :download, params)
   end
 
   # /*namespace_id/:project_id/-/jobs/:job_id/artifacts/keep(.:format)
@@ -176,8 +176,13 @@ module GitlabRoutingHelper
     expose_fast_artifacts_path(project, job, :browse)
   end
 
-  def expose_fast_artifacts_path(project, job, action)
+  def expose_fast_artifacts_path(project, job, action, params = {})
     path = "#{project.full_path}/-/jobs/#{job.id}/artifacts/#{action}"
+
+    unless params.empty?
+      path += "?#{params.to_query}"
+    end
+
     Gitlab::Utils.append_path(Gitlab.config.gitlab.relative_url_root, path)
   end
 
@@ -296,6 +301,12 @@ module GitlabRoutingHelper
   def gitlab_toggle_award_emoji_snippet_url(snippet, *args)
     new_args = snippet_query_params(snippet, *args)
     toggle_award_emoji_snippet_url(snippet, *new_args)
+  end
+
+  # Wikis
+
+  def wiki_page_path(wiki, page, **options)
+    Gitlab::UrlBuilder.wiki_page_url(wiki, page, **options, only_path: true)
   end
 
   private

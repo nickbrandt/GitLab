@@ -40,7 +40,7 @@ module Gitlab
       FALLBACK = -1
 
       def count(relation, column = nil, batch: true, start: nil, finish: nil)
-        if batch && Feature.enabled?(:usage_ping_batch_counter, default_enabled: true)
+        if batch
           Gitlab::Database::BatchCount.batch_count(relation, column, start: start, finish: finish)
         else
           relation.count
@@ -49,9 +49,9 @@ module Gitlab
         FALLBACK
       end
 
-      def distinct_count(relation, column = nil, batch: true, start: nil, finish: nil)
-        if batch && Feature.enabled?(:usage_ping_batch_counter, default_enabled: true)
-          Gitlab::Database::BatchCount.batch_distinct_count(relation, column, start: start, finish: finish)
+      def distinct_count(relation, column = nil, batch: true, batch_size: nil, start: nil, finish: nil)
+        if batch
+          Gitlab::Database::BatchCount.batch_distinct_count(relation, column, batch_size: batch_size, start: start, finish: finish)
         else
           relation.distinct_count_by(column)
         end
@@ -75,6 +75,21 @@ module Gitlab
         elsif counter.present?
           redis_usage_data_totals(counter)
         end
+      end
+
+      def with_prometheus_client
+        if Gitlab::Prometheus::Internal.prometheus_enabled?
+          prometheus_address = Gitlab::Prometheus::Internal.uri
+          yield Gitlab::PrometheusClient.new(prometheus_address, allow_local_requests: true)
+        end
+      end
+
+      def measure_duration
+        result = nil
+        duration = Benchmark.realtime do
+          result = yield
+        end
+        [result, duration]
       end
 
       private

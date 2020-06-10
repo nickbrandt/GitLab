@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Project Subscriptions', :js do
+RSpec.describe 'Project Subscriptions', :js do
   let(:project) { create(:project, :public, :repository) }
   let(:upstream_project) { create(:project, :public, :repository) }
   let(:user) { create(:user) }

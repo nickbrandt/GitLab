@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Analytics::CycleAnalytics::DataCollector do
+RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
   let_it_be(:user) { create(:user) }
 
   around do |example|
@@ -393,10 +393,12 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
       end
     end
 
-    context 'when `project_ids` parameter is given' do
-      let(:group) { create(:group) }
-      let(:project1) { create(:project, :repository, group: group) }
-      let(:project2) { create(:project, :repository, group: group) }
+    context 'when filter parameters are given' do
+      let_it_be(:group) { create(:group) }
+      let_it_be(:project1) { create(:project, :repository, group: group) }
+      let_it_be(:project2) { create(:project, :repository, group: group) }
+
+      let(:merge_request) { project2.merge_requests.first }
 
       let(:stage) do
         Analytics::CycleAnalytics::GroupStage.new(
@@ -407,12 +409,17 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         )
       end
 
-      let(:data_collector) do
-        described_class.new(stage: stage, params: {
-          from: Time.new(2019, 1, 1),
-          project_ids: [project2.id],
+      let(:data_collector_params) do
+        {
+          created_after: Time.new(2019, 1, 1),
           current_user: user
-        })
+        }
+      end
+
+      subject do
+        params = Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params).to_data_collector_params
+
+        described_class.new(stage: stage, params: params).records_fetcher.serialized_records
       end
 
       before do
@@ -427,13 +434,73 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         end
       end
 
-      it 'filters for the given `project_ids`' do
-        items = data_collector.records_fetcher.serialized_records
-        expect(items.size).to eq(1)
+      shared_examples 'filter examples' do
+        it 'provides filtered results' do
+          expect(subject.size).to eq(1)
 
-        merge_request = project2.merge_requests.first
-        expect(items.first[:title]).to eq(merge_request.title)
-        expect(items.first[:iid]).to eq(merge_request.iid.to_s)
+          expect(subject.first[:title]).to eq(merge_request.title)
+          expect(subject.first[:iid]).to eq(merge_request.iid.to_s)
+        end
+      end
+
+      context 'when `project_ids` parameter is given' do
+        before do
+          data_collector_params[:project_ids] = [project2.id]
+        end
+
+        it_behaves_like 'filter examples'
+      end
+
+      context 'when `assignee_username` is given' do
+        let(:assignee) { create(:user) }
+
+        before do
+          merge_request.assignees << assignee
+
+          data_collector_params[:assignee_username] = [assignee.username]
+        end
+
+        it_behaves_like 'filter examples'
+      end
+
+      context 'when `author_username` is given' do
+        let(:author) { create(:user) }
+
+        before do
+          merge_request.update!(author: author)
+
+          data_collector_params[:author_username] = author.username
+        end
+
+        it_behaves_like 'filter examples'
+      end
+
+      context 'when `label_name` is given' do
+        let(:label) { create(:group_label, group: group) }
+
+        before do
+          MergeRequests::UpdateService.new(
+            merge_request.project,
+            user,
+            label_ids: [label.id]
+          ).execute(merge_request)
+
+          data_collector_params[:label_name] = [label.name]
+        end
+
+        it_behaves_like 'filter examples'
+      end
+
+      context 'when `milestone_title` is given' do
+        let(:milestone) { create(:milestone, group: group) }
+
+        before do
+          merge_request.update!(milestone: milestone)
+
+          data_collector_params[:milestone_title] = milestone.title
+        end
+
+        it_behaves_like 'filter examples'
       end
     end
   end

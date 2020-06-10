@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Profiles::BillingsController do
+RSpec.describe Profiles::BillingsController do
   let(:user) { create(:user) }
 
   describe 'GET #index' do

@@ -34,6 +34,10 @@ module Vulnerabilities
         transition [:created, :running] => :failed
       end
 
+      event :reset_state do
+        transition running: :created
+      end
+
       state :created
       state :running
       state :finished

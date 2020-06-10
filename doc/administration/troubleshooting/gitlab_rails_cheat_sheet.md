@@ -263,7 +263,7 @@ p.import_state.mark_as_failed("Failed manually through console.")
 
 In a specific situation, an imported repository needed to be renamed. The Support
 Team was informed of a backup restore that failed on a single repository, which created
-the project with an empty repository. The project was successfully restored to a dev
+the project with an empty repository. The project was successfully restored to a development
 instance, then exported, and imported into a new project under a different name.
 
 The Support Team was able to transfer the incorrectly named imported project into the
@@ -378,39 +378,6 @@ end
 ```ruby
 user = User.find_by_username ''
 user.skip_reconfirmation!
-```
-
-### Get an admin token
-
-```ruby
-# Get the first admin's first access token (no longer works on 11.9+. see: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22743)
-User.where(admin:true).first.personal_access_tokens.first.token
-
-# Get the first admin's private token (no longer works on 10.2+)
-User.where(admin:true).private_token
-```
-
-### Create personal access token
-
-```ruby
-personal_access_token = User.find(123).personal_access_tokens.create(
-  name: 'apitoken',
-  impersonation: false,
-  scopes: [:api]
-)
-
-puts personal_access_token.token
-```
-
-You might also want to manually set the token string:
-
-```ruby
-User.find(123).personal_access_tokens.create(
-  name: 'apitoken',
-  token_digest: Gitlab::CryptoHelper.sha256('some-token-string-here'),
-  impersonation: false,
-  scopes: [:api]
-)
 ```
 
 ### Active users & Historical users
@@ -652,7 +619,7 @@ License.current.feature_available?(:jira_dev_panel_integration)
 
 ### Check if a project feature is available in a project
 
-Features listed in <https://gitlab.com/gitlab-org/gitlab/blob/master/ee/app/models/license.rb>.
+Features listed in [`license.rb`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/app/models/license.rb).
 
 ```ruby
 p = Project.find_by_full_path('<group>/<project>')

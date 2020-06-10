@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::EpicIssuesController do
+RSpec.describe Groups::EpicIssuesController do
   let(:group) { create(:group, :public) }
   let(:project) { create(:project, group: group) }
   let(:milestone) { create(:milestone, project: project) }

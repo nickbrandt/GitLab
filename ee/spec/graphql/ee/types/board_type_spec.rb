@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['Board'] do
+RSpec.describe GitlabSchema.types['Board'] do
   it 'includes the ee specific fields' do
     expect(described_class).to have_graphql_field('weight')
   end

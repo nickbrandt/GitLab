@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::PypiPackages do
+RSpec.describe API::PypiPackages do
   include WorkhorseHelpers
   include EE::PackagesManagerApiSpecHelpers
 

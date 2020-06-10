@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::MergeReportsService, '#execute' do
+RSpec.describe Security::MergeReportsService, '#execute' do
   let(:scanner_1) { build(:ci_reports_security_scanner, external_id: 'scanner-1', name: 'Scanner 1') }
   let(:scanner_2) { build(:ci_reports_security_scanner, external_id: 'scanner-2', name: 'Scanner 2') }
   let(:scanner_3) { build(:ci_reports_security_scanner, external_id: 'scanner-3', name: 'Scanner 3') }

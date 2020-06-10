@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Trial Sign Up', :js do
+RSpec.describe 'Trial Sign Up', :js do
   let(:user_attrs) { attributes_for(:user, first_name: 'GitLab', last_name: 'GitLab') }
 
   describe 'on GitLab.com' do

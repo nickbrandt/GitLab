@@ -3,6 +3,7 @@ import {
   conanSetupCommand,
   packagePipeline,
   packageTypeDisplay,
+  packageIcon,
   mavenInstallationXml,
   mavenInstallationCommand,
   mavenSetupXml,
@@ -101,6 +102,28 @@ describe('Getters PackageDetails Store', () => {
       it(`${packageEntity.package_type} should show as ${expectedResult}`, () => {
         expect(packageTypeDisplay(state)).toBe(expectedResult);
       });
+    });
+  });
+
+  describe('packageIcon', () => {
+    describe('nuget packages', () => {
+      it('should return nuget package icon', () => {
+        setupState({ packageEntity: nugetPackage });
+
+        expect(packageIcon(state)).toBe(nugetPackage.nuget_metadatum.icon_url);
+      });
+
+      it('should return null when nuget package does not have an icon', () => {
+        setupState({ packageEntity: { ...nugetPackage, nuget_metadatum: {} } });
+
+        expect(packageIcon(state)).toBe(null);
+      });
+    });
+
+    it('should not find icons for other package types', () => {
+      setupState({ packageEntity: npmPackage });
+
+      expect(packageIcon(state)).toBe(null);
     });
   });
 

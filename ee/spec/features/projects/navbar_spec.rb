@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Project navbar' do
+RSpec.describe 'Project navbar' do
   include NavbarStructureHelper
 
   include_context 'project navbar structure'
@@ -39,7 +39,7 @@ describe 'Project navbar' do
 
   context 'when security dashboard is available' do
     before do
-      stub_licensed_features(security_dashboard: true)
+      stub_licensed_features(security_dashboard: true, security_on_demand_scans: true)
 
       insert_after_nav_item(
         _('CI / CD'),
@@ -47,6 +47,7 @@ describe 'Project navbar' do
           nav_item: _('Security & Compliance'),
           nav_sub_items: [
             _('Security Dashboard'),
+            s_('OnDemandScans|On-demand Scans'),
             _('Configuration')
           ]
         }

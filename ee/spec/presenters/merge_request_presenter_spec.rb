@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequestPresenter do
+RSpec.describe MergeRequestPresenter do
   using RSpec::Parameterized::TableSyntax
 
   let(:merge_request) { create(:merge_request, source_project: project) }

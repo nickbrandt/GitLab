@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Audit::Events::Preloader do
+RSpec.describe Gitlab::Audit::Events::Preloader do
   describe '.preload!' do
     let_it_be(:audit_events) { create_list(:audit_event, 2) }
 

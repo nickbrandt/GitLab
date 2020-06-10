@@ -2,10 +2,11 @@
 
 require 'spec_helper'
 
-describe Ci::CompareSecretDetectionReportsService do
+RSpec.describe Ci::CompareSecretDetectionReportsService do
   let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
-  let(:project) { build(:project, :repository) }
+
+  let_it_be(:project) { create(:project, :repository) }
 
   before do
     stub_licensed_features(container_scanning: true)

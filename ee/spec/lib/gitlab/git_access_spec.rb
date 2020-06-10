@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::GitAccess do
+RSpec.describe Gitlab::GitAccess do
   include GitHelpers
   include EE::GeoHelpers
 
@@ -477,9 +477,8 @@ describe Gitlab::GitAccess do
     def self.run_group_permission_checks(permissions_matrix)
       permissions_matrix.each_pair do |role, matrix|
         it "has the correct permissions for group #{role}s" do
-          project
-            .project_group_links
-            .create(group: group, group_access: Gitlab::Access.sym_options[role])
+          create(:project_group_link, role, group: group,
+                                            project: project)
 
           protected_branch.save
 

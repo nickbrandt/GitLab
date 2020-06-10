@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Reports::Security::Report do
+RSpec.describe Gitlab::Ci::Reports::Security::Report do
   let(:report) { described_class.new('sast', commit_sha, created_at) }
   let(:commit_sha) { "d8978e74745e18ce44d88814004d4255ac6a65bb" }
   let(:created_at) { 2.weeks.ago }

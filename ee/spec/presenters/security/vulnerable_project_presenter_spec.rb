@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::VulnerableProjectPresenter do
+RSpec.describe Security::VulnerableProjectPresenter do
   let(:project) { create(:project) }
 
   before do

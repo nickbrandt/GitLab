@@ -3,9 +3,7 @@ import GroupSecurityDashboard from './components/group_security_dashboard.vue';
 import UnavailableState from './components/unavailable_state.vue';
 import createStore from './store';
 import { DASHBOARD_TYPES } from './store/constants';
-import createRouter from './store/router';
 import projectsPlugin from './store/plugins/projects';
-import syncWithRouter from './store/plugins/sync_with_router';
 
 export default () => {
   const el = document.getElementById('js-group-security-dashboard');
@@ -25,15 +23,13 @@ export default () => {
     });
   }
 
-  const router = createRouter();
   const store = createStore({
     dashboardType: DASHBOARD_TYPES.GROUP,
-    plugins: [projectsPlugin, syncWithRouter(router)],
+    plugins: [projectsPlugin],
   });
   return new Vue({
     el,
     store,
-    router,
     render(createElement) {
       return createElement(GroupSecurityDashboard, {
         props: {

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe JiraConnectSubscription do
+RSpec.describe JiraConnectSubscription do
   describe 'associations' do
     it { is_expected.to belong_to(:installation).class_name('JiraConnectInstallation') }
     it { is_expected.to belong_to(:namespace).class_name('Namespace') }

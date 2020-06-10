@@ -3,8 +3,7 @@
 ## Tooling
 
 - [Understanding EXPLAIN plans](../understanding_explain_plans.md)
-- [explain.depesz.com](https://explain.depesz.com/) for visualizing the output
-  of `EXPLAIN`
+- [explain.depesz.com](https://explain.depesz.com/) or [explain.dalibo.com](https://explain.dalibo.com/) for visualizing the output of `EXPLAIN`
 - [pgFormatter](http://sqlformat.darold.net/) a PostgreSQL SQL syntax beautifier
 
 ## Migrations
@@ -28,6 +27,7 @@
 - [Adding database indexes](../adding_database_indexes.md)
 - [Foreign keys & associations](../foreign_keys.md)
 - [Adding a foreign key constraint to an existing column](add_foreign_key_to_existing_column.md)
+- [`NOT NULL` constraints](not_null_constraints.md)
 - [Strings and the Text data type](strings_and_the_text_data_type.md)
 - [Single table inheritance](../single_table_inheritance.md)
 - [Polymorphic associations](../polymorphic_associations.md)

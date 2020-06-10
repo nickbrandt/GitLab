@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Metrics::Dashboard::ClusterMetricsEmbedService, :use_clean_rails_memory_store_caching do
+RSpec.describe Metrics::Dashboard::ClusterMetricsEmbedService, :use_clean_rails_memory_store_caching do
   include MetricsDashboardHelpers
   using RSpec::Parameterized::TableSyntax
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Query.vulnerabilities.location' do
+RSpec.describe 'Query.vulnerabilities.location' do
   include GraphqlHelpers
 
   subject { graphql_data.dig('vulnerabilities', 'nodes') }
@@ -40,6 +40,13 @@ describe 'Query.vulnerabilities.location' do
           requestMethod
         }
         ... on VulnerabilityLocationSast {
+          endLine
+          file
+          startLine
+          vulnerableClass
+          vulnerableMethod
+        }
+        ... on VulnerabilityLocationSecretDetection {
           endLine
           file
           startLine
@@ -166,6 +173,43 @@ describe 'Query.vulnerabilities.location' do
       location = subject.first['location']
 
       expect(location['__typename']).to eq('VulnerabilityLocationSast')
+      expect(location['file']).to eq('vulnerable_file')
+      expect(location['startLine']).to eq('420')
+      expect(location['endLine']).to eq('666')
+      expect(location['vulnerableClass']).to eq('VulnerableClass')
+      expect(location['vulnerableMethod']).to eq('vulnerable_method')
+    end
+  end
+
+  context 'when the vulnerability was found by a secret detection scan' do
+    let_it_be(:vulnerability) do
+      create(:vulnerability, project: project, report_type: :secret_detection)
+    end
+
+    let_it_be(:metadata) do
+      {
+        location: {
+          class: 'VulnerableClass',
+          method: 'vulnerable_method',
+          file: 'vulnerable_file',
+          start_line: '420',
+          end_line: '666'
+        }
+      }
+    end
+
+    let_it_be(:finding) do
+      create(
+        :vulnerabilities_occurrence,
+        vulnerability: vulnerability,
+        raw_metadata: metadata.to_json
+      )
+    end
+
+    it 'returns the file and line numbers where the vulnerability is located' do
+      location = subject.first['location']
+
+      expect(location['__typename']).to eq('VulnerabilityLocationSecretDetection')
       expect(location['file']).to eq('vulnerable_file')
       expect(location['startLine']).to eq('420')
       expect(location['endLine']).to eq('666')

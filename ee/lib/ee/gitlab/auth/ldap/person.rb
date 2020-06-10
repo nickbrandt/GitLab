@@ -8,6 +8,7 @@ module EE
       module Ldap
         module Person
           extend ActiveSupport::Concern
+          extend ::Gitlab::Utils::Override
 
           class_methods do
             def find_by_email(email, adapter)
@@ -54,9 +55,11 @@ module EE
             def ldap_attributes(config)
               attributes = super + [
                 'memberof',
-                (config.sync_ssh_keys if config.sync_ssh_keys.is_a?(String))
+                (config.sync_ssh_keys if config.sync_ssh_keys.is_a?(String)),
+                *config.attributes['first_name'],
+                *config.attributes['last_name']
               ]
-              attributes.compact.uniq
+              attributes.compact.uniq.reject(&:blank?)
             end
           end
 
@@ -92,6 +95,18 @@ module EE
             # Only get the first CN value of the string, that's the one that contains
             # the group name
             memberof.match(/(?:cn=([\w\s-]+))/i)&.captures&.first
+          end
+
+          override :name
+          def name
+            name = super
+            return name if name.present?
+
+            first_name = attribute_value(:first_name)&.first
+            last_name = attribute_value(:last_name)&.first
+            return unless first_name.present? || last_name.present?
+
+            "#{first_name} #{last_name}".strip
           end
         end
       end

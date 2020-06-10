@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw, :use_sql_query_cache_for_tracking_db do
+RSpec.describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw, :use_sql_query_cache_for_tracking_db do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -33,62 +33,6 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw, :use_sql_query_ca
     expect(subject).not_to receive(:try_obtain_lease)
 
     subject.perform
-  end
-
-  context 'with LFS objects' do
-    let(:lfs_object_local) { create(:lfs_object) }
-    let(:lfs_object_remote_1) { create(:lfs_object, :object_storage) }
-    let(:lfs_object_remote_2) { create(:lfs_object, :object_storage) }
-
-    before do
-      stub_lfs_object_storage
-
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_local.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
-    end
-
-    it 'schedules worker for file stored remotely and synced locally' do
-      expect(Geo::FileRegistryRemovalWorker).to receive(:perform_async).with('lfs', lfs_object_remote_1.id)
-      expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, lfs_object_local.id)
-
-      subject.perform
-    end
-
-    context 'with selective sync by namespace' do
-      let(:secondary) { create(:geo_node, :local_storage_only, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-      before do
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_local)
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_remote_1)
-        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_remote_2)
-      end
-
-      it 'schedules worker for file stored remotely and synced locally' do
-        expect(Geo::FileRegistryRemovalWorker).to receive(:perform_async).with('lfs', lfs_object_remote_1.id)
-        expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, lfs_object_remote_2.id)
-        expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, lfs_object_local.id)
-
-        subject.perform
-      end
-    end
-
-    context 'with selective sync by shard' do
-      let(:secondary) { create(:geo_node, :local_storage_only, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-      before do
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_local)
-        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_remote_1)
-        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_remote_2)
-      end
-
-      it 'schedules worker for file stored remotely and synced locally' do
-        expect(Geo::FileRegistryRemovalWorker).to receive(:perform_async).with('lfs', lfs_object_remote_1.id)
-        expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, lfs_object_remote_2.id)
-        expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, lfs_object_local.id)
-
-        subject.perform
-      end
-    end
   end
 
   context 'with attachments' do

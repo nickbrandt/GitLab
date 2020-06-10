@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::DeploymentPlatform do
+RSpec.describe EE::DeploymentPlatform do
   describe '#deployment_platform' do
     let(:group) { create(:group) }
     let(:project) { create(:project, group: group) }

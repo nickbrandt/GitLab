@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::StoreScansService do
+RSpec.describe Security::StoreScansService do
   let(:build) { create(:ci_build) }
 
   subject { Security::StoreScansService.new(build).execute }

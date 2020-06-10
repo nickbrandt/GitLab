@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe ServiceDeskSettings::UpdateService do
+RSpec.describe ServiceDeskSettings::UpdateService do
   describe '#execute' do
     let_it_be(:settings) { create(:service_desk_setting, outgoing_name: 'original name') }
     let_it_be(:user) { create(:user) }

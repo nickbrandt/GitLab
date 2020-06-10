@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Burndown do
+RSpec.describe Burndown do
   let_it_be(:user) { create(:user) }
   let(:start_date) { "2017-03-01" }
   let(:due_date) { "2017-03-03" }

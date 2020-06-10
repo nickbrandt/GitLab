@@ -1,7 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
 import { visitUrl } from '~/lib/utils/url_utility';
 import { createStore } from '~/ide/stores';
-import router from '~/ide/ide_router';
+import { createRouter } from '~/ide/ide_router';
 import {
   stageAllChanges,
   unstageAllChanges,
@@ -30,9 +30,11 @@ jest.mock('~/lib/utils/url_utility', () => ({
 
 describe('Multi-file store actions', () => {
   let store;
+  let router;
 
   beforeEach(() => {
     store = createStore();
+    router = createRouter(store);
 
     jest.spyOn(store, 'commit');
     jest.spyOn(store, 'dispatch');
@@ -94,26 +96,6 @@ describe('Multi-file store actions', () => {
           expect(store.state.openFiles.length).toBe(2);
         })
         .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('closeAllFiles', () => {
-    beforeEach(() => {
-      const f = file('closeAll');
-      store.state.openFiles.push(f);
-      store.state.openFiles[0].opened = true;
-      store.state.entries[f.path] = f;
-    });
-
-    it('closes all open files', done => {
-      store
-        .dispatch('closeAllFiles')
-        .then(() => {
-          expect(store.state.openFiles.length).toBe(0);
-
-          done();
-        })
         .catch(done.fail);
     });
   });
@@ -339,10 +321,12 @@ describe('Multi-file store actions', () => {
       it('adds all files from changedFiles to stagedFiles', () => {
         stageAllChanges(store);
 
-        expect(store.commit.mock.calls).toEqual([
-          [types.SET_LAST_COMMIT_MSG, ''],
-          [types.STAGE_CHANGE, expect.objectContaining({ path: file1.path })],
-        ]);
+        expect(store.commit.mock.calls).toEqual(
+          expect.arrayContaining([
+            [types.SET_LAST_COMMIT_MSG, ''],
+            [types.STAGE_CHANGE, expect.objectContaining({ path: file1.path })],
+          ]),
+        );
       });
 
       it('opens pending tab if a change exists in that file', () => {
@@ -371,9 +355,11 @@ describe('Multi-file store actions', () => {
       it('removes all files from stagedFiles after unstaging', () => {
         unstageAllChanges(store);
 
-        expect(store.commit.mock.calls).toEqual([
-          [types.UNSTAGE_CHANGE, expect.objectContaining({ path: file2.path })],
-        ]);
+        expect(store.commit.mock.calls).toEqual(
+          expect.arrayContaining([
+            [types.UNSTAGE_CHANGE, expect.objectContaining({ path: file2.path })],
+          ]),
+        );
       });
 
       it('opens pending tab if a change exists in that file', () => {

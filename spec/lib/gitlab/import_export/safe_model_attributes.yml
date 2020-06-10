@@ -472,6 +472,7 @@ Service:
 - properties
 - template
 - instance
+- alert_events
 - push_events
 - issues_events
 - commit_events
@@ -750,6 +751,7 @@ ProjectMetricsSetting:
 - external_dashboard_url
 - created_at
 - updated_at
+- dashboard_timezone
 Board:
 - id
 - project_id
@@ -860,5 +862,13 @@ SystemNoteMetadata:
   - id
   - commit_count
   - action
+  - created_at
+  - updated_at
+ProjectSecuritySetting:
+  - project_id
+  - auto_fix_container_scanning
+  - auto_fix_dast
+  - auto_fix_dependency_scanning
+  - auto_fix_sast
   - created_at
   - updated_at

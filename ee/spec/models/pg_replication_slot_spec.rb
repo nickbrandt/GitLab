@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe PgReplicationSlot do
+RSpec.describe PgReplicationSlot do
   if Gitlab::Database.replication_slots_supported?
     describe 'with replication slot support' do
       it '#max_replication_slots' do

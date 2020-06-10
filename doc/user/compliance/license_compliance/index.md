@@ -64,7 +64,7 @@ The following languages and package managers are supported.
 | Go         | [Godep](https://github.com/tools/godep), [go mod](https://github.com/golang/go/wiki/Modules) |[License Finder](https://github.com/pivotal/LicenseFinder)|
 | Java       | [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) |[License Finder](https://github.com/pivotal/LicenseFinder)|
 | .NET       | [Nuget](https://www.nuget.org/) (.NET Framework is supported via the [mono project](https://www.mono-project.com/). Windows specific dependencies are not supported at this time.)  |[License Finder](https://github.com/pivotal/LicenseFinder)|
-| Python     | [pip](https://pip.pypa.io/en/stable/) (Python is supported through [requirements.txt](https://pip.readthedocs.io/en/1.1/requirements.html) and [Pipfile.lock](https://github.com/pypa/pipfile#pipfilelock).) |[License Finder](https://github.com/pivotal/LicenseFinder)|
+| Python     | [pip](https://pip.pypa.io/en/stable/) (Python is supported through [requirements.txt](https://pip.pypa.io/en/1.1/requirements/) and [Pipfile.lock](https://github.com/pypa/pipfile#pipfilelock).) |[License Finder](https://github.com/pivotal/LicenseFinder)|
 | Ruby       | [gem](https://rubygems.org/) |[License Finder](https://github.com/pivotal/LicenseFinder)|
 | Objective-C, Swift | [Carthage](https://github.com/Carthage/Carthage) |[License Finder](https://github.com/pivotal/LicenseFinder)|
 
@@ -339,7 +339,7 @@ strict-ssl = false
 
 ### Configuring Yarn projects
 
-You can configure Yarn projects by using a [`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc)
+You can configure Yarn projects by using a [`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc/)
 file.
 
 #### Using private Yarn registries
@@ -384,6 +384,111 @@ You can supply a custom root certificate to complete TLS verification by using t
 `ADDITIONAL_CA_CERT_BUNDLE` [environment variable](#available-variables), or by
 specifying a `ca` setting in a [`.bowerrc`](https://bower.io/docs/config/#bowerrc-specification)
 file.
+
+### Configuring Conan projects
+
+You can configure [Conan](https://conan.io/) projects by adding a `.conan` directory to your
+project root. The project root serves as the [`CONAN_USER_HOME`](https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home).
+
+Consult the [Conan](https://docs.conan.io/en/latest/reference/config_files/conan.conf.html#conan-conf)
+documentation for a list of settings that you can apply.
+
+The `license_scanning` job runs in a [Debian 10](https://www.debian.org/releases/buster/) Docker
+image. The supplied image ships with some build tools such as [CMake](https://cmake.org/) and [GCC](https://gcc.gnu.org/).
+However, not all project types are supported by default. To install additional tools needed to
+compile dependencies, use a [`before_script`](../../../ci/yaml/README.md#before_script-and-after_script)
+to install the necessary build tools using the [`apt`](https://wiki.debian.org/PackageManagementTools)
+package manager. For a comprehensive list, consult [the Conan documentation](https://docs.conan.io/en/latest/introduction.html#all-platforms-all-build-systems-and-compilers).
+
+The default [Conan](https://conan.io/) configuration sets [`CONAN_LOGIN_USERNAME`](https://docs.conan.io/en/latest/reference/env_vars.html#conan-login-username-conan-login-username-remote-name)
+to `ci_user`, and binds [`CONAN_PASSWORD`](https://docs.conan.io/en/latest/reference/env_vars.html#conan-password-conan-password-remote-name)
+to the [`CI_JOB_TOKEN`](../../../ci/variables/predefined_variables.md)
+for the running job. This allows Conan projects to fetch packages from a [GitLab Conan Repository](../../packages/conan_repository/#fetching-conan-package-information-from-the-gitlab-package-registry)
+if a GitLab remote is specified in the `.conan/remotes.json` file.
+
+To override the default credentials specify a [`CONAN_LOGIN_USERNAME_{REMOTE_NAME}`](https://docs.conan.io/en/latest/reference/env_vars.html#conan-login-username-conan-login-username-remote-name)
+matching the name of the remote specified in the `.conan/remotes.json` file.
+
+NOTE: **Note:**
+[MSBuild](https://github.com/mono/msbuild#microsoftbuild-msbuild) projects aren't supported. The
+`license_scanning` image ships with [Mono](https://www.mono-project.com/) and [MSBuild](https://github.com/mono/msbuild#microsoftbuild-msbuild).
+Additional setup may be required to build packages for this project configuration.
+
+#### Using private Conan registries
+
+By default, [Conan](https://conan.io/) uses the `conan-center` remote. For example:
+
+```json
+{
+ "remotes": [
+  {
+   "name": "conan-center",
+   "url": "https://conan.bintray.com",
+   "verify_ssl": true
+  }
+ ]
+}
+```
+
+To fetch dependencies from an alternate remote, specify that remote in a `.conan/remotes.json`. For
+example:
+
+```json
+{
+ "remotes": [
+  {
+   "name": "gitlab",
+   "url": "https://gitlab.com/api/v4/packages/conan",
+   "verify_ssl": true
+  }
+ ]
+}
+```
+
+If credentials are required to authenticate then you can configure a [protected variable](../../../ci/variables/README.md#protect-a-custom-variable)
+following the naming convention described in the [`CONAN_LOGIN_USERNAME` documentation](https://docs.conan.io/en/latest/reference/env_vars.html#conan-login-username-conan-login-username-remote-name).
+
+#### Custom root certificates for Conan
+
+You can provide custom certificates by adding a `.conan/cacert.pem` file to the project root and
+setting [`CA_CERT_PATH`](https://docs.conan.io/en/latest/reference/env_vars.html#conan-cacert-path)
+to `.conan/cacert.pem`.
+
+If you specify the `ADDITIONAL_CA_CERT_BUNDLE` [environment variable](#available-variables), this
+variable's X.509 certificates are installed in the Docker image's default trust store and Conan is
+configured to use this as the default `CA_CERT_PATH`.
+
+### Configuring Go projects
+
+To configure [Go modules](https://github.com/golang/go/wiki/Modules)
+based projects, specify [environment variables](https://golang.org/pkg/cmd/go/#hdr-Environment_variables)
+in the `license_scanning` job's [variables](#available-variables) section in `.gitlab-ci.yml`.
+
+If a project has [vendored](https://golang.org/pkg/cmd/go/#hdr-Vendor_Directories) its modules,
+then the combination of the `vendor` directory and `mod.sum` file are used to detect the software
+licenses associated with the Go module dependencies.
+
+#### Using private Go registries
+
+You can use the [`GOPRIVATE`](https://golang.org/pkg/cmd/go/#hdr-Environment_variables)
+and [`GOPROXY`](https://golang.org/pkg/cmd/go/#hdr-Environment_variables)
+environment variables to control where modules are sourced from. Alternatively, you can use
+[`go mod vendor`](https://golang.org/ref/mod#tmp_28) to vendor a project's modules.
+
+#### Custom root certificates for Go
+
+You can specify the [`-insecure`](https://golang.org/pkg/cmd/go/internal/get/) flag by exporting the
+[`GOFLAGS`](https://golang.org/cmd/go/#hdr-Environment_variables)
+environment variable. For example:
+
+```yaml
+include:
+  - template: License-Scanning.gitlab-ci.yml
+
+license_scanning:
+  variables:
+    GOFLAGS: '-insecure'
+```
 
 ### Migration from `license_management` to `license_scanning`
 
@@ -487,9 +592,14 @@ license_scanning:
 The License Compliance job should now use local copies of the License Compliance analyzers to scan
 your code and generate security reports, without requiring internet access.
 
-Additional configuration may be needed for connecting to [private Maven repositories](#using-private-maven-repos),
+Additional configuration may be needed for connecting to
 [private Bower registries](#using-private-bower-registries),
-[private NPM registries](#using-private-npm-registries), [private Yarn registries](#using-private-yarn-registries), and [private Python repositories](#using-private-python-repos).
+[private Conan registries](#using-private-bower-registries),
+[private Go registries](#using-private-go-registries),
+[private Maven repositories](#using-private-maven-repos),
+[private NPM registries](#using-private-npm-registries),
+[private Python repositories](#using-private-python-repos),
+and [private Yarn registries](#using-private-yarn-registries).
 
 Exact name matches are required for [project policies](#project-policies-for-license-compliance)
 when running in an offline environment ([see related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/212388)).

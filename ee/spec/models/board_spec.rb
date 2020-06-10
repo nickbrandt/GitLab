@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Board do
+RSpec.describe Board do
   let(:board) { create(:board) }
 
   it { is_expected.to include_module(EE::Board) }

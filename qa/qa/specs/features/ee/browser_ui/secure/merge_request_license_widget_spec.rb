@@ -3,7 +3,7 @@
 require 'pathname'
 
 module QA
-  context 'Secure', :docker, :runner do
+  context 'Secure', :docker, :runner, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/219519', type: :investigating } do
     describe 'License merge request widget' do
       let(:approved_license_name) { "MIT" }
       let(:blacklisted_license_name) { "Zlib" }

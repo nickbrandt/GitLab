@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::RegisterJobService do
+RSpec.describe Ci::RegisterJobService do
   let_it_be(:shared_runner) { create(:ci_runner, :instance) }
   let!(:project) { create :project, shared_runners_enabled: true }
   let!(:pipeline) { create :ci_empty_pipeline, project: project }
@@ -86,14 +86,6 @@ describe Ci::RegisterJobService do
               end
 
               it_behaves_like 'does not return a build', 11
-
-              context 'and :ci_minutes_enforce_quota_for_public_projects FF is disabled' do
-                before do
-                  stub_feature_flags(ci_minutes_enforce_quota_for_public_projects: false)
-                end
-
-                it_behaves_like 'returns a build', 11
-              end
             end
           end
         end

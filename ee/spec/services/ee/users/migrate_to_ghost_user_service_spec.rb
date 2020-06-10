@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Users::MigrateToGhostUserService do
+RSpec.describe Users::MigrateToGhostUserService do
   context 'epics' do
     let!(:user)   { create(:user) }
     let(:service) { described_class.new(user) }

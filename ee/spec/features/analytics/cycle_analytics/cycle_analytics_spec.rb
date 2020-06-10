@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'Group Value Stream Analytics', :js do
+RSpec.describe 'Group Value Stream Analytics', :js do
   include DragTo
 
   let_it_be(:user) { create(:user) }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'ActionCable logging', :js do
+RSpec.describe 'ActionCable logging', :js do
   let_it_be(:project) { create(:project, :public) }
   let_it_be(:issue) { create(:issue, project: project) }
   let_it_be(:user) { create(:user) }
@@ -33,5 +33,15 @@ describe 'ActionCable logging', :js do
 
     gitlab_sign_in(user)
     visit project_issue_path(project, issue)
+
+    # Because there is no visual indicator for Capybara to wait on before closing the browser,
+    # we need to test an actual feature to ensure that the subscription was already established.
+
+    expect(page.find('.assignee')).to have_content 'None'
+
+    fill_in 'note[note]', with: "/assign #{user.username}"
+    click_button 'Comment'
+
+    expect(page.find('.assignee')).to have_content user.name
   end
 end

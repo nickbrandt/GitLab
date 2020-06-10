@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Resolvers::IterationsResolver do
+RSpec.describe Resolvers::IterationsResolver do
   include GraphqlHelpers
 
   describe '#resolve' do

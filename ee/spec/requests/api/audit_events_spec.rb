@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::AuditEvents do
+RSpec.describe API::AuditEvents do
   describe 'GET /audit_events' do
     let(:url) { "/audit_events" }
 

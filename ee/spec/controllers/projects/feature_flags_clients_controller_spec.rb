@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::FeatureFlagsClientsController do
+RSpec.describe Projects::FeatureFlagsClientsController do
   include Gitlab::Routing
 
   let_it_be(:project) { create(:project) }

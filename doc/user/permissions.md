@@ -131,6 +131,7 @@ The following table depicts the various user permission levels in a project.
 | Enable/disable tag protections                    |         |            |             | ✓        | ✓      |
 | Edit project                                      |         |            |             | ✓        | ✓      |
 | Edit project badges                               |         |            |             | ✓        | ✓      |
+| Share (invite) projects with groups               |         |            |             | ✓ (*8*)  | ✓ (*8*)|
 | Add deploy keys to project                        |         |            |             | ✓        | ✓      |
 | Configure project hooks                           |         |            |             | ✓        | ✓      |
 | Manage Runners                                    |         |            |             | ✓        | ✓      |
@@ -150,9 +151,12 @@ The following table depicts the various user permission levels in a project.
 | Manage [project access tokens](./project/settings/project_access_tokens.md) **(CORE ONLY)** |         |            |             | ✓        | ✓      |
 | Switch visibility level                           |         |            |             |          | ✓      |
 | Transfer project to another namespace             |         |            |             |          | ✓      |
+| Rename project                                    |         |            |             |          | ✓      |
 | Remove fork relationship                          |         |            |             |          | ✓      |
 | Remove project                                    |         |            |             |          | ✓      |
+| Archive project                                   |         |            |             |          | ✓      |
 | Delete issues                                     |         |            |             |          | ✓      |
+| Delete merge request                              |         |            |             |          | ✓      |
 | Disable notification emails                       |         |            |             |          | ✓      |
 | Force push to protected branches (*4*)            |         |            |             |          |        |
 | Remove protected branches (*4*)                   |         |            |             |          |        |
@@ -172,6 +176,7 @@ The following table depicts the various user permission levels in a project.
 1. If the [branch is protected](./project/protected_branches.md#using-the-allowed-to-merge-and-allowed-to-push-settings), this depends on the access Developers and Maintainers are given.
 1. Guest users can access GitLab [**Releases**](project/releases/index.md) for downloading assets but are not allowed to download the source code nor see repository information like tags and commits.
 1. Actions are limited only to records owned (referenced) by user.
+1. When [Share Group Lock](./group/index.md#share-with-group-lock) is enabled the project can't be shared with other groups. It does not affect group with group sharing.
 
 ## Project features permissions
 
@@ -239,6 +244,7 @@ group.
 | Publish [packages](packages/index.md) **(PREMIUM)**  |       |          | ✓         | ✓          | ✓     |
 | View metrics dashboard annotations                     |       | ✓        | ✓         | ✓          | ✓     |
 | Create project in group                                |       |          | ✓ (3)     | ✓ (3)      | ✓ (3) |
+| Share (invite) groups with groups                      |       |          |           |            | ✓     |
 | Create/edit/delete group milestones                    |       |          | ✓         | ✓          | ✓     |
 | Enable/disable a dependency proxy **(PREMIUM)**        |       |          | ✓         | ✓          | ✓     |
 | Use security dashboard **(ULTIMATE)**                  |       |          | ✓         | ✓          | ✓     |
@@ -246,11 +252,12 @@ group.
 | View/manage group-level Kubernetes cluster             |       |          |           | ✓          | ✓     |
 | Create subgroup                                        |       |          |           | ✓ (1)      | ✓     |
 | Edit epic comments (posted by any user) **(ULTIMATE)** |       |          |           | ✓ (2)      | ✓ (2) |
-| Edit group                                             |       |          |           |            | ✓     |
+| Edit group settings                                    |       |          |           |            | ✓     |
 | Manage group level CI/CD variables                     |       |          |           |            | ✓     |
 | Manage group members                                   |       |          |           |            | ✓     |
-| Remove group                                           |       |          |           |            | ✓     |
+| Delete group                                           |       |          |           |            | ✓     |
 | Delete group epic **(ULTIMATE)**                       |       |          |           |            | ✓     |
+| Edit SAML SSO Billing **(SILVER ONLY)**                | ✓     | ✓        | ✓         | ✓          | ✓ (4) |
 | View group Audit Events                                |       |          |           |            | ✓     |
 | Disable notification emails                            |       |          |           |            | ✓     |
 | View Contribution analytics                            | ✓     | ✓        | ✓         | ✓          | ✓     |
@@ -258,6 +265,8 @@ group.
 | View Issues analytics **(PREMIUM)**                    | ✓     | ✓        | ✓         | ✓          | ✓     |
 | View Productivity analytics **(PREMIUM)**              |       | ✓        | ✓         | ✓          | ✓     |
 | View Value Stream analytics                            | ✓     | ✓        | ✓         | ✓          | ✓     |
+| View Billing **(FREE ONLY)**                           | ✓     | ✓        | ✓         | ✓          | ✓ (4) |
+| View Usage Quotas **(FREE ONLY)**                      | ✓     | ✓        | ✓         | ✓          | ✓ (4) |
 
 1. Groups can be set to [allow either Owners or Owners and
   Maintainers to create subgroups](group/subgroups/index.md#creating-a-subgroup)
@@ -265,6 +274,7 @@ group.
 1. Default project creation role can be changed at:
    - The [instance level](admin_area/settings/visibility_and_access_controls.md#default-project-creation-protection).
    - The [group level](group/index.md#default-project-creation-level).
+1. Does not apply to subgroups.
 
 ### Subgroup permissions
 
@@ -285,7 +295,7 @@ project and should only have access to that project.
 External users:
 
 - Cannot create groups, projects, or personal snippets.
-- Can only access projects to which they are explicitly granted access,
+- Can only access public projects and projects to which they are explicitly granted access,
   thus hiding all other internal or private ones from them (like being
   logged out).
 

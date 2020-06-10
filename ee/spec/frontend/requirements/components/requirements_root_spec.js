@@ -4,6 +4,9 @@ import { GlPagination } from '@gitlab/ui';
 import * as Sentry from '@sentry/browser';
 import createFlash from '~/flash';
 
+import FilteredSearchBarRoot from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
+import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
+
 import RequirementsRoot from 'ee/requirements/components/requirements_root.vue';
 import RequirementsTabs from 'ee/requirements/components/requirements_tabs.vue';
 import RequirementsLoading from 'ee/requirements/components/requirements_loading.vue';
@@ -19,15 +22,13 @@ import {
   mockRequirementsOpen,
   mockRequirementsCount,
   mockPageInfo,
+  mockFilters,
 } from '../mock_data';
 
 jest.mock('ee/requirements/constants', () => ({
   DEFAULT_PAGE_SIZE: 2,
-  FilterState: {
-    opened: 'OPENED',
-    archived: 'ARCHIVED',
-    all: 'ALL',
-  },
+  FilterState: jest.requireActual('ee/requirements/constants').FilterState,
+  AvailableSortOptions: jest.requireActual('ee/requirements/constants').AvailableSortOptions,
 }));
 
 jest.mock('~/flash');
@@ -181,6 +182,32 @@ describe('RequirementsRoot', () => {
           expect(wrapper.vm.showPaginationControls).toBe(false);
         });
       });
+
+      it.each`
+        hasPreviousPage | hasNextPage  | isVisible
+        ${true}         | ${undefined} | ${true}
+        ${undefined}    | ${true}      | ${true}
+        ${false}        | ${undefined} | ${false}
+        ${undefined}    | ${false}     | ${false}
+        ${false}        | ${false}     | ${false}
+        ${true}         | ${true}      | ${true}
+      `(
+        'returns $isVisible when hasPreviousPage is $hasPreviousPage and hasNextPage is $hasNextPage within `requirements.pageInfo`',
+        ({ hasPreviousPage, hasNextPage, isVisible }) => {
+          wrapper.setData({
+            requirements: {
+              pageInfo: {
+                hasPreviousPage,
+                hasNextPage,
+              },
+            },
+          });
+
+          return wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.showPaginationControls).toBe(isVisible);
+          });
+        },
+      );
     });
 
     describe('prevPage', () => {
@@ -225,23 +252,37 @@ describe('RequirementsRoot', () => {
       },
     };
 
-    describe('updateUrl', () => {
-      it('updates window URL with query params `page` and `prev`', () => {
-        wrapper.vm.updateUrl({
-          page: 2,
-          prev: mockPageInfo.startCursor,
+    describe('getFilteredSearchValue', () => {
+      it('returns array containing applied filter search values', () => {
+        wrapper.setData({
+          authorUsernames: ['root', 'john.doe'],
+          textSearch: 'foo',
         });
 
-        expect(global.window.location.href).toContain(`?page=2&prev=${mockPageInfo.startCursor}`);
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.getFilteredSearchValue()).toEqual(mockFilters);
+        });
       });
+    });
 
-      it('updates window URL with query params `page` and `next`', () => {
-        wrapper.vm.updateUrl({
-          page: 1,
-          next: mockPageInfo.endCursor,
+    describe('updateUrl', () => {
+      it('updates window URL based on presence of props for filtered search and sort criteria', () => {
+        wrapper.setData({
+          filterBy: FilterState.all,
+          currentPage: 2,
+          nextPageCursor: mockPageInfo.endCursor,
+          authorUsernames: ['root', 'john.doe'],
+          textSearch: 'foo',
+          sortBy: 'updated_asc',
         });
 
-        expect(global.window.location.href).toContain(`?page=1&next=${mockPageInfo.endCursor}`);
+        return wrapper.vm.$nextTick(() => {
+          wrapper.vm.updateUrl();
+
+          expect(global.window.location.href).toBe(
+            `http://localhost/?page=2&next=${mockPageInfo.endCursor}&state=all&search=foo&sort=updated_asc&author_username%5B%5D=root&author_username%5B%5D=john.doe`,
+          );
+        });
       });
     });
 
@@ -613,45 +654,84 @@ describe('RequirementsRoot', () => {
       });
     });
 
-    describe('handlePageChange', () => {
-      beforeEach(() => {
-        jest.spyOn(wrapper.vm, 'updateUrl').mockImplementation(jest.fn());
+    describe('handleFilterRequirements', () => {
+      it('updates props tied to requirements Graph query', () => {
+        wrapper.vm.handleFilterRequirements(mockFilters);
 
+        expect(wrapper.vm.authorUsernames).toEqual(['root', 'john.doe']);
+        expect(wrapper.vm.textSearch).toBe('foo');
+        expect(wrapper.vm.currentPage).toBe(1);
+        expect(wrapper.vm.prevPageCursor).toBe('');
+        expect(wrapper.vm.nextPageCursor).toBe('');
+        expect(global.window.location.href).toBe(
+          `http://localhost/?page=1&state=opened&search=foo&sort=created_desc&author_username%5B%5D=root&author_username%5B%5D=john.doe`,
+        );
+      });
+
+      it('updates props `textSearch` and `authorUsernames` with empty values when passed filters param is empty', () => {
+        wrapper.setData({
+          authorUsernames: ['foo'],
+          textSearch: 'bar',
+        });
+
+        wrapper.vm.handleFilterRequirements([]);
+
+        expect(wrapper.vm.authorUsernames).toEqual([]);
+        expect(wrapper.vm.textSearch).toBe('');
+      });
+    });
+
+    describe('handleSortRequirements', () => {
+      it('updates props tied to requirements Graph query', () => {
+        wrapper.vm.handleSortRequirements('updated_desc');
+
+        expect(wrapper.vm.sortBy).toBe('updated_desc');
+        expect(wrapper.vm.currentPage).toBe(1);
+        expect(wrapper.vm.prevPageCursor).toBe('');
+        expect(wrapper.vm.nextPageCursor).toBe('');
+        expect(global.window.location.href).toBe(
+          `http://localhost/?page=1&state=opened&sort=updated_desc`,
+        );
+      });
+    });
+
+    describe('handlePageChange', () => {
+      it('sets data prop `prevPageCursor` to empty string and `nextPageCursor` to `requirements.pageInfo.endCursor` when provided page param is greater than currentPage', () => {
         wrapper.setData({
           requirements: {
             list: mockRequirementsOpen,
             pageInfo: mockPageInfo,
           },
+          currentPage: 1,
           requirementsCount: mockRequirementsCount,
         });
 
-        return wrapper.vm.$nextTick();
-      });
-
-      it('calls `updateUrl` with `page` and `next` params when value of page is `2`', () => {
         wrapper.vm.handlePageChange(2);
 
-        expect(wrapper.vm.updateUrl).toHaveBeenCalledWith({
-          page: 2,
-          prev: '',
-          next: mockPageInfo.endCursor,
-        });
+        expect(wrapper.vm.prevPageCursor).toBe('');
+        expect(wrapper.vm.nextPageCursor).toBe(mockPageInfo.endCursor);
+        expect(global.window.location.href).toBe(
+          `http://localhost/?page=2&state=opened&sort=created_desc&next=${mockPageInfo.endCursor}`,
+        );
       });
 
-      it('calls `updateUrl` with `page` and `next` params when value of page is `1`', () => {
+      it('sets data prop `nextPageCursor` to empty string and `prevPageCursor` to `requirements.pageInfo.startCursor` when provided page param is less than currentPage', () => {
         wrapper.setData({
+          requirements: {
+            list: mockRequirementsOpen,
+            pageInfo: mockPageInfo,
+          },
           currentPage: 2,
+          requirementsCount: mockRequirementsCount,
         });
 
-        return wrapper.vm.$nextTick(() => {
-          wrapper.vm.handlePageChange(1);
+        wrapper.vm.handlePageChange(1);
 
-          expect(wrapper.vm.updateUrl).toHaveBeenCalledWith({
-            page: 1,
-            prev: mockPageInfo.startCursor,
-            next: '',
-          });
-        });
+        expect(wrapper.vm.prevPageCursor).toBe(mockPageInfo.startCursor);
+        expect(wrapper.vm.nextPageCursor).toBe('');
+        expect(global.window.location.href).toBe(
+          `http://localhost/?page=1&state=opened&sort=created_desc&prev=${mockPageInfo.startCursor}`,
+        );
       });
     });
   });
@@ -662,7 +742,27 @@ describe('RequirementsRoot', () => {
     });
 
     it('renders requirements-tabs component', () => {
-      expect(wrapper.find(RequirementsTabs).exists()).toBe(true);
+      expect(wrapper.contains(RequirementsTabs)).toBe(true);
+    });
+
+    it('renders filtered-search-bar component', () => {
+      expect(wrapper.contains(FilteredSearchBarRoot)).toBe(true);
+      expect(wrapper.find(FilteredSearchBarRoot).props('searchInputPlaceholder')).toBe(
+        'Search requirements',
+      );
+      expect(wrapper.find(FilteredSearchBarRoot).props('tokens')).toEqual([
+        {
+          type: 'author_username',
+          icon: 'user',
+          title: 'Author',
+          unique: false,
+          symbol: '@',
+          token: AuthorToken,
+          operators: [{ value: '=', description: 'is', default: 'true' }],
+          fetchPath: 'gitlab-org/gitlab-shell',
+          fetchAuthors: expect.any(Function),
+        },
+      ]);
     });
 
     it('renders empty state when query results are empty', () => {
@@ -676,7 +776,7 @@ describe('RequirementsRoot', () => {
       });
 
       return wrapper.vm.$nextTick(() => {
-        expect(wrapper.find(RequirementsEmptyState).exists()).toBe(true);
+        expect(wrapper.contains(RequirementsEmptyState)).toBe(true);
       });
     });
 
@@ -694,7 +794,7 @@ describe('RequirementsRoot', () => {
       });
 
       return wrapper.vm.$nextTick(() => {
-        expect(wrapper.find(RequirementForm).exists()).toBe(true);
+        expect(wrapper.contains(RequirementForm)).toBe(true);
       });
     });
 
@@ -704,7 +804,7 @@ describe('RequirementsRoot', () => {
       });
 
       return wrapper.vm.$nextTick(() => {
-        expect(wrapper.find(RequirementsEmptyState).exists()).toBe(false);
+        expect(wrapper.contains(RequirementsEmptyState)).toBe(false);
       });
     });
 

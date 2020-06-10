@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Packages::Pypi::PackagePresenter do
+RSpec.describe ::Packages::Pypi::PackagePresenter do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:project) { create(:project) }

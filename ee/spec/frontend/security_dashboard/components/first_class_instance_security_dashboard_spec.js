@@ -5,6 +5,7 @@ import SecurityDashboardLayout from 'ee/security_dashboard/components/security_d
 import FirstClassInstanceDashboard from 'ee/security_dashboard/components/first_class_instance_security_dashboard.vue';
 import FirstClassInstanceVulnerabilities from 'ee/security_dashboard/components/first_class_instance_security_dashboard_vulnerabilities.vue';
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
+import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vulnerability_chart.vue';
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
@@ -25,6 +26,7 @@ describe('First Class Instance Dashboard Component', () => {
 
   const findInstanceVulnerabilities = () => wrapper.find(FirstClassInstanceVulnerabilities);
   const findVulnerabilitySeverity = () => wrapper.find(VulnerabilitySeverity);
+  const findVulnerabilityChart = () => wrapper.find(VulnerabilityChart);
   const findCsvExportButton = () => wrapper.find(CsvExportButton);
   const findProjectManager = () => wrapper.find(ProjectManager);
   const findEmptyState = () => wrapper.find(GlEmptyState);
@@ -90,6 +92,10 @@ describe('First Class Instance Dashboard Component', () => {
 
     it('has filters', () => {
       expect(findFilters().exists()).toBe(true);
+    });
+
+    it('does not pass down a groupFullPath to the vulnerability chart', () => {
+      expect(findVulnerabilityChart().props('groupFullPath')).toBeUndefined();
     });
 
     it('responds to the projectFetch event', () => {

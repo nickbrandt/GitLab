@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Notes::PostProcessService do
+RSpec.describe Notes::PostProcessService do
   describe '#execute' do
     context 'analytics' do
       subject { described_class.new(note) }

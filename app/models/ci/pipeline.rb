@@ -31,6 +31,7 @@ module Ci
     belongs_to :pipeline_schedule, class_name: 'Ci::PipelineSchedule'
     belongs_to :merge_request, class_name: 'MergeRequest'
     belongs_to :external_pull_request
+    belongs_to :ci_ref, class_name: 'Ci::Ref', foreign_key: :ci_ref_id, inverse_of: :pipelines
 
     has_internal_id :iid, scope: :project, presence: false, track_if: -> { !importing? }, ensure_if: -> { !importing? }, init: ->(s) do
       s&.project&.all_pipelines&.maximum(:iid) || s&.project&.all_pipelines&.count
@@ -41,10 +42,13 @@ module Ci
     has_many :latest_statuses_ordered_by_stage, -> { latest.order(:stage_idx, :stage) }, class_name: 'CommitStatus', foreign_key: :commit_id, inverse_of: :pipeline
     has_many :processables, class_name: 'Ci::Processable', foreign_key: :commit_id, inverse_of: :pipeline
     has_many :builds, foreign_key: :commit_id, inverse_of: :pipeline
+    has_many :job_artifacts, through: :builds
     has_many :trigger_requests, dependent: :destroy, foreign_key: :commit_id # rubocop:disable Cop/ActiveRecordDependent
     has_many :variables, class_name: 'Ci::PipelineVariable'
     has_many :deployments, through: :builds
     has_many :environments, -> { distinct }, through: :deployments
+    has_many :latest_builds, -> { latest }, foreign_key: :commit_id, inverse_of: :pipeline, class_name: 'Ci::Build'
+    has_many :downloadable_artifacts, -> { not_expired.downloadable }, through: :latest_builds, source: :job_artifacts
 
     # Merge requests for which the current pipeline is running against
     # the merge request's latest commit.
@@ -56,20 +60,12 @@ module Ci
     has_many :cancelable_statuses, -> { cancelable }, foreign_key: :commit_id, class_name: 'CommitStatus'
     has_many :manual_actions, -> { latest.manual_actions.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
     has_many :scheduled_actions, -> { latest.scheduled_actions.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
-    has_many :artifacts, -> { latest.with_artifacts_not_expired.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
 
     has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
     has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
     has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_pipeline_id
 
     has_one :source_pipeline, class_name: 'Ci::Sources::Pipeline', inverse_of: :pipeline
-
-    has_one :ref_status, ->(pipeline) {
-      # We use .read_attribute to save 1 extra unneeded query to load the :project.
-      unscope(:where)
-        .where(project_id: pipeline.read_attribute(:project_id), ref: pipeline.ref, tag: pipeline.tag)
-      # Sadly :inverse_of is not supported (yet) by Rails for composite PKs.
-    }, class_name: 'Ci::Ref', inverse_of: :pipelines
 
     has_one :chat_data, class_name: 'Ci::PipelineChatData'
 
@@ -235,12 +231,10 @@ module Ci
       end
 
       after_transition any => [:success, :failed] do |pipeline|
+        ref_status = pipeline.ci_ref&.update_status_by!(pipeline)
+
         pipeline.run_after_commit do
-          if Feature.enabled?(:ci_pipeline_fixed_notifications)
-            PipelineUpdateCiRefStatusWorker.perform_async(pipeline.id)
-          else
-            PipelineNotificationWorker.perform_async(pipeline.id)
-          end
+          PipelineNotificationWorker.perform_async(pipeline.id, ref_status: ref_status)
         end
       end
 
@@ -798,13 +792,17 @@ module Ci
       @latest_builds_with_artifacts ||= builds.latest.with_artifacts_not_expired.to_a
     end
 
+    def latest_report_builds(reports_scope = ::Ci::JobArtifact.with_reports)
+      builds.latest.with_reports(reports_scope)
+    end
+
     def has_reports?(reports_scope)
-      complete? && builds.latest.with_reports(reports_scope).exists?
+      complete? && latest_report_builds(reports_scope).exists?
     end
 
     def test_reports
       Gitlab::Ci::Reports::TestReports.new.tap do |test_reports|
-        builds.latest.with_reports(Ci::JobArtifact.test_reports).preload(:project).find_each do |build|
+        latest_report_builds(Ci::JobArtifact.test_reports).preload(:project).find_each do |build|
           build.collect_test_reports!(test_reports)
         end
       end
@@ -826,7 +824,7 @@ module Ci
 
     def coverage_reports
       Gitlab::Ci::Reports::CoverageReports.new.tap do |coverage_reports|
-        builds.latest.with_reports(Ci::JobArtifact.coverage_reports).each do |build|
+        latest_report_builds(Ci::JobArtifact.coverage_reports).each do |build|
           build.collect_coverage_reports!(coverage_reports)
         end
       end
@@ -834,7 +832,7 @@ module Ci
 
     def terraform_reports
       ::Gitlab::Ci::Reports::TerraformReports.new.tap do |terraform_reports|
-        builds.latest.with_reports(::Ci::JobArtifact.terraform_reports).each do |build|
+        latest_report_builds(::Ci::JobArtifact.terraform_reports).each do |build|
           build.collect_terraform_reports!(terraform_reports)
         end
       end
@@ -967,6 +965,12 @@ module Ci
       return unless ::Gitlab::Ci::Features.ensure_scheduling_type_enabled?
 
       processables.populate_scheduling_type!
+    end
+
+    def ensure_ci_ref!
+      return unless Gitlab::Ci::Features.pipeline_fixed_notifications?
+
+      self.ci_ref = Ci::Ref.ensure_for(self)
     end
 
     private

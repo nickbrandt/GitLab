@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::ProjectSetting do
+RSpec.describe StatusPage::ProjectSetting do
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
   end

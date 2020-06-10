@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Set an Epic Subscription' do
+RSpec.describe 'Set an Epic Subscription' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }

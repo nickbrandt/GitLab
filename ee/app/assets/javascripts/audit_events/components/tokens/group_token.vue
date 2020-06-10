@@ -9,7 +9,7 @@ export default {
   inheritAttrs: false,
   tokenMethods: {
     fetchItem(id) {
-      return Api.group(id, () => {});
+      return Api.group(id);
     },
     fetchSuggestions(term) {
       return Api.groups(term);

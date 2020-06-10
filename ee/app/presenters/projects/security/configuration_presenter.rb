@@ -52,6 +52,7 @@ module Projects
             dependency_scanning: true,
             container_scanning: true
           }.to_json,
+          can_toggle_auto_fix_settings: auto_fix_permission,
           auto_fix_user_path: '/' # TODO: real link will be updated with https://gitlab.com/gitlab-org/gitlab/-/issues/215669
         }
       end
