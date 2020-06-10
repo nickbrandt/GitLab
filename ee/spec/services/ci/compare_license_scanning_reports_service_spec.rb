@@ -52,16 +52,16 @@ describe Ci::CompareLicenseScanningReportsService do
       let!(:base_pipeline) { build(:ee_ci_pipeline, :with_corrupted_license_scanning_report, project: project) }
       let!(:head_pipeline) { build(:ee_ci_pipeline, :with_corrupted_license_scanning_report, project: project) }
 
-      it 'returns status and error message' do
-        expect(subject[:status]).to eq(:error)
-        expect(subject[:status_reason]).to include('JSON parsing failed')
+      it 'does not expose parser errors' do
+        expect(subject[:status]).to eq(:parsed)
       end
 
-      it 'returns status and error message when pipeline is nil' do
-        result = service.execute(nil, head_pipeline)
+      context "when the base pipeline is nil" do
+        subject { service.execute(nil, head_pipeline) }
 
-        expect(result[:status]).to eq(:error)
-        expect(result[:status_reason]).to include('JSON parsing failed')
+        it 'does not expose parser errors' do
+          expect(subject[:status]).to eq(:parsed)
+        end
       end
     end
   end

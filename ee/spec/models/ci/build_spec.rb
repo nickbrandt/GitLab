@@ -252,8 +252,9 @@ RSpec.describe Ci::Build do
           create(:ee_ci_job_artifact, :license_scan, :with_corrupted_data, job: job, project: job.project)
         end
 
-        it 'raises an error' do
-          expect { subject }.to raise_error(Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning::LicenseScanningParserError)
+        it 'returns an empty report' do
+          expect { subject }.not_to raise_error
+          expect(license_scanning_report).to be_empty
         end
       end
 
