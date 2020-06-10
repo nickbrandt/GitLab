@@ -38,12 +38,22 @@ describe Gitlab::Ci::Config::Entry::Vault::Engine do
         end
       end
 
-      context 'when name is not present' do
+      context 'when name and path are missing' do
         let(:config) { {} }
 
         it 'reports error' do
-          expect(entry.errors)
-            .to include 'engine name can\'t be blank'
+          expect(entry.errors).to include 'engine config missing required keys: name, path'
+        end
+      end
+
+      context 'when name and path are blank' do
+        let(:config) { { name: '', path: '' } }
+
+        it 'reports error' do
+          aggregate_failures do
+            expect(entry.errors).to include 'engine name can\'t be blank'
+            expect(entry.errors).to include 'engine path can\'t be blank'
+          end
         end
       end
     end
