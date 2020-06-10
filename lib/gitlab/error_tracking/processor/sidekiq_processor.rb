@@ -7,11 +7,6 @@ module Gitlab
     module Processor
       class SidekiqProcessor < ::Raven::Processor
         FILTERED_STRING = '[FILTERED]'
-        PERMITTED_ARGUMENTS = Hash.new(Set.new).merge(
-          'PostReceive' => [0, 1, 2, 3],
-          'SystemHookPushWorker' => [1],
-          'WebHookWorker' => [2]
-        ).transform_values!(&:to_set).freeze
 
         def self.filter_arguments(args, klass)
           args.lazy.with_index.map do |arg, i|
@@ -19,13 +14,23 @@ module Gitlab
             when Numeric
               arg
             else
-              if PERMITTED_ARGUMENTS[klass].include?(i)
+              if permitted_arguments_for_worker(klass).include?(i)
                 arg
               else
                 FILTERED_STRING
               end
             end
           end
+        end
+
+        def self.permitted_arguments_for_worker(klass)
+          @permitted_arguments_for_worker ||= {}
+          @permitted_arguments_for_worker[klass] ||=
+            begin
+              klass.constantize&.loggable_arguments&.to_set
+            rescue
+              Set.new
+            end
         end
 
         def self.loggable_arguments(args, klass)

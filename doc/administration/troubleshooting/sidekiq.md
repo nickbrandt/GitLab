@@ -32,8 +32,7 @@ gitlab_rails['env'] = {"SIDEKIQ_LOG_ARGUMENTS" => "1"}
 This does not log all job arguments. To avoid logging sensitive
 information (for instance, password reset tokens), it logs numeric
 arguments for all workers, with overrides for some specific workers
-where their arguments are not sensitive. Permitted non-numeric arguments
-for specific workers can be seen in the [Sidekiq Processor source](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/error_tracking/processor/sidekiq_processor.rb).
+where their arguments are not sensitive.
 
 Example log output:
 

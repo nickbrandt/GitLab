@@ -7,6 +7,7 @@ class ElasticIndexerWorker # rubocop:disable Scalability/IdempotentWorker
   sidekiq_options retry: 2
   feature_category :global_search
   urgency :throttled
+  loggable_arguments 0, 1, 4
 
   def perform(operation, class_name, record_id, es_id, options = {})
     return true unless Gitlab::CurrentSettings.elasticsearch_indexing?

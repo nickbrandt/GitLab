@@ -18,6 +18,7 @@ module Geo
         include ::Gitlab::Utils::StrongMemoize
 
         sidekiq_options retry: false
+        loggable_arguments 0
 
         attr_reader :shard_name, :start_time, :loops
       end

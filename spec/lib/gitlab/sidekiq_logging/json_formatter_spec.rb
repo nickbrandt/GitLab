@@ -73,9 +73,9 @@ describe Gitlab::SidekiqLogging::JSONFormatter do
       context 'when the job has non-integer arguments' do
         it 'only allows permitted non-integer arguments through' do
           hash_input['args'] = [1, 'foo', 'bar']
-          hash_input['class'] = 'SystemHookPushWorker'
+          hash_input['class'] = 'WebHookWorker'
 
-          expect(subject['args']).to eq(['1', 'foo', '[FILTERED]'])
+          expect(subject['args']).to eq(['1', '[FILTERED]', 'bar'])
         end
       end
 

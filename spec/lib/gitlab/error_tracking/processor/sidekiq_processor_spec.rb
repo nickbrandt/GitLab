@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
-require 'fast_spec_helper'
+require 'spec_helper'
 require 'rspec-parameterized'
 
-require 'raven'
-
 RSpec.describe Gitlab::ErrorTracking::Processor::SidekiqProcessor do
+  after do
+    if described_class.instance_variable_defined?(:@permitted_arguments_for_worker)
+      described_class.remove_instance_variable(:@permitted_arguments_for_worker)
+    end
+  end
+
   describe '.filter_arguments' do
     it 'returns a lazy enumerator' do
       filtered = described_class.filter_arguments([1, 'string'], 'TestWorker')
@@ -26,13 +30,9 @@ RSpec.describe Gitlab::ErrorTracking::Processor::SidekiqProcessor do
 
       with_them do
         before do
-          permitted_arguments = Hash.new(Set.new).merge(
-            'NoPermittedArguments' => [],
-            'OnePermittedArgument' => [1],
-            'AllPermittedArguments' => [0, 1, 2, 3]
-          ).transform_values!(&:to_set)
-
-          stub_const("#{described_class}::PERMITTED_ARGUMENTS", permitted_arguments)
+          stub_const('NoPermittedArguments', double(loggable_arguments: []))
+          stub_const('OnePermittedArgument', double(loggable_arguments: [1]))
+          stub_const('AllPermittedArguments', double(loggable_arguments: [0, 1, 2, 3]))
         end
 
         it do
@@ -40,6 +40,45 @@ RSpec.describe Gitlab::ErrorTracking::Processor::SidekiqProcessor do
             .to eq(expected)
         end
       end
+    end
+  end
+
+  describe '.permitted_arguments_for_worker' do
+    it 'returns the loggable_arguments for a worker class as a set' do
+      stub_const('TestWorker', double(loggable_arguments: [1, 1]))
+
+      expect(described_class.permitted_arguments_for_worker('TestWorker'))
+        .to eq([1].to_set)
+    end
+
+    it 'returns an empty set when the worker class does not exist' do
+      expect(described_class.permitted_arguments_for_worker('TestWorker'))
+        .to eq(Set.new)
+    end
+
+    it 'returns an empty set when the worker class does not respond to loggable_arguments' do
+      stub_const('TestWorker', 1)
+
+      expect(described_class.permitted_arguments_for_worker('TestWorker'))
+        .to eq(Set.new)
+    end
+
+    it 'returns an empty set when loggable_arguments cannot be converted to a set' do
+      stub_const('TestWorker', double(loggable_arguments: 1))
+
+      expect(described_class.permitted_arguments_for_worker('TestWorker'))
+        .to eq(Set.new)
+    end
+
+    it 'memoizes the results' do
+      worker_class = double
+
+      stub_const('TestWorker', worker_class)
+
+      expect(worker_class).to receive(:loggable_arguments).once.and_return([])
+
+      described_class.permitted_arguments_for_worker('TestWorker')
+      described_class.permitted_arguments_for_worker('TestWorker')
     end
   end
 
