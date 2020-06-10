@@ -122,13 +122,13 @@ describe('EpicsListSectionComponent', () => {
 
     describe('epicsWithAssociatedParents', () => {
       it('should return epics which contain parent associations', () => {
-        wrapper = createComponent({
+        wrapper.setProps({
           epics: mockEpicsWithParents,
         });
 
-        expect(wrapper.vm.epicsWithAssociatedParents).toEqual(mockEpicsWithParents);
-
-        wrapper.destroy();
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.epicsWithAssociatedParents).toEqual(mockEpicsWithParents);
+        });
       });
     });
 
@@ -137,7 +137,7 @@ describe('EpicsListSectionComponent', () => {
         store.state.epicIds = ['1', '2', '3'];
       });
 
-      it('returns findParentEpics method by default', () => {
+      it('returns epicsWithAssociatedParents computed prop by default', () => {
         expect(wrapper.vm.displayedEpics).toEqual(wrapper.vm.epicsWithAssociatedParents);
       });
 
