@@ -52,7 +52,7 @@ class ListIssue {
   }
 
   findAssignee(findAssignee) {
-    return this.assignees.find(assignee => assignee.id === findAssignee.id);
+    return boardsStore.findIssueAssignee(this, findAssignee);
   }
 
   removeAssignee(removeAssignee) {

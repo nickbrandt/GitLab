@@ -786,6 +786,10 @@ const boardsStore = {
     }
   },
 
+  findIssueAssignee(issue, findAssignee) {
+    return issue.assignees.find(assignee => assignee.id === findAssignee.id);
+  },
+
   clearMultiSelect() {
     this.multiSelect.list = [];
   },
