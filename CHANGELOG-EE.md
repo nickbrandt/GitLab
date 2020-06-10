@@ -440,6 +440,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Add health status counts to usage data. !28964
 
 
+## 12.9.10 (2020-06-10)
+
+### Security (1 change)
+
+- Do not set fallback mirror user.
+
+
 ## 12.9.8 (2020-05-27)
 
 ### Security (3 changes)
