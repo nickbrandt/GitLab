@@ -9281,6 +9281,9 @@ msgstr ""
 msgid "Failed Jobs"
 msgstr ""
 
+msgid "Failed on"
+msgstr ""
+
 msgid "Failed to add a Zoom meeting"
 msgstr ""
 
@@ -15761,6 +15764,9 @@ msgid "Participants"
 msgstr ""
 
 msgid "Passed"
+msgstr ""
+
+msgid "Passed on"
 msgstr ""
 
 msgid "Password"
@@ -27250,6 +27256,9 @@ msgid "resolved the corresponding error and closed the issue."
 msgstr ""
 
 msgid "revised"
+msgstr ""
+
+msgid "satisfied"
 msgstr ""
 
 msgid "score"
