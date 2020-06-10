@@ -1,8 +1,18 @@
 - return unless show_buy_pipeline_minutes?(project, namespace)
 
+- link_text = s_("CurrentUser|Buy Pipeline minutes")
+- link_emoji = emoji_icon('clock9', 'aria-hidden': true)
+
 %li
   = link_to profile_usage_quotas_path,
     class: 'ci-minutes-emoji js-buy-pipeline-minutes-link',
     data: { 'track-event': 'click_buy_ci_minutes', 'track-label': current_user.namespace.actual_plan_name, 'track-property': 'user_dropdown' } do
-    = s_("CurrentUser|Buy Pipeline minutes")
-    = emoji_icon('clock9', 'aria-hidden': true)
+    - if show_pipeline_minutes_notification_dot?(project, namespace)
+      .gl-pb-2
+        = link_text
+        = link_emoji
+      %span.small.gl-pb-3.gl-text-orange-800
+        = s_("CurrentUser|One of your groups is running out")
+    - else
+      = link_text
+      = link_emoji
