@@ -31,8 +31,8 @@ module Gitlab
                   engine: {
                     name: 'kv-v2', path: secret[:engine_path]
                   },
-                  path: secret[:path],
-                  field: secret[:field]
+                  path: secret[:secret_path],
+                  field: secret[:secret_field]
                 }
               end
 
@@ -40,20 +40,26 @@ module Gitlab
 
               def secret
                 @secret ||= begin
-                              path_and_field, _, engine_path = config.rpartition('@')
-                              if path_and_field == ""
-                                path_and_field = config
-                                engine_path = 'kv-v2'
-                              end
-
-                              path, _, field = path_and_field.rpartition('/')
+                              secret, engine_path = secret_and_engine
+                              secret_path, _, secret_field = secret.rpartition('/')
 
                               {
                                 engine_path: engine_path,
-                                path: path,
-                                field: field
+                                secret_path: secret_path,
+                                secret_field: secret_field
                               }
                             end
+              end
+
+              def secret_and_engine
+                secret, _, engine = config.rpartition('@')
+
+                if secret == ""
+                  secret = config
+                  engine = 'kv-v2'
+                end
+
+                [secret, engine]
               end
             end
 
