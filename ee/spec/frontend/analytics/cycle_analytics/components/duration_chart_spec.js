@@ -1,9 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
-import { GlLoadingIcon } from '@gitlab/ui';
-import $ from 'jquery';
-import 'bootstrap';
-import '~/gl_dropdown';
+import { GlLoadingIcon, GlNewDropdownItem } from '@gitlab/ui';
 import durationChartStore from 'ee/analytics/cycle_analytics/store/modules/duration_chart';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
@@ -72,17 +69,11 @@ describe('DurationChart', () => {
   const findStageDropdown = _wrapper => _wrapper.find(StageDropdownFilter);
   const findLoader = _wrapper => _wrapper.find(GlLoadingIcon);
 
-  const openStageDropdown = _wrapper => {
-    $(findStageDropdown(_wrapper).element).trigger('shown.bs.dropdown');
-    return _wrapper.vm.$nextTick();
-  };
-
   const selectStage = (_wrapper, index = 0) => {
     findStageDropdown(_wrapper)
-      .findAll('a')
+      .findAll(GlNewDropdownItem)
       .at(index)
-      .trigger('click');
-    return _wrapper.vm.$nextTick();
+      .vm.$emit('click');
   };
 
   beforeEach(() => {
@@ -111,8 +102,8 @@ describe('DurationChart', () => {
     const selectedStages = stages.filter((_, index) => index !== selectedIndex);
 
     beforeEach(() => {
-      wrapper = createComponent({ mountFn: mount, stubs: { StageDropdownFilter: false } });
-      return openStageDropdown(wrapper).then(() => selectStage(wrapper, selectedIndex));
+      wrapper = createComponent({ stubs: { StageDropdownFilter } });
+      selectStage(wrapper, selectedIndex);
     });
 
     it('calls the `updateSelectedDurationChartStages` action', () => {

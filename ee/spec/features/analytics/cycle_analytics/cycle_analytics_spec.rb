@@ -942,7 +942,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
       end
 
       context 'Duration chart' do
-        let(:duration_chart_dropdown) { page.find('.dropdown-stages') }
+        let(:duration_chart_dropdown) { page.find('.js-dropdown-stages') }
 
         default_stages = Analytics::CycleAnalytics::StagePresenter::DEFAULT_STAGE_ATTRIBUTES
           .each_value
@@ -950,7 +950,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
           .freeze
 
         def duration_chart_stages
-          duration_chart_dropdown.all('.dropdown-menu-link').collect(&:text)
+          duration_chart_dropdown.all('.dropdown-item').collect(&:text)
         end
 
         def toggle_duration_chart_dropdown

@@ -212,10 +212,12 @@ export default {
             @selected="onStageSelect"
           />
         </div>
-        <div class="d-flex flex-column flex-md-row justify-content-between">
+        <div
+          class="gl-display-flex gl-flex-direction-column gl-justify-content-space-between flex-lg-row"
+        >
           <groups-dropdown-filter
             v-if="!hideGroupDropDown"
-            class="js-groups-dropdown-filter dropdown-select"
+            class="js-groups-dropdown-filter mr-0 mr-lg-2"
             :query-params="$options.groupsQueryParams"
             :default-group="selectedGroup"
             @selected="onGroupSelect"
@@ -223,7 +225,7 @@ export default {
           <projects-dropdown-filter
             v-if="shouldDisplayFilters"
             :key="selectedGroup.id"
-            class="js-projects-dropdown-filter ml-0 mt-1 mt-md-0 dropdown-select"
+            class="js-projects-dropdown-filter my-2 my-lg-0"
             :group-id="selectedGroup.id"
             :query-params="$options.projectsQueryParams"
             :multi-select="$options.multiProjectSelect"
