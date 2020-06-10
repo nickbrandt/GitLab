@@ -15,6 +15,7 @@ import {
   mockTimeframeInitialDate,
   mockGroupId,
   rawEpics,
+  mockEpicsWithParents,
   mockSortedBy,
   basePath,
   epicsPath,
@@ -119,20 +120,25 @@ describe('EpicsListSectionComponent', () => {
       });
     });
 
+    describe('epicsWithAssociatedParents', () => {
+      it('should return epics which contain parent associations', () => {
+        wrapper = createComponent({
+          epics: mockEpicsWithParents,
+        });
+
+        expect(wrapper.vm.epicsWithAssociatedParents).toEqual(mockEpicsWithParents);
+
+        wrapper.destroy();
+      });
+    });
+
     describe('displayedEpics', () => {
       beforeAll(() => {
         store.state.epicIds = ['1', '2', '3'];
       });
 
       it('returns findParentEpics method by default', () => {
-        expect(wrapper.vm.displayedEpics).toEqual(wrapper.vm.findParentEpics);
-      });
-
-      it('returns findEpicsMatchingFilter method if filtered is applied', () => {
-        wrapper.setProps({
-          hasFiltersApplied: true,
-        });
-        expect(wrapper.vm.displayedEpics).toEqual(wrapper.vm.findEpicsMatchingFilter);
+        expect(wrapper.vm.displayedEpics).toEqual(wrapper.vm.epicsWithAssociatedParents);
       });
 
       it('returns all epics if epicIid is specified', () => {
