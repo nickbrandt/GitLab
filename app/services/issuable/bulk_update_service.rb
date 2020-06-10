@@ -16,18 +16,12 @@ module Issuable
 
       ids = params.delete(:issuable_ids).split(",")
       items = find_issuables(parent, model_class, ids)
-
-      params.slice!(*permitted_attrs(type))
-      params.delete_if { |k, v| v.blank? }
-
-      if params[:assignee_ids] == [IssuableFinder::Params::NONE.to_s]
-        params[:assignee_ids] = []
-      end
+      update_params = filter_update_params(type)
 
       items.each do |issuable|
         next unless can?(current_user, :"update_#{type}", issuable)
 
-        update_class.new(issuable.issuing_parent, current_user, params).execute(issuable)
+        update_class.new(issuable.issuing_parent, current_user, update_params).execute(issuable)
       end
 
       {
@@ -50,6 +44,17 @@ module Issuable
       else
         attrs.push(:assignee_id)
       end
+    end
+
+    def filter_update_params(type)
+      params.slice!(*permitted_attrs(type))
+      params.delete_if { |k, v| v.blank? }
+
+      if params[:assignee_ids] == [IssuableFinder::Params::NONE.to_s]
+        params[:assignee_ids] = []
+      end
+
+      params
     end
 
     def find_issuables(parent, model_class, ids)

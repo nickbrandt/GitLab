@@ -20,6 +20,21 @@ module EE
 
         super.push(:health_status, :epic)
       end
+
+      override :filter_update_params
+      def filter_update_params(type)
+        super
+
+        set_health_status
+
+        params
+      end
+
+      def set_health_status
+        return unless params[:health_status].present?
+
+        params[:health_status] = nil if params[:health_status] == IssuableFinder::Params::NONE.to_s
+      end
     end
   end
 end

@@ -88,7 +88,7 @@ export default {
         milestone_id: this.form.find('input[name="update[milestone_id]"]').val(),
         issuable_ids: this.form.find('input[name="update[issuable_ids]"]').val(),
         subscription_event: this.form.find('input[name="update[subscription_event]"]').val(),
-        health_status: healthStatusValue === 'null' ? null : healthStatusValue,
+        health_status: healthStatusValue === 'null' ? '0' : healthStatusValue,
         add_label_ids: [],
         remove_label_ids: [],
       },
