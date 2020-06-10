@@ -47,6 +47,7 @@ module EE
       has_one :status_page_setting, inverse_of: :project, class_name: 'StatusPage::ProjectSetting'
       has_one :compliance_framework_setting, class_name: 'ComplianceManagement::ComplianceFramework::ProjectSettings', inverse_of: :project
       has_one :security_setting, class_name: 'ProjectSecuritySetting'
+      has_one :vulnerability_statistic, class_name: 'Vulnerabilities::Statistic'
 
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_users, through: :approvers, source: :user
