@@ -40,9 +40,7 @@ class ListIssue {
   }
 
   removeLabel(removeLabel) {
-    if (removeLabel) {
-      this.labels = this.labels.filter(label => removeLabel.id !== label.id);
-    }
+    boardsStore.removeIssueLabel(this, removeLabel);
   }
 
   removeLabels(labels) {
