@@ -8,7 +8,11 @@ module Gitlab
         # Entry that represents a secrets definition.
         #
         class Secrets < ::Gitlab::Config::Entry::Node
-          include ::Gitlab::Config::Entry::Configurable
+          include ::Gitlab::Config::Entry::Validatable
+
+          validations do
+            validates :config, type: Hash
+          end
 
           def compose!(deps = nil)
             super do
