@@ -698,6 +698,11 @@ const boardsStore = {
       ),
     );
   },
+  removeIssueLabel(issue, removeLabel) {
+    if (removeLabel) {
+      issue.labels = issue.labels.filter(label => removeLabel.id !== label.id);
+    }
+  },
 
   addIssueAssignee(issue, assignee) {
     if (!issue.findAssignee(assignee)) {
