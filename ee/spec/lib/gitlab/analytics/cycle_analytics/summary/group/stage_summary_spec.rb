@@ -51,6 +51,35 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary d
         end
       end
 
+      context 'with `assignee_username` filter' do
+        let(:assignee) { create(:user) }
+
+        before do
+          issue = project.issues.last
+          issue.assignees << assignee
+        end
+
+        subject { described_class.new(group, options: { from: Time.now, current_user: user, assignee_username: [assignee.username] }).data }
+
+        it 'finds issues from those projects' do
+          expect(subject.first[:value]).to eq('1')
+        end
+      end
+
+      context 'with `author_username` filter' do
+        let(:author) { create(:user) }
+
+        before do
+          project.issues.last.update!(author: author)
+        end
+
+        subject { described_class.new(group, options: { from: Time.now, current_user: user, author_username: [author.username] }).data }
+
+        it 'finds issues from those projects' do
+          expect(subject.first[:value]).to eq('1')
+        end
+      end
+
       context 'when `from` and `to` parameters are provided' do
         subject { described_class.new(group, options: { from: 10.days.ago, to: Time.now, current_user: user }).data }
 
