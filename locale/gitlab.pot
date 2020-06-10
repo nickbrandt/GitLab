@@ -14642,6 +14642,9 @@ msgstr ""
 msgid "New issue title"
 msgstr ""
 
+msgid "New iteration"
+msgstr ""
+
 msgid "New iteration created"
 msgstr ""
 
@@ -14817,6 +14820,9 @@ msgid "No forks are available to you."
 msgstr ""
 
 msgid "No grouping"
+msgstr ""
+
+msgid "No iterations to show"
 msgstr ""
 
 msgid "No job log"

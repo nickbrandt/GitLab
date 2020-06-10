@@ -1,6 +1,6 @@
-query GroupIterations($fullPath: ID!, $state: IterationState) {
+query GroupIterations($fullPath: ID!, $state: IterationState!) {
   group(fullPath: $fullPath) {
-    sprints(state: $state, first: 20) {
+    iterations(state: $state, first: 20) {
       nodes {
         title
         state
