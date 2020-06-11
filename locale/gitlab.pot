@@ -2242,6 +2242,9 @@ msgstr ""
 msgid "An error occurred when updating the issue weight"
 msgstr ""
 
+msgid "An error occurred while acknowledging the notification. Refresh the page and try again."
+msgstr ""
+
 msgid "An error occurred while adding formatted title for epic"
 msgstr ""
 

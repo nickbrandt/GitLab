@@ -19,7 +19,8 @@ module EE
           account_recovery_regular_check: 12,
           users_over_license_banner: 16,
           standalone_vulnerabilities_introduction_banner: 17,
-          active_user_count_threshold: 18
+          active_user_count_threshold: 18,
+          buy_pipeline_minutes_notification_dot: 19
         )
       end
     end

@@ -4,14 +4,14 @@ require "spec_helper"
 
 RSpec.describe EE::RunnersHelper do
   let_it_be(:user) { create(:user) }
+  let_it_be(:namespace) { create(:namespace, owner: user) }
+  let_it_be(:project) { create(:project, namespace: namespace) }
 
   before do
     allow(helper).to receive(:current_user).and_return(user)
   end
 
   shared_examples_for 'minutes notification' do
-    let_it_be(:namespace) { create(:namespace, owner: user) }
-    let_it_be(:project) { create(:project, namespace: namespace) }
     let(:show_warning) { true }
     let(:context_level) { project }
     let(:threshold) { double('Ci::Minutes::Notification', show?: show_warning) }
@@ -109,10 +109,52 @@ RSpec.describe EE::RunnersHelper do
     describe '.show_pipeline_minutes_notification_dot?' do
       subject { helper.show_pipeline_minutes_notification_dot?(project, namespace) }
 
-      it_behaves_like 'minutes notification' do
+      before do
+        allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(experiment_status)
+      end
+
+      it_behaves_like 'minutes notification'
+
+      context 'when the notification dot has been acknowledged' do
         before do
-          allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(experiment_status)
+          create(:user_callout, user: user, feature_name: described_class::BUY_PIPELINE_MINUTES_NOTIFICATION_DOT)
+          expect(helper).not_to receive(:show_out_of_pipeline_minutes_notification?)
         end
+
+        it { is_expected.to be_falsy }
+      end
+
+      context 'when the notification dot has not been acknowledged' do
+        before do
+          expect(helper).to receive(:show_out_of_pipeline_minutes_notification?).and_return(true)
+        end
+
+        it { is_expected.to be_truthy }
+      end
+    end
+
+    describe '.show_buy_pipeline_with_subtext?' do
+      subject { helper.show_buy_pipeline_with_subtext?(project, namespace) }
+
+      before do
+        allow(helper).to receive(:experiment_enabled?).with(:ci_notification_dot).and_return(experiment_status)
+      end
+
+      context 'when the notification dot has not been acknowledged' do
+        before do
+          expect(helper).not_to receive(:show_out_of_pipeline_minutes_notification?)
+        end
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'when the notification dot has been acknowledged' do
+        before do
+          create(:user_callout, user: user, feature_name: described_class::BUY_PIPELINE_MINUTES_NOTIFICATION_DOT)
+          expect(helper).to receive(:show_out_of_pipeline_minutes_notification?).and_return(true)
+        end
+
+        it { is_expected.to be_truthy }
       end
     end
   end
