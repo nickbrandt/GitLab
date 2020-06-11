@@ -2408,6 +2408,9 @@ msgstr ""
 msgid "An empty GitLab User field will add the FogBugz user's full name (e.g. \"By John Smith\") in the description of all issues and comments. It will also associate and/or assign these issues and comments with the project creator."
 msgstr ""
 
+msgid "An empty date will inherit from milestone dates"
+msgstr ""
+
 msgid "An error has occurred"
 msgstr ""
 
@@ -23908,6 +23911,9 @@ msgstr ""
 msgid "This epic already has the maximum number of child epics."
 msgstr ""
 
+msgid "This epic and any containing child epics are confidential and should only be visible to team members with at least Reporter access."
+msgstr ""
+
 msgid "This epic and its child elements will only be visible to team members with at minimum Reporter access."
 msgstr ""
 
@@ -25083,6 +25089,9 @@ msgid "Unable to load the merge request widget. Try reloading the page."
 msgstr ""
 
 msgid "Unable to resolve"
+msgstr ""
+
+msgid "Unable to save epic. Please try again"
 msgstr ""
 
 msgid "Unable to save iteration. Please try again"
