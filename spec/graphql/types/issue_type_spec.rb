@@ -25,7 +25,8 @@ describe GitlabSchema.types['Issue'] do
   describe 'pagination and totalCount' do
     let_it_be(:user) { create(:user) }
     let_it_be(:project) { create(:project, :public) }
-    let_it_be(:issues) { create_list(:issue, 10, project: project) }
+    let_it_be(:now) { Time.now.change(usec: 0) }
+    let_it_be(:issues) { create_list(:issue, 10, project: project, created_at: now) }
 
     let(:total_count_path) { %w(data project issues totalCount) }
     let(:page_size) { 3 }
@@ -70,8 +71,8 @@ describe GitlabSchema.types['Issue'] do
     end
 
     context 'totalCount' do
-      let_it_be(:end_cursor) { %w(data project issues pageInfo endCursor) }
-      let_it_be(:issues_edges) { %w(data project issues edges) }
+      let(:end_cursor) { %w(data project issues pageInfo endCursor) }
+      let(:issues_edges) { %w(data project issues edges) }
 
       it 'returns total count' do
         expect(subject.dig(*total_count_path)).to eq(issues.count)

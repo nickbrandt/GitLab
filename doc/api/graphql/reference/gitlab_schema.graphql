@@ -3969,6 +3969,11 @@ type EpicIssueConnection {
   Information to aid in pagination.
   """
   pageInfo: PageInfo!
+
+  """
+  Total count of collection
+  """
+  totalCount: Int!
 }
 
 """
@@ -5491,6 +5496,11 @@ type IssueConnection {
   Information to aid in pagination.
   """
   pageInfo: PageInfo!
+
+  """
+  Total count of collection
+  """
+  totalCount: Int!
 }
 
 """
