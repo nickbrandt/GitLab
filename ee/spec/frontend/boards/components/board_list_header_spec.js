@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 
-import Board from 'ee/boards/components/board_column.vue';
+import BoardListHeader from 'ee/boards/components/board_list_header.vue';
 import List from '~/boards/models/list';
 import { ListType, inactiveListId } from '~/boards/constants';
 import axios from '~/lib/utils/axios_utils';
@@ -20,7 +20,7 @@ const localVue = createLocalVue();
 
 localVue.use(Vuex);
 
-describe('Board Column Component', () => {
+describe('Board List Header Component', () => {
   let store;
   let wrapper;
   let axiosMock;
@@ -69,7 +69,7 @@ describe('Board Column Component', () => {
       );
     }
 
-    wrapper = shallowMount(Board, {
+    wrapper = shallowMount(BoardListHeader, {
       store,
       localVue,
       propsData: {
