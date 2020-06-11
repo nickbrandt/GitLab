@@ -14,6 +14,7 @@ import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue'
 import StageTableNav from 'ee/analytics/cycle_analytics/components/stage_table_nav.vue';
 import StageNavItem from 'ee/analytics/cycle_analytics/components/stage_nav_item.vue';
 import AddStageButton from 'ee/analytics/cycle_analytics/components/add_stage_button.vue';
+import FilterBar from 'ee/analytics/cycle_analytics/components/filter_bar.vue';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
@@ -29,6 +30,8 @@ import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
 const emptyStateSvgPath = 'path/to/empty/state';
+const milestonesPath = '/some/milestones/endpoint';
+const labelsPath = '/some/labels/endpoint';
 const hideGroupDropDown = false;
 const selectedGroup = convertObjectPropsToCamelCase(mockData.group);
 
@@ -53,6 +56,7 @@ function createComponent({
   withStageSelected = false,
   scatterplotEnabled = true,
   pathNavigationEnabled = false,
+  filterBarEnabled = false,
   props = {},
 } = {}) {
   const func = shallow ? shallowMount : mount;
@@ -64,6 +68,8 @@ function createComponent({
       emptyStateSvgPath,
       noDataSvgPath,
       noAccessSvgPath,
+      milestonesPath,
+      labelsPath,
       baseStagesEndpoint: mockData.endpoints.baseStagesEndpoint,
       hideGroupDropDown,
       ...props,
@@ -72,6 +78,7 @@ function createComponent({
       glFeatures: {
         cycleAnalyticsScatterplotEnabled: scatterplotEnabled,
         valueStreamAnalyticsPathNavigation: pathNavigationEnabled,
+        valueStreamAnalyticsFilterBar: filterBarEnabled,
       },
     },
     ...opts,
@@ -148,6 +155,10 @@ describe('Cycle Analytics component', () => {
 
   const displaysAddStageButton = flag => {
     expect(wrapper.find(AddStageButton).exists()).toBe(flag);
+  };
+
+  const displaysFilterBar = flag => {
+    expect(wrapper.find(FilterBar).exists()).toBe(flag);
   };
 
   beforeEach(() => {
@@ -294,6 +305,10 @@ describe('Cycle Analytics component', () => {
           });
         });
 
+        it('displays the duration chart', () => {
+          displaysDurationChart(true);
+        });
+
         describe('path navigation', () => {
           describe('disabled', () => {
             it('does not display the path navigation', () => {
@@ -315,8 +330,25 @@ describe('Cycle Analytics component', () => {
           });
         });
 
-        it('displays the duration chart', () => {
-          displaysDurationChart(true);
+        describe('filter bar', () => {
+          describe('disabled', () => {
+            it('does not display the filter bar', () => {
+              displaysFilterBar(false);
+            });
+          });
+
+          describe('enabled', () => {
+            beforeEach(() => {
+              wrapper = createComponent({
+                withStageSelected: true,
+                filterBarEnabled: true,
+              });
+            });
+
+            it('displays the filter bar', () => {
+              displaysFilterBar(true);
+            });
+          });
         });
 
         describe('StageTable', () => {
