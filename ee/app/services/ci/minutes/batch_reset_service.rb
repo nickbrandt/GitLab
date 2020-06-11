@@ -7,11 +7,20 @@ module Ci
 
       BATCH_SIZE = 1000.freeze
 
+      def initialize
+        @errors = []
+      end
+
       def execute!(ids_range: nil, batch_size: BATCH_SIZE)
         relation = Namespace
         relation = relation.id_in(ids_range) if ids_range
         relation.each_batch(of: batch_size) do |namespaces|
           reset_ci_minutes!(namespaces)
+        end
+
+        if @errors.any?
+          exception = BatchNotResetError.new('Some namespace shared runner minutes were not reset.')
+          Gitlab::ErrorTracking.track_and_raise_exception(exception, namespace_ranges: @errors)
         end
       end
 
@@ -27,13 +36,7 @@ module Ci
           reset_ci_minutes_notifications!(namespaces)
         end
       rescue ActiveRecord::ActiveRecordError
-        # We don't need to print a thousand of namespace_ids
-        # in the message if all batches failed.
-        # A small batch would be sufficient for investigation.
-        failed_namespace_ids = namespaces.limit(10).ids # rubocop: disable CodeReuse/ActiveRecord
-
-        raise BatchNotResetError.new(
-          "#{namespaces.size} namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: #{failed_namespace_ids}")
+        @errors << { count: namespaces.size, first_id: namespaces.first.id, last_id: namespaces.last.id }
       end
 
       def recalculate_extra_shared_runners_minutes_limits!(namespaces)
