@@ -18,11 +18,7 @@ namespace :gitlab do
       print "Enqueuing projects"
 
       project_id_batches do |ids|
-        args = ids.collect do |id|
-          [:index, 'Project', id, nil] # es_id is unused for :index
-        end
-
-        ElasticIndexerWorker.bulk_perform_async(args) # rubocop:disable Scalability/BulkPerformWithContext
+        ::Elastic::ProcessInitialBookkeepingService.backfill_projects!(*Project.find(ids))
         print "."
       end
 

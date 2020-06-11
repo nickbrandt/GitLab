@@ -6,8 +6,11 @@ module Elastic
       return unless elasticsearch_enabled?
       return unless prometheus_enabled?
 
-      gauge = Gitlab::Metrics.gauge(:global_search_bulk_cron_queue_size, 'Number of database records waiting to be synchronized to Elasticsearch', {}, :max)
-      gauge.set({}, Elastic::ProcessBookkeepingService.queue_size)
+      incremental_gauge = Gitlab::Metrics.gauge(:global_search_bulk_cron_queue_size, 'Number of incremental database updates waiting to be synchronized to Elasticsearch', {}, :max)
+      incremental_gauge.set({}, Elastic::ProcessBookkeepingService.queue_size)
+
+      initial_gauge = Gitlab::Metrics.gauge(:global_search_bulk_cron_initial_queue_size, 'Number of initial database updates waiting to be synchronized to Elasticsearch', {}, :max)
+      initial_gauge.set({}, Elastic::ProcessInitialBookkeepingService.queue_size)
     end
 
     private
