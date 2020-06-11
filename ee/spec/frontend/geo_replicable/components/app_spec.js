@@ -2,7 +2,7 @@ import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 import GeoReplicableApp from 'ee/geo_replicable/components/app.vue';
-import store from 'ee/geo_replicable/store';
+import createStore from 'ee/geo_replicable/store';
 import GeoReplicable from 'ee/geo_replicable/components/geo_replicable.vue';
 import GeoReplicableEmptyState from 'ee/geo_replicable/components/geo_replicable_empty_state.vue';
 import GeoReplicableFilterBar from 'ee/geo_replicable/components/geo_replicable_filter_bar.vue';
@@ -10,6 +10,7 @@ import {
   MOCK_GEO_REPLICATION_SVG_PATH,
   MOCK_GEO_TROUBLESHOOTING_LINK,
   MOCK_BASIC_FETCH_DATA_MAP,
+  MOCK_REPLICABLE_TYPE,
 } from '../mock_data';
 
 const localVue = createLocalVue();
@@ -31,7 +32,7 @@ describe('GeoReplicableApp', () => {
   const createComponent = () => {
     wrapper = shallowMount(GeoReplicableApp, {
       localVue,
-      store,
+      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
       propsData,
       methods: {
         ...actionSpies,
@@ -90,7 +91,7 @@ describe('GeoReplicableApp', () => {
       describe('with replicableItems', () => {
         beforeEach(() => {
           wrapper.vm.$store.state.replicableItems = MOCK_BASIC_FETCH_DATA_MAP;
-          wrapper.vm.$store.state.totalReplicableItems =
+          wrapper.vm.$store.state.paginationData.total =
             wrapper.vm.$store.state.replicableItems.length;
         });
 
@@ -110,7 +111,7 @@ describe('GeoReplicableApp', () => {
       describe('with no replicableItems', () => {
         beforeEach(() => {
           wrapper.vm.$store.state.replicableItems = [];
-          wrapper.vm.$store.state.totalReplicableItems = 0;
+          wrapper.vm.$store.state.paginationData.total = 0;
         });
 
         it('hides replicable items', () => {

@@ -3,7 +3,7 @@ import { createLocalVue, mount } from '@vue/test-utils';
 import { GlDropdown, GlDropdownItem, GlSearchBoxByType, GlButton } from '@gitlab/ui';
 import GeoReplicableFilterBar from 'ee/geo_replicable/components/geo_replicable_filter_bar.vue';
 import createStore from 'ee/geo_replicable/store';
-import { DEFAULT_SEARCH_DELAY } from 'ee/geo_replicable/store/constants';
+import { DEFAULT_SEARCH_DELAY } from 'ee/geo_replicable/constants';
 import { MOCK_REPLICABLE_TYPE } from '../mock_data';
 
 const localVue = createLocalVue();
@@ -22,7 +22,7 @@ describe('GeoReplicableFilterBar', () => {
   const createComponent = () => {
     wrapper = mount(GeoReplicableFilterBar, {
       localVue,
-      store: createStore(MOCK_REPLICABLE_TYPE),
+      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
       methods: {
         ...actionSpies,
       },

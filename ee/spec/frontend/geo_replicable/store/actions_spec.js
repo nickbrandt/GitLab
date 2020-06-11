@@ -6,7 +6,7 @@ import Api from 'ee/api';
 import * as actions from 'ee/geo_replicable/store/actions';
 import * as types from 'ee/geo_replicable/store/mutation_types';
 import createState from 'ee/geo_replicable/store/state';
-import { ACTION_TYPES } from 'ee/geo_replicable/store/constants';
+import { ACTION_TYPES, PREV, NEXT } from 'ee/geo_replicable/constants';
 import { gqClient } from 'ee/geo_replicable/utils';
 import packageFilesQuery from 'ee/geo_replicable/graphql/package_files.query.graphql';
 import {
@@ -16,6 +16,7 @@ import {
   MOCK_REPLICABLE_TYPE,
   MOCK_RESTFUL_PAGINATION_DATA,
   MOCK_BASIC_GRAPHQL_QUERY_RESPONSE,
+  MOCK_GRAPHQL_PAGINATION_DATA,
 } from '../mock_data';
 
 jest.mock('~/flash');
@@ -25,7 +26,7 @@ describe('GeoReplicable Store Actions', () => {
   let state;
 
   beforeEach(() => {
-    state = createState(MOCK_REPLICABLE_TYPE);
+    state = createState({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false });
   });
 
   describe('requestReplicableItems', () => {
@@ -86,7 +87,10 @@ describe('GeoReplicable Store Actions', () => {
           null,
           state,
           [],
-          [{ type: 'requestReplicableItems' }, { type: 'fetchReplicableItemsGraphQl' }],
+          [
+            { type: 'requestReplicableItems' },
+            { type: 'fetchReplicableItemsGraphQl', payload: null },
+          ],
           done,
         );
       });
@@ -112,33 +116,92 @@ describe('GeoReplicable Store Actions', () => {
 
   describe('fetchReplicableItemsGraphQl', () => {
     describe('on success', () => {
-      const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
-      const data = registries.edges.map(e => e.node);
-
       beforeEach(() => {
         jest.spyOn(gqClient, 'query').mockResolvedValue({
           data: MOCK_BASIC_GRAPHQL_QUERY_RESPONSE,
         });
+        state.paginationData = MOCK_GRAPHQL_PAGINATION_DATA;
       });
 
-      it('should call gqClient with no before/after variables', () => {
-        testAction(
-          actions.fetchReplicableItemsGraphQl,
-          null,
-          state,
-          [],
-          [
-            {
-              type: 'receiveReplicableItemsSuccess',
-              payload: { data },
+      describe('with no direction set', () => {
+        const direction = null;
+        const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
+        const data = registries.edges.map(e => e.node);
+
+        it('should call gqClient with no before/after variables', () => {
+          testAction(
+            actions.fetchReplicableItemsGraphQl,
+            direction,
+            state,
+            [],
+            [
+              {
+                type: 'receiveReplicableItemsSuccess',
+                payload: { data, pagination: registries.pageInfo },
+              },
+            ],
+            () => {
+              expect(gqClient.query).toHaveBeenCalledWith({
+                query: packageFilesQuery,
+                variables: { before: '', after: '' },
+              });
             },
-          ],
-          () => {
-            expect(gqClient.query).toHaveBeenCalledWith({
-              query: packageFilesQuery,
-            });
-          },
-        );
+          );
+        });
+      });
+
+      describe('with direction set to "next"', () => {
+        const direction = NEXT;
+        const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
+        const data = registries.edges.map(e => e.node);
+
+        it('should call gqClient with after variable but no before variable', () => {
+          testAction(
+            actions.fetchReplicableItemsGraphQl,
+            direction,
+            state,
+            [],
+            [
+              {
+                type: 'receiveReplicableItemsSuccess',
+                payload: { data, pagination: registries.pageInfo },
+              },
+            ],
+            () => {
+              expect(gqClient.query).toHaveBeenCalledWith({
+                query: packageFilesQuery,
+                variables: { before: '', after: MOCK_GRAPHQL_PAGINATION_DATA.endCursor },
+              });
+            },
+          );
+        });
+      });
+
+      describe('with direction set to "prev"', () => {
+        const direction = PREV;
+        const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
+        const data = registries.edges.map(e => e.node);
+
+        it('should call gqClient with before variable but no after variable', () => {
+          testAction(
+            actions.fetchReplicableItemsGraphQl,
+            direction,
+            state,
+            [],
+            [
+              {
+                type: 'receiveReplicableItemsSuccess',
+                payload: { data, pagination: registries.pageInfo },
+              },
+            ],
+            () => {
+              expect(gqClient.query).toHaveBeenCalledWith({
+                query: packageFilesQuery,
+                variables: { before: MOCK_GRAPHQL_PAGINATION_DATA.startCursor, after: '' },
+              });
+            },
+          );
+        });
       });
     });
 
@@ -185,11 +248,7 @@ describe('GeoReplicable Store Actions', () => {
             [
               {
                 type: 'receiveReplicableItemsSuccess',
-                payload: {
-                  data: MOCK_BASIC_FETCH_DATA_MAP,
-                  perPage: pagination.perPage,
-                  total: pagination.total,
-                },
+                payload: { data: MOCK_BASIC_FETCH_DATA_MAP, pagination },
               },
             ],
             () => {
@@ -204,7 +263,7 @@ describe('GeoReplicable Store Actions', () => {
 
       describe('with params set', () => {
         beforeEach(() => {
-          state.currentPage = 3;
+          state.paginationData.page = 3;
           state.searchFilter = 'test search';
           state.currentFilterIndex = 2;
         });
@@ -218,11 +277,7 @@ describe('GeoReplicable Store Actions', () => {
             [
               {
                 type: 'receiveReplicableItemsSuccess',
-                payload: {
-                  data: MOCK_BASIC_FETCH_DATA_MAP,
-                  perPage: pagination.perPage,
-                  total: pagination.total,
-                },
+                payload: { data: MOCK_BASIC_FETCH_DATA_MAP, pagination },
               },
             ],
             () => {
@@ -488,7 +543,7 @@ describe('GeoReplicable Store Actions', () => {
 
   describe('setPage', () => {
     it('should commit mutation SET_PAGE', done => {
-      state.currentPage = 1;
+      state.paginationData.page = 1;
 
       const testValue = 2;
 

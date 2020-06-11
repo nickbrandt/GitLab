@@ -43,3 +43,7 @@ export const ACTION_TYPES = {
   REVERIFY: 'reverify',
   FORCE_REDOWNLOAD: 'force_redownload',
 };
+
+export const PREV = 'prev';
+
+export const NEXT = 'next';

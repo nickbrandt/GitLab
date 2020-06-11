@@ -24,9 +24,9 @@ export default {
     },
   },
   computed: {
-    ...mapState(['isLoading', 'totalReplicableItems']),
+    ...mapState(['isLoading', 'paginationData']),
     hasReplicableItems() {
-      return this.totalReplicableItems > 0;
+      return this.paginationData.total > 0;
     },
   },
   created() {
