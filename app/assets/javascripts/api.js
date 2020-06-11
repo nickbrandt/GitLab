@@ -54,6 +54,7 @@ const Api = {
   rawFilePath: '/api/:version/projects/:id/repository/files/:path/raw',
   issuePath: '/api/:version/projects/:id/issues/:issue_iid',
   tagsPath: '/api/:version/projects/:id/repository/tags',
+  updateMergeRequestPath: '/api/:version/projects/:id/merge_requests/:mrid',
 
   group(groupId, callback = () => {}) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -558,7 +559,7 @@ const Api = {
   },
 
   updateMergeRequest(project, mergeRequest, data = {}) {
-    const url = Api.buildUrl(Api.projectMergeRequestPath)
+    const url = Api.buildUrl(Api.updateMergeRequestPath)
       .replace(':id', encodeURIComponent(project))
       .replace(':mrid', encodeURIComponent(mergeRequest));
 
