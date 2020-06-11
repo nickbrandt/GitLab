@@ -24,6 +24,10 @@ module Gitlab
             Arel.sql("#{join_expression_name}.created_at")
           end
 
+          def column_list
+            [timestamp_projection]
+          end
+
           # rubocop: disable CodeReuse/ActiveRecord
           def apply_query_customization(query)
             query
