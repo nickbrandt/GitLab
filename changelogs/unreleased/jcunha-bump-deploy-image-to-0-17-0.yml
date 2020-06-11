@@ -2,5 +2,5 @@
 title: Removes PVC on PostgreSQL delete, enables multiline secrets, updates Helm and
   glibc
 merge_request: 34399
-author:
+author: verenion
 type: added
