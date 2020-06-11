@@ -163,7 +163,7 @@ RSpec.describe 'Admin::AuditLogs', :js do
 
   def filter_for(type, name)
     within '[data-qa-selector="admin_audit_log_filter"]' do
-      find('input').click
+      first('div').click
 
       click_link type
       click_link name
