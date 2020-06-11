@@ -1,0 +1,197 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`~/ide/stores/modules/file_system/utils/parse should parse 1`] = `
+Object {
+  "": Object {
+    "children": Array [
+      Object {
+        "name": "config",
+        "type": "tree",
+      },
+      Object {
+        "name": "lorem",
+        "type": "tree",
+      },
+      Object {
+        "name": "src",
+        "type": "tree",
+      },
+      Object {
+        "name": "123.txt",
+        "type": "blob",
+      },
+      Object {
+        "name": "LICENSE",
+        "type": "blob",
+      },
+      Object {
+        "name": "NEW_FILE",
+        "type": "blob",
+      },
+      Object {
+        "name": "NEW_FILE2",
+        "type": "blob",
+      },
+      Object {
+        "name": "README.md",
+        "type": "blob",
+      },
+      Object {
+        "name": "test",
+        "type": "blob",
+      },
+    ],
+    "name": "",
+    "opened": false,
+    "path": "",
+    "timestamp": 0,
+    "type": "tree",
+  },
+  "123.txt": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "123.txt",
+    "path": "123.txt",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "LICENSE": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "LICENSE",
+    "path": "LICENSE",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "NEW_FILE": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "NEW_FILE",
+    "path": "NEW_FILE",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "NEW_FILE2": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "NEW_FILE2",
+    "path": "NEW_FILE2",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "README.md": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "README.md",
+    "path": "README.md",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "config": Object {
+    "children": Array [
+      Object {
+        "name": "temp.config.js",
+        "type": "blob",
+      },
+      Object {
+        "name": "test.config.js",
+        "type": "blob",
+      },
+    ],
+    "name": "config",
+    "opened": false,
+    "path": "config",
+    "timestamp": 0,
+    "type": "tree",
+  },
+  "config/temp.config.js": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "temp.config.js",
+    "path": "config/temp.config.js",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "config/test.config.js": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "test.config.js",
+    "path": "config/test.config.js",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "lorem": Object {
+    "children": Array [
+      Object {
+        "name": "C.md",
+        "type": "blob",
+      },
+    ],
+    "name": "lorem",
+    "opened": false,
+    "path": "lorem",
+    "timestamp": 0,
+    "type": "tree",
+  },
+  "lorem/C.md": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "C.md",
+    "path": "lorem/C.md",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "src": Object {
+    "children": Array [
+      Object {
+        "name": "test",
+        "type": "tree",
+      },
+    ],
+    "name": "src",
+    "opened": false,
+    "path": "src",
+    "timestamp": 0,
+    "type": "tree",
+  },
+  "src/test": Object {
+    "children": Array [
+      Object {
+        "name": "ANOTHER_NEW_FILE",
+        "type": "blob",
+      },
+    ],
+    "name": "test",
+    "opened": false,
+    "path": "src/test",
+    "timestamp": 0,
+    "type": "tree",
+  },
+  "src/test/ANOTHER_NEW_FILE": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "ANOTHER_NEW_FILE",
+    "path": "src/test/ANOTHER_NEW_FILE",
+    "timestamp": 0,
+    "type": "blob",
+  },
+  "test": Object {
+    "active": false,
+    "content": "",
+    "isLoaded": false,
+    "name": "test",
+    "path": "test",
+    "timestamp": 0,
+    "type": "blob",
+  },
+}
+`;

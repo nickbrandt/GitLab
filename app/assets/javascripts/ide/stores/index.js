@@ -9,6 +9,7 @@ import pipelines from './modules/pipelines';
 import mergeRequests from './modules/merge_requests';
 import branches from './modules/branches';
 import fileTemplates from './modules/file_templates';
+import fileSystem from './modules/file_system';
 import paneModule from './modules/pane';
 import clientsideModule from './modules/clientside';
 import routerModule from './modules/router';
@@ -25,6 +26,7 @@ export const createStoreOptions = () => ({
     pipelines,
     mergeRequests,
     branches,
+    fileSystem,
     fileTemplates: fileTemplates(),
     rightPane: paneModule(),
     clientside: clientsideModule(),

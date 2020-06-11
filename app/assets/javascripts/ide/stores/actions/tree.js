@@ -1,36 +1,29 @@
-import { defer } from 'lodash';
-import { __ } from '../../../locale';
-import service from '../../services';
 import * as types from '../mutation_types';
-import { decorateFiles } from '../../lib/files';
 
-export const toggleTreeOpen = ({ commit }, path) => {
-  commit(types.TOGGLE_TREE_OPEN, path);
+export const toggleTreeOpen = ({ dispatch }, path) => {
+  dispatch('fileSystem/toggleOpenTree', path);
 };
 
-export const showTreeEntry = ({ commit, dispatch, state }, path) => {
-  const entry = state.entries[path];
-  const parentPath = entry ? entry.parentPath : '';
-
-  if (parentPath) {
-    commit(types.SET_TREE_OPEN, parentPath);
-
-    dispatch('showTreeEntry', parentPath);
-  }
+export const showTreeEntry = ({ dispatch }, path) => {
+  dispatch('fileSystem/openParents', path);
 };
 
-export const handleTreeEntryAction = ({ commit, dispatch }, row) => {
-  if (row.type === 'tree') {
-    dispatch('toggleTreeOpen', row.path);
-  } else if (row.type === 'blob') {
-    if (!row.opened) {
-      commit(types.TOGGLE_FILE_OPEN, row.path);
+export const handleTreeEntryAction = ({ state, commit, dispatch }, path) => {
+  const entry = state.fileSystem.files[path];
+
+  if (!entry) {
+    return;
+  } else if (entry.type === 'tree') {
+    // dispatch('toggleTreeOpen', path);
+  } else if (entry.type === 'blob') {
+    if (!entry.opened) {
+      commit(types.TOGGLE_FILE_OPEN, path);
     }
 
-    dispatch('setFileActive', row.path);
+    dispatch('setFileActive', path);
   }
 
-  dispatch('showTreeEntry', row.path);
+  dispatch('showTreeEntry', path);
 };
 
 export const setDirectoryData = ({ state, commit }, { branchId, treeList }) => {
@@ -47,50 +40,12 @@ export const setDirectoryData = ({ state, commit }, { branchId, treeList }) => {
   });
 };
 
-export const getFiles = ({ state, commit, dispatch }, payload = {}) =>
-  new Promise((resolve, reject) => {
-    const projectId = state.currentProjectId;
-    const { branchId, ref = branchId } = payload;
+export const getFiles = ({ state, dispatch }, payload = {}) => {
+  const projectPath = state.project.path_with_namespace;
+  const { branchId, ref = branchId } = payload;
 
-    if (
-      !state.trees[`${projectId}/${branchId}`] ||
-      (state.trees[`${projectId}/${branchId}`].tree &&
-        state.trees[`${projectId}/${branchId}`].tree.length === 0)
-    ) {
-      const selectedProject = state.project;
-
-      commit(types.CREATE_TREE, { treePath: `${projectId}/${branchId}` });
-      service
-        .getFiles(selectedProject.path_with_namespace, ref)
-        .then(({ data }) => {
-          const { entries, treeList } = decorateFiles({
-            data,
-            projectId,
-            branchId,
-          });
-
-          commit(types.SET_ENTRIES, entries);
-
-          // Defer setting the directory data because this triggers some intense rendering.
-          // The entries is all we need to load the file editor.
-          defer(() => dispatch('setDirectoryData', { branchId, treeList }));
-
-          resolve();
-        })
-        .catch(e => {
-          dispatch('setErrorMessage', {
-            text: __('An error occurred while loading all the files.'),
-            action: actionPayload =>
-              dispatch('getFiles', actionPayload).then(() => dispatch('setErrorMessage', null)),
-            actionText: __('Please try again'),
-            actionPayload: { branchId },
-          });
-          reject(e);
-        });
-    } else {
-      resolve();
-    }
-  });
+  return dispatch('fileSystem/fetchFiles', { projectPath, ref });
+};
 
 export const restoreTree = ({ dispatch, commit, state }, path) => {
   const entry = state.entries[path];

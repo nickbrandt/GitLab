@@ -20,8 +20,7 @@ export const currentProject = state => state.project;
 
 export const emptyRepo = state => state.project?.empty_repo;
 
-export const currentTree = state =>
-  state.trees[`${state.currentProjectId}/${state.currentBranchId}`];
+export const currentTree = state => state.fileSystem.files[''];
 
 export const hasMergeRequest = state => Boolean(state.currentMergeRequestId);
 

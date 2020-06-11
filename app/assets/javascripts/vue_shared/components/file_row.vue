@@ -18,6 +18,11 @@ export default {
       type: Number,
       required: true,
     },
+    getUrl: {
+      type: Function,
+      required: false,
+      default: () => () => '',
+    },
   },
   computed: {
     isTree() {
@@ -25,6 +30,9 @@ export default {
     },
     isBlob() {
       return this.file.type === 'blob';
+    },
+    fileUrl() {
+      return this.getUrl(this.file);
     },
     levelIndentation() {
       return {
@@ -60,18 +68,16 @@ export default {
     toggleTreeOpen(path) {
       this.$emit('toggleTreeOpen', path);
     },
-    clickedFile(path) {
-      this.$emit('clickFile', path);
+    clickedFile() {
+      this.$emit('clickFile', this.file);
     },
     clickFile() {
       // Manual Action if a tree is selected/opened
-      if (this.isTree && this.hasUrlAtCurrentRoute()) {
+      if (this.isTree) {
         this.toggleTreeOpen(this.file.path);
       }
 
-      if (this.$router) this.$router.push(`/project${this.file.url}`);
-
-      if (this.isBlob) this.clickedFile(this.file.path);
+      this.clickedFile();
     },
     scrollIntoView(isInit = false) {
       const block = isInit && this.isTree ? 'center' : 'nearest';
@@ -95,11 +101,6 @@ export default {
       const filePath = this.file.path.replace(/[/]$/g, '');
 
       return filePath === routePath;
-    },
-    hasUrlAtCurrentRoute() {
-      if (!this.$router || !this.$router.currentRoute) return true;
-
-      return this.$router.currentRoute.path === `/project${escapeFileUrl(this.file.url)}`;
     },
   },
 };

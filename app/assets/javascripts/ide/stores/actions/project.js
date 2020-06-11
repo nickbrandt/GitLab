@@ -84,39 +84,26 @@ export const showBranchNotFoundError = ({ dispatch }, branchId) => {
   });
 };
 
-export const loadEmptyBranch = ({ commit, state }, { branchId }) => {
+export const loadEmptyBranch = ({ commit, state, getters }, { branchId }) => {
   const projectId = state.currentProjectId;
   const treePath = `${projectId}/${branchId}`;
-  const currentTree = state.trees[`${projectId}/${branchId}`];
 
   // If we already have a tree, let's not recreate an empty one
-  if (currentTree) {
+  if (getters.currentTree) {
     return;
   }
 
-  commit(types.CREATE_TREE, { treePath });
   commit(types.TOGGLE_LOADING, {
     entry: state.trees[treePath],
     forceValue: false,
   });
 };
 
-export const loadFile = ({ dispatch, state }, { basePath }) => {
+export const loadFile = ({ dispatch }, { basePath }) => {
   if (basePath) {
     const path = basePath.slice(-1) === '/' ? basePath.slice(0, -1) : basePath;
-    const treeEntryKey = Object.keys(state.entries).find(
-      key => key === path && !state.entries[key].pending,
-    );
-    const treeEntry = state.entries[treeEntryKey];
 
-    if (treeEntry) {
-      dispatch('handleTreeEntryAction', treeEntry);
-    } else {
-      dispatch('createTempEntry', {
-        name: path,
-        type: 'blob',
-      });
-    }
+    dispatch('handleTreeEntryAction', path);
   }
 };
 

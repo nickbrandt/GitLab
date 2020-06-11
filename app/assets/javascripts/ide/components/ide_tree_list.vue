@@ -23,10 +23,11 @@ export default {
     },
   },
   computed: {
-    ...mapState(['currentBranchId']),
+    ...mapState(['currentBranchId', 'currentProjectId']),
+    ...mapState('fileSystem', ['files']),
     ...mapGetters(['currentProject', 'currentTree']),
     showLoading() {
-      return !this.currentTree || this.currentTree.loading;
+      return !this.currentTree;
     },
   },
   mounted() {
@@ -34,6 +35,16 @@ export default {
   },
   methods: {
     ...mapActions(['updateViewer', 'toggleTreeOpen']),
+    clickFile(file) {
+      const url = this.getUrl(file);
+
+      this.$router.push(url);
+    },
+    getUrl(file) {
+      return `/project/${this.currentProjectId}/${file.type}/${this.currentBranchId}/-/${
+        file.path
+      }${file.type === 'tree' ? '/' : ''}`;
+    },
   },
   IdeFileRow,
 };
@@ -52,14 +63,17 @@ export default {
         <slot name="header"></slot>
       </header>
       <div class="ide-tree-body h-100">
-        <template v-if="currentTree.tree.length">
+        <template v-if="currentTree.children.length">
           <file-tree
-            v-for="file in currentTree.tree"
-            :key="file.key"
-            :file="file"
+            v-for="{ name } in currentTree.children"
+            :key="name"
+            :file-path="name"
             :level="0"
+            :files="files"
             :file-row-component="$options.IdeFileRow"
+            :get-url="getUrl"
             @toggleTreeOpen="toggleTreeOpen"
+            @clickFile="clickFile"
           />
         </template>
         <div v-else class="file-row">{{ __('No files') }}</div>
