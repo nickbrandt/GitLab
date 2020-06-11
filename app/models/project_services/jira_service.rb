@@ -439,8 +439,6 @@ class JiraService < IssueTrackerService
       s_("JiraService|Jira comments will be created when an issue gets referenced in a merge request.")
     when "commit", "commit_events"
       s_("JiraService|Jira comments will be created when an issue gets referenced in a commit.")
-    else
-      super
     end
   end
 end
