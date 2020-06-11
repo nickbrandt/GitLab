@@ -13,22 +13,39 @@ module StatusPage
     MAX_PAGES = 5
     MAX_UPLOADS = MAX_KEYS_PER_PAGE * MAX_PAGES
 
-    def self.details_path(id)
-      "data/incident/#{id}.json"
-    end
+    class << self
+      def details_path(id)
+        "data/incident/#{id}.json"
+      end
 
-    def self.upload_path(issue_iid, secret, file_name)
-      uploads_path = self.uploads_path(issue_iid)
+      def details_url(issue)
+        return unless published_issue_available?(issue, issue.project.status_page_setting)
 
-      File.join(uploads_path, secret, file_name)
-    end
+        issue.project.status_page_setting.normalized_status_page_url +
+          CGI.escape(details_path(issue.iid))
+      end
 
-    def self.uploads_path(issue_iid)
-      File.join('data', 'incident', issue_iid.to_s, '/')
-    end
+      def upload_path(issue_iid, secret, file_name)
+        uploads_path = uploads_path(issue_iid)
 
-    def self.list_path
-      'data/list.json'
+        File.join(uploads_path, secret, file_name)
+      end
+
+      def uploads_path(issue_iid)
+        File.join('data', 'incident', issue_iid.to_s, '/')
+      end
+
+      def list_path
+        'data/list.json'
+      end
+
+      private
+
+      def published_issue_available?(issue, setting)
+        issue.status_page_published_incident &&
+          setting&.enabled? &&
+          setting&.status_page_url
+      end
     end
 
     class Error < StandardError

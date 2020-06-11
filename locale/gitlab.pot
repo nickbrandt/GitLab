@@ -18016,6 +18016,9 @@ msgstr ""
 msgid "Publish to status page"
 msgstr ""
 
+msgid "Published on status page"
+msgstr ""
+
 msgid "Publishes this issue to the associated status page."
 msgstr ""
 

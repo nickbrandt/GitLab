@@ -9,6 +9,48 @@ RSpec.describe StatusPage::Storage do
     it { is_expected.to eq('data/incident/123.json') }
   end
 
+  describe '.details_url' do
+    let_it_be(:issue, reload: true) { create(:issue) }
+
+    subject { described_class.details_url(issue) }
+
+    context 'when issue is not published' do
+      it { is_expected.to be_nil }
+    end
+
+    context 'with a published incident' do
+      let_it_be(:incident) { create(:status_page_published_incident, issue: issue) }
+
+      context 'without a status page setting' do
+        it { is_expected.to be_nil }
+      end
+
+      context 'when status page setting is disabled' do
+        let_it_be(:setting) { create(:status_page_setting, project: issue.project) }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'when status page setting is enabled' do
+        let_it_be(:setting) { create(:status_page_setting, :enabled, project: issue.project) }
+
+        before do
+          stub_licensed_features(status_page: true)
+        end
+
+        it { is_expected.to eq("https://status.gitlab.com/#/data%2Fincident%2F#{issue.iid}.json") }
+
+        context 'when status page setting does not include a url' do
+          before do
+            setting.update!(status_page_url: nil)
+          end
+
+          it { is_expected.to be_nil }
+        end
+      end
+    end
+  end
+
   describe '.list_path' do
     subject { described_class.list_path }
 
