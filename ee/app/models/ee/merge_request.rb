@@ -161,7 +161,7 @@ module EE
     def compare_dependency_scanning_reports(current_user)
       return missing_report_error("dependency scanning") unless has_dependency_scanning_reports?
 
-      compare_reports(::Ci::CompareDependencyScanningReportsService, current_user)
+      compare_reports(::Ci::CompareSecurityReportsService, current_user, 'dependency_scanning')
     end
 
     def has_license_scanning_reports?
@@ -175,7 +175,7 @@ module EE
     def compare_container_scanning_reports(current_user)
       return missing_report_error("container scanning") unless has_container_scanning_reports?
 
-      compare_reports(::Ci::CompareContainerScanningReportsService, current_user)
+      compare_reports(::Ci::CompareSecurityReportsService, current_user, 'container_scanning')
     end
 
     def has_sast_reports?
@@ -189,13 +189,13 @@ module EE
     def compare_sast_reports(current_user)
       return missing_report_error("SAST") unless has_sast_reports?
 
-      compare_reports(::Ci::CompareSastReportsService, current_user)
+      compare_reports(::Ci::CompareSecurityReportsService, current_user, 'sast')
     end
 
     def compare_secret_detection_reports(current_user)
       return missing_report_error("secret detection") unless has_secret_detection_reports?
 
-      compare_reports(::Ci::CompareSecretDetectionReportsService, current_user)
+      compare_reports(::Ci::CompareSecurityReportsService, current_user, 'secret_detection')
     end
 
     def has_dast_reports?
@@ -205,7 +205,7 @@ module EE
     def compare_dast_reports(current_user)
       return missing_report_error("DAST") unless has_dast_reports?
 
-      compare_reports(::Ci::CompareDastReportsService, current_user)
+      compare_reports(::Ci::CompareSecurityReportsService, current_user, 'dast')
     end
 
     def compare_license_scanning_reports(current_user)

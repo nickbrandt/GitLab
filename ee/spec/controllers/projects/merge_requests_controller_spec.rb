@@ -432,7 +432,7 @@ RSpec.describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareDependencyScanningReportsService, project.users.first).and_return(comparison_status)
+        .with(::Ci::CompareSecurityReportsService, project.users.first, 'dependency_scanning').and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
@@ -502,7 +502,7 @@ RSpec.describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareContainerScanningReportsService, project.users.first).and_return(comparison_status)
+        .with(::Ci::CompareSecurityReportsService, project.users.first, 'container_scanning').and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
@@ -572,7 +572,7 @@ RSpec.describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareSastReportsService, project.users.first).and_return(comparison_status)
+        .with(::Ci::CompareSecurityReportsService, project.users.first, 'sast').and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
@@ -643,7 +643,7 @@ RSpec.describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareSecretDetectionReportsService, project.users.first).and_return(comparison_status)
+        .with(::Ci::CompareSecurityReportsService, project.users.first, 'secret_detection').and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
@@ -713,7 +713,7 @@ RSpec.describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareDastReportsService, project.users.first).and_return(comparison_status)
+        .with(::Ci::CompareSecurityReportsService, project.users.first, 'dast').and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
