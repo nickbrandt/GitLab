@@ -85,7 +85,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
       lfs_object = create(:lfs_object)
       merge_request_diff = create(:merge_request_diff, :external)
       package_file = create(:conan_package_file, :conan_package)
-      terraform_state = create(:terraform_state, project: project)
+      terraform_state = create(:terraform_state, :with_file, project: project)
       upload = create(:upload)
 
       expect(Geo::ContainerRepositoryRegistry.where(container_repository_id: container_repository.id).count).to eq(0)
