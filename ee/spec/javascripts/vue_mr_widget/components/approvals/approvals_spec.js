@@ -1,5 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import Approvals from 'ee/vue_merge_request_widget/components/approvals/approvals.vue';
 import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
 import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
@@ -55,7 +55,7 @@ describe('EE MRWidget approvals', () => {
     });
   };
 
-  const findAction = () => wrapper.find(GlDeprecatedButton);
+  const findAction = () => wrapper.find(GlButton);
   const findActionData = () => {
     const action = findAction();
 
@@ -184,7 +184,7 @@ describe('EE MRWidget approvals', () => {
 
         it('approve action is rendered', () => {
           expect(findActionData()).toEqual({
-            variant: 'primary',
+            variant: 'info',
             text: 'Approve',
             inverted: false,
           });
@@ -205,7 +205,7 @@ describe('EE MRWidget approvals', () => {
 
           it('approve action (with inverted) is rendered', () => {
             expect(findActionData()).toEqual({
-              variant: 'primary',
+              variant: 'info',
               text: 'Approve',
               inverted: true,
             });
@@ -221,7 +221,7 @@ describe('EE MRWidget approvals', () => {
 
           it('approve additionally action is rendered', () => {
             expect(findActionData()).toEqual({
-              variant: 'primary',
+              variant: 'info',
               text: 'Approve additionally',
               inverted: true,
             });
