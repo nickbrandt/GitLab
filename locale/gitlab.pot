@@ -17221,6 +17221,9 @@ msgstr ""
 msgid "ProjectSettings|Enable 'Delete source branch' option by default"
 msgstr ""
 
+msgid "ProjectSettings|Enable merge trains and pipelines for merged results"
+msgstr ""
+
 msgid "ProjectSettings|Every merge creates a merge commit"
 msgstr ""
 
@@ -17287,9 +17290,6 @@ msgstr ""
 msgid "ProjectSettings|Merge options"
 msgstr ""
 
-msgid "ProjectSettings|Merge pipelines will try to validate the post-merge result prior to merging"
-msgstr ""
-
 msgid "ProjectSettings|Merge requests"
 msgstr ""
 
@@ -17315,6 +17315,9 @@ msgid "ProjectSettings|Pages for project documentation"
 msgstr ""
 
 msgid "ProjectSettings|Pipelines"
+msgstr ""
+
+msgid "ProjectSettings|Pipelines for merge requests must be enabled in the CI/CD configuration file, or pipelines could be unresolvable or dropped"
 msgstr ""
 
 msgid "ProjectSettings|Pipelines must succeed"
