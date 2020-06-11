@@ -83,6 +83,16 @@ class UpdateRoutesForLostAndFoundGroupAndOrphanedProjects < ActiveRecord::Migrat
         )
       end
     end
+
+    def generate_unique_path
+      # Generate a unique path if there is no route for the namespace
+      # (an existing route guarantees that the path is already unique)
+      unless Route.for_source('Namespace', self.id)
+        self.path = Uniquify.new.string(self.path) do |str|
+          Route.where(path: str).exists?
+        end
+      end
+    end
   end
 
   class Group < Namespace
@@ -140,6 +150,7 @@ class UpdateRoutesForLostAndFoundGroupAndOrphanedProjects < ActiveRecord::Migrat
     return unless lost_and_found_group
 
     # Update the 'lost-and-found' group description to be more self-explanatory
+    lost_and_found_group.generate_unique_path
     lost_and_found_group.description =
       'Group for storing projects that were not properly deleted. '\
       'It should be considered as a system level Group with non-working '\
