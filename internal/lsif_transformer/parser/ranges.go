@@ -6,13 +6,15 @@ import (
 	"strconv"
 )
 
-const Definitions = "definitions"
-const References = "references"
+const (
+	definitions = "definitions"
+	references  = "references"
+)
 
 type Ranges struct {
-	Entries map[Id]*Range
 	DefRefs map[Id]*DefRef
 	Hovers  *Hovers
+	Cache   *cache
 }
 
 type RawRange struct {
@@ -51,10 +53,15 @@ func NewRanges(tempDir string) (*Ranges, error) {
 		return nil, err
 	}
 
+	cache, err := newCache(tempDir, "ranges", Range{})
+	if err != nil {
+		return nil, err
+	}
+
 	return &Ranges{
-		Entries: make(map[Id]*Range),
 		DefRefs: make(map[Id]*DefRef),
 		Hovers:  hovers,
+		Cache:   cache,
 	}, nil
 }
 
@@ -84,7 +91,11 @@ func (r *Ranges) Serialize(f io.Writer, rangeIds []Id, docs map[Id]string) error
 	}
 
 	for i, rangeId := range rangeIds {
-		entry := r.Entries[rangeId]
+		entry, err := r.getRange(rangeId)
+		if err != nil {
+			continue
+		}
+
 		serializedRange := SerializedRange{
 			StartLine:      entry.Line,
 			StartChar:      entry.Character,
@@ -109,6 +120,10 @@ func (r *Ranges) Serialize(f io.Writer, rangeIds []Id, docs map[Id]string) error
 }
 
 func (r *Ranges) Close() error {
+	if err := r.Cache.Close(); err != nil {
+		return err
+	}
+
 	return r.Hovers.Close()
 }
 
@@ -129,9 +144,7 @@ func (r *Ranges) addRange(line []byte) error {
 		return err
 	}
 
-	r.Entries[rg.Id] = &rg.Data
-
-	return nil
+	return r.Cache.SetEntry(rg.Id, &rg.Data)
 }
 
 func (r *Ranges) addItem(line []byte) error {
@@ -140,26 +153,49 @@ func (r *Ranges) addItem(line []byte) error {
 		return err
 	}
 
-	if defRef.Property != Definitions && defRef.Property != References {
+	if defRef.Property != definitions && defRef.Property != references {
 		return nil
 	}
 
 	for _, rangeId := range defRef.RangeIds {
-		if entry, ok := r.Entries[rangeId]; ok {
-			entry.RefId = defRef.RefId
+		var rg Range
+		if err := r.Cache.Entry(rangeId, &rg); err != nil {
+			return err
+		}
+
+		rg.RefId = defRef.RefId
+
+		if err := r.Cache.SetEntry(rangeId, &rg); err != nil {
+			return err
 		}
 	}
 
-	if defRef.Property != Definitions {
-		return nil
+	if defRef.Property == definitions {
+		return r.addDefRef(&defRef)
 	}
 
-	defRange := r.Entries[defRef.RangeIds[0]]
+	return nil
+}
+
+func (r *Ranges) addDefRef(defRef *RawDefRef) error {
+	var rg Range
+	if err := r.Cache.Entry(defRef.RangeIds[0], &rg); err != nil {
+		return err
+	}
 
 	r.DefRefs[defRef.RefId] = &DefRef{
-		Line:  strconv.Itoa(int(defRange.Line + 1)),
+		Line:  strconv.Itoa(int(rg.Line + 1)),
 		DocId: defRef.DocId,
 	}
 
 	return nil
+}
+
+func (r *Ranges) getRange(rangeId Id) (*Range, error) {
+	var rg Range
+	if err := r.Cache.Entry(rangeId, &rg); err != nil {
+		return nil, err
+	}
+
+	return &rg, nil
 }
