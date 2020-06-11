@@ -9,7 +9,7 @@ module QA
       context 'regular git commit' do
         it 'is proxied to the primary and ultimately replicated to the secondary' do
           file_name = 'README.md'
-          key_title = "key for ssh tests #{Time.now.to_f}"
+          key_title = "Geo SSH to 2nd #{Time.now.to_f}"
           project = nil
           key = nil
 
@@ -17,12 +17,13 @@ module QA
             # Create a new SSH key for the user
             key = Resource::SSHKey.fabricate_via_api! do |resource|
               resource.title = key_title
+              resource.expires_at = Date.today + 2
             end
 
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project for ssh push to 2nd'
+              project.description = 'Geo test project for SSH push to 2nd'
             end
 
             # Perform a git push over SSH directly to the primary
@@ -39,7 +40,7 @@ module QA
             project.visit!
           end
 
-          QA::Runtime::Logger.debug('Visiting the secondary geo node')
+          QA::Runtime::Logger.debug('*****Visiting the secondary geo node*****')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
@@ -47,14 +48,7 @@ module QA
             end
 
             # Ensure the SSH key has replicated
-            Page::Main::Menu.perform(&:click_settings_link)
-            Page::Profile::Menu.perform do |menu|
-              menu.click_ssh_keys
-              menu.wait_for_key_to_replicate(key_title)
-            end
-
-            expect(page).to have_content(key.title)
-            expect(page).to have_content(key.md5_fingerprint)
+            expect(key).to be_replicated
 
             # Ensure project has replicated
             Page::Main::Menu.perform(&:go_to_projects)
@@ -97,7 +91,7 @@ module QA
 
       context 'git-lfs commit' do
         it 'is proxied to the primary and ultimately replicated to the secondary' do
-          key_title = "key for ssh tests #{Time.now.to_f}"
+          key_title = "Geo SSH LFS to 2nd #{Time.now.to_f}"
           file_name_primary = 'README.md'
           file_name_secondary = 'README_MORE.md'
           project = nil
@@ -107,6 +101,7 @@ module QA
             # Create a new SSH key for the user
             key = Resource::SSHKey.fabricate_via_api! do |resource|
               resource.title = key_title
+              resource.expires_at = Date.today + 2
             end
 
             # Create a new Project
@@ -129,7 +124,7 @@ module QA
             end
           end
 
-          QA::Runtime::Logger.debug('Visiting the secondary geo node')
+          QA::Runtime::Logger.debug('*****Visiting the secondary geo node*****')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
@@ -137,14 +132,7 @@ module QA
             end
 
             # Ensure the SSH key has replicated
-            Page::Main::Menu.perform(&:click_settings_link)
-            Page::Profile::Menu.perform do |menu|
-              menu.click_ssh_keys
-              menu.wait_for_key_to_replicate(key_title)
-            end
-
-            expect(page).to have_content(key.title)
-            expect(page).to have_content(key.md5_fingerprint)
+            expect(key).to be_replicated
 
             # Ensure project has replicated
             Page::Main::Menu.perform(&:go_to_projects)

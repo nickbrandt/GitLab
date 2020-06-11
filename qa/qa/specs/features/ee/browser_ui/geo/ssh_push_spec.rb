@@ -7,7 +7,7 @@ module QA
 
       context 'regular git commit' do
         it "is replicated to the secondary" do
-          key_title = "key for ssh tests #{Time.now.to_f}"
+          key_title = "Geo SSH #{Time.now.to_f}"
           file_content = 'This is a Geo project! Commit from primary.'
           project = nil
           key = nil
@@ -16,12 +16,13 @@ module QA
             # Create a new SSH key for the user
             key = Resource::SSHKey.fabricate_via_api! do |resource|
               resource.title = key_title
+              resource.expires_at = Date.today + 2
             end
 
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project for ssh push'
+              project.description = 'Geo test project for SSH push'
             end
 
             # Perform a git push over SSH directly to the primary
@@ -42,19 +43,12 @@ module QA
             end
           end
 
-          QA::Runtime::Logger.debug('Visiting the secondary geo node')
+          QA::Runtime::Logger.debug('*****Visiting the secondary geo node*****')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end
-
-            # Ensure the SSH key has replicated
-            Page::Main::Menu.act { click_settings_link }
-            Page::Profile::Menu.act { click_ssh_keys }
-
-            expect(page).to have_content(key.title)
-            expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
             Page::Main::Menu.perform { |menu| menu.go_to_projects }
@@ -76,7 +70,7 @@ module QA
 
       context 'git-lfs commit' do
         it "is replicated to the secondary" do
-          key_title = "key for ssh tests #{Time.now.to_f}"
+          key_title = "Geo SSH LFS #{Time.now.to_f}"
           file_content = 'The rendered file could not be displayed because it is stored in LFS.'
           project = nil
           key = nil
@@ -90,7 +84,7 @@ module QA
             # Create a new Project
             project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
-              project.description = 'Geo test project for ssh lfs push'
+              project.description = 'Geo test project for SSH LFS push'
             end
 
             # Perform a git push over SSH directly to the primary
@@ -115,19 +109,12 @@ module QA
             end
           end
 
-          QA::Runtime::Logger.debug('Visiting the secondary geo node')
+          QA::Runtime::Logger.debug('*****Visiting the secondary geo node*****')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end
-
-            # Ensure the SSH key has replicated
-            Page::Main::Menu.act { click_settings_link }
-            Page::Profile::Menu.act { click_ssh_keys }
-
-            expect(page).to have_content(key.title)
-            expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
             Page::Main::Menu.perform { |menu| menu.go_to_projects }
