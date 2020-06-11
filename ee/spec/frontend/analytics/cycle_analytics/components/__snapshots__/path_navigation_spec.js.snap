@@ -4,6 +4,7 @@ exports[`PathNavigation matches snapshot 1`] = `
 <div
   class="gl-path-nav"
   data-testid="gl-path-nav"
+  style="--path-bg-color: #fafafa;"
 >
   <span
     class="gl-path-fade gl-path-fade-left"
