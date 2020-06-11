@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :go_module_version, class: 'Packages::GoModuleVersion' do
+  factory :go_module_version, class: 'Packages::Go::ModuleVersion' do
     skip_create
 
     initialize_with do
