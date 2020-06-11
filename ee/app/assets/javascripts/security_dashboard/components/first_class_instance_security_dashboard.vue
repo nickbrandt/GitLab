@@ -46,7 +46,6 @@ export default {
       type: String,
       required: true,
     },
-
     vulnerabilitiesExportEndpoint: {
       type: String,
       required: true,
