@@ -6,15 +6,15 @@ module Gitlab
       class BaseTransfer
         include LogHelpers
 
-        attr_reader :file_type, :file_id, :filename, :uploader, :expected_checksum, :request_data
+        attr_reader :file_type, :file_id, :filename, :expected_checksum, :request_data, :resource
 
         TEMP_PREFIX = 'tmp_'.freeze
 
-        def initialize(file_type:, file_id:, request_data:, expected_checksum: nil, filename: nil, uploader: nil)
+        def initialize(resource:, file_type:, file_id:, request_data:, expected_checksum: nil, filename: nil)
+          @resource = resource
           @file_type = file_type
           @file_id = file_id
           @filename = filename
-          @uploader = uploader
           @expected_checksum = expected_checksum
           @request_data = request_data
         end
@@ -84,6 +84,10 @@ module Gitlab
         end
 
         private
+
+        def uploader
+          raise NotImplementedError, "#{self.class} does not implement #{__method__}"
+        end
 
         def skipped_result
           Result.new(success: false, bytes_downloaded: 0, skipped: true)
