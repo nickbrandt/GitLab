@@ -2140,6 +2140,9 @@ msgstr ""
 msgid "Allow users to request access (if visibility is public or internal)"
 msgstr ""
 
+msgid "Allowed Geo IP"
+msgstr ""
+
 msgid "Allowed email domain restriction only permitted for top-level groups"
 msgstr ""
 
@@ -5644,6 +5647,9 @@ msgstr ""
 msgid "Coming soon"
 msgstr ""
 
+msgid "Comma-separated, e.g. '1.1.1.1, 2.2.2.0/24'"
+msgstr ""
+
 msgid "Command"
 msgstr ""
 
@@ -5950,6 +5956,9 @@ msgid "Connection failure"
 msgstr ""
 
 msgid "Connection timed out"
+msgstr ""
+
+msgid "Connection timeout"
 msgstr ""
 
 msgid "Contact sales to upgrade"
@@ -20304,6 +20313,9 @@ msgstr ""
 msgid "Set the milestone to %{milestone_reference}."
 msgstr ""
 
+msgid "Set the timeout in seconds to send a secondary node status to the primary and IPs allowed for the secondary nodes."
+msgstr ""
+
 msgid "Set time estimate"
 msgstr ""
 
@@ -23264,6 +23276,9 @@ msgid "Time from first commit until first comment"
 msgstr ""
 
 msgid "Time from last commit to merge"
+msgstr ""
+
+msgid "Time in seconds"
 msgstr ""
 
 msgid "Time in seconds GitLab will wait for a response from the external service. When the service does not respond in time, access will be denied."
