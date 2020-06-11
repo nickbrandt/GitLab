@@ -5,9 +5,9 @@ module EE
     extend ::Gitlab::Utils::Override
     include ::Gitlab::Utils::StrongMemoize
 
-    attr_reader :label_ids_ordered_by_selection
-
     private
+
+    attr_reader :label_ids_ordered_by_selection
 
     override :filter_params
     def filter_params(issuable)
@@ -26,9 +26,9 @@ module EE
 
     override :filter_labels
     def filter_labels
-      @label_ids_ordered_by_selection = params[:add_label_ids].to_a + params[:label_ids].to_a # rubocop:disable Gitlab/ModuleWithInstanceVariables
-
       super
+
+      @label_ids_ordered_by_selection = params[:add_label_ids].to_a + params[:label_ids].to_a # rubocop:disable Gitlab/ModuleWithInstanceVariables
     end
 
     def update_task_event?
