@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ElasticIndexBulkCronWorker
+class ElasticIndexInitialBulkCronWorker
   include Elastic::BulkCronWorker
 
   feature_category :global_search
@@ -10,6 +10,6 @@ class ElasticIndexBulkCronWorker
   private
 
   def service
-    Elastic::ProcessBookkeepingService.new
+    Elastic::ProcessInitialBookkeepingService.new
   end
 end

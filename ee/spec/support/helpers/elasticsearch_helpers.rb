@@ -4,6 +4,7 @@ module ElasticsearchHelpers
   def ensure_elasticsearch_index!
     # Ensure that any enqueued updates are processed
     Elastic::ProcessBookkeepingService.new.execute
+    Elastic::ProcessInitialBookkeepingService.new.execute
 
     # Make any documents added to the index visible
     refresh_index!
