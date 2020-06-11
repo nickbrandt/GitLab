@@ -342,7 +342,8 @@ RSpec.describe 'geo rake tasks', :geo do
         stub_licensed_features(geo: true)
         stub_current_geo_node(current_node)
 
-        allow(GeoNodeStatus).to receive(:current_node_status).once.and_return(geo_node_status)
+        allow(GeoNodeStatus).to receive(:current_node_status).and_return(geo_node_status)
+        allow(Gitlab.config.geo.registry_replication).to receive(:enabled).and_return(true)
       end
 
       it 'runs with no error' do
@@ -360,6 +361,32 @@ RSpec.describe 'geo rake tasks', :geo do
 
         it 'does not show health status summary' do
           expect { run_rake_task('geo:status') }.not_to output(/Health Status Summary/).to_stdout
+        end
+
+        it 'prints messages for all the checks' do
+          [
+            /Name/,
+            /URL/,
+            /GitLab Version/,
+            /Geo Role/,
+            /Health Status/,
+            /Sync Settings/,
+            /Database replication lag/,
+            /Repositories/,
+            /Verified Repositories/,
+            /Wikis/,
+            /Verified Wikis/,
+            /LFS Objects/,
+            /Attachments/,
+            /CI job artifacts/,
+            /Container repositories/,
+            /Design repositories/,
+            /Repositories Checked/,
+            /Last event ID seen from primary/,
+            /Last status report was/
+          ].each do |text|
+            expect { run_rake_task('geo:status') }.to output(text).to_stdout
+          end
         end
       end
 
