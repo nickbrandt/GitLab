@@ -90,7 +90,7 @@ class Import::FogbugzController < Import::BaseController
   def importable_repos
     repos = client.repos
 
-    already_added_projects_names = already_added_projects.pluck(:import_source)
+    already_added_projects_names = already_added_projects.map(&:import_source)
 
     repos.reject { |repo| already_added_projects_names.include? repo.name }
   end

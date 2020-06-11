@@ -49,8 +49,6 @@ class Import::BitbucketServerController < Import::BaseController
     else
       render json: { errors: _('This namespace has already been taken! Please choose another one.') }, status: :unprocessable_entity
     end
-  rescue BitbucketServer::Connection::ConnectionError => error
-    render json: { errors: _("Unable to connect to server: %{error}") % { error: error } }, status: :unprocessable_entity
   end
 
   def configure
@@ -91,7 +89,7 @@ class Import::BitbucketServerController < Import::BaseController
   def importable_repos
     # Use the import URL to filter beyond what BaseService#find_already_added_projects
     already_added_projects = filter_added_projects('bitbucket_server', bitbucket_repos.map(&:browse_url))
-    already_added_projects_names = already_added_projects.pluck(:import_source)
+    already_added_projects_names = already_added_projects.map(&:import_source)
 
     bitbucket_repos.reject { |repo| already_added_projects_names.include?(repo.browse_url) || !repo.valid? }
   end

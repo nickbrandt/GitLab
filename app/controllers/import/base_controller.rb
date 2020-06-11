@@ -77,10 +77,6 @@ class Import::BaseController < ApplicationController
     NamespaceSerializer.new.represent(namespaces)
   end
 
-  def already_added_project_names
-    @already_added_projects_names ||= already_added_projects.pluck(:import_source) # rubocop:disable CodeReuse/ActiveRecord
-  end
-
   def namespaces
     current_user.manageable_groups_with_routes
   end

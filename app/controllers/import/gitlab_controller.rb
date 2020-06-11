@@ -57,7 +57,7 @@ class Import::GitlabController < Import::BaseController
   def importable_repos
     repos = client.projects(starting_page: 1, page_limit: MAX_PROJECT_PAGES, per_page: PER_PAGE_PROJECTS)
 
-    already_added_projects_names = already_added_projects.pluck(:import_source)
+    already_added_projects_names = already_added_projects.map(&:import_source)
 
     repos.reject { |repo| already_added_projects_names.include? repo["path_with_namespace"] }
   end
