@@ -52,7 +52,7 @@ export default {
 
 <template>
   <security-dashboard-layout>
-    <template #header>
+    <template #sticky>
       <filters :projects="projects" @filterChange="handleFilterChange" />
     </template>
     <group-security-vulnerabilities
