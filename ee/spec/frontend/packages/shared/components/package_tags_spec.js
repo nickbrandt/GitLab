@@ -16,9 +16,9 @@ describe('PackageTags', () => {
     });
   }
 
-  const tagLabel = () => wrapper.find({ ref: 'tagLabel' });
-  const tagBadges = () => wrapper.findAll({ ref: 'tagBadge' });
-  const moreBadge = () => wrapper.find({ ref: 'moreBadge' });
+  const tagLabel = () => wrapper.find('[data-testid="tagLabel"]');
+  const tagBadges = () => wrapper.findAll('[data-testid="tagBadge"]');
+  const moreBadge = () => wrapper.find('[data-testid="moreBadge"]');
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
@@ -68,12 +68,12 @@ describe('PackageTags', () => {
   });
 
   describe('tagBadgeStyle', () => {
-    const defaultStyle = ['badge', 'badge-info', 'd-none'];
+    const defaultStyle = ['badge', 'badge-info', 'gl-display-none'];
 
     it('shows tag badge when there is only one', () => {
       createComponent([mockTags[0]]);
 
-      const expectedStyle = [...defaultStyle, 'd-flex', 'gl-ml-3'];
+      const expectedStyle = [...defaultStyle, 'gl-display-flex', 'gl-ml-3'];
 
       expect(
         tagBadges()
@@ -100,7 +100,7 @@ describe('PackageTags', () => {
       });
 
       const expectedStyleWithoutAppend = [...defaultStyle, 'd-md-flex'];
-      const expectedStyleWithAppend = [...expectedStyleWithoutAppend, 'append-right-4'];
+      const expectedStyleWithAppend = [...expectedStyleWithoutAppend, 'gl-mr-2'];
 
       const allBadges = tagBadges();
 
