@@ -44,6 +44,8 @@ later (once a day). If you need to garbage collect them immediately, run
 
 ## Remove unreferenced LFS files
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/36628) in GitLab 12.10.
+
 Unreferenced LFS files are removed on a daily basis but you can remove them immediately if
 you need to. For example:
 
