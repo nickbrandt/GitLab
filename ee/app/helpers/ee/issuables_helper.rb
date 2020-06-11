@@ -28,6 +28,15 @@ module EE
       data
     end
 
+    override :issue_only_initial_data
+    def issue_only_initial_data(issuable)
+      return {} unless issuable.is_a?(Issue)
+
+      super.merge(
+        publishedIncidentUrl: StatusPage::Storage.details_url(issuable)
+      )
+    end
+
     override :issuable_meta_author_slot
     def issuable_meta_author_slot(author, css_class: nil)
       gitlab_team_member_badge(author, css_class: css_class)
