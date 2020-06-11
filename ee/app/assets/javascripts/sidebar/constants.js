@@ -20,7 +20,7 @@ export const iterationSelectTextMap = {
 };
 
 export const healthStatusForRestApi = {
-  NO_STATUS: null,
+  NO_STATUS: '0',
   [healthStatus.ON_TRACK]: 'on_track',
   [healthStatus.NEEDS_ATTENTION]: 'needs_attention',
   [healthStatus.AT_RISK]: 'at_risk',

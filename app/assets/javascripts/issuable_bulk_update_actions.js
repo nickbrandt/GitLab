@@ -79,8 +79,6 @@ export default {
    */
 
   getFormDataAsObject() {
-    const healthStatusValue = this.form.find('input[name="update[health_status]"]').val();
-
     const formData = {
       update: {
         state_event: this.form.find('input[name="update[state_event]"]').val(),
@@ -88,7 +86,7 @@ export default {
         milestone_id: this.form.find('input[name="update[milestone_id]"]').val(),
         issuable_ids: this.form.find('input[name="update[issuable_ids]"]').val(),
         subscription_event: this.form.find('input[name="update[subscription_event]"]').val(),
-        health_status: healthStatusValue === 'null' ? '0' : healthStatusValue,
+        health_status: this.form.find('input[name="update[health_status]"]').val(),
         add_label_ids: [],
         remove_label_ids: [],
       },

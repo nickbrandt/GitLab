@@ -64,6 +64,19 @@ RSpec.describe Issuable::BulkUpdateService do
             expect(issuable.health_status).to eq('on_track')
           end
         end
+
+        context "when params values are '0'" do
+          let(:params) { { issuable_ids: issuables.map(&:id), health_status: '0' } }
+
+          it 'succeeds and remove values' do
+            expect(subject[:success]).to be_truthy
+            expect(subject[:count]).to eq(issuables.count)
+            issuables.each do |issuable|
+              issuable.reload
+              expect(issuable.health_status).to be_nil
+            end
+          end
+        end
       end
 
       context 'when features are disabled' do
