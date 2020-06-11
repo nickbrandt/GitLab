@@ -20,7 +20,10 @@ class DiffsEntity < Grape::Entity
   end
 
   expose :commit do |diffs, options|
-    CommitEntity.represent(options[:commit], commit_options(options))
+    CommitEntity.represent(
+      options[:commit] || merge_request.commits&.last,
+      commit_options(options)
+    )
   end
 
   expose :context_commits, using: API::Entities::Commit, if: -> (diffs, options) { merge_request&.project&.context_commits_enabled? } do |diffs|
