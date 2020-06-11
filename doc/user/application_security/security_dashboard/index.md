@@ -56,7 +56,6 @@ Use it to find and fix vulnerabilities.
 
 ![Project Security Dashboard](img/project_security_dashboard_v13_0.png)
 
-
 ## Group Security Dashboard
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/6709) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.5.
