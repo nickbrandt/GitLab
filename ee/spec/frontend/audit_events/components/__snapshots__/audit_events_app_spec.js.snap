@@ -5,10 +5,8 @@ exports[`AuditEventsApp when initialized matches the snapshot 1`] = `
   <div
     class="row-content-block second-block pb-0"
   >
-    <form
-      class="filter-form d-flex justify-content-between audit-controls row"
-      method="GET"
-      path="form/path"
+    <div
+      class="d-flex justify-content-between audit-controls row"
     >
       <div
         class="col-lg-auto flex-fill form-group align-items-lg-center pr-lg-8"
@@ -24,17 +22,7 @@ exports[`AuditEventsApp when initialized matches the snapshot 1`] = `
             clearbuttontitle="Clear"
             close-button-title="Close"
             placeholder="Search"
-            value=""
-          />
-           
-          <input
-            name="entity_type"
-            type="hidden"
-          />
-           
-          <input
-            name="entity_id"
-            type="hidden"
+            value="[object Object]"
           />
         </div>
       </div>
@@ -45,14 +33,12 @@ exports[`AuditEventsApp when initialized matches the snapshot 1`] = `
         <div
           class="audit-controls d-flex align-items-lg-center flex-column flex-lg-row col-lg-auto px-0"
         >
-          <date-range-field-stub
-            formelement="[object HTMLFormElement]"
-          />
+          <date-range-field-stub />
            
           <sorting-field-stub />
         </div>
       </div>
-    </form>
+    </div>
   </div>
    
   <audit-events-table-stub

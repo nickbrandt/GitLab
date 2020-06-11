@@ -1,7 +1,5 @@
 <script>
 import { GlNewDropdown, GlNewDropdownHeader, GlNewDropdownItem } from '@gitlab/ui';
-
-import { setUrlParams, queryToObject } from '~/lib/utils/url_utility';
 import { s__ } from '~/locale';
 
 const SORTING_TITLE = s__('SortOptions|Sort by:');
@@ -22,21 +20,24 @@ export default {
     GlNewDropdownHeader,
     GlNewDropdownItem,
   },
-  data() {
-    const { sort: selectedOption } = queryToObject(window.location.search);
-
-    return {
-      selectedOption: selectedOption || SORTING_OPTIONS[0].key,
-    };
+  props: {
+    sortBy: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   computed: {
+    selectedOption() {
+      return this.sortBy || SORTING_OPTIONS[0].key;
+    },
     selectedOptionText() {
       return SORTING_OPTIONS.find(option => option.key === this.selectedOption).text;
     },
   },
   methods: {
-    getItemLink(key) {
-      return setUrlParams({ sort: key });
+    onItemClick(option) {
+      this.$emit('selected', option);
     },
     isChecked(key) {
       return key === this.selectedOption;
@@ -60,7 +61,7 @@ export default {
         :key="option.key"
         :is-check-item="true"
         :is-checked="isChecked(option.key)"
-        :href="getItemLink(option.key)"
+        @click="onItemClick(option.key)"
       >
         {{ option.text }}
       </gl-new-dropdown-item>

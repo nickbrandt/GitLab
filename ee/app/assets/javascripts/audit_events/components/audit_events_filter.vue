@@ -1,6 +1,5 @@
 <script>
 import { GlFilteredSearch } from '@gitlab/ui';
-import { queryToObject } from '~/lib/utils/url_utility';
 import { FILTER_TOKENS, AVAILABLE_TOKEN_TYPES } from '../constants';
 import { availableTokensValidator } from '../validators';
 
@@ -9,6 +8,11 @@ export default {
     GlFilteredSearch,
   },
   props: {
+    defaultSelectedToken: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     enabledTokenTypes: {
       type: Array,
       required: false,
@@ -44,31 +48,24 @@ export default {
       }
       return enabledTokens;
     },
-    id() {
-      return this.searchTerm?.value?.data;
-    },
-    type() {
-      return this.searchTerm?.type;
+    searchValue() {
+      const { searchTerm } = this;
+      return {
+        id: searchTerm?.value?.data,
+        type: searchTerm?.type,
+      };
     },
   },
   created() {
-    this.setSearchTermsFromQuery();
+    const { defaultSelectedToken } = this;
+    if (defaultSelectedToken) {
+      const { id, type } = defaultSelectedToken;
+      this.searchTerms = [{ type, value: { data: id, operator: '=' } }];
+    }
   },
   methods: {
-    // The form logic here will be removed once all the audit
-    // components are migrated into a single Vue application.
-    // https://gitlab.com/gitlab-org/gitlab/-/issues/215363
-    getFormElement() {
-      return this.$refs.input.form;
-    },
-    setSearchTermsFromQuery() {
-      const { entity_type: type, entity_id: value } = queryToObject(window.location.search);
-      if (type && value) {
-        this.searchTerms = [{ type, value: { data: value, operator: '=' } }];
-      }
-    },
-    filteredSearchSubmit() {
-      this.getFormElement().submit();
+    onSubmit() {
+      this.$emit('selected', this.searchValue);
     },
   },
 };
@@ -87,10 +84,7 @@ export default {
       :close-button-title="__('Close')"
       :available-tokens="filterTokens"
       class="gl-h-32 w-100"
-      @submit="filteredSearchSubmit"
+      @submit="onSubmit"
     />
-
-    <input ref="input" v-model="type" type="hidden" name="entity_type" />
-    <input v-model="id" type="hidden" name="entity_id" />
   </div>
 </template>
