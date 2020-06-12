@@ -98,9 +98,16 @@ export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
-export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
+export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch, state }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS);
-  dispatch('typeOfWork/fetchTopRankedGroupLabels');
+  const { selectedLabelIds = [] } = state;
+  // use the filter bar labels if we have them available
+  if (selectedLabelIds.length) {
+    return dispatch('typeOfWork/setTasksByTypeLabels', selectedLabelIds).then(() => {
+      return dispatch('typeOfWork/fetchTasksByTypeData');
+    });
+  }
+  return dispatch('typeOfWork/fetchTopRankedGroupLabels');
 };
 
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
@@ -119,7 +126,10 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
-    .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
+    .catch(error => {
+      // console.log('error', error);
+      return dispatch('receiveCycleAnalyticsDataError', error);
+    });
 };
 
 export const requestGroupStages = ({ commit }) => commit(types.REQUEST_GROUP_STAGES);

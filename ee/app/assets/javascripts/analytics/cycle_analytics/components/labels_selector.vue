@@ -1,7 +1,14 @@
 <script>
 import Api from 'ee/api';
 import { debounce } from 'lodash';
-import { GlDropdown, GlDropdownItem, GlIcon, GlLoadingIcon, GlSearchBoxByType } from '@gitlab/ui';
+import {
+  GlDropdown,
+  GlDropdownItem,
+  GlIcon,
+  GlLoadingIcon,
+  GlSearchBoxByType,
+  GlTooltip,
+} from '@gitlab/ui';
 import { mapGetters } from 'vuex';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
@@ -16,6 +23,7 @@ export default {
     GlIcon,
     GlLoadingIcon,
     GlSearchBoxByType,
+    GlTooltip,
   },
   props: {
     defaultSelectedLabelIds: {
@@ -74,10 +82,13 @@ export default {
     noMatchingLabels() {
       return Boolean(this.searchTerm.length && !this.labels.length);
     },
+    inactiveClasses() {
+      return this.inactive ? 'gl-opacity-3 cursor-not-allowed' : '';
+    },
   },
   watch: {
     searchTerm() {
-      debounce(this.fetchData(), DATA_REFETCH_DELAY);
+      this.search();
     },
   },
   mounted() {
@@ -102,6 +113,9 @@ export default {
           this.loading = false;
         });
     },
+    search: debounce(function debouncedSearch() {
+      this.fetchData();
+    }, DATA_REFETCH_DELAY),
     labelTitle(label) {
       // there are 2 possible endpoints for group labels
       // one returns label.name the other label.title
@@ -133,7 +147,10 @@ export default {
     </template>
     <template>
       <slot name="label-dropdown-list-header">
-        <gl-dropdown-item :active="!selectedLabelId.length" @click.prevent="$emit('clearLabel')"
+        <gl-dropdown-item
+          :class="inactiveClasses"
+          :active="!selectedLabelId.length"
+          @click.prevent="$emit('clearLabel')"
           >{{ __('Select a label') }}
         </gl-dropdown-item>
       </slot>
@@ -163,8 +180,36 @@ export default {
         <div v-show="loading" class="text-center">
           <gl-loading-icon :inline="true" size="md" />
         </div>
-        <div v-show="noMatchingLabels" class="text-secondary">
-          {{ __('No matching labels') }}
+        <div class="mb-3 px-3">
+          <gl-dropdown-item
+            v-for="label in labels"
+            :key="label.id"
+            :class="{
+              'pl-4': !inactive && multiselect && !isSelectedLabel(label.id),
+              'cursor-not-allowed': inactive || disabled,
+            }"
+            :disabled="inactive"
+            :active="!inactive && isSelectedLabel(label.id)"
+            @click.prevent="$emit('selectLabel', label.id, selectedLabelIds)"
+          >
+            <gl-icon
+              v-if="!inactive && multiselect && isSelectedLabel(label.id)"
+              class="text-gray-700 mr-1 vertical-align-middle"
+              name="mobile-issue-close"
+            />
+            <span
+              :style="{ backgroundColor: label.color }"
+              class="d-inline-block dropdown-label-box"
+            >
+            </span>
+            {{ labelTitle(label) }}
+          </gl-dropdown-item>
+          <div v-show="loading" class="text-center">
+            <gl-loading-icon :inline="true" size="md" />
+          </div>
+          <div v-show="noMatchingLabels" class="text-secondary">
+            {{ __('No matching labels') }}
+          </div>
         </div>
       </div>
     </template>

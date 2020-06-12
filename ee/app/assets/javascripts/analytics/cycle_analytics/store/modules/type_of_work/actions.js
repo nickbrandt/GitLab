@@ -73,3 +73,6 @@ export const setTasksByTypeFilters = ({ dispatch, commit }, data) => {
   commit(types.SET_TASKS_BY_TYPE_FILTERS, data);
   dispatch('fetchTasksByTypeData');
 };
+
+export const setTasksByTypeLabels = ({ commit }, data) =>
+  commit(types.SET_TASKS_BY_TYPE_LABELS, data);

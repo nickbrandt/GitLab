@@ -134,6 +134,9 @@ export default {
     hasProject() {
       return this.selectedProjectIds.length > 0;
     },
+    hasLabelFilters() {
+      return Boolean(this.selectedLabels?.length);
+    },
   },
 
   methods: {
@@ -344,7 +347,11 @@ export default {
         </div>
       </div>
       <duration-chart v-if="shouldDisplayDurationChart" class="mt-3" :stages="activeStages" />
-      <type-of-work-charts v-if="shouldDisplayTypeOfWorkCharts" :is-loading="isLoadingTypeOfWork" />
+      <type-of-work-charts
+        v-if="shouldDisplayTypeOfWorkCharts"
+        :is-loading="isLoadingTypeOfWork"
+        :can-select-labels="!hasLabelFilters"
+      />
     </div>
   </div>
 </template>

@@ -182,6 +182,7 @@ describe('Cycle Analytics component', () => {
   afterEach(() => {
     wrapper.destroy();
     mock.restore();
+
     wrapper = null;
   });
 

@@ -19,7 +19,8 @@ export default () => ({
   selectedAuthor: null,
   selectedMilestone: null,
   selectedAssignees: [],
-  selectedLabels: [],
+  selectedLabels: [], // NOTE: Filters for the VSA endpoints use label name
+  selectedLabelIds: [], // NOTE: The tasks by type chart uses labelIds
 
   currentStageEvents: [],
 

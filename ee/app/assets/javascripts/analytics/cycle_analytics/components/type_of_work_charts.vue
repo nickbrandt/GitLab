@@ -10,6 +10,13 @@ import { TASKS_BY_TYPE_SUBJECT_ISSUE } from '../constants';
 export default {
   name: 'TypeOfWorkCharts',
   components: { GlLoadingIcon, TasksByTypeChart, TasksByTypeFilters },
+  props: {
+    canSelectLabels: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
   computed: {
     ...mapState('typeOfWork', ['isLoadingTasksByTypeChart', 'isLoadingTasksByTypeChartTopLabels']),
     ...mapGetters('typeOfWork', ['selectedTasksByTypeFilters', 'tasksByTypeChartData']),
@@ -71,6 +78,7 @@ export default {
         :has-data="hasData"
         :selected-label-ids="selectedLabelIdsFilter"
         :subject-filter="selectedSubjectFilter"
+        :can-select-labels="canSelectLabels"
         @updateFilter="onUpdateFilter"
       />
       <tasks-by-type-chart

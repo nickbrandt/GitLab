@@ -5,6 +5,7 @@ import tasksByTypeStore from 'ee/analytics/cycle_analytics/store/modules/type_of
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_chart.vue';
 import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_filters.vue';
+import LabelsSelector from 'ee/analytics/cycle_analytics/components/labels_selector.vue';
 import { tasksByTypeData, taskByTypeFilters } from '../mock_data';
 import {
   TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST,
@@ -26,6 +27,7 @@ const fakeStore = ({ initialGetters, initialState }) =>
         getters: {
           tasksByTypeChartData: () => tasksByTypeData,
           selectedTasksByTypeFilters: () => taskByTypeFilters,
+          currentGroupPath: () => 'fake/group/path',
           ...initialGetters,
         },
         state: {
@@ -36,11 +38,12 @@ const fakeStore = ({ initialGetters, initialState }) =>
   });
 
 describe('TypeOfWorkCharts', () => {
-  function createComponent({ stubs = {}, initialGetters, initialState } = {}) {
+  function createComponent({ stubs = {}, initialGetters, initialState, props = {} } = {}) {
     return shallowMount(TypeOfWorkCharts, {
       localVue,
       store: fakeStore({ initialGetters, initialState }),
       methods: actionSpies,
+      propsData: { canSelectLabels: true, ...props },
       stubs: {
         TasksByTypeChart: true,
         TasksByTypeFilters: true,
@@ -51,6 +54,7 @@ describe('TypeOfWorkCharts', () => {
 
   let wrapper = null;
 
+  const findLabelSelectorFilter = _wrapper => _wrapper.find('labelsselector-stub');
   const findSubjectFilters = _wrapper => _wrapper.find(TasksByTypeFilters);
   const findTasksByTypeChart = _wrapper => _wrapper.find(TasksByTypeChart);
   const findLoader = _wrapper => _wrapper.find(GlLoadingIcon);
@@ -125,6 +129,33 @@ describe('TypeOfWorkCharts', () => {
 
     it('renders loading icon', () => {
       expect(findLoader(wrapper).exists()).toBe(true);
+    });
+  });
+
+  describe('canSelectLabels', () => {
+    describe('set to true', () => {
+      beforeEach(() => {
+        wrapper = createComponent({
+          stubs: { TasksByTypeFilters, LabelsSelector: true },
+        });
+      });
+
+      it('does not set the labels selector to inactive', () => {
+        expect(findLabelSelectorFilter(wrapper).attributes('inactive')).toBeUndefined();
+      });
+    });
+
+    describe('set to false', () => {
+      beforeEach(() => {
+        wrapper = createComponent({
+          props: { canSelectLabels: false },
+          stubs: { TasksByTypeFilters, LabelsSelector: true },
+        });
+      });
+
+      it('sets the labels selector to inactive', () => {
+        expect(findLabelSelectorFilter(wrapper).attributes('inactive')).toBe('true');
+      });
     });
   });
 });

@@ -89,6 +89,9 @@ export default {
     },
   },
   TASKS_BY_TYPE_FILTERS,
+  INACTIVE_TOOLTIP_TEXT: s__(
+    'CycleAnalytics|Currently displaying data using labels from the filter bar',
+  ),
 };
 </script>
 <template>
