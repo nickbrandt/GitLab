@@ -5,6 +5,7 @@ module Geo
     module Primary
       class ShardWorker < Geo::Scheduler::Primary::SchedulerWorker # rubocop:disable Scalability/IdempotentWorker
         sidekiq_options retry: false
+        loggable_arguments 0
 
         attr_accessor :shard_name
 

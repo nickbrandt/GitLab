@@ -5,6 +5,7 @@ class ElasticNamespaceIndexerWorker # rubocop:disable Scalability/IdempotentWork
 
   feature_category :global_search
   sidekiq_options retry: 2
+  loggable_arguments 1
 
   def perform(namespace_id, operation)
     return true unless Gitlab::CurrentSettings.elasticsearch_indexing?
