@@ -61,7 +61,7 @@ will help you to quickly create a deployment:
 1. Navigate to your project's **CI/CD > Pipelines** page, and run a pipeline on any branch.
 1. When the pipeline has run successfully, graphs will be available on the **Operations > Metrics** page.
 
-![Monitoring Dashboard](img/prometheus_monitoring_dashboard_v12_8.png)
+![Monitoring Dashboard](img/prometheus_monitoring_dashboard_v13_1.png)
 
 #### Using the Metrics Dashboard
 
