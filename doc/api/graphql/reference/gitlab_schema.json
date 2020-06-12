@@ -34929,20 +34929,6 @@
               "deprecationReason": null
             },
             {
-              "name": "pipeline",
-              "description": "Pipeline that created the test report",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "Pipeline",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "state",
               "description": "State of the test report",
               "args": [
