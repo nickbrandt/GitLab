@@ -5,8 +5,8 @@ module EE
     module GitAccess
       prepend GeoGitAccess
       extend ::Gitlab::Utils::Override
-      include ActionView::Helpers::SanitizeHelper
       include PathLocksHelper
+      include SubscribableBannerHelper
 
       override :check
       def check(cmd, changes)
@@ -98,9 +98,13 @@ module EE
 
       def check_if_license_blocks_changes!
         if ::License.block_changes?
-          message = ::LicenseHelper.license_message(signed_in: true, is_admin: (user && user.admin?))
+          message = license_message(signed_in: true, is_admin: (user && user.admin?))
           raise ::Gitlab::GitAccess::ForbiddenError, strip_tags(message)
         end
+      end
+
+      def strip_tags(html)
+        Rails::Html::FullSanitizer.new.sanitize(html)
       end
 
       override :check_size_limit?

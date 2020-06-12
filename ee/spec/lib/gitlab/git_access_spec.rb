@@ -600,6 +600,18 @@ RSpec.describe Gitlab::GitAccess do
         end
       end
 
+      context "when license blocks changes" do
+        before do
+          create_current_license(starts_at: 1.month.ago.to_date, block_changes_at: Date.current, notify_admins_at: Date.current)
+          user.update_attribute(:admin, true)
+          project.add_role(user, :developer)
+        end
+
+        it 'raises an error' do
+          expect { push_changes(changes[:any]) }.to raise_error(Gitlab::GitAccess::ForbiddenError, /Your subscription will expire/)
+        end
+      end
+
       context "group-specific access control" do
         let(:user) { create(:user) }
         let(:group) { create(:group) }
