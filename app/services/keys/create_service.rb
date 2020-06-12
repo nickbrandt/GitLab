@@ -2,6 +2,8 @@
 
 module Keys
   class CreateService < ::Keys::BaseService
+    attr_accessor :current_user
+
     def initialize(current_user, params = {})
       @current_user, @params = current_user, params
       @ip_address = @params.delete(:ip_address)
