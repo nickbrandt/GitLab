@@ -22834,6 +22834,12 @@ msgstr ""
 msgid "This %{issuable} is locked. Only <strong>project members</strong> can comment."
 msgstr ""
 
+msgid "This %{noteableTypeText} is %{confidentialLinkStart}confidential%{linkEnd} and %{lockedLinkStart}locked%{linkEnd}."
+msgstr ""
+
+msgid "This %{noteableTypeText} is locked."
+msgstr ""
+
 msgid "This %{viewer} could not be displayed because %{reason}. You can %{options} instead."
 msgstr ""
 
@@ -22981,10 +22987,7 @@ msgstr ""
 msgid "This is a Work in Progress"
 msgstr ""
 
-msgid "This is a confidential epic."
-msgstr ""
-
-msgid "This is a confidential issue."
+msgid "This is a confidential %{noteableTypeText}."
 msgstr ""
 
 msgid "This is a delayed job to run in %{remainingTime}"
@@ -23011,9 +23014,6 @@ msgstr ""
 msgid "This is your current session"
 msgstr ""
 
-msgid "This issue is %{confidentialLinkStart}confidential%{linkEnd} and %{lockedLinkStart}locked%{linkEnd}."
-msgstr ""
-
 msgid "This issue is confidential"
 msgstr ""
 
@@ -23021,9 +23021,6 @@ msgid "This issue is currently blocked by the following issues: %{issues}."
 msgstr ""
 
 msgid "This issue is in a child epic of the filtered epic"
-msgstr ""
-
-msgid "This issue is locked."
 msgstr ""
 
 msgid "This job depends on other jobs with expired/erased artifacts: %{invalid_dependencies}"
@@ -26847,6 +26844,9 @@ msgid "entries cannot be nil"
 msgstr ""
 
 msgid "entries cannot contain HTML tags"
+msgstr ""
+
+msgid "epic"
 msgstr ""
 
 msgid "error"
