@@ -1824,7 +1824,7 @@ input CreateSnippetInput {
   """
   Content of the snippet
   """
-  content: String!
+  content: String
 
   """
   Description of the snippet
@@ -1835,6 +1835,11 @@ input CreateSnippetInput {
   File name of the snippet
   """
   fileName: String
+
+  """
+  The snippet files to create
+  """
+  files: [SnippetFileInputType!]
 
   """
   The project full path the snippet is associated with
@@ -11708,6 +11713,41 @@ type SnippetEdge {
   The item at the end of the edge.
   """
   node: Snippet
+}
+
+"""
+Type of a snippet file input action
+"""
+enum SnippetFileInputActionEnum {
+  create
+  delete
+  move
+  update
+}
+
+"""
+Represents an action to perform over a snippet file
+"""
+input SnippetFileInputType {
+  """
+  Type of input action
+  """
+  action: SnippetFileInputActionEnum!
+
+  """
+  Snippet file content
+  """
+  content: String
+
+  """
+  Path of the snippet file
+  """
+  filePath: String!
+
+  """
+  Previous path of the snippet file
+  """
+  previousPath: String
 }
 
 type SnippetPermissions {
