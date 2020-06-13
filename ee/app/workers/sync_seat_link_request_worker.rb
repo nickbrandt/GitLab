@@ -5,6 +5,9 @@ class SyncSeatLinkRequestWorker
 
   feature_category :billing
 
+  # Retry for up to approximately 6 days
+  sidekiq_options retry: 20
+
   idempotent!
   worker_has_external_dependencies!
 
