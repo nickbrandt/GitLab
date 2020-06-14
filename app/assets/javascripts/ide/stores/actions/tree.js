@@ -27,20 +27,6 @@ export const handleTreeEntryAction = ({ state, commit, dispatch }, path) => {
   dispatch('showTreeEntry', path);
 };
 
-export const setDirectoryData = ({ state, commit }, { branchId, treeList }) => {
-  const projectId = state.currentProjectId;
-  const selectedTree = state.trees[`${projectId}/${branchId}`];
-
-  commit(types.SET_DIRECTORY_DATA, {
-    treePath: `${projectId}/${branchId}`,
-    data: treeList,
-  });
-  commit(types.TOGGLE_LOADING, {
-    entry: selectedTree,
-    forceValue: false,
-  });
-};
-
 export const getFiles = ({ state, dispatch }, payload = {}) => {
   const projectPath = state.project.path_with_namespace;
   const { branchId, ref = branchId } = payload;

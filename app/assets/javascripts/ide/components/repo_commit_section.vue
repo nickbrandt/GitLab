@@ -22,7 +22,7 @@ export default {
       return Boolean(this.someUncommittedChanges || this.lastCommitMsg);
     },
     activeFileKey() {
-      return this.activeFile ? this.activeFile.key : null;
+      return this.activeFile?.path;
     },
   },
   watch: {

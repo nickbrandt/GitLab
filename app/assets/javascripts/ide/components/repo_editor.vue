@@ -49,6 +49,7 @@ export default {
       'editorTheme',
       'entries',
       'currentProjectId',
+      'activeFilePath',
     ]),
     ...mapState('fileSystem', ['files']),
     ...mapState('editor', ['fileInfos']),
@@ -112,9 +113,6 @@ export default {
     },
   },
   watch: {
-    fileInfo(newVal) {
-      console.log(newVal);
-    },
     file(newVal, oldVal) {
       if (oldVal.pending) {
         this.removePendingTab(oldVal);
@@ -252,12 +250,7 @@ export default {
     setupEditor() {
       if (!this.file || !this.editor.instance) return;
 
-      const head = this.getStagedFile(this.file.path);
-
-      this.model = this.editor.createModel(
-        this.file,
-        this.file.staged && this.file.key.indexOf('unstaged-') === 0 ? head : null,
-      );
+      this.model = this.editor.createModel(this.file, this.file.path);
 
       if (this.viewer === viewerTypes.mr && this.file.mrChange) {
         this.editor.attachMergeRequestModel(this.model);
@@ -269,7 +262,7 @@ export default {
 
       this.model.onChange(model => {
         const { file } = model;
-        if (!file.active) return;
+        if (file.path !== this.activeFilePath) return;
 
         const monacoModel = model.getModel();
         const content = monacoModel.getValue();

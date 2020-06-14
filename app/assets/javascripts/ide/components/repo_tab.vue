@@ -1,5 +1,5 @@
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import { __, sprintf } from '~/locale';
 
 import FileIcon from '~/vue_shared/components/file_icon.vue';
@@ -26,6 +26,10 @@ export default {
     };
   },
   computed: {
+    ...mapState(['activeFilePath']),
+    isActive() {
+      return this.tab.path === this.activeFilePath;
+    },
     closeLabel() {
       if (this.fileHasChanged) {
         return sprintf(__(`%{tabname} changed`), { tabname: this.tab.name });
@@ -45,7 +49,7 @@ export default {
   methods: {
     ...mapActions(['closeFile', 'updateDelayViewerUpdated', 'openPendingTab']),
     clickFile(tab) {
-      if (tab.active) return;
+      if (this.isActive) return;
 
       this.updateDelayViewerUpdated(true);
 
@@ -72,7 +76,7 @@ export default {
 <template>
   <li
     :class="{
-      active: tab.active,
+      active: isActive,
       disabled: tab.pending,
     }"
     @click="clickFile(tab)"

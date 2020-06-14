@@ -35,7 +35,7 @@ export const closeFile = ({ commit, state, dispatch }, file) => {
     dispatch('goToFileUrl');
   }
 
-  eventHub.$emit(`editor.update.model.dispose.${file.key}`);
+  eventHub.$emit(`editor.update.model.dispose.${file.path}`);
 };
 
 export const goToFileUrl = ({ state, dispatch }, path) => {
@@ -168,8 +168,8 @@ export const discardFileChanges = ({ dispatch, state, commit, getters }, path) =
 
   commit(types.REMOVE_FILE_FROM_CHANGED, path);
 
-  eventHub.$emit(`editor.update.model.new.content.${file.key}`, file.content);
-  eventHub.$emit(`editor.update.model.dispose.unstaged-${file.key}`, file.content);
+  eventHub.$emit(`editor.update.model.new.content.${file.path}`, file.content);
+  eventHub.$emit(`editor.update.model.dispose.unstaged-${file.path}`, file.content);
 };
 
 export const stageChange = ({ state, commit, dispatch, getters }, path) => {
@@ -180,7 +180,7 @@ export const stageChange = ({ state, commit, dispatch, getters }, path) => {
   commit(types.SET_LAST_COMMIT_MSG, '');
 
   if (stagedFile) {
-    eventHub.$emit(`editor.update.model.new.content.staged-${stagedFile.key}`, stagedFile.content);
+    eventHub.$emit(`editor.update.model.new.content.staged-${stagedFile.path}`, stagedFile.content);
   }
 
   const file = getters.getStagedFile(path);
@@ -209,7 +209,7 @@ export const unstageChange = ({ state, commit, dispatch, getters }, path) => {
 };
 
 export const openPendingTab = ({ commit, dispatch, getters, state }, { file, keyPrefix }) => {
-  if (getters.activeFile && getters.activeFile.key === `${keyPrefix}-${file.path}`) return false;
+  if (getters.activeFile && getters.activeFile.path === `${file.path}`) return false;
 
   state.openFiles.forEach(f => eventHub.$emit(`editor.update.model.dispose.${f}`));
 

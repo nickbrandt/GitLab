@@ -47,7 +47,7 @@ export default {
       return `${getCommitIconMap(this.file).class} ml-auto mr-auto`;
     },
     fullKey() {
-      return `${this.keyPrefix}-${this.file.key}`;
+      return `${this.keyPrefix}-${this.file.path}`;
     },
     isActive() {
       return this.activeFileKey === this.fullKey;

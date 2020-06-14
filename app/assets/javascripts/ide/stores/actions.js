@@ -240,7 +240,7 @@ export const renameEntry = ({ dispatch, commit, state, getters }, { path, name, 
     const isReset = isRevert && !newEntry.changed && !newEntry.tempFile;
     const isInChanges = state.changedFiles
       .concat(state.stagedFiles)
-      .some(({ key }) => key === newEntry.key);
+      .some(({ key }) => key === newEntry.path);
 
     if (isReset) {
       commit(types.REMOVE_FILE_FROM_STAGED_AND_CHANGED, newEntry);
@@ -249,7 +249,7 @@ export const renameEntry = ({ dispatch, commit, state, getters }, { path, name, 
     }
 
     if (!newEntry.tempFile) {
-      eventHub.$emit(`editor.update.model.dispose.${entry.key}`);
+      eventHub.$emit(`editor.update.model.dispose.${entry.path}`);
     }
 
     if (newEntry.opened) {

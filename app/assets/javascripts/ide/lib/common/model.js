@@ -9,7 +9,7 @@ export default class Model {
     this.disposable = new Disposable();
     this.file = file;
     this.head = head;
-    this.content = file.content !== '' || file.deleted ? file.content : file.raw;
+    this.content = file.content;
     this.options = { ...defaultModelOptions };
 
     this.disposable.add(
@@ -40,9 +40,9 @@ export default class Model {
     this.updateNewContent = this.updateNewContent.bind(this);
     this.dispose = this.dispose.bind(this);
 
-    eventHub.$on(`editor.update.model.dispose.${this.file.key}`, this.dispose);
-    eventHub.$on(`editor.update.model.content.${this.file.key}`, this.updateContent);
-    eventHub.$on(`editor.update.model.new.content.${this.file.key}`, this.updateNewContent);
+    eventHub.$on(`editor.update.model.dispose.${this.file.path}`, this.dispose);
+    eventHub.$on(`editor.update.model.content.${this.file.path}`, this.updateContent);
+    eventHub.$on(`editor.update.model.new.content.${this.file.path}`, this.updateNewContent);
   }
 
   get url() {
@@ -54,7 +54,7 @@ export default class Model {
   }
 
   get path() {
-    return this.file.key;
+    return this.file.path;
   }
 
   getModel() {
@@ -126,9 +126,9 @@ export default class Model {
 
     this.events.clear();
 
-    eventHub.$off(`editor.update.model.dispose.${this.file.key}`, this.dispose);
-    eventHub.$off(`editor.update.model.content.${this.file.key}`, this.updateContent);
-    eventHub.$off(`editor.update.model.new.content.${this.file.key}`, this.updateNewContent);
+    eventHub.$off(`editor.update.model.dispose.${this.file.path}`, this.dispose);
+    eventHub.$off(`editor.update.model.content.${this.file.path}`, this.updateContent);
+    eventHub.$off(`editor.update.model.new.content.${this.file.path}`, this.updateNewContent);
 
     this.disposable.dispose();
   }
