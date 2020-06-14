@@ -97,3 +97,7 @@ export const packageJsonPath = 'package.json';
 
 export const SIDE_LEFT = 'left';
 export const SIDE_RIGHT = 'right';
+
+export const FS_TYPE_BLOB = 'blob';
+export const FS_TYPE_TREE = 'tree';
+export const FS_ROOT_PATH = '';

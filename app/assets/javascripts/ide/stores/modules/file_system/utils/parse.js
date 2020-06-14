@@ -1,39 +1,8 @@
 /* eslint-disable import/prefer-default-export */
+import { FS_TYPE_BLOB, FS_TYPE_TREE, FS_ROOT_PATH } from '../../../../constants';
 import { insertIntoTree } from './tree';
 import { splitPath } from './path';
-
-const TYPE_BLOB = 'blob';
-const TYPE_TREE = 'tree';
-
-const ROOT_PATH = '';
-
-const createBaseFileObject = (type, { path = ROOT_PATH, name = ROOT_PATH }) => {
-  return {
-    type,
-    timestamp: 0,
-    path,
-    name,
-  };
-};
-
-const createBlob = (...args) => {
-  return {
-    ...createBaseFileObject(TYPE_BLOB, ...args),
-    isLoaded: false,
-    isLoading: false,
-    content: '',
-    isBinary: false,
-    size: 0,
-  };
-};
-
-const createTree = (...args) => {
-  return {
-    ...createBaseFileObject(TYPE_TREE, ...args),
-    children: [],
-    opened: false,
-  };
-};
+import { createBlob, createTree } from './models';
 
 const insertEntry = (files, path, type, createFn) => {
   if (!path || files[path]) {
@@ -46,7 +15,7 @@ const insertEntry = (files, path, type, createFn) => {
     [path]: createFn({ path, name }),
   });
 
-  insertEntry(files, parentPath, TYPE_TREE, createTree);
+  insertEntry(files, parentPath, FS_TYPE_TREE, createTree);
 
   insertIntoTree(files[parentPath], type, name);
 };
@@ -55,10 +24,10 @@ export const parseToFileObjects = paths => {
   const files = {};
 
   const rootTree = createTree({});
-  files[ROOT_PATH] = rootTree;
+  files[FS_ROOT_PATH] = rootTree;
 
   paths.forEach(path => {
-    insertEntry(files, path, TYPE_BLOB, createBlob);
+    insertEntry(files, path, FS_TYPE_BLOB, createBlob);
   });
 
   return files;

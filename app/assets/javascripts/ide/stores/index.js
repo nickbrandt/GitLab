@@ -14,6 +14,8 @@ import paneModule from './modules/pane';
 import clientsideModule from './modules/clientside';
 import routerModule from './modules/router';
 import editorModule from './modules/editor';
+import gitModule from './modules/git';
+import { setupGitWatcher } from './modules/git/utils/setup';
 
 Vue.use(Vuex);
 
@@ -33,9 +35,16 @@ export const createStoreOptions = () => ({
     clientside: clientsideModule(),
     router: routerModule,
     editor: editorModule,
+    git: gitModule,
   },
 });
 
-export const createStore = () => new Vuex.Store(createStoreOptions());
+export const createStore = () => {
+  const store = new Vuex.Store(createStoreOptions());
+
+  setupGitWatcher(store);
+
+  return store;
+};
 
 export default createStore();

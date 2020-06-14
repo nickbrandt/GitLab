@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+import Vue from 'vue';
 import * as types from './mutation_types';
 import { getParentPaths } from './utils/path';
 import timestamper from './utils/timestamp';
@@ -33,7 +34,9 @@ const setOpenedTrue = setOpened(true);
 
 export default {
   [types.SET_FILES](state, files) {
-    Object.assign(state, { files });
+    Object.keys(files).forEach(key => {
+      Vue.set(state.files, key, files[key]);
+    });
   },
   [types.SET_FILE_LOADING](state, { path, isLoading }) {
     updateEntry(state, path, file => {
