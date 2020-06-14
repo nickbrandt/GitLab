@@ -8,6 +8,7 @@ describe('Epic Warning Component', () => {
 
   const findIcon = () => wrapper.find(GlIcon);
   const findConfidentialBlock = () => wrapper.find({ ref: 'confidential' });
+  const findEpicWarning = () => wrapper.find({ ref: 'epicWarning' });
 
   const createComponent = (props, isNoteableEpic = true) => {
     wrapper = shallowMount(EpicWarning, {
@@ -60,9 +61,12 @@ describe('Epic Warning Component', () => {
   });
 
   describe('when noteable type is not epic', () => {
-    it('does not render itself', () => {
+    beforeEach(() => {
       createComponent({ isConfidential: true }, false);
-      expect(wrapper.find('.issuable-note-warning').exists()).toBe(false);
+    });
+
+    it('does not render itself', () => {
+      expect(findEpicWarning().exists()).toBe(false);
     });
   });
 });

@@ -28,7 +28,7 @@ export default {
 </script>
 
 <template>
-  <div v-if="isNoteableTypeEpic && isConfidential" class="issuable-note-warning">
+  <div v-if="isNoteableTypeEpic && isConfidential" ref="epicWarning" class="issuable-note-warning">
     <gl-icon name="eye-slash" :size="16" class="icon" />
     <span ref="confidential">
       {{ __('This is a confidential epic.') }}
