@@ -17,7 +17,7 @@ export const handleTreeEntryAction = ({ state, commit, dispatch }, path) => {
     // Disabling for now since there's a collision between this being called and `ide_tree_list` calling `toggleTreeOpen`
     // dispatch('toggleTreeOpen', path);
   } else if (entry.type === 'blob') {
-    if (!entry.opened) {
+    if (!state.openFiles.some(x => x === entry.path)) {
       commit(types.TOGGLE_FILE_OPEN, path);
     }
 

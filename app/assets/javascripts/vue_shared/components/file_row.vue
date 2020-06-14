@@ -1,7 +1,6 @@
 <script>
 import FileHeader from '~/vue_shared/components/file_row_header.vue';
 import FileIcon from '~/vue_shared/components/file_icon.vue';
-import { escapeFileUrl } from '~/lib/utils/url_utility';
 
 export default {
   name: 'FileRow',
@@ -18,10 +17,15 @@ export default {
       type: Number,
       required: true,
     },
-    getUrl: {
+    isFileOpen: {
       type: Function,
       required: false,
-      default: () => () => '',
+      default: () => file => file.opened,
+    },
+    isFileActive: {
+      type: Function,
+      required: false,
+      default: () => file => file.active,
     },
   },
   computed: {
@@ -31,8 +35,11 @@ export default {
     isBlob() {
       return this.file.type === 'blob';
     },
-    fileUrl() {
-      return this.getUrl(this.file);
+    isOpen() {
+      return this.isFileOpen(this.file);
+    },
+    isActive() {
+      return this.isFileActive(this.file);
     },
     levelIndentation() {
       return {
@@ -41,10 +48,10 @@ export default {
     },
     fileClass() {
       return {
-        'file-open': this.isBlob && this.file.opened,
-        'is-active': this.isBlob && this.file.active,
+        'file-open': this.isBlob && this.isOpen,
+        'is-active': this.isBlob && this.isActive,
         folder: this.isTree,
-        'is-open': this.file.opened,
+        'is-open': this.isOpen,
       };
     },
     textForTitle() {
@@ -53,7 +60,7 @@ export default {
     },
   },
   watch: {
-    'file.active': function fileActiveWatch(active) {
+    isActive: function fileActiveWatch(active) {
       if (this.file.type === 'blob' && active) {
         this.scrollIntoView();
       }

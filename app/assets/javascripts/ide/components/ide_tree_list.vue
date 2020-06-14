@@ -23,7 +23,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['currentBranchId', 'currentProjectId']),
+    ...mapState(['currentBranchId', 'currentProjectId', 'activeFilePath', 'openFiles']),
     ...mapState('fileSystem', ['files']),
     ...mapGetters(['currentProject', 'currentTree']),
     showLoading() {
@@ -37,6 +37,12 @@ export default {
     ...mapActions(['updateViewer', 'toggleTreeOpen', 'goToFileUrl']),
     clickFile(file) {
       this.goToFileUrl(file.path);
+    },
+    isFileOpen(file) {
+      return this.openFiles.some(x => x === file.path);
+    },
+    isFileActive(file) {
+      return file.path === this.activeFilePath;
     },
   },
   IdeFileRow,
@@ -64,6 +70,8 @@ export default {
             :level="0"
             :files="files"
             :file-row-component="$options.IdeFileRow"
+            :is-file-open="isFileOpen"
+            :is-file-active="isFileActive"
             @toggleTreeOpen="toggleTreeOpen"
             @clickFile="clickFile"
           />

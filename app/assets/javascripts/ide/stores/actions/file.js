@@ -107,20 +107,8 @@ export const getRawFileData = ({ state, commit, dispatch, getters }, { path }) =
   });
 };
 
-export const changeFileContent = ({ commit, state, getters }, { path, content }) => {
-  const file = state.entries[path];
-  commit(types.UPDATE_FILE_CONTENT, {
-    path,
-    content,
-  });
-
-  const indexOfChangedFile = state.changedFiles.findIndex(f => f.path === path);
-
-  if (file.changed && indexOfChangedFile === -1) {
-    commit(types.STAGE_CHANGE, { path, diffInfo: getters.getDiffInfo(path) });
-  } else if (!file.changed && !file.tempFile && indexOfChangedFile !== -1) {
-    commit(types.REMOVE_FILE_FROM_CHANGED, path);
-  }
+export const changeFileContent = ({ dispatch }, payload) => {
+  dispatch('fileSystem/setFileContent', payload);
 };
 
 export const restoreOriginalFile = ({ dispatch, state, commit }, path) => {

@@ -48,3 +48,7 @@ export const openTree = ({ commit }, payload) => {
 export const openParents = ({ commit }, path) => {
   commit(types.OPEN_PARENTS, path);
 };
+
+export const setFileContent = ({ commit }, payload) => {
+  commit(types.SET_FILE_CONTENT, payload);
+};

@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import * as types from './mutation_types';
 import { getParentPaths } from './utils/path';
+import timestamper from './utils/timestamp';
 
 const updateEntry = (state, path, fn) => {
   const entry = state.files[path];
@@ -10,6 +11,17 @@ const updateEntry = (state, path, fn) => {
   }
 
   fn(entry);
+};
+const updateTimestamp = (state, path) => {
+  const timestamp = timestamper.next();
+
+  getParentPaths(path)
+    .concat(path)
+    .forEach(p => {
+      updateEntry(state, p, file => {
+        file.timestamp = timestamp;
+      });
+    });
 };
 const setOpened = val => entry => {
   entry.opened = val;
@@ -29,13 +41,19 @@ export default {
     });
   },
   [types.SET_FILE_DATA](state, { path, data }) {
-    console.log(data);
     updateEntry(state, path, file => {
       file.isBinary = data.binary;
       file.content = data.content;
       file.size = data.size;
       file.isLoaded = true;
     });
+    updateTimestamp(state, path);
+  },
+  [types.SET_FILE_CONTENT](state, { path, content }) {
+    updateEntry(state, path, file => {
+      file.content = content;
+    });
+    updateTimestamp(state, path);
   },
   [types.OPEN_PARENTS](state, path) {
     getParentPaths(path).forEach(parentPath => {
