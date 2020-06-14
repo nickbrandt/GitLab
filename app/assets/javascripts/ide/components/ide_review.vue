@@ -24,9 +24,7 @@ export default {
   },
   mounted() {
     if (this.activeFile && this.activeFile.pending && !this.activeFile.deleted) {
-      this.$router.push(`/project${this.activeFile.url}`, () => {
-        this.updateViewer('editor');
-      });
+      this.goToFileUrl(this.activeFile.path);
     } else if (this.activeFile && this.activeFile.deleted) {
       this.resetOpenFiles();
     }
@@ -36,7 +34,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions(['updateViewer', 'resetOpenFiles']),
+    ...mapActions(['updateViewer', 'resetOpenFiles', 'goToFileUrl']),
   },
 };
 </script>

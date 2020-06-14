@@ -47,7 +47,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['closeFile', 'updateDelayViewerUpdated', 'openPendingTab']),
+    ...mapActions(['closeFile', 'updateDelayViewerUpdated', 'openPendingTab', 'goToFileUrl']),
     clickFile(tab) {
       if (this.isActive) return;
 
@@ -56,7 +56,7 @@ export default {
       if (tab.pending) {
         this.openPendingTab({ file: tab, keyPrefix: tab.staged ? 'staged' : 'unstaged' });
       } else {
-        this.$router.push(`/project${tab.url}`);
+        this.goToFileUrl(tab.path);
       }
     },
     mouseOverTab() {
@@ -83,7 +83,7 @@ export default {
     @mouseover="mouseOverTab"
     @mouseout="mouseOutTab"
   >
-    <div :title="tab.url" class="multi-file-tab">
+    <div :title="tab.path" class="multi-file-tab">
       <file-icon :file-name="tab.name" :size="16" />
       {{ tab.name }}
       <file-status-icon :file="tab" />

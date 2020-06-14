@@ -68,7 +68,7 @@ export default {
       document.querySelector('.navbar-gitlab').classList.add(`theme-${this.themeName}`);
   },
   methods: {
-    ...mapActions(['toggleFileFinder']),
+    ...mapActions(['toggleFileFinder', 'goToFileUrl']),
     onBeforeUnload(e = {}) {
       const returnValue = __('Are you sure you want to lose unsaved changes?');
 
@@ -80,7 +80,7 @@ export default {
       return returnValue;
     },
     openFile(file) {
-      this.$router.push(`/project${file.url}`);
+      this.goToFileUrl(file.path);
     },
     createNewFile() {
       this.$refs.newModal.open(modalTypes.blob);

@@ -253,7 +253,7 @@ export const renameEntry = ({ dispatch, commit, state, getters }, { path, name, 
     }
 
     if (newEntry.opened) {
-      dispatch('router/push', `/project${newEntry.url}`, { root: true });
+      dispatch('goToFileUrl', newEntry.path);
     }
   }
 

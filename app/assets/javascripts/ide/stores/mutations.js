@@ -204,8 +204,6 @@ export default {
     const newPath = parentPath ? `${parentPath}/${name}` : name;
     const isRevert = newPath === oldEntry.prevPath;
 
-    const newUrl = replaceFileUrl(oldEntry.url, oldEntry.path, newPath);
-
     const newKey = oldEntry.key.replace(new RegExp(oldEntry.path, 'g'), newPath);
 
     const baseProps = {
@@ -213,7 +211,6 @@ export default {
       name,
       id: newPath,
       path: newPath,
-      url: newUrl,
       key: newKey,
       parentPath: parentPath || '',
     };
@@ -232,7 +229,6 @@ export default {
             prevId: oldEntry.prevId || oldEntry.id,
             prevPath: oldEntry.prevPath || oldEntry.path,
             prevName: oldEntry.prevName || oldEntry.name,
-            prevUrl: oldEntry.prevUrl || oldEntry.url,
             prevKey: oldEntry.prevKey || oldEntry.key,
             prevParentPath: oldEntry.prevParentPath || oldEntry.parentPath,
           };

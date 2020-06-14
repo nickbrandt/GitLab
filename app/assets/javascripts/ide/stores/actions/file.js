@@ -159,7 +159,7 @@ export const discardFileChanges = ({ dispatch, state, commit, getters }, path) =
   if (!isDestructiveDiscard && file.path === getters.activeFile?.path) {
     dispatch('updateDelayViewerUpdated', true)
       .then(() => {
-        dispatch('router/push', `/project${file.url}`, { root: true });
+        dispatch('goToFileUrl', file.path);
       })
       .catch(e => {
         throw e;

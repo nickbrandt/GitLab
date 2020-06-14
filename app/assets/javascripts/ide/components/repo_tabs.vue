@@ -25,13 +25,13 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['updateViewer', 'removePendingTab']),
+    ...mapActions(['updateViewer', 'removePendingTab', 'goToFileUrl']),
     openFileViewer(viewer) {
       this.updateViewer(viewer);
 
       if (this.activeFile.pending) {
         return this.removePendingTab(this.activeFile).then(() => {
-          this.$router.push(`/project${this.activeFile.url}`);
+          this.goToFileUrl(this.activeFile.path);
         });
       }
 
