@@ -28,7 +28,7 @@ export const fetchFileData = ({ state, rootState, rootGetters, commit }, path) =
 
   return service
     .getAllFileData(url)
-    .then(({ data }) => {
+    .then(data => {
       commit(types.SET_FILE_DATA, { path, data });
       commit(types.SET_FILE_LOADING, { path, isLoading: false });
     })

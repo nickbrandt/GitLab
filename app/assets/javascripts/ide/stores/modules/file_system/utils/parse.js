@@ -23,6 +23,7 @@ const createBlob = (...args) => {
     isLoading: false,
     content: '',
     isBinary: false,
+    size: 0,
   };
 };
 

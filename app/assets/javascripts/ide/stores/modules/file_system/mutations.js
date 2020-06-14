@@ -29,9 +29,11 @@ export default {
     });
   },
   [types.SET_FILE_DATA](state, { path, data }) {
+    console.log(data);
     updateEntry(state, path, file => {
       file.isBinary = data.binary;
       file.content = data.content;
+      file.size = data.size;
       file.isLoaded = true;
     });
   },

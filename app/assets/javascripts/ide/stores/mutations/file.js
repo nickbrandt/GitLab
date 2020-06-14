@@ -60,11 +60,6 @@ export default {
       changed,
     });
   },
-  [types.SET_FILE_LANGUAGE](state, { file, fileLanguage }) {
-    Object.assign(state.entries[file.path], {
-      fileLanguage,
-    });
-  },
   [types.SET_FILE_POSITION](state, { file, editorRow, editorColumn }) {
     Object.assign(state.entries[file.path], {
       editorRow,

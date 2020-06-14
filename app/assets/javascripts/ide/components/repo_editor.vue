@@ -48,8 +48,10 @@ export default {
       'renderWhitespaceInCode',
       'editorTheme',
       'entries',
+      'currentProjectId',
     ]),
     ...mapState('fileSystem', ['files']),
+    ...mapState('editor', ['fileInfos']),
     ...mapGetters([
       'currentMergeRequest',
       'getStagedFile',
@@ -59,8 +61,11 @@ export default {
       'currentBranch',
     ]),
     ...mapGetters('fileTemplates', ['showFileTemplatesBar']),
+    fileInfo() {
+      return this.fileInfos[this.file.path] || {};
+    },
     shouldHideEditor() {
-      return this.file && this.file.binary;
+      return this.file && this.file.isBinary;
     },
     showContentViewer() {
       return (
@@ -72,10 +77,10 @@ export default {
       return this.shouldHideEditor && this.file.mrChange && this.viewer === viewerTypes.mr;
     },
     isEditorViewMode() {
-      return this.file.viewMode === FILE_VIEW_MODE_EDITOR;
+      return this.fileInfo.viewMode === FILE_VIEW_MODE_EDITOR;
     },
     isPreviewViewMode() {
-      return this.file.viewMode === FILE_VIEW_MODE_PREVIEW;
+      return this.fileInfo.viewMode === FILE_VIEW_MODE_PREVIEW;
     },
     editTabCSS() {
       return {
@@ -107,19 +112,24 @@ export default {
     },
   },
   watch: {
+    fileInfo(newVal) {
+      console.log(newVal);
+    },
     file(newVal, oldVal) {
       if (oldVal.pending) {
         this.removePendingTab(oldVal);
       }
 
       // Compare key to allow for files opened in review mode to be cached differently
-      if (oldVal.key !== this.file.key) {
+      if (oldVal.path !== this.file.path) {
         this.initEditor();
 
         if (this.currentActivityView !== leftSidebarViews.edit.name) {
-          this.setFileViewMode({
-            file: this.file,
-            viewMode: FILE_VIEW_MODE_EDITOR,
+          this.setFileInfo({
+            path: this.file.path,
+            data: {
+              viewMode: FILE_VIEW_MODE_EDITOR,
+            },
           });
         }
       }
@@ -127,8 +137,10 @@ export default {
     currentActivityView() {
       if (this.currentActivityView !== leftSidebarViews.edit.name) {
         this.setFileViewMode({
-          file: this.file,
-          viewMode: FILE_VIEW_MODE_EDITOR,
+          path: this.file.path,
+          data: {
+            viewMode: FILE_VIEW_MODE_EDITOR,
+          },
         });
       }
     },
@@ -159,7 +171,7 @@ export default {
         this.content = content;
         this.images = images;
       } else {
-        this.content = this.file.content || this.file.raw;
+        this.content = this.file.content;
         this.images = {};
       }
     },
@@ -182,18 +194,15 @@ export default {
   methods: {
     ...mapActions([
       'getFileData',
-      'getRawFileData',
       'changeFileContent',
-      'setFileLanguage',
-      'setEditorPosition',
-      'setFileViewMode',
       'updateViewer',
       'removePendingTab',
       'triggerFilesChange',
       'addTempImage',
     ]),
+    ...mapActions('editor', ['setFileInfo']),
     initEditor() {
-      if (this.shouldHideEditor && (this.file.content || this.file.raw)) {
+      if (this.shouldHideEditor && this.file.content) {
         return;
       }
 
@@ -220,9 +229,12 @@ export default {
         return Promise.resolve();
       }
 
-      return this.getFileData({
-        path: this.file.path,
-      });
+      return Promise.all([
+        this.getFileData({
+          path: this.file.path,
+        }),
+        this.setFileInfo({ path: this.file.path, data: { editor: FILE_VIEW_MODE_EDITOR } }),
+      ]);
     },
     createEditorInstance() {
       this.editor.dispose();
@@ -266,15 +278,27 @@ export default {
 
       // Handle Cursor Position
       this.editor.onPositionChange((instance, e) => {
-        this.setEditorPosition({
-          editorRow: e.position.lineNumber,
-          editorColumn: e.position.column,
+        this.setFileInfo({
+          path: this.file.path,
+          data: {
+            editorRow: e.position.lineNumber,
+            editorColumn: e.position.column,
+          },
         });
       });
 
+      this.editor.setPosition({
+        lineNumber: this.fileInfo.editorRow || 0,
+        column: this.fileInfo.editorColumn || 0,
+      });
+
       // Handle File Language
-      this.setFileLanguage({
-        fileLanguage: this.model.language,
+      this.setFileInfo({
+        path: this.file.path,
+        data: {
+          fileLanguage: this.model.language,
+          viewMode: FILE_VIEW_MODE_EDITOR,
+        },
       });
 
       this.$emit('editorSetup');
@@ -335,7 +359,12 @@ export default {
           <a
             href="javascript:void(0);"
             role="button"
-            @click.prevent="setFileViewMode({ file, viewMode: $options.FILE_VIEW_MODE_EDITOR })"
+            @click.prevent="
+              setFileInfo({
+                path: file.path,
+                data: { viewMode: $options.FILE_VIEW_MODE_EDITOR },
+              })
+            "
           >
             {{ __('Edit') }}
           </a>
@@ -344,7 +373,12 @@ export default {
           <a
             href="javascript:void(0);"
             role="button"
-            @click.prevent="setFileViewMode({ file, viewMode: $options.FILE_VIEW_MODE_PREVIEW })"
+            @click.prevent="
+              setFileInfo({
+                path: file.path,
+                data: { viewMode: $options.FILE_VIEW_MODE_PREVIEW },
+              })
+            "
             >{{ previewMode.previewTitle }}</a
           >
         </li>
@@ -356,8 +390,6 @@ export default {
       ref="editor"
       :class="{
         'is-readonly': isCommitModeActive,
-        'is-deleted': file.deleted,
-        'is-added': file.tempFile,
       }"
       class="multi-file-editor-holder"
       data-qa-selector="editor_container"
@@ -367,10 +399,10 @@ export default {
       v-if="showContentViewer"
       :content="content"
       :images="images"
-      :path="file.rawPath || file.path"
+      :path="file.path"
       :file-path="file.path"
       :file-size="file.size"
-      :project-path="file.projectId"
+      :project-path="currentProjectId"
       :commit-sha="currentBranchCommit"
       :type="fileType"
     />
