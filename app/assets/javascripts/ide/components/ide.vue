@@ -39,6 +39,7 @@ export default {
       'errorMessage',
       'loading',
     ]),
+    ...mapState('fileSystem', ['files']),
     ...mapGetters([
       'activeFile',
       'someUncommittedChanges',
@@ -50,6 +51,14 @@ export default {
     ]),
     themeName() {
       return window.gon?.user_color_scheme;
+    },
+  },
+  watch: {
+    openFiles(val) {
+      console.log('[ide.openFiles]', val);
+    },
+    activeFile(val) {
+      console.log('[ide.activeFile]', val);
     },
   },
   mounted() {
@@ -99,7 +108,13 @@ export default {
       <div class="multi-file-edit-pane">
         <template v-if="activeFile">
           <commit-editor-header v-if="isCommitModeActive" :active-file="activeFile" />
-          <repo-tabs v-else :active-file="activeFile" :files="openFiles" :viewer="viewer" />
+          <repo-tabs
+            v-else
+            :active-file="activeFile"
+            :files="openFiles"
+            :entries="files"
+            :viewer="viewer"
+          />
           <repo-editor :file="activeFile" class="multi-file-edit-pane-content" />
         </template>
         <template v-else>

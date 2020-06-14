@@ -23,6 +23,18 @@ export default {
   [types.SET_FILES](state, files) {
     Object.assign(state, { files });
   },
+  [types.SET_FILE_LOADING](state, { path, isLoading }) {
+    updateEntry(state, path, file => {
+      file.isLoading = isLoading;
+    });
+  },
+  [types.SET_FILE_DATA](state, { path, data }) {
+    updateEntry(state, path, file => {
+      file.isBinary = data.binary;
+      file.content = data.content;
+      file.isLoaded = true;
+    });
+  },
   [types.OPEN_PARENTS](state, path) {
     getParentPaths(path).forEach(parentPath => {
       updateEntry(state, parentPath, setOpenedTrue);

@@ -15,6 +15,28 @@ const fetchGqlProjectData = projectPath =>
     .then(({ data }) => data.project);
 
 export default {
+  getAllFileData(endpoint) {
+    return axios
+      .get(endpoint, {
+        params: { format: 'json', viewer: 'none' },
+      })
+      .then(({ data }) => {
+        const { raw_path: rawPath, ...rest } = data;
+
+        if (!rawPath) {
+          return rest;
+        }
+
+        return axios
+          .get(rawPath, {
+            transformResponse: [f => f],
+          })
+          .then(({ data: content }) => ({
+            ...rest,
+            content,
+          }));
+      });
+  },
   getFileData(endpoint) {
     return axios.get(endpoint, {
       params: { format: 'json', viewer: 'none' },

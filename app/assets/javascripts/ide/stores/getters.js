@@ -7,7 +7,8 @@ import {
   PERMISSION_PUSH_CODE,
 } from '../constants';
 
-export const activeFile = state => state.openFiles.find(file => file.active) || null;
+export const activeFile = state =>
+  (state.activeFilePath && state.fileSystem.files[state.activeFilePath]) || null;
 
 export const addedFiles = state => state.changedFiles.filter(f => f.tempFile);
 
@@ -38,8 +39,9 @@ export const allBlobs = state =>
     .sort((a, b) => b.lastOpenedAt - a.lastOpenedAt);
 
 export const getChangedFile = state => path => state.changedFiles.find(f => f.path === path);
-export const getStagedFile = state => path => state.stagedFiles.find(f => f.path === path);
-export const getOpenFile = state => path => state.openFiles.find(f => f.path === path);
+export const getStagedFile = state => path => state.stagedFiles.some(f => f.path === path);
+export const getOpenFile = state => path =>
+  state.openFiles.some(f => f === path) ? state.fileSystem[path] : null;
 
 export const lastOpenedFile = state =>
   [...state.changedFiles, ...state.stagedFiles].sort((a, b) => b.lastOpenedAt - a.lastOpenedAt)[0];

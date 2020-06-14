@@ -34,16 +34,9 @@ export default {
     this.updateViewer(this.viewerType);
   },
   methods: {
-    ...mapActions(['updateViewer', 'toggleTreeOpen']),
+    ...mapActions(['updateViewer', 'toggleTreeOpen', 'goToFileUrl']),
     clickFile(file) {
-      const url = this.getUrl(file);
-
-      this.$router.push(url);
-    },
-    getUrl(file) {
-      return `/project/${this.currentProjectId}/${file.type}/${this.currentBranchId}/-/${
-        file.path
-      }${file.type === 'tree' ? '/' : ''}`;
+      this.goToFileUrl(file.path);
     },
   },
   IdeFileRow,
@@ -71,7 +64,6 @@ export default {
             :level="0"
             :files="files"
             :file-row-component="$options.IdeFileRow"
-            :get-url="getUrl"
             @toggleTreeOpen="toggleTreeOpen"
             @clickFile="clickFile"
           />

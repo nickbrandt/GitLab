@@ -49,6 +49,7 @@ export default {
       'editorTheme',
       'entries',
     ]),
+    ...mapState('fileSystem', ['files']),
     ...mapGetters([
       'currentMergeRequest',
       'getStagedFile',
@@ -154,7 +155,7 @@ export default {
       if (!val) return;
 
       if (this.fileType === 'markdown') {
-        const { content, images } = extractMarkdownImagesFromEntries(this.file, this.entries);
+        const { content, images } = extractMarkdownImagesFromEntries(this.file, this.files);
         this.content = content;
         this.images = images;
       } else {
@@ -221,12 +222,7 @@ export default {
 
       return this.getFileData({
         path: this.file.path,
-        makeFileActive: false,
-      }).then(() =>
-        this.getRawFileData({
-          path: this.file.path,
-        }),
-      );
+      });
     },
     createEditorInstance() {
       this.editor.dispose();
@@ -276,11 +272,6 @@ export default {
         });
       });
 
-      this.editor.setPosition({
-        lineNumber: this.file.editorRow,
-        column: this.file.editorColumn,
-      });
-
       // Handle File Language
       this.setFileLanguage({
         fileLanguage: this.model.language,
@@ -295,17 +286,15 @@ export default {
     },
     fetchEditorconfigRules() {
       return getRulesWithTraversal(this.file.path, path => {
-        const entry = this.entries[path];
+        const entry = this.files[path];
         if (!entry) return Promise.resolve(null);
 
-        const content = entry.content || entry.raw;
+        const { content } = entry.content;
         if (content) return Promise.resolve(content);
 
-        return this.getFileData({ path: entry.path, makeFileActive: false }).then(() =>
-          this.getRawFileData({ path: entry.path }),
-        );
-      }).then(rules => {
-        this.rules = mapRulesToMonaco(rules);
+        return this.getFileData({ path: entry.path });
+      }).then(() => {
+        this.rules = mapRulesToMonaco([]);
       });
     },
     onPaste(event) {

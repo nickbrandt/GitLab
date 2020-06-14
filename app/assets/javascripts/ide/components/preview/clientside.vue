@@ -94,9 +94,7 @@ export default {
     ...mapActions(['getFileData', 'getRawFileData']),
     ...mapActions('clientside', ['pingUsage']),
     loadFileContent(path) {
-      return this.getFileData({ path, makeFileActive: false }).then(() =>
-        this.getRawFileData({ path }),
-      );
+      return this.getFileData({ path });
     },
     initPreview() {
       if (!this.mainEntry) return null;

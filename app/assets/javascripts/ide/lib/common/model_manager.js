@@ -17,8 +17,8 @@ export default class ModelManager {
   }
 
   addModel(file, head = null) {
-    if (this.hasCachedModel(file.key)) {
-      return this.getModel(file.key);
+    if (this.hasCachedModel(file.path)) {
+      return this.getModel(file.path);
     }
 
     const model = new Model(file, head);
@@ -26,7 +26,7 @@ export default class ModelManager {
     this.disposable.add(model);
 
     eventHub.$on(
-      `editor.update.model.dispose.${file.key}`,
+      `editor.update.model.dispose.${file.path}`,
       this.removeCachedModel.bind(this, file),
     );
 
@@ -34,9 +34,9 @@ export default class ModelManager {
   }
 
   removeCachedModel(file) {
-    this.models.delete(file.key);
+    this.models.delete(file.path);
 
-    eventHub.$off(`editor.update.model.dispose.${file.key}`, this.removeCachedModel);
+    eventHub.$off(`editor.update.model.dispose.${file.path}`, this.removeCachedModel);
   }
 
   dispose() {

@@ -20,8 +20,9 @@ const createBlob = (...args) => {
   return {
     ...createBaseFileObject(TYPE_BLOB, ...args),
     isLoaded: false,
+    isLoading: false,
     content: '',
-    active: false,
+    isBinary: false,
   };
 };
 

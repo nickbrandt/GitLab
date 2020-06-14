@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import { joinPaths, escapeFileUrl } from '~/lib/utils/url_utility';
 import service from '../../../services';
 import { parseToFileObjects } from './utils/parse';
 import * as types from './mutation_types';
@@ -7,6 +8,33 @@ export const fetchFiles = ({ commit }, { projectPath, ref }) => {
   return service.getFiles(projectPath, ref).then(({ data }) => {
     commit(types.SET_FILES, parseToFileObjects(data));
   });
+};
+
+export const fetchFileData = ({ state, rootState, rootGetters, commit }, path) => {
+  const file = state.files[path];
+
+  if (!file || file.isLoaded) return Promise.resolve();
+
+  commit(types.SET_FILE_LOADING, { path, isLoading: true });
+
+  const url = joinPaths(
+    gon.relative_url_root || '/',
+    rootState.currentProjectId,
+    '-',
+    file.type,
+    rootGetters.lastCommit && rootGetters.lastCommit.id,
+    escapeFileUrl(file.path),
+  );
+
+  return service
+    .getAllFileData(url)
+    .then(({ data }) => {
+      commit(types.SET_FILE_DATA, { path, data });
+      commit(types.SET_FILE_LOADING, { path, isLoading: false });
+    })
+    .catch(() => {
+      commit(types.SET_FILE_LOADING, { path, isLoading: false });
+    });
 };
 
 export const toggleOpenTree = ({ commit }, path) => {

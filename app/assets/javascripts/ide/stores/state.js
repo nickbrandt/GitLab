@@ -9,6 +9,7 @@ export default () => ({
   stagedFiles: [],
   endpoints: {},
   lastCommitMsg: '',
+  activeFilePath: '',
   loading: false,
   openFiles: [],
   trees: {},

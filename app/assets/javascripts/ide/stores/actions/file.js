@@ -8,8 +8,8 @@ import { viewerTypes, stageKeys } from '../../constants';
 
 export const closeFile = ({ commit, state, dispatch }, file) => {
   const { path } = file;
-  const indexOfClosedFile = state.openFiles.findIndex(f => f.key === file.key);
-  const fileWasActive = file.active;
+  const indexOfClosedFile = state.openFiles.findIndex(f => f === path);
+  const fileWasActive = path === state.activeFilePath;
 
   if (file.pending) {
     commit(types.REMOVE_PENDING_TAB, file);
@@ -29,73 +29,33 @@ export const closeFile = ({ commit, state, dispatch }, file) => {
         keyPrefix: nextFileToOpen.staged ? 'staged' : 'unstaged',
       });
     } else {
-      dispatch('router/push', `/project${nextFileToOpen.url}`, { root: true });
+      dispatch('goToFileUrl', nextFileToOpen.path);
     }
   } else if (!state.openFiles.length) {
-    dispatch('router/push', `/project/${file.projectId}/tree/${file.branchId}/`, { root: true });
+    dispatch('goToFileUrl');
   }
 
   eventHub.$emit(`editor.update.model.dispose.${file.key}`);
 };
 
-export const setFileActive = ({ commit, state, getters, dispatch }, path) => {
-  const file = state.entries[path];
-  const currentActiveFile = getters.activeFile;
+export const goToFileUrl = ({ state, dispatch }, path) => {
+  const file = path && state.fileSystem.files[path];
+  const type = file?.type || 'tree';
 
-  if (file.active) return;
+  const baseUrl = `/project/${state.currentProjectId}/${type}/${state.currentBranchId}/`;
 
-  if (currentActiveFile) {
-    commit(types.SET_FILE_ACTIVE, {
-      path: currentActiveFile.path,
-      active: false,
-    });
-  }
+  const url = file ? `${baseUrl}-/${file.path}${type === 'tree' ? '/' : ''}` : baseUrl;
 
-  commit(types.SET_FILE_ACTIVE, { path, active: true });
+  dispatch('router/push', url, { root: true });
+};
+
+export const setFileActive = ({ commit, dispatch }, path) => {
+  commit(types.SET_FILE_ACTIVE, path);
   dispatch('scrollToTab');
 };
 
-export const getFileData = (
-  { state, commit, dispatch, getters },
-  { path, makeFileActive = true, openFile = makeFileActive },
-) => {
-  const file = state.entries[path];
-  const fileDeletedAndReadded = getters.isFileDeletedAndReadded(path);
-
-  if (file.raw || (file.tempFile && !file.prevPath && !fileDeletedAndReadded))
-    return Promise.resolve();
-
-  commit(types.TOGGLE_LOADING, { entry: file });
-
-  const url = joinPaths(
-    gon.relative_url_root || '/',
-    state.currentProjectId,
-    '-',
-    file.type,
-    getters.lastCommit && getters.lastCommit.id,
-    escapeFileUrl(file.prevPath || file.path),
-  );
-
-  return service
-    .getFileData(url)
-    .then(({ data }) => {
-      setPageTitleForFile(state, file);
-
-      if (data) commit(types.SET_FILE_DATA, { data, file });
-      if (openFile) commit(types.TOGGLE_FILE_OPEN, path);
-      if (makeFileActive) dispatch('setFileActive', path);
-      commit(types.TOGGLE_LOADING, { entry: file });
-    })
-    .catch(() => {
-      commit(types.TOGGLE_LOADING, { entry: file });
-      dispatch('setErrorMessage', {
-        text: __('An error occurred while loading the file.'),
-        action: payload =>
-          dispatch('getFileData', payload).then(() => dispatch('setErrorMessage', null)),
-        actionText: __('Please try again'),
-        actionPayload: { path, makeFileActive },
-      });
-    });
+export const getFileData = ({ dispatch }, { path }) => {
+  return dispatch('fileSystem/fetchFileData', path);
 };
 
 export const setFileMrChange = ({ commit }, { file, mrChange }) => {
@@ -232,7 +192,7 @@ export const discardFileChanges = ({ dispatch, state, commit, getters }, path) =
   eventHub.$emit(`editor.update.model.dispose.unstaged-${file.key}`, file.content);
 };
 
-export const stageChange = ({ commit, dispatch, getters }, path) => {
+export const stageChange = ({ state, commit, dispatch, getters }, path) => {
   const stagedFile = getters.getStagedFile(path);
   const openFile = getters.getOpenFile(path);
 
@@ -245,7 +205,7 @@ export const stageChange = ({ commit, dispatch, getters }, path) => {
 
   const file = getters.getStagedFile(path);
 
-  if (openFile && openFile.active && file) {
+  if (openFile && path === state.activeFilePath && file) {
     dispatch('openPendingTab', {
       file,
       keyPrefix: stageKeys.staged,
@@ -253,14 +213,14 @@ export const stageChange = ({ commit, dispatch, getters }, path) => {
   }
 };
 
-export const unstageChange = ({ commit, dispatch, getters }, path) => {
+export const unstageChange = ({ state, commit, dispatch, getters }, path) => {
   const openFile = getters.getOpenFile(path);
 
   commit(types.UNSTAGE_CHANGE, { path, diffInfo: getters.getDiffInfo(path) });
 
   const file = getters.getChangedFile(path);
 
-  if (openFile && openFile.active && file) {
+  if (openFile && path === state.activeFilePath && file) {
     dispatch('openPendingTab', {
       file,
       keyPrefix: stageKeys.unstaged,
@@ -269,9 +229,9 @@ export const unstageChange = ({ commit, dispatch, getters }, path) => {
 };
 
 export const openPendingTab = ({ commit, dispatch, getters, state }, { file, keyPrefix }) => {
-  if (getters.activeFile && getters.activeFile.key === `${keyPrefix}-${file.key}`) return false;
+  if (getters.activeFile && getters.activeFile.key === `${keyPrefix}-${file.path}`) return false;
 
-  state.openFiles.forEach(f => eventHub.$emit(`editor.update.model.dispose.${f.key}`));
+  state.openFiles.forEach(f => eventHub.$emit(`editor.update.model.dispose.${f}`));
 
   commit(types.ADD_PENDING_TAB, { file, keyPrefix });
 

@@ -21,15 +21,13 @@ export default {
     if (!this.activeFile) return;
 
     if (this.activeFile.pending && !this.activeFile.deleted) {
-      this.$router.push(`/project${this.activeFile.url}`, () => {
-        this.updateViewer('editor');
-      });
+      this.goToFileUrl(this.activeFile.path);
     } else if (this.activeFile.deleted) {
       this.resetOpenFiles();
     }
   },
   methods: {
-    ...mapActions(['updateViewer', 'createTempEntry', 'resetOpenFiles']),
+    ...mapActions(['updateViewer', 'createTempEntry', 'resetOpenFiles', 'goToFileUrl']),
     createNewFile() {
       this.$refs.newModal.open(modalTypes.blob);
     },

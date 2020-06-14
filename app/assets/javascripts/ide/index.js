@@ -34,10 +34,6 @@ export function initIde(el, options = {}) {
   const { rootComponent = ide, extendStore = identity } = options;
   const router = createRouter(store);
 
-  store.subscribeAction(({ type, payload }) => {
-    console.log(type, payload);
-  });
-
   return new Vue({
     el,
     store: extendStore(store, el),
