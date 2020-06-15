@@ -146,6 +146,14 @@ CAUTION: **Caution:**
 The Unleash client **must** be given a user ID for the feature to be enabled for
 target users. See the [Ruby example](#ruby-application-example) below.
 
+#### List
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/35930) in GitLab 13.1.
+
+A feature flag may be enabled for a saved list of users. Under the hood, this is
+similar to [User IDs](#user-ids), but instead relies on lists created through
+the [User List API](../../../api/feature_flag_user_lists.md).
+
 ## Integrate feature flags with your application
 
 To use feature flags with your application, get access credentials from GitLab.
