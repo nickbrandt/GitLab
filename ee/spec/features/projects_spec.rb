@@ -26,7 +26,7 @@ RSpec.describe 'Project' do
       expect(find('.js-select-namespace')).to have_content group.name
     end
 
-    it "uses supplied namespace", :js do
+    it "uses supplied namespace", :js, quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/222234' do
       visit new_project_path(namespace_id: other_subgroup.id)
       find('#create-from-template-tab').click
       find('.custom-group-project-templates-tab').click
