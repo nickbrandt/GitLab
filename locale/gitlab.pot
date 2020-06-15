@@ -2940,6 +2940,9 @@ msgstr ""
 msgid "Assign"
 msgstr ""
 
+msgid "Assign Iteration"
+msgstr ""
+
 msgid "Assign custom color like #FF0000"
 msgstr ""
 
@@ -9464,6 +9467,9 @@ msgstr ""
 msgid "Failed to set due date because the date format is invalid."
 msgstr ""
 
+msgid "Failed to set iteration on this issue. Please try again."
+msgstr ""
+
 msgid "Failed to signing using smartcard authentication"
 msgstr ""
 
@@ -12467,6 +12473,9 @@ msgstr ""
 msgid "It's you"
 msgstr ""
 
+msgid "Iteration"
+msgstr ""
+
 msgid "Iteration changed to"
 msgstr ""
 
@@ -14895,6 +14904,9 @@ msgid "No forks are available to you."
 msgstr ""
 
 msgid "No grouping"
+msgstr ""
+
+msgid "No iteration"
 msgstr ""
 
 msgid "No iterations to show"
