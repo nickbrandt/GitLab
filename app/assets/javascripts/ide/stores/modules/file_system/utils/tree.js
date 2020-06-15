@@ -9,3 +9,13 @@ export const insertIntoTree = (tree, type, name) => {
 
   tree.children.splice(idx, 0, entry);
 };
+
+export const removeFromTree = (tree, child) => {
+  const idx = sortedIndexBy(tree.children, child, getTreeChildSortKey);
+
+  if (getTreeChildSortKey(tree.children[idx]) !== getTreeChildSortKey(child)) {
+    return;
+  }
+
+  tree.children.splice(idx, 1);
+};

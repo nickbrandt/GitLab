@@ -85,7 +85,7 @@ const calculateTreeDiff = (objects, atree, btree, path = '') => {
       const aSortKey = getTreeChildSortKey(achild);
       const bSortKey = getTreeChildSortKey(bchild);
 
-      if (achild.key === bchild.key) {
+      if (aSortKey === bSortKey && achild.key === bchild.key) {
         // next children :)
         aidx += 1;
         bidx += 1;

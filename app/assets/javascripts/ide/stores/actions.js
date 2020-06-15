@@ -181,36 +181,8 @@ export const setLinks = ({ commit }, links) => commit(types.SET_LINKS, links);
 export const setErrorMessage = ({ commit }, errorMessage) =>
   commit(types.SET_ERROR_MESSAGE, errorMessage);
 
-export const deleteEntry = ({ commit, dispatch, state }, path) => {
-  const entry = state.entries[path];
-  const { prevPath, prevName, prevParentPath } = entry;
-  const isTree = entry.type === 'tree';
-  const prevEntry = prevPath && state.entries[prevPath];
-
-  if (prevPath && (!prevEntry || prevEntry.deleted)) {
-    dispatch('renameEntry', {
-      path,
-      name: prevName,
-      parentPath: prevParentPath,
-    });
-    dispatch('deleteEntry', prevPath);
-    return;
-  }
-
-  if (entry.opened) dispatch('closeFile', entry);
-
-  if (isTree) {
-    entry.tree.forEach(f => dispatch('deleteEntry', f.path));
-  }
-
-  commit(types.DELETE_ENTRY, path);
-
-  // Only stage if we're not a directory or a new file
-  if (!isTree && !entry.tempFile) {
-    dispatch('stageChange', path);
-  }
-
-  dispatch('triggerFilesChange');
+export const deleteEntry = ({ dispatch }, path) => {
+  return dispatch('fileSystem/removeFile', path);
 };
 
 export const resetOpenFiles = ({ commit }) => commit(types.RESET_OPEN_FILES);

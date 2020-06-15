@@ -54,3 +54,7 @@ export const openParents = ({ commit }, path) => {
 export const setFileContent = ({ commit }, payload) => {
   commit(types.SET_FILE_CONTENT, payload);
 };
+
+export const removeFile = ({ commit }, path) => {
+  commit(types.REMOVE_FILE, path);
+};

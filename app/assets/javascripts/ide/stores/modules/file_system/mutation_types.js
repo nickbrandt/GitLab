@@ -6,3 +6,4 @@ export const SET_FILE_DATA = 'SET_FILE_DATA';
 export const OPEN_PARENTS = 'OPEN_PARENT_TREES';
 export const OPEN_TREE = 'OPEN_TREE';
 export const TOGGLE_OPEN_TREE = 'TOGGLE_OPEN_TREE';
+export const REMOVE_FILE = 'REMOVE_FILE';

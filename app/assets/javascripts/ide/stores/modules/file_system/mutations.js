@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
 import Vue from 'vue';
 import * as types from './mutation_types';
-import { getParentPaths } from './utils/path';
+import { getParentPaths, splitPath } from './utils/path';
+import { removeFromTree } from './utils/tree';
 import timestamper from './utils/timestamp';
 
 const updateEntry = (state, path, fn) => {
@@ -68,5 +69,17 @@ export default {
   },
   [types.TOGGLE_OPEN_TREE](state, path) {
     updateEntry(state, path, toggleOpened);
+  },
+  [types.REMOVE_FILE](state, path) {
+    const file = state.files[path];
+
+    if (!file) {
+      return;
+    }
+
+    const [parentPath, name] = splitPath(path);
+    removeFromTree(state.files[parentPath], { name, type: file.type });
+
+    updateTimestamp(state, parentPath);
   },
 };
