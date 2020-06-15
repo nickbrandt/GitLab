@@ -53,14 +53,6 @@ export default {
       return window.gon?.user_color_scheme;
     },
   },
-  watch: {
-    openFiles(val) {
-      console.log('[ide.openFiles]', val);
-    },
-    activeFile(val) {
-      console.log('[ide.activeFile]', val);
-    },
-  },
   mounted() {
     window.onbeforeunload = e => this.onBeforeUnload(e);
 

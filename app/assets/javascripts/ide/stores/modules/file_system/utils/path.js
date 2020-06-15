@@ -7,7 +7,7 @@ export const splitPath = path => {
 
 export const getParentPaths = path => [
   ...(path ? [''] : []),
-  path
+  ...path
     .split('/')
     .reduce((acc, item, idx) => acc.concat(!idx ? item : `${acc[idx - 1]}/${item}`), [])
     .slice(0, -1),

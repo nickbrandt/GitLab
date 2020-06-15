@@ -11,18 +11,19 @@ const getTreeChildKey = (context, tree, treeChild, prevChildren) => {
 
   const sortKey = getTreeChildSortKey(treeChild);
   const prevChild = prevChildren[sortKey];
+  const prevKey = prevChild?.[0]?.key;
+  const fullPath = joinPaths(tree.path, treeChild.name);
 
-  if (prevChild && lastTimestamp >= treeChild.timestamp) {
-    return prevChild.key;
+  if (prevKey && lastTimestamp >= context.fs[fullPath].timestamp) {
+    return prevKey;
   }
 
-  const fullPath = joinPaths(tree.path, treeChild.name);
-  return updateObjectsWithPath(context, fullPath);
+  return updateObjectsWithPath(context, fullPath, prevKey);
 };
 
-const getChildrenWithKeys = (context, tree) => {
-  const { objects, rootRef } = context;
-  const prevObj = rootRef && objects[rootRef];
+const getChildrenWithKeys = (context, tree, baseRef) => {
+  const { objects } = context;
+  const prevObj = objects[baseRef];
   const prevChildren = prevObj ? groupBy(prevObj.data.children, getTreeChildSortKey) : {};
 
   return tree.children.map(treeChild => {
@@ -66,8 +67,8 @@ function updateObjectsWithTreeChildren(objects, children) {
  *
  * @param {{rootRef: String, objects: Object, fs: Object, lastTimestamp: Number}} context
  */
-export function updateObjectsWithTree(context, tree) {
-  const childrenWithKeys = getChildrenWithKeys(context, tree);
+export function updateObjectsWithTree(context, tree, baseRef) {
+  const childrenWithKeys = getChildrenWithKeys(context, tree, baseRef);
 
   return updateObjectsWithTreeChildren(context.objects, childrenWithKeys);
 }
@@ -76,7 +77,7 @@ export function updateObjectsWithTree(context, tree) {
  *
  * @param {{rootRef: String, objects: Object, fs: Object, lastTimestamp: Number}} context
  */
-export function updateObjectsWithPath(context, path) {
+export function updateObjectsWithPath(context, path, baseRef) {
   const entry = context.fs[path];
 
   if (!entry) {
@@ -88,7 +89,7 @@ export function updateObjectsWithPath(context, path) {
     return updateObjectsWithBlob(context.objects, entry);
   }
 
-  return updateObjectsWithTree(context, entry);
+  return updateObjectsWithTree(context, entry, baseRef);
 }
 
 /**
@@ -98,7 +99,7 @@ export function updateObjectsWithPath(context, path) {
 export const updateObjects = context => {
   const root = context.fs[FS_ROOT_PATH];
 
-  return updateObjectsWithTree(context, root);
+  return updateObjectsWithTree(context, root, context.rootRef);
 };
 
 export const loadBlobContent = (objects, ref, path, content) => {
