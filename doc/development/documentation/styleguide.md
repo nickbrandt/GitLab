@@ -752,7 +752,7 @@ URLs.
 
 Linking to internal documentation content is not as straightforward as we'd like.
 For example, not using relative to root links or `.html` extensions can make it difficult to determine the link you'd like to refer to. 
-However, in order to XYZ we established the following style requirements.
+However, in order enable users to [browse the docs from the repository](https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc#gitlab-docs) we established the following style requirements.
 
 To link to internal documentation:
 
