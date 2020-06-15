@@ -5266,7 +5266,7 @@ ALTER SEQUENCE public.project_import_data_id_seq OWNED BY public.project_import_
 
 CREATE TABLE public.project_incident_management_settings (
     project_id integer NOT NULL,
-    create_issue boolean DEFAULT true NOT NULL,
+    create_issue boolean DEFAULT false NOT NULL,
     send_email boolean DEFAULT false NOT NULL,
     issue_template_key text
 );
@@ -13965,6 +13965,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200605003204
 20200608072931
 20200608075553
+20200608214008
 20200609002841
+20200609212701
 \.
 
