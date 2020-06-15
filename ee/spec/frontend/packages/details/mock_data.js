@@ -1,4 +1,5 @@
 import { formatDate } from '~/lib/utils/datetime_utility';
+import { orderBy } from 'lodash';
 
 export const registryUrl = 'foo/registry';
 
@@ -43,18 +44,21 @@ export const generateMavenSetupXml = () => `<repositories>
   </snapshotRepository>
 </distributionManagement>`;
 
-export const generateCommonPackageInformation = packageEntity => [
+const generateCommonPackageInformation = packageEntity => [
   {
     label: 'Version',
     value: packageEntity.version,
+    order: 2,
   },
   {
     label: 'Created on',
     value: formatDate(packageEntity.created_at),
+    order: 5,
   },
   {
     label: 'Updated at',
     value: formatDate(packageEntity.updated_at),
+    order: 6,
   },
 ];
 
@@ -62,6 +66,7 @@ export const generateStandardPackageInformation = packageEntity => [
   {
     label: 'Name',
     value: packageEntity.name,
+    order: 1,
   },
   ...generateCommonPackageInformation(packageEntity),
 ];
@@ -70,9 +75,35 @@ export const generateConanInformation = conanPackage => [
   {
     label: 'Recipe',
     value: conanPackage.recipe,
+    order: 1,
   },
   ...generateCommonPackageInformation(conanPackage),
 ];
+
+export const generateNugetInformation = nugetPackage =>
+  orderBy(
+    [
+      ...generateCommonPackageInformation(nugetPackage),
+      {
+        label: 'Name',
+        value: nugetPackage.name,
+        order: 1,
+      },
+      {
+        label: 'Project URL',
+        value: nugetPackage.nuget_metadatum.project_url,
+        order: 3,
+        type: 'link',
+      },
+      {
+        label: 'License URL',
+        value: nugetPackage.nuget_metadatum.license_url,
+        order: 4,
+        type: 'link',
+      },
+    ],
+    ['order'],
+  );
 
 export const pypiSetupCommandStr = `[gitlab]
 repository = foo

@@ -41,3 +41,7 @@ export const NpmManager = {
 export const FETCH_PACKAGE_VERSIONS_ERROR = s__(
   'PackageRegistry|Unable to fetch package version information.',
 );
+
+export const InformationType = {
+  LINK: 'link',
+};
