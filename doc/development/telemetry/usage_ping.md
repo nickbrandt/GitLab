@@ -429,6 +429,7 @@ On GitLab.com, we have DangerBot setup to monitor Telemetry related files and Da
 | `projects_jira_dvcs_server_active`                      | `counts`                           |             |                |                                                   |
 | `labels`                                                | `counts`                           |             |                |                                                   |
 | `merge_requests`                                        | `counts`                           |             |                |                                                   |
+| `merge_requests_users`                                  | `counts`                           |             |                |                                                   |
 | `notes`                                                 | `counts`                           |             |                |                                                   |
 | `wiki_pages_create`                                     | `counts`                           |             |                |                                                   |
 | `wiki_pages_update`                                     | `counts`                           |             |                |                                                   |
