@@ -10,6 +10,7 @@ module AlertManagement
     include Sortable
     include Noteable
     include Gitlab::SQL::Pattern
+    include Presentable
 
     STATUSES = {
       triggered: 0,

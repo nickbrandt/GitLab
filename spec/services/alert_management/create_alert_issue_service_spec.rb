@@ -8,10 +8,6 @@ RSpec.describe AlertManagement::CreateAlertIssueService do
   let_it_be(:project) { create(:project, group: group) }
   let_it_be(:payload) do
     {
-      'title' => 'Alert title',
-      'annotations' => {
-        'title' => 'Alert title'
-      },
       'startsAt' => '2020-04-27T10:10:22.265949279Z',
       'generatorURL' => 'http://8d467bd4607a:9090/graph?g0.expr=vector%281%29&g0.tab=1'
     }
@@ -61,7 +57,7 @@ RSpec.describe AlertManagement::CreateAlertIssueService do
       end
 
       it 'sets the issue title' do
-        expect(created_issue.title).to eq(alert_presenter.title)
+        expect(created_issue.title).to eq(alert.title)
       end
 
       it 'sets the issue description' do
@@ -187,11 +183,11 @@ RSpec.describe AlertManagement::CreateAlertIssueService do
       end
 
       context 'when issue cannot be created' do
-        let(:alert) { prometheus_alert }
+        let(:alert) { generic_alert }
 
         before do
-          # set invalid payload for Prometheus alert
-          alert.update!(payload: {})
+          # Invalid alert
+          alert.update_columns(title: '')
         end
 
         it 'has an unsuccessful status' do
