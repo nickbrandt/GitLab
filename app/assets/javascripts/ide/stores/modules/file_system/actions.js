@@ -10,7 +10,7 @@ export const fetchFiles = ({ commit }, { projectPath, ref }) => {
   });
 };
 
-export const fetchFileData = ({ state, rootState, rootGetters, commit }, path) => {
+export const fetchFileData = ({ dispatch, state, rootState, rootGetters, commit }, path) => {
   const file = state.files[path];
 
   if (!file || file.isLoaded) return Promise.resolve();
@@ -31,6 +31,8 @@ export const fetchFileData = ({ state, rootState, rootGetters, commit }, path) =
     .then(data => {
       commit(types.SET_FILE_DATA, { path, data });
       commit(types.SET_FILE_LOADING, { path, isLoading: false });
+      // NOTE: There's probably a more decoupled way to handle this...
+      return dispatch('git/loadBlob', { path, content: data.content }, { root: true });
     })
     .catch(() => {
       commit(types.SET_FILE_LOADING, { path, isLoading: false });

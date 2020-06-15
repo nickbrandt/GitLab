@@ -9,4 +9,5 @@ export default () => ({
       timestamp: -1,
     },
   },
+  loadedFiles: [],
 });

@@ -1,4 +1,4 @@
-import { updateObjects } from './utils/fs';
+import { updateObjects, loadBlobContent } from './utils/fs';
 import * as types from './mutation_types';
 
 const addAllRefsToSet = (objects, ref, keys) => {
@@ -45,6 +45,17 @@ export default {
 
     toDelete.forEach(key => {
       delete state.objects[key];
+    });
+  },
+  [types.LOAD_BLOB](state, { path, content }) {
+    const lookup = {};
+
+    Object.entries(state.refs).forEach(([refKey, ref]) => {
+      const newRef = lookup[ref] || loadBlobContent(state.objects, ref, path, content);
+
+      lookup[ref] = newRef;
+
+      state.refs[refKey] = newRef;
     });
   },
 };

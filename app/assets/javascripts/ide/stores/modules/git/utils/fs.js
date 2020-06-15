@@ -38,14 +38,25 @@ const getChildrenWithKeys = (context, tree) => {
 
 /**
  *
- * @param {{rootRef: String, objects: Object, fs: Object, lastTimestamp: Number}} context
+ * @param {Object} objects
  */
-export function updateObjectsWithBlob(context, file) {
+export function updateObjectsWithBlob(objects, file) {
   const obj = createGitObjectBlob(file);
   const key = hashGitObject(obj);
 
-  if (!context.objects[key]) {
-    context.objects[key] = obj;
+  if (!objects[key]) {
+    objects[key] = obj;
+  }
+
+  return key;
+}
+
+function updateObjectsWithTreeChildren(objects, children) {
+  const obj = createGitObjectTree({ children });
+  const key = hashGitObject(obj);
+
+  if (!objects[key]) {
+    objects[key] = obj;
   }
 
   return key;
@@ -58,14 +69,7 @@ export function updateObjectsWithBlob(context, file) {
 export function updateObjectsWithTree(context, tree) {
   const childrenWithKeys = getChildrenWithKeys(context, tree);
 
-  const obj = createGitObjectTree({ children: childrenWithKeys });
-  const key = hashGitObject(obj);
-
-  if (!context.objects[key]) {
-    context.objects[key] = obj;
-  }
-
-  return key;
+  return updateObjectsWithTreeChildren(context.objects, childrenWithKeys);
 }
 
 /**
@@ -81,7 +85,7 @@ export function updateObjectsWithPath(context, path) {
   }
 
   if (entry.type === FS_TYPE_BLOB) {
-    return updateObjectsWithBlob(context, entry);
+    return updateObjectsWithBlob(context.objects, entry);
   }
 
   return updateObjectsWithTree(context, entry);
@@ -95,4 +99,33 @@ export const updateObjects = context => {
   const root = context.fs[FS_ROOT_PATH];
 
   return updateObjectsWithTree(context, root);
+};
+
+export const loadBlobContent = (objects, ref, path, content) => {
+  const obj = objects[ref];
+
+  if (!obj) {
+    console.error('[ide.git.fs] Expected to find obj with ref', ref);
+    return '';
+  }
+
+  if (!path) {
+    return updateObjectsWithBlob(objects, { content, isLoaded: true });
+  }
+
+  const [curPath, ...nextParts] = path.split('/');
+  const nextPath = nextParts.join('/');
+
+  const newChildren = obj.data.children.map(child => {
+    if (child.name !== curPath) {
+      return child;
+    }
+
+    return {
+      ...child,
+      key: loadBlobContent(objects, child.key, nextPath, content),
+    };
+  });
+
+  return updateObjectsWithTreeChildren(objects, newChildren);
 };

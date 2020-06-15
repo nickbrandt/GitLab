@@ -15,3 +15,7 @@ export const cleanObjects = ({ commit }) => {
   commit(types.CLEAN_OBJECTS);
   commit(types.SET_CLEANING_FLAG, false);
 };
+
+export const loadBlob = ({ commit }, payload) => {
+  commit(types.LOAD_BLOB, payload);
+};
