@@ -7,6 +7,7 @@ import state from './state';
 import customStages from './modules/custom_stages/index';
 import durationChart from './modules/duration_chart/index';
 import typeOfWork from './modules/type_of_work/index';
+import filters from './modules/filters/index';
 
 Vue.use(Vuex);
 
@@ -16,5 +17,5 @@ export default () =>
     getters,
     mutations,
     state,
-    modules: { customStages, durationChart, typeOfWork },
+    modules: { customStages, durationChart, typeOfWork, filters },
   });
