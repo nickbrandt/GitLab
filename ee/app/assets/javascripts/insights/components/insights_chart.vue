@@ -20,11 +20,13 @@ export default {
   props: {
     loaded: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: false,
     },
     type: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
     title: {
       type: String,
@@ -38,7 +40,8 @@ export default {
     },
     data: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
     error: {
       type: String,
@@ -150,7 +153,7 @@ export default {
       @created="onChartCreated"
     />
   </resizable-chart-container>
-  <div v-else class="insights-chart">
+  <div v-else-if="error" class="insights-chart">
     <insights-chart-error
       :chart-name="title"
       :title="__('This chart could not be displayed')"

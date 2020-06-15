@@ -74,7 +74,7 @@ export default {
   <div class="insights-page" data-qa-selector="insights_page">
     <div v-if="hasChartsConfigured" class="js-insights-page-container">
       <h4 class="text-center">{{ pageConfig.title }}</h4>
-      <div v-if="!pageLoading" class="insights-charts" data-qa-selector="insights_charts">
+      <div class="insights-charts" data-qa-selector="insights_charts">
         <insights-chart
           v-for="({ loaded, type, description, data, error }, key, index) in chartData"
           :key="index"
@@ -86,7 +86,7 @@ export default {
           :error="error"
         />
       </div>
-      <div v-else class="insights-chart-loading text-center">
+      <div v-if="pageLoading" class="insights-chart-loading text-center p-5">
         <gl-loading-icon :inline="true" size="lg" />
       </div>
     </div>

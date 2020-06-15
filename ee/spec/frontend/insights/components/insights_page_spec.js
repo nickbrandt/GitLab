@@ -65,11 +65,21 @@ describe('Insights page component', () => {
         });
       });
 
-      it('does not display chart area', () => {
+      it('does display chart area', () => {
         return component.$nextTick(() => {
-          expect(component.$el.querySelector('.js-insights-page-container .insights-charts')).toBe(
-            null,
-          );
+          expect(
+            component.$el.querySelector('.js-insights-page-container .insights-charts'),
+          ).not.toBe(null);
+        });
+      });
+
+      it('does not display chart', () => {
+        return component.$nextTick(() => {
+          expect(
+            component.$el.querySelector(
+              '.js-insights-page-container .insights-charts .insights-chart',
+            ),
+          ).toBe(null);
         });
       });
     });
