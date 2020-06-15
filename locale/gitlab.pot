@@ -10136,6 +10136,9 @@ msgstr ""
 msgid "Geo allows you to replicate your GitLab instance to other geographical locations."
 msgstr ""
 
+msgid "Geo nodes are paused using a command run on the node"
+msgstr ""
+
 msgid "GeoNodeStatusEvent|%{timeAgoStr} (%{pendingEvents} events)"
 msgstr ""
 
@@ -10239,6 +10242,9 @@ msgid "GeoNodes|Replication slot WAL"
 msgstr ""
 
 msgid "GeoNodes|Replication slots"
+msgstr ""
+
+msgid "GeoNodes|Replication status"
 msgstr ""
 
 msgid "GeoNodes|Repositories"
@@ -18677,6 +18683,12 @@ msgstr ""
 msgid "Replication"
 msgstr ""
 
+msgid "Replication enabled"
+msgstr ""
+
+msgid "Replication paused"
+msgstr ""
+
 msgid "Reply by email"
 msgstr ""
 
@@ -19041,9 +19053,6 @@ msgid "Restricts sign-ups for email addresses that match the given regex. See th
 msgstr ""
 
 msgid "Resume"
-msgstr ""
-
-msgid "Resume replication"
 msgstr ""
 
 msgid "Resync"

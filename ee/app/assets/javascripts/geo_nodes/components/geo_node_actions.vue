@@ -36,15 +36,6 @@ export default {
     },
   },
   computed: {
-    isToggleAllowed() {
-      return !this.node.primary && this.nodeEditAllowed;
-    },
-    nodeToggleLabel() {
-      return this.node.enabled ? __('Pause replication') : __('Resume replication');
-    },
-    nodeToggleIcon() {
-      return this.node.enabled ? 'pause' : 'play';
-    },
     isSecondaryNode() {
       return !this.node.primary;
     },
@@ -112,18 +103,6 @@ export default {
         @click="onRepairNode"
       >
         {{ s__('Repair authentication') }}
-      </gl-deprecated-button>
-      <gl-deprecated-button
-        v-if="isToggleAllowed"
-        :class="{
-          'btn-warning': node.enabled,
-          'btn-success': !node.enabled,
-        }"
-        class="btn btn-sm mx-1 sm-column-spacing"
-        @click="onToggleNode"
-      >
-        <icon :name="nodeToggleIcon" />
-        {{ nodeToggleLabel }}
       </gl-deprecated-button>
       <a v-if="nodeEditAllowed" :href="node.editPath" class="btn btn-sm mx-1 sm-column-spacing">
         {{ __('Edit') }}
