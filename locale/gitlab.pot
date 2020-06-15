@@ -15313,6 +15313,9 @@ msgstr ""
 msgid "One or more of you personal access tokens were revoked"
 msgstr ""
 
+msgid "One or more of your %{provider} projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
+msgstr ""
+
 msgid "One or more of your Bitbucket projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
 msgstr ""
 
@@ -16319,6 +16322,9 @@ msgid "Please choose a group URL with no special characters."
 msgstr ""
 
 msgid "Please complete your profile with email address"
+msgstr ""
+
+msgid "Please convert %{linkStart}them to Git%{linkEnd}, and go through the %{linkToImportFlow} again."
 msgstr ""
 
 msgid "Please convert them to %{link_to_git}, and go through the %{link_to_import_flow} again."
@@ -18227,6 +18233,9 @@ msgid "Recent searches"
 msgstr ""
 
 msgid "Recipe"
+msgstr ""
+
+msgid "Reconfigure"
 msgstr ""
 
 msgid "Recover hidden stage"
