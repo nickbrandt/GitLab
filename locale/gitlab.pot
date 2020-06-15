@@ -371,7 +371,7 @@ msgstr ""
 msgid "%{host} sign-in from new location"
 msgstr ""
 
-msgid "%{icon}You are about to add %{usersTag} people to the discussion. Proceed with caution."
+msgid "%{icon}You are about to add %{usersTag} people to the discussion. They will all receive a notification."
 msgstr ""
 
 msgid "%{issuableType} will be removed! Are you sure?"
