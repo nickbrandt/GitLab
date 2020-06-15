@@ -34,6 +34,10 @@ module EE
             .for_ref(ref)
             .for_project_paths(project_path)
         end
+
+        scope :security_scans_scanned_resources_count, -> (report_types) do
+          joins(:security_scans).where(security_scans: { scan_type: report_types }).group(:scan_type).sum(:scanned_resources_count)
+        end
       end
 
       def shared_runners_minutes_limit_enabled?
