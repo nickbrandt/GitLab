@@ -4,6 +4,7 @@ import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { removeFlash, handleErrorOrRethrow, isStageNameExistsError } from '../utils';
+import { TASKS_BY_TYPE_FILTERS } from '../constants';
 
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
@@ -90,9 +91,16 @@ export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
-export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
+export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch, state }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS);
-  dispatch('typeOfWork/fetchTopRankedGroupLabels');
+  const { selectedLabelIds = [] } = state;
+  // use the filter bar labels if we have them available
+  if (selectedLabelIds.length) {
+    return dispatch('typeOfWork/setTasksByTypeLabels', selectedLabelIds).then(() => {
+      return dispatch('typeOfWork/fetchTasksByTypeData');
+    });
+  }
+  return dispatch('typeOfWork/fetchTopRankedGroupLabels');
 };
 
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {

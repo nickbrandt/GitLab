@@ -42,4 +42,7 @@ export default {
         break;
     }
   },
+  [types.SET_TASKS_BY_TYPE_LABELS](state, selectedLabelIds) {
+    state.selectedLabelIds = selectedLabelIds;
+  },
 };

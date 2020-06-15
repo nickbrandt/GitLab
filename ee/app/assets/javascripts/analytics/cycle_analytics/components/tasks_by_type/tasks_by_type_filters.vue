@@ -37,6 +37,11 @@ export default {
       type: Boolean,
       required: true,
     },
+    canSelectLabels: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   computed: {
     subjectFilterOptions() {
@@ -89,6 +94,9 @@ export default {
     },
   },
   TASKS_BY_TYPE_FILTERS,
+  INACTIVE_TOOLTIP_TEXT: s__(
+    'CycleAnalytics|Currently displaying data using labels from the filter bar',
+  ),
 };
 </script>
 <template>
@@ -105,6 +113,8 @@ export default {
         :max-labels="maxLabels"
         :aria-label="__('CycleAnalytics|Display chart filters')"
         :selected-label-id="selectedLabelIds"
+        :inactive="!canSelectLabels"
+        :inactive-tooltip-text="$options.INACTIVE_TOOLTIP_TEXT"
         aria-expanded="false"
         multiselect
         right
@@ -130,7 +140,7 @@ export default {
           <div class="mb-3 px-3">
             <p class="font-weight-bold text-left my-2">
               {{ s__('CycleAnalytics|Select labels') }}
-              <br /><small>{{ selectedLabelLimitText }}</small>
+              <small v-if="canSelectLabels"><br />{{ selectedLabelLimitText }}</small>
             </p>
           </div>
         </template>

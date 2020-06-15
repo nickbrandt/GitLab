@@ -18,6 +18,7 @@ import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 
 const selectedLabelIds = [groupLabels[0].id];
 
+const findInactiveContainer = ctx => ctx.find('[data-testid="inactive-container"]');
 const findSubjectFilters = ctx => ctx.find(GlSegmentedControl);
 const findSelectedSubjectFilters = ctx => findSubjectFilters(ctx).attributes('checked');
 const findDropdownLabels = ctx => ctx.find(LabelsSelector).findAll(GlDropdownItem);
@@ -54,6 +55,7 @@ function createComponent({ props = {}, mountFn = shallowMount } = {}) {
       labels: groupLabels,
       subjectFilter: TASKS_BY_TYPE_SUBJECT_ISSUE,
       hasData: true,
+      canSelectLabels: true,
       ...props,
     },
     stubs: {
@@ -201,6 +203,56 @@ describe('TasksByTypeFilters', () => {
             filter: TASKS_BY_TYPE_FILTERS.SUBJECT,
             value: TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST,
           },
+        ]);
+      });
+    });
+  });
+
+  describe('canSelectLabels', () => {
+    const defaultProps = {
+      selectedLabelIds: [groupLabels[0].id, groupLabels[1].id],
+      warningMessageThreshold: 2,
+      maxLabels: 5,
+    };
+
+    describe('set to true', () => {
+      beforeEach(() => {
+        wrapper = createComponent({
+          props: defaultProps,
+        });
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('indicates how many labels are selected', () => {
+        expect(wrapper.text()).toContain('2 selected (5 max)');
+      });
+
+      it('does not set inactive classes for the dropdown', () => {
+        expect(findInactiveContainer(wrapper).classes()).toEqual([]);
+      });
+    });
+
+    describe('set to false', () => {
+      beforeEach(() => {
+        wrapper = createComponent({
+          props: {
+            ...defaultProps,
+            canSelectLabels: false,
+          },
+        });
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('does not indicate how many labels are selected', () => {
+        expect(wrapper.text()).not.toContain('2 selected (5 max)');
+      });
+
+      it('sets inactive classes for the dropdown', () => {
+        expect(findInactiveContainer(wrapper).classes()).toEqual([
+          'gl-opacity-3',
+          'cursor-not-allowed',
         ]);
       });
     });

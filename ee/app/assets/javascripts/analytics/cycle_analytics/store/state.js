@@ -16,6 +16,7 @@ export default () => ({
   selectedGroup: null,
   selectedProjects: [],
   selectedStage: null,
+  selectedLabelIds: [], // NOTE: The tasks by type chart uses labelIds
 
   currentStageEvents: [],
 
