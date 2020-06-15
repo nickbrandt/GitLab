@@ -11,3 +11,10 @@ export const healthStatusTextMap = {
   [healthStatus.NEEDS_ATTENTION]: __('Needs attention'),
   [healthStatus.AT_RISK]: __('At risk'),
 };
+
+export const iterationSelectTextMap = {
+  iteration: __('Iteration'),
+  noIteration: __('No iteration'),
+  noIterationItem: [{ title: __('No iteration'), id: null }],
+  iterationSelectFail: __('Failed to set iteration on this issue. Please try again.'),
+};
