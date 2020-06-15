@@ -110,3 +110,15 @@ function rspec_paralellized_job() {
 
   date
 }
+
+function rspec_matched_tests() {
+  local matching_tests_file=${1}
+  local rspec_opts=${2}
+  local test_files="$(cat "${matching_tests_file}")"
+
+  if [[ -n $test_files ]]; then
+    rspec_simple_job "${rspec_opts} ${test_files}"
+  else
+    echo "No test files to run"
+  fi
+}
