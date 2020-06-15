@@ -28,11 +28,11 @@ module EE
       wrapper_classes = %w(gl-label gl-label-scoped)
       wrapper_classes << 'gl-label-sm' if small
 
-      <<~HTML.chomp.html_safe
-        <span class="d-inline-block position-relative scoped-label-wrapper">
-          <span class="#{wrapper_classes.join(' ')}" style="color: #{label.color}">#{label_html}</span>
-        </span>
-      HTML
+      border_width = small ? '1px' : '2px'
+
+      html = %(<span class="#{wrapper_classes.join(' ')}" style="--label-inset-border: inset 0 0 0 #{border_width} #{label.color}; color: #{label.color}">#{label_html}</span>).html_safe
+
+      html
     end
 
     def label_tooltip_title(label)
