@@ -82,7 +82,7 @@ class Import::BitbucketController < Import::BaseController
   def importable_repos
     already_added_projects_names = already_added_projects.map(&:import_source)
 
-    bitbucket_repos.reject { |repo| (already_added_projects_names.include? repo.full_name) || !repo.valid? }
+    bitbucket_repos.reject { |repo| already_added_projects_names.include?(repo.full_name) || !repo.valid? }
   end
   # rubocop: enable CodeReuse/ActiveRecord
 

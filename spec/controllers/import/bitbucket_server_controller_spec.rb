@@ -142,10 +142,28 @@ RSpec.describe Import::BitbucketServerController do
       allow(controller).to receive(:client).and_return(client)
 
       @repo = double(slug: 'vim', project_key: 'asd', full_name: 'asd/vim', "valid?" => true, project_name: 'asd', browse_url: 'http://test', name: 'vim')
-      @invalid_repo = double(slug: 'invalid', project_key: 'foobar', full_name: 'asd/foobar', "valid?" => false, browse_url: 'http://bad-repo')
+      @invalid_repo = double(slug: 'invalid', project_key: 'foobar', full_name: 'asd/foobar', "valid?" => false, browse_url: 'http://bad-repo', name: 'invalid')
       @created_repo = double(slug: 'created', project_key: 'existing', full_name: 'group/created', "valid?" => true, browse_url: 'http://existing')
       assign_session_tokens
       stub_feature_flags(new_import_ui: false)
+    end
+
+    context 'with new_import_ui feature flag enabled' do
+      before do
+        stub_feature_flags(new_import_ui: true)
+      end
+
+      it 'returns invalid repos' do
+        allow(client).to receive(:repos).with(filter: nil, limit: 25, page_offset: 0).and_return([@repo, @invalid_repo])
+
+        get :status, format: :json
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['incompatible_repos'].length).to eq(1)
+        expect(json_response.dig("incompatible_repos", 0, "id")).to eq(@invalid_repo.full_name)
+        expect(json_response['provider_repos'].length).to eq(1)
+        expect(json_response.dig("provider_repos", 0, "id")).to eq(@repo.full_name)
+      end
     end
 
     it_behaves_like 'import controller with new_import_ui feature flag' do
