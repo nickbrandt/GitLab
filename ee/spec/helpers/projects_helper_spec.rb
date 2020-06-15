@@ -87,83 +87,111 @@ RSpec.describe ProjectsHelper do
     end
   end
 
-  shared_context 'project with owner and pipeline' do
-    let(:user) { create(:user) }
-    let(:group) { create(:group).tap { |g| g.add_owner(user) } }
-    let(:pipeline) do
-      create(:ee_ci_pipeline,
-             :with_sast_report,
-             user: user,
-             project: project,
-             ref: project.default_branch,
-             sha: project.commit.sha)
-    end
-    let(:project) { create(:project, :repository, group: group) }
-  end
-
   describe '#project_security_dashboard_config' do
-    include_context 'project with owner and pipeline'
+    let_it_be(:user) { create(:user) }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:project) { create(:project, :repository, group: group) }
+
+    let(:pipeline) { nil }
+
+    subject { helper.project_security_dashboard_config(project, pipeline) }
 
     before do
+      group.add_owner(user)
       allow(helper).to receive(:current_user).and_return(user)
     end
 
-    let(:project) { create(:project, :repository, group: group) }
-
-    context 'project without pipeline' do
-      subject { helper.project_security_dashboard_config(project, nil) }
-
-      it 'returns simple config' do
-        expect(subject).to match(
+    context 'project without vulnerabilities' do
+      let(:expected_value) do
+        {
           empty_state_svg_path: start_with('/assets/illustrations/security-dashboard_empty'),
           security_dashboard_help_path: '/help/user/application_security/security_dashboard/index'
-        )
+        }
       end
+
+      it { is_expected.to match(expected_value) }
     end
 
-    context 'project with pipeline' do
-      subject { helper.project_security_dashboard_config(project, pipeline) }
-
-      it 'checks if first vulnerability class is enabled' do
-        expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true)
-
-        subject
+    context 'project with vulnerabilities' do
+      before do
+        create(:vulnerability, project: project)
       end
 
-      context 'when first first class vulnerabilities is enabled for project' do
+      let(:expected_core_values) do
+        hash_including(
+          project: { id: project.id, name: project.name },
+          project_full_path: project.full_path,
+          vulnerabilities_endpoint: "/#{project.full_path}/-/security/vulnerability_findings",
+          vulnerabilities_summary_endpoint: "/#{project.full_path}/-/security/vulnerability_findings/summary",
+          vulnerability_feedback_help_path: '/help/user/application_security/index#interacting-with-the-vulnerabilities',
+          empty_state_svg_path: start_with('/assets/illustrations/security-dashboard-empty-state'),
+          dashboard_documentation: '/help/user/application_security/security_dashboard/index',
+          security_dashboard_help_path: '/help/user/application_security/security_dashboard/index',
+          user_callouts_path: '/-/user_callouts',
+          user_callout_id: 'standalone_vulnerabilities_introduction_banner',
+          show_introduction_banner: 'true'
+        )
+      end
+
+      it { is_expected.to match(expected_core_values) }
+
+      context 'when the first_class_vulnerabilities available' do
+        let(:export_endpoint) { "/api/v4/security/projects/#{project.id}/vulnerability_exports" }
+        let(:expected_sub_hash) { hash_including(vulnerabilities_export_endpoint: export_endpoint) }
+
         before do
-          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true).and_return(true)
+          allow(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true).and_return(true)
         end
 
-        it 'checks if first vulnerability class is enabled' do
-          expect(subject[:vulnerabilities_export_endpoint]).to(
-            eq(
-              api_v4_security_projects_vulnerability_exports_path(id: project.id)
-            ))
-        end
+        it { is_expected.to match(expected_sub_hash) }
       end
 
-      context 'when first first class vulnerabilities is disabled for project' do
+      context 'when the first_class_vulnerabilities is not available' do
         before do
-          expect(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true).and_return(false)
+          allow(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true).and_return(false)
         end
 
-        it 'checks if first vulnerability class is enabled' do
-          expect(subject).not_to have_key(:vulnerabilities_export_endpoint)
+        it { is_expected.not_to have_key(:vulnerabilities_export_endpoint) }
+      end
+
+      context 'project without pipeline' do
+        let(:expected_sub_hash) do
+          hash_including(
+            has_pipeline_data: 'false'
+          )
         end
+
+        it { is_expected.to match(expected_sub_hash) }
       end
 
-      it 'returns config containing pipeline details' do
-        expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard/index'
-        expect(subject[:has_pipeline_data]).to eq 'true'
-      end
+      context 'project with pipeline' do
+        let_it_be(:pipeline) do
+          create(:ee_ci_pipeline,
+                 :with_sast_report,
+                 user: user,
+                 project: project,
+                 ref: project.default_branch,
+                 sha: project.commit.sha)
+        end
 
-      it 'returns the "vulnerability findings" endpoint paths' do
-        expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
-        expect(subject[:vulnerabilities_summary_endpoint]).to(
-          eq(
-            summary_project_security_vulnerability_findings_path(project)
-          ))
+        let(:project_path) { "http://test.host/#{project.full_path}" }
+        let(:expected_sub_hash) do
+          hash_including(
+            pipeline_id: pipeline.id,
+            user_path: "http://test.host/#{pipeline.user.username}",
+            user_avatar_path: pipeline.user.avatar_url,
+            user_name: pipeline.user.name,
+            commit_id: pipeline.commit.short_id,
+            commit_path: "#{project_path}/-/commit/#{pipeline.commit.sha}",
+            ref_id: project.default_branch,
+            ref_path: "#{project_path}/-/commits/#{project.default_branch}",
+            pipeline_path: "#{project_path}/-/pipelines/#{pipeline.id}",
+            pipeline_created: pipeline.created_at.to_s(:iso8601),
+            has_pipeline_data: 'true'
+          )
+        end
+
+        it { is_expected.to match(expected_sub_hash) }
       end
     end
   end
