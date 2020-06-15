@@ -4,7 +4,6 @@ import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { removeFlash, handleErrorOrRethrow, isStageNameExistsError } from '../utils';
-import { TASKS_BY_TYPE_FILTERS } from '../constants';
 
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);

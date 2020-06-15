@@ -6939,6 +6939,9 @@ msgstr ""
 msgid "CycleAnalytics|All stages"
 msgstr ""
 
+msgid "CycleAnalytics|Currently displaying data using labels from the filter bar"
+msgstr ""
+
 msgid "CycleAnalytics|Date"
 msgstr ""
 
