@@ -19,3 +19,7 @@ export const cleanObjects = ({ commit }) => {
 export const loadBlob = ({ commit }, payload) => {
   commit(types.LOAD_BLOB, payload);
 };
+
+export const refreshStatus = ({ commit }) => {
+  commit(types.REFRESH_STATUS);
+};

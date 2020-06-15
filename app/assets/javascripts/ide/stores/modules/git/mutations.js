@@ -1,4 +1,5 @@
 import { updateObjects, loadBlobContent } from './utils/fs';
+import { calculateDiff } from './utils/diff';
 import * as types from './mutation_types';
 
 const addAllRefsToSet = (objects, ref, keys) => {
@@ -57,5 +58,10 @@ export default {
 
       state.refs[refKey] = newRef;
     });
+  },
+  [types.REFRESH_STATUS](state) {
+    const status = calculateDiff(state.objects, state.refs.head, state.refs.fs);
+
+    state.status = status;
   },
 };

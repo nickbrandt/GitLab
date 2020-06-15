@@ -16,12 +16,21 @@ export const setupGitWatcher = store => {
     val => {
       console.log(JSON.parse(JSON.stringify(val)));
       console.log(Object.keys(store.state.git.objects).length);
+      store.dispatch('git/refreshStatus');
 
       // WARNING: this kind of creates a race condition and is a bit of an expensive operation. We should think of a way to
       // assure async reliability + optimize for performance.
       store.dispatch('git/cleanObjects');
 
       console.log(Object.keys(store.state.git.objects).length);
+    },
+    { deep: true },
+  );
+
+  store.watch(
+    state => state.git.status,
+    val => {
+      console.log(JSON.parse(JSON.stringify(val)));
     },
     { deep: true },
   );
