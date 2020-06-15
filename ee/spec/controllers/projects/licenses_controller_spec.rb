@@ -91,7 +91,7 @@ RSpec.describe Projects::LicensesController do
             let_it_be(:mit_policy) { create(:software_license_policy, :denied, software_license: mit, project: project) }
             let_it_be(:other_license) { create(:software_license, spdx_identifier: "Other-Id") }
             let_it_be(:other_license_policy) { create(:software_license_policy, :allowed, software_license: other_license, project: project) }
-            let_it_be(:pipeline) { create(:ee_ci_pipeline, project: project, builds: [create(:ee_ci_build, :license_scan_v2, :success)]) }
+            let_it_be(:pipeline) { create(:ee_ci_pipeline, project: project, builds: [create(:ee_ci_build, :license_scan_v2_1, :success)]) }
 
             context "when loading all policies" do
               before do
@@ -116,7 +116,7 @@ RSpec.describe Projects::LicensesController do
                   "id" => nil,
                   "spdx_identifier" => "BSD-3-Clause",
                   "name" => "BSD 3-Clause \"New\" or \"Revised\" License",
-                  "url" => "http://spdx.org/licenses/BSD-3-Clause.json",
+                  "url" => "https://opensource.org/licenses/BSD-3-Clause",
                   "classification" => "unclassified"
                 })
               end
@@ -126,7 +126,7 @@ RSpec.describe Projects::LicensesController do
                   "id" => mit_policy.id,
                   "spdx_identifier" => "MIT",
                   "name" => mit.name,
-                  "url" => "http://spdx.org/licenses/MIT.json",
+                  "url" => "https://opensource.org/licenses/MIT",
                   "classification" => "denied"
                 })
               end
