@@ -5350,10 +5350,10 @@ msgstr ""
 msgid "ClusterIntegration|Select zone to choose machine type"
 msgstr ""
 
-msgid "ClusterIntegration|Send Cilium Logs"
+msgid "ClusterIntegration|Send Container Network Policies Logs"
 msgstr ""
 
-msgid "ClusterIntegration|Send ModSecurity Logs"
+msgid "ClusterIntegration|Send Web Application Firewall Logs"
 msgstr ""
 
 msgid "ClusterIntegration|Service Token"
