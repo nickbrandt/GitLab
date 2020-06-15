@@ -101,18 +101,11 @@ DAG Visualization is under development and requires more testing, but is being m
 
 It is deployed behind a feature flag that is **disabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
-can opt to enable it for your instance.
+can opt to enable it for your instance:
 
 ```ruby
-# To force-enable it globally
+# Instance-wide
 Feature.enable(:dag_pipeline_tab)
-
-# To Enable DAG tab only on a specific project, disabling it system-wide
-Feature.enable(:dag_pipeline_tab, Project.find_by_full_path("gitlab-org/gitlab"))
-
-# To disable it globally
-Feature.disable(:dag_pipeline_tab)
-
-# To revert to default
-Feature.remove(:dag_pipeline_tab)
+# or by project
+Feature.enable(:dag_pipeline_tab, Project.find(<project id>))
 ```
