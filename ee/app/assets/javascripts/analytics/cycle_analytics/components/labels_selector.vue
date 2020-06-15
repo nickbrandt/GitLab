@@ -63,7 +63,7 @@ export default {
     },
     inactive: {
       type: Boolean,
-      required: true,
+      required: false,
       default: false,
     },
     inactiveTooltipText: {
@@ -102,7 +102,7 @@ export default {
     },
   },
   mounted() {
-    this.search();
+    this.fetchData();
   },
   methods: {
     ...mapGetters(['currentGroupPath']),
@@ -180,6 +180,7 @@ export default {
               'cursor-not-allowed': inactive || disabled,
             }"
             :disabled="inactive"
+            :active="!inactive && isSelectedLabel(label.id)"
             @click.prevent="$emit('selectLabel', label.id, selectedLabelIds)"
           >
             <gl-icon
