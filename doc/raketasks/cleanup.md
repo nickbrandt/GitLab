@@ -64,6 +64,8 @@ I, [2020-01-08T20:51:17.148765 #43765]  INFO -- : Removed unreferenced LFS files
 
 ## Remove garbage from filesystem
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20863) in GitLab 11.2.
+
 Clean up local project upload files if they don't exist in GitLab database. The
 task attempts to fix the file if it can find its project, otherwise it moves the
 file to a lost and found directory.
@@ -95,6 +97,10 @@ I, [2018-07-27T12:08:33.689869 #89817]  INFO -- : Did move to lost and found /op
 I, [2018-07-27T12:08:33.755624 #89817]  INFO -- : Did fix /opt/gitlab/embedded/service/gitlab-rails/public/uploads/foo/bar/89a0f7b0b97008a4a18cedccfdcd93fb/foo.txt -> /opt/gitlab/embedded/service/gitlab-rails/public/uploads/qux/foo/bar/89a0f7b0b97008a4a18cedccfdcd93fb/foo.txt
 I, [2018-07-27T12:08:33.760257 #89817]  INFO -- : Did move to lost and found /opt/gitlab/embedded/service/gitlab-rails/public/uploads/foo/bar/1dd6f0f7eefd2acc4c2233f89a0f7b0b/image.png -> /opt/gitlab/embedded/service/gitlab-rails/public/uploads/-/project-lost-found/foo/bar/1dd6f0f7eefd2acc4c2233f89a0f7b0b/image.png
 ```
+
+## Remove garbage from object storage
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20918) in GitLab 11.2.
 
 Remove object store upload files if they don't exist in GitLab database.
 
