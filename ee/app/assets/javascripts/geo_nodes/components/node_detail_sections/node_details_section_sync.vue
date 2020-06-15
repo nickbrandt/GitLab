@@ -78,6 +78,11 @@ export default {
           detailsPath: `${this.node.url}admin/geo/designs`,
         },
         {
+          itemTitle: s__('GeoNodes|Package files'),
+          itemValue: this.nodeDetails.packageFiles,
+          itemValueType: VALUE_TYPE.GRAPH,
+        },
+        {
           itemTitle: s__('GeoNodes|Data replication lag'),
           itemValue: this.dbReplicationLag(),
           itemValueType: VALUE_TYPE.PLAIN,
