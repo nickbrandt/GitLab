@@ -3,12 +3,12 @@ import * as types from './mutation_types';
 
 export default {
   [types.UPDATE_OBJECTS](state, { fs }) {
-    const timestamp = state.lastTimestamp;
+    const { lastTimestamp, objects, refs } = state;
 
-    const newRef = updateObjects({ objects: state.objects, fs, timestamp });
+    const newRef = updateObjects({ objects, lastTimestamp, rootRef: refs.fs, fs });
 
     state.refs.fs = newRef;
-    if (timestamp < 0) {
+    if (lastTimestamp < 0) {
       state.refs.head = newRef;
     }
   },

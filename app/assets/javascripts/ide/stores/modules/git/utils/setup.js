@@ -16,6 +16,7 @@ export const setupGitWatcher = store => {
     state => state.git.refs,
     val => {
       console.log(JSON.parse(JSON.stringify(val)));
+      console.log(store.state.git.objects);
     },
     { deep: true },
   );
