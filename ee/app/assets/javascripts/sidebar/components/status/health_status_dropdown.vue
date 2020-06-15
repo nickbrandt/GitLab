@@ -1,5 +1,4 @@
 <script>
-import Tracking from '~/tracking';
 import { GlButton, GlDropdownItem, GlDropdown, GlDropdownDivider } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { healthStatusTextMap } from '../../constants';
@@ -11,7 +10,6 @@ export default {
     GlDropdownItem,
     GlDropdownDivider,
   },
-  mixins: [Tracking.mixin()],
   props: {
     isEditable: {
       type: Boolean,
@@ -40,9 +38,6 @@ export default {
     };
   },
   computed: {
-    canRemoveStatus() {
-      return this.isEditable && this.status;
-    },
     statusText() {
       return this.status ? healthStatusTextMap[this.status] : s__('Sidebar|None');
     },
@@ -72,27 +67,10 @@ export default {
     handleDropdownClick(status) {
       this.selectedStatus = status;
       this.$emit('onDropdownClick', status);
-      this.track('change_health_status', { property: status });
       this.hideDropdown();
     },
     hideDropdown() {
       this.isDropdownShowing = false;
-    },
-    toggleFormDropdown() {
-      this.isDropdownShowing = !this.isDropdownShowing;
-
-      /**
-       * We need to programmatically open the dropdown to make the
-       * outside click on document close the dropdown.
-       */
-      const { dropdown } = this.$refs.dropdown.$refs;
-
-      if (dropdown && this.isDropdownShowing) {
-        dropdown.show();
-      }
-    },
-    removeStatus() {
-      this.handleDropdownClick(null);
     },
     isSelected(status) {
       return this.status === status;

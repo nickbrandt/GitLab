@@ -65,7 +65,10 @@ export default class IssuableBulkUpdateSidebar {
     new MilestoneSelect();
     issueStatusSelect();
     subscriptionSelect();
-    HealthStatusSelect();
+
+    if (HealthStatusSelect) {
+      HealthStatusSelect();
+    }
   }
 
   setupBulkUpdateActions() {

@@ -3,12 +3,11 @@
 require 'spec_helper'
 
 describe 'Issues > Health status bulk assignment' do
-  let(:user) { create(:user) }
-  let(:group) { create(:group, :public) }
-  let(:project) { create(:project, :public, group: group) }
-
-  let!(:issue1) { create(:issue, project: project, title: "Issue 1") }
-  let!(:issue2) { create(:issue, project: project, title: "Issue 2") }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group, :public) }
+  let_it_be(:project) { create(:project, :public, group: group) }
+  let_it_be(:issue1) { create(:issue, project: project, title: "Issue 1") }
+  let_it_be(:issue2) { create(:issue, project: project, title: "Issue 2") }
 
   context 'as an allowed user', :js do
     before do
@@ -22,16 +21,12 @@ describe 'Issues > Health status bulk assignment' do
     end
 
     context 'sidebar' do
-      before do
-        enable_bulk_update
-      end
-
       it 'is present when bulk edit is enabled' do
+        enable_bulk_update
         expect(page).to have_css('.issuable-sidebar')
       end
 
       it 'is not present when bulk edit is disabled' do
-        disable_bulk_update
         expect(page).not_to have_css('.issuable-sidebar')
       end
     end
@@ -49,7 +44,7 @@ describe 'Issues > Health status bulk assignment' do
             update_issues
           end
 
-          it do
+          it 'updates the health statuses' do
             expect(issue1.reload.health_status).to eq 'on_track'
             expect(issue2.reload.health_status).to eq 'on_track'
           end
@@ -62,7 +57,7 @@ describe 'Issues > Health status bulk assignment' do
             update_issues
           end
 
-          it do
+          it 'updates the checked issue\'s status' do
             expect(issue1.reload.health_status).to eq 'at_risk'
             expect(issue2.reload.health_status).to eq nil
           end
@@ -81,12 +76,10 @@ describe 'Issues > Health status bulk assignment' do
       visit project_issues_path(project)
     end
 
-    context 'cannot bulk assign health_status' do
-      it do
-        expect(page).not_to have_button 'Edit issues'
-        expect(page).not_to have_css '.check-all-issues'
-        expect(page).not_to have_css '.issue-check'
-      end
+    it 'cannot bulk assign health_status' do
+      expect(page).not_to have_button 'Edit issues'
+      expect(page).not_to have_css '.check-all-issues'
+      expect(page).not_to have_css '.issue-check'
     end
   end
 
@@ -99,7 +92,7 @@ describe 'Issues > Health status bulk assignment' do
     end
   end
 
-  def check_issue(issue, uncheck = false)
+  def toggle_issue(issue, uncheck = false)
     page.within('.issues-list') do
       if uncheck
         uncheck "selected_issue_#{issue.id}"
@@ -110,7 +103,7 @@ describe 'Issues > Health status bulk assignment' do
   end
 
   def uncheck_issue(issue)
-    check_issue(issue, true)
+    toggle_issue(issue, uncheck: true)
   end
 
   def update_issues
@@ -121,9 +114,5 @@ describe 'Issues > Health status bulk assignment' do
   def enable_bulk_update
     visit project_issues_path(project)
     click_button 'Edit issues'
-  end
-
-  def disable_bulk_update
-    click_button 'Cancel'
   end
 end

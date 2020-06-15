@@ -1,6 +1,6 @@
 - group = local_assigns.fetch(:group)
 - type = local_assigns.fetch(:type)
-- bulk_issue_health_status_flag = @group&.feature_available?(:issuable_health_status) && Feature.enabled?(:bulk_update_health_status) && type == :issues
+- bulk_issue_health_status_flag = Feature.enabled?(:bulk_update_health_status) && type == :issues && @project&.group&.feature_available?(:issuable_health_status)
 
 %aside.issues-bulk-update.js-right-sidebar.right-sidebar{ 'aria-live' => 'polite', data: { 'signed-in': current_user.present? } }
   .issuable-sidebar.hidden

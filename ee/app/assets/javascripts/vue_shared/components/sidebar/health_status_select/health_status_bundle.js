@@ -27,7 +27,7 @@ export default () => {
         this.selectedStatus = selectedStatus;
         healthStatusFormFieldEl.setAttribute(
           'value',
-          selectedStatus ? healthStatusForRestApi[selectedStatus] : selectedStatus,
+          healthStatusForRestApi[selectedStatus || 'NO_STATUS'],
         );
       },
     },
