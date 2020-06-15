@@ -61,11 +61,11 @@ gitlab:
   task-runner:
     resources:
       requests:
-        cpu: 50m
-        memory: 350M
+        cpu: 300m
+        memory: 800M
       limits:
-        cpu: 100m
-        memory: 700M
+        cpu: 450m
+        memory: 1200M
   webservice:
     resources:
       requests:
@@ -92,6 +92,7 @@ gitlab:
         periodSeconds: 15  # Default is 10
         timeoutSeconds: 5  # Default is 2
 gitlab-runner:
+  install: false
   resources:
     requests:
       cpu: 675m

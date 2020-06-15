@@ -99,9 +99,9 @@ function get_pod() {
   local namespace="${KUBE_NAMESPACE}"
   local release="${CI_ENVIRONMENT_SLUG}"
   local app_name="${1}"
-  local status="${2-Running}"
+  local status2="${2-Running}"
 
-  get_pod_cmd="kubectl get pods --namespace ${namespace} --field-selector=status.phase=${status} -lapp=${app_name},release=${release} --no-headers -o=custom-columns=NAME:.metadata.name | tail -n 1"
+  get_pod_cmd="kubectl get pods --namespace ${namespace} --field-selector=status.phase=${status2} -lapp=${app_name},release=${release} --no-headers -o=custom-columns=NAME:.metadata.name | tail -n 1"
   echoinfo "Waiting till '${app_name}' pod is ready" true
   echoinfo "Running '${get_pod_cmd}'"
 
@@ -124,6 +124,38 @@ function get_pod() {
 
   echoinfo "The pod name is '${pod_name}'."
   echo "${pod_name}"
+}
+
+function run_task() {
+  local namespace="${KUBE_NAMESPACE}"
+  local ruby_cmd="${1}"
+  local task_runner_pod=$(get_pod "task-runner")
+
+  kubectl exec -it --namespace "${namespace}" "${task_runner_pod}" -- gitlab-rails runner "${ruby_cmd}"
+}
+
+function disable_sign_ups() {
+  if [ -z ${REVIEW_APPS_ROOT_TOKEN+x} ]; then
+    echoerr "In order to protect Review Apps, REVIEW_APPS_ROOT_TOKEN variable must be set"
+    false
+  else
+    true
+  fi
+
+  # Create the root token
+  local ruby_cmd="token = User.find_by_username('root').personal_access_tokens.create(scopes: [:api], name: 'Token to disable sign-ups'); token.set_token('${REVIEW_APPS_ROOT_TOKEN}'); begin; token.save!; rescue(ActiveRecord::RecordNotUnique); end"
+  run_task "${ruby_cmd}"
+
+  # Disable sign-ups
+  curl --request PUT --header "PRIVATE-TOKEN: ${REVIEW_APPS_ROOT_TOKEN}" "${CI_ENVIRONMENT_URL}/api/v4/application/settings?signup_enabled=false"
+
+  local signup_enabled=$(curl --silent --show-error --request GET --header "PRIVATE-TOKEN: ${REVIEW_APPS_ROOT_TOKEN}" "${CI_ENVIRONMENT_URL}/api/v4/application/settings" | jq ".signup_enabled")
+  if [[ "${signup_enabled}" == "false" ]]; then
+    echoinfo "Sign-ups have been disabled successfully."
+  else
+    echoerr "Sign-ups should be disabled but are still enabled!"
+    false
+  fi
 }
 
 function check_kube_domain() {
