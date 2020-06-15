@@ -45,7 +45,7 @@ export default function initCopyToClipboard() {
       if (text) return text;
 
       const target = trigger.getAttribute('data-clipboard-target');
-      return document.querySelector(target).textContent;
+      return document.querySelector(target)?.textContent;
     },
   });
   clipboard.on('success', genericSuccess);
