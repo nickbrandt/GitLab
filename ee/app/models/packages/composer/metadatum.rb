@@ -8,7 +8,7 @@ module Packages
 
       belongs_to :package, -> { where(package_type: :composer) }, inverse_of: :composer_metadatum
 
-      validates :package, presence: true
+      validates :package, :target_sha, :composer_json, presence: true
     end
   end
 end

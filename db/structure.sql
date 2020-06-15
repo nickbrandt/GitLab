@@ -4672,7 +4672,8 @@ ALTER SEQUENCE public.packages_build_infos_id_seq OWNED BY public.packages_build
 
 CREATE TABLE public.packages_composer_metadata (
     package_id bigint NOT NULL,
-    target_sha bytea NOT NULL
+    target_sha bytea NOT NULL,
+    composer_json jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 CREATE TABLE public.packages_conan_file_metadata (
@@ -13971,5 +13972,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200609142507
 20200609142508
 20200609212701
+20200615083635
 \.
 
