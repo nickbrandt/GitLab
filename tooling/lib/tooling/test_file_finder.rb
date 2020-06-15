@@ -12,18 +12,17 @@ module Tooling
     end
 
     def test_files
-      matchers = [ee_matcher, foss_matcher]
-      matchers.inject(Set.new) do |result, matcher|
-        test_files = matcher.match(@file)
-        result | test_files
-      end.to_a
+      impacted_tests = ee_impact | non_ee_impact
+      impacted_tests.impact(@file)
     end
 
     private
 
     attr_reader :file, :foss_test_only, :result
 
-    class TestFileMatcher
+    class ImpactedTestFile
+      attr_reader :pattern_matchers
+
       def initialize
         @pattern_matchers = {}
 
@@ -34,34 +33,45 @@ module Tooling
         @pattern_matchers[pattern] = block
       end
 
-      def match(file)
-        @pattern_matchers.each_with_object(Set.new) do |(pattern, test_matcher), result|
+      def impact(file)
+        @pattern_matchers.each_with_object(Set.new) do |(pattern, block), result|
           if (match = pattern.match(file))
-            result << test_matcher.call(match)
+            result << block.call(match)
+          end
+        end.to_a
+      end
+
+      def |(other)
+        self.class.new do |combined_matcher|
+          self.pattern_matchers.each do |pattern, block|
+            combined_matcher.associate(pattern, &block)
+          end
+          other.pattern_matchers.each do |pattern, block|
+            combined_matcher.associate(pattern, &block)
           end
         end
       end
     end
 
-    def ee_matcher
-      TestFileMatcher.new do |matcher|
+    def ee_impact
+      ImpactedTestFile.new do |impact|
         unless foss_test_only
-          matcher.associate(%r{^#{EE_PREFIX}app/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}_spec.rb" }
-          matcher.associate(%r{^#{EE_PREFIX}app/(.*/)ee/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}#{match[2]}_spec.rb" }
-          matcher.associate(%r{^#{EE_PREFIX}lib/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/lib/#{match[1]}_spec.rb" }
-          matcher.associate(%r{^#{EE_PREFIX}spec/(.+)_spec.rb$}) { |match| match[0] }
+          impact.associate(%r{^#{EE_PREFIX}app/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}_spec.rb" }
+          impact.associate(%r{^#{EE_PREFIX}app/(.*/)ee/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}#{match[2]}_spec.rb" }
+          impact.associate(%r{^#{EE_PREFIX}lib/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/lib/#{match[1]}_spec.rb" }
+          impact.associate(%r{^#{EE_PREFIX}spec/(.+)_spec.rb$}) { |match| match[0] }
         end
 
-        matcher.associate(%r{^#{EE_PREFIX}(?!spec)(.*/)ee/(.+)\.rb$}) { |match| "spec/#{match[1]}#{match[2]}_spec.rb" }
-        matcher.associate(%r{^#{EE_PREFIX}spec/(.*/)ee/(.+)\.rb$}) { |match| "spec/#{match[1]}#{match[2]}.rb" }
+        impact.associate(%r{^#{EE_PREFIX}(?!spec)(.*/)ee/(.+)\.rb$}) { |match| "spec/#{match[1]}#{match[2]}_spec.rb" }
+        impact.associate(%r{^#{EE_PREFIX}spec/(.*/)ee/(.+)\.rb$}) { |match| "spec/#{match[1]}#{match[2]}.rb" }
       end
     end
 
-    def foss_matcher
-      TestFileMatcher.new do |matcher|
-        matcher.associate(%r{^app/(.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
-        matcher.associate(%r{^(tooling/)?lib/(.+)\.rb$}) { |match| "spec/#{match[1]}lib/#{match[2]}_spec.rb" }
-        matcher.associate(%r{^spec/(.+)_spec.rb$}) { |match| match[0] }
+    def non_ee_impact
+      ImpactedTestFile.new do |impact|
+        impact.associate(%r{^app/(.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
+        impact.associate(%r{^(tooling/)?lib/(.+)\.rb$}) { |match| "spec/#{match[1]}lib/#{match[2]}_spec.rb" }
+        impact.associate(%r{^spec/(.+)_spec.rb$}) { |match| match[0] }
       end
     end
   end
