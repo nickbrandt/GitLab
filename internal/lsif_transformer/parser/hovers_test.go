@@ -9,6 +9,10 @@ import (
 func TestHoversRead(t *testing.T) {
 	h := setupHovers(t)
 
+	var offset Offset
+	require.NoError(t, h.Offsets.Entry(2, &offset))
+	require.Equal(t, Offset{At: 0, Len: 19}, offset)
+
 	require.Equal(t, `[{"value":"hello"}]`, string(h.For(1)))
 
 	require.NoError(t, h.Close())

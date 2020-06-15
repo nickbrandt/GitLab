@@ -7,13 +7,13 @@ import (
 )
 
 type Offset struct {
-	At  int
-	Len int
+	At  int32
+	Len int32
 }
 
 type Hovers struct {
-	Offsets       map[Id]*Offset
 	File          *os.File
+	Offsets       *cache
 	CurrentOffset int
 }
 
@@ -42,9 +42,14 @@ func NewHovers(tempDir string) (*Hovers, error) {
 		return nil, err
 	}
 
+	offsets, err := newCache(tempDir, "hovers-indexes", Offset{})
+	if err != nil {
+		return nil, err
+	}
+
 	return &Hovers{
-		Offsets:       make(map[Id]*Offset),
 		File:          file,
+		Offsets:       offsets,
 		CurrentOffset: 0,
 	}, nil
 }
@@ -69,8 +74,8 @@ func (h *Hovers) Read(label string, line []byte) error {
 }
 
 func (h *Hovers) For(refId Id) json.RawMessage {
-	offset, ok := h.Offsets[refId]
-	if !ok || offset == nil {
+	var offset Offset
+	if err := h.Offsets.Entry(refId, &offset); err != nil || offset.Len == 0 {
 		return nil
 	}
 
@@ -88,7 +93,11 @@ func (h *Hovers) Close() error {
 		return err
 	}
 
-	return os.Remove(h.File.Name())
+	if err := os.Remove(h.File.Name()); err != nil {
+		return err
+	}
+
+	return h.Offsets.Close()
 }
 
 func (h *Hovers) addData(line []byte) error {
@@ -117,10 +126,10 @@ func (h *Hovers) addData(line []byte) error {
 		return err
 	}
 
-	h.Offsets[rawData.Id] = &Offset{At: h.CurrentOffset, Len: n}
+	offset := Offset{At: int32(h.CurrentOffset), Len: int32(n)}
 	h.CurrentOffset += n
 
-	return nil
+	return h.Offsets.SetEntry(rawData.Id, &offset)
 }
 
 func (h *Hovers) addHoverRef(line []byte) error {
@@ -129,9 +138,12 @@ func (h *Hovers) addHoverRef(line []byte) error {
 		return err
 	}
 
-	h.Offsets[hoverRef.ResultSetId] = h.Offsets[hoverRef.HoverId]
+	var offset Offset
+	if err := h.Offsets.Entry(hoverRef.HoverId, &offset); err != nil {
+		return err
+	}
 
-	return nil
+	return h.Offsets.SetEntry(hoverRef.ResultSetId, &offset)
 }
 
 func (h *Hovers) addResultSetRef(line []byte) error {
@@ -140,13 +152,10 @@ func (h *Hovers) addResultSetRef(line []byte) error {
 		return err
 	}
 
-	offset, ok := h.Offsets[ref.ResultSetId]
-	if !ok {
+	var offset Offset
+	if err := h.Offsets.Entry(ref.ResultSetId, &offset); err != nil {
 		return nil
 	}
 
-	h.Offsets[ref.RefId] = offset
-	delete(h.Offsets, ref.ResultSetId)
-
-	return nil
+	return h.Offsets.SetEntry(ref.RefId, &offset)
 }
