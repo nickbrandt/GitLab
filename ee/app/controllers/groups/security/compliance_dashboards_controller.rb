@@ -16,7 +16,7 @@ class Groups::Security::ComplianceDashboardsController < Groups::ApplicationCont
   def paginated_merge_requests
     @paginated_merge_requests ||= begin
       merge_requests = MergeRequestsComplianceFinder.new(current_user, { group_id: @group.id }).execute
-      Kaminari.paginate_array(merge_requests).page(params[:page])
+      merge_requests.page(params[:page])
     end
   end
 
