@@ -36,9 +36,9 @@ module Gitlab
     def expired_subject
       if subscribable.block_changes?
         if auto_renew?
-          _('Something went wrong with your automatic subscription renewal')
+          _('Something went wrong with your automatic subscription renewal.')
         else
-          _('Your subscription has been downgraded')
+          _('Your subscription has been downgraded.')
         end
       else
         _('Your subscription expired!')
@@ -49,9 +49,9 @@ module Gitlab
       remaining_days = pluralize(subscribable.remaining_days, 'day')
 
       if auto_renew?
-        _('Your subscription will automatically renew in %{remaining_days}') % { remaining_days: remaining_days }
+        _('Your subscription will automatically renew in %{remaining_days}.') % { remaining_days: remaining_days }
       else
-        _('Your subscription will expire in %{remaining_days}') % { remaining_days: remaining_days }
+        _('Your subscription will expire in %{remaining_days}.') % { remaining_days: remaining_days }
       end
     end
 

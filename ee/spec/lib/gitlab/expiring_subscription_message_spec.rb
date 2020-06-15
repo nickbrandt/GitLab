@@ -67,7 +67,7 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
 
                 it 'has a nice subject' do
                   Timecop.freeze(today) do
-                    expect(subject).to include('Your subscription has been downgraded')
+                    expect(subject).to include('Your subscription has been downgraded.')
                   end
                 end
 
@@ -187,7 +187,7 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
                 end
 
                 it 'has a nice subject' do
-                  expect(subject).to include('Your subscription will automatically renew in 4 days')
+                  expect(subject).to include('Your subscription will automatically renew in 4 days.')
                 end
 
                 it 'has an expiration blocking message' do

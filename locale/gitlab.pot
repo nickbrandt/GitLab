@@ -20845,7 +20845,7 @@ msgstr ""
 msgid "Something went wrong while updating your list settings"
 msgstr ""
 
-msgid "Something went wrong with your automatic subscription renewal"
+msgid "Something went wrong with your automatic subscription renewal."
 msgstr ""
 
 msgid "Something went wrong, unable to add %{project} to dashboard"
@@ -26201,13 +26201,13 @@ msgstr ""
 msgid "Your subscription expired!"
 msgstr ""
 
-msgid "Your subscription has been downgraded"
+msgid "Your subscription has been downgraded."
 msgstr ""
 
-msgid "Your subscription will automatically renew in %{remaining_days}"
+msgid "Your subscription will automatically renew in %{remaining_days}."
 msgstr ""
 
-msgid "Your subscription will expire in %{remaining_days}"
+msgid "Your subscription will expire in %{remaining_days}."
 msgstr ""
 
 msgid "Zoom meeting added"
