@@ -34,6 +34,10 @@ describe Ci::RunDastScanService do
         expect(subject.ref).to eq(branch)
       end
 
+      it 'sets the source to indicate an ondemand scan' do
+        expect(subject.source).to eq('ondemand_scan')
+      end
+
       it 'creates a stage' do
         expect { subject }.to change(Ci::Stage, :count).by(1)
       end
@@ -42,19 +46,24 @@ describe Ci::RunDastScanService do
         expect { subject }.to change(Ci::Build, :count).by(1)
       end
 
+      it 'sets the build name to indicate a DAST scan' do
+        build = subject.builds.first
+        expect(build.name).to eq('DAST Scan')
+      end
+
       it 'creates a build with appropriate options' do
         build = subject.builds.first
         expected_options = {
-          "image" => {
-            "name" => "$SECURE_ANALYZERS_PREFIX/dast:$DAST_VERSION"
+          'image' => {
+            'name' => '$SECURE_ANALYZERS_PREFIX/dast:$DAST_VERSION'
           },
-          "script" => [
-            "export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}",
-            "/analyze"
+          'script' => [
+            'export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}',
+            '/analyze'
           ],
-          "artifacts" => {
-            "reports" => {
-              "dast" => ["gl-dast-report.json"]
+          'artifacts' => {
+            'reports' => {
+              'dast' => ['gl-dast-report.json']
             }
           }
         }
@@ -65,21 +74,21 @@ describe Ci::RunDastScanService do
         build = subject.builds.first
         expected_variables = [
           {
-            "key" => "DAST_VERSION",
-            "value" => "1",
-            "public" => true
+            'key' => 'DAST_VERSION',
+            'value' => '1',
+            'public' => true
           }, {
-            "key" => "SECURE_ANALYZERS_PREFIX",
-            "value" => "registry.gitlab.com/gitlab-org/security-products/analyzers",
-            "public" => true
+            'key' => 'SECURE_ANALYZERS_PREFIX',
+            'value' => 'registry.gitlab.com/gitlab-org/security-products/analyzers',
+            'public' => true
           }, {
-            "key" => "DAST_WEBSITE",
-            "value" => target_url,
-            "public" => true
+            'key' => 'DAST_WEBSITE',
+            'value' => target_url,
+            'public' => true
           }, {
-            "key" => "GIT_STRATEGY",
-            "value" => "none",
-            "public" => true
+            'key' => 'GIT_STRATEGY',
+            'value' => 'none',
+            'public' => true
           }
         ]
         expect(build.yaml_variables).to eq(expected_variables)
@@ -92,7 +101,7 @@ describe Ci::RunDastScanService do
 
       context 'when the repository has no commits' do
         it 'uses a placeholder' do
-          expect(subject.sha).to eq("placeholder")
+          expect(subject.sha).to eq('placeholder')
         end
       end
 

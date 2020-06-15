@@ -43,7 +43,7 @@ module Ci
           project: project,
           ref: branch,
           sha: project.repository.commit&.id || DEFAULT_SHA_FOR_PROJECTS_WITHOUT_COMMITS,
-          source: :web,
+          source: :ondemand_scan,
           user: user
         )
       end
@@ -62,7 +62,7 @@ module Ci
     def create_build!(pipeline, stage, branch, target_url)
       reraise!(with: CreateBuildError.new('Could not create build')) do
         Ci::Build.create!(
-          name: 'On demand DAST scan',
+          name: 'DAST Scan',
           pipeline: pipeline,
           project: project,
           ref: branch,
