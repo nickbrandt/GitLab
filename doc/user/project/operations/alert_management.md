@@ -121,7 +121,10 @@ GitLab currently only supports a single assignee per alert.
 1. If the right sidebar is not expanded, click
    **{angle-double-right}** **Expand sidebar** to expand it.
 1. In the right sidebar, locate the **Assignee** and click **Edit**. From the
-   dropdown menu, select each user you want to assign to the alert.
+   dropdown menu, select each user you want to assign to the alert. GitLab creates
+   a [To-Do list item](../../todos.md) for each user.
+
+   ![Alert Management Details View Assignee(s)](img/alert_todo_assignees_v13_1.png)
 
 To remove an assignee, click **Edit** next to the **Assignee** dropdown menu and
 deselect the user from the list of assignees, or click **Unassigned**.
