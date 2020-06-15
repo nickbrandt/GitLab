@@ -26,14 +26,12 @@ export default {
 </script>
 
 <template>
-  <div>
-    <gl-daterange-picker
-      class="d-flex flex-wrap flex-sm-nowrap"
-      :default-start-date="startDate"
-      :default-end-date="endDate"
-      start-picker-class="form-group align-items-lg-center mr-0 mr-sm-1 d-flex flex-column flex-lg-row"
-      end-picker-class="form-group align-items-lg-center mr-0 mr-sm-2 d-flex flex-column flex-lg-row"
-      @input="onInput"
-    />
-  </div>
+  <gl-daterange-picker
+    class="d-flex flex-wrap flex-sm-nowrap"
+    :default-start-date="startDate"
+    :default-end-date="endDate"
+    start-picker-class="form-group align-items-lg-center mr-0 mr-sm-1 d-flex flex-column flex-lg-row"
+    end-picker-class="form-group align-items-lg-center mr-0 mr-sm-2 d-flex flex-column flex-lg-row"
+    @input="onInput"
+  />
 </template>

@@ -42,7 +42,7 @@ export default {
     ...mapState(['filterValue', 'startDate', 'endDate', 'sortBy']),
   },
   methods: {
-    ...mapActions(['setDateRange', 'setFilterValue', 'setSortBy']),
+    ...mapActions(['setDateRange', 'setFilterValue', 'setSortBy', 'searchForAuditEvents']),
   },
 };
 </script>
@@ -53,24 +53,31 @@ export default {
       <div class="d-flex justify-content-between audit-controls row">
         <div class="col-lg-auto flex-fill form-group align-items-lg-center pr-lg-8">
           <audit-events-filter
-            v-bind="{
-              enabledTokenTypes,
-              qaSelector: filterQaSelector,
-              defaultSelectedToken: filterValue,
-            }"
+            :enabled-token-types="enabledTokenTypes"
+            :qa-selector="filterQaSelector"
+            :default-selected-tokens="filterValue"
             @selected="setFilterValue"
+            @submit="searchForAuditEvents"
           />
         </div>
         <div class="d-flex col-lg-auto flex-wrap pl-lg-0">
           <div
             class="audit-controls d-flex align-items-lg-center flex-column flex-lg-row col-lg-auto px-0"
           >
-            <date-range-field v-bind="{ startDate, endDate }" @selected="setDateRange" />
-            <sorting-field v-bind="{ sortBy }" @selected="setSortBy" />
+            <date-range-field
+              :start-date="startDate"
+              :end-date="endDate"
+              @selected="setDateRange"
+            />
+            <sorting-field :sort-by="sortBy" @selected="setSortBy" />
           </div>
         </div>
       </div>
     </div>
-    <audit-events-table v-bind="{ events, isLastPage, qaSelector: tableQaSelector }" />
+    <audit-events-table
+      :events="events"
+      :is-last-page="isLastPage"
+      :qa-selector="tableQaSelector"
+    />
   </div>
 </template>

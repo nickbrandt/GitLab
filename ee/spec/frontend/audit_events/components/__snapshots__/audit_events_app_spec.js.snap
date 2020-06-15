@@ -33,9 +33,14 @@ exports[`AuditEventsApp when initialized matches the snapshot 1`] = `
         <div
           class="audit-controls d-flex align-items-lg-center flex-column flex-lg-row col-lg-auto px-0"
         >
-          <date-range-field-stub />
+          <date-range-field-stub
+            enddate="Sun Feb 02 2020 00:00:00 GMT+0000 (Greenwich Mean Time)"
+            startdate="Wed Jan 01 2020 00:00:00 GMT+0000 (Greenwich Mean Time)"
+          />
            
-          <sorting-field-stub />
+          <sorting-field-stub
+            sortby="created_asc"
+          />
         </div>
       </div>
     </div>

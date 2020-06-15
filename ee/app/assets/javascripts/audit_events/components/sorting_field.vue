@@ -29,10 +29,7 @@ export default {
   },
   computed: {
     selectedOption() {
-      return this.sortBy || SORTING_OPTIONS[0].key;
-    },
-    selectedOptionText() {
-      return SORTING_OPTIONS.find(option => option.key === this.selectedOption).text;
+      return SORTING_OPTIONS.find(option => option.key === this.sortBy) || SORTING_OPTIONS[0];
     },
   },
   methods: {
@@ -40,7 +37,7 @@ export default {
       this.$emit('selected', option);
     },
     isChecked(key) {
-      return key === this.selectedOption;
+      return key === this.selectedOption.key;
     },
   },
   SORTING_TITLE,
@@ -50,11 +47,7 @@ export default {
 
 <template>
   <div>
-    <gl-new-dropdown
-      v-model="selectedOption"
-      :text="selectedOptionText"
-      class="w-100 flex-column flex-lg-row form-group"
-    >
+    <gl-new-dropdown :text="selectedOption.text" class="w-100 flex-column flex-lg-row form-group">
       <gl-new-dropdown-header> {{ $options.SORTING_TITLE }}</gl-new-dropdown-header>
       <gl-new-dropdown-item
         v-for="option in $options.SORTING_OPTIONS"
@@ -66,7 +59,5 @@ export default {
         {{ option.text }}
       </gl-new-dropdown-item>
     </gl-new-dropdown>
-
-    <input type="hidden" name="sort" :value="selectedOption" />
   </div>
 </template>

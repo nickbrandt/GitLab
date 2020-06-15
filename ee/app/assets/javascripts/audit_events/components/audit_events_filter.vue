@@ -8,10 +8,10 @@ export default {
     GlFilteredSearch,
   },
   props: {
-    defaultSelectedToken: {
-      type: Object,
+    defaultSelectedTokens: {
+      type: Array,
       required: false,
-      default: null,
+      default: () => [],
     },
     enabledTokenTypes: {
       type: Array,
@@ -40,32 +40,26 @@ export default {
     filterTokens() {
       // This limits the user to search by only one of the available tokens
       const { enabledTokens, searchTerm } = this;
+
       if (searchTerm?.type) {
         return enabledTokens.map(token => ({
           ...token,
           disabled: searchTerm.type !== token.type,
         }));
       }
+
       return enabledTokens;
-    },
-    searchValue() {
-      const { searchTerm } = this;
-      return {
-        id: searchTerm?.value?.data,
-        type: searchTerm?.type,
-      };
     },
   },
   created() {
-    const { defaultSelectedToken } = this;
-    if (defaultSelectedToken) {
-      const { id, type } = defaultSelectedToken;
-      this.searchTerms = [{ type, value: { data: id, operator: '=' } }];
-    }
+    this.searchTerms = this.defaultSelectedTokens;
   },
   methods: {
     onSubmit() {
-      this.$emit('selected', this.searchValue);
+      this.$emit('submit');
+    },
+    onInput() {
+      this.$emit('selected', this.searchTerms);
     },
   },
 };
@@ -85,6 +79,7 @@ export default {
       :available-tokens="filterTokens"
       class="gl-h-32 w-100"
       @submit="onSubmit"
+      @input="onInput"
     />
   </div>
 </template>

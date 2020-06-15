@@ -5,14 +5,7 @@ import createStore from './store';
 
 export default selector => {
   const el = document.querySelector(selector);
-  const {
-    events,
-    isLastPage,
-    formPath,
-    enabledTokenTypes,
-    filterQaSelector,
-    tableQaSelector,
-  } = el.dataset;
+  const { events, isLastPage, enabledTokenTypes, filterQaSelector, tableQaSelector } = el.dataset;
 
   const store = createStore();
   store.dispatch('initializeAuditEvents');
@@ -26,7 +19,6 @@ export default selector => {
           events: JSON.parse(events),
           isLastPage: parseBoolean(isLastPage),
           enabledTokenTypes: JSON.parse(enabledTokenTypes),
-          formPath,
           filterQaSelector,
           tableQaSelector,
         },

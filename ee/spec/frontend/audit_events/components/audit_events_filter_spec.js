@@ -6,9 +6,8 @@ import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_events/constants';
 
 describe('AuditEventsFilter', () => {
   let wrapper;
-  const formElement = document.createElement('form');
-  formElement.submit = jest.fn();
 
+  const defaultSelectedTokens = [{ type: 'Project', value: { data: 1, operator: '=' } }];
   const findFilteredSearch = () => wrapper.find(GlFilteredSearch);
   const getAvailableTokens = () => findFilteredSearch().props('availableTokens');
   const getAvailableTokenProps = type =>
@@ -18,9 +17,6 @@ describe('AuditEventsFilter', () => {
     wrapper = shallowMount(AuditEventsFilter, {
       propsData: {
         ...props,
-      },
-      methods: {
-        getFormElement: () => formElement,
       },
     });
   };
@@ -47,24 +43,12 @@ describe('AuditEventsFilter', () => {
   });
 
   describe('when the default token value is set', () => {
-    const defaultSelectedToken = {
-      type: 'Project',
-      id: '1',
-    };
-
     beforeEach(() => {
-      initComponent({ defaultSelectedToken });
+      initComponent({ defaultSelectedTokens });
     });
 
     it('sets the filtered searched token', () => {
-      expect(findFilteredSearch().props('value')).toMatchObject([
-        {
-          type: defaultSelectedToken.type,
-          value: {
-            data: defaultSelectedToken.id,
-          },
-        },
-      ]);
+      expect(findFilteredSearch().props('value')).toEqual(defaultSelectedTokens);
     });
 
     it('only one token matching the selected token type is enabled', () => {
@@ -78,9 +62,8 @@ describe('AuditEventsFilter', () => {
         findFilteredSearch().vm.$emit('submit');
       });
 
-      it('should emit the "selected" event with the selected token', () => {
-        expect(wrapper.emitted().selected).toBeTruthy();
-        expect(wrapper.emitted().selected[0]).toEqual([defaultSelectedToken]);
+      it('should emit the "submit" event', () => {
+        expect(wrapper.emitted().submit).toHaveLength(1);
       });
     });
   });
@@ -94,19 +77,23 @@ describe('AuditEventsFilter', () => {
       expect(findFilteredSearch().vm.value).toEqual([]);
     });
 
-    describe('and the user submits the search field', () => {
+    describe('and the user inputs nothing into the search field', () => {
       beforeEach(() => {
-        findFilteredSearch().vm.$emit('submit');
+        findFilteredSearch().vm.$emit('input', []);
       });
 
-      it('should emit the "selected" event with undefined values', () => {
-        expect(wrapper.emitted().selected).toBeTruthy();
-        expect(wrapper.emitted().selected[0]).toEqual([
-          {
-            id: undefined,
-            type: undefined,
-          },
-        ]);
+      it('should emit the "selected" event with empty values', () => {
+        expect(wrapper.emitted().selected[0]).toEqual([[]]);
+      });
+
+      describe('and the user submits the search field', () => {
+        beforeEach(() => {
+          findFilteredSearch().vm.$emit('submit');
+        });
+
+        it('should emit the "submit" event', () => {
+          expect(wrapper.emitted().submit).toHaveLength(1);
+        });
       });
     });
   });

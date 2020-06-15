@@ -8,6 +8,11 @@ import AuditEventsFilter from 'ee/audit_events/components/audit_events_filter.vu
 import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_events/constants';
 import createStore from 'ee/audit_events/store';
 
+const TEST_SORT_BY = 'created_asc';
+const TEST_START_DATE = new Date('2020-01-01');
+const TEST_END_DATE = new Date('2020-02-02');
+const TEST_FILTER_VALUE = [{ id: 50, type: 'User' }];
+
 describe('AuditEventsApp', () => {
   let wrapper;
   let store;
@@ -18,7 +23,6 @@ describe('AuditEventsApp', () => {
   const tableQaSelector = 'table_qa_selector';
 
   const initComponent = (props = {}) => {
-    store = createStore();
     wrapper = shallowMount(AuditEventsApp, {
       store,
       propsData: {
@@ -35,6 +39,16 @@ describe('AuditEventsApp', () => {
     });
   };
 
+  beforeEach(() => {
+    store = createStore();
+    Object.assign(store.state, {
+      startDate: TEST_START_DATE,
+      endDate: TEST_END_DATE,
+      sortBy: TEST_SORT_BY,
+      filterValue: TEST_FILTER_VALUE,
+    });
+  });
+
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
@@ -50,54 +64,51 @@ describe('AuditEventsApp', () => {
       expect(wrapper.element).toMatchSnapshot();
     });
 
-    it('passes its events property to the logs table', () => {
-      expect(wrapper.find(AuditEventsTable).props('events')).toEqual(events);
+    it('renders audit events table', () => {
+      expect(wrapper.find(AuditEventsTable).props()).toEqual({
+        events,
+        qaSelector: tableQaSelector,
+        isLastPage: true,
+      });
     });
 
-    it('passes the tables QA selector to the logs table', () => {
-      expect(wrapper.find(AuditEventsTable).props('qaSelector')).toEqual(tableQaSelector);
+    it('renders audit events filter', () => {
+      expect(wrapper.find(AuditEventsFilter).props()).toEqual({
+        enabledTokenTypes,
+        qaSelector: filterQaSelector,
+        defaultSelectedTokens: TEST_FILTER_VALUE,
+      });
     });
 
-    it('passes its available token types to the logs filter', () => {
-      expect(wrapper.find(AuditEventsFilter).props('enabledTokenTypes')).toEqual(enabledTokenTypes);
+    it('renders date range field', () => {
+      expect(wrapper.find(DateRangeField).props()).toEqual({
+        startDate: TEST_START_DATE,
+        endDate: TEST_END_DATE,
+      });
     });
 
-    it('passes the filters QA selector to the logs filter', () => {
-      expect(wrapper.find(AuditEventsFilter).props('qaSelector')).toEqual(filterQaSelector);
-    });
-
-    it('sets the defaultSelectedToken of the logs filter', () => {
-      expect(wrapper.find(AuditEventsFilter).props('defaultSelectedToken')).toEqual(
-        store.state.filterValue,
-      );
-    });
-
-    it('sets the dates of the date range field', () => {
-      const { startDate, endDate } = store.state;
-      expect(wrapper.find(DateRangeField).props('startDate')).toEqual(startDate);
-      expect(wrapper.find(DateRangeField).props('endDate')).toEqual(endDate);
-    });
-
-    it('sets the sort order of the sorting field', () => {
-      expect(wrapper.find(SortingField).props('sortBy')).toEqual(store.state.sortBy);
+    it('renders sorting field', () => {
+      expect(wrapper.find(SortingField).props()).toEqual({ sortBy: TEST_SORT_BY });
     });
   });
 
   describe('when a field is selected', () => {
     beforeEach(() => {
+      jest.spyOn(store, 'dispatch').mockImplementation();
       initComponent();
     });
 
     it.each`
-      name               | field                | handler
-      ${'date range'}    | ${DateRangeField}    | ${'setDateRange'}
-      ${'sort by'}       | ${SortingField}      | ${'setSortBy'}
-      ${'events filter'} | ${AuditEventsFilter} | ${'setFilterValue'}
-    `('for $name, it calls $handler', ({ field, handler }) => {
-      const stub = jest.fn();
-      wrapper.setMethods({ [handler]: stub });
-      wrapper.find(field).vm.$emit('selected');
-      expect(stub).toHaveBeenCalled();
+      name               | field                | action              | payload
+      ${'date range'}    | ${DateRangeField}    | ${'setDateRange'}   | ${'test'}
+      ${'sort by'}       | ${SortingField}      | ${'setSortBy'}      | ${'test'}
+      ${'events filter'} | ${AuditEventsFilter} | ${'setFilterValue'} | ${'test'}
+    `('for $name, it calls $handler', ({ field, action, payload }) => {
+      expect(store.dispatch).not.toHaveBeenCalled();
+
+      wrapper.find(field).vm.$emit('selected', payload);
+
+      expect(store.dispatch).toHaveBeenCalledWith(action, payload);
     });
   });
 });

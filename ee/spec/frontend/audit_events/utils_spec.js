@@ -8,6 +8,7 @@ describe('Audit Event Utils', () => {
         created_before: '2020-04-13',
         sortBy: 'created_asc',
       };
+
       expect(parseAuditEventSearchQuery(input)).toEqual({
         created_after: new Date('2020-03-13'),
         created_before: new Date('2020-04-13'),
@@ -19,17 +20,15 @@ describe('Audit Event Utils', () => {
   describe('createAuditEventSearchQuery', () => {
     it('returns a query object with remapped keys and stringified dates', () => {
       const input = {
-        filterValue: {
-          id: '1',
-          type: 'user',
-        },
+        filterValue: [{ type: 'User', value: { data: '1', operator: '=' } }],
         startDate: new Date('2020-03-13'),
         endDate: new Date('2020-04-13'),
         sortBy: 'bar',
       };
+
       expect(createAuditEventSearchQuery(input)).toEqual({
         entity_id: '1',
-        entity_type: 'user',
+        entity_type: 'User',
         created_after: '2020-03-13',
         created_before: '2020-04-13',
         sort: 'bar',
