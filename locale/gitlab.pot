@@ -8234,6 +8234,9 @@ msgstr ""
 msgid "Email not verified. Please verify your email in Salesforce."
 msgstr ""
 
+msgid "Email notification for unknown sign-ins"
+msgstr ""
+
 msgid "Email patch"
 msgstr ""
 
@@ -15327,6 +15330,9 @@ msgid "Notifications off"
 msgstr ""
 
 msgid "Notifications on"
+msgstr ""
+
+msgid "Notify users by email when sign-in location is not recognized"
 msgstr ""
 
 msgid "Nov"
