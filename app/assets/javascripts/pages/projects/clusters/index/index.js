@@ -5,4 +5,5 @@ document.addEventListener('DOMContentLoaded', () => {
   const callout = document.querySelector('.gcp-signup-offer');
   PersistentUserCallout.factory(callout);
   initClustersListApp();
+  initIntegrationForm();
 });
