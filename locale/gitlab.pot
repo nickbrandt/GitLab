@@ -1852,6 +1852,9 @@ msgid_plural "Alerts"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "AlertManagement| assign yourself"
+msgstr ""
+
 msgid "AlertManagement|Acknowledged"
 msgstr ""
 
@@ -1876,16 +1879,13 @@ msgstr ""
 msgid "AlertManagement|All alerts"
 msgstr ""
 
-msgid "AlertManagement|Assign Assignees"
+msgid "AlertManagement|Assign To"
 msgstr ""
 
 msgid "AlertManagement|Assign status"
 msgstr ""
 
 msgid "AlertManagement|Assignee"
-msgstr ""
-
-msgid "AlertManagement|Assignee(s)"
 msgstr ""
 
 msgid "AlertManagement|Assignees"
@@ -1940,6 +1940,9 @@ msgid "AlertManagement|No alerts to display."
 msgstr ""
 
 msgid "AlertManagement|None"
+msgstr ""
+
+msgid "AlertManagement|None -"
 msgstr ""
 
 msgid "AlertManagement|Open"
