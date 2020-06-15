@@ -52,8 +52,7 @@ export const isCommitModeActive = state =>
 export const isReviewModeActive = state =>
   state.currentActivityView === leftSidebarViews.review.name;
 
-export const someUncommittedChanges = state =>
-  Boolean(state.changedFiles.length || state.stagedFiles.length);
+export const someUncommittedChanges = state => Boolean(state.git.status.length);
 
 export const getChangesInFolder = state => path => {
   const changedFilesCount = state.changedFiles.filter(f => filePathMatches(f.path, path)).length;

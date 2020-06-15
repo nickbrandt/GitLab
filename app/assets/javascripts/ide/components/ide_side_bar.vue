@@ -24,7 +24,7 @@ export default {
     IdeProjectHeader,
   },
   computed: {
-    ...mapState(['loading', 'currentActivityView', 'changedFiles', 'stagedFiles', 'lastCommitMsg']),
+    ...mapState(['loading', 'currentActivityView', 'lastCommitMsg']),
     ...mapGetters(['currentProject', 'someUncommittedChanges']),
     showSuccessMessage() {
       return (

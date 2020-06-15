@@ -14,8 +14,9 @@ export default {
     tooltip,
   },
   computed: {
-    ...mapState(['changedFiles', 'stagedFiles', 'lastCommitMsg']),
+    ...mapState(['stagedFiles', 'lastCommitMsg']),
     ...mapState('commit', ['commitMessage', 'submitCommitLoading']),
+    ...mapState('git', ['status']),
     ...mapGetters(['lastOpenedFile', 'someUncommittedChanges', 'activeFile']),
     ...mapGetters('commit', ['discardDraftButtonDisabled']),
     showStageUnstageArea() {
@@ -60,7 +61,7 @@ export default {
     <template v-if="showStageUnstageArea">
       <commit-files-list
         :key-prefix="$options.stageKeys.staged"
-        :file-list="stagedFiles"
+        :file-list="status"
         :active-file-key="activeFileKey"
         :empty-state-text="__('There are no changes')"
         class="is-first"

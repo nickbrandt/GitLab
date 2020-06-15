@@ -1,9 +1,9 @@
 import { commitItemIconMap } from './constants';
 
 export default file => {
-  if (file.deleted) {
+  if (file.modification === 'removed') {
     return commitItemIconMap.deleted;
-  } else if (file.tempFile && !file.prevPath) {
+  } else if (file.modification === 'addition') {
     return commitItemIconMap.addition;
   }
 
