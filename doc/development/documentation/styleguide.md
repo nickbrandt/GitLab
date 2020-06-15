@@ -750,6 +750,9 @@ _Internal_ refers to documentation in the same project. When linking to document
 separate projects (for example, linking to Omnibus docs from GitLab docs), you must use absolute
 URLs.
 
+Linking to other documentation content is not as straightforward as we'd like.
+However, in order to XYZ we established the following style requirements.
+
 To link to internal documentation:
 
 - Use relative links to Markdown files in the same repository.
