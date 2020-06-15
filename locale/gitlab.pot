@@ -9251,6 +9251,9 @@ msgstr ""
 msgid "Expiration date"
 msgstr ""
 
+msgid "Expiration not enforced"
+msgstr ""
+
 msgid "Expiration policy for the Container Registry is a perfect solution for keeping the Registry space down while still enjoying the full power of GitLab CI/CD."
 msgstr ""
 
