@@ -5,4 +5,5 @@ export default () => ({
     fs: '',
   },
   lastTimestamp: -1,
+  isCleaning: false,
 });
