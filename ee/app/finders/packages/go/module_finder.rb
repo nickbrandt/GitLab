@@ -22,7 +22,7 @@ module Packages
         module_project_path = module_path.shift(project_path.length)
         return unless module_project_path == project_path
 
-        Packages::GoModule.new(@project, @module_name, module_path.join('/'))
+        Packages::Go::Module.new(@project, @module_name, module_path.join('/'))
       end
     end
   end

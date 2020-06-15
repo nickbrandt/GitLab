@@ -24,7 +24,7 @@ module Packages
           if pseudo_version? target
             semver = parse_semver(target)
             commit = pseudo_version_commit(@mod.project, semver)
-            Packages::GoModuleVersion.new(@mod, :pseudo, commit, name: target, semver: semver)
+            Packages::Go::ModuleVersion.new(@mod, :pseudo, commit, name: target, semver: semver)
           else
             @mod.version_by(ref: target)
           end

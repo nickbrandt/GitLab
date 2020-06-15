@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :go_module, class: 'Packages::GoModule' do
+  factory :go_module, class: 'Packages::Go::Module' do
     initialize_with { new(attributes[:project], attributes[:name], attributes[:path]) }
     skip_create
 
