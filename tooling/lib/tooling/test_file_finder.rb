@@ -60,9 +60,8 @@ module Tooling
     def foss_matcher
       TestFileMatcher.new do |matcher|
         matcher.associate(%r{^app/(.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
-        matcher.associate(%r{^lib/(.+)\.rb$}) { |match| "spec/lib/#{match[1]}_spec.rb" }
+        matcher.associate(%r{^(tooling/)?lib/(.+)\.rb$}) { |match| "spec/#{match[1]}lib/#{match[2]}_spec.rb" }
         matcher.associate(%r{^spec/(.+)_spec.rb$}) { |match| match[0] }
-        matcher.associate(%r{^(tooling/lib/.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
       end
     end
   end

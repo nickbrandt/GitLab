@@ -31,10 +31,10 @@ RSpec.describe Tooling::TestFileFinder do
     end
 
     context 'when given a file in tooling/' do
-      let(:file) { 'tooling/lib/quality/test_file_finder.rb' }
+      let(:file) { 'tooling/lib/tooling/test_file_finder.rb' }
 
       it 'returns the matching tooling test' do
-        expect(subject.test_files).to contain_exactly('spec/tooling/lib/quality/test_file_finder_spec.rb')
+        expect(subject.test_files).to contain_exactly('spec/tooling/lib/tooling/test_file_finder_spec.rb')
       end
     end
 
