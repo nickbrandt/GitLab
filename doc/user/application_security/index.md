@@ -17,14 +17,15 @@ For an overview of application security with GitLab, see
 
 ## Quick start
 
-Get started quickly with Dependency Scanning, License Scanning, and Static Application Security
-Testing (SAST) by adding the following to your `.gitlab-ci.yml`:
+Get started quickly with Dependency Scanning, License Scanning, Static Application Security
+Testing (SAST), and Secret Detection by adding the following to your `.gitlab-ci.yml`:
 
 ```yaml
 include:
   - template: Dependency-Scanning.gitlab-ci.yml
   - template: License-Scanning.gitlab-ci.yml
   - template: SAST.gitlab-ci.yml
+  - template: Secret-Detection.gitlab-ci.yml
 ```
 
 To add Dynamic Application Security Testing (DAST) scanning, add the following to your
@@ -64,6 +65,19 @@ GitLab uses the following tools to scan and report known vulnerabilities found i
 | [Security Dashboard](security_dashboard/index.md) **(ULTIMATE)**             | View vulnerabilities in all your projects and groups.                  |
 | [Static Application Security Testing (SAST)](sast/index.md) **(ULTIMATE)**   | Analyze source code for known vulnerabilities.                         |
 
+## Security Scanning with Auto DevOps
+
+When [Auto DevOps](../../topics/autodevops/) is enabled, all GitLab Security scanning tools will be configured using default settings.
+
+- [Auto SAST](../../topics/autodevops/stages.md#auto-sast-ultimate)
+- [Auto Secret Detection](../../topics/autodevops/stages.md#auto-secret-detection-ultimate)
+- [Auto DAST](../../topics/autodevops/stages.md#auto-dast-ultimate)
+- [Auto Dependency Scanning](../../topics/autodevops/stages.md#auto-dependency-scanning-ultimate)
+- [Auto License Compliance](../../topics/autodevops/stages.md#auto-license-compliance-ultimate)
+- [Auto Container Scanning](../../topics/autodevops/stages.md#auto-container-scanning-ultimate)
+
+While you cannot directly customize Auto DevOps, you can [include the Auto DevOps template in your project's `.gitlab-ci.yml` file](../../topics/autodevops/customize.md#customizing-gitlab-ciyml).
+
 ## Maintenance and update of the vulnerabilities database
 
 The scanning tools and vulnerabilities database are updated regularly.
@@ -71,7 +85,7 @@ The scanning tools and vulnerabilities database are updated regularly.
 | Secure scanning tool                                         | Vulnerabilities database updates          |
 |:-------------------------------------------------------------|-------------------------------------------|
 | [Container Scanning](container_scanning/index.md)            | Uses `clair`. The latest `clair-db` version is used for each job by running the [`latest` Docker image tag](https://gitlab.com/gitlab-org/gitlab/blob/438a0a56dc0882f22bdd82e700554525f552d91b/lib/gitlab/ci/templates/Security/Container-Scanning.gitlab-ci.yml#L37). The `clair-db` database [is updated daily according to the author](https://github.com/arminc/clair-local-scan#clair-server-or-local). |
-| [Dependency Scanning](dependency_scanning/index.md)          | Relies on `bundler-audit` (for Rubygems), `retire.js` (for NPM packages), and `gemnasium` (GitLab's own tool for all libraries). Both `bundler-audit` and `retire.js` fetch their vulnerabilities data from GitHub repositories, so vulnerabilities added to `ruby-advisory-db` and `retire.js` are immediately available. The tools themselves are updated once per month if there's a new version. The [Gemnasium DB](https://gitlab.com/gitlab-org/security-products/gemnasium-db) is updated at least once a week. See our [current measurement of time from CVE being issued to our product being updated](https://about.gitlab.com/handbook/engineering/development/performance-indicators/#cve-issue-to-update). |
+| [Dependency Scanning](dependency_scanning/index.md)          | Relies on `bundler-audit` (for Ruby gems), `retire.js` (for NPM packages), and `gemnasium` (GitLab's own tool for all libraries). Both `bundler-audit` and `retire.js` fetch their vulnerabilities data from GitHub repositories, so vulnerabilities added to `ruby-advisory-db` and `retire.js` are immediately available. The tools themselves are updated once per month if there's a new version. The [Gemnasium DB](https://gitlab.com/gitlab-org/security-products/gemnasium-db) is updated at least once a week. See our [current measurement of time from CVE being issued to our product being updated](https://about.gitlab.com/handbook/engineering/development/performance-indicators/#cve-issue-to-update). |
 | [Dynamic Application Security Testing (DAST)](dast/index.md) | The scanning engine is updated on a periodic basis. See the [version of the underlying tool `zaproxy`](https://gitlab.com/gitlab-org/security-products/dast/blob/master/Dockerfile#L1). The scanning rules are downloaded at scan runtime. |
 | [Static Application Security Testing (SAST)](sast/index.md)  | Relies exclusively on [the tools GitLab wraps](sast/index.md#supported-languages-and-frameworks). The underlying analyzers are updated at least once per month if a relevant update is available. The vulnerabilities database is updated by the upstream tools. |
 
@@ -95,7 +109,7 @@ information with several options:
 - [Dismiss vulnerability](#dismissing-a-vulnerability): Dismissing a vulnerability styles it in
   strikethrough.
 - [Create issue](#creating-an-issue-for-a-vulnerability): Create a new issue with the title and
-  description prepopulated with information from the vulnerability report. By default, such issues
+  description pre-populated with information from the vulnerability report. By default, such issues
   are [confidential](../project/issues/confidential_issues.md).
 - [Solution](#solutions-for-vulnerabilities-auto-remediation): For some vulnerabilities,
   a solution is provided for how to fix the vulnerability.
@@ -142,7 +156,7 @@ button from within the vulnerability modal, or by using the action buttons to th
 a vulnerability row in the group security dashboard.
 
 This creates a [confidential issue](../project/issues/confidential_issues.md) in the project the
-vulnerability came from, and prepopulates it with some useful information taken from the vulnerability
+vulnerability came from, and pre-populates it with some useful information taken from the vulnerability
 report. Once the issue is created, you are redirected to it so you can edit, assign, or comment on
 it.
 
@@ -216,9 +230,15 @@ rating.
 
 ### Enabling Security Approvals within a project
 
-To enable Security Approvals, a [project approval rule](../project/merge_requests/merge_request_approvals.md#multiple-approval-rules-premium)
+To enable Security Approvals, a [project approval rule](../project/merge_requests/merge_request_approvals.md#adding--editing-a-default-approval-rule)
 must be created with the case-sensitive name `Vulnerability-Check`. This approval group must be set
-with the number of approvals required greater than zero.
+with the number of approvals required greater than zero. You must have Maintainer or Owner [permissions](../permissions.md#project-members-permissions) to manage approval rules.
+
+1. Navigate to your project's **{settings}** **Settings > General** and expand **Merge request approvals**.
+1. Click **Add approval rule**, or **Edit**.
+   - Add or change the **Rule name** to `Vulnerability-Check` (case sensitive).
+
+![Vulnerability Check Approver Rule](img/vulnerability-check_v13_0.png)
 
 Once this group is added to your project, the approval rule is enabled for all merge requests.
 

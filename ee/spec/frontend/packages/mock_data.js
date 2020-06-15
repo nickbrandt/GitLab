@@ -118,6 +118,9 @@ export const nugetPackage = {
   updated_at: '2015-12-10',
   version: '1.0.0',
   dependency_links: Object.values(dependencyLinks),
+  nuget_metadatum: {
+    icon_url: 'fake-icon',
+  },
 };
 
 export const pypiPackage = {

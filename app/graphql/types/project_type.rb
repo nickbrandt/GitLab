@@ -95,6 +95,8 @@ module Types
           description: 'Status of Jira import background job of the project'
     field :only_allow_merge_if_pipeline_succeeds, GraphQL::BOOLEAN_TYPE, null: true,
           description: 'Indicates if merge requests of the project can only be merged with successful jobs'
+    field :allow_merge_on_skipped_pipeline, GraphQL::BOOLEAN_TYPE, null: true,
+          description: 'If `only_allow_merge_if_pipeline_succeeds` is true, indicates if merge requests of the project can also be merged with skipped jobs'
     field :request_access_enabled, GraphQL::BOOLEAN_TYPE, null: true,
           description: 'Indicates if users can request member access to the project'
     field :only_allow_merge_if_all_discussions_are_resolved, GraphQL::BOOLEAN_TYPE, null: true,
@@ -125,6 +127,7 @@ module Types
           Types::MergeRequestType.connection_type,
           null: true,
           description: 'Merge requests of the project',
+          extras: [:lookahead],
           resolver: Resolvers::MergeRequestsResolver
 
     field :merge_request,
@@ -215,13 +218,14 @@ module Types
           Types::AlertManagement::AlertType.connection_type,
           null: true,
           description: 'Alert Management alerts of the project',
-          resolver: Resolvers::AlertManagementAlertResolver
+          extras: [:lookahead],
+          resolver: Resolvers::AlertManagement::AlertResolver
 
     field :alert_management_alert,
           Types::AlertManagement::AlertType,
           null: true,
           description: 'A single Alert Management alert of the project',
-          resolver: Resolvers::AlertManagementAlertResolver.single
+          resolver: Resolvers::AlertManagement::AlertResolver.single
 
     field :alert_management_alert_status_counts,
           Types::AlertManagement::AlertStatusCountsType,

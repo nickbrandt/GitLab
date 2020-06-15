@@ -4,9 +4,11 @@ require_dependency 'alert_management'
 
 module AlertManagement
   class Alert < ApplicationRecord
+    include IidRoutes
     include AtomicInternalId
     include ShaAttribute
     include Sortable
+    include Noteable
     include Gitlab::SQL::Pattern
 
     STATUSES = {
@@ -28,6 +30,9 @@ module AlertManagement
 
     has_many :alert_assignees, inverse_of: :alert
     has_many :assignees, through: :alert_assignees
+
+    has_many :notes, as: :noteable, inverse_of: :noteable, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+    has_many :user_mentions, class_name: 'AlertManagement::AlertUserMention', foreign_key: :alert_management_alert_id
 
     has_internal_id :iid, scope: :project, init: ->(s) { s.project.alert_management_alerts.maximum(:iid) }
 
@@ -143,7 +148,24 @@ module AlertManagement
       increment!(:events)
     end
 
+    # required for todos (typically contains an identifier like issue iid)
+    #  no-op; we could use iid, but we don't have a reference prefix
+    def to_reference(_from = nil, full: false)
+      ''
+    end
+
+    def execute_services
+      return unless Feature.enabled?(:alert_slack_event, project)
+      return unless project.has_active_services?(:alert_hooks)
+
+      project.execute_services(hook_data, :alert_hooks)
+    end
+
     private
+
+    def hook_data
+      Gitlab::DataBuilder::Alert.build(self)
+    end
 
     def hosts_length
       return unless hosts

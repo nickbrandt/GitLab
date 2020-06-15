@@ -362,6 +362,8 @@ When **Metrics Dashboard YAML definition is invalid** at least one of the follow
 1. `query_range: can't be blank` [learn more](#metrics-metrics-properties)
 1. `unit: can't be blank` [learn more](#metrics-metrics-properties)
 
+Metrics Dashboard YAML definition validation information is also available as a [GraphQL API field](../../../api/graphql/reference/index.md#metricsdashboard)
+
 #### Dashboard YAML properties
 
 Dashboards have several components:
@@ -385,7 +387,7 @@ The following tables outline the details of expected properties.
 
 | Property | Type | Required | Description |
 | -------- | ---- | -------- | ----------- |
-| `variables` | hash | no | Variables can be defined here. |
+| `variables` | hash | yes | Variables can be defined here. |
 
 Read the documentation on [templating](#templating-variables-for-metrics-dashboards).
 
@@ -395,6 +397,7 @@ Read the documentation on [templating](#templating-variables-for-metrics-dashboa
 | -------- | ---- | -------- | ----------- |
 | `url` | string | yes | The address of the link. |
 | `title` | string | no | Display title for the link. |
+| `type` | string | no | Type of the link. Specifies the link type, can be: `grafana` |
 
 Read the documentation on [links](#add-related-links-to-custom-dashboards).
 
@@ -745,7 +748,7 @@ Templating variables can be used to make your metrics dashboard more versatile.
 [dashboard YAML](#dashboard-top-level-properties).
 Define your variables in the `variables` key, under `templating`. The value of
 the `variables` key should be a hash, and each key under `variables`
-defines a templating variable on the dashboard.
+defines a templating variable on the dashboard, and may contain alphanumeric and underscore characters.
 
 A variable can be used in a Prometheus query in the same dashboard using the syntax
 described [here](#using-variables).
@@ -842,8 +845,13 @@ templating:
 Related links can be added to the top of your metrics dashboard, which can be used for quickly
 navigating between dashboards or external services. The links will open in the same tab.
 
+The dashboard's time range is appended to the `url` as URL parameters.
+
 The `url` attribute is required for the link but the `title` attribute is optional; if the `title`
 is missing then the full address of the URL will be displayed.
+
+The `type` attribute is optional; if the `type` is `grafana`, the dashboard's time range values are
+converted to Grafana's time range format and appended to the `url`.
 
 ![Links UI](img/related_links_v13_1.png)
 
@@ -855,6 +863,9 @@ links:
     url: https://gitlab.com
   - title: GitLab Documentation
     url: https://docs.gitlab.com
+  - title: Public Grafana playground dashboard
+    url: https://play.grafana.org/d/000000012/grafana-play-home?orgId=1
+    type: grafana
 ```
 
 ### View and edit the source file of a custom dashboard
@@ -978,6 +989,9 @@ receivers:
 ```
 
 In order for GitLab to associate your alerts with an [environment](../../../ci/environments/index.md), you need to configure a `gitlab_environment_name` label on the alerts you set up in Prometheus. The value of this should match the name of your Environment in GitLab.
+
+NOTE: **Note**
+In GitLab versions 13.1 and greater, you can configure your manually configured Prometheus server to use the [Generic alerts integration](generic_alerts.md).
 
 ### Taking action on incidents **(ULTIMATE)**
 

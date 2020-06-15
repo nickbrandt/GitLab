@@ -2,7 +2,7 @@
 import { mapActions } from 'vuex';
 import { GlLink, GlButton } from '@gitlab/ui';
 import { __ } from '~/locale';
-import { ACTION_TYPES } from '../store/constants';
+import { ACTION_TYPES } from '../constants';
 import GeoReplicableStatus from './geo_replicable_status.vue';
 import GeoReplicableTimeAgo from './geo_replicable_time_ago.vue';
 

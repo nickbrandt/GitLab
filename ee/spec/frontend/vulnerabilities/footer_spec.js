@@ -37,7 +37,6 @@ describe('Vulnerability Footer', () => {
   const solutionInfoProp = {
     hasDownload: true,
     hasMr: false,
-    hasRemediation: true,
     isStandaloneVulnerability: true,
     remediation: {},
     solution: 'Upgrade to fixed version.\n',

@@ -48,7 +48,6 @@ describe('AlertManagementList', () => {
   const findAssignees = () => wrapper.findAll('[data-testid="assigneesField"]');
   const findSeverityFields = () => wrapper.findAll('[data-testid="severityField"]');
   const findSeverityColumnHeader = () => wrapper.findAll('th').at(0);
-  const findStartTimeColumnHeader = () => wrapper.findAll('th').at(1);
   const findPagination = () => wrapper.find(GlPagination);
   const alertsCount = {
     open: 14,
@@ -92,10 +91,7 @@ describe('AlertManagementList', () => {
     });
   }
 
-  const mockStartedAtCol = {};
-
   beforeEach(() => {
-    jest.spyOn(document, 'querySelector').mockReturnValue(mockStartedAtCol);
     mountComponent();
   });
 
@@ -266,7 +262,7 @@ describe('AlertManagementList', () => {
         findAssignees()
           .at(1)
           .text(),
-      ).toBe(mockAlerts[1].assignees[0].username);
+      ).toBe(mockAlerts[1].assignees.nodes[0].username);
     });
 
     it('navigates to the detail page when alert row is clicked', () => {
@@ -295,6 +291,7 @@ describe('AlertManagementList', () => {
                   startedAt: '2020-03-17T23:18:14.996Z',
                   endedAt: '2020-04-17T23:18:14.996Z',
                   severity: 'high',
+                  assignees: { nodes: [] },
                 },
               ],
             },
@@ -333,7 +330,12 @@ describe('AlertManagementList', () => {
     beforeEach(() => {
       mountComponent({
         props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
-        data: { alerts: { list: mockAlerts }, errored: false, sort: 'STARTED_AT_ASC', alertsCount },
+        data: {
+          alerts: { list: mockAlerts },
+          errored: false,
+          sort: 'STARTED_AT_DESC',
+          alertsCount,
+        },
         loading: false,
         stubs: { GlTable },
       });
@@ -347,17 +349,6 @@ describe('AlertManagementList', () => {
       findSeverityColumnHeader().trigger('click');
 
       expect(wrapper.vm.$data.sort).toBe('SEVERITY_DESC');
-    });
-
-    it('updates the `ariaSort` attribute so the sort icon appears in the proper column', () => {
-      expect(findStartTimeColumnHeader().attributes('aria-sort')).toBe('ascending');
-
-      findSeverityColumnHeader().trigger('click');
-
-      wrapper.vm.$nextTick(() => {
-        expect(findStartTimeColumnHeader().attributes('aria-sort')).toBe('none');
-        expect(findSeverityColumnHeader().attributes('aria-sort')).toBe('ascending');
-      });
     });
   });
 

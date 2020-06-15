@@ -11,15 +11,22 @@ RSpec.describe Elastic::MetricsUpdateService, :prometheus do
   end
 
   describe '#execute' do
-    it 'sets a gauge for global_search_bulk_cron_queue_size' do
+    it 'sets gauges' do
       expect(Elastic::ProcessBookkeepingService).to receive(:queue_size).and_return(4)
+      expect(Elastic::ProcessInitialBookkeepingService).to receive(:queue_size).and_return(6)
 
-      gauge_double = instance_double(Prometheus::Client::Gauge)
+      incremental_gauge_double = instance_double(Prometheus::Client::Gauge)
       expect(Gitlab::Metrics).to receive(:gauge)
         .with(:global_search_bulk_cron_queue_size, anything, {}, :max)
-        .and_return(gauge_double)
+        .and_return(incremental_gauge_double)
 
-      expect(gauge_double).to receive(:set).with({}, 4)
+      initial_gauge_double = instance_double(Prometheus::Client::Gauge)
+      expect(Gitlab::Metrics).to receive(:gauge)
+        .with(:global_search_bulk_cron_initial_queue_size, anything, {}, :max)
+        .and_return(initial_gauge_double)
+
+      expect(incremental_gauge_double).to receive(:set).with({}, 4)
+      expect(initial_gauge_double).to receive(:set).with({}, 6)
 
       subject.execute
     end

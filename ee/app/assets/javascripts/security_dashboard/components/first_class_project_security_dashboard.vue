@@ -112,6 +112,8 @@ export default {
             <csv-export-button :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint" />
           </div>
           <vulnerabilities-count-list :project-full-path="projectFullPath" />
+        </template>
+        <template #sticky>
           <filters @filterChange="handleFilterChange" />
         </template>
         <project-vulnerabilities-app

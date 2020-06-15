@@ -49,8 +49,8 @@ module Vulnerabilities
       record
     end
 
-    # Rails 5.0 does not properly handle validation of enums in select queries such as find_or_initialize_by.
-    # This method, and calls to it can be removed when we are on Rails 5.2.
+    # Rails does not validate enums in select queries such as `find_or_initialize_by`,
+    # So we raise an ArgumentError early to return a human-readable error
     def self.validate_enums(feedback_params)
       unless feedback_types.include?(feedback_params[:feedback_type])
 

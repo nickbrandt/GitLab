@@ -326,6 +326,10 @@ module Clusters
       end
     end
 
+    def local_tiller_enabled?
+      Feature.enabled?(:managed_apps_local_tiller, clusterable, default_enabled: false)
+    end
+
     private
 
     def unique_management_project_environment_scope
@@ -373,7 +377,10 @@ module Clusters
 
     def retrieve_nodes
       result = ::Gitlab::Kubernetes::KubeClient.graceful_request(id) { kubeclient.get_nodes }
-      cluster_nodes = result[:response].to_a
+
+      return unless result[:response]
+
+      cluster_nodes = result[:response]
 
       result = ::Gitlab::Kubernetes::KubeClient.graceful_request(id) { kubeclient.metrics_client.get_nodes }
       nodes_metrics = result[:response].to_a

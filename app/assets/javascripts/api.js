@@ -38,6 +38,7 @@ const Api = {
   userPostStatusPath: '/api/:version/user/status',
   commitPath: '/api/:version/projects/:id/repository/commits',
   applySuggestionPath: '/api/:version/suggestions/:id/apply',
+  applySuggestionBatchPath: '/api/:version/suggestions/batch_apply',
   commitPipelinesPath: '/:project_id/commit/:sha/pipelines',
   branchSinglePath: '/api/:version/projects/:id/repository/branches/:branch',
   createBranchPath: '/api/:version/projects/:id/repository/branches',
@@ -52,6 +53,7 @@ const Api = {
   environmentsPath: '/api/:version/projects/:id/environments',
   rawFilePath: '/api/:version/projects/:id/repository/files/:path/raw',
   issuePath: '/api/:version/projects/:id/issues/:issue_iid',
+  tagsPath: '/api/:version/projects/:id/repository/tags',
 
   group(groupId, callback = () => {}) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -322,6 +324,12 @@ const Api = {
     return axios.put(url);
   },
 
+  applySuggestionBatch(ids) {
+    const url = Api.buildUrl(Api.applySuggestionBatchPath);
+
+    return axios.put(url, { ids });
+  },
+
   commitPipelines(projectId, sha) {
     const encodedProjectId = projectId
       .split('/')
@@ -555,6 +563,18 @@ const Api = {
       .replace(':mrid', encodeURIComponent(mergeRequest));
 
     return axios.put(url, data);
+  },
+
+  tags(id, query = '', options = {}) {
+    const url = Api.buildUrl(this.tagsPath).replace(':id', encodeURIComponent(id));
+
+    return axios.get(url, {
+      params: {
+        search: query,
+        per_page: DEFAULT_PER_PAGE,
+        ...options,
+      },
+    });
   },
 
   buildUrl(url) {

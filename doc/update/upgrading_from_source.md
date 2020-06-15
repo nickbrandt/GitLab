@@ -12,7 +12,7 @@ Make sure you view this update guide from the branch (version) of GitLab you
 would like to install (e.g., `11.8`. You can select the version in the version
 dropdown at the top left corner of GitLab (below the menu bar).
 
-In all examples, replace `BRANCH` with the branch for the version you uprading
+In all examples, replace `BRANCH` with the branch for the version you upgrading
 to (e.g. `11-8-stable` for `11.8`), and replace `PREVIOUS_BRANCH` with the
 branch for the version you are upgrading from (e.g. `11-7-stable` for `11.7`).
 
@@ -290,7 +290,7 @@ add the following line to `config/initializers/smtp_settings.rb`:
 ActionMailer::Base.delivery_method = :smtp
 ```
 
-See [smtp_settings.rb.sample](https://gitlab.com/gitlab-org/gitlab/blob/master/config/initializers/smtp_settings.rb.sample#L13) as an example.
+See [`smtp_settings.rb.sample`](https://gitlab.com/gitlab-org/gitlab/blob/master/config/initializers/smtp_settings.rb.sample#L13) as an example.
 
 #### Init script
 
@@ -318,7 +318,7 @@ For Ubuntu 16.04.1 LTS:
 sudo systemctl daemon-reload
 ```
 
-### 13. Install libs, migrations, etc
+### 13. Install libraries, migrations, etc
 
 ```shell
 cd /home/git/gitlab
@@ -382,6 +382,18 @@ Example:
 
 Additional instructions here.
 -->
+
+### 13.0.1
+
+As part of [deprecating Rack Attack throttles on Omnibus GitLab](https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/4750), Rack Attack initializer on GitLab
+was renamed from [`config/initializers/rack_attack_new.rb` to `config/initializers/rack_attack.rb`](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/33072).
+If this file exists on your installation, consider creating a backup before updating:
+
+```shell
+cd /home/git/gitlab
+
+cp config/initializers/rack_attack.rb config/initializers/rack_attack_backup.rb
+```
 
 ## Troubleshooting
 

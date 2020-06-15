@@ -82,6 +82,8 @@
   - 1
 - - elastic_commit_indexer
   - 1
+- - elastic_delete_project
+  - 1
 - - elastic_full_index
   - 1
 - - elastic_indexer
@@ -241,6 +243,8 @@
 - - repository_update_mirror
   - 1
 - - repository_update_remote_mirror
+  - 1
+- - requirements_management_process_requirements_reports
   - 1
 - - security_scans
   - 2

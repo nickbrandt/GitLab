@@ -137,6 +137,12 @@ module EE
       end
 
       with_scope :subject
+      condition(:on_demand_scans_enabled) do
+        ::Feature.enabled?(:security_on_demand_scans_feature_flag, project) &&
+        @subject.feature_available?(:security_on_demand_scans)
+      end
+
+      with_scope :subject
       condition(:license_scanning_enabled) do
         @subject.feature_available?(:license_scanning)
       end
@@ -235,6 +241,8 @@ module EE
       rule { can?(:read_project) & iterations_available }.enable :read_iteration
 
       rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
+
+      rule { on_demand_scans_enabled & can?(:developer_access) }.enable :read_on_demand_scans
 
       rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
 
@@ -360,7 +368,7 @@ module EE
         prevent :owner_access
       end
 
-      rule { ip_enforcement_prevents_access }.policy do
+      rule { ip_enforcement_prevents_access & ~admin }.policy do
         prevent :read_project
       end
 
@@ -388,6 +396,7 @@ module EE
 
       rule { requirements_available & reporter }.policy do
         enable :create_requirement
+        enable :create_requirement_test_report
         enable :admin_requirement
         enable :update_requirement
       end

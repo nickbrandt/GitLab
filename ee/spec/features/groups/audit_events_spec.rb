@@ -4,12 +4,12 @@ require 'spec_helper'
 
 RSpec.describe 'Groups > Audit Events', :js do
   let(:user) { create(:user) }
-  let(:pete) { create(:user, name: 'Pete') }
+  let(:alex) { create(:user, name: 'Alex') }
   let(:group) { create(:group) }
 
   before do
     group.add_owner(user)
-    group.add_developer(pete)
+    group.add_developer(alex)
     sign_in(user)
   end
 
@@ -43,7 +43,9 @@ RSpec.describe 'Groups > Audit Events', :js do
     it "appears in the group's audit events" do
       visit group_group_members_path(group)
 
-      group_member = group.members.find_by(user_id: pete)
+      wait_for_requests
+
+      group_member = group.members.find_by(user_id: alex)
 
       page.within "#group_member_#{group_member.id}" do
         click_button 'Developer'
@@ -57,7 +59,7 @@ RSpec.describe 'Groups > Audit Events', :js do
       page.within('#audits') do
         expect(page).to have_content 'Change access level from developer to maintainer'
         expect(page).to have_content(user.name)
-        expect(page).to have_content('Pete')
+        expect(page).to have_content('Alex')
       end
     end
   end

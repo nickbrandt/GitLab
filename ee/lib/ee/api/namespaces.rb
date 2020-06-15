@@ -36,8 +36,8 @@ module EE
         resource :namespaces, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
           helpers do
             params :gitlab_subscription_optional_attributes do
-              optional :seats, type: Integer, default: 0, desc: 'The number of seats purchased'
-              optional :max_seats_used, type: Integer, default: 0, desc: 'The max number of active users detected in the last month'
+              optional :seats, type: Integer, desc: 'The number of seats purchased'
+              optional :max_seats_used, type: Integer, desc: 'The max number of active users detected in the last month'
               optional :plan_code, type: String, desc: 'The code of the purchased plan'
               optional :end_date, type: Date, desc: 'The date when subscription expires'
               optional :auto_renew, type: Grape::API::Boolean, desc: 'Whether the subscription auto renews'
@@ -53,7 +53,6 @@ module EE
           params do
             optional :shared_runners_minutes_limit, type: Integer, desc: "Pipeline minutes quota for this namespace"
             optional :extra_shared_runners_minutes_limit, type: Integer, desc: "Extra pipeline minutes for this namespace"
-            optional :trial_ends_on, type: Date, desc: "Trial expiration date"
           end
           put ':id' do
             authenticated_as_admin!

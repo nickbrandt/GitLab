@@ -427,6 +427,14 @@ RSpec.describe ProjectPolicy do
           let(:range) { '10.0.0.0/8' }
 
           it { is_expected.to be_disallowed(:read_project) }
+
+          context 'with admin enabled', :enable_admin_mode do
+            it { is_expected.to be_allowed(:read_project) }
+          end
+
+          context 'with admin disabled' do
+            it { is_expected.to be_disallowed(:read_project) }
+          end
         end
       end
 

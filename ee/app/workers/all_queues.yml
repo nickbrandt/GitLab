@@ -35,6 +35,14 @@
   :weight: 1
   :idempotent: true
   :tags: []
+- :name: cronjob:elastic_index_initial_bulk_cron
+  :feature_category: :global_search
+  :has_external_dependencies: 
+  :urgency: :throttled
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: cronjob:geo_container_repository_sync_dispatch
   :feature_category: :geo_replication
   :has_external_dependencies: 
@@ -74,6 +82,14 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+  :tags: []
+- :name: cronjob:geo_registry_sync
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
   :tags: []
 - :name: cronjob:geo_repository_sync
   :feature_category: :geo_replication
@@ -555,6 +571,14 @@
   :weight: 1
   :idempotent: true
   :tags: []
+- :name: elastic_delete_project
+  :feature_category: :global_search
+  :has_external_dependencies: 
+  :urgency: :throttled
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: elastic_full_index
   :feature_category: :global_search
   :has_external_dependencies: 
@@ -642,6 +666,14 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+  :tags: []
+- :name: requirements_management_process_requirements_reports
+  :feature_category: :requirements_management
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
   :tags: []
 - :name: service_desk_email_receiver
   :feature_category: :issue_tracking

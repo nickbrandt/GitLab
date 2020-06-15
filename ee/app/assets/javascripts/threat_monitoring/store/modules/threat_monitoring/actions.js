@@ -57,14 +57,16 @@ export const fetchEnvironments = ({ state, dispatch }) => {
 export const setCurrentEnvironmentId = ({ commit, dispatch }, environmentId) => {
   commit(types.SET_CURRENT_ENVIRONMENT_ID, environmentId);
   dispatch(`threatMonitoringWaf/fetchStatistics`, null, { root: true });
-  dispatch(`threatMonitoringNetworkPolicy/fetchStatistics`, null, { root: true });
-  if (window.gon.features?.networkPolicyManagement) {
-    dispatch(`networkPolicies/fetchPolicies`, environmentId, { root: true });
-  }
+  dispatch(`threatMonitoringNetworkPolicy/fetchStatistics`, null, {
+    root: true,
+  });
+  dispatch(`networkPolicies/fetchPolicies`, environmentId, { root: true });
 };
 
 export const setCurrentTimeWindow = ({ commit, dispatch }, timeWindow) => {
   commit(types.SET_CURRENT_TIME_WINDOW, timeWindow.name);
   dispatch(`threatMonitoringWaf/fetchStatistics`, null, { root: true });
-  dispatch(`threatMonitoringNetworkPolicy/fetchStatistics`, null, { root: true });
+  dispatch(`threatMonitoringNetworkPolicy/fetchStatistics`, null, {
+    root: true,
+  });
 };

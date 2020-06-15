@@ -34,6 +34,12 @@ class ProjectsController < Projects::ApplicationController
   # Project Export Rate Limit
   before_action :export_rate_limit, only: [:export, :download_export, :generate_new_export]
 
+  # Experiments
+  before_action only: [:new, :create] do
+    frontend_experimentation_tracking_data(:new_create_project_ui, 'click_tab')
+    push_frontend_feature_flag(:new_create_project_ui) if experiment_enabled?(:new_create_project_ui)
+  end
+
   layout :determine_layout
 
   def index
@@ -356,6 +362,7 @@ class ProjectsController < Projects::ApplicationController
 
   def project_params_attributes
     [
+      :allow_merge_on_skipped_pipeline,
       :avatar,
       :build_allow_git_fetch,
       :build_coverage_regex,

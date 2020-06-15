@@ -1,0 +1,6 @@
+---
+title: Allow to specify multiple domains when restricting group membership by email
+  domain
+merge_request: 33498
+author:
+type: added

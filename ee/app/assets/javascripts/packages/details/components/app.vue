@@ -11,8 +11,8 @@ import {
   GlTab,
   GlTabs,
   GlTable,
+  GlSprintf,
 } from '@gitlab/ui';
-import { escape } from 'lodash';
 import Tracking from '~/tracking';
 import PackageActivity from './activity.vue';
 import PackageInformation from './information.vue';
@@ -28,7 +28,7 @@ import DependencyRow from './dependency_row.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
-import { __, s__, sprintf } from '~/locale';
+import { __, s__ } from '~/locale';
 import { PackageType, TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
 import { mapActions, mapState } from 'vuex';
@@ -45,6 +45,7 @@ export default {
     GlTabs,
     GlTable,
     GlIcon,
+    GlSprintf,
     PackageActivity,
     PackageInformation,
     PackageTitle,
@@ -95,20 +96,6 @@ export default {
     },
     canDeletePackage() {
       return this.canDelete && this.destroyPath;
-    },
-    deleteModalDescription() {
-      return sprintf(
-        s__(
-          `PackageRegistry|You are about to delete version %{boldStart}%{version}%{boldEnd} of %{boldStart}%{name}%{boldEnd}. Are you sure?`,
-        ),
-        {
-          version: escape(this.packageEntity.version),
-          name: escape(this.packageEntity.name),
-          boldStart: '<b>',
-          boldEnd: '</b>',
-        },
-        false,
-      );
     },
     packageInformation() {
       return generatePackageInfo(this.packageEntity);
@@ -181,6 +168,9 @@ export default {
   },
   i18n: {
     deleteModalTitle: s__(`PackageRegistry|Delete Package Version`),
+    deleteModalContent: s__(
+      `PackageRegistry|You are about to delete version %{version} of %{name}. Are you sure?`,
+    ),
   },
   filesTableHeaderFields: [
     {
@@ -324,7 +314,15 @@ export default {
 
     <gl-modal ref="deleteModal" class="js-delete-modal" modal-id="delete-modal">
       <template #modal-title>{{ $options.i18n.deleteModalTitle }}</template>
-      <p v-html="deleteModalDescription"></p>
+      <gl-sprintf :message="$options.i18n.deleteModalContent">
+        <template #version>
+          <strong>{{ packageEntity.version }}</strong>
+        </template>
+
+        <template #name>
+          <strong>{{ packageEntity.name }}</strong>
+        </template>
+      </gl-sprintf>
 
       <div slot="modal-footer" class="w-100">
         <div class="float-right">

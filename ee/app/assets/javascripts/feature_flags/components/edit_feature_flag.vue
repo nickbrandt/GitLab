@@ -31,6 +31,10 @@ export default {
       type: String,
       required: true,
     },
+    projectId: {
+      type: String,
+      required: true,
+    },
   },
   translations: {
     legacyFlagAlert: s__(
@@ -101,6 +105,7 @@ export default {
       <feature-flag-form
         :name="name"
         :description="description"
+        :project-id="projectId"
         :scopes="scopes"
         :strategies="strategies"
         :cancel-path="path"

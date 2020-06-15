@@ -2,10 +2,13 @@ inherit_gem:
   gitlab-styles:
     - rubocop-default.yml
 
-inherit_from: .rubocop_todo.yml
 require:
   - ./rubocop/rubocop
   - rubocop-rspec
+
+inherit_from:
+  - .rubocop_todo.yml
+  - ./rubocop/rubocop-migrations.yml
 
 inherit_mode:
   merge:
@@ -178,6 +181,9 @@ Rails/ApplicationRecord:
     - spec/**/*.rb
     - ee/db/**/*.rb
     - ee/spec/**/*.rb
+
+Cop/DefaultScope:
+  Enabled: true
 
 Rails/FindBy:
   Enabled: true
@@ -444,3 +450,12 @@ Rails/TimeZone:
     - 'spec/models/**/*'
     - 'ee/app/models/**/*'
     - 'ee/spec/models/**/*'
+
+# WIP: See https://gitlab.com/gitlab-org/gitlab/-/issues/220040
+Rails/SaveBang:
+  Enabled: true
+  Include:
+    - 'spec/**/*.rb'
+    - 'ee/spec/**/*.rb'
+    - 'qa/spec/**/*.rb'
+    - 'qa/qa/specs/**/*.rb'

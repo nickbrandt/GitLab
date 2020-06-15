@@ -41,6 +41,27 @@ RSpec.describe ProjectsController do
           end
         end
       end
+
+      context 'with the new_create_project_ui experiment enabled and the user is part of the control group' do
+        before do
+          stub_experiment(new_create_project_ui: true)
+          stub_experiment_for_user(new_create_project_ui: false)
+          allow_any_instance_of(described_class).to receive(:experimentation_subject_id).and_return('uuid')
+        end
+
+        it 'passes the right tracking parameters to the frontend' do
+          get(:new)
+
+          expect(Gon.tracking_data).to eq(
+            {
+              category: 'Manage::Import::Experiment::NewCreateProjectUi',
+              action: 'click_tab',
+              label: 'uuid',
+              property: 'control_group'
+            }
+          )
+        end
+      end
     end
   end
 
@@ -358,6 +379,15 @@ RSpec.describe ProjectsController do
           expect(assigns[:lfs_blob_ids]).not_to be_nil
         end
       end
+    end
+
+    context 'namespace storage limit' do
+      let_it_be(:project) { create(:project, :public, :repository ) }
+      let(:namespace) { project.namespace }
+
+      subject { get :show, params: { namespace_id: namespace, id: project } }
+
+      it_behaves_like 'namespace storage limit alert'
     end
   end
 

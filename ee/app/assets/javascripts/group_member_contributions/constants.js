@@ -6,6 +6,7 @@ const COLUMNS = [
   { name: 'issuesCreated', text: __('Opened issues') },
   { name: 'issuesClosed', text: __('Closed issues') },
   { name: 'mergeRequestsCreated', text: __('Opened MRs') },
+  { name: 'mergeRequestsApproved', text: __('Approved MRs') },
   { name: 'mergeRequestsMerged', text: __('Merged MRs') },
   { name: 'totalEvents', text: __('Total Contributions') },
 ];

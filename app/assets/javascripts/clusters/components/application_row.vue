@@ -1,7 +1,5 @@
 <script>
-/* eslint-disable vue/require-default-prop */
-/* eslint-disable @gitlab/vue-require-i18n-strings */
-import { GlLink, GlModalDirective } from '@gitlab/ui';
+import { GlLink, GlModalDirective, GlSprintf } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import eventHub from '../event_hub';
 import identicon from '../../vue_shared/components/identicon.vue';
@@ -17,6 +15,7 @@ export default {
     loadingButton,
     identicon,
     GlLink,
+    GlSprintf,
     UninstallApplicationButton,
     UninstallApplicationConfirmationModal,
     UpdateApplicationConfirmationModal,
@@ -36,15 +35,17 @@ export default {
     titleLink: {
       type: String,
       required: false,
+      default: '',
     },
     manageLink: {
       type: String,
       required: false,
+      default: '',
     },
     logoUrl: {
       type: String,
       required: false,
-      default: null,
+      default: '',
     },
     disabled: {
       type: Boolean,
@@ -59,14 +60,17 @@ export default {
     status: {
       type: String,
       required: false,
+      default: '',
     },
     statusReason: {
       type: String,
       required: false,
+      default: '',
     },
     requestReason: {
       type: String,
       required: false,
+      default: '',
     },
     installed: {
       type: Boolean,
@@ -78,17 +82,15 @@ export default {
       required: false,
       default: false,
     },
-    installedVia: {
-      type: String,
-      required: false,
-    },
     version: {
       type: String,
       required: false,
+      default: '',
     },
     chartRepo: {
       type: String,
       required: false,
+      default: '',
     },
     updateAvailable: {
       type: Boolean,
@@ -206,15 +208,6 @@ export default {
 
       return sprintf(errorDescription, { title: this.title });
     },
-    versionLabel() {
-      if (this.updateFailed) {
-        return __('Update failed');
-      } else if (this.isUpdating) {
-        return __('Updating');
-      }
-
-      return this.updateSuccessful ? __('Updated to') : __('Updated');
-    },
     updateFailureDescription() {
       return s__('ClusterIntegration|Update failed. Please check the logs and try again.');
     },
@@ -282,12 +275,16 @@ export default {
   },
   methods: {
     installClicked() {
+      if (this.disabled || this.installButtonDisabled) return;
+
       eventHub.$emit('installApplication', {
         id: this.id,
         params: this.installApplicationRequestParams,
       });
     },
     updateConfirmed() {
+      if (this.isUpdating) return;
+
       eventHub.$emit('updateApplication', {
         id: this.id,
         params: this.installApplicationRequestParams,
@@ -334,11 +331,7 @@ export default {
           >
           <span v-else class="js-cluster-application-title">{{ title }}</span>
         </strong>
-        <span
-          v-if="installedVia"
-          class="js-cluster-application-installed-via"
-          v-html="installedVia"
-        ></span>
+        <slot name="installedVia"></slot>
         <div>
           <slot name="description"></slot>
         </div>
@@ -361,14 +354,20 @@ export default {
             v-if="shouldShowUpdateDetails"
             class="form-text text-muted label p-0 js-cluster-application-update-details"
           >
-            {{ versionLabel }}
-            <gl-link
-              v-if="updateSuccessful"
-              :href="chartRepo"
-              target="_blank"
-              class="js-cluster-application-update-version"
-              >chart v{{ version }}</gl-link
-            >
+            <template v-if="updateFailed">{{ __('Update failed') }}</template>
+            <template v-else-if="isUpdating">{{ __('Updating') }}</template>
+            <template v-else>
+              <gl-sprintf :message="__('Updated to %{linkStart}chart v%{linkEnd}')">
+                <template #link="{ content }">
+                  <gl-link
+                    :href="chartRepo"
+                    target="_blank"
+                    class="js-cluster-application-update-version"
+                    >{{ content }}{{ version }}</gl-link
+                  >
+                </template>
+              </gl-sprintf>
+            </template>
           </div>
 
           <div

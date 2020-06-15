@@ -3,8 +3,14 @@ import { shallowMount } from '@vue/test-utils';
 import { GlLink, GlDeprecatedButton, GlIcon, GlLoadingIcon } from '@gitlab/ui';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
 import RequirementForm from 'ee/requirements/components/requirement_form.vue';
+import RequirementStatusBadge from 'ee/requirements/components/requirement_status_badge.vue';
 
-import { requirement1, requirementArchived, mockUserPermissions } from '../mock_data';
+import {
+  requirement1,
+  requirementArchived,
+  mockUserPermissions,
+  mockTestReport,
+} from '../mock_data';
 
 const createComponent = (requirement = requirement1) =>
   shallowMount(RequirementItem, {
@@ -75,6 +81,12 @@ describe('RequirementItem', () => {
     describe('author', () => {
       it('returns value of `requirement.author`', () => {
         expect(wrapper.vm.author).toBe(requirement1.author);
+      });
+    });
+
+    describe('testReport', () => {
+      it('returns testReport object from reports array within `requirement`', () => {
+        expect(wrapper.vm.testReport).toBe(mockTestReport);
       });
     });
   });
@@ -172,6 +184,25 @@ describe('RequirementItem', () => {
       expect(authorEl.find('.author').text()).toBe(requirement1.author.name);
     });
 
+    it('renders element containing requirement updated at', () => {
+      const updatedAtEl = wrapper.find('.issuable-info .issuable-updated-at');
+
+      expect(updatedAtEl.text()).toContain('updated');
+      expect(updatedAtEl.text()).toContain('ago');
+      expect(updatedAtEl.attributes('title')).toBe('Mar 20, 2020 8:09am GMT+0000');
+    });
+
+    it('renders requirement-status-badge component', () => {
+      const statusBadgeElSm = wrapper.find('.issuable-main-info').find(RequirementStatusBadge);
+      const statusBadgeElMd = wrapper.find('.issuable-meta').find(RequirementStatusBadge);
+
+      expect(statusBadgeElSm.exists()).toBe(true);
+      expect(statusBadgeElMd.exists()).toBe(true);
+      expect(statusBadgeElSm.props('testReport')).toBe(mockTestReport);
+      expect(statusBadgeElMd.props('testReport')).toBe(mockTestReport);
+      expect(statusBadgeElMd.props('elementType')).toBe('li');
+    });
+
     it('renders element containing requirement `Edit` button when `requirement.userPermissions.updateRequirement` is true', () => {
       const editButtonEl = wrapper.find('.controls .requirement-edit').find(GlDeprecatedButton);
 
@@ -257,14 +288,6 @@ describe('RequirementItem', () => {
       return wrapperArchived.vm.$nextTick(() => {
         expect(wrapperArchived.contains('.controls .requirement-reopen')).toBe(false);
       });
-    });
-
-    it('renders element containing requirement updated at', () => {
-      const updatedAtEl = wrapper.find('.issuable-meta .issuable-updated-at > span');
-
-      expect(updatedAtEl.text()).toContain('updated');
-      expect(updatedAtEl.text()).toContain('ago');
-      expect(updatedAtEl.attributes('title')).toBe('Mar 20, 2020 8:09am GMT+0000');
     });
   });
 });

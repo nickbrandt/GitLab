@@ -3,7 +3,7 @@ import { mapActions, mapState, mapGetters } from 'vuex';
 import { debounce } from 'lodash';
 import { GlSearchBoxByType, GlDropdown, GlDropdownItem, GlButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
-import { DEFAULT_SEARCH_DELAY, ACTION_TYPES, FILTER_STATES } from '../store/constants';
+import { DEFAULT_SEARCH_DELAY, ACTION_TYPES, FILTER_STATES } from '../constants';
 
 export default {
   name: 'GeoReplicableFilterBar',

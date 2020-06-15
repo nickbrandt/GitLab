@@ -2,10 +2,10 @@
 
 require 'spec_helper'
 
-RSpec.describe Ci::CompareSastReportsService do
+describe Ci::CompareSastReportsService do
+  let_it_be(:project) { create(:project, :repository) }
   let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
-  let(:project) { build(:project, :repository) }
 
   before do
     stub_licensed_features(container_scanning: true)
@@ -59,6 +59,17 @@ RSpec.describe Ci::CompareSastReportsService do
         compare_keys = subject[:data]['fixed'].map { |t| t['identifiers'].first['external_id'] }
         expected_keys = %w(char fopen strcpy char)
         expect(compare_keys - expected_keys).to eq([])
+      end
+    end
+
+    describe "#build_comparer" do
+      context "when the head_pipeline is nil" do
+        subject { service.build_comparer(base_pipeline, nil) }
+
+        let(:base_pipeline) { create(:ee_ci_pipeline) }
+
+        specify { expect { subject }.not_to raise_error }
+        specify { expect(subject.scans).to be_empty }
       end
     end
   end

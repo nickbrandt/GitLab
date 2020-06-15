@@ -50,7 +50,8 @@ RSpec.describe ClearSharedRunnersMinutesWorker do
           it 'raises an exception' do
             expect { worker.perform }.to raise_error(
               Ci::Minutes::BatchResetService::BatchNotResetError,
-              "#{namespace_ids.count} namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: #{namespace_ids}")
+              'Some namespace shared runner minutes were not reset.'
+            )
           end
         end
       end

@@ -72,12 +72,12 @@ module QA
           Page::Project::Settings::Main.perform do |settings|
             # Change visibility from public to internal
             settings.expand_visibility_project_features_permissions do |page|
-              page.set_project_visibility "Internal"
+              page.set_project_visibility "Private"
             end
           end
         end
 
-        it_behaves_like 'audit event', ["Change visibility from public to internal"]
+        it_behaves_like 'audit event', ["Change visibility from public to private"]
       end
 
       context "Export file download", quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217949', type: :investigating } do

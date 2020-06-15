@@ -128,6 +128,7 @@ class License < ApplicationRecord
     sast
     secret_detection
     security_dashboard
+    security_on_demand_scans
     status_page
     subepics
     threat_monitoring

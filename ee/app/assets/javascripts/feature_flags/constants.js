@@ -4,6 +4,7 @@ import { s__ } from '~/locale';
 export const ROLLOUT_STRATEGY_ALL_USERS = 'default';
 export const ROLLOUT_STRATEGY_PERCENT_ROLLOUT = 'gradualRolloutUserId';
 export const ROLLOUT_STRATEGY_USER_ID = 'userWithId';
+export const ROLLOUT_STRATEGY_GITLAB_USER_LIST = 'gitlabUserList';
 
 export const PERCENT_ROLLOUT_GROUP_ID = 'default';
 

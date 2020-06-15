@@ -18,6 +18,7 @@ module Gitlab
     class << self
       include Gitlab::Utils::UsageData
       include Gitlab::Utils::StrongMemoize
+      include Gitlab::UsageDataConcerns::Topology
 
       def data(force_refresh: false)
         Rails.cache.fetch('usage_data', force: force_refresh, expires_in: 2.weeks) do
@@ -45,7 +46,7 @@ module Gitlab
 
       def license_usage_data
         {
-          recorded_at: Time.now, # should be calculated very first
+          recorded_at: recorded_at,
           uuid: alt_usage_data { Gitlab::CurrentSettings.uuid },
           hostname: alt_usage_data { Gitlab.config.gitlab.host },
           version: alt_usage_data { Gitlab::VERSION },
@@ -53,6 +54,10 @@ module Gitlab
           active_user_count: count(User.active),
           edition: 'CE'
         }
+      end
+
+      def recorded_at
+        Time.now
       end
 
       def recording_ce_finish_data
@@ -65,6 +70,7 @@ module Gitlab
       # rubocop: disable CodeReuse/ActiveRecord
       def system_usage_data
         alert_bot_incident_count = count(::Issue.authored(::User.alert_bot))
+        issues_created_manually_from_alerts = count(Issue.with_alert_management_alerts.not_authored_by(::User.alert_bot))
 
         {
           counts: {
@@ -115,7 +121,9 @@ module Gitlab
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
             issues_using_zoom_quick_actions: distinct_count(ZoomMeeting, :issue_id),
             issues_with_embedded_grafana_charts_approx: grafana_embed_usage_data,
-            issues_created_gitlab_alerts: count(Issue.with_alert_management_alerts.not_authored_by(::User.alert_bot)),
+            issues_created_from_alerts: total_alert_issues,
+            issues_created_gitlab_alerts: issues_created_manually_from_alerts,
+            issues_created_manually_from_alerts: issues_created_manually_from_alerts,
             incident_issues: alert_bot_incident_count,
             alert_bot_incident_issues: alert_bot_incident_count,
             incident_labeled_issues: count(::Issue.with_label_attributes(IncidentManagement::CreateIssueService::INCIDENT_LABEL)),
@@ -181,6 +189,7 @@ module Gitlab
 
       def features_usage_data_ce
         {
+          instance_auto_devops_enabled: alt_usage_data(fallback: nil) { Gitlab::CurrentSettings.auto_devops_enabled? },
           container_registry_enabled: alt_usage_data(fallback: nil) { Gitlab.config.registry.enabled },
           dependency_proxy_enabled: Gitlab.config.try(:dependency_proxy)&.enabled,
           gitlab_shared_runners_enabled: alt_usage_data(fallback: nil) { Gitlab.config.gitlab_ci.shared_runners_enabled },
@@ -237,25 +246,6 @@ module Gitlab
           },
           app_server: { type: app_server_type }
         }
-      end
-
-      def topology_usage_data
-        topology_data, duration = measure_duration do
-          alt_usage_data(fallback: {}) do
-            {
-              nodes: topology_node_data
-            }.compact
-          end
-        end
-        { topology: topology_data.merge(duration_s: duration) }
-      end
-
-      def topology_node_data
-        with_prometheus_client do |client|
-          by_instance_mem =
-            client.aggregate(func: 'avg', metric: 'node_memory_MemTotal_bytes', by: 'instance').compact
-          by_instance_mem.values.map { |v| { node_memory_total_bytes: v } }
-        end
       end
 
       def app_server_type
@@ -443,6 +433,16 @@ module Gitlab
       end
 
       private
+
+      def total_alert_issues
+        # Remove prometheus table queries once they are deprecated
+        # To be removed with https://gitlab.com/gitlab-org/gitlab/-/issues/217407.
+        [
+          count(Issue.with_alert_management_alerts),
+          count(::Issue.with_self_managed_prometheus_alert_events),
+          count(::Issue.with_prometheus_alert_events)
+        ].reduce(:+)
+      end
 
       def user_minimum_id
         strong_memoize(:user_minimum_id) do

@@ -15,6 +15,8 @@ import FileTemplatesBar from './file_templates/bar.vue';
 import { __ } from '~/locale';
 import { extractMarkdownImagesFromEntries } from '../stores/utils';
 import { getPathParent, readFileAsDataURL } from '../utils';
+import { getRulesWithTraversal } from '../lib/editorconfig/parser';
+import mapRulesToMonaco from '../lib/editorconfig/rules_mapper';
 
 export default {
   components: {
@@ -32,6 +34,7 @@ export default {
     return {
       content: '',
       images: {},
+      rules: {},
     };
   },
   computed: {
@@ -51,7 +54,6 @@ export default {
       'getStagedFile',
       'isEditModeActive',
       'isCommitModeActive',
-      'isReviewModeActive',
       'currentBranch',
     ]),
     ...mapGetters('fileTemplates', ['showFileTemplatesBar']),
@@ -83,10 +85,6 @@ export default {
         active: this.isPreviewViewMode,
       };
     },
-    fileType() {
-      const info = viewerInformationForPath(this.file.path);
-      return (info && info.id) || '';
-    },
     showEditor() {
       return !this.shouldHideEditor && this.isEditorViewMode;
     },
@@ -98,6 +96,12 @@ export default {
     },
     currentBranchCommit() {
       return this.currentBranch?.commit.id;
+    },
+    previewMode() {
+      return viewerInformationForPath(this.file.path);
+    },
+    fileType() {
+      return this.previewMode?.id || '';
     },
   },
   watch: {
@@ -181,7 +185,6 @@ export default {
       'setFileLanguage',
       'setEditorPosition',
       'setFileViewMode',
-      'setFileEOL',
       'updateViewer',
       'removePendingTab',
       'triggerFilesChange',
@@ -194,7 +197,7 @@ export default {
 
       this.editor.clearEditor();
 
-      this.fetchFileData()
+      Promise.all([this.fetchFileData(), this.fetchEditorconfigRules()])
         .then(() => {
           this.createEditorInstance();
         })
@@ -231,7 +234,7 @@ export default {
         if (this.viewer === viewerTypes.edit) {
           this.editor.createInstance(this.$refs.editor);
         } else {
-          this.editor.createDiffInstance(this.$refs.editor, !this.isReviewModeActive);
+          this.editor.createDiffInstance(this.$refs.editor);
         }
 
         this.setupEditor();
@@ -253,6 +256,8 @@ export default {
         this.editor.attachModel(this.model);
       }
 
+      this.model.updateOptions(this.rules);
+
       this.model.onChange(model => {
         const { file } = model;
         if (!file.active) return;
@@ -260,7 +265,6 @@ export default {
         const monacoModel = model.getModel();
         const content = monacoModel.getValue();
         this.changeFileContent({ path: file.path, content });
-        this.setFileEOL({ eol: this.model.eol });
       });
 
       // Handle Cursor Position
@@ -281,15 +285,27 @@ export default {
         fileLanguage: this.model.language,
       });
 
-      // Get File eol
-      this.setFileEOL({
-        eol: this.model.eol,
-      });
+      this.$emit('editorSetup');
     },
     refreshEditorDimensions() {
       if (this.showEditor) {
         this.editor.updateDimensions();
       }
+    },
+    fetchEditorconfigRules() {
+      return getRulesWithTraversal(this.file.path, path => {
+        const entry = this.entries[path];
+        if (!entry) return Promise.resolve(null);
+
+        const content = entry.content || entry.raw;
+        if (content) return Promise.resolve(content);
+
+        return this.getFileData({ path: entry.path, makeFileActive: false }).then(() =>
+          this.getRawFileData({ path: entry.path }),
+        );
+      }).then(rules => {
+        this.rules = mapRulesToMonaco(rules);
+      });
     },
     onPaste(event) {
       const editor = this.editor.instance;
@@ -331,16 +347,15 @@ export default {
             role="button"
             @click.prevent="setFileViewMode({ file, viewMode: $options.FILE_VIEW_MODE_EDITOR })"
           >
-            <template v-if="viewer === $options.viewerTypes.edit">{{ __('Edit') }}</template>
-            <template v-else>{{ __('Review') }}</template>
+            {{ __('Edit') }}
           </a>
         </li>
-        <li v-if="file.previewMode" :class="previewTabCSS">
+        <li v-if="previewMode" :class="previewTabCSS">
           <a
             href="javascript:void(0);"
             role="button"
             @click.prevent="setFileViewMode({ file, viewMode: $options.FILE_VIEW_MODE_PREVIEW })"
-            >{{ file.previewMode.previewTitle }}</a
+            >{{ previewMode.previewTitle }}</a
           >
         </li>
       </ul>

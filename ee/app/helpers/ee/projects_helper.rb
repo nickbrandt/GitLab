@@ -150,6 +150,7 @@ module EE
       %w[
         projects/security/configuration#show
         projects/security/dashboard#index
+        projects/on_demand_scans#index
         projects/dependencies#index
         projects/licenses#index
         projects/threat_monitoring#show
@@ -278,6 +279,10 @@ module EE
       if can?(current_user, :read_project_security_dashboard, project)
         nav_tabs << :security
         nav_tabs << :security_configuration
+      end
+
+      if can?(current_user, :read_on_demand_scans, @project)
+        nav_tabs << :on_demand_scans
       end
 
       if can?(current_user, :read_dependencies, project)

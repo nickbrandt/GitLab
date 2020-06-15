@@ -144,6 +144,22 @@ warnings.
 To learn more about [how SAST works](../../user/application_security/sast/index.md),
 see the documentation.
 
+## Auto Secret Detection **(ULTIMATE)**
+
+> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.1.
+
+Secret Detection uses the
+[Secret Detection Docker image](https://gitlab.com/gitlab-org/security-products/analyzers/secrets) to run Secret Detection on the current code, and checks for leaked secrets. The
+Auto Secret Detection stage runs only on the
+[Ultimate](https://about.gitlab.com/pricing/) tier, and requires
+[GitLab Runner](https://docs.gitlab.com/runner/) 11.5 or above.
+
+After creating the report, it's uploaded as an artifact which you can later
+download and evaluate. The merge request widget also displays any security
+warnings.
+
+To learn more, see [Secret Detection](../../user/application_security/secret_detection/index.md).
+
 ## Auto Dependency Scanning **(ULTIMATE)**
 
 > Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.7.
@@ -196,7 +212,7 @@ see the documentation.
 ## Auto Review Apps
 
 This is an optional step, since many projects don't have a Kubernetes cluster
-available. If the [requirements](index.md#requirements) are not met, the job is
+available. If the [requirements](requirements.md) are not met, the job is
 silently skipped.
 
 [Review Apps](../../ci/review_apps/index.md) are temporary application environments based on the
@@ -297,7 +313,7 @@ Any performance differences between the source and target branches are also
 ## Auto Deploy
 
 This is an optional step, since many projects don't have a Kubernetes cluster
-available. If the [requirements](index.md#requirements) are not met, the job is skipped.
+available. If the [requirements](requirements.md) are not met, the job is skipped.
 
 After a branch or merge request is merged into the project's default branch (usually
 `master`), Auto Deploy deploys the application to a `production` environment in
@@ -598,7 +614,7 @@ GitLab provides some initial alerts for you after you install Prometheus:
 
 To use Auto Monitoring:
 
-1. [Install and configure the requirements](index.md#requirements).
+1. [Install and configure the Auto DevOps requirements](requirements.md).
 1. [Enable Auto DevOps](index.md#enablingdisabling-auto-devops), if you haven't done already.
 1. Navigate to your project's **{rocket}** **CI/CD > Pipelines** and click **Run Pipeline**.
 1. After the pipeline finishes successfully, open the

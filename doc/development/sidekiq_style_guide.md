@@ -78,7 +78,7 @@ As a general rule, a worker can be considered idempotent if:
 
 - It can safely run multiple times with the same arguments.
 - Application side-effects are expected to happen only once
-  (or side-effects of a second run are not impactful).
+  (or side-effects of a second run do not have an effect).
 
 A good example of that would be a cache expiration worker.
 
@@ -156,7 +156,7 @@ named `disable_<queue name>_deduplication`. For example to disable
 deduplication for the `AuthorizedProjectsWorker`, we would enable the
 feature flag `disable_authorized_projects_deduplication`.
 
-From chatops:
+From ChatOps:
 
 ```shell
 /chatops run feature set disable_authorized_projects_deduplication true
@@ -272,10 +272,10 @@ annotated with the `worker_resource_boundary` method.
 
 Most workers tend to spend most of their time blocked, wait on network responses
 from other services such as Redis, PostgreSQL, and Gitaly. Since Sidekiq is a
-multithreaded environment, these jobs can be scheduled with high concurrency.
+multi-threaded environment, these jobs can be scheduled with high concurrency.
 
 Some workers, however, spend large amounts of time _on-CPU_ running logic in
-Ruby. Ruby MRI does not support true multithreading - it relies on the
+Ruby. Ruby MRI does not support true multi-threading - it relies on the
 [GIL](https://thoughtbot.com/blog/untangling-ruby-threads#the-global-interpreter-lock)
 to greatly simplify application development by only allowing one section of Ruby
 code in a process to run at a time, no matter how many cores the machine
@@ -427,7 +427,7 @@ isn't picked up by the cops. In any case, please leave a code-comment
 pointing to which context will be used when disabling the cops.
 
 When you do provide objects to the context, please make sure that the
-route for namespaces and projects is preloaded. This can be done using
+route for namespaces and projects is pre-loaded. This can be done using
 the `.with_route` scope defined on all `Routable`s.
 
 ### Cron-Workers
@@ -518,6 +518,34 @@ job needs to be scheduled with.
 The `context_proc` which needs to return a hash with the context
 information for the job.
 
+## Arguments logging
+
+When [`SIDEKIQ_LOG_ARGUMENTS`](../administration/troubleshooting/sidekiq.md#log-arguments-to-sidekiq-jobs)
+is enabled, Sidekiq job arguments will be logged.
+
+By default, the only arguments logged are numeric arguments, because
+arguments of other types could contain sensitive information. To
+override this, use `loggable_arguments` inside a worker with the indexes
+of the arguments to be logged. (Numeric arguments do not need to be
+specified here.)
+
+For example:
+
+```ruby
+class MyWorker
+  include ApplicationWorker
+
+  loggable_arguments 1, 3
+
+  # object_id will be logged as it's numeric
+  # string_a will be logged due to the loggable_arguments call
+  # string_b will be filtered from logs
+  # string_c will be logged due to the loggable_arguments call
+  def perform(object_id, string_a, string_b, string_c)
+  end
+end
+```
+
 ## Tests
 
 Each Sidekiq worker must be tested using RSpec, just like any other class. These
@@ -591,7 +619,7 @@ to be merged and deployed before additional changes are merged.
 1. In a further merge request, update `ExampleWorker.perform_async` calls to
    use the new argument.
 
-##### Parameter hash  
+##### Parameter hash
 
 This approach will not require multiple deployments if an existing worker already
 utilizes a parameter hash.

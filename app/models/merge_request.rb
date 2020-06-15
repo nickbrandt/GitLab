@@ -877,7 +877,7 @@ class MergeRequest < ApplicationRecord
 
     check_service = MergeRequests::MergeabilityCheckService.new(self)
 
-    if async && Feature.enabled?(:async_merge_request_check_mergeability, project, default_enabled: true)
+    if async
       check_service.async_execute
     else
       check_service.execute(retry_lease: false)
@@ -1169,6 +1169,7 @@ class MergeRequest < ApplicationRecord
   def mergeable_ci_state?
     return true unless project.only_allow_merge_if_pipeline_succeeds?
     return false unless actual_head_pipeline
+    return true if project.allow_merge_on_skipped_pipeline? && actual_head_pipeline.skipped?
 
     actual_head_pipeline.success?
   end

@@ -2,10 +2,10 @@
 
 require 'spec_helper'
 
-RSpec.describe Ci::CompareContainerScanningReportsService do
+describe Ci::CompareContainerScanningReportsService do
+  let_it_be(:project) { create(:project, :repository) }
   let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
-  let(:project) { build(:project, :repository) }
 
   before do
     stub_licensed_features(container_scanning: true)
@@ -58,6 +58,17 @@ RSpec.describe Ci::CompareContainerScanningReportsService do
         expected_keys = %w(CVE-2017-16997 CVE-2017-18269 CVE-2018-1000001 CVE-2016-10228 CVE-2010-4052 CVE-2018-18520 CVE-2018-16869 CVE-2018-18311)
         expect(compare_keys - expected_keys).to eq([])
       end
+    end
+  end
+
+  describe "#build_comparer" do
+    context "when the head_pipeline is nil" do
+      subject { service.build_comparer(base_pipeline, nil) }
+
+      let(:base_pipeline) { create(:ee_ci_pipeline) }
+
+      specify { expect { subject }.not_to raise_error }
+      specify { expect(subject.scans).to be_empty }
     end
   end
 end

@@ -37,11 +37,3 @@
     0 0.25rem 0.75rem $gl-btn-active-background;
 }
 
-
-.dropdown-groups,
-.dropdown-projects {
-  &.show.dropdown .dropdown-menu {
-    min-height: $grid-size * 21;
-  }
-}
-

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import createStore from './store';
 import GeoReplicableApp from './components/app.vue';
 
@@ -7,30 +8,21 @@ Vue.use(Translate);
 
 export default () => {
   const el = document.getElementById('js-geo-replicable');
-  const { replicableType } = el.dataset;
+  const { replicableType, geoTroubleshootingLink, geoReplicableEmptySvgPath } = el.dataset;
+  const useGraphQl = parseBoolean(el.dataset.graphql);
 
   return new Vue({
     el,
-    store: createStore(replicableType),
+    store: createStore({ replicableType, useGraphQl }),
     components: {
       GeoReplicableApp,
-    },
-    data() {
-      const {
-        dataset: { geoTroubleshootingLink, geoReplicableEmptySvgPath },
-      } = this.$options.el;
-
-      return {
-        geoTroubleshootingLink,
-        geoReplicableEmptySvgPath,
-      };
     },
 
     render(createElement) {
       return createElement('geo-replicable-app', {
         props: {
-          geoTroubleshootingLink: this.geoTroubleshootingLink,
-          geoReplicableEmptySvgPath: this.geoReplicableEmptySvgPath,
+          geoTroubleshootingLink,
+          geoReplicableEmptySvgPath,
         },
       });
     },

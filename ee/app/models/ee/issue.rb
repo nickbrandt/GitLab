@@ -36,10 +36,6 @@ module EE
 
       has_one :status_page_published_incident, class_name: 'StatusPage::PublishedIncident', inverse_of: :issue
 
-      has_and_belongs_to_many :self_managed_prometheus_alert_events, join_table: :issues_self_managed_prometheus_alert_events
-      has_and_belongs_to_many :prometheus_alert_events, join_table: :issues_prometheus_alert_events
-      has_many :prometheus_alerts, through: :prometheus_alert_events
-
       has_many :vulnerability_links, class_name: 'Vulnerabilities::IssueLink', inverse_of: :issue
       has_many :related_vulnerabilities, through: :vulnerability_links, source: :vulnerability
 
@@ -123,6 +119,10 @@ module EE
 
     def supports_weight?
       project&.feature_available?(:issue_weights)
+    end
+
+    def can_assign_epic?(user)
+      user&.can?(:admin_epic, project.group)
     end
 
     def related_issues(current_user, preload: nil)

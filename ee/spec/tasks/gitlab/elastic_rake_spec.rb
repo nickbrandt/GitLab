@@ -32,10 +32,9 @@ RSpec.describe 'gitlab:elastic namespace rake tasks', :elastic do
     end
 
     it 'queues jobs for each project batch' do
-      expect(ElasticIndexerWorker).to receive(:bulk_perform_async).with([
-        [:index, 'Project', project1.id, nil],
-        [:index, 'Project', project2.id, nil]
-      ])
+      expect(Elastic::ProcessInitialBookkeepingService).to receive(:backfill_projects!).with(
+        project1, project2
+      )
 
       run_rake_task 'gitlab:elastic:index_projects'
     end
@@ -55,10 +54,9 @@ RSpec.describe 'gitlab:elastic namespace rake tasks', :elastic do
       end
 
       it 'does not queue jobs for projects that should not be indexed' do
-        expect(ElasticIndexerWorker).to receive(:bulk_perform_async).with([
-          [:index, 'Project', project1.id, nil],
-          [:index, 'Project', project3.id, nil]
-        ])
+        expect(Elastic::ProcessInitialBookkeepingService).to receive(:backfill_projects!).with(
+          project1, project3
+        )
 
         run_rake_task 'gitlab:elastic:index_projects'
       end

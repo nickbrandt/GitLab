@@ -10,6 +10,17 @@ describe Gitlab::UsageData, :aggregate_failures do
     stub_object_store_settings
   end
 
+  describe '#uncached_data' do
+    it 'ensures recorded_at is set before any other usage data calculation' do
+      %i(alt_usage_data redis_usage_data distinct_count count).each do |method|
+        expect(described_class).not_to receive(method)
+      end
+      expect(described_class).to receive(:recorded_at).and_raise(Exception.new('Stopped calculating recorded_at'))
+
+      expect { described_class.uncached_data }.to raise_error('Stopped calculating recorded_at')
+    end
+  end
+
   describe '#data' do
     let!(:ud) { build(:usage_data) }
 
@@ -57,7 +68,7 @@ describe Gitlab::UsageData, :aggregate_failures do
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
       expect(count_data[:projects_with_terraform_reports]).to eq(2)
       expect(count_data[:projects_with_terraform_states]).to eq(2)
-      expect(count_data[:terraform_reports]).to eq(3)
+      expect(count_data[:terraform_reports]).to eq(6)
       expect(count_data[:terraform_states]).to eq(3)
       expect(count_data[:issues_created_from_gitlab_error_tracking_ui]).to eq(1)
       expect(count_data[:issues_with_associated_zoom_link]).to eq(2)
@@ -65,6 +76,8 @@ describe Gitlab::UsageData, :aggregate_failures do
       expect(count_data[:issues_with_embedded_grafana_charts_approx]).to eq(2)
       expect(count_data[:incident_issues]).to eq(4)
       expect(count_data[:issues_created_gitlab_alerts]).to eq(1)
+      expect(count_data[:issues_created_from_alerts]).to eq(3)
+      expect(count_data[:issues_created_manually_from_alerts]).to eq(1)
       expect(count_data[:alert_bot_incident_issues]).to eq(4)
       expect(count_data[:incident_labeled_issues]).to eq(3)
 
@@ -100,6 +113,10 @@ describe Gitlab::UsageData, :aggregate_failures do
          uploads: { enabled: nil, object_store: { enabled: false, direct_upload: true, background_upload: false, provider: "AWS" } },
          packages: { enabled: true, object_store: { enabled: false, direct_upload: false, background_upload: true, provider: "AWS" } } }
       )
+    end
+
+    it 'gathers topology data' do
+      expect(subject.keys).to include(:topology)
     end
 
     context 'with existing container expiration policies' do
@@ -211,7 +228,8 @@ describe Gitlab::UsageData, :aggregate_failures do
     describe '#features_usage_data_ce' do
       subject { described_class.features_usage_data_ce }
 
-      it 'gathers feature usage data' do
+      it 'gathers feature usage data', :aggregate_failures do
+        expect(subject[:instance_auto_devops_enabled]).to eq(Gitlab::CurrentSettings.auto_devops_enabled?)
         expect(subject[:mattermost_enabled]).to eq(Gitlab.config.mattermost.enabled)
         expect(subject[:signup_enabled]).to eq(Gitlab::CurrentSettings.allow_signup?)
         expect(subject[:ldap_enabled]).to eq(Gitlab.config.ldap.enabled)
@@ -261,88 +279,6 @@ describe Gitlab::UsageData, :aggregate_failures do
 
       def stub_runtime(runtime)
         allow(Gitlab::Runtime).to receive(:identify).and_return(runtime)
-      end
-    end
-
-    describe '#topology_usage_data' do
-      subject { described_class.topology_usage_data }
-
-      before do
-        # this pins down time shifts when benchmarking durations
-        allow(Process).to receive(:clock_gettime).and_return(0)
-      end
-
-      context 'when embedded Prometheus server is enabled' do
-        before do
-          expect(Gitlab::Prometheus::Internal).to receive(:prometheus_enabled?).and_return(true)
-          expect(Gitlab::Prometheus::Internal).to receive(:uri).and_return('http://prom:9090')
-        end
-
-        it 'contains a topology element' do
-          allow_prometheus_queries
-
-          expect(subject).to have_key(:topology)
-        end
-
-        context 'tracking node metrics' do
-          it 'contains node level metrics for each instance' do
-            expect_prometheus_api_to receive(:aggregate)
-              .with(func: 'avg', metric: 'node_memory_MemTotal_bytes', by: 'instance')
-              .and_return({
-                'instance1' => 512,
-                'instance2' => 1024
-              })
-
-            expect(subject[:topology]).to eq({
-              duration_s: 0,
-              nodes: [
-                {
-                  node_memory_total_bytes: 512
-                },
-                {
-                  node_memory_total_bytes: 1024
-                }
-              ]
-            })
-          end
-        end
-
-        context 'and no results are found' do
-          it 'does not report anything' do
-            expect_prometheus_api_to receive(:aggregate).and_return({})
-
-            expect(subject[:topology]).to eq({
-              duration_s: 0,
-              nodes: []
-            })
-          end
-        end
-
-        context 'and a connection error is raised' do
-          it 'does not report anything' do
-            expect_prometheus_api_to receive(:aggregate).and_raise('Connection failed')
-
-            expect(subject[:topology]).to eq({ duration_s: 0 })
-          end
-        end
-      end
-
-      context 'when embedded Prometheus server is disabled' do
-        it 'does not report anything' do
-          expect(subject[:topology]).to eq({ duration_s: 0 })
-        end
-      end
-
-      def expect_prometheus_api_to(receive_matcher)
-        expect_next_instance_of(Gitlab::PrometheusClient) do |client|
-          expect(client).to receive_matcher
-        end
-      end
-
-      def allow_prometheus_queries
-        allow_next_instance_of(Gitlab::PrometheusClient) do |client|
-          allow(client).to receive(:aggregate).and_return({})
-        end
       end
     end
 

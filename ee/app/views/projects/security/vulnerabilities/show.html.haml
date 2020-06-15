@@ -3,7 +3,8 @@
 - breadcrumb_title @vulnerability.id
 - page_title @vulnerability.title
 - page_description @vulnerability.description
+- vulnerability_data = vulnerability_data(@vulnerability, @pipeline)
 
-#js-vulnerability-header{ data: vulnerability_data(@vulnerability, @pipeline) }
-#js-vulnerability-details{ data: vulnerability_data(@vulnerability, @pipeline) }
-#js-vulnerability-footer{ data: vulnerability_data(@vulnerability, @pipeline) }
+#js-vulnerability-header{ data: vulnerability_data }
+#js-vulnerability-details{ data: vulnerability_data }
+#js-vulnerability-footer{ data: vulnerability_data }

@@ -367,6 +367,10 @@ module ProjectsHelper
     @project.metrics_setting_external_dashboard_url
   end
 
+  def metrics_dashboard_timezone
+    @project.metrics_setting_dashboard_timezone
+  end
+
   def grafana_integration_url
     @project.grafana_integration&.grafana_url
   end
@@ -538,11 +542,6 @@ module ProjectsHelper
     else
       s_("ProjectLastActivity|Never")
     end
-  end
-
-  def project_wiki_path_with_version(proj, page, version, is_newest)
-    url_params = is_newest ? {} : { version_id: version }
-    project_wiki_path(proj, page, url_params)
   end
 
   def project_status_css_class(status)

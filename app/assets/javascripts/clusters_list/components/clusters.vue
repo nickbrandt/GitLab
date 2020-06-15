@@ -1,10 +1,12 @@
 <script>
+import * as Sentry from '@sentry/browser';
 import { mapState, mapActions } from 'vuex';
 import {
   GlDeprecatedBadge as GlBadge,
   GlLink,
   GlLoadingIcon,
   GlPagination,
+  GlSprintf,
   GlTable,
 } from '@gitlab/ui';
 import tooltip from '~/vue_shared/directives/tooltip';
@@ -12,18 +14,21 @@ import { CLUSTER_TYPES, STATUSES } from '../constants';
 import { __, sprintf } from '~/locale';
 
 export default {
+  nodeMemoryText: __('%{totalMemory} (%{freeSpacePercentage}%{percentSymbol} free)'),
+  nodeCpuText: __('%{totalCpu} (%{freeSpacePercentage}%{percentSymbol} free)'),
   components: {
     GlBadge,
     GlLink,
     GlLoadingIcon,
     GlPagination,
+    GlSprintf,
     GlTable,
   },
   directives: {
     tooltip,
   },
   computed: {
-    ...mapState(['clusters', 'clustersPerPage', 'loading', 'page', 'totalCulsters']),
+    ...mapState(['clusters', 'clustersPerPage', 'loading', 'page', 'providers', 'totalCulsters']),
     currentPage: {
       get() {
         return this.page;
@@ -47,15 +52,14 @@ export default {
           key: 'node_size',
           label: __('Nodes'),
         },
-        // Fields are missing calculation methods and not ready to display
-        // {
-        //  key: 'node_cpu',
-        //  label: __('Total cores (vCPUs)'),
-        // },
-        // {
-        //  key: 'node_memory',
-        //  label: __('Total memory (GB)'),
-        // },
+        {
+          key: 'total_cpu',
+          label: __('Total cores (CPUs)'),
+        },
+        {
+          key: 'total_memory',
+          label: __('Total memory (GB)'),
+        },
         {
           key: 'cluster_type',
           label: __('Cluster level'),
@@ -72,13 +76,104 @@ export default {
   },
   methods: {
     ...mapActions(['fetchClusters', 'setPage']),
-    statusClass(status) {
-      const iconClass = STATUSES[status] || STATUSES.default;
-      return iconClass.className;
+    k8sQuantityToGb(quantity) {
+      if (!quantity) {
+        return 0;
+      } else if (quantity.endsWith(__('Ki'))) {
+        return parseInt(quantity.substr(0, quantity.length - 2), 10) * 0.000001024;
+      } else if (quantity.endsWith(__('Mi'))) {
+        return parseInt(quantity.substr(0, quantity.length - 2), 10) * 0.001048576;
+      }
+
+      // We are trying to track quantity types coming from Kubernetes.
+      // Sentry will notify us if we are missing types.
+      throw new Error(`UnknownK8sMemoryQuantity:${quantity}`);
+    },
+    k8sQuantityToCpu(quantity) {
+      if (!quantity) {
+        return 0;
+      } else if (quantity.endsWith('m')) {
+        return parseInt(quantity.substr(0, quantity.length - 1), 10) / 1000.0;
+      } else if (quantity.endsWith('n')) {
+        return parseInt(quantity.substr(0, quantity.length - 1), 10) / 1000000000.0;
+      }
+
+      // We are trying to track quantity types coming from Kubernetes.
+      // Sentry will notify us if we are missing types.
+      throw new Error(`UnknownK8sCpuQuantity:${quantity}`);
+    },
+    selectedProvider(provider) {
+      return this.providers[provider] || this.providers.default;
     },
     statusTitle(status) {
       const iconTitle = STATUSES[status] || STATUSES.default;
       return sprintf(__('Status: %{title}'), { title: iconTitle.title }, false);
+    },
+    totalMemoryAndUsage(nodes) {
+      try {
+        // For EKS node.usage will not be present unless the user manually
+        // install the metrics server
+        if (nodes && nodes[0].usage) {
+          let totalAllocatableMemory = 0;
+          let totalUsedMemory = 0;
+
+          nodes.reduce((total, node) => {
+            const allocatableMemoryQuantity = node.status.allocatable.memory;
+            const allocatableMemoryGb = this.k8sQuantityToGb(allocatableMemoryQuantity);
+            totalAllocatableMemory += allocatableMemoryGb;
+
+            const usedMemoryQuantity = node.usage.memory;
+            const usedMemoryGb = this.k8sQuantityToGb(usedMemoryQuantity);
+            totalUsedMemory += usedMemoryGb;
+
+            return null;
+          }, 0);
+
+          const freeSpacePercentage = (1 - totalUsedMemory / totalAllocatableMemory) * 100;
+
+          return {
+            totalMemory: totalAllocatableMemory.toFixed(2),
+            freeSpacePercentage: Math.round(freeSpacePercentage),
+          };
+        }
+      } catch (error) {
+        Sentry.captureException(error);
+      }
+
+      return { totalMemory: null, freeSpacePercentage: null };
+    },
+    totalCpuAndUsage(nodes) {
+      try {
+        // For EKS node.usage will not be present unless the user manually
+        // install the metrics server
+        if (nodes && nodes[0].usage) {
+          let totalAllocatableCpu = 0;
+          let totalUsedCpu = 0;
+
+          nodes.reduce((total, node) => {
+            const allocatableCpuQuantity = node.status.allocatable.cpu;
+            const allocatableCpu = this.k8sQuantityToCpu(allocatableCpuQuantity);
+            totalAllocatableCpu += allocatableCpu;
+
+            const usedCpuQuantity = node.usage.cpu;
+            const usedCpuGb = this.k8sQuantityToCpu(usedCpuQuantity);
+            totalUsedCpu += usedCpuGb;
+
+            return null;
+          }, 0);
+
+          const freeSpacePercentage = (1 - totalUsedCpu / totalAllocatableCpu) * 100;
+
+          return {
+            totalCpu: totalAllocatableCpu.toFixed(2),
+            freeSpacePercentage: Math.round(freeSpacePercentage),
+          };
+        }
+      } catch (error) {
+        Sentry.captureException(error);
+      }
+
+      return { totalCpu: null, freeSpacePercentage: null };
     },
   },
 };
@@ -90,25 +185,30 @@ export default {
   <section v-else>
     <gl-table :items="clusters" :fields="fields" stacked="md" class="qa-clusters-table">
       <template #cell(name)="{ item }">
-        <div class="d-flex flex-row-reverse flex-md-row js-status">
-          <gl-link data-qa-selector="cluster" :data-qa-cluster-name="item.name" :href="item.path">
+        <div
+          class="gl-display-flex gl-align-items-center gl-justify-content-end gl-justify-content-md-start js-status"
+        >
+          <img
+            :src="selectedProvider(item.provider_type).path"
+            :alt="selectedProvider(item.provider_type).text"
+            class="gl-w-6 gl-h-6 gl-display-flex gl-align-items-center"
+          />
+
+          <gl-link
+            data-qa-selector="cluster"
+            :data-qa-cluster-name="item.name"
+            :href="item.path"
+            class="gl-px-3"
+          >
             {{ item.name }}
           </gl-link>
 
           <gl-loading-icon
-            v-if="item.status === 'deleting'"
+            v-if="item.status === 'deleting' || item.status === 'creating'"
             v-tooltip
             :title="statusTitle(item.status)"
             size="sm"
-            class="mr-2 ml-md-2"
           />
-          <div
-            v-else
-            v-tooltip
-            class="cluster-status-indicator rounded-circle align-self-center gl-w-4 gl-h-4 mr-2 ml-md-2"
-            :class="statusClass(item.status)"
-            :title="statusTitle(item.status)"
-          ></div>
         </div>
       </template>
 
@@ -117,6 +217,34 @@ export default {
         <small v-else class="gl-font-sm gl-font-style-italic gl-text-gray-400">{{
           __('Unknown')
         }}</small>
+      </template>
+
+      <template #cell(total_cpu)="{ item }">
+        <span v-if="item.nodes">
+          <gl-sprintf :message="$options.nodeCpuText">
+            <template #totalCpu>{{ totalCpuAndUsage(item.nodes).totalCpu }}</template>
+            <template #freeSpacePercentage>{{
+              totalCpuAndUsage(item.nodes).freeSpacePercentage
+            }}</template>
+            <template #percentSymbol
+              >%</template
+            >
+          </gl-sprintf>
+        </span>
+      </template>
+
+      <template #cell(total_memory)="{ item }">
+        <span v-if="item.nodes">
+          <gl-sprintf :message="$options.nodeMemoryText">
+            <template #totalMemory>{{ totalMemoryAndUsage(item.nodes).totalMemory }}</template>
+            <template #freeSpacePercentage>{{
+              totalMemoryAndUsage(item.nodes).freeSpacePercentage
+            }}</template>
+            <template #percentSymbol
+              >%</template
+            >
+          </gl-sprintf>
+        </span>
       </template>
 
       <template #cell(cluster_type)="{value}">

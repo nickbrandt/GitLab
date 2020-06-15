@@ -2369,24 +2369,10 @@ describe MergeRequest do
       end
 
       context 'when async is true' do
-        context 'and async_merge_request_check_mergeability feature flag is enabled' do
-          it 'executes MergeabilityCheckService asynchronously' do
-            expect(mergeability_service).to receive(:async_execute)
+        it 'executes MergeabilityCheckService asynchronously' do
+          expect(mergeability_service).to receive(:async_execute)
 
-            subject.check_mergeability(async: true)
-          end
-        end
-
-        context 'and async_merge_request_check_mergeability feature flag is disabled' do
-          before do
-            stub_feature_flags(async_merge_request_check_mergeability: false)
-          end
-
-          it 'executes MergeabilityCheckService' do
-            expect(mergeability_service).to receive(:execute)
-
-            subject.check_mergeability(async: true)
-          end
+          subject.check_mergeability(async: true)
         end
       end
     end
@@ -2531,12 +2517,13 @@ describe MergeRequest do
   end
 
   describe '#mergeable_ci_state?' do
-    let(:project) { create(:project, only_allow_merge_if_pipeline_succeeds: true) }
     let(:pipeline) { create(:ci_empty_pipeline) }
 
-    subject { build(:merge_request, target_project: project) }
-
     context 'when it is only allowed to merge when build is green' do
+      let(:project) { create(:project, only_allow_merge_if_pipeline_succeeds: true) }
+
+      subject { build(:merge_request, target_project: project) }
+
       context 'and a failed pipeline is associated' do
         before do
           pipeline.update(status: 'failed', sha: subject.diff_head_sha)
@@ -2558,7 +2545,7 @@ describe MergeRequest do
       context 'and a skipped pipeline is associated' do
         before do
           pipeline.update(status: 'skipped', sha: subject.diff_head_sha)
-          allow(subject).to receive(:head_pipeline) { pipeline }
+          allow(subject).to receive(:head_pipeline).and_return(pipeline)
         end
 
         it { expect(subject.mergeable_ci_state?).to be_falsey }
@@ -2566,7 +2553,48 @@ describe MergeRequest do
 
       context 'when no pipeline is associated' do
         before do
-          allow(subject).to receive(:head_pipeline) { nil }
+          allow(subject).to receive(:head_pipeline).and_return(nil)
+        end
+
+        it { expect(subject.mergeable_ci_state?).to be_falsey }
+      end
+    end
+
+    context 'when it is only allowed to merge when build is green or skipped' do
+      let(:project) { create(:project, only_allow_merge_if_pipeline_succeeds: true, allow_merge_on_skipped_pipeline: true) }
+
+      subject { build(:merge_request, target_project: project) }
+
+      context 'and a failed pipeline is associated' do
+        before do
+          pipeline.update!(status: 'failed', sha: subject.diff_head_sha)
+          allow(subject).to receive(:head_pipeline).and_return(pipeline)
+        end
+
+        it { expect(subject.mergeable_ci_state?).to be_falsey }
+      end
+
+      context 'and a successful pipeline is associated' do
+        before do
+          pipeline.update!(status: 'success', sha: subject.diff_head_sha)
+          allow(subject).to receive(:head_pipeline).and_return(pipeline)
+        end
+
+        it { expect(subject.mergeable_ci_state?).to be_truthy }
+      end
+
+      context 'and a skipped pipeline is associated' do
+        before do
+          pipeline.update!(status: 'skipped', sha: subject.diff_head_sha)
+          allow(subject).to receive(:head_pipeline).and_return(pipeline)
+        end
+
+        it { expect(subject.mergeable_ci_state?).to be_truthy }
+      end
+
+      context 'when no pipeline is associated' do
+        before do
+          allow(subject).to receive(:head_pipeline).and_return(nil)
         end
 
         it { expect(subject.mergeable_ci_state?).to be_falsey }
@@ -2574,7 +2602,9 @@ describe MergeRequest do
     end
 
     context 'when merges are not restricted to green builds' do
-      subject { build(:merge_request, target_project: create(:project, only_allow_merge_if_pipeline_succeeds: false)) }
+      let(:project) { create(:project, only_allow_merge_if_pipeline_succeeds: false) }
+
+      subject { build(:merge_request, target_project: project) }
 
       context 'and a failed pipeline is associated' do
         before do
@@ -2588,6 +2618,23 @@ describe MergeRequest do
       context 'when no pipeline is associated' do
         before do
           allow(subject).to receive(:head_pipeline) { nil }
+        end
+
+        it { expect(subject.mergeable_ci_state?).to be_truthy }
+      end
+
+      context 'and a skipped pipeline is associated' do
+        before do
+          pipeline.update!(status: 'skipped', sha: subject.diff_head_sha)
+          allow(subject).to receive(:head_pipeline).and_return(pipeline)
+        end
+
+        it { expect(subject.mergeable_ci_state?).to be_truthy }
+      end
+
+      context 'when no pipeline is associated' do
+        before do
+          allow(subject).to receive(:head_pipeline).and_return(nil)
         end
 
         it { expect(subject.mergeable_ci_state?).to be_truthy }

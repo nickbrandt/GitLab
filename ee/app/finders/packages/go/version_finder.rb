@@ -3,7 +3,7 @@
 module Packages
   module Go
     class VersionFinder
-      include ::API::Helpers::Packages::Go::ModuleHelpers
+      include Gitlab::Golang
 
       attr_reader :mod
 
@@ -13,7 +13,7 @@ module Packages
 
       def execute
         @mod.project.repository.tags
-          .filter { |tag| semver? tag }
+          .filter { |tag| semver_tag? tag }
           .map    { |tag| @mod.version_by(ref: tag) }
           .filter { |ver| ver.valid? }
       end

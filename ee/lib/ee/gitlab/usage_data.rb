@@ -39,11 +39,9 @@ module EE
 
         override :uncached_data
         def uncached_data
-          usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, default_time_period)
-
           super
             .merge(usage_activity_by_stage)
-            .merge(usage_activity_by_stage_monthly)
+            .merge(usage_activity_by_stage(:usage_activity_by_stage_monthly, default_time_period))
             .merge(recording_ee_finish_data)
         end
 
@@ -164,6 +162,7 @@ module EE
                 epics: count(::Epic),
                 feature_flags: count(Operations::FeatureFlag),
                 geo_nodes: count(::GeoNode),
+                geo_event_log_max_id: alt_usage_data { Geo::EventLog.maximum(:id) || 0 },
                 ldap_group_links: count(::LdapGroupLink),
                 issues_with_health_status: count(::Issue.with_health_status),
                 ldap_keys: count(::LDAPKey),
@@ -275,7 +274,7 @@ module EE
             groups: distinct_count(::GroupMember.where(time_period), :user_id),
             ldap_keys: distinct_count(::LDAPKey.where(time_period), :user_id),
             ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id),
-            users_created: count(::User.where(time_period)),
+            users_created: count(::User.where(time_period), start: user_minimum_id, finish: user_maximum_id),
             value_stream_management_customized_group_stages: count(::Analytics::CycleAnalytics::GroupStage.where(custom: true)),
             projects_with_compliance_framework: count(::ComplianceManagement::ComplianceFramework::ProjectSettings),
             ldap_servers: ldap_available_servers.size,
@@ -290,7 +289,9 @@ module EE
           {
             clusters: distinct_count(::Clusters::Cluster.where(time_period), :user_id),
             clusters_applications_prometheus: cluster_applications_user_distinct_count(::Clusters::Applications::Prometheus, time_period),
-            operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations').where(time_period)),
+            operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations').where(time_period),
+                                                          start: user_minimum_id,
+                                                          finish: user_maximum_id),
             operations_dashboard_users_with_projects_added: distinct_count(UsersOpsDashboardProject.joins(:user).merge(::User.active).where(time_period), :user_id),
             projects_prometheus_active: distinct_count(::Project.with_active_prometheus_service.where(time_period), :creator_id),
             projects_with_error_tracking_enabled: distinct_count(::Project.with_enabled_error_tracking.where(time_period), :creator_id),
@@ -340,12 +341,12 @@ module EE
         def usage_activity_by_stage_verify(time_period)
           {
             ci_builds: distinct_count(::Ci::Build.where(time_period), :user_id),
-            ci_external_pipelines: distinct_count(::Ci::Pipeline.external.where(time_period), :user_id),
-            ci_internal_pipelines: distinct_count(::Ci::Pipeline.internal.where(time_period), :user_id),
-            ci_pipeline_config_auto_devops: distinct_count(::Ci::Pipeline.auto_devops_source.where(time_period), :user_id),
-            ci_pipeline_config_repository: distinct_count(::Ci::Pipeline.repository_source.where(time_period), :user_id),
+            ci_external_pipelines: distinct_count(::Ci::Pipeline.external.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
+            ci_internal_pipelines: distinct_count(::Ci::Pipeline.internal.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
+            ci_pipeline_config_auto_devops: distinct_count(::Ci::Pipeline.auto_devops_source.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
+            ci_pipeline_config_repository: distinct_count(::Ci::Pipeline.repository_source.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
             ci_pipeline_schedules: distinct_count(::Ci::PipelineSchedule.where(time_period), :owner_id),
-            ci_pipelines: distinct_count(::Ci::Pipeline.where(time_period), :user_id),
+            ci_pipelines: distinct_count(::Ci::Pipeline.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
             ci_triggers: distinct_count(::Ci::Trigger.where(time_period), :owner_id),
             clusters_applications_runner: cluster_applications_user_distinct_count(::Clusters::Applications::Runner, time_period),
             projects_reporting_ci_cd_back_to_github: distinct_count(::Project.with_github_service_pipeline_events.where(time_period), :creator_id)
@@ -363,7 +364,10 @@ module EE
           }
 
           SECURE_PRODUCT_TYPES.each do |secure_type, attribs|
-            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
+            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period),
+                                                                          :user_id,
+                                                                          start: user_minimum_id,
+                                                                          finish: user_maximum_id)
           end
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911

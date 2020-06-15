@@ -1,0 +1,5 @@
+---
+title: Fix description diff delete button not hidden after clicked
+merge_request: 33127
+author:
+type: fixed

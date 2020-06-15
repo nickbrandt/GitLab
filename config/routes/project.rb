@@ -67,7 +67,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         namespace :ci do
           resource :lint, only: [:show, :create]
-          resources :daily_build_group_report_results, only: [:index], constraints: { format: 'csv' }
+          resources :daily_build_group_report_results, only: [:index], constraints: { format: /(csv|json)/ }
         end
 
         namespace :settings do
@@ -324,9 +324,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         draw :wiki
 
         namespace :import do
-          resource :jira, only: [:show], controller: :jira do
-            post :import
-          end
+          resource :jira, only: [:show], controller: :jira
         end
       end
       # End of the /-/ scope.

@@ -10,10 +10,10 @@ export default {
     GeoReplicableItem,
   },
   computed: {
-    ...mapState(['replicableItems', 'currentPage', 'pageSize', 'totalReplicableItems']),
+    ...mapState(['replicableItems', 'paginationData']),
     page: {
       get() {
-        return this.currentPage;
+        return this.paginationData.page;
       },
       set(newVal) {
         this.setPage(newVal);
@@ -21,7 +21,7 @@ export default {
       },
     },
     hasReplicableItems() {
-      return this.totalReplicableItems > 0;
+      return this.paginationData.total > 0;
     },
   },
   methods: {
@@ -45,8 +45,8 @@ export default {
     <gl-pagination
       v-if="hasReplicableItems"
       v-model="page"
-      :per-page="pageSize"
-      :total-items="totalReplicableItems"
+      :per-page="paginationData.perPage"
+      :total-items="paginationData.total"
       align="center"
     />
   </section>

@@ -1,8 +1,8 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { GlPagination, GlModal } from '@gitlab/ui';
+import { GlPagination, GlModal, GlSprintf } from '@gitlab/ui';
 import Tracking from '~/tracking';
-import { s__, sprintf } from '~/locale';
+import { s__ } from '~/locale';
 import { TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
 import PackagesListLoader from '../../shared/components/packages_list_loader.vue';
@@ -12,6 +12,7 @@ export default {
   components: {
     GlPagination,
     GlModal,
+    GlSprintf,
     PackagesListLoader,
     PackagesListRow,
   },
@@ -44,17 +45,8 @@ export default {
     modalAction() {
       return s__('PackageRegistry|Delete package');
     },
-    deletePackageDescription() {
-      if (!this.itemToBeDeleted) {
-        return '';
-      }
-      return sprintf(
-        s__(
-          'PackageRegistry|You are about to delete <b>%{packageName}</b>, this operation is irreversible, are you sure?',
-        ),
-        { packageName: `${this.itemToBeDeleted.name}:${this.itemToBeDeleted.version}` },
-        false,
-      );
+    deletePackageName() {
+      return this.itemToBeDeleted?.name ?? '';
     },
     tracking() {
       const category = this.itemToBeDeleted
@@ -80,6 +72,11 @@ export default {
       this.track(TrackingActions.CANCEL_DELETE_PACKAGE);
       this.itemToBeDeleted = null;
     },
+  },
+  i18n: {
+    deleteModalContent: s__(
+      'PackageRegistry|You are about to delete %{name}, this operation is irreversible, are you sure?',
+    ),
   },
 };
 </script>
@@ -121,7 +118,11 @@ export default {
       >
         <template #modal-title>{{ modalAction }}</template>
         <template #modal-ok>{{ modalAction }}</template>
-        <p v-html="deletePackageDescription"></p>
+        <gl-sprintf :message="$options.i18n.deleteModalContent">
+          <template #name>
+            <strong>{{ deletePackageName }}</strong>
+          </template>
+        </gl-sprintf>
       </gl-modal>
     </template>
   </div>

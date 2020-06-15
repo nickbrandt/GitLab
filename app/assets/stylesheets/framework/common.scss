@@ -111,7 +111,7 @@ pre {
 
 hr {
   margin: 24px 0;
-  border-top: 1px solid darken($gray-normal, 8%);
+  border-top: 1px solid $gray-darker;
 }
 
 .str-truncated {
@@ -135,7 +135,7 @@ hr {
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  > div:not(.block),
+  > div:not(.block):not(.select2-display-none),
   .str-truncated {
     display: inline;
   }

@@ -299,23 +299,6 @@ RSpec.describe GithubService do
     end
   end
 
-  describe '#test_data' do
-    let(:user) { project.owner }
-    let(:test_data) { subject.test_data(project, user) }
-
-    it 'raises error if no pipeline found' do
-      project.ci_pipelines.delete_all
-
-      expect { test_data }.to raise_error 'Please set up a pipeline on your repository.'
-    end
-
-    it 'generates data for latest pipeline' do
-      pipeline
-
-      expect(test_data[:object_kind]).to eq 'pipeline'
-    end
-  end
-
   describe '#test' do
     it 'mentions creator in success message' do
       dummy_response = { context: "default", creator: { login: "YourUser" } }

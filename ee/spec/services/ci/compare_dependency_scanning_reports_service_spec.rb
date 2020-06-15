@@ -2,10 +2,10 @@
 
 require 'spec_helper'
 
-RSpec.describe Ci::CompareDependencyScanningReportsService do
+describe Ci::CompareDependencyScanningReportsService do
+  let_it_be(:project) { create(:project, :repository) }
   let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
-  let(:project) { build(:project, :repository) }
 
   before do
     stub_licensed_features(dependency_scanning: true)
@@ -81,6 +81,17 @@ RSpec.describe Ci::CompareDependencyScanningReportsService do
 
         expect(result[:status]).to eq(:error)
         expect(result[:status_reason]).to include('JSON parsing failed')
+      end
+    end
+
+    describe "#build_comparer" do
+      context "when the head_pipeline is nil" do
+        subject { service.build_comparer(base_pipeline, nil) }
+
+        let(:base_pipeline) { create(:ee_ci_pipeline) }
+
+        specify { expect { subject }.not_to raise_error }
+        specify { expect(subject.scans).to be_empty }
       end
     end
   end

@@ -13,6 +13,7 @@ RSpec.describe Board do
     it { is_expected.to have_one(:assignee).through(:board_assignee) }
     it { is_expected.to have_many(:board_labels) }
     it { is_expected.to have_many(:labels).through(:board_labels) }
+    it { is_expected.to have_many(:user_preferences) }
   end
 
   describe 'validations' do

@@ -6,6 +6,8 @@ module Types
       graphql_name 'AlertManagementAlert'
       description "Describes an alert from the project's Alert Management"
 
+      implements(Types::Notes::NoteableType)
+
       authorize :read_alert_management_alert
 
       field :iid,
@@ -85,7 +87,7 @@ module Types
             description: 'Timestamp the alert was last updated'
 
       field :assignees,
-            [Types::UserType],
+            Types::UserType.connection_type,
             null: true,
             description: 'Assignees of the alert'
 

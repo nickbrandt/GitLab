@@ -1,5 +1,5 @@
 <script>
-import { isEqual, pickBy } from 'lodash';
+import { isEqual } from 'lodash';
 import { __, sprintf, s__ } from '../../locale';
 import createFlash from '../../flash';
 import PipelinesService from '../services/pipelines_service';
@@ -10,7 +10,8 @@ import NavigationControls from './nav_controls.vue';
 import { getParameterByName } from '../../lib/utils/common_utils';
 import CIPaginationMixin from '../../vue_shared/mixins/ci_pagination_api_mixin';
 import PipelinesFilteredSearch from './pipelines_filtered_search.vue';
-import { ANY_TRIGGER_AUTHOR, RAW_TEXT_WARNING, SUPPORTED_FILTER_PARAMETERS } from '../constants';
+import { validateParams } from '../utils';
+import { ANY_TRIGGER_AUTHOR, RAW_TEXT_WARNING, FILTER_TAG_IDENTIFIER } from '../constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
@@ -225,14 +226,12 @@ export default {
       return this.glFeatures.filterPipelinesSearch;
     },
     validatedParams() {
-      return pickBy(this.params, (val, key) => SUPPORTED_FILTER_PARAMETERS.includes(key) && val);
+      return validateParams(this.params);
     },
   },
   created() {
     this.service = new PipelinesService(this.endpoint);
-    this.requestData = { page: this.page, scope: this.scope };
-
-    Object.assign(this.requestData, this.validatedParams);
+    this.requestData = { page: this.page, scope: this.scope, ...this.validatedParams };
   },
   methods: {
     successCallback(resp) {
@@ -267,8 +266,16 @@ export default {
       filters.forEach(filter => {
         // do not add Any for username query param, so we
         // can fetch all trigger authors
-        if (filter.type && filter.value.data !== ANY_TRIGGER_AUTHOR) {
+        if (
+          filter.type &&
+          filter.value.data !== ANY_TRIGGER_AUTHOR &&
+          filter.type !== FILTER_TAG_IDENTIFIER
+        ) {
           this.requestData[filter.type] = filter.value.data;
+        }
+
+        if (filter.type === FILTER_TAG_IDENTIFIER) {
+          this.requestData.ref = filter.value.data;
         }
 
         if (!filter.type) {
@@ -313,7 +320,6 @@ export default {
 
     <pipelines-filtered-search
       v-if="canFilterPipelines"
-      :pipelines="state.pipelines"
       :project-id="projectId"
       :params="validatedParams"
       @filterPipelines="filterPipelines"

@@ -6,8 +6,7 @@ import { mapGetters } from 'vuex';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
 import { removeFlash } from '../utils';
-
-const DATA_REFETCH_DELAY = 250;
+import { DATA_REFETCH_DELAY } from '../../shared/constants';
 
 export default {
   name: 'LabelsSelector',

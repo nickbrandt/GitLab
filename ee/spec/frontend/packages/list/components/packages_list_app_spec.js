@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlEmptyState, GlTab, GlTabs } from '@gitlab/ui';
+import { GlEmptyState, GlTab, GlTabs, GlSprintf, GlLink } from '@gitlab/ui';
 import PackageListApp from 'ee/packages/list/components/packages_list_app.vue';
 
 const localVue = createLocalVue();
@@ -46,6 +46,8 @@ describe('packages_list_app', () => {
         PackageList,
         GlTab,
         GlTabs,
+        GlSprintf,
+        GlLink,
       },
     });
   };
@@ -66,16 +68,10 @@ describe('packages_list_app', () => {
 
   describe('empty state', () => {
     it('generate the correct empty list link', () => {
-      const link = findListComponent().find('a');
+      const link = findListComponent().find(GlLink);
 
-      expect(link.element).toMatchInlineSnapshot(`
-        <a
-          href="${emptyListHelpUrl}"
-          target="_blank"
-        >
-          publish and share your packages
-        </a>
-      `);
+      expect(link.attributes('href')).toBe(emptyListHelpUrl);
+      expect(link.text()).toBe('publish and share your packages');
     });
 
     it('includes the right content on the default tab', () => {

@@ -4,49 +4,55 @@ module Ci
   module Minutes
     class EmailNotificationService < ::BaseService
       def execute
-        return unless ::Gitlab.com?
         return unless namespace.shared_runners_minutes_limit_enabled?
 
-        notify_on_total_usage
-        notify_on_partial_usage
+        notify
       end
 
       private
 
-      def recipients
-        namespace.user? ? [namespace.owner.email] : namespace.owners.pluck(:email) # rubocop:disable CodeReuse/ActiveRecord
+      attr_reader :notification
+
+      def notify
+        @notification = ::Ci::Minutes::Notification.new(project, nil)
+
+        if notification.no_remaining_minutes?
+          notify_total_usage
+        elsif notification.running_out?
+          notify_partial_usage
+        end
       end
 
-      def notify_on_total_usage
-        return unless namespace.shared_runners_minutes_used? && namespace.last_ci_minutes_notification_at.nil?
+      def notify_total_usage
+        return if namespace.last_ci_minutes_notification_at
 
         namespace.update_columns(last_ci_minutes_notification_at: Time.current)
 
         CiMinutesUsageMailer.notify(namespace, recipients).deliver_later
       end
 
-      def notify_on_partial_usage
-        return if namespace.shared_runners_minutes_used?
-        return if namespace.last_ci_minutes_usage_notification_level == current_alert_level
-        return if alert_levels.max < namespace.shared_runners_remaining_minutes_percent
+      def notify_partial_usage
+        return if already_notified_running_out
 
-        namespace.update_columns(last_ci_minutes_usage_notification_level: current_alert_level)
+        namespace.update_columns(last_ci_minutes_usage_notification_level: current_alert_percentage)
 
-        CiMinutesUsageMailer.notify_limit(namespace, recipients, current_alert_level).deliver_later
+        CiMinutesUsageMailer.notify_limit(namespace, recipients, current_alert_percentage).deliver_later
+      end
+
+      def already_notified_running_out
+        namespace.last_ci_minutes_usage_notification_level == current_alert_percentage
+      end
+
+      def recipients
+        namespace.user? ? [namespace.owner_email] : namespace.owners_emails
       end
 
       def namespace
         @namespace ||= project.shared_runners_limit_namespace
       end
 
-      def alert_levels
-        @alert_levels ||= EE::Namespace::CI_USAGE_ALERT_LEVELS.sort
-      end
-
-      def current_alert_level
-        remaining_percent = namespace.shared_runners_remaining_minutes_percent
-
-        @current_alert_level ||= alert_levels.find { |level| level >= remaining_percent }
+      def current_alert_percentage
+        notification.stage_percentage
       end
     end
   end

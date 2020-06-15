@@ -50,13 +50,17 @@ with a dollar sign (`$`) as this likely indicates the password being used is an 
 variable. For example, `https://username:$password@example.com/path/to/repo` won't be
 detected, whereas `https://username:password@example.com/path/to/repo` would be detected.
 
+NOTE: **Note:**
+You don't have to configure Secret Detection manually as shown in this section if you're using [Auto Secret Detection](../../../topics/autodevops/stages.md#auto-secret-detection-ultimate)
+provided by [Auto DevOps](../../../topics/autodevops/index.md).
+
 ## Full History Secret Scan
 
-GitLab 12.11 introduced support for scanning the full history of a reposity. This new functionality
+GitLab 12.11 introduced support for scanning the full history of a repository. This new functionality
 is particularly useful when you are enabling Secret Detection in a repository for the first time and you
 want to perform a full secret scan. Running a secret scan on the full history can take a long time,
 especially for larger repositories with lengthy Git histories. We recommend not setting this variable
-as part of your normal job defintion.
+as part of your normal job definition.
 
 A new configuration variable ([`SAST_GITLEAKS_HISTORIC_SCAN`](../sast/#vulnerability-filters))
 can be set to change the behavior of the GitLab Secret Detection scan to run on the entire Git history of a repository.

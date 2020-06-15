@@ -15,7 +15,8 @@ module Ci
     end
 
     def build_comparer(base_pipeline, head_pipeline)
-      comparer_class.new(get_report(base_pipeline), get_report(head_pipeline), head_security_scans: head_pipeline.security_scans)
+      head_scans = head_pipeline&.security_scans || Security::Scan.none
+      comparer_class.new(get_report(base_pipeline), get_report(head_pipeline), head_security_scans: head_scans)
     end
   end
 end

@@ -28,7 +28,7 @@ immediate update, unless:
 - The mirror is already being updated.
 - 5 minutes haven't elapsed since its last update.
 
-For security reasons, from [GitLab 12.10 onwards](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/27166),
+For security reasons, in [GitLab 12.10 and later](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/27166),
 the URL to the original repository is only displayed to users with
 Maintainer or Owner permissions to the mirrored project.
 
@@ -406,13 +406,13 @@ proxy_push()
   REFNAME="$3"
 
   # --- Pattern of branches to proxy pushes
-  whitelisted=$(expr "$branch" : "\(master\)")
+  allowlist=$(expr "$branch" : "\(master\)")
 
   case "$refname" in
     refs/heads/*)
       branch=$(expr "$refname" : "refs/heads/\(.*\)")
 
-      if [ "$whitelisted" = "$branch" ]; then
+      if [ "$allowlist" = "$branch" ]; then
         unset GIT_QUARANTINE_PATH # handle https://git-scm.com/docs/git-receive-pack#_quarantine_environment
         error="$(git push --quiet $TARGET_REPO $NEWREV:$REFNAME 2>&1)"
         fail=$?
@@ -453,7 +453,7 @@ Note that this sample has a few limitations:
 - This example may not work verbatim for your use case and might need modification.
   - It does not regard different types of authentication mechanisms for the mirror.
   - It does not work with forced updates (rewriting history).
-  - Only branches that match the `whitelisted` patterns will be proxy pushed.
+  - Only branches that match the `allowlist` patterns will be proxy pushed.
 - The script circumvents the Git hook quarantine environment because the update of `$TARGET_REPO`
   is seen as a ref update and Git will complain about it.
 

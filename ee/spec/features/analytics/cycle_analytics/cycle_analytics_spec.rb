@@ -21,6 +21,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
 
   stage_nav_selector = '.stage-nav'
   path_nav_selector = '.js-path-navigation'
+  filter_bar_selector = '.js-filter-bar'
 
   3.times do |i|
     let_it_be("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
@@ -153,19 +154,38 @@ RSpec.describe 'Group Value Stream Analytics', :js do
       expect(page).to have_selector('.js-daterange-picker', visible: true)
     end
 
-    it 'does not show the path navigation' do
-      expect(page).to have_selector(path_nav_selector, visible: false)
+    it 'shows the path navigation' do
+      expect(page).to have_selector(path_nav_selector)
     end
 
-    context 'with path navigation feature flag enabled' do
-      before do
-        stub_feature_flags(value_stream_analytics_path_navigation: true)
-        select_group
-      end
+    it 'shows the filter bar' do
+      expect(page).to have_selector(filter_bar_selector, visible: false)
+    end
+  end
 
-      it 'shows the path navigation' do
-        expect(page).to have_selector(path_nav_selector, visible: true)
-      end
+  context 'with path navigation feature flag disabled' do
+    before do
+      stub_feature_flags(value_stream_analytics_path_navigation: false)
+
+      visit analytics_cycle_analytics_path
+      select_group
+    end
+
+    it 'shows the path navigation' do
+      expect(page).not_to have_selector(path_nav_selector)
+    end
+  end
+
+  context 'with filter bar feature flag disabled' do
+    before do
+      stub_feature_flags(value_stream_analytics_filter_bar: false)
+
+      visit analytics_cycle_analytics_path
+      select_group
+    end
+
+    it 'does not show the filter bar' do
+      expect(page).not_to have_selector(filter_bar_selector)
     end
   end
 
@@ -942,7 +962,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
       end
 
       context 'Duration chart' do
-        let(:duration_chart_dropdown) { page.find('.dropdown-stages') }
+        let(:duration_chart_dropdown) { page.find('.js-dropdown-stages') }
 
         default_stages = Analytics::CycleAnalytics::StagePresenter::DEFAULT_STAGE_ATTRIBUTES
           .each_value
@@ -950,7 +970,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
           .freeze
 
         def duration_chart_stages
-          duration_chart_dropdown.all('.dropdown-menu-link').collect(&:text)
+          duration_chart_dropdown.all('.dropdown-item').collect(&:text)
         end
 
         def toggle_duration_chart_dropdown

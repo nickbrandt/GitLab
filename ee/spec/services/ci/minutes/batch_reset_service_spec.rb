@@ -95,14 +95,29 @@ RSpec.describe Ci::Minutes::BatchResetService do
       let(:ids_range) { nil }
 
       before do
-        allow(Namespace).to receive(:transaction).and_raise(ActiveRecord::ActiveRecordError)
+        expect(Namespace).to receive(:transaction).once.ordered.and_raise(ActiveRecord::ActiveRecordError)
+        expect(Namespace).to receive(:transaction).once.ordered.and_call_original
       end
 
-      it 'decorates the error with more information' do
-        expect { subject }
-          .to raise_error(
-            Ci::Minutes::BatchResetService::BatchNotResetError,
-            '3 namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: [1, 2, 3]')
+      it 'continues its progress' do
+        expect(service).to receive(:reset_ci_minutes!).with([namespace_1, namespace_2, namespace_3]).and_call_original
+        expect(service).to receive(:reset_ci_minutes!).with([namespace_4, namespace_5, namespace_6]).and_call_original
+
+        expect(Gitlab::ErrorTracking).to receive(:track_and_raise_exception)
+        subject
+      end
+
+      it 'raises exception with namespace details' do
+        expect(Gitlab::ErrorTracking).to receive(
+          :track_and_raise_exception
+        ).with(
+          Ci::Minutes::BatchResetService::BatchNotResetError.new(
+            'Some namespace shared runner minutes were not reset.'
+          ),
+          { namespace_ranges: [{ count: 3, first_id: 1, last_id: 3 }] }
+        ).once.and_call_original
+
+        expect { subject }.to raise_error(Ci::Minutes::BatchResetService::BatchNotResetError)
       end
     end
   end

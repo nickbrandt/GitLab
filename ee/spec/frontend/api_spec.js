@@ -788,7 +788,7 @@ describe('Api', () => {
       it('GETs the right url', () => {
         mock.onGet(expectedUrl).replyOnce(200, []);
 
-        return Api.fetchFeatureFlagUserLists(dummyApiVersion, projectId).then(({ data }) => {
+        return Api.fetchFeatureFlagUserLists(projectId).then(({ data }) => {
           expect(data).toEqual([]);
         });
       });
@@ -802,11 +802,9 @@ describe('Api', () => {
         };
         mock.onPost(expectedUrl, mockUserListData).replyOnce(200, mockUserList);
 
-        return Api.createFeatureFlagUserList(dummyApiVersion, projectId, mockUserListData).then(
-          ({ data }) => {
-            expect(data).toEqual(mockUserList);
-          },
-        );
+        return Api.createFeatureFlagUserList(projectId, mockUserListData).then(({ data }) => {
+          expect(data).toEqual(mockUserList);
+        });
       });
     });
 
@@ -814,7 +812,7 @@ describe('Api', () => {
       it('GETs the right url', () => {
         mock.onGet(`${expectedUrl}/1`).replyOnce(200, mockUserList);
 
-        return Api.fetchFeatureFlagUserList(dummyApiVersion, projectId, 1).then(({ data }) => {
+        return Api.fetchFeatureFlagUserList(projectId, 1).then(({ data }) => {
           expect(data).toEqual(mockUserList);
         });
       });
@@ -824,7 +822,7 @@ describe('Api', () => {
       it('PUTs the right url', () => {
         mock.onPut(`${expectedUrl}/1`).replyOnce(200, { ...mockUserList, user_xids: '5' });
 
-        return Api.updateFeatureFlagUserList(dummyApiVersion, projectId, {
+        return Api.updateFeatureFlagUserList(projectId, {
           ...mockUserList,
           user_xids: '5',
         }).then(({ data }) => {
@@ -837,7 +835,7 @@ describe('Api', () => {
       it('DELETEs the right url', () => {
         mock.onDelete(`${expectedUrl}/1`).replyOnce(200, 'deleted');
 
-        return Api.deleteFeatureFlagUserList(dummyApiVersion, projectId, 1).then(({ data }) => {
+        return Api.deleteFeatureFlagUserList(projectId, 1).then(({ data }) => {
           expect(data).toBe('deleted');
         });
       });

@@ -2,16 +2,16 @@ import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlLink, GlButton } from '@gitlab/ui';
 import GeoReplicableItem from 'ee/geo_replicable/components/geo_replicable_item.vue';
-import store from 'ee/geo_replicable/store';
-import { ACTION_TYPES } from 'ee/geo_replicable/store/constants';
-import { MOCK_BASIC_FETCH_DATA_MAP } from '../mock_data';
+import createStore from 'ee/geo_replicable/store';
+import { ACTION_TYPES } from 'ee/geo_replicable/constants';
+import { MOCK_BASIC_FETCH_DATA_MAP, MOCK_REPLICABLE_TYPE } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('GeoReplicableItem', () => {
   let wrapper;
-  const mockReplicable = MOCK_BASIC_FETCH_DATA_MAP.data[0];
+  const mockReplicable = MOCK_BASIC_FETCH_DATA_MAP[0];
 
   const actionSpies = {
     initiateReplicableSync: jest.fn(),
@@ -29,7 +29,7 @@ describe('GeoReplicableItem', () => {
   const createComponent = () => {
     wrapper = mount(GeoReplicableItem, {
       localVue,
-      store,
+      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
       propsData,
       methods: {
         ...actionSpies,

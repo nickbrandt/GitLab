@@ -1,0 +1,5 @@
+---
+title: Clean up serialized objects in audit_events
+merge_request: 32434
+author:
+type: fixed

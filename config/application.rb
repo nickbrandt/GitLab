@@ -164,6 +164,8 @@ module Gitlab
     config.assets.paths << Gemojione.images_path
     config.assets.paths << "#{config.root}/vendor/assets/fonts"
 
+    config.assets.precompile << "application_dark.css"
+
     config.assets.precompile << "print.css"
     config.assets.precompile << "mailer.css"
     config.assets.precompile << "mailer_client_specific.css"
@@ -301,7 +303,10 @@ module Gitlab
     end
 
     config.after_initialize do
-      Rails.application.reload_routes!
+      # Devise (see initializers/8_devise.rb) already reloads routes if
+      # eager loading is enabled, so don't do this twice since it's
+      # expensive.
+      Rails.application.reload_routes! unless config.eager_load
 
       project_url_helpers = Module.new do
         extend ActiveSupport::Concern

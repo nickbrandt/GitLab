@@ -24,6 +24,12 @@ class AllowedEmailDomain < ApplicationRecord
 
   belongs_to :group, class_name: 'Group', foreign_key: :group_id
 
+  class << self
+    def domain_names
+      pluck(:domain)
+    end
+  end
+
   def allow_root_group_only
     if group&.parent_id
       errors.add(:base, _('Allowed email domain restriction only permitted for top-level groups'))

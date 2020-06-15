@@ -12,8 +12,8 @@
 #
 # To enable the experiment for 10% of the users:
 #
-# chatops: `/chatops run feature set experiment_key_experiment_percentage 10 --actors`
-# console: `Feature.enable_percentage_of_actors(:experiment_key_experiment_percentage, 10)`
+# chatops: `/chatops run feature set experiment_key_experiment_percentage 10`
+# console: `Feature.enable_percentage_of_time(:experiment_key_experiment_percentage, 10)`
 #
 # To disable the experiment:
 #
@@ -26,7 +26,7 @@
 # console: `Feature.get(:experiment_key_experiment_percentage).percentage_of_time_value`
 #
 
-# TODO: rewrite that
+# TODO: see https://gitlab.com/gitlab-org/gitlab/-/issues/217490
 module Gitlab
   module Experimentation
     EXPERIMENTS = {
@@ -47,6 +47,12 @@ module Gitlab
       },
       upgrade_link_in_user_menu_a: {
         tracking_category: 'Growth::Expansion::Experiment::UpgradeLinkInUserMenuA'
+      },
+      invite_members_version_a: {
+        tracking_category: 'Growth::Expansion::Experiment::InviteMembersVersionA'
+      },
+      new_create_project_ui: {
+        tracking_category: 'Manage::Import::Experiment::NewCreateProjectUi'
       }
     }.freeze
 

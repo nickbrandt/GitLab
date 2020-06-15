@@ -128,7 +128,7 @@ module Gitlab
     end
 
     def self.repository_verification_enabled?
-      Feature.enabled?('geo_repository_verification', default_enabled: true)
+      Feature.enabled?(:geo_repository_verification, default_enabled: true)
     end
 
     def self.allowed_ip?(ip)

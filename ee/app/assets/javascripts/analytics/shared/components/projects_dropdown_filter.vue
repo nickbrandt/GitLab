@@ -1,19 +1,29 @@
 <script>
-import $ from 'jquery';
-import { escape } from 'lodash';
-import { GlLoadingIcon, GlDeprecatedButton, GlAvatar } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { debounce } from 'lodash';
+import {
+  GlIcon,
+  GlLoadingIcon,
+  GlAvatar,
+  GlNewDropdown as GlDropdown,
+  GlNewDropdownHeader as GlDropdownHeader,
+  GlNewDropdownItem as GlDropdownItem,
+  GlSearchBoxByType,
+} from '@gitlab/ui';
 import { n__, s__, __ } from '~/locale';
 import Api from '~/api';
-import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
+import { DATA_REFETCH_DELAY } from '../constants';
+import { filterBySearchTerm } from '../utils';
 
 export default {
   name: 'ProjectsDropdownFilter',
   components: {
-    Icon,
+    GlIcon,
     GlLoadingIcon,
-    GlDeprecatedButton,
     GlAvatar,
+    GlDropdown,
+    GlDropdownHeader,
+    GlDropdownItem,
+    GlSearchBoxByType,
   },
   props: {
     groupId: {
@@ -44,7 +54,9 @@ export default {
   data() {
     return {
       loading: true,
+      projects: [],
       selectedProjects: this.defaultProjects || [],
+      searchTerm: '',
     };
   },
   computed: {
@@ -67,25 +79,29 @@ export default {
     isOnlyOneProjectSelected() {
       return this.selectedProjects.length === 1;
     },
+    selectedProjectIds() {
+      return this.selectedProjects.map(p => p.id);
+    },
+    availableProjects() {
+      return filterBySearchTerm(this.projects, this.searchTerm);
+    },
+    noResultsAvailable() {
+      const { loading, availableProjects } = this;
+      return !loading && !availableProjects.length;
+    },
+  },
+  watch: {
+    searchTerm() {
+      this.search();
+    },
   },
   mounted() {
-    $(this.$refs.projectsDropdown).glDropdown({
-      selectable: true,
-      filterable: true,
-      filterRemote: true,
-      fieldName: 'project_id',
-      multiSelect: this.multiSelect,
-      search: {
-        fields: ['name'],
-      },
-      clicked: this.onClick.bind(this),
-      data: this.fetchData.bind(this),
-      renderRow: project => this.rowTemplate(project),
-      text: project => project.name,
-      opened: e => e.target.querySelector('.dropdown-input-field').focus(),
-    });
+    this.search();
   },
   methods: {
+    search: debounce(function debouncedSearch() {
+      this.fetchData();
+    }, DATA_REFETCH_DELAY),
     getSelectedProjects(selectedProject, isMarking) {
       return isMarking
         ? this.selectedProjects.concat([selectedProject])
@@ -99,54 +115,32 @@ export default {
         ? this.getSelectedProjects(selectedObj, isMarking)
         : this.singleSelectedProject(selectedObj, isMarking);
     },
-    onClick({ selectedObj, e, isMarking }) {
-      e.preventDefault();
-      this.setSelectedProjects(selectedObj, isMarking);
+    onClick({ project, isSelected }) {
+      this.setSelectedProjects(project, !isSelected);
       this.$emit('selected', this.selectedProjects);
     },
-    fetchData(term, callback) {
+    fetchData() {
       this.loading = true;
-      return Api.groupProjects(this.groupId, term, this.queryParams, projects => {
+      return Api.groupProjects(this.groupId, this.searchTerm, this.queryParams, projects => {
+        this.projects = projects;
         this.loading = false;
-        callback(projects);
       });
     },
-    rowTemplate(project) {
-      const selected = this.defaultProjects
-        ? this.defaultProjects.find(p => p.id === project.id)
-        : false;
-      const isActiveClass = selected ? 'is-active' : '';
-      return `
-          <li>
-            <a href='#' class='dropdown-menu-link ${isActiveClass}'>
-              ${this.avatarTemplate(project)}
-              <div class="align-middle">${escape(project.name)}</div>
-            </a>
-          </li>
-        `;
-    },
-    avatarTemplate(project) {
-      const identiconSizeClass = 's16 rect-avatar d-flex justify-content-center flex-column';
-      return project.avatar_url
-        ? renderAvatar(project, { sizeClass: 's16 rect-avatar' })
-        : renderIdenticon(project, {
-            sizeClass: identiconSizeClass,
-          });
+    isProjectSelected(id) {
+      return this.selectedProjects ? this.selectedProjectIds.includes(id) : false;
     },
   },
 };
 </script>
 
 <template>
-  <div>
-    <div ref="projectsDropdown" class="dropdown dropdown-projects">
-      <gl-deprecated-button
-        class="dropdown-menu-toggle wide shadow-none bg-white"
-        type="button"
-        data-toggle="dropdown"
-        aria-expanded="false"
-        :aria-label="label"
-      >
+  <gl-dropdown
+    ref="projectsDropdown"
+    class="dropdown dropdown-projects"
+    toggle-class="gl-shadow-none"
+  >
+    <template #button-content>
+      <div class="gl-display-flex">
         <gl-avatar
           v-if="isOnlyOneProjectSelected"
           :src="selectedProjects[0].avatar_url"
@@ -155,22 +149,40 @@ export default {
           :size="16"
           shape="rect"
           :alt="selectedProjects[0].name"
-          class="d-inline-flex align-text-bottom"
+          class="gl-display-inline-flex gl-vertical-align-middle gl-mr-2"
         />
         {{ selectedProjectsLabel }}
-        <icon name="chevron-down" />
-      </gl-deprecated-button>
-      <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-full-width">
-        <div class="dropdown-title">{{ __('Projects') }}</div>
-        <div class="dropdown-input">
-          <input class="dropdown-input-field" type="search" :placeholder="__('Search projects')" />
-          <icon name="search" class="dropdown-input-search" data-hidden="true" />
-        </div>
-        <div class="dropdown-loading pt-8">
-          <gl-loading-icon size="lg" class="pt-8" />
-        </div>
-        <div class="dropdown-content"></div>
+        <gl-icon class="gl-ml-2" name="chevron-down" />
       </div>
-    </div>
-  </div>
+    </template>
+    <gl-dropdown-header>{{ __('Projects') }}</gl-dropdown-header>
+    <gl-search-box-by-type v-model.trim="searchTerm" class="gl-m-3" />
+
+    <gl-dropdown-item
+      v-for="project in availableProjects"
+      :key="project.id"
+      :is-check-item="true"
+      :is-checked="isProjectSelected(project.id)"
+      @click.prevent="onClick({ project, isSelected: isProjectSelected(project.id) })"
+    >
+      <div class="gl-display-flex">
+        <gl-avatar
+          class="gl-mr-2 vertical-align-middle"
+          :alt="project.name"
+          :size="16"
+          :entity-id="project.id"
+          :entity-name="project.name"
+          :src="project.avatar_url"
+          shape="rect"
+        />
+        {{ project.name }}
+      </div>
+    </gl-dropdown-item>
+    <gl-dropdown-item v-show="noResultsAvailable" class="gl-pointer-events-none text-secondary">{{
+      __('No matching results')
+    }}</gl-dropdown-item>
+    <gl-dropdown-item v-if="loading">
+      <gl-loading-icon size="lg" />
+    </gl-dropdown-item>
+  </gl-dropdown>
 </template>

@@ -57,9 +57,7 @@ RSpec.describe Gitlab::Elastic::Indexer do
     let(:to_sha) { project.repository.commit.sha }
 
     before do
-      # enable the indexing and index the project
       stub_ee_application_setting(elasticsearch_indexing: true)
-      Elastic::IndexRecordService.new.execute(project, true)
     end
 
     shared_examples 'index up to the specified commit' do

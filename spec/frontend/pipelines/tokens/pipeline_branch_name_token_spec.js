@@ -22,10 +22,9 @@ describe('Pipeline Branch Name Token', () => {
       type: 'ref',
       icon: 'branch',
       title: 'Branch name',
-      dataType: 'ref',
       unique: true,
-      branches,
       projectId: '21',
+      disabled: false,
     },
     value: {
       data: '',
@@ -83,7 +82,7 @@ describe('Pipeline Branch Name Token', () => {
   });
 
   describe('shows branches correctly', () => {
-    it('renders all trigger authors', () => {
+    it('renders all branches', () => {
       createComponent({ stubs }, { branches, loading: false });
 
       expect(findAllFilteredSearchSuggestions()).toHaveLength(branches.length);

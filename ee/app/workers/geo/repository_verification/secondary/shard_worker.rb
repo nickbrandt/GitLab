@@ -10,6 +10,8 @@ module Geo
         # rubocop:enable Scalability/CronWorkerContext
         attr_accessor :shard_name
 
+        loggable_arguments 0
+
         def perform(shard_name)
           @shard_name = shard_name
 

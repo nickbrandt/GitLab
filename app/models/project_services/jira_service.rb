@@ -203,17 +203,16 @@ class JiraService < IssueTrackerService
     add_comment(data, jira_issue)
   end
 
+  def valid_connection?
+    test(nil)[:success]
+  end
+
   def test(_)
     result = test_settings
     success = result.present?
     result = @error&.message unless success
 
     { success: success, result: result }
-  end
-
-  # Jira does not need test data.
-  def test_data(_, _)
-    nil
   end
 
   override :support_close_issue?

@@ -91,6 +91,7 @@ RSpec.describe Gitlab::UsageData do
         epics_deepest_relationship_level
         feature_flags
         geo_nodes
+        geo_event_log_max_id
         issues_with_health_status
         ldap_group_links
         ldap_keys

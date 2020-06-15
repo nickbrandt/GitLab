@@ -7,8 +7,10 @@ import {
   normalizeHeaders,
   convertObjectPropsToCamelCase,
 } from '~/lib/utils/common_utils';
+import packageFilesQuery from '../graphql/package_files.query.graphql';
+import { gqClient } from '../utils';
 import * as types from './mutation_types';
-import { FILTER_STATES } from './constants';
+import { FILTER_STATES, PREV, NEXT } from '../constants';
 
 // Fetch Replicable Items
 export const requestReplicableItems = ({ commit }) => commit(types.REQUEST_REPLICABLE_ITEMS);
@@ -23,15 +25,48 @@ export const receiveReplicableItemsError = ({ state, commit }) => {
   commit(types.RECEIVE_REPLICABLE_ITEMS_ERROR);
 };
 
-export const fetchReplicableItems = ({ state, dispatch }) => {
+export const fetchReplicableItems = ({ state, dispatch }, direction) => {
   dispatch('requestReplicableItems');
 
-  const { filterOptions, currentFilterIndex, currentPage, searchFilter } = state;
+  return state.useGraphQl
+    ? dispatch('fetchReplicableItemsGraphQl', direction)
+    : dispatch('fetchReplicableItemsRestful');
+};
+
+export const fetchReplicableItemsGraphQl = ({ state, dispatch }, direction) => {
+  let before = '';
+  let after = '';
+
+  if (direction === PREV) {
+    before = state.paginationData.startCursor;
+  } else if (direction === NEXT) {
+    after = state.paginationData.endCursor;
+  }
+
+  gqClient
+    .query({
+      query: packageFilesQuery,
+      variables: { before, after },
+    })
+    .then(res => {
+      const registries = res.data.geoNode.packageFileRegistries;
+      const data = registries.edges.map(e => e.node);
+      const pagination = registries.pageInfo;
+
+      dispatch('receiveReplicableItemsSuccess', { data, pagination });
+    })
+    .catch(() => {
+      dispatch('receiveReplicableItemsError');
+    });
+};
+
+export const fetchReplicableItemsRestful = ({ state, dispatch }) => {
+  const { filterOptions, currentFilterIndex, searchFilter, paginationData } = state;
 
   const statusFilter = currentFilterIndex ? filterOptions[currentFilterIndex] : filterOptions[0];
 
   const query = {
-    page: currentPage,
+    page: paginationData.page,
     search: searchFilter || null,
     sync_status: statusFilter.value === FILTER_STATES.ALL.value ? null : statusFilter.value,
   };
@@ -39,14 +74,10 @@ export const fetchReplicableItems = ({ state, dispatch }) => {
   Api.getGeoReplicableItems(state.replicableType, query)
     .then(res => {
       const normalizedHeaders = normalizeHeaders(res.headers);
-      const paginationInformation = parseIntPagination(normalizedHeaders);
-      const camelCaseData = convertObjectPropsToCamelCase(res.data, { deep: true });
+      const pagination = parseIntPagination(normalizedHeaders);
+      const data = convertObjectPropsToCamelCase(res.data, { deep: true });
 
-      dispatch('receiveReplicableItemsSuccess', {
-        data: camelCaseData,
-        perPage: paginationInformation.perPage,
-        total: paginationInformation.total,
-      });
+      dispatch('receiveReplicableItemsSuccess', { data, pagination });
     })
     .catch(() => {
       dispatch('receiveReplicableItemsError');

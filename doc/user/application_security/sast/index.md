@@ -74,7 +74,7 @@ The following table shows which languages, package managers and frameworks are s
 | .NET Framework                                                              | [Security Code Scan](https://security-code-scan.github.io)                             | 13.0                         |
 | Any                                                                         | [Gitleaks](https://github.com/zricethezav/gitleaks) and [TruffleHog](https://github.com/dxa4481/truffleHog) | 11.9    |
 | Apex (Salesforce)                                                           | [PMD](https://pmd.github.io/pmd/index.html)                                            | 12.1                         |
-| C/C++                                                                       | [Flawfinder](https://dwheeler.com/flawfinder/)                                         | 10.7                         |
+| C/C++                                                                       | [Flawfinder](https://github.com/david-a-wheeler/flawfinder)                            | 10.7                         |
 | Elixir (Phoenix)                                                            | [Sobelow](https://github.com/nccgroup/sobelow)                                         | 11.10                        |
 | Go                                                                          | [Gosec](https://github.com/securego/gosec)                                             | 10.7                         |
 | Groovy ([Ant](https://ant.apache.org/), [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) and [SBT](https://www.scala-sbt.org/)) | [SpotBugs](https://spotbugs.github.io/) with the [find-sec-bugs](https://find-sec-bugs.github.io/) plugin | 11.3 (Gradle) & 11.9 (Ant, Maven, SBT) |
@@ -288,8 +288,8 @@ Some analyzers make it possible to filter out vulnerabilities under a given thre
 
 | Environment variable    | Default value | Description |
 |-------------------------|---------------|-------------|
-| `SAST_EXCLUDED_PATHS`         | -   | Exclude vulnerabilities from output based on the paths. This is a comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec` ). Parent directories will also match patterns. |
-| `SAST_BANDIT_EXCLUDED_PATHS`  | -   | comma-separated list of paths to exclude from scan. Uses Python's [`fnmatch` syntax](https://docs.python.org/2/library/fnmatch.html) |
+| `SAST_EXCLUDED_PATHS`         | `spec, test, tests, tmp` | Exclude vulnerabilities from output based on the paths. This is a comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec` ). Parent directories will also match patterns. |
+| `SAST_BANDIT_EXCLUDED_PATHS`  | -   | comma-separated list of paths to exclude from scan. Uses Python's [`fnmatch` syntax](https://docs.python.org/2/library/fnmatch.html); For example: `'*/tests/*'` |
 | `SAST_BRAKEMAN_LEVEL`   |         1 | Ignore Brakeman vulnerabilities under given confidence level. Integer, 1=Low 3=High. |
 | `SAST_FLAWFINDER_LEVEL` |         1 | Ignore Flawfinder vulnerabilities under given risk level. Integer, 0=No risk, 5=High risk. |
 | `SAST_GITLEAKS_ENTROPY_LEVEL` | 8.0 | Minimum entropy for secret detection. Float, 0.0 = low, 8.0 = high. |
@@ -317,6 +317,8 @@ Some analyzers can be customized with environment variables.
 | Environment variable        | Analyzer | Description |
 |-----------------------------|----------|-------------|
 | `SCAN_KUBERNETES_MANIFESTS`           | Kubesec              | Set to `"true"` to scan Kubernetes manifests. |
+| `KUBESEC_HELM_CHARTS_PATH`            | Kubesec              | Optional path to Helm charts that `helm` will use to generate a Kubernetes manifest that `kubesec` will scan. If dependencies are defined, `helm dependency build` should be ran in a `before_script` to fetch the necessary dependencies. |
+| `KUBESEC_HELM_OPTIONS`                | Kubesec              | Additional arguments for the `helm` executable. |
 | `ANT_HOME`                            | SpotBugs             | The `ANT_HOME` environment variable. |
 | `ANT_PATH`                            | SpotBugs             | Path to the `ant` executable. |
 | `GRADLE_PATH`                         | SpotBugs             | Path to the `gradle` executable. |
@@ -346,11 +348,10 @@ analyzer containers: `DOCKER_`, `CI`, `GITLAB_`, `FF_`, `HOME`, `PWD`, `OLDPWD`,
 
 ## Reports JSON format
 
-CAUTION: **Caution:**
-The JSON report artifacts are not a public API of SAST and their format may change in the future.
+The SAST tool emits a JSON report file. For more information, see the
+[schema for this report](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/sast-report-format.json).
 
-The SAST tool emits a JSON report file. Here is an example of the report structure with all important parts of
-it highlighted:
+Here's an example SAST report:
 
 ```json-doc
 {
@@ -424,40 +425,6 @@ it highlighted:
   "remediations": []
 }
 ```
-
-CAUTION: **Deprecation:**
-Beginning with GitLab 12.9, SAST no longer reports `undefined` severity and confidence levels.
-
-Here is the description of the report file structure nodes and their meaning. All fields are mandatory in
-the report JSON unless stated otherwise. Presence of optional fields depends on the underlying analyzers being used.
-
-| Report JSON node                        | Function |
-|-----------------------------------------|----------|
-| `version`                               | Report syntax version used to generate this JSON. |
-| `vulnerabilities`                       | Array of vulnerability objects. |
-| `vulnerabilities[].id`                  | Unique identifier of the vulnerability. |
-| `vulnerabilities[].category`            | Where this vulnerability belongs (such as SAST, Dependency Scanning). For SAST, it will always be `sast`. |
-| `vulnerabilities[].name`                | Name of the vulnerability. Must not include the occurrence's specific information. Optional. |
-| `vulnerabilities[].message`             | A short text that describes the vulnerability, it may include the occurrence's specific information. Optional. |
-| `vulnerabilities[].description`         | A long text that describes the vulnerability. Optional. |
-| `vulnerabilities[].cve`                 | (**DEPRECATED - use `vulnerabilities[].id` instead**) A fingerprint string value that represents a concrete occurrence of the vulnerability. It's used to determine whether two vulnerability occurrences are same or different. May not be 100% accurate. **This is NOT a [CVE](https://cve.mitre.org/)**.                                                                                                                                      |
-| `vulnerabilities[].severity`            | How much the vulnerability impacts the software. Possible values: `Info`, `Unknown`, `Low`, `Medium`, `High`, `Critical`. |
-| `vulnerabilities[].confidence`          | How reliable the vulnerability's assessment is. Possible values: `Ignore`, `Unknown`, `Experimental`, `Low`, `Medium`, `High`, `Confirmed`. |
-| `vulnerabilities[].solution`            | Explanation of how to fix the vulnerability. Optional. |
-| `vulnerabilities[].scanner`             | A node that describes the analyzer used to find this vulnerability. |
-| `vulnerabilities[].scanner.id`          | ID of the scanner as a snake_case string. |
-| `vulnerabilities[].scanner.name`        | Name of the scanner, for display purposes. |
-| `vulnerabilities[].location`            | A node that tells where the vulnerability is located. |
-| `vulnerabilities[].location.file`       | Path to the file where the vulnerability is located. Optional. |
-| `vulnerabilities[].location.start_line` | The first line of the code affected by the vulnerability. Optional. |
-| `vulnerabilities[].location.end_line`   | The last line of the code affected by the vulnerability. Optional. |
-| `vulnerabilities[].location.class`      | If specified, provides the name of the class where the vulnerability is located. Optional. |
-| `vulnerabilities[].location.method`     | If specified, provides the name of the method where the vulnerability is located. Optional. |
-| `vulnerabilities[].identifiers`         | An ordered array of references that identify a vulnerability on internal or external databases. |
-| `vulnerabilities[].identifiers[].type`  | Type of the identifier. Possible values: common identifier types (among `cve`, `cwe`, `osvdb`, and `usn`) or analyzer-dependent ones (like `bandit_test_id` for [Bandit analyzer](https://wiki.openstack.org/wiki/Security/Projects/Bandit)). |
-| `vulnerabilities[].identifiers[].name`  | Name of the identifier for display purposes. |
-| `vulnerabilities[].identifiers[].value` | Value of the identifier for matching purposes. |
-| `vulnerabilities[].identifiers[].url`   | URL to identifier's documentation. Optional. |
 
 ## Secret detection
 

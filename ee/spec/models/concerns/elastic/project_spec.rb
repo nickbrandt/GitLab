@@ -47,9 +47,6 @@ RSpec.describe Project, :elastic do
 
       it 'only indexes enabled projects' do
         Sidekiq::Testing.inline! do
-          # We have to trigger indexing of the previously-created project because we don't have a way to
-          # enable ES for it before it's created, at which point it won't be indexed anymore
-          ElasticIndexerWorker.perform_async(:index, project.class.to_s, project.id, project.es_id)
           create :project, path: 'test2', description: 'awesome project'
           create :project
 
@@ -78,18 +75,18 @@ RSpec.describe Project, :elastic do
 
       it 'indexes only projects under the group' do
         Sidekiq::Testing.inline! do
-          create :project, name: 'test1', group: create(:group, parent: group)
-          create :project, name: 'test2', description: 'awesome project'
-          create :project, name: 'test3', group: group
+          create :project, name: 'group_test1', group: create(:group, parent: group)
+          create :project, name: 'group_test2', description: 'awesome project'
+          create :project, name: 'group_test3', group: group
           create :project, path: 'someone_elses_project', name: 'test4'
 
           ensure_elasticsearch_index!
         end
 
-        expect(described_class.elastic_search('test*', options: { project_ids: :any }).total_count).to eq(2)
-        expect(described_class.elastic_search('test3', options: { project_ids: :any }).total_count).to eq(1)
-        expect(described_class.elastic_search('test2', options: { project_ids: :any }).total_count).to eq(0)
-        expect(described_class.elastic_search('test4', options: { project_ids: :any }).total_count).to eq(0)
+        expect(described_class.elastic_search('group_test*', options: { project_ids: :any }).total_count).to eq(2)
+        expect(described_class.elastic_search('group_test3', options: { project_ids: :any }).total_count).to eq(1)
+        expect(described_class.elastic_search('group_test2', options: { project_ids: :any }).total_count).to eq(0)
+        expect(described_class.elastic_search('group_test4', options: { project_ids: :any }).total_count).to eq(0)
       end
     end
   end

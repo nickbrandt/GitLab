@@ -248,10 +248,10 @@ should look similar to this:
 
 ```yaml
 build:
-  image: docker:19.03.8
+  image: docker:19.03.11
   stage: build
   services:
-    - docker:19.03.8-dind
+    - docker:19.03.11-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $CI_REGISTRY/group/project/image:latest .
@@ -262,10 +262,10 @@ You can also make use of [other variables](../../../ci/variables/README.md) to a
 
 ```yaml
 build:
-  image: docker:19.03.8
+  image: docker:19.03.11
   stage: build
   services:
-    - docker:19.03.8-dind
+    - docker:19.03.11-dind
   variables:
     IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   script:
@@ -288,9 +288,9 @@ when needed. Changes to `master` also get tagged as `latest` and deployed using
 an application-specific deploy script:
 
 ```yaml
-image: docker:19.03.8
+image: docker:19.03.11
 services:
-  - docker:19.03.8-dind
+  - docker:19.03.11-dind
 
 stages:
   - build
@@ -363,9 +363,9 @@ Below is an example of what your `.gitlab-ci.yml` should look like:
 
 ```yaml
  build:
-   image: $CI_REGISTRY/group/project/docker:19.03.8
+   image: $CI_REGISTRY/group/project/docker:19.03.11
    services:
-     - name: $CI_REGISTRY/group/project/docker:19.03.8-dind
+     - name: $CI_REGISTRY/group/project/docker:19.03.11-dind
        alias: docker
    stage: build
    script:
@@ -373,7 +373,7 @@ Below is an example of what your `.gitlab-ci.yml` should look like:
      - docker run my-docker-image /script/to/run/tests
 ```
 
-If you forget to set the service alias, the `docker:19.03.8` image won't find the
+If you forget to set the service alias, the `docker:19.03.11` image won't find the
 `dind` service, and an error like the following will be thrown:
 
 ```plaintext
@@ -443,10 +443,10 @@ stages:
   - clean
 
 build_image:
-  image: docker:19.03.8
+  image: docker:19.03.11
   stage: build
   services:
-    - docker:19.03.8-dind
+    - docker:19.03.11-dind
   variables:
     IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   script:
@@ -459,10 +459,10 @@ build_image:
     - master
 
 delete_image:
-  image: docker:19.03.8
+  image: docker:19.03.11
   stage: clean
   services:
-    - docker:19.03.8-dind
+    - docker:19.03.11-dind
   variables:
     IMAGE_TAG: $CI_PROJECT_PATH:$CI_COMMIT_REF_SLUG
     REG_SHA256: ade837fc5224acd8c34732bf54a94f579b47851cc6a7fd5899a98386b782e228
@@ -496,8 +496,9 @@ older tags and images are regularly removed from the Container Registry.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/15398) in GitLab 12.8.
 
 NOTE: **Note:**
-Expiration policies for projects created before GitLab 12.8 may be enabled by an
-admin in the [CI/CD Package Registry settings](./../../admin_area/settings/index.md#cicd).
+For GitLab.com, expiration policies are not available for projects created before GitLab 12.8.
+For self-managed instances, expiration policies may be enabled by an admin in the
+[CI/CD Package Registry settings](./../../admin_area/settings/index.md#cicd).
 Note the inherent [risks involved](./index.md#use-with-external-container-registries).
 
 It is possible to create a per-project expiration policy, so that you can make sure that
@@ -531,6 +532,17 @@ The UI allows you to configure the following:
 - **Docker tags with names matching this regex pattern will expire:** the regex used to determine what tags should be expired. To qualify all tags for expiration, use the default value of `.*`.
 - **Docker tags with names matching this regex pattern will be preserved:** the regex used to determine what tags should be preserved. To preserve all tags, use the default value of `.*`.
 
+#### Troubleshooting expiration policies
+
+If you see the following message:
+
+"Something went wrong while updating the expiration policy."
+
+Check the regex patterns to ensure they are valid.
+
+You can use [Rubular](https://rubular.com/) to check your regex.
+View some common [regex pattern examples](#regex-pattern-examples).
+
 ### Managing project expiration policy through the API
 
 You can set, update, and disable the expiration policies using the GitLab API.
@@ -553,6 +565,36 @@ a policy that will remove large quantities of tags (in the thousands), the GitLa
 run the policy may get backed up or fail completely. It is recommended you only enable container expiration
 policies for projects that were created before GitLab 12.8 if you are confident the amount of tags
 being cleaned up will be minimal.
+
+### Regex pattern examples
+
+Expiration policies use regex patterns to determine which tags should be preserved or removed, both in the UI and the API.
+
+Here are examples of regex patterns you may want to use:
+
+- Match all tags:
+
+  ```plaintext
+  .*
+  ```
+
+- Match tags that start with `v`:
+
+  ```plaintext
+  v.+
+  ```
+
+- Match tags that contain `master`:
+
+  ```plaintext
+  master
+  ```
+
+- Match tags that either start with `v`, contain `master`, or contain `release`:
+
+  ```plaintext
+  (?:v.+|master|release)
+  ```
 
 ## Limitations
 
