@@ -62,7 +62,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
 
           resources :dashboard, only: [:index], controller: :dashboard
-          resource :configuration, only: [:show], controller: :configuration
+
+          resource :configuration, only: [:show], controller: :configuration do
+            post :auto_fix, on: :collection
+          end
+
           resource :discover, only: [:show], controller: :discover
 
           resources :vulnerability_findings, only: [:index] do

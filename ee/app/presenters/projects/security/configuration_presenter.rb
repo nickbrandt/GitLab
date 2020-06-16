@@ -49,8 +49,8 @@ module Projects
           help_page_path: help_page_path('user/application_security/index'),
           latest_pipeline_path: latest_pipeline_path,
           auto_fix_enabled: {
-            dependency_scanning: true,
-            container_scanning: true
+            dependency_scanning: project_settings.auto_fix_dependency_scanning,
+            container_scanning: project_settings.auto_fix_container_scanning
           }.to_json,
           can_toggle_auto_fix_settings: auto_fix_permission,
           auto_fix_user_path: '/' # TODO: real link will be updated with https://gitlab.com/gitlab-org/gitlab/-/issues/215669
@@ -141,6 +141,10 @@ module Projects
 
       def localized_scan_names
         @localized_scan_names ||= self.class.localized_scan_names
+      end
+
+      def project_settings
+        ProjectSecuritySetting.safe_find_or_create_for(project)
       end
     end
   end
