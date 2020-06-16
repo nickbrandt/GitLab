@@ -137,6 +137,23 @@ RSpec.describe Ci::Build do
         end
       end
     end
+
+    describe 'variable CI_HAS_OPEN_REQUIREMENTS' do
+      it "is included with value 'true' if there are open requirements" do
+        create(:requirement, project: project)
+
+        expect(subject).to include({ key: 'CI_HAS_OPEN_REQUIREMENTS',
+                                     value: 'true', public: true, masked: false })
+      end
+
+      it 'is not included if there are no open requirements' do
+        create(:requirement, project: project, state: :archived)
+
+        requirement_variable = subject.find { |var| var[:key] == 'CI_HAS_OPEN_REQUIREMENTS' }
+
+        expect(requirement_variable).to be_nil
+      end
+    end
   end
 
   describe '#collect_security_reports!' do

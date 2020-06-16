@@ -714,6 +714,11 @@ module EE
       feature_available?(:jira_dev_panel_integration) && JiraConnectSubscription.for_project(self).exists?
     end
 
+    override :predefined_variables
+    def predefined_variables
+      super.concat(requirements_ci_variables)
+    end
+
     private
 
     def group_hooks
@@ -765,6 +770,14 @@ module EE
     def user_defined_rules
       strong_memoize(:user_defined_rules) do
         approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc)
+      end
+    end
+
+    def requirements_ci_variables
+      ::Gitlab::Ci::Variables::Collection.new.tap do |variables|
+        if requirements.opened.any?
+          variables.append(key: 'CI_HAS_OPEN_REQUIREMENTS', value: 'true')
+        end
       end
     end
   end
