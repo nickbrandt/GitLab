@@ -1,5 +1,5 @@
 ---
-title: Use Keys::DestroyService for deleting ssh keys via API from admin
+title: Use Keys::DestroyService for deleting an SSH key when an admin deletes a key via the API
 merge_request: 34535
 author: Rajendra Kadam
 type: fixed
