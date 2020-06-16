@@ -1,12 +1,36 @@
 <script>
-import { GlForm } from '@gitlab/ui';
+import { GlForm, GlToggle, GlFormGroup,  GlTooltip, GlTooltipDirective, GlButton } from '@gitlab/ui';
+import { s__, __, sprintf } from '~/locale';
 export default {
-    components: [
-        GlForm
-    ]
+    components: {
+        GlFormGroup,
+        GlForm,
+        GlToggle,
+        GlTooltip,
+        GlTooltipDirective,
+        GlButton,
+    },
+    directives: {
+        GlTooltip: GlTooltipDirective,
+    }
 }
 </script>
 
 <template>
-    <h1> Integration Form is HERE </h1>
+    <div class="d-flex align-items-center">
+        <gl-form-group>
+            <gl-form>
+                <h4 pr-2 m-0> {{ s__('ClusterIntegration|GitLab Integration') }} </h4>
+
+
+                <div id="tooltipcontainer">
+                    <gl-toggle v-gl-tooltip:tooltipcontainer :title="s__('ClusterIntegration|Enable or disable GitLab\'s connection to your Kubernetes cluster.')">
+
+                    </gl-toggle>
+                </div>
+
+                
+            </gl-form>
+        </gl-form-group>
+    </div>
 </template>
