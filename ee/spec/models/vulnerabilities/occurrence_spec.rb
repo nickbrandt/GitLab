@@ -529,6 +529,32 @@ RSpec.describe Vulnerabilities::Occurrence do
     subject(:load_feedback) { occurrence.load_feedback.to_a }
 
     it { is_expected.to eq(expected_feedback) }
+
+    context 'when you have multiple occurrences' do
+      let_it_be(:occurrence_2) do
+        create(
+          :vulnerabilities_occurrence,
+          report_type: :dependency_scanning,
+          project: project
+        )
+      end
+
+      let_it_be(:feedback_2) do
+        create(
+          :vulnerability_feedback,
+          :dependency_scanning,
+          :dismissal,
+          project: project,
+          project_fingerprint: occurrence_2.project_fingerprint
+        )
+      end
+
+      let(:expected_feedback) { [[feedback], [feedback_2]] }
+
+      subject(:load_feedback) { [occurrence, occurrence_2].map(&:load_feedback) }
+
+      it { is_expected.to eq(expected_feedback) }
+    end
   end
 
   describe '#state' do

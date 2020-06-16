@@ -205,7 +205,7 @@ module Vulnerabilities
         occurrence_keys.each do |occurrence_key|
           loader.call(
             occurrence_key,
-            feedback.select { |f| occurrence_key = f.occurrence_key }
+            feedback.select { |f| occurrence_key == f.occurrence_key }
           )
         end
       end
