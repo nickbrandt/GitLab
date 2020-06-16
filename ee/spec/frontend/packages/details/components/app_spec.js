@@ -63,7 +63,6 @@ describe('PackagesApp', () => {
       stubs: {
         ...stubChildren(PackagesApp),
         GlDeprecatedButton: false,
-        GlLink: false,
         GlModal: false,
         GlTab: false,
         GlTabs: false,
@@ -278,7 +277,8 @@ describe('PackagesApp', () => {
 
     it(`file download link call event with ${TrackingActions.PULL_PACKAGE}`, () => {
       createComponent({ packageEntity: conanPackage });
-      firstFileDownloadLink().trigger('click');
+
+      firstFileDownloadLink().vm.$emit('click');
       expect(eventSpy).toHaveBeenCalledWith(
         category,
         TrackingActions.PULL_PACKAGE,

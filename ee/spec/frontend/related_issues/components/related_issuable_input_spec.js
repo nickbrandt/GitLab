@@ -70,19 +70,21 @@ describe('RelatedIssuableInput', () => {
   });
 
   describe('focus', () => {
-    it('when clicking anywhere on the input wrapper it should focus the input', () => {
+    it('when clicking anywhere on the input wrapper it should focus the input', async () => {
       const wrapper = shallowMount(RelatedIssuableInput, {
         propsData: {
           ...propsData,
           references: ['foo', 'bar'],
         },
+        // We need to attach to document, so that `document.activeElement` is properly set in jsdom
+        attachToDocument: true,
       });
 
       wrapper.find('li').trigger('click');
 
-      return wrapper.vm.$nextTick().then(() => {
-        expect(document.activeElement).toBe(wrapper.find({ ref: 'input' }).element);
-      });
+      await wrapper.vm.$nextTick();
+
+      expect(document.activeElement).toBe(wrapper.find({ ref: 'input' }).element);
     });
   });
 

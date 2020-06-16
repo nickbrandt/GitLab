@@ -56,6 +56,7 @@ describe('packages_coming_soon', () => {
       },
       stubs: {
         ApolloQuery,
+        GlLink: true,
       },
       mocks: {
         $apolloData,
@@ -115,7 +116,7 @@ describe('packages_coming_soon', () => {
     it('tracks when an issue title link is clicked', () => {
       eventSpy.mockClear();
 
-      findIssueTitleLink().trigger('click');
+      findIssueTitleLink().vm.$emit('click');
 
       expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.COMING_SOON_LIST, {
         label: firstIssue.title,
@@ -126,7 +127,7 @@ describe('packages_coming_soon', () => {
     it('tracks when an issue id link is clicked', () => {
       eventSpy.mockClear();
 
-      findIssueIdLink().trigger('click');
+      findIssueIdLink().vm.$emit('click');
 
       expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.COMING_SOON_LIST, {
         label: firstIssue.title,
