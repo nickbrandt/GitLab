@@ -9683,12 +9683,6 @@ msgstr ""
 msgid "FeatureFlags|Target environments"
 msgstr ""
 
-msgid "FeatureFlags|There are no active feature flags"
-msgstr ""
-
-msgid "FeatureFlags|There are no inactive feature flags"
-msgstr ""
-
 msgid "FeatureFlags|There was an error fetching the feature flags."
 msgstr ""
 
@@ -13272,6 +13266,9 @@ msgid "List view"
 msgstr ""
 
 msgid "List your Bitbucket Server repositories"
+msgstr ""
+
+msgid "Lists"
 msgstr ""
 
 msgid "Live preview"
@@ -26582,6 +26579,9 @@ msgid "created"
 msgstr ""
 
 msgid "created %{timeAgo}"
+msgstr ""
+
+msgid "created %{timeago}"
 msgstr ""
 
 msgid "customize"

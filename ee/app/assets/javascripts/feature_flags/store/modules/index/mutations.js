@@ -1,20 +1,25 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
+import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from '../../../constants';
 import { mapToScopesViewModel } from '../helpers';
 
 const mapFlag = flag => ({ ...flag, scopes: mapToScopesViewModel(flag.scopes || []) });
 
 const updateFlag = (state, flag) => {
-  const i = state.featureFlags.findIndex(({ id }) => id === flag.id);
-  const staleFlag = state.featureFlags.find(({ id }) => id === flag.id);
-  Vue.set(state.featureFlags, i, flag);
+  const index = state[FEATURE_FLAG_SCOPE].findIndex(({ id }) => id === flag.id);
+  Vue.set(state[FEATURE_FLAG_SCOPE], index, flag);
+};
 
-  if (staleFlag.active !== flag.active) {
-    const change = flag.active ? 1 : -1;
-    Vue.set(state.count, 'enabled', state.count.enabled + change);
-    Vue.set(state.count, 'disabled', state.count.disabled - change);
+const createPaginationInfo = (state, headers) => {
+  let paginationInfo;
+  if (Object.keys(headers).length) {
+    const normalizedHeaders = normalizeHeaders(headers);
+    paginationInfo = parseIntPagination(normalizedHeaders);
+  } else {
+    paginationInfo = headers;
   }
+  return paginationInfo;
 };
 
 export default {
@@ -30,25 +35,50 @@ export default {
   [types.SET_INSTANCE_ID](state, instance) {
     state.instanceId = instance;
   },
+  [types.SET_PROJECT_ID](state, project) {
+    state.projectId = project;
+  },
   [types.REQUEST_FEATURE_FLAGS](state) {
     state.isLoading = true;
   },
   [types.RECEIVE_FEATURE_FLAGS_SUCCESS](state, response) {
     state.isLoading = false;
     state.hasError = false;
-    state.count = response.data.count;
-    state.featureFlags = (response.data.feature_flags || []).map(mapFlag);
+    state[FEATURE_FLAG_SCOPE] = (response.data.feature_flags || []).map(mapFlag);
 
-    let paginationInfo;
-    if (Object.keys(response.headers).length) {
-      const normalizedHeaders = normalizeHeaders(response.headers);
-      paginationInfo = parseIntPagination(normalizedHeaders);
-    } else {
-      paginationInfo = response.headers;
-    }
-    state.pageInfo = paginationInfo;
+    const paginationInfo = createPaginationInfo(state, response.headers);
+    state.count = {
+      ...state.count,
+      [FEATURE_FLAG_SCOPE]: paginationInfo?.total ?? state[FEATURE_FLAG_SCOPE].length,
+    };
+    state.pageInfo = {
+      ...state.pageInfo,
+      [FEATURE_FLAG_SCOPE]: paginationInfo,
+    };
   },
   [types.RECEIVE_FEATURE_FLAGS_ERROR](state) {
+    state.isLoading = false;
+    state.hasError = true;
+  },
+  [types.REQUEST_USER_LISTS](state) {
+    state.isLoading = true;
+  },
+  [types.RECEIVE_USER_LISTS_SUCCESS](state, response) {
+    state.isLoading = false;
+    state.hasError = false;
+    state[USER_LIST_SCOPE] = response.data || [];
+
+    const paginationInfo = createPaginationInfo(state, response.headers);
+    state.count = {
+      ...state.count,
+      [USER_LIST_SCOPE]: paginationInfo?.total ?? state[USER_LIST_SCOPE].length,
+    };
+    state.pageInfo = {
+      ...state.pageInfo,
+      [USER_LIST_SCOPE]: paginationInfo,
+    };
+  },
+  [types.RECEIVE_USER_LISTS_ERROR](state) {
     state.isLoading = false;
     state.hasError = true;
   },
@@ -77,7 +107,7 @@ export default {
     updateFlag(state, mapFlag(data));
   },
   [types.RECEIVE_UPDATE_FEATURE_FLAG_ERROR](state, i) {
-    const flag = state.featureFlags.find(({ id }) => i === id);
+    const flag = state[FEATURE_FLAG_SCOPE].find(({ id }) => i === id);
     updateFlag(state, { ...flag, active: !flag.active });
   },
 };

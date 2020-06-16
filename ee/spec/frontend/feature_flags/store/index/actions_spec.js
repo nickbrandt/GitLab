@@ -16,6 +16,10 @@ import {
   updateFeatureFlag,
   receiveUpdateFeatureFlagSuccess,
   receiveUpdateFeatureFlagError,
+  requestUserLists,
+  receiveUserListsSuccess,
+  receiveUserListsError,
+  fetchUserLists,
 } from 'ee/feature_flags/store/modules/index/actions';
 import { mapToScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
 import state from 'ee/feature_flags/store/modules/index/state';
@@ -23,7 +27,10 @@ import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
-import { getRequestData, rotateData, featureFlag } from '../../mock_data';
+import Api from 'ee/api';
+import { getRequestData, rotateData, featureFlag, userList } from '../../mock_data';
+
+jest.mock('ee/api.js');
 
 describe('Feature flags actions', () => {
   let mockedState;
@@ -180,6 +187,99 @@ describe('Feature flags actions', () => {
         null,
         mockedState,
         [{ type: types.RECEIVE_FEATURE_FLAGS_ERROR }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchUserLists', () => {
+    beforeEach(() => {
+      Api.fetchFeatureFlagUserLists.mockResolvedValue({ data: [userList], headers: {} });
+    });
+
+    describe('success', () => {
+      it('dispatches requestUserLists and receiveUserListsSuccess ', done => {
+        testAction(
+          fetchUserLists,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestUserLists',
+            },
+            {
+              payload: { data: [userList], headers: {} },
+              type: 'receiveUserListsSuccess',
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('error', () => {
+      it('dispatches requestUserLists and receiveUserListsError ', done => {
+        Api.fetchFeatureFlagUserLists.mockRejectedValue();
+
+        testAction(
+          fetchUserLists,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestUserLists',
+            },
+            {
+              type: 'receiveUserListsError',
+            },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('requestUserLists', () => {
+    it('should commit RECEIVE_USER_LISTS_SUCCESS mutation', done => {
+      testAction(
+        requestUserLists,
+        null,
+        mockedState,
+        [{ type: types.REQUEST_USER_LISTS }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveUserListsSuccess', () => {
+    it('should commit RECEIVE_USER_LISTS_SUCCESS mutation', done => {
+      testAction(
+        receiveUserListsSuccess,
+        { data: [userList], headers: {} },
+        mockedState,
+        [
+          {
+            type: types.RECEIVE_USER_LISTS_SUCCESS,
+            payload: { data: [userList], headers: {} },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveUserListsError', () => {
+    it('should commit RECEIVE_USER_LISTS_ERROR mutation', done => {
+      testAction(
+        receiveUserListsError,
+        null,
+        mockedState,
+        [{ type: types.RECEIVE_USER_LISTS_ERROR }],
         [],
         done,
       );

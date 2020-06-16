@@ -308,10 +308,10 @@ export default {
     return axios.put(`${url}/${node.id}`, node);
   },
 
-  fetchFeatureFlagUserLists(id) {
+  fetchFeatureFlagUserLists(id, page) {
     const url = Api.buildUrl(this.featureFlagUserLists).replace(':id', id);
 
-    return axios.get(url);
+    return axios.get(url, { params: { page } });
   },
 
   createFeatureFlagUserList(id, list) {

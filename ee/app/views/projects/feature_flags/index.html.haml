@@ -1,6 +1,7 @@
 - page_title s_('FeatureFlags|Feature Flags')
 
 #feature-flags-vue{ data: { endpoint: project_feature_flags_path(@project, format: :json),
+  "project-id" => @project.id,
   "error-state-svg-path" => image_path('illustrations/feature_flag.svg'),
   "feature-flags-help-page-path" => help_page_path("user/project/operations/feature_flags"),
   "feature-flags-anchored-help-page-path" => help_page_path("user/project/operations/feature_flags", anchor: "client-libraries"),

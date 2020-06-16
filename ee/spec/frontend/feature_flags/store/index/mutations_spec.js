@@ -3,7 +3,7 @@ import mutations from 'ee/feature_flags/store/modules/index/mutations';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
 import { mapToScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
-import { getRequestData, rotateData, featureFlag } from '../../mock_data';
+import { getRequestData, rotateData, featureFlag, userList } from '../../mock_data';
 
 describe('Feature flags store Mutations', () => {
   let stateCopy;
@@ -84,17 +84,71 @@ describe('Feature flags store Mutations', () => {
     });
 
     it('should set count with the given data', () => {
-      expect(stateCopy.count).toEqual(getRequestData.count);
+      expect(stateCopy.count.featureFlags).toEqual(37);
     });
 
     it('should set pagination', () => {
-      expect(stateCopy.pageInfo).toEqual(parseIntPagination(normalizeHeaders(headers)));
+      expect(stateCopy.pageInfo.featureFlags).toEqual(
+        parseIntPagination(normalizeHeaders(headers)),
+      );
     });
   });
 
   describe('RECEIVE_FEATURE_FLAGS_ERROR', () => {
     beforeEach(() => {
       mutations[types.RECEIVE_FEATURE_FLAGS_ERROR](stateCopy);
+    });
+
+    it('should set isLoading to false', () => {
+      expect(stateCopy.isLoading).toEqual(false);
+    });
+
+    it('should set hasError to true', () => {
+      expect(stateCopy.hasError).toEqual(true);
+    });
+  });
+
+  describe('REQUEST_USER_LISTS', () => {
+    it('sets isLoading to true', () => {
+      mutations[types.REQUEST_USER_LISTS](stateCopy);
+      expect(stateCopy.isLoading).toBe(true);
+    });
+  });
+
+  describe('RECIEVE_USER_LISTS_SUCCESS', () => {
+    const headers = {
+      'x-next-page': '2',
+      'x-page': '1',
+      'X-Per-Page': '2',
+      'X-Prev-Page': '',
+      'X-TOTAL': '37',
+      'X-Total-Pages': '5',
+    };
+
+    beforeEach(() => {
+      mutations[types.RECEIVE_USER_LISTS_SUCCESS](stateCopy, { data: [userList], headers });
+    });
+
+    it('sets isLoading to false', () => {
+      expect(stateCopy.isLoading).toBe(false);
+    });
+
+    it('sets userLists to the received userLists', () => {
+      expect(stateCopy.userLists).toEqual([userList]);
+    });
+
+    it('sets pagination info for user lits', () => {
+      expect(stateCopy.pageInfo.userLists).toEqual(parseIntPagination(normalizeHeaders(headers)));
+    });
+
+    it('sets the count for user lists', () => {
+      expect(stateCopy.count.userLists).toBe(parseInt(headers['X-TOTAL'], 10));
+    });
+  });
+
+  describe('RECEIVE_USER_LISTS_ERROR', () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_USER_LISTS_ERROR](stateCopy);
     });
 
     it('should set isLoading to false', () => {
@@ -158,7 +212,7 @@ describe('Feature flags store Mutations', () => {
         ...flag,
         scopes: mapToScopesViewModel(flag.scopes || []),
       }));
-      stateCopy.count = { enabled: 1, disabled: 0 };
+      stateCopy.count = { featureFlags: 1, userLists: 0 };
 
       mutations[types.UPDATE_FEATURE_FLAG](stateCopy, {
         ...featureFlag,
@@ -176,12 +230,6 @@ describe('Feature flags store Mutations', () => {
         },
       ]);
     });
-    it('should update the enabled count', () => {
-      expect(stateCopy.count.enabled).toBe(0);
-    });
-    it('should update the disabled count', () => {
-      expect(stateCopy.count.disabled).toBe(1);
-    });
   });
 
   describe('RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS', () => {
@@ -191,7 +239,7 @@ describe('Feature flags store Mutations', () => {
         ...flagState,
         scopes: mapToScopesViewModel(flag.scopes || []),
       }));
-      stateCopy.count = stateCount;
+      stateCopy.count.featureFlags = stateCount;
 
       mutations[types.RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS](stateCopy, {
         ...featureFlag,
@@ -209,32 +257,6 @@ describe('Feature flags store Mutations', () => {
           active: false,
         },
       ]);
-    });
-
-    it('updates the count data', () => {
-      runUpdate({ all: 1, enabled: 1, disabled: 0 }, { active: true }, { active: false });
-
-      expect(stateCopy.count).toEqual({ all: 1, enabled: 0, disabled: 1 });
-    });
-
-    describe('when count data does not match up with the number of flags in state', () => {
-      it('updates the count data when the flag changes to inactive', () => {
-        runUpdate({ all: 4, enabled: 1, disabled: 3 }, { active: true }, { active: false });
-
-        expect(stateCopy.count).toEqual({ all: 4, enabled: 0, disabled: 4 });
-      });
-
-      it('updates the count data when the flag changes to active', () => {
-        runUpdate({ all: 4, enabled: 1, disabled: 3 }, { active: false }, { active: true });
-
-        expect(stateCopy.count).toEqual({ all: 4, enabled: 2, disabled: 2 });
-      });
-
-      it('retains the count data when flag.active does not change', () => {
-        runUpdate({ all: 4, enabled: 1, disabled: 3 }, { active: true }, { active: true });
-
-        expect(stateCopy.count).toEqual({ all: 4, enabled: 1, disabled: 3 });
-      });
     });
   });
 
@@ -257,12 +279,6 @@ describe('Feature flags store Mutations', () => {
           active: false,
         },
       ]);
-    });
-    it('should update the enabled count', () => {
-      expect(stateCopy.count.enabled).toBe(0);
-    });
-    it('should update the disabled count', () => {
-      expect(stateCopy.count.disabled).toBe(1);
     });
   });
 });

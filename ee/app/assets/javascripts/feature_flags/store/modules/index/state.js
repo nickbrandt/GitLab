@@ -1,7 +1,10 @@
+import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from '../../../constants';
+
 export default () => ({
-  featureFlags: [],
+  [FEATURE_FLAG_SCOPE]: [],
+  [USER_LIST_SCOPE]: [],
   count: {},
-  pageInfo: {},
+  pageInfo: { [FEATURE_FLAG_SCOPE]: {}, [USER_LIST_SCOPE]: {} },
   isLoading: true,
   hasError: false,
   endpoint: null,
@@ -10,4 +13,5 @@ export default () => ({
   isRotating: false,
   hasRotateError: false,
   options: {},
+  projectId: '',
 });

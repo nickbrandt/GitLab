@@ -1,4 +1,5 @@
 import * as types from './mutation_types';
+import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
 
 export const setFeatureFlagsEndpoint = ({ commit }, endpoint) =>
@@ -9,6 +10,8 @@ export const setFeatureFlagsOptions = ({ commit }, options) =>
 
 export const setInstanceIdEndpoint = ({ commit }, endpoint) =>
   commit(types.SET_INSTANCE_ID_ENDPOINT, endpoint);
+
+export const setProjectId = ({ commit }, endpoint) => commit(types.SET_PROJECT_ID, endpoint);
 
 export const setInstanceId = ({ commit }, instanceId) => commit(types.SET_INSTANCE_ID, instanceId);
 
@@ -32,6 +35,19 @@ export const requestFeatureFlags = ({ commit }) => commit(types.REQUEST_FEATURE_
 export const receiveFeatureFlagsSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_FEATURE_FLAGS_SUCCESS, response);
 export const receiveFeatureFlagsError = ({ commit }) => commit(types.RECEIVE_FEATURE_FLAGS_ERROR);
+
+export const fetchUserLists = ({ state, dispatch }) => {
+  dispatch('requestUserLists');
+
+  return Api.fetchFeatureFlagUserLists(state.projectId, state.options.page)
+    .then(({ data, headers }) => dispatch('receiveUserListsSuccess', { data, headers }))
+    .catch(() => dispatch('receiveUserListsError'));
+};
+
+export const requestUserLists = ({ commit }) => commit(types.REQUEST_USER_LISTS);
+export const receiveUserListsSuccess = ({ commit }, response) =>
+  commit(types.RECEIVE_USER_LISTS_SUCCESS, response);
+export const receiveUserListsError = ({ commit }) => commit(types.RECEIVE_USER_LISTS_ERROR);
 
 export const toggleFeatureFlag = ({ dispatch }, flag) => {
   dispatch('updateFeatureFlag', flag);
