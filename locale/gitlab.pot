@@ -24473,6 +24473,9 @@ msgstr ""
 msgid "User IDs"
 msgstr ""
 
+msgid "User Lists can only be created and modified with %{linkStart}the API%{linkEnd}"
+msgstr ""
+
 msgid "User OAuth applications"
 msgstr ""
 
