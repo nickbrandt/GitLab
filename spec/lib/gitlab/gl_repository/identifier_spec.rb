@@ -54,29 +54,19 @@ describe Gitlab::GlRepository::Identifier do
     end
   end
 
-  describe 'incorrect format' do
-    def expect_error_raised_for(identifier)
-      expect { described_class.new(identifier) }.to raise_error(ArgumentError)
+  context 'when the format is incorrect' do
+    where(:identifier) do
+      [
+        'wiki-noid',
+        'foo-2',
+        'snippet-2-wiki',
+        'snippet',
+        'project-1-wiki-bar'
+      ]
     end
 
-    it 'raises error for incorrect id' do
-      expect_error_raised_for('wiki-noid')
-    end
-
-    it 'raises error for incorrect type' do
-      expect_error_raised_for('foo-2')
-    end
-
-    it 'raises error for incorrect three-segment container' do
-      expect_error_raised_for('snippet-2-wiki')
-    end
-
-    it 'raises error for one segment' do
-      expect_error_raised_for('snippet')
-    end
-
-    it 'raises error for more than three segments' do
-      expect_error_raised_for('project-1-wiki-bar')
+    with_them do
+      it_behaves_like 'illegal gl_identifier'
     end
   end
 end
