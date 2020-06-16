@@ -1,9 +1,12 @@
 <script>
+import { mapState } from 'vuex';
 import BoardListHeader from 'ee_else_ce/boards/components/board_list_header.vue';
+import EpicLane from './epic_lane.vue';
 
 export default {
   components: {
     BoardListHeader,
+    EpicLane,
   },
   props: {
     lists: {
@@ -12,14 +15,6 @@ export default {
     },
     disabled: {
       type: Boolean,
-      required: true,
-    },
-    issueLinkBase: {
-      type: String,
-      required: true,
-    },
-    rootPath: {
-      type: String,
       required: true,
     },
     boardId: {
@@ -31,11 +26,9 @@ export default {
       required: false,
       default: false,
     },
-    groupId: {
-      type: Number,
-      required: false,
-      default: null,
-    },
+  },
+  computed: {
+    ...mapState(['epics']),
   },
 };
 </script>
@@ -62,5 +55,6 @@ export default {
         :is-swimlanes-header="true"
       />
     </div>
+    <epic-lane v-for="epic in epics" :key="epic.id" :epic="epic" />
   </div>
 </template>

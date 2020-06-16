@@ -83,7 +83,9 @@ export default {
       return this.item.type === ChildType.Epic ? 'epic' : 'issues';
     },
     stateIconClass() {
-      return this.isOpen ? 'issue-token-state-icon-open' : 'issue-token-state-icon-closed';
+      return this.isOpen
+        ? 'issue-token-state-icon-open gl-text-green-500'
+        : 'issue-token-state-icon-closed gl-text-blue-500';
     },
     itemId() {
       return this.itemReference.split(this.item.pathIdSeparator).pop();
