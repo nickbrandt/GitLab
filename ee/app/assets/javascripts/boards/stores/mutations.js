@@ -81,4 +81,8 @@ export default {
     state.epicsSwimlanesFetchFailure = true;
     state.epicsSwimlanesFetchInProgress = false;
   },
+
+  [mutationTypes.RECEIVE_EPICS_SUCCESS]: (state, epics) => {
+    state.epics = epics;
+  },
 };

@@ -380,6 +380,9 @@ msgstr ""
 msgid "%{issuableType} will be removed! Are you sure?"
 msgstr ""
 
+msgid "%{issuesCount} issues in this group"
+msgstr ""
+
 msgid "%{issuesSize} issues"
 msgstr ""
 
