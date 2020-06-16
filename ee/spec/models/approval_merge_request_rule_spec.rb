@@ -45,9 +45,9 @@ RSpec.describe ApprovalMergeRequestRule do
       end
 
       it 'is invalid when reusing the same name within the same merge request' do
-        existing = create(:code_owner_rule, name: '*.rb', merge_request: merge_request, section: 'section')
+        existing = create(:code_owner_rule, name: '*.rb', merge_request: merge_request)
 
-        new = build(:code_owner_rule, merge_request: existing.merge_request, name: '*.rb', section: 'section')
+        new = build(:code_owner_rule, merge_request: existing.merge_request, name: '*.rb')
 
         expect(new).not_to be_valid
         expect { new.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
