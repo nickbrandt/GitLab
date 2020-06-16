@@ -50,132 +50,43 @@ RSpec.describe ApprovalState do
     before do
       allow(merge_request).to receive(:committers).and_return(User.where(id: committers))
 
-      project.update!(
-        merge_requests_author_approval: merge_requests_author_approval,
-        merge_requests_disable_committers_approval: merge_requests_disable_committers_approval
-      )
+      allow(project).to receive(:merge_requests_author_approval?).and_return(merge_requests_author_approval)
+      allow(project).to receive(:merge_requests_disable_committers_approval?).and_return(merge_requests_disable_committers_approval)
+
       create_rule(users: committers)
     end
 
-    context 'when self approval is disabled on project level' do
+    context 'when self approval is disabled on project' do
       let(:merge_requests_author_approval) { false }
 
       it 'excludes authors' do
         expect(results).not_to include(merge_request.author)
       end
-
-      context 'when self approval is enabled on instance level' do
-        before do
-          stub_application_setting(prevent_merge_requests_author_approval: false)
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-        end
-
-        it 'excludes author' do
-          expect(results).not_to include(merge_request.author)
-        end
-      end
-
-      context 'when self approval is disabled on instance level' do
-        before do
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-          stub_application_setting(prevent_merge_requests_author_approval: true)
-        end
-
-        it 'excludes authors' do
-          expect(results).not_to include(merge_request.author)
-        end
-      end
     end
 
-    context 'when self approval is enabled on project level' do
+    context 'when self approval is enabled on project' do
       let(:merge_requests_author_approval) { true }
 
       it 'includes author' do
         expect(results).to include(merge_request.author)
       end
-
-      context 'when self approval is enabled on instance level' do
-        before do
-          stub_application_setting(prevent_merge_requests_author_approval: false)
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-        end
-
-        it 'includes author' do
-          expect(results).to include(merge_request.author)
-        end
-      end
-
-      context 'when self approval is disabled on instance level' do
-        before do
-          stub_application_setting(prevent_merge_requests_author_approval: true)
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-        end
-
-        it 'excludes authors' do
-          expect(results).not_to include(merge_request.author)
-        end
-      end
     end
 
-    context 'when committers approval is enabled on project level' do
+    context 'when committers approval is enabled on project' do
       let(:merge_requests_author_approval) { true }
       let(:merge_requests_disable_committers_approval) { false }
 
       it 'includes committers' do
         expect(results).to include(*committers)
       end
-
-      context 'when committers approval is enabled on instance level' do
-        before do
-          stub_application_setting(prevent_merge_requests_committers_approval: false)
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-        end
-
-        it 'includes committers' do
-          expect(results).to include(*committers)
-        end
-      end
-
-      context 'when committers approval is disabled on instance level' do
-        before do
-          stub_application_setting(prevent_merge_requests_committers_approval: true)
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-        end
-
-        it 'excludes committers' do
-          expect(results).not_to include(*committers)
-        end
-      end
     end
 
-    context 'when committers approval is disabled on project level' do
+    context 'when committers approval is disabled on project' do
       let(:merge_requests_author_approval) { true }
       let(:merge_requests_disable_committers_approval) { true }
 
       it 'excludes committers' do
         expect(results).not_to include(*committers)
-      end
-
-      context 'when committers approval is enabled on instance level' do
-        before do
-          stub_application_setting(prevent_merge_requests_committers_approval: false)
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-        end
-
-        it 'excludes committers' do
-          expect(results).not_to include(*committers)
-        end
-      end
-
-      context 'when committers approval is disabled on instance level' do
-        before do
-          stub_application_setting(prevent_merge_requests_committers_approval: true)
-          stub_licensed_features(admin_merge_request_approvers_rules: true)
-        end
-
-        it 'excludes committers' do
-          expect(results).not_to include(*committers)
-        end
       end
     end
   end

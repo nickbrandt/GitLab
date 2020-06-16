@@ -75,6 +75,36 @@ module EE
             .prevent_merge_requests_committers_approval
       end
 
+      with_scope :subject
+      condition(:regulated_merge_request_approval_settings) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          @subject.has_regulated_settings?
+      end
+
+      condition(:cannot_modify_approvers_rules) do
+        if @subject.project_compliance_mr_approval_settings?
+          regulated_merge_request_approval_settings?
+        else
+          owner_cannot_modify_approvers_rules? && !admin?
+        end
+      end
+
+      condition(:cannot_modify_merge_request_author_setting) do
+        if @subject.project_compliance_mr_approval_settings?
+          regulated_merge_request_approval_settings?
+        else
+          owner_cannot_modify_merge_request_author_setting? && !admin?
+        end
+      end
+
+      condition(:cannot_modify_merge_request_committer_setting) do
+        if @subject.project_compliance_mr_approval_settings?
+          regulated_merge_request_approval_settings?
+        else
+          owner_cannot_modify_merge_request_committer_setting? && !admin?
+        end
+      end
+
       with_scope :global
       condition(:cluster_health_available) do
         License.feature_available?(:cluster_health)
@@ -372,23 +402,20 @@ module EE
         prevent :read_project
       end
 
-      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+      rule { cannot_modify_approvers_rules }.policy do
         prevent :modify_approvers_rules
+        prevent :modify_approvers_list
       end
 
-      rule { owner_cannot_modify_merge_request_author_setting & ~admin }.policy do
+      rule { cannot_modify_merge_request_author_setting }.policy do
         prevent :modify_merge_request_author_setting
       end
 
-      rule { owner_cannot_modify_merge_request_committer_setting & ~admin }.policy do
+      rule { cannot_modify_merge_request_committer_setting }.policy do
         prevent :modify_merge_request_committer_setting
       end
 
       rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
-
-      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
-        prevent :modify_approvers_list
-      end
 
       rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
 

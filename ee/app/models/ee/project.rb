@@ -214,6 +214,13 @@ module EE
       end
     end
 
+    def has_regulated_settings?
+      return unless compliance_framework_setting
+
+      compliance_framework_id = ::ComplianceManagement::ComplianceFramework::FRAMEWORKS[compliance_framework_setting.framework.to_sym]
+      ::Gitlab::CurrentSettings.current_application_settings.compliance_frameworks.include?(compliance_framework_id)
+    end
+
     def can_store_security_reports?
       namespace.store_security_reports_available? || public?
     end
@@ -672,28 +679,35 @@ module EE
 
     def disable_overriding_approvers_per_merge_request
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+      return (::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? || super) unless project_compliance_mr_approval_settings?
+      return super unless has_regulated_settings?
 
-      ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? ||
-        super
+      ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request?
     end
     alias_method :disable_overriding_approvers_per_merge_request?, :disable_overriding_approvers_per_merge_request
 
     def merge_requests_author_approval
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+      return false if !project_compliance_mr_approval_settings? && ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
+      return super if !project_compliance_mr_approval_settings? && !::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
+      return super unless has_regulated_settings?
 
-      return false if ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
-
-      super
+      !::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
     end
     alias_method :merge_requests_author_approval?, :merge_requests_author_approval
 
     def merge_requests_disable_committers_approval
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+      return (::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? || super) unless project_compliance_mr_approval_settings?
+      return super unless has_regulated_settings?
 
-      ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? ||
-        super
+      ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval?
     end
     alias_method :merge_requests_disable_committers_approval?, :merge_requests_disable_committers_approval
+
+    def project_compliance_mr_approval_settings?
+      ::Feature.enabled?(:project_compliance_merge_request_approval_settings, self)
+    end
 
     def license_compliance
       strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
