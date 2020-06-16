@@ -15,7 +15,7 @@ cloud provider more easily.
 
 ## AWS
 
-GitLab provides Docker images to simplify working with AWS, and a template to make
+GitLab provides Docker images that you can use to [run AWS commands from GitLab CI/CD](#run-aws-commands-from-gitlab-cicd), and a template to make
 it easier to [deploy to AWS](#deploy-your-application-to-the-aws-elastic-container-service-ecs).
 
 ### Run AWS commands from GitLab CI/CD
