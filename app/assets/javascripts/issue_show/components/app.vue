@@ -1,11 +1,10 @@
 <script>
-import { GlIntersectionObserver } from '@gitlab/ui';
+import { GlIcon, GlIntersectionObserver } from '@gitlab/ui';
 import Visibility from 'visibilityjs';
 import { __, s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { visitUrl } from '~/lib/utils/url_utility';
 import Poll from '~/lib/utils/poll';
-import Icon from '~/vue_shared/components/icon.vue';
 import eventHub from '../event_hub';
 import Service from '../services/index';
 import Store from '../stores';
@@ -19,8 +18,8 @@ import { IssuableStatus, IssuableStatusText, IssuableType } from '../constants';
 
 export default {
   components: {
+    GlIcon,
     GlIntersectionObserver,
-    Icon,
     descriptionComponent,
     titleComponent,
     editedComponent,
@@ -422,6 +421,7 @@ export default {
           <div
             v-if="shouldShowStickyHeader"
             class="issue-sticky-header gl-fixed gl-z-index-2 gl-bg-white gl-border-1 gl-border-b-solid gl-border-b-gray-200 gl-py-3"
+            data-testid="issue-sticky-header"
           >
             <div
               class="issue-sticky-header-text gl-display-flex gl-align-items-center gl-mx-auto gl-px-5"
@@ -430,7 +430,7 @@ export default {
                 class="issuable-status-box status-box gl-my-0"
                 :class="[isOpenStatus ? 'status-box-open' : 'status-box-issue-closed']"
               >
-                <icon :name="statusIcon" class="gl-display-block d-sm-none gl-h-6!" />
+                <gl-icon :name="statusIcon" class="gl-display-block d-sm-none gl-h-6!" />
                 <span class="gl-display-none d-sm-block">{{ statusText }}</span>
               </p>
               <p

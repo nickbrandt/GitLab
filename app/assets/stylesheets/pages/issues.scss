@@ -305,9 +305,9 @@ ul.related-merge-requests > li {
 }
 
 .issue-sticky-header {
-  left: 0;
+  @include gl-left-0;
+  @include gl-w-full;
   top: $header-height;
-  width: 100%;
 
   // collapsed right sidebar
   @include media-breakpoint-up(sm) {
@@ -362,7 +362,7 @@ ul.related-merge-requests > li {
 
 .issuable-header-slide-enter-active,
 .issuable-header-slide-leave-active {
-  transition: transform 0.5s;
+  @include gl-transition-slow;
 }
 
 .issuable-header-slide-enter,

@@ -26,7 +26,7 @@ describe('Issuable output', () => {
   let realtimeRequestCount = 0;
   let wrapper;
 
-  const findStickyHeader = () => wrapper.find('.issue-sticky-header');
+  const findStickyHeader = () => wrapper.find('[data-testid="issue-sticky-header"]');
 
   beforeEach(() => {
     setFixtures(`
