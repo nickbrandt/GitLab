@@ -360,6 +360,16 @@ ul.related-merge-requests > li {
   }
 }
 
+.issuable-header-slide-enter-active,
+.issuable-header-slide-leave-active {
+  transition: transform 0.5s;
+}
+
+.issuable-header-slide-enter,
+.issuable-header-slide-leave-to {
+  transform: translateY(-100%);
+}
+
 .issuable-list-root {
   .gl-label-link {
     text-decoration: none;

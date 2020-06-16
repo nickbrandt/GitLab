@@ -15,6 +15,7 @@ import editedComponent from './edited.vue';
 import formComponent from './form.vue';
 import PinnedLinks from './pinned_links.vue';
 import recaptchaModalImplementor from '~/vue_shared/mixins/recaptcha_modal_implementor';
+import { IssuableStatus, IssuableStatusText, IssuableType } from '../constants';
 
 export default {
   components: {
@@ -207,16 +208,16 @@ export default {
       return sprintf(s__('Error updating %{issuableType}'), { issuableType: this.issuableType });
     },
     isOpenStatus() {
-      return this.issuableStatus === 'opened';
+      return this.issuableStatus === IssuableStatus.Open;
     },
     statusIcon() {
       return this.isOpenStatus ? 'issue-open-m' : 'mobile-issue-close';
     },
     statusText() {
-      return this.isOpenStatus ? __('Open') : __('Closed');
+      return IssuableStatusText[this.issuableStatus];
     },
     shouldShowStickyHeader() {
-      return this.isStickyHeaderShowing && this.issuableType === 'issue';
+      return this.isStickyHeaderShowing && this.issuableType === IssuableType.Issue;
     },
   },
   created() {
@@ -417,7 +418,7 @@ export default {
       />
 
       <gl-intersection-observer @appear="hideStickyHeader" @disappear="showStickyHeader">
-        <transition name="slide">
+        <transition name="issuable-header-slide">
           <div
             v-if="shouldShowStickyHeader"
             class="issue-sticky-header gl-fixed gl-z-index-2 gl-bg-white gl-border-1 gl-border-b-solid gl-border-b-gray-200 gl-py-3"
@@ -470,15 +471,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style>
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 0.5s;
-}
-
-.slide-enter,
-.slide-leave-to {
-  transform: translateY(-100%);
-}
-</style>
