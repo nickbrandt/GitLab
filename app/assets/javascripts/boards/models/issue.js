@@ -30,9 +30,7 @@ class ListIssue {
   }
 
   addLabel(label) {
-    if (!this.findLabel(label)) {
-      this.labels.push(new ListLabel(label));
-    }
+    boardsStore.addIssueLabel(this, label);
   }
 
   findLabel(findLabel) {
