@@ -16,7 +16,7 @@ unless ux_paths_to_review.empty?
 
       The review does not need to block merging this merge request. See the:
 
-      - [UX team members](https://about.gitlab.com/handbook/engineering/ux/#meet-some-of-our-team-members) for the appropriate UX team member for this review.
+      - [UX team members](https://about.gitlab.com/company/team/?department=ux-department) for the appropriate UX team member for this review.
       - [Documentation workflows](https://docs.gitlab.com/ee/development/documentation/workflow.html) for information on when to assign a merge request for review.
     MARKDOWN
   end
