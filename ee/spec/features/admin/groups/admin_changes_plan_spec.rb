@@ -9,6 +9,7 @@ RSpec.describe 'Changes GL.com plan for group' do
   let(:admin) { create(:admin) }
 
   before do
+    allow(::Gitlab).to receive(:com?).and_return(true)
     allow(Gitlab::CurrentSettings).to receive(:should_check_namespace_plan?) { true }
 
     sign_in(admin)

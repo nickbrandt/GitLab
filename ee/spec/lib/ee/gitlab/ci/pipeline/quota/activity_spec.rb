@@ -9,6 +9,8 @@ RSpec.describe EE::Gitlab::Ci::Pipeline::Quota::Activity do
   let(:plan_limits) { create(:plan_limits, plan: gold_plan) }
   let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan) }
 
+  before { allow(::Gitlab).to receive(:com?).and_return(true) }
+
   subject { described_class.new(namespace, project) }
 
   shared_context 'pipeline activity limit exceeded' do

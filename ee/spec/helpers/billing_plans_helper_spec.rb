@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe BillingPlansHelper do
+  before { allow(::Gitlab).to receive(:com?).and_return(true) }
+  
   describe '#current_plan?' do
     it 'returns true when current_plan' do
       plan = Hashie::Mash.new(purchase_link: { action: 'current_plan' })

@@ -11,6 +11,8 @@ RSpec.describe 'shared/billings/_trial_status.html.haml' do
   let(:trial) { false }
 
   before do
+    # allow(::Gitlab).to receive(:com?).and_return(true)
+
     create(:gitlab_subscription, namespace: group, hosted_plan: plan, trial_ends_on: trial_ends_on, trial: trial)
   end
 

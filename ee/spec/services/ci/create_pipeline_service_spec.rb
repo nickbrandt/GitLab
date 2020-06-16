@@ -20,6 +20,8 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
   end
 
   before do
+    allow(::Gitlab).to receive(:com?).and_return(true)
+    
     create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
 
     project.add_developer(user)

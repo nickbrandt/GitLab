@@ -9,6 +9,8 @@ RSpec.describe EE::Gitlab::Ci::Pipeline::Quota::JobActivity do
   let_it_be(:plan_limits, reload: true) { create(:plan_limits, plan: gold_plan) }
   let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan) }
 
+  before { allow(::Gitlab).to receive(:com?).and_return(true) }
+
   subject { described_class.new(namespace, project) }
 
   describe '#enabled?' do
