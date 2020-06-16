@@ -30,7 +30,9 @@ module Gitlab
         end
 
         def detail_store
-          STORAGES.flat_map(&:detail_store)
+          STORAGES.flat_map do |storage|
+            storage.detail_store.map { |details| details.merge(storage: storage.name.demodulize) }
+          end
         end
 
         %i[get_request_count query_time read_bytes write_bytes].each do |method|

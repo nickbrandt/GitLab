@@ -97,4 +97,18 @@ describe Gitlab::Instrumentation::Redis do
       expect(described_class.payload.keys).to match_array(expected_payload.keys)
     end
   end
+
+  describe '.detail_store' do
+    it 'returns a flat array of detail stores with the storage name added to each item' do
+      details_row = { cmd: 'GET foo', duration: 1 }
+
+      stub_storages(:detail_store, [details_row])
+
+      expect(described_class.detail_store)
+        .to contain_exactly(details_row.merge(storage: 'ActionCable'),
+                            details_row.merge(storage: 'Cache'),
+                            details_row.merge(storage: 'Queues'),
+                            details_row.merge(storage: 'SharedState'))
+    end
+  end
 end
