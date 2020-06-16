@@ -198,8 +198,8 @@ describe RemoveDuplicateLabelsFromProject do
       it 'modifies the titles of the partial duplicates' do
         migration.up
 
-        expect(second_label.reload.title).to match(/#{label_title}_duplicate/)
-        expect(fourth_label.reload.title).to match(/#{other_title}_duplicate/)
+        expect(second_label.reload.title).to match(/#{label_title}_duplicate#{second_label.id}$/)
+        expect(fourth_label.reload.title).to match(/#{other_title}_duplicate#{fourth_label.id}$/)
       end
 
       it 'restores renamed records on rollback' do
@@ -212,6 +212,22 @@ describe RemoveDuplicateLabelsFromProject do
 
         expect(second_label.reload.attributes).to include(second_label_attributes)
         expect(fourth_label.reload.attributes).to include(fourth_label_attributes)
+      end
+
+      context 'when the labels have a long title that might overflow' do
+        let(:long_title) { "a" * 255 }
+
+        before do
+          first_label.update_attribute(:title, long_title)
+          second_label.update_attribute(:title, long_title)
+        end
+
+        it 'keeps the length within the limit' do
+          migration.up
+
+          expect(second_label.reload.title).to eq("#{"a" * 244}_duplicate#{second_label.id}")
+          expect(second_label.title.length).to eq 255
+        end
       end
     end
   end

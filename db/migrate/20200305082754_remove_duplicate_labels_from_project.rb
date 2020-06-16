@@ -70,19 +70,20 @@ WITH data AS (
       # create backup records
       BackupLabel.insert_all!(duplicate_labels.map { |label| label.except("row_number") })
 
-      ApplicationRecord.connection.execute(<<-SQL.squish)
-DELETE FROM labels
-WHERE labels.id IN (#{duplicate_labels.map { |dup| dup["id"] }.join(", ")});
-      SQL
+      Label.where(id: duplicate_labels.pluck("id")).delete_all
     end
   end
 
   def rename_partial_duplicates(start_id, stop_id)
+    # We need to ensure that the new title (with `_duplicate#{ID}`) doesn't exceed the limit.
+    # Truncate the original title (if needed) to 245 characters minus the length of the ID
+    # then add `_duplicate#{ID}`
+
     soft_duplicates = ApplicationRecord.connection.execute(<<-SQL.squish)
 WITH data AS (
   SELECT
      *,
-     title || '_' || 'duplicate' || id AS new_title,
+     substring(title from 1 for 245 - length(id::text)) || '_duplicate' || id::text as new_title,
      #{RENAME} AS restore_action,
      row_number() OVER (PARTITION BY project_id, title ORDER BY id) AS row_number
   FROM labels
@@ -95,7 +96,7 @@ WITH data AS (
       BackupLabel.insert_all!(soft_duplicates.map { |label| label.except("row_number") })
 
       ApplicationRecord.connection.execute(<<-SQL.squish)
-UPDATE labels SET title = title || '_' || 'duplicate' || extract(epoch from now())
+UPDATE labels SET title = substring(title from 1 for 245 - length(id::text)) || '_duplicate' || id::text
 WHERE labels.id IN (#{soft_duplicates.map { |dup| dup["id"] }.join(", ")});
       SQL
     end
