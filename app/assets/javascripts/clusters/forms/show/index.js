@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import IntegrationForm from '../components/integration_form.vue';
+import { createStore } from '../stores'
 
 
 export default () => {
     const entryPoint = document.querySelector('#js-cluster-integration-form')
-    const dataset = entryPoint.dataset;
+    const { endpoint } = entryPoint.dataset;
 
     if(!entryPoint) {
         return;
@@ -12,8 +13,9 @@ export default () => {
 
     new Vue({
         el: '#js-cluster-integration-form',
+        store: createStore({ endpoint }),
         render(createElement) {
-          return createElement(IntegrationForm);
+            return createElement(IntegrationForm);
         },
       });
     };
