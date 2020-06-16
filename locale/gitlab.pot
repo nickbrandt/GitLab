@@ -3133,6 +3133,9 @@ msgstr ""
 msgid "Archived"
 msgstr ""
 
+msgid "Archived in this version"
+msgstr ""
+
 msgid "Archived project! Repository and other project resources are read only"
 msgstr ""
 
@@ -6895,6 +6898,9 @@ msgstr ""
 msgid "Could not add admins as members"
 msgstr ""
 
+msgid "Could not archive %{design}. Please try again."
+msgstr ""
+
 msgid "Could not authorize chat nickname. Try again!"
 msgstr ""
 
@@ -7893,6 +7899,8 @@ msgstr ""
 msgid "Deleted chat nickname: %{chat_name}!"
 msgstr ""
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 msgid "Deleted in this version"
 msgstr ""
 
@@ -7902,6 +7910,13 @@ msgstr ""
 msgid "Deleted projects cannot be restored!"
 msgstr ""
 
+=======
+>>>>>>> 086fa509029... Use "archive" in design management
+=======
+msgid "Deleted in this version"
+msgstr ""
+
+>>>>>>> 5918a4550f2... Update modal text
 msgid "Deleting"
 msgstr ""
 
@@ -8314,6 +8329,18 @@ msgid "DesignManagement|%{filename} did not change."
 msgstr ""
 
 msgid "DesignManagement|Adding a design with the same filename replaces the file in a new version."
+msgstr ""
+
+msgid "DesignManagement|Archive designs"
+msgstr ""
+
+msgid "DesignManagement|Archive selected"
+msgstr ""
+
+msgid "DesignManagement|Archived designs will still be available in previous versions of the design collection."
+msgstr ""
+
+msgid "DesignManagement|Are you sure you want to archive the selected designs?"
 msgstr ""
 
 msgid "DesignManagement|Are you sure you want to cancel changes to this comment?"
