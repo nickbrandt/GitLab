@@ -56,23 +56,6 @@ describe('LabelToken', () => {
       });
     });
 
-    describe('hideDefaultOptions = true', () => {
-      it('does not render defualt suggestions', () => {
-        createComponent(
-          {
-            config: {
-              ...defaultConfig,
-              hideDefaultOptions: true,
-            },
-          },
-          { stubs },
-        );
-        const html = wrapper.html();
-        expect(html).not.toContain('None');
-        expect(html).not.toContain('Any');
-      });
-    });
-
     describe('when no search term is given', () => {
       it('renders two label suggestions', () => {
         createComponent(null, { stubs });

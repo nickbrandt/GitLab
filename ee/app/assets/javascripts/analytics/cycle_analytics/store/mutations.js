@@ -115,4 +115,5 @@ export default {
     state.isSavingStageOrder = false;
     state.errorSavingStageOrder = true;
   },
+  [types.SET_SELECTED_FILTERS]() {},
 };

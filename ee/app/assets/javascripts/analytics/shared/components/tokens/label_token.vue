@@ -37,9 +37,6 @@ export default {
           value: this.getEscapedText(label.title),
         }));
     },
-    hideDefault() {
-      return this.config?.hideDefaultOptions;
-    },
   },
   methods: {
     getEscapedText(text) {
@@ -80,15 +77,13 @@ export default {
     <template #suggestions>
       <gl-loading-icon v-if="config.isLoading" />
       <template v-else>
-        <div v-if="!hideDefault">
-          <gl-filtered-search-suggestion
-            v-for="suggestion in $options.defaultSuggestions"
-            :key="suggestion.value"
-            :value="suggestion.value"
-            >{{ suggestion.text }}</gl-filtered-search-suggestion
-          >
-          <gl-dropdown-divider v-if="config.isLoading || filteredLabels.length" />
-        </div>
+        <gl-filtered-search-suggestion
+          v-for="suggestion in $options.defaultSuggestions"
+          :key="suggestion.value"
+          :value="suggestion.value"
+          >{{ suggestion.text }}</gl-filtered-search-suggestion
+        >
+        <gl-dropdown-divider v-if="config.isLoading || filteredLabels.length" />
         <gl-filtered-search-suggestion
           v-for="label in filteredLabels"
           ref="labelItem"

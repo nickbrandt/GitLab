@@ -39,7 +39,7 @@ export default {
     },
   },
   methods: {
-    getEscapedText(text = null) {
+    getEscapedText(text) {
       let escapedText = text;
       const hasSpace = text.indexOf(' ') !== -1;
       const hasDoubleQuote = text.indexOf('"') !== -1;

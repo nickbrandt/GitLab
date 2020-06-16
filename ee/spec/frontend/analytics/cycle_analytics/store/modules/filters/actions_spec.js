@@ -4,8 +4,7 @@ import testAction from 'helpers/vuex_action_helper';
 import * as actions from 'ee/analytics/cycle_analytics/store/modules/filters/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/modules/filters/mutation_types';
 import initialState from 'ee/analytics/cycle_analytics/store/modules/filters/state';
-import createFlash from '~/flash';
-import { filterMilestones, filterUsers, filterLabels } from '../../../mock_data';
+import { filterLabels } from '../../../mock_data';
 
 const milestonesPath = 'fake_milestones_path';
 const labelsPath = 'fake_labels_path';
