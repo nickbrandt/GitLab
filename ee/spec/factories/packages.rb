@@ -249,6 +249,8 @@ FactoryBot.define do
     trait(:checksum_failure) do
       verification_failure { 'Could not calculate the checksum' }
     end
+
+    factory :package_file_with_file, traits: [:jar]
   end
 
   factory :maven_metadatum, class: 'Packages::Maven::Metadatum' do

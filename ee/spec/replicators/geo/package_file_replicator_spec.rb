@@ -7,5 +7,5 @@ RSpec.describe Geo::PackageFileReplicator do
 
   include_examples 'a blob replicator'
 
-  include_examples 'secondary counters', :package_file_registry
+  include_examples 'secondary counters', :geo_package_file_registry
 end

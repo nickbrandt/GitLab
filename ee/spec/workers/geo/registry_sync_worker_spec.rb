@@ -19,7 +19,7 @@ describe Geo::RegistrySyncWorker, :geo, :use_sql_query_cache_for_tracking_db do
   end
 
   it 'does not schedule anything when tracking database is not configured' do
-    create(:package_file_registry)
+    create(:geo_package_file_registry)
 
     expect(::Geo::EventWorker).not_to receive(:perform_async)
 
@@ -29,7 +29,7 @@ describe Geo::RegistrySyncWorker, :geo, :use_sql_query_cache_for_tracking_db do
   end
 
   it 'does not schedule anything when node is disabled' do
-    create(:package_file_registry)
+    create(:geo_package_file_registry)
 
     secondary.enabled = false
     secondary.save!
@@ -40,8 +40,8 @@ describe Geo::RegistrySyncWorker, :geo, :use_sql_query_cache_for_tracking_db do
   end
 
   it 'does not schedule duplicated jobs' do
-    package_file_1 = create(:package_file_registry)
-    package_file_2 = create(:package_file_registry)
+    package_file_1 = create(:geo_package_file_registry)
+    package_file_2 = create(:geo_package_file_registry)
 
     stub_const('Geo::Scheduler::SchedulerWorker::DB_RETRIEVE_BATCH_SIZE', 5)
     secondary.update!(files_max_capacity: 8)
@@ -63,8 +63,8 @@ describe Geo::RegistrySyncWorker, :geo, :use_sql_query_cache_for_tracking_db do
   end
 
   it 'does not schedule duplicated jobs because of query cache' do
-    package_file_1 = create(:package_file_registry)
-    package_file_2 = create(:package_file_registry)
+    package_file_1 = create(:geo_package_file_registry)
+    package_file_2 = create(:geo_package_file_registry)
 
     # We retrieve all the items in a single batch
     stub_const('Geo::Scheduler::SchedulerWorker::DB_RETRIEVE_BATCH_SIZE', 2)
@@ -105,7 +105,7 @@ describe Geo::RegistrySyncWorker, :geo, :use_sql_query_cache_for_tracking_db do
 
     allow_any_instance_of(::Gitlab::Geo::Replication::BlobDownloader).to receive(:execute).and_return(result_object)
 
-    create_list(:package_file_registry, 10)
+    create_list(:geo_package_file_registry, 10)
 
     expect(::Geo::EventWorker).to receive(:perform_async).exactly(10).times.and_call_original
     # For 10 downloads, we expect four database reloads:

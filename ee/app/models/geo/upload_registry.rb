@@ -26,6 +26,10 @@ class Geo::UploadRegistry < Geo::BaseRegistry
     ::Geo::FileRegistryRemovalWorker
   end
 
+  def self.find_registry_differences(range)
+    finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
+  end
+
   # If false, RegistryConsistencyService will frequently check the end of the
   # table to quickly handle new replicables.
   def self.has_create_events?
