@@ -79,16 +79,19 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       lfs_object = create(:lfs_object)
       job_artifact = create(:ci_job_artifact)
       upload = create(:upload)
+      package_file = create(:conan_package_file, :conan_package)
 
       expect(Geo::LfsObjectRegistry.where(lfs_object_id: lfs_object.id).count).to eq(0)
       expect(Geo::JobArtifactRegistry.where(artifact_id: job_artifact.id).count).to eq(0)
       expect(Geo::UploadRegistry.where(file_id: upload.id).count).to eq(0)
+      expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(0)
 
       subject.perform
 
       expect(Geo::LfsObjectRegistry.where(lfs_object_id: lfs_object.id).count).to eq(1)
       expect(Geo::JobArtifactRegistry.where(artifact_id: job_artifact.id).count).to eq(1)
       expect(Geo::UploadRegistry.where(file_id: upload.id).count).to eq(1)
+      expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(1)
     end
 
     context 'when geo_job_artifact_registry_ssot_sync is disabled' do
@@ -105,6 +108,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       it 'does not execute RegistryConsistencyService for Job Artifacts' do
         allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: 1000).and_call_original
         allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: 1000).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: 1000).and_call_original
 
         expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::JobArtifactRegistry, batch_size: 1000)
 
@@ -126,6 +130,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       it 'does not execute RegistryConsistencyService for Uploads' do
         allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::JobArtifactRegistry, batch_size: 1000).and_call_original
         allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: 1000).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: 1000).and_call_original
 
         expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::UploadRegistry, batch_size: 1000)
 

@@ -40,6 +40,25 @@ class Packages::PackageFile < ApplicationRecord
 
   update_project_statistics project_statistics_name: :packages_size
 
+  def self.replicables_for_geo_node
+    return self.all unless Gitlab::Geo.current_node.selective_sync?
+
+    query = ::Packages::Package.where(project_id: Gitlab::Geo.current_node.projects).select(:id)
+    cte = Gitlab::SQL::CTE.new(:restricted_packages, query)
+    replicable_table = self.arel_table
+
+    inner_join_restricted_packages =
+      cte.table
+        .join(replicable_table, Arel::Nodes::InnerJoin)
+        .on(cte.table[:id].eq(replicable_table[:package_id]))
+        .join_sources
+
+    self
+      .with(cte.to_arel)
+      .from(cte.table)
+      .joins(inner_join_restricted_packages)
+  end
+
   def update_file_metadata
     # The file.object_store is set during `uploader.store!`
     # which happens after object is inserted/updated

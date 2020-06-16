@@ -1252,9 +1252,9 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe 'package files secondary counters' do
     context 'when package registries available' do
       before do
-        create(:package_file_registry, :failed)
-        create(:package_file_registry, :failed)
-        create(:package_file_registry, :synced)
+        create(:geo_package_file_registry, :failed)
+        create(:geo_package_file_registry, :failed)
+        create(:geo_package_file_registry, :synced)
       end
 
       it 'returns the right number of failed and synced repos' do

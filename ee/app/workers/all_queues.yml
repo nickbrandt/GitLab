@@ -153,7 +153,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent: 
+  :idempotent: true
   :tags: []
 - :name: cronjob:geo_sidekiq_cron_config
   :feature_category: :geo_replication
