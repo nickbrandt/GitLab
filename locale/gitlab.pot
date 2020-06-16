@@ -5362,10 +5362,10 @@ msgstr ""
 msgid "ClusterIntegration|Select zone to choose machine type"
 msgstr ""
 
-msgid "ClusterIntegration|Send Cilium Logs"
+msgid "ClusterIntegration|Send Container Network Policies Logs"
 msgstr ""
 
-msgid "ClusterIntegration|Send ModSecurity Logs"
+msgid "ClusterIntegration|Send Web Application Firewall Logs"
 msgstr ""
 
 msgid "ClusterIntegration|Service Token"
@@ -25315,6 +25315,9 @@ msgid "We will automatically renew your %{strong}%{plan_name}%{strong_close} sub
 msgstr ""
 
 msgid "We've found no vulnerabilities"
+msgstr ""
+
+msgid "Web Application Firewall"
 msgstr ""
 
 msgid "Web IDE"
