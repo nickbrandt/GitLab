@@ -70,8 +70,7 @@ module FeatureFlagHelpers
 
   def expect_user_to_see_feature_flags_index_page
     expect(page).to have_css('h3.page-title', text: 'Feature Flags')
-    expect(page).to have_text('All')
-    expect(page).to have_text('Enabled')
-    expect(page).to have_text('Disabled')
+    expect(page).to have_text('Feature Flags')
+    expect(page).to have_text('Lists')
   end
 end

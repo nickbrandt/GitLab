@@ -23,3 +23,6 @@ export const LEGACY_FLAG = 'legacy_flag';
 export const NEW_FLAG_ALERT = s__(
   'FeatureFlags|Feature Flags will look different in the next milestone. No action is needed, but you may notice the functionality was changed to improve the workflow.',
 );
+
+export const FEATURE_FLAG_SCOPE = 'featureFlags';
+export const USER_LIST_SCOPE = 'userLists';
