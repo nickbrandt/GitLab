@@ -34,6 +34,8 @@ describe Packages::Composer::CreatePackageService do
 
           expect(created_package.name).to eq package_name
           expect(created_package.version).to eq 'dev-master'
+          expect(created_package.composer_metadatum.target_sha).to eq branch.target
+          expect(created_package.composer_metadatum.composer_json.to_json).to eq json
         end
       end
 

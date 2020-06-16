@@ -12,7 +12,8 @@ module Packages
         ::Packages::Package.transaction do
           ::Packages::Composer::Metadatum.upsert(
             package_id: created_package.id,
-            target_sha: target
+            target_sha: target,
+            composer_json: composer_json
           )
         end
       end
