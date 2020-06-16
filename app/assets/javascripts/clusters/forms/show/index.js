@@ -3,14 +3,13 @@ import IntegrationForm from '../components/integration_form.vue';
 
 
 export default () => {
-    console.log("my form function")
-
     const entryPoint = document.querySelector('#js-cluster-integration-form')
-    console.log(entryPoint)
+    const dataset = entryPoint.dataset;
 
     if(!entryPoint) {
         return;
     }
+
     new Vue({
         el: '#js-cluster-integration-form',
         render(createElement) {
