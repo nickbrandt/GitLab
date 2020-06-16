@@ -215,13 +215,7 @@ export default {
 
           <h5 class="mt-4">{{ s__('NetworkPolicies|Enforcement status') }}</h5>
           <p>{{ s__('NetworkPolicies|Choose whether to enforce this policy.') }}</p>
-          <gl-toggle
-            v-model="selectedPolicy.isEnabled"
-            :label-on="__('Enabled')"
-            :label-off="__('Disabled')"
-            label-position="right"
-            data-testid="policyToggle"
-          />
+          <gl-toggle v-model="selectedPolicy.isEnabled" data-testid="policyToggle" />
         </div>
       </template>
     </gl-drawer>

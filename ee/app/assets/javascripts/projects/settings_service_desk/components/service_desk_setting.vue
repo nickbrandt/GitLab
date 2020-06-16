@@ -91,8 +91,8 @@ export default {
       id="service-desk-checkbox"
       :value="isEnabled"
       class="d-inline-block align-middle mr-1"
-      :label-on="__('Service Desk is on')"
-      :label-off="__('Service Desk is off')"
+      label="Service desk"
+      label-position="left"
       @change="onCheckboxToggle"
     />
     <label class="align-middle" for="service-desk-checkbox">
