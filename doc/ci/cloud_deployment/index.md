@@ -87,8 +87,8 @@ GitLab provides a series of [CI templates that you can include in your project](
 To automate deployments of your application to your [Amazon Elastic Container Service](https://aws.amazon.com/ecs/) (AWS ECS)
 cluster, you can `include` the `Deploy-ECS.gitlab-ci.yml` template in your `.gitlab-ci.yml` file.
 
-GitLab also provides [Docker images](https://gitlab.com/gitlab-org/cloud-deploy/-/tree/master/aws) that can be used in you 'gitlab-ci.yml' file to simpligy working with AWS.
-Currently Availiable:
+GitLab also provides [Docker images](https://gitlab.com/gitlab-org/cloud-deploy/-/tree/master/aws) that can be used in your `gitlab-ci.yml` file to simplify working with AWS:
+
 - Use `registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest` to use AWS CLI commands.
 - Use `registry.gitlab.com/gitlab-org/cloud-deploy/aws-ecs:latest` to deploy your application to AWS ECS.
 
