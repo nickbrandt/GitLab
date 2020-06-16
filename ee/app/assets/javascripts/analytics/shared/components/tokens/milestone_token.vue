@@ -30,9 +30,12 @@ export default {
       return this.config.milestones;
     },
     filteredMilestones() {
-      return this.milestones.filter(
-        milestone => milestone.title.toLowerCase().indexOf(this.value.data?.toLowerCase()) !== -1,
-      );
+      return this.value?.data
+        ? this.milestones.filter(
+            milestone =>
+              milestone.title.toLowerCase().indexOf(this.value.data?.toLowerCase()) !== -1,
+          )
+        : this.milestones;
     },
   },
   methods: {
@@ -70,7 +73,7 @@ export default {
 </script>
 
 <template>
-  <gl-filtered-search-token :config="config" v-bind="{ ...this.$attrs }" v-on="$listeners">
+  <gl-filtered-search-token :config="config" v-bind="{ ...$props, ...$attrs }" v-on="$listeners">
     <template #view="{ inputValue }">
       <template v-if="config.symbol">{{ config.symbol }}</template
       >{{ inputValue }}

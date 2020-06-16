@@ -5,7 +5,7 @@ let state = null;
 
 describe('Filters mutations', () => {
   beforeEach(() => {
-    state = {};
+    state = { initialTokens: {}, milestones: {}, authors: {}, labels: {}, assignees: {} };
   });
 
   afterEach(() => {

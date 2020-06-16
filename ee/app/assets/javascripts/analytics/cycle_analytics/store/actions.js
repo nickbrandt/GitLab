@@ -234,6 +234,9 @@ export const removeStage = ({ dispatch, state }, stageId) => {
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
 
+export const setSelectedFilters = ({ commit }, filters) =>
+  commit(types.SET_SELECTED_FILTERS, filters);
+
 export const initializeCycleAnalyticsSuccess = ({ commit }) =>
   commit(types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS);
 

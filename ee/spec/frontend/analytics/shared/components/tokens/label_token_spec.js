@@ -3,7 +3,7 @@ import { GlFilteredSearchSuggestion, GlLoadingIcon } from '@gitlab/ui';
 import LabelToken from 'ee/analytics/shared/components/tokens/label_token.vue';
 import { mockLabels } from './mock_data';
 
-describe('MilestoneToken', () => {
+describe('LabelToken', () => {
   let wrapper;
   const defaultValue = { data: '' };
   const defaultConfig = {

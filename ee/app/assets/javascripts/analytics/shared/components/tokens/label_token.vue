@@ -69,21 +69,21 @@ export default {
 </script>
 
 <template>
-  <gl-filtered-search-token :config="config" v-bind="{ ...this.$attrs }" v-on="$listeners">
+  <gl-filtered-search-token :config="config" v-bind="{ ...$props, ...$attrs }" v-on="$listeners">
     <template #view="{ inputValue }">
-      <template v-if="config.symbol">{{ config.symbol }}</template>
-      {{ inputValue }}
+      <template v-if="config.symbol">{{ config.symbol }}</template
+      >{{ inputValue }}
     </template>
     <template #suggestions>
-      <gl-filtered-search-suggestion
-        v-for="suggestion in $options.defaultSuggestions"
-        :key="suggestion.value"
-        :value="suggestion.value"
-        >{{ suggestion.text }}</gl-filtered-search-suggestion
-      >
-      <gl-dropdown-divider v-if="config.isLoading || filteredLabels.length" />
       <gl-loading-icon v-if="config.isLoading" />
       <template v-else>
+        <gl-filtered-search-suggestion
+          v-for="suggestion in $options.defaultSuggestions"
+          :key="suggestion.value"
+          :value="suggestion.value"
+          >{{ suggestion.text }}</gl-filtered-search-suggestion
+        >
+        <gl-dropdown-divider v-if="config.isLoading || filteredLabels.length" />
         <gl-filtered-search-suggestion
           v-for="label in filteredLabels"
           ref="labelItem"

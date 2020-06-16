@@ -3002,6 +3002,9 @@ msgstr ""
 msgid "Assignee(s)"
 msgstr ""
 
+msgid "Assignees"
+msgstr ""
+
 msgid "Assigns %{assignee_users_sentence}."
 msgstr ""
 
