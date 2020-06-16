@@ -12,7 +12,6 @@ module VulnerabilitiesHelper
       timestamp: Time.now.to_i,
       create_issue_url: create_vulnerability_feedback_issue_path(vulnerability.finding.project),
       has_mr: !!vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
-      finding_json: vulnerability_finding_data(vulnerability),
       create_mr_url: create_vulnerability_feedback_merge_request_path(vulnerability.finding.project),
       discussions_url: discussions_project_security_vulnerability_path(vulnerability.project, vulnerability),
       notes_url: project_security_vulnerability_notes_path(vulnerability.project, vulnerability),
