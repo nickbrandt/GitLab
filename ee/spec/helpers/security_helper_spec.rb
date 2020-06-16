@@ -4,10 +4,6 @@ require 'spec_helper'
 
 RSpec.describe SecurityHelper do
   describe '#instance_security_dashboard_data' do
-    before do
-      stub_feature_flags(first_class_vulnerabilities: true)
-    end
-
     subject { instance_security_dashboard_data }
 
     it 'returns vulnerability, project, feedback, asset, and docs paths for the instance security dashboard' do

@@ -52,18 +52,6 @@ RSpec.describe Projects::Security::VulnerabilitiesController do
         expect(response.body).to have_text(vulnerability.title)
       end
     end
-
-    context 'when the feature flag is disabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: false)
-      end
-
-      it 'renders the 404 page' do
-        show_vulnerability
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
   end
 
   describe 'GET #discussions' do
@@ -84,18 +72,6 @@ RSpec.describe Projects::Security::VulnerabilitiesController do
       expect(response).to match_response_schema('entities/discussions')
 
       expect(json_response.pluck('id')).to eq([discussion_note.discussion_id])
-    end
-
-    context 'when the feature flag is disabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: false)
-      end
-
-      it 'renders the 404 page' do
-        show_vulnerability_discussion_list
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
     end
   end
 end

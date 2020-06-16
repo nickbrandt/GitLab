@@ -135,25 +135,6 @@ RSpec.describe ProjectsHelper do
 
       it { is_expected.to match(expected_core_values) }
 
-      context 'when the first_class_vulnerabilities available' do
-        let(:export_endpoint) { "/api/v4/security/projects/#{project.id}/vulnerability_exports" }
-        let(:expected_sub_hash) { hash_including(vulnerabilities_export_endpoint: export_endpoint) }
-
-        before do
-          allow(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true).and_return(true)
-        end
-
-        it { is_expected.to match(expected_sub_hash) }
-      end
-
-      context 'when the first_class_vulnerabilities is not available' do
-        before do
-          allow(::Feature).to receive(:enabled?).with(:first_class_vulnerabilities, project, default_enabled: true).and_return(false)
-        end
-
-        it { is_expected.not_to have_key(:vulnerabilities_export_endpoint) }
-      end
-
       context 'project without pipeline' do
         let(:expected_sub_hash) do
           hash_including(
@@ -187,7 +168,8 @@ RSpec.describe ProjectsHelper do
             ref_path: "#{project_path}/-/commits/#{project.default_branch}",
             pipeline_path: "#{project_path}/-/pipelines/#{pipeline.id}",
             pipeline_created: pipeline.created_at.to_s(:iso8601),
-            has_pipeline_data: 'true'
+            has_pipeline_data: 'true',
+            vulnerabilities_export_endpoint: "/api/v4/security/projects/#{project.id}/vulnerability_exports"
           )
         end
 
