@@ -47,9 +47,10 @@ module QA
 
           @group.visit!
           Page::Group::Show.perform(&:go_to_new_project)
-          Page::Project::New.perform do |new_page|
-            new_page.click_create_from_template_tab
 
+          QA::Flow::Project.go_to_create_project_from_template
+
+          Page::Project::New.perform do |new_page|
             expect(new_page).to have_text(built_in)
           end
 
@@ -84,6 +85,8 @@ module QA
           Resource::Group.fabricate_via_api!.visit!
 
           Page::Group::Show.perform(&:go_to_new_project)
+
+          QA::Flow::Project.go_to_create_project_from_template
 
           Page::Project::New.perform(&:go_to_create_from_template_instance_tab)
         end
@@ -128,6 +131,8 @@ module QA
           group.visit!
 
           Page::Group::Show.perform(&:go_to_new_project)
+
+          QA::Flow::Project.go_to_create_project_from_template
 
           Page::Project::New.perform(&:go_to_create_from_template_group_tab)
         end

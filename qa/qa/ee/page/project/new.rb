@@ -31,12 +31,10 @@ module QA
           end
 
           def go_to_create_from_template_group_tab
-            click_create_from_template_tab
             click_element(:group_templates_tab)
           end
 
           def go_to_create_from_template_instance_tab
-            click_create_from_template_tab
             click_element(:instance_templates_tab)
           end
 
