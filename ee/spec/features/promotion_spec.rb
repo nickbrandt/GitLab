@@ -315,8 +315,10 @@ RSpec.describe 'Promotions', :js do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
-      find('.js-weight-sidebar-callout .js-close-callout').click
+      within 'div.js-weight-sidebar-callout' do
+        find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
+        click_link "Don't show me this again"
+      end
 
       expect(page).not_to have_selector('.js-weight-sidebar-callout')
     end
