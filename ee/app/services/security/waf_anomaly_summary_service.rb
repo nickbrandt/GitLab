@@ -5,14 +5,16 @@ module Security
   # Queries ES and retrieves both total nginx requests & modsec violations
   #
   class WafAnomalySummaryService < ::BaseService
-    def initialize(environment:, interval: 'day', from: 30.days.ago.iso8601, to: Time.zone.now.iso8601)
+    def initialize(environment:, cluster: environment.deployment_platform&.cluster, interval: 'day', from: 30.days.ago.iso8601, to: Time.zone.now.iso8601, options: {})
       @environment = environment
+      @cluster = cluster
       @interval = interval
       @from = from
       @to = to
+      @options = options
     end
 
-    def execute
+    def execute(totals_only: false)
       return if elasticsearch_client.nil?
       return unless @environment.external_url
 
@@ -28,6 +30,8 @@ module Security
         nginx_total_requests = nginx_results.dig('hits', 'total').to_f
         modsec_total_requests = modsec_results.dig('hits', 'total').to_f
       end
+
+      return { total_traffic: nginx_total_requests, total_anomalous_traffic: modsec_total_requests } if totals_only
 
       anomalous_traffic_count = nginx_total_requests.zero? ? 0 : (modsec_total_requests / nginx_total_requests).round(2)
 
@@ -46,13 +50,13 @@ module Security
     end
 
     def elasticsearch_client
-      @elasticsearch_client ||= application_elastic_stack&.elasticsearch_client
+      @elasticsearch_client ||= application_elastic_stack&.elasticsearch_client(timeout: @options[:timeout])
     end
 
     private
 
     def application_elastic_stack
-      @application_elastic_stack ||= @environment.deployment_platform&.cluster&.application_elastic_stack
+      @application_elastic_stack ||= @cluster&.application_elastic_stack
     end
 
     def chart_above_v3?

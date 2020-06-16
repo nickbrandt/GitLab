@@ -34,7 +34,7 @@ module EE
 
         override :usage_data_counters
         def usage_data_counters
-          super + [::Gitlab::UsageDataCounters::LicensesList]
+          super + [::Gitlab::UsageDataCounters::LicensesList, ::Gitlab::UsageDataCounters::IngressModsecurityCounter]
         end
 
         override :uncached_data
