@@ -23,7 +23,6 @@ module QA
               push_rules.fill_commit_message_rule(@needed_phrase_limitation)
               push_rules.fill_deny_commit_message_rule(@deny_message_phrase_limitation)
               push_rules.check_prevent_secrets
-              push_rules.check_restrict_author
               push_rules.check_deny_delete_tag
               push_rules.click_submit
             end
@@ -81,11 +80,6 @@ module QA
             error: Regexp.escape('File name id_rsa was blacklisted by the pattern id_rsa$'))
         end
 
-        it 'restricts commits by user' do
-          expect_error_on_push(file: standard_file, user: @root,
-            error: Regexp.escape("Author '#{@root.email}' is not a member of team"))
-        end
-
         it 'restricts removal of tag' do
           tag = Resource::Tag.fabricate_via_api! do |tag|
             tag.project = @project
@@ -95,6 +89,31 @@ module QA
 
           expect_error_on_push(file: standard_file, tag: tag.name,
             error: 'You cannot delete a tag')
+        end
+      end
+
+      describe 'with commits restricted by author email to existing GitLab users' do
+        before do
+          prepare
+
+          Page::Project::Settings::Repository.perform do |repository|
+            repository.expand_push_rules do |push_rules|
+              push_rules.check_restrict_author
+              push_rules.click_submit
+            end
+          end
+        end
+
+        it 'rejects non-member users' do
+          non_member_user = Resource::User.new.tap do |user|
+            user.username = ''
+            user.password = ''
+            user.name = 'non_member_user'
+            user.email = 'non_member_user@non_member_user.com'
+          end
+
+          expect_error_on_push(file: standard_file, user: non_member_user,
+            error: Regexp.escape("Author '#{non_member_user.email}' is not a member of team"))
         end
       end
 
