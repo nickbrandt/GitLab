@@ -146,18 +146,18 @@ describe('Stacked column chart component', () => {
     });
 
     it('allows user to override legend label texts using props', () => {
-      wrapper.setProps({
+      const legendRelatedProps = {
         legendMinText: 'legendMinText',
         legendMaxText: 'legendMaxText',
         legendAverageText: 'legendAverageText',
         legendCurrentText: 'legendCurrentText',
+      };
+      wrapper.setProps({
+        ...legendRelatedProps,
       });
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(findChart().props().legendMinText).toBe('legendMinText');
-        expect(findChart().props().legendMaxText).toBe('legendMaxText');
-        expect(findChart().props().legendAverageText).toBe('legendAverageText');
-        expect(findChart().props().legendCurrentText).toBe('legendCurrentText');
+        expect(findChart().props()).toMatchObject(legendRelatedProps);
       });
     });
 
@@ -175,10 +175,6 @@ describe('Stacked column chart component', () => {
       it('should render an inline legend layout', () => {
         expect(findLegend().props('layout')).toBe('inline');
       });
-
-      it('matches the snapshot', () => {
-        expect(findLegend().element).toMatchSnapshot();
-      });
     });
 
     describe('when table legend layout prop is set', () => {
@@ -190,10 +186,6 @@ describe('Stacked column chart component', () => {
 
       it('should render a tabular legend layout', () => {
         expect(findLegend().props('layout')).toBe('table');
-      });
-
-      it('matches the snapshot', () => {
-        expect(findLegend().element).toMatchSnapshot();
       });
     });
   });
