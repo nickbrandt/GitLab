@@ -14081,6 +14081,9 @@ msgstr ""
 msgid "Metrics|Create metric"
 msgstr ""
 
+msgid "Metrics|Current"
+msgstr ""
+
 msgid "Metrics|Delete metric"
 msgstr ""
 
@@ -14129,6 +14132,9 @@ msgid "Metrics|Manage chart links"
 msgstr ""
 
 msgid "Metrics|Max"
+msgstr ""
+
+msgid "Metrics|Min"
 msgstr ""
 
 msgid "Metrics|Must be a valid PromQL query."
