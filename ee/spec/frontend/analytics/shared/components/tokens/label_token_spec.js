@@ -3,7 +3,7 @@ import { GlFilteredSearchSuggestion, GlLoadingIcon } from '@gitlab/ui';
 import LabelToken from 'ee/analytics/shared/components/tokens/label_token.vue';
 import { mockLabels } from './mock_data';
 
-describe('MilestoneToken', () => {
+describe('LabelToken', () => {
   let wrapper;
   const defaultValue = { data: '' };
   const defaultConfig = {
@@ -53,6 +53,23 @@ describe('MilestoneToken', () => {
         createComponent(null, { stubs });
 
         expect(findFilteredSearchSuggestion(dropdownIndex).text()).toEqual(text);
+      });
+    });
+
+    describe('hideDefaultOptions = true', () => {
+      it('does not render defualt suggestions', () => {
+        createComponent(
+          {
+            config: {
+              ...defaultConfig,
+              hideDefaultOptions: true,
+            },
+          },
+          { stubs },
+        );
+        const html = wrapper.html();
+        expect(html).not.toContain('None');
+        expect(html).not.toContain('Any');
       });
     });
 

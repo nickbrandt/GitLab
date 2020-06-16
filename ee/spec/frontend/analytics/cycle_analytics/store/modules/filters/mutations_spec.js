@@ -1,11 +1,17 @@
 import mutations from 'ee/analytics/cycle_analytics/store/modules/filters/mutations';
 import * as types from 'ee/analytics/cycle_analytics/store/modules/filters/mutation_types';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { filterMilestones, filterUsers, filterLabels } from '../../../mock_data';
 
 let state = null;
 
+const milestones = filterMilestones.map(convertObjectPropsToCamelCase);
+const users = filterUsers.map(convertObjectPropsToCamelCase);
+const labels = filterLabels.map(convertObjectPropsToCamelCase);
+
 describe('Filters mutations', () => {
   beforeEach(() => {
-    state = {};
+    state = { initialTokens: {}, milestones: {}, authors: {}, labels: {}, assignees: {} };
   });
 
   afterEach(() => {
