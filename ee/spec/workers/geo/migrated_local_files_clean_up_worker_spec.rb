@@ -141,61 +141,6 @@ RSpec.describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw, :use_sql_qu
     end
   end
 
-  context 'with job artifacts' do
-    let(:job_artifact_local) { create(:ci_job_artifact) }
-    let(:job_artifact_remote_1) { create(:ci_job_artifact, :remote_store, project: synced_project) }
-
-    before do
-      stub_artifacts_object_storage
-
-      create(:geo_job_artifact_registry, artifact_id: job_artifact_local.id)
-      create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id)
-    end
-
-    it 'schedules worker for artifact stored remotely and synced locally' do
-      expect(Geo::FileRegistryRemovalWorker).to receive(:perform_async).with('job_artifact', job_artifact_remote_1.id)
-      expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, job_artifact_local.id)
-
-      subject.perform
-    end
-
-    context 'with selective sync by namespace' do
-      let(:job_artifact_remote_2) { create(:ci_job_artifact, :remote_store, project: project_broken_storage) }
-
-      let(:secondary) { create(:geo_node, :local_storage_only, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-      before do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_2.id)
-      end
-
-      it 'schedules worker for artifact stored remotely and synced locally' do
-        expect(Geo::FileRegistryRemovalWorker).to receive(:perform_async).with('job_artifact', job_artifact_remote_2.id)
-        expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, job_artifact_remote_1.id)
-        expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, job_artifact_local.id)
-
-        subject.perform
-      end
-    end
-
-    context 'with selective sync by shard' do
-      let(:job_artifact_remote_2) { create(:ci_job_artifact, :remote_store, project: unsynced_project) }
-
-      let(:secondary) { create(:geo_node, :local_storage_only, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-      before do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_2.id)
-      end
-
-      it 'schedules worker for artifact stored remotely and synced locally' do
-        expect(Geo::FileRegistryRemovalWorker).to receive(:perform_async).with('job_artifact', job_artifact_remote_1.id)
-        expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, job_artifact_remote_2.id)
-        expect(Geo::FileRegistryRemovalWorker).not_to receive(:perform_async).with(anything, job_artifact_local.id)
-
-        subject.perform
-      end
-    end
-  end
-
   context 'backoff time' do
     let(:cache_key) { "#{described_class.name.underscore}:skip" }
 

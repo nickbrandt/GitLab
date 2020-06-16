@@ -329,58 +329,6 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
     end
   end
 
-  #   describe '#find_migrated_local' do
-  #     before do
-  #       create(:geo_job_artifact_registry, artifact_id: job_artifact_synced_project.id)
-  #       create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_synced_project.id)
-  #       create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_unsynced_project.id)
-  #       create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_broken_storage.id)
-  #     end
-
-  #     it 'returns job artifacts excluding ones from the exception list' do
-  #       job_artifacts = subject.find_migrated_local(batch_size: 10, except_ids: [job_artifact_remote_synced_project.id])
-
-  #       expect(job_artifacts).to match_ids(job_artifact_remote_unsynced_project, job_artifact_remote_broken_storage)
-  #     end
-
-  #     it 'includes synced job artifacts that are expired, exclude stored locally' do
-  #       job_artifacts = subject.find_migrated_local(batch_size: 10)
-
-  #       expect(job_artifacts).to match_ids(job_artifact_remote_synced_project, job_artifact_remote_unsynced_project,
-  #                                          job_artifact_remote_broken_storage)
-  #     end
-
-  #     context 'with selective sync by namespace' do
-  #       let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
-
-  #       it 'returns job artifacts remotely and successfully synced locally' do
-  #         job_artifacts = subject.find_migrated_local(batch_size: 10)
-
-  #         expect(job_artifacts).to match_ids(job_artifact_remote_synced_project)
-  #       end
-  #     end
-
-  #     context 'with selective sync by shard' do
-  #       let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
-
-  #       it 'returns job artifacts remotely and successfully synced locally' do
-  #         job_artifacts = subject.find_migrated_local(batch_size: 10)
-
-  #         expect(job_artifacts).to match_ids(job_artifact_remote_broken_storage)
-  #       end
-  #     end
-
-  #     context 'with object storage sync disabled' do
-  #       let(:secondary) { create(:geo_node, :local_storage_only) }
-
-  #       it 'returns job artifacts excluding ones from the exception list' do
-  #         job_artifacts = subject.find_migrated_local(batch_size: 10, except_ids: [job_artifact_remote_synced_project.id])
-
-  #         expect(job_artifacts).to match_ids(job_artifact_remote_unsynced_project, job_artifact_remote_broken_storage)
-  #       end
-  #     end
-  #   end
-
   describe '#find_retryable_failed_registries' do
     it 'returns registries for job artifacts that have failed to sync' do
       registry_ci_job_artifact_1 = create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_1.id)

@@ -80,16 +80,6 @@ module Geo
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def find_migrated_local(batch_size:, except_ids: [])
-      # all_job_artifacts
-      #   .inner_join_job_artifact_registry
-      #   .with_files_stored_remotely
-      #   .id_not_in(except_ids)
-      #   .limit(batch_size)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # rubocop: disable CodeReuse/ActiveRecord
     def find_retryable_failed_registries(batch_size:, except_ids: [])
       syncable
         .failed
