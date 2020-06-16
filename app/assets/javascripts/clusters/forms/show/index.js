@@ -7,12 +7,12 @@ export default () => {
 
     const entryPoint = document.querySelector('#js-cluster-integration-form')
     console.log(entryPoint)
+
     if(!entryPoint) {
         return;
     }
     new Vue({
         el: '#js-cluster-integration-form',
-       // store: createStore(entryPoint.dataset),
         render(createElement) {
           return createElement(IntegrationForm);
         },
