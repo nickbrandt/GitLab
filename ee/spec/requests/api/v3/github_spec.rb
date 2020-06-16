@@ -300,6 +300,15 @@ RSpec.describe API::V3::Github do
         it 'returns an array of projects belonging to group' do
           expect_project_under_namespace([project, project2], group, user)
         end
+
+        context 'with a private group' do
+          let(:group) { create(:group, :private) }
+          let!(:project2) { create(:project, :private, group: group) }
+
+          it 'returns an array of projects belonging to group' do
+            expect_project_under_namespace([project, project2], group, user)
+          end
+        end
       end
     end
 
