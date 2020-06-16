@@ -25215,6 +25215,9 @@ msgstr ""
 msgid "We've found no vulnerabilities"
 msgstr ""
 
+msgid "Web Application Firewall"
+msgstr ""
+
 msgid "Web IDE"
 msgstr ""
 

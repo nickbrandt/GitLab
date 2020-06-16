@@ -18,7 +18,7 @@ import modSecurityLogo from 'images/cluster_app_logos/gitlab.png';
 const { UPDATING, UNINSTALLING, INSTALLING, INSTALLED, UPDATED } = APPLICATION_STATUS;
 
 export default {
-  title: 'Web Application Firewall',
+  title: __('Web Application Firewall'),
   modsecurityUrl: 'https://modsecurity.org/about.html',
   components: {
     GlAlert,
