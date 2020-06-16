@@ -171,6 +171,14 @@
   :weight: 1
   :idempotent: 
   :tags: []
+- :name: cronjob:ingress_modsecurity_counter_metrics
+  :feature_category: :web_firewall
+  :has_external_dependencies: true
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
+  :tags: []
 - :name: cronjob:ldap_all_groups_sync
   :feature_category: :authentication_and_authorization
   :has_external_dependencies: true
