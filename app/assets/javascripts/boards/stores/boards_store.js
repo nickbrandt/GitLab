@@ -837,6 +837,11 @@ const boardsStore = {
       issue.assignees = obj.assignees.map(a => new ListAssignee(a));
     }
   },
+  addIssueLabel(issue, label) {
+    if (!issue.findLabel(label)) {
+      issue.labels.push(new ListLabel(label));
+    }
+  },
   updateIssue(issue) {
     const data = {
       issue: {
