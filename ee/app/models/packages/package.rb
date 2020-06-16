@@ -53,6 +53,13 @@ class Packages::Package < ApplicationRecord
     joins(:conan_metadatum).where(packages_conan_metadata: { package_username: package_username })
   end
 
+  scope :with_composer_target, -> (target) do
+    includes(:composer_metadatum)
+      .joins(:composer_metadatum)
+      .where(Packages::Composer::Metadatum.table_name => { target_sha: target })
+  end
+  scope :preload_composer, -> { preload(:composer_metadatum) }
+
   scope :without_nuget_temporary_name, -> { where.not(name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
 
   scope :has_version, -> { where.not(version: nil) }
