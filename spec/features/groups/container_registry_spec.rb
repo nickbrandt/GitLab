@@ -24,6 +24,13 @@ describe 'Container Registry', :js do
     expect(page).to have_title _('Container Registry')
   end
 
+  it 'sidebar menu is open' do
+    visit_container_registry
+
+    sidebar = find('.nav-sidebar')
+    expect(sidebar).to have_link _('Container Registry')
+  end
+
   context 'when there are no image repositories' do
     it 'list page has no container title' do
       visit_container_registry
