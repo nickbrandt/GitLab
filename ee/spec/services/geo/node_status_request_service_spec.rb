@@ -53,5 +53,19 @@ RSpec.describe Geo::NodeStatusRequestService, :geo do
         projects_count: 10
       }))
     end
+
+    it 'sends all of the data in the status JSONB field in the request' do
+      expect(Gitlab::HTTP).to receive(:perform_request)
+                                .with(
+                                  Net::HTTP::Post,
+                                  primary.status_url,
+                                  hash_including(
+                                    body: hash_including(
+                                      'status' => hash_including(
+                                        *GeoNodeStatus::RESOURCE_STATUS_FIELDS))))
+                                .and_return(double(success?: true))
+
+      subject.execute(create(:geo_node_status, :healthy))
+    end
   end
 end

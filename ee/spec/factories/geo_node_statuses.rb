@@ -20,6 +20,7 @@ FactoryBot.define do
       job_artifacts_synced_count { 577 }
       job_artifacts_synced_missing_on_primary_count { 91 }
       container_repositories_count { 400 }
+      container_repositories_registry_count { 203 }
       container_repositories_failed_count { 3 }
       container_repositories_synced_count { 200 }
       design_repositories_count { 400 }
