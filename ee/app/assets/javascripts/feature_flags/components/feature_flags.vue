@@ -7,6 +7,8 @@ import {
   GlDeprecatedButton,
   GlModalDirective,
   GlLink,
+  GlAlert,
+  GlSprintf,
 } from '@gitlab/ui';
 import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from '../constants';
 import FeatureFlagsTable from './feature_flags_table.vue';
@@ -36,6 +38,8 @@ export default {
     GlLoadingIcon,
     GlDeprecatedButton,
     GlLink,
+    GlAlert,
+    GlSprintf,
     ConfigureFeatureFlagsModal,
   },
   directives: {
@@ -66,6 +70,10 @@ export default {
       type: String,
       required: true,
     },
+    userListsApiDocPath: {
+      type: String,
+      required: true,
+    },
     rotateInstanceIdPath: {
       type: String,
       required: false,
@@ -93,6 +101,7 @@ export default {
     return {
       scope: getParameterByName('scope') || this.$options.scopes.featureFlags,
       page: getParameterByName('page') || '1',
+      isUserListAlertDismissed: false,
     };
   },
   scopes: {
@@ -261,6 +270,19 @@ export default {
         >
       </div>
     </h3>
+    <gl-alert v-if="!isUserListAlertDismissed" @dismiss="isUserListAlertDismissed = true">
+      <gl-sprintf
+        :message="
+          __('User Lists can only be created and modified with %{linkStart}the API%{linkEnd}')
+        "
+      >
+        <template #link="{ content }">
+          <gl-link :href="userListsApiDocPath" target="_blank">
+            {{ content }}
+          </gl-link>
+        </template>
+      </gl-sprintf>
+    </gl-alert>
 
     <div v-if="shouldRenderTabs" class="top-area scrolling-tabs-container inner-page-scroll-tabs">
       <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
