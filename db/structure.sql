@@ -10469,6 +10469,8 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications
 
 CREATE INDEX index_oauth_openid_requests_on_access_grant_id ON public.oauth_openid_requests USING btree (access_grant_id);
 
+CREATE INDEX index_on_author_id_and_entity_id_and_entity_type_and_id_desc ON public.audit_events USING btree (author_id, entity_id, entity_type, id DESC);
+
 CREATE UNIQUE INDEX index_on_deploy_keys_id_and_type_and_public ON public.keys USING btree (id, type) WHERE (public = true);
 
 CREATE INDEX index_on_id_partial_with_legacy_storage ON public.projects USING btree (id) WHERE ((storage_version < 2) OR (storage_version IS NULL));
@@ -14108,6 +14110,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200615123055
 20200615193524
 20200615232735
+20200616145031
 20200617000757
 20200617001001
 20200617001118
