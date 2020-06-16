@@ -8,6 +8,7 @@ import { getMonthNames } from '~/lib/utils/datetime_utility';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import { mergeUrlParams } from '~/lib/utils/url_utility';
 import IssuesAnalyticsTable from './issues_analytics_table.vue';
+import FilteredSearchIssueAnalytics from '../filtered_search_issues_analytics';
 import { transformFilters } from '../utils';
 
 export default {
@@ -91,15 +92,21 @@ export default {
     showFiltersEmptyState() {
       return !this.loading && !this.showChart && this.hasFilters;
     },
+    dataZoomConfig() {
+      const config = {
+        type: 'slider',
+        startValue: 0,
+      };
+
+      if (this.svgs['scroll-handle']) {
+        return { ...config, handleIcon: this.svgs['scroll-handle'] };
+      }
+
+      return config;
+    },
     chartOptions() {
       return {
-        dataZoom: [
-          {
-            type: 'slider',
-            startValue: 0,
-            handleIcon: this.svgs['scroll-handle'],
-          },
-        ],
+        dataZoom: [this.dataZoomConfig],
       };
     },
     series() {
@@ -134,6 +141,9 @@ export default {
     },
   },
   created() {
+    this.filterManager = new FilteredSearchIssueAnalytics(this.appliedFilters);
+    this.filterManager.setup();
+
     this.setSvg('scroll-handle');
   },
   mounted() {
