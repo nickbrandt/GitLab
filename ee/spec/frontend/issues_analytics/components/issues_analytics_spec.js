@@ -8,6 +8,13 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { createStore } from 'ee/issues_analytics/stores';
 
+const mockFilterManagerSetup = jest.fn();
+jest.mock('ee/issues_analytics/filtered_search_issues_analytics', () =>
+  jest.fn().mockImplementation(() => ({
+    setup: mockFilterManagerSetup,
+  })),
+);
+
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
