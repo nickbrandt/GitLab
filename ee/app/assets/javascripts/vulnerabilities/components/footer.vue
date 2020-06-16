@@ -6,27 +6,23 @@ import createFlash from '~/flash';
 import { s__, __ } from '~/locale';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
+import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import HistoryEntry from './history_entry.vue';
 import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
 
 export default {
   name: 'VulnerabilityFooter',
-  components: { IssueNote, SolutionCard, HistoryEntry },
+  components: { IssueNote, SolutionCard, MergeRequestNote, HistoryEntry },
   props: {
     discussionsUrl: {
       type: String,
       required: true,
     },
-    feedback: {
-      type: Object,
-      required: false,
-      default: null,
-    },
     notesUrl: {
       type: String,
       required: true,
     },
-    project: {
+    finding: {
       type: Object,
       required: true,
     },
@@ -53,11 +49,14 @@ export default {
           return acc;
         }, {});
     },
-    hasIssue() {
-      return Boolean(this.feedback?.issue_iid);
-    },
     hasSolution() {
-      return this.solutionInfo.solution || this.solutionInfo.hasRemediation;
+      return Boolean(this.solutionInfo.solution || this.solutionInfo.remediation);
+    },
+    project() {
+      return {
+        url: this.finding.project?.full_path,
+        value: this.finding.project?.full_name,
+      };
     },
   },
 
@@ -156,8 +155,20 @@ export default {
 <template>
   <div>
     <solution-card v-if="hasSolution" v-bind="solutionInfo" />
-    <div v-if="hasIssue" class="card">
-      <issue-note :feedback="feedback" :project="project" class="card-body" />
+
+    <div v-if="finding.issue_feedback || finding.merge_request_feedback" class="card">
+      <issue-note
+        v-if="finding.issue_feedback"
+        :feedback="finding.issue_feedback"
+        :project="project"
+        class="card-body"
+      />
+      <merge-request-note
+        v-if="finding.merge_request_feedback"
+        :feedback="finding.merge_request_feedback"
+        :project="project"
+        class="card-body"
+      />
     </div>
     <hr />
 
