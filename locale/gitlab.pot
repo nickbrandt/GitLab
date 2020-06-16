@@ -2671,6 +2671,9 @@ msgstr ""
 msgid "Approval rules"
 msgstr ""
 
+msgid "Approval rules reset to project defaults"
+msgstr ""
+
 msgid "ApprovalRuleRemove|%d member"
 msgid_plural "ApprovalRuleRemove|%d members"
 msgstr[0] ""
@@ -18960,6 +18963,9 @@ msgid "Reset runners registration token"
 msgstr ""
 
 msgid "Reset template"
+msgstr ""
+
+msgid "Reset to project defaults"
 msgstr ""
 
 msgid "Resetting the authorization key for this project will require updating the authorization key in every alert source it is enabled in."

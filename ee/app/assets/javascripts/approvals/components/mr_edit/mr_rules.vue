@@ -18,15 +18,11 @@ export default {
     EmptyRule,
     RuleInput,
   },
-  data() {
-    return {
-      targetBranch: '',
-    };
-  },
   computed: {
     ...mapState(['settings']),
     ...mapState({
       rules: state => state.approvals.rules,
+      targetBranch: state => state.approvals.targetBranch,
     }),
     hasNamedRule() {
       if (this.settings.allowMultiRule) {
@@ -60,14 +56,18 @@ export default {
       },
       immediate: true,
     },
+    targetBranch() {
+      this.fetchRules({ targetBranch: this.targetBranch });
+    },
   },
   mounted() {
     if (this.isEditPath) {
       this.mergeRequestTargetBranchElement = document.querySelector('#merge_request_target_branch');
+      const targetBranch = this.mergeRequestTargetBranchElement?.value;
 
-      this.targetBranch = this.mergeRequestTargetBranchElement?.value;
+      this.setTargetBranch(targetBranch);
 
-      if (this.targetBranch) {
+      if (targetBranch) {
         targetBranchMutationObserver = new MutationObserver(this.onTargetBranchMutation);
         targetBranchMutationObserver.observe(this.mergeRequestTargetBranchElement, {
           attributes: true,
@@ -85,13 +85,12 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setEmptyRule', 'addEmptyRule', 'fetchRules']),
+    ...mapActions(['setEmptyRule', 'addEmptyRule', 'fetchRules', 'setTargetBranch']),
     onTargetBranchMutation() {
       const selectedTargetBranchValue = this.mergeRequestTargetBranchElement.value;
 
       if (this.targetBranch !== selectedTargetBranchValue) {
-        this.targetBranch = selectedTargetBranchValue;
-        this.fetchRules(this.targetBranch);
+        this.setTargetBranch(selectedTargetBranchValue);
       }
     },
     indicatorText(rule) {
