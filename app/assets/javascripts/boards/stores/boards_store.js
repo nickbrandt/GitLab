@@ -812,6 +812,11 @@ const boardsStore = {
   updateIssueData(issue, newData) {
     Object.assign(issue, newData);
   },
+
+  setIssueFetchingState(issue, key, value) {
+    issue.isFetching[key] = value;
+  },
+
   refreshIssueData(issue, obj) {
     issue.id = obj.id;
     issue.iid = obj.iid;

@@ -80,7 +80,7 @@ class ListIssue {
   }
 
   setFetchingState(key, value) {
-    this.isFetching[key] = value;
+    boardsStore.setIssueFetchingState(this, key, value);
   }
 
   setLoadingState(key, value) {
