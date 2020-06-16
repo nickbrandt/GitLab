@@ -18,7 +18,7 @@ class AuditEventPresenter < Gitlab::View::Presenter::Simple
   end
 
   def ip_address
-    details[:ip_address]
+    audit_event.ip_address || details[:ip_address]
   end
 
   def details

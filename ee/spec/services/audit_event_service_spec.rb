@@ -64,10 +64,16 @@ RSpec.describe AuditEventService do
         expect(event[:details][:entity_path]).to eq(project.full_path)
       end
 
-      it 'has the IP address' do
+      it 'has the IP address in the details hash' do
         event = service.for_member(project_member).security_event
 
         expect(event[:details][:ip_address]).to eq(user.current_sign_in_ip)
+      end
+
+      it 'has the IP address stored in a separate attribute' do
+        event = service.for_member(project_member).security_event
+
+        expect(event.ip_address).to eq(user.current_sign_in_ip)
       end
     end
 
@@ -131,6 +137,7 @@ RSpec.describe AuditEventService do
         it 'defaults to the IP address in the details hash' do
           event = service.security_event
 
+          expect(event.ip_address).to eq('10.11.12.13')
           expect(event[:details][:ip_address]).to eq('10.11.12.13')
         end
       end
@@ -139,6 +146,7 @@ RSpec.describe AuditEventService do
         it 'has the user IP address' do
           event = service.security_event
 
+          expect(event.ip_address).to eq(user.current_sign_in_ip)
           expect(event[:details][:ip_address]).to eq(user.current_sign_in_ip)
         end
       end
@@ -151,6 +159,7 @@ RSpec.describe AuditEventService do
           event = service.security_event
 
           expect(event[:details][:ip_address]).to eq('192.168.88.88')
+          expect(event.ip_address).to eq('192.168.88.88')
         end
 
         it 'has the impersonator name' do
@@ -283,6 +292,7 @@ RSpec.describe AuditEventService do
       end
 
       it 'has the right IP address' do
+        expect(event.ip_address).to eq(ip_address)
         expect(event.details[:ip_address]).to eq(ip_address)
       end
     end
@@ -293,6 +303,7 @@ RSpec.describe AuditEventService do
       end
 
       it 'does not have the ip_address' do
+        expect(event.ip_address).to be_nil
         expect(event.details).not_to have_key(:ip_address)
       end
     end

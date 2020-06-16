@@ -16,7 +16,9 @@ RSpec.describe AuditEventPresenter do
     }
   end
 
-  let(:audit_event) { create(:audit_event, details: details) }
+  let(:audit_event) do
+    create(:audit_event, ip_address: '10.2.1.1', details: details)
+  end
 
   subject(:presenter) do
     described_class.new(audit_event)
@@ -100,8 +102,16 @@ RSpec.describe AuditEventPresenter do
     expect(presenter.target).to eq(details[:target_details])
   end
 
-  it 'exposes the ip address' do
-    expect(presenter.ip_address).to eq(details[:ip_address])
+  context 'exposes the ip address' do
+    it 'exposes the database value by default' do
+      expect(presenter.ip_address).to eq('10.2.1.1')
+    end
+
+    it 'falls back to the details hash' do
+      audit_event.update(ip_address:  nil)
+
+      expect(presenter.ip_address).to eq('127.0.0.1')
+    end
   end
 
   context 'exposes the object' do
