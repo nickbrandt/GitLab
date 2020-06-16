@@ -34,13 +34,14 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
 
   describe '#update_cache!' do
     it 'writes a cache' do
+      status = described_class.new
+
       rails_cache = double
       allow(Rails).to receive(:cache).and_return(rails_cache)
-      allow(rails_cache).to receive(:fetch).with('flipper:persisted_names', expires_in: 1.minute).and_return([described_class.cache_key])
 
       expect(rails_cache).to receive(:write).with(described_class.cache_key, kind_of(Hash))
 
-      described_class.new.update_cache!
+      status.update_cache!
     end
   end
 
@@ -1326,18 +1327,17 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
 
     context 'backward compatibility when counters stored in separate columns' do
       describe '#projects_count' do
-        it 'counts the number of projects' do
+        it 'returns data from the deprecated field if it is not defined in the status field' do
           subject.write_attribute(:projects_count, 10)
           subject.status = {}
 
           expect(subject.projects_count).to eq 10
         end
 
-        it 'sets data in both ways, deprecated and the new one' do
+        it 'sets data in the new status field' do
           subject.projects_count = 10
 
           expect(subject.projects_count).to eq 10
-          expect(subject.read_attribute(:projects_count)).to eq 10
         end
 
         it 'uses column counters when calculates percents using attr_in_percentage' do
@@ -1355,6 +1355,14 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
         subject.status = { "projects_count" => "10" }
 
         expect(subject.projects_count).to eq 10
+      end
+    end
+
+    context 'status booleans are converted into booleans' do
+      it 'returns boolean value' do
+        subject.status = { "repositories_replication_enabled" => "true" }
+
+        expect(subject.repositories_replication_enabled).to eq true
       end
     end
   end

@@ -7,9 +7,13 @@ module API
     resource :geo do
       helpers do
         def sanitized_node_status_params
-          allowed_attributes = GeoNodeStatus.attribute_names - ['id']
-          valid_attributes = params.keys & allowed_attributes
-          params.slice(*valid_attributes)
+          valid_attributes = GeoNodeStatus.attribute_names - GeoNodeStatus::RESOURCE_STATUS_FIELDS - ['id']
+          sanitized_params = params.slice(*valid_attributes)
+
+          # sanitize status field
+          sanitized_params['status'] = sanitized_params['status'].slice(*GeoNodeStatus::RESOURCE_STATUS_FIELDS) if sanitized_params['status']
+
+          sanitized_params
         end
 
         # Check if a Geo request is legit or fail the flow

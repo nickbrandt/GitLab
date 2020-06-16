@@ -20,6 +20,7 @@ FactoryBot.define do
       job_artifacts_synced_count { 577 }
       job_artifacts_synced_missing_on_primary_count { 91 }
       container_repositories_count { 400 }
+      container_repositories_registry_count { 203 }
       container_repositories_failed_count { 3 }
       container_repositories_synced_count { 200 }
       design_repositories_count { 400 }
@@ -55,6 +56,13 @@ FactoryBot.define do
       last_successful_status_check_timestamp { 2.minutes.ago }
       version { Gitlab::VERSION }
       revision { Gitlab.revision }
+      attachments_replication_enabled { true }
+      container_repositories_replication_enabled { false }
+      design_repositories_replication_enabled { true }
+      job_artifacts_replication_enabled { false }
+      lfs_objects_replication_enabled { true }
+      repositories_replication_enabled { true }
+      repository_verification_enabled { true }
     end
 
     trait :unhealthy do

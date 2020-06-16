@@ -1,0 +1,5 @@
+---
+title: 'Geo: Fix synchronization disabled on primary UI'
+merge_request: 33760
+author:
+type: fixed
