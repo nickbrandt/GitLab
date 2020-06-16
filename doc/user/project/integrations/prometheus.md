@@ -361,6 +361,13 @@ When **Metrics Dashboard YAML definition is invalid** at least one of the follow
 1. `query: can't be blank` [learn more](#metrics-metrics-properties)
 1. `query_range: can't be blank` [learn more](#metrics-metrics-properties)
 1. `unit: can't be blank` [learn more](#metrics-metrics-properties)
+1. `YAML syntax: The parsed YAML is too big`
+
+   This is displayed when the YAML file is larger than 1 MB.
+
+1. `YAML syntax: Invalid configuration format`
+
+   This is displayed when the YAML file is empty or does not contain valid YAML.
 
 Metrics Dashboard YAML definition validation information is also available as a [GraphQL API field](../../../api/graphql/reference/index.md#metricsdashboard)
 
