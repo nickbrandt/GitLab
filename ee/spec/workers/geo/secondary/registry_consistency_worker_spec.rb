@@ -94,28 +94,6 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(1)
     end
 
-    context 'when geo_job_artifact_registry_ssot_sync is disabled' do
-      let_it_be(:job_artifact) { create(:ci_job_artifact) }
-
-      before do
-        stub_feature_flags(geo_job_artifact_registry_ssot_sync: false)
-      end
-
-      it 'returns false' do
-        expect(subject.perform).to be_falsey
-      end
-
-      it 'does not execute RegistryConsistencyService for Job Artifacts' do
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: 1000).and_call_original
-
-        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::JobArtifactRegistry, batch_size: 1000)
-
-        subject.perform
-      end
-    end
-
     context 'when geo_file_registry_ssot_sync is disabled' do
       let_it_be(:upload) { create(:upload) }
 
