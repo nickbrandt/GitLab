@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+ux_paths_to_review = helper.changes_by_category[:frontend]
+
+unless ux_paths_to_review.empty?
+  message 'This merge request adds or changes files that may require a ' \
+    'review from the UX team.'
+
+  if GitlabDanger.new(helper.gitlab_helper).ci?
+    markdown(<<~MARKDOWN)
+      ## UX review
+
+      The following files may require a UX review:
+
+      * #{ux_paths_to_review.map { |path| "`#{path}`" }.join("\n* ")}
+
+      The review does not need to block merging this merge request. See the:
+
+      - [UX team members](https://about.gitlab.com/handbook/engineering/ux/#meet-some-of-our-team-members) for the appropriate UX team member for this review.
+      - [Documentation workflows](https://docs.gitlab.com/ee/development/documentation/workflow.html) for information on when to assign a merge request for review.
+    MARKDOWN
+  end
+end
