@@ -19905,6 +19905,9 @@ msgstr ""
 msgid "Select a timezone"
 msgstr ""
 
+msgid "Select a weight for the storage new repositories will be placed on."
+msgstr ""
+
 msgid "Select all"
 msgstr ""
 
@@ -19984,9 +19987,6 @@ msgid "Select target branch"
 msgstr ""
 
 msgid "Select the branch you want to set as the default for this project. All merge requests and commits will automatically be made against this branch unless you specify a different one."
-msgstr ""
-
-msgid "Select the configured storage available for new repositories to be placed on."
 msgstr ""
 
 msgid "Select the custom project template source group."
