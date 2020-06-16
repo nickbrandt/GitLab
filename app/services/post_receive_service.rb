@@ -22,6 +22,9 @@ class PostReceiveService
 
     PostReceive.perform_async(params[:gl_repository], params[:identifier],
                               params[:changes], push_options.as_json)
+    
+    SecretDetectionWorker.perform_async(repository, params[:gl_repository], params[:identifier],
+                                        params[:changes], push_options.as_json)
 
     mr_options = push_options.get(:merge_request)
     if mr_options.present?
