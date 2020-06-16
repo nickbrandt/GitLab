@@ -486,4 +486,24 @@ RSpec.describe Ci::Build do
       expect(described_class.license_scan).to contain_exactly(build_with_license_scan)
     end
   end
+
+  describe 'ci_secrets_management_available?' do
+    subject(:build) { job.ci_secrets_management_available? }
+
+    context 'when secrets management feature is available' do
+      before do
+        stub_licensed_features(ci_secrets_management: true)
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context 'when secrets management feature is not available' do
+      before do
+        stub_licensed_features(ci_secrets_management: false)
+      end
+
+      it { is_expected.to be false }
+    end
+  end
 end
