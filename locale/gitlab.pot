@@ -15338,13 +15338,49 @@ msgstr ""
 msgid "On track"
 msgstr ""
 
+msgid "OnDemandScans|Attached branch"
+msgstr ""
+
+msgid "OnDemandScans|Attached branch is where the scan job runs."
+msgstr ""
+
+msgid "OnDemandScans|Could not run the scan. Please try again."
+msgstr ""
+
 msgid "OnDemandScans|Create new DAST scan"
+msgstr ""
+
+msgid "OnDemandScans|DAST will scan the target URL and any discovered sub URLs."
+msgstr ""
+
+msgid "OnDemandScans|New on-demand DAST scan"
 msgstr ""
 
 msgid "OnDemandScans|On-demand Scans"
 msgstr ""
 
+msgid "OnDemandScans|On-demand scans run outside the DevOps cycle and find vulnerabilities in your projects. %{learnMoreLinkStart}Learn more%{learnMoreLinkEnd}"
+msgstr ""
+
+msgid "OnDemandScans|Only a passive scan can be performed on demand."
+msgstr ""
+
+msgid "OnDemandScans|Passive DAST Scan"
+msgstr ""
+
+msgid "OnDemandScans|Please enter a valid URL format, ex: http://www.example.com/home"
+msgstr ""
+
+msgid "OnDemandScans|Run this scan"
+msgstr ""
+
+msgid "OnDemandScans|Scan mode"
+msgstr ""
+
 msgid "OnDemandScans|Schedule or run scans immediately against target sites. Currently available on-demand scan type: DAST. %{helpLinkStart}More information%{helpLinkEnd}"
+msgstr ""
+
+msgid "OnDemandScans|Target URL"
 msgstr ""
 
 msgid "Onboarding"
