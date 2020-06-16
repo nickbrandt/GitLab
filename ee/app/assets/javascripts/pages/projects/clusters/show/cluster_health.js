@@ -1,4 +1,4 @@
-import initCeBundle from '~/monitoring/monitoring_bundle';
+import initCeBundle from '~/monitoring/monitoring_app';
 
 export default () => {
   const el = document.getElementById('prometheus-graphs');
