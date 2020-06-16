@@ -3415,6 +3415,9 @@ msgstr ""
 msgid "Beta"
 msgstr ""
 
+msgid "Bi-weekly code coverage"
+msgstr ""
+
 msgid "Billing"
 msgstr ""
 
@@ -5573,6 +5576,15 @@ msgid "Clusters|An error occurred while loading clusters"
 msgstr ""
 
 msgid "Code"
+msgstr ""
+
+msgid "Code Coverage: %{coveragePercentage}%{percentSymbol}"
+msgstr ""
+
+msgid "Code Coverage| Empty code coverage data"
+msgstr ""
+
+msgid "Code Coverage|Couldn't fetch the code coverage data"
 msgstr ""
 
 msgid "Code Owners"
@@ -12510,6 +12522,9 @@ msgid "It must have a header row and at least two columns: the first column is t
 msgstr ""
 
 msgid "It seems like the Dependency Scanning job ran successfully, but no dependencies have been detected in your project."
+msgstr ""
+
+msgid "It seems that there is currently no available data for code coverage"
 msgstr ""
 
 msgid "It's you"
@@ -26705,6 +26720,9 @@ msgid "created %{timeago}"
 msgstr ""
 
 msgid "customize"
+msgstr ""
+
+msgid "data"
 msgstr ""
 
 msgid "date must not be after 9999-12-31"
