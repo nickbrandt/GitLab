@@ -1,0 +1,5 @@
+---
+title: Fix creating/updating issues with epic_iid parameter on API
+merge_request: 34641
+author:
+type: fixed

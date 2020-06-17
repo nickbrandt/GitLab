@@ -254,11 +254,26 @@ RSpec.describe API::Issues, :mailer do
             group.add_owner(user)
           end
 
-          it 'sets epic on issue' do
-            request
+          context 'with epic_id parameter' do
+            let(:params) { { title: 'issue with epic', epic_id: epic.id } }
 
-            expect(response).to have_gitlab_http_status(:success)
-            expect(json_response['epic_iid']).to eq(epic.iid)
+            it 'sets epic on issue' do
+              request
+
+              expect(response).to have_gitlab_http_status(:success)
+              expect(json_response['epic_iid']).to eq(epic.iid)
+            end
+          end
+
+          context 'with deprecated epic_iid parameter' do
+            let(:params) { { title: 'issue with epic', epic_iid: epic.iid } }
+
+            it 'sets epic on issue' do
+              request
+
+              expect(response).to have_gitlab_http_status(:success)
+              expect(json_response['epic_iid']).to eq(epic.iid)
+            end
           end
         end
 
