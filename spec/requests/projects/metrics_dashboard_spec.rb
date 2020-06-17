@@ -49,12 +49,12 @@ describe 'metrics dashboard page' do
     let(:dashboard_path) { '.gitlab/dashboards/dashboard_path.yml' }
 
     it 'returns 200' do
-      send_request(dashboard: dashboard_path)
+      send_request(dashboard_path: dashboard_path)
       expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'assigns environment0' do
-      send_request(dashboard: dashboard_path)
+      send_request(dashboard_path: dashboard_path)
       expect(assigns(:environment).id).to eq(environment.id)
     end
   end
@@ -63,18 +63,18 @@ describe 'metrics dashboard page' do
     let(:dashboard_path) { '.gitlab/dashboards/dashboard_path.yml' }
 
     it 'returns 200' do
-      send_request(dahboard: dashboard_path, environment: environment.id)
+      send_request(dahboard_path: dashboard_path, environment: environment.id)
       expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'assigns query param environment' do
-      send_request(dashboard: dashboard_path, environment: environment2.id)
+      send_request(dashboard_path: dashboard_path, environment: environment2.id)
       expect(assigns(:environment).id).to eq(environment2.id)
     end
 
     context 'when query param environment does not exist' do
       it 'responds with 404' do
-        send_request(dashboard: dashboard_path, environment: 99)
+        send_request(dashboard_path: dashboard_path, environment: 99)
         expect(response).to have_gitlab_http_status(:not_found)
       end
     end
