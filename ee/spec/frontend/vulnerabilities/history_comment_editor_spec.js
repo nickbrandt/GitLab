@@ -44,6 +44,28 @@ describe('History Comment Editor', () => {
     expect(wrapper.emitted().onSave[0][0]).toBe(comment);
   });
 
+  it('sanitizes a new comment to protect against an XSS attack', () => {
+    createWrapper();
+    const comment = '"><img src=x onerror=alert(document.domain)>';
+    const sanitizedComment = '"&gt;';
+    textarea().vm.$emit('input', comment);
+    saveButton().vm.$emit('click');
+
+    expect(wrapper.emitted().onSave).toHaveLength(1);
+    expect(wrapper.emitted().onSave[0][0]).toBe(sanitizedComment);
+  });
+
+  it('sanitizes a new comment to protect against an XSS attack using an iframe', () => {
+    createWrapper();
+    const comment = `"><iframe src='hxxps://nefarious.com'>'`;
+    const sanitizedComment = `"&gt;<iframe>'</iframe>`;
+    textarea().vm.$emit('input', comment);
+    saveButton().vm.$emit('click');
+
+    expect(wrapper.emitted().onSave).toHaveLength(1);
+    expect(wrapper.emitted().onSave[0][0]).toBe(sanitizedComment);
+  });
+
   it('emits the cancel event when the cancel button is clicked', () => {
     createWrapper();
     cancelButton().vm.$emit('click');

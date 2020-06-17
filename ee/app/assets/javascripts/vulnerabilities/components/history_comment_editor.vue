@@ -1,4 +1,5 @@
 <script>
+import sanitize from 'sanitize-html';
 import { GlFormTextarea, GlButton, GlLoadingIcon } from '@gitlab/ui';
 
 export default {
@@ -21,10 +22,10 @@ export default {
   },
   computed: {
     isSaveButtonDisabled() {
-      return this.isSaving || !this.trimmedComment.length;
+      return this.isSaving || !this.sanitizedComment.length;
     },
-    trimmedComment() {
-      return this.comment.trim();
+    sanitizedComment() {
+      return sanitize(this.comment.trim());
     },
   },
 };
@@ -43,7 +44,7 @@ export default {
         ref="saveButton"
         variant="success"
         :disabled="isSaveButtonDisabled"
-        @click="$emit('onSave', trimmedComment)"
+        @click="$emit('onSave', sanitizedComment)"
       >
         <gl-loading-icon v-if="isSaving" class="mr-1" />
         {{ __('Save comment') }}
