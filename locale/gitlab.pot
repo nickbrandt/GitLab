@@ -9512,6 +9512,12 @@ msgstr ""
 msgid "Failed to install."
 msgstr ""
 
+msgid "Failed to load assignees. Please try again."
+msgstr ""
+
+msgid "Failed to load authors. Please try again."
+msgstr ""
+
 msgid "Failed to load emoji list."
 msgstr ""
 

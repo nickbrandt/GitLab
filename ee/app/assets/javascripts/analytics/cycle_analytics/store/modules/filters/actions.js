@@ -93,3 +93,10 @@ export const setFilters = ({ dispatch, state }, params) => {
 
   return dispatch('setSelectedFilters', nextFilters, { root: true });
 };
+
+export const initialize = ({ dispatch, commit }, initialFilters) => {
+  commit(types.INITIALIZE, initialFilters);
+  return Promise.resolve()
+    .then(() => dispatch('setPaths', initialFilters))
+    .then(() => dispatch('setFilters', initialFilters));
+};

@@ -6,6 +6,29 @@ import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
 import LabelToken from '../../shared/components/tokens/label_token.vue';
 import UserToken from '../../shared/components/tokens/user_token.vue';
 
+const prepareTokens = ({
+  selectedMilestone = null,
+  selectedAuthor = null,
+  selectedAssignees = [],
+  selectedLabels,
+}) => {
+  const authorToken = selectedAuthor ? { type: 'author', value: { data: selectedAuthor } } : null;
+  const milestoneToken = selectedMilestone
+    ? { type: 'milestone', value: { data: selectedMilestone } }
+    : null;
+  const assigneeTokens = selectedAssignees.length
+    ? selectedAssignees.map(data => ({ type: 'assignees', value: { data } }))
+    : [];
+  const labelTokens = selectedLabels.length
+    ? selectedLabels.map(data => ({ type: 'labels', value: { data } }))
+    : [];
+
+  let initTokens = [...assigneeTokens, ...labelTokens];
+  if (authorToken) initTokens = [...initTokens, authorToken];
+  if (milestoneToken) initTokens = [...initTokens, milestoneToken];
+  return initTokens;
+};
+
 export default {
   name: 'FilterBar',
   components: {
@@ -33,6 +56,7 @@ export default {
       authorsLoading: state => state.authors.isLoading,
       assignees: state => state.assignees.data,
       assigneesLoading: state => state.assignees.isLoading,
+      initialTokens: state => state.initialTokens,
     }),
     availableTokens() {
       return [
@@ -81,8 +105,15 @@ export default {
       ];
     },
   },
+  mounted() {
+    this.initializeTokens();
+  },
   methods: {
     ...mapActions('filters', ['setFilters']),
+    initializeTokens() {
+      const preparedTokens = prepareTokens(this.initialTokens);
+      this.value = preparedTokens;
+    },
     processFilters(filters) {
       return filters.reduce((acc, token) => {
         const { type, value } = token;
