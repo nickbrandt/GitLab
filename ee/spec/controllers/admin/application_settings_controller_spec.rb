@@ -160,6 +160,33 @@ RSpec.describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'compliance frameworks' do
+      let(:settings) { { compliance_frameworks: [1, 2, 3, 4, 5] } }
+      let(:feature) { :admin_merge_request_approvers_rules }
+
+      context 'when feature flag is enabled' do
+        before do
+          stub_feature_flags(admin_compliance_merge_request_approval_settings: true)
+        end
+
+        it_behaves_like 'settings for licensed features'
+      end
+
+      context 'when feature flag is disabled' do
+        before do
+          stub_licensed_features(feature => true)
+          stub_feature_flags(admin_compliance_merge_request_approval_settings: false)
+        end
+
+        it 'does not update settings' do
+          attribute_names = settings.keys.map(&:to_s)
+
+          expect { put :update, params: { application_setting: settings } }
+            .not_to change { ApplicationSetting.current.reload.attributes.slice(*attribute_names) }
+        end
+      end
+    end
+
     context 'required instance ci template' do
       let(:settings) { { required_instance_ci_template: 'Auto-DevOps' } }
       let(:feature) { :required_ci_templates }
