@@ -91,6 +91,12 @@ RSpec.describe IterationsFinder do
       expect(subject.to_a).to contain_exactly(started_group_iteration)
     end
 
+    it 'filters by ID' do
+      params[:id] = iteration_from_project_1.id
+
+      expect(subject).to contain_exactly(iteration_from_project_1)
+    end
+
     context 'by timeframe' do
       it 'returns iterations with start_date and due_date between timeframe' do
         params.merge!(start_date: now - 1.day, end_date: 3.days.from_now)

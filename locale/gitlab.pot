@@ -6432,6 +6432,9 @@ msgstr ""
 msgid "Could not find design."
 msgstr ""
 
+msgid "Could not find iteration"
+msgstr ""
+
 msgid "Could not remove the trigger."
 msgstr ""
 
