@@ -115,5 +115,11 @@ export default {
     state.isSavingStageOrder = false;
     state.errorSavingStageOrder = true;
   },
-  [types.SET_SELECTED_FILTERS]() {},
+  [types.SET_SELECTED_FILTERS](state, params) {
+    const { selectedAuthor, selectedAssignees, selectedMilestone, selectedLabels } = params;
+    state.selectedAuthor = selectedAuthor;
+    state.selectedAssignees = selectedAssignees;
+    state.selectedMilestone = selectedMilestone;
+    state.selectedLabels = selectedLabels;
+  },
 };

@@ -60,7 +60,7 @@ describe('Cycle analytics actions', () => {
     ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
     ${'setSelectedStage'}    | ${'SET_SELECTED_STAGE'}    | ${'selectedStage'}      | ${{ id: 'someStageId' }}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
-    testAction(
+    return testAction(
       actions[action],
       payload,
       state,
@@ -198,7 +198,7 @@ describe('Cycle analytics actions', () => {
     });
 
     it(`dispatches actions for required value stream analytics analytics data`, () => {
-      testAction(
+      return testAction(
         actions.fetchCycleAnalyticsData,
         state,
         null,
@@ -648,9 +648,7 @@ describe('Cycle analytics actions', () => {
   });
 
   describe('receiveStageMedianValuesError', () => {
-    beforeEach(() => {});
-
-    it(`commits the ${types.RECEIVE_STAGE_MEDIANS_ERROR} mutation`, () => {
+    it(`commits the ${types.RECEIVE_STAGE_MEDIANS_ERROR} mutation`, () =>
       testAction(
         actions.receiveStageMedianValuesError,
         null,
@@ -661,8 +659,7 @@ describe('Cycle analytics actions', () => {
           },
         ],
         [],
-      );
-    });
+      ));
 
     it('will flash an error message', () => {
       actions.receiveStageMedianValuesError({ commit: () => {} });

@@ -100,11 +100,14 @@ export default {
       ];
     },
   },
+  created() {
+    this.fetchTokenData();
+  },
   mounted() {
     this.initializeTokens();
   },
   methods: {
-    ...mapActions('filters', ['setFilters']),
+    ...mapActions('filters', ['setFilters', 'fetchTokenData']),
     initializeTokens() {
       const {
         selectedMilestone: milestone = null,

@@ -18,9 +18,11 @@ describe('Filter bar', () => {
   let store;
 
   let setFiltersMock;
+  let fetchTokenDataMock;
 
   const createStore = (initialState = {}) => {
     setFiltersMock = jest.fn();
+    fetchTokenDataMock = jest.fn();
 
     return new Vuex.Store({
       modules: {
@@ -32,6 +34,7 @@ describe('Filter bar', () => {
           },
           actions: {
             setFilters: setFiltersMock,
+            fetchTokenData: fetchTokenDataMock,
           },
         },
       },
@@ -57,11 +60,19 @@ describe('Filter bar', () => {
       .props('availableTokens')
       .filter(token => token.type === type)[0];
 
-  it('renders GlFilteredSearch component', () => {
-    store = createStore();
-    wrapper = createComponent(store);
+  describe('default', () => {
+    beforeEach(() => {
+      store = createStore();
+      wrapper = createComponent(store);
+    });
 
-    expect(findFilteredSearch().exists()).toBe(true);
+    it('renders GlFilteredSearch component', () => {
+      expect(findFilteredSearch().exists()).toBe(true);
+    });
+
+    it('fetches the token data', () => {
+      expect(fetchTokenDataMock).toHaveBeenCalled();
+    });
   });
 
   describe('when the state has data', () => {

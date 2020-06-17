@@ -48,6 +48,18 @@ const defaultStubs = {
   GroupsDropdownFilter: true,
 };
 
+const initialCycleAnalyticsState = {
+  createdAfter: mockData.startDate,
+  createdBefore: mockData.endDate,
+  selectedMilestone: null,
+  selectedAuthor: null,
+  selectedAssignees: [],
+  selectedLabels: [],
+  milestonesPath,
+  labelsPath,
+  group: selectedGroup,
+};
+
 function createComponent({
   opts = {
     stubs: defaultStubs,
@@ -68,8 +80,6 @@ function createComponent({
       emptyStateSvgPath,
       noDataSvgPath,
       noAccessSvgPath,
-      milestonesPath,
-      labelsPath,
       baseStagesEndpoint: mockData.endpoints.baseStagesEndpoint,
       hideGroupDropDown,
       ...props,
@@ -601,30 +611,31 @@ describe('Cycle Analytics component', () => {
       name: 'New test group',
     };
 
+    const defaultParams = {
+      created_after: toYmd(mockData.startDate),
+      created_before: toYmd(mockData.endDate),
+      group_id: selectedGroup.fullPath,
+      'project_ids[]': [],
+      milestone_title: null,
+      author_username: null,
+      'assignee_username[]': [],
+      'label_name[]': [],
+    };
+
+    const selectedProjectIds = mockData.selectedProjects.map(({ id }) => id);
+
     beforeEach(() => {
       commonUtils.historyPushState = jest.fn();
       urlUtils.setUrlParams = jest.fn();
 
       mock = new MockAdapter(axios);
+      wrapper = createComponent();
 
-      wrapper = createComponent({
-        shallow: false,
-        scatterplotEnabled: false,
-        stubs: {
-          ...defaultStubs,
-        },
-      });
-
-      return wrapper.vm.$nextTick();
+      wrapper.vm.$store.dispatch('initializeCycleAnalytics', initialCycleAnalyticsState);
     });
 
     it('sets the created_after and created_before url parameters', () => {
-      return shouldSetUrlParams({
-        created_after: toYmd(mockData.startDate),
-        created_before: toYmd(mockData.endDate),
-        group_id: null,
-        'project_ids[]': [],
-      });
+      return shouldSetUrlParams(defaultParams);
     });
 
     describe('with hideGroupDropDown=true', () => {
@@ -635,31 +646,23 @@ describe('Cycle Analytics component', () => {
         mock = new MockAdapter(axios);
 
         wrapper = createComponent({
-          shallow: false,
-          scatterplotEnabled: false,
-          stubs: {
-            ...defaultStubs,
-          },
           props: {
             hideGroupDropDown: true,
           },
         });
 
         wrapper.vm.$store.dispatch('initializeCycleAnalytics', {
-          createdAfter: mockData.startDate,
-          createdBefore: mockData.endDate,
+          ...initialCycleAnalyticsState,
           group: fakeGroup,
         });
-
-        return wrapper.vm.$nextTick();
       });
 
       it('sets the group_id url parameter', () => {
         return shouldSetUrlParams({
+          ...defaultParams,
           created_after: toYmd(mockData.startDate),
           created_before: toYmd(mockData.endDate),
           group_id: null,
-          'project_ids[]': [],
         });
       });
     });
@@ -669,38 +672,56 @@ describe('Cycle Analytics component', () => {
         wrapper.vm.$store.dispatch('setSelectedGroup', {
           ...fakeGroup,
         });
-        return wrapper.vm.$nextTick();
       });
 
       it('sets the group_id url parameter', () => {
         return shouldSetUrlParams({
-          created_after: toYmd(mockData.startDate),
-          created_before: toYmd(mockData.endDate),
+          ...defaultParams,
           group_id: fakeGroup.fullPath,
-          'project_ids[]': [],
         });
       });
     });
 
     describe('with a group and selectedProjectIds set', () => {
-      const selectedProjectIds = mockData.selectedProjects.map(({ id }) => id);
-
       beforeEach(() => {
         wrapper.vm.$store.dispatch('setSelectedGroup', {
           ...selectedGroup,
         });
 
         wrapper.vm.$store.dispatch('setSelectedProjects', mockData.selectedProjects);
-
         return wrapper.vm.$nextTick();
       });
 
       it('sets the project_ids url parameter', () => {
         return shouldSetUrlParams({
+          ...defaultParams,
           created_after: toYmd(mockData.startDate),
           created_before: toYmd(mockData.endDate),
           group_id: selectedGroup.fullPath,
           'project_ids[]': selectedProjectIds,
+        });
+      });
+    });
+
+    describe.each`
+      stateKey               | payload                          | paramKey
+      ${'selectedMilestone'} | ${'12.0'}                        | ${'milestone_title'}
+      ${'selectedAuthor'}    | ${'rootUser'}                    | ${'author_username'}
+      ${'selectedAssignees'} | ${['rootUser', 'secondaryUser']} | ${'assignee_username[]'}
+      ${'selectedLabels'}    | ${['Afternix', 'Brouceforge']}   | ${'label_name[]'}
+    `('with a $stateKey updates the $paramKey url parameter', ({ stateKey, payload, paramKey }) => {
+      beforeEach(() => {
+        wrapper.vm.$store.dispatch('filters/setFilters', {
+          ...initialCycleAnalyticsState,
+          group: selectedGroup,
+          selectedProjects: mockData.selectedProjects,
+          [stateKey]: payload,
+        });
+      });
+      it(`sets the ${paramKey} url parameter`, () => {
+        return shouldSetUrlParams({
+          ...defaultParams,
+          [paramKey]: payload,
         });
       });
     });
