@@ -27,7 +27,7 @@ module EE
             end
 
             def secrets_enabled?
-              ::Feature.enabled?(:ci_secrets_syntax, default_enabled: true)
+              ::Gitlab::Ci::Features.secrets_syntax_enabled?
             end
           end
         end
