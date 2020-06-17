@@ -13,6 +13,8 @@ describe('MrWidgetTerraformConainer', () => {
 
   const propsData = { endpoint: '/path/to/terraform/report.json' };
 
+  const findPlans = () => wrapper.findAll(TerraformPlan).wrappers.map(x => x.props('plan'));
+
   const mockPollingApi = (response, body, header) => {
     mock.onGet(propsData.endpoint).reply(response, body, header);
   };
@@ -44,7 +46,7 @@ describe('MrWidgetTerraformConainer', () => {
     it('diplays loading skeleton', () => {
       expect(wrapper.find(GlSkeletonLoading).exists()).toBe(true);
 
-      expect(wrapper.find(TerraformPlan).exists()).toBe(false);
+      expect(findPlans()).toEqual([]);
     });
   });
 
@@ -72,7 +74,7 @@ describe('MrWidgetTerraformConainer', () => {
       it('diplays terraform components and stops loading', () => {
         expect(wrapper.find(GlSkeletonLoading).exists()).toBe(false);
 
-        expect(wrapper.findAll(TerraformPlan).length).toEqual(Object.keys(plans).length);
+        expect(findPlans().length).toEqual(Object.keys(plans).length);
       });
 
       it('does not make additional requests after poll is successful', () => {
@@ -92,11 +94,7 @@ describe('MrWidgetTerraformConainer', () => {
       });
 
       it('generates one broken plan', () => {
-        const displayPlans = wrapper.findAll(TerraformPlan);
-
-        expect(displayPlans.length).toEqual(1);
-
-        expect(displayPlans.at(0).props('plan')).toEqual({});
+        expect(findPlans()).toEqual([{}]);
       });
 
       it('does not make additional requests after poll is unsuccessful', () => {

@@ -6,6 +6,8 @@ import TerraformPlan from '~/vue_merge_request_widget/components/terraform/terra
 describe('TerraformPlan', () => {
   let wrapper;
 
+  const findLogButton = () => wrapper.find('.js-terraform-report-link');
+
   const mountWrapper = propsData => {
     wrapper = shallowMount(TerraformPlan, { stubs: { GlLink, GlSprintf }, propsData });
   };
@@ -32,7 +34,8 @@ describe('TerraformPlan', () => {
     });
 
     it('renders button when url is found', () => {
-      expect(wrapper.text()).toContain('View full log');
+      expect(findLogButton().exists()).toBe(true);
+      expect(findLogButton().text()).toEqual('View full log');
     });
   });
 
@@ -50,7 +53,7 @@ describe('TerraformPlan', () => {
     });
 
     it('does not render button because url is missing', () => {
-      expect(wrapper.text()).not.toContain('View full log');
+      expect(findLogButton().exists()).toBe(false);
     });
   });
 });

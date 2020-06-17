@@ -12,7 +12,6 @@ export default {
   props: {
     plan: {
       required: true,
-      default: () => {},
       type: Object,
     },
   },
@@ -51,7 +50,9 @@ export default {
 
 <template>
   <div class="gl-display-flex">
-    <span class="append-right-default gl-align-self-start gl-mt-3">
+    <span
+      class="gl-display-flex gl-align-items-center gl-justify-content-center append-right-default gl-align-self-start gl-mt-1"
+    >
       <gl-icon name="status_warning" :size="24" />
     </span>
 
@@ -82,7 +83,7 @@ export default {
         </p>
       </div>
 
-      <div class="terraform-mr-plan-actions">
+      <div>
         <gl-link
           v-if="plan.job_path"
           :href="plan.job_path"

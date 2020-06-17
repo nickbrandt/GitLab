@@ -20,16 +20,20 @@ export default {
     return {
       loading: true,
       plans: {},
+      poll: null,
     };
   },
   created() {
     this.fetchPlans();
   },
+  beforeDestroy() {
+    this.poll.stop();
+  },
   methods: {
     fetchPlans() {
       this.loading = true;
 
-      const poll = new Poll({
+      this.poll = new Poll({
         resource: {
           fetchPlans: () => axios.get(this.endpoint),
         },
@@ -40,17 +44,17 @@ export default {
 
           if (Object.keys(this.plans).length) {
             this.loading = false;
-            poll.stop();
+            this.poll.stop();
           }
         },
         errorCallback: () => {
           this.plans = { bad_plan: {} };
           this.loading = false;
-          poll.stop();
+          this.poll.stop();
         },
       });
 
-      poll.makeRequest();
+      this.poll.makeRequest();
     },
   },
 };
