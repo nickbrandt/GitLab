@@ -1,5 +1,8 @@
 <script>
+import { mapState } from 'vuex';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+
+import OverrideDropdown from './override_dropdown.vue';
 import ActiveToggle from './active_toggle.vue';
 import JiraTriggerFields from './jira_trigger_fields.vue';
 import JiraIssuesFields from './jira_issues_fields.vue';
@@ -9,6 +12,7 @@ import DynamicField from './dynamic_field.vue';
 export default {
   name: 'IntegrationForm',
   components: {
+    OverrideDropdown,
     ActiveToggle,
     JiraTriggerFields,
     JiraIssuesFields,
@@ -49,6 +53,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(['overrideAvailable']),
     isJira() {
       return this.type === 'jira';
     },
@@ -61,6 +66,7 @@ export default {
 
 <template>
   <div>
+    <override-dropdown v-if="overrideAvailable" />
     <active-toggle v-if="showActive" v-bind="activeToggleProps" />
     <jira-trigger-fields v-if="isJira" v-bind="triggerFieldsProps" />
     <trigger-fields v-else-if="triggerEvents.length" :events="triggerEvents" :type="type" />
