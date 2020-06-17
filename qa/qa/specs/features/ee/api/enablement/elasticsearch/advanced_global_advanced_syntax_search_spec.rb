@@ -44,7 +44,7 @@ module QA
       end
 
       context 'when searching for projects using advanced syntax' do
-        it 'searches in the project name' do
+        it 'searches in the project name', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/221251', type: :investigating } do
           expect_search_to_find_project("es-adv-*#{project_name_suffix}")
         end
 
