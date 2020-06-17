@@ -1,6 +1,8 @@
+
+
 = form_for @cluster, url: clusterable.cluster_path(@cluster), as: :cluster, html: { class: 'js-cluster-integration-form' } do |field|
   = form_errors(@cluster)
-  #js-cluster-integration-form { data: { endpoint: @cluster } }
+  #js-cluster-integration-form #{ClusterSerializer.new.represent_list(@cluster).to_json}
   .form-group
     .d-flex.align-items-center
       %h4.pr-2.m-0
@@ -24,7 +26,7 @@
         = s_("ClusterIntegration| is the default environment scope for this cluster. This means that all jobs, regardless of their environment, will use this cluster. %{environment_scope_start}More information%{environment_scope_end}").html_safe % { environment_scope_start: environment_scope_start, environment_scope_end: '</a>'.html_safe }
 
   .form-group
-    %h5= s_('zBase DOmain')
+    %h5= s_('Base Domain')
     = field.text_field :base_domain, class: 'col-md-6 form-control js-select-on-focus', data: { qa_selector: 'base_domain_field' }
     .form-text.text-muted
       - auto_devops_url = help_page_path('topics/autodevops/index')
@@ -41,5 +43,6 @@
 
   - if can?(current_user, :update_cluster, @cluster)
     .form-group
-      = field.submit _('Save Changes'), class: 'btn btn-success ', data: { qa_selector: 'save_changes_button'}
+      = field.submit _('Save Changes'), class: 'btn btn-success float-right ', data: { qa_selector: 'save_changes_button'}
+      &nbsp&nbsp
    
