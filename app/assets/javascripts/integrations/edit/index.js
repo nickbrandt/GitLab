@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { createStore } from './store';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import IntegrationForm from './components/integration_form.vue';
 
@@ -37,6 +38,7 @@ export default el => {
 
   return new Vue({
     el,
+    store: createStore(),
     render(createElement) {
       return createElement(IntegrationForm, {
         props: {
