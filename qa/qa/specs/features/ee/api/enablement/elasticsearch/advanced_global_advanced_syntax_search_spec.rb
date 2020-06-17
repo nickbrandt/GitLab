@@ -48,7 +48,7 @@ module QA
           expect_search_to_find_project("es-adv-*#{project_name_suffix}")
         end
 
-        it 'searches in the project description' do
+        it 'searches in the project description', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/221251', type: :investigating } do
           expect_search_to_find_project("unique +#{project_name_suffix}")
         end
       end
