@@ -7,6 +7,7 @@ import { __ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import epicUtils from '../utils/epic_utils';
 import { statusType } from '../constants';
@@ -23,6 +24,7 @@ export default {
     GitlabTeamMemberBadge: () =>
       import('ee_component/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue'),
   },
+  mixins: [glFeatureFlagsMixin()],
   computed: {
     ...mapState([
       'sidebarCollapsed',
@@ -32,6 +34,7 @@ export default {
       'created',
       'canUpdate',
       'confidential',
+      'newEpicWebUrl',
     ]),
     ...mapGetters(['isEpicOpen']),
     statusIcon() {
@@ -50,6 +53,11 @@ export default {
     },
     actionButtonText() {
       return this.isEpicOpen ? __('Close epic') : __('Reopen epic');
+    },
+    canCreate() {
+      const { canCreate } = this.$store.state;
+
+      return canCreate && this.glFeatures.createEpicForm;
     },
   },
   mounted() {
@@ -108,13 +116,22 @@ export default {
         </strong>
       </div>
     </div>
-    <div v-if="canUpdate" class="detail-page-header-actions js-issuable-actions">
+    <div class="detail-page-header-actions js-issuable-actions">
       <gl-deprecated-button
+        v-if="canUpdate"
         :loading="epicStatusChangeInProgress"
         :class="actionButtonClass"
         @click="toggleEpicStatus(isEpicOpen)"
         >{{ actionButtonText }}</gl-deprecated-button
       >
+
+      <gl-deprecated-button
+        v-if="canCreate"
+        class="btn btn-grouped btn-success btn-inverted js-new-epic-button"
+        :href="newEpicWebUrl"
+      >
+        {{ __('New epic') }}
+      </gl-deprecated-button>
     </div>
     <gl-deprecated-button
       :aria-label="__('Toggle sidebar')"
