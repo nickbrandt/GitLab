@@ -1,4 +1,5 @@
 <script>
+import { mapGetters } from 'vuex';
 import eventHub from '../event_hub';
 import { capitalize, lowerCase, isEmpty } from 'lodash';
 import { __, sprintf } from '~/locale';
@@ -59,6 +60,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['disableForm']),
     isCheckbox() {
       return this.type === 'checkbox';
     },
@@ -107,6 +109,7 @@ export default {
         id: this.fieldId,
         name: this.fieldName,
         state: this.valid,
+        disabled: this.disableForm,
       };
     },
     valid() {

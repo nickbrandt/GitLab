@@ -1,4 +1,5 @@
 <script>
+import { mapGetters } from 'vuex';
 import eventHub from '../event_hub';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { GlFormGroup, GlToggle } from '@gitlab/ui';
@@ -21,6 +22,9 @@ export default {
       activated: this.initialActivated,
     };
   },
+  computed: {
+    ...mapGetters(['disableForm']),
+  },
   mounted() {
     // Initialize view
     this.$nextTick(() => {
@@ -42,6 +46,7 @@ export default {
         v-model="activated"
         name="service[active]"
         class="gl-display-block gl-line-height-0"
+        :disabled="disableForm"
         @change="onToggle"
       />
     </gl-form-group>

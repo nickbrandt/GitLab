@@ -1,4 +1,5 @@
 <script>
+import { mapGetters } from 'vuex';
 import { startCase } from 'lodash';
 import { __ } from '~/locale';
 import { GlFormGroup, GlFormCheckbox, GlFormInput } from '@gitlab/ui';
@@ -32,6 +33,7 @@ export default {
     },
   },
   computed: {
+    ...mapGetters(['disableForm']),
     placeholder() {
       return placeholderForType[this.type];
     },
@@ -58,7 +60,11 @@ export default {
     <div id="trigger-fields" class="gl-pt-3">
       <gl-form-group v-for="event in events" :key="event.title" :description="event.description">
         <input :name="checkboxName(event.name)" type="hidden" value="false" />
-        <gl-form-checkbox v-model="event.value" :name="checkboxName(event.name)">
+        <gl-form-checkbox
+          v-model="event.value"
+          :name="checkboxName(event.name)"
+          :disabled="disableForm"
+        >
           {{ startCase(event.title) }}
         </gl-form-checkbox>
         <gl-form-input
@@ -66,6 +72,7 @@ export default {
           v-model="event.field.value"
           :name="fieldName(event.field.name)"
           :placeholder="placeholder"
+          :disabled="disableForm"
         />
       </gl-form-group>
     </div>
