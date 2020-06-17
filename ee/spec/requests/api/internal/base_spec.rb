@@ -256,7 +256,7 @@ RSpec.describe API::Internal::Base do
       end
 
       it 'returns the repository_http_path at the primary node' do
-        expect(Route).to receive(:find_source_of_path).and_return(project)
+        expect(Project).to receive(:find_by_full_path).and_return(project)
 
         lfs_auth_user(user.id, project)
 
