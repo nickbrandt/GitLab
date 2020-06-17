@@ -12,13 +12,13 @@ config:
 
 init:
   expect:
-    pipeline: created
+    pipeline: pending
     stages:
       test: skipped
-      deploy: created
+      deploy: pending
     jobs:
       test: manual
-      deploy: created
+      deploy: pending
 
 transitions:
   - event: enqueue
@@ -27,10 +27,10 @@ transitions:
       pipeline: pending
       stages:
         test: pending
-        deploy: created
+        deploy: pending
       jobs:
         test: pending
-        deploy: created
+        deploy: pending
 
   - event: run
     jobs: [test]
@@ -38,10 +38,10 @@ transitions:
       pipeline: running
       stages:
         test: running
-        deploy: created
+        deploy: pending
       jobs:
         test: running
-        deploy: created
+        deploy: pending
 
   - event: drop
     jobs: [test]
@@ -54,5 +54,13 @@ transitions:
         test: failed
         deploy: pending
 
-# TOOD: should we run deploy?
-# Further discussions: https://gitlab.com/gitlab-org/gitlab/-/issues/213080
+  - event: success
+    jobs: [deploy]
+    expect:
+      pipeline: success
+      stages:
+        test: success
+        deploy: success
+      jobs:
+        test: failed
+        deploy: success

@@ -836,23 +836,6 @@ shared_examples 'Pipeline Processing Service' do
     end
   end
 
-  context 'when a needed job is manual', :sidekiq_inline do
-    let!(:linux_build) { create_build('linux:build', stage: 'build', stage_idx: 0, when: 'manual', allow_failure: true) }
-    let!(:deploy) { create_build('deploy', stage: 'deploy', stage_idx: 1, scheduling_type: :dag) }
-
-    before do
-      create(:ci_build_need, build: deploy, name: 'linux:build')
-    end
-
-    it 'makes deploy DAG to be waiting for optional manual to finish' do
-      expect(process_pipeline).to be_truthy
-
-      expect(stages).to eq(%w(skipped created))
-      expect(all_builds.manual).to contain_exactly(linux_build)
-      expect(all_builds.created).to contain_exactly(deploy)
-    end
-  end
-
   private
 
   def all_builds

@@ -9,7 +9,6 @@ config:
     stage: deploy
     when: always
     script: exit 0
-    needs: [test]
 
 init:
   expect:

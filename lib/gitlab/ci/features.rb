@@ -45,6 +45,10 @@ module Gitlab
       def self.dependency_tree_for_dag?
         ::Feature.enabled?(:ci_dependency_tree_for_dag)
       end
+
+      def self.dag_behaves_same_as_stage?
+        ::Feature.enabled?(:ci_dag_behaves_same_as_stage)
+      end
     end
   end
 end
