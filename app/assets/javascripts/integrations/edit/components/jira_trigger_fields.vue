@@ -1,5 +1,6 @@
 <script>
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { mapGetters } from 'vuex';
 import { s__ } from '~/locale';
 import { GlFormGroup, GlFormCheckbox, GlFormRadio } from '@gitlab/ui';
 
@@ -55,6 +56,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['disableForm']),
     showEnableComments() {
       return this.triggerCommit || this.triggerMergeRequest;
     },
@@ -74,12 +76,20 @@ export default {
       "
     >
       <input name="service[commit_events]" type="hidden" value="false" />
-      <gl-form-checkbox v-model="triggerCommit" name="service[commit_events]">
+      <gl-form-checkbox
+        v-model="triggerCommit"
+        name="service[commit_events]"
+        :disabled="disableForm"
+      >
         {{ __('Commit') }}
       </gl-form-checkbox>
 
       <input name="service[merge_requests_events]" type="hidden" value="false" />
-      <gl-form-checkbox v-model="triggerMergeRequest" name="service[merge_requests_events]">
+      <gl-form-checkbox
+        v-model="triggerMergeRequest"
+        name="service[merge_requests_events]"
+        :disabled="disableForm"
+      >
         {{ __('Merge request') }}
       </gl-form-checkbox>
     </gl-form-group>
@@ -90,7 +100,11 @@ export default {
       data-testid="comment-settings"
     >
       <input name="service[comment_on_event_enabled]" type="hidden" value="false" />
-      <gl-form-checkbox v-model="enableComments" name="service[comment_on_event_enabled]">
+      <gl-form-checkbox
+        v-model="enableComments"
+        name="service[comment_on_event_enabled]"
+        :disabled="disableForm"
+      >
         {{ s__('Integrations|Enable comments') }}
       </gl-form-checkbox>
     </gl-form-group>
@@ -106,6 +120,7 @@ export default {
         v-model="commentDetail"
         :value="commentDetailOption.value"
         name="service[comment_detail]"
+        :disabled="disableForm"
       >
         {{ commentDetailOption.label }}
         <template #help>
