@@ -46,6 +46,11 @@ module EE
               description: 'Packages of the project',
               resolver: ::Resolvers::PackagesResolver
 
+        field :compliance_frameworks, Types::ComplianceManagement::ComplianceFrameworkType.connection_type,
+              description: 'Compliance frameworks associated with the project',
+              resolver: ::Resolvers::ComplianceFrameworksResolver,
+              null: true
+
         def self.requirements_available?(project, user)
           ::Feature.enabled?(:requirements_management, project, default_enabled: true) && Ability.allowed?(user, :read_requirement, project)
         end

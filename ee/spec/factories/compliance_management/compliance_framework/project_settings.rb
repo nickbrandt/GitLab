@@ -5,8 +5,10 @@ FactoryBot.define do
     project
     framework { ComplianceManagement::ComplianceFramework::ProjectSettings.frameworks.keys.sample }
 
-    trait :sox do
-      framework { 'sox' }
+    ComplianceManagement::ComplianceFramework::ProjectSettings.frameworks.keys.each do |k|
+      trait k do
+        framework { k }
+      end
     end
   end
 end
