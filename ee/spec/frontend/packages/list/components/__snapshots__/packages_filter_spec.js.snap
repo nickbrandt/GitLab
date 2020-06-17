@@ -2,6 +2,7 @@
 
 exports[`packages_filter renders 1`] = `
 <gl-search-box-by-click-stub
+  clearable="true"
   clearbuttontitle="Clear"
   clearrecentsearchestext="Clear recent searches"
   closebuttontitle="Close"
