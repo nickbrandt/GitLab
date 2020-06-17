@@ -4,10 +4,10 @@ require 'spec_helper'
 
 describe 'metrics dashboard page' do
   # Further tests can be found at metrics_dashboard_controller_spec.rb
-  let(:project) { create(:project) }
-  let!(:environment) { create(:environment, project: project) }
-  let!(:environment2) { create(:environment, project: project) }
-  let(:user) { project.owner }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:environment) { create(:environment, project: project) }
+  let_it_be(:environment2) { create(:environment, project: project) }
+  let_it_be(:user) { project.owner }
 
   before do
     project.add_developer(user)
@@ -53,7 +53,7 @@ describe 'metrics dashboard page' do
       expect(response).to have_gitlab_http_status(:ok)
     end
 
-    it 'assigns environment0' do
+    it 'assigns environment' do
       send_request(dashboard_path: dashboard_path)
       expect(assigns(:environment).id).to eq(environment.id)
     end
