@@ -124,6 +124,7 @@ class License < ApplicationRecord
     enforce_pat_expiration
     prometheus_alerts
     pseudonymizer
+    release_evidence_test_artifacts
     report_approver_rules
     requirements
     sast
