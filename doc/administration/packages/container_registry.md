@@ -720,6 +720,8 @@ no longer directly accessible via the `:latest` tag.
 
 ### Recycling unused tags
 
+> [Introduced](https://gitlab.com/gitlab-org/omnibus-gitlab/-/merge_requests/987) in Omnibus GitLab 8.12.
+
 There are a couple of considerations you need to note before running the
 built-in command:
 
