@@ -157,6 +157,10 @@ RSpec.describe Gitlab::UsageData do
       expect(subject[:counts][:user_preferences_group_overview_details]).to eq(User.active.count - 2) # we have exactly 2 active users with security dashboard set
       expect(subject[:counts][:user_preferences_group_overview_security_dashboard]).to eq 2
     end
+
+    it 'includes a recording_ee_finished_at timestamp' do
+      expect(subject[:recording_ee_finished_at]).to be_a(Time)
+    end
   end
 
   describe '.features_usage_data_ee' do
@@ -718,14 +722,6 @@ RSpec.describe Gitlab::UsageData do
           )
         end
       end
-    end
-  end
-
-  describe '.recording_ee_finished_at' do
-    subject { described_class.recording_ee_finish_data }
-
-    it 'gathers time ee recording finishes at' do
-      expect(subject[:recording_ee_finished_at]).to be_a(Time)
     end
   end
 
