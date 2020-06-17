@@ -82,22 +82,22 @@ RSpec.describe API::Users do
       end
     end
 
-    describe 'POST /keys' do
-      let(:key_attrs) { attributes_for :key }
-
-      def make_request(endpoint, user)
-        post api(endpoint, user), params: key_attrs
-      end
-
+    describe 'POST /user/keys' do
       it 'creates audit event when user adds a new SSH key' do
+        key = attributes_for(:key)
+
         expect do
-          make_request("/user/keys", user)
+          post api('/user/keys', user), params: key
         end.to change { AuditEvent.count }.by(1)
       end
+    end
 
+    describe 'POST /users/:id/keys' do
       it 'creates audit event when admin adds a new key for a user' do
+        key = attributes_for(:key)
+
         expect do
-          make_request("/users/#{user.id}/keys", admin)
+          post api("/users/#{user.id}/keys", admin), params: key
         end.to change { AuditEvent.count }.by(1)
       end
     end
