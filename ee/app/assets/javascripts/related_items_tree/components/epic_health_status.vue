@@ -50,8 +50,10 @@ export default {
         {{ healthStatus.issuesOnTrack }}
       </span></span
     >
-    <span class="mr-1 mr-md-2 text-secondary health-label-long">{{ __('issues on track') }}</span>
-    <span class="mr-1 mr-md-2 text-secondary text-truncate health-label-short">{{
+    <span class="mr-1 mr-md-2 text-secondary health-label-long gl-display-none">{{
+      __('issues on track')
+    }}</span>
+    <span class="mr-1 mr-md-2 text-secondary text-truncate health-label-short gl-display-none">{{
       __('on track')
     }}</span>
 
@@ -60,10 +62,10 @@ export default {
         {{ healthStatus.issuesNeedingAttention }}
       </span></span
     >
-    <span class="mr-1 mr-md-2 text-secondary health-label-long">{{
+    <span class="mr-1 mr-md-2 text-secondary health-label-long gl-display-none">{{
       __('issues need attention')
     }}</span>
-    <span class="mr-1 mr-md-2 text-secondary text-truncate health-label-short">{{
+    <span class="mr-1 mr-md-2 text-secondary text-truncate health-label-short gl-display-none">{{
       __('need attention')
     }}</span>
 
@@ -72,7 +74,9 @@ export default {
         {{ healthStatus.issuesAtRisk }}
       </span></span
     >
-    <span class="text-secondary health-label-long">{{ __('issues at risk') }}</span>
-    <span class="text-secondary text-truncate health-label-short">{{ __('at risk') }}</span>
+    <span class="text-secondary health-label-long gl-display-none">{{ __('issues at risk') }}</span>
+    <span class="text-secondary text-truncate health-label-short gl-display-none">{{
+      __('at risk')
+    }}</span>
   </div>
 </template>
