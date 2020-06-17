@@ -17,7 +17,7 @@ describe('GeoReplicableItem', () => {
     initiateReplicableSync: jest.fn(),
   };
 
-  const propsData = {
+  const defaultProps = {
     name: mockReplicable.name,
     projectId: mockReplicable.projectId,
     syncStatus: mockReplicable.state,
@@ -26,11 +26,14 @@ describe('GeoReplicableItem', () => {
     lastChecked: null,
   };
 
-  const createComponent = () => {
+  const createComponent = (props = {}) => {
     wrapper = mount(GeoReplicableItem, {
       localVue,
       store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
-      propsData,
+      propsData: {
+        ...defaultProps,
+        ...props,
+      },
       methods: {
         ...actionSpies,
       },
@@ -45,6 +48,7 @@ describe('GeoReplicableItem', () => {
   const findGlLink = () => findCard().find(GlLink);
   const findGlButton = () => findCard().find(GlButton);
   const findCardHeader = () => findCard().find('.card-header');
+  const findTextTitle = () => findCardHeader().find('span');
   const findCardBody = () => findCard().find('.card-body');
 
   describe('template', () => {
@@ -64,22 +68,44 @@ describe('GeoReplicableItem', () => {
       expect(findCardBody().exists()).toBe(true);
     });
 
-    it('GlLink renders', () => {
-      expect(findGlLink().exists()).toBe(true);
-    });
-
-    describe('ReSync Button', () => {
-      it('renders', () => {
-        expect(findGlButton().exists()).toBe(true);
+    describe('with projectId', () => {
+      it('GlLink renders correctly', () => {
+        expect(findGlLink().exists()).toBe(true);
+        expect(findGlLink().text()).toBe(mockReplicable.name);
       });
 
-      it('calls initiateReplicableSync when clicked', () => {
-        findGlButton().trigger('click');
-        expect(actionSpies.initiateReplicableSync).toHaveBeenCalledWith({
-          projectId: propsData.projectId,
-          name: propsData.name,
-          action: ACTION_TYPES.RESYNC,
+      describe('ReSync Button', () => {
+        it('renders', () => {
+          expect(findGlButton().exists()).toBe(true);
         });
+
+        it('calls initiateReplicableSync when clicked', () => {
+          findGlButton().trigger('click');
+          expect(actionSpies.initiateReplicableSync).toHaveBeenCalledWith({
+            projectId: mockReplicable.projectId,
+            name: mockReplicable.name,
+            action: ACTION_TYPES.RESYNC,
+          });
+        });
+      });
+    });
+
+    describe('without projectId', () => {
+      beforeEach(() => {
+        createComponent({ projectId: null });
+      });
+
+      it('Text title renders correctly', () => {
+        expect(findTextTitle().exists()).toBe(true);
+        expect(findTextTitle().text()).toBe(mockReplicable.name);
+      });
+
+      it('GlLink does not render', () => {
+        expect(findGlLink().exists()).toBe(false);
+      });
+
+      it('ReSync Button does not render', () => {
+        expect(findGlButton().exists()).toBe(false);
       });
     });
   });
