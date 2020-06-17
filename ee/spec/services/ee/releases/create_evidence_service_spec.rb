@@ -39,5 +39,29 @@ describe Releases::CreateEvidenceService do
       service.execute
       expect(Releases::Evidence.last.summary['release']).not_to have_key('report_artifacts')
     end
+
+    it 'keeps build report artifacts if feature is licenced' do
+      stub_licensed_features(release_evidence_test_artifacts: true)
+
+      Ci::Build.update_all(artifacts_expire_at: 1.month.from_now)
+
+      service.execute
+
+      expect(build_with_artifacts.reload.artifacts_expire_at).to be_present
+      expect(build_test_report.reload.artifacts_expire_at).to be_nil
+      expect(build_coverage_report.reload.artifacts_expire_at).to be_nil
+    end
+
+    it 'does not keep artifacts if feature is unlicenced' do
+      stub_licensed_features(release_evidence_test_artifacts: false)
+
+      Ci::Build.update_all(artifacts_expire_at: 1.month.from_now)
+
+      service.execute
+
+      expect(build_with_artifacts.reload.artifacts_expire_at).to be_present
+      expect(build_test_report.reload.artifacts_expire_at).to be_present
+      expect(build_coverage_report.reload.artifacts_expire_at).to be_present
+    end
   end
 end
