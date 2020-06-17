@@ -40,21 +40,18 @@ rspec-complete:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
     - bundle install
     - bundle exec rspec
 ```
 
-To run the most relevant specs first instead of the whole suite, the
-[default configuration](https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Verify/FailFast.gitlab-ci.yml)
-can be included as a template:
+To run the most relevant specs first instead of the whole suite, [`include`](../../../ci/yaml/README.md#include)
+the template by adding the following to your CI/CD configuration:
 
 ```yaml
 include:
   - template: Verify/FailFast.gitlab-ci.yml
 ```
-
-To run the most relevant specs first instead of the whole suite, [`include`](../../../ci/yaml/README.md#include)
-the template by adding the following to your CI/CD configuration:
 
 ### Example test loads
 
@@ -71,4 +68,4 @@ will run the 100 tests for `example.rb`:
 - If all of these 100 tests pass, then the full `rspec-complete` suite of 1000 tests is allowed to run.
 - If any of these 100 tests fail, they will fail quickly, and `rspec-complete` will not run any tests.
 
-This saves resources and time as the full 1000 test suite does not run.
+The final case saves resources and time as the full 1000 test suite does not run.
