@@ -8,13 +8,7 @@ class Projects::MetricsDashboardController < Projects::ApplicationController
   end
 
   def metrics_dashboard_page
-    @environment = if metrics_dashboard_page_params[:environment]
-                     project.environments.find(metrics_dashboard_page_params[:environment])
-                   else
-                     project.default_environment
-                   end
-
-    if @environment
+    if environment
       render 'projects/environments/metrics'
     else
       render_404
@@ -22,6 +16,15 @@ class Projects::MetricsDashboardController < Projects::ApplicationController
   end
 
   private
+
+  def environment
+    @environment ||=
+      if metrics_dashboard_page_params[:environment]
+        project.environments.find(metrics_dashboard_page_params[:environment])
+      else
+        project.default_environment
+      end
+  end
 
   def metrics_dashboard_page_params
     params.permit(:environment)
