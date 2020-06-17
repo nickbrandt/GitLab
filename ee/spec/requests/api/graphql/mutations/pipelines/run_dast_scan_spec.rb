@@ -63,7 +63,7 @@ describe 'Running a DAST Scan' do
           allow(Ci::Pipeline).to receive(:create!).and_raise(StandardError)
         end
 
-        it_behaves_like 'a mutation that returns errors in the response', errors: ['Could not create pipeline']
+        it_behaves_like 'a mutation that returns errors in the response', errors: ['Pipeline could not be created']
       end
 
       context 'when the stage could not be created' do
@@ -71,7 +71,7 @@ describe 'Running a DAST Scan' do
           allow(Ci::Stage).to receive(:create!).and_raise(StandardError)
         end
 
-        it_behaves_like 'a mutation that returns errors in the response', errors: ['Could not create stage']
+        it_behaves_like 'a mutation that returns errors in the response', errors: ['Stage could not be created']
       end
 
       context 'when the build could not be created' do
@@ -79,7 +79,7 @@ describe 'Running a DAST Scan' do
           allow(Ci::Build).to receive(:create!).and_raise(StandardError)
         end
 
-        it_behaves_like 'a mutation that returns errors in the response', errors: ['Could not create build']
+        it_behaves_like 'a mutation that returns errors in the response', errors: ['Build could not be created']
       end
 
       context 'when the build could not be enqueued' do
@@ -87,7 +87,7 @@ describe 'Running a DAST Scan' do
           allow_any_instance_of(Ci::Build).to receive(:enqueue!).and_raise(StandardError)
         end
 
-        it_behaves_like 'a mutation that returns errors in the response', errors: ['Could not enqueue build']
+        it_behaves_like 'a mutation that returns errors in the response', errors: ['Build could not be enqueued']
       end
     end
   end
