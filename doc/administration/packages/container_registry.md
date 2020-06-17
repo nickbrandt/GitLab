@@ -775,6 +775,8 @@ that you have backed up all registry data.
 
 ### Performing garbage collection without downtime
 
+> [Introduced](https://gitlab.com/gitlab-org/omnibus-gitlab/-/merge_requests/764) in GitLab 8.8.
+
 You can perform a garbage collection without stopping the Container Registry by setting
 it into a read-only mode and by not using the built-in command. During this time,
 you will be able to pull from the Container Registry, but you will not be able to
