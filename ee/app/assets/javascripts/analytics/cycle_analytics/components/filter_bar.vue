@@ -6,27 +6,22 @@ import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
 import LabelToken from '../../shared/components/tokens/label_token.vue';
 import UserToken from '../../shared/components/tokens/user_token.vue';
 
-const prepareTokens = ({
-  selectedMilestone = null,
-  selectedAuthor = null,
-  selectedAssignees = [],
-  selectedLabels,
-}) => {
-  const authorToken = selectedAuthor ? { type: 'author', value: { data: selectedAuthor } } : null;
-  const milestoneToken = selectedMilestone
-    ? { type: 'milestone', value: { data: selectedMilestone } }
-    : null;
-  const assigneeTokens = selectedAssignees.length
-    ? selectedAssignees.map(data => ({ type: 'assignees', value: { data } }))
+export const prepareTokens = ({
+  milestone = null,
+  author = null,
+  assignees = [],
+  labels = [],
+} = {}) => {
+  const authorToken = author ? [{ type: 'author', value: { data: author } }] : [];
+  const milestoneToken = milestone ? [{ type: 'milestone', value: { data: milestone } }] : [];
+  const assigneeTokens = assignees?.length
+    ? assignees.map(data => ({ type: 'assignees', value: { data } }))
     : [];
-  const labelTokens = selectedLabels.length
-    ? selectedLabels.map(data => ({ type: 'labels', value: { data } }))
+  const labelTokens = labels?.length
+    ? labels.map(data => ({ type: 'labels', value: { data } }))
     : [];
 
-  let initTokens = [...assigneeTokens, ...labelTokens];
-  if (authorToken) initTokens = [...initTokens, authorToken];
-  if (milestoneToken) initTokens = [...initTokens, milestoneToken];
-  return initTokens;
+  return [...authorToken, ...milestoneToken, ...assigneeTokens, ...labelTokens];
 };
 
 export default {
@@ -111,7 +106,13 @@ export default {
   methods: {
     ...mapActions('filters', ['setFilters']),
     initializeTokens() {
-      const preparedTokens = prepareTokens(this.initialTokens);
+      const {
+        selectedMilestone: milestone = null,
+        selectedAuthor: author = null,
+        selectedAssignees: assignees = [],
+        selectedLabels: labels = [],
+      } = this.initialTokens;
+      const preparedTokens = prepareTokens({ milestone, author, assignees, labels });
       this.value = preparedTokens;
     },
     processFilters(filters) {
