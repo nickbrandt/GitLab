@@ -9,7 +9,7 @@ module Operations
 
     belongs_to :project
 
-    has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.operations_feature_flags&.maximum(:iid) }, backfill: true, presence: false
+    has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.operations_feature_flags&.maximum(:iid) }
 
     default_value_for :active, true
 
