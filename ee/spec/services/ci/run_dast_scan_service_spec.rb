@@ -12,8 +12,10 @@ describe Ci::RunDastScanService do
     subject { described_class.new(project: project, user: user).execute(branch: branch, target_url: target_url) }
 
     context 'when the user does not have permission to run a dast scan' do
-      it 'raises an exception'  do
-        expect { subject }.to raise_error(described_class::NotAllowed)
+      it 'raises an exeception with #full_messages populated' do
+        expect { subject }.to raise_error(Ci::RunDastScanService::RunError) do |error|
+          expect(error.full_messages[0]).to include('you don\'t have permission to perform this action')
+        end
       end
     end
 
@@ -110,8 +112,10 @@ describe Ci::RunDastScanService do
           allow(Ci::Pipeline).to receive(:create!).and_raise(StandardError)
         end
 
-        it 'raises an exception' do
-          expect { subject }.to raise_error(Ci::RunDastScanService::CreatePipelineError)
+        it 'raises an exeception with #full_messages populated' do
+          expect { subject }.to raise_error(Ci::RunDastScanService::RunError) do |error|
+            expect(error.full_messages).to include('Pipeline could not be created')
+          end
         end
       end
 
@@ -120,8 +124,10 @@ describe Ci::RunDastScanService do
           allow(Ci::Stage).to receive(:create!).and_raise(StandardError)
         end
 
-        it 'raises an exception' do
-          expect { subject }.to raise_error(Ci::RunDastScanService::CreateStageError)
+        it 'raises an exeception with #full_messages populated' do
+          expect { subject }.to raise_error(Ci::RunDastScanService::RunError) do |error|
+            expect(error.full_messages).to include('Stage could not be created')
+          end
         end
 
         it 'does not create a pipeline' do
@@ -134,8 +140,10 @@ describe Ci::RunDastScanService do
           allow(Ci::Build).to receive(:create!).and_raise(StandardError)
         end
 
-        it 'raises an exception' do
-          expect { subject }.to raise_error(Ci::RunDastScanService::CreateBuildError)
+        it 'raises an exeception with #full_messages populated' do
+          expect { subject }.to raise_error(Ci::RunDastScanService::RunError) do |error|
+            expect(error.full_messages).to include('Build could not be created')
+          end
         end
 
         it 'does not create a stage' do
@@ -148,12 +156,31 @@ describe Ci::RunDastScanService do
           allow_any_instance_of(Ci::Build).to receive(:enqueue!).and_raise(StandardError)
         end
 
-        it 'raises an exception' do
-          expect { subject }.to raise_error(Ci::RunDastScanService::EnqueueError)
+        it 'raises an exeception with #full_messages populated' do
+          expect { subject }.to raise_error(Ci::RunDastScanService::RunError) do |error|
+            expect(error.full_messages).to include('Build could not be enqueued')
+          end
         end
 
         it 'does not create a build' do
           expect { subject rescue nil }.not_to change(Ci::Pipeline, :count)
+        end
+      end
+
+      context 'when a validation error is raised' do
+        before do
+          klass = Ci::Pipeline
+          allow(klass).to receive(:create!).and_raise(
+            ActiveRecord::RecordInvalid, klass.new.tap do |pl|
+              pl.errors.add(:sha, 'can\'t be blank')
+            end
+          )
+        end
+
+        it 'raises an exeception with #full_messages populated' do
+          expect { subject }.to raise_error(Ci::RunDastScanService::RunError) do |error|
+            expect(error.full_messages).to include('Sha can\'t be blank')
+          end
         end
       end
     end
