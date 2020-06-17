@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlFilteredSearch } from '@gitlab/ui';
+import { GlFilteredSearch, GlSearchBoxByClick, GlTooltipDirective } from '@gitlab/ui';
 import { __ } from '~/locale';
 import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
 import LabelToken from '../../shared/components/tokens/label_token.vue';
@@ -10,6 +10,10 @@ export default {
   name: 'FilterBar',
   components: {
     GlFilteredSearch,
+    GlSearchBoxByClick,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     disabled: {
@@ -117,14 +121,23 @@ export default {
       });
     },
   },
+  placeholder: __('Filter results'),
 };
 </script>
 
 <template>
+  <gl-search-box-by-click
+    v-if="disabled"
+    v-gl-tooltip.hover
+    :title="s__('Select a project first')"
+    :placeholder="$options.placeholder"
+    :disabled="disabled"
+  />
   <gl-filtered-search
+    v-else
     v-model="value"
     :disabled="disabled"
-    :placeholder="__('Filter results')"
+    :placeholder="$options.placeholder"
     :clear-button-title="__('Clear')"
     :close-button-title="__('Close')"
     :available-tokens="availableTokens"

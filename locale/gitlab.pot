@@ -20028,6 +20028,9 @@ msgstr ""
 msgid "Select a project"
 msgstr ""
 
+msgid "Select a project first"
+msgstr ""
+
 msgid "Select a project to read Insights configuration file"
 msgstr ""
 
