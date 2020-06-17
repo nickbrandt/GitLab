@@ -328,7 +328,7 @@ module API
         user = User.find_by(id: params.delete(:id))
         not_found!('User') unless user
 
-        key = ::GpgKeys::CreateService.new(current_user, declared_params(include_missing: false).merge(user: user)).execute
+        key = ::GpgKeys::CreateService.new(user, declared_params(include_missing: false)).execute
 
         if key.persisted?
           present key, with: Entities::GpgKey
