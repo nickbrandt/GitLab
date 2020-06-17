@@ -17,4 +17,10 @@ export default () => ({
     isLoading: false,
     data: [],
   },
+  initialTokens: {
+    selectedMilestone: null,
+    selectedAuthor: null,
+    selectedAssignees: [],
+    selectedLabels: [],
+  },
 });

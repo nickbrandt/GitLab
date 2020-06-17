@@ -1,6 +1,22 @@
 import * as types from './mutation_types';
 
 export default {
+  [types.INITIALIZE](
+    state,
+    {
+      selectedAuthor = null,
+      selectedMilestone = null,
+      selectedAssignees = [],
+      selectedLabels = [],
+    } = {},
+  ) {
+    state.initialTokens = {
+      selectedAuthor,
+      selectedMilestone,
+      selectedAssignees,
+      selectedLabels,
+    };
+  },
   [types.SET_MILESTONES_PATH](state, milestonesPath) {
     state.milestonesPath = milestonesPath;
   },

@@ -25,6 +25,25 @@ describe('Filters actions', () => {
     mock.restore();
   });
 
+  describe('initialize', () => {
+    const initialData = {
+      milestonesPath,
+      labelsPath,
+      selectedAuthor: 'Mr cool',
+      selectedMilestone: 'NEXT',
+    };
+
+    it('initializes the state and dispatches setPaths and setFilters', () => {
+      return testAction(
+        actions.initialize,
+        initialData,
+        state,
+        [{ type: types.INITIALIZE, payload: initialData }],
+        [{ type: 'setPaths', payload: initialData }, { type: 'setFilters', payload: initialData }],
+      );
+    });
+  });
+
   describe('setFilters', () => {
     const nextFilters = {
       selectedAuthor: 'Mr cool',
