@@ -150,9 +150,9 @@ target users. See the [Ruby example](#ruby-application-example) below.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/35930) in GitLab 13.1.
 
-A feature flag may be enabled for a saved list of users. Under the hood, this is
-similar to [User IDs](#user-ids), but instead relies on lists created through
-the [User List API](../../../api/feature_flag_user_lists.md).
+A feature flag can be enabled for lists of users created with the [Feature Flag User List API](../../../api/feature_flag_user_lists.md).
+Similar to [User IDs](#user-ids), it uses the Unleash [`userWithId`](https://unleash.github.io/docs/activation_strategy#userwithid)
+activation strategy.
 
 ## Integrate feature flags with your application
 
