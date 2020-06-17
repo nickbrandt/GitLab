@@ -1,22 +1,21 @@
 <script>
 import { GlLink } from '@gitlab/ui';
-import dateFormat from 'dateformat';
+import { formatDate } from '~/lib/utils/datetime_utility';
 
 export default {
   components: {
     GlLink,
-  },
-  filters: {
-    date: value => {
-      const date = new Date(value);
-      return dateFormat(date, 'mmm d, yyyy', true);
-    },
   },
   props: {
     iterations: {
       type: Array,
       required: false,
       default: () => [],
+    },
+  },
+  methods: {
+    formatDate(date) {
+      return formatDate(date, 'mmm d, yyyy');
     },
   },
 };
@@ -32,7 +31,7 @@ export default {
           >
         </div>
         <div class="text-secondary gl-mb-3">
-          {{ iteration.startDate | date }}–{{ iteration.dueDate | date }}
+          {{ formatDate(iteration.startDate) }}–{{ formatDate(iteration.dueDate) }}
         </div>
       </li>
     </ul>

@@ -4,6 +4,7 @@ import createDefaultClient from '~/lib/graphql';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import Iterations from './components/iterations.vue';
 import IterationForm from './components/iteration_form.vue';
+import IterationReport from './components/iteration_report.vue';
 
 Vue.use(VueApollo);
 
@@ -41,6 +42,28 @@ export function initIterationForm() {
           groupPath: el.dataset.groupFullPath,
           previewMarkdownPath: el.dataset.previewMarkdownPath,
           iterationsListPath: el.dataset.iterationsListPath,
+        },
+      });
+    },
+  });
+}
+
+export function initIterationReport() {
+  const el = document.querySelector('.js-iteration');
+
+  const { groupPath, iterationId, editIterationPath } = el.dataset;
+  const canEdit = parseBoolean(el.dataset.canEdit);
+
+  return new Vue({
+    el,
+    apolloProvider,
+    render(createElement) {
+      return createElement(IterationReport, {
+        props: {
+          groupPath,
+          iterationId,
+          canEdit,
+          editIterationPath,
         },
       });
     },
