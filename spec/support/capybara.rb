@@ -165,7 +165,7 @@ RSpec.configure do |config|
           message = "Unable to access Chrome javascript console logs. You may be using an outdated version of ChromeDriver."
           raise JSConsoleError, message
         else
-          raise
+          raise error
         end
       end
     end
