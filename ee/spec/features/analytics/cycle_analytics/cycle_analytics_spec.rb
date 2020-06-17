@@ -556,7 +556,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
           it_behaves_like 'manual ordering disabled'
         end
 
-        context 'with at least one custom stage' do
+        context 'with at least one custom stage', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/216745' do
           shared_examples 'draggable stage' do |original_order, updated_order, start_index, end_index,|
             before do
               page.driver.browser.manage.window.resize_to(1650, 1150)
