@@ -55,7 +55,7 @@ export default {
           <audit-events-filter
             :enabled-token-types="enabledTokenTypes"
             :qa-selector="filterQaSelector"
-            :default-selected-tokens="filterValue"
+            :value="filterValue"
             @selected="setFilterValue"
             @submit="searchForAuditEvents"
           />

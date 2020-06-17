@@ -8,7 +8,7 @@ export default {
     GlFilteredSearch,
   },
   props: {
-    defaultSelectedTokens: {
+    value: {
       type: Array,
       required: false,
       default: () => [],
@@ -25,14 +25,9 @@ export default {
       default: undefined,
     },
   },
-  data() {
-    return {
-      searchTerms: [],
-    };
-  },
   computed: {
     searchTerm() {
-      return this.searchTerms.find(term => AVAILABLE_TOKEN_TYPES.includes(term.type));
+      return this.value.find(term => AVAILABLE_TOKEN_TYPES.includes(term.type));
     },
     enabledTokens() {
       return FILTER_TOKENS.filter(token => this.enabledTokenTypes.includes(token.type));
@@ -51,15 +46,12 @@ export default {
       return enabledTokens;
     },
   },
-  created() {
-    this.searchTerms = this.defaultSelectedTokens;
-  },
   methods: {
     onSubmit() {
       this.$emit('submit');
     },
-    onInput() {
-      this.$emit('selected', this.searchTerms);
+    onInput(val) {
+      this.$emit('selected', val);
     },
   },
 };
@@ -72,7 +64,7 @@ export default {
     :data-qa-selector="qaSelector"
   >
     <gl-filtered-search
-      v-model="searchTerms"
+      :value="value"
       :placeholder="__('Search')"
       :clear-button-title="__('Clear')"
       :close-button-title="__('Close')"

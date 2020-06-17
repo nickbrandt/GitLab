@@ -7,7 +7,7 @@ import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_events/constants';
 describe('AuditEventsFilter', () => {
   let wrapper;
 
-  const defaultSelectedTokens = [{ type: 'Project', value: { data: 1, operator: '=' } }];
+  const value = [{ type: 'Project', value: { data: 1, operator: '=' } }];
   const findFilteredSearch = () => wrapper.find(GlFilteredSearch);
   const getAvailableTokens = () => findFilteredSearch().props('availableTokens');
   const getAvailableTokenProps = type =>
@@ -44,11 +44,11 @@ describe('AuditEventsFilter', () => {
 
   describe('when the default token value is set', () => {
     beforeEach(() => {
-      initComponent({ defaultSelectedTokens });
+      initComponent({ value });
     });
 
     it('sets the filtered searched token', () => {
-      expect(findFilteredSearch().props('value')).toEqual(defaultSelectedTokens);
+      expect(findFilteredSearch().props('value')).toEqual(value);
     });
 
     it('only one token matching the selected token type is enabled', () => {

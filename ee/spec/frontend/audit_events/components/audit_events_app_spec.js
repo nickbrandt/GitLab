@@ -76,7 +76,7 @@ describe('AuditEventsApp', () => {
       expect(wrapper.find(AuditEventsFilter).props()).toEqual({
         enabledTokenTypes,
         qaSelector: filterQaSelector,
-        defaultSelectedTokens: TEST_FILTER_VALUE,
+        value: TEST_FILTER_VALUE,
       });
     });
 

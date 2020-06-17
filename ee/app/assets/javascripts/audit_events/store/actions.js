@@ -10,7 +10,7 @@ export const initializeAuditEvents = ({ commit }) => {
 };
 
 export const searchForAuditEvents = ({ state }) => {
-  visitUrl(setUrlParams(createAuditEventSearchQuery(state), undefined, true));
+  visitUrl(setUrlParams(createAuditEventSearchQuery(state)));
 };
 
 export const setDateRange = ({ commit, dispatch }, { startDate, endDate }) => {

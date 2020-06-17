@@ -32,6 +32,7 @@ describe('Audit Event Utils', () => {
         created_after: '2020-03-13',
         created_before: '2020-04-13',
         sort: 'bar',
+        page: null,
       });
     });
   });

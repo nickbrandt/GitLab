@@ -16,21 +16,15 @@ export const parseAuditEventSearchQuery = ({
 });
 
 export const createAuditEventSearchQuery = ({ filterValue, startDate, endDate, sortBy }) => {
-  const entityValues = filterValue.filter(value => AVAILABLE_TOKEN_TYPES.includes(value.type));
-  let searchQuery = {
+  const entityValue = filterValue.find(value => AVAILABLE_TOKEN_TYPES.includes(value.type));
+
+  return {
     created_after: startDate ? pikadayToString(startDate) : null,
     created_before: endDate ? pikadayToString(endDate) : null,
     sort: sortBy,
+    entity_id: entityValue?.value.data,
+    entity_type: entityValue?.type,
+    // When changing the search parameters, we should be resetting to the first page
+    page: null,
   };
-
-  if (entityValues.length) {
-    const {
-      type,
-      value: { data: id },
-    } = entityValues[0] || { type: null, value: { data: null } };
-
-    searchQuery = { ...searchQuery, entity_id: id, entity_type: type };
-  }
-
-  return searchQuery;
 };
