@@ -10,6 +10,12 @@ module EE
             extend ::Gitlab::Utils::Override
 
             prepended do
+              attributes :secrets
+
+              validations do
+                validates :secrets, absence: { message: 'feature is disabled' }, unless: :secrets_enabled?
+              end
+
               entry :secrets, ::Gitlab::Ci::Config::Entry::Secrets,
                 description: 'Configured secrets for this job',
                 inherit: false
@@ -18,6 +24,10 @@ module EE
             override :value
             def value
               super.merge({ secrets: secrets_value }.compact)
+            end
+
+            def secrets_enabled?
+              ::Feature.enabled?(:ci_secrets_syntax, default_enabled: true)
             end
           end
         end

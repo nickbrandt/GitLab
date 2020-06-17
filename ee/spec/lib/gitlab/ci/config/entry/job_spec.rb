@@ -6,19 +6,40 @@ RSpec.describe Gitlab::Ci::Config::Entry::Job do
   let(:entry) { described_class.new(config, name: :rspec) }
 
   describe 'validations' do
-    before do
-      entry.compose!
-    end
-
     context 'when entry value is correct' do
       context 'when has secrets' do
-        let(:config) { { script: 'echo', secrets: {} } }
+        let(:config) { { script: 'echo', secrets: { DATABASE_PASSWORD: { vault: 'production/db/password' } } } }
 
-        it { expect(entry).to be_valid }
+        context 'when ci_secrets_syntax feature flag is enabled' do
+          before do
+            stub_feature_flags(ci_secrets_syntax: true)
+            entry.compose!
+          end
+
+          it { expect(entry).to be_valid }
+        end
+
+        context 'when ci_secrets_syntax feature flag is disabled' do
+          before do
+            stub_feature_flags(ci_secrets_syntax: false)
+            entry.compose!
+          end
+
+          it 'returns an error' do
+            aggregate_failures do
+              expect(entry).not_to be_valid
+              expect(entry.errors).to include 'job secrets feature is disabled'
+            end
+          end
+        end
       end
     end
 
     context 'when entry value is not correct' do
+      before do
+        entry.compose!
+      end
+
       context 'when has needs' do
         context 'when needs is bridge type' do
           let(:config) do
