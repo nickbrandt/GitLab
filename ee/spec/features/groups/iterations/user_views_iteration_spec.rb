@@ -16,7 +16,7 @@ RSpec.describe 'User views iteration' do
     sign_in(user)
   end
 
-  context 'view an iteration', :js do
+  context 'view an iteration', :js, quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/222915' do
     before do
       visit group_iteration_path(iteration.group, iteration)
     end
