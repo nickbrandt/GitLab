@@ -7,6 +7,7 @@ class ClusterEntity < Grape::Entity
   expose :enabled
   expose :environment_scope
   expose :name
+  expose :domain
   expose :nodes
   expose :status_name, as: :status
   expose :status_reason

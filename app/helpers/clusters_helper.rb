@@ -6,6 +6,8 @@ module ClustersHelper
     false
   end
 
+
+
   def create_new_cluster_label(provider: nil)
     case provider
     when 'aws'

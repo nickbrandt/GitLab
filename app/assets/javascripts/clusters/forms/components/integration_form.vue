@@ -19,8 +19,27 @@ export default {
     },
 
     computed: {
-        ...mapState(['endpoint', 'tester']),
+        ...mapState(['clusterEnabled', 'clusterDomain', 'clusterEnvironmentScope']),
+       
     },
+
+    props: {
+       
+        clusterEnabled: {
+            type: Boolean, 
+            required: true,
+        }, 
+         clusterDomain: {
+            type: String, 
+            required: true,
+        }, 
+         clusterEnvironmentScope: {
+            type: String, 
+            required: true,
+        }, 
+                
+    },
+
 
     props: {
         //change this to @cluster.enabled?
@@ -47,7 +66,7 @@ export default {
         console.log("TOGGLED")
         console.log(e)
         console.log(this.tester)
-        console.log(this.endpoint)
+       // console.log(this.items)
         
     },
   },

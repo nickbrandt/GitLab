@@ -14,6 +14,7 @@ describe ClusterSerializer do
         :enabled,
         :environment_scope,
         :name,
+        :domain,
         :nodes,
         :path,
         :status)
