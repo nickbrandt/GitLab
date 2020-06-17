@@ -65,6 +65,19 @@ FactoryBot.define do
       repository_verification_enabled { true }
     end
 
+    trait :replicated_and_verified do
+      attachments_failed_count { 0 }
+      lfs_objects_failed_count { 0 }
+      job_artifacts_failed_count { 0 }
+      container_repositories_failed_count { 0 }
+      design_repositories_failed_count { 0 }
+      repositories_failed_count { 0 }
+      wikis_failed_count { 0 }
+      repositories_verification_failed_count { 0 }
+      wikis_verification_failed_count { 0 }
+      repositories_checked_failed_count { 0 }
+    end
+
     trait :unhealthy do
       status_message { "Could not connect to Geo node - HTTP Status Code: 401 Unauthorized\nTest" }
     end
