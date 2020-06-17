@@ -9,6 +9,10 @@ module EE
       alias_method :ee_authorize_admin_group!, :authorize_admin_group!
 
       before_action :ee_authorize_admin_group!, only: [:restore]
+
+      before_action do
+        push_frontend_feature_flag(:create_epic_form, @group)
+      end
     end
 
     override :render_show_html
