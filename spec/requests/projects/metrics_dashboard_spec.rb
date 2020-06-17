@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 describe 'metrics dashboard page' do
-  # Further tests can be found at metrics_dashboard_controller_spec.rb
   let_it_be(:project) { create(:project) }
   let_it_be(:environment) { create(:environment, project: project) }
   let_it_be(:environment2) { create(:environment, project: project) }
