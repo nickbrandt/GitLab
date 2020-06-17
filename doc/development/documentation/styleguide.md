@@ -750,16 +750,14 @@ _Internal_ refers to documentation in the same project. When linking to document
 separate projects (for example, linking to Omnibus docs from GitLab docs), you must use absolute
 URLs.
 
-We don't use absolute URLs like `https://docs.gitlab.com/ee/index.html` to crosslink
-to other docs within the same project. We need to use relative links like `../index.md`
-that link to `.md` files to:
+Do not use absolute URLs like `https://docs.gitlab.com/ee/index.html` to crosslink
+to other docs within the same project. Use relative links to the file, like `../index.md`. (These are converted to HTML when the site is rendered.)
 
-- Make crosslinks work in Review Apps, local previews, and `/help`.
-- Make crosslinks work when working on the docs locally, to verify that links to
-  other doc pages work before pushing new commits.
-- Make crosslinks work when browsing the doc files from within the `gitlab`, `gitlab-runner`,
-  `omnibus-gitlab`, and `charts` repositories. For example:
-  <https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc#gitlab-docs>.
+Relative linking enables crosslinks to work:
+
+- in Review Apps, local previews, and `/help`.
+- when working on the docs locally, so you can verify that they work as early as possible in the process.
+- within the GitLab UI when browsing doc files in their respective repositories. For example, the links displayed at <https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc#gitlab-docs>.
 
 To link to internal documentation:
 
