@@ -255,7 +255,7 @@ export default {
             <projects-dropdown-filter
               v-if="shouldDisplayFilters"
               :key="selectedGroup.id"
-              class="project-select"
+              class="js-projects-dropdown-filter project-select"
               :group-id="selectedGroup.id"
               :query-params="$options.projectsQueryParams"
               :multi-select="$options.multiProjectSelect"
