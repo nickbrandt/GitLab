@@ -62,10 +62,12 @@ RSpec.describe API::Users do
   end
 
   context 'extended audit events' do
+    before do
+      stub_licensed_features(extended_audit_events: true)
+    end
+
     describe "PUT /users/:id" do
       it "creates audit event when updating user with new password" do
-        stub_licensed_features(extended_audit_events: true)
-
         put api("/users/#{user.id}", admin), params: { password: '12345678' }
 
         expect(AuditEvent.count).to eq(1)
@@ -74,10 +76,28 @@ RSpec.describe API::Users do
 
     describe 'POST /users/:id/block' do
       it 'creates audit event when blocking user' do
-        stub_licensed_features(extended_audit_events: true)
-
         expect do
           post api("/users/#{user.id}/block", admin)
+        end.to change { AuditEvent.count }.by(1)
+      end
+    end
+
+    describe 'POST /keys' do
+      let(:key_attrs) { attributes_for :key }
+
+      def make_request(endpoint, user)
+        post api(endpoint, user), params: key_attrs
+      end
+
+      it 'creates audit event when user adds a new SSH key' do
+        expect do
+          make_request("/user/keys", user)
+        end.to change { AuditEvent.count }.by(1)
+      end
+
+      it 'creates audit event when admin adds a new key for a user' do
+        expect do
+          make_request("/users/#{user.id}/keys", admin)
         end.to change { AuditEvent.count }.by(1)
       end
     end
