@@ -248,8 +248,14 @@ module API
               name: :project_url,
               type: String,
               desc: 'The Buildkite pipeline URL'
+            },
+            {
+              required: false,
+              name: :enable_ssl_verification,
+              type: Boolean,
+              desc: 'DEPRECATED: This parameter has no effect since SSL verification will always be enabled'
             }
-          ],
+        ],
           'campfire' => [
             {
               required: true,

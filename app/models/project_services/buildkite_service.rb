@@ -8,7 +8,6 @@ class BuildkiteService < CiService
   ENDPOINT = "https://buildkite.com"
 
   prop_accessor :project_url, :token
-  boolean_accessor :enable_ssl_verification
 
   validates :project_url, presence: true, public_url: true, if: :activated?
   validates :token, presence: true, if: :activated?
@@ -17,6 +16,15 @@ class BuildkiteService < CiService
 
   def self.supported_events
     %w(push merge_request tag_push)
+  end
+
+  # Since SSL verification will always be enabled for Buildkite,
+  # we no longer needs to store the boolean.
+  # This is a stub method to work with deprecated API param.
+  # TODO: remove enable_ssl_verification after 14.0
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/222808
+  def enable_ssl_verification=(_value)
+    self.properties.delete('enable_ssl_verification') # Remove unused key
   end
 
   def webhook_url

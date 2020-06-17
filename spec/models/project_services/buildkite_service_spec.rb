@@ -57,12 +57,13 @@ RSpec.describe BuildkiteService, :use_clean_rails_memory_store_caching do
     end
 
     it 'always activates SSL verification after saved' do
+      service.create_service_hook(enable_ssl_verification: false)
+
       service.enable_ssl_verification = false
       service.active = true
 
-      service.save!
-
-      expect(service.reload.enable_ssl_verification).to be true
+      expect { service.save! }
+        .to change { service.service_hook.enable_ssl_verification }.from(false).to(true)
     end
 
     describe '#webhook_url' do
