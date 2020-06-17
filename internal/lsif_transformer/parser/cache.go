@@ -41,11 +41,10 @@ func (c *cache) Entry(id Id, data interface{}) error {
 }
 
 func (c *cache) Close() error {
-	if err := c.file.Close(); err != nil {
-		return err
-	}
-
-	return os.Remove(c.file.Name())
+	return combineErrors(
+		c.file.Close(),
+		os.Remove(c.file.Name()),
+	)
 }
 
 func (c *cache) setOffset(id Id) error {

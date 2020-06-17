@@ -89,15 +89,11 @@ func (h *Hovers) For(refId Id) json.RawMessage {
 }
 
 func (h *Hovers) Close() error {
-	if err := h.File.Close(); err != nil {
-		return err
-	}
-
-	if err := os.Remove(h.File.Name()); err != nil {
-		return err
-	}
-
-	return h.Offsets.Close()
+	return combineErrors(
+		h.File.Close(),
+		os.Remove(h.File.Name()),
+		h.Offsets.Close(),
+	)
 }
 
 func (h *Hovers) addData(line []byte) error {

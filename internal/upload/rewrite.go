@@ -140,7 +140,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 		inputReader = p
 	}
 
-	inputReader, err := rew.handleLsifUpload(inputReader, opts.LocalTempPath)
+	inputReader, err := rew.handleLsifUpload(ctx, inputReader, opts.LocalTempPath, filename)
 	if err != nil {
 		return err
 	}
@@ -170,7 +170,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 	return rew.filter.ProcessFile(ctx, name, fh, rew.writer)
 }
 
-func (rew *rewriter) handleLsifUpload(reader io.Reader, tempPath string) (io.Reader, error) {
+func (rew *rewriter) handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string) (io.Reader, error) {
 	if rew.preauth.ProcessLsif {
 		p, err := parser.NewParser(reader, tempPath)
 		if err != nil {
@@ -183,7 +183,9 @@ func (rew *rewriter) handleLsifUpload(reader io.Reader, tempPath string) (io.Rea
 		}
 
 		if err := p.Close(); err != nil {
-			return nil, err
+			log.WithContextFields(ctx, log.Fields{
+				"filename": filename,
+			}).Print("failed to close lsif parser: " + err.Error())
 		}
 
 		return z, nil
