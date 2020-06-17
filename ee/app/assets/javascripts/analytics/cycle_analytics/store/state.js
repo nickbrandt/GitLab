@@ -16,6 +16,10 @@ export default () => ({
   selectedGroup: null,
   selectedProjects: [],
   selectedStage: null,
+  selectedAuthor: null,
+  selectedMilestone: null,
+  selectedAssignees: [],
+  selectedLabels: [],
 
   currentStageEvents: [],
 

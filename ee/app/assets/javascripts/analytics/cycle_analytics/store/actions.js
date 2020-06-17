@@ -234,20 +234,27 @@ export const removeStage = ({ dispatch, state }, stageId) => {
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
 
-export const setSelectedFilters = ({ commit }, filters) =>
+export const setSelectedFilters = ({ commit, dispatch }, filters = {}) => {
   commit(types.SET_SELECTED_FILTERS, filters);
+  if (filters?.group?.fullPath) {
+    return dispatch('fetchCycleAnalyticsData');
+  }
+  return Promise.resolve();
+};
 
 export const initializeCycleAnalyticsSuccess = ({ commit }) =>
   commit(types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS);
 
 export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {}) => {
   commit(types.INITIALIZE_CYCLE_ANALYTICS, initialData);
-  if (initialData?.group?.fullPath) {
-    return dispatch('fetchCycleAnalyticsData').then(() =>
-      dispatch('initializeCycleAnalyticsSuccess'),
-    );
-  }
 
+  dispatch('filters/initialize', initialData);
+
+  if (initialData?.group?.fullPath) {
+    return Promise.resolve()
+      .then(() => dispatch('fetchCycleAnalyticsData'))
+      .then(() => dispatch('initializeCycleAnalyticsSuccess'));
+  }
   return dispatch('initializeCycleAnalyticsSuccess');
 };
 

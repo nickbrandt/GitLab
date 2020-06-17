@@ -59,10 +59,7 @@ describe('Filters actions', () => {
         [
           {
             type: 'setSelectedFilters',
-            payload: {
-              ...nextFilters,
-              selectedLabels: [],
-            },
+            payload: nextFilters,
           },
         ],
       );
@@ -79,7 +76,7 @@ describe('Filters actions', () => {
             type: 'setSelectedFilters',
             payload: {
               ...nextFilters,
-              selectedLabels: [filterLabels[1]],
+              selectedLabels: [filterLabels[1].title],
             },
           },
         ],
@@ -88,7 +85,7 @@ describe('Filters actions', () => {
   });
 
   describe('setPaths', () => {
-    it('sets the api paths and dispatches requests for initial data', () => {
+    it('sets the api paths', () => {
       return testAction(
         actions.setPaths,
         { milestonesPath, labelsPath },
@@ -97,6 +94,18 @@ describe('Filters actions', () => {
           { payload: 'fake_milestones_path.json', type: types.SET_MILESTONES_PATH },
           { payload: 'fake_labels_path.json', type: types.SET_LABELS_PATH },
         ],
+        [],
+      );
+    });
+  });
+
+  describe('fetchTokenData', () => {
+    it('dispatches requests for token data', () => {
+      return testAction(
+        actions.fetchTokenData,
+        { milestonesPath, labelsPath },
+        state,
+        [],
         [
           { type: 'fetchLabels' },
           { type: 'fetchMilestones' },

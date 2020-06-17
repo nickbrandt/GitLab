@@ -79,6 +79,12 @@ export const buildCycleAnalyticsInitialData = ({
   groupFullPath = null,
   groupParentId = null,
   groupAvatarUrl = null,
+  author = null,
+  milestone = null,
+  labels = null,
+  assignees = null,
+  labelsPath = '',
+  milestonesPath = '',
 } = {}) => ({
   group: groupId
     ? convertObjectPropsToCamelCase(
@@ -96,6 +102,12 @@ export const buildCycleAnalyticsInitialData = ({
   selectedProjects: projects
     ? buildProjectsFromJSON(projects).map(convertObjectPropsToCamelCase)
     : [],
+  selectedAuthor: author,
+  selectedMilestone: milestone,
+  selectedLabels: labels ? JSON.parse(labels) : [],
+  selectedAssignees: assignees ? JSON.parse(assignees) : [],
+  labelsPath,
+  milestonesPath,
 });
 
 export const filterBySearchTerm = (data = [], searchTerm = '', filterByKey = 'name') => {

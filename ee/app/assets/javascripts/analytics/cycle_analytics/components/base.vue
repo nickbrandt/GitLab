@@ -58,14 +58,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    milestonesPath: {
-      type: String,
-      required: true,
-    },
-    labelsPath: {
-      type: String,
-      required: true,
-    },
   },
   computed: {
     ...mapState([
@@ -76,6 +68,10 @@ export default {
       'selectedGroup',
       'selectedProjects',
       'selectedStage',
+      'selectedMilestone',
+      'selectedAuthor',
+      'selectedLabels',
+      'selectedAssignees',
       'stages',
       'summary',
       'currentStageEvents',
@@ -124,6 +120,10 @@ export default {
         'project_ids[]': this.selectedProjectIds,
         created_after: toYmd(this.startDate),
         created_before: toYmd(this.endDate),
+        milestone_title: this.selectedMilestone,
+        author_username: this.selectedAuthor,
+        'label_name[]': this.selectedLabels,
+        'assignee_username[]': this.selectedAssignees,
       };
     },
     stageCount() {
@@ -135,8 +135,6 @@ export default {
   },
   mounted() {
     const {
-      labelsPath,
-      milestonesPath,
       glFeatures: {
         cycleAnalyticsScatterplotEnabled: hasDurationChart,
         cycleAnalyticsScatterplotMedianEnabled: hasDurationChartMedian,
@@ -151,8 +149,6 @@ export default {
       hasPathNavigation,
       hasFilterBar,
     });
-
-    this.setPaths({ labelsPath, milestonesPath });
   },
   methods: {
     ...mapActions([
@@ -175,7 +171,6 @@ export default {
       'createStage',
       'clearFormErrors',
     ]),
-    ...mapActions('filters', ['setPaths']),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
