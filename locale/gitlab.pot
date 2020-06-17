@@ -21877,6 +21877,9 @@ msgstr ""
 msgid "Suggestions must all be on the same branch."
 msgstr ""
 
+msgid "Suggestions that change line count can't be added to batches, yet."
+msgstr ""
+
 msgid "Suggestions:"
 msgstr ""
 
