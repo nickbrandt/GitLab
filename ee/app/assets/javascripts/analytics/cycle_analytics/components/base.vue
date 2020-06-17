@@ -222,7 +222,6 @@ export default {
   },
   maxDateRange: DATE_RANGE_LIMIT,
   STAGE_ACTIONS,
-  commonFilterClasses: ['gl-display-flex gl-flex-direction-column gl-md-flex-direction-row'],
 };
 </script>
 <template>
@@ -242,36 +241,34 @@ export default {
           />
         </div>
         <div
-          :class="$options.commonFilterClasses"
-          class="gl-justify-content-space-between gl-align-items-center"
+          class="gl-display-flex gl-flex-direction-column gl-lg-flex-direction-row gl-justify-content-space-between"
         >
-          <groups-dropdown-filter
-            v-if="!hideGroupDropDown"
-            class="js-groups-dropdown-filter"
-            :query-params="$options.groupsQueryParams"
-            :default-group="selectedGroup"
-            @selected="onGroupSelect"
-          />
-          <projects-dropdown-filter
-            v-if="shouldDisplayFilters"
-            :key="selectedGroup.id"
-            class="js-projects-dropdown-filter gl-ml-0"
-            :group-id="selectedGroup.id"
-            :query-params="$options.projectsQueryParams"
-            :multi-select="$options.multiProjectSelect"
-            :default-projects="selectedProjects"
-            @selected="onProjectsSelect"
-          />
+          <div class="dropdown-container d-flex flex-column flex-lg-row">
+            <groups-dropdown-filter
+              v-if="!hideGroupDropDown"
+              class="js-groups-dropdown-filter"
+              :class="{ 'mr-lg-3': shouldDisplayFilters }"
+              :query-params="$options.groupsQueryParams"
+              :default-group="selectedGroup"
+              @selected="onGroupSelect"
+            />
+            <projects-dropdown-filter
+              v-if="shouldDisplayFilters"
+              :key="selectedGroup.id"
+              class="js-projects-dropdown-filter project-select"
+              :group-id="selectedGroup.id"
+              :query-params="$options.projectsQueryParams"
+              :multi-select="$options.multiProjectSelect"
+              :default-projects="selectedProjects"
+              @selected="onProjectsSelect"
+            />
+          </div>
           <filter-bar
             v-if="featureFlags.hasFilterBar"
-            class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 mx-2"
+            class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3"
             :disabled="!hasProject"
           />
-          <div
-            v-if="shouldDisplayFilters"
-            :class="$options.commonFilterClasses"
-            class="gl-justify-content-end gl-white-space-nowrap"
-          >
+          <div v-if="shouldDisplayFilters" class="gl-justify-content-end gl-white-space-nowrap">
             <date-range
               :start-date="startDate"
               :end-date="endDate"
