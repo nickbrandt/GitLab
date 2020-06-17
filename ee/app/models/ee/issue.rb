@@ -44,6 +44,9 @@ module EE
       has_many :vulnerability_links, class_name: 'Vulnerabilities::IssueLink', inverse_of: :issue
       has_many :related_vulnerabilities, through: :vulnerability_links, source: :vulnerability
 
+      has_many :feature_flag_issues
+      has_many :feature_flags, through: :feature_flag_issues, class_name: '::Operations::FeatureFlag'
+
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
       validate :validate_confidential_epic
 
