@@ -36,6 +36,7 @@ class Packages::Package < ApplicationRecord
   validates :version, format: { with: Gitlab::Regex.semver_regex }, if: -> { npm? || nuget? }
   validates :name, format: { with: Gitlab::Regex.conan_recipe_component_regex }, if: :conan?
   validates :version, format: { with: Gitlab::Regex.conan_recipe_component_regex }, if: :conan?
+  validates :version, format: { with: Gitlab::Regex.maven_version_regex }, if: -> { version? && maven? }
 
   enum package_type: { maven: 1, npm: 2, conan: 3, nuget: 4, pypi: 5, composer: 6 }
 
