@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_dependency 'compliance_management/compliance_framework'
+
 module ComplianceManagement
   module ComplianceFramework
     class ProjectSettings < ApplicationRecord
