@@ -27,7 +27,7 @@ module Mutations
                required: true,
                description: 'The type of scan to be run.'
 
-      authorize :create_pipeline
+      authorize :run_ondemand_dast_scan
 
       def resolve(project_path:, target_url:, branch:, scan_type:)
         project = authorized_find!(full_path: project_path)
