@@ -325,8 +325,9 @@ module EE
         feature_available?(:github_project_service_integration)
     end
 
+    override :service_desk_enabled
     def service_desk_enabled
-      ::EE::Gitlab::ServiceDesk.enabled?(project: self) && super
+      ::EE::Gitlab::ServiceDesk.enabled?(project: self) && self[:service_desk_enabled]
     end
     alias_method :service_desk_enabled?, :service_desk_enabled
 
