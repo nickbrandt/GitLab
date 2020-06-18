@@ -37,10 +37,7 @@ module Geo
     end
 
     def find_migrated_local_objects(batch_size:)
-      attachment_ids = find_migrated_local_attachments_ids(batch_size: batch_size)
-      job_artifact_ids = find_migrated_local_job_artifacts_ids(batch_size: batch_size)
-
-      take_batch(attachment_ids, job_artifact_ids)
+      find_migrated_local_attachments_ids(batch_size: batch_size)
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -50,16 +47,6 @@ module Geo
       attachments_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES))
                         .pluck(Geo::Fdw::Upload.arel_table[:uploader], Geo::Fdw::Upload.arel_table[:id])
                         .map { |uploader, id| [uploader.sub(/Uploader\z/, '').underscore, id] }
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def find_migrated_local_job_artifacts_ids(batch_size:)
-      return [] unless job_artifacts_object_store_enabled?
-
-      job_artifacts_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(:job_artifact))
-                          .pluck(Geo::Fdw::Ci::JobArtifact.arel_table[:id])
-                          .map { |id| ['job_artifact', id] }
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -74,13 +61,8 @@ module Geo
       FileUploader.object_store_enabled?
     end
 
-    def job_artifacts_object_store_enabled?
-      JobArtifactUploader.object_store_enabled?
-    end
-
     def object_store_enabled?
-      attachments_object_store_enabled? ||
-        job_artifacts_object_store_enabled?
+      attachments_object_store_enabled?
     end
 
     def sync_object_storage_enabled?
@@ -89,10 +71,6 @@ module Geo
 
     def attachments_finder
       @attachments_finder ||= AttachmentRegistryFinder.new(current_node_id: current_node.id)
-    end
-
-    def job_artifacts_finder
-      @job_artifacts_finder ||= JobArtifactRegistryFinder.new(current_node_id: current_node.id)
     end
   end
 end
