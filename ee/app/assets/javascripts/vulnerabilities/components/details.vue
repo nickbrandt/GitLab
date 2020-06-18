@@ -17,7 +17,7 @@ export default {
       return this.vulnerability.location || {};
     },
     scanner() {
-      return this.finding.scanner || {};
+      return this.vulnerability.scanner || {};
     },
     fileText() {
       return (this.location.file || '') + (this.lineNumber ? `:${this.lineNumber}` : '');
@@ -63,9 +63,9 @@ export default {
         <severity-badge :severity="vulnerability.severity" class="gl-display-inline ml-1" />
       </detail-item>
       <detail-item
-        v-if="finding.evidence"
+        v-if="vulnerability.evidence"
         :sprintf-message="__('%{labelStart}Evidence:%{labelEnd} %{evidence}')"
-        >{{ finding.evidence }}
+        >{{ vulnerability.evidence }}
       </detail-item>
       <detail-item :sprintf-message="__('%{labelStart}Report Type:%{labelEnd} %{reportType}')"
         >{{ vulnerability.report_type }}

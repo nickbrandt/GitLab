@@ -59,10 +59,9 @@ function createFooterApp() {
   const props = {
     discussionsUrl,
     notesUrl,
-    finding,
     solutionInfo: {
-      solution: finding.solution,
-      remediation: finding.remediation,
+      solution,
+      remediation,
       hasDownload,
       hasMr,
       hasRemediation,
