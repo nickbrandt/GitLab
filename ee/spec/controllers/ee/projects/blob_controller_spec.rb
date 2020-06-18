@@ -8,9 +8,30 @@ RSpec.describe Projects::BlobController do
   let(:project) { create(:project, :public, :repository) }
 
   shared_examples "file matches a codeowners rule" do
+    # Expected behavior for both these contexts should be equivalent, however
+    #   the feature flag is used in code to control which code path is followed.
+    #
+    context ":use_legacy_codeowner_validations is true" do
+      before do
+        stub_feature_flags(use_legacy_codeowner_validations: true)
+      end
+
+      it_behaves_like "renders to the expected_view with an error msg"
+    end
+
+    context ":use_legacy_codeowner_validations is false" do
+      before do
+        stub_feature_flags(use_legacy_codeowner_validations: false)
+      end
+
+      it_behaves_like "renders to the expected_view with an error msg"
+    end
+  end
+
+  shared_examples "renders to the expected_view with an error msg" do
     let(:error_msg) { "Example error msg" }
 
-    it "renders to the edit page with an error msg" do
+    it "renders to the expected_view with an error msg" do
       default_params[:file_path] = "CHANGELOG"
 
       expect_next_instance_of(Gitlab::CodeOwners::Validator) do |validator|

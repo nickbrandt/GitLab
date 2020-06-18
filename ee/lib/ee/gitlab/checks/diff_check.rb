@@ -31,6 +31,8 @@ module EE
         # Issue to remove this feature flag:
         # https://gitlab.com/gitlab-org/gitlab/-/issues/217427
         def skip_web_ui_code_owner_validations?
+          return true unless ::Feature.enabled?(:use_legacy_codeowner_validations)
+
           ::Feature.enabled?(:skip_web_ui_code_owner_validations, project)
         end
 
