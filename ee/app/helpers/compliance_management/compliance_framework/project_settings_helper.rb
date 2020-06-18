@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_dependency 'compliance_management/compliance_framework'
+
 module ComplianceManagement
   module ComplianceFramework
     module ProjectSettingsHelper
@@ -64,7 +66,7 @@ module ComplianceManagement
 
       def compliance_framework_tooltip_values
         @compliance_framework_tooltip_values ||=
-          compliance_framework_title_values.map { |k, v| [k, get_compliance_framework_tooltip(v)] }.to_h
+          compliance_framework_title_values.transform_values { |v| get_compliance_framework_tooltip(v) }
       end
 
       def get_compliance_framework_tooltip(framework)
