@@ -2,6 +2,7 @@
 import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
+import { CancelToken } from 'axios';
 import download from '~/lib/utils/downloader';
 import { redirectTo } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
@@ -39,6 +40,7 @@ export default {
       isLoadingUser: false,
       vulnerability: this.initialVulnerability,
       user: undefined,
+      refreshVulnerabilitySource: undefined,
     };
   },
 
@@ -115,6 +117,14 @@ export default {
           });
       },
     },
+  },
+
+  created() {
+    VulnerabilitiesEventBus.$on('VULNERABILITY_STATE_CHANGED', this.refreshVulnerability);
+  },
+
+  destroyed() {
+    VulnerabilitiesEventBus.$off('VULNERABILITY_STATE_CHANGED', this.refreshVulnerability);
   },
 
   methods: {
@@ -210,6 +220,37 @@ export default {
         fileData: this.vulnerability.remediations[0].diff,
         fileName: `remediation.patch`,
       });
+    },
+    refreshVulnerability() {
+      this.isLoadingVulnerability = true;
+
+      // Cancel any pending API requests.
+      if (this.refreshVulnerabilitySource) {
+        this.refreshVulnerabilitySource.cancel();
+      }
+
+      this.refreshVulnerabilitySource = CancelToken.source();
+
+      Api.fetchVulnerability(this.vulnerability.id, {
+        cancelToken: this.refreshVulnerabilitySource.token,
+      })
+        .then(({ data }) => {
+          Object.assign(this.vulnerability, data);
+        })
+        .catch(e => {
+          // Don't show an error message if the request was cancelled through the cancel token.
+          if (!axios.isCancel(e)) {
+            createFlash(
+              s__(
+                'VulnerabilityManagement|Something went wrong while trying to refresh the vulnerability. Please try again later.',
+              ),
+            );
+          }
+        })
+        .finally(() => {
+          this.isLoadingVulnerability = false;
+          this.refreshVulnerabilitySource = undefined;
+        });
     },
   },
 };
