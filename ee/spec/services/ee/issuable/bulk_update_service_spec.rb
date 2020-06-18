@@ -40,7 +40,7 @@ RSpec.describe Issuable::BulkUpdateService do
       group.add_reporter(user)
     end
 
-    context 'updating health status' do
+    context 'updating health status and epic' do
       let(:params) do
         {
           issuable_ids: issuables.map(&:id),
@@ -51,7 +51,7 @@ RSpec.describe Issuable::BulkUpdateService do
 
       context 'when features are enabled' do
         before do
-          stub_licensed_features(issuable_health_status: true, epics: true)
+          stub_licensed_features(epics: true, issuable_health_status: true)
         end
 
         it 'succeeds and returns the correct number of issuables updated' do

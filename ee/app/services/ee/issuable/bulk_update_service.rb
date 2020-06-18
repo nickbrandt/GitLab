@@ -46,7 +46,7 @@ module EE
         return unless params[:epic].present?
 
         epic_param = params.delete(:epic)
-        params[:epic] = nil if no_epic?(epic_param)
+        params[:epic] = nil if remove_epic?(epic_param)
         return if params[:epic].present?
 
         epic = find_epic(epic_param)
@@ -65,7 +65,7 @@ module EE
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
-      def no_epic?(epic_param)
+      def remove_epic?(epic_param)
         epic_param == IssuableFinder::Params::NONE.to_s
       end
     end

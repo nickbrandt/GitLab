@@ -3,10 +3,11 @@
 require 'spec_helper'
 
 RSpec.describe Groups::IssuesController do
-  let(:user)      { create(:user) }
   let(:group)     { create(:group, :public) }
   let(:project)   { create(:project_empty_repo, :public, namespace: group) }
   let(:milestone) { create(:milestone, group: group) }
+  let(:user)      { create(:user) }
+  let(:epic)      { create(:epic, group: group) }
   let(:issue1)    { create(:issue, project: project) }
   let(:issue2)    { create(:issue, project: project) }
 
@@ -17,7 +18,8 @@ RSpec.describe Groups::IssuesController do
       {
         update: {
           milestone_id: milestone.id,
-          issuable_ids: "#{issue1.id}, #{issue2.id}"
+          issuable_ids: "#{issue1.id}, #{issue2.id}",
+          epic: epic.id
           },
           group_id: group
         }
@@ -25,8 +27,8 @@ RSpec.describe Groups::IssuesController do
 
     context 'when group bulk edit feature is not enabled' do
       before do
+        stub_licensed_features(epics: true, group_bulk_edit: false)
         sign_in(user)
-        stub_licensed_features(group_bulk_edit: false)
       end
 
       it 'returns 404 status' do
@@ -37,8 +39,8 @@ RSpec.describe Groups::IssuesController do
 
     context 'when group bulk edit feature is enabled' do
       before do
+        stub_licensed_features(epics: true, group_bulk_edit: true)
         sign_in(user)
-        stub_licensed_features(group_bulk_edit: true)
       end
 
       context 'when user has permissions to bulk update issues' do
@@ -52,10 +54,12 @@ RSpec.describe Groups::IssuesController do
           expect(response).to have_gitlab_http_status(:ok)
         end
 
-        it 'updates issues milestone' do
+        it 'updates issues milestone and epic' do
           expect { subject }
             .to change { issue1.reload.milestone }.from(nil).to(milestone)
             .and change { issue2.reload.milestone }.from(nil).to(milestone)
+            .and change { issue1.epic }.from(nil).to(epic)
+            .and change { issue2.epic }.from(nil).to(epic)
         end
       end
 
@@ -70,10 +74,12 @@ RSpec.describe Groups::IssuesController do
           expect(response).to have_gitlab_http_status(:not_found)
         end
 
-        it 'does not update issues milestone' do
+        it 'does not update issues milestone or epic' do
           expect { subject }
             .to not_change { issue1.reload.milestone }
             .and not_change { issue2.reload.milestone }
+            .and not_change { issue1.epic }
+            .and not_change { issue2.epic }
         end
       end
     end
