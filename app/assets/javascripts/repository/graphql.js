@@ -29,6 +29,15 @@ const defaultClient = createDefaultClient(
         });
       },
       readme(_, { url }) {
+        // Unfortunately hacky way of URL matching
+        const startupCall =
+          gl.startup_calls[`${url.replace(gon.gitlab_url, '')}?viewer=rich&format=json`];
+        if (startupCall?.fetchCall) {
+          return startupCall.fetchCall
+            .then(response => response.json())
+            .then(data => ({ ...data, __typename: 'ReadmeFile' }));
+        }
+
         return axios
           .get(url, { params: { viewer: 'rich', format: 'json' } })
           .then(({ data }) => ({ ...data, __typename: 'ReadmeFile' }));

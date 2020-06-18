@@ -2,6 +2,10 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import { resolveCommit, fetchLogsTree } from '~/repository/log_tree';
 
+window.gl = window.gl || {
+  startup_calls: {},
+};
+
 const mockData = [
   {
     commit: {
@@ -14,6 +18,17 @@ const mockData = [
     type: 'blob',
   },
 ];
+
+const expectedObject = {
+  __typename: 'LogTreeCommit',
+  commitPath: 'https://test.com',
+  committedDate: '2019-01-01',
+  fileName: 'index.js',
+  filePath: '/index.js',
+  message: 'testing message',
+  sha: '123',
+  type: 'blob',
+};
 
 describe('resolveCommit', () => {
   it('calls resolve when commit found', () => {
@@ -84,20 +99,34 @@ describe('fetchLogsTree', () => {
       expect(axios.get.mock.calls.length).toEqual(1);
     }));
 
+  describe('using startupCall', () => {
+    const responseMock = {
+      status: 200,
+      headers: {},
+      json: () => new Promise(resolve => resolve(mockData)),
+    };
+
+    afterAll(() => {
+      window.gl.startup_calls = {};
+    });
+
+    it('uses startup call fetch when it is not done yet', () => {
+      window.gl.startup_calls = {
+        '/gitlab-org/gitlab-foss/-/refs/master/logs_tree/?format=json&offset=0': {
+          fetchCall: new Promise(resolve => resolve(responseMock)),
+        },
+      };
+
+      return fetchLogsTree(client, '', '0', resolver).then(() => {
+        expect(resolver.resolve).toHaveBeenCalledWith(expect.objectContaining(expectedObject));
+        expect(axios.get.mock.calls.length).toEqual(0);
+      });
+    });
+  });
+
   it('calls entry resolver', () =>
     fetchLogsTree(client, '', '0', resolver).then(() => {
-      expect(resolver.resolve).toHaveBeenCalledWith(
-        expect.objectContaining({
-          __typename: 'LogTreeCommit',
-          commitPath: 'https://test.com',
-          committedDate: '2019-01-01',
-          fileName: 'index.js',
-          filePath: '/index.js',
-          message: 'testing message',
-          sha: '123',
-          type: 'blob',
-        }),
-      );
+      expect(resolver.resolve).toHaveBeenCalledWith(expect.objectContaining(expectedObject));
     }));
 
   it('writes query to client', () =>
@@ -105,18 +134,7 @@ describe('fetchLogsTree', () => {
       expect(client.writeQuery).toHaveBeenCalledWith({
         query: expect.anything(),
         data: {
-          commits: [
-            expect.objectContaining({
-              __typename: 'LogTreeCommit',
-              commitPath: 'https://test.com',
-              committedDate: '2019-01-01',
-              fileName: 'index.js',
-              filePath: '/index.js',
-              message: 'testing message',
-              sha: '123',
-              type: 'blob',
-            }),
-          ],
+          commits: [expect.objectContaining(expectedObject)],
         },
       });
     }));
