@@ -11,6 +11,10 @@ class Geo::BaseRegistry < Geo::TrackingBase
     where(self::MODEL_FOREIGN_KEY => range).pluck(self::MODEL_FOREIGN_KEY)
   end
 
+  def self.pluck_model_foreign_key
+    where(nil).pluck(self::MODEL_FOREIGN_KEY)
+  end
+
   def self.model_id_in(ids)
     where(self::MODEL_FOREIGN_KEY => ids)
   end

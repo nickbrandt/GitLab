@@ -18,8 +18,9 @@ module Geo
       REGISTRY_CLASSES = [
         Geo::JobArtifactRegistry,
         Geo::LfsObjectRegistry,
-        Geo::UploadRegistry,
-        Geo::PackageFileRegistry
+        Geo::PackageFileRegistry,
+        Geo::ProjectRegistry,
+        Geo::UploadRegistry
       ].freeze
 
       BATCH_SIZE = 1000
