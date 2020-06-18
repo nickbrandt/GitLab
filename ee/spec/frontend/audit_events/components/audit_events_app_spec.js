@@ -2,12 +2,20 @@ import { shallowMount } from '@vue/test-utils';
 
 import AuditEventsApp from 'ee/audit_events/components/audit_events_app.vue';
 import DateRangeField from 'ee/audit_events/components/date_range_field.vue';
+import SortingField from 'ee/audit_events/components/sorting_field.vue';
 import AuditEventsTable from 'ee/audit_events/components/audit_events_table.vue';
 import AuditEventsFilter from 'ee/audit_events/components/audit_events_filter.vue';
 import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_events/constants';
+import createStore from 'ee/audit_events/store';
+
+const TEST_SORT_BY = 'created_asc';
+const TEST_START_DATE = new Date('2020-01-01');
+const TEST_END_DATE = new Date('2020-02-02');
+const TEST_FILTER_VALUE = [{ id: 50, type: 'User' }];
 
 describe('AuditEventsApp', () => {
   let wrapper;
+  let store;
 
   const events = [{ foo: 'bar' }];
   const enabledTokenTypes = AVAILABLE_TOKEN_TYPES;
@@ -16,8 +24,8 @@ describe('AuditEventsApp', () => {
 
   const initComponent = (props = {}) => {
     wrapper = shallowMount(AuditEventsApp, {
+      store,
       propsData: {
-        formPath: 'form/path',
         isLastPage: true,
         filterQaSelector,
         tableQaSelector,
@@ -31,9 +39,20 @@ describe('AuditEventsApp', () => {
     });
   };
 
+  beforeEach(() => {
+    store = createStore();
+    Object.assign(store.state, {
+      startDate: TEST_START_DATE,
+      endDate: TEST_END_DATE,
+      sortBy: TEST_SORT_BY,
+      filterValue: TEST_FILTER_VALUE,
+    });
+  });
+
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
+    store = null;
   });
 
   describe('when initialized', () => {
@@ -45,25 +64,51 @@ describe('AuditEventsApp', () => {
       expect(wrapper.element).toMatchSnapshot();
     });
 
-    it('sets the form element on the date range field', () => {
-      const { element } = wrapper.find('form');
-      expect(wrapper.find(DateRangeField).props('formElement')).toEqual(element);
+    it('renders audit events table', () => {
+      expect(wrapper.find(AuditEventsTable).props()).toEqual({
+        events,
+        qaSelector: tableQaSelector,
+        isLastPage: true,
+      });
     });
 
-    it('passes its events property to the logs table', () => {
-      expect(wrapper.find(AuditEventsTable).props('events')).toEqual(events);
+    it('renders audit events filter', () => {
+      expect(wrapper.find(AuditEventsFilter).props()).toEqual({
+        enabledTokenTypes,
+        qaSelector: filterQaSelector,
+        value: TEST_FILTER_VALUE,
+      });
     });
 
-    it('passes the tables QA selector to the logs table', () => {
-      expect(wrapper.find(AuditEventsTable).props('qaSelector')).toEqual(tableQaSelector);
+    it('renders date range field', () => {
+      expect(wrapper.find(DateRangeField).props()).toEqual({
+        startDate: TEST_START_DATE,
+        endDate: TEST_END_DATE,
+      });
     });
 
-    it('passes its available token types to the logs filter', () => {
-      expect(wrapper.find(AuditEventsFilter).props('enabledTokenTypes')).toEqual(enabledTokenTypes);
+    it('renders sorting field', () => {
+      expect(wrapper.find(SortingField).props()).toEqual({ sortBy: TEST_SORT_BY });
+    });
+  });
+
+  describe('when a field is selected', () => {
+    beforeEach(() => {
+      jest.spyOn(store, 'dispatch').mockImplementation();
+      initComponent();
     });
 
-    it('passes the filters QA selector to the logs filter', () => {
-      expect(wrapper.find(AuditEventsFilter).props('qaSelector')).toEqual(filterQaSelector);
+    it.each`
+      name               | field                | action              | payload
+      ${'date range'}    | ${DateRangeField}    | ${'setDateRange'}   | ${'test'}
+      ${'sort by'}       | ${SortingField}      | ${'setSortBy'}      | ${'test'}
+      ${'events filter'} | ${AuditEventsFilter} | ${'setFilterValue'} | ${'test'}
+    `('for $name, it calls $handler', ({ field, action, payload }) => {
+      expect(store.dispatch).not.toHaveBeenCalled();
+
+      wrapper.find(field).vm.$emit('selected', payload);
+
+      expect(store.dispatch).toHaveBeenCalledWith(action, payload);
     });
   });
 });
