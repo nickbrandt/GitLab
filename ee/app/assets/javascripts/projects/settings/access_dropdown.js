@@ -14,8 +14,8 @@ export default class AccessDropdown {
     this.accessLevelsData = accessLevelsData.roles;
     this.$dropdown = $dropdown;
     this.$wrap = this.$dropdown.closest(`.${this.accessLevel}-container`);
-    this.usersPath = '/autocomplete/users.json';
-    this.groupsPath = '/autocomplete/project_groups.json';
+    this.usersPath = '/-/autocomplete/users.json';
+    this.groupsPath = '/-/autocomplete/project_groups.json';
     this.defaultLabel = this.$dropdown.data('defaultLabel');
 
     this.setSelectedItems([]);
