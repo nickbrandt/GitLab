@@ -59,7 +59,7 @@
     %pre.wrap
       = strip_signature(@tag.message)
 
-.append-bottom-default.prepend-top-default
+.gl-mb-3.prepend-top-default
   - if @release.description.present?
     .description.md
       = markdown_field(@release, :description)
