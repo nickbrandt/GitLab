@@ -112,6 +112,17 @@ RSpec.describe AuthorizedProjectUpdate::ProjectGroupLinkCreateService do
       end
     end
 
+    context 'unapproved access requests' do
+      before do
+        create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: group_user, group: group)
+      end
+
+      it 'does not create project authorization' do
+        expect { service.execute }.not_to(
+          change { ProjectAuthorization.count }.from(0))
+      end
+    end
+
     context 'project has more users than BATCH_SIZE' do
       let(:batch_size) { 2 }
       let(:users) { create_list(:user, batch_size + 1 ) }

@@ -401,6 +401,10 @@ module EE
       root_ancestor.saml_provider&.prohibited_outer_forks?
     end
 
+    def unassigned_role_allowed?
+      feature_available?(:unassigned_role) && !has_parent?
+    end
+
     private
 
     def custom_project_templates_group_allowed

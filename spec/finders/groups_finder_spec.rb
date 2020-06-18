@@ -106,6 +106,14 @@ RSpec.describe GroupsFinder do
             parent_group.update_attribute(:visibility_level, Gitlab::VisibilityLevel::PRIVATE)
           end
 
+          context 'being limited access member of parent group' do
+            it 'returns visible subgroups' do
+              create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: user, group: parent_group)
+
+              is_expected.to contain_exactly(parent_group, public_subgroup, internal_subgroup)
+            end
+          end
+
           context 'being member of parent group' do
             it 'returns all subgroups' do
               parent_group.add_guest(user)

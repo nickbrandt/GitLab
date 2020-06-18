@@ -9,12 +9,13 @@ module Gitlab
   module Access
     AccessDeniedError = Class.new(StandardError)
 
-    NO_ACCESS  = 0
-    GUEST      = 10
-    REPORTER   = 20
-    DEVELOPER  = 30
-    MAINTAINER = 40
-    OWNER      = 50
+    NO_ACCESS      = 0
+    UNASSIGNED     = 5
+    GUEST          = 10
+    REPORTER       = 20
+    DEVELOPER      = 30
+    MAINTAINER     = 40
+    OWNER          = 50
 
     # Branch protection settings
     PROTECTION_NONE          = 0
@@ -38,12 +39,16 @@ module Gitlab
         options_with_owner.values
       end
 
+      def values_with_limited
+        options_with_unassigned.values
+      end
+
       def options
         {
-          "Guest"      => GUEST,
-          "Reporter"   => REPORTER,
-          "Developer"  => DEVELOPER,
-          "Maintainer" => MAINTAINER
+          "Guest"          => GUEST,
+          "Reporter"       => REPORTER,
+          "Developer"      => DEVELOPER,
+          "Maintainer"     => MAINTAINER
         }
       end
 
@@ -86,7 +91,7 @@ module Gitlab
       end
 
       def human_access(access)
-        options_with_owner.key(access)
+        options_with_unassigned.key(access)
       end
 
       def human_access_with_none(access)
