@@ -6,9 +6,8 @@ import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_events/constants';
 
 describe('AuditEventsFilter', () => {
   let wrapper;
-  const formElement = document.createElement('form');
-  formElement.submit = jest.fn();
 
+  const value = [{ type: 'Project', value: { data: 1, operator: '=' } }];
   const findFilteredSearch = () => wrapper.find(GlFilteredSearch);
   const getAvailableTokens = () => findFilteredSearch().props('availableTokens');
   const getAvailableTokenProps = type =>
@@ -18,9 +17,6 @@ describe('AuditEventsFilter', () => {
     wrapper = shallowMount(AuditEventsFilter, {
       propsData: {
         ...props,
-      },
-      methods: {
-        getFormElement: () => formElement,
       },
     });
   };
@@ -46,74 +42,59 @@ describe('AuditEventsFilter', () => {
     });
   });
 
-  describe('when the URL query has a search term', () => {
-    const type = 'User';
-    const id = '1';
-
+  describe('when the default token value is set', () => {
     beforeEach(() => {
-      delete window.location;
-      window.location = { search: `entity_type=${type}&entity_id=${id}` };
-      initComponent();
+      initComponent({ value });
     });
 
     it('sets the filtered searched token', () => {
-      expect(findFilteredSearch().props('value')).toMatchObject([
-        {
-          type,
-          value: {
-            data: id,
-          },
-        },
-      ]);
+      expect(findFilteredSearch().props('value')).toEqual(value);
+    });
+
+    it('only one token matching the selected token type is enabled', () => {
+      expect(getAvailableTokenProps('Project').disabled).toEqual(false);
+      expect(getAvailableTokenProps('Group').disabled).toEqual(true);
+      expect(getAvailableTokenProps('User').disabled).toEqual(true);
+    });
+
+    describe('and the user submits the search field', () => {
+      beforeEach(() => {
+        findFilteredSearch().vm.$emit('submit');
+      });
+
+      it('should emit the "submit" event', () => {
+        expect(wrapper.emitted().submit).toHaveLength(1);
+      });
     });
   });
 
-  describe('when the URL query is empty', () => {
+  describe('when the default token value is not set', () => {
     beforeEach(() => {
-      delete window.location;
-      window.location = { search: '' };
       initComponent();
     });
 
     it('has an empty search value', () => {
       expect(findFilteredSearch().vm.value).toEqual([]);
     });
-  });
 
-  describe('when submitting the filtered search', () => {
-    beforeEach(() => {
-      initComponent();
-      findFilteredSearch().vm.$emit('submit');
-    });
-
-    it("calls submit on this component's FORM element", () => {
-      expect(formElement.submit).toHaveBeenCalledWith();
-    });
-  });
-
-  describe('when a search token has been selected', () => {
-    const searchTerm = {
-      value: { data: '1' },
-      type: 'Project',
-    };
-    beforeEach(() => {
-      initComponent();
-      wrapper.setData({
-        searchTerms: [searchTerm],
+    describe('and the user inputs nothing into the search field', () => {
+      beforeEach(() => {
+        findFilteredSearch().vm.$emit('input', []);
       });
-    });
 
-    it('only one token matching the selected type is available', () => {
-      expect(getAvailableTokenProps('Project').disabled).toEqual(false);
-      expect(getAvailableTokenProps('Group').disabled).toEqual(true);
-      expect(getAvailableTokenProps('User').disabled).toEqual(true);
-    });
+      it('should emit the "selected" event with empty values', () => {
+        expect(wrapper.emitted().selected[0]).toEqual([[]]);
+      });
 
-    it('sets the input values according to the search term', () => {
-      expect(wrapper.find('input[name="entity_type"]').attributes().value).toEqual(searchTerm.type);
-      expect(wrapper.find('input[name="entity_id"]').attributes().value).toEqual(
-        searchTerm.value.data,
-      );
+      describe('and the user submits the search field', () => {
+        beforeEach(() => {
+          findFilteredSearch().vm.$emit('submit');
+        });
+
+        it('should emit the "submit" event', () => {
+          expect(wrapper.emitted().submit).toHaveLength(1);
+        });
+      });
     });
   });
 

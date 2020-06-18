@@ -3,6 +3,9 @@
 class Geo::DesignRegistry < Geo::BaseRegistry
   include ::Delay
 
+  MODEL_CLASS = ::Project
+  MODEL_FOREIGN_KEY = :project_id
+
   RETRIES_BEFORE_REDOWNLOAD = 5
 
   belongs_to :project

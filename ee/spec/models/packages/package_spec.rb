@@ -141,6 +141,34 @@ RSpec.describe Packages::Package, type: :model do
         it { is_expected.not_to allow_value('%2e%2e%2f1.2.3').for(:version) }
       end
 
+      context 'maven package' do
+        subject { create(:maven_package) }
+
+        it { is_expected.to allow_value('0').for(:version) }
+        it { is_expected.to allow_value('1').for(:version) }
+        it { is_expected.to allow_value('10').for(:version) }
+        it { is_expected.to allow_value('1.0').for(:version) }
+        it { is_expected.to allow_value('1.3.350.v20200505-1744').for(:version) }
+        it { is_expected.to allow_value('1.1-beta-2').for(:version) }
+        it { is_expected.to allow_value('1.2-SNAPSHOT').for(:version) }
+        it { is_expected.to allow_value('12.1.2-2-1').for(:version) }
+        it { is_expected.to allow_value('1.2.3..beta').for(:version) }
+        it { is_expected.to allow_value('1.2.3-beta').for(:version) }
+        it { is_expected.to allow_value('10.2.3-beta').for(:version) }
+        it { is_expected.to allow_value('2.0.0.v200706041905-7C78EK9E_EkMNfNOd2d8qq').for(:version) }
+        it { is_expected.to allow_value('1.2-alpha-1-20050205.060708-1').for(:version) }
+        it { is_expected.to allow_value('703220b4e2cea9592caeb9f3013f6b1e5335c293').for(:version) }
+        it { is_expected.to allow_value('RELEASE').for(:version) }
+        it { is_expected.not_to allow_value('..1.2.3').for(:version) }
+        it { is_expected.not_to allow_value('  1.2.3').for(:version) }
+        it { is_expected.not_to allow_value("1.2.3  \r\t").for(:version) }
+        it { is_expected.not_to allow_value("\r\t 1.2.3").for(:version) }
+        it { is_expected.not_to allow_value('1.2.3-4/../../').for(:version) }
+        it { is_expected.not_to allow_value('1.2.3-4%2e%2e%').for(:version) }
+        it { is_expected.not_to allow_value('../../../../../1.2.3').for(:version) }
+        it { is_expected.not_to allow_value('%2e%2e%2f1.2.3').for(:version) }
+      end
+
       it_behaves_like 'validating version to be SemVer compliant for', :npm_package
       it_behaves_like 'validating version to be SemVer compliant for', :nuget_package
     end
