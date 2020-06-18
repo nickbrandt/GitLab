@@ -12,13 +12,14 @@ RSpec.describe AlertManagement::AlertPresenter do
     }
   end
   let_it_be(:generic_alert) do
-    create(:alert_management_alert, project: project, payload: generic_payload)
+    create(:alert_management_alert, :with_host, :with_service, :with_monitoring_tool, project: project, payload: generic_payload)
   end
   let_it_be(:prometheus_payload) do
     {
       'annotations' => {
         'title' => 'Alert title',
-        'gitlab_incident_markdown' => '**`markdown example`**'
+        'gitlab_incident_markdown' => '**`markdown example`**',
+        'custom annotation' => 'custom annotation value'
       },
       'startsAt' => '2020-04-27T10:10:22.265949279Z',
       'generatorURL' => 'http://8d467bd4607a:9090/graph?g0.expr=vector%281%29&g0.tab=1'
@@ -28,27 +29,29 @@ RSpec.describe AlertManagement::AlertPresenter do
     create(:alert_management_alert, :prometheus, project: project, payload: prometheus_payload)
   end
   let(:alert) { generic_alert }
-  let(:presenter) { described_class.new(alert) }
+
+  subject(:presenter) { described_class.new(alert) }
 
   describe '#issue_description' do
     let(:markdown_line_break) { '  ' }
 
     context 'with generic alert' do
       let(:alert) { generic_alert }
-      let(:parsed_payload) { Gitlab::Alerting::NotificationPayloadParser.call(generic_payload.to_h) }
-      let(:alert_presenter) { Gitlab::Alerting::Alert.new(project: project, payload: parsed_payload).present }
 
       it 'returns an alert issue description' do
         expect(presenter.issue_description).to eq(
           <<~MARKDOWN.chomp
             #### Summary
 
-            **Start time:** #{alert_presenter.start_time}
+            **Start time:** #{presenter.start_time}#{markdown_line_break}
+            **Severity:** #{presenter.severity}#{markdown_line_break}
+            **Service:** #{alert.service}#{markdown_line_break}
+            **Monitoring tool:** #{alert.monitoring_tool}#{markdown_line_break}
+            **Hosts:** #{alert.hosts.join(' ')}
 
             #### Alert Details
 
-            **custom.param:** 73#{markdown_line_break}
-            **severity:** critical
+            **custom.param:** 73
           MARKDOWN
         )
       end
@@ -56,16 +59,20 @@ RSpec.describe AlertManagement::AlertPresenter do
 
     context 'with prometheus alert' do
       let(:alert) { prometheus_alert }
-      let(:alert_presenter) { Gitlab::Alerting::Alert.new(project: project, payload: prometheus_payload).present }
 
       it 'returns an alert issue description' do
         expect(presenter.issue_description).to eq(
           <<~MARKDOWN.chomp
             #### Summary
 
-            **Start time:** #{alert_presenter.start_time}#{markdown_line_break}
-            **full_query:** `vector(1)`
+            **Start time:** #{presenter.start_time}#{markdown_line_break}
+            **Severity:** #{presenter.severity}#{markdown_line_break}
+            **full_query:** `vector(1)`#{markdown_line_break}
+            **Monitoring tool:** Prometheus
 
+            #### Alert Details
+
+            **custom annotation:** custom annotation value
 
             ---
 

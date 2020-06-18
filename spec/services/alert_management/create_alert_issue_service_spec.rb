@@ -15,6 +15,7 @@ RSpec.describe AlertManagement::CreateAlertIssueService do
   let_it_be(:generic_alert, reload: true) { create(:alert_management_alert, :triggered, project: project, payload: payload) }
   let_it_be(:prometheus_alert, reload: true) { create(:alert_management_alert, :triggered, :prometheus, project: project, payload: payload) }
   let(:alert) { generic_alert }
+  let(:alert_presenter) { alert.present }
   let(:created_issue) { Issue.last! }
 
   describe '#execute' do
@@ -161,9 +162,6 @@ RSpec.describe AlertManagement::CreateAlertIssueService do
 
       context 'when the alert is prometheus alert' do
         let(:alert) { prometheus_alert }
-        let(:alert_presenter) do
-          Gitlab::Alerting::Alert.new(project: project, payload: alert.payload).present
-        end
 
         it_behaves_like 'creating an alert issue'
         it_behaves_like 'setting an issue attributes'
@@ -172,10 +170,6 @@ RSpec.describe AlertManagement::CreateAlertIssueService do
 
       context 'when the alert is generic' do
         let(:alert) { generic_alert }
-        let(:alert_presenter) do
-          alert_payload = Gitlab::Alerting::NotificationPayloadParser.call(alert.payload.to_h)
-          Gitlab::Alerting::Alert.new(project: project, payload: alert_payload).present
-        end
 
         it_behaves_like 'creating an alert issue'
         it_behaves_like 'setting an issue attributes'

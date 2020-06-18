@@ -26,6 +26,8 @@ module AlertManagement
       ignored: :ignore
     }.freeze
 
+    DETAILS_IGNORED_PARAMS = %w(start_time).freeze
+
     belongs_to :project
     belongs_to :issue, optional: true
 
@@ -137,7 +139,7 @@ module AlertManagement
     end
 
     def details
-      details_payload = payload.except(*attributes.keys)
+      details_payload = payload.except(*attributes.keys, *DETAILS_IGNORED_PARAMS)
 
       Gitlab::Utils::InlineHash.merge_keys(details_payload)
     end
