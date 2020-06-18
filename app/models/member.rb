@@ -25,7 +25,6 @@ class Member < ApplicationRecord
   validates :user_id, uniqueness: { scope: [:source_type, :source_id],
                                     message: "already exists in source",
                                     allow_nil: true }
-  validates :access_level, inclusion: { in: Gitlab::Access.all_values }, presence: true
   validate :higher_access_level_than_group, unless: :importing?
   validates :invite_email,
     presence: {
@@ -85,6 +84,7 @@ class Member < ApplicationRecord
   scope :developers, -> { active.where(access_level: DEVELOPER) }
   scope :maintainers, -> { active.where(access_level: MAINTAINER) }
   scope :non_guests, -> { where('members.access_level > ?', GUEST) }
+  scope :non_unassigned, -> { where('members.access_level > ?', UNASSIGNED) }
   scope :owners, -> { active.where(access_level: OWNER) }
   scope :owners_and_maintainers, -> { active.where(access_level: [OWNER, MAINTAINER]) }
   scope :with_user, -> (user) { where(user: user) }

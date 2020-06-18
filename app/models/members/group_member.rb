@@ -13,6 +13,8 @@ class GroupMember < Member
   # Make sure group member points only to group as it source
   default_value_for :source_type, SOURCE_TYPE
   validates :source_type, format: { with: /\ANamespace\z/ }
+  validates :access_level, inclusion: { in: Gitlab::Access.values_with_limited }, presence: true
+
   default_scope { where(source_type: SOURCE_TYPE) } # rubocop:disable Cop/DefaultScope
 
   scope :of_groups, ->(groups) { where(source_id: groups.select(:id)) }
