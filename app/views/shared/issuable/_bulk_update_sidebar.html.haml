@@ -28,6 +28,13 @@
           - field_name = "update[assignee_ids][]"
           = dropdown_tag(_("Select assignee"), options: { toggle_class: "js-user-search js-update-assignee js-filter-submit js-filter-bulk-update", title: _("Assign to"), filter: true, dropdown_class: "dropdown-menu-user dropdown-menu-selectable",
             placeholder: _("Search authors"), data: { first_user: (current_user.username if current_user), null_user: true, current_user: true, project_id: @project.id, field_name: field_name } })
+      - if epic_bulk_edit_flag
+        .block
+          .title
+            = _('Epic')
+          .filter-item.epic-bulk-edit
+            #js-epic-select-root{ data: { group_id: @project&.group&.id, show_header: "true" } }
+          %input{ id: 'issue_epic_id', type: 'hidden', name: 'update[epic_id]' }
       .block
         .title
           = _('Milestone')
