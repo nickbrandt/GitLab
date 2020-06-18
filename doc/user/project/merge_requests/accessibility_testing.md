@@ -23,7 +23,8 @@ analyzed to a file called `accessibility`.
 
 ## Accessibility Merge Request widget
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/39425) in GitLab 13.0.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/39425) in GitLab 13.0 behind the disabled [feature flag](../../../administration/feature_flags.md) `:accessibility_report_view`.
+> - [Feature Flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/217372) in GitLab 13.1.
 
 In addition to the report artifact that is created, GitLab will also show the
 Accessibility Report in the merge request widget area:
