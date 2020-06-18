@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import Vue from 'vue';
 import createRouter from './router';
 import App from './components/app.vue';
