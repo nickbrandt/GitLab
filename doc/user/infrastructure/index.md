@@ -8,6 +8,8 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 ## GitLab managed Terraform State
 
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2673) in GitLab 13.0.
+
 [Terraform remote backends](https://www.terraform.io/docs/backends/index.html)
 enable you to store the state file in a remote, shared store. GitLab uses the
 [Terraform HTTP backend](https://www.terraform.io/docs/backends/types/http.html)
