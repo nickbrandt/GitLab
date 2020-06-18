@@ -1,0 +1,5 @@
+---
+title: Remove the counter badge for Designs tab when Git LFS is disabled
+merge_request: 34833
+author: George Tsiolis
+type: changed

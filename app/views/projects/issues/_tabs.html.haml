@@ -6,7 +6,8 @@
   %li
     = link_to '#designs-tab', class: 'js-issue-tabs', id: 'designs', role: 'tab', 'aria-controls': 'js-designs', 'aria-selected': 'false', data: { toggle: 'tab', target: '#designs-tab', qa_selector: 'designs_tab_link' } do
       = _('Designs')
-      %span.badge.badge-pill.js-designs-count
+      - if @project.design_management_enabled?
+        %span.badge.badge-pill.js-designs-count
 .tab-content
   #discussion-tab.tab-pane.show.active{ role: 'tabpanel', 'aria-labelledby': 'discussion', data: { qa_selector: 'discussion_tab_content' } }
     = render 'projects/issues/discussion'
