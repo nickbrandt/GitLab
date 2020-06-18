@@ -1,6 +1,7 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
+import httpStatusCodes from '~/lib/utils/http_status';
 import * as actions from 'ee/analytics/cycle_analytics/store/modules/filters/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/modules/filters/mutation_types';
 import initialState from 'ee/analytics/cycle_analytics/store/modules/filters/state';
@@ -33,13 +34,17 @@ describe('Filters actions', () => {
       selectedMilestone: 'NEXT',
     };
 
-    it('initializes the state and dispatches setPaths and setFilters', () => {
+    it('initializes the state and dispatches setPaths, setFilters and fetchTokenData', () => {
       return testAction(
         actions.initialize,
         initialData,
         state,
         [{ type: types.INITIALIZE, payload: initialData }],
-        [{ type: 'setPaths', payload: initialData }, { type: 'setFilters', payload: initialData }],
+        [
+          { type: 'setPaths', payload: initialData },
+          { type: 'setFilters', payload: initialData },
+          { type: 'fetchTokenData' },
+        ],
       );
     });
   });
@@ -119,7 +124,7 @@ describe('Filters actions', () => {
   describe('fetchAuthors', () => {
     describe('success', () => {
       beforeEach(() => {
-        mock.onAny().replyOnce(200, filterUsers);
+        mock.onAny().replyOnce(httpStatusCodes.OK, filterUsers);
       });
 
       it('dispatches RECEIVE_AUTHORS_SUCCESS with received data', () => {
@@ -138,7 +143,7 @@ describe('Filters actions', () => {
 
     describe('error', () => {
       beforeEach(() => {
-        mock.onAny().replyOnce(500);
+        mock.onAny().replyOnce(httpStatusCodes.SERVICE_UNAVAILABLE);
       });
 
       it('dispatches RECEIVE_AUTHORS_ERROR', () => {
@@ -150,7 +155,7 @@ describe('Filters actions', () => {
             { type: types.REQUEST_AUTHORS },
             {
               type: types.RECEIVE_AUTHORS_ERROR,
-              payload: 500,
+              payload: httpStatusCodes.SERVICE_UNAVAILABLE,
             },
           ],
           [],
@@ -162,7 +167,7 @@ describe('Filters actions', () => {
   describe('fetchMilestones', () => {
     describe('success', () => {
       beforeEach(() => {
-        mock.onGet(milestonesPath).replyOnce(200, filterMilestones);
+        mock.onGet(milestonesPath).replyOnce(httpStatusCodes.OK, filterMilestones);
       });
 
       it('dispatches RECEIVE_MILESTONES_SUCCESS with received data', () => {
@@ -181,7 +186,7 @@ describe('Filters actions', () => {
 
     describe('error', () => {
       beforeEach(() => {
-        mock.onAny().replyOnce(500);
+        mock.onAny().replyOnce(httpStatusCodes.SERVICE_UNAVAILABLE);
       });
 
       it('dispatches RECEIVE_MILESTONES_ERROR', () => {
@@ -193,7 +198,7 @@ describe('Filters actions', () => {
             { type: types.REQUEST_MILESTONES },
             {
               type: types.RECEIVE_MILESTONES_ERROR,
-              payload: 500,
+              payload: httpStatusCodes.SERVICE_UNAVAILABLE,
             },
           ],
           [],
@@ -205,7 +210,7 @@ describe('Filters actions', () => {
   describe('fetchAssignees', () => {
     describe('success', () => {
       beforeEach(() => {
-        mock.onAny().replyOnce(200, filterUsers);
+        mock.onAny().replyOnce(httpStatusCodes.OK, filterUsers);
       });
 
       it('dispatches RECEIVE_ASSIGNEES_SUCCESS with received data', () => {
@@ -224,7 +229,7 @@ describe('Filters actions', () => {
 
     describe('error', () => {
       beforeEach(() => {
-        mock.onAny().replyOnce(500);
+        mock.onAny().replyOnce(httpStatusCodes.SERVICE_UNAVAILABLE);
       });
 
       it('dispatches RECEIVE_ASSIGNEES_ERROR', () => {
@@ -236,7 +241,7 @@ describe('Filters actions', () => {
             { type: types.REQUEST_ASSIGNEES },
             {
               type: types.RECEIVE_ASSIGNEES_ERROR,
-              payload: 500,
+              payload: httpStatusCodes.SERVICE_UNAVAILABLE,
             },
           ],
           [],
@@ -248,7 +253,7 @@ describe('Filters actions', () => {
   describe('fetchLabels', () => {
     describe('success', () => {
       beforeEach(() => {
-        mock.onGet(labelsPath).replyOnce(200, filterLabels);
+        mock.onGet(labelsPath).replyOnce(httpStatusCodes.OK, filterLabels);
       });
 
       it('dispatches RECEIVE_LABELS_SUCCESS with received data', () => {
@@ -267,7 +272,7 @@ describe('Filters actions', () => {
 
     describe('error', () => {
       beforeEach(() => {
-        mock.onAny().replyOnce(500);
+        mock.onAny().replyOnce(httpStatusCodes.SERVICE_UNAVAILABLE);
       });
 
       it('dispatches RECEIVE_LABELS_ERROR', () => {
@@ -279,7 +284,7 @@ describe('Filters actions', () => {
             { type: types.REQUEST_LABELS },
             {
               type: types.RECEIVE_LABELS_ERROR,
-              payload: 500,
+              payload: httpStatusCodes.SERVICE_UNAVAILABLE,
             },
           ],
           [],

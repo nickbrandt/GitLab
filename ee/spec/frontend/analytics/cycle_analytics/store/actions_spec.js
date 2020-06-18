@@ -56,7 +56,6 @@ describe('Cycle analytics actions', () => {
   it.each`
     action                   | type                       | stateKey                | payload
     ${'setFeatureFlags'}     | ${'SET_FEATURE_FLAGS'}     | ${'featureFlags'}       | ${{ hasDurationChart: true }}
-    ${'setSelectedGroup'}    | ${'SET_SELECTED_GROUP'}    | ${'selectedGroup'}      | ${'someNewGroup'}
     ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
     ${'setSelectedStage'}    | ${'SET_SELECTED_STAGE'}    | ${'selectedStage'}      | ${{ id: 'someStageId' }}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
@@ -85,6 +84,48 @@ describe('Cycle analytics actions', () => {
         [{ type: types.SET_DATE_RANGE, payload: { startDate, endDate } }],
         [{ type: 'fetchCycleAnalyticsData' }],
       );
+    });
+  });
+
+  describe('setSelectedGroup', () => {
+    it('commits the setSelectedGroup mutation', () => {
+      return testAction(
+        actions.setSelectedGroup,
+        { ...selectedGroup },
+        state,
+        [{ type: types.SET_SELECTED_GROUP, payload: selectedGroup }],
+        [],
+      );
+    });
+
+    describe('with hasFilterBar=true', () => {
+      beforeEach(() => {
+        state = {
+          ...state,
+          featureFlags: {
+            ...state.featureFlags,
+            hasFilterBar: true,
+          },
+        };
+        mock = new MockAdapter(axios);
+      });
+
+      it('commits the setSelectedGroup mutation', () => {
+        return testAction(
+          actions.setSelectedGroup,
+          { full_path: selectedGroup.fullPath },
+          state,
+          [{ type: types.SET_SELECTED_GROUP, payload: { full_path: selectedGroup.fullPath } }],
+          [
+            {
+              type: 'filters/initialize',
+              payload: {
+                groupPath: selectedGroup.fullPath,
+              },
+            },
+          ],
+        );
+      });
     });
   });
 
