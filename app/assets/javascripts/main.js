@@ -179,9 +179,7 @@ function deferredInitialisation() {
 document.addEventListener('DOMContentLoaded', () => {
   const $body = $('body');
   const $document = $(document);
-  const $window = $(window);
-  const $sidebarGutterToggle = $('.js-sidebar-toggle');
-  let bootstrapBreakpoint = bp.getBreakpointSize();
+  const bootstrapBreakpoint = bp.getBreakpointSize();
 
   if (document.querySelector('#js-peek')) initPerformanceBar({ container: '#js-peek' });
 
@@ -289,39 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $(document).trigger('toggle.comments');
   });
-
-  $document.on('breakpoint:change', (e, breakpoint) => {
-    const breakpointSizes = ['md', 'sm', 'xs'];
-    if (breakpointSizes.includes(breakpoint)) {
-      const $gutterIcon = $sidebarGutterToggle.find('i');
-      if ($gutterIcon.hasClass('fa-angle-double-right')) {
-        $sidebarGutterToggle.trigger('click');
-      }
-
-      const sidebarGutterVueToggleEl = document.querySelector('.js-sidebar-vue-toggle');
-
-      // Sidebar has an icon which corresponds to collapsing the sidebar
-      // only then trigger the click.
-      if (sidebarGutterVueToggleEl) {
-        const collapseIcon = sidebarGutterVueToggleEl.querySelector('i.fa-angle-double-right');
-
-        if (collapseIcon) {
-          collapseIcon.click();
-        }
-      }
-    }
-  });
-
-  function fitSidebarForSize() {
-    const oldBootstrapBreakpoint = bootstrapBreakpoint;
-    bootstrapBreakpoint = bp.getBreakpointSize();
-
-    if (bootstrapBreakpoint !== oldBootstrapBreakpoint) {
-      $document.trigger('breakpoint:change', [bootstrapBreakpoint]);
-    }
-  }
-
-  $window.on('resize.app', fitSidebarForSize);
 
   $('form.filter-form').on('submit', function filterFormSubmitCallback(event) {
     const link = document.createElement('a');
