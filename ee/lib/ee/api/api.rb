@@ -20,6 +20,7 @@ module EE
         mount ::API::EpicLinks
         mount ::API::Epics
         mount ::API::ElasticsearchIndexedNamespaces
+        mount ::API::ElasticsearchClusterReindexing
         mount ::API::FeatureFlags
         mount ::API::FeatureFlagsUserLists
         mount ::API::FeatureFlagScopes

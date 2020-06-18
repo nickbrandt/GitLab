@@ -76,6 +76,13 @@ namespace :gitlab do
       Rake::Task["gitlab:elastic:create_empty_index"].invoke(*args)
     end
 
+    desc "GitLab | Elasticsearch | Zero-downtime cluster reindexing"
+    task reindex_cluster: :environment do
+      ElasticClusterReindexingWorker.perform_async
+
+      puts "Reindexing job was successfully scheduled".color(:green)
+    end
+
     desc "GitLab | Elasticsearch | Clear indexing status"
     task clear_index_status: :environment do
       IndexStatus.delete_all

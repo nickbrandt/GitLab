@@ -571,6 +571,14 @@
   :weight: 1
   :idempotent: 
   :tags: []
+- :name: elastic_cluster_reindexing
+  :feature_category: :global_search
+  :has_external_dependencies: 
+  :urgency: :throttled
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
+  :tags: []
 - :name: elastic_commit_indexer
   :feature_category: :global_search
   :has_external_dependencies: 

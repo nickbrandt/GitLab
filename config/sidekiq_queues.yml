@@ -80,6 +80,8 @@
   - 1
 - - elastic_batch_project_indexer
   - 1
+- - elastic_cluster_reindexing
+  - 1
 - - elastic_commit_indexer
   - 1
 - - elastic_delete_project
