@@ -32,6 +32,7 @@ export default {
       'epicStatusChangeInProgress',
       'author',
       'created',
+      'canCreate',
       'canUpdate',
       'confidential',
       'newEpicWebUrl',
@@ -54,10 +55,8 @@ export default {
     actionButtonText() {
       return this.isEpicOpen ? __('Close epic') : __('Reopen epic');
     },
-    canCreate() {
-      const { canCreate } = this.$store.state;
-
-      return canCreate && this.glFeatures.createEpicForm;
+    userCanCreate() {
+      return this.canCreate && this.glFeatures.createEpicForm;
     },
   },
   mounted() {
@@ -126,7 +125,7 @@ export default {
       >
 
       <gl-deprecated-button
-        v-if="canCreate"
+        v-if="userCanCreate"
         class="btn btn-grouped btn-success btn-inverted js-new-epic-button"
         :href="newEpicWebUrl"
       >
