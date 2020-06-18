@@ -1,0 +1,5 @@
+---
+title: Use GpgKeys::CreateService when a user creates gpg keys for themselves via the API
+merge_request: 34817
+author: Rajendra Kadam
+type: fixed
