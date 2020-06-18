@@ -30,8 +30,6 @@ import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
 const emptyStateSvgPath = 'path/to/empty/state';
-const milestonesPath = '/some/milestones/endpoint';
-const labelsPath = '/some/labels/endpoint';
 const hideGroupDropDown = false;
 const selectedGroup = convertObjectPropsToCamelCase(mockData.group);
 
@@ -48,6 +46,13 @@ const defaultStubs = {
   GroupsDropdownFilter: true,
 };
 
+const defaultFeatureFlags = {
+  hasDurationChart: true,
+  hasDurationChartMedian: true,
+  hasPathNavigation: false,
+  hasFilterBar: false,
+};
+
 const initialCycleAnalyticsState = {
   createdAfter: mockData.startDate,
   createdBefore: mockData.endDate,
@@ -55,8 +60,6 @@ const initialCycleAnalyticsState = {
   selectedAuthor: null,
   selectedAssignees: [],
   selectedLabels: [],
-  milestonesPath,
-  labelsPath,
   group: selectedGroup,
 };
 
@@ -66,9 +69,7 @@ function createComponent({
   },
   shallow = true,
   withStageSelected = false,
-  scatterplotEnabled = true,
-  pathNavigationEnabled = false,
-  filterBarEnabled = false,
+  featureFlags = {},
   props = {},
 } = {}) {
   const func = shallow ? shallowMount : mount;
@@ -84,19 +85,16 @@ function createComponent({
       hideGroupDropDown,
       ...props,
     },
-    provide: {
-      glFeatures: {
-        cycleAnalyticsScatterplotEnabled: scatterplotEnabled,
-        valueStreamAnalyticsPathNavigation: pathNavigationEnabled,
-        valueStreamAnalyticsFilterBar: filterBarEnabled,
-      },
-    },
     ...opts,
   });
 
   comp.vm.$store.dispatch('initializeCycleAnalytics', {
     createdAfter: mockData.startDate,
     createdBefore: mockData.endDate,
+    featureFlags: {
+      ...defaultFeatureFlags,
+      ...featureFlags,
+    },
   });
 
   if (withStageSelected) {
@@ -173,11 +171,11 @@ describe('Cycle Analytics component', () => {
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
-    wrapper = createComponent();
-
-    wrapper.vm.$store.dispatch('initializeCycleAnalytics', {
-      createdAfter: mockData.startDate,
-      createdBefore: mockData.endDate,
+    wrapper = createComponent({
+      featureFlags: {
+        hasPathNavigation: true,
+        hasFilterBar: true,
+      },
     });
   });
 
@@ -257,6 +255,10 @@ describe('Cycle Analytics component', () => {
           mock = new MockAdapter(axios);
           wrapper = createComponent({
             withStageSelected: true,
+            featureFlags: {
+              hasPathNavigation: true,
+              hasFilterBar: true,
+            },
           });
         });
 
@@ -321,6 +323,15 @@ describe('Cycle Analytics component', () => {
 
         describe('path navigation', () => {
           describe('disabled', () => {
+            beforeEach(() => {
+              wrapper = createComponent({
+                withStageSelected: true,
+                featureFlags: {
+                  hasPathNavigation: false,
+                },
+              });
+            });
+
             it('does not display the path navigation', () => {
               displaysPathNavigation(false);
             });
@@ -330,7 +341,9 @@ describe('Cycle Analytics component', () => {
             beforeEach(() => {
               wrapper = createComponent({
                 withStageSelected: true,
-                pathNavigationEnabled: true,
+                featureFlags: {
+                  hasPathNavigation: true,
+                },
               });
             });
 
@@ -342,6 +355,15 @@ describe('Cycle Analytics component', () => {
 
         describe('filter bar', () => {
           describe('disabled', () => {
+            beforeEach(() => {
+              wrapper = createComponent({
+                withStageSelected: true,
+                featureFlags: {
+                  hasFilterBar: false,
+                },
+              });
+            });
+
             it('does not display the filter bar', () => {
               displaysFilterBar(false);
             });
@@ -351,7 +373,9 @@ describe('Cycle Analytics component', () => {
             beforeEach(() => {
               wrapper = createComponent({
                 withStageSelected: true,
-                filterBarEnabled: true,
+                featureFlags: {
+                  hasFilterBar: true,
+                },
               });
             });
 
@@ -364,6 +388,7 @@ describe('Cycle Analytics component', () => {
         describe('StageTable', () => {
           beforeEach(() => {
             mock = new MockAdapter(axios);
+
             wrapper = createComponent({
               opts: {
                 stubs: {

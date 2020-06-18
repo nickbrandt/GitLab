@@ -2,7 +2,6 @@
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
@@ -40,7 +39,7 @@ export default {
     MetricCard,
     FilterBar,
   },
-  mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
+  mixins: [UrlSyncMixin],
   props: {
     emptyStateSvgPath: {
       type: String,
@@ -106,7 +105,10 @@ export default {
       return !this.hasNoAccessError && !this.isLoading;
     },
     shouldDsiplayPathNavigation() {
-      return this.featureFlags.hasPathNavigation && !this.hasNoAccessError;
+      return this.featureFlags.hasPathNavigation && !this.hasNoAccessError && this.selectedStage;
+    },
+    shouldDisplayFilterBar() {
+      return this.featureFlags.hasFilterBar && this.currentGroupPath;
     },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
@@ -133,23 +135,7 @@ export default {
       return this.selectedProjectIds.length > 0;
     },
   },
-  mounted() {
-    const {
-      glFeatures: {
-        cycleAnalyticsScatterplotEnabled: hasDurationChart,
-        cycleAnalyticsScatterplotMedianEnabled: hasDurationChartMedian,
-        valueStreamAnalyticsPathNavigation: hasPathNavigation,
-        valueStreamAnalyticsFilterBar: hasFilterBar,
-      },
-    } = this;
 
-    this.setFeatureFlags({
-      hasDurationChart,
-      hasDurationChartMedian,
-      hasPathNavigation,
-      hasFilterBar,
-    });
-  },
   methods: {
     ...mapActions([
       'fetchCycleAnalyticsData',
@@ -160,9 +146,9 @@ export default {
       'setDateRange',
       'updateStage',
       'removeStage',
-      'setFeatureFlags',
       'updateStage',
       'reorderStage',
+      'setSelectedFilters',
     ]),
     ...mapActions('customStages', [
       'hideForm',
@@ -259,7 +245,7 @@ export default {
             />
           </div>
           <filter-bar
-            v-if="featureFlags.hasFilterBar"
+            v-if="shouldDisplayFilterBar"
             class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3"
             :disabled="!hasProject"
           />

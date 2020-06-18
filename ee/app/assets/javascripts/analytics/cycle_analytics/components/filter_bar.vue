@@ -100,9 +100,6 @@ export default {
       ];
     },
   },
-  created() {
-    this.fetchTokenData();
-  },
   mounted() {
     this.initializeTokens();
   },

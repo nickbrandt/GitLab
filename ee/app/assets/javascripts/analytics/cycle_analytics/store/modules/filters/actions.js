@@ -6,9 +6,11 @@ import * as types from './mutation_types';
 
 const appendExtension = path => (path.indexOf('.') > -1 ? path : `${path}.json`);
 
-export const setPaths = ({ commit }, { milestonesPath = '', labelsPath = '' }) => {
-  commit(types.SET_MILESTONES_PATH, appendExtension(milestonesPath));
-  commit(types.SET_LABELS_PATH, appendExtension(labelsPath));
+export const setPaths = ({ commit }, { groupPath = '', milestonesPath = '', labelsPath = '' }) => {
+  const ms = milestonesPath || `/groups/${groupPath}/-/milestones`;
+  const ls = labelsPath || `/groups/${groupPath}/-/labels`;
+  commit(types.SET_MILESTONES_PATH, appendExtension(ms));
+  commit(types.SET_LABELS_PATH, appendExtension(ls));
 };
 
 export const fetchTokenData = ({ dispatch }) => {
@@ -88,5 +90,6 @@ export const initialize = ({ dispatch, commit }, initialFilters) => {
   commit(types.INITIALIZE, initialFilters);
   return Promise.resolve()
     .then(() => dispatch('setPaths', initialFilters))
-    .then(() => dispatch('setFilters', initialFilters));
+    .then(() => dispatch('setFilters', initialFilters))
+    .then(() => dispatch('fetchTokenData'));
 };

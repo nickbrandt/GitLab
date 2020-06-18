@@ -8,11 +8,19 @@ import { removeFlash, handleErrorOrRethrow, isStageNameExistsError } from '../ut
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
-export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
-
-export const setSelectedProjects = ({ commit }, projects) => {
-  commit(types.SET_SELECTED_PROJECTS, projects);
+export const setSelectedGroup = ({ commit, dispatch, state }, group) => {
+  commit(types.SET_SELECTED_GROUP, group);
+  const { featureFlags } = state;
+  if (featureFlags?.hasFilterBar) {
+    return dispatch('filters/initialize', {
+      groupPath: group.full_path,
+    });
+  }
+  return Promise.resolve();
 };
+
+export const setSelectedProjects = ({ commit }, projects) =>
+  commit(types.SET_SELECTED_PROJECTS, projects);
 
 export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
 
@@ -234,9 +242,10 @@ export const removeStage = ({ dispatch, state }, stageId) => {
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
 
-export const setSelectedFilters = ({ commit, dispatch }, filters = {}) => {
+export const setSelectedFilters = ({ commit, dispatch, getters }, filters = {}) => {
   commit(types.SET_SELECTED_FILTERS, filters);
-  if (filters?.group?.fullPath) {
+  const { currentGroupPath } = getters;
+  if (currentGroupPath) {
     return dispatch('fetchCycleAnalyticsData');
   }
   return Promise.resolve();
@@ -248,9 +257,17 @@ export const initializeCycleAnalyticsSuccess = ({ commit }) =>
 export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {}) => {
   commit(types.INITIALIZE_CYCLE_ANALYTICS, initialData);
 
-  dispatch('filters/initialize', initialData);
+  const { featureFlags = {} } = initialData;
+  commit(types.SET_FEATURE_FLAGS, featureFlags);
 
-  if (initialData?.group?.fullPath) {
+  if (initialData.group?.fullPath) {
+    if (featureFlags?.hasFilterBar) {
+      dispatch('filters/initialize', {
+        groupPath: initialData.group.fullPath,
+        ...initialData,
+      });
+    }
+
     return Promise.resolve()
       .then(() => dispatch('fetchCycleAnalyticsData'))
       .then(() => dispatch('initializeCycleAnalyticsSuccess'));
