@@ -506,4 +506,57 @@ RSpec.describe Ci::Build do
       it { is_expected.to be false }
     end
   end
+
+  describe '#runner_required_feature_names' do
+    let(:valid_secrets) do
+      {
+        DATABASE_PASSWORD: {
+          vault: {
+            engine: { name: 'kv-v2', path: 'kv-v2' },
+            path: 'production/db',
+            field: 'password'
+          }
+        }
+      }
+    end
+    let(:build) { create(:ci_build, secrets: secrets) }
+
+    subject { build.runner_required_feature_names }
+
+    context 'when secrets management feature is available' do
+      before do
+        stub_licensed_features(ci_secrets_management: true)
+      end
+
+      context 'when there are secrets defined' do
+        let(:secrets) { valid_secrets }
+
+        it { is_expected.to include(:secrets) }
+      end
+
+      context 'when there are no secrets defined' do
+        let(:secrets) { {} }
+
+        it { is_expected.not_to include(:secrets) }
+      end
+    end
+
+    context 'when secrets management feature is not available' do
+      before do
+        stub_licensed_features(ci_secrets_management: false)
+      end
+
+      context 'when there are secrets defined' do
+        let(:secrets) { valid_secrets }
+
+        it { is_expected.not_to include(:secrets) }
+      end
+
+      context 'when there are no secrets defined' do
+        let(:secrets) { {} }
+
+        it { is_expected.not_to include(:secrets) }
+      end
+    end
+  end
 end
