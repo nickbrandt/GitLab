@@ -4,7 +4,7 @@ require 'airborne'
 require 'securerandom'
 
 module QA
-  context 'Enablement:Search' do
+  context 'Enablement:Search', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/221251', type: :investigating } do
     describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin do
       let(:project_name_suffix) { SecureRandom.hex(8) }
       let(:api_client) { Runtime::API::Client.new(:gitlab) }
@@ -44,11 +44,11 @@ module QA
       end
 
       context 'when searching for projects using advanced syntax' do
-        it 'searches in the project name', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/221251', type: :investigating } do
+        it 'searches in the project name' do
           expect_search_to_find_project("es-adv-*#{project_name_suffix}")
         end
 
-        it 'searches in the project description', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/221251', type: :investigating } do
+        it 'searches in the project description' do
           expect_search_to_find_project("unique +#{project_name_suffix}")
         end
       end
