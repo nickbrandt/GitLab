@@ -131,24 +131,4 @@ RSpec.describe Geo::Fdw::GeoNode, :geo, type: :model do
       end
     end
   end
-
-  describe '#job_artifacts', :geo_fdw do
-    subject { described_class.find(node.id) }
-
-    context 'when selective sync is enabled' do
-      it 'applies a CTE statement' do
-        node.update!(selective_sync_type: 'namespaces')
-
-        expect(subject.job_artifacts.to_sql).to match(/WITH .+restricted_job_artifacts/)
-      end
-    end
-
-    context 'when selective sync is disabled' do
-      it 'doest not apply a CTE statement' do
-        node.update!(selective_sync_type: nil)
-
-        expect(subject.job_artifacts.to_sql).not_to match(/WITH .+restricted_job_artifacts/)
-      end
-    end
-  end
 end
