@@ -162,9 +162,10 @@ RSpec.describe 'Admin::AuditLogs', :js do
   end
 
   def filter_for(type, name)
-    within '[data-qa-selector="admin_audit_log_filter"]' do
-      find('input').click
+    filter_container = '[data-testid="audit-events-filter"]'
 
+    find(filter_container).click
+    within filter_container do
       click_link type
       click_link name
 
