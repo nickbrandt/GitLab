@@ -1,30 +1,39 @@
 import Vue from 'vue';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { GlIcon } from '@gitlab/ui';
 
+import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
+import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import EpicHeader from 'ee/epic/components/epic_header.vue';
 import createStore from 'ee/epic/store';
 import { statusType } from 'ee/epic/constants';
 
-import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData } from '../mock_data';
 
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('EpicHeaderComponent', () => {
+  let wrapper;
   let vm;
   let store;
 
   beforeEach(() => {
-    const Component = Vue.extend(EpicHeader);
-
     store = createStore();
     store.dispatch('setEpicMeta', mockEpicMeta);
     store.dispatch('setEpicData', mockEpicData);
 
-    vm = mountComponentWithStore(Component, {
+    wrapper = shallowMount(EpicHeader, {
+      localVue,
       store,
     });
+
+    vm = wrapper.vm;
   });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   describe('computed', () => {
@@ -96,21 +105,29 @@ describe('EpicHeaderComponent', () => {
     });
 
     it('renders epic status icon and text elements', () => {
-      const statusEl = vm.$el.querySelector('.issuable-status-box');
+      const statusEl = wrapper.find('.issuable-status-box');
 
-      expect(statusEl).not.toBeNull();
-      expect(
-        statusEl.querySelector('svg.ic-issue-open-m use').getAttribute('xlink:href'),
-      ).toContain('issue-open-m');
+      expect(statusEl.exists()).toBe(true);
+      expect(statusEl.find(GlIcon).props('name')).toBe('issue-open-m');
+      expect(statusEl.find('span').text()).toBe('Open');
+    });
 
-      expect(statusEl.querySelector('span').innerText.trim()).toBe('Open');
+    it('renders confidential icon when `confidential` prop is true', () => {
+      vm.$store.state.confidential = true;
+
+      return Vue.nextTick(() => {
+        const iconEl = wrapper.find('.issuable-warning-icon').find(GlIcon);
+        expect(iconEl.exists()).toBe(true);
+        expect(iconEl.props('name')).toBe('eye-slash');
+      });
     });
 
     it('renders epic author details element', () => {
-      const metaEl = vm.$el.querySelector('.issuable-meta');
+      const metaEl = wrapper.find('.issuable-meta');
 
-      expect(metaEl).not.toBeNull();
-      expect(metaEl.querySelector('strong a.user-avatar-link')).not.toBeNull();
+      expect(metaEl.exists()).toBe(true);
+      expect(metaEl.find(TimeagoTooltip).exists()).toBe(true);
+      expect(metaEl.find(UserAvatarLink).exists()).toBe(true);
     });
 
     it('renders action buttons element', () => {
@@ -122,13 +139,13 @@ describe('EpicHeaderComponent', () => {
     });
 
     it('renders toggle sidebar button element', () => {
-      const toggleButtonEl = vm.$el.querySelector('button.js-sidebar-toggle');
+      const toggleButtonEl = wrapper.find('.js-sidebar-toggle');
 
-      expect(toggleButtonEl).not.toBeNull();
-      expect(toggleButtonEl.getAttribute('aria-label')).toBe('Toggle sidebar');
-      expect(toggleButtonEl.classList.contains('d-block')).toBe(true);
-      expect(toggleButtonEl.classList.contains('d-sm-none')).toBe(true);
-      expect(toggleButtonEl.classList.contains('gutter-toggle')).toBe(true);
+      expect(toggleButtonEl.exists()).toBe(true);
+      expect(toggleButtonEl.attributes('aria-label')).toBe('Toggle sidebar');
+      expect(toggleButtonEl.classes()).toEqual(
+        expect.arrayContaining([('d-block', 'd-sm-none', 'gutter-toggle')]),
+      );
     });
 
     it('renders GitLab team member badge when `author.isGitlabEmployee` is `true`', () => {

@@ -23,6 +23,7 @@ module EE
         data[:epicLinksEndpoint] = group_epic_links_path(parent, issuable)
         data[:fullPath] = parent.full_path
         data[:projectsEndpoint] = expose_path(api_v4_groups_projects_path(id: parent.id))
+        data[:confidential] = issuable.confidential
       end
 
       data
