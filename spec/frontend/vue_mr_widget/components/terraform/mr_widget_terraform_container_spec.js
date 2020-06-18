@@ -74,7 +74,7 @@ describe('MrWidgetTerraformConainer', () => {
       it('diplays terraform components and stops loading', () => {
         expect(wrapper.find(GlSkeletonLoading).exists()).toBe(false);
 
-        expect(findPlans().length).toEqual(Object.keys(plans).length);
+        expect(findPlans()).toEqual(Object.values(plans));
       });
 
       it('does not make additional requests after poll is successful', () => {
