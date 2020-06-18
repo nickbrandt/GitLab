@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Ci
-  class CompareContainerScanningReportsService < ::Ci::CompareReportsBaseService
+  class CompareSecurityReportsService < ::Ci::CompareReportsBaseService
     def comparer_class
       Gitlab::Ci::Reports::Security::VulnerabilityReportsComparer
     end
@@ -11,7 +11,7 @@ module Ci
     end
 
     def get_report(pipeline)
-      Security::PipelineVulnerabilitiesFinder.new(pipeline: pipeline, params: { report_type: %w[container_scanning], scope: 'all' }).execute
+      Security::PipelineVulnerabilitiesFinder.new(pipeline: pipeline, params: { report_type: [params[:report_type]], scope: 'all' }).execute
     end
 
     def build_comparer(base_pipeline, head_pipeline)
