@@ -342,7 +342,6 @@ export default {
                 :stages="activeStages"
                 :medians="medians"
                 :is-creating-custom-stage="isCreatingCustomStage"
-                :can-edit-stages="true"
                 :custom-ordering="enableCustomOrdering"
                 @reorderStage="onStageReorder"
                 @selectStage="onStageSelect"
