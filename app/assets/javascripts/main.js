@@ -176,6 +176,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  /**
+   * TODO: Apparently we are collapsing the right sidebar on certain screensizes per default
+   * except on issue board pages. Why can't we do it with CSS?
+   *
+   * Proposal: Expose a global sidebar API, which we could import wherever we are manipulating
+   * the visibility of the sidebar.
+   *
+   * Quick fix: Get rid of jQuery for this implementation
+   */
   const isBoardsPage = /(projects|groups):boards:show/.test(document.body.dataset.page);
   if (!isBoardsPage && (bootstrapBreakpoint === 'sm' || bootstrapBreakpoint === 'xs')) {
     const $rightSidebar = $('aside.right-sidebar');
@@ -202,7 +211,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   localTimeAgo($('abbr.timeago, .js-timeago'), true);
 
-  // Disable form buttons while a form is submitting
+  /**
+   * This disables form buttons while a form is submitting
+   * We do not difinitively know all of the places where this is used
+   *
+   * TODO: Defer execution, migrate to behaviors, and add sentry logging
+   */
   $body.on('ajax:complete, ajax:beforeSend, submit', 'form', function ajaxCompleteCallback(e) {
     const $buttons = $('[type="submit"], .js-disable-on-submit', this).not('.js-no-auto-disable');
     switch (e.type) {
@@ -229,7 +243,11 @@ document.addEventListener('DOMContentLoaded', () => {
     $('.header-content').toggleClass('menu-expanded');
   });
 
-  // Commit show suppressed diff
+  /**
+   * Show suppressed commit diff
+   *
+   * TODO: Move to commit diff pages
+   */
   $document.on('click', '.diff-content .js-show-suppressed-diff', function showDiffCallback() {
     const $container = $(this).parent();
     $container.next('table').show();
