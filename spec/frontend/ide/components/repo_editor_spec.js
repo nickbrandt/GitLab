@@ -557,6 +557,11 @@ describe('RepoEditor', () => {
           });
         });
 
+      // Pasting an image does a lot of things like using the FileReader API,
+      // so, waitForPromises isn't very reliable (and causes a flaky spec)
+      // Read more about state.watch: https://vuex.vuejs.org/api/#watch
+      const waitForFileContentChange = () => watchState(s => s.entries['foo/bar.md'].content);
+
       beforeEach(() => {
         setFileName('bar.md');
 
@@ -576,13 +581,10 @@ describe('RepoEditor', () => {
         });
       });
 
-      // The following test is flaky
-      // see https://gitlab.com/gitlab-org/gitlab/-/issues/221039
-      // eslint-disable-next-line jest/no-disabled-tests
-      it.skip('adds an image entry to the same folder for a pasted image in a markdown file', () => {
+      it('adds an image entry to the same folder for a pasted image in a markdown file', () => {
         pasteImage();
 
-        return waitForPromises().then(() => {
+        return waitForFileContentChange().then(() => {
           expect(vm.$store.state.entries['foo/foo.png']).toMatchObject({
             path: 'foo/foo.png',
             type: 'blob',
@@ -596,10 +598,7 @@ describe('RepoEditor', () => {
       it("adds a markdown image tag to the file's contents", () => {
         pasteImage();
 
-        // Pasting an image does a lot of things like using the FileReader API,
-        // so, waitForPromises isn't very reliable (and causes a flaky spec)
-        // Read more about state.watch: https://vuex.vuejs.org/api/#watch
-        return watchState(s => s.entries['foo/bar.md'].content).then(() => {
+        return waitForFileContentChange().then(() => {
           expect(vm.file.content).toBe('hello world\n![foo.png](./foo.png)');
         });
       });
