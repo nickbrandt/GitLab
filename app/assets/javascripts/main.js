@@ -223,13 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   localTimeAgo($('abbr.timeago, .js-timeago'), true);
 
-  // Form submitter
-  $('.trigger-submit').on('change', function triggerSubmitCallback() {
-    $(this)
-      .parents('form')
-      .submit();
-  });
-
   // Disable form buttons while a form is submitting
   $body.on('ajax:complete, ajax:beforeSend, submit', 'form', function ajaxCompleteCallback(e) {
     const $buttons = $('[type="submit"], .js-disable-on-submit', this).not('.js-no-auto-disable');
