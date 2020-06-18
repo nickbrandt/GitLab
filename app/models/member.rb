@@ -25,7 +25,6 @@ class Member < ApplicationRecord
   validates :user_id, uniqueness: { scope: [:source_type, :source_id],
                                     message: "already exists in source",
                                     allow_nil: true }
-  validates :access_level, inclusion: { in: Gitlab::Access.all_values }, presence: true
   validate :higher_access_level_than_group, unless: :importing?
   validates :invite_email,
     presence: {

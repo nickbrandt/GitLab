@@ -12,6 +12,7 @@ class GroupPolicy < BasePolicy
 
   condition(:has_access) { access_level != GroupMember::NO_ACCESS }
 
+  condition(:limited_access) { access_level >= GroupMember::LIMITED_ACCESS }
   condition(:guest) { access_level >= GroupMember::GUEST }
   condition(:developer) { access_level >= GroupMember::DEVELOPER }
   condition(:owner) { access_level >= GroupMember::OWNER }

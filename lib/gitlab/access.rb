@@ -9,12 +9,13 @@ module Gitlab
   module Access
     AccessDeniedError = Class.new(StandardError)
 
-    NO_ACCESS  = 0
-    GUEST      = 10
-    REPORTER   = 20
-    DEVELOPER  = 30
-    MAINTAINER = 40
-    OWNER      = 50
+    NO_ACCESS      = 0
+    LIMITED_ACCESS = 5
+    GUEST          = 10
+    REPORTER       = 20
+    DEVELOPER      = 30
+    MAINTAINER     = 40
+    OWNER          = 50
 
     # Branch protection settings
     PROTECTION_NONE          = 0
@@ -38,12 +39,19 @@ module Gitlab
         options_with_owner.values
       end
 
+      def values_with_limited
+        options_with_limited.values
+      end
+
       def options
         {
-          "Guest"      => GUEST,
-          "Reporter"   => REPORTER,
-          "Developer"  => DEVELOPER,
-          "Maintainer" => MAINTAINER
+          # Added as a part of https://gitlab.com/gitlab-org/gitlab/-/merge_requests/34848
+          # Proof of concept work.
+          # "Limited Access" => LIMITED_ACCESS,
+          "Guest"          => GUEST,
+          "Reporter"       => REPORTER,
+          "Developer"      => DEVELOPER,
+          "Maintainer"     => MAINTAINER
         }
       end
 
@@ -56,6 +64,12 @@ module Gitlab
       def options_with_none
         options_with_owner.merge(
           "None" => NO_ACCESS
+        )
+      end
+
+      def options_with_limited
+        options_with_owner.merge(
+          "Limited Access" => LIMITED_ACCESS
         )
       end
 
