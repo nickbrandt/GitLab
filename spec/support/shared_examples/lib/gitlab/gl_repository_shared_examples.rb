@@ -12,14 +12,7 @@ RSpec.shared_examples 'parsing gl_repository identifier' do
 end
 
 RSpec.shared_examples 'illegal gl_identifier' do
-  subject do
-    described_class.parse(identifier).tap do |ident|
-      ident.repo_type
-      ident.container
-    end
-  end
-
   it 'raises an error' do
-    expect { subject }.to raise_error(described_class::IllegalIdentifier)
+    expect { described_class.parse(identifier) }.to raise_error(described_class::InvalidIdentifier)
   end
 end

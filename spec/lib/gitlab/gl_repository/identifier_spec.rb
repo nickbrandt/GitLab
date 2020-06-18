@@ -14,12 +14,32 @@ describe Gitlab::GlRepository::Identifier do
       let(:expected_container) { project }
       let(:expected_type) { Gitlab::GlRepository::PROJECT }
     end
+
+    it_behaves_like 'parsing gl_repository identifier' do
+      let(:record_id) { project.id }
+      let(:identifier) { "project-#{record_id}-project" }
+      let(:expected_container) { project }
+      let(:expected_type) { Gitlab::GlRepository::PROJECT }
+    end
+
+    it_behaves_like 'parsing gl_repository identifier' do
+      let(:identifier) { "project-1000000" }
+      let(:expected_container) { nil }
+      let(:expected_type) { Gitlab::GlRepository::PROJECT }
+    end
   end
 
   describe 'wiki' do
     it_behaves_like 'parsing gl_repository identifier' do
       let(:record_id) { project.id }
       let(:identifier) { "wiki-#{record_id}" }
+      let(:expected_container) { project }
+      let(:expected_type) { Gitlab::GlRepository::WIKI }
+    end
+
+    it_behaves_like 'parsing gl_repository identifier' do
+      let(:record_id) { project.id }
+      let(:identifier) { "project-#{record_id}-wiki" }
       let(:expected_container) { project }
       let(:expected_type) { Gitlab::GlRepository::WIKI }
     end
@@ -59,7 +79,11 @@ describe Gitlab::GlRepository::Identifier do
       [
         'wiki-noid',
         'foo-2',
+        'project-0',
+        '2-project',
         'snippet-2-wiki',
+        'project-wibble-wiki',
+        'wiki-1-project',
         'snippet',
         'project-1-wiki-bar'
       ]
