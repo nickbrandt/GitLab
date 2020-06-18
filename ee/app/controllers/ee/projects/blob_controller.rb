@@ -12,6 +12,7 @@ module EE
       private
 
       def validate_codeowner_rules
+        return unless ::Feature.enabled?(:use_legacy_codeowner_validations)
         return if params[:file_path].blank?
 
         codeowners_error = codeowners_check_error(project, branch_name, params[:file_path])
