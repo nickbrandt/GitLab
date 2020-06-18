@@ -1,5 +1,5 @@
 {
-  "requirement_iid1": "passed",
-  "requirement_iid2": "failed",
-  "requirement_iid3": "passed"
+  "1": "passed",
+  "2": "failed",
+  "3": "passed"
 }

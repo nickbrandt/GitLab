@@ -21,16 +21,18 @@ module RequirementsManagement
       def persist_requirement_reports(build, ci_report)
         timestamp = Time.current
 
-        if ci_report.all_passed?
-          bulk_insert!(persist_all_requirement_reports_as_passed(build, timestamp))
-        else
-          bulk_insert!(persist_individual_reports(build, ci_report, timestamp))
-        end
+        reports = if ci_report.all_passed?
+                    passed_reports_for_all_requirements(build, timestamp)
+                  else
+                    individual_reports(build, ci_report, timestamp)
+                  end
+
+        bulk_insert!(reports)
       end
 
       private
 
-      def persist_all_requirement_reports_as_passed(build, timestamp)
+      def passed_reports_for_all_requirements(build, timestamp)
         [].tap do |reports|
           build.project.requirements.opened.select(:id).find_each do |requirement|
             reports << build_report(state: :passed, requirement: requirement, build: build, timestamp: timestamp)
@@ -38,7 +40,7 @@ module RequirementsManagement
         end
       end
 
-      def persist_individual_reports(build, ci_report, timestamp)
+      def individual_reports(build, ci_report, timestamp)
         [].tap do |reports|
           iids = ci_report.requirements.keys
           break [] if iids.empty?
@@ -66,6 +68,8 @@ module RequirementsManagement
         )
       end
     end
+
+    private
 
     def validate_pipeline_reference
       if pipeline_id != build&.pipeline_id

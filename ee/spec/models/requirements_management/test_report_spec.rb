@@ -68,9 +68,9 @@ RSpec.describe RequirementsManagement::TestReport do
       context 'and the entries are valid' do
         let(:ci_report) do
           Gitlab::Ci::Reports::RequirementsManagement::Report.new.tap do |report|
-            report.add_requirement('requirement_iid1', 'passed')
-            report.add_requirement('requirement_iid2', 'failed')
-            report.add_requirement('requirement_iid3', 'passed')
+            report.add_requirement('1', 'passed')
+            report.add_requirement('2', 'failed')
+            report.add_requirement('3', 'passed')
           end
         end
 
@@ -84,13 +84,13 @@ RSpec.describe RequirementsManagement::TestReport do
 
           reports = RequirementsManagement::TestReport.where(pipeline: build.pipeline)
           expect(reports).to match_array([
-            have_attributes(
-              requirement: requirement1,
-              author: build.user,
-              state: 'passed'),
+            have_attributes(requirement: requirement1,
+                            author: build.user,
+                            state: 'passed'),
             have_attributes(requirement: requirement2,
-            author: build.user,
-            state: 'failed')
+                            author: build.user,
+                            state: 'failed')
+
           ])
         end
       end
@@ -98,9 +98,9 @@ RSpec.describe RequirementsManagement::TestReport do
       context 'and the entries are not valid' do
         let(:ci_report) do
           Gitlab::Ci::Reports::RequirementsManagement::Report.new.tap do |report|
-            report.add_requirement('requirement_iid0', 'passed')
-            report.add_requirement('requirement_iid1', 'nonsense')
-            report.add_requirement('requirement_iid2', nil)
+            report.add_requirement('0', 'passed')
+            report.add_requirement('1', 'nonsense')
+            report.add_requirement('2', nil)
           end
         end
 

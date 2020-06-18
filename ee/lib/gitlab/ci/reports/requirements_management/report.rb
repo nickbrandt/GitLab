@@ -12,7 +12,7 @@ module Gitlab
           end
 
           def add_requirement(key, value)
-            @requirements[key.remove('requirement_iid')] = value
+            @requirements[key] = value
           end
 
           def all_passed?
