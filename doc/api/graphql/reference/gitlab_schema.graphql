@@ -5024,6 +5024,11 @@ type Group {
   shareWithGroupLock: Boolean
 
   """
+  Total storage limit of the root namespace in bytes
+  """
+  storageSizeLimit: Int
+
+  """
   The permission level required to create subgroups within the group
   """
   subgroupCreationLevel: String
@@ -7741,6 +7746,11 @@ type Namespace {
   Aggregated storage statistics of the namespace. Only available for root namespaces
   """
   rootStorageStatistics: RootStorageStatistics
+
+  """
+  Total storage limit of the root namespace in bytes
+  """
+  storageSizeLimit: Int
 
   """
   Visibility of the namespace

@@ -13757,6 +13757,20 @@
               "deprecationReason": null
             },
             {
+              "name": "storageSizeLimit",
+              "description": "Total storage limit of the root namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "subgroupCreationLevel",
               "description": "The permission level required to create subgroups within the group",
               "args": [
@@ -22972,6 +22986,20 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "RootStorageStatistics",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "storageSizeLimit",
+              "description": "Total storage limit of the root namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               },
               "isDeprecated": false,
