@@ -128,6 +128,7 @@ export default {
         v-if="userCanCreate"
         class="btn btn-grouped btn-success btn-inverted js-new-epic-button"
         :href="newEpicWebUrl"
+        data-testid="new-epic-button"
       >
         {{ __('New epic') }}
       </gl-deprecated-button>
