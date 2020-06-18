@@ -62,12 +62,12 @@ function disableJQueryAnimations() {
 }
 
 // Disable jQuery animations
-if (gon && gon.disable_animations) {
+if (gon?.disable_animations) {
   disableJQueryAnimations();
 }
 
 // inject test utilities if necessary
-if (process.env.NODE_ENV !== 'production' && gon && gon.test_env) {
+if (process.env.NODE_ENV !== 'production' && gon?.test_env) {
   disableJQueryAnimations();
   import(/* webpackMode: "eager" */ './test_utils/'); // eslint-disable-line no-unused-expressions
 }
