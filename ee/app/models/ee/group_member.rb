@@ -26,8 +26,15 @@ module EE
     end
 
     class_methods do
+      extend ::Gitlab::Utils::Override
+
       def member_of_group?(group, user)
         exists?(group: group, user: user)
+      end
+
+      override :access_level_roles
+      def access_level_roles
+        ::Gitlab::Access.options_with_unassigned
       end
     end
 

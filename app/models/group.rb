@@ -268,7 +268,7 @@ class Group < Namespace
     add_user(user, :owner, current_user: current_user)
   end
 
-  def member?(user, min_access_level = Gitlab::Access::GUEST)
+  def member?(user, min_access_level = Gitlab::Access::UNASSIGNED)
     return false unless user
 
     max_member_access_for_user(user) >= min_access_level
@@ -326,7 +326,7 @@ class Group < Namespace
   # rubocop: enable CodeReuse/ServiceClass
 
   def user_ids_for_project_authorizations
-    members_with_parents.pluck(:user_id)
+    members_with_parents.where.not(access_level: Gitlab::Access::UNASSIGNED).pluck(:user_id)
   end
 
   def self_and_ancestors_ids
@@ -352,7 +352,7 @@ class Group < Namespace
   end
 
   def members_from_self_and_ancestors_with_effective_access_level
-    members_with_parents.select([:user_id, 'MAX(access_level) AS access_level'])
+    members_with_parents.non_unassigned.select([:user_id, 'MAX(access_level) AS access_level'])
                         .group(:user_id)
   end
 
