@@ -30,6 +30,16 @@ export default {
       type: Object,
       required: true,
     },
+    issueFeedback: {
+      type: Object,
+      required: false,
+      default: () => null,
+    },
+    mergeRequestFeedback: {
+      type: Object,
+      required: false,
+      default: () => null,
+    },
   },
 
   data: () => ({
@@ -150,16 +160,16 @@ export default {
   <div data-qa-selector="vulnerability_footer">
     <solution-card v-if="hasSolution" v-bind="solutionInfo" />
 
-    <div v-if="project.issue_feedback || project.merge_request_feedback" class="card">
+    <div v-if="issueFeedback || mergeRequestFeedback" class="card">
       <issue-note
-        v-if="project.issue_feedback"
-        :feedback="project.issue_feedback"
+        v-if="issueFeedback"
+        :feedback="issueFeedback"
         :project="project"
         class="card-body"
       />
       <merge-request-note
-        v-if="project.merge_request_feedback"
-        :feedback="project.merge_request_feedback"
+        v-if="mergeRequestFeedback"
+        :feedback="mergeRequestFeedback"
         :project="project"
         class="card-body"
       />
