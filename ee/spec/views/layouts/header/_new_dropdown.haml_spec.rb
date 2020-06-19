@@ -28,19 +28,9 @@ describe 'layouts/header/_new_dropdown' do
         group.add_owner(user)
       end
 
-      it 'does not have "New epic" link' do
-        render
-
-        expect(rendered).not_to have_link(
-          'New epic',
-          href: new_group_epic_path(group)
-        )
-      end
-
-      context 'when epics are enabled' do
+      context 'with the epics license' do
         before do
           stub_licensed_features(epics: true)
-          stub_feature_flags(create_epic_form: true)
         end
 
         it 'has a "New epic" link' do
@@ -50,6 +40,21 @@ describe 'layouts/header/_new_dropdown' do
             'New epic',
             href: new_group_epic_path(group)
           )
+        end
+
+        context 'with the create_epic_form feature flag disabled' do
+          before do
+            stub_feature_flags(create_epic_form: false)
+          end
+
+          it 'does not have "New epic" link' do
+            render
+
+            expect(rendered).not_to have_link(
+              'New epic',
+              href: new_group_epic_path(group)
+            )
+          end
         end
       end
     end
