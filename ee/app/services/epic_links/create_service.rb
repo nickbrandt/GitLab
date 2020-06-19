@@ -23,13 +23,11 @@ module EpicLinks
     def create_single_link
       child_epic = referenced_issuables.first
 
-      if linkable_epic?(child_epic)
-        set_child_epic!(child_epic)
-
-        create_notes(child_epic, nil)
+      if linkable_epic?(child_epic) && set_child_epic(child_epic)
+        create_notes(child_epic)
         success
       else
-        error(child_epic.errors.messages[:parent].first, 409)
+        error(child_epic.errors.values.flatten.to_sentence, 409)
       end
     end
 
@@ -41,19 +39,21 @@ module EpicLinks
       affected_epics = [issuable]
       affected_epics << referenced_epic if referenced_epic.parent
 
-      set_child_epic!(referenced_epic)
+      if set_child_epic(referenced_epic)
+        create_notes(referenced_epic)
+      end
 
-      yield
+      referenced_epic
     end
 
-    def create_notes(referenced_epic, params)
+    def create_notes(referenced_epic)
       SystemNoteService.change_epics_relation(issuable, referenced_epic, current_user, 'relate_epic')
     end
 
-    def set_child_epic!(child_epic)
+    def set_child_epic(child_epic)
       child_epic.parent = issuable
       child_epic.move_to_start
-      child_epic.save!
+      child_epic.save
     end
 
     def linkable_issuables(epics)

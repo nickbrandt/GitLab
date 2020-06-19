@@ -16,9 +16,12 @@ module EpicIssues
 
       link.epic = issuable
       link.move_to_start
-      link.save!
 
-      yield params
+      if link.save
+        create_notes(referenced_issue, params)
+      end
+
+      link
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
