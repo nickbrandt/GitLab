@@ -1,6 +1,7 @@
 query getStorageCounter($fullPath: ID!) {
   namespace(fullPath: $fullPath) {
     id
+    storageSizeLimit
     rootStorageStatistics {
       storageSize
       repositorySize
