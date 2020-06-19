@@ -1,0 +1,116 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "vector",
+    "result": [
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "10"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node1:9100",
+          "job": "node"
+        },
+        "value": [
+          1592912931.814,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node1:9229",
+          "job": "gitlab-workhorse"
+        },
+        "value": [
+          1592912931.814,
+          "4"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node2:9236",
+          "job": "gitaly"
+        },
+        "value": [
+          1592912931.814,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_cpus:count",
+          "instance": "node1:9100"
+        },
+        "value": [
+          1592912931.814,
+          "8"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_cpus:count",
+          "instance": "node2:9100"
+        },
+        "value": [
+          1592912931.814,
+          "16"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w",
+          "instance": "node2:9236",
+          "job": "gitaly"
+        },
+        "value": [
+          1592912931.814,
+          "400.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w",
+          "instance": "node1:9229",
+          "job": "gitlab-workhorse"
+        },
+        "value": [
+          1592912931.814,
+          "303.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_unique_memory_bytes:avg1w",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "301.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_proportional_memory_bytes:avg1w",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "302.25"
+        ]
+      }
+    ]
+  }
+}

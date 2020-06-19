@@ -1,0 +1,335 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "vector",
+    "result": [
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:gitlab_workhorse_http_requests:rate5m"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:gitlab_workhorse_http_requests:rate1h"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg",
+          "instance": "node2:8080",
+          "job": "cadvisor"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg",
+          "instance": "node1:9229",
+          "job": "gitlab-workhorse"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg",
+          "instance": "node2:9236",
+          "job": "gitaly"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg",
+          "instance": "node1:8080",
+          "job": "node"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_unique_memory_bytes:avg",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_proportional_memory_bytes:avg",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "10"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node2:8080",
+          "job": "cadvisor"
+        },
+        "value": [
+          1592912931.814,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node1:9100",
+          "job": "node"
+        },
+        "value": [
+          1592912931.814,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node2:9100",
+          "job": "node"
+        },
+        "value": [
+          1592912931.814,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node1:9229",
+          "job": "gitlab-workhorse"
+        },
+        "value": [
+          1592912931.814,
+          "4"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process:count",
+          "instance": "node2:9236",
+          "job": "gitaly"
+        },
+        "value": [
+          1592912931.814,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:gitlab_workhorse_http_requests:rate1d"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:gitlab_workhorse_http_requests:rate1w"
+        },
+        "value": [
+          1592912931.814,
+          "11.1235226438044264152"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_cpus:count",
+          "instance": "node1:9100"
+        },
+        "value": [
+          1592912931.814,
+          "8"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_cpus:count",
+          "instance": "node2:9100"
+        },
+        "value": [
+          1592912931.814,
+          "16"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_memory_total_bytes:avg",
+          "instance": "node1:9100"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_memory_total_bytes:avg1w",
+          "instance": "node1:9100"
+        },
+        "value": [
+          1592912931.814,
+          "512"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_memory_total_bytes:avg",
+          "instance": "node2:9100"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_memory_total_bytes:avg1w",
+          "instance": "node2:9100"
+        },
+        "value": [
+          1592912931.814,
+          "1024"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w",
+          "instance": "node2:8080",
+          "job": "cadvisor"
+        },
+        "value": [
+          1592912931.814,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w",
+          "instance": "node2:9236",
+          "job": "gitaly"
+        },
+        "value": [
+          1592912931.814,
+          "400.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "300.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w",
+          "instance": "node1:8080",
+          "job": "node"
+        },
+        "value": [
+          1592912931.814,
+          "304.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w",
+          "instance": "node2:8080",
+          "job": "node"
+        },
+        "value": [
+          1592912931.814,
+          "401.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w",
+          "instance": "node1:9229",
+          "job": "gitlab-workhorse"
+        },
+        "value": [
+          1592912931.814,
+          "303.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_unique_memory_bytes:avg1w",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "301.25"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "gitlab_usage_ping:node_service_process_proportional_memory_bytes:avg1w",
+          "instance": "node1:8080",
+          "job": "gitlab-rails"
+        },
+        "value": [
+          1592912931.814,
+          "302.25"
+        ]
+      }
+    ]
+  }
+}

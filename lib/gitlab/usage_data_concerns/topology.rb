@@ -18,119 +18,105 @@ module Gitlab
 
       def topology_usage_data
         topology_data, duration = measure_duration do
-          alt_usage_data(fallback: {}) do
-            {
-              nodes: topology_node_data
-            }.compact
-          end
+          topology_all_data || {}
         end
+
         { topology: topology_data.merge(duration_s: duration) }
       end
 
       private
 
-      def topology_node_data
-        with_prometheus_client do |client|
-          # node-level data
-          by_instance_mem = topology_node_memory(client)
-          by_instance_cpus = topology_node_cpus(client)
-          # service-level data
-          by_instance_by_job_by_metric_memory = topology_all_service_memory(client)
-          by_instance_by_job_process_count = topology_all_service_process_count(client)
+      # Returns either nil or a non-empty hash with data (i.e. nil elements removed)
+      def topology_all_data
+        alt_usage_data(fallback: nil) do
+          with_prometheus_client do |client|
+            response = client.query('{__name__ =~ "^gitlab_usage_ping:.+"}')
 
-          instances = Set.new(by_instance_mem.keys + by_instance_cpus.keys)
-          instances.map do |instance|
+            other_metrics, node_specific_metrics = topology_extract_metrics_groups(response)
+
             {
-              node_memory_total_bytes: by_instance_mem[instance],
-              node_cpus: by_instance_cpus[instance],
-              node_services:
-                topology_node_services(instance, by_instance_by_job_process_count, by_instance_by_job_by_metric_memory)
+              application_requests_per_hour: alt_usage_data { topology_app_requests_per_hour(other_metrics) },
+              nodes: alt_usage_data(fallback: []) { topology_nodes(node_specific_metrics) }
             }.compact
           end
         end
       end
 
-      def topology_node_memory(client)
-        aggregate_single(client, 'avg (node_memory_MemTotal_bytes) by (instance)')
-      end
-
-      def topology_node_cpus(client)
-        aggregate_single(client, 'count (node_cpu_seconds_total{mode="idle"}) by (instance)')
-      end
-
-      def topology_all_service_memory(client)
-        aggregate_many(
-          client,
-          'avg ({__name__ =~ "(ruby_){0,1}process_(resident|unique|proportional)_memory_bytes", job != "gitlab_exporter_process"}) by (instance, job, __name__)'
-        )
-      end
-
-      def topology_all_service_process_count(client)
-        aggregate_many(client, 'count ({__name__ =~ "(ruby_){0,1}process_start_time_seconds", job != "gitlab_exporter_process"}) by (instance, job)')
-      end
-
-      def topology_node_services(instance, all_process_counts, all_process_memory)
-        # returns all node service data grouped by service name as the key
-        instance_service_data =
-          topology_instance_service_process_count(instance, all_process_counts)
-            .deep_merge(topology_instance_service_memory(instance, all_process_memory))
-
-        # map to list of hashes where service names become values instead, and remove
-        # unknown services, since they might not be ours
-        instance_service_data.each_with_object([]) do |entry, list|
-          service, service_metrics = entry
-          gitlab_service = JOB_TO_SERVICE_NAME[service.to_s]
-          next unless gitlab_service
-
-          list << { name: gitlab_service }.merge(service_metrics)
+      # Splits up all metric data into those that are per-node and those that are not
+      # node specific (i.e. global)
+      def topology_extract_metrics_groups(all_metrics)
+        metrics_groups = all_metrics.group_by do |hash|
+          hash['metric']['instance'].present?
         end
+
+        other_metrics = metrics_groups[false]
+        node_specific_metrics = metrics_groups[true]
+
+        [other_metrics, node_specific_metrics]
       end
 
-      def topology_instance_service_process_count(instance, all_instance_data)
-        topology_data_for_instance(instance, all_instance_data).to_h do |metric, count|
-          [metric['job'], { process_count: count }]
+      def topology_app_requests_per_hour(metrics)
+        app_requests_per_second_metric = metrics.find do |metric|
+          metric['metric']['__name__'] == 'gitlab_usage_ping:gitlab_workhorse_http_requests:rate1w'
         end
+
+        return unless app_requests_per_second_metric
+
+        (app_requests_per_second_metric['value'].last.to_f * 60 * 60).to_i
       end
 
-      def topology_instance_service_memory(instance, all_instance_data)
-        topology_data_for_instance(instance, all_instance_data).each_with_object({}) do |entry, hash|
-          metric, memory = entry
-          job = metric['job']
-          key =
-            case metric['__name__']
-            when match_process_memory_metric_for_type('resident') then :process_memory_rss
-            when match_process_memory_metric_for_type('unique') then :process_memory_uss
-            when match_process_memory_metric_for_type('proportional') then :process_memory_pss
+      def topology_nodes(node_specific_metrics)
+        # Normalize instance names so we can process data on a per-node basis
+        metrics_by_node = node_specific_metrics.group_by { |h| drop_port(h['metric']['instance']) }
+
+        metrics_by_node.map do |_node_name, node_data|
+          topology_process_node_data(node_data).tap do |result|
+            # turn hash with services as keys into list of hashes with service names as values
+            result[:node_services] = result[:node_services].map do |service_name, service_data|
+              service_data.merge(name: service_name)
             end
-
-          hash[job] ||= {}
-          hash[job][key] ||= memory
+          end
         end
       end
 
-      def match_process_memory_metric_for_type(type)
-        /(ruby_){0,1}process_#{type}_memory_bytes/
+      def topology_process_node_data(node_data)
+        node_data.each_with_object({}) do |data, result|
+          labels, value = [data['metric'], data['value'].last.to_i]
+          metric_name = labels['__name__']
+          job_name = labels['job']
+
+          case metric_name
+          when 'gitlab_usage_ping:node_memory_total_bytes:avg1w'
+            result[:node_memory_total_bytes] = value
+          when 'gitlab_usage_ping:node_cpus:count'
+            result[:node_cpus] = value
+          when /gitlab_usage_ping:node_service_/
+            result[:node_services] ||= {}
+            result[:node_services].deep_merge!(topology_node_service_data(metric_name, job_name, value))
+          end
+        end
       end
 
-      def topology_data_for_instance(instance, all_instance_data)
-        all_instance_data.filter { |metric, _value| metric['instance'] == instance }
+      def topology_node_service_data(metric_name, job_label, value)
+        gitlab_service = JOB_TO_SERVICE_NAME[job_label]
+        return {} unless gitlab_service
+
+        case metric_name
+        when 'gitlab_usage_ping:node_service_process_resident_memory_bytes:avg1w'
+          { gitlab_service => { process_memory_rss: value } }
+        when 'gitlab_usage_ping:node_service_process_unique_memory_bytes:avg1w'
+          { gitlab_service => { process_memory_uss: value } }
+        when 'gitlab_usage_ping:node_service_process_proportional_memory_bytes:avg1w'
+          { gitlab_service => { process_memory_pss: value } }
+        when 'gitlab_usage_ping:node_service_process:count'
+          { gitlab_service => { process_count: value } }
+        else
+          {}
+        end
       end
 
       def drop_port(instance)
         instance.gsub(/:.+$/, '')
-      end
-
-      # Will retain a single `instance` key that values are mapped to
-      def aggregate_single(client, query)
-        client.aggregate(query) { |metric| drop_port(metric['instance']) }
-      end
-
-      # Will retain a composite key that values are mapped to
-      def aggregate_many(client, query)
-        client.aggregate(query) do |metric|
-          metric['instance'] = drop_port(metric['instance'])
-          metric
-        end
       end
     end
   end

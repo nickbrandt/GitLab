@@ -230,7 +230,10 @@ module UsageDataHelpers
 
   def allow_prometheus_queries
     allow_next_instance_of(Gitlab::PrometheusClient) do |client|
-      allow(client).to receive(:aggregate).and_return({})
+      allow(client).to receive(:query).and_return(prometheus_empty_body('vector'))
+      allow(client).to receive(:query_range).and_return(prometheus_empty_body('vector'))
+      allow(client).to receive(:aggregate).and_return(prometheus_empty_body('vector'))
+      allow(client).to receive(:scalar).and_return(0.0)
     end
   end
 
