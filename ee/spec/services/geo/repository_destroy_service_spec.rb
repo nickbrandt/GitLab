@@ -24,34 +24,41 @@ RSpec.describe Geo::RepositoryDestroyService, :geo do
 
   describe '#execute' do
     context 'with a project on a legacy storage' do
-      let(:project) { create(:project_empty_repo, :legacy_storage) }
+      let(:project) { create(:project_empty_repo, :legacy_storage, :wiki_repo) }
+      let(:repository_disk_path) { "#{project.disk_path}.git" }
+      let(:repository_deleted_disk_path) { "#{project.disk_path}+#{project.id}#{Repositories::ShellDestroyService::DELETED_FLAG}.git" }
+      let(:wiki_disk_path) { "#{project.disk_path}.wiki.git" }
+      let(:wiki_deleted_disk_path) { "#{project.disk_path}.wiki+#{project.id}#{Repositories::ShellDestroyService::DELETED_FLAG}.git" }
 
       subject(:service) { described_class.new(project.id, project.name, project.disk_path, project.repository_storage) }
 
-      it 'delegates project removal to Projects::DestroyService' do
-        expect_any_instance_of(EE::Projects::DestroyService).to receive(:geo_replicate)
+      it 'delegates project removal to Projects::DestroyService#geo_replicate' do
+        expect_next_instance_of(Projects::DestroyService) do |destroy_service|
+          expect(destroy_service).to receive(:geo_replicate).once
+        end
 
         service.execute
       end
 
-      it 'removes the repository from disk' do
-        project.delete
-
-        expect(project.gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
+      it 'moves the repository/wiki to a +deleted folder' do
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_disk_path)).to be_truthy
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_deleted_disk_path)).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_disk_path)).to be_truthy
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_deleted_disk_path)).to be_falsey
 
         service.execute
 
-        expect(project.gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_disk_path)).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_deleted_disk_path)).to be_truthy
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_disk_path)).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_deleted_disk_path)).to be_truthy
       end
 
-      it 'cleans up deleted repositories' do
-        project.delete
+      it 'cleans up the repository/wiki +deleted folders', :sidekiq_inline do
+        subject.execute
 
-        expect(::GitlabShellWorker).to receive(:perform_in)
-          .with(5.minutes, :remove_repository, project.repository_storage, "#{project.disk_path}+#{project.id}+deleted")
-          .and_return(true)
-
-        service.execute
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_deleted_disk_path)).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_deleted_disk_path)).to be_falsey
       end
 
       it 'removes the tracking entries' do
@@ -66,34 +73,41 @@ RSpec.describe Geo::RepositoryDestroyService, :geo do
     end
 
     context 'with a project on a hashed storage' do
-      let(:project) { create(:project_empty_repo) }
+      let(:project) { create(:project_empty_repo, :wiki_repo) }
+      let(:repository_disk_path) { "#{project.disk_path}.git" }
+      let(:repository_deleted_disk_path) { "#{project.disk_path}+#{project.id}#{Repositories::ShellDestroyService::DELETED_FLAG}.git" }
+      let(:wiki_disk_path) { "#{project.disk_path}.wiki.git" }
+      let(:wiki_deleted_disk_path) { "#{project.disk_path}.wiki+#{project.id}#{Repositories::ShellDestroyService::DELETED_FLAG}.git" }
 
       subject(:service) { described_class.new(project.id, project.name, project.disk_path, project.repository_storage) }
 
       it 'delegates project removal to Projects::DestroyService' do
-        expect_any_instance_of(EE::Projects::DestroyService).to receive(:geo_replicate)
+        expect_next_instance_of(Projects::DestroyService) do |destroy_service|
+          expect(destroy_service).to receive(:geo_replicate).once
+        end
 
         service.execute
       end
 
-      it 'removes the repository from disk' do
-        project.delete
-
-        expect(project.gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
+      it 'moves the repository/wiki to a +deleted folder' do
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_disk_path)).to be_truthy
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_deleted_disk_path)).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_disk_path)).to be_truthy
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_deleted_disk_path)).to be_falsey
 
         service.execute
 
-        expect(project.gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_disk_path)).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_deleted_disk_path)).to be_truthy
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_disk_path)).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_deleted_disk_path)).to be_truthy
       end
 
-      it 'cleans up deleted repositories' do
-        project.delete
+      it 'cleans up the repository/wiki +deleted folders', :sidekiq_inline do
+        subject.execute
 
-        expect(::GitlabShellWorker).to receive(:perform_in)
-          .with(5.minutes, :remove_repository, project.repository_storage, "#{project.disk_path}+#{project.id}+deleted")
-          .and_return(true)
-
-        service.execute
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, repository_deleted_disk_path)).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, wiki_deleted_disk_path)).to be_falsey
       end
 
       it 'removes the tracking entries' do
@@ -113,7 +127,9 @@ RSpec.describe Geo::RepositoryDestroyService, :geo do
       subject(:service) { described_class.new(project.id, project.name, project.disk_path, project.repository_storage) }
 
       it 'delegates project removal to Projects::DestroyService' do
-        expect_any_instance_of(EE::Projects::DestroyService).to receive(:geo_replicate)
+        expect_next_instance_of(Projects::DestroyService) do |destroy_service|
+          expect(destroy_service).to receive(:geo_replicate).once
+        end
 
         service.execute
       end
@@ -159,7 +175,9 @@ RSpec.describe Geo::RepositoryDestroyService, :geo do
         subject(:service) { described_class.new(project.id) }
 
         it 'delegates project removal to Projects::DestroyService' do
-          expect_any_instance_of(EE::Projects::DestroyService).to receive(:geo_replicate)
+          expect_next_instance_of(Projects::DestroyService) do |destroy_service|
+            expect(destroy_service).to receive(:geo_replicate).once
+          end
 
           service.execute
         end
