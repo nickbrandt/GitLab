@@ -54,9 +54,17 @@ export default {
 
 <template>
   <div class="md" data-qa-selector="vulnerability_details">
-    <h1 class="mt-3 mb-2 border-bottom-0" data-testid="title">{{ vulnerability.title }}</h1>
+    <h1
+      class="mt-3 mb-2 border-bottom-0"
+      data-testid="title"
+      data-qa-selector="vulnerability_title"
+    >
+      {{ vulnerability.title }}
+    </h1>
     <h3 class="mt-0">{{ __('Description') }}</h3>
-    <p data-testid="description">{{ vulnerability.description }}</p>
+    <p data-testid="description" data-qa-selector="vulnerability_description">
+      {{ vulnerability.description }}
+    </p>
 
     <ul>
       <detail-item :sprintf-message="__('%{labelStart}Severity:%{labelEnd} %{severity}')">
