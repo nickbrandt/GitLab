@@ -25,8 +25,7 @@
 
   %meta{ 'http-equiv' => 'X-UA-Compatible', content: 'IE=edge' }
 
-  - if page_startup_api_calls
-    = render 'layouts/startup_js'
+  = render 'layouts/startup_js'
 
   -# Open Graph - http://ogp.me/
   %meta{ property: 'og:type', content: "object" }

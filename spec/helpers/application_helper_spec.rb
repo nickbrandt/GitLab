@@ -212,8 +212,10 @@ describe ApplicationHelper do
   describe '#page_startup_api_calls' do
     it 'returns map containing JS Page Startup Calls' do
       helper.add_page_startup_api_call("testURL")
+
       startup_calls = helper.page_startup_api_calls
-      expect(startup_calls["testURL"]).to eq("")
+
+      expect(startup_calls["testURL"]).to eq({})
     end
   end
 
