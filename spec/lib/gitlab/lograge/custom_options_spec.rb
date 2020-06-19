@@ -51,8 +51,10 @@ RSpec.describe Gitlab::Lograge::CustomOptions do
         allow(Gitlab::Metrics::Transaction).to receive(:current).and_return(transaction)
       end
 
-      it 'adds db counters' do
-        expect(subject).to include(:db_count, :db_write_count, :db_cached_count)
+      it 'adds db counters', :request_store do
+        ActiveRecord::Base.connection.execute('SELECT pg_sleep(0.1);')
+
+        expect(subject).to include(db_count: 1, db_write_count: 0, db_cached_count: 0)
       end
     end
 
