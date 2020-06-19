@@ -29,10 +29,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    canEditStages: {
-      type: Boolean,
-      required: true,
-    },
     customOrdering: {
       type: Boolean,
       required: false,
@@ -92,7 +88,6 @@ export default {
       :title="stage.title"
       :value="medianValue(stage.id)"
       :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
-      :can-edit="canEditStages"
       :is-default-stage="!stage.custom"
       @remove="$emit($options.STAGE_ACTIONS.REMOVE, stage.id)"
       @hide="$emit($options.STAGE_ACTIONS.HIDE, { id: stage.id, hidden: true })"
@@ -100,7 +95,6 @@ export default {
       @edit="$emit($options.STAGE_ACTIONS.EDIT, stage)"
     />
     <add-stage-button
-      v-if="canEditStages"
       :class="$options.noDragClass"
       :active="isCreatingCustomStage"
       @showform="$emit('showAddStageForm')"

@@ -31,11 +31,6 @@ export default {
       default: 0,
       required: false,
     },
-    canEdit: {
-      type: Boolean,
-      default: false,
-      required: false,
-    },
     id: {
       // The IDs of stages are strings until custom stages have been added.
       // Only at this point the IDs become numbers, so we have to allow both.
@@ -56,14 +51,8 @@ export default {
     median() {
       return approximateDuration(this.value);
     },
-    editable() {
-      return this.canEdit;
-    },
-    menuOpen() {
-      return this.canEdit && this.isHover;
-    },
     openMenuClasses() {
-      return this.menuOpen ? 'd-flex justify-content-end' : '';
+      return this.isHover ? 'd-flex justify-content-end' : '';
     },
   },
   mounted() {
@@ -100,11 +89,7 @@ export default {
     @mouseover="handleHover(true)"
     @mouseleave="handleHover()"
   >
-    <stage-card-list-item
-      :is-active="isActive"
-      :can-edit="editable"
-      class="d-flex justify-space-between"
-    >
+    <stage-card-list-item :is-active="isActive" class="d-flex justify-space-between">
       <div
         ref="title"
         class="stage-nav-item-cell stage-name text-truncate w-50 pr-2"
@@ -120,7 +105,7 @@ export default {
           <span v-if="hasValue">{{ median }}</span>
           <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
         </div>
-        <div v-show="menuOpen" ref="dropdown" :class="[openMenuClasses]" class="dropdown w-25">
+        <div v-show="isHover" ref="dropdown" :class="[openMenuClasses]" class="dropdown w-25">
           <gl-deprecated-button
             :title="__('More actions')"
             class="more-actions-toggle btn btn-transparent p-0"
