@@ -89,7 +89,7 @@ export default {
             <span class="d-flex">
               <icon
                 :title="s__('MetricChart|Selected')"
-                class="flex-shrink-0 append-right-4"
+                class="flex-shrink-0 gl-mr-2"
                 :class="{
                   invisible: !isSelectedMetric(metric.key),
                 }"

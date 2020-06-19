@@ -76,7 +76,7 @@ export default {
         <gl-dropdown-item v-for="(name, id) in sortFields" :key="id" @click="setSortField(id)">
           <span class="d-flex">
             <gl-icon
-              class="flex-shrink-0 append-right-4"
+              class="flex-shrink-0 gl-mr-2"
               :class="{ invisible: !isCurrentSortField(id) }"
               name="mobile-issue-close"
             />
