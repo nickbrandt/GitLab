@@ -186,6 +186,7 @@ export default {
             :aria-label="__('Go full screen')"
             class="toolbar-btn toolbar-fullscreen-btn js-zen-enter"
             data-container="body"
+            tabindex="-1"
             :title="__('Go full screen')"
             type="button"
           >
