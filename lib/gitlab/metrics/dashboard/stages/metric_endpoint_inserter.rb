@@ -6,7 +6,7 @@ module Gitlab
       module Stages
         class MetricEndpointInserter < BaseStage
           def transform!
-            raise Errors::DashboardProcessingError.new('Environment is required for Stages::MetricEndpointInserter') unless params[:environment]
+            raise Errors::DashboardProcessingError.new(_('Environment is required for Stages::MetricEndpointInserter')) unless params[:environment]
 
             for_metrics do |metric|
               metric[:prometheus_endpoint_path] = endpoint_for_metric(metric)
