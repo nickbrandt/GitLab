@@ -1,3 +1,7 @@
+// this file can't be migrated to jest because it relies on the browser to perform integration tests:
+// (specifically getClientBoundingRect and mouse movements)
+// see: https://gitlab.com/groups/gitlab-org/-/epics/895#what-if-theres-a-karma-spec-which-is-simply-unmovable-to-jest-ie-it-is-dependent-on-a-running-browser-environment
+
 import { GlBreakpointInstance } from '@gitlab/ui/dist/utils';
 import {
   calculateTop,

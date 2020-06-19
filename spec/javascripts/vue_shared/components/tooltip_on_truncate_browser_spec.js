@@ -1,3 +1,7 @@
+// this file can't be migrated to jest because it relies on the browser to perform integration tests:
+// (specifically testing around css properties `overflow` and `white-space`)
+// see: https://gitlab.com/groups/gitlab-org/-/epics/895#what-if-theres-a-karma-spec-which-is-simply-unmovable-to-jest-ie-it-is-dependent-on-a-running-browser-environment
+
 import { mount, shallowMount } from '@vue/test-utils';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 
