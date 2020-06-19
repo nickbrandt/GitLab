@@ -20,7 +20,13 @@ module IssuableLinks
         return error(issuables_not_found_message, 404)
       end
 
+      @errors = []
       create_links
+
+      if @errors.present?
+        return error(@errors.join('. '), 422)
+      end
+
       success
     end
 
@@ -36,18 +42,26 @@ module IssuableLinks
 
     def create_links
       objects = linkable_issuables(referenced_issuables)
-
       # it is important that this is not called after relate_issuables, as it relinks epic to the issuable
       # see EpicLinks::EpicIssues#relate_issuables
       affected_epics = affected_epics(objects)
 
-      objects.each do |referenced_object|
-        relate_issuables(referenced_object) do |params|
-          create_notes(referenced_object, params)
-        end
-      end
+      link_issuables(objects)
 
       Epics::UpdateDatesService.new(affected_epics).execute unless affected_epics.blank?
+    end
+
+    def link_issuables(target_issuables)
+      target_issuables.each do |referenced_object|
+        link = relate_issuables(referenced_object)
+
+        unless link.valid?
+          @errors << _("%{ref} cannot be added: %{error}") % {
+            ref: referenced_object.to_reference,
+            error: link.errors.messages.values.flatten.to_sentence
+          }
+        end
+      end
     end
 
     def referenced_issuables

@@ -2,17 +2,21 @@
 
 module IssueLinks
   class CreateService < IssuableLinks::CreateService
+    # rubocop: disable CodeReuse/ActiveRecord
     def relate_issuables(referenced_issue)
-      attrs = { source: issuable, target: referenced_issue }
+      link = IssueLink.find_or_initialize_by(source: issuable, target: referenced_issue)
 
       if params[:link_type].present?
-        attrs[:link_type] = params[:link_type]
+        link.link_type = params[:link_type]
       end
 
-      link = IssueLink.create(attrs)
+      if link.changed? && link.save
+        create_notes(referenced_issue)
+      end
 
-      yield if link.persisted?
+      link
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     def linkable_issuables(issues)
       @linkable_issuables ||= begin
@@ -20,7 +24,7 @@ module IssueLinks
       end
     end
 
-    def create_notes(referenced_issue, params)
+    def create_notes(referenced_issue)
       SystemNoteService.relate_issue(issuable, referenced_issue, current_user)
       SystemNoteService.relate_issue(referenced_issue, issuable, current_user)
     end

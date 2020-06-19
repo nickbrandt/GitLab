@@ -13,8 +13,6 @@ RSpec.describe EpicIssues::CreateService do
     let(:user) { create(:user) }
     let(:valid_reference) { issue.to_reference(full: true) }
 
-    let!(:existing_link) { create(:epic_issue, epic: epic, issue: issue3) }
-
     def assign_issue(references)
       params = { issuable_references: references }
 
@@ -32,6 +30,8 @@ RSpec.describe EpicIssues::CreateService do
       end
 
       it 'orders the epic issue to the first place and moves the existing ones down' do
+        existing_link = create(:epic_issue, epic: epic, issue: issue3)
+
         subject
 
         expect(created_link.relative_position).to be < existing_link.reload.relative_position
@@ -175,13 +175,15 @@ RSpec.describe EpicIssues::CreateService do
             let(:created_link2) { EpicIssue.find_by!(issue_id: issue2.id) }
 
             it 'creates new relationships' do
-              expect { subject }.to change(EpicIssue, :count).from(1).to(3)
+              expect { subject }.to change { EpicIssue.count }.by(2)
 
               expect(created_link1).to have_attributes(epic: epic)
               expect(created_link2).to have_attributes(epic: epic)
             end
 
             it 'orders the epic issues to the first place and moves the existing ones down' do
+              existing_link = create(:epic_issue, epic: epic, issue: issue3)
+
               subject
 
               expect(created_link2.relative_position).to be < created_link1.relative_position
@@ -195,6 +197,32 @@ RSpec.describe EpicIssues::CreateService do
             it 'creates 2 system notes for each issue' do
               expect { subject }.to change { Note.count }.from(0).to(4)
             end
+          end
+        end
+
+        context 'when there are invalid references' do
+          let(:epic) { create(:epic, confidential: true, group: group) }
+          let(:valid_issue) { create(:issue, :confidential, project: project) }
+          let(:invalid_issue1) { create(:issue, project: project) }
+          let(:invalid_issue2) { create(:issue, project: project) }
+
+          subject do
+            assign_issue([invalid_issue1.to_reference(full: true),
+                          valid_issue.to_reference(full: true),
+                          invalid_issue2.to_reference(full: true)])
+          end
+
+          it 'creates links only for valid references' do
+            expect { subject }.to change { EpicIssue.count }.by(1)
+          end
+
+          it 'returns error status' do
+            expect(subject).to eq(
+              status: :error,
+              http_status: 422,
+              message: "#{invalid_issue1.to_reference} cannot be added: Cannot set confidential epic for not-confidential issue. "\
+                       "#{invalid_issue2.to_reference} cannot be added: Cannot set confidential epic for not-confidential issue"
+            )
           end
         end
       end
@@ -251,7 +279,7 @@ RSpec.describe EpicIssues::CreateService do
         end
 
         it 'does not create a new association' do
-          expect { subject }.not_to change(EpicIssue, :count).from(2)
+          expect { subject }.not_to change(EpicIssue, :count)
         end
 
         it 'updates the existing association' do
@@ -263,7 +291,7 @@ RSpec.describe EpicIssues::CreateService do
         end
 
         it 'creates 3 system notes' do
-          expect { subject }.to change { Note.count }.from(0).to(3)
+          expect { subject }.to change { Note.count }.by(3)
         end
 
         it 'updates both old and new epic milestone dates' do

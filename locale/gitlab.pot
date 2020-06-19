@@ -520,6 +520,9 @@ msgstr ""
 msgid "%{primary} (%{secondary})"
 msgstr ""
 
+msgid "%{ref} cannot be added: %{error}"
+msgstr ""
+
 msgid "%{releases} release"
 msgid_plural "%{releases} releases"
 msgstr[0] ""
