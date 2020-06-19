@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this, no-param-reassign */
 /*
-  no-param-reassign is disabled because one method of BoardsStoreEE 
+  no-param-reassign is disabled because one method of BoardsStoreEE
   modify the passed parameter in conformity with non-ee BoardsStore.
 */
 
@@ -190,7 +190,7 @@ class BoardsStoreEE {
     issue.epic = newEpic;
   }
 
-  updateWeight(newWeight, id) {
+  updateWeight([newWeight, id]) {
     const { issue } = this.store.detail;
     if (issue.id === id && issue.sidebarInfoEndpoint) {
       issue.setLoadingState('weight', true);
