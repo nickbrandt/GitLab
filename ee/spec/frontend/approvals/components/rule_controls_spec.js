@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import MREditModule from 'ee/approvals/stores/modules/mr_edit';
 import { createStoreOptions } from 'ee/approvals/stores';
 import RuleControls from 'ee/approvals/components/rule_controls.vue';
@@ -31,7 +31,7 @@ describe('EE Approvals RuleControls', () => {
       store: new Vuex.Store(store),
     });
   };
-  const findButtons = () => wrapper.findAll(GlDeprecatedButton);
+  const findButtons = () => wrapper.findAll(GlButton);
   const findButton = label => findButtons().filter(button => hasLabel(button, label)).wrappers[0];
   const findEditButton = () => findButton('Edit');
   const findRemoveButton = () => findButton('Remove');
