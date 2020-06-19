@@ -17449,9 +17449,6 @@ msgstr ""
 msgid "ProjectService|Comment"
 msgstr ""
 
-msgid "ProjectService|Comment will be posted on each event"
-msgstr ""
-
 msgid "ProjectService|Perform common operations on GitLab project: %{project_name}"
 msgstr ""
 
