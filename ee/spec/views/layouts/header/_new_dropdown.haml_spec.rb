@@ -14,6 +14,15 @@ describe 'layouts/header/_new_dropdown' do
       assign(:group, group)
     end
 
+    it 'does not have "New epic" link' do
+      render
+
+      expect(rendered).not_to have_link(
+        'New epic',
+        href: new_group_epic_path(group)
+      )
+    end
+
     context 'as a Group owner' do
       before do
         group.add_owner(user)
