@@ -6,7 +6,7 @@
 - show_auto_devops_callout = show_auto_devops_callout?(@project)
 - add_page_startup_api_call logs_file_project_ref_path(@project, ref, @path, format: "json", offset: 0)
 - if @tree.readme
-  - add_page_startup_api_call "#{project_blob_path(@project, tree_join(@ref, @tree.readme.path))}?viewer=rich&format=json"
+  - add_page_startup_api_call project_blob_path(@project, tree_join(@ref, @tree.readme.path), viewer: "rich", format: "json")
 
 #tree-holder.tree-holder.clearfix
   .nav-block
