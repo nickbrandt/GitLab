@@ -33,7 +33,11 @@ module Gitlab
           end
 
           def query_type(metric)
-            metric[:query] ? :query : :query_range
+            if metric[:query]
+              ::Prometheus::ProxyService::PROMETHEUS_QUERY_API.to_sym
+            else
+              ::Prometheus::ProxyService::PROMETHEUS_QUERY_RANGE_API.to_sym
+            end
           end
 
           def query_for_metric(metric)
