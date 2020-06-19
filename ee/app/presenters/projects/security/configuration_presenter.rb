@@ -25,7 +25,7 @@ module Projects
           license_management: _('Search your project dependencies for their licenses and apply policies.'),
           license_scanning: _('Search your project dependencies for their licenses and apply policies.'),
           sast: _('Analyze your source code for known vulnerabilities.'),
-          secret_detection: _('Analyze your source code and git history for secrets')
+          secret_detection: _('Analyze your source code and git history for secrets.')
         }.freeze
       end
 
