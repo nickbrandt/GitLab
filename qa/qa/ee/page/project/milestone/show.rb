@@ -5,17 +5,24 @@ module QA
     module Page
       module Project
         module Milestone
-          class Show < ::QA::Page::Base
-            view 'ee/app/views/shared/milestones/_weight.html.haml' do
-              element :total_issue_weight_value
-            end
+          module Show
+            extend QA::Page::PageConcern
 
-            view 'ee/app/assets/javascripts/burndown_chart/components/burn_charts.vue' do
-              element :weight_button
-            end
+            def self.prepended(base)
+              super
+              base.class_eval do
+                view 'ee/app/views/shared/milestones/_weight.html.haml' do
+                  element :total_issue_weight_value
+                end
 
-            view 'ee/app/assets/javascripts/burndown_chart/components/burndown_chart.vue' do
-              element :burndown_chart
+                view 'ee/app/assets/javascripts/burndown_chart/components/burn_charts.vue' do
+                  element :weight_button
+                end
+
+                view 'ee/app/assets/javascripts/burndown_chart/components/burndown_chart.vue' do
+                  element :burndown_chart
+                end
+              end
             end
 
             def click_weight_button

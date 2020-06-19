@@ -24,7 +24,7 @@ module QA
       it 'shows burndown chart on milestone page' do
         milestone.visit!
 
-        QA::EE::Page::Project::Milestone::Show.perform do |show|
+        QA::Page::Project::Milestone::Show.perform do |show|
           expect(show.burndown_chart).to be_visible
           expect(show.burndown_chart).to have_content("Open issues")
 
