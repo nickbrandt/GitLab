@@ -11,8 +11,6 @@ module Gitlab
         segments = gl_repository&.split('-')
 
         # gl_repository can either have 2 or 3 segments:
-        # "wiki-1" is the older 2-segment format, where container is implied.
-        # "group-1-wiki" is the newer 3-segment format, including container information.
         #
         # TODO: convert all 2-segment format to 3-segment:
         # https://gitlab.com/gitlab-org/gitlab/-/issues/219192
@@ -28,6 +26,8 @@ module Gitlab
         raise InvalidIdentifier, %Q(Invalid GL Repository "#{gl_repository}")
       end
 
+      # The older 2-segment format, where the container is implied.
+      # eg. project-1, wiki-1
       class TwoPartIdentifier < Identifier
         def initialize(repo_type_name, container_id_str)
           @container_id_str = container_id_str
@@ -37,10 +37,12 @@ module Gitlab
         private
 
         def container_class
-          repo_type&.container_class
+          repo_type.container_class
         end
       end
 
+      # The newer 3-segment format, where the container is explicit
+      # eg. group-1-wiki, project-1-wiki
       class ThreePartIdentifier < Identifier
         def initialize(container_type, container_id_str, repo_type_name)
           @container_id_str = container_id_str
@@ -61,13 +63,11 @@ module Gitlab
       end
 
       def repo_type
-        strong_memoize(:repo_type) {Gitlab::GlRepository.types[repo_type_name] }
+        strong_memoize(:repo_type) { Gitlab::GlRepository.types[repo_type_name] }
       end
 
       def container
-        strong_memoize(:container) do
-          container_class&.find_by_id(container_id) if container_id
-        end
+        strong_memoize(:container) { container_class.find_by_id(container_id) }
       end
 
       def valid?
