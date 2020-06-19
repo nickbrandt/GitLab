@@ -72,22 +72,6 @@ describe Gitlab::BackgroundMigration::UpdateVulnerabilitiesFromDismissalFeedback
         .to(dismiss_feedback.created_at)
     end
 
-    context 'project is archived' do
-      let!(:project) { projects.create!(namespace_id: namespace.id, name: 'gitlab', path: 'gitlab', archived: true) }
-
-      it 'vulnerability dismissed_by_id should remain nil' do
-        expect(vulnerability.dismissed_by_id).to eq(nil)
-
-        expect { described_class.new.perform(project.id) }.not_to change { vulnerability.reload.dismissed_by_id }.from(nil)
-      end
-
-      it 'vulnerability dismissed_at should remain nil' do
-        expect(vulnerability.dismissed_at).to eq(nil)
-
-        expect { described_class.new.perform(project.id) }.not_to change { vulnerability.reload.dismissed_at }.from(nil)
-      end
-    end
-
     context 'project is set to be deleted' do
       let!(:project) { projects.create!(namespace_id: namespace.id, name: 'gitlab', path: 'gitlab', pending_delete: true) }
 
@@ -124,7 +108,7 @@ describe Gitlab::BackgroundMigration::UpdateVulnerabilitiesFromDismissalFeedback
   def vuln_params
     {
       title: 'title',
-      state: described_class::VULNERABILITY_DISMISSED,
+      state: described_class::VULNERABILITY_DISMISSED_STATE,
       severity: severity,
       confidence: confidence,
       report_type: report_type,
