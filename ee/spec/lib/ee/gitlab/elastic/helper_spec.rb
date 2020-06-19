@@ -7,7 +7,7 @@ RSpec.describe Gitlab::Elastic::Helper do
 
   shared_context 'with a legacy index' do
     before do
-      @index_name = helper.create_legacy_index
+      @index_name = helper.create_empty_index(with_alias: false, options: { index_name: helper.target_name })
     end
   end
 

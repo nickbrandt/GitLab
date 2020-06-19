@@ -28,10 +28,6 @@ module Gitlab
         end
       end
 
-      def create_legacy_index
-        create_empty_index(with_alias: false, options: { index_name: target_name })
-      end
-
       def create_empty_index(with_alias: true, options: {})
         new_index_name = options[:index_name] || "#{target_name}-#{Time.now.strftime("%Y%m%d-%H%M")}"
 
@@ -140,7 +136,7 @@ module Gitlab
       end
 
       def update_settings(index_name: nil, settings:)
-        client.indices.put_settings(index: index_name, body: settings)
+        client.indices.put_settings(index: index_name || target_index_name, body: settings)
       end
 
       def switch_alias(from: target_index_name, to:)

@@ -141,6 +141,7 @@ The following API resources are available outside of project and group contexts 
 | [Pages domains](pages_domains.md)                  | `/pages/domains` (also available for projects)                          |
 | [Projects](projects.md)                            | `/users/:id/projects` (also available for projects)                     |
 | [Project Repository Storage Moves](project_repository_storage_moves.md) | `/project_repository_storage_moves`                |
+| [Reindex Advanced Global Search index](elasticsearch_cluster_reindexing.md) | `/elasticsearch_cluster_reindexing`                                     |
 | [Runners](runners.md)                              | `/runners` (also available for projects)                                |
 | [Search](search.md)                                | `/search` (also available for groups and projects)                      |
 | [Settings](settings.md) **(CORE ONLY)**            | `/application/settings`                                                 |

@@ -7,7 +7,7 @@ module API
     resource :elasticsearch_cluster_reindexing do
       desc 'Reindex elasticsearch index using reindex API' do
         detail <<~END
-          This feature was introduced in GitLab 13.1.
+          This feature was introduced in GitLab 13.2.
 
           This will trigger elasticsearch zero-downtime cluster reindexing.
 
@@ -15,7 +15,9 @@ module API
         END
       end
       put 'trigger' do
-        ElasticClusterReindexingWorker.perform_async # rubocop:disable CodeReuse/Worker
+        job_id = ElasticClusterReindexingWorker.perform_async # rubocop:disable CodeReuse/Worker
+
+        { job_id: job_id }
       end
     end
   end

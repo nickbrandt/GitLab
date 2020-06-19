@@ -46,13 +46,15 @@ module Elastic
     def index_options(for_reindexing:)
       if for_reindexing
         {
-         number_of_replicas: 0,
-         translog: { durability: 'async' }
+          refresh_interval: -1, # Disable automatic refreshing
+          number_of_replicas: 0,
+          translog: { durability: 'async' }
         }
       else
         {
-         number_of_replicas: Gitlab::CurrentSettings.elasticsearch_replicas,
-         translog: { durability: 'request' }
+          refresh_interval: nil, # Change it back to the default
+          number_of_replicas: Gitlab::CurrentSettings.elasticsearch_replicas,
+          translog: { durability: 'request' }
         }
       end
     end
