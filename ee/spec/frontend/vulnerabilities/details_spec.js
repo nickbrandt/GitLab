@@ -152,25 +152,25 @@ describe('Vulnerability Details', () => {
     it('shows the scanner name only but no link', () => {
       createWrapper({ scanner: { name: 'some scanner' } });
       expect(scannerText()).toBe('Scanner: some scanner');
-      expect(link().vm.$el instanceof HTMLSpanElement).toBe(true);
+      expect(link().element instanceof HTMLSpanElement).toBe(true);
     });
 
     it('shows the scanner name and version but no link', () => {
       createWrapper({ scanner: { name: 'some scanner', version: '1.2.3' } });
       expect(scannerText()).toBe('Scanner: some scanner (version 1.2.3)');
-      expect(link().vm.$el instanceof HTMLSpanElement).toBe(true);
+      expect(link().element instanceof HTMLSpanElement).toBe(true);
     });
 
     it('shows the scanner name only with a link', () => {
       createWrapper({ scanner: { name: 'some scanner', url: '//link' } });
       expect(scannerText()).toBe('Scanner: some scanner');
-      expect(link().props('href')).toBe('//link');
+      expect(link().attributes('href')).toBe('//link');
     });
 
     it('shows the scanner name and version with a link', () => {
       createWrapper({ scanner: { name: 'some scanner', version: '1.2.3', url: '//link' } });
       expect(scannerText()).toBe('Scanner: some scanner (version 1.2.3)');
-      expect(link().props('href')).toBe('//link');
+      expect(link().attributes('href')).toBe('//link');
     });
   });
 });
