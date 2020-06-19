@@ -2443,6 +2443,9 @@ msgstr ""
 msgid "An error occurred while rendering preview broadcast message"
 msgstr ""
 
+msgid "An error occurred while rendering the editor"
+msgstr ""
+
 msgid "An error occurred while reordering issues."
 msgstr ""
 
