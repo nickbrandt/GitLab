@@ -28,13 +28,13 @@ module Gitlab
             when :admin
               admin_url(metric)
             when :group
-              error!('Group is required when cluster_type is :group') unless params[:group]
+              error!(_('Group is required when cluster_type is :group')) unless params[:group]
               group_url(metric)
             when :project
-              error!('Project is required when cluster_type is :project') unless project
+              error!(_('Project is required when cluster_type is :project')) unless project
               project_url(metric)
             else
-              error!('Unrecognized cluster type')
+              error!(_('Unrecognized cluster type'))
             end
           end
 
@@ -73,8 +73,8 @@ module Gitlab
           end
 
           def verify_params
-            raise Errors::DashboardProcessingError.new('Cluster is required for Stages::ClusterEndpointInserter') unless params[:cluster]
-            raise Errors::DashboardProcessingError.new('Cluster type must be specificed for Stages::ClusterEndpointInserter') unless params[:cluster_type]
+            raise Errors::DashboardProcessingError.new(_('Cluster is required for Stages::ClusterEndpointInserter')) unless params[:cluster]
+            raise Errors::DashboardProcessingError.new(_('Cluster type must be specificed for Stages::ClusterEndpointInserter')) unless params[:cluster_type]
           end
         end
       end
