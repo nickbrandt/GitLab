@@ -62,6 +62,7 @@ class Clusters::ClustersController < Clusters::BaseController
   end
 
   def update
+    
     Clusters::UpdateService
       .new(current_user, update_params)
       .execute(cluster)
@@ -180,6 +181,7 @@ class Clusters::ClustersController < Clusters::BaseController
   end
 
   def update_params
+    
     if cluster.provided_by_user?
       params.require(:cluster).permit(
         :enabled,

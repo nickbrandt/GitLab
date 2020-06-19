@@ -2,14 +2,9 @@
 
 = form_for @cluster, url: clusterable.cluster_path(@cluster), as: :cluster, html: { class: 'js-cluster-integration-form' } do |field|
   = form_errors(@cluster)
-  #js-cluster-integration-form #{ClusterSerializer.new.represent_list(@cluster).to_json}
-  .form-group
-    .d-flex.align-items-center
-      %h4.pr-2.m-0
-        = s_('ClusterIntegration|GitLab Integration')
-      %label.gl-mb-0.js-cluster-enable-toggle-area{ title: s_('ClusterIntegration|Enable or disable GitLab\'s connection to your Kubernetes cluster.'), data: { toggle: 'tooltip', container: 'body' } }
-        = render "shared/buttons/project_feature_toggle", is_checked: @cluster.enabled?, label: s_("ClusterIntegration|Toggle Kubernetes cluster"), disabled: !can?(current_user, :update_cluster, @cluster), data: { qa_selector: 'integration_status_toggle' } do
-          = field.hidden_field :enabled, { class: 'js-project-feature-toggle-input'}
+  %p= js_cluster_form_data(@cluster, can?(current_user, :update_cluster, @cluster))
+  #js-cluster-integration-form{ data: js_cluster_form_data(@cluster, can?(current_user, :update_cluster, @cluster)) }
+  
 
   .form-group
     %h5= s_('ClusterIntegration|Environment scope')
