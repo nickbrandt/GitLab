@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import { createStore } from '~/integrations/edit/store';
 import DynamicField from '~/integrations/edit/components/dynamic_field.vue';
 import { GlFormGroup, GlFormCheckbox, GlFormInput, GlFormSelect, GlFormTextarea } from '@gitlab/ui';
 
@@ -17,6 +18,7 @@ describe('DynamicField', () => {
   const createComponent = props => {
     wrapper = mount(DynamicField, {
       propsData: { ...defaultProps, ...props },
+      store: createStore(),
     });
   };
 

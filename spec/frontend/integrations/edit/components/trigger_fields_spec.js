@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import { createStore } from '~/integrations/edit/store';
 import TriggerFields from '~/integrations/edit/components/trigger_fields.vue';
 import { GlFormGroup, GlFormCheckbox, GlFormInput } from '@gitlab/ui';
 
@@ -12,6 +13,7 @@ describe('TriggerFields', () => {
   const createComponent = props => {
     wrapper = mount(TriggerFields, {
       propsData: { ...defaultProps, ...props },
+      store: createStore(),
     });
   };
 
