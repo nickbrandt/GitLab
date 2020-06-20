@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { createStore } from '~/integrations/edit/store';
 import IntegrationForm from '~/integrations/edit/components/integration_form.vue';
 import ActiveToggle from '~/integrations/edit/components/active_toggle.vue';
 import JiraTriggerFields from '~/integrations/edit/components/jira_trigger_fields.vue';
@@ -26,6 +27,7 @@ describe('IntegrationForm', () => {
   const createComponent = (props, featureFlags = {}) => {
     wrapper = shallowMount(IntegrationForm, {
       propsData: { ...defaultProps, ...props },
+      store: createStore(),
       stubs: {
         ActiveToggle,
         JiraTriggerFields,

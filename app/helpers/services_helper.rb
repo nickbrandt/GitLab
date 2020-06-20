@@ -109,7 +109,8 @@ module ServicesHelper
       enable_comments: integration.comment_on_event_enabled.to_s,
       comment_detail: integration.comment_detail,
       trigger_events: trigger_events_for_service(integration),
-      fields: fields_for_service(integration)
+      fields: fields_for_service(integration),
+      inherit_from_id: integration.inherit_from_id
     }
   end
 

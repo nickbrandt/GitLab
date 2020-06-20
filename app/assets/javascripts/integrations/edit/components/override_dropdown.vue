@@ -1,16 +1,16 @@
 <script>
-import { __ } from '~/locale';
+import { s__ } from '~/locale';
 import { mapState } from 'vuex';
 import { GlNewDropdown, GlNewDropdownItem } from '@gitlab/ui';
 
 const options = [
   {
     value: 'instance',
-    text: __('Use instance level settings'),
+    text: s__('Integrations|Use instance level settings'),
   },
   {
     value: 'project',
-    text: __('Use custom settings'),
+    text: s__('Integrations|Use custom settings'),
   },
 ];
 
@@ -46,7 +46,7 @@ export default {
   <div
     class="gl-display-flex gl-justify-content-space-between gl-align-items-baseline gl-py-4 gl-mt-5 gl-mb-6 gl-border-t-1 gl-border-t-solid gl-border-b-1 gl-border-b-solid gl-border-gray-100"
   >
-    <span>{{ __('This integration has multiple settings available.') }}</span>
+    <span>{{ s__('Integrations|This integration has multiple settings available.') }}</span>
     <gl-new-dropdown :text="selected.text">
       <gl-new-dropdown-item v-for="option in options" :key="option.value" @click="onClick(option)">
         {{ option.text }}

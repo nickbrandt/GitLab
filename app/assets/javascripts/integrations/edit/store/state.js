@@ -1,4 +1,4 @@
-export default () => ({
+export default ({ overrideAvailable = false }) => ({
   override: false,
-  overrideAvailable: true, // TODO: Should default to false and be passed from the backend
+  overrideAvailable,
 });

@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { isEmpty } from 'lodash';
 import { createStore } from './store';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import IntegrationForm from './components/integration_form.vue';
@@ -24,6 +25,7 @@ export default el => {
     editProjectPath,
     triggerEvents,
     fields,
+    inheritFromId,
     ...booleanAttributes
   } = el.dataset;
   const {
@@ -36,9 +38,13 @@ export default el => {
     enableJiraIssues,
   } = parseBooleanInData(booleanAttributes);
 
+  const initialState = {
+    overrideAvailable: !isEmpty(inheritFromId),
+  };
+
   return new Vue({
     el,
-    store: createStore(),
+    store: createStore(initialState),
     render(createElement) {
       return createElement(IntegrationForm, {
         props: {
