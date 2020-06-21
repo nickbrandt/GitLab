@@ -10,6 +10,6 @@ class ElasticIndexInitialBulkCronWorker
   private
 
   def service
-    Elastic::ProcessInitialBookkeepingService.new
+    Gitlab::Elastic::BulkIndexer::InitialProcessor.service
   end
 end

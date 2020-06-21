@@ -25,7 +25,7 @@ class ElasticNamespaceIndexerWorker # rubocop:disable Scalability/IdempotentWork
 
   def index_projects(namespace)
     namespace.all_projects.find_in_batches do |batch|
-      ::Elastic::ProcessInitialBookkeepingService.backfill_projects!(*batch)
+      Gitlab::Elastic::BulkIndexer::InitialProcessor.backfill_projects!(*batch)
     end
   end
 

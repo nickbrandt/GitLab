@@ -27,6 +27,14 @@
   :weight: 1
   :idempotent: 
   :tags: []
+- :name: cronjob:elastic_index_bulk_blob_cron
+  :feature_category: :global_search
+  :has_external_dependencies: 
+  :urgency: :throttled
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: cronjob:elastic_index_bulk_cron
   :feature_category: :global_search
   :has_external_dependencies: 

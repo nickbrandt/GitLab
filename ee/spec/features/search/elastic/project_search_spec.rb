@@ -49,6 +49,7 @@ RSpec.describe 'Project elastic search', :js, :elastic do
     it 'finds wiki pages', :sidekiq_inline do
       project.wiki.create_page('test.md', 'Test searching for a wiki page')
       project.wiki.index_wiki_blobs
+      ensure_elasticsearch_index!
 
       submit_search('Test')
       select_search_scope('Wiki')
@@ -68,6 +69,7 @@ RSpec.describe 'Project elastic search', :js, :elastic do
 
     it 'finds commits', :sidekiq_inline do
       project.repository.index_commits_and_blobs
+      ensure_elasticsearch_index!
 
       submit_search('initial')
       select_search_scope('Commits')
@@ -77,6 +79,7 @@ RSpec.describe 'Project elastic search', :js, :elastic do
 
     it 'finds blobs', :sidekiq_inline do
       project.repository.index_commits_and_blobs
+      ensure_elasticsearch_index!
 
       submit_search('def')
       select_search_scope('Code')

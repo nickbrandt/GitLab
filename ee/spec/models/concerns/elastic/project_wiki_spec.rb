@@ -22,7 +22,7 @@ RSpec.describe ProjectWiki, :elastic do
     expect(project.wiki.elastic_search('term1 | term2', type: 'wiki_blob')[:wiki_blobs][:total_count]).to eq(2)
   end
 
-  it 'can delete wiki pages', :sidekiq_inline do
+  it 'can delete wiki pages' do
     expect(project.wiki.elastic_search('term2', type: 'wiki_blob')[:wiki_blobs][:total_count]).to eq(1)
 
     project.wiki.find_page('omega_page').delete

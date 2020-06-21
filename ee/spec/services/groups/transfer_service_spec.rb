@@ -83,10 +83,11 @@ RSpec.describe Groups::TransferService, '#execute' do
       project1 = create(:project, :repository, :public, namespace: group)
       project2 = create(:project, :repository, :public, namespace: group)
       project3 = create(:project, :repository, :private, namespace: group)
+      processor = Gitlab::Elastic::BulkIndexer::IncrementalProcessor
 
-      expect(Elastic::ProcessBookkeepingService).to receive(:track!).with(project1)
-      expect(Elastic::ProcessBookkeepingService).to receive(:track!).with(project2)
-      expect(Elastic::ProcessBookkeepingService).not_to receive(:track!).with(project3)
+      expect(Elastic::ProcessBookkeepingService).to receive(:track!).with(project1, processor: processor)
+      expect(Elastic::ProcessBookkeepingService).to receive(:track!).with(project2, processor: processor)
+      expect(Elastic::ProcessBookkeepingService).not_to receive(:track!).with(project3, processor: processor)
 
       transfer_service.execute(new_group)
 

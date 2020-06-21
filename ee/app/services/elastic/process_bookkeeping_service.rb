@@ -2,14 +2,69 @@
 
 module Elastic
   class ProcessBookkeepingService
-    REDIS_SET_KEY = 'elastic:incremental:updates:0:zset'
-    REDIS_SCORE_KEY = 'elastic:incremental:updates:0:score'
-    LIMIT = 10_000
+    # This module ensures the compatibilty for the processor class
+    # by making sure it exposes the proper keys
+    module Processor
+      KEYSET = [
+        :REDIS_SET_KEY,
+        :REDIS_SCORE_KEY
+      ].freeze
+
+      @classes = Set.new
+      @queues = Hash.new { |h, k| h[k] = Set.new }
+
+      def self.each
+        @classes.each { |cls| yield cls }
+      end
+
+      def self.ensure_const!(cls, const)
+        return cls.const_get(const, true) if cls.const_defined?(const) # rubocop:disable Gitlab/ConstGetInheritFalse
+
+        raise StandardError.new("#{cls} cannot be used as a Processor: #{const} is not defined.")
+      end
+
+      # Ensure each Processor exposes a unique queue.
+      def self.extended(cls)
+        @classes << cls
+
+        KEYSET.each do |k|
+          queue_name = ensure_const!(cls, k)
+
+          raise StandardError.new("#{cls} redefine queue #{queue_name}") if @queues[k].include?(queue_name)
+
+          @queues[k] << queue_name
+        end
+
+        # ensure LIMIT
+        ensure_const!(cls, :LIMIT)
+      end
+
+      def self.queues
+        @queues.dup
+      end
+
+      def process(*refs)
+        raise NotImplementedError
+      end
+
+      def flush
+        raise NotImplementedError
+      end
+
+      def process_async(*items)
+        ProcessBookkeepingService.track!(*items, processor: self)
+      end
+
+      def service
+        ProcessBookkeepingService.new(new)
+      end
+    end
 
     class << self
       # Add some records to the processing queue. Items must be serializable to
       # a Gitlab::Elastic::DocumentReference
-      def track!(*items)
+      def track!(*items, processor:)
+        raise StandardError, "#{processor} doesn't implement #{Processor}" unless processor.is_a? Processor
         return true if items.empty?
 
         refs = items.map do |item|
@@ -17,38 +72,38 @@ module Elastic
         end
 
         with_redis do |redis|
-          scored_refs(*refs) do |group|
+          scored_refs(*refs, processor: processor) do |group|
             logger.debug(class: self.name,
-                         redis_set: self::REDIS_SET_KEY,
+                         redis_set: processor::REDIS_SET_KEY,
                          message: 'track_items',
                          count: group.count,
                          tracked_items_encoded: group.to_json)
 
             # We don't update existing entries so that the order of
             # insertion is guaranteed (FIFO).
-            redis.zadd(self::REDIS_SET_KEY, group, nx: true)
+            redis.zadd(processor::REDIS_SET_KEY, group, nx: true)
           end
         end
 
         true
       end
 
-      def queue_size
-        with_redis { |redis| redis.zcard(self::REDIS_SET_KEY) }
-      end
-
-      def scored_refs(*refs, &blk)
+      def scored_refs(*refs, processor:, &blk)
         with_score_redis do |redis|
           # Efficiently generate a guaranteed-unique score for each item
-          max = redis.incrby(self::REDIS_SCORE_KEY, refs.size)
+          max = redis.incrby(processor::REDIS_SCORE_KEY, refs.size)
           min = (max - refs.size) + 1
 
           (min..max).zip(refs).each_slice(1000, &blk)
         end
       end
 
-      def clear_tracking!
-        with_redis { |redis| redis.del(self::REDIS_SET_KEY, self::REDIS_SCORE_KEY) }
+      def queue_size(processor:)
+        with_redis { |redis| redis.zcard(processor::REDIS_SET_KEY) }
+      end
+
+      def clear_tracking!(processor:)
+        with_redis { |redis| redis.del(processor::REDIS_SET_KEY, processor::REDIS_SCORE_KEY) }
       end
 
       def logger
@@ -68,18 +123,30 @@ module Elastic
       end
     end
 
+    attr_reader :processor
+
+    def initialize(processor)
+      raise StandardError.new(processor) unless processor.class.is_a? Processor
+
+      @processor = processor
+    end
+
     def execute
       self.class.with_redis { |redis| execute_with_redis(redis) }
     end
 
     private
 
+    def track!(*items)
+      self.class.track!(*items, processor: @processor.class)
+    end
+
     def execute_with_redis(redis)
       start_time = Time.current
 
-      specs = redis.zrangebyscore(self.class::REDIS_SET_KEY,
+      specs = redis.zrangebyscore(processor.class::REDIS_SET_KEY,
                                   '-inf', '+inf',
-                                  limit: [0, self.class::LIMIT],
+                                  limit: [0, processor.class::LIMIT],
                                   with_scores: true)
       return 0 if specs.empty?
 
@@ -97,15 +164,15 @@ module Elastic
       refs.preload_database_records!
 
       # Run the processor on the batch, returning the failures
-      refs.each { |ref| submit_document(ref) }
-      failures = bulk_indexer.flush
+      refs.each { |ref| processor.process(ref) }
+      failures = processor.flush
 
       redis.multi do |multi|
         # Remove all the successes
-        multi.zremrangebyscore(self.class::REDIS_SET_KEY, first_score, last_score)
+        multi.zremrangebyscore(processor.class::REDIS_SET_KEY, first_score, last_score)
 
         # Re-enqueue any failures so they are retried
-        self.class.track!(*failures)
+        track!(*failures)
       end
 
       records_count = specs.count
@@ -137,14 +204,6 @@ module Elastic
       end
 
       refs
-    end
-
-    def submit_document(ref)
-      bulk_indexer.process(ref)
-    end
-
-    def bulk_indexer
-      @bulk_indexer ||= ::Gitlab::Elastic::BulkIndexer.new(logger: logger)
     end
 
     def logger

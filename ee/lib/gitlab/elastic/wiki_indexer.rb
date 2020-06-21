@@ -23,6 +23,24 @@ module Gitlab
     end
 
     class WikiIndexer < Indexer
+      class InitialProcessor < self
+        REDIS_SET_KEY = 'elastic:bulk:wiki:initial:0:zset'
+        REDIS_SCORE_KEY = 'elastic:bulk:wiki:initial:0:score'
+
+        def process_async(*refs)
+          refs.each { |ref| ElasticCommitIndexerWorker.perform_async(ref.db_id, nil, nil, true) }
+        end
+
+        extend ::Elastic::ProcessBookkeepingService::Processor
+      end
+
+      class IncrementalProcessor < self
+        REDIS_SET_KEY = 'elastic:bulk:wiki:updates:0:zset'
+        REDIS_SCORE_KEY = 'elastic:bulk:wiki:updates:0:score'
+
+        extend ::Elastic::ProcessBookkeepingService::Processor
+      end
+
       def operation_for(project)
         ProjectWikiOperation.new(project)
       end

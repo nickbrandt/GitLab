@@ -18,7 +18,8 @@ namespace :gitlab do
       print "Enqueuing projects"
 
       project_id_batches do |ids|
-        ::Elastic::ProcessInitialBookkeepingService.backfill_projects!(*Project.find(ids))
+        projects = Project.preload(:issues, :merge_requests, :snippets, :notes, :milestones).find(ids)
+        Gitlab::Elastic::BulkIndexer::InitialProcessor.backfill_projects!(*projects)
         print "."
       end
 

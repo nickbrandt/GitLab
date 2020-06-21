@@ -32,7 +32,7 @@ RSpec.describe 'gitlab:elastic namespace rake tasks', :elastic do
     end
 
     it 'queues jobs for each project batch' do
-      expect(Elastic::ProcessInitialBookkeepingService).to receive(:backfill_projects!).with(
+      expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).to receive(:backfill_projects!).with(
         project1, project2
       )
 
@@ -54,7 +54,7 @@ RSpec.describe 'gitlab:elastic namespace rake tasks', :elastic do
       end
 
       it 'does not queue jobs for projects that should not be indexed' do
-        expect(Elastic::ProcessInitialBookkeepingService).to receive(:backfill_projects!).with(
+        expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).to receive(:backfill_projects!).with(
           project1, project3
         )
 

@@ -8,9 +8,7 @@ RSpec.describe Gitlab::Elastic::BulkIndexer, :elastic do
 
   let(:project) { issue.project }
 
-  let(:logger) { ::Gitlab::Elasticsearch::Logger.build }
-
-  subject(:indexer) { described_class.new(logger: logger) }
+  subject(:indexer) { described_class.new }
 
   let(:es_client) { indexer.client }
 
@@ -147,6 +145,30 @@ RSpec.describe Gitlab::Elastic::BulkIndexer, :elastic do
         refresh_index!
 
         expect(search(Issue, '*').size).to eq(0)
+      end
+    end
+  end
+
+  describe described_class::InitialProcessor do
+    describe '.backfill_projects!' do
+      it 'only accepts `Project` instances' do
+        expect { described_class.backfill_projects!(1) }.to raise_error(ArgumentError)
+        expect { described_class.backfill_projects!(issue) }.to raise_error(ArgumentError)
+      end
+
+      it 'calls initial project indexing' do
+        expect(Gitlab::Elastic::Indexer::InitialProcessor).to receive(:process_async).with(project)
+        expect(Gitlab::Elastic::WikiIndexer::InitialProcessor).to receive(:process_async).with(project)
+
+        expect { described_class.backfill_projects!(project) }.to change {
+          Elastic::ProcessBookkeepingService.queue_size(processor: described_class)
+        }
+      end
+
+      it 'uses a separate queue' do
+        expect { described_class.backfill_projects!(project) }.not_to change {
+          Elastic::ProcessBookkeepingService.queue_size(processor: Gitlab::Elastic::Indexer::IncrementalProcessor)
+        }
       end
     end
   end

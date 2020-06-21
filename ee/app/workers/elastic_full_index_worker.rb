@@ -13,8 +13,8 @@ class ElasticFullIndexWorker # rubocop:disable Scalability/IdempotentWorker
   def perform(start_id, end_id)
     return true unless Gitlab::CurrentSettings.elasticsearch_indexing?
 
-    Project.id_in(start_id..end_id).find_each do |project|
-      Elastic::ProcessInitialBookkeepingService.backfill_projects!(project)
+    Project.id_in(start_id..end_id).find_in_batches do |batch|
+      Gitlab::Elastic::BulkIndexer::InitialProcessor.backfill_projects!(*batch)
     end
   end
 end

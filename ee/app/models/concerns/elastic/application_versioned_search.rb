@@ -3,8 +3,22 @@ module Elastic
   module ApplicationVersionedSearch
     extend ActiveSupport::Concern
 
-    FORWARDABLE_INSTANCE_METHODS = [:es_id, :es_parent].freeze
-    FORWARDABLE_CLASS_METHODS = [:elastic_search, :es_import, :es_type, :index_name, :document_type, :mapping, :mappings, :settings, :import].freeze
+    FORWARDABLE_INSTANCE_METHODS = %i[
+      es_id
+      es_parent
+    ].freeze
+
+    FORWARDABLE_CLASS_METHODS = %i[
+      elastic_search
+      es_import
+      es_type
+      index_name
+      document_type
+      mapping
+      mappings
+      settings
+      import
+    ].freeze
 
     def __elasticsearch__(&block)
       @__elasticsearch__ ||= ::Elastic::MultiVersionInstanceProxy.new(self)
@@ -45,15 +59,15 @@ module Elastic
     end
 
     def maintain_elasticsearch_create
-      ::Elastic::ProcessBookkeepingService.track!(self)
+      ::Gitlab::Elastic::BulkIndexer::InitialProcessor.process_async(self)
     end
 
     def maintain_elasticsearch_update
-      ::Elastic::ProcessBookkeepingService.track!(self)
+      ::Gitlab::Elastic::BulkIndexer::IncrementalProcessor.process_async(self)
     end
 
     def maintain_elasticsearch_destroy
-      ::Elastic::ProcessBookkeepingService.track!(self)
+      ::Gitlab::Elastic::BulkIndexer::IncrementalProcessor.process_async(self)
     end
 
     class_methods do

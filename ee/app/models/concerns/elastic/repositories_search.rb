@@ -15,7 +15,7 @@ module Elastic
     end
 
     def index_commits_and_blobs
-      ::ElasticCommitIndexerWorker.perform_async(project.id)
+      ::Gitlab::Elastic::Indexer::IncrementalProcessor.process_async(project)
     end
   end
 end

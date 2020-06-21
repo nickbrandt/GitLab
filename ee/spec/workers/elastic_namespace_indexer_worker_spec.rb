@@ -13,7 +13,7 @@ RSpec.describe ElasticNamespaceIndexerWorker, :elastic do
   it 'returns true if ES disabled' do
     stub_ee_application_setting(elasticsearch_indexing: false)
 
-    expect(Elastic::ProcessInitialBookkeepingService).not_to receive(:backfill_projects!)
+    expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).not_to receive(:backfill_projects!)
 
     expect(subject.perform(1, "index")).to be_truthy
   end
@@ -21,7 +21,7 @@ RSpec.describe ElasticNamespaceIndexerWorker, :elastic do
   it 'returns true if limited indexing is not enabled' do
     stub_ee_application_setting(elasticsearch_limit_indexing: false)
 
-    expect(Elastic::ProcessInitialBookkeepingService).not_to receive(:backfill_projects!)
+    expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).not_to receive(:backfill_projects!)
 
     expect(subject.perform(1, "index")).to be_truthy
   end
@@ -31,7 +31,7 @@ RSpec.describe ElasticNamespaceIndexerWorker, :elastic do
     let(:projects) { create_list :project, 3, namespace: namespace }
 
     it 'indexes all projects belonging to the namespace' do
-      expect(Elastic::ProcessInitialBookkeepingService).to receive(:backfill_projects!).with(*projects)
+      expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).to receive(:backfill_projects!).with(*projects)
 
       subject.perform(namespace.id, :index)
     end

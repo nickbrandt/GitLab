@@ -11,8 +11,9 @@ RSpec.describe ElasticsearchIndexedProject do
     let(:container) { :elasticsearch_indexed_project }
     let(:attribute) { :project_id }
     let(:index_action) do
-      expect(Elastic::ProcessBookkeepingService).to receive(:track!).with(subject.project)
+      expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).to receive(:backfill_projects!).with(subject.project)
     end
+
     let(:delete_action) do
       expect(ElasticDeleteProjectWorker).to receive(:perform_async).with(subject.project.id, subject.project.es_id)
     end

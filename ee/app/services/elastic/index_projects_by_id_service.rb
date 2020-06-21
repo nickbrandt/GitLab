@@ -3,8 +3,9 @@
 module Elastic
   class IndexProjectsByIdService
     def execute(project_ids: [], namespace_ids: [])
-      projects = Project.find(project_ids)
-      Elastic::ProcessInitialBookkeepingService.backfill_projects!(*projects)
+      Project.id_in(project_ids).find_in_batches do |batch|
+        Gitlab::Elastic::BulkIndexer::InitialProcessor.backfill_projects!(*batch)
+      end
 
       namespace_ids.each do |namespace_id|
         ElasticNamespaceIndexerWorker.perform_async(namespace_id, :index)

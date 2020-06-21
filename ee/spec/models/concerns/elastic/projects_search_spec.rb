@@ -18,10 +18,18 @@ RSpec.describe Elastic::ProjectsSearch do
   end
 
   describe '#maintain_elasticsearch_create' do
-    it 'calls track!' do
-      expect(::Elastic::ProcessInitialBookkeepingService).to receive(:track!).and_return(true)
+    it 'calls process_async' do
+      expect(::Gitlab::Elastic::BulkIndexer::InitialProcessor).to receive(:process_async).and_return(true)
 
       subject.maintain_elasticsearch_create
+    end
+  end
+
+  describe '#maintain_elasticsearch_update' do
+    it 'calls process_async' do
+      expect(::Gitlab::Elastic::BulkIndexer::IncrementalProcessor).to receive(:process_async).and_return(true)
+
+      subject.maintain_elasticsearch_update
     end
   end
 

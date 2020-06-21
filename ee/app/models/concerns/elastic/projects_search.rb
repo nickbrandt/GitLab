@@ -11,10 +11,6 @@ module Elastic
         ::Gitlab::CurrentSettings.elasticsearch_indexes_project?(self)
       end
 
-      def maintain_elasticsearch_create
-        ::Elastic::ProcessInitialBookkeepingService.track!(self)
-      end
-
       def maintain_elasticsearch_destroy
         ElasticDeleteProjectWorker.perform_async(self.id, self.es_id)
       end

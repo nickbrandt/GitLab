@@ -8,7 +8,7 @@ RSpec.describe Elastic::IndexProjectsByIdService do
       project1 = create(:project)
       project2 = create(:project)
 
-      expect(Elastic::ProcessInitialBookkeepingService).to receive(:backfill_projects!).with(project1, project2)
+      expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).to receive(:backfill_projects!).with(project1, project2)
 
       Sidekiq::Testing.fake! do
         described_class.new.execute(project_ids: [project1.id, project2.id], namespace_ids: [3, 4])

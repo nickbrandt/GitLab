@@ -11,7 +11,7 @@ RSpec.describe ElasticFullIndexWorker do
 
   it 'does nothing if ES disabled' do
     stub_ee_application_setting(elasticsearch_indexing: false)
-    expect(Elastic::ProcessInitialBookkeepingService).not_to receive(:backfill_projects!)
+    expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).not_to receive(:backfill_projects!)
 
     subject.perform(1, 2)
   end
@@ -20,9 +20,7 @@ RSpec.describe ElasticFullIndexWorker do
     let(:projects) { create_list(:project, 3) }
 
     it 'indexes projects in range' do
-      projects.each do |project|
-        expect(Elastic::ProcessInitialBookkeepingService).to receive(:backfill_projects!).with(project)
-      end
+      expect(Gitlab::Elastic::BulkIndexer::InitialProcessor).to receive(:backfill_projects!).with(*projects)
 
       subject.perform(projects.first.id, projects.last.id)
     end

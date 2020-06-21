@@ -91,6 +91,8 @@ module Gitlab
     end
 
     class Indexer
+      LIMIT = 1_000
+
       Error = Class.new(StandardError)
 
       class << self
@@ -101,6 +103,24 @@ module Gitlab
         def logger
           ::Gitlab::Elasticsearch::Logger.build
         end
+      end
+
+      class InitialProcessor < self
+        REDIS_SET_KEY = 'elastic:bulk:repository:initial:0:zset'
+        REDIS_SCORE_KEY = 'elastic:bulk:repository:initial:0:score'
+
+        def process_async(*refs)
+          refs.each { |ref| ElasticCommitIndexerWorker.perform_async(ref.db_id) }
+        end
+
+        extend ::Elastic::ProcessBookkeepingService::Processor
+      end
+
+      class IncrementalProcessor < self
+        REDIS_SET_KEY = 'elastic:bulk:repository:updates:0:zset'
+        REDIS_SCORE_KEY = 'elastic:bulk:repository:updates:0:score'
+
+        extend ::Elastic::ProcessBookkeepingService::Processor
       end
 
       attr_reader :operations, :failures

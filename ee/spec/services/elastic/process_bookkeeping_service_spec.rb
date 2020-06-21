@@ -10,7 +10,8 @@ RSpec.describe Elastic::ProcessBookkeepingService, :clean_gitlab_redis_shared_st
     end
   end
 
-  let(:zset) { 'elastic:incremental:updates:0:zset' }
+  let(:processor_class) { ::Gitlab::Elastic::BulkIndexer::IncrementalProcessor }
+  let(:zset) { processor_class::REDIS_SET_KEY }
   let(:redis) { @redis }
   let(:ref_class) { ::Gitlab::Elastic::DocumentReference }
 
@@ -18,9 +19,17 @@ RSpec.describe Elastic::ProcessBookkeepingService, :clean_gitlab_redis_shared_st
   let(:issue) { fake_refs.first }
   let(:issue_spec) { issue.serialize }
 
+  def track!(*items)
+    described_class.track!(*items, processor: processor_class)
+  end
+
+  def queue_size
+    described_class.queue_size(processor: processor_class)
+  end
+
   describe '.track' do
     it 'enqueues a record' do
-      described_class.track!(issue)
+      track!(issue)
 
       spec, score = redis.zpopmin(zset)
 
@@ -29,9 +38,9 @@ RSpec.describe Elastic::ProcessBookkeepingService, :clean_gitlab_redis_shared_st
     end
 
     it 'enqueues a set of unique records' do
-      described_class.track!(*fake_refs)
+      track!(*fake_refs)
 
-      expect(described_class.queue_size).to eq(fake_refs.size)
+      expect(queue_size).to eq(fake_refs.size)
 
       spec1, score1 = redis.zpopmin(zset)
       _, score2 = redis.zpopmin(zset)
@@ -41,114 +50,111 @@ RSpec.describe Elastic::ProcessBookkeepingService, :clean_gitlab_redis_shared_st
     end
 
     it 'enqueues 10 identical records as 1 entry' do
-      described_class.track!(*([issue] * 10))
+      track!(*([issue] * 10))
 
-      expect(described_class.queue_size).to eq(1)
+      expect(queue_size).to eq(1)
     end
 
     it 'deduplicates across multiple inserts' do
-      10.times { described_class.track!(issue) }
+      10.times { track!(issue) }
 
-      expect(described_class.queue_size).to eq(1)
+      expect(queue_size).to eq(1)
     end
   end
 
   describe '.queue_size' do
     it 'reports the queue size' do
-      expect(described_class.queue_size).to eq(0)
+      expect(queue_size).to eq(0)
 
-      described_class.track!(*fake_refs)
+      track!(*fake_refs)
 
-      expect(described_class.queue_size).to eq(fake_refs.size)
+      expect(queue_size).to eq(fake_refs.size)
 
-      expect { redis.zpopmin(zset) }.to change(described_class, :queue_size).by(-1)
+      expect { redis.zpopmin(zset) }.to change { queue_size }.by(-1)
     end
   end
 
   describe '.clear_tracking!' do
     it 'removes all entries from the queue' do
-      described_class.track!(*fake_refs)
+      track!(*fake_refs)
 
-      expect(described_class.queue_size).to eq(fake_refs.size)
+      expect(queue_size).to eq(fake_refs.size)
 
-      described_class.clear_tracking!
+      described_class.clear_tracking!(processor: processor_class)
 
-      expect(described_class.queue_size).to eq(0)
+      expect(queue_size).to eq(0)
     end
   end
 
   describe '#execute' do
     let(:limit) { 5 }
+    let(:processor) { processor_class.new }
+
+    subject(:service) { described_class.new(processor) }
 
     before do
-      stub_const('Elastic::ProcessBookkeepingService::LIMIT', limit)
+      stub_const("#{processor_class.name}::LIMIT", limit)
     end
 
     it 'submits a batch of documents' do
-      described_class.track!(*fake_refs)
+      track!(*fake_refs)
 
-      expect(described_class.queue_size).to eq(fake_refs.size)
+      expect(queue_size).to eq(fake_refs.size)
       expect_processing(*fake_refs[0...limit])
 
-      expect { described_class.new.execute }.to change(described_class, :queue_size).by(-limit)
+      expect { service.execute }.to change { queue_size }.by(-limit)
     end
 
     it 'returns the number of documents processed' do
-      described_class.track!(*fake_refs)
+      track!(*fake_refs)
 
       expect_processing(*fake_refs[0...limit])
 
-      expect(described_class.new.execute).to eq(limit)
+      expect(service.execute).to eq(limit)
     end
 
     it 'returns 0 without writing to the index when there are no documents' do
-      expect(::Gitlab::Elastic::BulkIndexer).not_to receive(:new)
+      expect(processor).not_to receive(:flush)
 
-      expect(described_class.new.execute).to eq(0)
+      expect(service.execute).to eq(0)
     end
 
     it 'retries failed documents' do
-      described_class.track!(*fake_refs)
+      track!(*fake_refs)
       failed = fake_refs[0]
 
-      expect(described_class.queue_size).to eq(10)
+      expect(queue_size).to eq(10)
       expect_processing(*fake_refs[0...limit], failures: [failed])
 
-      expect { described_class.new.execute }.to change(described_class, :queue_size).by(-limit + 1)
+      expect { service.execute }.to change { queue_size }.by(-limit + 1)
 
       serialized, _ = redis.zpopmax(zset)
       expect(ref_class.deserialize(serialized)).to eq(failed)
     end
 
     it 'discards malformed documents' do
-      described_class.track!('Bad')
+      track!('Bad')
 
-      expect(described_class.queue_size).to eq(1)
-      expect_next_instance_of(::Gitlab::Elastic::BulkIndexer) do |indexer|
-        expect(indexer).not_to receive(:process)
-      end
+      expect(queue_size).to eq(1)
+      expect(processor).not_to receive(:process)
 
-      expect { described_class.new.execute }.to change(described_class, :queue_size).by(-1)
+      expect { service.execute }.to change { queue_size }.by(-1)
     end
 
     it 'fails, preserving documents, when processing fails with an exception' do
-      described_class.track!(issue)
+      track!(issue)
 
-      expect(described_class.queue_size).to eq(1)
-      expect_next_instance_of(::Gitlab::Elastic::BulkIndexer) do |indexer|
-        expect(indexer).to receive(:process).with(issue) { raise 'Bad' }
-      end
+      expect(queue_size).to eq(1)
+      expect(processor).to receive(:process).with(issue) { raise 'Bad' }
 
-      expect { described_class.new.execute }.to raise_error('Bad')
-      expect(described_class.queue_size).to eq(1)
+      expect { service.execute }.to raise_error('Bad')
+      expect(queue_size).to eq(1)
     end
 
     def expect_processing(*refs, failures: [])
-      expect_next_instance_of(::Gitlab::Elastic::BulkIndexer) do |indexer|
-        refs.each { |ref| expect(indexer).to receive(:process).with(ref) }
+      refs.each { |ref| expect(processor).to receive(:process).with(ref) }
 
-        expect(indexer).to receive(:flush) { failures }
-      end
+      expect(processor).to receive(:flush) { failures }
     end
   end
 end

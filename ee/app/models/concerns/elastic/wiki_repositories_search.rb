@@ -9,7 +9,7 @@ module Elastic
     delegate(:delete_index_for_commits_and_blobs, :elastic_search, to: :__elasticsearch__)
 
     def index_wiki_blobs
-      ElasticCommitIndexerWorker.perform_async(project.id, nil, nil, true)
+      Gitlab::Elastic::WikiIndexer::IncrementalProcessor.process_async(project)
     end
   end
 end

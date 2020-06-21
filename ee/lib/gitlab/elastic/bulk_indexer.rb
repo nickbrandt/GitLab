@@ -13,15 +13,60 @@ module Gitlab
     #
     # BulkIndexer is not safe for concurrent use.
     class BulkIndexer
+      LIMIT = 10_000
+
+      class << self
+        def logger
+          ::Gitlab::Elasticsearch::Logger.build
+        end
+      end
+
+      class InitialProcessor < self
+        REDIS_SET_KEY = 'elastic:bulk:initial:0:zset'
+        REDIS_SCORE_KEY = 'elastic:bulk:initial:0:score'
+
+        INDEXED_ASSOCIATIONS = {
+          issues:         ->(project) { project.issues },
+          merge_requests: ->(project) { project.merge_requests },
+          snippets:       ->(project) { project.snippets },
+          notes:          ->(project) { project.notes.searchable },
+          milestones:     ->(project) { project.milestones }
+        }.freeze
+
+        def self.backfill_projects!(*projects)
+          raise ArgumentError, "Only Projects can be backfilled." unless projects.all? { |p| p.is_a?(Project) }
+
+          process_async(*projects)
+
+          # Index the repository & wiki
+          Indexer::InitialProcessor.process_async(*projects)
+          WikiIndexer::InitialProcessor.process_async(*projects)
+
+          INDEXED_ASSOCIATIONS.each do |_, association|
+            projects.each do |project|
+              association.call(project).find_in_batches { |batch| process_async(*batch) }
+            end
+          end
+        end
+
+        extend ::Elastic::ProcessBookkeepingService::Processor
+      end
+
+      class IncrementalProcessor < self
+        REDIS_SET_KEY = 'elastic:bulk:updates:0:zset'
+        REDIS_SCORE_KEY = 'elastic:bulk:updates:0:score'
+
+        extend ::Elastic::ProcessBookkeepingService::Processor
+      end
+
       include ::Elasticsearch::Model::Client::ClassMethods
 
-      attr_reader :logger, :failures
+      attr_reader :failures
 
-      def initialize(logger:)
+      def initialize
         @body = []
         @body_size_bytes = 0
         @failures = []
-        @logger = logger
         @ref_cache = []
       end
 
@@ -150,6 +195,10 @@ module Gitlab
         end
 
         out
+      end
+
+      def logger
+        self.class.logger
       end
     end
   end

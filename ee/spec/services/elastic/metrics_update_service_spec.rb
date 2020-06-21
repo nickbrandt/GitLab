@@ -11,22 +11,26 @@ RSpec.describe Elastic::MetricsUpdateService, :prometheus do
   end
 
   describe '#execute' do
+    using RSpec::Parameterized::TableSyntax
+
+    def setup_gauge_double(processor, gauge, queue_size)
+      gauge_double = instance_double(Prometheus::Client::Gauge)
+
+      allow(Elastic::ProcessBookkeepingService).to receive(:queue_size).with(processor: processor).and_return(queue_size)
+      allow(Gitlab::Metrics).to receive(:gauge)
+                                  .with(gauge, anything, {}, :max)
+                                  .and_return(gauge_double)
+
+      expect(gauge_double).to receive(:set).with({}, queue_size)
+    end
+
     it 'sets gauges' do
-      expect(Elastic::ProcessBookkeepingService).to receive(:queue_size).and_return(4)
-      expect(Elastic::ProcessInitialBookkeepingService).to receive(:queue_size).and_return(6)
-
-      incremental_gauge_double = instance_double(Prometheus::Client::Gauge)
-      expect(Gitlab::Metrics).to receive(:gauge)
-        .with(:global_search_bulk_cron_queue_size, anything, {}, :max)
-        .and_return(incremental_gauge_double)
-
-      initial_gauge_double = instance_double(Prometheus::Client::Gauge)
-      expect(Gitlab::Metrics).to receive(:gauge)
-        .with(:global_search_bulk_cron_initial_queue_size, anything, {}, :max)
-        .and_return(initial_gauge_double)
-
-      expect(incremental_gauge_double).to receive(:set).with({}, 4)
-      expect(initial_gauge_double).to receive(:set).with({}, 6)
+      setup_gauge_double(::Gitlab::Elastic::BulkIndexer::InitialProcessor, :global_search_bulk_project_initial_queue_size, 1)
+      setup_gauge_double(::Gitlab::Elastic::BulkIndexer::IncrementalProcessor, :global_search_bulk_project_incremental_queue_size, 5)
+      setup_gauge_double(::Gitlab::Elastic::Indexer::InitialProcessor, :global_search_bulk_repository_initial_queue_size, 10)
+      setup_gauge_double(::Gitlab::Elastic::Indexer::IncrementalProcessor, :global_search_bulk_repository_incremental_queue_size, 15)
+      setup_gauge_double(::Gitlab::Elastic::WikiIndexer::InitialProcessor, :global_search_bulk_wiki_initial_queue_size, 20)
+      setup_gauge_double(::Gitlab::Elastic::WikiIndexer::IncrementalProcessor, :global_search_bulk_wiki_incremental_queue_size, 25)
 
       subject.execute
     end
