@@ -128,6 +128,7 @@ describe('AddLicenseForm', () => {
       vm.licenseName = 'FOO';
       Vue.nextTick(() => {
         const feedbackElement = vm.$el.querySelectorAll('.text-secondary');
+        const formCheckElementMargin = vm.$el.querySelector('.form-check.mb-3');
 
         expect(feedbackElement[0].innerText.trim()).toBe(
           'Acceptable license to be used in the project',
@@ -136,6 +137,9 @@ describe('AddLicenseForm', () => {
         expect(feedbackElement[1].innerText.trim()).toBe(
           'Disallow merge request if detected and will instruct developer to remove',
         );
+
+        expect(formCheckElementMargin).not.toBeNull();
+
         done();
       });
     });
@@ -145,8 +149,10 @@ describe('AddLicenseForm', () => {
       vm.licenseName = 'FOO';
       Vue.nextTick(() => {
         const feedbackElement = vm.$el.querySelectorAll('.text-secondary');
+        const formCheckElementMargin = vm.$el.querySelector('.form-check.mb-3');
 
         expect(feedbackElement.length).toBe(0);
+        expect(formCheckElementMargin).toBeNull();
         done();
       });
     });
