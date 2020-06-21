@@ -13282,6 +13282,9 @@ msgstr ""
 msgid "LicenseCompliance|%{docLinkStart}License Approvals%{docLinkEnd} are inactive"
 msgstr ""
 
+msgid "LicenseCompliance|Acceptable license to be used in the project"
+msgstr ""
+
 msgid "LicenseCompliance|Add a license"
 msgstr ""
 
@@ -13301,6 +13304,9 @@ msgid "LicenseCompliance|Denied"
 msgstr ""
 
 msgid "LicenseCompliance|Deny"
+msgstr ""
+
+msgid "LicenseCompliance|Disallow merge request if detected and will instruct developer to remove"
 msgstr ""
 
 msgid "LicenseCompliance|Learn more about %{linkStart}License Approvals%{linkEnd}"
