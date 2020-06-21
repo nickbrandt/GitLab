@@ -49,8 +49,8 @@ export default {
       return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
     },
     isTooltipEnabled() {
-      return gon.features.licenseComplianceDeniesMr;
-    }
+      return Boolean(gon?.features?.licenseComplianceDeniesMr);
+    },
   },
   watch: {
     isAddingNewLicense(isAddingNewLicense) {
@@ -116,34 +116,38 @@ export default {
             {{ tableHeaders[0].label }}
 
             <gl-icon
+              v-if="isTooltipEnabled"
               ref="reportInfo"
               name="question"
               class="text-info ml-1"
               :aria-label="__('help')"
               :size="14"
-              :v-if="isTooltipEnabled"
             />
             <gl-popover
+              v-if="isTooltipEnabled"
               :target="() => $refs.reportInfo.$el"
               placement="bottom"
               triggers="click blur"
-              :title="title"
+              :css-classes="['mt-3']"
             >
-              <h5>Allowed</h5>
-              <span class="text-secondary"> {{s__('Licenses|Acceptable license to be used in the project')}}</span>
-              <h5>Denied</h5>
-              <span class="text-secondary"> {{s__('Licenses|Dissallow Merge request if detected and will instruct the developer to remove')}}</span>
-            </gl-popover>            
-          </div>     
-
-          <div
-            class="table-section"
-            :class="tableHeaders[1].className"
-            role="rowheader"
-          >
-             {{ tableHeaders[1].label }}
+              <h5>{{ __('Allowed') }}</h5>
+              <span class="text-secondary">
+                {{ s__('Licenses|Acceptable license to be used in the project') }}</span
+              >
+              <h5>{{ __('Denied') }}</h5>
+              <span class="text-secondary">
+                {{
+                  s__(
+                    'Licenses|Dissallow Merge request if detected and will instruct the developer to remove',
+                  )
+                }}</span
+              >
+            </gl-popover>
           </div>
-  
+
+          <div class="table-section" :class="tableHeaders[1].className" role="rowheader">
+            {{ tableHeaders[1].label }}
+          </div>
         </template>
       </template>
 

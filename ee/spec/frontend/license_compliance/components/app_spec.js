@@ -323,5 +323,4 @@ describe('Project Licenses', () => {
       });
     });
   });
-
 });

@@ -152,6 +152,5 @@ export default {
         </gl-tab>
       </gl-tabs>
     </template>
-
   </div>
 </template>
