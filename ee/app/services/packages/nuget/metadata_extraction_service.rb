@@ -48,8 +48,7 @@ module Packages
       def extract_metadata(file)
         doc = Nokogiri::XML(file)
 
-        XPATHS.map { |key, query| [key, doc.xpath(query).text.presence] }
-              .to_h
+        XPATHS.transform_values { |query| doc.xpath(query).text.presence }
               .compact
               .tap do |metadata|
                 metadata[:package_dependencies] = extract_dependencies(doc)
