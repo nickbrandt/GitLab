@@ -11,6 +11,7 @@ describe('AddLicenseForm', () => {
   const findCancelButton = () => vm.$el.querySelector('.js-cancel');
 
   beforeEach(() => {
+    window.gon = { features: { licenseComplianceDeniesMr: false } };
     vm = mountComponent(Component);
   });
 
@@ -117,6 +118,35 @@ describe('AddLicenseForm', () => {
         expect(feedbackElement.innerText.trim()).toBe(
           'This license already exists in this project.',
         );
+        done();
+      });
+    });
+
+    it('shows dropdown descriptions, if licenseComplianceDeniesMr feature flag is enabled', done => {
+      window.gon = { features: { licenseComplianceDeniesMr: true } };
+      vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
+      vm.licenseName = 'FOO';
+      Vue.nextTick(() => {
+        const feedbackElement = vm.$el.querySelectorAll('.text-secondary');
+
+        expect(feedbackElement[0].innerText.trim()).toBe(
+          'Acceptable license to be used in the project',
+        );
+
+        expect(feedbackElement[1].innerText.trim()).toBe(
+          'Disallow merge request if detected and will instruct developer to remove',
+        );
+        done();
+      });
+    });
+
+    it('does not show dropdown descriptions, if licenseComplianceDeniesMr feature flag is disabled', done => {
+      vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
+      vm.licenseName = 'FOO';
+      Vue.nextTick(() => {
+        const feedbackElement = vm.$el.querySelectorAll('.text-secondary');
+
+        expect(feedbackElement.length).toBe(0);
         done();
       });
     });

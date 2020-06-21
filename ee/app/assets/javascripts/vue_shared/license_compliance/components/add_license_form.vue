@@ -89,7 +89,7 @@ export default {
         v-for="option in $options.approvalStatusOptions"
         :key="option.value"
         class="form-check"
-        v-bind:class="{ 'mb-3': isDescriptionEnabled }"
+        :class="{ 'mb-3': isDescriptionEnabled }"
       >
         <input
           :id="`js-${option.value}-license-radio`"
