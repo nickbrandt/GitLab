@@ -48,6 +48,9 @@ export default {
     showLoadingSpinner() {
       return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
     },
+    isTooltipEnabled() {
+      return gon.features.licenseComplianceDeniesMr;
+    }
   },
   watch: {
     isAddingNewLicense(isAddingNewLicense) {
@@ -79,13 +82,13 @@ export default {
 <template>
   <gl-loading-icon v-if="showLoadingSpinner" />
   <div v-else class="license-management">
-    <delete-confirmation-modal v-if="false && isAdmin" />
+    <delete-confirmation-modal v-if="isAdmin" />
 
     <paginated-list
       :list="managedLicenses"
       :empty-search-message="$options.emptySearchMessage"
       :empty-message="$options.emptyMessage"
-      :filterable="false && isAdmin"
+      :filterable="isAdmin"
       filter="name"
       data-qa-selector="license_compliance_list"
     >
@@ -106,7 +109,7 @@ export default {
 
         <template v-else>
           <div
-            class="table-section"
+            class="table-section d-flex pl-2"
             :class="tableHeaders[0].className"
             role="rowheader"
           >
@@ -115,9 +118,10 @@ export default {
             <gl-icon
               ref="reportInfo"
               name="question"
-              class="text-info"
+              class="text-info ml-1"
               :aria-label="__('help')"
               :size="14"
+              :v-if="isTooltipEnabled"
             />
             <gl-popover
               :target="() => $refs.reportInfo.$el"
@@ -156,7 +160,7 @@ export default {
 
       <template #default="{ listItem }">
         <admin-license-management-row
-          v-if="false && isAdmin"
+          v-if="isAdmin"
           :license="listItem"
           :loading="isLicenseBeingUpdated(listItem.id)"
         />
