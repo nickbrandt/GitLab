@@ -183,7 +183,7 @@ RSpec.describe Gitlab::Elastic::DocumentReference do
       expect(collection.first).to eq(ref1)
     end
 
-    describe '#preload_database_records' do
+    describe '#preload_database_records!' do
       let(:issue1) { create(:issue) }
       let(:issue2) { create(:issue) }
       let(:note1) { create(:note) }
@@ -210,7 +210,7 @@ RSpec.describe Gitlab::Elastic::DocumentReference do
 
         database_records = nil
         expect do
-          database_records = collection.preload_database_records.map { |ref| ref.database_record }
+          database_records = collection.preload_database_records!.map { |ref| ref.database_record }
         end.not_to exceed_query_limit(2)
 
         expect(database_records[0]).to eq(issue1)

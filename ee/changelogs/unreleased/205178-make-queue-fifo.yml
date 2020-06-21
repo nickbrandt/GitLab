@@ -1,0 +1,5 @@
+---
+title: Improve the Elasticsearch index queue scheduling.
+merge_request: 35036
+author:
+type: performance

@@ -12,21 +12,21 @@ module Elastic
       def track!(*items)
         return true if items.empty?
 
-        items.map! { |item| ::Gitlab::Elastic::DocumentReference.serialize(item) }
+        refs = items.map do |item|
+          ::Gitlab::Elastic::DocumentReference.serialize(item)
+        end
 
         with_redis do |redis|
-          # Efficiently generate a guaranteed-unique score for each item
-          max = redis.incrby(self::REDIS_SCORE_KEY, items.size)
-          min = (max - items.size) + 1
-
-          (min..max).zip(items).each_slice(1000) do |group|
+          scored_refs(*refs) do |group|
             logger.debug(class: self.name,
                          redis_set: self::REDIS_SET_KEY,
                          message: 'track_items',
                          count: group.count,
                          tracked_items_encoded: group.to_json)
 
-            redis.zadd(self::REDIS_SET_KEY, group)
+            # We don't update existing entries so that the order of
+            # insertion is guaranteed (FIFO).
+            redis.zadd(self::REDIS_SET_KEY, group, nx: true)
           end
         end
 
@@ -35,6 +35,16 @@ module Elastic
 
       def queue_size
         with_redis { |redis| redis.zcard(self::REDIS_SET_KEY) }
+      end
+
+      def scored_refs(*refs, &blk)
+        with_score_redis do |redis|
+          # Efficiently generate a guaranteed-unique score for each item
+          max = redis.incrby(self::REDIS_SCORE_KEY, refs.size)
+          min = (max - refs.size) + 1
+
+          (min..max).zip(refs).each_slice(1000, &blk)
+        end
       end
 
       def clear_tracking!
@@ -47,7 +57,14 @@ module Elastic
       end
 
       def with_redis(&blk)
-        Gitlab::Redis::SharedState.with(&blk) # rubocop:disable CodeReuse/ActiveRecord
+        ::Gitlab::Redis::SharedState.with(&blk) # rubocop:disable CodeReuse/ActiveRecord
+      end
+
+      # We need to use a different connection outside of the pool
+      # for operations that can't run in a transaction, like assigning
+      # the score to the DocumentReferences
+      def with_score_redis(&blk)
+        yield ::Redis.new(Gitlab::Redis::SharedState.params)
       end
     end
 
@@ -60,7 +77,10 @@ module Elastic
     def execute_with_redis(redis)
       start_time = Time.current
 
-      specs = redis.zrangebyscore(self.class::REDIS_SET_KEY, '-inf', '+inf', limit: [0, LIMIT], with_scores: true)
+      specs = redis.zrangebyscore(self.class::REDIS_SET_KEY,
+                                  '-inf', '+inf',
+                                  limit: [0, self.class::LIMIT],
+                                  with_scores: true)
       return 0 if specs.empty?
 
       first_score = specs.first.last
@@ -74,14 +94,19 @@ module Elastic
       )
 
       refs = deserialize_all(specs)
-      refs.preload_database_records.each { |ref| submit_document(ref) }
+      refs.preload_database_records!
+
+      # Run the processor on the batch, returning the failures
+      refs.each { |ref| submit_document(ref) }
       failures = bulk_indexer.flush
 
-      # Re-enqueue any failures so they are retried
-      self.class.track!(*failures) if failures.present?
+      redis.multi do |multi|
+        # Remove all the successes
+        multi.zremrangebyscore(self.class::REDIS_SET_KEY, first_score, last_score)
 
-      # Remove all the successes
-      redis.zremrangebyscore(self.class::REDIS_SET_KEY, first_score, last_score)
+        # Re-enqueue any failures so they are retried
+        self.class.track!(*failures)
+      end
 
       records_count = specs.count
 
@@ -99,6 +124,7 @@ module Elastic
 
     def deserialize_all(specs)
       refs = ::Gitlab::Elastic::DocumentReference::Collection.new
+
       specs.each do |spec, _|
         refs.deserialize_and_add(spec)
       rescue ::Gitlab::Elastic::DocumentReference::InvalidError => err

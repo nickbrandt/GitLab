@@ -27,7 +27,7 @@ module Gitlab
           @refs.each(&blk)
         end
 
-        def preload_database_records
+        def preload_database_records!
           @refs.group_by(&:klass).each do |klass, group|
             ids = group.map(&:db_id)
 
