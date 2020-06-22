@@ -19464,6 +19464,9 @@ msgstr ""
 msgid "Required approvals (%{approvals_given} given, you've approved)"
 msgstr ""
 
+msgid "Required in this project."
+msgstr ""
+
 msgid "Requirement"
 msgstr ""
 
