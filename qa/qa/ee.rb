@@ -118,6 +118,7 @@ module QA
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
           autoload :Main, 'qa/ee/page/project/settings/main'
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
+          autoload :ProtectedTags, 'qa/ee/page/project/settings/protected_tags'
           autoload :MergeRequest, 'qa/ee/page/project/settings/merge_request'
           autoload :MergeRequestApprovals, 'qa/ee/page/project/settings/merge_request_approvals'
           autoload :Integrations, 'qa/ee/page/project/settings/integrations'
