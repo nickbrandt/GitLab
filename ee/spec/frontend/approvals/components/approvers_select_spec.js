@@ -1,11 +1,10 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import $ from 'jquery';
 import Api from 'ee/api';
 import ApproversSelect from 'ee/approvals/components/approvers_select.vue';
 import { TYPE_USER, TYPE_GROUP } from 'ee/approvals/constants';
-import { TEST_HOST } from 'spec/test_constants';
+import { TEST_HOST } from 'helpers/test_constants';
 
-const DEBOUNCE_TIME = 250;
 const TEST_PROJECT_ID = '17';
 const TEST_GROUP_AVATAR = `${TEST_HOST}/group-avatar.png`;
 const TEST_USER_AVATAR = `${TEST_HOST}/user-avatar.png`;
@@ -26,7 +25,8 @@ const TEST_USERS = [
 const localVue = createLocalVue();
 
 const waitForEvent = ($input, event) => new Promise(resolve => $input.one(event, resolve));
-const parseAvatar = element => (element.classList.contains('identicon') ? null : element.src);
+const parseAvatar = element =>
+  element.classList.contains('identicon') ? null : element.getAttribute('src');
 const select2Container = () => document.querySelector('.select2-container');
 const select2DropdownOptions = () => document.querySelectorAll('#select2-drop .user-result');
 const select2DropdownItems = () =>
@@ -57,7 +57,7 @@ describe('Approvals ApproversSelect', () => {
       ...options.propsData,
     };
 
-    wrapper = mount(localVue.extend(ApproversSelect), {
+    wrapper = shallowMount(ApproversSelect, {
       ...options,
       propsData,
       localVue,
@@ -68,18 +68,15 @@ describe('Approvals ApproversSelect', () => {
   };
   const search = (term = '') => {
     $input.select2('search', term);
-    jasmine.clock().mockDate();
-    jasmine.clock().tick(DEBOUNCE_TIME);
+    jest.runOnlyPendingTimers();
   };
 
   beforeEach(() => {
-    jasmine.clock().install();
-    spyOn(Api, 'groups').and.returnValue(Promise.resolve(TEST_GROUPS));
-    spyOn(Api, 'projectUsers').and.returnValue(Promise.resolve(TEST_USERS));
+    jest.spyOn(Api, 'groups').mockResolvedValue(TEST_GROUPS);
+    jest.spyOn(Api, 'projectUsers').mockReturnValue(Promise.resolve(TEST_USERS));
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
     wrapper.destroy();
   });
 
@@ -117,6 +114,7 @@ describe('Approvals ApproversSelect', () => {
       factory();
 
       waitForEvent($input, 'select2-loaded')
+        .then(jest.runOnlyPendingTimers)
         .then(done)
         .catch(done.fail);
 
@@ -147,6 +145,7 @@ describe('Approvals ApproversSelect', () => {
       });
 
       waitForEvent($input, 'select2-loaded')
+        .then(jest.runOnlyPendingTimers)
         .then(done)
         .catch(done.fail);
 
@@ -185,10 +184,12 @@ describe('Approvals ApproversSelect', () => {
         $(options[TEST_GROUPS.length]).trigger('mouseup');
         $(options[0]).trigger('mouseup');
       })
+      .then(jest.runOnlyPendingTimers)
       .then(done)
       .catch(done.fail);
 
     waitForEvent($input, 'change')
+      .then(jest.runOnlyPendingTimers)
       .then(() => {
         expect(wrapper.emittedByOrder()).toEqual(expected);
       })
