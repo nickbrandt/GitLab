@@ -4,7 +4,7 @@
 
 ## Trigger Advanced Global Search reindexing
 
-Trigger zero-downtime background reindexing
+Trigger zero-downtime background reindexing.
 
 ```plaintext
 PUT /elasticsearch_cluster_reindexing/trigger
