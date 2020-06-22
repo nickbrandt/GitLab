@@ -146,3 +146,20 @@ export const fetchFoos = ({ state }) => {
   return axios.get(state.settings.fooPath);
 };
 ```
+
+### 7. How can I test the production build locally?
+
+Sometimes the necessity of testing locally what the frontend production build would produce, to do so the steps are:
+
+1. `gdk stop webpack`
+1. edit `gitlab.yaml` and set `webpack => dev_server => enabled: false`
+1. `yarn webpack-prod`
+1. `gdk restart rails-web`
+
+The production build takes few minutes to be compled, any code change at this point will be displayed only after executing again the points `3` and `4`
+To return to the normal `development mode` 
+
+1. edit `gitlab.yaml` and set `webpack => dev_server => enabled: true`
+1. (Optional) `yarn clean`
+1. `gdk start webpack`
+1. `gdk-restart rails-web`
