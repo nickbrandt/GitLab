@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe Gitlab::Git::DiffStatsCollection do
+RSpec.describe Gitlab::Git::DiffStatsCollection do
   let(:stats_a) do
     double(Gitaly::DiffStats, additions: 10, deletions: 15, path: 'foo')
   end
