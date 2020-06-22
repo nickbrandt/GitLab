@@ -333,13 +333,23 @@ FactoryBot.define do
       end
     end
 
-    trait :requirements do
+    trait :all_passing_requirements do
       file_format { :raw }
       file_type { :requirements }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/requirements_management/report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/requirements_management/all_passing_report.json'), 'application/json')
+      end
+    end
+
+    trait :individual_requirements do
+      file_format { :raw }
+      file_type { :requirements }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/requirements_management/report_by_requirement.json'), 'application/json')
       end
     end
   end
