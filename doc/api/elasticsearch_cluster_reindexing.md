@@ -1,4 +1,4 @@
-# Advanced Global Search index reindexing
+# Advanced Global Search index reindexing **(STARTER ONLY)**
 
 >**Note:** This feature was introduced in GitLab 13.2
 
