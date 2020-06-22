@@ -28,7 +28,7 @@
               - unless Gitlab::CurrentSettings.elasticsearch_indexing?
                 .form-text.text-muted
                   = _('Please create an index before enabling indexing')
-              - if Feature.enabled?(:elasticsearch_web_indexing, default_enabled: true) && Gitlab::CurrentSettings.elasticsearch_indexing?
+              - if Gitlab::CurrentSettings.elasticsearch_indexing?
                 .form-text
                   = link_to _('Index all projects'), admin_elasticsearch_enqueue_index_path,
                       class: ['btn', 'btn-success'], method: :post
