@@ -75,9 +75,7 @@ class EpicsFinder < IssuableFinder
                # The `group` method takes care of checking permissions
                [group]
              else
-               # `same_root` should be set only if we are sure that all groups
-               # in related_groups have the same ancestor root group
-               ::Group.groups_user_can_read_epics(related_groups, current_user, same_root: true)
+               permissioned_related_groups
              end
 
     epics = Epic.where(group: groups)
@@ -86,6 +84,22 @@ class EpicsFinder < IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
+
+  def permissioned_related_groups
+    groups = related_groups
+
+    # if user is member of top-level related group, he can automatically read
+    # all epics in all subgroups
+    return groups if can_read_all_epics_in_related_groups?(groups)
+
+    groups_user_can_read_epics(groups)
+  end
+
+  def groups_user_can_read_epics(groups)
+    # `same_root` should be set only if we are sure that all groups
+    # in related_groups have the same ancestor root group
+    ::Group.groups_user_can_read_epics(groups, current_user, same_root: true)
+  end
 
   def filter_items(items)
     items = by_created_at(items)
@@ -166,7 +180,7 @@ class EpicsFinder < IssuableFinder
 
   def with_confidentiality_access_check(epics, groups)
     return epics unless Feature.enabled?(:confidential_epics_query, group)
-    return epics if can_read_all_related_groups?(groups)
+    return epics if can_read_all_epics_in_related_groups?(groups)
 
     epics.not_confidential_or_in_groups(groups_with_confidential_access(groups))
   end
@@ -179,7 +193,7 @@ class EpicsFinder < IssuableFinder
     GroupMember.by_group_ids(group_ids).by_user_id(current_user).non_guests.select(:source_id)
   end
 
-  def can_read_all_related_groups?(groups)
+  def can_read_all_epics_in_related_groups?(groups)
     return false unless current_user
 
     # If a user is a member of a group, he also inherits access to all subgroups,
