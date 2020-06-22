@@ -15,5 +15,11 @@ module Vulnerabilities
     validates :low, numericality: { greater_than_or_equal_to: 0 }
     validates :unknown, numericality: { greater_than_or_equal_to: 0 }
     validates :info, numericality: { greater_than_or_equal_to: 0 }
+
+    class << self
+      def update_stats_with(vulnerability)
+        true
+      end
+    end
   end
 end

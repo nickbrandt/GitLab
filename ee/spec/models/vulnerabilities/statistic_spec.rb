@@ -17,4 +17,8 @@ RSpec.describe Vulnerabilities::Statistic do
     it { is_expected.to validate_numericality_of(:info).is_greater_than_or_equal_to(0) }
     it { is_expected.to define_enum_for(:letter_grade).with_values(%i(a b c d f)) }
   end
+
+  describe '.update_stats_with' do
+    pending('This functionality is WIP')
+  end
 end
