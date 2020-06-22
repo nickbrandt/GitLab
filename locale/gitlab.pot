@@ -19432,6 +19432,9 @@ msgstr ""
 msgid "Revoke"
 msgstr ""
 
+msgid "Revoked"
+msgstr ""
+
 msgid "Revoked impersonation token %{token_name}!"
 msgstr ""
 

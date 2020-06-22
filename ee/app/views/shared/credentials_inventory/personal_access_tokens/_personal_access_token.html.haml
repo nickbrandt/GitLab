@@ -7,7 +7,7 @@
   .table-section.section-30
     .table-mobile-header{ role: 'rowheader' }
       = _('Scope')
-    .table-mobile-content
+    .table-mobile-content.ws-normal
       - scopes = personal_access_token.scopes
       = scopes.present? ? scopes.join(", ") : _('No Scopes')
   .table-section.section-10
@@ -21,5 +21,11 @@
     .table-mobile-content
       - if personal_access_token.expires?
         = personal_access_token.expires_at
-      - else
+      - elsif !personal_access_token.revoked?
         = _('Never')
+  .table-section.section-10
+    .table-mobile-header{ role: 'rowheader' }
+      = _('Revoked')
+    .table-mobile-content
+      - if personal_access_token.revoked?
+        = personal_access_token.updated_at.to_date

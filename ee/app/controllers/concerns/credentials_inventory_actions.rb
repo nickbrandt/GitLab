@@ -14,7 +14,7 @@ module CredentialsInventoryActions
 
   def filter_credentials
     if show_personal_access_tokens?
-      ::PersonalAccessTokensFinder.new({ user: users, impersonation: false, state: 'active', sort: 'id_desc' }).execute
+      ::PersonalAccessTokensFinder.new({ user: users, impersonation: false, sort: 'id_desc' }).execute
     elsif show_ssh_keys?
       ::KeysFinder.new({ users: users, key_type: 'ssh' }).execute
     end
