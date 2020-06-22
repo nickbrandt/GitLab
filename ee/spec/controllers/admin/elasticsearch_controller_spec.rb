@@ -36,17 +36,5 @@ RSpec.describe Admin::ElasticsearchController do
         expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
       end
     end
-
-    context 'when feature is disabled' do
-      it 'does nothing and returns 404' do
-        stub_feature_flags(elasticsearch_web_indexing: false)
-
-        expect(::Elastic::IndexProjectsService).not_to receive(:new)
-
-        post :enqueue_index
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
   end
 end
