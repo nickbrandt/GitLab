@@ -116,7 +116,6 @@ export default {
             <span class="gl-white-space-nowrap gl-ml-2" :class="{ 'gl-pl-5': !isSelected(option) }">
               {{ option.name }}
             </span>
-            <slot v-bind="{ filter, option }"></slot>
           </span>
         </button>
       </div>

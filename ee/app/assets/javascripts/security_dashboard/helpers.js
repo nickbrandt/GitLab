@@ -1,4 +1,6 @@
+import isPlainObject from 'lodash/isPlainObject';
 import { s__ } from '~/locale';
+import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import { ALL, BASE_FILTERS } from 'ee/security_dashboard/store/modules/filters/constants';
 import { REPORT_TYPES, SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
 import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
@@ -44,6 +46,27 @@ export const initFirstClassVulnerabilityFilters = projects => {
   }
 
   return filters;
+};
+
+export const getFormattedSummary = (rawSummary = {}) => {
+  if (!isPlainObject(rawSummary)) {
+    return [];
+  }
+  // Convert keys to snake case so they can be matched against REPORT_TYPES keys for translation
+  const snakeCasedSummary = convertObjectPropsToSnakeCase(rawSummary);
+  // Convert object to an array of entries to make it easier to loop through
+  const summaryEntries = Object.entries(snakeCasedSummary);
+  // Filter out empty entries as we don't want to display those in the summary
+  const withoutEmptyEntries = summaryEntries.filter(
+    ([, scanSummary]) => scanSummary?.vulnerabilitiesCount !== undefined,
+  );
+  // Replace keys with translations found in REPORT_TYPES if available
+  const formattedEntries = withoutEmptyEntries.map(([scanType, scanSummary]) => {
+    const name = REPORT_TYPES[scanType];
+    return name ? [name, scanSummary] : null;
+  });
+  // Filter out keys that could not be matched with any translation and are thus considered invalid
+  return formattedEntries.filter(entry => entry !== null);
 };
 
 export default () => ({});
