@@ -3,5 +3,9 @@
 %h3.page-title= _('Group Audit Events')
 %p.light= _('Events in %{group_name}') % { group_name: @group.name }
 
-= render 'shared/audit_events/event_filter', path: group_audit_events_path(@group)
-= render 'shared/audit_events/event_table', events: @events
+#js-group-audit-events-app{ data: { form_path: group_audit_events_path(@group),
+  events: @table_events.to_json,
+  is_last_page: @events.last_page?.to_json,
+  filter_qa_selector: 'group_audit_log_filter',
+  table_qa_selector: 'group_audit_log_table',
+  filter_token_options: group_audit_event_tokens(@group.id).to_json } }

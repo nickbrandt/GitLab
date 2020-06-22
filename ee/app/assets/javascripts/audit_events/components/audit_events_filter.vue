@@ -1,7 +1,7 @@
 <script>
 import { GlFilteredSearch } from '@gitlab/ui';
-import { FILTER_TOKENS, AVAILABLE_TOKEN_TYPES } from '../constants';
-import { availableTokensValidator } from '../validators';
+import { AUDIT_FILTER_CONFIGS } from '../constants';
+import { filterTokenOptionsValidator } from '../validators';
 
 export default {
   components: {
@@ -13,11 +13,11 @@ export default {
       required: false,
       default: () => [],
     },
-    enabledTokenTypes: {
+    filterTokenOptions: {
       type: Array,
       required: false,
-      default: () => AVAILABLE_TOKEN_TYPES,
-      validator: availableTokensValidator,
+      default: () => AUDIT_FILTER_CONFIGS,
+      validator: filterTokenOptionsValidator,
     },
     qaSelector: {
       type: String,
@@ -25,25 +25,30 @@ export default {
       default: undefined,
     },
   },
+  data() {
+    return {
+      filterTokens: this.filterTokenOptions.map(option => ({
+        ...AUDIT_FILTER_CONFIGS.find(({ type }) => type === option.type),
+        ...option,
+      })),
+    };
+  },
   computed: {
-    searchTerm() {
-      return this.value.find(term => AVAILABLE_TOKEN_TYPES.includes(term.type));
+    tokenSearchTerm() {
+      return this.value.find(term => this.filterTokens.find(token => token.type === term.type));
     },
     enabledTokens() {
-      return FILTER_TOKENS.filter(token => this.enabledTokenTypes.includes(token.type));
-    },
-    filterTokens() {
-      // This limits the user to search by only one of the available tokens
-      const { enabledTokens, searchTerm } = this;
+      const { tokenSearchTerm } = this;
 
-      if (searchTerm?.type) {
-        return enabledTokens.map(token => ({
+      // If a user has searched for a term within a token, limit the user to that one token
+      if (tokenSearchTerm) {
+        return this.filterTokens.map(token => ({
           ...token,
-          disabled: searchTerm.type !== token.type,
+          disabled: tokenSearchTerm.type !== token.type,
         }));
       }
 
-      return enabledTokens;
+      return this.filterTokens;
     },
   },
   methods: {
@@ -68,7 +73,7 @@ export default {
       :placeholder="__('Search')"
       :clear-button-title="__('Clear')"
       :close-button-title="__('Close')"
-      :available-tokens="filterTokens"
+      :available-tokens="enabledTokens"
       class="gl-h-32 w-100"
       @submit="onSubmit"
       @input="onInput"

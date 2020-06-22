@@ -3106,6 +3106,9 @@ msgstr ""
 msgid "AuditLogs|IP Address"
 msgstr ""
 
+msgid "AuditLogs|Member Events"
+msgstr ""
+
 msgid "AuditLogs|No matching %{type} found."
 msgstr ""
 

@@ -1,6 +1,21 @@
 # frozen_string_literal: true
 
 module AuditEventsHelper
+  FILTER_TOKEN_TYPES = {
+      user: :user,
+      group: :group,
+      project: :project,
+      group_member: :group_member
+  }.freeze
+
+  def admin_audit_event_tokens
+    [{ type: FILTER_TOKEN_TYPES[:user] }, { type: FILTER_TOKEN_TYPES[:group] }, { type: FILTER_TOKEN_TYPES[:project] }].freeze
+  end
+
+  def group_audit_event_tokens(group_id)
+    [{ type: FILTER_TOKEN_TYPES[:group_member], group_id: group_id }]
+  end
+
   def human_text(details)
     return details[:custom_message] if details[:custom_message]
 

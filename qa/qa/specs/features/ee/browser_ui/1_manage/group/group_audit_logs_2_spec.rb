@@ -31,7 +31,7 @@ module QA
           Page::Group::Settings::General.perform(&:set_lfs_enabled)
         end
 
-        it_behaves_like 'audit event', ["Change lfs enabled from false to true", "Change lfs enabled from true to false"]
+        it_behaves_like 'audit event', ["Changed lfs enabled from false to true", "Changed lfs enabled from true to false"]
       end
 
       context 'Enable and disable LFS' do
@@ -45,7 +45,7 @@ module QA
           Page::Group::Settings::General.perform(&:set_membership_lock_disabled)
         end
 
-        it_behaves_like 'audit event', ["Change membership lock from true to false", "Change membership lock from false to true"]
+        it_behaves_like 'audit event', ["Changed membership lock from true to false", "Changed membership lock from false to true"]
       end
 
       context 'Enable and disable allow user request access' do
@@ -59,7 +59,7 @@ module QA
           Page::Group::Settings::General.perform(&:toggle_request_access)
         end
 
-        it_behaves_like 'audit event', ["Change request access enabled from true to false", "Change request access enabled from false to true"]
+        it_behaves_like 'audit event', ["Changed request access enabled from true to false", "Changed request access enabled from false to true"]
       end
 
       # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/31764
@@ -76,7 +76,7 @@ module QA
           Page::Group::Settings::General.perform(&:set_require_2fa_disabled)
         end
 
-        it_behaves_like 'audit event', ["Change require two factor authentication from true to false", "Change require two factor authentication from false to true"]
+        it_behaves_like 'audit event', ["Changed require two factor authentication from true to false", "Changed require two factor authentication from false to true"]
       end
 
       context 'Change project creation level' do
@@ -89,7 +89,7 @@ module QA
           end
         end
 
-        it_behaves_like 'audit event', ["Change project creation level"]
+        it_behaves_like 'audit event', ["Changed project creation level"]
       end
     end
 

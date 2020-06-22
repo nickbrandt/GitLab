@@ -1,11 +1,13 @@
 import Vue from 'vue';
-import { parseBoolean } from '~/lib/utils/common_utils';
+
+import { convertObjectPropsToCamelCase, parseBoolean } from '~/lib/utils/common_utils';
+
 import AuditEventsApp from './components/audit_events_app.vue';
 import createStore from './store';
 
 export default selector => {
   const el = document.querySelector(selector);
-  const { events, isLastPage, enabledTokenTypes, filterQaSelector, tableQaSelector } = el.dataset;
+  const { events, isLastPage, filterTokenOptions, filterQaSelector, tableQaSelector } = el.dataset;
 
   const store = createStore();
   store.dispatch('initializeAuditEvents');
@@ -18,7 +20,9 @@ export default selector => {
         props: {
           events: JSON.parse(events),
           isLastPage: parseBoolean(isLastPage),
-          enabledTokenTypes: JSON.parse(enabledTokenTypes),
+          filterTokenOptions: JSON.parse(filterTokenOptions).map(filterTokenOption =>
+            convertObjectPropsToCamelCase(filterTokenOption),
+          ),
           filterQaSelector,
           tableQaSelector,
         },

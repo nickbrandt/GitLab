@@ -17,7 +17,7 @@ exports[`AuditEventsApp when initialized matches the snapshot 1`] = `
           data-testid="audit-events-filter"
         >
           <gl-filtered-search-stub
-            availabletokens="[object Object],[object Object],[object Object]"
+            availabletokens="[object Object],[object Object],[object Object],[object Object]"
             class="gl-h-32 w-100"
             clearbuttontitle="Clear"
             close-button-title="Close"

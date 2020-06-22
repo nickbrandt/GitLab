@@ -64,7 +64,10 @@ export default {
       return this.suggestions.length > 0;
     },
     lowerCaseType() {
-      return this.config.type.toLowerCase();
+      return this.config.type
+        .replace('_', ' ')
+        .trim()
+        .toLowerCase();
     },
     noSuggestionsString() {
       return sprintf(s__('AuditLogs|No matching %{type} found.'), { type: this.lowerCaseType });
