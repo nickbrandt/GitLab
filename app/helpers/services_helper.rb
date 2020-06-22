@@ -101,6 +101,7 @@ module ServicesHelper
 
   def integration_form_data(integration)
     {
+      id: integration.id,
       show_active: integration.show_active_box?.to_s,
       activated: (integration.active || integration.new_record?).to_s,
       type: integration.to_param,
