@@ -213,6 +213,29 @@ function install_external_dns() {
   fi
 }
 
+function install_certmanager() {
+  local namespace="${KUBE_NAMESPACE}"
+  local release="cert-manager-review-app-helm3"
+
+  echoinfo "Installing cert-manager..." true
+
+  if ! deploy_exists "${namespace}" "${release}" || previous_deploy_failed "${namespace}" "${release}" ; then
+    kubectl apply \
+    -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
+
+    echoinfo "Installing cert-manager Helm chart"
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+
+    helm install "${release}" jetstack/cert-manager \
+      --namespace "${namespace}" \
+      --version v0.15.1 \
+      --set installCRDS=true
+  else
+    echoinfo "The cert-manager Helm chart is already successfully deployed."
+  fi
+}
+
 function create_application_secret() {
   local namespace="${KUBE_NAMESPACE}"
   local release="${CI_ENVIRONMENT_SLUG}"
