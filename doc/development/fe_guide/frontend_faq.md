@@ -153,8 +153,7 @@ Sometimes it's necessary to test locally what the frontend production build woul
 
 1. `gdk stop webpack`
 1. edit `gitlab.yaml` and set `webpack => dev_server => enabled: false`
-1. `yarn webpack-prod`
-1. `gdk restart rails-web`
+1. `yarn webpack-prod && gdk restart rails-web`
 
 The production build takes a few minutes to be completed, any code change at this point will be displayed only after executing again the points `3` and `4`
 To return to the normal `development mode:`
