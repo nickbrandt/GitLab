@@ -140,14 +140,14 @@ export default {
         $(this.$el).trigger('hidden.gl.dropdown');
 
         if (isNewValue) {
-          eventHub.$emit('updateWeight', [value, this.id]);
+          eventHub.$emit('updateWeight', value, this.id);
         }
 
         this.showEditField(false);
       }
     },
     removeWeight() {
-      eventHub.$emit('updateWeight', ['', this.id]);
+      eventHub.$emit('updateWeight', '', this.id);
     },
   },
 };

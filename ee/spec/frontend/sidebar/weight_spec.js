@@ -125,7 +125,7 @@ describe('Weight', () => {
       vm.$refs.editableField.dispatchEvent(event);
 
       expect(vm.hasValidInput).toBe(true);
-      expect(eventHub.$emit).toHaveBeenCalledWith('updateWeight', [expectedWeightValue, ID]);
+      expect(eventHub.$emit).toHaveBeenCalledWith('updateWeight', expectedWeightValue, ID);
     });
   });
 
@@ -143,7 +143,7 @@ describe('Weight', () => {
 
     return vm.$nextTick(() => {
       expect(vm.hasValidInput).toBe(true);
-      expect(eventHub.$emit).toHaveBeenCalledWith('updateWeight', ['', ID]);
+      expect(eventHub.$emit).toHaveBeenCalledWith('updateWeight', '', ID);
     });
   });
 
