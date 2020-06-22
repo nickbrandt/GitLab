@@ -19,9 +19,6 @@ module EE
 
     prepended do
       with_scope :subject
-      condition(:service_desk_enabled) { @subject.service_desk_enabled? }
-
-      with_scope :subject
       condition(:related_issues_disabled) { !@subject.feature_available?(:related_issues) }
 
       with_scope :subject
@@ -203,12 +200,6 @@ module EE
 
       condition(:group_timelogs_available) do
         @subject.feature_available?(:group_timelogs)
-      end
-
-      rule { support_bot }.enable :guest_access
-      rule { support_bot & ~service_desk_enabled }.policy do
-        prevent :create_note
-        prevent :read_project
       end
 
       rule { visual_review_bot }.policy do
@@ -440,7 +431,6 @@ module EE
     override :lookup_access_level!
     def lookup_access_level!
       return ::Gitlab::Access::NO_ACCESS if needs_new_sso_session?
-      return ::Gitlab::Access::REPORTER if support_bot? && service_desk_enabled?
       return ::Gitlab::Access::NO_ACCESS if visual_review_bot?
 
       super
