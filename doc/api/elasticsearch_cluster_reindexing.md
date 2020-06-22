@@ -1,6 +1,6 @@
 # Advanced Global Search index reindexing **(STARTER ONLY)**
 
->**Note:** This feature was introduced in GitLab 13.2
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/34069) in GitLab Starter 13.2.
 
 ## Trigger Advanced Global Search reindexing
 
