@@ -27,6 +27,7 @@ module Security
       filter_by_report_types
       filter_by_severities
       filter_by_states
+      filter_by_scanners
 
       vulnerabilities
     end
@@ -56,6 +57,12 @@ module Security
     def filter_by_states
       if filters[:state].present?
         @vulnerabilities = vulnerabilities.with_states(filters[:state])
+      end
+    end
+
+    def filter_by_scanners
+      if filters[:scanner].present?
+        @vulnerabilities = vulnerabilities.with_scanners(filters[:scanner])
       end
     end
   end

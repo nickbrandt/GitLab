@@ -12,15 +12,15 @@ RSpec.describe Resolvers::VulnerabilitiesResolver do
     let_it_be(:user) { create(:user, security_dashboard_projects: [project]) }
 
     let_it_be(:low_vulnerability) do
-      create(:vulnerability, :detected, :low, :dast, project: project)
+      create(:vulnerability, :with_findings, :detected, :low, :dast, project: project)
     end
 
     let_it_be(:critical_vulnerability) do
-      create(:vulnerability, :detected, :critical, :sast, project: project)
+      create(:vulnerability, :with_findings, :detected, :critical, :sast, project: project)
     end
 
     let_it_be(:high_vulnerability) do
-      create(:vulnerability, :dismissed, :high, :container_scanning, project: project)
+      create(:vulnerability, :with_findings, :dismissed, :high, :container_scanning, project: project)
     end
 
     let(:current_user) { user }
@@ -45,6 +45,14 @@ RSpec.describe Resolvers::VulnerabilitiesResolver do
       let(:filters) { { state: ['dismissed'] } }
 
       it 'only returns vulnerabilities of the given states' do
+        is_expected.to contain_exactly(high_vulnerability)
+      end
+    end
+
+    context 'when given scanner' do
+      let(:filters) { { scanner: [high_vulnerability.finding_scanner_external_id] } }
+
+      it 'only returns vulnerabilities of the given scanner' do
         is_expected.to contain_exactly(high_vulnerability)
       end
     end
