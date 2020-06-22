@@ -259,7 +259,7 @@ Ties are broken arbitrarily.
 In specific circumstances it was possible to create labels with duplicate titles in the same
 namespace.
 
-To resolve the duplication, [in GitLab 13.1](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21384)
+To resolve the duplication, [in GitLab 13.2](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21384)
 and later, some duplicate labels have `_duplicate<number>` appended to their titles.
 
 You can safely change these labels' titles if you prefer.

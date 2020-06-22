@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require Rails.root.join('db', 'migrate', '20200305082754_remove_duplicate_labels_from_project.rb')
+require Rails.root.join('db', 'post_migrate', '20200305082754_remove_duplicate_labels_from_project.rb')
 
-describe RemoveDuplicateLabelsFromProject do
+RSpec.describe RemoveDuplicateLabelsFromProject do
   let(:labels_table) { table(:labels) }
   let(:labels) { labels_table.all }
   let(:projects_table) { table(:projects) }
