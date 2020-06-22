@@ -590,7 +590,7 @@ module EE
 
       # Index the wiki repository after import of non-forked projects only, the project repository is indexed
       # in ProjectImportState so ElasticSearch will get project repository changes when mirrors are updated
-      ElasticCommitIndexerWorker.perform_async(id, nil, nil, true) if use_elasticsearch? && !forked?
+      wiki.index_wiki_blobs if use_elasticsearch? & !forked?
     end
 
     override :import?

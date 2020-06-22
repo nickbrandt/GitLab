@@ -2,10 +2,50 @@
 
 require 'spec_helper'
 
+RSpec.describe Gitlab::Elastic::ProjectOperation do
+  let(:project) { create(:project, :repository) }
+
+  subject(:operation) { described_class.new(project) }
+
+  describe '#find_indexable_commit' do
+    it 'is truthy for reachable commits' do
+      expect(operation.find_indexable_commit(project.repository.commit.sha)).to be_an_instance_of(::Commit)
+    end
+
+    it 'is falsey for unreachable commits', :aggregate_failures do
+      expect(operation.find_indexable_commit(Gitlab::Git::BLANK_SHA)).to be_nil
+      expect(operation.find_indexable_commit(Gitlab::Git::EMPTY_TREE_ID)).to be_nil
+    end
+  end
+end
+
+module Process
+  class StatusMock
+    attr_reader :exitstatus
+
+    def success?
+      exitstatus == 0
+    end
+
+    class OK < self
+      def initialize
+        @exitstatus = 0
+      end
+    end
+
+    class Error < self
+      def initialize
+        @exitstatus = 1
+      end
+    end
+  end
+end
+
 RSpec.describe Gitlab::Elastic::Indexer do
   include StubENV
 
   before do
+    RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 10000000
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'true')
   end
 
@@ -14,47 +54,45 @@ RSpec.describe Gitlab::Elastic::Indexer do
   let(:to_commit) { project.commit }
   let(:to_sha) { to_commit.try(:sha) }
 
-  let(:popen_success) { [[''], 0] }
-  let(:popen_failure) { [['error'], 1] }
+  def results_spec(indexer, error_code: 0)
+    indexer.operations.values.map do |op|
+      # Return the latest indexed SHA
+      [op.project.id, op.repository_path, op.repository.commit.sha, error_code].join("\t")
+    end
+  end
 
-  subject(:indexer) { described_class.new(project) }
+  def popen_success(indexer)
+    Gitlab::Popen::Result.new('/dev/null',
+                              results_spec(indexer, error_code: 0).join("\n"),
+                              '',
+                              Process::StatusMock::OK.new,
+                              1.second)
+  end
+
+  def popen_failure(indexer)
+    Gitlab::Popen::Result.new('/dev/null',
+                              results_spec(indexer, error_code: 1).join("\n"),
+                              'error',
+                              Process::StatusMock::Error.new,
+                              1.second)
+  end
+
+  subject(:indexer) do
+    described_class.new(project)
+  end
 
   context 'empty project', :elastic do
     let(:project) { create(:project) }
 
-    it 'updates the index status without running the indexing command' do
+    it 'ignores the indexing command' do
       expect_popen.never
 
-      indexer.run
-
-      expect_index_status(Gitlab::Git::BLANK_SHA)
-    end
-
-    context 'when indexing an unborn head', :elastic do
-      it 'updates the index status without running the indexing command' do
-        allow(project.repository).to receive(:exists?).and_return(false)
-        expect_popen.never
-
-        indexer.run
-
-        expect_index_status(Gitlab::Git::BLANK_SHA)
-      end
-    end
-  end
-
-  describe '#find_indexable_commit' do
-    it 'is truthy for reachable commits' do
-      expect(indexer.find_indexable_commit(project.repository.commit.sha)).to be_an_instance_of(::Commit)
-    end
-
-    it 'is falsey for unreachable commits', :aggregate_failures do
-      expect(indexer.find_indexable_commit(Gitlab::Git::BLANK_SHA)).to be_nil
-      expect(indexer.find_indexable_commit(Gitlab::Git::EMPTY_TREE_ID)).to be_nil
+      indexer.flush
     end
   end
 
   context 'with an indexed project', :elastic do
-    let(:to_sha) { project.repository.commit.sha }
+    let(:head) { project.repository.commit.sha }
 
     before do
       stub_ee_application_setting(elasticsearch_indexing: true)
@@ -62,48 +100,46 @@ RSpec.describe Gitlab::Elastic::Indexer do
 
     shared_examples 'index up to the specified commit' do
       it 'updates the index status when the indexing is a success' do
-        expect_popen.and_return(popen_success)
+        expect_popen.and_return(popen_success(indexer))
 
-        indexer.run(to_sha)
+        indexer.flush
 
-        expect_index_status(to_sha)
+        expect_index_status(head)
       end
 
       it 'leaves the index status untouched when the indexing fails' do
-        expect_popen.and_return(popen_failure)
+        expect_popen.and_return(popen_failure(indexer))
 
-        expect { indexer.run }.to raise_error(Gitlab::Elastic::Indexer::Error)
+        expect(indexer.flush).to contain_exactly(project)
 
         expect(project.index_status).to be_nil
       end
     end
 
-    context 'when indexing a HEAD commit', :elastic do
+    context 'when indexing a descendant commit', :elastic do
       it_behaves_like 'index up to the specified commit'
 
       it 'runs the indexing command' do
-        gitaly_connection_data = {
-          storage: project.repository_storage
-        }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage))
+        gitaly_connection_data = Gitlab::GitalyClient
+                                   .connection_data(project.repository_storage)
+                                   .merge(storage: project.repository_storage)
 
         expect_popen.with(
           [
             TestEnv.indexer_bin_path,
-            project.id.to_s,
-            "#{project.repository.disk_path}.git"
+            "--blob-type", "blob",
+            "--input-file", "/dev/stdin"
           ],
           nil,
           hash_including(
             'GITALY_CONNECTION_INFO'  => gitaly_connection_data.to_json,
-            'ELASTIC_CONNECTION_INFO' => elasticsearch_config.to_json,
+            'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
             'RAILS_ENV'               => Rails.env,
-            'CORRELATION_ID'          => Labkit::Correlation::CorrelationId.current_id,
-            'FROM_SHA'                => expected_from_sha,
-            'TO_SHA'                  => to_sha
+            'CORRELATION_ID'          => Labkit::Correlation::CorrelationId.current_id
           )
-        ).and_return(popen_success)
+        ).and_return(popen_success(indexer))
 
-        indexer.run
+        indexer.flush
       end
 
       context 'when IndexStatus exists' do
@@ -115,9 +151,9 @@ RSpec.describe Gitlab::Elastic::Indexer do
           end
 
           it 'uses last_commit as from_sha' do
-            expect_popen.and_return(popen_success)
+            expect_popen.and_return(popen_success(indexer))
 
-            indexer.run(to_sha)
+            indexer.flush
 
             expect_index_status(to_sha)
           end
@@ -125,10 +161,8 @@ RSpec.describe Gitlab::Elastic::Indexer do
       end
     end
 
-    context 'when indexing a non-HEAD commit', :elastic do
-      let(:to_sha) { project.repository.commit('HEAD~1').sha }
-
-      it_behaves_like 'index up to the specified commit'
+    context 'when indexing a non-descendant commit', :elastic do
+      let(:head) { project.repository.commit('HEAD~1').sha }
 
       context 'after reverting a change' do
         let(:user) { project.owner }
@@ -137,9 +171,7 @@ RSpec.describe Gitlab::Elastic::Indexer do
         def change_repository_and_index(project, &blk)
           yield blk if blk
 
-          current_commit = project.repository.commit('master').sha
-
-          described_class.new(project).run(current_commit)
+          indexer.process(project).flush
           ensure_elasticsearch_index!
         end
 
@@ -177,7 +209,14 @@ RSpec.describe Gitlab::Elastic::Indexer do
             expect(indexed_file_paths_for('12')).to include('12')
             expect(indexed_file_paths_for('23')).to include('23')
 
-            project.index_status.update!(last_commit: '____________')
+            # set the index_status to a bogus commit
+            IndexStatus.upsert({
+                                 project_id: project.id,
+                                 last_commit: '____________',
+                                 created_at: Time.now,
+                                 updated_at: Time.now
+                               },
+                               unique_by: :project_id)
 
             change_repository_and_index(project) do
               project.repository.write_ref('master', sha_for_reset)
@@ -213,7 +252,7 @@ RSpec.describe Gitlab::Elastic::Indexer do
 
     context "when indexing a project's wiki", :elastic do
       let(:project) { create(:project, :wiki_repo) }
-      let(:indexer) { described_class.new(project, wiki: true) }
+      let(:indexer) { ::Gitlab::Elastic::WikiIndexer.new(project) }
       let(:to_sha) { project.wiki.repository.commit('master').sha }
 
       before do
@@ -224,21 +263,18 @@ RSpec.describe Gitlab::Elastic::Indexer do
         expect_popen.with(
           [
             TestEnv.indexer_bin_path,
-            '--blob-type=wiki_blob',
+            '--blob-type', 'wiki_blob',
             '--skip-commits',
-            project.id.to_s,
-            "#{project.wiki.repository.disk_path}.git"
+            '--input-file', '/dev/stdin'
           ],
           nil,
           hash_including(
-            'ELASTIC_CONNECTION_INFO' => elasticsearch_config.to_json,
-            'RAILS_ENV'               => Rails.env,
-            'FROM_SHA'                => expected_from_sha,
-            'TO_SHA'                  => to_sha
+            'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
+            'RAILS_ENV'               => Rails.env
           )
-        ).and_return(popen_success)
+        ).and_return(popen_success(indexer))
 
-        indexer.run
+        indexer.flush
       end
 
       context 'when IndexStatus#last_wiki_commit is no longer in repository' do
@@ -247,9 +283,7 @@ RSpec.describe Gitlab::Elastic::Indexer do
         def change_wiki_and_index(project, &blk)
           yield blk if blk
 
-          current_commit = project.wiki.repository.commit('master').sha
-
-          described_class.new(project, wiki: true).run(current_commit)
+          indexer.process(project).flush
           ensure_elasticsearch_index!
         end
 
@@ -275,7 +309,14 @@ RSpec.describe Gitlab::Elastic::Indexer do
           expect(indexed_wiki_paths_for('12')).to include('12')
           expect(indexed_wiki_paths_for('23')).to include('23')
 
-          project.index_status.update!(last_wiki_commit: '____________')
+          # set the index_status to a bogus commit
+          IndexStatus.upsert({
+                               project_id: project.id,
+                               last_wiki_commit: '____________',
+                               created_at: Time.now,
+                               updated_at: Time.now
+                             },
+                             unique_by: :project_id)
 
           change_wiki_and_index(project) do
             project.wiki.repository.write_ref('master', sha_for_reset)
@@ -317,8 +358,12 @@ RSpec.describe Gitlab::Elastic::Indexer do
     end
   end
 
+  def ref(record)
+    Gitlab::Elastic::DocumentReference.build(record)
+  end
+
   def expect_popen
-    expect(Gitlab::Popen).to receive(:popen)
+    expect(Gitlab::Popen).to receive(:popen_with_detail)
   end
 
   def expect_index_status(sha)
@@ -329,16 +374,7 @@ RSpec.describe Gitlab::Elastic::Indexer do
     expect(status.last_commit).to eq(sha)
   end
 
-  def elasticsearch_config
-    Gitlab::CurrentSettings.elasticsearch_config.merge(
-      index_name: 'gitlab-test'
-    )
-  end
-
   def envvars
-    indexer.send(:build_envvars,
-                 Gitlab::Git::BLANK_SHA,
-                 Gitlab::Git::BLANK_SHA,
-                 project.repository.__elasticsearch__.elastic_writing_targets.first)
+    indexer.send(:build_envvars, gitaly_storage: project.repository_storage)
   end
 end

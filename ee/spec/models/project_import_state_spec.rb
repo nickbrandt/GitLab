@@ -39,7 +39,7 @@ RSpec.describe ProjectImportState, type: :model do
         end
 
         it 'does not index the repository' do
-          expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+          expect(project.repository).not_to receive(:index_commits_and_blobs)
 
           import_state.finish
         end
@@ -52,7 +52,7 @@ RSpec.describe ProjectImportState, type: :model do
 
         context 'no index status' do
           it 'schedules a full index of the repository' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id)
+            expect(project.repository).to receive(:index_commits_and_blobs)
 
             import_state.finish
           end
@@ -62,7 +62,7 @@ RSpec.describe ProjectImportState, type: :model do
           let(:index_status) { IndexStatus.create!(project: project, indexed_at: Time.current, last_commit: 'foo') }
 
           it 'schedules a full index of the repository' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id)
+            expect(project.repository).to receive(:index_commits_and_blobs)
 
             import_state.finish
           end

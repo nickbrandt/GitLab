@@ -12,10 +12,10 @@ RSpec.describe 'Repository index', :elastic do
     end
 
     it 'indexes initial push' do
-      sha1 = project.repository.create_file(user, '12', '', message: '12', branch_name: 'master')
+      project.repository.create_file(user, '12', '', message: '12', branch_name: 'master')
       project.repository.create_file(user, '23', '', message: '23', branch_name: 'master')
 
-      Gitlab::Elastic::Indexer.new(project).run(sha1)
+      Gitlab::Elastic::Indexer.new(project).run
       ensure_elasticsearch_index!
 
       expect(indexed_file_paths_for('12')).to include('12')

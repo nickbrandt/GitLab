@@ -38,6 +38,22 @@ RSpec.describe Git::BranchPushService do
     end
 
     context 'ElasticSearch indexing', :elastic do
+      shared_examples "triggers Elasticsearch indexing" do
+        it 'calls #index_commits_and_blobs' do
+          expect(project.repository).to receive(:index_commits_and_blobs)
+
+          subject.execute
+        end
+      end
+
+      shared_examples "skips Elasticsearch indexing" do
+        it 'does not run ElasticCommitIndexerWorker' do
+          expect(project.repository).not_to receive(:index_commits_and_blobs)
+
+          subject.execute
+        end
+      end
+
       before do
         stub_ee_application_setting(elasticsearch_indexing?: true)
       end
@@ -47,33 +63,17 @@ RSpec.describe Git::BranchPushService do
           Gitlab::Redis::SharedState.with { |redis| redis.sadd(:elastic_projects_indexing, project.id) }
         end
 
-        it 'does not run ElasticCommitIndexerWorker' do
-          expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
-
-          subject.execute
-        end
+        it_behaves_like "skips Elasticsearch indexing"
       end
 
-      it 'runs ElasticCommitIndexerWorker' do
-        expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id)
-
-        subject.execute
-      end
-
-      it "triggers indexer when push to default branch", :sidekiq_might_not_need_inline do
-        expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run)
-
-        subject.execute
+      context 'when push to the default branch' do
+        it_behaves_like "triggers Elasticsearch indexing"
       end
 
       context 'when push to non-default branch' do
         let(:ref) { 'refs/heads/other' }
 
-        it 'does not trigger indexer when push to non-default branch' do
-          expect_any_instance_of(Gitlab::Elastic::Indexer).not_to receive(:run)
-
-          subject.execute
-        end
+        it_behaves_like "skips Elasticsearch indexing"
       end
 
       context 'when limited indexing is on' do
@@ -82,11 +82,7 @@ RSpec.describe Git::BranchPushService do
         end
 
         context 'when the project is not enabled specifically' do
-          it 'does not run ElasticCommitIndexerWorker' do
-            expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
-
-            subject.execute
-          end
+          it_behaves_like "skips Elasticsearch indexing"
         end
 
         context 'when a project is enabled specifically' do
@@ -94,11 +90,7 @@ RSpec.describe Git::BranchPushService do
             create :elasticsearch_indexed_project, project: project
           end
 
-          it 'runs ElasticCommitIndexerWorker' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id)
-
-            subject.execute
-          end
+          it_behaves_like "triggers Elasticsearch indexing"
         end
 
         context 'when a group is enabled' do
@@ -109,11 +101,7 @@ RSpec.describe Git::BranchPushService do
             create :elasticsearch_indexed_namespace, namespace: group
           end
 
-          it 'runs ElasticCommitIndexerWorker' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id)
-
-            subject.execute
-          end
+          it_behaves_like "triggers Elasticsearch indexing"
         end
       end
     end

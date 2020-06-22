@@ -1849,7 +1849,7 @@ RSpec.describe Project do
       end
 
       it 'does not index the wiki repository' do
-        expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+        expect(project.wiki).not_to receive(:index_wiki_blobs)
 
         project.after_import
       end
@@ -1861,7 +1861,7 @@ RSpec.describe Project do
       end
 
       it 'schedules a full index of the wiki repository' do
-        expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true)
+        expect(project.wiki).to receive(:index_wiki_blobs)
 
         project.after_import
       end
@@ -1871,7 +1871,7 @@ RSpec.describe Project do
           expect(project).to receive(:forked?).and_return(true)
         end
         it 'does not index the wiki repository' do
-          expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+          expect(project.wiki).not_to receive(:index_wiki_blobs)
 
           project.after_import
         end

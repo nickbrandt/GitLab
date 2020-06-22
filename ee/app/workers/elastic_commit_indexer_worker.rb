@@ -24,6 +24,7 @@ class ElasticCommitIndexerWorker
     project = Project.find(project_id)
     return true unless project.use_elasticsearch?
 
-    Gitlab::Elastic::Indexer.new(project, wiki: wiki).run
+    indexer = wiki ? ::Gitlab::Elastic::WikiIndexer.new(project) : Gitlab::Elastic::Indexer.new(project)
+    indexer.run
   end
 end

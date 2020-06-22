@@ -13,7 +13,7 @@ RSpec.describe Elastic::Latest::ProjectWikiClassProxy do
     before do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
-      Gitlab::Elastic::Indexer.new(project, wiki: true).run
+      Gitlab::Elastic::WikiIndexer.new(project).run
       ensure_elasticsearch_index!
     end
 

@@ -60,9 +60,7 @@ module EE
 
         after_transition started: :finished do |state, _|
           if state.project.use_elasticsearch?
-            state.run_after_commit do
-              ElasticCommitIndexerWorker.perform_async(state.project_id)
-            end
+            state.run_after_commit { state.project.repository.index_commits_and_blobs }
           end
         end
 

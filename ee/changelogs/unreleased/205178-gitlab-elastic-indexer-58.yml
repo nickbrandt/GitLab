@@ -1,0 +1,5 @@
+---
+title: Support the new 'gitlab-elasticsearch-indexer' file interface.
+merge_request: 35035
+author:
+type: changed

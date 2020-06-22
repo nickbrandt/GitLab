@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe ProjectWiki, :elastic do
-  let_it_be(:project) { create(:project, :wiki_repo) }
+  let(:project) { create(:project, :wiki_repo) }
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
@@ -22,26 +22,12 @@ RSpec.describe ProjectWiki, :elastic do
     expect(project.wiki.elastic_search('term1 | term2', type: 'wiki_blob')[:wiki_blobs][:total_count]).to eq(2)
   end
 
-  it 'indexes' do
-    expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true)
-
-    project.wiki.index_wiki_blobs
-  end
-
-  it 'can delete wiki pages' do
+  it 'can delete wiki pages', :sidekiq_inline do
     expect(project.wiki.elastic_search('term2', type: 'wiki_blob')[:wiki_blobs][:total_count]).to eq(1)
 
-    Sidekiq::Testing.inline! do
-      project.wiki.find_page('omega_page').delete
-
-      expect_next_instance_of(Gitlab::Elastic::Indexer) do |indexer|
-        expect(indexer).to receive(:run).and_call_original
-      end
-
-      project.wiki.index_wiki_blobs
-
-      ensure_elasticsearch_index!
-    end
+    project.wiki.find_page('omega_page').delete
+    project.wiki.index_wiki_blobs
+    ensure_elasticsearch_index!
 
     expect(project.wiki.elastic_search('term2', type: 'wiki_blob')[:wiki_blobs][:total_count]).to eq(0)
   end

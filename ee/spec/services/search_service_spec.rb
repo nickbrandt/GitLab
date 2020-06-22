@@ -68,7 +68,7 @@ RSpec.describe SearchService do
         it_behaves_like 'it redacts incorrect results' do
           before do
             create(:wiki_page, wiki: project.wiki)
-            Gitlab::Elastic::Indexer.new(project, wiki: true).run
+            Gitlab::Elastic::WikiIndexer.new(project).run
             ensure_elasticsearch_index!
           end
         end
