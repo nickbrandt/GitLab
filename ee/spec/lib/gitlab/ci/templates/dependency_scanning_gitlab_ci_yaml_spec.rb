@@ -91,7 +91,7 @@ RSpec.describe 'Dependency-Scanning.gitlab-ci.yml' do
 
             context 'with file at depth 1' do
               # prepend a directory to files (e.g. convert go.sum to foo/go.sum)
-              let(:files_at_depth_x) {  Hash[files.map { |k, v| ["foo/#{k}", v]}] }
+              let(:files_at_depth_x) { files.transform_keys { |k| "foo/#{k}"} }
 
               it 'creates a pipeline with the expected jobs' do
                 expect(build_names).to include(*include_build_names)
@@ -100,7 +100,7 @@ RSpec.describe 'Dependency-Scanning.gitlab-ci.yml' do
 
             context 'with file at depth 2' do
               # prepend a directory to files (e.g. convert go.sum to foo/bar/go.sum)
-              let(:files_at_depth_x) {  Hash[files.map { |k, v| ["foo/bar/#{k}", v]}] }
+              let(:files_at_depth_x) { files.transform_keys { |k| "foo/bar/#{k}"} }
 
               it 'creates a pipeline with the expected jobs' do
                 expect(build_names).to include(*include_build_names)
@@ -108,7 +108,7 @@ RSpec.describe 'Dependency-Scanning.gitlab-ci.yml' do
             end
 
             context 'with file at depth > 2' do
-              let(:files_at_depth_x) {  Hash[files.map { |k, v| ["foo/bar/baz/#{k}", v]}] }
+              let(:files_at_depth_x) { files.transform_keys { |k| "foo/bar/baz/#{k}"} }
 
               it 'includes no job' do
                 expect { pipeline }.to raise_error(Ci::CreatePipelineService::CreateError)
