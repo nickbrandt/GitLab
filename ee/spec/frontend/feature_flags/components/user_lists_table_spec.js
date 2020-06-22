@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import * as timeago from 'timeago.js';
+import { GlModal } from '@gitlab/ui';
 import UserListsTable from 'ee/feature_flags/components/user_lists_table.vue';
 import { userList } from '../mock_data';
 
@@ -45,6 +46,47 @@ describe('User Lists Table', () => {
       expect(list.contains('[data-testid="ffUserListName"]')).toBe(true);
       expect(list.contains('[data-testid="ffUserListIds"]')).toBe(true);
       expect(list.contains('[data-testid="ffUserListTimestamp"]')).toBe(true);
+    });
+  });
+
+  describe('delete button', () => {
+    it('should display the confirmation modal', () => {
+      const modal = wrapper.find(GlModal);
+
+      wrapper.find('[data-testid="delete-user-list"]').trigger('click');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(modal.text()).toContain(`Delete ${userList.name}?`);
+        expect(modal.text()).toContain(`User list ${userList.name} will be removed.`);
+      });
+    });
+  });
+
+  describe('confirmation modal', () => {
+    let modal;
+
+    beforeEach(() => {
+      modal = wrapper.find(GlModal);
+
+      wrapper.find('button').trigger('click');
+
+      return wrapper.vm.$nextTick();
+    });
+
+    it('should emit delete with list on confirmation', () => {
+      modal.find('[data-testid="modal-confirm"]').trigger('click');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('delete')).toEqual([[userLists[0]]]);
+      });
+    });
+
+    it('should not emit delete with list when not confirmed', () => {
+      modal.find('button').trigger('click');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('delete')).toBeUndefined();
+      });
     });
   });
 });

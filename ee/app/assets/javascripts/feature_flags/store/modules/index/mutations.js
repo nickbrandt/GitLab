@@ -110,4 +110,12 @@ export default {
     const flag = state[FEATURE_FLAG_SCOPE].find(({ id }) => i === id);
     updateFlag(state, { ...flag, active: !flag.active });
   },
+  [types.REQUEST_DELETE_USER_LIST](state, list) {
+    state.userLists = state.userLists.filter(l => l !== list);
+  },
+  [types.RECEIVE_DELETE_USER_LIST_ERROR](state, list) {
+    state.isLoading = false;
+    state.hasError = true;
+    state.userLists = state.userLists.concat(list).sort((l1, l2) => l1.iid - l2.iid);
+  },
 };

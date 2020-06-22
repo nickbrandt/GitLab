@@ -190,6 +190,7 @@ export default {
       'setProjectId',
       'rotateInstanceId',
       'toggleFeatureFlag',
+      'deleteUserList',
     ]),
     onChangeTab(scope) {
       this.scope = scope;
@@ -330,6 +331,7 @@ export default {
     <user-lists-table
       v-else-if="shouldRenderTable($options.scopes.userLists)"
       :user-lists="userLists"
+      @delete="deleteUserList"
     />
 
     <table-pagination
