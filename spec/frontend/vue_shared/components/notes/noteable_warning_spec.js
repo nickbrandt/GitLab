@@ -145,13 +145,13 @@ describe('Issue Warning Component', () => {
 
     it('renders confidential & locked messages with noteable "epic"', async () => {
       wrapperLocked.setProps({
-        noteableType: 'epic',
+        noteableType: 'Epic',
       });
       wrapperConfidential.setProps({
-        noteableType: 'epic',
+        noteableType: 'Epic',
       });
       wrapperLockedAndConfidential.setProps({
-        noteableType: 'epic',
+        noteableType: 'Epic',
       });
 
       await wrapperLocked.vm.$nextTick();
@@ -170,13 +170,13 @@ describe('Issue Warning Component', () => {
 
     it('renders confidential & locked messages with noteable "merge request"', async () => {
       wrapperLocked.setProps({
-        noteableType: 'merge_request',
+        noteableType: 'MergeRequest',
       });
       wrapperConfidential.setProps({
-        noteableType: 'merge_request',
+        noteableType: 'MergeRequest',
       });
       wrapperLockedAndConfidential.setProps({
-        noteableType: 'merge_request',
+        noteableType: 'MergeRequest',
       });
 
       await wrapperLocked.vm.$nextTick();
