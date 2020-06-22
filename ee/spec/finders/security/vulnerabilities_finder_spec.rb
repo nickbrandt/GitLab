@@ -6,15 +6,15 @@ RSpec.describe Security::VulnerabilitiesFinder do
   let_it_be(:project) { create(:project) }
 
   let_it_be(:vulnerability1) do
-    create(:vulnerability, severity: :low, report_type: :sast, state: :detected, project: project)
+    create(:vulnerability, :with_findings, severity: :low, report_type: :sast, state: :detected, project: project)
   end
 
   let_it_be(:vulnerability2) do
-    create(:vulnerability, severity: :medium, report_type: :dast, state: :dismissed, project: project)
+    create(:vulnerability, :with_findings, severity: :medium, report_type: :dast, state: :dismissed, project: project)
   end
 
   let_it_be(:vulnerability3) do
-    create(:vulnerability, severity: :high, report_type: :dependency_scanning, state: :confirmed, project: project)
+    create(:vulnerability, :with_findings, severity: :high, report_type: :dependency_scanning, state: :confirmed, project: project)
   end
 
   let(:filters) { {} }
@@ -54,6 +54,14 @@ RSpec.describe Security::VulnerabilitiesFinder do
     let(:filters) { { state: %w[detected confirmed] } }
 
     it 'only returns vulnerabilities matching the given states' do
+      is_expected.to contain_exactly(vulnerability1, vulnerability3)
+    end
+  end
+
+  context 'when filtered by scanner' do
+    let(:filters) { { scanner: [vulnerability1.finding_scanner_external_id, vulnerability3.finding_scanner_external_id] } }
+
+    it 'only returns vulnerabilities matching the given scanners' do
       is_expected.to contain_exactly(vulnerability1, vulnerability3)
     end
   end

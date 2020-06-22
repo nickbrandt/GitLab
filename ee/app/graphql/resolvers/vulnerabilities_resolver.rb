@@ -22,6 +22,10 @@ module Resolvers
              required: false,
              description: 'Filter vulnerabilities by state'
 
+    argument :scanner, [GraphQL::STRING_TYPE],
+             required: false,
+             description: 'Filter vulnerabilities by scanner'
+
     def resolve(**args)
       return Vulnerability.none unless vulnerable
 
