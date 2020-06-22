@@ -149,7 +149,7 @@ export const fetchFoos = ({ state }) => {
 
 ### 7. How can I test the production build locally?
 
-Sometimes the necessity of testing locally what the frontend production build would produce, to do so the steps are:
+Sometimes is necessary to test locally what the frontend production build would produce, to do so the steps are:
 
 1. `gdk stop webpack`
 1. edit `gitlab.yaml` and set `webpack => dev_server => enabled: false`
