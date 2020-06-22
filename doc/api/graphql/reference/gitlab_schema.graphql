@@ -6274,7 +6274,7 @@ type JiraService implements Service {
   active: Boolean
 
   """
-  List of Jira projects fetched through Jira REST API
+  List of all Jira projects fetched through Jira REST API
   """
   projects(
     """

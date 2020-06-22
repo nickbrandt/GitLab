@@ -17342,7 +17342,7 @@
             },
             {
               "name": "projects",
-              "description": "List of Jira projects fetched through Jira REST API",
+              "description": "List of all Jira projects fetched through Jira REST API",
               "args": [
                 {
                   "name": "name",
