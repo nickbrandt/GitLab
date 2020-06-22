@@ -6,6 +6,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
 import { DASHBOARD_TYPES } from '../store/constants';
+import convertReportType from 'ee/vue_shared/security_reports/store/utils/convert_report_type';
 import getPrimaryIdentifier from 'ee/vue_shared/security_reports/store/utils/get_primary_identifier';
 
 export default {
@@ -47,10 +48,6 @@ export default {
       }
       return location && (location.image || location.file || location.path);
     },
-    vulnerabilityScanner() {
-      const { scanner } = this.vulnerability;
-      return scanner?.name;
-    },
     isDismissed() {
       return Boolean(this.vulnerability.dismissal_feedback);
     },
@@ -69,6 +66,9 @@ export default {
     },
     isSelected() {
       return Boolean(this.selectedVulnerabilities[this.vulnerability.id]);
+    },
+    useConvertReportType() {
+      return convertReportType(this.vulnerability.report_type);
     },
   },
   methods: {
@@ -152,8 +152,8 @@ export default {
 
     <div class="table-section section-15">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Scanner') }}</div>
-      <div class="table-mobile-content">
-        {{ vulnerabilityScanner }}
+      <div class="table-mobile-content text-capitalize">
+        {{ useConvertReportType }}
       </div>
     </div>
 
