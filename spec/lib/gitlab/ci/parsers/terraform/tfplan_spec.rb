@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Terraform::Tfplan do
+RSpec.describe Gitlab::Ci::Parsers::Terraform::Tfplan do
   describe '#parse!' do
     let_it_be(:artifact) { create(:ci_job_artifact, :terraform) }
 
