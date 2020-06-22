@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::ReloadDiffsService, :use_clean_rails_memory_store_caching do
+RSpec.describe MergeRequests::ReloadDiffsService, :use_clean_rails_memory_store_caching do
   let(:current_user) { create(:user) }
   let(:merge_request) { create(:merge_request) }
   let(:subject) { described_class.new(merge_request, current_user) }
