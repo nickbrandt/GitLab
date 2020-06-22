@@ -2,10 +2,13 @@
 
 class Projects::InsightsController < Projects::ApplicationController
   include InsightsActions
+  include Analytics::UniqueVisitsHelper
 
   helper_method :project_insights_config
 
   before_action :authorize_read_project!
+
+  track_unique_visits :show, target_id: 'p_analytics_insights'
 
   private
 

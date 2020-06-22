@@ -74,6 +74,18 @@ RSpec.describe Groups::Analytics::ProductivityAnalyticsController do
         expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
+
+    context 'when the feature is licensed' do
+      before do
+        stub_licensed_features(productivity_analytics: true)
+        group.add_owner(current_user)
+      end
+
+      it_behaves_like 'tracking unique visits', :show do
+        let(:request_params) { { group_id: group } }
+        let(:target_id) { 'g_analytics_productivity' }
+      end
+    end
   end
 
   describe 'GET show.json' do
