@@ -115,8 +115,8 @@ module Vulnerabilities
     end
 
     def self.counted_by_severity
-      group(:severity).count.each_with_object({}) do |(severity, count), accum|
-        accum[SEVERITY_LEVELS[severity]] = count
+      group(:severity).count.transform_keys do |severity|
+        SEVERITY_LEVELS[severity]
       end
     end
 
