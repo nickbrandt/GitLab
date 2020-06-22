@@ -7,11 +7,10 @@ import { AVAILABLE_TOKEN_TYPES } from 'ee/audit_events/constants';
 describe('AuditEventsFilter', () => {
   let wrapper;
 
-  const value = [{ type: 'Project', value: { data: 1, operator: '=' } }];
+  const value = [{ type: 'project', value: { data: 1, operator: '=' } }];
   const findFilteredSearch = () => wrapper.find(GlFilteredSearch);
   const getAvailableTokens = () => findFilteredSearch().props('availableTokens');
-  const getAvailableTokenProps = type =>
-    getAvailableTokens().filter(token => token.type === type)[0];
+  const getAvailableTokenProps = type => getAvailableTokens().find(token => token.type === type);
 
   const initComponent = (props = {}) => {
     wrapper = shallowMount(AuditEventsFilter, {
@@ -27,10 +26,11 @@ describe('AuditEventsFilter', () => {
   });
 
   describe.each`
-    type         | title
-    ${'Project'} | ${'Project Events'}
-    ${'Group'}   | ${'Group Events'}
-    ${'User'}    | ${'User Events'}
+    type              | title
+    ${'project'}      | ${'Project Events'}
+    ${'group'}        | ${'Group Events'}
+    ${'user'}         | ${'User Events'}
+    ${'group_member'} | ${'Member Events'}
   `('for the list of available tokens', ({ type, title }) => {
     it(`creates a unique token for ${type}`, () => {
       initComponent();
@@ -52,9 +52,9 @@ describe('AuditEventsFilter', () => {
     });
 
     it('only one token matching the selected token type is enabled', () => {
-      expect(getAvailableTokenProps('Project').disabled).toEqual(false);
-      expect(getAvailableTokenProps('Group').disabled).toEqual(true);
-      expect(getAvailableTokenProps('User').disabled).toEqual(true);
+      expect(getAvailableTokenProps('project').disabled).toEqual(false);
+      expect(getAvailableTokenProps('group').disabled).toEqual(true);
+      expect(getAvailableTokenProps('user').disabled).toEqual(true);
     });
 
     describe('and the user submits the search field', () => {
@@ -103,11 +103,11 @@ describe('AuditEventsFilter', () => {
 
     beforeEach(() => {
       initComponent({
-        enabledTokenTypes: [type],
+        filterTokenOptions: [{ type }],
       });
     });
 
-    it('only the enabled token type is available for selection', () => {
+    it('only the enabled tokens type is available for selection', () => {
       expect(getAvailableTokens().length).toEqual(1);
       expect(getAvailableTokens()).toMatchObject([{ type }]);
     });

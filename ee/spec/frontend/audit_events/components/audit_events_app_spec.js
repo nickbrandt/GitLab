@@ -18,7 +18,7 @@ describe('AuditEventsApp', () => {
   let store;
 
   const events = [{ foo: 'bar' }];
-  const enabledTokenTypes = AVAILABLE_TOKEN_TYPES;
+  const filterTokenOptions = AVAILABLE_TOKEN_TYPES.map(type => ({ type }));
   const filterQaSelector = 'filter_qa_selector';
   const tableQaSelector = 'table_qa_selector';
 
@@ -29,7 +29,7 @@ describe('AuditEventsApp', () => {
         isLastPage: true,
         filterQaSelector,
         tableQaSelector,
-        enabledTokenTypes,
+        filterTokenOptions,
         events,
         ...props,
       },
@@ -74,7 +74,7 @@ describe('AuditEventsApp', () => {
 
     it('renders audit events filter', () => {
       expect(wrapper.find(AuditEventsFilter).props()).toEqual({
-        enabledTokenTypes,
+        filterTokenOptions,
         qaSelector: filterQaSelector,
         value: TEST_FILTER_VALUE,
       });

@@ -56,7 +56,7 @@ module QA
           Page::Group::Menu.perform(&:click_group_general_settings_item)
         end
 
-        it_behaves_like 'audit event', ['Add group'] do
+        it_behaves_like 'audit event', ['Added group'] do
           let(:group) do
             Resource::Group.fabricate_via_api! do |group|
               group.name = group_name
@@ -75,7 +75,7 @@ module QA
             settings.click_save_name_visibility_settings_button
           end
         end
-        it_behaves_like 'audit event', ['Change repository size limit']
+        it_behaves_like 'audit event', ['Changed repository size limit']
       end
 
       context 'Update group name' do
@@ -90,7 +90,7 @@ module QA
           end
         end
 
-        it_behaves_like 'audit event', ['Change name']
+        it_behaves_like 'audit event', ['Changed name']
       end
 
       context 'Add user, change access level, remove user' do
@@ -105,7 +105,7 @@ module QA
           end
         end
 
-        it_behaves_like 'audit event', ['Add user access as guest', 'Change access level', 'Remove user access']
+        it_behaves_like 'audit event', ['Added user access as Guest', 'Changed access level', 'Removed user access']
       end
 
       context 'Add and remove project access' do
@@ -126,7 +126,7 @@ module QA
           @group.visit!
         end
 
-        it_behaves_like 'audit event', ['Add project access', 'Remove project access']
+        it_behaves_like 'audit event', ['Added project access', 'Removed project access']
       end
     end
 

@@ -9,9 +9,11 @@ RSpec.describe Groups::AuditEventsController do
 
   describe 'GET #index' do
     let(:sort) { nil }
+    let(:entity_type) { nil }
+    let(:entity_id) { nil }
 
     let(:request) do
-      get :index, params: { group_id: group.to_param, sort: sort }
+      get :index, params: { group_id: group.to_param, sort: sort, entity_type: entity_type, entity_id: entity_id }
     end
 
     context 'authorized' do
@@ -22,13 +24,23 @@ RSpec.describe Groups::AuditEventsController do
 
       context 'when audit_events feature is available' do
         let(:level) { Gitlab::Audit::Levels::Group.new(group: group) }
-        let(:audit_logs_params) { ActionController::Parameters.new(sort: '').permit! }
+        let(:audit_logs_params) { ActionController::Parameters.new(sort: '', entity_type: '', entity_id: '').permit! }
 
         before do
           stub_licensed_features(audit_events: true)
 
           allow(Gitlab::Audit::Levels::Group).to receive(:new).and_return(level)
           allow(AuditLogFinder).to receive(:new).and_call_original
+        end
+
+        shared_examples 'AuditLogFinder params' do
+          it 'has the correct params' do
+            request
+
+            expect(AuditLogFinder).to have_received(:new).with(
+              level: level, params: audit_logs_params
+            )
+          end
         end
 
         it 'renders index with 200 status code' do
@@ -38,12 +50,22 @@ RSpec.describe Groups::AuditEventsController do
           expect(response).to render_template(:index)
         end
 
-        it 'invokes AuditLogFinder with correct arguments' do
-          request
+        context 'invokes AuditLogFinder with correct arguments' do
+          it_behaves_like 'AuditLogFinder params'
+        end
 
-          expect(AuditLogFinder).to have_received(:new).with(
-            level: level, params: audit_logs_params
-          )
+        context 'author' do
+          context 'when no author entity type is specified' do
+            it_behaves_like 'AuditLogFinder params'
+          end
+
+          context 'when the author entity type is specified' do
+            let(:entity_type) { 'Author' }
+            let(:entity_id) { 1 }
+            let(:audit_logs_params) { ActionController::Parameters.new(sort: '', author_id: '1').permit! }
+
+            it_behaves_like 'AuditLogFinder params'
+          end
         end
 
         context 'ordering' do

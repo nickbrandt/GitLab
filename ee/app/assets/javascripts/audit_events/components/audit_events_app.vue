@@ -23,7 +23,7 @@ export default {
       required: false,
       default: false,
     },
-    enabledTokenTypes: {
+    filterTokenOptions: {
       type: Array,
       required: true,
     },
@@ -53,7 +53,7 @@ export default {
       <div class="d-flex justify-content-between audit-controls row">
         <div class="col-lg-auto flex-fill form-group align-items-lg-center pr-lg-8">
           <audit-events-filter
-            :enabled-token-types="enabledTokenTypes"
+            :filter-token-options="filterTokenOptions"
             :qa-selector="filterQaSelector"
             :value="filterValue"
             @selected="setFilterValue"
