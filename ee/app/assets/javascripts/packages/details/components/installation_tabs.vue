@@ -20,7 +20,7 @@ export default {
 </script>
 
 <template>
-  <div class="append-bottom-default">
+  <div class="gl-mb-3">
     <gl-tabs @input="trackInstallationTabChange">
       <gl-tab :title="s__('PackageRegistry|Installation')" title-item-class="js-installation-tab">
         <div class="prepend-left-default append-right-default">

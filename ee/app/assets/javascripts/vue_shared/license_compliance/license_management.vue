@@ -107,7 +107,7 @@ export default {
       </template>
 
       <template v-if="isAdmin" #subheader>
-        <div v-if="formIsOpen" class="prepend-top-default append-bottom-default">
+        <div v-if="formIsOpen" class="prepend-top-default gl-mb-3">
           <add-license-form
             :managed-licenses="managedLicenses"
             :loading="isAddingNewLicense"

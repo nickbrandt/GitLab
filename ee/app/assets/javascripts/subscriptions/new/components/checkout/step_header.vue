@@ -26,6 +26,6 @@ export default {
       :aria-label="title"
       name="check-circle"
     />
-    <h5 class="gl-mt-0 append-bottom-default">{{ title }}</h5>
+    <h5 class="gl-mt-0 gl-mb-3">{{ title }}</h5>
   </div>
 </template>
