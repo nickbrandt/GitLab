@@ -157,7 +157,7 @@ Sometimes it's necessary to test locally what the frontend production build woul
 1. `gdk restart rails-web`
 
 The production build takes few minutes to be compled, any code change at this point will be displayed only after executing again the points `3` and `4`
-To return to the normal `development mode` 
+To return to the normal `development mode:` 
 
 1. edit `gitlab.yaml` and set `webpack => dev_server => enabled: true`
 1. (Optional) `yarn clean`
