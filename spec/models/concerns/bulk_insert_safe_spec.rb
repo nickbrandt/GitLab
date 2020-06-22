@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe BulkInsertSafe do
+RSpec.describe BulkInsertSafe do
   class BulkInsertItem < ActiveRecord::Base
     include BulkInsertSafe
     include ShaAttribute

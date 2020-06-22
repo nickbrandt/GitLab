@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::UsageData, :aggregate_failures do
+RSpec.describe Gitlab::UsageData, :aggregate_failures do
   include UsageDataHelpers
 
   before do

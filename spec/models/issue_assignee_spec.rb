@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe IssueAssignee do
+RSpec.describe IssueAssignee do
   let(:issue) { create(:issue) }
 
   subject { issue.issue_assignees.build(assignee: create(:user)) }
