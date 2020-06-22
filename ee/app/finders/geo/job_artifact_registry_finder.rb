@@ -44,7 +44,7 @@ module Geo
     #
     # @return [Array] the first element is an Array of untracked IDs, and the second element is an Array of tracked IDs that are unused
     def find_registry_differences(range)
-      source_ids = job_artifacts.id_in(range).pluck(::Ci::JobArtifact.arel_table[:id]) # rubocop:disable CodeReuse/ActiveRecord
+      source_ids = job_artifacts.not_expired.id_in(range).pluck(::Ci::JobArtifact.arel_table[:id]) # rubocop:disable CodeReuse/ActiveRecord
       tracked_ids = syncable.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids

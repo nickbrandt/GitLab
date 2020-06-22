@@ -106,6 +106,12 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
   end
 
   describe '#find_registry_differences' do
+    # Untracked IDs should not contain any of these expired job artifacts.
+    let!(:ci_job_artifact_6) { create(:ci_job_artifact, :expired, project: synced_project) }
+    let!(:ci_job_artifact_7) { create(:ci_job_artifact, :expired, project: unsynced_project) }
+    let!(:ci_job_artifact_8) { create(:ci_job_artifact, :expired, project: project_broken_storage) }
+    let!(:ci_job_artifact_remote_4) { create(:ci_job_artifact, :expired, :remote_store) }
+
     context 'untracked IDs' do
       before do
         create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_1.id)
@@ -181,6 +187,26 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
         end
       end
 
+      context 'with an expired registry' do
+        let!(:expired) { create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_6.id) }
+
+        it 'includes expired tracked IDs that exists in the model table' do
+          range = ci_job_artifact_6.id..ci_job_artifact_6.id
+
+          _, unused_tracked_ids = subject.find_registry_differences(range)
+
+          expect(unused_tracked_ids).to match_array([ci_job_artifact_6.id])
+        end
+
+        it 'excludes IDs outside the ID range' do
+          range = (ci_job_artifact_6.id + 1)..(ci_job_artifact_6.id + 10)
+
+          _, unused_tracked_ids = subject.find_registry_differences(range)
+
+          expect(unused_tracked_ids).to be_empty
+        end
+      end
+
       context 'with selective sync by namespace' do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
@@ -203,6 +229,16 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
               _, unused_tracked_ids = subject.find_registry_differences(range)
 
               expect(unused_tracked_ids).to be_empty
+            end
+
+            it 'includes expired tracked IDs that are in selectively synced projects' do
+              create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_6.id)
+
+              range = ci_job_artifact_6.id..ci_job_artifact_6.id
+
+              _, unused_tracked_ids = subject.find_registry_differences(range)
+
+              expect(unused_tracked_ids).to match_array([ci_job_artifact_6.id])
             end
           end
         end
@@ -231,6 +267,16 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
 
               expect(unused_tracked_ids).to be_empty
             end
+
+            it 'includes expired tracked IDs that are in selectively synced shards' do
+              create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_8.id)
+
+              range = ci_job_artifact_8.id..ci_job_artifact_8.id
+
+              _, unused_tracked_ids = subject.find_registry_differences(range)
+
+              expect(unused_tracked_ids).to match_array([ci_job_artifact_8.id])
+            end
           end
         end
       end
@@ -247,6 +293,16 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
               _, unused_tracked_ids = subject.find_registry_differences(range)
 
               expect(unused_tracked_ids).to match_array([ci_job_artifact_remote_1.id])
+            end
+
+            it 'includes expired tracked IDs that are in object storage' do
+              create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_4.id)
+
+              range = ci_job_artifact_remote_4.id..ci_job_artifact_remote_4.id
+
+              _, unused_tracked_ids = subject.find_registry_differences(range)
+
+              expect(unused_tracked_ids).to match_array([ci_job_artifact_remote_4.id])
             end
           end
 
