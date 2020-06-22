@@ -49,9 +49,9 @@ For information about project and group milestones API, see:
 - [Group Milestones API](../../../api/group_milestones.md)
 
 NOTE: **Note:**
-The group milestone only returns only group milestones in the UI.
-Both group and project milestones will show, however the project milestones will be only for the
-group you are viewing.
+If you're in a group and click **Issues > Milestones**, you'll see group milestones and the milestones
+of projects in this group.
+If you're in a project and click **Issues > Milestones**, you'll only see this project's milestones.
 
 ## Creating milestones
 
