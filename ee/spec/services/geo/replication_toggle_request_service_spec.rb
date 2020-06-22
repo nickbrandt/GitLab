@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::ReplicationToggleRequestService, :geo do
+RSpec.describe Geo::ReplicationToggleRequestService, :geo do
   include ::EE::GeoHelpers
   include ApiHelpers
 

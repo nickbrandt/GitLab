@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'getting a compliance frameworks list for a project' do
+RSpec.describe 'getting a compliance frameworks list for a project' do
   include GraphqlHelpers
 
   let_it_be(:project_member) { create(:project_member, :maintainer) }

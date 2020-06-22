@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::ReportSummaryService, '#execute' do
+RSpec.describe Security::ReportSummaryService, '#execute' do
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:pipeline) { create(:ci_pipeline, :success, project: project) }
 

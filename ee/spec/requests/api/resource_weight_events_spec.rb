@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::API::ResourceWeightEvents do
+RSpec.describe ::API::ResourceWeightEvents do
   let_it_be(:user) { create(:user) }
   let_it_be(:project, reload: true) { create(:project, :public, namespace: user.namespace) }
   let_it_be(:issue) { create(:issue, project: project, author: user) }

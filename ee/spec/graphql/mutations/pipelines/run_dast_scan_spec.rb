@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Mutations::Pipelines::RunDastScan do
+RSpec.describe Mutations::Pipelines::RunDastScan do
   let(:group) { create(:group) }
   let(:project) { create(:project, group: group) }
   let(:user) { create(:user) }

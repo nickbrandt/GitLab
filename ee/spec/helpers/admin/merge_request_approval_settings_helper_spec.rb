@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::MergeRequestApprovalSettingsHelper do
+RSpec.describe Admin::MergeRequestApprovalSettingsHelper do
   describe '#show_compliance_merge_request_approval_settings?' do
     using RSpec::Parameterized::TableSyntax
 

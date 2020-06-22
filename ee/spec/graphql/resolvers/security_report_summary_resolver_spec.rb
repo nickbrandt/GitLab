@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Resolvers::SecurityReportSummaryResolver do
+RSpec.describe Resolvers::SecurityReportSummaryResolver do
   include GraphqlHelpers
 
   let_it_be(:pipeline) { double('project') }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Evidences::BuildArtifactEntity do
+RSpec.describe Evidences::BuildArtifactEntity do
   include Gitlab::Routing
 
   let(:build) { create(:ci_build, :artifacts) }

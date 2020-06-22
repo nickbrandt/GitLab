@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::RunDastScanService do
+RSpec.describe Ci::RunDastScanService do
   let(:project) { create(:project) }
   let(:branch) { SecureRandom.hex }
   let(:target_url) { FFaker::Internet.uri(:http) }

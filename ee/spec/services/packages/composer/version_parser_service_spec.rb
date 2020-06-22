@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Composer::VersionParserService do
+RSpec.describe Packages::Composer::VersionParserService do
   let_it_be(:params) { {} }
 
   describe '#execute' do

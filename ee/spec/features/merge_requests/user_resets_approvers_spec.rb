@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Merge Requests > User resets approvers', :js do
+RSpec.describe 'Merge Requests > User resets approvers', :js do
   include FeatureApprovalHelper
 
   let(:project) { create(:project, :repository) }

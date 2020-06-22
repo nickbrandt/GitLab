@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Running a DAST Scan' do
+RSpec.describe 'Running a DAST Scan' do
   include GraphqlHelpers
 
   let(:project) { create(:project) }

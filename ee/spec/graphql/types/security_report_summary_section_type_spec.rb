@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe GitlabSchema.types['SecurityReportSummarySection'] do
+RSpec.describe GitlabSchema.types['SecurityReportSummarySection'] do
   specify { expect(described_class.graphql_name).to eq('SecurityReportSummarySection') }
 
   it 'has specific fields' do

@@ -51,7 +51,7 @@ RSpec.describe Projects::Analytics::CodeReviewsController, type: :request do
   end
 end
 
-describe Projects::Analytics::CodeReviewsController, type: :controller do
+RSpec.describe Projects::Analytics::CodeReviewsController, type: :controller do
   let(:user) { create :user }
   let(:project) { create(:project) }
 
