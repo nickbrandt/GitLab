@@ -60,9 +60,12 @@ describe('Issue Warning Component', () => {
       });
     });
 
-    it('renders information about confidential issue', () => {
+    it('renders information about confidential issue', async () => {
       expect(findConfidentialBlock().exists()).toBe(true);
       expect(findConfidentialBlock().element).toMatchSnapshot();
+
+      await wrapper.vm.$nextTick();
+      expect(findConfidentialBlock(wrapper).text()).toContain('This is a confidential issue.');
     });
 
     it('renders warning icon', () => {
