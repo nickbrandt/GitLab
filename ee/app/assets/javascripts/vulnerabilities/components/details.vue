@@ -11,17 +11,13 @@ export default {
       type: Object,
       required: true,
     },
-    finding: {
-      type: Object,
-      required: true,
-    },
   },
   computed: {
     location() {
-      return this.finding.location || {};
+      return this.vulnerability.location || {};
     },
     scanner() {
-      return this.finding.scanner || {};
+      return this.vulnerability.scanner || {};
     },
     fileText() {
       return (this.location.file || '') + (this.lineNumber ? `:${this.lineNumber}` : '');
@@ -57,19 +53,27 @@ export default {
 </script>
 
 <template>
-  <div class="md">
-    <h1 class="mt-3 mb-2 border-bottom-0" data-testid="title">{{ vulnerability.title }}</h1>
+  <div class="md" data-qa-selector="vulnerability_details">
+    <h1
+      class="mt-3 mb-2 border-bottom-0"
+      data-testid="title"
+      data-qa-selector="vulnerability_title"
+    >
+      {{ vulnerability.title }}
+    </h1>
     <h3 class="mt-0">{{ __('Description') }}</h3>
-    <p data-testid="description">{{ finding.description }}</p>
+    <p data-testid="description" data-qa-selector="vulnerability_description">
+      {{ vulnerability.description }}
+    </p>
 
     <ul>
       <detail-item :sprintf-message="__('%{labelStart}Severity:%{labelEnd} %{severity}')">
         <severity-badge :severity="vulnerability.severity" class="gl-display-inline ml-1" />
       </detail-item>
       <detail-item
-        v-if="finding.evidence"
+        v-if="vulnerability.evidence"
         :sprintf-message="__('%{labelStart}Evidence:%{labelEnd} %{evidence}')"
-        >{{ finding.evidence }}
+        >{{ vulnerability.evidence }}
       </detail-item>
       <detail-item :sprintf-message="__('%{labelStart}Report Type:%{labelEnd} %{reportType}')"
         >{{ vulnerability.report_type }}
@@ -125,10 +129,10 @@ export default {
       </ul>
     </template>
 
-    <template v-if="finding.links && finding.links.length">
+    <template v-if="vulnerability.links && vulnerability.links.length">
       <h3>{{ __('Links') }}</h3>
       <ul>
-        <li v-for="link in finding.links" :key="link.url">
+        <li v-for="link in vulnerability.links" :key="link.url">
           <gl-link
             :href="link.url"
             data-testid="link"
@@ -142,10 +146,10 @@ export default {
       </ul>
     </template>
 
-    <template v-if="finding.identifiers && finding.identifiers.length">
+    <template v-if="vulnerability.identifiers && vulnerability.identifiers.length">
       <h3>{{ __('Identifiers') }}</h3>
       <ul>
-        <li v-for="identifier in finding.identifiers" :key="identifier.url">
+        <li v-for="identifier in vulnerability.identifiers" :key="identifier.url">
           <gl-link :href="identifier.url" data-testid="identifier" target="_blank">
             {{ identifier.name }}
           </gl-link>

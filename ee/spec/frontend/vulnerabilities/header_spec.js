@@ -29,38 +29,32 @@ describe('Vulnerability Header', () => {
     created_at: new Date().toISOString(),
     report_type: 'sast',
     state: 'detected',
-  };
-
-  const diff = 'some diff to download';
-
-  const getFinding = ({
-    shouldShowCreateIssueButton = false,
-    shouldShowMergeRequestButton = false,
-  }) => {
-    return {
-      description: 'description',
-      identifiers: 'identifiers',
-      links: 'links',
-      location: 'location',
-      name: 'name',
-      issue_feedback: shouldShowCreateIssueButton ? null : { issue_iid: 12 },
-      remediations: shouldShowMergeRequestButton ? [{ diff }] : null,
-      merge_request_feedback: {
-        merge_request_path: shouldShowMergeRequestButton ? null : 'some path',
-      },
-    };
-  };
-
-  const dataset = {
-    createMrUrl: '/create_mr_url',
-    createIssueUrl: '/create_issue_url',
-    projectFingerprint: 'abc123',
+    create_mr_url: '/create_mr_url',
+    create_issue_url: '/create_issue_url',
+    project_fingerprint: 'abc123',
     pipeline: {
       id: 2,
       created_at: new Date().toISOString(),
       url: 'pipeline_url',
       sourceBranch: 'master',
     },
+    description: 'description',
+    identifiers: 'identifiers',
+    links: 'links',
+    location: 'location',
+    name: 'name',
+  };
+
+  const diff = 'some diff to download';
+
+  const getVulnerability = ({ shouldShowCreateIssueButton, shouldShowMergeRequestButton }) => {
+    return {
+      issue_feedback: shouldShowCreateIssueButton ? null : { issue_iid: 12 },
+      remediations: shouldShowMergeRequestButton ? [{ diff }] : null,
+      merge_request_feedback: {
+        merge_request_path: shouldShowMergeRequestButton ? null : 'some path',
+      },
+    };
   };
 
   const createRandomUser = () => {
@@ -77,13 +71,10 @@ describe('Vulnerability Header', () => {
   const findResolutionAlert = () => wrapper.find(ResolutionAlert);
   const findStatusDescription = () => wrapper.find(StatusDescription);
 
-  const createWrapper = ({ vulnerability = {}, finding = getFinding({}), props = {} }) => {
+  const createWrapper = (vulnerability = {}) => {
     wrapper = shallowMount(Header, {
       propsData: {
-        ...dataset,
-        ...props,
         initialVulnerability: { ...defaultVulnerability, ...vulnerability },
-        finding,
       },
     });
   };
@@ -96,7 +87,7 @@ describe('Vulnerability Header', () => {
   });
 
   describe('state dropdown', () => {
-    beforeEach(() => createWrapper({}));
+    beforeEach(() => createWrapper());
 
     it('the vulnerability state dropdown is rendered', () => {
       expect(wrapper.find(VulnerabilityStateDropdown).exists()).toBe(true);
@@ -158,12 +149,12 @@ describe('Vulnerability Header', () => {
 
   describe('split button', () => {
     it('does render the create merge request and issue button as a split button', () => {
-      createWrapper({
-        finding: getFinding({
+      createWrapper(
+        getVulnerability({
           shouldShowCreateIssueButton: true,
           shouldShowMergeRequestButton: true,
         }),
-      });
+      );
       expect(findSplitButton().exists()).toBe(true);
       const buttons = findSplitButton().props('buttons');
       expect(buttons).toHaveLength(3);
@@ -173,21 +164,19 @@ describe('Vulnerability Header', () => {
     });
 
     it('does not render the split button if there is only one action', () => {
-      createWrapper({ finding: getFinding({ shouldShowCreateIssueButton: true }) });
+      createWrapper(getVulnerability({ shouldShowCreateIssueButton: true }));
       expect(findSplitButton().exists()).toBe(false);
     });
   });
 
   describe('single action button', () => {
     it('does not display if there are no actions', () => {
-      createWrapper({});
+      createWrapper(getVulnerability({}));
       expect(findGlDeprecatedButton().exists()).toBe(false);
     });
 
     describe('create issue', () => {
-      beforeEach(() =>
-        createWrapper({ finding: getFinding({ shouldShowCreateIssueButton: true }) }),
-      );
+      beforeEach(() => createWrapper(getVulnerability({ shouldShowCreateIssueButton: true })));
 
       it('does display if there is only one action and not an issue already created', () => {
         expect(findGlDeprecatedButton().exists()).toBe(true);
@@ -197,22 +186,21 @@ describe('Vulnerability Header', () => {
       it('calls create issue endpoint on click and redirects to new issue', () => {
         const issueUrl = '/group/project/issues/123';
         const spy = jest.spyOn(urlUtility, 'redirectTo');
-        mockAxios.onPost(dataset.createIssueUrl).reply(200, {
+        mockAxios.onPost(defaultVulnerability.create_issue_url).reply(200, {
           issue_url: issueUrl,
         });
         findGlDeprecatedButton().vm.$emit('click');
         return waitForPromises().then(() => {
           expect(mockAxios.history.post).toHaveLength(1);
           const [postRequest] = mockAxios.history.post;
-          expect(postRequest.url).toBe(dataset.createIssueUrl);
+          expect(postRequest.url).toBe(defaultVulnerability.create_issue_url);
           expect(JSON.parse(postRequest.data)).toMatchObject({
             vulnerability_feedback: {
               feedback_type: FEEDBACK_TYPES.ISSUE,
               category: defaultVulnerability.report_type,
-              project_fingerprint: dataset.projectFingerprint,
+              project_fingerprint: defaultVulnerability.project_fingerprint,
               vulnerability_data: {
-                ...defaultVulnerability,
-                ...getFinding({ shouldShowCreateIssueButton: true }),
+                ...getVulnerability({ shouldShowCreateIssueButton: true }),
                 category: defaultVulnerability.report_type,
                 vulnerability_id: defaultVulnerability.id,
               },
@@ -223,7 +211,7 @@ describe('Vulnerability Header', () => {
       });
 
       it('shows an error message when issue creation fails', () => {
-        mockAxios.onPost(dataset.createIssueUrl).reply(500);
+        mockAxios.onPost(defaultVulnerability.create_issue_url).reply(500);
         findGlDeprecatedButton().vm.$emit('click');
         return waitForPromises().then(() => {
           expect(mockAxios.history.post).toHaveLength(1);
@@ -237,8 +225,8 @@ describe('Vulnerability Header', () => {
     describe('create merge request', () => {
       beforeEach(() => {
         createWrapper({
-          vulnerability: { state: 'resolved' },
-          finding: getFinding({ shouldShowMergeRequestButton: true }),
+          ...getVulnerability({ shouldShowMergeRequestButton: true }),
+          state: 'resolved',
         });
       });
 
@@ -250,22 +238,21 @@ describe('Vulnerability Header', () => {
       it('emits createMergeRequest when create merge request button is clicked', () => {
         const mergeRequestPath = '/group/project/merge_request/123';
         const spy = jest.spyOn(urlUtility, 'redirectTo');
-        mockAxios.onPost(dataset.createMRUrl).reply(200, {
+        mockAxios.onPost(defaultVulnerability.create_mr_url).reply(200, {
           merge_request_path: mergeRequestPath,
         });
         findGlDeprecatedButton().vm.$emit('click');
         return waitForPromises().then(() => {
           expect(mockAxios.history.post).toHaveLength(1);
           const [postRequest] = mockAxios.history.post;
-          expect(postRequest.url).toBe(dataset.createMrUrl);
+          expect(postRequest.url).toBe(defaultVulnerability.create_mr_url);
           expect(JSON.parse(postRequest.data)).toMatchObject({
             vulnerability_feedback: {
               feedback_type: FEEDBACK_TYPES.MERGE_REQUEST,
               category: defaultVulnerability.report_type,
-              project_fingerprint: dataset.projectFingerprint,
+              project_fingerprint: defaultVulnerability.project_fingerprint,
               vulnerability_data: {
-                ...defaultVulnerability,
-                ...getFinding({ shouldShowMergeRequestButton: true }),
+                ...getVulnerability({ shouldShowMergeRequestButton: true }),
                 category: defaultVulnerability.report_type,
                 state: 'resolved',
               },
@@ -276,7 +263,7 @@ describe('Vulnerability Header', () => {
       });
 
       it('shows an error message when merge request creation fails', () => {
-        mockAxios.onPost(dataset.createMRUrl).reply(500);
+        mockAxios.onPost(defaultVulnerability.create_mr_url).reply(500);
         findGlDeprecatedButton().vm.$emit('click');
         return waitForPromises().then(() => {
           expect(mockAxios.history.post).toHaveLength(1);
@@ -290,8 +277,8 @@ describe('Vulnerability Header', () => {
     describe('can download patch', () => {
       beforeEach(() => {
         createWrapper({
-          finding: getFinding({ shouldShowMergeRequestButton: true }),
-          props: { createMrUrl: '' },
+          ...getVulnerability({ shouldShowMergeRequestButton: true }),
+          create_mr_url: '',
         });
       });
 
@@ -314,7 +301,7 @@ describe('Vulnerability Header', () => {
     test.each(vulnerabilityStateEntries)(
       'the vulnerability state badge has the correct style for the %s state',
       (state, stateObject) => {
-        createWrapper({ vulnerability: { state } });
+        createWrapper({ state });
 
         expect(findBadge().classes()).toContain(`status-box-${stateObject.statusBoxStyle}`);
         expect(findBadge().text()).toBe(state);
@@ -327,16 +314,16 @@ describe('Vulnerability Header', () => {
       const user = createRandomUser();
       const vulnerability = {
         ...defaultVulnerability,
-        ...{ state: 'confirmed', confirmed_by_id: user.id },
+        state: 'confirmed',
+        confirmed_by_id: user.id,
       };
 
-      createWrapper({ vulnerability });
+      createWrapper(vulnerability);
 
       return waitForPromises().then(() => {
         expect(findStatusDescription().exists()).toBe(true);
         expect(findStatusDescription().props()).toEqual({
           vulnerability,
-          pipeline: dataset.pipeline,
           user,
           isLoadingVulnerability: wrapper.vm.isLoadingVulnerability,
           isLoadingUser: wrapper.vm.isLoadingUser,
@@ -350,10 +337,8 @@ describe('Vulnerability Header', () => {
 
     beforeEach(() => {
       createWrapper({
-        vulnerability: {
-          resolved_on_default_branch: true,
-          project_default_branch: branchName,
-        },
+        resolved_on_default_branch: true,
+        project_default_branch: branchName,
       });
     });
 
@@ -372,10 +357,8 @@ describe('Vulnerability Header', () => {
     describe('when the vulnerability is already resolved', () => {
       beforeEach(() => {
         createWrapper({
-          vulnerability: {
-            resolved_on_default_branch: true,
-            state: 'resolved',
-          },
+          resolved_on_default_branch: true,
+          state: 'resolved',
         });
       });
 
@@ -392,7 +375,7 @@ describe('Vulnerability Header', () => {
       `loads the correct user for the vulnerability state "%s"`,
       state => {
         const user = createRandomUser();
-        createWrapper({ vulnerability: { state, [`${state}_by_id`]: user.id } });
+        createWrapper({ state, [`${state}_by_id`]: user.id });
 
         return waitForPromises().then(() => {
           expect(mockAxios.history.get).toHaveLength(1);
@@ -402,7 +385,7 @@ describe('Vulnerability Header', () => {
     );
 
     it('does not load a user if there is no user ID', () => {
-      createWrapper({ vulnerability: { state: 'detected' } });
+      createWrapper({ state: 'detected' });
 
       return waitForPromises().then(() => {
         expect(mockAxios.history.get).toHaveLength(0);
@@ -411,7 +394,7 @@ describe('Vulnerability Header', () => {
     });
 
     it('will show an error when the user cannot be loaded', () => {
-      createWrapper({ vulnerability: { state: 'confirmed', confirmed_by_id: 1 } });
+      createWrapper({ state: 'confirmed', confirmed_by_id: 1 });
 
       mockAxios.onGet().replyOnce(500);
 
@@ -423,7 +406,7 @@ describe('Vulnerability Header', () => {
 
     it('will set the isLoadingUser property correctly when the user is loading and finished loading', () => {
       const user = createRandomUser();
-      createWrapper({ vulnerability: { state: 'confirmed', confirmed_by_id: user.id } });
+      createWrapper({ state: 'confirmed', confirmed_by_id: user.id });
 
       expect(findStatusDescription().props('isLoadingUser')).toBe(true);
 

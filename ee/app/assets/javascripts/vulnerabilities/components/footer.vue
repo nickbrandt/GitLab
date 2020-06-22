@@ -22,13 +22,23 @@ export default {
       type: String,
       required: true,
     },
-    finding: {
+    project: {
       type: Object,
       required: true,
     },
     solutionInfo: {
       type: Object,
       required: true,
+    },
+    issueFeedback: {
+      type: Object,
+      required: false,
+      default: () => null,
+    },
+    mergeRequestFeedback: {
+      type: Object,
+      required: false,
+      default: () => null,
     },
   },
 
@@ -51,12 +61,6 @@ export default {
     },
     hasSolution() {
       return Boolean(this.solutionInfo.solution || this.solutionInfo.remediation);
-    },
-    project() {
-      return {
-        url: this.finding.project?.full_path,
-        value: this.finding.project?.full_name,
-      };
     },
   },
 
@@ -153,19 +157,19 @@ export default {
 };
 </script>
 <template>
-  <div>
+  <div data-qa-selector="vulnerability_footer">
     <solution-card v-if="hasSolution" v-bind="solutionInfo" />
 
-    <div v-if="finding.issue_feedback || finding.merge_request_feedback" class="card">
+    <div v-if="issueFeedback || mergeRequestFeedback" class="card">
       <issue-note
-        v-if="finding.issue_feedback"
-        :feedback="finding.issue_feedback"
+        v-if="issueFeedback"
+        :feedback="issueFeedback"
         :project="project"
         class="card-body"
       />
       <merge-request-note
-        v-if="finding.merge_request_feedback"
-        :feedback="finding.merge_request_feedback"
+        v-if="mergeRequestFeedback"
+        :feedback="mergeRequestFeedback"
         :project="project"
         class="card-body"
       />

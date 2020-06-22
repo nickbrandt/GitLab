@@ -29,11 +29,10 @@ describe('Vulnerability Footer', () => {
     },
     finding: {},
     notesUrl: '/notes',
-  };
-
-  const project = {
-    full_path: '/root/security-reports',
-    full_name: 'Administrator / Security Reports',
+    project: {
+      full_path: '/root/security-reports',
+      full_name: 'Administrator / Security Reports',
+    },
   };
 
   const solutionInfoProp = {
@@ -81,22 +80,18 @@ describe('Vulnerability Footer', () => {
   });
 
   describe.each`
-    type               | prop                        | component
-    ${'issue'}         | ${'issue_feedback'}         | ${IssueNote}
-    ${'merge request'} | ${'merge_request_feedback'} | ${MergeRequestNote}
+    type               | prop                      | component
+    ${'issue'}         | ${'issueFeedback'}        | ${IssueNote}
+    ${'merge request'} | ${'mergeRequestFeedback'} | ${MergeRequestNote}
   `('$type note', ({ prop, component }) => {
     // The object itself does not matter, we just want to make sure it's passed to the issue note.
     const feedback = {};
 
     it('shows issue note when an issue exists for the vulnerability', () => {
-      createWrapper({ ...minimumProps, finding: { project, [prop]: feedback } });
+      createWrapper({ ...minimumProps, [prop]: feedback });
       expect(wrapper.contains(component)).toBe(true);
       expect(wrapper.find(component).props()).toMatchObject({
         feedback,
-        project: {
-          url: project.full_path,
-          value: project.full_name,
-        },
       });
     });
 
