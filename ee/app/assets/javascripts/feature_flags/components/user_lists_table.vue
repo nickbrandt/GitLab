@@ -1,10 +1,11 @@
 <script>
 import { s__, sprintf } from '~/locale';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
-import { GlTooltipDirective } from '@gitlab/ui';
+import { GlButton, GlModal, GlSprintf, GlTooltipDirective, GlModalDirective } from '@gitlab/ui';
 
 export default {
-  directives: { GlTooltip: GlTooltipDirective },
+  components: { GlButton, GlModal, GlSprintf },
+  directives: { GlTooltip: GlTooltipDirective, GlModal: GlModalDirective },
   mixins: [timeagoMixin],
   props: {
     userLists: {
@@ -13,7 +14,31 @@ export default {
     },
   },
   translations: {
-    createdTimeagoLabel: s__('created %{timeago}'),
+    createdTimeagoLabel: s__('UserList|created %{timeago}'),
+    deleteListTitle: s__('UserList|Delete %{name}?'),
+    deleteListMessage: s__('User list %{name} will be removed. Are you sure?'),
+  },
+  modal: {
+    id: 'deleteListModal',
+    actionPrimary: {
+      text: s__('Delete user list'),
+      attributes: { variant: 'danger', 'data-testid': 'modal-confirm' },
+    },
+  },
+  data() {
+    return {
+      deleteUserList: null,
+    };
+  },
+  computed: {
+    deleteListName() {
+      return this.deleteUserList?.name;
+    },
+    modalTitle() {
+      return sprintf(this.$options.translations.deleteListTitle, {
+        name: this.deleteListName,
+      });
+    },
   },
   methods: {
     createdTimeago(list) {
@@ -23,6 +48,12 @@ export default {
     },
     displayList(list) {
       return list.user_xids.replace(/,/g, ', ');
+    },
+    onDelete() {
+      this.$emit('delete', this.deleteUserList);
+    },
+    confirmDeleteList(list) {
+      this.deleteUserList = list;
     },
   },
 };
@@ -36,9 +67,9 @@ export default {
       class="gl-border-b-solid gl-border-gray-100 gl-border-b-1 gl-w-full gl-py-4 gl-display-flex gl-justify-content-space-between"
     >
       <div class="gl-display-flex gl-flex-direction-column gl-overflow-hidden gl-flex-grow-1">
-        <span data-testid="ffUserListName" class="gl-font-weight-bold gl-mb-2">{{
-          list.name
-        }}</span>
+        <span data-testid="ffUserListName" class="gl-font-weight-bold gl-mb-2">
+          {{ list.name }}
+        </span>
         <span
           v-gl-tooltip
           :title="tooltipTitle(list.created_at)"
@@ -49,6 +80,28 @@ export default {
         </span>
         <span data-testid="ffUserListIds" class="gl-str-truncated">{{ displayList(list) }}</span>
       </div>
+      <gl-button
+        v-gl-modal="$options.modal.id"
+        class="gl-align-self-start gl-mt-2"
+        category="secondary"
+        variant="danger"
+        icon="remove"
+        data-testid="delete-user-list"
+        @click="confirmDeleteList(list)"
+      />
     </div>
+    <gl-modal
+      :title="modalTitle"
+      :modal-id="$options.modal.id"
+      :action-primary="$options.modal.actionPrimary"
+      static
+      @primary="onDelete"
+    >
+      <gl-sprintf :message="$options.translations.deleteListMessage">
+        <template #name>
+          <b>{{ deleteListName }}</b>
+        </template>
+      </gl-sprintf>
+    </gl-modal>
   </div>
 </template>

@@ -67,6 +67,20 @@ export const receiveUpdateFeatureFlagSuccess = ({ commit }, data) =>
 export const receiveUpdateFeatureFlagError = ({ commit }, id) =>
   commit(types.RECEIVE_UPDATE_FEATURE_FLAG_ERROR, id);
 
+export const deleteUserList = ({ state, dispatch }, list) => {
+  dispatch('requestDeleteUserList', list);
+
+  return Api.deleteFeatureFlagUserList(state.projectId, list.iid)
+    .then(() => dispatch('fetchUserLists'))
+    .catch(() => dispatch('receiveDeleteUserListError', list));
+};
+
+export const requestDeleteUserList = ({ commit }, list) =>
+  commit(types.REQUEST_DELETE_USER_LIST, list);
+
+export const receiveDeleteUserListError = ({ commit }, list) =>
+  commit(types.RECEIVE_DELETE_USER_LIST_ERROR, list);
+
 export const rotateInstanceId = ({ state, dispatch }) => {
   dispatch('requestRotateInstanceId');
 

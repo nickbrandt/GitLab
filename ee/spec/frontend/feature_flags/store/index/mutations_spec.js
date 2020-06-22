@@ -115,7 +115,7 @@ describe('Feature flags store Mutations', () => {
     });
   });
 
-  describe('RECIEVE_USER_LISTS_SUCCESS', () => {
+  describe('RECEIVE_USER_LISTS_SUCCESS', () => {
     const headers = {
       'x-next-page': '2',
       'x-page': '1',
@@ -279,6 +279,30 @@ describe('Feature flags store Mutations', () => {
           active: false,
         },
       ]);
+    });
+  });
+  describe('REQUEST_DELETE_USER_LIST', () => {
+    beforeEach(() => {
+      stateCopy.userLists = [userList];
+      mutations[types.REQUEST_DELETE_USER_LIST](stateCopy, userList);
+    });
+
+    it('should remove the deleted list', () => {
+      expect(stateCopy.userLists).not.toContain(userList);
+    });
+  });
+  describe('RECEIVE_DELETE_USER_LIST_ERROR', () => {
+    beforeEach(() => {
+      stateCopy.userLists = [];
+      mutations[types.RECEIVE_DELETE_USER_LIST_ERROR](stateCopy, userList);
+    });
+
+    it('should set isLoading to false and hasError to true', () => {
+      expect(stateCopy.isLoading).toBe(false);
+      expect(stateCopy.hasError).toBe(true);
+    });
+    it('should add the user list back to the list of user lists', () => {
+      expect(stateCopy.userLists).toContain(userList);
     });
   });
 });
