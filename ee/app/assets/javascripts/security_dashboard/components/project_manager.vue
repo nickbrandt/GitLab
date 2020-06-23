@@ -2,7 +2,7 @@
 import { mapState, mapActions, mapGetters } from 'vuex';
 import { GlDeprecatedButton } from '@gitlab/ui';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
-import ProjectList from './project_list.vue';
+import ProjectList from './first_class_project_manager/project_list.vue';
 
 export default {
   components: {

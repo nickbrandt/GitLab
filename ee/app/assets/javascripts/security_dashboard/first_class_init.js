@@ -7,8 +7,6 @@ import FirstClassInstanceSecurityDashboard from './components/first_class_instan
 import UnavailableState from './components/unavailable_state.vue';
 import createStore from './store';
 import createRouter from './router';
-import projectsPlugin from './store/plugins/projects';
-import projectSelector from './store/plugins/project_selector';
 import apolloProvider from './graphql/provider';
 
 const isRequired = message => {
@@ -63,10 +61,7 @@ export default (
   }
 
   const router = createRouter();
-  const store = createStore({
-    dashboardType,
-    plugins: [projectSelector, projectsPlugin],
-  });
+  const store = createStore({ dashboardType });
 
   return new Vue({
     el,
