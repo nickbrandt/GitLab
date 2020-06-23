@@ -12,7 +12,7 @@ RSpec.describe StatusPage do
 
     it 'delegates to TriggerPublishService' do
       expect_next_instance_of(StatusPage::TriggerPublishService,
-                              project, user, triggered_by) do |service|
+                              project, user, triggered_by, action: :update) do |service|
         expect(service).to receive(:execute)
       end
 
