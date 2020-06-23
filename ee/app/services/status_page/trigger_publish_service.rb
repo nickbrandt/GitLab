@@ -17,10 +17,13 @@ module StatusPage
     PUBLISH_WHEN_ISSUE_CHANGED =
       %w[title description confidential state_id closed_by_id].freeze
 
-    def initialize(project, user, triggered_by)
+    VALID_ACTIONS = %i[init update].freeze
+
+    def initialize(project, user, triggered_by, action:)
       @project = project
       @user = user
       @triggered_by = triggered_by
+      @action = set_action(action)
     end
 
     def execute
@@ -33,7 +36,21 @@ module StatusPage
 
     private
 
-    attr_reader :user, :project, :triggered_by
+    attr_reader :user, :project, :triggered_by, :action
+
+    def set_action(action)
+      raise ArgumentError, 'Invalid action' unless VALID_ACTIONS.include?(action)
+
+      action
+    end
+
+    def update?
+      action == :update
+    end
+
+    def init?
+      action == :init
+    end
 
     def can_publish?
       user&.can?(:publish_status_page, project)
@@ -59,13 +76,14 @@ module StatusPage
 
     # Trigger publish for public (non-confidential) issues
     # - which were changed
+    # - which were not changed, and the action is not update (i.e init action)
     # - just become confidential to unpublish
     def eligable_issue_id_from_issue
       issue = triggered_by
 
       changes = issue.previous_changes.keys & PUBLISH_WHEN_ISSUE_CHANGED
 
-      return if changes.none?
+      return if update? && changes.none?
       return if issue.confidential? && changes.exclude?('confidential')
       return unless issue.status_page_published_incident
 
