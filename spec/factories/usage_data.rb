@@ -92,7 +92,8 @@ FactoryBot.define do
 
       # Create fresh & a month (28-days SMAU) old  data
       [2, 29].each do |n|
-        create(:snippet, created_at: n.days.ago)
+        create_list(:project_snippet, 2, project: projects[0], created_at: n.days.ago)
+        create(:personal_snippet, created_at: n.days.ago)
       end
     end
   end
