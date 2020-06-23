@@ -34,6 +34,7 @@ describe('Edit feature flag form', () => {
         path: '/feature_flags',
         environmentsEndpoint: 'environments.json',
         projectId: '8',
+        featureFlagIssuesEndpoint: `${TEST_HOST}/feature_flags/5/issues`,
       },
       store,
       provide: {
@@ -140,6 +141,12 @@ describe('Edit feature flag form', () => {
       return axios.waitForAll().then(() => {
         expect(wrapper.find(Form).props('version')).toBe(NEW_VERSION_FLAG);
       });
+    });
+
+    it('renders the related issues widget', () => {
+      const expected = `${TEST_HOST}/feature_flags/5/issues`;
+
+      expect(wrapper.find(Form).props('featureFlagIssuesEndpoint')).toBe(expected);
     });
   });
 

@@ -35,6 +35,10 @@ export default {
       type: String,
       required: true,
     },
+    featureFlagIssuesEndpoint: {
+      type: String,
+      required: true,
+    },
   },
   translations: {
     legacyFlagAlert: s__(
@@ -111,6 +115,7 @@ export default {
         :cancel-path="path"
         :submit-text="__('Save changes')"
         :environments-endpoint="environmentsEndpoint"
+        :feature-flag-issues-endpoint="featureFlagIssuesEndpoint"
         :active="active"
         :version="version"
         @handleSubmit="data => updateFeatureFlag(data)"
