@@ -77,6 +77,11 @@ export default {
       type: String,
       required: true,
     },
+    isLinkedIssueBlock: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   computed: {
     hasRelatedIssues() {
@@ -169,7 +174,7 @@ export default {
           class="js-add-related-issues-form-area card-body bordered-box bg-white"
         >
           <add-issuable-form
-            :is-linked-issue-block="true"
+            :is-linked-issue-block="isLinkedIssueBlock"
             :is-submitting="isSubmitting"
             :issuable-type="issuableType"
             :input-value="inputValue"

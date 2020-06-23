@@ -28,6 +28,7 @@ import {
   LEGACY_FLAG,
 } from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
+import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
 
 export default {
   components: {
@@ -41,6 +42,7 @@ export default {
     Icon,
     EnvironmentsDropdown,
     Strategy,
+    RelatedIssuesRoot,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -82,6 +84,11 @@ export default {
     environmentsEndpoint: {
       type: String,
       required: true,
+    },
+    featureFlagIssuesEndpoint: {
+      type: String,
+      required: false,
+      default: '',
     },
     strategies: {
       type: Array,
@@ -145,6 +152,9 @@ export default {
     },
     canDeleteStrategy() {
       return this.formStrategies.length > 1;
+    },
+    showRelatedIssues() {
+      return this.featureFlagIssuesEndpoint.length > 0;
     },
   },
   mounted() {
@@ -312,6 +322,13 @@ export default {
           ></textarea>
         </div>
       </div>
+
+      <related-issues-root
+        v-if="showRelatedIssues"
+        :endpoint="featureFlagIssuesEndpoint"
+        :can-admin="true"
+        :is-linked-issue-block="false"
+      />
 
       <template v-if="supportsStrategies">
         <div class="row">

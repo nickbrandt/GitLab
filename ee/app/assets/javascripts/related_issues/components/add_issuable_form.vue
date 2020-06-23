@@ -148,6 +148,7 @@ export default {
     </template>
     <related-issuable-input
       ref="relatedIssuableInput"
+      input-id="add-related-issues-form-input"
       :focus-on-mount="true"
       :references="pendingReferences"
       :path-id-separator="pathIdSeparator"
