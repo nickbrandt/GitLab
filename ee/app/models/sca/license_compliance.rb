@@ -9,8 +9,9 @@ module SCA
       desc: -> (items) { items.reverse }
     }.with_indifferent_access
 
-    def initialize(project)
+    def initialize(project, pipeline)
       @project = project
+      @pipeline = pipeline
     end
 
     def policies
@@ -42,7 +43,7 @@ module SCA
 
     private
 
-    attr_reader :project
+    attr_reader :project, :pipeline
 
     def known_policies
       strong_memoize(:known_policies) do
@@ -58,12 +59,6 @@ module SCA
 
         [reported_license.canonical_id, build_policy(reported_license, nil)]
       end.compact.to_h
-    end
-
-    def pipeline
-      strong_memoize(:pipeline) do
-        project.latest_pipeline_with_reports(::Ci::JobArtifact.license_scanning_reports)
-      end
     end
 
     def license_scan_report
