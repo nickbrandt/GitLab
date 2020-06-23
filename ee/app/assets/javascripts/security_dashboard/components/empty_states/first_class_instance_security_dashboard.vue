@@ -1,6 +1,6 @@
 <script>
 import { GlButton, GlEmptyState, GlLink } from '@gitlab/ui';
-import { s__ } from '~/locale';
+import { s__ } from '~/locale'; // eslint-disable-line no-unused-vars
 
 export default {
   components: {

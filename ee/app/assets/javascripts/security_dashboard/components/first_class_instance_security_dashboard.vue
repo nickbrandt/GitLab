@@ -130,8 +130,8 @@ export default {
     />
     <div v-else-if="shouldShowEmptyState">
       <empty-state
-        :svgPath="emptyStateSvgPath"
-        :dashboardDocumentation="dashboardDocumentation"
+        :svg-path="emptyStateSvgPath"
+        :dashboard-documentation="dashboardDocumentation"
         @handleAddProjectsClick="toggleProjectSelector"
       />
     </div>
