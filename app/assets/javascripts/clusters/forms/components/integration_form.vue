@@ -80,7 +80,7 @@ export default {
       </div>
     </gl-form-group>
 
-    <gl-form-group v-if="multiple"
+    <gl-form-group v-if="!multiple"
       id="environment_scope"
       class="col-md-6"
       :label="s__('ClusterIntegration|Environment scope')"
@@ -88,7 +88,9 @@ export default {
       :description="s__('ClusterIntegration|Choose which of your environments will use this cluster.')"
       label-for="environment_scope"
       >
-      <gl-form-input id="environment_scope" />
+      <gl-form-input 
+        id="environment_scope"
+        type="text" />
     </gl-form-group>
 
     <gl-form-group v-else
@@ -96,12 +98,15 @@ export default {
       class="col-md-6"
       :label="s__('ClusterIntegration|Environment scope')"
       label-size="sm"
-      :description="s__('ClusterIntegration| <code>*</code> is the default environment scope for this cluster. This means that all jobs, regardless of their environment, will use this cluster.')"
+      :description="s__('ClusterIntegration| <code>*</code> is the default environment scope for this cluster. This means that all jobs, regardless of their environment, will use this cluster. %{linkStart}More information%{linkEnd}')"
       label-for="environment_scope"
-      value="*"
-      disabled="disabled"
       >
-      <gl-form-input id="environment_scope" />
+      <gl-form-input 
+        id="environment_scope"
+        type="text"
+        disabled="disabled" 
+        value="*"
+      />
     </gl-form-group>
   </div>
 </template>
