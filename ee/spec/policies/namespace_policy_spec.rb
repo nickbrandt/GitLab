@@ -48,4 +48,6 @@ RSpec.describe NamespacePolicy do
       it { is_expected.to be_disallowed(:create_jira_connect_subscription) }
     end
   end
+
+  it_behaves_like 'update namespace limit policy'
 end
