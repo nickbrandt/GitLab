@@ -116,7 +116,7 @@ RSpec.describe 'User updates feature flag', :js do
         visit(project_audit_events_path(project))
 
         expect(page).to(
-          have_text("Updated feature flag ci_live_trace. Updated rule review/* active state from true to false.")
+          have_text("Updated feature flag <strong>ci_live_trace</strong>. Updated rule <strong>review/*</strong> active state from <strong>true</strong> to <strong>false</strong>.")
         )
       end
     end
@@ -147,7 +147,7 @@ RSpec.describe 'User updates feature flag', :js do
         visit(project_audit_events_path(project))
 
         expect(page).to(
-          have_text("Updated feature flag ci_live_trace")
+          have_text("Updated feature flag <strong>ci_live_trace</strong>")
         )
       end
     end
@@ -175,7 +175,7 @@ RSpec.describe 'User updates feature flag', :js do
         visit(project_audit_events_path(project))
 
         expect(page).to(
-          have_text("Updated feature flag ci_live_trace")
+          have_text("Updated feature flag <strong>ci_live_trace</strong>")
         )
       end
     end

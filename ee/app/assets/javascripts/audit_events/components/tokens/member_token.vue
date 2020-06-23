@@ -13,7 +13,17 @@ export default {
       return Api.user(id).then(res => res.data);
     },
     fetchSuggestions(term) {
-      return Api.groupMembers(this.config.groupId, { search: term }).then(res => res.data);
+      const { groupId, projectPath } = this.config;
+
+      if (groupId) {
+        return Api.groupMembers(groupId, { search: term }).then(res => res.data);
+      }
+
+      if (projectPath) {
+        return Api.projectUsers(projectPath, term);
+      }
+
+      return {};
     },
     getItemName({ name }) {
       return name;
