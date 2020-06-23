@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Secure', :docker, :runner do
+  context 'Secure', :docker, :runner, quarantine: { type: :investigating } do
     describe 'Security Dashboard in a Project' do
       let(:vulnerability_name) { "CVE-2017-18269 in glibc" }
       let(:vulnerability_description) { "Short description to match in specs" }
@@ -55,7 +55,7 @@ module QA
         @runner.remove_via_api!
       end
 
-      it 'shows vulnerability details', quarantine: { type: :investigating } do
+      it 'shows vulnerability details' do
         @project.visit!
 
         Page::Project::Menu.perform(&:click_on_security_dashboard)
