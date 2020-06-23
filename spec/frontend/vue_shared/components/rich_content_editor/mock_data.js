@@ -47,6 +47,7 @@ export const kramdownTextNode = buildMockTextNode('{:toc}');
 export const identifierTextNode = buildMockTextNode('[Some text]: https://link.com');
 export const identifierInlineCodeTextEnteringNode = buildMockTextNodeWithAdjacentInlineCode(true);
 export const identifierInlineCodeTextExitingNode = buildMockTextNodeWithAdjacentInlineCode(false);
+export const embeddedRubyTextNode = buildMockTextNode('<%= partial("some/path") %>');
 export const normalTextNode = buildMockTextNode('This is just normal text.');
 
 const uneditableOpenToken = {
