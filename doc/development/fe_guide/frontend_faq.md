@@ -151,7 +151,7 @@ export const fetchFoos = ({ state }) => {
 
 Sometimes it's necessary to test locally what the frontend production build would produce, to do so the steps are:
 
-1. `gdk stop webpack`
+1. Stop webpack: `gdk stop webpack`.
 1. edit `gitlab.yaml` and set `webpack => dev_server => enabled: false`
 1. `yarn webpack-prod && gdk restart rails-web`
 
