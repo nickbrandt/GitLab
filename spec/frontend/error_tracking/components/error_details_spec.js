@@ -195,7 +195,7 @@ describe('ErrorDetails', () => {
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
       expect(wrapper.find(Stacktrace).exists()).toBe(false);
       expect(wrapper.find(GlBadge).exists()).toBe(false);
-      expect(wrapper.findAll(GlButton).length).toBe(3);
+      expect(wrapper.findAll(GlButton)).toHaveLength(3);
     });
 
     describe('unsafe chars for culprit field', () => {
