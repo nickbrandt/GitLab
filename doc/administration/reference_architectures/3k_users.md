@@ -558,65 +558,282 @@ If you use a cloud-managed service, or provide your own PostgreSQL:
 
 ### Standalone PostgreSQL using Omnibus GitLab
 
-1. SSH into the PostgreSQL server.
-1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
-   package you want using **steps 1 and 2** from the GitLab downloads page.
-   - Do not complete any other steps on the download page.
-1. Generate a password hash for PostgreSQL. This assumes you will use the default
+The following IPs will be used as an example: 
+
+- `10.6.0.31`: PostgreSQL primary
+- `10.6.0.32`: PostgreSQL secondary 1
+- `10.6.0.33`: PostgreSQL secondary 2
+
+First, make sure to [install](https://about.gitlab.com/install/)
+the Linux GitLab package **on each node**. Following the steps,
+install the necessary dependencies from step 1, and add the
+GitLab package repository from step 2. When installing GitLab
+in the second step, do not supply the `EXTERNAL_URL` value.
+
+#### PostgreSQL primary node
+
+1. SSH into the PostgreSQL primary node.
+1. Generate a password hash for the PostgreSQL username/password pair. This assumes you will use the default
    username of `gitlab` (recommended). The command will request a password
    and confirmation. Use the value that is output by this command in the next
-   step as the value of `POSTGRESQL_PASSWORD_HASH`.
+   step as the value of `<postgresql_password_hash>`:
 
    ```shell
    sudo gitlab-ctl pg-password-md5 gitlab
    ```
 
-1. Edit `/etc/gitlab/gitlab.rb` and add the contents below, updating placeholder
-   values appropriately.
+1. Generate a password hash for the PgBouncer username/password pair. This assumes you will use the default
+   username of `pgbouncer` (recommended). The command will request a password
+   and confirmation. Use the value that is output by this command in the next
+   step as the value of `<pgbouncer_password_hash>`:
 
-   - `POSTGRESQL_PASSWORD_HASH` - The value output from the previous step
-   - `APPLICATION_SERVER_IP_BLOCKS` - A space delimited list of IP subnets or IP
-     addresses of the GitLab application servers that will connect to the
-     database. Example: `%w(123.123.123.123/32 123.123.123.234/32)`
+   ```shell
+   sudo gitlab-ctl pg-password-md5 pgbouncer
+   ```
+
+1. On the primary database node, edit `/etc/gitlab/gitlab.rb` replacing values noted in the `# START user configuration` section:
 
    ```ruby
-   # Disable all components except PostgreSQL
+   # Disable all components except PostgreSQL and Repmgr and Consul
    roles ['postgres_role']
-   repmgr['enable'] = false
-   consul['enable'] = false
-   prometheus['enable'] = false
-   alertmanager['enable'] = false
-   pgbouncer_exporter['enable'] = false
-   redis_exporter['enable'] = false
-   gitlab_exporter['enable'] = false
 
-   # Set the network addresses that the exporters used for monitoring will listen on
-   node_exporter['listen_address'] = '0.0.0.0:9100'
-   postgres_exporter['listen_address'] = '0.0.0.0:9187'
-   postgres_exporter['dbname'] = 'gitlabhq_production'
-   postgres_exporter['password'] = 'POSTGRESQL_PASSWORD_HASH'
-
-   # Set the PostgreSQL address and port
+   # PostgreSQL configuration
    postgresql['listen_address'] = '0.0.0.0'
-   postgresql['port'] = 5432
-
-   # Replace POSTGRESQL_PASSWORD_HASH with a generated md5 value
-   postgresql['sql_user_password'] = 'POSTGRESQL_PASSWORD_HASH'
-
-   # Replace APPLICATION_SERVER_IP_BLOCK with the CIDR address of the application node
-   postgresql['trust_auth_cidr_addresses'] = %w(127.0.0.1/32 APPLICATION_SERVER_IP_BLOCK)
+   postgresql['hot_standby'] = 'on'
+   postgresql['wal_level'] = 'replica'
+   postgresql['shared_preload_libraries'] = 'repmgr_funcs'
 
    # Disable automatic database migrations
    gitlab_rails['auto_migrate'] = false
+
+   # Configure the Consul agent
+   consul['services'] = %w(postgresql)
+
+   # START user configuration
+   # Please set the real values as explained in Required Information section
+   #
+   # Replace PGBOUNCER_PASSWORD_HASH with a generated md5 value
+   postgresql['pgbouncer_user_password'] = '<pgbouncer_password_hash>'
+   # Replace POSTGRESQL_PASSWORD_HASH with a generated md5 value
+   postgresql['sql_user_password'] = '<postgresql_password_hash>'
+   # Set `max_wal_senders` to one more than the number of database nodes in the cluster.
+   # This is used to prevent replication from using up all of the
+   # available database connections.
+   postgresql['max_wal_senders'] = 4
+   postgresql['max_replication_slots'] = 4
+
+   # Replace XXX.XXX.XXX.XXX/YY with Network Address
+   postgresql['trust_auth_cidr_addresses'] = %w(10.6.0.0/24)
+   repmgr['trust_auth_cidr_addresses'] = %w(127.0.0.1/32 10.6.0.0/24)
+
+   ## Enable service discovery for Prometheus
+   consul['monitoring_service_discovery'] =  true
+
+   # Set the network addresses that the exporters will listen on for monitoring
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   postgres_exporter['listen_address'] = '0.0.0.0:9187'
+
+   ## The IPs of the Consul server nodes
+   ## You can also use FQDNs and intermix them with IPs
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
+   }
+   #
+   # END user configuration
    ```
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
-1. Note the PostgreSQL node's IP address or hostname, port, and
-   plain text password. These will be necessary when configuring the [GitLab
-   application server](#configure-gitlab-rails) later.
+
+<div align="right">
+  <a type="button" class="btn btn-default" href="#setup-components">
+    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+  </a>
+</div>
+
+#### PostgreSQL secondary nodes
+
+1. On both the secondary nodes, add the same configuration specified above for the primary node
+   with an additional setting that will inform `gitlab-ctl` that they are standby nodes initially
+   and there's no need to attempt to register them as a primary node:
+
+   ```ruby
+   # Disable all components except PostgreSQL and Repmgr and Consul
+   roles ['postgres_role']
+
+   # PostgreSQL configuration
+   postgresql['listen_address'] = '0.0.0.0'
+   postgresql['hot_standby'] = 'on'
+   postgresql['wal_level'] = 'replica'
+   postgresql['shared_preload_libraries'] = 'repmgr_funcs'
+
+   # Disable automatic database migrations
+   gitlab_rails['auto_migrate'] = false
+
+   # Configure the Consul agent
+   consul['services'] = %w(postgresql)
+
+   # Specify if a node should attempt to be primary on initialization.
+   repmgr['master_on_initialization'] = false
+
+   # START user configuration
+   # Please set the real values as explained in Required Information section
+   #
+   # Replace PGBOUNCER_PASSWORD_HASH with a generated md5 value
+   postgresql['pgbouncer_user_password'] = '<pgbouncer_password_hash>'
+   # Replace POSTGRESQL_PASSWORD_HASH with a generated md5 value
+   postgresql['sql_user_password'] = '<postgresql_password_hash>'
+   # Set `max_wal_senders` to one more than the number of database nodes in the cluster.
+   # This is used to prevent replication from using up all of the
+   # available database connections.
+   postgresql['max_wal_senders'] = 4
+   postgresql['max_replication_slots'] = 4
+
+   # Replace XXX.XXX.XXX.XXX/YY with Network Address
+   postgresql['trust_auth_cidr_addresses'] = %w(10.6.0.0/24)
+   repmgr['trust_auth_cidr_addresses'] = %w(127.0.0.1/32 10.6.0.0/24)
+
+   ## Enable service discovery for Prometheus
+   consul['monitoring_service_discovery'] =  true
+
+   # Set the network addresses that the exporters will listen on for monitoring
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   postgres_exporter['listen_address'] = '0.0.0.0:9187'
+
+   ## The IPs of the Consul server nodes
+   ## You can also use FQDNs and intermix them with IPs
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
+   }
+   #
+   # END user configuration
+
+   ```
+
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 Advanced [configuration options](https://docs.gitlab.com/omnibus/settings/database.html)
 are supported and can be added if needed.
+
+<div align="right">
+  <a type="button" class="btn btn-default" href="#setup-components">
+    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+  </a>
+</div>
+
+### PostgreSQL post-configuration
+
+SSH into the **primary node**:
+
+1. Open a database prompt:
+
+   ```shell
+   gitlab-psql -d gitlabhq_production
+   ```
+
+1. Enable the `pg_trgm` extension:
+
+   ```shell
+   CREATE EXTENSION pg_trgm;
+   ```
+
+1. Exit the database prompt by typing `\q` and Enter.
+
+1. Verify the cluster is initialized with one node:
+
+   ```shell
+   gitlab-ctl repmgr cluster show
+   ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+   Role      | Name     | Upstream | Connection String
+   ----------+----------|----------|----------------------------------------
+   * master  | HOSTNAME |          | host=HOSTNAME user=gitlab_repmgr dbname=gitlab_repmgr
+   ```
+
+1. Note down the hostname or IP address in the connection string: `host=HOSTNAME`. We will
+   refer to the hostname in the next section as `<primary_node_name>`. If the value
+   is not an IP address, it will need to be a resolvable name (via DNS or
+   `/etc/hosts`)
+
+SSH into the **secondary node**:
+
+1. Set up the repmgr standby:
+
+   ```shell
+   gitlab-ctl repmgr standby setup <primary_node_name>
+   ```
+
+   Do note that this will remove the existing data on the node. The command
+   has a wait time.
+
+   The output should be similar to the following:
+
+   ```console
+   Doing this will delete the entire contents of /var/opt/gitlab/postgresql/data
+   If this is not what you want, hit Ctrl-C now to exit
+   To skip waiting, rerun with the -w option
+   Sleeping for 30 seconds
+   Stopping the database
+   Removing the data
+   Cloning the data
+   Starting the database
+   Registering the node with the cluster
+   ok: run: repmgrd: (pid 19068) 0s
+   ```
+
+1. Verify the node now appears in the cluster:
+
+   ```shell
+   gitlab-ctl repmgr cluster show
+   ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+   Role      | Name    | Upstream  | Connection String
+   ----------+---------|-----------|------------------------------------------------
+   * master  | MASTER  |           | host=MASTER_NODE_NAME user=gitlab_repmgr dbname=gitlab_repmgr
+     standby | STANDBY | MASTER    | host=STANDBY_HOSTNAME user=gitlab_repmgr dbname=gitlab_repmgr
+     standby | STANDBY | MASTER    | host=STANDBY_HOSTNAME user=gitlab_repmgr dbname=gitlab_repmgr
+   ```
+
+### Database checkpoint
+
+Before moving on, make sure the databases are configured correctly. Run the
+following command on the **primary** node to verify that replication is working
+properly:
+
+```shell
+gitlab-ctl repmgr cluster show
+```
+
+The output should be similar to:
+
+```plaintext
+Role      | Name         | Upstream     | Connection String
+----------+--------------|--------------|--------------------------------------------------------------------
+* master  | MASTER  |        | host=MASTER port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
+  standby | STANDBY | MASTER | host=STANDBY port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
+  standby | STANDBY | MASTER | host=STANDBY port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
+```
+
+If the 'Role' column for any node says "FAILED", check the
+[Troubleshooting section](#troubleshooting) before proceeding.
+
+Also, check that the check master command works successfully on each node:
+
+```shell
+su - gitlab-consul
+gitlab-ctl repmgr-check-master || echo 'This node is a standby repmgr node'
+```
+
+This command relies on exit codes to tell Consul whether a particular node is a master
+or secondary. The most important thing here is that this command does not produce errors.
+If there are errors it's most likely due to incorrect `gitlab-consul` database user permissions.
+Check the [Troubleshooting section](#troubleshooting) before proceeding.
+
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -937,10 +1154,12 @@ On each node perform the following:
    nginx['enable'] = true
 
    ## PostgreSQL connection details
-   gitlab_rails['db_adapter'] = 'postgresql'
-   gitlab_rails['db_encoding'] = 'unicode'
-   gitlab_rails['db_host'] = '10.1.0.5' # IP/hostname of database server
-   gitlab_rails['db_password'] = 'DB password'
+   # Disable PostgreSQL on the application node
+   postgresql['enable'] = false
+   gitlab_rails['db_host'] = '10.6.0.20' # internal load balancer IP
+   gitlab_rails['db_port'] = 6432
+   gitlab_rails['db_password'] = '<postgresql_user_password>'
+   gitlab_rails['auto_migrate'] = false
 
    ## Redis connection details
    ## Must be the same in every sentinel node
@@ -1014,6 +1233,21 @@ above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
 certificates are not present, NGINX will fail to start. See the
 [NGINX documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
 for more information.
+
+### GitLab Rails post-configuration
+
+Ensure that all migrations ran:
+
+```shell
+gitlab-rake gitlab:db:configure
+```
+
+NOTE: **Note:**
+If you encounter a `rake aborted!` error stating that PgBouncer is failing to connect to
+PostgreSQL it may be that your PgBouncer node's IP address is missing from
+PostgreSQL's `trust_auth_cidr_addresses` in `gitlab.rb` on your database nodes. See
+[PgBouncer error `ERROR:  pgbouncer cannot connect to server`](#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
+in the Troubleshooting section before proceeding.
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
