@@ -31,15 +31,15 @@ describe('first class instance security dashboard empty state', () => {
   });
 
   it('contains a GlEmptyState', () => {
-    expect(findGlEmptyState().exists()).toEqual(true);
+    expect(findGlEmptyState().exists()).toBe(true);
   });
 
   it('contains a GlLink with href attribute equal to dashboardDocumentation', () => {
-    expect(findLink().attributes('href')).toEqual(dashboardDocumentation);
+    expect(findLink().attributes('href')).toBe(dashboardDocumentation);
   });
 
   it('contains a GlButton', () => {
-    expect(findButton().exists()).toEqual(true);
+    expect(findButton().exists()).toBe(true);
   });
 
   it('emits `handleAddProjectsClick` on button click', async () => {

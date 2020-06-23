@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlEmptyState, GlButton } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import FirstClassInstanceDashboard from 'ee/security_dashboard/components/first_class_instance_security_dashboard.vue';
 import FirstClassInstanceVulnerabilities from 'ee/security_dashboard/components/first_class_instance_security_dashboard_vulnerabilities.vue';
@@ -8,6 +8,7 @@ import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vul
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import ProjectManager from 'ee/security_dashboard/components/first_class_project_manager/project_manager.vue';
+import EmptyState from 'ee/security_dashboard/components/empty_states/first_class_instance_security_dashboard.vue';
 
 describe('First Class Instance Dashboard Component', () => {
   let wrapper;
@@ -24,7 +25,7 @@ describe('First Class Instance Dashboard Component', () => {
   const findVulnerabilityChart = () => wrapper.find(VulnerabilityChart);
   const findCsvExportButton = () => wrapper.find(CsvExportButton);
   const findProjectManager = () => wrapper.find(ProjectManager);
-  const findEmptyState = () => wrapper.find(GlEmptyState);
+  const findEmptyState = () => wrapper.find(EmptyState);
   const findFilters = () => wrapper.find(Filters);
 
   const createWrapper = ({ data = {}, stubs }) => {
@@ -102,7 +103,7 @@ describe('First Class Instance Dashboard Component', () => {
         data: {
           isManipulatingProjects: false,
           stubs: {
-            GlEmptyState,
+            EmptyState,
             GlButton,
           },
         },
@@ -110,7 +111,10 @@ describe('First Class Instance Dashboard Component', () => {
     });
 
     it('renders the empty state', () => {
-      expect(findEmptyState().props('title')).toBe('Add a project to your dashboard');
+      expect(findEmptyState().props()).toEqual({
+        svgPath: emptyStateSvgPath,
+        dashboardDocumentation,
+      });
     });
 
     it('does not render the vulnerability list', () => {
