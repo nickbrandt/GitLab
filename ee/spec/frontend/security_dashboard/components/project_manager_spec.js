@@ -7,7 +7,7 @@ import createDefaultState from 'ee/security_dashboard/store/modules/project_sele
 import { GlDeprecatedButton } from '@gitlab/ui';
 
 import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
-import ProjectList from 'ee/security_dashboard/components/project_list.vue';
+import ProjectList from 'ee/security_dashboard/components/first_class_project_manager/project_list.vue';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 
 const localVue = createLocalVue();

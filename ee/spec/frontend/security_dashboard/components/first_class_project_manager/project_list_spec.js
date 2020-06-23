@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
 import { GlDeprecatedBadge as GlBadge, GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
-import ProjectList from 'ee/security_dashboard/components/project_list.vue';
+import ProjectList from 'ee/security_dashboard/components/first_class_project_manager/project_list.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
 const getArrayWithLength = n => [...Array(n).keys()];
@@ -67,7 +67,7 @@ describe('Project List component', () => {
     ).toBe(true);
   });
 
-  it('renders a project-item with the project name', () => {
+  it('renders a project-item with a project name', () => {
     const projectNameWithNamespace = 'foo';
 
     factory({
@@ -77,6 +77,15 @@ describe('Project List component', () => {
     expect(getFirstProjectItem().text()).toContain(projectNameWithNamespace);
   });
 
+  it('renders a project-item with a GraphQL project name', () => {
+    const projectNameWithNamespace = 'foo';
+
+    factory({
+      projects: generateMockProjects(1, { nameWithNamespace: projectNameWithNamespace }),
+    });
+
+    expect(getFirstProjectItem().text()).toContain(projectNameWithNamespace);
+  });
   it('renders a project-item with a remove button', () => {
     factory({ projects: generateMockProjects(1) });
 

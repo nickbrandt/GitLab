@@ -20115,6 +20115,9 @@ msgstr ""
 msgid "SecurityReports|There was an error while generating the report."
 msgstr ""
 
+msgid "SecurityReports|Unable to add %{invalidProjectsMessage}"
+msgstr ""
+
 msgid "SecurityReports|Unable to add %{invalidProjects}"
 msgstr ""
 

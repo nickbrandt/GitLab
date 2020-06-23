@@ -57,7 +57,6 @@ export default {
       result({ data, loading }) {
         this.isFirstResultLoading = loading;
         this.pageInfo = data.vulnerabilities.pageInfo;
-        this.$emit('projectFetch', data.instanceSecurityDashboard.projects.nodes);
       },
       error() {
         this.errorLoadingVulnerabilities = true;

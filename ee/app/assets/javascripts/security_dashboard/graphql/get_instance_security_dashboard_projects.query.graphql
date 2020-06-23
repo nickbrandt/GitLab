@@ -1,6 +1,6 @@
 #import "ee/security_dashboard/graphql/project.fragment.graphql"
 
-query getInstanceSecurityDashboardProjects {
+query projectsQuery {
   instanceSecurityDashboard {
     projects {
       nodes {
