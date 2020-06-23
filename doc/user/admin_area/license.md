@@ -112,7 +112,7 @@ If you originally installed Community Edition rather than Enterprise Edition you
 [upgrade to Enterprise Edition](../../update/README.md#community-to-enterprise-edition)
 before uploading your license.
 
-GitLab.com users won't be able to upload and use a self-managed license. If you
+GitLab.com users cannot upload and use a self-managed license. If you
 wish to use paid features on GitLab.com, a separate subscription may be
 [purchased](../../subscriptions/index.md#subscribe-to-gitlabcom).
 
