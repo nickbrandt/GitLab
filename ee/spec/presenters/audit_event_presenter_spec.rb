@@ -61,9 +61,19 @@ RSpec.describe AuditEventPresenter do
         end
       end
 
-      context 'when `author_name` is included in the details' do
+      context 'when author_name is set in the author_name column' do
+        it 'shows the author name as provided in the database column' do
+          expect(presenter.author_name).to eq('Jane Doe')
+        end
+      end
+
+      context 'when `author_name` is included in the details and not in the author_name column' do
+        before do
+          audit_event.update!(author_name: nil)
+        end
+
         it 'shows the author name as provided in the details' do
-          expect(presenter.author_name).to eq('author')
+          expect(presenter.author_name).to eq(details[:author_name])
         end
       end
     end
@@ -73,7 +83,11 @@ RSpec.describe AuditEventPresenter do
         audit_event.author_id = -1
       end
 
-      context 'when `author_name` is not included in details' do
+      context 'when `author_name` is not included in details and not in the author_name column' do
+        before do
+          audit_event.update!(author_name: nil)
+        end
+
         let(:details) do
           {
             author_name: nil,
@@ -90,7 +104,11 @@ RSpec.describe AuditEventPresenter do
         end
       end
 
-      context 'when `author_name` is included in details' do
+      context 'when `author_name` is included in details and not in the author_name column' do
+        before do
+          audit_event.update!(author_name: nil)
+        end
+
         it 'shows the author name as provided in the details' do
           expect(presenter.author_name).to eq('author')
         end

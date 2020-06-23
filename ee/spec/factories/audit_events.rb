@@ -9,6 +9,7 @@ FactoryBot.define do
     entity_type { 'User' }
     entity_id   { target_user.id }
     ip_address { IPAddr.new '127.0.0.1' }
+    author_name { 'Jane Doe' }
     details do
       {
         change: 'email address',

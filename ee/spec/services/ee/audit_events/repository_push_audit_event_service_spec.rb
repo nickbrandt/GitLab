@@ -20,6 +20,7 @@ RSpec.describe EE::AuditEvents::RepositoryPushAuditEventService do
     let(:attrs) do
       {
         author_id: user.id,
+        author_name: user.name,
         entity_id: entity.id,
         entity_type: entity_type,
         type: 'SecurityEvent',
