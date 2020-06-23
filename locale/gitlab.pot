@@ -957,9 +957,6 @@ msgstr ""
 msgid "A .NET Core console application template, customizable for any .NET Core project"
 msgstr ""
 
-msgid "A DAG must have two dependent jobs to be visualized on this tab."
-msgstr ""
-
 msgid "A GitBook site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features."
 msgstr ""
 
@@ -7098,6 +7095,9 @@ msgid "CycleAnalytics|stage dropdown"
 msgstr ""
 
 msgid "DAG"
+msgstr ""
+
+msgid "DAG visualization requires at least 3 dependent jobs."
 msgstr ""
 
 msgid "DNS"
