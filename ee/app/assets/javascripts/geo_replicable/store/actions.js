@@ -10,7 +10,7 @@ import {
 import packageFilesQuery from '../graphql/package_files.query.graphql';
 import { gqClient } from '../utils';
 import * as types from './mutation_types';
-import { FILTER_STATES, PREV, NEXT } from '../constants';
+import { FILTER_STATES, PREV, NEXT, DEFAULT_PAGE_SIZE } from '../constants';
 
 // Fetch Replicable Items
 export const requestReplicableItems = ({ commit }) => commit(types.REQUEST_REPLICABLE_ITEMS);
@@ -37,8 +37,14 @@ export const fetchReplicableItemsGraphQl = ({ state, dispatch }, direction) => {
   let before = '';
   let after = '';
 
+  // If we are going backwards we want the last 20, otherwise get the first 20.
+  let first = DEFAULT_PAGE_SIZE;
+  let last = null;
+
   if (direction === PREV) {
     before = state.paginationData.startCursor;
+    first = null;
+    last = DEFAULT_PAGE_SIZE;
   } else if (direction === NEXT) {
     after = state.paginationData.endCursor;
   }
@@ -46,12 +52,15 @@ export const fetchReplicableItemsGraphQl = ({ state, dispatch }, direction) => {
   gqClient
     .query({
       query: packageFilesQuery,
-      variables: { before, after },
+      variables: { first, last, before, after },
     })
     .then(res => {
       const registries = res.data.geoNode.packageFileRegistries;
       const data = registries.edges.map(e => e.node);
-      const pagination = registries.pageInfo;
+      const pagination = {
+        ...registries.pageInfo,
+        page: state.paginationData.page,
+      };
 
       dispatch('receiveReplicableItemsSuccess', { data, pagination });
     })

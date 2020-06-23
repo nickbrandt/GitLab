@@ -6,7 +6,7 @@ import Api from 'ee/api';
 import * as actions from 'ee/geo_replicable/store/actions';
 import * as types from 'ee/geo_replicable/store/mutation_types';
 import createState from 'ee/geo_replicable/store/state';
-import { ACTION_TYPES, PREV, NEXT } from 'ee/geo_replicable/constants';
+import { ACTION_TYPES, PREV, NEXT, DEFAULT_PAGE_SIZE } from 'ee/geo_replicable/constants';
 import { gqClient } from 'ee/geo_replicable/utils';
 import packageFilesQuery from 'ee/geo_replicable/graphql/package_files.query.graphql';
 import {
@@ -121,6 +121,7 @@ describe('GeoReplicable Store Actions', () => {
           data: MOCK_BASIC_GRAPHQL_QUERY_RESPONSE,
         });
         state.paginationData = MOCK_GRAPHQL_PAGINATION_DATA;
+        state.paginationData.page = 1;
       });
 
       describe('with no direction set', () => {
@@ -128,7 +129,7 @@ describe('GeoReplicable Store Actions', () => {
         const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
         const data = registries.edges.map(e => e.node);
 
-        it('should call gqClient with no before/after variables', () => {
+        it('should call gqClient with no before/after variables as well as a first variable but no last variable', () => {
           testAction(
             actions.fetchReplicableItemsGraphQl,
             direction,
@@ -143,7 +144,7 @@ describe('GeoReplicable Store Actions', () => {
             () => {
               expect(gqClient.query).toHaveBeenCalledWith({
                 query: packageFilesQuery,
-                variables: { before: '', after: '' },
+                variables: { before: '', after: '', first: DEFAULT_PAGE_SIZE, last: null },
               });
             },
           );
@@ -155,7 +156,7 @@ describe('GeoReplicable Store Actions', () => {
         const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
         const data = registries.edges.map(e => e.node);
 
-        it('should call gqClient with after variable but no before variable', () => {
+        it('should call gqClient with after variable but no before variable as well as a first variable but no last variable', () => {
           testAction(
             actions.fetchReplicableItemsGraphQl,
             direction,
@@ -170,7 +171,12 @@ describe('GeoReplicable Store Actions', () => {
             () => {
               expect(gqClient.query).toHaveBeenCalledWith({
                 query: packageFilesQuery,
-                variables: { before: '', after: MOCK_GRAPHQL_PAGINATION_DATA.endCursor },
+                variables: {
+                  before: '',
+                  after: MOCK_GRAPHQL_PAGINATION_DATA.endCursor,
+                  first: DEFAULT_PAGE_SIZE,
+                  last: null,
+                },
               });
             },
           );
@@ -182,7 +188,7 @@ describe('GeoReplicable Store Actions', () => {
         const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
         const data = registries.edges.map(e => e.node);
 
-        it('should call gqClient with before variable but no after variable', () => {
+        it('should call gqClient with before variable but no after variable as well as a last variable but no first variable', () => {
           testAction(
             actions.fetchReplicableItemsGraphQl,
             direction,
@@ -197,7 +203,12 @@ describe('GeoReplicable Store Actions', () => {
             () => {
               expect(gqClient.query).toHaveBeenCalledWith({
                 query: packageFilesQuery,
-                variables: { before: MOCK_GRAPHQL_PAGINATION_DATA.startCursor, after: '' },
+                variables: {
+                  before: MOCK_GRAPHQL_PAGINATION_DATA.startCursor,
+                  after: '',
+                  first: null,
+                  last: DEFAULT_PAGE_SIZE,
+                },
               });
             },
           );
