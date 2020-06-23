@@ -21,18 +21,18 @@ following the [2,000-user reference architecture](2k_users.md).
 
 | Service                                                      | Nodes | Configuration                   | GCP             | AWS                     | Azure          |
 |--------------------------------------------------------------|-------|---------------------------------|-----------------|-------------------------|----------------|
-| GitLab Rails                                                 | 3     | 8 vCPU, 7.2GB Memory            | `n1-highcpu-8`  | `c5.2xlarge`            | F8s v2         |
-| PostgreSQL                                                   | 3     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | D2s v3         |
-| PgBouncer                                                    | 3     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
-| Gitaly                                                       | 2     | 4 vCPU, 15GB Memory             | `n1-standard-4` | `m5.xlarge`             | D4s v3         |
+| External load balancing node                                 | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
 | Redis                                                        | 3     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | D2s v3         |
 | Consul + Sentinel                                            | 3     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
+| PostgreSQL                                                   | 3     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | D2s v3         |
+| PgBouncer                                                    | 3     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
+| Internal load balancing node                                 | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
+| Gitaly                                                       | 2 minimum     | 4 vCPU, 15GB Memory             | `n1-standard-4` | `m5.xlarge`             | D4s v3         |
 | Sidekiq                                                      | 4     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | D2s v3         |
+| GitLab Rails                                                 | 3     | 8 vCPU, 7.2GB Memory            | `n1-highcpu-8`  | `c5.2xlarge`            | F8s v2         |
+| Monitoring node                                              | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
 | Object Storage                                               | n/a   | n/a                             | n/a             | n/a                     | n/a            |
 | NFS Server                                                   | 1     | 4 vCPU, 3.6GB Memory            | `n1-highcpu-4`  | `c5.xlarge`             | F4s v2         |
-| Monitoring node                                              | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
-| External load balancing node ([6](#footnotes))               | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
-| Internal load balancing node ([6](#footnotes))               | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
 
 The architectures were built and tested with the [Intel Xeon E5 v3 (Haswell)](https://cloud.google.com/compute/docs/cpu-platforms)
 CPU platform on GCP. On different hardware you may find that adjustments, either lower
@@ -50,27 +50,60 @@ in the table above.
 
 ## Setup components
 
-To set up GitLab and its components to accommodate up to 2,000 users:
+To set up GitLab and its components to accommodate up to 3,000 users:
 
-1. [Configure the external load balancing node](#configure-the-load-balancer)
+1. [Configure the external load balancing node](#configure-the-external-load-balancer)
    that will handle the load balancing of the two GitLab application services nodes.
+1. [Configure Redis](#configure-redis).
+1. [Configure Consul and Sentinel](#configure-consul-and-sentinel).
+1. [Configure PostgreSQL](#configure-postgresql), the database for GitLab.
+1. [Configure PgBouncer](#configure-pgbouncer).
+1. [Configure the internal load balancing node](#configure-the-internal-load-balancer)
+1. [Configure Gitaly](#configure-gitaly),
+   which provides access to the Git repositories.
+1. [Configure Sidekiq](#configure-sidekiq).
+1. [Configure the main GitLab Rails application](#configure-gitlab-rails)
+   to run Puma/Unicorn, Workhorse, GitLab Shell, and to serve all frontend requests (UI, API, Git
+   over HTTP/SSH).
+1. [Configure Prometheus](#configure-prometheus) to monitor your GitLab environment.
 1. [Configure the Object Storage](#configure-the-object-storage)
    used for shared data objects.
 1. [Configure NFS (Optional)](#configure-nfs-optional)
    to have shared disk storage service as an alternative to Gitaly and/or Object Storage (although
    not recommended). NFS is required for GitLab Pages, you can skip this step if you're not using
    that feature.
-1. [Configure PostgreSQL](#configure-postgresql),
-   the database for GitLab.
-1. [Configure Redis](#configure-redis).
-1. [Configure Gitaly](#configure-gitaly),
-   which provides access to the Git repositories.
-1. [Configure the main GitLab Rails application](#configure-gitlab-rails)
-   to run Puma/Unicorn, Workhorse, GitLab Shell, and to serve all frontend requests (UI, API, Git
-   over HTTP/SSH).
-1. [Configure Prometheus](#configure-prometheus) to monitor your GitLab environment.
 
-## Configure the load balancer
+We start with all servers on the same 10.6.0.0/16 private network range, they
+can connect to each other freely on those addresses.
+
+Here is a list and description of each machine and the assigned IP:
+
+- `10.6.0.10`: External Load Balancer
+- `10.6.0.61`: Redis 1
+- `10.6.0.62`: Redis 2
+- `10.6.0.63`: Redis 3
+- `10.6.0.11`: Consul/Sentinel 1
+- `10.6.0.12`: Consul/Sentinel 2
+- `10.6.0.13`: Consul/Sentinel 3
+- `10.6.0.31`: PostgreSQL primary
+- `10.6.0.32`: PostgreSQL secondary 1
+- `10.6.0.33`: PostgreSQL secondary 2
+- `10.6.0.21`: PgBouncer 1
+- `10.6.0.22`: PgBouncer 2
+- `10.6.0.23`: PgBouncer 3
+- `10.6.0.20`: Internal Load Balancer
+- `10.6.0.51`: Gitaly 1
+- `10.6.0.52`: Gitaly 2
+- `10.6.0.71`: Sidekiq 1
+- `10.6.0.72`: Sidekiq 2
+- `10.6.0.73`: Sidekiq 3
+- `10.6.0.74`: Sidekiq 4
+- `10.6.0.41`: GitLab application 1
+- `10.6.0.42`: GitLab application 2
+- `10.6.0.43`: GitLab application 3
+- `10.6.0.81`: Prometheus
+
+## Configure the external load balancer
 
 NOTE: **Note:**
 This architecture has been tested and validated with [HAProxy](https://www.haproxy.org/)
