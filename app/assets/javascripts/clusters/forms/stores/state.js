@@ -4,6 +4,8 @@ export default (initialState = {}) => {
   return {
     enabled: parseBoolean(initialState.enabled),
     editable: parseBoolean(initialState.editable),
+    multiple: parseBoolean(initialState.multiple_clusters),
+   
   }
 };
   

@@ -5,7 +5,7 @@ import { createStore } from '../stores'
 
 export default () => {
     const entryPoint = document.querySelector('#js-cluster-integration-form')
-
+    console.log(entryPoint)
     if(!entryPoint) {
         return;
     }

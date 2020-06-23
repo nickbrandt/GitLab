@@ -30,10 +30,11 @@ module ClustersHelper
     }
   end
 
-  def js_cluster_form_data(cluster, can_edit) 
+  def js_cluster_form_data(cluster, can_edit, multiple_clusters) 
     {
       enabled: cluster.enabled?.to_s, 
-      editable: can_edit.to_s
+      editable: can_edit.to_s,
+      multiple_clusters: multiple_clusters.to_s
     }
   end
 
