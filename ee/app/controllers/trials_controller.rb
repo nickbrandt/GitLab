@@ -5,7 +5,7 @@ class TrialsController < ApplicationController
 
   layout 'trial'
 
-  before_action :check_if_gl_com
+  before_action :check_if_gl_com_or_dev
   before_action :authenticate_user!
   before_action :find_or_create_namespace, only: :apply
 
