@@ -38,12 +38,11 @@ const fakeStore = ({ initialGetters, initialState }) =>
   });
 
 describe('TypeOfWorkCharts', () => {
-  function createComponent({ stubs = {}, initialGetters, initialState, props = {} } = {}) {
+  function createComponent({ stubs = {}, initialGetters, initialState } = {}) {
     return shallowMount(TypeOfWorkCharts, {
       localVue,
       store: fakeStore({ initialGetters, initialState }),
       methods: actionSpies,
-      propsData: { canSelectLabels: true, ...props },
       stubs: {
         TasksByTypeChart: true,
         TasksByTypeFilters: true,
@@ -129,33 +128,6 @@ describe('TypeOfWorkCharts', () => {
 
     it('renders loading icon', () => {
       expect(findLoader(wrapper).exists()).toBe(true);
-    });
-  });
-
-  describe('canSelectLabels', () => {
-    describe('set to true', () => {
-      beforeEach(() => {
-        wrapper = createComponent({
-          stubs: { TasksByTypeFilters, LabelsSelector: true },
-        });
-      });
-
-      it('does not set the labels selector to inactive', () => {
-        expect(findLabelSelectorFilter(wrapper).attributes('inactive')).toBeUndefined();
-      });
-    });
-
-    describe('set to false', () => {
-      beforeEach(() => {
-        wrapper = createComponent({
-          props: { canSelectLabels: false },
-          stubs: { TasksByTypeFilters, LabelsSelector: true },
-        });
-      });
-
-      it('sets the labels selector to inactive', () => {
-        expect(findLabelSelectorFilter(wrapper).attributes('inactive')).toBe('true');
-      });
     });
   });
 });
