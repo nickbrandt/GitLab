@@ -36,10 +36,7 @@ export default {
   <div class="order-summary d-flex flex-column flex-grow-1 prepend-top-5 mt-lg-5">
     <div class="d-lg-none">
       <div @click="toggleCollapse">
-        <h4
-          class="d-flex justify-content-between gl-font-lg"
-          :class="{ 'prepend-bottom-32': !collapsed }"
-        >
+        <h4 class="d-flex justify-content-between gl-font-lg" :class="{ 'gl-mb-7': !collapsed }">
           <div class="d-flex">
             <gl-icon v-if="collapsed" name="chevron-right" :size="18" />
             <gl-icon v-else name="chevron-down" :size="18" />

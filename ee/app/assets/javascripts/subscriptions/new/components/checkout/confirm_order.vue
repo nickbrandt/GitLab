@@ -25,7 +25,7 @@ export default {
 };
 </script>
 <template>
-  <div v-if="isActive" class="full-width prepend-bottom-32">
+  <div v-if="isActive" class="full-width gl-mb-7">
     <gl-deprecated-button :disabled="isConfirmingOrder" variant="success" @click="confirmOrder">
       <gl-loading-icon v-if="isConfirmingOrder" inline size="sm" />
       {{ isConfirmingOrder ? $options.i18n.confirming : $options.i18n.confirm }}
