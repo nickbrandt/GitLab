@@ -159,7 +159,7 @@ The production build takes a few minutes to be completed; any code change at thi
 displayed only after executing the item 3 above again.
 To return to the normal development mode:
 
-1. edit `gitlab.yaml` and set `webpack => dev_server => enabled: true`
+1. Open `gitlab.yaml` located in your `gitlab` installation folder, scroll down to the `webpack` section and change back `dev_server` to `enabled: true`.
 1. (Optional) `yarn clean`
 1. Start webpack again: `gdk start webpack`.
 1. Restart GDK: `gdk-restart rails-web`
