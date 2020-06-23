@@ -161,5 +161,5 @@ To return to the normal `development` mode:
 
 1. edit `gitlab.yaml` and set `webpack => dev_server => enabled: true`
 1. (Optional) `yarn clean`
-1. `gdk start webpack`
+1. Start webpack again: `gdk start webpack`.
 1. `gdk-restart rails-web`
