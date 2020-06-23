@@ -164,6 +164,12 @@ module AlertManagement
       project.execute_services(hook_data, :alert_hooks)
     end
 
+    def present
+      return super(presenter_class: AlertManagement::PrometheusAlertPresenter) if prometheus?
+
+      super
+    end
+
     private
 
     def hook_data

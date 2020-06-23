@@ -47,11 +47,7 @@ module AlertManagement
       end
     end
 
-    def alert_markdown
-      return unless alert.prometheus?
-
-      alerting_alert.alert_markdown
-    end
+    def alert_markdown; end
 
     def metadata_list
       metadata = []
@@ -78,22 +74,14 @@ module AlertManagement
     end
 
     def details_list
-      return alerting_alert.annotation_list if alert.prometheus?
-
       alert.details
         .map { |label, value| list_item(label, value) }
         .join(MARKDOWN_LINE_BREAK)
     end
 
-    def metric_embed_for_alert
-      return unless alert.prometheus?
+    def metric_embed_for_alert; end
 
-      alerting_alert.metric_embed_for_alert
-    end
-
-    def full_query
-      alert.prometheus? ? alerting_alert.full_query : nil
-    end
+    def full_query; end
 
     def list_item(key, value)
       "**#{key}:** #{value}".strip
