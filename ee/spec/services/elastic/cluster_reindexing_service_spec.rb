@@ -5,8 +5,6 @@ require 'spec_helper'
 RSpec.describe Elastic::ClusterReindexingService, :elastic do
   subject { described_class.new }
 
-  let!(:settings) { create(:application_setting) }
-
   context 'job is not in progress' do
     before do
       allow(subject).to receive(:current_job).and_return(nil)
@@ -21,7 +19,7 @@ RSpec.describe Elastic::ClusterReindexingService, :elastic do
       end
 
       it 'pauses elasticsearch indexing' do
-        expect { subject.execute }.to change { ApplicationSetting.current.elasticsearch_pause_indexing }.from(false).to(true)
+        expect { subject.execute }.to change { Gitlab::CurrentSettings.elasticsearch_pause_indexing }.from(false).to(true)
       end
     end
 
@@ -58,7 +56,6 @@ RSpec.describe Elastic::ClusterReindexingService, :elastic do
       allow(subject).to receive(:current_job).and_return(job_info)
       allow(Gitlab::Elastic::Helper.default).to receive(:task_status).and_return({ 'completed' => true })
       allow(Gitlab::Elastic::Helper.default).to receive(:refresh_index).and_return(true)
-      settings.update!(elasticsearch_pause_indexing: true)
     end
 
     context 'stage: initial' do
@@ -79,8 +76,9 @@ RSpec.describe Elastic::ClusterReindexingService, :elastic do
         expect(Gitlab::Elastic::Helper.default).to receive(:update_settings)
         expect(Gitlab::Elastic::Helper.default).to receive(:switch_alias)
         expect(Gitlab::Elastic::Helper.default).to receive(:delete_index).twice
+        expect(Gitlab::CurrentSettings).to receive(:update!).with(elasticsearch_pause_indexing: false)
 
-        expect { subject.execute(stage: :final) }.to change { ApplicationSetting.current.elasticsearch_pause_indexing }.from(true).to(false)
+        subject.execute(stage: :final)
       end
     end
   end

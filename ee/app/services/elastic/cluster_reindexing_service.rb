@@ -4,6 +4,12 @@ module Elastic
   class ClusterReindexingService
     REDIS_KEY = 'elastic:cluster_reindexing_service:job'
 
+    INDEX_OPTIONS = {
+        refresh_interval: -1, # Disable automatic refreshing
+        number_of_replicas: 0,
+        translog: { durability: 'async' }
+    }.freeze
+
     def execute(stage: :initial)
       case stage.to_sym
       when :initial
@@ -43,30 +49,22 @@ module Elastic
       end
     end
 
-    def index_options(for_reindexing:)
-      if for_reindexing
-        {
-          refresh_interval: -1, # Disable automatic refreshing
-          number_of_replicas: 0,
-          translog: { durability: 'async' }
-        }
-      else
-        {
-          refresh_interval: nil, # Change it back to the default
-          number_of_replicas: Gitlab::CurrentSettings.elasticsearch_replicas,
-          translog: { durability: 'request' }
-        }
-      end
+    def default_index_options
+      {
+        refresh_interval: nil, # Change it back to the default
+        number_of_replicas: Gitlab::CurrentSettings.elasticsearch_replicas,
+        translog: { durability: 'request' }
+      }
     end
 
     def initial_stage!
       # Pause indexing
-      ApplicationSetting.current.update!(elasticsearch_pause_indexing: true)
+      Gitlab::CurrentSettings.update!(elasticsearch_pause_indexing: true)
     end
 
     def indexing_stage!
       # Create an index with custom settings
-      index_name = elastic_helper.create_empty_index(with_alias: false, options: { settings: index_options(for_reindexing: true) })
+      index_name = elastic_helper.create_empty_index(with_alias: false, options: { settings: INDEX_OPTIONS })
 
       # Record documents count
       documents_count = elastic_helper.index_size.dig('docs', 'count')
@@ -110,7 +108,7 @@ module Elastic
       raise StandardError, "Documents count is different, #{new_documents_count} != #{old_documents_count}" if old_documents_count != new_documents_count
 
       # Change index settings back
-      elastic_helper.update_settings(index_name: job_info[:index_name], settings: index_options(for_reindexing: false))
+      elastic_helper.update_settings(index_name: job_info[:index_name], settings: default_index_options)
 
       # Switch alias to a new index
       elastic_helper.switch_alias(to: job_info[:index_name])
@@ -119,7 +117,7 @@ module Elastic
       elastic_helper.delete_index(index_name: job_info[:old_index_name])
 
       # Unpause indexing
-      ApplicationSetting.current.update!(elasticsearch_pause_indexing: false)
+      Gitlab::CurrentSettings.update!(elasticsearch_pause_indexing: false)
 
       # Remove job info from redis
       delete_current_job!
@@ -133,7 +131,7 @@ module Elastic
 
     def abort_indexing!(index_name)
       # Unpause indexing
-      ApplicationSetting.current.update!(elasticsearch_pause_indexing: false)
+      Gitlab::CurrentSettings.update!(elasticsearch_pause_indexing: false)
 
       # Remove index
       elastic_helper.delete_index(index_name: index_name) if index_name
