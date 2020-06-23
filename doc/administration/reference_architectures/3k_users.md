@@ -32,7 +32,7 @@ following the [2,000-user reference architecture](2k_users.md).
 | GitLab Rails                                                 | 3     | 8 vCPU, 7.2GB Memory            | `n1-highcpu-8`  | `c5.2xlarge`            | F8s v2         |
 | Monitoring node                                              | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
 | Object Storage                                               | n/a   | n/a                             | n/a             | n/a                     | n/a            |
-| NFS Server                                                   | 1     | 4 vCPU, 3.6GB Memory            | `n1-highcpu-4`  | `c5.xlarge`             | F4s v2         |
+| NFS Server (optional, not recommended)                      | 1     | 4 vCPU, 3.6GB Memory            | `n1-highcpu-4`  | `c5.xlarge`             | F4s v2         |
 
 The architectures were built and tested with the [Intel Xeon E5 v3 (Haswell)](https://cloud.google.com/compute/docs/cpu-platforms)
 CPU platform on GCP. On different hardware you may find that adjustments, either lower
