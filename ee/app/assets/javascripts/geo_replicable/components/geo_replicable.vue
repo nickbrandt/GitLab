@@ -1,6 +1,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import { GlPagination } from '@gitlab/ui';
+import { PREV, NEXT } from '../constants';
 import GeoReplicableItem from './geo_replicable_item.vue';
 
 export default {
@@ -16,12 +17,27 @@ export default {
         return this.paginationData.page;
       },
       set(newVal) {
+        let action;
+        if (this.useGraphQl) {
+          action = this.page > newVal ? PREV : NEXT;
+        }
+
         this.setPage(newVal);
-        this.fetchReplicableItems();
+        this.fetchReplicableItems(action);
       },
     },
-    showRestfulPagination() {
-      return !this.useGraphQl && this.paginationData.total > 0;
+    paginationProps() {
+      if (!this.useGraphQl) {
+        return {
+          perPage: this.paginationData.perPage,
+          totalItems: this.paginationData.total,
+        };
+      }
+
+      return {
+        prevPage: this.paginationData.hasPreviousPage ? this.page - 1 : null,
+        nextPage: this.paginationData.hasNextPage ? this.page + 1 : null,
+      };
     },
   },
   methods: {
@@ -45,12 +61,6 @@ export default {
       :last-verified="item.lastVerifiedAt"
       :last-checked="item.lastCheckedAt"
     />
-    <gl-pagination
-      v-if="showRestfulPagination"
-      v-model="page"
-      :per-page="paginationData.perPage"
-      :total-items="paginationData.total"
-      align="center"
-    />
+    <gl-pagination v-model="page" v-bind="paginationProps" align="center" />
   </section>
 </template>
