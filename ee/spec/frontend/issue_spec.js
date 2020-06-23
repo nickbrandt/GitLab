@@ -98,7 +98,7 @@ describe('Issue', () => {
 
       testContext.$triggeredButton = $btn;
 
-      mockCloseButtonResponseSuccess(testContext.$triggeredButton.attr('href'), {
+      mockCloseButtonResponseSuccess(testContext.$triggeredButton.data('endpoint'), {
         id: 34,
       });
 
