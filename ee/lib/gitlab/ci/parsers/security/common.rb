@@ -53,7 +53,6 @@ module Gitlab
             identifiers = create_identifiers(report, data['identifiers'])
             report.add_occurrence(
               ::Gitlab::Ci::Reports::Security::Occurrence.new(
-                uuid: SecureRandom.uuid,
                 report_type: report.type,
                 name: data['message'],
                 compare_key: data['cve'] || '',

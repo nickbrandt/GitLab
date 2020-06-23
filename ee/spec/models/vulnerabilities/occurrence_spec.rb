@@ -23,7 +23,6 @@ RSpec.describe Vulnerabilities::Occurrence do
 
     it { is_expected.to validate_presence_of(:scanner) }
     it { is_expected.to validate_presence_of(:project) }
-    it { is_expected.to validate_presence_of(:uuid) }
     it { is_expected.to validate_presence_of(:project_fingerprint) }
     it { is_expected.to validate_presence_of(:primary_identifier) }
     it { is_expected.to validate_presence_of(:location_fingerprint) }
@@ -37,7 +36,7 @@ RSpec.describe Vulnerabilities::Occurrence do
 
   context 'database uniqueness' do
     let(:occurrence) { create(:vulnerabilities_occurrence) }
-    let(:new_occurrence) { occurrence.dup.tap { |o| o.uuid = SecureRandom.uuid } }
+    let(:new_occurrence) { occurrence.dup }
 
     it "when all index attributes are identical" do
       expect { new_occurrence.save! }.to raise_error(ActiveRecord::RecordNotUnique)

@@ -30,7 +30,6 @@ FactoryBot.define do
     end
     scanner factory: :ci_reports_security_scanner
     severity { :high }
-    sequence(:uuid) { generate(:vulnerability_occurrence_uuid) }
 
     skip_create
 

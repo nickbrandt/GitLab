@@ -63,7 +63,6 @@ module Vulnerabilities
 
     validates :scanner, presence: true
     validates :project, presence: true
-    validates :uuid, presence: true
 
     validates :primary_identifier, presence: true
     validates :project_fingerprint, presence: true
