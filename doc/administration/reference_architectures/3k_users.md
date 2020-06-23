@@ -634,6 +634,40 @@ are supported and can be added if needed.
 
 ## Configure the internal load balancing node
 
+If you're running more than one PgBouncer node as recommended, then at this time you'll need to set
+up a TCP internal load balancer to serve each correctly.
+
+As an example, here's how you could do it with [HAProxy](https://www.haproxy.org/):
+
+```plaintext
+global
+    log /dev/log local0
+    log localhost local1 notice
+    log stdout format raw local0
+
+defaults
+    log global
+    default-server inter 10s fall 3 rise 2
+    balance leastconn
+
+frontend internal-pgbouncer-tcp-in
+    bind *:6432
+    mode tcp
+    option tcplog
+
+    default_backend pgbouncer
+
+backend pgbouncer
+    mode tcp
+    option tcp-check
+
+    server pgbouncer1 10.6.0.21:6432 check
+    server pgbouncer2 10.6.0.22:6432 check
+    server pgbouncer3 10.6.0.23:6432 check
+```
+
+Refer to your preferred Load Balancer's documentation for further guidance.
+
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
     Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
