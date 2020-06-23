@@ -217,51 +217,89 @@ Configure DNS for an alternate SSH hostname such as `altssh.gitlab.example.com`.
   </a>
 </div>
 
-## Configure the object storage
+## Configure Redis
 
-GitLab supports using an object storage service for holding numerous types of data.
-It's recommended over [NFS](#configure-nfs-optional) and in general it's better
-in larger setups as object storage is typically much more performant, reliable,
-and scalable.
+In this section, you'll be guided through configuring an external Redis instance
+to be used with GitLab.
 
-Object storage options that GitLab has tested, or is aware of customers using include:
+Recommended Redis setup differs depending on the size of the architecture. For
+smaller architectures (less than 3,000 users) a single instance should suffice.
+For medium sized installs (3,000 - 5,000) we suggest one Redis cluster for all
+classes and that Redis Sentinel is hosted alongside Consul. For larger architectures
+(10,000 users or more) we suggest running a separate Redis Cluster for the Cache
+class and another for the Queues and Shared State classes respectively. We also
+recommend that you run the Redis Sentinel clusters separately for each Redis Cluster.
 
-- SaaS/Cloud solutions such as [Amazon S3](https://aws.amazon.com/s3/), [Google cloud storage](https://cloud.google.com/storage).
-- On-premises hardware and appliances from various storage vendors.
-- MinIO. There is [a guide to deploying this](https://docs.gitlab.com/charts/advanced/external-object-storage/minio.html) within our Helm Chart documentation.
+### Provide your own Redis instance
 
-For configuring GitLab to use Object Storage refer to the following guides
-based on what features you intend to use:
+Redis version 5.0 or higher is required, as this is what ships with
+Omnibus GitLab packages starting with GitLab 13.0. Older Redis versions
+do not support an optional count argument to SPOP which is now required for
+[Merge Trains](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md).
 
-1. Configure [object storage for backups](../../raketasks/backup_restore.md#uploading-backups-to-a-remote-cloud-storage).
-1. Configure [object storage for job artifacts](../job_artifacts.md#using-object-storage)
-   including [incremental logging](../job_logs.md#new-incremental-logging-architecture).
-1. Configure [object storage for LFS objects](../lfs/index.md#storing-lfs-objects-in-remote-object-storage).
-1. Configure [object storage for uploads](../uploads.md#using-object-storage-core-only).
-1. Configure [object storage for merge request diffs](../merge_request_diffs.md#using-object-storage).
-1. Configure [object storage for Container Registry](../packages/container_registry.md#container-registry-storage-driver) (optional feature).
-1. Configure [object storage for Mattermost](https://docs.mattermost.com/administration/config-settings.html#file-storage) (optional feature).
-1. Configure [object storage for packages](../packages/index.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
-1. Configure [object storage for Dependency Proxy](../packages/dependency_proxy.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
-1. Configure [object storage for Pseudonymizer](../pseudonymizer.md#configuration) (optional feature). **(ULTIMATE ONLY)**
-1. Configure [object storage for autoscale Runner caching](https://docs.gitlab.com/runner/configuration/autoscale.html#distributed-runners-caching) (optional - for improved performance).
-1. Configure [object storage for Terraform state files](../terraform_state.md#using-object-storage-core-only).
+In addition, GitLab makes use of certain commands like `UNLINK` and `USAGE` which
+were introduced only in Redis 4.
 
-Using separate buckets for each data type is the recommended approach for GitLab.
+Managed Redis from cloud providers such as AWS ElastiCache will work. If these
+services support high availability, be sure it is not the Redis Cluster type.
 
-A limitation of our configuration is that each use of object storage is separately configured.
-[We have an issue for improving this](https://gitlab.com/gitlab-org/gitlab/-/issues/23345)
-and easily using one bucket with separate folders is one improvement that this might bring.
+Note the Redis node's IP address or hostname, port, and password (if required).
+These will be necessary when configuring the
+[GitLab application servers](#configure-gitlab-rails) later.
 
-There is at least one specific issue with using the same bucket:
-when GitLab is deployed with the Helm chart restore from backup
-[will not properly function](https://docs.gitlab.com/charts/advanced/external-object-storage/#lfs-artifacts-uploads-packages-external-diffs-pseudonymizer)
-unless separate buckets are used.
+### Standalone Redis using Omnibus GitLab
 
-One risk of using a single bucket would be if your organization decided to
-migrate GitLab to the Helm deployment in the future. GitLab would run, but the situation with
-backups might not be realized until the organization had a critical requirement for the backups to
-work.
+The Omnibus GitLab package can be used to configure a standalone Redis server.
+The steps below are the minimum necessary to configure a Redis server with
+Omnibus:
+
+1. SSH into the Redis server.
+1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
+   package you want using **steps 1 and 2** from the GitLab downloads page.
+     - Do not complete any other steps on the download page.
+
+1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
+
+   ```ruby
+   ## Enable Redis
+   redis['enable'] = true
+
+   ## Disable all other services
+   sidekiq['enable'] = false
+   gitlab_workhorse['enable'] = false
+   puma['enable'] = false
+   unicorn['enable'] = false
+   postgresql['enable'] = false
+   nginx['enable'] = false
+   prometheus['enable'] = false
+   alertmanager['enable'] = false
+   pgbouncer_exporter['enable'] = false
+   gitlab_exporter['enable'] = false
+   gitaly['enable'] = false
+   grafana['enable'] = false
+
+   redis['bind'] = '0.0.0.0'
+   redis['port'] = 6379
+   redis['password'] = 'SECRET_PASSWORD_HERE'
+
+   gitlab_rails['enable'] = false
+
+   # Set the network addresses that the exporters used for monitoring will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   redis_exporter['listen_address'] = '0.0.0.0:9121'
+   redis_exporter['flags'] = {
+         'redis.addr' => 'redis://0.0.0.0:6379',
+         'redis.password' => 'SECRET_PASSWORD_HERE',
+   }
+   ```
+
+1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+1. Note the Redis node's IP address or hostname, port, and
+   Redis password. These will be necessary when [configuring the GitLab
+   application servers](#configure-gitlab-rails) later.
+
+Advanced [configuration options](https://docs.gitlab.com/omnibus/settings/redis.html)
+are supported and can be added if needed.
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -269,13 +307,7 @@ work.
   </a>
 </div>
 
-## Configure NFS (optional)
-
-[Object storage](#configure-the-object-storage), along with [Gitaly](#configure-gitaly)
-are recommended over NFS wherever possible for improved performance. If you intend
-to use GitLab Pages, this currently [requires NFS](troubleshooting.md#gitlab-pages-requires-nfs).
-
-See how to [configure NFS](../high_availability/nfs.md).
+## Configure Consul and Sentinel
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -371,89 +403,15 @@ are supported and can be added if needed.
   </a>
 </div>
 
-## Configure Redis
+## Configure PgBouncer
 
-In this section, you'll be guided through configuring an external Redis instance
-to be used with GitLab.
+<div align="right">
+  <a type="button" class="btn btn-default" href="#setup-components">
+    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+  </a>
+</div>
 
-Recommended Redis setup differs depending on the size of the architecture. For
-smaller architectures (less than 3,000 users) a single instance should suffice.
-For medium sized installs (3,000 - 5,000) we suggest one Redis cluster for all
-classes and that Redis Sentinel is hosted alongside Consul. For larger architectures
-(10,000 users or more) we suggest running a separate Redis Cluster for the Cache
-class and another for the Queues and Shared State classes respectively. We also
-recommend that you run the Redis Sentinel clusters separately for each Redis Cluster.
-
-### Provide your own Redis instance
-
-Redis version 5.0 or higher is required, as this is what ships with
-Omnibus GitLab packages starting with GitLab 13.0. Older Redis versions
-do not support an optional count argument to SPOP which is now required for
-[Merge Trains](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md).
-
-In addition, GitLab makes use of certain commands like `UNLINK` and `USAGE` which
-were introduced only in Redis 4.
-
-Managed Redis from cloud providers such as AWS ElastiCache will work. If these
-services support high availability, be sure it is not the Redis Cluster type.
-
-Note the Redis node's IP address or hostname, port, and password (if required).
-These will be necessary when configuring the
-[GitLab application servers](#configure-gitlab-rails) later.
-
-### Standalone Redis using Omnibus GitLab
-
-The Omnibus GitLab package can be used to configure a standalone Redis server.
-The steps below are the minimum necessary to configure a Redis server with
-Omnibus:
-
-1. SSH into the Redis server.
-1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
-   package you want using **steps 1 and 2** from the GitLab downloads page.
-     - Do not complete any other steps on the download page.
-
-1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
-
-   ```ruby
-   ## Enable Redis
-   redis['enable'] = true
-
-   ## Disable all other services
-   sidekiq['enable'] = false
-   gitlab_workhorse['enable'] = false
-   puma['enable'] = false
-   unicorn['enable'] = false
-   postgresql['enable'] = false
-   nginx['enable'] = false
-   prometheus['enable'] = false
-   alertmanager['enable'] = false
-   pgbouncer_exporter['enable'] = false
-   gitlab_exporter['enable'] = false
-   gitaly['enable'] = false
-   grafana['enable'] = false
-
-   redis['bind'] = '0.0.0.0'
-   redis['port'] = 6379
-   redis['password'] = 'SECRET_PASSWORD_HERE'
-
-   gitlab_rails['enable'] = false
-
-   # Set the network addresses that the exporters used for monitoring will listen on
-   node_exporter['listen_address'] = '0.0.0.0:9100'
-   redis_exporter['listen_address'] = '0.0.0.0:9121'
-   redis_exporter['flags'] = {
-         'redis.addr' => 'redis://0.0.0.0:6379',
-         'redis.password' => 'SECRET_PASSWORD_HERE',
-   }
-   ```
-
-1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
-1. Note the Redis node's IP address or hostname, port, and
-   Redis password. These will be necessary when [configuring the GitLab
-   application servers](#configure-gitlab-rails) later.
-
-Advanced [configuration options](https://docs.gitlab.com/omnibus/settings/redis.html)
-are supported and can be added if needed.
+## Configure the internal load balancing node
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -641,6 +599,14 @@ To configure Gitaly with TLS:
 
 1. Delete `gitaly['listen_addr']` to allow only encrypted connections.
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+
+<div align="right">
+  <a type="button" class="btn btn-default" href="#setup-components">
+    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+  </a>
+</div>
+
+## Configure Sidekiq
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -906,6 +872,72 @@ running [Prometheus](../monitoring/prometheus/index.md) and
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. In the GitLab UI, set `admin/application_settings/metrics_and_profiling` > Metrics - Grafana to `/-/grafana` to
 `http[s]://<MONITOR NODE>/-/grafana`
+
+<div align="right">
+  <a type="button" class="btn btn-default" href="#setup-components">
+    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+  </a>
+</div>
+
+## Configure the object storage
+
+GitLab supports using an object storage service for holding numerous types of data.
+It's recommended over [NFS](#configure-nfs-optional) and in general it's better
+in larger setups as object storage is typically much more performant, reliable,
+and scalable.
+
+Object storage options that GitLab has tested, or is aware of customers using include:
+
+- SaaS/Cloud solutions such as [Amazon S3](https://aws.amazon.com/s3/), [Google cloud storage](https://cloud.google.com/storage).
+- On-premises hardware and appliances from various storage vendors.
+- MinIO. There is [a guide to deploying this](https://docs.gitlab.com/charts/advanced/external-object-storage/minio.html) within our Helm Chart documentation.
+
+For configuring GitLab to use Object Storage refer to the following guides
+based on what features you intend to use:
+
+1. Configure [object storage for backups](../../raketasks/backup_restore.md#uploading-backups-to-a-remote-cloud-storage).
+1. Configure [object storage for job artifacts](../job_artifacts.md#using-object-storage)
+   including [incremental logging](../job_logs.md#new-incremental-logging-architecture).
+1. Configure [object storage for LFS objects](../lfs/index.md#storing-lfs-objects-in-remote-object-storage).
+1. Configure [object storage for uploads](../uploads.md#using-object-storage-core-only).
+1. Configure [object storage for merge request diffs](../merge_request_diffs.md#using-object-storage).
+1. Configure [object storage for Container Registry](../packages/container_registry.md#container-registry-storage-driver) (optional feature).
+1. Configure [object storage for Mattermost](https://docs.mattermost.com/administration/config-settings.html#file-storage) (optional feature).
+1. Configure [object storage for packages](../packages/index.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
+1. Configure [object storage for Dependency Proxy](../packages/dependency_proxy.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
+1. Configure [object storage for Pseudonymizer](../pseudonymizer.md#configuration) (optional feature). **(ULTIMATE ONLY)**
+1. Configure [object storage for autoscale Runner caching](https://docs.gitlab.com/runner/configuration/autoscale.html#distributed-runners-caching) (optional - for improved performance).
+1. Configure [object storage for Terraform state files](../terraform_state.md#using-object-storage-core-only).
+
+Using separate buckets for each data type is the recommended approach for GitLab.
+
+A limitation of our configuration is that each use of object storage is separately configured.
+[We have an issue for improving this](https://gitlab.com/gitlab-org/gitlab/-/issues/23345)
+and easily using one bucket with separate folders is one improvement that this might bring.
+
+There is at least one specific issue with using the same bucket:
+when GitLab is deployed with the Helm chart restore from backup
+[will not properly function](https://docs.gitlab.com/charts/advanced/external-object-storage/#lfs-artifacts-uploads-packages-external-diffs-pseudonymizer)
+unless separate buckets are used.
+
+One risk of using a single bucket would be if your organization decided to
+migrate GitLab to the Helm deployment in the future. GitLab would run, but the situation with
+backups might not be realized until the organization had a critical requirement for the backups to
+work.
+
+<div align="right">
+  <a type="button" class="btn btn-default" href="#setup-components">
+    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+  </a>
+</div>
+
+## Configure NFS (optional)
+
+[Object storage](#configure-the-object-storage), along with [Gitaly](#configure-gitaly)
+are recommended over NFS wherever possible for improved performance. If you intend
+to use GitLab Pages, this currently [requires NFS](troubleshooting.md#gitlab-pages-requires-nfs).
+
+See how to [configure NFS](../high_availability/nfs.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
