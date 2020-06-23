@@ -23,7 +23,7 @@ export default {
       this.$emit('handleAddProjectsClick');
     },
   },
-}
+};
 </script>
 
 <template>

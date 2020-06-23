@@ -7,9 +7,10 @@ describe('first class instance security dashboard empty state', () => {
   const dashboardDocumentation = '/path/to/dashboard/documentation';
   const svgPath = '/placeholder.svg';
 
-  const createWrapper = () => mount(EmptyState, {
-    propsData: { svgPath, dashboardDocumentation },
-  });
+  const createWrapper = () =>
+    mount(EmptyState, {
+      propsData: { svgPath, dashboardDocumentation },
+    });
   const findGlEmptyState = () => wrapper.find(GlEmptyState);
   const findButton = () => wrapper.find(GlButton);
   const findLink = () => wrapper.find(GlLink);
