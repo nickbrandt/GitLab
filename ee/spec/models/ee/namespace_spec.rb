@@ -25,6 +25,10 @@ RSpec.describe Namespace do
   it { is_expected.to delegate_method(:upgradable?).to(:gitlab_subscription) }
   it { is_expected.to delegate_method(:email).to(:owner).with_prefix.allow_nil }
 
+  before do
+    allow(::Gitlab).to receive(:com?).and_return(true)
+  end
+
   shared_examples 'plan helper' do |namespace_plan|
     let(:namespace) { create(:namespace_with_plan, plan: "#{plan_name}_plan") }
 
@@ -81,7 +85,7 @@ RSpec.describe Namespace do
     let(:namespace) { create(:namespace) }
 
     before do
-      allow(Gitlab).to receive(:com?).and_return(true)
+      allow(::Gitlab).to receive(:com?).and_return(true)
     end
 
     subject { namespace.actual_plan_name }
@@ -364,7 +368,7 @@ RSpec.describe Namespace do
     end
 
     context 'when "default" plan is defined in the system' do
-      let!(:default_plan) { create(:default_plan) }
+      let!(:free_plan) { create(:free_plan) }
 
       context 'when no limits are set' do
         it_behaves_like 'uses an implied configuration'
@@ -373,7 +377,7 @@ RSpec.describe Namespace do
       context 'when limits are set for the default plan' do
         let!(:default_limits) do
           create(:plan_limits,
-            plan: default_plan,
+            plan: free_plan,
             ci_active_pipelines: 1,
             ci_pipeline_size: 2,
             ci_active_jobs: 3)
@@ -756,20 +760,7 @@ RSpec.describe Namespace do
   end
 
   describe '#actual_plan' do
-    context 'when namespace does not have a subscription associated' do
-      it 'generates a subscription and returns default plan' do
-        expect(namespace.actual_plan).to eq(Plan.default)
-
-        # This should be revisited after https://gitlab.com/gitlab-org/gitlab/-/issues/214434
-        expect(namespace.gitlab_subscription).to be_present
-      end
-    end
-
     context 'when running on Gitlab.com' do
-      before do
-        allow(Gitlab).to receive(:com?).and_return(true)
-      end
-
       context 'when namespace has a subscription associated' do
         before do
           create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
@@ -825,18 +816,95 @@ RSpec.describe Namespace do
         end
       end
     end
+
+    context 'when not running on Gitlab.com' do
+      before do
+        allow(::Gitlab).to receive(:com?).and_return(false)
+      end
+
+      context 'when namespace does not have a subscription associated' do
+        it 'does not generate a subscription and returns default plan' do
+          expect(namespace.actual_plan).to eq(Plan.default)
+
+          expect(namespace.gitlab_subscription).to be_blank
+        end
+      end
+
+      context 'when namespace has a subscription associated' do
+        before do
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+        end
+
+        it 'returns the default plan' do
+          expect(namespace.actual_plan).to eq(default_plan)
+        end
+      end
+
+      context 'when namespace does not have a subscription associated' do
+        it 'generates a subscription and returns default plan' do
+          expect(namespace.actual_plan).to eq(Plan.default)
+          expect(namespace.gitlab_subscription).to be_blank
+        end
+
+        context 'when default plan does exist' do
+          before do
+            default_plan
+          end
+
+          it 'does not generate a subscription' do
+            expect(namespace.actual_plan).to eq(default_plan)
+            expect(namespace.gitlab_subscription).to be_blank
+          end
+        end
+
+        context 'when namespace is a subgroup with a parent' do
+          let(:subgroup) { create(:namespace, parent: namespace) }
+
+          context 'when free plan does exist' do
+            before do
+              default_plan
+            end
+
+            it 'does not generates a subscription' do
+              expect(subgroup.actual_plan).to eq(default_plan)
+              expect(subgroup.gitlab_subscription).not_to be_present
+            end
+          end
+
+          context 'when namespace has a subscription associated' do
+            before do
+              create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+            end
+
+            it 'returns the default plan' do
+              expect(subgroup.actual_plan).to eq(default_plan)
+            end
+          end
+        end
+      end
+    end
   end
 
   describe '#actual_plan_name' do
     context 'when namespace does not have a subscription associated' do
-      it 'returns default plan' do
-        expect(namespace.actual_plan_name).to eq('default')
+      context 'when running on Gitlab.com' do
+        it 'returns free plan' do
+          expect(namespace.actual_plan_name).to eq('free')
+        end
+      end
+
+      context 'when not running on Gitlab.com' do
+        it 'returns default plan' do
+          allow(::Gitlab).to receive(:com?).and_return(false)
+
+          expect(namespace.actual_plan_name).to eq('default')
+        end
       end
     end
 
     context 'when running on Gitlab.com' do
       before do
-        allow(Gitlab).to receive(:com?).and_return(true)
+        allow(::Gitlab).to receive(:com?).and_return(true)
       end
 
       context 'when namespace has a subscription associated' do

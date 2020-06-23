@@ -18,6 +18,10 @@ RSpec.describe EE::Gitlab::Ci::Pipeline::Quota::Size do
 
   subject { described_class.new(namespace, pipeline, command) }
 
+  before do
+    allow(::Gitlab).to receive(:com?).and_return(true)
+  end
+
   shared_context 'pipeline size limit exceeded' do
     before do
       config = YAML.dump({

@@ -11,8 +11,6 @@ RSpec.describe 'shared/billings/_trial_status.html.haml' do
   let(:trial) { false }
 
   before do
-    # allow(::Gitlab).to receive(:com?).and_return(true)
-
     create(:gitlab_subscription, namespace: group, hosted_plan: plan, trial_ends_on: trial_ends_on, trial: trial)
   end
 
@@ -53,6 +51,8 @@ RSpec.describe 'shared/billings/_trial_status.html.haml' do
     let(:trial_ends_on) { Date.yesterday }
 
     it 'displays the date is expired' do
+      allow(::Gitlab).to receive(:com?).and_return(true)
+
       render 'shared/billings/trial_status', namespace: group
 
       expect(rendered).to have_content("Your GitLab.com trial expired on #{trial_ends_on}")
