@@ -711,8 +711,8 @@ module EE
       ::Feature.enabled?(:project_compliance_merge_request_approval_settings, self)
     end
 
-    def license_compliance
-      strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
+    def license_compliance(pipeline = latest_pipeline_with_reports(::Ci::JobArtifact.license_scanning_reports))
+      SCA::LicenseCompliance.new(self, pipeline)
     end
 
     override :template_source?

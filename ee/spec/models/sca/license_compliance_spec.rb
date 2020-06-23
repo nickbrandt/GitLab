@@ -3,7 +3,7 @@
 require "spec_helper"
 
 RSpec.describe SCA::LicenseCompliance do
-  subject { described_class.new(project) }
+  subject { project.license_compliance }
 
   let(:project) { create(:project, :repository, :private) }
   let(:mit) { create(:software_license, :mit) }
