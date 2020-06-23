@@ -7259,7 +7259,6 @@ CREATE TABLE public.vulnerability_occurrences (
     primary_identifier_id bigint NOT NULL,
     project_fingerprint bytea NOT NULL,
     location_fingerprint bytea NOT NULL,
-    uuid character varying(36) NOT NULL,
     name character varying NOT NULL,
     metadata_version character varying NOT NULL,
     raw_metadata text NOT NULL,
@@ -14119,5 +14118,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200618134723
 20200622103836
 20200623190357
+20200623190457
 \.
 
