@@ -60,6 +60,10 @@ module FeatureFlagHelpers
     find('.js-feature-flag-edit-button')
   end
 
+  def delete_strategy_button
+    find("button[data-testid='delete-strategy-button']")
+  end
+
   def status_toggle_button
     find('.js-feature-flag-status button')
   end

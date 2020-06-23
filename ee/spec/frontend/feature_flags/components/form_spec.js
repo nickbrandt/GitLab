@@ -406,12 +406,12 @@ describe('feature flag form', () => {
         strategies: [
           {
             type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-            paramters: { percentage: '30' },
+            parameters: { percentage: '30' },
             scopes: [],
           },
           {
             type: ROLLOUT_STRATEGY_ALL_USERS,
-            paramters: {},
+            parameters: {},
             scopes: [{ environment_scope: 'review/*' }],
           },
         ],
@@ -429,7 +429,7 @@ describe('feature flag form', () => {
       expect(strategy.exists()).toBe(true);
       expect(strategy.props('strategy')).toEqual({
         type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-        paramters: { percentage: '30' },
+        parameters: { percentage: '30' },
         scopes: [],
       });
     });
@@ -446,7 +446,7 @@ describe('feature flag form', () => {
     it('should remove a strategy on delete', () => {
       const strategy = {
         type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-        paramters: { percentage: '30' },
+        parameters: { percentage: '30' },
         scopes: [],
       };
       wrapper.find(Strategy).vm.$emit('delete');

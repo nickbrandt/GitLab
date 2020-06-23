@@ -1,6 +1,6 @@
 <script>
 import Vue from 'vue';
-import { memoize, isString, cloneDeep, isNumber } from 'lodash';
+import { memoize, isString, cloneDeep, isNumber, uniqueId } from 'lodash';
 import {
   GlDeprecatedButton,
   GlDeprecatedBadge as GlBadge,
@@ -143,7 +143,6 @@ export default {
     supportsStrategies() {
       return this.glFeatures.featureFlagsNewVersion && this.version === NEW_VERSION_FLAG;
     },
-
     canDeleteStrategy() {
       return this.formStrategies.length > 1;
     },
@@ -160,6 +159,14 @@ export default {
     }
   },
   methods: {
+    keyFor(strategy) {
+      if (strategy.id) {
+        return strategy.id;
+      }
+
+      return uniqueId('strategy_');
+    },
+
     addStrategy() {
       this.formStrategies.push({ name: '', parameters: {}, scopes: [] });
     },
@@ -321,7 +328,7 @@ export default {
         <div v-if="filteredStrategies.length > 0" data-testid="feature-flag-strategies">
           <strategy
             v-for="(strategy, index) in filteredStrategies"
-            :key="strategy.id"
+            :key="keyFor(strategy)"
             :strategy="strategy"
             :index="index"
             :endpoint="environmentsEndpoint"
