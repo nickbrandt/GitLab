@@ -9419,6 +9419,8 @@ CREATE INDEX index_approvers_on_target_id_and_target_type ON public.approvers US
 
 CREATE INDEX index_approvers_on_user_id ON public.approvers USING btree (user_id);
 
+CREATE INDEX index_audit_events_on_entity_id_entity_type_id_desc_author_id ON public.audit_events USING btree (entity_id, entity_type, id DESC, author_id);
+
 CREATE INDEX index_audit_events_on_ruby_object_in_details ON public.audit_events USING btree (id) WHERE (details ~~ '%ruby/object%'::text);
 
 CREATE INDEX index_award_emoji_on_awardable_type_and_awardable_id ON public.award_emoji USING btree (awardable_type, awardable_id);
@@ -10466,8 +10468,6 @@ CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON public.oauth
 CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications USING btree (uid);
 
 CREATE INDEX index_oauth_openid_requests_on_access_grant_id ON public.oauth_openid_requests USING btree (access_grant_id);
-
-CREATE INDEX index_on_author_id_and_entity_id_and_entity_type_and_id_desc ON public.audit_events USING btree (entity_id, entity_type, id DESC, author_id);
 
 CREATE UNIQUE INDEX index_on_deploy_keys_id_and_type_and_public ON public.keys USING btree (id, type) WHERE (public = true);
 

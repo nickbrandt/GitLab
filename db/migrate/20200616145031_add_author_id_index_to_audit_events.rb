@@ -7,8 +7,8 @@ class AddAuthorIdIndexToAuditEvents < ActiveRecord::Migration[6.0]
 
   disable_ddl_transaction!
 
-  INDEX_NAME = 'index_on_entity_id_and_entity_type_and_id_desc_and_author_id'.freeze
-  OLD_INDEX_NAME = 'index_audit_events_on_entity_id_and_entity_type_and_id_desc'.freeze
+  INDEX_NAME = 'index_audit_events_on_entity_id_entity_type_id_desc_author_id'
+  OLD_INDEX_NAME = 'index_audit_events_on_entity_id_and_entity_type_and_id_desc'
 
   def up
     add_concurrent_index(:audit_events, [:entity_id, :entity_type, :id, :author_id], order: { id: :desc }, name: INDEX_NAME)
