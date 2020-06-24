@@ -18,7 +18,7 @@ import {
 } from '~/lib/utils/datetime_utility';
 import { sprintf, __ } from '~/locale';
 import initUserPopovers from '~/user_popovers';
-import { mergeUrlParams } from '~/lib/utils/url_utility';
+import { mergeUrlParams, getParameterValues } from '~/lib/utils/url_utility';
 import IssueAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
 import { isScopedLabel } from '~/lib/utils/common_utils';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -34,6 +34,7 @@ export default {
     GlLabel,
     GlIcon,
     GlSprintf,
+    IssueSubepicFlag: () => import('ee_component/issue/issue_subpepic_flag.vue'),
   },
   directives: {
     GlTooltip,
@@ -65,6 +66,7 @@ export default {
   data() {
     return {
       jiraLogo,
+      filterEpicId: null,
     };
   },
   computed: {
@@ -175,6 +177,7 @@ export default {
     },
   },
   mounted() {
+    this.setFilterEpicId();
     // TODO: Refactor user popover to use its own component instead of
     // spawning event listeners on Vue-rendered elements.
     initUserPopovers([this.$refs.openedAgoByContainer.$el]);
@@ -198,6 +201,10 @@ export default {
         issuable: this.issuable,
         selected: ev.target.checked,
       });
+    },
+    setFilterEpicId() {
+      const [epicId] = getParameterValues('epic_id');
+      this.filterEpicId = parseInt(epicId, 10);
     },
   },
 
@@ -228,7 +235,7 @@ export default {
       <!-- Issuable info container -->
       <!-- Issuable main info -->
       <div class="flex-grow-1">
-        <div class="title">
+        <div class="title gl-display-flex gl-align-items-center">
           <span class="issue-title-text">
             <gl-icon
               v-if="issuable.confidential"
@@ -252,6 +259,11 @@ export default {
               />
             </gl-link>
           </span>
+          <issue-subepic-flag
+            v-if="filterEpicId"
+            :issue-epic="issuable.epic"
+            :filter-epic-id="filterEpicId"
+          />
           <span v-if="issuable.has_tasks" class="ml-1 task-status d-none d-sm-inline-block">
             {{ issuable.task_status }}
           </span>
