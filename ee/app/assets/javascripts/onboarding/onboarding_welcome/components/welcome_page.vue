@@ -129,7 +129,7 @@ export default {
         {{ __("Ok let's go") }}
       </gl-link>
       <p class="small mt-8">
-        <gl-link class="qa-skip-tour-btn" @click="skipTour">
+        <gl-link class="qa-skip-tour-btn" data-qa-selector="skip_for_now_link" @click="skipTour">
           {{ skipText }}
         </gl-link>
       </p>
