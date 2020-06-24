@@ -78,17 +78,6 @@ describe('gl_emoji', () => {
       );
     });
 
-    it('bomb emoji with image fallback', () => {
-      const emojiKey = 'bomb';
-      const markup = glEmojiTag(emojiFixtureMap[emojiKey].name, {
-        forceFallback: true,
-      });
-
-      expect(trimText(markup)).toMatchInlineSnapshot(
-        `"<gl-emoji data-force-fallback=\\"true\\" data-name=\\"bomb\\"></gl-emoji>"`,
-      );
-    });
-
     it('bomb emoji with sprite fallback readiness', () => {
       const emojiKey = 'bomb';
       const markup = glEmojiTag(emojiFixtureMap[emojiKey].name, {
@@ -96,17 +85,6 @@ describe('gl_emoji', () => {
       });
       expect(trimText(markup)).toMatchInlineSnapshot(
         `"<gl-emoji data-fallback-sprite-class=\\"emoji-bomb\\" data-name=\\"bomb\\"></gl-emoji>"`,
-      );
-    });
-
-    it('bomb emoji with sprite fallback', () => {
-      const emojiKey = 'bomb';
-      const markup = glEmojiTag(emojiFixtureMap[emojiKey].name, {
-        forceFallback: true,
-        sprite: true,
-      });
-      expect(trimText(markup)).toMatchInlineSnapshot(
-        `"<gl-emoji class=\\"emoji-icon emoji-bomb\\" data-fallback-sprite-class=\\"emoji-bomb\\" data-force-fallback=\\"true\\" data-name=\\"bomb\\"></gl-emoji>"`,
       );
     });
   });

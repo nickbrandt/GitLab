@@ -10,7 +10,7 @@ class GlEmoji extends HTMLElement {
   }
   initialize(enforceUnicodeRedering) {
     let emojiUnicode = this.textContent.trim();
-    const { fallbackSpriteClass, fallbackSrc, forceFallback } = this.dataset;
+    const { fallbackSpriteClass, fallbackSrc } = this.dataset;
     let { name, unicodeVersion } = this.dataset;
 
     return initEmojiMap()
@@ -26,12 +26,8 @@ class GlEmoji extends HTMLElement {
             unicodeVersion = emojiInfo.u;
             this.dataset.uni = unicodeVersion;
 
-            if (forceFallback === 'true' && !fallbackSpriteClass) {
-              this.innerHTML = emojiImageTag(name, emojiFallbackImageSrc(name));
-            } else {
-              emojiUnicode = emojiInfo.e;
-              this.innerHTML = emojiInfo.e;
-            }
+            emojiUnicode = emojiInfo.e;
+            this.innerHTML = emojiInfo.e;
 
             this.title = emojiInfo.d;
           }

@@ -108,26 +108,17 @@ export function emojiImageTag(name, src) {
 }
 
 export function glEmojiTag(inputName, options) {
-  const opts = { sprite: false, forceFallback: false, ...options };
+  const opts = { sprite: false, ...options };
   const name = normalizeEmojiName(inputName);
   const fallbackSpriteClass = `emoji-${name}`;
 
-  const classList = [];
-  if (opts.forceFallback && opts.sprite) {
-    classList.push('emoji-icon');
-    classList.push(fallbackSpriteClass);
-  }
-  const classAttribute = classList.length > 0 ? `class="${classList.join(' ')}"` : '';
   const fallbackSpriteAttribute = opts.sprite
     ? `data-fallback-sprite-class="${fallbackSpriteClass}"`
     : '';
-  const forceFallbackAttribute = opts.forceFallback ? 'data-force-fallback="true"' : '';
 
   return `
     <gl-emoji
-      ${classAttribute}
       ${fallbackSpriteAttribute}
-      ${forceFallbackAttribute}
       data-name="${name}"></gl-emoji>
   `;
 }
