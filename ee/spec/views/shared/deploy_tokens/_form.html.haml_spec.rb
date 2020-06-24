@@ -16,6 +16,7 @@ describe 'shared/deploy_tokens/_form.html.haml' do
     if can
       it "renders the packages scopes for user role #{role} in #{type}" do
         render 'shared/deploy_tokens/form', token: token, group_or_project: subject
+
         expect(rendered).to have_content('Allows read access to the package registry')
       end
     else
