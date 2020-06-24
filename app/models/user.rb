@@ -1845,3 +1845,4 @@ class User < ApplicationRecord
 end
 
 User.prepend_if_ee('EE::User')
+puts ::EE::User
