@@ -16,7 +16,6 @@ RSpec.describe Member do
 
     it { is_expected.to validate_presence_of(:user) }
     it { is_expected.to validate_presence_of(:source) }
-    it { is_expected.to validate_inclusion_of(:access_level).in_array(Gitlab::Access.all_values) }
 
     it_behaves_like 'an object with email-formated attributes', :invite_email do
       subject { build(:project_member) }
@@ -126,6 +125,7 @@ RSpec.describe Member do
 
       accepted_request_user = create(:user).tap { |u| project.request_access(u) }
       @accepted_request_member = project.requesters.find_by(user_id: accepted_request_user.id).tap { |m| m.accept_request }
+      @member_with_limited_access = create(:group_member, access_level: Gitlab::Access::LIMITED_ACCESS, group: group)
     end
 
     describe '.access_for_user_ids' do
@@ -154,6 +154,15 @@ RSpec.describe Member do
       it { expect(described_class.non_invite).to include @accepted_invite_member }
       it { expect(described_class.non_invite).to include @requested_member }
       it { expect(described_class.non_invite).to include @accepted_request_member }
+    end
+
+    describe '.non_limited_access' do
+      it { expect(described_class.non_limited_access).to include @maintainer }
+      it { expect(described_class.non_limited_access).to include @invited_member }
+      it { expect(described_class.non_limited_access).to include @accepted_invite_member }
+      it { expect(described_class.non_limited_access).to include @requested_member }
+      it { expect(described_class.non_limited_access).to include @accepted_request_member }
+      it { expect(described_class.non_limited_access).not_to include @member_with_limited_access }
     end
 
     describe '.request' do

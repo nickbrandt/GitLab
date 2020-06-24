@@ -45,9 +45,6 @@ module Gitlab
 
       def options
         {
-          # Added as a part of https://gitlab.com/gitlab-org/gitlab/-/merge_requests/34848
-          # Proof of concept work.
-          # "Limited Access" => LIMITED_ACCESS,
           "Guest"          => GUEST,
           "Reporter"       => REPORTER,
           "Developer"      => DEVELOPER,
@@ -68,6 +65,8 @@ module Gitlab
       end
 
       def options_with_limited
+        # Added as a part of https://gitlab.com/gitlab-org/gitlab/-/merge_requests/34848
+        # Proof of concept work.
         options_with_owner.merge(
           "Limited Access" => LIMITED_ACCESS
         )
@@ -100,7 +99,7 @@ module Gitlab
       end
 
       def human_access(access)
-        options_with_owner.key(access)
+        options_with_limited.key(access)
       end
 
       def human_access_with_none(access)
