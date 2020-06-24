@@ -1,5 +1,6 @@
 $header-item-height: 60px;
 $item-height: 50px;
+$milestones-collapsed-height: 38px;
 $details-cell-width: 320px;
 $timeline-cell-width: 180px;
 $border-style: 1px solid $border-gray-normal;
@@ -408,9 +409,17 @@ html.group-epics-roadmap-html {
 }
 
 .milestones-list-section {
+  &.milestones-list-section-collapsed {
+    height: $milestones-collapsed-height;
+  }
+
   .milestones-list-items {
     .milestone-timeline-cell {
       width: $timeline-cell-width;
+    }
+
+    .milestone-timeline-cell-empty {
+      height: $milestones-collapsed-height;
     }
 
     .timeline-bar-wrapper {
