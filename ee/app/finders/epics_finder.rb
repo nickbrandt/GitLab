@@ -179,7 +179,6 @@ class EpicsFinder < IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   def with_confidentiality_access_check(epics, groups)
-    return epics unless Feature.enabled?(:confidential_epics_query, group)
     return epics if can_read_all_epics_in_related_groups?(groups)
 
     epics.not_confidential_or_in_groups(groups_with_confidential_access(groups))
