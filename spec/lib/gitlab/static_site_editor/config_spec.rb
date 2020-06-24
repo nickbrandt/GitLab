@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::StaticSiteEditor::Config do
+RSpec.describe Gitlab::StaticSiteEditor::Config do
   subject(:config) { described_class.new(repository, ref, file_path, return_url) }
 
   let_it_be(:namespace) { create(:namespace, name: 'namespace') }
@@ -28,6 +28,22 @@ describe Gitlab::StaticSiteEditor::Config do
         is_supported_content: 'true',
         base_url: '/namespace/project/-/sse/master%2FREADME.md'
       )
+    end
+
+    context 'when file has .md.erb extension' do
+      let(:file_path) { 'README.md.erb' }
+
+      before do
+        repository.create_file(
+          project.creator,
+          file_path,
+          '',
+          message: 'message',
+          branch_name: 'master'
+        )
+      end
+
+      it { is_expected.to include(is_supported_content: 'true') }
     end
 
     context 'when file path is nested' do

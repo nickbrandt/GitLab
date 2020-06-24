@@ -38,7 +38,7 @@ class UpdateAllMirrorsWorker # rubocop:disable Scalability/IdempotentWorker
 
     # Ignore mirrors that become due for scheduling once work begins, so we
     # can't end up in an infinite loop
-    now = Time.now
+    now = Time.current
     last = nil
     scheduled = 0
 
@@ -73,8 +73,8 @@ class UpdateAllMirrorsWorker # rubocop:disable Scalability/IdempotentWorker
 
     if scheduled > 0
       # Wait for all ProjectImportScheduleWorker jobs to complete
-      deadline = Time.now + SCHEDULE_WAIT_TIMEOUT
-      sleep 1 while ProjectImportScheduleWorker.queue_size > 0 && Time.now < deadline
+      deadline = Time.current + SCHEDULE_WAIT_TIMEOUT
+      sleep 1 while ProjectImportScheduleWorker.queue_size > 0 && Time.current < deadline
     end
 
     scheduled

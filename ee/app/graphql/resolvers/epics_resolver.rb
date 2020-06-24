@@ -18,7 +18,7 @@ module Resolvers
 
     argument :search, GraphQL::STRING_TYPE,
              required: false,
-             description: 'Filter epics by title and description'
+             description: 'Search query for epic title or description'
 
     argument :sort, Types::EpicSortEnum,
              required: false,

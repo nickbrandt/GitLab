@@ -3655,7 +3655,9 @@ CREATE TABLE public.jira_tracker_data (
     encrypted_username_iv character varying,
     encrypted_password character varying,
     encrypted_password_iv character varying,
-    jira_issue_transition_id character varying
+    jira_issue_transition_id character varying,
+    project_key text,
+    CONSTRAINT check_214cf6a48b CHECK ((char_length(project_key) <= 255))
 );
 
 CREATE SEQUENCE public.jira_tracker_data_id_seq
@@ -6333,6 +6335,13 @@ CREATE TABLE public.snippet_repositories (
     snippet_id bigint NOT NULL,
     shard_id bigint NOT NULL,
     disk_path character varying(80) NOT NULL
+);
+
+CREATE TABLE public.snippet_statistics (
+    snippet_id bigint NOT NULL,
+    repository_size bigint DEFAULT 0 NOT NULL,
+    file_count bigint DEFAULT 0 NOT NULL,
+    commit_count bigint DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE public.snippet_user_mentions (
@@ -9045,6 +9054,9 @@ ALTER TABLE ONLY public.smartcard_identities
 ALTER TABLE ONLY public.snippet_repositories
     ADD CONSTRAINT snippet_repositories_pkey PRIMARY KEY (snippet_id);
 
+ALTER TABLE ONLY public.snippet_statistics
+    ADD CONSTRAINT snippet_statistics_pkey PRIMARY KEY (snippet_id);
+
 ALTER TABLE ONLY public.snippet_user_mentions
     ADD CONSTRAINT snippet_user_mentions_pkey PRIMARY KEY (id);
 
@@ -9409,7 +9421,7 @@ CREATE INDEX index_approvers_on_target_id_and_target_type ON public.approvers US
 
 CREATE INDEX index_approvers_on_user_id ON public.approvers USING btree (user_id);
 
-CREATE INDEX index_audit_events_on_entity_id_and_entity_type_and_id_desc ON public.audit_events USING btree (entity_id, entity_type, id DESC);
+CREATE INDEX index_audit_events_on_entity_id_entity_type_id_desc_author_id ON public.audit_events USING btree (entity_id, entity_type, id DESC, author_id);
 
 CREATE INDEX index_audit_events_on_ruby_object_in_details ON public.audit_events USING btree (id) WHERE (details ~~ '%ruby/object%'::text);
 
@@ -9548,8 +9560,6 @@ CREATE INDEX index_ci_freeze_periods_on_project_id ON public.ci_freeze_periods U
 CREATE UNIQUE INDEX index_ci_group_variables_on_group_id_and_key ON public.ci_group_variables USING btree (group_id, key);
 
 CREATE UNIQUE INDEX index_ci_instance_variables_on_key ON public.ci_instance_variables USING btree (key);
-
-CREATE INDEX index_ci_job_artifacts_file_store_is_null ON public.ci_job_artifacts USING btree (id) WHERE (file_store IS NULL);
 
 CREATE INDEX index_ci_job_artifacts_for_terraform_reports ON public.ci_job_artifacts USING btree (project_id, id) WHERE (file_type = 18);
 
@@ -10214,8 +10224,6 @@ CREATE INDEX index_labels_on_type_and_project_id ON public.labels USING btree (t
 CREATE UNIQUE INDEX index_lfs_file_locks_on_project_id_and_path ON public.lfs_file_locks USING btree (project_id, path);
 
 CREATE INDEX index_lfs_file_locks_on_user_id ON public.lfs_file_locks USING btree (user_id);
-
-CREATE INDEX index_lfs_objects_file_store_is_null ON public.lfs_objects USING btree (id) WHERE (file_store IS NULL);
 
 CREATE INDEX index_lfs_objects_on_file_store ON public.lfs_objects USING btree (file_store);
 
@@ -11082,8 +11090,6 @@ CREATE INDEX index_uploads_on_model_id_and_model_type ON public.uploads USING bt
 CREATE INDEX index_uploads_on_store ON public.uploads USING btree (store);
 
 CREATE INDEX index_uploads_on_uploader_and_path ON public.uploads USING btree (uploader, path);
-
-CREATE INDEX index_uploads_store_is_null ON public.uploads USING btree (id) WHERE (store IS NULL);
 
 CREATE INDEX index_user_agent_details_on_subject_id_and_subject_type ON public.user_agent_details USING btree (subject_id, subject_type);
 
@@ -12949,6 +12955,9 @@ ALTER TABLE ONLY public.protected_branch_unprotect_access_levels
 ALTER TABLE ONLY public.alert_management_alert_user_mentions
     ADD CONSTRAINT fk_rails_eb2de0cdef FOREIGN KEY (note_id) REFERENCES public.notes(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.snippet_statistics
+    ADD CONSTRAINT fk_rails_ebc283ccf1 FOREIGN KEY (snippet_id) REFERENCES public.snippets(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.ci_daily_report_results
     ADD CONSTRAINT fk_rails_ebc2931b90 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -14032,6 +14041,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200519141534
 20200519171058
 20200519194042
+20200519201128
 20200520103514
 20200521022725
 20200521225327
@@ -14094,6 +14104,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200615123055
 20200615193524
 20200615232735
+20200616145031
 20200617000757
 20200617001001
 20200617001118
@@ -14104,5 +14115,11 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200618105638
 20200618134223
 20200618134723
+20200619154527
+20200619154528
+20200622103836
+20200622235737
+20200623000148
+20200623000320
 \.
 

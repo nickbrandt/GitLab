@@ -108,7 +108,6 @@ export default {
       :dashboard-documentation="dashboardDocumentation"
       :empty-state-svg-path="emptyStateSvgPath"
       :filters="filters"
-      should-show-selection
       :vulnerabilities="vulnerabilities"
       @refetch-vulnerabilities="refetchVulnerabilities"
     >

@@ -11,10 +11,14 @@ RSpec.describe 'New group screen', :js do
     visit new_users_sign_up_group_path
   end
 
-  subject { page }
-
   it 'shows the progress bar with the correct steps' do
-    expect(subject).to have_content('Create your group')
-    expect(subject).to have_content('1. Your profile 2. Your GitLab group 3. Your first project')
+    expect(page).to have_content('Create your group')
+    expect(page).to have_content('1. Your profile 2. Your GitLab group 3. Your first project')
+  end
+
+  it 'autofills the group path' do
+    fill_in 'group_name', with: 'test'
+
+    expect(page).to have_field('group_path', with: 'test')
   end
 end

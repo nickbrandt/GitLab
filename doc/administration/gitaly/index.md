@@ -19,12 +19,13 @@ In the Gitaly documentation:
   - [GitLab Shell](https://gitlab.com/gitlab-org/gitlab-shell).
   - [GitLab Workhorse](https://gitlab.com/gitlab-org/gitlab-workhorse).
 
-GitLab end users do not have direct access to Gitaly.
+GitLab end users do not have direct access to Gitaly. Gitaly only manages Git
+repository access for GitLab. Other types of GitLab data aren't accessed using Gitaly.
 
 CAUTION: **Caution:**
-From GitLab 13.0, using NFS for Git repositories is deprecated. In GitLab 14.0,
-support for NFS for Git repositories is scheduled to be removed. Upgrade to
-[Gitaly Cluster](praefect.md) as soon as possible.
+From GitLab 13.0, Gitaly support for NFS is deprecated. In GitLab 14.0, Gitaly support
+for NFS is scheduled to be removed. Upgrade to [Gitaly Cluster](praefect.md) as soon as
+possible.
 
 ## Architecture
 
@@ -387,31 +388,9 @@ Gitaly makes the following assumptions:
   clients, and that Gitaly server can read and write to `/mnt/gitlab/storage2`.
 - Your `gitaly1.internal` and `gitaly2.internal` Gitaly servers can reach each other.
 
-Note you can't a use mixed setup, with at least one of your Gitaly servers configured as a local
-server with the `path` setting provided. This is because other Gitaly instances can't communicate
-with it. The following setup is _incorrect_, because:
-
-- You must replace `path` with `gitaly_address` containing a proper value.
-- The address must be reachable from the other two addresses provided.
-
-```ruby
-git_data_dirs({
-  'default' => { 'gitaly_address' => 'tcp://gitaly1.internal:8075' },
-  'storage1' => { 'path' => '/var/opt/gitlab/git-data' },
-  'storage2' => { 'gitaly_address' => 'tcp://gitaly2.internal:8075' },
-})
-```
-
-You should use configuration similar to the following:
-
-```ruby
-git_data_dirs({
-  'default' => { 'gitaly_address' => 'tcp://gitaly1.internal:8075' },
-  # this should be the IP address of the GitLab server that has Gitaly running on it
-  'storage1' => { 'gitaly_address' => 'tcp://gitlab.internal:8075' },
-  'storage2' => { 'gitaly_address' => 'tcp://gitaly2.internal:8075' },
-})
-```
+You can't define Gitaly servers with some as a local directory (with `path`) and some as remote
+server (with `gitaly_address`). However, local and remote Gitaly services can be used together. See
+[mixed configuration](#mixed-configuration) for more information.
 
 **For Omnibus GitLab**
 
@@ -474,6 +453,34 @@ DANGER: **Danger:**
 If you have [server hooks](../server_hooks.md) configured, either per repository or globally, you
 must move these to the Gitaly servers. If you have multiple Gitaly servers, copy your server hooks
 to all Gitaly servers.
+
+#### Mixed configuration
+
+GitLab can reside on the same server as one of many Gitaly servers, but doesn't support
+configuration that mixes local and remote configuration. The following setup is incorrect, because:
+
+- `path` is invalid for some of the Gitaly servers.
+- All addresses must be reachable from the other Gitaly servers.
+
+```ruby
+git_data_dirs({
+  'default' => { 'gitaly_address' => 'tcp://gitaly1.internal:8075' },
+  'storage1' => { 'path' => '/var/opt/gitlab/git-data' },
+  'storage2' => { 'gitaly_address' => 'tcp://gitaly2.internal:8075' },
+})
+```
+
+To combine local and remote Gitaly servers, use an external address for the local Gitaly server. For
+example:
+
+```ruby
+git_data_dirs({
+  'default' => { 'gitaly_address' => 'tcp://gitaly1.internal:8075' },
+  # Address of the GitLab server that has Gitaly running on it
+  'storage1' => { 'gitaly_address' => 'tcp://gitlab.internal:8075' },
+  'storage2' => { 'gitaly_address' => 'tcp://gitaly2.internal:8075' },
+})
+```
 
 ### Disable Gitaly where not required (optional)
 

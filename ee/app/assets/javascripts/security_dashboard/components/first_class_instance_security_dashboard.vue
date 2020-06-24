@@ -1,13 +1,14 @@
 <script>
-import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlLoadingIcon, GlButton, GlEmptyState, GlLink } from '@gitlab/ui';
-import { s__ } from '~/locale';
+import createFlash from '~/flash';
+import { __, s__ } from '~/locale';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import InstanceSecurityVulnerabilities from './first_class_instance_security_dashboard_vulnerabilities.vue';
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
 import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vulnerability_chart.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
-import ProjectManager from './project_manager.vue';
+import projectsQuery from 'ee/security_dashboard/graphql/get_instance_security_dashboard_projects.query.graphql';
+import ProjectManager from './first_class_project_manager/project_manager.vue';
 import CsvExportButton from './csv_export_button.vue';
 import vulnerabilityHistoryQuery from '../graphql/instance_vulnerability_history.graphql';
 
@@ -38,30 +39,38 @@ export default {
       type: String,
       required: true,
     },
-    projectAddEndpoint: {
-      type: String,
-      required: true,
-    },
-    projectListEndpoint: {
-      type: String,
-      required: true,
-    },
     vulnerabilitiesExportEndpoint: {
       type: String,
       required: true,
     },
   },
+  apollo: {
+    projects: {
+      query: projectsQuery,
+      update(data) {
+        return data.instanceSecurityDashboard.projects.nodes;
+      },
+      error() {
+        createFlash(__('Something went wrong, unable to get projects'));
+      },
+    },
+  },
   data() {
     return {
       filters: {},
-      graphqlProjectList: [], // TODO: Rename me to projects once we back the project selector with GraphQL as well
       showProjectSelector: false,
       vulnerabilityHistoryQuery,
+      projects: [],
+      isManipulatingProjects: false,
     };
   },
   computed: {
-    ...mapState('projectSelector', ['projects']),
-    ...mapGetters('projectSelector', ['isUpdatingProjects']),
+    isLoadingProjects() {
+      return this.$apollo.queries.projects.loading;
+    },
+    isUpdatingProjects() {
+      return this.isLoadingProjects || this.isManipulatingProjects;
+    },
     hasProjectsData() {
       return !this.isUpdatingProjects && this.projects.length > 0;
     },
@@ -81,24 +90,15 @@ export default {
           };
     },
   },
-  created() {
-    this.setProjectEndpoints({
-      add: this.projectAddEndpoint,
-      list: this.projectListEndpoint,
-    });
-
-    this.fetchProjects();
-  },
   methods: {
-    ...mapActions('projectSelector', ['setProjectEndpoints', 'fetchProjects']),
     handleFilterChange(filters) {
       this.filters = filters;
     },
     toggleProjectSelector() {
       this.showProjectSelector = !this.showProjectSelector;
     },
-    handleProjectFetch(projects) {
-      this.graphqlProjectList = projects;
+    handleProjectManipulation(value) {
+      this.isManipulatingProjects = value;
     },
   },
 };
@@ -119,12 +119,7 @@ export default {
       </header>
     </template>
     <template #sticky>
-      <filters
-        v-if="shouldShowDashboard"
-        :projects="graphqlProjectList"
-        @filterChange="handleFilterChange"
-        @projectFetch="handleProjectFetch"
-      />
+      <filters v-if="shouldShowDashboard" :projects="projects" @filterChange="handleFilterChange" />
     </template>
     <instance-security-vulnerabilities
       v-if="shouldShowDashboard"
@@ -132,7 +127,6 @@ export default {
       :dashboard-documentation="dashboardDocumentation"
       :empty-state-svg-path="emptyStateSvgPath"
       :filters="filters"
-      @projectFetch="handleProjectFetch"
     />
     <gl-empty-state
       v-else-if="shouldShowEmptyState"
@@ -156,7 +150,12 @@ export default {
       </template>
     </gl-empty-state>
     <div v-else class="d-flex justify-content-center">
-      <project-manager v-if="showProjectSelector" />
+      <project-manager
+        v-if="showProjectSelector"
+        :projects="projects"
+        :is-manipulating-projects="isManipulatingProjects"
+        @handle-project-manipulation="handleProjectManipulation"
+      />
       <gl-loading-icon v-else size="lg" class="mt-4" />
     </div>
     <template #aside>

@@ -81,6 +81,11 @@ export default {
       required: false,
       default: '',
     },
+    isLinkedIssueBlock: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     this.store = new RelatedIssuesStore();
@@ -226,6 +231,7 @@ export default {
     :auto-complete-sources="autoCompleteSources"
     :issuable-type="issuableType"
     :path-id-separator="pathIdSeparator"
+    :is-linked-issue-block="isLinkedIssueBlock"
     @saveReorder="saveIssueOrder"
     @toggleAddRelatedIssuesForm="onToggleAddRelatedIssuesForm"
     @addIssuableFormInput="onInput"

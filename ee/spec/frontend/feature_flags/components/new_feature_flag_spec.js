@@ -57,6 +57,10 @@ describe('New feature flag form', () => {
     expect(wrapper.find(Form).exists()).toEqual(true);
   });
 
+  it('does not render the related issues widget', () => {
+    expect(wrapper.find(Form).props('featureFlagIssuesEndpoint')).toBe('');
+  });
+
   it('should render default * row', () => {
     const defaultScope = {
       id: expect.any(String),

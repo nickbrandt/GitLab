@@ -15,6 +15,7 @@ import {
 } from 'ee/feature_flags/constants';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import { featureFlag, userList } from '../mock_data';
+import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
 
 jest.mock('ee/api.js');
 
@@ -57,6 +58,21 @@ describe('feature flag form', () => {
     factory(requiredProps);
 
     expect(wrapper.find('.js-ff-cancel').attributes('href')).toEqual(requiredProps.cancelPath);
+  });
+
+  it('does not render the related issues widget without the featureFlagIssuesEndpoint', () => {
+    factory(requiredProps);
+
+    expect(wrapper.find(RelatedIssuesRoot).exists()).toBe(false);
+  });
+
+  it('renders the related issues widget when the featureFlagIssuesEndpoint is provided', () => {
+    factory({
+      ...requiredProps,
+      featureFlagIssuesEndpoint: '/some/endpoint',
+    });
+
+    expect(wrapper.find(RelatedIssuesRoot).exists()).toBe(true);
   });
 
   describe('without provided data', () => {
@@ -406,12 +422,12 @@ describe('feature flag form', () => {
         strategies: [
           {
             type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-            paramters: { percentage: '30' },
+            parameters: { percentage: '30' },
             scopes: [],
           },
           {
             type: ROLLOUT_STRATEGY_ALL_USERS,
-            paramters: {},
+            parameters: {},
             scopes: [{ environment_scope: 'review/*' }],
           },
         ],
@@ -429,7 +445,7 @@ describe('feature flag form', () => {
       expect(strategy.exists()).toBe(true);
       expect(strategy.props('strategy')).toEqual({
         type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-        paramters: { percentage: '30' },
+        parameters: { percentage: '30' },
         scopes: [],
       });
     });
@@ -446,7 +462,7 @@ describe('feature flag form', () => {
     it('should remove a strategy on delete', () => {
       const strategy = {
         type: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-        paramters: { percentage: '30' },
+        parameters: { percentage: '30' },
         scopes: [],
       };
       wrapper.find(Strategy).vm.$emit('delete');

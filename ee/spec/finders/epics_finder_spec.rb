@@ -57,8 +57,8 @@ RSpec.describe EpicsFinder do
           expect(epics).to contain_exactly(epic1, epic2, epic3)
         end
 
-        it 'does not execute more than 8 SQL queries' do
-          expect { epics.to_a }.not_to exceed_all_query_limit(8)
+        it 'does not execute more than 5 SQL queries' do
+          expect { epics.to_a }.not_to exceed_all_query_limit(5)
         end
 
         context 'sorting' do
@@ -169,18 +169,18 @@ RSpec.describe EpicsFinder do
             end
           end
 
-          it 'does not execute more than 12 SQL queries' do
-            expect { epics.to_a }.not_to exceed_all_query_limit(12)
+          it 'does not execute more than 5 SQL queries' do
+            expect { epics.to_a }.not_to exceed_all_query_limit(5)
           end
 
-          it 'does not execute more than 13 SQL queries when checking namespace plans' do
+          it 'does not execute more than 6 SQL queries when checking namespace plans' do
             allow(Gitlab::CurrentSettings)
               .to receive(:should_check_namespace_plan?)
               .and_return(true)
 
             create(:gitlab_subscription, :gold, namespace: group)
 
-            expect { epics.to_a }.not_to exceed_all_query_limit(13)
+            expect { epics.to_a }.not_to exceed_all_query_limit(6)
           end
         end
 
@@ -323,6 +323,18 @@ RSpec.describe EpicsFinder do
             it 'returns all nested epics' do
               expect(subject).to match_array([base_epic1, base_epic2, private_epic1, private_epic2, public_epic1, public_epic2])
             end
+
+            it 'does not execute more than 5 SQL queries' do
+              expect { subject }.not_to exceed_all_query_limit(5)
+            end
+
+            it 'does not check permission for subgroups because user inherits permission' do
+              finder = described_class.new(search_user, group_id: base_group.id)
+
+              expect(finder).not_to receive(:groups_user_can_read_epics)
+
+              finder.execute
+            end
           end
 
           context 'when user is member of private subgroup' do
@@ -332,6 +344,20 @@ RSpec.describe EpicsFinder do
 
             it 'returns also confidential epics from this subgroup' do
               expect(subject).to match_array([base_epic2, private_epic1, private_epic2, public_epic1])
+            end
+
+            # if user is not member of top-level group, we need to check
+            # if he can read epics in each subgroup
+            it 'does not execute more than 10 SQL queries' do
+              expect { subject }.not_to exceed_all_query_limit(10)
+            end
+
+            it 'checks permission for each subgroup' do
+              finder = described_class.new(search_user, group_id: base_group.id)
+
+              expect(finder).to receive(:groups_user_can_read_epics).and_call_original
+
+              finder.execute
             end
           end
 

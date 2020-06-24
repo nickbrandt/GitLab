@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Snippet do
+RSpec.describe Snippet do
   describe 'modules' do
     subject { described_class }
 
@@ -20,6 +20,7 @@ describe Snippet do
     it { is_expected.to have_many(:award_emoji).dependent(:destroy) }
     it { is_expected.to have_many(:user_mentions).class_name("SnippetUserMention") }
     it { is_expected.to have_one(:snippet_repository) }
+    it { is_expected.to have_one(:statistics).class_name('SnippetStatistics') }
   end
 
   describe 'validation' do
@@ -88,6 +89,17 @@ describe Snippet do
           end
         end
       end
+    end
+  end
+
+  describe 'callbacks' do
+    it 'creates snippet statistics when the snippet is created' do
+      snippet = build(:snippet)
+      expect(snippet.statistics).to be_nil
+
+      snippet.save
+
+      expect(snippet.statistics).to be_persisted
     end
   end
 

@@ -1,5 +1,6 @@
 export const projects = {
   totalUsage: 'N/A',
+  limit: 10000000,
   projects: [
     {
       id: '24',

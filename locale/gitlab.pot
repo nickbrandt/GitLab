@@ -2011,6 +2011,9 @@ msgstr ""
 msgid "AlertManagement|There was an error while updating the status of the alert. Please try again."
 msgstr ""
 
+msgid "AlertManagement|This assignee cannot be assigned to this alert."
+msgstr ""
+
 msgid "AlertManagement|Tool"
 msgstr ""
 
@@ -3019,6 +3022,9 @@ msgid "Assignee"
 msgid_plural "%d Assignees"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Assignee has no permissions"
+msgstr ""
 
 msgid "Assignee lists not available with your current license"
 msgstr ""
@@ -14302,6 +14308,9 @@ msgstr ""
 msgid "Metrics|Refresh dashboard"
 msgstr ""
 
+msgid "Metrics|Select a value"
+msgstr ""
+
 msgid "Metrics|Star dashboard"
 msgstr ""
 
@@ -14327,6 +14336,9 @@ msgid "Metrics|There was an error getting deployment information."
 msgstr ""
 
 msgid "Metrics|There was an error getting environments information."
+msgstr ""
+
+msgid "Metrics|There was an error getting options for variable \"%{name}\"."
 msgstr ""
 
 msgid "Metrics|There was an error trying to validate your query"
@@ -17644,7 +17656,7 @@ msgstr ""
 msgid "ProjectSettings|Forks"
 msgstr ""
 
-msgid "ProjectSettings|Git Large File Storage"
+msgid "ProjectSettings|Git Large File Storage (LFS)"
 msgstr ""
 
 msgid "ProjectSettings|Internal"
@@ -20115,6 +20127,9 @@ msgstr ""
 msgid "SecurityReports|There was an error while generating the report."
 msgstr ""
 
+msgid "SecurityReports|Unable to add %{invalidProjectsMessage}"
+msgstr ""
+
 msgid "SecurityReports|Unable to add %{invalidProjects}"
 msgstr ""
 
@@ -21194,6 +21209,9 @@ msgid "Something went wrong, unable to remove project"
 msgstr ""
 
 msgid "Something went wrong, unable to search projects"
+msgstr ""
+
+msgid "Something went wrong."
 msgstr ""
 
 msgid "Something went wrong. Please try again."
@@ -24638,9 +24656,6 @@ msgstr ""
 msgid "UsageQuota|Storage"
 msgstr ""
 
-msgid "UsageQuota|Storage usage:"
-msgstr ""
-
 msgid "UsageQuota|This namespace has no projects which use shared runners"
 msgstr ""
 
@@ -24669,6 +24684,12 @@ msgid "UsageQuota|Wiki"
 msgstr ""
 
 msgid "UsageQuota|Wikis"
+msgstr ""
+
+msgid "UsageQuota|You used: %{usage} %{limit}"
+msgstr ""
+
+msgid "UsageQuota|out of %{formattedLimit} of your namespace storage"
 msgstr ""
 
 msgid "Use %{code_start}::%{code_end} to create a %{link_start}scoped label set%{link_end} (eg. %{code_start}priority::1%{code_end})"
@@ -25414,6 +25435,9 @@ msgid "VulnerabilityManagement|Resolved %{timeago} by %{user}"
 msgstr ""
 
 msgid "VulnerabilityManagement|Something went wrong while trying to delete the comment. Please try again later."
+msgstr ""
+
+msgid "VulnerabilityManagement|Something went wrong while trying to refresh the vulnerability. Please try again later."
 msgstr ""
 
 msgid "VulnerabilityManagement|Something went wrong while trying to retrieve the vulnerability history. Please try again later."

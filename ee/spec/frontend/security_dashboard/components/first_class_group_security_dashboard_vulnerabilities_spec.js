@@ -52,7 +52,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
         emptyStateSvgPath,
         filters: null,
         isLoading: true,
-        shouldShowSelection: false,
+        shouldShowSelection: true,
         shouldShowProjectNamespace: true,
         vulnerabilities: [],
       });
@@ -143,7 +143,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
         emptyStateSvgPath,
         filters: null,
         isLoading: false,
-        shouldShowSelection: false,
+        shouldShowSelection: true,
         shouldShowProjectNamespace: true,
         vulnerabilities,
       });

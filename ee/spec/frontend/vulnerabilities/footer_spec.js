@@ -141,10 +141,10 @@ describe('Vulnerability Footer', () => {
 
     describe('new notes polling', () => {
       const getDiscussion = (entries, index) => entries.at(index).props('discussion');
-      const createNotesRequest = note =>
+      const createNotesRequest = (...notes) =>
         mockAxios
           .onGet(minimumProps.notesUrl)
-          .replyOnce(200, { notes: [note], last_fetched_at: Date.now() });
+          .replyOnce(200, { notes, last_fetched_at: Date.now() });
 
       beforeEach(() => {
         const historyItems = [
@@ -202,6 +202,16 @@ describe('Vulnerability Footer', () => {
           expect(mockAxios.history.get).toHaveLength(2);
           expect(createFlash).toHaveBeenCalled();
         });
+      });
+
+      it('emits the VULNERABILITY_STATE_CHANGED event when the system note is new', async () => {
+        const spy = jest.spyOn(VulnerabilitiesEventBus, '$emit');
+        const note = { system: true, id: 1, discussion_id: 3 };
+        createNotesRequest(note);
+        await axios.waitForAll();
+
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGED');
       });
     });
   });

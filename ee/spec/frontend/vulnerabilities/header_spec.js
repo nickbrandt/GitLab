@@ -3,7 +3,7 @@ import { GlDeprecatedButton } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
 import waitForPromises from 'helpers/wait_for_promises';
 import UsersMockHelper from 'helpers/user_mock_data_helper';
-import Api from '~/api';
+import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
 import download from '~/lib/utils/downloader';
 import * as urlUtility from '~/lib/utils/url_utility';
@@ -120,7 +120,7 @@ describe('Vulnerability Header', () => {
 
     it('when the vulnerability state dropdown emits a change event, the vulnerabilities event bus event is emitted with the proper event', () => {
       const newState = 'dismiss';
-      jest.spyOn(VulnerabilitiesEventBus, '$emit');
+      const spy = jest.spyOn(VulnerabilitiesEventBus, '$emit');
       mockAxios.onPost().reply(201, { state: newState });
       expect(findBadge().text()).not.toBe(newState);
 
@@ -129,8 +129,8 @@ describe('Vulnerability Header', () => {
       dropdown.vm.$emit('change');
 
       return waitForPromises().then(() => {
-        expect(VulnerabilitiesEventBus.$emit).toHaveBeenCalledTimes(1);
-        expect(VulnerabilitiesEventBus.$emit).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGE');
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGE');
       });
     });
 
@@ -354,19 +354,12 @@ describe('Vulnerability Header', () => {
       expect(alert.props().defaultBranchName).toEqual(branchName);
     });
 
-    describe('when the vulnerability is already resolved', () => {
-      beforeEach(() => {
-        createWrapper({
-          resolved_on_default_branch: true,
-          state: 'resolved',
-        });
-      });
+    it('the resolution alert component should not be shown if when the vulnerability is already resolved', async () => {
+      wrapper.vm.vulnerability.state = 'resolved';
+      await wrapper.vm.$nextTick();
+      const alert = findResolutionAlert();
 
-      it('should not show the resolution alert component', () => {
-        const alert = findResolutionAlert();
-
-        expect(alert.exists()).toBe(false);
-      });
+      expect(alert.exists()).toBe(false);
     });
   });
 
@@ -414,6 +407,47 @@ describe('Vulnerability Header', () => {
         expect(mockAxios.history.get).toHaveLength(1);
         expect(findStatusDescription().props('isLoadingUser')).toBe(false);
       });
+    });
+  });
+
+  describe('when vulnerability state is changed', () => {
+    it('refreshes the vulnerability', async () => {
+      const url = Api.buildUrl(Api.vulnerabilityPath).replace(':id', defaultVulnerability.id);
+      const vulnerability = { state: 'dismissed' };
+      mockAxios.onGet(url).replyOnce(200, vulnerability);
+      createWrapper();
+      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+      await waitForPromises();
+
+      expect(findBadge().text()).toBe(vulnerability.state);
+      expect(findStatusDescription().props('vulnerability')).toMatchObject(vulnerability);
+    });
+
+    it('shows an error message when the vulnerability cannot be loaded', async () => {
+      mockAxios.onGet().replyOnce(500);
+      createWrapper();
+      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+      await waitForPromises();
+
+      expect(createFlash).toHaveBeenCalledTimes(1);
+      expect(mockAxios.history.get).toHaveLength(1);
+    });
+
+    it('cancels a pending refresh request if the vulnerability state has changed', async () => {
+      mockAxios.onGet().reply(200);
+      createWrapper();
+      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+
+      const source = wrapper.vm.refreshVulnerabilitySource;
+      const spy = jest.spyOn(source, 'cancel');
+
+      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+      await waitForPromises();
+
+      expect(createFlash).toHaveBeenCalledTimes(0);
+      expect(mockAxios.history.get).toHaveLength(1);
+      expect(spy).toHaveBeenCalled();
+      expect(wrapper.vm.refreshVulnerabilitySource).not.toBe(source); // Check that the source has changed.
     });
   });
 });

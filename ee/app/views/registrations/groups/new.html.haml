@@ -14,7 +14,7 @@
           .form-group.group-name-holder.col-sm-12
             = f.label :name, class: 'label-bold' do
               = _('Group name (your organization)')
-            = f.text_field :name, class: 'form-control',
+            = f.text_field :name, class: 'form-control js-autofill-group-name',
               required: true,
               title: _('Please fill in a descriptive name for your group.'),
               autofocus: true
@@ -27,7 +27,8 @@
               .group-root-path.input-group-prepend.has-tooltip{ title: root_url, :'data-placement' => 'bottom' }
                 .input-group-text
                   %span= root_url
-              = f.text_field :path, class: 'form-control js-validate-group-path',
+              = f.hidden_field :parent_id
+              = f.text_field :path, class: 'form-control js-validate-group-path js-autofill-group-path',
                 required: true,
                 pattern: Gitlab::PathRegex::NAMESPACE_FORMAT_REGEX_JS,
                 title: _('Please choose a group URL with no special characters.')

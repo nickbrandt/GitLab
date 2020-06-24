@@ -25,6 +25,9 @@ export default {
   UPDATE_ALERT_ASSIGNEES_ERROR: s__(
     'AlertManagement|There was an error while updating the assignee(s) of the alert. Please try again.',
   ),
+  UPDATE_ALERT_ASSIGNEES_GRAPHQL_ERROR: s__(
+    'AlertManagement|This assignee cannot be assigned to this alert.',
+  ),
   components: {
     GlIcon,
     GlDropdown,
@@ -139,7 +142,7 @@ export default {
           this.users = data;
         })
         .catch(() => {
-          this.$emit('alert-sidebar-error', this.$options.FETCH_USERS_ERROR);
+          this.$emit('alert-error', this.$options.FETCH_USERS_ERROR);
         })
         .finally(() => {
           this.isDropdownSearching = false;
@@ -156,12 +159,20 @@ export default {
             projectPath: this.projectPath,
           },
         })
-        .then(() => {
+        .then(({ data: { alertSetAssignees: { errors } = [] } = {} } = {}) => {
           this.hideDropdown();
-          this.$emit('alert-refresh');
+
+          if (errors[0]) {
+            return this.$emit(
+              'alert-sidebar-error',
+              `${this.$options.UPDATE_ALERT_ASSIGNEES_GRAPHQL_ERROR} ${errors[0]}.`,
+            );
+          }
+
+          return this.$emit('alert-refresh');
         })
         .catch(() => {
-          this.$emit('alert-sidebar-error', this.$options.UPDATE_ALERT_ASSIGNEES_ERROR);
+          this.$emit('alert-error', this.$options.UPDATE_ALERT_ASSIGNEES_ERROR);
         })
         .finally(() => {
           this.isUpdating = false;

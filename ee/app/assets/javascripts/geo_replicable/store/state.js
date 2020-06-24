@@ -1,4 +1,4 @@
-import { FILTER_STATES } from '../constants';
+import { FILTER_STATES, DEFAULT_PAGE_SIZE } from '../constants';
 
 const createState = ({ replicableType, useGraphQl }) => ({
   replicableType,
@@ -14,7 +14,7 @@ const createState = ({ replicableType, useGraphQl }) => ({
     endCursor: '',
     // RESTful
     total: 0,
-    perPage: 0,
+    perPage: DEFAULT_PAGE_SIZE,
     page: 1,
   },
 

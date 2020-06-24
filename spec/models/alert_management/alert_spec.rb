@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe AlertManagement::Alert do
+RSpec.describe AlertManagement::Alert do
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:issue) }
@@ -335,6 +335,24 @@ describe AlertManagement::Alert do
 
     it 'increments the events count by 1' do
       expect { subject }.to change { alert.events }.by(1)
+    end
+  end
+
+  describe '#present' do
+    context 'when alert is generic' do
+      let(:alert) { build(:alert_management_alert) }
+
+      it 'uses generic alert presenter' do
+        expect(alert.present).to be_kind_of(AlertManagement::AlertPresenter)
+      end
+    end
+
+    context 'when alert is Prometheus specific' do
+      let(:alert) { build(:alert_management_alert, :prometheus) }
+
+      it 'uses Prometheus Alert presenter' do
+        expect(alert.present).to be_kind_of(AlertManagement::PrometheusAlertPresenter)
+      end
     end
   end
 end

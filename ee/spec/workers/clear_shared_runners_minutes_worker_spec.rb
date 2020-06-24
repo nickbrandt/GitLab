@@ -36,7 +36,7 @@ RSpec.describe ClearSharedRunnersMinutesWorker do
         it 'resets timer' do
           subject
 
-          expect(statistics.reload.shared_runners_seconds_last_reset).to be_like_time(Time.now)
+          expect(statistics.reload.shared_runners_seconds_last_reset).to be_like_time(Time.current)
         end
 
         context 'when there are namespaces that were not reset after the reset steps' do
@@ -68,7 +68,7 @@ RSpec.describe ClearSharedRunnersMinutesWorker do
         it 'resets timer' do
           subject
 
-          expect(statistics.reload.shared_runners_seconds_last_reset).to be_like_time(Time.now)
+          expect(statistics.reload.shared_runners_seconds_last_reset).to be_like_time(Time.current)
         end
       end
 
@@ -118,7 +118,7 @@ RSpec.describe ClearSharedRunnersMinutesWorker do
         [:last_ci_minutes_notification_at, :last_ci_minutes_usage_notification_level].each do |attr|
           context "when #{attr} is present" do
             before do
-              namespace.update_attribute(attr, Time.now)
+              namespace.update_attribute(attr, Time.current)
             end
 
             it 'nullifies the field' do
