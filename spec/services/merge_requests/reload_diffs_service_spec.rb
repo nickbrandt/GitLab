@@ -34,10 +34,8 @@ describe MergeRequests::ReloadDiffsService, :use_clean_rails_memory_store_cachin
 
     context 'cache clearing' do
       it 'clears the cache for older diffs on the merge request' do
-        old_diff = merge_request.merge_request_diff
-        old_cache_key = old_diff.diffs_collection.cache_key
-
-        expect_any_instance_of(Redis).to receive(:del).with(old_cache_key).and_call_original
+        expect_any_instance_of(Redis).to receive(:del).once.and_call_original
+        expect(Rails.cache).to receive(:delete).once.and_call_original
 
         subject.execute
       end
