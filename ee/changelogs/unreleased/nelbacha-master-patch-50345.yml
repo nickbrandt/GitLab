@@ -1,5 +1,0 @@
----
-title: Conditionally render the packages scopes in deploy token settings
-merge_request: 33042
-author:
-type: fixed
