@@ -49,8 +49,8 @@ module Geo
 
       job_id = Geo::ProjectSyncWorker.perform_async(
         project_id,
-        sync_repository: registry.repository_sync_due?(Time.now),
-        sync_wiki: registry.wiki_sync_due?(Time.now)
+        sync_repository: registry.repository_sync_due?(Time.current),
+        sync_wiki: registry.wiki_sync_due?(Time.current)
       )
 
       { project_id: project_id, job_id: job_id } if job_id
