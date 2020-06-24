@@ -11,7 +11,7 @@ import projectsQuery from 'ee/security_dashboard/graphql/get_instance_security_d
 import ProjectManager from './first_class_project_manager/project_manager.vue';
 import CsvExportButton from './csv_export_button.vue';
 import vulnerabilityHistoryQuery from '../graphql/instance_vulnerability_history.graphql';
-import EmptyState from './empty_states/first_class_instance_security_dashboard.vue';
+import DashboardNotConfigured from './empty_states/dashboard_not_configured.vue';
 
 export default {
   components: {
@@ -24,7 +24,7 @@ export default {
     Filters,
     GlLoadingIcon,
     GlButton,
-    EmptyState,
+    DashboardNotConfigured,
   },
   props: {
     dashboardDocumentation: {
@@ -129,7 +129,7 @@ export default {
       :filters="filters"
     />
     <div v-else-if="shouldShowEmptyState">
-      <empty-state
+      <dashboard-not-configured
         :svg-path="emptyStateSvgPath"
         :dashboard-documentation="dashboardDocumentation"
         @handleAddProjectsClick="toggleProjectSelector"

@@ -8,7 +8,7 @@ import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vul
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import ProjectManager from 'ee/security_dashboard/components/first_class_project_manager/project_manager.vue';
-import EmptyState from 'ee/security_dashboard/components/empty_states/first_class_instance_security_dashboard.vue';
+import DashboardNotConfigured from 'ee/security_dashboard/components/empty_states/dashboard_not_configured.vue';
 
 describe('First Class Instance Dashboard Component', () => {
   let wrapper;
@@ -25,7 +25,7 @@ describe('First Class Instance Dashboard Component', () => {
   const findVulnerabilityChart = () => wrapper.find(VulnerabilityChart);
   const findCsvExportButton = () => wrapper.find(CsvExportButton);
   const findProjectManager = () => wrapper.find(ProjectManager);
-  const findEmptyState = () => wrapper.find(EmptyState);
+  const findEmptyState = () => wrapper.find(DashboardNotConfigured);
   const findFilters = () => wrapper.find(Filters);
 
   const createWrapper = ({ data = {}, stubs }) => {
@@ -103,7 +103,7 @@ describe('First Class Instance Dashboard Component', () => {
         data: {
           isManipulatingProjects: false,
           stubs: {
-            EmptyState,
+            DashboardNotConfigured,
             GlButton,
           },
         },
