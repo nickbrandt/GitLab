@@ -46,7 +46,7 @@ FactoryBot.define do
       create(:sentry_issue, issue: projects[0].issues[0])
 
       # Incident Labeled Issues
-      incident_label_attrs = IncidentManagement::CreateIssueService::INCIDENT_LABEL
+      incident_label_attrs = IncidentManagement::CreateIncidentLabelService::LABEL_PROPERTIES
       incident_label = create(:label, project: projects[0], **incident_label_attrs)
       create(:labeled_issue, project: projects[0], labels: [incident_label])
       incident_group = create(:group)
