@@ -21,7 +21,7 @@ module Resolvers
 
       argument :search, GraphQL::STRING_TYPE,
                required: false,
-               description: 'Filter requirements by title search'
+               description: 'Search query for requirement title'
 
       argument :author_username, [GraphQL::STRING_TYPE],
                required: false,
