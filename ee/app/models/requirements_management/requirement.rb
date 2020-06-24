@@ -7,6 +7,9 @@ module RequirementsManagement
     include AtomicInternalId
     include Sortable
     include Gitlab::SQL::Pattern
+    include IgnorableColumns
+
+    ignore_column :pipeline_id, remove_with: '13.4', remove_after: '2020-08-22'
 
     # the expected name for this table is `requirements_management_requirements`,
     # but to avoid downtime and deployment issues `requirements` is still used
