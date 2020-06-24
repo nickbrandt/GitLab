@@ -10,9 +10,3 @@ RSpec.shared_examples 'parsing gl_repository identifier' do
     )
   end
 end
-
-RSpec.shared_examples 'illegal gl_identifier' do
-  it 'raises an error' do
-    expect { described_class.parse(identifier) }.to raise_error(described_class::InvalidIdentifier)
-  end
-end

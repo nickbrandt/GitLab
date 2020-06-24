@@ -15,11 +15,13 @@ describe Gitlab::GlRepository::Identifier do
       let(:expected_type) { Gitlab::GlRepository::PROJECT }
     end
 
-    it_behaves_like 'parsing gl_repository identifier' do
-      let(:record_id) { project.id }
-      let(:identifier) { "project-#{record_id}-project" }
-      let(:expected_container) { project }
-      let(:expected_type) { Gitlab::GlRepository::PROJECT }
+    pending 'https://gitlab.com/gitlab-org/gitlab/-/issues/219192' do
+      it_behaves_like 'parsing gl_repository identifier' do
+        let(:record_id) { project.id }
+        let(:identifier) { "project-#{record_id}-code" }
+        let(:expected_container) { project }
+        let(:expected_type) { Gitlab::GlRepository::PROJECT }
+      end
     end
 
     it_behaves_like 'parsing gl_repository identifier' do
@@ -90,7 +92,14 @@ describe Gitlab::GlRepository::Identifier do
     end
 
     with_them do
-      it_behaves_like 'illegal gl_identifier'
+      it 'raises InvalidIdentifier' do
+        expect { described_class.parse(identifier) }.to raise_error(described_class::InvalidIdentifier)
+      end
+    end
+
+    it 'raises InvalidIdentifier on project-1-project' do
+      pending 'https://gitlab.com/gitlab-org/gitlab/-/issues/219192'
+      expect { described_class.parse('project-1-project') }.to raise_error(described_class::InvalidIdentifier)
     end
   end
 end
