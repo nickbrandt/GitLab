@@ -33,6 +33,6 @@ RSpec.describe 'User deletes feature flag', :js do
   it 'records audit event' do
     visit(project_audit_events_path(project))
 
-    expect(page).to have_text("Deleted feature flag <strong>ci_live_trace</strong>.")
+    expect(page).to have_text("Deleted feature flag ci_live_trace.")
   end
 end

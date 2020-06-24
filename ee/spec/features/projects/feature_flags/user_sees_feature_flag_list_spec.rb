@@ -80,7 +80,7 @@ RSpec.describe 'User sees feature flag list', :js do
       visit(project_audit_events_path(project))
 
       expect(page).to(
-        have_text('Updated feature flag <strong>ci_live_trace</strong>. Updated active from <strong>"false"</strong> to <strong>"true"</strong>.')
+        have_text('Updated feature flag ci_live_trace. Updated active from "false" to "true".')
       )
     end
   end

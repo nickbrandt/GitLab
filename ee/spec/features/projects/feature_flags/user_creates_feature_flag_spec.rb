@@ -96,7 +96,7 @@ RSpec.describe 'User creates feature flag', :js do
       it 'records audit event' do
         visit(project_audit_events_path(project))
 
-        expect(page).to have_text("Created feature flag <strong>ci_live_trace</strong> with description <strong>\"For live trace\"</strong>.")
+        expect(page).to have_text("Created feature flag ci_live_trace with description \"For live trace\".")
       end
     end
 
