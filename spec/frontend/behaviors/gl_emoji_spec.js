@@ -1,59 +1,28 @@
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import { initEmojiMap, glEmojiTag, EMOJI_VERSION } from '~/emoji';
+import { initEmojiMap, EMOJI_VERSION } from '~/emoji';
 import installGlEmojiElement from '~/behaviors/gl_emoji';
+
+import * as EmojiUnicodeSupport from '~/emoji/support';
+import waitForPromises from 'jest/helpers/wait_for_promises';
+
+jest.mock('~/emoji/support');
 
 describe('gl_emoji', () => {
   let mock;
   const emojiData = getJSONFixture('emojis/emojis.json');
 
-  const emojiFixtureBomb = {
-    name: 'bomb',
-    moji: '💣',
-    unicodeVersion: '6.0',
-  };
-
-  const emojiFixtureGreyQuestion = {
-    name: 'grey_question',
-    moji: '❔',
-    unicodeVersion: '6.0',
-  };
-
   beforeAll(() => {
+    jest.spyOn(EmojiUnicodeSupport, 'default').mockReturnValue(true);
     installGlEmojiElement();
   });
 
-  async function markupToDomElement(markup) {
+  function markupToDomElement(markup) {
     const div = document.createElement('div');
     div.innerHTML = markup;
     document.body.appendChild(div);
 
     return div.firstElementChild;
-  }
-
-  function testGlEmojiImageFallback(element, name) {
-    expect(element.tagName.toLowerCase()).toBe('img');
-    expect(element.getAttribute('src')).toBe(`/-/emojis/${EMOJI_VERSION}/${name}.png`);
-    expect(element.getAttribute('title')).toBe(`:${name}:`);
-    expect(element.getAttribute('alt')).toBe(`:${name}:`);
-  }
-
-  const defaults = {
-    sprite: false,
-  };
-
-  function testGlEmojiElement(element, name, unicodeVersion, unicodeMoji, options = {}) {
-    const opts = { ...defaults, ...options };
-    expect(element.tagName.toLowerCase()).toBe('gl-emoji');
-    expect(element.dataset.name).toBe(name);
-    expect(element.dataset.uni).toBe(unicodeVersion);
-
-    const fallbackSpriteClass = `emoji-${name}`;
-    if (opts.sprite) {
-      expect(element.dataset.fallbackSpriteClass).toBe(fallbackSpriteClass);
-    }
-
-    expect(element.textContent.trim()).toBe(unicodeMoji);
   }
 
   beforeEach(() => {
@@ -69,45 +38,73 @@ describe('gl_emoji', () => {
     document.body.innerHTML = '';
   });
 
-  it('bomb emoji', async () => {
-    const markup = glEmojiTag(emojiFixtureBomb.name);
+  describe.each([
+    [
+      'bomb emoji just with name attribute',
+      '<gl-emoji data-name="bomb"></gl-emoji>',
+      '<gl-emoji data-name="bomb" data-uni="6.0" title="bomb">💣</gl-emoji>',
+      '<gl-emoji data-name="bomb" data-uni="6.0" title="bomb"><img class="emoji" title=":bomb:" alt=":bomb:" src="/-/emojis/1/bomb.png" width="20" height="20" align="absmiddle"></gl-emoji>',
+    ],
+    [
+      'bomb emoji with name attribute and unicode version',
+      '<gl-emoji data-name="bomb" data-unicode-version="6.0">💣</gl-emoji>',
+      '<gl-emoji data-name="bomb" data-unicode-version="6.0">💣</gl-emoji>',
+      '<gl-emoji data-name="bomb" data-unicode-version="6.0"><img class="emoji" title=":bomb:" alt=":bomb:" src="/-/emojis/1/bomb.png" width="20" height="20" align="absmiddle"></gl-emoji>',
+    ],
+    [
+      'bomb emoji with sprite fallback',
+      '<gl-emoji data-fallback-sprite-class="emoji-bomb" data-name="bomb"></gl-emoji>',
+      '<gl-emoji data-fallback-sprite-class="emoji-bomb" data-name="bomb" data-uni="6.0" title="bomb">💣</gl-emoji>',
+      '<gl-emoji data-fallback-sprite-class="emoji-bomb" data-name="bomb" data-uni="6.0" title="bomb" class="emoji-icon emoji-bomb">💣</gl-emoji>',
+    ],
+    [
+      'bomb emoji with image fallback',
+      '<gl-emoji data-fallback-src="/bomb.png" data-name="bomb"></gl-emoji>',
+      '<gl-emoji data-fallback-src="/bomb.png" data-name="bomb" data-uni="6.0" title="bomb">💣</gl-emoji>',
+      '<gl-emoji data-fallback-src="/bomb.png" data-name="bomb" data-uni="6.0" title="bomb"><img class="emoji" title=":bomb:" alt=":bomb:" src="/bomb.png" width="20" height="20" align="absmiddle"></gl-emoji>',
+    ],
+    [
+      'invalid emoji',
+      '<gl-emoji data-name="invalid_emoji"></gl-emoji>',
+      '<gl-emoji data-name="grey_question" data-uni="6.0" title="white question mark ornament">❔</gl-emoji>',
+      '<gl-emoji data-name="grey_question" data-uni="6.0" title="white question mark ornament"><img class="emoji" title=":grey_question:" alt=":grey_question:" src="/-/emojis/1/grey_question.png" width="20" height="20" align="absmiddle"></gl-emoji>',
+    ],
+  ])('%s', (name, markup, withEmojiSupport, withoutEmojiSupport) => {
+    it(`renders correctly with emoji support`, async () => {
+      jest.spyOn(EmojiUnicodeSupport, 'default').mockReturnValue(true);
+      const glEmojiElement = markupToDomElement(markup);
 
-    const glEmojiElement = await markupToDomElement(markup);
-    testGlEmojiElement(
-      glEmojiElement,
-      emojiFixtureBomb.name,
-      emojiFixtureBomb.unicodeVersion,
-      emojiFixtureBomb.moji,
-    );
-  });
+      await waitForPromises();
 
-  it('bomb emoji with sprite fallback readiness', async () => {
-    const markup = glEmojiTag(emojiFixtureBomb.name, {
-      sprite: true,
+      expect(glEmojiElement.outerHTML).toBe(withEmojiSupport);
     });
 
-    const glEmojiElement = await markupToDomElement(markup);
-    testGlEmojiElement(
-      glEmojiElement,
-      emojiFixtureBomb.name,
-      emojiFixtureBomb.unicodeVersion,
-      emojiFixtureBomb.moji,
-      {
-        sprite: true,
-      },
-    );
+    it(`renders correctly without emoji support`, async () => {
+      jest.spyOn(EmojiUnicodeSupport, 'default').mockReturnValue(false);
+      const glEmojiElement = markupToDomElement(markup);
+
+      await waitForPromises();
+
+      expect(glEmojiElement.outerHTML).toBe(withoutEmojiSupport);
+    });
   });
 
-  it('question mark when invalid emoji name given', async () => {
-    const name = 'invalid_emoji';
-    const markup = glEmojiTag(name);
+  it('Adds sprite CSS if emojis are not supported', async () => {
+    const testPath = '/test-path.css';
+    jest.spyOn(EmojiUnicodeSupport, 'default').mockReturnValue(false);
+    window.gon.emoji_sprites_css_path = testPath;
 
-    const glEmojiElement = await markupToDomElement(markup, true);
-    testGlEmojiElement(
-      glEmojiElement,
-      emojiFixtureGreyQuestion.name,
-      emojiFixtureGreyQuestion.unicodeVersion,
-      emojiFixtureGreyQuestion.moji,
+    expect(document.head.querySelector(`link[href="${testPath}"]`)).toBe(null);
+    expect(window.gon.emoji_sprites_css_added).toBeFalsy();
+
+    markupToDomElement(
+      '<gl-emoji data-fallback-sprite-class="emoji-bomb" data-name="bomb"></gl-emoji>',
     );
+    await waitForPromises();
+
+    expect(document.head.querySelector(`link[href="${testPath}"]`).outerHTML).toBe(
+      '<link rel="stylesheet" href="/test-path.css">',
+    );
+    expect(window.gon.emoji_sprites_css_added).toBe(true);
   });
 });
