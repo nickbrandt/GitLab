@@ -4,6 +4,7 @@ import emojiRegex from 'emoji-regex';
 import createFlash from '~/flash';
 import EmojiMenu from './emoji_menu';
 import { __ } from '~/locale';
+import * as Emoji from '~/emoji';
 
 const defaultStatusEmoji = 'speech_balloon';
 
@@ -55,22 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  let emojiModule;
-  import(/* webpackChunkName: 'emoji' */ '~/emoji')
-    .then(Emoji => {
-      emojiModule = Emoji;
-      return Emoji.initEmojiMap();
-    })
+  Emoji.initEmojiMap()
     .then(() => {
       const emojiMenu = new EmojiMenu(
-        emojiModule,
+        Emoji,
         toggleEmojiMenuButtonSelector,
         'js-status-emoji-menu',
         selectEmojiCallback,
       );
       emojiMenu.bindEvents();
 
-      const defaultEmojiTag = emojiModule.glEmojiTag(defaultStatusEmoji);
+      const defaultEmojiTag = Emoji.glEmojiTag(defaultStatusEmoji);
       statusMessageField.addEventListener('input', () => {
         const hasStatusMessage = statusMessageField.value.trim() !== '';
         const statusEmoji = findStatusEmoji();

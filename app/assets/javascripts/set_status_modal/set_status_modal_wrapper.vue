@@ -8,6 +8,7 @@ import { __, s__ } from '~/locale';
 import Api from '~/api';
 import eventHub from './event_hub';
 import EmojiMenuInModal from './emoji_menu_in_modal';
+import * as Emoji from '~/emoji';
 
 const emojiMenuClass = 'js-modal-status-emoji-menu';
 
@@ -64,21 +65,16 @@ export default {
       const emojiAutocomplete = new GfmAutoComplete();
       emojiAutocomplete.setup($(this.$refs.statusMessageField), { emojis: true });
 
-      let emojiModule;
-      import(/* webpackChunkName: 'emoji' */ '~/emoji')
-        .then(Emoji => {
-          emojiModule = Emoji;
-          return Emoji.initEmojiMap();
-        })
+      Emoji.initEmojiMap()
         .then(() => {
           if (this.emoji) {
-            this.emojiTag = emojiModule.glEmojiTag(this.emoji);
+            this.emojiTag = Emoji.glEmojiTag(this.emoji);
           }
           this.noEmoji = this.emoji === '';
-          this.defaultEmojiTag = emojiModule.glEmojiTag('speech_balloon');
+          this.defaultEmojiTag = Emoji.glEmojiTag('speech_balloon');
 
           this.emojiMenu = new EmojiMenuInModal(
-            emojiModule,
+            Emoji,
             toggleEmojiMenuButtonSelector,
             emojiMenuClass,
             this.setEmoji,

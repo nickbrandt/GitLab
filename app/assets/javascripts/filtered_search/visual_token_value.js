@@ -7,6 +7,7 @@ import DropdownUtils from '~/filtered_search/dropdown_utils';
 import Flash from '~/flash';
 import UsersCache from '~/lib/utils/users_cache';
 import { __ } from '~/locale';
+import * as Emoji from '~/emoji';
 
 export default class VisualTokenValue {
   constructor(tokenValue, tokenType, tokenOperator) {
@@ -136,24 +137,14 @@ export default class VisualTokenValue {
     const container = tokenValueContainer;
     const element = tokenValueElement;
     const value = this.tokenValue;
-    let emojiModule;
 
-    return (
-      import(/* webpackChunkName: 'emoji' */ '~/emoji')
-        .then(Emoji => {
-          emojiModule = Emoji;
-          return Emoji.initEmojiMap();
-        })
-        .then(() => {
-          if (!emojiModule.isEmojiNameValid(value)) {
-            return;
-          }
+    return Emoji.initEmojiMap().then(() => {
+      if (!Emoji.isEmojiNameValid(value)) {
+        return;
+      }
 
-          container.dataset.originalValue = value;
-          element.innerHTML = emojiModule.glEmojiTag(value);
-        })
-        // ignore error and leave emoji name in the search bar
-        .catch(() => {})
-    );
+      container.dataset.originalValue = value;
+      element.innerHTML = Emoji.glEmojiTag(value);
+    });
   }
 }
