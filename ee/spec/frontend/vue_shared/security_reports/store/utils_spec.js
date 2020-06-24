@@ -7,6 +7,7 @@ import {
 } from 'ee/vue_shared/security_reports/store/utils';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
+import getPrimaryIdentifiers from 'ee/vue_shared/security_reports/store/utils/get_primary_identifier';
 
 describe('security reports utils', () => {
   describe('findIssueIndex', () => {
@@ -72,6 +73,22 @@ describe('security reports utils', () => {
       const result = getFileLocation(undefined);
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('getPrimaryIdentifier', () => {
+    const identifiers = [
+      { external_type: 'cve', name: 'CVE-1337' },
+      { external_type: 'gemnaisum', name: 'GEMNASIUM-1337' },
+    ];
+    it('should return the `cve` identifier if a `cve` identifier does exist', () => {
+      expect(getPrimaryIdentifiers(identifiers)).toBe(identifiers[0].name);
+    });
+    it('should return the first identifier if a `cve` identifier does not exist', () => {
+      expect(getPrimaryIdentifiers([identifiers[1]])).toBe(identifiers[1].name);
+    });
+    it('should return an empty string if identifiers is empty', () => {
+      expect(getPrimaryIdentifiers()).toBe('');
     });
   });
 
