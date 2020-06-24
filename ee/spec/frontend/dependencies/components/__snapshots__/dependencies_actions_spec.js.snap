@@ -17,7 +17,7 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           class="d-flex"
         >
           <gl-icon-stub
-            class="flex-shrink-0 append-right-4 invisible"
+            class="flex-shrink-0 gl-mr-2 invisible"
             name="mobile-issue-close"
             size="16"
           />
@@ -31,7 +31,7 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           class="d-flex"
         >
           <gl-icon-stub
-            class="flex-shrink-0 append-right-4 invisible"
+            class="flex-shrink-0 gl-mr-2 invisible"
             name="mobile-issue-close"
             size="16"
           />
@@ -45,7 +45,7 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           class="d-flex"
         >
           <gl-icon-stub
-            class="flex-shrink-0 append-right-4"
+            class="flex-shrink-0 gl-mr-2"
             name="mobile-issue-close"
             size="16"
           />

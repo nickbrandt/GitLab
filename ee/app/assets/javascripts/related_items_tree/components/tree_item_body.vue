@@ -175,7 +175,7 @@ export default {
               :title="__('Confidential')"
               :aria-label="__('Confidential')"
               name="eye-slash"
-              class="confidential-icon append-right-4 align-self-baseline align-self-md-auto mt-xl-0"
+              class="confidential-icon gl-mr-2 align-self-baseline align-self-md-auto mt-xl-0"
             />
             <gl-link
               v-gl-tooltip.hover

@@ -312,7 +312,7 @@ export default {
                   >
                     <span class="d-flex">
                       <icon
-                        class="flex-shrink-0 append-right-4"
+                        class="flex-shrink-0 gl-mr-2"
                         :class="{
                           invisible: !isSelectedSortField(metric.key),
                         }"
