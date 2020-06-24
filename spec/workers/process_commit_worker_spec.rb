@@ -202,7 +202,7 @@ describe ProcessCommitWorker do
                                    id: '123',
                                    authored_date: Time.current.to_s)
 
-      expect(commit.authored_date).to be_an_instance_of(Time)
+      expect(commit.authored_date).to be_a_kind_of(Time)
     end
   end
 end
