@@ -540,8 +540,5 @@ module.exports = {
 
   devtool: NO_SOURCEMAPS ? false : devtool,
 
-  node: {
-    fs: 'empty', // sqljs requires fs
-    setImmediate: false,
-  },
+  node: false,
 };
