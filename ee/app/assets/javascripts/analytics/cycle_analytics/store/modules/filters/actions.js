@@ -6,6 +6,8 @@ import * as types from './mutation_types';
 
 const appendExtension = path => (path.indexOf('.') > -1 ? path : `${path}.json`);
 
+// TODO: After we remove instance VSA we can rely on the paths from the BE
+// https://gitlab.com/gitlab-org/gitlab/-/issues/223735
 export const setPaths = ({ commit }, { groupPath = '', milestonesPath = '', labelsPath = '' }) => {
   const ms = milestonesPath || `/groups/${groupPath}/-/milestones`;
   const ls = labelsPath || `/groups/${groupPath}/-/labels`;
@@ -88,8 +90,7 @@ export const setFilters = ({ dispatch }, nextFilters) =>
 
 export const initialize = ({ dispatch, commit }, initialFilters) => {
   commit(types.INITIALIZE, initialFilters);
-  return Promise.resolve()
-    .then(() => dispatch('setPaths', initialFilters))
+  return dispatch('setPaths', initialFilters)
     .then(() => dispatch('setFilters', initialFilters))
     .then(() => dispatch('fetchTokenData'));
 };

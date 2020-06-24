@@ -98,7 +98,7 @@ function createComponent({
   });
 
   if (withStageSelected) {
-    comp.vm.$store.dispatch('setSelectedGroup', {
+    comp.vm.$store.commit('SET_SELECTED_GROUP', {
       ...selectedGroup,
     });
 

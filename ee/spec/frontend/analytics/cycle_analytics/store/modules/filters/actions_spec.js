@@ -16,10 +16,15 @@ jest.mock('~/flash', () => jest.fn());
 describe('Filters actions', () => {
   let state;
   let mock;
+  let mockDispatch;
+  let mockCommit;
 
   beforeEach(() => {
     state = initialState();
     mock = new MockAdapter(axios);
+
+    mockDispatch = jest.fn().mockResolvedValue();
+    mockCommit = jest.fn();
   });
 
   afterEach(() => {
@@ -34,18 +39,37 @@ describe('Filters actions', () => {
       selectedMilestone: 'NEXT',
     };
 
-    it('initializes the state and dispatches setPaths, setFilters and fetchTokenData', () => {
-      return testAction(
-        actions.initialize,
-        initialData,
-        state,
-        [{ type: types.INITIALIZE, payload: initialData }],
-        [
-          { type: 'setPaths', payload: initialData },
-          { type: 'setFilters', payload: initialData },
-          { type: 'fetchTokenData' },
-        ],
-      );
+    it('dispatches setPaths, setFilters and fetchTokenData', () => {
+      return actions
+        .initialize(
+          {
+            state,
+            dispatch: mockDispatch,
+            commit: mockCommit,
+          },
+          initialData,
+        )
+        .then(() => {
+          expect(mockDispatch).toHaveBeenCalledTimes(3);
+          expect(mockDispatch).toHaveBeenCalledWith('setPaths', initialData);
+          expect(mockDispatch).toHaveBeenCalledWith('setFilters', initialData);
+          expect(mockDispatch).toHaveBeenCalledWith('fetchTokenData');
+        });
+    });
+
+    it(`commits the ${types.INITIALIZE}`, () => {
+      return actions
+        .initialize(
+          {
+            state,
+            dispatch: mockDispatch,
+            commit: mockCommit,
+          },
+          initialData,
+        )
+        .then(() => {
+          expect(mockCommit).toHaveBeenCalledWith(types.INITIALIZE, initialData);
+        });
     });
   });
 

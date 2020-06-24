@@ -108,6 +108,8 @@ export default {
       return this.featureFlags.hasPathNavigation && !this.hasNoAccessError && this.selectedStage;
     },
     shouldDisplayFilterBar() {
+      // TODO: After we remove instance VSA currentGroupPath will be always set
+      // https://gitlab.com/gitlab-org/gitlab/-/issues/223735
       return this.featureFlags.hasFilterBar && this.currentGroupPath;
     },
     isLoadingTypeOfWork() {

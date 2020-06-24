@@ -268,9 +268,9 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
       });
     }
 
-    return Promise.resolve()
-      .then(() => dispatch('fetchCycleAnalyticsData'))
-      .then(() => dispatch('initializeCycleAnalyticsSuccess'));
+    return dispatch('fetchCycleAnalyticsData').then(() =>
+      dispatch('initializeCycleAnalyticsSuccess'),
+    );
   }
   return dispatch('initializeCycleAnalyticsSuccess');
 };
