@@ -4,6 +4,7 @@ class ProjectUpdateRepositoryStorageWorker # rubocop:disable Scalability/Idempot
   include ApplicationWorker
 
   feature_category :gitaly
+  urgency :throttled
 
   def perform(project_id, new_repository_storage_key, repository_storage_move_id = nil)
     repository_storage_move =

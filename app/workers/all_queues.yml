@@ -5,7 +5,7 @@
 ---
 - :name: authorized_project_update:authorized_project_update_project_create
   :feature_category: :authentication_and_authorization
-  :has_external_dependencies:
+  :has_external_dependencies: 
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
@@ -13,7 +13,7 @@
   :tags: []
 - :name: authorized_project_update:authorized_project_update_project_group_link_create
   :feature_category: :authentication_and_authorization
-  :has_external_dependencies:
+  :has_external_dependencies: 
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
@@ -1542,7 +1542,7 @@
 - :name: project_update_repository_storage
   :feature_category: :gitaly
   :has_external_dependencies: 
-  :urgency: :low
+  :urgency: :throttled
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
