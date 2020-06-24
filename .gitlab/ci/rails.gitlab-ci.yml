@@ -295,6 +295,17 @@ rspec system pg11-as-if-foss:
     - .rails:rules:as-if-foss-system
   parallel: 24
 
+load-rails-as-if-foss:
+  extends:
+    - .rails-job-base
+    - .as-if-foss
+    - .use-pg11
+    - .rails:rules:load-rails-as-if-foss
+  stage: test
+  needs: ["setup-test-env"]
+  script:
+    - run_timed_command "rails runner 'puts Gitlab.version_info'"
+
 .rspec-ee-base-pg11:
   extends:
     - .rspec-base

@@ -518,6 +518,12 @@
     - <<: *if-merge-request
       changes: *ci-patterns
 
+.rails:rules:load-rails-as-if-foss:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - changes: *backend-patterns
+
 .rails:rules:ee-mr-and-master-only:
   rules:
     - <<: *if-not-ee
