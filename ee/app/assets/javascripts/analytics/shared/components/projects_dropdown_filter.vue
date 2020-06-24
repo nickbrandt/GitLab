@@ -140,7 +140,7 @@ export default {
     toggle-class="gl-shadow-none"
   >
     <template #button-content>
-      <div class="gl-display-flex">
+      <div class="gl-display-flex gl-flex-fill-1">
         <gl-avatar
           v-if="isOnlyOneProjectSelected"
           :src="selectedProjects[0].avatar_url"
@@ -152,8 +152,8 @@ export default {
           class="gl-display-inline-flex gl-vertical-align-middle gl-mr-2"
         />
         {{ selectedProjectsLabel }}
-        <gl-icon class="gl-ml-2" name="chevron-down" />
       </div>
+      <gl-icon class="gl-ml-2" name="chevron-down" />
     </template>
     <gl-dropdown-header>{{ __('Projects') }}</gl-dropdown-header>
     <gl-search-box-by-type v-model.trim="searchTerm" class="gl-m-3" />

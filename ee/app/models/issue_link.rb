@@ -65,6 +65,23 @@ class IssueLink < ApplicationRecord
         .joins("INNER JOIN issues ON issues.id = issue_links.#{blocking_key}")
         .where('issues.state_id' => Issuable::STATE_ID_MAP[:opened])
     end
+
+    def blocking_issues_for_collection(issues_ids)
+      from_union([
+        select('COUNT(*), issue_links.source_id AS blocking_issue_id')
+          .joins(:target)
+          .where(issues: { state_id: Issue.available_states[:opened] })
+          .where(link_type: TYPE_BLOCKS)
+          .where(source_id: issues_ids)
+          .group(:blocking_issue_id),
+        select('COUNT(*), issue_links.target_id AS blocking_issue_id')
+          .joins(:source)
+          .where(issues: { state_id: Issue.available_states[:opened] })
+          .where(link_type: TYPE_IS_BLOCKED_BY)
+          .where(target_id: issues_ids)
+          .group(:blocking_issue_id)
+      ], remove_duplicates: false).select('blocking_issue_id, SUM(count) AS count').group('blocking_issue_id')
+    end
   end
 
   def check_self_relation

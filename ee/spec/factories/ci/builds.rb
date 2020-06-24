@@ -124,7 +124,7 @@ FactoryBot.define do
 
     trait :requirements_report do
       after(:build) do |build|
-        build.job_artifacts << create(:ee_ci_job_artifact, :requirements, job: build)
+        build.job_artifacts << create(:ee_ci_job_artifact, :all_passing_requirements, job: build)
       end
     end
   end

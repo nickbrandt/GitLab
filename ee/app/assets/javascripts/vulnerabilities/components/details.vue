@@ -1,12 +1,11 @@
 <script>
 import { GlLink, GlSprintf } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
-import SafeLink from 'ee/vue_shared/components/safe_link.vue';
 import DetailItem from './detail_item.vue';
 
 export default {
   name: 'VulnerabilityDetails',
-  components: { GlLink, SeverityBadge, DetailItem, SafeLink, GlSprintf },
+  components: { GlLink, SeverityBadge, DetailItem, GlSprintf },
   props: {
     vulnerability: {
       type: Object,
@@ -37,6 +36,22 @@ export default {
     scannerUrl() {
       return this.scanner.url || '';
     },
+    scannerDetails() {
+      if (this.scannerUrl) {
+        return {
+          component: 'GlLink',
+          properties: {
+            href: this.scannerUrl,
+            target: '_blank',
+          },
+        };
+      }
+
+      return {
+        component: 'span',
+        properties: {},
+      };
+    },
   },
 };
 </script>
@@ -63,10 +78,9 @@ export default {
         v-if="scanner.name"
         :sprintf-message="__('%{labelStart}Scanner:%{labelEnd} %{scanner}')"
       >
-        <safe-link
-          :href="scannerUrl"
-          target="_blank"
-          rel="noopener noreferrer"
+        <component
+          :is="scannerDetails.component"
+          v-bind="scannerDetails.properties"
           data-testid="scannerSafeLink"
         >
           <gl-sprintf
@@ -77,7 +91,7 @@ export default {
             <template #scannerVersion>{{ scanner.version }}</template>
           </gl-sprintf>
           <template v-else>{{ scanner.name }}</template>
-        </safe-link>
+        </component>
       </detail-item>
       <detail-item
         v-if="location.image"

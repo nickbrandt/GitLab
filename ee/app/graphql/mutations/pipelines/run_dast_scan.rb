@@ -27,7 +27,7 @@ module Mutations
                required: true,
                description: 'The type of scan to be run.'
 
-      authorize :create_pipeline
+      authorize :run_ondemand_dast_scan
 
       def resolve(project_path:, target_url:, branch:, scan_type:)
         project = authorized_find!(full_path: project_path)
@@ -36,7 +36,7 @@ module Mutations
         service = Ci::RunDastScanService.new(project: project, user: current_user)
         pipeline = service.execute(branch: branch, target_url: target_url)
         success_response(project: project, pipeline: pipeline)
-      rescue *Ci::RunDastScanService::EXCEPTIONS => err
+      rescue Ci::RunDastScanService::RunError => err
         error_response(err)
       end
 
@@ -58,7 +58,7 @@ module Mutations
       end
 
       def error_response(err)
-        { errors: [err.message] }
+        { errors: err.full_messages }
       end
     end
   end

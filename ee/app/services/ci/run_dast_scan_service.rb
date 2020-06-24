@@ -4,13 +4,14 @@ module Ci
   class RunDastScanService
     DEFAULT_SHA_FOR_PROJECTS_WITHOUT_COMMITS = :placeholder
 
-    EXCEPTIONS = [
-      NotAllowed = Class.new(StandardError),
-      CreatePipelineError = Class.new(StandardError),
-      CreateStageError = Class.new(StandardError),
-      CreateBuildError = Class.new(StandardError),
-      EnqueueError = Class.new(StandardError)
-    ].freeze
+    class RunError < StandardError
+      attr_reader :full_messages
+
+      def initialize(msg, full_messages = [])
+        @full_messages = full_messages.unshift(msg)
+        super(msg)
+      end
+    end
 
     def initialize(project:, user:)
       @project = project
@@ -18,7 +19,10 @@ module Ci
     end
 
     def execute(branch:, target_url:)
-      raise NotAllowed unless allowed?
+      unless allowed?
+        msg = Gitlab::Graphql::Authorize::AuthorizeResource::RESOURCE_ACCESS_ERROR
+        raise RunError.new(msg)
+      end
 
       ActiveRecord::Base.transaction do
         pipeline = create_pipeline!(branch)
@@ -38,7 +42,7 @@ module Ci
     end
 
     def create_pipeline!(branch)
-      reraise!(with: CreatePipelineError.new('Could not create pipeline')) do
+      reraise!(msg: 'Pipeline could not be created') do
         Ci::Pipeline.create!(
           project: project,
           ref: branch,
@@ -50,7 +54,7 @@ module Ci
     end
 
     def create_stage!(pipeline)
-      reraise!(with: CreateStageError.new('Could not create stage')) do
+      reraise!(msg: 'Stage could not be created') do
         Ci::Stage.create!(
           name: 'dast',
           pipeline: pipeline,
@@ -60,7 +64,7 @@ module Ci
     end
 
     def create_build!(pipeline, stage, branch, target_url)
-      reraise!(with: CreateBuildError.new('Could not create build')) do
+      reraise!(msg: 'Build could not be created') do
         Ci::Build.create!(
           name: 'DAST Scan',
           pipeline: pipeline,
@@ -75,16 +79,19 @@ module Ci
     end
 
     def enqueue!(build)
-      reraise!(with: EnqueueError.new('Could not enqueue build')) do
+      reraise!(msg: 'Build could not be enqueued') do
         build.enqueue!
       end
     end
 
-    def reraise!(with:)
+    def reraise!(msg:)
       yield
+    rescue ActiveRecord::RecordInvalid => err
+      Gitlab::ErrorTracking.track_exception(err)
+      raise RunError.new(msg, err.record.errors.full_messages)
     rescue => err
       Gitlab::ErrorTracking.track_exception(err)
-      raise with
+      raise RunError.new(msg)
     end
 
     def options

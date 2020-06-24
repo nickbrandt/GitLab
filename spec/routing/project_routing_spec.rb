@@ -778,6 +778,12 @@ describe 'project routing' do
     end
   end
 
+  describe Projects::Settings::OperationsController, 'routing' do
+    it 'to #reset_alerting_token' do
+      expect(post('/gitlab/gitlabhq/-/settings/operations/reset_alerting_token')).to route_to('projects/settings/operations#reset_alerting_token', namespace_id: 'gitlab', project_id: 'gitlabhq')
+    end
+  end
+
   describe Projects::Settings::RepositoryController, 'routing' do
     it 'to #show' do
       expect(get('/gitlab/gitlabhq/-/settings/repository')).to route_to('projects/settings/repository#show', namespace_id: 'gitlab', project_id: 'gitlabhq')
@@ -870,6 +876,14 @@ describe 'project routing' do
       expect(get('/gitlab/gitlabhq/-/design_management/designs/1/c6f00aa50b80887ada30a6fe517670be9f8f9ece/resized_image/v432x230')).to route_to('projects/design_management/designs/resized_image#show', namespace_id: 'gitlab', project_id: 'gitlabhq', design_id: '1', sha: 'c6f00aa50b80887ada30a6fe517670be9f8f9ece', id: 'v432x230')
       expect(get('/gitlab/gitlabhq/-/design_management/designs/1/invalid/resized_image/v432x230')).to route_to('application#route_not_found', unmatched_route: 'gitlab/gitlabhq/-/design_management/designs/1/invalid/resized_image/v432x230')
       expect(get('/gitlab/gitlabhq/-/design_management/designs/1/c6f00aa50b80887ada30a6fe517670be9f8f9ece/resized_image/small')).to route_to('application#route_not_found', unmatched_route: 'gitlab/gitlabhq/-/design_management/designs/1/c6f00aa50b80887ada30a6fe517670be9f8f9ece/resized_image/small')
+    end
+  end
+
+  describe Projects::Snippets::BlobsController, "routing" do
+    it "to #raw" do
+      expect(get('/gitlab/gitlabhq/-/snippets/1/raw/master/lib/version.rb'))
+        .to route_to('projects/snippets/blobs#raw', namespace_id: 'gitlab',
+                     project_id: 'gitlabhq', snippet_id: '1', ref: 'master', path: 'lib/version.rb')
     end
   end
 end

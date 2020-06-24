@@ -116,7 +116,7 @@ export default {
 <template>
   <gl-dropdown ref="groupsDropdown" class="dropdown dropdown-groups" toggle-class="gl-shadow-none">
     <template #button-content>
-      <div class="gl-display-flex">
+      <div class="gl-display-flex gl-flex-fill-1">
         <gl-avatar
           v-if="selectedGroup.name"
           :src="selectedGroup.avatar_url"
@@ -128,8 +128,8 @@ export default {
           class="gl-display-inline-flex gl-vertical-align-middle gl-mr-2"
         />
         {{ selectedGroupName }}
-        <gl-icon class="gl-ml-2" name="chevron-down" />
       </div>
+      <gl-icon class="gl-ml-2" name="chevron-down" />
     </template>
     <gl-dropdown-header>{{ __('Groups') }}</gl-dropdown-header>
     <gl-search-box-by-type v-model.trim="searchTerm" class="gl-m-3" />

@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import SafeLink from 'ee/vue_shared/components/safe_link.vue';
+import { GlLink } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import LicensePackages from './license_packages.vue';
@@ -9,7 +9,7 @@ import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/const
 
 export default {
   name: 'LicenseSetApprovalStatusModal',
-  components: { SafeLink, LicensePackages, GlModal: DeprecatedModal2 },
+  components: { GlLink, LicensePackages, GlModal: DeprecatedModal2 },
   computed: {
     ...mapState(LICENSE_MANAGEMENT, ['currentLicenseInModal', 'canManageLicenses']),
     headerTitleText() {
@@ -61,12 +61,9 @@ export default {
           {{ s__('LicenseCompliance|URL') }}:
         </label>
         <div class="col-sm-9 text-secondary">
-          <safe-link
-            :href="currentLicenseInModal.url"
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            >{{ currentLicenseInModal.url }}</safe-link
-          >
+          <gl-link :href="currentLicenseInModal.url" target="_blank" rel="nofollow">{{
+            currentLicenseInModal.url
+          }}</gl-link>
         </div>
       </div>
       <div class="row prepend-top-10 append-bottom-10 js-license-packages">

@@ -6,6 +6,7 @@ import statusCodes from '~/lib/utils/http_status';
 import * as commonUtils from '~/lib/utils/common_utils';
 import createFlash from '~/flash';
 import { defaultTimeRange } from '~/vue_shared/constants';
+import * as getters from '~/monitoring/stores/getters';
 import { ENVIRONMENT_AVAILABLE_STATE } from '~/monitoring/constants';
 
 import { createStore } from '~/monitoring/stores';
@@ -18,6 +19,7 @@ import {
   fetchEnvironmentsData,
   fetchDashboardData,
   fetchAnnotations,
+  fetchDashboardValidationWarnings,
   toggleStarredValue,
   fetchPrometheusMetric,
   setInitialState,
@@ -35,6 +37,7 @@ import {
 } from '~/monitoring/stores/utils';
 import getEnvironments from '~/monitoring/queries/getEnvironments.query.graphql';
 import getAnnotations from '~/monitoring/queries/getAnnotations.query.graphql';
+import getDashboardValidationWarnings from '~/monitoring/queries/getDashboardValidationWarnings.query.graphql';
 import storeState from '~/monitoring/stores/state';
 import {
   deploymentData,
@@ -60,7 +63,7 @@ describe('Monitoring store actions', () => {
   let state;
 
   beforeEach(() => {
-    store = createStore();
+    store = createStore({ getters });
     state = store.state.monitoringDashboard;
     mock = new MockAdapter(axios);
 
@@ -263,6 +266,11 @@ describe('Monitoring store actions', () => {
       state.projectPath = 'gitlab-org/gitlab-test';
       state.currentEnvironmentName = 'production';
       state.currentDashboard = '.gitlab/dashboards/custom_dashboard.yml';
+      // testAction doesn't have access to getters. The state is passed in as getters
+      // instead of the actual getters inside the testAction method implementation.
+      // All methods downstream that needs access to getters will throw and error.
+      // For that reason, the result of the getter is set as a state variable.
+      state.fullDashboardPath = store.getters['monitoringDashboard/fullDashboardPath'];
     });
 
     it('fetches annotations data and dispatches receiveAnnotationsSuccess', () => {
@@ -328,6 +336,106 @@ describe('Monitoring store actions', () => {
         state,
         [],
         [{ type: 'receiveAnnotationsFailure' }],
+        () => {
+          expect(mockMutate).toHaveBeenCalledWith(mutationVariables);
+        },
+      );
+    });
+  });
+
+  describe('fetchDashboardValidationWarnings', () => {
+    let mockMutate;
+    let mutationVariables;
+
+    beforeEach(() => {
+      state.projectPath = 'gitlab-org/gitlab-test';
+      state.currentEnvironmentName = 'production';
+      state.currentDashboard = '.gitlab/dashboards/dashboard_with_warnings.yml';
+
+      mockMutate = jest.spyOn(gqClient, 'mutate');
+      mutationVariables = {
+        mutation: getDashboardValidationWarnings,
+        variables: {
+          projectPath: state.projectPath,
+          environmentName: state.currentEnvironmentName,
+          dashboardPath: state.currentDashboard,
+        },
+      };
+    });
+
+    it('dispatches receiveDashboardValidationWarningsSuccess with true payload when there are warnings', () => {
+      mockMutate.mockResolvedValue({
+        data: {
+          project: {
+            id: 'gid://gitlab/Project/29',
+            environments: {
+              nodes: [
+                {
+                  name: 'production',
+                  metricsDashboard: {
+                    path: '.gitlab/dashboards/dashboard_errors_test.yml',
+                    schemaValidationWarnings: ["unit: can't be blank"],
+                  },
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      return testAction(
+        fetchDashboardValidationWarnings,
+        null,
+        state,
+        [],
+        [{ type: 'receiveDashboardValidationWarningsSuccess', payload: true }],
+        () => {
+          expect(mockMutate).toHaveBeenCalledWith(mutationVariables);
+        },
+      );
+    });
+
+    it('dispatches receiveDashboardValidationWarningsSuccess with false payload when there are no warnings', () => {
+      mockMutate.mockResolvedValue({
+        data: {
+          project: {
+            id: 'gid://gitlab/Project/29',
+            environments: {
+              nodes: [
+                {
+                  name: 'production',
+                  metricsDashboard: {
+                    path: '.gitlab/dashboards/dashboard_errors_test.yml',
+                    schemaValidationWarnings: [],
+                  },
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      return testAction(
+        fetchDashboardValidationWarnings,
+        null,
+        state,
+        [],
+        [{ type: 'receiveDashboardValidationWarningsSuccess', payload: false }],
+        () => {
+          expect(mockMutate).toHaveBeenCalledWith(mutationVariables);
+        },
+      );
+    });
+
+    it('dispatches receiveDashboardValidationWarningsFailure if the warnings API call fails', () => {
+      mockMutate.mockRejectedValue({});
+
+      return testAction(
+        fetchDashboardValidationWarnings,
+        null,
+        state,
+        [],
+        [{ type: 'receiveDashboardValidationWarningsFailure' }],
         () => {
           expect(mockMutate).toHaveBeenCalledWith(mutationVariables);
         },
@@ -455,7 +563,7 @@ describe('Monitoring store actions', () => {
       state.dashboardEndpoint = '/dashboard';
     });
 
-    it('on success, dispatches receive and success actions', () => {
+    it('on success, dispatches receive and success actions, then fetches dashboard warnings', () => {
       document.body.dataset.page = 'projects:environments:metrics';
       mock.onGet(state.dashboardEndpoint).reply(200, response);
 
@@ -470,6 +578,7 @@ describe('Monitoring store actions', () => {
             type: 'receiveMetricsDashboardSuccess',
             payload: { response },
           },
+          { type: 'fetchDashboardValidationWarnings' },
         ],
       );
     });
@@ -478,9 +587,12 @@ describe('Monitoring store actions', () => {
       let result;
       beforeEach(() => {
         const params = {};
+        const localGetters = {
+          fullDashboardPath: store.getters['monitoringDashboard/fullDashboardPath'],
+        };
         result = () => {
           mock.onGet(state.dashboardEndpoint).replyOnce(500, mockDashboardsErrorResponse);
-          return fetchDashboard({ state, commit, dispatch }, params);
+          return fetchDashboard({ state, commit, dispatch, getters: localGetters }, params);
         };
       });
 
@@ -609,10 +721,10 @@ describe('Monitoring store actions', () => {
     });
 
     it('commits empty state when state.groups is empty', done => {
-      const getters = {
+      const localGetters = {
         metricsWithData: () => [],
       };
-      fetchDashboardData({ state, commit, dispatch, getters })
+      fetchDashboardData({ state, commit, dispatch, getters: localGetters })
         .then(() => {
           expect(Tracking.event).toHaveBeenCalledWith(
             document.body.dataset.page,
@@ -637,11 +749,11 @@ describe('Monitoring store actions', () => {
       );
 
       const [metric] = state.dashboard.panelGroups[0].panels[0].metrics;
-      const getters = {
+      const localGetters = {
         metricsWithData: () => [metric.id],
       };
 
-      fetchDashboardData({ state, commit, dispatch, getters })
+      fetchDashboardData({ state, commit, dispatch, getters: localGetters })
         .then(() => {
           expect(dispatch).toHaveBeenCalledWith('fetchPrometheusMetric', {
             metric,
@@ -738,7 +850,7 @@ describe('Monitoring store actions', () => {
             type: types.RECEIVE_METRIC_RESULT_SUCCESS,
             payload: {
               metricId: metric.metricId,
-              result: data.result,
+              data,
             },
           },
         ],
@@ -775,7 +887,7 @@ describe('Monitoring store actions', () => {
               type: types.RECEIVE_METRIC_RESULT_SUCCESS,
               payload: {
                 metricId: metric.metricId,
-                result: data.result,
+                data,
               },
             },
           ],
@@ -817,7 +929,7 @@ describe('Monitoring store actions', () => {
               type: types.RECEIVE_METRIC_RESULT_SUCCESS,
               payload: {
                 metricId: metric.metricId,
-                result: data.result,
+                data,
               },
             },
           ],
@@ -852,7 +964,7 @@ describe('Monitoring store actions', () => {
             type: types.RECEIVE_METRIC_RESULT_SUCCESS,
             payload: {
               metricId: metric.metricId,
-              result: data.result,
+              data,
             },
           },
         ],

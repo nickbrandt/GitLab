@@ -10,7 +10,7 @@ export default {
     GeoReplicableItem,
   },
   computed: {
-    ...mapState(['replicableItems', 'paginationData']),
+    ...mapState(['replicableItems', 'paginationData', 'useGraphQl']),
     page: {
       get() {
         return this.paginationData.page;
@@ -20,12 +20,15 @@ export default {
         this.fetchReplicableItems();
       },
     },
-    hasReplicableItems() {
-      return this.paginationData.total > 0;
+    showRestfulPagination() {
+      return !this.useGraphQl && this.paginationData.total > 0;
     },
   },
   methods: {
     ...mapActions(['setPage', 'fetchReplicableItems']),
+    buildName(item) {
+      return item.name ? item.name : item.id;
+    },
   },
 };
 </script>
@@ -35,15 +38,15 @@ export default {
     <geo-replicable-item
       v-for="item in replicableItems"
       :key="item.id"
-      :name="item.name"
+      :name="buildName(item)"
       :project-id="item.projectId"
-      :sync-status="item.state"
+      :sync-status="item.state.toLowerCase()"
       :last-synced="item.lastSyncedAt"
       :last-verified="item.lastVerifiedAt"
       :last-checked="item.lastCheckedAt"
     />
     <gl-pagination
-      v-if="hasReplicableItems"
+      v-if="showRestfulPagination"
       v-model="page"
       :per-page="paginationData.perPage"
       :total-items="paginationData.total"

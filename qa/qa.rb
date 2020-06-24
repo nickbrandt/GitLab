@@ -254,6 +254,12 @@ module QA
         autoload :Show, 'qa/page/project/pipeline/show'
       end
 
+      module Tag
+        autoload :Index, 'qa/page/project/tag/index'
+        autoload :New, 'qa/page/project/tag/new'
+        autoload :Show, 'qa/page/project/tag/show'
+      end
+
       module Job
         autoload :Show, 'qa/page/project/job/show'
       end
@@ -273,6 +279,7 @@ module QA
         autoload :Runners, 'qa/page/project/settings/runners'
         autoload :MergeRequest, 'qa/page/project/settings/merge_request'
         autoload :MirroringRepositories, 'qa/page/project/settings/mirroring_repositories'
+        autoload :ProtectedTags, 'qa/page/project/settings/protected_tags'
         autoload :VisibilityFeaturesPermissions, 'qa/page/project/settings/visibility_features_permissions'
 
         module Services
@@ -356,7 +363,6 @@ module QA
 
     module Issuable
       autoload :New, 'qa/page/issuable/new'
-      autoload :Sidebar, 'qa/page/issuable/sidebar'
     end
 
     module Alert
@@ -442,6 +448,7 @@ module QA
 
       module Issuable
         autoload :Common, 'qa/page/component/issuable/common'
+        autoload :Sidebar, 'qa/page/component/issuable/sidebar'
       end
 
       module IssueBoard

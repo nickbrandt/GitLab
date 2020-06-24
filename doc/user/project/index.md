@@ -104,6 +104,7 @@ When you create a project in GitLab, you'll have access to a large number of
 - [Dependency List](../application_security/dependency_list/index.md): view project dependencies. **(ULTIMATE)**
 - [Requirements](requirements/index.md): Requirements allow you to create criteria to check your products against. **(ULTIMATE)**
 - [Static Site Editor](static_site_editor/index.md): quickly edit content on static websites without prior knowledge of the codebase or Git commands.
+- [Code Intelligence](code_intelligence.md): code navigation features.
 
 ### Project integrations
 
@@ -171,6 +172,24 @@ Read through the documentation on [project settings](settings/index.md).
   - [FogBugz to GitLab](import/fogbugz.md)
 - [Export a project from GitLab](settings/import_export.md#exporting-a-project-and-its-data)
 - [Importing and exporting projects between GitLab instances](settings/import_export.md)
+
+## Remove a project
+
+To remove a project, first navigate to the home page for that project.
+
+1. Navigate to **Settings > General**.
+1. Expand the **Advanced** section.
+1. Scroll down to the **Remove project** section.
+1. Click **Remove project**
+1. Confirm this action by typing in the expected text.
+
+### Delayed removal **(PREMIUM)**
+
+By default, clicking to remove a project is followed by a seven day delay. Admins can restore the project during this period of time.
+This delay [may be changed by an admin](../admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
+
+Admins can view all projects pending deletion. If you're an administrator, go to the top navigation bar, click **Projects > Your projects**, and then select the **Removed projects** tab.
+From this tab an admin can restore any project.
 
 ## CI/CD for external repositories **(PREMIUM)**
 

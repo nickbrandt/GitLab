@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Geo::RepositoryDestroyService do
+RSpec.describe Geo::RepositoryDestroyService, :geo do
   include ::EE::GeoHelpers
 
   let_it_be(:secondary) { create(:geo_node) }
@@ -126,6 +126,50 @@ RSpec.describe Geo::RepositoryDestroyService do
 
         expect(Geo::ProjectRegistry.where(project: project)).to be_empty
         expect(Geo::DesignRegistry.where(project: project)).to be_empty
+      end
+    end
+
+    context 'with an unused registry' do
+      let!(:project) { create(:project_empty_repo, :legacy_storage) }
+      let!(:unused_project_registry) { create(:geo_project_registry, project_id: project.id) }
+      let!(:unused_design_registry) { create(:geo_design_registry, project_id: project.id) }
+
+      subject(:service) { described_class.new(project.id) }
+
+      context 'when the replicable model does not exist' do
+        before do
+          project.delete
+        end
+
+        it 'does not delegate project removal to Projects::DestroyService' do
+          expect_any_instance_of(EE::Projects::DestroyService).not_to receive(:geo_replicate)
+
+          service.execute
+        end
+
+        it 'removes the registry entries' do
+          service.execute
+
+          expect(Geo::ProjectRegistry.where(project: project)).to be_empty
+          expect(Geo::DesignRegistry.where(project: project)).to be_empty
+        end
+      end
+
+      context 'when the replicable model exists' do
+        subject(:service) { described_class.new(project.id) }
+
+        it 'delegates project removal to Projects::DestroyService' do
+          expect_any_instance_of(EE::Projects::DestroyService).to receive(:geo_replicate)
+
+          service.execute
+        end
+
+        it 'removes the registry entries' do
+          service.execute
+
+          expect(Geo::ProjectRegistry.where(project: project)).to be_empty
+          expect(Geo::DesignRegistry.where(project: project)).to be_empty
+        end
       end
     end
   end

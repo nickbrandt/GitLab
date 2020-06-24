@@ -174,7 +174,7 @@ module Gitlab
       # @param [Symbol] event_name
       # @param [Hash] event_data
       def publish(event_name, **event_data)
-        return unless Feature.enabled?(:geo_self_service_framework)
+        return unless Feature.enabled?(:geo_self_service_framework_replication, default_enabled: true)
 
         raise ArgumentError, "Unsupported event: '#{event_name}'" unless self.class.event_supported?(event_name)
 

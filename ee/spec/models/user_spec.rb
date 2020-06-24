@@ -1060,7 +1060,6 @@ RSpec.describe User do
 
       where(:user_type, :expected_result) do
         'service_user'      | true
-        'support_bot'       | false
         'visual_review_bot' | false
       end
 

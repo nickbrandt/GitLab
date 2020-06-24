@@ -377,6 +377,7 @@ class Project < ApplicationRecord
   delegate :forward_deployment_enabled, :forward_deployment_enabled=, :forward_deployment_enabled?, to: :ci_cd_settings
   delegate :actual_limits, :actual_plan_name, to: :namespace, allow_nil: true
   delegate :allow_merge_on_skipped_pipeline, :allow_merge_on_skipped_pipeline?, :allow_merge_on_skipped_pipeline=, to: :project_setting
+  delegate :active?, to: :prometheus_service, allow_nil: true, prefix: true
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -454,6 +455,7 @@ class Project < ApplicationRecord
   scope :with_statistics, -> { includes(:statistics) }
   scope :with_namespace, -> { includes(:namespace) }
   scope :with_import_state, -> { includes(:import_state) }
+  scope :include_project_feature, -> { includes(:project_feature) }
   scope :with_service, ->(service) { joins(service).eager_load(service) }
   scope :with_shared_runners, -> { where(shared_runners_enabled: true) }
   scope :with_container_registry, -> { where(container_registry_enabled: true) }
@@ -675,10 +677,11 @@ class Project < ApplicationRecord
     # '>' or its escaped form ('&gt;') are checked for because '>' is sometimes escaped
     # when the reference comes from an external source.
     def markdown_reference_pattern
-      %r{
-        #{reference_pattern}
-        (#{reference_postfix}|#{reference_postfix_escaped})
-      }x
+      @markdown_reference_pattern ||=
+        %r{
+          #{reference_pattern}
+          (#{reference_postfix}|#{reference_postfix_escaped})
+        }x
     end
 
     def trending
@@ -1922,6 +1925,7 @@ class Project < ApplicationRecord
       .append(key: 'CI_PROJECT_PATH', value: full_path)
       .append(key: 'CI_PROJECT_PATH_SLUG', value: full_path_slug)
       .append(key: 'CI_PROJECT_NAMESPACE', value: namespace.full_path)
+      .append(key: 'CI_PROJECT_ROOT_NAMESPACE', value: namespace.root_ancestor.path)
       .append(key: 'CI_PROJECT_URL', value: web_url)
       .append(key: 'CI_PROJECT_VISIBILITY', value: Gitlab::VisibilityLevel.string_level(visibility_level))
       .append(key: 'CI_PROJECT_REPOSITORY_LANGUAGES', value: repository_languages.map(&:name).join(',').downcase)
@@ -2409,6 +2413,11 @@ class Project < ApplicationRecord
   def metrics_setting
     super || build_metrics_setting
   end
+
+  def service_desk_enabled
+    false
+  end
+  alias_method :service_desk_enabled?, :service_desk_enabled
 
   private
 

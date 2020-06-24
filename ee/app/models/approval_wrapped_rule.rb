@@ -1,6 +1,19 @@
 # frozen_string_literal: true
 
-# A common state computation interface to wrap around ApprovalRuleLike models
+# A common state computation interface to wrap around ApprovalRuleLike models.
+#
+# There are 2 types of approval rules (`ApprovalProjectRule` and
+# `ApprovalMergeRequestRule`), we want to get the data we need for the approval
+# state of each rule via a common interface. That depends on the approvals data
+# of a merge request.
+#
+# `ApprovalProjectRule` doesn't have access to the merge request unlike
+# `ApprovalMergeRequestRule`. Given that, instead of having different checks and
+# methods when dealing with a `ApprovalProjectRule`, having a comon interface
+# is easier and simpler to interact with.
+#
+# Different types of `ApprovalWrappedRule` also helps since we have different
+# `rule_type`s that can behave differently.
 class ApprovalWrappedRule
   extend Forwardable
   include Gitlab::Utils::StrongMemoize

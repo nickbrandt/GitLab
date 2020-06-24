@@ -8,13 +8,17 @@ import {
   GlIcon,
   GlDropdown,
   GlDropdownItem,
+  GlLink,
   GlTabs,
   GlTab,
   GlBadge,
   GlPagination,
+  GlSearchBoxByType,
+  GlSprintf,
 } from '@gitlab/ui';
 import createFlash from '~/flash';
-import { s__ } from '~/locale';
+import { __, s__ } from '~/locale';
+import { debounce, trim } from 'lodash';
 import { joinPaths, visitUrl } from '~/lib/utils/url_utility';
 import { fetchPolicies } from '~/lib/graphql';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
@@ -47,11 +51,12 @@ const initialPaginationState = {
 export default {
   i18n: {
     noAlertsMsg: s__(
-      "AlertManagement|No alerts available to display. If you think you're seeing this message in error, refresh the page.",
+      'AlertManagement|No alerts available to display. See %{linkStart}enabling alert management%{linkEnd} for more information on adding alerts to the list.',
     ),
     errorMsg: s__(
       "AlertManagement|There was an error displaying the alerts. Confirm your endpoint's configuration details to ensure alerts appear.",
     ),
+    searchPlaceholder: __('Search or filter results...'),
   },
   fields: [
     {
@@ -119,10 +124,13 @@ export default {
     GlDropdown,
     GlDropdownItem,
     GlIcon,
+    GlLink,
     GlTabs,
     GlTab,
     GlBadge,
     GlPagination,
+    GlSearchBoxByType,
+    GlSprintf,
   },
   props: {
     projectPath: {
@@ -134,6 +142,10 @@ export default {
       required: true,
     },
     enableAlertManagementPath: {
+      type: String,
+      required: true,
+    },
+    populatingAlertsHelpUrl: {
       type: String,
       required: true,
     },
@@ -152,6 +164,7 @@ export default {
       query: getAlerts,
       variables() {
         return {
+          searchTerm: this.searchTerm,
           projectPath: this.projectPath,
           statuses: this.statusFilter,
           sort: this.sort,
@@ -178,6 +191,7 @@ export default {
       query: getAlertsCountByStatus,
       variables() {
         return {
+          searchTerm: this.searchTerm,
           projectPath: this.projectPath,
         };
       },
@@ -188,6 +202,7 @@ export default {
   },
   data() {
     return {
+      searchTerm: '',
       errored: false,
       isAlertDismissed: false,
       isErrorAlertDismissed: false,
@@ -203,7 +218,11 @@ export default {
   computed: {
     showNoAlertsMsg() {
       return (
-        !this.errored && !this.loading && this.alertsCount?.all === 0 && !this.isAlertDismissed
+        !this.errored &&
+        !this.loading &&
+        this.alertsCount?.all === 0 &&
+        !this.searchTerm &&
+        !this.isAlertDismissed
       );
     },
     showErrorMsg() {
@@ -249,6 +268,13 @@ export default {
       this.resetPagination();
       this.sort = `${sortingColumn}_${sortingDirection}`;
     },
+    onInputChange: debounce(function debounceSearch(input) {
+      const trimmedInput = trim(input);
+      if (trimmedInput !== this.searchTerm) {
+        this.resetPagination();
+        this.searchTerm = trimmedInput;
+      }
+    }, 500),
     updateAlertStatus(status, iid) {
       this.$apollo
         .mutate({
@@ -319,13 +345,23 @@ export default {
   <div>
     <div v-if="alertManagementEnabled" class="alert-management-list">
       <gl-alert v-if="showNoAlertsMsg" @dismiss="isAlertDismissed = true">
-        {{ $options.i18n.noAlertsMsg }}
+        <gl-sprintf :message="$options.i18n.noAlertsMsg">
+          <template #link="{ content }">
+            <gl-link
+              class="gl-display-inline-block"
+              :href="populatingAlertsHelpUrl"
+              target="_blank"
+            >
+              {{ content }}
+            </gl-link>
+          </template>
+        </gl-sprintf>
       </gl-alert>
       <gl-alert v-if="showErrorMsg" variant="danger" @dismiss="isErrorAlertDismissed = true">
         {{ $options.i18n.errorMsg }}
       </gl-alert>
 
-      <gl-tabs @input="filterAlertsByStatus">
+      <gl-tabs content-class="gl-p-0" @input="filterAlertsByStatus">
         <gl-tab v-for="tab in $options.statusTabs" :key="tab.status">
           <template slot="title">
             <span>{{ tab.title }}</span>
@@ -336,11 +372,19 @@ export default {
         </gl-tab>
       </gl-tabs>
 
+      <div class="gl-bg-gray-10 gl-p-5 gl-border-b-solid gl-border-b-1 gl-border-gray-100">
+        <gl-search-box-by-type
+          class="gl-bg-white"
+          :placeholder="$options.i18n.searchPlaceholder"
+          @input="onInputChange"
+        />
+      </div>
+
       <h4 class="d-block d-md-none my-3">
         {{ s__('AlertManagement|Alerts') }}
       </h4>
       <gl-table
-        class="alert-management-table mt-3"
+        class="alert-management-table"
         :items="alerts ? alerts.list : []"
         :fields="$options.fields"
         :show-empty="true"

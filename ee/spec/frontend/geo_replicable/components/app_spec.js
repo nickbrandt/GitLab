@@ -52,82 +52,59 @@ describe('GeoReplicableApp', () => {
   const findGeoReplicableFilterBar = () =>
     findGeoReplicableContainer().find(GeoReplicableFilterBar);
 
-  describe('template', () => {
-    beforeEach(() => {
-      createComponent();
-    });
-
-    it('renders the replicable container', () => {
-      expect(findGeoReplicableContainer().exists()).toBe(true);
-    });
-
-    it('renders the filter bar', () => {
-      expect(findGeoReplicableFilterBar().exists()).toBe(true);
-    });
-
-    describe('when isLoading = true', () => {
+  describe.each`
+    isLoading | useGraphQl | replicableItems              | showReplicableItems | showEmptyState | showFilterBar | showLoader
+    ${false}  | ${false}   | ${MOCK_BASIC_FETCH_DATA_MAP} | ${true}             | ${false}       | ${true}       | ${false}
+    ${false}  | ${false}   | ${[]}                        | ${false}            | ${true}        | ${true}       | ${false}
+    ${false}  | ${true}    | ${MOCK_BASIC_FETCH_DATA_MAP} | ${true}             | ${false}       | ${false}      | ${false}
+    ${false}  | ${true}    | ${[]}                        | ${false}            | ${true}        | ${false}      | ${false}
+    ${true}   | ${false}   | ${MOCK_BASIC_FETCH_DATA_MAP} | ${false}            | ${false}       | ${true}       | ${true}
+    ${true}   | ${false}   | ${[]}                        | ${false}            | ${false}       | ${true}       | ${true}
+    ${true}   | ${true}    | ${MOCK_BASIC_FETCH_DATA_MAP} | ${false}            | ${false}       | ${false}      | ${true}
+    ${true}   | ${true}    | ${[]}                        | ${false}            | ${false}       | ${false}      | ${true}
+  `(
+    `template`,
+    ({
+      isLoading,
+      useGraphQl,
+      replicableItems,
+      showReplicableItems,
+      showEmptyState,
+      showFilterBar,
+      showLoader,
+    }) => {
       beforeEach(() => {
-        wrapper.vm.$store.state.isLoading = true;
+        createComponent();
       });
 
-      it('hides replicable items', () => {
-        expect(findGeoReplicable().exists()).toBe(false);
-      });
-
-      it('hides empty state', () => {
-        expect(findGeoReplicableEmptyState().exists()).toBe(false);
-      });
-
-      it('shows loader', () => {
-        expect(findGlLoadingIcon().exists()).toBe(true);
-      });
-    });
-
-    describe('when isLoading = false', () => {
-      beforeEach(() => {
-        wrapper.vm.$store.state.isLoading = false;
-      });
-
-      describe('with replicableItems', () => {
+      describe(`when isLoading is ${isLoading} and useGraphQl is ${useGraphQl}, ${
+        replicableItems.length ? 'with' : 'without'
+      } replicableItems`, () => {
         beforeEach(() => {
-          wrapper.vm.$store.state.replicableItems = MOCK_BASIC_FETCH_DATA_MAP;
-          wrapper.vm.$store.state.paginationData.total =
-            wrapper.vm.$store.state.replicableItems.length;
+          wrapper.vm.$store.state.isLoading = isLoading;
+          wrapper.vm.$store.state.useGraphQl = useGraphQl;
+          wrapper.vm.$store.state.replicableItems = replicableItems;
+          wrapper.vm.$store.state.paginationData.total = replicableItems.length;
         });
 
-        it('shows replicable items', () => {
-          expect(findGeoReplicable().exists()).toBe(true);
+        it(`${showReplicableItems ? 'shows' : 'hides'} the replicable items`, () => {
+          expect(findGeoReplicable().exists()).toBe(showReplicableItems);
         });
 
-        it('hides empty state', () => {
-          expect(findGeoReplicableEmptyState().exists()).toBe(false);
+        it(`${showEmptyState ? 'shows' : 'hides'} the empty state`, () => {
+          expect(findGeoReplicableEmptyState().exists()).toBe(showEmptyState);
         });
 
-        it('hides loader', () => {
-          expect(findGlLoadingIcon().exists()).toBe(false);
+        it(`${showFilterBar ? 'shows' : 'hides'} the filter bar`, () => {
+          expect(findGeoReplicableFilterBar().exists()).toBe(showFilterBar);
+        });
+
+        it(`${showLoader ? 'shows' : 'hides'} the loader`, () => {
+          expect(findGlLoadingIcon().exists()).toBe(showLoader);
         });
       });
-
-      describe('with no replicableItems', () => {
-        beforeEach(() => {
-          wrapper.vm.$store.state.replicableItems = [];
-          wrapper.vm.$store.state.paginationData.total = 0;
-        });
-
-        it('hides replicable items', () => {
-          expect(findGeoReplicable().exists()).toBe(false);
-        });
-
-        it('shows empty state', () => {
-          expect(findGeoReplicableEmptyState().exists()).toBe(true);
-        });
-
-        it('hides loader', () => {
-          expect(findGlLoadingIcon().exists()).toBe(false);
-        });
-      });
-    });
-  });
+    },
+  );
 
   describe('onCreate', () => {
     beforeEach(() => {

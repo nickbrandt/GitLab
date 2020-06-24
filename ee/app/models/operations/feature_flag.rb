@@ -9,7 +9,7 @@ module Operations
 
     belongs_to :project
 
-    has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.operations_feature_flags&.maximum(:iid) }, backfill: true, presence: false
+    has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.operations_feature_flags&.maximum(:iid) }
 
     default_value_for :active, true
 
@@ -17,6 +17,8 @@ module Operations
     has_many :scopes, class_name: 'Operations::FeatureFlagScope'
     # strategies exists only for the second version
     has_many :strategies, class_name: 'Operations::FeatureFlags::Strategy'
+    has_many :feature_flag_issues
+    has_many :issues, through: :feature_flag_issues
     has_one :default_scope, -> { where(environment_scope: '*') }, class_name: 'Operations::FeatureFlagScope'
 
     validates :project, presence: true
@@ -59,6 +61,17 @@ module Operations
           .reorder(:id)
           .references(:operations_scopes)
       end
+    end
+
+    def related_issues(current_user, preload:)
+      issues = ::Issue
+        .select('issues.*, operations_feature_flags_issues.id AS link_id')
+        .joins(:feature_flag_issues)
+        .where('operations_feature_flags_issues.feature_flag_id = ?', id)
+        .order('operations_feature_flags_issues.id ASC')
+        .includes(preload)
+
+      Ability.issues_readable_by_user(issues, current_user)
     end
 
     private

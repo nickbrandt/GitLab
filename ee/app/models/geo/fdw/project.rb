@@ -9,7 +9,6 @@ module Geo
       self.primary_key = :id
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('projects')
 
-      has_many :job_artifacts, class_name: 'Geo::Fdw::Ci::JobArtifact'
       has_many :container_repositories, class_name: 'Geo::Fdw::ContainerRepository'
 
       belongs_to :namespace, class_name: 'Geo::Fdw::Namespace'

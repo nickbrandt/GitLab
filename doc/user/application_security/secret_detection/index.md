@@ -118,15 +118,15 @@ declare a job with the same name as the SAST job to override. Place this new job
 inclusion and specify any additional keys under it.
 
 In the following example, we include the Secret Detection template and at the same time we
-override the `secret-scan` job with the `SECRET_DETECTION_HISTORIC_SCAN` variable to `true`:
+override the `secret_detection` job with the `SECRET_DETECTION_HISTORIC_SCAN` variable to `true`:
 
 ```yaml
 include:
   - template: Secret-Detection.gitlab-ci.yml
 
-secrets-scan:
+secret_detection:
   variables:
-    SECRET_DETECTION_HISTORIC_SCAN: true
+    SECRET_DETECTION_HISTORIC_SCAN: "true"
 ```
 
 Because the template is [evaluated before](../../../ci/yaml/README.md#include)
@@ -145,6 +145,18 @@ Secret Detection can be customized by defining available variables:
 | `SECRET_DETECTION_COMMIT_FROM` | -     | The commit a Gitleaks scan starts at. |
 | `SECRET_DETECTION_COMMIT_TO` | -       | The commit a Gitleaks scan ends at. |
 | `SECRET_DETECTION_HISTORIC_SCAN` | false | Flag to enable a historic Gitleaks scan. |
+
+### Logging Level
+
+You can control the verbosity of logs by setting the `SECURE_LOG_LEVEL` env var. It's default is set to `info`, you can set it to any of the following levels:
+
+- `panic`
+- `fatal`
+- `error`
+- `warn`
+- `info`
+- `debug`
+- `trace`
 
 ## Full History Secret Scan
 

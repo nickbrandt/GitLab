@@ -38,24 +38,29 @@ The Web IDE currently provides:
 
 Because the Web IDE is based on the [Monaco Editor](https://microsoft.github.io/monaco-editor/),
 you can find a more complete list of supported languages in the
-[Monaco languages](https://github.com/Microsoft/monaco-languages) repository.
+[Monaco languages](https://github.com/Microsoft/monaco-languages) repository. Under the hood,
+Monaco uses the [Monarch](https://microsoft.github.io/monaco-editor/monarch.html) library for syntax highlighting.
+
+If you are missing Syntax Highlighting support for any language, we prepared a short guide on how to [add support for a missing language Syntax Highlighting.](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/assets/javascripts/ide/lib/languages/README.md)
 
 NOTE: **Note:**
 Single file editing is based on the [Ace Editor](https://ace.c9.io).
 
 ### Themes
 
-> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2389) in GitLab 13.0.
+> - [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2389) in GitLab in 13.0.
+> - Full Solarized Dark Theme [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/219228) in GitLab 13.1.
 
 All the themes GitLab supports for syntax highlighting are added to the Web IDE's code editor.
 You can pick a theme from your [profile preferences](../../profile/preferences.md).
 
-The themes are available only in the Web IDE file editor, except for the [dark theme](https://gitlab.com/gitlab-org/gitlab/-/issues/209808),
-which applies to the entire Web IDE screen.
+The themes are available only in the Web IDE file editor, except for the [dark theme](https://gitlab.com/gitlab-org/gitlab/-/issues/209808) and
+the [solarized dark theme](https://gitlab.com/gitlab-org/gitlab/-/issues/219228),
+which apply to the entire Web IDE screen.
 
-| Solarized Light Theme                                         | Dark Theme                              |
-|---------------------------------------------------------------|-----------------------------------------|
-| ![Solarized Light Theme](img/solarized_light_theme_v13.0.png) | ![Dark Theme](img/dark_theme_v13.0.png) |
+| Solarized Light Theme                                         | Solarized Dark Theme                                        | Dark Theme                              |
+|---------------------------------------------------------------|-------------------------------------------------------------|-----------------------------------------|
+| ![Solarized Light Theme](img/solarized_light_theme_v13_0.png) | ![Solarized Dark Theme](img/solarized_dark_theme_v13_1.png) | ![Dark Theme](img/dark_theme_v13_0.png) |
 
 ## Configure the Web IDE
 
@@ -208,16 +213,19 @@ to work:
 
 - The Runner needs to have
   [`[session_server]` configured properly](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-session_server-section).
+  This section requires at least a `session_timeout` value (which defaults to 1800
+  seconds) and a `listen_address` value. If `advertise_address` is not defined, `listen_address` is used.
 - If you are using a reverse proxy with your GitLab instance, web terminals need to be
   [enabled](../../../administration/integration/terminal.md#enabling-and-disabling-terminal-support). **(ULTIMATE ONLY)**
 
 If you have the terminal open and the job has finished with its tasks, the
 terminal will block the job from finishing for the duration configured in
-[`[session_server].terminal_max_retention_time`](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-session_server-section)
+[`[session_server].session_timeout`](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-session_server-section)
 until you close the terminal window.
 
 NOTE: **Note:** Not all executors are
-[supported](https://docs.gitlab.com/runner/executors/#compatibility-chart)
+[supported](https://docs.gitlab.com/runner/executors/#compatibility-chart).
+The [File Sync](#file-syncing-to-web-terminal) feature is supported on Kubernetes runners only.
 
 ### Web IDE configuration file
 
@@ -241,6 +249,8 @@ In the code below there is an example of this configuration file:
 
 ```yaml
 terminal:
+  # This can be any image that has the necessary runtime environment for your project.
+  image: node:10-alpine
   before_script:
     - apt-get update
   script: sleep 60

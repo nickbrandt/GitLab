@@ -44,27 +44,40 @@ describe('GeoReplicable', () => {
       expect(findGeoReplicableContainer().exists()).toBe(true);
     });
 
-    describe('GlPagination', () => {
-      describe('when perPage >= total', () => {
-        beforeEach(() => {
-          wrapper.vm.$store.state.paginationData.perPage = 2;
-          wrapper.vm.$store.state.paginationData.total = 1;
+    describe('when useGraphQl is false', () => {
+      describe('GlPagination', () => {
+        describe('when perPage >= total', () => {
+          beforeEach(() => {
+            wrapper.vm.$store.state.paginationData.perPage = 2;
+            wrapper.vm.$store.state.paginationData.total = 1;
+          });
+
+          it('is hidden', () => {
+            expect(findGlPagination().isEmpty()).toBe(true);
+          });
         });
 
-        it('is hidden', () => {
-          expect(findGlPagination().isEmpty()).toBe(true);
+        describe('when perPage < total', () => {
+          beforeEach(() => {
+            wrapper.vm.$store.state.paginationData.perPage = 1;
+            wrapper.vm.$store.state.paginationData.total = 2;
+          });
+
+          it('renders', () => {
+            expect(findGlPagination().html()).not.toBeUndefined();
+          });
         });
       });
+    });
 
-      describe('when perPage < total', () => {
-        beforeEach(() => {
-          wrapper.vm.$store.state.paginationData.perPage = 1;
-          wrapper.vm.$store.state.paginationData.total = 2;
-        });
+    describe('when useGraphQl is true', () => {
+      beforeEach(() => {
+        createComponent();
+        wrapper.vm.$store.state.useGraphQl = true;
+      });
 
-        it('renders', () => {
-          expect(findGlPagination().html()).not.toBeUndefined();
-        });
+      it('does not render GlPagination', () => {
+        expect(findGlPagination().exists()).toBeFalsy();
       });
     });
 
@@ -85,17 +98,19 @@ describe('GeoReplicable', () => {
   });
 
   describe('changing the page', () => {
-    beforeEach(() => {
-      createComponent();
-      wrapper.vm.page = 2;
-    });
+    describe('when useGraphQl is false', () => {
+      beforeEach(() => {
+        createComponent();
+        wrapper.vm.page = 2;
+      });
 
-    it('should call setPage', () => {
-      expect(actionSpies.setPage).toHaveBeenCalledWith(2);
-    });
+      it('should call setPage', () => {
+        expect(actionSpies.setPage).toHaveBeenCalledWith(2);
+      });
 
-    it('should call fetchReplicableItems', () => {
-      expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
+      it('should call fetchReplicableItems', () => {
+        expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
+      });
     });
   });
 });

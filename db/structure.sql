@@ -478,6 +478,7 @@ CREATE TABLE public.application_settings (
     repository_storages_weighted jsonb DEFAULT '{}'::jsonb NOT NULL,
     max_import_size integer DEFAULT 50 NOT NULL,
     enforce_pat_expiration boolean DEFAULT true NOT NULL,
+    compliance_frameworks smallint[] DEFAULT '{}'::smallint[] NOT NULL,
     CONSTRAINT check_d03919528d CHECK ((char_length(container_registry_vendor) <= 255)),
     CONSTRAINT check_d820146492 CHECK ((char_length(spam_check_endpoint_url) <= 255)),
     CONSTRAINT check_e5aba18f02 CHECK ((char_length(container_registry_version) <= 255))
@@ -1074,7 +1075,8 @@ CREATE TABLE public.ci_builds_metadata (
     config_variables jsonb,
     has_exposed_artifacts boolean,
     environment_auto_stop_in character varying(255),
-    expanded_environment_name character varying(255)
+    expanded_environment_name character varying(255),
+    secrets jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 CREATE SEQUENCE public.ci_builds_metadata_id_seq
@@ -1221,7 +1223,8 @@ CREATE TABLE public.ci_job_artifacts (
     file_sha256 bytea,
     file_format smallint,
     file_location smallint,
-    locked boolean
+    locked boolean,
+    CONSTRAINT check_27f0f6dbab CHECK ((file_store IS NOT NULL))
 );
 
 CREATE SEQUENCE public.ci_job_artifacts_id_seq
@@ -3199,6 +3202,23 @@ CREATE TABLE public.group_deploy_keys (
     CONSTRAINT check_f58fa0a0f7 CHECK ((char_length(key) <= 4096))
 );
 
+CREATE TABLE public.group_deploy_keys_groups (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    group_id bigint NOT NULL,
+    group_deploy_key_id bigint NOT NULL
+);
+
+CREATE SEQUENCE public.group_deploy_keys_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.group_deploy_keys_groups_id_seq OWNED BY public.group_deploy_keys_groups.id;
+
 CREATE SEQUENCE public.group_deploy_keys_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -3774,7 +3794,8 @@ CREATE TABLE public.lfs_objects (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     file character varying,
-    file_store integer DEFAULT 1
+    file_store integer DEFAULT 1,
+    CONSTRAINT check_eecfc5717d CHECK ((file_store IS NOT NULL))
 );
 
 CREATE SEQUENCE public.lfs_objects_id_seq
@@ -6708,7 +6729,8 @@ CREATE TABLE public.uploads (
     created_at timestamp without time zone NOT NULL,
     store integer DEFAULT 1,
     mount_point character varying,
-    secret character varying
+    secret character varying,
+    CONSTRAINT check_5e9547379c CHECK ((store IS NOT NULL))
 );
 
 CREATE SEQUENCE public.uploads_id_seq
@@ -7257,6 +7279,30 @@ CREATE SEQUENCE public.vulnerability_scanners_id_seq
 
 ALTER SEQUENCE public.vulnerability_scanners_id_seq OWNED BY public.vulnerability_scanners.id;
 
+CREATE TABLE public.vulnerability_statistics (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    project_id bigint NOT NULL,
+    total integer DEFAULT 0 NOT NULL,
+    critical integer DEFAULT 0 NOT NULL,
+    high integer DEFAULT 0 NOT NULL,
+    medium integer DEFAULT 0 NOT NULL,
+    low integer DEFAULT 0 NOT NULL,
+    unknown integer DEFAULT 0 NOT NULL,
+    info integer DEFAULT 0 NOT NULL,
+    letter_grade smallint NOT NULL
+);
+
+CREATE SEQUENCE public.vulnerability_statistics_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.vulnerability_statistics_id_seq OWNED BY public.vulnerability_statistics.id;
+
 CREATE TABLE public.vulnerability_user_mentions (
     id bigint NOT NULL,
     vulnerability_id bigint NOT NULL,
@@ -7724,6 +7770,8 @@ ALTER TABLE ONLY public.group_custom_attributes ALTER COLUMN id SET DEFAULT next
 
 ALTER TABLE ONLY public.group_deploy_keys ALTER COLUMN id SET DEFAULT nextval('public.group_deploy_keys_id_seq'::regclass);
 
+ALTER TABLE ONLY public.group_deploy_keys_groups ALTER COLUMN id SET DEFAULT nextval('public.group_deploy_keys_groups_id_seq'::regclass);
+
 ALTER TABLE ONLY public.group_deploy_tokens ALTER COLUMN id SET DEFAULT nextval('public.group_deploy_tokens_id_seq'::regclass);
 
 ALTER TABLE ONLY public.group_group_links ALTER COLUMN id SET DEFAULT nextval('public.group_group_links_id_seq'::regclass);
@@ -8076,6 +8124,8 @@ ALTER TABLE ONLY public.vulnerability_occurrences ALTER COLUMN id SET DEFAULT ne
 
 ALTER TABLE ONLY public.vulnerability_scanners ALTER COLUMN id SET DEFAULT nextval('public.vulnerability_scanners_id_seq'::regclass);
 
+ALTER TABLE ONLY public.vulnerability_statistics ALTER COLUMN id SET DEFAULT nextval('public.vulnerability_statistics_id_seq'::regclass);
+
 ALTER TABLE ONLY public.vulnerability_user_mentions ALTER COLUMN id SET DEFAULT nextval('public.vulnerability_user_mentions_id_seq'::regclass);
 
 ALTER TABLE ONLY public.web_hook_logs ALTER COLUMN id SET DEFAULT nextval('public.web_hook_logs_id_seq'::regclass);
@@ -8204,15 +8254,6 @@ ALTER TABLE ONLY public.chat_teams
 
 ALTER TABLE public.design_management_designs
     ADD CONSTRAINT check_07155e2715 CHECK ((char_length((filename)::text) <= 255)) NOT VALID;
-
-ALTER TABLE public.ci_job_artifacts
-    ADD CONSTRAINT check_27f0f6dbab CHECK ((file_store IS NOT NULL)) NOT VALID;
-
-ALTER TABLE public.uploads
-    ADD CONSTRAINT check_5e9547379c CHECK ((store IS NOT NULL)) NOT VALID;
-
-ALTER TABLE public.lfs_objects
-    ADD CONSTRAINT check_eecfc5717d CHECK ((file_store IS NOT NULL)) NOT VALID;
 
 ALTER TABLE ONLY public.ci_build_needs
     ADD CONSTRAINT ci_build_needs_pkey PRIMARY KEY (id);
@@ -8531,6 +8572,9 @@ ALTER TABLE ONLY public.group_custom_attributes
 
 ALTER TABLE ONLY public.group_deletion_schedules
     ADD CONSTRAINT group_deletion_schedules_pkey PRIMARY KEY (group_id);
+
+ALTER TABLE ONLY public.group_deploy_keys_groups
+    ADD CONSTRAINT group_deploy_keys_groups_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.group_deploy_keys
     ADD CONSTRAINT group_deploy_keys_pkey PRIMARY KEY (id);
@@ -9117,6 +9161,9 @@ ALTER TABLE ONLY public.vulnerability_occurrences
 ALTER TABLE ONLY public.vulnerability_scanners
     ADD CONSTRAINT vulnerability_scanners_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.vulnerability_statistics
+    ADD CONSTRAINT vulnerability_statistics_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.vulnerability_user_mentions
     ADD CONSTRAINT vulnerability_user_mentions_pkey PRIMARY KEY (id);
 
@@ -9156,7 +9203,7 @@ CREATE UNIQUE INDEX any_approver_merge_request_rule_type_unique_index ON public.
 
 CREATE UNIQUE INDEX any_approver_project_rule_type_unique_index ON public.approval_project_rules USING btree (project_id) WHERE (rule_type = 3);
 
-CREATE UNIQUE INDEX approval_rule_name_index_for_code_owners ON public.approval_merge_request_rules USING btree (merge_request_id, code_owner, name) WHERE (code_owner = true);
+CREATE UNIQUE INDEX approval_rule_name_index_for_code_owners ON public.approval_merge_request_rules USING btree (merge_request_id, code_owner, name) WHERE ((code_owner = true) AND (section IS NULL));
 
 CREATE INDEX ci_builds_gitlab_monitor_metrics ON public.ci_builds USING btree (status, created_at, project_id) WHERE ((type)::text = 'Ci::Build'::text);
 
@@ -9334,7 +9381,9 @@ CREATE UNIQUE INDEX index_approval_project_rules_users_1 ON public.approval_proj
 
 CREATE INDEX index_approval_project_rules_users_2 ON public.approval_project_rules_users USING btree (user_id);
 
-CREATE UNIQUE INDEX index_approval_rule_name_for_code_owners_rule_type ON public.approval_merge_request_rules USING btree (merge_request_id, name) WHERE (rule_type = 2);
+CREATE UNIQUE INDEX index_approval_rule_name_for_code_owners_rule_type ON public.approval_merge_request_rules USING btree (merge_request_id, name) WHERE ((rule_type = 2) AND (section IS NULL));
+
+CREATE UNIQUE INDEX index_approval_rule_name_for_sectional_code_owners_rule_type ON public.approval_merge_request_rules USING btree (merge_request_id, name, section) WHERE (rule_type = 2);
 
 CREATE INDEX index_approval_rules_code_owners_rule_type ON public.approval_merge_request_rules USING btree (merge_request_id) WHERE (rule_type = 2);
 
@@ -9992,6 +10041,10 @@ CREATE INDEX index_group_deletion_schedules_on_marked_for_deletion_on ON public.
 
 CREATE INDEX index_group_deletion_schedules_on_user_id ON public.group_deletion_schedules USING btree (user_id);
 
+CREATE UNIQUE INDEX index_group_deploy_keys_group_on_group_deploy_key_and_group_ids ON public.group_deploy_keys_groups USING btree (group_id, group_deploy_key_id);
+
+CREATE INDEX index_group_deploy_keys_groups_on_group_deploy_key_id ON public.group_deploy_keys_groups USING btree (group_deploy_key_id);
+
 CREATE UNIQUE INDEX index_group_deploy_keys_on_fingerprint ON public.group_deploy_keys USING btree (fingerprint);
 
 CREATE INDEX index_group_deploy_keys_on_fingerprint_sha256 ON public.group_deploy_keys USING btree (fingerprint_sha256);
@@ -10590,6 +10643,12 @@ CREATE INDEX index_project_statistics_on_namespace_id ON public.project_statisti
 
 CREATE UNIQUE INDEX index_project_statistics_on_project_id ON public.project_statistics USING btree (project_id);
 
+CREATE INDEX index_project_statistics_on_repository_size_and_project_id ON public.project_statistics USING btree (repository_size, project_id);
+
+CREATE INDEX index_project_statistics_on_storage_size_and_project_id ON public.project_statistics USING btree (storage_size, project_id);
+
+CREATE INDEX index_project_statistics_on_wiki_size_and_project_id ON public.project_statistics USING btree (wiki_size, project_id);
+
 CREATE UNIQUE INDEX index_project_tracing_settings_on_project_id ON public.project_tracing_settings USING btree (project_id);
 
 CREATE INDEX index_projects_api_created_at_id_desc ON public.projects USING btree (created_at, id DESC);
@@ -11157,6 +11216,10 @@ CREATE UNIQUE INDEX index_vulnerability_occurrences_on_uuid ON public.vulnerabil
 CREATE INDEX index_vulnerability_occurrences_on_vulnerability_id ON public.vulnerability_occurrences USING btree (vulnerability_id);
 
 CREATE UNIQUE INDEX index_vulnerability_scanners_on_project_id_and_external_id ON public.vulnerability_scanners USING btree (project_id, external_id);
+
+CREATE INDEX index_vulnerability_statistics_on_letter_grade ON public.vulnerability_statistics USING btree (letter_grade);
+
+CREATE INDEX index_vulnerability_statistics_on_project_id ON public.vulnerability_statistics USING btree (project_id);
 
 CREATE UNIQUE INDEX index_vulnerability_user_mentions_on_note_id ON public.vulnerability_user_mentions USING btree (note_id) WHERE (note_id IS NOT NULL);
 
@@ -12628,6 +12691,9 @@ ALTER TABLE ONLY public.metrics_dashboard_annotations
 ALTER TABLE ONLY public.pool_repositories
     ADD CONSTRAINT fk_rails_af3f8c5d62 FOREIGN KEY (shard_id) REFERENCES public.shards(id) ON DELETE RESTRICT;
 
+ALTER TABLE ONLY public.vulnerability_statistics
+    ADD CONSTRAINT fk_rails_af61a7df4c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.resource_label_events
     ADD CONSTRAINT fk_rails_b126799f57 FOREIGN KEY (label_id) REFERENCES public.labels(id) ON DELETE SET NULL;
 
@@ -12708,6 +12774,9 @@ ALTER TABLE ONLY public.project_repositories
 
 ALTER TABLE ONLY public.packages_nuget_dependency_link_metadata
     ADD CONSTRAINT fk_rails_c3313ee2e4 FOREIGN KEY (dependency_link_id) REFERENCES public.packages_dependency_links(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.group_deploy_keys_groups
+    ADD CONSTRAINT fk_rails_c3854f19f5 FOREIGN KEY (group_deploy_key_id) REFERENCES public.group_deploy_keys(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.merge_request_user_mentions
     ADD CONSTRAINT fk_rails_c440b9ea31 FOREIGN KEY (note_id) REFERENCES public.notes(id) ON DELETE CASCADE;
@@ -12846,6 +12915,9 @@ ALTER TABLE ONLY public.merge_request_metrics
 
 ALTER TABLE ONLY public.draft_notes
     ADD CONSTRAINT fk_rails_e753681674 FOREIGN KEY (merge_request_id) REFERENCES public.merge_requests(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.group_deploy_keys_groups
+    ADD CONSTRAINT fk_rails_e87145115d FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.description_versions
     ADD CONSTRAINT fk_rails_e8f4caf9c7 FOREIGN KEY (epic_id) REFERENCES public.epics(id) ON DELETE CASCADE;
@@ -13950,6 +14022,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200521225327
 20200521225337
 20200521225346
+20200522205606
 20200522235146
 20200525114553
 20200525121014
@@ -13961,6 +14034,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200526153844
 20200526164946
 20200526164947
+20200526231421
 20200527092027
 20200527094322
 20200527095401
@@ -13980,12 +14054,16 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200602143020
 20200603073101
 20200603180338
+20200604001128
 20200604143628
 20200604145731
 20200604174544
 20200604174558
 20200605003204
 20200605093113
+20200605160806
+20200605160836
+20200605160851
 20200608072931
 20200608075553
 20200608214008
@@ -13994,9 +14072,19 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200609142507
 20200609142508
 20200609212701
+20200610130002
+20200613104045
 20200615083635
 20200615121217
 20200615123055
 20200615232735
+20200617000757
+20200617001001
+20200617001118
+20200617001637
+20200617001848
+20200617002030
+20200618134223
+20200618134723
 \.
 

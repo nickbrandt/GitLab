@@ -1811,6 +1811,50 @@ describe Ci::Build do
     end
   end
 
+  describe '.keep_artifacts!' do
+    let!(:build) { create(:ci_build, artifacts_expire_at: Time.current + 7.days) }
+    let!(:builds_for_update) do
+      Ci::Build.where(id: create_list(:ci_build, 3, artifacts_expire_at: Time.current + 7.days).map(&:id))
+    end
+
+    it 'resets expire_at' do
+      builds_for_update.keep_artifacts!
+
+      builds_for_update.each do |build|
+        expect(build.reload.artifacts_expire_at).to be_nil
+      end
+    end
+
+    it 'does not reset expire_at for other builds' do
+      builds_for_update.keep_artifacts!
+
+      expect(build.reload.artifacts_expire_at).to be_present
+    end
+
+    context 'when having artifacts files' do
+      let!(:artifact) { create(:ci_job_artifact, job: build, expire_in: '7 days') }
+      let!(:artifacts_for_update) do
+        builds_for_update.map do |build|
+          create(:ci_job_artifact, job: build, expire_in: '7 days')
+        end
+      end
+
+      it 'resets dependent objects' do
+        builds_for_update.keep_artifacts!
+
+        artifacts_for_update.each do |artifact|
+          expect(artifact.reload.expire_at).to be_nil
+        end
+      end
+
+      it 'does not reset dependent object for other builds' do
+        builds_for_update.keep_artifacts!
+
+        expect(artifact.reload.expire_at).to be_present
+      end
+    end
+  end
+
   describe '#keep_artifacts!' do
     let(:build) { create(:ci_build, artifacts_expire_at: Time.current + 7.days) }
 
@@ -2336,6 +2380,7 @@ describe Ci::Build do
           { key: 'CI_PROJECT_PATH', value: project.full_path, public: true, masked: false },
           { key: 'CI_PROJECT_PATH_SLUG', value: project.full_path_slug, public: true, masked: false },
           { key: 'CI_PROJECT_NAMESPACE', value: project.namespace.full_path, public: true, masked: false },
+          { key: 'CI_PROJECT_ROOT_NAMESPACE', value: project.namespace.root_ancestor.path, public: true, masked: false },
           { key: 'CI_PROJECT_URL', value: project.web_url, public: true, masked: false },
           { key: 'CI_PROJECT_VISIBILITY', value: 'private', public: true, masked: false },
           { key: 'CI_PROJECT_REPOSITORY_LANGUAGES', value: project.repository_languages.map(&:name).join(',').downcase, public: true, masked: false },
@@ -4258,15 +4303,15 @@ describe Ci::Build do
       end
     end
 
-    context 'when `release_steps` feature is required by build' do
+    context 'when `multi_build_steps` feature is required by build' do
       before do
         expect(build).to receive(:runner_required_feature_names) do
-          [:release_steps]
+          [:multi_build_steps]
         end
       end
 
       context 'when runner provides given feature' do
-        let(:runner_features) { { release_steps: true } }
+        let(:runner_features) { { multi_build_steps: true } }
 
         it { is_expected.to be_truthy }
       end

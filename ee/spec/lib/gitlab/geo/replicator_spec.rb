@@ -94,9 +94,9 @@ RSpec.describe Gitlab::Geo::Replicator do
     describe '#publish' do
       subject { Geo::DummyReplicator.new }
 
-      context 'when geo_self_service_framework feature is disabled' do
+      context 'when geo_self_service_framework_replication feature is disabled' do
         before do
-          stub_feature_flags(geo_self_service_framework: false)
+          stub_feature_flags(geo_self_service_framework_replication: false)
         end
 
         it 'returns nil' do

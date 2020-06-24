@@ -1,4 +1,4 @@
-query projectRequirements(
+query projectRequirementsEE(
   $projectPath: ID!
   $state: RequirementState
   $firstPageSize: Int

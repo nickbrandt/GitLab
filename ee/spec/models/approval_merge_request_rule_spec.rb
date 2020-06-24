@@ -17,7 +17,7 @@ RSpec.describe ApprovalMergeRequestRule do
     end
 
     it 'is invalid when name not unique within rule type and merge request' do
-      is_expected.to validate_uniqueness_of(:name).scoped_to([:merge_request_id, :rule_type])
+      is_expected.to validate_uniqueness_of(:name).scoped_to([:merge_request_id, :rule_type, :section])
     end
 
     context 'approval_project_rule is set' do
@@ -45,9 +45,9 @@ RSpec.describe ApprovalMergeRequestRule do
       end
 
       it 'is invalid when reusing the same name within the same merge request' do
-        existing = create(:code_owner_rule, name: '*.rb', merge_request: merge_request)
+        existing = create(:code_owner_rule, name: '*.rb', merge_request: merge_request, section: 'section')
 
-        new = build(:code_owner_rule, merge_request: existing.merge_request, name: '*.rb')
+        new = build(:code_owner_rule, merge_request: existing.merge_request, name: '*.rb', section: 'section')
 
         expect(new).not_to be_valid
         expect { new.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)

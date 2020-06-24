@@ -27,7 +27,7 @@ module Ci
       upload_multiple_artifacts: -> (build) { build.publishes_artifacts_reports? },
       refspecs: -> (build) { build.merge_request_ref? },
       artifacts_exclude: -> (build) { build.supports_artifacts_exclude? },
-      release_steps: -> (build) { build.release_steps? }
+      multi_build_steps: -> (build) { build.multi_build_steps? }
     }.freeze
 
     DEFAULT_RETRIES = {
@@ -801,6 +801,11 @@ module Ci
       has_expiring_artifacts? && job_artifacts_archive.present?
     end
 
+    def self.keep_artifacts!
+      update_all(artifacts_expire_at: nil)
+      Ci::JobArtifact.where(job: self.select(:id)).update_all(expire_at: nil)
+    end
+
     def keep_artifacts!
       self.update(artifacts_expire_at: nil)
       self.job_artifacts.update_all(expire_at: nil)
@@ -885,7 +890,7 @@ module Ci
         Gitlab::Ci::Features.artifacts_exclude_enabled?
     end
 
-    def release_steps?
+    def multi_build_steps?
       options.dig(:release)&.any? &&
         Gitlab::Ci::Features.release_generation_enabled?
     end

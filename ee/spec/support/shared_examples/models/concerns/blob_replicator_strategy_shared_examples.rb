@@ -38,7 +38,7 @@ RSpec.shared_examples 'a blob replicator' do
     end
 
     it 'does not schedule the checksum calculation if feature flag is disabled' do
-      stub_feature_flags(geo_self_service_framework: false)
+      stub_feature_flags(geo_self_service_framework_replication: false)
 
       expect(Geo::BlobVerificationPrimaryWorker).not_to receive(:perform_async)
       allow(replicator).to receive(:needs_checksum?).and_return(true)

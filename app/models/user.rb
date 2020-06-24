@@ -619,11 +619,12 @@ class User < ApplicationRecord
 
     # Pattern used to extract `@user` user references from text
     def reference_pattern
-      %r{
-        (?<!\w)
-        #{Regexp.escape(reference_prefix)}
-        (?<user>#{Gitlab::PathRegex::FULL_NAMESPACE_FORMAT_REGEX})
-      }x
+      @reference_pattern ||=
+        %r{
+          (?<!\w)
+          #{Regexp.escape(reference_prefix)}
+          (?<user>#{Gitlab::PathRegex::FULL_NAMESPACE_FORMAT_REGEX})
+        }x
     end
 
     # Return (create if necessary) the ghost user. The ghost user
@@ -652,6 +653,15 @@ class User < ApplicationRecord
         u.bio = 'The GitLab migration bot'
         u.name = 'GitLab Migration Bot'
         u.confirmed_at = Time.zone.now
+      end
+    end
+
+    def support_bot
+      email_pattern = "support%s@#{Settings.gitlab.host}"
+
+      unique_internal(where(user_type: :support_bot), 'support-bot', email_pattern) do |u|
+        u.bio = 'The GitLab support bot used for Service Desk'
+        u.name = 'GitLab Support Bot'
       end
     end
 

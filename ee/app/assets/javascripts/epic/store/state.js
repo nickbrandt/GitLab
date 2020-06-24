@@ -56,6 +56,7 @@ export default () => ({
   ancestors: [],
   participants: [],
   subscribed: false,
+  confidential: false,
 
   // Create Epic Props
   newEpicTitle: '',

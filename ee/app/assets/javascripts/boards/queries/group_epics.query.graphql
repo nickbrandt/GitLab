@@ -1,4 +1,4 @@
-query groupEpics($fullPath: ID!) {
+query groupEpicsEE($fullPath: ID!) {
   group(fullPath: $fullPath) {
     epics(first: 10) {
       nodes {

@@ -33,6 +33,7 @@ describe('Alert Details Sidebar Assignees', () => {
         ...data,
         sidebarCollapsed,
         projectPath: 'projectPath',
+        projectId: '1',
       },
       mocks: {
         $apollo: {
@@ -69,7 +70,7 @@ describe('Alert Details Sidebar Assignees', () => {
 
     beforeEach(() => {
       mock = new MockAdapter(axios);
-      const path = '/autocomplete/users.json';
+      const path = '/-/autocomplete/users.json';
       const users = [
         {
           avatar_url:

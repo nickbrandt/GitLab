@@ -38,6 +38,10 @@ export default {
     SidebarAssignee,
   },
   props: {
+    projectId: {
+      type: String,
+      required: true,
+    },
     projectPath: {
       type: String,
       required: true,
@@ -122,13 +126,13 @@ export default {
     updateAssigneesDropdown() {
       this.isDropdownSearching = true;
       return axios
-        .get(this.buildUrl(gon.relative_url_root, '/autocomplete/users.json'), {
+        .get(this.buildUrl(gon.relative_url_root, '/-/autocomplete/users.json'), {
           params: {
             search: this.search,
             per_page: 20,
             active: true,
             current_user: true,
-            project_id: gon?.current_project_id,
+            project_id: this.projectId,
           },
         })
         .then(({ data }) => {

@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 RSpec.describe StartPullMirroringService do
-  let(:project) { create(:project) }
-  let(:import_state) { create(:import_state, project: project) }
+  let(:project) { create(:project, :mirror, :repository) }
   let(:user) { create(:user) }
+  let(:import_state) { project.import_state }
 
   subject { described_class.new(project, user, pause_on_hard_failure: pause_on_hard_failure) }
 
@@ -59,6 +59,17 @@ RSpec.describe StartPullMirroringService do
     end
   end
 
+  shared_examples_for 'pull mirroring has not started' do |status|
+    it 'does not start pull mirroring' do
+      expect { execute }.to not_change { UpdateAllMirrorsWorker.jobs.size }
+      expect(execute[:status]).to eq(status)
+    end
+  end
+
+  before do
+    import_state.update(next_execution_timestamp: 1.minute.from_now)
+  end
+
   context 'when pause_on_hard_failure is false' do
     let(:pause_on_hard_failure) { false }
 
@@ -72,6 +83,14 @@ RSpec.describe StartPullMirroringService do
       it 'resets the import state retry_count' do
         expect { execute }.to change { import_state.retry_count }.to(0)
       end
+
+      context 'when mirror is due to be updated' do
+        before do
+          import_state.update(next_execution_timestamp: 1.minute.ago)
+        end
+
+        it_behaves_like 'pull mirroring has started'
+      end
     end
 
     context 'when does not reach the max retry limit yet' do
@@ -81,6 +100,14 @@ RSpec.describe StartPullMirroringService do
 
       it_behaves_like 'pull mirroring has started'
       it_behaves_like 'retry count did not reset'
+
+      context 'when mirror is due to be updated' do
+        before do
+          import_state.update(next_execution_timestamp: 1.minute.ago)
+        end
+
+        it_behaves_like 'pull mirroring has not started', :success
+      end
     end
   end
 
@@ -93,11 +120,7 @@ RSpec.describe StartPullMirroringService do
       end
 
       it_behaves_like 'retry count did not reset'
-
-      it 'does not start pull mirroring' do
-        expect { execute }.to not_change { UpdateAllMirrorsWorker.jobs.size }
-        expect(execute[:status]).to eq(:error)
-      end
+      it_behaves_like 'pull mirroring has not started', :error
     end
 
     context 'when does not reach the max retry limit yet' do
@@ -107,6 +130,14 @@ RSpec.describe StartPullMirroringService do
 
       it_behaves_like 'pull mirroring has started'
       it_behaves_like 'retry count did not reset'
+
+      context 'when mirror is due to be updated' do
+        before do
+          import_state.update(next_execution_timestamp: 1.minute.ago)
+        end
+
+        it_behaves_like 'pull mirroring has not started', :success
+      end
     end
   end
 

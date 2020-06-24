@@ -11,6 +11,9 @@ module Resolvers
     argument :title, GraphQL::STRING_TYPE,
              required: false,
              description: 'Fuzzy search by title'
+    argument :id, GraphQL::ID_TYPE,
+             required: false,
+             description: 'The ID of the Iteration to look up'
 
     type Types::IterationType, null: true
 
@@ -28,6 +31,7 @@ module Resolvers
 
     def iterations_finder_params(args)
       {
+        id: args[:id],
         state: args[:state] || 'all',
         start_date: args[:start_date],
         end_date: args[:end_date],

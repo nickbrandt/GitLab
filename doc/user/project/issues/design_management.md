@@ -30,9 +30,11 @@ to be enabled:
   project level, navigate to your project's **Settings > General**, expand **Visibility, project features, permissions**
   and enable **Git Large File Storage**.
 
-Design Management requires that projects are using
-[hashed storage](../../../administration/repository_storage_types.md#hashed-storage)
-(the default storage type since v10.0).
+Design Management also requires that projects are using
+[hashed storage](../../../administration/raketasks/storage.md#migrate-to-hashed-storage). Since
+ GitLab 10.0, newly created projects use hashed storage by default. A GitLab admin can verify the storage type of a
+project by navigating to **Admin Area > Projects** and then selecting the project in question.
+A project can be identified as hashed-stored if its *Gitaly relative path* contains `@hashed`.
 
 If the requirements are not met, the **Designs** tab displays a message to the user.
 
@@ -47,6 +49,7 @@ and [PDFs](https://gitlab.com/gitlab-org/gitlab/-/issues/32811) is planned for a
 ## Limitations
 
 - Design uploads are limited to 10 files at a time.
+- From GitLab 13.1, Design filenames are limited to 255 characters.
 - Design Management data
   [isn't deleted when a project is destroyed](https://gitlab.com/gitlab-org/gitlab/-/issues/13429) yet.
 - Design Management data [won't be moved](https://gitlab.com/gitlab-org/gitlab/-/issues/13426)
@@ -181,17 +184,23 @@ so that everyone involved can participate in the discussion.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13049) in GitLab 13.1.
 
-Discussion threads can be resolved on Designs. You can mark a thread as resolved
-or unresolved by clicking the **Resolve thread** icon at the first comment of the
-discussion.
+Discussion threads can be resolved on Designs.
 
-![Resolve thread icon](img/resolve_design-discussion_icon_v13_1.png)
+There are two ways to resolve/unresolve a Design thread:
 
-Pinned comments can also be resolved or unresolved in their threads.
-When replying to a comment, you will see a checkbox that you can click in order to resolve or unresolve
-the thread once published.
+1. You can mark a thread as resolved or unresolved by clicking the checkmark icon for **Resolve thread** in the top-right corner of the first comment of the discussion:
 
-![Resolve checkbox](img/resolve_design-discussion_checkbox_v13_1.png)
+  ![Resolve thread icon](img/resolve_design-discussion_icon_v13_1.png)
+
+1. Design threads can also be resolved or unresolved in their threads by using a checkbox.
+  When replying to a comment, you will see a checkbox that you can click in order to resolve or unresolve
+  the thread once published:
+
+  ![Resolve checkbox](img/resolve_design-discussion_checkbox_v13_1.png)
+
+Note that your resolved comment pins will disappear from the Design to free up space for new discussions.
+However, if you need to revisit or find a resolved discussion, all of your resolved threads will be
+available in the **Resolved Comment** area at the bottom of the right sidebar.
 
 ## Referring to designs in Markdown
 
@@ -232,4 +241,36 @@ To disable it:
 
 ```ruby
 Feature.disable(:design_management_reference_filter_gfm_pipeline)
+```
+
+## Design activity records
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/33051) in GitLab 13.1
+> - It's deployed behind a feature flag, disabled by default.
+> - It's enabled on GitLab.com.
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-design-events-core-only). **(CORE ONLY)**
+
+User activity events on designs (creation, deletion, and updates) are tracked by GitLab and
+displayed on the [user profile](../../profile/index.md#user-profile),
+[group](../../group/index.md#view-group-activity),
+and [project](../index.md#project-activity) activity pages.
+
+### Enable or disable Design Events **(CORE ONLY)**
+
+User activity for designs is under development and not ready for production use. It is
+deployed behind a feature flag that is **disabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/troubleshooting/navigating_gitlab_via_rails_console.md#starting-a-rails-console-session)
+can enable it for your instance. You're welcome to test it, but use it at your
+own risk.
+
+To enable it:
+
+```ruby
+Feature.enable(:design_activity_events)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:design_activity_events)
 ```

@@ -7,11 +7,13 @@ RSpec.describe 'layouts/header/_current_user_dropdown' do
 
   describe 'Buy Pipeline Minutes link in user dropdown' do
     let(:need_minutes) { true }
+    let(:show_notification_dot) { false }
 
     before do
       allow(view).to receive(:current_user).and_return(user)
       allow(view).to receive(:show_upgrade_link?).and_return(false)
       allow(view).to receive(:show_buy_pipeline_minutes?).and_return(need_minutes)
+      allow(view).to receive(:show_pipeline_minutes_notification_dot?).and_return(show_notification_dot)
 
       render
     end
@@ -24,6 +26,16 @@ RSpec.describe 'layouts/header/_current_user_dropdown' do
         expect(subject).to have_selector("[data-track-label='#{user.namespace.actual_plan_name}']")
         expect(subject).to have_selector('[data-track-property="user_dropdown"]')
         expect(subject).to have_link('Buy Pipeline minutes')
+        expect(subject).not_to have_content('One of your groups is running out')
+      end
+    end
+
+    context 'when pipeline minutes need bought and there is a notification dot' do
+      let(:show_notification_dot) { true }
+
+      it 'has "Buy Pipeline minutes" link with correct text', :aggregate_failures do
+        expect(subject).to have_link('Buy Pipeline minutes')
+        expect(subject).to have_content('One of your groups is running out')
       end
     end
 

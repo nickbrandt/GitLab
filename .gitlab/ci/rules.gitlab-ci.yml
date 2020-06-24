@@ -71,6 +71,22 @@
   - ".gitlab-ci.yml"
   - ".gitlab/ci/**/*"
 
+.ci-build-images-patterns: &ci-build-images-patterns
+  - ".gitlab-ci.yml"
+  - ".gitlab/ci/build-images.gitlab-ci.yml"
+
+.ci-review-patterns: &ci-review-patterns
+  - ".gitlab-ci.yml"
+  - ".gitlab/ci/frontend.gitlab-ci.yml"
+  - ".gitlab/ci/build-images.gitlab-ci.yml"
+  - ".gitlab/ci/review.gitlab-ci.yml"
+
+.ci-qa-patterns: &ci-qa-patterns
+  - ".gitlab-ci.yml"
+  - ".gitlab/ci/frontend.gitlab-ci.yml"
+  - ".gitlab/ci/build-images.gitlab-ci.yml"
+  - ".gitlab/ci/qa.gitlab-ci.yml"
+
 .yaml-patterns: &yaml-patterns
   - "**/*.yml"
 
@@ -91,6 +107,17 @@
   - "config/**/*.js"
   - "vendor/assets/**/*"
   - "{,ee/}{app/assets,app/helpers,app/presenters,app/views,locale,public,symbol}/**/*"
+
+.backend-patterns: &backend-patterns
+  - "Gemfile{,.lock}"
+  - "Rakefile"
+  - "config.ru"
+  # List explicitly all the app/ dirs that aren't backend (i.e. all except app/assets).
+  - "{,ee/}{app/channels,app/controllers,app/finders,app/graphql,app/helpers,app/mailers,app/models,app/policies,app/presenters,app/serializers,app/services,app/uploaders,app/validators,app/views,app/workers}/**/*"
+  - "{,ee/}{bin,cable,config,db,lib}/**/*"
+
+.db-patterns: &db-patterns
+  - "{,ee/}{db}/**/*"
 
 .backstage-patterns: &backstage-patterns
   - "Dangerfile"
@@ -197,6 +224,26 @@
     - <<: *if-master-schedule-2-hourly
     - <<: *if-merge-request-title-update-caches
 
+######################
+# Build images rules #
+######################
+.build-images:rules:build-qa-image:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-dot-com-gitlab-org-and-security-merge-request
+      changes: *ci-build-images-patterns
+    - <<: *if-dot-com-gitlab-org-and-security-merge-request
+      changes: *code-qa-patterns
+    - <<: *if-dot-com-gitlab-org-schedule
+
+.build-images:rules:build-assets-image:
+  rules:
+    - <<: *if-not-canonical-namespace
+      when: never
+    - changes: *ci-build-images-patterns
+    - changes: *code-qa-patterns
+
 ####################
 # Cache repo rules #
 ####################
@@ -263,7 +310,7 @@
     - <<: *if-not-canonical-namespace
       when: never
     - <<: *if-default-refs
-      changes: *code-backstage-qa-patterns
+      changes: *code-qa-patterns
 
 .frontend:rules:compile-test-assets:
   rules:
@@ -367,7 +414,7 @@
 .qa:rules:package-and-qa:
   rules:
     - <<: *if-dot-com-gitlab-org-and-security-merge-request
-      changes: *ci-patterns
+      changes: *ci-qa-patterns
       allow_failure: true
     - <<: *if-dot-com-gitlab-org-and-security-merge-request
       changes: *qa-patterns
@@ -382,24 +429,86 @@
 ###############
 # Rails rules #
 ###############
-.rails:rules:ee-and-foss:
+.rails:rules:ee-and-foss-migration:
   rules:
-    - <<: *if-default-refs
-      changes: *code-backstage-patterns
+    - changes: *db-patterns
+
+.rails:rules:ee-and-foss-unit:
+  rules:
+    - changes: *backend-patterns
+
+.rails:rules:ee-and-foss-integration:
+  rules:
+    - changes: *backend-patterns
+
+.rails:rules:ee-and-foss-system:
+  rules:
+    - changes: *code-backstage-patterns
+
+.rails:rules:ee-and-foss-fast_spec_helper:
+  rules:
+    - changes: ["config/**/*"]
 
 .rails:rules:default-refs-code-backstage-qa:
   rules:
     - <<: *if-default-refs
       changes: *code-backstage-qa-patterns
 
-.rails:rules:ee-only:
+.rails:rules:ee-only-migration:
   rules:
     - <<: *if-not-ee
       when: never
-    - <<: *if-default-refs
-      changes: *code-backstage-patterns
+    - changes: *db-patterns
 
-.rails:rules:as-if-foss:
+.rails:rules:ee-only-unit:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - changes: *backend-patterns
+
+.rails:rules:ee-only-integration:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - changes: *backend-patterns
+
+.rails:rules:ee-only-system:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - changes: *code-backstage-patterns
+
+.rails:rules:as-if-foss-migration:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-security-merge-request
+      changes: *db-patterns
+    - <<: *if-merge-request-title-as-if-foss
+    - <<: *if-merge-request
+      changes: *ci-patterns
+
+.rails:rules:as-if-foss-unit:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-security-merge-request
+      changes: *backend-patterns
+    - <<: *if-merge-request-title-as-if-foss
+    - <<: *if-merge-request
+      changes: *ci-patterns
+
+.rails:rules:as-if-foss-integration:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-security-merge-request
+      changes: *backend-patterns
+    - <<: *if-merge-request-title-as-if-foss
+    - <<: *if-merge-request
+      changes: *ci-patterns
+
+.rails:rules:as-if-foss-system:
   rules:
     - <<: *if-not-ee
       when: never
@@ -496,18 +605,12 @@
 ################
 # Review rules #
 ################
-.review:rules:build-qa-image:
+.review:rules:review-build-cng:
   rules:
     - <<: *if-not-ee
       when: never
-    - <<: *if-dot-com-gitlab-org-and-security-merge-request
-      changes: *code-qa-patterns
-    - <<: *if-dot-com-gitlab-org-schedule
-
-.review:rules:review-build-cng:
-  rules:
     - <<: *if-dot-com-gitlab-org-merge-request
-      changes: *ci-patterns
+      changes: *ci-review-patterns
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
     - <<: *if-dot-com-gitlab-org-merge-request
@@ -521,7 +624,7 @@
     - <<: *if-not-ee
       when: never
     - <<: *if-dot-com-gitlab-org-merge-request
-      changes: *ci-patterns
+      changes: *ci-review-patterns
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
       allow_failure: true
@@ -544,7 +647,7 @@
     - <<: *if-not-ee
       when: never
     - <<: *if-dot-com-gitlab-org-merge-request
-      changes: *ci-patterns
+      changes: *ci-review-patterns
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
       allow_failure: true

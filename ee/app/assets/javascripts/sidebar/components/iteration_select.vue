@@ -156,12 +156,12 @@ export default {
 </script>
 
 <template>
-  <div class="mt-3">
+  <div>
     <div v-gl-tooltip class="sidebar-collapsed-icon">
       <gl-icon :size="16" :aria-label="$options.iterationText" name="iteration" />
       <span class="collapse-truncated-title">{{ iteration }}</span>
     </div>
-    <div class="title hide-collapsed">
+    <div class="title hide-collapsed mt-3">
       {{ $options.iterationText }}
       <gl-button
         v-if="canEdit"

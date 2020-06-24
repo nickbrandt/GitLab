@@ -1,10 +1,13 @@
 <script>
-import { GlIcon, GlLink } from '@gitlab/ui';
+import { GlIcon, GlLink, GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   components: {
     GlIcon,
     GlLink,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     issue: {

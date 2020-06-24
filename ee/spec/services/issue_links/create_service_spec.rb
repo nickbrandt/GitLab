@@ -125,23 +125,60 @@ RSpec.describe IssueLinks::CreateService do
     context 'when reference of any already related issue is present' do
       let(:issue_a) { create :issue, project: project }
       let(:issue_b) { create :issue, project: project }
+      let(:issue_c) { create :issue, project: project }
 
       before do
-        create :issue_link, source: issue, target: issue_a
+        create :issue_link, source: issue, target: issue_b, link_type: IssueLink::TYPE_RELATES_TO
+        create :issue_link, source: issue, target: issue_c, link_type: IssueLink::TYPE_IS_BLOCKED_BY
       end
 
       let(:params) do
-        { issuable_references: [issue_b.to_reference, issue_a.to_reference] }
+        {
+          issuable_references: [
+            issue_a.to_reference,
+            issue_b.to_reference,
+            issue_c.to_reference
+          ],
+          link_type: IssueLink::TYPE_IS_BLOCKED_BY
+        }
       end
 
-      it 'returns success status' do
-        is_expected.to eq(status: :success)
+      it 'creates notes only for new and changed relations' do
+        expect(SystemNoteService).to receive(:relate_issue).with(issue, issue_a, anything)
+        expect(SystemNoteService).to receive(:relate_issue).with(issue_a, issue, anything)
+        expect(SystemNoteService).to receive(:relate_issue).with(issue, issue_b, anything)
+        expect(SystemNoteService).to receive(:relate_issue).with(issue_b, issue, anything)
+        expect(SystemNoteService).not_to receive(:relate_issue).with(issue, issue_c, anything)
+        expect(SystemNoteService).not_to receive(:relate_issue).with(issue_c, issue, anything)
+
+        subject
       end
 
-      it 'valid relations are created' do
-        expect { subject }.to change(IssueLink, :count).from(1).to(2)
+      it 'sets the same type of relation for selected references' do
+        expect(subject).to eq(status: :success)
 
-        expect(IssueLink.find_by!(target: issue_b)).to have_attributes(source: issue)
+        expect(IssueLink.where(target: [issue_a, issue_b, issue_c]).pluck(:link_type))
+          .to eq([IssueLink::TYPE_IS_BLOCKED_BY, IssueLink::TYPE_IS_BLOCKED_BY, IssueLink::TYPE_IS_BLOCKED_BY])
+      end
+    end
+
+    context 'when there are invalid references' do
+      let(:issue_a) { create :issue, project: project }
+
+      let(:params) do
+        { issuable_references: [issue.to_reference, issue_a.to_reference] }
+      end
+
+      it 'creates links only for valid references' do
+        expect { subject }.to change { IssueLink.count }.by(1)
+      end
+
+      it 'returns error status' do
+        expect(subject).to eq(
+          status: :error,
+          http_status: 422,
+          message: "#{issue.to_reference} cannot be added: cannot be related to itself"
+        )
       end
     end
   end

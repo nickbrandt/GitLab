@@ -12,6 +12,7 @@ import {
 import trackDashboardLoad from '../monitoring_tracking_helper';
 import getEnvironments from '../queries/getEnvironments.query.graphql';
 import getAnnotations from '../queries/getAnnotations.query.graphql';
+import getDashboardValidationWarnings from '../queries/getDashboardValidationWarnings.query.graphql';
 import statusCodes from '../../lib/utils/http_status';
 import { backOff, convertObjectPropsToCamelCase } from '../../lib/utils/common_utils';
 import { s__, sprintf } from '../../locale';
@@ -50,15 +51,14 @@ function backOffRequest(makeRequestCallback) {
   }, PROMETHEUS_TIMEOUT);
 }
 
-function getPrometheusMetricResult(prometheusEndpoint, params) {
+function getPrometheusQueryData(prometheusEndpoint, params) {
   return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
     .then(res => res.data)
     .then(response => {
       if (response.status === 'error') {
         throw new Error(response.error);
       }
-
-      return response.data.result;
+      return response.data;
     });
 }
 
@@ -117,17 +117,27 @@ export const fetchData = ({ dispatch }) => {
 
 // Metrics dashboard
 
-export const fetchDashboard = ({ state, commit, dispatch }) => {
+export const fetchDashboard = ({ state, commit, dispatch, getters }) => {
   dispatch('requestMetricsDashboard');
 
   const params = {};
-  if (state.currentDashboard) {
-    params.dashboard = state.currentDashboard;
+  if (getters.fullDashboardPath) {
+    params.dashboard = getters.fullDashboardPath;
   }
 
   return backOffRequest(() => axios.get(state.dashboardEndpoint, { params }))
     .then(resp => resp.data)
-    .then(response => dispatch('receiveMetricsDashboardSuccess', { response }))
+    .then(response => {
+      dispatch('receiveMetricsDashboardSuccess', { response });
+      /**
+       * After the dashboard is fetched, there can be non-blocking invalid syntax
+       * in the dashboard file. This call will fetch such syntax warnings
+       * and surface a warning on the UI. If the invalid syntax is blocking,
+       * the `fetchDashboard` returns a 404 with error messages that are displayed
+       * on the UI.
+       */
+      dispatch('fetchDashboardValidationWarnings');
+    })
     .catch(error => {
       Sentry.captureException(error);
 
@@ -194,7 +204,7 @@ export const fetchDashboardData = ({ state, dispatch, getters }) => {
 
   return Promise.all(promises)
     .then(() => {
-      const dashboardType = state.currentDashboard === '' ? 'default' : 'custom';
+      const dashboardType = getters.fullDashboardPath === '' ? 'default' : 'custom';
       trackDashboardLoad({
         label: `${dashboardType}_metrics_dashboard`,
         value: getters.metricsWithData().length,
@@ -229,9 +239,9 @@ export const fetchPrometheusMetric = (
 
   commit(types.REQUEST_METRIC_RESULT, { metricId: metric.metricId });
 
-  return getPrometheusMetricResult(metric.prometheusEndpointPath, queryParams)
-    .then(result => {
-      commit(types.RECEIVE_METRIC_RESULT_SUCCESS, { metricId: metric.metricId, result });
+  return getPrometheusQueryData(metric.prometheusEndpointPath, queryParams)
+    .then(data => {
+      commit(types.RECEIVE_METRIC_RESULT_SUCCESS, { metricId: metric.metricId, data });
     })
     .catch(error => {
       Sentry.captureException(error);
@@ -312,9 +322,9 @@ export const receiveEnvironmentsDataFailure = ({ commit }) => {
   commit(types.RECEIVE_ENVIRONMENTS_DATA_FAILURE);
 };
 
-export const fetchAnnotations = ({ state, dispatch }) => {
+export const fetchAnnotations = ({ state, dispatch, getters }) => {
   const { start } = convertToFixedRange(state.timeRange);
-  const dashboardPath = state.currentDashboard || DEFAULT_DASHBOARD_PATH;
+  const dashboardPath = getters.fullDashboardPath || DEFAULT_DASHBOARD_PATH;
   return gqClient
     .mutate({
       mutation: getAnnotations,
@@ -344,6 +354,46 @@ export const fetchAnnotations = ({ state, dispatch }) => {
 export const receiveAnnotationsSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_ANNOTATIONS_SUCCESS, data);
 export const receiveAnnotationsFailure = ({ commit }) => commit(types.RECEIVE_ANNOTATIONS_FAILURE);
+
+export const fetchDashboardValidationWarnings = ({ state, dispatch }) => {
+  /**
+   * Normally, the default dashboard won't throw any validation warnings.
+   *
+   * However, if a bug sneaks into the default dashboard making it invalid,
+   * this might come handy for our clients
+   */
+  const dashboardPath = state.currentDashboard || DEFAULT_DASHBOARD_PATH;
+  return gqClient
+    .mutate({
+      mutation: getDashboardValidationWarnings,
+      variables: {
+        projectPath: removeLeadingSlash(state.projectPath),
+        environmentName: state.currentEnvironmentName,
+        dashboardPath,
+      },
+    })
+    .then(resp => resp.data?.project?.environments?.nodes?.[0]?.metricsDashboard)
+    .then(({ schemaValidationWarnings }) => {
+      const hasWarnings = schemaValidationWarnings && schemaValidationWarnings.length !== 0;
+      /**
+       * The payload of the dispatch is a boolean, because at the moment a standard
+       * warning message is shown instead of the warnings the BE returns
+       */
+      dispatch('receiveDashboardValidationWarningsSuccess', hasWarnings || false);
+    })
+    .catch(err => {
+      Sentry.captureException(err);
+      dispatch('receiveDashboardValidationWarningsFailure');
+      createFlash(
+        s__('Metrics|There was an error getting dashboard validation warnings information.'),
+      );
+    });
+};
+
+export const receiveDashboardValidationWarningsSuccess = ({ commit }, hasWarnings) =>
+  commit(types.RECEIVE_DASHBOARD_VALIDATION_WARNINGS_SUCCESS, hasWarnings);
+export const receiveDashboardValidationWarningsFailure = ({ commit }) =>
+  commit(types.RECEIVE_DASHBOARD_VALIDATION_WARNINGS_FAILURE);
 
 // Dashboard manipulation
 

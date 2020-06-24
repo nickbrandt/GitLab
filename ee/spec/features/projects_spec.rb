@@ -17,7 +17,7 @@ RSpec.describe 'Project' do
       sign_in user
     end
 
-    it "defaults to correct namespace", :js do
+    it "defaults to correct namespace", :js, quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/223023' do
       visit new_project_path
       find('#create-from-template-tab').click
       find('.custom-group-project-templates-tab').click

@@ -151,11 +151,11 @@ The following variables allow configuration of global dependency scanning settin
 | Environment variable                    | Description |
 | --------------------------------------- |------------ |
 | `SECURE_ANALYZERS_PREFIX`               | Override the name of the Docker registry providing the official default images (proxy). Read more about [customizing analyzers](analyzers.md). |
-| `DS_ANALYZER_IMAGE_PREFIX`              | **DEPRECATED:** Use `SECURE_ANALYZERS_PREFIX` instead. |
 | `DS_DEFAULT_ANALYZERS`                  | Override the names of the official default images. Read more about [customizing analyzers](analyzers.md). |
 | `DS_DISABLE_DIND`                       | Disable Docker-in-Docker and run analyzers [individually](#enabling-docker-in-docker). This variable is `true` by default. |
 | `ADDITIONAL_CA_CERT_BUNDLE`             | Bundle of CA certs to trust. |
 | `DS_EXCLUDED_PATHS`                     | Exclude vulnerabilities from output based on the paths. A comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec`). Parent directories also match patterns. Default: `"spec, test, tests, tmp"` |
+| `SECURE_LOG_LEVEL`                      | Default log level is `info`, you can set it to any of the following strings: `panic`, `fatal`, `error`, `warn`, `info`, `debug`, `trace`. |
 
 #### Configuring Docker-in-Docker orchestrator
 
@@ -428,14 +428,14 @@ For details on saving and transporting Docker images as a file, see Docker's doc
 ### Set Dependency Scanning CI job variables to use local Dependency Scanning analyzers
 
 Add the following configuration to your `.gitlab-ci.yml` file. You must replace
-`DS_ANALYZER_IMAGE_PREFIX` to refer to your local Docker container registry:
+`SECURE_ANALYZERS_PREFIX` to refer to your local Docker container registry:
 
 ```yaml
 include:
   - template: Dependency-Scanning.gitlab-ci.yml
 
 variables:
-  DS_ANALYZER_IMAGE_PREFIX: "docker-registry.example.com/analyzers"
+  SECURE_ANALYZERS_PREFIX: "docker-registry.example.com/analyzers"
   GEMNASIUM_DB_REMOTE_URL: "gitlab.example.com/gemnasium-db.git"
   GIT_SSL_NO_VERIFY: "true"
 ```

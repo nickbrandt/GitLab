@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_dependency 'compliance_management/compliance_framework'
+
 module ComplianceManagement
   module ComplianceFramework
     class ProjectSettings < ApplicationRecord
@@ -8,13 +10,7 @@ module ComplianceManagement
 
       belongs_to :project
 
-      enum framework: {
-        gdpr: 1,    # General Data Protection Regulation
-        hipaa: 2,   # Health Insurance Portability and Accountability Act
-        pci_dss: 3, # Payment Card Industry-Data Security Standard
-        soc_2: 4,   # Service Organization Control 2
-        sox: 5      # Sarbanes-Oxley
-      }
+      enum framework: ::ComplianceManagement::ComplianceFramework::FRAMEWORKS
 
       validates :project, presence: true
       validates :framework, uniqueness: { scope: [:project_id] }

@@ -4,13 +4,10 @@ module EE
   module Gitlab
     module RepoPath
       module ClassMethods
-        extend ::Gitlab::Utils::Override
-
-        override :find_routes_source
-        def find_routes_source(path, *args)
+        def find_project(project_path)
           return super unless License.feature_available?(:project_aliases)
 
-          if project_alias = ProjectAlias.find_by_name(path)
+          if project_alias = ProjectAlias.find_by_name(project_path)
             [project_alias.project, nil]
           else
             super

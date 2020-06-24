@@ -129,6 +129,24 @@ RSpec.describe ApplicationSetting do
         end
       end
     end
+
+    context 'when validating compliance_frameworks' do
+      where(:compliance_frameworks, :is_valid) do
+        [1, 2, 3, 4, 5] | true
+        nil             | true
+        1               | true
+        [2, 3, 4, 6]    | false
+        6               | false
+      end
+
+      with_them do
+        specify do
+          setting.compliance_frameworks = compliance_frameworks
+
+          expect(setting.valid?).to eq(is_valid)
+        end
+      end
+    end
   end
 
   describe '#should_check_namespace_plan?' do
@@ -668,6 +686,20 @@ RSpec.describe ApplicationSetting do
       end
 
       it { is_expected.to eq(result) }
+    end
+  end
+
+  describe '#compliance_frameworks' do
+    it 'sorts the list' do
+      setting.compliance_frameworks = [5, 4, 1, 3, 2]
+
+      expect(setting.compliance_frameworks).to eq([1, 2, 3, 4, 5])
+    end
+
+    it 'removes duplicates' do
+      setting.compliance_frameworks = [1, 2, 2, 3, 3, 3]
+
+      expect(setting.compliance_frameworks).to eq([1, 2, 3])
     end
   end
 end

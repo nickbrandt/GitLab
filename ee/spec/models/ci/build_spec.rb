@@ -432,7 +432,7 @@ RSpec.describe Ci::Build do
 
     context 'when there is a requirements report' do
       before do
-        create(:ee_ci_job_artifact, :requirements, job: job, project: job.project)
+        create(:ee_ci_job_artifact, :all_passing_requirements, job: job, project: job.project)
       end
 
       context 'when requirements are available' do

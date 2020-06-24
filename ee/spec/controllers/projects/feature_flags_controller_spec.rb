@@ -48,6 +48,14 @@ RSpec.describe Projects::FeatureFlagsController do
         is_expected.to have_gitlab_http_status(:not_found)
       end
     end
+
+    context 'when the user is a reporter' do
+      let(:user) { reporter }
+
+      it 'responds with not found' do
+        is_expected.to have_gitlab_http_status(:not_found)
+      end
+    end
   end
 
   describe 'GET #index.json' do
