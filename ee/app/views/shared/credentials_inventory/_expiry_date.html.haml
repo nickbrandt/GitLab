@@ -1,0 +1,15 @@
+- if expiry_date&.past? || expiry_date&.today?
+  %span.d-inline-flex.align-items-center.text-danger.has-tooltip{ title: _('This credential has expired'), data: { testid: 'expiry-date-icon' } }
+    = sprite_icon('error', size: 16, css_class: "gl-icon mr-1")
+    = expiry_date.to_date
+
+- elsif expiry_date.present?
+  - if expires_soon
+    %span.d-inline-flex.align-items-center.text-warning{ data: { testid: 'expiry-date-icon' } }
+      = sprite_icon('warning', size: 16, css_class: "gl-icon mr-1")
+      = expiry_date.to_date
+  - else
+    = expiry_date.to_date
+
+- else
+  = _('Never')

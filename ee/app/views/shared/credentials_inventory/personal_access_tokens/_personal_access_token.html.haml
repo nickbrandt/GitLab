@@ -19,10 +19,7 @@
     .table-mobile-header{ role: 'rowheader' }
       = _('Expiration')
     .table-mobile-content
-      - if personal_access_token.expires?
-        = personal_access_token.expires_at
-      - else
-        = _('Never')
+      = render 'shared/credentials_inventory/expiry_date', expiry_date: personal_access_token.expires_at, expires_soon: personal_access_token.expires_soon?
   .table-section.section-10
     .table-mobile-header{ role: 'rowheader' }
       = _('Revoked')
