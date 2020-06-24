@@ -82,10 +82,13 @@ describe('security reports utils', () => {
       { external_type: 'gemnaisum', name: 'GEMNASIUM-1337' },
     ];
     it('should return the `cve` identifier if a `cve` identifier does exist', () => {
-      expect(getPrimaryIdentifiers(identifiers)).toBe(identifiers[0].name);
+      expect(getPrimaryIdentifiers(identifiers, 'external_type')).toBe(identifiers[0].name);
+    });
+    it('should return the first identifier if the property for type does not exist', () => {
+      expect(getPrimaryIdentifiers(identifiers, 'externalType')).toBe(identifiers[0].name);
     });
     it('should return the first identifier if a `cve` identifier does not exist', () => {
-      expect(getPrimaryIdentifiers([identifiers[1]])).toBe(identifiers[1].name);
+      expect(getPrimaryIdentifiers([identifiers[1]], 'external_type')).toBe(identifiers[1].name);
     });
     it('should return an empty string if identifiers is empty', () => {
       expect(getPrimaryIdentifiers()).toBe('');
