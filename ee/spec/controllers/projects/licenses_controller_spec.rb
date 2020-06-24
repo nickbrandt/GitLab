@@ -24,16 +24,28 @@ RSpec.describe Projects::LicensesController do
             project.add_reporter(user)
           end
 
-          it 'responds to an HTML request' do
-            get :index, params: params
+          context "when requesting HTML" do
+            subject { get :index, params: params }
 
-            expect(response).to have_gitlab_http_status(:ok)
-            licenses_app_data = assigns(:licenses_app_data)
-            expect(licenses_app_data[:project_licenses_endpoint]).to eql(controller.helpers.project_licenses_path(project, detected: true, format: :json))
-            expect(licenses_app_data[:read_license_policies_endpoint]).to eql(controller.helpers.api_v4_projects_managed_licenses_path(id: project.id))
-            expect(licenses_app_data[:write_license_policies_endpoint]).to eql('')
-            expect(licenses_app_data[:documentation_path]).to eql(help_page_path('user/compliance/license_compliance/index'))
-            expect(licenses_app_data[:empty_state_svg_path]).to eql(controller.helpers.image_path('illustrations/Dependency-list-empty-state.svg'))
+            let_it_be(:mit_license) { create(:software_license, :mit) }
+            let_it_be(:apache_license) { create(:software_license, :apache_2_0) }
+            let_it_be(:custom_license) { create(:software_license, :user_entered) }
+
+            before do
+              subject
+            end
+
+            it 'returns the necessary licenses app data' do
+              licenses_app_data = assigns(:licenses_app_data)
+
+              expect(response).to have_gitlab_http_status(:ok)
+              expect(licenses_app_data[:project_licenses_endpoint]).to eql(controller.helpers.project_licenses_path(project, detected: true, format: :json))
+              expect(licenses_app_data[:read_license_policies_endpoint]).to eql(controller.helpers.api_v4_projects_managed_licenses_path(id: project.id))
+              expect(licenses_app_data[:write_license_policies_endpoint]).to eql('')
+              expect(licenses_app_data[:documentation_path]).to eql(help_page_path('user/compliance/license_compliance/index'))
+              expect(licenses_app_data[:empty_state_svg_path]).to eql(controller.helpers.image_path('illustrations/Dependency-list-empty-state.svg'))
+              expect(licenses_app_data[:software_licenses]).to eql([apache_license.name, mit_license.name])
+            end
           end
 
           it 'counts usage of the feature' do
