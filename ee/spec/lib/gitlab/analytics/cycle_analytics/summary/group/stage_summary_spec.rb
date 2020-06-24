@@ -80,6 +80,27 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageSummary d
         end
       end
 
+      context 'with `label_name` filter' do
+        let(:label1) { create(:group_label, group: group) }
+        let(:label2) { create(:group_label, group: group) }
+
+        before do
+          issue = project.issues.last
+
+          Issues::UpdateService.new(
+            issue.project,
+            user,
+            label_ids: [label1.id, label2.id]
+          ).execute(issue)
+        end
+
+        subject { described_class.new(group, options: { from: Time.now, current_user: user, label_name: [label1.name, label2.name] }).data }
+
+        it 'finds issue with two labels' do
+          expect(subject.first[:value]).to eq('1')
+        end
+      end
+
       context 'when `from` and `to` parameters are provided' do
         subject { described_class.new(group, options: { from: 10.days.ago, to: Time.now, current_user: user }).data }
 

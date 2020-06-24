@@ -210,7 +210,24 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
           ).execute(issue)
         end
 
-        it_behaves_like 'custom cycle analytics stage'
+        it_behaves_like 'custom cycle analytics stage' do
+          context 'when filtering for two labels' do
+            let(:params) do
+              {
+                from: Time.new(2019),
+                to: Time.new(2020),
+                current_user: user,
+                label_name: [label.name, other_label.name]
+              }
+            end
+
+            subject { described_class.new(stage: stage, params: params) }
+
+            it 'does not raise query syntax error' do
+              expect { subject.records_fetcher.serialized_records }.not_to raise_error(ActiveRecord::StatementInvalid)
+            end
+          end
+        end
       end
 
       describe 'between issue creation time and issue label added time' do
@@ -486,6 +503,23 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
           ).execute(merge_request)
 
           data_collector_params[:label_name] = [label.name]
+        end
+
+        it_behaves_like 'filter examples'
+      end
+
+      context 'when two labels are given' do
+        let(:label1) { create(:group_label, group: group) }
+        let(:label2) { create(:group_label, group: group) }
+
+        before do
+          MergeRequests::UpdateService.new(
+            merge_request.project,
+            user,
+            label_ids: [label1.id, label2.id]
+          ).execute(merge_request)
+
+          data_collector_params[:label_name] = [label1.name, label2.name]
         end
 
         it_behaves_like 'filter examples'
