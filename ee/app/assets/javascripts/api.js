@@ -35,7 +35,8 @@ export default {
   paymentFormPath: '/-/subscriptions/payment_form',
   paymentMethodPath: '/-/subscriptions/payment_method',
   confirmOrderPath: '/-/subscriptions',
-  vulnerabilitiesActionPath: '/api/:version/vulnerabilities/:id/:action',
+  vulnerabilityPath: '/api/:version/vulnerabilities/:id',
+  vulnerabilityActionPath: '/api/:version/vulnerabilities/:id/:action',
   featureFlagUserLists: '/api/:version/projects/:id/feature_flags_user_lists',
   featureFlagUserList: '/api/:version/projects/:id/feature_flags_user_lists/:list_iid',
 
@@ -290,8 +291,13 @@ export default {
     return axios.post(url, params);
   },
 
+  fetchVulnerability(id, params) {
+    const url = Api.buildUrl(this.vulnerabilityPath).replace(':id', id);
+    return axios.get(url, params);
+  },
+
   changeVulnerabilityState(id, state) {
-    const url = Api.buildUrl(this.vulnerabilitiesActionPath)
+    const url = Api.buildUrl(this.vulnerabilityActionPath)
       .replace(':id', id)
       .replace(':action', state);
 

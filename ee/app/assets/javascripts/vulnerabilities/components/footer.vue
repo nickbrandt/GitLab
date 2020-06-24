@@ -127,6 +127,8 @@ export default {
       });
     },
     updateNotes(notes) {
+      let isVulnerabilityStateChanged = false;
+
       notes.forEach(note => {
         // If the note exists, update it.
         if (this.noteDictionary[note.id]) {
@@ -150,8 +152,18 @@ export default {
             notes: [note],
           };
           this.$set(this.discussionsDictionary, newDiscussion.id, newDiscussion);
+
+          // If the vulnerability status has changed, the note will be a system note.
+          if (note.system === true) {
+            isVulnerabilityStateChanged = true;
+          }
         }
       });
+
+      // Emit an event that tells the header to refresh the vulnerability.
+      if (isVulnerabilityStateChanged) {
+        VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+      }
     },
   },
 };
