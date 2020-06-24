@@ -8,7 +8,7 @@ class GlEmoji extends HTMLElement {
 
     this.initialize();
   }
-  initialize(enforceUnicodeRedering) {
+  initialize() {
     let emojiUnicode = this.textContent.trim();
     const { fallbackSpriteClass, fallbackSrc } = this.dataset;
     let { name, unicodeVersion } = this.dataset;
@@ -36,16 +36,17 @@ class GlEmoji extends HTMLElement {
         const isEmojiUnicode =
           this.childNodes &&
           Array.prototype.every.call(this.childNodes, childNode => childNode.nodeType === 3);
-        const hasImageFallback = fallbackSrc && fallbackSrc.length > 0;
-        const hasCssSpriteFalback = fallbackSpriteClass && fallbackSpriteClass.length > 0;
 
         if (
           emojiUnicode &&
           isEmojiUnicode &&
-          (!isEmojiUnicodeSupported(emojiUnicode, unicodeVersion) && !enforceUnicodeRedering)
+          !isEmojiUnicodeSupported(emojiUnicode, unicodeVersion)
         ) {
+          const hasImageFallback = fallbackSrc && fallbackSrc.length > 0;
+          const hasCssSpriteFallback = fallbackSpriteClass && fallbackSpriteClass.length > 0;
+
           // CSS sprite fallback takes precedence over image fallback
-          if (hasCssSpriteFalback) {
+          if (hasCssSpriteFallback) {
             if (!gon.emoji_sprites_css_added && gon.emoji_sprites_css_path) {
               const emojiSpriteLinkTag = document.createElement('link');
               emojiSpriteLinkTag.setAttribute('rel', 'stylesheet');
