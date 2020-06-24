@@ -23,14 +23,15 @@ module Tooling
     class ImpactedTestFile
       attr_reader :pattern_matchers
 
-      def initialize
+      def initialize(prefix: nil)
         @pattern_matchers = {}
+        @prefix = prefix
 
         yield self if block_given?
       end
 
       def associate(pattern, &block)
-        @pattern_matchers[pattern] = block
+        @pattern_matchers[%r{^#{@prefix}#{pattern}}] = block
       end
 
       def impact(file)
@@ -54,34 +55,33 @@ module Tooling
     end
 
     def ee_impact
-      ImpactedTestFile.new do |impact|
+      ImpactedTestFile.new(prefix: EE_PREFIX) do |impact|
         unless foss_test_only
-          impact.associate(%r{^#{EE_PREFIX}app/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}_spec.rb" }
-          impact.associate(%r{^#{EE_PREFIX}app/(.*/)ee/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}#{match[2]}_spec.rb" }
-          impact.associate(%r{^#{EE_PREFIX}lib/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/lib/#{match[1]}_spec.rb" }
-          impact.associate(%r{^#{EE_PREFIX}spec/(.+)_spec.rb$}) { |match| match[0] }
+          impact.associate(%r{app/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}_spec.rb" }
+          impact.associate(%r{app/(.*/)ee/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/#{match[1]}#{match[2]}_spec.rb" }
+          impact.associate(%r{lib/(.+)\.rb$}) { |match| "#{EE_PREFIX}spec/lib/#{match[1]}_spec.rb" }
         end
 
-        impact.associate(%r{^#{EE_PREFIX}(?!spec)(.*/)ee/(.+)\.rb$}) { |match| "spec/#{match[1]}#{match[2]}_spec.rb" }
-        impact.associate(%r{^#{EE_PREFIX}spec/(.*/)ee/(.+)\.rb$}) { |match| "spec/#{match[1]}#{match[2]}.rb" }
+        impact.associate(%r{(?!spec)(.*/)ee/(.+)\.rb$}) { |match| "spec/#{match[1]}#{match[2]}_spec.rb" }
+        impact.associate(%r{spec/(.*/)ee/(.+)\.rb$}) { |match| "spec/#{match[1]}#{match[2]}.rb" }
       end
     end
 
     def non_ee_impact
       ImpactedTestFile.new do |impact|
-        impact.associate(%r{^app/(.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
-        impact.associate(%r{^(tooling/)?lib/(.+)\.rb$}) { |match| "spec/#{match[1]}lib/#{match[2]}_spec.rb" }
-        impact.associate(%r{^spec/(.+)_spec.rb$}) { |match| match[0] }
-        impact.associate(%r{^config/initializers/(.+).rb$}) { |match| "spec/initializers/#{match[1]}_spec.rb" }
-        impact.associate(%r{^db/post_migrate/([0-9]+)_(.+).rb$}) { |match| "spec/migrations/#{match[2]}_spec.rb" }
-        impact.associate(%r{^db/migrate/([0-9]+)_(.+).rb$}) { |match| "spec/migrations/#{match[2]}_spec.rb" }
+        impact.associate(%r{app/(.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
+        impact.associate(%r{(tooling/)?lib/(.+)\.rb$}) { |match| "spec/#{match[1]}lib/#{match[2]}_spec.rb" }
+        impact.associate(%r{config/initializers/(.+).rb$}) { |match| "spec/initializers/#{match[1]}_spec.rb" }
+        impact.associate(%r{db/post_migrate/([0-9]+)_(.+).rb$}) { |match| "spec/migrations/#{match[2]}_spec.rb" }
+        impact.associate(%r{db/migrate/([0-9]+)_(.+).rb$}) { |match| "spec/migrations/#{match[2]}_spec.rb" }
+        impact.associate('db/structure.sql') { 'spec/db/schema_spec.rb' }
       end
     end
 
     def either_impact
-      ImpactedTestFile.new do |impact|
-        impact.associate(%r{^(#{EE_PREFIX})?spec/factories/.+\.rb$}) { 'spec/factories_spec.rb' }
-        impact.associate('db/structure.sql') { 'spec/db/schema_spec.rb' }
+      ImpactedTestFile.new(prefix: %r{^(#{EE_PREFIX})?}) do |impact|
+        impact.associate(%r{spec/(.+)_spec.rb$}) { |match| match[0] }
+        impact.associate(%r{spec/factories/.+\.rb$}) { 'spec/factories_spec.rb' }
       end
     end
   end
