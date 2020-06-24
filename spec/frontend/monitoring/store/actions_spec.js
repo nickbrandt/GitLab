@@ -62,10 +62,16 @@ describe('Monitoring store actions', () => {
   let store;
   let state;
 
+  let dispatch;
+  let commit;
+
   beforeEach(() => {
     store = createStore({ getters });
     state = store.state.monitoringDashboard;
     mock = new MockAdapter(axios);
+
+    commit = jest.fn();
+    dispatch = jest.fn();
 
     jest.spyOn(commonUtils, 'backOff').mockImplementation(callback => {
       const q = new Promise((resolve, reject) => {
@@ -199,12 +205,8 @@ describe('Monitoring store actions', () => {
   // Metrics dashboard
 
   describe('fetchDashboard', () => {
-    let dispatch;
-    let commit;
     const response = metricsDashboardResponse;
     beforeEach(() => {
-      dispatch = jest.fn();
-      commit = jest.fn();
       state.dashboardEndpoint = '/dashboard';
     });
 
@@ -291,14 +293,6 @@ describe('Monitoring store actions', () => {
   });
 
   describe('receiveMetricsDashboardSuccess', () => {
-    let commit;
-    let dispatch;
-
-    beforeEach(() => {
-      commit = jest.fn();
-      dispatch = jest.fn();
-    });
-
     it('stores groups', () => {
       const response = metricsDashboardResponse;
       receiveMetricsDashboardSuccess({ state, commit, dispatch }, { response });
@@ -358,13 +352,8 @@ describe('Monitoring store actions', () => {
   // Metrics
 
   describe('fetchDashboardData', () => {
-    let commit;
-    let dispatch;
-
     beforeEach(() => {
       jest.spyOn(Tracking, 'event');
-      commit = jest.fn();
-      dispatch = jest.fn();
 
       state.timeRange = defaultTimeRange;
     });
