@@ -68,7 +68,9 @@ module Elastic
     attr_reader :klass, :queue_name, :redis_set_key, :redis_score_key
 
     def with_redis(&blk)
-      Gitlab::Redis::SharedState.with(&blk) # rubocop:disable CodeReuse/ActiveRecord
+      Gitlab::Instrumentation::RedisClusterValidator.allow_cross_slot_commands do
+        Gitlab::Redis::SharedState.with(&blk) # rubocop:disable CodeReuse/ActiveRecord
+      end
     end
 
     def serialize(args, context)
