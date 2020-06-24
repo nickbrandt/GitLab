@@ -18749,6 +18749,9 @@ msgstr ""
 msgid "Releases documentation"
 msgstr ""
 
+msgid "Releases|New Release"
+msgstr ""
+
 msgid "Release|Something went wrong while getting the release details"
 msgstr ""
 
