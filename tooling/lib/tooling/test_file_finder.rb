@@ -12,7 +12,7 @@ module Tooling
     end
 
     def test_files
-      impacted_tests = ee_impact | non_ee_impact
+      impacted_tests = ee_impact | non_ee_impact | either_impact
       impacted_tests.impact(@file)
     end
 
@@ -72,6 +72,16 @@ module Tooling
         impact.associate(%r{^app/(.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
         impact.associate(%r{^(tooling/)?lib/(.+)\.rb$}) { |match| "spec/#{match[1]}lib/#{match[2]}_spec.rb" }
         impact.associate(%r{^spec/(.+)_spec.rb$}) { |match| match[0] }
+        impact.associate(%r{^config/initializers/(.+).rb$}) { |match| "spec/initializers/#{match[1]}_spec.rb" }
+        impact.associate(%r{^db/post_migrate/([0-9]+)_(.+).rb$}) { |match| "spec/migrations/#{match[2]}_spec.rb" }
+        impact.associate(%r{^db/migrate/([0-9]+)_(.+).rb$}) { |match| "spec/migrations/#{match[2]}_spec.rb" }
+      end
+    end
+
+    def either_impact
+      ImpactedTestFile.new do |impact|
+        impact.associate(%r{^(#{EE_PREFIX})?spec/factories/.+\.rb$}) { 'spec/factories_spec.rb' }
+        impact.associate('db/structure.sql') { 'spec/db/schema_spec.rb' }
       end
     end
   end

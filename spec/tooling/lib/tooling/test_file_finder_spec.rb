@@ -88,6 +88,54 @@ RSpec.describe Tooling::TestFileFinder do
       end
     end
 
+    context 'when given a factory file' do
+      let(:file) { 'spec/factories/users.rb' }
+
+      it 'returns spec/factories_spec.rb file' do
+        expect(subject.test_files).to contain_exactly('spec/factories_spec.rb')
+      end
+    end
+
+    context 'when given an ee factory file' do
+      let(:file) { 'ee/spec/factories/users.rb' }
+
+      it 'returns spec/factories_spec.rb file' do
+        expect(subject.test_files).to contain_exactly('spec/factories_spec.rb')
+      end
+    end
+
+    context 'when given db/structure.sql' do
+      let(:file) { 'db/structure.sql' }
+
+      it 'returns spec/db/schema_spec.rb' do
+        expect(subject.test_files).to contain_exactly('spec/db/schema_spec.rb')
+      end
+    end
+
+    context 'when given an initializer' do
+      let(:file) { 'config/initializers/action_mailer_hooks.rb' }
+
+      it 'returns the matching initializer spec' do
+        expect(subject.test_files).to contain_exactly('spec/initializers/action_mailer_hooks_spec.rb')
+      end
+    end
+
+    context 'when given a migration file' do
+      let(:file) { 'db/migrate/20191023152913_add_default_and_free_plans.rb' }
+
+      it 'returns the matching migration spec' do
+        expect(subject.test_files).to contain_exactly('spec/migrations/add_default_and_free_plans_spec.rb')
+      end
+    end
+
+    context 'when given a post-migration file' do
+      let(:file) { 'db/post_migrate/20200608072931_backfill_imported_snippet_repositories.rb' }
+
+      it 'returns the matching migration spec' do
+        expect(subject.test_files).to contain_exactly('spec/migrations/backfill_imported_snippet_repositories_spec.rb')
+      end
+    end
+
     context 'with foss_test_only: true' do
       subject { Tooling::TestFileFinder.new(file, foss_test_only: true) }
 
