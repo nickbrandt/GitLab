@@ -179,6 +179,7 @@ module API
       mount ::API::Discussions
       mount ::API::ResourceLabelEvents
       mount ::API::ResourceMilestoneEvents
+      mount ::API::ResourceStateEvents
       mount ::API::NotificationSettings
       mount ::API::Pages
       mount ::API::PagesDomains
