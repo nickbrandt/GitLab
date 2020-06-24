@@ -45,44 +45,9 @@ RSpec.describe 'Admin::CredentialsInventory' do
 
     context 'filtering' do
       context 'by Personal Access Tokens' do
-        context 'and there is an active token' do
-          before do
-            create(:personal_access_token,
-              user: create(:user, name: 'David'),
-              created_at: '2019-12-10',
-              expires_at: nil)
+        let(:credentials_path) { admin_credentials_path(filter: 'personal_access_tokens') }
 
-            visit admin_credentials_path(filter: 'personal_access_tokens')
-          end
-
-          it 'shows details of the active personal access token' do
-            expect(first_row.text).to include('David')
-            expect(first_row.text).to include('api')
-            expect(first_row.text).to include('2019-12-10')
-            expect(first_row.text).to include('Never')
-          end
-        end
-
-        context 'and there is a revoked token' do
-          before do
-            create(:personal_access_token,
-              user: create(:user, name: 'David'),
-              created_at: '2019-12-10',
-              updated_at: '2020-06-22',
-              revoked: true,
-              expires_at: nil)
-
-            visit admin_credentials_path(filter: 'personal_access_tokens')
-          end
-
-          it 'shows details of the revoked personal access token' do
-            expect(first_row.text).to include('David')
-            expect(first_row.text).to include('api')
-            expect(first_row.text).to include('2019-12-10')
-            expect(first_row.text).to include('2020-06-22')
-            expect(first_row.text).not_to include('Never')
-          end
-        end
+        it_behaves_like 'credentials inventory personal access tokens'
       end
 
       context 'by SSH Keys' do
