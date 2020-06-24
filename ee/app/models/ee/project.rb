@@ -73,6 +73,7 @@ module EE
 
       has_many :protected_environments
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
+      has_many :software_licenses, through: :software_license_policies
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
       has_many :packages, class_name: 'Packages::Package'
       has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'

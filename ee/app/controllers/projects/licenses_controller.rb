@@ -100,7 +100,8 @@ module Projects
         read_license_policies_endpoint: expose_path(api_v4_projects_managed_licenses_path(id: @project.id)),
         write_license_policies_endpoint: write_license_policies_endpoint,
         documentation_path: help_page_path('user/compliance/license_compliance/index'),
-        empty_state_svg_path: helpers.image_path('illustrations/Dependency-list-empty-state.svg')
+        empty_state_svg_path: helpers.image_path('illustrations/Dependency-list-empty-state.svg'),
+        software_licenses: SoftwareLicense.unclassified_licenses_for(project).pluck_names
       }
     end
   end
