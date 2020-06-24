@@ -124,7 +124,11 @@ RSpec.describe Tooling::TestFileFinder do
       let(:file) { 'db/migrate/20191023152913_add_default_and_free_plans.rb' }
 
       it 'returns the matching migration spec' do
-        expect(subject.test_files).to contain_exactly('spec/migrations/add_default_and_free_plans_spec.rb')
+        test_files = %w[
+          spec/migrations/add_default_and_free_plans_spec.rb
+          spec/migrations/20191023152913_add_default_and_free_plans_spec.rb
+        ]
+        expect(subject.test_files).to contain_exactly(*test_files)
       end
     end
 
@@ -132,7 +136,11 @@ RSpec.describe Tooling::TestFileFinder do
       let(:file) { 'db/post_migrate/20200608072931_backfill_imported_snippet_repositories.rb' }
 
       it 'returns the matching migration spec' do
-        expect(subject.test_files).to contain_exactly('spec/migrations/backfill_imported_snippet_repositories_spec.rb')
+        test_files = %w[
+          spec/migrations/backfill_imported_snippet_repositories_spec.rb
+          spec/migrations/20200608072931_backfill_imported_snippet_repositories_spec.rb
+        ]
+        expect(subject.test_files).to contain_exactly(*test_files)
       end
     end
 

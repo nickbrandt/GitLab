@@ -37,7 +37,8 @@ module Tooling
       def impact(file)
         @pattern_matchers.each_with_object(Set.new) do |(pattern, block), result|
           if (match = pattern.match(file))
-            result << block.call(match)
+            test_files = block.call(match)
+            result.merge(Array(test_files))
           end
         end.to_a
       end
@@ -72,9 +73,13 @@ module Tooling
         impact.associate(%r{app/(.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
         impact.associate(%r{(tooling/)?lib/(.+)\.rb$}) { |match| "spec/#{match[1]}lib/#{match[2]}_spec.rb" }
         impact.associate(%r{config/initializers/(.+).rb$}) { |match| "spec/initializers/#{match[1]}_spec.rb" }
-        impact.associate(%r{db/post_migrate/([0-9]+)_(.+).rb$}) { |match| "spec/migrations/#{match[2]}_spec.rb" }
-        impact.associate(%r{db/migrate/([0-9]+)_(.+).rb$}) { |match| "spec/migrations/#{match[2]}_spec.rb" }
         impact.associate('db/structure.sql') { 'spec/db/schema_spec.rb' }
+        impact.associate(%r{db/(?:post_)?migrate/([0-9]+)_(.+).rb$}) do |match|
+          [
+            "spec/migrations/#{match[2]}_spec.rb",
+            "spec/migrations/#{match[1]}_#{match[2]}_spec.rb"
+          ]
+        end
       end
     end
 
