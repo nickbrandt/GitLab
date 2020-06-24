@@ -90,7 +90,7 @@ export default {
 };
 </script>
 <template>
-  <div class="insights-container prepend-top-default">
+  <div class="insights-container gl-mt-3">
     <div class="mb-3">
       <h3>{{ __('Insights') }}</h3>
     </div>

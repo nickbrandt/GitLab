@@ -99,11 +99,7 @@ export default {
       <img :src="slackLogoPath" class="gitlab-slack-logo" />
     </div>
 
-    <button
-      type="button"
-      class="btn btn-red mx-auto js-popup-button prepend-top-default"
-      @click="togglePopup"
-    >
+    <button type="button" class="btn btn-red mx-auto js-popup-button gl-mt-3" @click="togglePopup">
       {{ __('Add GitLab to Slack') }}
     </button>
 
@@ -154,7 +150,7 @@ export default {
           Shows the issue with id <strong>&lt;id&gt;</strong>
         </span>
 
-        <div class="prepend-top-default">
+        <div class="gl-mt-3">
           <a v-once :href="docsPath">{{ __('More Slack commands') }}</a>
         </div>
       </div>

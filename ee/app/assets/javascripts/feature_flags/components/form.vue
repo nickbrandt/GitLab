@@ -372,7 +372,7 @@ export default {
             </template>
           </gl-sprintf>
 
-          <div class="js-scopes-table prepend-top-default">
+          <div class="js-scopes-table gl-mt-3">
             <div class="gl-responsive-table-row table-row-header" role="row">
               <div class="table-section section-30" role="columnheader">
                 {{ s__('FeatureFlags|Environment Spec') }}

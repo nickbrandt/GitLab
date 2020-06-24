@@ -109,7 +109,7 @@ export default {
       v-if="showPagination"
       :change="onPageChange"
       :page-info="pageInfo"
-      class="justify-content-center prepend-top-default"
+      class="justify-content-center gl-mt-3"
     />
   </div>
 </template>

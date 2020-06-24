@@ -55,7 +55,7 @@ export default {
       }}
     </div>
     <div v-if="taxRate">
-      <div class="border-bottom prepend-top-default gl-mb-3"></div>
+      <div class="border-bottom gl-mt-3 gl-mb-3"></div>
       <div class="d-flex justify-content-between text-secondary">
         <div>{{ $options.i18n.subtotal }}</div>
         <div class="js-total-ex-vat">{{ formatAmount(totalExVat, usersPresent) }}</div>
@@ -65,7 +65,7 @@ export default {
         <div class="js-vat">{{ formatAmount(vat, usersPresent) }}</div>
       </div>
     </div>
-    <div class="border-bottom prepend-top-default gl-mb-3"></div>
+    <div class="border-bottom gl-mt-3 gl-mb-3"></div>
     <div class="d-flex justify-content-between bold gl-font-lg">
       <div>{{ $options.i18n.total }}</div>
       <div class="js-total-amount">{{ formatAmount(totalAmount, usersPresent) }}</div>

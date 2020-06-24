@@ -53,7 +53,7 @@ export default {
         :tracking-action="$options.trackingActions.COPY_MAVEN_XML"
       />
 
-      <p class="prepend-top-default font-weight-bold">
+      <p class="gl-mt-3 font-weight-bold">
         {{ s__('PackageRegistry|Maven Command') }}
       </p>
       <code-instruction

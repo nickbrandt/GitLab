@@ -150,12 +150,12 @@ export default {
         {{ s__('OperationsDashboard|Add projects') }}
       </gl-button>
     </div>
-    <div class="prepend-top-default">
+    <div class="gl-mt-3">
       <vue-draggable
         v-if="projects.length"
         v-model="projects"
         group="dashboard-projects"
-        class="row prepend-top-default dashboard-cards"
+        class="row gl-mt-3 dashboard-cards"
       >
         <div v-for="project in projects" :key="project.id" class="col-12 col-md-6 col-xl-4 px-2">
           <dashboard-project :project="project" />

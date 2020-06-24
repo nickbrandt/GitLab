@@ -86,7 +86,7 @@ export default {
 <template>
   <div>
     <template v-if="hasPipelineData">
-      <div class="card security-dashboard prepend-top-default">
+      <div class="card security-dashboard gl-mt-3">
         <div class="card-header border-bottom-0">
           <span class="js-security-dashboard-left">
             <gl-sprintf
