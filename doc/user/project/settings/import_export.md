@@ -95,7 +95,7 @@ The following items will be exported:
 
 - Project and wiki repositories
 - Project uploads
-- Project configuration, including services
+- Project configuration, excluding integrations
 - Issues with comments, merge requests with diffs and comments, labels, milestones, snippets, time tracking,
   and other project entities
 - Design Management files and data

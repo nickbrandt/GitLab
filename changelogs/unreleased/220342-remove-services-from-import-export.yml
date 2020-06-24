@@ -1,0 +1,5 @@
+---
+title: Exclude integrations (services) from import/export
+merge_request: 35249
+author:
+type: changed
