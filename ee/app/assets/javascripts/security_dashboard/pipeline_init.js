@@ -16,6 +16,7 @@ export default () => {
     dashboardDocumentation,
     emptyStateSvgPath,
     pipelineId,
+    pipelineIid,
     projectId,
     sourceBranch,
     vulnerabilitiesEndpoint,
@@ -41,6 +42,7 @@ export default () => {
         props: {
           projectId: parseInt(projectId, 10),
           pipelineId: parseInt(pipelineId, 10),
+          pipelineIid: parseInt(pipelineIid, 10),
           vulnerabilitiesEndpoint,
           vulnerabilityFeedbackHelpPath,
           sourceBranch,

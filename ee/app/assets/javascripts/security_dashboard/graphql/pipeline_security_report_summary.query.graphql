@@ -1,21 +1,19 @@
-query ($fullPath: ID!, $pipelineId: ID!) {
+query($fullPath: ID!, $pipelineIid: ID!) {
   project(fullPath: $fullPath) {
-    pipelines(id:$pipelineId) {
-      nodes {
-        securityReportSummary {
-          dast {
-            vulnerabilitiesCount
-            scannedResourcesCount
-          }
-          sast {
-            scannedResourcesCount
-          }
-          containerScanning {
-            vulnerabilitiesCount
-          }
-          dependencyScanning {
-            vulnerabilitiesCount
-          }
+    pipeline(iid: $pipelineIid) {
+      securityReportSummary {
+        dast {
+          vulnerabilitiesCount
+          scannedResourcesCount
+        }
+        sast {
+          vulnerabilitiesCount
+        }
+        containerScanning {
+          vulnerabilitiesCount
+        }
+        dependencyScanning {
+          vulnerabilitiesCount
         }
       }
     }

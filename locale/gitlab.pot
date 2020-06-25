@@ -249,11 +249,6 @@ msgid_plural "%d unresolved threads"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%d url scanned"
-msgid_plural "%d urls scanned"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "%d vulnerability"
 msgid_plural "%d vulnerabilities"
 msgstr[0] ""
@@ -11703,6 +11698,9 @@ msgid_plural "Hide charts"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Hide details"
+msgstr ""
+
 msgid "Hide file browser"
 msgstr ""
 
@@ -20093,6 +20091,9 @@ msgstr ""
 msgid "SecurityReports|Return to dashboard"
 msgstr ""
 
+msgid "SecurityReports|Scan details"
+msgstr ""
+
 msgid "SecurityReports|Security Dashboard"
 msgstr ""
 
@@ -20778,6 +20779,9 @@ msgid "Show commit description"
 msgstr ""
 
 msgid "Show complete raw log"
+msgstr ""
+
+msgid "Show details"
 msgstr ""
 
 msgid "Show file browser"
