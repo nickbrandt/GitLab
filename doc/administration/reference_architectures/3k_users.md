@@ -591,6 +591,15 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    sudo gitlab-ctl pg-password-md5 pgbouncer
    ```
 
+1. Generate a password hash for the Consul database username/password pair. This assumes you will use the default
+   username of `gitlab-consul` (recommended). The command will request a password
+   and confirmation. Use the value that is output by this command in the next
+   step as the value of `<consul_password_hash>`:
+
+   ```shell
+   sudo gitlab-ctl pg-password-md5 gitlab-consul
+   ```
+
 1. On the primary database node, edit `/etc/gitlab/gitlab.rb` replacing values noted in the `# START user configuration` section:
 
    ```ruby
@@ -720,7 +729,7 @@ are supported and can be added if needed.
   </a>
 </div>
 
-### PostgreSQL post-configuration
+#### PostgreSQL post-configuration
 
 SSH into the **primary node**:
 
@@ -783,46 +792,29 @@ SSH into the **secondary node**:
    ok: run: repmgrd: (pid 19068) 0s
    ```
 
-1. Verify the node now appears in the cluster:
-
-   ```shell
-   gitlab-ctl repmgr cluster show
-   ```
-
-   The output should be similar to the following:
-
-   ```plaintext
-   Role      | Name    | Upstream  | Connection String
-   ----------+---------|-----------|------------------------------------------------
-   * master  | MASTER  |           | host=MASTER_NODE_NAME user=gitlab_repmgr dbname=gitlab_repmgr
-     standby | STANDBY | MASTER    | host=STANDBY_HOSTNAME user=gitlab_repmgr dbname=gitlab_repmgr
-     standby | STANDBY | MASTER    | host=STANDBY_HOSTNAME user=gitlab_repmgr dbname=gitlab_repmgr
-   ```
-
-### Database checkpoint
 
 Before moving on, make sure the databases are configured correctly. Run the
 following command on the **primary** node to verify that replication is working
-properly:
+properly and the secondary nodes appear in the cluster:
 
 ```shell
 gitlab-ctl repmgr cluster show
 ```
 
-The output should be similar to:
+The output should be similar to the following:
 
 ```plaintext
-Role      | Name         | Upstream     | Connection String
-----------+--------------|--------------|--------------------------------------------------------------------
-* master  | MASTER  |        | host=MASTER port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
-  standby | STANDBY | MASTER | host=STANDBY port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
-  standby | STANDBY | MASTER | host=STANDBY port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
+Role      | Name    | Upstream  | Connection String
+----------+---------|-----------|------------------------------------------------
+* master  | MASTER  |           | host=<primary_node_name> user=gitlab_repmgr dbname=gitlab_repmgr
+   standby | STANDBY | MASTER    | host=<secondary_node_name> user=gitlab_repmgr dbname=gitlab_repmgr
+   standby | STANDBY | MASTER    | host=<secondary_node_name> user=gitlab_repmgr dbname=gitlab_repmgr
 ```
 
 If the 'Role' column for any node says "FAILED", check the
-[Troubleshooting section](#troubleshooting) before proceeding.
+[Troubleshooting section](troubleshooting/index.md) before proceeding.
 
-Also, check that the check master command works successfully on each node:
+Also, check that the `repmgr-check-master` command works successfully on each node:
 
 ```shell
 su - gitlab-consul
@@ -832,8 +824,7 @@ gitlab-ctl repmgr-check-master || echo 'This node is a standby repmgr node'
 This command relies on exit codes to tell Consul whether a particular node is a master
 or secondary. The most important thing here is that this command does not produce errors.
 If there are errors it's most likely due to incorrect `gitlab-consul` database user permissions.
-Check the [Troubleshooting section](#troubleshooting) before proceeding.
-
+Check the [Troubleshooting section](troubleshooting/index.md) before proceeding.
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -842,6 +833,87 @@ Check the [Troubleshooting section](#troubleshooting) before proceeding.
 </div>
 
 ## Configure PgBouncer
+
+Now that the PostgreSQL servers are all set up, let's configure PgBouncer.
+The following IPs will be used as an example:
+
+- `10.6.0.21`: PgBouncer 1
+- `10.6.0.22`: PgBouncer 2
+- `10.6.0.23`: PgBouncer 3
+
+1. On each PgBouncer node, edit `/etc/gitlab/gitlab.rb`:
+
+   ```ruby
+   # Disable all components except Pgbouncer and Consul agent
+   roles ['pgbouncer_role']
+
+   # Configure PgBouncer
+   pgbouncer['admin_users'] = %w(pgbouncer gitlab-consul)
+
+   pgbouncer['users'] = {
+   'gitlab-consul': {
+      password: '<consul_password_hash>'
+   },
+   'pgbouncer': {
+      password: '<pgbouncer_password_hash>'
+   }
+   }
+
+   # Configure Consul agent
+   consul['watchers'] = %w(postgresql)
+   consul['enable'] = true
+   consul['configuration'] = {
+   retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13)
+   }
+
+   # Enable service discovery for Prometheus
+   consul['monitoring_service_discovery'] = true
+
+   # Set the network addresses that the exporters will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   ```
+
+1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+
+1. Create a `.pgpass` file so Consul is able to
+   reload PgBouncer. Enter the PgBouncer password twice when asked:
+
+   ```shell
+   gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
+   ```
+
+1. Ensure each node is talking to the current master:
+
+   ```shell
+   gitlab-ctl pgb-console # You will be prompted for PGBOUNCER_PASSWORD
+   ```
+
+   If there is an error `psql: ERROR:  Auth failed` after typing in the
+   password, ensure you previously generated the MD5 password hashes with the correct
+   format. The correct format is to concatenate the password and the username:
+   `PASSWORDUSERNAME`. For example, `Sup3rS3cr3tpgbouncer` would be the text
+   needed to generate an MD5 password hash for the `pgbouncer` user.
+
+1. Once the console prompt is available, run the following queries:
+
+   ```shell
+   show databases ; show clients ;
+   ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+           name         |  host       | port |      database       | force_user | pool_size | reserve_pool | pool_mode | max_connections | current_connections
+   ---------------------+-------------+------+---------------------+------------+-----------+--------------+-----------+-----------------+---------------------
+    gitlabhq_production | MASTER_HOST | 5432 | gitlabhq_production |            |        20 |            0 |           |               0 |                   0
+    pgbouncer           |             | 6432 | pgbouncer           | pgbouncer  |         2 |            0 | statement |               0 |                   0
+   (2 rows)
+
+    type |   user    |      database       |  state  |   addr         | port  | local_addr | local_port |    connect_time     |    request_time     |    ptr    | link | remote_pid | tls
+   ------+-----------+---------------------+---------+----------------+-------+------------+------------+---------------------+---------------------+-----------+------+------------+-----
+    C    | pgbouncer | pgbouncer           | active  | 127.0.0.1      | 56846 | 127.0.0.1  |       6432 | 2017-08-21 18:09:59 | 2017-08-21 18:10:48 | 0x22b3880 |      |          0 |
+   (2 rows)
+   ```
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
