@@ -107,6 +107,10 @@ RSpec.describe AuditEventPresenter do
       expect(presenter.ip_address).to eq('10.2.1.1')
     end
 
+    it 'survives a round trip from JSON' do
+      expect(Gitlab::Json.parse(presenter.ip_address.to_json)).to eq(presenter.ip_address)
+    end
+
     it 'falls back to the details hash' do
       audit_event.update(ip_address:  nil)
 
