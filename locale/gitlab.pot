@@ -11709,6 +11709,9 @@ msgstr ""
 msgid "Hide host keys manual input"
 msgstr ""
 
+msgid "Hide list"
+msgstr ""
+
 msgid "Hide marketing-related entries from help"
 msgstr ""
 
@@ -20781,6 +20784,9 @@ msgid "Show file contents"
 msgstr ""
 
 msgid "Show latest version"
+msgstr ""
+
+msgid "Show list"
 msgstr ""
 
 msgid "Show me everything"
