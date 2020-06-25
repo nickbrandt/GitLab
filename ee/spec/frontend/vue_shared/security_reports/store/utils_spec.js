@@ -50,9 +50,9 @@ describe('security reports utils', () => {
       ['sast', 'SAST'],
       ['dependency_scanning', 'Dependency Scanning'],
       ['CONTAINER_SCANNING', 'Container Scanning'],
-      ['CUSTOM_SCANNER', 'custom scanner'],
-      ['mast', 'mast'],
-      ['TAST', 'tast'],
+      ['CUSTOM_SCANNER', 'Custom scanner'],
+      ['mast', 'Mast'],
+      ['TAST', 'Tast'],
       [undefined, ''],
     ])('converts the report type "%s" to the human-readable string "%s"', (input, output) => {
       expect(convertReportType(input)).toEqual(output);
