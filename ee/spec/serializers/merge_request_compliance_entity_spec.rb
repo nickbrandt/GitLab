@@ -17,11 +17,11 @@ RSpec.describe MergeRequestComplianceEntity do
 
     it 'includes merge request attributes for compliance' do
       expect(subject).to include(
-        :id, :title, :merged_at, :milestone, :path, :issuable_reference, :approved_by_users
+        :id, :title, :merged_at, :milestone, :path, :issuable_reference, :author, :approved_by_users
       )
     end
 
-    describe 'with a approver' do
+    describe 'with an approver' do
       let_it_be(:approver) { create(:user) }
       let!(:approval) { create :approval, merge_request: merge_request, user: approver }
 

@@ -4,6 +4,15 @@ const twoDaysAgo = () => {
   return date.toISOString();
 };
 
+const createUser = id => ({
+  id,
+  avatar_url: `https://${id}`,
+  name: `User ${id}`,
+  state: 'active',
+  username: `user-${id}`,
+  web_url: `http://localhost:3000/user-${id}`,
+});
+
 export const createMergeRequest = ({ id = 1, pipeline, approvers } = {}) => {
   const mergeRequest = {
     id,
@@ -14,6 +23,9 @@ export const createMergeRequest = ({ id = 1, pipeline, approvers } = {}) => {
     path: `/h5bp/html5-boilerplate/-/merge_requests/${id}`,
     title: `Merge request ${id}`,
   };
+
+  mergeRequest.author = createUser(id);
+
   if (pipeline) {
     mergeRequest.pipeline_status = pipeline;
   }
@@ -38,14 +50,7 @@ export const createPipelineStatus = status => ({
 export const createApprovers = count => {
   return Array(count)
     .fill()
-    .map((_, id) => ({
-      id,
-      avatar_url: `https://${id}`,
-      name: `User ${id}`,
-      state: 'active',
-      username: `user-${id}`,
-      web_url: `http://localhost:3000/user-${id}`,
-    }));
+    .map((_, id) => createUser(id));
 };
 
 export const createMergeRequests = ({ count = 1 } = {}) => {
