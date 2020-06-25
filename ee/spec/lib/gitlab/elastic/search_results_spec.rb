@@ -622,6 +622,10 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
           Foo.bar(x)
 
           include "bikes-3.4"
+          /a/longer/file-path/absolute_with_specials.txt
+          another/file-path/relative-with-specials.txt
+          /file-path/components-within-slashes/
+          another/file-path/differeñt-lønguage.txt
 
           us-east-2
           bye
@@ -650,6 +654,22 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       it 'finds files with other special chars' do
         expect(search_for('"and;colons:too$"')).to include(file_name)
         expect(search_for('bar\(x\)')).to include(file_name)
+      end
+
+      it 'finds absolute file paths with slashes and other special chars' do
+        expect(search_for('"absolute_with_specials.txt"')).to include(file_name)
+      end
+
+      it 'finds relative file paths with slashes and other special chars' do
+        expect(search_for('"relative-with-specials.txt"')).to include(file_name)
+      end
+
+      it 'finds file path components within slashes for directories' do
+        expect(search_for('"components-within-slashes"')).to include(file_name)
+      end
+
+      it 'finds file paths for various languages' do
+        expect(search_for('"differeñt-lønguage.txt"')).to include(file_name)
       end
     end
   end

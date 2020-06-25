@@ -111,7 +111,7 @@ Patterns:
 - `'"((?:\\"|[^"]|\\")*)"'`: captures terms inside quotes, removing the quotes
 - `"'((?:\\'|[^']|\\')*)'"`: same as above, for single-quotes
 - `'\.([^.]+)(?=\.|\s|\Z)'`: separate terms with periods in-between
-- `'\/?([^\/]+)(?=\/|\b)'`: separate path terms `like/this/one`
+- `'([\p{L}_.-]+)'` : some common chars in file names to keep the whole filename intact (eg. `my_file-ñame.txt`)
 
 #### `edgeNGram_filter`
 
