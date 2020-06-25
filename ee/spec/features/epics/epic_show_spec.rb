@@ -10,7 +10,9 @@ RSpec.describe 'Epic show', :js do
   let_it_be(:label2) { create(:group_label, group: group, title: 'enhancement') }
   let_it_be(:label3) { create(:group_label, group: group, title: 'documentation') }
   let_it_be(:public_issue) { create(:issue, project: public_project) }
-  let_it_be(:note_text) { 'Contemnit enim disserendi elegantiam.' }
+  let_it_be(:note_text1) { 'Contemnit enim disserendi elegantiam.' }
+  let_it_be(:note_text2) { 'vel illum qui dolorem eum' }
+  let_it_be(:note_text3) { 'fugiat quo voluptas nulla pariatur?' }
   let_it_be(:epic_title) { 'Sample epic' }
 
   let_it_be(:markdown) do
@@ -135,6 +137,55 @@ RSpec.describe 'Epic show', :js do
     it 'shows epic thread filter dropdown' do
       page.within('.js-noteable-awards') do
         expect(find('.js-discussion-filter-container #discussion-filter-dropdown')).to have_content('Show all activity')
+      end
+    end
+
+    describe 'Sort dropdown' do
+      let!(:dropdown_label) { find('.js-sort-discussion-filter-container #sort-discussion-filter-dropdown') }
+
+      def submit_comment(text)
+        fill_in 'note[note]', with: text
+        click_button 'Comment'
+        wait_for_requests
+      end
+
+      context 'when sorted by `Oldest first`' do
+        it 'shows label `Oldest first`' do
+          page.within('.js-noteable-awards') do
+            expect(dropdown_label).to have_content('Oldest first')
+          end
+        end
+
+        it 'shows comments in the correct order' do
+          submit_comment(note_text1)
+          submit_comment(note_text2)
+          items = all('.timeline-entry .timeline-discussion-body p')
+          expect(items[0]).to have_content(note_text1)
+          expect(items[1]).to have_content(note_text2)
+        end
+      end
+
+      context 'when sorted by `Newest first`' do
+        before do
+          page.within('.js-noteable-awards') do
+            dropdown_label.click
+            wait_for_requests
+            find('.js-sort-discussion-filter-container .js-newest-first').click
+            wait_for_requests
+          end
+        end
+
+        it 'shows label `Newest first`' do
+          page.within('.js-noteable-awards') do
+            expect(dropdown_label).to have_content('Newest first')
+          end
+        end
+
+        it 'shows the newly created comment in the top' do
+          submit_comment(note_text3)
+          items = all('.timeline-entry .timeline-discussion-body p')
+          expect(items[0]).to have_content(note_text3)
+        end
       end
     end
   end
