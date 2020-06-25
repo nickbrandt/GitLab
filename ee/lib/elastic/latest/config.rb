@@ -38,7 +38,7 @@ module Elastic
               code_analyzer: {
                 type: 'custom',
                 tokenizer: 'whitespace',
-                filter: %w(code lowercase asciifolding)
+                filter: %w(code lowercase asciifolding remove_duplicates)
               },
               code_search_analyzer: {
                 type: 'custom',
@@ -61,7 +61,7 @@ module Elastic
                   '"((?:\\"|[^"]|\\")*)"', # capture terms inside quotes, removing the quotes
                   "'((?:\\'|[^']|\\')*)'", # same as above, for single quotes
                   '\.([^.]+)(?=\.|\s|\Z)', # separate terms on periods
-                  '\/?([^\/]+)(?=\/|\b)' # separate path terms (like/this/one)
+                  '([\p{L}_.-]+)' # some common chars in file names to keep the whole filename intact (eg. my_file-name.txt)
                 ]
               }
             },
