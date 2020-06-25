@@ -281,6 +281,9 @@ Cop/ActiveRecordAssociationReload:
 Gitlab/AvoidFeatureGet:
   Enabled: true
 
+Gitlab/DocumentationLinks:
+  Enabled: true
+
 Naming/PredicateName:
   Enabled: true
   Exclude:
