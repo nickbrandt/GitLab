@@ -16,6 +16,7 @@ class MergeRequestComplianceEntity < Grape::Entity
     merge_request.to_reference(merge_request.project.group)
   end
 
+  expose :author, using: API::Entities::UserBasic
   expose :approved_by_users, using: API::Entities::UserBasic
 
   expose :pipeline_status, if: -> (*) { can_read_pipeline? }, with: DetailedStatusEntity

@@ -5883,6 +5883,9 @@ msgstr ""
 msgid "Compliance frameworks"
 msgstr ""
 
+msgid "ComplianceDashboard|created by:"
+msgstr ""
+
 msgid "ComplianceFramework|GDPR"
 msgstr ""
 

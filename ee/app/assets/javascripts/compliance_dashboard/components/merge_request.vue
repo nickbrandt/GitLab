@@ -1,6 +1,6 @@
 <script>
 import { sprintf, s__ } from '~/locale';
-import { GlTooltipDirective } from '@gitlab/ui';
+import { GlAvatar, GlAvatarLink, GlTooltipDirective } from '@gitlab/ui';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import Approvers from './approvers.vue';
@@ -12,6 +12,8 @@ export default {
   components: {
     CiIcon,
     Approvers,
+    GlAvatar,
+    GlAvatarLink,
   },
   mixins: [timeagoMixin],
   props: {
@@ -43,6 +45,9 @@ export default {
       return this.tooltipTitle(this.mergeRequest.merged_at);
     },
   },
+  strings: {
+    createdBy: s__('ComplianceDashboard|created by:'),
+  },
 };
 </script>
 
@@ -57,6 +62,26 @@ export default {
         </div>
         <span class="gl-text-gray-700">
           {{ mergeRequest.issuable_reference }}
+        </span>
+        <span class="issuable-authored gl-text-gray-700 d-inline-flex align-items-center">
+          - {{ $options.strings.createdBy }}
+          <gl-avatar-link
+            :key="mergeRequest.author.id"
+            :title="mergeRequest.author.name"
+            :href="mergeRequest.author.web_url"
+            :data-user-id="mergeRequest.author.id"
+            :data-name="mergeRequest.author.name"
+            class="d-inline-flex align-items-center ml-2 author-link js-user-link"
+          >
+            <gl-avatar
+              :src="mergeRequest.author.avatar_url"
+              :entity-id="mergeRequest.author.id"
+              :entity-name="mergeRequest.author.name"
+              :size="16"
+              class="mr-1"
+            />
+            <span>{{ mergeRequest.author.name }}</span>
+          </gl-avatar-link>
         </span>
       </div>
 

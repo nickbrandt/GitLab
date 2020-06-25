@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlAvatarLink } from '@gitlab/ui';
 
 import MergeRequest from 'ee/compliance_dashboard/components/merge_request.vue';
 import { createMergeRequest, createPipelineStatus } from '../mock_data';
@@ -10,6 +11,7 @@ describe('MergeRequest component', () => {
   const findCiLink = () => wrapper.find('.controls').find('a');
   const findInfo = () => wrapper.find('.issuable-main-info');
   const findTime = () => wrapper.find('time');
+  const findAuthorAvatarLink = () => wrapper.find('.issuable-authored').find(GlAvatarLink);
 
   const createComponent = mergeRequest => {
     return shallowMount(MergeRequest, {
@@ -54,6 +56,10 @@ describe('MergeRequest component', () => {
           .find('span')
           .text(),
       ).toEqual(mergeRequest.issuable_reference);
+    });
+
+    it('renders the author name', () => {
+      expect(findAuthorAvatarLink().text()).toEqual(mergeRequest.author.name);
     });
 
     it('renders the "merged at" time', () => {

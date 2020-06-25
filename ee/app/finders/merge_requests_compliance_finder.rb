@@ -62,6 +62,7 @@ class MergeRequestsComplianceFinder < MergeRequestsFinder
 
   def preloads
     [
+      :author,
       :approved_by_users,
       :metrics,
       source_project: :route,
