@@ -3,8 +3,7 @@ import { GlButton, GlCard, GlCollapse, GlCollapseToggleDirective, GlSprintf } fr
 import { __ } from '~/locale';
 import AccessorUtilities from '~/lib/utils/accessor';
 import { getFormattedSummary } from '../helpers';
-
-const LOCAL_STORAGE_KEY = 'hide_pipelines_security_reports_summary_details';
+import { COLLAPSE_SECURITY_REPORTS_SUMMARY_LOCAL_STORAGE_KEY as LOCAL_STORAGE_KEY } from '../constants';
 
 export default {
   name: 'SecurityReportsSummary',
