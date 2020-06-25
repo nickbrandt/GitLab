@@ -44,7 +44,7 @@ describe 'metrics dashboard page' do
     end
   end
 
-  describe 'GET /:namespace/:project/-d/:dashboard_path' do
+  describe 'GET /:namespace/:project/-/d/:dashboard_path' do
     let(:dashboard_path) { '.gitlab/dashboards/dashboard_path.yml' }
 
     it 'returns 200' do
@@ -58,7 +58,7 @@ describe 'metrics dashboard page' do
     end
   end
 
-  describe 'GET :/namespace/:project/-d/:dashboard_path?environment=:environment.id' do
+  describe 'GET :/namespace/:project/-/d/:dashboard_path?environment=:environment.id' do
     let(:dashboard_path) { '.gitlab/dashboards/dashboard_path.yml' }
 
     it 'returns 200' do
@@ -80,6 +80,6 @@ describe 'metrics dashboard page' do
   end
 
   def send_request(params = {})
-    get namespace_project_metrics_dashboard_page_path(namespace_id: project.namespace, project_id: project, **params)
+    get namespace_project_metrics_dashboard_path(namespace_id: project.namespace, project_id: project, **params)
   end
 end

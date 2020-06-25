@@ -26,7 +26,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       scope '-' do
         get 'archive/*id', constraints: { format: Gitlab::PathRegex.archive_formats_regex, id: /.+?/ }, to: 'repositories#archive', as: 'archive'
         get 'd(/:dashboard_path)', constraints: { dashboard_path: /.+\.yml/ },
-          to: 'metrics_dashboard#metrics_dashboard_page', as: :metrics_dashboard_page, format: false
+          to: 'metrics_dashboard#show', as: :metrics_dashboard, format: false
 
         resources :artifacts, only: [:index, :destroy]
 

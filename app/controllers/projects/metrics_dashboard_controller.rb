@@ -1,32 +1,28 @@
 # frozen_string_literal: true
-
-class Projects::MetricsDashboardController < Projects::ApplicationController
-  before_action :metrics_dashboard_page do
-    authorize_metrics_dashboard!
-
-    push_frontend_feature_flag(:prometheus_computed_alerts)
-  end
-
-  def metrics_dashboard_page
-    if environment
-      render 'projects/environments/metrics'
-    else
-      render_404
+module Projects
+  class MetricsDashboardController < Projects::ApplicationController
+    before_action :authorize_metrics_dashboard!
+    before_action do
+      push_frontend_feature_flag(:prometheus_computed_alerts)
     end
-  end
 
-  private
-
-  def environment
-    @environment ||=
-      if metrics_dashboard_page_params[:environment]
-        project.environments.find(metrics_dashboard_page_params[:environment])
+    def show
+      if environment
+        render 'projects/environments/metrics'
       else
-        project.default_environment
+        render_404
       end
-  end
+    end
 
-  def metrics_dashboard_page_params
-    params.permit(:environment)
+    private
+
+    def environment
+      @environment ||=
+        if params[:environment]
+          project.environments.find(params[:environment])
+        else
+          project.default_environment
+        end
+    end
   end
 end
