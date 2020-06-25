@@ -161,7 +161,7 @@ module EE
                 geo_nodes: count(::GeoNode),
                 geo_event_log_max_id: alt_usage_data { Geo::EventLog.maximum(:id) || 0 },
                 ldap_group_links: count(::LdapGroupLink),
-                issues_with_health_status: count(::Issue.with_health_status),
+                issues_with_health_status: count(::Issue.with_health_status, start: issue_minimum_id, finish: issue_maximum_id),
                 ldap_keys: count(::LDAPKey),
                 ldap_users: count(::User.ldap, 'users.id'),
                 pod_logs_usages_total: redis_usage_data { ::Gitlab::UsageCounters::PodLogs.usage_totals[:total] },
