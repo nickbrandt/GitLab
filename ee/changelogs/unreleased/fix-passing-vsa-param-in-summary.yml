@@ -1,0 +1,5 @@
+---
+title: Fix passing date params in VSA Summary request
+merge_request: 35152
+author:
+type: fixed

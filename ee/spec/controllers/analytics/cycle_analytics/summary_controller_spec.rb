@@ -31,6 +31,17 @@ RSpec.describe Analytics::CycleAnalytics::SummaryController do
     subject { get :show, params: params }
 
     it_behaves_like 'summary endpoint'
+
+    it 'passes the date filter to the query class' do
+      expected_date_range = {
+        created_after: Date.parse(params[:created_after]).at_beginning_of_day,
+        created_before: Date.parse(params[:created_before]).at_end_of_day
+      }
+
+      expect(IssuesFinder).to receive(:new).with(user, hash_including(expected_date_range)).and_call_original
+
+      subject
+    end
   end
 
   describe 'GET "time_summary"' do
