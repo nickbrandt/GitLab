@@ -926,7 +926,11 @@ The following IPs will be used as an example:
 If you're running more than one PgBouncer node as recommended, then at this time you'll need to set
 up a TCP internal load balancer to serve each correctly.
 
-As an example, here's how you could do it with [HAProxy](https://www.haproxy.org/):
+The following IP will be used as an example:
+
+- `10.6.0.20`: Internal Load Balancer
+
+Here's how you could do it with [HAProxy](https://www.haproxy.org/):
 
 ```plaintext
 global
