@@ -24,6 +24,7 @@ module Gitlab
             Arel.sql("#{join_expression_name}.created_at")
           end
 
+          override :column_list
           def column_list
             [timestamp_projection]
           end
