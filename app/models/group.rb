@@ -339,7 +339,7 @@ class Group < Namespace
   end
 
   def members_from_self_and_ancestors_with_effective_access_level
-    members_with_parents.select([:user_id, 'MAX(access_level) AS access_level'])
+    members_with_parents.non_limited_access.select([:user_id, 'MAX(access_level) AS access_level'])
                         .group(:user_id)
   end
 
