@@ -2680,6 +2680,9 @@ msgstr ""
 msgid "Apply this approval rule to any branch or a specific protected branch."
 msgstr ""
 
+msgid "Applying"
+msgstr ""
+
 msgid "Applying a template will replace the existing issue description. Any changes you have made will be lost."
 msgstr ""
 
