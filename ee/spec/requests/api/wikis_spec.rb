@@ -12,38 +12,39 @@ require 'spec_helper'
 # - maintainer
 # because they are 3 edge cases of using wiki pages.
 
-RSpec.describe API::Wikis do
+describe API::Wikis do
   include WorkhorseHelpers
 
-  let(:user) { create(:user) }
-  let(:group) { create(:group).tap { |g| g.add_owner(user) } }
-  let(:project_wiki) { create(:project_wiki, project: project, user: user) }
+  let_it_be(:user) { create(:user) }
+  let(:group) { create(:group, :internal, :wiki_repo) }
+  let(:wiki) { create(:group_wiki, container: group, user: user) }
   let(:payload) { { content: 'content', format: 'rdoc', title: 'title' } }
   let(:expected_keys_with_content) { %w(content format slug title) }
   let(:expected_keys_without_content) { %w(format slug title) }
-  let(:wiki) { project_wiki }
 
-  shared_examples_for 'wiki API 404 Project Not Found' do
-    include_examples 'wiki API 404 Not Found', 'Project'
+  shared_examples_for 'wiki API 404 Group Not Found' do
+    include_examples 'wiki API 404 Not Found', 'Group'
   end
 
-  describe 'GET /projects/:id/wikis' do
-    let(:url) { "/projects/#{project.id}/wikis" }
+  describe 'GET /groups/:id/wikis' do
+    let(:url) { "/groups/#{group.id}/wikis" }
 
-    context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_repo, :wiki_disabled) }
+    context 'when group wiki is disabled' do
+      before do
+        stub_feature_flags(group_wiki: false)
+      end
 
       context 'when user is guest' do
         before do
           get api(url)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
 
           get api(url, user)
         end
@@ -53,7 +54,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
 
           get api(url, user)
         end
@@ -62,20 +63,21 @@ RSpec.describe API::Wikis do
       end
     end
 
-    context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_repo, :wiki_private) }
+    # Skipped pending https://gitlab.com/gitlab-org/gitlab/-/issues/208412
+    xcontext 'when wiki is available only for team members' do
+      let(:group) { create(:group, :wiki_repo, :wiki_private) }
 
       context 'when user is guest' do
         before do
           get api(url)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
         end
 
         include_examples 'wikis API returns list of wiki pages'
@@ -83,7 +85,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
         end
 
         include_examples 'wikis API returns list of wiki pages'
@@ -91,19 +93,17 @@ RSpec.describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project, :wiki_repo) }
-
       context 'when user is guest' do
         before do
           get api(url)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
         end
 
         include_examples 'wikis API returns list of wiki pages'
@@ -111,7 +111,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
         end
 
         include_examples 'wikis API returns list of wiki pages'
@@ -119,24 +119,26 @@ RSpec.describe API::Wikis do
     end
   end
 
-  describe 'GET /projects/:id/wikis/:slug' do
-    let(:page) { create(:wiki_page, wiki: project.wiki) }
-    let(:url) { "/projects/#{project.id}/wikis/#{page.slug}" }
+  describe 'GET /groups/:id/wikis/:slug' do
+    let(:page) { create(:wiki_page, wiki: wiki) }
+    let(:url) { "/groups/#{group.id}/wikis/#{page.slug}" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_repo, :wiki_disabled) }
+      before do
+        stub_feature_flags(group_wiki: false)
+      end
 
       context 'when user is guest' do
         before do
           get api(url)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
 
           get api(url, user)
         end
@@ -146,7 +148,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
 
           get api(url, user)
         end
@@ -155,27 +157,28 @@ RSpec.describe API::Wikis do
       end
     end
 
-    context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_repo, :wiki_private) }
+    # Skipped pending https://gitlab.com/gitlab-org/gitlab/-/issues/208412
+    xcontext 'when wiki is available only for team members' do
+      let(:group) { create(:group, :wiki_repo, :wiki_private) }
 
       context 'when user is guest' do
         before do
           get api(url)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
           get api(url, user)
         end
 
         include_examples 'wikis API returns wiki page'
 
-        context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+        context 'when page does not exist' do
+          let(:url) { "/groups/#{group.id}/wikis/unknown" }
 
           include_examples 'wiki API 404 Wiki Page Not Found'
         end
@@ -183,15 +186,15 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
 
           get api(url, user)
         end
 
         include_examples 'wikis API returns wiki page'
 
-        context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+        context 'when page does not exist' do
+          let(:url) { "/groups/#{group.id}/wikis/unknown" }
 
           include_examples 'wiki API 404 Wiki Page Not Found'
         end
@@ -199,27 +202,25 @@ RSpec.describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project, :wiki_repo) }
-
       context 'when user is guest' do
         before do
           get api(url)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
 
           get api(url, user)
         end
 
         include_examples 'wikis API returns wiki page'
 
-        context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+        context 'when page does not exist' do
+          let(:url) { "/groups/#{group.id}/wikis/unknown" }
 
           include_examples 'wiki API 404 Wiki Page Not Found'
         end
@@ -227,15 +228,15 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
 
           get api(url, user)
         end
 
         include_examples 'wikis API returns wiki page'
 
-        context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+        context 'when page does not exist' do
+          let(:url) { "/groups/#{group.id}/wikis/unknown" }
 
           include_examples 'wiki API 404 Wiki Page Not Found'
         end
@@ -243,24 +244,26 @@ RSpec.describe API::Wikis do
     end
   end
 
-  describe 'POST /projects/:id/wikis' do
+  describe 'POST /groups/:id/wikis' do
     let(:payload) { { title: 'title', content: 'content' } }
-    let(:url) { "/projects/#{project.id}/wikis" }
+    let(:url) { "/groups/#{group.id}/wikis" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled, :wiki_repo) }
+      before do
+        stub_feature_flags(group_wiki: false)
+      end
 
       context 'when user is guest' do
         before do
           post(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
           post(api(url, user), params: payload)
         end
 
@@ -269,7 +272,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
           post(api(url, user), params: payload)
         end
 
@@ -277,20 +280,20 @@ RSpec.describe API::Wikis do
       end
     end
 
-    context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private, :wiki_repo) }
+    xcontext 'when wiki is available only for team members' do
+      let(:group) { create(:group, :wiki_private, :wiki_repo) }
 
       context 'when user is guest' do
         before do
           post(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
         end
 
         include_examples 'wikis API creates wiki page'
@@ -298,7 +301,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
         end
 
         include_examples 'wikis API creates wiki page'
@@ -306,19 +309,17 @@ RSpec.describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project, :wiki_repo) }
-
       context 'when user is guest' do
         before do
           post(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
         end
 
         include_examples 'wikis API creates wiki page'
@@ -326,7 +327,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
         end
 
         include_examples 'wikis API creates wiki page'
@@ -334,25 +335,27 @@ RSpec.describe API::Wikis do
     end
   end
 
-  describe 'PUT /projects/:id/wikis/:slug' do
-    let(:page) { create(:wiki_page, wiki: project_wiki) }
+  describe 'PUT /group/:id/wikis/:slug' do
+    let(:page) { create(:wiki_page, wiki: wiki) }
     let(:payload) { { title: 'new title', content: 'new content' } }
-    let(:url) { "/projects/#{project.id}/wikis/#{page.slug}" }
+    let(:url) { "/groups/#{group.id}/wikis/#{page.slug}" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled, :wiki_repo) }
+      before do
+        stub_feature_flags(group_wiki: false)
+      end
 
       context 'when user is guest' do
         before do
           put(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
 
           put(api(url, user), params: payload)
         end
@@ -362,7 +365,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
 
           put(api(url, user), params: payload)
         end
@@ -371,26 +374,26 @@ RSpec.describe API::Wikis do
       end
     end
 
-    context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private, :wiki_repo) }
+    xcontext 'when wiki is available only for team members' do
+      let(:group) { create(:group, :wiki_private, :wiki_repo) }
 
       context 'when user is guest' do
         before do
           put(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
         end
 
         include_examples 'wikis API updates wiki page'
 
-        context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+        context 'when page does not exist' do
+          let(:url) { "/groups/#{group.id}/wikis/unknown" }
 
           before do
             put(api(url, user), params: payload)
@@ -402,13 +405,13 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
         end
 
         include_examples 'wikis API updates wiki page'
 
         context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+          let(:url) { "/group/#{group.id}/wikis/unknown" }
 
           before do
             put(api(url, user), params: payload)
@@ -420,25 +423,23 @@ RSpec.describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project, :wiki_repo) }
-
       context 'when user is guest' do
         before do
           put(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
         end
 
         include_examples 'wikis API updates wiki page'
 
-        context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+        context 'when page does not exist' do
+          let(:url) { "/groups/#{group.id}/wikis/unknown" }
 
           before do
             put(api(url, user), params: payload)
@@ -450,13 +451,13 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
         end
 
         include_examples 'wikis API updates wiki page'
 
-        context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+        context 'when page does not exist' do
+          let(:url) { "/groups/#{group.id}/wikis/unknown" }
 
           before do
             put(api(url, user), params: payload)
@@ -467,31 +468,34 @@ RSpec.describe API::Wikis do
       end
     end
 
-    context 'when wiki belongs to a group project' do
-      let(:project) { create(:project, :wiki_repo, namespace: group) }
+    context 'when user is owner of parent group' do
+      let(:namespace) { create(:group).tap { |g| g.add_owner(user) } }
+      let(:group) { create(:group, :wiki_repo, parent: namespace) }
 
       include_examples 'wikis API updates wiki page'
     end
   end
 
-  describe 'DELETE /projects/:id/wikis/:slug' do
-    let(:page) { create(:wiki_page, wiki: project_wiki) }
-    let(:url) { "/projects/#{project.id}/wikis/#{page.slug}" }
+  describe 'DELETE /groups/:id/wikis/:slug' do
+    let(:page) { create(:wiki_page, wiki: wiki) }
+    let(:url) { "/groups/#{group.id}/wikis/#{page.slug}" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled, :wiki_repo) }
+      before do
+        stub_feature_flags(group_wiki: false)
+      end
 
       context 'when user is guest' do
         before do
           delete(api(url))
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
 
           delete(api(url, user))
         end
@@ -501,7 +505,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
 
           delete(api(url, user))
         end
@@ -510,20 +514,21 @@ RSpec.describe API::Wikis do
       end
     end
 
-    context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private, :wiki_repo) }
+    # Skipped pending https://gitlab.com/gitlab-org/gitlab/-/issues/208412
+    xcontext 'when wiki is available only for team members' do
+      let(:group) { create(:group, :wiki_repo, :wiki_private) }
 
       context 'when user is guest' do
         before do
           delete(api(url))
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
 
           delete(api(url, user))
         end
@@ -533,7 +538,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
 
           delete(api(url, user))
         end
@@ -543,19 +548,17 @@ RSpec.describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project, :wiki_repo) }
-
       context 'when user is guest' do
         before do
           delete(api(url))
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
 
           delete(api(url, user))
         end
@@ -565,23 +568,24 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
 
           delete(api(url, user))
         end
 
         include_examples 'wiki API 204 No Content'
 
-        context 'when page is not existing' do
-          let(:url) { "/projects/#{project.id}/wikis/unknown" }
+        context 'when page does not exist' do
+          let(:url) { "/groups/#{group.id}/wikis/unknown" }
 
           include_examples 'wiki API 404 Wiki Page Not Found'
         end
       end
     end
 
-    context 'when wiki belongs to a group project' do
-      let(:project) { create(:project, :wiki_repo, namespace: group) }
+    context 'when user is owner of parent group' do
+      let(:namespace) { create(:group).tap { |g| g.add_owner(user) } }
+      let(:group) { create(:group, :wiki_repo, parent: namespace) }
 
       before do
         delete(api(url, user))
@@ -591,9 +595,9 @@ RSpec.describe API::Wikis do
     end
   end
 
-  describe 'POST /projects/:id/wikis/attachments' do
+  describe 'POST /groups/:id/wikis/attachments' do
     let(:payload) { { file: fixture_file_upload('spec/fixtures/dk.png') } }
-    let(:url) { "/projects/#{project.id}/wikis/attachments" }
+    let(:url) { "/groups/#{group.id}/wikis/attachments" }
     let(:file_path) { "#{Wikis::CreateAttachmentService::ATTACHMENT_PATH}/fixed_hex/dk.png" }
     let(:result_hash) do
       {
@@ -608,19 +612,21 @@ RSpec.describe API::Wikis do
     end
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled, :wiki_repo) }
+      before do
+        stub_feature_flags(group_wiki: false)
+      end
 
       context 'when user is guest' do
         before do
           post(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
           post(api(url, user), params: payload)
         end
 
@@ -629,7 +635,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
           post(api(url, user), params: payload)
         end
 
@@ -637,20 +643,21 @@ RSpec.describe API::Wikis do
       end
     end
 
-    context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private, :wiki_repo) }
+    # Skipped pending https://gitlab.com/gitlab-org/gitlab/-/issues/208412
+    xcontext 'when wiki is available only for team members' do
+      let(:group) { create(:group, :wiki_private, :wiki_repo) }
 
       context 'when user is guest' do
         before do
           post(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
         end
 
         include_examples 'wiki API uploads wiki attachment'
@@ -658,7 +665,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
         end
 
         include_examples 'wiki API uploads wiki attachment'
@@ -666,19 +673,17 @@ RSpec.describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project, :wiki_repo) }
-
       context 'when user is guest' do
         before do
           post(api(url), params: payload)
         end
 
-        include_examples 'wiki API 404 Project Not Found'
+        include_examples 'wiki API 404 Group Not Found'
       end
 
       context 'when user is developer' do
         before do
-          project.add_developer(user)
+          group.add_developer(user)
         end
 
         include_examples 'wiki API uploads wiki attachment'
@@ -686,7 +691,7 @@ RSpec.describe API::Wikis do
 
       context 'when user is maintainer' do
         before do
-          project.add_maintainer(user)
+          group.add_maintainer(user)
         end
 
         include_examples 'wiki API uploads wiki attachment'
