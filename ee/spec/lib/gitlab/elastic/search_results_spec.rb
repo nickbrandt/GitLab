@@ -629,6 +629,14 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
           us-east-2
           bye
+
+          MyJavaClass::javaLangStaticMethodCall
+          $my_perl_object->perlMethodCall
+          LanguageWithSingleColon:someSingleColonMethodCall
+          WouldHappenInManyLanguages,tokenAfterCommaWithNoSpace
+          ParenthesesBetweenTokens)tokenAfterParentheses
+          a.b.c=missing_token_around_equals
+
         FILE
       end
       let(:file_name) { 'elastic_specialchars_test.md' }
@@ -670,6 +678,30 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
       it 'finds file paths for various languages' do
         expect(search_for('"differeñt-lønguage.txt"')).to include(file_name)
+      end
+
+      it 'finds java style static method call after ::' do
+        expect(search_for('javaLangStaticMethodCall')).to include(file_name)
+      end
+
+      it 'finds perl object method call' do
+        expect(search_for('perlMethodCall')).to include(file_name)
+      end
+
+      it 'finds tokens after a colon' do
+        expect(search_for('someSingleColonMethodCall')).to include(file_name)
+      end
+
+      it 'finds tokens after a comma with no space' do
+        expect(search_for('tokenAfterCommaWithNoSpace')).to include(file_name)
+      end
+
+      it 'finds a token directly after parentheses' do
+        expect(search_for('tokenAfterParentheses')).to include(file_name)
+      end
+
+      it 'finds a token after = without a space' do
+        expect(search_for('missing_token_around_equals')).to include(file_name)
       end
     end
   end
