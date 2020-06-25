@@ -811,7 +811,7 @@ Role      | Name    | Upstream  | Connection String
 ```
 
 If the 'Role' column for any node says "FAILED", check the
-[Troubleshooting section](troubleshooting/index.md) before proceeding.
+[Troubleshooting section](troubleshooting.md) before proceeding.
 
 Also, check that the `repmgr-check-master` command works successfully on each node:
 
@@ -823,7 +823,7 @@ gitlab-ctl repmgr-check-master || echo 'This node is a standby repmgr node'
 This command relies on exit codes to tell Consul whether a particular node is a master
 or secondary. The most important thing here is that this command does not produce errors.
 If there are errors it's most likely due to incorrect `gitlab-consul` database user permissions.
-Check the [Troubleshooting section](troubleshooting/index.md) before proceeding.
+Check the [Troubleshooting section](troubleshooting.md) before proceeding.
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -1426,7 +1426,7 @@ NOTE: **Note:**
 If you encounter a `rake aborted!` error stating that PgBouncer is failing to connect to
 PostgreSQL it may be that your PgBouncer node's IP address is missing from
 PostgreSQL's `trust_auth_cidr_addresses` in `gitlab.rb` on your database nodes. See
-[PgBouncer error `ERROR:  pgbouncer cannot connect to server`](#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
+[PgBouncer error `ERROR:  pgbouncer cannot connect to server`](troubleshooting.md#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
 in the Troubleshooting section before proceeding.
 
 <div align="right">
