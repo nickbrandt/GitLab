@@ -24664,6 +24664,9 @@ msgstr ""
 msgid "UsageQuota|Pipelines"
 msgstr ""
 
+msgid "UsageQuota|Purchase more storage"
+msgstr ""
+
 msgid "UsageQuota|Repositories"
 msgstr ""
 

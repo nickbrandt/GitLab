@@ -8,8 +8,9 @@ describe('Storage counter app', () => {
   let wrapper;
 
   const findTotalUsage = () => wrapper.find("[data-testid='total-usage']");
+  const findPurchaseStorageLink = () => wrapper.find("[data-testid='purchase-storage-link']");
 
-  function createComponent(loading = false) {
+  function createComponent(props = {}, loading = false) {
     const $apollo = {
       queries: {
         namespace: {
@@ -19,7 +20,7 @@ describe('Storage counter app', () => {
     };
 
     wrapper = mount(StorageApp, {
-      propsData: { namespacePath: 'h5bp', helpPagePath: 'help' },
+      propsData: { namespacePath: 'h5bp', helpPagePath: 'help', ...props },
       mocks: { $apollo },
     });
   }
@@ -85,6 +86,27 @@ describe('Storage counter app', () => {
       await wrapper.vm.$nextTick();
 
       expect(findTotalUsage().text()).toContain('N/A');
+    });
+  });
+
+  describe('purchase storage link', () => {
+    describe('when purchaseStorageUrl is not set', () => {
+      it('does not render an additional link', () => {
+        expect(findPurchaseStorageLink().exists()).toBe(false);
+      });
+    });
+
+    describe('when purchaseStorageUrl is set', () => {
+      beforeEach(() => {
+        createComponent({ purchaseStorageUrl: 'customers.gitlab.com' });
+      });
+
+      it('does render link', () => {
+        const link = findPurchaseStorageLink();
+
+        expect(link).toExist();
+        expect(link.attributes('href')).toBe('customers.gitlab.com');
+      });
     });
   });
 });
