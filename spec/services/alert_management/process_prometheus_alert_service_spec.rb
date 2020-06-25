@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe AlertManagement::ProcessPrometheusAlertService do
-  let_it_be(:project) { create(:project) }
+  let_it_be(:project) { create(:project, :repository) }
 
   before do
     allow(ProjectServiceWorker).to receive(:perform_async)
@@ -146,7 +146,6 @@ RSpec.describe AlertManagement::ProcessPrometheusAlertService do
       end
 
       context 'environment given' do
-        let(:project) { create(:project, :repository) }
         let(:environment) { create(:environment, project: project) }
 
         it 'sets the environment' do
