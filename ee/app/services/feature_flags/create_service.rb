@@ -46,7 +46,7 @@ module FeatureFlags
     end
 
     def new_version_feature_flags_enabled?
-      ::Feature.enabled?(:feature_flags_new_version, project)
+      ::Feature.enabled?(:feature_flags_new_version, project, default_enabled: true)
     end
   end
 end
