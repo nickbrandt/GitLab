@@ -1172,6 +1172,96 @@ To configure Gitaly with TLS:
 
 ## Configure Sidekiq
 
+Sidekiq requires connection to the Redis, PostgreSQL and Gitaly instance.
+To configure the Sidekiq nodes, one each one:
+
+1. SSH into the Sidekiq server.
+1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab package
+you want using steps 1 and 2 from the GitLab downloads page.
+**Do not complete any other steps on the download page.**
+1. Open `/etc/gitlab/gitlab.rb` with your editor:
+
+   ```ruby
+   ########################################
+   #####        Services Disabled       ###
+   ########################################
+
+   nginx['enable'] = false
+   grafana['enable'] = false
+   prometheus['enable'] = false
+   gitlab_rails['auto_migrate'] = false
+   alertmanager['enable'] = false
+   gitaly['enable'] = false
+   gitlab_monitor['enable'] = false
+   gitlab_workhorse['enable'] = false
+   nginx['enable'] = false
+   puma['enable'] = false
+   postgres_exporter['enable'] = false
+   postgresql['enable'] = false
+   redis['enable'] = false
+   redis_exporter['enable'] = false
+   gitlab_exporter['enable'] = false
+
+   ########################################
+   ####              Redis              ###
+   ########################################
+
+   ## Must be the same in every sentinel node
+   redis['master_name'] = 'gitlab-redis'
+
+   ## The same password for Redis authentication you set up for the master node.
+   redis['master_password'] = '<redis_primary_password>'
+
+   ## A list of sentinels with `host` and `port`
+   gitlab_rails['redis_sentinels'] = [
+      {'host' => '10.6.0.11', 'port' => 26379},
+      {'host' => '10.6.0.12', 'port' => 26379},
+      {'host' => '10.6.0.13', 'port' => 26379},
+   ]
+
+   #######################################
+   ###              Gitaly             ###
+   #######################################
+
+   git_data_dirs({
+     'default' => { 'gitaly_address' => 'tcp://gitaly1.internal:8075' },
+     'storage1' => { 'gitaly_address' => 'tcp://gitaly1.internal:8075' },
+     'storage2' => { 'gitaly_address' => 'tcp://gitaly2.internal:8075' },
+   })
+   gitlab_rails['gitaly_token'] = 'YOUR_TOKEN'
+
+   #######################################
+   ###            Postgres             ###
+   #######################################
+   gitlab_rails['db_host'] = '10.6.0.20' # internal load balancer IP
+   gitlab_rails['db_port'] = 6432
+   gitlab_rails['db_password'] = '<postgresql_user_password>'
+   gitlab_rails['db_adapter'] = 'postgresql'
+   gitlab_rails['db_encoding'] = 'unicode'
+   gitlab_rails['auto_migrate'] = false
+
+   #######################################
+   ###      Sidekiq configuration      ###
+   #######################################
+   sidekiq['listen_address'] = "10.6.0.71"
+
+   #######################################
+   ###     Monitoring configuration    ###
+   #######################################
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13)
+   }
+
+   # Set the network addresses that the exporters will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+
+   # Rails Status for prometheus
+   gitlab_rails['monitoring_whitelist'] = ['10.6.0.81/32', '127.0.0.0/8']
+   ```
+
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
     Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
