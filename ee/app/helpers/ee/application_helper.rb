@@ -3,7 +3,6 @@
 module EE
   module ApplicationHelper
     extend ::Gitlab::Utils::Override
-    include ::OnboardingExperimentHelper
 
     DB_LAG_SHOW_THRESHOLD = 60 # seconds
     LOG_CURSOR_CHECK_TIME = ::Gitlab::Geo::LogCursor::Daemon::SECONDARY_CHECK_INTERVAL
@@ -111,10 +110,6 @@ module EE
       return false if project.mirror? && project.repository.up_to_date_with_upstream?(event.branch_name)
 
       show
-    end
-
-    def user_onboarding_enabled?
-      allow_access_to_onboarding?
     end
 
     def show_whats_new_dropdown_item?
