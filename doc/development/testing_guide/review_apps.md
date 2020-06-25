@@ -166,6 +166,9 @@ Here are some permissions you may want to have, and the roles that grant them:
 The default username is `root` and its password can be found in the 1Password
 secure note named `gitlab-{ce,ee} Review App's root password`.
 
+NOTE: **Note:**
+This information is limited to GitLab team members.
+
 ### Enable a feature flag for my Review App
 
 1. Open your Review App and log in as documented above.
