@@ -349,6 +349,10 @@ module Ci
       success.group(:project_id).select('max(id) as id')
     end
 
+    def self.last_finished_for_ref_id(ci_ref_id)
+      where(ci_ref_id: ci_ref_id).ci_sources.finished.order(id: :desc).select(:id).take
+    end
+
     def self.truncate_sha(sha)
       sha[0...8]
     end
