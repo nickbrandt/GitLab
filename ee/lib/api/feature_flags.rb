@@ -246,7 +246,7 @@ module API
       end
 
       def feature_flags_new_version_enabled?
-        Feature.enabled?(:feature_flags_new_version, user_project)
+        Feature.enabled?(:feature_flags_new_version, user_project, default_enabled: true)
       end
 
       def rename_key(hash, old_key, new_key)

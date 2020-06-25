@@ -12,7 +12,7 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
 
   before_action do
     push_frontend_feature_flag(:feature_flag_permissions)
-    push_frontend_feature_flag(:feature_flags_new_version, project)
+    push_frontend_feature_flag(:feature_flags_new_version, project, default_enabled: true)
   end
 
   def index
@@ -103,7 +103,7 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   end
 
   def new_version_feature_flags_enabled?
-    ::Feature.enabled?(:feature_flags_new_version, project)
+    ::Feature.enabled?(:feature_flags_new_version, project, default_enabled: true)
   end
 
   def create_params
