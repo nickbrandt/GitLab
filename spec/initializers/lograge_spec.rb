@@ -169,22 +169,11 @@ RSpec.describe 'lograge', type: :request do
             expect(log_data).to include("db_count" => 1, "db_write_count" => 0, "db_cached_count" => 0)
           end
         end
-
-        context 'with db payload' do
-          before do
-            event.payload.except!(:db_runtime)
-          end
-          it 'does not include db counters', :request_store do
-            subscriber.process_action(event)
-
-            expect(log_data).not_to include("db_count" => 0, "db_write_count" => 0, "db_cached_count" => 0)
-          end
-        end
       end
 
       context 'when RequestStore is disabled' do
         context 'with db payload' do
-          it 'includes db counters' do
+          it 'does not include db counters' do
             ActiveRecord::Base.connection.execute('SELECT pg_sleep(0.1);')
             subscriber.process_action(event)
 
