@@ -5,8 +5,23 @@ FactoryBot.define do
     skip_create
 
     transient do
-      project { raise ArgumentError.new("project is required") }
-      service { raise ArgumentError.new("this factory cannot be used without specifying a trait") }
+      files { { 'foo.txt' => 'content' } }
+      message { 'Message' }
+      project { create(:project, :repository) }
+
+      service do
+        Files::MultiService.new(
+          project,
+          project.owner,
+          commit_message: message,
+          start_branch: project.repository.root_ref || 'master',
+          branch_name: project.repository.root_ref || 'master',
+          actions: files.map do |path, content|
+            { action: :create, file_path: path, content: content }
+          end
+        )
+      end
+
       tag { nil }
       tag_message { nil }
 
@@ -27,27 +42,10 @@ FactoryBot.define do
       end
     end
 
-    initialize_with do
-      commit
-    end
-
     trait :files do
       transient do
         files { raise ArgumentError.new("files is required") }
         message { 'Add files' }
-      end
-
-      service do
-        Files::MultiService.new(
-          project,
-          project.owner,
-          commit_message: message,
-          start_branch: project.repository.root_ref || 'master',
-          branch_name: project.repository.root_ref || 'master',
-          actions: files.map do |path, content|
-            { action: :create, file_path: path, content: content }
-          end
-        )
       end
     end
 
@@ -55,19 +53,7 @@ FactoryBot.define do
       transient do
         path { raise ArgumentError.new("path is required") }
         message { 'Add package' }
-      end
-
-      service do
-        Files::MultiService.new(
-          project,
-          project.owner,
-          commit_message: message,
-          start_branch: project.repository.root_ref || 'master',
-          branch_name: project.repository.root_ref || 'master',
-          actions: [
-            { action: :create, file_path: path + '/b.go', content: "package b\nfunc Bye() { println(\"Goodbye world!\") }\n" }
-          ]
-        )
+        files { { "#{path}/b.go" => "package b\nfunc Bye() { println(\"Goodbye world!\") }\n" } }
       end
     end
 
@@ -75,39 +61,22 @@ FactoryBot.define do
       transient do
         name { nil }
         message { 'Add module' }
+        host_prefix { "#{::Gitlab.config.gitlab.host}/#{project.path_with_namespace}" }
 
-        url do
-          v = "#{::Gitlab.config.gitlab.host}/#{project.path_with_namespace}"
+        url { name ? "#{host_prefix}/#{name}" : host_prefix }
+        path { name.to_s + '/' }
 
-          if name
-            v + '/' + name
-          else
-            v
-          end
-        end
-
-        path do
-          if name
-            name + '/'
-          else
-            ''
-          end
+        files do
+          {
+            "#{path}go.mod" => "module #{url}\n",
+            "#{path}a.go" => "package a\nfunc Hi() { println(\"Hello world!\") }\n"
+          }
         end
       end
+    end
 
-      service do
-        Files::MultiService.new(
-          project,
-          project.owner,
-          commit_message: message,
-          start_branch: project.repository.root_ref || 'master',
-          branch_name: project.repository.root_ref || 'master',
-          actions: [
-            { action: :create, file_path: path + 'go.mod', content: "module #{url}\n" },
-            { action: :create, file_path: path + 'a.go', content: "package a\nfunc Hi() { println(\"Hello world!\") }\n" }
-          ]
-        )
-      end
+    initialize_with do
+      commit
     end
   end
 end

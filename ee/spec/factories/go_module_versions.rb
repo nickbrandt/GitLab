@@ -15,7 +15,7 @@ FactoryBot.define do
 
     mod { create :go_module }
     type { :commit }
-    commit { raise ArgumentError.new("commit is required") }
+    commit { mod.project.repository.head_commit }
     name { nil }
     semver { nil }
     ref { nil }
@@ -23,16 +23,49 @@ FactoryBot.define do
     params { OpenStruct.new(mod: mod, type: type, commit: commit, name: name, semver: semver, ref: ref) }
 
     trait :tagged do
-      name { raise ArgumentError.new("name is required") }
       ref { mod.project.repository.find_tag(name) }
       commit { ref.dereferenced_target }
+      name do
+        # This provides a sane default value, but in reality the caller should
+        # specify `name:`
+
+        # Find 'latest' semver tag (does not actually use semver precedence rules)
+        mod.project.repository.tags
+          .filter { |t| Packages::SemVer.match?(t.name, prefixed: true) }
+          .map    { |t| Packages::SemVer.parse(t.name, prefixed: true) }
+          .max    { |a, b| "#{a}" <=> "#{b}" }
+          .to_s
+      end
 
       params { OpenStruct.new(mod: mod, type: :ref, commit: commit, semver: name, ref: ref) }
     end
 
     trait :pseudo do
       transient do
-        prefix { raise ArgumentError.new("prefix is required") }
+        prefix do
+          # This provides a sane default value, but in reality the caller should
+          # specify `prefix:`
+
+          # This does not take into account that `commit` may be before the
+          # latest tag.
+
+          # Find 'latest' semver tag (does not actually use semver precedence rules)
+          v = mod.project.repository.tags
+            .filter { |t| Packages::SemVer.match?(t.name, prefixed: true) }
+            .map    { |t| Packages::SemVer.parse(t.name, prefixed: true) }
+            .max    { |a, b| "#{a}" <=> "#{b}" }
+
+          # Default if no semver tags exist
+          next 'v0.0.0' unless v
+
+          # Valid pseudo-versions are:
+          #   vX.0.0-yyyymmddhhmmss-sha1337beef0, when no earlier tagged commit exists for X
+          #   vX.Y.Z-pre.0.yyyymmddhhmmss-sha1337beef0, when most recent prior tag is vX.Y.Z-pre
+          #   vX.Y.(Z+1)-0.yyyymmddhhmmss-sha1337beef0, when most recent prior tag is vX.Y.Z
+
+          v = v.with(patch: v.patch + 1) unless v.prerelease
+          "#{v}.0"
+        end
       end
 
       type { :pseudo }
