@@ -152,5 +152,46 @@ RSpec.describe 'lograge', type: :request do
         expect(log_data['etag_route']).to eq(etag_route)
       end
     end
+
+    context 'with transaction' do
+      let(:transaction) { Gitlab::Metrics::WebTransaction.new({}) }
+
+      before do
+        allow(Gitlab::Metrics::Transaction).to receive(:current).and_return(transaction)
+      end
+
+      context 'when RequestStore is enabled', :request_store do
+        context 'with db payload' do
+          it 'includes db counters', :request_store do
+            ActiveRecord::Base.connection.execute('SELECT pg_sleep(0.1);')
+            subscriber.process_action(event)
+
+            expect(log_data).to include("db_count" => 1, "db_write_count" => 0, "db_cached_count" => 0)
+          end
+        end
+
+        context 'with db payload' do
+          before do
+            event.payload.except!(:db_runtime)
+          end
+          it 'does not include db counters', :request_store do
+            subscriber.process_action(event)
+
+            expect(log_data).not_to include("db_count" => 0, "db_write_count" => 0, "db_cached_count" => 0)
+          end
+        end
+      end
+
+      context 'when RequestStore is disabled' do
+        context 'with db payload' do
+          it 'includes db counters' do
+            ActiveRecord::Base.connection.execute('SELECT pg_sleep(0.1);')
+            subscriber.process_action(event)
+
+            expect(log_data).not_to include("db_count" => 1, "db_write_count" => 0, "db_cached_count" => 0)
+          end
+        end
+      end
+    end
   end
 end

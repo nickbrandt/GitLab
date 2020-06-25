@@ -20,8 +20,6 @@ module Gitlab
           username: event.payload[:username],
           ua: event.payload[:ua]
         }
-        payload.merge!(::Gitlab::Metrics::Subscribers::ActiveRecord.db_counter_payload)
-
         payload.merge!(event.payload[:metadata]) if event.payload[:metadata]
 
         ::Gitlab::InstrumentationHelper.add_instrumentation_data(payload)

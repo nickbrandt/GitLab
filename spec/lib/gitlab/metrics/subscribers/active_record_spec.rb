@@ -52,7 +52,7 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActiveRecord do
             subscriber.sql(event)
 
             described_class::DB_COUNTERS.each do |counter|
-              expect(Gitlab::SafeRequestStore[counter]).to eq expected_counters[counter]
+              expect(Gitlab::SafeRequestStore[counter].to_i).to eq expected_counters[counter]
             end
           end
 
@@ -62,7 +62,7 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActiveRecord do
                 subscriber.sql(event)
 
                 described_class::DB_COUNTERS.each do |counter|
-                  expect(Gitlab::SafeRequestStore[counter]).to eq expected_counters[counter]
+                  expect(Gitlab::SafeRequestStore[counter].to_i).to eq expected_counters[counter]
                 end
               end
             end
@@ -256,9 +256,15 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActiveRecord do
       end
 
       context 'when query is not executed' do
-        let(:expected_payload) { {} }
+        let(:expected_payload) do
+          {
+            db_count: 0,
+            db_cached_count: 0,
+            db_write_count: 0
+          }
+        end
 
-        it 'returns empty payload' do
+        it 'returns correct payload' do
           expect(described_class.db_counter_payload).to eq(expected_payload)
         end
       end
@@ -267,7 +273,7 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActiveRecord do
     context 'when RequestStore is disabled' do
       let(:expected_payload) { {} }
 
-      it 'returns correct payload' do
+      it 'returns empty payload' do
         subscriber.sql(event)
 
         expect(described_class.db_counter_payload).to eq(expected_payload)
