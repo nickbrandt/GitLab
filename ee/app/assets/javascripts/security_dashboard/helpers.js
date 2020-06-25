@@ -48,6 +48,32 @@ export const initFirstClassVulnerabilityFilters = projects => {
   return filters;
 };
 
+/**
+ * Provided a security reports summary from the GraphQL API, this returns an array of arrays
+ * representing a properly formatted report ready to be displayed in the UI. Each sub-array consists
+ * of the user-friend report's name, and the summary's payload. Note that summary entries are
+ * considered empty and are filtered out of the return if the payload is `null` or don't include
+ * a vulnerabilitiesCount property. Report types whose name can't be matched to a user-friendly
+ * name are filtered out as well.
+ *
+ * Take the following summary for example:
+ * {
+ *   containerScanning: { vulnerabilitiesCount: 123 },
+ *   invalidReportType: { vulnerabilitiesCount: 123 },
+ *   dast: null,
+ * }
+ *
+ * The formatted summary would look like this:
+ * [
+ *   ['containerScanning', { vulnerabilitiesCount: 123 }]
+ * ]
+ *
+ * Note that `invalidReportType` was filtered out as it can't be matched with a user-friendly name,
+ * and the DAST report was omitted because it's empty (`null`).
+ *
+ * @param {Object} rawSummary
+ * @returns {Array}
+ */
 export const getFormattedSummary = (rawSummary = {}) => {
   if (!isPlainObject(rawSummary)) {
     return [];
