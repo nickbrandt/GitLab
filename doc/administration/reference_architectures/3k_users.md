@@ -558,7 +558,7 @@ If you use a cloud-managed service, or provide your own PostgreSQL:
 
 ### Standalone PostgreSQL using Omnibus GitLab
 
-The following IPs will be used as an example: 
+The following IPs will be used as an example:
 
 - `10.6.0.31`: PostgreSQL primary
 - `10.6.0.32`: PostgreSQL secondary 1
@@ -791,7 +791,6 @@ SSH into the **secondary node**:
    Registering the node with the cluster
    ok: run: repmgrd: (pid 19068) 0s
    ```
-
 
 Before moving on, make sure the databases are configured correctly. Run the
 following command on the **primary** node to verify that replication is working
