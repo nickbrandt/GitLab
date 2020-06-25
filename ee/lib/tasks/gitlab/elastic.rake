@@ -9,6 +9,18 @@ namespace :gitlab do
 
       Rake::Task["gitlab:elastic:recreate_index"].invoke
       Rake::Task["gitlab:elastic:clear_index_status"].invoke
+
+      # enable `elasticsearch_indexing` if it isn't
+      unless Gitlab::CurrentSettings.elasticsearch_indexing?
+        ApplicationSettings::UpdateService.new(
+          Gitlab::CurrentSettings.current_application_settings,
+          nil,
+          { elasticsearch_indexing: true }
+        ).execute
+
+        puts "Setting `elasticsearch_indexing` has been enabled."
+      end
+
       Rake::Task["gitlab:elastic:index_projects"].invoke
       Rake::Task["gitlab:elastic:index_snippets"].invoke
     end
