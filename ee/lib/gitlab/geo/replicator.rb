@@ -125,6 +125,10 @@ module Gitlab
         model.count
       end
 
+      def self.registry_count
+        registry_class.count
+      end
+
       def self.synced_count
         registry_class.synced.count
       end

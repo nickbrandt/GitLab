@@ -1234,6 +1234,10 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
         create(:geo_package_file_registry, :synced)
       end
 
+      it 'returns the right number of repos in registry' do
+        expect(subject.package_files_registry_count).to eq(3)
+      end
+
       it 'returns the right number of failed and synced repos' do
         expect(subject.package_files_failed_count).to eq(2)
         expect(subject.package_files_synced_count).to eq(1)
@@ -1246,6 +1250,7 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
 
     context 'when no package registries available' do
       it 'returns 0' do
+        expect(subject.package_files_registry_count).to eq(0)
         expect(subject.package_files_failed_count).to eq(0)
         expect(subject.package_files_synced_count).to eq(0)
       end

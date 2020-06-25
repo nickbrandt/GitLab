@@ -93,7 +93,7 @@ export const rawMockNodeDetails = {
   design_repositories_synced_count: 0,
   design_repositories_failed_count: 0,
   design_repositories_synced_in_percentage: '0.00%',
-  package_files_count: 25,
+  package_files_registry_count: 25,
   package_files_synced_count: 25,
   package_files_failed_count: 0,
   package_files_synced_in_percentage: '100.00%',
