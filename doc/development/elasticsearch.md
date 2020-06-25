@@ -113,10 +113,6 @@ Patterns:
 - `'\.([^.]+)(?=\.|\s|\Z)'`: separate terms with periods in-between
 - `'([\p{L}_.-]+)'` : some common chars in file names to keep the whole filename intact (eg. `my_file-ñame.txt`)
 
-#### `edgeNGram_filter`
-
-Uses an [Edge NGram token filter](https://www.elastic.co/guide/en/elasticsearch/reference/5.5/analysis-edgengram-tokenfilter.html) to allow inputs with only parts of a token to find the token. For example it would turn `glasses` into permutations starting with `gl` and ending with `glasses`, which would allow a search for "`glass`" to find the original token `glasses`
-
 ## Gotchas
 
 - Searches can have their own analyzers. Remember to check when editing analyzers
