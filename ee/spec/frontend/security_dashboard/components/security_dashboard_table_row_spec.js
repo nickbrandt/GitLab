@@ -74,24 +74,20 @@ describe('Security Dashboard Table Row', () => {
         findContent(0)
           .text()
           .toLowerCase(),
-      ).toContain(wrapper.props().vulnerability.severity);
+      ).toContain(mockDataVulnerabilities[0].severity);
     });
 
     it('should render the identifier name', () => {
-      expect(
-        findContent(2)
-          .text()
-          .toLowerCase(),
-      ).toContain(wrapper.props().vulnerability.identifiers[0].name.toLowerCase());
+      expect(findContent(2).text()).toContain(mockDataVulnerabilities[0].identifiers[0].name);
     });
 
     describe('the project name', () => {
       it('should render the name', () => {
-        expect(findContent(1).text()).toContain(wrapper.props().vulnerability.name);
+        expect(findContent(1).text()).toContain(mockDataVulnerabilities[0].name);
       });
 
       it('should render the project namespace', () => {
-        expect(findContent(1).text()).toContain(wrapper.props().vulnerability.location.file);
+        expect(findContent(1).text()).toContain(mockDataVulnerabilities[0].location.file);
       });
 
       it('should fire the openModal action when clicked', () => {
@@ -116,7 +112,7 @@ describe('Security Dashboard Table Row', () => {
       });
 
       it('should contain project name as the namespace', () => {
-        expect(findContent(1).text()).toContain(wrapper.props().vulnerability.project.full_name);
+        expect(findContent(1).text()).toContain(mockDataVulnerabilities[0].project.full_name);
       });
     });
 
@@ -129,7 +125,7 @@ describe('Security Dashboard Table Row', () => {
       });
 
       it('should contain container image as the namespace', () => {
-        expect(findContent(1).text()).toContain(wrapper.props().vulnerability.location.image);
+        expect(findContent(1).text()).toContain(mockDataVulnerabilities[7].location.image);
       });
     });
   });
