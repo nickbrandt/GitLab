@@ -14529,6 +14529,31 @@ CREATE SEQUENCE public.redirect_routes_id_seq
 
 ALTER SEQUENCE public.redirect_routes_id_seq OWNED BY public.redirect_routes.id;
 
+CREATE TABLE public.reindexing_tasks (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    documents_count integer,
+    stage smallint DEFAULT 0 NOT NULL,
+    index_name_from text,
+    index_name_to text,
+    elastic_task text,
+    error_message text,
+    CONSTRAINT check_091208af07 CHECK ((char_length(error_message) <= 255)),
+    CONSTRAINT check_8ff6fc681d CHECK ((char_length(elastic_task) <= 255)),
+    CONSTRAINT check_d2e824f68e CHECK ((char_length(index_name_from) <= 255)),
+    CONSTRAINT check_d8c71cf289 CHECK ((char_length(index_name_to) <= 255))
+);
+
+CREATE SEQUENCE public.reindexing_tasks_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.reindexing_tasks_id_seq OWNED BY public.reindexing_tasks.id;
+
 CREATE TABLE public.release_links (
     id bigint NOT NULL,
     release_id integer NOT NULL,
@@ -16701,6 +16726,8 @@ ALTER TABLE ONLY public.push_rules ALTER COLUMN id SET DEFAULT nextval('public.p
 
 ALTER TABLE ONLY public.redirect_routes ALTER COLUMN id SET DEFAULT nextval('public.redirect_routes_id_seq'::regclass);
 
+ALTER TABLE ONLY public.reindexing_tasks ALTER COLUMN id SET DEFAULT nextval('public.reindexing_tasks_id_seq'::regclass);
+
 ALTER TABLE ONLY public.release_links ALTER COLUMN id SET DEFAULT nextval('public.release_links_id_seq'::regclass);
 
 ALTER TABLE ONLY public.releases ALTER COLUMN id SET DEFAULT nextval('public.releases_id_seq'::regclass);
@@ -17863,6 +17890,9 @@ ALTER TABLE ONLY public.push_rules
 
 ALTER TABLE ONLY public.redirect_routes
     ADD CONSTRAINT redirect_routes_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.reindexing_tasks
+    ADD CONSTRAINT reindexing_tasks_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.release_links
     ADD CONSTRAINT release_links_pkey PRIMARY KEY (id);
@@ -19844,6 +19874,8 @@ CREATE UNIQUE INDEX index_redirect_routes_on_path ON public.redirect_routes USIN
 CREATE UNIQUE INDEX index_redirect_routes_on_path_unique_text_pattern_ops ON public.redirect_routes USING btree (lower((path)::text) varchar_pattern_ops);
 
 CREATE INDEX index_redirect_routes_on_source_type_and_source_id ON public.redirect_routes USING btree (source_type, source_id);
+
+CREATE INDEX index_reindexing_tasks_on_stage ON public.reindexing_tasks USING btree (stage);
 
 CREATE UNIQUE INDEX index_release_links_on_release_id_and_name ON public.release_links USING btree (release_id, name);
 
@@ -23408,6 +23440,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200623000148
 20200623000320
 20200623121135
+20200623141544
 20200623170000
 20200623185440
 20200624075411

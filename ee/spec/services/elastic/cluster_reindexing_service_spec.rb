@@ -25,60 +25,50 @@ RSpec.describe Elastic::ClusterReindexingService, :elastic do
 
     context 'stage: indexing' do
       it 'triggers reindexing' do
+        task = create(:reindexing_task, stage: :initial)
+
         allow(Gitlab::Elastic::Helper.default).to receive(:create_empty_index).and_return('new_index_name')
         allow(Gitlab::Elastic::Helper.default).to receive(:reindex).and_return('task_id')
 
-        job = subject.execute(stage: :indexing)
+        subject.execute(stage: :indexing)
 
-        expect(job[:index_name]).to eq('new_index_name')
-        expect(job[:task_id]).to eq('task_id')
+        task = task.reload
+        expect(task.index_name_to).to eq('new_index_name')
+        expect(task.elastic_task).to eq('task_id')
+        expect(task.reload.stage).to eq('indexing')
       end
     end
 
     context 'stage: final' do
       it 'raises and error when job is not started' do
-        expect { subject.execute(stage: :final) }.to raise_error(StandardError, /is not started/)
+        expect { subject.execute(stage: :final) }.to raise_error(StandardError, /performed after/)
       end
     end
   end
 
   context 'job is in progress' do
-    let(:job_info) do
-      {
-        old_index_name: 'old_index',
-        index_name: 'new_index',
-        documents_count: 10,
-        task_id: 'task_id'
-      }
-    end
-
     before do
-      allow(subject).to receive(:current_job).and_return(job_info)
       allow(Gitlab::Elastic::Helper.default).to receive(:task_status).and_return({ 'completed' => true })
       allow(Gitlab::Elastic::Helper.default).to receive(:refresh_index).and_return(true)
     end
 
-    context 'stage: initial' do
-      it 'raises an error when another job is active' do
-        expect { subject.execute }.to raise_error(StandardError, /another job/)
-      end
-    end
-
     context 'stage: final' do
+      let(:task) { create(:reindexing_task, stage: :final, documents_count: 10) }
+
       it 'raises an error if documents count is different' do
-        expect(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => 15 })
+        expect(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => task.documents_count * 2 })
 
         expect { subject.execute(stage: :final) }.to raise_error(StandardError, /count is different/)
       end
 
       it 'launches all stage steps' do
-        expect(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => 10 })
+        expect(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => task.documents_count })
         expect(Gitlab::Elastic::Helper.default).to receive(:update_settings)
         expect(Gitlab::Elastic::Helper.default).to receive(:switch_alias)
         expect(Gitlab::Elastic::Helper.default).to receive(:delete_index).twice
         expect(Gitlab::CurrentSettings).to receive(:update!).with(elasticsearch_pause_indexing: false)
 
-        subject.execute(stage: :final)
+        expect { subject.execute(stage: :final) }.to change { task.reload.stage.to_sym }.from(:final).to(:success)
       end
     end
   end

@@ -17,25 +17,31 @@ module Elastic
 
         initial_stage!
       when :indexing
+        check_stage_order!(allowed_stages: [:initial], current_stage: stage)
+
         indexing_stage!
       when :final
+        check_stage_order!(allowed_stages: [:indexing, :final], current_stage: stage)
+
         final_stage!
       end
     end
 
-    def current_job
-      with_redis do |redis|
-        body = redis.get(REDIS_KEY)
-
-        Gitlab::Json.parse(body).with_indifferent_access if body
-      end
+    def current_task
+      ReindexingTask.current
     end
 
     private
 
+    def check_stage_order!(allowed_stages:, current_stage:)
+      return if allowed_stages.map(&:to_s).include?(current_task&.stage)
+
+      raise StandardError, "#{current_stage} could only be performed after #{allowed_stages} stage(s)"
+    end
+
     def preflight_check!
       # Check that no other operation is in progress
-      if current_job
+      if current_task
         raise StandardError, 'There is another job in progress. Aborting'
       end
 
@@ -58,11 +64,15 @@ module Elastic
     end
 
     def initial_stage!
+      ReindexingTask.create!
+
       # Pause indexing
       Gitlab::CurrentSettings.update!(elasticsearch_pause_indexing: true)
     end
 
     def indexing_stage!
+      current_task.update!(stage: :indexing)
+
       # Create an index with custom settings
       index_name = elastic_helper.create_empty_index(with_alias: false, options: { settings: INDEX_OPTIONS })
 
@@ -72,82 +82,69 @@ module Elastic
       # Trigger reindex
       task_id = elastic_helper.reindex(to: index_name)
 
-      # Save job info
-      info = {
-        old_index_name: elastic_helper.target_index_name,
-        index_name: index_name,
+      current_task.update!(
+        index_name_from: elastic_helper.target_index_name,
+        index_name_to: index_name,
         documents_count: documents_count,
-        task_id: task_id
-      }
+        elastic_task: task_id
+      )
 
-      with_redis do |redis|
-        redis.set(REDIS_KEY, info.to_json)
-      end
-
-      info
+      true
     rescue StandardError => e
-      abort_indexing!(index_name)
+      abort_indexing!(e)
 
       raise e
     end
 
     def final_stage!
-      job_info = current_job
+      task = current_task
 
-      raise StandardError, "Indexing is not started" unless job_info
+      task.update!(stage: :final)
 
       # Check if indexing is completed
-      return false unless elastic_helper.task_status(task_id: job_info[:task_id])['completed']
+      return false unless elastic_helper.task_status(task_id: task.elastic_task)['completed']
 
       # Refresh a new index
-      elastic_helper.refresh_index(index_name: job_info[:index_name])
+      elastic_helper.refresh_index(index_name: task.index_name_to)
 
       # Compare documents count
-      old_documents_count = job_info[:documents_count]
-      new_documents_count = elastic_helper.index_size.dig('docs', 'count')
+      old_documents_count = task.documents_count
+      new_documents_count = elastic_helper.index_size(index_name: task.index_name_to).dig('docs', 'count')
       raise StandardError, "Documents count is different, #{new_documents_count} != #{old_documents_count}" if old_documents_count != new_documents_count
 
       # Change index settings back
-      elastic_helper.update_settings(index_name: job_info[:index_name], settings: default_index_options)
+      elastic_helper.update_settings(index_name: task.index_name_to, settings: default_index_options)
 
       # Switch alias to a new index
-      elastic_helper.switch_alias(to: job_info[:index_name])
+      elastic_helper.switch_alias(to: task.index_name_to)
 
       # Drop an old index
-      elastic_helper.delete_index(index_name: job_info[:old_index_name])
+      elastic_helper.delete_index(index_name: task.index_name_from)
 
       # Unpause indexing
       Gitlab::CurrentSettings.update!(elasticsearch_pause_indexing: false)
 
-      # Remove job info from redis
-      delete_current_job!
+      task.update!(stage: :success)
 
       true
     rescue StandardError => e
-      abort_indexing!(job_info.try(:[], :index_name))
+      abort_indexing!(e)
 
       raise e
     end
 
-    def abort_indexing!(index_name)
+    def abort_indexing!(exception)
+      current_task.update!(
+        stage: :failure,
+        error_message: "#{exception.class}: #{exception.message}"[0, 255]
+      )
+
       # Unpause indexing
       Gitlab::CurrentSettings.update!(elasticsearch_pause_indexing: false)
 
       # Remove index
+      index_name = current_task&.index_name_to
       elastic_helper.delete_index(index_name: index_name) if index_name
-
-      # Remove job info from redis
-      delete_current_job!
-    end
-
-    def delete_current_job!
-      with_redis do |redis|
-        redis.del(REDIS_KEY)
-      end
-    end
-
-    def with_redis(&blk)
-      Gitlab::Redis::SharedState.with(&blk) # rubocop:disable CodeReuse/ActiveRecord
     end
 
     def elastic_helper

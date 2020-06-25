@@ -113,15 +113,14 @@ module Gitlab
         client.cluster.stats['nodes']['fs']['free_in_bytes']
       end
 
-      def reindex(from: target_index_name, to:, wait_for_completion: false, script: {})
+      def reindex(from: target_index_name, to:, wait_for_completion: false)
         body = {
           source: {
             index: from
           },
           dest: {
             index: to
-          },
-          script: script
+          }
         }
 
         response = client.reindex(body: body, slices: 'auto', wait_for_completion: wait_for_completion)
