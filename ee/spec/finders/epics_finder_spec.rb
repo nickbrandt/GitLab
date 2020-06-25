@@ -308,11 +308,30 @@ RSpec.describe EpicsFinder do
           let_it_be(:public_group1) { create(:group, :public, parent: base_group) }
           let_it_be(:public_epic1) { create(:epic, group: public_group1) }
           let_it_be(:public_epic2) { create(:epic, :confidential, group: public_group1) }
+          let(:execute_params) { {} }
 
-          subject { described_class.new(search_user, group_id: base_group.id).execute }
+          subject { described_class.new(search_user, group_id: base_group.id).execute(execute_params) }
 
           it 'returns only public epics' do
             expect(subject).to match_array([base_epic2, public_epic1])
+          end
+
+          context 'when skip_visibility_check is true' do
+            let(:execute_params) { { skip_visibility_check: true } }
+
+            it 'returns all epics' do
+              expect(subject).to match_array([base_epic1, base_epic2, private_epic1, private_epic2, public_epic1, public_epic2])
+            end
+
+            context 'when skip_epic_count_visibility_check is disabled' do
+              before do
+                stub_feature_flags(skip_epic_count_visibility_check: false)
+              end
+
+              it 'returns only public epics' do
+                expect(subject).to match_array([base_epic2, public_epic1])
+              end
+            end
           end
 
           context 'when user is member of ancestor group' do
