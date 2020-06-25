@@ -1451,18 +1451,6 @@ running [Prometheus](../monitoring/prometheus/index.md) and
    ```ruby
    external_url 'http://gitlab.example.com'
 
-   # Enable Prometheus
-   prometheus['enable'] = true
-   prometheus['listen_address'] = '0.0.0.0:9090'
-   prometheus['monitor_kubernetes'] = false
-
-   # Enable Login form
-   grafana['disable_login_form'] = false
-
-   # Enable Grafana
-   grafana['enable'] = true
-   grafana['admin_password'] = 'toomanysecrets'
-
    # Disable all other services
    gitlab_rails['auto_migrate'] = false
    alertmanager['enable'] = false
@@ -1479,73 +1467,25 @@ running [Prometheus](../monitoring/prometheus/index.md) and
    unicorn['enable'] = false
    node_exporter['enable'] = false
    gitlab_exporter['enable'] = false
-   ```
 
-1. Prometheus also needs some scrape configs to pull all the data from the various
-   nodes where we configured exporters. Assuming that your nodes' IPs are:
+   # Enable Prometheus
+   prometheus['enable'] = true
+   prometheus['listen_address'] = '0.0.0.0:9090'
+   prometheus['monitor_kubernetes'] = false
 
-   ```plaintext
-   1.1.1.1: postgres
-   1.1.1.2: redis
-   1.1.1.3: gitaly1
-   1.1.1.4: rails1
-   1.1.1.5: rails2
-   ```
+   # Enable Login form
+   grafana['disable_login_form'] = false
 
-   Add the following to `/etc/gitlab/gitlab.rb`:
+   # Enable Grafana
+   grafana['enable'] = true
+   grafana['admin_password'] = '<grafana_password>'
 
-   ```ruby
-   prometheus['scrape_configs'] = [
-     {
-        'job_name': 'postgres',
-        'static_configs' => [
-        'targets' => ['1.1.1.1:9187'],
-        ],
-     },
-     {
-        'job_name': 'redis',
-        'static_configs' => [
-        'targets' => ['1.1.1.2:9121'],
-        ],
-     },
-     {
-        'job_name': 'gitaly',
-        'static_configs' => [
-        'targets' => ['1.1.1.3:9236'],
-        ],
-     },
-     {
-        'job_name': 'gitlab-nginx',
-        'static_configs' => [
-        'targets' => ['1.1.1.4:8060', '1.1.1.5:8060'],
-        ],
-     },
-     {
-        'job_name': 'gitlab-workhorse',
-        'static_configs' => [
-        'targets' => ['1.1.1.4:9229', '1.1.1.5:9229'],
-        ],
-     },
-     {
-        'job_name': 'gitlab-rails',
-        'metrics_path': '/-/metrics',
-        'static_configs' => [
-        'targets' => ['1.1.1.4:8080', '1.1.1.5:8080'],
-        ],
-     },
-     {
-        'job_name': 'gitlab-sidekiq',
-        'static_configs' => [
-        'targets' => ['1.1.1.4:8082', '1.1.1.5:8082'],
-        ],
-     },
-     {
-        'job_name': 'node',
-        'static_configs' => [
-        'targets' => ['1.1.1.1:9100', '1.1.1.2:9100', '1.1.1.3:9100', '1.1.1.4:9100', '1.1.1.5:9100'],
-        ],
-     },
-   ]
+   # Enable service discovery for Prometheus
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13)
+   }
    ```
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
