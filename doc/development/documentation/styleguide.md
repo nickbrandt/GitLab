@@ -1336,6 +1336,22 @@ a helpful link back to how the feature was developed.
   > - [Moved](<link-to-issue>) to GitLab Core in 12.0.
   ```
 
+- If a feature is deprecated, include a link to a replacement (when available):
+
+  ```markdown
+  > - [Deprecated](<link-to-issue>) in GitLab 11.3. Replaced by [meaningful text](<link-to-appropriate-documentation>).
+  ```
+
+   It's also acceptable to describe the replacement in surrounding text, if available.
+
+   If the deprecation is not obvious in existing text, you may want to include a warning such as:
+
+   ```markdown
+   CAUTION: **Warning:**
+   This feature was [deprecated](link-to-issue) in GitLab 12.3
+   and replaced by [Feature name](link-to-feature-documentation).
+   ```
+
 NOTE: **Note:**
 Version text must be on its own line and surrounded by blank lines to render correctly.
 
