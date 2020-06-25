@@ -1699,7 +1699,7 @@ class Project < ApplicationRecord
 
   def pages_url
     url = pages_group_url
-    url_path = full_path.partition('/').last
+    url_path = full_path.partition('/').last.downcase
 
     # If the project path is the same as host, we serve it as group page
     return url if url == "#{Settings.pages.protocol}://#{url_path}"
