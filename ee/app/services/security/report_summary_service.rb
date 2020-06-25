@@ -20,6 +20,8 @@ module Security
     private
 
     def summary_counts_for_report_type(report_type, summary_types)
+      return unless report_exists?(report_type)
+
       summary_types.each_with_object({}) do |summary_type, response|
         case summary_type
         when :vulnerabilities_count
@@ -45,6 +47,10 @@ module Security
       strong_memoize(:scanned_resources_counts) do
         ::Security::ScannedResourcesCountingService.new(@pipeline, requested_report_types(:scanned_resources_count)).execute
       end
+    end
+
+    def report_exists?(report_type)
+      @pipeline&.security_reports&.reports&.key?(report_type.to_s)
     end
   end
 end
