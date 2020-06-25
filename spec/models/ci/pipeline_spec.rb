@@ -1978,6 +1978,23 @@ RSpec.describe Ci::Pipeline, :mailer do
     end
   end
 
+  describe '.last_finished_for_ref_id' do
+    let(:project) { create(:project, :repository) }
+    let(:branch) { project.default_branch }
+    let(:ref) { project.ci_refs.take }
+    let(:config_source) { Ci::PipelineEnums.config_sources[:parameter_source] }
+    let!(:pipeline1) { create(:ci_pipeline, :success, project: project, ref: branch) }
+    let!(:pipeline2) { create(:ci_pipeline, :success, project: project, ref: branch) }
+    let!(:pipeline3) { create(:ci_pipeline, :failed, project: project, ref: branch) }
+    let!(:pipeline4) { create(:ci_pipeline, :success, project: project, ref: branch) }
+    let!(:pipeline5) { create(:ci_pipeline, :success, project: project, ref: branch, config_source: config_source) }
+
+    it 'returns the expected pipeline' do
+      result = described_class.last_finished_for_ref_id(ref.id)
+      expect(result).to eq(pipeline4)
+    end
+  end
+
   describe '.internal_sources' do
     subject { described_class.internal_sources }
 
