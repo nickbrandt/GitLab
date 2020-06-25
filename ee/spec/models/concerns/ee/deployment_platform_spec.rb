@@ -24,6 +24,7 @@ RSpec.describe EE::DeploymentPlatform do
         end
 
         it 'returns a kubernetes platform' do
+          is_expected.not_to eq(cluster.platform_kubernetes)
           is_expected.to be_kind_of(Clusters::Platforms::Kubernetes)
         end
       end
@@ -45,8 +46,8 @@ RSpec.describe EE::DeploymentPlatform do
           stub_licensed_features(multiple_clusters: false)
         end
 
-        it 'returns a kubernetes platform' do
-          is_expected.to be_kind_of(Clusters::Platforms::Kubernetes)
+        it 'returns default cluster' do
+          is_expected.to eq(default_cluster.platform_kubernetes)
         end
       end
     end
