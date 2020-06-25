@@ -50,7 +50,9 @@ class EpicsFinder < IssuableFinder
     Epic
   end
 
-  def execute
+  def execute(skip_visibility_check: false)
+    @skip_visibility_check = skip_visibility_check
+
     raise ArgumentError, 'group_id argument is missing' unless params[:group_id]
     return Epic.none unless Ability.allowed?(current_user, :read_epic, group)
 
@@ -194,6 +196,7 @@ class EpicsFinder < IssuableFinder
   end
 
   def can_read_all_epics_in_related_groups?(groups)
+    return true if skip_visibility_check?
     return false unless current_user
 
     # If a user is a member of a group, he also inherits access to all subgroups,
@@ -208,5 +211,9 @@ class EpicsFinder < IssuableFinder
     # - in that case top-level group is group's root parent
     parent = params.fetch(:include_ancestor_groups, false) ? groups.first.root_ancestor : group
     Ability.allowed?(current_user, :read_confidential_epic, parent)
+  end
+
+  def skip_visibility_check?
+    @skip_visibility_check && Feature.enabled?(:skip_epic_count_visibility_check, group, default_enabled: true)
   end
 end

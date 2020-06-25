@@ -19,17 +19,33 @@ RSpec.describe GroupsHelper do
   describe '#group_epics_count' do
     before do
       stub_licensed_features(epics: true)
-
-      create_list(:epic, 3, :opened, group: group)
-      create_list(:epic, 2, :closed, group: group)
     end
 
-    it 'returns open epics count' do
-      expect(helper.group_epics_count(state: 'opened')).to eq(3)
+    describe 'filtering by state' do
+      before do
+        create_list(:epic, 3, :opened, group: group)
+        create_list(:epic, 2, :closed, group: group)
+      end
+
+      it 'returns open epics count' do
+        expect(helper.group_epics_count(state: 'opened')).to eq(3)
+      end
+
+      it 'returns closed epics count' do
+        expect(helper.group_epics_count(state: 'closed')).to eq(2)
+      end
     end
 
-    it 'returns closed epics count' do
-      expect(helper.group_epics_count(state: 'closed')).to eq(2)
+    it 'counts also epics from subgroups not visible to user' do
+      parent_group = create(:group, :public)
+      subgroup = create(:group, :private, parent: parent_group)
+      create(:epic, :opened, group: parent_group)
+      create(:epic, :opened, group: subgroup)
+      helper.instance_variable_set(:@group, parent_group)
+
+      expect(Ability.allowed?(owner, :read_epic, parent_group)).to be_truthy
+      expect(Ability.allowed?(owner, :read_epic, subgroup)).to be_falsey
+      expect(helper.group_epics_count(state: 'opened')).to eq(2)
     end
   end
 
