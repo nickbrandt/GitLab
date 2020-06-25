@@ -7,7 +7,12 @@ module IncidentManagement
     queue_namespace :incident_management
     feature_category :incident_management
 
-    def perform(alert_id)
+    # `project_id` and `alert_payload` are deprecated and can be removed
+    # starting from 14.0 release
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/224500
+    def perform(_project_id = nil, _alert_payload = nil, alert_id = nil)
+      return unless alert_id
+
       alert = find_alert(alert_id)
       return unless alert
 
@@ -24,7 +29,7 @@ module IncidentManagement
     end
 
     def parsed_payload(alert)
-      Gitlab::Alerting::NotificationPayloadParser.call(alert.payload.to_h)
+      Gitlab::Alerting::NotificationPayloadParser.call(alert.payload.to_h, alert.project)
     end
 
     def create_issue_for(alert)
