@@ -106,8 +106,8 @@ RSpec.describe 'Admin::AuditLogs', :js do
       let_it_be(:audit_event_1) { create(:user_audit_event, created_at: 5.days.ago) }
       let_it_be(:audit_event_2) { create(:user_audit_event, created_at: 3.days.ago) }
       let_it_be(:audit_event_3) { create(:user_audit_event, created_at: 1.day.ago) }
-      let!(:events_path) { :admin_audit_logs_path }
-      let!(:entity) { nil }
+      let_it_be(:events_path) { :admin_audit_logs_path }
+      let_it_be(:entity) { nil }
 
       it_behaves_like 'audit events date filter'
     end
