@@ -1,0 +1,5 @@
+---
+title: Add Project.complianceFrameworks field to GraphQL schema
+merge_request: 34838
+author:
+type: added
