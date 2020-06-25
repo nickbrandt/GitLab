@@ -320,7 +320,9 @@ module Ci
     # ref - The ref to scope the data to (e.g. "master"). If the ref is not
     #       given we simply get the latest pipelines for the commits, regardless
     #       of what refs the pipelines belong to.
-    def self.latest_pipeline_per_commit(commits, ref = nil)
+    # project_key - Support `commits` from different projects, returns results
+    #       keyed by `hash[project_id][commit_id]`
+    def self.latest_pipeline_per_commit(commits, ref = nil, project_key: false)
       p1 = arel_table
       p2 = arel_table.alias
 
@@ -341,7 +343,13 @@ module Ci
       relation = relation.where(ref: ref) if ref
 
       relation.each_with_object({}) do |pipeline, hash|
-        hash[pipeline.sha] = pipeline
+        commits = if project_key
+                    hash[pipeline.project_id] ||= {}
+                  else
+                    hash
+                  end
+
+        commits[pipeline.sha] = pipeline
       end
     end
 

@@ -61,7 +61,7 @@ module Gitlab
         Note.elastic_search(query, options: opt)
       end
 
-      def commits(page: 1, per_page: DEFAULT_PER_PAGE)
+      def commits(page: 1, per_page: DEFAULT_PER_PAGE, preload_method: nil)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :download_code, project)
 
         if project.empty_repo? || query.blank?
@@ -72,7 +72,8 @@ module Gitlab
             project.repository.find_commits_by_message_with_elastic(
               query,
               page: (page || 1).to_i,
-              per_page: per_page
+              per_page: per_page,
+              preload_method: preload_method
             )
           else
             offset = per_page * ((page || 1) - 1)
