@@ -61,10 +61,10 @@ export default {
   <gl-card body-class="gl-py-0" header-class="gl-border-b-0">
     <template #header>
       <div class="row">
-        <div class="col-9">
+        <div class="col-7">
           <strong>{{ s__('SecurityReports|Scan details') }}</strong>
         </div>
-        <div v-if="localStorageUsable" class="col-3 gl-text-right">
+        <div v-if="localStorageUsable" class="col-5 gl-text-right">
           <gl-button
             v-collapse-toggle.security-reports-summary-details
             data-testid="collapse-button"
@@ -76,10 +76,10 @@ export default {
     </template>
     <gl-collapse id="security-reports-summary-details" v-model="isVisible" class="gl-pb-3">
       <div v-for="[scanType, scanSummary] in formattedSummary" :key="scanType" class="row gl-my-3">
-        <div class="col-2">
+        <div class="col-6 col-md-4 col-lg-2">
           {{ scanType }}
         </div>
-        <div class="col-10">
+        <div class="col-6 col-md-8 col-lg-10">
           <gl-sprintf
             :message="
               n__('%d vulnerability', '%d vulnerabilities', scanSummary.vulnerabilitiesCount)
