@@ -897,48 +897,6 @@ RSpec.describe GroupPolicy do
     end
   end
 
-  describe 'read_cluster_health' do
-    let(:current_user) { owner }
-
-    context 'when cluster is readable' do
-      context 'and cluster health is available' do
-        before do
-          stub_licensed_features(cluster_health: true)
-        end
-
-        it { is_expected.to be_allowed(:read_cluster_health) }
-      end
-
-      context 'and cluster health is unavailable' do
-        before do
-          stub_licensed_features(cluster_health: false)
-        end
-
-        it { is_expected.to be_disallowed(:read_cluster_health) }
-      end
-    end
-
-    context 'when cluster is not readable to user' do
-      let(:current_user) { build(:user) }
-
-      context 'when cluster health is available' do
-        before do
-          stub_licensed_features(cluster_health: true)
-        end
-
-        it { is_expected.to be_disallowed(:read_cluster_health) }
-      end
-
-      context 'when cluster health is unavailable' do
-        before do
-          stub_licensed_features(cluster_health: false)
-        end
-
-        it { is_expected.to be_disallowed(:read_cluster_health) }
-      end
-    end
-  end
-
   describe 'update_default_branch_protection' do
     context 'for an admin' do
       let(:current_user) { admin }

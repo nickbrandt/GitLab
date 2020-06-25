@@ -9,7 +9,6 @@ module EE
       prepended do
         before_action :expire_etag_cache, only: [:show]
         before_action :authorize_read_prometheus!, only: :prometheus_proxy
-        before_action :authorize_read_cluster_health!, only: [:metrics_dashboard]
       end
 
       def metrics
@@ -70,10 +69,6 @@ module EE
       end
 
       private
-
-      def authorize_read_cluster_health!
-        access_denied! unless can?(current_user, :read_cluster_health, cluster)
-      end
 
       def expire_etag_cache
         return if request.format.json? || !clusterable.environments_cluster_path(cluster)
