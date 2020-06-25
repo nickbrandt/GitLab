@@ -1002,11 +1002,20 @@ Note: **Note:** The token referred to throughout the Gitaly documentation is
 just an arbitrary password selected by the administrator. It is unrelated to
 tokens created for the GitLab API or other similar web API tokens.
 
-Below we describe how to configure one Gitaly server `gitaly1.internal` with
-secret token `gitalysecret`. We assume your GitLab installation has two
-repository storages: `default` and `storage1`.
+Below we describe how to configure two Gitaly servers, with IPs and
+domain names:
 
-To configure the Gitaly server:
+- `10.6.0.51`: Gitaly 1 (`gitaly1.internal`)
+- `10.6.0.52`: Gitaly 2 (`gitaly2.internal`)
+
+The secret token is assumed to be `gitalysecret` and that
+your GitLab installation has three repository storages:
+
+- `default` on Gitaly 1
+- `storage1` on Gitaly 1
+- `storage2` on Gitaly 2
+
+On each node:
 
 1. [Download/Install](https://about.gitlab.com/install/) the Omnibus GitLab
    package you want using **steps 1 and 2** from the GitLab downloads page but
@@ -1057,24 +1066,31 @@ To configure the Gitaly server:
    # firewalls to restrict access to this address/port.
    # Comment out following line if you only want to support TLS connections
    gitaly['listen_addr'] = "0.0.0.0:8075"
-   gitaly['prometheus_listen_addr'] = "0.0.0.0:9236"
-
-   # Set the network addresses that the exporters used for monitoring will listen on
-   node_exporter['listen_address'] = '0.0.0.0:9100'
    ```
 
-1. Append the following to `/etc/gitlab/gitlab.rb` on `gitaly1.internal`:
+1. Append the following to `/etc/gitlab/gitlab.rb` for each respective server:
+   1. On `gitaly1.internal`:
 
-   ```ruby
-   git_data_dirs({
-     'default' => {
-       'path' => '/var/opt/gitlab/git-data'
-     },
-     'storage1' => {
-       'path' => '/mnt/gitlab/git-data'
-     },
-   })
-   ```
+      ```ruby
+      git_data_dirs({
+        'default' => {
+          'path' => '/var/opt/gitlab/git-data'
+        },
+        'storage1' => {
+          'path' => '/mnt/gitlab/git-data'
+        },
+      })
+      ```
+
+   1. On `gitaly2.internal`:
+
+      ```ruby
+      git_data_dirs({
+        'storage2' => {
+          'path' => '/mnt/gitlab/git-data'
+        },
+      })
+      ```
 
    <!--
    updates to following example must also be made at
@@ -1242,7 +1258,7 @@ On each node perform the following:
    redis['master_name'] = 'gitlab-redis'
 
    ## The same password for Redis authentication you set up for the Redis primary node.
-   redis['master_password'] = 'redis-password-goes-here'
+   redis['master_password'] = '<redis_primary_password>'
 
    ## A list of sentinels with `host` and `port`
    gitlab_rails['redis_sentinels'] = [
@@ -1258,10 +1274,9 @@ On each node perform the following:
    puma['listen'] = '0.0.0.0'
 
    # Add the monitoring node's IP address to the monitoring whitelist and allow it to
-   # scrape the NGINX metrics. Replace placeholder `monitoring.gitlab.example.com` with
-   # the address and/or subnets gathered from the monitoring node
-   gitlab_rails['monitoring_whitelist'] = ['<MONITOR NODE IP>/32', '127.0.0.0/8']
-   nginx['status']['options']['allow'] = ['<MONITOR NODE IP>/32', '127.0.0.0/8']
+   # scrape the NGINX metrics
+   gitlab_rails['monitoring_whitelist'] = ['10.6.0.81/32', '127.0.0.0/8']
+   nginx['status']['options']['allow'] = ['10.6.0.81/32', '127.0.0.0/8']
 
    ## Uncomment and edit the following options if you have set up NFS
    ##
