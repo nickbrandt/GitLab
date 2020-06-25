@@ -74,6 +74,7 @@ class License < ApplicationRecord
     file_locks
     geo
     github_project_service_integration
+    generic_alert_fingerprinting
     group_allowed_email_domains
     group_ip_restriction
     group_project_templates
