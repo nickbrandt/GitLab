@@ -16,6 +16,8 @@ import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.
 
 const props = {
   dashboardDocumentation: '/help/docs',
+  notEnabledScannersHelpPath: '/help/docs/',
+  noPipelineRunScannersHelpPath: '/new/pipeline',
   emptyStateSvgPath: '/svgs/empty/svg',
   projectFullPath: '/group/project',
   securityDashboardHelpPath: '/security/dashboard/help-path',
@@ -60,13 +62,12 @@ describe('First class Project Security Dashboard component', () => {
       expect(findVulnerabilities().exists()).toBe(true);
     });
 
-    it('should pass down the %s prop to the vulnerabilities', () => {
-      expect(findVulnerabilities().props('dashboardDocumentation')).toBe(
-        props.dashboardDocumentation,
-      );
-      expect(findVulnerabilities().props('emptyStateSvgPath')).toBe(props.emptyStateSvgPath);
-      expect(findVulnerabilities().props('projectFullPath')).toBe(props.projectFullPath);
-    });
+    it.each(['dashboardDocumentation', 'emptyStateSvgPath', 'projectFullPath'])(
+      'should pass down the %s prop to the vulnerabilities',
+      propName => {
+        expect(findVulnerabilities().props(propName)).toBe(props[propName]);
+      },
+    );
 
     it('should render the filters component', () => {
       expect(findFilters().exists()).toBe(true);

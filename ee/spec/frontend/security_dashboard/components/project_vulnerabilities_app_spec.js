@@ -11,9 +11,11 @@ describe('Vulnerabilities app component', () => {
   };
 
   const createWrapper = ({ props = {}, $apollo = apolloMock } = {}, options = {}) => {
-    return shallowMount(ProjectVulnerabilitiesApp, {
+    wrapper = shallowMount(ProjectVulnerabilitiesApp, {
       propsData: {
         dashboardDocumentation: '#',
+        notEnabledScannersHelpPath: '#',
+        noPipelineRunScannersHelpPath: '#',
         emptyStateSvgPath: '#',
         projectFullPath: '#',
         ...props,
@@ -31,7 +33,7 @@ describe('Vulnerabilities app component', () => {
   const findVulnerabilityList = () => wrapper.find(VulnerabilityList);
 
   beforeEach(() => {
-    wrapper = createWrapper();
+    createWrapper();
   });
 
   afterEach(() => {
@@ -97,7 +99,7 @@ describe('Vulnerabilities app component', () => {
     });
   });
 
-  describe("when there's a loading error", () => {
+  describe("when there's an error loading vulnerabilities", () => {
     beforeEach(() => {
       createWrapper();
       wrapper.setData({ errorLoadingVulnerabilities: true });
@@ -105,6 +107,34 @@ describe('Vulnerabilities app component', () => {
 
     it('should render the alert', () => {
       expect(findAlert().exists()).toBe(true);
+    });
+  });
+
+  describe('security scanners', () => {
+    const notEnabledScannersHelpPath = '#not-enabled';
+    const noPipelineRunScannersHelpPath = '#no-pipeline';
+
+    beforeEach(() => {
+      createWrapper({
+        props: { notEnabledScannersHelpPath, noPipelineRunScannersHelpPath },
+      });
+    });
+
+    it('should pass the security scanners to the vulnerability list', () => {
+      const securityScanners = { enabled: ['SAST', 'DAST'], pipelineRun: ['SAST', 'DAST'] };
+
+      wrapper.setData({ securityScanners });
+
+      expect(findVulnerabilityList().props().securityScanners).toEqual(securityScanners);
+    });
+
+    it('should pass the help paths to the vulnerability list', () => {
+      expect(findVulnerabilityList().props()).toEqual(
+        expect.objectContaining({
+          notEnabledScannersHelpPath,
+          noPipelineRunScannersHelpPath,
+        }),
+      );
     });
   });
 });

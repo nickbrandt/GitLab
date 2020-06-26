@@ -47,17 +47,11 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
     });
 
     it('passes down isLoading correctly', () => {
-      expect(findVulnerabilities().props()).toEqual({
-        dashboardDocumentation,
-        emptyStateSvgPath,
-        filters: null,
-        isLoading: true,
-        shouldShowIdentifier: false,
-        shouldShowReportType: false,
-        shouldShowSelection: true,
-        shouldShowProjectNamespace: true,
-        vulnerabilities: [],
-      });
+      expect(findVulnerabilities().props()).toEqual(
+        expect.objectContaining({
+          isLoading: true,
+        }),
+      );
     });
   });
 
@@ -145,7 +139,10 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
         emptyStateSvgPath,
         filters: null,
         isLoading: false,
+        noPipelineRunScannersHelpPath: '',
+        notEnabledScannersHelpPath: '',
         shouldShowIdentifier: false,
+        securityScanners: {},
         shouldShowReportType: false,
         shouldShowSelection: true,
         shouldShowProjectNamespace: true,
