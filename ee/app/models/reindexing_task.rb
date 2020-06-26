@@ -11,26 +11,15 @@ class ReindexingTask < ApplicationRecord
     failure:  4
   }
 
-  scope :running, -> { where(stage: IN_PROGRESS_STAGES) }
-
-  validate :only_one_running_task_allowed
+  before_save :set_in_progress_flag
 
   def self.current
-    running.last
+    where(in_progress: true).last
   end
 
   private
 
-  def only_one_running_task_allowed
-    return unless IN_PROGRESS_STAGES.include?(stage)
-    return unless another_task_running?
-
-    errors.add(:stage, 'Another task is already running')
-  end
-
-  def another_task_running?
-    self.class.running
-              .id_not_in(self.id)
-              .exists?
+  def set_in_progress_flag
+    self.in_progress = IN_PROGRESS_STAGES.include?(stage)
   end
 end

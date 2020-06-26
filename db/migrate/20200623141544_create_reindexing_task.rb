@@ -12,6 +12,7 @@ class CreateReindexingTask < ActiveRecord::Migration[6.0]
       t.timestamps_with_timezone null: false
       t.integer :documents_count
       t.integer :stage, null: false, default: 0, limit: 2, index: true
+      t.boolean :in_progress, null: false, default: true
       t.text :index_name_from
       t.text :index_name_to
       t.text :elastic_task
@@ -22,6 +23,8 @@ class CreateReindexingTask < ActiveRecord::Migration[6.0]
     add_text_limit :reindexing_tasks, :index_name_to, 255
     add_text_limit :reindexing_tasks, :elastic_task, 255
     add_text_limit :reindexing_tasks, :error_message, 255
+
+    add_index :reindexing_tasks, :in_progress, unique: true, where: 'in_progress'
   end
 
   def down

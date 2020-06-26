@@ -2,8 +2,6 @@
 
 module Elastic
   class ClusterReindexingService
-    REDIS_KEY = 'elastic:cluster_reindexing_service:job'
-
     INDEX_OPTIONS = {
         refresh_interval: -1, # Disable automatic refreshing
         number_of_replicas: 0,

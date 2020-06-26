@@ -14535,6 +14535,7 @@ CREATE TABLE public.reindexing_tasks (
     updated_at timestamp with time zone NOT NULL,
     documents_count integer,
     stage smallint DEFAULT 0 NOT NULL,
+    in_progress boolean DEFAULT true NOT NULL,
     index_name_from text,
     index_name_to text,
     elastic_task text,
@@ -19874,6 +19875,8 @@ CREATE UNIQUE INDEX index_redirect_routes_on_path ON public.redirect_routes USIN
 CREATE UNIQUE INDEX index_redirect_routes_on_path_unique_text_pattern_ops ON public.redirect_routes USING btree (lower((path)::text) varchar_pattern_ops);
 
 CREATE INDEX index_redirect_routes_on_source_type_and_source_id ON public.redirect_routes USING btree (source_type, source_id);
+
+CREATE UNIQUE INDEX index_reindexing_tasks_on_in_progress ON public.reindexing_tasks USING btree (in_progress) WHERE in_progress;
 
 CREATE INDEX index_reindexing_tasks_on_stage ON public.reindexing_tasks USING btree (stage);
 
