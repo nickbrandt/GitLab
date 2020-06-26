@@ -228,6 +228,22 @@ RSpec.describe EpicsFinder do
           end
         end
 
+        context 'by confidential' do
+          let_it_be(:confidential_epic) { create(:epic, :confidential, group: group) }
+
+          it 'returns only confdential epics when confidential is true' do
+            params = { confidential: true }
+
+            expect(epics(params)).to contain_exactly(confidential_epic)
+          end
+
+          it 'does not include confidential epics when confidential is false' do
+            params = { confidential: false }
+
+            expect(epics(params)).not_to include(confidential_epic)
+          end
+        end
+
         context 'by iids' do
           let_it_be(:subgroup) { create(:group, :private, parent: group) }
           let_it_be(:subepic1) { create(:epic, group: subgroup, iid: epic1.iid) }

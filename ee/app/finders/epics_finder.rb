@@ -19,6 +19,7 @@
 #   include_ancestor_groups: boolean
 #   include_descendant_groups: boolean
 #   starts_with_iid: string (containing a number)
+#   confidential: boolean
 
 class EpicsFinder < IssuableFinder
   include TimeFrameFilter
@@ -114,6 +115,7 @@ class EpicsFinder < IssuableFinder
     items = by_parent(items)
     items = by_iids(items)
     items = by_my_reaction_emoji(items)
+    items = by_confidential(items)
 
     starts_with_iid(items)
   end
@@ -220,5 +222,11 @@ class EpicsFinder < IssuableFinder
 
   def skip_visibility_check?
     @skip_visibility_check && Feature.enabled?(:skip_epic_count_visibility_check, group, default_enabled: true)
+  end
+
+  def by_confidential(items)
+    return items if params[:confidential].nil?
+
+    params[:confidential] ? items.confidential : items.public_only
   end
 end
