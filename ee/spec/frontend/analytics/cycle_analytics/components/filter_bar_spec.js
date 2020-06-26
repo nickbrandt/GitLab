@@ -1,7 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { GlFilteredSearch } from '@gitlab/ui';
-import FilterBar from 'ee/analytics/cycle_analytics/components/filter_bar.vue';
+import FilterBar, { prepareTokens } from 'ee/analytics/cycle_analytics/components/filter_bar.vue';
 import initialFiltersState from 'ee/analytics/cycle_analytics/store/modules/filters/state';
 import { filterMilestones, filterLabels } from '../mock_data';
 
@@ -57,11 +57,15 @@ describe('Filter bar', () => {
       .props('availableTokens')
       .filter(token => token.type === type)[0];
 
-  it('renders GlFilteredSearch component', () => {
-    store = createStore();
-    wrapper = createComponent(store);
+  describe('default', () => {
+    beforeEach(() => {
+      store = createStore();
+      wrapper = createComponent(store);
+    });
 
-    expect(findFilteredSearch().exists()).toBe(true);
+    it('renders GlFilteredSearch component', () => {
+      expect(findFilteredSearch().exists()).toBe(true);
+    });
   });
 
   describe('when the state has data', () => {
@@ -174,6 +178,29 @@ describe('Filter bar', () => {
         },
         undefined,
       );
+    });
+  });
+
+  describe('prepareTokens', () => {
+    describe('with empty data', () => {
+      it('returns an empty array', () => {
+        expect(prepareTokens()).toEqual([]);
+        expect(prepareTokens({})).toEqual([]);
+        expect(prepareTokens({ milestone: null, author: null, assignees: [], labels: [] })).toEqual(
+          [],
+        );
+      });
+    });
+
+    it.each`
+      token          | value                     | result
+      ${'milestone'} | ${'v1.0'}                 | ${[{ type: 'milestone', value: { data: 'v1.0' } }]}
+      ${'author'}    | ${'mr.popo'}              | ${[{ type: 'author', value: { data: 'mr.popo' } }]}
+      ${'labels'}    | ${['z-fighters']}         | ${[{ type: 'labels', value: { data: 'z-fighters' } }]}
+      ${'assignees'} | ${['krillin', 'piccolo']} | ${[{ type: 'assignees', value: { data: 'krillin' } }, { type: 'assignees', value: { data: 'piccolo' } }]}
+    `('with $token=$value sets the $token key', ({ token, value, result }) => {
+      const res = prepareTokens({ [token]: value });
+      expect(res).toEqual(result);
     });
   });
 });

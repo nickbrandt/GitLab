@@ -2,7 +2,6 @@
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
@@ -40,7 +39,7 @@ export default {
     MetricCard,
     FilterBar,
   },
-  mixins: [glFeatureFlagsMixin(), UrlSyncMixin],
+  mixins: [UrlSyncMixin],
   props: {
     emptyStateSvgPath: {
       type: String,
@@ -58,14 +57,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    milestonesPath: {
-      type: String,
-      required: true,
-    },
-    labelsPath: {
-      type: String,
-      required: true,
-    },
   },
   computed: {
     ...mapState([
@@ -76,6 +67,10 @@ export default {
       'selectedGroup',
       'selectedProjects',
       'selectedStage',
+      'selectedMilestone',
+      'selectedAuthor',
+      'selectedLabels',
+      'selectedAssignees',
       'stages',
       'summary',
       'currentStageEvents',
@@ -110,7 +105,12 @@ export default {
       return !this.hasNoAccessError && !this.isLoading;
     },
     shouldDsiplayPathNavigation() {
-      return this.featureFlags.hasPathNavigation && !this.hasNoAccessError;
+      return this.featureFlags.hasPathNavigation && !this.hasNoAccessError && this.selectedStage;
+    },
+    shouldDisplayFilterBar() {
+      // TODO: After we remove instance VSA currentGroupPath will be always set
+      // https://gitlab.com/gitlab-org/gitlab/-/issues/223735
+      return this.featureFlags.hasFilterBar && this.currentGroupPath;
     },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
@@ -124,6 +124,10 @@ export default {
         'project_ids[]': this.selectedProjectIds,
         created_after: toYmd(this.startDate),
         created_before: toYmd(this.endDate),
+        milestone_title: this.selectedMilestone,
+        author_username: this.selectedAuthor,
+        'label_name[]': this.selectedLabels,
+        'assignee_username[]': this.selectedAssignees,
       };
     },
     stageCount() {
@@ -133,27 +137,7 @@ export default {
       return this.selectedProjectIds.length > 0;
     },
   },
-  mounted() {
-    const {
-      labelsPath,
-      milestonesPath,
-      glFeatures: {
-        cycleAnalyticsScatterplotEnabled: hasDurationChart,
-        cycleAnalyticsScatterplotMedianEnabled: hasDurationChartMedian,
-        valueStreamAnalyticsPathNavigation: hasPathNavigation,
-        valueStreamAnalyticsFilterBar: hasFilterBar,
-      },
-    } = this;
 
-    this.setFeatureFlags({
-      hasDurationChart,
-      hasDurationChartMedian,
-      hasPathNavigation,
-      hasFilterBar,
-    });
-
-    this.setPaths({ labelsPath, milestonesPath });
-  },
   methods: {
     ...mapActions([
       'fetchCycleAnalyticsData',
@@ -164,9 +148,9 @@ export default {
       'setDateRange',
       'updateStage',
       'removeStage',
-      'setFeatureFlags',
       'updateStage',
       'reorderStage',
+      'setSelectedFilters',
     ]),
     ...mapActions('customStages', [
       'hideForm',
@@ -175,7 +159,6 @@ export default {
       'createStage',
       'clearFormErrors',
     ]),
-    ...mapActions('filters', ['setPaths']),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
@@ -264,7 +247,7 @@ export default {
             />
           </div>
           <filter-bar
-            v-if="featureFlags.hasFilterBar"
+            v-if="shouldDisplayFilterBar"
             class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3"
             :disabled="!hasProject"
           />

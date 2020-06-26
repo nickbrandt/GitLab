@@ -30,12 +30,15 @@ export default {
       return this.config.labels;
     },
     filteredLabels() {
-      return this.labels
-        .filter(label => label.title.toLowerCase().indexOf(this.value.data?.toLowerCase()) !== -1)
-        .map(label => ({
-          ...label,
-          value: this.getEscapedText(label.title),
-        }));
+      const labelsList = this.labels.map(label => ({
+        ...label,
+        value: this.getEscapedText(label.title),
+      }));
+      return this.value?.data
+        ? labelsList.filter(
+            label => label.title.toLowerCase().indexOf(this.value.data?.toLowerCase()) !== -1,
+          )
+        : labelsList;
     },
   },
   methods: {

@@ -6,18 +6,20 @@ import { parseBoolean } from '~/lib/utils/common_utils';
 
 export default () => {
   const el = document.querySelector('#js-cycle-analytics-app');
-  const {
-    emptyStateSvgPath,
-    noDataSvgPath,
-    noAccessSvgPath,
-    hideGroupDropDown,
-    milestonesPath = '',
-    labelsPath = '',
-  } = el.dataset;
-
+  const { emptyStateSvgPath, noDataSvgPath, noAccessSvgPath, hideGroupDropDown } = el.dataset;
   const initialData = buildCycleAnalyticsInitialData(el.dataset);
   const store = createStore();
-  store.dispatch('initializeCycleAnalytics', initialData);
+  const {
+    cycleAnalyticsScatterplotEnabled: hasDurationChart = false,
+    cycleAnalyticsScatterplotMedianEnabled: hasDurationChartMedian = false,
+    valueStreamAnalyticsPathNavigation: hasPathNavigation = false,
+    valueStreamAnalyticsFilterBar: hasFilterBar = false,
+  } = gon?.features;
+
+  store.dispatch('initializeCycleAnalytics', {
+    ...initialData,
+    featureFlags: { hasDurationChart, hasDurationChartMedian, hasPathNavigation, hasFilterBar },
+  });
 
   return new Vue({
     el,
@@ -30,8 +32,6 @@ export default () => {
           noDataSvgPath,
           noAccessSvgPath,
           hideGroupDropDown: parseBoolean(hideGroupDropDown),
-          milestonesPath,
-          labelsPath,
         },
       }),
   });
