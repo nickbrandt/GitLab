@@ -99,9 +99,9 @@ function get_pod() {
   local namespace="${KUBE_NAMESPACE}"
   local release="${CI_ENVIRONMENT_SLUG}"
   local app_name="${1}"
-  local status2="${2-Running}"
+  local status="${2-Running}"
 
-  get_pod_cmd="kubectl get pods --namespace ${namespace} --field-selector=status.phase=${status2} -lapp=${app_name},release=${release} --no-headers -o=custom-columns=NAME:.metadata.name | tail -n 1"
+  get_pod_cmd="kubectl get pods --namespace ${namespace} --field-selector=status.phase=${status} -lapp=${app_name},release=${release} --no-headers -o=custom-columns=NAME:.metadata.name | tail -n 1"
   echoinfo "Waiting till '${app_name}' pod is ready" true
   echoinfo "Running '${get_pod_cmd}'"
 
@@ -147,7 +147,7 @@ function disable_sign_ups() {
   run_task "${ruby_cmd}"
 
   # Disable sign-ups
-  curl --request PUT --header "PRIVATE-TOKEN: ${REVIEW_APPS_ROOT_TOKEN}" "${CI_ENVIRONMENT_URL}/api/v4/application/settings?signup_enabled=false"
+  curl  --silent --show-error --request PUT --header "PRIVATE-TOKEN: ${REVIEW_APPS_ROOT_TOKEN}" "${CI_ENVIRONMENT_URL}/api/v4/application/settings?signup_enabled=false"
 
   local signup_enabled=$(curl --silent --show-error --request GET --header "PRIVATE-TOKEN: ${REVIEW_APPS_ROOT_TOKEN}" "${CI_ENVIRONMENT_URL}/api/v4/application/settings" | jq ".signup_enabled")
   if [[ "${signup_enabled}" == "false" ]]; then
@@ -213,6 +213,9 @@ function install_external_dns() {
   fi
 }
 
+# This script is used to install cert-manager in the cluster
+# The installation steps are documented in
+# https://gitlab.com/gitlab-org/quality/team-tasks/snippets/1990286
 function install_certmanager() {
   local namespace="${KUBE_NAMESPACE}"
   local release="cert-manager-review-app-helm3"

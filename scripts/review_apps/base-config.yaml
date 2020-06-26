@@ -92,7 +92,6 @@ gitlab:
         periodSeconds: 15  # Default is 10
         timeoutSeconds: 5  # Default is 2
 gitlab-runner:
-  install: false
   resources:
     requests:
       cpu: 675m
