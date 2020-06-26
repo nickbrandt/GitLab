@@ -118,24 +118,13 @@ FactoryBot.define do
   end
 
   factory :composer_metadatum, class: 'Packages::Composer::Metadatum' do
-    package { create(:composer_package) }
-
-    target_sha { '123' }
-    composer_json { { name: 'foo' } }
   end
 
   factory :package_build_info, class: 'Packages::BuildInfo' do
-    package
   end
 
   factory :package_file, class: 'Packages::PackageFile' do
     package
-
-    file { fixture_file_upload('spec/fixtures/packages/conan/recipe_files/conanfile.py') }
-    file_name { 'conanfile.py' }
-    file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
-    file_md5 { '12345abcde' }
-    size { 400.kilobytes }
 
     factory :conan_package_file do
       package { create(:conan_package, without_package_files: true) }
@@ -308,7 +297,6 @@ FactoryBot.define do
   factory :conan_file_metadatum, class: 'Packages::Conan::FileMetadatum' do
     package_file { create(:conan_package_file, :conan_recipe_file, without_loaded_metadatum: true) }
     recipe_revision { '0' }
-    conan_file_type { 'recipe_file' }
 
     trait(:recipe_file) do
       conan_file_type { 'recipe_file' }
@@ -328,7 +316,7 @@ FactoryBot.define do
   end
 
   factory :packages_dependency_link, class: 'Packages::DependencyLink' do
-    package { create(:nuget_package) }
+    package
     dependency { create(:packages_dependency) }
     dependency_type { :dependencies }
 
@@ -340,7 +328,6 @@ FactoryBot.define do
   end
 
   factory :nuget_dependency_link_metadatum, class: 'Packages::Nuget::DependencyLinkMetadatum' do
-    dependency_link { create(:packages_dependency_link) }
     target_framework { '.NETStandard2.0' }
   end
 
