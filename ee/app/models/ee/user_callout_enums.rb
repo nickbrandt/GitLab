@@ -7,6 +7,8 @@ module EE
     class_methods do
       extend ::Gitlab::Utils::Override
 
+      # If you are going to add new items to this hash, check that you're not going
+      # to conflict with FOSS-only values: https://gitlab.com/gitlab-org/gitlab/blob/master/app/models/user_callout_enums.rb
       override :feature_names
       def feature_names
         super.merge(
