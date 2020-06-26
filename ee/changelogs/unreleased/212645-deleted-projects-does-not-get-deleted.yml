@@ -1,0 +1,5 @@
+---
+title: Remove spacing interval between soft deleted projects
+merge_request: 35046
+author:
+type: fixed
