@@ -8,19 +8,15 @@ module Elastic
         translog: { durability: 'async' }
     }.freeze
 
-    def execute(stage: :initial)
-      case stage.to_sym
+    def execute
+      case current_task.stage.to_sym
       when :initial
         preflight_check!
 
         initial_stage!
       when :indexing
-        check_stage_order!(allowed_stages: [:initial], current_stage: stage)
-
         indexing_stage!
       when :final
-        check_stage_order!(allowed_stages: [:indexing, :final], current_stage: stage)
-
         final_stage!
       end
     end
@@ -31,18 +27,7 @@ module Elastic
 
     private
 
-    def check_stage_order!(allowed_stages:, current_stage:)
-      return if allowed_stages.map(&:to_s).include?(current_task&.stage)
-
-      raise StandardError, "#{current_stage} could only be performed after #{allowed_stages} stage(s)"
-    end
-
     def preflight_check!
-      # Check that no other operation is in progress
-      if current_task
-        raise StandardError, 'There is another job in progress. Aborting'
-      end
-
       unless elastic_helper.alias_exists?
         raise StandardError, 'You should use aliases feature to be able to perform this operation'
       end
@@ -62,15 +47,15 @@ module Elastic
     end
 
     def initial_stage!
-      ReindexingTask.create!
-
       # Pause indexing
       Gitlab::CurrentSettings.update!(elasticsearch_pause_indexing: true)
+
+      current_task.update!(stage: :indexing)
+
+      true
     end
 
     def indexing_stage!
-      current_task.update!(stage: :indexing)
-
       # Create an index with custom settings
       index_name = elastic_helper.create_empty_index(with_alias: false, options: { settings: INDEX_OPTIONS })
 
@@ -84,7 +69,8 @@ module Elastic
         index_name_from: elastic_helper.target_index_name,
         index_name_to: index_name,
         documents_count: documents_count,
-        elastic_task: task_id
+        elastic_task: task_id,
+        stage: :final
       )
 
       true
@@ -96,8 +82,6 @@ module Elastic
 
     def final_stage!
       task = current_task
-
-      task.update!(stage: :final)
 
       # Check if indexing is completed
       return false unless elastic_helper.task_status(task_id: task.elastic_task)['completed']

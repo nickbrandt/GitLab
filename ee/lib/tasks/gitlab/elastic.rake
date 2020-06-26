@@ -78,7 +78,7 @@ namespace :gitlab do
 
     desc "GitLab | Elasticsearch | Zero-downtime cluster reindexing"
     task reindex_cluster: :environment do
-      ElasticClusterReindexingWorker.perform_async
+      ReindexingTask.create!
 
       puts "Reindexing job was successfully scheduled".color(:green)
     end
