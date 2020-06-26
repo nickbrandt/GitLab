@@ -32,6 +32,7 @@ describe('first class instance security dashboard empty state', () => {
 
   it('contains a GlEmptyState', () => {
     expect(findGlEmptyState().exists()).toBe(true);
+    expect(findGlEmptyState().props()).toMatchObject({ svgPath });
   });
 
   it('contains a GlLink with href attribute equal to dashboardDocumentation', () => {
