@@ -840,7 +840,9 @@ The following IPs will be used as an example:
 - `10.6.0.22`: PgBouncer 2
 - `10.6.0.23`: PgBouncer 3
 
-1. On each PgBouncer node, edit `/etc/gitlab/gitlab.rb`:
+1. On each PgBouncer node, edit `/etc/gitlab/gitlab.rb`, and replace
+   `<consul_password_hash>` and `<pgbouncer_password_hash>` with the
+   password hashes you [set up previously](#postgresql-primary-node):
 
    ```ruby
    # Disable all components except Pgbouncer and Consul agent
@@ -920,7 +922,7 @@ The following IPs will be used as an example:
   </a>
 </div>
 
-## Configure the internal load balancing node
+## Configure the internal load balancer
 
 If you're running more than one PgBouncer node as recommended, then at this time you'll need to set
 up a TCP internal load balancer to serve each correctly.
@@ -1310,7 +1312,7 @@ On each node perform the following:
 1. Create/edit `/etc/gitlab/gitlab.rb` and use the following configuration.
    To maintain uniformity of links across nodes, the `external_url`
    on the application server should point to the external URL that users will use
-   to access GitLab. This would be the URL of the [load balancer](#configure-the-load-balancer)
+   to access GitLab. This would be the URL of the [external load balancer](#configure-the-external-load-balancer)
    which will route traffic to the GitLab application server:
 
    ```ruby
