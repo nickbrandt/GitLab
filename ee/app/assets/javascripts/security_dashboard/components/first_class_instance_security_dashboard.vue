@@ -128,13 +128,12 @@ export default {
       :empty-state-svg-path="emptyStateSvgPath"
       :filters="filters"
     />
-    <div v-else-if="shouldShowEmptyState">
-      <dashboard-not-configured
-        :svg-path="emptyStateSvgPath"
-        :dashboard-documentation="dashboardDocumentation"
-        @handleAddProjectsClick="toggleProjectSelector"
-      />
-    </div>
+    <dashboard-not-configured
+      v-else-if="shouldShowEmptyState"
+      :svg-path="emptyStateSvgPath"
+      :dashboard-documentation="dashboardDocumentation"
+      @handleAddProjectsClick="toggleProjectSelector"
+    />
     <div v-else class="d-flex justify-content-center">
       <project-manager
         v-if="showProjectSelector"
