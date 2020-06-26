@@ -146,6 +146,12 @@ RSpec.describe API::MergeRequestApprovalRules do
     let(:approver) { create(:user) }
     let(:group) { create(:group) }
     let(:approval_project_rule_id) { nil }
+    let(:approver_params) do
+      {
+        user_ids: user_ids,
+        group_ids: group_ids
+      }
+    end
     let(:user_ids) { [] }
     let(:group_ids) { [] }
 
@@ -153,10 +159,8 @@ RSpec.describe API::MergeRequestApprovalRules do
       {
         name: 'Test',
         approvals_required: 1,
-        approval_project_rule_id: approval_project_rule_id,
-        user_ids: user_ids,
-        group_ids: group_ids
-      }
+        approval_project_rule_id: approval_project_rule_id
+      }.merge(approver_params)
     end
 
     let(:action) { post api(url, current_user), params: params }
@@ -222,15 +226,32 @@ RSpec.describe API::MergeRequestApprovalRules do
 
         let(:approval_project_rule_id) { approval_project_rule.id }
 
-        it 'copies the attributes from the project rule execpt approvals_required' do
-          rule = json_response
+        context 'with blank approver params' do
+          it 'copies the attributes from the project rule except approvers' do
+            rule = json_response
 
-          expect(rule['name']).to eq(approval_project_rule.name)
-          expect(rule['approvals_required']).to eq(params[:approvals_required])
-          expect(rule['source_rule']['approvals_required']).to eq(approval_project_rule.approvals_required)
-          expect(rule['eligible_approvers']).to match([hash_including('id' => approver.id)])
-          expect(rule['users']).to match([hash_including('id' => approver.id)])
-          expect(rule['groups']).to match([hash_including('id' => group.id)])
+            expect(rule['name']).to eq(approval_project_rule.name)
+            expect(rule['approvals_required']).to eq(params[:approvals_required])
+            expect(rule['source_rule']['approvals_required']).to eq(approval_project_rule.approvals_required)
+            expect(rule['eligible_approvers']).to eq([])
+            expect(rule['users']).to eq([])
+            expect(rule['groups']).to eq([])
+          end
+        end
+
+        context 'with omitted approver params' do
+          let(:approver_params) { {} }
+
+          it 'copies the attributes from the project rule except approvals_required' do
+            rule = json_response
+
+            expect(rule['name']).to eq(approval_project_rule.name)
+            expect(rule['approvals_required']).to eq(params[:approvals_required])
+            expect(rule['source_rule']['approvals_required']).to eq(approval_project_rule.approvals_required)
+            expect(rule['eligible_approvers']).to match([hash_including('id' => approver.id)])
+            expect(rule['users']).to match([hash_including('id' => approver.id)])
+            expect(rule['groups']).to match([hash_including('id' => group.id)])
+          end
         end
       end
     end
