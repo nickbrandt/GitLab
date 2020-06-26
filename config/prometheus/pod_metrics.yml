@@ -1,5 +1,14 @@
 dashboard: 'Pod metrics'
 priority: 10
+
+templating:
+  variables:
+    pod_name:
+      type: metric_label_values
+      options:
+        series_selector: 'container_cpu_usage_seconds_total'
+        label: 'pod_name'
+
 panel_groups:
 - group: CPU metrics
   panels:

@@ -44,6 +44,12 @@ RSpec.describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store
       it_behaves_like 'valid dashboard service response'
     end
 
+    context 'when the pod metrics dashboard is specified' do
+      let(:dashboard_path) { pod_dashboard_path }
+
+      it_behaves_like 'valid dashboard service response'
+    end
+
     context 'when the self monitoring dashboard is specified' do
       let(:dashboard_path) { self_monitoring_dashboard_path }
 
@@ -143,9 +149,10 @@ RSpec.describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store
   describe '.find_all_paths' do
     let(:all_dashboard_paths) { described_class.find_all_paths(project) }
     let(:system_dashboard) { { path: system_dashboard_path, display_name: 'Default dashboard', default: true, system_dashboard: true } }
+    let(:pod_dashboard) { { path: pod_dashboard_path, display_name: 'Pod Health', default: false, system_dashboard: false } }
 
     it 'includes only the system dashboard by default' do
-      expect(all_dashboard_paths).to eq([system_dashboard])
+      expect(all_dashboard_paths).to eq([system_dashboard, pod_dashboard])
     end
 
     context 'when the project contains dashboards' do
@@ -155,7 +162,7 @@ RSpec.describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store
       it 'includes system and project dashboards' do
         project_dashboard = { path: dashboard_path, display_name: 'test.yml', default: false, system_dashboard: false }
 
-        expect(all_dashboard_paths).to contain_exactly(system_dashboard, project_dashboard)
+        expect(all_dashboard_paths).to contain_exactly(system_dashboard, pod_dashboard, project_dashboard)
       end
     end
 
