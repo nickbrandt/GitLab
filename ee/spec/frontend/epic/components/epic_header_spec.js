@@ -70,7 +70,7 @@ describe('EpicHeaderComponent', () => {
         vm.$store.state.state = statusType.open;
 
         expect(vm.actionButtonClass).toBe(
-          'btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button btn-close',
+          'js-btn-epic-action qa-close-reopen-epic-button btn-close',
         );
       });
 
@@ -78,7 +78,7 @@ describe('EpicHeaderComponent', () => {
         vm.$store.state.state = statusType.close;
 
         expect(vm.actionButtonClass).toBe(
-          'btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button btn-open',
+          'js-btn-epic-action qa-close-reopen-epic-button btn-open',
         );
       });
     });
