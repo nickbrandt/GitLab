@@ -58,6 +58,7 @@ module EE
         mount ::API::VisualReviewDiscussions
         mount ::API::Analytics::CodeReviewAnalytics
         mount ::API::Analytics::GroupActivityAnalytics
+        mount ::API::Analytics::Reports
         mount ::API::ProtectedEnvironments
         mount ::API::ResourceWeightEvents
 
