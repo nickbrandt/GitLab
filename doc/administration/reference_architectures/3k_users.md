@@ -922,7 +922,7 @@ The following IPs will be used as an example:
   </a>
 </div>
 
-## Configure the internal load balancer
+### Configure the internal load balancer
 
 If you're running more than one PgBouncer node as recommended, then at this time you'll need to set
 up a TCP internal load balancer to serve each correctly.
