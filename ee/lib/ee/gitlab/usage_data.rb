@@ -98,8 +98,6 @@ module EE
 
         # rubocop: disable CodeReuse/ActiveRecord
         def service_desk_counts
-          return {} unless ::License.feature_available?(:service_desk)
-
           projects_with_service_desk = ::Project.where(service_desk_enabled: true)
 
           {

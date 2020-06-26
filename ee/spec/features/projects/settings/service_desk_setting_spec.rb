@@ -12,7 +12,6 @@ RSpec.describe 'Service Desk Setting', :js do
     sign_in(user)
 
     allow_any_instance_of(Project).to receive(:present).with(current_user: user).and_return(presenter)
-    allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).with(project: presenter).and_return(true)
     allow(::Gitlab::IncomingEmail).to receive(:enabled?) { true }
     allow(::Gitlab::IncomingEmail).to receive(:supports_wildcard?) { true }
 

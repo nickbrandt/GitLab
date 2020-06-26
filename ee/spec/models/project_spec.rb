@@ -1158,26 +1158,6 @@ RSpec.describe Project do
       expect(project.service_desk_enabled?).to be_truthy
       expect(project.service_desk_enabled).to be_truthy
     end
-
-    context 'namespace plans active' do
-      before do
-        stub_application_setting(check_namespace_plan: true)
-      end
-
-      it 'is disabled' do
-        expect(project.service_desk_enabled?).to be_falsy
-        expect(project.service_desk_enabled).to be_falsy
-      end
-
-      context 'Service Desk available in namespace plan' do
-        let!(:gitlab_subscription) { create(:gitlab_subscription, :silver, namespace: namespace) }
-
-        it 'is enabled' do
-          expect(project.service_desk_enabled?).to be_truthy
-          expect(project.service_desk_enabled).to be_truthy
-        end
-      end
-    end
   end
 
   describe '#service_desk_address' do
@@ -1543,7 +1523,7 @@ RSpec.describe Project do
       allow(global_license).to receive(:features).and_return([
         :subepics, # Gold only
         :epics, # Silver and up
-        :service_desk, # Silver and up
+        :push_rules, # Silver and up
         :audit_events, # Bronze and up
         :geo # Global feature, should not be checked at namespace level
       ])
@@ -1560,7 +1540,7 @@ RSpec.describe Project do
         let(:plan_license) { :bronze }
 
         it 'filters for bronze features' do
-          is_expected.to contain_exactly(:audit_events, :geo, :service_desk)
+          is_expected.to contain_exactly(:audit_events, :geo, :push_rules)
         end
       end
 
@@ -1568,7 +1548,7 @@ RSpec.describe Project do
         let(:plan_license) { :silver }
 
         it 'filters for silver features' do
-          is_expected.to contain_exactly(:service_desk, :audit_events, :geo, :epics)
+          is_expected.to contain_exactly(:push_rules, :audit_events, :geo, :epics)
         end
       end
 
@@ -1576,7 +1556,7 @@ RSpec.describe Project do
         let(:plan_license) { :gold }
 
         it 'filters for gold features' do
-          is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
+          is_expected.to contain_exactly(:epics, :push_rules, :audit_events, :geo, :subepics)
         end
       end
 
@@ -1593,7 +1573,7 @@ RSpec.describe Project do
           let(:project) { create(:project, :public, group: group) }
 
           it 'includes all features in global license' do
-            is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
+            is_expected.to contain_exactly(:epics, :push_rules, :audit_events, :geo, :subepics)
           end
         end
       end
@@ -1601,7 +1581,7 @@ RSpec.describe Project do
 
     context 'when namespace should not be checked' do
       it 'includes all features in global license' do
-        is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
+        is_expected.to contain_exactly(:epics, :push_rules, :audit_events, :geo, :subepics)
       end
     end
 

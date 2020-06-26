@@ -9,7 +9,6 @@ module EE
       prepended do
         include DescriptionDiffActions
 
-        before_action :check_service_desk_available!, only: [:service_desk]
         before_action :whitelist_query_limiting_ee, only: [:update]
 
         before_action do

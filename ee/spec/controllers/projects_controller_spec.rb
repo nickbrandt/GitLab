@@ -207,7 +207,6 @@ RSpec.describe ProjectsController do
     it 'updates Service Desk attributes' do
       allow(Gitlab::IncomingEmail).to receive(:enabled?) { true }
       allow(Gitlab::IncomingEmail).to receive(:supports_wildcard?) { true }
-      stub_licensed_features(service_desk: true)
       params = {
         service_desk_enabled: true
       }

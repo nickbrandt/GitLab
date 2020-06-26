@@ -278,6 +278,11 @@ module EE
       project&.compliance_framework_setting&.present?
     end
 
+    override :render_service_desk_menu?
+    def render_service_desk_menu?
+      true
+    end
+
     private
 
     def get_project_security_nav_tabs(project, current_user)
