@@ -8009,6 +8009,9 @@ msgstr ""
 msgid "Dismissed on pipeline %{pipelineLink} at %{projectLink}"
 msgstr ""
 
+msgid "Display alerts from all your monitoring tools directly within GitLab."
+msgstr ""
+
 msgid "Display name"
 msgstr ""
 
@@ -25389,6 +25392,9 @@ msgstr ""
 msgid "VisibilityLevel|Unknown"
 msgstr ""
 
+msgid "Visit settings page"
+msgstr ""
+
 msgid "VisualReviewApp|%{stepStart}Step 1%{stepEnd}. Copy the following script:"
 msgstr ""
 
@@ -26109,6 +26115,9 @@ msgid "You can notify the app / group or a project by sending them an email noti
 msgstr ""
 
 msgid "You can now export your security dashboard to a CSV report."
+msgstr ""
+
+msgid "You can now manage alert endpoint configuration in the Alerts section on the Operations settings page. Fields on this page have been deprecated."
 msgstr ""
 
 msgid "You can now submit a merge request to get this change into the original branch."
