@@ -51,7 +51,7 @@ export default {
         :tracking-action="$options.trackingActions.COPY_NPM_INSTALL_COMMAND"
       />
 
-      <p class="prepend-top-default font-weight-bold">{{ s__('PackageRegistry|yarn') }}</p>
+      <p class="gl-mt-3 font-weight-bold">{{ s__('PackageRegistry|yarn') }}</p>
       <code-instruction
         :instruction="yarnCommand"
         :copy-text="s__('PackageRegistry|Copy yarn command')"
@@ -69,7 +69,7 @@ export default {
         :tracking-action="$options.trackingActions.COPY_NPM_SETUP_COMMAND"
       />
 
-      <p class="prepend-top-default font-weight-bold">{{ s__('PackageRegistry|yarn') }}</p>
+      <p class="gl-mt-3 font-weight-bold">{{ s__('PackageRegistry|yarn') }}</p>
       <code-instruction
         :instruction="yarnSetupCommand"
         :copy-text="s__('PackageRegistry|Copy yarn setup command')"

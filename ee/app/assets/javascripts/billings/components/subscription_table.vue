@@ -86,7 +86,7 @@ export default {
   <div>
     <div
       v-if="!isLoading && !hasError"
-      class="card prepend-top-default subscription-table js-subscription-table"
+      class="card gl-mt-3 subscription-table js-subscription-table"
     >
       <div class="js-subscription-header card-header">
         <strong>{{ subscriptionHeader }}</strong>

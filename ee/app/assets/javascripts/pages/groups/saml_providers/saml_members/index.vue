@@ -36,7 +36,7 @@ export default {
 };
 </script>
 <template>
-  <div class="prepend-top-default">
+  <div class="gl-mt-3">
     <gl-skeleton-loading v-if="isInitialLoadInProgress" />
     <gl-table v-else :items="members" :fields="$options.fields">
       <template #cell(name)="{ item }">

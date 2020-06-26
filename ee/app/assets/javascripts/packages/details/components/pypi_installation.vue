@@ -34,7 +34,7 @@ export default {
 <template>
   <installation-tabs :tracking-label="$options.trackingLabel">
     <template #installation>
-      <p class="prepend-top-default font-weight-bold">
+      <p class="gl-mt-3 font-weight-bold">
         {{ s__('PackageRegistry|Pip Command') }}
       </p>
       <code-instruction

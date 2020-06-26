@@ -174,11 +174,11 @@ export default {
         </template>
       </gl-sprintf>
     </p>
-    <div class="prepend-top-default">
+    <div class="gl-mt-3">
       <div v-if="projects.length">
         <div v-for="project in projects" :key="project.id">
           <project-header :project="project" @remove="removeProject" />
-          <div class="row prepend-top-default no-gutters mx-n2">
+          <div class="row gl-mt-3 no-gutters mx-n2">
             <environment
               v-for="environment in project.environments"
               :key="environment.id"
