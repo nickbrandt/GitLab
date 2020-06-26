@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon, GlButton, GlEmptyState, GlLink } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { __, s__ } from '~/locale';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
@@ -11,6 +11,7 @@ import projectsQuery from 'ee/security_dashboard/graphql/get_instance_security_d
 import ProjectManager from './first_class_project_manager/project_manager.vue';
 import CsvExportButton from './csv_export_button.vue';
 import vulnerabilityHistoryQuery from '../graphql/instance_vulnerability_history.graphql';
+import DashboardNotConfigured from './empty_states/dashboard_not_configured.vue';
 
 export default {
   components: {
@@ -21,10 +22,9 @@ export default {
     VulnerabilitySeverity,
     VulnerabilityChart,
     Filters,
-    GlEmptyState,
     GlLoadingIcon,
     GlButton,
-    GlLink,
+    DashboardNotConfigured,
   },
   props: {
     dashboardDocumentation: {
@@ -128,27 +128,12 @@ export default {
       :empty-state-svg-path="emptyStateSvgPath"
       :filters="filters"
     />
-    <gl-empty-state
+    <dashboard-not-configured
       v-else-if="shouldShowEmptyState"
-      :title="s__('SecurityReports|Add a project to your dashboard')"
       :svg-path="emptyStateSvgPath"
-    >
-      <template #description>
-        {{
-          s__(
-            'SecurityReports|The security dashboard displays the latest security findings for projects you wish to monitor. Select "Edit dashboard" to add and remove projects.',
-          )
-        }}
-        <gl-link :href="dashboardDocumentation">{{
-          s__('SecurityReports|More information')
-        }}</gl-link>
-      </template>
-      <template #actions>
-        <gl-button variant="success" @click="toggleProjectSelector">
-          {{ s__('SecurityReports|Add projects') }}
-        </gl-button>
-      </template>
-    </gl-empty-state>
+      :dashboard-documentation="dashboardDocumentation"
+      @handleAddProjectsClick="toggleProjectSelector"
+    />
     <div v-else class="d-flex justify-content-center">
       <project-manager
         v-if="showProjectSelector"
