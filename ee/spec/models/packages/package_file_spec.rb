@@ -52,7 +52,7 @@ RSpec.describe Packages::PackageFile, type: :model do
   end
 
   describe '#update_file_metadata callback' do
-    let(:package_file) { build(:package_file, :nuget, file_store: 0, size: nil) }
+    let_it_be(:package_file) { build(:package_file, :nuget, file_store: nil, size: nil) }
 
     subject { package_file.save! }
 
@@ -61,10 +61,9 @@ RSpec.describe Packages::PackageFile, type: :model do
         .to receive(:update_file_metadata)
         .and_call_original
 
-      subject
-
-      expect(package_file.file_store).to eq 1
-      expect(package_file.size).to eq 3513
+      expect { subject }
+        .to change { package_file.file_store }.from(nil).to(::Packages::PackageFileUploader::Store::LOCAL)
+        .and change { package_file.size }.from(nil).to(3513)
     end
   end
 
