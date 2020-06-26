@@ -63,8 +63,13 @@ export default {
     // passed to it in order to track the visibilty of each row's `row-details`
     // slot. So, create a deep clone of them here to avoid mutating the
     // `dependencies` prop.
+    // We also make sure that `vulnerabilities` is always defined to prevent rendering
+    // errors when the user is allowe to see dependencies but not their vulnerabilities.
     transformDependenciesForUI(dependencies) {
-      return cloneDeep(dependencies);
+      return dependencies.map(({ vulnerabilities, ...dep }) => ({
+        ...cloneDeep(dep),
+        vulnerabilities: vulnerabilities ? cloneDeep(vulnerabilities) : [],
+      }));
     },
   },
   fields: [
