@@ -54,7 +54,7 @@ describe('DependenciesTable component', () => {
     });
 
     const isVulnerableCellText = normalizeWhitespace(isVulnerableCell.text());
-    if (dependency.vulnerabilities.length) {
+    if (dependency?.vulnerabilities?.length) {
       expect(isVulnerableCellText).toContain(`${dependency.vulnerabilities.length} vuln`);
     } else {
       expect(isVulnerableCellText).toBe('');
@@ -105,13 +105,17 @@ describe('DependenciesTable component', () => {
     });
   });
 
-  describe('given dependencies with no vulnerabilities', () => {
+  describe.each`
+    description                                                             | vulnerabilitiesPayload
+    ${'given dependencies with no vulnerabilities'}                         | ${{ vulnerabilities: [] }}
+    ${'given dependencies when user is not allowed to see vulnerabilities'} | ${{}}
+  `('$description', ({ vulnerabilitiesPayload }) => {
     let dependencies;
 
     beforeEach(() => {
       dependencies = [
-        makeDependency({ vulnerabilities: [] }),
-        makeDependency({ name: 'foo', vulnerabilities: [] }),
+        makeDependency({ ...vulnerabilitiesPayload }),
+        makeDependency({ name: 'foo', ...vulnerabilitiesPayload }),
       ];
 
       createComponent({
