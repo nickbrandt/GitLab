@@ -34,7 +34,9 @@ module ClustersHelper
     {
       enabled: cluster.enabled?.to_s, 
       editable: can_edit.to_s,
-      multiple_clusters: multiple_clusters.to_s
+      multiple_clusters: multiple_clusters.to_s, 
+      cluster_info: cluster.base_domain.to_s
+  
     }
   end
 

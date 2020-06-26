@@ -1,5 +1,5 @@
 
-
+<meta content="utf-8" http-equiv="encoding">
 = form_for @cluster, url: clusterable.cluster_path(@cluster), as: :cluster, html: { class: 'js-cluster-integration-form' } do |field|
   = form_errors(@cluster)
   
@@ -40,5 +40,5 @@
   - if can?(current_user, :update_cluster, @cluster)
     .form-group
       = field.submit _('Save Changes'), class: 'btn btn-success float-right ', data: { qa_selector: 'save_changes_button'}
-      &nbsp&nbsp
+
    

@@ -34,23 +34,28 @@ export default {
   },
 
   computed: {
-    ...mapState(['enabled', 'editable', 'multiple']),
+    ...mapState(['enabled', 'editable', 'multiple', 'info']),
   },
 
 
   mounted() {
     this.toggleEnabled = this.enabled;
+    this.clusterInfo = this.info;
   },
 
   data() {
     return {
       toggleEnabled: true,
+      environmentScope: "*",
+      clusterInfo: "blah",
+
     };
   },
 };
 </script>
 
 <template>
+  
   <div>
     <gl-form-group>
       <div class="gl-display-flex gl-align-items-center">
@@ -80,9 +85,9 @@ export default {
       </div>
     </gl-form-group>
 
-    <gl-form-group v-if="!multiple"
+    <gl-form-group v-if="multiple"
       id="environment_scope"
-      class="col-md-6"
+      class="col-md-6 "
       :label="s__('ClusterIntegration|Environment scope')"
       label-size="sm"
       :description="s__('ClusterIntegration|Choose which of your environments will use this cluster.')"
@@ -92,6 +97,7 @@ export default {
         id="environment_scope"
         type="text" />
     </gl-form-group>
+
 
     <gl-form-group v-else
       id="environment_scope"
@@ -107,6 +113,26 @@ export default {
         disabled="disabled" 
         value="*"
       />
+      <small class="text-gl-muted"> <gl-sprintf> </gl-sprintf> </small>
     </gl-form-group>
+    <br><br>
+
+    <gl-form-group
+      id="cluster_base_domain"
+      class="col-md-6"
+      :label="s__('ClusterIntegration|Base Domain')"
+      label-size="sm"
+      :description="s__('ClusterIntegration|Specifying a domain will allow you to use Auto Review Apps and Auto Deploy stages for Auto DevOps. The domain should have a wildcard DNS configured matching the domain. More information')"
+      label-for="base_domain"
+      >
+      <gl-form-input 
+        id="cluster_base_domain"
+        :value="this.clusterInfo"
+        type="text" />
+    </gl-form-group>
+     <br><br>
+
+
+
   </div>
 </template>
