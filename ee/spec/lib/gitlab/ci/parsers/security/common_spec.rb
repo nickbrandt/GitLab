@@ -36,7 +36,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
             "cve": "CVE-1020",
             "severity": "High",
             "solution": "Upgrade to latest version.",
-            "scanner": { "id": "gemnasium", "name": "Gemnasium" },
+            "scanner": { "id": "gemnasium", "name": "Gemnasium", "vendor": { "name": "GitLab" } },
             "location": {},
             "identifiers": [],
             "links": [{ "url": "" }]
@@ -52,7 +52,8 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
             "solution": "Upgrade to latest versions.",
             "scanner": {
               "id": "gemnasium",
-              "name": "Gemnasium"
+              "name": "Gemnasium",
+              "vendor": { "name": "GitLab" }
             },
             "location": {},
             "identifiers": [],
@@ -68,7 +69,8 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
             "solution": "Upgrade to fixed version.\r\n",
             "scanner": {
               "id": "gemnasium",
-              "name": "Gemnasium"
+              "name": "Gemnasium",
+              "vendor": { "name": "GitLab" }
             },
             "location": {},
             "identifiers": [],
@@ -174,6 +176,52 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
 
         report.occurrences.map do |vulnerability|
           expect(vulnerability.raw_metadata).not_to include(fix_with_id.to_json)
+        end
+      end
+    end
+
+    context 'parsing scanners' do
+      let(:raw_json) do
+        {
+          "vulnerabilities": [
+            {
+              "category": "dependency_scanning",
+              "name": "Vulnerabilities in libxml2",
+              "message": "Vulnerabilities in libxml2 in nokogiri",
+              "description": "",
+              "cve": "CVE-1020",
+              "severity": "High",
+              "solution": "Upgrade to latest version.",
+              "scanner": raw_scanner,
+              "location": {},
+              "identifiers": [],
+              "links": [{ "url": "" }]
+            }
+          ],
+          "remediations": [],
+          "dependency_files": []
+        }
+      end
+
+      subject(:scanner) { report.occurrences.first.scanner }
+
+      before do
+        parser.parse!(raw_json.to_json, report)
+      end
+
+      context 'when vendor is missing in scanner' do
+        let(:raw_scanner) { { 'id': 'gemnasium', 'name': 'Gemnasium' } }
+
+        it 'returns scanner with empty vendor field' do
+          expect(scanner.vendor).to be_nil
+        end
+      end
+
+      context 'when vendor is not missing in scanner' do
+        let(:raw_scanner) { { 'id': 'gemnasium', 'name': 'Gemnasium', 'vendor': { 'name': 'GitLab' } } }
+
+        it 'returns scanner with parsed vendor value' do
+          expect(scanner.vendor).to eq('GitLab')
         end
       end
     end

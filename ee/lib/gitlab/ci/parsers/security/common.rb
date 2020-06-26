@@ -72,7 +72,8 @@ module Gitlab
             report.add_scanner(
               ::Gitlab::Ci::Reports::Security::Scanner.new(
                 external_id: scanner['id'],
-                name: scanner['name']))
+                name: scanner['name'],
+                vendor: scanner.dig('vendor', 'name')))
           end
 
           def create_identifiers(report, identifiers)

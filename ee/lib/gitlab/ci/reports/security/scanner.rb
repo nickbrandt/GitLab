@@ -5,11 +5,12 @@ module Gitlab
     module Reports
       module Security
         class Scanner
-          attr_accessor :external_id, :name
+          attr_accessor :external_id, :name, :vendor
 
-          def initialize(external_id:, name:)
+          def initialize(external_id:, name:, vendor:)
             @external_id = external_id
             @name = name
+            @vendor = vendor
           end
 
           def key
@@ -20,8 +21,9 @@ module Gitlab
             %i[
               external_id
               name
+              vendor
             ].each_with_object({}) do |key, hash|
-              hash[key] = public_send(key) # rubocop:disable GitlabSecurity/PublicSend
+              hash[key] = public_send(key).to_s # rubocop:disable GitlabSecurity/PublicSend
             end
           end
 

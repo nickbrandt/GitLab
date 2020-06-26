@@ -11,7 +11,7 @@ module Vulnerabilities
     validates :project, presence: true
     validates :external_id, presence: true, uniqueness: { scope: :project_id }
     validates :name, presence: true
-    validates :vendor, presence: true, length: { maximum: 255 }
+    validates :vendor, length: { maximum: 255, allow_nil: false }
 
     scope :with_external_id, -> (external_ids) { where(external_id: external_ids) }
   end
