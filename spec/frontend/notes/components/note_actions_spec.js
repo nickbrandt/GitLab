@@ -127,7 +127,13 @@ describe('noteActions', () => {
           .catch(done.fail);
       });
 
-      it('should be possible to assign or unassign the comment author', () => {
+      it('should be possible to assign or unassign the comment author if the user has access to edit an issue', () => {
+        store.dispatch('setNoteableData', {
+          current_user: {
+            can_update: true,
+          },
+        });
+
         wrapper = shallowMountNoteActions(props, {
           targetType: () => 'issue',
         });
@@ -139,6 +145,11 @@ describe('noteActions', () => {
         axiosMock.onPut(`${TEST_HOST}/api/v4/projects/group/project/issues/1`).reply(() => {
           expect(actions.updateAssignees).toHaveBeenCalled();
         });
+      });
+
+      it('should not be possible to assign or unassign the comment author if the user does not have access to edit an issue', () => {
+        const assignUserButton = wrapper.find('[data-testid="assign-user"]');
+        expect(assignUserButton.exists()).toBe(false);
       });
 
       it('should not be possible to assign or unassign the comment author in a merge request', () => {
