@@ -1,0 +1,5 @@
+---
+title: Changes the displayed summary text in security reports in merge requests
+merge_request: 33857
+author:
+type: changed

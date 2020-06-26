@@ -5,7 +5,7 @@ export const sastParsedIssues = [
     title: 'Arbitrary file existence disclosure in Action Pack',
     path: 'Gemfile.lock',
     line: 12,
-    severity: 'High',
+    severity: 'high',
     urlPath: 'foo/Gemfile.lock',
     report_type: 'sast',
   },
@@ -32,7 +32,7 @@ export const dockerReportParsed = {
     {
       vulnerability: 'CVE-2017-12944',
       namespace: 'debian:8',
-      severity: 'Medium',
+      severity: 'medium',
       title: 'CVE-2017-12944',
       path: 'debian:8',
       identifiers: [
@@ -47,7 +47,7 @@ export const dockerReportParsed = {
     {
       vulnerability: 'CVE-2017-16232',
       namespace: 'debian:8',
-      severity: 'Negligible',
+      severity: 'low',
       title: 'CVE-2017-16232',
       path: 'debian:8',
       identifiers: [
@@ -64,7 +64,7 @@ export const dockerReportParsed = {
     {
       vulnerability: 'CVE-2014-8130',
       namespace: 'debian:8',
-      severity: 'Negligible',
+      severity: 'low',
       title: 'CVE-2014-8130',
       path: 'debian:8',
       identifiers: [
@@ -81,7 +81,7 @@ export const dockerReportParsed = {
     {
       vulnerability: 'CVE-2017-12944',
       namespace: 'debian:8',
-      severity: 'Medium',
+      severity: 'medium',
       title: 'CVE-2017-12944',
       path: 'debian:8',
       identifiers: [
@@ -96,7 +96,7 @@ export const dockerReportParsed = {
     {
       vulnerability: 'CVE-2017-16232',
       namespace: 'debian:8',
-      severity: 'Negligible',
+      severity: 'low',
       title: 'CVE-2017-16232',
       path: 'debian:8',
       identifiers: [
@@ -111,7 +111,7 @@ export const dockerReportParsed = {
     {
       vulnerability: 'CVE-2014-8130',
       namespace: 'debian:8',
-      severity: 'Negligible',
+      severity: 'low',
       title: 'CVE-2014-8130',
       path: 'debian:8',
       identifiers: [
@@ -134,7 +134,7 @@ export const parsedDast = [
     title: 'Absence of Anti-CSRF Tokens',
     riskcode: '1',
     riskdesc: 'Low (Medium)',
-    severity: 'Low',
+    severity: 'low',
     cweid: '3',
     desc: '<p>No Anti-CSRF tokens were found in a HTML submission form.</p>',
     pluginid: '123',
@@ -176,7 +176,7 @@ export const parsedDast = [
         url: 'https://cwe.mitre.org/data/definitions/4.html',
       },
     ],
-    severity: 'Low',
+    severity: 'low',
     cweid: '4',
     desc: '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff".</p>',
     pluginid: '3456',
@@ -197,7 +197,7 @@ export const secretScanningParsedIssues = [
     title: 'AWS SecretKey detected',
     path: 'Gemfile.lock',
     line: 12,
-    severity: 'Critical',
+    severity: 'critical',
     urlPath: 'foo/Gemfile.lock',
   },
 ];

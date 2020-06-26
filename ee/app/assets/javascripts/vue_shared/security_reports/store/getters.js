@@ -1,5 +1,5 @@
 import { s__, sprintf } from '~/locale';
-import { countIssues, groupedTextBuilder, statusIcon, groupedReportText } from './utils';
+import { countVulnerabilities, groupedTextBuilder, statusIcon, groupedReportText } from './utils';
 import { LOADING, ERROR, SUCCESS } from './constants';
 import messages from './messages';
 
@@ -30,27 +30,27 @@ export const groupedDependencyText = ({ dependencyScanning }) =>
     messages.DEPENDENCY_SCANNING_IS_LOADING,
   );
 
-export const summaryCounts = state =>
-  [
-    state.sast,
-    state.containerScanning,
-    state.dast,
-    state.dependencyScanning,
-    state.secretScanning,
-  ].reduce(
-    (acc, report) => {
-      const curr = countIssues(report);
-      acc.added += curr.added;
-      acc.dismissed += curr.dismissed;
-      acc.fixed += curr.fixed;
-      acc.existing += curr.existing;
-      return acc;
-    },
-    { added: 0, dismissed: 0, fixed: 0, existing: 0 },
-  );
+export const summaryCounts = ({
+  containerScanning,
+  dast,
+  dependencyScanning,
+  sast,
+  secretScanning,
+} = {}) => {
+  const allNewVulns = [
+    ...containerScanning.newIssues,
+    ...dast.newIssues,
+    ...dependencyScanning.newIssues,
+    ...sast.newIssues,
+    ...secretScanning.newIssues,
+  ];
+
+  return countVulnerabilities(allNewVulns);
+};
 
 export const groupedSummaryText = (state, getters) => {
   const reportType = s__('ciReport|Security scanning');
+  let status = '';
 
   // All reports are loading
   if (getters.areAllReportsLoading) {
@@ -62,10 +62,6 @@ export const groupedSummaryText = (state, getters) => {
     return s__('ciReport|Security scanning failed loading any results');
   }
 
-  const { added, fixed, existing, dismissed } = getters.summaryCounts;
-
-  let status = '';
-
   if (getters.areReportsLoading && getters.anyReportHasError) {
     status = s__('ciReport|(is loading, errors when loading results)');
   } else if (getters.areReportsLoading && !getters.anyReportHasError) {
@@ -74,13 +70,9 @@ export const groupedSummaryText = (state, getters) => {
     status = s__('ciReport|(errors when loading results)');
   }
 
-  /*
-   In order to correct wording, we ne to set the base property to true,
-   if at least one report has a base.
-   */
-  const paths = { head: true, base: !getters.noBaseInAllReports };
+  const { critical, high, other } = getters.summaryCounts;
 
-  return groupedTextBuilder({ reportType, paths, added, fixed, existing, dismissed, status });
+  return groupedTextBuilder({ reportType, status, critical, high, other });
 };
 
 export const summaryStatus = (state, getters) => {
