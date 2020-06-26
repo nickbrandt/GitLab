@@ -19,6 +19,8 @@ const data = {
     lfsObjectsSize: 0,
     buildArtifactsSize: 1272375,
     packagesSize: 0,
+    wikiSize: 2048,
+    snippetsSize: 1024,
   },
 };
 

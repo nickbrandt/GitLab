@@ -27,6 +27,7 @@ query getStorageCounter($fullPath: ID!) {
             buildArtifactsSize
             packagesSize
             wikiSize
+            snippetsSize
           }
         }
       }
