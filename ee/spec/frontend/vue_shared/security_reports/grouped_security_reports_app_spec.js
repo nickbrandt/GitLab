@@ -187,7 +187,7 @@ describe('Grouped security reports app', () => {
 
         // Renders the summary text
         expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected 8 new, and 7 fixed vulnerabilities',
+          'Security scanning detected 8 vulnerabilities.',
         );
 
         // Renders the expand button
@@ -196,24 +196,20 @@ describe('Grouped security reports app', () => {
         );
 
         // Renders Sast result
-        expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'SAST detected 1 new, and 2 fixed vulnerabilities',
-        );
+        expect(trimText(wrapper.vm.$el.textContent)).toContain('SAST detected 1 vulnerability');
 
         // Renders DSS result
         expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
+          'Dependency scanning detected 2 vulnerabilities.',
         );
 
         // Renders container scanning result
         expect(wrapper.vm.$el.textContent).toContain(
-          'Container scanning detected 2 new, and 1 fixed vulnerabilities',
+          'Container scanning detected 2 vulnerabilities.',
         );
 
         // Renders DAST result
-        expect(wrapper.vm.$el.textContent).toContain(
-          'DAST detected 1 new, and 2 fixed vulnerabilities',
-        );
+        expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 vulnerability.');
       });
 
       it('opens modal with more information', () => {
@@ -293,9 +289,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.text()).toContain(
-        'Container scanning detected 2 new, and 1 fixed vulnerabilities',
-      );
+      expect(wrapper.text()).toContain('Container scanning detected 2 vulnerabilities.');
     });
   });
 
@@ -324,7 +318,7 @@ describe('Grouped security reports app', () => {
 
     it('should display the correct numbers of vulnerabilities', () => {
       expect(wrapper.vm.$el.textContent).toContain(
-        'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
+        'Dependency scanning detected 2 vulnerabilities.',
       );
     });
   });
@@ -362,9 +356,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.vm.$el.textContent).toContain(
-        'DAST detected 1 new, and 2 fixed vulnerabilities',
-      );
+      expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 vulnerability');
     });
 
     it('shows the scanned URLs count and a link to the CI job if available', () => {
@@ -431,9 +423,7 @@ describe('Grouped security reports app', () => {
       });
 
       it('should display the correct numbers of vulnerabilities', () => {
-        expect(wrapper.text()).toContain(
-          'Secret scanning detected 2 new, and 1 fixed vulnerabilities',
-        );
+        expect(wrapper.text()).toContain('Secret scanning detected 2 vulnerabilities.');
       });
     });
 
@@ -470,9 +460,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.vm.$el.textContent).toContain(
-        'SAST detected 1 new, and 2 fixed vulnerabilities',
-      );
+      expect(wrapper.vm.$el.textContent).toContain('SAST detected 1 vulnerability.');
     });
   });
 

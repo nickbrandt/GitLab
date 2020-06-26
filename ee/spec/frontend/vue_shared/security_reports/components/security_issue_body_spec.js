@@ -10,6 +10,12 @@ import {
   dependencyScanningIssues,
   secretScanningParsedIssues,
 } from '../mock_data';
+import {
+  CRITICAL,
+  HIGH,
+  MEDIUM,
+  LOW,
+} from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 
 describe('Security Issue Body', () => {
   let wrapper;
@@ -31,11 +37,11 @@ describe('Security Issue Body', () => {
   });
 
   describe.each([
-    ['SAST', sastParsedIssues[0], true, 'High'],
-    ['DAST', parsedDast[0], false, 'Low'],
-    ['Container Scanning', dockerReportParsed.vulnerabilities[0], false, 'Medium'],
+    ['SAST', sastParsedIssues[0], true, HIGH],
+    ['DAST', parsedDast[0], false, LOW],
+    ['Container Scanning', dockerReportParsed.vulnerabilities[0], false, MEDIUM],
     ['Dependency Scanning', dependencyScanningIssues[0], true],
-    ['Secret Scanning', secretScanningParsedIssues[0], false, 'Critical'],
+    ['Secret Scanning', secretScanningParsedIssues[0], false, CRITICAL],
   ])('for a %s vulnerability', (name, vuln, hasReportLink, severity) => {
     beforeEach(() => {
       createComponent(vuln);
