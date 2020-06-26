@@ -1,8 +1,17 @@
 <script>
-import { GlAlert, GlBadge, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
+import {
+  GlAlert,
+  GlBadge,
+  GlLoadingIcon,
+  GlEmptyState,
+  GlIcon,
+  GlNewDropdown,
+  GlNewDropdownItem,
+} from '@gitlab/ui';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import { __ } from '~/locale';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
+import IterationForm from './iteration_form.vue';
 import query from '../queries/group_iteration.query.graphql';
 
 const iterationStates = {
@@ -17,6 +26,10 @@ export default {
     GlBadge,
     GlLoadingIcon,
     GlEmptyState,
+    GlIcon,
+    GlNewDropdown,
+    GlNewDropdownItem,
+    IterationForm,
   },
   apollo: {
     group: {
@@ -56,6 +69,7 @@ export default {
   },
   data() {
     return {
+      isEditing: false,
       error: '',
       group: {
         iteration: {},
@@ -104,6 +118,14 @@ export default {
       :title="__('Could not find iteration')"
       :compact="false"
     />
+    <iteration-form
+      v-else-if="isEditing"
+      :group-path="groupPath"
+      :is-editing="true"
+      :iteration="iteration"
+      @updated="isEditing = false"
+      @cancel="isEditing = false"
+    />
     <template v-else>
       <div
         ref="topbar"
@@ -115,6 +137,21 @@ export default {
         <span class="gl-ml-4"
           >{{ formatDate(iteration.startDate) }} – {{ formatDate(iteration.dueDate) }}</span
         >
+        <gl-new-dropdown
+          v-if="canEdit"
+          variant="default"
+          toggle-class="gl-text-decoration-none gl-border-0! gl-shadow-none!"
+          class="gl-ml-auto gl-text-secondary"
+          right
+          no-caret
+        >
+          <template #button-content>
+            <gl-icon name="ellipsis_v" /><span class="gl-sr-only">{{ __('Actions') }}</span>
+          </template>
+          <gl-new-dropdown-item @click="isEditing = true">{{
+            __('Edit iteration')
+          }}</gl-new-dropdown-item>
+        </gl-new-dropdown>
       </div>
       <h3 ref="title" class="page-title">{{ iteration.title }}</h3>
       <div ref="description" v-html="iteration.description"></div>

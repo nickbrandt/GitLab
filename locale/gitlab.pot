@@ -1233,6 +1233,9 @@ msgstr ""
 msgid "Action to take when receiving an alert."
 msgstr ""
 
+msgid "Actions"
+msgstr ""
+
 msgid "Activate"
 msgstr ""
 
@@ -8234,6 +8237,9 @@ msgstr ""
 msgid "Edit issues"
 msgstr ""
 
+msgid "Edit iteration"
+msgstr ""
+
 msgid "Edit public deploy key"
 msgstr ""
 
@@ -12665,6 +12671,9 @@ msgstr ""
 msgid "Iteration removed"
 msgstr ""
 
+msgid "Iteration updated"
+msgstr ""
+
 msgid "Iterations"
 msgstr ""
 
@@ -14887,9 +14896,6 @@ msgid "New Issue"
 msgid_plural "New Issues"
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "New Iteration"
-msgstr ""
 
 msgid "New Jira import"
 msgstr ""
@@ -24516,6 +24522,9 @@ msgid "Update failed. Please try again."
 msgstr ""
 
 msgid "Update it"
+msgstr ""
+
+msgid "Update iteration"
 msgstr ""
 
 msgid "Update now"

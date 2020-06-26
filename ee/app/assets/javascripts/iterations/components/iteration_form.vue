@@ -4,7 +4,9 @@ import createFlash from '~/flash';
 import { visitUrl } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
+import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import createIteration from '../queries/create_iteration.mutation.graphql';
+import updateIteration from '../queries/update_iteration.mutation.graphql';
 import DueDateSelectors from '~/due_date_select';
 
 export default {
@@ -26,18 +28,42 @@ export default {
     },
     iterationsListPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
+    },
+    isEditing: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    iteration: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
   },
   data() {
     return {
       iterations: [],
       loading: false,
-      title: '',
-      description: '',
-      startDate: '',
-      dueDate: '',
+      title: this.iteration.title,
+      description: this.iteration.description,
+      startDate: this.iteration.startDate,
+      dueDate: this.iteration.dueDate,
     };
+  },
+  computed: {
+    variables() {
+      return {
+        input: {
+          groupPath: this.groupPath,
+          title: this.title,
+          description: this.description,
+          startDate: this.startDate,
+          dueDate: this.dueDate,
+        },
+      };
+    },
   },
   mounted() {
     // eslint-disable-next-line no-new
@@ -46,22 +72,24 @@ export default {
   methods: {
     save() {
       this.loading = true;
+      return this.isEditing ? this.updateIteration() : this.createIteration();
+    },
+    cancel() {
+      if (this.iterationsListPath) {
+        visitUrl(this.iterationsListPath);
+      } else {
+        this.$emit('cancel');
+      }
+    },
+    createIteration() {
       return this.$apollo
         .mutate({
           mutation: createIteration,
-          variables: {
-            input: {
-              groupPath: this.groupPath,
-              title: this.title,
-              description: this.description,
-              startDate: this.startDate,
-              dueDate: this.dueDate,
-            },
-          },
+          variables: this.variables,
         })
         .then(({ data }) => {
           const { errors, iteration } = data.createIteration;
-          if (errors?.length > 0) {
+          if (errors.length > 0) {
             this.loading = false;
             createFlash(errors[0]);
             return;
@@ -72,6 +100,33 @@ export default {
         .catch(() => {
           this.loading = false;
           createFlash(__('Unable to save iteration. Please try again'));
+        });
+    },
+    updateIteration() {
+      return this.$apollo
+        .mutate({
+          mutation: updateIteration,
+          variables: {
+            input: {
+              ...this.variables.input,
+              id: getIdFromGraphQLId(this.iteration.id),
+            },
+          },
+        })
+        .then(({ data }) => {
+          const { errors } = data.updateIteration;
+          if (errors.length > 0) {
+            createFlash(errors[0]);
+            return;
+          }
+
+          this.$emit('updated');
+        })
+        .catch(() => {
+          createFlash(__('Unable to save iteration. Please try again'));
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     updateDueDate(val) {
@@ -87,7 +142,9 @@ export default {
 <template>
   <div>
     <div class="gl-display-flex">
-      <h3 class="page-title">{{ __('New Iteration') }}</h3>
+      <h3 ref="pageTitle" class="page-title">
+        {{ isEditing ? __('Edit iteration') : __('New iteration') }}
+      </h3>
     </div>
     <hr />
     <gl-form class="row common-note-form">
@@ -174,9 +231,9 @@ export default {
 
     <div class="form-actions d-flex">
       <gl-button :loading="loading" data-testid="save-iteration" variant="success" @click="save">{{
-        __('Create iteration')
+        isEditing ? __('Update iteration') : __('Create iteration')
       }}</gl-button>
-      <gl-button class="ml-auto" data-testid="cancel-iteration" :href="iterationsListPath">{{
+      <gl-button class="ml-auto" data-testid="cancel-iteration" @click="cancel">{{
         __('Cancel')
       }}</gl-button>
     </div>
