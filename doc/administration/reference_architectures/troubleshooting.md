@@ -445,7 +445,60 @@ In case you are experiencing any issues connecting through PgBouncer, the first 
 sudo gitlab-ctl tail pgbouncer
 ```
 
-Additionally, you can check the output from `show databases` in the [Administrative console](#administrative-console). In the output, you would expect to see values in the `host` field for the `gitlabhq_production` database. Additionally, `current_connections` should be greater than 1.
+Additionally, you can check the output from `show databases` in the [administrative console](#pgbouncer-administrative-console). In the output, you would expect to see values in the `host` field for the `gitlabhq_production` database. Additionally, `current_connections` should be greater than 1.
+
+### PgBouncer administrative console
+
+As part of Omnibus GitLab, the `gitlab-ctl pgb-console` command is provided to automatically connect to the PgBouncer administrative console. See the [PgBouncer documentation](https://www.pgbouncer.org/usage.html#admin-console) for detailed instructions on how to interact with the console.
+
+To start a session:
+
+```shell
+sudo gitlab-ctl pgb-console
+```
+
+The password you will be prompted for is the `pgbouncer_user_password`
+
+To get some basic information about the instance, run
+
+```shell
+pgbouncer=# show databases; show clients; show servers;
+        name         |   host    | port |      database       | force_user | pool_size | reserve_pool | pool_mode | max_connections | current_connections
+---------------------+-----------+------+---------------------+------------+-----------+--------------+-----------+-----------------+---------------------
+ gitlabhq_production | 127.0.0.1 | 5432 | gitlabhq_production |            |       100 |            5 |           |               0 |                   1
+ pgbouncer           |           | 6432 | pgbouncer           | pgbouncer  |         2 |            0 | statement |               0 |                   0
+(2 rows)
+
+ type |   user    |      database       | state  |   addr    | port  | local_addr | local_port |    connect_time     |    request_time     |    ptr    | link
+| remote_pid | tls
+------+-----------+---------------------+--------+-----------+-------+------------+------------+---------------------+---------------------+-----------+------
++------------+-----
+ C    | gitlab    | gitlabhq_production | active | 127.0.0.1 | 44590 | 127.0.0.1  |       6432 | 2018-04-24 22:13:10 | 2018-04-24 22:17:10 | 0x12444c0 |
+|          0 |
+ C    | gitlab    | gitlabhq_production | active | 127.0.0.1 | 44592 | 127.0.0.1  |       6432 | 2018-04-24 22:13:10 | 2018-04-24 22:17:10 | 0x12447c0 |
+|          0 |
+ C    | gitlab    | gitlabhq_production | active | 127.0.0.1 | 44594 | 127.0.0.1  |       6432 | 2018-04-24 22:13:10 | 2018-04-24 22:17:10 | 0x1244940 |
+|          0 |
+ C    | gitlab    | gitlabhq_production | active | 127.0.0.1 | 44706 | 127.0.0.1  |       6432 | 2018-04-24 22:14:22 | 2018-04-24 22:16:31 | 0x1244ac0 |
+|          0 |
+ C    | gitlab    | gitlabhq_production | active | 127.0.0.1 | 44708 | 127.0.0.1  |       6432 | 2018-04-24 22:14:22 | 2018-04-24 22:15:15 | 0x1244c40 |
+|          0 |
+ C    | gitlab    | gitlabhq_production | active | 127.0.0.1 | 44794 | 127.0.0.1  |       6432 | 2018-04-24 22:15:15 | 2018-04-24 22:15:15 | 0x1244dc0 |
+|          0 |
+ C    | gitlab    | gitlabhq_production | active | 127.0.0.1 | 44798 | 127.0.0.1  |       6432 | 2018-04-24 22:15:15 | 2018-04-24 22:16:31 | 0x1244f40 |
+|          0 |
+ C    | pgbouncer | pgbouncer           | active | 127.0.0.1 | 44660 | 127.0.0.1  |       6432 | 2018-04-24 22:13:51 | 2018-04-24 22:17:12 | 0x1244640 |
+|          0 |
+(8 rows)
+
+ type |  user  |      database       | state |   addr    | port | local_addr | local_port |    connect_time     |    request_time     |    ptr    | link | rem
+ote_pid | tls
+------+--------+---------------------+-------+-----------+------+------------+------------+---------------------+---------------------+-----------+------+----
+--------+-----
+ S    | gitlab | gitlabhq_production | idle  | 127.0.0.1 | 5432 | 127.0.0.1  |      35646 | 2018-04-24 22:15:15 | 2018-04-24 22:17:10 | 0x124dca0 |      |
+  19980 |
+(1 row)
+```
 
 ### Message: `LOG:  invalid CIDR mask in address`
 
