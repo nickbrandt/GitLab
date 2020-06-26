@@ -490,6 +490,10 @@ class License < ApplicationRecord
     starts_at > Date.current
   end
 
+  def auto_renew?
+    false
+  end
+
   private
 
   def restricted_attr(name, default = nil)

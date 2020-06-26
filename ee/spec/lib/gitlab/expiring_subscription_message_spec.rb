@@ -22,10 +22,12 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
     context 'subscribable installed' do
       let(:expired_date) { Time.utc(2020, 3, 9, 10) }
       let(:today) { Time.utc(2020, 3, 7, 10) }
+      let(:auto_renew) { false }
 
       before do
         allow(subscribable).to receive(:plan).and_return('ultimate')
         allow(subscribable).to receive(:expires_at).and_return(expired_date)
+        allow(subscribable).to receive(:auto_renew?).and_return(auto_renew)
       end
 
       context 'subscribable should not notify admins' do
@@ -89,9 +91,7 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
                   end
 
                   context 'is auto_renew' do
-                    before do
-                      allow(subscribable).to receive(:auto_renew?).and_return(true)
-                    end
+                    let(:auto_renew) { true }
 
                     it 'has a nice subject' do
                       Timecop.freeze(today) do
@@ -181,10 +181,16 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
                 end
               end
 
-              context 'is auto_renew' do
-                before do
-                  allow(subscribable).to receive(:auto_renew?).and_return(true)
+              context 'is auto_renew nil' do
+                let(:auto_renew) { nil }
+
+                it 'returns nil' do
+                  expect(subject).to be nil
                 end
+              end
+
+              context 'is auto_renew' do
+                let(:auto_renew) { true }
 
                 it 'has a nice subject' do
                   expect(subject).to include('Your subscription will automatically renew in 4 days.')
