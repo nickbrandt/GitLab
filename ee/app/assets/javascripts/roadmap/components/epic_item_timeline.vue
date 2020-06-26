@@ -185,7 +185,7 @@ export default {
               aria-hidden="true"
             />
             <div class="gl-font-sm d-flex align-items-center text-nowrap">
-              <icon class="append-right-2" :size="12" name="weight" />
+              <icon class="gl-mr-1" :size="12" name="weight" />
               <p class="m-0" :aria-label="epicWeightPercentageText">{{ epicWeightPercentage }}%</p>
             </div>
           </div>
