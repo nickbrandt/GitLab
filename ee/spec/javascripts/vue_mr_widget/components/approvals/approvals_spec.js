@@ -1,5 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import Approvals from 'ee/vue_merge_request_widget/components/approvals/approvals.vue';
 import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
 import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
@@ -62,8 +62,8 @@ describe('EE MRWidget approvals', () => {
     return !action.exists()
       ? null
       : {
-          variant: action.attributes('variant'),
-          inverted: action.classes('btn-inverted'),
+          variant: action.props('variant'),
+          category: action.props('category'),
           text: action.text(),
         };
   };
@@ -186,7 +186,7 @@ describe('EE MRWidget approvals', () => {
           expect(findActionData()).toEqual({
             variant: 'info',
             text: 'Approve',
-            inverted: false,
+            category: 'primary',
           });
         });
       });
@@ -203,11 +203,11 @@ describe('EE MRWidget approvals', () => {
             waitForTick(done);
           });
 
-          it('approve action (with inverted) is rendered', () => {
+          it('approve action (with inverted style) is rendered', () => {
             expect(findActionData()).toEqual({
               variant: 'info',
               text: 'Approve',
-              inverted: true,
+              category: 'secondary',
             });
           });
         });
@@ -223,7 +223,7 @@ describe('EE MRWidget approvals', () => {
             expect(findActionData()).toEqual({
               variant: 'info',
               text: 'Approve additionally',
-              inverted: true,
+              category: 'secondary',
             });
           });
         });
@@ -239,13 +239,13 @@ describe('EE MRWidget approvals', () => {
           service.approveMergeRequest.and.callFake(() => new Promise(() => {}));
           const action = findAction();
 
-          expect(action.find(GlLoadingIcon).exists()).toBe(false);
+          expect(action.props('loading')).toBe(false);
 
           action.vm.$emit('click');
 
           tick()
             .then(() => {
-              expect(action.find(GlLoadingIcon).exists()).toBe(true);
+              expect(action.props('loading')).toBe(true);
             })
             .then(done)
             .catch(done.fail);
@@ -360,7 +360,7 @@ describe('EE MRWidget approvals', () => {
         expect(findActionData()).toEqual({
           variant: 'warning',
           text: 'Revoke approval',
-          inverted: true,
+          category: 'secondary',
         });
       });
 
