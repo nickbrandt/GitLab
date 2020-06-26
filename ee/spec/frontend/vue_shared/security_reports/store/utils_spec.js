@@ -46,17 +46,21 @@ describe('security reports utils', () => {
   });
 
   describe('convertReportType', () => {
-    it.each([
-      ['sast', 'SAST'],
-      ['dependency_scanning', 'Dependency Scanning'],
-      ['CONTAINER_SCANNING', 'Container Scanning'],
-      ['CUSTOM_SCANNER', 'Custom scanner'],
-      ['mast', 'Mast'],
-      ['TAST', 'Tast'],
-      [undefined, ''],
-    ])('converts the report type "%s" to the human-readable string "%s"', (input, output) => {
-      expect(convertReportType(input)).toEqual(output);
-    });
+    it.each`
+      reportType               | output
+      ${'sast'}                | ${'SAST'}
+      ${'dependency_scanning'} | ${'Dependency Scanning'}
+      ${'CONTAINER_SCANNING'}  | ${'Container Scanning'}
+      ${'CUSTOM_SCANNER'}      | ${'Custom scanner'}
+      ${'mast'}                | ${'Mast'}
+      ${'TAST'}                | ${'Tast'}
+      ${undefined}             | ${''}
+    `(
+      'converts the report type "$reportType" to the human-readable string "$output"',
+      ({ reportType, output }) => {
+        expect(convertReportType(reportType)).toEqual(output);
+      },
+    );
   });
 
   describe('filterByKey', () => {
