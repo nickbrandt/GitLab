@@ -44,8 +44,7 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
   def initial_data
     {
       labels: epic.labels,
-      subscribed: subscribed?,
-      canCreate: can?(current_user, :create_epic, epic)
+      subscribed: subscribed?
     }
   end
 
