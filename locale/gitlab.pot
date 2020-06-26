@@ -20127,10 +20127,10 @@ msgstr ""
 msgid "SecurityReports|Return to dashboard"
 msgstr ""
 
-msgid "SecurityReports|Scanner type"
+msgid "SecurityReports|Scan details"
 msgstr ""
 
-msgid "SecurityReports|Scan details"
+msgid "SecurityReports|Scanner type"
 msgstr ""
 
 msgid "SecurityReports|Security Dashboard"
