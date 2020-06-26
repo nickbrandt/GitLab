@@ -1,7 +1,10 @@
 <script>
+import { s__ } from '~/locale';
 import { GlAlert, GlDeprecatedButton, GlIntersectionObserver } from '@gitlab/ui';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/project_vulnerabilities.graphql';
+import securityScannersQuery from '../graphql/project_security_scanners.graphql';
 import { VULNERABILITIES_PER_PAGE } from '../store/constants';
 
 export default {
@@ -12,7 +15,16 @@ export default {
     GlIntersectionObserver,
     VulnerabilityList,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
+    notEnabledScannersHelpPath: {
+      type: String,
+      required: true,
+    },
+    noPipelineRunScannersHelpPath: {
+      type: String,
+      required: true,
+    },
     projectFullPath: {
       type: String,
       required: true,
@@ -92,10 +104,13 @@ export default {
     <vulnerability-list
       v-else
       :is-loading="isLoadingFirstVulnerabilities"
+      :not-enabled-scanners-help-path="notEnabledScannersHelpPath"
+      :no-pipeline-run-scanners-help-path="noPipelineRunScannersHelpPath"
       :filters="filters"
       :vulnerabilities="vulnerabilities"
       :should-show-identifier="true"
       :should-show-report-type="true"
+      :security-scanners="securityScanners"
       @refetch-vulnerabilities="refetchVulnerabilities"
     />
     <gl-intersection-observer

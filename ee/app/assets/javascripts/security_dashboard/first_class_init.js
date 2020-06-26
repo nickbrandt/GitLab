@@ -34,6 +34,8 @@ export default (
   }
 
   const props = {
+    notEnabledScannersHelpPath: el.dataset.notEnabledScannersHelpPath,
+    noPipelineRunScannersHelpPath: el.dataset.noPipelineRunScannersHelpPath,
     hasVulnerabilities: Boolean(el.dataset.hasVulnerabilities),
     securityDashboardHelpPath: el.dataset.securityDashboardHelpPath,
     projectAddEndpoint: el.dataset.projectAddEndpoint,
