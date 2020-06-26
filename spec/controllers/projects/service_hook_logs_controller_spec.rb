@@ -32,8 +32,10 @@ RSpec.describe Projects::ServiceHookLogsController do
   describe 'POST #retry' do
     subject { post :retry, params: log_params }
 
-    it 'executes the hook and redirects to the service form' do
-      expect_any_instance_of(ServiceHook).to receive(:execute)
+    it 'executes the hook and redirects to the service form', :aggregate_failures do
+      expect_next_allocation_of(ServiceHook) do |service_hook|
+        expect(service_hook).to receive(:execute)
+      end
       expect_any_instance_of(described_class).to receive(:set_hook_execution_notice)
       expect(subject).to redirect_to(edit_project_service_path(project, service))
     end

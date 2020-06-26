@@ -150,6 +150,21 @@ refresh_service = MergeRequests::RefreshService.new(project, user)
 refresh_service.execute(oldrev, newrev, ref)
 ```
 
+In some cases instances are created using `allocate` instead of `new`.
+For example when models are loaded with ActiveRecord. In this case you can use `expect_next_allocation_of` or `allow_next_allocation_of` like in the example below.
+
+```ruby
+let!(:project) { create(:project) }
+
+specify do
+  expect_next_allocation_of(Project) do |project_instance|
+    expect(project_instance).to receive(:add_import_job)
+  end
+
+  Project.find(project.id).add_import_job
+end
+```
+
 ## Do not `rescue Exception`
 
 See ["Why is it bad style to `rescue Exception => e` in Ruby?"](https://stackoverflow.com/questions/10048173/why-is-it-bad-style-to-rescue-exception-e-in-ruby).

@@ -4804,7 +4804,9 @@ RSpec.describe Project do
     end
 
     it 'executes the system hooks when inside a transaction' do
-      allow_any_instance_of(WebHookService).to receive(:execute)
+      allow_next_allocation_of(WebHookService) do |web_hook_service|
+        expect(web_hook_service).to receive(:execute)
+      end
 
       create(:system_hook, merge_requests_events: true)
 
@@ -4826,22 +4828,15 @@ RSpec.describe Project do
 
     it 'executes services with the specified scope' do
       data = 'any data'
-
-      expect(SlackService).to receive(:allocate).and_wrap_original do |method|
-        method.call.tap do |instance|
-          expect(instance).to receive(:async_execute).with(data).once
-        end
+      expect_next_allocation_of(SlackService) do |service|
+        expect(service).to receive(:async_execute).with(data).once
       end
 
       service.project.execute_services(data, :push_hooks)
     end
 
     it 'does not execute services that don\'t match the specified scope' do
-      expect(SlackService).not_to receive(:allocate).and_wrap_original do |method|
-        method.call.tap do |instance|
-          expect(instance).not_to receive(:async_execute)
-        end
-      end
+      expect(SlackService).not_to receive(:allocate)
 
       service.project.execute_services(anything, :merge_request_hooks)
     end
