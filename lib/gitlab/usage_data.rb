@@ -207,6 +207,7 @@ module Gitlab
           ldap_enabled: alt_usage_data(fallback: nil) { Gitlab.config.ldap.enabled },
           mattermost_enabled: alt_usage_data(fallback: nil) { Gitlab.config.mattermost.enabled },
           omniauth_enabled: alt_usage_data(fallback: nil) { Gitlab::Auth.omniauth_enabled? },
+          prometheus_enabled: alt_usage_data(fallback: nil) { Gitlab::Prometheus::Internal.prometheus_enabled? },
           prometheus_metrics_enabled: alt_usage_data(fallback: nil) { Gitlab::Metrics.prometheus_metrics_enabled? },
           reply_by_email_enabled: alt_usage_data(fallback: nil) { Gitlab::IncomingEmail.enabled? },
           signup_enabled: alt_usage_data(fallback: nil) { Gitlab::CurrentSettings.allow_signup? },

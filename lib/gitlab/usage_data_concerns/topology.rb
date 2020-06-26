@@ -16,39 +16,54 @@ module Gitlab
         'node' => 'node-exporter'
       }.freeze
 
-      def topology_usage_data
-        topology_data, duration = measure_duration do
-          alt_usage_data(fallback: {}) { topology_fetch_all_data }
+      CollectionFailure = Struct.new(:query, :error) do
+        def to_h
+          { query => error }
         end
-        { topology: topology_data.merge(duration_s: duration) }
+      end
+
+      def topology_usage_data
+        failures = []
+        topology_data, duration = measure_duration { topology_fetch_all_data(failures) }
+        {
+          topology: topology_data
+                      .merge(duration_s: duration)
+                      .merge(failures: failures.map(&:to_h))
+        }
       end
 
       private
 
-      def topology_fetch_all_data
+      def topology_fetch_all_data(failures)
         with_prometheus_client(fallback: {}) do |client|
           {
-            application_requests_per_hour: topology_app_requests_per_hour(client),
-            nodes: topology_node_data(client)
+            application_requests_per_hour: topology_app_requests_per_hour(client, failures),
+            nodes: topology_node_data(client, failures)
           }.compact
         end
+      rescue => e
+        failures << CollectionFailure.new('other', e.class.to_s)
+        {}
       end
 
-      def topology_app_requests_per_hour(client)
-        result = client.query(one_week_average('gitlab_usage_ping:ops:rate5m')).first
+      def topology_app_requests_per_hour(client, failures)
+        result = query_safely('gitlab_usage_ping:ops:rate5m', 'app_requests', failures, fallback: nil) do |query|
+          client.query(one_week_average(query)).first
+        end
+
         return unless result
 
         # the metric is recorded as a per-second rate
         (result['value'].last.to_f * 1.hour).to_i
       end
 
-      def topology_node_data(client)
+      def topology_node_data(client, failures)
         # node-level data
-        by_instance_mem = topology_node_memory(client)
-        by_instance_cpus = topology_node_cpus(client)
+        by_instance_mem = topology_node_memory(client, failures)
+        by_instance_cpus = topology_node_cpus(client, failures)
         # service-level data
-        by_instance_by_job_by_type_memory = topology_all_service_memory(client)
-        by_instance_by_job_process_count = topology_all_service_process_count(client)
+        by_instance_by_job_by_type_memory = topology_all_service_memory(client, failures)
+        by_instance_by_job_process_count = topology_all_service_process_count(client, failures)
 
         instances = Set.new(by_instance_mem.keys + by_instance_cpus.keys)
         instances.map do |instance|
@@ -61,36 +76,60 @@ module Gitlab
         end
       end
 
-      def topology_node_memory(client)
-        aggregate_by_instance(client, 'gitlab_usage_ping:node_memory_total_bytes:avg')
+      def topology_node_memory(client, failures)
+        query_safely('gitlab_usage_ping:node_memory_total_bytes:avg', 'node_memory', failures, fallback: {}) do |query|
+          aggregate_by_instance(client, query)
+        end
       end
 
-      def topology_node_cpus(client)
-        aggregate_by_instance(client, 'gitlab_usage_ping:node_cpus:count')
+      def topology_node_cpus(client, failures)
+        query_safely('gitlab_usage_ping:node_cpus:count', 'node_cpus', failures, fallback: {}) do |query|
+          aggregate_by_instance(client, query)
+        end
       end
 
-      def topology_all_service_memory(client)
+      def topology_all_service_memory(client, failures)
         {
-          rss: topology_service_memory_rss(client),
-          uss: topology_service_memory_uss(client),
-          pss: topology_service_memory_pss(client)
+          rss: topology_service_memory_rss(client, failures),
+          uss: topology_service_memory_uss(client, failures),
+          pss: topology_service_memory_pss(client, failures)
         }
       end
 
-      def topology_service_memory_rss(client)
-        aggregate_by_labels(client, 'gitlab_usage_ping:node_service_process_resident_memory_bytes:avg')
+      def topology_service_memory_rss(client, failures)
+        query_safely(
+          'gitlab_usage_ping:node_service_process_resident_memory_bytes:avg', 'service_rss', failures, fallback: []
+        ) { |query| aggregate_by_labels(client, query) }
       end
 
-      def topology_service_memory_uss(client)
-        aggregate_by_labels(client, 'gitlab_usage_ping:node_service_process_unique_memory_bytes:avg')
+      def topology_service_memory_uss(client, failures)
+        query_safely(
+          'gitlab_usage_ping:node_service_process_unique_memory_bytes:avg', 'service_uss', failures, fallback: []
+        ) { |query| aggregate_by_labels(client, query) }
       end
 
-      def topology_service_memory_pss(client)
-        aggregate_by_labels(client, 'gitlab_usage_ping:node_service_process_proportional_memory_bytes:avg')
+      def topology_service_memory_pss(client, failures)
+        query_safely(
+          'gitlab_usage_ping:node_service_process_proportional_memory_bytes:avg', 'service_pss', failures, fallback: []
+        ) { |query| aggregate_by_labels(client, query) }
       end
 
-      def topology_all_service_process_count(client)
-        aggregate_by_labels(client, 'gitlab_usage_ping:node_service_process:count')
+      def topology_all_service_process_count(client, failures)
+        query_safely(
+          'gitlab_usage_ping:node_service_process:count', 'service_process_count', failures, fallback: []
+        ) { |query| aggregate_by_labels(client, query) }
+      end
+
+      def query_safely(query, query_name, failures, fallback:)
+        result = yield query
+
+        return result if result.present?
+
+        failures << CollectionFailure.new(query_name, 'empty_result')
+        fallback
+      rescue => e
+        failures << CollectionFailure.new(query_name, e.class.to_s)
+        fallback
       end
 
       def topology_node_services(instance, all_process_counts, all_process_memory)
