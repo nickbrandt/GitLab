@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20200518114540_schedule_fix_ruby_object_in_audit_events.rb')
 
-describe ScheduleFixRubyObjectInAuditEvents do
+RSpec.describe ScheduleFixRubyObjectInAuditEvents do
   let(:audit_events) { table(:audit_events) }
 
   it 'schedules background migrations' do

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::Packages::Composer::PackagesPresenter do
+RSpec.describe ::Packages::Composer::PackagesPresenter do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:package_name) { 'sample-project' }

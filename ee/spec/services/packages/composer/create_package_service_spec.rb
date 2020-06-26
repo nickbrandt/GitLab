@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::Composer::CreatePackageService do
+RSpec.describe Packages::Composer::CreatePackageService do
   include EE::PackagesManagerApiSpecHelpers
 
   let_it_be(:package_name) { 'composer-package-name' }

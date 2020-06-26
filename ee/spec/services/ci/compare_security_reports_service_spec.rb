@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::CompareSecurityReportsService do
+RSpec.describe Ci::CompareSecurityReportsService do
   let_it_be(:project) { create(:project, :repository) }
   let(:current_user) { build(:user, :admin) }
 

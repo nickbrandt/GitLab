@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Alerting::NotificationPayloadParser do
+RSpec.describe Gitlab::Alerting::NotificationPayloadParser do
   let(:project) { build_stubbed(:project) }
 
   describe '.call' do

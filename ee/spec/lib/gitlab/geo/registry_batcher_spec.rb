@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::RegistryBatcher, :geo, :use_clean_rails_memory_store_caching do
+RSpec.describe Gitlab::Geo::RegistryBatcher, :geo, :use_clean_rails_memory_store_caching do
   describe '#next_range!' do
     let(:model_class) { LfsObject }
     let(:model_foreign_key) { registry_class::MODEL_FOREIGN_KEY }

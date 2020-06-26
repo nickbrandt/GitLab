@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::FixRubyObjectInAuditEvents, :migration, schema: 20200518114540 do
+RSpec.describe Gitlab::BackgroundMigration::FixRubyObjectInAuditEvents, :migration, schema: 20200518114540 do
   let(:audit_events) { table(:audit_events) }
 
   it 'cleans up ruby/object in details field', :aggregate_failures do

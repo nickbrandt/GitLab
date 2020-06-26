@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe RequirementsManagement::ProcessTestReportsService do
+RSpec.describe RequirementsManagement::ProcessTestReportsService do
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { create(:user) }
   let_it_be(:build) { create(:ee_ci_build, :requirements_report, project: project, user: user) }

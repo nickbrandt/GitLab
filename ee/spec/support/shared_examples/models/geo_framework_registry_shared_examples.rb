@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples 'a Geo framework registry' do
+RSpec.shared_examples 'a Geo framework registry' do
   let(:registry_class_factory) { described_class.underscore.tr('/', '_').to_sym }
 
   context 'finders' do
