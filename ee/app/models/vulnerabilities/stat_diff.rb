@@ -10,7 +10,7 @@ module Vulnerabilities
       update_required? ? changes.keys : []
     end
 
-    def change_values
+    def changed_values
       update_required? ? changes.values : []
     end
 

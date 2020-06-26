@@ -18,7 +18,31 @@ RSpec.describe Vulnerabilities::Statistic do
     it { is_expected.to define_enum_for(:letter_grade).with_values(%i(a b c d f)) }
   end
 
-  describe '.update_stats_with' do
-    pending('This functionality is WIP')
+  describe '.before_save' do
+    describe '#assign_letter_grade' do
+      let(:statistic) { build(:vulnerability_statistic, letter_grade: nil, critical: 5) }
+
+      subject(:save_statistic) { statistic.save! }
+
+      it 'assigns the letter_grade' do
+        expect { save_statistic }.to change { statistic.letter_grade }.from(nil).to('f')
+      end
+    end
+  end
+
+  describe '.letter_grade_for' do
+    subject { described_class.letter_grade_for(object) }
+
+    context 'when the given object is an instance of Vulnerabilities::Statistic' do
+      let(:object) { build(:vulnerability_statistic, critical: 1) }
+
+      it { is_expected.to eq(4) }
+    end
+
+    context 'when the given object is a Hash' do
+      let(:object) { { 'high' => 1 } }
+
+      it { is_expected.to eq(3) }
+    end
   end
 end

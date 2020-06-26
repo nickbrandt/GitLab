@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Vulnerabilities::StatDiff do
+  using RSpec::Parameterized::TableSyntax
+
   let!(:vulnerability) { create(:vulnerability, :detected, severity: :high, title: 'Title') }
   let(:stat_diff) { described_class.new(vulnerability) }
   let(:update_vulnerability) {}
@@ -25,7 +27,25 @@ RSpec.describe Vulnerabilities::StatDiff do
 
       context 'when the severity is not changed' do
         context 'when the state is changed' do
-          shared_examples 'state changes' do |from:, to:, is_update_required:|
+          where(:from, :to, :is_update_required) do
+            'confirmed' | 'detected'  | false
+            'confirmed' | 'resolved'  | true
+            'confirmed' | 'dismissed' | true
+
+            'detected'  | 'confirmed' | false
+            'detected'  | 'resolved'  | true
+            'detected'  | 'dismissed' | true
+
+            'resolved'  | 'dismissed' | false
+            'resolved'  | 'confirmed' | true
+            'resolved'  | 'detected'  | true
+
+            'dismissed' | 'resolved'  | false
+            'dismissed' | 'confirmed' | true
+            'dismissed' | 'detected'  | true
+          end
+
+          with_them do
             let(:update_vulnerability) { vulnerability.update_attribute(:state, to) }
 
             before do
@@ -34,22 +54,6 @@ RSpec.describe Vulnerabilities::StatDiff do
 
             it { is_expected.to eq(is_update_required) }
           end
-
-          it_behaves_like 'state changes', from: 'confirmed', to: 'detected', is_update_required: false
-          it_behaves_like 'state changes', from: 'confirmed', to: 'resolved', is_update_required: true
-          it_behaves_like 'state changes', from: 'confirmed', to: 'dismissed', is_update_required: true
-
-          it_behaves_like 'state changes', from: 'detected', to: 'confirmed', is_update_required: false
-          it_behaves_like 'state changes', from: 'detected', to: 'resolved', is_update_required: true
-          it_behaves_like 'state changes', from: 'detected', to: 'dismissed', is_update_required: true
-
-          it_behaves_like 'state changes', from: 'resolved', to: 'dismissed', is_update_required: false
-          it_behaves_like 'state changes', from: 'resolved', to: 'confirmed', is_update_required: true
-          it_behaves_like 'state changes', from: 'resolved', to: 'detected', is_update_required: true
-
-          it_behaves_like 'state changes', from: 'dismissed', to: 'resolved', is_update_required: false
-          it_behaves_like 'state changes', from: 'dismissed', to: 'confirmed', is_update_required: true
-          it_behaves_like 'state changes', from: 'dismissed', to: 'detected', is_update_required: true
         end
 
         context 'when the state is not changed' do
@@ -81,7 +85,25 @@ RSpec.describe Vulnerabilities::StatDiff do
         end
 
         context 'when the state is changed' do
-          shared_examples 'state & severity change together' do |from:, to:, expected_changes:|
+          where(:from, :to, :expected_changes) do
+            'confirmed' | 'detected'  | { 'total' => 0, 'high' => -1, 'critical' => 1 }
+            'confirmed' | 'resolved'  | { 'total' => -1, 'high' => -1 }
+            'confirmed' | 'dismissed' | { 'total' => -1, 'high' => -1 }
+
+            'detected'  | 'confirmed' | { 'total' => 0, 'high' => -1, 'critical' => 1 }
+            'detected'  | 'resolved'  | { 'total' => -1, 'high' => -1 }
+            'detected'  | 'dismissed' | { 'total' => -1, 'high' => -1 }
+
+            'resolved'  | 'dismissed' | { 'total' => 0 }
+            'resolved'  | 'confirmed' | { 'total' => 1, 'critical' => 1 }
+            'resolved'  | 'detected'  | { 'total' => 1, 'critical' => 1 }
+
+            'dismissed' | 'resolved'  | { 'total' => 0 }
+            'dismissed' | 'confirmed' | { 'total' => 1, 'critical' => 1 }
+            'dismissed' | 'detected'  | { 'total' => 1, 'critical' => 1 }
+          end
+
+          with_them do
             let(:update_vulnerability) { vulnerability.update!(state: to, severity: :critical) }
 
             before do
@@ -90,28 +112,30 @@ RSpec.describe Vulnerabilities::StatDiff do
 
             it { is_expected.to eq(expected_changes) }
           end
-
-          it_behaves_like 'state & severity change together', from: 'confirmed', to: 'detected', expected_changes: { 'total' => 0, 'high' => -1, 'critical' => 1 }
-          it_behaves_like 'state & severity change together', from: 'confirmed', to: 'resolved', expected_changes: { 'total' => -1, 'high' => -1 }
-          it_behaves_like 'state & severity change together', from: 'confirmed', to: 'dismissed', expected_changes: { 'total' => -1, 'high' => -1 }
-
-          it_behaves_like 'state & severity change together', from: 'detected', to: 'confirmed', expected_changes: { 'total' => 0, 'high' => -1, 'critical' => 1 }
-          it_behaves_like 'state & severity change together', from: 'detected', to: 'resolved', expected_changes: { 'total' => -1, 'high' => -1 }
-          it_behaves_like 'state & severity change together', from: 'detected', to: 'dismissed', expected_changes: { 'total' => -1, 'high' => -1 }
-
-          it_behaves_like 'state & severity change together', from: 'resolved', to: 'dismissed', expected_changes: { 'total' => 0 }
-          it_behaves_like 'state & severity change together', from: 'resolved', to: 'confirmed', expected_changes: { 'total' => 1, 'critical' => 1 }
-          it_behaves_like 'state & severity change together', from: 'resolved', to: 'detected', expected_changes: { 'total' => 1, 'critical' => 1 }
-
-          it_behaves_like 'state & severity change together', from: 'dismissed', to: 'resolved', expected_changes: { 'total' => 0 }
-          it_behaves_like 'state & severity change together', from: 'dismissed', to: 'confirmed', expected_changes: { 'total' => 1, 'critical' => 1 }
-          it_behaves_like 'state & severity change together', from: 'dismissed', to: 'detected', expected_changes: { 'total' => 1, 'critical' => 1 }
         end
       end
 
       context 'when the severity is not changed' do
         context 'when the state is changed' do
-          shared_examples 'state changes' do |from:, to:, expected_changes:|
+          where(:from, :to, :expected_changes) do
+            'confirmed' | 'detected'  | { 'total' => 0 }
+            'confirmed' | 'resolved'  | { 'total' => -1, 'high' => -1 }
+            'confirmed' | 'dismissed' | { 'total' => -1, 'high' => -1 }
+
+            'detected'  | 'confirmed' | { 'total' => 0 }
+            'detected'  | 'resolved'  | { 'total' => -1, 'high' => -1 }
+            'detected'  | 'dismissed' | { 'total' => -1, 'high' => -1 }
+
+            'resolved'  | 'dismissed' | { 'total' => 0 }
+            'resolved'  | 'confirmed' | { 'total' => 1, 'high' => 1 }
+            'resolved'  | 'detected'  | { 'total' => 1, 'high' => 1 }
+
+            'dismissed' | 'resolved'  | { 'total' => 0 }
+            'dismissed' | 'confirmed' | { 'total' => 1, 'high' => 1 }
+            'dismissed' | 'detected'  | { 'total' => 1, 'high' => 1 }
+          end
+
+          with_them do
             let(:update_vulnerability) { vulnerability.update_attribute(:state, to) }
 
             before do
@@ -120,22 +144,6 @@ RSpec.describe Vulnerabilities::StatDiff do
 
             it { is_expected.to eq(expected_changes) }
           end
-
-          it_behaves_like 'state changes', from: 'confirmed', to: 'detected', expected_changes: { 'total' => 0 }
-          it_behaves_like 'state changes', from: 'confirmed', to: 'resolved', expected_changes: { 'total' => -1, 'high' => -1 }
-          it_behaves_like 'state changes', from: 'confirmed', to: 'dismissed', expected_changes: { 'total' => -1, 'high' => -1 }
-
-          it_behaves_like 'state changes', from: 'detected', to: 'confirmed', expected_changes: { 'total' => 0 }
-          it_behaves_like 'state changes', from: 'detected', to: 'resolved', expected_changes: { 'total' => -1, 'high' => -1 }
-          it_behaves_like 'state changes', from: 'detected', to: 'dismissed', expected_changes: { 'total' => -1, 'high' => -1 }
-
-          it_behaves_like 'state changes', from: 'resolved', to: 'dismissed', expected_changes: { 'total' => 0 }
-          it_behaves_like 'state changes', from: 'resolved', to: 'confirmed', expected_changes: { 'total' => 1, 'high' => 1 }
-          it_behaves_like 'state changes', from: 'resolved', to: 'detected', expected_changes: { 'total' => 1, 'high' => 1 }
-
-          it_behaves_like 'state changes', from: 'dismissed', to: 'resolved', expected_changes: { 'total' => 0 }
-          it_behaves_like 'state changes', from: 'dismissed', to: 'confirmed', expected_changes: { 'total' => 1, 'high' => 1 }
-          it_behaves_like 'state changes', from: 'dismissed', to: 'detected', expected_changes: { 'total' => 1, 'high' => 1 }
         end
 
         context 'when the state is not changed' do
@@ -172,8 +180,8 @@ RSpec.describe Vulnerabilities::StatDiff do
     end
   end
 
-  describe '#change_values' do
-    subject { stat_diff.change_values }
+  describe '#changed_values' do
+    subject { stat_diff.changed_values }
 
     context 'when there are changes' do
       let(:expected_values) { [-1, -1] }
