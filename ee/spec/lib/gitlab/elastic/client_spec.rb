@@ -57,12 +57,15 @@ RSpec.describe Gitlab::Elastic::Client do
       end
 
       it 'signs_requests' do
+        # Mock the correlation ID (passed as header) to have deterministic signature
+        allow(Labkit::Correlation::CorrelationId).to receive(:current_or_new_id).and_return('new-correlation-id')
+
         stub_instance_credentials(creds_fail_response)
         travel_to(Time.parse('20170303T133952Z')) do
           stub_request(:get, 'http://example-elastic:9200/foo/_all/1')
             .with(
               headers: {
-                'Authorization'        => 'AWS4-HMAC-SHA256 Credential=0/20170303/us-east-1/es/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=4ba2aae19a476152dacf5a2191da67b0cf81b9d7152dab5c42b1bba701da19f1',
+                'Authorization'        => 'AWS4-HMAC-SHA256 Credential=0/20170303/us-east-1/es/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date;x-opaque-id, Signature=c3180885fb19ca2cf4673a361aa47615dddd3ed52159fffcfeda9e732d7c91b8',
                 'Content-Type'         => 'application/json',
                 'X-Amz-Content-Sha256' => 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
                 'X-Amz-Date'           => '20170303T133952Z'
