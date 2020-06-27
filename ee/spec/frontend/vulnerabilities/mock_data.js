@@ -21,6 +21,7 @@ export const generateVulnerabilities = () => [
     reportType: 'DEPENDENCY_SCANNING',
     location: {
       file: 'src/main/java/com/gitlab/security_products/tests/App.java',
+      startLine: '1337',
     },
     project: {
       nameWithNamespace: 'Administrator / Vulnerability reports',
@@ -33,7 +34,7 @@ export const generateVulnerabilities = () => [
     state: 'opened',
     reportType: 'CUSTOM_SCANNER_WITHOUT_TRANSLATION',
     location: {
-      file: 'yarn.lock',
+      file: 'src/main/java/com/gitlab/security_products/tests/App.java',
     },
     project: {
       nameWithNamespace: 'Mixed Vulnerabilities / Dependency List Test 01',
@@ -48,7 +49,7 @@ export const generateVulnerabilities = () => [
       file: 'yarn.lock',
     },
     project: {
-      nameWithNamespace: 'Mixed Vulnerabilities / Dependency List Test 01',
+      nameWithNamespace: 'Mixed Vulnerabilities / Rails App',
     },
   },
 ];
