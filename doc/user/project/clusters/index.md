@@ -76,81 +76,6 @@ Simply add another cluster, like you did the first time, and make sure to
 [set an environment scope](#setting-the-environment-scope-premium) that will
 differentiate the new cluster with the rest.
 
-### Cluster configuration
-
-After [adding a Kubernetes cluster](add_remove_clusters.md) to GitLab, read this section that covers
-important considerations for configuring Kubernetes clusters with GitLab.
-
-#### Security implications
-
-CAUTION: **Important:**
-The whole cluster security is based on a model where [developers](../../permissions.md)
-are trusted, so **only trusted users should be allowed to control your clusters**.
-
-The default cluster configuration grants access to a wide set of
-functionalities needed to successfully build and deploy a containerized
-application. Bear in mind that the same credentials are used for all the
-applications running on the cluster.
-
-#### GitLab-managed clusters
-
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22011) in GitLab 11.5.
-> - Became [optional](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/26565) in GitLab 11.11.
-
-You can choose to allow GitLab to manage your cluster for you. If your cluster is
-managed by GitLab, resources for your projects will be automatically created. See the
-[Access controls](add_remove_clusters.md#access-controls) section for details on which resources will
-be created.
-
-If you choose to manage your own cluster, project-specific resources will not be created
-automatically. If you are using [Auto DevOps](../../../topics/autodevops/index.md), you will
-need to explicitly provide the `KUBE_NAMESPACE` [deployment variable](#deployment-variables)
-that will be used by your deployment jobs, otherwise a namespace will be created for you.
-
-##### Important notes
-
-Note the following with GitLab and clusters:
-
-- If you [install applications](#installing-applications) on your cluster, GitLab will
-  create the resources required to run these even if you have chosen to manage your own
-  cluster.
-- Be aware that manually managing resources that have been created by GitLab, like
-  namespaces and service accounts, can cause unexpected errors. If this occurs, try
-  [clearing the cluster cache](#clearing-the-cluster-cache).
-
-##### Clearing the cluster cache
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/31759) in GitLab 12.6.
-
-If you choose to allow GitLab to manage your cluster for you, GitLab stores a cached
-version of the namespaces and service accounts it creates for your projects. If you
-modify these resources in your cluster manually, this cache can fall out of sync with
-your cluster, which can cause deployment jobs to fail.
-
-To clear the cache:
-
-1. Navigate to your project’s **Operations > Kubernetes** page, and select your cluster.
-1. Expand the **Advanced settings** section.
-1. Click **Clear cluster cache**.
-
-#### Base domain
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/24580) in GitLab 11.8.
-
-NOTE: **Note:**
-You do not need to specify a base domain on cluster settings when using GitLab Serverless. The domain in that case
-will be specified as part of the Knative installation. See [Installing Applications](#installing-applications).
-
-Specifying a base domain will automatically set `KUBE_INGRESS_BASE_DOMAIN` as an environment variable.
-If you are using [Auto DevOps](../../../topics/autodevops/index.md), this domain will be used for the different
-stages. For example, Auto Review Apps and Auto Deploy.
-
-The domain should have a wildcard DNS configured to the Ingress IP address. After Ingress has been installed (see [Installing Applications](#installing-applications)),
-you can either:
-
-- Create an `A` record that points to the Ingress IP address with your domain provider.
-- Enter a wildcard DNS address using a service such as nip.io or xip.io. For example, `192.168.1.1.xip.io`.
-
 #### Setting the environment scope **(PREMIUM)**
 
 When adding more than one Kubernetes cluster to your project, you need to differentiate
@@ -204,6 +129,81 @@ The result will then be:
   job.
 - No cluster details will be available in the `test` job because it doesn't
   define any environment.
+
+## Configuring your Kubernetes cluster
+
+After [adding a Kubernetes cluster](add_remove_clusters.md) to GitLab, read this section that covers
+important considerations for configuring Kubernetes clusters with GitLab.
+
+### Security implications
+
+CAUTION: **Important:**
+The whole cluster security is based on a model where [developers](../../permissions.md)
+are trusted, so **only trusted users should be allowed to control your clusters**.
+
+The default cluster configuration grants access to a wide set of
+functionalities needed to successfully build and deploy a containerized
+application. Bear in mind that the same credentials are used for all the
+applications running on the cluster.
+
+### GitLab-managed clusters
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22011) in GitLab 11.5.
+> - Became [optional](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/26565) in GitLab 11.11.
+
+You can choose to allow GitLab to manage your cluster for you. If your cluster is
+managed by GitLab, resources for your projects will be automatically created. See the
+[Access controls](add_remove_clusters.md#access-controls) section for details on which resources will
+be created.
+
+If you choose to manage your own cluster, project-specific resources will not be created
+automatically. If you are using [Auto DevOps](../../../topics/autodevops/index.md), you will
+need to explicitly provide the `KUBE_NAMESPACE` [deployment variable](#deployment-variables)
+that will be used by your deployment jobs, otherwise a namespace will be created for you.
+
+#### Important notes
+
+Note the following with GitLab and clusters:
+
+- If you [install applications](#installing-applications) on your cluster, GitLab will
+  create the resources required to run these even if you have chosen to manage your own
+  cluster.
+- Be aware that manually managing resources that have been created by GitLab, like
+  namespaces and service accounts, can cause unexpected errors. If this occurs, try
+  [clearing the cluster cache](#clearing-the-cluster-cache).
+
+#### Clearing the cluster cache
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/31759) in GitLab 12.6.
+
+If you choose to allow GitLab to manage your cluster for you, GitLab stores a cached
+version of the namespaces and service accounts it creates for your projects. If you
+modify these resources in your cluster manually, this cache can fall out of sync with
+your cluster, which can cause deployment jobs to fail.
+
+To clear the cache:
+
+1. Navigate to your project’s **Operations > Kubernetes** page, and select your cluster.
+1. Expand the **Advanced settings** section.
+1. Click **Clear cluster cache**.
+
+### Base domain
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/24580) in GitLab 11.8.
+
+NOTE: **Note:**
+You do not need to specify a base domain on cluster settings when using GitLab Serverless. The domain in that case
+will be specified as part of the Knative installation. See [Installing Applications](#installing-applications).
+
+Specifying a base domain will automatically set `KUBE_INGRESS_BASE_DOMAIN` as an environment variable.
+If you are using [Auto DevOps](../../../topics/autodevops/index.md), this domain will be used for the different
+stages. For example, Auto Review Apps and Auto Deploy.
+
+The domain should have a wildcard DNS configured to the Ingress IP address. After Ingress has been installed (see [Installing Applications](#installing-applications)),
+you can either:
+
+- Create an `A` record that points to the Ingress IP address with your domain provider.
+- Enter a wildcard DNS address using a service such as nip.io or xip.io. For example, `192.168.1.1.xip.io`.
 
 ## Installing applications
 
