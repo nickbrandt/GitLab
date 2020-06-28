@@ -20,6 +20,8 @@ module EE
           expose :updating_name_disabled_for_users, if: ->(_instance, _opts) { ::License.feature_available?(:disable_name_update_for_users) }
           expose :npm_package_requests_forwarding, if: ->(_instance, _opts) { ::License.feature_available?(:packages) }
           expose :group_owners_can_manage_default_branch_protection, if: ->(_instance, _opts) { ::License.feature_available?(:default_branch_protection_restriction_in_groups) }
+          expose :maintenance_mode, if: ->(_instance, _opts) { ::License.feature_available?(:geo) }
+          expose :maintenance_mode_message, if: ->(_instance, _opts) { ::License.feature_available?(:geo) }
         end
       end
     end

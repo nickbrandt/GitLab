@@ -125,6 +125,18 @@ RSpec.describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'updating maintenance mode setting' do
+      let(:settings) do
+        {
+          maintenance_mode: true,
+          maintenance_mode_message: 'GitLab is in maintenance'
+        }
+      end
+      let(:feature) { :geo }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     context 'project deletion adjourned period' do
       let(:settings) { { deletion_adjourned_period: 6 } }
       let(:feature) { :adjourned_deletion_for_projects_and_groups }

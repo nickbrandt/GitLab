@@ -47,6 +47,10 @@ module EE
               attrs = attrs.except(:group_owners_can_manage_default_branch_protection)
             end
 
+            unless License.feature_available?(:geo)
+              attrs = attrs.except(:maintenance_mode, :maintenance_mode_message)
+            end
+
             attrs
           end
         end
