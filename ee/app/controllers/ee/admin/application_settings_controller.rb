@@ -78,7 +78,7 @@ module EE
           attrs << :group_owners_can_manage_default_branch_protection
         end
 
-        if License.feature_available?(:geo)
+        if ::License.feature_available?(:geo) && ::Feature.enabled?(:maintenance_mode)
           attrs << :maintenance_mode
           attrs << :maintenance_mode_message
         end
