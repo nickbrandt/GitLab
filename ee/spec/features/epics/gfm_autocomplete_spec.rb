@@ -17,6 +17,14 @@ RSpec.describe 'GFM autocomplete', :js do
     wait_for_requests
   end
 
+  it 'opens quick action autocomplete when updating description' do
+    find('.js-issuable-edit').click
+
+    find('#issue-description').native.send_keys('/')
+
+    expect(page).to have_selector('.atwho-container')
+  end
+
   context 'issuables' do
     let(:project) { create(:project, :repository, namespace: group) }
 
