@@ -1951,9 +1951,6 @@ msgstr ""
 msgid "AlertManagement|Edit"
 msgstr ""
 
-msgid "AlertManagement|End time"
-msgstr ""
-
 msgid "AlertManagement|Events"
 msgstr ""
 
