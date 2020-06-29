@@ -1,8 +1,8 @@
 <script>
-import { GlFormGroup, GlFormInput, GlSprintf } from '@gitlab/ui';
+import { GlFormGroup, GlFormInput, GlSprintf, GlLink } from '@gitlab/ui';
 import { mapActions, mapState } from 'vuex';
 import { validateName, validateUrl } from '../validations';
-import { VALIDATION_FIELD_KEYS } from '../constants';
+import { VALIDATION_FIELD_KEYS, NODE_NAME_MORE_INFO } from '../constants';
 
 export default {
   name: 'GeoNodeFormCore',
@@ -10,6 +10,7 @@ export default {
     GlFormGroup,
     GlFormInput,
     GlSprintf,
+    GlLink,
   },
   props: {
     nodeData: {
@@ -29,13 +30,13 @@ export default {
       this.setError({ key: VALIDATION_FIELD_KEYS.URL, error: validateUrl(this.nodeData.url) });
     },
   },
+  NODE_NAME_MORE_INFO,
 };
 </script>
 
 <template>
-  <section class="form-row">
+  <section>
     <gl-form-group
-      class="col-sm-6"
       :label="__('Name')"
       label-for="node-name-field"
       :state="Boolean(formErrors.name)"
@@ -45,43 +46,92 @@ export default {
         <gl-sprintf
           :message="
             __(
-              'The unique identifier for the Geo node. Must match %{geoNodeName} if it is set in gitlab.rb, otherwise it must match %{externalUrl} with a trailing slash',
+              'Must match with the %{codeStart}geo_node_name%{codeEnd} in %{codeStart}/etc/gitlab/gitlab.rb%{codeEnd}. %{linkStart}More information%{linkEnd}',
             )
           "
         >
-          <template #geoNodeName>
-            <code>{{ __('geo_node_name') }}</code>
+          <template #code="{ content }">
+            <code>{{ content }}</code>
           </template>
-          <template #externalUrl>
-            <code>{{ __('external_url') }}</code>
+          <template #link="{ content }">
+            <gl-link :href="$options.NODE_NAME_MORE_INFO" target="_blank">{{ content }}</gl-link>
           </template>
         </gl-sprintf>
       </template>
-      <gl-form-input
-        id="node-name-field"
-        v-model="nodeData.name"
+      <div
         :class="{ 'is-invalid': Boolean(formErrors.name) }"
-        data-qa-selector="node_name_field"
-        type="text"
-        @input="checkName"
-      />
+        class="gl-display-flex gl-align-items-center"
+      >
+        <gl-form-input
+          id="node-name-field"
+          v-model="nodeData.name"
+          class="col-sm-6 gl-pr-8!"
+          :class="{ 'is-invalid': Boolean(formErrors.name) }"
+          data-qa-selector="node_name_field"
+          type="text"
+          @input="checkName"
+        />
+        <span class="gl-text-gray-700 m-n5 gl-z-index-2">{{ 255 - nodeData.name.length }}</span>
+      </div>
     </gl-form-group>
-    <gl-form-group
-      class="col-sm-6"
-      :label="__('URL')"
-      label-for="node-url-field"
-      :description="__('The user-facing URL of the Geo node')"
-      :state="Boolean(formErrors.url)"
-      :invalid-feedback="formErrors.url"
-    >
-      <gl-form-input
-        id="node-url-field"
-        v-model="nodeData.url"
-        :class="{ 'is-invalid': Boolean(formErrors.url) }"
-        data-qa-selector="node_url_field"
-        type="text"
-        @input="checkUrl"
-      />
-    </gl-form-group>
+    <section class="form-row">
+      <gl-form-group
+        class="col-12 col-sm-6"
+        :label="__('URL')"
+        label-for="node-url-field"
+        :state="Boolean(formErrors.url)"
+        :invalid-feedback="formErrors.url"
+      >
+        <template #description>
+          <gl-sprintf
+            :message="
+              __(
+                'Must match with the %{codeStart}external_url%{codeEnd} in %{codeStart}/etc/gitlab/gitlab.rb%{codeEnd}.',
+              )
+            "
+          >
+            <template #code="{ content }">
+              <code>{{ content }}</code>
+            </template>
+          </gl-sprintf>
+        </template>
+        <div
+          :class="{ 'is-invalid': Boolean(formErrors.url) }"
+          class="gl-display-flex gl-align-items-center"
+        >
+          <gl-form-input
+            id="node-url-field"
+            v-model="nodeData.url"
+            class="gl-pr-8!"
+            :class="{ 'is-invalid': Boolean(formErrors.url) }"
+            data-qa-selector="node_url_field"
+            type="text"
+            @input="checkUrl"
+          />
+          <span class="gl-text-gray-700 m-n5 gl-z-index-2">{{ 255 - nodeData.url.length }}</span>
+        </div>
+      </gl-form-group>
+      <gl-form-group
+        v-if="nodeData.primary"
+        class="col-12 col-sm-6"
+        :label="__('Internal URL (optional)')"
+        label-for="node-internal-url-field"
+        :description="
+          __('The URL defined on the primary node that secondary nodes should use to contact it.')
+        "
+      >
+        <div class="gl-display-flex gl-align-items-center">
+          <gl-form-input
+            id="node-internal-url-field"
+            v-model="nodeData.internalUrl"
+            class="gl-pr-8!"
+            type="text"
+          />
+          <span class="gl-text-gray-700 m-n5 gl-z-index-2">{{
+            255 - nodeData.internalUrl.length
+          }}</span>
+        </div>
+      </gl-form-group>
+    </section>
   </section>
 </template>
