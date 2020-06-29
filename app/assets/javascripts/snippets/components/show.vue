@@ -27,6 +27,7 @@ export default {
     <template v-else>
       <snippet-header :snippet="snippet" />
       <snippet-title :snippet="snippet" />
+      <blob-embeddable v-if="embeddable" class="mb-3" :url="snippet.webUrl" />
       <snippet-blob :snippet="snippet" />
     </template>
   </div>

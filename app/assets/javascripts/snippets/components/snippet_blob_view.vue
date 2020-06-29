@@ -93,7 +93,6 @@ export default {
 </script>
 <template>
   <div>
-    <blob-embeddable v-if="embeddable" class="mb-3" :url="snippet.webUrl" />
     <article class="file-holder snippet-file-content">
       <blob-header
         :blob="blob"
