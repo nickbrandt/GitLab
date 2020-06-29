@@ -83,10 +83,10 @@ describe('Security Dashboard Table Row', () => {
 
     it('should render the report type', () => {
       expect(
-        findContent(2)
+        findContent(3)
           .text()
           .toLowerCase(),
-      ).toContain(wrapper.props().vulnerability.report_type.toLowerCase());
+      ).toContain(vulnerability.report_type.toLowerCase());
     });
 
     describe('the project name', () => {
