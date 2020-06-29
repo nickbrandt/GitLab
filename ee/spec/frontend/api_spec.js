@@ -841,4 +841,20 @@ describe('Api', () => {
       });
     });
   });
+
+  describe('getApplicationSettings', () => {
+    const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/application/settings`;
+    const apiResponse = { mock_setting: 1, mock_setting2: 2 };
+
+    it('fetches applications settings', () => {
+      jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+      jest.spyOn(axios, 'get');
+      mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+
+      return Api.getApplicationSettings().then(({ data }) => {
+        expect(data).toEqual(apiResponse);
+        expect(axios.get).toHaveBeenCalledWith(expectedUrl);
+      });
+    });
+  });
 });

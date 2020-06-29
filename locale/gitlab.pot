@@ -22975,6 +22975,9 @@ msgstr ""
 msgid "There was an error fetching the %{replicableType}"
 msgstr ""
 
+msgid "There was an error fetching the Geo Settings"
+msgstr ""
+
 msgid "There was an error fetching the Node's Groups"
 msgstr ""
 

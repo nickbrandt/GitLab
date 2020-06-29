@@ -39,6 +39,7 @@ export default {
   vulnerabilityActionPath: '/api/:version/vulnerabilities/:id/:action',
   featureFlagUserLists: '/api/:version/projects/:id/feature_flags_user_lists',
   featureFlagUserList: '/api/:version/projects/:id/feature_flags_user_lists/:list_iid',
+  applicationSettingsPath: '/api/:version/application/settings',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -348,5 +349,10 @@ export default {
       .replace(':list_iid', listIid);
 
     return axios.delete(url);
+  },
+
+  getApplicationSettings() {
+    const url = Api.buildUrl(this.applicationSettingsPath);
+    return axios.get(url);
   },
 };
