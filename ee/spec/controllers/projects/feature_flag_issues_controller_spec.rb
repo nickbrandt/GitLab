@@ -172,6 +172,16 @@ RSpec.describe Projects::FeatureFlagIssuesController do
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
+    it 'returns not found when related issues feature is unavailable' do
+      stub_licensed_features(related_issues: false)
+      feature_flag, _issue = setup
+      sign_in(developer)
+
+      get_request(project, feature_flag)
+
+      expect(response).to have_gitlab_http_status(:not_found)
+    end
+
     context 'when feature flags are unlicensed' do
       before do
         stub_licensed_features(feature_flags: false)
@@ -201,7 +211,7 @@ RSpec.describe Projects::FeatureFlagIssuesController do
         namespace_id: project.namespace,
         project_id: project,
         feature_flag_iid: feature_flag,
-        issuable_references: [issue.to_reference],
+        issuable_references: [issue.to_reference(full: true)],
         link_type: 'relates_to'
       }
 
@@ -241,16 +251,24 @@ RSpec.describe Projects::FeatureFlagIssuesController do
       }))
     end
 
-    it 'does not create a link for a reporter' do
-      feature_flag, issue = setup
-      sign_in(reporter)
+    it 'creates a cross project link for a project in the same namespace' do
+      other_project = create(:project, namespace: project.namespace)
+      other_project.add_developer(developer)
+      feature_flag = create(:operations_feature_flag, project: project)
+      issue = create(:issue, project: other_project)
+      sign_in(developer)
 
       post_request(project, feature_flag, issue)
 
-      expect(response).to have_gitlab_http_status(:not_found)
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response).to match(a_hash_including({
+        'issuables' => [a_hash_including({
+          'id' => issue.id
+        })]
+      }))
     end
 
-    it 'does not create a cross project link' do
+    it 'creates a cross project link for a project in another namespace' do
       other_project = create(:project)
       other_project.add_developer(developer)
       feature_flag = create(:operations_feature_flag, project: project)
@@ -259,7 +277,70 @@ RSpec.describe Projects::FeatureFlagIssuesController do
 
       post_request(project, feature_flag, issue)
 
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response).to match(a_hash_including({
+        'issuables' => [a_hash_including({
+          'id' => issue.id
+        })]
+      }))
+    end
+
+    it 'does not create a link for a reporter' do
+      feature_flag, issue = setup
+      sign_in(reporter)
+
+      post_request(project, feature_flag, issue)
+
       expect(response).to have_gitlab_http_status(:not_found)
+      expect(::FeatureFlagIssue.count).to eq(0)
+    end
+
+    it "does not create a cross project link when the user is not a member of the issue's project" do
+      other_project = create(:project, namespace: project.namespace)
+      feature_flag = create(:operations_feature_flag, project: project)
+      issue = create(:issue, project: other_project, confidential: true)
+      sign_in(developer)
+
+      post_request(project, feature_flag, issue)
+
+      expect(response).to have_gitlab_http_status(:not_found)
+      expect(::FeatureFlagIssue.count).to eq(0)
+    end
+
+    it "does not create a cross project link when the user is a guest of the issue's project" do
+      other_project = create(:project, namespace: project.namespace)
+      other_project.add_guest(developer)
+      feature_flag = create(:operations_feature_flag, project: project)
+      issue = create(:issue, project: other_project, confidential: true)
+      sign_in(developer)
+
+      post_request(project, feature_flag, issue)
+
+      expect(response).to have_gitlab_http_status(:not_found)
+      expect(::FeatureFlagIssue.count).to eq(0)
+    end
+
+    it 'does not create a link when the user cannot read the issue' do
+      feature_flag, issue = setup
+      sign_in(developer)
+      allow(Ability).to receive(:allowed?).and_call_original
+      allow(Ability).to receive(:allowed?).with(developer, :read_issue, issue).and_return(false)
+
+      post_request(project, feature_flag, issue)
+
+      expect(response).to have_gitlab_http_status(:not_found)
+      expect(::FeatureFlagIssue.count).to eq(0)
+    end
+
+    it 'does not create a link when the related issues feature is unavailable' do
+      stub_licensed_features(related_issues: false)
+      feature_flag, issue = setup
+      sign_in(developer)
+
+      post_request(project, feature_flag, issue)
+
+      expect(response).to have_gitlab_http_status(:not_found)
+      expect(::FeatureFlagIssue.count).to eq(0)
     end
 
     context 'when feature flags are unlicensed' do
@@ -274,6 +355,7 @@ RSpec.describe Projects::FeatureFlagIssuesController do
         post_request(project, feature_flag, issue)
 
         expect(response).to have_gitlab_http_status(:not_found)
+        expect(::FeatureFlagIssue.count).to eq(0)
       end
     end
   end
@@ -311,6 +393,17 @@ RSpec.describe Projects::FeatureFlagIssuesController do
     it 'does not unlink the issue for a reporter' do
       feature_flag, issue, link = setup
       sign_in(reporter)
+
+      delete_request(project, feature_flag, link)
+
+      expect(response).to have_gitlab_http_status(:not_found)
+      expect(feature_flag.reload.issues).to eq([issue])
+    end
+
+    it 'does not unlink the issue when the related issues feature is unavailable' do
+      stub_licensed_features(related_issues: false)
+      feature_flag, issue, link = setup
+      sign_in(developer)
 
       delete_request(project, feature_flag, link)
 

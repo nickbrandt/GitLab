@@ -8,4 +8,4 @@
                       project_id: @project.id,
                       feature_flags_path: project_feature_flags_path(@project),
                       environments_endpoint: search_project_environments_path(@project, format: :json),
-                      feature_flag_issues_endpoint: Feature.enabled?(:feature_flags_issue_links, @project) ? project_feature_flag_issues_path(@project, @feature_flag) : ''} }
+                      feature_flag_issues_endpoint: Feature.enabled?(:feature_flags_issue_links, @project) && can?(current_user, :read_issue_link, @project) ? project_feature_flag_issues_path(@project, @feature_flag) : ''} }
