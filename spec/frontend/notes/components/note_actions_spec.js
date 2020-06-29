@@ -146,16 +146,15 @@ describe('noteActions', () => {
     };
 
     beforeEach(() => {
-      store.dispatch('setUserData', userDataMock);
-      store.dispatch('setNoteableData', {
-        current_user: {
-          can_update: true,
-        },
-      });
-
       wrapper = shallowMountNoteActions(props, {
         targetType: () => 'issue',
       });
+      store.state.noteableData = {
+        current_user: {
+          can_update: true,
+        },
+      };
+      store.state.userData = userDataMock;
     });
 
     afterEach(() => {
