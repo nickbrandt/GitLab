@@ -1046,4 +1046,6 @@ RSpec.describe GroupPolicy do
   end
 
   it_behaves_like 'update namespace limit policy'
+
+  include_examples 'analytics report embedding'
 end

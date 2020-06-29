@@ -1473,4 +1473,6 @@ RSpec.describe ProjectPolicy do
       it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
     end
   end
+
+  include_examples 'analytics report embedding'
 end

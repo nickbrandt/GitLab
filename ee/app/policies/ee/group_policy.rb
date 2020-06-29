@@ -251,6 +251,8 @@ module EE
       rule { can?(:maintainer_access) & push_rules_available }.enable :change_push_rules
 
       rule { admin & is_gitlab_com }.enable :update_subscription_limit
+
+      rule { public_group }.enable :embed_analytics_report
     end
 
     override :lookup_access_level!
