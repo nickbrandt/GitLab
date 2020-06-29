@@ -1,0 +1,5 @@
+---
+title: Fix project authorizations for instance security dashboard
+merge_request:
+author:
+type: security
