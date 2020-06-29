@@ -115,13 +115,9 @@ export default {
 </script>
 
 <template>
-  <div
-    :style="sectionContainerStyles"
-    class="milestones-list-section gl-display-table"
-    :class="{ 'milestones-list-section-collapsed': !milestonesExpanded }"
-  >
+  <div :style="sectionContainerStyles" class="milestones-list-section gl-display-table">
     <div
-      class="milestones-list-title gl-display-table-cell border-bottom gl-vertical-align-top position-sticky gl-p-3"
+      class="milestones-list-title gl-display-table-cell border-bottom gl-vertical-align-top position-sticky gl-px-3 gl-pt-2"
     >
       <div class="gl-display-flex gl-align-items-center">
         <span

@@ -30,22 +30,15 @@ describe('MilestoneTimelineComponent', () => {
     });
   };
 
-  const findMilestoneTimelineCell = () => wrapper.find('.milestone-timeline-cell');
   const findMilestoneItem = () => wrapper.find(MilestoneItem);
 
   describe.each`
-    props                            | hasCellEmpty | hasMilestoneItem
-    ${{}}                            | ${false}     | ${true}
-    ${{ milestonesExpanded: false }} | ${true}      | ${false}
-  `('with $props', ({ props, hasCellEmpty, hasMilestoneItem }) => {
+    props                            | hasMilestoneItem
+    ${{}}                            | ${true}
+    ${{ milestonesExpanded: false }} | ${false}
+  `('with $props', ({ props, hasMilestoneItem }) => {
     beforeEach(() => {
       createWrapper(props);
-    });
-
-    it(`renders timeline cell with empty class = ${hasCellEmpty}`, () => {
-      expect(findMilestoneTimelineCell().classes('milestone-timeline-cell-empty')).toBe(
-        hasCellEmpty,
-      );
     });
 
     it(`renders MilestoneItem component = ${hasMilestoneItem}`, () => {

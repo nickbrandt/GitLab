@@ -1,7 +1,7 @@
 $header-item-height: 60px;
 $item-height: 50px;
-$milestones-collapsed-height: 38px;
 $details-cell-width: 320px;
+$timeline-cell-height: 32px;
 $timeline-cell-width: 180px;
 $border-style: 1px solid $border-gray-normal;
 $roadmap-gradient-dark-gray: rgba(0, 0, 0, 0.15);
@@ -409,21 +409,14 @@ html.group-epics-roadmap-html {
 }
 
 .milestones-list-section {
-  &.milestones-list-section-collapsed {
-    height: $milestones-collapsed-height;
-  }
-
   .milestones-list-items {
     .milestone-timeline-cell {
+      height: $timeline-cell-height;
       width: $timeline-cell-width;
     }
 
-    .milestone-timeline-cell-empty {
-      height: $milestones-collapsed-height;
-    }
-
     .timeline-bar-wrapper {
-      height: 32px;
+      height: $timeline-cell-height;
       color: $gray-700;
     }
 
