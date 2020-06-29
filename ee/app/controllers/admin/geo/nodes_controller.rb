@@ -29,7 +29,7 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
   end
 
   def new
-    @form_title = _('New Geo Node')
+    @form_title = _('Add New Node')
     render :form
   end
 

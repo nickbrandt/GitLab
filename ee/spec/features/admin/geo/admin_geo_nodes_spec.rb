@@ -132,7 +132,7 @@ RSpec.describe 'admin Geo Nodes', :js, :geo do
 
       fill_in 'node-url-field', with: 'http://newsite.com'
       fill_in 'node-internal-url-field', with: 'http://internal-url.com'
-      click_button 'Update'
+      click_button 'Save changes'
 
       wait_for_requests
       expect(current_path).to eq admin_geo_nodes_path
