@@ -5,14 +5,17 @@ require 'spec_helper'
 describe InstanceSecurityDashboard do
   let_it_be(:project1) { create(:project) }
   let_it_be(:project2) { create(:project) }
+  let_it_be(:project3) { create(:project) }
   let_it_be(:pipeline1) { create(:ci_pipeline, project: project1) }
   let_it_be(:pipeline2) { create(:ci_pipeline, project: project2) }
+  let_it_be(:pipeline3) { create(:ci_pipeline, project: project3) }
   let(:project_ids) { [project1.id] }
   let(:user) { create(:user) }
 
   before do
     project1.add_developer(user)
-    user.security_dashboard_projects << [project1, project2]
+    project3.add_guest(user)
+    user.security_dashboard_projects << [project1, project2, project3]
   end
 
   subject { described_class.new(user, project_ids: project_ids) }
@@ -92,7 +95,7 @@ describe InstanceSecurityDashboard do
       let(:user) { create(:auditor) }
 
       it "returns all projects on the user's dashboard" do
-        expect(subject.projects).to contain_exactly(project1, project2)
+        expect(subject.projects).to contain_exactly(project1, project2, project3)
       end
     end
   end
