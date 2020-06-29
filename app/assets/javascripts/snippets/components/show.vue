@@ -1,19 +1,27 @@
 <script>
+import BlobEmbeddable from '~/blob/components/blob_embeddable.vue';
 import SnippetHeader from './snippet_header.vue';
 import SnippetTitle from './snippet_title.vue';
 import SnippetBlob from './snippet_blob_view.vue';
 import { GlLoadingIcon } from '@gitlab/ui';
 
 import { getSnippetMixin } from '../mixins/snippets';
+import { SNIPPET_VISIBILITY_PUBLIC } from '~/snippets/constants';
 
 export default {
   components: {
+    BlobEmbeddable,
     SnippetHeader,
     SnippetTitle,
     GlLoadingIcon,
     SnippetBlob,
   },
   mixins: [getSnippetMixin],
+  computed: {
+    embeddable() {
+      return this.snippet.visibilityLevel === SNIPPET_VISIBILITY_PUBLIC;
+    },
+  },
 };
 </script>
 <template>
@@ -28,7 +36,9 @@ export default {
       <snippet-header :snippet="snippet" />
       <snippet-title :snippet="snippet" />
       <blob-embeddable v-if="embeddable" class="mb-3" :url="snippet.webUrl" />
-      <snippet-blob :snippet="snippet" />
+      <div v-for="blob in blobs" :key="blob.path">
+        <snippet-blob :snippet="snippet" :blob="blob" />
+      </div>
     </template>
   </div>
 </template>
