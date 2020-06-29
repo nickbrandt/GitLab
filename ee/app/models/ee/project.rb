@@ -312,6 +312,7 @@ module EE
       ::Feature.enabled?(:repository_push_audit_event, self)
     end
 
+    override :feature_available?
     def feature_available?(feature, user = nil)
       if ::ProjectFeature::FEATURES.include?(feature)
         super
