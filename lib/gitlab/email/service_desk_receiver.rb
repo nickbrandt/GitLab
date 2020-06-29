@@ -9,7 +9,7 @@ module Gitlab
         key = service_desk_key(mail)
         return unless key
 
-        ::Gitlab::Email::Handler::EE::ServiceDeskHandler.new(mail, nil, service_desk_key: key)
+        Gitlab::Email::Handler::ServiceDeskHandler.new(mail, nil, service_desk_key: key)
       end
 
       def service_desk_key(mail)

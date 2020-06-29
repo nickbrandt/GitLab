@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
+RSpec.describe Gitlab::Email::Handler::ServiceDeskHandler do
   include_context :email_shared_context
 
   before do
@@ -10,7 +10,7 @@ RSpec.describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
     stub_config_setting(host: 'localhost')
   end
 
-  let(:email_raw) { email_fixture('emails/service_desk.eml', dir: 'ee') }
+  let(:email_raw) { email_fixture('emails/service_desk.eml') }
   let_it_be(:namespace) { create(:namespace, name: "email") }
   let(:expected_description) do
     "Service desk stuff!\n\n```\na = b\n```\n\n`/label ~label1`\n`/assign @user1`\n`/close`\n![image](uploads/image.png)"
@@ -49,7 +49,7 @@ RSpec.describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
       it_behaves_like 'a new issue request'
 
       context 'with legacy incoming email address' do
-        let(:email_raw) { fixture_file('emails/service_desk_legacy.eml', dir: 'ee') }
+        let(:email_raw) { fixture_file('emails/service_desk_legacy.eml') }
 
         it_behaves_like 'a new issue request'
       end
@@ -120,7 +120,7 @@ RSpec.describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
         context 'and template cannot be found' do
           before do
             service = ServiceDeskSetting.new(project_id: project.id, issue_template_key: 'unknown')
-            service.save(validate: false)
+            service.save!(validate: false)
           end
 
           it 'does not append template text to issue description' do
@@ -233,7 +233,7 @@ RSpec.describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
     end
 
     context 'when there is a sender address and a from address' do
-      let(:email_raw) { email_fixture('emails/service_desk_sender_and_from.eml', dir: 'ee') }
+      let(:email_raw) { email_fixture('emails/service_desk_sender_and_from.eml') }
 
       it 'prefers the from address' do
         setup_attachment
@@ -261,13 +261,13 @@ RSpec.describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
     end
 
     context 'when the email is forwarded through an alias' do
-      let(:email_raw) { email_fixture('emails/service_desk_forwarded.eml', dir: 'ee') }
+      let(:email_raw) { email_fixture('emails/service_desk_forwarded.eml') }
 
       it_behaves_like 'a new issue request'
     end
 
     context 'when the email is forwarded' do
-      let(:email_raw) { email_fixture('emails/service_desk_forwarded_new_issue.eml', dir: 'ee') }
+      let(:email_raw) { email_fixture('emails/service_desk_forwarded_new_issue.eml') }
 
       it_behaves_like 'a new issue request' do
         let(:expected_description) do
@@ -300,12 +300,12 @@ RSpec.describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
     end
   end
 
-  def email_fixture(path, dir:)
-    fixture_file(path, dir: dir).gsub('project_id', project.project_id.to_s)
+  def email_fixture(path)
+    fixture_file(path).gsub('project_id', project.project_id.to_s)
   end
 
   def service_desk_fixture(path, slug: nil, key: 'mykey')
     slug ||= project.full_path_slug.to_s
-    fixture_file(path, dir: 'ee').gsub('project_slug', slug).gsub('project_key', key)
+    fixture_file(path).gsub('project_slug', slug).gsub('project_key', key)
   end
 end
