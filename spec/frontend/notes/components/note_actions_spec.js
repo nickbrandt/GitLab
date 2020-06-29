@@ -135,11 +135,17 @@ describe('noteActions', () => {
   });
 
   describe('when a user has access to edit an issue', () => {
-    beforeEach(() => {
+    const testButtonClickTriggersAction = () => {
       axiosMock.onPut(`${TEST_HOST}/api/v4/projects/group/project/issues/1`).reply(() => {
         expect(actions.updateAssignees).toHaveBeenCalled();
       });
 
+      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
+      expect(assignUserButton.exists()).toBe(true);
+      assignUserButton.trigger('click');
+    };
+
+    beforeEach(() => {
       store.dispatch('setUserData', userDataMock);
       store.dispatch('setNoteableData', {
         current_user: {
@@ -157,20 +163,16 @@ describe('noteActions', () => {
       axiosMock.restore();
     });
 
-    it('should be possible to assign the comment author', () => {
-      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
-      expect(assignUserButton.exists()).toBe(true);
-      assignUserButton.trigger('click');
-    });
-
-    it('should be possible to unassign the comment author', () => {
-      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
-      expect(assignUserButton.exists()).toBe(true);
-      assignUserButton.trigger('click');
-    });
+    it('should be possible to assign the comment author', testButtonClickTriggersAction);
+    it('should be possible to unassign the comment author', testButtonClickTriggersAction);
   });
 
   describe('when a user does not have access to edit an issue', () => {
+    const testButtonDoesNotRender = () => {
+      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
+      expect(assignUserButton.exists()).toBe(false);
+    };
+
     beforeEach(() => {
       wrapper = shallowMountNoteActions(props, {
         targetType: () => 'issue',
@@ -181,15 +183,8 @@ describe('noteActions', () => {
       wrapper.destroy();
     });
 
-    it('should not be possible to assign the comment author', () => {
-      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
-      expect(assignUserButton.exists()).toBe(false);
-    });
-
-    it('should not be possible to unassign the comment author', () => {
-      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
-      expect(assignUserButton.exists()).toBe(false);
-    });
+    it('should not be possible to assign the comment author', testButtonDoesNotRender);
+    it('should not be possible to unassign the comment author', testButtonDoesNotRender);
   });
 
   describe('user is not logged in', () => {
