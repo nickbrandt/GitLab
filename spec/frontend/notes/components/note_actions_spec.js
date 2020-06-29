@@ -127,35 +127,68 @@ describe('noteActions', () => {
           .catch(done.fail);
       });
 
-      it('should be possible to assign or unassign the comment author if the user has access to edit an issue', () => {
-        store.dispatch('setNoteableData', {
-          current_user: {
-            can_update: true,
-          },
-        });
-
-        wrapper = shallowMountNoteActions(props, {
-          targetType: () => 'issue',
-        });
-
-        const assignUserButton = wrapper.find('[data-testid="assign-user"]');
-        expect(assignUserButton.exists()).toBe(true);
-
-        assignUserButton.trigger('click');
-        axiosMock.onPut(`${TEST_HOST}/api/v4/projects/group/project/issues/1`).reply(() => {
-          expect(actions.updateAssignees).toHaveBeenCalled();
-        });
-      });
-
-      it('should not be possible to assign or unassign the comment author if the user does not have access to edit an issue', () => {
-        const assignUserButton = wrapper.find('[data-testid="assign-user"]');
-        expect(assignUserButton.exists()).toBe(false);
-      });
-
       it('should not be possible to assign or unassign the comment author in a merge request', () => {
         const assignUserButton = wrapper.find('[data-testid="assign-user"]');
         expect(assignUserButton.exists()).toBe(false);
       });
+    });
+  });
+
+  describe('when a user has access to edit an issue', () => {
+    beforeEach(() => {
+      axiosMock.onPut(`${TEST_HOST}/api/v4/projects/group/project/issues/1`).reply(() => {
+        expect(actions.updateAssignees).toHaveBeenCalled();
+      });
+
+      store.dispatch('setUserData', userDataMock);
+      store.dispatch('setNoteableData', {
+        current_user: {
+          can_update: true,
+        },
+      });
+
+      wrapper = shallowMountNoteActions(props, {
+        targetType: () => 'issue',
+      });
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+      axiosMock.restore();
+    });
+
+    it('should be possible to assign the comment author', () => {
+      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
+      expect(assignUserButton.exists()).toBe(true);
+      assignUserButton.trigger('click');
+    });
+
+    it('should be possible to unassign the comment author', () => {
+      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
+      expect(assignUserButton.exists()).toBe(true);
+      assignUserButton.trigger('click');
+    });
+  });
+
+  describe('when a user does not have access to edit an issue', () => {
+    beforeEach(() => {
+      wrapper = shallowMountNoteActions(props, {
+        targetType: () => 'issue',
+      });
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('should not be possible to assign the comment author', () => {
+      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
+      expect(assignUserButton.exists()).toBe(false);
+    });
+
+    it('should not be possible to unassign the comment author', () => {
+      const assignUserButton = wrapper.find('[data-testid="assign-user"]');
+      expect(assignUserButton.exists()).toBe(false);
     });
   });
 
