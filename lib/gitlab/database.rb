@@ -102,7 +102,7 @@ module Gitlab
     end
 
     def self.postgresql_minimum_supported_version?
-      version.to_f >= 9.6
+      version.to_f >= 11
     end
 
     def self.upsert_supported?
