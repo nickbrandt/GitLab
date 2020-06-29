@@ -517,7 +517,7 @@ class MergeRequest < ApplicationRecord
       participants << merge_user
     end
 
-    participants
+    participants.select { |participant| Ability.allowed?(participant, :read_merge_request, self) }
   end
 
   def first_commit
