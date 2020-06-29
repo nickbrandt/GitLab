@@ -46,7 +46,7 @@ module MergeTrains
         source_sha: merge_status[:source_id])
         .execute(:merge_request_event, merge_request: merge_request)
 
-      return error(pipeline.error_messages) unless pipeline.persisted?
+      return error(pipeline.full_error_messages) unless pipeline.persisted?
 
       success(pipeline: pipeline)
     end
