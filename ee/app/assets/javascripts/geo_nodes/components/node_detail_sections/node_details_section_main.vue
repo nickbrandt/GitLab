@@ -3,6 +3,7 @@ import { GlLink, GlIcon } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 
 import GeoNodeHealthStatus from '../geo_node_health_status.vue';
+import GeoNodeReplicationStatus from '../geo_node_replication_status.vue';
 import GeoNodeActions from '../geo_node_actions.vue';
 
 export default {
@@ -11,6 +12,7 @@ export default {
     GlIcon,
     GeoNodeHealthStatus,
     GeoNodeActions,
+    GeoNodeReplicationStatus,
   },
   props: {
     node: {
@@ -107,6 +109,9 @@ export default {
         :status="nodeHealthStatus"
         :status-check-timestamp="nodeDetails.statusCheckTimestamp"
       />
+      <div v-if="!node.primary">
+        <geo-node-replication-status :node="node" />
+      </div>
     </div>
   </div>
 </template>

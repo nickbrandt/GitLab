@@ -38,36 +38,6 @@ describe('GeoNodeActionsComponent', () => {
   });
 
   describe('computed', () => {
-    describe('isToggleAllowed', () => {
-      it('returns boolean value representing if toggle on node can be allowed', () => {
-        let vmX = createComponent(mockNodes[0], true, false);
-
-        expect(vmX.isToggleAllowed).toBeFalsy();
-        vmX.$destroy();
-
-        vmX = createComponent(mockNodes[1]);
-
-        expect(vmX.isToggleAllowed).toBeTruthy();
-        vmX.$destroy();
-      });
-    });
-
-    describe('nodeToggleLabel', () => {
-      it('returns label for toggle button for a node', () => {
-        let mockNode = { ...mockNodes[1] };
-        let vmX = createComponent(mockNode);
-
-        expect(vmX.nodeToggleLabel).toBe('Pause replication');
-        vmX.$destroy();
-
-        mockNode = { ...mockNodes[1], enabled: false };
-        vmX = createComponent(mockNode);
-
-        expect(vmX.nodeToggleLabel).toBe('Resume replication');
-        vmX.$destroy();
-      });
-    });
-
     describe('disabledRemovalTooltip', () => {
       describe.each`
         nodeRemovalAllowed | tooltip
@@ -87,20 +57,6 @@ describe('GeoNodeActionsComponent', () => {
   });
 
   describe('methods', () => {
-    describe('onToggleNode', () => {
-      it('emits showNodeActionModal with actionType `toggle`, node reference, modalMessage, modalActionLabel, and modalTitle', () => {
-        vm.onToggleNode();
-
-        expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
-          actionType: NODE_ACTIONS.TOGGLE,
-          node: vm.node,
-          modalMessage: 'Pausing replication stops the sync process. Are you sure?',
-          modalActionLabel: vm.nodeToggleLabel,
-          modalTitle: 'Pause replication',
-        });
-      });
-    });
-
     describe('onRemovePrimaryNode', () => {
       it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage, modalActionLabel, and modalTitle', () => {
         vm.onRemovePrimaryNode();
