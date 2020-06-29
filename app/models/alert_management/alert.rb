@@ -115,7 +115,7 @@ module AlertManagement
     scope :for_fingerprint, -> (project, fingerprint) { where(project: project, fingerprint: fingerprint) }
     scope :for_environment, -> (environment) { where(environment: environment) }
     scope :search, -> (query) { fuzzy_search(query, [:title, :description, :monitoring_tool, :service]) }
-    scope :open, -> { for_status(STATUSES.values_at(:triggered, :acknowledged)) }
+    scope :open, -> { with_status(:triggered, :acknowledged) }
     scope :with_prometheus_alert, -> { includes(:prometheus_alert) }
 
     scope :order_start_time,    -> (sort_order) { order(started_at: sort_order) }
