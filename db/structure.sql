@@ -14291,7 +14291,8 @@ CREATE TABLE public.projects (
     marked_for_deletion_at date,
     marked_for_deletion_by_user_id integer,
     autoclose_referenced_issues boolean,
-    suggestion_commit_message character varying(255)
+    suggestion_commit_message character varying(255),
+    has_confluence boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE public.projects_id_seq
@@ -23476,6 +23477,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200618105638
 20200618134223
 20200618134723
+20200619000316
 20200619154527
 20200619154528
 20200622040750

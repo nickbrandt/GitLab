@@ -1,0 +1,5 @@
+---
+title: Database migration to add projects.has_confluence
+merge_request: 35485
+author:
+type: other

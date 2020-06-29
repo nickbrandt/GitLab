@@ -554,6 +554,7 @@ Project:
 - has_external_issue_tracker
 - request_access_enabled
 - has_external_wiki
+- has_confluence
 - only_allow_merge_if_all_discussions_are_resolved
 - remove_source_branch_after_merge
 - auto_cancel_pending_pipelines
