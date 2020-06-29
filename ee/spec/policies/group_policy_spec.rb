@@ -1086,4 +1086,6 @@ RSpec.describe GroupPolicy do
       end
     end
   end
+
+  it_behaves_like 'update namespace limit policy'
 end

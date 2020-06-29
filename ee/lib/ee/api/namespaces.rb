@@ -53,6 +53,8 @@ module EE
           params do
             optional :shared_runners_minutes_limit, type: Integer, desc: "Pipeline minutes quota for this namespace"
             optional :extra_shared_runners_minutes_limit, type: Integer, desc: "Extra pipeline minutes for this namespace"
+            optional :additional_purchased_storage_size, type: Integer, desc: "Additional storage size for this namespace"
+            optional :additional_purchased_storage_ends_on, type: Date, desc: "End of subscription of the additional purchased storage"
           end
           put ':id' do
             authenticated_as_admin!

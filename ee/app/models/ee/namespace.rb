@@ -26,10 +26,12 @@ module EE
       attr_writer :root_ancestor
 
       has_one :namespace_statistics
+      has_one :namespace_limit, inverse_of: :namespace
       has_one :gitlab_subscription, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_one :elasticsearch_indexed_namespace
 
       accepts_nested_attributes_for :gitlab_subscription
+      accepts_nested_attributes_for :namespace_limit
 
       scope :include_gitlab_subscription, -> { includes(:gitlab_subscription) }
       scope :join_gitlab_subscription, -> { joins("LEFT OUTER JOIN gitlab_subscriptions ON gitlab_subscriptions.namespace_id=namespaces.id") }
@@ -53,6 +55,10 @@ module EE
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         :extra_shared_runners_minutes, to: :namespace_statistics, allow_nil: true
 
+      delegate :additional_purchased_storage_size, :additional_purchased_storage_size=,
+        :additional_purchased_storage_ends_on, :additional_purchased_storage_ends_on=,
+        to: :namespace_limit, allow_nil: true
+
       delegate :email, to: :owner, allow_nil: true, prefix: true
 
       # Opportunistically clear the +file_template_project_id+ if invalid
@@ -70,6 +76,10 @@ module EE
 
       # Changing the plan or other details may invalidate this cache
       before_save :clear_feature_available_cache
+    end
+
+    def namespace_limit
+      super.presence || build_namespace_limit
     end
 
     class_methods do

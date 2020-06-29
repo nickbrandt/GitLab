@@ -11,6 +11,10 @@ RSpec.describe API::Namespaces do
 
   describe "GET /namespaces" do
     context "when authenticated as admin" do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(true)
+      end
+
       it "returns correct attributes" do
         get api("/namespaces", admin)
 
@@ -23,12 +27,14 @@ RSpec.describe API::Namespaces do
                                                                  'parent_id', 'members_count_with_descendants',
                                                                  'plan', 'shared_runners_minutes_limit',
                                                                  'avatar_url', 'web_url', 'trial_ends_on', 'trial',
-                                                                 'extra_shared_runners_minutes_limit', 'billable_members_count')
+                                                                 'extra_shared_runners_minutes_limit', 'billable_members_count',
+                                                                 'additional_purchased_storage_size', 'additional_purchased_storage_ends_on')
 
         expect(user_kind_json_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
                                                                 'parent_id', 'plan', 'shared_runners_minutes_limit',
                                                                 'avatar_url', 'web_url', 'trial_ends_on', 'trial',
-                                                                'extra_shared_runners_minutes_limit', 'billable_members_count')
+                                                                'extra_shared_runners_minutes_limit', 'billable_members_count',
+                                                                'additional_purchased_storage_size', 'additional_purchased_storage_ends_on')
       end
     end
 
@@ -111,27 +117,43 @@ RSpec.describe API::Namespaces do
   end
 
   describe 'PUT /namespaces/:id' do
+    let(:params) do
+      {
+        shared_runners_minutes_limit: 9001,
+        additional_purchased_storage_size: 10_000,
+        additional_purchased_storage_ends_on: Date.today.to_s
+      }
+    end
+
+    before do
+      allow(Gitlab).to receive(:com?).and_return(true)
+    end
+
     context 'when authenticated as admin' do
       it 'updates namespace using full_path when full_path contains dots' do
-        put api("/namespaces/#{group1.full_path}", admin), params: { shared_runners_minutes_limit: 9001 }
+        put api("/namespaces/#{group1.full_path}", admin), params: params
 
         aggregate_failures do
           expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['shared_runners_minutes_limit']).to eq(9001)
+          expect(json_response['shared_runners_minutes_limit']).to eq(params[:shared_runners_minutes_limit])
+          expect(json_response['additional_purchased_storage_size']).to eq(params[:additional_purchased_storage_size])
+          expect(json_response['additional_purchased_storage_ends_on']).to eq(params[:additional_purchased_storage_ends_on])
         end
       end
 
       it 'updates namespace using id' do
-        put api("/namespaces/#{group1.id}", admin), params: { shared_runners_minutes_limit: 9001 }
+        put api("/namespaces/#{group1.id}", admin), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response['shared_runners_minutes_limit']).to eq(9001)
+        expect(json_response['shared_runners_minutes_limit']).to eq(params[:shared_runners_minutes_limit])
+        expect(json_response['additional_purchased_storage_size']).to eq(params[:additional_purchased_storage_size])
+        expect(json_response['additional_purchased_storage_ends_on']).to eq(params[:additional_purchased_storage_ends_on])
       end
     end
 
     context 'when not authenticated as admin' do
       it 'retuns 403' do
-        put api("/namespaces/#{group1.id}", user), params: { shared_runners_minutes_limit: 9001 }
+        put api("/namespaces/#{group1.id}", user), params: params
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end
@@ -139,7 +161,7 @@ RSpec.describe API::Namespaces do
 
     context 'when namespace not found' do
       it 'returns 404' do
-        put api("/namespaces/#{non_existing_record_id}", admin), params: { shared_runners_minutes_limit: 9001 }
+        put api("/namespaces/#{non_existing_record_id}", admin), params: params
 
         expect(response).to have_gitlab_http_status(:not_found)
         expect(json_response).to eq('message' => '404 Namespace Not Found')
@@ -147,10 +169,20 @@ RSpec.describe API::Namespaces do
     end
 
     context 'when invalid params' do
-      it 'returns validation error' do
-        put api("/namespaces/#{group1.id}", admin), params: { shared_runners_minutes_limit: 'unknown' }
+      where(:attr) do
+        [
+          :shared_runners_minutes_limit,
+          :additional_purchased_storage_size,
+          :additional_purchased_storage_ends_on
+        ]
+      end
 
-        expect(response).to have_gitlab_http_status(:bad_request)
+      with_them do
+        it "returns validation error for #{attr}" do
+          put api("/namespaces/#{group1.id}", admin), params: Hash[attr, 'unknown']
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+        end
       end
     end
 

@@ -256,6 +256,8 @@ module EE
       rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
 
       rule { can?(:maintainer_access) & push_rules_available }.enable :change_push_rules
+
+      rule { admin & is_gitlab_com }.enable :update_subscription_limit
     end
 
     override :lookup_access_level!
