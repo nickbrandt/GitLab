@@ -71,6 +71,11 @@ describe('Cycle analytics getters', () => {
   });
 
   describe('cycleAnalyticsRequestParams', () => {
+    const selectedAuthor = 'Gohan';
+    const selectedMilestone = 'SSJ4';
+    const selectedAssignees = ['krillin', 'gotenks'];
+    const selectedLabels = ['cell saga', 'buu saga'];
+
     beforeEach(() => {
       const fullPath = 'cool-beans';
       state = {
@@ -80,20 +85,41 @@ describe('Cycle analytics getters', () => {
         startDate,
         endDate,
         selectedProjects,
+        selectedAuthor,
+        selectedMilestone,
+        selectedAssignees,
+        selectedLabels,
       };
     });
 
     it.each`
-      param               | value
-      ${'created_after'}  | ${'2018-12-15'}
-      ${'created_before'} | ${'2019-01-14'}
-      ${'project_ids'}    | ${[1, 2]}
+      param                  | value
+      ${'created_after'}     | ${'2018-12-15'}
+      ${'created_before'}    | ${'2019-01-14'}
+      ${'project_ids'}       | ${[1, 2]}
+      ${'author_username'}   | ${selectedAuthor}
+      ${'milestone_title'}   | ${selectedMilestone}
+      ${'assignee_username'} | ${selectedAssignees}
+      ${'label_name'}        | ${selectedLabels}
     `('should return the $param with value $value', ({ param, value }) => {
       expect(
         getters.cycleAnalyticsRequestParams(state, { selectedProjectIds: [1, 2] }),
       ).toMatchObject({
         [param]: value,
       });
+    });
+
+    it.each`
+      param                  | stateKey               | value
+      ${'assignee_username'} | ${'selectedAssignees'} | ${[]}
+      ${'label_name'}        | ${'selectedLabels'}    | ${[]}
+    `('should not return the $param when $stateKey=$value', ({ param, stateKey, value }) => {
+      expect(
+        getters.cycleAnalyticsRequestParams(
+          { ...state, [stateKey]: value },
+          { selectedProjectIds: [1, 2] },
+        ),
+      ).not.toContain(param);
     });
   });
 
