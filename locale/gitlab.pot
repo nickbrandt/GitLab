@@ -1284,6 +1284,9 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
+msgid "Add \"%{value}\" to allowlist"
+msgstr ""
+
 msgid "Add %d issue"
 msgid_plural "Add %d issues"
 msgstr[0] ""
@@ -9275,9 +9278,6 @@ msgstr ""
 msgid "Exactly one of %{attributes} is required"
 msgstr ""
 
-msgid "Example: <code>acme.com,acme.co.in,acme.uk</code>."
-msgstr ""
-
 msgid "Example: @sub\\.company\\.com$"
 msgstr ""
 
@@ -14797,9 +14797,6 @@ msgid "MrDeploymentActions|Re-deploy"
 msgstr ""
 
 msgid "MrDeploymentActions|Stop environment"
-msgstr ""
-
-msgid "Multiple domains are supported with comma delimiters."
 msgstr ""
 
 msgid "Multiple issue boards"
