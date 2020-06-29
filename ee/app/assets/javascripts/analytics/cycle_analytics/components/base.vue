@@ -72,7 +72,6 @@ export default {
       'selectedLabels',
       'selectedAssignees',
       'stages',
-      'summary',
       'currentStageEvents',
       'errorCode',
       'startDate',
@@ -248,7 +247,7 @@ export default {
           </div>
           <filter-bar
             v-if="shouldDisplayFilterBar"
-            class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3"
+            class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3 gl-border-none"
             :disabled="!hasProject"
           />
           <div v-if="shouldDisplayFilters" class="gl-justify-content-end gl-white-space-nowrap">

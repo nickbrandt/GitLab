@@ -72,22 +72,16 @@ const fetchStageMedian = (currentGroupPath, stageId, params) =>
   }));
 
 export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
-  const {
-    currentGroupPath,
-    cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
-  } = getters;
-
+  const { currentGroupPath, cycleAnalyticsRequestParams } = getters;
   const { stages } = state;
-  const params = {
-    created_after,
-    created_before,
-    project_ids,
-  };
-
-  dispatch('requestStageMedianValues');
   const stageIds = stages.map(s => s.slug);
 
-  return Promise.all(stageIds.map(stageId => fetchStageMedian(currentGroupPath, stageId, params)))
+  dispatch('requestStageMedianValues');
+  return Promise.all(
+    stageIds.map(stageId =>
+      fetchStageMedian(currentGroupPath, stageId, cycleAnalyticsRequestParams),
+    ),
+  )
     .then(data => dispatch('receiveStageMedianValuesSuccess', data))
     .catch(error =>
       handleErrorOrRethrow({

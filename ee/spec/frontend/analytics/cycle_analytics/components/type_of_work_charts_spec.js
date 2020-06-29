@@ -26,6 +26,7 @@ const fakeStore = ({ initialGetters, initialState }) =>
         getters: {
           tasksByTypeChartData: () => tasksByTypeData,
           selectedTasksByTypeFilters: () => taskByTypeFilters,
+          currentGroupPath: () => 'fake/group/path',
           ...initialGetters,
         },
         state: {

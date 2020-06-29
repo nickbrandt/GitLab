@@ -77,7 +77,7 @@ export default {
   },
   watch: {
     searchTerm() {
-      debounce(this.fetchData(), DATA_REFETCH_DELAY);
+      this.search();
     },
   },
   mounted() {
@@ -102,6 +102,9 @@ export default {
           this.loading = false;
         });
     },
+    search: debounce(function debouncedSearch() {
+      this.fetchData();
+    }, DATA_REFETCH_DELAY),
     labelTitle(label) {
       // there are 2 possible endpoints for group labels
       // one returns label.name the other label.title
