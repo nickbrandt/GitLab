@@ -4,6 +4,8 @@ module Gitlab
   module Database
     include Gitlab::Metrics::Methods
 
+    MINIMUM_POSTGRES_VERSION = 11
+
     # https://www.postgresql.org/docs/9.2/static/datatype-numeric.html
     MAX_INT_VALUE = 2147483647
 
@@ -102,7 +104,7 @@ module Gitlab
     end
 
     def self.postgresql_minimum_supported_version?
-      version.to_f >= 11
+      version.to_f >= MINIMUM_POSTGRES_VERSION
     end
 
     def self.upsert_supported?
