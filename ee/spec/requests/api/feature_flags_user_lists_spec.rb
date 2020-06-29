@@ -343,8 +343,21 @@ RSpec.describe API::FeatureFlagsUserLists do
 
       delete api("/projects/#{project.id}/feature_flags_user_lists/#{list.iid}", developer)
 
-      expect(response).to have_gitlab_http_status(:ok)
+      expect(response).to have_gitlab_http_status(:no_content)
+      expect(response.body).to be_blank
       expect(project.operations_feature_flags_user_lists.count).to eq(0)
+    end
+
+    it 'does not delete the list if it is associated with a strategy' do
+      list = create_list
+      feature_flag = create(:operations_feature_flag, :new_version_flag, project: project)
+      create(:operations_strategy, feature_flag: feature_flag, name: 'gitlabUserList', user_list: list)
+
+      delete api("/projects/#{project.id}/feature_flags_user_lists/#{list.iid}", developer)
+
+      expect(response).to have_gitlab_http_status(:conflict)
+      expect(json_response).to eq({ 'message' => ['User list is associated with a strategy'] })
+      expect(list.reload).to be_persisted
     end
   end
 end

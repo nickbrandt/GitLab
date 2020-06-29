@@ -84,7 +84,9 @@ module API
         end
         delete do
           list = user_project.operations_feature_flags_user_lists.find_by_iid!(params[:iid])
-          list.destroy
+          unless list.destroy
+            render_api_error!(list.errors.full_messages, :conflict)
+          end
         end
       end
     end

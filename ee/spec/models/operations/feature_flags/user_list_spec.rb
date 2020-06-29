@@ -67,6 +67,31 @@ RSpec.describe Operations::FeatureFlags::UserList do
     end
   end
 
+  describe '#destroy' do
+    it 'deletes the model if it is not associated with any feature flag strategies' do
+      project = create(:project)
+      user_list = described_class.create(project: project, name: 'My User List', user_xids: 'user1,user2')
+
+      user_list.destroy
+
+      expect(described_class.count).to eq(0)
+    end
+
+    it 'does not delete the model if it is associated with a feature flag strategy' do
+      project = create(:project)
+      user_list = described_class.create(project: project, name: 'My User List', user_xids: 'user1,user2')
+      feature_flag = create(:operations_feature_flag, :new_version_flag, project: project)
+      strategy = create(:operations_strategy, feature_flag: feature_flag, name: 'gitlabUserList', user_list: user_list)
+
+      user_list.destroy
+
+      expect(described_class.count).to eq(1)
+      expect(::Operations::FeatureFlags::StrategyUserList.count).to eq(1)
+      expect(strategy.reload.user_list).to eq(user_list)
+      expect(strategy.valid?).to eq(true)
+    end
+  end
+
   it_behaves_like 'AtomicInternalId' do
     let(:internal_id_attribute) { :iid }
     let(:instance) { build(:operations_feature_flag_user_list) }
