@@ -48,10 +48,6 @@ module EE
       issuables_service(noteable, noteable.project, author).change_iteration(iteration)
     end
 
-    def unapprove_mr(noteable, user)
-      merge_requests_service(noteable, noteable.project, user).unapprove_mr
-    end
-
     # Called when the weight of a Noteable is changed
     #
     # noteable   - Noteable object
@@ -153,10 +149,6 @@ module EE
 
     def epics_service(noteable, author)
       EE::SystemNotes::EpicsService.new(noteable: noteable, author: author)
-    end
-
-    def merge_requests_service(noteable, project, author)
-      ::SystemNotes::MergeRequestsService.new(noteable: noteable, project: project, author: author)
     end
 
     def merge_trains_service(noteable, project, author)
