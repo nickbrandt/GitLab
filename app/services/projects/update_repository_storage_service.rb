@@ -14,6 +14,8 @@ module Projects
     end
 
     def execute
+      return ServiceResponse.success unless repository_storage_move.scheduled?
+
       repository_storage_move.start!
 
       raise SameFilesystemError if same_filesystem?(repository.storage, destination_storage_name)

@@ -121,6 +121,30 @@ RSpec.describe Projects::UpdateRepositoryStorageService do
           expect(project.reload_pool_repository).to be_nil
         end
       end
+
+      context 'when the repository move is finished' do
+        let(:repository_storage_move) { create(:project_repository_storage_move, :finished, project: project, destination_storage_name: destination) }
+
+        it 'is idempotent' do
+          expect do
+            result = subject.execute
+
+            expect(result).to be_success
+          end.not_to change(repository_storage_move, :state)
+        end
+      end
+
+      context 'when the repository move is failed' do
+        let(:repository_storage_move) { create(:project_repository_storage_move, :failed, project: project, destination_storage_name: destination) }
+
+        it 'is idempotent' do
+          expect do
+            result = subject.execute
+
+            expect(result).to be_success
+          end.not_to change(repository_storage_move, :state)
+        end
+      end
     end
 
     context 'with wiki repository' do
