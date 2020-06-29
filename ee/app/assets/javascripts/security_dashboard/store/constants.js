@@ -30,3 +30,5 @@ export const UNSCANNED_PROJECTS_DATE_RANGES = [
   { description: s__('UnscannedProjects|30 or more days'), fromDay: 30, toDay: 60 },
   { description: s__('UnscannedProjects|60 or more days'), fromDay: 60, toDay: Infinity },
 ];
+
+export const PRIMARY_IDENTIFIER_TYPE = 'cve';
