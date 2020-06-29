@@ -6,6 +6,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
 import { DASHBOARD_TYPES } from '../store/constants';
+import getPrimaryIdentifier from 'ee/vue_shared/security_reports/store/utils/get_primary_identifier';
 
 export default {
   name: 'SecurityDashboardTableRow',
@@ -35,6 +36,9 @@ export default {
     ...mapState('vulnerabilities', ['selectedVulnerabilities']),
     severity() {
       return this.vulnerability.severity || ' ';
+    },
+    vulnerabilityIdentifier() {
+      return getPrimaryIdentifier(this.vulnerability.identifiers);
     },
     vulnerabilityNamespace() {
       const { project, location } = this.vulnerability;
@@ -132,6 +136,13 @@ export default {
             {{ vulnerabilityNamespace }}
           </small>
         </template>
+      </div>
+    </div>
+
+    <div class="table-section section-15">
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Identifier') }}</div>
+      <div class="table-mobile-content">
+        {{ vulnerabilityIdentifier }}
       </div>
     </div>
 
