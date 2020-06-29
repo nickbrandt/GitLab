@@ -65,7 +65,7 @@ const createComponent = ({ state, getters, props, actionMocks, isAdmin, options,
     },
     provide: {
       glFeatures: { licenseComplianceDeniesMr: false },
-      ...provide
+      ...provide,
     },
     store: fakeStore,
     ...options,
@@ -262,7 +262,6 @@ describe('License Management', () => {
 
       describe('when licenseComplianceDeniesMr feature flag enabled', () => {
         it('should show the developer only tooltip', () => {
-
           createComponent({
             state: { isLoadingManagedLicenses: false },
             isAdmin: false,
