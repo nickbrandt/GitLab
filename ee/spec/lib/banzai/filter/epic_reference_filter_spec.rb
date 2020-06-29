@@ -62,7 +62,7 @@ RSpec.describe Banzai::Filter::EpicReferenceFilter do
       link = doc.css('a').first
 
       expect(link).to have_attribute('data-original')
-      expect(link.attr('data-original')).to eq(reference)
+      expect(link.attr('data-original')).to eq(CGI.escapeHTML(reference))
     end
 
     it 'ignores invalid epic IIDs' do
