@@ -271,7 +271,7 @@ RSpec.describe Namespace do
     it 'only checks the plan once' do
       expect(group).to receive(:load_feature_available).once.and_call_original
 
-      2.times { group.feature_available?(:service_desk) }
+      2.times { group.feature_available?(:push_rules) }
     end
 
     context 'when checking namespace plan' do

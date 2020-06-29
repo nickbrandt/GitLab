@@ -29,7 +29,7 @@ module Gitlab
           end
 
           def can_handle?
-            ::EE::Gitlab::ServiceDesk.supported? && (project_id || can_handle_legacy_format? || service_desk_key)
+            ::Gitlab::ServiceDesk.supported? && (project_id || can_handle_legacy_format? || service_desk_key)
           end
 
           def execute

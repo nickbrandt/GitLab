@@ -94,16 +94,6 @@ RSpec.describe Project do
       end
     end
 
-    describe '.service_desk_enabled' do
-      it 'returns the correct project' do
-        project_with_service_desk_enabled = create(:project)
-        project_with_service_desk_disabled = create(:project, :service_desk_disabled)
-
-        expect(described_class.service_desk_enabled).to include(project_with_service_desk_enabled)
-        expect(described_class.service_desk_enabled).not_to include(project_with_service_desk_disabled)
-      end
-    end
-
     describe '.with_jira_dvcs_cloud' do
       it 'returns the correct project' do
         jira_dvcs_cloud_project = create(:project, :jira_dvcs_cloud)
@@ -171,20 +161,6 @@ RSpec.describe Project do
 
         expect(described_class.with_active_prometheus_service).to include(project_with_active_prometheus_service)
         expect(described_class.with_active_prometheus_service).not_to include(project_without_active_prometheus_service)
-      end
-    end
-
-    describe '.find_by_service_desk_project_key' do
-      it 'returns the correct project' do
-        project2 = create(:project)
-        create(:service_desk_setting, project: project, project_key: 'key1')
-        create(:service_desk_setting, project: project2, project_key: 'key2')
-
-        expect(Project.find_by_service_desk_project_key('key2')).to eq(project2)
-      end
-
-      it 'returns nil if there is no project with the key' do
-        expect(Project.find_by_service_desk_project_key('some_key')).to be_nil
       end
     end
 
@@ -953,7 +929,7 @@ RSpec.describe Project do
       expect(project).to receive(:load_licensed_feature_available)
                              .once.and_call_original
 
-      2.times { project.feature_available?(:service_desk) }
+      2.times { project.feature_available?(:push_rules) }
     end
 
     context 'when feature symbol is not included on Namespace features code' do
@@ -1132,38 +1108,6 @@ RSpec.describe Project do
       end
 
       it { is_expected.to be_falsey }
-    end
-  end
-
-  describe '#service_desk_enabled?' do
-    let!(:license) { create(:license, plan: License::PREMIUM_PLAN) }
-    let(:namespace) { create(:namespace) }
-
-    subject(:project) { build(:project, :private, namespace: namespace, service_desk_enabled: true) }
-
-    before do
-      allow(::Gitlab).to receive(:com?).and_return(true)
-      allow(::Gitlab::IncomingEmail).to receive(:enabled?).and_return(true)
-      allow(::Gitlab::IncomingEmail).to receive(:supports_wildcard?).and_return(true)
-    end
-
-    it 'is enabled' do
-      expect(project.service_desk_enabled?).to be_truthy
-      expect(project.service_desk_enabled).to be_truthy
-    end
-  end
-
-  describe '#service_desk_address' do
-    let(:project) { create(:project, service_desk_enabled: true) }
-
-    before do
-      allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).and_return(true)
-      allow(Gitlab.config.incoming_email).to receive(:enabled).and_return(true)
-      allow(Gitlab.config.incoming_email).to receive(:address).and_return("test+%{key}@mail.com")
-    end
-
-    it 'uses project full path as service desk address key' do
-      expect(project.service_desk_address).to eq("test+#{project.full_path_slug}-#{project.project_id}-issue-@mail.com")
     end
   end
 

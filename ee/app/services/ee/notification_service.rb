@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'ee/gitlab/service_desk'
+require 'gitlab/service_desk'
 
 module EE
   module NotificationService
@@ -97,7 +97,7 @@ module EE
     end
 
     def send_service_desk_notification(note)
-      return unless EE::Gitlab::ServiceDesk.supported?
+      return unless ::Gitlab::ServiceDesk.supported?
       return unless note.noteable_type == 'Issue'
 
       issue = note.noteable

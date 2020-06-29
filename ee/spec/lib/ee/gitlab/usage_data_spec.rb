@@ -221,8 +221,6 @@ RSpec.describe Gitlab::UsageData do
     it 'gathers Service Desk data' do
       create_list(:issue, 2, confidential: true, author: User.support_bot, project: project)
 
-      allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).with(anything).and_return(true)
-
       expect(subject).to eq(service_desk_enabled_projects: 1,
                             service_desk_issues: 2)
     end
