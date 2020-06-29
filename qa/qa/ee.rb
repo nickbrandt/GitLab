@@ -49,6 +49,8 @@ module QA
 
       module Main
         autoload :Banner, 'qa/ee/page/main/banner'
+        autoload :Login, 'qa/ee/page/main/login'
+        autoload :Onboarding, 'qa/ee/page/main/onboarding'
       end
 
       module Admin
