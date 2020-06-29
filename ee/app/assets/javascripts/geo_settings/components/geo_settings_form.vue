@@ -1,7 +1,7 @@
 <script>
+import { mapState } from 'vuex';
 import { GlFormGroup, GlFormInput, GlButton } from '@gitlab/ui';
 import { visitUrl } from '~/lib/utils/url_utility';
-import { DEFAULT_TIMEOUT, DEFAULT_ALLOWED_IP } from '../constants';
 
 export default {
   name: 'GeoSettingsForm',
@@ -10,11 +10,10 @@ export default {
     GlFormInput,
     GlButton,
   },
-  data() {
-    return {
-      timeout: DEFAULT_TIMEOUT,
-      allowedIp: DEFAULT_ALLOWED_IP,
-    };
+  computed: {
+    // The real connection between vuex and the component will be implemented in
+    // a later MR, this feature is anyhow behind feature flag
+    ...mapState(['timeout', 'allowedIp']),
   },
   methods: {
     redirect() {

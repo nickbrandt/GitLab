@@ -1,0 +1,9 @@
+export const MOCK_APPLICATION_SETTINGS_FETCH_RESPONSE = {
+  geo_status_timeout: 10,
+  geo_node_allowed_ips: '0.0.0.0/0, ::/0',
+};
+
+export const MOCK_BASIC_SETTINGS_DATA = {
+  timeout: MOCK_APPLICATION_SETTINGS_FETCH_RESPONSE.geo_status_timeout,
+  allowedIp: MOCK_APPLICATION_SETTINGS_FETCH_RESPONSE.geo_node_allowed_ips,
+};
