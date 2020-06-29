@@ -7,7 +7,7 @@
 #
 module API
   module V3
-    class Github < Grape::API
+    class Github < Grape::API::Instance
       JIRA_DEV_PANEL_FEATURE = :jira_dev_panel_integration.freeze
       NO_SLASH_URL_PART_REGEX = %r{[^/]+}.freeze
       ENDPOINT_REQUIREMENTS = {
