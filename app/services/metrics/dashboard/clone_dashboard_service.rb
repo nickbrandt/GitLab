@@ -19,7 +19,10 @@ module Metrics
 
       class << self
         def allowed_dashboard_templates
-          @allowed_dashboard_templates ||= Set[::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH].freeze
+          @allowed_dashboard_templates ||= Set[
+            ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH,
+            ::Metrics::Dashboard::PodDashboardService::DASHBOARD_PATH
+          ].freeze
         end
 
         def sequences
@@ -153,7 +156,7 @@ module Metrics
       end
 
       def sequence
-        self.class.sequences[dashboard_template]
+        self.class.sequences[dashboard_template] || []
       end
     end
   end

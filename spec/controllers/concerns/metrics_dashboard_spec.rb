@@ -88,11 +88,19 @@ RSpec.describe MetricsDashboard do
 
         context 'in all_dashboard list' do
           let(:system_dashboard) { json_response['all_dashboards'].find { |dashboard| dashboard["system_dashboard"] == true } }
-          let(:project_dashboard) { json_response['all_dashboards'].find { |dashboard| dashboard["system_dashboard"] == false } }
+          let(:pod_metrics_dashboard) { json_response['all_dashboards'].find { |dashboard| dashboard['path'] == 'config/prometheus/pod_metrics.yml' } }
+          let(:project_dashboard) { json_response['all_dashboards'].find { |dashboard| dashboard['path'] == '.gitlab/dashboards/test.yml' } }
 
           it 'includes project_blob_path only for project dashboards' do
             expect(system_dashboard['project_blob_path']).to be_nil
+            expect(pod_metrics_dashboard['project_blob_path']).to be_nil
             expect(project_dashboard['project_blob_path']).to eq("/#{project.namespace.path}/#{project.name}/-/blob/master/.gitlab/dashboards/test.yml")
+          end
+
+          it 'allows editing only for project dashboards' do
+            expect(system_dashboard['can_edit']).to be(false)
+            expect(pod_metrics_dashboard['can_edit']).to be(false)
+            expect(project_dashboard['can_edit']).to be(true)
           end
 
           describe 'project permissions' do
@@ -135,6 +143,14 @@ RSpec.describe MetricsDashboard do
               all_dashboards = json_response['all_dashboards'].map { |dashboard| dashboard.slice('display_name', 'starred', 'user_starred_path') }
               expected_response = [
                 { "display_name" => "Default dashboard", "starred" => false, 'user_starred_path' => api_v4_projects_metrics_user_starred_dashboards_path(id: project.id, params: { dashboard_path: 'config/prometheus/common_metrics.yml' }) },
+                {
+                  "display_name" => "Pod Health",
+                  "starred" => false,
+                  'user_starred_path' => api_v4_projects_metrics_user_starred_dashboards_path(
+                    id: project.id,
+                    params: { dashboard_path: 'config/prometheus/pod_metrics.yml' }
+                  )
+                },
                 { "display_name" => "anomaly.yml", "starred" => false, 'user_starred_path' => api_v4_projects_metrics_user_starred_dashboards_path(id: project.id, params: { dashboard_path: '.gitlab/dashboards/anomaly.yml' }) },
                 { "display_name" => "errors.yml", "starred" => true, 'user_starred_path' => api_v4_projects_metrics_user_starred_dashboards_path(id: project.id, params: { dashboard_path: '.gitlab/dashboards/errors.yml' }) },
                 { "display_name" => "test.yml", "starred" => true, 'user_starred_path' => api_v4_projects_metrics_user_starred_dashboards_path(id: project.id, params: { dashboard_path: '.gitlab/dashboards/test.yml' }) }

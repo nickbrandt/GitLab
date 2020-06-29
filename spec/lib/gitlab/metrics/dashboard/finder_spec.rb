@@ -148,8 +148,8 @@ RSpec.describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store
 
   describe '.find_all_paths' do
     let(:all_dashboard_paths) { described_class.find_all_paths(project) }
-    let(:system_dashboard) { { path: system_dashboard_path, display_name: 'Default dashboard', default: true, system_dashboard: true } }
-    let(:pod_dashboard) { { path: pod_dashboard_path, display_name: 'Pod Health', default: false, system_dashboard: false } }
+    let(:system_dashboard) { { path: system_dashboard_path, display_name: 'Default dashboard', default: true, system_dashboard: true, out_of_the_box_dashboard: true } }
+    let(:pod_dashboard) { { path: pod_dashboard_path, display_name: 'Pod Health', default: false, system_dashboard: false, out_of_the_box_dashboard: true } }
 
     it 'includes only the system dashboard by default' do
       expect(all_dashboard_paths).to eq([system_dashboard, pod_dashboard])
@@ -160,7 +160,7 @@ RSpec.describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store
       let(:project) { project_with_dashboard(dashboard_path) }
 
       it 'includes system and project dashboards' do
-        project_dashboard = { path: dashboard_path, display_name: 'test.yml', default: false, system_dashboard: false }
+        project_dashboard = { path: dashboard_path, display_name: 'test.yml', default: false, system_dashboard: false, out_of_the_box_dashboard: false }
 
         expect(all_dashboard_paths).to contain_exactly(system_dashboard, pod_dashboard, project_dashboard)
       end
@@ -172,7 +172,8 @@ RSpec.describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store
           path: self_monitoring_dashboard_path,
           display_name: 'Default dashboard',
           default: true,
-          system_dashboard: false
+          system_dashboard: false,
+          out_of_the_box_dashboard: true
         }
       end
       let(:dashboard_path) { '.gitlab/dashboards/test.yml' }
@@ -187,7 +188,8 @@ RSpec.describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store
           path: dashboard_path,
           display_name: 'test.yml',
           default: false,
-          system_dashboard: false
+          system_dashboard: false,
+          out_of_the_box_dashboard: false
         }
 
         expect(all_dashboard_paths).to contain_exactly(self_monitoring_dashboard, project_dashboard)

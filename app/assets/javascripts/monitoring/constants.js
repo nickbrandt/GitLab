@@ -208,6 +208,8 @@ export const annotationsSymbolIcon = 'path://m5 229 5 8h-10z';
  */
 export const DEFAULT_DASHBOARD_PATH = 'config/prometheus/common_metrics.yml';
 
+export const PREDEFINED_DASHBOARD_PATH = 'config/prometheus/';
+
 export const OPERATORS = {
   greaterThan: '>',
   equalTo: '==',
