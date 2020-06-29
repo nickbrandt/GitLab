@@ -16,21 +16,6 @@ module EE
         end
       end
 
-      override :issue_except_actions
-      def issue_except_actions
-        super + %i[service_desk]
-      end
-
-      override :set_issuables_index_only_actions
-      def set_issuables_index_only_actions
-        super + %i[service_desk]
-      end
-
-      def service_desk
-        @issues = @issuables # rubocop:disable Gitlab/ModuleWithInstanceVariables
-        @users.push(::User.support_bot) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-      end
-
       private
 
       def issue_params_attributes
@@ -41,20 +26,13 @@ module EE
         attrs
       end
 
+      override :finder_options
       def finder_options
         options = super
-        options.reject! { |key| key == 'weight' } unless project.feature_available?(:issue_weights)
 
-        if service_desk?
-          options.reject! { |key| key == 'author_username' || key == 'author_id' }
-          options[:author_id] = ::User.support_bot
-        end
+        return super if project.feature_available?(:issue_weights)
 
-        options
-      end
-
-      def service_desk?
-        action_name == 'service_desk'
+        options.reject { |key| key == 'weight' }
       end
 
       def whitelist_query_limiting_ee

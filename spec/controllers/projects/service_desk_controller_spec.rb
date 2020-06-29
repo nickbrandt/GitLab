@@ -11,8 +11,6 @@ RSpec.describe Projects::ServiceDeskController do
   let_it_be(:user) { create(:user) }
 
   before do
-    allow(License).to receive(:feature_available?).and_call_original
-    allow(License).to receive(:feature_available?).with(:service_desk) { true }
     allow(Gitlab::IncomingEmail).to receive(:enabled?) { true }
     allow(Gitlab::IncomingEmail).to receive(:supports_wildcard?) { true }
 
@@ -56,7 +54,7 @@ RSpec.describe Projects::ServiceDeskController do
     context 'when issue template file becomes outdated' do
       it 'returns template_file_missing as true' do
         service = ServiceDeskSetting.new(project_id: project.id, issue_template_key: 'deleted')
-        service.save(validate: false)
+        service.save!(validate: false)
 
         get :show, params: { namespace_id: project.namespace.to_param, project_id: project }, format: :json
 
