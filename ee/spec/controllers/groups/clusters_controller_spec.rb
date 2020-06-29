@@ -87,25 +87,7 @@ RSpec.describe Groups::ClustersController do
         sign_in(user)
       end
 
-      context 'with license' do
-        before do
-          stub_licensed_features(cluster_health: true)
-        end
-
-        it_behaves_like 'the default dashboard'
-      end
-
-      context 'without license' do
-        before do
-          stub_licensed_features(cluster_health: false)
-        end
-
-        it 'has status not found' do
-          get :metrics_dashboard, params: metrics_params, format: :json
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
+      it_behaves_like 'the default dashboard'
     end
   end
 

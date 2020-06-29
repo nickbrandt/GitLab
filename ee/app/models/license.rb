@@ -109,7 +109,6 @@ class License < ApplicationRecord
   EEP_FEATURES.freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
-    cluster_health
     compliance_framework
     container_scanning
     credentials_inventory

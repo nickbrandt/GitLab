@@ -102,11 +102,6 @@ module EE
         end
       end
 
-      with_scope :global
-      condition(:cluster_health_available) do
-        License.feature_available?(:cluster_health)
-      end
-
       with_scope :subject
       condition(:group_push_rules_enabled) do
         @subject.group && ::Feature.enabled?(:group_push_rules, @subject.group.root_ancestor)
@@ -406,8 +401,6 @@ module EE
       rule { cannot_modify_merge_request_committer_setting }.policy do
         prevent :modify_merge_request_committer_setting
       end
-
-      rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
 
       rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
 

@@ -66,11 +66,6 @@ module EE
       end
 
       with_scope :global
-      condition(:cluster_health_available) do
-        License.feature_available?(:cluster_health)
-      end
-
-      with_scope :global
       condition(:commit_committer_check_disabled_globally) do
         !PushRule.global&.commit_committer_check
       end
@@ -222,8 +217,6 @@ module EE
       end
 
       rule { ~group_timelogs_available }.prevent :read_group_timelogs
-
-      rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
 
       rule { ~(admin | allow_to_manage_default_branch_protection) }.policy do
         prevent :update_default_branch_protection

@@ -34,21 +34,13 @@ RSpec.describe Banzai::Filter::InlineMetricsRedactorFilter do
     let(:query_params) { { group: 'Cluster Health', title: 'CPU Usage', y_label: 'CPU (cores)' } }
     let(:url) { urls.metrics_namespace_project_cluster_url(*params, **query_params) }
 
-    context 'with cluster health license' do
-      before do
-        stub_licensed_features(cluster_health: true)
-      end
-
+    context 'with user who can read cluster' do
       it_behaves_like 'redacts the embed placeholder'
       it_behaves_like 'retains the embed placeholder when applicable'
     end
 
-    context 'without cluster health license' do
-      let(:doc) { filter(input, current_user: project.owner) }
-
-      before do
-        stub_licensed_features(cluster_health: false)
-      end
+    context 'without user who can read cluster' do
+      let(:doc) { filter(input, current_user: create(:user)) }
 
       it 'redacts the embed placeholder' do
         expect(doc.to_s).to be_empty
