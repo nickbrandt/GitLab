@@ -50,7 +50,7 @@ class Profiles::PersonalAccessTokensController < Profiles::ApplicationController
   end
 
   def active_personal_access_tokens
-    finder(state: 'active', sort: 'expires_at_asc').execute
+    finder(state: 'active_or_expired', sort: 'expires_at_desc').execute
   end
 end
 
