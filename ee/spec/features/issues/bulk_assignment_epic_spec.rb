@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Issues > Epic bulk assignment' do
+RSpec.describe 'Issues > Epic bulk assignment', :js do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group, :public) }
   let_it_be(:project) { create(:project, :public, group: group) }

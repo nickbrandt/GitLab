@@ -19,7 +19,7 @@ RSpec.describe Groups::IssuesController do
         update: {
           milestone_id: milestone.id,
           issuable_ids: "#{issue1.id}, #{issue2.id}",
-          epic: epic.id
+          epic_id: epic.id
           },
           group_id: group
         }

@@ -26,6 +26,9 @@ module EE
         super
 
         set_health_status
+        set_epic_param
+
+        params
       end
 
       def set_health_status
@@ -34,39 +37,33 @@ module EE
         params[:health_status] = nil if params[:health_status] == IssuableFinder::Params::NONE.to_s
       end
 
-      override :filter_update_params
-      def filter_update_params(type)
-        super
-        set_epic_param
-
-        params
-      end
-
       def set_epic_param
-        return unless params[:epic].present?
+        return unless params[:epic_id].present?
 
-        epic_param = params.delete(:epic)
-        params[:epic] = nil if remove_epic?(epic_param)
-        return if params[:epic].present?
+        epic_id = params.delete(:epic_id)
+        epic = find_epic(epic_id)
 
-        epic = find_epic(epic_param)
-        params[:epic] = epic if epic.present?
+        # Set as nil if removing an epic or set as the Epic object
+        # if epic_id is present and the Epic was found.
+        params[:epic] = epic if epic.nil? || epic.present?
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
-      def find_epic(id)
+      def find_epic(epic_id)
+        return if remove_epic?(epic_id)
+
         group = parent.is_a?(Group) ? parent : parent.group
         return unless group.present?
 
         EpicsFinder.new(current_user, group_id: group.id,
-                        include_ancestor_groups: true).find(id)
+                        include_ancestor_groups: true).find(epic_id)
       rescue ActiveRecord::RecordNotFound
-        nil
+        false
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
-      def remove_epic?(epic_param)
-        epic_param == IssuableFinder::Params::NONE.to_s
+      def remove_epic?(epic_id)
+        epic_id == IssuableFinder::Params::NONE.to_s
       end
     end
   end

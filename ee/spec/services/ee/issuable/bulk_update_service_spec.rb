@@ -98,7 +98,7 @@ RSpec.describe Issuable::BulkUpdateService do
 
       context 'when user can not admin epic' do
         let(:epic3) { create(:epic, group: create(:group)) }
-        let(:params) { { issuable_ids: issuables.map(&:id), epic: epic3.id } }
+        let(:params) { { issuable_ids: issuables.map(&:id), epic_id: epic3.id } }
 
         it_behaves_like 'does not update issuables attribute', :epic
       end
