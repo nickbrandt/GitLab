@@ -133,6 +133,8 @@ module Projects
         end
 
         def process_incident_issues
+          return if Feature.enabled?(:am_alert_prometheus_replacement, project)
+
           alerts.each do |alert|
             IncidentManagement::ProcessPrometheusAlertWorker
               .perform_async(project.id, alert.to_h)

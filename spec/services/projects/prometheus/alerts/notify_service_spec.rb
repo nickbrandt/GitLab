@@ -19,6 +19,7 @@ RSpec.describe Projects::Prometheus::Alerts::NotifyService do
   before do
     # We use `let_it_be(:project)` so we make sure to clear caches
     project.clear_memoization(:licensed_feature_available)
+    stub_feature_flags(am_alert_prometheus_replacement: false)
   end
 
   shared_examples 'sends notification email' do
@@ -289,6 +290,14 @@ RSpec.describe Projects::Prometheus::Alerts::NotifyService do
         end
 
         it_behaves_like 'processes incident issues', 2
+
+        context 'alert management replacement feature enabled' do
+          before do
+            stub_feature_flags(am_alert_prometheus_replacement: true)
+          end
+
+          it_behaves_like 'does not process incident issues'
+        end
 
         context 'multiple firing alerts' do
           let(:payload_raw) do
