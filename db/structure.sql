@@ -1276,6 +1276,23 @@ CREATE SEQUENCE public.ci_pipeline_chat_data_id_seq
 
 ALTER SEQUENCE public.ci_pipeline_chat_data_id_seq OWNED BY public.ci_pipeline_chat_data.id;
 
+CREATE TABLE public.ci_pipeline_messages (
+    id bigint NOT NULL,
+    severity smallint DEFAULT 0 NOT NULL,
+    pipeline_id integer NOT NULL,
+    content text NOT NULL,
+    CONSTRAINT check_58ca2981b2 CHECK ((char_length(content) <= 10000))
+);
+
+CREATE SEQUENCE public.ci_pipeline_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.ci_pipeline_messages_id_seq OWNED BY public.ci_pipeline_messages.id;
+
 CREATE TABLE public.ci_pipeline_schedule_variables (
     id integer NOT NULL,
     key character varying NOT NULL,
@@ -7631,6 +7648,8 @@ ALTER TABLE ONLY public.ci_job_variables ALTER COLUMN id SET DEFAULT nextval('pu
 
 ALTER TABLE ONLY public.ci_pipeline_chat_data ALTER COLUMN id SET DEFAULT nextval('public.ci_pipeline_chat_data_id_seq'::regclass);
 
+ALTER TABLE ONLY public.ci_pipeline_messages ALTER COLUMN id SET DEFAULT nextval('public.ci_pipeline_messages_id_seq'::regclass);
+
 ALTER TABLE ONLY public.ci_pipeline_schedule_variables ALTER COLUMN id SET DEFAULT nextval('public.ci_pipeline_schedule_variables_id_seq'::regclass);
 
 ALTER TABLE ONLY public.ci_pipeline_schedules ALTER COLUMN id SET DEFAULT nextval('public.ci_pipeline_schedules_id_seq'::regclass);
@@ -8340,6 +8359,9 @@ ALTER TABLE ONLY public.ci_job_variables
 
 ALTER TABLE ONLY public.ci_pipeline_chat_data
     ADD CONSTRAINT ci_pipeline_chat_data_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.ci_pipeline_messages
+    ADD CONSTRAINT ci_pipeline_messages_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.ci_pipeline_schedule_variables
     ADD CONSTRAINT ci_pipeline_schedule_variables_pkey PRIMARY KEY (id);
@@ -9608,6 +9630,8 @@ CREATE UNIQUE INDEX index_ci_job_variables_on_key_and_job_id ON public.ci_job_va
 CREATE INDEX index_ci_pipeline_chat_data_on_chat_name_id ON public.ci_pipeline_chat_data USING btree (chat_name_id);
 
 CREATE UNIQUE INDEX index_ci_pipeline_chat_data_on_pipeline_id ON public.ci_pipeline_chat_data USING btree (pipeline_id);
+
+CREATE INDEX index_ci_pipeline_messages_on_pipeline_id ON public.ci_pipeline_messages USING btree (pipeline_id);
 
 CREATE UNIQUE INDEX index_ci_pipeline_schedule_variables_on_schedule_id_and_key ON public.ci_pipeline_schedule_variables USING btree (pipeline_schedule_id, key);
 
@@ -12586,6 +12610,9 @@ ALTER TABLE ONLY public.packages_conan_metadata
 ALTER TABLE ONLY public.vulnerability_feedback
     ADD CONSTRAINT fk_rails_8c77e5891a FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY public.ci_pipeline_messages
+    ADD CONSTRAINT fk_rails_8d3b04e3e1 FOREIGN KEY (pipeline_id) REFERENCES public.ci_pipelines(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.approval_merge_request_rules_approved_approvers
     ADD CONSTRAINT fk_rails_8dc94cff4d FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
@@ -14153,6 +14180,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200619154528
 20200622095419
 20200622103836
+20200622104923
 20200622235737
 20200623000148
 20200623000320

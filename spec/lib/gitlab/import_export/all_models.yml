@@ -228,6 +228,7 @@ ci_pipelines:
 - latest_builds
 - daily_report_results
 - latest_builds_report_results
+- messages
 ci_refs:
 - project
 - ci_pipelines
