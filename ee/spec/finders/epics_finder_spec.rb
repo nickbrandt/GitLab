@@ -389,16 +389,6 @@ RSpec.describe EpicsFinder do
               expect(subject).to match_array([base_epic2, public_epic1, public_epic2])
             end
           end
-
-          context 'when confidential_epics_query is disabled' do
-            before do
-              stub_feature_flags(confidential_epics_query: false)
-            end
-
-            it 'returns also confidential epics' do
-              expect(subject).to match_array([base_epic1, base_epic2, public_epic1, public_epic2])
-            end
-          end
         end
 
         context 'with negated labels' do
