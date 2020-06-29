@@ -28,8 +28,6 @@ to use the bundled PostgreSQL having only its service enabled.
 
 ## Provide your own PostgreSQL instance **(CORE ONLY)**
 
-This content has been moved to a [new location](external.md).
-
 This setup is for when you have installed GitLab using the
 [Omnibus GitLab packages](https://about.gitlab.com/install/) (CE or EE),
 or installed it [from source](../../install/installation.md), but you want to use
