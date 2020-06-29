@@ -22,6 +22,7 @@
 
 class EpicsFinder < IssuableFinder
   include TimeFrameFilter
+  include Gitlab::Utils::StrongMemoize
 
   IID_STARTS_WITH_PATTERN = %r{\A(\d)+\z}.freeze
 
@@ -128,10 +129,15 @@ class EpicsFinder < IssuableFinder
   end
 
   def group
-    return unless params[:group_id]
-    return @group if defined?(@group)
+    strong_memoize(:group) do
+      next unless params[:group_id]
 
-    @group = Group.find(params[:group_id])
+      if params[:group_id].is_a?(Group)
+        params[:group_id]
+      else
+        Group.find(params[:group_id])
+      end
+    end
   end
 
   def starts_with_iid(items)
