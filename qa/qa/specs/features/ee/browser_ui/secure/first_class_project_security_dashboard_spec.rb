@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Secure', :docker, :runner, quarantine: { type: :investigating } do
+  RSpec.describe 'Secure', :docker, :runner, quarantine: { type: :investigating } do
     describe 'Security Dashboard in a Project' do
       let(:vulnerability_name) { "CVE-2017-18269 in glibc" }
       let(:vulnerability_description) { "Short description to match in specs" }

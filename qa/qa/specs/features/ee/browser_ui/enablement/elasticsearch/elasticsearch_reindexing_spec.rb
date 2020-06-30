@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Create' do
+  RSpec.describe 'Create' do
     describe 'Search using Elasticsearch', :orchestrated, :elasticsearch, :requires_admin do
       include Runtime::Fixtures
       let(:project_name) { 'testing_elasticsearch_indexing' }
