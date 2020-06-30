@@ -32,7 +32,7 @@ class Geo::BaseRegistry < Geo::TrackingBase
       new(self::MODEL_FOREIGN_KEY => id, created_at: Time.zone.now)
     end
 
-    bulk_insert!(records, returns: :ids)
+    bulk_insert!(records, skip_duplicates: true, returns: :ids)
   end
 
   def self.delete_for_model_ids(ids)

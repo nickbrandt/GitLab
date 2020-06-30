@@ -43,4 +43,23 @@ RSpec.shared_examples 'a Geo framework registry' do
       end
     end
   end
+
+  describe '.insert_for_model_ids' do
+    it 'returns an array with the primary key values for all inserted records' do
+      ids = described_class.insert_for_model_ids([1])
+
+      expect(ids).to contain_exactly(a_kind_of(Integer))
+    end
+
+    context 'when duplicate items are to be inserted' do
+      let(:registry) { create(registry_class_factory) }
+
+      it 'does not raise an error' do
+        duplicated_key = registry.public_send(described_class::MODEL_FOREIGN_KEY)
+
+        expect { described_class.insert_for_model_ids([duplicated_key]) }
+          .not_to raise_error
+      end
+    end
+  end
 end

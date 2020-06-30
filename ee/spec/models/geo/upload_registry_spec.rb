@@ -13,6 +13,29 @@ RSpec.describe Geo::UploadRegistry, :geo, :geo_fdw do
     let(:invalid_items_for_bulk_insertion) { [] } # class does not have any validations defined
   end
 
+  describe '.insert_for_model_ids' do
+    it 'returns an array with the primary key values for all inserted records' do
+      ids = described_class.insert_for_model_ids([[1, 'avatar']])
+
+      expect(ids).to contain_exactly(a_kind_of(Integer))
+    end
+
+    it 'sets file_id and file_type for all inserted records' do
+      ids = described_class.insert_for_model_ids([[1, 'avatar']])
+
+      expect(described_class.where(id: ids).pluck(:file_id, :file_type)).to eq([[1, 'avatar']])
+    end
+
+    context 'when duplicate items are to be inserted' do
+      it 'does not raise an error' do
+        registry = create(:geo_upload_registry)
+
+        expect { described_class.insert_for_model_ids([[registry.file_id, registry.file_type]]) }
+          .not_to raise_error
+      end
+    end
+  end
+
   it 'finds associated Upload record' do
     registry = create(:geo_upload_registry, :attachment, :with_file)
 

@@ -22,6 +22,15 @@ RSpec.describe Geo::JobArtifactRegistry, :geo do
 
       expect(described_class.where(id: ids).pluck(:success)).to eq([false])
     end
+
+    context 'when duplicate items are to be inserted' do
+      it 'does not raise an error' do
+        registry = create(:geo_job_artifact_registry)
+
+        expect { described_class.insert_for_model_ids([registry.artifact_id]) }
+          .not_to raise_error
+      end
+    end
   end
 
   describe '.replication_enabled?' do
