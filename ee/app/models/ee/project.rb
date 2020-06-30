@@ -167,6 +167,8 @@ module EE
       delegate :merge_trains_enabled?, to: :ci_cd_settings
       delegate :closest_gitlab_subscription, to: :namespace
 
+      delegate :requirements_access_level, to: :project_feature, allow_nil: true
+
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
       validates :max_pages_size,
@@ -184,6 +186,7 @@ module EE
       end
 
       default_value_for :packages_enabled, true
+      default_value_for :requirements_enabled, true
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :status_page_setting, update_only: true, allow_destroy: true

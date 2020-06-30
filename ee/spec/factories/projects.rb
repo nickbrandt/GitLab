@@ -76,6 +76,10 @@ FactoryBot.modify do
       service_desk_enabled { true }
     end
 
+    trait(:issues_enabled) do
+      issues_access_level { ProjectFeature::ENABLED }
+    end
+
     trait :github_imported do
       import_type { 'github' }
     end
