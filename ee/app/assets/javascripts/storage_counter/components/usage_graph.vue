@@ -22,6 +22,7 @@ export default {
         repositorySize,
         storageSize,
         wikiSize,
+        snippetsSize,
       } = this.rootStorageStatistics;
 
       if (storageSize === 0) {
@@ -58,6 +59,12 @@ export default {
           style: this.usageStyle(this.barRatio(wikiSize)),
           class: 'gl-bg-data-viz-magenta-500',
           size: wikiSize,
+        },
+        {
+          name: s__('UsageQuota|Snippets'),
+          style: this.usageStyle(this.barRatio(snippetsSize)),
+          class: 'gl-bg-data-viz-orange-800',
+          size: snippetsSize,
         },
       ]
         .filter(data => data.size !== 0)
