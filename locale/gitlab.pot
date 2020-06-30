@@ -6549,6 +6549,12 @@ msgstr ""
 msgid "Coverage"
 msgstr ""
 
+msgid "Coverage Fuzzing"
+msgstr ""
+
+msgid "Crash State"
+msgstr ""
+
 msgid "Create"
 msgstr ""
 
@@ -10023,6 +10029,9 @@ msgid "Filter..."
 msgstr ""
 
 msgid "Find File"
+msgstr ""
+
+msgid "Find bugs in your code with coverage-guided fuzzing"
 msgstr ""
 
 msgid "Find by path"
@@ -21547,6 +21556,9 @@ msgstr ""
 msgid "Stack trace"
 msgstr ""
 
+msgid "Stacktrace snippet"
+msgstr ""
+
 msgid "Stage"
 msgstr ""
 
@@ -25591,6 +25603,9 @@ msgstr ""
 msgid "Vulnerability|Class"
 msgstr ""
 
+msgid "Vulnerability|Crash Address"
+msgstr ""
+
 msgid "Vulnerability|Description"
 msgstr ""
 
@@ -26880,6 +26895,9 @@ msgid "ciReport|Container scanning"
 msgstr ""
 
 msgid "ciReport|Container scanning detects known vulnerabilities in your docker images."
+msgstr ""
+
+msgid "ciReport|Coverage Fuzzing"
 msgstr ""
 
 msgid "ciReport|Create a merge request to implement this solution, or download and apply the patch manually."

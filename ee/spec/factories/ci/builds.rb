@@ -127,5 +127,11 @@ FactoryBot.define do
         build.job_artifacts << create(:ee_ci_job_artifact, :all_passing_requirements, job: build)
       end
     end
+
+    trait :coverage_fuzzing_report do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :coverage_fuzzing, job: build)
+      end
+    end
   end
 end

@@ -11310,6 +11310,11 @@ type SecurityReportSummary {
   containerScanning: SecurityReportSummarySection
 
   """
+  Aggregated counts for the coverage_fuzzing scan
+  """
+  coverageFuzzing: SecurityReportSummarySection
+
+  """
   Aggregated counts for the dast scan
   """
   dast: SecurityReportSummarySection
@@ -13994,7 +13999,8 @@ type Vulnerability {
 
   """
   Type of the security report that found the vulnerability (SAST,
-  DEPENDENCY_SCANNING, CONTAINER_SCANNING, DAST, SECRET_DETECTION)
+  DEPENDENCY_SCANNING, CONTAINER_SCANNING, DAST, SECRET_DETECTION,
+  COVERAGE_FUZZING)
   """
   reportType: VulnerabilityReportType
 
@@ -14332,6 +14338,7 @@ The type of the security scan that found the vulnerability.
 """
 enum VulnerabilityReportType {
   CONTAINER_SCANNING
+  COVERAGE_FUZZING
   DAST
   DEPENDENCY_SCANNING
   SAST

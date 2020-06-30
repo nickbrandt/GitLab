@@ -307,7 +307,8 @@ module EE
       feature_available?(:secret_detection) ||
       feature_available?(:dependency_scanning) ||
       feature_available?(:container_scanning) ||
-      feature_available?(:dast)
+      feature_available?(:dast) ||
+      feature_available?(:coverage_fuzzing)
     end
 
     def free_plan?

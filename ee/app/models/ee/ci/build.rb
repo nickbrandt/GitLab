@@ -15,7 +15,8 @@ module EE
         secret_detection: :secret_detection,
         dependency_scanning: :dependency_scanning,
         container_scanning: :container_scanning,
-        dast: :dast
+        dast: :dast,
+        coverage_fuzzing: :coverage_fuzzing
       }.with_indifferent_access.freeze
 
       prepended do

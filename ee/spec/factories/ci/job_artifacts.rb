@@ -352,5 +352,16 @@ FactoryBot.define do
           Rails.root.join('ee/spec/fixtures/requirements_management/report_by_requirement.json'), 'application/json')
       end
     end
+
+    trait :coverage_fuzzing do
+      file_format { :raw }
+      file_type { :coverage_fuzzing }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-coverage-fuzzing-report.json'),
+          'application/json')
+      end
+    end
   end
 end

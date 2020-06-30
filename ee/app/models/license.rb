@@ -112,6 +112,7 @@ class License < ApplicationRecord
   EEU_FEATURES = EEP_FEATURES + %i[
     compliance_framework
     container_scanning
+    coverage_fuzzing
     credentials_inventory
     dast
     dependency_scanning
