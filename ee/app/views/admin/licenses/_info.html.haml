@@ -42,6 +42,11 @@
           - if @license.expired?
             %span.badge.badge-danger.float-right
               %strong= _('Expired')
+        %li
+          %span.light= _('License ID:')
+          %strong= @license.license_id
+          = clipboard_button(text: @license.license_id, title: _("Copy ID"), class: "btn-transparent btn-clipboard")
+
 
   .col-md-6
     .card.border-info
