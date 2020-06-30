@@ -48,6 +48,7 @@ export default {
           names: toNounSeriesText(this.rulesLeft),
           count: this.approvalsLeft,
         },
+        false,
       );
     },
     hasApprovers() {
