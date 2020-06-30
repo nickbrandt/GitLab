@@ -129,7 +129,7 @@ export default {
       return this.targetType === 'issue';
     },
     canAssign() {
-      return this.getNoteableData.current_user.can_update && this.isIssue;
+      return this.getNoteableData.current_user?.can_update && this.isIssue;
     },
   },
   methods: {
