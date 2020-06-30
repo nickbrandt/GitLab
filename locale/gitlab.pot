@@ -17779,12 +17779,6 @@ msgstr ""
 msgid "ProjectSettings|Repository"
 msgstr ""
 
-msgid "ProjectSettings|Requirements"
-msgstr ""
-
-msgid "ProjectSettings|Requirements management system for this project"
-msgstr ""
-
 msgid "ProjectSettings|Share code pastes with others out of Git repository"
 msgstr ""
 
