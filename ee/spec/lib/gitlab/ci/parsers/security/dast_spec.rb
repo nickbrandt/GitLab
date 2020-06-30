@@ -16,15 +16,16 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Dast do
           :occurrence_count,
           :identifier_count,
           :scanner_count,
+          :scanned_resources_count,
           :last_occurrence_hostname,
           :last_occurrence_method_name,
           :last_occurrence_path,
           :last_occurrence_severity,
           :last_occurrence_confidence) do
-      :dast                             | 24 | 15 | 1 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
-      :dast_multiple_sites              | 25 | 15 | 1 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
-      :dast_deprecated_no_spider        | 2  | 3  | 1 | 'http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io' | 'GET' | '/' | 'low' | 'medium'
-      :dast_deprecated_no_common_fields | 24 | 15 | 1 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
+      :dast                             | 24 | 15 | 1 | 6 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
+      :dast_multiple_sites              | 25 | 15 | 1 | 0 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
+      :dast_deprecated_no_spider        | 2  | 3  | 1 | 0 | 'http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io' | 'GET' | '/' | 'low' | 'medium'
+      :dast_deprecated_no_common_fields | 24 | 15 | 1 | 0 | 'http://goat:8080' | 'GET' | '/WebGoat/plugins/bootstrap/css/bootstrap.min.css' | 'info' | 'low'
     end
 
     with_them do
@@ -36,10 +37,11 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Dast do
         end
       end
 
-      it 'parses all identifiers and occurrences' do
+      it 'parses all identifiers, occurrences and scanned resources' do
         expect(report.occurrences.length).to eq(occurrence_count)
         expect(report.identifiers.length).to eq(identifier_count)
         expect(report.scanners.length).to eq(scanner_count)
+        expect(report.scanned_resources.length).to eq(scanned_resources_count)
       end
 
       it 'generates expected location' do

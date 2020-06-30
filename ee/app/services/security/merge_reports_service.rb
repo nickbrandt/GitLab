@@ -42,6 +42,7 @@ module Security
         copy_scanners_to_target(source)
         copy_identifiers_to_target(source)
         copy_occurrences_to_buffer(source)
+        copy_scanned_resources_to_target(source)
       end
 
       copy_occurrences_to_target
@@ -63,6 +64,10 @@ module Security
 
     def copy_occurrences_to_buffer(source)
       @occurrences.concat(source.occurrences)
+    end
+
+    def copy_scanned_resources_to_target(source_report)
+      @target_report.scanned_resources.concat(source_report.scanned_resources).uniq!
     end
 
     # this method mutates the passed seen_identifiers set
