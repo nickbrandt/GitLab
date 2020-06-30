@@ -2,7 +2,7 @@
 
 module QA
   # https://gitlab.com/gitlab-org/gitlab/issues/35706
-  context 'Geo', :orchestrated, :geo do
+  RSpec.describe 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo Wiki HTTP push secondary' do
       let(:wiki_content) { 'This tests wiki pushes via HTTP to secondary.' }
       let(:push_content_primary) { 'This is from the Geo wiki push to primary!' }

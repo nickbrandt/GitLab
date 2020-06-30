@@ -3,7 +3,7 @@
 require 'airborne'
 
 module QA
-  context 'Geo', :orchestrated, :geo do
+  RSpec.describe 'Geo', :orchestrated, :geo do
     describe 'Geo Nodes API' do
       before(:all) do
         get_personal_access_token

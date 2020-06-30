@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Geo', :orchestrated, :geo do
+  RSpec.describe 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo project deletion replication' do
       include Support::Api
 
