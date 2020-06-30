@@ -17149,7 +17149,7 @@ msgstr ""
 msgid "Profiles|Full name"
 msgstr ""
 
-msgid "Profiles|Give your individual key a title"
+msgid "Profiles|Give your individual key a title. This will be publically visible."
 msgstr ""
 
 msgid "Profiles|Include private contributions on my profile"
