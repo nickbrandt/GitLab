@@ -996,9 +996,6 @@ msgstr ""
 msgid "A Let's Encrypt account will be configured for this GitLab installation using your email address. You will receive emails to warn of expiring certificates."
 msgstr ""
 
-msgid "A Terraform report was generated in your pipelines."
-msgstr ""
-
 msgid "A basic page and serverless function that uses AWS Lambda, AWS API Gateway, and GitLab Pages"
 msgstr ""
 
@@ -10271,9 +10268,6 @@ msgstr ""
 msgid "Generate new export"
 msgstr ""
 
-msgid "Generating the report caused an error."
-msgstr ""
-
 msgid "Geo"
 msgstr ""
 
@@ -19091,9 +19085,6 @@ msgstr ""
 msgid "Reported %{timeAgo} by %{reportedBy}"
 msgstr ""
 
-msgid "Reported Resource Changes: %{addNum} to add, %{changeNum} to change, %{deleteNum} to delete"
-msgstr ""
-
 msgid "Reporter"
 msgstr ""
 
@@ -22351,6 +22342,34 @@ msgstr ""
 msgid "Terms of Service and Privacy Policy"
 msgstr ""
 
+msgid "Terraform|%{number} Terraform report failed to generate"
+msgid_plural "Terraform|%{number} Terraform reports failed to generate"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Terraform|%{number} Terraform report was generated in your pipelines"
+msgid_plural "Terraform|%{number} Terraform reports were generated in your pipelines"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Terraform|A Terraform report failed to generate."
+msgstr ""
+
+msgid "Terraform|A Terraform report was generated in your pipelines."
+msgstr ""
+
+msgid "Terraform|Generating the report caused an error."
+msgstr ""
+
+msgid "Terraform|Reported Resource Changes: %{addNum} to add, %{changeNum} to change, %{deleteNum} to delete"
+msgstr ""
+
+msgid "Terraform|The Terraform report %{name} failed to generate."
+msgstr ""
+
+msgid "Terraform|The Terraform report %{name} was generated in your pipelines."
+msgstr ""
+
 msgid "Test"
 msgstr ""
 
@@ -22476,9 +22495,6 @@ msgid "The Issue Tracker is the place to add things that need to be improved or 
 msgstr ""
 
 msgid "The Prometheus server responded with \"bad request\". Please check your queries are correct and are supported in your Prometheus version. %{documentationLink}"
-msgstr ""
-
-msgid "The Terraform report %{name} was generated in your pipelines."
 msgstr ""
 
 msgid "The URL defined on the primary node that secondary nodes should use to contact it."
