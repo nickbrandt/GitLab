@@ -260,6 +260,11 @@ type AlertManagementAlert implements Noteable {
   issueIid: ID
 
   """
+  URL for metrics embed for the alert
+  """
+  metricsDashboardUrl: String
+
+  """
   Monitoring tool the alert came from
   """
   monitoringTool: String

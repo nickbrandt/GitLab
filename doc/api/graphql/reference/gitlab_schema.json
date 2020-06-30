@@ -717,6 +717,20 @@
               "deprecationReason": null
             },
             {
+              "name": "metricsDashboardUrl",
+              "description": "URL for metrics embed for the alert",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "monitoringTool",
               "description": "Monitoring tool the alert came from",
               "args": [
