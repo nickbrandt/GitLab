@@ -431,6 +431,11 @@ module ProjectsHelper
       end
     end
 
+    if project.has_confluence? && ConfluenceService.feature_enabled?(project)
+      nav_tabs.delete(:wiki)
+      nav_tabs << :confluence
+    end
+
     nav_tabs << external_nav_tabs(project)
 
     nav_tabs.flatten

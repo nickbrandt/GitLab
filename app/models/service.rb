@@ -12,7 +12,7 @@ class Service < ApplicationRecord
   ignore_columns %i[title description], remove_with: '13.4', remove_after: '2020-09-22'
 
   SERVICE_NAMES = %w[
-    alerts asana assembla bamboo bugzilla buildkite campfire custom_issue_tracker discord
+    alerts asana assembla bamboo bugzilla buildkite campfire confluence custom_issue_tracker discord
     drone_ci emails_on_push external_wiki flowdock hangouts_chat hipchat irker jira
     mattermost mattermost_slash_commands microsoft_teams packagist pipelines_email
     pivotaltracker prometheus pushover redmine slack slack_slash_commands teamcity unify_circuit webex_teams youtrack
@@ -41,8 +41,9 @@ class Service < ApplicationRecord
   after_initialize :initialize_properties
 
   after_commit :reset_updated_properties
-  after_commit :cache_project_has_external_issue_tracker
-  after_commit :cache_project_has_external_wiki
+  # after_commit :cache_project_has_external_issue_tracker
+  # after_commit :cache_project_has_external_wiki
+  after_commit :update_project_service_caches
 
   belongs_to :project, inverse_of: :services
   has_one :service_hook
@@ -56,6 +57,7 @@ class Service < ApplicationRecord
   validate :validate_is_instance_or_template
 
   scope :visible, -> { where.not(type: 'GitlabIssueTrackerService') }
+  scope :confluences, -> { where(type: 'ConfluenceService').active }
   scope :issue_trackers, -> { where(category: 'issue_tracker') }
   scope :external_wikis, -> { where(type: 'ExternalWikiService').active }
   scope :active, -> { where(active: true) }
@@ -375,17 +377,24 @@ class Service < ApplicationRecord
     errors.add(:template, 'The service should be a service template or instance-level integration') if template? && instance?
   end
 
-  def cache_project_has_external_issue_tracker
+  # Or cache all columns in one update?
+  def update_project_service_caches
     if project && !project.destroyed?
-      project.cache_has_external_issue_tracker
+      # binding.pry
+      # project.update_columns({
+      #   cache_has_external_issue_tracker: project.services.external_issue_trackers.any?,
+      #   has_external_wiki: project.services.external_wikis.any?,
+      #   has_confluence: project.services.confluences.any?
+      # })s
+      project.cache_has_external_issue_tracker# if category == 'issue_tracker'
+      project.cache_has_external_wiki#if self.is_a?(ExternalWikiService)
+      project.update_column(:has_confluence, project.services.confluences.any?)# if self.is_a?(ConfluenceService)
     end
   end
 
-  def cache_project_has_external_wiki
-    if project && !project.destroyed?
-      project.cache_has_external_wiki
-    end
-  end
+  # def cache_has_confluence
+  #   project.update_column(:has_confluence, services.confluences.any?)
+  # end
 
   def self.event_description(event)
     ServicesHelper.service_event_description(event)

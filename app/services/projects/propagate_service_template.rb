@@ -65,6 +65,7 @@ module Projects
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
+    # What is this?
     def run_callbacks(batch)
       if active_external_issue_tracker?
         Project.where(id: batch).update_all(has_external_issue_tracker: true)

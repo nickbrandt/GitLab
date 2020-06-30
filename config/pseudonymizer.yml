@@ -392,6 +392,7 @@ tables:
     - repository_read_only
     - request_access_enabled
     - has_external_wiki
+    - has_confluence
     - ci_config_path
     - lfs_enabled
     - only_allow_merge_if_all_discussions_are_resolved

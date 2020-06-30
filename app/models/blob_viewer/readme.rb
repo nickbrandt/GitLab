@@ -14,6 +14,7 @@ module BlobViewer
     end
 
     def render_error
+      # here?
       return if project.has_external_wiki? || (project.wiki_enabled? && project.wiki.has_home_page?)
 
       :no_wiki

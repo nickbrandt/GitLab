@@ -144,6 +144,7 @@ class Project < ApplicationRecord
   # Project services
   has_one :alerts_service
   has_one :campfire_service
+  has_one :confluence_service
   has_one :discord_service
   has_one :drone_ci_service
   has_one :emails_on_push_service
@@ -1252,6 +1253,12 @@ class Project < ApplicationRecord
     update_column(:has_external_wiki, services.external_wikis.any?) if Gitlab::Database.read_write?
   end
 
+  def confluence
+    strong_memoize(:confluence) do
+      services.confluences.first if has_confluence?
+    end
+  end
+
   def find_or_initialize_services
     available_services_names = Service.available_services_names - disabled_services
 
@@ -1261,7 +1268,11 @@ class Project < ApplicationRecord
   end
 
   def disabled_services
-    []
+    strong_memoize(:disabled_services) do
+      [].tap do |disabled_services|
+        disabled_services.push(ConfluenceService.to_param) unless ConfluenceService.feature_enabled?(self)
+      end
+    end
   end
 
   def find_or_initialize_service(name)

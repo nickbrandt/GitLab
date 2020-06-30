@@ -109,6 +109,34 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     end
   end
 
+  # describe 'external wiki entry tab' do
+  #   let(:properties) { { 'external_wiki_url' => 'https://gitlab.com' } }
+  #   let(:service_status) { true }
+
+  #   before do
+  #     project.create_external_wiki_service(active: service_status, properties: properties)
+  #     project.reload
+  #   end
+
+  #   context 'when it is active' do
+  #     it 'shows the external wiki tab with the external wiki service link' do
+  #       render
+
+  #       expect(rendered).to have_link('External Wiki', href: properties['external_wiki_url'])
+  #     end
+  #   end
+
+  #   context 'when it is disabled' do
+  #     let(:service_status) { false }
+
+  #     it 'does not show the external wiki tab' do
+  #       render
+
+  #       expect(rendered).not_to have_link('External Wiki')
+  #     end
+  #   end
+  # end
+
   describe 'ci/cd settings tab' do
     before do
       project.update!(archived: project_archived)
