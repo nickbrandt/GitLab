@@ -476,6 +476,9 @@ msgstr ""
 msgid "%{name} found %{resultsString}"
 msgstr ""
 
+msgid "%{name} is already being used for another emoji"
+msgstr ""
+
 msgid "%{name} is scheduled for %{action}"
 msgstr ""
 
