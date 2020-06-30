@@ -20,6 +20,10 @@ class Timelog < ApplicationRecord
     where('spent_at BETWEEN ? AND ?', start_time, end_time)
   end
 
+  scope :for_merge_requests, -> (merge_request_scope) do
+    where(merge_request: merge_request_scope)
+  end
+
   def issuable
     issue || merge_request
   end

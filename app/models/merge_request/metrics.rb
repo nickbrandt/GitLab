@@ -5,6 +5,11 @@ class MergeRequest::Metrics < ApplicationRecord
   belongs_to :pipeline, class_name: 'Ci::Pipeline', foreign_key: :pipeline_id
   belongs_to :latest_closed_by, class_name: 'User'
   belongs_to :merged_by, class_name: 'User'
+
+  scope :preloaded, -> { preload(:merged_by, :latest_closed_by) }
+  scope :for_merge_requests, -> (merge_request_scope) do
+    where(merge_request: merge_request_scope)
+  end
 end
 
 MergeRequest::Metrics.prepend_if_ee('EE::MergeRequest::Metrics')

@@ -8,14 +8,26 @@ module API
       expose :title, :description
       expose :state, :created_at, :updated_at
 
-      # Avoids an N+1 query when metadata is included
-      def issuable_metadata(subject, options, method, args = nil)
-        cached_subject = options.dig(:issuable_metadata, subject.id)
+      def presented
+        lazy_issuable_metadata
 
-        if cached_subject
-          cached_subject[method]
-        else
-          subject.public_send(method, *args) # rubocop: disable GitlabSecurity/PublicSend
+        super
+      end
+
+      def issuable_metadata
+        lazy_issuable_metadata
+      end
+
+      protected
+
+      def lazy_issuable_metadata
+        BatchLoader.for(object).batch(key: :issuable_metadata) do |models, loader|
+          issuable_metadata = Gitlab::IssuableMetadata.new(nil, models)
+          metadata_by_id = issuable_metadata.data
+
+          models.each do |issuable|
+            loader.call(issuable, metadata_by_id[issuable.id])
+          end
         end
       end
     end
