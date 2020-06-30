@@ -33402,6 +33402,20 @@
             },
             {
               "name": "firstReleaseShortVersion",
+              "description": "Release short version the error was first seen",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "firstReleaseVersion",
               "description": "Release version the error was first seen",
               "args": [
 
@@ -33534,6 +33548,20 @@
             },
             {
               "name": "lastReleaseShortVersion",
+              "description": "Release short version the error was last seen",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "lastReleaseVersion",
               "description": "Release version the error was last seen",
               "args": [
 
