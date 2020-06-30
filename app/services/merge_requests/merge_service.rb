@@ -27,6 +27,7 @@ module MergeRequests
           success
         end
       end
+
       log_info("Merge process finished on JID #{merge_jid} with state #{state}")
     rescue MergeError => e
       handle_merge_error(log_message: e.message, save_message_on_model: true)
@@ -89,7 +90,7 @@ module MergeRequests
       repository.merge(current_user, source, merge_request, commit_message)
     rescue Gitlab::Git::PreReceiveError => e
       raise MergeError,
-            "Something went wrong during merge pre-receive hook. #{e.message}".strip
+            "GL-HOOK-ERR: Something went wrong during merge pre-receive hook. #{e.message}".strip
     rescue => e
       handle_merge_error(log_message: e.message)
       raise_error('Something went wrong during merge')
