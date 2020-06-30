@@ -18,7 +18,8 @@ class ConfluenceService < Service
   # and Gitlab::UrlBlocker.validate!(value, blocker_args)
 
   def self.feature_enabled?(actor)
-    ::Feature.enabled?(FEATURE_FLAG, actor)
+    true
+    # ::Feature.enabled?(FEATURE_FLAG, actor)
   end
 
   def title
