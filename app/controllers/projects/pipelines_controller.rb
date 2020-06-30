@@ -19,6 +19,8 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
   before_action :ensure_pipeline, only: [:show]
 
+  before_action :ensure_valid_scope, only: [:index]
+
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show]
 
   track_unique_visits :charts, target_id: 'p_analytics_pipelines'
@@ -44,7 +46,7 @@ class Projects::PipelinesController < Projects::ApplicationController
         render json: {
           pipelines: serialize_pipelines,
           count: {
-            all: @pipelines_count,
+            all: @pipelines_count
           }
         }
       end
@@ -221,6 +223,10 @@ class Projects::PipelinesController < Projects::ApplicationController
 
   def ensure_pipeline
     render_404 unless pipeline
+  end
+
+  def ensure_valid_scope
+    redirect_to project_pipelines_path(project, status: params[:scope]) if %w[running pending].include?(params[:scope])
   end
 
   # rubocop: disable CodeReuse/ActiveRecord

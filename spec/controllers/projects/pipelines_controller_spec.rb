@@ -119,6 +119,14 @@ RSpec.describe Projects::PipelinesController do
       end
     end
 
+    context 'when scope is pending or running' do
+      it 'redirects to all pipelines with that status instead' do
+        get_pipelines_index_json(scope: 'running')
+
+        expect(response).to redirect_to(project_pipelines_path(project, status: 'running'))
+      end
+    end
+
     context 'filter by scope' do
       context 'scope is branches or tags' do
         before do
@@ -191,14 +199,6 @@ RSpec.describe Projects::PipelinesController do
           get_pipelines_index_json(status: 'success')
 
           check_pipeline_response(returned: 1, all: 1)
-        end
-
-        context 'when filter by unrelated scope' do
-          it 'returns empty list' do
-            get_pipelines_index_json(status: 'success', scope: 'running')
-
-            check_pipeline_response(returned: 0, all: 1)
-          end
         end
       end
 
