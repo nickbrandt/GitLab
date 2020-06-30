@@ -53,10 +53,6 @@ module EE
         nav_tabs << :project_insights
       end
 
-      if can?(current_user, :read_requirement, project)
-        nav_tabs << :requirements
-      end
-
       nav_tabs
     end
 
@@ -70,8 +66,7 @@ module EE
     override :project_permissions_settings
     def project_permissions_settings(project)
       super.merge(
-        packagesEnabled: !!project.packages_enabled,
-        requirementsAccessLevel: project.requirements_access_level
+        packagesEnabled: !!project.packages_enabled
       )
     end
 
@@ -79,8 +74,7 @@ module EE
     def project_permissions_panel_data(project)
       super.merge(
         packagesAvailable: ::Gitlab.config.packages.enabled && project.feature_available?(:packages),
-        packagesHelpPath: help_page_path('user/packages/index'),
-        requirementsAvailable: project.feature_available?(:requirements)
+        packagesHelpPath: help_page_path('user/packages/index')
       )
     end
 
