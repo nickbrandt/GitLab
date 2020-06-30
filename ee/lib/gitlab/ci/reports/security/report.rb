@@ -14,6 +14,7 @@ module Gitlab
           attr_reader :scanners
           attr_reader :identifiers
 
+          attr_accessor :scanned_resources
           attr_accessor :error
 
           def initialize(type, commit_sha, created_at)
@@ -23,6 +24,7 @@ module Gitlab
             @occurrences = []
             @scanners = {}
             @identifiers = {}
+            @scanned_resources = []
           end
 
           def errored?

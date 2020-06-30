@@ -5,6 +5,7 @@ FactoryBot.define do
     type { :sast }
     commit_sha { Digest::SHA1.hexdigest(SecureRandom.hex) }
     created_at { 2.weeks.ago }
+    scanned_resources { [] }
 
     transient do
       occurrences { [] }

@@ -87,7 +87,8 @@ RSpec.describe Security::MergeReportsService, '#execute' do
       :ci_reports_security_report,
       scanners: [scanner_1, scanner_2],
       occurrences: report_1_occurrences,
-      identifiers: report_1_occurrences.flat_map(&:identifiers)
+      identifiers: report_1_occurrences.flat_map(&:identifiers),
+      scanned_resources: ['example.com', 'example.com/1', 'example.com/2']
     )
   end
 
@@ -98,7 +99,8 @@ RSpec.describe Security::MergeReportsService, '#execute' do
       :ci_reports_security_report,
       scanners: [scanner_2],
       occurrences: report_2_occurrences,
-      identifiers: occurrence_id_2_loc_2.identifiers
+      identifiers: occurrence_id_2_loc_2.identifiers,
+      scanned_resources: ['example.com', 'example.com/3']
     )
   end
 
@@ -144,6 +146,17 @@ RSpec.describe Security::MergeReportsService, '#execute' do
           occurrence_id_2_loc_1,
           occurrence_wasc_1,
           occurrence_id_1
+      ])
+    )
+  end
+
+  it 'deduplicates scanned resources' do
+    expect(subject.scanned_resources).to(
+      eq([
+        'example.com',
+        'example.com/1',
+        'example.com/2',
+        'example.com/3'
       ])
     )
   end
