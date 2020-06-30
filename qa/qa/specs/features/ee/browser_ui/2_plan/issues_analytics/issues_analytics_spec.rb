@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable do
+  RSpec.describe 'Plan', :reliable do
     shared_examples 'issues analytics page' do
       let(:issue) do
         Resource::Issue.fabricate_via_api!
