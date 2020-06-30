@@ -14,9 +14,11 @@ module Projects
     end
 
     def execute
-      return ServiceResponse.success unless repository_storage_move.scheduled?
+      repository_storage_move.with_lock do
+        return ServiceResponse.success unless repository_storage_move.scheduled? # rubocop:disable Cop/AvoidReturnFromBlocks
 
-      repository_storage_move.start!
+        repository_storage_move.start!
+      end
 
       raise SameFilesystemError if same_filesystem?(repository.storage, destination_storage_name)
 

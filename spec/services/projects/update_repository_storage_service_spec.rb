@@ -45,6 +45,7 @@ RSpec.describe Projects::UpdateRepositoryStorageService do
             .and_call_original
 
           result = subject.execute
+          project.reload
 
           expect(result).to be_success
           expect(project).not_to be_repository_read_only
@@ -115,6 +116,7 @@ RSpec.describe Projects::UpdateRepositoryStorageService do
             .and_return(checksum)
 
           result = subject.execute
+          project.reload
 
           expect(result).to be_success
           expect(project.repository_storage).to eq('test_second_storage')
