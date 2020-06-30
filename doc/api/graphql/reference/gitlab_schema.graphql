@@ -3164,6 +3164,11 @@ type DiffStatsSummary {
   Number of lines deleted
   """
   deletions: Int!
+
+  """
+  Number of files changed
+  """
+  fileCount: Int!
 }
 
 type Discussion implements ResolvableInterface {
