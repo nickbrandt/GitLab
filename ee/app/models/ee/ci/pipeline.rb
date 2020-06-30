@@ -48,7 +48,8 @@ module EE
           license_management: %i[license_scanning],
           license_scanning: %i[license_scanning],
           metrics: %i[metrics_reports],
-          requirements: %i[requirements]
+          requirements: %i[requirements],
+          coverage_fuzzing: %i[coverage_fuzzing]
         }.freeze
 
         state_machine :status do

@@ -69,6 +69,22 @@ RSpec.describe EE::Ci::JobArtifact do
     end
   end
 
+  describe '.coverage_fuzzing_reports' do
+    subject { Ci::JobArtifact.coverage_fuzzing }
+
+    context 'when there is a metrics report' do
+      let!(:artifact) { create(:ee_ci_job_artifact, :coverage_fuzzing) }
+
+      it { is_expected.to eq([artifact]) }
+    end
+
+    context 'when there is no coverage fuzzing reports' do
+      let!(:artifact) { create(:ee_ci_job_artifact, :trace) }
+
+      it { is_expected.to be_empty }
+    end
+  end
+
   describe '.associated_file_types_for' do
     using RSpec::Parameterized::TableSyntax
 

@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :ee_ci_pipeline, class: 'Ci::Pipeline', parent: :ci_pipeline do
-    %i[container_scanning dast dependency_list dependency_scanning license_management license_scanning sast secret_detection].each do |report_type|
+    %i[container_scanning dast dependency_list dependency_scanning license_management license_scanning sast secret_detection coverage_fuzzing].each do |report_type|
       trait "with_#{report_type}_report".to_sym do
         status { :success }
 
