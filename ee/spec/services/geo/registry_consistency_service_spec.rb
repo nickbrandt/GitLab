@@ -21,7 +21,7 @@ RSpec.describe Geo::RegistryConsistencyService, :geo, :use_clean_rails_memory_st
 
   shared_examples 'registry consistency service' do |klass|
     let(:registry_class) { klass }
-    let(:registry_class_factory) { registry_class.underscore.tr('/', '_').to_sym }
+    let(:registry_class_factory) { registry_factory_name(registry_class) }
     let(:model_class) { registry_class::MODEL_CLASS }
     let(:model_class_factory) { model_class_factory_name(model_class) }
     let(:model_foreign_key) { registry_class::MODEL_FOREIGN_KEY }
