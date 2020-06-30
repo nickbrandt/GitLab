@@ -134,6 +134,10 @@ module EE
         !merge_train_pipeline? && super
       end
 
+      def ci_secrets_management_available?
+        project.beta_feature_available?(:ci_secrets_management)
+      end
+
       private
 
       def parse_security_artifact_blob(security_report, blob)
