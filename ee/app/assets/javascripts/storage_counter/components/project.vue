@@ -78,6 +78,7 @@ export default {
     buildArtifactsSize: s__('UsageQuota|Artifacts'),
     packagesSize: s__('UsageQuota|Packages'),
     wikiSize: s__('UsageQuota|Wiki'),
+    snippetsSize: s__('UsageQuota|Snippets'),
   },
 };
 </script>

@@ -19228,7 +19228,7 @@ msgstr ""
 msgid "Repository sync capacity"
 msgstr ""
 
-msgid "Repository: %{counter_repositories} / Wikis: %{counter_wikis} / Build Artifacts: %{counter_build_artifacts} / LFS: %{counter_lfs_objects}"
+msgid "Repository: %{counter_repositories} / Wikis: %{counter_wikis} / Build Artifacts: %{counter_build_artifacts} / LFS: %{counter_lfs_objects} / Snippets: %{counter_snippets}"
 msgstr ""
 
 msgid "RepositorySettingsAccessLevel|Select"
@@ -24732,6 +24732,9 @@ msgid "UsageQuota|Repositories"
 msgstr ""
 
 msgid "UsageQuota|Repository"
+msgstr ""
+
+msgid "UsageQuota|Snippets"
 msgstr ""
 
 msgid "UsageQuota|Storage"
