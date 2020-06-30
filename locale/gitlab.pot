@@ -13255,6 +13255,9 @@ msgstr ""
 msgid "License History"
 msgstr ""
 
+msgid "License ID:"
+msgstr ""
+
 msgid "License URL"
 msgstr ""
 
