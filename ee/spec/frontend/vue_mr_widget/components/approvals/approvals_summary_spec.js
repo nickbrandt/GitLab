@@ -5,7 +5,7 @@ import { toNounSeriesText } from '~/lib/utils/grammar';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 
 const testApprovers = () => Array.from({ length: 5 }, (_, i) => i).map(id => ({ id }));
-const testRulesLeft = () => ['Lorem', 'Ipsum', 'dolar sit'];
+const testRulesLeft = () => ['Lorem', 'Ipsum', 'dolar & sit'];
 const TEST_APPROVALS_LEFT = 3;
 
 describe('EE MRWidget approvals summary', () => {
