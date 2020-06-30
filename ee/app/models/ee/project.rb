@@ -616,7 +616,8 @@ module EE
 
     def adjourned_deletion?
       feature_available?(:adjourned_deletion_for_projects_and_groups) &&
-        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+        ::Gitlab::CurrentSettings.deletion_adjourned_period.positive? &&
+        group_deletion_mode_configured?
     end
 
     def marked_for_deletion?
@@ -749,6 +750,13 @@ module EE
           variables.append(key: 'CI_HAS_OPEN_REQUIREMENTS', value: 'true')
         end
       end
+    end
+
+    # If the feature to configure project deletion mode is NOT enabled, we default to delayed deletion
+    def group_deletion_mode_configured?
+      return true unless ::Feature.enabled?(:configure_project_deletion_mode, self)
+
+      group && group.delayed_project_removal? # Return the group's setting for delayed deletion, false for user namespace projects
     end
   end
 end

@@ -117,6 +117,11 @@ module EE
       end
     end
 
+    def show_delayed_project_removal_setting?(group)
+      group.feature_available?(:adjourned_deletion_for_projects_and_groups) &&
+        ::Feature.enabled?(:configure_project_deletion_mode, group)
+    end
+
     private
 
     def get_group_sidebar_links

@@ -1029,4 +1029,24 @@ RSpec.describe Group do
 
     it { is_expected.to match([user.email]) }
   end
+
+  describe '#configure_project_deletion_mode_available?' do
+    using RSpec::Parameterized::TableSyntax
+
+    before do
+      stub_licensed_features(adjourned_deletion_for_projects_and_groups: licensed?)
+      stub_feature_flags(configure_project_deletion_mode: flag_enabled?)
+    end
+
+    where(:licensed?, :flag_enabled?, :result) do
+      true  | true  | true
+      true  | false | false
+      false | true  | false
+      false | false | false
+    end
+
+    with_them do
+      it { expect(group.configure_project_deletion_mode_available?).to be result }
+    end
+  end
 end
