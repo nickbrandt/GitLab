@@ -74,16 +74,44 @@ RSpec.describe ::API::Entities::Snippet do
     end
 
     describe 'files' do
-      it 'returns snippet blob data in files' do
-        expect(subject[:files].count).to eq snippet.blobs.count
-        expect(subject[:files].first[:path]).to eq snippet.blobs.first.path
-      end
+      let(:blob)   { snippet.blobs.first }
+      let(:ref)    { blob.repository.root_ref }
 
       context 'when repository does not exist' do
         it 'does not include the files attribute' do
           allow(snippet).to receive(:repository_exists?).and_return(false)
 
           expect(subject).not_to include(:files)
+        end
+      end
+
+      shared_examples 'snippet files' do
+        let(:file) { subject[:files].first }
+
+        it 'returns all snippet files' do
+          expect(subject[:files].count).to eq snippet.blobs.count
+        end
+
+        it 'has the file path' do
+          expect(file[:path]).to eq blob.path
+        end
+
+        it 'has the raw url' do
+          expect(file[:raw_url]).to match(raw_url)
+        end
+      end
+
+      context 'with PersonalSnippet' do
+        it_behaves_like 'snippet files' do
+          let(:snippet) { personal_snippet }
+          let(:raw_url) { "/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}" }
+        end
+      end
+
+      context 'with ProjectSnippet' do
+        it_behaves_like 'snippet files' do
+          let(:snippet) { project_snippet }
+          let(:raw_url) { "#{snippet.project.full_path}/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}" }
         end
       end
     end

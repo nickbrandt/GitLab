@@ -271,21 +271,17 @@ module GitlabRoutingHelper
     end
   end
 
-  def gitlab_raw_snippet_blob_url(blob)
-    snippet = blob.container
+  def gitlab_raw_snippet_blob_url(snippet, path, ref = nil)
+    params = {
+      snippet_id: snippet,
+      ref: ref || snippet.repository.root_ref,
+      path: path
+    }
 
     if snippet.is_a?(ProjectSnippet)
-      namespace_project_snippet_blob_raw_url(
-        {
-          namespace_id: snippet.project.namespace,
-          project_id: snippet.project,
-          snippet_id: snippet,
-          ref: blob.repository.root_ref,
-          path: blob.path
-        }
-      )
+      project_snippet_blob_raw_url(snippet.project, params)
     else
-      snippet_blob_raw_url(snippet, ref: blob.repository.root_ref, path: blob.path)
+      snippet_blob_raw_url(params)
     end
   end
 

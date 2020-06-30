@@ -18,8 +18,6 @@ module Gitlab
       def build(object, **options)
         # Objects are sometimes wrapped in a BatchLoader instance
         case object.itself
-        when Blob
-          snippet_blob_raw_url(object)
         when ::Ci::Build
           instance.project_job_url(object.project, object, **options)
         when Commit
@@ -73,15 +71,15 @@ module Gitlab
       end
 
       def snippet_url(snippet, **options)
-        if options.delete(:raw).present?
+        if options[:file].present?
+          file, ref = options.values_at(:file, :ref)
+
+          instance.gitlab_raw_snippet_blob_url(snippet, file, ref)
+        elsif options.delete(:raw).present?
           instance.gitlab_raw_snippet_url(snippet, **options)
         else
           instance.gitlab_snippet_url(snippet, **options)
         end
-      end
-
-      def snippet_blob_raw_url(blob)
-        instance.gitlab_raw_snippet_blob_url(blob)
       end
 
       def wiki_url(wiki, **options)

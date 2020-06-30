@@ -193,18 +193,27 @@ RSpec.describe GitlabRoutingHelper do
 
     describe '#gitlab_raw_snippet_blob_url' do
       let(:blob) { snippet.blobs.first }
-      let(:ref)  { blob.repository.root_ref }
+      let(:ref)  { 'snippet-test-ref' }
 
-      context 'with PersonalSnippet' do
+      context 'for a PersonalSnippet' do
         let(:snippet) { personal_snippet }
 
-        it { expect(gitlab_raw_snippet_blob_url(blob)).to eq("http://test.host/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}") }
+        it { expect(gitlab_raw_snippet_blob_url(snippet, blob.path, ref)).to eq("http://test.host/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}") }
       end
 
-      context 'with ProjectSnippet' do
+      context 'for a ProjectSnippet' do
         let(:snippet) { project_snippet }
 
-        it { expect(gitlab_raw_snippet_blob_url(blob)).to eq("http://test.host/#{snippet.project.full_path}/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}") }
+        it { expect(gitlab_raw_snippet_blob_url(snippet, blob.path, ref)).to eq("http://test.host/#{snippet.project.full_path}/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}") }
+      end
+
+      context 'without a ref' do
+        let(:snippet) { personal_snippet }
+        let(:ref) { snippet.repository.root_ref }
+
+        it 'uses the root ref' do
+          expect(gitlab_raw_snippet_blob_url(snippet, blob.path)).to eq("http://test.host/-/snippets/#{snippet.id}/raw/#{ref}/#{blob.path}")
+        end
       end
     end
 
