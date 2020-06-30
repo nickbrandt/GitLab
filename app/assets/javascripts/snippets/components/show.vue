@@ -35,7 +35,7 @@ export default {
     <template v-else>
       <snippet-header :snippet="snippet" />
       <snippet-title :snippet="snippet" />
-      <blob-embeddable v-if="embeddable" class="mb-3" :url="snippet.webUrl" />
+      <blob-embeddable v-if="embeddable" class="gl-mb-5" :url="snippet.webUrl" />
       <div v-for="blob in blobs" :key="blob.path">
         <snippet-blob :snippet="snippet" :blob="blob" />
       </div>
