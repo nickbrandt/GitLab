@@ -20388,6 +20388,8 @@ CREATE INDEX tmp_index_ci_pipelines_lock_version ON public.ci_pipelines USING bt
 
 CREATE INDEX tmp_index_ci_stages_lock_version ON public.ci_stages USING btree (id) WHERE (lock_version IS NULL);
 
+CREATE UNIQUE INDEX unique_merge_request_metrics_by_merge_request_id ON public.merge_request_metrics USING btree (merge_request_id);
+
 CREATE UNIQUE INDEX users_security_dashboard_projects_unique_index ON public.users_security_dashboard_projects USING btree (project_id, user_id);
 
 CREATE UNIQUE INDEX vulnerability_feedback_unique_idx ON public.vulnerability_feedback USING btree (project_id, category, feedback_type, project_fingerprint);
@@ -23378,6 +23380,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200525144525
 20200526000407
 20200526013844
+20200526115436
 20200526120714
 20200526142550
 20200526153844
