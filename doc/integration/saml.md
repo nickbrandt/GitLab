@@ -585,7 +585,7 @@ the CSRF check.
 
 To bypass this you can add `skip_before_action :verify_authenticity_token` to the
 `omniauth_callbacks_controller.rb` file immediately after the `class` line and
-comment out the `protect_from_forgery` line using a `#`.  Restart Unicorn for this
+comment out the `protect_from_forgery` line using a `#`. Restart Unicorn for this
 change to take effect. This will allow the error to hit GitLab, where it can then
 be seen in the usual logs, or as a flash message on the login screen.
 
