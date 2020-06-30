@@ -23,6 +23,11 @@ export default {
       type: String,
       required: true,
     },
+    purchaseStorageUrl: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   apollo: {
     namespace: {
@@ -64,8 +69,8 @@ export default {
 <template>
   <div>
     <div class="pipeline-quota container-fluid py-4 px-2 m-0">
-      <div class="row py-0">
-        <div class="col-sm-12">
+      <div class="row py-0 d-flex align-items-center">
+        <div class="col-sm-8">
           <gl-sprintf :message="s__('UsageQuota|You used: %{usage} %{limit}')">
             <template #usage>
               <span class="gl-font-weight-bold" data-testid="total-usage">
@@ -90,6 +95,15 @@ export default {
           >
             <icon name="question" :size="12" />
           </gl-link>
+        </div>
+        <div v-if="purchaseStorageUrl" class="col-sm-4 text-right">
+          <gl-link
+            :href="purchaseStorageUrl"
+            class="btn btn-success"
+            target="_blank"
+            data-testid="purchase-storage-link"
+            >{{ s__('UsageQuota|Purchase more storage') }}</gl-link
+          >
         </div>
       </div>
       <div class="row py-0">

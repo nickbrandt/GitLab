@@ -119,4 +119,32 @@ RSpec.describe EE::NamespacesHelper do
       it { is_expected.to eq(profile_usage_quotas_path(anchor: 'storage-quota-tab')) }
     end
   end
+
+  describe '#purchase_storage_url' do
+    subject { helper.purchase_storage_url }
+
+    context 'when on .com' do
+      before do
+        allow(::Gitlab).to receive(:com?).and_return(true)
+      end
+
+      it { is_expected.to eq(EE::SUBSCRIPTIONS_MORE_STORAGE_URL) }
+
+      context 'when feature flag disabled' do
+        before do
+          stub_feature_flags(buy_storage_link: false)
+        end
+
+        it { is_expected.to be_nil }
+      end
+    end
+
+    context 'when not on .com' do
+      before do
+        allow(::Gitlab).to receive(:com?).and_return(false)
+      end
+
+      it { is_expected.to be_nil }
+    end
+  end
 end

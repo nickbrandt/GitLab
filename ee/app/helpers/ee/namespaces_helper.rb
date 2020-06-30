@@ -40,5 +40,12 @@ module EE
         profile_usage_quotas_path(anchor: 'storage-quota-tab')
       end
     end
+
+    def purchase_storage_url
+      return unless ::Gitlab.dev_env_or_com?
+      return unless ::Feature.enabled?(:buy_storage_link)
+
+      EE::SUBSCRIPTIONS_MORE_STORAGE_URL
+    end
   end
 end
