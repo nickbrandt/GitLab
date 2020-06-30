@@ -16,7 +16,7 @@ class Gitlab::Seeder::Vulnerabilities
       primary_identifier = create_identifier(rank)
       vulnerability = create_vulnerability
       occurrence = create_occurrence(vulnerability, rank, primary_identifier)
-      # Create occurrence_pipeline join model
+      # Create finding_pipeline join model
       occurrence.pipelines << pipeline
       # Create occurrence_identifier join models
       occurrence.identifiers << primary_identifier

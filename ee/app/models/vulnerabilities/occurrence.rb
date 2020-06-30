@@ -22,8 +22,8 @@ module Vulnerabilities
 
     has_many :occurrence_identifiers, class_name: 'Vulnerabilities::OccurrenceIdentifier'
     has_many :identifiers, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Identifier'
-    has_many :occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
-    has_many :pipelines, through: :occurrence_pipelines, class_name: 'Ci::Pipeline'
+    has_many :finding_pipelines, class_name: 'Vulnerabilities::FindingPipeline'
+    has_many :pipelines, through: :finding_pipelines, class_name: 'Ci::Pipeline'
 
     attr_writer :sha
 
@@ -103,12 +103,12 @@ module Vulnerabilities
     end
 
     def self.for_pipelines(pipelines)
-      joins(:occurrence_pipelines)
+      joins(:finding_pipelines)
         .where(vulnerability_occurrence_pipelines: { pipeline_id: pipelines })
     end
 
     def self.count_by_day_and_severity(period)
-      joins(:occurrence_pipelines)
+      joins(:finding_pipelines)
         .select('CAST(vulnerability_occurrence_pipelines.created_at AS DATE) AS day', :severity, 'COUNT(distinct vulnerability_occurrences.id) as count')
         .where(['vulnerability_occurrence_pipelines.created_at >= ?', Time.zone.now.beginning_of_day - period])
         .group(:day, :severity)

@@ -14,8 +14,8 @@ RSpec.describe Ci::Pipeline do
 
   it { is_expected.to have_many(:security_scans).through(:builds).class_name('Security::Scan') }
   it { is_expected.to have_many(:downstream_bridges) }
-  it { is_expected.to have_many(:vulnerability_findings).through(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::Occurrence') }
-  it { is_expected.to have_many(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::OccurrencePipeline') }
+  it { is_expected.to have_many(:vulnerability_findings).through(:vulnerabilities_finding_pipelines).class_name('Vulnerabilities::Occurrence') }
+  it { is_expected.to have_many(:vulnerabilities_finding_pipelines).class_name('Vulnerabilities::FindingPipeline') }
 
   describe '.failure_reasons' do
     it 'contains failure reasons about exceeded limits' do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class OccurrencePipeline < ApplicationRecord
+  class FindingPipeline < ApplicationRecord
     self.table_name = "vulnerability_occurrence_pipelines"
 
     belongs_to :occurrence, class_name: 'Vulnerabilities::Occurrence'
