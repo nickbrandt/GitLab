@@ -127,6 +127,7 @@ RSpec.describe Groups::SecurityFeaturesHelper do
         vulnerabilities_history_endpoint: "/groups/#{group.full_path}/-/security/vulnerability_findings/history",
         projects_endpoint: "http://localhost/api/v4/groups/#{group.id}/projects",
         group_full_path: group.full_path,
+        no_vulnerabilities_svg_path: '/images/illustrations/issues.svg',
         vulnerability_feedback_help_path: '/help/user/application_security/index#interacting-with-the-vulnerabilities',
         empty_state_svg_path: '/images/illustrations/security-dashboard-empty-state.svg',
         dashboard_documentation: '/help/user/application_security/security_dashboard/index',
