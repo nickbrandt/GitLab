@@ -34,9 +34,6 @@ class Projects::PipelinesController < Projects::ApplicationController
       .page(params[:page])
       .per(30)
 
-    @running_count = limited_pipelines_count(project, 'running')
-    @pending_count = limited_pipelines_count(project, 'pending')
-    @finished_count = limited_pipelines_count(project, 'finished')
     @pipelines_count = limited_pipelines_count(project)
 
     respond_to do |format|
@@ -48,9 +45,6 @@ class Projects::PipelinesController < Projects::ApplicationController
           pipelines: serialize_pipelines,
           count: {
             all: @pipelines_count,
-            running: @running_count,
-            pending: @pending_count,
-            finished: @finished_count
           }
         }
       end
