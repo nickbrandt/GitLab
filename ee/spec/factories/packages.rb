@@ -118,13 +118,28 @@ FactoryBot.define do
   end
 
   factory :composer_metadatum, class: 'Packages::Composer::Metadatum' do
+    package { create(:composer_package) }
+
+    target_sha { '123' }
+    composer_json { { name: 'foo' } }
   end
 
   factory :package_build_info, class: 'Packages::BuildInfo' do
+    package
   end
 
   factory :package_file, class: 'Packages::PackageFile' do
     package
+
+    file_name { 'somefile.txt' }
+
+    transient do
+      file_fixture { 'spec/fixtures/packages/conan/recipe_files/conanfile.py' }
+    end
+
+    after(:build) do |package_file, evaluator|
+      package_file.file = fixture_file_upload(evaluator.file_fixture)
+    end
 
     factory :conan_package_file do
       package { create(:conan_package, without_package_files: true) }
@@ -140,7 +155,7 @@ FactoryBot.define do
           end
         end
 
-        file { fixture_file_upload('spec/fixtures/packages/conan/recipe_files/conanfile.py') }
+        file_fixture { 'spec/fixtures/packages/conan/recipe_files/conanfile.py' }
         file_name { 'conanfile.py' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
@@ -154,7 +169,7 @@ FactoryBot.define do
           end
         end
 
-        file { fixture_file_upload('spec/fixtures/packages/conan/recipe_files/conanmanifest.txt') }
+        file_fixture { 'spec/fixtures/packages/conan/recipe_files/conanmanifest.txt' }
         file_name { 'conanmanifest.txt' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
@@ -168,7 +183,7 @@ FactoryBot.define do
           end
         end
 
-        file { fixture_file_upload('spec/fixtures/packages/conan/package_files/conanmanifest.txt') }
+        file_fixture { 'spec/fixtures/packages/conan/package_files/conanmanifest.txt' }
         file_name { 'conanmanifest.txt' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
@@ -182,7 +197,7 @@ FactoryBot.define do
           end
         end
 
-        file { fixture_file_upload('spec/fixtures/packages/conan/package_files/conaninfo.txt') }
+        file_fixture { 'spec/fixtures/packages/conan/package_files/conaninfo.txt' }
         file_name { 'conaninfo.txt' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
@@ -196,7 +211,7 @@ FactoryBot.define do
           end
         end
 
-        file { fixture_file_upload('spec/fixtures/packages/conan/package_files/conan_package.tgz') }
+        file_fixture { 'spec/fixtures/packages/conan/package_files/conan_package.tgz' }
         file_name { 'conan_package.tgz' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
@@ -205,28 +220,28 @@ FactoryBot.define do
     end
 
     trait(:jar) do
-      file { fixture_file_upload('spec/fixtures/packages/maven/my-app-1.0-20180724.124855-1.jar') }
+      file_fixture { 'spec/fixtures/packages/maven/my-app-1.0-20180724.124855-1.jar' }
       file_name { 'my-app-1.0-20180724.124855-1.jar' }
       file_sha1 { '4f0bfa298744d505383fbb57c554d4f5c12d88b3' }
       size { 100.kilobytes }
     end
 
     trait(:pom) do
-      file { fixture_file_upload('spec/fixtures/packages/maven/my-app-1.0-20180724.124855-1.pom') }
+      file_fixture { 'spec/fixtures/packages/maven/my-app-1.0-20180724.124855-1.pom' }
       file_name { 'my-app-1.0-20180724.124855-1.pom' }
       file_sha1 { '19c975abd49e5102ca6c74a619f21e0cf0351c57' }
       size { 200.kilobytes }
     end
 
     trait(:xml) do
-      file { fixture_file_upload('spec/fixtures/packages/maven/maven-metadata.xml') }
+      file_fixture { 'spec/fixtures/packages/maven/maven-metadata.xml' }
       file_name { 'maven-metadata.xml' }
       file_sha1 { '42b1bdc80de64953b6876f5a8c644f20204011b0' }
       size { 300.kilobytes }
     end
 
     trait(:npm) do
-      file { fixture_file_upload('spec/fixtures/packages/npm/foo-1.0.1.tgz') }
+      file_fixture { 'spec/fixtures/packages/npm/foo-1.0.1.tgz' }
       file_name { 'foo-1.0.1.tgz' }
       file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
       verified_at { Date.current }
@@ -236,7 +251,7 @@ FactoryBot.define do
 
     trait(:nuget) do
       package
-      file { fixture_file_upload('spec/fixtures/packages/nuget/package.nupkg') }
+      file_fixture { 'spec/fixtures/packages/nuget/package.nupkg' }
       file_name { 'package.nupkg' }
       file_sha1 { '5fe852b2a6abd96c22c11fa1ff2fb19d9ce58b57' }
       size { 300.kilobytes }
@@ -244,7 +259,7 @@ FactoryBot.define do
 
     trait(:pypi) do
       package
-      file { fixture_file_upload('spec/fixtures/packages/pypi/sample-project.tar.gz') }
+      file_fixture { 'spec/fixtures/packages/pypi/sample-project.tar.gz' }
       file_name { 'sample-project-1.0.0.tar.gz' }
       file_sha1 { '2c0cfbed075d3fae226f051f0cc771b533e01aff' }
       file_md5 { '0a7392d24f42f83068fa3767c5310052' }
@@ -297,6 +312,7 @@ FactoryBot.define do
   factory :conan_file_metadatum, class: 'Packages::Conan::FileMetadatum' do
     package_file { create(:conan_package_file, :conan_recipe_file, without_loaded_metadatum: true) }
     recipe_revision { '0' }
+    conan_file_type { 'recipe_file' }
 
     trait(:recipe_file) do
       conan_file_type { 'recipe_file' }
@@ -316,7 +332,7 @@ FactoryBot.define do
   end
 
   factory :packages_dependency_link, class: 'Packages::DependencyLink' do
-    package
+    package { create(:nuget_package) }
     dependency { create(:packages_dependency) }
     dependency_type { :dependencies }
 
@@ -328,6 +344,7 @@ FactoryBot.define do
   end
 
   factory :nuget_dependency_link_metadatum, class: 'Packages::Nuget::DependencyLinkMetadatum' do
+    dependency_link { create(:packages_dependency_link) }
     target_framework { '.NETStandard2.0' }
   end
 
