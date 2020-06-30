@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls, :requires_admin do
+  RSpec.describe 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls, :requires_admin do
     describe 'LDAP Group sync' do
       include Support::Api
 

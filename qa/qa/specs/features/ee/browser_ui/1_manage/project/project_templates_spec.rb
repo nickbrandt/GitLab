@@ -2,7 +2,7 @@
 require 'securerandom'
 
 module QA
-  context :manage do
+  RSpec.describe 'Manage' do
     describe 'Project templates' do
       before(:all) do
         @files = [

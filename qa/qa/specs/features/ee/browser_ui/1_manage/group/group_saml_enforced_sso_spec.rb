@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :group_saml, :orchestrated do
+  RSpec.describe 'Manage', :group_saml, :orchestrated do
     describe 'Group SAML SSO - Enforced SSO' do
       include Support::Api
 
