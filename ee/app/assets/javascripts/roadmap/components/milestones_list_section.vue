@@ -115,7 +115,7 @@ export default {
 </script>
 
 <template>
-  <div :style="sectionContainerStyles" class="milestones-list-section gl-display-table">
+  <div :style="sectionContainerStyles" class="milestones-list-section gl-display-table clearfix">
     <div
       class="milestones-list-title gl-display-table-cell border-bottom gl-vertical-align-top position-sticky gl-px-3 gl-pt-2"
     >
