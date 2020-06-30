@@ -10,6 +10,7 @@ RSpec.describe 'Issue page tabs', :js do
   describe 'discussions tab counter' do
     before do
       allow(Ability).to receive(:allowed?) { true }
+      stub_feature_flags(design_management_moved: false)
     end
 
     subject do
