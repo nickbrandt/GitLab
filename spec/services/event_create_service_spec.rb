@@ -173,7 +173,7 @@ RSpec.describe EventCreateService do
     end
   end
 
-  describe '#wiki_event' do
+  describe '#wiki_event', :clean_gitlab_redis_shared_state do
     let_it_be(:user) { create(:user) }
     let_it_be(:wiki_page) { create(:wiki_page) }
     let_it_be(:meta) { create(:wiki_page_meta, :for_wiki_page, wiki_page: wiki_page) }
@@ -191,6 +191,15 @@ RSpec.describe EventCreateService do
             wiki_page: wiki_page,
             author: user
           )
+        end
+
+        it 'records the event in the event counter' do
+          counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+          tracking_params = { event_action: counter_class::WIKI_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+          expect { event }
+            .to change { counter_class.count_unique_events(tracking_params) }
+            .from(0).to(1)
         end
 
         it 'is idempotent', :aggregate_failures do
@@ -241,6 +250,15 @@ RSpec.describe EventCreateService do
     subject { service.push(project, user, push_data) }
 
     it_behaves_like 'service for creating a push event', PushEventPayloadService
+
+    it 'records the event in the event counter' do
+      counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+      tracking_params = { event_action: counter_class::PUSH_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+      expect { subject }
+        .to change { counter_class.count_unique_events(tracking_params) }
+        .from(0).to(1)
+    end
   end
 
   describe '#bulk_push', :clean_gitlab_redis_shared_state do
@@ -255,6 +273,15 @@ RSpec.describe EventCreateService do
     subject { service.bulk_push(project, user, push_data) }
 
     it_behaves_like 'service for creating a push event', BulkPushEventPayloadService
+
+    it 'records the event in the event counter' do
+      counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+      tracking_params = { event_action: counter_class::PUSH_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+      expect { subject }
+        .to change { counter_class.count_unique_events(tracking_params) }
+        .from(0).to(1)
+    end
   end
 
   describe 'Project' do
@@ -273,7 +300,7 @@ RSpec.describe EventCreateService do
     end
   end
 
-  describe 'design events' do
+  describe 'design events', :clean_gitlab_redis_shared_state do
     let_it_be(:design) { create(:design, project: project) }
     let_it_be(:author) { user }
 
@@ -314,6 +341,15 @@ RSpec.describe EventCreateService do
       end
 
       it_behaves_like 'feature flag gated multiple event creation'
+
+      it 'records the event in the event counter' do
+        counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+        tracking_params = { event_action: counter_class::DESIGN_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+        expect { result }
+          .to change { counter_class.count_unique_events(tracking_params) }
+          .from(0).to(1)
+      end
     end
 
     describe '#destroy_designs' do
@@ -334,6 +370,15 @@ RSpec.describe EventCreateService do
       end
 
       it_behaves_like 'feature flag gated multiple event creation'
+
+      it 'records the event in the event counter' do
+        counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+        tracking_params = { event_action: counter_class::DESIGN_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+        expect { result }
+          .to change { counter_class.count_unique_events(tracking_params) }
+          .from(0).to(1)
+      end
     end
   end
 end

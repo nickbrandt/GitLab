@@ -158,7 +158,8 @@ module Gitlab
             usage_counters,
             user_preferences_usage,
             ingress_modsecurity_usage,
-            container_expiration_policies_usage
+            container_expiration_policies_usage,
+            action_monthly_active_users(default_time_period)
           ).tap do |data|
             data[:snippets] = data[:personal_snippets] + data[:project_snippets]
           end
@@ -573,6 +574,35 @@ module Gitlab
 
         { analytics_unique_visits: results }
       end
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      def action_monthly_active_users(time_period)
+        counter = Gitlab::UsageDataCounters::TrackUniqueActions.new
+
+        project_count = counter.count_unique_events(
+          event_action: Gitlab::UsageDataCounters::TrackUniqueActions::PUSH_ACTION,
+          date_from: time_period[:created_at].first,
+          date_to: time_period[:created_at].last
+        )
+
+        design_count = counter.count_unique_events(
+          event_action: Gitlab::UsageDataCounters::TrackUniqueActions::DESIGN_ACTION,
+          date_from: time_period[:created_at].first,
+          date_to: time_period[:created_at].last
+        )
+
+        wiki_count = counter.count_unique_events(
+          event_action: Gitlab::UsageDataCounters::TrackUniqueActions::WIKI_ACTION,
+          date_from: time_period[:created_at].first,
+          date_to: time_period[:created_at].last)
+
+        {
+          action_monthly_active_users_project_repo: project_count,
+          action_monthly_active_users_design_management: design_count,
+          action_monthly_active_users_wiki_repo: wiki_count
+        }
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       private
 

@@ -135,6 +135,8 @@ class EventCreateService
       event.update_columns(updated_at: time_stamp, created_at: time_stamp)
     end
 
+    Gitlab::UsageDataCounters::TrackUniqueActions.track_action(event_action: action, event_target: wiki_page_meta.class, author_id: author.id)
+
     event
   end
 
@@ -174,6 +176,8 @@ class EventCreateService
       action = Event.actions[status]
       raise IllegalActionError, "#{status} is not a valid status" if action.nil?
 
+      Gitlab::UsageDataCounters::TrackUniqueActions.track_action(event_action: status, event_target: record.class, author_id: current_user.id)
+
       parent_attrs(record.resource_parent)
         .merge(base_attrs)
         .merge(action: action, target_id: record.id, target_type: record.class.name)
@@ -193,6 +197,8 @@ class EventCreateService
 
       new_event
     end
+
+    Gitlab::UsageDataCounters::TrackUniqueActions.track_action(event_action: :pushed, event_target: Project, author_id: current_user.id)
 
     Users::LastPushEventService.new(current_user)
       .cache_last_push_event(event)
