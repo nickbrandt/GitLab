@@ -25,34 +25,6 @@ RSpec.describe Projects::ClustersController do
       clusterable.add_maintainer(user)
     end
 
-    context 'with inappropriate requests' do
-      context 'with annoymous user' do
-        before do
-          sign_out(user)
-        end
-
-        it 'redirects to signin page' do
-          get :prometheus_proxy, params: prometheus_proxy_params
-
-          expect(response).to redirect_to(new_user_session_path)
-        end
-      end
-
-      context 'with invalid clusterable id' do
-        before do
-          sign_in(user)
-        end
-
-        let(:other_clusterable) { create(:project) }
-
-        it 'returns 404' do
-          get :prometheus_proxy, params: prometheus_proxy_params(id: other_clusterable.id)
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-    end
-
     describe 'security' do
       let(:prometheus_adapter) { double(:prometheus_adapter, can_query?: true, query: nil) }
 
