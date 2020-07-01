@@ -1,5 +1,0 @@
----
-title: Fixed pypi package API XSS
-merge_request:
-author:
-type: security
