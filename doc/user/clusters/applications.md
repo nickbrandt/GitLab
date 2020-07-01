@@ -889,6 +889,10 @@ project. Refer to the
 [Configuration section of the Prometheus chart's README](https://github.com/helm/charts/tree/master/stable/prometheus#configuration)
 for the available configuration options.
 
+NOTE: **Note:**
+Support for installing the Prometheus managed application is provided by the GitLab APM group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [APM group](https://about.gitlab.com/handbook/product/product-categories/#apm-group).
+
 ### Install GitLab Runner using GitLab CI/CD
 
 GitLab Runner is installed using GitLab CI/CD by defining configuration in
@@ -1282,6 +1286,10 @@ available configuration options.
 
 NOTE: **Note:**
 In this alpha implementation of installing Elastic Stack through CI, reading the environment logs through Elasticsearch is unsupported. This is supported if [installed via the UI](#elastic-stack).
+
+NOTE: **Note:**
+Support for installing the Elastic Stack managed application is provided by the GitLab APM group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [APM group](https://about.gitlab.com/handbook/product/product-categories/#apm-group).
 
 ### Install Crossplane using GitLab CI/CD
 
