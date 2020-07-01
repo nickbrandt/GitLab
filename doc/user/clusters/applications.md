@@ -716,6 +716,10 @@ management project. Refer to the
 [chart](https://github.com/helm/charts/tree/master/stable/nginx-ingress)
 for the available configuration options.
 
+NOTE: **Note:**
+Support for installing the Ingress managed application is provided by the GitLab Configure group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/categories/#configure-group).
+
 ### Install cert-manager using GitLab CI/CD
 
 cert-manager is installed using GitLab CI/CD by defining configuration in
@@ -752,6 +756,10 @@ You can customize the installation of cert-manager by defining a
 management project. Refer to the
 [chart](https://hub.helm.sh/charts/jetstack/cert-manager) for the
 available configuration options.
+
+NOTE: **Note:**
+Support for installing the Cert Manager managed application is provided by the GitLab Configure group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/categories/#configure-group).
 
 ### Install Sentry using GitLab CI/CD
 
@@ -1268,6 +1276,10 @@ Refer to the
 [chart reference](https://zero-to-jupyterhub.readthedocs.io/en/stable/reference/reference.html) for the
 available configuration options.
 
+NOTE: **Note:**
+Support for installing the JupyterHub managed application is provided by the GitLab Configure group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/categories/#configure-group).
+
 ### Install Elastic Stack using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25138) in GitLab 12.8.
@@ -1378,6 +1390,10 @@ domain: 'my.wildcard.A.record.dns'
 ```
 
 If you plan to use GitLab Serverless capabilities, be sure to set an A record wildcard domain on your custom configuration.
+
+NOTE: **Note:**
+Support for installing the Knative managed application is provided by the GitLab Configure group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/categories/#configure-group).
 
 #### Knative Metrics
 
