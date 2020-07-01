@@ -6,6 +6,7 @@ module Projects
     before_action :authorize_admin_software_license_policy!, only: [:create, :update]
     before_action do
       push_frontend_feature_flag(:license_policy_list, default_enabled: true)
+      push_frontend_feature_flag(:license_approvals, default_enabled: false)
     end
 
     def index
@@ -101,7 +102,13 @@ module Projects
         write_license_policies_endpoint: write_license_policies_endpoint,
         documentation_path: help_page_path('user/compliance/license_compliance/index'),
         empty_state_svg_path: helpers.image_path('illustrations/Dependency-list-empty-state.svg'),
-        software_licenses: SoftwareLicense.unclassified_licenses_for(project).pluck_names
+        software_licenses: SoftwareLicense.unclassified_licenses_for(project).pluck_names,
+        project_id: @project.id,
+        project_path: expose_path(api_v4_projects_path(id: @project.id)),
+        rules_path: expose_path(api_v4_projects_approval_settings_rules_path(id: @project.id)),
+        settings_path: expose_path(api_v4_projects_approval_settings_path(id: @project.id)),
+        approvals_documentation_path: help_page_path('user/application_security/index', anchor: 'enabling-license-approvals-within-a-project'),
+        locked_approvals_rule_name: ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT
       }
     end
   end

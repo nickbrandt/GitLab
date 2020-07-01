@@ -27,6 +27,7 @@ const TEST_FALLBACK_RULE = {
   approvalsRequired: 1,
   isFallback: true,
 };
+const TEST_LOCKED_RULE_NAME = 'LOCKED_RULE';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -511,30 +512,41 @@ describe('EE Approvals RuleForm', () => {
       store.state.settings.allowMultiRule = false;
     });
 
-    it('hides name', () => {
-      createComponent();
+    describe('with locked rule name', () => {
+      beforeEach(() => {
+        store.state.settings.lockedApprovalsRuleName = TEST_LOCKED_RULE_NAME;
+        createComponent();
+      });
 
-      expect(findNameInput().exists()).toBe(true);
+      it('does not render the approval-rule name input', () => {
+        expect(findNameInput().exists()).toBe(false);
+      });
     });
 
-    describe('with no init rule', () => {
+    describe.each`
+      lockedRuleName           | expectedNameSubmitted
+      ${TEST_LOCKED_RULE_NAME} | ${TEST_LOCKED_RULE_NAME}
+      ${null}                  | ${'Default'}
+    `('with no init rule', ({ lockedRuleName, expectedNameSubmitted }) => {
       beforeEach(() => {
+        store.state.settings.lockedApprovalsRuleName = lockedRuleName;
         createComponent();
         wrapper.vm.approvalsRequired = TEST_APPROVALS_REQUIRED;
       });
 
       describe('with approvers selected', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           wrapper.vm.approvers = TEST_APPROVERS;
           wrapper.vm.submit();
 
-          localVue.nextTick(done);
+          return localVue.nextTick();
         });
 
         it('posts new rule', () => {
           expect(actions.postRule).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({
+              name: expectedNameSubmitted,
               approvalsRequired: TEST_APPROVALS_REQUIRED,
               users: TEST_APPROVERS.map(x => x.id),
             }),
@@ -544,10 +556,10 @@ describe('EE Approvals RuleForm', () => {
       });
 
       describe('without approvers', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           wrapper.vm.submit();
 
-          localVue.nextTick(done);
+          return localVue.nextTick();
         });
 
         it('puts fallback rule', () => {
@@ -560,8 +572,13 @@ describe('EE Approvals RuleForm', () => {
       });
     });
 
-    describe('with init rule', () => {
+    describe.each`
+      lockedRuleName           | inputName | expectedNameSubmitted
+      ${TEST_LOCKED_RULE_NAME} | ${'Foo'}  | ${TEST_LOCKED_RULE_NAME}
+      ${null}                  | ${'Foo'}  | ${'Foo'}
+    `('with init rule', ({ lockedRuleName, inputName, expectedNameSubmitted }) => {
       beforeEach(() => {
+        store.state.settings.lockedApprovalsRuleName = lockedRuleName;
         createComponent({
           initRule: TEST_RULE,
         });
@@ -569,12 +586,13 @@ describe('EE Approvals RuleForm', () => {
       });
 
       describe('with empty name and empty approvers', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           wrapper.vm.name = '';
           wrapper.vm.approvers = [];
+
           wrapper.vm.submit();
 
-          localVue.nextTick(done);
+          return localVue.nextTick();
         });
 
         it('deletes rule', () => {
@@ -596,7 +614,7 @@ describe('EE Approvals RuleForm', () => {
 
       describe('with name and approvers', () => {
         beforeEach(done => {
-          wrapper.vm.name = 'Bogus';
+          wrapper.vm.name = inputName;
           wrapper.vm.approvers = TEST_APPROVERS;
           wrapper.vm.submit();
 
@@ -608,7 +626,7 @@ describe('EE Approvals RuleForm', () => {
             expect.anything(),
             expect.objectContaining({
               id: TEST_RULE.id,
-              name: 'Bogus',
+              name: expectedNameSubmitted,
               approvalsRequired: TEST_APPROVALS_REQUIRED,
               users: TEST_APPROVERS.map(x => x.id),
             }),
