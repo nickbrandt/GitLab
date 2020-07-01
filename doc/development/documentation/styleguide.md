@@ -328,6 +328,9 @@ tenses, words, and phrases:
 - Don't use profanity or obscenities. Doing so may negatively affect other
   users and contributors, which is contrary to GitLab's value of
   [diversity and inclusion](https://about.gitlab.com/handbook/values/#diversity-inclusion).
+- Avoid the use of [racially-insensitive terminology or phrases](https://www.marketplace.org/2020/06/17/tech-companies-update-language-to-avoid-offensive-terms/). For example:
+  - Use *primary* and *secondary* for database and server relationships.
+  - Use *allowlist* and *denylist* to describe access control lists.
 
 ### Word usage clarifications
 
