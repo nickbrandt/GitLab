@@ -46,10 +46,6 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     Feature.enabled?(:geo_project_registry_ssot_sync)
   end
 
-  def self.has_create_events?
-    true
-  end
-
   def self.find_registry_differences(range)
     source_ids = Gitlab::Geo.current_node.projects.id_in(range).pluck_primary_key
     tracked_ids = self.pluck_model_ids_in_range(range)
