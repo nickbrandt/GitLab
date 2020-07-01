@@ -1,0 +1,5 @@
+---
+title: Add cluster reindexing feature to our ES integration
+merge_request: 34069
+author:
+type: added
