@@ -51,7 +51,7 @@ export default {
 <template>
   <div
     data-testid="sort-discussion-filter"
-    class="mr-2 d-inline-block align-bottom full-width-mobile"
+    class="gl-mr-2 gl-display-inline-block gl-vertical-align-bottom full-width-mobile"
   >
     <local-storage-sync
       :value="sortDirection"
