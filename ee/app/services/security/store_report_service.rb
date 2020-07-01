@@ -36,10 +36,15 @@ module Security
     end
 
     def create_vulnerability_finding(occurrence)
-      vulnerability_finding = create_or_find_vulnerability_finding(occurrence)
+      vulnerability_params = occurrence.to_hash.except(:compare_key, :identifiers, :location, :scanner)
+      vulnerability_finding = create_or_find_vulnerability_finding(occurrence, vulnerability_params)
+
+      update_vulnerability_scanner(occurrence)
+
+      update_vulnerability_finding(vulnerability_finding, vulnerability_params)
 
       occurrence.identifiers.map do |identifier|
-        create_vulnerability_identifier_object(vulnerability_finding, identifier)
+        create_or_update_vulnerability_identifier_object(vulnerability_finding, identifier)
       end
 
       create_vulnerability_pipeline_object(vulnerability_finding, pipeline)
@@ -48,15 +53,12 @@ module Security
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def create_or_find_vulnerability_finding(occurrence)
+    def create_or_find_vulnerability_finding(occurrence, create_params)
       find_params = {
         scanner: scanners_objects[occurrence.scanner.key],
         primary_identifier: identifiers_objects[occurrence.primary_identifier.key],
         location_fingerprint: occurrence.location.fingerprint
       }
-
-      create_params = occurrence.to_hash
-        .except(:compare_key, :identifiers, :location, :scanner)
 
       begin
         project
@@ -69,23 +71,35 @@ module Security
         Gitlab::ErrorTracking.track_and_raise_exception(e, create_params: create_params&.dig(:raw_metadata))
       end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    def create_vulnerability_identifier_object(vulnerability_finding, identifier)
-      vulnerability_finding.occurrence_identifiers.find_or_create_by!( # rubocop: disable CodeReuse/ActiveRecord
-        identifier: identifiers_objects[identifier.key])
+    def update_vulnerability_scanner(occurrence)
+      scanner = scanners_objects[occurrence.scanner.key]
+      scanner.update!(occurrence.scanner.to_hash)
+    end
+
+    def update_vulnerability_finding(vulnerability_finding, update_params)
+      vulnerability_finding.update!(update_params)
+    end
+
+    def create_or_update_vulnerability_identifier_object(vulnerability_finding, identifier)
+      identifier_object = identifiers_objects[identifier.key]
+      vulnerability_finding.occurrence_identifiers.find_or_create_by!(identifier: identifier_object)
+      identifier_object.update!(identifier.to_hash)
     rescue ActiveRecord::RecordNotUnique
     end
 
     def create_vulnerability_pipeline_object(vulnerability_finding, pipeline)
-      vulnerability_finding.occurrence_pipelines.find_or_create_by!(pipeline: pipeline) # rubocop: disable CodeReuse/ActiveRecord
+      vulnerability_finding.occurrence_pipelines.find_or_create_by!(pipeline: pipeline)
     rescue ActiveRecord::RecordNotUnique
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     def create_vulnerability(vulnerability_finding, pipeline)
-      return if vulnerability_finding.vulnerability_id
-
-      Vulnerabilities::CreateService.new(vulnerability_finding.project, pipeline.user, finding_id: vulnerability_finding.id).execute
+      if vulnerability_finding.vulnerability_id
+        Vulnerabilities::UpdateService.new(vulnerability_finding.project, pipeline.user, finding: vulnerability_finding).execute
+      else
+        Vulnerabilities::CreateService.new(vulnerability_finding.project, pipeline.user, finding_id: vulnerability_finding.id).execute
+      end
     end
 
     def scanners_objects
