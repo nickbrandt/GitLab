@@ -97,6 +97,8 @@ RSpec.describe Security::StoreReportService, '#execute' do
         location_fingerprint: 'd869ba3f0b3347eb2749135a437dc07c8ae0f420')
     end
 
+    let!(:vulnerability) { create(:vulnerability, findings: [occurrence], project: project) }
+
     before do
       project.add_developer(user)
       allow(new_pipeline).to receive(:user).and_return(user)
@@ -118,6 +120,20 @@ RSpec.describe Security::StoreReportService, '#execute' do
 
     it 'inserts all occurrence pipelines (join model) for this new pipeline' do
       expect { subject }.to change { Vulnerabilities::OccurrencePipeline.where(pipeline: new_pipeline).count }.by(33)
+    end
+
+    it 'inserts new vulnerabilities with data from findings from this new pipeline' do
+      expect { subject }.to change { Vulnerability.count }.by(32)
+    end
+
+    it 'updates existing occurrences with new data' do
+      subject
+      expect(occurrence.reload).to have_attributes(severity: 'medium', name: 'Probable insecure usage of temp file/directory.')
+    end
+
+    it 'updates existing vulnerability with new data' do
+      subject
+      expect(vulnerability.reload).to have_attributes(severity: 'medium', title: 'Probable insecure usage of temp file/directory.', title_html: 'Probable insecure usage of temp file/directory.')
     end
   end
 
