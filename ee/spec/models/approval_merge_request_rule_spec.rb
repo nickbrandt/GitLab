@@ -169,6 +169,14 @@ RSpec.describe ApprovalMergeRequestRule do
       it 'finds the existing rule' do
         expect(rule).to eq(existing_code_owner_rule)
       end
+
+      context "when the existing rule matches name but not section" do
+        let(:entry) { Gitlab::CodeOwners::Entry.new("*.rb", "@user", "example_section") }
+
+        it "creates a new rule" do
+          expect(rule).not_to eq(existing_code_owner_rule)
+        end
+      end
     end
 
     it 'creates a new rule if it does not exist' do
