@@ -4,7 +4,7 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import TestSuiteTable from './test_suite_table.vue';
 import TestSummary from './test_summary.vue';
 import TestSummaryTable from './test_summary_table.vue';
-import store from '~/pipelines/stores/test_reports';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   name: 'TestReports',
@@ -14,7 +14,7 @@ export default {
     TestSummary,
     TestSummaryTable,
   },
-  store,
+  mixins: [glFeatureFlagsMixin()],
   computed: {
     ...mapState(['isLoading', 'selectedSuite', 'testReports']),
     showSuite() {
@@ -25,8 +25,13 @@ export default {
       return testSuites.length > 0;
     },
   },
+  created() {
+    if (this.glFeatures.buildReportSummary) {
+      this.fetchSummary();
+    }
+  },
   methods: {
-    ...mapActions(['setSelectedSuite', 'removeSelectedSuite']),
+    ...mapActions(['fetchFullReport', 'fetchSummary', 'setSelectedSuite', 'removeSelectedSuite']),
     summaryBackClick() {
       this.removeSelectedSuite();
     },

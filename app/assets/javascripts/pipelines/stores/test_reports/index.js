@@ -7,9 +7,9 @@ import mutations from './mutations';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+export default (summaryEndpoint, fullReportEndpoint) => new Vuex.Store({
   actions,
   getters,
   mutations,
-  state,
+  state: state(summaryEndpoint, fullReportEndpoint),
 });

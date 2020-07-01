@@ -22,4 +22,5 @@
 
 .js-pipeline-details-vue{ data: { endpoint: project_pipeline_path(@project, @pipeline, format: :json),
   test_report_endpoint: test_report_project_pipeline_path(@project, @pipeline, format: :json),
+  test_report_summary_endpoint: Feature.enabled?(:build_report_summary, @project) && summary_project_tests_path(@project, @pipeline, format: :json),
   test_reports_count_endpoint: test_reports_count_project_pipeline_path(@project, @pipeline, format: :json) } }
