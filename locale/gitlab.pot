@@ -6077,6 +6077,9 @@ msgstr ""
 msgid "Configure limit for issues created per minute by web and API requests."
 msgstr ""
 
+msgid "Configure limits for Project/Group Import/Export."
+msgstr ""
+
 msgid "Configure limits for web and API requests."
 msgstr ""
 
@@ -12218,6 +12221,9 @@ msgstr ""
 msgid "Import timed out. Import took longer than %{import_jobs_expiration} seconds"
 msgstr ""
 
+msgid "Import/Export Rate Limits"
+msgstr ""
+
 msgid "Import/Export illustration"
 msgstr ""
 
@@ -13973,6 +13979,24 @@ msgid "MattermostService|This service allows users to perform common operations 
 msgstr ""
 
 msgid "Maven Metadata"
+msgstr ""
+
+msgid "Max Group Export Download requests per minute per user"
+msgstr ""
+
+msgid "Max Group Export requests per minute per user"
+msgstr ""
+
+msgid "Max Group Import requests per minute per user"
+msgstr ""
+
+msgid "Max Project Export Download requests per minute per user"
+msgstr ""
+
+msgid "Max Project Export requests per minute per user"
+msgstr ""
+
+msgid "Max Project Import requests per minute per user"
 msgstr ""
 
 msgid "Max access level"

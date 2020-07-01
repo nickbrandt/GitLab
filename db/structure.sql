@@ -9145,6 +9145,12 @@ CREATE TABLE public.application_settings (
     compliance_frameworks smallint[] DEFAULT '{}'::smallint[] NOT NULL,
     notify_on_unknown_sign_in boolean DEFAULT true NOT NULL,
     default_branch_name text,
+    project_import_limit integer DEFAULT 6 NOT NULL,
+    project_export_limit integer DEFAULT 6 NOT NULL,
+    project_download_export_limit integer DEFAULT 1 NOT NULL,
+    group_import_limit integer DEFAULT 6 NOT NULL,
+    group_export_limit integer DEFAULT 6 NOT NULL,
+    group_download_export_limit integer DEFAULT 1 NOT NULL,
     CONSTRAINT check_51700b31b5 CHECK ((char_length(default_branch_name) <= 255)),
     CONSTRAINT check_d03919528d CHECK ((char_length(container_registry_vendor) <= 255)),
     CONSTRAINT check_d820146492 CHECK ((char_length(spam_check_endpoint_url) <= 255)),
@@ -23573,6 +23579,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200626060151
 20200626130220
 20200630110826
+20200701093859
 20200702123805
 20200703154822
 20200704143633
