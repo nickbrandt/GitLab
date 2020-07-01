@@ -1174,6 +1174,13 @@ To configure Gitaly with TLS:
 ## Configure Sidekiq
 
 Sidekiq requires connection to the Redis, PostgreSQL and Gitaly instance.
+The following IPs will be used as an example:
+
+- `10.6.0.71`: Sidekiq 1
+- `10.6.0.72`: Sidekiq 2
+- `10.6.0.73`: Sidekiq 3
+- `10.6.0.74`: Sidekiq 4
+
 To configure the Sidekiq nodes, one each one:
 
 1. SSH into the Sidekiq server.
@@ -1244,7 +1251,8 @@ you want using steps 1 and 2 from the GitLab downloads page.
    #######################################
    ###      Sidekiq configuration      ###
    #######################################
-   sidekiq['listen_address'] = "10.6.0.71"
+   sidekiq['listen_address'] = "0.0.0.0"
+   sidekiq_cluster['enable'] = true
 
    #######################################
    ###     Monitoring configuration    ###
@@ -1262,6 +1270,9 @@ you want using steps 1 and 2 from the GitLab downloads page.
    # Rails Status for prometheus
    gitlab_rails['monitoring_whitelist'] = ['10.6.0.81/32', '127.0.0.0/8']
    ```
+
+TIP: **Tip:**
+You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_processes.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
