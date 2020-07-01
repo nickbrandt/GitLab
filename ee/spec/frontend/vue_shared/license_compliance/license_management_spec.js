@@ -30,7 +30,7 @@ const PaginatedListMock = {
 
 const noop = () => {};
 
-const createComponent = ({ state, getters, props, actionMocks, isAdmin, options }) => {
+const createComponent = ({ state, getters, props, actionMocks, isAdmin, options, provide }) => {
   const fakeStore = new Vuex.Store({
     modules: {
       licenseManagement: {
@@ -63,16 +63,16 @@ const createComponent = ({ state, getters, props, actionMocks, isAdmin, options 
     stubs: {
       PaginatedList: PaginatedListMock,
     },
+    provide: {
+      glFeatures: { licenseComplianceDeniesMr: false },
+      ...provide
+    },
     store: fakeStore,
     ...options,
   });
 };
 
 describe('License Management', () => {
-  beforeEach(() => {
-    window.gon = { features: { licenseComplianceDeniesMr: false } };
-  });
-
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
@@ -197,11 +197,12 @@ describe('License Management', () => {
 
       describe('when licenseComplianceDeniesMr feature flag enabled', () => {
         it('should not show the developer only tooltip', () => {
-          window.gon.features.licenseComplianceDeniesMr = true;
-
           createComponent({
             state: { isLoadingManagedLicenses: false },
             isAdmin: true,
+            provide: {
+              glFeatures: { licenseComplianceDeniesMr: true },
+            },
           });
 
           expect(wrapper.find(GlIcon).exists()).toBe(false);
@@ -211,8 +212,6 @@ describe('License Management', () => {
 
       describe('when licenseComplianceDeniesMr feature flag disabled', () => {
         it('should not show the developer only tooltip', () => {
-          window.gon.features.licenseComplianceDeniesMr = false;
-
           createComponent({
             state: { isLoadingManagedLicenses: false },
             isAdmin: true,
@@ -263,11 +262,13 @@ describe('License Management', () => {
 
       describe('when licenseComplianceDeniesMr feature flag enabled', () => {
         it('should show the developer only tooltip', () => {
-          window.gon.features.licenseComplianceDeniesMr = true;
 
           createComponent({
             state: { isLoadingManagedLicenses: false },
             isAdmin: false,
+            provide: {
+              glFeatures: { licenseComplianceDeniesMr: true },
+            },
           });
 
           expect(wrapper.find(GlIcon).exists()).toBe(true);
@@ -277,8 +278,6 @@ describe('License Management', () => {
 
       describe('when licenseComplianceDeniesMr feature flag disabled', () => {
         it('should not show the developer only tooltip', () => {
-          window.gon.features.licenseComplianceDeniesMr = false;
-
           createComponent({
             state: { isLoadingManagedLicenses: false },
             isAdmin: false,

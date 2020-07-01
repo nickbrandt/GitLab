@@ -1,4 +1,5 @@
 <script>
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlButton, GlLoadingIcon, GlIcon, GlPopover } from '@gitlab/ui';
 import { s__ } from '~/locale';
@@ -10,6 +11,7 @@ import LicenseManagementRow from './components/license_management_row.vue';
 import DeleteConfirmationModal from './components/delete_confirmation_modal.vue';
 import PaginatedList from '~/vue_shared/components/paginated_list.vue';
 import LicenseApprovals from '../../approvals/components/license_compliance/index.vue';
+
 
 export default {
   name: 'LicenseManagement',
@@ -49,7 +51,7 @@ export default {
       return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
     },
     isTooltipEnabled() {
-      return Boolean(gon?.features?.licenseComplianceDeniesMr);
+      return Boolean(this.glFeatures.licenseComplianceDeniesMr);
     },
   },
   watch: {
