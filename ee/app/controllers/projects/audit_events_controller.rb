@@ -14,10 +14,10 @@ class Projects::AuditEventsController < Projects::ApplicationController
   def index
     level = Gitlab::Audit::Levels::Project.new(project: project)
     # This is an interim change until we have proper API support within Audit Events
-    params = transform_author_entity_type(audit_logs_params)
+    audit_params = transform_author_entity_type(audit_logs_params)
 
     events = AuditLogFinder
-      .new(level: level, params: params)
+      .new(level: level, params: audit_params)
       .execute
       .page(params[:page])
       .without_count
