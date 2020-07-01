@@ -1,6 +1,7 @@
 import DashboardPage from '../pages/dashboard_page.vue';
+import PanelBuilder from '../pages/panel_builder_page.vue';
 
-import { BASE_DASHBOARD_PAGE } from './constants';
+import { BASE_DASHBOARD_PAGE, BUILDER_PAGE } from './constants';
 
 /**
  * Because the cluster health page uses the dashboard
@@ -10,6 +11,11 @@ import { BASE_DASHBOARD_PAGE } from './constants';
  * https://gitlab.com/gitlab-org/gitlab/-/issues/221096
  */
 export default [
+  {
+    name: BUILDER_PAGE,
+    path: '/builder',
+    component: PanelBuilder,
+  },
   {
     name: BASE_DASHBOARD_PAGE,
     path: '*',

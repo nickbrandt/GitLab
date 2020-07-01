@@ -24,7 +24,7 @@ import {
   VARIABLE_TYPES,
 } from '../constants';
 
-function prometheusMetricQueryParams(timeRange) {
+export function prometheusMetricQueryParams(timeRange) {
   const { start, end } = convertToFixedRange(timeRange);
 
   const timeDiff = (new Date(end) - new Date(start)) / 1000;
@@ -52,7 +52,7 @@ function backOffRequest(makeRequestCallback) {
   }, PROMETHEUS_TIMEOUT);
 }
 
-function getPrometheusQueryData(prometheusEndpoint, params) {
+export function getPrometheusQueryData(prometheusEndpoint, params) {
   return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
     .then(res => res.data)
     .then(response => {
