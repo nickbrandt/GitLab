@@ -125,7 +125,7 @@ RSpec.describe MergeRequests::RefreshService do
           end
 
           it_behaves_like 'creates an approval rule based on current diff' do
-            let(:approval_rules_size) { 4 }
+            let(:approval_rules_size) { 5 }
           end
         end
       end
