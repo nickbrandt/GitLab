@@ -26,8 +26,9 @@ you begin. The best way back up a repository is to
 [export the project](../settings/import_export.md#exporting-a-project-and-its-data).
 
 NOTE: **Note:**
-Git LFS files can only be removed by an Administrator using a [rake task](../../../raketasks/cleanup.html).
-Follow [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/223621) for updates.
+Git LFS files can only be removed by an Administrator using a
+[rake task](../../../raketasks/cleanup.md). Removal of this limitation
+[is planned](https://gitlab.com/gitlab-org/gitlab/-/issues/223621).
 
 ## Purge files from repository history
 
@@ -51,7 +52,8 @@ To make cloning your project faster, rewrite branches and tags to remove unwante
    ```
 
    To purge large files stored using Git LFS, the `--blob--callback` option can
-   be used:
+   be used. The example below, uses the callback to read the file size from the
+   Git LFS pointer, and removes files larger than 10MB.
 
    ```shell
    git filter-repo --blob-callback '
@@ -96,7 +98,7 @@ To make cloning your project faster, rewrite branches and tags to remove unwante
    [Protected tags](../protected_tags.md) will cause this to fail. To proceed, you must remove tag
    protection, push, and then re-enable protected tags.
 
-1. Manually run [project housekeeping](../../../administration/housekeeping.html#manual-housekeeping)
+1. Manually run [project housekeeping](../../../administration/housekeeping.md#manual-housekeeping)
 
 NOTE: **Note**
 Project statistics are cached for performance. You may need to wait 5-10 minutes
