@@ -10,9 +10,6 @@ RSpec.describe 'Epic show', :js do
   let_it_be(:label2) { create(:group_label, group: group, title: 'enhancement') }
   let_it_be(:label3) { create(:group_label, group: group, title: 'documentation') }
   let_it_be(:public_issue) { create(:issue, project: public_project) }
-  let_it_be(:note_text1) { 'Contemnit enim disserendi elegantiam.' }
-  let_it_be(:note_text2) { 'vel illum qui dolorem eum' }
-  let_it_be(:note_text3) { 'fugiat quo voluptas nulla pariatur?' }
   let_it_be(:epic_title) { 'Sample epic' }
 
   let_it_be(:markdown) do
@@ -141,11 +138,7 @@ RSpec.describe 'Epic show', :js do
     end
 
     describe 'Sort dropdown' do
-      def submit_comment(text)
-        fill_in 'note[note]', with: text
-        click_button 'Comment'
-        wait_for_requests
-      end
+      let!(:notes) { create_list(:note, 2, noteable: epic) }
 
       context 'when sorted by `Oldest first`' do
         it 'shows label `Oldest first`' do
@@ -155,11 +148,9 @@ RSpec.describe 'Epic show', :js do
         end
 
         it 'shows comments in the correct order' do
-          submit_comment(note_text1)
-          submit_comment(note_text2)
           items = all('.timeline-entry .timeline-discussion-body p')
-          expect(items[0]).to have_content(note_text1)
-          expect(items[1]).to have_content(note_text2)
+          expect(items[0]).to have_content(notes[0].note)
+          expect(items[1]).to have_content(notes[1].note)
         end
       end
 
@@ -167,7 +158,6 @@ RSpec.describe 'Epic show', :js do
         before do
           page.within('[data-testid="sort-discussion-filter"]') do
             find('button').click
-            wait_for_requests
             find('.js-newest-first').click
             wait_for_requests
           end
@@ -179,10 +169,10 @@ RSpec.describe 'Epic show', :js do
           end
         end
 
-        it 'shows the newly created comment in the top' do
-          submit_comment(note_text3)
+        it 'shows comments in the correct order' do
           items = all('.timeline-entry .timeline-discussion-body p')
-          expect(items[0]).to have_content(note_text3)
+          expect(items[0]).to have_content(notes[1].note)
+          expect(items[1]).to have_content(notes[0].note)
         end
       end
     end
