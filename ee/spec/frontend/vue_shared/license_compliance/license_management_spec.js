@@ -256,7 +256,7 @@ describe('License Management', () => {
       describe.each`
         licenseComplianceDeniesMr | should
         ${true}                   | ${'should'}
-        ${false}                  | ${'shouls not'}
+        ${false}                  | ${'should not'}
       `(
         'when licenseComplianceDeniesMr feature flag is $licenseComplianceDeniesMr',
         ({ licenseComplianceDeniesMr, should }) => {
