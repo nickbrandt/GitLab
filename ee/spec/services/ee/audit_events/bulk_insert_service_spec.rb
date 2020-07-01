@@ -22,7 +22,6 @@ RSpec.describe EE::AuditEvents::BulkInsertService do
       entity_type: entity_type,
       type: 'SecurityEvent',
       created_at: timestamp,
-      updated_at: timestamp,
       details: {
         updated_ref: 'master',
         author_name: user.name,
