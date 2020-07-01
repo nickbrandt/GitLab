@@ -20,10 +20,10 @@ module Packages
         <!DOCTYPE html>
         <html>
           <head>
-            <title>Links for #{name}</title>
+            <title>Links for #{escape(name)}</title>
           </head>
           <body>
-            <h1>Links for #{name}</h1>
+            <h1>Links for #{escape(name)}</h1>
             #{links}
           </body>
         </html>
@@ -47,7 +47,7 @@ module Packages
       end
 
       def package_link(url, required_python, filename)
-        "<a href=\"#{url}\" data-requires-python=\"#{required_python}\">#{filename}</a><br>"
+        "<a href=\"#{url}\" data-requires-python=\"#{escape(required_python)}\">#{filename}</a><br>"
       end
 
       def build_pypi_package_path(file)
@@ -65,6 +65,10 @@ module Packages
 
       def name
         @packages.first.name
+      end
+
+      def escape(str)
+        ERB::Util.html_escape(str)
       end
     end
   end

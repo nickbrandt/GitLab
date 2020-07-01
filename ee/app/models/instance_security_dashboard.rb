@@ -56,5 +56,10 @@ class InstanceSecurityDashboard
       .where(users_security_dashboard_projects: { user_id: user.id })
       .where(project_authorizations: { user_id: user.id })
       .where('users_security_dashboard_projects.project_id = project_authorizations.project_id')
+      .where(access_level: authorized_access_levels)
+  end
+
+  def authorized_access_levels
+    Gitlab::Access.vulnerability_access_levels.values
   end
 end
