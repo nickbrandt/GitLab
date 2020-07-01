@@ -17,7 +17,7 @@ module QA
                     element :cluster_health_section
                   end
 
-                  view 'ee/app/views/clusters/clusters/_health_tab.html.haml' do
+                  view 'app/views/clusters/clusters/_health_tab.html.haml' do
                     element :health, required: true
                   end
                 end
