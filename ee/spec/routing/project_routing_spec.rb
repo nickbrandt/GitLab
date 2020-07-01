@@ -58,4 +58,10 @@ RSpec.describe 'EE-specific project routing' do
       it_behaves_like 'redirecting a legacy project path', "/gitlab/gitlabhq/audit_events", "/gitlab/gitlabhq/-/audit_events"
     end
   end
+
+  describe Projects::Integrations::Jira::IssuesController, 'routing', type: :routing do
+    it "to #index" do
+      expect(get("/gitlab/gitlabhq/-/integrations/jira/issues")).to route_to('projects/integrations/jira/issues#index', namespace_id: 'gitlab', project_id: 'gitlabhq')
+    end
+  end
 end

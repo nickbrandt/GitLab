@@ -12716,6 +12716,9 @@ msgstr ""
 msgid "January"
 msgstr ""
 
+msgid "Jira Issues"
+msgstr ""
+
 msgid "Jira import is already running."
 msgstr ""
 
