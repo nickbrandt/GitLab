@@ -36,7 +36,7 @@ export default (
   const props = {
     emptyStateSvgPath: el.dataset.emptyStateSvgPath,
     dashboardDocumentation: el.dataset.dashboardDocumentation,
-    hasPipelineData: Boolean(el.dataset.hasPipelineData),
+    hasVulnerabilities: Boolean(el.dataset.hasVulnerabilities),
     securityDashboardHelpPath: el.dataset.securityDashboardHelpPath,
     projectAddEndpoint: el.dataset.projectAddEndpoint,
     projectListEndpoint: el.dataset.projectListEndpoint,

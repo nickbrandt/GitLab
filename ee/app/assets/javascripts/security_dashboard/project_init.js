@@ -8,10 +8,10 @@ export default () => {
   const securityTab = document.getElementById('js-security-report-app');
   const props = {
     ...securityTab.dataset,
-    hasPipelineData: parseBoolean(securityTab.dataset.hasPipelineData),
+    hasVulnerabilities: parseBoolean(securityTab.dataset.hasVulnerabilities),
   };
 
-  if (props.hasPipelineData) {
+  if (props.hasVulnerabilities) {
     Object.assign(props, {
       project: {
         id: props.projectId,

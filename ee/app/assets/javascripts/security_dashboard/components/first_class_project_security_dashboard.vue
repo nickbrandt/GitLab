@@ -41,7 +41,7 @@ export default {
       required: false,
       default: '',
     },
-    hasPipelineData: {
+    hasVulnerabilities: {
       type: Boolean,
       required: false,
       default: false,
@@ -87,7 +87,7 @@ export default {
 
 <template>
   <div>
-    <template v-if="hasPipelineData">
+    <template v-if="hasVulnerabilities">
       <security-dashboard-layout>
         <template #header>
           <gl-banner
