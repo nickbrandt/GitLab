@@ -1019,6 +1019,10 @@ metrics:
     - 'flow:sourceContext=namespace;destinationContext=namespace'
 ```
 
+NOTE: **Note:**
+Support for installing the Cilium managed application is provided by the GitLab Container Security group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Container Security group](https://about.gitlab.com/handbook/product/product-categories/#container-security-group).
+
 ### Install Falco using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/91) in GitLab 13.1.
@@ -1105,6 +1109,10 @@ You can check these logs with the following command:
 ```shell
 kubectl logs -l app=falco -n gitlab-managed-apps
 ```
+
+NOTE: **Note:**
+Support for installing the Falco managed application is provided by the GitLab Container Security group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Container Security group](https://about.gitlab.com/handbook/product/product-categories/#container-security-group).
 
 ### Install Vault using GitLab CI/CD
 
@@ -1321,6 +1329,10 @@ The configuration chart link points to the current development release, which
 may differ from the version you have installed. To ensure compatibility, switch
 to the specific branch or tag you are using.
 
+NOTE: **Note:**
+Support for installing the Fluentd managed application is provided by the GitLab Container Security group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Container Security group](https://about.gitlab.com/handbook/product/product-categories/#container-security-group).
+
 ### Install Knative using GitLab CI/CD
 
 To install Knative, define the `.gitlab/managed-apps/config.yaml` file
@@ -1399,6 +1411,10 @@ podAnnotations:
 ```
 
 The only information to be changed here is the profile name which is `profile-one` in this example. Refer to the [AppArmor tutorial](https://kubernetes.io/docs/tutorials/clusters/apparmor/#securing-a-pod) for more information on how AppArmor is integrated in Kubernetes.
+
+NOTE: **Note:**
+Support for installing the AppArmor managed application is provided by the GitLab Container Security group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Container Security group](https://about.gitlab.com/handbook/product/product-categories/#container-security-group).
 
 ## Upgrading applications
 
