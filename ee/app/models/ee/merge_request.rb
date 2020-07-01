@@ -102,6 +102,7 @@ module EE
     override :mergeable?
     def mergeable?(skip_ci_check: false)
       return false unless approved?
+      return false if has_denied_policies?
       return false if merge_blocked_by_other_mrs?
 
       super
@@ -142,6 +143,13 @@ module EE
       hidden.delete_if(&:merged?) unless include_merged
 
       hidden.count
+    end
+
+    def has_denied_policies?
+      return false if ::Feature.disabled?(:license_compliance_denies_mr, project, default_enabled: false)
+      return false unless has_license_scanning_reports?
+
+      actual_head_pipeline.license_scanning_report.violates?(project.software_license_policies)
     end
 
     def enabled_reports
