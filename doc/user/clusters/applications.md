@@ -916,6 +916,10 @@ management project. Refer to the
 [chart](https://gitlab.com/gitlab-org/charts/gitlab-runner) for the
 available configuration options.
 
+NOTE: **Note:**
+Support for installing the Elastic Stack managed application is provided by the GitLab Runner group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Runner group](https://about.gitlab.com/handbook/product/product-categories/#runner-group).
+
 ### Install Cilium using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/22) in GitLab 12.8.
