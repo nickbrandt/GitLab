@@ -1,0 +1,5 @@
+---
+title: Fix pagination on Group Audit Events
+merge_request: 35767
+author:
+type: fixed
