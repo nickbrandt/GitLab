@@ -56,6 +56,7 @@ class License < ApplicationRecord
     cluster_deployments
     code_owner_approval_required
     commit_committer_check
+    compliance_framework
     cross_project_pipelines
     custom_file_templates
     custom_file_templates_for_namespace
@@ -110,7 +111,6 @@ class License < ApplicationRecord
   EEP_FEATURES.freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
-    compliance_framework
     container_scanning
     coverage_fuzzing
     credentials_inventory
