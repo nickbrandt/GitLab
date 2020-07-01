@@ -298,6 +298,18 @@ msgstr ""
 msgid "%{authorsName}'s thread"
 msgstr ""
 
+msgid "%{code_open}\"johnsmith@example.com\": \"@johnsmith\"%{code_close} will add \"By %{link_open}@johnsmith%{link_close}\" to all issues and comments originally created by johnsmith@example.com, and will set %{link_open}@johnsmith%{link_close} as the assignee on all issues originally assigned to johnsmith@example.com."
+msgstr ""
+
+msgid "%{code_open}\"johnsmith@example.com\": \"John Smith\"%{code_close} will add \"By John Smith\" to all issues and comments originally created by johnsmith@example.com."
+msgstr ""
+
+msgid "%{code_open}\"johnsmith@example.com\": \"johnsm...@example.com\"%{code_close} will add \"By johnsm...@example.com\" to all issues and comments originally created by johnsmith@example.com. The email address or username is masked to ensure the user's privacy."
+msgstr ""
+
+msgid "%{code_open}\"johnsmith@example.com\": \"johnsmith@example.com\"%{code_close} will add \"By %{link_open}johnsmith@example.com%{link_close}\" to all issues and comments originally created by johnsmith@example.com. By default, the email address or username is masked to ensure the user's privacy. Use this option if you want to show the full email address."
+msgstr ""
+
 msgid "%{code_open}Masked%{code_close} to prevent the values from being displayed in job logs (must match certain regexp requirements)."
 msgstr ""
 
@@ -1020,18 +1032,6 @@ msgid ":%{startLine} to %{endLine}"
 msgstr ""
 
 msgid "< 1 hour"
-msgstr ""
-
-msgid "<code>\"johnsmith@example.com\": \"@johnsmith\"</code> will add \"By <a href=\"#\">@johnsmith</a>\" to all issues and comments originally created by johnsmith@example.com, and will set <a href=\"#\">@johnsmith</a> as the assignee on all issues originally assigned to johnsmith@example.com."
-msgstr ""
-
-msgid "<code>\"johnsmith@example.com\": \"John Smith\"</code> will add \"By John Smith\" to all issues and comments originally created by johnsmith@example.com."
-msgstr ""
-
-msgid "<code>\"johnsmith@example.com\": \"johnsm...@example.com\"</code> will add \"By johnsm...@example.com\" to all issues and comments originally created by johnsmith@example.com. The email address or username is masked to ensure the user's privacy."
-msgstr ""
-
-msgid "<code>\"johnsmith@example.com\": \"johnsmith@example.com\"</code> will add \"By <a href=\"#\">johnsmith@example.com</a>\" to all issues and comments originally created by johnsmith@example.com. By default, the email address or username is masked to ensure the user's privacy. Use this option if you want to show the full email address."
 msgstr ""
 
 msgid "<project name>"
@@ -4650,10 +4650,10 @@ msgstr ""
 msgid "Child epic doesn't exist."
 msgstr ""
 
-msgid "Choose <strong>Create archive</strong> and wait for archiving to complete."
+msgid "Choose %{strong_open}Create archive%{strong_close} and wait for archiving to complete."
 msgstr ""
 
-msgid "Choose <strong>Next</strong> at the bottom of the page."
+msgid "Choose %{strong_open}Next%{strong_close} at the bottom of the page."
 msgstr ""
 
 msgid "Choose a branch/tag (e.g. %{master}) or enter a commit (e.g. %{sha}) to see what's changed or to create a merge request."
@@ -4899,10 +4899,10 @@ msgstr ""
 msgid "Clears weight."
 msgstr ""
 
-msgid "Click the <strong>Download</strong> button and wait for downloading to complete."
+msgid "Click the %{strong_open}Download%{strong_close} button and wait for downloading to complete."
 msgstr ""
 
-msgid "Click the <strong>Select none</strong> button on the right, since we only need \"Google Code Project Hosting\"."
+msgid "Click the %{strong_open}Select none%{strong_close} button on the right, since we only need \"Google Code Project Hosting\"."
 msgstr ""
 
 msgid "Click the button below to begin the install process by navigating to the Kubernetes page"
@@ -10528,7 +10528,7 @@ msgstr ""
 msgid "Find the downloaded ZIP file and decompress it."
 msgstr ""
 
-msgid "Find the newly extracted <code>Takeout/Google Code Project Hosting/GoogleCodeProjectHosting.json</code> file."
+msgid "Find the newly extracted %{code_open}Takeout/Google Code Project Hosting/GoogleCodeProjectHosting.json%{code_close} file."
 msgstr ""
 
 msgid "Fingerprint"
@@ -20683,7 +20683,7 @@ msgstr ""
 msgid "Scroll down"
 msgstr ""
 
-msgid "Scroll down to <strong>Google Code Project Hosting</strong> and enable the switch on the right."
+msgid "Scroll down to %{strong_open}Google Code Project Hosting%{strong_close} and enable the switch on the right."
 msgstr ""
 
 msgid "Scroll left"
@@ -23888,7 +23888,7 @@ msgstr ""
 msgid "The user map has been saved. Continue by selecting the projects you want to import."
 msgstr ""
 
-msgid "The user map is a JSON document mapping the Google Code users that participated on your projects to the way their email addresses and usernames will be imported into GitLab. You can change this by changing the value on the right hand side of <code>:</code>. Be sure to preserve the surrounding double quotes, other punctuation and the email address or username on the left hand side."
+msgid "The user map is a JSON document mapping the Google Code users that participated on your projects to the way their email addresses and usernames will be imported into GitLab. You can change this by changing the value on the right hand side of %{code_open}:%{code_close}. Be sure to preserve the surrounding double quotes, other punctuation and the email address or username on the left hand side."
 msgstr ""
 
 msgid "The user map is a mapping of the FogBugz users that participated on your projects to the way their email address and usernames will be imported into GitLab. You can change this by populating the table below."
@@ -25782,7 +25782,7 @@ msgstr ""
 msgid "Upgrade your plan to improve Merge Requests."
 msgstr ""
 
-msgid "Upload <code>GoogleCodeProjectHosting.json</code> here:"
+msgid "Upload %{code_open}GoogleCodeProjectHosting.json%{code_close} here:"
 msgstr ""
 
 msgid "Upload CSV file"
