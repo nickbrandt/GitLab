@@ -30,10 +30,6 @@ export default {
   data() {
     return {
       formIsOpen: false,
-      tableHeaders: [
-        { className: 'section-70', label: s__('Licenses|Policy') },
-        { className: 'section-30', label: s__('Licenses|Name') },
-      ],
     };
   },
   computed: {
@@ -109,13 +105,8 @@ export default {
         </div>
 
         <template v-else>
-          <div
-            class="table-section gl-d-flex gl-pl-2"
-            :class="tableHeaders[0].className"
-            role="rowheader"
-          >
-            {{ tableHeaders[0].label }}
-
+          <div class="table-section gl-d-flex gl-pl-2 section-70" role="rowheader">
+            {{ s__('Licenses|Policy') }}
             <gl-icon
               v-if="isTooltipEnabled"
               ref="reportInfo"
@@ -146,8 +137,8 @@ export default {
             </gl-popover>
           </div>
 
-          <div class="table-section" :class="tableHeaders[1].className" role="rowheader">
-            {{ tableHeaders[1].label }}
+          <div class="table-section section-30" role="rowheader">
+            {{ s__('Licenses|Name') }}
           </div>
         </template>
       </template>
