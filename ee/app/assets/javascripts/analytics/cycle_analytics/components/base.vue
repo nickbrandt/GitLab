@@ -1,5 +1,6 @@
 <script>
-import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
@@ -25,6 +26,7 @@ export default {
   components: {
     DateRange,
     DurationChart,
+    GlButton,
     GlLoadingIcon,
     GlEmptyState,
     GroupsDropdownFilter,
@@ -111,8 +113,14 @@ export default {
       // https://gitlab.com/gitlab-org/gitlab/-/issues/223735
       return this.featureFlags.hasFilterBar && this.currentGroupPath;
     },
+    canCreateMultipleValueStreams() {
+      return Boolean(this.featureFlags.hasCreateMultipleValueStreams);
+    },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
+    },
+    isXSBreakpoint() {
+      return bp.getBreakpointSize() === 'xs';
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -190,6 +198,9 @@ export default {
     onStageReorder(data) {
       this.reorderStage(data);
     },
+    onCreateValueStream() {
+      // stub handler - to be implemented in a follow up
+    },
   },
   multiProjectSelect: true,
   dateOptions: [7, 30, 90],
@@ -208,8 +219,19 @@ export default {
 </script>
 <template>
   <div>
-    <div class="mb-3">
+    <div
+      class="mb-3 gl-display-flex gl-flex-direction-column gl-sm-flex-direction-row gl-justify-content-space-between"
+    >
       <h3>{{ __('Value Stream Analytics') }}</h3>
+      <div
+        class="gl-align-self-center"
+        :class="{
+          'gl-w-full': isXSBreakpoint,
+          'gl-mt-5': !isXSBreakpoint,
+        }"
+      >
+        <gl-button @click="onCreateValueStream">{{ __('Create new value stream') }}</gl-button>
+      </div>
     </div>
     <div class="mw-100">
       <div class="mt-3 py-2 px-3 bg-gray-light border-top border-bottom">
