@@ -116,6 +116,10 @@ RSpec.describe MergeRequest do
 
             it { is_expected.to be_falsey }
           end
+
+          context 'with License-Check enabled' do
+
+          end
         end
       end
     end
