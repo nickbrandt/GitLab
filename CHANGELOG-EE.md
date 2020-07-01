@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.10.13 (2020-07-01)
+
+### Security (2 changes)
+
+- Fixed pypi package API XSS.
+- Fix project authorizations for instance security dashboard.
+
+
 ## 12.10.12 (2020-06-24)
 
 - No changes.
