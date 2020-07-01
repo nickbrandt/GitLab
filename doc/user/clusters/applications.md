@@ -1325,6 +1325,10 @@ management project. Refer to the
 [chart](https://github.com/crossplane/crossplane/tree/master/cluster/charts/crossplane#configuration) for the
 available configuration options. Note that this link points to the documentation for the current development release, which may differ from the version you have installed.
 
+NOTE: **Note:**
+Support for the Crossplane managed application is provided by the Crossplane team.
+If you run into issues, please [open a support ticket](https://github.com/crossplane/crossplane/issues/new/choose) directly.
+
 ### Install Fluentd using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/76) in GitLab 12.10.
