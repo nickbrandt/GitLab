@@ -5,6 +5,7 @@ import {
   countVulnerabilities,
   groupedReportText,
 } from 'ee/vue_shared/security_reports/store/utils';
+import convertReportType from 'ee/vue_shared/security_reports/store/utils/convert_report_type';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import {
@@ -42,6 +43,24 @@ describe('security reports utils', () => {
 
       expect(findIssueIndex(issuesList, issue)).toEqual(-1);
     });
+  });
+
+  describe('convertReportType', () => {
+    it.each`
+      reportType               | output
+      ${'sast'}                | ${'SAST'}
+      ${'dependency_scanning'} | ${'Dependency Scanning'}
+      ${'CONTAINER_SCANNING'}  | ${'Container Scanning'}
+      ${'CUSTOM_SCANNER'}      | ${'Custom scanner'}
+      ${'mast'}                | ${'Mast'}
+      ${'TAST'}                | ${'Tast'}
+      ${undefined}             | ${''}
+    `(
+      'converts the report type "$reportType" to the human-readable string "$output"',
+      ({ reportType, output }) => {
+        expect(convertReportType(reportType)).toEqual(output);
+      },
+    );
   });
 
   describe('filterByKey', () => {

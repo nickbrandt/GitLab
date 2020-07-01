@@ -81,6 +81,14 @@ describe('Security Dashboard Table Row', () => {
       expect(findContent(2).text()).toContain(vulnerability.identifiers[0].name);
     });
 
+    it('should render the report type', () => {
+      expect(
+        findContent(3)
+          .text()
+          .toLowerCase(),
+      ).toContain(vulnerability.report_type.toLowerCase());
+    });
+
     describe('the project name', () => {
       it('should render the name', () => {
         expect(findContent(1).text()).toContain(vulnerability.name);
