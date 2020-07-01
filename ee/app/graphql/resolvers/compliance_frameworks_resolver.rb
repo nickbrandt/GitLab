@@ -2,7 +2,7 @@
 
 module Resolvers
   class ComplianceFrameworksResolver < BaseResolver
-    type EE::Types::ComplianceManagement::ComplianceFrameworkType, null: true
+    type Types::ComplianceManagement::ComplianceFrameworkType, null: true
 
     alias_method :project, :object
 

@@ -46,7 +46,7 @@ module EE
               description: 'Packages of the project',
               resolver: ::Resolvers::PackagesResolver
 
-        field :compliance_frameworks, Types::ComplianceManagement::ComplianceFrameworkType.connection_type,
+        field :compliance_frameworks, ::Types::ComplianceManagement::ComplianceFrameworkType.connection_type,
               description: 'Compliance frameworks associated with the project',
               resolver: ::Resolvers::ComplianceFrameworksResolver,
               null: true
