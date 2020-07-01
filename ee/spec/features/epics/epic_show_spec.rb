@@ -141,8 +141,6 @@ RSpec.describe 'Epic show', :js do
     end
 
     describe 'Sort dropdown' do
-      let!(:dropdown_label) { find('.js-sort-discussion-filter-container #sort-discussion-filter-dropdown') }
-
       def submit_comment(text)
         fill_in 'note[note]', with: text
         click_button 'Comment'
@@ -151,8 +149,8 @@ RSpec.describe 'Epic show', :js do
 
       context 'when sorted by `Oldest first`' do
         it 'shows label `Oldest first`' do
-          page.within('.js-noteable-awards') do
-            expect(dropdown_label).to have_content('Oldest first')
+          page.within('[data-testid="sort-discussion-filter"]') do
+            expect(find('.js-dropdown-text')).to have_content('Oldest first')
           end
         end
 
@@ -167,17 +165,17 @@ RSpec.describe 'Epic show', :js do
 
       context 'when sorted by `Newest first`' do
         before do
-          page.within('.js-noteable-awards') do
-            dropdown_label.click
+          page.within('[data-testid="sort-discussion-filter"]') do
+            find('button').click
             wait_for_requests
-            find('.js-sort-discussion-filter-container .js-newest-first').click
+            find('.js-newest-first').click
             wait_for_requests
           end
         end
 
         it 'shows label `Newest first`' do
-          page.within('.js-noteable-awards') do
-            expect(dropdown_label).to have_content('Newest first')
+          page.within('[data-testid="sort-discussion-filter"]') do
+            expect(find('.js-dropdown-text')).to have_content('Newest first')
           end
         end
 

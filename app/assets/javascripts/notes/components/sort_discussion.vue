@@ -50,19 +50,15 @@ export default {
 
 <template>
   <div
-    class="js-sort-discussion-filter-container mr-2 d-inline-block align-bottom full-width-mobile"
+    data-testid="sort-discussion-filter"
+    class="mr-2 d-inline-block align-bottom full-width-mobile"
   >
     <local-storage-sync
       :value="sortDirection"
       :storage-key="storageKey"
       @input="setDiscussionSortDirection"
     />
-    <button
-      id="sort-discussion-filter-dropdown"
-      class="btn btn-sm js-dropdown-text"
-      data-toggle="dropdown"
-      aria-expanded="false"
-    >
+    <button class="btn btn-sm js-dropdown-text" data-toggle="dropdown" aria-expanded="false">
       {{ dropdownText }}
       <gl-icon name="chevron-down" />
     </button>
