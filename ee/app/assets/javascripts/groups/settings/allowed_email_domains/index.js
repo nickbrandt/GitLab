@@ -10,12 +10,9 @@ export default () => {
       CommaSeparatedListTokenSelector,
     },
     data() {
-      const { dataset } = document.querySelector(this.$options.el);
+      const { hiddenInputId, labelId } = document.querySelector(this.$options.el).dataset;
 
-      return {
-        hiddenInputId: dataset.hiddenInputId,
-        labelId: dataset.labelId,
-      };
+      return { hiddenInputId, labelId };
     },
     render(createElement) {
       return createElement('comma-separated-list-token-selector', {
