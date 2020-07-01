@@ -7,7 +7,7 @@ module FeatureFlagIssues
     end
 
     def linkable_issuables(issues)
-      issues.select { |issue| can?(current_user, :read_issue, issue) }
+      Ability.issues_readable_by_user(issues, current_user)
     end
 
     def relate_issuables(referenced_issue)

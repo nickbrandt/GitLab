@@ -323,8 +323,8 @@ RSpec.describe Projects::FeatureFlagIssuesController do
     it 'does not create a link when the user cannot read the issue' do
       feature_flag, issue = setup
       sign_in(developer)
-      allow(Ability).to receive(:allowed?).and_call_original
-      allow(Ability).to receive(:allowed?).with(developer, :read_issue, issue).and_return(false)
+      allow(Ability).to receive(:issues_readable_by_user).and_call_original
+      allow(Ability).to receive(:issues_readable_by_user).with([issue], developer).and_return([])
 
       post_request(project, feature_flag, issue)
 
