@@ -53,5 +53,5 @@
     - if @user_cluster.allow_user_defined_namespace?
       = render('clusters/clusters/namespace', platform_field: platform_kubernetes_field)
 
-  .form-group
+  .form-group.gl-display-flex.gl-justify-content-end
     = field.submit s_('ClusterIntegration|Add Kubernetes cluster'), class: 'btn btn-success', data: { qa_selector: 'add_kubernetes_cluster_button' }

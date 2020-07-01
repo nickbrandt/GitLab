@@ -39,5 +39,5 @@
       = s_('ClusterIntegration| %{custom_domain_start}More information%{custom_domain_end}.').html_safe % { custom_domain_start: custom_domain_start, custom_domain_end: '</a>'.html_safe }
 
   - if can?(current_user, :update_cluster, @cluster)
-    .form-group
+    .form-group.gl-display-flex.gl-justify-content-end
       = field.submit _('Save changes'), class: 'btn btn-success', data: { qa_selector: 'save_changes_button' }
