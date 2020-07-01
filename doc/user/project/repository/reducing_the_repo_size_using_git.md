@@ -40,10 +40,22 @@ To make cloning your project faster, rewrite branches and tags to remove unwante
 
 1. Using `git filter-repo`, purge any files from the history of your repository.
 
-   To purge all large files, the `--strip-blobs-bigger-than` option can be used:
+   To purge large files, the `--strip-blobs-bigger-than` option can be used:
 
    ```shell
    git filter-repo --strip-blobs-bigger-than 10M
+   ```
+
+   To purge large files stored using Git LFS, the `--blob--callback` option can
+   be used:
+
+   ```shell
+   git filter-repo --blob-callback '
+     if blob.data.startswith(b"version https://git-lfs.github.com/spec/v1"):
+       size_in_bytes = int.from_bytes(blob.data[124:], byteorder="big")
+       if size_in_bytes > 10*1000:
+         blob.skip()
+     '
    ```
 
    To purge specific large files by path, the `--path` and `--invert-paths` options can be combined:
