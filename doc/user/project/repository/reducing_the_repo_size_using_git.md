@@ -25,6 +25,10 @@ Rewriting repository history is a destructive operation. Make sure to backup you
 you begin. The best way back up a repository is to
 [export the project](../settings/import_export.md#exporting-a-project-and-its-data).
 
+NOTE: **Note:**
+Git LFS files can only be removed by an Administrator using a [rake task](../../../raketasks/cleanup.html).
+Follow [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/223621) for updates.
+
 ## Purge files from repository history
 
 To make cloning your project faster, rewrite branches and tags to remove unwanted files.
@@ -91,6 +95,12 @@ To make cloning your project faster, rewrite branches and tags to remove unwante
 
    [Protected tags](../protected_tags.md) will cause this to fail. To proceed, you must remove tag
    protection, push, and then re-enable protected tags.
+
+1. Manually run [project housekeeping](../../../administration/housekeeping.html#manual-housekeeping)
+
+NOTE: **Note**
+Project statistics are cached for performance. You may need to wait 5-10 minutes
+to see a reduction in storage utilization.
 
 ## Purge files from GitLab storage
 
@@ -188,6 +198,7 @@ You will receive an email once it has completed.
 
 When using repository cleanup, note:
 
+- Project statistics are cached. You may need to wait 5-10 minutes to see a reduction in storage utilization.
 - Housekeeping prunes loose objects older than 2 weeks. This means objects added in the last 2 weeks
   will not be removed immediately. If you have access to the
   [Gitaly](../../../administration/gitaly/index.md) server, you may run `git gc --prune=now` to
