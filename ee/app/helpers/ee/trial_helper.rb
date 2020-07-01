@@ -14,8 +14,13 @@ module EE
     end
 
     def namespace_options_for_select(selected = nil)
-      groups = current_user.manageable_groups.map { |g| [g.name, g.id] }
-      users = [[current_user.namespace.name, current_user.namespace_id]]
+      groups = current_user.manageable_groups_eligible_for_trial.map { |g| [g.name, g.id] }
+      user_namespace = current_user.namespace
+      users = if user_namespace.gitlab_subscription&.trial?
+                []
+              else
+                [[user_namespace.name, user_namespace.id]]
+              end
 
       grouped_options = {
         'New' => [[_('Create group'), 0]],
