@@ -34,12 +34,19 @@ module QA
         group.add_member(developer_user, Resource::Members::AccessLevel::DEVELOPER)
       end
 
-      it 'allows enforcing and logging in with 2fa' do
+      it 'allows enforcing 2FA via UI and logging in with 2FA' do
         enforce_two_factor_authentication_on_group(group)
 
         enable_two_factor_authentication_for_user(developer_user)
 
         Flow::Login.sign_in(as: developer_user, skip_page_validation: true)
+
+        Page::Main::TwoFactorAuth.perform do |two_fa_auth|
+          two_fa_auth.set_2fa_code('000000')
+          two_fa_auth.click_verify_code_button
+        end
+
+        expect(page).to have_text('Invalid two-factor code')
 
         Page::Main::TwoFactorAuth.perform do |two_fa_auth|
           two_fa_auth.set_2fa_code(@otp.fresh_otp)
@@ -65,6 +72,8 @@ module QA
         @owner_api_client ||= Runtime::API::Client.new(:gitlab, user: owner_user)
       end
 
+      # We are intentionally using the UI to enforce 2FA to exercise the flow with UI.
+      # Any future tests should use the API for this purpose.
       def enforce_two_factor_authentication_on_group(group)
         Flow::Login.while_signed_in(as: owner_user) do
           group.visit!
