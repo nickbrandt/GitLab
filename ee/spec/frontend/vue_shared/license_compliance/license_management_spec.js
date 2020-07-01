@@ -197,32 +197,23 @@ describe('License Management', () => {
         });
       });
 
-      describe('when licenseComplianceDeniesMr feature flag enabled', () => {
-        it('should not show the developer only tooltip', () => {
-          createComponent({
-            state: { isLoadingManagedLicenses: false },
-            isAdmin: true,
-            provide: {
-              glFeatures: { licenseComplianceDeniesMr: true },
-            },
+      describe.each([true, false])(
+        'when licenseComplianceDeniesMr feature flag is %p',
+        ({ licenseComplianceDeniesMr }) => {
+          it('should not show the developer only tooltip', () => {
+            createComponent({
+              state: { isLoadingManagedLicenses: false },
+              isAdmin: false,
+              provide: {
+                glFeatures: { licenseComplianceDeniesMr },
+              },
+            });
+
+            expect(findIcon().exists()).toBe(false);
+            expect(findPopover().exists()).toBe(false);
           });
-
-          expect(findIcon().exists()).toBe(false);
-          expect(findPopover().exists()).toBe(false);
-        });
-      });
-
-      describe('when licenseComplianceDeniesMr feature flag disabled', () => {
-        it('should not show the developer only tooltip', () => {
-          createComponent({
-            state: { isLoadingManagedLicenses: false },
-            isAdmin: true,
-          });
-
-          expect(findIcon().exists()).toBe(false);
-          expect(findPopover().exists()).toBe(false);
-        });
-      });
+        },
+      );
     });
 
     describe('when developer', () => {
@@ -262,10 +253,14 @@ describe('License Management', () => {
         });
       });
 
-      describe.each([true, false])(
-        'when licenseComplianceDeniesMr feature flag is %p',
-        licenseComplianceDeniesMr => {
-          it('should show the developer only tooltip', () => {
+      describe.each`
+        licenseComplianceDeniesMr | should
+        ${true}                   | ${'should'}
+        ${false}                  | ${'shouls not'}
+      `(
+        'when licenseComplianceDeniesMr feature flag is $licenseComplianceDeniesMr',
+        ({ licenseComplianceDeniesMr, should }) => {
+          it(`${should} show the developer only tooltip`, () => {
             createComponent({
               state: { isLoadingManagedLicenses: false },
               isAdmin: false,

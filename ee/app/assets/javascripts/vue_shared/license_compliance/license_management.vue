@@ -3,7 +3,6 @@ import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlButton, GlLoadingIcon, GlIcon, GlPopover } from '@gitlab/ui';
 import { s__ } from '~/locale';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
 import AddLicenseForm from './components/add_license_form.vue';
 import AdminLicenseManagementRow from './components/admin_license_management_row.vue';
@@ -126,7 +125,7 @@ export default {
               <span class="text-secondary">
                 {{ s__('Licenses|Acceptable license to be used in the project') }}</span
               >
-              <h5>{{ __('Denied') }}</h5>
+              <div class="h5">{{ __('Denied') }}</div>
               <span class="text-secondary">
                 {{
                   s__(
