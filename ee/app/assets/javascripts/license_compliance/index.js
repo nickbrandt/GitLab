@@ -11,8 +11,24 @@ export default () => {
     documentationPath,
     readLicensePoliciesEndpoint,
     writeLicensePoliciesEndpoint,
+    projectId,
+    projectPath,
+    rulesPath,
+    settingsPath,
+    approvalsDocumentationPath,
+    lockedApprovalsRuleName,
   } = el.dataset;
-  const store = createStore();
+
+  const storeSettings = {
+    projectId,
+    projectPath,
+    rulesPath,
+    settingsPath,
+    approvalsDocumentationPath,
+    lockedApprovalsRuleName,
+  };
+  const store = createStore(storeSettings);
+
   store.dispatch('licenseManagement/setIsAdmin', Boolean(writeLicensePoliciesEndpoint));
   store.dispatch('licenseManagement/setAPISettings', {
     apiUrlManageLicenses: readLicensePoliciesEndpoint,

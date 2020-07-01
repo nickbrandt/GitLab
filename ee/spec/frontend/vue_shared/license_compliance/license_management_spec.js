@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import LicenseManagement from 'ee/vue_shared/license_compliance/license_management.vue';
@@ -7,6 +7,7 @@ import AdminLicenseManagementRow from 'ee/vue_shared/license_compliance/componen
 import LicenseManagementRow from 'ee/vue_shared/license_compliance/components/license_management_row.vue';
 import AddLicenseForm from 'ee/vue_shared/license_compliance/components/add_license_form.vue';
 import DeleteConfirmationModal from 'ee/vue_shared/license_compliance/components/delete_confirmation_modal.vue';
+import LicenseComplianceApprovals from 'ee/approvals/components/license_compliance/index.vue';
 import { approvedLicense, blacklistedLicense } from './mock_data';
 
 Vue.use(Vuex);
@@ -29,7 +30,7 @@ const PaginatedListMock = {
 
 const noop = () => {};
 
-const createComponent = ({ state, getters, props, actionMocks, isAdmin }) => {
+const createComponent = ({ state, getters, props, actionMocks, isAdmin, options }) => {
   const fakeStore = new Vuex.Store({
     modules: {
       licenseManagement: {
@@ -63,6 +64,7 @@ const createComponent = ({ state, getters, props, actionMocks, isAdmin }) => {
       PaginatedList: PaginatedListMock,
     },
     store: fakeStore,
+    ...options,
   });
 };
 
@@ -124,14 +126,14 @@ describe('License Management', () => {
 
   describe('permission based functionality', () => {
     describe('when admin', () => {
-      it('should invoke `setLicenseAprroval` action on `addLicense` event on form only', () => {
+      it('should invoke `setLicenseApproval` action on `addLicense` event on form only', () => {
         const setLicenseApprovalMock = jest.fn();
         createComponent({
           state: { isLoadingManagedLicenses: false },
           actionMocks: { setLicenseApproval: setLicenseApprovalMock },
           isAdmin: true,
         });
-        wrapper.find(GlDeprecatedButton).vm.$emit('click');
+        wrapper.find(GlButton).vm.$emit('click');
 
         return wrapper.vm.$nextTick().then(() => {
           wrapper.find(AddLicenseForm).vm.$emit('addLicense');
@@ -139,23 +141,44 @@ describe('License Management', () => {
         });
       });
 
+      describe.each([true, false])(
+        'with licenseApprovals feature flag set to "%p"',
+        licenseApprovalsEnabled => {
+          beforeEach(() => {
+            createComponent({
+              state: { isLoadingManagedLicenses: false },
+              isAdmin: true,
+              options: {
+                provide: {
+                  glFeatures: { licenseApprovals: licenseApprovalsEnabled },
+                },
+              },
+            });
+          });
+
+          it('should render the license-approvals section accordingly', () => {
+            expect(wrapper.find(LicenseComplianceApprovals).exists()).toBe(licenseApprovalsEnabled);
+          });
+        },
+      );
+
       describe('when not loading', () => {
         beforeEach(() => {
           createComponent({ state: { isLoadingManagedLicenses: false }, isAdmin: true });
         });
 
         it('should render the form if the form is open and disable the form button', () => {
-          wrapper.find(GlDeprecatedButton).vm.$emit('click');
+          wrapper.find(GlButton).vm.$emit('click');
 
           return wrapper.vm.$nextTick().then(() => {
             expect(wrapper.find(AddLicenseForm).exists()).toBe(true);
-            expect(wrapper.find(GlDeprecatedButton).attributes('disabled')).toBe('true');
+            expect(wrapper.find(GlButton).attributes('disabled')).toBe('true');
           });
         });
 
         it('should not render the form if the form is closed and have active button', () => {
           expect(wrapper.find(AddLicenseForm).exists()).toBe(false);
-          expect(wrapper.find(GlDeprecatedButton).attributes('disabled')).not.toBe('true');
+          expect(wrapper.find(GlButton).attributes('disabled')).not.toBe('true');
         });
 
         it('should render delete confirmation modal', () => {
@@ -168,15 +191,16 @@ describe('License Management', () => {
         });
       });
     });
+
     describe('when developer', () => {
-      it('should not invoke `setLicenseAprroval` action or `addLicense` event on form', () => {
+      it('should not invoke `setLicenseApproval` action or `addLicense` event on form', () => {
         const setLicenseApprovalMock = jest.fn();
         createComponent({
           state: { isLoadingManagedLicenses: false },
           actionMocks: { setLicenseApproval: setLicenseApprovalMock },
           isAdmin: false,
         });
-        expect(wrapper.find(GlDeprecatedButton).exists()).toBe(false);
+        expect(wrapper.find(GlButton).exists()).toBe(false);
         expect(wrapper.find(AddLicenseForm).exists()).toBe(false);
         expect(setLicenseApprovalMock).not.toHaveBeenCalled();
       });
@@ -186,9 +210,13 @@ describe('License Management', () => {
           createComponent({ state: { isLoadingManagedLicenses: false, isAdmin: false } });
         });
 
+        it('should not render the approval section', () => {
+          expect(wrapper.find(LicenseComplianceApprovals).exists()).toBe(false);
+        });
+
         it('should not render the form', () => {
           expect(wrapper.find(AddLicenseForm).exists()).toBe(false);
-          expect(wrapper.find(GlDeprecatedButton).exists()).toBe(false);
+          expect(wrapper.find(GlButton).exists()).toBe(false);
         });
 
         it('should not render delete confirmation modal', () => {

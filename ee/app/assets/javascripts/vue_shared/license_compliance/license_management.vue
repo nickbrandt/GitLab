@@ -1,14 +1,15 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
 import AddLicenseForm from './components/add_license_form.vue';
 import AdminLicenseManagementRow from './components/admin_license_management_row.vue';
 import LicenseManagementRow from './components/license_management_row.vue';
 import DeleteConfirmationModal from './components/delete_confirmation_modal.vue';
 import PaginatedList from '~/vue_shared/components/paginated_list.vue';
-
-import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
+import LicenseApprovals from '../../approvals/components/license_compliance/index.vue';
 
 export default {
   name: 'LicenseManagement',
@@ -17,10 +18,12 @@ export default {
     DeleteConfirmationModal,
     AdminLicenseManagementRow,
     LicenseManagementRow,
-    GlDeprecatedButton,
+    GlButton,
     GlLoadingIcon,
     PaginatedList,
+    LicenseApprovals,
   },
+  mixins: [glFeatureFlagsMixin()],
   data() {
     return {
       formIsOpen: false,
@@ -37,6 +40,9 @@ export default {
       'hasPendingLicenses',
       'isAddingNewLicense',
     ]),
+    hasLicenseApprovals() {
+      return Boolean(this.glFeatures.licenseApprovals);
+    },
     showLoadingSpinner() {
       return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
     },
@@ -82,16 +88,19 @@ export default {
       data-qa-selector="license_compliance_list"
     >
       <template #header>
-        <gl-deprecated-button
-          v-if="isAdmin"
-          class="js-open-form order-1"
-          :disabled="formIsOpen"
-          variant="success"
-          data-qa-selector="license_add_button"
-          @click="openAddLicenseForm"
-        >
-          {{ s__('LicenseCompliance|Add a license') }}
-        </gl-deprecated-button>
+        <div v-if="isAdmin" class="order-1 gl-display-flex gl-align-items-center">
+          <gl-button
+            class="js-open-form"
+            :disabled="formIsOpen"
+            variant="success"
+            data-qa-selector="license_add_button"
+            @click="openAddLicenseForm"
+          >
+            {{ s__('LicenseCompliance|Add a license') }}
+          </gl-button>
+
+          <license-approvals v-if="hasLicenseApprovals" class="gl-ml-3" />
+        </div>
 
         <template v-else>
           <div
