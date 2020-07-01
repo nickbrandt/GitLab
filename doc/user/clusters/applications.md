@@ -814,6 +814,10 @@ postgresql:
   postgresqlPassword: example-postgresql-password
 ```
 
+NOTE: **Note:**
+Support for installing the Sentry managed application is provided by the GitLab Health group.
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Health group](https://about.gitlab.com/handbook/product/product-categories/#health-group).
+
 ### Install PostHog using GitLab CI/CD
 
 [PostHog](https://www.posthog.com) 🦔 is a developer-friendly, open-source product analytics platform.
