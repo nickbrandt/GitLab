@@ -31,31 +31,31 @@ export default {
       return [
         {
           name: s__('UsageQuota|Repositories'),
-          style: this.usageStyle(this.sizePercentage(repositorySize)),
+          style: this.usageStyle(this.barRatio(repositorySize)),
           class: 'gl-bg-data-viz-blue-500',
           size: repositorySize,
         },
         {
           name: s__('UsageQuota|LFS Objects'),
-          style: this.usageStyle(this.sizePercentage(lfsObjectsSize)),
+          style: this.usageStyle(this.barRatio(lfsObjectsSize)),
           class: 'gl-bg-data-viz-orange-600',
           size: lfsObjectsSize,
         },
         {
           name: s__('UsageQuota|Packages'),
-          style: this.usageStyle(this.sizePercentage(packagesSize)),
+          style: this.usageStyle(this.barRatio(packagesSize)),
           class: 'gl-bg-data-viz-aqua-500',
           size: packagesSize,
         },
         {
           name: s__('UsageQuota|Build Artifacts'),
-          style: this.usageStyle(this.sizePercentage(buildArtifactsSize)),
+          style: this.usageStyle(this.barRatio(buildArtifactsSize)),
           class: 'gl-bg-data-viz-green-600',
           size: buildArtifactsSize,
         },
         {
           name: s__('UsageQuota|Wikis'),
-          style: this.usageStyle(this.sizePercentage(wikiSize)),
+          style: this.usageStyle(this.barRatio(wikiSize)),
           class: 'gl-bg-data-viz-magenta-500',
           size: wikiSize,
         },
@@ -68,24 +68,24 @@ export default {
     formatSize(size) {
       return numberToHumanSize(size);
     },
-    usageStyle(percentage) {
-      return { width: `${percentage.toFixed()}%` };
+    usageStyle(ratio) {
+      return { flex: ratio };
     },
-    sizePercentage(size) {
+    barRatio(size) {
       let max = this.rootStorageStatistics.storageSize;
 
       if (this.limit !== 0 && max <= this.limit) {
         max = this.limit;
       }
 
-      return (size / max) * 100;
+      return size / max;
     },
   },
 };
 </script>
 <template>
   <div v-if="storageTypes" class="gl-display-flex gl-flex-direction-column w-100">
-    <div class="gl-h-6 my-3 gl-bg-gray-50 gl-rounded-base">
+    <div class="gl-h-6 gl-my-5 gl-bg-gray-50 gl-rounded-base gl-display-flex">
       <div
         v-for="storageType in storageTypes"
         :key="storageType.name"

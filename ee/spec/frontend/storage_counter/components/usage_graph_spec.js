@@ -16,7 +16,7 @@ function mountComponent({ rootStorageStatistics, limit }) {
 function findStorageTypeUsagesSerialized() {
   return wrapper
     .findAll('[data-testid="storage-type-usage"]')
-    .wrappers.map(wp => wp.element.style.width);
+    .wrappers.map(wp => wp.element.style.flex);
 }
 
 describe('Storage Counter usage graph component', () => {
@@ -93,8 +93,14 @@ describe('Storage Counter usage graph component', () => {
       mountComponent(data);
     });
 
-    it('sets correct width values', () => {
-      expect(findStorageTypeUsagesSerialized()).toStrictEqual(['33%', '27%', '20%', '13%', '7%']);
+    it('sets correct flex values', () => {
+      expect(findStorageTypeUsagesSerialized()).toStrictEqual([
+        '0.3333333333333333',
+        '0.26666666666666666',
+        '0.2',
+        '0.13333333333333333',
+        '0.06666666666666667',
+      ]);
     });
   });
 
@@ -105,7 +111,13 @@ describe('Storage Counter usage graph component', () => {
     });
 
     it('it does render correclty', () => {
-      expect(findStorageTypeUsagesSerialized()).toStrictEqual(['33%', '27%', '20%', '13%', '7%']);
+      expect(findStorageTypeUsagesSerialized()).toStrictEqual([
+        '0.3333333333333333',
+        '0.26666666666666666',
+        '0.2',
+        '0.13333333333333333',
+        '0.06666666666666667',
+      ]);
     });
   });
 });
