@@ -10,7 +10,6 @@ RSpec.describe 'Epic show', :js do
   let_it_be(:label2) { create(:group_label, group: group, title: 'enhancement') }
   let_it_be(:label3) { create(:group_label, group: group, title: 'documentation') }
   let_it_be(:public_issue) { create(:issue, project: public_project) }
-  let_it_be(:note_text) { 'Contemnit enim disserendi elegantiam.' }
   let_it_be(:epic_title) { 'Sample epic' }
 
   let_it_be(:markdown) do
@@ -135,6 +134,46 @@ RSpec.describe 'Epic show', :js do
     it 'shows epic thread filter dropdown' do
       page.within('.js-noteable-awards') do
         expect(find('.js-discussion-filter-container #discussion-filter-dropdown')).to have_content('Show all activity')
+      end
+    end
+
+    describe 'Sort dropdown' do
+      let!(:notes) { create_list(:note, 2, noteable: epic) }
+
+      context 'when sorted by `Oldest first`' do
+        it 'shows label `Oldest first`' do
+          page.within('[data-testid="sort-discussion-filter"]') do
+            expect(find('.js-dropdown-text')).to have_content('Oldest first')
+          end
+        end
+
+        it 'shows comments in the correct order' do
+          items = all('.timeline-entry .timeline-discussion-body p')
+          expect(items[0]).to have_content(notes[0].note)
+          expect(items[1]).to have_content(notes[1].note)
+        end
+      end
+
+      context 'when sorted by `Newest first`' do
+        before do
+          page.within('[data-testid="sort-discussion-filter"]') do
+            find('button').click
+            find('.js-newest-first').click
+            wait_for_requests
+          end
+        end
+
+        it 'shows label `Newest first`' do
+          page.within('[data-testid="sort-discussion-filter"]') do
+            expect(find('.js-dropdown-text')).to have_content('Newest first')
+          end
+        end
+
+        it 'shows comments in the correct order' do
+          items = all('.timeline-entry .timeline-discussion-body p')
+          expect(items[0]).to have_content(notes[1].note)
+          expect(items[1]).to have_content(notes[0].note)
+        end
       end
     end
   end
