@@ -52,6 +52,10 @@ class Geo::BaseRegistry < Geo::TrackingBase
       .limit(batch_size)
   end
 
+  def self.has_create_events?
+    true
+  end
+
   def model_record_id
     read_attribute(self.class::MODEL_FOREIGN_KEY)
   end
