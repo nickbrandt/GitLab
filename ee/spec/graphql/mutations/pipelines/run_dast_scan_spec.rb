@@ -4,11 +4,11 @@ require 'spec_helper'
 
 RSpec.describe Mutations::Pipelines::RunDastScan do
   let(:group) { create(:group) }
-  let(:project) { create(:project, group: group) }
+  let(:project) { create(:project, :repository, group: group) }
   let(:user) { create(:user) }
   let(:project_path) { project.full_path }
   let(:target_url) { FFaker::Internet.uri(:https) }
-  let(:branch) { SecureRandom.hex }
+  let(:branch) { project.default_branch }
   let(:scan_type) { Types::DastScanTypeEnum.enum[:passive] }
 
   subject(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }

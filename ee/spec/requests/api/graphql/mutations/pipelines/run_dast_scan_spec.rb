@@ -5,11 +5,11 @@ require 'spec_helper'
 RSpec.describe 'Running a DAST Scan' do
   include GraphqlHelpers
 
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :repository, creator: current_user) }
   let(:current_user) { create(:user) }
   let(:project_path) { project.full_path }
   let(:target_url) { FFaker::Internet.uri(:https) }
-  let(:branch) { SecureRandom.hex }
+  let(:branch) { project.default_branch }
   let(:scan_type) { Types::DastScanTypeEnum.enum[:passive] }
 
   let(:mutation) do
@@ -58,36 +58,13 @@ RSpec.describe 'Running a DAST Scan' do
         expect(mutation_response['pipelineUrl']).to eq(expected_url)
       end
 
-      context 'when the pipeline could not be created' do
+      context 'when pipeline creation fails' do
         before do
-          allow(Ci::Pipeline).to receive(:create!).and_raise(StandardError)
+          allow_any_instance_of(Ci::Pipeline).to receive(:created_successfully?).and_return(false)
+          allow_any_instance_of(Ci::Pipeline).to receive(:full_error_messages).and_return('error message')
         end
 
-        it_behaves_like 'a mutation that returns errors in the response', errors: ['Pipeline could not be created']
-      end
-
-      context 'when the stage could not be created' do
-        before do
-          allow(Ci::Stage).to receive(:create!).and_raise(StandardError)
-        end
-
-        it_behaves_like 'a mutation that returns errors in the response', errors: ['Stage could not be created']
-      end
-
-      context 'when the build could not be created' do
-        before do
-          allow(Ci::Build).to receive(:create!).and_raise(StandardError)
-        end
-
-        it_behaves_like 'a mutation that returns errors in the response', errors: ['Build could not be created']
-      end
-
-      context 'when the build could not be enqueued' do
-        before do
-          allow_any_instance_of(Ci::Build).to receive(:enqueue!).and_raise(StandardError)
-        end
-
-        it_behaves_like 'a mutation that returns errors in the response', errors: ['Build could not be enqueued']
+        it_behaves_like 'a mutation that returns errors in the response', errors: ['error message']
       end
     end
   end
