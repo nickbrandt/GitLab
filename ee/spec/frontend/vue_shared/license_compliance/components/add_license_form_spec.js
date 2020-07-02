@@ -154,9 +154,10 @@ describe('AddLicenseForm', () => {
       vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
       vm.licenseName = 'FOO';
       Vue.nextTick(() => {
-        const formCheckElement = vm.$el.querySelector('.form-check');
+        const formCheckElements = vm.$el.querySelectorAll('.form-check');
 
-        expect(formCheckElement.element).toMatchSnapshot();
+        expect(formCheckElements[0]).toMatchSnapshot();
+        expect(formCheckElements[1]).toMatchSnapshot();
         done();
       });
     });
