@@ -72,12 +72,12 @@ export default {
             mutation: addProjectToSecurityDashboard,
             variables: { id: project.id },
             update(store, { data: results }) {
-              const data = store.readQuery({
-                query: projectsQuery,
+              const data = store.readQuery({ query: projectsQuery });
+              const newProject = results.addProjectToSecurityDashboard.project;
+              data.instanceSecurityDashboard.projects.nodes.push({
+                ...newProject,
+                vulnerabilitySeveritiesCount: newProject.vulnerabilitySeveritiesCount || null, // This is required to surpress missing field warning in GraphQL.
               });
-              data.instanceSecurityDashboard.projects.nodes.push(
-                results.addProjectToSecurityDashboard.project,
-              );
               store.writeQuery({ query: projectsQuery, data });
             },
           })

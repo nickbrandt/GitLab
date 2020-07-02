@@ -4,7 +4,7 @@ import createFlash from '~/flash';
 import { __, s__ } from '~/locale';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import InstanceSecurityVulnerabilities from './first_class_instance_security_dashboard_vulnerabilities.vue';
-import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
+import VulnerabilitySeverities from 'ee/security_dashboard/components/first_class_vulnerability_severities.vue';
 import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vulnerability_chart.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import projectsQuery from 'ee/security_dashboard/graphql/get_instance_security_dashboard_projects.query.graphql';
@@ -19,7 +19,7 @@ export default {
     CsvExportButton,
     SecurityDashboardLayout,
     InstanceSecurityVulnerabilities,
-    VulnerabilitySeverity,
+    VulnerabilitySeverities,
     VulnerabilityChart,
     Filters,
     GlLoadingIcon,
@@ -32,10 +32,6 @@ export default {
       required: true,
     },
     emptyStateSvgPath: {
-      type: String,
-      required: true,
-    },
-    vulnerableProjectsEndpoint: {
       type: String,
       required: true,
     },
@@ -149,7 +145,7 @@ export default {
         :query="vulnerabilityHistoryQuery"
         class="mb-4"
       />
-      <vulnerability-severity v-if="shouldShowDashboard" :endpoint="vulnerableProjectsEndpoint" />
+      <vulnerability-severities v-if="shouldShowDashboard" :projects="projects" />
     </template>
   </security-dashboard-layout>
 </template>

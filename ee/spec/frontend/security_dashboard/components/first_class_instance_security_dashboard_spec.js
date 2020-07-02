@@ -3,7 +3,7 @@ import { GlButton } from '@gitlab/ui';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import FirstClassInstanceDashboard from 'ee/security_dashboard/components/first_class_instance_security_dashboard.vue';
 import FirstClassInstanceVulnerabilities from 'ee/security_dashboard/components/first_class_instance_security_dashboard_vulnerabilities.vue';
-import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
+import VulnerabilitySeverity from 'ee/security_dashboard/components/first_class_vulnerability_severities.vue';
 import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vulnerability_chart.vue';
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';

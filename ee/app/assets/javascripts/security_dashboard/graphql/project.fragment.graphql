@@ -1,4 +1,8 @@
 fragment Project on Project {
   id
   name
+  nameWithNamespace
+  fullPath
+  avatarUrl
+  path
 }
