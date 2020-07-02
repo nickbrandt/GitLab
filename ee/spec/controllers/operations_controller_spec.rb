@@ -97,15 +97,15 @@ RSpec.describe OperationsController do
 
       let!(:alert_events) do
         [
-          create(:prometheus_alert_event, prometheus_alert: alert1),
-          create(:prometheus_alert_event, prometheus_alert: alert2),
-          create(:prometheus_alert_event, prometheus_alert: alert1),
-          create(:prometheus_alert_event, :resolved, prometheus_alert: alert2)
+          create(:alert_management_alert, prometheus_alert: alert1, project: project, environment: environment),
+          create(:alert_management_alert, prometheus_alert: alert2, project: project, environment: environment),
+          create(:alert_management_alert, prometheus_alert: alert1, project: project, environment: environment),
+          create(:alert_management_alert, :resolved, prometheus_alert: alert2, project: project, environment: environment)
         ]
       end
 
-      let(:firing_alert_events) { alert_events.select(&:firing?) }
-      let(:last_firing_alert) { firing_alert_events.last.prometheus_alert }
+      let(:open_alerts) { alert_events.select(&:triggered?) + alert_events.select(&:acknowledged?) }
+      let(:last_firing_alert) { open_alerts.last.prometheus_alert }
 
       let(:alert_path) do
         metrics_project_environment_path(project, environment)
@@ -135,7 +135,7 @@ RSpec.describe OperationsController do
         expect(expected_project['remove_path'])
           .to eq(remove_operations_project_path(project_id: project.id))
         expect(expected_project['last_deployment']['id']).to eq(deployment.id)
-        expect(expected_project['alert_count']).to eq(firing_alert_events.size)
+        expect(expected_project['alert_count']).to eq(open_alerts.size)
         expect(expected_project['alert_path']).to eq(alert_path)
         expect(expected_project['last_alert']['id']).to eq(last_firing_alert.id)
       end
