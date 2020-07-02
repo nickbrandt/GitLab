@@ -2,6 +2,7 @@
 
 class ElasticCommitIndexerWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
+  include Gitlab::ExclusiveLeaseHelpers
 
   feature_category :global_search
   sidekiq_options retry: 2
@@ -14,6 +15,8 @@ class ElasticCommitIndexerWorker # rubocop:disable Scalability/IdempotentWorker
 
     return true unless project.use_elasticsearch?
 
-    Gitlab::Elastic::Indexer.new(project, wiki: wiki).run(newrev)
+    in_lock("#{self.class.name}/#{project_id}/#{wiki}", ttl: 1.hour, retries: 0) do
+      Gitlab::Elastic::Indexer.new(project, wiki: wiki).run(newrev)
+    end
   end
 end
