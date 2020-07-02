@@ -150,9 +150,6 @@ export default {
     supportsStrategies() {
       return this.glFeatures.featureFlagsNewVersion && this.version === NEW_VERSION_FLAG;
     },
-    canDeleteStrategy() {
-      return this.formStrategies.length > 1;
-    },
     showRelatedIssues() {
       return this.featureFlagIssuesEndpoint.length > 0;
     },
@@ -349,7 +346,6 @@ export default {
             :strategy="strategy"
             :index="index"
             :endpoint="environmentsEndpoint"
-            :can-delete="canDeleteStrategy"
             :user-lists="userLists"
             @change="onFormStrategyChange($event, index)"
             @delete="deleteStrategy(strategy)"
