@@ -23,7 +23,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
 
     using RSpec::Parameterized::TableSyntax
 
-    where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :occurrence_identifiers, :occurrence_pipelines) do
+    where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :occurrence_identifiers, :finding_pipelines) do
       'with SAST report'                | :sast                | 3 | 17 | 33 | 39 | 33
       'with Dependency Scanning report' | :dependency_scanning | 2 | 7  | 4  | 7  | 4
       'with Container Scanning report'  | :container_scanning  | 1 | 8  | 8  | 8  | 8
@@ -46,8 +46,8 @@ RSpec.describe Security::StoreReportService, '#execute' do
         expect { subject }.to change { Vulnerabilities::OccurrenceIdentifier.count }.by(occurrence_identifiers)
       end
 
-      it 'inserts all occurrence pipelines (join model)' do
-        expect { subject }.to change { Vulnerabilities::OccurrencePipeline.count }.by(occurrence_pipelines)
+      it 'inserts all finding pipelines (join model)' do
+        expect { subject }.to change { Vulnerabilities::FindingPipeline.count }.by(finding_pipelines)
       end
 
       it 'inserts all vulnerabilties' do
@@ -119,7 +119,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
     end
 
     it 'inserts all occurrence pipelines (join model) for this new pipeline' do
-      expect { subject }.to change { Vulnerabilities::OccurrencePipeline.where(pipeline: new_pipeline).count }.by(33)
+      expect { subject }.to change { Vulnerabilities::FindingPipeline.where(pipeline: new_pipeline).count }.by(33)
     end
 
     it 'inserts new vulnerabilities with data from findings from this new pipeline' do
