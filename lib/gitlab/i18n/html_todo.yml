@@ -136,22 +136,6 @@
     - "<code>\\\"johnsmith@example.com\\\": \\\"johnsmith@example.com\\\"</code> 은 원래 johnsmith@example.com이 생성한 모든 이슈와 주석에 \\\"By <a href=\\\"#\\\">johnsmith@example.com</a>\\\"을 추가합니다. 기본적으로 이메일 주소 또는 사용자 이름은 가려져 있어서 사용자의 개인정보를 보호합니다. 전체 전자 메일 주소를 표시하려면 이 옵션을 사용하십시오."
     - "<code>\\\"johnsmith@example.com\\\": \\\"johnsmith@example.com\\\"</code> ajoutera « Par <a href=\\\"#\\\">johnsmith@example.com</a> » à tous les tickets et commentaires créés à l’origine par johnsmith@example.com. Par défaut, l’adresse de courriel ou le nom d’utilisateur est masqué pour garantir la confidentialité de l’utilisateur. Utilisez cette option si vous souhaitez afficher l’adresse de courriel complète."
     - "<code>\\\"johnsmith@example.com\\\": \\\"johnsmith@example.com\\\"</code> añadirá \\\"Por <a href=\\\"#\\\">johnsmith@example.com</a>\\\" a todas las incidencias y comentarios originalmente creados por johnsmith@example.com. Por defecto, el correo electrónico o el nombre de usuario está oculto para asegurar la privacidad del usuario. Utilice esta opción si desea mostrar la dirección de correo electrónico completa."
-"<strong>%{group_name}</strong> group members":
-  plural_id:
-  translations:
-    - "<strong>%{group_name}</strong> 群組成員"
-    - "Membros do grupo <strong>%{group_name}</strong>"
-    - "<strong>%{group_name}</strong> グループのメンバー"
-    - "<strong>%{group_name}</strong> 群組的成員"
-    - "Membros do grupo <strong>%{group_name}</strong>"
-    - "<strong>%{group_name}</strong> участников группы"
-    - "<strong>%{group_name}</strong> 群组成员"
-    - "<strong>%{group_name}</strong> користувачі групи"
-    - "<strong>%{group_name}</strong> Gruppenmitglieder"
-    - "<strong>%{group_name}</strong> 그룹 멤버"
-    - "Membres du groupe <strong>%{group_name}</strong>"
-    - "miembros del grupo <strong>%{group_name}</strong>"
-    - "<strong>%{group_name}</strong> grup üyeleri"
 "<strong>%{label_name}</strong> <span>will be permanently deleted from %{subject_name}. This cannot be undone.</span>":
   plural_id:
   translations:
@@ -565,16 +549,6 @@
     - "<p class=\\\"text-tertiary\\\"><a href=\\\"%{docsUrl}\\\">공통 메트릭스</a>가 발견되지 않았습니다.</p>"
     - "<p class=\\\"text-tertiary\\\">Aucune <a href=\\\"%{docsUrl}\\\">métrique commune</a> trouvée</p>"
     - "<p class=\\\"text-tertiary\\\">No se han encontrado<a href=\\\"%{docsUrl}\\\">métricas comunes</a> </p>"
-"Read more about project permissions <strong>%{link_to_help}</strong>":
-  plural_id:
-  translations:
-    - "Saiba mais sobre as permissões do projeto <strong>%{link_to_help}</strong>"
-    - "プロジェクトの権限については <strong>%{link_to_help}</strong> を参照"
-    - "了解有关项目权限的更多信息 <strong>%{link_to_help}</strong>"
-    - "Дізнайтеся більше про права доступу в проекті <strong>%{link_to_help}</strong>"
-    - "Lies mehr über Projektberechtigungen <strong>%{link_to_help}</strong>"
-    - "Pour en savoir plus sur les autorisations de projet : <strong>%{link_to_help}</strong>"
-    - "Lea más sobre los permisos de este proyecto <strong>%{link_to_help}</strong>"
 "SSH host keys are not available on this system. Please use <code>ssh-keyscan</code> command or contact your GitLab administrator for more information.":
   plural_id:
   translations:
@@ -1053,3 +1027,29 @@
     - "设置作业的过期时间。一旦逾期，作业将被归档并且不能重试。留空则永不过期。必须设置为 1 天以上，例如： <code>15 days</code>, <code>1 month</code>,  <code>2 years</code>。"
     - "Встановіть тривалість, протягом якої завдання будуть вважатися застарілими. Як тільки пройде цей час, вони будуть заархівовані і більше не зможуть бути повтореними. Залиште порожнім, щоб завдання ніколи не застарівали. Має бути не менше 1 дня, наприклад: <code>15 днів</code>, <code>1 місяць</code>, <code>2 роки</code>."
     - "Establezca la duración durante la cual los trabajos se considerarán antiguos y vencidos. Una vez pasado ese tiempo, los trabajos se archivarán y ya no se podrá volver a reintentar su ejecución. Establezca este campo como nulo para que los trabajos no caduquen. Este valor, no debe ser inferior a 1 día, por ejemplo: <code>15 días</code>, <code>1 mes</code>, <code>2 años</code>."
+"<strong>%{group_name}</strong> group members":
+  plural_id:
+  translations:
+    - "<strong>%{group_name}</strong> 群組成員"
+    - "Membros do grupo <strong>%{group_name}</strong>"
+    - "<strong>%{group_name}</strong> グループのメンバー"
+    - "<strong>%{group_name}</strong> 群組的成員"
+    - "Membros do grupo <strong>%{group_name}</strong>"
+    - "<strong>%{group_name}</strong> участников группы"
+    - "<strong>%{group_name}</strong> 群组成员"
+    - "<strong>%{group_name}</strong> користувачі групи"
+    - "<strong>%{group_name}</strong> Gruppenmitglieder"
+    - "<strong>%{group_name}</strong> 그룹 멤버"
+    - "Membres du groupe <strong>%{group_name}</strong>"
+    - "miembros del grupo <strong>%{group_name}</strong>"
+    - "<strong>%{group_name}</strong> grup üyeleri"
+"Read more about project permissions <strong>%{link_to_help}</strong>":
+  plural_id:
+  translations:
+    - "Saiba mais sobre as permissões do projeto <strong>%{link_to_help}</strong>"
+    - "プロジェクトの権限については <strong>%{link_to_help}</strong> を参照"
+    - "了解有关项目权限的更多信息 <strong>%{link_to_help}</strong>"
+    - "Дізнайтеся більше про права доступу в проекті <strong>%{link_to_help}</strong>"
+    - "Lies mehr über Projektberechtigungen <strong>%{link_to_help}</strong>"
+    - "Pour en savoir plus sur les autorisations de projet : <strong>%{link_to_help}</strong>"
+    - "Lea más sobre los permisos de este proyecto <strong>%{link_to_help}</strong>"

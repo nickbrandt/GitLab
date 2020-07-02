@@ -405,6 +405,9 @@ msgstr ""
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
 msgstr ""
 
+msgid "%{group_name} group members"
+msgstr ""
+
 msgid "%{group_name} uses group managed accounts. You need to create a new GitLab account which will be managed by %{group_name}."
 msgstr ""
 
@@ -1029,9 +1032,6 @@ msgid "<code>\"johnsmith@example.com\": \"johnsmith@example.com\"</code> will ad
 msgstr ""
 
 msgid "<project name>"
-msgstr ""
-
-msgid "<strong>%{group_name}</strong> group members"
 msgstr ""
 
 msgid "<strong>%{label_name}</strong> <span>will be permanently deleted from %{subject_name}. This cannot be undone.</span>"
@@ -19453,7 +19453,7 @@ msgstr ""
 msgid "Read more"
 msgstr ""
 
-msgid "Read more about project permissions <strong>%{link_to_help}</strong>"
+msgid "Read more about project permissions %{help_link_open}here%{help_link_close}"
 msgstr ""
 
 msgid "Read more about related issues"
@@ -28301,9 +28301,6 @@ msgid "has already been taken"
 msgstr ""
 
 msgid "help"
-msgstr ""
-
-msgid "here"
 msgstr ""
 
 msgid "http:"
