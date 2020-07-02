@@ -74,9 +74,6 @@
     - "< 1 hora"
     - "< 1 saat"
     - "< 1 Stunde"
-"<strong>%{label_name}</strong> <span>will be permanently deleted from %{subject_name}. This cannot be undone.</span>":
-  plural_id:
-  translations:
 "<strong>Deletes</strong> source branch":
   plural_id:
   translations:
@@ -1053,3 +1050,6 @@
     - "회원과 <strong>%{sso_label}</strong> 항목을 공유해 신원 제공 업체를 통해 그룹에 로그인할 수 있도록 합니다."
     - "Partager le <strong>%{sso_label}</strong> avec les membres afin qu’ils puissent se connecter à votre groupe via votre fournisseur d’identité"
     - "Comparta <strong>%{sso_label}</strong> con los diferentes miembros para que puedan iniciar sesión en su grupo a través de su proveedor de identidad"
+"<strong>%{label_name}</strong> <span>will be permanently deleted from %{subject_name}. This cannot be undone.</span>":
+  plural_id:
+  translations:
