@@ -45,21 +45,9 @@ RSpec.describe 'Admin::CredentialsInventory' do
 
     context 'filtering' do
       context 'by Personal Access Tokens' do
-        before do
-          create(:personal_access_token,
-            user: create(:user, name: 'David'),
-            created_at: '2019-12-10',
-            expires_at: nil)
+        let(:credentials_path) { admin_credentials_path(filter: 'personal_access_tokens') }
 
-          visit admin_credentials_path(filter: 'personal_access_tokens')
-        end
-
-        it 'shows details of personal access tokens' do
-          expect(first_row.text).to include('David')
-          expect(first_row.text).to include('api')
-          expect(first_row.text).to include('2019-12-10')
-          expect(first_row.text).to include('Never')
-        end
+        it_behaves_like 'credentials inventory personal access tokens'
       end
 
       context 'by SSH Keys' do
