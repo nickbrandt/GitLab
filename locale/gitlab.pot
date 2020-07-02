@@ -15311,9 +15311,6 @@ msgstr ""
 msgid "No test coverage"
 msgstr ""
 
-msgid "No thanks"
-msgstr ""
-
 msgid "No vulnerabilities present"
 msgstr ""
 
@@ -27554,7 +27551,7 @@ msgstr ""
 msgid "mrWidget|To approve this merge request, please enter your password. This project requires all approvals to be authenticated."
 msgstr ""
 
-msgid "mrWidget|Use %{linkStart}CI pipelines to test your code%{linkEnd}, simply add a GitLab CI configuration file to your project. It only takes a minute to make your code more secure and robust."
+msgid "mrWidget|Use %{linkStart}CI pipelines to test your code%{linkEnd} by simply adding a GitLab CI configuration file to your project. It only takes a minute to make your code more secure and robust."
 msgstr ""
 
 msgid "mrWidget|When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged"
