@@ -141,14 +141,12 @@ RSpec.describe 'Epic show', :js do
       let!(:notes) { create_list(:note, 2, noteable: epic) }
 
       context 'when sorted by `Oldest first`' do
-        it 'shows label `Oldest first`' do
+        it 'shows comments in the correct order' do
           page.within('[data-testid="sort-discussion-filter"]') do
             expect(find('.js-dropdown-text')).to have_content('Oldest first')
           end
-        end
 
-        it 'shows comments in the correct order' do
-          items = all('.timeline-entry .timeline-discussion-body p')
+          items = all('.timeline-entry .timeline-discussion-body .note-text')
           expect(items[0]).to have_content(notes[0].note)
           expect(items[1]).to have_content(notes[1].note)
         end
@@ -163,14 +161,12 @@ RSpec.describe 'Epic show', :js do
           end
         end
 
-        it 'shows label `Newest first`' do
+        it 'shows comments in the correct order' do
           page.within('[data-testid="sort-discussion-filter"]') do
             expect(find('.js-dropdown-text')).to have_content('Newest first')
           end
-        end
 
-        it 'shows comments in the correct order' do
-          items = all('.timeline-entry .timeline-discussion-body p')
+          items = all('.timeline-entry .timeline-discussion-body .note-text')
           expect(items[0]).to have_content(notes[1].note)
           expect(items[1]).to have_content(notes[0].note)
         end
