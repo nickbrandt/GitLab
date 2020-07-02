@@ -3,6 +3,8 @@
 # Make sure we have loaded partitioned models here
 # (even with eager loading disabled).
 
+Gitlab::Database::Partitioning::PartitionCreator.register(AuditEventPartitioned)
+
 begin
   Gitlab::Database::Partitioning::PartitionCreator.new.create_partitions
 rescue ActiveRecord::ActiveRecordError, PG::Error
