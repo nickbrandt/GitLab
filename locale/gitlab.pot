@@ -14799,6 +14799,9 @@ msgstr ""
 msgid "MrDeploymentActions|Stop environment"
 msgstr ""
 
+msgid "Multiple domains are supported."
+msgstr ""
+
 msgid "Multiple issue boards"
 msgstr ""
 
@@ -19478,7 +19481,7 @@ msgstr ""
 msgid "Restrict access by IP address"
 msgstr ""
 
-msgid "Restrict membership by email"
+msgid "Restrict membership by email domain"
 msgstr ""
 
 msgid "Restricts sign-ups for email addresses that match the given regex. See the %{supported_syntax_link_start}supported syntax%{supported_syntax_link_end} for more information."
