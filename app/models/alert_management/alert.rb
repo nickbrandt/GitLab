@@ -145,8 +145,8 @@ module AlertManagement
     end
 
     def self.last_prometheus_alert_by_project_id
-      ids = select(arel_table[:id].maximum.as('id')).group(:project_id).map(&:id)
-      with_prometheus_alert.find(ids)
+      ids = select(arel_table[:id].maximum).group(:project_id)
+      with_prometheus_alert.where(id: ids)
     end
 
     def details

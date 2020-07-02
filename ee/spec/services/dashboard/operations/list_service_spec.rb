@@ -41,7 +41,7 @@ RSpec.describe Dashboard::Operations::ListService do
       it 'ensures a fixed amount of queries' do
         queries = ActiveRecord::QueryRecorder.new { subject }.count
 
-        expect(queries).to eq(8)
+        expect(queries).to eq(7)
       end
     end
 
