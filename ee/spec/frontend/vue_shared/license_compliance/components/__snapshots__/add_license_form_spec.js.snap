@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AddLicenseForm template does not show dropdown descriptions, if licenseComplianceDeniesMr feature flag is disabled 1`] = `undefined`;

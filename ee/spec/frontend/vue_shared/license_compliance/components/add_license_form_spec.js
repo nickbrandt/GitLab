@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { shallowMount } from '@vue/test-utils';
 import LicenseIssueBody from 'ee/vue_shared/license_compliance/components/add_license_form.vue';
 import mountComponent from 'helpers/vue_mount_component_helper';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_compliance/constants';
@@ -11,7 +12,6 @@ describe('AddLicenseForm', () => {
   const findCancelButton = () => vm.$el.querySelector('.js-cancel');
 
   beforeEach(() => {
-    window.gon = { features: { licenseComplianceDeniesMr: false } };
     vm = mountComponent(Component);
   });
 
@@ -123,18 +123,22 @@ describe('AddLicenseForm', () => {
     });
 
     it('shows dropdown descriptions, if licenseComplianceDeniesMr feature flag is enabled', done => {
-      window.gon = { features: { licenseComplianceDeniesMr: true } };
-      vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
-      vm.licenseName = 'FOO';
+      const wrapper = shallowMount(LicenseIssueBody, {
+        propsData: {
+          managedLicenses: [{ name: 'FOO' }],
+        },
+        provide: {
+          glFeatures: { licenseComplianceDeniesMr: true },
+        },
+      });
+
       Vue.nextTick(() => {
-        const feedbackElement = vm.$el.querySelectorAll('.text-secondary');
-        const formCheckElementMargin = vm.$el.querySelector('.form-check.mb-3');
+        const descriptionElement = wrapper.findAll('.text-secondary');
+        const formCheckElementMargin = wrapper.find('.form-check');
 
-        expect(feedbackElement[0].innerText.trim()).toBe(
-          'Acceptable license to be used in the project',
-        );
+        expect(descriptionElement.at(0).text()).toBe('Acceptable license to be used in the project');
 
-        expect(feedbackElement[1].innerText.trim()).toBe(
+        expect(descriptionElement.at(1).text()).toBe(
           'Disallow merge request if detected and will instruct developer to remove',
         );
 
@@ -148,11 +152,9 @@ describe('AddLicenseForm', () => {
       vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
       vm.licenseName = 'FOO';
       Vue.nextTick(() => {
-        const feedbackElement = vm.$el.querySelectorAll('.text-secondary');
-        const formCheckElementMargin = vm.$el.querySelector('.form-check.mb-3');
+        const formCheckElement = vm.$el.querySelector('.form-check');
 
-        expect(feedbackElement.length).toBe(0);
-        expect(formCheckElementMargin).toBeNull();
+        expect(formCheckElement.element).toMatchSnapshot();
         done();
       });
     });
