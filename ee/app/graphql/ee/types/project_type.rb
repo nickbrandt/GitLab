@@ -18,6 +18,12 @@ module EE
               description: 'Vulnerabilities reported on the project',
               resolver: ::Resolvers::VulnerabilitiesResolver
 
+        field :vulnerability_scanners,
+              ::Types::VulnerabilityScannerType.connection_type,
+              null: true,
+              description: 'Vulnerability scanners reported on the project vulnerabilties',
+              resolver: ::Resolvers::Vulnerabilities::ScannersResolver
+
         field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
                description: 'Counts for each severity of vulnerability of the project',
                resolve: -> (obj, _args, ctx) do

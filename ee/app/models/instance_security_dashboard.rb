@@ -32,6 +32,12 @@ class InstanceSecurityDashboard
     Vulnerability.for_projects(projects)
   end
 
+  def vulnerability_scanners
+    return Vulnerabilities::Scanner.none if projects.empty?
+
+    Vulnerabilities::Scanner.for_projects(projects)
+  end
+
   private
 
   attr_reader :project_ids, :user

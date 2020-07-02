@@ -2222,6 +2222,8 @@ Represents a vulnerability scanner.
 | ---   |  ---- | ----------  |
 | `externalId` | String | External ID of the vulnerability scanner |
 | `name` | String | Name of the vulnerability scanner |
+| `reportType` | VulnerabilityReportType | Type of the vulnerability report |
+| `vendor` | String | Vendor of the vulnerability scanner |
 
 ## VulnerabilitySeveritiesCount
 

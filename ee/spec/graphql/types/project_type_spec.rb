@@ -15,7 +15,7 @@ RSpec.describe GitlabSchema.types['Project'] do
 
   it 'includes the ee specific fields' do
     expected_fields = %w[
-      service_desk_enabled service_desk_address vulnerabilities
+      service_desk_enabled service_desk_address vulnerabilities vulnerability_scanners
       requirement_states_count vulnerability_severities_count packages
       compliance_frameworks
     ]
