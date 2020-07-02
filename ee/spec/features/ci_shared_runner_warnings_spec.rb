@@ -6,8 +6,10 @@ RSpec.describe 'CI shared runner limits' do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:user) { create(:user) }
-  let!(:project) { create(:project, :repository, namespace: group, shared_runners_enabled: true) }
+  let(:project) { create(:project, :repository, namespace: group, shared_runners_enabled: true) }
   let(:group) { create(:group) }
+  let(:pipeline) { create(:ci_empty_pipeline, project: project, sha: project.commit.sha, ref: 'master') }
+  let!(:job) { create(:ci_build, pipeline: pipeline) }
 
   before do
     sign_in(user)
@@ -46,6 +48,12 @@ RSpec.describe 'CI shared runner limits' do
 
           expect_quota_exceeded_alert(message)
         end
+
+        it 'displays a warning message on a job page' do
+          visit project_job_path(project, job)
+
+          expect_quota_exceeded_alert(message)
+        end
       end
     end
 
@@ -67,6 +75,12 @@ RSpec.describe 'CI shared runner limits' do
 
         expect_quota_exceeded_alert(message)
       end
+
+      it 'displays a warning message on a job page' do
+        visit project_job_path(project, job)
+
+        expect_quota_exceeded_alert(message)
+      end
     end
 
     context 'when limit not yet exceeded' do
@@ -80,6 +94,12 @@ RSpec.describe 'CI shared runner limits' do
 
       it 'does not display a warning message on pipelines page' do
         visit project_pipelines_path(project)
+
+        expect_no_quota_exceeded_alert
+      end
+
+      it 'displays a warning message on a job page' do
+        visit project_job_path(project, job)
 
         expect_no_quota_exceeded_alert
       end
