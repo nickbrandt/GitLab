@@ -19,7 +19,7 @@ export default {
     UserAvatarLink,
   },
   props: {
-    hasPipelineData: {
+    hasVulnerabilities: {
       type: Boolean,
       required: false,
       default: false,
@@ -85,7 +85,7 @@ export default {
 </script>
 <template>
   <div>
-    <template v-if="hasPipelineData">
+    <template v-if="hasVulnerabilities">
       <div class="card security-dashboard gl-mt-3">
         <div class="card-header border-bottom-0">
           <span class="js-security-dashboard-left">

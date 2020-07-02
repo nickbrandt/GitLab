@@ -92,9 +92,7 @@ RSpec.describe ProjectsHelper do
     let_it_be(:group) { create(:group) }
     let_it_be(:project) { create(:project, :repository, group: group) }
 
-    let(:pipeline) { nil }
-
-    subject { helper.project_security_dashboard_config(project, pipeline) }
+    subject { helper.project_security_dashboard_config(project) }
 
     before do
       group.add_owner(user)
@@ -104,6 +102,7 @@ RSpec.describe ProjectsHelper do
     context 'project without vulnerabilities' do
       let(:expected_value) do
         {
+          has_vulnerabilities: 'false',
           empty_state_svg_path: start_with('/assets/illustrations/security-dashboard_empty'),
           security_dashboard_help_path: '/help/user/application_security/security_dashboard/index'
         }
@@ -117,12 +116,14 @@ RSpec.describe ProjectsHelper do
         create(:vulnerability, project: project)
       end
 
-      let(:expected_core_values) do
-        hash_including(
+      let(:expected_values) do
+        {
+          has_vulnerabilities: 'true',
           project: { id: project.id, name: project.name },
           project_full_path: project.full_path,
           vulnerabilities_endpoint: "/#{project.full_path}/-/security/vulnerability_findings",
           vulnerabilities_summary_endpoint: "/#{project.full_path}/-/security/vulnerability_findings/summary",
+          vulnerabilities_export_endpoint: "/api/v4/security/projects/#{project.id}/vulnerability_exports",
           vulnerability_feedback_help_path: '/help/user/application_security/index#interacting-with-the-vulnerabilities',
           empty_state_svg_path: start_with('/assets/illustrations/security-dashboard-empty-state'),
           dashboard_documentation: '/help/user/application_security/security_dashboard/index',
@@ -130,51 +131,10 @@ RSpec.describe ProjectsHelper do
           user_callouts_path: '/-/user_callouts',
           user_callout_id: 'standalone_vulnerabilities_introduction_banner',
           show_introduction_banner: 'true'
-        )
+        }
       end
 
-      it { is_expected.to match(expected_core_values) }
-
-      context 'project without pipeline' do
-        let(:expected_sub_hash) do
-          hash_including(
-            has_pipeline_data: 'false'
-          )
-        end
-
-        it { is_expected.to match(expected_sub_hash) }
-      end
-
-      context 'project with pipeline' do
-        let_it_be(:pipeline) do
-          create(:ee_ci_pipeline,
-                 :with_sast_report,
-                 user: user,
-                 project: project,
-                 ref: project.default_branch,
-                 sha: project.commit.sha)
-        end
-
-        let(:project_path) { "http://test.host/#{project.full_path}" }
-        let(:expected_sub_hash) do
-          hash_including(
-            pipeline_id: pipeline.id,
-            user_path: "http://test.host/#{pipeline.user.username}",
-            user_avatar_path: pipeline.user.avatar_url,
-            user_name: pipeline.user.name,
-            commit_id: pipeline.commit.short_id,
-            commit_path: "#{project_path}/-/commit/#{pipeline.commit.sha}",
-            ref_id: project.default_branch,
-            ref_path: "#{project_path}/-/commits/#{project.default_branch}",
-            pipeline_path: "#{project_path}/-/pipelines/#{pipeline.id}",
-            pipeline_created: pipeline.created_at.to_s(:iso8601),
-            has_pipeline_data: 'true',
-            vulnerabilities_export_endpoint: "/api/v4/security/projects/#{project.id}/vulnerability_exports"
-          )
-        end
-
-        it { is_expected.to match(expected_sub_hash) }
-      end
+      it { is_expected.to match(expected_values) }
     end
   end
 

@@ -51,9 +51,9 @@ describe('First class Project Security Dashboard component', () => {
     wrapper = null;
   });
 
-  describe('on render when pipeline has data', () => {
+  describe('on render when there are vulnerabilities', () => {
     beforeEach(() => {
-      createComponent({ props: { hasPipelineData: true } });
+      createComponent({ props: { hasVulnerabilities: true } });
     });
 
     it('should render the vulnerabilities', () => {
@@ -89,7 +89,7 @@ describe('First class Project Security Dashboard component', () => {
     beforeEach(() => {
       mockAxios = new MockAdapter(axios);
       mockAxios.onPost(props.userCalloutsPath, { feature_name: props.userCalloutId }).reply(200);
-      createComponent({ props: { hasPipelineData: true, showIntroductionBanner: true } });
+      createComponent({ props: { hasVulnerabilities: true, showIntroductionBanner: true } });
     });
 
     afterEach(() => {
@@ -125,7 +125,7 @@ describe('First class Project Security Dashboard component', () => {
   describe('when user already dismissed the banner in the past', () => {
     beforeEach(() => {
       Cookies.set(BANNER_COOKIE_KEY, 'true');
-      createComponent({ props: { hasPipelineData: true, showIntroductionBanner: true } });
+      createComponent({ props: { hasVulnerabilities: true, showIntroductionBanner: true } });
     });
 
     afterEach(() => {
@@ -141,7 +141,7 @@ describe('First class Project Security Dashboard component', () => {
     beforeEach(() => {
       createComponent({
         props: {
-          hasPipelineData: true,
+          hasVulnerabilities: true,
         },
         data() {
           return { filters };
@@ -154,11 +154,11 @@ describe('First class Project Security Dashboard component', () => {
     });
   });
 
-  describe('when pipeline has no data', () => {
+  describe('when there is no vulnerability', () => {
     beforeEach(() => {
       createComponent({
         props: {
-          hasPipelineData: false,
+          hasVulnerabilities: false,
         },
       });
     });

@@ -22,7 +22,7 @@ describe('Project Security Dashboard component', () => {
       store: createStore(),
       stubs: ['security-dashboard-table'],
       propsData: {
-        hasPipelineData: true,
+        hasVulnerabilities: true,
         emptyStateSvgPath: `${TEST_HOST}/img`,
         securityDashboardHelpPath: `${TEST_HOST}/help_dashboard`,
         commit: {
@@ -108,7 +108,7 @@ describe('Project Security Dashboard component', () => {
 
   describe('Empty State renders correctly', () => {
     beforeEach(() => {
-      createComponent({ hasPipelineData: false });
+      createComponent({ hasVulnerabilities: false });
     });
 
     it('renders empty state component with correct props', () => {
