@@ -399,9 +399,13 @@ class Issue < ApplicationRecord
     end
   end
 
-  # Returns `true` if this Issue is visible to everybody.
+  # Returns `true` if this Issue is visible to everybody at the time of the change
   def publicly_visible?
-    project.public? && !confidential? && !::Gitlab::ExternalAuthorization.enabled?
+    project.public? && !(confidential_without_changes) && !::Gitlab::ExternalAuthorization.enabled?
+  end
+
+  def confidential_without_changes
+    confidential_changed? ? confidential_was : confidential?
   end
 
   def expire_etag_cache

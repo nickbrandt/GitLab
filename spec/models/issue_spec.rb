@@ -939,9 +939,10 @@ RSpec.describe Issue do
     where(:visibility_level, :confidential, :new_attributes, :check_for_spam?) do
       Gitlab::VisibilityLevel::PUBLIC   | false | { description: 'woo' } | true
       Gitlab::VisibilityLevel::PUBLIC   | false | { title: 'woo' } | true
-      Gitlab::VisibilityLevel::PUBLIC   | true  | { confidential: false } | true
+      Gitlab::VisibilityLevel::PUBLIC   | true  | { confidential: false } | false
+      Gitlab::VisibilityLevel::PUBLIC   | false | { confidential: true } | true
       Gitlab::VisibilityLevel::PUBLIC   | true  | { description: 'woo' } | false
-      Gitlab::VisibilityLevel::PUBLIC   | false | { title: 'woo', confidential: true } | false
+      Gitlab::VisibilityLevel::PUBLIC   | false | { title: 'woo', confidential: true } | true
       Gitlab::VisibilityLevel::PUBLIC   | false | { description: 'original description' } | false
       Gitlab::VisibilityLevel::INTERNAL | false | { description: 'woo' } | false
       Gitlab::VisibilityLevel::PRIVATE  | false | { description: 'woo' } | false
