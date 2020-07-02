@@ -36,10 +36,6 @@ describe('PathNavigation', () => {
     wrapper = null;
   });
 
-  it('matches snapshot', () => {
-    expect(wrapper.element).toMatchSnapshot();
-  });
-
   describe('displays correctly', () => {
     it('has the correct props', () => {
       expect(wrapper.find(GlPath).props('items')).toMatchObject(transformedStagePathData);
