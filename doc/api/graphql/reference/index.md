@@ -545,6 +545,7 @@ Aggregated summary of changes
 | `additions` | Int! | Number of lines added |
 | `changes` | Int! | Number of lines changed |
 | `deletions` | Int! | Number of lines deleted |
+| `fileCount` | Int! | Number of files changed |
 
 ## Discussion
 
