@@ -104,13 +104,6 @@
     - "Vous êtes sur le point de supprimer ce badge. Les badges supprimés <strong>ne peuvent pas</strong> être restaurés."
     - "Va a eliminar esta insignia. Las insignias eliminadas <strong>no se pueden</strong> restaurar."
     - "Bu rozeti sileceksiniz. Silinen rozetler geri <strong>yüklenemez</strong>."
-"BillingPlans|Your GitLab.com %{plan} trial will <strong>expire after %{expiration_date}</strong>. You can retain access to the %{plan} features by upgrading below.":
-  plural_id:
-  translations:
-    - "GitLab.com の %{plan} の試用版は、<strong>%{expiration_date}後に有効期限が切れます</strong>。 以下をアップグレードして、%{plan} の機能へのアクセスをそのままにできます。"
-    - "您的GitLab.com%{plan}试用将在<strong>%{expiration_date}过期</strong>。您可以通过以下方式升级以保留对%{plan}功能的访问权限。"
-    - "Ваш пробний період використання GitLab.com %{plan} закінчується <strong>%{expiration_date}</strong>. Ви можете зберегти доступ до функцій %{plan} шляхом оновленням нижче."
-    - "Su periodo de prueba de GitLab.com %{plan} <strong>caducará después del %{expiration_date}</strong>. Puede conservar el acceso a las %{plan} funciones actualizando la versión %{plan} de GitLab.com a continuación."
 "Branch <strong>%{branch_name}</strong> was created. To set up auto deploy, choose a GitLab CI Yaml template and commit your changes. %{link_to_autodeploy_doc}":
   plural_id:
   translations:
@@ -1053,3 +1046,10 @@
 "<strong>%{label_name}</strong> <span>will be permanently deleted from %{subject_name}. This cannot be undone.</span>":
   plural_id:
   translations:
+"BillingPlans|Your GitLab.com %{plan} trial will <strong>expire after %{expiration_date}</strong>. You can retain access to the %{plan} features by upgrading below.":
+  plural_id:
+  translations:
+    - "GitLab.com の %{plan} の試用版は、<strong>%{expiration_date}後に有効期限が切れます</strong>。 以下をアップグレードして、%{plan} の機能へのアクセスをそのままにできます。"
+    - "您的GitLab.com%{plan}试用将在<strong>%{expiration_date}过期</strong>。您可以通过以下方式升级以保留对%{plan}功能的访问权限。"
+    - "Ваш пробний період використання GitLab.com %{plan} закінчується <strong>%{expiration_date}</strong>. Ви можете зберегти доступ до функцій %{plan} шляхом оновленням нижче."
+    - "Su periodo de prueba de GitLab.com %{plan} <strong>caducará después del %{expiration_date}</strong>. Puede conservar el acceso a las %{plan} funciones actualizando la versión %{plan} de GitLab.com a continuación."
