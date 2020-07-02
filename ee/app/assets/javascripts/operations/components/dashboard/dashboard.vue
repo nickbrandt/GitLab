@@ -118,6 +118,7 @@ export default {
       :ok-title="s__('OperationsDashboard|Add projects')"
       :ok-disabled="okDisabled"
       ok-variant="success"
+      data-qa-selector="add_projects_modal"
       @cancel="onCancel"
       @ok="onOk"
     >
@@ -146,6 +147,7 @@ export default {
         variant="success"
         category="primary"
         data-testid="add-projects-button"
+        data-qa-selector="add_projects_button"
       >
         {{ s__('OperationsDashboard|Add projects') }}
       </gl-button>
@@ -185,6 +187,7 @@ export default {
             v-gl-modal="$options.modalId"
             variant="success"
             data-testid="add-projects-button"
+            data-qa-selector="add_projects_button"
           >
             {{ s__('OperationsDashboard|Add projects') }}
           </gl-button>
