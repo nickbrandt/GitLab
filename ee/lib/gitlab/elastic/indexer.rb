@@ -109,8 +109,9 @@ module Gitlab
           'SSL_CERT_DIR'            => OpenSSL::X509::DEFAULT_CERT_DIR
         }
 
-        # Users can override default SSL certificate path via these envs
-        %w(SSL_CERT_FILE SSL_CERT_DIR).each_with_object(vars) do |key, hash|
+        # Users can override default SSL certificate path via SSL_CERT_FILE SSL_CERT_DIR
+        # AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is used in AWS ECS to get credentials when making AWS API calls
+        %w(SSL_CERT_FILE SSL_CERT_DIR AWS_CONTAINER_CREDENTIALS_RELATIVE_URI).each_with_object(vars) do |key, hash|
           hash[key] = ENV[key] if ENV.key?(key)
         end
       end
