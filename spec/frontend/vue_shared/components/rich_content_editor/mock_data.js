@@ -19,9 +19,7 @@ const buildMockTextNodeWithAdjacentInlineCode = isForward => {
       type: 'code',
       [direction]: {
         literal: isForward ? literalClose : literalOpen,
-        [direction]: {
-          literal: null,
-        },
+        [direction]: null,
       },
     },
   };
