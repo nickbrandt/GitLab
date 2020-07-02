@@ -179,6 +179,16 @@ module API
       mount ::API::ResourceLabelEvents
       mount ::API::ResourceMilestoneEvents
       mount ::API::NotificationSettings
+      mount ::API::ProjectPackages
+      mount ::API::GroupPackages
+      mount ::API::PackageFiles
+      mount ::API::NugetPackages
+      mount ::API::PypiPackages
+      mount ::API::ComposerPackages
+      mount ::API::ConanPackages
+      mount ::API::MavenPackages
+      mount ::API::NpmPackages
+      mount ::API::GoProxy
       mount ::API::Pages
       mount ::API::PagesDomains
       mount ::API::ProjectClusters
