@@ -6,17 +6,20 @@ export default () => {
 
   if (!container) return;
 
-  const { groupFullPath } = container.dataset;
+  const { groupFullPath, groupName, reportPagesPath } = container.dataset;
+  const { reportPages: enableReportPages } = gon?.features;
 
   // eslint-disable-next-line no-new
   new Vue({
     el: container,
+    provide: {
+      groupFullPath,
+      groupName,
+      reportPagesPath,
+      enableReportPages,
+    },
     render(h) {
-      return h(GroupActivityCard, {
-        props: {
-          groupFullPath,
-        },
-      });
+      return h(GroupActivityCard);
     },
   });
 };

@@ -1,11 +1,12 @@
 <script>
-import { GlCard, GlSkeletonLoading } from '@gitlab/ui';
+import { GlCard, GlSkeletonLoading, GlLink } from '@gitlab/ui';
 
 export default {
   name: 'MetricCard',
   components: {
     GlCard,
     GlSkeletonLoading,
+    GlLink,
   },
   props: {
     title: {
@@ -45,7 +46,10 @@ export default {
           ref="metricItem"
           class="js-metric-card-item flex-grow text-center"
         >
-          <h3 class="my-2">{{ valueText(metric) }}</h3>
+          <gl-link v-if="metric.link" :href="metric.link">
+            <h3 class="gl-my-2 gl-text-blue-700">{{ valueText(metric) }}</h3>
+          </gl-link>
+          <h3 v-else class="gl-my-2">{{ valueText(metric) }}</h3>
           <p class="text-secondary gl-font-sm mb-2">{{ metric.label }}</p>
         </div>
       </div>

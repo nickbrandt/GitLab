@@ -2,26 +2,27 @@
 import Api from 'ee/api';
 import { __, s__ } from '~/locale';
 import createFlash from '~/flash';
+import { mergeUrlParams } from '~/lib/utils/url_utility';
 import MetricCard from '../../shared/components/metric_card.vue';
+
+const ENABLED_REPORT_PAGES = ['mergeRequests'];
 
 export default {
   name: 'GroupActivityCard',
   components: {
     MetricCard,
   },
-  props: {
-    groupFullPath: {
-      type: String,
-      required: true,
-    },
-  },
+  inject: ['groupFullPath', 'groupName', 'reportPagesPath', 'enableReportPages'],
   data() {
     return {
       isLoading: false,
       metrics: {
-        mergeRequests: { value: null, label: s__('GroupActivyMetrics|Merge Requests created') },
-        issues: { value: null, label: s__('GroupActivyMetrics|Issues created') },
-        newMembers: { value: null, label: s__('GroupActivityMetrics|New Members created') },
+        mergeRequests: {
+          value: null,
+          label: s__('GroupActivityMetrics|Merge Requests opened'),
+        },
+        issues: { value: null, label: s__('GroupActivityMetrics|Issues opened') },
+        newMembers: { value: null, label: s__('GroupActivityMetrics|Members added') },
       },
     };
   },
@@ -33,6 +34,7 @@ export default {
           key,
           value,
           label,
+          link: this.generateReportPageLink(key),
         };
       });
     },
@@ -60,13 +62,27 @@ export default {
           this.isLoading = false;
         });
     },
+    displayReportLink(key) {
+      return this.enableReportPages && ENABLED_REPORT_PAGES.includes(key);
+    },
+    generateReportPageLink(key) {
+      return this.displayReportLink(key)
+        ? mergeUrlParams(
+            {
+              groupPath: this.groupFullPath,
+              groupName: this.groupName,
+            },
+            this.reportPagesPath,
+          )
+        : null;
+    },
   },
 };
 </script>
 
 <template>
   <metric-card
-    :title="s__('GroupActivyMetrics|Recent activity (last 90 days)')"
+    :title="s__('GroupActivityMetrics|Recent activity (last 90 days)')"
     :metrics="metricsArray"
     :is-loading="isLoading"
   />
