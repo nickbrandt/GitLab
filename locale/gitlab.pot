@@ -10280,6 +10280,9 @@ msgstr ""
 msgid "Generate new export"
 msgstr ""
 
+msgid "GenericReports|Report"
+msgstr ""
+
 msgid "Geo"
 msgstr ""
 
@@ -11234,16 +11237,16 @@ msgstr ""
 msgid "Group: %{name}"
 msgstr ""
 
-msgid "GroupActivityMetrics|New Members created"
+msgid "GroupActivityMetrics|Issues opened"
 msgstr ""
 
-msgid "GroupActivyMetrics|Issues created"
+msgid "GroupActivityMetrics|Members added"
 msgstr ""
 
-msgid "GroupActivyMetrics|Merge Requests created"
+msgid "GroupActivityMetrics|Merge Requests opened"
 msgstr ""
 
-msgid "GroupActivyMetrics|Recent activity (last 90 days)"
+msgid "GroupActivityMetrics|Recent activity (last 90 days)"
 msgstr ""
 
 msgid "GroupImport|Failed to import group."

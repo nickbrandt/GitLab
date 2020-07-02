@@ -3,7 +3,7 @@ import { GlSkeletonLoading } from '@gitlab/ui';
 import MetricCard from 'ee/analytics/shared/components/metric_card.vue';
 
 const metrics = [
-  { key: 'first_metric', value: 10, label: 'First metric', unit: 'days' },
+  { key: 'first_metric', value: 10, label: 'First metric', unit: 'days', link: 'some_link' },
   { key: 'second_metric', value: 20, label: 'Yet another metric' },
   { key: 'third_metric', value: null, label: 'Null metric without value', unit: 'parsecs' },
   { key: 'fourth_metric', value: '-', label: 'Metric without value', unit: 'parsecs' },
@@ -75,18 +75,23 @@ describe('MetricCard', () => {
       });
 
       describe.each`
-        columnIndex | label                          | value  | unit
-        ${0}        | ${'First metric'}              | ${10}  | ${' days'}
-        ${1}        | ${'Yet another metric'}        | ${20}  | ${''}
-        ${2}        | ${'Null metric without value'} | ${'-'} | ${''}
-        ${3}        | ${'Metric without value'}      | ${'-'} | ${''}
-      `('metric columns', ({ columnIndex, label, value, unit }) => {
-        it(`renders ${value}${unit} ${label}`, () => {
-          expect(
-            findMetricItem()
-              .at(columnIndex)
-              .text(),
-          ).toEqual(`${value}${unit} ${label}`);
+        columnIndex | label                          | value  | unit       | link
+        ${0}        | ${'First metric'}              | ${10}  | ${' days'} | ${'some_link'}
+        ${1}        | ${'Yet another metric'}        | ${20}  | ${''}      | ${null}
+        ${2}        | ${'Null metric without value'} | ${'-'} | ${''}      | ${null}
+        ${3}        | ${'Metric without value'}      | ${'-'} | ${''}      | ${null}
+      `('metric columns', ({ columnIndex, label, value, unit, link }) => {
+        it(`renders ${value}${unit} ${label} with URL ${link}`, () => {
+          const allMetricItems = findMetricItem();
+          const metricItem = allMetricItems.at(columnIndex);
+
+          expect(metricItem.text()).toBe(`${value}${unit} ${label}`);
+
+          if (link) {
+            expect(metricItem.find('a').attributes('href')).toBe(link);
+          } else {
+            expect(metricItem.find('a').exists()).toBe(false);
+          }
         });
       });
     });

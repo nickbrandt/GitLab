@@ -7,9 +7,11 @@ import MetricCard from 'ee/analytics/shared/components/metric_card.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 
 const TEST_GROUP_ID = 'gitlab-org';
+const TEST_GROUP_NAME = 'Gitlab Org';
 const TEST_MERGE_REQUESTS_COUNT = { data: { merge_requests_count: 10 } };
 const TEST_ISSUES_COUNT = { data: { issues_count: 20 } };
 const TEST_NEW_MEMBERS_COUNT = { data: { new_members_count: 30 } };
+const REPORT_PAGES_PATH = 'report_pages';
 
 describe('GroupActivity component', () => {
   let wrapper;
@@ -17,8 +19,11 @@ describe('GroupActivity component', () => {
 
   const createComponent = () => {
     wrapper = mount(GroupActivityCard, {
-      propsData: {
+      provide: {
         groupFullPath: TEST_GROUP_ID,
+        groupName: TEST_GROUP_NAME,
+        reportPagesPath: REPORT_PAGES_PATH,
+        enableReportPages: false,
       },
     });
   };
@@ -85,9 +90,9 @@ describe('GroupActivity component', () => {
       .then(waitForPromises)
       .then(() => {
         expect(findMetricCard().props('metrics')).toEqual([
-          { key: 'mergeRequests', value: 10, label: 'Merge Requests created' },
-          { key: 'issues', value: 20, label: 'Issues created' },
-          { key: 'newMembers', value: 30, label: 'New Members created' },
+          { key: 'mergeRequests', value: 10, label: 'Merge Requests opened', link: null },
+          { key: 'issues', value: 20, label: 'Issues opened', link: null },
+          { key: 'newMembers', value: 30, label: 'Members added', link: null },
         ]);
       });
   });

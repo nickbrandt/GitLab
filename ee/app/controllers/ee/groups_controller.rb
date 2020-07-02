@@ -13,6 +13,10 @@ module EE
       before_action only: :issues do
         push_frontend_feature_flag(:scoped_labels, @group)
       end
+
+      before_action only: :show do
+        push_frontend_feature_flag(:report_pages)
+      end
     end
 
     override :render_show_html
