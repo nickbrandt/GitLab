@@ -19,7 +19,8 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
   before_action :ensure_pipeline, only: [:show]
 
-  before_action :ensure_valid_scope, only: [:index]
+  # Will be removed with https://gitlab.com/gitlab-org/gitlab/-/issues/225596
+  before_action :redirect_for_legacy_scope_filter, only: [:index], if: -> { request.format.html? }
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show]
 
@@ -225,8 +226,10 @@ class Projects::PipelinesController < Projects::ApplicationController
     render_404 unless pipeline
   end
 
-  def ensure_valid_scope
-    redirect_to project_pipelines_path(project, status: params[:scope]) if %w[running pending].include?(params[:scope])
+  def redirect_for_legacy_scope_filter
+    return unless %w[running pending].include?(params[:scope])
+
+    redirect_to url_for(safe_params.except(:scope).merge(status: safe_params[:scope])), status: :moved_permanently
   end
 
   # rubocop: disable CodeReuse/ActiveRecord

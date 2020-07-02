@@ -119,11 +119,11 @@ RSpec.describe Projects::PipelinesController do
       end
     end
 
-    context 'when scope is pending or running' do
+    context 'when user tries to access legacy scope via URL' do
       it 'redirects to all pipelines with that status instead' do
-        get_pipelines_index_json(scope: 'running')
+        get_pipelines_index_html(scope: 'running')
 
-        expect(response).to redirect_to(project_pipelines_path(project, status: 'running'))
+        expect(response).to redirect_to(project_pipelines_path(project, status: 'running', format: :html))
       end
     end
 
@@ -217,6 +217,14 @@ RSpec.describe Projects::PipelinesController do
           check_pipeline_response(returned: 6, all: 6)
         end
       end
+    end
+
+    def get_pipelines_index_html(params = {})
+      get :index, params: {
+                    namespace_id: project.namespace,
+                    project_id: project
+                  }.merge(params),
+                  format: :html
     end
 
     def get_pipelines_index_json(params = {})
