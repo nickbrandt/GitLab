@@ -52,6 +52,16 @@ export const generateVulnerabilities = () => [
       nameWithNamespace: 'Mixed Vulnerabilities / Rails App',
     },
   },
+  {
+    id: 'id_4',
+    title: 'Vulnerability 4',
+    severity: 'critical',
+    state: 'dismissed',
+    location: {},
+    project: {
+      nameWithNamespace: 'Administrator / Security reports',
+    },
+  },
 ];
 
 export const vulnerabilities = generateVulnerabilities();
