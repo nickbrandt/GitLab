@@ -141,7 +141,7 @@ enables verbose output from Clair by setting the `CLAIR_OUTPUT` environment vari
 
 ```yaml
 include:
-  template: Container-Scanning.gitlab-ci.yml
+  - template: Container-Scanning.gitlab-ci.yml
 
 variables:
   CLAIR_OUTPUT: High
@@ -184,7 +184,7 @@ specify any additional keys. For example:
 
 ```yaml
 include:
-  template: Container-Scanning.gitlab-ci.yml
+  - template: Container-Scanning.gitlab-ci.yml
 
 container_scanning:
   variables:
