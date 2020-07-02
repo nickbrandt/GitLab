@@ -18,11 +18,7 @@ RSpec.describe API::ProjectPackages do
 
     subject { get api(url) }
 
-    context 'packages feature enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'project is public' do
         it_behaves_like 'returns packages', :project, :no_type
       end
@@ -109,18 +105,6 @@ RSpec.describe API::ProjectPackages do
         end
       end
     end
-
-    context 'packages feature disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it 'returns 403' do
-        get api(url, user)
-
-        expect(response).to have_gitlab_http_status(:forbidden)
-      end
-    end
   end
 
   describe 'GET /projects/:id/packages/:package_id' do
@@ -142,11 +126,7 @@ RSpec.describe API::ProjectPackages do
       end
     end
 
-    context 'packages feature enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'project is public' do
         it 'returns 200 and the package information' do
           subject
@@ -222,26 +202,10 @@ RSpec.describe API::ProjectPackages do
         end
       end
     end
-
-    context 'packages feature disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it 'returns 403' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:forbidden)
-      end
-    end
   end
 
   describe 'DELETE /projects/:id/packages/:package_id' do
-    context 'packages feature enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'project is public' do
         it 'returns 403 for non authenticated user' do
           delete api(package_url)
@@ -302,18 +266,6 @@ RSpec.describe API::ProjectPackages do
 
           expect(response).to have_gitlab_http_status(:no_content)
         end
-      end
-    end
-
-    context 'packages feature disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it 'returns 403' do
-        delete api(package_url, user)
-
-        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end
