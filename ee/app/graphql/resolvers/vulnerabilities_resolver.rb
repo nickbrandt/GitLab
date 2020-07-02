@@ -29,7 +29,7 @@ module Resolvers
     def resolve(**args)
       return Vulnerability.none unless vulnerable
 
-      vulnerabilities(args).with_findings.ordered
+      vulnerabilities(args).with_findings_and_scanner.ordered
     end
 
     private

@@ -37,7 +37,7 @@ RSpec.describe ProjectPolicy do
     let(:additional_developer_permissions) do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
-        read_vulnerability create_vulnerability create_vulnerability_export admin_vulnerability
+        read_vulnerability read_vulnerability_scanner create_vulnerability create_vulnerability_export admin_vulnerability
         admin_vulnerability_issue_link read_merge_train
       ]
     end
@@ -53,7 +53,7 @@ RSpec.describe ProjectPolicy do
         read_pipeline read_build read_commit_status read_container_image
         read_environment read_deployment read_merge_request read_pages
         create_merge_request_in award_emoji
-        read_project_security_dashboard read_vulnerability
+        read_project_security_dashboard read_vulnerability read_vulnerability_scanner
         read_software_license_policy
         read_threat_monitoring read_merge_train
       ]

@@ -257,7 +257,10 @@ module EE
 
       rule { can?(:read_project) & iterations_available }.enable :read_iteration
 
-      rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
+      rule { security_dashboard_enabled & can?(:developer_access) }.policy do
+        enable :read_vulnerability
+        enable :read_vulnerability_scanner
+      end
 
       rule { on_demand_scans_enabled & can?(:developer_access) }.enable :read_on_demand_scans
 
@@ -323,6 +326,7 @@ module EE
 
       rule { auditor & security_dashboard_enabled }.policy do
         enable :read_vulnerability
+        enable :read_vulnerability_scanner
       end
 
       rule { auditor & ~developer }.policy do
