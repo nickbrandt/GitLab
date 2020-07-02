@@ -188,7 +188,7 @@ For example, to add support for files referenced by a `Widget` model with a
 
 1. Create `ee/app/replicators/geo/widget_replicator.rb`. Implement the
    `#carrierwave_uploader` method which should return a `CarrierWave::Uploader`.
-   And implement the private `#model` method to return the `Widget` class.
+   And implement the class method `.model` to return the `Widget` class.
 
    ```ruby
    # frozen_string_literal: true
@@ -197,14 +197,12 @@ For example, to add support for files referenced by a `Widget` model with a
      class WidgetReplicator < Gitlab::Geo::Replicator
        include ::Geo::BlobReplicatorStrategy
 
-       def carrierwave_uploader
-         model_record.file
+       def self.model
+         ::Widget
        end
 
-       private
-
-       def model
-         ::Widget
+       def carrierwave_uploader
+         model_record.file
        end
      end
    end
