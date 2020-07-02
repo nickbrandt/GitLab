@@ -167,10 +167,12 @@ RSpec.describe TodosHelper do
   describe '#todo_target_state_pill' do
     subject { helper.todo_target_state_pill(todo) }
 
-    shared_examples 'a rendered state pill' do |atrr|
+    shared_examples 'a rendered state pill' do |attr|
       it 'returns expected html' do
-        html = "<span class=\"target-status\"><span class=\"status-box status-box-#{atrr[:type]}-#{atrr[:state].dasherize}\">#{atrr[:state].capitalize}</span></span>"
-        expect(subject).to eql(html)
+        aggregate_failures do
+          expect(subject).to have_css(".status-box-#{attr[:type]}-#{attr[:state].dasherize}")
+          expect(subject).to have_content(attr[:state].capitalize)
+        end
       end
     end
 
