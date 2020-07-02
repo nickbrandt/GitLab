@@ -84,14 +84,12 @@ module EE
     #
     # @return [AuditEventService]
     def for_failed_login
-      ip = @details[:ip_address]
       auth = @details[:with] || 'STANDARD'
 
       @details = {
         failed_login: auth.upcase,
         author_name: @author.name,
-        target_details: @author.name,
-        ip_address: ip
+        target_details: @author.name
       }
 
       self
@@ -125,10 +123,8 @@ module EE
     end
 
     def prepare_security_event
-      if admin_audit_log_enabled?
-        add_security_event_admin_details!
-        add_impersonation_details!
-      end
+      add_security_event_admin_details!
+      add_impersonation_details!
     end
 
     # Creates an event record in DB
@@ -138,16 +134,18 @@ module EE
     def unauth_security_event
       return unless audit_events_enabled?
 
-      @details.delete(:ip_address) unless admin_audit_log_enabled?
-      @details[:entity_path] = @entity&.full_path if admin_audit_log_enabled?
+      add_security_event_admin_details!
 
-      SecurityEvent.create(
+      payload = {
         author_id: @author.id,
         entity_id: @entity.respond_to?(:id) ? @entity.id : -1,
         entity_type: 'User',
-        details: @details,
-        ip_address: ip_address
-      )
+        details: @details
+      }
+
+      payload[:ip_address] = ip_address if admin_audit_log_enabled?
+
+      SecurityEvent.create(payload)
     end
 
     # Builds the @details attribute for user
@@ -248,26 +246,25 @@ module EE
             author_name: @author&.name,
             target_id: key_title,
             target_type: model_class,
-            target_details: key_title,
-            ip_address: @details[:ip_address]
+            target_details: key_title
           }
         end
 
       self
     end
 
-    def ip_address
-      @author.current_sign_in_ip || @details[:ip_address]
-    end
-
     def add_security_event_admin_details!
+      return unless admin_audit_log_enabled?
+
       @details.merge!(
         ip_address: ip_address,
-        entity_path: @entity.full_path
+        entity_path: @entity&.full_path
       )
     end
 
     def add_impersonation_details!
+      return unless admin_audit_log_enabled?
+
       if @author.is_a?(::Gitlab::Audit::ImpersonatedAuthor)
         @details.merge!(impersonated_by: @author.impersonated_by)
       end
