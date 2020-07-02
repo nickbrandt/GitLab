@@ -5,15 +5,15 @@ module Resolvers
     type Types::PackageType, null: true
 
     def resolve(**args)
-      return unless packages_available?(object, current_user)
+      return unless packages_available?
 
       ::Packages::PackagesFinder.new(object).execute
     end
 
     private
 
-    def packages_available?(object, user)
-      ::Gitlab.config.packages.enabled && object.feature_available?(:packages)
+    def packages_available?
+      ::Gitlab.config.packages.enabled
     end
   end
 end

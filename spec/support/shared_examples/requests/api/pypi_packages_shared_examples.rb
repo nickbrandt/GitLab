@@ -150,13 +150,3 @@ RSpec.shared_examples 'rejects PyPI access with unknown project id' do
     end
   end
 end
-
-RSpec.shared_examples 'rejects PyPI packages access with packages features disabled' do
-  context 'with packages features disabled' do
-    before do
-      stub_licensed_features(packages: false)
-    end
-
-    it_behaves_like 'process PyPi api request', :anonymous, :forbidden
-  end
-end

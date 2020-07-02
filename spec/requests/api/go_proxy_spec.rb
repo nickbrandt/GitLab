@@ -30,7 +30,6 @@ RSpec.describe API::GoProxy do
   before do
     project.add_developer(user)
 
-    stub_licensed_features(packages: true)
     stub_feature_flags(go_proxy_disable_gomod_validation: false)
 
     modules

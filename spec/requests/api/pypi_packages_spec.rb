@@ -17,11 +17,7 @@ RSpec.describe API::PypiPackages do
 
     subject { get api(url) }
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -64,8 +60,6 @@ RSpec.describe API::PypiPackages do
 
       it_behaves_like 'rejects PyPI access with unknown project id'
     end
-
-    it_behaves_like 'rejects PyPI packages access with packages features disabled'
   end
 
   describe 'POST /api/v4/projects/:id/packages/pypi/authorize' do
@@ -76,11 +70,7 @@ RSpec.describe API::PypiPackages do
 
     subject { post api(url), headers: headers }
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -122,8 +112,6 @@ RSpec.describe API::PypiPackages do
 
       it_behaves_like 'rejects PyPI access with unknown project id'
     end
-
-    it_behaves_like 'rejects PyPI packages access with packages features disabled'
   end
 
   describe 'POST /api/v4/projects/:id/packages/pypi' do
@@ -147,11 +135,7 @@ RSpec.describe API::PypiPackages do
       )
     end
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -206,8 +190,6 @@ RSpec.describe API::PypiPackages do
 
       it_behaves_like 'rejects PyPI access with unknown project id'
     end
-
-    it_behaves_like 'rejects PyPI packages access with packages features disabled'
   end
 
   describe 'GET /api/v4/projects/:id/packages/pypi/files/:sha256/*file_identifier' do
@@ -218,11 +200,7 @@ RSpec.describe API::PypiPackages do
 
     subject { get api(url) }
 
-    context 'with packages features enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with valid project' do
         using RSpec::Parameterized::TableSyntax
 
@@ -277,7 +255,5 @@ RSpec.describe API::PypiPackages do
 
       it_behaves_like 'rejects PyPI access with unknown project id'
     end
-
-    it_behaves_like 'rejects PyPI packages access with packages features disabled'
   end
 end
