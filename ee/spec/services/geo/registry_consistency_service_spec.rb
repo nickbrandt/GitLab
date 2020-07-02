@@ -156,81 +156,79 @@ RSpec.describe Geo::RegistryConsistencyService, :geo, :use_clean_rails_memory_st
         end
       end
 
-      unless klass == Geo::PackageFileRegistry
-        context 'when there are unused registries' do
-          context 'with no replicable records' do
-            let(:records) { create_list(model_class_factory, batch_size) }
-            let(:unused_model_ids) { records.map(&:id) }
+      context 'when there are unused registries' do
+        context 'with no replicable records' do
+          let(:records) { create_list(model_class_factory, batch_size) }
+          let(:unused_model_ids) { records.map(&:id) }
 
-            let!(:registries) do
-              records.map do |record|
-                create(registry_class_factory, model_foreign_key => record.id)
-              end
-            end
-
-            before do
-              model_class.where(id: unused_model_ids).delete_all
-            end
-
-            it 'deletes unused registries', :sidekiq_inline do
-              subject.execute
-
-              expect(registry_class.where(model_foreign_key => unused_model_ids)).to be_empty
-            end
-
-            it 'returns truthy' do
-              expect(subject.execute).to be_truthy
+          let!(:registries) do
+            records.map do |record|
+              create(registry_class_factory, model_foreign_key => record.id)
             end
           end
 
-          context 'when the unused registry foreign key ids are lower than the first replicable model id' do
-            let(:records) { create_list(model_class_factory, batch_size) }
-            let(:unused_registry_ids) { [records.first].map(&:id) }
+          before do
+            model_class.where(id: unused_model_ids).delete_all
+          end
 
-            let!(:registries) do
-              records.map do |record|
-                create(registry_class_factory, model_foreign_key => record.id)
-              end
-            end
+          it 'deletes unused registries', :sidekiq_inline do
+            subject.execute
 
-            before do
-              model_class.where(id: unused_registry_ids).delete_all
-            end
+            expect(registry_class.where(model_foreign_key => unused_model_ids)).to be_empty
+          end
 
-            it 'deletes unused registries', :sidekiq_inline do
-              subject.execute
+          it 'returns truthy' do
+            expect(subject.execute).to be_truthy
+          end
+        end
 
-              expect(registry_class.where(model_foreign_key => unused_registry_ids)).to be_empty
-            end
+        context 'when the unused registry foreign key ids are lower than the first replicable model id' do
+          let(:records) { create_list(model_class_factory, batch_size) }
+          let(:unused_registry_ids) { [records.first].map(&:id) }
 
-            it 'returns truthy' do
-              expect(subject.execute).to be_truthy
+          let!(:registries) do
+            records.map do |record|
+              create(registry_class_factory, model_foreign_key => record.id)
             end
           end
 
-          context 'when the unused registry foreign key ids are greater than the last replicable model id' do
-            let(:records) { create_list(model_class_factory, batch_size) }
-            let(:unused_registry_ids) { [records.last].map(&:id) }
+          before do
+            model_class.where(id: unused_registry_ids).delete_all
+          end
 
-            let!(:registries) do
-              records.map do |record|
-                create(registry_class_factory, model_foreign_key => record.id)
-              end
+          it 'deletes unused registries', :sidekiq_inline do
+            subject.execute
+
+            expect(registry_class.where(model_foreign_key => unused_registry_ids)).to be_empty
+          end
+
+          it 'returns truthy' do
+            expect(subject.execute).to be_truthy
+          end
+        end
+
+        context 'when the unused registry foreign key ids are greater than the last replicable model id' do
+          let(:records) { create_list(model_class_factory, batch_size) }
+          let(:unused_registry_ids) { [records.last].map(&:id) }
+
+          let!(:registries) do
+            records.map do |record|
+              create(registry_class_factory, model_foreign_key => record.id)
             end
+          end
 
-            before do
-              model_class.where(id: unused_registry_ids).delete_all
-            end
+          before do
+            model_class.where(id: unused_registry_ids).delete_all
+          end
 
-            it 'deletes unused registries', :sidekiq_inline do
-              subject.execute
+          it 'deletes unused registries', :sidekiq_inline do
+            subject.execute
 
-              expect(registry_class.where(model_foreign_key => unused_registry_ids)).to be_empty
-            end
+            expect(registry_class.where(model_foreign_key => unused_registry_ids)).to be_empty
+          end
 
-            it 'returns truthy' do
-              expect(subject.execute).to be_truthy
-            end
+          it 'returns truthy' do
+            expect(subject.execute).to be_truthy
           end
         end
       end

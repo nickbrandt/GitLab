@@ -30,6 +30,10 @@ module Gitlab
             define_method :replicator do
               @_replicator ||= klass.new(model_record: self)
             end
+
+            define_singleton_method :replicator_class do
+              @_replicator_class ||= klass
+            end
           RUBY
         end
       end

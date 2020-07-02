@@ -224,7 +224,7 @@ module Gitlab
       #
       # @return [Geo::BaseRegistry] registry instance
       def registry
-        registry_class.for_model_record_id(model_record.id)
+        registry_class.for_model_record_id(model_record_id)
       end
 
       # Checksum value from the main database
