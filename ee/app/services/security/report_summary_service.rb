@@ -28,6 +28,8 @@ module Security
           response[:vulnerabilities_count] = vulnerability_counts[report_type.to_s]
         when :scanned_resources_count
           response[:scanned_resources_count] = scanned_resources_counts[report_type.to_s]
+        when :scanned_resources
+          response[:scanned_resources] = scanned_resources[report_type.to_s]
         end
       end
     end
@@ -35,6 +37,13 @@ module Security
     def requested_report_types(summary_type)
       @report_types_for_summary_type ||= Gitlab::Utils.multiple_key_invert(@selection_information)
       @report_types_for_summary_type[summary_type].map(&:to_s)
+    end
+
+    def scanned_resources
+      strong_memoize(:scanned_resources) do
+        scanned_resources_limit = 20
+        ::Security::ScannedResourcesService.new(@pipeline, requested_report_types(:scanned_resources), scanned_resources_limit).execute
+      end
     end
 
     def vulnerability_counts
