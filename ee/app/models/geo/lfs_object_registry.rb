@@ -21,10 +21,6 @@ class Geo::LfsObjectRegistry < Geo::BaseRegistry
     ::Geo::LfsObjectRegistryFinder
   end
 
-  def self.delete_worker_class
-    ::Geo::FileRegistryRemovalWorker
-  end
-
   def self.find_registry_differences(range)
     finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
   end

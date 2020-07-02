@@ -36,7 +36,13 @@ class Geo::BaseRegistry < Geo::TrackingBase
   end
 
   def self.delete_for_model_ids(ids)
-    raise NotImplementedError, "#{self.class} does not implement #{__method__}"
+    ids.map do |id|
+      delete_worker_class.perform_async(replicator_class.replicable_name, id)
+    end
+  end
+
+  def self.replicator_class
+    self::MODEL_CLASS.replicator_class
   end
 
   def self.find_unsynced_registries(batch_size:, except_ids: [])
@@ -56,8 +62,8 @@ class Geo::BaseRegistry < Geo::TrackingBase
     true
   end
 
-  def model_record_id
-    read_attribute(self.class::MODEL_FOREIGN_KEY)
+  def self.delete_worker_class
+    ::Geo::FileRegistryRemovalWorker
   end
 
   def self.find_registry_differences(range)
@@ -72,5 +78,9 @@ class Geo::BaseRegistry < Geo::TrackingBase
     unused_tracked_ids = tracked_ids - source_ids
 
     [untracked_ids, unused_tracked_ids]
+  end
+
+  def model_record_id
+    read_attribute(self.class::MODEL_FOREIGN_KEY)
   end
 end

@@ -34,6 +34,13 @@ module Geo
       raise NotImplementedError
     end
 
+    # Return the absolute path to locally stored package file
+    #
+    # @return [String] File path
+    def blob_path
+      carrierwave_uploader.class.absolute_path(carrierwave_uploader)
+    end
+
     def calculate_checksum!
       checksum = model_record.calculate_checksum!
       update_verification_state!(checksum: checksum)

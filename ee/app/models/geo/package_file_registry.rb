@@ -11,9 +11,4 @@ class Geo::PackageFileRegistry < Geo::BaseRegistry
 
   sha_attribute :verification_checksum
   sha_attribute :verification_checksum_mismatched
-
-  def self.delete_for_model_ids(package_file_ids)
-    # TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/222635
-    []
-  end
 end
