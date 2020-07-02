@@ -45,6 +45,10 @@ In these examples, the `id` and `user_id` columns are packed together, which
 means we only need 8 bytes to store _both_ of them. This in turn means each row
 will require 8 bytes less space.
 
+Note: **NOTE:**
+Since Ruby on Rails 5.1, the default data type for IDs is `bigint`, which uses 8 bytes.
+We are using `integer` in the examples to showcase a more realistic reordering scenario.
+
 ## Type Sizes
 
 While the [PostgreSQL documentation](https://www.postgresql.org/docs/current/datatype.html) contains plenty
