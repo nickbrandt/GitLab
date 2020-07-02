@@ -50,10 +50,6 @@ export default {
       required: false,
       default: '',
     },
-    canDelete: {
-      type: Boolean,
-      required: true,
-    },
     userLists: {
       type: Array,
       required: false,
@@ -274,7 +270,6 @@ export default {
 
       <div class="align-self-end align-self-md-stretch order-first offset-md-0 order-md-0 ml-auto">
         <gl-deprecated-button
-          v-if="canDelete"
           data-testid="delete-strategy-button"
           variant="danger"
           @click="$emit('delete')"

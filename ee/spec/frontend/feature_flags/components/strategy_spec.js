@@ -23,7 +23,6 @@ describe('Feature flags strategy', () => {
         strategy: {},
         index: 0,
         endpoint: '',
-        canDelete: true,
         userLists: [userList],
       },
     },
@@ -56,7 +55,7 @@ describe('Feature flags strategy', () => {
         parameters[parameter] = value;
       }
       strategy = { name, parameters };
-      propsData = { strategy, index: 0, endpoint: '', canDelete: true };
+      propsData = { strategy, index: 0, endpoint: '' };
       factory({ propsData });
     });
 
@@ -92,7 +91,7 @@ describe('Feature flags strategy', () => {
     let strategy;
     beforeEach(() => {
       strategy = { name: ROLLOUT_STRATEGY_GITLAB_USER_LIST, userListId: '2', parameters: {} };
-      propsData = { strategy, index: 0, endpoint: '', canDelete: true, userLists: [userList] };
+      propsData = { strategy, index: 0, endpoint: '', userLists: [userList] };
       factory({ propsData });
     });
 
@@ -142,7 +141,7 @@ describe('Feature flags strategy', () => {
           parameters: { percentage: '50' },
           scopes: [{ environmentScope: '*' }],
         };
-        const propsData = { strategy, index: 0, endpoint: '', canDelete: true };
+        const propsData = { strategy, index: 0, endpoint: '' };
         factory({ propsData });
       });
 
@@ -208,23 +207,16 @@ describe('Feature flags strategy', () => {
         wrapper.find(GlDeprecatedButton).vm.$emit('click');
         expect(wrapper.emitted('delete')).toEqual([[]]);
       });
-
-      it('should not display the delete button if can delete is false', () => {
-        const propsData = { strategy, index: 0, endpoint: '', canDelete: false };
-        factory({ propsData });
-
-        expect(wrapper.find(GlDeprecatedButton).exists()).toBe(false);
-      });
     });
 
-    describe('wihtout scopes defined', () => {
+    describe('without scopes defined', () => {
       beforeEach(() => {
         const strategy = {
           name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
           parameters: { percentage: '50' },
           scopes: [],
         };
-        const propsData = { strategy, index: 0, endpoint: '', canDelete: true };
+        const propsData = { strategy, index: 0, endpoint: '' };
         factory({ propsData });
       });
 
