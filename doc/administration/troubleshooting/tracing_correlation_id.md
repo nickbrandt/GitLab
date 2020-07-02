@@ -5,9 +5,9 @@ type: reference
 # Finding relevant log entries with a correlation ID
 
 Since GitLab 11.6, a unique tracking ID, known as the "correlation ID" has been
-logged for all requests in GitLab. This is great for tracking the logged
-behavior in a precise manner. Without this approach and can be difficult or
-impossible to match up log entries together.
+logged for most requests in GitLab. This makes it easier to trace behavior in a
+distributed system. Without this ID it can be difficult or
+impossible to match correlating log entries together.
 
 ## Getting the correlation ID
 
@@ -46,12 +46,22 @@ you reproduce an action in GitLab. You could tail the GitLab logs, filtering
 to requests by your user, and then watch the requests until you see what you're
 interested in.
 
+### Getting the correlation ID from curl
+
+If you're using curl then you can use the verbose option to show request and response headers, as well as other debug info.
+
+```shell
+➜  ~ curl -v https://gitlab.example.com/api/v4/projects
+# look for a line that looks like this
+< x-request-id: 4rAMkV3gof4
+```
+
 #### Using jq
 
 This example uses [jq](https://stedolan.github.io/jq/) to filter results and
 display values we most likely care about.
 
-```sh
+```shell
 sudo gitlab-ctl tail gitlab-rails/production_json.log | jq 'select(.username == "bob") | "User: \(.username), \(.method) \(.path), \(.controller)#\(.action), ID: \(.correlation_id)"'
 ```
 
@@ -65,7 +75,7 @@ sudo gitlab-ctl tail gitlab-rails/production_json.log | jq 'select(.username == 
 
 This example uses only grep and tr, which are more likely to be installed than jq.
 
-```sh
+```shell
 sudo gitlab-ctl tail gitlab-rails/production_json.log | grep '"username":"bob"' | tr ',' '\n' | egrep 'method|path|correlation_id'
 ```
 
@@ -91,7 +101,7 @@ entries. You can simply filter the lines by the correlation ID itself since it
 is unique enough that there shouldn't be any duplicates. A simple find & grep
 combo should find what you're looking for.
 
-```sh
+```shell
 # find <gitlab log directory> -type f -mtime -0 exec grep '<correlation ID>' '{}' '+'
 find /var/log/gitlab -type f -mtime 0 -exec grep 'LOt9hgi1TV4' '{}' '+'
 ```
@@ -107,5 +117,6 @@ find /var/log/gitlab -type f -mtime 0 -exec grep 'LOt9hgi1TV4' '{}' '+'
 If you have done some horizontal scaling in your GitLab infrastructure, then
 you will need to search across _all_ of your GitLab nodes. You can do this with
 some sort of log aggregation software like Loki, ELK, Splunk, or others.
+
 Something like Ansible or pssh (parellel ssh), that can execute commands across your servers in
 parallel, could be used to execute the same search command. Or you could craft your own solution.
