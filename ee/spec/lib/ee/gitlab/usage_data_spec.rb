@@ -265,7 +265,7 @@ RSpec.describe Gitlab::UsageData do
     end
   end
 
-  describe '#operations_dashboard_usage' do
+  describe '.operations_dashboard_usage' do
     subject { described_class.operations_dashboard_usage }
 
     before_all do
