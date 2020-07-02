@@ -140,12 +140,10 @@ export default {
       <gl-loading-icon v-else size="lg" class="mt-4" />
     </div>
     <template #aside>
-      <vulnerability-chart
-        v-if="shouldShowDashboard"
-        :query="vulnerabilityHistoryQuery"
-        class="mb-4"
-      />
-      <vulnerability-severities v-if="shouldShowDashboard" :projects="projects" />
+      <template v-if="shouldShowDashboard">
+        <vulnerability-chart :query="vulnerabilityHistoryQuery" class="mb-4" />
+        <vulnerability-severities :projects="projects" />
+      </template>
     </template>
   </security-dashboard-layout>
 </template>
