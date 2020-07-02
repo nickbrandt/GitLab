@@ -136,7 +136,9 @@ describe('AddLicenseForm', () => {
         const descriptionElement = wrapper.findAll('.text-secondary');
         const formCheckElementMargin = wrapper.find('.form-check');
 
-        expect(descriptionElement.at(0).text()).toBe('Acceptable license to be used in the project');
+        expect(descriptionElement.at(0).text()).toBe(
+          'Acceptable license to be used in the project',
+        );
 
         expect(descriptionElement.at(1).text()).toBe(
           'Disallow merge request if detected and will instruct developer to remove',
