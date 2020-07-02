@@ -9,11 +9,11 @@ export const setMilestonesEndpoint = ({ commit }, milestonesEndpoint) =>
 export const setLabelsEndpoint = ({ commit }, labelsEndpoint) =>
   commit(types.SET_LABELS_ENDPOINT, labelsEndpoint);
 
-export const fetchMilestones = ({ commit, state }) => {
+export const fetchMilestones = ({ commit, state }, search_title = '') => {
   commit(types.REQUEST_MILESTONES);
 
   return axios
-    .get(state.milestonesEndpoint)
+    .get(state.milestonesEndpoint, { params: { search_title } })
     .then(({ data }) => {
       commit(types.RECEIVE_MILESTONES_SUCCESS, data);
     })
@@ -24,11 +24,11 @@ export const fetchMilestones = ({ commit, state }) => {
     });
 };
 
-export const fetchLabels = ({ commit, state }) => {
+export const fetchLabels = ({ commit, state }, search = '') => {
   commit(types.REQUEST_LABELS);
 
   return axios
-    .get(state.labelsEndpoint)
+    .get(state.labelsEndpoint, { params: { search } })
     .then(({ data }) => {
       commit(types.RECEIVE_LABELS_SUCCESS, data);
     })

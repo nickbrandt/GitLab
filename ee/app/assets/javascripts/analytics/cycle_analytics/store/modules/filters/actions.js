@@ -15,21 +15,12 @@ export const setPaths = ({ commit }, { groupPath = '', milestonesPath = '', labe
   commit(types.SET_LABELS_PATH, appendExtension(ls));
 };
 
-export const fetchTokenData = ({ dispatch }) => {
-  return Promise.all([
-    dispatch('fetchLabels'),
-    dispatch('fetchMilestones'),
-    dispatch('fetchAuthors'),
-    dispatch('fetchAssignees'),
-  ]);
-};
-
-export const fetchMilestones = ({ commit, state }) => {
+export const fetchMilestones = ({ commit, state }, search_title = '') => {
   commit(types.REQUEST_MILESTONES);
   const { milestonesPath } = state;
 
   return axios
-    .get(milestonesPath)
+    .get(milestonesPath, { params: { search_title } })
     .then(({ data }) => commit(types.RECEIVE_MILESTONES_SUCCESS, data))
     .catch(({ response }) => {
       const { status } = response;
@@ -38,11 +29,11 @@ export const fetchMilestones = ({ commit, state }) => {
     });
 };
 
-export const fetchLabels = ({ commit, state }) => {
+export const fetchLabels = ({ commit, state }, search = '') => {
   commit(types.REQUEST_LABELS);
 
   return axios
-    .get(state.labelsPath)
+    .get(state.labelsPath, { params: { search } })
     .then(({ data }) => commit(types.RECEIVE_LABELS_SUCCESS, data))
     .catch(({ response }) => {
       const { status } = response;
@@ -90,7 +81,5 @@ export const setFilters = ({ dispatch }, nextFilters) =>
 
 export const initialize = ({ dispatch, commit }, initialFilters) => {
   commit(types.INITIALIZE, initialFilters);
-  return dispatch('setPaths', initialFilters)
-    .then(() => dispatch('setFilters', initialFilters))
-    .then(() => dispatch('fetchTokenData'));
+  return dispatch('setPaths', initialFilters).then(() => dispatch('setFilters', initialFilters));
 };

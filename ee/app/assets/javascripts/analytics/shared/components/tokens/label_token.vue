@@ -6,6 +6,8 @@ import {
   GlLoadingIcon,
 } from '@gitlab/ui';
 import { __ } from '~/locale';
+import { debounce } from 'lodash';
+import { DEBOUNCE_DELAY } from '~/vue_shared/components/filtered_search_bar/constants';
 
 export default {
   components: {
@@ -29,38 +31,14 @@ export default {
     labels() {
       return this.config.labels;
     },
-    filteredLabels() {
-      const labelsList = this.labels.map(label => ({
-        ...label,
-        value: this.getEscapedText(label.title),
-      }));
-      return this.value?.data
-        ? labelsList.filter(
-            label => label.title.toLowerCase().indexOf(this.value.data?.toLowerCase()) !== -1,
-          )
-        : labelsList;
-    },
+  },
+  created() {
+    this.searchLabels(this.value);
   },
   methods: {
-    getEscapedText(text) {
-      let escapedText = text;
-      const hasSpace = text.indexOf(' ') !== -1;
-      const hasDoubleQuote = text.indexOf('"') !== -1;
-
-      // Encapsulate value with quotes if it has spaces
-      // Known side effect: values's with both single and double quotes
-      // won't escape properly
-      if (hasSpace) {
-        if (hasDoubleQuote) {
-          escapedText = `'${text}'`;
-        } else {
-          // Encapsulate singleQuotes or if it hasSpace
-          escapedText = `"${text}"`;
-        }
-      }
-
-      return escapedText;
-    },
+    searchLabels: debounce(function debouncedSearch({ data = '' }) {
+      this.config.fetchData(data);
+    }, DEBOUNCE_DELAY),
   },
   defaultSuggestions: [
     // eslint-disable-next-line @gitlab/require-i18n-strings
@@ -72,7 +50,12 @@ export default {
 </script>
 
 <template>
-  <gl-filtered-search-token :config="config" v-bind="{ ...$props, ...$attrs }" v-on="$listeners">
+  <gl-filtered-search-token
+    :config="config"
+    v-bind="{ ...$props, ...$attrs }"
+    v-on="$listeners"
+    @input="searchLabels"
+  >
     <template #view="{ inputValue }">
       <template v-if="config.symbol">{{ config.symbol }}</template
       >{{ inputValue }}
@@ -86,12 +69,12 @@ export default {
           :value="suggestion.value"
           >{{ suggestion.text }}</gl-filtered-search-suggestion
         >
-        <gl-dropdown-divider v-if="config.isLoading || filteredLabels.length" />
+        <gl-dropdown-divider v-if="config.isLoading || labels.length" />
         <gl-filtered-search-suggestion
-          v-for="label in filteredLabels"
+          v-for="label in labels"
           ref="labelItem"
           :key="label.id"
-          :value="label.value"
+          :value="label.title"
         >
           <div class="d-flex">
             <span

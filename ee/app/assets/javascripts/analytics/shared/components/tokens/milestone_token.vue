@@ -6,6 +6,8 @@ import {
   GlLoadingIcon,
 } from '@gitlab/ui';
 import { __ } from '~/locale';
+import { debounce } from 'lodash';
+import { DEBOUNCE_DELAY } from '~/vue_shared/components/filtered_search_bar/constants';
 
 export default {
   components: {
@@ -29,14 +31,9 @@ export default {
     milestones() {
       return this.config.milestones;
     },
-    filteredMilestones() {
-      return this.value?.data
-        ? this.milestones.filter(
-            milestone =>
-              milestone.title.toLowerCase().indexOf(this.value.data?.toLowerCase()) !== -1,
-          )
-        : this.milestones;
-    },
+  },
+  created() {
+    this.searchMilestones(this.value);
   },
   methods: {
     getEscapedText(text) {
@@ -58,6 +55,9 @@ export default {
 
       return escapedText;
     },
+    searchMilestones: debounce(function debouncedSearch({ data = '' }) {
+      this.config.fetchData(data);
+    }, DEBOUNCE_DELAY),
   },
   defaultSuggestions: [
     // eslint-disable-next-line @gitlab/require-i18n-strings
@@ -73,7 +73,12 @@ export default {
 </script>
 
 <template>
-  <gl-filtered-search-token :config="config" v-bind="{ ...$props, ...$attrs }" v-on="$listeners">
+  <gl-filtered-search-token
+    :config="config"
+    v-bind="{ ...$props, ...$attrs }"
+    v-on="$listeners"
+    @input="searchMilestones"
+  >
     <template #view="{ inputValue }">
       <template v-if="config.symbol">{{ config.symbol }}</template
       >{{ inputValue }}
@@ -85,11 +90,11 @@ export default {
         :value="suggestion.value"
         >{{ suggestion.text }}</gl-filtered-search-suggestion
       >
-      <gl-dropdown-divider v-if="config.isLoading || filteredMilestones.length" />
+      <gl-dropdown-divider v-if="config.isLoading || milestones.length" />
       <gl-loading-icon v-if="config.isLoading" />
       <template v-else>
         <gl-filtered-search-suggestion
-          v-for="milestone in filteredMilestones"
+          v-for="milestone in milestones"
           ref="milestoneItem"
           :key="milestone.id"
           :value="getEscapedText(milestone.title)"
