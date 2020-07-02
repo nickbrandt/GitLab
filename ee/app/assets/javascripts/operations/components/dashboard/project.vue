@@ -113,7 +113,10 @@ export default {
 };
 </script>
 <template>
-  <div class="js-dashboard-project dashboard-card card border-0">
+  <div
+    class="js-dashboard-project dashboard-card card border-0"
+    data-qa-selector="dashboard_project_card"
+  >
     <project-header
       :project="project"
       :has-pipeline-failed="hasPipelineFailed"
