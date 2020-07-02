@@ -311,7 +311,7 @@ RSpec.describe 'Promotions', :js do
       expect(find('.promotion-issue-weight-sidebar-message')).to have_content 'Improve issues management with Issue weight and GitLab Enterprise Edition'
     end
 
-    it 'is removed after dismissal' do
+    it 'is removed after dismissal', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/222518' do
       visit project_issue_path(project, issue)
       wait_for_requests
 
