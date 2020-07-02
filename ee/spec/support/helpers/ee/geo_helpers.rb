@@ -33,6 +33,10 @@ module EE
       ::Gitlab::ShardHealthCache.update(Array(shards))
     end
 
+    def registry_factory_name(registry_class)
+      registry_class.underscore.tr('/', '_').to_sym
+    end
+
     def with_no_geo_database_configured(&block)
       allow(::Gitlab::Geo).to receive(:geo_database_configured?).and_return(false)
 
