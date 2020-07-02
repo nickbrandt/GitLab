@@ -6,7 +6,7 @@ RSpec.describe Gitlab::UsageDataConcerns::Topology do
   include UsageDataHelpers
 
   describe '#topology_usage_data' do
-    subject { Class.new.extend(described_class).topology_usage_data }
+    subject { Class.new.include(described_class).topology_usage_data }
 
     before do
       # this pins down time shifts when benchmarking durations
