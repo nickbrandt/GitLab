@@ -331,6 +331,8 @@ RSpec.describe Gitlab::UsageData do
             create(:deploy_key, user: user)
             create(:key, user: user)
             create(:project, creator: user)
+            create(:project, creator: user, disable_overriding_approvers_per_merge_request: true)
+            create(:project, creator: user, disable_overriding_approvers_per_merge_request: false)
             create(:protected_branch, project: project)
             create(:remote_mirror, project: project)
             create(:snippet, author: user)
@@ -348,6 +350,8 @@ RSpec.describe Gitlab::UsageData do
             projects_enforcing_code_owner_approval: 0,
             merge_requests_with_optional_codeowners: 4,
             merge_requests_with_required_codeowners: 8,
+            projects_with_disable_overriding_approvers_per_merge_request: 2,
+            projects_without_disable_overriding_approvers_per_merge_request: 16,
             projects_imported_from_github: 2,
             projects_with_repositories_enabled: 12,
             protected_branches: 2,
@@ -362,6 +366,8 @@ RSpec.describe Gitlab::UsageData do
             projects_enforcing_code_owner_approval: 0,
             merge_requests_with_optional_codeowners: 2,
             merge_requests_with_required_codeowners: 4,
+            projects_with_disable_overriding_approvers_per_merge_request: 1,
+            projects_without_disable_overriding_approvers_per_merge_request: 8,
             projects_imported_from_github: 1,
             projects_with_repositories_enabled: 6,
             protected_branches: 1,
