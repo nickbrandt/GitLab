@@ -32,10 +32,12 @@ module Gitlab
 
         return static_credentials if static_credentials&.set?
 
-        # Instantiating this will perform an API call, so only do so if the
-        # static credentials did not work
-        instance_credentials = Aws::InstanceProfileCredentials.new
-
+        # When static credentials are not configured, Aws::CredentialProviderChain API
+        # will be used to retrieve credentials. It will check AWS access credential environment
+        # variables, AWS credential profile, ECS credential service and EC2 credential service.
+        # Please see aws-sdk-core/lib/aws-sdk-core/credential_provider_chain.rb for details of
+        # the possible providers and order of the providers.
+        instance_credentials = Aws::CredentialProviderChain.new.resolve
         instance_credentials if instance_credentials&.set?
       end
     end

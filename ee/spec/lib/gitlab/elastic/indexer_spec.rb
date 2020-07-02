@@ -317,6 +317,22 @@ RSpec.describe Gitlab::Elastic::Indexer do
     end
   end
 
+  context 'when AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is set' do
+    let(:aws_cred_relative_uri) { '/ecs/relative/cred/uri'}
+
+    before do
+      stub_env('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI', aws_cred_relative_uri)
+    end
+
+    context 'when building env vars for child process' do
+      subject { envvars }
+
+      it 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI env vars will be included' do
+        expect(subject).to include('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI' => aws_cred_relative_uri)
+      end
+    end
+  end
+
   def expect_popen
     expect(Gitlab::Popen).to receive(:popen)
   end
