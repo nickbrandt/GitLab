@@ -4386,7 +4386,7 @@ msgstr ""
 msgid "Changes affect new repositories only. If not specified, Git's default name %{branch_name_default} will be used."
 msgstr ""
 
-msgid "Changes are shown as if the <b>source</b> revision was being merged into the <b>target</b> revision."
+msgid "Changes are shown as if the %{b_open}source%{b_close} revision was being merged into the %{b_open}target%{b_close} revision."
 msgstr ""
 
 msgid "Changes are still tracked. Useful for cluster/index migrations."
@@ -10711,10 +10711,10 @@ msgstr ""
 msgid "From"
 msgstr ""
 
-msgid "From %{providerTitle}"
+msgid "From %{code_open}%{source_title}%{code_close} into"
 msgstr ""
 
-msgid "From <code>%{source_title}</code> into"
+msgid "From %{providerTitle}"
 msgstr ""
 
 msgid "From Google Code"

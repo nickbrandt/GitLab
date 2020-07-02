@@ -131,19 +131,6 @@
     - "La branĉo <strong>%{branch_name}</strong> estis kreita. Por agordi aŭtomatan disponigadon, bonvolu elekti Yaml-ŝablonon por GitLab CI kaj enmeti viajn ŝanĝojn. %{link_to_autodeploy_doc}"
     - "La branche <strong>%{branch_name}</strong> a été créée. Pour mettre en place le déploiement automatisé, sélectionnez un modèle de fichier YAML pour l’intégration continue (CI) de GitLab, et validez les modifications. %{link_to_autodeploy_doc}"
     - "La rama <strong>%{branch_name}</strong> fue creada. Para configurar el auto despliegue, escoge una plantilla Yaml para GitLab CI y envía tus cambios. %{link_to_autodeploy_doc}"
-"Changes are shown as if the <b>source</b> revision was being merged into the <b>target</b> revision.":
-  plural_id:
-  translations:
-    - "Mudanças serão mostradas se revisão de <b>origem</b> tiver sofrido merge na revisão <b>alvo</b>."
-    - "<b>source</b>リビジョンが<b>target</b>リビジョン内に取り込まれているような変更として表示されます"
-    - "As alterações são mostradas como se a revisão de <b>origem</b> estivesse a ser mesclada na revisão de <b>destino</b>."
-    - "Показаны изменения как будто произошло слияние ревизии кода <b>источника</b> с <b>целевой</b> ревизией кода."
-    - "差异显示方式依<b>源</b>版本合并到<b>目标</b>版本的形式。"
-    - "Зміни відображаються так, ніби <b>редакція-джерело</b> була злита в <b>цільову редакцію</b>."
-    - "Änderungen werden angezeigt, als ob die <b>Quell</b>-Revision in die <b>Ziel</b>-Revision gemerged wurde."
-    - "변경 사항은 <b>source</b> 리비전이 <b>target</b> 리비전에 머지된 것처럼 표시됩니다."
-    - "Les modifications sont affichées comme si la révision <b>source</b> était fusionnée dans la révision<b>cible</b>."
-    - "Los cambios se muestran como si la revisión del <b>origen</b> se ha fusionado con la revisión del <b>objetivo</b>."
 "Choose between <code>clone</code> or <code>fetch</code> to get the recent application code":
   plural_id:
   translations:
@@ -261,11 +248,6 @@
     - "完成您的<strong>%{group_name}</strong>专用帐户设置。"
     - "Завершіть налаштування вашого виділеного облікового запису для <strong>%{group_name}</strong>."
     - "Finalizar la configuración de su cuenta dedicada para <strong>%{group_name}</strong>."
-"From <code>%{source_title}</code> into":
-  plural_id:
-  translations:
-    - "<code>%{source_title}</code> から"
-    - "Від <code>%{source_title}</code> до"
 "Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.":
   plural_id:
   translations:
@@ -1053,3 +1035,21 @@
     - "Ein Fork ist eine Kopie eines Projekts.<br />Wenn du ein Repository forkst, kannst du, ohne Auswirkungen auf das ursprüngliche Projekt, Änderungen vornehmen."
     - "포크는 프로젝트의 사본입니다.<br />저장소를 포크하면 원래 프로젝트에 영향을주지 않고 변경할 수 있습니다."
     - "Un fork es una copia de un proyecto.<br />Realizar un fork de un repositorio le permite realizar cambios sin afectar al proyecto original."
+"Changes are shown as if the <b>source</b> revision was being merged into the <b>target</b> revision.":
+  plural_id:
+  translations:
+    - "Mudanças serão mostradas se revisão de <b>origem</b> tiver sofrido merge na revisão <b>alvo</b>."
+    - "<b>source</b>リビジョンが<b>target</b>リビジョン内に取り込まれているような変更として表示されます"
+    - "As alterações são mostradas como se a revisão de <b>origem</b> estivesse a ser mesclada na revisão de <b>destino</b>."
+    - "Показаны изменения как будто произошло слияние ревизии кода <b>источника</b> с <b>целевой</b> ревизией кода."
+    - "差异显示方式依<b>源</b>版本合并到<b>目标</b>版本的形式。"
+    - "Зміни відображаються так, ніби <b>редакція-джерело</b> була злита в <b>цільову редакцію</b>."
+    - "Änderungen werden angezeigt, als ob die <b>Quell</b>-Revision in die <b>Ziel</b>-Revision gemerged wurde."
+    - "변경 사항은 <b>source</b> 리비전이 <b>target</b> 리비전에 머지된 것처럼 표시됩니다."
+    - "Les modifications sont affichées comme si la révision <b>source</b> était fusionnée dans la révision<b>cible</b>."
+    - "Los cambios se muestran como si la revisión del <b>origen</b> se ha fusionado con la revisión del <b>objetivo</b>."
+"From <code>%{source_title}</code> into":
+  plural_id:
+  translations:
+    - "<code>%{source_title}</code> から"
+    - "Від <code>%{source_title}</code> до"
