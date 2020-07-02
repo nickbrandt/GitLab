@@ -84,9 +84,9 @@ module Gitlab
       # @return [Boolean] whether the file exists on storage
       def file_exist?
         if local?
-          File.exist?(file.path)
+          File.exist?(replicator.carrierwave_uploader.path)
         else
-          file.exists?
+          replicator.carrierwave_uploader.exists?
         end
       end
     end
