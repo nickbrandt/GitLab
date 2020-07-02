@@ -27,7 +27,7 @@ you begin. The best way back up a repository is to
 
 NOTE: **Note:**
 Git LFS files can only be removed by an Administrator using a
-[rake task](../../../raketasks/cleanup.md). Removal of this limitation
+[Rake task](../../../raketasks/cleanup.md). Removal of this limitation
 [is planned](https://gitlab.com/gitlab-org/gitlab/-/issues/223621).
 
 ## Purge files from repository history
