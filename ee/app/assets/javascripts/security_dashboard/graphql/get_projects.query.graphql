@@ -5,9 +5,6 @@ query getProjects($search: String!, $after: String = "", $first: Int!) {
   projects(search: $search, after: $after, first: $first, membership: true) {
     nodes {
       ...Project
-      avatarUrl
-      nameWithNamespace
-      path
     }
     pageInfo {
       ...PageInfo
