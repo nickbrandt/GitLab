@@ -11,38 +11,9 @@ RSpec.describe API::Helpers::PackagesHelpers do
 
     it 'authorizes packages access' do
       expect(helper).to receive(:require_packages_enabled!)
-      expect(helper).to receive(:authorize_packages_feature!).with(project)
       expect(helper).to receive(:authorize_read_package!).with(project)
 
       expect(subject).to eq nil
-    end
-  end
-
-  describe 'authorize_packages_feature!' do
-    let(:feature_enabled) { true }
-
-    subject { helper.authorize_packages_feature!(project) }
-
-    before do
-      allow(project).to receive(:feature_available?).with(:packages).and_return(feature_enabled)
-    end
-
-    context 'with feature enabled' do
-      it "doesn't call forbidden!" do
-        expect(helper).to receive(:forbidden!).never
-
-        expect(subject).to eq nil
-      end
-    end
-
-    context 'with feature disabled' do
-      let(:feature_enabled) { false }
-
-      it 'calls forbidden!' do
-        expect(helper).to receive(:forbidden!).once
-
-        subject
-      end
     end
   end
 

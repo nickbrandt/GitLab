@@ -13,11 +13,7 @@ RSpec.describe API::GroupPackages do
     let(:url) { "/groups/#{group.id}/packages" }
     let(:package_schema) { 'public_api/v4/packages/group_packages' }
 
-    context 'with packages feature enabled' do
-      before do
-        stub_licensed_features(packages: true)
-      end
-
+    context 'without the need for a license' do
       context 'with sorting' do
         let_it_be(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
         let_it_be(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
@@ -146,14 +142,6 @@ RSpec.describe API::GroupPackages do
 
         it_behaves_like 'returning response status', :bad_request
       end
-    end
-
-    context 'with packages feature disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it_behaves_like 'rejects packages access', :group, :no_type, :forbidden
     end
   end
 end

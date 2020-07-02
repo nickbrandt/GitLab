@@ -55,7 +55,7 @@ module API
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_packages_feature!(unauthorized_user_project!)
+        unauthorized_user_project!
       end
 
       namespace ':id/packages/pypi' do

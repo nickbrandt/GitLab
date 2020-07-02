@@ -74,7 +74,6 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
         authorize_read_package!
-        authorize_packages_feature!
       end
 
       namespace ':id/packages/go/*module_name/@v' do
@@ -90,7 +89,7 @@ module API
 
         desc 'Get information about the given module version' do
           detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/<version>.info. This feature was introduced in GitLab 13.1.'
-          success EE::API::Entities::GoModuleVersion
+          success ::API::Entities::GoModuleVersion
         end
         params do
           requires :module_version, type: String, desc: 'Module version'
@@ -98,7 +97,7 @@ module API
         get ':module_version.info', requirements: MODULE_VERSION_REQUIREMENTS do
           ver = find_version
 
-          present ::Packages::Go::ModuleVersionPresenter.new(ver), with: EE::API::Entities::GoModuleVersion
+          present ::Packages::Go::ModuleVersionPresenter.new(ver), with: ::API::Entities::GoModuleVersion
         end
 
         desc 'Get the module file of the given module version' do

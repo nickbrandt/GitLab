@@ -32,18 +32,8 @@ module EE
         mount ::API::License
         mount ::API::ProjectMirror
         mount ::API::ProjectPushRule
-        mount ::API::NugetPackages
-        mount ::API::PypiPackages
-        mount ::API::ComposerPackages
-        mount ::API::ConanPackages
-        mount ::API::MavenPackages
-        mount ::API::NpmPackages
-        mount ::API::GoProxy
         mount ::API::MergeTrains
-        mount ::API::ProjectPackages
-        mount ::API::GroupPackages
         mount ::API::GroupHooks
-        mount ::API::PackageFiles
         mount ::API::Scim
         mount ::API::ManagedLicenses
         mount ::API::ProjectApprovals

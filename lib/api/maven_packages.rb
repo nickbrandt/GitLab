@@ -98,8 +98,6 @@ module API
       package = ::Packages::Maven::PackageFinder
         .new(params[:path], current_user, project: project).execute!
 
-      authorize_packages_feature!(package.project)
-
       package_file = ::Packages::PackageFileFinder
         .new(package, file_name).execute!
 
@@ -136,7 +134,6 @@ module API
         package = ::Packages::Maven::PackageFinder
           .new(params[:path], current_user, group: group).execute!
 
-        authorize_packages_feature!(package.project)
         authorize_read_package!(package.project)
 
         package_file = ::Packages::PackageFileFinder
@@ -159,10 +156,6 @@ module API
       requires :id, type: String, desc: 'The ID of a project'
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      before do
-        authorize_packages_feature!(user_project)
-      end
-
       desc 'Download the maven package file' do
         detail 'This feature was introduced in GitLab 11.3'
       end
