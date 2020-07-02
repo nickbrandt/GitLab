@@ -8,7 +8,7 @@ import MrWidgetLicenses from 'ee/vue_shared/license_compliance/mr_widget_license
 import ReportSection from '~/reports/components/report_section.vue';
 import BlockingMergeRequestsReport from './components/blocking_merge_requests/blocking_merge_requests_report.vue';
 
-import { n__, s__, __, sprintf } from '~/locale';
+import { s__, __, sprintf } from '~/locale';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
 import MrWidgetApprovals from './components/approvals/approvals.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
@@ -33,10 +33,8 @@ export default {
   componentNames,
   data() {
     return {
-      isLoadingCodequality: false,
       isLoadingBrowserPerformance: false,
       isLoadingLoadPerformance: false,
-      loadingCodequalityFailed: false,
       loadingBrowserPerformanceFailed: false,
       loadingLoadPerformanceFailed: false,
       loadingLicenseReportFailed: false,
@@ -46,21 +44,8 @@ export default {
     shouldRenderApprovals() {
       return this.mr.hasApprovalsAvailable && this.mr.state !== 'nothingToMerge';
     },
-    shouldRenderCodeQuality() {
-      const { codeclimate } = this.mr || {};
-      return codeclimate && codeclimate.head_path;
-    },
     shouldRenderLicenseReport() {
       return this.mr.enabledReports?.licenseScanning;
-    },
-    hasCodequalityIssues() {
-      return (
-        this.mr.codeclimateMetrics &&
-        ((this.mr.codeclimateMetrics.newIssues &&
-          this.mr.codeclimateMetrics.newIssues.length > 0) ||
-          (this.mr.codeclimateMetrics.resolvedIssues &&
-            this.mr.codeclimateMetrics.resolvedIssues.length > 0))
-      );
     },
     hasBrowserPerformanceMetrics() {
       return (
@@ -111,47 +96,6 @@ export default {
         enabledReports &&
         this.$options.securityReportTypes.some(reportType => enabledReports[reportType])
       );
-    },
-    codequalityText() {
-      const { newIssues, resolvedIssues } = this.mr.codeclimateMetrics;
-      const text = [];
-
-      if (!newIssues.length && !resolvedIssues.length) {
-        text.push(s__('ciReport|No changes to code quality'));
-      } else if (newIssues.length || resolvedIssues.length) {
-        text.push(s__('ciReport|Code quality'));
-
-        if (resolvedIssues.length) {
-          text.push(n__(' improved on %d point', ' improved on %d points', resolvedIssues.length));
-        }
-
-        if (newIssues.length > 0 && resolvedIssues.length > 0) {
-          text.push(__(' and'));
-        }
-
-        if (newIssues.length) {
-          text.push(n__(' degraded on %d point', ' degraded on %d points', newIssues.length));
-        }
-      }
-
-      return text.join('');
-    },
-    codequalityPopover() {
-      const { codeclimate } = this.mr || {};
-      if (codeclimate && !codeclimate.base_path) {
-        return {
-          title: s__('ciReport|Base pipeline codequality artifact not found'),
-          content: sprintf(
-            s__('ciReport|%{linkStartTag}Learn more about codequality reports %{linkEndTag}'),
-            {
-              linkStartTag: `<a href="${this.mr.codequalityHelpPath}" target="_blank" rel="noopener noreferrer">`,
-              linkEndTag: '<i class="fa fa-external-link" aria-hidden="true"></i></a>',
-            },
-            false,
-          ),
-        };
-      }
-      return {};
     },
 
     browserPerformanceText() {
@@ -204,10 +148,6 @@ export default {
       return [...text, ...reportNumbers.join(', ')].join('');
     },
 
-    codequalityStatus() {
-      return this.checkReportStatus(this.isLoadingCodequality, this.loadingCodequalityFailed);
-    },
-
     browserPerformanceStatus() {
       return this.checkReportStatus(
         this.isLoadingBrowserPerformance,
@@ -236,11 +176,6 @@ export default {
     },
   },
   watch: {
-    shouldRenderCodeQuality(newVal) {
-      if (newVal) {
-        this.fetchCodeQuality();
-      }
-    },
     hasBrowserPerformancePaths(newVal) {
       if (newVal) {
         this.fetchBrowserPerformance();
@@ -263,37 +198,6 @@ export default {
         apiApprovePath: store.apiApprovePath,
         apiUnapprovePath: store.apiUnapprovePath,
       };
-    },
-    fetchCodeQuality() {
-      const { codeclimate } = this.mr || {};
-
-      if (!codeclimate.base_path) {
-        this.isLoadingCodequality = false;
-        this.loadingCodequalityFailed = true;
-        return;
-      }
-
-      this.isLoadingCodequality = true;
-
-      Promise.all([
-        this.service.fetchReport(codeclimate.head_path),
-        this.service.fetchReport(codeclimate.base_path),
-      ])
-        .then(values =>
-          this.mr.compareCodeclimateMetrics(
-            values[0],
-            values[1],
-            this.mr.headBlobPath,
-            this.mr.baseBlobPath,
-          ),
-        )
-        .then(() => {
-          this.isLoadingCodequality = false;
-        })
-        .catch(() => {
-          this.isLoadingCodequality = false;
-          this.loadingCodequalityFailed = true;
-        });
     },
 
     fetchBrowserPerformance() {
@@ -367,18 +271,13 @@ export default {
     />
     <div class="mr-section-container mr-widget-workflow">
       <blocking-merge-requests-report :mr="mr" />
-      <report-section
+      <grouped-codequality-reports-app
         v-if="shouldRenderCodeQuality"
-        :status="codequalityStatus"
-        :loading-text="translateText('codeclimate').loading"
-        :error-text="translateText('codeclimate').error"
-        :success-text="codequalityText"
-        :unresolved-issues="mr.codeclimateMetrics.newIssues"
-        :resolved-issues="mr.codeclimateMetrics.resolvedIssues"
-        :has-issues="hasCodequalityIssues"
-        :component="$options.componentNames.CodequalityIssueBody"
-        :popover-options="codequalityPopover"
-        class="js-codequality-widget mr-widget-border-top mr-report"
+        :base-path="mr.codeclimate.base_path"
+        :head-path="mr.codeclimate.head_path"
+        :head-blob-path="mr.headBlobPath"
+        :base-blob-path="mr.baseBlobPath"
+        :codequality-help-path="mr.codequalityHelpPath"
       />
       <report-section
         v-if="shouldRenderBrowserPerformance"
