@@ -21,7 +21,7 @@ RSpec.describe Issuable::BulkUpdateService do
   end
 
   shared_examples 'does not update issuables attribute' do |attribute|
-    it 'does not update issuables' do
+    it 'raises record not found error' do
       issuables.each do |issuable|
         expect { subject }.not_to change { issuable.send(attribute) }
       end
@@ -75,6 +75,22 @@ RSpec.describe Issuable::BulkUpdateService do
               expect(issuable.health_status).to be_nil
               expect(issuable.epic).to be_nil
             end
+          end
+        end
+
+        context 'when epic param is incorrect' do
+          let(:external_epic) { create(:epic, group: create(:group, :private))}
+          let(:params) do
+            {
+              issuable_ids: issuables.map(&:id),
+              epic_id: external_epic.id
+            }
+          end
+
+          it 'returns error' do
+            expect(subject.message).to eq('Epic not found for given params')
+            expect(subject.status).to eq(:error)
+            expect(subject.http_status).to eq(422)
           end
         end
       end
@@ -143,7 +159,11 @@ RSpec.describe Issuable::BulkUpdateService do
           stub_licensed_features(epics: false)
         end
 
-        it_behaves_like 'does not update issuables attribute', :labels
+        it 'does not update issuables attribute' do
+          issuables.each do |issuable|
+            expect { subject }.not_to change { issuable.labels }
+          end
+        end
       end
 
       context 'when issuable_ids contain external epics' do

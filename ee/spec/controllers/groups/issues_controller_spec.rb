@@ -61,6 +61,23 @@ RSpec.describe Groups::IssuesController do
             .and change { issue1.epic }.from(nil).to(epic)
             .and change { issue2.epic }.from(nil).to(epic)
         end
+
+        context 'when params are incorrect' do
+          let(:external_epic) { create(:epic, group: create(:group, :private)) }
+          let(:params) do
+            {
+              update: { issuable_ids: "#{issue1.id}, #{issue2.id}", epic_id: external_epic.id },
+              group_id: group
+            }
+          end
+
+          it 'returns 422 status' do
+            subject
+
+            expect(response).to have_gitlab_http_status(:unprocessable_entity)
+            expect(response.body).to include('Epic not found for given params')
+          end
+        end
       end
 
       context 'when user does not have permissions to bulk update issues' do

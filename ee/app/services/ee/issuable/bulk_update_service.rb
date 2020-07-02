@@ -41,29 +41,27 @@ module EE
         return unless params[:epic_id].present?
 
         epic_id = params.delete(:epic_id)
-        epic = find_epic(epic_id)
-
-        # Set as nil if removing an epic or set as the Epic object
-        # if epic_id is present and the Epic was found.
-        params[:epic] = epic if epic.nil? || epic.present?
+        params[:epic] = find_epic(epic_id)
       end
 
-      # rubocop: disable CodeReuse/ActiveRecord
       def find_epic(epic_id)
         return if remove_epic?(epic_id)
 
-        group = parent.is_a?(Group) ? parent : parent.group
-        return unless group.present?
-
-        EpicsFinder.new(current_user, group_id: group.id,
-                        include_ancestor_groups: true).find(epic_id)
+        EpicsFinder.new(current_user, group_id: group&.id, include_ancestor_groups: true).find(epic_id)
       rescue ActiveRecord::RecordNotFound
-        false
+        raise ArgumentError, _('Epic not found for given params')
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       def remove_epic?(epic_id)
         epic_id == IssuableFinder::Params::NONE.to_s
+      end
+
+      def epics_available?
+        group&.feature_available?(:epics)
+      end
+
+      def group
+        parent.is_a?(Group) ? parent : parent.group
       end
     end
   end
