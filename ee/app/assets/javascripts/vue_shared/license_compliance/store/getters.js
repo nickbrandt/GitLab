@@ -21,7 +21,7 @@ export const licenseReportGroups = state =>
   );
 
 export const hasReportItems = (_, getters) => {
-  return Boolean(getters.licenseReport && getters.licenseReport.length);
+  return Boolean(getters.licenseReport?.length);
 };
 
 export const baseReportHasLicenses = state => {
