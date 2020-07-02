@@ -161,7 +161,7 @@ RSpec.describe 'Epic show', :js do
           end
         end
 
-        it 'shows comments in the correct order' do
+        it 'shows comments in the correct order', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/225637' do
           page.within('[data-testid="sort-discussion-filter"]') do
             expect(find('.js-dropdown-text')).to have_content('Newest first')
           end
