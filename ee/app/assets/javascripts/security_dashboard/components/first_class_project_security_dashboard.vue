@@ -57,11 +57,13 @@ export default {
     },
     userCalloutId: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
     userCalloutsPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
   },
   data() {
