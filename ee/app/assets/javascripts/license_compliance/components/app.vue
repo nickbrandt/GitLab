@@ -131,26 +131,24 @@ export default {
       <template v-else>{{ s__('Licenses|Specified policies in this project') }}</template>
     </header>
 
-    <template>
-      <gl-tabs v-model="tabIndex" content-class="pt-0">
-        <gl-tab data-testid="licensesTab">
-          <template #title>
-            <span data-testid="licensesTabTitle">{{ s__('Licenses|Detected in Project') }}</span>
-            <gl-badge pill>{{ licenseCount }}</gl-badge>
-          </template>
+    <gl-tabs v-model="tabIndex" content-class="pt-0">
+      <gl-tab data-testid="licensesTab">
+        <template #title>
+          <span data-testid="licensesTabTitle">{{ s__('Licenses|Detected in Project') }}</span>
+          <gl-badge pill>{{ licenseCount }}</gl-badge>
+        </template>
 
-          <detected-licenses-table />
-        </gl-tab>
+        <detected-licenses-table />
+      </gl-tab>
 
-        <gl-tab data-testid="policiesTab">
-          <template #title>
-            <span data-testid="policiesTabTitle">{{ s__('Licenses|Policies') }}</span>
-            <gl-badge pill>{{ policyCount }}</gl-badge>
-          </template>
+      <gl-tab data-testid="policiesTab">
+        <template #title>
+          <span data-testid="policiesTabTitle">{{ s__('Licenses|Policies') }}</span>
+          <gl-badge pill>{{ policyCount }}</gl-badge>
+        </template>
 
-          <license-management />
-        </gl-tab>
-      </gl-tabs>
-    </template>
+        <license-management />
+      </gl-tab>
+    </gl-tabs>
   </div>
 </template>

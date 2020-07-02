@@ -106,34 +106,34 @@ export default {
         <template v-else>
           <div class="table-section gl-d-flex gl-pl-2 section-70" role="rowheader">
             {{ s__('Licenses|Policy') }}
-            <gl-icon
-              v-if="isTooltipEnabled"
-              ref="reportInfo"
-              name="question"
-              class="text-info gl-ml-1 gl-cursor-pointer"
-              :aria-label="__('help')"
-              :size="14"
-            />
-            <gl-popover
-              v-if="isTooltipEnabled"
-              :target="() => $refs.reportInfo.$el"
-              placement="bottom"
-              triggers="click blur"
-              :css-classes="['gl-mt-3']"
-            >
-              <div class="h5">{{ __('Allowed') }}</div>
-              <span class="text-secondary">
-                {{ s__('Licenses|Acceptable license to be used in the project') }}</span
+            <template v-if="isTooltipEnabled">
+              <gl-icon
+                ref="reportInfo"
+                name="question"
+                class="text-info gl-ml-1 gl-cursor-pointer"
+                :aria-label="__('help')"
+                :size="14"
+              />
+              <gl-popover
+                :target="() => $refs.reportInfo.$el"
+                placement="bottom"
+                triggers="click blur"
+                :css-classes="['gl-mt-3']"
               >
-              <div class="h5">{{ __('Denied') }}</div>
-              <span class="text-secondary">
-                {{
-                  s__(
-                    'Licenses|Disallow Merge request if detected and will instruct the developer to remove',
-                  )
-                }}</span
-              >
-            </gl-popover>
+                <div class="h5">{{ __('Allowed') }}</div>
+                <span class="text-secondary">
+                  {{ s__('Licenses|Acceptable license to be used in the project') }}</span
+                >
+                <div class="h5">{{ __('Denied') }}</div>
+                <span class="text-secondary">
+                  {{
+                    s__(
+                      'Licenses|Disallow Merge request if detected and will instruct the developer to remove',
+                    )
+                  }}</span
+                >
+              </gl-popover>
+            </template>
           </div>
 
           <div class="table-section section-30" role="rowheader">
