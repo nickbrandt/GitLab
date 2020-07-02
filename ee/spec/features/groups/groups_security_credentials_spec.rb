@@ -42,21 +42,9 @@ RSpec.describe 'Groups::Security::Credentials' do
 
     context 'filtering' do
       context 'by Personal Access Tokens' do
-        before do
-          create(:personal_access_token,
-            user: managed_user,
-            created_at: '2019-12-10',
-            expires_at: nil)
+        let(:credentials_path) { group_security_credentials_path(group_id: group_id, filter: 'personal_access_tokens') }
 
-          visit group_security_credentials_path(group_id: group_id, filter: 'personal_access_tokens')
-        end
-
-        it 'shows details of personal access tokens' do
-          expect(first_row.text).to include('David')
-          expect(first_row.text).to include('api')
-          expect(first_row.text).to include('2019-12-10')
-          expect(first_row.text).to include('Never')
-        end
+        it_behaves_like 'credentials inventory personal access tokens', group_managed_account: true
       end
 
       context 'by SSH Keys' do
