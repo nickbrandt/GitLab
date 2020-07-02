@@ -116,17 +116,26 @@ const createPipelinesTabs = testReportsStore => {
   }
 };
 
-const createTestDetails = (fullReportEndpoint, summaryEndpoint) => {
+const createTestDetails = () => {
   if (!window.gon?.features?.junitPipelineView) {
     return;
   }
 
-  const testReportsStore = createTestReportsStore({ fullReportEndpoint, summaryEndpoint });
-  createPipelinesTabs(testReportsStore);
+  const el = document.querySelector('#js-pipeline-tests-detail');
+  const { fullReportEndpoint, summaryEndpoint, countEndpoint } = el?.dataset;
+
+  const testReportsStore = createTestReportsStore({
+    fullReportEndpoint,
+    summaryEndpoint: summaryEndpoint || countEndpoint,
+  });
+
+  if (!window.gon?.features?.buildReportSummary) {
+    createPipelinesTabs(testReportsStore);
+  }
 
   // eslint-disable-next-line no-new
   new Vue({
-    el: '#js-pipeline-tests-detail',
+    el,
     components: {
       TestReports,
     },
@@ -170,6 +179,6 @@ export default () => {
 
   createPipelinesDetailApp(mediator);
   createPipelineHeaderApp(mediator);
-  createTestDetails(dataset.testReportEndpoint, dataset.testReportsCountEndpoint);
+  createTestDetails();
   createDagApp();
 };

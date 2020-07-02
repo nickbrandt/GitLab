@@ -3,7 +3,9 @@ import * as types from './mutation_types';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 
-export const fetchSummary = ({ state, commit }) => {
+export const fetchSummary = ({ dispatch, state, commit }) => {
+  dispatch('setLoading', true);
+
   return axios
     .get(state.summaryEndpoint)
     .then(({ data }) => {
@@ -18,11 +20,14 @@ export const fetchSummary = ({ state, commit }) => {
     })
     .catch(() => {
       createFlash(s__('TestReports|There was an error fetching the summary.'));
+    })
+    .finally(() => {
+      dispatch('setLoading', false);
     });
 };
 
 export const fetchFullReport = ({ state, commit, dispatch }) => {
-  dispatch('toggleLoading');
+  dispatch('setLoading', true);
 
   return axios
     .get(state.fullReportEndpoint)
@@ -31,13 +36,20 @@ export const fetchFullReport = ({ state, commit, dispatch }) => {
       createFlash(s__('TestReports|There was an error fetching the test reports.'));
     })
     .finally(() => {
-      dispatch('toggleLoading');
+      dispatch('setLoading', false);
     });
 };
 
-export const setSelectedSuite = ({ commit }, data) => commit(types.SET_SELECTED_SUITE, data);
-export const removeSelectedSuite = ({ commit }) => commit(types.SET_SELECTED_SUITE, {});
-export const toggleLoading = ({ commit }) => commit(types.TOGGLE_LOADING);
+export const setSelectedSuite = ({ commit, dispatch, state }, index) => {
+  commit(types.SET_SELECTED_SUITE, index);
+
+  // Fetch the full report when the user clicks to see more details
+  if (!state.hasFullReport) {
+    dispatch('fetchFullReport');
+  }
+};
+export const removeSelectedSuite = ({ commit }) => commit(types.SET_SELECTED_SUITE, null);
+export const setLoading = ({ commit }, isLoading) => commit(types.SET_LOADING, isLoading);
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
