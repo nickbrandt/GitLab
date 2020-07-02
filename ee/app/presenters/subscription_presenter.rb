@@ -27,6 +27,8 @@ class SubscriptionPresenter < Gitlab::View::Presenter::Delegated
   def remaining_days
     return unless end_date
 
+    return 0 if expired?
+
     (end_date - Date.today).to_i
   end
 

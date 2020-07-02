@@ -88,5 +88,13 @@ RSpec.describe SubscriptionPresenter do
         expect(subject).to eq(2)
       end
     end
+
+    it 'is 0 if expired' do
+      allow(subscription).to receive(:end_date).and_return(Time.utc(2020, 3, 1, 10).to_date)
+
+      Timecop.freeze(today) do
+        expect(subject).to eq(0)
+      end
+    end
   end
 end
