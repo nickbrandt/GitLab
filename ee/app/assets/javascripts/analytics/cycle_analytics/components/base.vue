@@ -113,7 +113,7 @@ export default {
       // https://gitlab.com/gitlab-org/gitlab/-/issues/223735
       return this.featureFlags.hasFilterBar && this.currentGroupPath;
     },
-    canCreateMultipleValueStreams() {
+    shouldDisplayCreateMultipleValueStreams() {
       return Boolean(this.featureFlags.hasCreateMultipleValueStreams);
     },
     isLoadingTypeOfWork() {
@@ -220,17 +220,20 @@ export default {
 <template>
   <div>
     <div
-      class="mb-3 gl-display-flex gl-flex-direction-column gl-sm-flex-direction-row gl-justify-content-space-between"
+      class="gl-mb-3 gl-display-flex gl-flex-direction-column gl-sm-flex-direction-row gl-justify-content-space-between"
     >
       <h3>{{ __('Value Stream Analytics') }}</h3>
       <div
+        v-if="shouldDisplayCreateMultipleValueStreams"
         class="gl-align-self-center"
         :class="{
           'gl-w-full': isXSBreakpoint,
           'gl-mt-5': !isXSBreakpoint,
         }"
       >
-        <gl-button @click="onCreateValueStream">{{ __('Create new value stream') }}</gl-button>
+        <gl-button data-testid="create-value-stream" @click="onCreateValueStream">{{
+          __('Create new value stream')
+        }}</gl-button>
       </div>
     </div>
     <div class="mw-100">

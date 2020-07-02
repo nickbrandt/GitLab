@@ -6833,6 +6833,9 @@ msgstr ""
 msgid "Create new label"
 msgstr ""
 
+msgid "Create new value stream"
+msgstr ""
+
 msgid "Create new..."
 msgstr ""
 
