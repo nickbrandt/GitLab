@@ -2,6 +2,11 @@
 
 module Gitlab
   module UsageDataConcerns
+    # rubocop:disable Gitlab/ModuleWithInstanceVariables
+    #
+    # We already have a follow up issue and MR to resolve this properly:
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/225492
+    # https://gitlab.com/gitlab-org/gitlab/-/merge_requests/35856/
     module Topology
       include Gitlab::Utils::UsageData
 
@@ -23,31 +28,31 @@ module Gitlab
       end
 
       def topology_usage_data
-        failures = []
-        topology_data, duration = measure_duration { topology_fetch_all_data(failures) }
+        @failures = []
+        topology_data, duration = measure_duration { topology_fetch_all_data }
         {
           topology: topology_data
                       .merge(duration_s: duration)
-                      .merge(failures: failures.map(&:to_h))
+                      .merge(failures: @failures.map(&:to_h))
         }
       end
 
       private
 
-      def topology_fetch_all_data(failures)
+      def topology_fetch_all_data
         with_prometheus_client(fallback: {}) do |client|
           {
-            application_requests_per_hour: topology_app_requests_per_hour(client, failures),
-            nodes: topology_node_data(client, failures)
+            application_requests_per_hour: topology_app_requests_per_hour(client),
+            nodes: topology_node_data(client)
           }.compact
         end
       rescue => e
-        failures << CollectionFailure.new('other', e.class.to_s)
+        @failures << CollectionFailure.new('other', e.class.to_s)
         {}
       end
 
-      def topology_app_requests_per_hour(client, failures)
-        result = query_safely('gitlab_usage_ping:ops:rate5m', 'app_requests', failures, fallback: nil) do |query|
+      def topology_app_requests_per_hour(client)
+        result = query_safely('gitlab_usage_ping:ops:rate5m', 'app_requests', fallback: nil) do |query|
           client.query(one_week_average(query)).first
         end
 
@@ -57,13 +62,13 @@ module Gitlab
         (result['value'].last.to_f * 1.hour).to_i
       end
 
-      def topology_node_data(client, failures)
+      def topology_node_data(client)
         # node-level data
-        by_instance_mem = topology_node_memory(client, failures)
-        by_instance_cpus = topology_node_cpus(client, failures)
+        by_instance_mem = topology_node_memory(client)
+        by_instance_cpus = topology_node_cpus(client)
         # service-level data
-        by_instance_by_job_by_type_memory = topology_all_service_memory(client, failures)
-        by_instance_by_job_process_count = topology_all_service_process_count(client, failures)
+        by_instance_by_job_by_type_memory = topology_all_service_memory(client)
+        by_instance_by_job_process_count = topology_all_service_process_count(client)
 
         instances = Set.new(by_instance_mem.keys + by_instance_cpus.keys)
         instances.map do |instance|
@@ -76,59 +81,59 @@ module Gitlab
         end
       end
 
-      def topology_node_memory(client, failures)
-        query_safely('gitlab_usage_ping:node_memory_total_bytes:avg', 'node_memory', failures, fallback: {}) do |query|
+      def topology_node_memory(client)
+        query_safely('gitlab_usage_ping:node_memory_total_bytes:avg', 'node_memory', fallback: {}) do |query|
           aggregate_by_instance(client, query)
         end
       end
 
-      def topology_node_cpus(client, failures)
-        query_safely('gitlab_usage_ping:node_cpus:count', 'node_cpus', failures, fallback: {}) do |query|
+      def topology_node_cpus(client)
+        query_safely('gitlab_usage_ping:node_cpus:count', 'node_cpus', fallback: {}) do |query|
           aggregate_by_instance(client, query)
         end
       end
 
-      def topology_all_service_memory(client, failures)
+      def topology_all_service_memory(client)
         {
-          rss: topology_service_memory_rss(client, failures),
-          uss: topology_service_memory_uss(client, failures),
-          pss: topology_service_memory_pss(client, failures)
+          rss: topology_service_memory_rss(client),
+          uss: topology_service_memory_uss(client),
+          pss: topology_service_memory_pss(client)
         }
       end
 
-      def topology_service_memory_rss(client, failures)
+      def topology_service_memory_rss(client)
         query_safely(
-          'gitlab_usage_ping:node_service_process_resident_memory_bytes:avg', 'service_rss', failures, fallback: []
+          'gitlab_usage_ping:node_service_process_resident_memory_bytes:avg', 'service_rss', fallback: []
         ) { |query| aggregate_by_labels(client, query) }
       end
 
-      def topology_service_memory_uss(client, failures)
+      def topology_service_memory_uss(client)
         query_safely(
-          'gitlab_usage_ping:node_service_process_unique_memory_bytes:avg', 'service_uss', failures, fallback: []
+          'gitlab_usage_ping:node_service_process_unique_memory_bytes:avg', 'service_uss', fallback: []
         ) { |query| aggregate_by_labels(client, query) }
       end
 
-      def topology_service_memory_pss(client, failures)
+      def topology_service_memory_pss(client)
         query_safely(
-          'gitlab_usage_ping:node_service_process_proportional_memory_bytes:avg', 'service_pss', failures, fallback: []
+          'gitlab_usage_ping:node_service_process_proportional_memory_bytes:avg', 'service_pss', fallback: []
         ) { |query| aggregate_by_labels(client, query) }
       end
 
-      def topology_all_service_process_count(client, failures)
+      def topology_all_service_process_count(client)
         query_safely(
-          'gitlab_usage_ping:node_service_process:count', 'service_process_count', failures, fallback: []
+          'gitlab_usage_ping:node_service_process:count', 'service_process_count', fallback: []
         ) { |query| aggregate_by_labels(client, query) }
       end
 
-      def query_safely(query, query_name, failures, fallback:)
+      def query_safely(query, query_name, fallback:)
         result = yield query
 
         return result if result.present?
 
-        failures << CollectionFailure.new(query_name, 'empty_result')
+        @failures << CollectionFailure.new(query_name, 'empty_result')
         fallback
       rescue => e
-        failures << CollectionFailure.new(query_name, e.class.to_s)
+        @failures << CollectionFailure.new(query_name, e.class.to_s)
         fallback
       end
 
@@ -196,5 +201,6 @@ module Gitlab
         end
       end
     end
+    # rubocop:enable Gitlab/ModuleWithInstanceVariables
   end
 end
