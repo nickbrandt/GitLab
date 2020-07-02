@@ -14,7 +14,6 @@ RSpec.describe Geo::FileRegistryFinder, :geo, :geo_fdw do
       count_synced_missing_on_primary
       count_registry
       find_unsynced
-      find_migrated_local
       find_retryable_failed_registries
       find_retryable_synced_missing_on_primary_registries
     ].each do |required_method|

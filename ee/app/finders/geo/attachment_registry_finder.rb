@@ -92,10 +92,6 @@ module Geo
     alias_method :find_unsynced, :find_never_synced_registries
     # rubocop:enable CodeReuse/ActiveRecord
 
-    def find_migrated_local(batch_size:, except_ids: [])
-      Geo::UploadRegistry.none
-    end
-
     # rubocop: disable CodeReuse/ActiveRecord
     def find_retryable_failed_registries(batch_size:, except_ids: [])
       syncable
