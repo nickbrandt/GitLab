@@ -6,7 +6,6 @@ import {
   groupedReportText,
 } from 'ee/vue_shared/security_reports/store/utils';
 import convertReportType from 'ee/vue_shared/security_reports/store/utils/convert_report_type';
-import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import {
   CRITICAL,
@@ -61,15 +60,6 @@ describe('security reports utils', () => {
         expect(convertReportType(reportType)).toEqual(output);
       },
     );
-  });
-
-  describe('filterByKey', () => {
-    it('filters the array with the provided key', () => {
-      const array1 = [{ id: '1234' }, { id: 'abg543' }, { id: '214swfA' }];
-      const array2 = [{ id: '1234' }, { id: 'abg543' }, { id: '453OJKs' }];
-
-      expect(filterByKey(array1, array2, 'id')).toEqual([{ id: '214swfA' }]);
-    });
   });
 
   describe('getFileLocation', () => {
