@@ -20,13 +20,13 @@ import CustomStageForm from './custom_stage_form.vue';
 import PathNavigation from './path_navigation.vue';
 import MetricCard from '../../shared/components/metric_card.vue';
 import FilterBar from './filter_bar.vue';
+import ValueStreamSelect from './value_stream_select.vue';
 
 export default {
   name: 'CycleAnalytics',
   components: {
     DateRange,
     DurationChart,
-    GlButton,
     GlLoadingIcon,
     GlEmptyState,
     GroupsDropdownFilter,
@@ -40,6 +40,7 @@ export default {
     PathNavigation,
     MetricCard,
     FilterBar,
+    ValueStreamSelect,
   },
   mixins: [UrlSyncMixin],
   props: {
@@ -231,9 +232,7 @@ export default {
           'gl-mt-5': !isXSBreakpoint,
         }"
       >
-        <gl-button data-testid="create-value-stream" @click="onCreateValueStream">{{
-          __('Create new value stream')
-        }}</gl-button>
+        <value-stream-select @create="onCreateValueStream" />
       </div>
     </div>
     <div class="mw-100">
