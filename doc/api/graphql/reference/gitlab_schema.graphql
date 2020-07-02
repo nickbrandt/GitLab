@@ -11470,9 +11470,14 @@ type SentryDetailedError {
   firstReleaseLastCommit: String
 
   """
-  Release version the error was first seen
+  Release short version the error was first seen
   """
   firstReleaseShortVersion: String
+
+  """
+  Release version the error was first seen
+  """
+  firstReleaseVersion: String
 
   """
   Timestamp when the error was first seen
@@ -11510,9 +11515,14 @@ type SentryDetailedError {
   lastReleaseLastCommit: String
 
   """
-  Release version the error was last seen
+  Release short version the error was last seen
   """
   lastReleaseShortVersion: String
+
+  """
+  Release version the error was last seen
+  """
+  lastReleaseVersion: String
 
   """
   Timestamp when the error was last seen
