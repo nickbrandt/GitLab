@@ -91,16 +91,6 @@ module EE
         !merge_train_pipeline? && super
       end
 
-      def batch_lookup_report_artifact_for_file_type(file_type)
-        return unless available_licensed_report_type?(file_type)
-
-        latest_report_artifacts
-          .values_at(*::Ci::JobArtifact.associated_file_types_for(file_type.to_s))
-          .flatten
-          .compact
-          .last
-      end
-
       def expose_license_scanning_data?
         batch_lookup_report_artifact_for_file_type(:license_scanning).present?
       end
@@ -172,35 +162,6 @@ module EE
 
       def merge_train_ref?
         ::MergeRequest.merge_train_ref?(ref)
-      end
-
-      # This batch loads the latest reports for each CI job artifact
-      # type (e.g. sast, dast, etc.) in a single SQL query to eliminate
-      # the need to do N different `job_artifacts.where(file_type:
-      # X).last` calls.
-      #
-      # Return a hash of file type => array of 1 job artifact
-      def latest_report_artifacts
-        ::Gitlab::SafeRequestStore.fetch("pipeline:#{self.id}:latest_report_artifacts") do
-          # Note we use read_attribute(:project_id) to read the project
-          # ID instead of self.project_id. The latter appears to load
-          # the Project model. This extra filter doesn't appear to
-          # affect query plan but included to ensure we don't leak the
-          # wrong informaiton.
-          ::Ci::JobArtifact.where(
-            id: job_artifacts.with_reports
-              .select('max(ci_job_artifacts.id) as id')
-              .where(project_id: self.read_attribute(:project_id))
-              .group(:file_type)
-          )
-            .preload(:job)
-            .group_by(&:file_type)
-        end
-      end
-
-      def available_licensed_report_type?(file_type)
-        feature_names = REPORT_LICENSED_FEATURES.fetch(file_type)
-        feature_names.nil? || feature_names.any? { |feature| project.feature_available?(feature) }
       end
     end
   end
