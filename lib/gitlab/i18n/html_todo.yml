@@ -93,19 +93,6 @@
     - "<strong>Supprime</strong> la branche source"
     - "<strong>elimina</strong> la rama origen"
     - "Kaynak dalı <strong>siler</strong>"
-"A fork is a copy of a project.<br />Forking a repository allows you to make changes without affecting the original project.":
-  plural_id:
-  translations:
-    - "Um fork é uma cópia de um projeto.<br />Fork de um repositório permite que você faça alterações sem afetar o projeto original."
-    - "フォークはプロジェクトのコピーです。<br />リポジトリをフォークすると、元のプロジェクトに影響を与えずに変更することができます。"
-    - "分叉是專案的複本。<br />分叉版本庫讓您在不影響原始專案的情況下，進行變更。"
-    - "Um fork é uma cópia de um projeto.<br />Bifurcação de um repositório permite que faças alterações sem afetar o projeto original."
-    - "Ответвление - это копия проекта.<br />Ответвление репозитория позволяет вносить изменения, не влияя на исходный проект."
-    - "派生是项目的副本。<br />仓库的派生允许您在不影响原始项目的情况下进行更改。"
-    - "Форк - це копія проєкту.<br />Форк репозиторію дозволяє вносити зміни без впливу на оригінальний проєкт."
-    - "Ein Fork ist eine Kopie eines Projekts.<br />Wenn du ein Repository forkst, kannst du, ohne Auswirkungen auf das ursprüngliche Projekt, Änderungen vornehmen."
-    - "포크는 프로젝트의 사본입니다.<br />저장소를 포크하면 원래 프로젝트에 영향을주지 않고 변경할 수 있습니다."
-    - "Un fork es una copia de un proyecto.<br />Realizar un fork de un repositorio le permite realizar cambios sin afectar al proyecto original."
 "Badges|You are going to delete this badge. Deleted badges <strong>cannot</strong> be restored.":
   plural_id:
   translations:
@@ -1053,3 +1040,16 @@
     - "CSV导出将在后台创建。完成后，它将以附件形式发送到<strong>%{email}</strong>。"
     - "Експорт CSV буде створено у фоновому режимі. Після завершення його буде надіслано на <strong>%{email}</strong> у вкладенні."
     - "La exportación CSV se creará en segundo plano. Una vez finalizada, será enviada a <strong>%{email}</strong> como un fichero adjunto al correo electrónico."
+"A fork is a copy of a project.<br />Forking a repository allows you to make changes without affecting the original project.":
+  plural_id:
+  translations:
+    - "Um fork é uma cópia de um projeto.<br />Fork de um repositório permite que você faça alterações sem afetar o projeto original."
+    - "フォークはプロジェクトのコピーです。<br />リポジトリをフォークすると、元のプロジェクトに影響を与えずに変更することができます。"
+    - "分叉是專案的複本。<br />分叉版本庫讓您在不影響原始專案的情況下，進行變更。"
+    - "Um fork é uma cópia de um projeto.<br />Bifurcação de um repositório permite que faças alterações sem afetar o projeto original."
+    - "Ответвление - это копия проекта.<br />Ответвление репозитория позволяет вносить изменения, не влияя на исходный проект."
+    - "派生是项目的副本。<br />仓库的派生允许您在不影响原始项目的情况下进行更改。"
+    - "Форк - це копія проєкту.<br />Форк репозиторію дозволяє вносити зміни без впливу на оригінальний проєкт."
+    - "Ein Fork ist eine Kopie eines Projekts.<br />Wenn du ein Repository forkst, kannst du, ohne Auswirkungen auf das ursprüngliche Projekt, Änderungen vornehmen."
+    - "포크는 프로젝트의 사본입니다.<br />저장소를 포크하면 원래 프로젝트에 영향을주지 않고 변경할 수 있습니다."
+    - "Un fork es una copia de un proyecto.<br />Realizar un fork de un repositorio le permite realizar cambios sin afectar al proyecto original."
