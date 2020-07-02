@@ -89,9 +89,13 @@ export default function initDiffsApp(store) {
       const renderTreeList = treeListStored !== null ? parseBoolean(treeListStored) : true;
 
       this.setRenderTreeList(renderTreeList);
+
+      // Set whitespace default as per user preferences
+      const hideWhitespace = this.showWhitespaceDefault ? '0' : '1';
+      this.setShowWhitespace({ showWhitespace: hideWhitespace !== '1' });
     },
     methods: {
-      ...mapActions('diffs', ['setRenderTreeList']),
+      ...mapActions('diffs', ['setRenderTreeList', 'setShowWhitespace']),
     },
     render(createElement) {
       return createElement('diffs-app', {
@@ -108,7 +112,6 @@ export default function initDiffsApp(store) {
           isFluidLayout: this.isFluidLayout,
           dismissEndpoint: this.dismissEndpoint,
           showSuggestPopover: this.showSuggestPopover,
-          showWhitespaceDefault: this.showWhitespaceDefault,
         },
       });
     },
