@@ -12,14 +12,14 @@ export default {
   <div class="mr-widget-body media">
     <div class="space-children">
       <status-icon status="warning" />
-      <button type="button" class="btn btn-success btn-sm" disabled="true">
+      <gl-button category="primary" variant="success" disabled="disabled" size="small">
         {{ s__('mrWidget|Merge') }}
-      </button>
+      </gl-button>
     </div>
     <div class="media-body">
-      <span class="bold">
+      <strong>
         {{ s__('mrWidget|You can only merge once the denied license is removed') }}
-      </span>
+      </strong>
     </div>
   </div>
 </template>

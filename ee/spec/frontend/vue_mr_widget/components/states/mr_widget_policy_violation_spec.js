@@ -15,18 +15,16 @@ describe('EE MrWidgetPolicyViolation', () => {
     wrapper = null;
   });
 
-  describe('when shown', () => {
-    beforeEach(() => {
-      createComponent();
-    });
+  beforeEach(() => {
+    createComponent();
+  });
 
-    it('shows the disabled merge button', () => {
-      expect(wrapper.text()).toContain('Merge');
-      expect(findButton().attributes().disabled).toBe('disabled');
-    });
+  it('shows the disabled merge button', () => {
+    expect(wrapper.text()).toContain('Merge');
+    expect(findButton().attributes().disabled).toBe('disabled');
+  });
 
-    it('shows the disabled reason', () => {
-      expect(wrapper.text()).toContain('You can only merge once the denied license is removed');
-    });
+  it('shows the disabled reason', () => {
+    expect(wrapper.text()).toContain('You can only merge once the denied license is removed');
   });
 });

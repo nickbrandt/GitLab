@@ -21,11 +21,11 @@ export const licenseReportGroups = state =>
   );
 
 export const hasReportItems = (_, getters) => {
-  return getters.licenseReport && getters.licenseReport.length;
+  return Boolean(getters.licenseReport && getters.licenseReport.length);
 };
 
 export const baseReportHasLicenses = state => {
-  return state.existingLicenses.length;
+  return Boolean(state.existingLicenses.length);
 };
 
 export const licenseReportLength = (_, getters) => {

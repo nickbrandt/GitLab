@@ -114,14 +114,12 @@ export const receiveSetLicenseApprovalError = ({ commit }, error) => {
 export const fetchLicenseCheckApprovalRule = ({ dispatch, state }) => {
   dispatch('requestLicenseCheckApprovalRule');
 
-  axios
+  return axios
     .get(state.approvalsApiPath)
     .then(({ data }) => {
-      const hasLicenseCheckApprovalRule = Boolean(
-        data.approval_rules_left.find(rule => {
-          return rule.name === 'License-Check';
-        }),
-      );
+      const hasLicenseCheckApprovalRule = data.approval_rules_left.some(rule => {
+        return rule.name === 'License-Check';
+      });
 
       dispatch('receiveLicenseCheckApprovalRuleSuccess', { hasLicenseCheckApprovalRule });
     })
