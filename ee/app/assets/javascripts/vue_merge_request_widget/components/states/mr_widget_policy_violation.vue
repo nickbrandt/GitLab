@@ -1,10 +1,12 @@
 <script>
-import statusIcon from '~/vue_merge_request_widget/components/mr_widget_status_icon.vue';
+import { GlButton } from '@gitlab/ui';
+import StatusIcon from '~/vue_merge_request_widget/components/mr_widget_status_icon.vue';
 
 export default {
   name: 'MRWidgetPolicyViolation',
   components: {
-    statusIcon,
+    GlButton,
+    StatusIcon,
   },
 };
 </script>
