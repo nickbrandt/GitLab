@@ -11,11 +11,15 @@ export default {
     GlModalDirective,
   },
   props: {},
-  computed: {},
   data() {
     return {
       name: '',
     };
+  },
+  computed: {
+    isValid() {
+      return Boolean(this.name.length);
+    },
   },
 };
 </script>
@@ -26,17 +30,22 @@ export default {
       data-testid="create-value-stream"
       >{{ __('Create new value stream') }}</gl-button
     >
-    <!-- no-fade: no idea 🤷‍♂️ -->
     <gl-modal
       modal-id="create-value-stream-modal"
-      :title="__('Value stream name')"
-      no-fade
-      :action-primary="{ text: __('Create value stream') }"
+      :title="__('Value Stream Name')"
+      :action-primary="{
+        text: __('Create value stream'),
+        attributes: [
+          { variant: 'primary' },
+          {
+            disabled: !isValid,
+          },
+        ],
+      }"
       :action-cancel="{ text: __('Cancel') }"
-      @primary="$emit('create')"
+      @primary="$emit('create', { name })"
     >
-      <gl-form-input id="name" :value="name" :placeholder="__('Example: My value stream')" />
+      <gl-form-input id="name" v-model="name" :placeholder="__('Example: My value stream')" />
     </gl-modal>
-    <!-- :action-cancel -->
   </div>
 </template>

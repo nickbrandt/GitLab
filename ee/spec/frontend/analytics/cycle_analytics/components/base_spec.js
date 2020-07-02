@@ -18,6 +18,7 @@ import FilterBar from 'ee/analytics/cycle_analytics/components/filter_bar.vue';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
+import ValueStreamSelect from 'ee/analytics/cycle_analytics/components/value_stream_select.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
 import * as commonUtils from '~/lib/utils/common_utils';
@@ -44,6 +45,7 @@ const defaultStubs = {
   'labels-selector': true,
   DurationChart: true,
   GroupsDropdownFilter: true,
+  ValueStreamSelect: true,
 };
 
 const defaultFeatureFlags = {
@@ -171,7 +173,7 @@ describe('Cycle Analytics component', () => {
   };
 
   const displaysCreateValueStream = flag => {
-    expect(wrapper.find('[data-testid="create-value-stream"]').exists()).toBe(flag);
+    expect(wrapper.find(ValueStreamSelect).exists()).toBe(flag);
   };
 
   beforeEach(() => {
@@ -237,6 +239,7 @@ describe('Cycle Analytics component', () => {
       it('does not display the path navigation', () => {
         displaysPathNavigation(false);
       });
+
       it('does not display the create multiple value streams button', () => {
         displaysCreateValueStream(false);
       });
