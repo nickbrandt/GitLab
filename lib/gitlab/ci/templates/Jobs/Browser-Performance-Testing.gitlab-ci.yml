@@ -1,12 +1,12 @@
 performance:
   stage: performance
-  image: docker:19.03.11
+  image: docker:19.03.12
   allow_failure: true
   variables:
     DOCKER_TLS_CERTDIR: ""
     SITESPEED_IMAGE: "sitespeedio/sitespeed.io:11.2.0"
   services:
-    - docker:19.03.11-dind
+    - docker:19.03.12-dind
   script:
     - |
       if ! docker info &>/dev/null; then
