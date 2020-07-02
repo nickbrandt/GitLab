@@ -18,10 +18,15 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
         namespace: namespace
       ).message
     end
+    let(:grace_period_effective_from) { expired_date - 35.days }
+    let(:today) { Time.utc(2020, 3, 7, 10) }
+    let(:expired_date) { Time.utc(2020, 3, 9, 10).to_date }
+
+    before do
+      allow_any_instance_of(Gitlab::ExpiringSubscriptionMessage).to receive(:grace_period_effective_from).and_return(grace_period_effective_from)
+    end
 
     context 'subscribable installed' do
-      let(:expired_date) { Time.utc(2020, 3, 9, 10) }
-      let(:today) { Time.utc(2020, 3, 7, 10) }
       let(:auto_renew) { false }
 
       before do
@@ -123,6 +128,7 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
 
                 it 'has an expiration blocking message' do
                   allow(subscribable).to receive(:block_changes_at).and_return(Time.utc(2020, 3, 9, 10).to_date)
+                  allow(subscribable).to receive(:is_a?).with(::License).and_return(true)
 
                   Timecop.freeze(today) do
                     expect(subject).to include('No worries, you can still use all the Ultimate features for now. You have 2 days to renew your subscription.')
@@ -135,14 +141,13 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
           context 'subscribable is expiring soon' do
             before do
               allow(subscribable).to receive(:expired?).and_return(false)
-              allow(subscribable).to receive(:remaining_days).and_return(4)
               allow(subscribable).to receive(:will_block_changes?).and_return(true)
               allow(subscribable).to receive(:block_changes_at).and_return(expired_date)
             end
 
             it 'has a nice subject' do
               Timecop.freeze(today) do
-                expect(subject).to include('Your subscription will expire in 4 days')
+                expect(subject).to include('Your subscription will expire in 2 days')
               end
             end
 
@@ -193,13 +198,46 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
                 let(:auto_renew) { true }
 
                 it 'has a nice subject' do
-                  expect(subject).to include('Your subscription will automatically renew in 4 days.')
+                  Timecop.freeze(today) do
+                    expect(subject).to include('Your subscription will automatically renew in 2 days.')
+                  end
                 end
 
                 it 'has an expiration blocking message' do
                   Timecop.freeze(today) do
                     expect(subject).to include("We will automatically renew your Ultimate subscription for No Limit Records on 2020-03-09. There's nothing that you need to do, we'll let you know when the renewal is complete. Need more seats, a higher plan or just want to review your payment method?")
                   end
+                end
+              end
+            end
+          end
+
+          context 'subscribable expired a long time ago' do
+            let(:expired_date) { today.to_date - 1.year }
+            let(:grace_period_effective_from) { today.to_date - 25.days }
+
+            before do
+              allow(subscribable).to receive(:expires_at).and_return(expired_date)
+              allow(subscribable).to receive(:block_changes_at).and_return(expired_date)
+              allow(subscribable).to receive(:expired?).and_return(true)
+              allow(subscribable).to receive(:will_block_changes?).and_return(true)
+              allow(subscribable).to receive(:block_changes?).and_return(true)
+            end
+
+            context 'and is past the cutoff date' do
+              let(:grace_period_effective_from) { today.to_date - 40.days }
+
+              it 'has a nice subject' do
+                Timecop.freeze(today) do
+                  expect(subject).to include('Your subscription has been downgraded')
+                end
+              end
+            end
+
+            context 'and not past the cutoff date' do
+              it 'has a nice subject' do
+                Timecop.freeze(today) do
+                  expect(subject).to include('Your subscription will expire in 5 days')
                 end
               end
             end
