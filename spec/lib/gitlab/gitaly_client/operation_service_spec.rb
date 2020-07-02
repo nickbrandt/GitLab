@@ -202,7 +202,7 @@ RSpec.describe Gitlab::GitalyClient::OperationService do
 
       it "raises the error" do
         # the PreReceiveError class strips the GL-HOOK-ERR prefix from this error
-        expect { subject }.to raise_error(Gitlab::Git::PreReceiveError, "pre-receive hook failed: pre-receive hook error message")
+        expect { subject }.to raise_error(Gitlab::Git::PreReceiveError, "pre-receive hook failed.")
       end
     end
   end

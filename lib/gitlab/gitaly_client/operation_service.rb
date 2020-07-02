@@ -179,7 +179,7 @@ module Gitlab
         )
 
         if response.pre_receive_error.present?
-          raise Gitlab::Git::PreReceiveError.new("GL-HOOK-ERR: pre-receive hook failed: #{response.pre_receive_error}")
+          raise Gitlab::Git::PreReceiveError.new("GL-HOOK-ERR: pre-receive hook failed.")
         end
 
         Gitlab::Git::OperationService::BranchUpdate.from_gitaly(response.branch_update)
