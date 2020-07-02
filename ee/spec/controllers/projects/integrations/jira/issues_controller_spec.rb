@@ -16,6 +16,13 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
         create(:jira_service, project: project)
       end
 
+      it 'renders the "index" template' do
+        get :index, params: { namespace_id: project.namespace, project_id: project }
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to render_template(:index)
+      end
+
       context 'when jira_integration feature disabled' do
         it 'returns 404 status' do
           stub_feature_flags(jira_integration: false)
@@ -23,26 +30,6 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
           get :index, params: { namespace_id: project.namespace, project_id: project }
 
           expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-
-      context 'when GitLab issues disabled' do
-        it 'returns 404 status' do
-          project.issues_enabled = false
-          project.save!
-
-          get :index, params: { namespace_id: project.namespace, project_id: project }
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-
-      context 'when GitLab issues enabled' do
-        it 'renders the "index" template' do
-          get :index, params: { namespace_id: project.namespace, project_id: project }
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(response).to render_template(:index)
         end
       end
 
