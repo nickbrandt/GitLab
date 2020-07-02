@@ -6,32 +6,132 @@
       {
         "method": "GET",
         "type": "url",
-        "url": "http://api-server/"
+        "url": "http://nginx"
       },
       {
         "method": "GET",
         "type": "url",
-        "url": "http://api-server/v1"
-      },
-      {
-        "method": "DELETE",
-        "type": "url",
-        "url": "http://api-server/v1/tree/10"
+        "url": "http://nginx/"
       },
       {
         "method": "GET",
         "type": "url",
-        "url": "http://api-server/v1/tree/10"
+        "url": "http://nginx/1"
       },
       {
         "method": "GET",
         "type": "url",
-        "url": "http://api-server/v1/trees"
+        "url": "http://nginx/2"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/3"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/4"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/5"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/6"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/7"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/8"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/9"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/10"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/11"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/12"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/13"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/14"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/15"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/16"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/17"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/18"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/19"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/20"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/21"
       },
       {
         "method": "POST",
         "type": "url",
-        "url": "http://api-server/v1/trees"
+        "url": "http://nginx/myform"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/robots.txt"
+      },
+      {
+        "method": "GET",
+        "type": "url",
+        "url": "http://nginx/sitemap.xml"
       }
     ]
   },

@@ -109,6 +109,16 @@ FactoryBot.define do
       end
     end
 
+    trait :dast_large_scanned_resources_field do
+      file_format { :raw }
+      file_type { :dast }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-large-scanned-resources.json'), 'application/json')
+      end
+    end
+
     trait :low_severity_dast_report do
       file_format { :raw }
       file_type { :dast }
