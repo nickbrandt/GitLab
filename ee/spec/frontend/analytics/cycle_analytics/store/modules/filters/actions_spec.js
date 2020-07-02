@@ -39,7 +39,7 @@ describe('Filters actions', () => {
       selectedMilestone: 'NEXT',
     };
 
-    it('dispatches setPaths, setFilters and fetchTokenData', () => {
+    it('dispatches setPaths, setFilters', () => {
       return actions
         .initialize(
           {
@@ -50,10 +50,9 @@ describe('Filters actions', () => {
           initialData,
         )
         .then(() => {
-          expect(mockDispatch).toHaveBeenCalledTimes(3);
+          expect(mockDispatch).toHaveBeenCalledTimes(2);
           expect(mockDispatch).toHaveBeenCalledWith('setPaths', initialData);
           expect(mockDispatch).toHaveBeenCalledWith('setFilters', initialData);
-          expect(mockDispatch).toHaveBeenCalledWith('fetchTokenData');
         });
     });
 
@@ -124,23 +123,6 @@ describe('Filters actions', () => {
           { payload: 'fake_labels_path.json', type: types.SET_LABELS_PATH },
         ],
         [],
-      );
-    });
-  });
-
-  describe('fetchTokenData', () => {
-    it('dispatches requests for token data', () => {
-      return testAction(
-        actions.fetchTokenData,
-        { milestonesPath, labelsPath },
-        state,
-        [],
-        [
-          { type: 'fetchLabels' },
-          { type: 'fetchMilestones' },
-          { type: 'fetchAuthors' },
-          { type: 'fetchAssignees' },
-        ],
       );
     });
   });

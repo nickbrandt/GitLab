@@ -65,6 +65,7 @@ export default {
           symbol: '%',
           isLoading: this.milestonesLoading,
           operators: [{ value: '=', description: 'is', default: 'true' }],
+          fetchData: this.fetchMilestones,
         },
         {
           icon: 'labels',
@@ -76,6 +77,7 @@ export default {
           symbol: '~',
           isLoading: this.labelsLoading,
           operators: [{ value: '=', description: 'is', default: 'true' }],
+          fetchData: this.fetchLabels,
         },
         {
           icon: 'pencil',
@@ -86,6 +88,7 @@ export default {
           unique: true,
           isLoading: this.authorsLoading,
           operators: [{ value: '=', description: 'is', default: 'true' }],
+          fetchData: this.fetchAuthors,
         },
         {
           icon: 'user',
@@ -96,15 +99,23 @@ export default {
           unique: false,
           isLoading: this.assigneesLoading,
           operators: [{ value: '=', description: 'is', default: 'true' }],
+          fetchData: this.fetchAssignees,
         },
       ];
     },
   },
+
   mounted() {
     this.initializeTokens();
   },
   methods: {
-    ...mapActions('filters', ['setFilters', 'fetchTokenData']),
+    ...mapActions('filters', [
+      'setFilters',
+      'fetchMilestones',
+      'fetchLabels',
+      'fetchAuthors',
+      'fetchAssignees',
+    ]),
     initializeTokens() {
       const {
         selectedMilestone: milestone = null,

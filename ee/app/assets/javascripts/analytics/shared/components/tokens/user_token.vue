@@ -5,6 +5,8 @@ import {
   GlFilteredSearchSuggestion,
   GlLoadingIcon,
 } from '@gitlab/ui';
+import { debounce } from 'lodash';
+import { DEBOUNCE_DELAY } from '~/vue_shared/components/filtered_search_bar/constants';
 
 export default {
   components: {
@@ -25,19 +27,29 @@ export default {
     },
   },
   computed: {
-    users() {
-      return this.config.users;
-    },
     selectedUser() {
       return this.value?.data
         ? this.config.users.find(({ username }) => username === this.value.data)
         : {};
     },
   },
+  created() {
+    this.searchUsers(this.value);
+  },
+  methods: {
+    searchUsers: debounce(function debouncedSearch({ data = '' }) {
+      this.config.fetchData(data);
+    }, DEBOUNCE_DELAY),
+  },
 };
 </script>
 <template>
-  <gl-filtered-search-token :config="config" v-bind="{ ...$props, ...$attrs }" v-on="$listeners">
+  <gl-filtered-search-token
+    :config="config"
+    v-bind="{ ...$props, ...$attrs }"
+    v-on="$listeners"
+    @input="searchUsers"
+  >
     <template #view="{ inputValue }">
       <div v-if="selectedUser" data-testid="selected-user">
         <gl-avatar :size="16" :src="selectedUser.avatar_url" />
@@ -48,7 +60,7 @@ export default {
       <gl-loading-icon v-if="config.isLoading" />
       <template v-else>
         <gl-filtered-search-suggestion
-          v-for="user in users"
+          v-for="user in config.users"
           :key="user.username"
           :value="user.username"
           data-testid="user-item"

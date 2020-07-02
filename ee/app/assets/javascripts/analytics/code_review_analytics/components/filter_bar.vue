@@ -34,6 +34,7 @@ export default {
           unique: true,
           symbol: '%',
           isLoading: this.milestonesLoading,
+          fetchData: this.fetchMilestones,
         },
         {
           icon: 'labels',
@@ -44,6 +45,7 @@ export default {
           unique: false,
           symbol: '~',
           isLoading: this.labelsLoading,
+          fetchData: this.fetchLabels,
         },
       ];
     },

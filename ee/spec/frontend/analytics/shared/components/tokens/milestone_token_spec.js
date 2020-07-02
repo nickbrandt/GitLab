@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlFilteredSearchSuggestion, GlLoadingIcon } from '@gitlab/ui';
+import { GlFilteredSearchSuggestion, GlLoadingIcon, GlFilteredSearchToken } from '@gitlab/ui';
 import MilestoneToken from 'ee/analytics/shared/components/tokens/milestone_token.vue';
 import { mockMilestones } from './mock_data';
 
@@ -18,6 +18,7 @@ describe('MilestoneToken', () => {
 
   const findFilteredSearchSuggestion = index =>
     wrapper.findAll(GlFilteredSearchSuggestion).at(index);
+  const findFilteredSearchToken = () => wrapper.find(GlFilteredSearchToken);
   const findAllMilestoneSuggestions = () => wrapper.findAll({ ref: 'milestoneItem' });
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
 
@@ -31,6 +32,7 @@ describe('MilestoneToken', () => {
       unique: true,
       symbol: '%',
       isLoading: false,
+      fetchData: jest.fn(),
     };
     stubs = {
       GlFilteredSearchToken: {
@@ -72,21 +74,46 @@ describe('MilestoneToken', () => {
       );
     });
 
+    it('renders a suggestion for each item', () => {
+      createComponent({ config, value }, { stubs });
+
+      const res = findAllMilestoneSuggestions();
+      expect(res).toHaveLength(mockMilestones.length);
+
+      mockMilestones.forEach((m, index) => {
+        expect(res.at(index).html()).toContain(m.title);
+      });
+    });
+  });
+
+  describe('search', () => {
     describe('when no search term is given', () => {
-      it('renders two milestone suggestions', () => {
+      it('calls `fetchData` with an empty search term', () => {
         createComponent({ config, value }, { stubs });
 
-        expect(findAllMilestoneSuggestions()).toHaveLength(2);
+        expect(config.fetchData).toHaveBeenCalledWith('');
       });
     });
 
     describe('when the search term "v4" is given', () => {
-      it('renders one milestone suggestion that matches the search term', () => {
-        value.data = 'v4';
+      const query = 'v4';
+      it('calls `fetchData` with the search term', () => {
+        value.data = query;
 
         createComponent({ config, value }, { stubs });
 
-        expect(findAllMilestoneSuggestions()).toHaveLength(1);
+        expect(config.fetchData).toHaveBeenCalledWith(query);
+      });
+    });
+
+    describe('when the input changes', () => {
+      const data = 'v4';
+      it('calls `fetchData` with the updated search term', () => {
+        createComponent({ config, value }, { stubs: { GlFilteredSearchToken } });
+        expect(config.fetchData).not.toHaveBeenCalledWith(data);
+
+        findFilteredSearchToken().vm.$emit('input', { data });
+        expect(config.fetchData).toHaveBeenCalledWith(data);
       });
     });
   });
