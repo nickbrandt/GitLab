@@ -201,7 +201,7 @@ export default {
               <gl-button
                 v-gl-tooltip.hover.bottom="__('Edit')"
                 class="js-feature-flag-edit-button"
-                variant="danger"
+                variant="default"
                 category="secondary"
                 :href="featureFlag.edit_path"
               >
