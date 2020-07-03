@@ -5,7 +5,7 @@ import waitForPromises from 'helpers/wait_for_promises';
 import DashboardsDropdown from '~/monitoring/components/dashboards_dropdown.vue';
 import DuplicateDashboardForm from '~/monitoring/components/duplicate_dashboard_form.vue';
 
-import { dashboardGitResponse } from '../mock_data';
+import { dashboardGitResponse, selfMonitoringDashboardGitResponse } from '../mock_data';
 
 const defaultBranch = 'master';
 
@@ -16,11 +16,13 @@ describe('DashboardsDropdown', () => {
   let wrapper;
   let mockDashboards;
   let mockSelectedDashboard;
+  let mockModalDirective;
+  let duplicateDashboardAction;
 
   function createComponent(props, opts = {}) {
     const storeOpts = {
       methods: {
-        duplicateSystemDashboard: jest.fn(),
+        duplicateSystemDashboard: duplicateDashboardAction,
       },
       computed: {
         allDashboards: () => mockDashboards,
@@ -32,6 +34,9 @@ describe('DashboardsDropdown', () => {
       propsData: {
         ...props,
         defaultBranch,
+      },
+      directives: {
+        GlModal: mockModalDirective,
       },
       sync: false,
       ...storeOpts,
@@ -49,6 +54,8 @@ describe('DashboardsDropdown', () => {
   beforeEach(() => {
     mockDashboards = dashboardGitResponse;
     mockSelectedDashboard = null;
+    mockModalDirective = jest.fn();
+    duplicateDashboardAction = jest.fn();
   });
 
   describe('when it receives dashboards data', () => {
@@ -151,27 +158,17 @@ describe('DashboardsDropdown', () => {
     });
   });
 
-  describe('when a system dashboard is selected', () => {
-    let duplicateDashboardAction;
-    let modalDirective;
-
+  const cases = [
+    dashboardGitResponse[0],
+    dashboardGitResponse[2],
+    selfMonitoringDashboardGitResponse[0],
+  ];
+  describe.each(cases)('when an out of the box dashboard is selected', dashboard => {
     beforeEach(() => {
-      [mockSelectedDashboard] = dashboardGitResponse;
-      modalDirective = jest.fn();
-      duplicateDashboardAction = jest.fn().mockResolvedValue();
+      mockSelectedDashboard = dashboard;
+      duplicateDashboardAction.mockResolvedValue();
 
-      wrapper = createComponent(
-        {},
-        {
-          directives: {
-            GlModal: modalDirective,
-          },
-          methods: {
-            // Mock vuex actions
-            duplicateSystemDashboard: duplicateDashboardAction,
-          },
-        },
-      );
+      wrapper = createComponent();
 
       wrapper.vm.$refs.duplicateDashboardModal.hide = jest.fn();
     });
@@ -249,7 +246,7 @@ describe('DashboardsDropdown', () => {
           });
 
           return waitForPromises().then(() => {
-            expect(wrapper.emitted().selectDashboard[0][0]).toEqual(dashboardGitResponse[0]);
+            expect(wrapper.emitted().selectDashboard[0][0]).toEqual(mockSelectedDashboard);
           });
         });
       });
@@ -272,10 +269,10 @@ describe('DashboardsDropdown', () => {
       });
 
       it('id is correct, as the value of modal directive binding matches modal id', () => {
-        expect(modalDirective).toHaveBeenCalledTimes(1);
+        expect(mockModalDirective).toHaveBeenCalledTimes(1);
 
         // Binding's second argument contains the modal id
-        expect(modalDirective.mock.calls[0][1]).toEqual(
+        expect(mockModalDirective.mock.calls[0][1]).toEqual(
           expect.objectContaining({
             value: findModal().props('modalId'),
           }),
@@ -302,9 +299,8 @@ describe('DashboardsDropdown', () => {
     const findModal = () => wrapper.find(GlModal);
 
     beforeEach(() => {
-      wrapper = createComponent({
-        selectedDashboard: dashboardGitResponse[1],
-      });
+      [, mockSelectedDashboard] = dashboardGitResponse;
+      wrapper = createComponent();
     });
 
     it('displays an item for each dashboard', () => {
