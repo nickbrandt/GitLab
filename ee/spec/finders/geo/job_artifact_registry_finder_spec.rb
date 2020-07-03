@@ -353,38 +353,6 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
     end
   end
 
-  describe '#find_unsynced' do
-    it 'returns registries for job artifacts that have never been synced' do
-      create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_1.id)
-      create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_2.id, missing_on_primary: true)
-      registry_ci_job_artifact_3 = create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_3.id)
-      create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_4.id)
-      create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_5.id, missing_on_primary: true, retry_at: 1.day.ago)
-      create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_remote_1.id)
-      create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_2.id, missing_on_primary: true)
-      registry_ci_job_artifact_remote_3 = create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_remote_3.id)
-
-      registries = subject.find_unsynced(batch_size: 10)
-
-      expect(registries).to match_ids(registry_ci_job_artifact_3, registry_ci_job_artifact_remote_3)
-    end
-
-    it 'excludes except_ids' do
-      create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_1.id)
-      create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_2.id, missing_on_primary: true)
-      create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_3.id)
-      create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_4.id)
-      create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_5.id, missing_on_primary: true, retry_at: 1.day.ago)
-      create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_remote_1.id)
-      create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_2.id, missing_on_primary: true)
-      registry_ci_job_artifact_remote_3 = create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_remote_3.id)
-
-      registries = subject.find_unsynced(batch_size: 10, except_ids: [ci_job_artifact_3.id])
-
-      expect(registries).to match_ids(registry_ci_job_artifact_remote_3)
-    end
-  end
-
   describe '#find_retryable_failed_registries' do
     it 'returns registries for job artifacts that have failed to sync' do
       registry_ci_job_artifact_1 = create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_1.id)
