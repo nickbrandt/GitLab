@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'metrics dashboard page' do
+RSpec.describe 'metrics dashboard page' do
   let_it_be(:project) { create(:project) }
   let_it_be(:environment) { create(:environment, project: project) }
   let_it_be(:environment2) { create(:environment, project: project) }
@@ -13,7 +13,7 @@ describe 'metrics dashboard page' do
     login_as(user)
   end
 
-  describe 'GET /:namespace/:project/-/d' do
+  describe 'GET /:namespace/:project/-/metrics' do
     it 'returns 200' do
       send_request
       expect(response).to have_gitlab_http_status(:ok)
@@ -25,7 +25,7 @@ describe 'metrics dashboard page' do
     end
   end
 
-  describe 'GET /:namespace/:project/-/d?environment=:environment.id' do
+  describe 'GET /:namespace/:project/-/metrics?environment=:environment.id' do
     it 'returns 200' do
       send_request(environment: environment2.id)
       expect(response).to have_gitlab_http_status(:ok)
@@ -44,7 +44,7 @@ describe 'metrics dashboard page' do
     end
   end
 
-  describe 'GET /:namespace/:project/-/d/:dashboard_path' do
+  describe 'GET /:namespace/:project/-/metrics/:dashboard_path' do
     let(:dashboard_path) { '.gitlab/dashboards/dashboard_path.yml' }
 
     it 'returns 200' do
@@ -58,7 +58,7 @@ describe 'metrics dashboard page' do
     end
   end
 
-  describe 'GET :/namespace/:project/-/d/:dashboard_path?environment=:environment.id' do
+  describe 'GET :/namespace/:project/-/metrics/:dashboard_path?environment=:environment.id' do
     let(:dashboard_path) { '.gitlab/dashboards/dashboard_path.yml' }
 
     it 'returns 200' do
