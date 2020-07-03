@@ -6,7 +6,10 @@ query groupEpicsEE($fullPath: ID!) {
         iid
         title
         state
+        reference
         webUrl
+        createdAt
+        closedAt
         descendantCounts {
           openedIssues
           closedIssues

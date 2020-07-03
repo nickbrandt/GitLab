@@ -45,7 +45,7 @@ export default {
         'is-expandable': list.isExpandable,
         'is-collapsed': !list.isExpanded,
       }"
-      class="board gl-h-full gl-px-3 gl-vertical-align-top gl-white-space-normal"
+      class="board gl-px-3 gl-vertical-align-top gl-white-space-normal"
     >
       <board-list-header
         :can-admin-list="canAdminList"
@@ -56,5 +56,12 @@ export default {
       />
     </div>
     <epic-lane v-for="epic in epics" :key="epic.id" :epic="epic" />
+    <div class="board-lane-unassigned-issue gl-py-5 gl-px-3 gl-display-flex gl-align-items-center">
+      <span
+        class="gl-mr-3 gl-font-weight-bold gl-white-space-nowrap gl-text-overflow-ellipsis gl-overflow-hidden"
+      >
+        {{ __('Issues with no epics assigned') }}
+      </span>
+    </div>
   </div>
 </template>
