@@ -125,24 +125,20 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 	opts.TempFilePrefix = filename
 
 	var inputReader io.Reader
-	if exif.IsExifFile(filename) {
-		log.WithContextFields(ctx, log.Fields{
-			"filename": filename,
-		}).Print("running exiftool to remove any metadata")
-
-		cleaner, err := exif.NewCleaner(ctx, p)
+	var err error
+	switch {
+	case exif.IsExifFile(filename):
+		inputReader, err = handleExifUpload(ctx, p, filename)
 		if err != nil {
-			return fmt.Errorf("failed to start EXIF metadata cleaner: %v", err)
+			return err
 		}
-
-		inputReader = cleaner
-	} else {
+	case rew.preauth.ProcessLsif:
+		inputReader, err = handleLsifUpload(ctx, p, opts.LocalTempPath, filename)
+		if err != nil {
+			return err
+		}
+	default:
 		inputReader = p
-	}
-
-	inputReader, err := rew.handleLsifUpload(ctx, inputReader, opts.LocalTempPath, filename)
-	if err != nil {
-		return err
 	}
 
 	fh, err := filestore.SaveFileFromReader(ctx, inputReader, -1, opts)
@@ -170,28 +166,32 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 	return rew.filter.ProcessFile(ctx, name, fh, rew.writer)
 }
 
-func (rew *rewriter) handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string) (io.Reader, error) {
-	if rew.preauth.ProcessLsif {
-		p, err := parser.NewParser(reader, tempPath)
-		if err != nil {
-			return nil, err
-		}
+func handleExifUpload(ctx context.Context, r io.Reader, filename string) (io.Reader, error) {
+	log.WithContextFields(ctx, log.Fields{
+		"filename": filename,
+	}).Print("running exiftool to remove any metadata")
 
-		z, err := p.ZipReader()
-		if err != nil {
-			return nil, err
-		}
+	return exif.NewCleaner(ctx, r)
+}
 
-		if err := p.Close(); err != nil {
-			log.WithContextFields(ctx, log.Fields{
-				"filename": filename,
-			}).Print("failed to close lsif parser: " + err.Error())
-		}
-
-		return z, nil
+func handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string) (io.Reader, error) {
+	p, err := parser.NewParser(reader, tempPath)
+	if err != nil {
+		return nil, err
 	}
 
-	return reader, nil
+	z, err := p.ZipReader()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.Close(); err != nil {
+		log.WithContextFields(ctx, log.Fields{
+			"filename": filename,
+		}).Print("failed to close lsif parser: " + err.Error())
+	}
+
+	return z, nil
 }
 
 func (rew *rewriter) copyPart(ctx context.Context, name string, p *multipart.Part) error {
