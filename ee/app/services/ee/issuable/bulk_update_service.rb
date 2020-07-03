@@ -14,20 +14,18 @@ module EE
         super
       end
 
-      override :issuable_specific_attrs
-      def issuable_specific_attrs(type, attrs)
+      override :permitted_attrs
+      def permitted_attrs(type)
         return super unless type == 'issue'
 
-        super.push(:health_status, :epic)
+        super.push(:health_status, :epic_id)
       end
 
-      override :filter_update_params
-      def filter_update_params(type)
+      override :set_update_params
+      def set_update_params(type)
         super
 
         set_health_status
-
-        params
       end
 
       def set_health_status
