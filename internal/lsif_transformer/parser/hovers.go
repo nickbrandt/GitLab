@@ -42,6 +42,10 @@ func NewHovers(tempDir string) (*Hovers, error) {
 		return nil, err
 	}
 
+	if err := os.Remove(file.Name()); err != nil {
+		return nil, err
+	}
+
 	offsets, err := newCache(tempDir, "hovers-indexes", Offset{})
 	if err != nil {
 		return nil, err
@@ -91,7 +95,6 @@ func (h *Hovers) For(refId Id) json.RawMessage {
 func (h *Hovers) Close() error {
 	return combineErrors(
 		h.File.Close(),
-		os.Remove(h.File.Name()),
 		h.Offsets.Close(),
 	)
 }

@@ -68,21 +68,28 @@ func openZipReader(reader io.Reader, tempDir string) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer os.Remove(tempFile.Name())
 
-	if _, err := io.Copy(tempFile, reader); err != nil {
+	if err := os.Remove(tempFile.Name()); err != nil {
 		return nil, err
 	}
 
-	zr, err := zip.OpenReader(tempFile.Name())
+	size, err := io.Copy(tempFile, reader)
 	if err != nil {
 		return nil, err
 	}
 
-	f := zr.File[0]
-	if f == nil {
-		return nil, errors.New("invalid zip file")
+	if _, err := tempFile.Seek(0, io.SeekStart); err != nil {
+		return nil, err
 	}
 
-	return f.Open()
+	zr, err := zip.NewReader(tempFile, size)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(zr.File) == 0 {
+		return nil, errors.New("empty zip file")
+	}
+
+	return zr.File[0].Open()
 }
