@@ -445,7 +445,7 @@ QA testing:
   environment:
     name: qa
   script:
-  - deploy foo
+    - deploy foo
 ```
 
 The track `foo` being referenced must also be defined in the application's Helm chart, like:
