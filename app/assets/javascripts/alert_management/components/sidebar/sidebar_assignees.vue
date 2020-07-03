@@ -163,13 +163,11 @@ export default {
           this.hideDropdown();
 
           if (errors[0]) {
-            return this.$emit(
+            this.$emit(
               'alert-sidebar-error',
               `${this.$options.UPDATE_ALERT_ASSIGNEES_GRAPHQL_ERROR} ${errors[0]}.`,
             );
           }
-
-          return this.$emit('alert-refresh');
         })
         .catch(() => {
           this.$emit('alert-error', this.$options.UPDATE_ALERT_ASSIGNEES_ERROR);
