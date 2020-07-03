@@ -1966,6 +1966,9 @@ msgstr ""
 msgid "AlertManagement|Info"
 msgstr ""
 
+msgid "AlertManagement|Issue"
+msgstr ""
+
 msgid "AlertManagement|Low"
 msgstr ""
 
