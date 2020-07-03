@@ -66,7 +66,7 @@ export default {
 </script>
 <template>
   <div data-qa-selector="admin_license_compliance_row">
-    <issue-status-icon :status="status" class="float-left append-right-default" />
+    <issue-status-icon :status="status" class="float-left gl-mr-3" />
     <span class="js-license-name" data-qa-selector="license_name_content">{{ license.name }}</span>
     <div class="float-right">
       <div class="d-flex">
