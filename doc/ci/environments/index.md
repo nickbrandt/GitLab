@@ -786,7 +786,7 @@ detects expired environments.
 
 #### Delete a stopped environment
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22629) in GitLab 12.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/20620) in GitLab 12.10.
 
 You can delete [stopped environments](#stopping-an-environment) in one of two
 ways: through the GitLab UI or through the API.
