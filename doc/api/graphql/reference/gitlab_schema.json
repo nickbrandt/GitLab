@@ -37957,8 +37957,34 @@
               "deprecationReason": null
             },
             {
+              "name": "todos",
+              "description": "Updated todos",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "Todo",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "updatedIds",
-              "description": "The ids of the updated todo items",
+              "description": "The ids of the updated todo items. Deprecated in 13.2: Use todos",
               "args": [
 
               ],
@@ -37979,8 +38005,8 @@
                   }
                 }
               },
-              "isDeprecated": false,
-              "deprecationReason": null
+              "isDeprecated": true,
+              "deprecationReason": "Use todos. Deprecated in 13.2"
             }
           ],
           "inputFields": null,
@@ -38192,8 +38218,34 @@
               "deprecationReason": null
             },
             {
+              "name": "todos",
+              "description": "Updated todos",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "Todo",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "updatedIds",
-              "description": "Ids of the updated todos",
+              "description": "Ids of the updated todos. Deprecated in 13.2: Use todos",
               "args": [
 
               ],
@@ -38214,8 +38266,8 @@
                   }
                 }
               },
-              "isDeprecated": false,
-              "deprecationReason": null
+              "isDeprecated": true,
+              "deprecationReason": "Use todos. Deprecated in 13.2"
             }
           ],
           "inputFields": null,
