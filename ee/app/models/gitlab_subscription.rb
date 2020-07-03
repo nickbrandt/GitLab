@@ -3,6 +3,7 @@
 class GitlabSubscription < ApplicationRecord
   default_value_for(:start_date) { Date.today }
   before_update :log_previous_state_for_update
+  after_commit :index_namespace, on: [:create, :update]
   after_destroy_commit :log_previous_state_for_destroy
 
   belongs_to :namespace
@@ -85,5 +86,16 @@ class GitlabSubscription < ApplicationRecord
 
   def hosted?
     namespace_id.present?
+  end
+
+  # Kick off Elasticsearch indexing for paid groups with new or upgraded paid, hosted subscriptions
+  # Uses safe_find_or_create_by to avoid ActiveRecord::RecordNotUnique exception when upgrading from
+  # one paid plan to another paid plan
+  def index_namespace
+    return unless ::Feature.enabled?(:elasticsearch_index_only_paid_groups) &&
+        has_a_paid_hosted_plan? &&
+        saved_changes.key?('hosted_plan_id')
+
+    ElasticsearchIndexedNamespace.safe_find_or_create_by!(namespace_id: namespace_id)
   end
 end

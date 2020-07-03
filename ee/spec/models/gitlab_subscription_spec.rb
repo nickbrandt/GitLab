@@ -3,6 +3,12 @@
 require 'spec_helper'
 
 RSpec.describe GitlabSubscription do
+  using RSpec::Parameterized::TableSyntax
+
+  before do
+    stub_feature_flags(elasticsearch_index_only_paid_groups: false)
+  end
+
   %i[free_plan bronze_plan silver_plan gold_plan early_adopter_plan].each do |plan|
     let_it_be(plan) { create(plan) }
   end
@@ -247,6 +253,44 @@ RSpec.describe GitlabSubscription do
   end
 
   describe 'callbacks' do
+    context 'after_commit :index_namespace' do
+      where(:elasticsearch_index_only_paid_groups_setting, :operation, :initial_plan, :should_update_plan?, :should_index_namespace?) do
+        false   | :create   | :bronze         | false   | false
+        true    | :create   | :bronze         | false   | true
+        true    | :create   | :free           | false   | false
+        true    | :create   | { trial: true } | false   | false
+        false   | :update   | :bronze         | false   | false
+        true    | :update   | :bronze         | false   | false
+        true    | :update   | :bronze         | true    | true
+        true    | :update   | :free           | true    | true
+        true    | :update   | { trial: true } | true    | true
+      end
+
+      with_them do
+        let!(:gitlab_subscription) { operation == :create ? build(:gitlab_subscription, initial_plan) : create(:gitlab_subscription, initial_plan) }
+
+        before do
+          stub_feature_flags(elasticsearch_index_only_paid_groups: elasticsearch_index_only_paid_groups_setting)
+        end
+
+        it 'indexes namespace' do
+          if should_index_namespace?
+            expect(ElasticsearchIndexedNamespace).to receive(:safe_find_or_create_by!).with(namespace_id: gitlab_subscription.namespace_id)
+          else
+            expect(ElasticsearchIndexedNamespace).not_to receive(:safe_find_or_create_by!)
+          end
+
+          case operation
+          when :create
+            gitlab_subscription.save!
+          when :update
+            update_attributes = should_update_plan? ? { hosted_plan: create(:silver_plan), trial: false } : { max_seats_used: 32 }
+            gitlab_subscription.update!(update_attributes)
+          end
+        end
+      end
+    end
+
     it 'gitlab_subscription columns are contained in gitlab_subscription_history columns' do
       diff_attrs = %w(updated_at)
       expect(described_class.attribute_names - GitlabSubscriptionHistory.attribute_names).to eq(diff_attrs)
