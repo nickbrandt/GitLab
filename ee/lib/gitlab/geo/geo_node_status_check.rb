@@ -19,7 +19,6 @@ module Gitlab
 
       def print_status
         print_current_node_info
-        print_postgres_version
 
         print_gitlab_version
         print_geo_role
@@ -148,16 +147,6 @@ module Gitlab
           # Only primary node can create a status record in the database so if
           # it does not exist we get unsaved record where updated_at is nil
           puts 'Never'
-        end
-      end
-
-      def print_postgres_version
-        unless Gitlab::Database.postgresql_minimum_supported_version?
-          puts
-          puts 'WARNING: Please upgrade PostgreSQL to version 9.6 or greater.'\
-            ' The status of the replication cannot be determined reliably '\
-            'with the current version.'.color(:red)
-          puts
         end
       end
 
