@@ -3991,7 +3991,16 @@ msgstr ""
 msgid "Can override approvers and approvals required per merge request"
 msgstr ""
 
+msgid "Can't apply as %{phrase} changed in a more recent version."
+msgstr ""
+
+msgid "Can't apply as the source branch was deleted."
+msgstr ""
+
 msgid "Can't apply as this line has changed or the suggestion already matches its content."
+msgstr ""
+
+msgid "Can't apply this suggestion."
 msgstr ""
 
 msgid "Can't create snippet: %{err}"
@@ -23537,7 +23546,13 @@ msgstr ""
 msgid "This merge request does not have accessibility reports"
 msgstr ""
 
+msgid "This merge request is closed. To apply this suggestion, edit this file directly."
+msgstr ""
+
 msgid "This merge request is locked."
+msgstr ""
+
+msgid "This merge request was merged. To apply this suggestion, edit this file directly."
 msgstr ""
 
 msgid "This namespace has already been taken! Please choose another one."
@@ -23628,6 +23643,9 @@ msgid "This setting will update the hostname that is used to generate private co
 msgstr ""
 
 msgid "This subscription is for"
+msgstr ""
+
+msgid "This suggestion already matches its content."
 msgstr ""
 
 msgid "This timeout will take precedence when lower than project-defined timeout and accepts a human readable time input language like \"1 hour\". Values without specification represent seconds."
@@ -26272,6 +26290,9 @@ msgid "You don't have any recent searches"
 msgstr ""
 
 msgid "You don't have sufficient permission to perform this action."
+msgstr ""
+
+msgid "You don't have write access to the source branch."
 msgstr ""
 
 msgid "You don’t have access to Productivity Analytics in this group"
