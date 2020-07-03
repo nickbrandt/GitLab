@@ -5,5 +5,5 @@
 .form-group
   = f.text_field :ip_restriction_ranges, class: 'form-control', data: { qa_selector: 'ip_restriction_field' }, placeholder: _('Enter IP address range')
   .form-text.text-muted
-    - read_more_link = link_to(_('Read more'), help_page_path('user/group/index', anchor: 'ip-access-restriction-ultimate'))
+    - read_more_link = link_to(_('Read more'), help_page_path('user/group/index.md', anchor: 'ip-access-restriction-premium'))
     = _('This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Multiple addresses are supported with comma delimiters.<br>Example: <code>192.168.0.0/24,192.168.1.0/24</code>. %{read_more_link}.').html_safe % { read_more_link: read_more_link }
