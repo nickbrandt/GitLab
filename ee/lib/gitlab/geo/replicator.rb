@@ -28,8 +28,8 @@ module Gitlab
       #
       # @example Declaring support for :update and :delete events
       #   class MyReplicator < Gitlab::Geo::Replicator
-      #     event :update
-      #     event :delete
+      #     event :updated
+      #     event :deleted
       #   end
       #
       # @param [Symbol] event_name
