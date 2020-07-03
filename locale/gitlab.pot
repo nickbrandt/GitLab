@@ -4683,7 +4683,7 @@ msgstr ""
 msgid "Choose any color."
 msgstr ""
 
-msgid "Choose between <code>clone</code> or <code>fetch</code> to get the recent application code"
+msgid "Choose between %{code_open}clone%{code_close} or %{code_open}fetch%{code_close} to get the recent application code"
 msgstr ""
 
 msgid "Choose file…"
@@ -23846,7 +23846,7 @@ msgstr ""
 msgid "The passphrase required to decrypt the private key. This is optional and the value is encrypted at rest."
 msgstr ""
 
-msgid "The path to the CI configuration file. Defaults to <code>.gitlab-ci.yml</code>"
+msgid "The path to the CI configuration file. Defaults to %{code_open}.gitlab-ci.yml%{code_close}"
 msgstr ""
 
 msgid "The phase of the development lifecycle."

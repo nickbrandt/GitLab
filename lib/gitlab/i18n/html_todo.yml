@@ -131,19 +131,6 @@
     - "La branĉo <strong>%{branch_name}</strong> estis kreita. Por agordi aŭtomatan disponigadon, bonvolu elekti Yaml-ŝablonon por GitLab CI kaj enmeti viajn ŝanĝojn. %{link_to_autodeploy_doc}"
     - "La branche <strong>%{branch_name}</strong> a été créée. Pour mettre en place le déploiement automatisé, sélectionnez un modèle de fichier YAML pour l’intégration continue (CI) de GitLab, et validez les modifications. %{link_to_autodeploy_doc}"
     - "La rama <strong>%{branch_name}</strong> fue creada. Para configurar el auto despliegue, escoge una plantilla Yaml para GitLab CI y envía tus cambios. %{link_to_autodeploy_doc}"
-"Choose between <code>clone</code> or <code>fetch</code> to get the recent application code":
-  plural_id:
-  translations:
-    - "Escolha entre <code>clone</code> ou <code>fetch</code> para obter o código do aplicativo recente"
-    - "<code>clone</code> または <code>fetch</code> を選択して最新のアプリケーションコードを取得してください"
-    - "Escolhe entre <code>clone</code> ou <code>fetch</code> para obter o código da aplicação recente"
-    - "选择 <code>克隆</code> 或 <code>拉取</code> 以获取最近的应用程序代码"
-    - "Оберіть між <code>clone</code> та<code>fetch</code> щоб отримати найновіший код програми"
-    - "Wähle zwischen <code>clone</code> oder <code>fetch</code>, um den aktuellen Anwendungscode zu erhalten"
-    - "최근 응용 프로그램 코드를 얻으려면 <code>클론</code> 또는 <code>fetch</code>를 선택하십시오."
-    - "Choisissez entre <code>clone</code> ou <code>fetch</code> pour obtenir les dernières modifications du code de l’application"
-    - "Elija entre <code>clone</code> o <code>fetch</code> para obtener el código de la aplicación más reciente"
-    - "Wybierz pomiędzy <code>klonem</code> lub <code>pobierz</code> aby uzyskać najnowszy kod aplikacji"
 "ClusterIntegration| This will permanently delete the following resources: <ul> <li>All installed applications and related resources</li> <li>The <code>gitlab-managed-apps</code> namespace</li> <li>Any project namespaces</li> <li><code>clusterroles</code></li> <li><code>clusterrolebindings</code></li> </ul>":
   plural_id:
   translations:
@@ -449,14 +436,6 @@
     - "Les objets Git LFS <strong>ne sont pas</strong> synchronisés."
     - "Los objetos Git LFS <strong>no</strong> serán sincronizados."
     - "Obiekty Git LFS <strong>nie będą</strong> zsynchronizowane."
-"The path to the CI configuration file. Defaults to <code>.gitlab-ci.yml</code>":
-  plural_id:
-  translations:
-    - "CI 設定ファイルへのパス。デフォルトは <code>.gitlab-ci.yml</code>"
-    - "Путь к файлу конфигурации CI. По умолчанию это <code>.gitlab-ci.yml</code>"
-    - "CI配置文件的路径。默认为<code>.gitlab-ci.yml</code>"
-    - "Шлях до кофігураційного файлу CI. За замовчуванням <code>.gitlab-ci.yml</code>"
-    - "La ruta al archivo de configuración CI. Por defecto <code>.gitlab-ci.yml</code>"
 "The repository must be accessible over <code>http://</code>, <code>https://</code>, <code>ssh://</code> or <code>git://</code>.":
   plural_id:
   translations:
@@ -1053,3 +1032,24 @@
   translations:
     - "<code>%{source_title}</code> から"
     - "Від <code>%{source_title}</code> до"
+"Choose between <code>clone</code> or <code>fetch</code> to get the recent application code":
+  plural_id:
+  translations:
+    - "Escolha entre <code>clone</code> ou <code>fetch</code> para obter o código do aplicativo recente"
+    - "<code>clone</code> または <code>fetch</code> を選択して最新のアプリケーションコードを取得してください"
+    - "Escolhe entre <code>clone</code> ou <code>fetch</code> para obter o código da aplicação recente"
+    - "选择 <code>克隆</code> 或 <code>拉取</code> 以获取最近的应用程序代码"
+    - "Оберіть між <code>clone</code> та<code>fetch</code> щоб отримати найновіший код програми"
+    - "Wähle zwischen <code>clone</code> oder <code>fetch</code>, um den aktuellen Anwendungscode zu erhalten"
+    - "최근 응용 프로그램 코드를 얻으려면 <code>클론</code> 또는 <code>fetch</code>를 선택하십시오."
+    - "Choisissez entre <code>clone</code> ou <code>fetch</code> pour obtenir les dernières modifications du code de l’application"
+    - "Elija entre <code>clone</code> o <code>fetch</code> para obtener el código de la aplicación más reciente"
+    - "Wybierz pomiędzy <code>klonem</code> lub <code>pobierz</code> aby uzyskać najnowszy kod aplikacji"
+"The path to the CI configuration file. Defaults to <code>.gitlab-ci.yml</code>":
+  plural_id:
+  translations:
+    - "CI 設定ファイルへのパス。デフォルトは <code>.gitlab-ci.yml</code>"
+    - "Путь к файлу конфигурации CI. По умолчанию это <code>.gitlab-ci.yml</code>"
+    - "CI配置文件的路径。默认为<code>.gitlab-ci.yml</code>"
+    - "Шлях до кофігураційного файлу CI. За замовчуванням <code>.gitlab-ci.yml</code>"
+    - "La ruta al archivo de configuración CI. Por defecto <code>.gitlab-ci.yml</code>"
