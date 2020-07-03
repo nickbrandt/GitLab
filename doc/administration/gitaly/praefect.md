@@ -782,12 +782,15 @@ The Praefect `dataloss` sub-command helps identify lost writes by checking for u
 
 ```shell
 sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.toml dataloss [-virtual-storage <virtual-storage>]
+```
 
 If the virtual storage is not specified, every configured virtual storage is checked for data loss.
 
 ```shell
 sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.toml dataloss
+```
 
+```shell
 Virtual storage: default
   Current read-only primary: gitaly-2
   Previous write-enabled primary: gitaly-1
