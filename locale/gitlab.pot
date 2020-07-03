@@ -20264,7 +20264,7 @@ msgstr ""
 msgid "SecurityReports|Scan details"
 msgstr ""
 
-msgid "SecurityReports|Scanner type"
+msgid "SecurityReports|Scanner"
 msgstr ""
 
 msgid "SecurityReports|Security Dashboard"
@@ -25626,10 +25626,10 @@ msgstr ""
 msgid "Vulnerability|Project"
 msgstr ""
 
-msgid "Vulnerability|Scanner Provider"
+msgid "Vulnerability|Scanner"
 msgstr ""
 
-msgid "Vulnerability|Scanner Type"
+msgid "Vulnerability|Scanner Provider"
 msgstr ""
 
 msgid "Vulnerability|Severity"
@@ -26860,7 +26860,7 @@ msgstr ""
 msgid "ciReport|All projects"
 msgstr ""
 
-msgid "ciReport|All scanner types"
+msgid "ciReport|All scanners"
 msgstr ""
 
 msgid "ciReport|All severities"
