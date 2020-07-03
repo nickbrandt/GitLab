@@ -127,13 +127,6 @@
     - "これにより、次のリソースは完全に削除されます <ul> <li>インストールされているすべてのアプリケーションと関連したリソース</li> <li> <code>gitlab-managed-apps</code> 名前空間</li> <li>任意のプロジェクト名前空間</li> <li><code>clusterroles</code></li> <li><code>clusterrolebindings</code></li> </ul>"
     - "此操作将永久删除下列资源： <ul> <li>所有已安装的应用程序和相关资源</li> <li> <code>GitLab管理的应用</code> 命名空间</li> <li>任何项目命名空间</li> <li><code>clusterroles</code></li> <li><code>clusterrolebindings</code></li> </ul>"
     - "Esto eliminará permanentemente los siguientes recursos: <ul> <li>Todas las aplicaciones instaladas y sus recursos relacionados</li> <li>El espacio de nombres <code>gitlab-managed-apps</code></li> <li>Cualquier espacio de nombres de proyecto</li> <li><code> clusterroles </code></li> <li><code>clusterrolebindings</code></li> </ul>"
-"ClusterIntegration|A cluster management project can be used to run deployment jobs with Kubernetes <code>cluster-admin</code> privileges.":
-  plural_id:
-  translations:
-    - "クラスター管理プロジェクトを使用して、Kubernetes <code> cluster-admin </code>特権で展開ジョブを実行できます。"
-    - "Проект управления кластером можно использовать для запуска заданий развертывания с привилегиями Kubernetes <code>cluster-admin</code>."
-    - "集群管理的项目可以通过Kubernetes<code>cluster-admin</code>权限来运行部署作业。"
-    - "Проєкт управління кластером може використовуватися для виконання завдань розгортання з привілеями Kubernetes <code>cluster-admin</code>."
 "Configure a <code>.gitlab-webide.yml</code> file in the <code>.gitlab</code> directory to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}":
   plural_id:
   translations:
@@ -1053,3 +1046,10 @@
     - "您的GitLab.com%{plan}试用将在<strong>%{expiration_date}过期</strong>。您可以通过以下方式升级以保留对%{plan}功能的访问权限。"
     - "Ваш пробний період використання GitLab.com %{plan} закінчується <strong>%{expiration_date}</strong>. Ви можете зберегти доступ до функцій %{plan} шляхом оновленням нижче."
     - "Su periodo de prueba de GitLab.com %{plan} <strong>caducará después del %{expiration_date}</strong>. Puede conservar el acceso a las %{plan} funciones actualizando la versión %{plan} de GitLab.com a continuación."
+"ClusterIntegration|A cluster management project can be used to run deployment jobs with Kubernetes <code>cluster-admin</code> privileges.":
+  plural_id:
+  translations:
+    - "クラスター管理プロジェクトを使用して、Kubernetes <code> cluster-admin </code>特権で展開ジョブを実行できます。"
+    - "Проект управления кластером можно использовать для запуска заданий развертывания с привилегиями Kubernetes <code>cluster-admin</code>."
+    - "集群管理的项目可以通过Kubernetes<code>cluster-admin</code>权限来运行部署作业。"
+    - "Проєкт управління кластером може використовуватися для виконання завдань розгортання з привілеями Kubernetes <code>cluster-admin</code>."

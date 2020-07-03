@@ -5031,7 +5031,7 @@ msgstr ""
 msgid "ClusterIntegration|%{title} updated successfully."
 msgstr ""
 
-msgid "ClusterIntegration|A cluster management project can be used to run deployment jobs with Kubernetes <code>cluster-admin</code> privileges."
+msgid "ClusterIntegration|A cluster management project can be used to run deployment jobs with Kubernetes %{code_open}cluster-admin%{code_close} privileges."
 msgstr ""
 
 msgid "ClusterIntegration|A service token scoped to %{code}kube-system%{end_code} with %{code}cluster-admin%{end_code} privileges."
