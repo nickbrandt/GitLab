@@ -214,6 +214,7 @@ export default {
                 class="js-feature-flag-delete-button"
                 variant="danger"
                 category="primary"
+                icon="remove"
                 :disabled="!canDeleteFlag(featureFlag)"
                 @click="setDeleteModalData(featureFlag)"
               >
