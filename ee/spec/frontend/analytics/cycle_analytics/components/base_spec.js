@@ -66,6 +66,12 @@ const initialCycleAnalyticsState = {
   group: selectedGroup,
 };
 
+const mocks = {
+  $toast: {
+    show: jest.fn(),
+  },
+};
+
 function createComponent({
   opts = {
     stubs: defaultStubs,
@@ -88,6 +94,7 @@ function createComponent({
       hideGroupDropDown,
       ...props,
     },
+    mocks,
     ...opts,
   });
 
@@ -271,6 +278,14 @@ describe('Cycle Analytics component', () => {
 
         it('displays the create multiple value streams button', () => {
           displaysCreateValueStream(true);
+        });
+
+        it('displays a toast message when value stream is created', () => {
+          wrapper.find(ValueStreamSelect).vm.$emit('create', { name: 'cool new stream' });
+
+          expect(wrapper.vm.$toast.show).toHaveBeenCalledWith(
+            "'cool new stream' Value Stream created",
+          );
         });
       });
     });

@@ -1,9 +1,10 @@
 <script>
-import { GlButton, GlFormInput, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlButton, GlForm, GlFormInput, GlModal, GlModalDirective } from '@gitlab/ui';
 
 export default {
   components: {
     GlButton,
+    GlForm,
     GlFormInput,
     GlModal,
   },
@@ -24,7 +25,7 @@ export default {
 };
 </script>
 <template>
-  <div>
+  <gl-form>
     <gl-button
       v-gl-modal-directive="'create-value-stream-modal'"
       data-testid="create-value-stream"
@@ -47,5 +48,5 @@ export default {
     >
       <gl-form-input id="name" v-model="name" :placeholder="__('Example: My value stream')" />
     </gl-modal>
-  </div>
+  </gl-form>
 </template>
