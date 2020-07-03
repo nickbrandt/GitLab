@@ -20,7 +20,7 @@ class Packages::PackageFile < ApplicationRecord
   scope :with_file_name, ->(file_name) { where(file_name: file_name) }
   scope :with_file_name_like, ->(file_name) { where(arel_table[:file_name].matches(file_name)) }
   scope :with_files_stored_locally, -> { where(file_store: ::Packages::PackageFileUploader::Store::LOCAL) }
-  scope :with_conan_file_metadata, -> { includes(:conan_file_metadatum) }
+  scope :preload_conan_file_metadata, -> { preload(:conan_file_metadatum) }
 
   scope :with_conan_file_type, ->(file_type) do
     joins(:conan_file_metadatum)

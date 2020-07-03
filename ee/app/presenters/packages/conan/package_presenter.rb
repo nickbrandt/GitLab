@@ -86,14 +86,19 @@ module Packages
       def package_files
         return unless package
 
-        @package_files ||= package.package_files.with_conan_file_metadata
+        @package_files ||= package.package_files.preload_conan_file_metadata
       end
 
       def package
         strong_memoize(:package) do
           name, version = @recipe.split('@')[0].split('/')
 
-          @project.packages.with_name(name).with_version(version).order_created.last
+          @project.packages
+                  .conan
+                  .with_name(name)
+                  .with_version(version)
+                  .order_created
+                  .last
         end
       end
 
