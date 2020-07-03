@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon, GlIcon, GlPopover } from '@gitlab/ui';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import LicenseManagement from 'ee/vue_shared/license_compliance/license_management.vue';
@@ -29,8 +29,10 @@ const PaginatedListMock = {
 };
 
 const noop = () => {};
+const findIcon = () => wrapper.find(GlIcon);
+const findPopover = () => wrapper.find(GlPopover);
 
-const createComponent = ({ state, getters, props, actionMocks, isAdmin, options }) => {
+const createComponent = ({ state, getters, props, actionMocks, isAdmin, options, provide }) => {
   const fakeStore = new Vuex.Store({
     modules: {
       licenseManagement: {
@@ -62,6 +64,10 @@ const createComponent = ({ state, getters, props, actionMocks, isAdmin, options 
     },
     stubs: {
       PaginatedList: PaginatedListMock,
+    },
+    provide: {
+      glFeatures: { licenseComplianceDeniesMr: false },
+      ...provide,
     },
     store: fakeStore,
     ...options,
@@ -190,6 +196,24 @@ describe('License Management', () => {
           expect(wrapper.find(AdminLicenseManagementRow).exists()).toBe(true);
         });
       });
+
+      describe.each([true, false])(
+        'when licenseComplianceDeniesMr feature flag is %p',
+        licenseComplianceDeniesMr => {
+          it('should not show the developer only tooltip', () => {
+            createComponent({
+              state: { isLoadingManagedLicenses: false },
+              isAdmin: true,
+              provide: {
+                glFeatures: { licenseComplianceDeniesMr },
+              },
+            });
+
+            expect(findIcon().exists()).toBe(false);
+            expect(findPopover().exists()).toBe(false);
+          });
+        },
+      );
     });
 
     describe('when developer', () => {
@@ -228,6 +252,28 @@ describe('License Management', () => {
           expect(wrapper.find(AdminLicenseManagementRow).exists()).toBe(false);
         });
       });
+
+      describe.each`
+        licenseComplianceDeniesMr | should
+        ${true}                   | ${'should'}
+        ${false}                  | ${'should not'}
+      `(
+        'when licenseComplianceDeniesMr feature flag is $licenseComplianceDeniesMr',
+        ({ licenseComplianceDeniesMr, should }) => {
+          it(`${should} show the developer only tooltip`, () => {
+            createComponent({
+              state: { isLoadingManagedLicenses: false },
+              isAdmin: false,
+              provide: {
+                glFeatures: { licenseComplianceDeniesMr },
+              },
+            });
+
+            expect(findIcon().exists()).toBe(licenseComplianceDeniesMr);
+            expect(findPopover().exists()).toBe(licenseComplianceDeniesMr);
+          });
+        },
+      );
     });
   });
 });

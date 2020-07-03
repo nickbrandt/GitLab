@@ -2238,6 +2238,9 @@ msgstr ""
 msgid "Allow users to request access (if visibility is public or internal)"
 msgstr ""
 
+msgid "Allowed"
+msgstr ""
+
 msgid "Allowed Geo IP"
 msgstr ""
 
@@ -7439,6 +7442,9 @@ msgid "Deleting the license failed. You are not permitted to perform this action
 msgstr ""
 
 msgid "Deletion pending. This project will be removed on %{date}. Repository and other project resources are read-only."
+msgstr ""
+
+msgid "Denied"
 msgstr ""
 
 msgid "Denied authorization of chat nickname %{user_name}."
@@ -13466,6 +13472,9 @@ msgstr ""
 msgid "Licenses|%{remainingComponentsCount} more"
 msgstr ""
 
+msgid "Licenses|Acceptable license to be used in the project"
+msgstr ""
+
 msgid "Licenses|Component"
 msgstr ""
 
@@ -13476,6 +13485,9 @@ msgid "Licenses|Detected in Project"
 msgstr ""
 
 msgid "Licenses|Detected licenses that are out-of-compliance with the project's assigned policies"
+msgstr ""
+
+msgid "Licenses|Disallow Merge request if detected and will instruct the developer to remove"
 msgstr ""
 
 msgid "Licenses|Displays licenses detected in the project, based on the %{linkStart}latest successful%{linkEnd} scan"

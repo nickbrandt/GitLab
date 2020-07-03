@@ -1,8 +1,8 @@
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
-import { s__ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { mapState, mapGetters, mapActions } from 'vuex';
+import { GlButton, GlLoadingIcon, GlIcon, GlPopover } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
 import AddLicenseForm from './components/add_license_form.vue';
 import AdminLicenseManagementRow from './components/admin_license_management_row.vue';
@@ -20,6 +20,8 @@ export default {
     LicenseManagementRow,
     GlButton,
     GlLoadingIcon,
+    GlIcon,
+    GlPopover,
     PaginatedList,
     LicenseApprovals,
   },
@@ -27,10 +29,6 @@ export default {
   data() {
     return {
       formIsOpen: false,
-      tableHeaders: [
-        { className: 'section-70', label: s__('Licenses|Policy') },
-        { className: 'section-30', label: s__('Licenses|Name') },
-      ],
     };
   },
   computed: {
@@ -45,6 +43,9 @@ export default {
     },
     showLoadingSpinner() {
       return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
+    },
+    isTooltipEnabled() {
+      return Boolean(this.glFeatures.licenseComplianceDeniesMr);
     },
   },
   watch: {
@@ -103,14 +104,40 @@ export default {
         </div>
 
         <template v-else>
-          <div
-            v-for="header in tableHeaders"
-            :key="header.label"
-            class="table-section"
-            :class="header.className"
-            role="rowheader"
-          >
-            {{ header.label }}
+          <div class="table-section gl-d-flex gl-pl-2 section-70" role="rowheader">
+            {{ s__('Licenses|Policy') }}
+            <template v-if="isTooltipEnabled">
+              <gl-icon
+                ref="reportInfo"
+                name="question"
+                class="text-info gl-ml-1 gl-cursor-pointer"
+                :aria-label="__('help')"
+                :size="14"
+              />
+              <gl-popover
+                :target="() => $refs.reportInfo.$el"
+                placement="bottom"
+                triggers="click blur"
+                :css-classes="['gl-mt-3']"
+              >
+                <div class="h5">{{ __('Allowed') }}</div>
+                <span class="text-secondary">
+                  {{ s__('Licenses|Acceptable license to be used in the project') }}</span
+                >
+                <div class="h5">{{ __('Denied') }}</div>
+                <span class="text-secondary">
+                  {{
+                    s__(
+                      'Licenses|Disallow Merge request if detected and will instruct the developer to remove',
+                    )
+                  }}</span
+                >
+              </gl-popover>
+            </template>
+          </div>
+
+          <div class="table-section section-30" role="rowheader">
+            {{ s__('Licenses|Name') }}
           </div>
         </template>
       </template>
