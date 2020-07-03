@@ -3744,9 +3744,9 @@ Combining the individual examples given above for `release`, we'd have the follo
 
 ```yaml
 stages:
-- build
-- test
-- release-stg
+  - build
+  - test
+  - release-stg
 
 release_job:
   stage: release
@@ -4332,11 +4332,11 @@ Example:
 
 ```yaml
 .something_before: &something_before
-- echo 'something before'
+  - echo 'something before'
 
 .something_after: &something_after
-- echo 'something after'
-- echo 'another thing after'
+  - echo 'something after'
+  - echo 'another thing after'
 
 job_name:
   before_script:
@@ -4358,7 +4358,7 @@ For example:
 
 ```yaml
 .something: &something
-- echo 'something'
+  - echo 'something'
 
 job_name:
   script:
