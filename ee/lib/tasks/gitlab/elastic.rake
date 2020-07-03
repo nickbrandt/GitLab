@@ -46,13 +46,6 @@ namespace :gitlab do
       puts "Indexing is %.2f%% complete (%d/%d projects)" % [percent, indexed, projects]
     end
 
-    desc 'GitLab | Elasticsearch | Unlock repositories for indexing in case something gets stuck'
-    task clear_locked_projects: :environment do
-      Gitlab::Redis::SharedState.with { |redis| redis.del(:elastic_projects_indexing) }
-
-      puts 'Cleared all locked projects. Incremental indexing should work now.'
-    end
-
     desc "GitLab | Elasticsearch | Index all snippets"
     task index_snippets: :environment do
       logger = Logger.new(STDOUT)
@@ -127,7 +120,6 @@ namespace :gitlab do
 
       relation.all.in_batches(start: ENV['ID_FROM'], finish: ENV['ID_TO']) do |relation| # rubocop: disable Cop/InBatches
         ids = relation.reorder(:id).pluck(:id)
-        Gitlab::Redis::SharedState.with { |redis| redis.sadd(:elastic_projects_indexing, ids) }
         yield ids
       end
     end
