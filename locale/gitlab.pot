@@ -8777,6 +8777,9 @@ msgstr ""
 msgid "Environments|Logs from %{start} to %{end}."
 msgstr ""
 
+msgid "Environments|More information"
+msgstr ""
+
 msgid "Environments|New environment"
 msgstr ""
 
@@ -8814,9 +8817,6 @@ msgid "Environments|Re-deploy environment %{name}?"
 msgstr ""
 
 msgid "Environments|Re-deploy to environment"
-msgstr ""
-
-msgid "Environments|Read more about environments"
 msgstr ""
 
 msgid "Environments|Rollback"
@@ -18575,9 +18575,6 @@ msgid "Re-verification interval"
 msgstr ""
 
 msgid "Read more"
-msgstr ""
-
-msgid "Read more about environments"
 msgstr ""
 
 msgid "Read more about project permissions <strong>%{link_to_help}</strong>"
