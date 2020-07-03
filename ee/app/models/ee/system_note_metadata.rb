@@ -5,7 +5,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     EE_ICON_TYPES = %w[
-      weight approved unapproved relate unrelate published
+      weight unapproved relate unrelate published
       epic_issue_added issue_added_to_epic epic_issue_removed issue_removed_from_epic
       epic_issue_moved issue_changed_epic epic_date_changed relate_epic unrelate_epic
       vulnerability_confirmed vulnerability_dismissed vulnerability_resolved

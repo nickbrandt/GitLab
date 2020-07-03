@@ -48,20 +48,6 @@ module EE
       issuables_service(noteable, noteable.project, author).change_iteration(iteration)
     end
 
-    # Called when the merge request is approved by user
-    #
-    # noteable - Noteable object
-    # user     - User performing approve
-    #
-    # Example Note text:
-    #
-    #   "approved this merge request"
-    #
-    # Returns the created Note object
-    def approve_mr(noteable, user)
-      merge_requests_service(noteable, noteable.project, user).approve_mr
-    end
-
     def unapprove_mr(noteable, user)
       merge_requests_service(noteable, noteable.project, user).unapprove_mr
     end
