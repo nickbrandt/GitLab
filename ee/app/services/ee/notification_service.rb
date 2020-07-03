@@ -97,7 +97,7 @@ module EE
     end
 
     def send_service_desk_notification(note)
-      return unless EE::Gitlab::ServiceDesk.enabled?
+      return unless EE::Gitlab::ServiceDesk.supported?
       return unless note.noteable_type == 'Issue'
 
       issue = note.noteable

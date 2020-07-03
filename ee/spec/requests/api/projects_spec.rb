@@ -187,21 +187,10 @@ RSpec.describe API::Projects do
 
     describe 'service desk attributes' do
       it 'are exposed when the feature is available' do
-        stub_licensed_features(service_desk: true)
-
         get api("/projects/#{project.id}", user)
 
         expect(json_response).to have_key 'service_desk_enabled'
         expect(json_response).to have_key 'service_desk_address'
-      end
-
-      it 'are not exposed when the feature is not available' do
-        stub_licensed_features(service_desk: false)
-
-        get api("/projects/#{project.id}", user)
-
-        expect(json_response).not_to have_key 'service_desk_enabled'
-        expect(json_response).not_to have_key 'service_desk_address'
       end
     end
 
@@ -741,7 +730,6 @@ RSpec.describe API::Projects do
       subject { put(api("/projects/#{project.id}", user), params: { service_desk_enabled: true }) }
 
       before do
-        stub_licensed_features(service_desk: true)
         project.update!(service_desk_enabled: false)
 
         allow(::Gitlab::IncomingEmail).to receive(:enabled?).and_return(true)

@@ -37,7 +37,6 @@ class License < ApplicationRecord
     repository_size_limit
     seat_link
     send_emails_from_admin_area
-    service_desk
     scoped_issue_board
     usage_quotas
     visual_review_app
@@ -165,7 +164,6 @@ class License < ApplicationRecord
     related_issues
     repository_mirrors
     scoped_issue_board
-    service_desk
   ].freeze
 
   FEATURES_BY_PLAN = {
@@ -187,8 +185,7 @@ class License < ApplicationRecord
     'GitLab_Auditor_User' => :auditor_user,
     'GitLab_DeployBoard' => :deploy_board,
     'GitLab_FileLocks' => :file_locks,
-    'GitLab_Geo' => :geo,
-    'GitLab_ServiceDesk' => :service_desk
+    'GitLab_Geo' => :geo
   }.freeze
 
   # Global features that cannot be restricted to only a subset of projects or namespaces.

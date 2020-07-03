@@ -15,7 +15,6 @@ RSpec.describe EE::NotificationService, :mailer do
       allow(Notify).to receive(:service_desk_new_note_email)
                          .with(Integer, Integer).and_return(mailer)
 
-      allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).and_return(true)
       allow(::Gitlab::IncomingEmail).to receive(:enabled?) { true }
       allow(::Gitlab::IncomingEmail).to receive(:supports_wildcard?) { true }
     end
@@ -66,14 +65,6 @@ RSpec.describe EE::NotificationService, :mailer do
       context 'where the project has disabled the feature' do
         before do
           project.update(service_desk_enabled: false)
-        end
-
-        it_should_not_email!
-      end
-
-      context 'when the license doesn\'t allow service desk' do
-        before do
-          allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).and_return(false)
         end
 
         it_should_not_email!

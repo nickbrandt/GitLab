@@ -216,34 +216,15 @@ RSpec.describe Gitlab::UsageData do
   describe '.service_desk_counts' do
     subject { described_class.service_desk_counts }
 
-    context 'when Service Desk is disabled' do
-      it 'returns an empty hash' do
-        stub_licensed_features(service_desk: false)
+    let(:project) { create(:project, :service_desk_enabled) }
 
-        expect(subject).to eq({})
-      end
-    end
+    it 'gathers Service Desk data' do
+      create_list(:issue, 2, confidential: true, author: User.support_bot, project: project)
 
-    context 'when there is no license' do
-      it 'returns an empty hash' do
-        allow(License).to receive(:current).and_return(nil)
+      allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).with(anything).and_return(true)
 
-        expect(subject).to eq({})
-      end
-    end
-
-    context 'when Service Desk is enabled' do
-      let(:project) { create(:project, :service_desk_enabled) }
-
-      it 'gathers Service Desk data' do
-        create_list(:issue, 2, confidential: true, author: User.support_bot, project: project)
-
-        stub_licensed_features(service_desk: true)
-        allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).with(anything).and_return(true)
-
-        expect(subject).to eq(service_desk_enabled_projects: 1,
-                              service_desk_issues: 2)
-      end
+      expect(subject).to eq(service_desk_enabled_projects: 1,
+                            service_desk_issues: 2)
     end
   end
 

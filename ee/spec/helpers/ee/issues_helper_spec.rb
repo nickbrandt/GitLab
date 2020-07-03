@@ -77,7 +77,9 @@ RSpec.describe EE::IssuesHelper do
     let!(:new_issue) { create(:issue, author: User.support_bot, project: project2) }
 
     before do
-      allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).and_return(true)
+      allow(Gitlab::IncomingEmail).to receive(:enabled?) { true }
+      allow(Gitlab::IncomingEmail).to receive(:supports_wildcard?) { true }
+
       old_issue.update(moved_to: new_issue)
     end
 
