@@ -11,7 +11,7 @@
     .svg-content
       = render svg_path
 
-    %div{ class: is_empty_state ? "text-content" : "prepend-top-10 prepend-left-default" }
+    %div{ class: is_empty_state ? "text-content" : "prepend-top-10 gl-ml-3" }
       - if is_empty_state
         %h4= title_text
       - else

@@ -42,7 +42,7 @@ export default {
             <gl-icon v-else name="chevron-down" :size="18" />
             <div>{{ titleWithName }}</div>
           </div>
-          <div class="prepend-left-default">{{ formatAmount(totalAmount, usersPresent) }}</div>
+          <div class="gl-ml-3">{{ formatAmount(totalAmount, usersPresent) }}</div>
         </h4>
       </div>
       <summary-details v-show="!collapsed" />
