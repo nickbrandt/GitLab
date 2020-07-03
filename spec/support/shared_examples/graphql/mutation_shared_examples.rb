@@ -19,6 +19,14 @@ RSpec.shared_examples 'a mutation that returns top-level errors' do |errors: []|
   end
 end
 
+RSpec.shared_examples 'an invalid argument to the mutation' do |argument_name:|
+  it_behaves_like 'a mutation that returns top-level errors' do
+    let(:match_errors) do
+      contain_exactly(include("invalid value for #{GraphqlHelpers.fieldnamerize(argument_name)}"))
+    end
+  end
+end
+
 # Shared example for expecting schema-level errors.
 # See https://graphql-ruby.org/mutations/mutation_errors#errors-as-data
 #
