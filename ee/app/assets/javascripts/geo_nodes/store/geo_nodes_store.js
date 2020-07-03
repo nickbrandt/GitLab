@@ -138,7 +138,7 @@ export default class GeoNodesStore {
         failureCount: rawNodeDetails.design_repositories_failed_count || 0,
       },
       packageFiles: {
-        totalCount: rawNodeDetails.package_files_count || 0,
+        totalCount: rawNodeDetails.package_files_registry_count || 0,
         successCount: rawNodeDetails.package_files_synced_count || 0,
         failureCount: rawNodeDetails.package_files_failed_count || 0,
       },
