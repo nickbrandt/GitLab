@@ -2,30 +2,21 @@
 
 import $ from 'jquery';
 import '~/gl_dropdown';
-import initGlobalSearchInput from '~/global_search_input';
+import initSearchAutocomplete from '~/search_autocomplete';
 import '~/lib/utils/common_utils';
 
-describe('Global search input dropdown', () => {
+describe('Search autocomplete dropdown', () => {
   let widget = null;
 
   const userName = 'root';
-
   const userId = 1;
-
   const dashboardIssuesPath = '/dashboard/issues';
-
   const dashboardMRsPath = '/dashboard/merge_requests';
-
   const projectIssuesPath = '/gitlab-org/gitlab-foss/issues';
-
   const projectMRsPath = '/gitlab-org/gitlab-foss/-/merge_requests';
-
   const groupIssuesPath = '/groups/gitlab-org/-/issues';
-
   const groupMRsPath = '/groups/gitlab-org/-/merge_requests';
-
   const projectName = 'GitLab Community Edition';
-
   const groupName = 'Gitlab Org';
 
   const removeBodyAttributes = () => {
@@ -112,15 +103,15 @@ describe('Global search input dropdown', () => {
     expect(list.find(mrsIHaveCreatedLink).text()).toBe("Merge requests I've created");
   };
 
-  preloadFixtures('static/global_search_input.html');
+  preloadFixtures('static/search_autocomplete.html');
   beforeEach(() => {
-    loadFixtures('static/global_search_input.html');
+    loadFixtures('static/search_autocomplete.html');
 
     window.gon = {};
     window.gon.current_user_id = userId;
     window.gon.current_username = userName;
 
-    return (widget = initGlobalSearchInput());
+    return (widget = initSearchAutocomplete());
   });
 
   afterEach(() => {
@@ -183,31 +174,32 @@ describe('Global search input dropdown', () => {
     widget.wrap.trigger($.Event('keydown', { which: DOWN }));
     const enterKeyEvent = $.Event('keydown', { which: ENTER });
     widget.searchInput.trigger(enterKeyEvent);
+
     // This does not currently catch failing behavior. For security reasons,
     // browsers will not trigger default behavior (form submit, in this
     // example) on JavaScript-created keypresses.
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
-  describe('disableDropdown', () => {
+  describe('disableAutocomplete', () => {
     beforeEach(() => {
-      widget.enableDropdown();
+      widget.enableAutocomplete();
     });
 
     it('should close the Dropdown', () => {
       const toggleSpy = jest.spyOn(widget.dropdownToggle, 'dropdown');
 
       widget.dropdown.addClass('show');
-      widget.disableDropdown();
+      widget.disableAutocomplete();
 
       expect(toggleSpy).toHaveBeenCalledWith('toggle');
     });
   });
 
-  describe('enableDropdown', () => {
+  describe('enableAutocomplete', () => {
     it('should open the Dropdown', () => {
       const toggleSpy = jest.spyOn(widget.dropdownToggle, 'dropdown');
-      widget.enableDropdown();
+      widget.enableAutocomplete();
 
       expect(toggleSpy).toHaveBeenCalledWith('toggle');
     });
