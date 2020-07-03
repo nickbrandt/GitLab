@@ -305,11 +305,6 @@ declaring their names dynamically in `.gitlab-ci.yml`.
 
 Dynamic environments are a fundamental part of [Review apps](../review_apps/index.md).
 
-### Configuring incremental rollouts
-
-Learn how to release production changes to only a portion of your Kubernetes pods with
-[incremental rollouts](../environments/incremental_rollouts.md).
-
 #### Allowed variables
 
 The `name` and `url` parameters for dynamic environments can use most available CI/CD variables,
@@ -421,6 +416,11 @@ Kubernetes configuration is not supported for Kubernetes clusters
 that are [managed by GitLab](../../user/project/clusters/index.md#gitlab-managed-clusters).
 To follow progress on support for GitLab-managed clusters, see the
 [relevant issue](https://gitlab.com/gitlab-org/gitlab/-/issues/38054).
+
+#### Configuring incremental rollouts
+
+Learn how to release production changes to only a portion of your Kubernetes pods with
+[incremental rollouts](../environments/incremental_rollouts.md).
 
 ### Deployment safety
 
