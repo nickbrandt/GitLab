@@ -2914,10 +2914,10 @@ For example, to match a single file:
 
 ```yaml
 test:
-  script: [ 'echo 1' ]
+  script: [ "echo 'test' > file.txt" ]
   artifacts:
     expose_as: 'artifact 1'
-    paths: ['path/to/file.txt']
+    paths: ['file.txt']
 ```
 
 With this configuration, GitLab will add a link **artifact 1** to the relevant merge request
@@ -2927,10 +2927,10 @@ An example that will match an entire directory:
 
 ```yaml
 test:
-  script: [ 'echo 1' ]
+  script: [ "mkdir test && echo 'test' > test/file.txt" ]
   artifacts:
     expose_as: 'artifact 1'
-    paths: ['path/to/directory/']
+    paths: ['test/']
 ```
 
 Note the following:
