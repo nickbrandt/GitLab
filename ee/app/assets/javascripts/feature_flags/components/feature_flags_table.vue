@@ -202,10 +202,10 @@ export default {
                 v-gl-tooltip.hover.bottom="__('Edit')"
                 class="js-feature-flag-edit-button"
                 variant="default"
-                category="secondary"
+                category="primary"
+                icon="pencil"
                 :href="featureFlag.edit_path"
               >
-                <gl-icon name="pencil" :size="16" />
               </gl-button>
             </template>
             <template v-if="featureFlag.destroy_path">
