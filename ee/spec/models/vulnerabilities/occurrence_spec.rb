@@ -15,7 +15,7 @@ RSpec.describe Vulnerabilities::Occurrence do
     it { is_expected.to have_many(:pipelines).class_name('Ci::Pipeline') }
     it { is_expected.to have_many(:finding_pipelines).class_name('Vulnerabilities::FindingPipeline') }
     it { is_expected.to have_many(:identifiers).class_name('Vulnerabilities::Identifier') }
-    it { is_expected.to have_many(:occurrence_identifiers).class_name('Vulnerabilities::OccurrenceIdentifier') }
+    it { is_expected.to have_many(:finding_identifiers).class_name('Vulnerabilities::FindingIdentifier') }
   end
 
   describe 'validations' do

@@ -23,7 +23,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
 
     using RSpec::Parameterized::TableSyntax
 
-    where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :occurrence_identifiers, :finding_pipelines) do
+    where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :finding_identifiers, :finding_pipelines) do
       'with SAST report'                | :sast                | 3 | 17 | 33 | 39 | 33
       'with Dependency Scanning report' | :dependency_scanning | 2 | 7  | 4  | 7  | 4
       'with Container Scanning report'  | :container_scanning  | 1 | 8  | 8  | 8  | 8
@@ -43,7 +43,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
       end
 
       it 'inserts all occurrence identifiers (join model)' do
-        expect { subject }.to change { Vulnerabilities::OccurrenceIdentifier.count }.by(occurrence_identifiers)
+        expect { subject }.to change { Vulnerabilities::FindingIdentifier.count }.by(finding_identifiers)
       end
 
       it 'inserts all finding pipelines (join model)' do

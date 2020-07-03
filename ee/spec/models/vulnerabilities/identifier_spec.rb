@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Vulnerabilities::Identifier do
   describe 'associations' do
-    it { is_expected.to have_many(:occurrence_identifiers).class_name('Vulnerabilities::OccurrenceIdentifier') }
+    it { is_expected.to have_many(:finding_identifiers).class_name('Vulnerabilities::FindingIdentifier') }
     it { is_expected.to have_many(:occurrences).class_name('Vulnerabilities::Occurrence') }
     it { is_expected.to have_many(:primary_occurrences).class_name('Vulnerabilities::Occurrence') }
     it { is_expected.to belong_to(:project) }

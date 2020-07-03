@@ -83,7 +83,7 @@ module Security
 
     def create_or_update_vulnerability_identifier_object(vulnerability_finding, identifier)
       identifier_object = identifiers_objects[identifier.key]
-      vulnerability_finding.occurrence_identifiers.find_or_create_by!(identifier: identifier_object)
+      vulnerability_finding.finding_identifiers.find_or_create_by!(identifier: identifier_object)
       identifier_object.update!(identifier.to_hash)
     rescue ActiveRecord::RecordNotUnique
     end

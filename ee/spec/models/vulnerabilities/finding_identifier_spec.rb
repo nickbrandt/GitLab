@@ -2,14 +2,14 @@
 
 require 'spec_helper'
 
-RSpec.describe Vulnerabilities::OccurrenceIdentifier do
+RSpec.describe Vulnerabilities::FindingIdentifier do
   describe 'associations' do
     it { is_expected.to belong_to(:identifier).class_name('Vulnerabilities::Identifier') }
     it { is_expected.to belong_to(:occurrence).class_name('Vulnerabilities::Occurrence') }
   end
 
   describe 'validations' do
-    let!(:occurrence_identifier) { create(:vulnerabilities_occurrence_identifier) }
+    let!(:finding_identifier) { create(:vulnerabilities_finding_identifier) }
 
     it { is_expected.to validate_presence_of(:occurrence) }
     it { is_expected.to validate_presence_of(:identifier) }
