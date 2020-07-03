@@ -739,6 +739,12 @@ To enable this feature, you need to specify the [`environment:auto_stop_in`](../
 You can specify a human-friendly date as the value, such as `1 hour and 30 minutes` or `1 day`.
 `auto_stop_in` uses the same format of [`artifacts:expire_in` docs](../yaml/README.md#artifactsexpire_in).
 
+NOTE: **Note:**
+Due to the resource limitation, a background worker for stopping environments only
+runs once every hour. This means environments will not be stopped at the exact
+timestamp as the specified period, but will be stopped when the hourly cron worker
+detects expired environments.
+
 ##### Auto-stop example
 
 In the following example, there is a basic review app setup that creates a new environment
@@ -777,12 +783,6 @@ button can be used to prevent auto-stopping the environment. By clicking this bu
 and the environment will be active until it's stopped manually.
 
 ![Environment auto stop](../img/environment_auto_stop_v12_8.png)
-
-NOTE: **NOTE**
-Due to the resource limitation, a background worker for stopping environments only
-runs once every hour. This means environments will not be stopped at the exact
-timestamp as the specified period, but will be stopped when the hourly cron worker
-detects expired environments.
 
 #### Delete a stopped environment
 
