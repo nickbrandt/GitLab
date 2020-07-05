@@ -13,6 +13,9 @@ RSpec.describe JiraConnect::AppDescriptorController do
         'lifecycle' => {
           'installed' => '/events/installed',
           'uninstalled' => '/events/uninstalled'
+        },
+        'links' => {
+          'documentation' => 'http://test.host/help/integration/jira_development_panel#gitlabcom-1'
         }
       )
     end
