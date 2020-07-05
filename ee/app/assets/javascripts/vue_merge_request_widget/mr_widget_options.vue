@@ -237,7 +237,13 @@ export default {
       };
     },
   },
-  securityReportTypes: ['dast', 'sast', 'dependencyScanning', 'containerScanning'],
+  securityReportTypes: [
+    'dast',
+    'sast',
+    'dependencyScanning',
+    'containerScanning',
+    'coverageFuzzing',
+  ],
 };
 </script>
 <template>
@@ -311,6 +317,7 @@ export default {
         :enabled-reports="mr.enabledReports"
         :sast-help-path="mr.sastHelp"
         :dast-help-path="mr.dastHelp"
+        :coverage-fuzzing-help-path="mr.coverageFuzzingHelp"
         :container-scanning-help-path="mr.containerScanningHelp"
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
         :secret-scanning-help-path="mr.secretScanningHelp"

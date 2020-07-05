@@ -23,6 +23,7 @@ import {
   containerScanningDiffSuccessMock,
   dependencyScanningDiffSuccessMock,
   secretScanningDiffSuccessMock,
+  coverageFuzzingDiffSuccessMock,
 } from 'ee_jest/vue_shared/security_reports/mock_data';
 
 const SAST_SELECTOR = '.js-sast-widget';
@@ -30,6 +31,7 @@ const DAST_SELECTOR = '.js-dast-widget';
 const DEPENDENCY_SCANNING_SELECTOR = '.js-dependency-scanning-widget';
 const CONTAINER_SCANNING_SELECTOR = '.js-container-scanning';
 const SECRET_SCANNING_SELECTOR = '.js-secret-scanning';
+const COVERAGE_FUZZING_SELECTOR = '.js-coverage-fuzzing-widget';
 
 describe('ee merge request widget options', () => {
   let vm;
@@ -736,6 +738,78 @@ describe('ee merge request widget options', () => {
               .querySelector(DAST_SELECTOR)
               .textContent.trim(),
           ).toContain('DAST: Loading resulted in an error');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('Coverage Fuzzing', () => {
+    const COVERAGE_FUZZING_ENDPOINT = 'coverage_fuzzing_report';
+
+    beforeEach(() => {
+      gl.mrWidgetData = {
+        ...mockData,
+        enabled_reports: {
+          coverage_fuzzing: true,
+        },
+        coverage_fuzzing_comparison_path: COVERAGE_FUZZING_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
+      };
+    });
+
+    describe('when it is loading', () => {
+      it('should render loading indicator', () => {
+        mock.onGet(COVERAGE_FUZZING_ENDPOINT).reply(200, coverageFuzzingDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
+
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        expect(
+          findSecurityWidget()
+            .querySelector(COVERAGE_FUZZING_SELECTOR)
+            .textContent.trim(),
+        ).toContain('Coverage fuzzing is loading');
+      });
+    });
+
+    describe('with successful request', () => {
+      beforeEach(() => {
+        mock.onGet(COVERAGE_FUZZING_ENDPOINT).reply(200, coverageFuzzingDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
+
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+      });
+
+      it('should render provided data', done => {
+        setImmediate(() => {
+          expect(
+            findSecurityWidget()
+              .querySelector(`${COVERAGE_FUZZING_SELECTOR} .report-block-list-issue-description`)
+              .textContent.trim(),
+          ).toEqual(
+            'Coverage fuzzing detected 1 new critical and 1 new high severity vulnerabilities.',
+          );
+          done();
+        });
+      });
+    });
+
+    describe('with failed request', () => {
+      beforeEach(() => {
+        mock.onGet(COVERAGE_FUZZING_ENDPOINT).reply(500, {});
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(500, {});
+
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+      });
+
+      it('should render error indicator', done => {
+        setImmediate(() => {
+          expect(
+            findSecurityWidget()
+              .querySelector(COVERAGE_FUZZING_SELECTOR)
+              .textContent.trim(),
+          ).toContain('Coverage fuzzing: Loading resulted in an error');
           done();
         });
       });

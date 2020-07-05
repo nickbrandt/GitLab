@@ -22,6 +22,7 @@ import {
   containerScanningDiffSuccessMock,
   dependencyScanningDiffSuccessMock,
   secretScanningDiffSuccessMock,
+  coverageFuzzingDiffSuccessMock,
   mockFindings,
 } from './mock_data';
 
@@ -30,6 +31,7 @@ const DEPENDENCY_SCANNING_DIFF_ENDPOINT = 'dependency_scanning.json';
 const DAST_DIFF_ENDPOINT = 'dast.json';
 const SAST_DIFF_ENDPOINT = 'sast.json';
 const SECRET_SCANNING_DIFF_ENDPOINT = 'secret_scanning.json';
+const COVERAGE_FUZZING_DIFF_ENDPOINT = 'coverage_fuzzing.json';
 
 describe('Grouped security reports app', () => {
   let wrapper;
@@ -48,6 +50,7 @@ describe('Grouped security reports app', () => {
     canReadVulnerabilityFeedbackPath: true,
     vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
     vulnerabilityFeedbackHelpPath: 'path',
+    coverageFuzzingHelpPath: 'path',
     pipelineId: 123,
     projectFullPath: 'path',
   };
@@ -96,6 +99,7 @@ describe('Grouped security reports app', () => {
         containerScanning: true,
         dependencyScanning: true,
         secretScanning: true,
+        coverageFuzzing: true,
       },
     };
 
@@ -106,6 +110,7 @@ describe('Grouped security reports app', () => {
       gl.mrWidgetData.dast_comparison_path = DAST_DIFF_ENDPOINT;
       gl.mrWidgetData.sast_comparison_path = SAST_DIFF_ENDPOINT;
       gl.mrWidgetData.secret_scanning_comparison_path = SECRET_SCANNING_DIFF_ENDPOINT;
+      gl.mrWidgetData.coverage_fuzzing_comparison_path = COVERAGE_FUZZING_DIFF_ENDPOINT;
     });
 
     describe('with error', () => {
@@ -115,6 +120,7 @@ describe('Grouped security reports app', () => {
         mock.onGet(DAST_DIFF_ENDPOINT).reply(500);
         mock.onGet(SAST_DIFF_ENDPOINT).reply(500);
         mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(500);
+        mock.onGet(COVERAGE_FUZZING_DIFF_ENDPOINT).reply(500);
 
         createWrapper(allReportProps);
 
@@ -124,6 +130,7 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_ERROR),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_ERROR),
         ]);
       });
 
@@ -162,6 +169,7 @@ describe('Grouped security reports app', () => {
         mock.onGet(DAST_DIFF_ENDPOINT).reply(200, {});
         mock.onGet(SAST_DIFF_ENDPOINT).reply(200, {});
         mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(200, {});
+        mock.onGet(COVERAGE_FUZZING_DIFF_ENDPOINT).reply(200, {});
 
         createWrapper(allReportProps);
       });
@@ -180,6 +188,7 @@ describe('Grouped security reports app', () => {
         expect(wrapper.vm.$el.textContent).toContain('Dependency scanning is loading');
         expect(wrapper.vm.$el.textContent).toContain('Container scanning is loading');
         expect(wrapper.vm.$el.textContent).toContain('DAST is loading');
+        expect(wrapper.vm.$el.textContent).toContain('Coverage fuzzing is loading');
       });
     });
 
@@ -191,6 +200,7 @@ describe('Grouped security reports app', () => {
         mock.onGet(DAST_DIFF_ENDPOINT).reply(200, emptyResponse);
         mock.onGet(SAST_DIFF_ENDPOINT).reply(200, emptyResponse);
         mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(200, emptyResponse);
+        mock.onGet(COVERAGE_FUZZING_DIFF_ENDPOINT).reply(200, emptyResponse);
 
         createWrapper(allReportProps);
 
@@ -200,6 +210,7 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_SUCCESS),
         ]);
       });
 
@@ -239,6 +250,7 @@ describe('Grouped security reports app', () => {
         mock.onGet(DAST_DIFF_ENDPOINT).reply(200, dastDiffSuccessMock);
         mock.onGet(SAST_DIFF_ENDPOINT).reply(200, sastDiffSuccessMock);
         mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(200, secretScanningDiffSuccessMock);
+        mock.onGet(COVERAGE_FUZZING_DIFF_ENDPOINT).reply(200, coverageFuzzingDiffSuccessMock);
 
         createWrapper(allReportProps);
 
@@ -248,6 +260,7 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_SUCCESS),
         ]);
       });
 
@@ -284,6 +297,11 @@ describe('Grouped security reports app', () => {
         expect(wrapper.vm.$el.textContent).toContain(
           'DAST detected 1 new critical severity vulnerability.',
         );
+
+        // Renders container scanning result
+        expect(wrapper.vm.$el.textContent).toContain(
+          'Coverage fuzzing detected 1 new critical and 1 new high severity vulnerabilities.',
+        );
       });
 
       it('opens modal with more information', () => {
@@ -307,6 +325,7 @@ describe('Grouped security reports app', () => {
         ${'container-scanning'}  | ${containerScanningDiffSuccessMock.fixed}  | ${containerScanningDiffSuccessMock.added}
         ${'dast'}                | ${dastDiffSuccessMock.fixed}               | ${dastDiffSuccessMock.added}
         ${'secret-scanning'}     | ${secretScanningDiffSuccessMock.fixed}     | ${secretScanningDiffSuccessMock.added}
+        ${'coverage-fuzzing'}    | ${coverageFuzzingDiffSuccessMock.fixed}    | ${coverageFuzzingDiffSuccessMock.added}
       `(
         'renders a grouped-issues-list with the correct props for "$reportType" issues',
         ({ reportType, resolvedIssues, unresolvedIssues }) => {

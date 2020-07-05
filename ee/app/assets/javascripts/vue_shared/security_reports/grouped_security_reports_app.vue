@@ -92,6 +92,11 @@ export default {
       required: false,
       default: '',
     },
+    coverageFuzzingHelpPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     dependencyScanningHelpPath: {
       type: String,
       required: false,
@@ -178,6 +183,7 @@ export default {
       'sast',
       'containerScanning',
       'dast',
+      'coverageFuzzing',
       'dependencyScanning',
       'secretScanning',
       'summaryCounts',
@@ -193,10 +199,12 @@ export default {
       'groupedDastText',
       'groupedDependencyText',
       'groupedSecretScanningText',
+      'groupedCoverageFuzzingText',
       'containerScanningStatusIcon',
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
       'secretScanningStatusIcon',
+      'coverageFuzzingStatusIcon',
       'isBaseSecurityReportOutOfDate',
       'canCreateIssue',
       'canCreateMergeRequest',
@@ -214,6 +222,9 @@ export default {
     },
     hasDastReports() {
       return this.enabledReports.dast;
+    },
+    hasCoverageFuzzingReports() {
+      return this.enabledReports.coverageFuzzing;
     },
     hasSastReports() {
       return this.enabledReports.sast;
@@ -238,6 +249,9 @@ export default {
     },
     dastDownloadLink() {
       return this.dastSummary?.scannedResourcesCsvPath || '';
+    },
+    coverageFuzzingShowIssues() {
+      return this.coverageFuzzing.newIssues || this.coverageFuzzing.resolvedIssues;
     },
   },
 
@@ -289,6 +303,13 @@ export default {
       this.setSecretScanningDiffEndpoint(secretScanningDiffEndpoint);
       this.fetchSecretScanningDiff();
     }
+
+    const coverageFuzzingDiffEndpoint = gl?.mrWidgetData?.coverage_fuzzing_comparison_path;
+
+    if (coverageFuzzingDiffEndpoint && this.hasCoverageFuzzingReports) {
+      this.setCoverageFuzzingDiffEndpoint(coverageFuzzingDiffEndpoint);
+      this.fetchCoverageFuzzingDiff();
+    }
   },
   methods: {
     ...mapActions([
@@ -322,6 +343,8 @@ export default {
       'setDastDiffEndpoint',
       'fetchSecretScanningDiff',
       'setSecretScanningDiffEndpoint',
+      'fetchCoverageFuzzingDiff',
+      'setCoverageFuzzingDiffEndpoint',
     ]),
     ...mapActions('sast', {
       setSastDiffEndpoint: 'setDiffEndpoint',
@@ -511,6 +534,29 @@ export default {
             :component="$options.componentNames.SecurityIssueBody"
             class="report-block-group-list"
             data-testid="secret-scanning-issues-list"
+          />
+        </template>
+
+        <template v-if="hasCoverageFuzzingReports">
+          <summary-row
+            :summary="groupedCoverageFuzzingText"
+            :status-icon="coverageFuzzingStatusIcon"
+            :popover-options="coverageFuzzingPopover"
+            class="js-coverage-fuzzing-widget"
+            data-qa-selector="coverage_fuzzing_report"
+          >
+            <template #summary>
+              <security-summary :message="groupedCoverageFuzzingText" />
+            </template>
+          </summary-row>
+
+          <grouped-issues-list
+            v-if="coverageFuzzingShowIssues"
+            :unresolved-issues="coverageFuzzing.newIssues"
+            :resolved-issues="coverageFuzzing.resolvedIssues"
+            :component="$options.componentNames.SecurityIssueBody"
+            class="report-block-group-list"
+            data-testid="coverage-fuzzing-issues-list"
           />
         </template>
 
