@@ -21,6 +21,9 @@ class JiraConnect::AppDescriptorController < JiraConnect::ApplicationController
         name: 'GitLab',
         url: 'https://gitlab.com'
       },
+      links: {
+        documentation: help_page_url('integration/jira_development_panel', anchor: 'gitlabcom-1')
+      },
       authentication: {
         type: 'jwt'
       },
