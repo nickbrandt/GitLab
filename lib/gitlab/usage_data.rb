@@ -420,9 +420,8 @@ module Gitlab
         distinct_count(
           query,
           :author_id,
-          batch_size: 5_000, # Based on query performance, this is the optimal batch size.
-          start: User.minimum(:id),
-          finish: User.maximum(:id)
+          start: user_minimum_id,
+          finish: user_maximum_id
         )
       end
       # rubocop: enable CodeReuse/ActiveRecord
