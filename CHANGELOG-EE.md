@@ -388,6 +388,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Translate unauthenticated user string for Audit Event. !31856 (Sashi Kumar)
 
 
+## 12.10.14 (2020-07-06)
+
+### Security (1 change)
+
+- Maven packages upload endpoint is now properly using the uploaded file set by middleware.
+
+
 ## 12.10.13 (2020-07-01)
 
 ### Security (2 changes)
