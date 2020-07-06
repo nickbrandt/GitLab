@@ -1,6 +1,16 @@
 export const generateVulnerabilities = () => [
   {
     id: 'id_0',
+    identifiers: [
+      {
+        externalType: 'cve',
+        name: 'CVE-2018-1234',
+      },
+      {
+        externalType: 'gemnasium',
+        name: 'Gemnasium-2018-1234',
+      },
+    ],
     title: 'Vulnerability 0',
     severity: 'critical',
     state: 'dismissed',
@@ -15,6 +25,12 @@ export const generateVulnerabilities = () => [
   },
   {
     id: 'id_1',
+    identifiers: [
+      {
+        externalType: 'gemnasium',
+        name: 'Gemnasium-2018-1234',
+      },
+    ],
     title: 'Vulnerability 1',
     severity: 'high',
     state: 'opened',
