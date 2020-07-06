@@ -429,8 +429,8 @@ RSpec.describe Namespace do
     end
   end
 
-  describe '#shared_runners_enabled?' do
-    subject { namespace.shared_runners_enabled? }
+  describe '#any_project_with_shared_runners_enabled?' do
+    subject { namespace.any_project_with_shared_runners_enabled? }
 
     context 'without projects' do
       it { is_expected.to be_falsey }
@@ -557,8 +557,8 @@ RSpec.describe Namespace do
     end
   end
 
-  describe '#shared_runners_enabled?' do
-    subject { namespace.shared_runners_enabled? }
+  describe '#any_project_with_shared_runners_enabled?' do
+    subject { namespace.any_project_with_shared_runners_enabled? }
 
     context 'subgroup with shared runners enabled project' do
       let(:subgroup) { create(:group, parent: namespace) }

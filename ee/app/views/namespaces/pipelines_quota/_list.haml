@@ -29,7 +29,7 @@
     .col-sm-6.right
       - if namespace.shared_runners_minutes_limit_enabled?
         #{minutes_quota.monthly_percent_used}% used
-      - elsif !namespace.shared_runners_enabled?
+      - elsif !namespace.any_project_with_shared_runners_enabled?
         0% used
       - else
         = s_('UsageQuota|Unlimited')
@@ -47,7 +47,7 @@
         = _('Minutes')
 
   %tbody
-    - if !namespace.shared_runners_enabled?
+    - if !namespace.any_project_with_shared_runners_enabled?
       %tr
         %td{ colspan: 2 }
           .nothing-here-block

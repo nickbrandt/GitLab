@@ -211,7 +211,7 @@ class Namespace < ApplicationRecord
     Gitlab.config.lfs.enabled
   end
 
-  def shared_runners_enabled?
+  def any_project_with_shared_runners_enabled?
     projects.with_shared_runners.any?
   end
 
