@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 RSpec.describe API::MavenPackages do
+  include WorkhorseHelpers
+
   let_it_be(:group) { create(:group) }
   let_it_be(:user) { create(:user) }
   let_it_be(:project, reload: true) { create(:project, :public, namespace: group) }
@@ -484,6 +486,9 @@ RSpec.describe API::MavenPackages do
   end
 
   describe 'PUT /api/v4/projects/:id/packages/maven/*path/:file_name' do
+    let(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
+    let(:workhorse_header) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
+    let(:send_rewritten_field) { true }
     let(:file_upload) { fixture_file_upload('spec/fixtures/packages/maven/my-app-1.0-20180724.124855-1.jar') }
 
     before do
@@ -511,13 +516,18 @@ RSpec.describe API::MavenPackages do
       expect(response).to have_gitlab_http_status(:forbidden)
     end
 
-    context 'when params from workhorse are correct' do
-      let(:params) do
-        {
-          'file.path' => file_upload.path,
-          'file.name' => file_upload.original_filename
-        }
+    context 'without workhorse rewritten field' do
+      let(:send_rewritten_field) { false }
+
+      it 'rejects the request' do
+        upload_file_with_token
+
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
+    end
+
+    context 'when params from workhorse are correct' do
+      let(:params) { { file: file_upload } }
 
       it 'rejects a malicious request' do
         put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/%2e%2e%2f.ssh%2fauthorized_keys"), params: params, headers: headers_with_token
@@ -526,6 +536,8 @@ RSpec.describe API::MavenPackages do
       end
 
       context 'without workhorse header' do
+        let(:workhorse_header) { {} }
+
         subject { upload_file_with_token(params) }
 
         it_behaves_like 'package workhorse uploads'
@@ -572,7 +584,15 @@ RSpec.describe API::MavenPackages do
     end
 
     def upload_file(params = {}, request_headers = headers)
-      put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/my-app-1.0-20180724.124855-1.jar"), params: params, headers: request_headers
+      url = "/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/my-app-1.0-20180724.124855-1.jar"
+      workhorse_finalize(
+        api(url),
+        method: :put,
+        file_key: :file,
+        params: params,
+        headers: request_headers,
+        send_rewritten_field: send_rewritten_field
+      )
     end
 
     def upload_file_with_token(params = {}, request_headers = headers_with_token)
