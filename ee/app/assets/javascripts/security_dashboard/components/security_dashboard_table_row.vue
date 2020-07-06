@@ -39,7 +39,7 @@ export default {
       return this.vulnerability.severity || ' ';
     },
     vulnerabilityIdentifier() {
-      return getPrimaryIdentifier(this.vulnerability.identifiers);
+      return getPrimaryIdentifier(this.vulnerability.identifiers, 'external_type');
     },
     vulnerabilityNamespace() {
       const { project, location } = this.vulnerability;
