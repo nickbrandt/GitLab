@@ -1598,6 +1598,9 @@ can facilitate this by making sure the troubleshooting content addresses:
 1. How the user can confirm they have the problem.
 1. Steps the user can take towards resolution of the problem.
 
+If the contents of each category can be summarized in one line and a list of steps aren't required, consider setting up a
+[table](#tables) with headers of *Problem* \| *Cause* \| *Solution* (or *Workaround* if the fix is temporary), or *Error message* \| *Solution*.
+
 ## Feature flags
 
 Learn how to [document features deployed behind flags](feature_flags.md).
