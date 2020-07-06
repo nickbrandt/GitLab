@@ -27,7 +27,7 @@ module Banzai
 
         if update_nodes_enabled?
           @changed_nodes = {}
-          @nodes = self.result[:nodes]
+          @nodes = self.result[:reference_filter_nodes]
         end
       end
 
@@ -207,7 +207,7 @@ module Banzai
         @changed_nodes.sort_by { |index, _changed_nodes| -index }.each do |index, changed_nodes|
           nodes[index, 1] = changed_nodes
         end
-        result[:nodes] = nodes
+        result[:reference_filter_nodes] = nodes
       end
 
       def update_nodes_enabled?

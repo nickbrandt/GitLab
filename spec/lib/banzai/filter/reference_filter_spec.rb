@@ -231,7 +231,7 @@ RSpec.describe Banzai::Filter::ReferenceFilter do
 
         filter.call_and_update_nodes
 
-        expect(filter.result[:nodes]).to eq(expected_nodes)
+        expect(filter.result[:reference_filter_nodes]).to eq(expected_nodes)
       end
     end
 
@@ -254,7 +254,7 @@ RSpec.describe Banzai::Filter::ReferenceFilter do
         filter.call_and_update_nodes
 
         expect(filter.nodes).to eq(nodes)
-        expect(filter.result[:nodes]).to be nil
+        expect(filter.result[:reference_filter_nodes]).to be nil
       end
     end
   end
@@ -264,7 +264,7 @@ RSpec.describe Banzai::Filter::ReferenceFilter do
 
     let(:document) { Nokogiri::HTML.fragment('<a href="foo">foo</a>') }
 
-    let(:result) { { nodes: nodes } }
+    let(:result) { { reference_filter_nodes: nodes } }
 
     before do
       stub_feature_flags(update_nodes_for_banzai_reference_filter: true)
@@ -280,7 +280,7 @@ RSpec.describe Banzai::Filter::ReferenceFilter do
 
       described_class.call(document, { project: project }, result)
 
-      expect(result[:nodes]).to eq(expected_nodes)
+      expect(result[:reference_filter_nodes]).to eq(expected_nodes)
     end
 
     context "with update_nodes_for_banzai_reference_filter feature flag disabled" do
@@ -300,7 +300,7 @@ RSpec.describe Banzai::Filter::ReferenceFilter do
 
         described_class.call(document, { project: project }, result)
 
-        expect(result[:nodes]).to be nil
+        expect(result[:reference_filter_nodes]).to be nil
       end
     end
   end
