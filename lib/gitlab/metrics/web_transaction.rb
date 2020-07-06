@@ -65,10 +65,7 @@ module Gitlab
 
         if route
           path = endpoint_paths_cache[route.request_method][route.path]
-
-          # Feature categories will be added for grape endpoints in
-          # https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/462
-          { controller: 'Grape', action: "#{route.request_method} #{path}", feature_category: '' }
+          { controller: 'Grape', action: "#{route.request_method} #{path}" }
         end
       end
 
