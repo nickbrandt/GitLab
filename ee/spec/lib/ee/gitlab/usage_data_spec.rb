@@ -439,29 +439,20 @@ RSpec.describe Gitlab::UsageData do
         it 'includes accurate usage_activity_by_stage data' do
           for_defined_days_back do
             user    = create(:user, dashboard: 'operations')
-            cluster = create(:cluster, user: user)
             project = create(:project, creator: user)
-
-            create(:clusters_applications_prometheus, :installed, cluster: cluster)
             create(:users_ops_dashboard_project, user: user)
             create(:prometheus_service, project: project)
             create(:project_error_tracking_setting, project: project)
             create(:project_tracing_setting, project: project)
           end
 
-          expect(described_class.uncached_data[:usage_activity_by_stage][:monitor]).to eq(
-            clusters: 2,
-            clusters_applications_prometheus: 2,
-            operations_dashboard_default_dashboard: 2,
+          expect(described_class.uncached_data[:usage_activity_by_stage][:monitor]).to include(
             operations_dashboard_users_with_projects_added: 2,
             projects_prometheus_active: 2,
             projects_with_error_tracking_enabled: 2,
             projects_with_tracing_enabled: 2
           )
-          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:monitor]).to eq(
-            clusters: 1,
-            clusters_applications_prometheus: 1,
-            operations_dashboard_default_dashboard: 1,
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:monitor]).to include(
             operations_dashboard_users_with_projects_added: 1,
             projects_prometheus_active: 1,
             projects_with_error_tracking_enabled: 1,
