@@ -205,8 +205,7 @@ export default {
                 category="primary"
                 icon="pencil"
                 :href="featureFlag.edit_path"
-              >
-              </gl-button>
+              />
             </template>
             <template v-if="featureFlag.destroy_path">
               <gl-button
