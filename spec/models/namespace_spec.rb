@@ -897,6 +897,18 @@ RSpec.describe Namespace do
     end
   end
 
+  describe "#update_root_ancestor" do
+    it 'updates root_ancestor_id' do
+      root_group = create(:group)
+      nested_group = create(:group, parent: root_group)
+      deep_nested_group = create(:group, parent: nested_group)
+
+      expect { root_group.update_root_ancestor }.to change { root_group.root_ancestor_id }.from(nil).to(root_group.id)
+      expect { nested_group.update_root_ancestor }.to change { nested_group.root_ancestor_id }.from(nil).to(root_group.id)
+      expect { deep_nested_group.update_root_ancestor }.to change { deep_nested_group.root_ancestor_id }.from(nil).to(root_group.id)
+    end
+  end
+
   describe '#full_path_before_last_save' do
     context 'when the group has no parent' do
       it 'returns the path before last save' do

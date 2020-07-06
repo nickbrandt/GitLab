@@ -234,6 +234,12 @@ RSpec.describe Groups::TransferService do
           transfer_service.execute(new_parent_group)
         end
 
+        it 'updates subgroups root_ancestor' do
+          group.children.each do |subgroup|
+            expect(subgroup.root_ancestor_id).to eq(new_parent_group.root_ancestor_id)
+          end
+        end
+
         it 'updates subgroups path' do
           new_parent_path = new_parent_group.path
           group.children.each do |subgroup|

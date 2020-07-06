@@ -31,6 +31,7 @@ class Namespace < ApplicationRecord
   belongs_to :owner, class_name: "User"
 
   belongs_to :parent, class_name: "Namespace"
+  belongs_to :root_ancestor, class_name: "Namespace"
   has_many :children, class_name: "Namespace", foreign_key: :parent_id
   has_many :custom_emoji, inverse_of: :namespace
   has_one :chat_team, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -67,6 +68,7 @@ class Namespace < ApplicationRecord
   after_commit :refresh_access_of_projects_invited_groups, on: :update, if: -> { previous_changes.key?('share_with_group_lock') }
 
   before_create :sync_share_with_group_lock_with_parent
+  before_create :update_root_ancestor
   before_update :sync_share_with_group_lock_with_parent, if: :parent_changed?
   after_update :force_share_with_group_lock_on_descendants, if: -> { saved_change_to_share_with_group_lock? && share_with_group_lock? }
 
@@ -286,10 +288,14 @@ class Namespace < ApplicationRecord
     parent_id.present? || parent.present?
   end
 
+  # Remove this method after all namespaces have been updated to have root_ancestor_id
   def root_ancestor
-    strong_memoize(:root_ancestor) do
-      self_and_ancestors.reorder(nil).find_by(parent_id: nil)
-    end
+    super || strong_memoize(:root_ancestor) { calculate_root_ancestor }
+  end
+
+  def update_root_ancestor
+    self.root_ancestor_id = calculate_root_ancestor&.id
+    self.clear_memoization(:self_and_ancestors_ids)
   end
 
   def subgroup?
@@ -424,6 +430,10 @@ class Namespace < ApplicationRecord
       project.write_repository_config
       project.track_project_repository
     end
+  end
+
+  def calculate_root_ancestor
+    self_and_ancestors.reorder(nil).find_by(parent_id: nil)
   end
 end
 

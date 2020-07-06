@@ -13099,7 +13099,8 @@ CREATE TABLE public.namespaces (
     max_personal_access_token_lifetime integer,
     push_rule_id bigint,
     shared_runners_enabled boolean DEFAULT true NOT NULL,
-    allow_descendants_override_disabled_shared_runners boolean DEFAULT false NOT NULL
+    allow_descendants_override_disabled_shared_runners boolean DEFAULT false NOT NULL,
+    root_ancestor_id integer
 );
 
 CREATE SEQUENCE public.namespaces_id_seq
@@ -19571,6 +19572,8 @@ CREATE UNIQUE INDEX index_namespaces_on_push_rule_id ON public.namespaces USING 
 
 CREATE INDEX index_namespaces_on_require_two_factor_authentication ON public.namespaces USING btree (require_two_factor_authentication);
 
+CREATE INDEX index_namespaces_on_root_ancestor_id ON public.namespaces USING btree (root_ancestor_id);
+
 CREATE UNIQUE INDEX index_namespaces_on_runners_token ON public.namespaces USING btree (runners_token);
 
 CREATE UNIQUE INDEX index_namespaces_on_runners_token_encrypted ON public.namespaces USING btree (runners_token_encrypted);
@@ -21004,6 +21007,9 @@ ALTER TABLE ONLY public.protected_branches
 
 ALTER TABLE ONLY public.vulnerabilities
     ADD CONSTRAINT fk_7ac31eacb9 FOREIGN KEY (updated_by_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY public.namespaces
+    ADD CONSTRAINT fk_7c1a065d70 FOREIGN KEY (root_ancestor_id) REFERENCES public.namespaces(id) ON DELETE RESTRICT;
 
 ALTER TABLE ONLY public.vulnerabilities
     ADD CONSTRAINT fk_7c5bb22a22 FOREIGN KEY (due_date_sourcing_milestone_id) REFERENCES public.milestones(id) ON DELETE SET NULL;
@@ -23584,7 +23590,9 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200626130220
 20200630110826
 20200701093859
+20200702092810
 20200702123805
+20200702151210
 20200703154822
 20200704143633
 20200706005325
