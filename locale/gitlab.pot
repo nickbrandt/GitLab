@@ -10837,7 +10837,7 @@ msgstr ""
 msgid "GitLab restart is required to apply changes."
 msgstr ""
 
-msgid "GitLab single sign on URL"
+msgid "GitLab single sign-on URL"
 msgstr ""
 
 msgid "GitLab uses %{jaeger_link} to monitor distributed systems."
@@ -11386,7 +11386,7 @@ msgstr ""
 msgid "GroupSAML|Identity"
 msgstr ""
 
-msgid "GroupSAML|Identity provider single sign on URL"
+msgid "GroupSAML|Identity provider single sign-on URL"
 msgstr ""
 
 msgid "GroupSAML|Make sure you save this token — you won't be able to access it again."
