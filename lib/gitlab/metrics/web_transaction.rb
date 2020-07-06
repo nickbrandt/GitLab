@@ -32,10 +32,6 @@ module Gitlab
 
         action = "#{controller.action_name}"
 
-        # Try to get the feature category, but don't fail when the controller is
-        # not an ApplicationController.
-        feature_category = controller.class.try(:feature_category_for_action, action).to_s
-
         # Devise exposes a method called "request_format" that does the below.
         # However, this method is not available to all controllers (e.g. certain
         # Doorkeeper controllers). As such we use the underlying code directly.
@@ -49,7 +45,7 @@ module Gitlab
           action = "#{action}.#{suffix}"
         end
 
-        { controller: controller.class.name, action: action, feature_category: feature_category }
+        { controller: controller.class.name, action: action }
       end
 
       def labels_from_endpoint
