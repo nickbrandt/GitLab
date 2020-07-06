@@ -310,8 +310,7 @@ sudo adduser --disabled-login --gecos 'GitLab' git
 ## 6. Database
 
 NOTE: **Note:**
-Starting from GitLab 12.1, only PostgreSQL is supported. Because we need to make
-use of extensions and concurrent index removal, you need at least PostgreSQL 9.2.
+Starting from GitLab 12.1, only PostgreSQL is supported. Since GitLab 13.0, we require PostgreSQL 11+.
 
 1. Install the database packages:
 
