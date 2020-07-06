@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'spec_helper'
+
 RSpec.shared_examples 'credentials inventory expiry date' do
   it 'shows the expiry date' do
     visit credentials_path
@@ -9,22 +11,34 @@ RSpec.shared_examples 'credentials inventory expiry date' do
 end
 
 RSpec.shared_examples 'credentials inventory expiry date before' do
-  it 'shows the expiry without any warnings' do
-    Timecop.freeze(20.days.ago) do
-      visit credentials_path
+  before do
+    travel_to(date_time)
+  end
 
-      expect(first_row).not_to have_selector('[data-testid="expiry-date-icon"]')
-    end
+  after do
+    travel_back
+  end
+
+  it 'shows the expiry without any warnings' do
+    visit credentials_path
+
+    expect(first_row).not_to have_selector('[data-testid="expiry-date-icon"]')
   end
 end
 
 RSpec.shared_examples 'credentials inventory expiry date close or past' do
-  it 'adds a warning to the expiry date' do
-    Timecop.freeze(date_time) do
-      visit credentials_path
+  before do
+    travel_to(date_time)
+  end
 
-      expect(first_row).to have_selector('[data-testid="expiry-date-icon"]', class: css_class)
-    end
+  after do
+    travel_back
+  end
+
+  it 'adds a warning to the expiry date' do
+    visit credentials_path
+
+    expect(first_row).to have_selector('[data-testid="expiry-date-icon"]', class: css_class)
   end
 end
 
@@ -32,17 +46,19 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
   let_it_be(:user) { group_managed_account ? managed_user : create(:user, name: 'David') }
 
   context 'when a personal access token is active' do
-    before do
+    before_all do
       create(:personal_access_token,
         user: user,
         created_at: '2019-12-10',
         updated_at: '2020-06-22',
         expires_at: nil)
+    end
 
+    before do
       visit credentials_path
     end
 
-    it 'shows the details with no revoked date' do
+    it 'shows the details with no revoked date', :aggregate_failures do
       expect(first_row.text).to include('David')
       expect(first_row.text).to include('api')
       expect(first_row.text).to include('2019-12-10')
@@ -52,9 +68,9 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
   end
 
   context 'when a personal access token has an expiry' do
-    let(:expiry_date) { 1.day.since.to_date.to_s }
+    let_it_be(:expiry_date) { 1.day.since.to_date.to_s }
 
-    before do
+    before_all do
       create(:personal_access_token,
              user: user,
              created_at: '2019-12-10',
@@ -63,6 +79,8 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
     end
 
     context 'and is not expired' do
+      let(:date_time) { 20.days.ago }
+
       it_behaves_like 'credentials inventory expiry date'
       it_behaves_like 'credentials inventory expiry date before'
     end
@@ -85,18 +103,20 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
   end
 
   context 'when a personal access token is revoked' do
-    before do
+    before_all do
       create(:personal_access_token,
         :revoked,
         user: user,
         created_at: '2019-12-10',
         updated_at: '2020-06-22',
         expires_at: nil)
+    end
 
+    before do
       visit credentials_path
     end
 
-    it 'shows the details with a revoked date' do
+    it 'shows the details with a revoked date', :aggregate_failures do
       expect(first_row.text).to include('David')
       expect(first_row.text).to include('api')
       expect(first_row.text).to include('2019-12-10')
@@ -109,17 +129,19 @@ RSpec.shared_examples_for 'credentials inventory SSH keys' do |group_managed_acc
   let_it_be(:user) { group_managed_account ? managed_user : create(:user, name: 'David') }
 
   context 'when a SSH key is active' do
-    before do
+    before_all do
       create(:personal_key,
              user: user,
              created_at: '2019-12-09',
              last_used_at: '2019-12-10',
              expires_at: nil)
+    end
 
+    before do
       visit credentials_path
     end
 
-    it 'shows the details with no expiry' do
+    it 'shows the details with no expiry', :aggregate_failures do
       expect(first_row.text).to include('David')
       expect(first_row.text).to include('2019-12-09')
       expect(first_row.text).to include('2019-12-10')
@@ -128,9 +150,9 @@ RSpec.shared_examples_for 'credentials inventory SSH keys' do |group_managed_acc
   end
 
   context 'when a SSH key has an expiry' do
-    let(:expiry_date) { 1.day.since.to_date.to_s }
+    let_it_be(:expiry_date) { 1.day.since.to_date.to_s }
 
-    before do
+    before_all do
       create(:personal_key,
              user: user,
              created_at: '2019-12-10',
@@ -139,6 +161,8 @@ RSpec.shared_examples_for 'credentials inventory SSH keys' do |group_managed_acc
     end
 
     context 'and is not expired' do
+      let(:date_time) { 20.days.ago }
+
       it_behaves_like 'credentials inventory expiry date'
       it_behaves_like 'credentials inventory expiry date before'
     end
