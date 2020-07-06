@@ -295,3 +295,26 @@ export const reorderStage = ({ dispatch, state }, initialData) => {
       dispatch('receiveReorderStageError', { status, responseData }),
     );
 };
+
+export const receiveCreateValueStreamSuccess = ({ commit }) => {
+  // TODO: fetch / update list of value streams
+  commit(types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS);
+};
+
+export const createValueStream = ({ commit, rootState }, data) => {
+  const {
+    selectedGroup: { fullPath },
+  } = rootState;
+
+  commit(types.REQUEST_CREATE_VALUE_STREAM);
+
+  return Api.cycleAnalyticsCreateValueStream(fullPath, data)
+    .then(response => {
+      const { status, data: responseData } = response;
+      commit(types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS, { status, data: responseData });
+    })
+    .catch(({ response } = {}) => {
+      const { data: { message, errors } = null } = response;
+      commit(types.RECEIVE_CREATE_VALUE_STREAM_ERROR, { data, message, errors });
+    });
+};

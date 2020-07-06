@@ -23,6 +23,8 @@ export default () => ({
 
   currentStageEvents: [],
 
+  isCreatingValueStream: false,
+
   stages: [],
   summary: [],
   medians: {},

@@ -122,4 +122,13 @@ export default {
     state.selectedMilestone = selectedMilestone;
     state.selectedLabels = selectedLabels;
   },
+  [types.REQUEST_CREATE_VALUE_STREAM](state) {
+    state.isCreatingValueStream = true;
+  },
+  [types.RECEIVE_CREATE_VALUE_STREAM_ERROR](state) {
+    state.isCreatingValueStream = false;
+  },
+  [types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS](state) {
+    state.isCreatingValueStream = false;
+  },
 };
