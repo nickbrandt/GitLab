@@ -7,6 +7,7 @@
 // TODO: need to move this component to graphql - https://gitlab.com/gitlab-org/gitlab/-/issues/221246
 import { escape, isNumber } from 'lodash';
 import { GlLink, GlTooltipDirective as GlTooltip, GlSprintf, GlLabel, GlIcon } from '@gitlab/ui';
+import jiraLogo from '@gitlab/svgs/dist/illustrations/logos/jira.svg';
 import {
   dateInWords,
   formatDate,
@@ -60,6 +61,11 @@ export default {
       },
     },
   },
+  data() {
+    return {
+      jiraLogo,
+    };
+  },
   computed: {
     milestoneLink() {
       const { title } = this.issuable.milestone;
@@ -86,6 +92,9 @@ export default {
     },
     isClosed() {
       return this.issuable.state === 'closed';
+    },
+    isJiraIssue() {
+      return this.issuable.external_tracker === 'jira';
     },
     issueCreatedToday() {
       return getDayDifference(new Date(this.issuable.created_at), new Date()) < 1;
@@ -223,7 +232,13 @@ export default {
               :title="$options.confidentialTooltipText"
               :aria-label="$options.confidentialTooltipText"
             ></i>
-            <gl-link :href="issuable.web_url">{{ issuable.title }}</gl-link>
+            <gl-link
+              :href="issuable.web_url"
+              :target="isJiraIssue ? '_blank' : null"
+              :rel="isJiraIssue ? 'noopener noreferrer' : null"
+            >
+              {{ issuable.title }}
+            </gl-link>
           </span>
           <span v-if="issuable.has_tasks" class="ml-1 task-status d-none d-sm-inline-block">
             {{ issuable.task_status }}
@@ -231,7 +246,14 @@ export default {
         </div>
 
         <div class="issuable-info">
-          <span class="js-ref-path">{{ referencePath }}</span>
+          <span class="js-ref-path">
+            <span
+              v-if="isJiraIssue"
+              class="svg-container jira-logo-container"
+              v-html="jiraLogo"
+            ></span>
+            {{ referencePath }}
+          </span>
 
           <span data-testid="openedByMessage" class="d-none d-sm-inline-block mr-1">
             &middot;
