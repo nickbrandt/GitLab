@@ -7,6 +7,7 @@ module EE
 
     EE_PERMITTED_KEYS = %w[
       weight
+      health_status
     ].freeze
 
     private

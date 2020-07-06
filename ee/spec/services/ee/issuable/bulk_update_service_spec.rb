@@ -12,8 +12,8 @@ RSpec.describe Issuable::BulkUpdateService do
 
   shared_examples 'updates issuables attribute' do |attribute|
     it 'succeeds and returns the correct number of issuables updated' do
-      expect(subject[:success]).to be_truthy
-      expect(subject[:count]).to eq(issuables.count)
+      expect(subject.success?).to be_truthy
+      expect(subject.payload[:count]).to eq(issuables.count)
       issuables.each do |issuable|
         expect(issuable.reload.send(attribute)).to eq(new_value)
       end
@@ -31,48 +31,55 @@ RSpec.describe Issuable::BulkUpdateService do
   context 'with issues' do
     let_it_be(:type) { 'issue' }
     let_it_be(:parent) { group }
-    let(:issue1) { create(:issue, project: project1, health_status: :at_risk, epic: epic) }
-    let(:issue2) { create(:issue, project: project2, health_status: :at_risk, epic: epic) }
-    let(:epic) { create(:epic, group: group) }
-    let(:epic2) { create(:epic, group: group) }
+    let(:issue1) { create(:issue, project: project1, health_status: :at_risk) }
+    let(:issue2) { create(:issue, project: project2, health_status: :at_risk) }
     let(:issuables) { [issue1, issue2] }
 
     before do
       group.add_reporter(user)
     end
 
-    context 'updating health status and epic' do
+    context 'updating health status' do
       let(:params) do
         {
           issuable_ids: issuables.map(&:id),
-          health_status: :on_track,
-          epic: epic2
+          health_status: :on_track
         }
       end
 
       context 'when features are enabled' do
         before do
-          stub_licensed_features(epics: true, issuable_health_status: true)
+          stub_licensed_features(issuable_health_status: true)
         end
 
         it 'succeeds and returns the correct number of issuables updated' do
-          expect(subject[:success]).to be_truthy
-          expect(subject[:count]).to eq(issuables.count)
+          expect(subject.success?).to be_truthy
+          expect(subject.payload[:count]).to eq(issuables.count)
           issuables.each do |issuable|
-            issuable.reload
-            expect(issuable.epic).to eq(epic2)
-            expect(issuable.health_status).to eq('on_track')
+            expect(issuable.reload.health_status).to eq('on_track')
+          end
+        end
+
+        context "when params value is '0'" do
+          let(:params) { { issuable_ids: issuables.map(&:id), health_status: '0' } }
+
+          it 'succeeds and remove values' do
+            expect(subject.success?).to be_truthy
+            expect(subject.payload[:count]).to eq(issuables.count)
+            issuables.each do |issuable|
+              issuable.reload
+              expect(issuable.health_status).to be_nil
+            end
           end
         end
       end
 
-      context 'when features are disabled' do
+      context 'when feature issuable_health_status is disabled' do
         before do
-          stub_licensed_features(epics: false, issuable_health_status: false)
+          stub_licensed_features(issuable_health_status: false)
         end
 
         it_behaves_like 'does not update issuables attribute', :health_status
-        it_behaves_like 'does not update issuables attribute', :epic
       end
 
       context 'when user can not update issues' do
@@ -81,14 +88,6 @@ RSpec.describe Issuable::BulkUpdateService do
         end
 
         it_behaves_like 'does not update issuables attribute', :health_status
-        it_behaves_like 'does not update issuables attribute', :epic
-      end
-
-      context 'when user can not admin epic' do
-        let(:epic3) { create(:epic, group: create(:group)) }
-        let(:params) { { issuable_ids: issuables.map(&:id), epic: epic3 } }
-
-        it_behaves_like 'does not update issuables attribute', :epic
       end
     end
   end
@@ -140,8 +139,8 @@ RSpec.describe Issuable::BulkUpdateService do
         let(:params) { { issuable_ids: [epic1.id, epic3.id, outer_epic.id], add_label_ids: [label3.id] } }
 
         it 'updates epics that belong to the parent group or descendants' do
-          expect(subject[:success]).to be_truthy
-          expect(subject[:count]).to eq(2)
+          expect(subject.success?).to be_truthy
+          expect(subject.payload[:count]).to eq(2)
 
           expect(epic1.reload.labels).to eq([label1, label3])
           expect(epic3.reload.labels).to eq([label1, label3])

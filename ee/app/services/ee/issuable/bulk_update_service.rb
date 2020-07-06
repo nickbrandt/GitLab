@@ -14,11 +14,24 @@ module EE
         super
       end
 
-      override :issuable_specific_attrs
-      def issuable_specific_attrs(type, attrs)
+      override :permitted_attrs
+      def permitted_attrs(type)
         return super unless type == 'issue'
 
-        super.push(:health_status, :epic)
+        super.push(:health_status, :epic_id)
+      end
+
+      override :set_update_params
+      def set_update_params(type)
+        super
+
+        set_health_status
+      end
+
+      def set_health_status
+        return unless params[:health_status].present?
+
+        params[:health_status] = nil if params[:health_status] == IssuableFinder::Params::NONE.to_s
       end
     end
   end
