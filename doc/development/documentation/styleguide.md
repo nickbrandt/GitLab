@@ -1311,20 +1311,20 @@ The following are styles to follow when describing UI elements on a screen:
 
 ### Verbs for UI elements
 
-The following are recommended verbs for specific uses.
+The following are recommended verbs for specific uses with UI elements:
 
-| Recommended | Used for                   | Alternatives               |
-|:------------|:---------------------------|:---------------------------|
-| "click"     | buttons, links, menu items | "hit", "press", "select"   |
-| "check"     | checkboxes                 | "enable", "click", "press" |
-| "select"    | dropdowns                  | "pick"                     |
-| "expand"    | expandable sections        | "open"                     |
+| Recommended         | Used for                   | Replaces                   |
+|:--------------------|:---------------------------|:---------------------------|
+| *click*             | buttons, links, menu items | "hit", "press", "select"   |
+| *select* or *clear* | checkboxes                 | "enable", "click", "press" |
+| *select*            | dropdowns                  | "pick"                     |
+| *expand*            | expandable sections        | "open"                     |
 
 ### Other Verbs
 
-| Recommended | Used for                        | Alternatives       |
-|:------------|:--------------------------------|:-------------------|
-| "go"        | making a browser go to location | "navigate", "open" |
+| Recommended | Used for                        | Replaces              |
+|:------------|:--------------------------------|:----------------------|
+| *go to*     | making a browser go to location | "navigate to", "open" |
 
 ## GitLab versions and tiers
 
