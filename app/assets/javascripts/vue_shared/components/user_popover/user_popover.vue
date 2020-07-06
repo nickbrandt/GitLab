@@ -38,7 +38,7 @@ export default {
       return '';
     },
     userIsLoading() {
-      return !this.user.loaded;
+      return !this.user?.loaded;
     },
   },
 };
