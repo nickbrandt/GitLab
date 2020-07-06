@@ -1,6 +1,0 @@
----
-title: Maven packages upload endpoint is now properly using the uploaded file set
-  by middleware
-merge_request:
-author:
-type: security
