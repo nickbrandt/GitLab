@@ -325,9 +325,19 @@ tenses, words, and phrases:
 - Avoid using the word *currently* when talking about the product or its
   features. The documentation describes the product as it is, and not as it
   will be at some indeterminate point in the future.
+- Avoid the using the word *scalability* with increasing GitLab's performance
+  for additional users. Using the words *scale* or *scaling* in other cases is
+  acceptable, but references to increasing GitLab's performance for additional
+  users should direct readers to the GitLab
+  [reference architectures](../../administration/reference_architectures/index.md)
+  page.
+- Avoid all forms of the phrases *high availability* and *HA*, and instead
+  direct readers to the GitLab [reference architectures](../../administration/reference_architectures/index.md)
+  for information about configuring GitLab to have the performance needed for
+  additional users over time.
 - Don't use profanity or obscenities. Doing so may negatively affect other
   users and contributors, which is contrary to GitLab's value of
-  [diversity and inclusion](https://about.gitlab.com/handbook/values/#diversity-inclusion).
+  [Diversity, Inclusion, and Belonging](https://about.gitlab.com/handbook/values/#diversity-inclusion).
 - Avoid the use of [racially-insensitive terminology or phrases](https://www.marketplace.org/2020/06/17/tech-companies-update-language-to-avoid-offensive-terms/). For example:
   - Use *primary* and *secondary* for database and server relationships.
   - Use *allowlist* and *denylist* to describe access control lists.
