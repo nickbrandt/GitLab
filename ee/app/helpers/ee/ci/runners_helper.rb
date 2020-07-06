@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module EE
-  module RunnersHelper
+  module Ci::RunnersHelper
     include ::Gitlab::Utils::StrongMemoize
 
     BUY_PIPELINE_MINUTES_NOTIFICATION_DOT = 'buy_pipeline_minutes_notification_dot'

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RunnersHelper
+module Ci::RunnersHelper
   def runner_status_icon(runner)
     status = runner.status
     case status
@@ -40,4 +40,4 @@ module RunnersHelper
   end
 end
 
-RunnersHelper.prepend_if_ee('EE::RunnersHelper')
+Ci::RunnersHelper.prepend_if_ee('EE::Ci::RunnersHelper')
