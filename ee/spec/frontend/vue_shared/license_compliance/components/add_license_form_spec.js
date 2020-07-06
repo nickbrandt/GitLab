@@ -134,7 +134,7 @@ describe('AddLicenseForm', () => {
 
       Vue.nextTick(() => {
         const descriptionElement = wrapper.findAll('.text-secondary');
-        const formCheckElementMargin = wrapper.find('.form-check');
+        const formCheckElement = wrapper.find('.form-check');
 
         expect(descriptionElement.at(0).text()).toBe(
           'Acceptable license to be used in the project',
@@ -144,7 +144,7 @@ describe('AddLicenseForm', () => {
           'Disallow merge request if detected and will instruct developer to remove',
         );
 
-        expect(formCheckElementMargin).not.toBeNull();
+        expect(formCheckElement).not.toBeNull();
 
         done();
       });
