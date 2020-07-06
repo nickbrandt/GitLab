@@ -19,10 +19,10 @@ export default {
   <li :data-testid="valueName">
     <gl-sprintf :message="sprintfMessage">
       <template #label="{ content }">
-        <strong>{{ content }}</strong>
+        <strong data-testid="label">{{ content }}</strong>
       </template>
       <template #[valueName]>
-        <slot></slot>
+        <span data-testid="value"><slot></slot></span>
       </template>
     </gl-sprintf>
   </li>

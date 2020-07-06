@@ -409,6 +409,9 @@ msgstr ""
 msgid "%{labelStart}File:%{labelEnd} %{file}"
 msgstr ""
 
+msgid "%{labelStart}Headers:%{labelEnd} %{headers}"
+msgstr ""
+
 msgid "%{labelStart}Image:%{labelEnd} %{image}"
 msgstr ""
 
@@ -425,6 +428,12 @@ msgid "%{labelStart}Scanner:%{labelEnd} %{scanner}"
 msgstr ""
 
 msgid "%{labelStart}Severity:%{labelEnd} %{severity}"
+msgstr ""
+
+msgid "%{labelStart}Status:%{labelEnd} %{status}"
+msgstr ""
+
+msgid "%{labelStart}URL:%{labelEnd} %{url}"
 msgstr ""
 
 msgid "%{label_for_message} unavailable"
@@ -25681,6 +25690,12 @@ msgid "Vulnerability|Namespace"
 msgstr ""
 
 msgid "Vulnerability|Project"
+msgstr ""
+
+msgid "Vulnerability|Request"
+msgstr ""
+
+msgid "Vulnerability|Response"
 msgstr ""
 
 msgid "Vulnerability|Scanner"
