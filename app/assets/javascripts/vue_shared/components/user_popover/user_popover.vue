@@ -4,8 +4,11 @@ import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarImage from '../user_avatar/user_avatar_image.vue';
 import { glEmojiTag } from '../../../emoji';
 
+const MAX_SKELETON_LINES = 4;
+
 export default {
   name: 'UserPopover',
+  maxSkeletonLines: MAX_SKELETON_LINES,
   components: {
     Icon,
     GlPopover,
@@ -53,8 +56,10 @@ export default {
       </div>
       <div class="p-1 w-100">
         <template v-if="userIsLoading">
+          <!-- `gl-skeleton-loading` does not support equal length lines -->
+          <!-- This can be migrated to `gl-skeleton-loader` when https://gitlab.com/gitlab-org/gitlab-ui/-/issues/872 is completed -->
           <gl-skeleton-loading
-            v-for="n in 4"
+            v-for="n in $options.maxSkeletonLines"
             :key="n"
             :lines="1"
             class="animation-container-small mb-1"
