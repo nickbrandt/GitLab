@@ -14067,7 +14067,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "MetricsDashboardAnnotationID",
                   "ofType": null
                 }
               },
@@ -36646,6 +36646,16 @@
           "interfaces": [
 
           ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "MetricsDashboardAnnotationID",
+          "description": "Identifier of Metrics::Dashboard::Annotation",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },
