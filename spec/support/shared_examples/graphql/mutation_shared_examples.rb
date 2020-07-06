@@ -7,13 +7,15 @@
 #
 # There must be a method or let called `mutation` defined that executes
 # the mutation.
-RSpec.shared_examples 'a mutation that returns top-level errors' do |errors:|
+RSpec.shared_examples 'a mutation that returns top-level errors' do |errors: []|
+  let(:match_errors) { eq(errors) }
+
   it do
     post_graphql_mutation(mutation, current_user: current_user)
 
     error_messages = graphql_errors.map { |e| e['message'] }
 
-    expect(error_messages).to eq(errors)
+    expect(error_messages).to match_errors
   end
 end
 
