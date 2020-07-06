@@ -138,6 +138,24 @@ RSpec.describe ProjectsHelper do
     end
   end
 
+  describe '#sidebar_security_paths' do
+    let(:expected_security_paths) do
+      %w[
+        projects/security/configuration#show
+        projects/security/vulnerabilities#show
+        projects/security/dashboard#index
+        projects/on_demand_scans#index
+        projects/dependencies#index
+        projects/licenses#index
+        projects/threat_monitoring#show
+      ]
+    end
+
+    subject { helper.sidebar_security_paths }
+
+    it { is_expected.to eq(expected_security_paths) }
+  end
+
   describe '#get_project_nav_tabs' do
     using RSpec::Parameterized::TableSyntax
 
