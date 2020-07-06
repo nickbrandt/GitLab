@@ -145,6 +145,7 @@ module EE
     def sidebar_security_paths
       %w[
         projects/security/configuration#show
+        projects/security/vulnerabilities#show
         projects/security/dashboard#index
         projects/on_demand_scans#index
         projects/dependencies#index
