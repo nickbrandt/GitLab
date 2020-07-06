@@ -10,7 +10,7 @@ export default {
   },
 
   [types.SET_SUMMARY](state, summary) {
-    Object.assign(state, { testReports: { ...state.testReports, ...summary }});
+    Object.assign(state, { testReports: { ...state.testReports, ...summary } });
   },
 
   [types.SET_LOADING](state, isLoading) {

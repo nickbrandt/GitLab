@@ -10,29 +10,30 @@ describe('Mutations TestReports Store', () => {
   const defaultState = {
     endpoint: '',
     testReports: {},
-    selectedSuite: {},
+    selectedSuiteIndex: null,
     isLoading: false,
+    hasFullReport: false,
   };
 
   beforeEach(() => {
-    mockState = defaultState;
+    mockState = { ...defaultState };
   });
 
   describe('set reports', () => {
     it('should set testReports', () => {
-      const expectedState = { ...mockState, testReports };
+      const expectedState = { ...mockState, testReports, hasFullReport: true };
       mutations[types.SET_REPORTS](mockState, testReports);
 
-      expect(mockState.testReports).toEqual(expectedState.testReports);
+      expect(mockState).toEqual(expectedState);
     });
   });
 
   describe('set selected suite', () => {
     it('should set selectedSuite', () => {
-      const selectedSuite = testReports.test_suites[0];
-      mutations[types.SET_SELECTED_SUITE](mockState, selectedSuite);
+      const selectedSuiteIndex = 1;
+      mutations[types.SET_SELECTED_SUITE](mockState, selectedSuiteIndex);
 
-      expect(mockState.selectedSuite).toEqual(selectedSuite);
+      expect(mockState.selectedSuiteIndex).toEqual(selectedSuiteIndex);
     });
   });
 
@@ -41,23 +42,23 @@ describe('Mutations TestReports Store', () => {
       const summary = { total_count: 1 };
       mutations[types.SET_SUMMARY](mockState, summary);
 
-      expect(mockState.summary).toEqual(summary);
+      expect(mockState.testReports).toEqual(summary);
     });
   });
 
-  describe('toggle loading', () => {
+  describe('set loading', () => {
     it('should set to true', () => {
       const expectedState = { ...mockState, isLoading: true };
-      mutations[types.TOGGLE_LOADING](mockState);
+      mutations[types.SET_LOADING](mockState, true);
 
       expect(mockState.isLoading).toEqual(expectedState.isLoading);
     });
 
-    it('should toggle back to false', () => {
+    it('should set to false', () => {
       const expectedState = { ...mockState, isLoading: false };
       mockState.isLoading = true;
 
-      mutations[types.TOGGLE_LOADING](mockState);
+      mutations[types.SET_LOADING](mockState, false);
 
       expect(mockState.isLoading).toEqual(expectedState.isLoading);
     });

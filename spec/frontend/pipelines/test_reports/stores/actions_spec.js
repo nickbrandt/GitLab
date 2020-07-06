@@ -24,11 +24,12 @@ describe('Actions TestReports Store', () => {
     testReports: {},
     selectedSuite: {},
     summary: {},
+    hasFullReport: false,
   };
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
-    state = defaultState;
+    state = { ...defaultState };
   });
 
   afterEach(() => {
@@ -46,7 +47,7 @@ describe('Actions TestReports Store', () => {
         null,
         state,
         [{ type: types.SET_SUMMARY, payload: summary }],
-        [],
+        [{ type: 'setLoading', payload: true }, { type: 'setLoading', payload: false }],
         done,
       );
     });
@@ -59,7 +60,7 @@ describe('Actions TestReports Store', () => {
           summaryEndpoint: null,
         },
         [],
-        [],
+        [{ type: 'setLoading', payload: true }, { type: 'setLoading', payload: false }],
         () => {
           expect(createFlash).toHaveBeenCalled();
           done();
@@ -79,7 +80,7 @@ describe('Actions TestReports Store', () => {
         null,
         state,
         [{ type: types.SET_REPORTS, payload: testReports }],
-        [{ type: 'toggleLoading' }, { type: 'toggleLoading' }],
+        [{ type: 'setLoading', payload: true }, { type: 'setLoading', payload: false }],
         done,
       );
     });
@@ -92,7 +93,7 @@ describe('Actions TestReports Store', () => {
           fullReportEndpoint: null,
         },
         [],
-        [{ type: 'toggleLoading' }, { type: 'toggleLoading' }],
+        [{ type: 'setLoading', payload: true }, { type: 'setLoading', payload: false }],
         () => {
           expect(createFlash).toHaveBeenCalled();
           done();
@@ -102,44 +103,66 @@ describe('Actions TestReports Store', () => {
   });
 
   describe('set selected suite', () => {
-    const selectedSuite = testReports.test_suites[0];
+    const selectedSuite = 1;
 
-    it('sets selectedSuite', done => {
-      testAction(
-        actions.setSelectedSuite,
-        selectedSuite,
-        state,
-        [{ type: types.SET_SELECTED_SUITE, payload: selectedSuite }],
-        [],
-        done,
-      );
+    describe('when state does not have full report', () => {
+      it('sets selectedSuite', done => {
+        testAction(
+          actions.setSelectedSuite,
+          selectedSuite,
+          state,
+          [{ type: types.SET_SELECTED_SUITE, payload: selectedSuite }],
+          [{ type: 'fetchFullReport' }],
+          done,
+        );
+      });
+    });
+
+    describe('when state has full report', () => {
+      it('sets selectedSuite', done => {
+        testAction(
+          actions.setSelectedSuite,
+          selectedSuite,
+          { ...state, hasFullReport: true },
+          [{ type: types.SET_SELECTED_SUITE, payload: selectedSuite }],
+          [],
+          done,
+        );
+      });
     });
   });
 
   describe('remove selected suite', () => {
-    it('sets selectedSuite to {}', done => {
+    it('sets selectedSuiteIndex to null', done => {
       testAction(
         actions.removeSelectedSuite,
         {},
         state,
-        [{ type: types.SET_SELECTED_SUITE, payload: {} }],
+        [{ type: types.SET_SELECTED_SUITE, payload: null }],
         [],
         done,
       );
     });
   });
 
-  describe('toggles loading', () => {
+  describe('set loading', () => {
     it('sets isLoading to true', done => {
-      testAction(actions.toggleLoading, {}, state, [{ type: types.TOGGLE_LOADING }], [], done);
+      testAction(
+        actions.setLoading,
+        true,
+        state,
+        [{ type: types.SET_LOADING, payload: true }],
+        [],
+        done,
+      );
     });
 
     it('toggles isLoading to false', done => {
       testAction(
-        actions.toggleLoading,
-        {},
+        actions.setLoading,
+        false,
         { ...state, isLoading: true },
-        [{ type: types.TOGGLE_LOADING }],
+        [{ type: types.SET_LOADING, payload: false }],
         [],
         done,
       );
