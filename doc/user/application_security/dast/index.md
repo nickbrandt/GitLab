@@ -44,10 +44,10 @@ see the details and the URL(s) affected.
 ![DAST Widget Clicked](img/dast_single_v13_0.png)
 
 [Dynamic Application Security Testing (DAST)](https://en.wikipedia.org/wiki/Dynamic_Application_Security_Testing)
-uses the popular open source tool [OWASP ZAProxy](https://github.com/zaproxy/zaproxy)
+uses the popular open source tool [OWASP Zed Attack Proxy](https://www.zaproxy.org/)
 to perform an analysis on your running web application.
 
-By default, DAST executes [ZAP Baseline Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan)
+By default, DAST executes [ZAP Baseline Scan](https://www.zaproxy.org/docs/docker/baseline-scan/)
 and performs passive scanning only. It won't actively attack your application.
 However, DAST can be [configured](#full-scan)
 to also perform an *active scan*: attack your application and produce a more extensive security report.
