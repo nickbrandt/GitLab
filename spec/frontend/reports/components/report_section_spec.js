@@ -163,7 +163,7 @@ describe('Report section', () => {
           .catch(done.fail);
       });
 
-      it('emits an event on issue toggle if the shouldEmitToggleEvent prop does exist', done => {
+      it('does emit an event on issue toggle if the shouldEmitToggleEvent prop does exist', done => {
         createComponent({ hasIssues: true, shouldEmitToggleEvent: true });
 
         expect(wrapper.emitted().toggleEvent).toBeUndefined();
@@ -178,7 +178,7 @@ describe('Report section', () => {
           .catch(done.fail);
       });
 
-      it('emits an event on issue toggle if the shouldEmitToggleEvent prop does not exist', done => {
+      it('does not emit an event on issue toggle if the shouldEmitToggleEvent prop does not exist', done => {
         createComponent({ hasIssues: true });
 
         expect(wrapper.emitted().toggleEvent).toBeUndefined();
