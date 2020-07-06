@@ -54,6 +54,8 @@ module Security
 
     # rubocop: disable CodeReuse/ActiveRecord
     def create_or_find_vulnerability_finding(occurrence, create_params)
+      return if occurrence.scanner.blank?
+
       find_params = {
         scanner: scanners_objects[occurrence.scanner.key],
         primary_identifier: identifiers_objects[occurrence.primary_identifier.key],
@@ -73,6 +75,8 @@ module Security
     end
 
     def update_vulnerability_scanner(occurrence)
+      return if occurrence.scanner.blank?
+
       scanner = scanners_objects[occurrence.scanner.key]
       scanner.update!(occurrence.scanner.to_hash)
     end
@@ -105,7 +109,7 @@ module Security
     def scanners_objects
       strong_memoize(:scanners_objects) do
         @report.scanners.map do |key, scanner|
-          [key, existing_scanner_objects[key] || project.vulnerability_scanners.build(scanner.to_hash)]
+          [key, existing_scanner_objects[key] || project.vulnerability_scanners.build(scanner&.to_hash)]
         end.to_h
       end
     end
