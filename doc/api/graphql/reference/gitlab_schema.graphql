@@ -12128,7 +12128,7 @@ input MergeRequestSetLabelsInput {
   """
   The Label IDs to set. Replaces existing labels by default.
   """
-  labelIds: [ID!]!
+  labelIds: [LabelID!]!
 
   """
   Changes the operation mode. Defaults to REPLACE.
@@ -21085,7 +21085,7 @@ type User {
     """
     The global ID of the project the authored merge requests should be in. Incompatible with projectPath.
     """
-    projectId: ID
+    projectId: ProjectID
 
     """
     The full-path of the project the authored merge requests should be in. Incompatible with projectId.
@@ -21170,7 +21170,7 @@ type User {
     """
     The global ID of the project the authored merge requests should be in. Incompatible with projectPath.
     """
-    projectId: ID
+    projectId: ProjectID
 
     """
     The full-path of the project the authored merge requests should be in. Incompatible with projectId.

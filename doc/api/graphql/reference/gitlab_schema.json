@@ -33321,7 +33321,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "SCALAR",
-                      "name": "ID",
+                      "name": "LabelID",
                       "ofType": null
                     }
                   }
@@ -61089,7 +61089,7 @@
                   "description": "The global ID of the project the authored merge requests should be in. Incompatible with projectPath.",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "ProjectID",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -61294,7 +61294,7 @@
                   "description": "The global ID of the project the authored merge requests should be in. Incompatible with projectPath.",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "ProjectID",
                     "ofType": null
                   },
                   "defaultValue": null
