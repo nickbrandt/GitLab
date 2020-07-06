@@ -19,6 +19,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 - No changes.
 
+## 13.0.9 (2020-07-06)
+
+### Security (1 change)
+
+- Maven packages upload endpoint is now properly using the uploaded file set by middleware.
+
+
 ## 13.0.8 (2020-07-01)
 
 ### Security (2 changes)
