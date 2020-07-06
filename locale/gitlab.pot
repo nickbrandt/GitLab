@@ -25647,6 +25647,9 @@ msgstr ""
 msgid "Vulnerability|Class"
 msgstr ""
 
+msgid "Vulnerability|Comments"
+msgstr ""
+
 msgid "Vulnerability|Crash Address"
 msgstr ""
 
