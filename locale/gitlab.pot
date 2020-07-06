@@ -1289,7 +1289,7 @@ msgstr ""
 msgid "Account: %{account}"
 msgstr ""
 
-msgid "Action to take when receiving an alert."
+msgid "Action to take when receiving an alert. %{docsLink}"
 msgstr ""
 
 msgid "Actions"
@@ -12380,7 +12380,19 @@ msgstr ""
 msgid "Incident Management Limits"
 msgstr ""
 
-msgid "Incidents"
+msgid "IncidentSettings|Alert integration"
+msgstr ""
+
+msgid "IncidentSettings|Grafana integration"
+msgstr ""
+
+msgid "IncidentSettings|Incidents"
+msgstr ""
+
+msgid "IncidentSettings|PagerDuty integration"
+msgstr ""
+
+msgid "IncidentSettings|Set up integrations with external tools to help better manage incidents."
 msgstr ""
 
 msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
@@ -15038,6 +15050,9 @@ msgstr ""
 msgid "More information is available|here"
 msgstr ""
 
+msgid "More information."
+msgstr ""
+
 msgid "More than %{number_commits_distance} commits different with %{default_branch}"
 msgstr ""
 
@@ -15605,6 +15620,9 @@ msgid "No status"
 msgstr ""
 
 msgid "No template"
+msgstr ""
+
+msgid "No template selected"
 msgstr ""
 
 msgid "No test coverage"
