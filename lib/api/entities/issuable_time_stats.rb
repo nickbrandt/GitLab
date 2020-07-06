@@ -32,7 +32,7 @@ module API
       end
 
       def total_time_spent
-        lazy_timelogs.sum(&:time_spend) # rubocop:disable CodeReuse/ActiveRecord
+        lazy_timelogs.sum(&:time_spent) # rubocop:disable CodeReuse/ActiveRecord
       end
     end
   end

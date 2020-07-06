@@ -1021,7 +1021,7 @@ class MergeRequest < ApplicationRecord
   end
 
   def for_fork?
-    target_project != source_project
+    target_project_id != source_project_id
   end
 
   # If the merge request closes any issues, save this information in the

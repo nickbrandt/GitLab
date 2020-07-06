@@ -14,7 +14,11 @@ module API
         super
       end
 
-      def issuable_metadata
+      def issuable_metadata(user: nil)
+        # Because of the presence of the `user` parameter, we can't
+        # use the same lazy association.
+        return Gitlab::IssuableMetadata.new(user, [object]).data[object.id] if user
+
         lazy_issuable_metadata
       end
 
