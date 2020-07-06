@@ -23629,6 +23629,9 @@ msgstr ""
 msgid "This pipeline was triggered by a parent pipeline"
 msgstr ""
 
+msgid "This pipeline was triggered by a schedule."
+msgstr ""
+
 msgid "This project"
 msgstr ""
 
