@@ -6,7 +6,7 @@ module Mutations
       graphql_name 'MergeRequestSetLabels'
 
       argument :label_ids,
-               [GraphQL::ID_TYPE],
+               [::Types::GlobalIDType[Label]],
                required: true,
                description: <<~DESC
                             The Label IDs to set. Replaces existing labels by default.
@@ -23,10 +23,8 @@ module Mutations
         merge_request = authorized_find!(project_path: project_path, iid: iid)
         project = merge_request.project
 
-        label_ids = label_ids
-                      .map { |gid| GlobalID.parse(gid) }
-                      .select(&method(:label_descendant?))
-                      .map(&:model_id) # MergeRequests::UpdateService expects integers
+        # MergeRequests::UpdateService expects integers
+        label_ids = label_ids.compact.map(&:model_id)
 
         attribute_name = case operation_mode
                          when Types::MutationOperationModeEnum.enum[:append]
@@ -44,10 +42,6 @@ module Mutations
           merge_request: merge_request,
           errors: errors_on_object(merge_request)
         }
-      end
-
-      def label_descendant?(gid)
-        gid&.model_class&.ancestors&.include?(Label)
       end
     end
   end
