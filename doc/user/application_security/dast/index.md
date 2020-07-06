@@ -599,6 +599,44 @@ security reports without requiring internet access.
 
 Alternatively, you can use the variable `SECURE_ANALYZERS_PREFIX` to override the base registry address of the `dast` image.
 
+## On-Demand Scans
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/218465) in GitLab 13.2.
+> - It's deployed behind a feature flag, disabled by default.
+> - It's disabled on GitLab.com.
+> - It's able to be enabled or disabled per-project.
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-on-demand-scans).
+
+Passive DAST scans may be run on demand against a target website, outside the DevOps lifecycle. These scans will
+always be associated with the default or `master` branch of your project and the results can be seen in the project dashboard.
+
+![DAST On-Demand Scan](img/dast_on_demand_v13_2.png)
+
+### Enable or disable On-Demand Scans
+
+On-Demand Scans is under development and not ready for production use. It is
+deployed behind a feature flag that is **disabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can enable it for your instance. On-Demand Scans can be enabled or disabled per-project
+
+To enable it:
+
+```ruby
+# Instance-wide
+Feature.enable(:security_on_demand_scans_feature_flag)
+# or by project
+Feature.enable(:security_on_demand_scans_feature_flag, Project.find(<project id>))
+```
+
+To disable it:
+
+```ruby
+# Instance-wide
+Feature.disable(:security_on_demand_scans_feature_flag)
+# or by project
+Feature.disable(:security_on_demand_scans_feature_flag, Project.find(<project id>))
+```
+
 ## Reports
 
 The DAST tool outputs a report file in JSON format by default. However, this tool can also generate reports in
