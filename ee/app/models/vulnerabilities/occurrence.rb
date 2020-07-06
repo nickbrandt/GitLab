@@ -20,8 +20,8 @@ module Vulnerabilities
     belongs_to :primary_identifier, class_name: 'Vulnerabilities::Identifier', inverse_of: :primary_occurrences
     belongs_to :vulnerability, inverse_of: :findings
 
-    has_many :occurrence_identifiers, class_name: 'Vulnerabilities::OccurrenceIdentifier'
-    has_many :identifiers, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Identifier'
+    has_many :finding_identifiers, class_name: 'Vulnerabilities::FindingIdentifier'
+    has_many :identifiers, through: :finding_identifiers, class_name: 'Vulnerabilities::Identifier'
     has_many :finding_pipelines, class_name: 'Vulnerabilities::FindingPipeline'
     has_many :pipelines, through: :finding_pipelines, class_name: 'Ci::Pipeline'
 

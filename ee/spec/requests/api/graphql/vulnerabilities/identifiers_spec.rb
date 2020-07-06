@@ -25,7 +25,7 @@ RSpec.describe 'Query.vulnerabilities.identifiers' do
 
   let_it_be(:vulnerability) { create(:vulnerability, project: project, report_type: :container_scanning) }
 
-  let_it_be(:occurrence_identifier) do
+  let_it_be(:finding_identifier) do
     create(
       :vulnerabilities_identifier,
       external_type: 'CVE',
@@ -42,8 +42,8 @@ RSpec.describe 'Query.vulnerabilities.identifiers' do
     )
   end
 
-  let_it_be(:vulnerabilities_occurrence_identifier) do
-    create(:vulnerabilities_occurrence_identifier, identifier: occurrence_identifier, occurrence: finding)
+  let_it_be(:vulnerabilities_finding_identifier) do
+    create(:vulnerabilities_finding_identifier, identifier: finding_identifier, occurrence: finding)
   end
 
   subject { graphql_data.dig('vulnerabilities', 'nodes') }
@@ -58,9 +58,9 @@ RSpec.describe 'Query.vulnerabilities.identifiers' do
   it 'returns a vulnerability identifiers' do
     identifier = subject.first['identifiers'].first
 
-    expect(identifier['name']).to eq(occurrence_identifier.name)
-    expect(identifier['externalType']).to eq(occurrence_identifier.external_type)
-    expect(identifier['externalId']).to eq(occurrence_identifier.external_id)
-    expect(identifier['url']).to eq(occurrence_identifier.url)
+    expect(identifier['name']).to eq(finding_identifier.name)
+    expect(identifier['externalType']).to eq(finding_identifier.external_type)
+    expect(identifier['externalId']).to eq(finding_identifier.external_id)
+    expect(identifier['url']).to eq(finding_identifier.url)
   end
 end

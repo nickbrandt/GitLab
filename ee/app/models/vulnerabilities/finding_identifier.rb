@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class OccurrenceIdentifier < ApplicationRecord
+  class FindingIdentifier < ApplicationRecord
     self.table_name = "vulnerability_occurrence_identifiers"
 
     belongs_to :occurrence, class_name: 'Vulnerabilities::Occurrence'
