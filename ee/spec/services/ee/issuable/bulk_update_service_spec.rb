@@ -21,7 +21,7 @@ RSpec.describe Issuable::BulkUpdateService do
   end
 
   shared_examples 'does not update issuables attribute' do |attribute|
-    it 'raises record not found error' do
+    it 'does not update attribute' do
       issuables.each do |issuable|
         expect { subject }.not_to change { issuable.send(attribute) }
       end
@@ -159,11 +159,7 @@ RSpec.describe Issuable::BulkUpdateService do
           stub_licensed_features(epics: false)
         end
 
-        it 'does not update issuables attribute' do
-          issuables.each do |issuable|
-            expect { subject }.not_to change { issuable.labels }
-          end
-        end
+        it_behaves_like 'does not update issuables attribute', :labels
       end
 
       context 'when issuable_ids contain external epics' do

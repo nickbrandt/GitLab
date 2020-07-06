@@ -27,8 +27,6 @@ module EE
 
         set_health_status
         set_epic_param
-
-        params
       end
 
       def set_health_status

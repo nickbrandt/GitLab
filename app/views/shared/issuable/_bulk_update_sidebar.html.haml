@@ -52,13 +52,6 @@
           .filter-item.health-status.health-status-filter
             #js-bulk-update-health-status-root
           %input{ id: 'issue_health_status_value', type: 'hidden', name: 'update[health_status]' }
-      - if epic_bulk_edit_flag
-        .block
-          .title
-            = _('Epic')
-          .filter-item.epic-bulk-edit
-            #js-epic-select-root{ data: { group_id: @project&.group&.id, show_header: "true" } }
-          %input{ id: 'issue_epic_id', type: 'hidden', name: 'update[epic_id]' }
       .block
         .title
           = _('Subscriptions')
@@ -71,7 +64,6 @@
               %li
                 %a{ href: "#", data: { id: "unsubscribe" } }
                   = _('Unsubscribe')
-
 
       = hidden_field_tag "update[issuable_ids]", []
       = hidden_field_tag :state_event, params[:state_event]
