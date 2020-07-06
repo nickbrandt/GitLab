@@ -64,7 +64,6 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
       expect(first_row.text).to include('2019-12-10')
       expect(first_row.text).to include('Never')
       expect(first_row.text).not_to include('2020-06-22')
-      expect(first_row.text).not_to include('2020-06-22')
     end
   end
 
