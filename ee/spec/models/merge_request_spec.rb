@@ -118,13 +118,15 @@ RSpec.describe MergeRequest do
           end
 
           context 'with License-Check enabled' do
-            let_it_be(:license_check) { create(:report_approver_rule, :license_scanning, merge_request: merge_request, approvals_required: 1) }
-
             context 'when rule is not approved' do
+              let!(:license_check) { create(:report_approver_rule, :license_scanning, merge_request: merge_request, approvals_required: 1) }
+
               it { is_expected.to be_truthy }
             end
 
             context 'when rule is approved' do
+              let!(:license_check) { create(:report_approver_rule, :license_scanning, merge_request: merge_request, approvals_required: 0) }
+
               it { is_expected.to be_falsey }
             end
           end
