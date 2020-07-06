@@ -999,8 +999,8 @@ RSpec.describe User do
   describe '#managed_free_namespaces' do
     let_it_be(:user) { create(:user) }
     let_it_be(:licensed_group) { create(:group, gitlab_subscription: create(:gitlab_subscription, :bronze)) }
-    let_it_be(:free_group_z) { create(:group, name: 'Z', gitlab_subscription: create(:gitlab_subscription, :free)) }
-    let_it_be(:free_group_a) { create(:group, name: 'A', gitlab_subscription: create(:gitlab_subscription, :free)) }
+    let_it_be(:free_group_z) { create(:group, name: 'AZ', gitlab_subscription: create(:gitlab_subscription, :free)) }
+    let_it_be(:free_group_a) { create(:group, name: 'AA', gitlab_subscription: create(:gitlab_subscription, :free)) }
 
     subject { user.managed_free_namespaces }
 
