@@ -235,7 +235,7 @@ export default {
             <gl-link
               :href="issuable.web_url"
               :target="isJiraIssue ? '_blank' : null"
-              :rel="isJiraIssue ? 'noopener noreferrer' : null"
+              data-testid="issuable-title"
             >
               {{ issuable.title }}
             </gl-link>
@@ -250,6 +250,7 @@ export default {
             <span
               v-if="isJiraIssue"
               class="svg-container jira-logo-container"
+              data-testid="jira-logo"
               v-html="jiraLogo"
             ></span>
             {{ referencePath }}
