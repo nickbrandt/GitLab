@@ -1252,7 +1252,7 @@ you want using steps 1 and 2 from the GitLab downloads page.
    ###      Sidekiq configuration      ###
    #######################################
    sidekiq['listen_address'] = "0.0.0.0"
-   sidekiq_cluster['enable'] = true
+   sidekiq['cluster'] = true # no need to set this after GitLab 13.0
 
    #######################################
    ###     Monitoring configuration    ###
