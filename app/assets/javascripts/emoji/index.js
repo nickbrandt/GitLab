@@ -5,40 +5,49 @@ import axios from '../lib/utils/axios_utils';
 import AccessorUtilities from '../lib/utils/accessor';
 
 let emojiMap = null;
+let emojiPromise = null;
 let validEmojiNames = null;
 
 export const EMOJI_VERSION = '1';
-const EMOJI_VERSION_LOCALSTORAGE = `EMOJIS_${EMOJI_VERSION}`;
 
 const isLocalStorageAvailable = AccessorUtilities.isLocalStorageAccessSafe();
 
 export function initEmojiMap() {
-  return new Promise((resolve, reject) => {
-    if (emojiMap) {
-      resolve(emojiMap);
-    } else if (isLocalStorageAvailable && window.localStorage.getItem(EMOJI_VERSION_LOCALSTORAGE)) {
-      emojiMap = JSON.parse(window.localStorage.getItem(EMOJI_VERSION_LOCALSTORAGE));
-      validEmojiNames = [...Object.keys(emojiMap), ...Object.keys(emojiAliases)];
-      resolve(emojiMap);
-    } else {
-      // We load the JSON file direct from the server
-      // because it can't be loaded from a CDN due to
-      // cross domain problems with JSON
-      axios
-        .get(`${gon.relative_url_root || ''}/-/emojis/${EMOJI_VERSION}/emojis.json`)
-        .then(({ data }) => {
-          emojiMap = data;
-          validEmojiNames = [...Object.keys(emojiMap), ...Object.keys(emojiAliases)];
-          resolve(emojiMap);
-          if (isLocalStorageAvailable) {
-            window.localStorage.setItem(EMOJI_VERSION_LOCALSTORAGE, JSON.stringify(emojiMap));
-          }
-        })
-        .catch(err => {
-          reject(err);
-        });
-    }
-  });
+  emojiPromise =
+    emojiPromise ||
+    new Promise((resolve, reject) => {
+      if (emojiMap) {
+        resolve(emojiMap);
+      } else if (
+        isLocalStorageAvailable &&
+        window.localStorage.getItem('gl-emoji-map-version') === EMOJI_VERSION &&
+        window.localStorage.getItem('gl-emoji-map')
+      ) {
+        emojiMap = JSON.parse(window.localStorage.getItem('gl-emoji-map'));
+        validEmojiNames = [...Object.keys(emojiMap), ...Object.keys(emojiAliases)];
+        resolve(emojiMap);
+      } else {
+        // We load the JSON file direct from the server
+        // because it can't be loaded from a CDN due to
+        // cross domain problems with JSON
+        axios
+          .get(`${gon.relative_url_root || ''}/-/emojis/${EMOJI_VERSION}/emojis.json`)
+          .then(({ data }) => {
+            emojiMap = data;
+            validEmojiNames = [...Object.keys(emojiMap), ...Object.keys(emojiAliases)];
+            resolve(emojiMap);
+            if (isLocalStorageAvailable) {
+              window.localStorage.setItem('gl-emoji-map-version', EMOJI_VERSION);
+              window.localStorage.setItem('gl-emoji-map', JSON.stringify(emojiMap));
+            }
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }
+    });
+
+  return emojiPromise;
 }
 
 export function normalizeEmojiName(name) {

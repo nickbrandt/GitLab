@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Emojis (JavaScript fixtures)', type: :request do
+RSpec.describe 'Emojis (JavaScript fixtures)', type: :request do
   include JavaScriptFixturesHelpers
 
   before(:all) do
