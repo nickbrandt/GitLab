@@ -12,7 +12,7 @@ end
 
 RSpec.shared_examples 'credentials inventory expiry date before' do
   before do
-    travel_to(date_time)
+    travel_to(view_at_date)
   end
 
   after do
@@ -28,7 +28,7 @@ end
 
 RSpec.shared_examples 'credentials inventory expiry date close or past' do
   before do
-    travel_to(date_time)
+    travel_to(view_at_date)
   end
 
   after do
@@ -38,7 +38,7 @@ RSpec.shared_examples 'credentials inventory expiry date close or past' do
   it 'adds a warning to the expiry date' do
     visit credentials_path
 
-    expect(first_row).to have_selector('[data-testid="expiry-date-icon"]', class: css_class)
+    expect(first_row).to have_selector('[data-testid="expiry-date-icon"]', class: expected_css_class)
   end
 end
 
@@ -64,6 +64,7 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
       expect(first_row.text).to include('2019-12-10')
       expect(first_row.text).to include('Never')
       expect(first_row.text).not_to include('2020-06-22')
+      expect(first_row.text).not_to include('2020-06-22')
     end
   end
 
@@ -79,23 +80,23 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
     end
 
     context 'and is not expired' do
-      let(:date_time) { 20.days.ago }
+      let(:view_at_date) { 20.days.ago }
 
       it_behaves_like 'credentials inventory expiry date'
       it_behaves_like 'credentials inventory expiry date before'
     end
 
     context 'and is near expiry' do
-      let(:css_class) { 'text-warning' }
-      let(:date_time) { 1.day.ago }
+      let(:expected_css_class) { 'text-warning' }
+      let(:view_at_date) { 1.day.ago }
 
       it_behaves_like 'credentials inventory expiry date'
       it_behaves_like 'credentials inventory expiry date close or past'
     end
 
     context 'and is expired' do
-      let(:css_class) { 'text-danger' }
-      let(:date_time) { 2.days.since }
+      let(:expected_css_class) { 'text-danger' }
+      let(:view_at_date) { 2.days.since }
 
       it_behaves_like 'credentials inventory expiry date'
       it_behaves_like 'credentials inventory expiry date close or past'
@@ -161,23 +162,23 @@ RSpec.shared_examples_for 'credentials inventory SSH keys' do |group_managed_acc
     end
 
     context 'and is not expired' do
-      let(:date_time) { 20.days.ago }
+      let(:view_at_date) { 20.days.ago }
 
       it_behaves_like 'credentials inventory expiry date'
       it_behaves_like 'credentials inventory expiry date before'
     end
 
     context 'and is near expiry' do
-      let(:css_class) { 'text-warning' }
-      let(:date_time) { 1.day.ago }
+      let(:expected_css_class) { 'text-warning' }
+      let(:view_at_date) { 1.day.ago }
 
       it_behaves_like 'credentials inventory expiry date'
       it_behaves_like 'credentials inventory expiry date close or past'
     end
 
     context 'and is expired' do
-      let(:css_class) { 'text-danger' }
-      let(:date_time) { 2.days.since }
+      let(:expected_css_class) { 'text-danger' }
+      let(:view_at_date) { 2.days.since }
 
       it_behaves_like 'credentials inventory expiry date'
       it_behaves_like 'credentials inventory expiry date close or past'
