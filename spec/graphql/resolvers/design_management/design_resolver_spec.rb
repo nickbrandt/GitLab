@@ -63,6 +63,14 @@ RSpec.describe Resolvers::DesignManagement::DesignResolver do
           expect(resolve_design).to be_nil
         end
       end
+
+      context 'the ID does not belong to a design at all' do
+        let(:args) { { id: GitlabSchema.id_from_object(create(:user)).to_s } }
+
+        it 'complains meaningfully' do
+          expect { resolve_design }.to raise_error(::Gitlab::Graphql::Errors::ArgumentError, /not a valid id for DesignManagement::Design/)
+        end
+      end
     end
 
     context 'by filename' do

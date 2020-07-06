@@ -3,7 +3,7 @@
 module Resolvers
   module DesignManagement
     class DesignResolver < BaseResolver
-      argument :id, GraphQL::ID_TYPE,
+      argument :id, ::Types::GlobalIDType[::DesignManagement::Design],
                required: false,
                description: 'Find a design by its ID'
 

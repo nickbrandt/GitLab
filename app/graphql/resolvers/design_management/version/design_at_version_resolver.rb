@@ -11,11 +11,11 @@ module Resolvers
 
         authorize :read_design
 
-        argument :id, GraphQL::ID_TYPE,
+        argument :id, ::Types::GlobalIDType[::DesignManagement::DesignAtVersion],
                  required: false,
                  as: :design_at_version_id,
                  description: 'The ID of the DesignAtVersion'
-        argument :design_id, GraphQL::ID_TYPE,
+        argument :design_id, ::Types::GlobalIDType[::DesignManagement::Design],
                  required: false,
                  description: 'The ID of a specific design'
         argument :filename, GraphQL::STRING_TYPE,

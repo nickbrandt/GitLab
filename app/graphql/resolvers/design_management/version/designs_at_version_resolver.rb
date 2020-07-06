@@ -11,8 +11,7 @@ module Resolvers
 
         authorize :read_design
 
-        argument :ids,
-                 [GraphQL::ID_TYPE],
+        argument :ids, [::Types::GlobalIDType[::DesignManagement::Design]],
                  required: false,
                  description: 'Filters designs by their ID'
         argument :filenames,

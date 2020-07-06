@@ -4,15 +4,14 @@ module Resolvers
   module DesignManagement
     class DesignsResolver < BaseResolver
       argument :ids,
-               [GraphQL::ID_TYPE],
+               [::Types::GlobalIDType[::DesignManagement::Design]],
                required: false,
                description: 'Filters designs by their ID'
       argument :filenames,
                [GraphQL::STRING_TYPE],
                required: false,
                description: 'Filters designs by their filename'
-      argument :at_version,
-               GraphQL::ID_TYPE,
+      argument :at_version, ::Types::GlobalIDType[::DesignManagement::Version],
                required: false,
                description: 'Filters designs to only those that existed at the version. ' \
                             'If argument is omitted or nil then all designs will reflect the latest version'
@@ -39,8 +38,8 @@ module Resolvers
         GitlabSchema.object_from_id(at_version, expected_type: ::DesignManagement::Version)&.sync
       end
 
-      def design_ids(ids)
-        ids&.map { |id| GlobalID.parse(id, expected_type: ::DesignManagement::Design).model_id }
+      def design_ids(gids)
+        Array.wrap(gids).compact.map(&:model_id).presence
       end
 
       def issue

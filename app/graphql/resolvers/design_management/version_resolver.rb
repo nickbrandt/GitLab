@@ -9,7 +9,7 @@ module Resolvers
 
       authorize :read_design
 
-      argument :id, GraphQL::ID_TYPE,
+      argument :id, ::Types::GlobalIDType[::DesignManagement::Version],
                required: true,
                description: 'The Global ID of the version'
 
