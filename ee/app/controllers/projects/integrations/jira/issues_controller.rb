@@ -7,7 +7,6 @@ module Projects
         include RecordUserLastActivity
 
         before_action :check_feature_enabled!
-        before_action :check_issues_available!
 
         before_action do
           push_frontend_feature_flag(:jira_integration, project)
