@@ -21,8 +21,9 @@ export function initEmojiMap() {
       validEmojiNames = [...Object.keys(emojiMap), ...Object.keys(emojiAliases)];
       resolve(emojiMap);
     } else {
-      // We load the JSON from server
-      // Can't be loaded from CDN due to cross domain problems with JSON files
+      // We load the JSON file direct from the server
+      // because it can't be loaded from a CDN due to
+      // cross domain problems with JSON
       axios
         .get(`${gon.relative_url_root || ''}/-/emojis/${EMOJI_VERSION}/emojis.json`)
         .then(({ data }) => {
