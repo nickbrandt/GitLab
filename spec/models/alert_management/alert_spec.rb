@@ -94,6 +94,13 @@ RSpec.describe AlertManagement::Alert do
           let(:project) { existing_alert.project }
 
           it { is_expected.not_to be_valid }
+
+          context 'resolved status' do
+            # We are only validating uniqueness for non-resolved alerts
+            let(:new_alert) { build(:alert_management_alert, :resolved, fingerprint: fingerprint, project: project) }
+
+            it { is_expected.to be_valid }
+          end
         end
 
         context 'different project' do

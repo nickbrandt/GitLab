@@ -8676,6 +8676,7 @@ CREATE TABLE public.abuse_reports (
 );
 
 CREATE SEQUENCE public.abuse_reports_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -8850,13 +8851,13 @@ CREATE TABLE public.appearances (
     id integer NOT NULL,
     title character varying NOT NULL,
     description text NOT NULL,
-    logo character varying,
-    updated_by integer,
     header_logo character varying,
+    logo character varying,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     description_html text,
     cached_markdown_version integer,
+    favicon character varying,
     new_project_guidelines text,
     new_project_guidelines_html text,
     header_message text,
@@ -8865,14 +8866,15 @@ CREATE TABLE public.appearances (
     footer_message_html text,
     message_background_color text,
     message_font_color text,
-    favicon character varying,
     email_header_and_footer_enabled boolean DEFAULT false NOT NULL,
+    updated_by integer,
     profile_image_guidelines text,
     profile_image_guidelines_html text,
     CONSTRAINT appearances_profile_image_guidelines CHECK ((char_length(profile_image_guidelines) <= 4096))
 );
 
 CREATE SEQUENCE public.appearances_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -8889,6 +8891,7 @@ CREATE TABLE public.application_setting_terms (
 );
 
 CREATE SEQUENCE public.application_setting_terms_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -8907,7 +8910,6 @@ CREATE TABLE public.application_settings (
     updated_at timestamp without time zone,
     home_page_url character varying,
     default_branch_protection integer DEFAULT 2,
-    help_text text,
     restricted_visibility_levels text,
     version_check_enabled boolean DEFAULT true,
     max_attachment_size integer DEFAULT 10 NOT NULL,
@@ -8946,8 +8948,6 @@ CREATE TABLE public.application_settings (
     container_registry_token_expire_delay integer DEFAULT 5,
     after_sign_up_text text,
     user_default_external boolean DEFAULT false NOT NULL,
-    elasticsearch_indexing boolean DEFAULT false NOT NULL,
-    elasticsearch_search boolean DEFAULT false NOT NULL,
     repository_storages character varying DEFAULT 'default'::character varying,
     enabled_git_access_protocol character varying,
     domain_blacklist_enabled boolean DEFAULT false,
@@ -8969,33 +8969,19 @@ CREATE TABLE public.application_settings (
     html_emails_enabled boolean DEFAULT true,
     plantuml_url character varying,
     plantuml_enabled boolean,
-    shared_runners_minutes integer DEFAULT 0 NOT NULL,
-    repository_size_limit bigint DEFAULT 0,
     terminal_max_session_time integer DEFAULT 0 NOT NULL,
     unique_ips_limit_per_user integer,
     unique_ips_limit_time_window integer,
     unique_ips_limit_enabled boolean DEFAULT false NOT NULL,
     default_artifacts_expire_in character varying DEFAULT '0'::character varying NOT NULL,
-    elasticsearch_url character varying DEFAULT 'http://localhost:9200'::character varying,
-    elasticsearch_aws boolean DEFAULT false NOT NULL,
-    elasticsearch_aws_region character varying DEFAULT 'us-east-1'::character varying,
-    elasticsearch_aws_access_key character varying,
-    geo_status_timeout integer DEFAULT 10,
     uuid character varying,
     polling_interval_multiplier numeric DEFAULT 1.0 NOT NULL,
     cached_markdown_version integer,
-    check_namespace_plan boolean DEFAULT false NOT NULL,
-    mirror_max_delay integer DEFAULT 300 NOT NULL,
-    mirror_max_capacity integer DEFAULT 100 NOT NULL,
-    mirror_capacity_threshold integer DEFAULT 50 NOT NULL,
     prometheus_metrics_enabled boolean DEFAULT true NOT NULL,
     authorized_keys_enabled boolean DEFAULT true NOT NULL,
     help_page_hide_commercial_content boolean DEFAULT false,
     help_page_support_url character varying,
-    slack_app_enabled boolean DEFAULT false,
-    slack_app_id character varying,
     performance_bar_allowed_group_id integer,
-    allow_group_owners_to_manage_ldap boolean DEFAULT true NOT NULL,
     hashed_storage_enabled boolean DEFAULT true NOT NULL,
     project_export_enabled boolean DEFAULT true NOT NULL,
     auto_devops_enabled boolean DEFAULT true NOT NULL,
@@ -9011,13 +8997,13 @@ CREATE TABLE public.application_settings (
     gitaly_timeout_default integer DEFAULT 55 NOT NULL,
     gitaly_timeout_medium integer DEFAULT 30 NOT NULL,
     gitaly_timeout_fast integer DEFAULT 10 NOT NULL,
-    mirror_available boolean DEFAULT true NOT NULL,
     password_authentication_enabled_for_web boolean,
     password_authentication_enabled_for_git boolean DEFAULT true NOT NULL,
-    auto_devops_domain character varying,
     external_authorization_service_enabled boolean DEFAULT false NOT NULL,
     external_authorization_service_url character varying,
     external_authorization_service_default_label character varying,
+    default_project_creation integer DEFAULT 2 NOT NULL,
+    auto_devops_domain character varying,
     pages_domain_verification_enabled boolean DEFAULT true NOT NULL,
     user_default_internal_regex character varying,
     external_authorization_service_timeout double precision DEFAULT 0.5,
@@ -9026,31 +9012,53 @@ CREATE TABLE public.application_settings (
     encrypted_external_auth_client_key_iv character varying,
     encrypted_external_auth_client_key_pass character varying,
     encrypted_external_auth_client_key_pass_iv character varying,
-    email_additional_text character varying,
     enforce_terms boolean DEFAULT false,
-    file_template_project_id integer,
-    pseudonymizer_enabled boolean DEFAULT false NOT NULL,
+    mirror_available boolean DEFAULT true NOT NULL,
     hide_third_party_offers boolean DEFAULT false NOT NULL,
-    snowplow_enabled boolean DEFAULT false NOT NULL,
-    snowplow_collector_hostname character varying,
-    snowplow_cookie_domain character varying,
     instance_statistics_visibility_private boolean DEFAULT false NOT NULL,
+    receive_max_input_size integer,
     web_ide_clientside_preview_enabled boolean DEFAULT false NOT NULL,
     user_show_add_ssh_key_message boolean DEFAULT true NOT NULL,
-    custom_project_templates_group_id integer,
+    outbound_local_requests_whitelist character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
     usage_stats_set_by_user_id integer,
-    receive_max_input_size integer,
     diff_max_patch_bytes integer DEFAULT 102400 NOT NULL,
     archive_builds_in_seconds integer,
     commit_email_hostname character varying,
+    first_day_of_week integer DEFAULT 0 NOT NULL,
     protected_ci_variables boolean DEFAULT true NOT NULL,
     runners_registration_token_encrypted character varying,
     local_markdown_version integer DEFAULT 0 NOT NULL,
-    first_day_of_week integer DEFAULT 0 NOT NULL,
-    elasticsearch_limit_indexing boolean DEFAULT false NOT NULL,
-    default_project_creation integer DEFAULT 2 NOT NULL,
+    asset_proxy_enabled boolean DEFAULT false NOT NULL,
+    asset_proxy_url character varying,
+    asset_proxy_whitelist text,
+    encrypted_asset_proxy_secret_key text,
+    encrypted_asset_proxy_secret_key_iv character varying,
     lets_encrypt_notification_email character varying,
     lets_encrypt_terms_of_service_accepted boolean DEFAULT false NOT NULL,
+    help_text text,
+    elasticsearch_indexing boolean DEFAULT false NOT NULL,
+    elasticsearch_search boolean DEFAULT false NOT NULL,
+    shared_runners_minutes integer DEFAULT 0 NOT NULL,
+    repository_size_limit bigint DEFAULT 0,
+    elasticsearch_url character varying DEFAULT 'http://localhost:9200'::character varying,
+    elasticsearch_aws boolean DEFAULT false NOT NULL,
+    elasticsearch_aws_region character varying DEFAULT 'us-east-1'::character varying,
+    elasticsearch_aws_access_key character varying,
+    geo_status_timeout integer DEFAULT 10,
+    check_namespace_plan boolean DEFAULT false NOT NULL,
+    mirror_max_delay integer DEFAULT 300 NOT NULL,
+    mirror_max_capacity integer DEFAULT 100 NOT NULL,
+    mirror_capacity_threshold integer DEFAULT 50 NOT NULL,
+    slack_app_enabled boolean DEFAULT false,
+    slack_app_id character varying,
+    allow_group_owners_to_manage_ldap boolean DEFAULT true NOT NULL,
+    email_additional_text character varying,
+    file_template_project_id integer,
+    pseudonymizer_enabled boolean DEFAULT false NOT NULL,
+    snowplow_enabled boolean DEFAULT false NOT NULL,
+    snowplow_cookie_domain character varying,
+    custom_project_templates_group_id integer,
+    elasticsearch_limit_indexing boolean DEFAULT false NOT NULL,
     geo_node_allowed_ips character varying DEFAULT '0.0.0.0/0, ::/0'::character varying,
     elasticsearch_shards integer DEFAULT 5 NOT NULL,
     elasticsearch_replicas integer DEFAULT 1 NOT NULL,
@@ -9058,51 +9066,45 @@ CREATE TABLE public.application_settings (
     encrypted_lets_encrypt_private_key_iv text,
     required_instance_ci_template character varying,
     dns_rebinding_protection_enabled boolean DEFAULT true NOT NULL,
-    default_project_deletion_protection boolean DEFAULT false NOT NULL,
-    grafana_enabled boolean DEFAULT false NOT NULL,
     lock_memberships_to_ldap boolean DEFAULT false NOT NULL,
+    default_project_deletion_protection boolean DEFAULT false NOT NULL,
     time_tracking_limit_to_hours boolean DEFAULT false NOT NULL,
+    grafana_enabled boolean DEFAULT false NOT NULL,
     grafana_url character varying DEFAULT '/-/grafana'::character varying NOT NULL,
-    login_recaptcha_protection_enabled boolean DEFAULT false NOT NULL,
-    outbound_local_requests_whitelist character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
     raw_blob_request_limit integer DEFAULT 300 NOT NULL,
-    allow_local_requests_from_web_hooks_and_services boolean DEFAULT false NOT NULL,
-    allow_local_requests_from_system_hooks boolean DEFAULT true NOT NULL,
-    instance_administration_project_id bigint,
-    asset_proxy_enabled boolean DEFAULT false NOT NULL,
-    asset_proxy_url character varying,
-    asset_proxy_whitelist text,
-    encrypted_asset_proxy_secret_key text,
-    encrypted_asset_proxy_secret_key_iv character varying,
+    login_recaptcha_protection_enabled boolean DEFAULT false NOT NULL,
     static_objects_external_storage_url character varying(255),
     static_objects_external_storage_auth_token character varying(255),
-    max_personal_access_token_lifetime integer,
+    instance_administration_project_id bigint,
+    allow_local_requests_from_web_hooks_and_services boolean DEFAULT false,
+    allow_local_requests_from_system_hooks boolean DEFAULT true NOT NULL,
     throttle_protected_paths_enabled boolean DEFAULT false NOT NULL,
     throttle_protected_paths_requests_per_period integer DEFAULT 10 NOT NULL,
     throttle_protected_paths_period_in_seconds integer DEFAULT 60 NOT NULL,
     protected_paths character varying(255)[] DEFAULT '{/users/password,/users/sign_in,/api/v3/session.json,/api/v3/session,/api/v4/session.json,/api/v4/session,/users,/users/confirmation,/unsubscribes/,/import/github/personal_access_token,/admin/session}'::character varying[],
+    snowplow_collector_hostname character varying,
+    sourcegraph_enabled boolean DEFAULT false NOT NULL,
+    sourcegraph_url character varying(255),
+    max_personal_access_token_lifetime integer,
     throttle_incident_management_notification_enabled boolean DEFAULT false NOT NULL,
     throttle_incident_management_notification_period_in_seconds integer DEFAULT 3600,
     throttle_incident_management_notification_per_period integer DEFAULT 3600,
-    snowplow_iglu_registry_url character varying(255),
     push_event_hooks_limit integer DEFAULT 3 NOT NULL,
+    productivity_analytics_start_date timestamp with time zone,
     push_event_activities_limit integer DEFAULT 3 NOT NULL,
     custom_http_clone_url_root character varying(511),
+    snowplow_iglu_registry_url character varying(255),
     deletion_adjourned_period integer DEFAULT 7 NOT NULL,
-    license_trial_ends_on date,
+    snowplow_app_id character varying,
     eks_integration_enabled boolean DEFAULT false NOT NULL,
     eks_account_id character varying(128),
     eks_access_key_id character varying(128),
     encrypted_eks_secret_access_key_iv character varying(255),
     encrypted_eks_secret_access_key text,
-    snowplow_app_id character varying,
-    productivity_analytics_start_date timestamp with time zone,
-    default_ci_config_path character varying(255),
-    sourcegraph_enabled boolean DEFAULT false NOT NULL,
-    sourcegraph_url character varying(255),
+    license_trial_ends_on date,
     sourcegraph_public_only boolean DEFAULT true NOT NULL,
+    default_ci_config_path character varying(255),
     snippet_size_limit bigint DEFAULT 52428800 NOT NULL,
-    minimum_password_length integer DEFAULT 8 NOT NULL,
     encrypted_akismet_api_key text,
     encrypted_akismet_api_key_iv character varying(255),
     encrypted_elasticsearch_aws_secret_access_key text,
@@ -9115,23 +9117,24 @@ CREATE TABLE public.application_settings (
     encrypted_slack_app_secret_iv character varying(255),
     encrypted_slack_app_verification_token text,
     encrypted_slack_app_verification_token_iv character varying(255),
-    force_pages_access_control boolean DEFAULT false NOT NULL,
+    minimum_password_length integer DEFAULT 8 NOT NULL,
     updating_name_disabled_for_users boolean DEFAULT false NOT NULL,
+    force_pages_access_control boolean DEFAULT false NOT NULL,
     instance_administrators_group_id integer,
-    elasticsearch_indexed_field_length_limit integer DEFAULT 0 NOT NULL,
-    elasticsearch_max_bulk_size_mb smallint DEFAULT 10 NOT NULL,
-    elasticsearch_max_bulk_concurrency smallint DEFAULT 10 NOT NULL,
     disable_overriding_approvers_per_merge_request boolean DEFAULT false NOT NULL,
     prevent_merge_requests_author_approval boolean DEFAULT false NOT NULL,
     prevent_merge_requests_committers_approval boolean DEFAULT false NOT NULL,
+    elasticsearch_indexed_field_length_limit integer DEFAULT 0 NOT NULL,
+    elasticsearch_max_bulk_size_mb smallint DEFAULT 10 NOT NULL,
+    elasticsearch_max_bulk_concurrency smallint DEFAULT 10 NOT NULL,
     email_restrictions_enabled boolean DEFAULT false NOT NULL,
     email_restrictions text,
     npm_package_requests_forwarding boolean DEFAULT true NOT NULL,
     namespace_storage_size_limit bigint DEFAULT 0 NOT NULL,
+    push_rule_id bigint,
+    issues_create_limit integer DEFAULT 300 NOT NULL,
     seat_link_enabled boolean DEFAULT true NOT NULL,
     container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
-    issues_create_limit integer DEFAULT 300 NOT NULL,
-    push_rule_id bigint,
     group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL,
     container_registry_vendor text DEFAULT ''::text NOT NULL,
     container_registry_version text DEFAULT ''::text NOT NULL,
@@ -9152,12 +9155,14 @@ CREATE TABLE public.application_settings (
     group_export_limit integer DEFAULT 6 NOT NULL,
     group_download_export_limit integer DEFAULT 1 NOT NULL,
     CONSTRAINT check_51700b31b5 CHECK ((char_length(default_branch_name) <= 255)),
+    CONSTRAINT check_b4f67a6296 CHECK ((allow_local_requests_from_web_hooks_and_services IS NOT NULL)),
     CONSTRAINT check_d03919528d CHECK ((char_length(container_registry_vendor) <= 255)),
     CONSTRAINT check_d820146492 CHECK ((char_length(spam_check_endpoint_url) <= 255)),
     CONSTRAINT check_e5aba18f02 CHECK ((char_length(container_registry_version) <= 255))
 );
 
 CREATE SEQUENCE public.application_settings_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9312,6 +9317,7 @@ CREATE TABLE public.approvals (
 );
 
 CREATE SEQUENCE public.approvals_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9330,6 +9336,7 @@ CREATE TABLE public.approver_groups (
 );
 
 CREATE SEQUENCE public.approver_groups_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9348,6 +9355,7 @@ CREATE TABLE public.approvers (
 );
 
 CREATE SEQUENCE public.approvers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9378,6 +9386,7 @@ CREATE TABLE public.audit_events (
 );
 
 CREATE SEQUENCE public.audit_events_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9390,13 +9399,14 @@ CREATE TABLE public.award_emoji (
     id integer NOT NULL,
     name character varying,
     user_id integer,
-    awardable_id integer,
     awardable_type character varying,
+    awardable_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
 
 CREATE SEQUENCE public.award_emoji_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9456,12 +9466,13 @@ CREATE TABLE public.badges (
     project_id integer,
     group_id integer,
     type character varying NOT NULL,
-    name character varying(255),
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    name character varying(255)
 );
 
 CREATE SEQUENCE public.badges_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9477,6 +9488,7 @@ CREATE TABLE public.board_assignees (
 );
 
 CREATE SEQUENCE public.board_assignees_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9510,6 +9522,7 @@ CREATE TABLE public.board_labels (
 );
 
 CREATE SEQUENCE public.board_labels_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9559,13 +9572,14 @@ CREATE TABLE public.boards (
     project_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    name character varying DEFAULT 'Development'::character varying NOT NULL,
-    milestone_id integer,
     group_id integer,
-    weight integer
+    milestone_id integer,
+    weight integer,
+    name character varying DEFAULT 'Development'::character varying NOT NULL
 );
 
 CREATE SEQUENCE public.boards_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9585,12 +9599,13 @@ CREATE TABLE public.broadcast_messages (
     font character varying,
     message_html text NOT NULL,
     cached_markdown_version integer,
+    dismissable boolean,
     target_path character varying(255),
-    broadcast_type smallint DEFAULT 1 NOT NULL,
-    dismissable boolean
+    broadcast_type smallint DEFAULT 1 NOT NULL
 );
 
 CREATE SEQUENCE public.broadcast_messages_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9613,6 +9628,7 @@ CREATE TABLE public.chat_names (
 );
 
 CREATE SEQUENCE public.chat_names_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9631,6 +9647,7 @@ CREATE TABLE public.chat_teams (
 );
 
 CREATE SEQUENCE public.chat_teams_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9647,6 +9664,7 @@ CREATE TABLE public.ci_build_needs (
 );
 
 CREATE SEQUENCE public.ci_build_needs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9694,6 +9712,7 @@ CREATE TABLE public.ci_build_trace_section_names (
 );
 
 CREATE SEQUENCE public.ci_build_trace_section_names_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9704,8 +9723,8 @@ ALTER SEQUENCE public.ci_build_trace_section_names_id_seq OWNED BY public.ci_bui
 
 CREATE TABLE public.ci_build_trace_sections (
     project_id integer NOT NULL,
-    date_start timestamp without time zone NOT NULL,
-    date_end timestamp without time zone NOT NULL,
+    date_start timestamp with time zone NOT NULL,
+    date_end timestamp with time zone NOT NULL,
     byte_start bigint NOT NULL,
     byte_end bigint NOT NULL,
     build_id integer NOT NULL,
@@ -9760,13 +9779,14 @@ CREATE TABLE public.ci_builds (
     scheduled_at timestamp with time zone,
     token_encrypted character varying,
     upstream_pipeline_id integer,
+    processed boolean,
     resource_group_id bigint,
     waiting_for_resource_at timestamp with time zone,
-    processed boolean,
     scheduling_type smallint
 );
 
 CREATE SEQUENCE public.ci_builds_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9781,9 +9801,9 @@ CREATE TABLE public.ci_builds_metadata (
     project_id integer NOT NULL,
     timeout integer,
     timeout_source integer DEFAULT 1 NOT NULL,
-    interruptible boolean,
     config_options jsonb,
     config_variables jsonb,
+    interruptible boolean,
     has_exposed_artifacts boolean,
     environment_auto_stop_in character varying(255),
     expanded_environment_name character varying(255),
@@ -9791,6 +9811,7 @@ CREATE TABLE public.ci_builds_metadata (
 );
 
 CREATE SEQUENCE public.ci_builds_metadata_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9838,11 +9859,14 @@ ALTER SEQUENCE public.ci_daily_build_group_report_results_id_seq OWNED BY public
 CREATE TABLE public.ci_freeze_periods (
     id bigint NOT NULL,
     project_id bigint NOT NULL,
-    freeze_start character varying(998) NOT NULL,
-    freeze_end character varying(998) NOT NULL,
-    cron_timezone character varying(255) NOT NULL,
+    freeze_start text NOT NULL,
+    freeze_end text NOT NULL,
+    cron_timezone text NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT check_4a7939e04e CHECK ((char_length(freeze_end) <= 998)),
+    CONSTRAINT check_a92607bd2b CHECK ((char_length(freeze_start) <= 998)),
+    CONSTRAINT check_b14055adc3 CHECK ((char_length(cron_timezone) <= 255))
 );
 
 CREATE SEQUENCE public.ci_freeze_periods_id_seq
@@ -9870,6 +9894,7 @@ CREATE TABLE public.ci_group_variables (
 );
 
 CREATE SEQUENCE public.ci_group_variables_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9919,6 +9944,7 @@ CREATE TABLE public.ci_job_artifacts (
 );
 
 CREATE SEQUENCE public.ci_job_artifacts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -9993,6 +10019,7 @@ CREATE TABLE public.ci_pipeline_schedule_variables (
 );
 
 CREATE SEQUENCE public.ci_pipeline_schedule_variables_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10016,6 +10043,7 @@ CREATE TABLE public.ci_pipeline_schedules (
 );
 
 CREATE SEQUENCE public.ci_pipeline_schedules_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10036,6 +10064,7 @@ CREATE TABLE public.ci_pipeline_variables (
 );
 
 CREATE SEQUENCE public.ci_pipeline_variables_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10064,8 +10093,8 @@ CREATE TABLE public.ci_pipelines (
     auto_canceled_by_id integer,
     pipeline_schedule_id integer,
     source integer,
-    config_source integer,
     protected boolean,
+    config_source integer,
     failure_reason integer,
     iid integer,
     merge_request_id integer,
@@ -10090,6 +10119,7 @@ CREATE SEQUENCE public.ci_pipelines_config_pipeline_id_seq
 ALTER SEQUENCE public.ci_pipelines_config_pipeline_id_seq OWNED BY public.ci_pipelines_config.pipeline_id;
 
 CREATE SEQUENCE public.ci_pipelines_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10156,6 +10186,7 @@ CREATE TABLE public.ci_runner_namespaces (
 );
 
 CREATE SEQUENCE public.ci_runner_namespaces_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10173,6 +10204,7 @@ CREATE TABLE public.ci_runner_projects (
 );
 
 CREATE SEQUENCE public.ci_runner_projects_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10198,8 +10230,8 @@ CREATE TABLE public.ci_runners (
     run_untagged boolean DEFAULT true NOT NULL,
     locked boolean DEFAULT false NOT NULL,
     access_level integer DEFAULT 0 NOT NULL,
-    ip_address character varying,
     maximum_timeout integer,
+    ip_address character varying,
     runner_type smallint NOT NULL,
     token_encrypted character varying,
     public_projects_minutes_cost_factor double precision DEFAULT 0.0 NOT NULL,
@@ -10207,6 +10239,7 @@ CREATE TABLE public.ci_runners (
 );
 
 CREATE SEQUENCE public.ci_runners_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10225,6 +10258,7 @@ CREATE TABLE public.ci_sources_pipelines (
 );
 
 CREATE SEQUENCE public.ci_sources_pipelines_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10261,6 +10295,7 @@ CREATE TABLE public.ci_stages (
 );
 
 CREATE SEQUENCE public.ci_stages_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10294,6 +10329,7 @@ CREATE TABLE public.ci_trigger_requests (
 );
 
 CREATE SEQUENCE public.ci_trigger_requests_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10314,6 +10350,7 @@ CREATE TABLE public.ci_triggers (
 );
 
 CREATE SEQUENCE public.ci_triggers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10337,6 +10374,7 @@ CREATE TABLE public.ci_variables (
 );
 
 CREATE SEQUENCE public.ci_variables_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10352,6 +10390,7 @@ CREATE TABLE public.cluster_groups (
 );
 
 CREATE SEQUENCE public.cluster_groups_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10363,8 +10402,8 @@ ALTER SEQUENCE public.cluster_groups_id_seq OWNED BY public.cluster_groups.id;
 CREATE TABLE public.cluster_platforms_kubernetes (
     id integer NOT NULL,
     cluster_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
     api_url text,
     ca_cert text,
     namespace character varying,
@@ -10377,6 +10416,7 @@ CREATE TABLE public.cluster_platforms_kubernetes (
 );
 
 CREATE SEQUENCE public.cluster_platforms_kubernetes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10389,11 +10429,12 @@ CREATE TABLE public.cluster_projects (
     id integer NOT NULL,
     project_id integer NOT NULL,
     cluster_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL
 );
 
 CREATE SEQUENCE public.cluster_projects_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10438,8 +10479,8 @@ CREATE TABLE public.cluster_providers_gcp (
     cluster_id integer NOT NULL,
     status integer,
     num_nodes integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
     status_reason text,
     gcp_project_id character varying NOT NULL,
     zone character varying NOT NULL,
@@ -10453,6 +10494,7 @@ CREATE TABLE public.cluster_providers_gcp (
 );
 
 CREATE SEQUENCE public.cluster_providers_gcp_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10466,8 +10508,8 @@ CREATE TABLE public.clusters (
     user_id integer,
     provider_type integer,
     platform_type integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
     enabled boolean DEFAULT true,
     name character varying NOT NULL,
     environment_scope character varying DEFAULT '*'::character varying NOT NULL,
@@ -10475,9 +10517,9 @@ CREATE TABLE public.clusters (
     domain character varying,
     managed boolean DEFAULT true NOT NULL,
     namespace_per_environment boolean DEFAULT true NOT NULL,
-    management_project_id integer,
     cleanup_status smallint DEFAULT 1 NOT NULL,
-    cleanup_status_reason text
+    cleanup_status_reason text,
+    management_project_id integer
 );
 
 CREATE TABLE public.clusters_applications_cert_managers (
@@ -10492,6 +10534,7 @@ CREATE TABLE public.clusters_applications_cert_managers (
 );
 
 CREATE SEQUENCE public.clusters_applications_cert_managers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10519,7 +10562,7 @@ CREATE SEQUENCE public.clusters_applications_cilium_id_seq
 ALTER SEQUENCE public.clusters_applications_cilium_id_seq OWNED BY public.clusters_applications_cilium.id;
 
 CREATE TABLE public.clusters_applications_crossplane (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     cluster_id bigint NOT NULL,
@@ -10584,8 +10627,8 @@ ALTER SEQUENCE public.clusters_applications_fluentd_id_seq OWNED BY public.clust
 CREATE TABLE public.clusters_applications_helm (
     id integer NOT NULL,
     cluster_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
     status integer NOT NULL,
     version character varying NOT NULL,
     status_reason text,
@@ -10595,6 +10638,7 @@ CREATE TABLE public.clusters_applications_helm (
 );
 
 CREATE SEQUENCE public.clusters_applications_helm_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10606,8 +10650,8 @@ ALTER SEQUENCE public.clusters_applications_helm_id_seq OWNED BY public.clusters
 CREATE TABLE public.clusters_applications_ingress (
     id integer NOT NULL,
     cluster_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
     status integer NOT NULL,
     ingress_type integer NOT NULL,
     version character varying NOT NULL,
@@ -10620,6 +10664,7 @@ CREATE TABLE public.clusters_applications_ingress (
 );
 
 CREATE SEQUENCE public.clusters_applications_ingress_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10641,6 +10686,7 @@ CREATE TABLE public.clusters_applications_jupyter (
 );
 
 CREATE SEQUENCE public.clusters_applications_jupyter_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10663,6 +10709,7 @@ CREATE TABLE public.clusters_applications_knative (
 );
 
 CREATE SEQUENCE public.clusters_applications_knative_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10679,13 +10726,14 @@ CREATE TABLE public.clusters_applications_prometheus (
     status_reason text,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    last_update_started_at timestamp with time zone,
     encrypted_alert_manager_token character varying,
     encrypted_alert_manager_token_iv character varying,
+    last_update_started_at timestamp with time zone,
     healthy boolean
 );
 
 CREATE SEQUENCE public.clusters_applications_prometheus_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10707,6 +10755,7 @@ CREATE TABLE public.clusters_applications_runners (
 );
 
 CREATE SEQUENCE public.clusters_applications_runners_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10716,6 +10765,7 @@ CREATE SEQUENCE public.clusters_applications_runners_id_seq
 ALTER SEQUENCE public.clusters_applications_runners_id_seq OWNED BY public.clusters_applications_runners.id;
 
 CREATE SEQUENCE public.clusters_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10731,10 +10781,10 @@ CREATE TABLE public.clusters_kubernetes_namespaces (
     cluster_project_id integer,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    encrypted_service_account_token text,
     encrypted_service_account_token_iv character varying,
     namespace character varying NOT NULL,
     service_account_name character varying,
+    encrypted_service_account_token text,
     environment_id bigint
 );
 
@@ -10753,7 +10803,8 @@ CREATE TABLE public.commit_user_mentions (
     mentioned_users_ids integer[],
     mentioned_projects_ids integer[],
     mentioned_groups_ids integer[],
-    commit_id character varying NOT NULL
+    commit_id character varying,
+    CONSTRAINT check_724d773807 CHECK ((commit_id IS NOT NULL))
 );
 
 CREATE SEQUENCE public.commit_user_mentions_id_seq
@@ -10766,10 +10817,10 @@ CREATE SEQUENCE public.commit_user_mentions_id_seq
 ALTER SEQUENCE public.commit_user_mentions_id_seq OWNED BY public.commit_user_mentions.id;
 
 CREATE TABLE public.container_expiration_policies (
-    project_id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     next_run_at timestamp with time zone,
+    project_id bigint NOT NULL,
     name_regex character varying(255),
     cadence character varying(12) DEFAULT '1d'::character varying NOT NULL,
     older_than character varying(12) DEFAULT '90d'::character varying,
@@ -10789,6 +10840,7 @@ CREATE TABLE public.container_repositories (
 );
 
 CREATE SEQUENCE public.container_repositories_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10834,6 +10886,7 @@ CREATE TABLE public.conversational_development_index_metrics (
 );
 
 CREATE SEQUENCE public.conversational_development_index_metrics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10864,16 +10917,17 @@ ALTER SEQUENCE public.custom_emoji_id_seq OWNED BY public.custom_emoji.id;
 
 CREATE TABLE public.dependency_proxy_blobs (
     id integer NOT NULL,
-    group_id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
-    size bigint,
-    file_store integer,
+    file text NOT NULL,
     file_name character varying NOT NULL,
-    file text NOT NULL
+    file_store integer,
+    group_id integer NOT NULL,
+    size bigint,
+    updated_at timestamp with time zone NOT NULL
 );
 
 CREATE SEQUENCE public.dependency_proxy_blobs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10884,13 +10938,14 @@ ALTER SEQUENCE public.dependency_proxy_blobs_id_seq OWNED BY public.dependency_p
 
 CREATE TABLE public.dependency_proxy_group_settings (
     id integer NOT NULL,
-    group_id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
-    enabled boolean DEFAULT false NOT NULL
+    enabled boolean DEFAULT false NOT NULL,
+    group_id integer NOT NULL,
+    updated_at timestamp with time zone NOT NULL
 );
 
 CREATE SEQUENCE public.dependency_proxy_group_settings_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10909,6 +10964,7 @@ CREATE TABLE public.deploy_keys_projects (
 );
 
 CREATE SEQUENCE public.deploy_keys_projects_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10935,6 +10991,7 @@ CREATE TABLE public.deploy_tokens (
 );
 
 CREATE SEQUENCE public.deploy_tokens_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -10969,12 +11026,13 @@ CREATE TABLE public.deployments (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     on_stop character varying,
-    status smallint NOT NULL,
     finished_at timestamp with time zone,
+    status smallint NOT NULL,
     cluster_id integer
 );
 
 CREATE SEQUENCE public.deployments_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11020,11 +11078,11 @@ CREATE SEQUENCE public.design_management_designs_id_seq
 ALTER SEQUENCE public.design_management_designs_id_seq OWNED BY public.design_management_designs.id;
 
 CREATE TABLE public.design_management_designs_versions (
-    id bigint NOT NULL,
     design_id bigint NOT NULL,
     version_id bigint NOT NULL,
     event smallint DEFAULT 0 NOT NULL,
-    image_v432x230 character varying(255)
+    image_v432x230 character varying(255),
+    id bigint NOT NULL
 );
 
 CREATE SEQUENCE public.design_management_designs_versions_id_seq
@@ -11163,11 +11221,12 @@ CREATE TABLE public.emails (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     confirmation_token character varying,
-    confirmed_at timestamp without time zone,
-    confirmation_sent_at timestamp without time zone
+    confirmed_at timestamp with time zone,
+    confirmation_sent_at timestamp with time zone
 );
 
 CREATE SEQUENCE public.emails_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11190,6 +11249,7 @@ CREATE TABLE public.environments (
 );
 
 CREATE SEQUENCE public.environments_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11206,6 +11266,7 @@ CREATE TABLE public.epic_issues (
 );
 
 CREATE SEQUENCE public.epic_issues_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11222,6 +11283,7 @@ CREATE TABLE public.epic_metrics (
 );
 
 CREATE SEQUENCE public.epic_metrics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11277,14 +11339,16 @@ CREATE TABLE public.epics (
     closed_at timestamp without time zone,
     parent_id integer,
     relative_position integer,
-    state_id smallint DEFAULT 1 NOT NULL,
     start_date_sourcing_epic_id integer,
     due_date_sourcing_epic_id integer,
+    state_id smallint DEFAULT 1,
+    external_key character varying(255),
     confidential boolean DEFAULT false NOT NULL,
-    external_key character varying(255)
+    CONSTRAINT check_57ee003890 CHECK ((state_id IS NOT NULL))
 );
 
 CREATE SEQUENCE public.epics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11306,6 +11370,7 @@ CREATE TABLE public.events (
 );
 
 CREATE SEQUENCE public.events_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11366,6 +11431,7 @@ CREATE TABLE public.feature_gates (
 );
 
 CREATE SEQUENCE public.feature_gates_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11382,6 +11448,7 @@ CREATE TABLE public.features (
 );
 
 CREATE SEQUENCE public.features_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11398,6 +11465,7 @@ CREATE TABLE public.fork_network_members (
 );
 
 CREATE SEQUENCE public.fork_network_members_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11413,6 +11481,7 @@ CREATE TABLE public.fork_networks (
 );
 
 CREATE SEQUENCE public.fork_networks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11573,6 +11642,7 @@ CREATE TABLE public.geo_node_namespace_links (
 );
 
 CREATE SEQUENCE public.geo_node_namespace_links_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11640,6 +11710,7 @@ CREATE TABLE public.geo_node_statuses (
 );
 
 CREATE SEQUENCE public.geo_node_statuses_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11667,12 +11738,13 @@ CREATE TABLE public.geo_nodes (
     internal_url character varying,
     name character varying NOT NULL,
     container_repositories_max_capacity integer DEFAULT 10 NOT NULL,
+    sync_object_storage boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone,
-    updated_at timestamp with time zone,
-    sync_object_storage boolean DEFAULT false NOT NULL
+    updated_at timestamp with time zone
 );
 
 CREATE SEQUENCE public.geo_nodes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11865,6 +11937,7 @@ CREATE TABLE public.gpg_key_subkeys (
 );
 
 CREATE SEQUENCE public.gpg_key_subkeys_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11884,6 +11957,7 @@ CREATE TABLE public.gpg_keys (
 );
 
 CREATE SEQUENCE public.gpg_keys_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11907,6 +11981,7 @@ CREATE TABLE public.gpg_signatures (
 );
 
 CREATE SEQUENCE public.gpg_signatures_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -11945,6 +12020,7 @@ CREATE TABLE public.group_custom_attributes (
 );
 
 CREATE SEQUENCE public.group_custom_attributes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12073,6 +12149,7 @@ CREATE TABLE public.historical_data (
 );
 
 CREATE SEQUENCE public.historical_data_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12088,11 +12165,12 @@ CREATE TABLE public.identities (
     user_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    secondary_extern_uid character varying,
-    saml_provider_id integer
+    saml_provider_id integer,
+    secondary_extern_uid character varying
 );
 
 CREATE SEQUENCE public.identities_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12111,6 +12189,7 @@ CREATE TABLE public.import_export_uploads (
 );
 
 CREATE SEQUENCE public.import_export_uploads_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12155,6 +12234,7 @@ CREATE TABLE public.index_statuses (
 );
 
 CREATE SEQUENCE public.index_statuses_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12170,6 +12250,7 @@ CREATE TABLE public.insights (
 );
 
 CREATE SEQUENCE public.insights_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12225,6 +12306,7 @@ CREATE TABLE public.issue_links (
 );
 
 CREATE SEQUENCE public.issue_links_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12244,6 +12326,7 @@ CREATE TABLE public.issue_metrics (
 );
 
 CREATE SEQUENCE public.issue_metrics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12303,7 +12386,6 @@ CREATE TABLE public.issues (
     milestone_id integer,
     iid integer,
     updated_by_id integer,
-    weight integer,
     confidential boolean DEFAULT false NOT NULL,
     due_date date,
     moved_to_id integer,
@@ -12312,7 +12394,6 @@ CREATE TABLE public.issues (
     description_html text,
     time_estimate integer,
     relative_position integer,
-    service_desk_reply_to character varying,
     cached_markdown_version integer,
     last_edited_at timestamp without time zone,
     last_edited_by_id integer,
@@ -12320,14 +12401,17 @@ CREATE TABLE public.issues (
     closed_at timestamp with time zone,
     closed_by_id integer,
     state_id smallint DEFAULT 1 NOT NULL,
+    service_desk_reply_to character varying,
+    weight integer,
     duplicated_to_id integer,
     promoted_to_epic_id integer,
     health_status smallint,
-    external_key character varying(255),
-    sprint_id bigint
+    sprint_id bigint,
+    external_key character varying(255)
 );
 
 CREATE SEQUENCE public.issues_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12369,9 +12453,9 @@ ALTER SEQUENCE public.jira_connect_installations_id_seq OWNED BY public.jira_con
 
 CREATE TABLE public.jira_connect_subscriptions (
     id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
     jira_connect_installation_id bigint NOT NULL,
     namespace_id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL
 );
 
@@ -12458,6 +12542,7 @@ CREATE TABLE public.keys (
 );
 
 CREATE SEQUENCE public.keys_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12476,6 +12561,7 @@ CREATE TABLE public.label_links (
 );
 
 CREATE SEQUENCE public.label_links_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12494,6 +12580,7 @@ CREATE TABLE public.label_priorities (
 );
 
 CREATE SEQUENCE public.label_priorities_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12518,6 +12605,7 @@ CREATE TABLE public.labels (
 );
 
 CREATE SEQUENCE public.labels_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12538,6 +12626,7 @@ CREATE TABLE public.ldap_group_links (
 );
 
 CREATE SEQUENCE public.ldap_group_links_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12555,6 +12644,7 @@ CREATE TABLE public.lfs_file_locks (
 );
 
 CREATE SEQUENCE public.lfs_file_locks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12575,6 +12665,7 @@ CREATE TABLE public.lfs_objects (
 );
 
 CREATE SEQUENCE public.lfs_objects_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12593,6 +12684,7 @@ CREATE TABLE public.lfs_objects_projects (
 );
 
 CREATE SEQUENCE public.lfs_objects_projects_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12609,6 +12701,7 @@ CREATE TABLE public.licenses (
 );
 
 CREATE SEQUENCE public.licenses_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12643,14 +12736,15 @@ CREATE TABLE public.lists (
     "position" integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    user_id integer,
     milestone_id integer,
+    user_id integer,
     max_issue_count integer DEFAULT 0 NOT NULL,
     max_issue_weight integer DEFAULT 0 NOT NULL,
     limit_metric character varying(20)
 );
 
 CREATE SEQUENCE public.lists_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12680,6 +12774,7 @@ CREATE TABLE public.members (
 );
 
 CREATE SEQUENCE public.members_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12689,13 +12784,14 @@ CREATE SEQUENCE public.members_id_seq
 ALTER SEQUENCE public.members_id_seq OWNED BY public.members.id;
 
 CREATE TABLE public.merge_request_assignees (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     user_id integer NOT NULL,
     merge_request_id integer NOT NULL,
     created_at timestamp with time zone
 );
 
 CREATE SEQUENCE public.merge_request_assignees_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12722,33 +12818,33 @@ CREATE SEQUENCE public.merge_request_blocks_id_seq
 ALTER SEQUENCE public.merge_request_blocks_id_seq OWNED BY public.merge_request_blocks.id;
 
 CREATE TABLE public.merge_request_context_commit_diff_files (
+    merge_request_context_commit_id bigint,
     sha bytea NOT NULL,
     relative_order integer NOT NULL,
+    a_mode character varying(255) NOT NULL,
+    b_mode character varying(255) NOT NULL,
     new_file boolean NOT NULL,
     renamed_file boolean NOT NULL,
     deleted_file boolean NOT NULL,
     too_large boolean NOT NULL,
-    a_mode character varying(255) NOT NULL,
-    b_mode character varying(255) NOT NULL,
+    "binary" boolean,
     new_path text NOT NULL,
     old_path text NOT NULL,
-    diff text,
-    "binary" boolean,
-    merge_request_context_commit_id bigint
+    diff text
 );
 
 CREATE TABLE public.merge_request_context_commits (
     id bigint NOT NULL,
+    merge_request_id bigint,
     authored_date timestamp with time zone,
     committed_date timestamp with time zone,
-    relative_order integer NOT NULL,
     sha bytea NOT NULL,
+    relative_order integer NOT NULL,
     author_name text,
     author_email text,
     committer_name text,
     committer_email text,
-    message text,
-    merge_request_id bigint
+    message text
 );
 
 CREATE SEQUENCE public.merge_request_context_commits_id_seq
@@ -12761,8 +12857,8 @@ CREATE SEQUENCE public.merge_request_context_commits_id_seq
 ALTER SEQUENCE public.merge_request_context_commits_id_seq OWNED BY public.merge_request_context_commits.id;
 
 CREATE TABLE public.merge_request_diff_commits (
-    authored_date timestamp without time zone,
-    committed_date timestamp without time zone,
+    authored_date timestamp with time zone,
+    committed_date timestamp with time zone,
     merge_request_diff_id integer NOT NULL,
     relative_order integer NOT NULL,
     sha bytea NOT NULL,
@@ -12807,6 +12903,7 @@ CREATE TABLE public.merge_request_diffs (
 );
 
 CREATE SEQUENCE public.merge_request_diffs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12841,6 +12938,7 @@ CREATE TABLE public.merge_request_metrics (
 );
 
 CREATE SEQUENCE public.merge_request_metrics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12888,14 +12986,12 @@ CREATE TABLE public.merge_requests (
     merge_when_pipeline_succeeds boolean DEFAULT false NOT NULL,
     merge_user_id integer,
     merge_commit_sha character varying,
-    approvals_before_merge integer,
     rebase_commit_sha character varying,
     in_progress_merge_commit_sha character varying,
     lock_version integer DEFAULT 0,
     title_html text,
     description_html text,
     time_estimate integer,
-    squash boolean DEFAULT false NOT NULL,
     cached_markdown_version integer,
     last_edited_at timestamp without time zone,
     last_edited_by_id integer,
@@ -12904,7 +13000,9 @@ CREATE TABLE public.merge_requests (
     discussion_locked boolean,
     latest_merge_request_diff_id integer,
     allow_maintainer_to_push boolean,
+    squash boolean DEFAULT false NOT NULL,
     state_id smallint DEFAULT 1 NOT NULL,
+    approvals_before_merge integer,
     rebase_jid character varying,
     squash_commit_sha bytea,
     sprint_id bigint
@@ -12919,6 +13017,7 @@ CREATE TABLE public.merge_requests_closing_issues (
 );
 
 CREATE SEQUENCE public.merge_requests_closing_issues_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -12928,6 +13027,7 @@ CREATE SEQUENCE public.merge_requests_closing_issues_id_seq
 ALTER SEQUENCE public.merge_requests_closing_issues_id_seq OWNED BY public.merge_requests_closing_issues.id;
 
 CREATE SEQUENCE public.merge_requests_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13021,6 +13121,7 @@ CREATE TABLE public.milestones (
 );
 
 CREATE SEQUENCE public.milestones_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13032,6 +13133,16 @@ ALTER SEQUENCE public.milestones_id_seq OWNED BY public.milestones.id;
 CREATE TABLE public.namespace_aggregation_schedules (
     namespace_id integer NOT NULL
 );
+
+CREATE SEQUENCE public.namespace_aggregation_schedules_namespace_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.namespace_aggregation_schedules_namespace_id_seq OWNED BY public.namespace_aggregation_schedules.namespace_id;
 
 CREATE TABLE public.namespace_limits (
     additional_purchased_storage_size bigint DEFAULT 0 NOT NULL,
@@ -13052,6 +13163,16 @@ CREATE TABLE public.namespace_root_storage_statistics (
     snippets_size bigint DEFAULT 0 NOT NULL
 );
 
+CREATE SEQUENCE public.namespace_root_storage_statistics_namespace_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.namespace_root_storage_statistics_namespace_id_seq OWNED BY public.namespace_root_storage_statistics.namespace_id;
+
 CREATE TABLE public.namespace_statistics (
     id integer NOT NULL,
     namespace_id integer NOT NULL,
@@ -13060,6 +13181,7 @@ CREATE TABLE public.namespace_statistics (
 );
 
 CREATE SEQUENCE public.namespace_statistics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13078,31 +13200,31 @@ CREATE TABLE public.namespaces (
     type character varying,
     description character varying DEFAULT ''::character varying NOT NULL,
     avatar character varying,
-    membership_lock boolean DEFAULT false,
     share_with_group_lock boolean DEFAULT false,
     visibility_level integer DEFAULT 20 NOT NULL,
     request_access_enabled boolean DEFAULT true NOT NULL,
-    ldap_sync_status character varying DEFAULT 'ready'::character varying NOT NULL,
-    ldap_sync_error character varying,
-    ldap_sync_last_update_at timestamp without time zone,
-    ldap_sync_last_successful_update_at timestamp without time zone,
-    ldap_sync_last_sync_at timestamp without time zone,
     description_html text,
     lfs_enabled boolean,
     parent_id integer,
-    shared_runners_minutes_limit integer,
-    repository_size_limit bigint,
     require_two_factor_authentication boolean DEFAULT false NOT NULL,
     two_factor_grace_period integer DEFAULT 48 NOT NULL,
     cached_markdown_version integer,
-    project_creation_level integer,
     runners_token character varying,
-    file_template_project_id integer,
-    saml_discovery_token character varying,
+    project_creation_level integer,
     runners_token_encrypted character varying,
-    custom_project_templates_group_id integer,
     auto_devops_enabled boolean,
+    custom_project_templates_group_id integer,
+    file_template_project_id integer,
+    ldap_sync_error character varying,
+    ldap_sync_last_successful_update_at timestamp without time zone,
+    ldap_sync_last_sync_at timestamp without time zone,
+    ldap_sync_last_update_at timestamp without time zone,
+    repository_size_limit bigint,
+    saml_discovery_token character varying,
+    shared_runners_minutes_limit integer,
     extra_shared_runners_minutes_limit integer,
+    ldap_sync_status character varying DEFAULT 'ready'::character varying NOT NULL,
+    membership_lock boolean DEFAULT false,
     last_ci_minutes_notification_at timestamp with time zone,
     last_ci_minutes_usage_notification_level integer,
     subgroup_creation_level integer DEFAULT 1,
@@ -13119,6 +13241,7 @@ CREATE TABLE public.namespaces (
 );
 
 CREATE SEQUENCE public.namespaces_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13141,6 +13264,7 @@ CREATE TABLE public.note_diff_files (
 );
 
 CREATE SEQUENCE public.note_diff_files_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13179,6 +13303,7 @@ CREATE TABLE public.notes (
 );
 
 CREATE SEQUENCE public.notes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13190,8 +13315,8 @@ ALTER SEQUENCE public.notes_id_seq OWNED BY public.notes.id;
 CREATE TABLE public.notification_settings (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    source_id integer,
     source_type character varying,
+    source_id integer,
     level integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -13209,13 +13334,14 @@ CREATE TABLE public.notification_settings (
     success_pipeline boolean,
     push_to_merge_request boolean,
     issue_due boolean,
-    new_epic boolean,
     notification_email character varying,
-    fixed_pipeline boolean,
-    new_release boolean
+    new_epic boolean,
+    new_release boolean,
+    fixed_pipeline boolean
 );
 
 CREATE SEQUENCE public.notification_settings_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13237,6 +13363,7 @@ CREATE TABLE public.oauth_access_grants (
 );
 
 CREATE SEQUENCE public.oauth_access_grants_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13258,6 +13385,7 @@ CREATE TABLE public.oauth_access_tokens (
 );
 
 CREATE SEQUENCE public.oauth_access_tokens_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13282,6 +13410,7 @@ CREATE TABLE public.oauth_applications (
 );
 
 CREATE SEQUENCE public.oauth_applications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13297,6 +13426,7 @@ CREATE TABLE public.oauth_openid_requests (
 );
 
 CREATE SEQUENCE public.oauth_openid_requests_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13601,11 +13731,11 @@ CREATE TABLE public.packages_package_files (
     file_sha1 bytea,
     file_name character varying NOT NULL,
     file text NOT NULL,
-    file_sha256 bytea,
     verification_retry_at timestamp with time zone,
     verified_at timestamp with time zone,
     verification_failure character varying(255),
     verification_retry_count integer,
+    file_sha256 bytea,
     verification_checksum bytea
 );
 
@@ -13699,11 +13829,13 @@ CREATE TABLE public.pages_domains (
     certificate_source smallint DEFAULT 0 NOT NULL,
     wildcard boolean DEFAULT false NOT NULL,
     usage smallint DEFAULT 0 NOT NULL,
-    scope smallint DEFAULT 2 NOT NULL,
-    auto_ssl_failed boolean DEFAULT false NOT NULL
+    scope smallint DEFAULT 2,
+    auto_ssl_failed boolean DEFAULT false NOT NULL,
+    CONSTRAINT check_ab7cf26a46 CHECK ((scope IS NOT NULL))
 );
 
 CREATE SEQUENCE public.pages_domains_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13744,6 +13876,7 @@ CREATE TABLE public.path_locks (
 );
 
 CREATE SEQUENCE public.path_locks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13769,6 +13902,7 @@ CREATE TABLE public.personal_access_tokens (
 );
 
 CREATE SEQUENCE public.personal_access_tokens_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13778,18 +13912,17 @@ CREATE SEQUENCE public.personal_access_tokens_id_seq
 ALTER SEQUENCE public.personal_access_tokens_id_seq OWNED BY public.personal_access_tokens.id;
 
 CREATE TABLE public.plan_limits (
-    id bigint NOT NULL,
     plan_id bigint NOT NULL,
     ci_active_pipelines integer DEFAULT 0 NOT NULL,
     ci_pipeline_size integer DEFAULT 0 NOT NULL,
     ci_active_jobs integer DEFAULT 0 NOT NULL,
+    id bigint NOT NULL,
     project_hooks integer DEFAULT 100 NOT NULL,
     group_hooks integer DEFAULT 50 NOT NULL,
     ci_project_subscriptions integer DEFAULT 2 NOT NULL,
     ci_pipeline_schedules integer DEFAULT 10 NOT NULL,
     offset_pagination_limit integer DEFAULT 50000 NOT NULL,
     ci_instance_level_variables integer DEFAULT 25 NOT NULL,
-    storage_size_limit integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_lsif integer DEFAULT 20 NOT NULL,
     ci_max_artifact_size_archive integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_metadata integer DEFAULT 0 NOT NULL,
@@ -13814,6 +13947,7 @@ CREATE TABLE public.plan_limits (
     ci_max_artifact_size_secret_detection integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_requirements integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_coverage_fuzzing integer DEFAULT 0 NOT NULL,
+    storage_size_limit integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_browser_performance integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_load_performance integer DEFAULT 0 NOT NULL
 );
@@ -13836,6 +13970,7 @@ CREATE TABLE public.plans (
 );
 
 CREATE SEQUENCE public.plans_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13869,6 +14004,7 @@ CREATE TABLE public.programming_languages (
 );
 
 CREATE SEQUENCE public.programming_languages_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13921,6 +14057,7 @@ CREATE TABLE public.project_auto_devops (
 );
 
 CREATE SEQUENCE public.project_auto_devops_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13939,6 +14076,7 @@ CREATE TABLE public.project_ci_cd_settings (
 );
 
 CREATE SEQUENCE public.project_ci_cd_settings_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -13971,6 +14109,7 @@ CREATE TABLE public.project_custom_attributes (
 );
 
 CREATE SEQUENCE public.project_custom_attributes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14003,6 +14142,7 @@ CREATE TABLE public.project_deploy_tokens (
 );
 
 CREATE SEQUENCE public.project_deploy_tokens_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14062,6 +14202,7 @@ CREATE TABLE public.project_features (
 );
 
 CREATE SEQUENCE public.project_features_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14081,6 +14222,7 @@ CREATE TABLE public.project_group_links (
 );
 
 CREATE SEQUENCE public.project_group_links_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14099,6 +14241,7 @@ CREATE TABLE public.project_import_data (
 );
 
 CREATE SEQUENCE public.project_import_data_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14114,15 +14257,6 @@ CREATE TABLE public.project_incident_management_settings (
     issue_template_key text
 );
 
-CREATE SEQUENCE public.project_incident_management_settings_project_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-ALTER SEQUENCE public.project_incident_management_settings_project_id_seq OWNED BY public.project_incident_management_settings.project_id;
-
 CREATE TABLE public.project_metrics_settings (
     project_id integer NOT NULL,
     external_dashboard_url character varying,
@@ -14132,19 +14266,20 @@ CREATE TABLE public.project_metrics_settings (
 CREATE TABLE public.project_mirror_data (
     id integer NOT NULL,
     project_id integer NOT NULL,
-    retry_count integer DEFAULT 0 NOT NULL,
-    last_update_started_at timestamp without time zone,
-    last_update_scheduled_at timestamp without time zone,
-    next_execution_timestamp timestamp without time zone,
     status character varying,
     jid character varying,
     last_error text,
-    last_update_at timestamp with time zone,
     last_successful_update_at timestamp with time zone,
+    last_update_at timestamp with time zone,
+    last_update_scheduled_at timestamp without time zone,
+    last_update_started_at timestamp without time zone,
+    next_execution_timestamp timestamp without time zone,
+    retry_count integer DEFAULT 0 NOT NULL,
     correlation_id_value character varying(128)
 );
 
 CREATE SEQUENCE public.project_mirror_data_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14190,6 +14325,7 @@ CREATE TABLE public.project_repository_states (
 );
 
 CREATE SEQUENCE public.project_repository_states_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14239,15 +14375,14 @@ CREATE SEQUENCE public.project_security_settings_project_id_seq
 ALTER SEQUENCE public.project_security_settings_project_id_seq OWNED BY public.project_security_settings.project_id;
 
 CREATE TABLE public.project_settings (
-    project_id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    push_rule_id bigint,
-    show_default_award_emojis boolean DEFAULT true,
+    project_id integer NOT NULL,
+    show_default_award_emojis boolean DEFAULT true NOT NULL,
     allow_merge_on_skipped_pipeline boolean,
+    push_rule_id bigint,
     squash_option smallint DEFAULT 3,
-    has_confluence boolean DEFAULT false NOT NULL,
-    CONSTRAINT check_bde223416c CHECK ((show_default_award_emojis IS NOT NULL))
+    has_confluence boolean DEFAULT false NOT NULL
 );
 
 CREATE TABLE public.project_statistics (
@@ -14267,6 +14402,7 @@ CREATE TABLE public.project_statistics (
 );
 
 CREATE SEQUENCE public.project_statistics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14306,25 +14442,16 @@ CREATE TABLE public.projects (
     visibility_level integer DEFAULT 0 NOT NULL,
     archived boolean DEFAULT false NOT NULL,
     avatar character varying,
-    merge_requests_template text,
     star_count integer DEFAULT 0 NOT NULL,
     merge_requests_rebase_enabled boolean DEFAULT false,
     import_type character varying,
     import_source character varying,
-    approvals_before_merge integer DEFAULT 0 NOT NULL,
-    reset_approvals_on_push boolean DEFAULT true,
-    merge_requests_ff_only_enabled boolean DEFAULT false,
-    issues_template text,
-    mirror boolean DEFAULT false NOT NULL,
-    mirror_last_update_at timestamp without time zone,
-    mirror_last_successful_update_at timestamp without time zone,
-    mirror_user_id integer,
+    merge_requests_ff_only_enabled boolean DEFAULT false NOT NULL,
     shared_runners_enabled boolean DEFAULT true NOT NULL,
     runners_token character varying,
     build_coverage_regex character varying,
     build_allow_git_fetch boolean DEFAULT true NOT NULL,
     build_timeout integer DEFAULT 3600 NOT NULL,
-    mirror_trigger_builds boolean DEFAULT false NOT NULL,
     pending_delete boolean DEFAULT false,
     public_builds boolean DEFAULT true NOT NULL,
     last_repository_check_failed boolean,
@@ -14340,44 +14467,54 @@ CREATE TABLE public.projects (
     lfs_enabled boolean,
     description_html text,
     only_allow_merge_if_all_discussions_are_resolved boolean,
-    repository_size_limit bigint,
     printing_merge_request_link_enabled boolean DEFAULT true NOT NULL,
     auto_cancel_pending_pipelines integer DEFAULT 1 NOT NULL,
-    service_desk_enabled boolean DEFAULT true,
     cached_markdown_version integer,
     delete_error text,
     last_repository_updated_at timestamp without time zone,
-    disable_overriding_approvers_per_merge_request boolean,
     storage_version smallint,
     resolve_outdated_diff_discussions boolean,
-    remote_mirror_available_overridden boolean,
-    only_mirror_protected_branches boolean,
-    pull_mirror_available_overridden boolean,
-    jobs_cache_index integer,
     external_authorization_classification_label character varying,
-    mirror_overwrites_diverged_branches boolean,
+    jobs_cache_index integer,
     pages_https_only boolean DEFAULT true,
-    external_webhook_token character varying,
-    packages_enabled boolean,
-    merge_requests_author_approval boolean,
+    remote_mirror_available_overridden boolean,
     pool_repository_id bigint,
     runners_token_encrypted character varying,
     bfg_object_map character varying,
     detected_repository_languages boolean,
+    disable_overriding_approvers_per_merge_request boolean,
+    external_webhook_token character varying,
+    issues_template text,
+    merge_requests_author_approval boolean,
     merge_requests_disable_committers_approval boolean,
+    merge_requests_template text,
+    mirror_last_successful_update_at timestamp without time zone,
+    mirror_last_update_at timestamp without time zone,
+    mirror_overwrites_diverged_branches boolean,
+    mirror_user_id integer,
+    only_mirror_protected_branches boolean,
+    packages_enabled boolean,
+    pull_mirror_available_overridden boolean,
+    repository_size_limit bigint,
     require_password_to_approve boolean,
+    mirror boolean DEFAULT false NOT NULL,
+    mirror_trigger_builds boolean DEFAULT false NOT NULL,
+    reset_approvals_on_push boolean DEFAULT true,
+    service_desk_enabled boolean DEFAULT true,
+    approvals_before_merge integer DEFAULT 0 NOT NULL,
     emails_disabled boolean,
     max_pages_size integer,
     max_artifacts_size integer,
     pull_mirror_branch_prefix character varying(50),
-    remove_source_branch_after_merge boolean,
     marked_for_deletion_at date,
     marked_for_deletion_by_user_id integer,
-    autoclose_referenced_issues boolean,
-    suggestion_commit_message character varying(255)
+    remove_source_branch_after_merge boolean,
+    suggestion_commit_message character varying(255),
+    autoclose_referenced_issues boolean
 );
 
 CREATE SEQUENCE public.projects_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14417,6 +14554,7 @@ CREATE TABLE public.prometheus_alerts (
 );
 
 CREATE SEQUENCE public.prometheus_alerts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14441,6 +14579,7 @@ CREATE TABLE public.prometheus_metrics (
 );
 
 CREATE SEQUENCE public.prometheus_metrics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14455,11 +14594,12 @@ CREATE TABLE public.protected_branch_merge_access_levels (
     access_level integer DEFAULT 40,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    user_id integer,
-    group_id integer
+    group_id integer,
+    user_id integer
 );
 
 CREATE SEQUENCE public.protected_branch_merge_access_levels_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14474,11 +14614,12 @@ CREATE TABLE public.protected_branch_push_access_levels (
     access_level integer DEFAULT 40,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    user_id integer,
-    group_id integer
+    group_id integer,
+    user_id integer
 );
 
 CREATE SEQUENCE public.protected_branch_push_access_levels_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14496,6 +14637,7 @@ CREATE TABLE public.protected_branch_unprotect_access_levels (
 );
 
 CREATE SEQUENCE public.protected_branch_unprotect_access_levels_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14514,6 +14656,7 @@ CREATE TABLE public.protected_branches (
 );
 
 CREATE SEQUENCE public.protected_branches_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14533,6 +14676,7 @@ CREATE TABLE public.protected_environment_deploy_access_levels (
 );
 
 CREATE SEQUENCE public.protected_environment_deploy_access_levels_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14550,6 +14694,7 @@ CREATE TABLE public.protected_environments (
 );
 
 CREATE SEQUENCE public.protected_environments_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14569,6 +14714,7 @@ CREATE TABLE public.protected_tag_create_access_levels (
 );
 
 CREATE SEQUENCE public.protected_tag_create_access_levels_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14586,6 +14732,7 @@ CREATE TABLE public.protected_tags (
 );
 
 CREATE SEQUENCE public.protected_tags_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14629,6 +14776,7 @@ CREATE TABLE public.push_rules (
 );
 
 CREATE SEQUENCE public.push_rules_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14647,6 +14795,7 @@ CREATE TABLE public.redirect_routes (
 );
 
 CREATE SEQUENCE public.redirect_routes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14691,6 +14840,7 @@ CREATE TABLE public.releases (
 );
 
 CREATE SEQUENCE public.releases_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14707,20 +14857,21 @@ CREATE TABLE public.remote_mirrors (
     update_status character varying,
     last_update_at timestamp without time zone,
     last_successful_update_at timestamp without time zone,
+    last_update_started_at timestamp without time zone,
     last_error character varying,
+    only_protected_branches boolean DEFAULT false NOT NULL,
+    remote_name character varying,
     encrypted_credentials text,
     encrypted_credentials_iv character varying,
     encrypted_credentials_salt character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    last_update_started_at timestamp without time zone,
-    only_protected_branches boolean DEFAULT false NOT NULL,
-    remote_name character varying,
     error_notification_sent boolean,
     keep_divergent_refs boolean
 );
 
 CREATE SEQUENCE public.remote_mirrors_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14781,13 +14932,13 @@ CREATE TABLE public.resource_label_events (
     action integer NOT NULL,
     issue_id integer,
     merge_request_id integer,
-    epic_id integer,
     label_id integer,
     user_id integer,
     created_at timestamp with time zone NOT NULL,
     cached_markdown_version integer,
     reference text,
-    reference_html text
+    reference_html text,
+    epic_id integer
 );
 
 CREATE SEQUENCE public.resource_label_events_id_seq
@@ -14884,6 +15035,7 @@ CREATE TABLE public.routes (
 );
 
 CREATE SEQUENCE public.routes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14904,6 +15056,7 @@ CREATE TABLE public.saml_providers (
 );
 
 CREATE SEQUENCE public.saml_providers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14944,6 +15097,7 @@ CREATE TABLE public.scim_oauth_access_tokens (
 );
 
 CREATE SEQUENCE public.scim_oauth_access_tokens_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -14994,8 +15148,8 @@ ALTER SEQUENCE public.self_managed_prometheus_alert_events_id_seq OWNED BY publi
 CREATE TABLE public.sent_notifications (
     id integer NOT NULL,
     project_id integer,
-    noteable_id integer,
     noteable_type character varying,
+    noteable_id integer,
     recipient_id integer,
     commit_id character varying,
     reply_key character varying NOT NULL,
@@ -15006,6 +15160,7 @@ CREATE TABLE public.sent_notifications (
 );
 
 CREATE SEQUENCE public.sent_notifications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15030,12 +15185,12 @@ CREATE SEQUENCE public.sentry_issues_id_seq
 ALTER SEQUENCE public.sentry_issues_id_seq OWNED BY public.sentry_issues.id;
 
 CREATE TABLE public.serverless_domain_cluster (
-    uuid character varying(14) NOT NULL,
     pages_domain_id bigint NOT NULL,
     clusters_applications_knative_id bigint NOT NULL,
     creator_id bigint,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
+    uuid character varying(14) NOT NULL,
     encrypted_key text,
     encrypted_key_iv character varying(255),
     certificate text
@@ -15057,6 +15212,7 @@ CREATE TABLE public.services (
     updated_at timestamp without time zone,
     active boolean DEFAULT false NOT NULL,
     properties text,
+    template boolean DEFAULT false,
     push_events boolean DEFAULT true,
     issues_events boolean DEFAULT true,
     merge_requests_events boolean DEFAULT true,
@@ -15073,7 +15229,6 @@ CREATE TABLE public.services (
     deployment_events boolean DEFAULT false NOT NULL,
     description character varying(500),
     comment_on_event_enabled boolean DEFAULT true NOT NULL,
-    template boolean DEFAULT false,
     instance boolean DEFAULT false NOT NULL,
     comment_detail smallint,
     inherit_from_id bigint,
@@ -15081,6 +15236,7 @@ CREATE TABLE public.services (
 );
 
 CREATE SEQUENCE public.services_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15095,6 +15251,7 @@ CREATE TABLE public.shards (
 );
 
 CREATE SEQUENCE public.shards_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15115,6 +15272,7 @@ CREATE TABLE public.slack_integrations (
 );
 
 CREATE SEQUENCE public.slack_integrations_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15140,8 +15298,8 @@ CREATE SEQUENCE public.smartcard_identities_id_seq
 ALTER SEQUENCE public.smartcard_identities_id_seq OWNED BY public.smartcard_identities.id;
 
 CREATE TABLE public.snippet_repositories (
-    snippet_id bigint NOT NULL,
     shard_id bigint NOT NULL,
+    snippet_id bigint NOT NULL,
     disk_path character varying(80) NOT NULL
 );
 
@@ -15192,6 +15350,7 @@ CREATE TABLE public.snippets (
 );
 
 CREATE SEQUENCE public.snippets_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15204,12 +15363,14 @@ CREATE TABLE public.software_license_policies (
     id integer NOT NULL,
     project_id integer NOT NULL,
     software_license_id integer NOT NULL,
-    classification integer DEFAULT 0 NOT NULL,
+    classification integer DEFAULT 0,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT check_8e8751b568 CHECK ((classification IS NOT NULL))
 );
 
 CREATE SEQUENCE public.software_license_policies_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15225,6 +15386,7 @@ CREATE TABLE public.software_licenses (
 );
 
 CREATE SEQUENCE public.software_licenses_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15249,6 +15411,7 @@ CREATE TABLE public.spam_logs (
 );
 
 CREATE SEQUENCE public.spam_logs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15327,8 +15490,8 @@ ALTER SEQUENCE public.status_page_settings_project_id_seq OWNED BY public.status
 CREATE TABLE public.subscriptions (
     id integer NOT NULL,
     user_id integer,
-    subscribable_id integer,
     subscribable_type character varying,
+    subscribable_id integer,
     subscribed boolean,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
@@ -15336,6 +15499,7 @@ CREATE TABLE public.subscriptions (
 );
 
 CREATE SEQUENCE public.subscriptions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15377,6 +15541,7 @@ CREATE TABLE public.system_note_metadata (
 );
 
 CREATE SEQUENCE public.system_note_metadata_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15397,6 +15562,7 @@ CREATE TABLE public.taggings (
 );
 
 CREATE SEQUENCE public.taggings_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15412,6 +15578,7 @@ CREATE TABLE public.tags (
 );
 
 CREATE SEQUENCE public.tags_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15430,6 +15597,7 @@ CREATE TABLE public.term_agreements (
 );
 
 CREATE SEQUENCE public.term_agreements_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15469,10 +15637,11 @@ CREATE TABLE public.timelogs (
     updated_at timestamp without time zone NOT NULL,
     issue_id integer,
     merge_request_id integer,
-    spent_at timestamp without time zone
+    spent_at timestamp with time zone
 );
 
 CREATE SEQUENCE public.timelogs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15485,8 +15654,8 @@ CREATE TABLE public.todos (
     id integer NOT NULL,
     user_id integer NOT NULL,
     project_id integer,
-    target_id integer,
     target_type character varying NOT NULL,
+    target_id integer,
     author_id integer NOT NULL,
     action integer NOT NULL,
     state character varying NOT NULL,
@@ -15499,6 +15668,7 @@ CREATE TABLE public.todos (
 );
 
 CREATE SEQUENCE public.todos_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15513,6 +15683,7 @@ CREATE TABLE public.trending_projects (
 );
 
 CREATE SEQUENCE public.trending_projects_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15534,6 +15705,7 @@ CREATE TABLE public.u2f_registrations (
 );
 
 CREATE SEQUENCE public.u2f_registrations_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15547,8 +15719,8 @@ CREATE TABLE public.uploads (
     size bigint NOT NULL,
     path character varying(511) NOT NULL,
     checksum character varying(64),
-    model_id integer,
     model_type character varying,
+    model_id integer,
     uploader character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     store integer DEFAULT 1,
@@ -15558,6 +15730,7 @@ CREATE TABLE public.uploads (
 );
 
 CREATE SEQUENCE public.uploads_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15578,6 +15751,7 @@ CREATE TABLE public.user_agent_details (
 );
 
 CREATE SEQUENCE public.user_agent_details_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15594,6 +15768,7 @@ CREATE TABLE public.user_callouts (
 );
 
 CREATE SEQUENCE public.user_callouts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15621,14 +15796,15 @@ ALTER SEQUENCE public.user_canonical_emails_id_seq OWNED BY public.user_canonica
 
 CREATE TABLE public.user_custom_attributes (
     id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
     user_id integer NOT NULL,
     key character varying NOT NULL,
     value character varying NOT NULL
 );
 
 CREATE SEQUENCE public.user_custom_attributes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15655,8 +15831,8 @@ CREATE SEQUENCE public.user_details_user_id_seq
 ALTER SEQUENCE public.user_details_user_id_seq OWNED BY public.user_details.user_id;
 
 CREATE TABLE public.user_highest_roles (
-    user_id bigint NOT NULL,
     updated_at timestamp with time zone NOT NULL,
+    user_id bigint NOT NULL,
     highest_access_level integer
 );
 
@@ -15672,20 +15848,20 @@ CREATE TABLE public.user_preferences (
     merge_request_notes_filter smallint DEFAULT 0 NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    epics_sort character varying,
-    roadmap_epics_state integer,
-    epic_notes_filter smallint DEFAULT 0 NOT NULL,
+    first_day_of_week integer,
     issues_sort character varying,
     merge_requests_sort character varying,
-    roadmaps_sort character varying,
-    first_day_of_week integer,
     timezone character varying,
     time_display_relative boolean,
     time_format_in_24h boolean,
+    epic_notes_filter smallint DEFAULT 0 NOT NULL,
+    epics_sort character varying,
+    roadmap_epics_state integer,
+    roadmaps_sort character varying,
     projects_sort character varying(64),
     show_whitespace_in_diffs boolean DEFAULT true NOT NULL,
-    sourcegraph_enabled boolean,
     setup_for_company boolean,
+    sourcegraph_enabled boolean,
     render_whitespace_in_code boolean,
     tab_width smallint,
     feature_filter_type bigint,
@@ -15693,6 +15869,7 @@ CREATE TABLE public.user_preferences (
 );
 
 CREATE SEQUENCE public.user_preferences_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15710,6 +15887,7 @@ CREATE TABLE public.user_statuses (
 );
 
 CREATE SEQUENCE public.user_statuses_user_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15728,6 +15906,7 @@ CREATE TABLE public.user_synced_attributes_metadata (
 );
 
 CREATE SEQUENCE public.user_synced_attributes_metadata_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15774,7 +15953,6 @@ CREATE TABLE public.users (
     unconfirmed_email character varying,
     hide_no_ssh_key boolean DEFAULT false,
     website_url character varying DEFAULT ''::character varying NOT NULL,
-    admin_email_unsubscribed_at timestamp without time zone,
     notification_email character varying,
     hide_no_password boolean DEFAULT false,
     password_automatically_set boolean DEFAULT false,
@@ -15790,39 +15968,41 @@ CREATE TABLE public.users (
     consumed_timestep integer,
     layout integer DEFAULT 0,
     hide_project_limit boolean DEFAULT false,
-    note text,
     unlock_token character varying,
     otp_grace_period_started_at timestamp without time zone,
     external boolean DEFAULT false,
     incoming_email_token character varying,
     organization character varying,
-    auditor boolean DEFAULT false NOT NULL,
     require_two_factor_authentication_from_group boolean DEFAULT false NOT NULL,
     two_factor_grace_period integer DEFAULT 48 NOT NULL,
     last_activity_on date,
     notified_of_own_activity boolean,
     preferred_language character varying,
+    theme_id smallint,
+    include_private_contributions boolean,
+    feed_token character varying,
+    accepted_term_id integer,
+    private_profile boolean DEFAULT false NOT NULL,
+    commit_email character varying,
+    auditor boolean DEFAULT false NOT NULL,
+    admin_email_unsubscribed_at timestamp without time zone,
     email_opted_in boolean,
+    email_opted_in_at timestamp without time zone,
     email_opted_in_ip character varying,
     email_opted_in_source_id integer,
-    email_opted_in_at timestamp without time zone,
-    theme_id smallint,
-    accepted_term_id integer,
-    feed_token character varying,
-    private_profile boolean DEFAULT false NOT NULL,
-    roadmap_layout smallint,
-    include_private_contributions boolean,
-    commit_email character varying,
     group_view integer,
     managing_group_id integer,
+    note text,
+    roadmap_layout smallint,
+    static_object_token character varying(255),
     first_name character varying(255),
     last_name character varying(255),
-    static_object_token character varying(255),
     role smallint,
     user_type smallint
 );
 
 CREATE SEQUENCE public.users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15862,6 +16042,7 @@ CREATE TABLE public.users_star_projects (
 );
 
 CREATE SEQUENCE public.users_star_projects_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -15901,26 +16082,26 @@ CREATE TABLE public.vulnerabilities (
     author_id bigint NOT NULL,
     updated_by_id bigint,
     last_edited_by_id bigint,
-    start_date date,
-    due_date date,
+    start_date_sourcing_milestone_id bigint,
+    due_date_sourcing_milestone_id bigint,
     last_edited_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
+    start_date date,
+    due_date date,
+    state smallint DEFAULT 1 NOT NULL,
+    severity smallint NOT NULL,
+    confidence smallint NOT NULL,
+    severity_overridden boolean DEFAULT false,
+    confidence_overridden boolean DEFAULT false,
     title character varying(255) NOT NULL,
     title_html text,
     description text,
     description_html text,
-    start_date_sourcing_milestone_id bigint,
-    due_date_sourcing_milestone_id bigint,
-    state smallint DEFAULT 1 NOT NULL,
-    severity smallint NOT NULL,
-    severity_overridden boolean DEFAULT false,
-    confidence smallint NOT NULL,
-    confidence_overridden boolean DEFAULT false,
-    resolved_by_id bigint,
-    resolved_at timestamp with time zone,
     report_type smallint NOT NULL,
     cached_markdown_version integer,
+    resolved_by_id bigint,
+    resolved_at timestamp with time zone,
     confirmed_by_id bigint,
     confirmed_at timestamp with time zone,
     dismissed_at timestamp with time zone,
@@ -15978,6 +16159,7 @@ CREATE TABLE public.vulnerability_feedback (
 );
 
 CREATE SEQUENCE public.vulnerability_feedback_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -16165,6 +16347,7 @@ CREATE TABLE public.web_hook_logs (
 );
 
 CREATE SEQUENCE public.web_hook_logs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -16184,7 +16367,6 @@ CREATE TABLE public.web_hooks (
     issues_events boolean DEFAULT false NOT NULL,
     merge_requests_events boolean DEFAULT false NOT NULL,
     tag_push_events boolean DEFAULT false,
-    group_id integer,
     note_events boolean DEFAULT false NOT NULL,
     enable_ssl_verification boolean DEFAULT true,
     wiki_page_events boolean DEFAULT false NOT NULL,
@@ -16197,10 +16379,12 @@ CREATE TABLE public.web_hooks (
     encrypted_token character varying,
     encrypted_token_iv character varying,
     encrypted_url character varying,
-    encrypted_url_iv character varying
+    encrypted_url_iv character varying,
+    group_id integer
 );
 
 CREATE SEQUENCE public.web_hooks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -16218,6 +16402,7 @@ CREATE TABLE public.wiki_page_meta (
 );
 
 CREATE SEQUENCE public.wiki_page_meta_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -16236,6 +16421,7 @@ CREATE TABLE public.wiki_page_slugs (
 );
 
 CREATE SEQUENCE public.wiki_page_slugs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -16695,6 +16881,10 @@ ALTER TABLE ONLY public.metrics_users_starred_dashboards ALTER COLUMN id SET DEF
 
 ALTER TABLE ONLY public.milestones ALTER COLUMN id SET DEFAULT nextval('public.milestones_id_seq'::regclass);
 
+ALTER TABLE ONLY public.namespace_aggregation_schedules ALTER COLUMN namespace_id SET DEFAULT nextval('public.namespace_aggregation_schedules_namespace_id_seq'::regclass);
+
+ALTER TABLE ONLY public.namespace_root_storage_statistics ALTER COLUMN namespace_id SET DEFAULT nextval('public.namespace_root_storage_statistics_namespace_id_seq'::regclass);
+
 ALTER TABLE ONLY public.namespace_statistics ALTER COLUMN id SET DEFAULT nextval('public.namespace_statistics_id_seq'::regclass);
 
 ALTER TABLE ONLY public.namespaces ALTER COLUMN id SET DEFAULT nextval('public.namespaces_id_seq'::regclass);
@@ -16790,8 +16980,6 @@ ALTER TABLE ONLY public.project_features ALTER COLUMN id SET DEFAULT nextval('pu
 ALTER TABLE ONLY public.project_group_links ALTER COLUMN id SET DEFAULT nextval('public.project_group_links_id_seq'::regclass);
 
 ALTER TABLE ONLY public.project_import_data ALTER COLUMN id SET DEFAULT nextval('public.project_import_data_id_seq'::regclass);
-
-ALTER TABLE ONLY public.project_incident_management_settings ALTER COLUMN project_id SET DEFAULT nextval('public.project_incident_management_settings_project_id_seq'::regclass);
 
 ALTER TABLE ONLY public.project_mirror_data ALTER COLUMN id SET DEFAULT nextval('public.project_mirror_data_id_seq'::regclass);
 
@@ -18397,7 +18585,7 @@ CREATE INDEX backup_labels_group_id_title_idx ON public.backup_labels USING btre
 
 CREATE INDEX backup_labels_project_id_idx ON public.backup_labels USING btree (project_id);
 
-CREATE UNIQUE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
+CREATE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
 
 CREATE INDEX backup_labels_template_idx ON public.backup_labels USING btree (template) WHERE template;
 
@@ -18455,6 +18643,8 @@ CREATE INDEX idx_merge_requests_on_target_project_id_and_locked_state ON public.
 
 CREATE UNIQUE INDEX idx_metrics_users_starred_dashboard_on_user_project_dashboard ON public.metrics_users_starred_dashboards USING btree (user_id, project_id, dashboard_path);
 
+CREATE INDEX idx_mr_cc_diff_files_on_mr_cc_id ON public.merge_request_context_commit_diff_files USING btree (merge_request_context_commit_id);
+
 CREATE INDEX idx_mr_cc_diff_files_on_mr_cc_id_and_sha ON public.merge_request_context_commit_diff_files USING btree (merge_request_context_commit_id, sha);
 
 CREATE INDEX idx_packages_packages_on_project_id_name_version_package_type ON public.packages_packages USING btree (project_id, name, version, package_type);
@@ -18505,7 +18695,7 @@ CREATE INDEX index_alert_management_alerts_on_environment_id ON public.alert_man
 
 CREATE INDEX index_alert_management_alerts_on_issue_id ON public.alert_management_alerts USING btree (issue_id);
 
-CREATE UNIQUE INDEX index_alert_management_alerts_on_project_id_and_fingerprint ON public.alert_management_alerts USING btree (project_id, fingerprint);
+CREATE UNIQUE INDEX index_alert_management_alerts_on_project_id_and_fingerprint ON public.alert_management_alerts USING btree (project_id, fingerprint) WHERE (status <> '2'::smallint);
 
 CREATE UNIQUE INDEX index_alert_management_alerts_on_project_id_and_iid ON public.alert_management_alerts USING btree (project_id, iid);
 
@@ -18593,7 +18783,7 @@ CREATE UNIQUE INDEX index_approval_rule_name_for_code_owners_rule_type ON public
 
 CREATE UNIQUE INDEX index_approval_rule_name_for_sectional_code_owners_rule_type ON public.approval_merge_request_rules USING btree (merge_request_id, name, section) WHERE (rule_type = 2);
 
-CREATE INDEX index_approval_rules_code_owners_rule_type ON public.approval_merge_request_rules USING btree (merge_request_id) WHERE (rule_type = 2);
+CREATE INDEX index_approval_rules_code_owners_rule_type ON public.approval_merge_request_rules USING btree (merge_request_id, rule_type) WHERE (rule_type = 2);
 
 CREATE INDEX index_approvals_on_merge_request_id ON public.approvals USING btree (merge_request_id);
 
@@ -19057,8 +19247,6 @@ CREATE INDEX index_emails_on_user_id ON public.emails USING btree (user_id);
 
 CREATE INDEX index_enabled_clusters_on_id ON public.clusters USING btree (id) WHERE (enabled = true);
 
-CREATE INDEX index_environments_on_auto_stop_at ON public.environments USING btree (auto_stop_at) WHERE (auto_stop_at IS NOT NULL);
-
 CREATE INDEX index_environments_on_name_varchar_pattern_ops ON public.environments USING btree (name varchar_pattern_ops);
 
 CREATE UNIQUE INDEX index_environments_on_project_id_and_name ON public.environments USING btree (project_id, name);
@@ -19470,6 +19658,8 @@ CREATE UNIQUE INDEX index_merge_request_assignees_on_merge_request_id_and_user_i
 CREATE INDEX index_merge_request_assignees_on_user_id ON public.merge_request_assignees USING btree (user_id);
 
 CREATE INDEX index_merge_request_blocks_on_blocked_merge_request_id ON public.merge_request_blocks USING btree (blocked_merge_request_id);
+
+CREATE INDEX index_merge_request_context_commits_on_merge_request_id ON public.merge_request_context_commits USING btree (merge_request_id);
 
 CREATE UNIQUE INDEX index_merge_request_diff_commits_on_mr_diff_id_and_order ON public.merge_request_diff_commits USING btree (merge_request_diff_id, relative_order);
 
@@ -20223,6 +20413,8 @@ CREATE UNIQUE INDEX index_subscriptions_on_subscribable_and_user_id_and_project_
 
 CREATE INDEX index_successful_deployments_on_cluster_id_and_environment_id ON public.deployments USING btree (cluster_id, environment_id) WHERE (status = 2);
 
+CREATE INDEX index_suggestions_on_note_id ON public.suggestions USING btree (note_id);
+
 CREATE UNIQUE INDEX index_suggestions_on_note_id_and_relative_order ON public.suggestions USING btree (note_id, relative_order);
 
 CREATE UNIQUE INDEX index_system_note_metadata_on_description_version_id ON public.system_note_metadata USING btree (description_version_id) WHERE (description_version_id IS NOT NULL);
@@ -20819,8 +21011,8 @@ ALTER TABLE ONLY public.issues
 ALTER TABLE ONLY public.merge_requests
     ADD CONSTRAINT fk_06067f5644 FOREIGN KEY (latest_merge_request_diff_id) REFERENCES public.merge_request_diffs(id) ON DELETE SET NULL;
 
-ALTER TABLE ONLY public.user_interacted_projects
-    ADD CONSTRAINT fk_0894651f08 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.projects
+    ADD CONSTRAINT fk_0a31cca0b8 FOREIGN KEY (marked_for_deletion_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.web_hooks
     ADD CONSTRAINT fk_0c8ca6d9d1 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -20858,9 +21050,6 @@ ALTER TABLE ONLY public.vulnerabilities
 ALTER TABLE ONLY public.ci_sources_pipelines
     ADD CONSTRAINT fk_1e53c97c0a FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.boards
-    ADD CONSTRAINT fk_1e9a074a35 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY public.epics
     ADD CONSTRAINT fk_1fbed67632 FOREIGN KEY (start_date_sourcing_milestone_id) REFERENCES public.milestones(id) ON DELETE SET NULL;
 
@@ -20884,9 +21073,6 @@ ALTER TABLE ONLY public.project_ci_cd_settings
 
 ALTER TABLE ONLY public.epics
     ADD CONSTRAINT fk_25b99c1be3 FOREIGN KEY (parent_id) REFERENCES public.epics(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.projects
-    ADD CONSTRAINT fk_25d8780d11 FOREIGN KEY (marked_for_deletion_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.ci_pipelines
     ADD CONSTRAINT fk_262d4c2d19 FOREIGN KEY (auto_canceled_by_id) REFERENCES public.ci_pipelines(id) ON DELETE SET NULL;
@@ -20945,9 +21131,6 @@ ALTER TABLE ONLY public.ci_pipeline_schedule_variables
 ALTER TABLE ONLY public.geo_event_log
     ADD CONSTRAINT fk_42c3b54bed FOREIGN KEY (cache_invalidation_event_id) REFERENCES public.geo_cache_invalidation_events(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.remote_mirrors
-    ADD CONSTRAINT fk_43a9aa4ca8 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY public.ci_runner_projects
     ADD CONSTRAINT fk_4478a6f1e4 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -20969,9 +21152,6 @@ ALTER TABLE ONLY public.alert_management_alerts
 ALTER TABLE ONLY public.path_locks
     ADD CONSTRAINT fk_5265c98f24 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.clusters_applications_prometheus
-    ADD CONSTRAINT fk_557e773639 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY public.vulnerability_feedback
     ADD CONSTRAINT fk_563ff1912e FOREIGN KEY (merge_request_id) REFERENCES public.merge_requests(id) ON DELETE SET NULL;
 
@@ -20986,6 +21166,9 @@ ALTER TABLE ONLY public.project_access_tokens
 
 ALTER TABLE ONLY public.merge_requests
     ADD CONSTRAINT fk_6149611a04 FOREIGN KEY (assignee_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY public.dependency_proxy_group_settings
+    ADD CONSTRAINT fk_616ddd680a FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.events
     ADD CONSTRAINT fk_61fbf6ca48 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
@@ -21013,9 +21196,6 @@ ALTER TABLE ONLY public.protected_branch_push_access_levels
 
 ALTER TABLE ONLY public.services
     ADD CONSTRAINT fk_71cce407f9 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.user_interacted_projects
-    ADD CONSTRAINT fk_722ceba4f7 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.vulnerabilities
     ADD CONSTRAINT fk_725465b774 FOREIGN KEY (dismissed_by_id) REFERENCES public.users(id) ON DELETE SET NULL;
@@ -21167,6 +21347,12 @@ ALTER TABLE ONLY public.ci_builds
 ALTER TABLE ONLY public.ci_pipelines
     ADD CONSTRAINT fk_a23be95014 FOREIGN KEY (merge_request_id) REFERENCES public.merge_requests(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.todos
+    ADD CONSTRAINT fk_a27c483435 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.jira_connect_subscriptions
+    ADD CONSTRAINT fk_a3c10bcf7d FOREIGN KEY (namespace_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT fk_a4b8fefe3e FOREIGN KEY (managing_group_id) REFERENCES public.namespaces(id) ON DELETE SET NULL;
 
@@ -21257,9 +21443,6 @@ ALTER TABLE ONLY public.todos
 ALTER TABLE ONLY public.geo_event_log
     ADD CONSTRAINT fk_cff7185ad2 FOREIGN KEY (reset_checksum_event_id) REFERENCES public.geo_reset_checksum_events(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.project_mirror_data
-    ADD CONSTRAINT fk_d1aad367d7 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY public.environments
     ADD CONSTRAINT fk_d1c8c1da6a FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -21287,11 +21470,11 @@ ALTER TABLE ONLY public.system_note_metadata
 ALTER TABLE ONLY public.todos
     ADD CONSTRAINT fk_d94154aa95 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.label_links
-    ADD CONSTRAINT fk_d97dd08678 FOREIGN KEY (label_id) REFERENCES public.labels(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY public.project_group_links
     ADD CONSTRAINT fk_daa8cee94c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.dependency_proxy_blobs
+    ADD CONSTRAINT fk_db58bbc5d7 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.epics
     ADD CONSTRAINT fk_dccd3f98fc FOREIGN KEY (assignee_id) REFERENCES public.users(id) ON DELETE SET NULL;
@@ -21352,6 +21535,9 @@ ALTER TABLE ONLY public.epics
 
 ALTER TABLE ONLY public.boards
     ADD CONSTRAINT fk_f15266b5f9 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.jira_connect_subscriptions
+    ADD CONSTRAINT fk_f1d617343f FOREIGN KEY (jira_connect_installation_id) REFERENCES public.jira_connect_installations(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.ci_pipeline_variables
     ADD CONSTRAINT fk_f29c5f4380 FOREIGN KEY (pipeline_id) REFERENCES public.ci_pipelines(id) ON DELETE CASCADE;
@@ -21424,6 +21610,9 @@ ALTER TABLE ONLY public.ci_daily_build_group_report_results
 
 ALTER TABLE ONLY public.ci_subscriptions_projects
     ADD CONSTRAINT fk_rails_0818751483 FOREIGN KEY (downstream_project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.user_interacted_projects
+    ADD CONSTRAINT fk_rails_0894651f08 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.trending_projects
     ADD CONSTRAINT fk_rails_09feecd872 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -21530,8 +21719,8 @@ ALTER TABLE ONLY public.epic_user_mentions
 ALTER TABLE ONLY public.approver_groups
     ADD CONSTRAINT fk_rails_1cdcbd7723 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.packages_tags
-    ADD CONSTRAINT fk_rails_1dfc868911 FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.boards
+    ADD CONSTRAINT fk_rails_1e9a074a35 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.geo_repository_created_events
     ADD CONSTRAINT fk_rails_1f49e46a61 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -21577,6 +21766,9 @@ ALTER TABLE ONLY public.reviews
 
 ALTER TABLE ONLY public.draft_notes
     ADD CONSTRAINT fk_rails_2a8dac9901 FOREIGN KEY (author_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.packages_tags
+    ADD CONSTRAINT fk_rails_2b18ae9256 FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.group_group_links
     ADD CONSTRAINT fk_rails_2b2353ca49 FOREIGN KEY (shared_with_group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
@@ -21698,6 +21890,9 @@ ALTER TABLE ONLY public.clusters_applications_fluentd
 ALTER TABLE ONLY public.operations_strategies_user_lists
     ADD CONSTRAINT fk_rails_43241e8d29 FOREIGN KEY (strategy_id) REFERENCES public.operations_strategies(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.remote_mirrors
+    ADD CONSTRAINT fk_rails_43a9aa4ca8 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.lfs_file_locks
     ADD CONSTRAINT fk_rails_43df7a0412 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -21779,6 +21974,9 @@ ALTER TABLE ONLY public.geo_node_namespace_links
 ALTER TABLE ONLY public.clusters_applications_knative
     ADD CONSTRAINT fk_rails_54fc91e0a0 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.clusters_applications_prometheus
+    ADD CONSTRAINT fk_rails_557e773639 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.terraform_states
     ADD CONSTRAINT fk_rails_558901b030 FOREIGN KEY (locked_by_user_id) REFERENCES public.users(id);
 
@@ -21838,9 +22036,6 @@ ALTER TABLE ONLY public.approval_project_rules
 
 ALTER TABLE ONLY public.user_highest_roles
     ADD CONSTRAINT fk_rails_60f6c325a6 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.dependency_proxy_group_settings
-    ADD CONSTRAINT fk_rails_616ddd680a FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.group_deploy_tokens
     ADD CONSTRAINT fk_rails_61a572b41a FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
@@ -21928,6 +22123,9 @@ ALTER TABLE ONLY public.list_user_preferences
 
 ALTER TABLE ONLY public.project_custom_attributes
     ADD CONSTRAINT fk_rails_719c3dccc5 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.user_interacted_projects
+    ADD CONSTRAINT fk_rails_722ceba4f7 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.slack_integrations
     ADD CONSTRAINT fk_rails_73db19721a FOREIGN KEY (service_id) REFERENCES public.services(id) ON DELETE CASCADE;
@@ -22124,17 +22322,11 @@ ALTER TABLE ONLY public.project_aliases
 ALTER TABLE ONLY public.vulnerability_user_mentions
     ADD CONSTRAINT fk_rails_a18600f210 FOREIGN KEY (note_id) REFERENCES public.notes(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.todos
-    ADD CONSTRAINT fk_rails_a27c483435 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY public.jira_tracker_data
     ADD CONSTRAINT fk_rails_a299066916 FOREIGN KEY (service_id) REFERENCES public.services(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.protected_environments
     ADD CONSTRAINT fk_rails_a354313d11 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.jira_connect_subscriptions
-    ADD CONSTRAINT fk_rails_a3c10bcf7d FOREIGN KEY (namespace_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.fork_network_members
     ADD CONSTRAINT fk_rails_a40860a1ca FOREIGN KEY (fork_network_id) REFERENCES public.fork_networks(id) ON DELETE CASCADE;
@@ -22337,6 +22529,9 @@ ALTER TABLE ONLY public.subscriptions
 ALTER TABLE ONLY public.operations_strategies
     ADD CONSTRAINT fk_rails_d183b6e6dd FOREIGN KEY (feature_flag_id) REFERENCES public.operations_feature_flags(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.project_mirror_data
+    ADD CONSTRAINT fk_rails_d1aad367d7 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.requirements_management_test_reports
     ADD CONSTRAINT fk_rails_d1e8b498bf FOREIGN KEY (author_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
@@ -22357,9 +22552,6 @@ ALTER TABLE ONLY public.geo_hashed_storage_attachments_events
 
 ALTER TABLE ONLY public.jira_imports
     ADD CONSTRAINT fk_rails_da617096ce FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE SET NULL;
-
-ALTER TABLE ONLY public.dependency_proxy_blobs
-    ADD CONSTRAINT fk_rails_db58bbc5d7 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.issues_prometheus_alert_events
     ADD CONSTRAINT fk_rails_db5b756534 FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE CASCADE;
@@ -22456,9 +22648,6 @@ ALTER TABLE ONLY public.prometheus_alerts
 
 ALTER TABLE ONLY public.import_export_uploads
     ADD CONSTRAINT fk_rails_f129140f9e FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.jira_connect_subscriptions
-    ADD CONSTRAINT fk_rails_f1d617343f FOREIGN KEY (jira_connect_installation_id) REFERENCES public.jira_connect_installations(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.requirements
     ADD CONSTRAINT fk_rails_f212e67e63 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
@@ -23641,6 +23830,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200704143633
 20200704161600
 20200706005325
+20200706035141
 20200706154619
 20200706170536
 20200707071941

@@ -55,7 +55,7 @@ module AlertManagement
     validates :severity,        presence: true
     validates :status,          presence: true
     validates :started_at,      presence: true
-    validates :fingerprint,     uniqueness: { scope: :project }, allow_blank: true
+    validates :fingerprint,     uniqueness: { scope: :project }, allow_blank: true, unless: :resolved?
     validate  :hosts_length
 
     enum severity: {
