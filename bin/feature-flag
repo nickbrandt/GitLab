@@ -12,18 +12,6 @@ require 'cgi'
 
 require_relative '../lib/feature/shared' unless defined?(Feature::Shared)
 
-Options = Struct.new(
-  :name,
-  :type,
-  :group,
-  :ee,
-  :amend,
-  :dry_run,
-  :force,
-  :introduced_by_url,
-  :rollout_issue_url
-)
-
 module FeatureFlagHelpers
   Abort = Class.new(StandardError)
   Done = Class.new(StandardError)
@@ -42,6 +30,18 @@ end
 class FeatureFlagOptionParser
   extend FeatureFlagHelpers
   extend ::Feature::Shared
+
+  Options = Struct.new(
+    :name,
+    :type,
+    :group,
+    :ee,
+    :amend,
+    :dry_run,
+    :force,
+    :introduced_by_url,
+    :rollout_issue_url
+  )
 
   class << self
     def parse(argv)
