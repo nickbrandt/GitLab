@@ -38,7 +38,7 @@
           = s_('GroupSAML|With prohibit outer forks flag enabled group members will be able to fork project only inside your group.')
     .well-segment.borderless.mb-3.col-12.col-lg-9.p-0
       = f.label :sso_url, class: 'label-bold' do
-        = s_('GroupSAML|Identity provider single sign on URL')
+        = s_('GroupSAML|Identity provider single sign-on URL')
       = f.text_field :sso_url, placeholder: 'e.g. https://example.com/adfs/ls', class: 'form-control', data: { qa_selector: 'identity_provider_sso_field' }
       .form-text.text-muted
         = s_('GroupSAML|Members will be forwarded here when signing in to your group. Get this from your identity provider, where it can also be called "SSO Service Location", "SAML Token Issuance Endpoint", or "SAML 2.0/W-Federation URL".')
