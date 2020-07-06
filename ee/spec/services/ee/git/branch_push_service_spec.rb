@@ -42,18 +42,6 @@ RSpec.describe Git::BranchPushService do
         stub_ee_application_setting(elasticsearch_indexing?: true)
       end
 
-      context 'when the project is locked by elastic.rake', :clean_gitlab_redis_shared_state do
-        before do
-          Gitlab::Redis::SharedState.with { |redis| redis.sadd(:elastic_projects_indexing, project.id) }
-        end
-
-        it 'does not run ElasticCommitIndexerWorker' do
-          expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
-
-          subject.execute
-        end
-      end
-
       it 'runs ElasticCommitIndexerWorker' do
         expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id)
 
