@@ -30,6 +30,8 @@ module Security
           response[:scanned_resources_count] = scanned_resources_counts[report_type.to_s]
         when :scanned_resources
           response[:scanned_resources] = scanned_resources[report_type.to_s]
+        when :scanned_resources_csv_path
+          nil
         end
       end
     end

@@ -63,4 +63,8 @@ RSpec.describe 'Query.project(fullPath).pipeline(iid).securityReportSummary' do
 
     expect(dast_scanned_resources.length).to eq(20)
   end
+
+  it 'returns nil for the scannedResourcesCsvPath' do
+    expect(security_report_summary.dig('dast', 'scannedResourcesCsvPath')).to be_nil
+  end
 end
