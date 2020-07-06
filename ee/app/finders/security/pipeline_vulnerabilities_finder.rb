@@ -89,7 +89,7 @@ module Security
         occurrence.vulnerability = vulnerabilities[occurrence.project_fingerprint]
         occurrence.project = pipeline.project
         occurrence.sha = pipeline.sha
-        occurrence.build_scanner(report_occurrence.scanner.to_hash)
+        occurrence.build_scanner(report_occurrence.scanner&.to_hash)
         occurrence.identifiers = report_occurrence.identifiers.map do |identifier|
           Vulnerabilities::Identifier.new(identifier.to_hash)
         end

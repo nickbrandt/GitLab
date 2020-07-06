@@ -10,7 +10,7 @@ RSpec.describe Security::PipelineVulnerabilitiesFinder do
   end
 
   let_it_be(:project) { create(:project, :repository) }
-  let_it_be(:pipeline) { create(:ci_pipeline, :success, project: project) }
+  let_it_be(:pipeline, reload: true) { create(:ci_pipeline, :success, project: project) }
 
   describe '#execute' do
     let(:params) { {} }
@@ -23,7 +23,7 @@ RSpec.describe Security::PipelineVulnerabilitiesFinder do
     let_it_be(:artifact_cs) { create(:ee_ci_job_artifact, :container_scanning, job: build_cs, project: project) }
     let_it_be(:artifact_dast) { create(:ee_ci_job_artifact, :dast, job: build_dast, project: project) }
     let_it_be(:artifact_ds) { create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds, project: project) }
-    let_it_be(:artifact_sast) { create(:ee_ci_job_artifact, :sast, job: build_sast, project: project) }
+    let!(:artifact_sast) { create(:ee_ci_job_artifact, :sast, job: build_sast, project: project) }
 
     let(:cs_count) { read_fixture(artifact_cs)['vulnerabilities'].count }
     let(:ds_count) { read_fixture(artifact_ds)['vulnerabilities'].count }
@@ -296,6 +296,16 @@ RSpec.describe Security::PipelineVulnerabilitiesFinder do
         found_occurrences.each_with_index do |found, i|
           expect(found.metadata['cve']).to eq(report_occurrences[i].compare_key)
         end
+      end
+    end
+
+    context 'when scanner is not provided in the report occurrences' do
+      let!(:artifact_sast) { create(:ee_ci_job_artifact, :sast_with_missing_scanner, job: build_sast, project: project) }
+
+      it 'sets empty scanner' do
+        sast_scanners = subject.occurrences.select(&:sast?).map(&:scanner)
+
+        expect(sast_scanners).to all(have_attributes(project_id: nil, external_id: nil, name: nil))
       end
     end
 
