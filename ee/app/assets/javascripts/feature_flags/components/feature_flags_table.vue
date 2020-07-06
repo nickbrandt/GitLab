@@ -217,8 +217,7 @@ export default {
                 icon="remove"
                 :disabled="!canDeleteFlag(featureFlag)"
                 @click="setDeleteModalData(featureFlag)"
-              >
-              </gl-button>
+              />
             </template>
           </div>
         </div>
