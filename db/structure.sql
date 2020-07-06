@@ -13014,7 +13014,8 @@ CREATE TABLE public.namespace_aggregation_schedules (
 CREATE TABLE public.namespace_limits (
     additional_purchased_storage_size bigint DEFAULT 0 NOT NULL,
     additional_purchased_storage_ends_on date,
-    namespace_id integer NOT NULL
+    namespace_id integer NOT NULL,
+    temporary_storage_increase_ends_on date
 );
 
 CREATE TABLE public.namespace_root_storage_statistics (
@@ -23580,5 +23581,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200703154822
 20200704143633
 20200706005325
+20200706170536
 \.
 
