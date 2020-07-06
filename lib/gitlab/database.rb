@@ -111,6 +111,33 @@ module Gitlab
       version.to_f >= 9.5
     end
 
+    def self.check_postgres_version_and_print_warning
+      return if Gitlab::Database.postgresql_minimum_supported_version?
+      return if Gitlab::Runtime.rails_runner?
+
+      Kernel.warn ERB.new(Rainbow.new.wrap(<<~EOS).red).result
+
+                  ██     ██  █████  ██████  ███    ██ ██ ███    ██  ██████ 
+                  ██     ██ ██   ██ ██   ██ ████   ██ ██ ████   ██ ██      
+                  ██  █  ██ ███████ ██████  ██ ██  ██ ██ ██ ██  ██ ██   ███ 
+                  ██ ███ ██ ██   ██ ██   ██ ██  ██ ██ ██ ██  ██ ██ ██    ██ 
+                   ███ ███  ██   ██ ██   ██ ██   ████ ██ ██   ████  ██████  
+
+        ******************************************************************************
+          You are using PostgreSQL <%= Gitlab::Database.version %>, but PostgreSQL >= <%= Gitlab::Database::MINIMUM_POSTGRES_VERSION %>
+          is required for this version of GitLab.
+          <% if Rails.env.development? || Rails.env.test? %>
+          If using gitlab-development-kit, please find the relevant steps here:
+            https://gitlab.com/gitlab-org/gitlab-development-kit/-/blob/master/doc/howto/postgresql.md#upgrade-postgresql
+          <% end %>
+          Please upgrade your environment to a supported PostgreSQL version, see
+          https://docs.gitlab.com/ee/install/requirements.html#database for details.
+        ******************************************************************************
+      EOS
+    rescue ActiveRecord::ActiveRecordError, PG::Error
+      # ignore - happens when Rake tasks yet have to create a database, e.g. for testing
+    end
+
     # map some of the function names that changed between PostgreSQL 9 and 10
     # https://wiki.postgresql.org/wiki/New_in_postgres_10
     def self.pg_wal_lsn_diff

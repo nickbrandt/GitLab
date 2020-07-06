@@ -115,6 +115,47 @@ RSpec.describe Gitlab::Database do
     end
   end
 
+  describe '.check_postgres_version_and_print_warning' do
+    subject { described_class.check_postgres_version_and_print_warning }
+
+    it 'prints a warning if not compliant with minimum postgres version' do
+      allow(described_class).to receive(:postgresql_minimum_supported_version?).and_return(false)
+
+      expect(Kernel).to receive(:warn).with(/You are using PostgreSQL/)
+
+      subject
+    end
+
+    it 'doesnt print a warning if compliant with minimum postgres version' do
+      allow(described_class).to receive(:postgresql_minimum_supported_version?).and_return(true)
+
+      expect(Kernel).not_to receive(:warn).with(/You are using PostgreSQL/)
+
+      subject
+    end
+
+    it 'doesnt print a warning in Rails runner environment' do
+      allow(described_class).to receive(:postgresql_minimum_supported_version?).and_return(false)
+      allow(Gitlab::Runtime).to receive(:rails_runner?).and_return(true)
+
+      expect(Kernel).not_to receive(:warn).with(/You are using PostgreSQL/)
+
+      subject
+    end
+
+    it 'ignores ActiveRecord errors' do
+      allow(described_class).to receive(:postgresql_minimum_supported_version?).and_raise(ActiveRecord::ActiveRecordError)
+
+      expect { subject }.not_to raise_error
+    end
+
+    it 'ignores Postgres errors' do
+      allow(described_class).to receive(:postgresql_minimum_supported_version?).and_raise(PG::Error)
+
+      expect { subject }.not_to raise_error
+    end
+  end
+
   describe '.replication_slots_supported?' do
     it 'returns false when using PostgreSQL 9.3' do
       allow(described_class).to receive(:version).and_return('9.3.1')
