@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import { getAllByRole, getByTestId } from '@testing-library/dom';
 import { GlLink } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import VulnerabilityDetails from 'ee/vulnerabilities/components/details.vue';
@@ -167,6 +168,58 @@ describe('Vulnerability Details', () => {
       createWrapper({ scanner: { name: 'some scanner', version: '1.2.3', url: '//link' } });
       expect(scannerText()).toBe('Scanner: some scanner (version 1.2.3)');
       expect(link().attributes('href')).toBe('//link');
+    });
+  });
+
+  describe('http data', () => {
+    const TEST_HEADERS = [{ name: 'Name1', value: 'Value1' }, { name: 'Name2', value: 'Value2' }];
+    const TEST_URL = 'http://foo.bar/test';
+    const EXPECT_HEADERS = {
+      label: 'Headers:',
+      content: 'Name1: Value1\nName2: Value2',
+      isCode: true,
+    };
+
+    const getTextContent = el => el.textContent.trim();
+    const getLabel = el => getTextContent(getByTestId(el, 'label'));
+    const getContent = el => getTextContent(getByTestId(el, 'value'));
+    const getSectionData = testId => {
+      const section = getById(testId).element;
+
+      if (!section) {
+        return null;
+      }
+
+      return getAllByRole(section, 'listitem').map(li => ({
+        label: getLabel(li),
+        content: getContent(li),
+        ...(li.querySelector('code') ? { isCode: true } : {}),
+      }));
+    };
+
+    it.each`
+      request                                                    | expectedData
+      ${{}}                                                      | ${null}
+      ${{ headers: TEST_HEADERS }}                               | ${[EXPECT_HEADERS]}
+      ${{ headers: TEST_HEADERS, method: 'GET' }}                | ${[{ label: 'Method:', content: 'GET' }, EXPECT_HEADERS]}
+      ${{ headers: TEST_HEADERS, method: 'GET', url: TEST_URL }} | ${[{ label: 'Method:', content: 'GET' }, { label: 'URL:', content: TEST_URL }, EXPECT_HEADERS]}
+      ${{ url: TEST_URL }}                                       | ${[{ label: 'URL:', content: TEST_URL }]}
+      ${{ method: 'GET' }}                                       | ${[{ label: 'Method:', content: 'GET' }]}
+    `('shows request data for $request', ({ request, expectedData }) => {
+      createWrapper({ request });
+      expect(getSectionData('request')).toEqual(expectedData);
+    });
+
+    it.each`
+      response                                                            | expectedData
+      ${{}}                                                               | ${null}
+      ${{ headers: TEST_HEADERS }}                                        | ${[EXPECT_HEADERS]}
+      ${{ headers: TEST_HEADERS, status_code: 200 }}                      | ${[EXPECT_HEADERS]}
+      ${{ headers: TEST_HEADERS, status_code: 200, reason_phrase: 'OK' }} | ${[{ label: 'Status:', content: '200 OK' }, EXPECT_HEADERS]}
+      ${{ status_code: 400, reason_phrase: 'Something bad' }}             | ${[{ label: 'Status:', content: '400 Something bad' }]}
+    `('shows response data for $response', ({ response, expectedData }) => {
+      createWrapper({ response });
+      expect(getSectionData('response')).toEqual(expectedData);
     });
   });
 });

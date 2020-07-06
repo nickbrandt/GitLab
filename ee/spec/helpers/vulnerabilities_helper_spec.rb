@@ -115,7 +115,9 @@ RSpec.describe VulnerabilitiesHelper do
         remediations: finding.remediations,
         solution: kind_of(String),
         evidence: kind_of(String),
-        scanner: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder)
+        scanner: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder),
+        request: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder),
+        response: kind_of(Grape::Entity::Exposure::NestingExposure::OutputBuilder)
       )
 
       expect(subject[:location]['blob_path']).to match(kind_of(String))

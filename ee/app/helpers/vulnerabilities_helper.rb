@@ -53,7 +53,9 @@ module VulnerabilitiesHelper
       :remediations,
       :evidence,
       :scanner,
-      :solution
+      :solution,
+      :request,
+      :response
     )
 
     if data[:location]['file']
