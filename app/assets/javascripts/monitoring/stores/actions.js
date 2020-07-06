@@ -142,7 +142,7 @@ export const fetchDashboard = ({ state, commit, dispatch, getters }) => {
       dispatch('receiveMetricsDashboardFailure', error);
 
       if (state.showErrorBanner) {
-        if (error.response.data && error.response.data.message) {
+        if (error.response?.data && error.response.data.message) {
           const { message } = error.response.data;
           createFlash(
             sprintf(

@@ -247,6 +247,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :functions, only: [:index]
         end
 
+        get :metrics, to: 'metrics/dashboard#index'
+        get :metrics_dashboard, to: 'metrics/dashboard#metrics_dashboard'
+
         resources :environments, except: [:destroy] do
           member do
             post :stop
