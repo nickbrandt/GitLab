@@ -2,6 +2,9 @@
 
 RSpec.shared_examples "installing applications for a cluster" do |managed_apps_local_tiller|
   before do
+    # Reduce interval from 10 seconds which is too long for an automated test
+    stub_const("#{Clusters::ClustersController}::STATUS_POLLING_INTERVAL", 500)
+
     stub_feature_flags(managed_apps_local_tiller: managed_apps_local_tiller)
 
     visit cluster_path
