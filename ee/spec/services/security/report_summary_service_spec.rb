@@ -73,7 +73,7 @@ RSpec.describe Security::ReportSummaryService, '#execute' do
   context 'All fields are requested' do
     let(:selection_information) do
       {
-        dast: [:scanned_resources_count, :vulnerabilities_count, :scanned_resources],
+        dast: [:scanned_resources_count, :vulnerabilities_count, :scanned_resources, :scanned_resources_csv_path],
         sast: [:scanned_resources_count, :vulnerabilities_count],
         container_scanning: [:scanned_resources_count, :vulnerabilities_count],
         dependency_scanning: [:scanned_resources_count, :vulnerabilities_count]
@@ -100,6 +100,10 @@ RSpec.describe Security::ReportSummaryService, '#execute' do
 
     it 'returns the scanned resources limited to 20' do
       expect(result[:dast][:scanned_resources].length).to eq(20)
+    end
+
+    it 'returns the scanned_resources_csv_path as nil' do
+      expect(result[:dast][:scanned_resources_csv_path]).to be_nil
     end
 
     context 'When no security scans ran' do
