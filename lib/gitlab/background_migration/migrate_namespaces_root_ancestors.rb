@@ -18,7 +18,13 @@ module Gitlab
       end
 
       def perform(start_id, stop_id)
-        Namespace.where(id: start_id..stop_id).find_each do |namespace|
+        scope = Namespace.where(id: start_id..stop_id)
+
+        # Update all root namespaces with their ids
+        scope.where(parent_id: nil).update_all('root_ancestor_id = id')
+
+        # Update all children namespaces
+        scope.where.not(parent_id: nil).find_each do |namespace|
           namespace.update_column(:root_ancestor_id, namespace.self_and_ancestors.reorder(nil).find_by(parent_id: nil).id)
         end
       end

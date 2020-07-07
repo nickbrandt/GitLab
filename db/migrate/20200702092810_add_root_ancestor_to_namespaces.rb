@@ -9,8 +9,9 @@ class AddRootAncestorToNamespaces < ActiveRecord::Migration[6.0]
 
   def up
     with_lock_retries do
-      add_column :namespaces, :root_ancestor_id, :integer
+      add_column :namespaces, :root_ancestor_id, :integer unless column_exists?(:namespaces, :root_ancestor_id)
     end
+
     add_concurrent_foreign_key :namespaces, :namespaces, column: :root_ancestor_id, on_delete: :restrict
     add_concurrent_index :namespaces, :root_ancestor_id
   end
