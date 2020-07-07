@@ -216,7 +216,7 @@ export default {
       </div>
     </div>
     <gl-popover :target="getAuthorPopoverTarget()" triggers="hover focus" placement="top">
-      <div class="user-popover p-0 d-flex">
+      <div class="gl-line-height-normal d-flex">
         <div class="p-1 flex-shrink-1">
           <gl-avatar :entity-name="author.name" :alt="author.name" :src="author.avatarUrl" />
         </div>
