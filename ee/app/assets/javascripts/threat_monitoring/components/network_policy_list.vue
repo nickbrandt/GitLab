@@ -177,7 +177,7 @@ export default {
             :title="s__('NetworkPolicies|No policies detected')"
             :description="$options.emptyStateDescription"
             :primary-button-link="documentationFullPath"
-            :primary-button-text="__('Learn More')"
+            :primary-button-text="__('Learn more')"
           />
         </slot>
       </template>

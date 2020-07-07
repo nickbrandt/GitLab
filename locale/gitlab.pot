@@ -1249,7 +1249,7 @@ msgstr ""
 msgid "AccessTokens|reset it"
 msgstr ""
 
-msgid "AccessibilityReport|Learn More"
+msgid "AccessibilityReport|Learn more"
 msgstr ""
 
 msgid "AccessibilityReport|Message: %{message}"
@@ -13298,9 +13298,6 @@ msgstr ""
 msgid "Learn GitLab"
 msgstr ""
 
-msgid "Learn More"
-msgstr ""
-
 msgid "Learn how to %{link_start}contribute to the built-in templates%{link_end}"
 msgstr ""
 
@@ -20317,7 +20314,7 @@ msgstr ""
 msgid "SecurityReports|Issue Created"
 msgstr ""
 
-msgid "SecurityReports|Learn More"
+msgid "SecurityReports|Learn more"
 msgstr ""
 
 msgid "SecurityReports|Learn more about setting up your dashboard"
