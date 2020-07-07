@@ -289,11 +289,7 @@ export default {
   >
     <template v-if="pipelinePath" #actionButtons>
       <div>
-        <a
-          :href="securityTab"
-          target="_blank"
-          class="btn btn-default btn-sm float-right append-right-default"
-        >
+        <a :href="securityTab" target="_blank" class="btn btn-default btn-sm float-right gl-mr-3">
           <span>{{ s__('ciReport|View full report') }}</span>
           <icon :size="16" name="external-link" />
         </a>

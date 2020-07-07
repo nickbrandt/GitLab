@@ -69,7 +69,7 @@ export default {
   <div>
     <div class="mr-widget-extension d-flex align-items-center pl-3">
       <button
-        class="btn btn-blank square s32 append-right-default"
+        class="btn btn-blank square s32 gl-mr-3"
         type="button"
         :aria-label="ariaLabel"
         @click="toggle"
