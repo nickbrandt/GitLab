@@ -1,5 +1,7 @@
 - page_title _('Jira Issues')
 
+= render 'shared/issuable/search_bar', type: :issues
+
 .js-issuables-list{ data: { endpoint: expose_path(project_integrations_jira_issues_path(@project, format: :json)),
   'can-bulk-edit': false,
   'empty-svg-path': image_path('illustrations/issues.svg'),
