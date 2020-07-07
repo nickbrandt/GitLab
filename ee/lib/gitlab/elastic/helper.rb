@@ -105,6 +105,12 @@ module Gitlab
         client.indices.stats['indices'][index_name || target_index_name]['total']
       end
 
+      def documents_count(index_name: nil)
+        index = index_name || target_index_name
+
+        client.indices.stats.dig('indices', index, 'primaries', 'docs', 'count')
+      end
+
       def index_size_bytes
         index_size['store']['size_in_bytes']
       end
