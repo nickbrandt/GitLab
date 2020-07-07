@@ -21,6 +21,8 @@ RSpec.describe Vulnerabilities::ResolveService do
       project.add_developer(user)
     end
 
+    it_behaves_like 'calls Vulnerabilities::Statistics::UpdateService'
+
     it 'resolves a vulnerability' do
       Timecop.freeze do
         resolve_vulnerability
