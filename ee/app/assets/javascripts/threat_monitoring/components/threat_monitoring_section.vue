@@ -118,7 +118,7 @@ export default {
       :description="chartEmptyStateText"
       :svg-path="chartEmptyStateSvgPath"
       :primary-button-link="documentationFullPath"
-      :primary-button-text="__('Learn More')"
+      :primary-button-text="__('Learn more')"
       compact
     />
   </div>

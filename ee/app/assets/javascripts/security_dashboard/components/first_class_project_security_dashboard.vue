@@ -97,7 +97,7 @@ export default {
             class="mt-4"
             variant="introduction"
             :title="s__('SecurityReports|Introducing standalone vulnerabilities')"
-            :button-text="s__('SecurityReports|Learn More')"
+            :button-text="s__('SecurityReports|Learn more')"
             :button-link="dashboardDocumentation"
             @close="handleBannerClose"
           >
