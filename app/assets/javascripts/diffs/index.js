@@ -4,7 +4,8 @@ import { parseBoolean } from '~/lib/utils/common_utils';
 import FindFile from '~/vue_shared/components/file_finder/index.vue';
 import eventHub from '../notes/event_hub';
 import diffsApp from './components/app.vue';
-import { TREE_LIST_STORAGE_KEY } from './constants';
+import { TREE_LIST_STORAGE_KEY, DIFF_WHITESPACE_COOKIE_NAME } from './constants';
+import Cookies from 'js-cookie';
 
 export default function initDiffsApp(store) {
   const fileFinderEl = document.getElementById('js-diff-file-finder');
@@ -90,9 +91,11 @@ export default function initDiffsApp(store) {
 
       this.setRenderTreeList(renderTreeList);
 
-      // Set whitespace default as per user preferences
-      const hideWhitespace = this.showWhitespaceDefault ? '0' : '1';
-      this.setShowWhitespace({ showWhitespace: hideWhitespace !== '1' });
+      // Set whitespace default as per user preferences unless cookie is already set
+      if (!Cookies.get(DIFF_WHITESPACE_COOKIE_NAME)) {
+        const hideWhitespace = this.showWhitespaceDefault ? '0' : '1';
+        this.setShowWhitespace({ showWhitespace: hideWhitespace !== '1' });
+      }
     },
     methods: {
       ...mapActions('diffs', ['setRenderTreeList', 'setShowWhitespace']),
