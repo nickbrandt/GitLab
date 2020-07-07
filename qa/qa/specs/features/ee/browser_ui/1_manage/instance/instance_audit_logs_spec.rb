@@ -2,7 +2,7 @@
 require 'securerandom'
 
 module QA
-  context 'Manage', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/218332', type: :investigating } do
+  RSpec.describe 'Manage', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/218332', type: :investigating } do
     shared_examples 'audit event' do |expected_events|
       it 'logs audit events for UI operations' do
         sign_in

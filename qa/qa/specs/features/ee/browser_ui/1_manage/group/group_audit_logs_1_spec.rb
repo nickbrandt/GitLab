@@ -2,7 +2,7 @@
 require 'securerandom'
 
 module QA
-  context 'Manage' do
+  RSpec.describe 'Manage' do
     include Support::Api
 
     let(:api_client) { Runtime::API::Client.new(:gitlab) }

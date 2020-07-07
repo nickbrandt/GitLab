@@ -2,7 +2,7 @@
 require 'securerandom'
 
 module QA
-  context 'Manage' do
+  RSpec.describe 'Manage' do
     describe 'Group access', :requires_admin, :skip_live_env do
       include Runtime::IPAddress
 

@@ -2,7 +2,7 @@
 require 'securerandom'
 
 module QA
-  context 'Manage' do
+  RSpec.describe 'Manage' do
     shared_examples 'audit event' do |expected_events|
       it 'logs audit events for UI operations' do
         Page::Group::Menu.perform(&:go_to_audit_events_settings)
