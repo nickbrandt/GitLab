@@ -13129,9 +13129,14 @@ type TodoRestoreManyPayload {
   errors: [String!]!
 
   """
-  The ids of the updated todo items
+  Updated todos
   """
-  updatedIds: [ID!]!
+  todos: [Todo!]!
+
+  """
+  The ids of the updated todo items. Deprecated in 13.2: Use todos
+  """
+  updatedIds: [ID!]! @deprecated(reason: "Use todos. Deprecated in 13.2")
 }
 
 """
@@ -13211,9 +13216,14 @@ type TodosMarkAllDonePayload {
   errors: [String!]!
 
   """
-  Ids of the updated todos
+  Updated todos
   """
-  updatedIds: [ID!]!
+  todos: [Todo!]!
+
+  """
+  Ids of the updated todos. Deprecated in 13.2: Use todos
+  """
+  updatedIds: [ID!]! @deprecated(reason: "Use todos. Deprecated in 13.2")
 }
 
 """
