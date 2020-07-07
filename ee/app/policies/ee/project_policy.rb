@@ -227,7 +227,6 @@ module EE
         enable :read_deploy_board
         enable :admin_issue_link
         enable :admin_epic_issue
-        enable :read_package
         enable :read_group_timelogs
       end
 
@@ -252,8 +251,6 @@ module EE
         enable :create_iteration
         enable :admin_iteration
       end
-
-      rule { can?(:public_access) }.enable :read_package
 
       rule { can?(:read_project) & iterations_available }.enable :read_iteration
 
