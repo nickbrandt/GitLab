@@ -143,7 +143,7 @@ export default {
       </div>
     </div>
 
-    <div class="table-section section-15">
+    <div class="table-section gl-white-space-normal section-15">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Identifier') }}</div>
       <div class="table-mobile-content">
         {{ vulnerabilityIdentifier }}
