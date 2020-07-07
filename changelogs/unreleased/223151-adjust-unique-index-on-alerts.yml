@@ -1,5 +1,5 @@
 ---
-title: 36024 Change Alert fingerprint index to run when status is not resolved
-merge_request:
+title: Change Alert fingerprint index to run when status is not resolved
+merge_request: 36024
 author:
-type: other
+type: changed
