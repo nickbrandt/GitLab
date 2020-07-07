@@ -903,6 +903,8 @@ RSpec.describe Namespace do
       nested_group = create(:group, parent: root_group)
       deep_nested_group = create(:group, parent: nested_group)
 
+      [root_group, nested_group, deep_nested_group].map { |g| g.root_ancestor_id = nil }
+
       expect { root_group.update_root_ancestor }.to change { root_group.root_ancestor_id }.from(nil).to(root_group.id)
       expect { nested_group.update_root_ancestor }.to change { nested_group.root_ancestor_id }.from(nil).to(root_group.id)
       expect { deep_nested_group.update_root_ancestor }.to change { deep_nested_group.root_ancestor_id }.from(nil).to(root_group.id)

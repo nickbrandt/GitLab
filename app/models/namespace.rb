@@ -433,7 +433,9 @@ class Namespace < ApplicationRecord
   end
 
   def calculate_root_ancestor
-    self_and_ancestors.reorder(nil).find_by(parent_id: nil)
+    return self unless parent_id
+
+    ancestors.reorder(nil).find_by(parent_id: nil)
   end
 end
 
