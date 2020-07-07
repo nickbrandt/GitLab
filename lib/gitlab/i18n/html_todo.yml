@@ -154,23 +154,6 @@
     - "Налаштуйте файл <code>.gitlab-webide.yml</code> у директорії <code>.gitlab</code>, щоб почати використовувати Веб-термінал. %{helpStart}Докладніше.%{helpEnd}"
     - "웹 터미널 사용을 시작하도록 <code>.gitlab</code> 디렉토리에서 <code>.gitlab-webide.yml</code> 파일을 구성하십시오. %{helpStart}자세히 알아보십시오.%{helpEnd}"
     - "Configure un archivo <code>.gitlab-webide.yml</code> en el directorio <code>.gitlab</code> para comenzar a utilizar el Terminal Web. %{helpStart}Aprende más.%{helpEnd}"
-"ContributionAnalytics|<strong>%{created_count}</strong> created, <strong>%{closed_count}</strong> closed.":
-  plural_id:
-  translations:
-    - "<strong>%{created_count}</strong> 件を作成、<strong>%{closed_count}</strong>件をクローズしました。"
-    - "已创建<strong>%{created_count}</strong> 个，已关闭<strong>%{closed_count}</strong>个。"
-    - "<strong>%{created_count}</strong> створено, <strong>%{closed_count}</strong> закрито."
-    - "<strong>%{created_count}</strong> creado, <strong>%{closed_count}</strong> cerrado."
-    - "<strong>%{created_count}</strong> oluşturuldu, <strong>%{closed_count}</strong> kapatıldı."
-"ContributionAnalytics|<strong>%{created_count}</strong> created, <strong>%{merged_count}</strong> merged.":
-  plural_id:
-  translations:
-"ContributionAnalytics|<strong>%{pushes}</strong> pushes, more than <strong>%{commits}</strong> commits by <strong>%{people}</strong> contributors.":
-  plural_id:
-  translations:
-    - "<strong>%{pushes}</strong>回のプッシュ、<strong>%{commits}</strong>回以上のコミットが貢献者<strong>%{people}</strong>によって行われました。"
-    - "<strong>%{pushes}</strong>次推送，含来自<strong>%{people}</strong>位贡献者的<strong>%{commits}</strong>次以上提交。"
-    - "<strong>%{pushes}</strong> отправок — больше чем <strong>%{commits}</strong> коммитов от <strong>%{people}</strong> участников."
 "Contributions for <strong>%{calendar_date}</strong>":
   plural_id:
   translations:
@@ -694,6 +677,23 @@
     - "Pour en savoir plus sur les autorisations de projet : <strong>%{link_to_help}</strong>"
     - "Lea más sobre los permisos de este proyecto <strong>%{link_to_help}</strong>"
 "Your license will be included in your GitLab backup and will survive upgrades, so in normal usage you should never need to re-upload your <code>.gitlab-license</code> file.":
+  plural_id:
+  translations:
+"ContributionAnalytics|<strong>%{pushes}</strong> pushes, more than <strong>%{commits}</strong> commits by <strong>%{people}</strong> contributors.":
+  plural_id:
+  translations:
+    - "<strong>%{pushes}</strong>回のプッシュ、<strong>%{commits}</strong>回以上のコミットが貢献者<strong>%{people}</strong>によって行われました。"
+    - "<strong>%{pushes}</strong>次推送，含来自<strong>%{people}</strong>位贡献者的<strong>%{commits}</strong>次以上提交。"
+    - "<strong>%{pushes}</strong> отправок — больше чем <strong>%{commits}</strong> коммитов от <strong>%{people}</strong> участников."
+"ContributionAnalytics|<strong>%{created_count}</strong> created, <strong>%{closed_count}</strong> closed.":
+  plural_id:
+  translations:
+    - "<strong>%{created_count}</strong> 件を作成、<strong>%{closed_count}</strong>件をクローズしました。"
+    - "已创建<strong>%{created_count}</strong> 个，已关闭<strong>%{closed_count}</strong>个。"
+    - "<strong>%{created_count}</strong> створено, <strong>%{closed_count}</strong> закрито."
+    - "<strong>%{created_count}</strong> creado, <strong>%{closed_count}</strong> cerrado."
+    - "<strong>%{created_count}</strong> oluşturuldu, <strong>%{closed_count}</strong> kapatıldı."
+"ContributionAnalytics|<strong>%{created_count}</strong> created, <strong>%{merged_count}</strong> merged.":
   plural_id:
   translations:
 "<code>\\\"johnsmith@example.com\\\": \\\"@johnsmith\\\"</code> will add \\\"By <a href=\\\"#\\\">@johnsmith</a>\\\" to all issues and comments originally created by johnsmith@example.com, and will set <a href=\\\"#\\\">@johnsmith</a> as the assignee on all issues originally assigned to johnsmith@example.com.":
