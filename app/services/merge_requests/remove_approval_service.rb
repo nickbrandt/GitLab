@@ -9,26 +9,31 @@ module MergeRequests
 
       approval = merge_request.approvals.where(user: current_user)
 
-      currently_approved = merge_request.approved?
+      trigger_approval_hooks(merge_request) do
+        next unless approval.destroy_all # rubocop: disable Cop/DestroyAll
 
-      if approval.destroy_all # rubocop: disable Cop/DestroyAll
-        merge_request.reset_approval_cache!
+        reset_approvals_cache(merge_request)
         create_note(merge_request)
-
-        if currently_approved
-          notification_service.async.unapprove_mr(merge_request, current_user)
-          execute_hooks(merge_request, 'unapproved')
-        else
-          execute_hooks(merge_request, 'unapproval')
-        end
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     private
 
+    def reset_approvals_cache(merge_request)
+      merge_request.approvals.reset
+    end
+
+    def trigger_approval_hooks(merge_request)
+      yield
+
+      execute_hooks(merge_request, 'unapproved')
+    end
+
     def create_note(merge_request)
       SystemNoteService.unapprove_mr(merge_request, current_user)
     end
   end
 end
+
+MergeRequests::RemoveApprovalService.prepend_if_ee('EE::MergeRequests::RemoveApprovalService')

@@ -48,16 +48,6 @@ RSpec.describe SystemNoteService do
     end
   end
 
-  describe '.unapprove_mr' do
-    it 'calls MergeRequestsService' do
-      expect_next_instance_of(::SystemNotes::MergeRequestsService) do |service|
-        expect(service).to receive(:unapprove_mr)
-      end
-
-      described_class.unapprove_mr(noteable, author)
-    end
-  end
-
   describe '.change_weight_note' do
     it 'calls IssuableService' do
       expect_next_instance_of(::SystemNotes::IssuablesService) do |service|

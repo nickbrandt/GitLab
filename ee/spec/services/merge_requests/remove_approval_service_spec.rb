@@ -22,9 +22,7 @@ RSpec.describe MergeRequests::RemoveApprovalService do
       end
 
       it 'removes the approval' do
-        expect(merge_request.approvals.size).to eq 1
-        execute!
-        expect(merge_request.approvals).to be_empty
+        expect { execute! }.to change { merge_request.approvals.size }.from(1).to(0)
       end
 
       it 'creates an unapproval note' do
@@ -60,14 +58,9 @@ RSpec.describe MergeRequests::RemoveApprovalService do
         allow(service).to receive(:notification_service).and_return(notification_service)
       end
 
-      it 'fires an unapproved webhook' do
-        expect(service).to receive(:execute_hooks).with(merge_request, 'unapproved')
-
-        execute!
-      end
-
-      it 'sends a notification' do
+      it 'fires an unapproved webhook and sends a notification' do
         expect(notification_service).to receive_message_chain(:async, :unapprove_mr).with(merge_request, user)
+        expect(service).to receive(:execute_hooks).with(merge_request, 'unapproved')
 
         execute!
       end
