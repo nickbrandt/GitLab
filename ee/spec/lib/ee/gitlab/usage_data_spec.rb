@@ -532,26 +532,14 @@ RSpec.describe Gitlab::UsageData do
       context 'for release' do
         it 'includes accurate usage_activity_by_stage data' do
           for_defined_days_back do
-            user = create(:user)
-            create(:deployment, :failed, user: user)
             create(:project, :mirror, mirror_trigger_builds: true)
-            create(:release, author: user)
-            create(:deployment, :success, user: user)
           end
 
-          expect(described_class.uncached_data[:usage_activity_by_stage][:release]).to eq(
-            deployments: 2,
-            failed_deployments: 2,
-            projects_mirrored_with_pipelines_enabled: 2,
-            releases: 2,
-            successful_deployments: 2
+          expect(described_class.uncached_data[:usage_activity_by_stage][:release]).to include(
+            projects_mirrored_with_pipelines_enabled: 2
           )
-          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:release]).to eq(
-            deployments: 1,
-            failed_deployments: 1,
-            projects_mirrored_with_pipelines_enabled: 1,
-            releases: 1,
-            successful_deployments: 1
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:release]).to include(
+            projects_mirrored_with_pipelines_enabled: 1
           )
         end
       end

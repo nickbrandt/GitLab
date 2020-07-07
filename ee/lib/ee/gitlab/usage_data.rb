@@ -295,11 +295,7 @@ module EE
         override :usage_activity_by_stage_release
         def usage_activity_by_stage_release(time_period)
           super.merge({
-            deployments: distinct_count(::Deployment.where(time_period), :user_id),
-            failed_deployments: distinct_count(::Deployment.failed.where(time_period), :user_id),
-            projects_mirrored_with_pipelines_enabled: distinct_count(::Project.mirrored_with_enabled_pipelines.where(time_period), :creator_id),
-            releases: distinct_count(::Release.where(time_period), :author_id),
-            successful_deployments: distinct_count(::Deployment.success.where(time_period), :user_id)
+            projects_mirrored_with_pipelines_enabled: distinct_count(::Project.mirrored_with_enabled_pipelines.where(time_period), :creator_id)
           })
         end
 
