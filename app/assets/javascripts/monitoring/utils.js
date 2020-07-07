@@ -224,6 +224,11 @@ export const templatingVariablesFromUrl = (search = window.location.search) => {
   return mapKeys(paramsWithVars, (val, key) => removePrefixFromLabel(key));
 };
 
+export const envIdFromUrl = (search = window.location.search) => {
+  const params = queryToObject(search);
+  return params?.env_id
+};
+
 /**
  * Update the URL with variables. This usually get triggered when
  * the user interacts with the dynamic input elements in the monitoring

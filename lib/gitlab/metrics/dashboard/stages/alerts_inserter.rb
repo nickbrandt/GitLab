@@ -10,7 +10,7 @@ module Gitlab
           include ::Gitlab::Utils::StrongMemoize
 
           def transform!
-            return if metrics_with_alerts.empty?
+            return if metrics_with_alerts.empty? || params[:environment].blank?
 
             for_metrics do |metric|
               next unless metrics_with_alerts.include?(metric[:metric_id])

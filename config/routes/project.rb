@@ -249,6 +249,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         get :metrics, to: 'metrics/dashboard#index'
         get :metrics_dashboard, to: 'metrics/dashboard#metrics_dashboard'
+        get '/prometheus/api/v1/*proxy_path', to: 'metrics/dashboard#prometheus_proxy', as: :prometheus_api
 
         resources :environments, except: [:destroy] do
           member do

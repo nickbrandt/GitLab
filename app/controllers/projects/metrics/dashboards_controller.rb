@@ -4,8 +4,13 @@ module Projects
   module Metrics
     class DashboardController < Projects::ApplicationController
       include MetricsDashboard
+      include ::Metrics::Dashboard::PrometheusApiProxy
 
-      before_action :environment
+      before_action only: [:metrics, :metrics_dashboard] do
+        authorize_metrics_dashboard!
+
+        push_frontend_feature_flag(:prometheus_computed_alerts)
+      end
 
       def index
         respond_to do |format|
@@ -22,10 +27,26 @@ module Projects
 
       private
 
+      def proxyable
+        @proxyable ||= if environment
+                         environment.prometheus_adapter
+                       else
+                         ::Clusters::ClustersHierarchy.new(project)
+                           .base_and_ancestors
+                           .default_environment
+                           .first
+                           .prometheus_adapter
+                       end
+      end
+
       def environment
         if params[:env_id]
           @environment ||= project.environments.find(params[:env_id])
         end
+      end
+
+      def proxy_variable_substitution_service
+        ::Prometheus::ProxyVariableSubstitutionService
       end
     end
   end

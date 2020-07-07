@@ -110,7 +110,7 @@ module Prometheus
 
     def prometheus_adapter
       strong_memoize(:prometheus_adapter) do
-        @proxyable.prometheus_adapter
+        @proxyable
       end
     end
 

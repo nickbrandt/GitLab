@@ -9,6 +9,7 @@ import {
   parseAnnotationsResponse,
   removeLeadingSlash,
 } from './utils';
+import { envIdFromUrl } from '../utils';
 import trackDashboardLoad from '../monitoring_tracking_helper';
 import getEnvironments from '../queries/getEnvironments.query.graphql';
 import getAnnotations from '../queries/getAnnotations.query.graphql';
@@ -30,11 +31,13 @@ function prometheusMetricQueryParams(timeRange) {
   const timeDiff = (new Date(end) - new Date(start)) / 1000;
   const minStep = 60;
   const queryDataPoints = 600;
+  const envId = envIdFromUrl();
 
   return {
     start_time: start,
     end_time: end,
     step: Math.max(minStep, Math.ceil(timeDiff / queryDataPoints)),
+    env_id: envId,
   };
 }
 
@@ -120,6 +123,11 @@ export const fetchDashboard = ({ state, commit, dispatch, getters }) => {
   const params = {};
   if (getters.fullDashboardPath) {
     params.dashboard = getters.fullDashboardPath;
+  }
+
+  const envId = envIdFromUrl();
+  if (envId) {
+    params.env_id = envId;
   }
 
   return backOffRequest(() => axios.get(state.dashboardEndpoint, { params }))

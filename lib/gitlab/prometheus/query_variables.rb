@@ -5,8 +5,13 @@ module Gitlab
     module QueryVariables
       # start_time and end_time should be Time objects.
       def self.call(environment, start_time: nil, end_time: nil)
-        {
-          __range: range(start_time, end_time),
+        v = {
+          __range: range(start_time, end_time)
+        }
+
+        return v unless environment
+
+        v.merge({
           ci_environment_slug: environment.slug,
           kube_namespace: environment.deployment_namespace || '',
           environment_filter: %{container_name!="POD",environment="#{environment.slug}"},
@@ -14,7 +19,7 @@ module Gitlab
           ci_project_namespace: environment.project.namespace.name,
           ci_project_path: environment.project.full_path,
           ci_environment_name: environment.name
-        }
+        })
       end
 
       private

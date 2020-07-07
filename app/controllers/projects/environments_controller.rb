@@ -160,11 +160,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   def metrics_redirect
     environment = project.default_environment
 
-    if environment
-      redirect_to environment_metrics_path(environment)
-    else
-      render :empty_metrics
-    end
+    redirect_to project_metrics_path(project, env_id: environment&.id)
   end
 
   def metrics

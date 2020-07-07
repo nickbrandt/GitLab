@@ -8,7 +8,11 @@ class Projects::Environments::PrometheusApiController < Projects::ApplicationCon
   private
 
   def proxyable
-    @proxyable ||= project.environments.find(params[:id])
+    @proxyable ||= environment.prometheus_adapter
+  end
+
+  def environment
+    @environment ||= project.environments.find(params[:id])
   end
 
   def proxy_variable_substitution_service
