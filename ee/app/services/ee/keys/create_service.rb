@@ -10,7 +10,7 @@ module EE
       end
 
       def log_audit_event(key)
-        audit_event_service.for_user(key.title).security_event
+        audit_event_service.for_key(key.title, key.id).security_event
       end
 
       def audit_event_service

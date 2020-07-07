@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AuditEventService
+  attr_accessor :target_type, :target_id
+
   # Instantiates a new service
   #
   # @param [User] author the user who authors the change
@@ -63,7 +65,9 @@ class AuditEventService
       author_id: @author.id,
       author_name: @author.name,
       entity_id: @entity.id,
-      entity_type: @entity.class.name
+      entity_type: @entity.class.name,
+      target_type: @target_type,
+      target_id: @target_id
     }
   end
 

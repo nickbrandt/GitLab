@@ -16,11 +16,13 @@ RSpec.describe AuditEventService do
 
     it 'creates an event and logs to a file' do
       expect(service).to receive(:file_logger).and_return(logger)
+      service.target_type = 'User'
       expect(logger).to receive(:info).with(author_id: user.id,
                                             author_name: user.name,
                                             entity_id: project.id,
                                             entity_type: "Project",
-                                            action: :destroy)
+                                            action: :destroy,
+                                            target_type: 'User')
 
       expect { service.security_event }.to change(SecurityEvent, :count).by(1)
     end

@@ -13,26 +13,27 @@ module EE
     def for_member(member)
       action = @details[:action]
       old_access_level = @details[:old_access_level]
-      user_id = member.id
-      user_name = member.user ? member.user.name : 'Deleted User'
+      @target_id = member.id
+      member_name = member.user ? member.user.name : 'Deleted User'
 
+      @target_type = 'User'
       @details =
         case action
         when :destroy
           {
             remove: "user_access",
             author_name: @author.name,
-            target_id: user_id,
+            target_id: @target_id,
             target_type: "User",
-            target_details: user_name
+            target_details: member_name
           }
         when :expired
           {
             remove: "user_access",
             author_name: member.created_by ? member.created_by.name : 'Deleted User',
-            target_id: user_id,
+            target_id: @target_id,
             target_type: "User",
-            target_details: user_name,
+            target_details: member_name,
             system_event: true,
             reason: "access expired on #{member.expires_at}"
           }
@@ -41,9 +42,9 @@ module EE
             add: "user_access",
             as: ::Gitlab::Access.options_with_owner.key(member.access_level.to_i),
             author_name: @author.name,
-            target_id: user_id,
+            target_id: @target_id,
             target_type: "User",
-            target_details: user_name
+            target_details: member_name
           }
         when :update, :override
           {
@@ -53,9 +54,9 @@ module EE
             expiry_from: @details[:old_expiry],
             expiry_to: member.expires_at,
             author_name: @author.name,
-            target_id: user_id,
+            target_id: @target_id,
             target_type: "User",
-            target_details: user_name
+            target_details: member_name
           }
         end
 
@@ -114,6 +115,9 @@ module EE
           target_details: @details[:target_details] || model.name
         }
 
+      @target_type = model.class.name
+      @target_id = model.id
+
       self
     end
 
@@ -157,10 +161,12 @@ module EE
     # @param [String] full_path required if it is different from the User model
     #   in @entity. This is for backward compatability and will be dropped after
     #   all of these incorrect usages are removed.
+    #   This is also used for recording when a user is currently
+    #   impersonated.
     #
     # @return [AuditEventService]
     def for_user(full_path = @entity.full_path)
-      for_custom_model('user', full_path)
+      for_custom_model('user', full_path, @entity.id)
     end
 
     # Builds the @details attribute for project
@@ -169,7 +175,7 @@ module EE
     #
     # @return [AuditEventService]
     def for_project
-      for_custom_model('project', @entity.full_path)
+      for_custom_model('project', @entity.full_path, @entity.id)
     end
 
     # Builds the @details attribute for group
@@ -178,7 +184,7 @@ module EE
     #
     # @return [AuditEventService]
     def for_group
-      for_custom_model('group', @entity.full_path)
+      for_custom_model('group', @entity.full_path, @entity.id)
     end
 
     def enabled?
@@ -219,10 +225,13 @@ module EE
       end
     end
 
-    def for_custom_model(model, key_title)
+    def for_custom_model(model, key_title, target_id)
       action = @details[:action]
       model_class = model.camelize
       custom_message = @details[:custom_message]
+
+      @target_type = model_class
+      @target_id = target_id
 
       @details =
         case action

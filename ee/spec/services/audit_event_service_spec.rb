@@ -14,6 +14,9 @@ RSpec.describe AuditEventService do
     it 'generates event' do
       event = service.for_member(project_member).security_event
       expect(event[:details][:target_details]).to eq(user.name)
+      expect(event[:details][:target_type]).to eq('User')
+      expect(event.target_type).to eq('User')
+      expect(event.target_id).to eq(project_member.id)
     end
 
     it 'handles deleted users' do
@@ -21,6 +24,8 @@ RSpec.describe AuditEventService do
 
       event = service.for_member(project_member).security_event
       expect(event[:details][:target_details]).to eq('Deleted User')
+      expect(event.target_id).to eq(project_member.id)
+      expect(event.target_type).to eq('User')
     end
 
     context 'user access expiry' do
@@ -313,7 +318,7 @@ RSpec.describe AuditEventService do
     let(:author_name) { 'Administrator' }
     let(:current_user) { User.new(name: author_name) }
     let(:target_user_full_path) { 'ejohn' }
-    let(:user) { instance_spy(User, full_path: target_user_full_path) }
+    let(:user) { create(:user) }
     let(:custom_message) { 'Some strange event has occurred' }
     let(:ip_address) { '127.0.0.1' }
     let(:options) { { action: action, custom_message: custom_message, ip_address: ip_address } }
@@ -327,10 +332,15 @@ RSpec.describe AuditEventService do
         expect(service.instance_variable_get(:@details)).to eq(
           remove: 'user',
           author_name: author_name,
-          target_id: target_user_full_path,
+          target_id: user.full_path,
           target_type: 'User',
-          target_details: target_user_full_path
+          target_details: user.full_path
         )
+      end
+
+      it 'sets database values' do
+        expect(service.instance_variable_get(:@target_type)).to eq('User')
+        expect(service.instance_variable_get(:@target_id)).to eq(user.id)
       end
     end
 
@@ -341,10 +351,15 @@ RSpec.describe AuditEventService do
         expect(service.instance_variable_get(:@details)).to eq(
           add: 'user',
           author_name: author_name,
-          target_id: target_user_full_path,
+          target_id: user.full_path,
           target_type: 'User',
-          target_details: target_user_full_path
+          target_details: user.full_path
         )
+      end
+
+      it 'sets database values' do
+        expect(service.instance_variable_get(:@target_type)).to eq('User')
+        expect(service.instance_variable_get(:@target_id)).to eq(user.id)
       end
     end
 
@@ -355,11 +370,16 @@ RSpec.describe AuditEventService do
         expect(service.instance_variable_get(:@details)).to eq(
           custom_message: custom_message,
           author_name: author_name,
-          target_id: target_user_full_path,
+          target_id: user.full_path,
           target_type: 'User',
-          target_details: target_user_full_path,
+          target_details: user.full_path,
           ip_address: ip_address
         )
+      end
+
+      it 'sets database values' do
+        expect(service.instance_variable_get(:@target_type)).to eq('User')
+        expect(service.instance_variable_get(:@target_id)).to eq(user.id)
       end
     end
   end
@@ -382,6 +402,65 @@ RSpec.describe AuditEventService do
         target_type: 'ApprovalProjectRule',
         target_details: 'Security'
       )
+    end
+
+    it 'sets database values' do
+      expect(service.instance_variable_get(:@target_type)).to eq('ApprovalProjectRule')
+      expect(service.instance_variable_get(:@target_id)).to eq(6)
+    end
+  end
+
+  describe '#for_project' do
+    let(:author_name) { 'Administrator' }
+    let(:current_user) { create(:user) }
+    let(:project) { create(:project) }
+    let(:action) { :destroy }
+    let(:options) { { action: action } }
+
+    subject(:service) { described_class.new(current_user, project, options).for_project }
+
+    it 'sets the details attribute' do
+      expect(service.instance_variable_get(:@details)).to eq(
+        {
+            remove: 'project',
+            author_name: current_user.name,
+            target_id: project.full_path,
+            target_type: 'Project',
+            target_details: project.full_path
+        }
+      )
+    end
+
+    it 'sets database values' do
+      expect(service.instance_variable_get(:@target_type)).to eq('Project')
+      expect(service.instance_variable_get(:@target_id)).to eq(project.id)
+    end
+  end
+
+  describe '#for_group' do
+    let(:author_name) { 'Administrator' }
+    let(:current_user) { create(:user) }
+    let(:group) { create(:group) }
+    let(:action) { :destroy }
+    let(:options) { { action: action } }
+
+    subject(:service) { described_class.new(current_user, group, options).for_group }
+
+    it 'sets the details attribute' do
+      expect(service.instance_variable_get(:@details)).to eq(
+        {
+            remove: 'group',
+            author_name: current_user.name,
+            target_id: group.full_path,
+            target_type: 'Group',
+            target_details: group.full_path
+        }
+      )
+    end
+
+    it 'sets database values' do
+      expect(service.instance_variable_get(:@target_type)).to eq('Group')
+      expect(service.instance_variable_get(:@target_id)).to eq(group.id)
     end
   end
 

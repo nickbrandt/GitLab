@@ -9368,6 +9368,9 @@ CREATE TABLE public.audit_events (
     updated_at timestamp without time zone,
     ip_address inet,
     author_name text,
+    target_type text,
+    target_id bigint,
+    CONSTRAINT check_82294106dd CHECK ((char_length(target_type) <= 255)),
     CONSTRAINT check_83ff8406e2 CHECK ((char_length(author_name) <= 255))
 );
 
@@ -23581,6 +23584,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200703154822
 20200704143633
 20200706005325
+20200706092954
 20200706170536
+20200707084450
 \.
 
