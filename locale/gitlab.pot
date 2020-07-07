@@ -4137,6 +4137,9 @@ msgstr ""
 msgid "Cannot have multiple Jira imports running at the same time"
 msgstr ""
 
+msgid "Cannot have multiple unresolved alerts"
+msgstr ""
+
 msgid "Cannot import because issues are not available in this project."
 msgstr ""
 

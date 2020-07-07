@@ -95,11 +95,35 @@ RSpec.describe AlertManagement::Alert do
 
           it { is_expected.not_to be_valid }
 
-          context 'resolved status' do
-            # We are only validating uniqueness for non-resolved alerts
-            let(:new_alert) { build(:alert_management_alert, :resolved, fingerprint: fingerprint, project: project) }
+          context 'various states' do
+            using RSpec::Parameterized::TableSyntax
 
-            it { is_expected.to be_valid }
+            # We are only validating uniqueness for non-resolved alerts
+            where(:existing_status, :new_status, :valid) do
+              :resolved      | :triggered    | true
+              :resolved      | :resolved     | true
+              :triggered     | :triggered    | false
+              :triggered     | :acknowledged | false
+              :triggered     | :ignored      | false
+              :triggered     | :resolved     | true
+              :acknowledged  | :triggered    | false
+              :acknowledged  | :acknowledged | false
+              :acknowledged  | :ignored      | false
+              :acknowledged  | :resolved     | true
+              :ignored       | :triggered    | false
+              :ignored       | :acknowledged | false
+              :ignored       | :ignored      | false
+              :ignored       | :resolved     | true
+            end
+
+            with_them do
+              let(:existing_alert) { create(:alert_management_alert, existing_status, fingerprint: fingerprint) }
+              let(:new_alert) { build(:alert_management_alert, new_status, fingerprint: fingerprint, project: project) }
+
+              it 'gives the correct validity' do
+                expect(new_alert.valid?).to eq(valid)
+              end
+            end
           end
         end
 

@@ -5,7 +5,7 @@ class AdjustUniqueIndexAlertManagementAlerts < ActiveRecord::Migration[6.0]
 
   DOWNTIME        = false
   INDEX_NAME      = 'index_alert_management_alerts_on_project_id_and_fingerprint'
-  RESOLVED_STATUS = AlertManagement::Alert::STATUSES[:resolved]
+  RESOLVED_STATUS = 2
 
   # rubocop:disable Migration/RemoveIndex
   # rubocop:disable Migration/AddIndex
