@@ -7,12 +7,6 @@ module API
         Gitlab::TimeTrackingFormatter.output(time_spent)
       end
 
-      def presented
-        lazy_timelogs
-
-        super
-      end
-
       expose :time_estimate
       expose :total_time_spent
       expose :human_time_estimate
@@ -21,19 +15,12 @@ module API
         expose :total_time_spent, as: :human_total_time_spent
       end
 
-      private
-
-      def lazy_timelogs
-        BatchLoader.for(object.id).batch(key: :timelogs, default_value: []) do |ids, loader|
-          Timelog.for_merge_requests(ids).find_each do |timelog|
-            loader.call(timelog.merge_request_id) { |acc| acc << timelog }
-          end
-        end
-      end
-
+      # rubocop: disable CodeReuse/ActiveRecord
       def total_time_spent
-        lazy_timelogs.sum(&:time_spent) # rubocop:disable CodeReuse/ActiveRecord
+        # Avoids an N+1 query since timelogs are preloaded
+        object.timelogs.map(&:time_spent).sum
       end
+      # rubocop: enable CodeReuse/ActiveRecord
     end
   end
 end

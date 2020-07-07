@@ -100,10 +100,6 @@ class MergeRequestDiff < ApplicationRecord
     joins(merge_request: :metrics).where(condition)
   end
 
-  scope :for_merge_requests, -> (merge_request_scope) do
-    where(merge_request: merge_request_scope)
-  end
-
   def self.ids_for_external_storage_migration(limit:)
     # No point doing any work unless the feature is enabled
     return [] unless Gitlab.config.external_diffs.enabled

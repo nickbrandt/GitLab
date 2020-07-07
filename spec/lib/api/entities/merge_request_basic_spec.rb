@@ -9,20 +9,25 @@ RSpec.describe ::API::Entities::MergeRequestBasic do
   let_it_be(:labels) { create_list(:label, 3) }
   let_it_be(:merge_requests) { create_list(:labeled_merge_request, 10, :unique_branches, :with_diffs, labels: labels) }
 
-  let(:scope) { MergeRequest.with_api_entity_associations }
-
   # This mimics the behavior of the `Grape::Entity` serializer
   def present(obj)
     described_class.new(obj).presented
   end
 
-  describe "#with_api_entity_associations" do
+  context "with :with_api_entity_associations scope" do
+    let(:scope) { MergeRequest.with_api_entity_associations }
+
     it "avoids N+1 queries" do
       query = scope.find(merge_request.id)
 
       control = ActiveRecord::QueryRecorder.new do
         present(query).to_json
       end
+
+      # stub the `head_commit_sha` as it will trigger a
+      # backward compatibility query that is out-of-scope
+      # for this test whenever it is `nil`
+      allow_any_instance_of(MergeRequestDiff).to receive(:head_commit_sha).and_return(Gitlab::Git::BLANK_SHA)
 
       query = scope.all
       batch = ActiveRecord::QueryRecorder.new do
