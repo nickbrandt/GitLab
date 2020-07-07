@@ -13,8 +13,12 @@ module EE
       include ::Gitlab::Utils::StrongMemoize
       include FromUnion
 
+      after_create :clear_rotation_notification_cache
+
       scope :with_no_expires_at, -> { where(revoked: false, expires_at: nil) }
       scope :with_expires_at_after, ->(max_lifetime) { where(revoked: false).where('expires_at > ?', max_lifetime) }
+      scope :expires_in, ->(within) { not_revoked.where('expires_at > NOW() AND expires_at <= ?', within) }
+      scope :created_on_or_after, ->(date) { active.where('created_at >= ?', date) }
 
       with_options if: :expiration_policy_enabled? do
         validates :expires_at, presence: true
@@ -56,6 +60,13 @@ module EE
       false
     end
 
+    override :revoke!
+    def revoke!
+      clear_rotation_notification_cache
+
+      super
+    end
+
     private
 
     def expiration_policy_enabled?
@@ -94,6 +105,10 @@ module EE
 
     def group_level_max_expiry_date
       user.managing_group.max_personal_access_token_lifetime_from_now
+    end
+
+    def clear_rotation_notification_cache
+      ::PersonalAccessTokens::RotationVerifierService.new(user).clear_cache
     end
   end
 end

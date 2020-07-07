@@ -3154,6 +3154,12 @@ msgstr ""
 msgid "At least one of group_id or project_id must be specified"
 msgstr ""
 
+msgid "At least one of your Personal Access Tokens is expired, but expiration enforcement is disabled. %{generate_new}"
+msgstr ""
+
+msgid "At least one of your Personal Access Tokens will expire soon, but expiration enforcement is disabled. %{generate_new}"
+msgstr ""
+
 msgid "At risk"
 msgstr ""
 
@@ -10346,6 +10352,9 @@ msgid "Generate key"
 msgstr ""
 
 msgid "Generate new export"
+msgstr ""
+
+msgid "Generate new token"
 msgstr ""
 
 msgid "GenericReports|Report"
