@@ -178,7 +178,6 @@ or newest items to be shown first.
 
 ![Issue activity sort order dropdown button](img/epic_activity_sort_order_v13_2.png)
 
-
 ## Award emoji
 
 You can [award an emoji](../../award_emojis.md) to that epic or its comments.
