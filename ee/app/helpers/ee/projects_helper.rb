@@ -154,6 +154,12 @@ module EE
       ]
     end
 
+    def sidebar_external_tracker_paths
+      %w[
+        projects/integrations/jira/issues#index
+      ]
+    end
+
     def size_limit_message(project)
       show_lfs = project.lfs_enabled? ? 'including files in LFS' : ''
 
