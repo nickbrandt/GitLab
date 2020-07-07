@@ -224,6 +224,8 @@ module EE
       model_class = model.camelize
       custom_message = @details[:custom_message]
 
+      @target_type = model_class
+
       @details =
         case action
         when :destroy

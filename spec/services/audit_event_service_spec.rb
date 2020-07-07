@@ -21,7 +21,6 @@ RSpec.describe AuditEventService do
                                             entity_id: project.id,
                                             entity_type: "Project",
                                             action: :destroy)
-
       expect { service.security_event }.to change(SecurityEvent, :count).by(1)
     end
 
