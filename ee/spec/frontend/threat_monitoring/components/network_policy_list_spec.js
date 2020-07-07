@@ -5,6 +5,7 @@ import { GlTable } from '@gitlab/ui';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { mockPoliciesResponse } from '../mock_data';
+import { PREDEFINED_NETWORK_POLICIES } from 'ee/threat_monitoring/constants';
 
 const mockData = mockPoliciesResponse.map(policy => convertObjectPropsToCamelCase(policy));
 
@@ -145,6 +146,43 @@ describe('NetworkPolicyList component', () => {
         expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/updatePolicy', {
           environmentId: -1,
           policy: mockData[0],
+        });
+      });
+
+      describe('given there is an updatePolicy error', () => {
+        beforeEach(() => {
+          jest.spyOn(store, 'dispatch').mockRejectedValue();
+        });
+
+        it('reverts isEnabled change', () => {
+          const initial = mockData[0].isEnabled;
+
+          findApplyButton().vm.$emit('click');
+
+          const policyToggle = findPolicyToggle();
+          expect(policyToggle.exists()).toBe(true);
+          expect(policyToggle.props('value')).toBe(initial);
+        });
+      });
+
+      describe('given theres is a predefined policy change', () => {
+        beforeEach(() => {
+          factory({
+            data: () => ({
+              selectedPolicyName: 'drop-outbound',
+              initialManifest: mockData[0].manifest,
+              initialEnforcementStatus: mockData[0].isEnabled,
+            }),
+          });
+        });
+
+        it('dispatches createPolicy action on apply button click', () => {
+          findApplyButton().vm.$emit('click');
+
+          expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/createPolicy', {
+            environmentId: -1,
+            policy: PREDEFINED_NETWORK_POLICIES[0],
+          });
         });
       });
     });
