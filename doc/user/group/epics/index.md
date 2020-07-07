@@ -176,7 +176,7 @@ you view.
 To change the activity sort order, click the **Oldest first** dropdown menu and select either oldest
 or newest items to be shown first.
 
-![Issue activity sort order dropdown button](img/issue_activity_sort_order_v13_2.png)
+![Issue activity sort order dropdown button](img/epic_activity_sort_order_v13_2.png)
 
 
 ## Award emoji
