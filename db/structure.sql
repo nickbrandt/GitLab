@@ -20498,6 +20498,8 @@ CREATE UNIQUE INDEX merge_request_user_mentions_on_mr_id_and_note_id_index ON pu
 
 CREATE UNIQUE INDEX merge_request_user_mentions_on_mr_id_index ON public.merge_request_user_mentions USING btree (merge_request_id) WHERE (note_id IS NULL);
 
+CREATE INDEX mr_approval_rules_index ON public.approval_merge_request_rules USING btree (merge_request_id, created_at);
+
 CREATE INDEX note_mentions_temp_index ON public.notes USING btree (id, noteable_type) WHERE (note ~~ '%@%'::text);
 
 CREATE UNIQUE INDEX one_canonical_wiki_page_slug_per_metadata ON public.wiki_page_slugs USING btree (wiki_page_meta_id) WHERE (canonical = true);
@@ -22575,6 +22577,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20190220150130
 20190222051615
 20190225152525
+20190225160300
 20190225160301
 20190228192410
 20190301081611
@@ -23642,5 +23645,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200706005325
 20200706170536
 20200707071941
+20200708192136
 \.
 

@@ -309,6 +309,10 @@ RSpec.describe Gitlab::UsageData do
             project = create(:project, :repository_private, :github_imported,
                               :test_repo, :remote_mirror, creator: user)
             merge_request = create(:merge_request, source_project: project)
+            project_rule = create(:approval_project_rule, project: project)
+            merge_rule = create(:approval_merge_request_rule, merge_request: merge_request)
+
+            create(:approval_merge_request_rule_source, approval_merge_request_rule: merge_rule, approval_project_rule: project_rule)
             create(:deploy_key, user: user)
             create(:key, user: user)
             create(:project, creator: user)
@@ -320,6 +324,8 @@ RSpec.describe Gitlab::UsageData do
             create(:suggestion, note: create(:note, project: project))
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
+            create(:approval_merge_request_rule, merge_request: merge_request)
+
             create_list(:code_owner_rule, 3, approvals_required: 2)
             create_list(:code_owner_rule, 2)
           end
@@ -333,6 +339,7 @@ RSpec.describe Gitlab::UsageData do
             merge_requests_with_required_codeowners: 8,
             projects_with_disable_overriding_approvers_per_merge_request: 2,
             projects_without_disable_overriding_approvers_per_merge_request: 16,
+            merge_requests_with_added_rules: 12,
             projects_imported_from_github: 2,
             projects_with_repositories_enabled: 12,
             protected_branches: 2,
@@ -350,6 +357,7 @@ RSpec.describe Gitlab::UsageData do
             merge_requests_with_required_codeowners: 4,
             projects_with_disable_overriding_approvers_per_merge_request: 1,
             projects_without_disable_overriding_approvers_per_merge_request: 8,
+            merge_requests_with_added_rules: 6,
             projects_imported_from_github: 1,
             projects_with_repositories_enabled: 6,
             protected_branches: 1,

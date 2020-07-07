@@ -214,6 +214,7 @@ module EE
             keys: distinct_count(::Key.regular_keys.where(time_period), :user_id),
             merge_requests: distinct_count(::MergeRequest.where(time_period), :author_id),
             projects_enforcing_code_owner_approval: distinct_count(::Project.requiring_code_owner_approval.where(time_period), :creator_id),
+            merge_requests_with_added_rules: distinct_count(::ApprovalMergeRequestRule.left_outer_joins(:approval_merge_request_rule_source).where(time_period).where(approval_merge_request_rule_sources: { approval_merge_request_rule_id: nil }), :merge_request_id),
             merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional.where(time_period), :merge_request_id),
             merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required.where(time_period), :merge_request_id),
             projects_with_disable_overriding_approvers_per_merge_request: count(::Project.where(time_period.merge(disable_overriding_approvers_per_merge_request: true))),
