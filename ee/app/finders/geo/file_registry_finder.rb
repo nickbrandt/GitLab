@@ -54,14 +54,6 @@ module Geo
       raise NotImplementedError
     end
 
-    # @!method find_migrated_local
-    #    Return an ActiveRecord::Relation of tracked resource records, filtered
-    #    by selective sync, with files stored remotely, excluding
-    #    specified IDs, limited to batch_size
-    def find_migrated_local
-      raise NotImplementedError
-    end
-
     # @!method find_retryable_failed_registries
     #    Return an ActiveRecord::Relation of registry records marked as failed,
     #    which are ready to be retried, excluding specified IDs, limited to

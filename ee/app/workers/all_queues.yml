@@ -75,14 +75,6 @@
   :weight: 1
   :idempotent: 
   :tags: []
-- :name: cronjob:geo_migrated_local_files_clean_up
-  :feature_category: :geo_replication
-  :has_external_dependencies: 
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 1
-  :idempotent: 
-  :tags: []
 - :name: cronjob:geo_prune_event_log
   :feature_category: :geo_replication
   :has_external_dependencies: 
