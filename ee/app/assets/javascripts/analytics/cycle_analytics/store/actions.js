@@ -109,7 +109,13 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
   removeFlash();
 
   dispatch('requestCycleAnalyticsData');
+  // TODO: we will need to do some extra refactoring here
+  // We need the selected value stream to be selected first
+  // once we have that, we can then fetch the groups stages and events,
+  // this is because they will now live under the /value_streams entity
+
   return Promise.resolve()
+    .then(() => dispatch('fetchValueStreams'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
@@ -312,4 +318,35 @@ export const createValueStream = ({ commit, rootState }, data) => {
       const { data: { message, errors } = null } = response;
       commit(types.RECEIVE_CREATE_VALUE_STREAM_ERROR, { data, message, errors });
     });
+};
+
+export const setSelectedValueStream = ({ commit }, streamId) =>
+  commit(types.SET_SELECTED_VALUE_STREAM, streamId);
+
+export const receiveValueStreams = ({ commit, dispatch }, { data }) => {
+  commit(types.RECEIVE_VALUE_STREAMS_SUCCESS, data);
+  const [firstStream] = data;
+  return dispatch('setSelectedValueStream', firstStream.id);
+};
+
+export const fetchValueStreams = ({ commit, dispatch, getters, state }, data) => {
+  const {
+    featureFlags: { hasCreateMultipleValueStreams = false },
+  } = state;
+  const { currentGroupPath } = getters;
+
+  if (hasCreateMultipleValueStreams) {
+    commit(types.REQUEST_VALUE_STREAMS);
+
+    return Api.cycleAnalyticsValueStreams(currentGroupPath)
+      .then(response => {
+        const { status, data: responseData } = response;
+        return dispatch('receiveValueStreams', { status, data: responseData });
+      })
+      .catch(({ response } = {}) => {
+        const { data: { message, errors } = null } = response;
+        commit(types.RECEIVE_VALUE_STREAMS_ERROR, { data, message, errors });
+      });
+  }
+  return Promise.resolve();
 };

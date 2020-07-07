@@ -20,6 +20,7 @@ export default () => ({
   selectedMilestone: null,
   selectedAssignees: [],
   selectedLabels: [],
+  selectedValueStream: null,
 
   currentStageEvents: [],
 
@@ -29,4 +30,5 @@ export default () => ({
   stages: [],
   summary: [],
   medians: {},
+  valueStreams: [],
 });

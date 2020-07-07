@@ -246,6 +246,7 @@ describe('Cycle analytics actions', () => {
         [],
         [
           { type: 'requestCycleAnalyticsData' },
+          { type: 'fetchValueStreams' },
           { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
           { type: 'receiveCycleAnalyticsDataSuccess' },

@@ -1,5 +1,15 @@
 <script>
-import { GlButton, GlForm, GlFormInput, GlFormGroup, GlModal, GlModalDirective } from '@gitlab/ui';
+import {
+  GlButton,
+  GlNewDropdown as GlDropdown,
+  GlNewDropdownItem as GlDropdownItem,
+  GlNewDropdownDivider as GlDropdownDivider,
+  GlForm,
+  GlFormInput,
+  GlFormGroup,
+  GlModal,
+  GlModalDirective,
+} from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
 import { sprintf, __ } from '~/locale';
 import { debounce } from 'lodash';
@@ -23,6 +33,9 @@ const validate = ({ name }) => {
 export default {
   components: {
     GlButton,
+    GlDropdown,
+    GlDropdownItem,
+    GlDropdownDivider,
     GlForm,
     GlFormInput,
     GlFormGroup,
@@ -41,12 +54,23 @@ export default {
     ...mapState({
       isLoading: 'isCreatingValueStream',
       initialFormErrors: 'createValueStreamErrors',
+      data: 'valueStreams',
+      selectedValueStream: 'selectedValueStream',
     }),
     isValid() {
       return !this.errors?.name.length;
     },
     invalidFeedback() {
       return this.errors?.name.join('\n');
+    },
+    hasValueStreams() {
+      return Boolean(this.data.length);
+    },
+    selectedValueStreamName() {
+      return this?.selectedValueStream?.name || '';
+    },
+    selectedValueStreamId() {
+      return this?.selectedValueStream?.id || null;
     },
   },
   mounted() {
@@ -58,7 +82,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['createValueStream']),
+    ...mapActions(['createValueStream', 'setSelectedValueStream']),
     onSubmit() {
       const { name } = this;
       return this.createValueStream({ name }).then(() => {
@@ -73,12 +97,32 @@ export default {
       const { name } = this;
       this.errors = validate({ name });
     }, 250),
+    isSelected(id) {
+      return this.selectedValueStreamId && this.selectedValueStreamId === id;
+    },
+    onSelect(id) {
+      this.setSelectedValueStream(id);
+    },
   },
 };
 </script>
 <template>
   <gl-form>
-    <gl-button v-gl-modal-directive="'create-value-stream-modal'" @click="onHandleInput">{{
+    <gl-dropdown v-if="hasValueStreams" :text="selectedValueStreamName" right>
+      <gl-dropdown-item
+        v-for="{ id, name: streamName } in data"
+        :key="id"
+        :is-check-item="true"
+        :is-checked="isSelected(id)"
+        @click="onSelect(id)"
+        >{{ streamName }}</gl-dropdown-item
+      >
+      <gl-dropdown-divider />
+      <gl-dropdown-item v-gl-modal-directive="'create-value-stream-modal'" @click="onHandleInput">{{
+        __('Create new value stream')
+      }}</gl-dropdown-item>
+    </gl-dropdown>
+    <gl-button v-else v-gl-modal-directive="'create-value-stream-modal'" @click="onHandleInput">{{
       __('Create new value stream')
     }}</gl-button>
     <gl-modal
