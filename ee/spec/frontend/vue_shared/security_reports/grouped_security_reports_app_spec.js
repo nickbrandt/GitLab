@@ -543,7 +543,7 @@ describe('Grouped security reports app', () => {
 
     beforeEach(() => {
       createWrapper(props);
-      trackingSpy = mockTracking('_category_', wrapper.vm.$el, jest.spyOn);
+      trackingSpy = mockTracking(category, wrapper.vm.$el, jest.spyOn);
     });
 
     afterEach(() => {
