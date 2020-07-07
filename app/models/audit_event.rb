@@ -20,6 +20,7 @@ class AuditEvent < ApplicationRecord
   scope :by_author_id, -> (author_id) { where(author_id: author_id) }
 
   after_initialize :initialize_details
+  after_validation :parallel_persist
 
   def self.order_by(method)
     case method.to_s
@@ -51,6 +52,10 @@ class AuditEvent < ApplicationRecord
   end
 
   private
+
+  def parallel_persist
+    self.target_type = details[:target_type]
+  end
 
   def default_author_value
     ::Gitlab::Audit::NullAuthor.for(author_id, (self[:author_name] || details[:author_name]))

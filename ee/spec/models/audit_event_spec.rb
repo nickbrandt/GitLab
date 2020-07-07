@@ -13,6 +13,16 @@ RSpec.describe AuditEvent, type: :model do
     it { is_expected.to validate_presence_of(:entity_type) }
   end
 
+  describe 'callbacks' do
+    context 'after_create' do
+      subject(:event) { create(:user_audit_event) }
+
+      it 'persists target_type to database' do
+        expect(subject.target_type).to eq('User')
+      end
+    end
+  end
+
   describe '.by_entity' do
     let_it_be(:project_event_1) { create(:project_audit_event) }
     let_it_be(:project_event_2) { create(:project_audit_event) }

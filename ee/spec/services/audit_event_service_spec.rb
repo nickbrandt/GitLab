@@ -14,6 +14,8 @@ RSpec.describe AuditEventService do
     it 'generates event' do
       event = service.for_member(project_member).security_event
       expect(event[:details][:target_details]).to eq(user.name)
+      expect(event[:details][:target_type]).to eq('User')
+      expect(event.target_type).to eq('User')
     end
 
     it 'handles deleted users' do
@@ -32,6 +34,17 @@ RSpec.describe AuditEventService do
         expect(event[:details][:remove]).to eq('user_access')
         expect(event[:details][:system_event]).to be_truthy
         expect(event[:details][:reason]).to include('access expired on')
+      end
+    end
+
+    context "user access creation" do
+      let(:service) { described_class.new(nil, project, { action: :create }) }
+
+      it 'generates a system event' do
+        event = service.for_member(project_member).security_event
+
+        expect(event[:details][:target_type]).to eq('User')
+        expect(event.target_type).to eq('User')
       end
     end
 
@@ -309,6 +322,22 @@ RSpec.describe AuditEventService do
     end
   end
 
+  describe '#for_project_group_link' do
+    let_it_be(:current_user) { create(:user) }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:link) { create(:project_group_link, group: group, project: project) }
+
+    let(:options) { { action: :create } }
+
+    subject(:event) { described_class.new(current_user, project, options).for_project_group_link(link).security_event }
+
+    it 'sets the target_type attribute' do
+      expect(event.details[:target_type]).to eq('Project')
+      expect(event.target_type).to eq('Project')
+    end
+  end
+
   describe '#for_user' do
     let(:author_name) { 'Administrator' }
     let(:current_user) { User.new(name: author_name) }
@@ -382,6 +411,59 @@ RSpec.describe AuditEventService do
         target_type: 'ApprovalProjectRule',
         target_details: 'Security'
       )
+    end
+  end
+
+  describe '#for_project' do
+    let(:author_name) { 'Administrator' }
+    let(:current_user) { create(:user) }
+    let(:project) { create(:project) }
+    let(:action) { :destroy }
+    let(:options) { { action: action } }
+
+    subject(:event) { described_class.new(current_user, project, options).for_project.security_event }
+
+    it 'sets the details attribute' do
+      expect(subject.details).to eq(
+        {
+          remove: 'project',
+          author_name: current_user.name,
+          target_id: project.full_path,
+          target_type: 'Project',
+          target_details: project.full_path
+        }
+      )
+    end
+
+    it 'sets the target_type column' do
+      expect(subject.target_type).to eq('Project')
+    end
+  end
+
+  describe '#for_group' do
+    let(:author_name) { 'Administrator' }
+    let(:current_user) { create(:user) }
+    let(:group) { create(:group) }
+    let(:action) { :destroy }
+    let(:options) { { action: action } }
+    let(:service) { described_class.new(current_user, group, options).for_group }
+
+    subject(:event) { service.security_event }
+
+    it 'sets the details attribute' do
+      expect(event.details).to eq(
+        {
+          remove: 'group',
+          author_name: current_user.name,
+          target_id: group.full_path,
+          target_type: 'Group',
+          target_details: group.full_path
+        }
+      )
+    end
+
+    it 'stores target_type in a database column' do
+      expect(subject.target_type).to eq('Group')
     end
   end
 
