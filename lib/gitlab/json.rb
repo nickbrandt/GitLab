@@ -19,7 +19,7 @@ module Gitlab
         # First we should ensure this really is a string, not some other
         # type which purports to be a string. This handles some legacy
         # usage of the JSON class.
-        string = string.to_s
+        string = string.to_s unless string.is_a?(String)
 
         legacy_mode = legacy_mode_enabled?(opts.delete(:legacy_mode))
         data = adapter_load(string, opts)
