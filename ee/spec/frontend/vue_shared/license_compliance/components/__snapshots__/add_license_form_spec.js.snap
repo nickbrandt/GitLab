@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AddLicenseForm template does not show dropdown descriptions, if licenseComplianceDeniesMr feature flag is disabled 1`] = `
+exports[`AddLicenseForm template does not show radio button descriptions, if licenseComplianceDeniesMr feature flag is disabled 1`] = `
 <div
   class="form-check"
 >
@@ -26,7 +26,7 @@ exports[`AddLicenseForm template does not show dropdown descriptions, if license
 </div>
 `;
 
-exports[`AddLicenseForm template does not show dropdown descriptions, if licenseComplianceDeniesMr feature flag is disabled 2`] = `
+exports[`AddLicenseForm template does not show radio button descriptions, if licenseComplianceDeniesMr feature flag is disabled 2`] = `
 <div
   class="form-check"
 >

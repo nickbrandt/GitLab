@@ -122,7 +122,7 @@ describe('AddLicenseForm', () => {
       });
     });
 
-    it('shows dropdown descriptions, if licenseComplianceDeniesMr feature flag is enabled', done => {
+    it('shows radio button descriptions, if licenseComplianceDeniesMr feature flag is enabled', done => {
       const wrapper = shallowMount(LicenseIssueBody, {
         propsData: {
           managedLicenses: [{ name: 'FOO' }],
@@ -134,7 +134,6 @@ describe('AddLicenseForm', () => {
 
       Vue.nextTick(() => {
         const descriptionElement = wrapper.findAll('.text-secondary');
-        const formCheckElement = wrapper.find('.form-check');
 
         expect(descriptionElement.at(0).text()).toBe(
           'Acceptable license to be used in the project',
@@ -144,13 +143,11 @@ describe('AddLicenseForm', () => {
           'Disallow merge request if detected and will instruct developer to remove',
         );
 
-        expect(formCheckElement).not.toBeNull();
-
         done();
       });
     });
 
-    it('does not show dropdown descriptions, if licenseComplianceDeniesMr feature flag is disabled', done => {
+    it('does not show radio button descriptions, if licenseComplianceDeniesMr feature flag is disabled', done => {
       vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
       vm.licenseName = 'FOO';
       Vue.nextTick(() => {
