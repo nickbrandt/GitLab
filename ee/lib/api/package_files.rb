@@ -17,7 +17,7 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get all package files' do
         detail 'This feature was introduced in GitLab 11.8'
-        success EE::API::Entities::PackageFile
+        success ::API::Entities::PackageFile
       end
       params do
         use :pagination
@@ -26,7 +26,7 @@ module API
         package = ::Packages::PackageFinder
           .new(user_project, params[:package_id]).execute
 
-        present paginate(package.package_files), with: EE::API::Entities::PackageFile
+        present paginate(package.package_files), with: ::API::Entities::PackageFile
       end
     end
   end

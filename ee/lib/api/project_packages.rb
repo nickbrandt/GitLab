@@ -16,7 +16,7 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get all project packages' do
         detail 'This feature was introduced in GitLab 11.8'
-        success EE::API::Entities::Package
+        success ::API::Entities::Package
       end
       params do
         use :pagination
@@ -35,12 +35,12 @@ module API
           declared_params.slice(:order_by, :sort, :package_type, :package_name)
         ).execute
 
-        present paginate(packages), with: EE::API::Entities::Package, user: current_user
+        present paginate(packages), with: ::API::Entities::Package, user: current_user
       end
 
       desc 'Get a single project package' do
         detail 'This feature was introduced in GitLab 11.9'
-        success EE::API::Entities::Package
+        success ::API::Entities::Package
       end
       params do
         requires :package_id, type: Integer, desc: 'The ID of a package'
@@ -49,7 +49,7 @@ module API
         package = ::Packages::PackageFinder
           .new(user_project, params[:package_id]).execute
 
-        present package, with: EE::API::Entities::Package, user: current_user
+        present package, with: ::API::Entities::Package, user: current_user
       end
 
       desc 'Remove a package' do
