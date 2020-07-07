@@ -4,8 +4,17 @@ module EE
   module Admin
     module ApplicationSettingsController
       extend ::Gitlab::Utils::Override
+      extend ActiveSupport::Concern
 
       include ::Admin::MergeRequestApprovalSettingsHelper
+
+      prepended do
+        before_action :elasticsearch_reindexing_task, only: [:integrations]
+
+        def elasticsearch_reindexing_task
+          @elasticsearch_reindexing_task = Elastic::ReindexingTask.last
+        end
+      end
 
       EE_VALID_SETTING_PANELS = %w(templates).freeze
 

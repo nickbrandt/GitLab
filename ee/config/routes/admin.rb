@@ -70,5 +70,6 @@ namespace :admin do
 
   namespace :elasticsearch do
     post :enqueue_index
+    post :trigger_reindexing
   end
 end

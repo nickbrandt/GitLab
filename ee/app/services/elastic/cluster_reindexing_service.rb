@@ -2,8 +2,10 @@
 
 module Elastic
   class ClusterReindexingService
+    include Gitlab::Utils::StrongMemoize
+
     INITIAL_INDEX_OPTIONS = { # Optimized for writes
-        refresh_interval: -1, # Disable automatic refreshing
+        refresh_interval: '10s',
         number_of_replicas: 0,
         translog: { durability: 'async' }
     }.freeze
@@ -20,7 +22,9 @@ module Elastic
     end
 
     def current_task
-      Elastic::ReindexingTask.current
+      strong_memoize(:elastic_current_task) do
+        Elastic::ReindexingTask.current
+      end
     end
 
     private
@@ -74,41 +78,62 @@ module Elastic
       true
     end
 
-    def reindexing!
-      task = current_task
+    def save_documents_count!(refresh:)
+      elastic_helper.refresh_index(index_name: current_task.index_name_to) if refresh
 
-      # Check if indexing is completed
-      task_status = elastic_helper.task_status(task_id: task.elastic_task)
+      new_documents_count = elastic_helper.index_size(index_name: current_task.index_name_to).dig('docs', 'count')
+      current_task.update!(documents_count_target: new_documents_count)
+    end
+
+    def check_task_status
+      save_documents_count!(refresh: false)
+
+      task_status = elastic_helper.task_status(task_id: current_task.elastic_task)
       return false unless task_status['completed']
 
-      # Check if reindexing is failed
       reindexing_error = task_status.dig('error', 'type')
       if reindexing_error
-        abort_reindexing!("Task #{task.elastic_task} has failed with Elasticsearch error.", additional_logs: { elasticsearch_error_type: reindexing_error })
+        abort_reindexing!("Task #{current_task.elastic_task} has failed with Elasticsearch error.", additional_logs: { elasticsearch_error_type: reindexing_error })
         return false
       end
 
-      # Refresh a new index
-      elastic_helper.refresh_index(index_name: task.index_name_to)
+      true
+    end
 
-      # Compare documents count
-      old_documents_count = task.documents_count
-      new_documents_count = elastic_helper.index_size(index_name: task.index_name_to).dig('docs', 'count')
+    def compare_documents_count
+      save_documents_count!(refresh: true)
+
+      old_documents_count = current_task.documents_count
+      new_documents_count = current_task.documents_count_target
       if old_documents_count != new_documents_count
         abort_reindexing!("Documents count is different, Count from new index: #{new_documents_count} Count from original index: #{old_documents_count}. This likely means something went wrong during reindexing.")
         return false
       end
 
-      # Change index settings back
-      elastic_helper.update_settings(index_name: task.index_name_to, settings: default_index_options)
+      true
+    end
 
-      # Switch alias to a new index
-      elastic_helper.switch_alias(to: task.index_name_to)
+    def apply_default_index_options
+      elastic_helper.update_settings(index_name: current_task.index_name_to, settings: default_index_options)
+    end
 
-      # Unpause indexing
+    def switch_alias_to_new_index
+      elastic_helper.switch_alias(to: current_task.index_name_to)
+    end
+
+    def finalize_reindexing
       Gitlab::CurrentSettings.update!(elasticsearch_pause_indexing: false)
 
-      task.update!(state: :success)
+      current_task.update!(state: :success)
+    end
+
+    def reindexing!
+      return false unless check_task_status
+      return false unless compare_documents_count
+
+      apply_default_index_options
+      switch_alias_to_new_index
+      finalize_reindexing
 
       true
     end

@@ -89,6 +89,28 @@
               = _('This only applies to repository indexing operations.')
 
         .sub-section
+          %h4= _('Elasticsearch zero-downtime reindexing')
+          = link_to _('Trigger cluster reindexing'), admin_elasticsearch_trigger_reindexing_path, class: 'btn btn-success', method: :post, disabled: @elasticsearch_reindexing_task&.in_progress?
+          .form-text.text-muted
+            = _('This feature should be used with an index that was created after 13.0')
+          - if @elasticsearch_reindexing_task
+            - expected_documents = @elasticsearch_reindexing_task.documents_count
+            - processed_documents = @elasticsearch_reindexing_task.documents_count_target
+            %h5= _('Reindexing status')
+            %p= _('State: %{last_reindexing_task_state}') % { last_reindexing_task_state: @elasticsearch_reindexing_task.state }
+            - if @elasticsearch_reindexing_task.elastic_task
+              %p= _('Task ID: %{elastic_task}') % { elastic_task: @elasticsearch_reindexing_task.elastic_task }
+            - if @elasticsearch_reindexing_task.error_message
+              %p= _('Error: %{error_message}') % { error_message: @elasticsearch_reindexing_task.error_message }
+            - if expected_documents
+              %p= _('Expected documents: %{expected_documents}') % { expected_documents: expected_documents }
+            - if processed_documents && expected_documents
+              - percentage = ((processed_documents / expected_documents.to_f) * 100).round(2)
+              %p= _('Documents reindexed: %{processed_documents} (%{percentage}%%)') % { processed_documents: processed_documents, percentage: percentage }
+              .progress
+                .progress-bar.progress-bar-striped.bg-success{ "aria-valuemax" => "100", "aria-valuemin" => "0", "aria-valuenow" => percentage, :role => "progressbar", :style => "width: #{percentage}%" }
+
+        .sub-section
           %h4= _('Elasticsearch indexing restrictions')
           .form-group
             .form-check

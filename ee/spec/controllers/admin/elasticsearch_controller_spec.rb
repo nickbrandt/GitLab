@@ -37,4 +37,29 @@ RSpec.describe Admin::ElasticsearchController do
       end
     end
   end
+
+  describe 'POST #trigger_reindexing' do
+    before do
+      sign_in(admin)
+    end
+
+    it 'creates a reindexing task' do
+      expect(Elastic::ReindexingTask).to receive(:create!)
+
+      post :trigger_reindexing
+
+      expect(controller).to set_flash[:notice].to include('reindexing triggered')
+      expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+    end
+
+    it 'does not create a reindexing task if there is another one' do
+      allow(Elastic::ReindexingTask).to receive(:current).and_return(build(:elastic_reindexing_task))
+      expect(Elastic::ReindexingTask).not_to receive(:create!)
+
+      post :trigger_reindexing
+
+      expect(controller).to set_flash[:warning].to include('already in progress')
+      expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+    end
+  end
 end

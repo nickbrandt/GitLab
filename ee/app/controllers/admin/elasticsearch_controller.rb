@@ -16,4 +16,17 @@ class Admin::ElasticsearchController < Admin::ApplicationController
 
     redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
   end
+
+  # POST
+  # Trigger reindexing task
+  def trigger_reindexing
+    if Elastic::ReindexingTask.running?
+      flash[:warning] = _('Elasticsearch reindexing is already in progress')
+    else
+      Elastic::ReindexingTask.create!
+      flash[:notice] = _('Elasticsearch reindexing triggered')
+    end
+
+    redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+  end
 end
