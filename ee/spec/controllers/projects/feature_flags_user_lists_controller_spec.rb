@@ -140,14 +140,5 @@ RSpec.describe Projects::FeatureFlagsUserListsController do
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
-
-    it 'returns not found when the feature flag is off' do
-      stub_feature_flags(feature_flag_user_lists: false)
-      list = create(:operations_feature_flag_user_list, project: project)
-
-      get(:show, params: request_params(iid: list.iid))
-
-      expect(response).to have_gitlab_http_status(:not_found)
-    end
   end
 end

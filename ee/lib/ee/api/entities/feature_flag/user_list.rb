@@ -5,6 +5,8 @@ module EE
     module Entities
       class FeatureFlag < Grape::Entity
         class UserList < Grape::Entity
+          include RequestAwareEntity
+
           expose :id
           expose :iid
           expose :project_id
@@ -12,6 +14,10 @@ module EE
           expose :updated_at
           expose :name
           expose :user_xids
+
+          expose :path do |list|
+            project_feature_flags_user_list_path(list.project, list)
+          end
         end
       end
     end

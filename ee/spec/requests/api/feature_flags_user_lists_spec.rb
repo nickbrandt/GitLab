@@ -58,7 +58,8 @@ RSpec.describe API::FeatureFlagsUserLists do
         'created_at' => user_list.created_at.as_json,
         'updated_at' => user_list.updated_at.as_json,
         'name' => 'list_a',
-        'user_xids' => 'user1'
+        'user_xids' => 'user1',
+        'path' => project_feature_flags_user_list_path(user_list.project, user_list)
       }])
     end
 
@@ -122,7 +123,8 @@ RSpec.describe API::FeatureFlagsUserLists do
         'iid' => list.iid,
         'project_id' => project.id,
         'created_at' => list.created_at.as_json,
-        'updated_at' => list.updated_at.as_json
+        'updated_at' => list.updated_at.as_json,
+        'path' => project_feature_flags_user_list_path(list.project, list)
       })
     end
 

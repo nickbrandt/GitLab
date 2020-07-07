@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Projects::FeatureFlagsUserListsController < Projects::ApplicationController
-  before_action :check_feature_flag!
+  before_action :check_feature_flag!, only: [:new, :edit]
   before_action :authorize_admin_feature_flags_user_lists!
   before_action :user_list, only: [:edit, :show]
 

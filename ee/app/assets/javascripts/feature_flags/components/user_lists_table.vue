@@ -1,10 +1,17 @@
 <script>
 import { s__, sprintf } from '~/locale';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
-import { GlButton, GlModal, GlSprintf, GlTooltipDirective, GlModalDirective } from '@gitlab/ui';
+import {
+  GlButton,
+  GlButtonGroup,
+  GlModal,
+  GlSprintf,
+  GlTooltipDirective,
+  GlModalDirective,
+} from '@gitlab/ui';
 
 export default {
-  components: { GlButton, GlModal, GlSprintf },
+  components: { GlButton, GlButtonGroup, GlModal, GlSprintf },
   directives: { GlTooltip: GlTooltipDirective, GlModal: GlModalDirective },
   mixins: [timeagoMixin],
   props: {
@@ -80,15 +87,23 @@ export default {
         </span>
         <span data-testid="ffUserListIds" class="gl-str-truncated">{{ displayList(list) }}</span>
       </div>
-      <gl-button
-        v-gl-modal="$options.modal.id"
-        class="gl-align-self-start gl-mt-2"
-        category="secondary"
-        variant="danger"
-        icon="remove"
-        data-testid="delete-user-list"
-        @click="confirmDeleteList(list)"
-      />
+
+      <gl-button-group class="gl-align-self-start gl-mt-2">
+        <gl-button
+          :href="list.path"
+          category="secondary"
+          icon="pencil"
+          data-testid="edit-user-list"
+        />
+        <gl-button
+          v-gl-modal="$options.modal.id"
+          category="secondary"
+          variant="danger"
+          icon="remove"
+          data-testid="delete-user-list"
+          @click="confirmDeleteList(list)"
+        />
+      </gl-button-group>
     </div>
     <gl-modal
       :title="modalTitle"
