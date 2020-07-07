@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import {
   GlTable,
   GlEmptyState,
@@ -41,6 +41,7 @@ export default {
   computed: {
     ...mapState('networkPolicies', ['policies', 'isLoadingPolicies', 'isUpdatingPolicy']),
     ...mapState('threatMonitoring', ['currentEnvironmentId']),
+    ...mapGetters('networkPolicies', ['policiesWithDefaults']),
     documentationFullPath() {
       return setUrlFragment(this.documentationPath, 'container-network-policy');
     },
@@ -50,7 +51,7 @@ export default {
     selectedPolicy() {
       if (!this.hasSelectedPolicy) return null;
 
-      return this.policies.find(policy => policy.name === this.selectedPolicyName);
+      return this.policiesWithDefaults.find(policy => policy.name === this.selectedPolicyName);
     },
     hasPolicyChanges() {
       if (!this.hasSelectedPolicy) return false;
@@ -61,12 +62,13 @@ export default {
       );
     },
     hasAutoDevopsPolicy() {
-      return this.policies.some(policy => policy.isAutodevops);
+      return this.policiesWithDefaults.some(policy => policy.isAutodevops);
     },
   },
   methods: {
-    ...mapActions('networkPolicies', ['updatePolicy']),
+    ...mapActions('networkPolicies', ['createPolicy', 'updatePolicy']),
     getTimeAgoString(creationTimestamp) {
+      if (!creationTimestamp) return '';
       return getTimeago().format(creationTimestamp);
     },
     presentPolicyDrawer(rows) {
@@ -84,13 +86,19 @@ export default {
       bTable.clearSelected();
     },
     savePolicy() {
-      return this.updatePolicy({
+      const promise = this.selectedPolicy.creationTimestamp ? this.updatePolicy : this.createPolicy;
+      return promise({
         environmentId: this.currentEnvironmentId,
         policy: this.selectedPolicy,
-      }).then(() => {
-        this.initialManifest = this.selectedPolicy.manifest;
-        this.initialEnforcementStatus = this.selectedPolicy.isEnabled;
-      });
+      })
+        .then(() => {
+          this.initialManifest = this.selectedPolicy.manifest;
+          this.initialEnforcementStatus = this.selectedPolicy.isEnabled;
+        })
+        .catch(() => {
+          this.selectedPolicy.manifest = this.initialManifest;
+          this.selectedPolicy.isEnabled = this.initialEnforcementStatus;
+        });
     },
   },
   fields: [
@@ -149,7 +157,7 @@ export default {
     <gl-table
       ref="policiesTable"
       :busy="isLoadingPolicies"
-      :items="policies"
+      :items="policiesWithDefaults"
       :fields="$options.fields"
       head-variant="white"
       stacked="md"
