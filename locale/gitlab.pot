@@ -167,6 +167,11 @@ msgid_plural "%d groups selected"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d inaccessible merge request"
 msgid_plural "%d inaccessible merge requests"
 msgstr[0] ""
@@ -14517,6 +14522,9 @@ msgstr ""
 msgid "Metrics|Select a value"
 msgstr ""
 
+msgid "Metrics|Set refresh rate"
+msgstr ""
+
 msgid "Metrics|Star dashboard"
 msgstr ""
 
@@ -15725,6 +15733,9 @@ msgid "October"
 msgstr ""
 
 msgid "OfSearchInADropdown|Filter"
+msgstr ""
+
+msgid "Off"
 msgstr ""
 
 msgid "Oh no!"
