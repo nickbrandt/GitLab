@@ -424,7 +424,7 @@ module EE
       rule { status_page_available & can?(:owner_access) }.enable :mark_issue_for_publication
       rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
 
-      rule { public_project }.enable :embed_analytics_report
+      rule { public_project }.enable :view_embedded_analytics_report
     end
 
     override :lookup_access_level!

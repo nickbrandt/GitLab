@@ -12,10 +12,6 @@ class Projects::InsightsController < Projects::ApplicationController
 
   private
 
-  def authorize_read_project!
-    render_404 unless can?(current_user, :read_project, project)
-  end
-
   def insights_entity
     project
   end
