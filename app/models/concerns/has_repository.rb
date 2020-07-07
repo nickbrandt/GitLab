@@ -76,7 +76,7 @@ module HasRepository
   end
 
   def default_branch
-    @default_branch ||= repository.root_ref
+    @default_branch ||= repository.root_ref || Gitlab::CurrentSettings.default_branch_name
   end
 
   def reload_default_branch
