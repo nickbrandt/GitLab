@@ -49,6 +49,12 @@ describe('User Lists Table', () => {
     });
   });
 
+  describe('edit button', () => {
+    it('should link to the path for the user list', () => {
+      expect(wrapper.find('[data-testid="edit-user-list"]').attributes('href')).toBe(userList.path);
+    });
+  });
+
   describe('delete button', () => {
     it('should display the confirmation modal', () => {
       const modal = wrapper.find(GlModal);
