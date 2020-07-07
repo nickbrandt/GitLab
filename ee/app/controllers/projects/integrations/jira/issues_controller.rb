@@ -5,6 +5,7 @@ module Projects
     module Jira
       class IssuesController < Projects::ApplicationController
         include RecordUserLastActivity
+        include SortingPreference
 
         before_action :check_feature_enabled!
 
@@ -15,7 +16,9 @@ module Projects
 
         def index
           respond_to do |format|
-            format.html
+            format.html do
+              @sort = set_sort_order
+            end
             format.json do
               render json: issues_json
             rescue Projects::Integrations::Jira::IntegrationError, Projects::Integrations::Jira::RequestError => e
@@ -30,6 +33,10 @@ module Projects
           jira_issues = ::Projects::Integrations::Jira::IssuesFinder.new(project, {}).execute
 
           ::Integrations::Jira::IssueSerializer.new.represent(jira_issues, project: project)
+        end
+
+        def default_sort_order
+          sort_value_created_date
         end
 
         protected
