@@ -6683,7 +6683,7 @@ msgstr ""
 msgid "ContributionAnalytics|No pushes for the selected time period."
 msgstr ""
 
-msgid "Contributions for <strong>%{calendar_date}</strong>"
+msgid "Contributions for %{calendar_date}"
 msgstr ""
 
 msgid "Contributions per group member"

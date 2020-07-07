@@ -137,18 +137,6 @@
     - "Налаштуйте файл <code>.gitlab-webide.yml</code> у директорії <code>.gitlab</code>, щоб почати використовувати Веб-термінал. %{helpStart}Докладніше.%{helpEnd}"
     - "웹 터미널 사용을 시작하도록 <code>.gitlab</code> 디렉토리에서 <code>.gitlab-webide.yml</code> 파일을 구성하십시오. %{helpStart}자세히 알아보십시오.%{helpEnd}"
     - "Configure un archivo <code>.gitlab-webide.yml</code> en el directorio <code>.gitlab</code> para comenzar a utilizar el Terminal Web. %{helpStart}Aprende más.%{helpEnd}"
-"Contributions for <strong>%{calendar_date}</strong>":
-  plural_id:
-  translations:
-    - "Contribuições para <strong>%{calendar_date}</strong>"
-    - "<strong>%{calendar_date}</strong>の貢献"
-    - "<strong>%{calendar_date}</strong>的贡献"
-    - "Внески за <strong>%{calendar_date}</strong>"
-    - "Beiträge am <strong>%{calendar_date}</strong>"
-    - "<strong>%{calendar_date}</strong>의 기여도"
-    - "Contributions du <strong>%{calendar_date}</strong>"
-    - "Contribuciones para <strong>%{calendar_date}</strong>"
-    - "<strong>%{calendar_date}</strong> için katkılar"
 "Depends on <strong>%d closed</strong> merge request.":
   plural_id: "Depends on <strong>%d closed</strong> merge requests."
   translations:
@@ -1053,3 +1041,15 @@
     - "Проект управления кластером можно использовать для запуска заданий развертывания с привилегиями Kubernetes <code>cluster-admin</code>."
     - "集群管理的项目可以通过Kubernetes<code>cluster-admin</code>权限来运行部署作业。"
     - "Проєкт управління кластером може використовуватися для виконання завдань розгортання з привілеями Kubernetes <code>cluster-admin</code>."
+"Contributions for <strong>%{calendar_date}</strong>":
+  plural_id:
+  translations:
+    - "Contribuições para <strong>%{calendar_date}</strong>"
+    - "<strong>%{calendar_date}</strong>の貢献"
+    - "<strong>%{calendar_date}</strong>的贡献"
+    - "Внески за <strong>%{calendar_date}</strong>"
+    - "Beiträge am <strong>%{calendar_date}</strong>"
+    - "<strong>%{calendar_date}</strong>의 기여도"
+    - "Contributions du <strong>%{calendar_date}</strong>"
+    - "Contribuciones para <strong>%{calendar_date}</strong>"
+    - "<strong>%{calendar_date}</strong> için katkılar"
