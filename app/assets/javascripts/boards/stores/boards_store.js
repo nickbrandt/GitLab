@@ -675,6 +675,21 @@ const boardsStore = {
     });
   },
 
+  moveListMultipleIssues({ list, issues, oldIndicies, newIndex, moveBeforeId, moveAfterId }) {
+    oldIndicies.reverse().forEach(index => {
+      list.issues.splice(index, 1);
+    });
+    list.issues.splice(newIndex, 0, ...issues);
+
+    return this.moveMultipleIssues({
+      ids: issues.map(issue => issue.id),
+      fromListId: null,
+      toListId: null,
+      moveBeforeId,
+      moveAfterId,
+    });
+  },
+
   newIssue(id, issue) {
     return axios.post(this.generateIssuesPath(id), {
       issue,
