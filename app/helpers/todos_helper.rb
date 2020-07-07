@@ -102,8 +102,8 @@ module TodosHelper
       end
 
     content_tag(:span, nil, class: 'target-status') do
-      content_tag(:span, nil, class: "status-box status-box-#{type}-#{todo.target.state.dasherize}") do
-        todo.target.state.capitalize
+      content_tag(:span, nil, class: "status-box status-box-#{type}-#{todo.target.state.to_s.dasherize}") do
+        todo.target.state.to_s.capitalize
       end
     end
   end
@@ -220,7 +220,7 @@ module TodosHelper
     when MergeRequest, Issue
       %w(closed merged).include?(todo.target.state)
     when AlertManagement::Alert
-      %w(resolved).include?(todo.target.state)
+      %i(resolved).include?(todo.target.state)
     else
       false
     end

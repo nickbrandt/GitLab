@@ -127,7 +127,7 @@ module AlertManagement
     scope :counts_by_status, -> { group(:status).count }
     scope :counts_by_project_id, -> { group(:project_id).count }
 
-    alias_method :state, :human_status_name
+    alias_method :state, :status_name
 
     def self.sort_by_attribute(method)
       case method.to_s
