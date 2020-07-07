@@ -101,11 +101,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :dependencies, only: [:index]
         resources :licenses, only: [:index, :create, :update]
 
-        # resources :on_demand_scans, only: [:index], controller: :on_demand_scans
         scope :on_demand_scans do
           root 'on_demand_scans#index', as: 'on_demand_scans'
-          namespace :profiles do
-            resources :site_profiles #, only: [:create, :edit]
+          scope :profiles do
+            root 'dast_profiles#index', as: 'profiles'
+            resources :dast_site_profiles, only: [:new]
           end
         end
 
