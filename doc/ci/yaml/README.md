@@ -1088,7 +1088,7 @@ The job attributes allowed by `rules` are:
   - If used as `when: delayed`, `start_in` is also required.
 - [`allow_failure`](#allow_failure): If not defined, defaults to `allow_failure: false`.
 
-If `when` is evaluated to any value except `never`, the job is included in the pipeline.
+If a rule evaluates to true, and `when` has any value except `never`, the job is included in the pipeline.
 
 For example:
 
@@ -1189,10 +1189,11 @@ for more details.
 
 #### Differences between `rules` and `only`/`except`
 
-A very important difference between `rules` and `only/except`, is that jobs defined
-with `only/except` do not trigger merge request pipelines without explicit configuration.
-`rules` *can* trigger all types of pipelines, without explicitly configuring each
-type.
+Jobs defined with `only/except` do not trigger merge request pipelines by default.
+You must explicitly add `only: merge_requests`.
+
+Jobs defined with `rules` can trigger all types of pipelines.
+You do not have to explicitly configure each type.
 
 For example:
 
@@ -1259,6 +1260,8 @@ Some details regarding the logic that determines the `when` for the job:
   rule without `if` or `changes`, always matches, and is always used if reached.
 - If a rule matches and has no `when` defined, the rule uses the `when`
   defined for the job, which defaults to `on_success` if not defined.
+- You can define `when` once per rule, or once at the job-level, which applies to
+  all rules. You can't mix `when` at the job-level with `when` in rules.
 
 For behavior similar to the [`only`/`except` keywords](#onlyexcept-basic), you can
 check the value of the `$CI_PIPELINE_SOURCE` variable.
