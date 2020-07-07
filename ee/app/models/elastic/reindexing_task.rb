@@ -17,6 +17,10 @@ class Elastic::ReindexingTask < ApplicationRecord
     where(in_progress: true).last
   end
 
+  def self.running?
+    current.present?
+  end
+
   private
 
   def set_in_progress_flag

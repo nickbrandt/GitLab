@@ -55,27 +55,36 @@ RSpec.describe Elastic::ClusterReindexingService, :elastic do
       allow(Gitlab::Elastic::Helper.default).to receive(:refresh_index).and_return(true)
     end
 
-    it 'errors if documents count is different' do
-      expect(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => task.reload.documents_count * 2 })
+    context 'errors are raised' do
+      before do
+        allow(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => task.reload.documents_count * 2 })
+      end
 
-      expect { subject.execute }.to change { task.reload.state }.from('reindexing').to('failure')
-      expect(task.reload.error_message).to match(/count is different/)
+      it 'errors if documents count is different' do
+        expect { subject.execute }.to change { task.reload.state }.from('reindexing').to('failure')
+        expect(task.reload.error_message).to match(/count is different/)
+      end
+
+      it 'errors if reindexing is failed' do
+        allow(Gitlab::Elastic::Helper.default).to receive(:task_status).and_return({ 'completed' => true, 'error' => { 'type' => 'search_phase_execution_exception' } })
+
+        expect { subject.execute }.to change { task.reload.state }.from('reindexing').to('failure')
+        expect(task.reload.error_message).to match(/has failed with/)
+      end
     end
 
-    it 'errors if reindexing is failed' do
-      allow(Gitlab::Elastic::Helper.default).to receive(:task_status).and_return({ 'completed' => true, 'error' => { 'type' => 'search_phase_execution_exception' } })
+    context 'task finishes correctly' do
+      before do
+        allow(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => task.reload.documents_count })
+      end
 
-      expect { subject.execute }.to change { task.reload.state }.from('reindexing').to('failure')
-      expect(task.reload.error_message).to match(/has failed with/)
-    end
+      it 'launches all state steps' do
+        expect(Gitlab::Elastic::Helper.default).to receive(:update_settings).with(index_name: task.index_name_to, settings: expected_default_settings)
+        expect(Gitlab::Elastic::Helper.default).to receive(:switch_alias).with(to: task.index_name_to)
+        expect(Gitlab::CurrentSettings).to receive(:update!).with(elasticsearch_pause_indexing: false)
 
-    it 'launches all state steps' do
-      expect(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => task.reload.documents_count })
-      expect(Gitlab::Elastic::Helper.default).to receive(:update_settings).with(index_name: task.index_name_to, settings: expected_default_settings)
-      expect(Gitlab::Elastic::Helper.default).to receive(:switch_alias).with(to: task.index_name_to)
-      expect(Gitlab::CurrentSettings).to receive(:update!).with(elasticsearch_pause_indexing: false)
-
-      expect { subject.execute }.to change { task.reload.state }.from('reindexing').to('success')
+        expect { subject.execute }.to change { task.reload.state }.from('reindexing').to('success')
+      end
     end
   end
 end
