@@ -67,6 +67,11 @@ export default {
       required: false,
       default: DropdownVariant.Sidebar,
     },
+    showHeader: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -132,7 +137,7 @@ export default {
       variant: this.variant,
       groupId: this.groupId,
       issueId: this.issueId,
-      selectedEpic: this.selectedEpic,
+      selectedEpic: this.initialEpic,
       selectedEpicIssueId: this.epicIssueId,
     });
     $(this.$refs.dropdown).on('shown.bs.dropdown', () => this.fetchEpics());
@@ -205,7 +210,7 @@ export default {
           :toggle-text-class="dropdownButtonTextClass"
         />
         <div class="dropdown-menu dropdown-select dropdown-menu-epics dropdown-menu-selectable">
-          <dropdown-header v-if="isDropdownVariantSidebar" />
+          <dropdown-header v-if="isDropdownVariantSidebar || showHeader" />
           <dropdown-search-input @onSearchInput="setSearchQuery" />
           <dropdown-contents
             v-if="!epicsFetchInProgress"

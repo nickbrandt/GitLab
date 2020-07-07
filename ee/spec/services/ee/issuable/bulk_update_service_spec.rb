@@ -21,7 +21,7 @@ RSpec.describe Issuable::BulkUpdateService do
   end
 
   shared_examples 'does not update issuables attribute' do |attribute|
-    it 'does not update issuables' do
+    it 'does not update attribute' do
       issuables.each do |issuable|
         expect { subject }.not_to change { issuable.send(attribute) }
       end
@@ -34,34 +34,38 @@ RSpec.describe Issuable::BulkUpdateService do
     let(:issue1) { create(:issue, project: project1, health_status: :at_risk) }
     let(:issue2) { create(:issue, project: project2, health_status: :at_risk) }
     let(:issuables) { [issue1, issue2] }
+    let(:epic) { create(:epic, group: group) }
 
     before do
       group.add_reporter(user)
     end
 
-    context 'updating health status' do
+    context 'updating health status and epic' do
       let(:params) do
         {
           issuable_ids: issuables.map(&:id),
-          health_status: :on_track
+          health_status: :on_track,
+          epic_id: epic.id
         }
       end
 
       context 'when features are enabled' do
         before do
-          stub_licensed_features(issuable_health_status: true)
+          stub_licensed_features(epics: true, issuable_health_status: true)
         end
 
         it 'succeeds and returns the correct number of issuables updated' do
           expect(subject.success?).to be_truthy
           expect(subject.payload[:count]).to eq(issuables.count)
           issuables.each do |issuable|
-            expect(issuable.reload.health_status).to eq('on_track')
+            issuable.reload
+            expect(issuable.health_status).to eq('on_track')
+            expect(issuable.epic).to eq(epic)
           end
         end
 
         context "when params value is '0'" do
-          let(:params) { { issuable_ids: issuables.map(&:id), health_status: '0' } }
+          let(:params) { { issuable_ids: issuables.map(&:id), health_status: '0', epic_id: '0' } }
 
           it 'succeeds and remove values' do
             expect(subject.success?).to be_truthy
@@ -69,7 +73,24 @@ RSpec.describe Issuable::BulkUpdateService do
             issuables.each do |issuable|
               issuable.reload
               expect(issuable.health_status).to be_nil
+              expect(issuable.epic).to be_nil
             end
+          end
+        end
+
+        context 'when epic param is incorrect' do
+          let(:external_epic) { create(:epic, group: create(:group, :private))}
+          let(:params) do
+            {
+              issuable_ids: issuables.map(&:id),
+              epic_id: external_epic.id
+            }
+          end
+
+          it 'returns error' do
+            expect(subject.message).to eq('Epic not found for given params')
+            expect(subject.status).to eq(:error)
+            expect(subject.http_status).to eq(422)
           end
         end
       end
@@ -88,6 +109,14 @@ RSpec.describe Issuable::BulkUpdateService do
         end
 
         it_behaves_like 'does not update issuables attribute', :health_status
+        it_behaves_like 'does not update issuables attribute', :epic
+      end
+
+      context 'when user can not admin epic' do
+        let(:epic3) { create(:epic, group: create(:group)) }
+        let(:params) { { issuable_ids: issuables.map(&:id), epic_id: epic3.id } }
+
+        it_behaves_like 'does not update issuables attribute', :epic
       end
     end
   end

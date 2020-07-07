@@ -8986,6 +8986,9 @@ msgstr ""
 msgid "Epic events"
 msgstr ""
 
+msgid "Epic not found for given params"
+msgstr ""
+
 msgid "Epics"
 msgstr ""
 
@@ -20517,6 +20520,9 @@ msgid "Select branch/tag"
 msgstr ""
 
 msgid "Select due date"
+msgstr ""
+
+msgid "Select epic"
 msgstr ""
 
 msgid "Select file"

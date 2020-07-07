@@ -89,7 +89,7 @@ describe('SidebarItemEpicsSelect', () => {
           expect(wrapper.vm.getEpic()).toEqual(
             expect.objectContaining({
               id: 0,
-              title: 'none',
+              title: 'No Epic',
             }),
           );
         });
