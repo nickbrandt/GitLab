@@ -108,12 +108,6 @@ RSpec.describe Projects::TagsController do
         create(:ci_empty_pipeline, sha: sha, project: project) # old pipeline
         pipeline = create(:ci_empty_pipeline, sha: sha, project: project)
 
-        # simulating pipeline creation by new tag
-        expect_any_instance_of(Repository).to receive(:add_tag).and_wrap_original do |m, *args|
-          create(:ci_empty_pipeline, sha: sha, project: project)
-          m.call(*args)
-        end
-
         expect_next_instance_of(Releases::CreateEvidenceService, anything, pipeline: pipeline) do |service|
           expect(service).to receive(:execute).and_call_original
         end
