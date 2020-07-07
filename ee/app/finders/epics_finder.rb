@@ -30,6 +30,7 @@ class EpicsFinder < IssuableFinder
 
   def self.scalar_params
     @scalar_params ||= %i[
+      board
       parent_id
       author_id
       author_username
@@ -108,6 +109,7 @@ class EpicsFinder < IssuableFinder
   end
 
   def filter_items(items)
+    items = in_board(items)
     items = by_created_at(items)
     items = by_updated_at(items)
     items = by_author(items)
@@ -152,6 +154,16 @@ class EpicsFinder < IssuableFinder
     raise ArgumentError unless self.class.valid_iid_query?(query)
 
     items.iid_starts_with(query)
+  end
+
+  def in_board(items)
+    board = params[:board]
+    return items unless board.present?
+
+    list_service = Boards::Issues::ListService.new(board.resource_parent, current_user, { board_id: board.id })
+    issues = list_service.execute.except(:order).pluck_primary_key
+    epics_in_boards = EpicIssue.where(issue: issues)
+    items.id_in(epics_in_boards.select("epic_id as id"))
   end
 
   def related_groups
