@@ -8,9 +8,11 @@ import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_re
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
+import initUserPopovers from '~/user_popovers';
 
 const mockAxios = new MockAdapter(axios);
 jest.mock('~/flash');
+jest.mock('~/user_popovers');
 
 describe('Vulnerability Footer', () => {
   let wrapper;
@@ -130,6 +132,18 @@ describe('Vulnerability Footer', () => {
       });
     });
 
+    it('calls initUserPopovers when a new history item is retrieved', () => {
+      const historyItems = [{ id: 1, note: 'some note' }];
+      mockAxios.onGet(discussionUrl).replyOnce(200, historyItems, { date: Date.now() });
+
+      expect(initUserPopovers).not.toHaveBeenCalled();
+      createWrapper();
+
+      return axios.waitForAll().then(() => {
+        expect(initUserPopovers).toHaveBeenCalled();
+      });
+    });
+
     it('shows an error the history list could not be retrieved', () => {
       mockAxios.onGet(discussionUrl).replyOnce(500);
       createWrapper();
@@ -191,6 +205,16 @@ describe('Vulnerability Footer', () => {
           const discussion = getDiscussion(entries, 2);
           expect(discussion.notes.length).toBe(1);
           expect(discussion.notes[0].note).toBe('new note on a new discussion');
+        });
+      });
+
+      it('calls initUserPopovers when a new note is retrieved', () => {
+        expect(initUserPopovers).not.toHaveBeenCalled();
+        const note = { id: 300, note: 'new note on a new discussion', discussion_id: 3 };
+        createNotesRequest(note);
+
+        return axios.waitForAll().then(() => {
+          expect(initUserPopovers).toHaveBeenCalled();
         });
       });
 
