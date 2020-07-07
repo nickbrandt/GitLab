@@ -296,6 +296,15 @@ const boardsStore = {
     Object.assign(this.moving, { list, issue });
   },
 
+  onNewListIssueResponse(list, issue, data) {
+    issue.refreshData(data);
+
+    if (list.issuesSize > 1) {
+      const moveBeforeId = list.issues[1].id;
+      this.moveIssue(issue.id, null, null, null, moveBeforeId);
+    }
+  },
+
   moveMultipleIssuesToList({ listFrom, listTo, issues, newIndex }) {
     const issueTo = issues.map(issue => listTo.findIssue(issue.id));
     const issueLists = issues.map(issue => issue.getLists()).flat();

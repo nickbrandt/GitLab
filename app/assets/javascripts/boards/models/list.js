@@ -166,12 +166,7 @@ class List {
   }
 
   onNewIssueResponse(issue, data) {
-    issue.refreshData(data);
-
-    if (this.issuesSize > 1) {
-      const moveBeforeId = this.issues[1].id;
-      boardsStore.moveIssue(issue.id, null, null, null, moveBeforeId);
-    }
+    boardsStore.onNewListIssueResponse(this, issue, data);
   }
 }
 
