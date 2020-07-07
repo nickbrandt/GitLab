@@ -364,73 +364,53 @@ RSpec.describe Gitlab::UsageData do
         it 'includes accurate usage_activity_by_stage data' do
           stub_config(
             ldap:
-              { enabled: true, servers: ldap_server_config },
-            omniauth:
-              { providers: omniauth_providers }
+              { enabled: true, servers: ldap_server_config }
           )
 
           for_defined_days_back do
             user = create(:user)
-            create(:event, author: user)
-            create(:group_member, user: user)
             create(:key, type: 'LDAPKey', user: user)
             create(:group_member, ldap: true, user: user)
             create(:cycle_analytics_group_stage)
             create(:compliance_framework_project_setting)
           end
 
-          expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to eq(
-            events: 2,
-            groups: 2,
+          expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to include(
             ldap_keys: 2,
             ldap_users: 2,
-            users_created: 8,
             value_stream_management_customized_group_stages: 2,
             projects_with_compliance_framework: 2,
             ldap_servers: 2,
             ldap_group_sync_enabled: true,
             ldap_admin_sync_enabled: true,
-            omniauth_providers: ['google_oauth2'],
             group_saml_enabled: true
           )
-          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:manage]).to eq(
-            events: 1,
-            groups: 1,
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:manage]).to include(
             ldap_keys: 1,
             ldap_users: 1,
-            users_created: 5,
             value_stream_management_customized_group_stages: 2,
             projects_with_compliance_framework: 2,
             ldap_servers: 2,
             ldap_group_sync_enabled: true,
             ldap_admin_sync_enabled: true,
-            omniauth_providers: ['google_oauth2'],
             group_saml_enabled: true
           )
-        end
-
-        def omniauth_providers
-          [
-            OpenStruct.new(name: 'google_oauth2'),
-            OpenStruct.new(name: 'ldapmain'),
-            OpenStruct.new(name: 'group_saml')
-          ]
         end
 
         def ldap_server_config
           {
             'main' =>
-              {
-                'provider_name' => 'ldapmain',
-                'group_base'    => 'ou=groups',
-                'admin_group'   => 'my_group'
-              },
+            {
+              'provider_name' => 'ldapmain',
+              'group_base'    => 'ou=groups',
+              'admin_group'   => 'my_group'
+            },
             'secondary' =>
-              {
-                'provider_name' => 'ldapsecondary',
-                'group_base'    => nil,
-                'admin_group'   => nil
-              }
+            {
+              'provider_name' => 'ldapsecondary',
+              'group_base'    => nil,
+              'admin_group'   => nil
+            }
           }
         end
       end
