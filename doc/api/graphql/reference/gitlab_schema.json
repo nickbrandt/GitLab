@@ -10377,6 +10377,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "milestoneTitle",
+                  "description": "Filter epics by milestone title, computed from epic's issues",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "iidStartsWith",
                   "description": "Filter epics by iid for autocomplete",
                   "type": {
@@ -13992,6 +14002,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "milestoneTitle",
+                  "description": "Filter epics by milestone title, computed from epic's issues",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "iidStartsWith",
                   "description": "Filter epics by iid for autocomplete",
                   "type": {
@@ -14117,6 +14137,16 @@
                         "ofType": null
                       }
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "milestoneTitle",
+                  "description": "Filter epics by milestone title, computed from epic's issues",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
