@@ -95,11 +95,7 @@ export default {
       data-qa-selector="add_license_submit_button"
       @click="addLicense"
     />
-    <gl-button
-      class="js-cancel"
-      :disabled="loading"
-      @click="closeForm"
-    >
+    <gl-button class="js-cancel" :disabled="loading" @click="closeForm">
       {{ s__('LicenseCompliance|Cancel') }}
     </gl-button>
   </div>
