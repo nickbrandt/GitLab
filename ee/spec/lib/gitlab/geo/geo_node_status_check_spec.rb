@@ -26,7 +26,8 @@ RSpec.describe Gitlab::Geo::GeoNodeStatusCheck do
         /CI job artifacts/,
         /Container repositories/,
         /Design repositories/,
-        /Repositories Checked/
+        /Repositories Checked/,
+        /Package Files Checked/
       ].each do |text|
         expect { subject.print_replication_verification_status }.to output(text).to_stdout
       end
@@ -39,11 +40,15 @@ RSpec.describe Gitlab::Geo::GeoNodeStatusCheck do
     end
 
     context 'when replication is not up-to-date' do
-      before do
+      it 'returns false when repositories_checked_failed_count is positive' do
         allow(geo_node_status).to receive(:repositories_checked_failed_count).and_return(1)
+
+        expect(subject.replication_verification_complete?).to be_falsy
       end
 
-      it 'returns false' do
+      it 'returns false when there are package files failed to sync' do
+        allow(::Geo::PackageFileReplicator).to receive(:failed_count).and_return(1)
+
         expect(subject.replication_verification_complete?).to be_falsy
       end
     end
