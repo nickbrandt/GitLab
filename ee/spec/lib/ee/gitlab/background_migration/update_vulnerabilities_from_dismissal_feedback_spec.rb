@@ -69,7 +69,7 @@ RSpec.describe Gitlab::BackgroundMigration::UpdateVulnerabilitiesFromDismissalFe
       expect { described_class.new.perform(project.id) }
         .to change { vulnerability.reload.dismissed_at }
         .from(nil)
-        .to(dismiss_feedback.created_at)
+        .to(dismiss_feedback.reload.created_at)
     end
 
     context 'project is set to be deleted' do
