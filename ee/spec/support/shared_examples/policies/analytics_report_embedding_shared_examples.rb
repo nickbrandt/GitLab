@@ -8,7 +8,7 @@ RSpec.shared_examples 'analytics report embedding' do
       allow(subject.subject).to receive(:public?).and_return(false)
     end
 
-    it { is_expected.to be_disallowed(:embed_analytics_report) }
+    it { is_expected.to be_disallowed(:view_embedded_analytics_report) }
   end
 
   context 'when subject is public' do
@@ -16,6 +16,6 @@ RSpec.shared_examples 'analytics report embedding' do
       allow(subject.subject).to receive(:public?).and_return(true)
     end
 
-    it { is_expected.to be_allowed(:embed_analytics_report) }
+    it { is_expected.to be_allowed(:view_embedded_analytics_report) }
   end
 end

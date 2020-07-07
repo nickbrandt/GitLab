@@ -106,7 +106,7 @@ RSpec.describe Groups::InsightsController do
         it_behaves_like '200 status'
       end
 
-      describe 'GET #show.sjon' do
+      describe 'GET #show.json' do
         subject { get :show, params: params.merge(group_id: parent_group.to_param), format: :json }
 
         it_behaves_like '200 status'
