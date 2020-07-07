@@ -183,14 +183,6 @@
     - "Contributions du <strong>%{calendar_date}</strong>"
     - "Contribuciones para <strong>%{calendar_date}</strong>"
     - "<strong>%{calendar_date}</strong> için katkılar"
-"Define environments in the deploy stage(s) in <code>.gitlab-ci.yml</code> to track deployments here.":
-  plural_id:
-  translations:
-    - "デプロイステージの環境を <code>.gitlab-ci.yml</code> で定義して、デプロイを追跡します。"
-    - "Обозначьте окружения на этапе(ах) развёртывания в <code>.gitlab-ci.yml</code> для отслеживания развёртывания здесь."
-    - "在<code>.githab-ci.yml</code>的 deploy 阶段中定义 environment 来跟踪部署。"
-    - "Визначте середовища на стадії розгортання у <code>.gitlab-ci.yml</code> щоб відстежувати розгортання тут."
-    - "Defina entornos en las distintas etapas de despliegue en el fichero <code>.gitlab-ci.yml</code> para llevar un registro de las implementaciones desde aquí."
 "Depends on <strong>%d closed</strong> merge request.":
   plural_id: "Depends on <strong>%d closed</strong> merge requests."
   translations:
@@ -1053,3 +1045,11 @@
     - "CI配置文件的路径。默认为<code>.gitlab-ci.yml</code>"
     - "Шлях до кофігураційного файлу CI. За замовчуванням <code>.gitlab-ci.yml</code>"
     - "La ruta al archivo de configuración CI. Por defecto <code>.gitlab-ci.yml</code>"
+"Define environments in the deploy stage(s) in <code>.gitlab-ci.yml</code> to track deployments here.":
+  plural_id:
+  translations:
+    - "デプロイステージの環境を <code>.gitlab-ci.yml</code> で定義して、デプロイを追跡します。"
+    - "Обозначьте окружения на этапе(ах) развёртывания в <code>.gitlab-ci.yml</code> для отслеживания развёртывания здесь."
+    - "在<code>.githab-ci.yml</code>的 deploy 阶段中定义 environment 来跟踪部署。"
+    - "Визначте середовища на стадії розгортання у <code>.gitlab-ci.yml</code> щоб відстежувати розгортання тут."
+    - "Defina entornos en las distintas etapas de despliegue en el fichero <code>.gitlab-ci.yml</code> para llevar un registro de las implementaciones desde aquí."

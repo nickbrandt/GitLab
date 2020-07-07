@@ -7651,7 +7651,7 @@ msgstr ""
 msgid "Define custom rules for what constitutes spam, independent of Akismet"
 msgstr ""
 
-msgid "Define environments in the deploy stage(s) in <code>.gitlab-ci.yml</code> to track deployments here."
+msgid "Define environments in the deploy stage(s) in %{code_open}.gitlab-ci.yml%{code_close} to track deployments here."
 msgstr ""
 
 msgid "Definition"
