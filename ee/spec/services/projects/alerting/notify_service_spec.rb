@@ -29,7 +29,7 @@ RSpec.describe Projects::Alerting::NotifyService do
         existing_alert # create existing alert
       end
 
-      context 'generic fingerprinting feature not enabled' do
+      context 'generic fingerprinting license not enabled' do
         let(:fingerprinting_enabled) { false }
 
         it 'creates AlertManagement::Alert' do
@@ -41,7 +41,7 @@ RSpec.describe Projects::Alerting::NotifyService do
         end
       end
 
-      context 'generic fingerprinting feature enabled' do
+      context 'generic fingerprinting license enabled' do
         let(:fingerprinting_enabled) { true }
 
         it 'does not create AlertManagement::Alert' do

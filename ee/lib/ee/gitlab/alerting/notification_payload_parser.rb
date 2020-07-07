@@ -26,8 +26,7 @@ module EE
         private
 
         def generic_alert_fingerprinting_enabled?
-          project.feature_available?(:generic_alert_fingerprinting) &&
-            project.beta_feature_available?(:generic_alert_fingerprinting)
+          project.feature_available?(:generic_alert_fingerprinting)
         end
       end
     end

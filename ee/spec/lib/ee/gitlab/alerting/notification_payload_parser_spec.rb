@@ -35,14 +35,6 @@ RSpec.describe Gitlab::Alerting::NotificationPayloadParser do
           expect(fingerprint).to eq(expected_fingerprint)
         end
 
-        context 'feature not enabled' do
-          before do
-            stub_feature_flags(generic_alert_fingerprinting: false)
-          end
-
-          it { is_expected.to eq(nil) }
-        end
-
         context 'payload has no values' do
           let(:payload) do
             {
