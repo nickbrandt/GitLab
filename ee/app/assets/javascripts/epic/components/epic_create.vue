@@ -7,7 +7,6 @@ import {
   GlIcon,
   GlButton,
   GlTooltipDirective,
-  GlButton,
 } from '@gitlab/ui';
 
 import { __ } from '~/locale';
