@@ -3626,29 +3626,20 @@ For more information, see [Deployments Safety](../environments/deployment_safety
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/19298) in GitLab 13.2.
 
-`release` indicates that the job will create a [Release](../../user/project/releases/index.md),
-and optionally include URLs for Release assets.
+`release` indicates that the job creates a [Release](../../user/project/releases/index.md),
+and optionally includes URLs for Release assets.
 
 These methods are supported:
 
-- [`name`](#releasename)
-- [`description`](#releasedescription)
 - [`tag_name`](#releasetag_name)
-- [`ref`](#releaseref)
-- [`milestones`](#releasemilestones)
-- [`released_at`](#releasereleased_at)
+- [`name`](#releasename) (optional)
+- [`description`](#releasedescription) (optional)
+- [`ref`](#releaseref) (optional)
+- [`milestones`](#releasemilestones) (optional)
+- [`released_at`](#releasereleased_at) (optional)
 
 The Release is created only if the job processes without error. If the Rails API
 returns an error during Release creation, the `release` job fails.
-
-#### Tags
-
-A `release` job should not be run against a tag commit, or it will continually re-trigger itself. This can be specified by including:
-
-```yaml
-only:
-  - tags
-```
 
 #### `release-cli` Docker image
 
@@ -3674,23 +3665,25 @@ A pipeline can have multiple `release` jobs, for example:
 
 ```yaml
 ios-release:
-  script: release > changelog.md
+  script:
+    - echo 'iOS release job'
   release:
      tag_name: v1.0.0-ios
-     description: changelog.md
+     description: 'iOS release v1.0.0'
 
 android-release:
-  script: release > changelog.md
+  script:
+    - echo 'Android release job'
   release:
      tag_name: v1.0.0-android
-     description: changelog.md
+     description: 'Android release v1.0.0'
 ```
 
 #### `release:tag_name`
 
 The `tag_name` must be specified. It can refer to an existing Git tag or can be specified by the user.
 
-When the specified tag doesn't exist in repository, a new tag is created from the associated SHA of the pipeline.
+When the specified tag doesn't exist in the repository, a new tag is created from the associated SHA of the pipeline.
 
 For example, when creating a Release from a Git tag:
 
@@ -3699,8 +3692,6 @@ job:
   release:
     tag_name: $CI_COMMIT_TAG
     description: changelog.txt
-  only:
-    - tags
 ```
 
 It is also possible to create any unique tag, in which case `only: tags` is not mandatory.
@@ -3719,17 +3710,16 @@ job:
 
 #### `release:name`
 
-The Release name. This is an optional field. If omitted, it is populated with
-`release:tag_name`.
+The Release name. If omitted, it is populated with the value of `release: tag_name`.
 
 #### `release:description`
 
-Specifies a file containing the longer description of the Release. This is a mandatory
-field and can point to a changelog.
+Specifies the longer description of the Release.
 
 #### `release:ref`
 
-When the `tag_name` does not exist, `release:ref` specifies the commit to be used instead of the pipeline `ref`. If `tag_name` doesn’t exist, the release will be created from `ref`. `ref` can be a commit SHA, another tag name, or a branch name.
+If the `release: tag_name` doesn’t exist yet, the release is created from `ref`.
+`ref` can be a commit SHA, another tag name, or a branch name.
 
 #### `release:milestones`
 
@@ -3737,36 +3727,64 @@ The title of each milestone the release is associated with.
 
 #### `release:released_at`
 
-The date when the release will be or was ready. Defaults to the current time. Expected in ISO 8601 format (2019-03-15T08:00:00Z).
+The date and time when the release is ready. Defaults to the current date and time if not
+defined. Expected in ISO 8601 format (2019-03-15T08:00:00Z).
 
 #### Complete example for `release`
 
-Combining the individual examples given above for `release`, we'd have the following code snippet:
+Combining the individual examples given above for `release` results in the following
+code snippets. There are two options, depending on how you generate the
+tags. These options cannot be used together, so choose one:
 
-```yaml
-stages:
-  - build
-  - test
-  - release-stg
+- To create a release when you push a Git tag, or when you add a Git tag
+  in the UI by going to **Repository > Tags**:
 
-release_job:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  only:
-    - tags
-  script:
-    - echo 'running release_job'
-  release:
-     name: 'Release $CI_COMMIT_SHA'
-     description: 'Created using the release-cli $EXTRA_DESCRIPTION'
-     tag_name: 'release-$CI_COMMIT_SHA'
-     ref: '$CI_COMMIT_SHA'
-     milestones:
-       - 'm1'
-       - 'm2'
-       - 'm3'
-     released_at: '2020-07-15T08:00:00Z'
-```
+  ```yaml
+  release_job:
+    stage: release
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    rules:
+      - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
+    script:
+      - echo 'running release_job'
+    release:
+       name: 'Release $CI_COMMIT_TAG'
+       description: 'Created using the release-cli $EXTRA_DESCRIPTION' # $EXTRA_DESCRIPTION must be defined
+       tag_name: '$CI_COMMIT_TAG'                                      # elsewhere in the pipeline.
+       ref: '$CI_COMMIT_TAG'
+       milestones:
+         - 'm1'
+         - 'm2'
+         - 'm3'
+       released_at: '2020-07-15T08:00:00Z'  # Optional, will auto generate if not defined,
+                                            # or can use a variable.
+  ```
+
+- To create a release automatically when changes are pushed to the default branch,
+  using a new Git tag that is defined with variables:
+
+  ```yaml
+  release_job:
+    stage: release
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    rules:
+      - if: $CI_COMMIT_TAG
+        when: never                                 # Do not run this job when a tag is created manually
+      - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Run this job when the default branch changes
+    script:
+      - echo 'running release_job'
+    release:
+       name: 'Release $CI_COMMIT_SHA'
+       description: 'Created using the release-cli $EXTRA_DESCRIPTION' # $EXTRA_DESCRIPTION and the tag_name
+       tag_name: 'v${MAJOR}.${MINOR}.${REVISION}'                      # variables must be defined elsewhere
+       ref: '$CI_COMMIT_SHA'                                           # in the pipeline.
+       milestones:
+         - 'm1'
+         - 'm2'
+         - 'm3'
+       released_at: '2020-07-15T08:00:00Z'          # Optional, will auto generate if not defined,
+                                                    # or can use a variable.
+  ```
 
 #### `releaser-cli` command line
 
@@ -3774,10 +3792,10 @@ The entries under the `:release` node are transformed into a `bash` command line
 to the Docker container, which contains the [release-cli](https://gitlab.com/gitlab-org/release-cli).
 You can also call the `release-cli` directly from a `script` entry.
 
-The YAML described above would be transferred into a command line like this:
+The YAML described above would be translated into a CLI command like this:
 
 ```shell
-release-cli create --name "Release $CI_COMMIT_SHA" --description "Created using the release-cli $EXTRA_DESCRIPTION" --tag-name "release-$CI_COMMIT_SHA" --ref "$CI_COMMIT_SHA" --released-at "2020-07-15T08:00:00Z" --milestone "m1" --milestone "m2" --milestone "m3"
+release-cli create --name "Release $CI_COMMIT_SHA" --description "Created using the release-cli $EXTRA_DESCRIPTION" --tag-name "v${MAJOR}.${MINOR}.${REVISION}" --ref "$CI_COMMIT_SHA" --released-at "2020-07-15T08:00:00Z" --milestone "m1" --milestone "m2" --milestone "m3"
 ```
 
 ### `pages`
