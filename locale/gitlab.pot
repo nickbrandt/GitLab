@@ -6207,6 +6207,9 @@ msgstr ""
 msgid "ContainerRegistry|Cleanup policy:"
 msgstr ""
 
+msgid "ContainerRegistry|Configuration digest: %{digest}"
+msgstr ""
+
 msgid "ContainerRegistry|Container Registry"
 msgstr ""
 
@@ -6220,6 +6223,9 @@ msgid "ContainerRegistry|Copy push command"
 msgstr ""
 
 msgid "ContainerRegistry|Delete selected"
+msgstr ""
+
+msgid "ContainerRegistry|Digest: %{imageId}"
 msgstr ""
 
 msgid "ContainerRegistry|Docker connection error"
@@ -6246,9 +6252,6 @@ msgstr ""
 msgid "ContainerRegistry|If you are not already logged in, you need to authenticate to the Container Registry by using your GitLab username and password. If you have %{twofaDocLinkStart}Two-Factor Authentication%{twofaDocLinkEnd} enabled, use a %{personalAccessTokensDocLinkStart}Personal Access Token%{personalAccessTokensDocLinkEnd} instead of a password."
 msgstr ""
 
-msgid "ContainerRegistry|Image ID: %{imageId}"
-msgstr ""
-
 msgid "ContainerRegistry|Image Repositories"
 msgstr ""
 
@@ -6258,6 +6261,9 @@ msgstr ""
 msgid "ContainerRegistry|Login"
 msgstr ""
 
+msgid "ContainerRegistry|Manifest digest: %{digest}"
+msgstr ""
+
 msgid "ContainerRegistry|Missing or insufficient permission, delete button disabled"
 msgstr ""
 
@@ -6265,6 +6271,9 @@ msgid "ContainerRegistry|Number of tags to retain:"
 msgstr ""
 
 msgid "ContainerRegistry|Published %{timeInfo}"
+msgstr ""
+
+msgid "ContainerRegistry|Published to the %{repositoryPath} image repository at %{time} on %{date}"
 msgstr ""
 
 msgid "ContainerRegistry|Push an image"
