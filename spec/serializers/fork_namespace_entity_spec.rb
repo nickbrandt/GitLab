@@ -51,6 +51,11 @@ RSpec.describe ForkNamespaceEntity do
     expect(json[:relative_path]).to eql polymorphic_path(namespace)
   end
 
+  it 'exposes human readable permission level' do
+    namespace.add_developer(user)
+    expect(json[:permission]).to eql 'Developer'
+  end
+
   it 'sets can_create_project to true when user can create projects in namespace' do
     allow(user).to receive(:can?).with(:create_projects, namespace).and_return(true)
 
