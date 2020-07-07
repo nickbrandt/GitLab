@@ -11,7 +11,7 @@ export default {
     },
   },
   computed: {
-    sanitisedHtml() {
+    sanitizedHtml() {
       return sanitize(this.html, { allowedTags: ALLOWED_TAGS });
     },
   },
@@ -19,5 +19,5 @@ export default {
 </script>
 
 <template>
-  <span v-html="sanitisedHtml"></span>
+  <span v-html="sanitizedHtml"></span>
 </template>
