@@ -29,11 +29,10 @@ module SystemCheck
 
       def try_connect_imap
         config.each do |mailbox|
-          $stdout.puts "\nChecking #{mailbox[:email]}\n"
+          $stdout.puts "Checking #{mailbox[:email]}"
           imap = Net::IMAP.new(mailbox[:host], port: mailbox[:port], ssl: mailbox[:ssl])
           imap.starttls if mailbox[:start_tls]
           imap.login(mailbox[:email], mailbox[:password])
-          $stdout.puts "Connected to #{mailbox[:email]}\n"
         end
         true
       rescue => error
@@ -55,7 +54,7 @@ module SystemCheck
         erb.filename = mail_room_config_path
         config_file = YAML.load(erb.result)
 
-        config_file.dig(:mailboxes)
+        config_file[:mailboxes]
       end
     end
   end
