@@ -17,6 +17,7 @@ RSpec.describe EE::AuditEvents::ImpersonationAuditEventService do
     it 'creates an event and logs to a file with the provided details' do
       expect(service).to receive(:file_logger).and_return(logger)
       expect(logger).to receive(:info).with(author_id: impersonator.id,
+                                            author_name: impersonator.name,
                                             entity_id: impersonator.id,
                                             entity_type: "User",
                                             action: :custom,
