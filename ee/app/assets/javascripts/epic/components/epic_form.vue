@@ -39,12 +39,12 @@ export default {
   },
   data() {
     return {
-      labels: [],
-      confidential: false,
-      description: '',
       title: '',
-      dueDateFixed: null,
+      description: '',
+      confidential: false,
+      labels: [],
       startDateFixed: null,
+      dueDateFixed: null,
       loading: false,
     };
   },
@@ -60,7 +60,7 @@ export default {
     save() {
       this.loading = true;
 
-      this.$apollo
+      return this.$apollo
         .mutate({
           mutation: createEpic,
           variables: {
@@ -133,7 +133,6 @@ export default {
           />
         </div>
       </div>
-
       <div class="form-group row">
         <div class="col-form-label col-sm-2">
           <label for="epic-description">{{ __('Description') }}</label>
@@ -165,10 +164,9 @@ export default {
           </markdown-field>
         </div>
       </div>
-
       <div class="form-group row gl-mt-7">
         <div class="col-sm-10 offset-sm-2">
-          <gl-form-checkbox v-model="confidential">{{
+          <gl-form-checkbox v-model="confidential" data-testid="epic-confidentiality">{{
             __(
               'This epic and any containing child epics are confidential and should only be visible to team members with at least Reporter access.',
             )
@@ -180,7 +178,7 @@ export default {
         <div class="col-lg-6">
           <div class="form-group row">
             <div class="col-form-label col-md-2 col-lg-4">
-              <label for="epic-title">{{ __('Labels') }}</label>
+              <label>{{ __('Labels') }}</label>
             </div>
             <div class="col-md-8 col-sm-10">
               <div class="issuable-form-select-holder">
@@ -207,41 +205,43 @@ export default {
         <div class="col-lg-6">
           <div class="form-group row">
             <div class="col-form-label col-md-2 col-lg-4">
-              <label for="epic-start-date">{{ __('Start date') }}</label>
+              <label>{{ __('Start date') }}</label>
             </div>
             <div class="col-md-8 col-sm-10">
               <div class="issuable-form-select-holder gl-mr-2">
-                <gl-datepicker v-model="startDateFixed" />
+                <gl-datepicker v-model="startDateFixed" data-testid="epic-start-date" />
               </div>
               <a
                 v-show="startDateFixed"
-                class="gl-white-space-nowrap js-clear-start-date"
+                class="gl-white-space-nowrap"
+                data-testid="clear-start-date"
                 href="#"
                 @click="updateStartDate(null)"
                 >{{ __('Clear start date') }}</a
               >
-              <span class="block gl-text-gray-400">{{
-                __('An empty date will inherit from milestone dates')
+              <span class="block gl-line-height-normal gl-mt-3 gl-text-gray-500">{{
+                __('Leave empty to inherit from milestone dates')
               }}</span>
             </div>
           </div>
           <div class="form-group row">
             <div class="col-form-label col-md-2 col-lg-4">
-              <label for="epic-due-date">{{ __('Due Date') }}</label>
+              <label>{{ __('Due Date') }}</label>
             </div>
             <div class="col-md-8 col-sm-10">
               <div class="issuable-form-select-holder gl-mr-2">
-                <gl-datepicker v-model="dueDateFixed" />
+                <gl-datepicker v-model="dueDateFixed" data-testid="epic-due-date" />
               </div>
               <a
                 v-show="dueDateFixed"
-                class="gl-white-space-nowrap js-clear-due-date"
+                class="gl-white-space-nowrap"
+                data-testid="clear-due-date"
                 href="#"
                 @click="updateDueDate(null)"
                 >{{ __('Clear due date') }}</a
               >
-              <span class="block gl-text-gray-400">{{
-                __('An empty date will inherit from milestone dates')
+              <span class="block gl-line-height-normal gl-mt-3 gl-text-gray-500">{{
+                __('Leave empty to inherit from milestone dates')
               }}</span>
             </div>
           </div>
@@ -259,7 +259,7 @@ export default {
       >
         {{ __('Create epic') }}
       </gl-button>
-      <gl-button class="ml-auto" data-testid="cancel-epic" :href="groupEpicsPath">{{
+      <gl-button class="gl-ml-auto" data-testid="cancel-epic" :href="groupEpicsPath">{{
         __('Cancel')
       }}</gl-button>
     </div>

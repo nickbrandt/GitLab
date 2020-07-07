@@ -2408,9 +2408,6 @@ msgstr ""
 msgid "An empty GitLab User field will add the FogBugz user's full name (e.g. \"By John Smith\") in the description of all issues and comments. It will also associate and/or assign these issues and comments with the project creator."
 msgstr ""
 
-msgid "An empty date will inherit from milestone dates"
-msgstr ""
-
 msgid "An error has occurred"
 msgstr ""
 
@@ -13643,6 +13640,9 @@ msgstr ""
 msgid "Leave edit mode? All unsaved changes will be lost."
 msgstr ""
 
+msgid "Leave empty to inherit from milestone dates"
+msgstr ""
+
 msgid "Leave group"
 msgstr ""
 
@@ -15417,6 +15417,9 @@ msgid "New Deploy Key"
 msgstr ""
 
 msgid "New Environment"
+msgstr ""
+
+msgid "New Epic"
 msgstr ""
 
 msgid "New File"
