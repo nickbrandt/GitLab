@@ -237,17 +237,13 @@ module EE
         override :usage_activity_by_stage_manage
         def usage_activity_by_stage_manage(time_period)
           super.merge({
-            events: distinct_count(::Event.where(time_period), :author_id),
-            groups: distinct_count(::GroupMember.where(time_period), :user_id),
             ldap_keys: distinct_count(::LDAPKey.where(time_period), :user_id),
             ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id),
-            users_created: count(::User.where(time_period), start: user_minimum_id, finish: user_maximum_id),
             value_stream_management_customized_group_stages: count(::Analytics::CycleAnalytics::GroupStage.where(custom: true)),
             projects_with_compliance_framework: count(::ComplianceManagement::ComplianceFramework::ProjectSettings),
             ldap_servers: ldap_available_servers.size,
             ldap_group_sync_enabled: ldap_config_present_for_any_provider?(:group_base),
             ldap_admin_sync_enabled: ldap_config_present_for_any_provider?(:admin_group),
-            omniauth_providers: filtered_omniauth_provider_names.reject { |name| name == 'group_saml' },
             group_saml_enabled: omniauth_provider_names.include?('group_saml')
           })
         end
@@ -356,24 +352,12 @@ module EE
         end
         # rubocop:enable CodeReuse/ActiveRecord
 
-        def ldap_available_servers
-          ::Gitlab::Auth::Ldap::Config.available_servers
-        end
-
         def ldap_config_present_for_any_provider?(configuration_item)
           ldap_available_servers.any? { |server_config| server_config[configuration_item.to_s] }
         end
 
-        def omniauth_provider_names
-          ::Gitlab.config.omniauth.providers.map(&:name)
-        end
-
-        # LDAP provider names are set by customers and could include
-        # sensitive info (server names, etc). LDAP providers normally
-        # don't appear in omniauth providers but filter to ensure
-        # no internal details leak via usage ping.
-        def filtered_omniauth_provider_names
-          omniauth_provider_names.reject { |name| name.starts_with?('ldap') }
+        def ldap_available_servers
+          ::Gitlab::Auth::Ldap::Config.available_servers
         end
       end
     end
