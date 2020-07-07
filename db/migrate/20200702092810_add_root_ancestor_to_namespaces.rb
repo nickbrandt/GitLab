@@ -17,6 +17,8 @@ class AddRootAncestorToNamespaces < ActiveRecord::Migration[6.0]
   end
 
   def down
+    remove_concurrent_index :namespaces, :root_ancestor_id
+
     with_lock_retries do
       remove_column :namespaces, :root_ancestor_id
     end
