@@ -12874,7 +12874,13 @@ msgstr ""
 msgid "JiraService|If different from Web URL"
 msgstr ""
 
+msgid "JiraService|Issue List"
+msgstr ""
+
 msgid "JiraService|Jira API URL"
+msgstr ""
+
+msgid "JiraService|Jira Issues"
 msgstr ""
 
 msgid "JiraService|Jira comments will be created when an issue gets referenced in a commit."
@@ -12884,6 +12890,9 @@ msgid "JiraService|Jira comments will be created when an issue gets referenced i
 msgstr ""
 
 msgid "JiraService|Jira issue tracker"
+msgstr ""
+
+msgid "JiraService|Open Jira"
 msgstr ""
 
 msgid "JiraService|Password or API token"

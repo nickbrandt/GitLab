@@ -2,6 +2,13 @@
 
 module EE
   module ServicesHelper
+    extend ::Gitlab::Utils::Override
+
+    override :project_jira_issues_integration?
+    def project_jira_issues_integration?
+      ::Feature.enabled?(:jira_integration, @project) && @project.jira_service.issues_enabled
+    end
+
     def add_to_slack_link(project, slack_app_id)
       "https://slack.com/oauth/authorize?scope=commands&client_id=#{slack_app_id}&redirect_uri=#{slack_auth_project_settings_slack_url(project)}&state=#{escaped_form_authenticity_token}"
     end
