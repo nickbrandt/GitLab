@@ -18,7 +18,6 @@ export default {
     GlFormCheckbox,
     GlIcon,
     GlButton,
-    GlButton,
     GlForm,
     GlFormInput,
   },
