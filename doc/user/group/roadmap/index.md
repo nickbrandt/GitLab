@@ -27,7 +27,7 @@ You can expand epics that contain child epics to show their child epics in the r
 You can click the chevron **{chevron-down}** next to the epic title to expand and collapse the child epics.
 
 On top of the milestone bars, you can see their title. When you hover a milestone bar or title, a popover appears with its title, start date and due date.
-You can also click the chevron **{chevron-down}** next to the "Milestones" heading to collapse the list of the milestone bars then re-expand the list.
+You can also click the chevron (**{chevron-down}**) next to the **Milestones** heading to toggle the list of the milestone bars.
 
 ![roadmap view](img/roadmap_view_v13_2.png)
 
