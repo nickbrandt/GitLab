@@ -89,18 +89,25 @@ describe('LabelsSelectRoot', () => {
       expect(wrapper.attributes('class')).toContain('labels-select-wrapper position-relative');
     });
 
-    it('renders component root element with CSS class `is-standalone` when `state.variant` is "standalone"', () => {
-      const wrapperStandalone = createComponent({
-        ...mockConfig,
-        variant: 'standalone',
-      });
+    it.each`
+      variant         | cssClass
+      ${'standalone'} | ${'is-standalone'}
+      ${'embedded'}   | ${'is-embedded'}
+    `(
+      'renders component root element with CSS class `$cssClass` when `state.variant` is "$variant"',
+      ({ variant, cssClass }) => {
+        const wrapperStandalone = createComponent({
+          ...mockConfig,
+          variant,
+        });
 
-      return wrapperStandalone.vm.$nextTick(() => {
-        expect(wrapperStandalone.classes()).toContain('is-standalone');
+        return wrapperStandalone.vm.$nextTick(() => {
+          expect(wrapperStandalone.classes()).toContain(cssClass);
 
-        wrapperStandalone.destroy();
-      });
-    });
+          wrapperStandalone.destroy();
+        });
+      },
+    );
 
     it('renders `dropdown-value-collapsed` component when `allowLabelCreate` prop is `true`', () => {
       expect(wrapper.find(DropdownValueCollapsed).exists()).toBe(true);

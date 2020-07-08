@@ -193,7 +193,9 @@ export default {
                   "
                   :labels-manage-path="groupUrl('labels')"
                   :labels-filter-base-path="groupUrl('epics')"
-                  variant="standalone"
+                  :labels-list-title="__('Select label')"
+                  :dropdown-button-text="__('Labels')"
+                  variant="embedded"
                   class="block labels js-labels-block"
                   @updateSelectedLabels="handleUpdateSelectedLabels"
                   >{{ __('None') }}</labels-select-vue

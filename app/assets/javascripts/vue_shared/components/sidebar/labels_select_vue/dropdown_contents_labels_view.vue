@@ -36,7 +36,7 @@ export default {
       'footerCreateLabelTitle',
       'footerManageLabelTitle',
     ]),
-    ...mapGetters(['selectedLabelsList', 'isDropdownVariantSidebar']),
+    ...mapGetters(['selectedLabelsList', 'isDropdownVariantSidebar', 'isDropdownVariantEmbedded']),
     visibleLabels() {
       if (this.searchKey) {
         return this.labels.filter(label =>
@@ -129,7 +129,10 @@ export default {
       class="labels-fetch-loading position-absolute d-flex align-items-center w-100 h-100"
       size="md"
     />
-    <div v-if="isDropdownVariantSidebar" class="dropdown-title d-flex align-items-center pt-0 pb-2">
+    <div
+      v-if="isDropdownVariantSidebar || isDropdownVariantEmbedded"
+      class="dropdown-title d-flex align-items-center pt-0 pb-2"
+    >
       <span class="flex-grow-1">{{ labelsListTitle }}</span>
       <gl-button
         :aria-label="__('Close')"
@@ -165,7 +168,7 @@ export default {
         </li>
       </smart-virtual-list>
     </div>
-    <div v-if="isDropdownVariantSidebar" class="dropdown-footer">
+    <div v-if="isDropdownVariantSidebar || isDropdownVariantEmbedded" class="dropdown-footer">
       <ul class="list-unstyled">
         <li v-if="allowLabelCreate">
           <gl-link
