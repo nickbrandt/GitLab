@@ -32,7 +32,7 @@ module ReleasesHelper
       update_release_api_docs_path: help_page_path('api/releases/index.md', anchor: 'update-a-release'),
       release_assets_docs_path: help_page(anchor: 'release-assets'),
       manage_milestones_path: project_milestones_path(@project),
-      new_milestone_path: new_project_milestone_url(@project)
+      new_milestone_path: new_project_milestone_path(@project)
     }
   end
 end
