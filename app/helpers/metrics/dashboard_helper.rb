@@ -3,19 +3,19 @@
 module Metrics::DashboardHelper
   include ActionView::Helpers::AssetUrlHelper
 
-  def environments_list_data
-    {
-      endpoint: project_environments_path(@project, format: :json)
-    }
-  end
+  # def environments_list_data
+  #   {
+  #     endpoint: project_environments_path(@project, format: :json)
+  #   }
+  # end
 
-  def environments_folder_list_view_data
-    {
-      "endpoint" => folder_project_environments_path(@project, @folder, format: :json),
-      "folder-name" => @folder,
-      "can-read-environment" => can?(current_user, :read_environment, @project).to_s
-    }
-  end
+  # def environments_folder_list_view_data
+  #   {
+  #     "endpoint" => folder_project_environments_path(@project, @folder, format: :json),
+  #     "folder-name" => @folder,
+  #     "can-read-environment" => can?(current_user, :read_environment, @project).to_s
+  #   }
+  # end
 
   def custom_metrics_available?(project)
     can?(current_user, :admin_project, project)
@@ -69,7 +69,6 @@ module Metrics::DashboardHelper
     return {} unless environment
 
     {
-      'metrics-dashboard-base-path' => environment_metrics_path(environment),
       'current-environment-name'    => environment.name,
       'has-metrics'                 => "#{environment.has_metrics?}",
       # 'has-metrics'                 => "true",
@@ -79,7 +78,10 @@ module Metrics::DashboardHelper
   end
 
   def project_and_environment_metrics_data(project, environment)
-    v = { 'dashboard-endpoint' => project_metrics_dashboard_path(project, format: :json) }
+    v = {
+      'metrics-dashboard-base-path' => project_metrics_path(project),
+      'dashboard-endpoint' => project_metrics_dashboard_path(project, format: :json)
+    }
     return v unless project && environment
 
     v.merge({
