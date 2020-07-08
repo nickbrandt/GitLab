@@ -75,8 +75,6 @@ module EE
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
       has_many :software_licenses, through: :software_license_policies
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
-      has_many :packages, class_name: 'Packages::Package'
-      has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
       has_many :merge_trains, foreign_key: 'target_project_id', inverse_of: :target_project
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
@@ -630,14 +628,6 @@ module EE
       instance.token
     end
 
-    def root_namespace
-      if namespace.has_parent?
-        namespace.root_ancestor
-      else
-        namespace
-      end
-    end
-
     override :lfs_http_url_to_repo
     def lfs_http_url_to_repo(operation)
       return super unless ::Gitlab::Geo.secondary_with_primary?
@@ -648,14 +638,6 @@ module EE
 
     def feature_usage
       super.presence || build_feature_usage
-    end
-
-    def package_already_taken?(package_name)
-      namespace.root_ancestor.all_projects
-        .joins(:packages)
-        .where.not(id: id)
-        .merge(Packages::Package.with_name(package_name))
-        .exists?
     end
 
     def adjourned_deletion?
