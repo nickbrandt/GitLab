@@ -265,7 +265,7 @@ class GeoNode < ApplicationRecord
   def lfs_objects
     return LfsObject.all unless selective_sync?
 
-    query = LfsObjectsProject.project_id_in(projects).select(:lfs_object_id)
+    query = LfsObjectsProject.project_id_in(projects).select(:lfs_object_id).distinct
     cte = Gitlab::SQL::CTE.new(:restricted_lfs_objects, query)
     lfs_object_table = LfsObject.arel_table
 

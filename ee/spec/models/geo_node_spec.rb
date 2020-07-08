@@ -776,4 +776,67 @@ RSpec.describe GeoNode, :request_store, :geo, type: :model do
       end
     end
   end
+
+  describe '#lfs_objects' do
+    let_it_be(:synced_group) { create(:group) }
+    let_it_be(:nested_group) { create(:group, parent: synced_group) }
+    let_it_be(:synced_project) { create(:project, group: synced_group) }
+    let_it_be(:synced_project_in_nested_group) { create(:project, group: nested_group) }
+    let_it_be(:unsynced_project) { create(:project) }
+    let_it_be(:project_broken_storage) { create(:project, :broken_storage) }
+
+    let_it_be(:lfs_object_1) { create(:lfs_object) }
+    let_it_be(:lfs_object_2) { create(:lfs_object) }
+    let_it_be(:lfs_object_3) { create(:lfs_object) }
+    let_it_be(:lfs_object_4) { create(:lfs_object) }
+    let_it_be(:lfs_object_5) { create(:lfs_object) }
+
+    before_all do
+      create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+      create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
+      create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_3)
+      create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_4)
+      create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
+    end
+
+    context 'without selective sync' do
+      it 'returns all projects without selective sync' do
+        expect(node.lfs_objects).to match_array([lfs_object_1, lfs_object_2, lfs_object_3, lfs_object_4, lfs_object_5])
+      end
+    end
+
+    context 'with selective sync by namespace' do
+      before do
+        node.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+      end
+
+      it 'excludes LFS objects that are not in selectively synced projects' do
+        expect(node.lfs_objects).to match_array([lfs_object_1, lfs_object_2, lfs_object_3])
+      end
+
+      it 'excludes LFS objects from fork networks' do
+        forked_project = create(:project, group: synced_group)
+        create(:lfs_objects_project, project: forked_project, lfs_object: lfs_object_1)
+
+        expect(node.lfs_objects).to match_array([lfs_object_1, lfs_object_2, lfs_object_3])
+      end
+    end
+
+    context 'with selective sync by shard' do
+      before do
+        node.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+      end
+
+      it 'excludes LFS objects that are not in selectively synced shards' do
+        expect(node.lfs_objects).to match_array([lfs_object_5])
+      end
+
+      it 'excludes LFS objects from fork networks' do
+        forked_project = create(:project, :broken_storage)
+        create(:lfs_objects_project, project: forked_project, lfs_object: lfs_object_5)
+
+        expect(node.lfs_objects).to match_array([lfs_object_5])
+      end
+    end
+  end
 end
