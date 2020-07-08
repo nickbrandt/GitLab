@@ -17694,7 +17694,7 @@ msgstr ""
 msgid "Project clone URL"
 msgstr ""
 
-msgid "Project configuration, including services"
+msgid "Project configuration, excluding integrations"
 msgstr ""
 
 msgid "Project description (optional)"
