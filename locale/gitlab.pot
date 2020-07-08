@@ -4060,9 +4060,6 @@ msgstr ""
 msgid "Can't apply as the source branch was deleted."
 msgstr ""
 
-msgid "Can't apply as this line has changed or the suggestion already matches its content."
-msgstr ""
-
 msgid "Can't apply this suggestion."
 msgstr ""
 
