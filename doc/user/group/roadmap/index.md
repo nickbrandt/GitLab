@@ -24,7 +24,7 @@ When you hover over an epic bar, a popover appears with the epic's title, start 
 weight completed.
 
 You can expand epics that contain child epics to show their child epics in the roadmap.
-You can click the chevron **{chevron-down}** next to the epic title to expand and collapse the child epics.
+You can click the chevron (**{chevron-down}**) next to the epic title to expand and collapse the child epics.
 
 On top of the milestone bars, you can see their title. When you hover a milestone bar or title, a popover appears with its title, start date and due date.
 You can also click the chevron (**{chevron-down}**) next to the **Milestones** heading to toggle the list of the milestone bars.
