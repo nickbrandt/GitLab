@@ -330,6 +330,8 @@ module EE
                                                                           finish: user_maximum_id)
           end
 
+          results[:"#{prefix}unique_users_all_secure_scanners"] = distinct_count(::Ci::Build.where(name: SECURE_PRODUCT_TYPES.keys).where(time_period), :user_id)
+
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           combined_license_key = "#{prefix}license_management_jobs".to_sym
           license_scan_count = results.delete("#{prefix}license_scanning_jobs".to_sym)
