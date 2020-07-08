@@ -21540,6 +21540,9 @@ msgstr ""
 msgid "Something went wrong while initializing the OpenAPI viewer"
 msgstr ""
 
+msgid "Something went wrong while inserting your image. Please try again."
+msgstr ""
+
 msgid "Something went wrong while merging this merge request. Please try again."
 msgstr ""
 
