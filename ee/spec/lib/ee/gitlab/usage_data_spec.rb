@@ -526,6 +526,8 @@ RSpec.describe Gitlab::UsageData do
 
       context 'for secure' do
         let_it_be(:user) { create(:user, group_view: :security_dashboard) }
+        let_it_be(:user2) { create(:user, group_view: :security_dashboard) }
+        let_it_be(:user3) { create(:user, group_view: :security_dashboard) }
 
         before do
           for_defined_days_back do
@@ -540,13 +542,33 @@ RSpec.describe Gitlab::UsageData do
 
         it 'includes accurate usage_activity_by_stage data' do
           expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
-            user_preferences_group_overview_security_dashboard: 1,
+            user_preferences_group_overview_security_dashboard: 3,
             user_container_scanning_jobs: 1,
             user_dast_jobs: 1,
             user_dependency_scanning_jobs: 1,
             user_license_management_jobs: 1,
             user_sast_jobs: 1,
-            user_secret_detection_jobs: 1
+            user_secret_detection_jobs: 1,
+            user_unique_users_all_secure_scanners: 1
+          )
+        end
+
+        it 'counts unique users correctly across multiple scanners' do
+          for_defined_days_back do
+            create(:ci_build, name: 'sast', user: user2)
+            create(:ci_build, name: 'dast', user: user2)
+            create(:ci_build, name: 'dast', user: user3)
+          end
+
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
+            user_preferences_group_overview_security_dashboard: 3,
+            user_container_scanning_jobs: 1,
+            user_dast_jobs: 3,
+            user_dependency_scanning_jobs: 1,
+            user_license_management_jobs: 1,
+            user_sast_jobs: 2,
+            user_secret_detection_jobs: 1,
+            user_unique_users_all_secure_scanners: 3
           )
         end
 
@@ -556,13 +578,14 @@ RSpec.describe Gitlab::UsageData do
           end
 
           expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
-            user_preferences_group_overview_security_dashboard: 1,
+            user_preferences_group_overview_security_dashboard: 3,
             user_container_scanning_jobs: 1,
             user_dast_jobs: 1,
             user_dependency_scanning_jobs: 1,
             user_license_management_jobs: 2,
             user_sast_jobs: 1,
-            user_secret_detection_jobs: 1
+            user_secret_detection_jobs: 1,
+            user_unique_users_all_secure_scanners: 1
           )
         end
 
@@ -571,13 +594,14 @@ RSpec.describe Gitlab::UsageData do
           allow(::Ci::Build).to receive(:distinct_count_by).and_raise(ActiveRecord::StatementInvalid)
 
           expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
-            user_preferences_group_overview_security_dashboard: 1,
+            user_preferences_group_overview_security_dashboard: 3,
             user_container_scanning_jobs: -1,
             user_dast_jobs: -1,
             user_dependency_scanning_jobs: -1,
             user_license_management_jobs: -1,
             user_sast_jobs: -1,
-            user_secret_detection_jobs: -1
+            user_secret_detection_jobs: -1,
+            user_unique_users_all_secure_scanners: -1
           )
         end
       end
