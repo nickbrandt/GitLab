@@ -159,6 +159,30 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
       end
     end
 
+    context 'for release' do
+      it 'includes accurate usage_activity_by_stage data' do
+        for_defined_days_back do
+          user = create(:user)
+          create(:deployment, :failed, user: user)
+          create(:release, author: user)
+          create(:deployment, :success, user: user)
+        end
+
+        expect(described_class.uncached_data[:usage_activity_by_stage][:release]).to include(
+          deployments: 2,
+          failed_deployments: 2,
+          releases: 2,
+          successful_deployments: 2
+        )
+        expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:release]).to include(
+          deployments: 1,
+          failed_deployments: 1,
+          releases: 1,
+          successful_deployments: 1
+        )
+      end
+    end
+
     it 'ensures recorded_at is set before any other usage data calculation' do
       %i(alt_usage_data redis_usage_data distinct_count count).each do |method|
         expect(described_class).not_to receive(method)
