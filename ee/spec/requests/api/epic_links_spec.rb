@@ -214,14 +214,15 @@ RSpec.describe API::EpicLinks do
   describe 'DELETE /groups/:id/epics/:epic_iid/epics' do
     let!(:child_epic) { create(:epic, group: group, parent: epic)}
     let(:url) { "/groups/#{group.path}/epics/#{epic.iid}/epics/#{child_epic.id}" }
+    let(:features_when_forbidden) { { epics: false } }
 
     subject { delete api(url, user) }
 
     it_behaves_like 'user does not have access'
 
-    context 'when subepics feature is enabled' do
+    context 'when epics feature is enabled' do
       before do
-        stub_licensed_features(epics: true, subepics: true)
+        stub_licensed_features(epics: true)
       end
 
       context 'when user is guest' do
@@ -243,6 +244,24 @@ RSpec.describe API::EpicLinks do
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
           expect(epic.reload.children).not_to include(child_epic)
+        end
+      end
+    end
+
+    context 'when epics feature is disabled' do
+      before do
+        stub_licensed_features(epics: false)
+      end
+
+      context 'when user is developer' do
+        before do
+          group.add_developer(user)
+        end
+
+        it 'returns 403 status' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
