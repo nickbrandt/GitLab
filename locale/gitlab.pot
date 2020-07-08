@@ -15928,6 +15928,9 @@ msgstr ""
 msgid "Open in Xcode"
 msgstr ""
 
+msgid "Open in file view"
+msgstr ""
+
 msgid "Open issues"
 msgstr ""
 
