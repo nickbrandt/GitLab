@@ -154,6 +154,9 @@ class ProjectPolicy < BasePolicy
     ::Feature.enabled?(:build_service_proxy, @subject)
   end
 
+  with_scope :subject
+  condition(:packages_disabled) { !@subject.packages_enabled }
+
   features = %w[
     merge_requests
     issues
@@ -259,6 +262,7 @@ class ProjectPolicy < BasePolicy
     enable :read_metrics_dashboard_annotation
     enable :metrics_dashboard
     enable :read_confidential_issues
+    enable :read_package
   end
 
   # We define `:public_user_access` separately because there are cases in gitlab-ee
@@ -295,12 +299,17 @@ class ProjectPolicy < BasePolicy
     enable :read_metrics_user_starred_dashboard
   end
 
+  rule { packages_disabled | repository_disabled }.policy do
+    prevent(*create_read_update_admin_destroy(:package))
+  end
+
   rule { owner | admin | guest | group_member }.prevent :request_access
   rule { ~request_access_enabled }.prevent :request_access
 
   rule { can?(:developer_access) & can?(:create_issue) }.enable :import_issues
 
   rule { can?(:developer_access) }.policy do
+    enable :create_package
     enable :admin_board
     enable :admin_merge_request
     enable :admin_milestone
@@ -341,6 +350,7 @@ class ProjectPolicy < BasePolicy
   end
 
   rule { can?(:maintainer_access) }.policy do
+    enable :destroy_package
     enable :admin_board
     enable :push_to_delete_protected_branch
     enable :update_snippet
@@ -475,6 +485,7 @@ class ProjectPolicy < BasePolicy
   end
 
   rule { can?(:public_access) }.policy do
+    enable :read_package
     enable :read_project
     enable :read_board
     enable :read_list
