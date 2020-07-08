@@ -200,12 +200,7 @@ export default {
       {{ label }}
       <gl-loading-icon v-if="dateSaveInProgress" :inline="true" />
       <div class="float-right d-flex">
-        <icon
-          v-popover="popoverOptions"
-          name="question-o"
-          class="help-icon append-right-5"
-          tabindex="0"
-        />
+        <icon v-popover="popoverOptions" name="question-o" class="help-icon gl-mr-2" tabindex="0" />
         <gl-deprecated-button
           v-show="canUpdate && !editing"
           ref="editButton"
@@ -249,7 +244,7 @@ export default {
               v-if="isDateInvalid && selectedDateIsFixed"
               v-popover="dateInvalidPopoverOptions"
               name="warning"
-              class="date-warning-icon append-right-5 prepend-left-5"
+              class="date-warning-icon gl-mr-2 prepend-left-5"
               tabindex="0"
             />
             <span v-if="selectedAndEditable" class="no-value d-flex">

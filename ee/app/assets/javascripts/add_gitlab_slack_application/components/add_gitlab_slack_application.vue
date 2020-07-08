@@ -134,7 +134,7 @@ export default {
       </span>
     </div>
 
-    <div class="center prepend-top-20 append-bottom-10 append-right-5 prepend-left-5">
+    <div class="center prepend-top-20 append-bottom-10 gl-mr-2 prepend-left-5">
       <img v-once :src="gitlabForSlackGifPath" class="gitlab-slack-gif" />
     </div>
 
@@ -146,7 +146,7 @@ export default {
           >/gitlab &lt;project-alias&gt; issue show &lt;id&gt;</code
         >
         <span>
-          <div class="gitlab-slack-right-arrow inline append-right-5" v-html="arrowRightSvg"></div>
+          <div class="gitlab-slack-right-arrow inline gl-mr-2" v-html="arrowRightSvg"></div>
           Shows the issue with id <strong>&lt;id&gt;</strong>
         </span>
 

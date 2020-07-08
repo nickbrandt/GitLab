@@ -3,7 +3,7 @@
 require 'pathname'
 
 module QA
-  context 'Secure', :docker, :runner, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/213676', type: :investigating } do
+  RSpec.describe 'Secure', :docker, :runner, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/213676', type: :investigating } do
     let(:number_of_dependencies_in_fixture) { 7 }
     let(:dependency_scan_example_vuln) { 'Prototype pollution attack in mixin-deep' }
     let(:container_scan_example_vuln) { 'CVE-2017-18269 in glibc' }
