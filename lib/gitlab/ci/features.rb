@@ -50,6 +50,11 @@ module Gitlab
       def self.store_pipeline_messages?(project)
         ::Feature.enabled?(:ci_store_pipeline_messages, project, default_enabled: true)
       end
+
+      # Remove in https://gitlab.com/gitlab-org/gitlab/-/issues/227052
+      def self.variables_api_filter_environment_scope?
+        ::Feature.enabled?(:ci_variables_api_filter_environment_scope, default_enabled: false)
+      end
     end
   end
 end
