@@ -1,0 +1,5 @@
+---
+title: Remoe commit ref validation for the release yaml node
+merge_request: 36256
+author:
+type: fixed
