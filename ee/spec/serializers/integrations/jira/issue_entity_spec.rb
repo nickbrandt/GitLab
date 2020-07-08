@@ -4,6 +4,14 @@ require 'spec_helper'
 
 RSpec.describe Integrations::Jira::IssueEntity do
   let(:project) { build(:project) }
+
+  let(:reporter) do
+    double(
+      'displayName' => 'reporter',
+      'name' => 'reporter@reporter.com'
+    )
+  end
+
   let(:jira_issue) do
     double(
       summary: 'summary',
@@ -11,7 +19,7 @@ RSpec.describe Integrations::Jira::IssueEntity do
       updated: '2020-06-26T15:38:32.000+0000',
       resolutiondate: '2020-06-27T13:23:51.000+0000',
       labels: ['backend'],
-      reporter: double('displayName' => 'reporter'),
+      reporter: reporter,
       assignee: double('displayName' => 'assignee'),
       project: double(key: 'GL'),
       key: 'GL-5',
@@ -35,7 +43,10 @@ RSpec.describe Integrations::Jira::IssueEntity do
           text_color: '#FFFFFF'
         }
       ],
-      author: { name: 'reporter' },
+      author: {
+        name: 'reporter',
+        web_url: 'http://jira.com/secure/ViewProfile.jspa?name=reporter@reporter.com'
+      },
       assignees: [
         { name: 'assignee' }
       ],
@@ -43,6 +54,16 @@ RSpec.describe Integrations::Jira::IssueEntity do
       references: { relative: 'GL-5' },
       external_tracker: 'jira'
     )
+  end
+
+  context 'with Jira Cloud configuration' do
+    before do
+      allow(reporter).to receive(:accountId).and_return('12345')
+    end
+
+    it 'returns the Jira Cloud profile URL' do
+      expect(subject[:author]).to include(web_url: 'http://jira.com/people/12345')
+    end
   end
 
   context 'without assignee' do

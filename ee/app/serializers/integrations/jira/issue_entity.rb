@@ -39,7 +39,8 @@ module Integrations
 
       expose :author do |jira_issue|
         {
-          name: jira_issue.reporter.displayName
+          name: jira_issue.reporter.displayName,
+          web_url: author_web_url(jira_issue)
         }
       end
 
@@ -67,6 +68,17 @@ module Integrations
 
       expose :external_tracker do |_jira_issue|
         'jira'
+      end
+
+      private
+
+      def author_web_url(jira_issue)
+        # There are differences between Jira Cloud and Jira Server URLs and responses.
+        if jira_issue.reporter.try(:accountId)
+          "#{jira_issue.client.options[:site]}people/#{jira_issue.reporter.accountId}"
+        else
+          "#{jira_issue.client.options[:site]}secure/ViewProfile.jspa?name=#{jira_issue.reporter.name}"
+        end
       end
     end
   end
