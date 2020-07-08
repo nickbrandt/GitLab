@@ -118,16 +118,18 @@ describe('RECEIVE_BOARD_LISTS_SUCCESS', () => {
 });
 
 describe('RECEIVE_SWIMLANES_FAILURE', () => {
-  it('sets epicsSwimlanesFetchInProgress to false and epicsSwimlanesFetchFailure to true', () => {
+  it('sets epicsSwimlanesFetchInProgress to false and sets error message', () => {
     const state = {
       epicsSwimlanesFetchInProgress: true,
-      epicsSwimlanesFetchFailure: false,
+      error: undefined,
     };
 
     mutations.RECEIVE_SWIMLANES_FAILURE(state);
 
     expect(state.epicsSwimlanesFetchInProgress).toBe(false);
-    expect(state.epicsSwimlanesFetchFailure).toBe(true);
+    expect(state.error).toEqual(
+      'An error occurred while fetching the board swimlanes. Please reload the page.',
+    );
   });
 });
 
