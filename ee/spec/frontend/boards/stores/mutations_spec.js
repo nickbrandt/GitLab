@@ -1,6 +1,6 @@
 import mutations from 'ee/boards/stores/mutations';
 import { inactiveListId } from '~/boards/constants';
-import { mockSwimlanes, mockEpics } from '../mock_data';
+import { mockLists, mockEpics } from '../mock_data';
 
 const expectNotImplemented = action => {
   it('is not implemented', () => {
@@ -134,10 +134,10 @@ describe('RECEIVE_SWIMLANES_SUCCESS', () => {
       epicsSwimlanes: {},
     };
 
-    mutations.RECEIVE_SWIMLANES_SUCCESS(state, mockSwimlanes);
+    mutations.RECEIVE_SWIMLANES_SUCCESS(state, mockLists);
 
     expect(state.epicsSwimlanesFetchInProgress).toBe(false);
-    expect(state.epicsSwimlanes).toEqual(mockSwimlanes);
+    expect(state.epicsSwimlanes).toEqual(mockLists);
   });
 });
 
