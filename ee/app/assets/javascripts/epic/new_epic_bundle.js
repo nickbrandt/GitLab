@@ -16,16 +16,27 @@ export function initEpicForm() {
     return null;
   }
 
+  const {
+    groupPath,
+    groupEpicsPath,
+    labelsFetchPath,
+    labelsManagePath,
+    markdownDocsPath,
+    markdownPreviewPath,
+  } = el.dataset;
+
   return new Vue({
     el,
     apolloProvider,
     render(createElement) {
       return createElement(EpicForm, {
         props: {
-          groupPath: el.dataset.groupFullPath,
-          groupEpicsPath: el.dataset.groupEpicsPath,
-          markdownPreviewPath: el.dataset.markdownPreviewPath,
-          markdownDocsPath: el.dataset.markdownDocsPath,
+          groupPath,
+          groupEpicsPath,
+          labelsFetchPath,
+          labelsManagePath,
+          markdownDocsPath,
+          markdownPreviewPath,
         },
       });
     },

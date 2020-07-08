@@ -20,6 +20,8 @@ describe('ee/epic/components/epic_form.vue', () => {
       propsData: {
         groupPath: TEST_GROUP_PATH,
         groupEpicsPath: TEST_HOST,
+        labelsFetchPath: TEST_HOST,
+        labelsManagePath: TEST_HOST,
       },
       stubs: {
         ApolloMutation,

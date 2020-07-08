@@ -7,7 +7,7 @@ import {
   GlFormGroup,
   GlFormInput,
 } from '@gitlab/ui';
-import { visitUrl, joinPaths } from '~/lib/utils/url_utility';
+import { visitUrl } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
 import LabelsSelectVue from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
@@ -31,6 +31,14 @@ export default {
       required: true,
     },
     groupEpicsPath: {
+      type: String,
+      required: true,
+    },
+    labelsFetchPath: {
+      type: String,
+      required: true,
+    },
+    labelsManagePath: {
       type: String,
       required: true,
     },
@@ -62,9 +70,6 @@ export default {
     },
   },
   methods: {
-    groupUrl(path) {
-      return joinPaths('/groups', this.groupPath, '/-/', path);
-    },
     save() {
       this.loading = true;
 
@@ -180,11 +185,9 @@ export default {
             :allow-multiselect="true"
             :allow-scoped-labels="false"
             :selected-labels="labels"
-            :labels-fetch-path="
-              groupUrl('labels.json?include_ancestor_groups=true&only_group_labels=true')
-            "
-            :labels-manage-path="groupUrl('labels')"
-            :labels-filter-base-path="groupUrl('epics')"
+            :labels-fetch-path="labelsFetchPath"
+            :labels-manage-path="labelsManagePath"
+            :labels-filter-base-path="groupEpicsPath"
             :labels-list-title="__('Select label')"
             :dropdown-button-text="__('Choose labels')"
             variant="embedded"
