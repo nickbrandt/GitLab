@@ -68,7 +68,7 @@ RSpec.describe ServiceFieldEntity do
             placeholder: nil,
             required: nil,
             choices: nil,
-            value: true
+            value: 'true'
           }
 
           is_expected.to include(expected_hash)
