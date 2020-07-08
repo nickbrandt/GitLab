@@ -38,7 +38,7 @@ RSpec.shared_examples 'credentials inventory expiry date close or past' do
   it 'adds a warning to the expiry date' do
     visit credentials_path
 
-    expect(first_row).to have_selector('[data-testid="expiry-date-icon"]', class: expected_css_class)
+    expect(first_row.find('[data-testid="expiry-date-icon"]').find('svg').native.inner_html).to match(/<use xlink:href=".+?icons-.+?##{expected_icon}">/)
   end
 end
 
@@ -86,7 +86,7 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
     end
 
     context 'and is near expiry' do
-      let(:expected_css_class) { 'text-warning' }
+      let(:expected_icon) { 'warning' }
       let(:view_at_date) { 1.day.ago }
 
       it_behaves_like 'credentials inventory expiry date'
@@ -94,7 +94,7 @@ RSpec.shared_examples_for 'credentials inventory personal access tokens' do |gro
     end
 
     context 'and is expired' do
-      let(:expected_css_class) { 'text-danger' }
+      let(:expected_icon) { 'error' }
       let(:view_at_date) { 2.days.since }
 
       it_behaves_like 'credentials inventory expiry date'
@@ -168,7 +168,7 @@ RSpec.shared_examples_for 'credentials inventory SSH keys' do |group_managed_acc
     end
 
     context 'and is near expiry' do
-      let(:expected_css_class) { 'text-warning' }
+      let(:expected_icon) { 'warning' }
       let(:view_at_date) { 1.day.ago }
 
       it_behaves_like 'credentials inventory expiry date'
@@ -176,7 +176,7 @@ RSpec.shared_examples_for 'credentials inventory SSH keys' do |group_managed_acc
     end
 
     context 'and is expired' do
-      let(:expected_css_class) { 'text-danger' }
+      let(:expected_icon) { 'error' }
       let(:view_at_date) { 2.days.since }
 
       it_behaves_like 'credentials inventory expiry date'
