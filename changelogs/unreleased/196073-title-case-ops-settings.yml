@@ -1,0 +1,5 @@
+---
+title: Fix Operations Settings section titles to be title cased
+merge_request: 36384
+author:
+type: fixed
