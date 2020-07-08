@@ -51,13 +51,13 @@ export const removeLeadingSlash = str => (str || '').replace(/^\/+/, '');
  * @param {String} projectPath Current project path
  * @returns {Array}
  */
-export const parseEnvironmentsResponse = (response = [], projectPath) =>
+export const parseEnvironmentsResponse = (response = [], projectPath, currentDashboard) =>
   (response || []).map(env => {
     const id = getIdFromGraphQLId(env.id);
     return {
       ...env,
       id,
-      metrics_path: `${projectPath}/environments/${id}/metrics`,
+      metrics_path: `${projectPath}/-/metrics?env_id=${id}&dashboard=${currentDashboard}`,
     };
   });
 

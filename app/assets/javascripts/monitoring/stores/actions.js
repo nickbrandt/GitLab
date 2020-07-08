@@ -304,7 +304,7 @@ export const fetchEnvironmentsData = ({ state, dispatch }) => {
       },
     })
     .then(resp =>
-      parseEnvironmentsResponse(resp.data?.project?.data?.environments, state.projectPath),
+      parseEnvironmentsResponse(resp.data?.project?.data?.environments, state.projectPath, state.currentDashboard),
     )
     .then(environments => {
       if (!environments) {
