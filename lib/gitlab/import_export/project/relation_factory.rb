@@ -70,10 +70,8 @@ module Gitlab
         private
 
         def invalid_relation?
-          # Do not create relation if it is:
-          #   - A service
-          #   - A legacy trigger
-          service? || legacy_trigger?
+          # Do not create relation if it is a legacy trigger
+          legacy_trigger?
         end
 
         def setup_models
@@ -135,10 +133,6 @@ module Gitlab
               status.pipeline = imported_object
             end
           end
-        end
-
-        def service?
-          @relation_name == :services
         end
 
         def legacy_trigger?
