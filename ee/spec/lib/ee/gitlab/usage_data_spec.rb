@@ -301,7 +301,7 @@ RSpec.describe Gitlab::UsageData do
       end
 
       context 'for create' do
-        it 'includes accurate usage_activity_by_stage data' do
+        it 'includes accurate usage_activity_by_stage data', :aggregate_failures do
           for_defined_days_back do
             user = create(:user)
             project = create(:project, :repository_private, :github_imported,
@@ -310,7 +310,9 @@ RSpec.describe Gitlab::UsageData do
             create(:project, creator: user)
             create(:project, creator: user, disable_overriding_approvers_per_merge_request: true)
             create(:project, creator: user, disable_overriding_approvers_per_merge_request: false)
-            create(:protected_branch, project: project)
+            create(:approval_project_rule, project: project)
+            protected_branch = create(:protected_branch, project: project)
+            create(:approval_project_rule, protected_branches: [protected_branch], project: project)
             create(:suggestion, note: create(:note, project: project))
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
@@ -319,6 +321,8 @@ RSpec.describe Gitlab::UsageData do
           end
 
           expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to include(
+            approval_project_rules: 4,
+            approval_project_rules_with_target_branch: 2,
             projects_enforcing_code_owner_approval: 0,
             merge_requests_with_optional_codeowners: 4,
             merge_requests_with_required_codeowners: 8,
@@ -328,6 +332,8 @@ RSpec.describe Gitlab::UsageData do
             suggestions: 2
           )
           expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:create]).to include(
+            approval_project_rules: 4,
+            approval_project_rules_with_target_branch: 2,
             projects_enforcing_code_owner_approval: 0,
             merge_requests_with_optional_codeowners: 2,
             merge_requests_with_required_codeowners: 4,
