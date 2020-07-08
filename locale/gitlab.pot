@@ -19859,6 +19859,9 @@ msgstr ""
 msgid "SAML for %{group_name}"
 msgstr ""
 
+msgid "SAST Configuration"
+msgstr ""
+
 msgid "SHA256"
 msgstr ""
 

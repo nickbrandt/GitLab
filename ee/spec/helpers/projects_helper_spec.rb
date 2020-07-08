@@ -142,6 +142,7 @@ RSpec.describe ProjectsHelper do
     let(:expected_security_paths) do
       %w[
         projects/security/configuration#show
+        projects/security/sast_configuration#show
         projects/security/vulnerabilities#show
         projects/security/dashboard#index
         projects/on_demand_scans#index
