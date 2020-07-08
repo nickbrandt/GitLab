@@ -32,6 +32,9 @@ RSpec.describe 'User updates feature flag', :js do
 
     it 'user adds a second strategy' do
       visit(edit_project_feature_flag_path(project, feature_flag))
+
+      wait_for_requests
+
       click_button 'Add strategy'
       within_strategy_row(2) do
         select 'Percent rollout (logged in users)', from: 'Type'
