@@ -78,10 +78,8 @@ RSpec.describe API::ProjectClusters do
       end
     end
 
-    context 'when license has multiple clusters feature' do
+    context 'when another cluster exists' do
       before do
-        stub_licensed_features(multiple_clusters: true)
-
         create(:cluster, :provided_by_gcp, :project,
                projects: [project])
 

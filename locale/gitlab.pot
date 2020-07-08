@@ -12490,9 +12490,6 @@ msgstr ""
 msgid "Instance administrators group already exists"
 msgstr ""
 
-msgid "Instance does not support multiple Kubernetes clusters"
-msgstr ""
-
 msgid "Instance license"
 msgstr ""
 

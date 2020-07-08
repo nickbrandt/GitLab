@@ -118,8 +118,6 @@ RSpec.describe Projects::Prometheus::Alerts::NotifyService do
       end
 
       before do
-        stub_licensed_features(multiple_clusters: true)
-
         create(:clusters_applications_prometheus, :installed,
                cluster: prd_cluster, alert_manager_token: token)
         create(:clusters_applications_prometheus, :installed,

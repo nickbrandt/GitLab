@@ -442,52 +442,44 @@ RSpec.describe Project do
   end
 
   describe '#deployment_variables' do
-    context 'when project has a deployment platforms' do
-      context 'when multiple clusters (EEP) is enabled' do
-        before do
-          stub_licensed_features(multiple_clusters: true)
-        end
+    let(:project) { create(:project) }
 
-        let(:project) { create(:project) }
+    let!(:default_cluster) do
+      create(:cluster,
+              :not_managed,
+              platform_type: :kubernetes,
+              projects: [project],
+              environment_scope: '*',
+              platform_kubernetes: default_cluster_kubernetes)
+    end
 
-        let!(:default_cluster) do
-          create(:cluster,
-                 :not_managed,
-                 platform_type: :kubernetes,
-                 projects: [project],
-                 environment_scope: '*',
-                 platform_kubernetes: default_cluster_kubernetes)
-        end
+    let!(:review_env_cluster) do
+      create(:cluster,
+              :not_managed,
+              platform_type: :kubernetes,
+              projects: [project],
+              environment_scope: 'review/*',
+              platform_kubernetes: review_env_cluster_kubernetes)
+    end
 
-        let!(:review_env_cluster) do
-          create(:cluster,
-                 :not_managed,
-                 platform_type: :kubernetes,
-                 projects: [project],
-                 environment_scope: 'review/*',
-                 platform_kubernetes: review_env_cluster_kubernetes)
-        end
+    let(:default_cluster_kubernetes) { create(:cluster_platform_kubernetes, token: 'default-AAA') }
+    let(:review_env_cluster_kubernetes) { create(:cluster_platform_kubernetes, token: 'review-AAA') }
 
-        let(:default_cluster_kubernetes) { create(:cluster_platform_kubernetes, token: 'default-AAA') }
-        let(:review_env_cluster_kubernetes) { create(:cluster_platform_kubernetes, token: 'review-AAA') }
+    context 'when environment name is review/name' do
+      let!(:environment) { create(:environment, project: project, name: 'review/name') }
 
-        context 'when environment name is review/name' do
-          let!(:environment) { create(:environment, project: project, name: 'review/name') }
+      it 'returns variables from this service' do
+        expect(project.deployment_variables(environment: 'review/name'))
+          .to include(key: 'KUBE_TOKEN', value: 'review-AAA', public: false, masked: true)
+      end
+    end
 
-          it 'returns variables from this service' do
-            expect(project.deployment_variables(environment: 'review/name'))
-              .to include(key: 'KUBE_TOKEN', value: 'review-AAA', public: false, masked: true)
-          end
-        end
+    context 'when environment name is other' do
+      let!(:environment) { create(:environment, project: project, name: 'staging/name') }
 
-        context 'when environment name is other' do
-          let!(:environment) { create(:environment, project: project, name: 'staging/name') }
-
-          it 'returns variables from this service' do
-            expect(project.deployment_variables(environment: 'staging/name'))
-              .to include(key: 'KUBE_TOKEN', value: 'default-AAA', public: false, masked: true)
-          end
-        end
+      it 'returns variables from this service' do
+        expect(project.deployment_variables(environment: 'staging/name'))
+          .to include(key: 'KUBE_TOKEN', value: 'default-AAA', public: false, masked: true)
       end
     end
   end
