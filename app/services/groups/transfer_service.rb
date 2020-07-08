@@ -88,7 +88,6 @@ module Groups
       end
 
       @group.parent = @new_parent_group
-      @group.update_root_ancestor
       @group.save!
     end
 

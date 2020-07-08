@@ -66,9 +66,10 @@ class Namespace < ApplicationRecord
   delegate :avatar_url, to: :owner, allow_nil: true
 
   after_commit :refresh_access_of_projects_invited_groups, on: :update, if: -> { previous_changes.key?('share_with_group_lock') }
+  after_commit :refresh_root_ancestor, on: :create
+  after_commit :refresh_root_ancestor, on: :update, if: -> { previous_changes.key?('parent_id') }
 
   before_create :sync_share_with_group_lock_with_parent
-  before_create :update_root_ancestor
   before_update :sync_share_with_group_lock_with_parent, if: :parent_changed?
   after_update :force_share_with_group_lock_on_descendants, if: -> { saved_change_to_share_with_group_lock? && share_with_group_lock? }
 
@@ -293,8 +294,8 @@ class Namespace < ApplicationRecord
     super || strong_memoize(:root_ancestor) { calculate_root_ancestor }
   end
 
-  def update_root_ancestor
-    self.root_ancestor_id = calculate_root_ancestor&.id
+  def refresh_root_ancestor
+    update_column :root_ancestor_id, calculate_root_ancestor&.id
     self.clear_memoization(:self_and_ancestors_ids)
   end
 

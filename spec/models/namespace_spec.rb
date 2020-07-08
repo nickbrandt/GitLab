@@ -897,7 +897,7 @@ RSpec.describe Namespace do
     end
   end
 
-  describe "#update_root_ancestor" do
+  describe "#refresh_root_ancestor" do
     it 'updates root_ancestor_id' do
       root_group = create(:group)
       nested_group = create(:group, parent: root_group)
@@ -905,9 +905,9 @@ RSpec.describe Namespace do
 
       [root_group, nested_group, deep_nested_group].map { |g| g.root_ancestor_id = nil }
 
-      expect { root_group.update_root_ancestor }.to change { root_group.root_ancestor_id }.from(nil).to(root_group.id)
-      expect { nested_group.update_root_ancestor }.to change { nested_group.root_ancestor_id }.from(nil).to(root_group.id)
-      expect { deep_nested_group.update_root_ancestor }.to change { deep_nested_group.root_ancestor_id }.from(nil).to(root_group.id)
+      expect { root_group.refresh_root_ancestor }.to change { root_group.reload.root_ancestor_id }.from(nil).to(root_group.id)
+      expect { nested_group.refresh_root_ancestor }.to change { nested_group.reload.root_ancestor_id }.from(nil).to(root_group.id)
+      expect { deep_nested_group.refresh_root_ancestor }.to change { deep_nested_group.reload.root_ancestor_id }.from(nil).to(root_group.id)
     end
   end
 
