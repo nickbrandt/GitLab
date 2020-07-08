@@ -64,6 +64,10 @@ module Integrations
           relative: jira_issue.key
         }
       end
+
+      expose :external_tracker do |_jira_issue|
+        'jira'
+      end
     end
   end
 end
