@@ -22,8 +22,8 @@ module Geo
       end
 
       def find_unsynced_jobs(batch_size:)
-        convert_resource_relation_to_job_args(
-          registry_finder.find_unsynced(find_batch_params(batch_size))
+        convert_registry_relation_to_job_args(
+          registry_finder.find_never_synced_registries(find_batch_params(batch_size))
         )
       end
 
