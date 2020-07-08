@@ -50,8 +50,8 @@ RSpec.describe RemoveDuplicateLabelsFromProject do
 
   describe 'removing full duplicates' do
     context 'when there are no duplicate labels' do
-      let!(:first_label) { labels_table.create(project_label_attributes.merge(id: 1, title: "a different label")) }
-      let!(:second_label) { labels_table.create(project_label_attributes.merge(id: 2, title: "a totally different label")) }
+      let!(:first_label) { labels_table.create!(project_label_attributes.merge(id: 1, title: "a different label")) }
+      let!(:second_label) { labels_table.create!(project_label_attributes.merge(id: 2, title: "a totally different label")) }
 
       it 'does not remove anything' do
         expect { migration.up }.not_to change { backup_labels_table.count }
@@ -68,10 +68,10 @@ RSpec.describe RemoveDuplicateLabelsFromProject do
       # can't use the activerecord class because the `type` makes it think it has polymorphism and should be/have a ProjectLabel subclass
       let(:backup_labels) { ApplicationRecord.connection.execute('SELECT * from backup_labels') }
 
-      let!(:first_label) { labels_table.create(project_label_attributes.merge(id: 1)) }
-      let!(:second_label) { labels_table.create(project_label_attributes.merge(id: 2)) }
-      let!(:third_label) { labels_table.create(project_label_attributes.merge(id: 3, title: other_title)) }
-      let!(:fourth_label) { labels_table.create(project_label_attributes.merge(id: 4, title: other_title)) }
+      let!(:first_label) { labels_table.create!(project_label_attributes.merge(id: 1)) }
+      let!(:second_label) { labels_table.create!(project_label_attributes.merge(id: 2)) }
+      let!(:third_label) { labels_table.create!(project_label_attributes.merge(id: 3, title: other_title)) }
+      let!(:fourth_label) { labels_table.create!(project_label_attributes.merge(id: 4, title: other_title)) }
 
       it 'creates a backup record for each removed record' do
         expect { migration.up }.to change { backup_labels_table.count }.from(0).to(2)
@@ -105,9 +105,9 @@ RSpec.describe RemoveDuplicateLabelsFromProject do
     end
 
     context 'two duplicate records, one of which has a relationship' do
-      let!(:first_label) { labels_table.create(project_label_attributes.merge(id: 1)) }
-      let!(:second_label) { labels_table.create(project_label_attributes.merge(id: 2)) }
-      let!(:label_priority) { label_priorities_table.create(label_id: second_label.id, project_id: project_id, priority: 1) }
+      let!(:first_label) { labels_table.create!(project_label_attributes.merge(id: 1)) }
+      let!(:second_label) { labels_table.create!(project_label_attributes.merge(id: 2)) }
+      let!(:label_priority) { label_priorities_table.create!(label_id: second_label.id, project_id: project_id, priority: 1) }
 
       it 'does not remove anything' do
         expect { migration.up }.not_to change { labels_table.count }
@@ -125,12 +125,12 @@ RSpec.describe RemoveDuplicateLabelsFromProject do
     end
 
     context 'multiple duplicates, a subset of which have relationships' do
-      let!(:first_label) { labels_table.create(project_label_attributes.merge(id: 1)) }
-      let!(:second_label) { labels_table.create(project_label_attributes.merge(id: 2)) }
-      let!(:label_priority_for_second_label) { label_priorities_table.create(label_id: second_label.id, project_id: project_id, priority: 1) }
-      let!(:third_label) { labels_table.create(project_label_attributes.merge(id: 3)) }
-      let!(:fourth_label) { labels_table.create(project_label_attributes.merge(id: 4)) }
-      let!(:label_priority_for_fourth_label) { label_priorities_table.create(label_id: fourth_label.id, project_id: project_id, priority: 2) }
+      let!(:first_label) { labels_table.create!(project_label_attributes.merge(id: 1)) }
+      let!(:second_label) { labels_table.create!(project_label_attributes.merge(id: 2)) }
+      let!(:label_priority_for_second_label) { label_priorities_table.create!(label_id: second_label.id, project_id: project_id, priority: 1) }
+      let!(:third_label) { labels_table.create!(project_label_attributes.merge(id: 3)) }
+      let!(:fourth_label) { labels_table.create!(project_label_attributes.merge(id: 4)) }
+      let!(:label_priority_for_fourth_label) { label_priorities_table.create!(label_id: fourth_label.id, project_id: project_id, priority: 2) }
 
       it 'creates a backup record with `create` restore_action for each removed record' do
         expect { migration.up }.to change { backup_labels_table.where(restore_action: described_class::CREATE).count }.from(0).to(1)
@@ -167,8 +167,8 @@ RSpec.describe RemoveDuplicateLabelsFromProject do
   describe 'renaming partial duplicates' do
     # partial duplicates - only project_id and title match. Distinct colour prevents deletion.
     context 'when there are no duplicate labels' do
-      let!(:first_label) { labels_table.create(project_label_attributes.merge(id: 1, title: "a unique label", color: 'green')) }
-      let!(:second_label) { labels_table.create(project_label_attributes.merge(id: 2, title: "a totally different, unique, label", color: 'blue')) }
+      let!(:first_label) { labels_table.create!(project_label_attributes.merge(id: 1, title: "a unique label", color: 'green')) }
+      let!(:second_label) { labels_table.create!(project_label_attributes.merge(id: 2, title: "a totally different, unique, label", color: 'blue')) }
 
       it 'does not rename anything' do
         expect { migration.up }.not_to change { backup_labels_table.count }
@@ -176,10 +176,10 @@ RSpec.describe RemoveDuplicateLabelsFromProject do
     end
 
     context 'with duplicates with no relationships' do
-      let!(:first_label) { labels_table.create(project_label_attributes.merge(id: 1, color: 'green')) }
-      let!(:second_label) { labels_table.create(project_label_attributes.merge(id: 2, color: 'blue')) }
-      let!(:third_label) { labels_table.create(project_label_attributes.merge(id: 3, title: other_title, color: 'purple')) }
-      let!(:fourth_label) { labels_table.create(project_label_attributes.merge(id: 4, title: other_title, color: 'yellow')) }
+      let!(:first_label) { labels_table.create!(project_label_attributes.merge(id: 1, color: 'green')) }
+      let!(:second_label) { labels_table.create!(project_label_attributes.merge(id: 2, color: 'blue')) }
+      let!(:third_label) { labels_table.create!(project_label_attributes.merge(id: 3, title: other_title, color: 'purple')) }
+      let!(:fourth_label) { labels_table.create!(project_label_attributes.merge(id: 4, title: other_title, color: 'yellow')) }
 
       it 'creates a backup record for each renamed record' do
         expect { migration.up }.to change { backup_labels_table.count }.from(0).to(2)

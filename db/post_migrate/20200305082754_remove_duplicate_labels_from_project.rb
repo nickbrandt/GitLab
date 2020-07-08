@@ -31,14 +31,17 @@ class RemoveDuplicateLabelsFromProject < ActiveRecord::Migration[6.0]
     Project.each_batch(of: BATCH_SIZE) do |batch|
       range = batch.pluck('MIN(id)', 'MAX(id)').first
 
-      remove_full_duplicates(*range)
-      rename_partial_duplicates(*range)
+      transaction do
+        remove_full_duplicates(*range)
+      end
+
+      transaction do
+        rename_partial_duplicates(*range)
+      end
     end
   end
 
   def down
-    # we could probably make this more efficient by getting them in bulk by restore action
-    # and then applying them all at the same time...
     Project.each_batch(of: BATCH_SIZE) do |batch|
       range = batch.pluck('MIN(id)', 'MAX(id)').first
 
