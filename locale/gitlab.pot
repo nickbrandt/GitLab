@@ -27938,6 +27938,9 @@ msgstr ""
 msgid "opened %{timeAgoString} by %{user}"
 msgstr ""
 
+msgid "opened %{timeAgoString} by %{user} in Jira"
+msgstr ""
+
 msgid "opened %{timeAgo}"
 msgstr ""
 
