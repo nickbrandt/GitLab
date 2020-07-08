@@ -28,9 +28,6 @@ module EE
       condition(:deploy_board_disabled) { !@subject.feature_available?(:deploy_board) }
 
       with_scope :subject
-      condition(:packages_disabled) { !@subject.packages_enabled }
-
-      with_scope :subject
       condition(:iterations_available) { @subject.feature_available?(:iterations) }
 
       with_scope :subject
@@ -236,7 +233,6 @@ module EE
         enable :create_vulnerability_feedback
         enable :destroy_vulnerability_feedback
         enable :update_vulnerability_feedback
-        enable :create_package
         enable :read_feature_flag
         enable :create_feature_flag
         enable :update_feature_flag
@@ -287,10 +283,6 @@ module EE
 
       rule { deploy_board_disabled & ~is_development }.prevent :read_deploy_board
 
-      rule { packages_disabled | repository_disabled }.policy do
-        prevent(*create_read_update_admin_destroy(:package))
-      end
-
       rule { feature_flags_disabled | repository_disabled }.policy do
         prevent(*create_read_update_admin_destroy(:feature_flag))
         prevent(:admin_feature_flags_user_lists)
@@ -300,7 +292,6 @@ module EE
         enable :push_code_to_protected_branches
         enable :admin_path_locks
         enable :update_approvers
-        enable :destroy_package
         enable :admin_feature_flags_client
         enable :modify_approvers_rules
         enable :modify_approvers_list
