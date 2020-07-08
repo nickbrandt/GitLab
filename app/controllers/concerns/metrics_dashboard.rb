@@ -2,6 +2,8 @@
 
 # Provides an action which fetches a metrics dashboard according
 # to the parameters specified by the controller.
+# Methods `metrics_dashboard_params` and `include_all_dashboards?` can be overridden
+# in the controller where this module is included.
 module MetricsDashboard
   include RenderServiceResults
   include ChecksCollaboration

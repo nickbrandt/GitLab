@@ -102,4 +102,4 @@ module Metrics::DashboardHelper
   end
 end
 
-# EnvironmentsHelper.prepend_if_ee('::EE::EnvironmentsHelper')
+Metrics::DashboardHelper.prepend_if_ee('::EE::Metrics::DashboardHelper')
