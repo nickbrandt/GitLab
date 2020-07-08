@@ -4,7 +4,7 @@ require 'airborne'
 require 'securerandom'
 
 module QA
-  context 'Enablement:Search', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/222476', type: :investigating } do
+  RSpec.describe 'Enablement:Search', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/222476', type: :investigating } do
     describe 'When using elasticsearch API to search for a known blob', :orchestrated, :elasticsearch, :requires_admin do
       let(:project_file_content) { "elasticsearch: #{SecureRandom.hex(8)}" }
       let(:non_member_user) { Resource::User.fabricate_or_use('non_member_user', 'non_member_user_password') }
