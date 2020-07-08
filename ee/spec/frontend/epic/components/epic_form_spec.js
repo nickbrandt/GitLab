@@ -41,7 +41,7 @@ describe('ee/epic/components/epic_form.vue', () => {
   const findTitle = () => wrapper.find('#epic-title');
   const findDescription = () => wrapper.find('#epic-description');
   const findLabels = () => wrapper.find(LabelsSelectVue);
-  const findConfidentialityCheck = () => wrapper.find('[data-testid="epic-confidentiality"]');
+  const findConfidentialityCheck = () => wrapper.find('#epic-confidentiality');
   const findStartDate = () => wrapper.find('[data-testid="epic-start-date"]');
   const findStartDateReset = () => wrapper.find('[data-testid="clear-start-date"]');
   const findDueDate = () => wrapper.find('[data-testid="epic-due-date"]');
@@ -75,14 +75,16 @@ describe('ee/epic/components/epic_form.vue', () => {
 
       expect(wrapper.vm[field]).toBeTruthy();
 
-      findResetter().trigger('click');
+      findResetter().vm.$emit('click');
 
-      expect(wrapper.vm[field]).toBe(null);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.vm[field]).toBe(null);
+      });
     });
   });
 
   describe('save', () => {
-    it('submits successfully if form data is provided', () => {
+    it('submits successfully if form data is provided', async () => {
       createWrapper();
 
       const addLabelIds = [1];
@@ -101,7 +103,7 @@ describe('ee/epic/components/epic_form.vue', () => {
       findStartDate().vm.$emit('input', startDateFixed);
       findDueDate().vm.$emit('input', dueDateFixed);
 
-      findSaveButton().vm.$emit('click');
+      wrapper.vm.save();
 
       expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith({
         mutation: createEpic,
@@ -122,18 +124,18 @@ describe('ee/epic/components/epic_form.vue', () => {
     });
 
     it.each`
-      status        | result
-      ${'succeeds'} | ${TEST_NEW_EPIC}
-      ${'fails'}    | ${TEST_FAILED}
-    `('resets loading indicator when $status', ({ result }) => {
+      status        | result           | loading
+      ${'succeeds'} | ${TEST_NEW_EPIC} | ${true}
+      ${'fails'}    | ${TEST_FAILED}   | ${false}
+    `('resets loading indicator when $status', ({ result, loading }) => {
       createWrapper({ mutationResult: result });
 
       const savePromise = wrapper.vm.save();
 
-      expect(wrapper.vm.loading).toBeTruthy();
+      expect(wrapper.vm.loading).toBe(true);
 
       return savePromise.then(() => {
-        expect(findSaveButton().props('loading')).toBe(false);
+        expect(findSaveButton().props('loading')).toBe(loading);
       });
     });
   });

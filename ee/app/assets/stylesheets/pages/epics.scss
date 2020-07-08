@@ -97,6 +97,10 @@
   }
 }
 
+.issuable-form-select-holder {
+  width: $gl-dropdown-width;
+}
+
 .labels-select-wrapper.is-embedded {
   .labels-select-dropdown-button {
     @include gl-bg-white;
@@ -130,11 +134,17 @@
 
     bottom: 100%;
     width: 300px !important;
+    max-height: none;
     margin-bottom: $gl-spacing-scale-6 !important;
 
     a:not(.btn) {
       @include gl-reset-color;
     }
+  }
+
+  .dropdown-title {
+    padding-top: $gl-spacing-scale-2 !important;
+    padding-bottom: $gl-spacing-scale-4 !important;
   }
 
   .dropdown-footer .list-unstyled {

@@ -4598,6 +4598,9 @@ msgstr ""
 msgid "Choose file…"
 msgstr ""
 
+msgid "Choose labels"
+msgstr ""
+
 msgid "Choose the top-level group for your repository imports."
 msgstr ""
 
@@ -8866,6 +8869,9 @@ msgid "Enter IP address range"
 msgstr ""
 
 msgid "Enter a number"
+msgstr ""
+
+msgid "Enter a title for your epic"
 msgstr ""
 
 msgid "Enter a whole number between 0 and 100"
@@ -20964,6 +20970,9 @@ msgid "Select groups to replicate"
 msgstr ""
 
 msgid "Select health status"
+msgstr ""
+
+msgid "Select label"
 msgstr ""
 
 msgid "Select labels"
