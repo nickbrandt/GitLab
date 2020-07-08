@@ -1262,6 +1262,7 @@ Contains statistics about a milestone
 | `resolvedAt` | Time | Timestamp of when the object was resolved |
 | `resolvedBy` | User | User who resolved the object |
 | `system` | Boolean! | Indicates whether this note was created by the system or by a user |
+| `systemNoteIconName` | String | Name of the icon corresponding to a system note |
 | `updatedAt` | Time! | Timestamp of the note's last activity |
 | `userPermissions` | NotePermissions! | Permissions for the current user on the resource |
 

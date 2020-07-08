@@ -8256,6 +8256,11 @@ type Note implements ResolvableInterface {
   system: Boolean!
 
   """
+  Name of the icon corresponding to a system note
+  """
+  systemNoteIconName: String
+
+  """
   Timestamp of the note's last activity
   """
   updatedAt: Time!
