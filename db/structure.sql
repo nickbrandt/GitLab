@@ -14111,7 +14111,12 @@ CREATE TABLE public.project_incident_management_settings (
     project_id integer NOT NULL,
     create_issue boolean DEFAULT false NOT NULL,
     send_email boolean DEFAULT false NOT NULL,
-    issue_template_key text
+    issue_template_key text,
+    pagerduty_active boolean DEFAULT false NOT NULL,
+    encrypted_pagerduty_token bytea,
+    encrypted_pagerduty_token_iv bytea,
+    CONSTRAINT pagerduty_token_iv_length_constraint CHECK ((octet_length(encrypted_pagerduty_token_iv) <= 12)),
+    CONSTRAINT pagerduty_token_length_constraint CHECK ((octet_length(encrypted_pagerduty_token) <= 255))
 );
 
 CREATE SEQUENCE public.project_incident_management_settings_project_id_seq
@@ -23645,6 +23650,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200707071941
 20200707094341
 20200707095849
+20200708080631
 20200710102846
+20200710130234
 \.
 
