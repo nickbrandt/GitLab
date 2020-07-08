@@ -10,7 +10,7 @@
       %li
         = _("During this process, you’ll be asked for URLs from GitLab’s side. Use the URLs shown below.")
       %li
-        = (_("Set up assertions/attributes/claims (email, first_name, last_name) and NameID according to %{docsLinkStart}the documentation %{icon}%{docsLinkEnd}") % { icon: icon('external-link'), docsLinkStart: "<a href='#{help_page_path('user/group/saml_sso/index', anchor: 'assertions')}' target='_blank'>", docsLinkEnd: '</a>' }).html_safe
+        = (_("Set up assertions/attributes/claims (email, first_name, last_name) and NameID according to %{docsLinkStart}the documentation %{icon}%{docsLinkEnd}") % { icon: icon('external-link'), docsLinkStart: "<a href='#{help_page_path('user/group/saml_sso/group_managed_accounts', anchor: 'assertions')}' target='_blank'>", docsLinkEnd: '</a>' }).html_safe
       %li
         = (_("Fill in the fields below, turn on <strong>%{enable_label}</strong>, and press <strong>%{save_changes}</strong>") % { enable_label: _('Enable SAML authentication for this group'), save_changes: _('Save changes') }).html_safe
       %li
