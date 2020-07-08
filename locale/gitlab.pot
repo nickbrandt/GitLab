@@ -2862,6 +2862,9 @@ msgstr ""
 msgid "ApprovalRule|e.g. QA, Security, etc."
 msgstr ""
 
+msgid "Approvals|Section: %section"
+msgstr ""
+
 msgid "Approve"
 msgstr ""
 

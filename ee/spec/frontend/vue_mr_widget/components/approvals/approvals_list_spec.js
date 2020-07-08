@@ -40,13 +40,14 @@ const testRuleFallback = () => ({
 });
 const testRuleCodeOwner = () => ({
   id: '*.js',
-  name: '',
+  name: '*.js',
   fallback: true,
   approvals_required: 3,
   approved_by: [{ id: 1 }, { id: 2 }],
   approvers: [],
   approved: false,
   rule_type: 'code_owner',
+  section: 'Frontend',
 });
 const testRules = () => [testRuleApproved(), testRuleUnapproved(), testRuleOptional()];
 
@@ -286,11 +287,21 @@ describe('EE MRWidget approvals list', () => {
 
   describe('when code owner rule', () => {
     const rule = testRuleCodeOwner();
+    const ruleDefaultCodeOwners = {
+      ...testRuleCodeOwner(),
+      id: 2,
+      section: 'codeowners',
+    };
+    const ruleDocsSection = {
+      ...testRuleCodeOwner(),
+      id: 1,
+      section: 'Docs',
+    };
     let row;
 
     beforeEach(() => {
       createComponent({
-        approvalRules: [rule],
+        approvalRules: [rule, ruleDefaultCodeOwners, ruleDocsSection],
       });
       row = findRows().at(1);
     });
@@ -304,8 +315,15 @@ describe('EE MRWidget approvals list', () => {
     it('renders the name in a monospace font', () => {
       const codeOwnerRow = findRowElement(row, 'name');
 
-      expect(codeOwnerRow.classes('monospace')).toEqual(true);
-      expect(codeOwnerRow.text()).toEqual(rule.name);
+      expect(codeOwnerRow.find('.monospace').exists()).toEqual(true);
+      expect(codeOwnerRow.text()).toContain(rule.name);
+    });
+
+    it('renders code owner section name', () => {
+      const ruleSection = wrapper.findAll('[data-testid="rule-section"]');
+
+      expect(ruleSection.at(0).text()).toEqual(ruleDocsSection.section);
+      expect(ruleSection.at(1).text()).toEqual(rule.section);
     });
   });
 });
