@@ -18,7 +18,7 @@ module InsightsActions
       return render_404 unless Feature.enabled?(:embed_analytics_report, insights_entity)
       return render_404 unless can?(current_user, :view_embedded_analytics_report, insights_entity)
 
-      render :embedded, layout: false
+      render :embedded, layout: 'embedded'
     end
   end
 
