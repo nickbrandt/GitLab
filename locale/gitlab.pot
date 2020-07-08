@@ -262,6 +262,11 @@ msgid_plural "%d tags"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d unassigned issue"
+msgid_plural "%d unassigned issues"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d unresolved thread"
 msgid_plural "%d unresolved threads"
 msgstr[0] ""
@@ -12785,7 +12790,7 @@ msgstr ""
 msgid "Issues with comments, merge requests with diffs and comments, labels, milestones, snippets, and other project entities"
 msgstr ""
 
-msgid "Issues with no epics assigned"
+msgid "Issues with no epic assigned"
 msgstr ""
 
 msgid "Issues, merge requests, pushes, and comments."
