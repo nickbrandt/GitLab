@@ -266,17 +266,13 @@ module EE
           super.merge({
             assignee_lists: distinct_count(::List.assignee.where(time_period), :user_id),
             epics: distinct_count(::Epic.where(time_period), :author_id),
-            issues: distinct_count(::Issue.where(time_period), :author_id),
             label_lists: distinct_count(::List.label.where(time_period), :user_id),
             milestone_lists: distinct_count(::List.milestone.where(time_period), :user_id),
-            notes: distinct_count(::Note.where(time_period), :author_id),
-            projects: distinct_count(::Project.where(time_period), :creator_id),
             projects_jira_active: distinct_count(::Project.with_active_jira_services.where(time_period), :creator_id),
             projects_jira_dvcs_cloud_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_cloud.where(time_period), :creator_id),
             projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id),
             service_desk_enabled_projects: distinct_count_service_desk_enabled_projects(time_period),
-            service_desk_issues: count(::Issue.service_desk.where(time_period)),
-            todos: distinct_count(::Todo.where(time_period), :author_id)
+            service_desk_issues: count(::Issue.service_desk.where(time_period))
           })
         end
 
