@@ -17,6 +17,14 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
         expect(described_class.uncached_data).to include(:usage_activity_by_stage_monthly)
       end
 
+      it 'clears memoized values' do
+        %i(issue_minimum_id issue_maximum_id user_minimum_id user_maximum_id unique_visit_service).each do |key|
+          expect(described_class).to receive(:clear_memoization).with(key)
+        end
+
+        described_class.uncached_data
+      end
+
       context 'for configure' do
         it 'includes accurate usage_activity_by_stage data' do
           for_defined_days_back do

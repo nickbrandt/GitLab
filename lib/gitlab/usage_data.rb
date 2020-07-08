@@ -588,6 +588,8 @@ module Gitlab
       end
 
       def clear_memoized
+        clear_memoization(:issue_minimum_id)
+        clear_memoization(:issue_maximum_id)
         clear_memoization(:user_minimum_id)
         clear_memoization(:user_maximum_id)
         clear_memoization(:unique_visit_service)
