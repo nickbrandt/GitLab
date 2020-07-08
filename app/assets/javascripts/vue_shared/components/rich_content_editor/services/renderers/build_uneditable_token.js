@@ -7,23 +7,29 @@ const TAG_TYPES = {
   inline: 'span',
 };
 
+// Open helpers (singular and multiple)
+
+const buildUneditableOpenToken = (type = TAG_TYPES.block) =>
+  buildToken('openTag', type, {
+    attributes: { contenteditable: false },
+    classNames: [
+      'gl-px-4 gl-py-2 gl-opacity-5 gl-bg-gray-100 gl-user-select-none gl-cursor-not-allowed',
+    ],
+  });
+
 export const buildUneditableOpenTokens = (token, type = TAG_TYPES.block) => {
-  return [
-    buildToken('openTag', type, {
-      attributes: { contenteditable: false },
-      classNames: [
-        'gl-px-4 gl-py-2 gl-opacity-5 gl-bg-gray-100 gl-user-select-none gl-cursor-not-allowed',
-      ],
-    }),
-    token,
-  ];
+  return [buildUneditableOpenToken(type), token];
 };
+
+// Close helpers (singular and multiple)
 
 export const buildUneditableCloseToken = (type = TAG_TYPES.block) => buildToken('closeTag', type);
 
 export const buildUneditableCloseTokens = (token, type = TAG_TYPES.block) => {
   return [token, buildUneditableCloseToken(type)];
 };
+
+// Complete helpers (open plus close)
 
 export const buildUneditableInlineTokens = token => {
   return [
@@ -34,4 +40,21 @@ export const buildUneditableInlineTokens = token => {
 
 export const buildUneditableTokens = token => {
   return [...buildUneditableOpenTokens(token), buildUneditableCloseToken()];
+};
+
+export const buildUneditableHtmlTokens = node => {
+  /*
+  Toast UI internally appends ' data-tomark-pass ' attribute flags so it can target certain
+  nested nodes for internal use during Markdown <=> WYSIWYG conversions. In our case, we want
+  to prevent HTML being rendered completely in WYSIWYG mode and thus we use a `text` vs. `html`
+  type when building the token. However, in doing so, we need to strip out the ` data-tomark-pass `
+  to prevent their persistence within the `text` content as the user did not intend these as edits.
+
+  https://github.com/nhn/tui.editor/blob/cc54ec224fc3a4b6e5a2b19a71650959f41adc0e/apps/editor/src/js/convertor.js#L72
+  */
+  const regex = / data-tomark-pass /gm;
+  const content = node.literal.replace(regex, '');
+  const htmlAsTextToken = buildToken('text', null, { content });
+
+  return [buildUneditableOpenToken(), htmlAsTextToken, buildUneditableCloseToken()];
 };
