@@ -192,12 +192,6 @@ RSpec.describe Gitlab::Ci::Config::Entry::Release do
           it_behaves_like 'reports error', 'release released at must be a valid datetime'
         end
 
-        context 'when `ref` is not valid' do
-          let(:config) { { ref: 'ABC123' } }
-
-          it_behaves_like 'reports error', 'release ref must be a valid ref'
-        end
-
         context 'when `milestones` is not an array of strings' do
           let(:config) { { milestones: [1, 2, 3] } }
 
@@ -208,12 +202,6 @@ RSpec.describe Gitlab::Ci::Config::Entry::Release do
           let(:config) { { released_at: 'ABC123' } }
 
           it_behaves_like 'reports error', 'release released at must be a valid datetime'
-        end
-
-        context 'when `ref` is not valid' do
-          let(:config) { { ref: 'ABC123' } }
-
-          it_behaves_like 'reports error', 'release ref must be a valid ref'
         end
 
         context 'when `milestones` is not an array of strings' do

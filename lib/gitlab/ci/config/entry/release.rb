@@ -42,13 +42,6 @@ module Gitlab
                 errors.add(:released_at, "must be a valid datetime")
               end
             end
-            validate do
-              next unless config[:ref]
-
-              unless Commit.reference_valid?(config[:ref])
-                errors.add(:ref, "must be a valid ref")
-              end
-            end
           end
 
           def value
