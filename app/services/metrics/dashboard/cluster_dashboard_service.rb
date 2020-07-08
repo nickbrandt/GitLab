@@ -5,7 +5,7 @@
 module Metrics
   module Dashboard
     class ClusterDashboardService < ::Metrics::Dashboard::PredefinedDashboardService
-      DASHBOARD_PATH = 'ee/config/prometheus/cluster_metrics.yml'
+      DASHBOARD_PATH = 'config/prometheus/cluster_metrics.yml'
       DASHBOARD_NAME = 'Cluster'
 
       SEQUENCE = [
