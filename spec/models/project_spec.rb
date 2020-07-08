@@ -1666,6 +1666,14 @@ RSpec.describe Project do
       let(:project_name) { 'Project' }
 
       it { is_expected.to eq("http://group.example.com/project") }
+
+      context 'mixed case path' do
+        before do
+          project.update!(path: 'Project')
+        end
+
+        it { is_expected.to eq("http://group.example.com/Project") }
+      end
     end
   end
 
