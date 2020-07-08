@@ -1,15 +1,15 @@
-export default (initialState = {}) => ({
-  basePath: initialState.basePath || '',
-  headPath: initialState.headPath || '',
+export default () => ({
+  basePath: null,
+  headPath: null,
 
-  baseBlobPath: initialState.baseBlobPath || '',
-  headBlobPath: initialState.headBlobPath || '',
+  baseBlobPath: null,
+  headBlobPath: null,
 
-  isLoading: initialState.isLoading || false,
-  hasError: initialState.hasError || false,
+  isLoading: false,
+  hasError: false,
 
-  newIssues: initialState.newIssues || [],
-  resolvedIssues: initialState.resolvedIssues || [],
+  newIssues: [],
+  resolvedIssues: [],
 
-  helpPath: initialState.helpPath || '',
+  helpPath: null,
 });
