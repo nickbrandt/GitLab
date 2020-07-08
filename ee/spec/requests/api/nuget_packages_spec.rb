@@ -3,7 +3,7 @@ require 'spec_helper'
 
 RSpec.describe API::NugetPackages do
   include WorkhorseHelpers
-  include EE::PackagesManagerApiSpecHelpers
+  include PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create(:user) }
   let_it_be(:project, reload: true) { create(:project, :public) }

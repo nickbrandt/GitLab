@@ -3,7 +3,7 @@ require 'spec_helper'
 
 RSpec.describe API::ConanPackages do
   include WorkhorseHelpers
-  include EE::PackagesManagerApiSpecHelpers
+  include PackagesManagerApiSpecHelpers
 
   let(:package) { create(:conan_package) }
   let_it_be(:personal_access_token) { create(:personal_access_token) }
