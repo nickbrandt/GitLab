@@ -104,6 +104,54 @@ RSpec.describe EE::NamespacesHelper do
     end
   end
 
+  describe '#temporary_storage_increase_visible?' do
+    subject { helper.temporary_storage_increase_visible?(namespace) }
+
+    let_it_be(:namespace) { create(:namespace) }
+    let_it_be(:admin) { create(:user, namespace: namespace) }
+    let_it_be(:user) { create(:user) }
+
+    context 'when on .com' do
+      before do
+        allow(::Gitlab).to receive(:com?).and_return(true)
+      end
+
+      context 'when current_user is admin of namespace' do
+        before do
+          allow(helper).to receive(:current_user).and_return(admin)
+        end
+
+        it { is_expected.to eq(true) }
+
+        context 'when feature flag is disabled' do
+          before do
+            stub_feature_flags(temporary_storage_increase: false)
+          end
+
+          it { is_expected.to eq(false) }
+        end
+      end
+
+      context 'when current_user is not the admin of namespace' do
+        before do
+          allow(helper).to receive(:current_user).and_return(user)
+        end
+
+        it { is_expected.to eq(false) }
+      end
+    end
+
+    context 'when not on .com' do
+      context 'when current_user is admin of namespace' do
+        before do
+          allow(helper).to receive(:current_user).and_return(admin)
+        end
+
+        it { is_expected.to eq(false) }
+      end
+    end
+  end
+
   describe '#namespace_storage_usage_link' do
     subject { helper.namespace_storage_usage_link(namespace) }
 
