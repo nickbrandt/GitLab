@@ -23923,7 +23923,7 @@ msgstr ""
 msgid "This epic already has the maximum number of child epics."
 msgstr ""
 
-msgid "This epic and any containing child epics are confidential and should only be visible to team members with at least Reporter access."
+msgid "This epic and any containing child epics are confidential and are only visible to team members with at least Reporter access."
 msgstr ""
 
 msgid "This epic and its child elements will only be visible to team members with at minimum Reporter access."

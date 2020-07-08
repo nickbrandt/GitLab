@@ -171,8 +171,7 @@ export default {
         <gl-form-checkbox id="epic-confidentiality" v-model="confidential">{{
           __(
             'This epic and any containing child epics are confidential' +
-              ' and should only be visible to team members' +
-              ' with at least Reporter access.',
+              ' and are only visible to team members with at least Reporter access.',
           )
         }}</gl-form-checkbox>
       </gl-form-group>
