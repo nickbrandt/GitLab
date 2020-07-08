@@ -343,7 +343,7 @@ RSpec.describe API::Namespaces do
 
     context 'when authenticated as an admin' do
       context 'when namespace is not found' do
-        it 'returns a 404 error', :quarantine do
+        it 'returns a 404 error', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/11298' do
           do_put(1111, admin, params)
 
           expect(response).to have_gitlab_http_status(:not_found)
