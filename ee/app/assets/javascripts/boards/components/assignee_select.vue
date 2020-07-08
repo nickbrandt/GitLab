@@ -1,7 +1,7 @@
 <script>
-import '~/gl_dropdown';
-import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
+import '~/gl_dropdown';
+import { GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import UsersSelect from '~/users_select';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
 
@@ -9,6 +9,7 @@ export default {
   components: {
     UserAvatarImage,
     GlLoadingIcon,
+    GlIcon,
   },
   props: {
     anyUserText: {
@@ -133,7 +134,11 @@ export default {
           type="button"
         >
           <span class="dropdown-toggle-text"> {{ placeholderText }} </span>
-          <i aria-hidden="true" class="fa fa-chevron-down" data-hidden="true"> </i>
+          <gl-icon
+            name="chevron-down"
+            class="gl-absolute gl-top-3 gl-right-3 gl-text-gray-700"
+            :size="16"
+          />
         </button>
         <div
           class="dropdown-menu dropdown-select dropdown-menu-paging
@@ -146,15 +151,14 @@ dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
               :placeholder="__('Search')"
               type="search"
             />
-            <i aria-hidden="true" class="fa fa-search dropdown-input-search" data-hidden="true">
-            </i>
-            <i
-              aria-hidden="true"
-              class="fa fa-times dropdown-input-clear js-dropdown-input-clear"
-              data-hidden="true"
-              role="button"
-            >
-            </i>
+            <gl-icon
+              name="search"
+              class="dropdown-input-search gl-absolute gl-top-3 gl-right-5 gl-text-gray-500 gl-pointer-events-none"
+            />
+            <gl-icon
+              name="close"
+              class="dropdown-input-clear js-dropdown-input-clear gl-absolute gl-top-3 gl-right-5 gl-text-gray-700"
+            />
           </div>
           <div class="dropdown-content"></div>
           <div class="dropdown-loading"><gl-loading-icon /></div>
