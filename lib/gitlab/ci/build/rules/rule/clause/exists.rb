@@ -32,7 +32,7 @@ module Gitlab
         end
 
         def exact_matches?(paths)
-          @exact_globs.any? { |glob| paths.bsearch { |path| glob <=> path } }
+          @exact_globs.any? { |glob| paths.bsearch { |path| glob.downcase <=> path.downcase } }
         end
 
         def pattern_matches?(paths)
@@ -46,7 +46,7 @@ module Gitlab
         end
 
         def pattern_match?(glob, path)
-          File.fnmatch?(glob, path, File::FNM_PATHNAME | File::FNM_DOTMATCH | File::FNM_EXTGLOB)
+          File.fnmatch?(glob, path, File::FNM_PATHNAME | File::FNM_DOTMATCH | File::FNM_EXTGLOB | File::FNM_CASEFOLD)
         end
 
         # matches glob patterns that only match files in the top level directory
