@@ -26,14 +26,7 @@ module API
       expose(:upvotes)          { |merge_request, options| issuable_metadata.upvotes }
       expose(:downvotes)        { |merge_request, options| issuable_metadata.downvotes }
 
-      with_options using: Entities::UserBasic do
-        expose :author, as: :author
-        expose :assignees
-        expose :assignee do |merge_request, options|
-          merge_request.assignees.first
-        end
-      end
-
+      expose :author, :assignees, :assignee, using: Entities::UserBasic
       expose :source_project_id, :target_project_id
       expose :labels do |merge_request, options|
         if options[:with_labels_details]

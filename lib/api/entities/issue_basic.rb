@@ -22,7 +22,7 @@ module API
       end
 
       expose(:user_notes_count)     { |issue, options| issuable_metadata.user_notes_count }
-      expose(:merge_requests_count) { |issue, options| issuable_metadata(user: options[:current_user]).merge_requests_count }
+      expose(:merge_requests_count) { |issue, options| issuable_metadata.merge_requests_count }
       expose(:upvotes)              { |issue, options| issuable_metadata.upvotes }
       expose(:downvotes)            { |issue, options| issuable_metadata.downvotes }
       expose :due_date
