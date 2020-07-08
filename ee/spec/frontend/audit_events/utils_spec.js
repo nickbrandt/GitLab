@@ -47,7 +47,7 @@ describe('Audit Event Utils', () => {
 
   describe('getEntityTypeFromType', () => {
     it('returns the correct entity type when given a valid type', () => {
-      expect(getEntityTypeFromType('group_member')).toEqual('Author');
+      expect(getEntityTypeFromType('member')).toEqual('Author');
     });
 
     it('returns `undefined` when given an invalid type', () => {

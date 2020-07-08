@@ -5,7 +5,7 @@ module AuditEventsHelper
       user: :user,
       group: :group,
       project: :project,
-      group_member: :group_member
+      member: :member
   }.freeze
 
   def admin_audit_event_tokens
@@ -13,7 +13,11 @@ module AuditEventsHelper
   end
 
   def group_audit_event_tokens(group_id)
-    [{ type: FILTER_TOKEN_TYPES[:group_member], group_id: group_id }]
+    [{ type: FILTER_TOKEN_TYPES[:member], group_id: group_id }]
+  end
+
+  def project_audit_event_tokens(project_path)
+    [{ type: FILTER_TOKEN_TYPES[:member], project_path: project_path }]
   end
 
   def human_text(details)
