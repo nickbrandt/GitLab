@@ -8,6 +8,9 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
   let(:limit) { 100 }
   let(:model) { described_class.new(namespace) }
   let(:create_statistics) { create(:namespace_root_storage_statistics, namespace: namespace, storage_size: current_size)}
+  let_it_be(:gold_plan, reload: true) { create(:gold_plan) }
+  let_it_be(:plan_limits, reload: true) { create(:plan_limits, plan: gold_plan, storage_size_limit: 100) }
+  let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan) }
 
   before do
     create_statistics
@@ -41,7 +44,9 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
     it { is_expected.to eq(0.5) }
 
     context 'when limit is 0' do
-      let(:limit) { 0 }
+      before do
+        plan_limits.update!(storage_size_limit: 0)
+      end
 
       it { is_expected.to eq(0) }
     end
@@ -62,6 +67,31 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
   describe '#limit' do
     subject { model.limit }
 
-    it { is_expected.to eq(limit.megabytes) }
+    context 'when there is additional purchased storage and a plan' do
+      before do
+        plan_limits.update!(storage_size_limit: 15_000)
+        namespace.update!(additional_purchased_storage_size: 10_000)
+      end
+
+      it { is_expected.to eq(25_000.megabytes) }
+    end
+
+    context 'when there is no additionl purchased storage' do
+      before do
+        plan_limits.update!(storage_size_limit: 15_000)
+        namespace.update!(additional_purchased_storage_size: 0)
+      end
+
+      it { is_expected.to eq(15_000.megabytes) }
+    end
+
+    context 'when there is no additional purchased storage or plan limit set' do
+      before do
+        plan_limits.update!(storage_size_limit: 0)
+        namespace.update!(additional_purchased_storage_size: 0)
+      end
+
+      it { is_expected.to eq(0) }
+    end
   end
 end

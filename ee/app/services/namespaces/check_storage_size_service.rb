@@ -8,7 +8,7 @@ module Namespaces
 
     def initialize(namespace, user)
       @root_namespace = namespace.root_ancestor
-      @root_storage_size = Namespace::RootStorageSize.new(root_namespace)
+      @root_storage_size = EE::Namespace::RootStorageSize.new(root_namespace)
       @user = user
     end
 

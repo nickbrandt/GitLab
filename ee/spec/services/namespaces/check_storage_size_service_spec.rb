@@ -21,7 +21,7 @@ RSpec.describe Namespaces::CheckStorageSizeService, '#execute' do
       above_size_limit?: current_size > limit
     )
 
-    expect(Namespace::RootStorageSize).to receive(:new).and_return(root_storage_size)
+    expect(EE::Namespace::RootStorageSize).to receive(:new).and_return(root_storage_size)
   end
 
   context 'feature flag' do

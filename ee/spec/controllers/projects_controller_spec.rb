@@ -16,21 +16,33 @@ RSpec.describe ProjectsController do
 
     render_views
 
+    subject { get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path } }
+
     it 'shows the over size limit warning message if above_size_limit' do
       allow_next_instance_of(Gitlab::RepositorySizeChecker) do |checker|
         expect(checker).to receive(:above_size_limit?).and_return(true)
       end
       allow(controller).to receive(:current_user).and_return(user)
 
-      get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path }
+      subject
 
       expect(response.body).to match(/The size of this repository.+exceeds the limit/)
     end
 
     it 'does not show an over size warning if not above_size_limit' do
-      get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path }
+      subject
 
       expect(response.body).not_to match(/The size of this repository.+exceeds the limit/)
+    end
+
+    context 'namespace storage limit' do
+      let(:namespace) { public_project.namespace }
+
+      before do
+        allow(controller).to receive(:current_user).and_return(user)
+      end
+
+      it_behaves_like 'namespace storage limit alert'
     end
   end
 

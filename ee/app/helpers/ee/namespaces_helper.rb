@@ -32,7 +32,39 @@ module EE
       end
     end
 
-    override :namespace_storage_usage_link
+    def namespace_storage_alert(namespace)
+      return {} if current_user.nil?
+
+      payload = Namespaces::CheckStorageSizeService.new(namespace, current_user).execute.payload
+
+      return {} if payload.empty?
+
+      alert_level = payload[:alert_level]
+      root_namespace = payload[:root_namespace]
+
+      return {} if cookies["hide_storage_limit_alert_#{root_namespace.id}_#{alert_level}"] == 'true'
+
+      payload
+    end
+
+    def namespace_storage_alert_style(alert_level)
+      if alert_level == :error || alert_level == :alert
+        'danger'
+      else
+        alert_level.to_s
+      end
+    end
+
+    def namespace_storage_alert_icon(alert_level)
+      if alert_level == :error || alert_level == :alert
+        'error'
+      elsif alert_level == :info
+        'information-o'
+      else
+        alert_level.to_s
+      end
+    end
+
     def namespace_storage_usage_link(namespace)
       if namespace.group?
         group_usage_quotas_path(namespace, anchor: 'storage-quota-tab')
