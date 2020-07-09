@@ -142,16 +142,6 @@ module EE
         params[::APIGuard::PRIVATE_TOKEN_PARAM] || env[::APIGuard::PRIVATE_TOKEN_HEADER]
       end
 
-      def job_token_authentication?
-        initial_current_user && @current_authenticated_job.present? # rubocop:disable Gitlab/ModuleWithInstanceVariables
-      end
-
-      # Returns the job associated with the token provided for
-      # authentication, if any
-      def current_authenticated_job
-        @current_authenticated_job
-      end
-
       def warden
         env['warden']
       end

@@ -67,6 +67,7 @@ module API
       def find_user_from_sources
         deploy_token_from_request ||
           find_user_from_access_token ||
+          find_user_from_bearer_token ||
           find_user_from_job_token ||
           find_user_from_warden
       end
