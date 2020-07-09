@@ -55,22 +55,22 @@ const fetchUser = ({ commit, endpoint, query, action, errorMessage }) => {
 };
 
 export const fetchAuthors = ({ commit, rootGetters }, query = '') => {
-  const { currentGroupPath } = rootGetters;
+  const { currentGroupParentPath } = rootGetters;
   return fetchUser({
     commit,
     query,
-    endpoint: currentGroupPath,
+    endpoint: currentGroupParentPath,
     action: 'AUTHORS',
     errorMessage: __('Failed to load authors. Please try again.'),
   });
 };
 
 export const fetchAssignees = ({ commit, rootGetters }, query = '') => {
-  const { currentGroupPath } = rootGetters;
+  const { currentGroupParentPath } = rootGetters;
   return fetchUser({
     commit,
     query,
-    endpoint: currentGroupPath,
+    endpoint: currentGroupParentPath,
     action: 'ASSIGNEES',
     errorMessage: __('Failed to load assignees. Please try again.'),
   });
