@@ -103,6 +103,7 @@ module Security
         next if !include_dismissed? && dismissal_feedback?(occurrence)
         next unless confidence_levels.include?(occurrence.confidence)
         next unless severity_levels.include?(occurrence.severity)
+        next if scanners.present? && !scanners.include?(occurrence.scanner.external_id)
 
         occurrence
       end
@@ -139,6 +140,10 @@ module Security
 
     def severity_levels
       Array(params.fetch(:severity, Vulnerabilities::Occurrence.severities.keys))
+    end
+
+    def scanners
+      Array(params.fetch(:scanner, []))
     end
   end
 end
