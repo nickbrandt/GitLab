@@ -1,5 +1,0 @@
----
-title: Remove ref validation for release yaml node
-merge_request: 36256
-author:
-type: fixed
