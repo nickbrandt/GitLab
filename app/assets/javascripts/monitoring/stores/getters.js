@@ -23,35 +23,35 @@ export const selectedDashboard = (state, getters) => {
   );
 };
 
-/**
- * Get all state for metric in the dashboard or a group. The
- * states are not repeated so the dashboard or group can show
- * a global state.
- *
- * @param {Object} state
- * @returns {Function} A function that returns an array of
- * states in all the metric in the dashboard or group.
- */
-export const getMetricStates = state => groupKey => {
-  let groups = state.dashboard.panelGroups;
-  if (groupKey) {
-    groups = groups.filter(group => group.key === groupKey);
-  }
+// /**
+//  * Get all state for metric in the dashboard or a group. The
+//  * states are not repeated so the dashboard or group can show
+//  * a global state.
+//  *
+//  * @param {Object} state
+//  * @returns {Function} A function that returns an array of
+//  * states in all the metric in the dashboard or group.
+//  */
+// export const getMetricStates = state => groupKey => {
+//   let groups = state.dashboard.panelGroups;
+//   if (groupKey) {
+//     groups = groups.filter(group => group.key === groupKey);
+//   }
 
-  const metricStates = groups.reduce((acc, group) => {
-    group.panels.forEach(panel => {
-      panel.metrics.forEach(metric => {
-        if (metric.state) {
-          acc.push(metric.state);
-        }
-      });
-    });
-    return acc;
-  }, []);
+//   const metricStates = groups.reduce((acc, group) => {
+//     group.panels.forEach(panel => {
+//       panel.metrics.forEach(metric => {
+//         if (metric.state) {
+//           acc.push(metric.state);
+//         }
+//       });
+//     });
+//     return acc;
+//   }, []);
 
-  // Deduplicate and sort array
-  return Array.from(new Set(metricStates)).sort();
-};
+//   // Deduplicate and sort array
+//   return Array.from(new Set(metricStates)).sort();
+// };
 
 /**
  * Getter to obtain the list of metric ids that have data

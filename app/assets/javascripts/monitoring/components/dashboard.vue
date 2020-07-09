@@ -14,7 +14,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
-import GroupEmptyState from './group_empty_state.vue';
+// import GroupEmptyState from './group_empty_state.vue';
 import VariablesSection from './variables_section.vue';
 import LinksSection from './links_section.vue';
 
@@ -25,7 +25,7 @@ import {
   expandedPanelPayloadFromUrl,
   convertVariablesForURL,
 } from '../utils';
-import { metricStates, keyboardShortcutKeys } from '../constants';
+import { /* metricStates, */ keyboardShortcutKeys } from '../constants';
 import { defaultTimeRange } from '~/vue_shared/constants';
 
 export default {
@@ -38,7 +38,7 @@ export default {
     GlButton,
     GraphGroup,
     EmptyState,
-    GroupEmptyState,
+    // GroupEmptyState,
     VariablesSection,
     LinksSection,
   },
@@ -167,7 +167,7 @@ export default {
       'currentDashboard',
       'hasDashboardValidationWarnings',
     ]),
-    ...mapGetters('monitoringDashboard', ['selectedDashboard', 'getMetricStates']),
+    ...mapGetters('monitoringDashboard', ['selectedDashboard' /*, 'getMetricStates' */]),
     shouldShowEmptyState() {
       return Boolean(this.emptyState);
     },
@@ -263,22 +263,22 @@ export default {
       const dashboardPath = this.currentDashboard || this.selectedDashboard?.path;
       return panelToUrl(dashboardPath, convertVariablesForURL(this.variables), groupKey, panel);
     },
-    /**
-     * Return a single empty state for a group.
-     *
-     * If all states are the same a single state is returned to be displayed
-     * Except if the state is OK, in which case the group is displayed.
-     *
-     * @param {String} groupKey - Identifier for group
-     * @returns {String} state code from `metricStates`
-     */
-    groupSingleEmptyState(groupKey) {
-      const states = this.getMetricStates(groupKey);
-      if (states.length === 1 && states[0] !== metricStates.OK) {
-        return states[0];
-      }
-      return null;
-    },
+    // /**
+    //  * Return a single empty state for a group.
+    //  *
+    //  * If all states are the same a single state is returned to be displayed
+    //  * Except if the state is OK, in which case the group is displayed.
+    //  *
+    //  * @param {String} groupKey - Identifier for group
+    //  * @returns {String} state code from `metricStates`
+    //  */
+    // groupSingleEmptyState(groupKey) {
+    //   const states = this.getMetricStates(groupKey);
+    //   if (states.length === 1 && states[0] !== metricStates.OK) {
+    //     return states[0];
+    //   }
+    //   return null;
+    // },
     /**
      * Return true if the entire group is loading.
      * @param {String} groupKey - Identifier for group
@@ -293,10 +293,11 @@ export default {
      * @param {String} groupKey - Identifier for group
      * @returns {Boolean} If the group should be collapsed
      */
-    collapseGroup(groupKey) {
-      // Collapse group if no data is available
-      return !this.getMetricStates(groupKey).includes(metricStates.OK);
-    },
+    // collapseGroup(groupKey) {
+    //   return false;
+    //   // Collapse group if no data is available
+    //   return !this.getMetricStates(groupKey).includes(metricStates.OK);
+    // },
     prependToDocumentTitle(text) {
       if (text) {
         document.title = `${text} · ${this.originalDocumentTitle}`;
@@ -454,6 +455,7 @@ export default {
       </dashboard-panel>
 
       <div v-show="!expandedPanel.panel">
+        <!-- :collapse-group="collapseGroup(groupData.key)" -->
         <graph-group
           v-for="groupData in dashboard.panelGroups"
           :key="`${groupData.group}.${groupData.priority}`"
@@ -462,8 +464,8 @@ export default {
           :is-loading="isGroupLoading(groupData.key)"
           :collapse-group="collapseGroup(groupData.key)"
         >
+          <!-- v-if="!groupSingleEmptyState(groupData.key)" -->
           <vue-draggable
-            v-if="!groupSingleEmptyState(groupData.key)"
             :value="groupData.panels"
             group="metrics-dashboard"
             :component-data="{ attrs: { class: 'row mx-0 w-100' } }"
@@ -506,7 +508,7 @@ export default {
               </div>
             </div>
           </vue-draggable>
-          <div v-else class="py-5 col col-sm-10 col-md-8 col-lg-7 col-xl-6">
+          <!-- <div v-else class="py-5 col col-sm-10 col-md-8 col-lg-7 col-xl-6">
             <group-empty-state
               ref="empty-group"
               :documentation-path="documentationPath"
@@ -514,7 +516,7 @@ export default {
               :selected-state="groupSingleEmptyState(groupData.key)"
               :svg-path="emptyNoDataSmallSvgPath"
             />
-          </div>
+          </div> -->
         </graph-group>
       </div>
     </template>

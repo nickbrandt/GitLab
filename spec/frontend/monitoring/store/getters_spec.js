@@ -2,11 +2,11 @@ import _ from 'lodash';
 import * as getters from '~/monitoring/stores/getters';
 import mutations from '~/monitoring/stores/mutations';
 import * as types from '~/monitoring/stores/mutation_types';
-import { metricStates } from '~/monitoring/constants';
+// import { metricStates } from '~/monitoring/constants';
 import {
   customDashboardBasePath,
   environmentData,
-  metricsResult,
+  // metricsResult,
   dashboardGitResponse,
   storeVariables,
   mockLinks,
@@ -19,130 +19,130 @@ import {
 } from '../fixture_data';
 
 describe('Monitoring store Getters', () => {
-  describe('getMetricStates', () => {
-    let setupState;
-    let state;
-    let getMetricStates;
+  // describe('getMetricStates', () => {
+  //   let setupState;
+  //   let state;
+  //   let getMetricStates;
 
-    const setMetricSuccess = ({ result = metricsResult, group = 0, panel = 0, metric = 0 }) => {
-      const { metricId } = state.dashboard.panelGroups[group].panels[panel].metrics[metric];
-      mutations[types.RECEIVE_METRIC_RESULT_SUCCESS](state, {
-        metricId,
-        data: {
-          resultType: 'matrix',
-          result,
-        },
-      });
-    };
+  //   const setMetricSuccess = ({ result = metricsResult, group = 0, panel = 0, metric = 0 }) => {
+  //     const { metricId } = state.dashboard.panelGroups[group].panels[panel].metrics[metric];
+  //     mutations[types.RECEIVE_METRIC_RESULT_SUCCESS](state, {
+  //       metricId,
+  //       data: {
+  //         resultType: 'matrix',
+  //         result,
+  //       },
+  //     });
+  //   };
 
-    const setMetricFailure = ({ group = 0, panel = 0, metric = 0 }) => {
-      const { metricId } = state.dashboard.panelGroups[group].panels[panel].metrics[metric];
-      mutations[types.RECEIVE_METRIC_RESULT_FAILURE](state, {
-        metricId,
-      });
-    };
+  //   const setMetricFailure = ({ group = 0, panel = 0, metric = 0 }) => {
+  //     const { metricId } = state.dashboard.panelGroups[group].panels[panel].metrics[metric];
+  //     mutations[types.RECEIVE_METRIC_RESULT_FAILURE](state, {
+  //       metricId,
+  //     });
+  //   };
 
-    beforeEach(() => {
-      setupState = (initState = {}) => {
-        state = initState;
-        getMetricStates = getters.getMetricStates(state);
-      };
-    });
+  //   beforeEach(() => {
+  //     setupState = (initState = {}) => {
+  //       state = initState;
+  //       getMetricStates = getters.getMetricStates(state);
+  //     };
+  //   });
 
-    it('has method-style access', () => {
-      setupState();
+  //   it('has method-style access', () => {
+  //     setupState();
 
-      expect(getMetricStates).toEqual(expect.any(Function));
-    });
+  //     expect(getMetricStates).toEqual(expect.any(Function));
+  //   });
 
-    it('when dashboard has no panel groups, returns empty', () => {
-      setupState({
-        dashboard: {
-          panelGroups: [],
-        },
-      });
+  //   it('when dashboard has no panel groups, returns empty', () => {
+  //     setupState({
+  //       dashboard: {
+  //         panelGroups: [],
+  //       },
+  //     });
 
-      expect(getMetricStates()).toEqual([]);
-    });
+  //     expect(getMetricStates()).toEqual([]);
+  //   });
 
-    describe('when the dashboard is set', () => {
-      let groups;
-      beforeEach(() => {
-        setupState({
-          dashboard: { panelGroups: [] },
-        });
-        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
-        groups = state.dashboard.panelGroups;
-      });
+  //   describe('when the dashboard is set', () => {
+  //     let groups;
+  //     beforeEach(() => {
+  //       setupState({
+  //         dashboard: { panelGroups: [] },
+  //       });
+  //       mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
+  //       groups = state.dashboard.panelGroups;
+  //     });
 
-      it('no loaded metric returns empty', () => {
-        expect(getMetricStates()).toEqual([]);
-      });
+  //     it('no loaded metric returns empty', () => {
+  //       expect(getMetricStates()).toEqual([]);
+  //     });
 
-      it('on an empty metric with no result, returns NO_DATA', () => {
-        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
-        setMetricSuccess({ result: [], group: 2 });
+  //     it('on an empty metric with no result, returns NO_DATA', () => {
+  //       mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
+  //       setMetricSuccess({ result: [], group: 2 });
 
-        expect(getMetricStates()).toEqual([metricStates.NO_DATA]);
-      });
+  //       expect(getMetricStates()).toEqual([metricStates.NO_DATA]);
+  //     });
 
-      it('on a metric with a result, returns OK', () => {
-        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
-        setMetricSuccess({ group: 1 });
+  //     it('on a metric with a result, returns OK', () => {
+  //       mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
+  //       setMetricSuccess({ group: 1 });
 
-        expect(getMetricStates()).toEqual([metricStates.OK]);
-      });
+  //       expect(getMetricStates()).toEqual([metricStates.OK]);
+  //     });
 
-      it('on a metric with an error, returns an error', () => {
-        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
-        setMetricFailure({});
+  //     it('on a metric with an error, returns an error', () => {
+  //       mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
+  //       setMetricFailure({});
 
-        expect(getMetricStates()).toEqual([metricStates.UNKNOWN_ERROR]);
-      });
+  //       expect(getMetricStates()).toEqual([metricStates.UNKNOWN_ERROR]);
+  //     });
 
-      it('on multiple metrics with results, returns OK', () => {
-        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
+  //     it('on multiple metrics with results, returns OK', () => {
+  //       mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
 
-        setMetricSuccess({ group: 1 });
-        setMetricSuccess({ group: 1, panel: 1 });
+  //       setMetricSuccess({ group: 1 });
+  //       setMetricSuccess({ group: 1, panel: 1 });
 
-        expect(getMetricStates()).toEqual([metricStates.OK]);
+  //       expect(getMetricStates()).toEqual([metricStates.OK]);
 
-        // Filtered by groups
-        expect(getMetricStates(state.dashboard.panelGroups[1].key)).toEqual([metricStates.OK]);
-        expect(getMetricStates(state.dashboard.panelGroups[2].key)).toEqual([]);
-      });
-      it('on multiple metrics errors', () => {
-        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
+  //       // Filtered by groups
+  //       expect(getMetricStates(state.dashboard.panelGroups[1].key)).toEqual([metricStates.OK]);
+  //       expect(getMetricStates(state.dashboard.panelGroups[2].key)).toEqual([]);
+  //     });
+  //     it('on multiple metrics errors', () => {
+  //       mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
 
-        setMetricFailure({});
-        setMetricFailure({ group: 1 });
+  //       setMetricFailure({});
+  //       setMetricFailure({ group: 1 });
 
-        // Entire dashboard fails
-        expect(getMetricStates()).toEqual([metricStates.UNKNOWN_ERROR]);
-        expect(getMetricStates(groups[0].key)).toEqual([metricStates.UNKNOWN_ERROR]);
-        expect(getMetricStates(groups[1].key)).toEqual([metricStates.UNKNOWN_ERROR]);
-      });
+  //       // Entire dashboard fails
+  //       expect(getMetricStates()).toEqual([metricStates.UNKNOWN_ERROR]);
+  //       expect(getMetricStates(groups[0].key)).toEqual([metricStates.UNKNOWN_ERROR]);
+  //       expect(getMetricStates(groups[1].key)).toEqual([metricStates.UNKNOWN_ERROR]);
+  //     });
 
-      it('on multiple metrics with errors', () => {
-        mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
+  //     it('on multiple metrics with errors', () => {
+  //       mutations[types.RECEIVE_METRICS_DASHBOARD_SUCCESS](state, metricsDashboardPayload);
 
-        // An success in 1 group
-        setMetricSuccess({ group: 1 });
+  //       // An success in 1 group
+  //       setMetricSuccess({ group: 1 });
 
-        // An error in 2 groups
-        setMetricFailure({ group: 1, panel: 1 });
-        setMetricFailure({ group: 2, panel: 0 });
+  //       // An error in 2 groups
+  //       setMetricFailure({ group: 1, panel: 1 });
+  //       setMetricFailure({ group: 2, panel: 0 });
 
-        expect(getMetricStates()).toEqual([metricStates.OK, metricStates.UNKNOWN_ERROR]);
-        expect(getMetricStates(groups[1].key)).toEqual([
-          metricStates.OK,
-          metricStates.UNKNOWN_ERROR,
-        ]);
-        expect(getMetricStates(groups[2].key)).toEqual([metricStates.UNKNOWN_ERROR]);
-      });
-    });
-  });
+  //       expect(getMetricStates()).toEqual([metricStates.OK, metricStates.UNKNOWN_ERROR]);
+  //       expect(getMetricStates(groups[1].key)).toEqual([
+  //         metricStates.OK,
+  //         metricStates.UNKNOWN_ERROR,
+  //       ]);
+  //       expect(getMetricStates(groups[2].key)).toEqual([metricStates.UNKNOWN_ERROR]);
+  //     });
+  //   });
+  // });
 
   describe('metricsWithData', () => {
     let metricsWithData;
