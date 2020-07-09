@@ -1311,14 +1311,31 @@ RSpec.describe Namespace do
   end
 
   describe '#over_storage_limit?' do
-    before do
-      allow_next_instance_of(::Namespace::RootStorageSize, namespace.root_ancestor) do |project|
-        allow(project).to receive(:above_size_limit?).and_return(true)
-      end
+    using RSpec::Parameterized::TableSyntax
+
+    where(:is_dot_com, :feature_enabled, :above_size_limit, :result) do
+      false | false | false | false
+      false | false | true  | false
+      false | true  | false | false
+      false | true  | true  | false
+      true  | false | false | false
+      true  | false | true  | false
+      true  | true  | false | false
+      true  | true  | true  | true
     end
 
-    it 'returns a boolean indicating whether the root namespace is over the storage limit' do
-      expect(namespace.over_storage_limit?).to be true
+    with_them do
+      before do
+        allow(Gitlab).to receive(:dev_env_or_com?).and_return(is_dot_com)
+        stub_feature_flags(namespace_storage_limit: feature_enabled)
+        allow_next_instance_of(EE::Namespace::RootStorageSize, namespace.root_ancestor) do |project|
+          allow(project).to receive(:above_size_limit?).and_return(above_size_limit)
+        end
+      end
+
+      it 'returns a boolean indicating whether the root namespace is over the storage limit' do
+        expect(namespace.over_storage_limit?).to be result
+      end
     end
   end
 

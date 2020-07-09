@@ -1022,6 +1022,32 @@ RSpec.describe GroupPolicy do
     end
   end
 
+  context 'when group is locked because storage usage limit exceeded' do
+    let(:current_user) { owner }
+    let(:policies) do
+      %i[create_projects create_epic update_epic admin_milestone upload_file admin_label
+         admin_list admin_issue admin_pipeline add_cluster create_cluster update_cluster
+         admin_cluster admin_group_member create_deploy_token create_subgroup]
+    end
+
+    before do
+      allow(group).to receive(:over_storage_limit?).and_return(over_storage_limit)
+      stub_licensed_features(epics: true)
+    end
+
+    context 'when the group has exceeded its storage limit' do
+      let(:over_storage_limit) { true }
+
+      it { is_expected.to(be_disallowed(*policies)) }
+    end
+
+    context 'when the group has not exceeded its storage limit' do
+      let(:over_storage_limit) { false }
+
+      it { is_expected.to(be_allowed(*policies)) }
+    end
+  end
+
   it_behaves_like 'model with wiki policies' do
     let_it_be(:container) { create(:group) }
     let_it_be(:user) { owner }

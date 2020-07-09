@@ -87,6 +87,8 @@ module EE
         ::Feature.enabled?(:group_push_rules, @subject.root_ancestor) && @subject.feature_available?(:push_rules)
       end
 
+      condition(:over_storage_limit, scope: :subject) { @subject.over_storage_limit? }
+
       rule { public_group | logged_in_viewable }.policy do
         enable :read_wiki
         enable :download_wiki_code
@@ -253,6 +255,25 @@ module EE
       rule { admin & is_gitlab_com }.enable :update_subscription_limit
 
       rule { public_group }.enable :view_embedded_analytics_report
+
+      rule { over_storage_limit }.policy do
+        prevent :create_projects
+        prevent :create_epic
+        prevent :update_epic
+        prevent :admin_milestone
+        prevent :upload_file
+        prevent :admin_label
+        prevent :admin_list
+        prevent :admin_issue
+        prevent :admin_pipeline
+        prevent :add_cluster
+        prevent :create_cluster
+        prevent :update_cluster
+        prevent :admin_cluster
+        prevent :admin_group_member
+        prevent :create_deploy_token
+        prevent :create_subgroup
+      end
     end
 
     override :lookup_access_level!
