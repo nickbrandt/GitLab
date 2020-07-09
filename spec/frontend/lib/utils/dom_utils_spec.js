@@ -140,13 +140,23 @@ describe('DOM Utils', () => {
 
     it('correctly parses boolean-like data attributes', () => {
       expect(
-        parseBooleanDataAttributes(element, ['fooBar', 'foobar', 'baz', 'qux', 'doesNotExist']),
+        parseBooleanDataAttributes(element, [
+          'fooBar',
+          'foobar',
+          'baz',
+          'qux',
+          'doesNotExist',
+          'toString',
+        ]),
       ).toEqual({
         fooBar: true,
         foobar: false,
         baz: true,
         qux: true,
         doesNotExist: false,
+
+        // Ensure prototype properties aren't false positives
+        toString: false,
       });
     });
   });

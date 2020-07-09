@@ -1,5 +1,5 @@
+import { has } from 'lodash';
 import { isInIssuePage, isInMRPage, isInEpicPage } from './common_utils';
-import { dasherize, convertToSnakeCase } from './text_utility';
 
 export const addClassIfElementExists = (element, className) => {
   if (element) {
@@ -41,10 +41,9 @@ export const toggleContainerClasses = (containerEl, classList) => {
  * @param {string[]} names - The dataset (i.e., camelCase) names to inspect
  * @returns {Object.<string, boolean>}
  */
-export const parseBooleanDataAttributes = (element, names) =>
+export const parseBooleanDataAttributes = ({ dataset }, names) =>
   names.reduce((acc, name) => {
-    const attributeName = `data-${dasherize(convertToSnakeCase(name))}`;
-    acc[name] = element.hasAttribute(attributeName);
+    acc[name] = has(dataset, name);
 
     return acc;
   }, {});
