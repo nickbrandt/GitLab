@@ -1310,6 +1310,18 @@ RSpec.describe Namespace do
     end
   end
 
+  describe '#over_storage_limit?' do
+    before do
+      allow_next_instance_of(::Namespace::RootStorageSize, namespace.root_ancestor) do |project|
+        allow(project).to receive(:above_size_limit?).and_return(true)
+      end
+    end
+
+    it 'returns a boolean indicating whether the root namespace is over the storage limit' do
+      expect(namespace.over_storage_limit?).to be true
+    end
+  end
+
   describe '#actual_size_limit' do
     let(:namespace) { build(:namespace) }
 
