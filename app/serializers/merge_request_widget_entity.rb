@@ -86,12 +86,12 @@ class MergeRequestWidgetEntity < Grape::Entity
   end
 
   expose :blob_path do
-    expose :head_path, if: -> (mr, _) { mr.head_pipeline_sha } do |merge_request|
-      project_blob_path(merge_request.project, merge_request.head_pipeline_sha)
+    expose :head_path, if: -> (mr, _) { mr.source_branch_sha } do |merge_request|
+      project_blob_path(merge_request.project, merge_request.source_branch_sha)
     end
 
-    expose :base_path, if: -> (mr, _) { mr.base_pipeline_sha } do |merge_request|
-      project_blob_path(merge_request.project, merge_request.base_pipeline_sha)
+    expose :base_path, if: -> (mr, _) { mr.diff_base_sha } do |merge_request|
+      project_blob_path(merge_request.project, merge_request.diff_base_sha)
     end
   end
 

@@ -299,12 +299,6 @@ module Ci
                        project: [merge_request.source_project, merge_request.target_project])
     end
 
-    # This structure describes feature levels
-    # to access the file types for given reports
-    REPORT_LICENSED_FEATURES = {
-      codequality: nil
-    }.freeze
-
     # Returns the pipelines in descending order (= newest first), optionally
     # limited to a number of references.
     #
@@ -631,8 +625,6 @@ module Ci
     end
 
     def batch_lookup_report_artifact_for_file_type(file_type)
-      return unless available_licensed_report_type?(file_type)
-
       latest_report_artifacts
         .values_at(*::Ci::JobArtifact.associated_file_types_for(file_type.to_s))
         .flatten
@@ -662,11 +654,6 @@ module Ci
           .preload(:job)
           .group_by(&:file_type)
       end
-    end
-
-    def available_licensed_report_type?(file_type)
-      feature_names = REPORT_LICENSED_FEATURES.fetch(file_type)
-      feature_names.nil? || feature_names.any? { |feature| project.feature_available?(feature) }
     end
 
     def has_kubernetes_active?
