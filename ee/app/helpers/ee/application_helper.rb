@@ -33,7 +33,7 @@ module EE
 
       if unprocessed_too_old?
         minutes_behind = time_ago_in_words(next_unprocessed_event.created_at)
-        return (s_('Geo|The node is currently %{minutes_behind} behind the primary node.') %
+        (s_('Geo|The node is currently %{minutes_behind} behind the primary node.') %
           { minutes_behind: minutes_behind }).html_safe
       end
     end
