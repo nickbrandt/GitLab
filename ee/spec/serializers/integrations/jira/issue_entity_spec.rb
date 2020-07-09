@@ -8,7 +8,7 @@ RSpec.describe Integrations::Jira::IssueEntity do
   let(:reporter) do
     double(
       'displayName' => 'reporter',
-      'name' => 'reporter@reporter.com'
+      'name' => double
     )
   end
 
@@ -43,10 +43,7 @@ RSpec.describe Integrations::Jira::IssueEntity do
           text_color: '#FFFFFF'
         }
       ],
-      author: {
-        name: 'reporter',
-        web_url: 'http://jira.com/secure/ViewProfile.jspa?name=reporter@reporter.com'
-      },
+      author: hash_including(name: 'reporter'),
       assignees: [
         { name: 'assignee' }
       ],
@@ -54,6 +51,16 @@ RSpec.describe Integrations::Jira::IssueEntity do
       references: { relative: 'GL-5' },
       external_tracker: 'jira'
     )
+  end
+
+  context 'with Jira Server configuration' do
+    before do
+      allow(reporter).to receive(:name).and_return('reporter@reporter.com')
+    end
+
+    it 'returns the Jira Server profile URL' do
+      expect(subject[:author]).to include(web_url: 'http://jira.com/secure/ViewProfile.jspa?name=reporter@reporter.com')
+    end
   end
 
   context 'with Jira Cloud configuration' do
