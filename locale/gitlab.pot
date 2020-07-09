@@ -8878,9 +8878,6 @@ msgstr ""
 msgid "Enable Pseudonymizer data collection"
 msgstr ""
 
-msgid "Enable SAML authentication for this group"
-msgstr ""
-
 msgid "Enable Seat Link"
 msgstr ""
 
@@ -10447,7 +10444,7 @@ msgstr ""
 msgid "Files, directories, and submodules in the path %{path} for commit reference %{ref}"
 msgstr ""
 
-msgid "Fill in the fields below, turn on <strong>%{enable_label}</strong>, and press <strong>%{save_changes}</strong>"
+msgid "Fill in the fields below, turn on %{strong_open}Enable SAML authentication for this group%{strong_close}, and press %{strong_open}Save changes%{strong_close}"
 msgstr ""
 
 msgid "Filter"
@@ -10552,7 +10549,7 @@ msgstr ""
 msgid "Finish review"
 msgstr ""
 
-msgid "Finish setting up your dedicated account for <strong>%{group_name}</strong>."
+msgid "Finish setting up your dedicated account for %{group_name}."
 msgstr ""
 
 msgid "Finished"
@@ -21927,7 +21924,7 @@ msgstr ""
 msgid "Share"
 msgstr ""
 
-msgid "Share the <strong>%{sso_label}</strong> with members so they can sign in to your group through your identity provider"
+msgid "Share the %{strong_open}GitLab single sign-on URL%{strong_close} with members so they can sign in to your group through your identity provider"
 msgstr ""
 
 msgid "Shared Runners"

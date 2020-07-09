@@ -191,25 +191,6 @@
 "Example: <code>acme.com,acme.co.in,acme.uk</code>.":
   plural_id:
   translations:
-"Fill in the fields below, turn on <strong>%{enable_label}</strong>, and press <strong>%{save_changes}</strong>":
-  plural_id:
-  translations:
-    - "Preencha nos campos abaixo, ative o <strong>%{enable_label}</strong> e pressione <strong>%{save_changes}</strong>"
-    - "下記項目に必要事項を入力し、 <strong>%{enable_label}</strong>をオンにして、 <strong>%{save_changes}</strong>を押してください。"
-    - "填写下面的字段，启用<strong>%{enable_label}</strong>，然后点击<strong>%{save_changes}</strong>"
-    - "Заповніть поля нижче, увімкніть <strong>%{enable_label}</strong> та натисніть <strong>%{save_changes}</strong>"
-    - "Fülle die Felder unten aus, schalte <strong>%{enable_label}</strong> an, und drücke <strong>%{save_changes}</strong>"
-    - "Renseignez les champs ci‐dessous, activez <strong>%{enable_label}</strong> et appuyez sur <strong>%{save_changes}</strong>"
-    - "Rellene los siguientes campos, active <strong>%{enable_label}</strong>y presione <strong>%{save_changes}</strong>"
-"Finish setting up your dedicated account for <strong>%{group_name}</strong>.":
-  plural_id:
-  translations:
-    - "Termine de configurar sua conta dedicada para <strong>%{group_name}</strong>."
-    - "<strong>%{group_name} </strong>の専用アカウントの設定を完了してください。"
-    - "Завершите настройку вашей учетной записи для <strong>%{group_name}</strong>."
-    - "完成您的<strong>%{group_name}</strong>专用帐户设置。"
-    - "Завершіть налаштування вашого виділеного облікового запису для <strong>%{group_name}</strong>."
-    - "Finalizar la configuración de su cuenta dedicada para <strong>%{group_name}</strong>."
 "Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.":
   plural_id:
   translations:
@@ -351,17 +332,6 @@
     - "SSH主机密钥在此系统上不可用。请使用<code>ssh-keyscan</code>命令或与您的GitLab管理员联系以获取更多信息。"
     - "SSH-ключі хоста не доступні в цій системі. Будь ласка, використовуйте команду <code>ssh-keyscan</code> або зверніться до вашого адміністратора GitLab для додаткової інформації."
     - "Las claves SSH del host no se encuentran disponibles en este sistema. Utilice el comando <code>ssh-keyscan</code> o póngase en contacto con su administrador de GitLab para obtener más información."
-"Share the <strong>%{sso_label}</strong> with members so they can sign in to your group through your identity provider":
-  plural_id:
-  translations:
-    - "Compartilhe o <strong>%{sso_label}</strong> com membros de forma que eles possam entrar em seu grupo por meio de seu provedor de identidade"
-    - "メンバーと<strong>%{sso_label}</strong>を共有すると、自身の ID プロバイダーでサインインすることができます"
-    - "分享<strong>%{sso_label}</strong> 给组员，以便他们可以通过您的身份提供商登录您的群组"
-    - "Поділіться <strong>%{sso_label}</strong> із учасниками для того, щоб вони могли увійти до вашої групи через провайдера ідентифікації"
-    - "Teile das <strong>%{sso_label}</strong> mit Mitgliedern, damit sie sich über deinen Identitätsanbieter bei deiner Gruppe anmelden können"
-    - "회원과 <strong>%{sso_label}</strong> 항목을 공유해 신원 제공 업체를 통해 그룹에 로그인할 수 있도록 합니다."
-    - "Partager le <strong>%{sso_label}</strong> avec les membres afin qu’ils puissent se connecter à votre groupe via votre fournisseur d’identité"
-    - "Comparta <strong>%{sso_label}</strong> con los diferentes miembros para que puedan iniciar sesión en su grupo a través de su proveedor de identidad"
 "Speed up your DevOps<br>with GitLab":
   plural_id:
   translations:
@@ -1053,3 +1023,33 @@
     - "Выберите флажок <strong>Активный</strong>, нажмите на <strong>Сохранить изменения</strong> и начните использовать GitLab внутри Slack!"
     - "3. 选择<strong>Active</strong>复选框，点击<strong>Save change</strong>后开始在Slack中使用GitLab！"
     - "3. Встановіть прапорець в пункті <strong>Активний</strong>, натисніть <strong>Зберегти зміни</strong> та починайте використовувати GitLab в Slack!"
+"Finish setting up your dedicated account for <strong>%{group_name}</strong>.":
+  plural_id:
+  translations:
+    - "Termine de configurar sua conta dedicada para <strong>%{group_name}</strong>."
+    - "<strong>%{group_name} </strong>の専用アカウントの設定を完了してください。"
+    - "Завершите настройку вашей учетной записи для <strong>%{group_name}</strong>."
+    - "完成您的<strong>%{group_name}</strong>专用帐户设置。"
+    - "Завершіть налаштування вашого виділеного облікового запису для <strong>%{group_name}</strong>."
+    - "Finalizar la configuración de su cuenta dedicada para <strong>%{group_name}</strong>."
+"Fill in the fields below, turn on <strong>%{enable_label}</strong>, and press <strong>%{save_changes}</strong>":
+  plural_id:
+  translations:
+    - "Preencha nos campos abaixo, ative o <strong>%{enable_label}</strong> e pressione <strong>%{save_changes}</strong>"
+    - "下記項目に必要事項を入力し、 <strong>%{enable_label}</strong>をオンにして、 <strong>%{save_changes}</strong>を押してください。"
+    - "填写下面的字段，启用<strong>%{enable_label}</strong>，然后点击<strong>%{save_changes}</strong>"
+    - "Заповніть поля нижче, увімкніть <strong>%{enable_label}</strong> та натисніть <strong>%{save_changes}</strong>"
+    - "Fülle die Felder unten aus, schalte <strong>%{enable_label}</strong> an, und drücke <strong>%{save_changes}</strong>"
+    - "Renseignez les champs ci‐dessous, activez <strong>%{enable_label}</strong> et appuyez sur <strong>%{save_changes}</strong>"
+    - "Rellene los siguientes campos, active <strong>%{enable_label}</strong>y presione <strong>%{save_changes}</strong>"
+"Share the <strong>%{sso_label}</strong> with members so they can sign in to your group through your identity provider":
+  plural_id:
+  translations:
+    - "Compartilhe o <strong>%{sso_label}</strong> com membros de forma que eles possam entrar em seu grupo por meio de seu provedor de identidade"
+    - "メンバーと<strong>%{sso_label}</strong>を共有すると、自身の ID プロバイダーでサインインすることができます"
+    - "分享<strong>%{sso_label}</strong> 给组员，以便他们可以通过您的身份提供商登录您的群组"
+    - "Поділіться <strong>%{sso_label}</strong> із учасниками для того, щоб вони могли увійти до вашої групи через провайдера ідентифікації"
+    - "Teile das <strong>%{sso_label}</strong> mit Mitgliedern, damit sie sich über deinen Identitätsanbieter bei deiner Gruppe anmelden können"
+    - "회원과 <strong>%{sso_label}</strong> 항목을 공유해 신원 제공 업체를 통해 그룹에 로그인할 수 있도록 합니다."
+    - "Partager le <strong>%{sso_label}</strong> avec les membres afin qu’ils puissent se connecter à votre groupe via votre fournisseur d’identité"
+    - "Comparta <strong>%{sso_label}</strong> con los diferentes miembros para que puedan iniciar sesión en su grupo a través de su proveedor de identidad"
