@@ -1,9 +1,11 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
+import { once } from 'lodash';
 import { componentNames } from 'ee/reports/components/issue_body';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';
+import Tracking from '~/tracking';
 import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import IssueModal from './components/modal.vue';
@@ -11,6 +13,7 @@ import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
 import { GlSprintf, GlLink } from '@gitlab/ui';
 import { mrStates } from '~/mr_popover/constants';
+import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
 
 export default {
   store: createStore(),
@@ -188,6 +191,12 @@ export default {
     dastScans() {
       return this.dast.scans.filter(scan => scan.scanned_resources_count > 0);
     },
+    handleToggleEvent() {
+      return once(() => {
+        const { category, action } = trackMrSecurityReportDetails;
+        Tracking.event(category, action);
+      });
+    },
   },
 
   created() {
@@ -284,8 +293,10 @@ export default {
     :loading-text="groupedSummaryText"
     :error-text="groupedSummaryText"
     :has-issues="true"
+    :should-emit-toggle-event="true"
     class="mr-widget-border-top grouped-security-reports mr-report"
     data-qa-selector="vulnerability_report_grouped"
+    @toggleEvent="handleToggleEvent"
   >
     <template v-if="pipelinePath" #actionButtons>
       <div>
