@@ -1998,6 +1998,12 @@ msgstr ""
 msgid "AlertManagement|Medium"
 msgstr ""
 
+msgid "AlertManagement|Metrics"
+msgstr ""
+
+msgid "AlertManagement|Metrics weren't available in the alerts payload."
+msgstr ""
+
 msgid "AlertManagement|More information"
 msgstr ""
 
