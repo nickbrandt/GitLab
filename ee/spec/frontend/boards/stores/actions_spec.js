@@ -13,13 +13,20 @@ const expectNotImplemented = action => {
   });
 };
 
-describe('toggleShowLabels', () => {
-  it('should commit mutation TOGGLE_LABELS', done => {
+describe('setShowLabels', () => {
+  it('should commit mutation SET_SHOW_LABELS', done => {
     const state = {
       isShowingLabels: true,
     };
 
-    testAction(actions.toggleShowLabels, null, state, [{ type: types.TOGGLE_LABELS }], [], done);
+    testAction(
+      actions.setShowLabels,
+      false,
+      state,
+      [{ type: types.SET_SHOW_LABELS, payload: false }],
+      [],
+      done,
+    );
   });
 });
 

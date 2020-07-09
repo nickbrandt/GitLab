@@ -63,8 +63,8 @@ const fetchEpics = ({ endpoints }) => {
 export default {
   ...actionsCE,
 
-  toggleShowLabels({ commit }) {
-    commit(types.TOGGLE_LABELS);
+  setShowLabels({ commit }, val) {
+    commit(types.SET_SHOW_LABELS, val);
   },
 
   setActiveListId({ commit }, listId) {
