@@ -5,7 +5,7 @@ recent_merge_requests_by_group:
     series:
       open_merge_requests:
         title: Merge Requests
-        data_retrieval: Metrics::InsightsQuery
+        data_retrieval: Insights
         data_retrieval_options:
           issuable_type: merge_request
           issuable_state: opened

@@ -18,7 +18,7 @@ RSpec.describe Gitlab::Analytics::Reports::ConfigLoader do
   end
 
   describe '#find_report_by_id' do
-    subject { described_class.new.find_report_by_id!(report_id) }
+    subject { described_class.find_report_by_id!(report_id) }
 
     context 'when unknown report_id is given' do
       let(:report_id) { 'unknown_report_id' }
@@ -40,7 +40,7 @@ RSpec.describe Gitlab::Analytics::Reports::ConfigLoader do
   describe '#find_series_by_id' do
     let(:series_id) { 'open_merge_requests' }
 
-    subject { described_class.new.find_series_by_id!(report_id, series_id) }
+    subject { described_class.find_series_by_id!(report_id, series_id) }
 
     context 'when unknown report_id is given' do
       let(:report_id) { 'unknown_report_id' }

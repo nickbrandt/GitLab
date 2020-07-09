@@ -9,21 +9,38 @@ module API
 
       helpers do
         def api_endpoints_available?
-          # This will be scoped to a project or a group
-          Feature.enabled?(:report_pages) && ::License.feature_available?(:group_activity_analytics)
+          Feature.enabled?(:report_pages, parent_entity) && parent_entity.feature_available?(:group_activity_analytics)
         end
 
         def load_report
-          loader_class = Gitlab::Analytics::Reports::ConfigLoader
-          report_id = params[:report_id]
+          Gitlab::Analytics::Reports::ConfigLoader.find_report_by_id!(params[:report_id])
+        rescue Gitlab::Analytics::Reports::ConfigLoader::MissingReportError
+          not_found!("Report(#{params[:report_id]})")
+        end
 
-          loader_class.new.find_report_by_id!(report_id)
-        rescue loader_class::MissingReportError
-          not_found!("Report(#{report_id})")
+        def load_series
+          Gitlab::Analytics::Reports::ConfigLoader.find_series_by_id!(params[:report_id], params[:series_id])
+
+        rescue Gitlab::Analytics::Reports::ConfigLoader::MissingSeriesError
+          not_found!("Series(#{params[:series_id]})")
+        rescue Gitlab::Analytics::Reports::ConfigLoader::MissingReportError
+          not_found!("Report(#{params[:report_id]})")
+        end
+
+        def load_parent_entity
+          Group.find(params[:group_id])
+        end
+
+        def parent_entity
+          @parent_entity ||= load_parent_entity
         end
 
         def report
           @report ||= load_report
+        end
+
+        def series
+          @series ||= load_series
         end
       end
 
@@ -53,20 +70,12 @@ module API
               get do
                 not_found! unless api_endpoints_available?
 
-                # Dummy response
-                {
-                  labels: %w[label1 label2 label3],
-                  datasets: [
-                    {
-                      label: "Series 1",
-                      data: [
-                        1,
-                        2,
-                        3
-                      ]
-                    }
-                  ]
-                }
+                data = Gitlab::Analytics::Reports::SeriesDataLoader.new(
+                  series: series,
+                  params: { parent: parent_entity, current_user: current_user }
+                ).execute
+
+                present series, with: EE::API::Entities::Analytics::Reports::Series, data: data
               end
             end
           end

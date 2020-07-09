@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe API::Analytics::Reports do
   let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
   let_it_be(:report_id) { 'recent_merge_requests_by_group' }
 
   shared_examples 'error response examples' do
@@ -35,7 +36,7 @@ RSpec.describe API::Analytics::Reports do
 
   describe 'GET /analytics/reports/:id/chart' do
     subject(:api_call) do
-      get api("/analytics/reports/#{report_id}/chart", user)
+      get api("/analytics/reports/#{report_id}/chart?group_id=#{group.id}", user)
     end
 
     before do
@@ -65,10 +66,10 @@ RSpec.describe API::Analytics::Reports do
   end
 
   describe 'GET /analytics/series/:report_id/:series_id' do
-    let_it_be(:series_id) { 'some_series_id' }
+    let_it_be(:series_id) { 'open_merge_requests' }
 
     subject(:api_call) do
-      get api("/analytics/series/#{report_id}/#{series_id}", user)
+      get api("/analytics/series/#{report_id}/#{series_id}?group_id=#{group.id}", user)
     end
 
     it 'is successful' do
@@ -76,6 +77,17 @@ RSpec.describe API::Analytics::Reports do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(response.parsed_body['datasets'].size).to eq(1)
+    end
+
+    context 'when unknown series_id is given' do
+      let(:series_id) { 'unknown_series_id' }
+
+      it 'renders 404, not found' do
+        api_call
+
+        expect(response).to have_gitlab_http_status(:not_found)
+        expect(response.parsed_body['message']).to eq('404 Series(unknown_series_id) Not Found')
+      end
     end
 
     include_examples 'error response examples'
