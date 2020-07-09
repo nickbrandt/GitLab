@@ -40,9 +40,6 @@ or higher, are required for your CPU or Node counts accordingly. For more inform
 [Sysbench](https://github.com/akopytov/sysbench) benchmark of the CPU can be found
 [here](https://gitlab.com/gitlab-org/quality/performance/-/wikis/Reference-Architectures/GCP-CPU-Benchmarks).
 
-AWS-equivalent and Azure-equivalent configurations are rough suggestions
-and may change in the future. They have not been tested and validated.
-
 For data objects such as LFS, Uploads, Artifacts, etc, an [object storage service](#configure-the-object-storage)
 is recommended over NFS where possible, due to better performance and availability.
 Since this doesn't require a node to be set up, it's marked as not applicable (n/a)
