@@ -162,28 +162,6 @@
 "Example: <code>acme.com,acme.co.in,acme.uk</code>.":
   plural_id:
   translations:
-"Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.":
-  plural_id:
-  translations:
-    - "Você está em um nó Geo secundário <b>somente para leitura</b>. Se você quiser fazer mudanças, você deve visitar essa página no %{primary_node}."
-    - "あなたは<b>読み取り専用の</b>セカンダリGeoノードにいます。変更を加えたい場合は、%{primary_node} のこのページにアクセスする必要があります。"
-    - "Вы находитесь на вторичном узле Geo в режиме <b>только для чтения</b>. Если вы хотите внести изменения, вы должны зайти на эту же страницу на %{primary_node}."
-    - "当前正在访问Geo次要 <b>只读 </b>节点。如需进行任何写入操作，必须访问%{primary_node}。"
-    - "Ви знаходитесь на вторинному <b>лише для читання</b> Geo-вузлі. Якщо ви хочете внести будь-які зміни, ви повинні відвідати %{primary_node}."
-    - "Du befindest dich auf einem sekundären, <b>read-only</b> Geo-Knoten. Um Änderungen vorzunehmen, musst du diese Seite auf dem %{primary_node} aufrufen."
-    - "Vous êtes sur un nœud Geo secondaire <b>en lecture seule</b>. Si vous voulez apporter des modifications, vous devez le faire depuis cette page sur le %{primary_node}."
-    - "Está en un nodo Geo secundario de <b>sólo lectura</b>. Si quiere realizar cambios, debe visitar esta página en %{primary_node}."
-"Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page.":
-  plural_id:
-  translations:
-    - "Você está em um nó Geo secundário <b>somente para leitura </b>. Você pode ser capaz de fazer um número limitado de mudanças ou executar uma quantidade limitada de ações nessa página."
-    - "あなたは<b>読み取り専用の</b>セカンダリGeoノードにいます。このページでは限定的な変更・操作をすることができます。"
-    - "Вы находитесь на вторичном, доступном <b>только для чтения</b>, узле Geo. Вы можете осуществлять ограниченное количество изменений и действий на данной странице."
-    - "当前正在访问Geo次要 <b>只读 </b>节点。您可以在此页面上进行有限的更改或执行有限的操作。"
-    - "Ви знаходитесь на вторинному <b>лише для читання</b> Geo-вузлі. Ви зможете вносити лише обмежену кількість змін та виконувати обмежений набір операцій з цієї сторінки."
-    - "Du befindest dich auf einem sekundären, <b>read-only</b> Geo-Knoten. Möglicherweise kannst du nur eine begrenzte Anzahl an Änderungen oder Aktionen auf dieser Seite durchführen."
-    - "Vous êtes sur un nœud Geo secondaire <b>en lecture seule</b>. Nous ne pourrez effectuer que des modifications ou des actions limitées depuis cette page."
-    - "Está en un nodo secundario, <b>de solo lectura</b> Geo. Es posible que pueda realizar una cantidad limitada de cambios o realizar una cantidad limitada de acciones en esta página."
 "Git LFS objects will be synced in pull mirrors if LFS is %{docs_link_start}enabled for the project%{docs_link_end}. They will <strong>not</strong> be synced in push mirrors.":
   plural_id:
   translations:
@@ -1053,3 +1031,25 @@
     - "Contributions du <strong>%{calendar_date}</strong>"
     - "Contribuciones para <strong>%{calendar_date}</strong>"
     - "<strong>%{calendar_date}</strong> için katkılar"
+"Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.":
+  plural_id:
+  translations:
+    - "Você está em um nó Geo secundário <b>somente para leitura</b>. Se você quiser fazer mudanças, você deve visitar essa página no %{primary_node}."
+    - "あなたは<b>読み取り専用の</b>セカンダリGeoノードにいます。変更を加えたい場合は、%{primary_node} のこのページにアクセスする必要があります。"
+    - "Вы находитесь на вторичном узле Geo в режиме <b>только для чтения</b>. Если вы хотите внести изменения, вы должны зайти на эту же страницу на %{primary_node}."
+    - "当前正在访问Geo次要 <b>只读 </b>节点。如需进行任何写入操作，必须访问%{primary_node}。"
+    - "Ви знаходитесь на вторинному <b>лише для читання</b> Geo-вузлі. Якщо ви хочете внести будь-які зміни, ви повинні відвідати %{primary_node}."
+    - "Du befindest dich auf einem sekundären, <b>read-only</b> Geo-Knoten. Um Änderungen vorzunehmen, musst du diese Seite auf dem %{primary_node} aufrufen."
+    - "Vous êtes sur un nœud Geo secondaire <b>en lecture seule</b>. Si vous voulez apporter des modifications, vous devez le faire depuis cette page sur le %{primary_node}."
+    - "Está en un nodo Geo secundario de <b>sólo lectura</b>. Si quiere realizar cambios, debe visitar esta página en %{primary_node}."
+"Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page.":
+  plural_id:
+  translations:
+    - "Você está em um nó Geo secundário <b>somente para leitura </b>. Você pode ser capaz de fazer um número limitado de mudanças ou executar uma quantidade limitada de ações nessa página."
+    - "あなたは<b>読み取り専用の</b>セカンダリGeoノードにいます。このページでは限定的な変更・操作をすることができます。"
+    - "Вы находитесь на вторичном, доступном <b>только для чтения</b>, узле Geo. Вы можете осуществлять ограниченное количество изменений и действий на данной странице."
+    - "当前正在访问Geo次要 <b>只读 </b>节点。您可以在此页面上进行有限的更改或执行有限的操作。"
+    - "Ви знаходитесь на вторинному <b>лише для читання</b> Geo-вузлі. Ви зможете вносити лише обмежену кількість змін та виконувати обмежений набір операцій з цієї сторінки."
+    - "Du befindest dich auf einem sekundären, <b>read-only</b> Geo-Knoten. Möglicherweise kannst du nur eine begrenzte Anzahl an Änderungen oder Aktionen auf dieser Seite durchführen."
+    - "Vous êtes sur un nœud Geo secondaire <b>en lecture seule</b>. Nous ne pourrez effectuer que des modifications ou des actions limitées depuis cette page."
+    - "Está en un nodo secundario, <b>de solo lectura</b> Geo. Es posible que pueda realizar una cantidad limitada de cambios o realizar una cantidad limitada de acciones en esta página."
