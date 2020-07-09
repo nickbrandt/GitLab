@@ -17,7 +17,7 @@ module API
     resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get all project packages within a group' do
         detail 'This feature was introduced in GitLab 12.5'
-        success EE::API::Entities::Package
+        success ::API::Entities::Package
       end
       params do
         use :pagination
@@ -37,7 +37,7 @@ module API
           declared(params).slice(:exclude_subgroups, :order_by, :sort, :package_type, :package_name)
         ).execute
 
-        present paginate(packages), with: EE::API::Entities::Package, user: current_user, group: true
+        present paginate(packages), with: ::API::Entities::Package, user: current_user, group: true
       end
     end
   end
