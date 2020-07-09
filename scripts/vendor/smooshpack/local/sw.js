@@ -21,14 +21,23 @@ self.addEventListener('fetch', event => {
   console.log('[sw] handling fetch for ', event.request);
 
   if (/\.png$/.test(event.request.url)) {
-    console.log('[sw] handling image!!');
-    const response = new Response(FALLBACK, {
-      headers: {
-        'Content-Type': 'image/svg+xml',
-      },
+    const path = event.request.url.replace(/^https?:\/\/[^\/]+\//, '');
+    const response = self.clients.get(event.clientId).then(client => {
+      client.postMessage({ path });
+
+      return new Response(FALLBACK, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+        },
+      });
     });
+
     event.respondWith(response);
   }
+});
+
+self.addEventListener('message', event => {
+  console.log('[sw] got a message', event);
 });
 
 function install() {
