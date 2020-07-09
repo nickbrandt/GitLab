@@ -99,63 +99,56 @@ export const parsedBaseIssues = [
   },
 ];
 
-export const headPerformance = [
+export const headBrowserPerformance = [
   {
     subject: '/some/path',
     metrics: [
       {
-        name: 'Sitespeed Score',
-        value: 85,
-      },
-    ],
-  },
-  {
-    subject: '/some/other/path',
-    metrics: [
-      {
         name: 'Total Score',
-        value: 79,
+        value: 80,
         desiredSize: 'larger',
       },
       {
         name: 'Requests',
-        value: 3,
+        value: 30,
         desiredSize: 'smaller',
       },
-    ],
-  },
-  {
-    subject: '/yet/another/path',
-    metrics: [
       {
-        name: 'Sitespeed Score',
-        value: 80,
+        name: 'Speed Index',
+        value: 1155,
+        desiredSize: 'smaller',
+      },
+      {
+        name: 'Transfer Size (KB)',
+        value: '1070.1',
+        desiredSize: 'smaller',
       },
     ],
   },
 ];
 
-export const basePerformance = [
+export const baseBrowserPerformance = [
   {
     subject: '/some/path',
     metrics: [
       {
-        name: 'Sitespeed Score',
-        value: 84,
-      },
-    ],
-  },
-  {
-    subject: '/some/other/path',
-    metrics: [
-      {
         name: 'Total Score',
-        value: 80,
+        value: 82,
         desiredSize: 'larger',
       },
       {
         name: 'Requests',
-        value: 4,
+        value: 30,
+        desiredSize: 'smaller',
+      },
+      {
+        name: 'Speed Index',
+        value: 1165,
+        desiredSize: 'smaller',
+      },
+      {
+        name: 'Transfer Size (KB)',
+        value: '1065.1',
         desiredSize: 'smaller',
       },
     ],
