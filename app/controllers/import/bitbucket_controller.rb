@@ -26,10 +26,6 @@ class Import::BitbucketController < Import::BaseController
     super
   end
 
-  def jobs
-    render json: find_jobs('bitbucket')
-  end
-
   def realtime_changes
     super
   end
