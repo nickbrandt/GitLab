@@ -305,16 +305,12 @@ RSpec.describe Gitlab::UsageData do
           for_defined_days_back do
             user = create(:user)
             project = create(:project, :repository_private, :github_imported,
-                              :test_repo, :remote_mirror, creator: user)
+                              :test_repo, creator: user)
             merge_request = create(:merge_request, source_project: project)
-            create(:deploy_key, user: user)
-            create(:key, user: user)
             create(:project, creator: user)
             create(:project, creator: user, disable_overriding_approvers_per_merge_request: true)
             create(:project, creator: user, disable_overriding_approvers_per_merge_request: false)
             create(:protected_branch, project: project)
-            create(:remote_mirror, project: project)
-            create(:snippet, author: user)
             create(:suggestion, note: create(:note, project: project))
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
@@ -322,37 +318,22 @@ RSpec.describe Gitlab::UsageData do
             create_list(:code_owner_rule, 2)
           end
 
-          expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to eq(
-            deploy_keys: 2,
-            keys: 2,
-            merge_requests: 12,
+          expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to include(
             projects_enforcing_code_owner_approval: 0,
             merge_requests_with_optional_codeowners: 4,
             merge_requests_with_required_codeowners: 8,
-            projects_with_disable_overriding_approvers_per_merge_request: 2,
-            projects_without_disable_overriding_approvers_per_merge_request: 16,
             projects_imported_from_github: 2,
             projects_with_repositories_enabled: 12,
             protected_branches: 2,
-            remote_mirrors: 2,
-            snippets: 2,
             suggestions: 2
           )
-          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:create]).to eq(
-            deploy_keys: 1,
-            keys: 1,
-            merge_requests: 6,
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:create]).to include(
             projects_enforcing_code_owner_approval: 0,
-            merge_requests_users: 0,
             merge_requests_with_optional_codeowners: 2,
             merge_requests_with_required_codeowners: 4,
-            projects_with_disable_overriding_approvers_per_merge_request: 1,
-            projects_without_disable_overriding_approvers_per_merge_request: 8,
             projects_imported_from_github: 1,
             projects_with_repositories_enabled: 6,
             protected_branches: 1,
-            remote_mirrors: 1,
-            snippets: 1,
             suggestions: 1
           )
         end
