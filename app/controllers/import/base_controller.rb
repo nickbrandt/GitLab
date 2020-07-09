@@ -30,7 +30,7 @@ class Import::BaseController < ApplicationController
   end
 
   def incompatible_repos
-    []
+    raise NotImplementedError
   end
 
   def provider_name

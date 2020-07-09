@@ -54,6 +54,11 @@ class Import::GitlabController < Import::BaseController
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
+  override :incompatible_repos
+  def incompatible_repos
+    []
+  end
+
   override :provider_name
   def provider_name
     :gitlab

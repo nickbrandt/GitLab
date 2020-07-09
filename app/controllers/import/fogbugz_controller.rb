@@ -89,6 +89,11 @@ class Import::FogbugzController < Import::BaseController
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
+  override :incompatible_repos
+  def incompatible_repos
+    []
+  end
+
   override :provider_name
   def provider_name
     :fogbugz
