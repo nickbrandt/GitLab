@@ -34,6 +34,11 @@ export default {
       required: false,
       default: false,
     },
+    groupId: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   computed: {
     ...mapState(['epics']),
@@ -49,47 +54,48 @@ export default {
 
 <template>
   <div
-    class="board-swimlanes gl-white-space-nowrap gl-py-5 gl-px-3"
+    class="board-swimlanes gl-white-space-nowrap gl-pb-5 gl-px-3"
     data_qa_selector="board_epics_swimlanes"
   >
-    <div
-      v-for="list in lists"
-      :key="list.id"
-      :class="{
-        'is-expandable': list.isExpandable,
-        'is-collapsed': !list.isExpanded,
-      }"
-      class="board gl-px-3 gl-vertical-align-top gl-white-space-normal"
-    >
-      <board-list-header
-        :can-admin-list="canAdminList"
-        :list="list"
-        :disabled="disabled"
-        :board-id="boardId"
-        :is-swimlanes-header="true"
-      />
+    <div class="board-swimlanes-headers gl-sticky gl-pt-5 gl-bg-white gl-top-0 gl-z-index-3">
+      <div
+        v-for="list in lists"
+        :key="list.id"
+        :class="{
+          'is-collapsed': !list.isExpanded,
+        }"
+        class="board gl-px-3 gl-vertical-align-top gl-white-space-normal"
+      >
+        <board-list-header
+          :can-admin-list="canAdminList"
+          :list="list"
+          :disabled="disabled"
+          :board-id="boardId"
+          :is-swimlanes-header="true"
+        />
+      </div>
     </div>
     <div class="board-epics-swimlanes">
       <epic-lane v-for="epic in epics" :key="epic.id" :epic="epic" :lists="lists" />
-      <div
-        class="board-lane-unassigned-issues gl-py-5 gl-px-3 gl-display-flex gl-align-items-center"
-      >
-        <span
-          class="gl-mr-3 gl-font-weight-bold gl-white-space-nowrap gl-text-overflow-ellipsis gl-overflow-hidden"
-        >
-          {{ __('Issues with no epic assigned') }}
-        </span>
-        <span
-          v-gl-tooltip.hover
-          :title="issuesCountTooltipText"
-          class="gl-display-flex gl-align-items-center gl-text-gray-700"
-          tabindex="0"
-          :aria-label="issuesCountTooltipText"
-          data-testid="issues-lane-issue-count"
-        >
-          <gl-icon class="gl-mr-2 gl-flex-shrink-0" name="issues" aria-hidden="true" />
-          <span aria-hidden="true">{{ issuesCount }}</span>
-        </span>
+      <div class="board-lane-unassigned-issues gl-sticky gl-display-inline-block gl-left-0">
+        <div class="gl-left-0 gl-py-5 gl-px-3 gl-display-flex gl-align-items-center">
+          <span
+            class="gl-mr-3 gl-font-weight-bold gl-white-space-nowrap gl-text-overflow-ellipsis gl-overflow-hidden"
+          >
+            {{ __('Issues with no epic assigned') }}
+          </span>
+          <span
+            v-gl-tooltip.hover
+            :title="issuesCountTooltipText"
+            class="gl-display-flex gl-align-items-center gl-text-gray-700"
+            tabindex="0"
+            :aria-label="issuesCountTooltipText"
+            data-testid="issues-lane-issue-count"
+          >
+            <gl-icon class="gl-mr-2 gl-flex-shrink-0" name="issues" aria-hidden="true" />
+            <span aria-hidden="true">{{ issuesCount }}</span>
+          </span>
+        </div>
       </div>
       <div class="gl-display-flex">
         <issues-lane-list
@@ -97,6 +103,8 @@ export default {
           :key="`${list.id}-issues`"
           :list="list"
           :issues="list.issues"
+          :group-id="groupId"
+          :is-unassigned-issues-lane="true"
         />
       </div>
     </div>
