@@ -609,40 +609,13 @@ RSpec.describe Gitlab::UsageData do
       context 'for verify' do
         it 'includes accurate usage_activity_by_stage data' do
           for_defined_days_back do
-            user = create(:user)
-            create(:ci_build, user: user)
-            create(:ci_empty_pipeline, source: :external, user: user)
-            create(:ci_empty_pipeline, user: user)
-            create(:ci_pipeline, :auto_devops_source, user: user)
-            create(:ci_pipeline, :repository_source, user: user)
-            create(:ci_pipeline_schedule, owner: user)
-            create(:ci_trigger, owner: user)
-            create(:clusters_applications_runner, :installed)
             create(:github_service)
           end
 
-          expect(described_class.uncached_data[:usage_activity_by_stage][:verify]).to eq(
-            ci_builds: 2,
-            ci_external_pipelines: 2,
-            ci_internal_pipelines: 2,
-            ci_pipeline_config_auto_devops: 2,
-            ci_pipeline_config_repository: 2,
-            ci_pipeline_schedules: 2,
-            ci_pipelines: 2,
-            ci_triggers: 2,
-            clusters_applications_runner: 2,
+          expect(described_class.uncached_data[:usage_activity_by_stage][:verify]).to include(
             projects_reporting_ci_cd_back_to_github: 2
           )
-          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:verify]).to eq(
-            ci_builds: 1,
-            ci_external_pipelines: 1,
-            ci_internal_pipelines: 1,
-            ci_pipeline_config_auto_devops: 1,
-            ci_pipeline_config_repository: 1,
-            ci_pipeline_schedules: 1,
-            ci_pipelines: 1,
-            ci_triggers: 1,
-            clusters_applications_runner: 1,
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:verify]).to include(
             projects_reporting_ci_cd_back_to_github: 1
           )
         end
