@@ -12,15 +12,15 @@ module Integrations
       end
 
       expose :created_at do |jira_issue|
-        jira_issue.created
+        jira_issue.created.to_datetime.utc
       end
 
       expose :updated_at do |jira_issue|
-        jira_issue.updated
+        jira_issue.updated.to_datetime.utc
       end
 
       expose :closed_at do |jira_issue|
-        jira_issue.resolutiondate
+        jira_issue.resolutiondate&.to_datetime&.utc
       end
 
       expose :labels do |jira_issue|
