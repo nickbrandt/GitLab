@@ -303,10 +303,6 @@ module EE
       end
     end
 
-    def packages_feature_available?
-      packages_feature_enabled? && feature_available?(:packages)
-    end
-
     def dependency_proxy_feature_available?
       ::Gitlab.config.dependency_proxy.enabled && feature_available?(:dependency_proxy)
     end

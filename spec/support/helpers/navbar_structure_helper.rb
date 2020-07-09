@@ -19,39 +19,21 @@ module NavbarStructureHelper
     hash[:nav_sub_items].insert(index + 1, new_sub_nav_item_name)
   end
 
-  # TODO - This can be moved into 'project navbar structure' shared
-  # context when package feature gets moved to core.
-  # More information in: https://gitlab.com/gitlab-org/gitlab/-/issues/221259
   def insert_package_nav(within)
-    if ::Gitlab.ee?
-      insert_after_nav_item(
-        within,
-        new_nav_item: {
-          nav_item: _('Packages & Registries'),
-          nav_sub_items: [_('Package Registry')]
-        }
-      )
-    end
+    insert_after_nav_item(
+      within,
+      new_nav_item: {
+        nav_item: _('Packages & Registries'),
+        nav_sub_items: [_('Package Registry')]
+      }
+    )
   end
 
-  # TODO - This ee? condition can be removed
-  # when package feature gets moved to core.
-  # More information in: https://gitlab.com/gitlab-org/gitlab/-/issues/221259
   def insert_container_nav(within)
-    if ::Gitlab.ee?
-      insert_after_sub_nav_item(
-        _('Package Registry'),
-        within: _('Packages & Registries'),
-        new_sub_nav_item_name: _('Container Registry')
-      )
-    else
-      insert_after_nav_item(
-        within,
-        new_nav_item: {
-          nav_item: _('Packages & Registries'),
-          nav_sub_items: [_('Container Registry')]
-        }
-      )
-    end
+    insert_after_sub_nav_item(
+      _('Package Registry'),
+      within: _('Packages & Registries'),
+      new_sub_nav_item_name: _('Container Registry')
+    )
   end
 end
