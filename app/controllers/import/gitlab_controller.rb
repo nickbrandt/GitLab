@@ -20,10 +20,6 @@ class Import::GitlabController < Import::BaseController
     super
   end
 
-  def jobs
-    render json: find_jobs('gitlab')
-  end
-
   def create
     repo = client.project(params[:repo_id].to_i)
     target_namespace = find_or_create_namespace(repo['namespace']['path'], client.user['username'])

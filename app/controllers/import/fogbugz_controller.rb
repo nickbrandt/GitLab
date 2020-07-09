@@ -58,10 +58,6 @@ class Import::FogbugzController < Import::BaseController
     super
   end
 
-  def jobs
-    render json: find_jobs('fogbugz')
-  end
-
   def create
     repo = client.repo(params[:repo_id])
     fb_session = { uri: session[:fogbugz_uri], token: session[:fogbugz_token] }

@@ -180,20 +180,4 @@ RSpec.describe Import::BitbucketServerController do
       end
     end
   end
-
-  describe 'GET jobs' do
-    before do
-      assign_session_tokens
-    end
-
-    it 'returns a list of imported projects' do
-      created_project = create(:project, import_type: 'bitbucket_server', creator_id: user.id)
-
-      get :jobs
-
-      expect(json_response.count).to eq(1)
-      expect(json_response.first['id']).to eq(created_project.id)
-      expect(json_response.first['import_status']).to eq('none')
-    end
-  end
 end

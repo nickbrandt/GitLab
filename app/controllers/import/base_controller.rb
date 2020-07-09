@@ -87,15 +87,6 @@ class Import::BaseController < ApplicationController
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
-  # rubocop: disable CodeReuse/ActiveRecord
-  def find_jobs(import_type)
-    current_user.created_projects
-      .with_import_state
-      .where(import_type: import_type)
-      .to_json(only: [:id], methods: [:import_status])
-  end
-  # rubocop: enable CodeReuse/ActiveRecord
-
   # deprecated: being replaced by app/services/import/base_service.rb
   def find_or_create_namespace(names, owner)
     names = params[:target_namespace].presence || names
