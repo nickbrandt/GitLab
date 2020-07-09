@@ -6593,6 +6593,9 @@ msgstr ""
 msgid "Copy secret"
 msgstr ""
 
+msgid "Copy source branch name"
+msgstr ""
+
 msgid "Copy token"
 msgstr ""
 
