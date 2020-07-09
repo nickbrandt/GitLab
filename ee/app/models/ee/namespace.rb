@@ -50,6 +50,7 @@ module EE
 
       delegate :additional_purchased_storage_size, :additional_purchased_storage_size=,
         :additional_purchased_storage_ends_on, :additional_purchased_storage_ends_on=,
+        :temporary_storage_increase_ends_on,
         to: :namespace_limit, allow_nil: true
 
       delegate :email, to: :owner, allow_nil: true, prefix: true
