@@ -142,14 +142,6 @@ RSpec.describe API::Projects do
       end
     end
 
-    describe 'packages_enabled attribute' do
-      it 'is exposed' do
-        get api("/projects/#{project.id}", user)
-
-        expect(json_response).to have_key 'packages_enabled'
-      end
-    end
-
     describe 'compliance_frameworks attribute' do
       context 'when compliance_framework feature is available' do
         context 'when project has a compliance framework' do
@@ -797,22 +789,6 @@ RSpec.describe API::Projects do
         put(api("/projects/#{project.id}", developer), params: mirror_params)
 
         expect(response).to have_gitlab_http_status(:forbidden)
-      end
-    end
-
-    describe 'updating packages_enabled attribute' do
-      it 'is enabled by default' do
-        expect(project.packages_enabled).to be true
-      end
-
-      context 'without the need for a license' do
-        it 'disables project packages feature' do
-          put(api("/projects/#{project.id}", user), params: { packages_enabled: false })
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(project.reload.packages_enabled).to be false
-          expect(json_response['packages_enabled']).to eq(false)
-        end
       end
     end
 

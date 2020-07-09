@@ -31,10 +31,6 @@ module EE
 
       nav_tabs += get_project_security_nav_tabs(project, current_user)
 
-      if ::Gitlab.config.packages.enabled && can?(current_user, :read_package, project)
-        nav_tabs << :packages
-      end
-
       if can?(current_user, :read_code_review_analytics, project)
         nav_tabs << :code_review
       end
@@ -59,21 +55,6 @@ module EE
       tab_ability_map = super
       tab_ability_map[:feature_flags] = :read_feature_flag
       tab_ability_map
-    end
-
-    override :project_permissions_settings
-    def project_permissions_settings(project)
-      super.merge(
-        packagesEnabled: !!project.packages_enabled
-      )
-    end
-
-    override :project_permissions_panel_data
-    def project_permissions_panel_data(project)
-      super.merge(
-        packagesAvailable: ::Gitlab.config.packages.enabled,
-        packagesHelpPath: help_page_path('user/packages/index')
-      )
     end
 
     override :default_url_to_repo

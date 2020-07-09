@@ -11,12 +11,6 @@ RSpec.describe 'Project navbar' do
   let_it_be(:project) { create(:project, :repository) }
 
   before do
-    insert_after_sub_nav_item(
-      _('Labels'),
-      within: _('Issues'),
-      new_sub_nav_item_name: _('Service Desk')
-    )
-
     insert_package_nav(_('Operations'))
 
     project.add_maintainer(user)

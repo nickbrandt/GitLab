@@ -101,7 +101,6 @@ module QA
         autoload :Menu, 'qa/ee/page/project/menu'
 
         module SubMenus
-          autoload :Packages, 'qa/ee/page/project/sub_menus/packages'
           autoload :SecurityCompliance, 'qa/ee/page/project/sub_menus/security_compliance'
           autoload :Repository, 'qa/ee/page/project/sub_menus/repository'
           autoload :Settings, 'qa/ee/page/project/sub_menus/settings'
@@ -138,11 +137,6 @@ module QA
           module Metrics
             autoload :Show, 'qa/ee/page/project/operations/metrics/show'
           end
-        end
-
-        module Packages
-          autoload :Index, 'qa/ee/page/project/packages/index'
-          autoload :Show, 'qa/ee/page/project/packages/show'
         end
 
         module Pipeline
