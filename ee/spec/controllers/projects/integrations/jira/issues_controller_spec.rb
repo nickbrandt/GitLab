@@ -53,7 +53,7 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
       let(:jira_issues) { [] }
 
       it 'returns a list of serialized jira issues' do
-        expect_next_instance_of(Projects::Integrations::Jira::IssuesFinder, project, {}) do |finder|
+        expect_next_instance_of(Projects::Integrations::Jira::IssuesFinder) do |finder|
           expect(finder).to receive(:execute).and_return(jira_issues)
         end
 
@@ -82,6 +82,59 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
 
         expect(response).to have_gitlab_http_status(:bad_request)
         expect(json_response['errors']).to eq ['Request error']
+      end
+
+      it 'sets pagination headers' do
+        expect_next_instance_of(Projects::Integrations::Jira::IssuesFinder) do |finder|
+          expect(finder).to receive(:execute).and_return(jira_issues)
+        end
+
+        get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
+
+        expect(response).to include_pagination_headers
+        expect(response.headers['X-Page']).to eq '1'
+        expect(response.headers['X-Per-Page']).to eq Jira::Requests::Issues::ListService::PER_PAGE.to_s
+        expect(response.headers['X-Total']).to eq '0'
+      end
+
+      context 'when parameters are passed' do
+        shared_examples 'proper parameter values' do
+          it 'properly set the values' do
+            expect_next_instance_of(Projects::Integrations::Jira::IssuesFinder, project, expected_params) do |finder|
+              expect(finder).to receive(:execute).and_return(jira_issues)
+            end
+
+            get :index, params: { namespace_id: project.namespace, project_id: project }.merge(params), format: :json
+          end
+        end
+
+        context 'when there are no params' do
+          it_behaves_like 'proper parameter values' do
+            let(:params) { {} }
+            let(:expected_params) { { 'state' => 'opened', 'sort' => 'created_date' } }
+          end
+        end
+
+        context 'when pagination params' do
+          it_behaves_like 'proper parameter values' do
+            let(:params) { { 'page' => '12', 'per_page' => '20' } }
+            let(:expected_params) { { 'page' => '12', 'per_page' => '20', 'state' => 'opened', 'sort' => 'created_date' } }
+          end
+        end
+
+        context 'when state is closed' do
+          it_behaves_like 'proper parameter values' do
+            let(:params) { { 'state' => 'closed' } }
+            let(:expected_params) { { 'state' => 'closed', 'sort' => 'updated_desc' } }
+          end
+        end
+
+        context 'when invalid params' do
+          it_behaves_like 'proper parameter values' do
+            let(:params) { { 'invalid' => '12' } }
+            let(:expected_params) { { 'state' => 'opened', 'sort' => 'created_date' } }
+          end
+        end
       end
     end
   end
