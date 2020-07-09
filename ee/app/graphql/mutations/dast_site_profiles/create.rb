@@ -8,7 +8,7 @@ module Mutations
       graphql_name 'DastSiteProfileCreate'
 
       field :id, GraphQL::ID_TYPE,
-            null: false,
+            null: true,
             description: 'ID of the site profile.'
 
       argument :full_path, GraphQL::ID_TYPE,
