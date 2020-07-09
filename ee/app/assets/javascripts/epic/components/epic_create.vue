@@ -70,7 +70,7 @@ export default {
 
 <template>
   <div class="dropdown epic-create-dropdown">
-    <gl-button category="primary" variant="success" data-toggle="dropdown">
+    <gl-button category="primary" variant="success" class="qa-new-epic-button" data-toggle="dropdown">
       {{ __('New epic') }}
     </gl-button>
 
