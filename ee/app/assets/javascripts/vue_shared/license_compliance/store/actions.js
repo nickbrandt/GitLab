@@ -2,6 +2,7 @@ import axios from '~/lib/utils/axios_utils';
 import pollUntilComplete from '~/lib/utils/poll_until_complete';
 import * as types from './mutation_types';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
+import { LICENSE_CHECK_NAME } from 'ee/approvals/constants';
 import { convertToOldReportFormat } from './utils';
 
 export const setAPISettings = ({ commit }, data) => {
@@ -118,7 +119,7 @@ export const fetchLicenseCheckApprovalRule = ({ dispatch, state }) => {
     .get(state.approvalsApiPath)
     .then(({ data }) => {
       const hasLicenseCheckApprovalRule = data.approval_rules_left.some(rule => {
-        return rule.name === 'License-Check';
+        return rule.name === LICENSE_CHECK_NAME;
       });
 
       dispatch('receiveLicenseCheckApprovalRuleSuccess', { hasLicenseCheckApprovalRule });

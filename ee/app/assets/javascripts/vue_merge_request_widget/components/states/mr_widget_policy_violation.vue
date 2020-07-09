@@ -14,7 +14,7 @@ export default {
   <div class="mr-widget-body media">
     <div class="space-children">
       <status-icon status="warning" />
-      <gl-button category="primary" variant="success" disabled="disabled" size="small">
+      <gl-button category="primary" variant="success" disabled size="small">
         {{ s__('mrWidget|Merge') }}
       </gl-button>
     </div>

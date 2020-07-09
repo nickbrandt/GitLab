@@ -3,6 +3,7 @@ import * as actions from 'ee/vue_shared/license_compliance/store/actions';
 import * as mutationTypes from 'ee/vue_shared/license_compliance/store/mutation_types';
 import createState from 'ee/vue_shared/license_compliance/store/state';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_compliance/constants';
+import { LICENSE_CHECK_NAME } from 'ee/approvals/constants';
 import { TEST_HOST } from 'spec/test_constants';
 import testAction from 'helpers/vuex_action_helper';
 import { approvedLicense, blacklistedLicense } from '../mock_data';
@@ -485,7 +486,7 @@ describe('License store actions', () => {
   describe('fetchLicenseCheckApprovalRule ', () => {
     it('dispatches request/receive with detected approval rule', done => {
       const APPROVAL_RULE_RESPONSE = {
-        approval_rules_left: [{ name: 'License-Check' }],
+        approval_rules_left: [{ name: LICENSE_CHECK_NAME }],
       };
 
       axiosMock.onGet(approvalsApiPath).replyOnce(200, APPROVAL_RULE_RESPONSE);
