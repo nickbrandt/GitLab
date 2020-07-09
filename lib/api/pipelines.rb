@@ -14,6 +14,26 @@ module API
         detail 'This feature was introduced in GitLab 8.11.'
         success Entities::PipelineBasic
       end
+
+      helpers do
+        params :optional_scope do
+          optional :scope, types: [String, Array[String]], desc: 'The scope of builds to show',
+                           values: ::CommitStatus::AVAILABLE_STATUSES,
+                           coerce_with: ->(scope) {
+                             case scope
+                             when String
+                               [scope]
+                             when ::Hash
+                               scope.values
+                             when ::Array
+                               scope
+                             else
+                               ['unknown']
+                             end
+                           }
+        end
+      end
+
       params do
         use :pagination
         optional :scope,    type: String, values: %w[running pending finished branches tags],
@@ -103,10 +123,12 @@ module API
         use :optional_scope
         use :pagination
       end
+
       # rubocop: disable CodeReuse/ActiveRecord
       get ':id/pipelines/:pipeline_id/jobs' do
+        authenticate!
         authorize!(:read_pipeline, user_project)
-        pipeline = user_project.ci_pipelines.find(params[:pipeline_id])
+        pipeline = user_project.all_pipelines.find(params[:pipeline_id])
         authorize!(:read_build, pipeline)
 
         builds = pipeline.builds
@@ -129,8 +151,9 @@ module API
 
       # rubocop: disable CodeReuse/ActiveRecord
       get ':id/pipelines/:pipeline_id/bridges' do
+        authenticate!
         authorize!(:read_build, user_project)
-        pipeline = user_project.ci_pipelines.find(params[:pipeline_id])
+        pipeline = user_project.all_pipelines.find(params[:pipeline_id])
         authorize!(:read_pipeline, pipeline)
 
         bridges = pipeline.bridges
@@ -221,6 +244,19 @@ module API
     end
 
     helpers do
+      # rubocop: disable CodeReuse/ActiveRecord
+      def filter_builds(builds, scope)
+        return builds if scope.nil? || scope.empty?
+
+        available_statuses = ::CommitStatus::AVAILABLE_STATUSES
+
+        unknown = scope - available_statuses
+        render_api_error!('Scope contains invalid value(s)', 400) unless unknown.empty?
+
+        builds.where(status: available_statuses && scope)
+      end
+
+      # rubocop: enable CodeReuse/ActiveRecord
       def pipeline
         strong_memoize(:pipeline) do
           user_project.ci_pipelines.find(params[:pipeline_id])
