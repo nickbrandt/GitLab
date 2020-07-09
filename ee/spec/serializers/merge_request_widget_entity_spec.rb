@@ -32,7 +32,7 @@ RSpec.describe MergeRequestWidgetEntity do
   end
 
   def create_all_artifacts
-    artifacts = %i(codequality performance)
+    artifacts = %i(codequality performance browser_performance)
 
     artifacts.each do |artifact_type|
       create(:ee_ci_build, artifact_type, :success, pipeline: pipeline, project: pipeline.project)
@@ -63,8 +63,9 @@ RSpec.describe MergeRequestWidgetEntity do
     using RSpec::Parameterized::TableSyntax
 
     where(:json_entry, :artifact_type) do
-      :codeclimate         | :codequality
-      :performance         | :performance
+      :codeclimate                 | :codequality
+      :browser_performance         | :browser_performance
+      :browser_performance         | :performance
     end
 
     with_them do
@@ -109,38 +110,59 @@ RSpec.describe MergeRequestWidgetEntity do
       )
 
       allow(head_pipeline).to receive(:available_licensed_report_type?).and_return(true)
-
-      create(
-        :ee_ci_build,
-        :performance,
-        pipeline: head_pipeline,
-        yaml_variables: yaml_variables
-      )
     end
 
-    context "when head pipeline's performance build has the threshold variable defined" do
-      let(:yaml_variables) do
-        [
-          { key: 'FOO', value: 'BAR' },
-          { key: 'DEGRADATION_THRESHOLD', value: '5' }
-        ]
+    shared_examples 'degradation_threshold' do
+      context "when head pipeline's browser performance build has the threshold variable defined" do
+        let(:yaml_variables) do
+          [
+            { key: 'FOO', value: 'BAR' },
+            { key: 'DEGRADATION_THRESHOLD', value: '5' }
+          ]
+        end
+
+        it "returns the value of the variable" do
+          expect(subject.as_json[:browser_performance][:degradation_threshold]).to eq(5)
+        end
       end
 
-      it "returns the value of the variable" do
-        expect(subject.as_json[:performance][:degradation_threshold]).to eq(5)
+      context "when head pipeline's browser performance build has no threshold variable defined" do
+        let(:yaml_variables) do
+          [
+            { key: 'FOO', value: 'BAR' }
+          ]
+        end
+
+        it "returns nil" do
+          expect(subject.as_json[:browser_performance][:degradation_threshold]).to be_nil
+        end
       end
     end
 
-    context "when head pipeline's performance build has no threshold variable defined" do
-      let(:yaml_variables) do
-        [
-          { key: 'FOO', value: 'BAR' }
-        ]
+    context 'with browser_performance artifact' do
+      before do
+        create(
+          :ee_ci_build,
+          :browser_performance,
+          pipeline: head_pipeline,
+          yaml_variables: yaml_variables
+        )
       end
 
-      it "returns nil" do
-        expect(subject.as_json[:performance][:degradation_threshold]).to be_nil
+      include_examples 'degradation_threshold'
+    end
+
+    context 'with performance artifact' do
+      before do
+        create(
+          :ee_ci_build,
+          :performance,
+          pipeline: head_pipeline,
+          yaml_variables: yaml_variables
+        )
       end
+
+      include_examples 'degradation_threshold'
     end
   end
 

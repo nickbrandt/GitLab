@@ -45,6 +45,7 @@ module EE
           container_scanning: %i[container_scanning],
           dast: %i[dast],
           performance: %i[merge_request_performance_metrics],
+          browser_performance: %i[merge_request_performance_metrics],
           license_management: %i[license_scanning],
           license_scanning: %i[license_scanning],
           metrics: %i[metrics_reports],

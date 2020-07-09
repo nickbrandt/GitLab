@@ -24446,6 +24446,9 @@ msgstr ""
 msgid "Total Contributions"
 msgstr ""
 
+msgid "Total Score"
+msgstr ""
+
 msgid "Total artifacts size: %{total_size}"
 msgstr ""
 
@@ -27076,6 +27079,12 @@ msgstr ""
 msgid "cannot merge"
 msgstr ""
 
+msgid "ciReport|%{degradedNum} degraded"
+msgstr ""
+
+msgid "ciReport|%{improvedNum} improved"
+msgstr ""
+
 msgid "ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}"
 msgstr ""
 
@@ -27103,6 +27112,9 @@ msgstr ""
 msgid "ciReport|%{reportType}: Loading resulted in an error"
 msgstr ""
 
+msgid "ciReport|%{sameNum} same"
+msgstr ""
+
 msgid "ciReport|(errors when loading results)"
 msgstr ""
 
@@ -27125,6 +27137,12 @@ msgid "ciReport|Automatically apply the patch in a new branch"
 msgstr ""
 
 msgid "ciReport|Base pipeline codequality artifact not found"
+msgstr ""
+
+msgid "ciReport|Browser performance test metrics: "
+msgstr ""
+
+msgid "ciReport|Browser performance test metrics: No changes"
 msgstr ""
 
 msgid "ciReport|Code quality"
@@ -27199,13 +27217,7 @@ msgstr ""
 msgid "ciReport|No changes to code quality"
 msgstr ""
 
-msgid "ciReport|No changes to performance metrics"
-msgstr ""
-
 msgid "ciReport|No code quality issues found"
-msgstr ""
-
-msgid "ciReport|Performance metrics"
 msgstr ""
 
 msgid "ciReport|Resolve with merge request"

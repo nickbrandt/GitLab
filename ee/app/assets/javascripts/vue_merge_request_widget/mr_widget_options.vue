@@ -14,7 +14,6 @@ import MrWidgetApprovals from './components/approvals/approvals.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
 import MergeTrainHelperText from './components/merge_train_helper_text.vue';
 import { MTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
-import { TOTAL_SCORE_METRIC_NAME } from 'ee/vue_merge_request_widget/stores/constants';
 
 export default {
   components: {
@@ -33,9 +32,9 @@ export default {
   data() {
     return {
       isLoadingCodequality: false,
-      isLoadingPerformance: false,
+      isLoadingBrowserPerformance: false,
       loadingCodequalityFailed: false,
-      loadingPerformanceFailed: false,
+      loadingBrowserPerformanceFailed: false,
       loadingLicenseReportFailed: false,
     };
   },
@@ -59,36 +58,36 @@ export default {
             this.mr.codeclimateMetrics.resolvedIssues.length > 0))
       );
     },
-    hasPerformanceMetrics() {
+    hasBrowserPerformanceMetrics() {
       return (
-        this.mr.performanceMetrics &&
-        ((this.mr.performanceMetrics.degraded && this.mr.performanceMetrics.degraded.length > 0) ||
-          (this.mr.performanceMetrics.improved && this.mr.performanceMetrics.improved.length > 0))
+        this.mr.browserPerformanceMetrics?.degraded?.length > 0 ||
+        this.mr.browserPerformanceMetrics?.improved?.length > 0 ||
+        this.mr.browserPerformanceMetrics?.same?.length > 0
       );
     },
-    hasPerformancePaths() {
-      const { performance } = this.mr || {};
+    hasBrowserPerformancePaths() {
+      const browserPerformance = this.mr?.browserPerformance || {};
 
-      return Boolean(performance?.head_path && performance?.base_path);
+      return Boolean(browserPerformance?.head_path && browserPerformance?.base_path);
     },
-    degradedTotalScore() {
-      return this.mr?.performanceMetrics?.degraded.find(
-        metric => metric.name === TOTAL_SCORE_METRIC_NAME,
+    degradedBrowserPerformanceTotalScore() {
+      return this.mr?.browserPerformanceMetrics?.degraded.find(
+        metric => metric.name === __('Total Score'),
       );
     },
-    hasPerformanceDegradation() {
-      const threshold = this.mr?.performance?.degradation_threshold || 0;
+    hasBrowserPerformanceDegradation() {
+      const threshold = this.mr?.browserPerformance?.degradation_threshold || 0;
 
       if (!threshold) {
         return true;
       }
 
-      const totalScoreDelta = this.degradedTotalScore?.delta || 0;
+      const totalScoreDelta = this.degradedBrowserPerformanceTotalScore?.delta || 0;
 
       return threshold + totalScoreDelta <= 0;
     },
-    shouldRenderPerformance() {
-      return this.hasPerformancePaths && this.hasPerformanceDegradation;
+    shouldRenderBrowserPerformance() {
+      return this.hasBrowserPerformancePaths && this.hasBrowserPerformanceDegradation;
     },
     shouldRenderSecurityReport() {
       const { enabledReports } = this.mr;
@@ -139,37 +138,40 @@ export default {
       return {};
     },
 
-    performanceText() {
-      const { improved, degraded } = this.mr.performanceMetrics;
+    browserPerformanceText() {
+      const { improved, degraded, same } = this.mr.browserPerformanceMetrics;
       const text = [];
+      const reportNumbers = [];
 
-      if (!improved.length && !degraded.length) {
-        text.push(s__('ciReport|No changes to performance metrics'));
-      } else if (improved.length || degraded.length) {
-        text.push(s__('ciReport|Performance metrics'));
+      if (improved.length || degraded.length || same.length) {
+        text.push(s__('ciReport|Browser performance test metrics: '));
 
-        if (improved.length) {
-          text.push(n__(' improved on %d point', ' improved on %d points', improved.length));
-        }
-
-        if (improved.length > 0 && degraded.length > 0) {
-          text.push(__(' and'));
-        }
-
-        if (degraded.length) {
-          text.push(n__(' degraded on %d point', ' degraded on %d points', degraded.length));
-        }
+        if (degraded.length > 0)
+          reportNumbers.push(
+            sprintf(s__('ciReport|%{degradedNum} degraded'), { degradedNum: degraded.length }),
+          );
+        if (same.length > 0)
+          reportNumbers.push(sprintf(s__('ciReport|%{sameNum} same'), { sameNum: same.length }));
+        if (improved.length > 0)
+          reportNumbers.push(
+            sprintf(s__('ciReport|%{improvedNum} improved'), { improvedNum: improved.length }),
+          );
+      } else {
+        text.push(s__('ciReport|Browser performance test metrics: No changes'));
       }
 
-      return text.join('');
+      return [...text, ...reportNumbers.join(', ')].join('');
     },
 
     codequalityStatus() {
       return this.checkReportStatus(this.isLoadingCodequality, this.loadingCodequalityFailed);
     },
 
-    performanceStatus() {
-      return this.checkReportStatus(this.isLoadingPerformance, this.loadingPerformanceFailed);
+    browserPerformanceStatus() {
+      return this.checkReportStatus(
+        this.isLoadingBrowserPerformance,
+        this.loadingBrowserPerformanceFailed,
+      );
     },
 
     shouldRenderMergeTrainHelperText() {
@@ -191,9 +193,9 @@ export default {
         this.fetchCodeQuality();
       }
     },
-    hasPerformancePaths(newVal) {
+    hasBrowserPerformancePaths(newVal) {
       if (newVal) {
-        this.fetchPerformance();
+        this.fetchBrowserPerformance();
       }
     },
   },
@@ -241,19 +243,20 @@ export default {
         });
     },
 
-    fetchPerformance() {
-      const { head_path, base_path } = this.mr.performance;
+    fetchBrowserPerformance() {
+      const { head_path, base_path } = this.mr.browserPerformance;
 
-      this.isLoadingPerformance = true;
+      this.isLoadingBrowserPerformance = true;
 
       Promise.all([this.service.fetchReport(head_path), this.service.fetchReport(base_path)])
         .then(values => {
-          this.mr.comparePerformanceMetrics(values[0], values[1]);
-          this.isLoadingPerformance = false;
+          this.mr.compareBrowserPerformanceMetrics(values[0], values[1]);
         })
         .catch(() => {
-          this.isLoadingPerformance = false;
-          this.loadingPerformanceFailed = true;
+          this.loadingBrowserPerformanceFailed = true;
+        })
+        .finally(() => {
+          this.isLoadingBrowserPerformance = false;
         });
     },
 
@@ -308,16 +311,17 @@ export default {
         class="js-codequality-widget mr-widget-border-top mr-report"
       />
       <report-section
-        v-if="shouldRenderPerformance"
-        :status="performanceStatus"
-        :loading-text="translateText('performance').loading"
-        :error-text="translateText('performance').error"
-        :success-text="performanceText"
-        :unresolved-issues="mr.performanceMetrics.degraded"
-        :resolved-issues="mr.performanceMetrics.improved"
-        :has-issues="hasPerformanceMetrics"
+        v-if="shouldRenderBrowserPerformance"
+        :status="browserPerformanceStatus"
+        :loading-text="translateText('browser-performance').loading"
+        :error-text="translateText('browser-performance').error"
+        :success-text="browserPerformanceText"
+        :unresolved-issues="mr.browserPerformanceMetrics.degraded"
+        :resolved-issues="mr.browserPerformanceMetrics.improved"
+        :neutral-issues="mr.browserPerformanceMetrics.same"
+        :has-issues="hasBrowserPerformanceMetrics"
         :component="$options.componentNames.PerformanceIssueBody"
-        class="js-performance-widget mr-widget-border-top mr-report"
+        class="js-browser-performance-widget mr-widget-border-top mr-report"
       />
       <grouped-metrics-reports-app
         v-if="mr.metricsReportsPath"
