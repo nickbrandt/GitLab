@@ -4,6 +4,8 @@ import $ from 'jquery';
 import '~/gl_dropdown';
 import initSearchAutocomplete from '~/search_autocomplete';
 import '~/lib/utils/common_utils';
+import axios from '~/lib/utils/axios_utils';
+import AxiosMockAdapter from 'axios-mock-adapter';
 
 describe('Search autocomplete dropdown', () => {
   let widget = null;
@@ -16,6 +18,7 @@ describe('Search autocomplete dropdown', () => {
   const projectMRsPath = '/gitlab-org/gitlab-foss/-/merge_requests';
   const groupIssuesPath = '/groups/gitlab-org/-/issues';
   const groupMRsPath = '/groups/gitlab-org/-/merge_requests';
+  const autocompletePath = '/search/autocomplete';
   const projectName = 'GitLab Community Edition';
   const groupName = 'Gitlab Org';
 
@@ -111,7 +114,7 @@ describe('Search autocomplete dropdown', () => {
     window.gon.current_user_id = userId;
     window.gon.current_username = userName;
 
-    return (widget = initSearchAutocomplete());
+    return (widget = initSearchAutocomplete({ autocompletePath }));
   });
 
   afterEach(() => {
@@ -179,6 +182,79 @@ describe('Search autocomplete dropdown', () => {
     // browsers will not trigger default behavior (form submit, in this
     // example) on JavaScript-created keypresses.
     expect(submitSpy).not.toHaveBeenCalled();
+  });
+
+  describe('show autocomplete results', () => {
+    beforeEach(() => {
+      widget.enableAutocomplete();
+
+      const axiosMock = new AxiosMockAdapter(axios);
+      const autocompleteUrl = new RegExp(autocompletePath);
+
+      axiosMock.onGet(autocompleteUrl).reply(200, [
+        {
+          category: 'Projects',
+          id: 1,
+          value: 'Gitlab Test',
+          label: 'Gitlab Org / Gitlab Test',
+          url: '/gitlab-org/gitlab-test',
+          avatar_url: '',
+        },
+        {
+          category: 'Groups',
+          id: 1,
+          value: 'Gitlab Org',
+          label: 'Gitlab Org',
+          url: '/gitlab-org',
+          avatar_url: '',
+        },
+      ]);
+    });
+
+    function triggerAutocomplete() {
+      return new Promise(resolve => {
+        const dropdown = widget.searchInput.data('glDropdown');
+        const filterCallback = dropdown.filter.options.callback;
+        dropdown.filter.options.callback = jest.fn(data => {
+          filterCallback(data);
+
+          resolve();
+        });
+
+        widget.searchInput.val('Gitlab');
+        widget.searchInput.triggerHandler('input');
+      });
+    }
+
+    it('suggest Projects', done => {
+      // eslint-disable-next-line promise/catch-or-return
+      triggerAutocomplete().finally(() => {
+        const list = widget.wrap.find('.dropdown-menu').find('ul');
+        const link = "a[href$='/gitlab-org/gitlab-test']";
+
+        expect(list.find(link).length).toBe(1);
+
+        done();
+      });
+
+      // Make sure jest properly acknowledge the `done` invocation
+      jest.runOnlyPendingTimers();
+    });
+
+    it('suggest Groups', done => {
+      // eslint-disable-next-line promise/catch-or-return
+      triggerAutocomplete().finally(() => {
+        const list = widget.wrap.find('.dropdown-menu').find('ul');
+        const link = "a[href$='/gitlab-org']";
+
+        expect(list.find(link).length).toBe(1);
+
+        done();
+      });
+
+      // Make sure jest properly acknowledge the `done` invocation
+      jest.runOnlyPendingTimers();
+    });
   });
 
   describe('disableAutocomplete', () => {
