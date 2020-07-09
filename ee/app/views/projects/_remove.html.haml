@@ -1,9 +1,16 @@
 - return unless can?(current_user, :remove_project, project)
+- adjourned_deletion = project.adjourned_deletion?
 
 - unless project.marked_for_deletion?
   .sub-section
     %h4.danger-title= _('Remove project')
-    = render 'projects/settings/marked_for_removal'
+    %p
+      %strong= s_('Delayed Project Deletion (%{adjourned_deletion})') % { adjourned_deletion: adjourned_deletion ? 'Enabled' : 'Disabled' }
+    - if adjourned_deletion
+      = render 'projects/settings/marked_for_removal'
+    - else
+      %p
+        = _("Removing a project deletes it immediately, there will be no delay before the project is permanently removed.")
     %p
       %strong= _('Removing the project will delete its repository and all related resources including issues, merge requests etc.')
     = form_tag(project_path(project), method: :delete) do

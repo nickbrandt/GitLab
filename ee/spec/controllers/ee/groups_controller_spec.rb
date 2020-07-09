@@ -512,8 +512,7 @@ RSpec.describe GroupsController do
       before do
         group.add_owner(user)
         sign_in(user)
-        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
-        stub_feature_flags(configure_project_deletion_mode: available)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: available)
       end
 
       context 'when feature is available' do

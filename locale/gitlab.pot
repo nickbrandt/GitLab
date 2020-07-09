@@ -7500,6 +7500,9 @@ msgstr ""
 msgid "Define environments in the deploy stage(s) in <code>.gitlab-ci.yml</code> to track deployments here."
 msgstr ""
 
+msgid "Delayed Project Deletion (%{adjourned_deletion})"
+msgstr ""
+
 msgid "DelayedJobs|Are you sure you want to run %{jobName} immediately? Otherwise this job will run automatically after it's timer finishes."
 msgstr ""
 
@@ -19510,10 +19513,13 @@ msgstr ""
 msgid "Removes time estimate."
 msgstr ""
 
-msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanantly removed. Are you ABSOLUTELY sure?"
+msgid "Removing a project deletes it immediately, there will be no delay before the project is permanently removed."
 msgstr ""
 
 msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed."
+msgstr ""
+
+msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed. Are you ABSOLUTELY sure?"
 msgstr ""
 
 msgid "Removing license…"

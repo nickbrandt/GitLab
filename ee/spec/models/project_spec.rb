@@ -2461,18 +2461,6 @@ RSpec.describe Project do
       it { is_expected.to be result }
     end
 
-    context 'when configure_project_deletion_mode feature is disabled' do
-      before do
-        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
-        stub_application_setting(deletion_adjourned_period: 7)
-        stub_feature_flags(configure_project_deletion_mode: false)
-      end
-
-      it 'adjourns deletion' do
-        is_expected.to be true
-      end
-    end
-
     context 'when project belongs to user namespace' do
       let_it_be(:user) { create(:user) }
       let_it_be(:user_project) { create(:project, namespace: user.namespace) }
@@ -2480,23 +2468,10 @@ RSpec.describe Project do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
         stub_application_setting(deletion_adjourned_period: 7)
-        stub_feature_flags(configure_project_deletion_mode: feature_enabled?)
       end
 
-      context 'configure_project_deletion_mode is enabled' do
-        let(:feature_enabled?) { true }
-
-        it 'deletes immediately' do
-          expect(user_project.adjourned_deletion?).to be nil
-        end
-      end
-
-      context 'configure_project_deletion_mode is disabled' do
-        let(:feature_enabled?) { false }
-
-        it 'adjourns deletion' do
-          expect(user_project.adjourned_deletion?).to be true
-        end
+      it 'deletes immediately' do
+        expect(user_project.adjourned_deletion?).to be nil
       end
     end
   end
