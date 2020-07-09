@@ -49,9 +49,7 @@ module Gitlab
         keys = (date_from.to_date..date_to.to_date).map { |date| key(event_action, date) }
 
         Gitlab::Redis::SharedState.with do |redis|
-          Gitlab::Instrumentation::RedisClusterValidator.allow_cross_slot_commands do
-            redis.pfcount(*keys)
-          end
+          redis.pfcount(*keys)
         end
       end
 
@@ -75,7 +73,7 @@ module Gitlab
 
       def key(event_action, date)
         year_day = date.strftime('%G-%j')
-        "#{event_action}-#{year_day}"
+        "{#{event_action}}-#{year_day}"
       end
 
       def add_event(event_action, author_id, date)

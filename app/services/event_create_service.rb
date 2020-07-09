@@ -176,14 +176,18 @@ class EventCreateService
       action = Event.actions[status]
       raise IllegalActionError, "#{status} is not a valid status" if action.nil?
 
-      Gitlab::UsageDataCounters::TrackUniqueActions.track_action(event_action: status, event_target: record.class, author_id: current_user.id)
-
       parent_attrs(record.resource_parent)
         .merge(base_attrs)
         .merge(action: action, target_id: record.id, target_type: record.class.name)
     end
 
-    Event.insert_all(attribute_sets, returning: %w[id])
+    result = Event.insert_all(attribute_sets, returning: %w[id])
+
+    pairs.each do |record, status|
+      Gitlab::UsageDataCounters::TrackUniqueActions.track_action(event_action: status, event_target: record.class, author_id: current_user.id)
+    end
+
+    result
   end
 
   def create_push_event(service_class, project, current_user, push_data)
