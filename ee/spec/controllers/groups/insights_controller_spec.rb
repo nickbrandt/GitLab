@@ -157,6 +157,14 @@ RSpec.describe Groups::InsightsController do
         end
       end
 
+      shared_examples 'not the embedded page' do
+        it 'does not render the embedded page' do
+          subject
+
+          expect(response).to_not render_template(:embedded)
+        end
+      end
+
       context 'when feature is disabled' do
         before do
           stub_feature_flags(embed_analytics_report: false)
@@ -164,6 +172,7 @@ RSpec.describe Groups::InsightsController do
 
         it_behaves_like '404 status'
         include_examples 'has iframe options set'
+        include_examples 'not the embedded page'
       end
 
       context 'when project is public' do
@@ -172,6 +181,12 @@ RSpec.describe Groups::InsightsController do
 
         it_behaves_like '200 status'
         include_examples 'has iframe options set'
+
+        it 'renders embedded template' do
+          subject
+
+          expect(response).to render_template(:embedded)
+        end
       end
 
       context 'when project is internal' do
@@ -180,11 +195,13 @@ RSpec.describe Groups::InsightsController do
 
         it_behaves_like '404 status'
         include_examples 'has iframe options set'
+        include_examples 'not the embedded page'
       end
 
       context 'when project is private' do
         it_behaves_like '404 status'
         include_examples 'has iframe options set'
+        include_examples 'not the embedded page'
       end
     end
   end
