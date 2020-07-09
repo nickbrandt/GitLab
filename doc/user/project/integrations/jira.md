@@ -212,3 +212,46 @@ which may lead to a `401 unauthorized` error when testing your Jira integration.
 If CAPTCHA has been triggered, you will not be able to use Jira's REST API to
 authenticate with the Jira site. You will need to log in to your Jira instance
 and complete the CAPTCHA.
+
+## Extending Jira Integration
+
+Jira integration is extending and brings Jira issues listing into GitLab, so now you do not have
+to leave GitLab to work with your Jira issues.
+
+In order to enable Jira issues listing in GitLab, the project owner has to enable Jira issues in
+Jira Integration configuration and select the Jira project key for which issues are going to be fetched.
+
+![Jira issues integration enabled](img/jira/jira-issues-enabled.png)
+
+### Jira Issues Navigation
+
+Once Jira issues integration is enabled, you should be able to navigate to your jiraa issues from GitLab sidebar menu.
+A `Jira Issues` menu should be available with option to list the issues or navigate to Jira instance.
+
+![Jira issues sidebar navigation on mouse over](img/jira/jira_issues_sidebar_menu_on_hover.png)
+
+### Jira Issues List
+
+The list of issues fetched from Jira is sorted by default descendingly by created date. No filtering is applied by
+default.
+
+To refine the list of issues, the search bar can be used to search Jira issues by text
+cotained in issue summary(title) or description. Also, for the MVC, filtering by `labels`, `status`, `reporter`
+and `assignee` is available through URL parameters. Extending searchbar functionality with above filtering capabilities
+(by `labels`, `status`, `reporter` and `assignee`) will be coming as one of upcoming iteration.
+
+#### Refining Jira Issue List with search and filtering
+
+- To search for issues that contain a specific text, simply enter the text in the searchbar and click `search` button.
+
+- To filter list of issues by `labels`, you will need to specify the label as part of the `labels[]`
+parameter in the URL. You can filter issues by multiple labels. Only issues that cotain all specified
+labels will be listed. e.g. `/-/integrations/jira/issues?labels[]=backend&labels[]=feature&labels[]=QA`
+
+- To filter list of issues by `status`, specify the `status` parameter in the URL. e.g. `/-/integrations/jira/issues?status=In Progress`
+
+- To filter list of issues by `reporter`, specify reporter's Jira display name for the
+`author_username` parameter in the URL. e.g. `/-/integrations/jira/issues?author_username=John Smith`
+
+- To filter list of issues by `assignee`, specify assignee's Jira display name for the
+`assigeee_username` parameter in the URL. e.g. `/-/integrations/jira/issues?assigeee_username=John Smith`
