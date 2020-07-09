@@ -50,14 +50,7 @@ class Import::FogbugzController < Import::BaseController
       return redirect_to new_import_fogbugz_path
     end
 
-    return super if Feature.enabled?(:new_import_ui)
-
-    @repos = client.repos
-
-    @already_added_projects = find_already_added_projects('fogbugz')
-    already_added_projects_names = @already_added_projects.pluck(:import_source)
-
-    @repos.reject! { |repo| already_added_projects_names.include? repo.name }
+    super
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
