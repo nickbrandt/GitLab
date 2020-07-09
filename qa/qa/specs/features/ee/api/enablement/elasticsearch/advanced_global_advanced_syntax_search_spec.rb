@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
+require 'airborne'
 require 'securerandom'
 
 module QA
-  Rspec.describe 'Enablement:Search' do
+  RSpec.describe 'Enablement:Search' do
     describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin do
       let(:project_name_suffix) { SecureRandom.hex(8) }
       let(:api_client) { Runtime::API::Client.new(:gitlab) }

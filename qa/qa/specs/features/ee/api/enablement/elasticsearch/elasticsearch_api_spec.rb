@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
+require 'airborne'
 require 'securerandom'
 
 module QA
-  Rspec.describe 'Enablement:Search' do
+  RSpec.describe 'Enablement:Search' do
     describe 'When using elasticsearch API to search for a known blob', :orchestrated, :elasticsearch, :requires_admin do
       let(:project_file_content) { "elasticsearch: #{SecureRandom.hex(8)}" }
       let(:non_member_user) { Resource::User.fabricate_or_use('non_member_user', 'non_member_user_password') }
