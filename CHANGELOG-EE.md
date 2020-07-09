@@ -19,6 +19,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 - No changes.
 
+## 13.0.10 (2020-07-09)
+
+### Fixed (1 change)
+
+- Geo - Does not sync LFS objects from fork networks. !36202
+
+
 ## 13.0.9 (2020-07-06)
 
 ### Security (1 change)
