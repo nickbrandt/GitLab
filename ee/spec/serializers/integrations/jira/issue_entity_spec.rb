@@ -8,7 +8,7 @@ RSpec.describe Integrations::Jira::IssueEntity do
   let(:reporter) do
     double(
       'displayName' => 'reporter',
-      'name' => double
+      'name' => double # Default to Jira Server issue response, Jira Cloud replaces name with accountId
     )
   end
 

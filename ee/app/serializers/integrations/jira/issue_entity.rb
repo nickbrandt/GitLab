@@ -74,6 +74,8 @@ module Integrations
 
       def author_web_url(jira_issue)
         # There are differences between Jira Cloud and Jira Server URLs and responses.
+        # accountId is only available on Jira Cloud.
+        # https://community.atlassian.com/t5/Jira-Questions/How-to-find-account-id-on-jira-on-premise/qaq-p/1168652
         if jira_issue.reporter.try(:accountId)
           "#{jira_issue.client.options[:site]}people/#{jira_issue.reporter.accountId}"
         else
