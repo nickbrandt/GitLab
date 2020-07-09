@@ -12,6 +12,7 @@ module QA
           element :group_members_item
           element :group_milestones_link
           element :group_settings_item
+          element :wiki_link
         end
 
         view 'app/views/layouts/nav/sidebar/_analytics_links.html.haml' do
@@ -63,6 +64,12 @@ module QA
             find_element(:group_issues_item).hover
 
             yield
+          end
+        end
+
+        def click_wiki
+          within_sidebar do
+            click_element(:wiki_link)
           end
         end
       end

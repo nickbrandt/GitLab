@@ -123,6 +123,20 @@
 
       = render 'layouts/nav/sidebar/analytics_links', links: group_analytics_navbar_links(@group, current_user)
 
+      - if group_sidebar_link?(:wiki)
+        - wiki_url = @group.wiki.web_url
+        = nav_link(controller: :wikis) do
+          = link_to wiki_url, class: 'shortcuts-wiki', data: { qa_selector: 'wiki_link' } do
+            .nav-icon-container
+              = sprite_icon('book')
+            %span.nav-item-name
+              = _('Wiki')
+          %ul.sidebar-sub-level-items.is-fly-out-only
+            = nav_link(controller: :wikis, html_options: { class: "fly-out-top-item" } ) do
+              = link_to wiki_url do
+                %strong.fly-out-top-item-name
+                  = _('Wiki')
+
       - if group_sidebar_link?(:group_members)
         = nav_link(path: 'group_members#index') do
           = link_to group_group_members_path(@group) do
