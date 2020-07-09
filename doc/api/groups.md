@@ -1052,7 +1052,7 @@ POST /groups/:id/ldap_group_links
 | `id`      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
 | `cn`      | string         | no       | The CN of an LDAP group |
 | `filter`  | string         | no       | The LDAP filter for the group |
-| `group_access` | integer   | yes      | Minimum access level for members of the LDAP group |
+| `group_access` | integer   | yes      | Minimum [access level](members.md#valid-access-levels) for members of the LDAP group |
 | `provider` | string        | yes      | LDAP provider for the LDAP group link |
 
 NOTE: **Note:**
