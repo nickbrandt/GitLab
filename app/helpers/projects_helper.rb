@@ -433,6 +433,10 @@ module ProjectsHelper
 
     nav_tabs << external_nav_tabs(project)
 
+    if ::Gitlab.config.packages.enabled && can?(current_user, :read_package, project)
+      nav_tabs << :packages
+    end
+
     nav_tabs.flatten
   end
 
@@ -584,6 +588,7 @@ module ProjectsHelper
   def project_permissions_settings(project)
     feature = project.project_feature
     {
+      packagesEnabled: !!project.packages_enabled,
       visibilityLevel: project.visibility_level,
       requestAccessEnabled: !!project.request_access_enabled,
       issuesAccessLevel: feature.issues_access_level,
@@ -604,6 +609,8 @@ module ProjectsHelper
 
   def project_permissions_panel_data(project)
     {
+      packagesAvailable: ::Gitlab.config.packages.enabled,
+      packagesHelpPath: help_page_path('user/packages/index'),
       currentSettings: project_permissions_settings(project),
       canDisableEmails: can_disable_emails?(project, current_user),
       canChangeVisibilityLevel: can_change_visibility_level?(project, current_user),
