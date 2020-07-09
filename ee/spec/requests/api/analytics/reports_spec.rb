@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe API::Analytics::Reports do
   let_it_be(:user) { create(:user) }
-  let_it_be(:report_id) { 'some_report_id' }
+  let_it_be(:report_id) { 'recent_merge_requests_by_group' }
 
   shared_examples 'error response examples' do
     context 'when `report_pages` feature flag is off' do
@@ -46,7 +46,19 @@ RSpec.describe API::Analytics::Reports do
       api_call
 
       expect(response).to have_gitlab_http_status(:ok)
-      expect(response.parsed_body["id"]).to eq(report_id)
+      expect(response.parsed_body['id']).to eq(report_id)
+      expect(response.parsed_body).to match_schema('analytics/reports/chart', dir: 'ee')
+    end
+
+    context 'when unknown report_id is given' do
+      let(:report_id) { 'unknown_report_id' }
+
+      it 'renders 404, not found' do
+        api_call
+
+        expect(response).to have_gitlab_http_status(:not_found)
+        expect(response.parsed_body['message']).to eq('404 Report(unknown_report_id) Not Found')
+      end
     end
 
     include_examples 'error response examples'
@@ -63,7 +75,7 @@ RSpec.describe API::Analytics::Reports do
       api_call
 
       expect(response).to have_gitlab_http_status(:ok)
-      expect(response.parsed_body["datasets"].size).to eq(1)
+      expect(response.parsed_body['datasets'].size).to eq(1)
     end
 
     include_examples 'error response examples'
