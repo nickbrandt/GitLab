@@ -9,6 +9,7 @@ import SolutionCard from 'ee/vue_shared/security_reports/components/solution_car
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import HistoryEntry from './history_entry.vue';
 import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
+import initUserPopovers from '~/user_popovers';
 
 export default {
   name: 'VulnerabilityFooter',
@@ -68,6 +69,12 @@ export default {
     this.fetchDiscussions();
 
     VulnerabilitiesEventBus.$on('VULNERABILITY_STATE_CHANGE', this.fetchDiscussions);
+  },
+
+  updated() {
+    this.$nextTick(() => {
+      initUserPopovers(this.$el.querySelectorAll('.js-user-link'));
+    });
   },
 
   beforeDestroy() {
