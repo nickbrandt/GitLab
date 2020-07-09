@@ -73,7 +73,6 @@ export default {
     <gl-button
       category="primary"
       variant="success"
-      class="qa-new-epic-button"
       data-toggle="dropdown"
     >
       {{ __('New epic') }}
