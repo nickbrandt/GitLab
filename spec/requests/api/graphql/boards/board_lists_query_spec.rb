@@ -18,112 +18,206 @@ RSpec.describe 'get board lists' do
   let(:board)             { }
   let(:board_parent_type) { board_parent.class.to_s.downcase }
   let(:board_data)        { graphql_data[board_parent_type]['boards']['edges'].first['node'] }
-  let(:lists_data)        { board_data['lists']['edges'] }
-  let(:start_cursor)      { board_data['lists']['pageInfo']['startCursor'] }
-  let(:end_cursor)        { board_data['lists']['pageInfo']['endCursor'] }
 
-  def query(list_params = params)
-    graphql_query_for(
-      board_parent_type,
-      { 'fullPath' => board_parent.full_path },
-      <<~BOARDS
-        boards(first: 1) {
-          edges {
-            node {
-              #{field_with_params('lists', list_params)} {
-                pageInfo {
-                  startCursor
-                  endCursor
-                }
-                edges {
-                  node {
-                    #{all_graphql_fields_for('board_lists'.classify)}
+  context 'multiple lists' do
+    let(:lists_data)        { board_data['lists']['edges'] }
+    let(:start_cursor)      { board_data['lists']['pageInfo']['startCursor'] }
+    let(:end_cursor)        { board_data['lists']['pageInfo']['endCursor'] }
+
+    def lists_query(lists_params = params)
+      graphql_query_for(
+        board_parent_type,
+        { 'fullPath' => board_parent.full_path },
+        <<~BOARDS
+          boards(first: 1) {
+            edges {
+              node {
+                #{field_with_params('lists', lists_params)} {
+                  pageInfo {
+                    startCursor
+                    endCursor
+                  }
+                  edges {
+                    node {
+                      #{all_graphql_fields_for('board_lists'.classify)}
+                    }
                   }
                 }
               }
             }
           }
-        }
-    BOARDS
-    )
-  end
-
-  shared_examples 'group and project board lists query' do
-    let!(:board) { create(:board, resource_parent: board_parent) }
-
-    context 'when the user does not have access to the board' do
-      it 'returns nil' do
-        post_graphql(query, current_user: unauth_user)
-
-        expect(graphql_data[board_parent_type]).to be_nil
-      end
+      BOARDS
+      )
     end
 
-    context 'when user can read the board' do
-      before do
-        board_parent.add_reporter(user)
+    shared_examples 'group and project board lists query' do
+      let!(:board) { create(:board, resource_parent: board_parent) }
+
+      context 'when the user does not have access to the board' do
+        it 'returns nil' do
+          post_graphql(lists_query, current_user: unauth_user)
+
+          expect(graphql_data[board_parent_type]).to be_nil
+        end
       end
 
-      describe 'sorting and pagination' do
-        let_it_be(:current_user) { user }
-        let(:data_path) { [board_parent_type, :boards, :edges, 0, :node, :lists] }
+      context 'when user can read the board' do
+        before do
+          board_parent.add_reporter(user)
+        end
 
-        def pagination_query(params, page_info)
-          graphql_query_for(
-            board_parent_type,
-            { 'fullPath' => board_parent.full_path },
-            <<~BOARDS
-              boards(first: 1) {
-                edges {
-                  node {
-                    #{query_graphql_field('lists', params, "#{page_info} edges { node { id } }")}
+        describe 'sorting and pagination' do
+          let_it_be(:current_user) { user }
+          let(:data_path) { [board_parent_type, :boards, :edges, 0, :node, :lists] }
+
+          def pagination_query(params, page_info)
+            graphql_query_for(
+              board_parent_type,
+              { 'fullPath' => board_parent.full_path },
+              <<~BOARDS
+                boards(first: 1) {
+                  edges {
+                    node {
+                      #{query_graphql_field('lists', params, "#{page_info} edges { node { id } }")}
+                    }
                   }
                 }
-              }
-            BOARDS
-          )
-        end
+              BOARDS
+            )
+          end
 
-        def pagination_results_data(data)
-          data.map { |list| list.dig('node', 'id') }
-        end
+          def pagination_results_data(data)
+            data.map { |list| list.dig('node', 'id') }
+          end
 
-        context 'when using default sorting' do
-          let!(:label_list)   { create(:list, board: board, label: label, position: 10) }
-          let!(:label_list2)  { create(:list, board: board, label: label2, position: 2) }
-          let!(:backlog_list) { create(:backlog_list, board: board) }
-          let(:closed_list)   { board.lists.find_by(list_type: :closed) }
-          let(:lists)         { [backlog_list, label_list2, label_list, closed_list] }
+          context 'when using default sorting' do
+            let!(:label_list)   { create(:list, board: board, label: label, position: 10) }
+            let!(:label_list2)  { create(:list, board: board, label: label2, position: 2) }
+            let!(:backlog_list) { create(:backlog_list, board: board) }
+            let(:closed_list)   { board.lists.find_by(list_type: :closed) }
+            let(:lists)         { [backlog_list, label_list2, label_list, closed_list] }
 
-          context 'when ascending' do
-            it_behaves_like 'sorted paginated query' do
-              let(:sort_param)       { }
-              let(:first_param)      { 2 }
-              let(:expected_results) { lists.map { |list| list.to_global_id.to_s } }
+            context 'when ascending' do
+              it_behaves_like 'sorted paginated query' do
+                let(:sort_param)       { }
+                let(:first_param)      { 2 }
+                let(:expected_results) { lists.map { |list| list.to_global_id.to_s } }
+              end
             end
           end
         end
       end
     end
-  end
 
-  describe 'for a project' do
-    let(:board_parent) { project }
-    let(:label) { project_label }
-    let(:label2) { project_label2 }
+    describe 'for a project' do
+      let(:board_parent) { project }
+      let(:label) { project_label }
+      let(:label2) { project_label2 }
 
-    it_behaves_like 'group and project board lists query'
-  end
-
-  describe 'for a group' do
-    let(:board_parent) { group }
-    let(:label) { group_label }
-    let(:label2) { group_label2 }
-
-    before do
-      allow(board_parent).to receive(:multiple_issue_boards_available?).and_return(false)
+      it_behaves_like 'group and project board lists query'
     end
 
-    it_behaves_like 'group and project board lists query'
+    describe 'for a group' do
+      let(:board_parent) { group }
+      let(:label) { group_label }
+      let(:label2) { group_label2 }
+
+      before do
+        allow(board_parent).to receive(:multiple_issue_boards_available?).and_return(false)
+      end
+
+      it_behaves_like 'group and project board lists query'
+    end
+  end
+
+  context 'single list retrieval' do
+    let!(:board) { create(:board, resource_parent: board_parent) }
+    let!(:list) { create(:list, board: board) }
+    let(:list_id) { list.to_global_id }
+    let(:list_data) { board_data['list'] }
+
+    def list_query(list_params = params)
+      graphql_query_for(
+        board_parent_type,
+        { 'fullPath' => board_parent.full_path },
+        <<~BOARDS
+        boards(first: 1) {
+          edges {
+            node {
+              #{field_with_params('list', list_params)} {
+              #{all_graphql_fields_for('board_lists'.classify)}
+              }
+            }
+          }
+        }
+      BOARDS
+      )
+    end
+
+    shared_examples 'group and project board single list query' do
+      context 'when the user does not have access to the board' do
+        it 'returns nil' do
+          post_graphql(list_query, current_user: unauth_user)
+
+          expect(graphql_data[board_parent_type]).to be_nil
+        end
+      end
+
+      context 'when user can read the board' do
+        before do
+          board_parent.add_reporter(user)
+        end
+
+        let_it_be(:current_user) { user }
+        let(:data_path) { [board_parent_type, :boards, :edges, 0, :node, :list] }
+
+        context 'and the list exists within that board' do
+          let(:params) { "id: \"#{list.to_global_id}\"" }
+
+          it 'returns the list' do
+            post_graphql(list_query, current_user: current_user)
+
+            expect(list_data['id']).to eq list_id.to_s
+          end
+        end
+
+        context 'and the list does not exist within that board' do
+          let!(:other_list) { create(:list, label: label, position: 10) }
+          let(:params) { "id: \"#{other_list.to_global_id}\"" }
+
+          it 'returns nil' do
+            post_graphql(list_query, current_user: current_user)
+
+            expect(list_data).to be_nil
+          end
+        end
+
+        context 'and the list does not exist at all' do
+          let(:params) { 'id: "nonsense"' }
+
+          it 'returns nil' do
+            post_graphql(list_query, current_user: current_user)
+
+            expect(list_data).to be_nil
+          end
+        end
+      end
+    end
+
+    describe 'for a project' do
+      let(:board_parent) { project }
+      let(:label) { project_label }
+      let(:label2) { project_label2 }
+
+      it_behaves_like 'group and project board single list query'
+    end
+
+    describe 'for a group' do
+      let(:board_parent) { group }
+      let(:label) { group_label }
+      let(:label2) { group_label2 }
+
+      it_behaves_like 'group and project board single list query'
+    end
   end
 end

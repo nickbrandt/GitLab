@@ -938,6 +938,16 @@ type Board {
   id: ID!
 
   """
+  A single list of the project board
+  """
+  list(
+    """
+    Find a board list by ID
+    """
+    id: ID
+  ): BoardList
+
+  """
   Lists of the board
   """
   lists(
@@ -955,6 +965,11 @@ type Board {
     Returns the first _n_ elements from the list.
     """
     first: Int
+
+    """
+    Find a board list by ID
+    """
+    id: ID
 
     """
     Returns the last _n_ elements from the list.

@@ -188,6 +188,7 @@ Represents a project or group board
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! | ID (global ID) of the board |
+| `list` | BoardList | A single list of the project board |
 | `name` | String | Name of the board |
 | `weight` | Int | Weight of the board |
 

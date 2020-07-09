@@ -2505,9 +2505,42 @@
               "deprecationReason": null
             },
             {
+              "name": "list",
+              "description": "A single list of the project board",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Find a board list by ID",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "BoardList",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "lists",
               "description": "Lists of the board",
               "args": [
+                {
+                  "name": "id",
+                  "description": "Find a board list by ID",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
                 {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",

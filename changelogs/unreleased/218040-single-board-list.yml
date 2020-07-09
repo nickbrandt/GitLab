@@ -1,0 +1,5 @@
+---
+title: Allow single board list retrieval via GraphQL
+merge_request: 36439
+author:
+type: added

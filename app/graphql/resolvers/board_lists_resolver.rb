@@ -8,7 +8,12 @@ module Resolvers
 
     alias_method :board, :object
 
-    def resolve(lookahead: nil)
+    argument :id,
+             GraphQL::ID_TYPE,
+             required: false,
+             description: 'Find a board list by ID'
+
+    def resolve(id: nil, lookahead: nil)
       authorize!(board)
 
       lists = board_lists
@@ -17,7 +22,15 @@ module Resolvers
         List.preload_preferences_for_user(lists, context[:current_user])
       end
 
-      Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection.new(lists)
+      if id
+        # rubocop: disable CodeReuse/ActiveRecord
+        lists.find(extract_list_id(id))
+        # rubocop: enable CodeReuse/ActiveRecord
+      else
+        Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection.new(lists)
+      end
+    rescue ActiveRecord::RecordNotFound
+      nil
     end
 
     private
@@ -25,6 +38,12 @@ module Resolvers
     def board_lists
       service = Boards::Lists::ListService.new(board.resource_parent, context[:current_user])
       service.execute(board, create_default_lists: false)
+    end
+
+    def extract_list_id(gid)
+      return unless gid.present?
+
+      GitlabSchema.parse_gid(gid, expected_type: ::List).model_id
     end
 
     def authorized_resource?(board)

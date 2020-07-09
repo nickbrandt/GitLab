@@ -18,6 +18,12 @@ module Types
           description: 'Lists of the board',
           resolver: Resolvers::BoardListsResolver,
           extras: [:lookahead]
+
+    field :list,
+          Types::BoardListType,
+          null: true,
+          description: 'A single list of the project board',
+          resolver: Resolvers::BoardListsResolver
   end
 end
 
