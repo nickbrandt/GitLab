@@ -85,21 +85,41 @@ RSpec.describe IssueLink do
     end
   end
 
-  describe '.blocking_issues_for_collection' do
-    it 'returns blocking issues count grouped by issue id' do
-      issue_1 = create(:issue)
-      issue_2 = create(:issue)
-      issue_3 = create(:issue)
-      blocking_issue_1 = create(:issue, project: issue_1.project)
-      blocking_issue_2 = create(:issue, project: issue_2.project)
-      create(:issue_link, source: blocking_issue_1, target: issue_1, link_type: IssueLink::TYPE_BLOCKS)
-      create(:issue_link, source: issue_2, target: blocking_issue_1, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
-      create(:issue_link, source: blocking_issue_2, target: issue_3, link_type: IssueLink::TYPE_BLOCKS)
+  describe 'collections' do
+    let_it_be(:blocked_issue_1) { create(:issue) }
+    let_it_be(:project) { blocked_issue_1.project }
+    let_it_be(:blocked_issue_2) { create(:issue, project: project) }
+    let_it_be(:blocked_issue_3) { create(:issue, project: project) }
+    let_it_be(:blocking_issue_1) { create(:issue, project: project) }
+    let_it_be(:blocking_issue_2) { create(:issue, project: project) }
 
-      results = described_class.blocking_issues_for_collection([blocking_issue_1, blocking_issue_2])
-
-      expect(results.find { |link| link.blocking_issue_id == blocking_issue_1.id }.count).to eq(2)
-      expect(results.find { |link| link.blocking_issue_id == blocking_issue_2.id }.count).to eq(1)
+    before :all do
+      create(:issue_link, source: blocking_issue_1, target: blocked_issue_1, link_type: IssueLink::TYPE_BLOCKS)
+      create(:issue_link, source: blocked_issue_2, target: blocking_issue_1, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+      create(:issue_link, source: blocking_issue_2, target: blocked_issue_3, link_type: IssueLink::TYPE_BLOCKS)
     end
+
+    describe '.blocking_issues_for_collection' do
+      it 'returns blocking issues count grouped by issue id' do
+        results = described_class.blocking_issues_for_collection([blocking_issue_1, blocking_issue_2])
+
+        expect(results.find { |link| link.blocking_issue_id == blocking_issue_1.id }.count).to eq(2)
+        expect(results.find { |link| link.blocking_issue_id == blocking_issue_2.id }.count).to eq(1)
+      end
+    end
+
+    describe '.blocked_issues_for_collection' do
+      it 'returns blocked issues count grouped by issue id' do
+        results = described_class.blocked_issues_for_collection([blocked_issue_1, blocked_issue_2, blocked_issue_3])
+
+        expect(result_by(results, blocked_issue_1.id).count).to eq(1)
+        expect(result_by(results, blocked_issue_2.id).count).to eq(1)
+        expect(result_by(results, blocked_issue_3.id).count).to eq(1)
+      end
+    end
+  end
+
+  def result_by(results, id)
+    results.find { |link| link.blocked_issue_id == id }
   end
 end
