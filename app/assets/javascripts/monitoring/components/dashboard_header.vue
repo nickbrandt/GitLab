@@ -136,6 +136,9 @@ export default {
     shouldShowEmptyState() {
       return Boolean(this.emptyState);
     },
+    shouldShowEmptyState() {
+      return Boolean(this.emptyState);
+    },
     shouldShowEnvironmentsDropdownNoMatchedMsg() {
       return !this.environmentsLoading && this.filteredEnvironments.length === 0;
     },
