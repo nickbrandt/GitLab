@@ -355,4 +355,9 @@ export default {
     const url = Api.buildUrl(this.applicationSettingsPath);
     return axios.get(url);
   },
+
+  updateApplicationSettings(data) {
+    const url = Api.buildUrl(this.applicationSettingsPath);
+    return axios.put(url, data);
+  },
 };
