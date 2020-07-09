@@ -27,6 +27,10 @@ export default {
       type: Object,
       required: true,
     },
+    milestonePath: {
+      type: String,
+      required: true,
+    },
     labelsPath: {
       type: String,
       required: true,
@@ -102,8 +106,7 @@ export default {
     <div v-if="!collapseScope || expanded">
       <board-milestone-select
         :board="board"
-        :group-id="groupId"
-        :project-id="projectId"
+        :milestone-path="milestonePath"
         :can-edit="canAdminBoard"
       />
 

@@ -15,15 +15,9 @@ export default {
       type: Object,
       required: true,
     },
-    groupId: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    projectId: {
-      type: Number,
-      required: false,
-      default: 0,
+    milestonePath: {
+      type: String,
+      required: true,
     },
     canEdit: {
       type: Boolean,
@@ -90,8 +84,7 @@ export default {
         <button
           ref="dropdownButton"
           :data-selected="selected"
-          :data-project-id="projectId"
-          :data-group-id="groupId"
+          :data-milestones="milestonePath"
           :data-show-no="true"
           :data-show-any="true"
           :data-show-started="true"
