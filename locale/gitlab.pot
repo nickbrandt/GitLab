@@ -6255,6 +6255,9 @@ msgstr ""
 msgid "ContainerRegistry|Delete selected"
 msgstr ""
 
+msgid "ContainerRegistry|Deletion disabled due to missing or insufficient permissions."
+msgstr ""
+
 msgid "ContainerRegistry|Digest: %{imageId}"
 msgstr ""
 
