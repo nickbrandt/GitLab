@@ -54,44 +54,7 @@ module IncidentManagement
       end
 
       def issue_description
-        markdown_line_break = '  '
-
-        <<~MARKDOWN.chomp
-          **Incident:** #{markdown_incident}#{markdown_line_break}
-          **Incident number:** #{incident_payload['incident_number']}#{markdown_line_break}
-          **Urgency:** #{incident_payload['urgency']}#{markdown_line_break}
-          **Status:** #{incident_payload['status']}#{markdown_line_break}
-          **Incident key:** #{incident_payload['incident_key']}#{markdown_line_break}
-          **Created at:** #{markdown_incident_created_at}#{markdown_line_break}
-          **Assignees:** #{markdown_assignees.join(', ')}#{markdown_line_break}
-          **Impacted services:** #{markdown_impacted_services.join(', ')}
-        MARKDOWN
-      end
-
-      def markdown_incident
-        "[#{incident_payload['title']}](#{incident_payload['url']})"
-      end
-
-      def incident_created_at
-        Time.parse(incident_payload['created_at'])
-      rescue
-        Time.current
-      end
-
-      def markdown_incident_created_at
-        incident_created_at.strftime('%d %B %Y, %-l:%M%p (%Z)')
-      end
-
-      def markdown_assignees
-        Array(incident_payload['assignees']).map do |assignee|
-          "[#{assignee['summary']}](#{assignee['url']})"
-        end
-      end
-
-      def markdown_impacted_services
-        Array(incident_payload['impacted_services']).map do |is|
-          "[#{is['summary']}](#{is['url']})"
-        end
+        Gitlab::IncidentManagement::PagerDuty::IncidentIssueDescription.new(incident_payload).to_s
       end
 
       def success(issue)
