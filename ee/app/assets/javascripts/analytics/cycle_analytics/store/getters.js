@@ -9,6 +9,9 @@ export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDE
 export const currentGroupPath = ({ selectedGroup }) =>
   selectedGroup && selectedGroup.fullPath ? selectedGroup.fullPath : null;
 
+export const currentGroupParentPath = ({ selectedGroup }, getters) =>
+  selectedGroup?.parentId || getters.currentGroupPath;
+
 export const selectedProjectIds = ({ selectedProjects }) =>
   selectedProjects.length ? selectedProjects.map(({ id }) => id) : [];
 
