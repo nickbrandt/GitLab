@@ -163,50 +163,60 @@ describe('Report section', () => {
           .catch(done.fail);
       });
 
-      it('does emit an event on issue toggle if the shouldEmitToggleEvent prop does exist', done => {
-        createComponent({ hasIssues: true, shouldEmitToggleEvent: true });
-
-        expect(wrapper.emitted().toggleEvent).toBeUndefined();
-
-        wrapper.vm.$el.querySelector('button').click();
-        return wrapper.vm
-          .$nextTick()
-          .then(() => {
-            expect(wrapper.emitted().toggleEvent).toHaveLength(1);
-          })
-          .then(done)
-          .catch(done.fail);
-      });
-
-      it('does not emit an event on issue toggle if the shouldEmitToggleEvent prop does not exist', done => {
-        createComponent({ hasIssues: true });
-
-        expect(wrapper.emitted().toggleEvent).toBeUndefined();
-
-        wrapper.vm.$el.querySelector('button').click();
-        return wrapper.vm
-          .$nextTick()
-          .then(() => {
-            expect(wrapper.emitted().toggleEvent).toBeUndefined();
-          })
-          .then(done)
-          .catch(done.fail);
-      });
-
       it('is always expanded, if always-open is set to true', done => {
-        createComponent({ alwaysOpen: true, hasIssues: true, shouldEmitToggleEvent: true });
-
+        vm.alwaysOpen = true;
         Vue.nextTick()
           .then(() => {
-            expect(wrapper.vm.$el.querySelector('.js-report-section-container')).not.toHaveCss(
-              hiddenCss,
-            );
-            expect(wrapper.vm.$el.querySelector('button')).toBeNull();
-            expect(wrapper.emitted().toggleEvent).toBeUndefined();
+            expect(vm.$el.querySelector('.js-report-section-container')).not.toHaveCss(hiddenCss);
+            expect(vm.$el.querySelector('button')).toBeNull();
           })
           .then(done)
           .catch(done.fail);
       });
+    });
+  });
+
+  describe('snowplow events', () => {
+    it('does emit an event on issue toggle if the shouldEmitToggleEvent prop does exist', done => {
+      createComponent({ hasIssues: true, shouldEmitToggleEvent: true });
+
+      expect(wrapper.emitted().toggleEvent).toBeUndefined();
+
+      wrapper.vm.$el.querySelector('button').click();
+      return wrapper.vm
+        .$nextTick()
+        .then(() => {
+          expect(wrapper.emitted().toggleEvent).toHaveLength(1);
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('does not emit an event on issue toggle if the shouldEmitToggleEvent prop does not exist', done => {
+      createComponent({ hasIssues: true });
+
+      expect(wrapper.emitted().toggleEvent).toBeUndefined();
+
+      wrapper.vm.$el.querySelector('button').click();
+      return wrapper.vm
+        .$nextTick()
+        .then(() => {
+          expect(wrapper.emitted().toggleEvent).toBeUndefined();
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('does not emit an event if always-open is set to true', done => {
+      createComponent({ alwaysOpen: true, hasIssues: true, shouldEmitToggleEvent: true });
+
+      wrapper.vm
+        .$nextTick()
+        .then(() => {
+          expect(wrapper.emitted().toggleEvent).toBeUndefined();
+        })
+        .then(done)
+        .catch(done.fail);
     });
   });
 
