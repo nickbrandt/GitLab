@@ -21,18 +21,18 @@ following the [2,000-user reference architecture](2k_users.md).
 
 | Service                                                      | Nodes | Configuration                   | GCP             | AWS                     | Azure          |
 |--------------------------------------------------------------|-------|---------------------------------|-----------------|-------------------------|----------------|
-| External load balancing node                                 | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
-| Redis                                                        | 3     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | D2s v3         |
-| Consul + Sentinel                                            | 3     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
-| PostgreSQL                                                   | 3     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | D2s v3         |
-| PgBouncer                                                    | 3     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
-| Internal load balancing node                                 | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
-| Gitaly                                                       | 2 minimum     | 4 vCPU, 15GB Memory             | `n1-standard-4` | `m5.xlarge`             | D4s v3         |
-| Sidekiq                                                      | 4     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | D2s v3         |
-| GitLab Rails                                                 | 3     | 8 vCPU, 7.2GB Memory            | `n1-highcpu-8`  | `c5.2xlarge`            | F8s v2         |
-| Monitoring node                                              | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | F2s v2         |
+| External load balancing node                                 | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | `F2s v2`       |
+| Redis                                                        | 3     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | `D2s v3`       |
+| Consul + Sentinel                                            | 3     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | `F2s v2`       |
+| PostgreSQL                                                   | 3     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | `D2s v3`       |
+| PgBouncer                                                    | 3     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | `F2s v2`       |
+| Internal load balancing node                                 | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | `F2s v2`       |
+| Gitaly                                                       | 2 minimum     | 4 vCPU, 15GB Memory             | `n1-standard-4` | `m5.xlarge`     | `D4s v3`       |
+| Sidekiq                                                      | 4     | 2 vCPU, 7.5GB Memory            | `n1-standard-2` | `m5.large`              | `D2s v3`       |
+| GitLab Rails                                                 | 3     | 8 vCPU, 7.2GB Memory            | `n1-highcpu-8`  | `c5.2xlarge`            | `F8s v2`       |
+| Monitoring node                                              | 1     | 2 vCPU, 1.8GB Memory            | `n1-highcpu-2`  | `c5.large`              | `F2s v2`       |
 | Object Storage                                               | n/a   | n/a                             | n/a             | n/a                     | n/a            |
-| NFS Server (optional, not recommended)                      | 1     | 4 vCPU, 3.6GB Memory            | `n1-highcpu-4`  | `c5.xlarge`             | F4s v2         |
+| NFS Server (optional, not recommended)                       | 1     | 4 vCPU, 3.6GB Memory            | `n1-highcpu-4`  | `c5.xlarge`             | `F4s v2`       |
 
 The architectures were built and tested with the [Intel Xeon E5 v3 (Haswell)](https://cloud.google.com/compute/docs/cpu-platforms)
 CPU platform on GCP. On different hardware you may find that adjustments, either lower
