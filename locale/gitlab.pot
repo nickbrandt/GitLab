@@ -3777,6 +3777,9 @@ msgstr ""
 msgid "Blocked issue"
 msgstr ""
 
+msgid "Blocking issues"
+msgstr ""
+
 msgid "Blocks"
 msgstr ""
 
