@@ -91,6 +91,16 @@ module EE
         !merge_train_pipeline? && super
       end
 
+      def batch_lookup_report_artifact_for_file_type(file_type)
+        return unless available_licensed_report_type?(file_type)
+
+        latest_report_artifacts
+          .values_at(*::Ci::JobArtifact.associated_file_types_for(file_type.to_s))
+          .flatten
+          .compact
+          .last
+      end
+
       def expose_license_scanning_data?
         batch_lookup_report_artifact_for_file_type(:license_scanning).present?
       end
@@ -162,6 +172,11 @@ module EE
 
       def merge_train_ref?
         ::MergeRequest.merge_train_ref?(ref)
+      end
+
+      def available_licensed_report_type?(file_type)
+        feature_names = REPORT_LICENSED_FEATURES.fetch(file_type)
+        feature_names.nil? || feature_names.any? { |feature| project.feature_available?(feature) }
       end
     end
   end
