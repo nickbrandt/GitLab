@@ -294,39 +294,7 @@ RSpec.describe Geo::LfsObjectRegistryFinder, :geo do
       create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
       registry_lfs_object_remote_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-      registries = subject.find_unsynced(batch_size: 10, except_ids: [lfs_object_3.id])
-
-      expect(registries).to match_ids(registry_lfs_object_remote_3)
-    end
-  end
-
-  describe '#find_unsynced' do
-    it 'returns registries for LFS objects that have never been synced' do
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
-      registry_lfs_object_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
-      registry_lfs_object_remote_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
-
-      registries = subject.find_unsynced(batch_size: 10)
-
-      expect(registries).to match_ids(registry_lfs_object_3, registry_lfs_object_remote_3)
-    end
-
-    it 'excludes except_ids' do
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
-      create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
-      registry_lfs_object_remote_3 = create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
-
-      registries = subject.find_unsynced(batch_size: 10, except_ids: [lfs_object_3.id])
+      registries = subject.find_never_synced_registries(batch_size: 10, except_ids: [lfs_object_3.id])
 
       expect(registries).to match_ids(registry_lfs_object_remote_3)
     end

@@ -36,13 +36,6 @@ module EE
       scope :include_gitlab_subscription, -> { includes(:gitlab_subscription) }
       scope :join_gitlab_subscription, -> { joins("LEFT OUTER JOIN gitlab_subscriptions ON gitlab_subscriptions.namespace_id=namespaces.id") }
 
-      scope :requiring_ci_extra_minutes_recalculation, -> do
-        joins(:namespace_statistics)
-          .where('namespaces.shared_runners_minutes_limit > 0')
-          .where('namespaces.extra_shared_runners_minutes_limit > 0')
-          .where('namespace_statistics.shared_runners_seconds > (namespaces.shared_runners_minutes_limit * 60)')
-      end
-
       scope :with_feature_available_in_plan, -> (feature) do
         plans = plans_with_feature(feature)
         matcher = ::Plan.where(name: plans)

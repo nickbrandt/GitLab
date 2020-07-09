@@ -2,20 +2,13 @@
 
 require 'spec_helper'
 
-RSpec.describe Geo::FileRegistryFinder, :geo, :geo_fdw do
+RSpec.describe Geo::FileRegistryFinder, :geo do
   include ::EE::GeoHelpers
 
   context 'with abstract methods' do
     %w[
+      replicables
       syncable
-      count_syncable
-      count_synced
-      count_failed
-      count_synced_missing_on_primary
-      count_registry
-      find_unsynced
-      find_retryable_failed_registries
-      find_retryable_synced_missing_on_primary_registries
     ].each do |required_method|
       it "requires subclasses to implement #{required_method}" do
         expect { subject.send(required_method) }.to raise_error(NotImplementedError)

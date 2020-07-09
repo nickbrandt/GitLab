@@ -22,7 +22,7 @@ describe('GeoReplicableFilterBar', () => {
   const createComponent = () => {
     wrapper = mount(GeoReplicableFilterBar, {
       localVue,
-      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
+      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, graphqlFieldName: null }),
       methods: {
         ...actionSpies,
       },

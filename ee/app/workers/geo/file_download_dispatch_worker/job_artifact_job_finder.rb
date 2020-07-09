@@ -10,12 +10,6 @@ module Geo
       def registry_finder
         @registry_finder ||= Geo::JobArtifactRegistryFinder.new(current_node_id: Gitlab::Geo.current_node.id)
       end
-
-      def find_unsynced_jobs(batch_size:)
-        convert_registry_relation_to_job_args(
-          registry_finder.find_never_synced_registries(find_batch_params(batch_size))
-        )
-      end
     end
   end
 end

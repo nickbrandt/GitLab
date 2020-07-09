@@ -14,11 +14,18 @@ export default () => {
     cycleAnalyticsScatterplotMedianEnabled: hasDurationChartMedian = false,
     valueStreamAnalyticsPathNavigation: hasPathNavigation = false,
     valueStreamAnalyticsFilterBar: hasFilterBar = false,
+    valueStreamAnalyticsCreateMultipleValueStreams: hasCreateMultipleValueStreams = false,
   } = gon?.features;
 
   store.dispatch('initializeCycleAnalytics', {
     ...initialData,
-    featureFlags: { hasDurationChart, hasDurationChartMedian, hasPathNavigation, hasFilterBar },
+    featureFlags: {
+      hasDurationChart,
+      hasDurationChartMedian,
+      hasPathNavigation,
+      hasFilterBar,
+      hasCreateMultipleValueStreams,
+    },
   });
 
   return new Vue({

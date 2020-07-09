@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 RSpec.describe Packages::Pypi::CreatePackageService do
-  include EE::PackagesManagerApiSpecHelpers
+  include PackagesManagerApiSpecHelpers
 
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { create(:user) }

@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 RSpec.describe Packages::Composer::CreatePackageService do
-  include EE::PackagesManagerApiSpecHelpers
+  include PackagesManagerApiSpecHelpers
 
   let_it_be(:package_name) { 'composer-package-name' }
   let_it_be(:json) { { name: package_name }.to_json }

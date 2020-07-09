@@ -51,6 +51,7 @@ const defaultFeatureFlags = {
   hasDurationChartMedian: true,
   hasPathNavigation: false,
   hasFilterBar: false,
+  hasCreateMultipleValueStreams: false,
 };
 
 const initialCycleAnalyticsState = {
@@ -169,6 +170,10 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(FilterBar).exists()).toBe(flag);
   };
 
+  const displaysCreateValueStream = flag => {
+    expect(wrapper.find('[data-testid="create-value-stream"]').exists()).toBe(flag);
+  };
+
   beforeEach(() => {
     mock = new MockAdapter(axios);
     wrapper = createComponent({
@@ -232,6 +237,9 @@ describe('Cycle Analytics component', () => {
       it('does not display the path navigation', () => {
         displaysPathNavigation(false);
       });
+      it('does not display the create multiple value streams button', () => {
+        displaysCreateValueStream(false);
+      });
 
       describe('hideGroupDropDown = true', () => {
         beforeEach(() => {
@@ -245,6 +253,21 @@ describe('Cycle Analytics component', () => {
 
         it('does not render the group dropdown', () => {
           expect(wrapper.find(GroupsDropdownFilter).exists()).toBe(false);
+        });
+      });
+
+      describe('hasCreateMultipleValueStreams = true', () => {
+        beforeEach(() => {
+          mock = new MockAdapter(axios);
+          wrapper = createComponent({
+            featureFlags: {
+              hasCreateMultipleValueStreams: true,
+            },
+          });
+        });
+
+        it('displays the create multiple value streams button', () => {
+          displaysCreateValueStream(true);
         });
       });
     });

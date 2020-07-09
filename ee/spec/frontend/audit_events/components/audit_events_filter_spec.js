@@ -26,11 +26,11 @@ describe('AuditEventsFilter', () => {
   });
 
   describe.each`
-    type              | title
-    ${'project'}      | ${'Project Events'}
-    ${'group'}        | ${'Group Events'}
-    ${'user'}         | ${'User Events'}
-    ${'group_member'} | ${'Member Events'}
+    type         | title
+    ${'project'} | ${'Project Events'}
+    ${'group'}   | ${'Group Events'}
+    ${'user'}    | ${'User Events'}
+    ${'member'}  | ${'Member Events'}
   `('for the list of available tokens', ({ type, title }) => {
     it(`creates a unique token for ${type}`, () => {
       initComponent();

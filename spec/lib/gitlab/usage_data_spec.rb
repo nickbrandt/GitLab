@@ -18,7 +18,10 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
       end
 
       it 'clears memoized values' do
-        %i(issue_minimum_id issue_maximum_id user_minimum_id user_maximum_id unique_visit_service).each do |key|
+        values = %i(issue_minimum_id issue_maximum_id
+                    user_minimum_id user_maximum_id unique_visit_service
+                    deployment_minimum_id deployment_maximum_id)
+        values.each do |key|
           expect(described_class).to receive(:clear_memoization).with(key)
         end
 
@@ -119,6 +122,45 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
           ]
         end
       end
+
+      context 'for verify' do
+        it 'includes accurate usage_activity_by_stage data' do
+          for_defined_days_back do
+            user = create(:user)
+            create(:ci_build, user: user)
+            create(:ci_empty_pipeline, source: :external, user: user)
+            create(:ci_empty_pipeline, user: user)
+            create(:ci_pipeline, :auto_devops_source, user: user)
+            create(:ci_pipeline, :repository_source, user: user)
+            create(:ci_pipeline_schedule, owner: user)
+            create(:ci_trigger, owner: user)
+            create(:clusters_applications_runner, :installed)
+          end
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:verify]).to include(
+            ci_builds: 2,
+            ci_external_pipelines: 2,
+            ci_internal_pipelines: 2,
+            ci_pipeline_config_auto_devops: 2,
+            ci_pipeline_config_repository: 2,
+            ci_pipeline_schedules: 2,
+            ci_pipelines: 2,
+            ci_triggers: 2,
+            clusters_applications_runner: 2
+          )
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:verify]).to include(
+            ci_builds: 1,
+            ci_external_pipelines: 1,
+            ci_internal_pipelines: 1,
+            ci_pipeline_config_auto_devops: 1,
+            ci_pipeline_config_repository: 1,
+            ci_pipeline_schedules: 1,
+            ci_pipelines: 1,
+            ci_triggers: 1,
+            clusters_applications_runner: 1
+          )
+        end
+      end
     end
 
     context 'for create' do
@@ -134,6 +176,40 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
           .to include(
             :merge_requests_users
           )
+      end
+
+      it 'includes accurate usage_activity_by_stage data' do
+        for_defined_days_back do
+          user = create(:user)
+          project = create(:project, :repository_private,
+                           :test_repo, :remote_mirror, creator: user)
+          create(:merge_request, source_project: project)
+          create(:deploy_key, user: user)
+          create(:key, user: user)
+          create(:project, creator: user, disable_overriding_approvers_per_merge_request: true)
+          create(:project, creator: user, disable_overriding_approvers_per_merge_request: false)
+          create(:remote_mirror, project: project)
+          create(:snippet, author: user)
+        end
+
+        expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to include(
+          deploy_keys: 2,
+          keys: 2,
+          merge_requests: 2,
+          projects_with_disable_overriding_approvers_per_merge_request: 2,
+          projects_without_disable_overriding_approvers_per_merge_request: 4,
+          remote_mirrors: 2,
+          snippets: 2
+        )
+        expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:create]).to include(
+          deploy_keys: 1,
+          keys: 1,
+          merge_requests: 1,
+          projects_with_disable_overriding_approvers_per_merge_request: 1,
+          projects_without_disable_overriding_approvers_per_merge_request: 2,
+          remote_mirrors: 1,
+          snippets: 1
+        )
       end
     end
 

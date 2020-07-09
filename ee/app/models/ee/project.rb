@@ -41,7 +41,6 @@ module EE
       has_one :github_service
       has_one :gitlab_slack_application_service
 
-      has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
       has_one :status_page_setting, inverse_of: :project, class_name: 'StatusPage::ProjectSetting'
@@ -121,7 +120,6 @@ module EE
       scope :with_active_jira_services, -> { joins(:services).merge(::JiraService.active) }
       scope :with_jira_dvcs_cloud, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: true)) }
       scope :with_jira_dvcs_server, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false)) }
-      scope :service_desk_enabled, -> { where(service_desk_enabled: true) }
       scope :github_imported, -> { where(import_type: 'github') }
       scope :with_protected_branches, -> { joins(:protected_branches) }
       scope :with_repositories_enabled, -> { joins(:project_feature).where(project_features: { repository_access_level: ::ProjectFeature::ENABLED }) }
@@ -200,12 +198,6 @@ module EE
       def with_slack_application_disabled
         joins('LEFT JOIN services ON services.project_id = projects.id AND services.type = \'GitlabSlackApplicationService\' AND services.active IS true')
           .where('services.id IS NULL')
-      end
-
-      def find_by_service_desk_project_key(key)
-        # project_key is not indexed for now
-        # see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24063#note_282435524 for details
-        joins(:service_desk_setting).find_by('service_desk_settings.project_key' => key)
       end
 
       override :with_web_entity_associations
@@ -331,21 +323,6 @@ module EE
       mirror? &&
         feature_available?(:ci_cd_projects) &&
         feature_available?(:github_project_service_integration)
-    end
-
-    override :service_desk_enabled
-    def service_desk_enabled
-      ::EE::Gitlab::ServiceDesk.enabled?(project: self)
-    end
-    alias_method :service_desk_enabled?, :service_desk_enabled
-
-    def service_desk_address
-      return unless service_desk_enabled?
-
-      config = ::Gitlab.config.incoming_email
-      wildcard = ::Gitlab::IncomingEmail::WILDCARD_PLACEHOLDER
-
-      config.address&.gsub(wildcard, "#{full_path_slug}-#{id}-issue-")
     end
 
     override :add_import_job

@@ -96,29 +96,6 @@ describe('Api', () => {
     });
   });
 
-  describe('groupMilestones', () => {
-    it('fetches group milestones', done => {
-      const groupId = 1;
-      const options = { state: 'active' };
-      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/1/milestones`;
-      mock.onGet(expectedUrl).reply(200, [
-        {
-          id: 1,
-          title: 'milestone1',
-          state: 'active',
-        },
-      ]);
-
-      Api.groupMilestones(groupId, options)
-        .then(({ data }) => {
-          expect(data.length).toBe(1);
-          expect(data[0].title).toBe('milestone1');
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
   describe('namespaces', () => {
     it('fetches namespaces', done => {
       const query = 'dummy query';
@@ -319,29 +296,6 @@ describe('Api', () => {
     });
   });
 
-  describe('projectMilestones', () => {
-    it('fetches project milestones', done => {
-      const projectId = 1;
-      const options = { state: 'active' };
-      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/1/milestones`;
-      mock.onGet(expectedUrl).reply(200, [
-        {
-          id: 1,
-          title: 'milestone1',
-          state: 'active',
-        },
-      ]);
-
-      Api.projectMilestones(projectId, options)
-        .then(({ data }) => {
-          expect(data.length).toBe(1);
-          expect(data[0].title).toBe('milestone1');
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
   describe('newLabel', () => {
     it('creates a new label', done => {
       const namespace = 'some namespace';
@@ -408,6 +362,30 @@ describe('Api', () => {
         expect(response.length).toBe(1);
         expect(response[0].name).toBe('test');
         done();
+      });
+    });
+  });
+
+  describe('commit', () => {
+    const projectId = 'user/project';
+    const sha = 'abcd0123';
+    const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${encodeURIComponent(
+      projectId,
+    )}/repository/commits/${sha}`;
+
+    it('fetches a single commit', () => {
+      mock.onGet(expectedUrl).reply(200, { id: sha });
+
+      return Api.commit(projectId, sha).then(({ data: commit }) => {
+        expect(commit.id).toBe(sha);
+      });
+    });
+
+    it('fetches a single commit without stats', () => {
+      mock.onGet(expectedUrl, { params: { stats: false } }).reply(200, { id: sha });
+
+      return Api.commit(projectId, sha, { stats: false }).then(({ data: commit }) => {
+        expect(commit.id).toBe(sha);
       });
     });
   });

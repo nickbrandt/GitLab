@@ -107,7 +107,7 @@ module API
             conan_package_reference: params[:conan_package_reference]
           )
 
-          present presenter, with: EE::API::Entities::ConanPackage::ConanPackageSnapshot
+          present presenter, with: ::API::Entities::ConanPackage::ConanPackageSnapshot
         end
 
         desc 'Recipe Snapshot' do
@@ -119,7 +119,7 @@ module API
 
           presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
-          present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeSnapshot
+          present presenter, with: ::API::Entities::ConanPackage::ConanRecipeSnapshot
         end
 
         # Get the manifest
@@ -191,7 +191,7 @@ module API
           status 200
           upload_urls = package_upload_urls(::Packages::Conan::FileMetadatum::PACKAGE_FILES)
 
-          present upload_urls, with: EE::API::Entities::ConanPackage::ConanUploadUrls
+          present upload_urls, with: ::API::Entities::ConanPackage::ConanUploadUrls
         end
 
         desc 'Recipe Upload Urls' do
@@ -204,7 +204,7 @@ module API
           status 200
           upload_urls = recipe_upload_urls(::Packages::Conan::FileMetadatum::RECIPE_FILES)
 
-          present upload_urls, with: EE::API::Entities::ConanPackage::ConanUploadUrls
+          present upload_urls, with: ::API::Entities::ConanPackage::ConanUploadUrls
         end
 
         desc 'Delete Package' do

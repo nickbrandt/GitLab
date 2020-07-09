@@ -72,7 +72,7 @@ module API
           track_event('nuget_service_index')
 
           present ::Packages::Nuget::ServiceIndexPresenter.new(authorized_user_project),
-            with: EE::API::Entities::Nuget::ServiceIndex
+            with: ::API::Entities::Nuget::ServiceIndex
         end
 
         # https://docs.microsoft.com/en-us/nuget/api/package-publish-resource
@@ -127,7 +127,7 @@ module API
           route_setting :authentication, deploy_token_allowed: true
           get 'index', format: :json do
             present ::Packages::Nuget::PackagesMetadataPresenter.new(find_packages),
-                    with: EE::API::Entities::Nuget::PackagesMetadata
+                    with: ::API::Entities::Nuget::PackagesMetadata
           end
 
           desc 'The NuGet Metadata Service - Package name and version level' do
@@ -139,7 +139,7 @@ module API
           route_setting :authentication, deploy_token_allowed: true
           get '*package_version', format: :json do
             present ::Packages::Nuget::PackageMetadataPresenter.new(find_package),
-                    with: EE::API::Entities::Nuget::PackageMetadata
+                    with: ::API::Entities::Nuget::PackageMetadata
           end
         end
 
@@ -158,7 +158,7 @@ module API
           route_setting :authentication, deploy_token_allowed: true
           get 'index', format: :json do
             present ::Packages::Nuget::PackagesVersionsPresenter.new(find_packages),
-                    with: EE::API::Entities::Nuget::PackagesVersions
+                    with: ::API::Entities::Nuget::PackagesVersions
           end
 
           desc 'The NuGet Content Service - content request' do
@@ -212,7 +212,7 @@ module API
             track_event('search_package')
 
             present ::Packages::Nuget::SearchResultsPresenter.new(search),
-              with: EE::API::Entities::Nuget::SearchResults
+              with: ::API::Entities::Nuget::SearchResults
           end
         end
       end

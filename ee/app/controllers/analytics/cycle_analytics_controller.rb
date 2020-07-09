@@ -16,6 +16,7 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
     push_frontend_feature_flag(:cycle_analytics_scatterplot_median_enabled, default_enabled: true)
     push_frontend_feature_flag(:value_stream_analytics_path_navigation, @group)
     push_frontend_feature_flag(:value_stream_analytics_filter_bar, @group)
+    push_frontend_feature_flag(:value_stream_analytics_create_multiple_value_streams, @group)
   end
 
   private

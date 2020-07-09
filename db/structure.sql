@@ -9413,6 +9413,23 @@ CREATE TABLE public.aws_roles (
     role_external_id character varying(64) NOT NULL
 );
 
+CREATE TABLE public.backup_labels (
+    id integer NOT NULL,
+    title character varying,
+    color character varying,
+    project_id integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    template boolean DEFAULT false,
+    description character varying,
+    description_html text,
+    type character varying,
+    group_id integer,
+    cached_markdown_version integer,
+    restore_action integer,
+    new_title character varying
+);
+
 CREATE TABLE public.badges (
     id integer NOT NULL,
     link_url character varying NOT NULL,
@@ -13748,7 +13765,8 @@ CREATE TABLE public.personal_access_tokens (
 '::character varying NOT NULL,
     impersonation boolean DEFAULT false NOT NULL,
     token_digest character varying,
-    expire_notification_delivered boolean DEFAULT false NOT NULL
+    expire_notification_delivered boolean DEFAULT false NOT NULL,
+    last_used_at timestamp with time zone
 );
 
 CREATE SEQUENCE public.personal_access_tokens_id_seq
@@ -17233,6 +17251,9 @@ ALTER TABLE ONLY public.award_emoji
 ALTER TABLE ONLY public.aws_roles
     ADD CONSTRAINT aws_roles_pkey PRIMARY KEY (user_id);
 
+ALTER TABLE ONLY public.backup_labels
+    ADD CONSTRAINT backup_labels_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.badges
     ADD CONSTRAINT badges_pkey PRIMARY KEY (id);
 
@@ -18367,6 +18388,20 @@ CREATE UNIQUE INDEX any_approver_project_rule_type_unique_index ON public.approv
 
 CREATE UNIQUE INDEX approval_rule_name_index_for_code_owners ON public.approval_merge_request_rules USING btree (merge_request_id, code_owner, name) WHERE ((code_owner = true) AND (section IS NULL));
 
+CREATE UNIQUE INDEX backup_labels_group_id_project_id_title_idx ON public.backup_labels USING btree (group_id, project_id, title);
+
+CREATE INDEX backup_labels_group_id_title_idx ON public.backup_labels USING btree (group_id, title) WHERE (project_id = NULL::integer);
+
+CREATE INDEX backup_labels_project_id_idx ON public.backup_labels USING btree (project_id);
+
+CREATE UNIQUE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
+
+CREATE INDEX backup_labels_template_idx ON public.backup_labels USING btree (template) WHERE template;
+
+CREATE INDEX backup_labels_title_idx ON public.backup_labels USING btree (title);
+
+CREATE INDEX backup_labels_type_project_id_idx ON public.backup_labels USING btree (type, project_id);
+
 CREATE INDEX ci_builds_gitlab_monitor_metrics ON public.ci_builds USING btree (status, created_at, project_id) WHERE ((type)::text = 'Ci::Build'::text);
 
 CREATE INDEX code_owner_approval_required ON public.protected_branches USING btree (project_id, code_owner_approval_required) WHERE (code_owner_approval_required = true);
@@ -18951,7 +18986,7 @@ CREATE INDEX index_deployments_on_environment_id_and_iid_and_project_id ON publi
 
 CREATE INDEX index_deployments_on_environment_id_and_status ON public.deployments USING btree (environment_id, status);
 
-CREATE INDEX index_deployments_on_id_and_status ON public.deployments USING btree (id, status);
+CREATE INDEX index_deployments_on_id_and_status_and_created_at ON public.deployments USING btree (id, status, created_at);
 
 CREATE INDEX index_deployments_on_id_where_cluster_id_present ON public.deployments USING btree (id) WHERE (cluster_id IS NOT NULL);
 
@@ -19373,7 +19408,7 @@ CREATE INDEX index_labels_on_group_id_and_title ON public.labels USING btree (gr
 
 CREATE INDEX index_labels_on_project_id ON public.labels USING btree (project_id);
 
-CREATE INDEX index_labels_on_project_id_and_title ON public.labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
+CREATE UNIQUE INDEX index_labels_on_project_id_and_title_unique ON public.labels USING btree (project_id, title) WHERE (group_id IS NULL);
 
 CREATE INDEX index_labels_on_template ON public.labels USING btree (template) WHERE template;
 
@@ -20078,6 +20113,8 @@ CREATE UNIQUE INDEX index_scim_identities_on_lower_extern_uid_and_group_id ON pu
 CREATE UNIQUE INDEX index_scim_identities_on_user_id_and_group_id ON public.scim_identities USING btree (user_id, group_id);
 
 CREATE UNIQUE INDEX index_scim_oauth_access_tokens_on_group_id_and_token_encrypted ON public.scim_oauth_access_tokens USING btree (group_id, token_encrypted);
+
+CREATE INDEX index_secure_ci_builds_on_user_id_created_at ON public.ci_builds USING btree (user_id, created_at) WHERE (((type)::text = 'Ci::Build'::text) AND ((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('license_scanning'::character varying)::text, ('sast'::character varying)::text, ('secret_detection'::character varying)::text])));
 
 CREATE INDEX index_security_ci_builds_on_name_and_id ON public.ci_builds USING btree (name, id) WHERE (((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text, ('secret_detection'::character varying)::text, ('license_scanning'::character varying)::text])) AND ((type)::text = 'Ci::Build'::text));
 
@@ -21011,6 +21048,9 @@ ALTER TABLE ONLY public.vulnerabilities
     ADD CONSTRAINT fk_7c5bb22a22 FOREIGN KEY (due_date_sourcing_milestone_id) REFERENCES public.milestones(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.labels
+    ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.backup_labels
     ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.merge_requests
@@ -22219,6 +22259,9 @@ ALTER TABLE ONLY public.serverless_domain_cluster
 ALTER TABLE ONLY public.labels
     ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.backup_labels
+    ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.project_feature_usages
     ADD CONSTRAINT fk_rails_c22a50024b FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -23205,6 +23248,10 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200304160801
 20200304160823
 20200304211738
+20200305020458
+20200305020459
+20200305082754
+20200305082858
 20200305121159
 20200305151736
 20200305200641
@@ -23560,6 +23607,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200618105638
 20200618134223
 20200618134723
+20200618152212
 20200619000316
 20200619154527
 20200619154528
@@ -23581,6 +23629,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200624222443
 20200625045442
 20200625082258
+20200625113337
 20200625190458
 20200626060151
 20200626130220
@@ -23590,6 +23639,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200702123805
 20200703154822
 20200704143633
+20200704161600
 20200706005325
 20200706170536
 20200707071941

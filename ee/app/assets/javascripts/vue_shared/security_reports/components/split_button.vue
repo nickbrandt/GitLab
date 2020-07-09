@@ -50,7 +50,7 @@ export default {
     <gl-dropdown-item v-for="button in buttons" :key="button.action" @click="setButton(button)">
       <div class="media">
         <div>
-          <icon v-if="selectedButton === button" class="append-right-5" name="mobile-issue-close" />
+          <icon v-if="selectedButton === button" class="gl-mr-2" name="mobile-issue-close" />
         </div>
         <div class="media-body" :class="{ 'prepend-left-20': selectedButton !== button }">
           <strong>{{ button.name }}</strong>

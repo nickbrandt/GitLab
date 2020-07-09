@@ -20,7 +20,7 @@ export default {
 <template>
   <div class="report-block-info license-item">
     <button
-      class="btn-blank btn-link append-right-5"
+      class="btn-blank btn-link gl-mr-2"
       type="button"
       data-toggle="modal"
       data-target="#modal-set-license-approval"

@@ -7,6 +7,8 @@ export const MOCK_GEO_TROUBLESHOOTING_LINK =
 
 export const MOCK_REPLICABLE_TYPE = 'designs';
 
+export const MOCK_GRAPHQL_REGISTRY = 'designsRegistry';
+
 export const MOCK_BASIC_FETCH_RESPONSE = {
   data: [
     {
@@ -53,7 +55,6 @@ export const MOCK_BASIC_GRAPHQL_QUERY_RESPONSE = {
       pageInfo: MOCK_GRAPHQL_PAGINATION_DATA,
       edges: [
         {
-          cursor: 'abc123',
           node: {
             id: 'git/1',
             packageFileId: '1',
@@ -62,7 +63,6 @@ export const MOCK_BASIC_GRAPHQL_QUERY_RESPONSE = {
           },
         },
         {
-          cursor: 'abc124',
           node: {
             id: 'git/2',
             packageFileId: '2',

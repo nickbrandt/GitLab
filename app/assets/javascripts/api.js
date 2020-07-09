@@ -9,7 +9,6 @@ const Api = {
   groupsPath: '/api/:version/groups.json',
   groupPath: '/api/:version/groups/:id',
   groupMembersPath: '/api/:version/groups/:id/members',
-  groupMilestonesPath: '/api/:version/groups/:id/milestones',
   subgroupsPath: '/api/:version/groups/:id/subgroups',
   namespacesPath: '/api/:version/namespaces.json',
   groupProjectsPath: '/api/:version/groups/:id/projects.json',
@@ -37,7 +36,9 @@ const Api = {
   userStatusPath: '/api/:version/users/:id/status',
   userProjectsPath: '/api/:version/users/:id/projects',
   userPostStatusPath: '/api/:version/user/status',
-  commitPath: '/api/:version/projects/:id/repository/commits',
+  commitPath: '/api/:version/projects/:id/repository/commits/:sha',
+  commitsPath: '/api/:version/projects/:id/repository/commits',
+
   applySuggestionPath: '/api/:version/suggestions/:id/apply',
   applySuggestionBatchPath: '/api/:version/suggestions/batch_apply',
   commitPipelinesPath: '/:project_id/commit/:sha/pipelines',
@@ -97,14 +98,6 @@ const Api = {
   groupLabels(namespace) {
     const url = Api.buildUrl(Api.groupLabelsPath).replace(':namespace_path', namespace);
     return axios.get(url).then(({ data }) => data);
-  },
-
-  groupMilestones(groupId, params = {}) {
-    const url = Api.buildUrl(Api.groupMilestonesPath).replace(':id', encodeURIComponent(groupId));
-
-    return axios.get(url, {
-      params,
-    });
   },
 
   // Return namespaces list. Filtered by query
@@ -271,12 +264,10 @@ const Api = {
     });
   },
 
-  projectMilestones(id, params = {}) {
+  projectMilestones(id) {
     const url = Api.buildUrl(Api.projectMilestonesPath).replace(':id', encodeURIComponent(id));
 
-    return axios.get(url, {
-      params,
-    });
+    return axios.get(url);
   },
 
   mergeRequests(params = {}) {
@@ -319,9 +310,17 @@ const Api = {
       .catch(() => flash(__('Something went wrong while fetching projects')));
   },
 
+  commit(id, sha, params = {}) {
+    const url = Api.buildUrl(this.commitPath)
+      .replace(':id', encodeURIComponent(id))
+      .replace(':sha', encodeURIComponent(sha));
+
+    return axios.get(url, { params });
+  },
+
   commitMultiple(id, data) {
     // see https://docs.gitlab.com/ce/api/commits.html#create-a-commit-with-multiple-files-and-actions
-    const url = Api.buildUrl(Api.commitPath).replace(':id', encodeURIComponent(id));
+    const url = Api.buildUrl(Api.commitsPath).replace(':id', encodeURIComponent(id));
     return axios.post(url, JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',

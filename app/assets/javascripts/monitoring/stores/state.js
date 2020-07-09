@@ -1,5 +1,6 @@
 import invalidUrl from '~/lib/utils/invalid_url';
 import { timezones } from '../format_date';
+import { dashboardEmptyStates } from '../constants';
 
 export default () => ({
   // API endpoints
@@ -20,7 +21,7 @@ export default () => ({
 
   // Dashboard data
   hasDashboardValidationWarnings: false,
-  emptyState: 'gettingStarted',
+  emptyState: dashboardEmptyStates.GETTING_STARTED,
   showEmptyState: true,
   showErrorBanner: true,
   isUpdatingStarredValue: false,
@@ -64,8 +65,16 @@ export default () => ({
 
   // GitLab paths to other pages
   projectPath: null,
+  operationsSettingsPath: '',
   logsPath: invalidUrl,
 
   // static paths
   customDashboardBasePath: '',
+
+  // current user data
+  /**
+   * Flag that denotes if the currently logged user can access
+   * the project Settings -> Operations
+   */
+  canAccessOperationsSettings: false,
 });

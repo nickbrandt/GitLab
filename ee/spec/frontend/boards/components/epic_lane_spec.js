@@ -66,5 +66,17 @@ describe('EpicLane', () => {
     it('renders one IssuesLaneList component per list passed in props', () => {
       expect(wrapper.findAll(IssuesLaneList)).toHaveLength(wrapper.props('lists').length);
     });
+
+    it('hides issues when collapsing', () => {
+      expect(wrapper.findAll(IssuesLaneList)).toHaveLength(wrapper.props('lists').length);
+      expect(wrapper.vm.isExpanded).toBe(true);
+
+      wrapper.find('[data-testid="epic-lane-chevron"]').vm.$emit('click');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.findAll(IssuesLaneList)).toHaveLength(0);
+        expect(wrapper.vm.isExpanded).toBe(false);
+      });
+    });
   });
 });

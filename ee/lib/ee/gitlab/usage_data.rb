@@ -210,22 +210,15 @@ module EE
         override :usage_activity_by_stage_create
         def usage_activity_by_stage_create(time_period)
           super.merge({
-            deploy_keys: distinct_count(::DeployKey.where(time_period), :user_id),
-            keys: distinct_count(::Key.regular_keys.where(time_period), :user_id),
-            merge_requests: distinct_count(::MergeRequest.where(time_period), :author_id),
             projects_enforcing_code_owner_approval: distinct_count(::Project.requiring_code_owner_approval.where(time_period), :creator_id),
             merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional.where(time_period), :merge_request_id),
             merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required.where(time_period), :merge_request_id),
-            projects_with_disable_overriding_approvers_per_merge_request: count(::Project.where(time_period.merge(disable_overriding_approvers_per_merge_request: true))),
-            projects_without_disable_overriding_approvers_per_merge_request: count(::Project.where(time_period.merge(disable_overriding_approvers_per_merge_request: [false, nil]))),
             projects_imported_from_github: distinct_count(::Project.github_imported.where(time_period), :creator_id),
             projects_with_repositories_enabled: distinct_count(::Project.with_repositories_enabled.where(time_period),
                                                                :creator_id,
                                                                start: user_minimum_id,
                                                                finish: user_maximum_id),
             protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id, start: user_minimum_id, finish: user_maximum_id),
-            remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
-            snippets: distinct_count(::Snippet.where(time_period), :author_id),
             suggestions: distinct_count(::Note.with_suggestions.where(time_period),
                                         :author_id,
                                         start: user_minimum_id,
@@ -299,15 +292,6 @@ module EE
         override :usage_activity_by_stage_verify
         def usage_activity_by_stage_verify(time_period)
           super.merge({
-            ci_builds: distinct_count(::Ci::Build.where(time_period), :user_id),
-            ci_external_pipelines: distinct_count(::Ci::Pipeline.external.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_internal_pipelines: distinct_count(::Ci::Pipeline.internal.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_pipeline_config_auto_devops: distinct_count(::Ci::Pipeline.auto_devops_source.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_pipeline_config_repository: distinct_count(::Ci::Pipeline.repository_source.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_pipeline_schedules: distinct_count(::Ci::PipelineSchedule.where(time_period), :owner_id),
-            ci_pipelines: distinct_count(::Ci::Pipeline.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_triggers: distinct_count(::Ci::Trigger.where(time_period), :owner_id),
-            clusters_applications_runner: cluster_applications_user_distinct_count(::Clusters::Applications::Runner, time_period),
             projects_reporting_ci_cd_back_to_github: distinct_count(::Project.with_github_service_pipeline_events.where(time_period), :creator_id)
           })
         end
@@ -329,6 +313,8 @@ module EE
                                                                           start: user_minimum_id,
                                                                           finish: user_maximum_id)
           end
+
+          results[:"#{prefix}unique_users_all_secure_scanners"] = distinct_count(::Ci::Build.where(name: SECURE_PRODUCT_TYPES.keys).where(time_period), :user_id)
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           combined_license_key = "#{prefix}license_management_jobs".to_sym

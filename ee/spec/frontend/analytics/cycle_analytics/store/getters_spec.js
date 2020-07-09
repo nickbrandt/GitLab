@@ -63,9 +63,45 @@ describe('Cycle analytics getters', () => {
     });
 
     describe('without a selectedGroup set', () => {
-      it.each([[''], [{}], [null]])('given %s will return null', value => {
+      it.each([[''], [{}], [null]])('given "%s" will return null', value => {
         state = { selectedGroup: value };
         expect(getters.currentGroupPath(state)).toEqual(null);
+      });
+    });
+  });
+
+  describe('currentGroupParentPath', () => {
+    const fullPath = 'cool-beans';
+    const parentId = 'subgroup/parent/id';
+
+    describe('with a subgroup', () => {
+      it('returns the parentId value of the sub group', () => {
+        state = {
+          selectedGroup: {
+            fullPath,
+            parentId,
+          },
+        };
+
+        expect(getters.currentGroupParentPath(state)).toEqual(parentId);
+      });
+    });
+
+    describe('with a parent group', () => {
+      it('returns the fullPath value of the group', () => {
+        const res = getters.currentGroupParentPath(
+          {
+            selectedGroup: {
+              fullPath,
+            },
+          },
+          {
+            ...getters,
+            currentGroupPath: fullPath,
+          },
+        );
+
+        expect(res).toEqual(fullPath);
       });
     });
   });

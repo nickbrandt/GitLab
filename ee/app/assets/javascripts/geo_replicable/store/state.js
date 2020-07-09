@@ -1,8 +1,9 @@
 import { FILTER_STATES, DEFAULT_PAGE_SIZE } from '../constants';
 
-const createState = ({ replicableType, useGraphQl }) => ({
+const createState = ({ replicableType, graphqlFieldName }) => ({
   replicableType,
-  useGraphQl,
+  graphqlFieldName,
+  useGraphQl: Boolean(graphqlFieldName),
   isLoading: false,
 
   replicableItems: [],

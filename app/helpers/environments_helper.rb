@@ -84,14 +84,16 @@ module EnvironmentsHelper
       'metrics-endpoint'     => additional_metrics_project_environment_path(project, environment, format: :json),
       'dashboard-endpoint'   => metrics_dashboard_project_environment_path(project, environment, format: :json),
       'deployments-endpoint' => project_environment_deployments_path(project, environment, format: :json),
-      'alerts-endpoint'      => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json)
-
+      'alerts-endpoint'      => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
+      'operations-settings-path' => project_settings_operations_path(project),
+      'can-access-operations-settings' => can?(current_user, :admin_operations, project).to_s
     }
   end
 
   def static_metrics_data
     {
       'documentation-path'               => help_page_path('administration/monitoring/prometheus/index.md'),
+      'add-dashboard-documentation-path' => help_page_path('user/project/integrations/prometheus.md', anchor: 'adding-a-new-dashboard-to-your-project'),
       'empty-getting-started-svg-path'   => image_path('illustrations/monitoring/getting_started.svg'),
       'empty-loading-svg-path'           => image_path('illustrations/monitoring/loading.svg'),
       'empty-no-data-svg-path'           => image_path('illustrations/monitoring/no_data.svg'),
