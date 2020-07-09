@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import initNamespaceStorageLimitAlert from '~/namespace_storage_limit_alert';
+import initNamespaceStorageLimitAlert from 'ee/namespace_storage_limit_alert';
 
 describe('broadcast message on dismiss', () => {
   const dismiss = () => {

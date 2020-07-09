@@ -11,6 +11,14 @@ RSpec.describe GroupsController do
   let_it_be(:subgroup) { create(:group, :private, parent: group) }
   let_it_be(:subgroup2) { create(:group, :private, parent: subgroup) }
 
+  describe 'GET #show' do
+    let(:namespace) { group }
+
+    subject { get :show, params: { id: group.to_param } }
+
+    it_behaves_like 'namespace storage limit alert'
+  end
+
   describe 'GET #activity' do
     render_views
 
