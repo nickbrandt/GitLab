@@ -161,7 +161,7 @@ RSpec.describe Groups::InsightsController do
         it 'does not render the embedded page' do
           subject
 
-          expect(response).to_not render_template(:embedded)
+          expect(response).not_to render_template(:embedded)
         end
       end
 
