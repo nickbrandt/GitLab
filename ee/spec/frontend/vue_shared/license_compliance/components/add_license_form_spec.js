@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { shallowMount } from '@vue/test-utils';
 import LicenseIssueBody from 'ee/vue_shared/license_compliance/components/add_license_form.vue';
 import mountComponent from 'helpers/vue_mount_component_helper';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_compliance/constants';
@@ -117,6 +118,43 @@ describe('AddLicenseForm', () => {
         expect(feedbackElement.innerText.trim()).toBe(
           'This license already exists in this project.',
         );
+        done();
+      });
+    });
+
+    it('shows radio button descriptions, if licenseComplianceDeniesMr feature flag is enabled', done => {
+      const wrapper = shallowMount(LicenseIssueBody, {
+        propsData: {
+          managedLicenses: [{ name: 'FOO' }],
+        },
+        provide: {
+          glFeatures: { licenseComplianceDeniesMr: true },
+        },
+      });
+
+      Vue.nextTick(() => {
+        const descriptionElement = wrapper.findAll('.text-secondary');
+
+        expect(descriptionElement.at(0).text()).toBe(
+          'Acceptable license to be used in the project',
+        );
+
+        expect(descriptionElement.at(1).text()).toBe(
+          'Disallow merge request if detected and will instruct developer to remove',
+        );
+
+        done();
+      });
+    });
+
+    it('does not show radio button descriptions, if licenseComplianceDeniesMr feature flag is disabled', done => {
+      vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
+      vm.licenseName = 'FOO';
+      Vue.nextTick(() => {
+        const formCheckElements = vm.$el.querySelectorAll('.form-check');
+
+        expect(formCheckElements[0]).toMatchSnapshot();
+        expect(formCheckElements[1]).toMatchSnapshot();
         done();
       });
     });

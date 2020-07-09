@@ -1,4 +1,5 @@
 <script>
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { GlDeprecatedButton } from '@gitlab/ui';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
@@ -12,10 +13,21 @@ export default {
     GlDeprecatedButton,
     LoadingButton,
   },
+  mixins: [glFeatureFlagsMixin()],
   LICENSE_APPROVAL_STATUS,
   approvalStatusOptions: [
-    { value: LICENSE_APPROVAL_STATUS.ALLOWED, label: s__('LicenseCompliance|Allow') },
-    { value: LICENSE_APPROVAL_STATUS.DENIED, label: s__('LicenseCompliance|Deny') },
+    {
+      value: LICENSE_APPROVAL_STATUS.ALLOWED,
+      label: s__('LicenseCompliance|Allow'),
+      description: s__('LicenseCompliance|Acceptable license to be used in the project'),
+    },
+    {
+      value: LICENSE_APPROVAL_STATUS.DENIED,
+      label: s__('LicenseCompliance|Deny'),
+      description: s__(
+        'LicenseCompliance|Disallow merge request if detected and will instruct developer to remove',
+      ),
+    },
   ],
   props: {
     managedLicenses: {
@@ -41,6 +53,9 @@ export default {
     },
     submitDisabled() {
       return this.isInvalidLicense || this.licenseName.trim() === '' || this.approvalStatus === '';
+    },
+    isDescriptionEnabled() {
+      return Boolean(this.glFeatures.licenseComplianceDeniesMr);
     },
   },
   methods: {
@@ -72,7 +87,12 @@ export default {
       </div>
     </div>
     <div class="form-group">
-      <div v-for="option in $options.approvalStatusOptions" :key="option.value" class="form-check">
+      <div
+        v-for="option in $options.approvalStatusOptions"
+        :key="option.value"
+        class="form-check"
+        :class="{ 'mb-3': isDescriptionEnabled }"
+      >
         <input
           :id="`js-${option.value}-license-radio`"
           v-model="approvalStatus"
@@ -80,10 +100,14 @@ export default {
           type="radio"
           :data-qa-selector="`${option.value}_license_radio`"
           :value="option.value"
+          :aria-describedby="`js-${option.value}-license-radio`"
         />
-        <label :for="`js-${option.value}-license-radio`" class="form-check-label">
+        <label :for="`js-${option.value}-license-radio`" class="form-check-label pt-1">
           {{ option.label }}
         </label>
+        <div v-if="isDescriptionEnabled" class="text-secondary">
+          {{ option.description }}
+        </div>
       </div>
     </div>
     <loading-button
