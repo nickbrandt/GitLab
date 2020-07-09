@@ -7,7 +7,7 @@ import {
   normalizeHeaders,
   convertObjectPropsToCamelCase,
 } from '~/lib/utils/common_utils';
-import packageFilesQuery from '../graphql/package_files.query.graphql';
+import buildReplicableTypeQuery from '../graphql/replicable_type_query_builder';
 import { gqClient } from '../utils';
 import * as types from './mutation_types';
 import { FILTER_STATES, PREV, NEXT, DEFAULT_PAGE_SIZE } from '../constants';
@@ -51,7 +51,7 @@ export const fetchReplicableItemsGraphQl = ({ state, dispatch }, direction) => {
 
   gqClient
     .query({
-      query: packageFilesQuery,
+      query: buildReplicableTypeQuery(state.graphqlFieldName),
       variables: { first, last, before, after },
     })
     .then(res => {
