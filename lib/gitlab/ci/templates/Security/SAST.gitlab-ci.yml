@@ -95,6 +95,7 @@ eslint-sast:
       exists:
         - '**/*.html'
         - '**/*.js'
+        - '**/*.jsx'
 
 flawfinder-sast:
   extends: .sast-analyzer
