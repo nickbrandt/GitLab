@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.1.4 (2020-07-09)
+
+### Fixed (2 changes)
+
+- Fix visual regression for MR approve button. !35213
+- Geo - Does not sync LFS objects from fork networks. !36201
+
+
 ## 13.1.3 (2020-07-06)
 
 ### Security (1 change)
