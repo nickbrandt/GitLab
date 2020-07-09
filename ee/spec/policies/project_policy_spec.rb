@@ -98,6 +98,10 @@ RSpec.describe ProjectPolicy do
           is_expected.to be_allowed(*auditor_permissions)
         end
       end
+
+      it_behaves_like 'project private features with read_all_resources ability' do
+        let(:user) { current_user }
+      end
     end
   end
 
