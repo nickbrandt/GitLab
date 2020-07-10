@@ -102,6 +102,12 @@ RSpec.describe Ci::Pipeline do
 
       include_examples '#batch_lookup_report_artifact_for_file_type', :browser_performance, :merge_request_performance_metrics
     end
+
+    context 'with load performance artifact' do
+      let_it_be(:pipeline, reload: true) { create(:ee_ci_pipeline, :with_load_performance_report, project: project) }
+
+      include_examples '#batch_lookup_report_artifact_for_file_type', :load_performance, :merge_request_performance_metrics
+    end
   end
 
   describe '#expose_license_scanning_data?' do

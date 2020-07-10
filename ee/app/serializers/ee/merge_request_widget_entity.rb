@@ -41,6 +41,16 @@ module EE
         end
       end
 
+      expose :load_performance, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:load_performance) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:load_performance)
+        end
+
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:load_performance)
+        end
+      end
+
       expose :enabled_reports do |merge_request|
         merge_request.enabled_reports
       end

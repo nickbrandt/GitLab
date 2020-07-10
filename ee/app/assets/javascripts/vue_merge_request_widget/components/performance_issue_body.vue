@@ -6,8 +6,8 @@
 import ReportLink from '~/reports/components/report_link.vue';
 
 function formatScore(value) {
-  if (Math.floor(value) !== value) {
-    return parseFloat(value).toFixed(2);
+  if (Number(value) && !Number.isInteger(value)) {
+    return (Math.floor(parseFloat(value) * 100) / 100).toFixed(2);
   }
   return value;
 }

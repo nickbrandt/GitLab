@@ -33,8 +33,10 @@ export default {
     return {
       isLoadingCodequality: false,
       isLoadingBrowserPerformance: false,
+      isLoadingLoadPerformance: false,
       loadingCodequalityFailed: false,
       loadingBrowserPerformanceFailed: false,
+      loadingLoadPerformanceFailed: false,
       loadingLicenseReportFailed: false,
     };
   },
@@ -88,6 +90,18 @@ export default {
     },
     shouldRenderBrowserPerformance() {
       return this.hasBrowserPerformancePaths && this.hasBrowserPerformanceDegradation;
+    },
+    hasLoadPerformanceMetrics() {
+      return (
+        this.mr.loadPerformanceMetrics?.degraded?.length > 0 ||
+        this.mr.loadPerformanceMetrics?.improved?.length > 0 ||
+        this.mr.loadPerformanceMetrics?.same?.length > 0
+      );
+    },
+    hasLoadPerformancePaths() {
+      const loadPerformance = this.mr?.loadPerformance || {};
+
+      return Boolean(loadPerformance.head_path && loadPerformance.base_path);
     },
     shouldRenderSecurityReport() {
       const { enabledReports } = this.mr;
@@ -163,6 +177,31 @@ export default {
       return [...text, ...reportNumbers.join(', ')].join('');
     },
 
+    loadPerformanceText() {
+      const { improved, degraded, same } = this.mr.loadPerformanceMetrics;
+      const text = [];
+      const reportNumbers = [];
+
+      if (improved.length || degraded.length || same.length) {
+        text.push(s__('ciReport|Load performance test metrics: '));
+
+        if (degraded.length > 0)
+          reportNumbers.push(
+            sprintf(s__('ciReport|%{degradedNum} degraded'), { degradedNum: degraded.length }),
+          );
+        if (same.length > 0)
+          reportNumbers.push(sprintf(s__('ciReport|%{sameNum} same'), { sameNum: same.length }));
+        if (improved.length > 0)
+          reportNumbers.push(
+            sprintf(s__('ciReport|%{improvedNum} improved'), { improvedNum: improved.length }),
+          );
+      } else {
+        text.push(s__('ciReport|Load performance test metrics: No changes'));
+      }
+
+      return [...text, ...reportNumbers.join(', ')].join('');
+    },
+
     codequalityStatus() {
       return this.checkReportStatus(this.isLoadingCodequality, this.loadingCodequalityFailed);
     },
@@ -171,6 +210,13 @@ export default {
       return this.checkReportStatus(
         this.isLoadingBrowserPerformance,
         this.loadingBrowserPerformanceFailed,
+      );
+    },
+
+    loadPerformanceStatus() {
+      return this.checkReportStatus(
+        this.isLoadingLoadPerformance,
+        this.loadingLoadPerformanceFailed,
       );
     },
 
@@ -196,6 +242,11 @@ export default {
     hasBrowserPerformancePaths(newVal) {
       if (newVal) {
         this.fetchBrowserPerformance();
+      }
+    },
+    hasLoadPerformancePaths(newVal) {
+      if (newVal) {
+        this.fetchLoadPerformance();
       }
     },
   },
@@ -257,6 +308,23 @@ export default {
         })
         .finally(() => {
           this.isLoadingBrowserPerformance = false;
+        });
+    },
+
+    fetchLoadPerformance() {
+      const { head_path, base_path } = this.mr.loadPerformance;
+
+      this.isLoadingLoadPerformance = true;
+
+      Promise.all([this.service.fetchReport(head_path), this.service.fetchReport(base_path)])
+        .then(values => {
+          this.mr.compareLoadPerformanceMetrics(values[0], values[1]);
+        })
+        .catch(() => {
+          this.loadingLoadPerformanceFailed = true;
+        })
+        .finally(() => {
+          this.isLoadingLoadPerformance = false;
         });
     },
 
@@ -322,6 +390,19 @@ export default {
         :has-issues="hasBrowserPerformanceMetrics"
         :component="$options.componentNames.PerformanceIssueBody"
         class="js-browser-performance-widget mr-widget-border-top mr-report"
+      />
+      <report-section
+        v-if="hasLoadPerformancePaths"
+        :status="loadPerformanceStatus"
+        :loading-text="translateText('load-performance').loading"
+        :error-text="translateText('load-performance').error"
+        :success-text="loadPerformanceText"
+        :unresolved-issues="mr.loadPerformanceMetrics.degraded"
+        :resolved-issues="mr.loadPerformanceMetrics.improved"
+        :neutral-issues="mr.loadPerformanceMetrics.same"
+        :has-issues="hasLoadPerformanceMetrics"
+        :component="$options.componentNames.PerformanceIssueBody"
+        class="js-load-performance-widget mr-widget-border-top mr-report"
       />
       <grouped-metrics-reports-app
         v-if="mr.metricsReportsPath"
