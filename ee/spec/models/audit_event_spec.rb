@@ -15,10 +15,21 @@ RSpec.describe AuditEvent, type: :model do
 
   describe 'callbacks' do
     context 'after_create' do
-      subject(:event) { create(:user_audit_event) }
+      let_it_be(:details) do
+        {
+          target_details: 'Test details',
+          target_type: 'User'
+        }
+      end
+
+      subject(:event) { create(:user_audit_event, details: details) }
 
       it 'persists target_type to database' do
         expect(subject.target_type).to eq('User')
+      end
+
+      it 'persists target_details to database' do
+        expect(subject.target_details).to eq(details[:target_details])
       end
     end
   end

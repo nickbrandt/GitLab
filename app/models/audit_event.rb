@@ -5,6 +5,8 @@ class AuditEvent < ApplicationRecord
   include IgnorableColumns
   include BulkInsertSafe
 
+  PARALLEL_PERSISTED_ATTRS = [:target_type, :target_details].freeze
+
   ignore_column :updated_at, remove_with: '13.4', remove_after: '2020-09-22'
 
   serialize :details, Hash # rubocop:disable Cop/ActiveRecordSerialize
@@ -54,7 +56,7 @@ class AuditEvent < ApplicationRecord
   private
 
   def parallel_persist
-    self.target_type = details[:target_type]
+    PARALLEL_PERSISTED_ATTRS.each { |attr| self[attr] = details[attr] }
   end
 
   def default_author_value

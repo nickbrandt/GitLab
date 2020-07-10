@@ -1,0 +1,5 @@
+---
+title: Add target_details to AuditEvent
+merge_request: 36567
+author:
+type: changed

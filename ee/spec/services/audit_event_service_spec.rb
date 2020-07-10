@@ -424,10 +424,6 @@ RSpec.describe AuditEventService do
         target_details: 'Security'
       )
     end
-
-    it 'sets database values' do
-      expect(service.instance_variable_get(:@target_type)).to eq('ApprovalProjectRule')
-    end
   end
 
   describe '#for_project' do
