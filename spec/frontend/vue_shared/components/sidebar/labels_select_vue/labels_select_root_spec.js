@@ -96,15 +96,13 @@ describe('LabelsSelectRoot', () => {
     `(
       'renders component root element with CSS class `$cssClass` when `state.variant` is "$variant"',
       ({ variant, cssClass }) => {
-        const wrapperStandalone = createComponent({
+        wrapper = createComponent({
           ...mockConfig,
           variant,
         });
 
-        return wrapperStandalone.vm.$nextTick(() => {
-          expect(wrapperStandalone.classes()).toContain(cssClass);
-
-          wrapperStandalone.destroy();
+        return wrapper.vm.$nextTick(() => {
+          expect(wrapper.classes()).toContain(cssClass);
         });
       },
     );

@@ -1,7 +1,7 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 
-import { GlIcon } from '@gitlab/ui';
+import { GlIcon, GlButton } from '@gitlab/ui';
 import DropdownButton from '~/vue_shared/components/sidebar/labels_select_vue/dropdown_button.vue';
 
 import labelSelectModule from '~/vue_shared/components/sidebar/labels_select_vue/store';
@@ -34,6 +34,10 @@ describe('DropdownButton', () => {
     wrapper.destroy();
   });
 
+  const findDropdownButton = () => wrapper.find(GlButton);
+  const findDropdownText = () => wrapper.find('.dropdown-toggle-text');
+  const findDropdownIcon = () => wrapper.find(GlIcon);
+
   describe('methods', () => {
     describe('handleButtonClick', () => {
       it.each`
@@ -41,24 +45,19 @@ describe('DropdownButton', () => {
         ${'standalone'}
         ${'embedded'}
       `(
-        'calls action `toggleDropdownContents` and stops event propagation when `state.variant` is "$variant"',
+        'toggles dropdown content and stops event propagation when `state.variant` is "$variant"',
         ({ variant }) => {
-          const event = {
-            stopPropagation: jest.fn(),
-          };
+          const event = { stopPropagation: jest.fn() };
+
           wrapper = createComponent({
             ...mockConfig,
             variant,
           });
 
-          jest.spyOn(wrapper.vm, 'toggleDropdownContents');
+          findDropdownButton().vm.$emit('click', event);
 
-          wrapper.vm.handleButtonClick(event);
-
-          expect(wrapper.vm.toggleDropdownContents).toHaveBeenCalled();
+          expect(store.state.showDropdownContents).toBe(true);
           expect(event.stopPropagation).toHaveBeenCalled();
-
-          wrapper.destroy();
         },
       );
     });
@@ -70,7 +69,7 @@ describe('DropdownButton', () => {
     });
 
     it('renders default button text element', () => {
-      const dropdownTextEl = wrapper.find('.dropdown-toggle-text');
+      const dropdownTextEl = findDropdownText();
 
       expect(dropdownTextEl.exists()).toBe(true);
       expect(dropdownTextEl.text()).toBe('Label');
@@ -78,7 +77,7 @@ describe('DropdownButton', () => {
 
     it('renders provided button text element', () => {
       store.state.dropdownButtonText = 'Custom label';
-      const dropdownTextEl = wrapper.find('.dropdown-toggle-text');
+      const dropdownTextEl = findDropdownText();
 
       return wrapper.vm.$nextTick().then(() => {
         expect(dropdownTextEl.text()).toBe('Custom label');
@@ -86,7 +85,7 @@ describe('DropdownButton', () => {
     });
 
     it('renders chevron icon element', () => {
-      const iconEl = wrapper.find(GlIcon);
+      const iconEl = findDropdownIcon();
 
       expect(iconEl.exists()).toBe(true);
       expect(iconEl.props('name')).toBe('chevron-down');

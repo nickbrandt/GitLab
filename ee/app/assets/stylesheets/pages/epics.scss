@@ -150,15 +150,4 @@
   .dropdown-footer .list-unstyled {
     @include gl-m-0;
   }
-
-  .color-input-container {
-    .dropdown-label-color-preview[style] {
-      @include gl-border-none;
-    }
-
-    .gl-form-input {
-      @include gl-rounded-top-left-none;
-      @include gl-rounded-bottom-left-none;
-    }
-  }
 }
