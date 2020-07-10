@@ -7,6 +7,7 @@ query project(
   $first: Int
   $severity: [VulnerabilitySeverity!]
   $reportType: [VulnerabilityReportType!]
+  $scanner: [String!]
   $state: [VulnerabilityState!]
 ) {
   project(fullPath: $fullPath) {
@@ -15,6 +16,7 @@ query project(
       first: $first
       severity: $severity
       reportType: $reportType
+      scanner: $scanner
       state: $state
     ) {
       nodes {

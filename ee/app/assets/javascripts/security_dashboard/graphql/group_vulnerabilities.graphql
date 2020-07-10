@@ -9,6 +9,7 @@ query group(
   $projectId: [ID!]
   $severity: [VulnerabilitySeverity!]
   $reportType: [VulnerabilityReportType!]
+  $scanner: [String!]
   $state: [VulnerabilityState!]
 ) {
   group(fullPath: $fullPath) {
@@ -22,6 +23,7 @@ query group(
       first: $first
       severity: $severity
       reportType: $reportType
+      scanner: $scanner
       state: $state
       projectId: $projectId
     ) {
