@@ -10,6 +10,7 @@ class Geo::DesignRegistry < Geo::BaseRegistry
 
   belongs_to :project
 
+  scope :never_synced, -> { with_state(:pending).where(last_synced_at: nil) }
   scope :pending, -> { with_state(:pending) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
