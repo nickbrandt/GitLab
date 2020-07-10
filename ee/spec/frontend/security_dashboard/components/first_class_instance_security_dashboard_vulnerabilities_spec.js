@@ -2,8 +2,8 @@ import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlAlert, GlTable, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
 import FirstClassInstanceVulnerabilities from 'ee/security_dashboard/components/first_class_instance_security_dashboard_vulnerabilities.vue';
-import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
-import { generateVulnerabilities } from '../../vulnerabilities/mock_data';
+import VulnerabilityList from 'ee/security_dashboard/components/vulnerability_list.vue';
+import { generateVulnerabilities } from './mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

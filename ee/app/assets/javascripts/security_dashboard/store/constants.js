@@ -1,5 +1,7 @@
 import { s__ } from '~/locale';
 
+export const VULNERABILITIES_PER_PAGE = 20;
+
 export const SEVERITY_LEVELS = {
   critical: s__('severity|Critical'),
   high: s__('severity|High'),

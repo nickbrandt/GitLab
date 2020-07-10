@@ -1,5 +1,5 @@
 #import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
-#import "ee/vulnerabilities/graphql/vulnerability.fragment.graphql"
+#import "./vulnerability.fragment.graphql"
 
 query instance(
   $after: String

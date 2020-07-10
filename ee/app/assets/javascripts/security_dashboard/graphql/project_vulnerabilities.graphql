@@ -11,13 +11,13 @@ query project(
 ) {
   project(fullPath: $fullPath) {
     vulnerabilities(
-      after:$after
-      first:$first
+      after: $after
+      first: $first
       severity: $severity
       reportType: $reportType
       state: $state
-    ){
-      nodes{
+    ) {
+      nodes {
         ...Vulnerability
       }
       pageInfo {

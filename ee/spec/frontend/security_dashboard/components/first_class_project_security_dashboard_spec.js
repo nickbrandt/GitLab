@@ -10,7 +10,7 @@ import FirstClassProjectSecurityDashboard, {
 } from 'ee/security_dashboard/components/first_class_project_security_dashboard.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
-import ProjectVulnerabilitiesApp from 'ee/vulnerabilities/components/project_vulnerabilities_app.vue';
+import ProjectVulnerabilitiesApp from 'ee/security_dashboard/components/project_vulnerabilities.vue';
 import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 

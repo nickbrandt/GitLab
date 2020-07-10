@@ -1,7 +1,7 @@
 import { GlAlert, GlIntersectionObserver } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import ProjectVulnerabilitiesApp from 'ee/vulnerabilities/components/project_vulnerabilities_app.vue';
-import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
+import ProjectVulnerabilitiesApp from 'ee/security_dashboard/components/project_vulnerabilities.vue';
+import VulnerabilityList from 'ee/security_dashboard/components/vulnerability_list.vue';
 import { generateVulnerabilities } from './mock_data';
 
 describe('Vulnerabilities app component', () => {
