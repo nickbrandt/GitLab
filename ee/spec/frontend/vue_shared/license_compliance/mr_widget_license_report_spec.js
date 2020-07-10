@@ -339,63 +339,6 @@ describe('License Report MR Widget', () => {
     expect(wrapper.find('#modal-set-license-approval')).not.toBeNull();
   });
 
-  describe('with approvalsApiPath prop set', () => {
-    it('should init store after mount calling fetchLicenseCheckApprovalRule', () => {
-      const actions = {
-        ...defaultActions,
-        setAPISettings: jest.fn(),
-        fetchLicenseCheckApprovalRule: jest.fn(),
-      };
-      mountComponent({ actions });
-
-      expect(actions.setAPISettings).toHaveBeenCalledWith(
-        expect.any(Object),
-        {
-          apiUrlManageLicenses: apiUrl,
-          licensesApiPath: defaultProps.licensesApiPath,
-          approvalsApiPath: defaultProps.approvalsApiPath,
-          canManageLicenses: true,
-        },
-        undefined,
-      );
-
-      expect(actions.fetchLicenseCheckApprovalRule).toHaveBeenCalledWith(
-        expect.any(Object),
-        undefined,
-        undefined,
-      );
-    });
-  });
-
-  describe('with approvalsApiPath prop unset', () => {
-    it('should init store after mount without calling fetchLicenseCheckApprovalRule', () => {
-      const props = {
-        ...defaultProps,
-        approvalsApiPath: '',
-      };
-
-      const actions = {
-        ...defaultActions,
-        setAPISettings: jest.fn(),
-        fetchLicenseCheckApprovalRule: jest.fn(),
-      };
-      mountComponent({ actions, props });
-
-      expect(actions.setAPISettings).toHaveBeenCalledWith(
-        expect.any(Object),
-        {
-          apiUrlManageLicenses: apiUrl,
-          licensesApiPath: defaultProps.licensesApiPath,
-          canManageLicenses: true,
-          approvalsApiPath: '',
-        },
-        undefined,
-      );
-
-      expect(actions.fetchLicenseCheckApprovalRule).not.toHaveBeenCalled();
-    });
-  });
-
   it('should init store after mount', () => {
     const actions = {
       setAPISettings: jest.fn(),
@@ -416,6 +359,12 @@ describe('License Report MR Widget', () => {
     );
 
     expect(actions.fetchParsedLicenseReport).toHaveBeenCalledWith(
+      expect.any(Object),
+      undefined,
+      undefined,
+    );
+
+    expect(actions.fetchLicenseCheckApprovalRule).toHaveBeenCalledWith(
       expect.any(Object),
       undefined,
       undefined,

@@ -115,6 +115,15 @@ export const receiveSetLicenseApprovalError = ({ commit }, error) => {
 export const fetchLicenseCheckApprovalRule = ({ dispatch, state }) => {
   dispatch('requestLicenseCheckApprovalRule');
 
+  /* 
+    If we call this action from the "License" tab in the pipeline view,
+    then we don't fetch the approvals since we aren't in the Merge request context.
+    Pipelines cannot have approval rules.
+  */
+  if (!state.approvalsApiPath) {
+    return dispatch('receiveLicenseCheckApprovalRuleError');
+  }
+
   return axios
     .get(state.approvalsApiPath)
     .then(({ data }) => {

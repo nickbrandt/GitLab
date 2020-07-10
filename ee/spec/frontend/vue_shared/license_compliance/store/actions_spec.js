@@ -537,6 +537,23 @@ describe('License store actions', () => {
       testAction(
         actions.fetchLicenseCheckApprovalRule,
         null,
+        { ...state, approvalsApiPath: '' },
+        [],
+        [
+          { type: 'requestLicenseCheckApprovalRule' },
+          { type: 'receiveLicenseCheckApprovalRuleError', payload: error },
+        ],
+        done,
+      );
+    });
+
+    it('dispatches request/receive error when no approvalsAPiPath is provided', done => {
+      const error = new Error('Request failed with status code 500');
+      axiosMock.onGet(approvalsApiPath).replyOnce(500);
+
+      testAction(
+        actions.fetchLicenseCheckApprovalRule,
+        null,
         state,
         [],
         [
