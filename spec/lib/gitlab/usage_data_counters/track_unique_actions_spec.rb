@@ -20,7 +20,7 @@ RSpec.describe Gitlab::UsageDataCounters::TrackUniqueActions, :clean_gitlab_redi
       context 'when the feature flag and the application setting is enabled' do
         context 'when the target and the action is valid' do
           before do
-            stub_feature_flags(cache_diff_stats_merge_request: true)
+            stub_feature_flags(described_class::FEATURE_FLAG => true)
             stub_application_setting(usage_ping_enabled: true)
           end
 
@@ -60,16 +60,16 @@ RSpec.describe Gitlab::UsageDataCounters::TrackUniqueActions, :clean_gitlab_redi
       using RSpec::Parameterized::TableSyntax
 
       where(:feature_flag, :application_setting, :target, :action) do
-        true  | true  | :project        | :invalid_action
-        false | true  | :project        | :pushed
-        true  | false | :project        | :pushed
+        true  | true  | Project         | :invalid_action
+        false | true  | Project         | :pushed
+        true  | false | Project         | :pushed
         true  | true  | :invalid_target | :pushed
       end
 
       with_them do
         before do
           stub_application_setting(usage_ping_enabled: application_setting)
-          stub_feature_flags(cache_diff_stats_merge_request: feature_flag)
+          stub_feature_flags(described_class::FEATURE_FLAG => feature_flag)
         end
 
         it 'returns the expected values' do

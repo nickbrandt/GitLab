@@ -577,24 +577,33 @@ module Gitlab
 
       # rubocop: disable CodeReuse/ActiveRecord
       def action_monthly_active_users(time_period)
+        return {} unless Feature.enabled?(Gitlab::UsageDataCounters::TrackUniqueActions::FEATURE_FLAG)
+
         counter = Gitlab::UsageDataCounters::TrackUniqueActions.new
 
-        project_count = counter.count_unique_events(
-          event_action: Gitlab::UsageDataCounters::TrackUniqueActions::PUSH_ACTION,
-          date_from: time_period[:created_at].first,
-          date_to: time_period[:created_at].last
-        )
+        project_count = redis_usage_data do
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::PUSH_ACTION,
+            date_from: time_period[:created_at].first,
+            date_to: time_period[:created_at].last
+          )
+        end
 
-        design_count = counter.count_unique_events(
-          event_action: Gitlab::UsageDataCounters::TrackUniqueActions::DESIGN_ACTION,
-          date_from: time_period[:created_at].first,
-          date_to: time_period[:created_at].last
-        )
+        design_count = redis_usage_data do
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::DESIGN_ACTION,
+            date_from: time_period[:created_at].first,
+            date_to: time_period[:created_at].last
+          )
+        end
 
-        wiki_count = counter.count_unique_events(
-          event_action: Gitlab::UsageDataCounters::TrackUniqueActions::WIKI_ACTION,
-          date_from: time_period[:created_at].first,
-          date_to: time_period[:created_at].last)
+        wiki_count = redis_usage_data do
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::WIKI_ACTION,
+            date_from: time_period[:created_at].first,
+            date_to: time_period[:created_at].last
+          )
+        end
 
         {
           action_monthly_active_users_project_repo: project_count,
