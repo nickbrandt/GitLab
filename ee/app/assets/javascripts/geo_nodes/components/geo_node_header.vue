@@ -40,7 +40,7 @@ export default {
           <strong>{{ node.name }}</strong>
           <gl-loading-icon
             v-if="nodeDetailsLoading || node.nodeActionActive"
-            class="node-details-loading prepend-left-10 inline"
+            class="node-details-loading gl-ml-3 inline"
           />
           <icon
             v-if="showNodeWarningIcon"
