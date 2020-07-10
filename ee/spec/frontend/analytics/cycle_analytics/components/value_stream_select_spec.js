@@ -5,12 +5,8 @@ import ValueStreamSelect from 'ee/analytics/cycle_analytics/components/value_str
 describe('ValueStreamSelect', () => {
   let wrapper = null;
 
-  function createComponent() {
-    return shallowMount(ValueStreamSelect, {});
-  }
-
+  const createComponent = () => shallowMount(ValueStreamSelect, {});
   const findModal = () => wrapper.find(GlModal);
-
   const submitButtonDisabledState = () => findModal().props('actionPrimary').attributes[1].disabled;
 
   beforeEach(() => {
@@ -27,9 +23,9 @@ describe('ValueStreamSelect', () => {
     });
 
     describe('with valid fields', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         wrapper = createComponent();
-        wrapper.setData({ name: 'Cool stream' });
+        await wrapper.setData({ name: 'Cool stream' });
       });
 
       it('submit button is enabled', () => {

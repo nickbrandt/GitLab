@@ -11,7 +11,6 @@ export default {
   directives: {
     GlModalDirective,
   },
-  props: {},
   data() {
     return {
       name: '',
@@ -26,11 +25,9 @@ export default {
 </script>
 <template>
   <gl-form>
-    <gl-button
-      v-gl-modal-directive="'create-value-stream-modal'"
-      data-testid="create-value-stream"
-      >{{ __('Create new value stream') }}</gl-button
-    >
+    <gl-button v-gl-modal-directive="'create-value-stream-modal'">{{
+      __('Create new value stream')
+    }}</gl-button>
     <gl-modal
       modal-id="create-value-stream-modal"
       :title="__('Value Stream Name')"
