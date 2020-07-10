@@ -74,7 +74,7 @@ module Epics
       return 'Relative position is not valid.' unless valid_relative_position?
 
       if different_epic_parent?
-        return "The sibling object's parent must match the #{new_parent ? "new" : "current"} parent epic."
+        "The sibling object's parent must match the #{new_parent ? "new" : "current"} parent epic."
       end
     end
 
