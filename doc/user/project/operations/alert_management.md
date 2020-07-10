@@ -189,11 +189,15 @@ deselect the user from the list of assignees, or click **Unassigned**.
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3066) in GitLab 13.1.
 
-NOTE: **Note:**
-GitLab currently only supports creating system notes when assigning an Alert.
+When you take action on an alert, this is logged as a system note,
+which is visible in the Alert Details view. This gives you a linear
+timeline of the alert's investigation and assignment history.
 
-Assigning a user an Alert creates a system note, visible in the Alert Details view,
-giving you a linear timeline of the alert's investigation and assignment history.
+The following actions will result in a system note:
+
+- [Updating the status of an alert](#update-an-alerts-status)
+- [Creating an issue based on an alert](#create-an-issue-from-an-alert)
+- [Assignment of an alert to a user](#update-an-alerts-assignee)
 
 ![Alert Management Details View System Notes](img/alert_detail_system_notes_v13_1.png)
 
