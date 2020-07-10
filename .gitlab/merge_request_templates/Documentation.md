@@ -46,7 +46,7 @@ All reviewers can help ensure accuracy, clarity, completeness, and adherence to 
 **2. Technical Writer**
 
 - [ ] Technical writer review. If not requested for this MR, must be scheduled post-merge. To request for this MR, assign the writer listed for the applicable [DevOps stage](https://about.gitlab.com/handbook/product/product-categories/#devops-stages).
-  - [ ] Add ~"Technical Writing" and `docs::` workflow label.
+  - [ ] Ensure ~"Technical Writing", ~"documentation", and a `docs::` scoped label are added.
   - [ ] Add ~docs-only when the only files changed are under `doc/*`.
   - [ ] Add ~"tw::doing" when starting work on the MR.
   - [ ] Add ~"tw::finished" if Technical Writing team work on the MR is complete but it remains open.
