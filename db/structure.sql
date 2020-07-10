@@ -9816,26 +9816,6 @@ CREATE SEQUENCE public.ci_daily_build_group_report_results_id_seq
 
 ALTER SEQUENCE public.ci_daily_build_group_report_results_id_seq OWNED BY public.ci_daily_build_group_report_results.id;
 
-CREATE TABLE public.ci_daily_report_results (
-    id bigint NOT NULL,
-    date date NOT NULL,
-    project_id bigint NOT NULL,
-    last_pipeline_id bigint NOT NULL,
-    value double precision NOT NULL,
-    param_type bigint NOT NULL,
-    ref_path character varying NOT NULL,
-    title character varying NOT NULL
-);
-
-CREATE SEQUENCE public.ci_daily_report_results_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-ALTER SEQUENCE public.ci_daily_report_results_id_seq OWNED BY public.ci_daily_report_results.id;
-
 CREATE TABLE public.ci_freeze_periods (
     id bigint NOT NULL,
     project_id bigint NOT NULL,
@@ -16406,8 +16386,6 @@ ALTER TABLE ONLY public.ci_builds_runner_session ALTER COLUMN id SET DEFAULT nex
 
 ALTER TABLE ONLY public.ci_daily_build_group_report_results ALTER COLUMN id SET DEFAULT nextval('public.ci_daily_build_group_report_results_id_seq'::regclass);
 
-ALTER TABLE ONLY public.ci_daily_report_results ALTER COLUMN id SET DEFAULT nextval('public.ci_daily_report_results_id_seq'::regclass);
-
 ALTER TABLE ONLY public.ci_freeze_periods ALTER COLUMN id SET DEFAULT nextval('public.ci_freeze_periods_id_seq'::regclass);
 
 ALTER TABLE ONLY public.ci_group_variables ALTER COLUMN id SET DEFAULT nextval('public.ci_group_variables_id_seq'::regclass);
@@ -17317,9 +17295,6 @@ ALTER TABLE ONLY public.ci_builds_runner_session
 
 ALTER TABLE ONLY public.ci_daily_build_group_report_results
     ADD CONSTRAINT ci_daily_build_group_report_results_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY public.ci_daily_report_results
-    ADD CONSTRAINT ci_daily_report_results_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.ci_freeze_periods
     ADD CONSTRAINT ci_freeze_periods_pkey PRIMARY KEY (id);
@@ -18740,8 +18715,6 @@ CREATE UNIQUE INDEX index_ci_builds_runner_session_on_build_id ON public.ci_buil
 
 CREATE INDEX index_ci_daily_build_group_report_results_on_last_pipeline_id ON public.ci_daily_build_group_report_results USING btree (last_pipeline_id);
 
-CREATE INDEX index_ci_daily_report_results_on_last_pipeline_id ON public.ci_daily_report_results USING btree (last_pipeline_id);
-
 CREATE INDEX index_ci_freeze_periods_on_project_id ON public.ci_freeze_periods USING btree (project_id);
 
 CREATE UNIQUE INDEX index_ci_group_variables_on_group_id_and_key ON public.ci_group_variables USING btree (group_id, key);
@@ -18957,8 +18930,6 @@ CREATE INDEX index_container_repository_on_name_trigram ON public.container_repo
 CREATE UNIQUE INDEX index_custom_emoji_on_namespace_id_and_name ON public.custom_emoji USING btree (namespace_id, name);
 
 CREATE UNIQUE INDEX index_daily_build_group_report_results_unique_columns ON public.ci_daily_build_group_report_results USING btree (project_id, ref_path, date, group_name);
-
-CREATE UNIQUE INDEX index_daily_report_results_unique_columns ON public.ci_daily_report_results USING btree (project_id, ref_path, param_type, date, title);
 
 CREATE INDEX index_dependency_proxy_blobs_on_group_id_and_file_name ON public.dependency_proxy_blobs USING btree (group_id, file_name);
 
@@ -22317,9 +22288,6 @@ ALTER TABLE ONLY public.gpg_signatures
 ALTER TABLE ONLY public.board_group_recent_visits
     ADD CONSTRAINT fk_rails_ca04c38720 FOREIGN KEY (board_id) REFERENCES public.boards(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.ci_daily_report_results
-    ADD CONSTRAINT fk_rails_cc5caec7d9 FOREIGN KEY (last_pipeline_id) REFERENCES public.ci_pipelines(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY public.issues_self_managed_prometheus_alert_events
     ADD CONSTRAINT fk_rails_cc5d88bbb0 FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE CASCADE;
 
@@ -22439,9 +22407,6 @@ ALTER TABLE ONLY public.alert_management_alert_user_mentions
 
 ALTER TABLE ONLY public.snippet_statistics
     ADD CONSTRAINT fk_rails_ebc283ccf1 FOREIGN KEY (snippet_id) REFERENCES public.snippets(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.ci_daily_report_results
-    ADD CONSTRAINT fk_rails_ebc2931b90 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.cluster_providers_aws
     ADD CONSTRAINT fk_rails_ed1fdfaeb2 FOREIGN KEY (created_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
@@ -23642,10 +23607,12 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200630110826
 20200701093859
 20200702123805
+20200703121557
 20200703154822
 20200704143633
 20200704161600
 20200706005325
+20200706154619
 20200706170536
 20200707071941
 20200707094341
