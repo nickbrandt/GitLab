@@ -3,24 +3,17 @@
 require 'spec_helper'
 
 RSpec.describe Projects::Integrations::Jira::IssuesFinder do
-  let_it_be(:project, reload: true) { create(:project) }
+  let_it_be(:project, refind: true) { create(:project) }
   let_it_be(:jira_service, reload: true) { create(:jira_service, project: project) }
   let(:params) { {} }
   let(:service) { described_class.new(project, params) }
 
+  before do
+    stub_licensed_features(jira_issues_integration: true)
+  end
+
   describe '#execute' do
     subject(:issues) { service.execute }
-
-    context 'when jira_integration feature flag is not enabled' do
-      before do
-        stub_feature_flags(jira_integration: false)
-      end
-
-      it 'exits early and returns no issues' do
-        expect(issues.size).to eq 0
-        expect(service.total_count).to be_nil
-      end
-    end
 
     context 'when jira service integration does not have project_key' do
       it 'raises error' do
@@ -129,6 +122,15 @@ RSpec.describe Projects::Integrations::Jira::IssuesFinder do
             subject
           end
         end
+      end
+    end
+
+    context 'when jira_issues_integration licensed feature is not available' do
+      it 'exits early and returns no issues' do
+        stub_licensed_features(jira_issues_integration: false)
+
+        expect(issues.size).to eq 0
+        expect(service.total_count).to be_nil
       end
     end
   end

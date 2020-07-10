@@ -69,7 +69,7 @@ module Projects
         protected
 
         def check_feature_enabled!
-          return render_404 unless Feature.enabled?(:jira_integration, project) && project.external_issue_tracker
+          return render_404 unless project.jira_issues_integration_available? && project.external_issue_tracker
         end
 
         def render_bad_request(error)

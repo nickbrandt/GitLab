@@ -313,6 +313,10 @@ module EE
       end
     end
 
+    def jira_issues_integration_available?
+      feature_available?(:jira_issues_integration)
+    end
+
     def multiple_approval_rules_available?
       feature_available?(:multiple_approval_rules)
     end
