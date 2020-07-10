@@ -158,8 +158,7 @@ module Gitlab
             usage_counters,
             user_preferences_usage,
             ingress_modsecurity_usage,
-            container_expiration_policies_usage,
-            action_monthly_active_users(default_time_period)
+            container_expiration_policies_usage
           ).tap do |data|
             data[:snippets] = data[:personal_snippets] + data[:project_snippets]
           end
@@ -490,7 +489,10 @@ module Gitlab
           remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
           snippets: distinct_count(::Snippet.where(time_period), :author_id)
         }.tap do |h|
-          h[:merge_requests_users] = merge_requests_users(time_period) if time_period.present?
+          if time_period.present?
+            h[:merge_requests_users] = merge_requests_users(time_period)
+            h.merge!(action_monthly_active_users(time_period))
+          end
         end
       end
       # rubocop: enable CodeReuse/ActiveRecord
