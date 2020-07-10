@@ -204,6 +204,11 @@ module EE
       def with_web_entity_associations
         super.preload(:compliance_framework_setting)
       end
+
+      override :with_api_entity_associations
+      def with_api_entity_associations
+        super.preload(group: [:ip_restrictions, :saml_provider])
+      end
     end
 
     def has_regulated_settings?
