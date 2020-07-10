@@ -406,13 +406,8 @@ module Gitlab
 
       # rubocop: disable CodeReuse/ActiveRecord
       def merge_requests_users(time_period)
-        query =
-          Event
-            .where(target_type: Event::TARGET_TYPES[:merge_request].to_s)
-            .where(time_period)
-
         distinct_count(
-          query,
+          Event.where(target_type: Event::TARGET_TYPES[:merge_request].to_s).where(time_period),
           :author_id,
           start: user_minimum_id,
           finish: user_maximum_id
