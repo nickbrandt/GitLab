@@ -39,13 +39,16 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
 
     context "when the latest default branch pipeline's source is auto devops" do
       before do
-        create(
+        pipeline = create(
           :ci_pipeline,
           :auto_devops_source,
           project: project,
           ref: project.default_branch,
           sha: project.commit.sha
         )
+        create(:ci_build, :sast, pipeline: pipeline, status: 'success')
+        create(:ci_build, :dast, pipeline: pipeline, status: 'success')
+        create(:ci_build, :secret_detection, pipeline: pipeline, status: 'pending')
       end
 
       it 'reports that auto devops is enabled' do
@@ -56,13 +59,13 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
         expect(subject[:can_toggle_auto_fix_settings]).to be_truthy
       end
 
-      it 'reports that all security jobs are configured' do
+      it 'reports that all scanners are configured for which latest pipeline has builds' do
         expect(Gitlab::Json.parse(subject[:features])).to contain_exactly(
           security_scan(:dast, configured: true),
           security_scan(:sast, configured: true),
-          security_scan(:container_scanning, configured: true),
-          security_scan(:dependency_scanning, configured: true),
-          security_scan(:license_scanning, configured: true),
+          security_scan(:container_scanning, configured: false),
+          security_scan(:dependency_scanning, configured: false),
+          security_scan(:license_scanning, configured: false),
           security_scan(:secret_detection, configured: true)
         )
       end
