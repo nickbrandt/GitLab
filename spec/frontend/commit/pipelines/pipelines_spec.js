@@ -153,23 +153,10 @@ describe('Pipelines table in Commits and Merge requests', () => {
       });
     });
 
-    describe('when latest pipeline does not have detached flag and merge_request_pipeline is true', () => {
-      it('does not render the run pipeline button', done => {
-        pipelineCopy.flags.detached_merge_request_pipeline = false;
-        pipelineCopy.flags.merge_request_pipeline = true;
-
-        mock.onGet('endpoint.json').reply(200, [pipelineCopy]);
-
-        vm = mountComponent(PipelinesTable, { ...props });
-
-        setImmediate(() => {
-          expect(vm.$el.querySelector('.js-run-mr-pipeline')).toBeNull();
-          done();
-        });
-      });
-    });
-
     describe('on click', () => {
+      const findModal = () =>
+        document.querySelector('#create-pipeline-for-fork-merge-request-modal');
+
       beforeEach(() => {
         pipelineCopy.flags.detached_merge_request_pipeline = true;
 
@@ -190,6 +177,7 @@ describe('Pipelines table in Commits and Merge requests', () => {
           vm.$el.querySelector('.js-run-mr-pipeline').click();
 
           vm.$nextTick(() => {
+            expect(findModal()).toBeNull();
             expect(vm.state.isRunningMergeRequestPipeline).toBe(true);
 
             setImmediate(() => {
@@ -197,6 +185,39 @@ describe('Pipelines table in Commits and Merge requests', () => {
 
               done();
             });
+          });
+        });
+      });
+    });
+
+    describe('on click for fork merge request', () => {
+      const findModal = () =>
+        document.querySelector('#create-pipeline-for-fork-merge-request-modal');
+
+      beforeEach(() => {
+        pipelineCopy.flags.detached_merge_request_pipeline = true;
+
+        mock.onGet('endpoint.json').reply(200, [pipelineCopy]);
+
+        vm = mountComponent(PipelinesTable, {
+          ...props,
+          projectId: '5',
+          mergeRequestId: 3,
+          canCreatePipelineInTargetProject: true,
+          sourceProjectFullPath: 'test/parent-project',
+          targetProjectFullPath: 'test/fork-project',
+        });
+      });
+
+      it('shows a security warning modal', done => {
+        jest.spyOn(Api, 'postMergeRequestPipeline').mockReturnValue(Promise.resolve());
+
+        setImmediate(() => {
+          vm.$el.querySelector('.js-run-mr-pipeline').click();
+
+          vm.$nextTick(() => {
+            expect(findModal()).not.toBeNull();
+            done();
           });
         });
       });

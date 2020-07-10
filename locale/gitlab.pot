@@ -17194,6 +17194,9 @@ msgstr ""
 msgid "Pipelines|Loading Pipelines"
 msgstr ""
 
+msgid "Pipelines|More Information"
+msgstr ""
+
 msgid "Pipelines|Project cache successfully reset."
 msgstr ""
 

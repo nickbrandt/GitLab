@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon, GlModal, GlLink } from '@gitlab/ui';
 import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import PipelinesService from '~/pipelines/services/pipelines_service';
 import PipelineStore from '~/pipelines/stores/pipelines_store';
@@ -12,12 +12,10 @@ import CIPaginationMixin from '~/vue_shared/mixins/ci_pagination_api_mixin';
 export default {
   components: {
     TablePagination,
-    GlDeprecatedButton,
+    GlButton,
     GlLoadingIcon,
     GlModal,
-  },
-  directives: {
-    GlModalDirective,
+    GlLink,
   },
   mixins: [pipelinesMixin, CIPaginationMixin],
   props: {
@@ -104,7 +102,7 @@ export default {
     isLatestPipelineCreatedInTargetProject() {
       const latest = this.state.pipelines[0];
 
-      return latest && latest.project.full_path === `/${this.targetProjectFullPath}`;
+      return latest?.project?.full_path === `/${this.targetProjectFullPath}`;
     },
     shouldShowSecurityWarning() {
       return (
@@ -178,6 +176,13 @@ export default {
         mergeRequestId: this.mergeRequestId,
       });
     },
+    tryRunPipeline() {
+      if (!this.shouldShowSecurityWarning) {
+        this.onClickRunPipeline();
+      } else {
+        this.$refs.modal.show();
+      }
+    },
   },
 };
 </script>
@@ -201,30 +206,19 @@ export default {
 
     <div v-else-if="shouldRenderTable" class="table-holder">
       <div v-if="canRenderPipelineButton" class="nav justify-content-end">
-        <gl-deprecated-button
-          v-if="!shouldShowSecurityWarning"
+        <gl-button
           variant="success"
           class="js-run-mr-pipeline prepend-top-10 btn-wide-on-xs"
           :disabled="state.isRunningMergeRequestPipeline"
-          @click="onClickRunPipeline"
+          @click="tryRunPipeline"
         >
           <gl-loading-icon v-if="state.isRunningMergeRequestPipeline" inline />
           {{ s__('Pipelines|Run Pipeline') }}
-        </gl-deprecated-button>
-
-        <gl-deprecated-button
-          v-if="shouldShowSecurityWarning"
-          v-gl-modal-directive="modalId"
-          variant="success"
-          class="js-run-mr-pipeline prepend-top-10 btn-wide-on-xs"
-          :disabled="state.isRunningMergeRequestPipeline"
-        >
-          <gl-loading-icon v-if="state.isRunningMergeRequestPipeline" inline />
-          {{ s__('Pipelines|Run Pipeline') }}
-        </gl-deprecated-button>
+        </gl-button>
 
         <gl-modal
-          :id="$options.id"
+          :id="modalId"
+          ref="modal"
           :modal-id="modalId"
           :title="s__('Pipelines|Are you sure you want to run this pipeline?')"
           :ok-title="s__('Pipelines|Run Pipeline')"
@@ -252,6 +246,12 @@ export default {
               )
             }}
           </p>
+          <gl-link
+            href="/help/ci/merge_request_pipelines/index.html#create-pipelines-in-the-parent-project-for-merge-requests-from-a-forked-project"
+            target="_blank"
+          >
+            {{ s__('Pipelines|More Information') }}
+          </gl-link>
         </gl-modal>
       </div>
 

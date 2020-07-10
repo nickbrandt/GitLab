@@ -358,11 +358,11 @@ export default class MergeRequestTabs {
         emptyStateSvgPath: pipelineTableViewEl.dataset.emptyStateSvgPath,
         errorStateSvgPath: pipelineTableViewEl.dataset.errorStateSvgPath,
         autoDevopsHelpPath: pipelineTableViewEl.dataset.helpAutoDevopsPath,
-        canCreatePipelineInTargetProject: mrWidgetData
-          ? mrWidgetData.can_create_pipeline_in_target_project
-          : null,
-        sourceProjectFullPath: mrWidgetData ? mrWidgetData.source_project_full_path : null,
-        targetProjectFullPath: mrWidgetData ? mrWidgetData.target_project_full_path : null,
+        canCreatePipelineInTargetProject: Boolean(
+          mrWidgetData?.can_create_pipeline_in_target_project,
+        ),
+        sourceProjectFullPath: mrWidgetData?.source_project_full_path || '',
+        targetProjectFullPath: mrWidgetData?.target_project_full_path || '',
         projectId: pipelineTableViewEl.dataset.projectId,
         mergeRequestId: mrWidgetData ? mrWidgetData.iid : null,
       },
