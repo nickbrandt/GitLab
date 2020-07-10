@@ -80,8 +80,7 @@ RSpec.describe API::Search do
 
         ensure_elasticsearch_index!
 
-        # Some N+1 queries still exist
-        expect { get api(endpoint, user), params: { scope: 'merge_requests', search: '*' } }.not_to exceed_query_limit(control.count + 16)
+        expect { get api(endpoint, user), params: { scope: 'merge_requests', search: '*' } }.not_to exceed_query_limit(control)
       end
     end
 
@@ -125,7 +124,7 @@ RSpec.describe API::Search do
         ensure_elasticsearch_index!
 
         # Some N+1 queries still exist
-        expect { get api(endpoint, user), params: { scope: 'commits', search: 'folder' } }.not_to exceed_query_limit(control.count + 9)
+        expect { get api(endpoint, user), params: { scope: 'commits', search: 'folder' } }.not_to exceed_query_limit(control).with_threshold(9)
       end
     end
 
@@ -187,8 +186,7 @@ RSpec.describe API::Search do
 
         ensure_elasticsearch_index!
 
-        # Some N+1 queries still exist
-        expect { get api(endpoint, user), params: { scope: 'issues', search: '*' } }.not_to exceed_query_limit(control.count + 2)
+        expect { get api(endpoint, user), params: { scope: 'issues', search: '*' } }.not_to exceed_query_limit(control)
       end
 
       it_behaves_like 'pagination', scope: 'issues'
@@ -213,7 +211,7 @@ RSpec.describe API::Search do
           ensure_elasticsearch_index!
 
           # Some N+1 queries still exist
-          expect { get api(endpoint, user), params: { scope: 'projects', search: '*' } }.not_to exceed_query_limit(control.count + 4)
+          expect { get api(endpoint, user), params: { scope: 'projects', search: '*' } }.not_to exceed_query_limit(control).with_threshold(4)
         end
       end
     end
@@ -234,7 +232,7 @@ RSpec.describe API::Search do
 
         ensure_elasticsearch_index!
 
-        expect { get api(endpoint, user), params: { scope: 'milestones', search: '*' } }.not_to exceed_query_limit(control.count)
+        expect { get api(endpoint, user), params: { scope: 'milestones', search: '*' } }.not_to exceed_query_limit(control)
       end
     end
 
