@@ -37,6 +37,64 @@ describe('Codequality report store utils', () => {
       expect(result.path).toEqual(baseIssues[0].location.path);
       expect(result.line).toEqual(baseIssues[0].location.lines.begin);
     });
+
+    describe('when an issue has no location or path', () => {
+      const issue = { description: 'Insecure Dependency' };
+
+      beforeEach(() => {
+        [result] = parseCodeclimateMetrics([issue], 'path');
+      });
+
+      it('is parsed', () => {
+        expect(result.name).toEqual(issue.description);
+      });
+    });
+
+    describe('when an issue has a path but no line', () => {
+      const issue = { description: 'Insecure Dependency', location: { path: 'Gemfile.lock' } };
+
+      beforeEach(() => {
+        [result] = parseCodeclimateMetrics([issue], 'path');
+      });
+
+      it('is parsed', () => {
+        expect(result.name).toEqual(issue.description);
+        expect(result.path).toEqual(issue.location.path);
+        expect(result.urlPath).toEqual(`path/${issue.location.path}`);
+      });
+    });
+
+    describe('when an issue has a line nested in positions', () => {
+      const issue = {
+        description: 'Insecure Dependency',
+        location: {
+          path: 'Gemfile.lock',
+          positions: { begin: { line: 84 } },
+        },
+      };
+
+      beforeEach(() => {
+        [result] = parseCodeclimateMetrics([issue], 'path');
+      });
+
+      it('is parsed', () => {
+        expect(result.name).toEqual(issue.description);
+        expect(result.path).toEqual(issue.location.path);
+        expect(result.urlPath).toEqual(
+          `path/${issue.location.path}#L${issue.location.positions.begin.line}`,
+        );
+      });
+    });
+
+    describe('with an empty issue array', () => {
+      beforeEach(() => {
+        result = parseCodeclimateMetrics([], 'path');
+      });
+
+      it('returns an empty array', () => {
+        expect(result).toEqual([]);
+      });
+    });
   });
 
   describe('doCodeClimateComparison', () => {
