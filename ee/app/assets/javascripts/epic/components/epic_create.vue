@@ -7,7 +7,6 @@ import {
   GlIcon,
   GlButton,
   GlTooltipDirective,
-  GlDeprecatedButton,
 } from '@gitlab/ui';
 
 import { __ } from '~/locale';
@@ -18,7 +17,6 @@ export default {
   components: {
     GlFormCheckbox,
     GlIcon,
-    GlDeprecatedButton,
     GlButton,
     GlForm,
     GlFormInput,
@@ -72,9 +70,14 @@ export default {
 
 <template>
   <div class="dropdown epic-create-dropdown">
-    <gl-deprecated-button variant="success" class="qa-new-epic-button" data-toggle="dropdown">
+    <gl-button
+      category="primary"
+      variant="success"
+      class="qa-new-epic-button"
+      data-toggle="dropdown"
+    >
       {{ __('New epic') }}
-    </gl-deprecated-button>
+    </gl-button>
 
     <div :class="{ 'dropdown-menu-right': alignRight }" class="dropdown-menu">
       <gl-form>
