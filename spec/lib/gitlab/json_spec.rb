@@ -217,7 +217,15 @@ RSpec.describe Gitlab::Json do
 
     describe ".pretty_generate" do
       let(:obj) do
-        { test: true, "foo.bar" => "baz", is_json: 1, some: [1, 2, 3] }
+        {
+          test: true,
+          "foo.bar" => "baz",
+          is_json: 1,
+          some: [1, 2, 3],
+          more: { test: true },
+          multi_line_empty_array: [],
+          multi_line_empty_obj: {}
+        }
       end
 
       it "generates pretty JSON" do
@@ -230,7 +238,15 @@ RSpec.describe Gitlab::Json do
               1,
               2,
               3
-            ]
+            ],
+            "more": {
+              "test": true
+            },
+            "multi_line_empty_array": [
+
+            ],
+            "multi_line_empty_obj": {
+            }
           }
         STR
 
@@ -253,7 +269,15 @@ RSpec.describe Gitlab::Json do
               1,
               2,
               3
-            ]
+            ],
+            "more" : {
+              "test" : true
+            },
+            "multi_line_empty_array" : [
+
+            ],
+            "multi_line_empty_obj" : {
+            }
           }
         STR
 
