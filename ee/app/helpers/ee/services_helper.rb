@@ -9,6 +9,21 @@ module EE
       ::Feature.enabled?(:jira_integration, @project) && @project.jira_service.issues_enabled
     end
 
+    override :integration_form_data
+    def integration_form_data(integration)
+      form_data = super
+
+      if integration.is_a?(JiraService)
+        form_data.merge!(
+          enable_jira_issues: integration.issues_enabled.to_s,
+          project_key: integration.project_key,
+          edit_project_path: @project ? edit_project_path(@project, anchor: 'js-shared-permissions') : nil
+        )
+      end
+
+      form_data
+    end
+
     def add_to_slack_link(project, slack_app_id)
       "https://slack.com/oauth/authorize?scope=commands&client_id=#{slack_app_id}&redirect_uri=#{slack_auth_project_settings_slack_url(project)}&state=#{escaped_form_authenticity_token}"
     end

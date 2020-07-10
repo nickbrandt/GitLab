@@ -13814,7 +13814,8 @@ CREATE TABLE public.plan_limits (
     ci_max_artifact_size_cluster_applications integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_secret_detection integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_requirements integer DEFAULT 0 NOT NULL,
-    ci_max_artifact_size_coverage_fuzzing integer DEFAULT 0 NOT NULL
+    ci_max_artifact_size_coverage_fuzzing integer DEFAULT 0 NOT NULL,
+    ci_max_artifact_size_browser_performance integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE public.plan_limits_id_seq
@@ -15639,7 +15640,9 @@ ALTER SEQUENCE public.user_custom_attributes_id_seq OWNED BY public.user_custom_
 CREATE TABLE public.user_details (
     user_id bigint NOT NULL,
     job_title character varying(200) DEFAULT ''::character varying NOT NULL,
-    bio character varying(255) DEFAULT ''::character varying NOT NULL
+    bio character varying(255) DEFAULT ''::character varying NOT NULL,
+    bio_html text,
+    cached_markdown_version integer
 );
 
 CREATE SEQUENCE public.user_details_user_id_seq
@@ -23634,6 +23637,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200626060151
 20200626130220
 20200629192638
+20200630091656
 20200630110826
 20200701093859
 20200702123805
@@ -23643,5 +23647,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200706005325
 20200706170536
 20200707071941
+20200707094341
 \.
 

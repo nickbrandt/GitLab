@@ -860,6 +860,7 @@ Represents a Group Member
 | `dueDate` | Time | Due date of the issue |
 | `epic` | Epic | Epic to which this issue belongs |
 | `healthStatus` | HealthStatus | Current health status. Returns null if `save_issuable_health_status` feature flag is disabled. |
+| `id` | ID! | ID of the issue |
 | `iid` | ID! | Internal ID of the issue |
 | `iteration` | Iteration | Iteration of the issue |
 | `milestone` | Milestone | Milestone of the issue |
@@ -945,6 +946,7 @@ Represents an iteration object.
 | `description` | String | Description of the iteration |
 | `dueDate` | Time | Timestamp of the iteration due date |
 | `id` | ID! | ID of the iteration |
+| `iid` | ID! | Internal ID of the iteration |
 | `startDate` | Time | Timestamp of the iteration start date |
 | `state` | IterationState! | State of the iteration |
 | `title` | String! | Title of the iteration |

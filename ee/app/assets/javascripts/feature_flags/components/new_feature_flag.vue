@@ -3,7 +3,12 @@ import { createNamespacedHelpers } from 'vuex';
 import { GlAlert } from '@gitlab/ui';
 import store from '../store/index';
 import FeatureFlagForm from './form.vue';
-import { LEGACY_FLAG, NEW_VERSION_FLAG, NEW_FLAG_ALERT } from '../constants';
+import {
+  LEGACY_FLAG,
+  NEW_VERSION_FLAG,
+  NEW_FLAG_ALERT,
+  ROLLOUT_STRATEGY_ALL_USERS,
+} from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
 
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -58,7 +63,7 @@ export default {
       return this.glFeatures.featureFlagsNewVersion;
     },
     strategies() {
-      return [{ name: '', parameters: {}, scopes: [] }];
+      return [{ name: ROLLOUT_STRATEGY_ALL_USERS, parameters: {}, scopes: [] }];
     },
   },
   created() {

@@ -175,6 +175,10 @@ module EE
       actual_plan_name
     end
 
+    def over_storage_limit?
+      ::Namespace::RootStorageSize.new(root_ancestor).above_size_limit?
+    end
+
     def actual_size_limit
       ::Gitlab::CurrentSettings.repository_size_limit
     end

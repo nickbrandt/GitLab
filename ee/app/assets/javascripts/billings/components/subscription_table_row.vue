@@ -66,7 +66,7 @@ export default {
       >
         <span class="property-label"> {{ col.label }} </span>
         <popover v-if="col.popover" :options="getPopoverOptions(col)" />
-        <p class="property-value prepend-top-5 gl-mb-0" :class="[col.colClass ? col.colClass : '']">
+        <p class="property-value gl-mt-2 gl-mb-0" :class="[col.colClass ? col.colClass : '']">
           {{ getDisplayValue(col) }}
         </p>
       </div>

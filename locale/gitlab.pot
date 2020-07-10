@@ -1124,6 +1124,9 @@ msgstr ""
 msgid "ACTION REQUIRED: Something went wrong while obtaining the Let's Encrypt certificate for GitLab Pages domain '%{domain}'"
 msgstr ""
 
+msgid "API Help"
+msgstr ""
+
 msgid "API Token"
 msgstr ""
 
@@ -1594,6 +1597,9 @@ msgstr ""
 msgid "Admin Overview"
 msgstr ""
 
+msgid "Admin Section"
+msgstr ""
+
 msgid "Admin mode already enabled"
 msgstr ""
 
@@ -1998,6 +2004,12 @@ msgstr ""
 msgid "AlertManagement|Medium"
 msgstr ""
 
+msgid "AlertManagement|Metrics"
+msgstr ""
+
+msgid "AlertManagement|Metrics weren't available in the alerts payload."
+msgstr ""
+
 msgid "AlertManagement|More information"
 msgstr ""
 
@@ -2314,6 +2326,9 @@ msgid "Also called \"Issuer\" or \"Relying party trust identifier\""
 msgstr ""
 
 msgid "Also called \"Relying party service URL\" or \"Reply URL\""
+msgstr ""
+
+msgid "Also unassign this user from related issues and merge requests"
 msgstr ""
 
 msgid "Alternate support URL for help page and help dropdown"
@@ -6590,6 +6605,9 @@ msgstr ""
 msgid "Copy secret"
 msgstr ""
 
+msgid "Copy source branch name"
+msgstr ""
+
 msgid "Copy token"
 msgstr ""
 
@@ -7517,6 +7535,9 @@ msgid "Denied authorization of chat nickname %{user_name}."
 msgstr ""
 
 msgid "Deny"
+msgstr ""
+
+msgid "Deny access request"
 msgstr ""
 
 msgid "Dependencies"
@@ -9874,7 +9895,7 @@ msgstr ""
 msgid "FeatureFlags|Edit list"
 msgstr ""
 
-msgid "FeatureFlags|Enable features for specific users and specific environments by defining feature flag strategies. By default, features are available to all users in all environments."
+msgid "FeatureFlags|Enable features for specific users and specific environments by defining feature flag strategies."
 msgstr ""
 
 msgid "FeatureFlags|Environment Spec"
@@ -10438,9 +10459,6 @@ msgstr ""
 msgid "Geo Settings"
 msgstr ""
 
-msgid "Geo allows you to replicate your GitLab instance to other geographical locations."
-msgstr ""
-
 msgid "Geo nodes are paused using a command run on the node"
 msgstr ""
 
@@ -10649,6 +10667,24 @@ msgid "Geo|All projects are being scheduled for resync"
 msgstr ""
 
 msgid "Geo|All projects are being scheduled for reverify"
+msgstr ""
+
+msgid "Geo|Allowed Geo IP can't be blank"
+msgstr ""
+
+msgid "Geo|Allowed Geo IP should be between 1 and 255 characters"
+msgstr ""
+
+msgid "Geo|Allowed Geo IP should contain valid IP addresses"
+msgstr ""
+
+msgid "Geo|Connection timeout can't be blank"
+msgstr ""
+
+msgid "Geo|Connection timeout must be a number"
+msgstr ""
+
+msgid "Geo|Connection timeout should be between 1-120"
 msgstr ""
 
 msgid "Geo|Could not remove tracking entry for an existing project."
@@ -12913,6 +12949,12 @@ msgstr ""
 msgid "JiraService|%{user_link} mentioned this issue in %{entity_link} of %{project_link}%{branch}:{quote}%{entity_message}{quote}"
 msgstr ""
 
+msgid "JiraService|Displaying Jira issues while leaving the GitLab issue functionality enabled might be confusing. Consider %{linkStart}disabling GitLab issues%{linkEnd} if they won’t otherwise be used."
+msgstr ""
+
+msgid "JiraService|Enable Jira issues"
+msgstr ""
+
 msgid "JiraService|Events for %{noteable_model_name} are disabled."
 msgstr ""
 
@@ -12937,6 +12979,9 @@ msgstr ""
 msgid "JiraService|Jira issue tracker"
 msgstr ""
 
+msgid "JiraService|Jira project key"
+msgstr ""
+
 msgid "JiraService|Open Jira"
 msgstr ""
 
@@ -12958,7 +13003,19 @@ msgstr ""
 msgid "JiraService|Username or Email"
 msgstr ""
 
+msgid "JiraService|View Jira issues in GitLab"
+msgstr ""
+
+msgid "JiraService|Warning: All GitLab users that have access to this GitLab project will be able to view all issues from the Jira project specified below."
+msgstr ""
+
 msgid "JiraService|Web URL"
+msgstr ""
+
+msgid "JiraService|Work on Jira issues without leaving GitLab. Adds a Jira menu to access your list of issues and view any issue as read-only."
+msgstr ""
+
+msgid "JiraService|e.g. AB"
 msgstr ""
 
 msgid "JiraService|transition ids can have only numbers which can be split with , or ;"
@@ -13455,6 +13512,9 @@ msgstr ""
 msgid "LicenseCompliance|%{docLinkStart}License Approvals%{docLinkEnd} are inactive"
 msgstr ""
 
+msgid "LicenseCompliance|Acceptable license to be used in the project"
+msgstr ""
+
 msgid "LicenseCompliance|Add a license"
 msgstr ""
 
@@ -13474,6 +13534,9 @@ msgid "LicenseCompliance|Denied"
 msgstr ""
 
 msgid "LicenseCompliance|Deny"
+msgstr ""
+
+msgid "LicenseCompliance|Disallow merge request if detected and will instruct developer to remove"
 msgstr ""
 
 msgid "LicenseCompliance|Learn more about %{linkStart}License Approvals%{linkEnd}"
@@ -13694,9 +13757,6 @@ msgid "List Your Gitea Repositories"
 msgstr ""
 
 msgid "List available repositories"
-msgstr ""
-
-msgid "List of IPs and CIDRs of allowed secondary nodes. Comma-separated, e.g. \"1.1.1.1, 2.2.2.0/24\""
 msgstr ""
 
 msgid "List settings"
@@ -13958,6 +14018,9 @@ msgid "Mark this issue as related to another issue"
 msgstr ""
 
 msgid "Markdown"
+msgstr ""
+
+msgid "Markdown Help"
 msgstr ""
 
 msgid "Markdown enabled"
@@ -16551,6 +16614,9 @@ msgstr ""
 msgid "Permissions"
 msgstr ""
 
+msgid "Permissions Help"
+msgstr ""
+
 msgid "Permissions, LFS, 2FA"
 msgstr ""
 
@@ -18723,6 +18789,9 @@ msgstr ""
 msgid "Public - The project can be accessed without any authentication."
 msgstr ""
 
+msgid "Public Access Help"
+msgstr ""
+
 msgid "Public deploy keys (%{deploy_keys_count})"
 msgstr ""
 
@@ -18853,6 +18922,9 @@ msgid "Quick range"
 msgstr ""
 
 msgid "README"
+msgstr ""
+
+msgid "Rake Tasks Help"
 msgstr ""
 
 msgid "Raw blob request rate limit per minute"
@@ -19178,6 +19250,9 @@ msgid "Remove license"
 msgstr ""
 
 msgid "Remove limit"
+msgstr ""
+
+msgid "Remove member"
 msgstr ""
 
 msgid "Remove milestone"
@@ -19957,6 +20032,9 @@ msgid "SSH Key"
 msgstr ""
 
 msgid "SSH Keys"
+msgstr ""
+
+msgid "SSH Keys Help"
 msgstr ""
 
 msgid "SSH host key fingerprints"
@@ -22518,6 +22596,9 @@ msgstr ""
 msgid "System Hooks"
 msgstr ""
 
+msgid "System Hooks Help"
+msgstr ""
+
 msgid "System Info"
 msgstr ""
 
@@ -22863,9 +22944,6 @@ msgid "The X509 Certificate to use when mutual TLS is required to communicate wi
 msgstr ""
 
 msgid "The above settings apply to all projects with the selected compliance framework(s)."
-msgstr ""
-
-msgid "The amount of seconds after which a request to get a secondary node status will time out."
 msgstr ""
 
 msgid "The application will be used where the client secret can be kept confidential. Native mobile apps and Single Page Apps are considered non-confidential."
@@ -23399,6 +23477,9 @@ msgid "There was an error syncing the %{replicableType}"
 msgstr ""
 
 msgid "There was an error trying to validate your query"
+msgstr ""
+
+msgid "There was an error updating the Geo Settings"
 msgstr ""
 
 msgid "There was an error updating the dashboard, branch name is invalid."
@@ -24446,6 +24527,9 @@ msgstr ""
 msgid "Total Contributions"
 msgstr ""
 
+msgid "Total Score"
+msgstr ""
+
 msgid "Total artifacts size: %{total_size}"
 msgstr ""
 
@@ -25274,6 +25358,9 @@ msgstr ""
 msgid "User restrictions"
 msgstr ""
 
+msgid "User settings"
+msgstr ""
+
 msgid "User was successfully created."
 msgstr ""
 
@@ -25983,6 +26070,9 @@ msgstr ""
 msgid "Webhooks"
 msgstr ""
 
+msgid "Webhooks Help"
+msgstr ""
+
 msgid "Webhooks allow you to trigger a URL if, for example, new code is pushed or a new issue is created. You can configure webhooks to listen for specific events like pushes, issues or merge requests. Group webhooks will apply to all projects in a group, allowing you to standardize webhook functionality across your entire group."
 msgstr ""
 
@@ -26253,6 +26343,9 @@ msgid "Work in progress (open and unassigned)"
 msgstr ""
 
 msgid "Work in progress Limit"
+msgstr ""
+
+msgid "Workflow Help"
 msgstr ""
 
 msgid "Write"
@@ -27076,6 +27169,12 @@ msgstr ""
 msgid "cannot merge"
 msgstr ""
 
+msgid "ciReport|%{degradedNum} degraded"
+msgstr ""
+
+msgid "ciReport|%{improvedNum} improved"
+msgstr ""
+
 msgid "ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}"
 msgstr ""
 
@@ -27103,6 +27202,9 @@ msgstr ""
 msgid "ciReport|%{reportType}: Loading resulted in an error"
 msgstr ""
 
+msgid "ciReport|%{sameNum} same"
+msgstr ""
+
 msgid "ciReport|(errors when loading results)"
 msgstr ""
 
@@ -27125,6 +27227,12 @@ msgid "ciReport|Automatically apply the patch in a new branch"
 msgstr ""
 
 msgid "ciReport|Base pipeline codequality artifact not found"
+msgstr ""
+
+msgid "ciReport|Browser performance test metrics: "
+msgstr ""
+
+msgid "ciReport|Browser performance test metrics: No changes"
 msgstr ""
 
 msgid "ciReport|Code quality"
@@ -27199,13 +27307,7 @@ msgstr ""
 msgid "ciReport|No changes to code quality"
 msgstr ""
 
-msgid "ciReport|No changes to performance metrics"
-msgstr ""
-
 msgid "ciReport|No code quality issues found"
-msgstr ""
-
-msgid "ciReport|Performance metrics"
 msgstr ""
 
 msgid "ciReport|Resolve with merge request"

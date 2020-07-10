@@ -12,6 +12,9 @@ module Types
     field :id, GraphQL::ID_TYPE, null: false,
           description: 'ID of the iteration'
 
+    field :iid, GraphQL::ID_TYPE, null: false,
+          description: 'Internal ID of the iteration'
+
     field :title, GraphQL::STRING_TYPE, null: false,
           description: 'Title of the iteration'
 

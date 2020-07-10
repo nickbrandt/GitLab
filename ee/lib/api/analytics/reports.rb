@@ -12,6 +12,19 @@ module API
           # This will be scoped to a project or a group
           Feature.enabled?(:report_pages) && ::License.feature_available?(:group_activity_analytics)
         end
+
+        def load_report
+          loader_class = Gitlab::Analytics::Reports::ConfigLoader
+          report_id = params[:report_id]
+
+          loader_class.new.find_report_by_id!(report_id)
+        rescue loader_class::MissingReportError
+          not_found!("Report(#{report_id})")
+        end
+
+        def report
+          @report ||= load_report
+        end
       end
 
       params do
@@ -25,20 +38,7 @@ module API
               get do
                 not_found! unless api_endpoints_available?
 
-                # Dummy response
-                {
-                  id: params[:report_id],
-                  title: 'Recent Issues (90 days)',
-                  chart: {
-                    type: 'bar',
-                    series: [
-                      {
-                        id: 'open_merge_requests',
-                        title: 'Merge requests'
-                      }
-                    ]
-                  }
-                }
+                present report, with: EE::API::Entities::Analytics::Reports::Chart
               end
             end
           end

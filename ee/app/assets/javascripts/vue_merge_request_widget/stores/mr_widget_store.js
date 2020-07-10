@@ -29,7 +29,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.appUrl = gon && gon.gitlab_url;
 
     this.initCodeclimate(data);
-    this.initPerformanceReport(data);
+    this.initBrowserPerformanceReport(data);
     this.licenseScanning = data.license_scanning;
     this.metricsReportsPath = data.metrics_reports_path;
 
@@ -85,11 +85,12 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     };
   }
 
-  initPerformanceReport(data) {
-    this.performance = data.performance;
-    this.performanceMetrics = {
+  initBrowserPerformanceReport(data) {
+    this.browserPerformance = data.browser_performance;
+    this.browserPerformanceMetrics = {
       improved: [],
       degraded: [],
+      same: [],
     };
   }
 
@@ -119,11 +120,12 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     );
   }
 
-  comparePerformanceMetrics(headMetrics, baseMetrics) {
-    const headMetricsIndexed = MergeRequestStore.normalizePerformanceMetrics(headMetrics);
-    const baseMetricsIndexed = MergeRequestStore.normalizePerformanceMetrics(baseMetrics);
+  compareBrowserPerformanceMetrics(headMetrics, baseMetrics) {
+    const headMetricsIndexed = MergeRequestStore.normalizeBrowserPerformanceMetrics(headMetrics);
+    const baseMetricsIndexed = MergeRequestStore.normalizeBrowserPerformanceMetrics(baseMetrics);
     const improved = [];
     const degraded = [];
+    const same = [];
 
     Object.keys(headMetricsIndexed).forEach(subject => {
       const subjectMetrics = headMetricsIndexed[subject];
@@ -150,18 +152,20 @@ export default class MergeRequestStore extends CEMergeRequestStore {
             } else {
               degraded.push(metricData);
             }
+          } else {
+            same.push(metricData);
           }
         }
       });
     });
 
-    this.performanceMetrics = { improved, degraded };
+    this.browserPerformanceMetrics = { improved, degraded, same };
   }
 
-  // normalize performance metrics by indexing on performance subject and metric name
-  static normalizePerformanceMetrics(performanceData) {
+  // normalize browser performance metrics by indexing on performance subject and metric name
+  static normalizeBrowserPerformanceMetrics(browserPerformanceData) {
     const indexedSubjects = {};
-    performanceData.forEach(({ subject, metrics }) => {
+    browserPerformanceData.forEach(({ subject, metrics }) => {
       const indexedMetrics = {};
       metrics.forEach(({ name, ...data }) => {
         indexedMetrics[name] = data;
