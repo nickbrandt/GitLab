@@ -1,0 +1,5 @@
+---
+title: Remove reference to sast:container
+merge_request: 32061
+author:
+type: removed
