@@ -8,18 +8,17 @@ export const fetchReports = ({ state, dispatch, commit }) => {
   commit(types.REQUEST_REPORTS);
 
   if (!state.basePath) {
-    dispatch('receiveReportsError');
-  } else {
-    Promise.all([axios.get(state.headPath), axios.get(state.basePath)])
-      .then(results =>
-        doCodeClimateComparison(
-          parseCodeclimateMetrics(results[0].data, state.headBlobPath),
-          parseCodeclimateMetrics(results[1].data, state.baseBlobPath),
-        ),
-      )
-      .then(data => dispatch('receiveReportsSuccess', data))
-      .catch(() => dispatch('receiveReportsError'));
+    return dispatch('receiveReportsError');
   }
+  return Promise.all([axios.get(state.headPath), axios.get(state.basePath)])
+    .then(results =>
+      doCodeClimateComparison(
+        parseCodeclimateMetrics(results[0].data, state.headBlobPath),
+        parseCodeclimateMetrics(results[1].data, state.baseBlobPath),
+      ),
+    )
+    .then(data => dispatch('receiveReportsSuccess', data))
+    .catch(() => dispatch('receiveReportsError'));
 };
 
 export const receiveReportsSuccess = ({ commit }, data) => {

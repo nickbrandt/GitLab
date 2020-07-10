@@ -1,9 +1,8 @@
 import { LOADING, ERROR, SUCCESS } from '../../constants';
 import { sprintf, __, s__, n__ } from '~/locale';
 
-export const hasCodequalityIssues = state => {
-  return state.newIssues?.length > 0 || state.resolvedIssues?.length > 0;
-};
+export const hasCodequalityIssues = state =>
+  Boolean(state.newIssues?.length || state.resolvedIssues?.length);
 
 export const codequalityStatus = state => {
   if (state.isLoading) {
@@ -22,14 +21,14 @@ export const codequalityText = state => {
 
   if (!newIssues.length && !resolvedIssues.length) {
     text.push(s__('ciReport|No changes to code quality'));
-  } else if (newIssues.length || resolvedIssues.length) {
+  } else {
     text.push(s__('ciReport|Code quality'));
 
     if (resolvedIssues.length) {
       text.push(n__(' improved on %d point', ' improved on %d points', resolvedIssues.length));
     }
 
-    if (newIssues.length > 0 && resolvedIssues.length > 0) {
+    if (newIssues.length && resolvedIssues.length) {
       text.push(__(' and'));
     }
 
