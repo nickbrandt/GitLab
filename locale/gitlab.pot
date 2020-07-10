@@ -735,6 +735,9 @@ msgstr ""
 msgid "'%{level}' is not a valid visibility level"
 msgstr ""
 
+msgid "'%{name}' Value Stream created"
+msgstr ""
+
 msgid "'%{name}' stage already exists"
 msgstr ""
 
@@ -6854,6 +6857,9 @@ msgstr ""
 msgid "Create snippet"
 msgstr ""
 
+msgid "Create value stream"
+msgstr ""
+
 msgid "Create wildcard: %{searchTerm}"
 msgstr ""
 
@@ -9446,6 +9452,9 @@ msgid "Exactly one of %{attributes} is required"
 msgstr ""
 
 msgid "Example: @sub\\.company\\.com$"
+msgstr ""
+
+msgid "Example: My value stream"
 msgstr ""
 
 msgid "Example: Usage = single query. (Requested) / (Capacity) = multiple queries combined into a formula."
@@ -25587,6 +25596,9 @@ msgid "Value Stream Analytics can help you determine your team’s velocity"
 msgstr ""
 
 msgid "Value Stream Analytics gives an overview of how much time it takes to go from idea to production in your project."
+msgstr ""
+
+msgid "Value Stream Name"
 msgstr ""
 
 msgid "ValueStreamAnalytics|%{days}d"
