@@ -144,17 +144,15 @@ module API
         post 'approve' do
           merge_request = find_project_merge_request(params[:merge_request_iid])
 
-          unauthorized! unless merge_request.can_approve?(current_user)
-
           check_sha_param!(params, merge_request)
 
-          begin
+          success =
             ::MergeRequests::ApprovalService
               .new(user_project, current_user, params)
               .execute(merge_request)
-          rescue ::MergeRequests::ApprovalService::IncorrectApprovalPasswordError
-            unauthorized!
-          end
+
+          unauthorized! unless success
+
           present_approval(merge_request)
         end
 
@@ -164,11 +162,11 @@ module API
         post 'unapprove' do
           merge_request = find_project_merge_request(params[:merge_request_iid])
 
-          not_found! unless merge_request.has_approved?(current_user)
-
-          ::MergeRequests::RemoveApprovalService
+          success = ::MergeRequests::RemoveApprovalService
             .new(user_project, current_user)
             .execute(merge_request)
+
+          not_found! unless success
 
           present_approval(merge_request)
         end
