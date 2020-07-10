@@ -31,7 +31,7 @@ module QA
           show.click_milestone_link
         end
 
-        QA::Page::Project::Milestone::Show.perform do |show|
+        Page::Milestone::Show.perform do |show|
           expect(show.total_issue_weight_value).to have_content(weight)
         end
 
