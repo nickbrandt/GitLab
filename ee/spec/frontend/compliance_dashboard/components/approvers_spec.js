@@ -8,7 +8,7 @@ import { createApprovers } from '../mock_data';
 describe('MergeRequest component', () => {
   let wrapper;
 
-  const findMessage = () => wrapper.find('li > span');
+  const findMessage = () => wrapper.find('[data-testid="approvers"]');
   const findCounter = () => wrapper.find('.avatar-counter');
   const findAvatarLinks = () => wrapper.findAll(GlAvatarLink);
 
@@ -32,8 +32,8 @@ describe('MergeRequest component', () => {
       wrapper = createComponent();
     });
 
-    it('displays the "No approvers" message', () => {
-      expect(findMessage().text()).toEqual('No approvers');
+    it('displays the "no approvers" message', () => {
+      expect(findMessage().text()).toEqual('no approvers');
     });
   });
 

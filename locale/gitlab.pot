@@ -2924,9 +2924,6 @@ msgstr ""
 msgid "Approved MRs"
 msgstr ""
 
-msgid "Approved by: "
-msgstr ""
-
 msgid "Approved the current merge request."
 msgstr ""
 
@@ -15433,9 +15430,6 @@ msgstr ""
 msgid "No application_settings found"
 msgstr ""
 
-msgid "No approvers"
-msgstr ""
-
 msgid "No authentication methods configured."
 msgstr ""
 
@@ -25109,6 +25103,9 @@ msgstr ""
 msgid "Updated to %{linkStart}chart v%{linkEnd}"
 msgstr ""
 
+msgid "Updates"
+msgstr ""
+
 msgid "Updating"
 msgstr ""
 
@@ -27139,6 +27136,9 @@ msgstr ""
 msgid "any-approver for the project already exists"
 msgstr ""
 
+msgid "approved by: "
+msgstr ""
+
 msgid "archived"
 msgstr ""
 
@@ -27760,7 +27760,7 @@ msgid_plural "merge requests"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "merged %{time_ago}"
+msgid "merged %{timeAgo}"
 msgstr ""
 
 msgid "missing"
@@ -28091,6 +28091,9 @@ msgid "never expires"
 msgstr ""
 
 msgid "new merge request"
+msgstr ""
+
+msgid "no approvers"
 msgstr ""
 
 msgid "no contributions"
