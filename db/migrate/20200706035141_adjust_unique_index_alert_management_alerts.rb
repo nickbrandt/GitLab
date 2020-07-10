@@ -16,6 +16,19 @@ class AdjustUniqueIndexAlertManagementAlerts < ActiveRecord::Migration[6.0]
   end
 
   def down
+    # Nullify duplicate fingerprints, except for the newest of each match (project_id, fingerprint).
+    query = <<-SQL
+      UPDATE alert_management_alerts am
+      SET fingerprint = NULL
+      WHERE am.created_at <>
+        (SELECT MAX(created_at)
+        FROM alert_management_alerts am2
+        WHERE am.fingerprint = am2.fingerprint AND am.project_id = am2.project_id)
+      AND am.fingerprint IS NOT NULL;
+    SQL
+
+    execute(query)
+
     remove_index :alert_management_alerts, name: NEW_INDEX_NAME
     add_index(:alert_management_alerts, %w(project_id fingerprint), name: INDEX_NAME, unique: true, using: :btree)
   end
