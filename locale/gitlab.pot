@@ -986,9 +986,6 @@ msgstr ""
 msgid "<code>Protected</code> to expose them to protected branches or tags only."
 msgstr ""
 
-msgid "<namespace / project>"
-msgstr ""
-
 msgid "<no name set>"
 msgstr ""
 
