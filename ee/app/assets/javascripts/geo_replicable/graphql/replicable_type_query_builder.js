@@ -9,17 +9,15 @@ export default graphQlFieldName => {
           pageInfo {
             ...PageInfo
           }
-          edges {
-            node {
-              id
-              packageFileId
-              state
-              retryCount
-              lastSyncFailure
-              retryAt
-              lastSyncedAt
-              createdAt
-            }
+          nodes {
+            id
+            packageFileId
+            state
+            retryCount
+            lastSyncFailure
+            retryAt
+            lastSyncedAt
+            createdAt
           }
         }
       }
