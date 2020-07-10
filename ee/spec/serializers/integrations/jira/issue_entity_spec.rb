@@ -39,8 +39,8 @@ RSpec.describe Integrations::Jira::IssueEntity do
       labels: [
         {
           name: 'backend',
-          color: '#b43fdd',
-          text_color: '#FFFFFF'
+          color: '#EBECF0',
+          text_color: '#283856'
         }
       ],
       author: hash_including(name: 'reporter'),
