@@ -121,7 +121,10 @@ export const fetchLicenseCheckApprovalRule = ({ dispatch, state }) => {
     Pipelines cannot have approval rules.
   */
   if (!state.approvalsApiPath) {
-    return dispatch('receiveLicenseCheckApprovalRuleError');
+    return dispatch(
+      'receiveLicenseCheckApprovalRuleError',
+      new Error('approvalsApiPath not provided'),
+    );
   }
 
   return axios

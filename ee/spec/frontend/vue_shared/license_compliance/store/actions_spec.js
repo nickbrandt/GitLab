@@ -530,8 +530,8 @@ describe('License store actions', () => {
       );
     });
 
-    it('dispatches request/receive on error', done => {
-      const error = new Error('Request failed with status code 500');
+    it('dispatches request/receive error when no approvalsAPiPath is provided', done => {
+      const error = new Error('approvalsApiPath not provided');
       axiosMock.onGet(approvalsApiPath).replyOnce(500);
 
       testAction(
@@ -547,7 +547,7 @@ describe('License store actions', () => {
       );
     });
 
-    it('dispatches request/receive error when no approvalsAPiPath is provided', done => {
+    it('dispatches request/receive on error', done => {
       const error = new Error('Request failed with status code 500');
       axiosMock.onGet(approvalsApiPath).replyOnce(500);
 
