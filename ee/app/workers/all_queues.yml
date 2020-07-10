@@ -189,7 +189,7 @@
   :tags: []
 - :name: cronjob:iterations_update_status
   :feature_category: :issue_tracking
-  :has_external_dependencies: 
+  :has_external_dependencies:
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
