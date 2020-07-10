@@ -33,7 +33,7 @@ export default {
 
 <template>
   <div
-    class="board-swimlanes-toggle-wrapper gl-display-flex gl-align-items-center prepend-left-10"
+    class="board-swimlanes-toggle-wrapper gl-display-flex gl-align-items-center gl-ml-3"
     data-testid="toggle-swimlanes"
   >
     <span
