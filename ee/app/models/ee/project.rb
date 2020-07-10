@@ -20,6 +20,7 @@ module EE
       include InsightsFeature
       include DeprecatedApprovalsBeforeMerge
       include UsageStatistics
+      include ProjectSecurityScannersInformation
 
       ignore_columns :mirror_last_update_at, :mirror_last_successful_update_at, remove_after: '2019-12-15', remove_with: '12.6'
 
