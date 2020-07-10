@@ -8,11 +8,11 @@ class AdjustUniqueIndexAlertManagementAlerts < ActiveRecord::Migration[6.0]
   NEW_INDEX_NAME  = 'index_partial_am_alerts_on_project_id_and_fingerprint'
   RESOLVED_STATUS = 2
 
-  # rubocop:disable Migration/RemoveIndex
-  # rubocop:disable Migration/AddIndex
+  disable_ddl_transaction!
+
   def up
-    add_index(:alert_management_alerts, %w(project_id fingerprint), where: "status <> '#{RESOLVED_STATUS}'", name: NEW_INDEX_NAME, unique: true, using: :btree)
-    remove_index :alert_management_alerts, name: INDEX_NAME
+    add_concurrent_index(:alert_management_alerts, %w(project_id fingerprint), where: "status <> #{RESOLVED_STATUS}", name: NEW_INDEX_NAME, unique: true, using: :btree)
+    remove_concurrent_index_by_name :alert_management_alerts, INDEX_NAME
   end
 
   def down
@@ -29,9 +29,7 @@ class AdjustUniqueIndexAlertManagementAlerts < ActiveRecord::Migration[6.0]
 
     execute(query)
 
-    remove_index :alert_management_alerts, name: NEW_INDEX_NAME
-    add_index(:alert_management_alerts, %w(project_id fingerprint), name: INDEX_NAME, unique: true, using: :btree)
+    remove_concurrent_index_by_name :alert_management_alerts, NEW_INDEX_NAME
+    add_concurrent_index(:alert_management_alerts, %w(project_id fingerprint), name: INDEX_NAME, unique: true, using: :btree)
   end
-  # rubocop:enable Migration/RemoveIndex
-  # rubocop:enable Migration/AddIndex
 end

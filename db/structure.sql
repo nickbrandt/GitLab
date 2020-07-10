@@ -19943,7 +19943,7 @@ CREATE INDEX index_pages_domains_on_verified_at_and_enabled_until ON public.page
 
 CREATE INDEX index_pages_domains_on_wildcard ON public.pages_domains USING btree (wildcard);
 
-CREATE UNIQUE INDEX index_partial_am_alerts_on_project_id_and_fingerprint ON public.alert_management_alerts USING btree (project_id, fingerprint) WHERE (status <> '2'::smallint);
+CREATE UNIQUE INDEX index_partial_am_alerts_on_project_id_and_fingerprint ON public.alert_management_alerts USING btree (project_id, fingerprint) WHERE (status <> 2);
 
 CREATE UNIQUE INDEX index_partitioned_foreign_keys_unique_index ON public.partitioned_foreign_keys USING btree (to_table, from_table, from_column);
 
