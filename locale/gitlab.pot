@@ -824,6 +824,9 @@ msgstr ""
 msgid "- show less"
 msgstr ""
 
+msgid "0 bytes"
+msgstr ""
+
 msgid "0 for unlimited"
 msgstr ""
 
@@ -6304,6 +6307,9 @@ msgid "ContainerRegistry|Image Repositories"
 msgstr ""
 
 msgid "ContainerRegistry|Image tags"
+msgstr ""
+
+msgid "ContainerRegistry|Invalid tag: missing manifest digest"
 msgstr ""
 
 msgid "ContainerRegistry|Login"
@@ -15108,6 +15114,9 @@ msgid "My company or team"
 msgstr ""
 
 msgid "My-Reaction"
+msgstr ""
+
+msgid "N/A"
 msgstr ""
 
 msgid "Name"
