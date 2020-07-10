@@ -217,7 +217,7 @@ for information on setting up alerts.
 
 For externally-managed Prometheus instances, you can configure your alerting rules to
 display a chart in the alert. See
-[Embedding metrics based on alerts in incident issues](../integrations/prometheus.md#embedding-metrics-based-on-alerts-in-incident-issues)
+[Embedding metrics based on alerts in incident issues](../../../operations/metrics/embed.md#embedding-metrics-based-on-alerts-in-incident-issues)
 for information on how to appropriately configure your alerting rules. See
 [External Prometheus instances](../integrations/prometheus.md#external-prometheus-instances)
 for information on setting up alerts for your self-managed Prometheus instance.
