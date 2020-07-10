@@ -47,7 +47,7 @@ RSpec.describe Integrations::Jira::IssueEntity do
       assignees: [
         { name: 'assignee' }
       ],
-      web_url: 'http://jira.com/projects/GL/issues/GL-5',
+      web_url: 'http://jira.com/browse/GL-5',
       references: { relative: 'GL-5' },
       external_tracker: 'jira'
     )
