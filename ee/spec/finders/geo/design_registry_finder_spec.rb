@@ -1,62 +1,57 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Geo::DesignRegistryFinder, :geo, :geo_fdw do
-  let!(:secondary) { create(:geo_node) }
-  let!(:project_1) { create(:project) }
-  let!(:project_2) { create(:project) }
-  let!(:project_3) { create(:project) }
-  let!(:project_4) { create(:project) }
-  let!(:project_5) { create(:project) }
-  let!(:project_6) { create(:project) }
+RSpec.describe Geo::DesignRegistryFinder, :geo do
+  let(:secondary) { create(:geo_node) }
+  let(:project_1) { create(:project) }
+  let(:project_2) { create(:project) }
+  let(:project_3) { create(:project) }
+  let(:project_4) { create(:project) }
+  let(:project_5) { create(:project) }
+  let(:project_6) { create(:project) }
 
   subject { described_class.new(current_node_id: secondary.id) }
 
-  context 'count all the things' do
+  context 'when geo_design_registry_ssot_sync is disabled', :geo_fdw do
     let!(:failed_registry) { create(:geo_design_registry, :sync_failed) }
     let!(:synced_registry) { create(:geo_design_registry, :synced) }
 
-    let(:synced_group) { create(:group) }
-    let(:unsynced_group) { create(:group) }
-    let(:synced_project) { create(:project, group: synced_group) }
-    let(:unsynced_project) { create(:project, :broken_storage, group: unsynced_group) }
+    before do
+      stub_feature_flags(geo_design_registry_ssot_sync: false)
+    end
 
     describe '#count_syncable' do
       it 'returns number of design repositories' do
         # One more design for the same project to assert absence of duplicates
         create(:design, project: synced_registry.project)
 
-        result = subject.count_syncable
-
-        expect(result).to eq(2)
+        expect(subject.count_syncable).to eq(2)
       end
     end
 
     describe '#count_synced' do
       it 'returns only synced registry' do
-        result = subject.count_synced
-
-        expect(result).to eq(1)
+        expect(subject.count_synced).to eq(1)
       end
     end
 
     describe '#count_failed' do
       it 'returns only failed registry' do
-        result = subject.count_failed
-
-        expect(result).to eq(1)
+        expect(subject.count_failed).to eq(1)
       end
     end
 
     describe '#count_registry' do
       it 'returns number of all registries' do
-        result = subject.count_registry
-
-        expect(result).to eq(2)
+        expect(subject.count_registry).to eq(2)
       end
     end
 
     context 'selective sync' do
+      let(:synced_group) { create(:group) }
+      let(:unsynced_group) { create(:group) }
+      let(:synced_project) { create(:project, group: synced_group) }
+      let(:unsynced_project) { create(:project, :broken_storage, group: unsynced_group) }
       let(:unsynced_project2) { create(:project, group: unsynced_group) }
       let(:synced_project2) { create(:project, group: synced_group) }
 
@@ -101,6 +96,48 @@ RSpec.describe Geo::DesignRegistryFinder, :geo, :geo_fdw do
             expect(result).to eq(2)
           end
         end
+      end
+    end
+  end
+
+  context 'when geo_design_registry_ssot_sync is enabled' do
+    let!(:registry_project_1) { create(:geo_design_registry, :synced, project_id: project_1.id) }
+    let!(:registry_project_2) { create(:geo_design_registry, :sync_failed, project_id: project_2.id) }
+    let!(:registry_project_3) { create(:geo_design_registry, project_id: project_3.id, last_synced_at: nil) }
+    let!(:registry_project_4) { create(:geo_design_registry, project_id: project_4.id, last_synced_at: 3.days.ago, retry_at: 2.days.ago) }
+    let!(:registry_project_5) { create(:geo_design_registry, project_id: project_5.id, last_synced_at: 6.days.ago) }
+    let!(:registry_project_6) { create(:geo_design_registry, project_id: project_6.id, last_synced_at: nil) }
+
+    before do
+      stub_feature_flags(geo_design_registry_ssot_sync: true)
+    end
+
+    describe '#count_syncable' do
+      it 'returns number of design repositories' do
+        # One more design for the same project to assert absence of duplicates
+        create(:design, project: project_1)
+
+        result = subject.count_syncable
+
+        expect(result).to eq(6)
+      end
+    end
+
+    describe '#count_synced' do
+      it 'returns only synced registry' do
+        expect(subject.count_synced).to eq(1)
+      end
+    end
+
+    describe '#count_failed' do
+      it 'returns only failed registry' do
+        expect(subject.count_failed).to eq(1)
+      end
+    end
+
+    describe '#count_registry' do
+      it 'returns number of all registries' do
+        expect(subject.count_registry).to eq(6)
       end
     end
   end

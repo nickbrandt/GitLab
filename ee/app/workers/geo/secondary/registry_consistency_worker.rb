@@ -16,6 +16,7 @@ module Geo
       feature_category :geo_replication
 
       REGISTRY_CLASSES = [
+        Geo::DesignRegistry,
         Geo::JobArtifactRegistry,
         Geo::LfsObjectRegistry,
         Geo::PackageFileRegistry,

@@ -40,6 +40,20 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     end
   end
 
+  def self.registry_consistency_worker_enabled?
+    Feature.enabled?(:geo_design_registry_ssot_sync)
+  end
+
+  def self.delete_for_model_ids(project_ids)
+    # We only need to delete the registry entries here. The design
+    # repository deletion should happen when a project is destroyed.
+    #
+    # See: https://gitlab.com/gitlab-org/gitlab/-/issues/13429
+    where(project_id: project_ids).delete_all
+
+    project_ids
+  end
+
   def self.find_registry_differences(range)
     source_ids = Gitlab::Geo.current_node.designs.id_in(range).pluck_primary_key
     tracked_ids = self.pluck_model_ids_in_range(range)
