@@ -72,7 +72,7 @@ module Banzai
         [
           Route.new(
             ::Gitlab::Metrics::Dashboard::Url.metrics_regex,
-            :read_environment
+            :metrics_dashboard
           ),
           Route.new(
             ::Gitlab::Metrics::Dashboard::Url.grafana_regex,

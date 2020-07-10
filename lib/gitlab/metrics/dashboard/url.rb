@@ -21,10 +21,8 @@ module Gitlab
             strong_memoize(:metrics_regex) do
               regex_for_project_metrics(
                 %r{
-                    /environments
-                    /(?<environment>\d+)
                     /(metrics_dashboard|metrics)
-                }x
+                  }x
               )
             end
           end
@@ -57,7 +55,7 @@ module Gitlab
 
           # Builds a metrics dashboard url based on the passed in arguments
           def build_dashboard_url(*args)
-            Gitlab::Routing.url_helpers.metrics_dashboard_namespace_project_environment_url(*args)
+            Gitlab::Routing.url_helpers.namespace_project_metrics_dashboard_url(*args)
           end
 
           # Matches dashboard urls for a metric chart embed

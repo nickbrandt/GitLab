@@ -5,11 +5,11 @@ require 'spec_helper'
 RSpec.describe Banzai::Filter::InlineMetricsFilter do
   include FilterSpecHelper
 
-  let(:params) { ['foo', 'bar', 12] }
+  let(:params) { %w(foo bar) }
   let(:query_params) { {} }
 
-  let(:trigger_url) { urls.metrics_namespace_project_environment_url(*params, query_params) }
-  let(:dashboard_url) { urls.metrics_dashboard_namespace_project_environment_url(*params, **query_params, embedded: true) }
+  let(:trigger_url) { urls.namespace_project_metrics_url(*params, query_params) }
+  let(:dashboard_url) { urls.namespace_project_metrics_dashboard_url(*params, **query_params, embedded: true) }
 
   it_behaves_like 'a metrics embed filter'
 
@@ -19,7 +19,8 @@ RSpec.describe Banzai::Filter::InlineMetricsFilter do
         dashboard: 'config/prometheus/common_metrics.yml',
         group: 'System metrics (Kubernetes)',
         title: 'Core Usage (Pod Average)',
-        y_label: 'Cores per Pod'
+        y_label: 'Cores per Pod',
+        env_id: 12
       }
     end
 
