@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe API::Pipelines do
+RSpec.describe API::Ci::Pipelines do
   let(:user)    { create(:user) }
   let(:project) { create(:project, :repository, creator: user) }
 
