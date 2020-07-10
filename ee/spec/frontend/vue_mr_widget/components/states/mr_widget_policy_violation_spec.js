@@ -22,7 +22,7 @@ describe('EE MrWidgetPolicyViolation', () => {
 
   it('shows the disabled merge button', () => {
     expect(wrapper.text()).toContain('Merge');
-    expect(findButton().attributes().disabled).toBe('true');
+    expect(findButton().props().disabled).toBe(true);
   });
 
   it('shows the disabled reason', () => {

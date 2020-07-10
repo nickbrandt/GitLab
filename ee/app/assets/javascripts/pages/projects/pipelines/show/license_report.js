@@ -15,7 +15,6 @@ export default () => {
       apiUrl,
       licenseManagementSettingsPath,
       licensesApiPath,
-      approvalsApiPath,
     } = licensesTab.dataset;
 
     // eslint-disable-next-line no-new
@@ -30,7 +29,6 @@ export default () => {
             apiUrl,
             licensesApiPath,
             licenseManagementSettingsPath,
-            approvalsApiPath,
             canManageLicenses: parseBoolean(canManageLicenses),
             alwaysOpen: true,
             reportSectionClass: 'split-report-section',
