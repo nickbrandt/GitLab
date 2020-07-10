@@ -5805,6 +5805,9 @@ msgstr ""
 msgid "Code owners"
 msgstr ""
 
+msgid "CodeIntelligence|This is the definition"
+msgstr ""
+
 msgid "CodeOwner|Pattern"
 msgstr ""
 
