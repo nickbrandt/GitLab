@@ -1,7 +1,7 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
-import eventHub from 'ee/projects/settings_service_desk/event_hub';
-import ServiceDeskSetting from 'ee/projects/settings_service_desk/components/service_desk_setting.vue';
+import eventHub from '~/projects/settings_service_desk/event_hub';
+import ServiceDeskSetting from '~/projects/settings_service_desk/components/service_desk_setting.vue';
 
 describe('ServiceDeskSetting', () => {
   let wrapper;
