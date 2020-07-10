@@ -3,8 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Projects::DastSiteProfilesController, type: :request do
-  let(:group) { create(:group) }
-  let(:project) { create(:project, namespace: group) }
+  let(:project) { create(:project) }
   let(:user) { create(:user) }
 
   describe 'GET #new' do
@@ -22,7 +21,7 @@ RSpec.describe Projects::DastSiteProfilesController, type: :request do
         end
 
         it 'can access page' do
-          get namespace_project_profiles_path(project.group, project)
+          get project_profiles_path(project)
 
           expect(response).to have_gitlab_http_status(:ok)
         end
@@ -36,7 +35,7 @@ RSpec.describe Projects::DastSiteProfilesController, type: :request do
         end
 
         it 'sees a 404 error' do
-          get namespace_project_profiles_path(project.group, project)
+          get project_profiles_path(project)
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -54,7 +53,7 @@ RSpec.describe Projects::DastSiteProfilesController, type: :request do
         it 'sees a 404 error' do
           stub_feature_flags(security_on_demand_scans_feature_flag: false)
           stub_licensed_features(security_on_demand_scans: true)
-          get namespace_project_profiles_path(project.group, project)
+          get project_profiles_path(project)
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -64,7 +63,7 @@ RSpec.describe Projects::DastSiteProfilesController, type: :request do
         it 'sees a 404 error' do
           stub_feature_flags(security_on_demand_scans_feature_flag: true)
           stub_licensed_features(security_on_demand_scans: false)
-          get namespace_project_profiles_path(project.group, project)
+          get project_profiles_path(project)
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
