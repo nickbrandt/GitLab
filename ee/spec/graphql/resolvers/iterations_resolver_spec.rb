@@ -30,9 +30,9 @@ RSpec.describe Resolvers::IterationsResolver do
 
       context 'without parameters' do
         it 'calls IterationsFinder to retrieve all iterations' do
-          params = { id: nil, group_ids: group.id, state: 'all', start_date: nil, end_date: nil, search_title: nil }
+          params = { id: nil, iid: nil, group_ids: group.id, state: 'all', start_date: nil, end_date: nil, search_title: nil }
 
-          expect(IterationsFinder).to receive(:new).with(params).and_call_original
+          expect(IterationsFinder).to receive(:new).with(current_user, params).and_call_original
 
           resolve_group_iterations
         end
@@ -44,11 +44,12 @@ RSpec.describe Resolvers::IterationsResolver do
           end_date = start_date + 1.hour
           search = 'wow'
           id = 1
-          params = { id: id, group_ids: group.id, state: 'closed', start_date: start_date, end_date: end_date, search_title: search }
+          iid = 2
+          params = { id: id, iid: iid, group_ids: group.id, state: 'closed', start_date: start_date, end_date: end_date, search_title: search }
 
-          expect(IterationsFinder).to receive(:new).with(params).and_call_original
+          expect(IterationsFinder).to receive(:new).with(current_user, params).and_call_original
 
-          resolve_group_iterations(start_date: start_date, end_date: end_date, state: 'closed', title: search, id: id)
+          resolve_group_iterations(start_date: start_date, end_date: end_date, state: 'closed', title: search, id: id, iid: iid)
         end
       end
 

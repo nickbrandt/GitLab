@@ -14,6 +14,9 @@ module Resolvers
     argument :id, GraphQL::ID_TYPE,
              required: false,
              description: 'The ID of the Iteration to look up'
+    argument :iid, GraphQL::ID_TYPE,
+             required: false,
+             description: 'The internal ID of the Iteration to look up'
 
     type Types::IterationType, null: true
 
@@ -22,7 +25,7 @@ module Resolvers
 
       authorize!
 
-      iterations = IterationsFinder.new(iterations_finder_params(args)).execute
+      iterations = IterationsFinder.new(context[:current_user], iterations_finder_params(args)).execute
 
       Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection.new(iterations)
     end
@@ -32,6 +35,7 @@ module Resolvers
     def iterations_finder_params(args)
       {
         id: args[:id],
+        iid: args[:iid],
         state: args[:state] || 'all',
         start_date: args[:start_date],
         end_date: args[:end_date],

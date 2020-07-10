@@ -602,6 +602,14 @@ class Project < ApplicationRecord
     end
   end
 
+  def self.projects_user_can(projects, user, action)
+    projects = where(id: projects)
+
+    DeclarativePolicy.user_scope do
+      projects.select { |project| Ability.allowed?(user, action, project) }
+    end
+  end
+
   # This scope returns projects where user has access to both the project and the feature.
   def self.filter_by_feature_visibility(feature, user)
     with_feature_available_for_user(feature, user)
