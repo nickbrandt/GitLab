@@ -19,6 +19,7 @@ module EE
 
     LICENSE_PLANS_TO_NAMESPACE_PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.invert.freeze
     PLANS = (NAMESPACE_PLANS_TO_LICENSE_PLANS.keys + [Plan::FREE]).freeze
+    TEMPORARY_STORAGE_INCREASE_DAYS = 30
 
     prepended do
       include EachBatch
@@ -51,7 +52,8 @@ module EE
       delegate :additional_purchased_storage_size, :additional_purchased_storage_size=,
         :additional_purchased_storage_ends_on, :additional_purchased_storage_ends_on=,
         :temporary_storage_increase_ends_on, :temporary_storage_increase_ends_on=,
-        :temporary_storage_increase_enabled?, to: :namespace_limit, allow_nil: true
+        :temporary_storage_increase_enabled?, :eligible_for_temporary_storage_increase?,
+        to: :namespace_limit, allow_nil: true
 
       delegate :email, to: :owner, allow_nil: true, prefix: true
 
@@ -333,6 +335,10 @@ module EE
 
     def use_elasticsearch?
       ::Gitlab::CurrentSettings.elasticsearch_indexes_namespace?(self)
+    end
+
+    def enable_temporary_storage_increase!
+      update(temporary_storage_increase_ends_on: TEMPORARY_STORAGE_INCREASE_DAYS.days.from_now)
     end
 
     private
