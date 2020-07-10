@@ -16,6 +16,10 @@ module EE
       redirect_path&.starts_with?('/-/invites/')
     end
 
+    def in_oauth_flow?
+      redirect_path&.starts_with?(oauth_authorization_path)
+    end
+
     def setup_for_company_label_text
       if in_subscription_flow?
         _('Who will be using this GitLab subscription?')
