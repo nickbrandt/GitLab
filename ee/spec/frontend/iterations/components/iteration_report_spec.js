@@ -6,7 +6,7 @@ describe('Iterations tabs', () => {
   let wrapper;
   const defaultProps = {
     groupPath: 'gitlab-org',
-    iterationId: '3',
+    iterationIid: '3',
   };
 
   const findTopbar = () => wrapper.find({ ref: 'topbar' });

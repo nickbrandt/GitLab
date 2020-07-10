@@ -10,7 +10,6 @@ import {
 } from '@gitlab/ui';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import { __ } from '~/locale';
-import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import IterationForm from './iteration_form.vue';
 import query from '../queries/group_iteration.query.graphql';
 
@@ -37,7 +36,7 @@ export default {
       variables() {
         return {
           groupPath: this.groupPath,
-          id: getIdFromGraphQLId(this.iterationId),
+          iid: this.iterationIid,
         };
       },
       update(data) {
@@ -57,7 +56,7 @@ export default {
       type: String,
       required: true,
     },
-    iterationId: {
+    iterationIid: {
       type: String,
       required: true,
     },
