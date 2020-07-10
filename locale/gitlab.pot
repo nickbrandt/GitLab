@@ -27247,6 +27247,9 @@ msgstr ""
 msgid "ciReport|Browser performance test metrics: No changes"
 msgstr ""
 
+msgid "ciReport|Checks"
+msgstr ""
+
 msgid "ciReport|Code quality"
 msgstr ""
 
@@ -27307,6 +27310,12 @@ msgstr ""
 msgid "ciReport|Learn more about interacting with security reports"
 msgstr ""
 
+msgid "ciReport|Load performance test metrics: "
+msgstr ""
+
+msgid "ciReport|Load performance test metrics: No changes"
+msgstr ""
+
 msgid "ciReport|Loading %{reportName} report"
 msgstr ""
 
@@ -27320,6 +27329,9 @@ msgid "ciReport|No changes to code quality"
 msgstr ""
 
 msgid "ciReport|No code quality issues found"
+msgstr ""
+
+msgid "ciReport|RPS"
 msgstr ""
 
 msgid "ciReport|Resolve with merge request"
@@ -27347,6 +27359,12 @@ msgid "ciReport|Solution"
 msgstr ""
 
 msgid "ciReport|Static Application Security Testing (SAST) detects known vulnerabilities in your source code."
+msgstr ""
+
+msgid "ciReport|TTFB P90"
+msgstr ""
+
+msgid "ciReport|TTFB P95"
 msgstr ""
 
 msgid "ciReport|There was an error creating the issue. Please try again."

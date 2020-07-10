@@ -13,6 +13,8 @@ import mockData, {
   headIssues,
   baseBrowserPerformance,
   headBrowserPerformance,
+  baseLoadPerformance,
+  headLoadPerformance,
   parsedBaseIssues,
   parsedHeadIssues,
 } from './mock_data';
@@ -45,6 +47,11 @@ describe('ee merge request widget options', () => {
     base_path: 'base.json',
   };
 
+  const DEFAULT_LOAD_PERFORMANCE = {
+    head_path: 'head.json',
+    base_path: 'base.json',
+  };
+
   beforeEach(() => {
     delete mrWidgetOptions.extends.el; // Prevent component mounting
 
@@ -71,12 +78,19 @@ describe('ee merge request widget options', () => {
   });
 
   const findBrowserPerformanceWidget = () => vm.$el.querySelector('.js-browser-performance-widget');
+  const findLoadPerformanceWidget = () => vm.$el.querySelector('.js-load-performance-widget');
   const findSecurityWidget = () => vm.$el.querySelector('.js-security-widget');
 
   const setBrowserPerformance = (data = {}) => {
     const browserPerformance = { ...DEFAULT_BROWSER_PERFORMANCE, ...data };
     gl.mrWidgetData.browserPerformance = browserPerformance;
     vm.mr.browserPerformance = browserPerformance;
+  };
+
+  const setLoadPerformance = (data = {}) => {
+    const loadPerformance = { ...DEFAULT_LOAD_PERFORMANCE, ...data };
+    gl.mrWidgetData.loadPerformance = loadPerformance;
+    vm.mr.loadPerformance = loadPerformance;
   };
 
   const VULNERABILITY_FEEDBACK_ENDPOINT = 'vulnerability_feedback_path';
@@ -650,6 +664,138 @@ describe('ee merge request widget options', () => {
               vm.$el.querySelector('.js-browser-performance-widget .js-code-text').textContent,
             ),
           ).toContain('Failed to load browser-performance report');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('load_performance', () => {
+    beforeEach(() => {
+      gl.mrWidgetData = {
+        ...mockData,
+        loadPerformance: {},
+      };
+    });
+
+    describe('when it is loading', () => {
+      it('should render loading indicator', done => {
+        mock.onGet(DEFAULT_LOAD_PERFORMANCE.head_path).reply(200, headLoadPerformance);
+        mock.onGet(DEFAULT_LOAD_PERFORMANCE.base_path).reply(200, baseLoadPerformance);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        vm.mr.loadPerformance = { ...DEFAULT_LOAD_PERFORMANCE };
+
+        vm.$nextTick(() => {
+          expect(trimText(findLoadPerformanceWidget().textContent)).toContain(
+            'Loading load-performance report',
+          );
+
+          done();
+        });
+      });
+    });
+
+    describe('with successful request', () => {
+      beforeEach(() => {
+        mock.onGet(DEFAULT_LOAD_PERFORMANCE.head_path).reply(200, headLoadPerformance);
+        mock.onGet(DEFAULT_LOAD_PERFORMANCE.base_path).reply(200, baseLoadPerformance);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+      });
+
+      describe('default', () => {
+        beforeEach(done => {
+          setLoadPerformance();
+
+          // wait for network request from component watch update method
+          setImmediate(done);
+        });
+
+        it('should render provided data', () => {
+          expect(
+            trimText(vm.$el.querySelector('.js-load-performance-widget .js-code-text').textContent),
+          ).toBe('Load performance test metrics: 1 degraded, 1 same, 2 improved');
+        });
+
+        describe('text connector', () => {
+          it('should only render information about fixed issues', done => {
+            vm.mr.loadPerformanceMetrics.degraded = [];
+            vm.mr.loadPerformanceMetrics.same = [];
+
+            Vue.nextTick(() => {
+              expect(
+                trimText(
+                  vm.$el.querySelector('.js-load-performance-widget .js-code-text').textContent,
+                ),
+              ).toBe('Load performance test metrics: 2 improved');
+              done();
+            });
+          });
+
+          it('should only render information about added issues', done => {
+            vm.mr.loadPerformanceMetrics.improved = [];
+            vm.mr.loadPerformanceMetrics.same = [];
+
+            Vue.nextTick(() => {
+              expect(
+                trimText(
+                  vm.$el.querySelector('.js-load-performance-widget .js-code-text').textContent,
+                ),
+              ).toBe('Load performance test metrics: 1 degraded');
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('with empty successful request', () => {
+      beforeEach(done => {
+        mock.onGet(DEFAULT_LOAD_PERFORMANCE.head_path).reply(200, {});
+        mock.onGet(DEFAULT_LOAD_PERFORMANCE.base_path).reply(200, {});
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.loadPerformance = { ...DEFAULT_LOAD_PERFORMANCE };
+        vm.mr.loadPerformance = gl.mrWidgetData.loadPerformance;
+
+        // wait for network request from component watch update method
+        setImmediate(done);
+      });
+
+      it('should render provided data', () => {
+        expect(
+          trimText(vm.$el.querySelector('.js-load-performance-widget .js-code-text').textContent),
+        ).toBe('Load performance test metrics: No changes');
+      });
+
+      it('does not show Expand button', () => {
+        const expandButton = vm.$el.querySelector('.js-load-performance-widget .js-collapse-btn');
+
+        expect(expandButton).toBeNull();
+      });
+
+      it('shows success icon', () => {
+        expect(
+          vm.$el.querySelector('.js-load-performance-widget .js-ci-status-icon-success'),
+        ).not.toBeNull();
+      });
+    });
+
+    describe('with failed request', () => {
+      beforeEach(() => {
+        mock.onGet(DEFAULT_LOAD_PERFORMANCE.head_path).reply(500, []);
+        mock.onGet(DEFAULT_LOAD_PERFORMANCE.base_path).reply(500, []);
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.loadPerformance = { ...DEFAULT_LOAD_PERFORMANCE };
+        vm.mr.loadPerformance = gl.mrWidgetData.loadPerformance;
+      });
+
+      it('should render error indicator', done => {
+        setImmediate(() => {
+          expect(
+            trimText(vm.$el.querySelector('.js-load-performance-widget .js-code-text').textContent),
+          ).toContain('Failed to load load-performance report');
           done();
         });
       });

@@ -133,6 +133,12 @@ RSpec.describe Ci::PipelinePresenter do
       include_examples '#downloadable_path_for_report_type', :browser_performance, :merge_request_performance_metrics
     end
 
+    context 'with load_performance artifact' do
+      let_it_be(:pipeline, reload: true) { create(:ee_ci_pipeline, :with_load_performance_report, project: project) }
+
+      include_examples '#downloadable_path_for_report_type', :load_performance, :merge_request_performance_metrics
+    end
+
     context 'with license_scanning artifact' do
       let_it_be(:pipeline, reload: true) { create(:ee_ci_pipeline, :with_license_scanning_report, project: project) }
 

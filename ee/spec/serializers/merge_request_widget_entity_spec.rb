@@ -32,7 +32,7 @@ RSpec.describe MergeRequestWidgetEntity do
   end
 
   def create_all_artifacts
-    artifacts = %i(codequality performance browser_performance)
+    artifacts = %i(codequality performance browser_performance load_performance)
 
     artifacts.each do |artifact_type|
       create(:ee_ci_build, artifact_type, :success, pipeline: pipeline, project: pipeline.project)
@@ -62,10 +62,11 @@ RSpec.describe MergeRequestWidgetEntity do
   describe 'test report artifacts', :request_store do
     using RSpec::Parameterized::TableSyntax
 
-    where(:json_entry, :artifact_type) do
-      :codeclimate                 | :codequality
-      :browser_performance         | :browser_performance
-      :browser_performance         | :performance
+    where(:json_entry, :artifact_type, :exposures) do
+      :codeclimate         | :codequality         | []
+      :browser_performance | :browser_performance | [:degradation_threshold, :head_path, :base_path]
+      :browser_performance | :performance         | [:degradation_threshold, :head_path, :base_path]
+      :load_performance    | :load_performance    | [:head_path, :base_path]
     end
 
     with_them do
@@ -88,6 +89,9 @@ RSpec.describe MergeRequestWidgetEntity do
 
           it "has data entry" do
             expect(subject.as_json).to include(json_entry)
+            exposures.each do |exposure|
+              expect(subject.as_json[json_entry]).to include(exposure)
+            end
           end
         end
 

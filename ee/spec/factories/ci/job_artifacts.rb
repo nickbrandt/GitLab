@@ -231,6 +231,16 @@ FactoryBot.define do
       end
     end
 
+    trait :load_performance do
+      file_format { :raw }
+      file_type { :load_performance }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('spec/fixtures/trace/sample_trace'), 'text/plain')
+      end
+    end
+
     trait :dependency_scanning do
       file_format { :raw }
       file_type { :dependency_scanning }
