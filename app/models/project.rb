@@ -524,7 +524,7 @@ class Project < ApplicationRecord
 
   scope :with_api_entity_associations, -> {
     preload(:project_feature, :route, :tags,
-            group: :ip_restrictions, namespace: [:route, :owner])
+            group: [:ip_restrictions, :saml_provider], namespace: [:route, :owner])
   }
 
   scope :with_api_commit_entity_associations, -> {
