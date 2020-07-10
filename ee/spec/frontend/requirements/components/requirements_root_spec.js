@@ -17,6 +17,8 @@ import RequirementForm from 'ee/requirements/components/requirement_form.vue';
 import createRequirement from 'ee/requirements/queries/createRequirement.mutation.graphql';
 import updateRequirement from 'ee/requirements/queries/updateRequirement.mutation.graphql';
 
+import { TEST_HOST } from 'helpers/test_constants';
+
 import {
   FilterState,
   mockRequirementsOpen,
@@ -280,7 +282,7 @@ describe('RequirementsRoot', () => {
           wrapper.vm.updateUrl();
 
           expect(global.window.location.href).toBe(
-            `http://localhost/?page=2&next=${mockPageInfo.endCursor}&state=all&search=foo&sort=updated_asc&author_username%5B%5D=root&author_username%5B%5D=john.doe`,
+            `${TEST_HOST}/?page=2&next=${mockPageInfo.endCursor}&state=all&search=foo&sort=updated_asc&author_username%5B%5D=root&author_username%5B%5D=john.doe`,
           );
         });
       });
@@ -664,7 +666,7 @@ describe('RequirementsRoot', () => {
         expect(wrapper.vm.prevPageCursor).toBe('');
         expect(wrapper.vm.nextPageCursor).toBe('');
         expect(global.window.location.href).toBe(
-          `http://localhost/?page=1&state=opened&search=foo&sort=created_desc&author_username%5B%5D=root&author_username%5B%5D=john.doe`,
+          `${TEST_HOST}/?page=1&state=opened&search=foo&sort=created_desc&author_username%5B%5D=root&author_username%5B%5D=john.doe`,
         );
       });
 
@@ -690,7 +692,7 @@ describe('RequirementsRoot', () => {
         expect(wrapper.vm.prevPageCursor).toBe('');
         expect(wrapper.vm.nextPageCursor).toBe('');
         expect(global.window.location.href).toBe(
-          `http://localhost/?page=1&state=opened&sort=updated_desc`,
+          `${TEST_HOST}/?page=1&state=opened&sort=updated_desc`,
         );
       });
     });
@@ -711,7 +713,7 @@ describe('RequirementsRoot', () => {
         expect(wrapper.vm.prevPageCursor).toBe('');
         expect(wrapper.vm.nextPageCursor).toBe(mockPageInfo.endCursor);
         expect(global.window.location.href).toBe(
-          `http://localhost/?page=2&state=opened&sort=created_desc&next=${mockPageInfo.endCursor}`,
+          `${TEST_HOST}/?page=2&state=opened&sort=created_desc&next=${mockPageInfo.endCursor}`,
         );
       });
 
@@ -730,7 +732,7 @@ describe('RequirementsRoot', () => {
         expect(wrapper.vm.prevPageCursor).toBe(mockPageInfo.startCursor);
         expect(wrapper.vm.nextPageCursor).toBe('');
         expect(global.window.location.href).toBe(
-          `http://localhost/?page=1&state=opened&sort=created_desc&prev=${mockPageInfo.startCursor}`,
+          `${TEST_HOST}/?page=1&state=opened&sort=created_desc&prev=${mockPageInfo.startCursor}`,
         );
       });
     });
