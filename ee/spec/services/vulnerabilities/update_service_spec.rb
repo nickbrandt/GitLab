@@ -22,6 +22,8 @@ RSpec.describe Vulnerabilities::UpdateService do
       project.add_developer(user)
     end
 
+    it_behaves_like 'calls Vulnerabilities::Statistics::UpdateService'
+
     context 'when neither severity nor confidence are overridden' do
       it 'updates the vulnerability from updated finding (title, severity and confidence only)', :aggregate_failures do
         expect { subject }.not_to change { project.vulnerabilities.count }
