@@ -1,16 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlAvatarLink } from '@gitlab/ui';
+import { GlAvatarLink, GlAvatar } from '@gitlab/ui';
 
 import MergeRequest from 'ee/compliance_dashboard/components/merge_request.vue';
-import { createMergeRequest, createPipelineStatus } from '../mock_data';
+import { createMergeRequest } from '../mock_data';
 
 describe('MergeRequest component', () => {
   let wrapper;
 
-  const findCiIcon = () => wrapper.find('.ci-icon');
-  const findCiLink = () => wrapper.find('.controls').find('a');
-  const findInfo = () => wrapper.find('.issuable-main-info');
-  const findTime = () => wrapper.find('time');
   const findAuthorAvatarLink = () => wrapper.find('.issuable-authored').find(GlAvatarLink);
 
   const createComponent = mergeRequest => {
@@ -43,47 +39,23 @@ describe('MergeRequest component', () => {
     });
 
     it('renders the title', () => {
-      expect(
-        findInfo()
-          .find('.title')
-          .text(),
-      ).toEqual(mergeRequest.title);
+      expect(wrapper.text()).toContain(mergeRequest.title);
     });
 
     it('renders the issuable reference', () => {
+      expect(wrapper.text()).toContain(mergeRequest.issuable_reference);
+    });
+
+    it('renders the author avatar', () => {
       expect(
-        findInfo()
-          .find('span')
-          .text(),
-      ).toEqual(mergeRequest.issuable_reference);
+        findAuthorAvatarLink()
+          .find(GlAvatar)
+          .exists(),
+      ).toEqual(true);
     });
 
     it('renders the author name', () => {
       expect(findAuthorAvatarLink().text()).toEqual(mergeRequest.author.name);
-    });
-
-    it('renders the "merged at" time', () => {
-      expect(findTime().text()).toEqual('merged 2 days ago');
-    });
-
-    it('does not link to a pipeline', () => {
-      expect(findCiLink().exists()).toEqual(false);
-    });
-
-    describe('with a pipeline', () => {
-      const pipeline = createPipelineStatus('success');
-
-      beforeEach(() => {
-        wrapper = createComponent(createMergeRequest({ pipeline }));
-      });
-
-      it('links to the pipeline', () => {
-        expect(findCiLink().attributes('href')).toEqual(pipeline.details_path);
-      });
-
-      it('renders a CI icon with the pipeline status', () => {
-        expect(findCiIcon().text()).toEqual(pipeline.group);
-      });
     });
   });
 });
