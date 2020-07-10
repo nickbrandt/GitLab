@@ -9,7 +9,7 @@
               = sprite_icon('angle-right', css_class: 's16 options-collapsed-icon')
             .avatar-container.s40
               = group_icon(group, alt: group.name, class: 'btn-template-icon avatar s40 avatar-tile', lazy: false)
-            .template-subgroup-name.prepend-left-5
+            .template-subgroup-name.gl-ml-2
               %strong= group.full_name
               - if group.description.present?
                 .text-muted
@@ -23,7 +23,7 @@
           .template-option.align-items-center.qa-template-option-row
             .avatar-container.s40
               = project_icon(project, alt: project.name, class: 'btn-template-icon avatar s40 avatar-tile', lazy: false)
-            .description.prepend-left-5
+            .description.gl-ml-2
               %strong
                 = project.title
               %br
