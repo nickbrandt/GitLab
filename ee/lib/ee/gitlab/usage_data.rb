@@ -97,6 +97,13 @@ module EE
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
+        def approval_rules_counts
+          {
+            approval_project_rules: count(ApprovalProjectRule),
+            approval_project_rules_with_target_branch: count(ApprovalProjectRulesProtectedBranch, :approval_project_rule_id)
+          }
+        end
+
         def service_desk_counts
           projects_with_service_desk = ::Project.where(service_desk_enabled: true)
 
@@ -223,7 +230,7 @@ module EE
                                         :author_id,
                                         start: user_minimum_id,
                                         finish: user_maximum_id)
-          })
+          }, approval_rules_counts)
         end
 
         # Omitted because no user, creator or author associated: `campaigns_imported_from_github`, `ldap_group_links`
