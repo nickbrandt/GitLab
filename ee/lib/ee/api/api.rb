@@ -51,7 +51,6 @@ module EE
         mount ::API::VulnerabilityFindings
         mount ::API::VulnerabilityIssueLinks
         mount ::API::VulnerabilityExports
-        mount ::API::MergeRequestApprovals
         mount ::API::MergeRequestApprovalRules
         mount ::API::ProjectAliases
         mount ::API::Dependencies
