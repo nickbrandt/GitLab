@@ -20124,6 +20124,9 @@ msgstr ""
 msgid "Search Button"
 msgstr ""
 
+msgid "Search Jira issues"
+msgstr ""
+
 msgid "Search Milestones"
 msgstr ""
 
