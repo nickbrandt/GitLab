@@ -4,14 +4,14 @@ require 'spec_helper'
 
 RSpec.describe EpicIssues::CreateService do
   describe '#execute' do
-    let(:group) { create(:group) }
-    let(:epic) { create(:epic, group: group) }
-    let(:project) { create(:project, group: group) }
-    let(:issue) { create(:issue, project: project) }
-    let(:issue2) { create(:issue, project: project) }
-    let(:issue3) { create(:issue, project: project) }
-    let(:user) { create(:user) }
-    let(:valid_reference) { issue.to_reference(full: true) }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:project) { create(:project, group: group) }
+    let_it_be(:user) { create(:user) }
+    let_it_be(:issue) { create(:issue, project: project) }
+    let_it_be(:issue2) { create(:issue, project: project) }
+    let_it_be(:issue3) { create(:issue, project: project) }
+    let_it_be(:valid_reference) { issue.to_reference(full: true) }
+    let_it_be(:epic, reload: true) { create(:epic, group: group) }
 
     def assign_issue(references)
       params = { issuable_references: references }
@@ -159,9 +159,9 @@ RSpec.describe EpicIssues::CreateService do
           end
 
           context 'when a link of an issue in a subgroup is given' do
-            let(:subgroup) { create(:group, parent: group) }
-            let(:project2) { create(:project, group: subgroup) }
-            let(:issue) { create(:issue, project: project2) }
+            let_it_be(:subgroup) { create(:group, parent: group) }
+            let_it_be(:project2) { create(:project, group: subgroup) }
+            let_it_be(:issue) { create(:issue, project: project2) }
 
             subject { assign_issue([Gitlab::Routing.url_helpers.namespace_project_issue_url(namespace_id: issue.project.namespace, project_id: issue.project, id: issue.iid)])}
 
@@ -201,10 +201,10 @@ RSpec.describe EpicIssues::CreateService do
         end
 
         context 'when there are invalid references' do
-          let(:epic) { create(:epic, confidential: true, group: group) }
-          let(:valid_issue) { create(:issue, :confidential, project: project) }
-          let(:invalid_issue1) { create(:issue, project: project) }
-          let(:invalid_issue2) { create(:issue, project: project) }
+          let_it_be(:epic) { create(:epic, confidential: true, group: group) }
+          let_it_be(:valid_issue) { create(:issue, :confidential, project: project) }
+          let_it_be(:invalid_issue1) { create(:issue, project: project) }
+          let_it_be(:invalid_issue2) { create(:issue, project: project) }
 
           subject do
             assign_issue([invalid_issue1.to_reference(full: true),
@@ -255,7 +255,7 @@ RSpec.describe EpicIssues::CreateService do
         end
 
         context 'when at least one of the issues is still not assigned to the epic' do
-          let(:valid_reference) { issue2.to_reference(full: true) }
+          let_it_be(:valid_reference) { issue2.to_reference(full: true) }
 
           subject { assign_issue([valid_reference, issue.to_reference(full: true)]) }
 
@@ -270,7 +270,7 @@ RSpec.describe EpicIssues::CreateService do
           issue.reload
         end
 
-        let(:another_epic) { create(:epic, group: group) }
+        let_it_be(:another_epic) { create(:epic, group: group) }
 
         subject do
           params = { issuable_references: [valid_reference] }
@@ -335,7 +335,7 @@ RSpec.describe EpicIssues::CreateService do
       context 'when issue from non group project is given' do
         subject { assign_issue([another_issue.to_reference(full: true)]) }
 
-        let(:another_issue) { create :issue }
+        let_it_be(:another_issue) { create :issue }
 
         before do
           group.add_developer(user)
