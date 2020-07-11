@@ -627,10 +627,6 @@ module EE
         .joins(:deletion_schedule).first
     end
 
-    def has_packages?(package_type)
-      packages.where(package_type: package_type).exists?
-    end
-
     def disable_overriding_approvers_per_merge_request
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
       return (::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? || super) unless project_compliance_mr_approval_settings?
