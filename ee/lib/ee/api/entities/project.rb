@@ -24,7 +24,6 @@ module EE
           expose :mirror_overwrites_diverged_branches, if: ->(project, _) { project.mirror? }
           expose :external_authorization_classification_label,
                  if: ->(_, _) { License.feature_available?(:external_authorization_service_api_management) }
-          expose :packages_enabled
           expose :service_desk_enabled
           expose :service_desk_address
           expose :marked_for_deletion_at, if: ->(project, _) { project.feature_available?(:adjourned_deletion_for_projects_and_groups) }
