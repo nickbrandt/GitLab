@@ -1,4 +1,4 @@
-import { generateConanRecipe, generatePackageInfo } from 'ee/packages/details/utils';
+import { generateConanRecipe, generatePackageInfo } from 'packages/details/utils';
 import { conanPackage, mavenPackage, npmPackage, nugetPackage } from '../mock_data';
 import {
   generateConanInformation,

@@ -1,3 +1,3 @@
-import initPackageDetail from 'ee/packages/details/';
+import initPackageDetail from 'packages/details/';
 
 document.addEventListener('DOMContentLoaded', initPackageDetail);

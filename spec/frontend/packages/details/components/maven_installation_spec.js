@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
-import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
+import MavenInstallation from 'packages/details/components/maven_installation.vue';
 import { registryUrl as mavenPath } from '../mock_data';
 import { mavenPackage as packageEntity } from '../../mock_data';
 import { GlTabs } from '@gitlab/ui';

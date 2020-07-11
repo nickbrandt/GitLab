@@ -2,20 +2,20 @@ import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
 import { GlEmptyState, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
-import * as getters from 'ee/packages/details/store/getters';
-import PackagesApp from 'ee/packages/details/components/app.vue';
-import PackageTitle from 'ee/packages/details/components/package_title.vue';
-import PackageInformation from 'ee/packages/details/components/information.vue';
-import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
-import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
-import * as SharedUtils from 'ee/packages/shared/utils';
-import { TrackingActions } from 'ee/packages/shared/constants';
-import PackagesListLoader from 'ee/packages/shared/components/packages_list_loader.vue';
-import PackageListRow from 'ee/packages/shared/components/package_list_row.vue';
-import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
-import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
-import PypiInstallation from 'ee/packages/details/components/pypi_installation.vue';
-import DependencyRow from 'ee/packages/details/components/dependency_row.vue';
+import * as getters from 'packages/details/store/getters';
+import PackagesApp from 'packages/details/components/app.vue';
+import PackageTitle from 'packages/details/components/package_title.vue';
+import PackageInformation from 'packages/details/components/information.vue';
+import NpmInstallation from 'packages/details/components/npm_installation.vue';
+import MavenInstallation from 'packages/details/components/maven_installation.vue';
+import * as SharedUtils from 'packages/shared/utils';
+import { TrackingActions } from 'packages/shared/constants';
+import PackagesListLoader from 'packages/shared/components/packages_list_loader.vue';
+import PackageListRow from 'packages/shared/components/package_list_row.vue';
+import ConanInstallation from 'packages/details/components/conan_installation.vue';
+import NugetInstallation from 'packages/details/components/nuget_installation.vue';
+import PypiInstallation from 'packages/details/components/pypi_installation.vue';
+import DependencyRow from 'packages/details/components/dependency_row.vue';
 import {
   conanPackage,
   mavenPackage,

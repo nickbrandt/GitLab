@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
-import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
+import NugetInstallation from 'packages/details/components/nuget_installation.vue';
 import { nugetPackage as packageEntity } from '../../mock_data';
 import { registryUrl as nugetPath } from '../mock_data';
 import { GlTabs } from '@gitlab/ui';

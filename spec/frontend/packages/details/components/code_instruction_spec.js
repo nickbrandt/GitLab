@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
-import CodeInstruction from 'ee/packages/details/components/code_instruction.vue';
-import { TrackingLabels } from 'ee/packages/details/constants';
+import CodeInstruction from 'packages/details/components/code_instruction.vue';
+import { TrackingLabels } from 'packages/details/constants';
 import Tracking from '~/tracking';
 
 describe('Package code instruction', () => {

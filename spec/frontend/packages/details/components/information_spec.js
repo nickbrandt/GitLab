@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import PackageInformation from 'ee/packages/details/components/information.vue';
+import PackageInformation from 'packages/details/components/information.vue';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import { GlLink } from '@gitlab/ui';
 

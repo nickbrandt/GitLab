@@ -1,7 +1,7 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import PackageTitle from 'ee/packages/details/components/package_title.vue';
-import PackageTags from 'ee/packages/shared/components/package_tags.vue';
+import PackageTitle from 'packages/details/components/package_title.vue';
+import PackageTags from 'packages/shared/components/package_tags.vue';
 import {
   conanPackage,
   mavenFiles,

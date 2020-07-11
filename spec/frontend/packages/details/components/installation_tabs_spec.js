@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
-import InstallationTabs from 'ee/packages/details/components/installation_tabs.vue';
+import InstallationTabs from 'packages/details/components/installation_tabs.vue';
 import Tracking from '~/tracking';
-import { TrackingActions } from 'ee/packages/details/constants';
+import { TrackingActions } from 'packages/details/constants';
 
 describe('InstallationTabs', () => {
   let wrapper;

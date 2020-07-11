@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import PackageActivity from 'ee/packages/details/components/activity.vue';
+import PackageActivity from 'packages/details/components/activity.vue';
 import {
   npmPackage,
   mavenPackage as packageWithoutBuildInfo,

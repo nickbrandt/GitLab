@@ -1,7 +1,7 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import PypiInstallation from 'ee/packages/details/components/pypi_installation.vue';
-import InstallationTabs from 'ee/packages/details/components/installation_tabs.vue';
+import PypiInstallation from 'packages/details/components/pypi_installation.vue';
+import InstallationTabs from 'packages/details/components/installation_tabs.vue';
 import { pypiPackage as packageEntity } from '../../mock_data';
 import { GlTabs } from '@gitlab/ui';
 

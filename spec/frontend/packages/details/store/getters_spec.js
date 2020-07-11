@@ -13,7 +13,7 @@ import {
   nugetSetupCommand,
   pypiPipCommand,
   pypiSetupCommand,
-} from 'ee/packages/details/store/getters';
+} from 'packages/details/store/getters';
 import {
   conanPackage,
   npmPackage,
@@ -29,8 +29,8 @@ import {
   registryUrl,
   pypiSetupCommandStr,
 } from '../mock_data';
-import { generateConanRecipe } from 'ee/packages/details/utils';
-import { NpmManager } from 'ee/packages/details/constants';
+import { generateConanRecipe } from 'packages/details/utils';
+import { NpmManager } from 'packages/details/constants';
 
 describe('Getters PackageDetails Store', () => {
   let state;

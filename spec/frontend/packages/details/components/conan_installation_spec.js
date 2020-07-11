@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
-import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
+import ConanInstallation from 'packages/details/components/conan_installation.vue';
 import { conanPackage as packageEntity } from '../../mock_data';
 import { registryUrl as conanPath } from '../mock_data';
 import { GlTabs } from '@gitlab/ui';

@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import DependencyRow from 'ee/packages/details/components/dependency_row.vue';
+import DependencyRow from 'packages/details/components/dependency_row.vue';
 import { dependencyLinks } from '../../mock_data';
 
 describe('DependencyRow', () => {
