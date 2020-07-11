@@ -33,6 +33,15 @@ module EE
       ::Gitlab::ShardHealthCache.update(Array(shards))
     end
 
+    def create_project_on_shard(shard_name)
+      project = create(:project)
+
+      # skipping validation which requires the shard name to exist in Gitlab.config.repositories.storages.keys
+      project.update_column(:repository_storage, shard_name)
+
+      project
+    end
+
     def registry_factory_name(registry_class)
       registry_class.underscore.tr('/', '_').to_sym
     end
