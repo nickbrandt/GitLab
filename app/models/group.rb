@@ -173,10 +173,7 @@ class Group < Namespace
   end
 
   def packages_feature_available?
-    # TODO: the ee? condition can be removed once
-    # the package feature is moved to core
-    # See https://gitlab.com/gitlab-org/gitlab/-/issues/221259
-    ::Gitlab.config.packages.enabled && ::Gitlab.ee?
+    ::Gitlab.config.packages.enabled
   end
 
   def notification_email_for(user)
