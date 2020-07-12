@@ -102,7 +102,7 @@ The fair usage algorithm assigns jobs in this order:
 1. Job 6 is next, because Project 3 is the only project left with no running jobs.
 1. Lastly we choose Job 3... because, again, it's the only job left.
 
-#### Enable a shared Runner
+#### Enable shared Runners
 
 On GitLab.com, [shared Runners](#shared-runners) are enabled in all projects by
 default.
@@ -110,12 +110,31 @@ default.
 On self-managed instances of GitLab, an administrator must [install](https://docs.gitlab.com/runner/install/index.html)
 and [register](https://docs.gitlab.com/runner/register/index.html) them.
 
-You can also enable or disable shared Runners for individual projects.
+You can also enable shared Runners for individual projects.
 
-To enable or disable a shared Runner:
+To enable shared Runners:
 
 1. Go to the project's **{settings}** **Settings > CI/CD** and expand the **Runners** section.
-1. Click **Allow shared Runners** or **Disable shared Runners**.
+1. Click **Allow shared Runners**.
+
+#### Disable shared Runners
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/23123) for groups in GitLab 13.2.
+
+You can disable shared Runners for individual projects or for groups.
+You must have Owner permissions for the project or group.
+
+To disable shared Runners for a project:
+
+1. Go to the project's **{settings}** **Settings > CI/CD** and expand the **Runners** section.
+1. In the **Shared Runners** area, click **Disable shared Runners**.
+
+To disable shared Runners for a group:
+
+1. Go to the group's **{settings}** **Settings > CI/CD** and expand the **Runners** section.
+1. In the **Shared Runners** area, click **Disable shared Runners globally**.
+1. Optionally, to allow shared Runners to be enabled for individual projects or subgroups,
+   click **Allow projects/subgroups to override the global setting**.
 
 ### Group Runners
 
