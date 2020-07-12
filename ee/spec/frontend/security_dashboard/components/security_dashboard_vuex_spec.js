@@ -32,6 +32,7 @@ describe('Security Dashboard component', () => {
   let mock;
   let lockFilterSpy;
   let setPipelineIdSpy;
+  let fetchPipelineJobsSpy;
   let store;
 
   const createComponent = props => {
@@ -43,6 +44,7 @@ describe('Security Dashboard component', () => {
       methods: {
         lockFilter: lockFilterSpy,
         setPipelineId: setPipelineIdSpy,
+        fetchPipelineJobs: fetchPipelineJobsSpy,
       },
       propsData: {
         dashboardDocumentation: '',
@@ -61,6 +63,7 @@ describe('Security Dashboard component', () => {
     mock = new MockAdapter(axios);
     lockFilterSpy = jest.fn();
     setPipelineIdSpy = jest.fn();
+    fetchPipelineJobsSpy = jest.fn();
     store = createStore();
   });
 
@@ -102,6 +105,10 @@ describe('Security Dashboard component', () => {
 
     it('sets the pipeline id', () => {
       expect(setPipelineIdSpy).toHaveBeenCalledWith(pipelineId);
+    });
+
+    it('fetchs the pipeline jobs', () => {
+      expect(fetchPipelineJobsSpy).toHaveBeenCalledWith();
     });
 
     describe('when the total number of vulnerabilities change', () => {

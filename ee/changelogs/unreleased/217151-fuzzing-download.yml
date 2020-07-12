@@ -1,0 +1,5 @@
+---
+title: Add ability to download fuzzing artifacts from pipeline page
+merge_request: 36676
+author:
+type: added
