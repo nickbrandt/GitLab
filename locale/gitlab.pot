@@ -20820,6 +20820,9 @@ msgstr ""
 msgid "SecurityReports|Dismissed '%{vulnerabilityName}'. Turn off the hide dismissed toggle to view."
 msgstr ""
 
+msgid "SecurityReports|Download Report"
+msgstr ""
+
 msgid "SecurityReports|Each vulnerability now has a unique page that can be directly linked to, shared, referenced, and tracked as the single source of truth. Vulnerability occurrences also persist across scanner runs, which improves tracking and visibility and reduces duplicates between scans."
 msgstr ""
 
@@ -20836,6 +20839,9 @@ msgid "SecurityReports|Error fetching the vulnerability list. Please check your 
 msgstr ""
 
 msgid "SecurityReports|False positive"
+msgstr ""
+
+msgid "SecurityReports|Fuzzing artifacts"
 msgstr ""
 
 msgid "SecurityReports|Group Security Dashboard"
