@@ -8800,7 +8800,8 @@ CREATE TABLE public.analytics_cycle_analytics_group_stages (
     end_event_label_id bigint,
     hidden boolean DEFAULT false NOT NULL,
     custom boolean DEFAULT true NOT NULL,
-    name character varying(255) NOT NULL
+    name character varying(255) NOT NULL,
+    group_value_stream_id bigint
 );
 
 CREATE SEQUENCE public.analytics_cycle_analytics_group_stages_id_seq
@@ -8811,6 +8812,24 @@ CREATE SEQUENCE public.analytics_cycle_analytics_group_stages_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.analytics_cycle_analytics_group_stages_id_seq OWNED BY public.analytics_cycle_analytics_group_stages.id;
+
+CREATE TABLE public.analytics_cycle_analytics_group_value_streams (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    group_id bigint NOT NULL,
+    name text NOT NULL,
+    CONSTRAINT check_bc1ed5f1f7 CHECK ((char_length(name) <= 100))
+);
+
+CREATE SEQUENCE public.analytics_cycle_analytics_group_value_streams_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.analytics_cycle_analytics_group_value_streams_id_seq OWNED BY public.analytics_cycle_analytics_group_value_streams.id;
 
 CREATE TABLE public.analytics_cycle_analytics_project_stages (
     id bigint NOT NULL,
@@ -16359,6 +16378,8 @@ ALTER TABLE ONLY public.allowed_email_domains ALTER COLUMN id SET DEFAULT nextva
 
 ALTER TABLE ONLY public.analytics_cycle_analytics_group_stages ALTER COLUMN id SET DEFAULT nextval('public.analytics_cycle_analytics_group_stages_id_seq'::regclass);
 
+ALTER TABLE ONLY public.analytics_cycle_analytics_group_value_streams ALTER COLUMN id SET DEFAULT nextval('public.analytics_cycle_analytics_group_value_streams_id_seq'::regclass);
+
 ALTER TABLE ONLY public.analytics_cycle_analytics_project_stages ALTER COLUMN id SET DEFAULT nextval('public.analytics_cycle_analytics_project_stages_id_seq'::regclass);
 
 ALTER TABLE ONLY public.appearances ALTER COLUMN id SET DEFAULT nextval('public.appearances_id_seq'::regclass);
@@ -17222,6 +17243,9 @@ ALTER TABLE ONLY public.allowed_email_domains
 
 ALTER TABLE ONLY public.analytics_cycle_analytics_group_stages
     ADD CONSTRAINT analytics_cycle_analytics_group_stages_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.analytics_cycle_analytics_group_value_streams
+    ADD CONSTRAINT analytics_cycle_analytics_group_value_streams_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.analytics_cycle_analytics_project_stages
     ADD CONSTRAINT analytics_cycle_analytics_project_stages_pkey PRIMARY KEY (id);
@@ -18557,6 +18581,10 @@ CREATE UNIQUE INDEX index_analytics_ca_group_stages_on_group_id_and_name ON publ
 CREATE INDEX index_analytics_ca_group_stages_on_relative_position ON public.analytics_cycle_analytics_group_stages USING btree (relative_position);
 
 CREATE INDEX index_analytics_ca_group_stages_on_start_event_label_id ON public.analytics_cycle_analytics_group_stages USING btree (start_event_label_id);
+
+CREATE INDEX index_analytics_ca_group_stages_on_value_stream_id ON public.analytics_cycle_analytics_group_stages USING btree (group_value_stream_id);
+
+CREATE UNIQUE INDEX index_analytics_ca_group_value_streams_on_group_id_and_name ON public.analytics_cycle_analytics_group_value_streams USING btree (group_id, name);
 
 CREATE INDEX index_analytics_ca_project_stages_on_end_event_label_id ON public.analytics_cycle_analytics_project_stages USING btree (end_event_label_id);
 
@@ -21225,6 +21253,9 @@ ALTER TABLE ONLY public.ci_variables
 ALTER TABLE ONLY public.merge_request_metrics
     ADD CONSTRAINT fk_ae440388cc FOREIGN KEY (latest_closed_by_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY public.analytics_cycle_analytics_group_stages
+    ADD CONSTRAINT fk_analytics_cycle_analytics_group_stages_group_value_stream_id FOREIGN KEY (group_value_stream_id) REFERENCES public.analytics_cycle_analytics_group_value_streams(id) ON DELETE CASCADE NOT VALID;
+
 ALTER TABLE ONLY public.fork_network_members
     ADD CONSTRAINT fk_b01280dae4 FOREIGN KEY (forked_from_project_id) REFERENCES public.projects(id) ON DELETE SET NULL;
 
@@ -21803,6 +21834,9 @@ ALTER TABLE ONLY public.project_repository_storage_moves
 
 ALTER TABLE ONLY public.x509_commit_signatures
     ADD CONSTRAINT fk_rails_53fe41188f FOREIGN KEY (x509_certificate_id) REFERENCES public.x509_certificates(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.analytics_cycle_analytics_group_value_streams
+    ADD CONSTRAINT fk_rails_540627381a FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.geo_node_namespace_links
     ADD CONSTRAINT fk_rails_546bf08d3e FOREIGN KEY (geo_node_id) REFERENCES public.geo_nodes(id) ON DELETE CASCADE;
@@ -23663,6 +23697,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200623170000
 20200623185440
 20200624075411
+20200624142107
+20200624142207
 20200624222443
 20200625045442
 20200625082258
@@ -23673,6 +23709,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200629192638
 20200630091656
 20200630110826
+20200701064756
 20200701093859
 20200701205710
 20200702123805
