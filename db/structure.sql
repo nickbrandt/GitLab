@@ -8801,7 +8801,7 @@ CREATE TABLE public.analytics_cycle_analytics_group_stages (
     hidden boolean DEFAULT false NOT NULL,
     custom boolean DEFAULT true NOT NULL,
     name character varying(255) NOT NULL,
-    group_value_stream_id bigint
+    group_value_stream_id bigint NOT NULL
 );
 
 CREATE SEQUENCE public.analytics_cycle_analytics_group_stages_id_seq
@@ -21259,7 +21259,7 @@ ALTER TABLE ONLY public.merge_request_metrics
     ADD CONSTRAINT fk_ae440388cc FOREIGN KEY (latest_closed_by_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.analytics_cycle_analytics_group_stages
-    ADD CONSTRAINT fk_analytics_cycle_analytics_group_stages_group_value_stream_id FOREIGN KEY (group_value_stream_id) REFERENCES public.analytics_cycle_analytics_group_value_streams(id) ON DELETE CASCADE NOT VALID;
+    ADD CONSTRAINT fk_analytics_cycle_analytics_group_stages_group_value_stream_id FOREIGN KEY (group_value_stream_id) REFERENCES public.analytics_cycle_analytics_group_value_streams(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.fork_network_members
     ADD CONSTRAINT fk_b01280dae4 FOREIGN KEY (forked_from_project_id) REFERENCES public.projects(id) ON DELETE SET NULL;
@@ -23715,6 +23715,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200630091656
 20200630110826
 20200701064756
+20200701070435
+20200701091253
 20200701093859
 20200701205710
 20200702123805

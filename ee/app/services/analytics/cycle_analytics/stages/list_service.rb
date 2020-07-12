@@ -17,7 +17,9 @@ module Analytics
         end
 
         def persisted_stages
-          parent.cycle_analytics_stages.for_list
+          scope = parent.cycle_analytics_stages
+          scope = scope.by_value_stream(params[:value_stream]) if params[:value_stream]
+          scope.for_list
         end
       end
     end
