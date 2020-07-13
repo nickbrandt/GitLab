@@ -25388,7 +25388,22 @@ msgstr ""
 msgid "User was successfully updated."
 msgstr ""
 
+msgid "UserLists|Add"
+msgstr ""
+
+msgid "UserLists|Add Users"
+msgstr ""
+
+msgid "UserLists|Add users"
+msgstr ""
+
+msgid "UserLists|Cancel"
+msgstr ""
+
 msgid "UserLists|Define a set of users to be used within feature flag strategies"
+msgstr ""
+
+msgid "UserLists|Enter a comma separated list of user IDs. These IDs should be the users of the system in which the feature flag is set, not GitLab IDs"
 msgstr ""
 
 msgid "UserLists|There are no users"
