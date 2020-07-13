@@ -53,6 +53,10 @@ describe('Security Dashboard Table Row', () => {
       expect(findContent(0).text()).toEqual('');
     });
 
+    it('should render a `` for the report type and scanner', () => {
+      expect(findContent(3).text()).toEqual('');
+    });
+
     it('should not render action buttons', () => {
       expect(wrapper.findAll('.action-buttons button')).toHaveLength(0);
     });
@@ -87,6 +91,10 @@ describe('Security Dashboard Table Row', () => {
           .text()
           .toLowerCase(),
       ).toContain(vulnerability.report_type.toLowerCase());
+    });
+
+    it('should render the scanner vendor if the scanner does exist', () => {
+      expect(findContent(3).text()).toContain(vulnerability.scanner.vendor);
     });
 
     describe('the project name', () => {
