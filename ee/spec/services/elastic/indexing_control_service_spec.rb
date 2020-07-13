@@ -54,6 +54,20 @@ RSpec.describe Elastic::IndexingControlService, :clean_gitlab_redis_shared_state
     end
   end
 
+  describe '.queue_size' do
+    it 'reports the queue size' do
+      stub_const("Elastic::IndexingControl::WORKERS", [worker_class])
+
+      expect(described_class.queue_size).to eq(0)
+
+      subject.add_to_waiting_queue!(worker_args, worker_context)
+
+      expect(described_class.queue_size).to eq(1)
+
+      expect { subject.resume_processing! }.to change(described_class, :queue_size).by(-1)
+    end
+  end
+
   describe '#add_to_waiting_queue!' do
     it 'adds a job to the set' do
       expect { subject.add_to_waiting_queue!(worker_args, worker_context) }.to change { subject.queue_size }.from(0).to(1)

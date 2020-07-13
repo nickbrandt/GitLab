@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable do
+  RSpec.describe 'Plan', :reliable do
     describe 'Issues weight visualization' do
       before do
         Flow::Login.sign_in

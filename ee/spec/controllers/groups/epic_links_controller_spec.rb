@@ -182,9 +182,9 @@ RSpec.describe Groups::EpicLinksController do
 
     it_behaves_like 'unlicensed subepics action'
 
-    context 'when subepics are enabled' do
+    context 'when epics are enabled' do
       before do
-        stub_licensed_features(epics: true, subepics: true)
+        stub_licensed_features(epics: true)
       end
 
       context 'when user has permissions to update the parent epic' do
@@ -221,6 +221,19 @@ RSpec.describe Groups::EpicLinksController do
 
           expect(response).to have_gitlab_http_status(:forbidden)
         end
+      end
+    end
+
+    context 'when user has permissions to update the parent epic but epics feature is disabled' do
+      before do
+        stub_licensed_features(epics: false)
+        group.add_developer(user)
+      end
+
+      it 'does not destroy the link' do
+        expect { subject }.not_to change { epic1.reload.parent }.from(parent_epic)
+
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end

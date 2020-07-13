@@ -641,9 +641,22 @@ module Ci
     end
 
     def add_error_message(content)
-      return unless Gitlab::Ci::Features.store_pipeline_messages?(project)
+      add_message(:error, content)
+    end
 
-      messages.error.build(content: content)
+    def add_warning_message(content)
+      add_message(:warning, content)
+    end
+
+    # We can't use `messages.error` scope here because messages should also be
+    # read when the pipeline is not persisted. Using the scope will return no
+    # results as it would query persisted data.
+    def error_messages
+      messages.select(&:error?)
+    end
+
+    def warning_messages
+      messages.select(&:warning?)
     end
 
     # Manually set the notes for a Ci::Pipeline
@@ -1008,8 +1021,6 @@ module Ci
     # Set scheduling type of processables if they were created before scheduling_type
     # data was deployed (https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22246).
     def ensure_scheduling_type!
-      return unless ::Gitlab::Ci::Features.ensure_scheduling_type_enabled?
-
       processables.populate_scheduling_type!
     end
 
@@ -1020,6 +1031,12 @@ module Ci
     end
 
     private
+
+    def add_message(severity, content)
+      return unless Gitlab::Ci::Features.store_pipeline_messages?(project)
+
+      messages.build(severity: severity, content: content)
+    end
 
     def pipeline_data
       Gitlab::DataBuilder::Pipeline.build(self)

@@ -3,11 +3,11 @@ import { GlBanner } from '@gitlab/ui';
 import Cookies from 'js-cookie';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import axios from '~/lib/utils/axios_utils';
-import ProjectVulnerabilitiesApp from 'ee/vulnerabilities/components/project_vulnerabilities_app.vue';
-import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
-import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
-import VulnerabilitiesCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
-import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
+import ProjectVulnerabilitiesApp from './project_vulnerabilities.vue';
+import ReportsNotConfigured from './empty_states/reports_not_configured.vue';
+import SecurityDashboardLayout from './security_dashboard_layout.vue';
+import VulnerabilitiesCountList from './vulnerability_count_list.vue';
+import Filters from './first_class_vulnerability_filters.vue';
 import CsvExportButton from './csv_export_button.vue';
 
 export const BANNER_COOKIE_KEY = 'hide_vulnerabilities_introduction_banner';

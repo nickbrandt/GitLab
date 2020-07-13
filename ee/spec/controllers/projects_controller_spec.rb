@@ -216,25 +216,6 @@ RSpec.describe ProjectsController do
       end
     end
 
-    it 'updates Service Desk attributes' do
-      allow(Gitlab::IncomingEmail).to receive(:enabled?) { true }
-      allow(Gitlab::IncomingEmail).to receive(:supports_wildcard?) { true }
-      params = {
-        service_desk_enabled: true
-      }
-
-      put :update,
-          params: {
-            namespace_id: project.namespace,
-            id: project,
-            project: params
-          }
-      project.reload
-
-      expect(response).to have_gitlab_http_status(:found)
-      expect(project.service_desk_enabled).to eq(true)
-    end
-
     context 'when merge_pipelines_enabled param is specified' do
       let(:params) { { merge_pipelines_enabled: true } }
 
@@ -354,9 +335,9 @@ RSpec.describe ProjectsController do
           false | false | true  | true
           false | true  | true  | true
           true  | false | false | false
-          true  | true  | false | nil
+          true  | true  | false | false
           true  | false | true  | true
-          true  | true  | true  | nil
+          true  | true  | true  | true
         end
 
         with_them do
@@ -372,6 +353,7 @@ RSpec.describe ProjectsController do
                 id: project,
                 project: { setting => param_value }
               }
+
             project.reload
 
             expect(project[setting]).to eq(final_value)

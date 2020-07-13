@@ -12,6 +12,7 @@ const customDashboardsData = new Array(30).fill(null).map((_, idx) => ({
   display_name: `Custom Dashboard ${idx}`,
   can_edit: true,
   system_dashboard: false,
+  out_of_the_box_dashboard: false,
   project_blob_path: `${mockProjectDir}/blob/master/dashboards/.gitlab/dashboards/dashboard_${idx}.yml`,
   path: `.gitlab/dashboards/dashboard_${idx}.yml`,
   starred: false,
@@ -302,6 +303,7 @@ export const dashboardGitResponse = [
     display_name: 'Default',
     can_edit: false,
     system_dashboard: true,
+    out_of_the_box_dashboard: true,
     project_blob_path: null,
     path: 'config/prometheus/common_metrics.yml',
     starred: false,
@@ -312,6 +314,44 @@ export const dashboardGitResponse = [
     display_name: 'dashboard.yml',
     can_edit: true,
     system_dashboard: false,
+    out_of_the_box_dashboard: false,
+    project_blob_path: `${mockProjectDir}/-/blob/master/.gitlab/dashboards/dashboard.yml`,
+    path: '.gitlab/dashboards/dashboard.yml',
+    starred: true,
+    user_starred_path: `${mockProjectDir}/metrics_user_starred_dashboards?dashboard_path=.gitlab/dashboards/dashboard.yml`,
+  },
+  {
+    default: false,
+    display_name: 'Pod Health',
+    can_edit: false,
+    system_dashboard: false,
+    out_of_the_box_dashboard: true,
+    project_blob_path: null,
+    path: 'config/prometheus/pod_metrics.yml',
+    starred: false,
+    user_starred_path: `${mockProjectDir}/metrics_user_starred_dashboards?dashboard_path=config/prometheus/pod_metrics.yml`,
+  },
+  ...customDashboardsData,
+];
+
+export const selfMonitoringDashboardGitResponse = [
+  {
+    default: true,
+    display_name: 'Default',
+    can_edit: false,
+    system_dashboard: false,
+    out_of_the_box_dashboard: true,
+    project_blob_path: null,
+    path: 'config/prometheus/self_monitoring_default.yml',
+    starred: false,
+    user_starred_path: `${mockProjectDir}/metrics_user_starred_dashboards?dashboard_path=config/prometheus/self_monitoring_default.yml`,
+  },
+  {
+    default: false,
+    display_name: 'dashboard.yml',
+    can_edit: true,
+    system_dashboard: false,
+    out_of_the_box_dashboard: false,
     project_blob_path: `${mockProjectDir}/-/blob/master/.gitlab/dashboards/dashboard.yml`,
     path: '.gitlab/dashboards/dashboard.yml',
     starred: true,
@@ -333,36 +373,6 @@ export const metricsResult = [
     ],
   },
 ];
-
-export const singleStatMetricsResult = {
-  title: 'Super Chart A2',
-  type: 'single-stat',
-  weight: 2,
-  metrics: [
-    {
-      id: 'metric_a1',
-      metricId: '2',
-      query: 'max(go_memstats_alloc_bytes{job="prometheus"}) by (job) /1024/1024',
-      unit: 'MB',
-      label: 'Total Consumption',
-      metric_id: 2,
-      prometheus_endpoint_path:
-        '/root/kubernetes-gke-project/environments/35/prometheus/api/v1/query?query=max%28go_memstats_alloc_bytes%7Bjob%3D%22prometheus%22%7D%29+by+%28job%29+%2F1024%2F1024',
-      result: [
-        {
-          metric: { job: 'prometheus' },
-          value: ['2019-06-26T21:03:20.881Z', 91],
-          values: [['2019-06-26T21:03:20.881Z', 91]],
-        },
-      ],
-    },
-  ],
-};
-
-export const singleStatMetricsWithFieldResult = {
-  ...singleStatMetricsResult,
-  field: 'job',
-};
 
 export const graphDataPrometheusQueryRangeMultiTrack = {
   title: 'Super Chart A3',

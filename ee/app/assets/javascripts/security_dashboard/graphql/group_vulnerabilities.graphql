@@ -1,5 +1,5 @@
 #import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
-#import "ee/vulnerabilities/graphql/vulnerability.fragment.graphql"
+#import "./vulnerability.fragment.graphql"
 #import "./project.fragment.graphql"
 
 query group(
@@ -24,8 +24,8 @@ query group(
       reportType: $reportType
       state: $state
       projectId: $projectId
-    ){
-      nodes{
+    ) {
+      nodes {
         ...Vulnerability
       }
       pageInfo {

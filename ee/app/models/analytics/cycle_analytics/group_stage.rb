@@ -7,6 +7,7 @@ module Analytics
 
       validates :group, presence: true
       belongs_to :group
+      belongs_to :value_stream, class_name: 'Analytics::CycleAnalytics::GroupValueStream', foreign_key: :group_value_stream_id
 
       alias_attribute :parent, :group
       alias_attribute :parent_id, :group_id

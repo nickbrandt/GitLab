@@ -252,6 +252,32 @@ RSpec.describe MergeRequestWidgetEntity do
     expect(subject.as_json).to include(:create_vulnerability_feedback_dismissal_path)
   end
 
+  describe '#can_read_vulnerability_feedback' do
+    context 'when user has permissions to read vulnerability feedback' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'is set to true' do
+        expect(subject.as_json[:can_read_vulnerability_feedback]).to eq(true)
+      end
+    end
+
+    context 'when user has no permissions to read vulnerability feedback' do
+      before do
+        project.add_guest(user)
+      end
+
+      it 'is set to false' do
+        expect(subject.as_json[:can_read_vulnerability_feedback]).to eq(false)
+      end
+    end
+  end
+
+  it 'has can_read_vulnerability_feedback property' do
+    expect(subject.as_json).to include(:can_read_vulnerability_feedback)
+  end
+
   it 'has pipeline id' do
     allow(merge_request).to receive(:head_pipeline).and_return(pipeline)
 

@@ -31,6 +31,14 @@ describe('security reports mutations', () => {
     });
   });
 
+  describe('SET_CAN_READ_VULNERABILITY_FEEDBACK', () => {
+    it('should set the vulnerabilities endpoint', () => {
+      mutations[types.SET_CAN_READ_VULNERABILITY_FEEDBACK](stateCopy, false);
+
+      expect(stateCopy.canReadVulnerabilityFeedback).toEqual(false);
+    });
+  });
+
   describe('SET_VULNERABILITY_FEEDBACK_PATH', () => {
     it('should set the vulnerabilities endpoint', () => {
       mutations[types.SET_VULNERABILITY_FEEDBACK_PATH](stateCopy, 'vulnerability_path');

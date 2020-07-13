@@ -131,7 +131,6 @@ module EE
       scope :with_active_prometheus_service, -> { joins(:prometheus_service).merge(PrometheusService.active) }
       scope :with_enabled_error_tracking, -> { joins(:error_tracking_setting).where(project_error_tracking_settings: { enabled: true }) }
       scope :with_tracing_enabled, -> { joins(:tracing_setting) }
-      scope :with_packages, -> { joins(:packages) }
       scope :mirrored_with_enabled_pipelines, -> do
         joins(:project_feature).mirror.where(mirror_trigger_builds: true,
                                              project_features: { builds_access_level: ::ProjectFeature::ENABLED })
@@ -180,8 +179,6 @@ module EE
         validates :mirror_user, presence: true
       end
 
-      default_value_for :packages_enabled, true
-
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :status_page_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :compliance_framework_setting, update_only: true, allow_destroy: true
@@ -203,7 +200,7 @@ module EE
 
       override :with_web_entity_associations
       def with_web_entity_associations
-        super.preload(:compliance_framework_setting)
+        super.preload(:compliance_framework_setting, group: [:ip_restrictions, :saml_provider])
       end
 
       override :with_api_entity_associations
@@ -589,15 +586,6 @@ module EE
 
     def protected_environments_feature_available?
       feature_available?(:protected_environments)
-    end
-
-    # Because we use default_value_for we need to be sure
-    # packages_enabled= method does exist even if we rollback migration.
-    # Otherwise many tests from spec/migrations will fail.
-    def packages_enabled=(value)
-      if has_attribute?(:packages_enabled)
-        write_attribute(:packages_enabled, value)
-      end
     end
 
     # Update the default branch querying the remote to determine its HEAD

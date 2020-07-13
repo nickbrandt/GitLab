@@ -121,15 +121,12 @@ module QA
       def set_file_template_if_not_already_set
         response = get Runtime::API::Request.new(@api_client, "/groups/#{@group.id}").url
 
-        if parse_body(response)[:file_template_project_id]
-          return
-        else
-          @group.visit!
-          Page::Group::Menu.perform(&:click_group_general_settings_item)
+        return if parse_body(response)[:file_template_project_id]
 
-          Page::Group::Settings::General.perform do |general|
-            general.choose_file_template_repository(@file_template_project.name)
-          end
+        @group.visit!
+        Page::Group::Menu.perform(&:click_group_general_settings_item)
+        Page::Group::Settings::General.perform do |general|
+          general.choose_file_template_repository(@file_template_project.name)
         end
       end
 

@@ -5,17 +5,6 @@ module EE
     module MoveService
       extend ::Gitlab::Utils::Override
 
-      override :execute
-      def execute(issue, target_project)
-        super
-
-        # Updates old issue sent notifications allowing
-        # to receive service desk emails on the new moved issue.
-        update_service_desk_sent_notifications
-
-        new_entity
-      end
-
       override :update_old_entity
       def update_old_entity
         rewrite_epic_issue
@@ -24,13 +13,6 @@ module EE
       end
 
       private
-
-      def update_service_desk_sent_notifications
-        return unless original_entity.from_service_desk?
-
-        original_entity
-          .sent_notifications.update_all(project_id: new_entity.project_id, noteable_id: new_entity.id)
-      end
 
       def rewrite_epic_issue
         return unless epic_issue = original_entity.epic_issue

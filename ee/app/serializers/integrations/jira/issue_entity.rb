@@ -25,13 +25,10 @@ module Integrations
 
       expose :labels do |jira_issue|
         jira_issue.labels.map do |name|
-          bg_color = Label.color_for(name)
-          text_color = LabelsHelper.text_color_for_bg(bg_color)
-
           {
             name: name,
-            color: bg_color,
-            text_color: text_color
+            color: '#EBECF0',
+            text_color: '#283856'
 
           }
         end
@@ -57,7 +54,7 @@ module Integrations
       end
 
       expose :web_url do |jira_issue|
-        "#{jira_issue.client.options[:site]}projects/#{jira_issue.project.key}/issues/#{jira_issue.key}"
+        "#{jira_issue.client.options[:site]}browse/#{jira_issue.key}"
       end
 
       expose :references do |jira_issue|

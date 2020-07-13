@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable do
+  RSpec.describe 'Plan', :reliable do
     describe 'Editing scoped labels on issues' do
       let(:initial_label) { 'animal::fox' }
       let(:new_label_same_scope) { 'animal::dolphin' }

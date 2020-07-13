@@ -27,24 +27,4 @@ RSpec.describe Banzai::Filter::InlineMetricsRedactorFilter do
     it_behaves_like 'redacts the embed placeholder'
     it_behaves_like 'retains the embed placeholder when applicable'
   end
-
-  context 'for a cluster metric embed' do
-    let_it_be(:cluster) { create(:cluster, :provided_by_gcp, :project, projects: [project]) }
-    let(:params) { [project.namespace.path, project.path, cluster.id] }
-    let(:query_params) { { group: 'Cluster Health', title: 'CPU Usage', y_label: 'CPU (cores)' } }
-    let(:url) { urls.metrics_namespace_project_cluster_url(*params, **query_params) }
-
-    context 'with user who can read cluster' do
-      it_behaves_like 'redacts the embed placeholder'
-      it_behaves_like 'retains the embed placeholder when applicable'
-    end
-
-    context 'without user who can read cluster' do
-      let(:doc) { filter(input, current_user: create(:user)) }
-
-      it 'redacts the embed placeholder' do
-        expect(doc.to_s).to be_empty
-      end
-    end
-  end
 end

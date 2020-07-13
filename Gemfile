@@ -365,7 +365,7 @@ group :development, :test do
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
 
-  gem 'gitlab-styles', '~> 4.2.0', require: false
+  gem 'gitlab-styles', '~> 4.3.0', require: false
   # Pin these dependencies, otherwise a new rule could break the CI pipelines
   gem 'rubocop', '~> 0.82.0'
   gem 'rubocop-performance', '~> 1.5.2'
@@ -502,3 +502,5 @@ gem 'valid_email', '~> 0.1'
 # JSON
 gem 'json', '~> 2.3.0'
 gem 'json-schema', '~> 2.8.0'
+gem 'oj', '~> 3.10.6'
+gem 'multi_json', '~> 1.14.1'

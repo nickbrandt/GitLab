@@ -2,6 +2,7 @@
 
 class ApprovalProjectRule < ApplicationRecord
   include ApprovalRuleLike
+  include Auditable
 
   belongs_to :project
   has_and_belongs_to_many :protected_branches
@@ -49,6 +50,14 @@ class ApprovalProjectRule < ApplicationRecord
       .find_or_initialize_by(report_type: report_type)
     rule.update!(attributes_to_apply_for(report_type))
     rule
+  end
+
+  def audit_add(model)
+    push_audit_event("Added #{model.class.name} #{model.name} to approval group on #{self.name} rule")
+  end
+
+  def audit_remove(model)
+    push_audit_event("Removed #{model.class.name} #{model.name} from approval group on #{self.name} rule")
   end
 
   private

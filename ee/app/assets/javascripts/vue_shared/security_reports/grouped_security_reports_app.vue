@@ -9,11 +9,14 @@ import Tracking from '~/tracking';
 import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import IssueModal from './components/modal.vue';
+import DastModal from './components/dast_modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
-import { GlSprintf, GlLink } from '@gitlab/ui';
+import { GlSprintf, GlLink, GlModalDirective } from '@gitlab/ui';
 import { mrStates } from '~/mr_popover/constants';
 import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
+import { fetchPolicies } from '~/lib/graphql';
+import securityReportSummaryQuery from './graphql/mr_security_report_summary.graphql';
 
 export default {
   store: createStore(),
@@ -25,8 +28,28 @@ export default {
     Icon,
     GlSprintf,
     GlLink,
+    DastModal,
+  },
+  directives: {
+    'gl-modal': GlModalDirective,
   },
   mixins: [securityReportsMixin, glFeatureFlagsMixin()],
+  apollo: {
+    dastSummary: {
+      query: securityReportSummaryQuery,
+      fetchPolicy: fetchPolicies.NETWORK_ONLY,
+      variables() {
+        return {
+          fullPath: this.projectFullPath,
+          pipelineIid: this.pipelineIid,
+        };
+      },
+      update(data) {
+        const dast = data?.project?.pipeline?.securityReportSummary?.dast;
+        return dast && Object.keys(dast).length ? dast : null;
+      },
+    },
+  },
   props: {
     enabledReports: {
       type: Object,
@@ -77,6 +100,11 @@ export default {
       required: false,
       default: '',
     },
+    canReadVulnerabilityFeedback: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     vulnerabilityFeedbackPath: {
       type: String,
       required: false,
@@ -107,6 +135,11 @@ export default {
       required: false,
       default: null,
     },
+    pipelineIid: {
+      type: Number,
+      required: false,
+      default: null,
+    },
     pipelinePath: {
       type: String,
       required: false,
@@ -131,6 +164,10 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    projectFullPath: {
+      type: String,
+      required: true,
     },
   },
   componentNames,
@@ -197,6 +234,9 @@ export default {
         Tracking.event(category, action);
       });
     },
+    dastDownloadLink() {
+      return this.dastSummary?.scannedResourcesCsvPath || '';
+    },
   },
 
   created() {
@@ -204,6 +244,7 @@ export default {
     this.setBaseBlobPath(this.baseBlobPath);
     this.setSourceBranch(this.sourceBranch);
 
+    this.setCanReadVulnerabilityFeedback(this.canReadVulnerabilityFeedback);
     this.setVulnerabilityFeedbackPath(this.vulnerabilityFeedbackPath);
     this.setVulnerabilityFeedbackHelpPath(this.vulnerabilityFeedbackHelpPath);
     this.setCreateVulnerabilityFeedbackIssuePath(this.createVulnerabilityFeedbackIssuePath);
@@ -253,6 +294,7 @@ export default {
       'setHeadBlobPath',
       'setBaseBlobPath',
       'setSourceBranch',
+      'setCanReadVulnerabilityFeedback',
       'setVulnerabilityFeedbackPath',
       'setVulnerabilityFeedbackHelpPath',
       'setCreateVulnerabilityFeedbackIssuePath',
@@ -413,16 +455,17 @@ export default {
               <div class="text-nowrap">
                 {{ n__('%d URL scanned', '%d URLs scanned', dastScans[0].scanned_resources_count) }}
               </div>
-              <gl-link
-                class="ml-2"
-                data-qa-selector="dast-ci-job-link"
-                :href="dastScans[0].job_path"
-              >
+              <gl-link v-gl-modal.dastUrl class="ml-2" data-qa-selector="dast-ci-job-link">
                 {{ __('View details') }}
               </gl-link>
+              <dast-modal
+                v-if="dastSummary"
+                :scanned-urls="dastSummary.scannedResources.nodes"
+                :scanned-resources-count="dastSummary.scannedResourcesCount"
+                :download-link="dastDownloadLink"
+              />
             </template>
           </summary-row>
-
           <grouped-issues-list
             v-if="dast.newIssues.length || dast.resolvedIssues.length"
             :unresolved-issues="dast.newIssues"

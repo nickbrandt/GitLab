@@ -341,6 +341,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Look for scope '-' at the top of the file.
 
       #
+      # Service Desk
+      #
+      get '/service_desk' => 'service_desk#show', as: :service_desk
+      put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
+
+      #
       # Templates
       #
       get '/templates/:template_type/:key' => 'templates#show',
@@ -399,6 +405,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       post 'alerts/notify', to: 'alerting/notifications#create'
+
+      post 'incident_management/pager_duty', to: 'incident_management/pager_duty_incidents#create'
 
       draw :legacy_builds
 

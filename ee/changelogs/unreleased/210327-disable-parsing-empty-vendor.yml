@@ -1,0 +1,5 @@
+---
+title: Change default vendor name to GitLab if not defined in the security schema
+merge_request: 36519
+author:
+type: fixed

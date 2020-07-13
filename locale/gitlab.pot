@@ -71,6 +71,11 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
+msgid "%d Scanned URL"
+msgid_plural "%d Scanned URLs"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d URL scanned"
 msgid_plural "%d URLs scanned"
 msgstr[0] ""
@@ -297,6 +302,9 @@ msgid "%{completedWeight} of %{totalWeight} weight completed"
 msgstr ""
 
 msgid "%{containerScanningLinkStart}Container Scanning%{containerScanningLinkEnd} and/or %{dependencyScanningLinkStart}Dependency Scanning%{dependencyScanningLinkEnd} must be enabled. %{securityBotLinkStart}GitLab-Security-Bot%{securityBotLinkEnd} will be the author of the auto-created merge request. %{moreInfoLinkStart}More information%{moreInfoLinkEnd}."
+msgstr ""
+
+msgid "%{contentStart}Drop files to attach, or %{contentEnd}%{linkStart}browse%{linkEnd}"
 msgstr ""
 
 msgid "%{cores} cores"
@@ -1289,7 +1297,7 @@ msgstr ""
 msgid "Account: %{account}"
 msgstr ""
 
-msgid "Action to take when receiving an alert."
+msgid "Action to take when receiving an alert. %{docsLink}"
 msgstr ""
 
 msgid "Actions"
@@ -1774,13 +1782,22 @@ msgstr ""
 msgid "AdminUsers|2FA Enabled"
 msgstr ""
 
+msgid "AdminUsers|Access"
+msgstr ""
+
 msgid "AdminUsers|Active"
 msgstr ""
 
 msgid "AdminUsers|Admin"
 msgstr ""
 
+msgid "AdminUsers|Administrators have access to all groups, projects and users and can manage all features in this installation"
+msgstr ""
+
 msgid "AdminUsers|Admins"
+msgstr ""
+
+msgid "AdminUsers|Automatically marked as default internal user"
 msgstr ""
 
 msgid "AdminUsers|Block"
@@ -1831,6 +1848,9 @@ msgstr ""
 msgid "AdminUsers|External"
 msgstr ""
 
+msgid "AdminUsers|External users cannot see internal or private projects unless access is explicitly granted. Also, external users cannot create projects, groups, or personal snippets."
+msgstr ""
+
 msgid "AdminUsers|Is using seat"
 msgstr ""
 
@@ -1853,6 +1873,12 @@ msgid "AdminUsers|Personal projects, group and user history will be left intact"
 msgstr ""
 
 msgid "AdminUsers|Reactivating a user will:"
+msgstr ""
+
+msgid "AdminUsers|Regular"
+msgstr ""
+
+msgid "AdminUsers|Regular users have access to their groups and projects"
 msgstr ""
 
 msgid "AdminUsers|Restore user access to the account, including web, Git and API."
@@ -1907,6 +1933,9 @@ msgid "AdminUsers|You are about to permanently delete the user %{username}. Issu
 msgstr ""
 
 msgid "AdminUsers|You are about to permanently delete the user %{username}. This will delete all of the issues, merge requests, and groups linked to them. To avoid data loss, consider using the %{strong_start}block user%{strong_end} feature instead. Once you %{strong_start}Delete user%{strong_end}, it cannot be undone or recovered."
+msgstr ""
+
+msgid "AdminUsers|You cannot remove your own admin rights."
 msgstr ""
 
 msgid "Administration"
@@ -3423,9 +3452,6 @@ msgstr ""
 msgid "Automatically create merge requests for vulnerabilities that have fixes available."
 msgstr ""
 
-msgid "Automatically marked as default internal user"
-msgstr ""
-
 msgid "Automatically resolved"
 msgstr ""
 
@@ -4119,6 +4145,9 @@ msgstr ""
 msgid "Cannot have multiple Jira imports running at the same time"
 msgstr ""
 
+msgid "Cannot have multiple unresolved alerts"
+msgstr ""
+
 msgid "Cannot import because issues are not available in this project."
 msgstr ""
 
@@ -4240,6 +4269,9 @@ msgid "Changed the title to \"%{title_param}\"."
 msgstr ""
 
 msgid "Changes"
+msgstr ""
+
+msgid "Changes affect new repositories only. If not specified, Git's default name %{branch_name_default} will be used."
 msgstr ""
 
 msgid "Changes are shown as if the <b>source</b> revision was being merged into the <b>target</b> revision."
@@ -5020,6 +5052,9 @@ msgid "ClusterIntegration|Cluster_applications artifact too big. Maximum allowab
 msgstr ""
 
 msgid "ClusterIntegration|Clusters are utilized by selecting the nearest ancestor with a matching environment scope. For example, project clusters will override group clusters."
+msgstr ""
+
+msgid "ClusterIntegration|Clusters are utilized by selecting the nearest ancestor with a matching environment scope. For example, project clusters will override group clusters. %{linkStart}More information%{linkEnd}"
 msgstr ""
 
 msgid "ClusterIntegration|Copy API URL"
@@ -5818,6 +5853,9 @@ msgid "Code owner approval is required"
 msgstr ""
 
 msgid "Code owners"
+msgstr ""
+
+msgid "CodeIntelligence|This is the definition"
 msgstr ""
 
 msgid "CodeOwner|Pattern"
@@ -7300,6 +7338,15 @@ msgstr ""
 msgid "Dashboard|Unable to add %{invalidProjects}. This dashboard is available for public projects, and private projects in groups with a Silver plan."
 msgstr ""
 
+msgid "DastProfiles|Manage profiles"
+msgstr ""
+
+msgid "DastProfiles|New Site Profile"
+msgstr ""
+
+msgid "DastProfiles|New site profile"
+msgstr ""
+
 msgid "Data is still calculating..."
 msgstr ""
 
@@ -7385,6 +7432,9 @@ msgid "Default first day of the week"
 msgstr ""
 
 msgid "Default first day of the week in calendars and date pickers."
+msgstr ""
+
+msgid "Default initial branch name"
 msgstr ""
 
 msgid "Default issue template"
@@ -7931,6 +7981,9 @@ msgstr ""
 msgid "DesignManagement|Deselect all"
 msgstr ""
 
+msgid "DesignManagement|Designs"
+msgstr ""
+
 msgid "DesignManagement|Discard comment"
 msgstr ""
 
@@ -7973,7 +8026,7 @@ msgstr ""
 msgid "DesignManagement|The maximum number of designs allowed to be uploaded is %{upload_limit}. Please try again."
 msgstr ""
 
-msgid "DesignManagement|To enable design management, you'll need to  %{requirements_link_start}meet the requirements%{requirements_link_end}. If you need help, reach out to our %{support_link_start}support team%{support_link_end} for assistance."
+msgid "DesignManagement|To enable design management, you'll need to %{requirements_link_start}meet the requirements%{requirements_link_end}. If you need help, reach out to our %{support_link_start}support team%{support_link_end} for assistance."
 msgstr ""
 
 msgid "DesignManagement|Unresolve thread"
@@ -8258,6 +8311,9 @@ msgid "Download artifacts"
 msgstr ""
 
 msgid "Download as"
+msgstr ""
+
+msgid "Download as CSV"
 msgstr ""
 
 msgid "Download asset"
@@ -12380,7 +12436,19 @@ msgstr ""
 msgid "Incident Management Limits"
 msgstr ""
 
-msgid "Incidents"
+msgid "IncidentSettings|Alert integration"
+msgstr ""
+
+msgid "IncidentSettings|Grafana integration"
+msgstr ""
+
+msgid "IncidentSettings|Incidents"
+msgstr ""
+
+msgid "IncidentSettings|PagerDuty integration"
+msgstr ""
+
+msgid "IncidentSettings|Set up integrations with external tools to help better manage incidents."
 msgstr ""
 
 msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
@@ -13744,6 +13812,9 @@ msgstr ""
 msgid "Link title is required"
 msgstr ""
 
+msgid "Link to go to GitLab pipeline documentation"
+msgstr ""
+
 msgid "Linked emails (%{email_count})"
 msgstr ""
 
@@ -15038,6 +15109,9 @@ msgstr ""
 msgid "More information is available|here"
 msgstr ""
 
+msgid "More information."
+msgstr ""
+
 msgid "More than %{number_commits_distance} commits different with %{default_branch}"
 msgstr ""
 
@@ -15605,6 +15679,9 @@ msgid "No status"
 msgstr ""
 
 msgid "No template"
+msgstr ""
+
+msgid "No template selected"
 msgstr ""
 
 msgid "No test coverage"
@@ -16192,9 +16269,6 @@ msgid "Owned by me"
 msgstr ""
 
 msgid "Owner"
-msgstr ""
-
-msgid "Package Files"
 msgstr ""
 
 msgid "Package Registry"
@@ -16821,6 +16895,9 @@ msgstr ""
 msgid "Pipeline|Canceled"
 msgstr ""
 
+msgid "Pipeline|Checking pipeline status."
+msgstr ""
+
 msgid "Pipeline|Commit"
 msgstr ""
 
@@ -16858,9 +16935,6 @@ msgid "Pipeline|Merge train pipeline"
 msgstr ""
 
 msgid "Pipeline|Merged result pipeline"
-msgstr ""
-
-msgid "Pipeline|No pipeline has been run for this commit."
 msgstr ""
 
 msgid "Pipeline|Passed"
@@ -20423,6 +20497,9 @@ msgstr ""
 msgid "SecurityConfiguration|Testing & Compliance"
 msgstr ""
 
+msgid "SecurityConfiguration|You can quickly enable all security scanning tools by enabling %{linkStart}Auto DevOps%{linkEnd}."
+msgstr ""
+
 msgid "SecurityReports|%{firstProject} and %{secondProject}"
 msgstr ""
 
@@ -21045,6 +21122,9 @@ msgid "Set target branch to %{branch_name}."
 msgstr ""
 
 msgid "Set the default expiration time for each job's artifacts. 0 for unlimited. The default unit is in seconds, but you can define an alternative. For example: <code>4 mins 2 sec</code>, <code>2h42min</code>."
+msgstr ""
+
+msgid "Set the default name of the initial branch when creating new repositories through the user interface."
 msgstr ""
 
 msgid "Set the due date to %{due_date}."
@@ -22928,6 +23008,9 @@ msgid_plural "The %{type} contains the following errors:"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "The .gitlab-ci.yml has been successfully created."
+msgstr ""
+
 msgid "The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
 msgstr ""
 
@@ -23510,6 +23593,9 @@ msgid "There was an error when subscribing to this label."
 msgstr ""
 
 msgid "There was an error when unsubscribing from this label."
+msgstr ""
+
+msgid "There was an error while fetching configuration data."
 msgstr ""
 
 msgid "There was an error while fetching value stream analytics data."
@@ -24438,6 +24524,9 @@ msgid "To start serving your jobs you can either add specific Runners to your pr
 msgstr ""
 
 msgid "To this GitLab instance"
+msgstr ""
+
+msgid "To view all %{scannedResourcesCount} scanned URLs, please download the CSV file"
 msgstr ""
 
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
@@ -25388,7 +25477,22 @@ msgstr ""
 msgid "User was successfully updated."
 msgstr ""
 
+msgid "UserLists|Add"
+msgstr ""
+
+msgid "UserLists|Add Users"
+msgstr ""
+
+msgid "UserLists|Add users"
+msgstr ""
+
+msgid "UserLists|Cancel"
+msgstr ""
+
 msgid "UserLists|Define a set of users to be used within feature flag strategies"
+msgstr ""
+
+msgid "UserLists|Enter a comma separated list of user IDs. These IDs should be the users of the system in which the feature flag is set, not GitLab IDs"
 msgstr ""
 
 msgid "UserLists|There are no users"

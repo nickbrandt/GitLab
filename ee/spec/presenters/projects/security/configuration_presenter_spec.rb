@@ -28,6 +28,10 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
       expect(auto_fix['container_scanning']).to be_truthy
     end
 
+    it 'includes the path to create a SAST merge request' do
+      expect(subject[:create_sast_merge_request_path]).to eq(project_security_configuration_sast_path(project))
+    end
+
     context "when the latest default branch pipeline's source is auto devops" do
       before do
         create(

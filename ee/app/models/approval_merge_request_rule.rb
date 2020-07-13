@@ -83,6 +83,16 @@ class ApprovalMergeRequestRule < ApplicationRecord
     end
   end
 
+  def audit_add(_model)
+    # no-op
+    # only audit on project rule
+  end
+
+  def audit_remove(_model)
+    # no-op
+    # only audit on project rule
+  end
+
   def project
     merge_request.target_project
   end

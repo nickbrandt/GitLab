@@ -45,15 +45,31 @@ describe('Grouped security reports app', () => {
     dastHelpPath: 'path',
     dependencyScanningHelpPath: 'path',
     secretScanningHelpPath: 'path',
+    canReadVulnerabilityFeedbackPath: true,
     vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
     vulnerabilityFeedbackHelpPath: 'path',
     pipelineId: 123,
+    projectFullPath: 'path',
   };
+
+  const glModalDirective = jest.fn();
 
   const createWrapper = (propsData, provide = {}) => {
     wrapper = mount(GroupedSecurityReportsApp, {
       propsData,
+      data() {
+        return {
+          dastSummary: null,
+        };
+      },
       provide,
+      directives: {
+        glModal: {
+          bind(el, { value }) {
+            glModalDirective(value);
+          },
+        },
+      },
     });
   };
 
@@ -262,6 +278,7 @@ describe('Grouped security reports app', () => {
       createWrapper({
         headBlobPath: 'path',
         pipelinePath,
+        projectFullPath: 'path',
       });
     });
 
@@ -364,13 +381,17 @@ describe('Grouped security reports app', () => {
       expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 vulnerability');
     });
 
-    it('shows the scanned URLs count and a link to the CI job if available', () => {
+    it('shows the scanned URLs count and opens a modal', async () => {
       const jobLink = wrapper.find('[data-qa-selector="dast-ci-job-link"]');
 
       expect(wrapper.text()).toContain('211 URLs scanned');
       expect(jobLink.exists()).toBe(true);
       expect(jobLink.text()).toBe('View details');
-      expect(jobLink.attributes('href')).toBe(scanUrl);
+
+      jobLink.vm.$emit('click');
+      await wrapper.vm.$nextTick();
+
+      expect(glModalDirective).toHaveBeenCalled();
     });
 
     it('does not show scanned resources info if there is 0 scanned URL', () => {

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  RSpec.describe 'Plan' do
     describe 'Epics Management' do
       before do
         Flow::Login.sign_in

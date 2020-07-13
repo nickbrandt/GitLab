@@ -31,8 +31,6 @@ export const VULNERABILITY_STATES = {
   resolved: s__('VulnerabilityStatusTypes|Resolved'),
 };
 
-export const VULNERABILITIES_PER_PAGE = 20;
-
 export const HEADER_ACTION_BUTTONS = {
   issueCreation: {
     name: s__('ciReport|Create issue'),

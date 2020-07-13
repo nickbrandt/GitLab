@@ -55,8 +55,12 @@ module AlertManagement
     validates :severity,        presence: true
     validates :status,          presence: true
     validates :started_at,      presence: true
-    validates :fingerprint,     uniqueness: { scope: :project }, allow_blank: true
-    validate  :hosts_length
+    validates :fingerprint,     allow_blank: true, uniqueness: {
+      scope: :project,
+      conditions: -> { not_resolved },
+      message: -> (object, data) { _('Cannot have multiple unresolved alerts') }
+    }, unless: :resolved?
+    validate :hosts_length
 
     enum severity: {
       critical: 0,
@@ -116,6 +120,7 @@ module AlertManagement
     scope :for_environment, -> (environment) { where(environment: environment) }
     scope :search, -> (query) { fuzzy_search(query, [:title, :description, :monitoring_tool, :service]) }
     scope :open, -> { with_status(:triggered, :acknowledged) }
+    scope :not_resolved, -> { where.not(status: STATUSES[:resolved]) }
     scope :with_prometheus_alert, -> { includes(:prometheus_alert) }
 
     scope :order_start_time,    -> (sort_order) { order(started_at: sort_order) }

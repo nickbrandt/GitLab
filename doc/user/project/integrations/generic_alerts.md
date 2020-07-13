@@ -19,7 +19,7 @@ The entire payload will be posted in the issue discussion as a comment
 authored by the GitLab Alert Bot.
 
 NOTE: **Note**
-In GitLab versions 13.1 and greater, you can configure [External Prometheus instances](prometheus.md#external-prometheus-instances) to use this endpoint.
+In GitLab versions 13.1 and greater, you can configure [External Prometheus instances](../../../operations/metrics/index.md#external-prometheus-instances) to use this endpoint.
 
 ## Setting up generic alerts
 
@@ -100,5 +100,7 @@ When an incoming alert contains the same payload as another alert (excluding the
 displays a counter on the
 [Alert Management List](../operations/alert_management.md#alert-management-list)
 and details pages.
+
+If the existing alert is already `resolved`, then a new alert will be created instead.
 
 ![Alert Management List](../operations/img/alert_list_v13_1.png)

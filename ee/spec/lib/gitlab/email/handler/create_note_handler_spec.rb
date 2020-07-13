@@ -142,7 +142,7 @@ RSpec.describe Gitlab::Email::Handler::CreateNoteHandler do
 
     context 'is enabled' do
       before do
-        allow(::Gitlab::ServiceDesk).to receive(:enabled?).with(project: project).and_return(true)
+        allow(Gitlab::ServiceDesk).to receive(:enabled?).and_return(true)
         project.project_feature.update!(issues_access_level: issues_access_level)
       end
 
@@ -185,7 +185,7 @@ RSpec.describe Gitlab::Email::Handler::CreateNoteHandler do
 
     context 'is disabled' do
       before do
-        allow(::Gitlab::ServiceDesk).to receive(:enabled?).with(project: project).and_return(false)
+        allow(Gitlab::ServiceDesk).to receive(:enabled?).and_return(false)
       end
 
       it 'does not create a comment' do

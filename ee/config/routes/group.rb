@@ -13,6 +13,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         module: :groups,
         as: :group,
         constraints: { group_id: Gitlab::PathRegex.full_namespace_route_regex }) do
+    draw :wiki
+
     resources :group_members, only: [], concerns: :access_requestable do
       patch :override, on: :member
     end
@@ -35,6 +37,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
               get :records
             end
           end
+          resources :value_streams, only: [:index, :create]
           resource :summary, controller: :summary, only: :show
           get '/time_summary' => 'summary#time_summary'
         end

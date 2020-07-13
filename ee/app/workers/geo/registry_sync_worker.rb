@@ -78,7 +78,7 @@ module Geo
     end
 
     def replicator_classes
-      Gitlab::Geo::ReplicableModel.replicators
+      Gitlab::Geo.replicator_classes
     end
   end
 end

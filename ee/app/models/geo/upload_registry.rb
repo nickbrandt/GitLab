@@ -60,10 +60,6 @@ class Geo::UploadRegistry < Geo::BaseRegistry
     end
   end
 
-  def self.replication_enabled?
-    FileUploader.object_store_enabled? ? Gitlab::Geo.current_node.sync_object_storage? : true
-  end
-
   def file
     upload&.path || s_('Removed %{type} with id %{id}') % { type: file_type, id: file_id }
   end

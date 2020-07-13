@@ -58,7 +58,7 @@ It is also possible to embed either the default dashboard metrics or individual 
 
 ## Embedding metrics based on alerts in incident issues
 
-For [GitLab-managed alerting rules](../../user/project/integrations/prometheus.md#setting-up-alerts-for-prometheus-metrics), the issue will include an embedded chart for the query corresponding to the alert. The chart displays an hour of data surrounding the starting point of the incident, 30 minutes before and after.
+For [GitLab-managed alerting rules](index.md#setting-up-alerts-for-prometheus-metrics), the issue will include an embedded chart for the query corresponding to the alert. The chart displays an hour of data surrounding the starting point of the incident, 30 minutes before and after.
 
 For [manually configured Prometheus instances](../../user/project/integrations/prometheus.md#manual-configuration-of-prometheus), a chart corresponding to the query can be included if these requirements are met:
 
@@ -72,20 +72,21 @@ For [manually configured Prometheus instances](../../user/project/integrations/p
 | One of `annotations/title`, `annotations/summary`, `labels/alertname` | Yes | Will be used as the chart title |
 | `annotations/gitlab_y_label` | No | Will be used as the chart's y-axis label |
 
-## Embedding Cluster Health Charts **(ULTIMATE)**
+## Embedding cluster health charts
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/40997) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
+> - [Introduced](<https://gitlab.com/gitlab-org/gitlab/-/issues/40997>) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
+> - [Moved](<https://gitlab.com/gitlab-org/gitlab/-/issues/208224>) to GitLab core in 13.2.
 
-[Cluster Health Metrics](../../user/project/clusters/index.md#visualizing-cluster-health-ultimate) can also be embedded in [GitLab-flavored Markdown](../../user/markdown.md).
+[Cluster Health Metrics](../../user/project/clusters/index.md#visualizing-cluster-health) can also be embedded in [GitLab-flavored Markdown](../../user/markdown.md).
 
-To embed a metric chart, include a link to that chart in the form `https://<root_url>/<project>/-/cluster/<cluster_id>?<query_params>` anywhere that GitLab-flavored Markdown is supported. To generate and copy a link to the chart, follow the instructions in the [Cluster Health Metric documentation](../../user/project/clusters/index.md#visualizing-cluster-health-ultimate).
+To embed a metric chart, include a link to that chart in the form `https://<root_url>/<project>/-/cluster/<cluster_id>?<query_params>` anywhere that GitLab-flavored Markdown is supported. To generate and copy a link to the chart, follow the instructions in the [Cluster Health Metric documentation](../../user/project/clusters/index.md#visualizing-cluster-health).
 
 The following requirements must be met for the metric to unfurl:
 
 - The `<cluster_id>` must correspond to a real cluster.
 - Prometheus must be monitoring the cluster.
 - The user must be allowed access to the project cluster metrics.
-- The dashboards must be reporting data on the [Cluster Health Page](../../user/project/clusters/index.md#visualizing-cluster-health-ultimate)
+- The dashboards must be reporting data on the [Cluster Health Page](../../user/project/clusters/index.md#visualizing-cluster-health)
 
  If the above requirements are met, then the metric will unfurl as seen below.
 

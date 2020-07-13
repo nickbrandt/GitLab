@@ -1,11 +1,12 @@
 <script>
-import { GlLink, GlSprintf, GlTable } from '@gitlab/ui';
+import { GlAlert, GlLink, GlSprintf, GlTable } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import AutoFixSettings from './auto_fix_settings.vue';
 
 export default {
   components: {
+    GlAlert,
     GlLink,
     GlSprintf,
     GlTable,
@@ -39,6 +40,21 @@ export default {
       type: Object,
       required: true,
     },
+    gitlabCiPresent: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    autoDevopsPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    canEnableAutoDevops: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     devopsMessage() {
@@ -68,6 +84,14 @@ export default {
         },
       ];
     },
+    shouldShowAutoDevopsAlert() {
+      return Boolean(
+        this.glFeatures.sastConfigurationByClick &&
+          !this.autoDevopsEnabled &&
+          !this.gitlabCiPresent &&
+          this.canEnableAutoDevops,
+      );
+    },
   },
   methods: {
     getStatusText(value) {
@@ -81,6 +105,9 @@ export default {
       });
     },
   },
+  autoDevopsAlertMessage: s__(`
+    SecurityConfiguration|You can quickly enable all security scanning tools by
+    enabling %{linkStart}Auto DevOps%{linkEnd}.`),
 };
 </script>
 
@@ -97,6 +124,21 @@ export default {
         </gl-sprintf>
       </p>
     </header>
+
+    <gl-alert
+      v-if="shouldShowAutoDevopsAlert"
+      :title="__('Auto DevOps')"
+      :primary-button-text="__('Enable Auto DevOps')"
+      :primary-button-link="autoDevopsPath"
+      :dismissible="false"
+      class="gl-mb-5"
+    >
+      <gl-sprintf :message="$options.autoDevopsAlertMessage">
+        <template #link="{ content }">
+          <gl-link :href="autoDevopsHelpPagePath" v-text="content" />
+        </template>
+      </gl-sprintf>
+    </gl-alert>
 
     <gl-table ref="securityControlTable" :items="features" :fields="fields" stacked="md">
       <template #cell(feature)="{ item }">

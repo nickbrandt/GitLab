@@ -81,6 +81,14 @@ module EE
         merge_request.head_pipeline.id
       end
 
+      expose :pipeline_iid, if: -> (mr, _) { mr.head_pipeline } do |merge_request|
+        merge_request.head_pipeline.iid
+      end
+
+      expose :can_read_vulnerability_feedback do |merge_request|
+        can?(current_user, :read_vulnerability_feedback, merge_request.project)
+      end
+
       expose :vulnerability_feedback_path do |merge_request|
         project_vulnerability_feedback_index_path(merge_request.project)
       end

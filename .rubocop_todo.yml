@@ -303,6 +303,11 @@ Performance/Detect:
 RSpec/ContextWording:
   Enabled: false
 
+# Offense count: 626
+# Cop supports --auto-correct.
+RSpec/EmptyLineAfterLetBlock:
+  Enabled: false
+
 # Offense count: 1121
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
@@ -666,12 +671,6 @@ Style/RedundantFreeze:
 Style/RedundantInterpolation:
   Enabled: false
 
-# Offense count: 33
-# Cop supports --auto-correct.
-# Configuration parameters: AllowMultipleReturnValues.
-Style/RedundantReturn:
-  Enabled: false
-
 # Offense count: 801
 # Cop supports --auto-correct.
 Style/RedundantSelf:
@@ -744,8 +743,6 @@ Style/SymbolProc:
 # Configuration parameters: AllowImplicitReturn, AllowedReceivers.
 Rails/SaveBang:
   Exclude:
-    - 'ee/spec/controllers/boards/issues_controller_spec.rb'
-    - 'ee/spec/controllers/boards/lists_controller_spec.rb'
     - 'ee/spec/controllers/ee/sent_notifications_controller_spec.rb'
     - 'ee/spec/controllers/groups/epic_issues_controller_spec.rb'
     - 'ee/spec/controllers/groups/epic_links_controller_spec.rb'
