@@ -18,7 +18,9 @@ module Projects
       end
 
       def show
-        @configuration = ConfigurationPresenter.new(project, auto_fix_permission: auto_fix_authorized?)
+        @configuration = ConfigurationPresenter.new(project,
+                                                    auto_fix_permission: auto_fix_authorized?,
+                                                    current_user: current_user)
       end
 
       def auto_fix
