@@ -24,8 +24,8 @@ query group(
       reportType: $reportType
       state: $state
       projectId: $projectId
-    ){
-      nodes{
+    ) {
+      nodes {
         ...Vulnerability
       }
       pageInfo {

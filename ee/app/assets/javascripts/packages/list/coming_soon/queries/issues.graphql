@@ -1,16 +1,16 @@
-query getComingSoonIssues($projectPath:ID!, $labelNames:[String]) {
-  project(fullPath:$projectPath) {
-    issues(state:opened, labelName:$labelNames) {
+query getComingSoonIssues($projectPath: ID!, $labelNames: [String]) {
+  project(fullPath: $projectPath) {
+    issues(state: opened, labelName: $labelNames) {
       nodes {
-        iid,
-        title,
-        webUrl,
+        iid
+        title
+        webUrl
         labels {
           nodes {
-            title,
+            title
             color
           }
-        },
+        }
         milestone {
           title
         }
