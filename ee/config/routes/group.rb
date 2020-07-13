@@ -37,6 +37,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
               get :records
             end
           end
+          resources :value_streams, only: [:index, :create]
           resource :summary, controller: :summary, only: :show
           get '/time_summary' => 'summary#time_summary'
         end

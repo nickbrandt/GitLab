@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class ApplicationController < ApplicationController
+  class ApplicationController < ::ApplicationController
     include RoutableActions
 
     layout 'analytics'
