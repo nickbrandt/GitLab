@@ -18,6 +18,16 @@ module Geo
       registries.count
     end
 
+    def find_registry_differences(range)
+      source_ids = Gitlab::Geo.current_node.designs.id_in(range).pluck_primary_key
+      tracked_ids = Geo::DesignRegistry.pluck_model_ids_in_range(range)
+
+      untracked_ids = source_ids - tracked_ids
+      unused_tracked_ids = tracked_ids - source_ids
+
+      [untracked_ids, unused_tracked_ids]
+    end
+
     # Returns Geo::DesignRegistry records that have never been synced.
     #
     # Does not care about selective sync, because it considers the Registry
