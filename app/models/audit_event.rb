@@ -5,7 +5,7 @@ class AuditEvent < ApplicationRecord
   include IgnorableColumns
   include BulkInsertSafe
 
-  PARALLEL_PERSISTED_ATTRS = [:target_type, :target_details].freeze
+  PARALLEL_PERSISTED_ATTRS = [:target_type, :target_details, :target_id].freeze
 
   ignore_column :updated_at, remove_with: '13.4', remove_after: '2020-09-22'
 

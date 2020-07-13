@@ -14,11 +14,12 @@ RSpec.describe AuditEvent, type: :model do
   end
 
   describe 'callbacks' do
-    context 'after_create' do
+    context 'after_validation' do
       let_it_be(:details) do
         {
           target_details: 'Test details',
-          target_type: 'User'
+          target_type: 'User',
+          target_id: 4
         }
       end
 
@@ -30,6 +31,10 @@ RSpec.describe AuditEvent, type: :model do
 
       it 'persists target_details to database' do
         expect(subject.target_details).to eq(details[:target_details])
+      end
+
+      it 'persists target_id to database' do
+        expect(subject.target_id).to eq(details[:target_id])
       end
     end
   end
