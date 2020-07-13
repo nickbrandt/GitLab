@@ -23566,6 +23566,9 @@ msgstr ""
 msgid "There was an error when unsubscribing from this label."
 msgstr ""
 
+msgid "There was an error while fetching configuration data."
+msgstr ""
+
 msgid "There was an error while fetching value stream analytics data."
 msgstr ""
 
