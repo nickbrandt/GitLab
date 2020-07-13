@@ -179,6 +179,9 @@ export default {
   [types.SET_TIME_RANGE](state, timeRange) {
     state.timeRange = timeRange;
   },
+  [types.SET_ENVIRONMENT_ID](state, environmentId) {
+    state.environmentId = environmentId;
+  },
   [types.SET_GETTING_STARTED_EMPTY_STATE](state) {
     state.emptyState = 'gettingStarted';
   },

@@ -24,6 +24,7 @@ import {
   panelToUrl,
   expandedPanelPayloadFromUrl,
   convertVariablesForURL,
+  envIdFromUrl,
 } from '../utils';
 import { metricStates, keyboardShortcutKeys } from '../constants';
 import { defaultTimeRange } from '~/vue_shared/constants';
@@ -152,6 +153,7 @@ export default {
   data() {
     return {
       selectedTimeRange: timeRangeFromUrl() || defaultTimeRange,
+      environmentId: envIdFromUrl(),
       isRearrangingPanels: false,
       originalDocumentTitle: document.title,
       hoveredPanel: '',
@@ -229,18 +231,14 @@ export default {
     Mousetrap.unbind(Object.values(keyboardShortcutKeys));
   },
   mounted() {
-    // if (!this.hasMetrics) {
-    //   console.log("no data");
-    //   this.setGettingStartedEmptyState();
-    // } else {
-    //   console.log("got data");
-      this.setTimeRange(this.selectedTimeRange);
-      this.fetchData();
-    // }
+    this.setEnvironmentId(this.environmentId);
+    this.setTimeRange(this.selectedTimeRange);
+    this.fetchData();
   },
   methods: {
     ...mapActions('monitoringDashboard', [
       'setTimeRange',
+      'setEnvironmentId',
       'fetchData',
       'setGettingStartedEmptyState',
       'setPanelGroupMetrics',

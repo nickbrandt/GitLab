@@ -21,6 +21,8 @@ module Gitlab
             strong_memoize(:metrics_regex) do
               regex_for_project_metrics(
                 %r{
+                    (/environments)?
+                    (/(?<environment>\d+))?
                     /(metrics_dashboard|metrics)
                   }x
               )

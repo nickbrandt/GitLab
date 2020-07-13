@@ -5,7 +5,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   # into app/controllers/projects/metrics_dashboard_controller.rb
   # See https://gitlab.com/gitlab-org/gitlab/-/issues/226002 for more details.
 
-  include MetricsDashboard
+  # include MetricsDashboard
 
   layout 'project'
 
@@ -164,16 +164,11 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   end
 
   def metrics
-    respond_to do |format|
-      format.html
-      format.json do
-        # Currently, this acts as a hint to load the metrics details into the cache
-        # if they aren't there already
-        @metrics = environment.metrics || {}
+    redirect_to project_metrics_path(project, env_id: environment.id)
+  end
 
-        render json: @metrics, status: @metrics.any? ? :ok : :no_content
-      end
-    end
+  def metrics_dashboard
+    redirect_to project_metrics_dashboard_path(project, env_id: environment.id)
   end
 
   def additional_metrics

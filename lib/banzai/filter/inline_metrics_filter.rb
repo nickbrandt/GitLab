@@ -27,9 +27,9 @@ module Banzai
         Gitlab::Metrics::Dashboard::Url.build_dashboard_url(
           params['namespace'],
           params['project'],
-          params['environment'],
+          # params['environment'],
           embedded: true,
-          **query_params(params['url'])
+          **query_params(params['url']).reverse_merge(env_id: params['environment'])
         )
       end
     end

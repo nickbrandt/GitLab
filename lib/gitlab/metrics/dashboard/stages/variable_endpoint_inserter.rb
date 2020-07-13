@@ -21,7 +21,8 @@ module Gitlab
             Gitlab::Routing.url_helpers.project_prometheus_api_path(
               project,
               proxy_path: ::Prometheus::ProxyService::PROMETHEUS_SERIES_API,
-              match: Array(series_selector)
+              match: Array(series_selector),
+              env_id: params[:environment]&.id
             )
           end
         end

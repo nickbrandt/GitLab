@@ -7,6 +7,8 @@ export default () => ({
   dashboardEndpoint: invalidUrl,
   dashboardsEndpoint: invalidUrl,
 
+  environmentId: null,
+
   // Dashboard request parameters
   timeRange: null,
   /**

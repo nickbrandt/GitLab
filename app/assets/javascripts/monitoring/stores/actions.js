@@ -31,13 +31,11 @@ function prometheusMetricQueryParams(timeRange) {
   const timeDiff = (new Date(end) - new Date(start)) / 1000;
   const minStep = 60;
   const queryDataPoints = 600;
-  const envId = envIdFromUrl();
 
   return {
     start_time: start,
     end_time: end,
     step: Math.max(minStep, Math.ceil(timeDiff / queryDataPoints)),
-    env_id: envId,
   };
 }
 
@@ -78,6 +76,10 @@ export const setInitialState = ({ commit }, initialState) => {
 
 export const setTimeRange = ({ commit }, timeRange) => {
   commit(types.SET_TIME_RANGE, timeRange);
+};
+
+export const setEnvironmentId = ({ commit }, environmentId) => {
+  commit(types.SET_ENVIRONMENT_ID, environmentId);
 };
 
 export const filterEnvironments = ({ commit, dispatch }, searchTerm) => {

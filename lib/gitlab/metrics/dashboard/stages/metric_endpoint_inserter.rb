@@ -24,7 +24,8 @@ module Gitlab
               Gitlab::Routing.url_helpers.project_prometheus_api_path(
                 project,
                 proxy_path: query_type(metric),
-                query: query_for_metric(metric)
+                query: query_for_metric(metric),
+                env_id: params[:environment]&.id
               )
             end
           end

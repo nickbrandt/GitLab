@@ -3,7 +3,7 @@ import { mapState, mapActions } from 'vuex';
 import DashboardPanel from '~/monitoring/components/dashboard_panel.vue';
 import { convertToFixedRange } from '~/lib/utils/datetime_range';
 import { defaultTimeRange } from '~/vue_shared/constants';
-import { timeRangeFromUrl, removeTimeRangeParams } from '../../utils';
+import { timeRangeFromUrl, removeTimeRangeParams, envIdFromUrl } from '../../utils';
 import { sidebarAnimationDuration } from '../../constants';
 
 let sidebarMutationObserver;
@@ -30,7 +30,9 @@ export default {
   },
   data() {
     const timeRange = timeRangeFromUrl(this.dashboardUrl) || defaultTimeRange;
+    const environmentId = envIdFromUrl(this.dashboardUrl);
     return {
+      environmentId: environmentId,
       timeRange: convertToFixedRange(timeRange),
       elWidth: 0,
     };
@@ -69,6 +71,7 @@ export default {
     });
     this.setShowErrorBanner(false);
     this.setTimeRange(this.timeRange);
+    this.setEnvironmentId(this.environmentId);
     this.fetchDashboard();
 
     sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
@@ -89,6 +92,9 @@ export default {
     ...mapActions({
       setTimeRange(dispatch, payload) {
         return dispatch(`${this.namespace}/setTimeRange`, payload);
+      },
+      setEnvironmentId(dispatch, payload) {
+        return dispatch(`${this.namespace}/setEnvironmentId`, payload);
       },
       fetchDashboard(dispatch, payload) {
         return dispatch(`${this.namespace}/fetchDashboard`, payload);
