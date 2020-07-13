@@ -9,5 +9,6 @@ mv package/sandpack www
 rm -r package
 
 patch ./www/index.html ./index.html.patch
+rm ./www/*service-worker.js
 
 make

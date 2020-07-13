@@ -41,9 +41,5 @@ function main() {
       },
       '*',
     );
-
-    navigator.serviceWorker.controller.postMessage({
-      message: 'Got a message!',
-    });
   });
 }

@@ -93,12 +93,6 @@ export default {
   methods: {
     ...mapActions(['getFileData', 'getRawFileData']),
     ...mapActions('clientside', ['pingUsage']),
-    handleWindowMessage(e) {
-      if (e.data.codesandbox) {
-        return;
-      }
-      console.log('[clientside.vue] Got a message!', e);
-    },
     loadFileContent(path) {
       return this.getFileData({ path, makeFileActive: false }).then(() =>
         this.getRawFileData({ path }),
@@ -125,7 +119,7 @@ export default {
           });
         });
     },
-    update(...args) {
+    update() {
       if (!this.sandpackReady) return;
 
       clearTimeout(this.timeout);
@@ -207,6 +201,7 @@ export default {
 <template>
   <div class="preview h-100 w-100 d-flex flex-column">
     <template v-if="showPreview">
+      <navigator :manager="manager" />
       <div id="ide-preview"></div>
     </template>
     <div
