@@ -14,7 +14,7 @@ query groupEpicsEE($fullPath: ID!) {
           openedIssues
           closedIssues
         }
-        issues {  
+        issues {
           nodes {
             id
             iid
@@ -44,7 +44,6 @@ query groupEpicsEE($fullPath: ID!) {
             }
           }
         }
-
       }
     }
   }
