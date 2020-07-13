@@ -22,6 +22,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.approvalsHelpPath = data.approvals_help_path;
     this.codequalityHelpPath = data.codequality_help_path;
     this.securityReportsPipelineId = data.pipeline_id;
+    this.securityReportsPipelineIid = data.pipeline_iid;
     this.createVulnerabilityFeedbackIssuePath = data.create_vulnerability_feedback_issue_path;
     this.createVulnerabilityFeedbackMergeRequestPath =
       data.create_vulnerability_feedback_merge_request_path;

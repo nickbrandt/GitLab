@@ -431,6 +431,8 @@ export default {
         :create-vulnerability-feedback-dismissal-path="mr.createVulnerabilityFeedbackDismissalPath"
         :pipeline-path="mr.pipeline.path"
         :pipeline-id="mr.securityReportsPipelineId"
+        :pipeline-iid="mr.securityReportsPipelineIid"
+        :project-full-path="mr.sourceProjectFullPath"
         :diverged-commits-count="mr.divergedCommitsCount"
         :mr-state="mr.state"
         :target-branch-tree-path="mr.targetBranchTreePath"
