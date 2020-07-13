@@ -61,6 +61,17 @@ RSpec.describe Gitlab::Ci::Reports::Security::Scanner do
         vendor: scanner.vendor
       })
     end
+
+    context 'when vendor is not defined' do
+      let(:scanner) { create(:ci_reports_security_scanner, vendor: nil) }
+
+      it 'returns expected hash' do
+        is_expected.to eq({
+          external_id: scanner.external_id,
+          name: scanner.name
+        })
+      end
+    end
   end
 
   describe '#==' do
