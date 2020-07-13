@@ -10,3 +10,4 @@ rm -r package
 
 patch ./www/index.html ./index.html.patch
 
+make
