@@ -194,7 +194,8 @@ module EE
         def jira_usage
           super.merge(
             projects_jira_dvcs_cloud_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled),
-            projects_jira_dvcs_server_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false))
+            projects_jira_dvcs_server_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false)),
+            projects_jira_issuelist_active: count(JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true })) # rubocop:disable CodeReuse/ActiveRecord
           )
         end
 

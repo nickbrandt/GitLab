@@ -33,6 +33,7 @@ RSpec.describe Gitlab::UsageData do
       create(:prometheus_alert, project: projects[1])
 
       create(:service, project: projects[1], type: 'JenkinsService', active: true)
+      create(:jira_service, project: projects[0], issues_enabled: true, project_key: 'GL')
 
       create(:package, project: projects[0])
       create(:package, project: projects[0])
@@ -105,6 +106,7 @@ RSpec.describe Gitlab::UsageData do
         projects_jenkins_active
         projects_jira_dvcs_cloud_active
         projects_jira_dvcs_server_active
+        projects_jira_issuelist_active
         projects_mirrored_with_pipelines_enabled
         projects_reporting_ci_cd_back_to_github
         projects_with_packages
@@ -130,6 +132,7 @@ RSpec.describe Gitlab::UsageData do
       expect(count_data[:status_page_projects]).to eq(1)
       expect(count_data[:status_page_issues]).to eq(1)
       expect(count_data[:issues_with_health_status]).to eq(2)
+      expect(count_data[:projects_jira_issuelist_active]).to eq(1)
     end
 
     it 'has integer value for epic relationship level' do
