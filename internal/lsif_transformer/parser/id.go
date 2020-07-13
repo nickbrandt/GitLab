@@ -14,7 +14,7 @@ const (
 type Id int32
 
 func (id *Id) UnmarshalJSON(b []byte) error {
-	if b[0] != '"' {
+	if len(b) > 0 && b[0] != '"' {
 		if err := id.unmarshalInt(b); err != nil {
 			return err
 		}

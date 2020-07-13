@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"strconv"
 )
@@ -177,6 +178,10 @@ func (r *Ranges) addItem(line []byte) error {
 }
 
 func (r *Ranges) addDefRef(defRef *RawDefRef) error {
+	if len(defRef.RangeIds) == 0 {
+		return errors.New("no range IDs")
+	}
+
 	var rg Range
 	if err := r.Cache.Entry(defRef.RangeIds[0], &rg); err != nil {
 		return err
