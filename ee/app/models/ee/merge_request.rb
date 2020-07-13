@@ -244,7 +244,7 @@ module EE
     private
 
     def has_approved_license_check?
-      approval_rules.license_compliance.any? && approval_rules.license_compliance.last.approvals_required == 0
+      approval_rules.license_compliance.last&.approvals_required == 0
     end
 
     def missing_report_error(report_type)
