@@ -173,7 +173,7 @@ Note (1): Snowplow JS and Snowplow Ruby are available on self-managed, however, 
 
 ## Snowflake data warehouse
 
-The Snowflake data warehouse is where we keep all of GitLab Inc's data. 
+The Snowflake data warehouse is where we keep all of GitLab Inc's data.
 
 ### Data Sources
 
