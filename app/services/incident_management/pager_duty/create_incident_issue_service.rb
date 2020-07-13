@@ -3,6 +3,8 @@
 module IncidentManagement
   module PagerDuty
     class CreateIncidentIssueService < BaseService
+      include IncidentManagement::Settings
+
       def initialize(project, incident_payload)
         super(project, User.alert_bot, incident_payload)
       end
@@ -38,7 +40,8 @@ module IncidentManagement
       end
 
       def webhook_available?
-        Feature.enabled?(:pagerduty_webhook, project)
+        Feature.enabled?(:pagerduty_webhook, project) &&
+          incident_management_setting.pagerduty_active?
       end
 
       def forbidden

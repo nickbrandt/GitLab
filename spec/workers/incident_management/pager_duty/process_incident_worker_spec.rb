@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe IncidentManagement::PagerDuty::ProcessIncidentWorker do
   let_it_be(:project) { create(:project) }
+  let_it_be(:incident_management_setting) { create(:project_incident_management_setting, project: project, pagerduty_active: true) }
 
   describe '#perform' do
     subject(:perform) { described_class.new.perform(project.id, incident_payload) }
