@@ -354,9 +354,9 @@ RSpec.describe ProjectsController do
           false | false | true  | true
           false | true  | true  | true
           true  | false | false | false
-          true  | true  | false | nil
+          true  | true  | false | false
           true  | false | true  | true
-          true  | true  | true  | nil
+          true  | true  | true  | true
         end
 
         with_them do
@@ -372,6 +372,7 @@ RSpec.describe ProjectsController do
                 id: project,
                 project: { setting => param_value }
               }
+
             project.reload
 
             expect(project[setting]).to eq(final_value)
