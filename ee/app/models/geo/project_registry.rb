@@ -3,6 +3,7 @@
 class Geo::ProjectRegistry < Geo::BaseRegistry
   include ::Delay
   include ::EachBatch
+  include ::FromUnion
   include ::ShaAttribute
 
   MODEL_CLASS = ::Project
@@ -176,8 +177,12 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     end
   end
 
-  def self.registries_pending_verification
-    repositories_pending_verification.or(wikis_pending_verification)
+  def self.repositories_checksummed_pending_verification
+    where(repositories_pending_verification.and(arel_table[:primary_repository_checksummed].eq(true)))
+  end
+
+  def self.wikis_checksummed_pending_verification
+    where(wikis_pending_verification.and(arel_table[:primary_wiki_checksummed].eq(true)))
   end
 
   def self.repositories_pending_verification
@@ -258,8 +263,9 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   #
   # @param [String] type must be one of the values in TYPES
   # @see REGISTRY_TYPES
-  def finish_sync!(type, missing_on_primary = false)
+  def finish_sync!(type, missing_on_primary = false, primary_checksummed = false)
     ensure_valid_type!(type)
+
     update!(
       # Indicate that the sync succeeded (but separately mark as synced atomically)
       "last_#{type}_successful_sync_at" => Time.current,
@@ -270,6 +276,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
       "#{type}_missing_on_primary" => missing_on_primary,
 
       # Indicate that repository verification needs to be done again
+      "primary_#{type}_checksummed" => primary_checksummed,
       "#{type}_verification_checksum_sha" => nil,
       "#{type}_checksum_mismatch" => false,
       "last_#{type}_verification_failure" => nil)
@@ -326,9 +333,11 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   end
 
   # Resets repository/wiki verification state. Is called when a Geo
-  # secondary node process a Geo::ResetChecksymEvent.
+  # secondary node process a Geo::ResetChecksumEvent.
   def reset_checksum!
     update!(
+      primary_repository_checksummed: true,
+      primary_wiki_checksummed: true,
       repository_verification_checksum_sha: nil,
       wiki_verification_checksum_sha: nil,
       repository_checksum_mismatch: false,

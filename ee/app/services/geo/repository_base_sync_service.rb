@@ -135,13 +135,21 @@ module Geo
     def mark_sync_as_successful(missing_on_primary: false)
       log_info("Marking #{type} sync as successful")
 
-      persisted = registry.finish_sync!(type, missing_on_primary)
+      persisted = registry.finish_sync!(type, missing_on_primary, primary_checksummed?)
 
       reschedule_sync unless persisted
 
       log_info("Finished #{type} sync",
               update_delay_s: update_delay_in_seconds,
               download_time_s: download_time_in_seconds)
+    end
+
+    def primary_checksummed?
+      primary_checksum.present?
+    end
+
+    def primary_checksum
+      project.repository_state&.public_send("#{type}_verification_checksum") # rubocop:disable GitlabSecurity/PublicSend
     end
 
     def reschedule_sync

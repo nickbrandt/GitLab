@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Geo::WikiSyncService do
+RSpec.describe Geo::WikiSyncService, :geo do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -124,6 +124,20 @@ RSpec.describe Geo::WikiSyncService do
           wiki_retry_count: 1
         )
       end
+    end
+
+    it 'marks primary_wiki_checksummed as true when wiki has been verified on primary' do
+      create(:repository_state, :wiki_verified, project: project)
+      registry = create(:geo_project_registry, project: project, primary_wiki_checksummed: false)
+
+      expect { subject.execute }.to change { registry.reload.primary_wiki_checksummed}.from(false).to(true)
+    end
+
+    it 'marks primary_wiki_checksummed as false when wiki has not been verified on primary' do
+      create(:repository_state, :wiki_failed, project: project)
+      registry = create(:geo_project_registry, project: project, primary_wiki_checksummed: true)
+
+      expect { subject.execute }.to change { registry.reload.primary_wiki_checksummed}.from(true).to(false)
     end
 
     context 'tracking database' do
