@@ -100,7 +100,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
         resources :dependencies, only: [:index]
         resources :licenses, only: [:index, :create, :update]
-        resources :on_demand_scans, only: [:index], controller: :on_demand_scans
+
+        scope :on_demand_scans do
+          root 'on_demand_scans#index', as: 'on_demand_scans'
+          scope :profiles do
+            root 'dast_profiles#index', as: 'profiles'
+            resources :dast_site_profiles, only: [:new]
+          end
+        end
 
         namespace :integrations do
           namespace :jira do
