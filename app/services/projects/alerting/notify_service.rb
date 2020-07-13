@@ -55,7 +55,7 @@ module Projects
       def find_alert_by_fingerprint(fingerprint)
         return unless fingerprint
 
-        AlertManagement::Alert.for_fingerprint(project, fingerprint).first
+        AlertManagement::Alert.not_resolved.for_fingerprint(project, fingerprint).first
       end
 
       def send_email?
