@@ -7,6 +7,8 @@ import mockLinkedPipelines from '../vue_shared/components/linked_pipelines_mock_
 describe('MRWidgetPipeline', () => {
   let wrapper;
 
+  const findPipelineInfoContainer = () => wrapper.find('[data-testid="pipeline-info-container"');
+
   function createComponent(pipeline) {
     wrapper = mount(pipelineComponent, {
       propsData: {
@@ -16,7 +18,8 @@ describe('MRWidgetPipeline', () => {
         ciStatus: 'success',
         sourceBranchLink: undefined,
         sourceBranch: undefined,
-        troubleshootingDocsPath: 'help',
+        mrTroubleshootingDocsPath: 'help',
+        ciTroubleshootingDocsPath: 'help2',
       },
     });
   }
@@ -73,7 +76,7 @@ describe('MRWidgetPipeline', () => {
         createComponent(pipeline);
 
         const expected = `Merge train pipeline #${pipeline.id} ${pipeline.details.status.label} for ${pipeline.commit.short_id}`;
-        const actual = trimText(wrapper.find('.js-pipeline-info-container').text());
+        const actual = trimText(findPipelineInfoContainer().text());
 
         expect(actual).toBe(expected);
       });
@@ -87,7 +90,7 @@ describe('MRWidgetPipeline', () => {
         createComponent(pipeline);
 
         const expected = `Merged result pipeline #${pipeline.id} ${pipeline.details.status.label} for ${pipeline.commit.short_id}`;
-        const actual = trimText(wrapper.find('.js-pipeline-info-container').text());
+        const actual = trimText(findPipelineInfoContainer().text());
 
         expect(actual).toBe(expected);
       });
