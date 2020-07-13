@@ -82,6 +82,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resource :operations, only: [:show, :update] do
             member do
               post :reset_alerting_token
+              post :reset_pagerduty_token
             end
           end
 
