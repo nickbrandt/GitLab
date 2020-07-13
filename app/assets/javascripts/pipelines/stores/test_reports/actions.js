@@ -20,9 +20,7 @@ export const fetchSummary = ({ state, commit, dispatch }) => {
         // Set the tab counter badge to total_count
         // This is temporary until we can server-side render that count number
         // (see https://gitlab.com/gitlab-org/gitlab/-/issues/223134)
-        if (data.total_count !== undefined) {
-          document.querySelector('.js-test-report-badge-counter').innerHTML = data.total_count;
-        }
+        document.querySelector('.js-test-report-badge-counter').innerHTML = data.total_count || 0;
       }
     })
     .catch(() => {
@@ -49,15 +47,8 @@ export const fetchFullReport = ({ state, commit, dispatch }) => {
     });
 };
 
-export const setSelectedSuiteIndex = ({ state, commit, dispatch }, data) => {
+export const setSelectedSuiteIndex = ({ commit }, data) =>
   commit(types.SET_SELECTED_SUITE_INDEX, data);
-
-  // Fetch the full report when the user clicks to see more details
-  if (!state.hasFullReport) {
-    dispatch('fetchFullReport');
-  }
-};
-
 export const removeSelectedSuiteIndex = ({ commit }) =>
   commit(types.SET_SELECTED_SUITE_INDEX, null);
 export const toggleLoading = ({ commit }) => commit(types.TOGGLE_LOADING);

@@ -134,32 +134,17 @@ describe('Actions TestReports Store', () => {
   });
 
   describe('set selected suite index', () => {
-    const selectedSuiteIndex = 0;
+    it('sets selectedSuiteIndex', done => {
+      const selectedSuiteIndex = 0;
 
-    describe('when state does not have full report', () => {
-      it('sets selectedSuiteIndex', done => {
-        testAction(
-          actions.setSelectedSuiteIndex,
-          selectedSuiteIndex,
-          state,
-          [{ type: types.SET_SELECTED_SUITE_INDEX, payload: selectedSuiteIndex }],
-          [{ type: 'fetchFullReport' }],
-          done,
-        );
-      });
-    });
-
-    describe('when state has full report', () => {
-      it('sets selectedSuiteIndex', done => {
-        testAction(
-          actions.setSelectedSuiteIndex,
-          selectedSuiteIndex,
-          { ...state, hasFullReport: true },
-          [{ type: types.SET_SELECTED_SUITE_INDEX, payload: selectedSuiteIndex }],
-          [],
-          done,
-        );
-      });
+      testAction(
+        actions.setSelectedSuiteIndex,
+        selectedSuiteIndex,
+        { ...state, hasFullReport: true },
+        [{ type: types.SET_SELECTED_SUITE_INDEX, payload: selectedSuiteIndex }],
+        [],
+        done,
+      );
     });
   });
 
