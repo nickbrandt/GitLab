@@ -38,4 +38,10 @@ RSpec.describe Gitlab::Elastic::GroupSearchResults do
       end
     end
   end
+
+  context 'query performance' do
+    let(:query) { '*' }
+
+    include_examples 'does not hit Elasticsearch twice for objects and counts', %w|projects notes blobs wiki_blobs commits issues merge_requests milestones|
+  end
 end

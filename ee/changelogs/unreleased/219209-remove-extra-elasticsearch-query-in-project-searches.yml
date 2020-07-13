@@ -1,0 +1,5 @@
+---
+title: Prevent 2nd Elasticsearch query for project searches
+merge_request: 36672
+author:
+type: performance
