@@ -41,13 +41,7 @@ self.addEventListener('fetch', event => {
     const requestId = uuidv4();
     const response = self.clients.get(event.clientId).then(client => {
       return new Promise((resolve, reject) => {
-        requests.set(requestId, {
-          resolve: val => {
-            console.log('[sw] resolving with val', val);
-            resolve(val);
-          },
-          reject,
-        });
+        requests.set(requestId, { resolve, reject });
 
         client.postMessage({ path, requestId });
       });
