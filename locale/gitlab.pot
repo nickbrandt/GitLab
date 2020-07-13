@@ -13795,6 +13795,9 @@ msgstr ""
 msgid "Link title is required"
 msgstr ""
 
+msgid "Link to go to GitLab pipeline documentation"
+msgstr ""
+
 msgid "Linked emails (%{email_count})"
 msgstr ""
 
@@ -16878,6 +16881,9 @@ msgstr ""
 msgid "Pipeline|Canceled"
 msgstr ""
 
+msgid "Pipeline|Checking pipeline status."
+msgstr ""
+
 msgid "Pipeline|Commit"
 msgstr ""
 
@@ -16915,9 +16921,6 @@ msgid "Pipeline|Merge train pipeline"
 msgstr ""
 
 msgid "Pipeline|Merged result pipeline"
-msgstr ""
-
-msgid "Pipeline|No pipeline has been run for this commit."
 msgstr ""
 
 msgid "Pipeline|Passed"
