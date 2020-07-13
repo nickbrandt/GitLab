@@ -1,9 +1,9 @@
 <script>
 import { s__ } from '~/locale';
 import { GlAlert, GlDeprecatedButton, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
-import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
+import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/project_vulnerabilities.graphql';
-import { VULNERABILITIES_PER_PAGE } from '../constants';
+import { VULNERABILITIES_PER_PAGE } from '../store/constants';
 
 export default {
   name: 'ProjectVulnerabilitiesApp',
