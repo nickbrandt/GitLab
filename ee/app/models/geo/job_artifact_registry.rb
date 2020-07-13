@@ -41,8 +41,4 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
       delete_worker_class.perform_async(:job_artifact, artifact_id)
     end
   end
-
-  def self.replication_enabled?
-    JobArtifactUploader.object_store_enabled? ? Gitlab::Geo.current_node.sync_object_storage? : true
-  end
 end
