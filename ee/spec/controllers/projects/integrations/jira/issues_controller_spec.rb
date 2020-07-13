@@ -129,6 +129,34 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
           end
         end
 
+        context 'when status param' do
+          it_behaves_like 'proper parameter values' do
+            let(:params) { { 'status' => 'jira status' } }
+            let(:expected_params) { { 'state' => 'opened', 'status' => 'jira status', 'sort' => 'created_date' } }
+          end
+        end
+
+        context 'when labels param' do
+          it_behaves_like 'proper parameter values' do
+            let(:params) { { 'labels' => %w[label1 label2] } }
+            let(:expected_params) { { 'state' => 'opened', 'labels' => %w[label1 label2], 'sort' => 'created_date' } }
+          end
+        end
+
+        context 'when author_username param' do
+          it_behaves_like 'proper parameter values' do
+            let(:params) { { 'author_username' => 'some reporter' } }
+            let(:expected_params) { { 'state' => 'opened', 'author_username' => 'some reporter', 'sort' => 'created_date' } }
+          end
+        end
+
+        context 'when assignee_username param' do
+          it_behaves_like 'proper parameter values' do
+            let(:params) { { 'assignee_username' => 'some assignee' } }
+            let(:expected_params) { { 'state' => 'opened', 'assignee_username' => 'some assignee', 'sort' => 'created_date' } }
+          end
+        end
+
         context 'when invalid params' do
           it_behaves_like 'proper parameter values' do
             let(:params) { { 'invalid' => '12' } }
