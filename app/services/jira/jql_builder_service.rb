@@ -90,8 +90,6 @@ module Jira
         %q[statusCategory != Done]
       when 'closed'
         %q[statusCategory = Done]
-      else
-        return
       end
     end
 
