@@ -1,35 +1,61 @@
 <script>
-import { GlButton, GlForm, GlFormInput, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlButton, GlForm, GlFormInput, GlFormGroup, GlModal, GlModalDirective } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
 import { sprintf, __ } from '~/locale';
+import { debounce } from 'lodash';
+
+const ERRORS = {
+  MIN_LENGTH: __('Name is required'),
+  MAX_LENGTH: __('Maximum length 100 characters'),
+};
+
+const validate = ({ name }) => {
+  const errors = { name: [] };
+  if (name.length > 100) {
+    errors.name.push(ERRORS.MAX_LENGTH);
+  }
+  if (!name.length) {
+    errors.name.push(ERRORS.MIN_LENGTH);
+  }
+  return errors;
+};
 
 export default {
   components: {
     GlButton,
     GlForm,
     GlFormInput,
+    GlFormGroup,
     GlModal,
   },
   directives: {
     GlModalDirective,
   },
-  props: {
-    isLoading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   data() {
     return {
       name: '',
+      errors: { name: [] },
     };
   },
   computed: {
-    ...mapState({ isCreatingValueStream: 'isLoading' }),
+    ...mapState({
+      isLoading: 'isCreatingValueStream',
+      initialFormErrors: 'createValueStreamErrors',
+    }),
     isValid() {
-      return Boolean(this.name.length);
+      return !this.errors?.name.length;
     },
+    invalidFeedback() {
+      return this.errors?.name.join('\n');
+    },
+  },
+  mounted() {
+    const { initialFormErrors } = this;
+    if (Object.keys(initialFormErrors).length) {
+      this.errors = initialFormErrors;
+    } else {
+      this.onHandleInput();
+    }
   },
   methods: {
     ...mapActions(['createValueStream']),
@@ -41,6 +67,10 @@ export default {
         this.name = '';
       });
     },
+    onHandleInput: debounce(function debouncedValidation() {
+      const { name } = this;
+      this.errors = validate({ name });
+    }, 250),
   },
 };
 </script>
@@ -66,7 +96,21 @@ export default {
       :action-cancel="{ text: __('Cancel') }"
       @primary.prevent="onSubmit"
     >
-      <gl-form-input id="name" v-model="name" :placeholder="__('Example: My value stream')" />
+      <gl-form-group
+        label="Name"
+        label-for="create-value-stream-name"
+        :invalid-feedback="invalidFeedback"
+        :state="isValid"
+      >
+        <gl-form-input
+          v-model.trim="name"
+          name="create-value-stream-name"
+          :placeholder="__('Example: My value stream')"
+          :state="isValid"
+          required
+          @input="onHandleInput"
+        />
+      </gl-form-group>
     </gl-modal>
   </gl-form>
 </template>

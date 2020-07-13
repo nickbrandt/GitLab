@@ -124,11 +124,14 @@ export default {
   },
   [types.REQUEST_CREATE_VALUE_STREAM](state) {
     state.isCreatingValueStream = true;
+    state.createValueStreamErrors = {};
   },
-  [types.RECEIVE_CREATE_VALUE_STREAM_ERROR](state) {
+  [types.RECEIVE_CREATE_VALUE_STREAM_ERROR](state, errors = {}) {
     state.isCreatingValueStream = false;
+    state.createValueStreamErrors = errors;
   },
   [types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS](state) {
     state.isCreatingValueStream = false;
+    state.createValueStreamErrors = {};
   },
 };

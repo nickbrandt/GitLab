@@ -856,4 +856,57 @@ describe('Cycle analytics actions', () => {
       );
     });
   });
+
+  describe('createValueStream', () => {
+    const payload = { name: 'cool value stream' };
+
+    beforeEach(() => {
+      state = { selectedGroup };
+    });
+
+    describe('with no errors', () => {
+      beforeEach(() => {
+        mock.onPost(endpoints.valueStreamData).replyOnce(httpStatusCodes.OK, {});
+      });
+
+      it(`commits the ${types.REQUEST_CREATE_VALUE_STREAM} and ${types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS} actions`, () => {
+        return testAction(
+          actions.createValueStream,
+          payload,
+          state,
+          [
+            { type: types.REQUEST_CREATE_VALUE_STREAM },
+            {
+              type: types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS,
+              payload: { status: httpStatusCodes.OK, data: {} },
+            },
+          ],
+          [],
+        );
+      });
+    });
+
+    describe('with errors', () => {
+      const resp = { message: 'error', errors: {} };
+      beforeEach(() => {
+        mock.onPost(endpoints.valueStreamData).replyOnce(httpStatusCodes.NOT_FOUND, resp);
+      });
+
+      it(`commits the ${types.REQUEST_CREATE_VALUE_STREAM} and ${types.RECEIVE_CREATE_VALUE_STREAM_ERROR} actions `, () => {
+        return testAction(
+          actions.createValueStream,
+          payload,
+          state,
+          [
+            { type: types.REQUEST_CREATE_VALUE_STREAM },
+            {
+              type: types.RECEIVE_CREATE_VALUE_STREAM_ERROR,
+              payload: { data: { ...payload }, ...resp },
+            },
+          ],
+          [],
+        );
+      });
+    });
+  });
 });

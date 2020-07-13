@@ -279,14 +279,6 @@ describe('Cycle Analytics component', () => {
         it('displays the create multiple value streams button', () => {
           displaysCreateValueStream(true);
         });
-
-        it('displays a toast message when value stream is created', () => {
-          wrapper.find(ValueStreamSelect).vm.$emit('create', { name: 'cool new stream' });
-
-          expect(wrapper.vm.$toast.show).toHaveBeenCalledWith(
-            "'cool new stream' Value Stream created",
-          );
-        });
       });
     });
 

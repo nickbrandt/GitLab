@@ -1008,4 +1008,26 @@ RSpec.describe 'Group Value Stream Analytics', :js do
       end
     end
   end
+
+  describe 'Create value stream', :js do
+    custom_value_stream_name = "Test value stream"
+
+    before do
+      visit analytics_cycle_analytics_path
+
+      select_group
+    end
+
+    it 'can create a value stream' do
+      expect(page).to have_text('Create new value stream')
+      modal_button = page.find_button('Create new value stream')
+
+      modal_button.click
+
+      fill_in 'create-value-stream-name', with: custom_value_stream_name
+      page.find_button('Create value stream').click
+
+      expect(page).to have_text("'#{custom_value_stream_name}' Value Stream created")
+    end
+  end
 end
