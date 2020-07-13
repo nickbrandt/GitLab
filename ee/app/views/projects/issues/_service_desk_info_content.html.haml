@@ -6,7 +6,7 @@
 - can_edit_project_settings = can?(current_user, :admin_project, @project)
 - title_text = _("Use Service Desk to connect with your users (e.g. to offer customer support) through email right inside GitLab")
 
-- if ::Gitlab::ServiceDesk.supported?
+- if Gitlab::ServiceDesk.supported?
   %div{ class: "#{callout_selector}" }
     .svg-content
       = render svg_path

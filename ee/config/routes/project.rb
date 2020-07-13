@@ -129,9 +129,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resource :tracing, only: [:show]
 
-      get '/service_desk' => 'service_desk#show', as: :service_desk
-      put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
-
       post '/restore' => '/projects#restore', as: :restore
 
       resource :insights, only: [:show], trailing_slash: true do

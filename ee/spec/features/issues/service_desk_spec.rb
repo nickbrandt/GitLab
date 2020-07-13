@@ -33,7 +33,7 @@ RSpec.describe 'Service Desk Issue Tracker', :js do
   describe 'issues list' do
     context 'when service desk is misconfigured' do
       before do
-        allow(::Gitlab::ServiceDesk).to receive(:supported?).and_return(false)
+        allow(Gitlab::ServiceDesk).to receive(:supported?).and_return(false)
         visit service_desk_project_issues_path(project)
       end
 
