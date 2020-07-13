@@ -26,7 +26,7 @@ module Banzai
         super
 
         if update_nodes_enabled?
-          @changed_nodes = {}
+          @new_nodes = {}
           @nodes = self.result[:reference_filter_nodes]
         end
       end
@@ -166,31 +166,31 @@ module Banzai
 
       def replace_text_with_html(node, index, html)
         if update_nodes_enabled?
-          replace_and_update_changed_nodes(node, index, html)
+          replace_and_update_new_nodes(node, index, html)
         else
           node.replace(html)
         end
       end
 
-      def replace_and_update_changed_nodes(node, index, html)
+      def replace_and_update_new_nodes(node, index, html)
         previous_node = node.previous
         next_node = node.next
         parent_node = node.parent
         # Unfortunately node.replace(html) returns re-parented nodes, not the actual replaced nodes in the doc
         # We need to find the actual nodes in the doc that were replaced
         node.replace(html)
-        @changed_nodes[index] = []
+        @new_nodes[index] = []
 
-        # We find first replaced node. If previous_node is nil, we take first parent child
-        replaced_node = previous_node ? previous_node.next : parent_node&.children&.first
+        # We replaced node with new nodes, so we find first new node. If previous_node is nil, we take first parent child
+        new_node = previous_node ? previous_node.next : parent_node&.children&.first
 
-        # We iterate from first to last replaced node and store replaced nodes in @changed_nodes
-        while replaced_node && replaced_node != next_node
-          @changed_nodes[index] << replaced_node.xpath(query)
-          replaced_node = replaced_node.next
+        # We iterate from first to last replaced node and store replaced nodes in @new_nodes
+        while new_node && new_node != next_node
+          @new_nodes[index] << new_node.xpath(query)
+          new_node = new_node.next
         end
 
-        @changed_nodes[index].flatten!
+        @new_nodes[index].flatten!
       end
 
       def only_path?
@@ -198,14 +198,14 @@ module Banzai
       end
 
       def with_update_nodes
-        @changed_nodes = {}
+        @new_nodes = {}
         yield.tap { update_nodes! }
       end
 
-      # Once Filter completes replacing nodes, we update nodes with @changed_nodes
+      # Once Filter completes replacing nodes, we update nodes with @new_nodes
       def update_nodes!
-        @changed_nodes.sort_by { |index, _changed_nodes| -index }.each do |index, changed_nodes|
-          nodes[index, 1] = changed_nodes
+        @new_nodes.sort_by { |index, _new_nodes| -index }.each do |index, new_nodes|
+          nodes[index, 1] = new_nodes
         end
         result[:reference_filter_nodes] = nodes
       end
