@@ -74,7 +74,7 @@ module Gitlab
 
       def key(event_action, date)
         year_day = date.strftime('%G-%j')
-        "{#{event_action}}-#{year_day}"
+        "#{year_day}-{#{event_action}}"
       end
 
       def add_event(event_action, author_id, date)
