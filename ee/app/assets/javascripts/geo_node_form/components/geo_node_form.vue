@@ -88,7 +88,7 @@ export default {
     />
     <geo-node-form-capacities :node-data="nodeData" />
     <section
-      class="gl-display-flex gl-align-items-center gl-p-5 gl-mt-6 gl-bg-gray-10 gl-border-t-solid gl-border-b-solid gl-border-t-1 gl-border-b-1 gl-border-gray-200"
+      class="gl-display-flex gl-align-items-center gl-p-5 gl-mt-6 gl-bg-gray-10 gl-border-t-solid gl-border-b-solid gl-border-t-1 gl-border-b-1 gl-border-gray-100"
     >
       <gl-button
         id="node-save-button"
