@@ -18692,6 +18692,8 @@ CREATE UNIQUE INDEX index_aws_roles_on_role_external_id ON public.aws_roles USIN
 
 CREATE UNIQUE INDEX index_aws_roles_on_user_id ON public.aws_roles USING btree (user_id);
 
+CREATE INDEX index_background_migration_jobs_for_partitioning_migrations ON public.background_migration_jobs USING btree (((arguments ->> 2))) WHERE (class_name = 'Gitlab::Database::PartitioningMigrationHelpers::BackfillPartitionedTable'::text);
+
 CREATE INDEX index_background_migration_jobs_on_class_name_and_arguments ON public.background_migration_jobs USING btree (class_name, arguments);
 
 CREATE INDEX index_background_migration_jobs_on_class_name_and_status_and_id ON public.background_migration_jobs USING btree (class_name, status, id);
@@ -23773,5 +23775,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200710105332
 20200710130234
 20200713071042
+20200713152443
 \.
 
