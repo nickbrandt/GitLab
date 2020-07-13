@@ -80,9 +80,11 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :clean_gi
           subject.process
           reloaded_registry = registry.reload
 
-          expect(reloaded_registry.wiki_verification_checksum_sha).to be_nil
-          expect(reloaded_registry.wiki_checksum_mismatch).to be false
-          expect(reloaded_registry.last_wiki_verification_failure).to be_nil
+          expect(reloaded_registry).to have_attributes(
+            wiki_verification_checksum_sha: nil,
+            wiki_checksum_mismatch: false,
+            last_wiki_verification_failure: nil
+          )
         end
 
         it 'sets resync_wiki_was_scheduled_at to the scheduled time' do
