@@ -8,10 +8,6 @@ module EE
       prepended do
         include UsageStatistics
       end
-
-      def prometheus_adapter
-        application_prometheus
-      end
     end
   end
 end

@@ -6,7 +6,6 @@ module Banzai
       def embed_params(node)
         url = node['href']
         @query_params = query_params(url)
-
         return unless [:group, :title, :y_label].all? do |param|
           @query_params.include?(param)
         end
