@@ -611,64 +611,6 @@ RSpec.describe ProjectPolicy do
     end
   end
 
-  describe 'read_package' do
-    context 'with admin' do
-      let(:current_user) { admin }
-
-      it { is_expected.to be_allowed(:read_package) }
-
-      context 'when repository is disabled' do
-        before do
-          project.project_feature.update(repository_access_level: ProjectFeature::DISABLED)
-        end
-
-        it { is_expected.to be_disallowed(:read_package) }
-      end
-    end
-
-    context 'with owner' do
-      let(:current_user) { owner }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with maintainer' do
-      let(:current_user) { maintainer }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with developer' do
-      let(:current_user) { developer }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with reporter' do
-      let(:current_user) { reporter }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with guest' do
-      let(:current_user) { guest }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with non member' do
-      let(:current_user) { create(:user) }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with anonymous' do
-      let(:current_user) { nil }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-  end
-
   describe 'remove_project when default_project_deletion_protection is set to true' do
     before do
       allow(Gitlab::CurrentSettings.current_application_settings)

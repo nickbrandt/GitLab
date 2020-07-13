@@ -39,8 +39,6 @@ RSpec.describe Project do
     it { is_expected.to have_many(:approvers).dependent(:destroy) }
     it { is_expected.to have_many(:approver_users).through(:approvers) }
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
-    it { is_expected.to have_many(:packages).class_name('Packages::Package') }
-    it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
     it { is_expected.to have_many(:upstream_project_subscriptions) }
     it { is_expected.to have_many(:upstream_projects) }
     it { is_expected.to have_many(:downstream_project_subscriptions) }
@@ -1926,12 +1924,6 @@ RSpec.describe Project do
     end
   end
 
-  describe '#packages_enabled' do
-    subject { create(:project).packages_enabled }
-
-    it { is_expected.to be true }
-  end
-
   describe '#update_root_ref' do
     let(:project) { create(:project, :repository) }
 
@@ -2381,33 +2373,6 @@ RSpec.describe Project do
     allow(Rails.application.routes)
       .to receive(:default_url_options)
       .and_return(host: host)
-  end
-
-  describe '#package_already_taken?' do
-    let(:namespace) { create(:namespace) }
-    let(:project) { create(:project, :public, namespace: namespace) }
-    let!(:package) { create(:npm_package, project: project, name: "@#{namespace.path}/foo") }
-
-    context 'no package exists with the same name' do
-      it 'returns false' do
-        result = project.package_already_taken?("@#{namespace.path}/bar")
-        expect(result).to be false
-      end
-
-      it 'returns false if it is the project that the package belongs to' do
-        result = project.package_already_taken?("@#{namespace.path}/foo")
-        expect(result).to be false
-      end
-    end
-
-    context 'a package already exists with the same name' do
-      let(:alt_project) { create(:project, :public, namespace: namespace) }
-
-      it 'returns true' do
-        result = alt_project.package_already_taken?("@#{namespace.path}/foo")
-        expect(result).to be true
-      end
-    end
   end
 
   describe '#ancestor_marked_for_deletion' do
