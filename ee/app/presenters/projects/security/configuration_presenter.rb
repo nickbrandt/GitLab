@@ -48,6 +48,7 @@ module Projects
         {
           auto_devops_enabled: auto_devops_source?,
           auto_devops_help_page_path: help_page_path('topics/autodevops/index'),
+          create_sast_merge_request_path: project_security_configuration_sast_path(project),
           features: features.to_json,
           help_page_path: help_page_path('user/application_security/index'),
           latest_pipeline_path: latest_pipeline_path,

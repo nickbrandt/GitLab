@@ -67,7 +67,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
           resource :configuration, only: [:show], controller: :configuration do
             post :auto_fix, on: :collection
-            resource :sast, only: [:show], controller: :sast_configuration
+            resource :sast, only: [:show, :create], controller: :sast_configuration
           end
 
           resource :discover, only: [:show], controller: :discover
