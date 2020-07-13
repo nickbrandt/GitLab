@@ -1,4 +1,4 @@
-import filterByKey from '../store/utils/filter_by_key';
+import { differenceBy } from 'lodash';
 
 const KEY_TO_FILTER_BY = 'fingerprint';
 
@@ -19,8 +19,8 @@ self.addEventListener('message', e => {
 
   // eslint-disable-next-line no-restricted-globals
   self.postMessage({
-    newIssues: filterByKey(headIssues, baseIssues, KEY_TO_FILTER_BY),
-    resolvedIssues: filterByKey(baseIssues, headIssues, KEY_TO_FILTER_BY),
+    newIssues: differenceBy(headIssues, baseIssues, KEY_TO_FILTER_BY),
+    resolvedIssues: differenceBy(baseIssues, headIssues, KEY_TO_FILTER_BY),
   });
 
   // eslint-disable-next-line no-restricted-globals

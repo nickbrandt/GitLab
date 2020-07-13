@@ -2,7 +2,6 @@ import {
   parseCodeclimateMetrics,
   doCodeClimateComparison,
 } from '~/reports/codequality_report/store/utils/codequality_comparison';
-import mockFilterByKey from '~/reports/codequality_report/store/utils/filter_by_key';
 import { baseIssues, mockParsedHeadIssues, mockParsedBaseIssues } from '../../mock_data';
 
 jest.mock('~/reports/codequality_report/workers/codequality_comparison_worker', () => {
@@ -15,10 +14,15 @@ jest.mock('~/reports/codequality_report/workers/codequality_comparison_worker', 
       postMessage: data => {
         if (!data.headIssues) return mockPostMessageCallback({ data: {} });
         if (!data.baseIssues) throw new Error();
+        const key = 'fingerprint';
         return mockPostMessageCallback({
           data: {
-            newIssues: mockFilterByKey(data.headIssues, data.baseIssues, 'fingerprint'),
-            resolvedIssues: mockFilterByKey(data.baseIssues, data.headIssues, 'fingerprint'),
+            newIssues: data.headIssues.filter(
+              item => !data.baseIssues.find(el => el[key] === item[key]),
+            ),
+            resolvedIssues: data.baseIssues.filter(
+              item => !data.headIssues.find(el => el[key] === item[key]),
+            ),
           },
         });
       },
