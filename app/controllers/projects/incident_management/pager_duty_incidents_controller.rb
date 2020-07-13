@@ -8,7 +8,7 @@ module Projects
       skip_before_action :verify_authenticity_token
       skip_before_action :project
 
-      prepend_before_action :repository, :project_without_auth
+      prepend_before_action :project_without_auth
 
       def create
         result = ServiceResponse.success(http_status: :accepted)
