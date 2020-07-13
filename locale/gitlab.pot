@@ -299,6 +299,9 @@ msgstr ""
 msgid "%{containerScanningLinkStart}Container Scanning%{containerScanningLinkEnd} and/or %{dependencyScanningLinkStart}Dependency Scanning%{dependencyScanningLinkEnd} must be enabled. %{securityBotLinkStart}GitLab-Security-Bot%{securityBotLinkEnd} will be the author of the auto-created merge request. %{moreInfoLinkStart}More information%{moreInfoLinkEnd}."
 msgstr ""
 
+msgid "%{contentStart}Drop files to attach, or %{contentEnd}%{linkStart}browse%{linkEnd}"
+msgstr ""
+
 msgid "%{cores} cores"
 msgstr ""
 
@@ -7928,6 +7931,9 @@ msgstr ""
 msgid "DesignManagement|Deselect all"
 msgstr ""
 
+msgid "DesignManagement|Designs"
+msgstr ""
+
 msgid "DesignManagement|Discard comment"
 msgstr ""
 
@@ -7970,7 +7976,7 @@ msgstr ""
 msgid "DesignManagement|The maximum number of designs allowed to be uploaded is %{upload_limit}. Please try again."
 msgstr ""
 
-msgid "DesignManagement|To enable design management, you'll need to  %{requirements_link_start}meet the requirements%{requirements_link_end}. If you need help, reach out to our %{support_link_start}support team%{support_link_end} for assistance."
+msgid "DesignManagement|To enable design management, you'll need to %{requirements_link_start}meet the requirements%{requirements_link_end}. If you need help, reach out to our %{support_link_start}support team%{support_link_end} for assistance."
 msgstr ""
 
 msgid "DesignManagement|Unresolve thread"
