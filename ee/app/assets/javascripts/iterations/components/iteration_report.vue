@@ -100,7 +100,7 @@ export default {
   },
   methods: {
     formatDate(date) {
-      return formatDate(date, 'mmm d, yyyy');
+      return formatDate(date, 'mmm d, yyyy', true);
     },
   },
 };
