@@ -128,7 +128,7 @@ export default {
     <template v-else>
       <div
         ref="topbar"
-        class="gl-display-flex gl-justify-items-center gl-align-items-center gl-py-3 gl-border-1 gl-border-b-solid gl-border-gray-200"
+        class="gl-display-flex gl-justify-items-center gl-align-items-center gl-py-3 gl-border-1 gl-border-b-solid gl-border-gray-100"
       >
         <gl-badge :variant="status.variant">
           {{ status.text }}
