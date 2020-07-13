@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
-class GroupVariableSerializer < BaseSerializer
-  entity GroupVariableEntity
+module Ci
+  class GroupVariableSerializer < BaseSerializer
+    entity ::Ci::GroupVariableEntity
+  end
 end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
-class VariableSerializer < BaseSerializer
-  entity VariableEntity
+module Ci
+  class VariableSerializer < BaseSerializer
+    entity ::Ci::VariableEntity
+  end
 end
