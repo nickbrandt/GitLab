@@ -57,7 +57,9 @@ export default {
     class="board-swimlanes gl-white-space-nowrap gl-pb-5 gl-px-3"
     data_qa_selector="board_epics_swimlanes"
   >
-    <div class="board-swimlanes-headers gl-sticky gl-pt-5 gl-bg-white gl-top-0 gl-z-index-3">
+    <div
+      class="board-swimlanes-headers gl-display-table gl-sticky gl-pt-5 gl-bg-white gl-top-0 gl-z-index-3"
+    >
       <div
         v-for="list in lists"
         :key="list.id"
@@ -75,7 +77,7 @@ export default {
         />
       </div>
     </div>
-    <div class="board-epics-swimlanes">
+    <div class="board-epics-swimlanes gl-display-table">
       <epic-lane v-for="epic in epics" :key="epic.id" :epic="epic" :lists="lists" />
       <div class="board-lane-unassigned-issues gl-sticky gl-display-inline-block gl-left-0">
         <div class="gl-left-0 gl-py-5 gl-px-3 gl-display-flex gl-align-items-center">
