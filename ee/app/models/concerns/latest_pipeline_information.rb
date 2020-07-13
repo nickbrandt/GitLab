@@ -4,7 +4,7 @@ module LatestPipelineInformation
   private
 
   def latest_builds_reports(only_successful_builds: false)
-    strong_memoize("reports_for_#{only_successful_builds}" ) do
+    strong_memoize("latest_builds_reports_#{only_successful_builds}" ) do
       builds = latest_security_builds
       builds = builds.select { |build| build.status == 'success' } if only_successful_builds
       builds.map do |build|
