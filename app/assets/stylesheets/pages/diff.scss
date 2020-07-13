@@ -935,7 +935,7 @@ table.code {
   }
 }
 
-.files:not([data-can-create-note='true']) .frame {
+.files:not([data-can-create-note]) .frame {
   cursor: auto;
 }
 
