@@ -1,5 +1,6 @@
 import testAction from 'helpers/vuex_action_helper';
 import Api from 'ee/api';
+import { stringifyUserIds } from 'ee/user_lists/store/utils';
 import createState from 'ee/user_lists/store/show/state';
 import * as types from 'ee/user_lists/store/show/mutation_types';
 import * as actions from 'ee/user_lists/store/show/actions';
@@ -49,6 +50,66 @@ describe('User Lists Show Actions', () => {
         undefined,
         mockState,
         [{ type: types.DISMISS_ERROR_ALERT }],
+        [],
+      );
+    });
+  });
+
+  describe('addUserIds', () => {
+    it('adds the given IDs and tries to update the user list', () => {
+      return testAction(
+        actions.addUserIds,
+        '1,2,3',
+        mockState,
+        [{ type: types.ADD_USER_IDS, payload: '1,2,3' }],
+        [{ type: 'updateUserList' }],
+      );
+    });
+  });
+
+  describe('removeUserId', () => {
+    it('removes the given ID and tries to update the user list', () => {
+      return testAction(
+        actions.removeUserId,
+        'user3',
+        mockState,
+        [{ type: types.REMOVE_USER_ID, payload: 'user3' }],
+        [{ type: 'updateUserList' }],
+      );
+    });
+  });
+
+  describe('updateUserList', () => {
+    beforeEach(() => {
+      mockState.userList = userList;
+      mockState.userIds = ['user1', 'user2', 'user3'];
+    });
+
+    it('commits REQUEST_USER_LIST and RECEIVE_USER_LIST_SUCCESS on success', () => {
+      Api.updateFeatureFlagUserList.mockResolvedValue({ data: userList });
+      return testAction(
+        actions.updateUserList,
+        undefined,
+        mockState,
+        [
+          { type: types.REQUEST_USER_LIST },
+          { type: types.RECEIVE_USER_LIST_SUCCESS, payload: userList },
+        ],
+        [],
+        () =>
+          expect(Api.updateFeatureFlagUserList).toHaveBeenCalledWith('1', {
+            ...userList,
+            user_xids: stringifyUserIds(mockState.userIds),
+          }),
+      );
+    });
+    it('commits REQUEST_USER_LIST and RECEIVE_USER_LIST_ERROR on error', () => {
+      Api.updateFeatureFlagUserList.mockRejectedValue({ message: 'fail' });
+      return testAction(
+        actions.updateUserList,
+        undefined,
+        mockState,
+        [{ type: types.REQUEST_USER_LIST }, { type: types.RECEIVE_USER_LIST_ERROR }],
         [],
       );
     });

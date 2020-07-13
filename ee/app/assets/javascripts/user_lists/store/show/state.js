@@ -1,4 +1,4 @@
-import states from '../../constants/show';
+import { states } from '../../constants/show';
 
 export default ({ projectId = '', userListIid = '' }) => ({
   state: states.LOADING,
