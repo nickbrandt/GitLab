@@ -340,6 +340,7 @@ export default {
         :container-scanning-help-path="mr.containerScanningHelp"
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
         :secret-scanning-help-path="mr.secretScanningHelp"
+        :can-read-vulnerability-feedback="mr.canReadVulnerabilityFeedback"
         :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
         :create-vulnerability-feedback-issue-path="mr.createVulnerabilityFeedbackIssuePath"

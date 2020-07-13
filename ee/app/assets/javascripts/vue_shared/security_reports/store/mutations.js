@@ -16,6 +16,10 @@ export default {
     state.sourceBranch = branch;
   },
 
+  [types.SET_CAN_READ_VULNERABILITY_FEEDBACK](state, value) {
+    state.canReadVulnerabilityFeedback = value;
+  },
+
   [types.SET_VULNERABILITY_FEEDBACK_PATH](state, path) {
     state.vulnerabilityFeedbackPath = path;
   },

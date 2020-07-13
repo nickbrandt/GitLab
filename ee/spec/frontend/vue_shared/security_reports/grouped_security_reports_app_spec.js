@@ -45,6 +45,7 @@ describe('Grouped security reports app', () => {
     dastHelpPath: 'path',
     dependencyScanningHelpPath: 'path',
     secretScanningHelpPath: 'path',
+    canReadVulnerabilityFeedbackPath: true,
     vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
     vulnerabilityFeedbackHelpPath: 'path',
     pipelineId: 123,
