@@ -57,7 +57,7 @@ module Integrations
       end
 
       expose :web_url do |jira_issue|
-        "#{jira_issue.client.options[:site]}projects/#{jira_issue.project.key}/issues/#{jira_issue.key}"
+        "#{jira_issue.client.options[:site]}browse/#{jira_issue.key}"
       end
 
       expose :references do |jira_issue|
