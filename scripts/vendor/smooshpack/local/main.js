@@ -6,6 +6,21 @@ function main() {
     return;
   }
 
+  window.addEventListener('message', event => {
+    console.log('[main] got an iframe message!', event);
+
+    const { type, payload } = event.data;
+
+    if (type !== 'gitlab-ide-response') {
+      return;
+    }
+
+    navigator.serviceWorker.controller.postMessage({
+      type,
+      payload,
+    });
+  });
+
   // Register a service worker hosted at the root of the
   // site using the default scope.
   navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(
@@ -17,21 +32,12 @@ function main() {
     },
   );
 
-  // NOTE: Something like this might be needed...
-  // for now it just keeps reloading :|
-  //
-  // navigator.serviceWorker.ready.then(() => {
-  //   window.location.reload();
-  // });
-
   navigator.serviceWorker.addEventListener('message', event => {
     console.log('[main] receiving message', event);
-    const path = event.data.path;
-
     window.parent.postMessage(
       {
         type: 'gitlab-ide',
-        data: event.data,
+        payload: event.data,
       },
       '*',
     );
@@ -39,9 +45,5 @@ function main() {
     navigator.serviceWorker.controller.postMessage({
       message: 'Got a message!',
     });
-  });
-
-  window.addEventListener('message', e => {
-    console.log('[main] received a message from iframe window', e);
   });
 }

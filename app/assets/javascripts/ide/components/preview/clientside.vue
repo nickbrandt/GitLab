@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { isEmpty } from 'lodash';
+import { isEmpty, isString } from 'lodash';
 import { Manager } from 'smooshpack';
 import { listen } from 'codesandbox-api';
 import { GlLoadingIcon } from '@gitlab/ui';
@@ -21,7 +21,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['entries', 'promotionSvgPath', 'links', 'codesandboxBundlerUrl']),
+    ...mapState(['entries', 'promotionSvgPath', 'links', 'codesandboxBundlerUrl', 'stagedFiles']),
     ...mapGetters(['packageJson', 'currentProject']),
     normalizedEntries() {
       return Object.keys(this.entries).reduce((acc, path) => {
@@ -62,7 +62,7 @@ export default {
     },
   },
   watch: {
-    entries: {
+    stagedFiles: {
       deep: true,
       handler: 'update',
     },
@@ -125,7 +125,7 @@ export default {
           });
         });
     },
-    update() {
+    update(...args) {
       if (!this.sandpackReady) return;
 
       clearTimeout(this.timeout);
@@ -153,15 +153,52 @@ export default {
 
       this.manager = new Manager('#ide-preview', this.sandboxOpts, settings);
 
-      this.manager.iframe.contentWindow.addEventListener('message', e => {
-        console.log('[clientside.vue] addEventListener contentWindow message', e);
-      });
+      window.addEventListener('message', ({ data: { type, payload } }) => {
+        if (type !== 'gitlab-ide') {
+          return;
+        }
 
-      window.addEventListener('message', e => {
-        console.log('[clientside.vue] window message', e);
-      });
+        const { path, requestId } = payload;
 
-      this.manager.iframe.contentWindow.postMessage({ question: 'IS THIS WORKING!? ' }, '*');
+        console.log('[clientside.vue] handling', path, requestId);
+
+        this.loadFileContent(path)
+          .then(contentParam => {
+            const isBase64 = isString(contentParam);
+            const content = isBase64
+              ? Uint8Array.from(atob(contentParam), c => c.charCodeAt(0))
+              : contentParam;
+
+            return this.getIframeContentWindow().then(contentWindow => {
+              contentWindow.postMessage(
+                {
+                  type: 'gitlab-ide-response',
+                  payload: {
+                    path,
+                    content,
+                    contentType: 'image/png',
+                    requestId,
+                  },
+                },
+                '*',
+              );
+            });
+          })
+          .catch(e => {
+            console.error('[clientside.vue] something bad happened fetching content for', path, e);
+          });
+      });
+    },
+    getIframeContentWindow() {
+      const iframe = this.$el.querySelector('iframe');
+
+      if (iframe?.contentWindow) {
+        return Promise.resolve(iframe.contentWindow);
+      }
+
+      return new Promise(resolve => setTimeout(resolve, 500)).then(() =>
+        this.getIframeContentWindow(),
+      );
     },
   },
 };

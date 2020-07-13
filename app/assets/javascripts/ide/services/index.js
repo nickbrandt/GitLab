@@ -29,9 +29,12 @@ export default {
       return Promise.resolve(file.raw);
     }
 
+    const options = file.binary ? { responseType: 'arraybuffer' } : {};
+
     return axios
       .get(file.rawPath, {
         transformResponse: [f => f],
+        ...options,
       })
       .then(({ data }) => data);
   },
