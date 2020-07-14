@@ -10072,7 +10072,8 @@ CREATE TABLE public.ci_pipelines (
     source_sha bytea,
     target_sha bytea,
     external_pull_request_id bigint,
-    ci_ref_id bigint
+    ci_ref_id bigint,
+    locked smallint DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE public.ci_pipelines_config (
@@ -18419,6 +18420,8 @@ CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_and_note_id_index ON public.ep
 
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_index ON public.epic_user_mentions USING btree (epic_id) WHERE (note_id IS NULL);
 
+CREATE INDEX idx_ci_pipelines_artifacts_locked ON public.ci_pipelines USING btree (ci_ref_id, id) WHERE (locked = 1);
+
 CREATE INDEX idx_deployment_clusters_on_cluster_id_and_kubernetes_namespace ON public.deployment_clusters USING btree (cluster_id, kubernetes_namespace);
 
 CREATE UNIQUE INDEX idx_deployment_merge_requests_unique_index ON public.deployment_merge_requests USING btree (deployment_id, merge_request_id);
@@ -23553,6 +23556,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200527152657
 20200527170649
 20200527211000
+20200527211605
 20200528054112
 20200528123703
 20200528125905
@@ -23625,6 +23629,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200625045442
 20200625082258
 20200625113337
+20200625174052
 20200625190458
 20200626060151
 20200626130220

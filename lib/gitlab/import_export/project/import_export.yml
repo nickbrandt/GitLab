@@ -308,6 +308,7 @@ excluded_attributes:
     - :merge_request_id
     - :external_pull_request_id
     - :ci_ref_id
+    - :locked
   stages:
     - :pipeline_id
   merge_access_levels:
