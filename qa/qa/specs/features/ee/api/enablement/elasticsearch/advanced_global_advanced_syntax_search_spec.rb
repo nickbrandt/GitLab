@@ -4,7 +4,7 @@ require 'airborne'
 require 'securerandom'
 
 module QA
-  RSpec.describe 'Enablement:Search', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/221251', type: :investigating } do
+  RSpec.describe 'Enablement:Search' do
     describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin do
       let(:project_name_suffix) { SecureRandom.hex(8) }
       let(:api_client) { Runtime::API::Client.new(:gitlab) }
@@ -21,7 +21,7 @@ module QA
       before do
         unless elasticsearch_original_state_on?
           QA::EE::Resource::Settings::Elasticsearch.fabricate_via_api!
-          sleep(60)
+          sleep(90)
           # wait for the change to propagate before inserting records or else
           # Gitlab::CurrentSettings.elasticsearch_indexing and
           # Elastic::ApplicationVersionedSearch::searchable? will be false
@@ -56,7 +56,7 @@ module QA
       private
 
       def expect_search_to_find_project(search_term)
-        QA::Support::Retrier.retry_on_exception(max_attempts: 10, sleep_interval: 3) do
+        QA::Support::Retrier.retry_on_exception(max_attempts: 10, sleep_interval: 6) do
           get Runtime::Search.create_search_request(api_client, 'projects', search_term).url
           expect_status(QA::Support::Api::HTTP_STATUS_OK)
 
