@@ -60,6 +60,20 @@ export default {
         this.errorLoadingVulnerabilities = true;
       },
     },
+    securityScanners: {
+      query: securityScannersQuery,
+      variables() {
+        return {
+          fullPath: this.projectFullPath,
+        };
+      },
+      update({ project }) {
+        return project?.securityScanners || {};
+      },
+      skip() {
+        return !this.glFeatures.scannerAlerts;
+      },
+    },
   },
   computed: {
     isLoadingVulnerabilities() {
