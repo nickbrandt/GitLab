@@ -202,6 +202,7 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
 
   describe 'wiki tab' do
     let(:can_read_wiki) { true }
+
     let_it_be(:current_user) { create(:user) }
 
     before do

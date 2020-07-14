@@ -12,12 +12,15 @@ module QA
           element :group_members_item
           element :group_milestones_link
           element :group_settings_item
-          element :wiki_link
         end
 
         view 'app/views/layouts/nav/sidebar/_analytics_links.html.haml' do
           element :analytics_link
           element :analytics_sidebar_submenu
+        end
+
+        view 'app/views/layouts/nav/sidebar/_wiki_link.html.haml' do
+          element :wiki_link
         end
 
         def click_group_members_item
