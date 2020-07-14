@@ -227,7 +227,7 @@ Jira Integration configuration and select the Jira project key for which issues 
 
 ### Jira Issues Navigation
 
-Once Jira issues integration is enabled, you should be able to navigate to your jiraa issues from GitLab sidebar menu.
+Once Jira issues integration is enabled, you should be able to navigate to your Jira issues from GitLab sidebar menu.
 A `Jira Issues` menu should be available with option to list the issues or navigate to Jira instance.
 
 ![Jira issues sidebar navigation on mouse over](img/jira/jira_issues_sidebar_menu_on_hover.png)
@@ -236,18 +236,18 @@ A `Jira Issues` menu should be available with option to list the issues or navig
 
 ![Open Jira issues list](img/jira/open_jira_issues_list.png)
 
-The list of issues is designed to closelly resemble GitLab look and feel yet leveraging Jira capabilities. This means
+The list of issues is designed to closely resemble GitLab look and feel yet leveraging Jira capabilities. This means
 we get to keep `Open`, `Close` and `All` tabs and map the Jira issues `categoryStatus != Done`, `categoryStatus = Done`
 or no `categoryStatus` filtering respeectivelly. By default navigating to Jira issues list would land you on `Open`
 issues tab(i.e. issues with `statusCategory != Done`), which is also the default Jira issues list filtering
 and sorted descendingly by created date.
 
 To refine the list of issues, the search bar can be used to search Jira issues by text
-cotained in issue summary(title) or description. Also, for the MVC, filtering by `labels`, `status`, `reporter`
+contained in issue summary (title) or description. Also, for the MVC, filtering by `labels`, `status`, `reporter`
 and `assignee` is available through URL parameters.
 
 Extending searchbar functionality with above filtering capabilities
-(by `labels`, `status`, `reporter` and `assignee`) will be coming as one of upcoming iteration.
+(by `labels`, `status`, `reporter` and `assignee`) will come in a future iteration.
 
 #### Refining Jira Issue List with search and filtering
 
