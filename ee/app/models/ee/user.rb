@@ -257,6 +257,13 @@ module EE
         .order(:name)
     end
 
+    def manageable_groups_eligible_for_trial
+      manageable_groups
+        .left_joins(:gitlab_subscription)
+        .where(gitlab_subscriptions: { trial: [nil, false] })
+        .order(:name)
+    end
+
     override :has_current_license?
     def has_current_license?
       License.current.present?
