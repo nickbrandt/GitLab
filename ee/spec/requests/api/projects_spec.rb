@@ -185,15 +185,6 @@ RSpec.describe API::Projects do
       end
     end
 
-    describe 'service desk attributes' do
-      it 'are exposed when the feature is available' do
-        get api("/projects/#{project.id}", user)
-
-        expect(json_response).to have_key 'service_desk_enabled'
-        expect(json_response).to have_key 'service_desk_address'
-      end
-    end
-
     context 'project soft-deletion' do
       subject { get api("/projects/#{project.id}", user) }
 

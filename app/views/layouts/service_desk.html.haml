@@ -1,8 +1,10 @@
 %html{ lang: "en" }
   %head
     %meta{ content: "text/html; charset=utf-8", "http-equiv" => "Content-Type" }
+    -# haml-lint:disable NoPlainNodes
     %title
       GitLab
+    -# haml-lint:enable NoPlainNodes
     = stylesheet_link_tag 'notify'
     = yield :head
   %body

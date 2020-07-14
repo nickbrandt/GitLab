@@ -26,8 +26,6 @@ RSpec.describe Emails::ServiceDesk do
       helper GitlabRoutingHelper
       helper EmailsHelper
 
-      append_view_path Rails.root.join('ee', 'app', 'views', 'notify')
-
       # this method is implemented in Notify class, we don't need to test it
       def reply_key
         'test-key'
