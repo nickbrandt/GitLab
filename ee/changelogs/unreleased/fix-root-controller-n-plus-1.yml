@@ -1,0 +1,5 @@
+---
+title: Fix N+1 in the RootController#index
+merge_request: 36805
+author:
+type: performance
