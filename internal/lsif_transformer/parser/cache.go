@@ -21,6 +21,10 @@ func newCache(tempDir, filename string, data interface{}) (*cache, error) {
 		return nil, err
 	}
 
+	if err := os.Remove(f.Name()); err != nil {
+		return nil, err
+	}
+
 	return &cache{file: f, chunkSize: int64(binary.Size(data))}, nil
 }
 
@@ -41,10 +45,7 @@ func (c *cache) Entry(id Id, data interface{}) error {
 }
 
 func (c *cache) Close() error {
-	return combineErrors(
-		c.file.Close(),
-		os.Remove(c.file.Name()),
-	)
+	return c.file.Close()
 }
 
 func (c *cache) setOffset(id Id) error {
