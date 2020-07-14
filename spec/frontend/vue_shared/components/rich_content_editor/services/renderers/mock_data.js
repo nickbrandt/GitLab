@@ -10,11 +10,6 @@ export const buildMockTextNode = literal => {
 
 export const normalTextNode = buildMockTextNode('This is just normal text.');
 
-export const htmlBlockNode = {
-  type: 'htmlBlock',
-  literal: '<div data-tomark-pass ><h1>Some header</h1><p>Some paragraph</p></div>',
-};
-
 // Token spec helpers
 
 const buildMockUneditableOpenToken = type => {

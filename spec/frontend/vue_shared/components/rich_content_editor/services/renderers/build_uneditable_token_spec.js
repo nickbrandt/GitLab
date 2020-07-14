@@ -8,7 +8,6 @@ import {
 } from '~/vue_shared/components/rich_content_editor/services/renderers/build_uneditable_token';
 
 import {
-  htmlBlockNode,
   originInlineToken,
   originToken,
   uneditableOpenTokens,
@@ -64,10 +63,15 @@ describe('Build Uneditable Token renderer helper', () => {
 
   describe('buildUneditableHtmlAsTextTokens', () => {
     it('returns a 3-item array of tokens with the htmlBlockNode wrapped as a text token in the middle of block tokens', () => {
+      const htmlBlockNode = {
+        type: 'htmlBlock',
+        literal: '<div data-tomark-pass ><h1>Some header</h1><p>Some paragraph</p></div>',
+      };
       const result = buildUneditableHtmlAsTextTokens(htmlBlockNode);
+      const { type, content } = result[1];
 
-      expect(result[1].type).toBe('text');
-      expect(result[1].content).not.toMatch(/ data-tomark-pass /);
+      expect(type).toBe('text');
+      expect(content).not.toMatch(/ data-tomark-pass /);
 
       expect(result).toHaveLength(3);
       expect(result).toStrictEqual(uneditableBlockTokens);
