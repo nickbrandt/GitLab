@@ -905,7 +905,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
       let(:feature_flag) { true }
 
       before do
-        counter = Gitlab::UsageDataCounters::TrackUniqueActions.new
+        counter = Gitlab::UsageDataCounters::TrackUniqueActions
         project = Event::TARGET_TYPES[:project]
         wiki = Event::TARGET_TYPES[:wiki]
         design = Event::TARGET_TYPES[:design]

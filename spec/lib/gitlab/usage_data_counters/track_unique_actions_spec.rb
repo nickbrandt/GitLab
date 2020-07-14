@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::UsageDataCounters::TrackUniqueActions, :clean_gitlab_redis_shared_state do
-  subject(:track_unique_events) { described_class.new }
+  subject(:track_unique_events) { described_class }
 
   let(:time) { Time.zone.now }
 

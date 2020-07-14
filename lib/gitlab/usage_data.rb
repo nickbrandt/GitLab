@@ -577,11 +577,10 @@ module Gitlab
         { analytics_unique_visits: results }
       end
 
-      # rubocop: disable CodeReuse/ActiveRecord
       def action_monthly_active_users(time_period)
         return {} unless Feature.enabled?(Gitlab::UsageDataCounters::TrackUniqueActions::FEATURE_FLAG)
 
-        counter = Gitlab::UsageDataCounters::TrackUniqueActions.new
+        counter = Gitlab::UsageDataCounters::TrackUniqueActions
 
         project_count = redis_usage_data do
           counter.count_unique_events(
@@ -613,7 +612,6 @@ module Gitlab
           action_monthly_active_users_wiki_repo: wiki_count
         }
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       private
 
