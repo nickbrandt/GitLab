@@ -151,7 +151,8 @@ RSpec.describe Projects::Settings::OperationsController do
           incident_management_setting_attributes: {
             create_issue: 'false',
             send_email: 'false',
-            issue_template_key: 'some-other-template'
+            issue_template_key: 'some-other-template',
+            pagerduty_active: 'true'
           }
         }
       end
@@ -184,6 +185,8 @@ RSpec.describe Projects::Settings::OperationsController do
         it_behaves_like 'a gitlab tracking event', { issue_template_key: nil }, 'disabled_issue_template_on_alerts'
         it_behaves_like 'a gitlab tracking event', { send_email: '1' }, 'enabled_sending_emails'
         it_behaves_like 'a gitlab tracking event', { send_email: '0' }, 'disabled_sending_emails'
+        it_behaves_like 'a gitlab tracking event', { pagerduty_active: '1' }, 'enabled_pagerduty_webhook'
+        it_behaves_like 'a gitlab tracking event', { pagerduty_active: '0' }, 'disabled_pagerduty_webhook'
       end
     end
 
