@@ -1,4 +1,4 @@
-import RelatedIssuesStore from 'ee/related_issues/stores/related_issues_store';
+import RelatedIssuesStore from '~/related_issues/stores/related_issues_store';
 
 import {
   issuable1,

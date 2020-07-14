@@ -1,8 +1,8 @@
 <script>
 import axios from 'axios';
-import RelatedIssuesStore from 'ee/related_issues/stores/related_issues_store';
-import RelatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
-import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
+import RelatedIssuesStore from '~/related_issues/stores/related_issues_store';
+import RelatedIssuesBlock from '~/related_issues/components/related_issues_block.vue';
+import { issuableTypesMap, PathIdSeparator } from '~/related_issues/constants';
 import { sprintf, __ } from '~/locale';
 import { joinPaths } from '~/lib/utils/url_utility';
 import { RELATED_ISSUES_ERRORS } from '../constants';

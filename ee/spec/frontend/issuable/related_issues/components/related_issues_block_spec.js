@@ -1,6 +1,6 @@
 import { shallowMount, mount } from '@vue/test-utils';
-import { GlButton, GlIcon } from '@gitlab/ui';
-import RelatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
+import { GlIcon } from '@gitlab/ui';
+import RelatedIssuesBlock from '~/related_issues/components/related_issues_block.vue';
 import {
   issuable1,
   issuable2,
@@ -10,102 +10,13 @@ import {
   linkedIssueTypesMap,
   linkedIssueTypesTextMap,
   PathIdSeparator,
-} from 'ee/related_issues/constants';
+} from '~/related_issues/constants';
 
 describe('RelatedIssuesBlock', () => {
   let wrapper;
 
-  const findIssueCountBadgeAddButton = () => wrapper.find(GlButton);
-
   afterEach(() => {
     wrapper.destroy();
-  });
-
-  describe('with defaults', () => {
-    beforeEach(() => {
-      wrapper = mount(RelatedIssuesBlock, {
-        propsData: {
-          pathIdSeparator: PathIdSeparator.Issue,
-          issuableType: 'issue',
-        },
-      });
-    });
-
-    it('displays "Linked issues" in the header', () => {
-      expect(wrapper.find('.card-title').text()).toContain('Linked issues');
-    });
-
-    it('unable to add new related issues', () => {
-      expect(findIssueCountBadgeAddButton().exists()).toBe(false);
-    });
-
-    it('add related issues form is hidden', () => {
-      expect(wrapper.contains('.js-add-related-issues-form-area')).toBe(false);
-    });
-  });
-
-  describe('with headerText slot', () => {
-    it('displays header text slot data', () => {
-      const headerText = '<div>custom header text</div>';
-
-      wrapper = shallowMount(RelatedIssuesBlock, {
-        propsData: {
-          pathIdSeparator: PathIdSeparator.Issue,
-          issuableType: 'issue',
-        },
-        slots: { headerText },
-      });
-
-      expect(wrapper.find('.card-title').html()).toContain(headerText);
-    });
-  });
-
-  describe('with isFetching=true', () => {
-    beforeEach(() => {
-      wrapper = mount(RelatedIssuesBlock, {
-        propsData: {
-          pathIdSeparator: PathIdSeparator.Issue,
-          isFetching: true,
-          issuableType: 'issue',
-        },
-      });
-    });
-
-    it('should show `...` badge count', () => {
-      expect(wrapper.vm.badgeLabel).toBe('...');
-    });
-  });
-
-  describe('with canAddRelatedIssues=true', () => {
-    beforeEach(() => {
-      wrapper = mount(RelatedIssuesBlock, {
-        propsData: {
-          pathIdSeparator: PathIdSeparator.Issue,
-          canAdmin: true,
-          issuableType: 'issue',
-        },
-      });
-    });
-
-    it('can add new related issues', () => {
-      expect(findIssueCountBadgeAddButton().exists()).toBe(true);
-    });
-  });
-
-  describe('with isFormVisible=true', () => {
-    beforeEach(() => {
-      wrapper = mount(RelatedIssuesBlock, {
-        propsData: {
-          pathIdSeparator: PathIdSeparator.Issue,
-          isFormVisible: true,
-          issuableType: 'issue',
-        },
-      });
-    });
-
-    it('shows add related issues form', () => {
-      expect(wrapper.contains('.js-add-related-issues-form-area')).toBe(true);
-    });
   });
 
   describe('showCategorizedIssues prop', () => {

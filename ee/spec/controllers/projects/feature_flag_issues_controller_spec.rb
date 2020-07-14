@@ -171,31 +171,6 @@ RSpec.describe Projects::FeatureFlagIssuesController do
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
-
-    it 'returns not found when related issues feature is unavailable' do
-      stub_licensed_features(related_issues: false)
-      feature_flag, _issue = setup
-      sign_in(developer)
-
-      get_request(project, feature_flag)
-
-      expect(response).to have_gitlab_http_status(:not_found)
-    end
-
-    context 'when feature flags are unlicensed' do
-      before do
-        stub_licensed_features(feature_flags: false)
-      end
-
-      it 'does not return linked issues' do
-        feature_flag, _, _ = setup
-        sign_in(developer)
-
-        get_request(project, feature_flag)
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
   end
 
   describe 'POST #create' do
@@ -331,33 +306,6 @@ RSpec.describe Projects::FeatureFlagIssuesController do
       expect(response).to have_gitlab_http_status(:not_found)
       expect(::FeatureFlagIssue.count).to eq(0)
     end
-
-    it 'does not create a link when the related issues feature is unavailable' do
-      stub_licensed_features(related_issues: false)
-      feature_flag, issue = setup
-      sign_in(developer)
-
-      post_request(project, feature_flag, issue)
-
-      expect(response).to have_gitlab_http_status(:not_found)
-      expect(::FeatureFlagIssue.count).to eq(0)
-    end
-
-    context 'when feature flags are unlicensed' do
-      before do
-        stub_licensed_features(feature_flags: false)
-      end
-
-      it 'does not create a link between the feature flag and the issue when feature flags are unlicensed' do
-        feature_flag, issue = setup
-        sign_in(developer)
-
-        post_request(project, feature_flag, issue)
-
-        expect(response).to have_gitlab_http_status(:not_found)
-        expect(::FeatureFlagIssue.count).to eq(0)
-      end
-    end
   end
 
   describe 'DELETE #destroy' do
@@ -393,17 +341,6 @@ RSpec.describe Projects::FeatureFlagIssuesController do
     it 'does not unlink the issue for a reporter' do
       feature_flag, issue, link = setup
       sign_in(reporter)
-
-      delete_request(project, feature_flag, link)
-
-      expect(response).to have_gitlab_http_status(:not_found)
-      expect(feature_flag.reload.issues).to eq([issue])
-    end
-
-    it 'does not unlink the issue when the related issues feature is unavailable' do
-      stub_licensed_features(related_issues: false)
-      feature_flag, issue, link = setup
-      sign_in(developer)
 
       delete_request(project, feature_flag, link)
 

@@ -28,7 +28,7 @@ import {
   LEGACY_FLAG,
 } from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
-import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
+import RelatedIssuesRoot from '~/related_issues/components/related_issues_root.vue';
 
 export default {
   components: {

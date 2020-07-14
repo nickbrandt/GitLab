@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import { PathIdSeparator } from 'ee/related_issues/constants';
-import issueToken from 'ee/related_issues/components/issue_token.vue';
+import { PathIdSeparator } from '~/related_issues/constants';
+import issueToken from '~/related_issues/components/issue_token.vue';
 
 describe('IssueToken', () => {
   const idKey = 200;

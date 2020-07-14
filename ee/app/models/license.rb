@@ -10,6 +10,7 @@ class License < ApplicationRecord
 
   EES_FEATURES = %i[
     audit_events
+    blocked_issues
     burndown_charts
     code_owners
     code_review_analytics
@@ -33,7 +34,6 @@ class License < ApplicationRecord
     project_merge_request_analytics
     protected_refs_for_users
     push_rules
-    related_issues
     repository_mirrors
     repository_size_limit
     seat_link

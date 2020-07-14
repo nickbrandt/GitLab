@@ -33,7 +33,7 @@ RSpec.describe Gitlab::Graphql::Aggregations::Issues::LazyBlockAggregate do
       end
 
       it 'does not make the query again' do
-        expect(IssueLink).not_to receive(:blocked_issues_for_collection)
+        expect(subject).not_to receive(:load_records_into_loaded_objects)
 
         subject.block_aggregate
       end
@@ -53,7 +53,8 @@ RSpec.describe Gitlab::Graphql::Aggregations::Issues::LazyBlockAggregate do
       end
 
       before do
-        expect(IssueLink).to receive(:blocked_issues_for_collection).and_return(fake_data)
+        issue_link = class_double('IssueLink').as_stubbed_const
+        expect(issue_link).to receive(:blocked_issues_for_collection).and_return(fake_data)
       end
 
       it 'clears the pending IDs' do

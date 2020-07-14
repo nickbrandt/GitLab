@@ -6,9 +6,7 @@ module IssueLinks
     def relate_issuables(referenced_issue)
       link = IssueLink.find_or_initialize_by(source: issuable, target: referenced_issue)
 
-      if params[:link_type].present?
-        link.link_type = params[:link_type]
-      end
+      ee_processing(link)
 
       if link.changed? && link.save
         create_notes(referenced_issue)
@@ -32,5 +30,13 @@ module IssueLinks
     def previous_related_issuables
       @related_issues ||= issuable.related_issues(current_user).to_a
     end
+
+    private
+
+    def ee_processing(_link)
+      # no-op, EE-only
+    end
   end
 end
+
+IssueLinks::CreateService.prepend_if_ee('EE::IssueLinks::CreateService')

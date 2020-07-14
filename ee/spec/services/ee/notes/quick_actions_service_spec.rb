@@ -332,24 +332,8 @@ RSpec.describe Notes::QuickActionsService do
         group.add_developer(user)
       end
 
-      context 'related issues are not enabled' do
-        before do
-          stub_licensed_features(related_issues: false)
-        end
-
-        it 'does not create issue relation' do
-          expect { execute(note) }.not_to change { IssueLink.count }
-        end
-      end
-
-      context 'related issues are enabled' do
-        before do
-          stub_licensed_features(related_issues: true)
-        end
-
-        it 'creates issue relation' do
-          expect { execute(note) }.to change { IssueLink.count }.by(1)
-        end
+      it 'creates issue relation' do
+        expect { execute(note) }.to change { IssueLink.count }.by(1)
       end
     end
   end

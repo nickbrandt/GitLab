@@ -9,7 +9,7 @@ import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType, treeItemChevronBtnClassName } from 'ee/related_items_tree/constants';
-import { PathIdSeparator } from 'ee/related_issues/constants';
+import { PathIdSeparator } from '~/related_issues/constants';
 
 import Icon from '~/vue_shared/components/icon.vue';
 

@@ -10,7 +10,7 @@ import {
   issuableTypesMap,
   itemAddFailureTypesMap,
   PathIdSeparator,
-} from 'ee/related_issues/constants';
+} from '~/related_issues/constants';
 
 import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';

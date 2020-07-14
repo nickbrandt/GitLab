@@ -4,7 +4,7 @@ import {
   itemAddFailureTypesMap,
   pathIndeterminateErrorMap,
   relatedIssuesRemoveErrorMap,
-} from 'ee/related_issues/constants';
+} from '~/related_issues/constants';
 import flash from '~/flash';
 import { s__, __ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';

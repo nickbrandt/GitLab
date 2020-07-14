@@ -12,23 +12,6 @@ module QA
               super
 
               base.class_eval do
-                view 'ee/app/assets/javascripts/related_issues/components/add_issuable_form.vue' do
-                  element :add_issue_button
-                end
-
-                view 'ee/app/assets/javascripts/related_issues/components/related_issuable_input.vue' do
-                  element :add_issue_input
-                end
-
-                view 'ee/app/assets/javascripts/related_issues/components/related_issues_block.vue' do
-                  element :related_issues_plus_button
-                end
-
-                view 'ee/app/assets/javascripts/related_issues/components/related_issues_list.vue' do
-                  element :related_issuable_item
-                  element :related_issues_loading_icon
-                end
-
                 view 'ee/app/assets/javascripts/sidebar/components/weight/weight.vue' do
                   element :weight_label_value
                   element :edit_weight_link

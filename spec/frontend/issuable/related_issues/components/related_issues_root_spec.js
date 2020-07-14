@@ -1,9 +1,9 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import waitForPromises from 'helpers/wait_for_promises';
-import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
-import relatedIssuesService from 'ee/related_issues/services/related_issues_service';
-import { linkedIssueTypesMap } from 'ee/related_issues/constants';
+import RelatedIssuesRoot from '~/related_issues/components/related_issues_root.vue';
+import relatedIssuesService from '~/related_issues/services/related_issues_service';
+import { linkedIssueTypesMap } from '~/related_issues/constants';
 import {
   defaultProps,
   issuable1,

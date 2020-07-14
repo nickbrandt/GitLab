@@ -15,7 +15,7 @@ import {
 } from 'ee/feature_flags/constants';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import { featureFlag, userList, allUsersStrategy } from '../mock_data';
-import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
+import RelatedIssuesRoot from '~/related_issues/components/related_issues_root.vue';
 
 jest.mock('ee/api.js');
 
