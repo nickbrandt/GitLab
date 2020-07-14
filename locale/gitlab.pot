@@ -1330,7 +1330,7 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-msgid "Add \"%{value}\" to allowlist"
+msgid "Add \"%{value}\""
 msgstr ""
 
 msgid "Add %d issue"
@@ -2283,6 +2283,9 @@ msgid "All users must have a name."
 msgstr ""
 
 msgid "Allow \"%{group_name}\" to sign you in"
+msgstr ""
+
+msgid "Allow access to the following IP addresses"
 msgstr ""
 
 msgid "Allow commits from members who can merge to the target branch."
@@ -9537,6 +9540,9 @@ msgstr ""
 msgid "Exactly one of %{attributes} is required"
 msgstr ""
 
+msgid "Example: <code>192.168.0.0/24</code>. %{read_more_link}."
+msgstr ""
+
 msgid "Example: @sub\\.company\\.com$"
 msgstr ""
 
@@ -15209,6 +15215,9 @@ msgstr ""
 msgid "MrDeploymentActions|Stop environment"
 msgstr ""
 
+msgid "Multiple IP address ranges are supported."
+msgstr ""
+
 msgid "Multiple domains are supported."
 msgstr ""
 
@@ -19951,9 +19960,6 @@ msgstr ""
 msgid "Restoring the project will prevent the project from being removed on this date and restore people's ability to make changes to it."
 msgstr ""
 
-msgid "Restrict access by IP address"
-msgstr ""
-
 msgid "Restrict membership by email domain"
 msgstr ""
 
@@ -23845,7 +23851,7 @@ msgstr ""
 msgid "This group has been scheduled for permanent removal on %{date}"
 msgstr ""
 
-msgid "This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Multiple addresses are supported with comma delimiters.<br>Example: <code>192.168.0.0/24,192.168.1.0/24</code>. %{read_more_link}."
+msgid "This group, including all subgroups, projects and git repositories, will be reachable from only the specified IP address ranges."
 msgstr ""
 
 msgid "This group, its subgroups and projects has been scheduled for removal on %{date}."
