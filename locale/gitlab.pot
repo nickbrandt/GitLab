@@ -6199,6 +6199,24 @@ msgstr ""
 msgid "Confirmation required"
 msgstr ""
 
+msgid "Confluence"
+msgstr ""
+
+msgid "ConfluenceService|Confluence Workspace"
+msgstr ""
+
+msgid "ConfluenceService|Connect a Confluence Cloud Workspace to your GitLab project"
+msgstr ""
+
+msgid "ConfluenceService|Enabling the Confluence Workspace will disable the default GitLab Wiki. Your GitLab Wiki data will be saved and you can always re-enable it later by turning off this integration"
+msgstr ""
+
+msgid "ConfluenceService|The URL of the Confluence Workspace"
+msgstr ""
+
+msgid "ConfluenceService|Your GitLab Wiki can be accessed here: %{wiki_link}. To re-enable your GitLab Wiki, disable this integration"
+msgstr ""
+
 msgid "Congratulations! You have enabled Two-factor Authentication!"
 msgstr ""
 

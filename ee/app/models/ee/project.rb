@@ -518,7 +518,7 @@ module EE
     override :disabled_services
     def disabled_services
       strong_memoize(:disabled_services) do
-        [].tap do |services|
+        super.tap do |services|
           services.push('jenkins') unless feature_available?(:jenkins_integration)
           services.push('github') unless feature_available?(:github_project_service_integration)
           ::Gitlab::CurrentSettings.slack_app_enabled ? services.push('slack_slash_commands') : services.push('gitlab_slack_application')
