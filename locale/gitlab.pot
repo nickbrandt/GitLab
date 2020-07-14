@@ -2480,6 +2480,12 @@ msgstr ""
 msgid "An error occurred while enabling Service Desk."
 msgstr ""
 
+msgid "An error occurred while fetching branches.  Retry the search."
+msgstr ""
+
+msgid "An error occurred while fetching commits.  Retry the search."
+msgstr ""
+
 msgid "An error occurred while fetching coverage reports."
 msgstr ""
 
@@ -2508,6 +2514,9 @@ msgid "An error occurred while fetching projects autocomplete."
 msgstr ""
 
 msgid "An error occurred while fetching sidebar data"
+msgstr ""
+
+msgid "An error occurred while fetching tags. Retry the search."
 msgstr ""
 
 msgid "An error occurred while fetching terraform reports."
@@ -7456,6 +7465,9 @@ msgid "Default: Directly import the Google Code email address or username"
 msgstr ""
 
 msgid "Default: Map a FogBugz account ID to a full name"
+msgstr ""
+
+msgid "DefaultBranchLabel|default"
 msgstr ""
 
 msgid "Define a custom pattern with cron syntax"
@@ -15618,6 +15630,9 @@ msgstr ""
 msgid "No matching results"
 msgstr ""
 
+msgid "No matching results for \"%{query}\""
+msgstr ""
+
 msgid "No merge requests found"
 msgstr ""
 
@@ -15652,6 +15667,9 @@ msgid "No prioritized labels with such name or description"
 msgstr ""
 
 msgid "No public groups"
+msgstr ""
+
+msgid "No ref selected"
 msgstr ""
 
 msgid "No related merge requests found."
@@ -20270,6 +20288,9 @@ msgstr ""
 msgid "Search branches and tags"
 msgstr ""
 
+msgid "Search by Git revision"
+msgstr ""
+
 msgid "Search by author"
 msgstr ""
 
@@ -24650,6 +24671,9 @@ msgid "Total weight"
 msgstr ""
 
 msgid "Total: %{total}"
+msgstr ""
+
+msgid "TotalRefCountIndicator|1000+"
 msgstr ""
 
 msgid "Trace"
