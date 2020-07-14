@@ -44,6 +44,10 @@ module QA
                 element :group_sidebar_submenu_content
                 element :group_saml_sso_link
               end
+
+              view 'app/views/layouts/nav/sidebar/_wiki_link.html.haml' do
+                element :wiki_link
+              end
             end
           end
 
@@ -112,6 +116,12 @@ module QA
               within_submenu(:group_secure_submenu) do
                 click_element(:security_dashboard_link)
               end
+            end
+          end
+
+          def click_group_wiki_link
+            within_sidebar do
+              click_element(:wiki_link)
             end
           end
         end

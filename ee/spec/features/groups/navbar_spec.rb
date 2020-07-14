@@ -218,4 +218,21 @@ RSpec.describe 'Group navbar' do
 
     it_behaves_like 'verified navigation bar'
   end
+
+  context 'when group wiki is available' do
+    before do
+      stub_feature_flags(group_wiki: true)
+
+      insert_after_nav_item(
+        _('Analytics'),
+        new_nav_item: {
+          nav_item: _('Wiki'),
+          nav_sub_items: []
+        }
+      )
+      visit group_path(group)
+    end
+
+    it_behaves_like 'verified navigation bar'
+  end
 end

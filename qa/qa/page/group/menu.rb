@@ -19,10 +19,6 @@ module QA
           element :analytics_sidebar_submenu
         end
 
-        view 'app/views/layouts/nav/sidebar/_wiki_link.html.haml' do
-          element :wiki_link
-        end
-
         def click_group_members_item
           within_sidebar do
             click_element(:group_members_item)
@@ -67,12 +63,6 @@ module QA
             find_element(:group_issues_item).hover
 
             yield
-          end
-        end
-
-        def click_wiki
-          within_sidebar do
-            click_element(:wiki_link)
           end
         end
       end
