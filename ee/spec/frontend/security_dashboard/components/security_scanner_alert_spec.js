@@ -30,13 +30,13 @@ describe('EE Vulnerability Security Scanner Alert', () => {
     it('renders when disabled scanners are detected', () => {
       createWrapper({ notEnabledScanners: ['SAST'], noPipelineRunScanners: [] });
 
-      expect(findAlert()).toBeTruthy();
+      expect(findAlert()).not.toBe(null);
     });
 
     it('renders when scanners without pipeline runs are detected', () => {
       createWrapper({ notEnabledScanners: [], noPipelineRunScanners: ['DAST'] });
 
-      expect(findAlert()).toBeTruthy();
+      expect(findAlert()).not.toBe(null);
     });
 
     it('does not render when all scanners are enabled', () => {
@@ -57,7 +57,7 @@ describe('EE Vulnerability Security Scanner Alert', () => {
       createWrapper({ notEnabledScanners: ['SAST'] });
 
       const dismissalButton = withinWrapper().getByRole('button', { name: /dismiss/i });
-      expect(wrapper.emitted('dismiss')).toBeFalsy();
+      expect(wrapper.emitted('dismiss')).toBe(undefined);
 
       await fireEvent.click(dismissalButton);
 
