@@ -5,17 +5,13 @@ require 'spec_helper'
 RSpec.describe 'Issue weight', :js do
   let(:project) { create(:project, :public) }
 
-  before do
-    stub_feature_flags(vue_issuables_list: false)
-  end
-
   it 'shows weight on issue list row' do
     create(:issue, project: project, weight: 2)
 
     visit project_issues_path(project)
 
     page.within(first('.issuable-info')) do
-      expect(page).to have_selector('.issue-weight-icon')
+      expect(page).to have_selector('[data-testid="weight"]')
       expect(page).to have_content(2)
     end
   end
