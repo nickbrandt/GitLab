@@ -56,7 +56,8 @@ export default {
       variant="info"
       size="small"
       :href="artifactDownloadUrl(jobs[0])"
-      >{{ $options.translations.FUZZING_ARTIFACTS }}</gl-button
     >
+      {{ $options.translations.FUZZING_ARTIFACTS }}
+    </gl-button>
   </div>
 </template>
