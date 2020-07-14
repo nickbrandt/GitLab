@@ -25,7 +25,7 @@ module Projects
         end
 
         def execute
-          return [] unless Feature.enabled?(:jira_integration, project)
+          return [] unless project.jira_issues_integration_available?
 
           raise IntegrationError, _('Jira service not configured.') unless jira_service&.active?
 

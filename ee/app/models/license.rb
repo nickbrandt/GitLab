@@ -82,6 +82,7 @@ class License < ApplicationRecord
     group_saml
     issues_analytics
     jira_dev_panel_integration
+    jira_issues_integration
     ldap_group_sync_filter
     merge_pipelines
     merge_request_performance_metrics

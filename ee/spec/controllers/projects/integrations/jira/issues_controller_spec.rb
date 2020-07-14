@@ -8,6 +8,10 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
   let(:project) { create(:project) }
   let(:user)    { create(:user) }
 
+  before do
+    stub_licensed_features(jira_issues_integration: true)
+  end
+
   describe 'GET #index' do
     before do
       sign_in(user)
@@ -15,9 +19,9 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
       create(:jira_service, project: project)
     end
 
-    context 'when jira_integration feature disabled' do
+    context 'when jira_issues_integration licensed feature is not available' do
       it 'returns 404 status' do
-        stub_feature_flags(jira_integration: false)
+        stub_licensed_features(jira_issues_integration: false)
 
         get :index, params: { namespace_id: project.namespace, project_id: project }
 
