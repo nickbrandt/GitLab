@@ -13122,7 +13122,7 @@ msgstr ""
 msgid "JiraService|Web URL"
 msgstr ""
 
-msgid "JiraService|Work on Jira issues without leaving GitLab. Adds a Jira menu to access your list of issues and view any issue as read-only."
+msgid "JiraService|Work on Jira issues without leaving GitLab. Adds a Jira menu to access your list of Jira issues and view any issue as read-only."
 msgstr ""
 
 msgid "JiraService|e.g. AB"
@@ -23857,6 +23857,9 @@ msgstr ""
 msgid "This is a \"Ghost User\", created to hold all issues authored by users that have since been deleted. This user cannot be removed."
 msgstr ""
 
+msgid "This is a Premium feature"
+msgstr ""
+
 msgid "This is a Work in Progress"
 msgstr ""
 
@@ -25265,6 +25268,9 @@ msgstr ""
 msgid "Upgrade plan to unlock Canary Deployments feature"
 msgstr ""
 
+msgid "Upgrade your plan"
+msgstr ""
+
 msgid "Upgrade your plan to activate Advanced Global Search."
 msgstr ""
 
@@ -25272,6 +25278,9 @@ msgid "Upgrade your plan to activate Audit Events."
 msgstr ""
 
 msgid "Upgrade your plan to activate Group Webhooks."
+msgstr ""
+
+msgid "Upgrade your plan to enable this feature of the Jira Integration."
 msgstr ""
 
 msgid "Upgrade your plan to improve Issue boards."
