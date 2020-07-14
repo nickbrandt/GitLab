@@ -1,0 +1,5 @@
+---
+title: Always sort Elasticsearch searches by relevance not updated_at
+merge_request: 36774
+author:
+type: fixed
