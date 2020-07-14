@@ -310,14 +310,13 @@ reconfigure a node and change its status from primary to replica and vice versa.
    # Set the network addresses that the exporters will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
    redis_exporter['listen_address'] = '0.0.0.0:9121'
-   ```
-
-1. Only the primary GitLab application server should handle migrations. To
-   prevent database migrations from running on upgrade, add the following
-   configuration to your `/etc/gitlab/gitlab.rb` file:
-
-   ```ruby
-   gitlab_rails['auto_migrate'] = false
+   redis_exporter['flags'] = {
+        'redis.addr' => 'redis://10.6.0.61:6379',
+        'redis.password' => 'redis-password-goes-here',
+   }
+   
+   # Disable auto migrations
+   gitlab_rails['auto_migrate'] = false   
    ```
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
@@ -326,6 +325,28 @@ NOTE: **Note:**
 You can specify multiple roles like sentinel and Redis as:
 `roles ['redis_sentinel_role', 'redis_master_role']`.
 Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
+
+You can list the current Redis Primary, Replica status via:
+
+    ```shell
+    /opt/gitlab/embedded/bin/redis-cli -h <host> -a 'redis-password-goes-here' info replication
+    ```
+    
+Show running GitLab services via:
+
+    ```shell
+    gitlab-ctl status
+    ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+    run: consul: (pid 30043) 76863s; run: log: (pid 29691) 76892s
+    run: logrotate: (pid 31152) 3070s; run: log: (pid 29595) 76908s
+    run: node-exporter: (pid 30064) 76862s; run: log: (pid 29624) 76904s
+    run: redis: (pid 30070) 76861s; run: log: (pid 29573) 76914s
+    run: redis-exporter: (pid 30075) 76861s; run: log: (pid 29674) 76896s
+   ```
 
 #### Configuring the replica Redis instances
 
@@ -375,12 +396,13 @@ Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
    # Set the network addresses that the exporters will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
    redis_exporter['listen_address'] = '0.0.0.0:9121'
-   ```
-
-1. To prevent reconfigure from running automatically on upgrade, run:
-
-   ```shell
-   sudo touch /etc/gitlab/skip-auto-reconfigure
+   redis_exporter['flags'] = {
+        'redis.addr' => 'redis://10.6.0.62:6379',
+        'redis.password' => 'redis-password-goes-here',
+   }  
+   
+   # Disable auto migrations
+   gitlab_rails['auto_migrate'] = false        
    ```
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
@@ -504,6 +526,7 @@ To configure the Sentinel:
    ## The IPs of the Consul server nodes
    ## You can also use FQDNs and intermix them with IPs
    consul['configuration'] = {
+      server: true,
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
    }
 
@@ -515,17 +538,35 @@ To configure the Sentinel:
    gitlab_rails['auto_migrate'] = false
    ```
 
-1. To prevent database migrations from running on upgrade, run:
-
-   ```shell
-   sudo touch /etc/gitlab/skip-auto-reconfigure
-   ```
-
-   Only the primary GitLab application server should handle migrations.
-
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. Go through the steps again for all the other Consul/Sentinel nodes, and
    make sure you set up the correct IPs.
+
+NOTE: **Note:**
+A Consul leader will be elected when the provisioning of the third Consul server is completed.
+Viewing the Consul logs `sudo gitlab-ctl tail consul` will display 
+`...[INFO] consul: New leader elected: ...`
+
+You can list the current Consul members (server, client) via:
+
+    ```shell
+    /opt/gitlab/embedded/bin/consul members
+    ```
+
+Show running GitLab services via:
+
+    ```shell
+    gitlab-ctl status
+    ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+   run: consul: (pid 30074) 76834s; run: log: (pid 29740) 76844s
+   run: logrotate: (pid 30925) 3041s; run: log: (pid 29649) 76861s
+   run: node-exporter: (pid 30093) 76833s; run: log: (pid 29663) 76855s
+   run: sentinel: (pid 30098) 76832s; run: log: (pid 29704) 76850s
+   ```
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -629,15 +670,18 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    postgresql['max_replication_slots'] = 4
 
    # Replace XXX.XXX.XXX.XXX/YY with Network Address
-   postgresql['trust_auth_cidr_addresses'] = %w(10.6.0.0/24)
+   postgresql['trust_auth_cidr_addresses'] = %w(127.0.0.1/32 10.6.0.0/24)
    repmgr['trust_auth_cidr_addresses'] = %w(127.0.0.1/32 10.6.0.0/24)
 
    ## Enable service discovery for Prometheus
+   consul['enable'] = true
    consul['monitoring_service_discovery'] =  true
 
    # Set the network addresses that the exporters will listen on for monitoring
    node_exporter['listen_address'] = '0.0.0.0:9100'
    postgres_exporter['listen_address'] = '0.0.0.0:9187'
+   postgres_exporter['dbname'] = 'gitlabhq_production'
+   postgres_exporter['password'] = '<postgresql_password_hash>'
 
    ## The IPs of the Consul server nodes
    ## You can also use FQDNs and intermix them with IPs
@@ -649,6 +693,30 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    ```
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+
+NOTE: **Note:**
+You can list the current PostgresSQL Primary, Secondary status via:
+
+    ```shell
+    /opt/gitlab/bin/gitlab-ctl repmgr cluster show
+    ```
+
+Show running GitLab services via:
+
+    ```shell
+    gitlab-ctl status
+    ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+    run: consul: (pid 30593) 77133s; run: log: (pid 29912) 77156s
+    run: logrotate: (pid 23449) 3341s; run: log: (pid 29794) 77175s
+    run: node-exporter: (pid 30613) 77133s; run: log: (pid 29824) 77170s
+    run: postgres-exporter: (pid 30620) 77132s; run: log: (pid 29894) 77163s
+    run: postgresql: (pid 30630) 77132s; run: log: (pid 29618) 77181s
+    run: repmgrd: (pid 30639) 77132s; run: log: (pid 29985) 77150s
+   ```
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -695,16 +763,19 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    postgresql['max_replication_slots'] = 4
 
    # Replace XXX.XXX.XXX.XXX/YY with Network Address
-   postgresql['trust_auth_cidr_addresses'] = %w(10.6.0.0/24)
+   postgresql['trust_auth_cidr_addresses'] = %w(127.0.0.1/32 10.6.0.0/24)
    repmgr['trust_auth_cidr_addresses'] = %w(127.0.0.1/32 10.6.0.0/24)
 
    ## Enable service discovery for Prometheus
+   consul['enable'] = true
    consul['monitoring_service_discovery'] =  true
 
    # Set the network addresses that the exporters will listen on for monitoring
    node_exporter['listen_address'] = '0.0.0.0:9100'
    postgres_exporter['listen_address'] = '0.0.0.0:9187'
-
+   postgres_exporter['dbname'] = 'gitlabhq_production'
+   postgres_exporter['password'] = '<postgresql_password_hash>'
+   
    ## The IPs of the Consul server nodes
    ## You can also use FQDNs and intermix them with IPs
    consul['configuration'] = {
@@ -712,7 +783,6 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    }
    #
    # END user configuration
-
    ```
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
@@ -803,8 +873,8 @@ The output should be similar to the following:
 Role      | Name    | Upstream  | Connection String
 ----------+---------|-----------|------------------------------------------------
 * master  | MASTER  |           | host=<primary_node_name> user=gitlab_repmgr dbname=gitlab_repmgr
-   standby | STANDBY | MASTER    | host=<secondary_node_name> user=gitlab_repmgr dbname=gitlab_repmgr
-   standby | STANDBY | MASTER    | host=<secondary_node_name> user=gitlab_repmgr dbname=gitlab_repmgr
+  standby | STANDBY | MASTER    | host=<secondary_node_name> user=gitlab_repmgr dbname=gitlab_repmgr
+  standby | STANDBY | MASTER    | host=<secondary_node_name> user=gitlab_repmgr dbname=gitlab_repmgr
 ```
 
 If the 'Role' column for any node says "FAILED", check the
@@ -869,6 +939,7 @@ The following IPs will be used as an example:
 
    # Set the network addresses that the exporters will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
+   pgbouncer_exporter['listen_address'] = '0.0.0.0:9188'
    ```
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
@@ -911,6 +982,23 @@ The following IPs will be used as an example:
    ------+-----------+---------------------+---------+----------------+-------+------------+------------+---------------------+---------------------+-----------+------+------------+-----
     C    | pgbouncer | pgbouncer           | active  | 127.0.0.1      | 56846 | 127.0.0.1  |       6432 | 2017-08-21 18:09:59 | 2017-08-21 18:10:48 | 0x22b3880 |      |          0 |
    (2 rows)
+   ```
+
+NOTE: **Note:**
+Show running GitLab services via:
+
+    ```shell
+    gitlab-ctl status
+    ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+   run: consul: (pid 31530) 77150s; run: log: (pid 31106) 77182s
+   run: logrotate: (pid 32613) 3357s; run: log: (pid 30107) 77500s
+   run: node-exporter: (pid 31550) 77149s; run: log: (pid 30138) 77493s
+   run: pgbouncer: (pid 32033) 75593s; run: log: (pid 31117) 77175s
+   run: pgbouncer-exporter: (pid 31558) 77148s; run: log: (pid 31498) 77156s
    ```
 
 <div align="right">
@@ -1049,6 +1137,7 @@ On each node:
    sidekiq['enable'] = false
    gitlab_workhorse['enable'] = false
    grafana['enable'] = false
+   gitlab_exporter['enable'] = false
 
    # If you run a seperate monitoring node you can disable these services
    alertmanager['enable'] = false
@@ -1068,6 +1157,21 @@ On each node:
    # firewalls to restrict access to this address/port.
    # Comment out following line if you only want to support TLS connections
    gitaly['listen_addr'] = "0.0.0.0:8075"
+   
+   ## Enable service discovery for Prometheus
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+   
+   # Set the network addresses that the exporters will listen on for monitoring
+   gitaly['prometheus_listen_addr'] = "0.0.0.0:9236"
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   gitlab_rails['prometheus_address'] = '10.6.0.81:9090'
+ 
+   ## The IPs of the Consul server nodes
+   ## You can also use FQDNs and intermix them with IPs
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
+   }  
    ```
 
 1. Append the following to `/etc/gitlab/gitlab.rb` for each respective server:
@@ -1104,6 +1208,22 @@ On each node:
 
    ```shell
    sudo /opt/gitlab/embedded/service/gitlab-shell/bin/check -config /opt/gitlab/embedded/service/gitlab-shell/config.yml
+   ```
+
+NOTE: **Note:**
+Show running GitLab services via:
+
+    ```shell
+    gitlab-ctl status
+    ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+   run: consul: (pid 30339) 77006s; run: log: (pid 29878) 77020s
+   run: gitaly: (pid 30351) 77005s; run: log: (pid 29660) 77040s
+   run: logrotate: (pid 7760) 3213s; run: log: (pid 29782) 77032s
+   run: node-exporter: (pid 30378) 77004s; run: log: (pid 29812) 77026s
    ```
 
 ### Gitaly TLS support
@@ -1201,7 +1321,6 @@ you want using steps 1 and 2 from the GitLab downloads page.
    gitlab_rails['auto_migrate'] = false
    alertmanager['enable'] = false
    gitaly['enable'] = false
-   gitlab_monitor['enable'] = false
    gitlab_workhorse['enable'] = false
    nginx['enable'] = false
    puma['enable'] = false
@@ -1253,7 +1372,6 @@ you want using steps 1 and 2 from the GitLab downloads page.
    ###      Sidekiq configuration      ###
    #######################################
    sidekiq['listen_address'] = "0.0.0.0"
-   sidekiq['cluster'] = true # no need to set this after GitLab 13.0
 
    #######################################
    ###     Monitoring configuration    ###
@@ -1270,10 +1388,27 @@ you want using steps 1 and 2 from the GitLab downloads page.
 
    # Rails Status for prometheus
    gitlab_rails['monitoring_whitelist'] = ['10.6.0.81/32', '127.0.0.0/8']
+   gitlab_rails['prometheus_address'] = '10.6.0.81:9090'
    ```
 
 TIP: **Tip:**
 You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_processes.md).
+
+NOTE: **Note:**
+Show running GitLab services via:
+
+    ```shell
+    gitlab-ctl status
+    ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+   run: consul: (pid 30114) 77353s; run: log: (pid 29756) 77367s
+   run: logrotate: (pid 9898) 3561s; run: log: (pid 29653) 77380s
+   run: node-exporter: (pid 30134) 77353s; run: log: (pid 29706) 77372s
+   run: sidekiq: (pid 30142) 77351s; run: log: (pid 29638) 77386s
+   ```
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -1347,6 +1482,7 @@ On each node perform the following:
    roles ['application_role']
    gitaly['enable'] = false
    nginx['enable'] = true
+   sidekiq['enable'] = false
 
    ## PostgreSQL connection details
    # Disable PostgreSQL on the application node
@@ -1369,17 +1505,28 @@ On each node perform the following:
      {'host' => '10.6.0.12', 'port' => 26379},
      {'host' => '10.6.0.13', 'port' => 26379}
    ]
-
+   
+   ## Enable service discovery for Prometheus
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+   
    # Set the network addresses that the exporters used for monitoring will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
    gitlab_workhorse['prometheus_listen_addr'] = '0.0.0.0:9229'
    sidekiq['listen_address'] = "0.0.0.0"
    puma['listen'] = '0.0.0.0'
 
+   ## The IPs of the Consul server nodes
+   ## You can also use FQDNs and intermix them with IPs
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
+   }    
+   
    # Add the monitoring node's IP address to the monitoring whitelist and allow it to
    # scrape the NGINX metrics
    gitlab_rails['monitoring_whitelist'] = ['10.6.0.81/32', '127.0.0.0/8']
    nginx['status']['options']['allow'] = ['10.6.0.81/32', '127.0.0.0/8']
+   gitlab_rails['prometheus_address'] = '10.6.0.81:9090'
 
    ## Uncomment and edit the following options if you have set up NFS
    ##
@@ -1428,20 +1575,40 @@ certificates are not present, NGINX will fail to start. See the
 [NGINX documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
 for more information.
 
+Show running GitLab services via:
+
+    ```shell
+    gitlab-ctl status
+    ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+   run: consul: (pid 4890) 8647s; run: log: (pid 29962) 79128s
+   run: gitlab-exporter: (pid 4902) 8647s; run: log: (pid 29913) 79134s
+   run: gitlab-workhorse: (pid 4904) 8646s; run: log: (pid 29713) 79155s
+   run: logrotate: (pid 12425) 1446s; run: log: (pid 29798) 79146s
+   run: nginx: (pid 4925) 8646s; run: log: (pid 29726) 79152s
+   run: node-exporter: (pid 4931) 8645s; run: log: (pid 29855) 79140s
+   run: puma: (pid 4936) 8645s; run: log: (pid 29656) 79161s
+   ```
+
 ### GitLab Rails post-configuration
 
-Ensure that all migrations ran:
+1. Ensure that all migrations ran:
 
-```shell
-gitlab-rake gitlab:db:configure
-```
+   ```shell
+   gitlab-rake gitlab:db:configure
+   ```
 
-NOTE: **Note:**
-If you encounter a `rake aborted!` error stating that PgBouncer is failing to connect to
-PostgreSQL it may be that your PgBouncer node's IP address is missing from
-PostgreSQL's `trust_auth_cidr_addresses` in `gitlab.rb` on your database nodes. See
-[PgBouncer error `ERROR:  pgbouncer cannot connect to server`](troubleshooting.md#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
-in the Troubleshooting section before proceeding.
+    NOTE: **Note:**
+    If you encounter a `rake aborted!` error stating that PgBouncer is failing to connect to
+    PostgreSQL it may be that your PgBouncer node's IP address is missing from
+    PostgreSQL's `trust_auth_cidr_addresses` in `gitlab.rb` on your database nodes. See
+    [PgBouncer error `ERROR:  pgbouncer cannot connect to server`](troubleshooting.md#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
+    in the Troubleshooting section before proceeding.
+
+1. [Configure fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -1504,6 +1671,23 @@ running [Prometheus](../monitoring/prometheus/index.md) and
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. In the GitLab UI, set `admin/application_settings/metrics_and_profiling` > Metrics - Grafana to `/-/grafana` to
 `http[s]://<MONITOR NODE>/-/grafana`
+
+NOTE: **Note:**
+Show running GitLab services via:
+
+    ```shell
+    gitlab-ctl status
+    ```
+
+   The output should be similar to the following:
+
+   ```plaintext
+   run: consul: (pid 31637) 17337s; run: log: (pid 29748) 78432s
+   run: grafana: (pid 31644) 17337s; run: log: (pid 29719) 78438s
+   run: logrotate: (pid 31809) 2936s; run: log: (pid 29581) 78462s
+   run: nginx: (pid 31665) 17335s; run: log: (pid 29556) 78468s
+   run: prometheus: (pid 31672) 17335s; run: log: (pid 29633) 78456s
+   ```
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
