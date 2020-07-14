@@ -5,15 +5,18 @@ require 'spec_helper'
 RSpec.describe OperationsHelper do
   include Gitlab::Routing
 
-  describe '#alerts_settings_data' do
-    let_it_be(:user) { create(:user) }
-    let_it_be(:project, reload: true) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project, reload: true) { create(:project) }
 
+  before do
+    helper.instance_variable_set(:@project, project)
+    allow(helper).to receive(:current_user) { user }
+  end
+
+  describe '#alerts_settings_data' do
     subject { helper.alerts_settings_data }
 
     before do
-      helper.instance_variable_set(:@project, project)
-      allow(helper).to receive(:current_user) { user }
       allow(helper).to receive(:can?).with(user, :admin_operations, project) { true }
     end
 
@@ -39,13 +42,16 @@ RSpec.describe OperationsHelper do
           'prometheus_authorization_key' => nil,
           'prometheus_api_url' => nil,
           'prometheus_activated' => 'false',
-          'prometheus_url' => notify_project_prometheus_alerts_url(project, format: :json)
+          'prometheus_url' => notify_project_prometheus_alerts_url(project, format: :json),
+          'disabled' => 'false'
         )
       end
     end
 
     context 'with external Prometheus configured' do
-      let_it_be(:prometheus_service, reload: true) { create(:prometheus_service, project: project) }
+      let_it_be(:prometheus_service, reload: true) do
+        create(:prometheus_service, project: project)
+      end
 
       context 'with external Prometheus enabled' do
         it 'returns the correct values' do
@@ -57,16 +63,31 @@ RSpec.describe OperationsHelper do
       end
 
       context 'with external Prometheus disabled' do
+        shared_examples 'Prometheus is disabled' do
+          it 'returns the correct values' do
+            expect(subject).to include(
+              'prometheus_activated' => 'false',
+              'prometheus_api_url' => prometheus_service.api_url
+            )
+          end
+        end
+
+        let(:cluster_managed) { false }
+
         before do
-          # Prometheus services uses manual_configuration as an alias for active, beware
+          allow(prometheus_service)
+            .to receive(:prometheus_available?)
+            .and_return(cluster_managed)
+
           prometheus_service.update!(manual_configuration: false)
         end
 
-        it 'returns the correct values' do
-          expect(subject).to include(
-            'prometheus_activated' => 'false',
-            'prometheus_api_url' => prometheus_service.api_url
-          )
+        include_examples 'Prometheus is disabled'
+
+        context 'when cluster managed' do
+          let(:cluster_managed) { true }
+
+          include_examples 'Prometheus is disabled'
         end
       end
 
@@ -107,6 +128,33 @@ RSpec.describe OperationsHelper do
           )
         end
       end
+    end
+  end
+
+  describe '#operations_settings_data' do
+    let_it_be(:operations_settings) do
+      create(
+        :project_incident_management_setting,
+        project: project,
+        issue_template_key: 'template-key',
+        pagerduty_active: true
+      )
+    end
+
+    subject { helper.operations_settings_data }
+
+    it 'returns the correct set of data' do
+      is_expected.to eq(
+        operations_settings_endpoint: project_settings_operations_path(project),
+        templates: '[]',
+        create_issue: 'false',
+        issue_template_key: 'template-key',
+        send_email: 'false',
+        pagerduty_active: 'true',
+        pagerduty_token: operations_settings.pagerduty_token,
+        pagerduty_webhook_url: project_incidents_pagerduty_url(project, token: operations_settings.pagerduty_token),
+        pagerduty_reset_key_path: reset_pagerduty_token_project_settings_operations_path(project)
+      )
     end
   end
 end

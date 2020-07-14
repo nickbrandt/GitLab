@@ -51,20 +51,9 @@ RSpec.describe 'Admin::CredentialsInventory' do
       end
 
       context 'by SSH Keys' do
-        before do
-          create(:personal_key,
-            user: create(:user, name: 'Tom'),
-            created_at: '2019-12-09',
-            last_used_at: '2019-12-10')
+        let(:credentials_path) { admin_credentials_path(filter: 'ssh_keys') }
 
-          visit admin_credentials_path(filter: 'ssh_keys')
-        end
-
-        it 'shows details of ssh keys' do
-          expect(first_row.text).to include('Tom')
-          expect(first_row.text).to include('2019-12-09')
-          expect(first_row.text).to include('2019-12-10')
-        end
+        it_behaves_like 'credentials inventory SSH keys'
       end
     end
   end

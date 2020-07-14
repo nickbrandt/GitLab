@@ -6,6 +6,7 @@ RSpec.describe PersonalAccessToken do
   describe 'scopes' do
     let_it_be(:expired_token) { create(:personal_access_token, expires_at: 1.day.ago) }
     let_it_be(:valid_token) { create(:personal_access_token, expires_at: 1.day.from_now) }
+    let_it_be(:long_expiry_token) { create(:personal_access_token, expires_at: '999999-12-31'.to_date) }
     let!(:pat) { create(:personal_access_token, expires_at: expiration_date) }
 
     describe 'with_expires_at_after' do
@@ -14,7 +15,7 @@ RSpec.describe PersonalAccessToken do
       let(:expiration_date) { 3.days.from_now }
 
       it 'includes the tokens with higher than the lifetime expires_at value' do
-        expect(subject).to contain_exactly(pat)
+        expect(subject).to contain_exactly(pat, long_expiry_token)
       end
 
       it "doesn't contain expired tokens" do
@@ -41,6 +42,16 @@ RSpec.describe PersonalAccessToken do
 
       it "doesn't contain tokens within the expiration time" do
         expect(subject).not_to include(valid_token)
+      end
+    end
+
+    describe 'expires_in' do
+      subject { described_class.expires_in(1.day.from_now) }
+
+      let(:expiration_date) { nil }
+
+      it 'only includes one token' do
+        expect(subject).to contain_exactly(valid_token)
       end
     end
   end

@@ -36,13 +36,6 @@ module EE
       scope :include_gitlab_subscription, -> { includes(:gitlab_subscription) }
       scope :join_gitlab_subscription, -> { joins("LEFT OUTER JOIN gitlab_subscriptions ON gitlab_subscriptions.namespace_id=namespaces.id") }
 
-      scope :requiring_ci_extra_minutes_recalculation, -> do
-        joins(:namespace_statistics)
-          .where('namespaces.shared_runners_minutes_limit > 0')
-          .where('namespaces.extra_shared_runners_minutes_limit > 0')
-          .where('namespace_statistics.shared_runners_seconds > (namespaces.shared_runners_minutes_limit * 60)')
-      end
-
       scope :with_feature_available_in_plan, -> (feature) do
         plans = plans_with_feature(feature)
         matcher = ::Plan.where(name: plans)
@@ -57,6 +50,7 @@ module EE
 
       delegate :additional_purchased_storage_size, :additional_purchased_storage_size=,
         :additional_purchased_storage_ends_on, :additional_purchased_storage_ends_on=,
+        :temporary_storage_increase_ends_on,
         to: :namespace_limit, allow_nil: true
 
       delegate :email, to: :owner, allow_nil: true, prefix: true
@@ -180,6 +174,10 @@ module EE
       return ::Plan::FREE if trial_active?
 
       actual_plan_name
+    end
+
+    def over_storage_limit?
+      ::Namespace::RootStorageSize.new(root_ancestor).above_size_limit?
     end
 
     def actual_size_limit

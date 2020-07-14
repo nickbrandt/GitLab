@@ -1050,6 +1050,60 @@ RSpec.describe User do
     end
   end
 
+  describe '#manageable_groups_eligible_for_trial' do
+    let_it_be(:user) { create :user }
+    let_it_be(:non_trialed_group_z) { create :group, name: 'Zeta', gitlab_subscription: create(:gitlab_subscription) }
+    let_it_be(:non_trialed_group_a) { create :group, name: 'Alpha', gitlab_subscription: create(:gitlab_subscription) }
+    let_it_be(:trialed_group) { create :group, name: 'Omitted', gitlab_subscription: create(:gitlab_subscription, trial: true) }
+
+    subject { user.manageable_groups_eligible_for_trial }
+
+    context 'user with no groups' do
+      it { is_expected.to eq [] }
+    end
+
+    context 'owner of an already-trialed group' do
+      before do
+        trialed_group.add_owner(user)
+      end
+
+      it { is_expected.not_to include trialed_group }
+    end
+
+    context 'guest of a non-trialed group' do
+      before do
+        non_trialed_group_a.add_guest(user)
+      end
+
+      it { is_expected.not_to include non_trialed_group_a }
+    end
+
+    context 'developer of a non-trialed group' do
+      before do
+        non_trialed_group_a.add_developer(user)
+      end
+
+      it { is_expected.not_to include non_trialed_group_a }
+    end
+
+    context 'maintainer of a non-trialed group' do
+      before do
+        non_trialed_group_a.add_maintainer(user)
+      end
+
+      it { is_expected.to include non_trialed_group_a }
+    end
+
+    context 'owner of 2 non-trialed groups' do
+      before do
+        non_trialed_group_z.add_owner(user)
+        non_trialed_group_a.add_owner(user)
+      end
+
+      it { is_expected.to eq [non_trialed_group_a, non_trialed_group_z] }
+    end
+  end
+
   describe '#active_for_authentication?' do
     subject { user.active_for_authentication? }
 

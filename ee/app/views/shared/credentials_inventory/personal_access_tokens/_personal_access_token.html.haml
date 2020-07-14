@@ -4,25 +4,22 @@
       = _('Owner')
     .table-mobile-content
       = render 'shared/credentials_inventory/users/user_detail', user: personal_access_token.user
-  .table-section.section-30
+  .table-section.section-20
     .table-mobile-header{ role: 'rowheader' }
       = _('Scope')
-    .table-mobile-content.ws-normal
+    .table-mobile-content.gl-white-space-normal
       - scopes = personal_access_token.scopes
       = scopes.present? ? scopes.join(", ") : _('No Scopes')
-  .table-section.section-10
+  .table-section.section-15
     .table-mobile-header{ role: 'rowheader' }
       = _('Created On')
     .table-mobile-content
       = personal_access_token.created_at.to_date
-  .table-section.section-10
+  .table-section.section-15
     .table-mobile-header{ role: 'rowheader' }
       = _('Expiration')
-    .table-mobile-content
-      - if personal_access_token.expires?
-        = personal_access_token.expires_at
-      - else
-        = _('Never')
+    .table-mobile-content.gl-w-full
+      = render 'shared/credentials_inventory/expiry_date', credential: personal_access_token
   .table-section.section-10
     .table-mobile-header{ role: 'rowheader' }
       = _('Revoked')

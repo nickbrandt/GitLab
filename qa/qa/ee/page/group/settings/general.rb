@@ -21,7 +21,7 @@ module QA
                   element :save_changes_button
                 end
 
-                view 'ee/app/views/groups/settings/_ip_restriction.html.haml' do
+                view 'ee/app/assets/javascripts/pages/groups/edit/index.js' do
                   element :ip_restriction_field
                 end
 
@@ -63,15 +63,17 @@ module QA
             def set_ip_address_restriction(ip_address)
               QA::Runtime::Logger.debug(%Q[Setting ip address restriction to: #{ip_address}])
               expand_section(:permission_lfs_2fa_section)
-              find_element(:ip_restriction_field).send_keys([:command, 'a'], :backspace)
-              find_element(:ip_restriction_field).set ip_address
-              click_element :save_permissions_changes_button
-            end
 
-            def restricted_ip_address
-              expand_section(:permission_lfs_2fa_section)
-              scroll_to_element(:ip_restriction_field)
-              find_element(:ip_restriction_field).value
+              # GitLab UI Token Selector (https://gitlab-org.gitlab.io/gitlab-ui/?path=/story/base-token-selector--default)
+              # `data-qa-*` can only be added to the wrapper so custom selector used to find token close buttons and text input
+              find_element(:ip_restriction_field).all('.gl-token-close', minimum: 0).each do |el|
+                el.click
+              end
+
+              ip_restriction_field_input = find_element(:ip_restriction_field).find('input[type="text"]')
+              ip_restriction_field_input.set ip_address
+              ip_restriction_field_input.send_keys(:enter)
+              click_element :save_permissions_changes_button
             end
 
             def set_membership_lock_enabled

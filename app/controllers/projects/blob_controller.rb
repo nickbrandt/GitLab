@@ -9,6 +9,7 @@ class Projects::BlobController < Projects::ApplicationController
   include ActionView::Helpers::SanitizeHelper
   include RedirectsForMissingPathOnTree
   include SourcegraphDecorator
+  include DiffHelper
 
   prepend_before_action :authenticate_user!, only: [:edit]
 
@@ -129,7 +130,7 @@ class Projects::BlobController < Projects::ApplicationController
         end
       end
 
-      return redirect_to_tree_root_for_missing_path(@project, @ref, @path)
+      redirect_to_tree_root_for_missing_path(@project, @ref, @path)
     end
   end
 

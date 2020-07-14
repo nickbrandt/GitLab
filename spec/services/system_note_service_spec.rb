@@ -681,4 +681,28 @@ RSpec.describe SystemNoteService do
       described_class.unapprove_mr(noteable, author)
     end
   end
+
+  describe '.change_alert_status' do
+    let(:alert) { build(:alert_management_alert) }
+
+    it 'calls AlertManagementService' do
+      expect_next_instance_of(SystemNotes::AlertManagementService) do |service|
+        expect(service).to receive(:change_alert_status).with(alert)
+      end
+
+      described_class.change_alert_status(alert, author)
+    end
+  end
+
+  describe '.new_alert_issue' do
+    let(:alert) { build(:alert_management_alert, :with_issue) }
+
+    it 'calls AlertManagementService' do
+      expect_next_instance_of(SystemNotes::AlertManagementService) do |service|
+        expect(service).to receive(:new_alert_issue).with(alert, alert.issue)
+      end
+
+      described_class.new_alert_issue(alert, alert.issue, author)
+    end
+  end
 end

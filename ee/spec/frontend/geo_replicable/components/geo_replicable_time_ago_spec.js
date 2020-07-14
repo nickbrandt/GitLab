@@ -20,7 +20,7 @@ describe('GeoReplicableTimeAgo', () => {
   const createComponent = () => {
     wrapper = mount(GeoReplicableTimeAgo, {
       localVue,
-      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false }),
+      store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, graphqlFieldName: null }),
       propsData,
     });
   };

@@ -374,7 +374,7 @@ export const fetchDashboardValidationWarnings = ({ state, dispatch }) => {
       },
     })
     .then(resp => resp.data?.project?.environments?.nodes?.[0]?.metricsDashboard)
-    .then(({ schemaValidationWarnings }) => {
+    .then(({ schemaValidationWarnings } = {}) => {
       const hasWarnings = schemaValidationWarnings && schemaValidationWarnings.length !== 0;
       /**
        * The payload of the dispatch is a boolean, because at the moment a standard

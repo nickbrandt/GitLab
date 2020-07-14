@@ -98,7 +98,7 @@ export default {
         },
         {
           value: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-          text: __('Percent rollout (logged in users)'),
+          text: __('Percent of users'),
         },
         {
           value: ROLLOUT_STRATEGY_USER_ID,
@@ -106,7 +106,7 @@ export default {
         },
         {
           value: ROLLOUT_STRATEGY_GITLAB_USER_LIST,
-          text: __('List'),
+          text: __('User List'),
         },
       ],
     };

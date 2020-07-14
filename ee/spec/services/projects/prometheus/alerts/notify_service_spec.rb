@@ -36,48 +36,8 @@ RSpec.describe Projects::Prometheus::Alerts::NotifyService do
     end
   end
 
-  shared_examples 'processes incident issues' do |amount|
-    let(:create_incident_service) { spy }
-
-    it 'processes issues' do
-      expect(IncidentManagement::ProcessPrometheusAlertWorker)
-        .to receive(:perform_async)
-        .with(project.id, kind_of(Hash))
-        .exactly(amount).times
-
-      Sidekiq::Testing.inline! do
-        expect(subject).to be_success
-      end
-    end
-  end
-
-  shared_examples 'does not process incident issues' do
-    it 'does not process issues' do
-      expect(IncidentManagement::ProcessPrometheusAlertWorker)
-        .not_to receive(:perform_async)
-
-      expect(subject).to be_success
-    end
-  end
-
-  shared_examples 'persists events' do
-    let(:create_events_service) { spy }
-
-    it 'persists events' do
-      expect(Projects::Prometheus::Alerts::CreateEventsService)
-        .to receive(:new)
-        .and_return(create_events_service)
-
-      expect(create_events_service)
-        .to receive(:execute)
-
-      expect(subject).to be_success
-    end
-  end
-
   shared_examples 'notifies alerts' do
     it_behaves_like 'sends notification email'
-    it_behaves_like 'persists events'
   end
 
   shared_examples 'no notifications' do |http_status:|
@@ -118,8 +78,6 @@ RSpec.describe Projects::Prometheus::Alerts::NotifyService do
       end
 
       before do
-        stub_licensed_features(multiple_clusters: true)
-
         create(:clusters_applications_prometheus, :installed,
                cluster: prd_cluster, alert_manager_token: token)
         create(:clusters_applications_prometheus, :installed,

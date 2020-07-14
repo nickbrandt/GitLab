@@ -24,7 +24,7 @@ module EE
         super
         return unless group.packages_feature_available?
 
-        npm_packages = Packages::GroupPackagesFinder.new(current_user, group, package_type: :npm).execute
+        npm_packages = ::Packages::GroupPackagesFinder.new(current_user, group, package_type: :npm).execute
         if different_root_ancestor? && npm_packages.exists?
           raise_ee_transfer_error(:group_contains_npm_packages)
         end

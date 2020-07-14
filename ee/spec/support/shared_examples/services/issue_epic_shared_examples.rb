@@ -13,6 +13,17 @@ RSpec.shared_examples 'issue with epic_id parameter' do
     end
   end
 
+  context 'when epic_id is 0' do
+    let(:params) { { title: 'issue1', epic_id: 0 } }
+
+    it 'ignores epic_id' do
+      issue = execute
+
+      expect(issue).to be_persisted
+      expect(issue.epic).to be_nil
+    end
+  end
+
   context 'when user can not add issues to the epic' do
     before do
       project.add_maintainer(user)

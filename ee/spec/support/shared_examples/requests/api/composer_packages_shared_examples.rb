@@ -13,7 +13,7 @@ RSpec.shared_examples 'Composer package index' do |user_type, status, add_member
       subject
 
       expect(response).to have_gitlab_http_status(status)
-      expect(response).to match_response_schema('packages/composer/index', dir: 'ee')
+      expect(response).to match_response_schema('public_api/v4/packages/composer/index')
     end
   end
 end
@@ -24,7 +24,7 @@ RSpec.shared_examples 'Composer empty provider index' do |user_type, status, add
       subject
 
       expect(response).to have_gitlab_http_status(status)
-      expect(response).to match_response_schema('packages/composer/provider', dir: 'ee')
+      expect(response).to match_response_schema('public_api/v4/packages/composer/provider')
       expect(json_response['providers']).to eq({})
     end
   end
@@ -36,7 +36,7 @@ RSpec.shared_examples 'Composer provider index' do |user_type, status, add_membe
       subject
 
       expect(response).to have_gitlab_http_status(status)
-      expect(response).to match_response_schema('packages/composer/provider', dir: 'ee')
+      expect(response).to match_response_schema('public_api/v4/packages/composer/provider')
       expect(json_response['providers']).to include(package.name)
     end
   end
@@ -48,7 +48,7 @@ RSpec.shared_examples 'Composer package api request' do |user_type, status, add_
       subject
 
       expect(response).to have_gitlab_http_status(status)
-      expect(response).to match_response_schema('packages/composer/package', dir: 'ee')
+      expect(response).to match_response_schema('public_api/v4/packages/composer/package')
       expect(json_response['packages']).to include(package.name)
       expect(json_response['packages'][package.name]).to include(package.version)
     end
@@ -68,6 +68,7 @@ RSpec.shared_examples 'Composer package creation' do |user_type, status, add_mem
 
       expect(response).to have_gitlab_http_status(status)
     end
+    it_behaves_like 'a gitlab tracking event', described_class.name, 'register_package'
   end
 end
 

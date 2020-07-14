@@ -17,6 +17,26 @@ RSpec.describe EE::ServicesHelper do
 
   subject { controller_class.new }
 
+  describe '#integration_form_data' do
+    subject { helper.integration_form_data(integration) }
+
+    context 'Slack service' do
+      let(:integration) { build(:slack_service) }
+
+      it 'does not include Jira specific fields' do
+        is_expected.not_to include(:show_jira_issues_integration, :enable_jira_issues, :project_key, :edit_project_path)
+      end
+    end
+
+    context 'Jira service' do
+      let(:integration) { build(:jira_service) }
+
+      it 'includes Jira specific fields' do
+        is_expected.to include(:show_jira_issues_integration, :enable_jira_issues, :project_key, :edit_project_path)
+      end
+    end
+  end
+
   describe '#add_to_slack_link' do
     it 'encodes a masked CSRF token' do
       expect(subject).to receive(:form_authenticity_token).and_return('a token')

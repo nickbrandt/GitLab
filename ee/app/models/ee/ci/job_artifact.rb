@@ -21,6 +21,7 @@ module EE
       DAST_REPORT_TYPES = %w[dast].freeze
       REQUIREMENTS_REPORT_FILE_TYPES = %w[requirements].freeze
       COVERAGE_FUZZING_REPORT_TYPES = %w[coverage_fuzzing].freeze
+      BROWSER_PERFORMANCE_REPORT_FILE_TYPES = %w[browser_performance performance].freeze
 
       scope :project_id_in, ->(ids) { where(project_id: ids) }
       scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
@@ -64,6 +65,7 @@ module EE
       def self.associated_file_types_for(file_type)
         return unless file_types.include?(file_type)
         return LICENSE_SCANNING_REPORT_FILE_TYPES if LICENSE_SCANNING_REPORT_FILE_TYPES.include?(file_type)
+        return BROWSER_PERFORMANCE_REPORT_FILE_TYPES if BROWSER_PERFORMANCE_REPORT_FILE_TYPES.include?(file_type)
 
         [file_type]
       end

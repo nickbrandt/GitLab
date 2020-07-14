@@ -12,6 +12,9 @@ import { trimText } from 'helpers/text_helper';
 import axios from '~/lib/utils/axios_utils';
 import { mrStates } from '~/mr_popover/constants';
 import { TEST_HOST } from 'helpers/test_constants';
+import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
+import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
+import ReportSection from '~/reports/components/report_section.vue';
 
 import {
   sastDiffSuccessMock,
@@ -32,6 +35,8 @@ describe('Grouped security reports app', () => {
   let wrapper;
   let mock;
 
+  const findReportSection = () => wrapper.find(ReportSection);
+
   const props = {
     headBlobPath: 'path',
     baseBlobPath: 'path',
@@ -40,15 +45,31 @@ describe('Grouped security reports app', () => {
     dastHelpPath: 'path',
     dependencyScanningHelpPath: 'path',
     secretScanningHelpPath: 'path',
+    canReadVulnerabilityFeedbackPath: true,
     vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
     vulnerabilityFeedbackHelpPath: 'path',
     pipelineId: 123,
+    projectFullPath: 'path',
   };
+
+  const glModalDirective = jest.fn();
 
   const createWrapper = (propsData, provide = {}) => {
     wrapper = mount(GroupedSecurityReportsApp, {
       propsData,
+      data() {
+        return {
+          dastSummary: null,
+        };
+      },
       provide,
+      directives: {
+        glModal: {
+          bind(el, { value }) {
+            glModalDirective(value);
+          },
+        },
+      },
     });
   };
 
@@ -257,6 +278,7 @@ describe('Grouped security reports app', () => {
       createWrapper({
         headBlobPath: 'path',
         pipelinePath,
+        projectFullPath: 'path',
       });
     });
 
@@ -359,13 +381,17 @@ describe('Grouped security reports app', () => {
       expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 vulnerability');
     });
 
-    it('shows the scanned URLs count and a link to the CI job if available', () => {
+    it('shows the scanned URLs count and opens a modal', async () => {
       const jobLink = wrapper.find('[data-qa-selector="dast-ci-job-link"]');
 
       expect(wrapper.text()).toContain('211 URLs scanned');
       expect(jobLink.exists()).toBe(true);
       expect(jobLink.text()).toBe('View details');
-      expect(jobLink.attributes('href')).toBe(scanUrl);
+
+      jobLink.vm.$emit('click');
+      await wrapper.vm.$nextTick();
+
+      expect(glModalDirective).toHaveBeenCalled();
     });
 
     it('does not show scanned resources info if there is 0 scanned URL', () => {
@@ -529,6 +555,46 @@ describe('Grouped security reports app', () => {
       it('should not display out of date message', () => {
         expect(wrapper.vm.$el.textContent).not.toContain('Security report is out of date.');
       });
+    });
+  });
+
+  describe('track report section expansion using Snowplow', () => {
+    let trackingSpy;
+    const { category, action } = trackMrSecurityReportDetails;
+
+    beforeEach(() => {
+      createWrapper(props);
+      trackingSpy = mockTracking(category, wrapper.vm.$el, jest.spyOn);
+    });
+
+    afterEach(() => {
+      unmockTracking();
+    });
+
+    it('tracks an event when toggled', () => {
+      expect(trackingSpy).not.toHaveBeenCalled();
+      findReportSection().vm.$emit('toggleEvent');
+      return wrapper.vm.$nextTick().then(() => {
+        expect(trackingSpy).toHaveBeenCalledWith(category, action);
+      });
+    });
+
+    it('tracks an event only the first time it is toggled', () => {
+      const report = findReportSection();
+
+      expect(trackingSpy).not.toHaveBeenCalled();
+      report.vm.$emit('toggleEvent');
+      return wrapper.vm
+        .$nextTick()
+        .then(() => {
+          expect(trackingSpy).toHaveBeenCalledWith(category, action);
+          expect(trackingSpy).toHaveBeenCalledTimes(1);
+          report.vm.$emit('toggleEvent');
+        })
+        .then(wrapper.vm.$nextTick())
+        .then(() => {
+          expect(trackingSpy).toHaveBeenCalledTimes(1);
+        });
     });
   });
 });

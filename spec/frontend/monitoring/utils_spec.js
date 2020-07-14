@@ -1,12 +1,8 @@
 import * as monitoringUtils from '~/monitoring/utils';
 import * as urlUtils from '~/lib/utils/url_utility';
 import { TEST_HOST } from 'jest/helpers/test_constants';
-import {
-  mockProjectDir,
-  singleStatMetricsResult,
-  anomalyMockGraphData,
-  barMockData,
-} from './mock_data';
+import { mockProjectDir, barMockData } from './mock_data';
+import { singleStatGraphData, anomalyGraphData } from './graph_data';
 import { metricsDashboardViewModel, graphData } from './fixture_data';
 
 const mockPath = `${TEST_HOST}${mockProjectDir}/-/environments/29/metrics`;
@@ -82,7 +78,7 @@ describe('monitoring/utils', () => {
     it('validates data with the query format', () => {
       const validGraphData = monitoringUtils.graphDataValidatorForValues(
         true,
-        singleStatMetricsResult,
+        singleStatGraphData(),
       );
 
       expect(validGraphData).toBe(true);
@@ -105,13 +101,13 @@ describe('monitoring/utils', () => {
     let threeMetrics;
     let fourMetrics;
     beforeEach(() => {
-      oneMetric = singleStatMetricsResult;
-      threeMetrics = anomalyMockGraphData;
+      oneMetric = singleStatGraphData();
+      threeMetrics = anomalyGraphData();
 
       const metrics = [...threeMetrics.metrics];
       metrics.push(threeMetrics.metrics[0]);
       fourMetrics = {
-        ...anomalyMockGraphData,
+        ...anomalyGraphData(),
         metrics,
       };
     });
@@ -460,7 +456,7 @@ describe('monitoring/utils', () => {
 
         expect(urlUtils.updateHistory).toHaveBeenCalledTimes(1);
         expect(urlUtils.updateHistory).toHaveBeenCalledWith({
-          url: `http://localhost/${urlParams}`,
+          url: `${TEST_HOST}/${urlParams}`,
           title: '',
         });
       },

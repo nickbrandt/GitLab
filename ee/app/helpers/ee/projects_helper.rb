@@ -145,9 +145,12 @@ module EE
     def sidebar_security_paths
       %w[
         projects/security/configuration#show
+        projects/security/sast_configuration#show
         projects/security/vulnerabilities#show
         projects/security/dashboard#index
         projects/on_demand_scans#index
+        projects/dast_profiles#index
+        projects/dast_site_profiles#new
         projects/dependencies#index
         projects/licenses#index
         projects/threat_monitoring#show
@@ -198,6 +201,7 @@ module EE
           vulnerabilities_export_endpoint: api_v4_security_projects_vulnerability_exports_path(id: project.id),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
+          no_vulnerabilities_svg_path: image_path('illustrations/issues.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
           security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
           user_callouts_path: user_callouts_path,

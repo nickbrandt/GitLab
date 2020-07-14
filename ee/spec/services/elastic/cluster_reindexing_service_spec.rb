@@ -57,7 +57,7 @@ RSpec.describe Elastic::ClusterReindexingService, :elastic do
 
     context 'errors are raised' do
       before do
-        allow(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => task.reload.documents_count * 2 })
+        allow(Gitlab::Elastic::Helper.default).to receive(:documents_count).with(index_name: task.index_name_to).and_return(task.reload.documents_count * 2)
       end
 
       it 'errors if documents count is different' do
@@ -75,7 +75,7 @@ RSpec.describe Elastic::ClusterReindexingService, :elastic do
 
     context 'task finishes correctly' do
       before do
-        allow(Gitlab::Elastic::Helper.default).to receive(:index_size).and_return('docs' => { 'count' => task.reload.documents_count })
+        allow(Gitlab::Elastic::Helper.default).to receive(:documents_count).with(index_name: task.index_name_to).and_return(task.reload.documents_count)
       end
 
       it 'launches all state steps' do

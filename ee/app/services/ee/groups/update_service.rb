@@ -118,7 +118,7 @@ module EE
         return true if params[:path].blank?
         return true if !group.has_parent? && group.path == params[:path]
 
-        npm_packages = Packages::GroupPackagesFinder.new(current_user, group, package_type: :npm).execute
+        npm_packages = ::Packages::GroupPackagesFinder.new(current_user, group, package_type: :npm).execute
         if npm_packages.exists?
           group.errors.add(:path, s_('GroupSettings|cannot change when group contains projects with NPM packages'))
           return

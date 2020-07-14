@@ -2,8 +2,8 @@ import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlAlert, GlTable, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
 import FirstClassInstanceVulnerabilities from 'ee/security_dashboard/components/first_class_instance_security_dashboard_vulnerabilities.vue';
-import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
-import { generateVulnerabilities } from '../../vulnerabilities/mock_data';
+import VulnerabilityList from 'ee/security_dashboard/components/vulnerability_list.vue';
+import { generateVulnerabilities } from './mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -12,14 +12,8 @@ describe('First Class Instance Dashboard Vulnerabilities Component', () => {
   let wrapper;
   let store;
 
-  const dashboardDocumentation = 'dashboard-documentation';
-  const emptyStateSvgPath = 'empty-state-path';
-  const emptyStateDescription =
-    "While it's rare to have no vulnerabilities, it can happen. In any event, we ask that you please double check your settings to make sure you've set up your dashboard correctly.";
-
   const findIntersectionObserver = () => wrapper.find(GlIntersectionObserver);
   const findVulnerabilities = () => wrapper.find(VulnerabilityList);
-  const findEmptyState = () => wrapper.find(GlEmptyState);
   const findAlert = () => wrapper.find(GlAlert);
 
   const createWrapper = ({ stubs, loading = false, isUpdatingProjects, data } = {}) => {
@@ -43,10 +37,6 @@ describe('First Class Instance Dashboard Vulnerabilities Component', () => {
 
     return shallowMount(FirstClassInstanceVulnerabilities, {
       localVue,
-      propsData: {
-        dashboardDocumentation,
-        emptyStateSvgPath,
-      },
       store,
       stubs,
       mocks: {
@@ -73,9 +63,7 @@ describe('First Class Instance Dashboard Vulnerabilities Component', () => {
 
     it('passes down isLoading correctly', () => {
       expect(findVulnerabilities().props()).toEqual({
-        dashboardDocumentation,
-        emptyStateSvgPath,
-        filters: null,
+        filters: {},
         isLoading: true,
         shouldShowIdentifier: false,
         shouldShowReportType: false,
@@ -118,22 +106,6 @@ describe('First Class Instance Dashboard Vulnerabilities Component', () => {
     });
   });
 
-  describe('when the query returned an empty vulnerability list', () => {
-    beforeEach(() => {
-      wrapper = createWrapper({
-        stubs: {
-          VulnerabilityList,
-          GlTable,
-          GlEmptyState,
-        },
-      });
-    });
-
-    it('displays the empty state', () => {
-      expect(findEmptyState().text()).toContain(emptyStateDescription);
-    });
-  });
-
   describe('when the query is loaded and we have results', () => {
     const vulnerabilities = generateVulnerabilities();
 
@@ -151,15 +123,9 @@ describe('First Class Instance Dashboard Vulnerabilities Component', () => {
       });
     });
 
-    it('does not have an empty state', () => {
-      expect(wrapper.html()).not.toContain(emptyStateDescription);
-    });
-
     it('passes down properties correctly', () => {
       expect(findVulnerabilities().props()).toEqual({
-        dashboardDocumentation,
-        emptyStateSvgPath,
-        filters: null,
+        filters: {},
         isLoading: false,
         shouldShowIdentifier: false,
         shouldShowReportType: false,

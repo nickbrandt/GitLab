@@ -53,8 +53,10 @@ export const createApprovers = count => {
     .map((_, id) => createUser(id));
 };
 
-export const createMergeRequests = ({ count = 1 } = {}) => {
+export const createMergeRequests = ({ count = 1, addPipeline = false } = {}) => {
   return Array(count)
     .fill()
-    .map((_, id) => createMergeRequest({ id }));
+    .map((_, id) =>
+      createMergeRequest({ id, pipeline: addPipeline ? createPipelineStatus('success') : null }),
+    );
 };

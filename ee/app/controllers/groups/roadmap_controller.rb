@@ -11,7 +11,7 @@ module Groups
     before_action :persist_roadmap_layout, only: [:show]
     before_action do
       push_frontend_feature_flag(:roadmap_buffered_rendering, @group)
-      push_frontend_feature_flag(:confidential_epics, @group)
+      push_frontend_feature_flag(:confidential_epics, @group, default_enabled: true)
     end
 
     # show roadmap for a group

@@ -196,7 +196,7 @@ GitLab can be considered to have two layers from a process perspective:
 - Process: `alertmanager`
 - GitLab.com: [Monitoring of GitLab.com](https://about.gitlab.com/handbook/engineering/monitoring/)
 
-[Alert manager](https://prometheus.io/docs/alerting/latest/alertmanager/) is a tool provided by Prometheus that _"handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integration such as email, PagerDuty, or OpsGenie. It also takes care of silencing and inhibition of alerts."_ You can read more in [issue #45740](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/45740) about what we will be alerting on.
+[Alert manager](https://prometheus.io/docs/alerting/latest/alertmanager/) is a tool provided by Prometheus that _"handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integration such as email, PagerDuty, or Opsgenie. It also takes care of silencing and inhibition of alerts."_ You can read more in [issue #45740](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/45740) about what we will be alerting on.
 
 #### Certificate management
 
@@ -369,7 +369,7 @@ Grafana is an open source, feature rich metrics dashboard and graph editor for G
 Jaeger, inspired by Dapper and OpenZipkin, is a distributed tracing system.
 It can be used for monitoring microservices-based distributed systems.
 
-For monitoring deployed apps, see [Jaeger tracing documentation](../user/project/operations/tracing.md)
+For monitoring deployed apps, see [Jaeger tracing documentation](../operations/tracing.md)
 
 #### Logrotate
 
@@ -567,7 +567,7 @@ For monitoring deployed apps, see the [Sentry integration docs](../user/project/
   - [GDK](https://gitlab.com/gitlab-org/gitlab/blob/master/config/gitlab.yml.example)
 - Layer: Core Service (Processor)
 - Process: `sidekiq`
-- GitLab.com: [Sidekiq](../user/gitlab_com/index.md#Sidekiq)
+- GitLab.com: [Sidekiq](../user/gitlab_com/index.md#sidekiq)
 
 Sidekiq is a Ruby background job processor that pulls jobs from the Redis queue and processes them. Background jobs allow GitLab to provide a faster request/response cycle by moving work into the background.
 

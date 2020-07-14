@@ -1,6 +1,6 @@
-export const mockSwimlanes = [
+export const mockLists = [
   {
-    id: 'gid://gitlab/List/1',
+    id: 1,
     title: 'Backlog',
     position: null,
     listType: 'backlog',
@@ -11,7 +11,7 @@ export const mockSwimlanes = [
     milestone: null,
   },
   {
-    id: 'gid://gitlab/List/10',
+    id: 10,
     title: 'To Do',
     position: 0,
     listType: 'label',
@@ -34,6 +34,56 @@ const defaultDescendantCounts = {
   closedIssues: 0,
 };
 
+const assignees = [
+  {
+    id: 'gid://gitlab/User/2',
+    username: 'angelina.herman',
+    name: 'Bernardina Bosco',
+    avatar: 'https://www.gravatar.com/avatar/eb7b664b13a30ad9f9ba4b61d7075470?s=80&d=identicon',
+    webUrl: 'http://127.0.0.1:3000/angelina.herman',
+  },
+];
+
+const labels = [
+  {
+    id: 'gid://gitlab/GroupLabel/5',
+    title: 'Cosync',
+    color: '#34ebec',
+    description: null,
+  },
+];
+
+const mockIssue = {
+  id: 'gid://gitlab/Issue/436',
+  iid: 27,
+  title: 'Issue 1',
+  referencePath: '#27',
+  dueDate: null,
+  timeEstimate: 0,
+  weight: null,
+  confidential: false,
+  path: '/gitlab-org/gitlab-test/-/issues/27',
+  assignees,
+  labels,
+};
+
+export const mockIssues = [
+  mockIssue,
+  {
+    id: 'gid://gitlab/Issue/437',
+    iid: 28,
+    title: 'Issue 2',
+    referencePath: '#28',
+    dueDate: null,
+    timeEstimate: 0,
+    weight: null,
+    confidential: false,
+    path: '/gitlab-org/gitlab-test/-/issues/28',
+    assignees,
+    labels,
+  },
+];
+
 export const mockEpic = {
   id: 1,
   iid: 1,
@@ -44,6 +94,7 @@ export const mockEpic = {
     openedIssues: 3,
     closedIssues: 2,
   },
+  issues: [mockIssue],
 };
 
 export const mockEpics = [

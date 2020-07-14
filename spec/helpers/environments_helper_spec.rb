@@ -23,6 +23,7 @@ RSpec.describe EnvironmentsHelper do
         'metrics-dashboard-base-path' => environment_metrics_path(environment),
         'current-environment-name' => environment.name,
         'documentation-path' => help_page_path('administration/monitoring/prometheus/index.md'),
+        'add-dashboard-documentation-path' => help_page_path('user/project/integrations/prometheus.md', anchor: 'adding-a-new-dashboard-to-your-project'),
         'empty-getting-started-svg-path' => match_asset_path('/assets/illustrations/monitoring/getting_started.svg'),
         'empty-loading-svg-path' => match_asset_path('/assets/illustrations/monitoring/loading.svg'),
         'empty-no-data-svg-path' => match_asset_path('/assets/illustrations/monitoring/no_data.svg'),
@@ -41,8 +42,24 @@ RSpec.describe EnvironmentsHelper do
         'custom-metrics-available' => 'true',
         'alerts-endpoint' => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
         'prometheus-alerts-available' => 'true',
-        'custom-dashboard-base-path' => Metrics::Dashboard::CustomDashboardService::DASHBOARD_ROOT
+        'custom-dashboard-base-path' => Metrics::Dashboard::CustomDashboardService::DASHBOARD_ROOT,
+        'operations-settings-path' => project_settings_operations_path(project),
+        'can-access-operations-settings' => 'true'
       )
+    end
+
+    context 'without admin_operations permission' do
+      before do
+        allow(helper).to receive(:can?)
+          .with(user, :admin_operations, project)
+          .and_return(false)
+      end
+
+      specify do
+        expect(metrics_data).to include(
+          'can-access-operations-settings' => 'false'
+        )
+      end
     end
 
     context 'without read_prometheus_alerts permission' do
@@ -95,6 +112,20 @@ RSpec.describe EnvironmentsHelper do
 
     it 'returns true' do
       expect(subject).to eq(true)
+    end
+  end
+
+  describe '#environment_logs_data' do
+    it 'returns logs data' do
+      expected_data = {
+        "environment-name": environment.name,
+        "environments-path": project_environments_path(project, format: :json),
+        "environment-id": environment.id,
+        "cluster-applications-documentation-path" => help_page_path('user/clusters/applications.md', anchor: 'elastic-stack'),
+        "clusters-path": project_clusters_path(project, format: :json)
+      }
+
+      expect(helper.environment_logs_data(project, environment)).to eq(expected_data)
     end
   end
 end

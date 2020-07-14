@@ -22,6 +22,7 @@ module EE
         mount_mutation ::Mutations::InstanceSecurityDashboard::AddProject
         mount_mutation ::Mutations::InstanceSecurityDashboard::RemoveProject
         mount_mutation ::Mutations::Pipelines::RunDastScan
+        mount_mutation ::Mutations::DastSiteProfiles::Create
       end
     end
   end

@@ -5,6 +5,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     ALLOWED_PARAMS_EE = [
+      :issues_enabled,
       :jenkins_url,
       :multiproject_enabled,
       :pass_unstable,

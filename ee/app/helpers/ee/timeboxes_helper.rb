@@ -37,7 +37,7 @@ module EE
         end
 
       if message
-        link = link_to "About burndown charts", help_page_path('user/project/milestones/index', anchor: 'burndown-charts'), class: 'burndown-docs-link'
+        link = link_to "About burndown charts", help_page_path('user/project/milestones/burndown_charts.md'), class: 'burndown-docs-link'
 
         content_tag(:div, (message + link).html_safe, id: "data-warning", class: "settings-message prepend-top-20")
       end

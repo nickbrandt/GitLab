@@ -1,6 +1,6 @@
 query groupIterations($fullPath: ID!, $title: String) {
   group(fullPath: $fullPath) {
-    iterations (title: $title) {
+    iterations(title: $title) {
       nodes {
         id
         title

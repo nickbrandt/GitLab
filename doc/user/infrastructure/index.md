@@ -36,6 +36,14 @@ To get started with a GitLab-managed Terraform State, there are two different op
 - [Use a local machine](#get-started-using-local-development).
 - [Use GitLab CI](#get-started-using-gitlab-ci).
 
+## Permissions for using Terraform
+
+In GitLab version 13.1, [Maintainer access](../permissions.md) was required to use a
+GitLab managed Terraform state backend. In GitLab versions 13.2 and greater,
+[Maintainer access](../permissions.md) is required to lock, unlock and write to the state
+(using `terraform apply`), while [Developer access](../permissions.md) is required to read
+the state (using `terraform plan -lock=false`).
+
 ## Get started using local development
 
 If you plan to only run `terraform plan` and `terraform apply` commands from your
@@ -54,8 +62,7 @@ local machine, this is a simple way to get started:
    ```
 
 1. Create a [Personal Access Token](../profile/personal_access_tokens.md) with
-   the `api` scope. The Terraform backend is restricted to users with
-   [Maintainer access](../permissions.md) to the repository.
+   the `api` scope.
 
 1. On your local machine, run `terraform init`, passing in the following options,
    replacing `<YOUR-PROJECT-NAME>`, `<YOUR-PROJECT-ID>`,  `<YOUR-USERNAME>` and
@@ -88,10 +95,6 @@ Next, [configure the backend](#configure-the-backend).
 
 After executing the `terraform init` command, you must configure the Terraform backend
 and the CI YAML file:
-
-CAUTION: **Important:**
-The Terraform backend is restricted to users with [Maintainer access](../permissions.md)
-to the repository.
 
 1. In your Terraform project, define the [HTTP backend](https://www.terraform.io/docs/backends/types/http.html)
    by adding the following code block in a `.tf` file (such as `backend.tf`) to
@@ -220,6 +223,18 @@ can configure this manually as follows:
      - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
    ```
 
+   NOTE: **Note:**
+   In distributions that use Bash (for example, Ubuntu), `alias` statements are not
+   expanded in non-interactive mode. If your pipelines fail with the error
+   `convert_report: command not found`, alias expansion can be activated explicitly
+   by adding a `shopt` command to your script:
+
+   ```yaml
+   before_script:
+     - shopt -s expand_aliases
+     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
+   ```
+
 1. Define a `script` that runs `terraform plan` and `terraform show`. These commands
    pipe the output and convert the relevant bits into a store variable `PLAN_JSON`.
    This JSON is used to create a
@@ -245,7 +260,7 @@ can configure this manually as follows:
 
 1. Running the pipeline displays the widget in the merge request, like this:
 
-   ![MR Terraform widget](img/terraform_plan_widget_v13_2.png)
+   ![Merge Request Terraform widget](img/terraform_plan_widget_v13_2.png)
 
 1. Clicking the **View Full Log** button in the widget takes you directly to the
    plan output present in the pipeline logs:

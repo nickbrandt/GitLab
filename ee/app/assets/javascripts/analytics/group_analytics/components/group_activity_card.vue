@@ -5,7 +5,11 @@ import createFlash from '~/flash';
 import { mergeUrlParams } from '~/lib/utils/url_utility';
 import MetricCard from '../../shared/components/metric_card.vue';
 
-const ENABLED_REPORT_PAGES = ['mergeRequests'];
+const REPORT_PAGE_CONFIGURATION = {
+  mergeRequests: {
+    id: 'recent_merge_requests_by_group',
+  },
+};
 
 export default {
   name: 'GroupActivityCard',
@@ -63,7 +67,7 @@ export default {
         });
     },
     displayReportLink(key) {
-      return this.enableReportPages && ENABLED_REPORT_PAGES.includes(key);
+      return this.enableReportPages && Object.keys(REPORT_PAGE_CONFIGURATION).includes(key);
     },
     generateReportPageLink(key) {
       return this.displayReportLink(key)
@@ -71,6 +75,7 @@ export default {
             {
               groupPath: this.groupFullPath,
               groupName: this.groupName,
+              reportId: REPORT_PAGE_CONFIGURATION[key].id,
             },
             this.reportPagesPath,
           )

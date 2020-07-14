@@ -25,7 +25,7 @@ RSpec.describe 'Promotions', :js do
 
     context 'when service desk is not supported' do
       before do
-        allow(::EE::Gitlab::ServiceDesk).to receive(:supported?).and_return(false)
+        allow(::Gitlab::ServiceDesk).to receive(:supported?).and_return(false)
       end
 
       it 'appears in project edit page' do
@@ -51,7 +51,7 @@ RSpec.describe 'Promotions', :js do
 
     context 'when service desk is supported' do
       before do
-        allow(::EE::Gitlab::ServiceDesk).to receive(:supported?).and_return(true)
+        allow(::Gitlab::ServiceDesk).to receive(:supported?).and_return(true)
       end
 
       it 'does not show promotion' do

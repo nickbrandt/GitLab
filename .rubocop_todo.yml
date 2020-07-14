@@ -303,6 +303,11 @@ Performance/Detect:
 RSpec/ContextWording:
   Enabled: false
 
+# Offense count: 626
+# Cop supports --auto-correct.
+RSpec/EmptyLineAfterLetBlock:
+  Enabled: false
+
 # Offense count: 1121
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
@@ -666,18 +671,6 @@ Style/RedundantFreeze:
 Style/RedundantInterpolation:
   Enabled: false
 
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/RedundantParentheses:
-  Exclude:
-    - 'ee/app/models/ee/merge_request.rb'
-
-# Offense count: 33
-# Cop supports --auto-correct.
-# Configuration parameters: AllowMultipleReturnValues.
-Style/RedundantReturn:
-  Enabled: false
-
 # Offense count: 801
 # Cop supports --auto-correct.
 Style/RedundantSelf:
@@ -750,14 +743,6 @@ Style/SymbolProc:
 # Configuration parameters: AllowImplicitReturn, AllowedReceivers.
 Rails/SaveBang:
   Exclude:
-    - 'ee/spec/controllers/boards/issues_controller_spec.rb'
-    - 'ee/spec/controllers/boards/lists_controller_spec.rb'
-    - 'ee/spec/controllers/ee/sent_notifications_controller_spec.rb'
-    - 'ee/spec/controllers/groups/epic_issues_controller_spec.rb'
-    - 'ee/spec/controllers/groups/epic_links_controller_spec.rb'
-    - 'ee/spec/controllers/groups/epics_controller_spec.rb'
-    - 'ee/spec/controllers/groups/roadmap_controller_spec.rb'
-    - 'ee/spec/controllers/groups/sso_controller_spec.rb'
     - 'ee/spec/controllers/projects/environments_controller_spec.rb'
     - 'ee/spec/controllers/projects/issues_controller_spec.rb'
     - 'ee/spec/controllers/projects/merge_requests/creations_controller_spec.rb'
@@ -859,7 +844,7 @@ Rails/SaveBang:
     - 'ee/spec/models/operations/feature_flag_spec.rb'
     - 'ee/spec/models/operations/feature_flags/strategy_spec.rb'
     - 'ee/spec/models/operations/feature_flags/user_list_spec.rb'
-    - 'ee/spec/models/packages/package_spec.rb'
+    - 'spec/models/packages/package_spec.rb'
     - 'ee/spec/models/project_ci_cd_setting_spec.rb'
     - 'ee/spec/models/project_services/github_service_spec.rb'
     - 'ee/spec/models/project_services/jenkins_service_spec.rb'
@@ -940,7 +925,6 @@ Rails/SaveBang:
     - 'ee/spec/services/merge_requests/remove_approval_service_spec.rb'
     - 'ee/spec/services/merge_requests/update_blocks_service_spec.rb'
     - 'ee/spec/services/merge_trains/refresh_merge_request_service_spec.rb'
-    - 'ee/spec/services/packages/conan/create_package_file_service_spec.rb'
     - 'ee/spec/services/projects/after_rename_service_spec.rb'
     - 'ee/spec/services/projects/import_export/export_service_spec.rb'
     - 'ee/spec/services/projects/update_mirror_service_spec.rb'
@@ -1417,6 +1401,7 @@ Rails/SaveBang:
     - 'spec/services/notes/create_service_spec.rb'
     - 'spec/services/notification_recipients/build_service_spec.rb'
     - 'spec/services/notification_service_spec.rb'
+    - 'spec/services/packages/conan/create_package_file_service_spec.rb'
     - 'spec/services/projects/after_rename_service_spec.rb'
     - 'spec/services/projects/autocomplete_service_spec.rb'
     - 'spec/services/projects/create_service_spec.rb'

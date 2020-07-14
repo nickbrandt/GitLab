@@ -44,4 +44,38 @@ RSpec.describe Geo::ProjectRegistryFinder, :geo do
       expect(registries).to match_ids(registry_project_2, registry_project_3)
     end
   end
+
+  describe '#find_project_ids_pending_verification' do
+    it 'returns project IDs where repository and/or wiki is pending verification' do
+      project_ids = subject.find_project_ids_pending_verification(batch_size: 10)
+
+      expect(project_ids).to match_array([project_1.id, project_4.id, project_5.id])
+    end
+
+    it 'excludes registries where repository and wiki is missing on primary' do
+      registry_project_7 = create(:geo_project_registry, :synced, repository_missing_on_primary: true)
+      registry_project_8 = create(:geo_project_registry, :synced, wiki_missing_on_primary: true)
+      create(:geo_project_registry, :synced, repository_missing_on_primary: true, wiki_missing_on_primary: true)
+
+      project_ids = subject.find_project_ids_pending_verification(batch_size: 10)
+
+      expect(project_ids).to match_array([project_1.id, project_4.id, project_5.id, registry_project_7.project_id, registry_project_8.project_id])
+    end
+
+    it 'excludes registries where repository and wiki has not been verified on primary' do
+      registry_project_7 = create(:geo_project_registry, :synced, primary_repository_checksummed: false)
+      registry_project_8 = create(:geo_project_registry, :synced, primary_wiki_checksummed: false)
+      create(:geo_project_registry, :synced, primary_repository_checksummed: false, primary_wiki_checksummed: false)
+
+      project_ids = subject.find_project_ids_pending_verification(batch_size: 10)
+
+      expect(project_ids).to match_array([project_1.id, project_4.id, project_5.id, registry_project_7.project_id, registry_project_8.project_id])
+    end
+
+    it 'excludes except_ids' do
+      project_ids = subject.find_project_ids_pending_verification(batch_size: 10, except_ids: [project_5.id])
+
+      expect(project_ids).to match_array([project_1.id, project_4.id])
+    end
+  end
 end

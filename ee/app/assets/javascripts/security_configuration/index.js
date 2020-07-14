@@ -1,11 +1,12 @@
 import Vue from 'vue';
+import { parseBooleanDataAttributes } from '~/lib/utils/dom_utils';
 import SecurityConfigurationApp from './components/app.vue';
 
 export default function init() {
   const el = document.getElementById('js-security-configuration');
   const {
-    autoDevopsEnabled,
     autoDevopsHelpPagePath,
+    autoDevopsPath,
     features,
     helpPagePath,
     latestPipelinePath,
@@ -17,11 +18,6 @@ export default function init() {
     toggleAutofixSettingEndpoint,
   } = el.dataset;
 
-  // When canToggleAutoFixSettings is false in the backend, it is undefined in the frontend,
-  // and when it's true in the backend, it comes in as an empty string in the frontend. The next
-  // line ensures that we cast it to a boolean.
-  const canToggleAutoFixSettings = el.dataset.canToggleAutoFixSettings !== undefined;
-
   return new Vue({
     el,
     components: {
@@ -30,19 +26,24 @@ export default function init() {
     render(createElement) {
       return createElement(SecurityConfigurationApp, {
         props: {
-          autoDevopsEnabled,
           autoDevopsHelpPagePath,
+          autoDevopsPath,
           features: JSON.parse(features),
           helpPagePath,
           latestPipelinePath,
+          ...parseBooleanDataAttributes(el, [
+            'autoDevopsEnabled',
+            'canEnableAutoDevops',
+            'gitlabCiPresent',
+          ]),
           autoFixSettingsProps: {
             autoFixEnabled: JSON.parse(autoFixEnabled),
             autoFixHelpPath,
             autoFixUserPath,
             containerScanningHelpPath,
             dependencyScanningHelpPath,
-            canToggleAutoFixSettings,
             toggleAutofixSettingEndpoint,
+            ...parseBooleanDataAttributes(el, ['canToggleAutoFixSettings']),
           },
         },
       });

@@ -57,14 +57,14 @@ RSpec.describe 'User creates feature flag', :js do
       select 'All users', from: 'Type'
     end
     within_strategy_row(2) do
-      select 'Percent rollout (logged in users)', from: 'Type'
+      select 'Percent of users', from: 'Type'
     end
     within_strategy_row(1) do
       delete_strategy_button.click
     end
 
     within_strategy_row(1) do
-      expect(page).to have_select('Type', selected: 'Percent rollout (logged in users)')
+      expect(page).to have_select('Type', selected: 'Percent of users')
     end
   end
 

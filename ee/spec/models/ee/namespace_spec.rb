@@ -271,7 +271,7 @@ RSpec.describe Namespace do
     it 'only checks the plan once' do
       expect(group).to receive(:load_feature_available).once.and_call_original
 
-      2.times { group.feature_available?(:service_desk) }
+      2.times { group.feature_available?(:push_rules) }
     end
 
     context 'when checking namespace plan' do
@@ -1307,6 +1307,18 @@ RSpec.describe Namespace do
       end
 
       it { is_expected.to be false }
+    end
+  end
+
+  describe '#over_storage_limit?' do
+    before do
+      allow_next_instance_of(::Namespace::RootStorageSize, namespace.root_ancestor) do |project|
+        allow(project).to receive(:above_size_limit?).and_return(true)
+      end
+    end
+
+    it 'returns a boolean indicating whether the root namespace is over the storage limit' do
+      expect(namespace.over_storage_limit?).to be true
     end
   end
 

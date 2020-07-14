@@ -4,7 +4,19 @@ module Gitlab
   module Database
     include Gitlab::Metrics::Methods
 
+    # Minimum PostgreSQL version requirement per documentation:
+    # https://docs.gitlab.com/ee/install/requirements.html#postgresql-requirements
     MINIMUM_POSTGRES_VERSION = 11
+
+    # Upcoming PostgreSQL version requirements
+    # Allows a soft warning about an upcoming minimum version requirement
+    # so administrators can prepare to upgrade
+    UPCOMING_POSTGRES_VERSION_DETAILS = {
+      gl_version: '13.6.0',
+      gl_version_date: 'November 2020',
+      pg_version_minimum: 12,
+      url: 'https://gitlab.com/groups/gitlab-org/-/epics/2374'
+    }.freeze
 
     # https://www.postgresql.org/docs/9.2/static/datatype-numeric.html
     MAX_INT_VALUE = 2147483647
@@ -99,16 +111,12 @@ module Gitlab
       version.to_f < 10
     end
 
-    def self.replication_slots_supported?
-      version.to_f >= 9.4
-    end
-
     def self.postgresql_minimum_supported_version?
       version.to_f >= MINIMUM_POSTGRES_VERSION
     end
 
-    def self.upsert_supported?
-      version.to_f >= 9.5
+    def self.postgresql_upcoming_deprecation?
+      version.to_f < UPCOMING_POSTGRES_VERSION_DETAILS[:pg_version_minimum]
     end
 
     def self.check_postgres_version_and_print_warning
@@ -221,9 +229,7 @@ module Gitlab
         VALUES #{tuples.map { |tuple| "(#{tuple.join(', ')})" }.join(', ')}
       EOF
 
-      if upsert_supported? && on_conflict == :do_nothing
-        sql = "#{sql} ON CONFLICT DO NOTHING"
-      end
+      sql = "#{sql} ON CONFLICT DO NOTHING" if on_conflict == :do_nothing
 
       sql = "#{sql} RETURNING id" if return_ids
 

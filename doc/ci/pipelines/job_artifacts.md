@@ -251,11 +251,22 @@ dashboards.
 > - Introduced in GitLab 11.5.
 > - Requires GitLab Runner 11.5 and above.
 
-The `performance` report collects [Performance metrics](../../user/project/merge_requests/browser_performance_testing.md)
+The `performance` report collects [Browser Performance Testing metrics](../../user/project/merge_requests/browser_performance_testing.md)
 as artifacts.
 
-The collected Performance report will be uploaded to GitLab as an artifact and will
+The collected Browser Performance report will be uploaded to GitLab as an artifact and will
 be automatically shown in merge requests.
+
+#### `artifacts:reports:load_performance` **(PREMIUM)**
+
+> - Introduced in [GitLab 13.2](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/35260) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.2.
+> - Requires GitLab Runner 11.5 and above.
+
+The `load_performance` report collects [Load Performance Testing metrics](../../user/project/merge_requests/load_performance_testing.md)
+as artifacts.
+
+The report is uploaded to GitLab as an artifact and is
+shown in merge requests automatically.
 
 #### `artifacts:reports:metrics` **(PREMIUM)**
 

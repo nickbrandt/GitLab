@@ -41,7 +41,6 @@ module EE
       has_one :github_service
       has_one :gitlab_slack_application_service
 
-      has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
       has_one :status_page_setting, inverse_of: :project, class_name: 'StatusPage::ProjectSetting'
@@ -75,8 +74,6 @@ module EE
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
       has_many :software_licenses, through: :software_license_policies
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
-      has_many :packages, class_name: 'Packages::Package'
-      has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
       has_many :merge_trains, foreign_key: 'target_project_id', inverse_of: :target_project
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
@@ -123,7 +120,6 @@ module EE
       scope :with_active_jira_services, -> { joins(:services).merge(::JiraService.active) }
       scope :with_jira_dvcs_cloud, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: true)) }
       scope :with_jira_dvcs_server, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false)) }
-      scope :service_desk_enabled, -> { where(service_desk_enabled: true) }
       scope :github_imported, -> { where(import_type: 'github') }
       scope :with_protected_branches, -> { joins(:protected_branches) }
       scope :with_repositories_enabled, -> { joins(:project_feature).where(project_features: { repository_access_level: ::ProjectFeature::ENABLED }) }
@@ -134,7 +130,6 @@ module EE
       scope :with_active_prometheus_service, -> { joins(:prometheus_service).merge(PrometheusService.active) }
       scope :with_enabled_error_tracking, -> { joins(:error_tracking_setting).where(project_error_tracking_settings: { enabled: true }) }
       scope :with_tracing_enabled, -> { joins(:tracing_setting) }
-      scope :with_packages, -> { joins(:packages) }
       scope :mirrored_with_enabled_pipelines, -> do
         joins(:project_feature).mirror.where(mirror_trigger_builds: true,
                                              project_features: { builds_access_level: ::ProjectFeature::ENABLED })
@@ -183,8 +178,6 @@ module EE
         validates :mirror_user, presence: true
       end
 
-      default_value_for :packages_enabled, true
-
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :status_page_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :compliance_framework_setting, update_only: true, allow_destroy: true
@@ -204,15 +197,14 @@ module EE
           .where('services.id IS NULL')
       end
 
-      def find_by_service_desk_project_key(key)
-        # project_key is not indexed for now
-        # see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24063#note_282435524 for details
-        joins(:service_desk_setting).find_by('service_desk_settings.project_key' => key)
-      end
-
       override :with_web_entity_associations
       def with_web_entity_associations
-        super.preload(:compliance_framework_setting)
+        super.preload(:compliance_framework_setting, group: [:ip_restrictions, :saml_provider])
+      end
+
+      override :with_api_entity_associations
+      def with_api_entity_associations
+        super.preload(group: [:ip_restrictions, :saml_provider])
       end
     end
 
@@ -321,6 +313,10 @@ module EE
       end
     end
 
+    def jira_issues_integration_available?
+      feature_available?(:jira_issues_integration)
+    end
+
     def multiple_approval_rules_available?
       feature_available?(:multiple_approval_rules)
     end
@@ -333,21 +329,6 @@ module EE
       mirror? &&
         feature_available?(:ci_cd_projects) &&
         feature_available?(:github_project_service_integration)
-    end
-
-    override :service_desk_enabled
-    def service_desk_enabled
-      ::EE::Gitlab::ServiceDesk.enabled?(project: self)
-    end
-    alias_method :service_desk_enabled?, :service_desk_enabled
-
-    def service_desk_address
-      return unless service_desk_enabled?
-
-      config = ::Gitlab.config.incoming_email
-      wildcard = ::Gitlab::IncomingEmail::WILDCARD_PLACEHOLDER
-
-      config.address&.gsub(wildcard, "#{full_path_slug}-#{id}-issue-")
     end
 
     override :add_import_job
@@ -541,7 +522,7 @@ module EE
     override :disabled_services
     def disabled_services
       strong_memoize(:disabled_services) do
-        [].tap do |services|
+        super.tap do |services|
           services.push('jenkins') unless feature_available?(:jenkins_integration)
           services.push('github') unless feature_available?(:github_project_service_integration)
           ::Gitlab::CurrentSettings.slack_app_enabled ? services.push('slack_slash_commands') : services.push('gitlab_slack_application')
@@ -610,15 +591,6 @@ module EE
       feature_available?(:protected_environments)
     end
 
-    # Because we use default_value_for we need to be sure
-    # packages_enabled= method does exist even if we rollback migration.
-    # Otherwise many tests from spec/migrations will fail.
-    def packages_enabled=(value)
-      if has_attribute?(:packages_enabled)
-        write_attribute(:packages_enabled, value)
-      end
-    end
-
     # Update the default branch querying the remote to determine its HEAD
     def update_root_ref(remote_name)
       root_ref = repository.find_remote_root_ref(remote_name)
@@ -628,14 +600,6 @@ module EE
     def feature_flags_client_token
       instance = operations_feature_flags_client || create_operations_feature_flags_client!
       instance.token
-    end
-
-    def root_namespace
-      if namespace.has_parent?
-        namespace.root_ancestor
-      else
-        namespace
-      end
     end
 
     override :lfs_http_url_to_repo
@@ -650,17 +614,10 @@ module EE
       super.presence || build_feature_usage
     end
 
-    def package_already_taken?(package_name)
-      namespace.root_ancestor.all_projects
-        .joins(:packages)
-        .where.not(id: id)
-        .merge(Packages::Package.with_name(package_name))
-        .exists?
-    end
-
     def adjourned_deletion?
       feature_available?(:adjourned_deletion_for_projects_and_groups) &&
-        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+        ::Gitlab::CurrentSettings.deletion_adjourned_period.positive? &&
+        group_deletion_mode_configured?
     end
 
     def marked_for_deletion?
@@ -794,8 +751,14 @@ module EE
         end
       end
     end
+
+    # If the feature to configure project deletion mode is NOT enabled, we default to delayed deletion
+    def group_deletion_mode_configured?
+      return true unless ::Feature.enabled?(:configure_project_deletion_mode, self)
+
+      group && group.delayed_project_removal? # Return the group's setting for delayed deletion, false for user namespace projects
+    end
   end
 end
 
 EE::Project.include_if_ee('::EE::GitlabRoutingHelper')
-EE::Project.include_if_ee('::EE::DeploymentPlatform')

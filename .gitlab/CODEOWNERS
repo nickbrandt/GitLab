@@ -13,6 +13,7 @@
 /doc/development/ @marcia @mjang1
 /doc/development/documentation/ @mikelewis
 /doc/ci @marcel.amirault @sselhorn
+/doc/operations @aqualls @eread
 /doc/user/clusters @aqualls
 /doc/user/infrastructure @aqualls
 /doc/user/project/clusters @aqualls
@@ -43,7 +44,7 @@
 # Feature specific owners
 /ee/lib/ee/gitlab/auth/ldap/ @dblessing @mkozono
 /lib/gitlab/auth/ldap/ @dblessing @mkozono
-/lib/gitlab/ci/templates/ @nolith @zj
+/lib/gitlab/ci/templates/ @nolith @dosuken123
 /lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml @DylanGriffith @mayra-cabrera @tkuah
 /lib/gitlab/ci/templates/Security/ @plafoucriere @gonzoyumo @twoodham @sethgitlab
 /ee/app/models/project_alias.rb @patrickbajao

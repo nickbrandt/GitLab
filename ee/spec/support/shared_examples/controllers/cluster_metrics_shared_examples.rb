@@ -74,21 +74,6 @@ RSpec.shared_examples 'cluster metrics' do
     end
   end
 
-  shared_examples 'the default dashboard' do
-    it 'returns a json object with the correct keys' do
-      get :metrics_dashboard, params: metrics_params, format: :json
-
-      expect(response).to have_gitlab_http_status(:ok)
-      expect(json_response.keys).to contain_exactly('dashboard', 'status', 'metrics_data')
-    end
-
-    it 'is the default dashboard' do
-      get :metrics_dashboard, params: metrics_params, format: :json
-
-      expect(json_response['dashboard']['dashboard']).to eq('Cluster health')
-    end
-  end
-
   private
 
   def go

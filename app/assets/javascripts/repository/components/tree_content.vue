@@ -3,9 +3,8 @@ import createFlash from '~/flash';
 import { __ } from '../../locale';
 import FileTable from './table/index.vue';
 import getRefMixin from '../mixins/get_ref';
-import filesQuery from '../queries/files.query.graphql';
-import projectPathQuery from '../queries/project_path.query.graphql';
-import vueFileListLfsBadgeQuery from '../queries/vue_file_list_lfs_badge.query.graphql';
+import getFiles from '../queries/getFiles.query.graphql';
+import getProjectPath from '../queries/getProjectPath.query.graphql';
 import FilePreview from './preview/index.vue';
 import { readmeFile } from '../utils/readme';
 
@@ -19,10 +18,7 @@ export default {
   mixins: [getRefMixin],
   apollo: {
     projectPath: {
-      query: projectPathQuery,
-    },
-    vueFileListLfsBadge: {
-      query: vueFileListLfsBadgeQuery,
+      query: getProjectPath,
     },
   },
   props: {
@@ -47,7 +43,6 @@ export default {
         blobs: [],
       },
       isLoadingFiles: false,
-      vueFileListLfsBadge: false,
     };
   },
   computed: {
@@ -75,14 +70,13 @@ export default {
 
       return this.$apollo
         .query({
-          query: filesQuery,
+          query: getFiles,
           variables: {
             projectPath: this.projectPath,
             ref: this.ref,
             path: this.path || '/',
             nextPageCursor: this.nextPageCursor,
             pageSize: PAGE_SIZE,
-            vueLfsEnabled: this.vueFileListLfsBadge,
           },
         })
         .then(({ data }) => {

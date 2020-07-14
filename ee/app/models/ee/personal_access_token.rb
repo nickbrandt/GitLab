@@ -17,7 +17,7 @@ module EE
 
       scope :with_no_expires_at, -> { where(revoked: false, expires_at: nil) }
       scope :with_expires_at_after, ->(max_lifetime) { where(revoked: false).where('expires_at > ?', max_lifetime) }
-      scope :expires_in, ->(within) { not_revoked.where('expires_at > NOW() AND expires_at <= ?', within) }
+      scope :expires_in, ->(within) { not_revoked.where('expires_at > CURRENT_DATE AND expires_at <= ?', within) }
       scope :created_on_or_after, ->(date) { active.where('created_at >= ?', date) }
 
       with_options if: :expiration_policy_enabled? do

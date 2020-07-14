@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  RSpec.describe 'Plan' do
     describe 'Jira issue import', :jira, :orchestrated, :requires_admin do
       let(:jira_project_key) { "JITD" }
       let(:jira_issue_title) { "[#{jira_project_key}-1] Jira to GitLab Test Issue" }
@@ -22,6 +22,8 @@ module QA
           Page::Project::Menu.perform(&:click_issues)
 
           Page::Project::Issue::Index.perform do |issues_page|
+            expect(issues_page).to have_content("2 issues successfully imported")
+
             issues_page.click_issue_link(jira_issue_title)
           end
         end

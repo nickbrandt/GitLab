@@ -637,6 +637,12 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
           ParenthesesBetweenTokens)tokenAfterParentheses
           a.b.c=missing_token_around_equals
 
+          def self.ruby_method_name(ruby_method_arg)
+          RubyClassInvoking.ruby_method_call(with_arg)
+
+          def self.ruby_method_123(ruby_another_method_arg)
+          RubyClassInvoking.ruby_call_method_123(with_arg)
+
         FILE
       end
       let(:file_name) { 'elastic_specialchars_test.md' }
@@ -702,6 +708,22 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
       it 'finds a token after = without a space' do
         expect(search_for('missing_token_around_equals')).to include(file_name)
+      end
+
+      it 'finds a ruby method name even if preceeded with dot' do
+        expect(search_for('ruby_method_name')).to include(file_name)
+      end
+
+      it 'finds a ruby method name with numbers' do
+        expect(search_for('ruby_method_123')).to include(file_name)
+      end
+
+      it 'finds a ruby method call even if preceeded with dot' do
+        expect(search_for('ruby_method_call')).to include(file_name)
+      end
+
+      it 'finds a ruby method call with numbers' do
+        expect(search_for('ruby_call_method_123')).to include(file_name)
       end
     end
   end

@@ -25,7 +25,9 @@ query groupEpics(
       edges {
         node {
           ...BaseEpic
-          parent { id }
+          parent {
+            id
+          }
         }
       }
     }

@@ -1,6 +1,8 @@
 <script>
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import { mapActions, mapState, mapGetters } from 'vuex';
+import { sprintf, __ } from '~/locale';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
@@ -19,6 +21,7 @@ import CustomStageForm from './custom_stage_form.vue';
 import PathNavigation from './path_navigation.vue';
 import MetricCard from '../../shared/components/metric_card.vue';
 import FilterBar from './filter_bar.vue';
+import ValueStreamSelect from './value_stream_select.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -38,6 +41,7 @@ export default {
     PathNavigation,
     MetricCard,
     FilterBar,
+    ValueStreamSelect,
   },
   mixins: [UrlSyncMixin],
   props: {
@@ -111,8 +115,14 @@ export default {
       // https://gitlab.com/gitlab-org/gitlab/-/issues/223735
       return this.featureFlags.hasFilterBar && this.currentGroupPath;
     },
+    shouldDisplayCreateMultipleValueStreams() {
+      return Boolean(this.featureFlags.hasCreateMultipleValueStreams);
+    },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
+    },
+    isXSBreakpoint() {
+      return bp.getBreakpointSize() === 'xs';
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -190,6 +200,10 @@ export default {
     onStageReorder(data) {
       this.reorderStage(data);
     },
+    onCreateValueStream({ name }) {
+      // stub - this will eventually trigger a vuex action
+      this.$toast.show(sprintf(__("'%{name}' Value Stream created"), { name }));
+    },
   },
   multiProjectSelect: true,
   dateOptions: [7, 30, 90],
@@ -208,8 +222,19 @@ export default {
 </script>
 <template>
   <div>
-    <div class="mb-3">
+    <div
+      class="gl-mb-3 gl-display-flex gl-flex-direction-column gl-sm-flex-direction-row gl-justify-content-space-between"
+    >
       <h3>{{ __('Value Stream Analytics') }}</h3>
+      <value-stream-select
+        v-if="shouldDisplayCreateMultipleValueStreams"
+        class="gl-align-self-center"
+        :class="{
+          'gl-w-full': isXSBreakpoint,
+          'gl-mt-5': !isXSBreakpoint,
+        }"
+        @create="onCreateValueStream"
+      />
     </div>
     <div class="mw-100">
       <div class="mt-3 py-2 px-3 bg-gray-light border-top border-bottom">

@@ -24,7 +24,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
       class="float-right d-flex"
     >
       <icon-stub
-        class="help-icon append-right-5"
+        class="help-icon gl-mr-2"
         name="question-o"
         size="16"
         tabindex="0"
@@ -56,7 +56,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
       />
        
       <span
-        class="prepend-left-5"
+        class="gl-ml-2"
       >
         Fixed:
       </span>
@@ -85,7 +85,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
       />
        
       <span
-        class="prepend-left-5"
+        class="gl-ml-2"
       >
         Inherited:
       </span>

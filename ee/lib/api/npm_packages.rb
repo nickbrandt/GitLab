@@ -27,7 +27,7 @@ module API
 
     desc 'Get all tags for a given an NPM package' do
       detail 'This feature was introduced in GitLab 12.7'
-      success EE::API::Entities::NpmPackageTag
+      success ::API::Entities::NpmPackageTag
     end
     params do
       requires :package_name, type: String, desc: 'Package name'
@@ -44,7 +44,7 @@ module API
                                               .execute
 
       present ::Packages::Npm::PackagePresenter.new(package_name, packages),
-              with: EE::API::Entities::NpmPackageTag
+              with: ::API::Entities::NpmPackageTag
     end
 
     params do
@@ -118,7 +118,7 @@ module API
           .new(project_by_package_name, package_name).execute
 
         present ::Packages::Npm::PackagePresenter.new(package_name, packages),
-          with: EE::API::Entities::NpmPackage
+          with: ::API::Entities::NpmPackage
       end
     end
 

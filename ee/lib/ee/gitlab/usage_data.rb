@@ -37,7 +37,8 @@ module EE
           super + [
             ::Gitlab::UsageDataCounters::LicensesList,
             ::Gitlab::UsageDataCounters::IngressModsecurityCounter,
-            StatusPage::UsageDataCounters::IncidentCounter
+            StatusPage::UsageDataCounters::IncidentCounter,
+            ::Gitlab::UsageDataCounters::NetworkPolicyCounter
           ]
         end
 
@@ -97,6 +98,13 @@ module EE
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
+        def approval_rules_counts
+          {
+            approval_project_rules: count(ApprovalProjectRule),
+            approval_project_rules_with_target_branch: count(ApprovalProjectRulesProtectedBranch, :approval_project_rule_id)
+          }
+        end
+
         def service_desk_counts
           projects_with_service_desk = ::Project.where(service_desk_enabled: true)
 
@@ -210,44 +218,33 @@ module EE
         override :usage_activity_by_stage_create
         def usage_activity_by_stage_create(time_period)
           super.merge({
-            deploy_keys: distinct_count(::DeployKey.where(time_period), :user_id),
-            keys: distinct_count(::Key.regular_keys.where(time_period), :user_id),
-            merge_requests: distinct_count(::MergeRequest.where(time_period), :author_id),
             projects_enforcing_code_owner_approval: distinct_count(::Project.requiring_code_owner_approval.where(time_period), :creator_id),
             merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional.where(time_period), :merge_request_id),
             merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required.where(time_period), :merge_request_id),
-            projects_with_disable_overriding_approvers_per_merge_request: count(::Project.where(time_period.merge(disable_overriding_approvers_per_merge_request: true))),
-            projects_without_disable_overriding_approvers_per_merge_request: count(::Project.where(time_period.merge(disable_overriding_approvers_per_merge_request: [false, nil]))),
             projects_imported_from_github: distinct_count(::Project.github_imported.where(time_period), :creator_id),
             projects_with_repositories_enabled: distinct_count(::Project.with_repositories_enabled.where(time_period),
                                                                :creator_id,
                                                                start: user_minimum_id,
                                                                finish: user_maximum_id),
             protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id, start: user_minimum_id, finish: user_maximum_id),
-            remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
-            snippets: distinct_count(::Snippet.where(time_period), :author_id),
             suggestions: distinct_count(::Note.with_suggestions.where(time_period),
                                         :author_id,
                                         start: user_minimum_id,
                                         finish: user_maximum_id)
-          })
+          }, approval_rules_counts)
         end
 
         # Omitted because no user, creator or author associated: `campaigns_imported_from_github`, `ldap_group_links`
         override :usage_activity_by_stage_manage
         def usage_activity_by_stage_manage(time_period)
           super.merge({
-            events: distinct_count(::Event.where(time_period), :author_id),
-            groups: distinct_count(::GroupMember.where(time_period), :user_id),
             ldap_keys: distinct_count(::LDAPKey.where(time_period), :user_id),
             ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id),
-            users_created: count(::User.where(time_period), start: user_minimum_id, finish: user_maximum_id),
             value_stream_management_customized_group_stages: count(::Analytics::CycleAnalytics::GroupStage.where(custom: true)),
             projects_with_compliance_framework: count(::ComplianceManagement::ComplianceFramework::ProjectSettings),
             ldap_servers: ldap_available_servers.size,
             ldap_group_sync_enabled: ldap_config_present_for_any_provider?(:group_base),
             ldap_admin_sync_enabled: ldap_config_present_for_any_provider?(:admin_group),
-            omniauth_providers: filtered_omniauth_provider_names.reject { |name| name == 'group_saml' },
             group_saml_enabled: omniauth_provider_names.include?('group_saml')
           })
         end
@@ -277,17 +274,13 @@ module EE
           super.merge({
             assignee_lists: distinct_count(::List.assignee.where(time_period), :user_id),
             epics: distinct_count(::Epic.where(time_period), :author_id),
-            issues: distinct_count(::Issue.where(time_period), :author_id),
             label_lists: distinct_count(::List.label.where(time_period), :user_id),
             milestone_lists: distinct_count(::List.milestone.where(time_period), :user_id),
-            notes: distinct_count(::Note.where(time_period), :author_id),
-            projects: distinct_count(::Project.where(time_period), :creator_id),
             projects_jira_active: distinct_count(::Project.with_active_jira_services.where(time_period), :creator_id),
             projects_jira_dvcs_cloud_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_cloud.where(time_period), :creator_id),
             projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id),
             service_desk_enabled_projects: distinct_count_service_desk_enabled_projects(time_period),
-            service_desk_issues: count(::Issue.service_desk.where(time_period)),
-            todos: distinct_count(::Todo.where(time_period), :author_id)
+            service_desk_issues: count(::Issue.service_desk.where(time_period))
           })
         end
 
@@ -295,11 +288,7 @@ module EE
         override :usage_activity_by_stage_release
         def usage_activity_by_stage_release(time_period)
           super.merge({
-            deployments: distinct_count(::Deployment.where(time_period), :user_id),
-            failed_deployments: distinct_count(::Deployment.failed.where(time_period), :user_id),
-            projects_mirrored_with_pipelines_enabled: distinct_count(::Project.mirrored_with_enabled_pipelines.where(time_period), :creator_id),
-            releases: distinct_count(::Release.where(time_period), :author_id),
-            successful_deployments: distinct_count(::Deployment.success.where(time_period), :user_id)
+            projects_mirrored_with_pipelines_enabled: distinct_count(::Project.mirrored_with_enabled_pipelines.where(time_period), :creator_id)
           })
         end
 
@@ -307,15 +296,6 @@ module EE
         override :usage_activity_by_stage_verify
         def usage_activity_by_stage_verify(time_period)
           super.merge({
-            ci_builds: distinct_count(::Ci::Build.where(time_period), :user_id),
-            ci_external_pipelines: distinct_count(::Ci::Pipeline.external.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_internal_pipelines: distinct_count(::Ci::Pipeline.internal.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_pipeline_config_auto_devops: distinct_count(::Ci::Pipeline.auto_devops_source.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_pipeline_config_repository: distinct_count(::Ci::Pipeline.repository_source.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_pipeline_schedules: distinct_count(::Ci::PipelineSchedule.where(time_period), :owner_id),
-            ci_pipelines: distinct_count(::Ci::Pipeline.where(time_period), :user_id, start: user_minimum_id, finish: user_maximum_id),
-            ci_triggers: distinct_count(::Ci::Trigger.where(time_period), :owner_id),
-            clusters_applications_runner: cluster_applications_user_distinct_count(::Clusters::Applications::Runner, time_period),
             projects_reporting_ci_cd_back_to_github: distinct_count(::Project.with_github_service_pipeline_events.where(time_period), :creator_id)
           })
         end
@@ -338,6 +318,8 @@ module EE
                                                                           finish: user_maximum_id)
           end
 
+          results[:"#{prefix}unique_users_all_secure_scanners"] = distinct_count(::Ci::Build.where(name: SECURE_PRODUCT_TYPES.keys).where(time_period), :user_id)
+
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           combined_license_key = "#{prefix}license_management_jobs".to_sym
           license_scan_count = results.delete("#{prefix}license_scanning_jobs".to_sym)
@@ -356,24 +338,12 @@ module EE
         end
         # rubocop:enable CodeReuse/ActiveRecord
 
-        def ldap_available_servers
-          ::Gitlab::Auth::Ldap::Config.available_servers
-        end
-
         def ldap_config_present_for_any_provider?(configuration_item)
           ldap_available_servers.any? { |server_config| server_config[configuration_item.to_s] }
         end
 
-        def omniauth_provider_names
-          ::Gitlab.config.omniauth.providers.map(&:name)
-        end
-
-        # LDAP provider names are set by customers and could include
-        # sensitive info (server names, etc). LDAP providers normally
-        # don't appear in omniauth providers but filter to ensure
-        # no internal details leak via usage ping.
-        def filtered_omniauth_provider_names
-          omniauth_provider_names.reject { |name| name.starts_with?('ldap') }
+        def ldap_available_servers
+          ::Gitlab::Auth::Ldap::Config.available_servers
         end
       end
     end

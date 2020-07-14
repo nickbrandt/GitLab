@@ -33,7 +33,7 @@ export default {
 };
 </script>
 <template>
-  <div class="order-summary d-flex flex-column flex-grow-1 prepend-top-5 mt-lg-5">
+  <div class="order-summary d-flex flex-column flex-grow-1 gl-mt-2 mt-lg-5">
     <div class="d-lg-none">
       <div @click="toggleCollapse">
         <h4 class="d-flex justify-content-between gl-font-lg" :class="{ 'gl-mb-7': !collapsed }">

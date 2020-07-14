@@ -1,6 +1,7 @@
+import { uniq } from 'lodash';
 import createState from 'ee/user_lists/store/show/state';
 import mutations from 'ee/user_lists/store/show/mutations';
-import states from 'ee/user_lists/constants/show';
+import { states } from 'ee/user_lists/constants/show';
 import * as types from 'ee/user_lists/store/show/mutation_types';
 import { userList } from 'ee_jest/feature_flags/mock_data';
 
@@ -45,6 +46,41 @@ describe('User Lists Show Mutations', () => {
     it('sets the state to error', () => {
       mutations[types.RECEIVE_USER_LIST_ERROR](mockState);
       expect(mockState.state).toBe(states.ERROR);
+    });
+  });
+  describe(types.ADD_USER_IDS, () => {
+    const newIds = ['user3', 'test1', '1', '3', ''];
+
+    beforeEach(() => {
+      mutations[types.RECEIVE_USER_LIST_SUCCESS](mockState, userList);
+      mutations[types.ADD_USER_IDS](mockState, newIds.join(', '));
+    });
+
+    it('adds the new IDs to the state unless empty', () => {
+      newIds.filter(id => id).forEach(id => expect(mockState.userIds).toContain(id));
+    });
+
+    it('does not add duplicate IDs to the state', () => {
+      expect(mockState.userIds).toEqual(uniq(mockState.userIds));
+    });
+  });
+  describe(types.REMOVE_USER_ID, () => {
+    let userIds;
+    let removedId;
+
+    beforeEach(() => {
+      mutations[types.RECEIVE_USER_LIST_SUCCESS](mockState, userList);
+      userIds = mockState.userIds;
+      removedId = 'user3';
+      mutations[types.REMOVE_USER_ID](mockState, removedId);
+    });
+
+    it('should remove the given id', () => {
+      expect(mockState).not.toContain(removedId);
+    });
+
+    it('should leave the rest of the IDs alone', () => {
+      userIds.filter(id => id !== removedId).forEach(id => expect(mockState.userIds).toContain(id));
     });
   });
 });

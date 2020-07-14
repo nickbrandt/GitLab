@@ -109,7 +109,7 @@ export default {
     ),
 
     newHelpText: s__(
-      'FeatureFlags|Enable features for specific users and specific environments by defining feature flag strategies. By default, features are available to all users in all environments.',
+      'FeatureFlags|Enable features for specific users and specific environments by defining feature flag strategies.',
     ),
     noStrategiesText: s__('FeatureFlags|Feature Flag has no strategies'),
   },
@@ -175,7 +175,7 @@ export default {
     },
 
     addStrategy() {
-      this.formStrategies.push({ name: '', parameters: {}, scopes: [] });
+      this.formStrategies.push({ name: ROLLOUT_STRATEGY_ALL_USERS, parameters: {}, scopes: [] });
     },
 
     deleteStrategy(s) {

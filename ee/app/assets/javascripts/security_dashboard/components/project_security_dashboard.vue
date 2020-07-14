@@ -115,7 +115,7 @@ export default {
           <span class="js-security-dashboard-right pull-right">
             <icon name="branch" />
             <gl-link :href="branch.path" class="monospace">{{ branch.id }}</gl-link>
-            <span class="text-muted prepend-left-5 append-right-5">&middot;</span>
+            <span class="text-muted gl-ml-2 gl-mr-2">&middot;</span>
             <icon name="commit" />
             <gl-link :href="commit.path" class="monospace">{{ commit.id }}</gl-link>
           </span>

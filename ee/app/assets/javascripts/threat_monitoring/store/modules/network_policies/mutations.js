@@ -18,6 +18,20 @@ export default {
     state.isLoadingPolicies = false;
     state.errorLoadingPolicies = true;
   },
+  [types.REQUEST_CREATE_POLICY](state) {
+    state.isUpdatingPolicy = true;
+    state.errorUpdatingPolicy = false;
+  },
+  [types.RECEIVE_CREATE_POLICY_SUCCESS](state, policy) {
+    const newPolicy = convertObjectPropsToCamelCase(policy);
+    state.policies = [...state.policies, newPolicy];
+    state.isUpdatingPolicy = false;
+    state.errorUpdatingPolicy = false;
+  },
+  [types.RECEIVE_CREATE_POLICY_ERROR](state) {
+    state.isUpdatingPolicy = false;
+    state.errorUpdatingPolicy = true;
+  },
   [types.REQUEST_UPDATE_POLICY](state) {
     state.isUpdatingPolicy = true;
     state.errorUpdatingPolicy = false;

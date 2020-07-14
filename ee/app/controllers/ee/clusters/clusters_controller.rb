@@ -3,7 +3,6 @@
 module EE
   module Clusters
     module ClustersController
-      include MetricsDashboard
       extend ActiveSupport::Concern
 
       prepended do

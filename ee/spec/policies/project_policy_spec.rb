@@ -98,6 +98,10 @@ RSpec.describe ProjectPolicy do
           is_expected.to be_allowed(*auditor_permissions)
         end
       end
+
+      it_behaves_like 'project private features with read_all_resources ability' do
+        let(:user) { current_user }
+      end
     end
   end
 
@@ -604,64 +608,6 @@ RSpec.describe ProjectPolicy do
       end
 
       it { is_expected.to be_disallowed(:read_threat_monitoring) }
-    end
-  end
-
-  describe 'read_package' do
-    context 'with admin' do
-      let(:current_user) { admin }
-
-      it { is_expected.to be_allowed(:read_package) }
-
-      context 'when repository is disabled' do
-        before do
-          project.project_feature.update(repository_access_level: ProjectFeature::DISABLED)
-        end
-
-        it { is_expected.to be_disallowed(:read_package) }
-      end
-    end
-
-    context 'with owner' do
-      let(:current_user) { owner }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with maintainer' do
-      let(:current_user) { maintainer }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with developer' do
-      let(:current_user) { developer }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with reporter' do
-      let(:current_user) { reporter }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with guest' do
-      let(:current_user) { guest }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with non member' do
-      let(:current_user) { create(:user) }
-
-      it { is_expected.to be_allowed(:read_package) }
-    end
-
-    context 'with anonymous' do
-      let(:current_user) { nil }
-
-      it { is_expected.to be_allowed(:read_package) }
     end
   end
 

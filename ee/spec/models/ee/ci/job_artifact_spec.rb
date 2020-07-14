@@ -91,9 +91,11 @@ RSpec.describe EE::Ci::JobArtifact do
     subject { Ci::JobArtifact.associated_file_types_for(file_type) }
 
     where(:file_type, :result) do
-      'license_scanning' | %w(license_management license_scanning)
-      'codequality'      | %w(codequality)
-      'quality'          | nil
+      'license_scanning'    | %w(license_management license_scanning)
+      'codequality'         | %w(codequality)
+      'browser_performance' | %w(browser_performance performance)
+      'load_performance'    | %w(load_performance)
+      'quality'             | nil
     end
 
     with_them do

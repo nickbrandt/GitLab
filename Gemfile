@@ -164,7 +164,8 @@ gem 'diff_match_patch', '~> 0.1.0'
 
 # Application server
 gem 'rack', '~> 2.0.9'
-gem 'rack-timeout', '~> 0.5.1'
+# https://github.com/sharpstone/rack-timeout/blob/master/README.md#rails-apps-manually
+gem 'rack-timeout', '~> 0.5.1', require: 'rack/timeout/base'
 
 group :unicorn do
   gem 'unicorn', '~> 5.5'
@@ -243,7 +244,9 @@ gem 'slack-messenger', '~> 2.3.3'
 gem 'hangouts-chat', '~> 0.0.5'
 
 # Asana integration
-gem 'asana', '~> 0.9'
+# asana 0.10.1 needs faraday 1.0
+# https://gitlab.com/gitlab-org/gitlab/-/issues/224296
+gem 'asana', '0.10.0'
 
 # FogBugz integration
 gem 'ruby-fogbugz', '~> 0.2.1'
@@ -362,7 +365,7 @@ group :development, :test do
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
 
-  gem 'gitlab-styles', '~> 4.2.0', require: false
+  gem 'gitlab-styles', '~> 4.3.0', require: false
   # Pin these dependencies, otherwise a new rule could break the CI pipelines
   gem 'rubocop', '~> 0.82.0'
   gem 'rubocop-performance', '~> 1.5.2'
@@ -499,3 +502,5 @@ gem 'valid_email', '~> 0.1'
 # JSON
 gem 'json', '~> 2.3.0'
 gem 'json-schema', '~> 2.8.0'
+gem 'oj', '~> 3.10.6'
+gem 'multi_json', '~> 1.14.1'

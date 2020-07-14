@@ -770,7 +770,7 @@ Relative linking enables crosslinks to work:
 
 - in Review Apps, local previews, and `/help`.
 - when working on the docs locally, so you can verify that they work as early as possible in the process.
-- within the GitLab UI when browsing doc files in their respective repositories. For example, the links displayed at <https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/README.md>.
+- within the GitLab UI when browsing doc files in their respective repositories. For example, the links displayed at `https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/README.md`.
 
 To link to internal documentation:
 
@@ -1455,7 +1455,7 @@ lines with an inserted line break. Splitting product or feature names across
 lines makes searching for these items more difficult, and can cause problems if
 names change.
 
-For example, the followng Markdown content is *not* formatted correctly:
+For example, the following Markdown content is *not* formatted correctly:
 
 ```markdown
 When entering a product or feature name that includes a space (such as GitLab

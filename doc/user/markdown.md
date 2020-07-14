@@ -92,7 +92,7 @@ to change.
 GitLab makes full use of the standard (CommonMark) formatting, but also includes additional
 functionality useful for GitLab users.
 
-It makes use of [new Markdown features](#new-GFM-markdown-extensions),
+It makes use of [new Markdown features](#new-gfm-markdown-extensions),
 not found in standard Markdown:
 
 - [Color "chips" written in HEX, RGB or HSL](#colors)
@@ -579,7 +579,7 @@ This snippet links to `<wiki_root>/miscellaneous.md`:
 
 ### Embedding metrics in GitLab Flavored Markdown
 
-Metric charts can be embedded within GitLab Flavored Markdown. See [Embedding Metrics within GitLab flavored Markdown](../user/project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown) for more details.
+Metric charts can be embedded within GitLab Flavored Markdown. See [Embedding Metrics within GitLab flavored Markdown](../operations/metrics/embed.md#embedding-metric-charts-within-gitlab-flavored-markdown) for more details.
 
 ## Standard Markdown and extensions in GitLab
 

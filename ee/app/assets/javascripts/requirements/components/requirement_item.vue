@@ -216,13 +216,13 @@ export default {
       </div>
     </div>
     <gl-popover :target="getAuthorPopoverTarget()" triggers="hover focus" placement="top">
-      <div class="user-popover p-0 d-flex">
-        <div class="p-1 flex-shrink-1">
+      <div class="gl-line-height-normal gl-display-flex">
+        <div class="gl-p-2 gl-flex-shrink-1">
           <gl-avatar :entity-name="author.name" :alt="author.name" :src="author.avatarUrl" />
         </div>
-        <div class="p-1 w-100">
-          <h5 class="m-0">{{ author.name }}</h5>
-          <div class="text-secondary mb-2">@{{ author.username }}</div>
+        <div class="gl-p-2 gl-w-full">
+          <h5 class="gl-m-0">{{ author.name }}</h5>
+          <div class="gl-text-gray-700 gl-mb-3">@{{ author.username }}</div>
         </div>
       </div>
     </gl-popover>

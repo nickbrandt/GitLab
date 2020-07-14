@@ -7,6 +7,11 @@ module EE
 
       private
 
+      override :approved_by_user?
+      def approved_by_user?(merge_request)
+        merge_request.has_approved?(current_user)
+      end
+
       override :reset_approvals_cache
       def reset_approvals_cache(merge_request)
         merge_request.reset_approval_cache!

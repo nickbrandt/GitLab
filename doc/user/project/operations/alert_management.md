@@ -41,16 +41,16 @@ When GitLab-managed Prometheus is installed, the [Alerts list](#alert-management
 is also enabled.
 
 To populate the alerts with data, see
-[GitLab-Managed Prometheus instances](../integrations/prometheus.md#managed-prometheus-instances).
+[GitLab-Managed Prometheus instances](../../../operations/metrics/index.md#managed-prometheus-instances).
 
 ### Enable external Prometheus alerts
 
 You can configure an externally-managed Prometheus instance to send alerts
-to GitLab. To set up this configuration, see the [configuring Prometheus](../integrations/prometheus.md#external-prometheus-instances) documentation. Activating the external Prometheus
+to GitLab. To set up this configuration, see the [configuring Prometheus](../../../operations/metrics/index.md#external-prometheus-instances) documentation. Activating the external Prometheus
 configuration also enables the [Alerts list](#alert-management-list).
 
 To populate the alerts with data, see
-[External Prometheus instances](../integrations/prometheus.md#external-prometheus-instances).
+[External Prometheus instances](../../../operations/metrics/index.md#external-prometheus-instances).
 
 ## Alert Management severity
 
@@ -189,13 +189,42 @@ deselect the user from the list of assignees, or click **Unassigned**.
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3066) in GitLab 13.1.
 
-NOTE: **Note:**
-GitLab currently only supports creating system notes when assigning an Alert.
+When you take action on an alert, this is logged as a system note,
+which is visible in the Alert Details view. This gives you a linear
+timeline of the alert's investigation and assignment history.
 
-Assigning a user an Alert creates a system note, visible in the Alert Details view,
-giving you a linear timeline of the alert's investigation and assignment history.
+The following actions will result in a system note:
+
+- [Updating the status of an alert](#update-an-alerts-status)
+- [Creating an issue based on an alert](#create-an-issue-from-an-alert)
+- [Assignment of an alert to a user](#update-an-alerts-assignee)
 
 ![Alert Management Details View System Notes](img/alert_detail_system_notes_v13_1.png)
+
+### View an Alert's metrics data
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/217768) in GitLab 13.2.
+
+To view the metrics for an alert:
+
+   1. Sign in as a user with Developer or higher [permissions](../../permissions.md).
+   1. Navigate to **{cloud-gear}** **Operations > Alerts**.
+   1. Click the alert you want to view.
+   1. Below the title of the alert, click the **Metrics** tab.
+
+![Alert Management Metrics View](img/alert_detail_metrics_v13_2.png)
+
+For GitLab-managed Prometheus instances, metrics data is automatically available
+for the alert, making it easy to see surrounding behavior. See
+[Managed Prometheus instances](../../../operations/metrics/index.md#managed-prometheus-instances)
+for information on setting up alerts.
+
+For externally-managed Prometheus instances, you can configure your alerting rules to
+display a chart in the alert. See
+[Embedding metrics based on alerts in incident issues](../../../operations/metrics/embed.md#embedding-metrics-based-on-alerts-in-incident-issues)
+for information on how to appropriately configure your alerting rules. See
+[External Prometheus instances](../../../operations/metrics/index.md#external-prometheus-instances)
+for information on setting up alerts for your self-managed Prometheus instance.
 
 ## Use cases for assigning alerts
 

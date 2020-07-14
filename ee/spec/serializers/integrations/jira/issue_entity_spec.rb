@@ -4,6 +4,14 @@ require 'spec_helper'
 
 RSpec.describe Integrations::Jira::IssueEntity do
   let(:project) { build(:project) }
+
+  let(:reporter) do
+    double(
+      'displayName' => 'reporter',
+      'name' => double # Default to Jira Server issue response, Jira Cloud replaces name with accountId
+    )
+  end
+
   let(:jira_issue) do
     double(
       summary: 'summary',
@@ -11,7 +19,7 @@ RSpec.describe Integrations::Jira::IssueEntity do
       updated: '2020-06-26T15:38:32.000+0000',
       resolutiondate: '2020-06-27T13:23:51.000+0000',
       labels: ['backend'],
-      reporter: double('displayName' => 'reporter'),
+      reporter: reporter,
       assignee: double('displayName' => 'assignee'),
       project: double(key: 'GL'),
       key: 'GL-5',
@@ -25,23 +33,44 @@ RSpec.describe Integrations::Jira::IssueEntity do
     expect(subject).to include(
       project_id: project.id,
       title: 'summary',
-      created_at: '2020-06-25T15:39:30.000+0000',
-      updated_at: '2020-06-26T15:38:32.000+0000',
-      closed_at: '2020-06-27T13:23:51.000+0000',
+      created_at: '2020-06-25T15:39:30.000+0000'.to_datetime.utc,
+      updated_at: '2020-06-26T15:38:32.000+0000'.to_datetime.utc,
+      closed_at: '2020-06-27T13:23:51.000+0000'.to_datetime.utc,
       labels: [
         {
           name: 'backend',
-          color: '#b43fdd',
-          text_color: '#FFFFFF'
+          color: '#EBECF0',
+          text_color: '#283856'
         }
       ],
-      author: { name: 'reporter' },
+      author: hash_including(name: 'reporter'),
       assignees: [
         { name: 'assignee' }
       ],
-      web_url: 'http://jira.com/projects/GL/issues/GL-5',
-      references: { relative: 'GL-5' }
+      web_url: 'http://jira.com/browse/GL-5',
+      references: { relative: 'GL-5' },
+      external_tracker: 'jira'
     )
+  end
+
+  context 'with Jira Server configuration' do
+    before do
+      allow(reporter).to receive(:name).and_return('reporter@reporter.com')
+    end
+
+    it 'returns the Jira Server profile URL' do
+      expect(subject[:author]).to include(web_url: 'http://jira.com/secure/ViewProfile.jspa?name=reporter@reporter.com')
+    end
+  end
+
+  context 'with Jira Cloud configuration' do
+    before do
+      allow(reporter).to receive(:accountId).and_return('12345')
+    end
+
+    it 'returns the Jira Cloud profile URL' do
+      expect(subject[:author]).to include(web_url: 'http://jira.com/people/12345')
+    end
   end
 
   context 'without assignee' do

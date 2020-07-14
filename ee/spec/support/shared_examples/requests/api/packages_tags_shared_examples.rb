@@ -30,7 +30,7 @@ RSpec.shared_examples 'returns package tags' do |user_type|
   it 'returns two package tags' do
     subject
 
-    expect(json_response).to match_schema('public_api/v4/packages/npm_package_tags', dir: 'ee')
+    expect(json_response).to match_schema('public_api/v4/packages/npm_package_tags')
     expect(json_response.length).to eq(3) # two tags + latest (auto added)
     expect(json_response[package_tag1.name]).to eq(package.version)
     expect(json_response[package_tag2.name]).to eq(package.version)

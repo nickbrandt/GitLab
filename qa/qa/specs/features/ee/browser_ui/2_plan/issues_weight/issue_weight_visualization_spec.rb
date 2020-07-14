@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable do
+  RSpec.describe 'Plan', :reliable do
     describe 'Issues weight visualization' do
       before do
         Flow::Login.sign_in
@@ -31,7 +31,7 @@ module QA
           show.click_milestone_link
         end
 
-        QA::Page::Project::Milestone::Show.perform do |show|
+        Page::Milestone::Show.perform do |show|
           expect(show.total_issue_weight_value).to have_content(weight)
         end
 

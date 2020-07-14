@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  RSpec.describe 'Plan' do
     describe 'Project milestone' do
       include Support::Dates
 
@@ -29,7 +29,7 @@ module QA
           milestone_list.click_milestone(project_milestone)
         end
 
-        Page::Project::Milestone::Show.perform do |milestone|
+        Page::Milestone::Show.perform do |milestone|
           expect(milestone).to have_element(:milestone_title_content, text: title)
           expect(milestone).to have_element(:milestone_description_content, text: description)
           expect(milestone).to have_start_date(start_date)

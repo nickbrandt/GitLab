@@ -1,7 +1,7 @@
 import { __, s__ } from '~/locale';
 
 import UserToken from './components/tokens/user_token.vue';
-import GroupMemberToken from './components/tokens/group_member_token.vue';
+import MemberToken from './components/tokens/member_token.vue';
 import ProjectToken from './components/tokens/project_token.vue';
 import GroupToken from './components/tokens/group_token.vue';
 
@@ -33,9 +33,9 @@ export const AUDIT_FILTER_CONFIGS = [
     ...DEFAULT_TOKEN_OPTIONS,
     icon: 'user',
     title: s__('AuditLogs|Member Events'),
-    type: 'group_member',
+    type: 'member',
     entityType: ENTITY_TYPES.AUTHOR,
-    token: GroupMemberToken,
+    token: MemberToken,
   },
   {
     ...DEFAULT_TOKEN_OPTIONS,

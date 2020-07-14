@@ -65,6 +65,7 @@ class Project < ApplicationRecord
 
   cache_markdown_field :description, pipeline: :description
 
+  default_value_for :packages_enabled, true
   default_value_for :archived, false
   default_value_for :resolve_outdated_diff_discussions, false
   default_value_for :container_registry_enabled, gitlab_config_features.container_registry
@@ -168,6 +169,7 @@ class Project < ApplicationRecord
   has_one :custom_issue_tracker_service
   has_one :bugzilla_service
   has_one :gitlab_issue_tracker_service, inverse_of: :project
+  has_one :confluence_service
   has_one :external_wiki_service
   has_one :prometheus_service, inverse_of: :project
   has_one :mock_ci_service
@@ -190,6 +192,10 @@ class Project < ApplicationRecord
   has_many :forks, through: :forked_to_members, source: :project, inverse_of: :forked_from_project
   has_many :fork_network_projects, through: :fork_network, source: :projects
 
+  # Packages
+  has_many :packages, class_name: 'Packages::Package'
+  has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
+
   has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
   has_one :import_export_upload, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_many :export_jobs, class_name: 'ProjectExportJob'
@@ -200,6 +206,7 @@ class Project < ApplicationRecord
   has_one :grafana_integration, inverse_of: :project
   has_one :project_setting, inverse_of: :project, autosave: true
   has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
+  has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project
@@ -441,6 +448,7 @@ class Project < ApplicationRecord
   # Sometimes queries (e.g. using CTEs) require explicit disambiguation with table name
   scope :projects_order_id_desc, -> { reorder(self.arel_table['id'].desc) }
 
+  scope :with_packages, -> { joins(:packages) }
   scope :in_namespace, ->(namespace_ids) { where(namespace_id: namespace_ids) }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where('namespace_id != ?', user.namespace_id) }
@@ -491,6 +499,7 @@ class Project < ApplicationRecord
         .where(repository_languages: { programming_language_id: lang_id_query })
   end
 
+  scope :service_desk_enabled, -> { where(service_desk_enabled: true) }
   scope :with_builds_enabled, -> { with_feature_enabled(:builds) }
   scope :with_issues_enabled, -> { with_feature_enabled(:issues) }
   scope :with_issues_available_for_user, ->(current_user) { with_feature_available_for_user(:issues, current_user) }
@@ -516,9 +525,8 @@ class Project < ApplicationRecord
       .where(project_pages_metadata: { project_id: nil })
   end
 
-  scope :with_api_entity_associations, -> {
-    preload(:project_feature, :route, :tags,
-            group: :ip_restrictions, namespace: [:route, :owner])
+  scope :with_api_commit_entity_associations, -> {
+    preload(:project_feature, :route, namespace: [:route, :owner])
   }
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
@@ -534,6 +542,10 @@ class Project < ApplicationRecord
 
   # Used by Projects::CleanupService to hold a map of rewritten object IDs
   mount_uploader :bfg_object_map, AttachmentUploader
+
+  def self.with_api_entity_associations
+    preload(:project_feature, :route, :tags, :group, namespace: [:route, :owner])
+  end
 
   def self.with_web_entity_associations
     preload(:project_feature, :route, :creator, :group, namespace: [:route, :owner])
@@ -589,6 +601,14 @@ class Project < ApplicationRecord
       # This has to be added to include features whose value is nil in the db
       visible << nil
       with_feature_access_level(feature, visible)
+    end
+  end
+
+  def self.projects_user_can(projects, user, action)
+    projects = where(id: projects)
+
+    DeclarativePolicy.user_scope do
+      projects.select { |project| Ability.allowed?(user, action, project) }
     end
   end
 
@@ -709,6 +729,12 @@ class Project < ApplicationRecord
       with_merge_requests_enabled = with_merge_requests_available_for_user(user).select(:id)
 
       from_union([with_issues_enabled, with_merge_requests_enabled]).select(:id)
+    end
+
+    def find_by_service_desk_project_key(key)
+      # project_key is not indexed for now
+      # see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24063#note_282435524 for details
+      joins(:service_desk_setting).find_by('service_desk_settings.project_key' => key)
     end
   end
 
@@ -840,6 +866,15 @@ class Project < ApplicationRecord
   def design_repository
     strong_memoize(:design_repository) do
       DesignManagement::Repository.new(self)
+    end
+  end
+
+  # Because we use default_value_for we need to be sure
+  # packages_enabled= method does exist even if we rollback migration.
+  # Otherwise many tests from spec/migrations will fail.
+  def packages_enabled=(value)
+    if has_attribute?(:packages_enabled)
+      write_attribute(:packages_enabled, value)
     end
   end
 
@@ -1252,6 +1287,11 @@ class Project < ApplicationRecord
     update_column(:has_external_wiki, services.external_wikis.any?) if Gitlab::Database.read_write?
   end
 
+  def has_confluence?
+    ConfluenceService.feature_enabled?(self) && # rubocop:disable CodeReuse/ServiceClass
+      project_setting.has_confluence?
+  end
+
   def find_or_initialize_services
     available_services_names = Service.available_services_names - disabled_services
 
@@ -1261,7 +1301,11 @@ class Project < ApplicationRecord
   end
 
   def disabled_services
-    []
+    strong_memoize(:disabled_services) do
+      [].tap do |disabled_services|
+        disabled_services.push(ConfluenceService.to_param) unless ConfluenceService.feature_enabled?(self) # rubocop:disable CodeReuse/ServiceClass
+      end
+    end
   end
 
   def find_or_initialize_service(name)
@@ -1700,10 +1744,10 @@ class Project < ApplicationRecord
 
   def pages_url
     url = pages_group_url
-    url_path = full_path.partition('/').last.downcase
+    url_path = full_path.partition('/').last
 
     # If the project path is the same as host, we serve it as group page
-    return url if url == "#{Settings.pages.protocol}://#{url_path}"
+    return url if url == "#{Settings.pages.protocol}://#{url_path}".downcase
 
     "#{url}/#{url_path}"
   end
@@ -2137,7 +2181,13 @@ class Project < ApplicationRecord
 
   # rubocop: disable CodeReuse/ServiceClass
   def forks_count
-    Projects::ForksCountService.new(self).count
+    BatchLoader.for(self).batch do |projects, loader|
+      fork_count_per_project = ::Projects::BatchForksCountService.new(projects).refresh_cache_and_retrieve_data
+
+      fork_count_per_project.each do |project, count|
+        loader.call(project, count)
+      end
+    end
   end
   # rubocop: enable CodeReuse/ServiceClass
 
@@ -2417,9 +2467,35 @@ class Project < ApplicationRecord
   end
 
   def service_desk_enabled
-    false
+    Gitlab::ServiceDesk.enabled?(project: self)
   end
+
   alias_method :service_desk_enabled?, :service_desk_enabled
+
+  def service_desk_address
+    return unless service_desk_enabled?
+
+    config = Gitlab.config.incoming_email
+    wildcard = Gitlab::IncomingEmail::WILDCARD_PLACEHOLDER
+
+    config.address&.gsub(wildcard, "#{full_path_slug}-#{id}-issue-")
+  end
+
+  def root_namespace
+    if namespace.has_parent?
+      namespace.root_ancestor
+    else
+      namespace
+    end
+  end
+
+  def package_already_taken?(package_name)
+    namespace.root_ancestor.all_projects
+      .joins(:packages)
+      .where.not(id: id)
+      .merge(Packages::Package.with_name(package_name))
+      .exists?
+  end
 
   private
 

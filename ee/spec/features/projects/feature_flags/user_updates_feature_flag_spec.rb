@@ -32,9 +32,12 @@ RSpec.describe 'User updates feature flag', :js do
 
     it 'user adds a second strategy' do
       visit(edit_project_feature_flag_path(project, feature_flag))
+
+      wait_for_requests
+
       click_button 'Add strategy'
       within_strategy_row(2) do
-        select 'Percent rollout (logged in users)', from: 'Type'
+        select 'Percent of users', from: 'Type'
         fill_in 'Percentage', with: '15'
       end
       click_button 'Save changes'
@@ -46,7 +49,7 @@ RSpec.describe 'User updates feature flag', :js do
         expect(page).to have_text 'All environments'
       end
       within_strategy_row(2) do
-        expect(page).to have_text 'Percent rollout (logged in users)'
+        expect(page).to have_text 'Percent of users'
         expect(page).to have_field 'Percentage', with: '15'
         expect(page).to have_text 'All environments'
       end

@@ -42,7 +42,7 @@ RSpec.shared_examples 'process nuget service index request' do |user_type, statu
       subject
 
       expect(response.media_type).to eq('application/json')
-      expect(json_response).to match_schema('public_api/v4/packages/nuget/service_index', dir: 'ee')
+      expect(json_response).to match_schema('public_api/v4/packages/nuget/service_index')
       expect(json_response).to be_a(Hash)
     end
 
@@ -59,7 +59,7 @@ RSpec.shared_examples 'returning nuget metadata json response with json schema' 
     subject
 
     expect(response.media_type).to eq('application/json')
-    expect(json_response).to match_schema(json_schema, dir: 'ee')
+    expect(json_response).to match_schema(json_schema)
     expect(json_response).to be_a(Hash)
   end
 end
@@ -256,7 +256,7 @@ RSpec.shared_examples 'process nuget download versions request' do |user_type, s
       subject
 
       expect(response.media_type).to eq('application/json')
-      expect(json_response).to match_schema('public_api/v4/packages/nuget/download_versions', dir: 'ee')
+      expect(json_response).to match_schema('public_api/v4/packages/nuget/download_versions')
       expect(json_response).to be_a(Hash)
       expect(json_response['versions']).to match_array(packages.map(&:version).sort)
     end
@@ -332,7 +332,7 @@ RSpec.shared_examples 'process nuget search request' do |user_type, status, add_
 
       expect(response.media_type).to eq('application/json')
       expect(json_response).to be_a(Hash)
-      expect(json_response).to match_schema('public_api/v4/packages/nuget/search', dir: 'ee')
+      expect(json_response).to match_schema('public_api/v4/packages/nuget/search')
       expect(json_response['totalHits']).to eq total_hits
       expect(json_response['data'].map { |e| e['versions'].size }).to match_array(versions)
     end

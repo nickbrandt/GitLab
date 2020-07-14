@@ -8,6 +8,10 @@ RSpec.describe EnvironmentsHelper do
   let(:user) { create(:user) }
 
   describe '#metrics_data' do
+    before do
+      allow(helper).to receive(:can?).and_return(false)
+    end
+
     subject { helper.metrics_data(project, environment) }
 
     context 'user has all accesses' do

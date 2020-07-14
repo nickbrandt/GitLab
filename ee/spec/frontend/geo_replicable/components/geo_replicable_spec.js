@@ -11,6 +11,7 @@ import {
   MOCK_REPLICABLE_TYPE,
   MOCK_GRAPHQL_PAGINATION_DATA,
   MOCK_RESTFUL_PAGINATION_DATA,
+  MOCK_GRAPHQL_REGISTRY,
 } from '../mock_data';
 
 const localVue = createLocalVue();
@@ -21,7 +22,7 @@ describe('GeoReplicable', () => {
   let store;
 
   const createStore = options => {
-    store = initStore({ replicableType: MOCK_REPLICABLE_TYPE, useGraphQl: false, ...options });
+    store = initStore({ replicableType: MOCK_REPLICABLE_TYPE, graphqlFieldName: null, ...options });
     jest.spyOn(store, 'dispatch').mockImplementation();
   };
 
@@ -67,17 +68,17 @@ describe('GeoReplicable', () => {
     });
   });
   describe('GlPagination', () => {
-    describe('when useGraphQl is false', () => {
+    describe('when graphqlFieldName is not defined', () => {
       it('renders always', () => {
-        createStore({ useGraphQl: false });
+        createStore();
         createComponent();
         expect(findGlPagination().exists()).toBe(true);
       });
     });
 
-    describe('when useGraphQl is true', () => {
+    describe('when graphqlFieldName is defined', () => {
       it('renders always', () => {
-        createStore({ useGraphQl: true });
+        createStore({ graphqlFieldName: MOCK_GRAPHQL_REGISTRY });
         createComponent();
         expect(findGlPagination().exists()).toBe(true);
       });
@@ -85,16 +86,16 @@ describe('GeoReplicable', () => {
   });
 
   describe.each`
-    useGraphQl | currentPage | newPage | action
-    ${false}   | ${1}        | ${2}    | ${undefined}
-    ${false}   | ${2}        | ${1}    | ${undefined}
-    ${true}    | ${1}        | ${2}    | ${'next'}
-    ${true}    | ${2}        | ${1}    | ${'prev'}
-  `(`changing the page`, ({ useGraphQl, currentPage, newPage, action }) => {
-    describe(`when useGraphQl is ${useGraphQl}`, () => {
+    graphqlFieldName         | currentPage | newPage | action
+    ${null}                  | ${1}        | ${2}    | ${undefined}
+    ${null}                  | ${2}        | ${1}    | ${undefined}
+    ${MOCK_GRAPHQL_REGISTRY} | ${1}        | ${2}    | ${'next'}
+    ${MOCK_GRAPHQL_REGISTRY} | ${2}        | ${1}    | ${'prev'}
+  `(`changing the page`, ({ graphqlFieldName, currentPage, newPage, action }) => {
+    describe(`when graphqlFieldName is ${graphqlFieldName}`, () => {
       describe(`from ${currentPage} to ${newPage}`, () => {
         beforeEach(() => {
-          createStore({ useGraphQl });
+          createStore({ graphqlFieldName });
           store.commit(types.RECEIVE_REPLICABLE_ITEMS_SUCCESS, {
             data: MOCK_BASIC_FETCH_DATA_MAP,
             pagination: { ...MOCK_GRAPHQL_PAGINATION_DATA, page: currentPage },

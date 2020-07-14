@@ -46,7 +46,7 @@ When GitLab detects a **Denied** license, you can view it in the [license list](
 
 You can view and modify existing policies from the [policies](#policies) tab.
 
-![Edit Policy](img/policies_maintainer_edit_v13_0.png)
+![Edit Policy](img/policies_maintainer_edit_v13_2.png)
 
 ## Use cases
 
@@ -385,6 +385,26 @@ You can supply a custom root certificate to complete TLS verification by using t
 specifying a `ca` setting in a [`.bowerrc`](https://bower.io/docs/config/#bowerrc-specification)
 file.
 
+#### Using private Bundler registries
+
+If you have a private Bundler registry you can use the
+[`source`](https://bundler.io/man/gemfile.5.html#GLOBAL-SOURCES)
+setting to specify its location.
+
+For example:
+
+```plaintext
+source "https://gems.example.com"
+```
+
+#### Custom root certificates for Bundler
+
+You can supply a custom root certificate to complete TLS verification by using the
+`ADDITIONAL_CA_CERT_BUNDLE` [environment variable](#available-variables), or by
+specifying a [`BUNDLE_SSL_CA_CERT`](https://bundler.io/v2.0/man/bundle-config.1.html)
+[environment variable](../../../ci/variables/README.md#custom-environment-variables)
+in the job definition.
+
 ### Configuring Conan projects
 
 You can configure [Conan](https://conan.io/) projects by adding a `.conan` directory to your
@@ -594,6 +614,7 @@ your code and generate security reports, without requiring internet access.
 
 Additional configuration may be needed for connecting to
 [private Bower registries](#using-private-bower-registries),
+[private Bundler registries](#using-private-bundler-registries),
 [private Conan registries](#using-private-bower-registries),
 [private Go registries](#using-private-go-registries),
 [private Maven repositories](#using-private-maven-repos),
@@ -636,34 +657,39 @@ and the associated classifications for each.
 
 Policies can be configured by maintainers of the project.
 
-![Edit Policy](img/policies_maintainer_edit_v13_0.png)
-![Add Policy](img/policies_maintainer_add_v13_0.png)
+![Edit Policy](img/policies_maintainer_edit_v13_2.png)
+![Add Policy](img/policies_maintainer_add_v13_2.png)
 
 Developers of the project can view the policies configured in a project.
 
 ![View Policies](img/policies_v13_0.png)
 
-## License Compliance report under pipelines
+### Enabling License Approvals within a project
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/5491) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13067) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.3.
 
-From your project's left sidebar, navigate to **CI/CD > Pipelines** and click on the
-pipeline ID that has a `license_scanning` job to see the Licenses tab with the listed
-licenses (if any).
+`License-Check` is an approval rule you can enable to allow an approver, individual, or group to
+approve a merge request that contains a `denied` license.
 
-![License Compliance Pipeline Tab](img/license_compliance_pipeline_tab_v13_0.png)
+You can enable `License-Check` one of two ways:
 
-<!-- ## Troubleshooting
+- Create a [project approval rule](../../project/merge_requests/merge_request_approvals.md#multiple-approval-rules-premium)
+  with the case-sensitive name `License-Check`.
+- Create an approval group in the [project policies section for License Compliance](#policies).
+  You must set this approval group's number of approvals required to greater than zero. Once you
+  enable this group in your project, the approval rule is enabled for all merge requests.
 
-Include any troubleshooting steps that you can foresee. If you know beforehand what issues
-one might have when setting this up, or when something is changed, or on upgrading, it's
-important to describe those, too. Think of things that may go wrong and include them here.
-This is important to minimize requests for support, and to avoid doc comments with
-questions that you know someone might ask.
+Any code changes cause the approvals required to reset.
 
-Each scenario can be a third-level heading, e.g. `### Getting error message X`.
-If you have none to add when creating a doc, leave this section in place
-but commented out to help encourage others to add to it in the future. -->
+An approval is required when a license report:
+
+- Contains a dependency that includes a software license that is `denied`.
+- Is not generated during pipeline execution.
+
+An approval is optional when a license report:
+
+- Contains no software license violations.
+- Contains only new licenses that are `allowed` or unknown.
 
 ## Troubleshooting
 

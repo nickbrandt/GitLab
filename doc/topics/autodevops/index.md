@@ -193,7 +193,7 @@ If enabling, check that your project does not have a `.gitlab-ci.yml`, or if one
    and choose the [deployment strategy](#deployment-strategy).
 1. Click **Save changes** for the changes to take effect.
 
-After enabling the feature, an Auto DevOps pipeline is triggered on the default branch.
+After enabling the feature, an Auto DevOps pipeline is triggered on the `master` branch.
 
 ### At the group level
 
@@ -248,11 +248,11 @@ TIP: **Tip:**
 Use the [blue-green deployment](../../ci/environments/incremental_rollouts.md#blue-green-deployment) technique
 to minimize downtime and risk.
 
-## Using multiple Kubernetes clusters **(PREMIUM)**
+## Using multiple Kubernetes clusters
 
 When using Auto DevOps, you can deploy different environments to
 different Kubernetes clusters, due to the 1:1 connection
-[existing between them](../../user/project/clusters/index.md#multiple-kubernetes-clusters-premium).
+[existing between them](../../user/project/clusters/index.md#multiple-kubernetes-clusters).
 
 The [Deploy Job template](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Deploy.gitlab-ci.yml)
 used by Auto DevOps currently defines 3 environment names:
@@ -279,8 +279,8 @@ To add a different cluster for each environment:
 1. Navigate to your project's **{cloud-gear}** **Operations > Kubernetes**.
 1. Create the Kubernetes clusters with their respective environment scope, as
    described from the table above.
-1. After creating the clusters, navigate to each cluster and install Helm Tiller
-   and Ingress. Wait for the Ingress IP address to be assigned.
+1. After creating the clusters, navigate to each cluster and install
+   Ingress. Wait for the Ingress IP address to be assigned.
 1. Make sure you've [configured your DNS](#auto-devops-base-domain) with the
    specified Auto DevOps domains.
 1. Navigate to each cluster's page, through **{cloud-gear}** **Operations > Kubernetes**,
@@ -301,9 +301,9 @@ No documented way of using private container registry with Auto DevOps exists.
 We strongly advise using GitLab Container Registry with Auto DevOps to
 simplify configuration and prevent any unforeseen issues.
 
-### Installing Helm behind a proxy
+### Install applications behind a proxy
 
-GitLab does not support installing [Helm as a GitLab-managed App](../../user/clusters/applications.md#helm) when
+GitLab's Helm integration does not support installing applications when
 behind a proxy. Users who want to do so must inject their proxy settings
 into the installation pods at runtime, such as by using a
 [`PodPreset`](https://kubernetes.io/docs/concepts/workloads/pods/podpreset/):

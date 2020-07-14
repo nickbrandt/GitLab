@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe API::GoProxy do
-  include EE::PackagesManagerApiSpecHelpers
+  include PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create :user }
   let_it_be(:project) { create :project_empty_repo, creator: user, path: 'my-go-lib' }

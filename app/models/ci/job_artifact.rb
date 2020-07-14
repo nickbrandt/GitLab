@@ -7,9 +7,12 @@ module Ci
     include UpdateProjectStatistics
     include UsageStatistics
     include Sortable
+    include IgnorableColumns
     extend Gitlab::Ci::Model
 
     NotSupportedAdapterError = Class.new(StandardError)
+
+    ignore_columns :locked, remove_after: '2020-07-22', remove_with: '13.4'
 
     TEST_REPORT_FILE_TYPES = %w[junit].freeze
     COVERAGE_REPORT_FILE_TYPES = %w[cobertura].freeze
@@ -34,6 +37,8 @@ module Ci
       license_management: 'gl-license-management-report.json',
       license_scanning: 'gl-license-scanning-report.json',
       performance: 'performance.json',
+      browser_performance: 'browser-performance.json',
+      load_performance: 'load-performance.json',
       metrics: 'metrics.txt',
       lsif: 'lsif.json',
       dotenv: '.env',
@@ -73,6 +78,8 @@ module Ci
       license_management: :raw,
       license_scanning: :raw,
       performance: :raw,
+      browser_performance: :raw,
+      load_performance: :raw,
       terraform: :raw,
       requirements: :raw,
       coverage_fuzzing: :raw
@@ -93,6 +100,8 @@ module Ci
       lsif
       metrics
       performance
+      browser_performance
+      load_performance
       sast
       secret_detection
       requirements
@@ -101,10 +110,6 @@ module Ci
     TYPE_AND_FORMAT_PAIRS = INTERNAL_TYPES.merge(REPORT_TYPES).freeze
 
     PLAN_LIMIT_PREFIX = 'ci_max_artifact_size_'
-
-    # This is required since we cannot add a default to the database
-    # https://gitlab.com/gitlab-org/gitlab/-/issues/215418
-    attribute :locked, :boolean, default: false
 
     belongs_to :project
     belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
@@ -124,7 +129,6 @@ module Ci
     scope :with_files_stored_locally, -> { where(file_store: ::JobArtifactUploader::Store::LOCAL) }
     scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
     scope :for_sha, ->(sha, project_id) { joins(job: :pipeline).where(ci_pipelines: { sha: sha, project_id: project_id }) }
-    scope :for_ref, ->(ref, project_id) { joins(job: :pipeline).where(ci_pipelines: { ref: ref, project_id: project_id }) }
     scope :for_job_name, ->(name) { joins(:job).where(ci_builds: { name: name }) }
 
     scope :with_file_types, -> (file_types) do
@@ -161,8 +165,7 @@ module Ci
 
     scope :expired, -> (limit) { where('expire_at < ?', Time.current).limit(limit) }
     scope :downloadable, -> { where(file_type: DOWNLOADABLE_TYPES) }
-    scope :locked, -> { where(locked: true) }
-    scope :unlocked, -> { where(locked: [false, nil]) }
+    scope :unlocked, -> { joins(job: :pipeline).merge(::Ci::Pipeline.unlocked).order(expire_at: :desc) }
 
     scope :scoped_project, -> { where('ci_job_artifacts.project_id = projects.id') }
 
@@ -180,7 +183,7 @@ module Ci
       codequality: 9, ## EE-specific
       license_management: 10, ## EE-specific
       license_scanning: 101, ## EE-specific till 13.0
-      performance: 11, ## EE-specific
+      performance: 11, ## EE-specific till 13.2
       metrics: 12, ## EE-specific
       metrics_referee: 13, ## runner referees
       network_referee: 14, ## runner referees
@@ -192,7 +195,9 @@ module Ci
       cluster_applications: 20,
       secret_detection: 21, ## EE-specific
       requirements: 22, ## EE-specific
-      coverage_fuzzing: 23 ## EE-specific
+      coverage_fuzzing: 23, ## EE-specific
+      browser_performance: 24, ## EE-specific
+      load_performance: 25 ## EE-specific
     }
 
     enum file_format: {

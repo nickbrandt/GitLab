@@ -34,7 +34,7 @@ exports[`Project Security Dashboard component Headline renders renders branch an
   </a>
    
   <span
-    class="text-muted prepend-left-5 append-right-5"
+    class="text-muted gl-ml-2 gl-mr-2"
   >
     ·
   </span>

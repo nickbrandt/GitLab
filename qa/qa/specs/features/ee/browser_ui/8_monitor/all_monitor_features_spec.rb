@@ -35,19 +35,6 @@ module QA
         end
       end
 
-      it 'observes cluster health graph' do
-        Page::Project::Menu.perform(&:go_to_operations_kubernetes)
-
-        Page::Project::Operations::Kubernetes::Index.perform do |cluster_list|
-          cluster_list.click_on_cluster(@cluster)
-        end
-
-        Page::Project::Operations::Kubernetes::Show.perform do |cluster_panel|
-          cluster_panel.open_health
-          cluster_panel.wait_for_cluster_health
-        end
-      end
-
       it 'creates and sets an incident template' do
         create_incident_template
 
@@ -58,9 +45,6 @@ module QA
             incident_settings.enable_issues_for_incidents
             incident_settings.select_issue_template('incident')
             incident_settings.save_incident_settings
-          end
-          settings.expand_incidents do |incident_settings|
-            expect(incident_settings).to have_template('incident')
           end
         end
       end

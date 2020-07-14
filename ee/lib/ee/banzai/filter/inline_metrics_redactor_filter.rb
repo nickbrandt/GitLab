@@ -11,8 +11,7 @@ module EE
         override :permissions_by_route
         def permissions_by_route
           super.concat([
-            ROUTE.new(::Gitlab::Metrics::Dashboard::Url.alert_regex, :read_prometheus_alerts),
-            ROUTE.new(::Gitlab::Metrics::Dashboard::Url.clusters_regex, :read_cluster)
+            ROUTE.new(::Gitlab::Metrics::Dashboard::Url.alert_regex, :read_prometheus_alerts)
           ])
         end
       end

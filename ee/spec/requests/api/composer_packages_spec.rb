@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 RSpec.describe API::ComposerPackages do
-  include EE::PackagesManagerApiSpecHelpers
+  include PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create(:user) }
   let_it_be(:group, reload: true) { create(:group, :public) }

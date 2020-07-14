@@ -14,6 +14,36 @@ query groupEpicsEE($fullPath: ID!) {
           openedIssues
           closedIssues
         }
+        issues {
+          nodes {
+            id
+            iid
+            title
+            referencePath: reference
+            dueDate
+            timeEstimate
+            weight
+            confidential
+            path: webUrl
+            assignees {
+              nodes {
+                id
+                username
+                name
+                avatar: avatarUrl
+                webUrl
+              }
+            }
+            labels {
+              nodes {
+                id
+                title
+                color
+                description
+              }
+            }
+          }
+        }
       }
     }
   }

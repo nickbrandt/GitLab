@@ -62,7 +62,7 @@ module Elastic
       index_name = elastic_helper.create_empty_index(with_alias: false, options: { settings: INITIAL_INDEX_OPTIONS })
 
       # Record documents count
-      documents_count = elastic_helper.index_size.dig('docs', 'count')
+      documents_count = elastic_helper.documents_count
 
       # Trigger reindex
       task_id = elastic_helper.reindex(to: index_name)
@@ -81,7 +81,7 @@ module Elastic
     def save_documents_count!(refresh:)
       elastic_helper.refresh_index(index_name: current_task.index_name_to) if refresh
 
-      new_documents_count = elastic_helper.index_size(index_name: current_task.index_name_to).dig('docs', 'count')
+      new_documents_count = elastic_helper.documents_count(index_name: current_task.index_name_to)
       current_task.update!(documents_count_target: new_documents_count)
     end
 

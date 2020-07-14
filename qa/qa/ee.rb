@@ -87,6 +87,10 @@ module QA
         end
       end
 
+      module Milestone
+        autoload :Show, 'qa/ee/page/milestone/show'
+      end
+
       module Profile
         autoload :Menu, 'qa/ee/page/profile/menu'
       end
@@ -113,10 +117,6 @@ module QA
           autoload :Show, 'qa/ee/page/project/wiki/show'
         end
 
-        module Milestone
-          autoload :Show, 'qa/ee/page/project/milestone/show'
-        end
-
         module Settings
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
           autoload :Main, 'qa/ee/page/project/settings/main'
@@ -135,10 +135,6 @@ module QA
         end
 
         module Operations
-          module Kubernetes
-            autoload :Show, 'qa/ee/page/project/operations/kubernetes/show'
-          end
-
           module Metrics
             autoload :Show, 'qa/ee/page/project/operations/metrics/show'
           end

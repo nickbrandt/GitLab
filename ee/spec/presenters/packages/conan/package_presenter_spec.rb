@@ -7,6 +7,16 @@ RSpec.describe ::Packages::Conan::PackagePresenter do
   let_it_be(:project) { create(:project) }
   let_it_be(:conan_package_reference) { '123456789'}
 
+  RSpec.shared_examples 'not selecting a package with the wrong type' do
+    context 'with a nuget package with same name and version' do
+      let_it_be(:wrong_package) { create(:nuget_package, name: 'wrong', version: '1.0.0', project: project) }
+
+      let(:recipe) { "#{wrong_package.name}/#{wrong_package.version}" }
+
+      it { is_expected.to be_empty }
+    end
+  end
+
   describe '#recipe_urls' do
     subject { described_class.new(recipe, user, project).recipe_urls }
 
@@ -15,6 +25,8 @@ RSpec.describe ::Packages::Conan::PackagePresenter do
 
       it { is_expected.to be_empty }
     end
+
+    it_behaves_like 'not selecting a package with the wrong type'
 
     context 'existing package' do
       let(:package) { create(:conan_package, project: project) }
@@ -39,6 +51,8 @@ RSpec.describe ::Packages::Conan::PackagePresenter do
 
       it { is_expected.to be_empty }
     end
+
+    it_behaves_like 'not selecting a package with the wrong type'
 
     context 'existing package' do
       let(:package) { create(:conan_package, project: project) }
@@ -69,6 +83,8 @@ RSpec.describe ::Packages::Conan::PackagePresenter do
 
       it { is_expected.to be_empty }
     end
+
+    it_behaves_like 'not selecting a package with the wrong type'
 
     context 'existing package' do
       let(:package) { create(:conan_package, project: project) }
@@ -138,6 +154,8 @@ RSpec.describe ::Packages::Conan::PackagePresenter do
 
       it { is_expected.to be_empty }
     end
+
+    it_behaves_like 'not selecting a package with the wrong type'
 
     context 'existing package' do
       let(:package) { create(:conan_package, project: project) }

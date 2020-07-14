@@ -6,7 +6,8 @@
 
 // TODO: need to move this component to graphql - https://gitlab.com/gitlab-org/gitlab/-/issues/221246
 import { escape, isNumber } from 'lodash';
-import { GlLink, GlTooltipDirective as GlTooltip, GlSprintf, GlLabel } from '@gitlab/ui';
+import { GlLink, GlTooltipDirective as GlTooltip, GlSprintf, GlLabel, GlIcon } from '@gitlab/ui';
+import jiraLogo from '@gitlab/svgs/dist/illustrations/logos/jira.svg';
 import {
   dateInWords,
   formatDate,
@@ -18,7 +19,6 @@ import {
 import { sprintf, __ } from '~/locale';
 import initUserPopovers from '~/user_popovers';
 import { mergeUrlParams } from '~/lib/utils/url_utility';
-import Icon from '~/vue_shared/components/icon.vue';
 import IssueAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
 import { isScopedLabel } from '~/lib/utils/common_utils';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -26,12 +26,13 @@ import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 export default {
   i18n: {
     openedAgo: __('opened %{timeAgoString} by %{user}'),
+    openedAgoJira: __('opened %{timeAgoString} by %{user} in Jira'),
   },
   components: {
-    Icon,
     IssueAssignees,
     GlLink,
     GlLabel,
+    GlIcon,
     GlSprintf,
   },
   directives: {
@@ -61,6 +62,11 @@ export default {
       },
     },
   },
+  data() {
+    return {
+      jiraLogo,
+    };
+  },
   computed: {
     milestoneLink() {
       const { title } = this.issuable.milestone;
@@ -87,6 +93,9 @@ export default {
     },
     isClosed() {
       return this.issuable.state === 'closed';
+    },
+    isJiraIssue() {
+      return this.issuable.external_tracker === 'jira';
     },
     issueCreatedToday() {
       return getDayDifference(new Date(this.issuable.created_at), new Date()) < 1;
@@ -153,14 +162,14 @@ export default {
           value: this.issuable.upvotes,
           title: __('Upvotes'),
           class: 'js-upvotes',
-          faicon: 'fa-thumbs-up',
+          icon: 'thumb-up',
         },
         {
           key: 'downvotes',
           value: this.issuable.downvotes,
           title: __('Downvotes'),
           class: 'js-downvotes',
-          faicon: 'fa-thumbs-down',
+          icon: 'thumb-down',
         },
       ];
     },
@@ -178,6 +187,10 @@ export default {
       return isScopedLabel({ title: name }) && this.scopedLabelsAvailable;
     },
     labelHref({ name }) {
+      if (this.isJiraIssue) {
+        return this.issuableLink({ 'labels[]': name });
+      }
+
       return this.issuableLink({ 'label_name[]': name });
     },
     onSelect(ev) {
@@ -217,14 +230,27 @@ export default {
       <div class="flex-grow-1">
         <div class="title">
           <span class="issue-title-text">
-            <i
+            <gl-icon
               v-if="issuable.confidential"
               v-gl-tooltip
-              class="fa fa-eye-slash"
+              name="eye-slash"
+              class="gl-vertical-align-text-bottom"
+              :size="16"
               :title="$options.confidentialTooltipText"
               :aria-label="$options.confidentialTooltipText"
-            ></i>
-            <gl-link :href="issuable.web_url">{{ issuable.title }}</gl-link>
+            />
+            <gl-link
+              :href="issuable.web_url"
+              :target="isJiraIssue ? '_blank' : null"
+              data-testid="issuable-title"
+            >
+              {{ issuable.title }}
+              <gl-icon
+                v-if="isJiraIssue"
+                name="external-link"
+                class="gl-vertical-align-text-bottom"
+              />
+            </gl-link>
           </span>
           <span v-if="issuable.has_tasks" class="ml-1 task-status d-none d-sm-inline-block">
             {{ issuable.task_status }}
@@ -232,11 +258,21 @@ export default {
         </div>
 
         <div class="issuable-info">
-          <span class="js-ref-path">{{ referencePath }}</span>
+          <span class="js-ref-path">
+            <span
+              v-if="isJiraIssue"
+              class="svg-container jira-logo-container"
+              data-testid="jira-logo"
+              v-html="jiraLogo"
+            ></span>
+            {{ referencePath }}
+          </span>
 
           <span data-testid="openedByMessage" class="d-none d-sm-inline-block mr-1">
             &middot;
-            <gl-sprintf :message="$options.i18n.openedAgo">
+            <gl-sprintf
+              :message="isJiraIssue ? $options.i18n.openedAgoJira : $options.i18n.openedAgo"
+            >
               <template #timeAgoString>
                 <span>{{ issuableCreatedAt }}</span>
               </template>
@@ -293,8 +329,9 @@ export default {
             v-gl-tooltip
             :title="__('Weight')"
             class="d-none d-sm-inline-block js-weight"
+            data-testid="weight"
           >
-            <icon name="weight" class="align-text-bottom" />
+            <gl-icon name="weight" class="align-text-bottom" />
             {{ issuable.weight }}
           </span>
         </div>
@@ -303,6 +340,7 @@ export default {
       <!-- Issuable meta -->
       <div class="flex-shrink-0 d-flex flex-column align-items-end justify-content-center">
         <div class="controls d-flex">
+          <span v-if="isJiraIssue">&nbsp;</span>
           <span v-if="isClosed" class="issuable-status">{{ __('CLOSED') }}</span>
 
           <issue-assignees
@@ -318,23 +356,23 @@ export default {
               v-if="meta.value"
               :key="meta.key"
               v-gl-tooltip
-              :class="['d-none d-sm-inline-block ml-2', meta.class]"
+              :class="['d-none d-sm-inline-block ml-2 vertical-align-middle', meta.class]"
               :title="meta.title"
             >
-              <icon v-if="meta.icon" :name="meta.icon" />
-              <i v-else :class="['fa', meta.faicon]"></i>
+              <gl-icon v-if="meta.icon" :name="meta.icon" />
               {{ meta.value }}
             </span>
           </template>
 
           <gl-link
+            v-if="!isJiraIssue"
             v-gl-tooltip
             class="ml-2 js-notes"
             :href="`${issuable.web_url}#notes`"
             :title="__('Comments')"
             :class="{ 'no-comments': hasNoComments }"
           >
-            <i class="fa fa-comments"></i>
+            <gl-icon name="comments" class="gl-vertical-align-text-bottom" />
             {{ userNotesCount }}
           </gl-link>
         </div>

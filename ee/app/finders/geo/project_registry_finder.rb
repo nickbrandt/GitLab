@@ -37,5 +37,36 @@ module Geo
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
+
+    # rubocop:disable CodeReuse/ActiveRecord
+    def find_project_ids_pending_verification(batch_size:, except_ids: [])
+      Geo::ProjectRegistry
+        .from_union([
+          repositories_checksummed_pending_verification,
+          wikis_checksummed_pending_verification
+        ])
+        .model_id_not_in(except_ids)
+        .limit(batch_size)
+        .pluck_model_foreign_key
+    end
+    # rubocop:enable CodeReuse/ActiveRecord
+
+    private
+
+    # rubocop:disable CodeReuse/ActiveRecord
+    def repositories_checksummed_pending_verification
+      Geo::ProjectRegistry
+        .repositories_checksummed_pending_verification
+        .select(Geo::ProjectRegistry.arel_table[:project_id])
+    end
+    # rubocop:enable CodeReuse/ActiveRecord
+
+    # rubocop:disable CodeReuse/ActiveRecord
+    def wikis_checksummed_pending_verification
+      Geo::ProjectRegistry
+        .wikis_checksummed_pending_verification
+        .select(Geo::ProjectRegistry.arel_table[:project_id])
+    end
+    # rubocop:enable CodeReuse/ActiveRecord
   end
 end

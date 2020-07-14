@@ -1,9 +1,9 @@
 <script>
-import { uniqueId } from 'lodash';
+import { uniqueId, orderBy } from 'lodash';
 import ApprovalCheckRulePopover from 'ee/approvals/components/approval_check_rule_popover.vue';
 import EmptyRuleName from 'ee/approvals/components/empty_rule_name.vue';
 import { RULE_TYPE_CODE_OWNER, RULE_TYPE_ANY_APPROVER } from 'ee/approvals/constants';
-import { sprintf, __ } from '~/locale';
+import { sprintf, __, s__ } from '~/locale';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import ApprovedIcon from './approved_icon.vue';
 
@@ -41,9 +41,13 @@ export default {
         {
           id: uniqueId(),
           title: __('Code Owners'),
-          rules: this.approvalRules
-            .filter(rule => rule.rule_type === RULE_TYPE_CODE_OWNER)
-            .map(rule => ({ ...rule, nameClass: 'monospace' })),
+          rules: orderBy(
+            this.approvalRules
+              .filter(rule => rule.rule_type === RULE_TYPE_CODE_OWNER)
+              .map(rule => ({ ...rule, nameClass: 'monospace' })),
+            [o => o.section === 'codeowners', 'name', 'section'],
+            ['desc', 'asc', 'asc'],
+          ),
         },
       ].filter(x => x.rules.length);
     },
@@ -77,6 +81,9 @@ export default {
         name: rule.name,
       });
     },
+    sectionNameLabel(rule) {
+      return sprintf(s__('Approvals|Section: %section'), { section: rule.section });
+    },
   },
   ruleTypeAnyApprover: RULE_TYPE_ANY_APPROVER,
 };
@@ -103,12 +110,22 @@ export default {
       <tr v-for="rule in rules" :key="rule.id">
         <td class="w-0"><approved-icon :is-approved="rule.approved" /></td>
         <td :colspan="rule.rule_type === $options.ruleTypeAnyApprover ? 2 : 1">
-          <div class="d-none d-sm-block js-name" :class="rule.nameClass">
+          <div class="d-none d-sm-block js-name">
             <empty-rule-name
               v-if="rule.rule_type === $options.ruleTypeAnyApprover"
               :eligible-approvers-docs-path="eligibleApproversDocsPath"
             />
-            <span v-else>{{ rule.name }}</span>
+            <span v-else>
+              <span
+                v-if="rule.section && rule.section !== 'codeowners'"
+                :aria-label="sectionNameLabel(rule)"
+                class="text-muted small d-block"
+                data-testid="rule-section"
+              >
+                {{ rule.section }}
+              </span>
+              <span :class="rule.nameClass">{{ rule.name }}</span>
+            </span>
             <approval-check-rule-popover
               :rule="rule"
               :security-approvals-help-page-path="securityApprovalsHelpPagePath"

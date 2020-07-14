@@ -40,6 +40,9 @@
 .if-merge-request-title-update-caches: &if-merge-request-title-update-caches
   if: '$CI_MERGE_REQUEST_TITLE =~ /UPDATE CACHE/'
 
+.if-merge-request-title-run-all-rspec: &if-merge-request-title-run-all-rspec
+  if: '$CI_MERGE_REQUEST_TITLE =~ /RUN ALL RSPEC/'
+
 .if-security-merge-request: &if-security-merge-request
   if: '$CI_PROJECT_NAMESPACE == "gitlab-org/security" && $CI_MERGE_REQUEST_IID'
 
@@ -116,6 +119,8 @@
   - "{,ee/}{app/channels,app/controllers,app/finders,app/graphql,app/helpers,app/mailers,app/models,app/policies,app/presenters,app/serializers,app/services,app/uploaders,app/validators,app/views,app/workers}/**/*"
   - "{,ee/}{bin,cable,config,db,lib}/**/*"
   - "{,ee/}spec/**/*.rb"
+  - ".gitlab-ci.yml"
+  - ".gitlab/ci/**/*"
 
 .db-patterns: &db-patterns
   - "{,ee/}{,spec/}{db,migrations}/**/*"
@@ -322,11 +327,8 @@
   rules:
     - <<: *if-not-ee
       when: never
-    - <<: *if-security-merge-request
+    - <<: *if-merge-request  # Always run for MRs since `compile-test-assets as-if-foss` is either needed by `rspec foss-impact` or the `rspec * as-if-foss` jobs.
       changes: *code-backstage-qa-patterns
-    - <<: *if-merge-request-title-as-if-foss
-    - <<: *if-merge-request
-      changes: *ci-patterns
 
 .frontend:rules:default-frontend-jobs:
   rules:
@@ -342,6 +344,15 @@
     - <<: *if-merge-request-title-as-if-foss
     - <<: *if-merge-request
       changes: *ci-patterns
+
+.frontend:rules:eslint-as-if-foss:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-merge-request-title-as-if-foss
+      when: never
+    - <<: *if-merge-request
+      changes: *frontend-patterns
 
 .frontend:rules:ee-mr-and-master-only:
   rules:
@@ -432,22 +443,27 @@
 .rails:rules:ee-and-foss-migration:
   rules:
     - changes: *db-patterns
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:ee-and-foss-unit:
   rules:
     - changes: *backend-patterns
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:ee-and-foss-integration:
   rules:
     - changes: *backend-patterns
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:ee-and-foss-system:
   rules:
     - changes: *code-backstage-patterns
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:ee-and-foss-fast_spec_helper:
   rules:
     - changes: ["config/**/*"]
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:default-refs-code-backstage-qa:
   rules:
@@ -459,24 +475,28 @@
     - <<: *if-not-ee
       when: never
     - changes: *db-patterns
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:ee-only-unit:
   rules:
     - <<: *if-not-ee
       when: never
     - changes: *backend-patterns
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:ee-only-integration:
   rules:
     - <<: *if-not-ee
       when: never
     - changes: *backend-patterns
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:ee-only-system:
   rules:
     - <<: *if-not-ee
       when: never
     - changes: *code-backstage-patterns
+    - <<: *if-merge-request-title-run-all-rspec
 
 .rails:rules:as-if-foss-migration:
   rules:
@@ -522,6 +542,7 @@
   rules:
     - <<: *if-not-ee
       when: never
+    - <<: *if-merge-request-title-run-all-rspec
     - <<: *if-merge-request
       changes: *code-backstage-patterns
     - <<: *if-master-refs
@@ -548,6 +569,21 @@
     - <<: *if-not-ee
       when: never
     - <<: *if-master-schedule-2-hourly
+    - <<: *if-merge-request-title-run-all-rspec
+
+.rails:rules:master-schedule-nightly--code-backstage:
+  rules:
+    - <<: *if-master-schedule-nightly
+    - <<: *if-merge-request
+      changes: [".gitlab/ci/rails.gitlab-ci.yml"]
+
+.rails:rules:master-schedule-nightly--code-backstage-ee-only:
+  rules:
+    - <<: *if-not-ee
+      when: never
+    - <<: *if-master-schedule-nightly
+    - <<: *if-merge-request
+      changes: [".gitlab/ci/rails.gitlab-ci.yml"]
 
 ##################
 # Releases rules #

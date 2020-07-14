@@ -26,18 +26,28 @@ module EE
         end
       end
 
-      expose :performance, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:performance) } do
+      expose :browser_performance, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:browser_performance) } do
         expose :degradation_threshold do |merge_request|
           merge_request.head_pipeline&.present(current_user: current_user)
-            &.degradation_threshold
+            &.degradation_threshold(:browser_performance)
         end
 
         expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:performance)
+          head_pipeline_downloadable_path_for_report_type(:browser_performance)
         end
 
         expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:performance)
+          base_pipeline_downloadable_path_for_report_type(:browser_performance)
+        end
+      end
+
+      expose :load_performance, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:load_performance) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:load_performance)
+        end
+
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:load_performance)
         end
       end
 
@@ -69,6 +79,14 @@ module EE
 
       expose :pipeline_id, if: -> (mr, _) { mr.head_pipeline } do |merge_request|
         merge_request.head_pipeline.id
+      end
+
+      expose :pipeline_iid, if: -> (mr, _) { mr.head_pipeline } do |merge_request|
+        merge_request.head_pipeline.iid
+      end
+
+      expose :can_read_vulnerability_feedback do |merge_request|
+        can?(current_user, :read_vulnerability_feedback, merge_request.project)
       end
 
       expose :vulnerability_feedback_path do |merge_request|

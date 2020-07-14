@@ -197,6 +197,8 @@ RSpec.describe MergeRequest do
   end
 
   describe 'validation' do
+    subject { build_stubbed(:merge_request) }
+
     it { is_expected.to validate_presence_of(:target_branch) }
     it { is_expected.to validate_presence_of(:source_branch) }
 
@@ -1109,11 +1111,29 @@ RSpec.describe MergeRequest do
   end
 
   describe "#work_in_progress?" do
-    ['WIP ', 'WIP:', 'WIP: ', '[WIP]', '[WIP] ', ' [WIP] WIP [WIP] WIP: WIP '].each do |wip_prefix|
+    subject { build_stubbed(:merge_request) }
+
+    [
+      'WIP ', 'WIP:', 'WIP: ', '[WIP]', '[WIP] ', ' [WIP] WIP [WIP] WIP: WIP ',
+      'Draft ', 'draft:', 'Draft: ', '[Draft]', '[DRAFT] ', 'Draft - '
+    ].each do |wip_prefix|
       it "detects the '#{wip_prefix}' prefix" do
         subject.title = "#{wip_prefix}#{subject.title}"
+
         expect(subject.work_in_progress?).to eq true
       end
+    end
+
+    it "detects merge request title just saying 'wip'" do
+      subject.title = "wip"
+
+      expect(subject.work_in_progress?).to eq true
+    end
+
+    it "detects merge request title just saying 'draft'" do
+      subject.title = "draft"
+
+      expect(subject.work_in_progress?).to eq true
     end
 
     it "doesn't detect WIP for words starting with WIP" do
@@ -1132,7 +1152,12 @@ RSpec.describe MergeRequest do
   end
 
   describe "#wipless_title" do
-    ['WIP ', 'WIP:', 'WIP: ', '[WIP]', '[WIP] ', '[WIP] WIP [WIP] WIP: WIP '].each do |wip_prefix|
+    subject { build_stubbed(:merge_request) }
+
+    [
+      'WIP ', 'WIP:', 'WIP: ', '[WIP]', '[WIP] ', '[WIP] WIP [WIP] WIP: WIP ',
+      'Draft ', 'draft:', 'Draft: ', '[Draft]', '[DRAFT] ', 'Draft - '
+    ].each do |wip_prefix|
       it "removes the '#{wip_prefix}' prefix" do
         wipless_title = subject.title
         subject.title = "#{wip_prefix}#{subject.title}"
@@ -1150,14 +1175,14 @@ RSpec.describe MergeRequest do
   end
 
   describe "#wip_title" do
-    it "adds the WIP: prefix to the title" do
-      wip_title = "WIP: #{subject.title}"
+    it "adds the Draft: prefix to the title" do
+      wip_title = "Draft: #{subject.title}"
 
       expect(subject.wip_title).to eq wip_title
     end
 
-    it "does not add the WIP: prefix multiple times" do
-      wip_title = "WIP: #{subject.title}"
+    it "does not add the Draft: prefix multiple times" do
+      wip_title = "Draft: #{subject.title}"
       subject.title = subject.wip_title
       subject.title = subject.wip_title
 
@@ -1223,51 +1248,21 @@ RSpec.describe MergeRequest do
     let(:merge_request) { subject }
     let(:repository) { merge_request.source_project.repository }
 
-    context 'when memoize_source_branch_merge_request feature is enabled' do
-      before do
-        stub_feature_flags(memoize_source_branch_merge_request: true)
-      end
+    context 'when the source project is set' do
+      it 'memoizes the value and returns the result' do
+        expect(repository).to receive(:branch_exists?).once.with(merge_request.source_branch).and_return(true)
 
-      context 'when the source project is set' do
-        it 'memoizes the value and returns the result' do
-          expect(repository).to receive(:branch_exists?).once.with(merge_request.source_branch).and_return(true)
-
-          2.times { expect(merge_request.source_branch_exists?).to eq(true) }
-        end
-      end
-
-      context 'when the source project is not set' do
-        before do
-          merge_request.source_project = nil
-        end
-
-        it 'returns false' do
-          expect(merge_request.source_branch_exists?).to eq(false)
-        end
+        2.times { expect(merge_request.source_branch_exists?).to eq(true) }
       end
     end
 
-    context 'when memoize_source_branch_merge_request feature is disabled' do
+    context 'when the source project is not set' do
       before do
-        stub_feature_flags(memoize_source_branch_merge_request: false)
+        merge_request.source_project = nil
       end
 
-      context 'when the source project is set' do
-        it 'does not memoize the value and returns the result' do
-          expect(repository).to receive(:branch_exists?).twice.with(merge_request.source_branch).and_return(true)
-
-          2.times { expect(merge_request.source_branch_exists?).to eq(true) }
-        end
-      end
-
-      context 'when the source project is not set' do
-        before do
-          merge_request.source_project = nil
-        end
-
-        it 'returns false' do
-          expect(merge_request.source_branch_exists?).to eq(false)
-        end
+      it 'returns false' do
+        expect(merge_request.source_branch_exists?).to eq(false)
       end
     end
   end

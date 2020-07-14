@@ -4,6 +4,7 @@ module Projects
   module Security
     class ConfigurationPresenter < Gitlab::View::Presenter::Delegated
       include Gitlab::Utils::StrongMemoize
+      include AutoDevopsHelper
 
       presents :project
 
@@ -48,6 +49,9 @@ module Projects
         {
           auto_devops_enabled: auto_devops_source?,
           auto_devops_help_page_path: help_page_path('topics/autodevops/index'),
+          create_sast_merge_request_path: project_security_configuration_sast_path(project),
+          auto_devops_path: auto_devops_settings_path(project),
+          can_enable_auto_devops: can_enable_auto_devops?,
           features: features.to_json,
           help_page_path: help_page_path('user/application_security/index'),
           latest_pipeline_path: latest_pipeline_path,
@@ -56,11 +60,22 @@ module Projects
             container_scanning: project_settings.auto_fix_container_scanning
           }.to_json,
           can_toggle_auto_fix_settings: auto_fix_permission,
+          gitlab_ci_present: gitlab_ci_present?,
           auto_fix_user_path: '/' # TODO: real link will be updated with https://gitlab.com/gitlab-org/gitlab/-/issues/215669
         }
       end
 
       private
+
+      def can_enable_auto_devops?
+        feature_available?(:builds, current_user) &&
+          can?(current_user, :admin_project, self) &&
+          !archived?
+      end
+
+      def gitlab_ci_present?
+        latest_pipeline_for_ref.try(:config_path) == Gitlab::FileDetector::PATTERNS[:gitlab_ci]
+      end
 
       def features
         scans = scan_types.map do |scan_type|

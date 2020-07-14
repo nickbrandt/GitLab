@@ -15,6 +15,7 @@ RSpec.describe Group do
     it { is_expected.to belong_to(:file_template_project).class_name('Project').without_validating_presence }
     it { is_expected.to have_many(:dependency_proxy_blobs) }
     it { is_expected.to have_many(:cycle_analytics_stages) }
+    it { is_expected.to have_many(:value_streams) }
     it { is_expected.to have_many(:ip_restrictions) }
     it { is_expected.to have_many(:allowed_email_domains) }
     it { is_expected.to have_one(:dependency_proxy_setting) }
@@ -1027,5 +1028,25 @@ RSpec.describe Group do
     subject { group.owners_emails }
 
     it { is_expected.to match([user.email]) }
+  end
+
+  describe '#configure_project_deletion_mode_available?' do
+    using RSpec::Parameterized::TableSyntax
+
+    before do
+      stub_licensed_features(adjourned_deletion_for_projects_and_groups: licensed?)
+      stub_feature_flags(configure_project_deletion_mode: flag_enabled?)
+    end
+
+    where(:licensed?, :flag_enabled?, :result) do
+      true  | true  | true
+      true  | false | false
+      false | true  | false
+      false | false | false
+    end
+
+    with_them do
+      it { expect(group.configure_project_deletion_mode_available?).to be result }
+    end
   end
 end

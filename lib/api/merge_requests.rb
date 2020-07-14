@@ -68,12 +68,6 @@ module API
         mr.all_pipelines
       end
 
-      def check_sha_param!(params, merge_request)
-        if params[:sha] && merge_request.diff_head_sha != params[:sha]
-          render_api_error!("SHA does not match HEAD of source branch: #{merge_request.diff_head_sha}", 409)
-        end
-      end
-
       def automatically_mergeable?(merge_when_pipeline_succeeds, merge_request)
         pipeline_active = merge_request.head_pipeline_active? || merge_request.actual_head_pipeline_active?
         merge_when_pipeline_succeeds && merge_request.mergeable_state?(skip_ci_check: true) && pipeline_active
@@ -93,7 +87,6 @@ module API
         if params[:view] == 'simple'
           options[:with] = Entities::MergeRequestSimple
         else
-          options[:issuable_metadata] = Gitlab::IssuableMetadata.new(current_user, merge_requests).data
           options[:skip_merge_status_recheck] = !declared_params[:with_merge_status_recheck]
         end
 

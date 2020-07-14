@@ -1,0 +1,5 @@
+---
+title: Add periodic worker for collecting network policy usage
+merge_request: 30328
+author:
+type: added

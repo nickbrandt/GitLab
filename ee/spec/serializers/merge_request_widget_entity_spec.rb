@@ -32,7 +32,7 @@ RSpec.describe MergeRequestWidgetEntity do
   end
 
   def create_all_artifacts
-    artifacts = %i(codequality performance)
+    artifacts = %i(codequality performance browser_performance load_performance)
 
     artifacts.each do |artifact_type|
       create(:ee_ci_build, artifact_type, :success, pipeline: pipeline, project: pipeline.project)
@@ -62,9 +62,11 @@ RSpec.describe MergeRequestWidgetEntity do
   describe 'test report artifacts', :request_store do
     using RSpec::Parameterized::TableSyntax
 
-    where(:json_entry, :artifact_type) do
-      :codeclimate         | :codequality
-      :performance         | :performance
+    where(:json_entry, :artifact_type, :exposures) do
+      :codeclimate         | :codequality         | []
+      :browser_performance | :browser_performance | [:degradation_threshold, :head_path, :base_path]
+      :browser_performance | :performance         | [:degradation_threshold, :head_path, :base_path]
+      :load_performance    | :load_performance    | [:head_path, :base_path]
     end
 
     with_them do
@@ -87,6 +89,9 @@ RSpec.describe MergeRequestWidgetEntity do
 
           it "has data entry" do
             expect(subject.as_json).to include(json_entry)
+            exposures.each do |exposure|
+              expect(subject.as_json[json_entry]).to include(exposure)
+            end
           end
         end
 
@@ -109,38 +114,59 @@ RSpec.describe MergeRequestWidgetEntity do
       )
 
       allow(head_pipeline).to receive(:available_licensed_report_type?).and_return(true)
-
-      create(
-        :ee_ci_build,
-        :performance,
-        pipeline: head_pipeline,
-        yaml_variables: yaml_variables
-      )
     end
 
-    context "when head pipeline's performance build has the threshold variable defined" do
-      let(:yaml_variables) do
-        [
-          { key: 'FOO', value: 'BAR' },
-          { key: 'DEGRADATION_THRESHOLD', value: '5' }
-        ]
+    shared_examples 'degradation_threshold' do
+      context "when head pipeline's browser performance build has the threshold variable defined" do
+        let(:yaml_variables) do
+          [
+            { key: 'FOO', value: 'BAR' },
+            { key: 'DEGRADATION_THRESHOLD', value: '5' }
+          ]
+        end
+
+        it "returns the value of the variable" do
+          expect(subject.as_json[:browser_performance][:degradation_threshold]).to eq(5)
+        end
       end
 
-      it "returns the value of the variable" do
-        expect(subject.as_json[:performance][:degradation_threshold]).to eq(5)
+      context "when head pipeline's browser performance build has no threshold variable defined" do
+        let(:yaml_variables) do
+          [
+            { key: 'FOO', value: 'BAR' }
+          ]
+        end
+
+        it "returns nil" do
+          expect(subject.as_json[:browser_performance][:degradation_threshold]).to be_nil
+        end
       end
     end
 
-    context "when head pipeline's performance build has no threshold variable defined" do
-      let(:yaml_variables) do
-        [
-          { key: 'FOO', value: 'BAR' }
-        ]
+    context 'with browser_performance artifact' do
+      before do
+        create(
+          :ee_ci_build,
+          :browser_performance,
+          pipeline: head_pipeline,
+          yaml_variables: yaml_variables
+        )
       end
 
-      it "returns nil" do
-        expect(subject.as_json[:performance][:degradation_threshold]).to be_nil
+      include_examples 'degradation_threshold'
+    end
+
+    context 'with performance artifact' do
+      before do
+        create(
+          :ee_ci_build,
+          :performance,
+          pipeline: head_pipeline,
+          yaml_variables: yaml_variables
+        )
       end
+
+      include_examples 'degradation_threshold'
     end
   end
 
@@ -224,6 +250,32 @@ RSpec.describe MergeRequestWidgetEntity do
     expect(subject.as_json).to include(:create_vulnerability_feedback_issue_path)
     expect(subject.as_json).to include(:create_vulnerability_feedback_merge_request_path)
     expect(subject.as_json).to include(:create_vulnerability_feedback_dismissal_path)
+  end
+
+  describe '#can_read_vulnerability_feedback' do
+    context 'when user has permissions to read vulnerability feedback' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'is set to true' do
+        expect(subject.as_json[:can_read_vulnerability_feedback]).to eq(true)
+      end
+    end
+
+    context 'when user has no permissions to read vulnerability feedback' do
+      before do
+        project.add_guest(user)
+      end
+
+      it 'is set to false' do
+        expect(subject.as_json[:can_read_vulnerability_feedback]).to eq(false)
+      end
+    end
+  end
+
+  it 'has can_read_vulnerability_feedback property' do
+    expect(subject.as_json).to include(:can_read_vulnerability_feedback)
   end
 
   it 'has pipeline id' do

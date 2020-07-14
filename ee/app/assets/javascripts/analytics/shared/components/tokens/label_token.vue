@@ -1,5 +1,6 @@
 <script>
 import {
+  GlToken,
   GlFilteredSearchToken,
   GlFilteredSearchSuggestion,
   GlDropdownDivider,
@@ -11,6 +12,7 @@ import { DEBOUNCE_DELAY } from '~/vue_shared/components/filtered_search_bar/cons
 
 export default {
   components: {
+    GlToken,
     GlFilteredSearchToken,
     GlFilteredSearchSuggestion,
     GlDropdownDivider,
@@ -26,10 +28,39 @@ export default {
       type: Object,
       required: true,
     },
+    active: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      activeLabel: null,
+    };
   },
   computed: {
     labels() {
       return this.config.labels;
+    },
+    containerStyle() {
+      if (this.activeLabel) {
+        const { color, text_color } = this.activeLabel;
+
+        return { backgroundColor: color, color: text_color };
+      }
+
+      return {};
+    },
+  },
+  watch: {
+    active: {
+      immediate: true,
+      handler(newValue) {
+        if (!newValue && this.labels) {
+          this.activeLabel = this.labels.find(l => l.title === this.value?.data);
+        }
+      },
     },
   },
   created() {
@@ -56,9 +87,17 @@ export default {
     v-on="$listeners"
     @input="searchLabels"
   >
-    <template #view="{ inputValue }">
-      <template v-if="config.symbol">{{ config.symbol }}</template
-      >{{ inputValue }}
+    <template #view-token="{ inputValue, cssClasses, listeners }">
+      <gl-token
+        variant="search-value"
+        :class="cssClasses"
+        :style="containerStyle"
+        data-testid="selected-label"
+        v-on="listeners"
+      >
+        <template v-if="config.symbol">{{ config.symbol }}</template>
+        {{ activeLabel ? activeLabel.title : inputValue }}
+      </gl-token>
     </template>
     <template #suggestions>
       <gl-loading-icon v-if="config.isLoading" />

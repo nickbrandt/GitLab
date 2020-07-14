@@ -7,9 +7,12 @@ module Analytics
 
       validates :group, presence: true
       belongs_to :group
+      belongs_to :value_stream, class_name: 'Analytics::CycleAnalytics::GroupValueStream', foreign_key: :group_value_stream_id
 
       alias_attribute :parent, :group
       alias_attribute :parent_id, :group_id
+
+      scope :by_value_stream, -> (value_stream) { where(group_value_stream_id: value_stream.id) }
 
       def self.relative_positioning_query_base(stage)
         where(group_id: stage.group_id)

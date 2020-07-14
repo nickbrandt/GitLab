@@ -3,7 +3,7 @@
 require 'securerandom'
 
 module QA
-  context 'Plan', :reliable do
+  RSpec.describe 'Plan', :reliable do
     describe 'Custom email', :requires_admin do
       before do
         Flow::Login.sign_in_as_admin

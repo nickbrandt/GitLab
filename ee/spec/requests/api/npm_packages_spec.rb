@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe API::NpmPackages do
-  include EE::PackagesManagerApiSpecHelpers
+  include PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
@@ -592,12 +592,12 @@ RSpec.describe API::NpmPackages do
   def expect_a_valid_package_response
     expect(response).to have_gitlab_http_status(:ok)
     expect(response.media_type).to eq('application/json')
-    expect(response).to match_response_schema('public_api/v4/packages/npm_package', dir: 'ee')
+    expect(response).to match_response_schema('public_api/v4/packages/npm_package')
     expect(json_response['name']).to eq(package.name)
-    expect(json_response['versions'][package.version]).to match_schema('public_api/v4/packages/npm_package_version', dir: 'ee')
+    expect(json_response['versions'][package.version]).to match_schema('public_api/v4/packages/npm_package_version')
     ::Packages::Npm::PackagePresenter::NPM_VALID_DEPENDENCY_TYPES.each do |dependency_type|
       expect(json_response.dig('versions', package.version, dependency_type.to_s)).to be_any
     end
-    expect(json_response['dist-tags']).to match_schema('public_api/v4/packages/npm_package_tags', dir: 'ee')
+    expect(json_response['dist-tags']).to match_schema('public_api/v4/packages/npm_package_tags')
   end
 end

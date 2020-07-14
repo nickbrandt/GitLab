@@ -6,7 +6,24 @@ module EE
 
     override :project_jira_issues_integration?
     def project_jira_issues_integration?
-      ::Feature.enabled?(:jira_integration, @project) && @project.jira_service.issues_enabled
+      @project.jira_issues_integration_available? && @project.jira_service.issues_enabled
+    end
+
+    override :integration_form_data
+    def integration_form_data(integration)
+      form_data = super
+
+      if integration.is_a?(JiraService)
+        form_data.merge!(
+          show_jira_issues_integration: @project&.feature_available?(:jira_issues_integration).to_s,
+          enable_jira_issues: integration.issues_enabled.to_s,
+          project_key: integration.project_key,
+          upgrade_plan_path: @project && ::Gitlab::CurrentSettings.should_check_namespace_plan? ? upgrade_plan_path(@project.group) : nil,
+          edit_project_path: @project ? edit_project_path(@project, anchor: 'js-shared-permissions') : nil
+        )
+      end
+
+      form_data
     end
 
     def add_to_slack_link(project, slack_app_id)
