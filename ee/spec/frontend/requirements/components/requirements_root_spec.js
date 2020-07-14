@@ -765,6 +765,9 @@ describe('RequirementsRoot', () => {
           fetchAuthors: expect.any(Function),
         },
       ]);
+      expect(wrapper.find(FilteredSearchBarRoot).props('recentSearchesStorageKey')).toBe(
+        'requirements-recent-searches',
+      );
     });
 
     it('renders empty state when query results are empty', () => {
