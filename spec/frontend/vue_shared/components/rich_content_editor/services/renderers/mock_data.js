@@ -17,7 +17,7 @@ export const htmlBlockNode = {
 
 // Token spec helpers
 
-const buildUneditableOpenToken = type => {
+const buildMockUneditableOpenToken = type => {
   return {
     type: 'openTag',
     tagName: type,
@@ -28,7 +28,7 @@ const buildUneditableOpenToken = type => {
   };
 };
 
-const buildUneditableCloseToken = type => {
+const buildMockUneditableCloseToken = type => {
   return { type: 'closeTag', tagName: type };
 };
 
@@ -36,8 +36,8 @@ export const originToken = {
   type: 'text',
   content: '{:.no_toc .hidden-md .hidden-lg}',
 };
-export const uneditableCloseToken = buildUneditableCloseToken('div');
-export const uneditableOpenTokens = [buildUneditableOpenToken('div'), originToken];
+export const uneditableCloseToken = buildMockUneditableCloseToken('div');
+export const uneditableOpenTokens = [buildMockUneditableOpenToken('div'), originToken];
 export const uneditableCloseTokens = [originToken, uneditableCloseToken];
 export const uneditableTokens = [...uneditableOpenTokens, uneditableCloseToken];
 
@@ -46,17 +46,17 @@ export const originInlineToken = {
   content: '<i>Inline</i> content',
 };
 export const uneditableInlineTokens = [
-  buildUneditableOpenToken('a'),
+  buildMockUneditableOpenToken('a'),
   originInlineToken,
-  buildUneditableCloseToken('a'),
+  buildMockUneditableCloseToken('a'),
 ];
 
 export const uneditableBlockTokens = [
-  buildUneditableOpenToken('div'),
+  buildMockUneditableOpenToken('div'),
   {
     type: 'text',
     tagName: null,
     content: '<div><h1>Some header</h1><p>Some paragraph</p></div>',
   },
-  buildUneditableCloseToken('div'),
+  buildMockUneditableCloseToken('div'),
 ];
