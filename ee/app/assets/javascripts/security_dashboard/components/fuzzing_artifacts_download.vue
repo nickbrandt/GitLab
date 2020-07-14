@@ -1,6 +1,6 @@
 <script>
 import { s__ } from '~/locale';
-import { GlButton, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlButton, GlNewDropdown, GlDropdownItem } from '@gitlab/ui';
 
 export default {
   translations: {
@@ -8,7 +8,7 @@ export default {
   },
   components: {
     GlButton,
-    GlDropdown,
+    GlNewDropdown,
     GlDropdownItem,
   },
   props: {
@@ -37,21 +37,24 @@ export default {
 <template>
   <div>
     <strong>{{ s__('SecurityReports|Download Report') }}</strong>
-    <gl-dropdown
+    <gl-new-dropdown
       v-if="hasDropdown"
       class="d-block mt-1"
       :text="$options.translations.FUZZING_ARTIFACTS"
-      variant="primary"
+      category="secondary"
+      variant="info"
+      size="small"
     >
       <gl-dropdown-item v-for="job in jobs" :key="job.id" :href="artifactDownloadUrl(job)">{{
         job.name
       }}</gl-dropdown-item>
-    </gl-dropdown>
+    </gl-new-dropdown>
     <gl-button
       v-else
       class="d-block mt-1"
       category="secondary"
       variant="info"
+      size="small"
       :href="artifactDownloadUrl(jobs[0])"
       >{{ $options.translations.FUZZING_ARTIFACTS }}</gl-button
     >

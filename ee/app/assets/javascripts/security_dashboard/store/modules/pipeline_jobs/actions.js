@@ -23,6 +23,3 @@ export const fetchPipelineJobs = ({ commit, state }) => {
       commit(types.RECEIVE_PIPELINE_JOBS_ERROR, error);
     });
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

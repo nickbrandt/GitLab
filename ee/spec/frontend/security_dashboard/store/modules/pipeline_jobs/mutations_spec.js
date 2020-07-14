@@ -35,7 +35,7 @@ describe('pipeline jobs module mutations', () => {
   });
 
   describe('RECEIVE_PIPELINE_JOBS_SUCCESS', () => {
-    it('should set the isLoading to true and pipelineJobs to the jobs array', () => {
+    it('should set the isLoading to false and pipelineJobs to the jobs array', () => {
       const jobs = [{}, {}];
       mutations[types.RECEIVE_PIPELINE_JOBS_SUCCESS](state, jobs);
       expect(state.isLoading).toBe(false);

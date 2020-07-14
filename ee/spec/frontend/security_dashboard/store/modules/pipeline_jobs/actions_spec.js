@@ -14,22 +14,18 @@ describe('pipeling jobs actions', () => {
     state = createState();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe('setPipelineJobsPath', () => {
-    const pipslineJobsPath = 123;
+    const pipelineJobsPath = 123;
 
     it('should commit the SET_PIPELINE_JOBS_PATH mutation', done => {
       testAction(
         actions.setPipelineJobsPath,
-        pipslineJobsPath,
+        pipelineJobsPath,
         state,
         [
           {
             type: types.SET_PIPELINE_JOBS_PATH,
-            payload: pipslineJobsPath,
+            payload: pipelineJobsPath,
           },
         ],
         [],
@@ -118,7 +114,7 @@ describe('pipeling jobs actions', () => {
       });
     });
 
-    describe('without server error', () => {
+    describe('with server error', () => {
       beforeEach(() => {
         mock.onGet(state.pipelineJobsPath).replyOnce(404);
       });

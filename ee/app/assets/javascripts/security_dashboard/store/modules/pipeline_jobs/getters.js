@@ -11,5 +11,3 @@ export const fuzzingJobsWithArtifact = state => {
     return job.stage === FUZZING_STAGE && job.artifacts.length > 0;
   });
 };
-
-export default () => {};
