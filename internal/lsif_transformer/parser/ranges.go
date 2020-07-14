@@ -13,7 +13,7 @@ const (
 )
 
 type Ranges struct {
-	DefRefs map[Id]*DefRef
+	DefRefs map[Id]Item
 	Hovers  *Hovers
 	Cache   *cache
 }
@@ -29,14 +29,14 @@ type Range struct {
 	RefId     Id
 }
 
-type RawDefRef struct {
+type RawItem struct {
 	Property string `json:"property"`
 	RefId    Id     `json:"outV"`
 	RangeIds []Id   `json:"inVs"`
 	DocId    Id     `json:"document"`
 }
 
-type DefRef struct {
+type Item struct {
 	Line  string
 	DocId Id
 }
@@ -60,7 +60,7 @@ func NewRanges(tempDir string) (*Ranges, error) {
 	}
 
 	return &Ranges{
-		DefRefs: make(map[Id]*DefRef),
+		DefRefs: make(map[Id]Item),
 		Hovers:  hovers,
 		Cache:   cache,
 	}, nil
@@ -148,48 +148,48 @@ func (r *Ranges) addRange(line []byte) error {
 }
 
 func (r *Ranges) addItem(line []byte) error {
-	var defRef RawDefRef
-	if err := json.Unmarshal(line, &defRef); err != nil {
+	var rawItem RawItem
+	if err := json.Unmarshal(line, &rawItem); err != nil {
 		return err
 	}
 
-	if defRef.Property != definitions && defRef.Property != references {
+	if rawItem.Property != definitions && rawItem.Property != references {
 		return nil
 	}
 
-	for _, rangeId := range defRef.RangeIds {
-		var rg Range
-		if err := r.Cache.Entry(rangeId, &rg); err != nil {
+	for _, rangeId := range rawItem.RangeIds {
+		rg, err := r.getRange(rangeId)
+		if err != nil {
 			return err
 		}
 
-		rg.RefId = defRef.RefId
+		rg.RefId = rawItem.RefId
 
-		if err := r.Cache.SetEntry(rangeId, &rg); err != nil {
+		if err := r.Cache.SetEntry(rangeId, rg); err != nil {
 			return err
 		}
 	}
 
-	if defRef.Property == definitions {
-		return r.addDefRef(&defRef)
+	if rawItem.Property == definitions {
+		return r.addDefRef(&rawItem)
 	}
 
 	return nil
 }
 
-func (r *Ranges) addDefRef(defRef *RawDefRef) error {
-	if len(defRef.RangeIds) == 0 {
+func (r *Ranges) addDefRef(rawItem *RawItem) error {
+	if len(rawItem.RangeIds) == 0 {
 		return errors.New("no range IDs")
 	}
 
-	var rg Range
-	if err := r.Cache.Entry(defRef.RangeIds[0], &rg); err != nil {
+	rg, err := r.getRange(rawItem.RangeIds[0])
+	if err != nil {
 		return err
 	}
 
-	r.DefRefs[defRef.RefId] = &DefRef{
+	r.DefRefs[rawItem.RefId] = Item{
 		Line:  strconv.Itoa(int(rg.Line + 1)),
-		DocId: defRef.DocId,
+		DocId: rawItem.DocId,
 	}
 
 	return nil
