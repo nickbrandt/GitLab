@@ -7,7 +7,7 @@ RSpec.describe MilestonesFinder do
   let(:group) { create(:group) }
   let(:project_1) { create(:project, namespace: group) }
   let(:project_2) { create(:project, namespace: group) }
-  let!(:milestone_1) { create(:milestone, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
+  let!(:milestone_1) { create(:milestone, group: group, title: 'one test', description: 'test description', start_date: now - 1.day, due_date: now) }
   let!(:milestone_2) { create(:milestone, group: group, start_date: now + 1.day, due_date: now + 2.days) }
   let!(:milestone_3) { create(:milestone, project: project_1, state: 'active', start_date: now + 2.days, due_date: now + 3.days) }
   let!(:milestone_4) { create(:milestone, project: project_2, state: 'active', start_date: now + 4.days, due_date: now + 5.days) }
@@ -82,6 +82,12 @@ RSpec.describe MilestonesFinder do
       expect(result.to_a).to contain_exactly(milestone_1)
     end
 
+    it 'filters by search' do
+      result = described_class.new(params.merge(search: 'test description')).execute
+
+      expect(result.to_a).to contain_exactly(milestone_1)
+    end
+
     context 'by timeframe' do
       it 'returns milestones with start_date and due_date between timeframe' do
         params.merge!(start_date: now - 1.day, end_date: now + 3.days)
@@ -108,6 +114,12 @@ RSpec.describe MilestonesFinder do
 
         expect(milestones).to match_array([milestone])
       end
+    end
+
+    it 'filters by iids' do
+      result = described_class.new(params.merge(iids: [milestone_3.iid, milestone_4.iid])).execute
+
+      expect(result.to_a).to contain_exactly(milestone_3, milestone_4)
     end
   end
 

@@ -8,6 +8,8 @@
 #   order - Orders by field default due date asc.
 #   title - filter by title.
 #   state - filters by state.
+#   search - string
+#   iids: integer[]
 
 class MilestonesFinder
   include FinderMethods
@@ -22,10 +24,12 @@ class MilestonesFinder
   def execute
     items = Milestone.all
     items = by_groups_and_projects(items)
+    items = by_iid(items)
     items = by_title(items)
     items = by_search_title(items)
     items = by_state(items)
     items = by_timeframe(items)
+    items = by_search(items)
 
     order(items)
   end
@@ -53,6 +57,28 @@ class MilestonesFinder
       items
     end
   end
+
+  def by_search(items)
+    if params[:search].present?
+      items.search(params[:search])
+    else
+      items
+    end
+  end
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  def by_iid(items)
+    return items unless params[:iids].present?
+
+    if params[:project_ids].present?
+      items.where(iid: params[:iids], project_id: params[:project_ids])
+    elsif params[:group_ids].present?
+      items.where(iid: params[:iids], group_id: params[:group_ids])
+    else
+      items
+    end
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def by_state(items)
     Milestone.filter_by_state(items, params[:state])

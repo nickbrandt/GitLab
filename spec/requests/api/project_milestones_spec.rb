@@ -16,6 +16,26 @@ RSpec.describe API::ProjectMilestones do
     let(:route) { "/projects/#{project.id}/milestones" }
   end
 
+  describe 'GET /projects/:id/milestones' do
+    it 'returns parent group milestones if include_parent_milestones is true' do
+      group = create(:group, :public)
+      project = create(:project, group: group)
+      project.add_developer(user)
+      group_milestone = create(:milestone, group: group)
+      project_milestone = create(:milestone, project: project)
+
+      get api("/projects/#{project.id}/milestones", user),
+          params: { include_parent_milestones: true }
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response.size).to eq(2)
+      expect(json_response.first['title']).to eq project_milestone.title
+      expect(json_response.first['id']).to eq project_milestone.id
+      expect(json_response.last['title']).to eq group_milestone.title
+      expect(json_response.last['id']).to eq group_milestone.id
+    end
+  end
+
   describe 'DELETE /projects/:id/milestones/:milestone_id' do
     let(:guest) { create(:user) }
     let(:reporter) { create(:user) }
