@@ -12,14 +12,14 @@ export default {
 </script>
 <template>
   <div class="mr-widget-body media">
-    <div class="space-children d-flex">
+    <div class="space-children gl-display-flex">
       <status-icon status="warning" />
       <gl-button category="primary" variant="success" disabled size="small">
         {{ s__('mrWidget|Merge') }}
       </gl-button>
     </div>
     <div class="media-body">
-      <strong class="bold">
+      <strong class="gl-font-weight-bold gl-text-gray-800 gl-pl-2">
         {{ s__('mrWidget|You can only merge once the denied license is removed') }}
       </strong>
     </div>
