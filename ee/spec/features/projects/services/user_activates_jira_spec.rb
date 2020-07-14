@@ -16,6 +16,7 @@ RSpec.describe 'User activates Jira', :js do
 
         visit_project_integration('Jira')
         fill_form
+        fill_in 'service_project_key', with: 'AB'
         click_test_integration
       end
 
