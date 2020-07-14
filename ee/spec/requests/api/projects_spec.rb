@@ -920,36 +920,78 @@ RSpec.describe API::Projects do
   end
 
   describe 'DELETE /projects/:id' do
-    context 'when feature is available' do
-      before do
-        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
-      end
+    let(:group) { create(:group) }
+    let(:project) { create(:project, group: group)}
 
-      it 'marks project for deletion' do
+    before do
+      group.add_user(user, Gitlab::Access::OWNER)
+    end
+
+    shared_examples 'deletes project immediately' do
+      it do
+        delete api("/projects/#{project.id}", user)
+
+        expect(response).to have_gitlab_http_status(:accepted)
+        expect(project.reload.pending_delete).to eq(true)
+      end
+    end
+
+    shared_examples 'marks project for deletion' do
+      it do
         delete api("/projects/#{project.id}", user)
 
         expect(response).to have_gitlab_http_status(:accepted)
         expect(project.reload.marked_for_deletion?).to be_truthy
       end
+    end
 
-      it 'returns error if project cannot be marked for deletion' do
-        message = 'Error'
-        expect(::Projects::MarkForDeletionService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: message })
-
-        delete api("/projects/#{project.id}", user)
-
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response["message"]).to eq(message)
+    context 'when feature is available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
-      context 'when instance setting is set to 0 days' do
-        it 'deletes project right away' do
-          allow(Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
+      context 'delayed project removal is enabled for group' do
+        let(:group) { create(:group, delayed_project_removal: true) }
+
+        it_behaves_like 'marks project for deletion'
+
+        it 'returns error if project cannot be marked for deletion' do
+          message = 'Error'
+          expect(::Projects::MarkForDeletionService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: message })
+
           delete api("/projects/#{project.id}", user)
 
-          expect(response).to have_gitlab_http_status(:accepted)
-          expect(project.reload.pending_delete).to eq(true)
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response["message"]).to eq(message)
         end
+
+        context 'when instance setting is set to 0 days' do
+          it 'deletes project right away' do
+            allow(Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
+            delete api("/projects/#{project.id}", user)
+
+            expect(response).to have_gitlab_http_status(:accepted)
+            expect(project.reload.pending_delete).to eq(true)
+          end
+        end
+      end
+
+      context 'delayed project removal is disabled for group' do
+        it_behaves_like 'deletes project immediately'
+      end
+
+      context 'for projects in user namespace' do
+        let(:project) { create(:project, namespace: user.namespace)}
+
+        it_behaves_like 'deletes project immediately'
+      end
+
+      context 'when configure_project_deletion_mode feature is disabled' do
+        before do
+          stub_feature_flags(configure_project_deletion_mode: false)
+        end
+
+        it_behaves_like 'marks project for deletion'
       end
     end
 
@@ -958,12 +1000,7 @@ RSpec.describe API::Projects do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
 
-      it 'deletes project' do
-        delete api("/projects/#{project.id}", user)
-
-        expect(response).to have_gitlab_http_status(:accepted)
-        expect(project.reload.pending_delete).to eq(true)
-      end
+      it_behaves_like 'deletes project immediately'
     end
   end
 

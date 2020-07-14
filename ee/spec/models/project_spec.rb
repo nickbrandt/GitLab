@@ -2433,50 +2433,69 @@ RSpec.describe Project do
   end
 
   describe '#adjourned_deletion?' do
-    context 'when marking for deletion feature is available' do
-      let(:project) { create(:project) }
+    using RSpec::Parameterized::TableSyntax
+
+    subject { project.adjourned_deletion? }
+
+    where(:licensed?, :feature_enabled_on_group?, :adjourned_period, :result) do
+      true    | true  | 0 | false
+      true    | true  | 1 | true
+      true    | false | 0 | false
+      true    | false | 1 | false
+      false   | true  | 0 | false
+      false   | true  | 1 | false
+      false   | false | 0 | false
+      false   | false | 1 | false
+    end
+
+    with_them do
+      let_it_be(:group) { create(:group) }
+      let_it_be(:project) { create(:project, group: group) }
 
       before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: licensed?)
+        stub_application_setting(deletion_adjourned_period: adjourned_period)
+        allow(group).to receive(:delayed_project_removal?).and_return(feature_enabled_on_group?)
+      end
+
+      it { is_expected.to be result }
+    end
+
+    context 'when configure_project_deletion_mode feature is disabled' do
+      before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+        stub_application_setting(deletion_adjourned_period: 7)
+        stub_feature_flags(configure_project_deletion_mode: false)
       end
 
-      context 'when number of days is set to more than 0' do
-        it 'returns true' do
-          stub_application_setting(deletion_adjourned_period: 1)
-
-          expect(project.adjourned_deletion?).to eq(true)
-        end
-      end
-
-      context 'when number of days is set to 0' do
-        it 'returns false' do
-          stub_application_setting(deletion_adjourned_period: 0)
-
-          expect(project.adjourned_deletion?).to eq(false)
-        end
+      it 'adjourns deletion' do
+        is_expected.to be true
       end
     end
 
-    context 'when marking for deletion feature is not available' do
-      let(:project) { create(:project) }
+    context 'when project belongs to user namespace' do
+      let_it_be(:user) { create(:user) }
+      let_it_be(:user_project) { create(:project, namespace: user.namespace) }
 
       before do
-        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+        stub_application_setting(deletion_adjourned_period: 7)
+        stub_feature_flags(configure_project_deletion_mode: feature_enabled?)
       end
 
-      context 'when number of days is set to more than 0' do
-        it 'returns false' do
-          stub_application_setting(deletion_adjourned_period: 1)
+      context 'configure_project_deletion_mode is enabled' do
+        let(:feature_enabled?) { true }
 
-          expect(project.adjourned_deletion?).to eq(false)
+        it 'deletes immediately' do
+          expect(user_project.adjourned_deletion?).to be nil
         end
       end
 
-      context 'when number of days is set to 0' do
-        it 'returns false' do
-          stub_application_setting(deletion_adjourned_period: 0)
+      context 'configure_project_deletion_mode is disabled' do
+        let(:feature_enabled?) { false }
 
-          expect(project.adjourned_deletion?).to eq(false)
+        it 'adjourns deletion' do
+          expect(user_project.adjourned_deletion?).to be true
         end
       end
     end
