@@ -888,35 +888,6 @@ export const searchBy = (query = '', searchSpace = {}) => {
  */
 export const isScopedLabel = ({ title = '' }) => title.indexOf('::') !== -1;
 
-window.gl = window.gl || {};
-window.gl.utils = {
-  ...(window.gl.utils || {}),
-  getPagePath,
-  isInGroupsPage,
-  isInProjectPage,
-  getProjectSlug,
-  getGroupSlug,
-  isInIssuePage,
-  ajaxGet,
-  rstrip,
-  updateTooltipTitle,
-  disableButtonIfEmptyField,
-  handleLocationHash,
-  isInViewport,
-  parseUrl,
-  parseUrlPathname,
-  getUrlParamsArray,
-  isMetaKey,
-  isMetaClick,
-  scrollToElement,
-  getParameterByName,
-  getSelectedFragment,
-  insertText,
-  nodeMatchesSelector,
-  spriteIcon,
-  imagePath,
-};
-
 // Methods to set and get Cookie
 export const setCookie = (name, value) => Cookies.set(name, value, { expires: 365 });
 
