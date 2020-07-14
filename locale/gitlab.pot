@@ -26411,6 +26411,9 @@ msgstr ""
 msgid "WikiEmptyIssueMessage|issue tracker"
 msgstr ""
 
+msgid "WikiEmpty| Have a Confluence wiki already? Use that instead."
+msgstr ""
+
 msgid "WikiEmpty|A wiki is where you can store all the details about your group. This can include why you've created it, its principles, how to use it, and so on."
 msgstr ""
 
@@ -26418,6 +26421,9 @@ msgid "WikiEmpty|A wiki is where you can store all the details about your projec
 msgstr ""
 
 msgid "WikiEmpty|Create your first page"
+msgstr ""
+
+msgid "WikiEmpty|Enable the Confluence Wiki integration"
 msgstr ""
 
 msgid "WikiEmpty|Suggest wiki improvement"
