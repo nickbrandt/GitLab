@@ -2,7 +2,6 @@
 
 module Gitlab
   module Database
-
     # Minimum PostgreSQL version requirement per documentation:
     # https://docs.gitlab.com/ee/install/requirements.html#postgresql-requirements
     MINIMUM_POSTGRES_VERSION = 11

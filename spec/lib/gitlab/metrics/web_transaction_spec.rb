@@ -9,10 +9,38 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
 
   before do
     allow(described_class).to receive(:prometheus_metric).and_return(prometheus_metric)
-    allow(transaction).to receive(:observe)
+  end
+
+  RSpec.shared_context 'ActionController request' do
+    let(:request) { double(:request, format: double(:format, ref: :html)) }
+    let(:controller_class) { double(:controller_class, name: 'TestController') }
+
+    before do
+      controller = double(:controller, class: controller_class, action_name: 'show', request: request)
+      env['action_controller.instance'] = controller
+    end
+  end
+
+  RSpec.shared_context 'transaction observe metrics' do
+    before do
+      allow(transaction).to receive(:observe)
+    end
+  end
+
+  RSpec.shared_examples 'metric with labels' do |metric_method|
+    include_context 'ActionController request'
+
+    it 'measures with correct labels and value' do
+      value = 1
+      expect(prometheus_metric).to receive(metric_method).with({ controller: 'TestController', action: 'show', feature_category: '' }, value)
+
+      transaction.send(metric_method, :bau, value)
+    end
   end
 
   describe '#duration' do
+    include_context 'transaction observe metrics'
+
     it 'returns the duration of a transaction in seconds' do
       transaction.run { sleep(0.5) }
 
@@ -21,6 +49,8 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
   end
 
   describe '#allocated_memory' do
+    include_context 'transaction observe metrics'
+
     it 'returns the allocated memory in bytes' do
       transaction.run { 'a' * 32 }
 
@@ -29,6 +59,8 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
   end
 
   describe '#run' do
+    include_context 'transaction observe metrics'
+
     it 'yields the supplied block' do
       expect { |b| transaction.run(&b) }.to yield_control
     end
@@ -55,9 +87,6 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
   end
 
   describe '#labels' do
-    let(:request) { double(:request, format: double(:format, ref: :html)) }
-    let(:controller_class) { double(:controller_class, name: 'TestController') }
-
     context 'when request goes to Grape endpoint' do
       before do
         route = double(:route, request_method: 'GET', path: '/:version/projects/:id/archive(.:format)')
@@ -85,11 +114,7 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
     end
 
     context 'when request goes to ActionController' do
-      before do
-        controller = double(:controller, class: controller_class, action_name: 'show', request: request)
-
-        env['action_controller.instance'] = controller
-      end
+      include_context 'ActionController request'
 
       it 'tags a transaction with the name and action of a controller' do
         expect(transaction.labels).to eq({ controller: 'TestController', action: 'show', feature_category: '' })
@@ -142,5 +167,23 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
 
       transaction.add_event(:bau, animal: 'dog')
     end
+  end
+
+  describe '#increment' do
+    let(:prometheus_metric) { instance_double(Prometheus::Client::Counter, :increment, base_labels: {}) }
+
+    it_behaves_like 'metric with labels', :increment
+  end
+
+  describe '#set' do
+    let(:prometheus_metric) { instance_double(Prometheus::Client::Gauge, :set, base_labels: {}) }
+
+    it_behaves_like 'metric with labels', :set
+  end
+
+  describe '#observe' do
+    let(:prometheus_metric) { instance_double(Prometheus::Client::Histogram, :observe, base_labels: {}) }
+
+    it_behaves_like 'metric with labels', :observe
   end
 end

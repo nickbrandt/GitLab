@@ -31,7 +31,7 @@ module Gitlab
             # set default metric options
             docstring "#{name.to_s.humanize} #{type}"
             multiprocess_mode :livesum if type == :gauge
-            buckets SMALL_BUCKETS if type == :histogram
+            buckets ::Prometheus::Client::Histogram::DEFAULT_BUCKETS if type == :histogram
 
             evaluate(&block)
             # always filter sensitive labels and merge with base ones
@@ -74,8 +74,12 @@ module Gitlab
         @memory_after = System.memory_usage_rss
         @finished_at = System.monotonic_time
 
-        observe(:cputime_seconds, thread_cpu_duration)
-        observe(:duration_seconds, duration)
+        observe(:cputime_seconds, thread_cpu_duration) do
+          buckets SMALL_BUCKETS
+        end
+        observe(:duration_seconds, duration) do
+          buckets SMALL_BUCKETS
+        end
         observe(:allocated_memory_bytes, allocated_memory * 1024.0) do
           buckets BIG_BUCKETS
         end
@@ -126,7 +130,7 @@ module Gitlab
       def increment(name, value = 1, &block)
         counter = self.class.prometheus_metric(name, :counter, &block)
 
-        counter.increment(counter.base_labels, value)
+        counter.increment(counter.base_labels&.merge(labels), value)
       end
 
       # Set gauge metric
@@ -144,7 +148,7 @@ module Gitlab
       def set(name, value, &block)
         gauge = self.class.prometheus_metric(name, :gauge, &block)
 
-        gauge.set(gauge.base_labels, value)
+        gauge.set(gauge.base_labels&.merge(labels), value)
       end
 
       # Observe histogram metric
@@ -162,7 +166,7 @@ module Gitlab
       def observe(name, value, &block)
         histogram = self.class.prometheus_metric(name, :histogram, &block)
 
-        histogram.observe(histogram.base_labels, value)
+        histogram.observe(histogram.base_labels&.merge(labels), value)
       end
 
       def labels

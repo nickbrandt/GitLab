@@ -53,7 +53,7 @@ module Gitlab
         end
 
         def increment(counter)
-          current_transaction.increment(counter, 1)
+          current_transaction.increment("gitlab_transaction_#{counter}_total".to_sym, 1)
 
           if Gitlab::SafeRequestStore.active?
             Gitlab::SafeRequestStore[counter] = Gitlab::SafeRequestStore[counter].to_i + 1
