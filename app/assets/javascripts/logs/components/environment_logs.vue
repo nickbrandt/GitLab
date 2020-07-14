@@ -8,6 +8,7 @@ import {
   GlDropdown,
   GlDropdownHeader,
   GlDropdownItem,
+  GlDropdownDivider,
   GlInfiniteScroll,
 } from '@gitlab/ui';
 
@@ -27,6 +28,7 @@ export default {
     GlDropdown,
     GlDropdownHeader,
     GlDropdownItem,
+    GlDropdownDivider,
     GlInfiniteScroll,
     LogSimpleFilters,
     LogAdvancedFilters,
@@ -55,6 +57,10 @@ export default {
       type: String,
       required: true,
     },
+    clustersPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -63,7 +69,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('environmentLogs', ['environments', 'timeRange', 'logs', 'pods']),
+    ...mapState('environmentLogs', ['environments', 'timeRange', 'logs', 'pods', 'managedApps']),
     ...mapGetters('environmentLogs', ['trace', 'showAdvancedFilters']),
 
     showLoader() {
@@ -85,12 +91,15 @@ export default {
     });
 
     this.fetchEnvironments(this.environmentsPath);
+    this.fetchManagedApps(this.clustersPath);
   },
   methods: {
     ...mapActions('environmentLogs', [
       'setInitData',
       'showEnvironment',
+      'showManagedApp',
       'fetchEnvironments',
+      'fetchManagedApps',
       'refreshPodLogs',
       'fetchMoreLogsPrepend',
       'dismissRequestEnvironmentsError',
@@ -100,6 +109,9 @@ export default {
 
     isCurrentEnvironment(envName) {
       return envName === this.environments.current;
+    },
+    isCurrentManagedApp(appName) {
+      return appName === this.managedApps.current;
     },
     topReached() {
       if (!this.logs.isLoading) {
@@ -182,6 +194,23 @@ export default {
                 name="status_success_borderless"
               />
               <div class="flex-grow-1">{{ env.name }}</div>
+            </div>
+          </gl-dropdown-item>
+          <gl-dropdown-divider />
+          <gl-dropdown-header class="text-center">
+            {{ s__('Environments|Managed apps') }}
+          </gl-dropdown-header>
+          <gl-dropdown-item
+            v-for="app in managedApps.options"
+            :key="app.id"
+            @click="showManagedApp(app.name)"
+          >
+            <div class="gl-display-flex">
+              <gl-icon
+                :class="{ invisible: !isCurrentManagedApp(app.name) }"
+                name="status_success_borderless"
+              />
+              <div class="flex-grow-1">{{ app.name }}</div>
             </div>
           </gl-dropdown-item>
         </gl-dropdown>

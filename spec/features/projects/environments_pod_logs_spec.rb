@@ -37,7 +37,7 @@ RSpec.describe 'Environment > Pod Logs', :js, :kubeclient do
 
       dropdown_items = find(".dropdown-menu").all(".dropdown-item")
       expect(dropdown_items.first).to have_content(environment.name)
-      expect(dropdown_items.size).to eq(2)
+      expect(dropdown_items.size).to eq(3)
     end
   end
 
