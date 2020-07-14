@@ -17,11 +17,13 @@ describe('ee/epic/components/epic_form.vue', () => {
 
   const createWrapper = ({ mutationResult = TEST_NEW_EPIC } = {}) => {
     wrapper = shallowMount(EpicForm, {
-      propsData: {
+      provide: {
         groupPath: TEST_GROUP_PATH,
         groupEpicsPath: TEST_HOST,
         labelsFetchPath: TEST_HOST,
         labelsManagePath: TEST_HOST,
+        markdownPreviewPath: TEST_HOST,
+        markdownDocsPath: TEST_HOST,
       },
       stubs: {
         ApolloMutation,
@@ -40,10 +42,10 @@ describe('ee/epic/components/epic_form.vue', () => {
     wrapper = null;
   });
 
-  const findTitle = () => wrapper.find('#epic-title');
-  const findDescription = () => wrapper.find('#epic-description');
   const findLabels = () => wrapper.find(LabelsSelectVue);
-  const findConfidentialityCheck = () => wrapper.find('#epic-confidentiality');
+  const findTitle = () => wrapper.find('[data-testid="epic-title"]');
+  const findDescription = () => wrapper.find('[data-testid="epic-description"]');
+  const findConfidentialityCheck = () => wrapper.find('[data-testid="epic-confidentiality"]');
   const findStartDate = () => wrapper.find('[data-testid="epic-start-date"]');
   const findStartDateReset = () => wrapper.find('[data-testid="clear-start-date"]');
   const findDueDate = () => wrapper.find('[data-testid="epic-due-date"]');

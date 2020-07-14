@@ -8871,9 +8871,6 @@ msgstr ""
 msgid "Enter a number"
 msgstr ""
 
-msgid "Enter a title for your epic"
-msgstr ""
-
 msgid "Enter a whole number between 0 and 100"
 msgstr ""
 
@@ -9228,7 +9225,13 @@ msgstr ""
 msgid "Epics|Are you sure you want to remove %{bStart}%{targetIssueTitle}%{bEnd} from %{bStart}%{parentEpicTitle}%{bEnd}?"
 msgstr ""
 
+msgid "Epics|Enter a title for your epic"
+msgstr ""
+
 msgid "Epics|How can I solve this?"
+msgstr ""
+
+msgid "Epics|Leave empty to inherit from milestone dates"
 msgstr ""
 
 msgid "Epics|More information"
@@ -9270,10 +9273,16 @@ msgstr ""
 msgid "Epics|These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely."
 msgstr ""
 
+msgid "Epics|This epic and any containing child epics are confidential and should only be visible to team members with at least Reporter access."
+msgstr ""
+
 msgid "Epics|This will also remove any descendents of %{bStart}%{targetEpicTitle}%{bEnd} from %{bStart}%{parentEpicTitle}%{bEnd}. Are you sure?"
 msgstr ""
 
 msgid "Epics|To schedule your epic's %{epicDateType} date based on milestones, assign a milestone with a %{epicDateType} date to any issue in the epic."
+msgstr ""
+
+msgid "Epics|Unable to save epic. Please try again"
 msgstr ""
 
 msgid "Epics|due"
@@ -13644,9 +13653,6 @@ msgid "Leave blank for no limit. Once set, existing personal access tokens may b
 msgstr ""
 
 msgid "Leave edit mode? All unsaved changes will be lost."
-msgstr ""
-
-msgid "Leave empty to inherit from milestone dates"
 msgstr ""
 
 msgid "Leave group"
@@ -23923,9 +23929,6 @@ msgstr ""
 msgid "This epic already has the maximum number of child epics."
 msgstr ""
 
-msgid "This epic and any containing child epics are confidential and are only visible to team members with at least Reporter access."
-msgstr ""
-
 msgid "This epic and its child elements will only be visible to team members with at minimum Reporter access."
 msgstr ""
 
@@ -25101,9 +25104,6 @@ msgid "Unable to load the merge request widget. Try reloading the page."
 msgstr ""
 
 msgid "Unable to resolve"
-msgstr ""
-
-msgid "Unable to save epic. Please try again"
 msgstr ""
 
 msgid "Unable to save iteration. Please try again"

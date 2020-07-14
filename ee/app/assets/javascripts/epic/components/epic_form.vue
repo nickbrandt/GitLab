@@ -9,7 +9,7 @@ import {
 } from '@gitlab/ui';
 import { visitUrl } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
-import { __ } from '~/locale';
+import { s__ } from '~/locale';
 import LabelsSelectVue from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
 import createEpic from '../queries/createEpic.mutation.graphql';
@@ -25,34 +25,14 @@ export default {
     MarkdownField,
     LabelsSelectVue,
   },
-  props: {
-    groupPath: {
-      type: String,
-      required: true,
-    },
-    groupEpicsPath: {
-      type: String,
-      required: true,
-    },
-    labelsFetchPath: {
-      type: String,
-      required: true,
-    },
-    labelsManagePath: {
-      type: String,
-      required: true,
-    },
-    markdownPreviewPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    markdownDocsPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
-  },
+  inject: [
+    'groupPath',
+    'groupEpicsPath',
+    'labelsFetchPath',
+    'labelsManagePath',
+    'markdownPreviewPath',
+    'markdownDocsPath',
+  ],
   data() {
     return {
       title: '',
@@ -68,6 +48,13 @@ export default {
     labelIds() {
       return this.labels.map(label => label.id);
     },
+  },
+  i18n: {
+    confidentialityLabel: s__(`
+      Epics|This epic and any containing child epics are confidential
+      and should only be visible to team members with at least Reporter access.
+    `),
+    epicDatesHint: s__('Epics|Leave empty to inherit from milestone dates'),
   },
   methods: {
     save() {
@@ -102,7 +89,7 @@ export default {
         })
         .catch(() => {
           this.loading = false;
-          createFlash(__('Unable to save epic. Please try again'));
+          createFlash(s__('Epics|Unable to save epic. Please try again'));
         });
     },
     updateDueDate(val) {
@@ -136,7 +123,8 @@ export default {
         <gl-form-input
           id="epic-title"
           v-model="title"
-          :placeholder="__('Enter a title for your epic')"
+          data-testid="epic-title"
+          :placeholder="s__('Epics|Enter a title for your epic')"
           autocomplete="off"
           autofocus
         />
@@ -158,6 +146,7 @@ export default {
             <textarea
               id="epic-description"
               v-model="description"
+              data-testid="epic-description"
               class="note-textarea js-gfm-input js-autosize markdown-area"
               dir="auto"
               data-supports-quick-actions="true"
@@ -169,39 +158,35 @@ export default {
         </markdown-field>
       </gl-form-group>
       <gl-form-group :label="__('Confidentiality')" label-for="epic-confidentiality">
-        <gl-form-checkbox id="epic-confidentiality" v-model="confidential">{{
-          __(
-            'This epic and any containing child epics are confidential' +
-              ' and are only visible to team members with at least Reporter access.',
-          )
-        }}</gl-form-checkbox>
+        <gl-form-checkbox
+          id="epic-confidentiality"
+          v-model="confidential"
+          data-testid="epic-confidentiality"
+        >
+          {{ $options.i18n.confidentialityLabel }}
+        </gl-form-checkbox>
       </gl-form-group>
       <hr />
       <gl-form-group :label="__('Labels')">
-        <div class="issuable-form-select-holder">
-          <labels-select-vue
-            :allow-label-edit="false"
-            :allow-label-create="true"
-            :allow-multiselect="true"
-            :allow-scoped-labels="false"
-            :selected-labels="labels"
-            :labels-fetch-path="labelsFetchPath"
-            :labels-manage-path="labelsManagePath"
-            :labels-filter-base-path="groupEpicsPath"
-            :labels-list-title="__('Select label')"
-            :dropdown-button-text="__('Choose labels')"
-            variant="embedded"
-            class="block labels js-labels-block"
-            @updateSelectedLabels="handleUpdateSelectedLabels"
-          >
-            {{ __('None') }}
-          </labels-select-vue>
-        </div>
+        <labels-select-vue
+          :allow-label-edit="false"
+          :allow-label-create="true"
+          :allow-multiselect="true"
+          :allow-scoped-labels="false"
+          :selected-labels="labels"
+          :labels-fetch-path="labelsFetchPath"
+          :labels-manage-path="labelsManagePath"
+          :labels-filter-base-path="groupEpicsPath"
+          :labels-list-title="__('Select label')"
+          :dropdown-button-text="__('Choose labels')"
+          variant="embedded"
+          class="block labels js-labels-block"
+          @updateSelectedLabels="handleUpdateSelectedLabels"
+        >
+          {{ __('None') }}
+        </labels-select-vue>
       </gl-form-group>
-      <gl-form-group
-        :label="__('Start date')"
-        :description="__('Leave empty to inherit from milestone dates')"
-      >
+      <gl-form-group :label="__('Start date')" :description="$options.i18n.epicDatesHint">
         <div class="gl-display-inline-block gl-mr-2">
           <gl-datepicker v-model="startDateFixed" data-testid="epic-start-date" />
         </div>
@@ -216,8 +201,9 @@ export default {
         </gl-button>
       </gl-form-group>
       <gl-form-group
+        class="gl-pb-4"
         :label="__('Due date')"
-        :description="__('Leave empty to inherit from milestone dates')"
+        :description="$options.i18n.epicDatesHint"
       >
         <div class="gl-display-inline-block gl-mr-2">
           <gl-datepicker v-model="dueDateFixed" data-testid="epic-due-date" />
