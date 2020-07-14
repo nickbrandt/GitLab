@@ -13,6 +13,21 @@ module Gitlab
             scanned_resources_sum
           end
 
+          def scanned_resources_for_csv(scanned_resources)
+            scanned_resources.map do |sr|
+              uri = URI.parse(sr['url'] || '')
+              OpenStruct.new({
+                request_method: sr['method'],
+                scheme: uri.scheme,
+                host: uri.host,
+                port: uri.port,
+                path: uri.path,
+                query_string: uri.query,
+                raw_url: sr['url']
+              })
+            end
+          end
+
           private
 
           def parse_report_json(blob)

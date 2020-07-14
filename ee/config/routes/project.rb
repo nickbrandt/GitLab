@@ -78,6 +78,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             end
           end
 
+          resources :scanned_resources, only: [:index]
+
           resources :vulnerabilities, only: [:show] do
             member do
               get :discussions, format: :json
