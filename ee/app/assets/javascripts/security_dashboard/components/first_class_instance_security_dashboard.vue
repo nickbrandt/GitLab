@@ -101,7 +101,10 @@ export default {
     <template #header>
       <header class="page-title-holder flex-fill d-flex align-items-center">
         <h2 class="page-title flex-grow">{{ s__('SecurityReports|Security Dashboard') }}</h2>
-        <csv-export-button :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint" />
+        <csv-export-button
+          v-if="!shouldShowEmptyState"
+          :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint"
+        />
         <gl-button
           class="page-title-controls ml-2"
           :variant="toggleButtonProps.variant"

@@ -108,6 +108,10 @@ describe('First Class Instance Dashboard Component', () => {
       expect(findEmptyState().props()).toEqual({});
     });
 
+    it('does not render the export button', () => {
+      expect(findCsvExportButton().exists()).toBe(false);
+    });
+
     it('does not render the vulnerability list', () => {
       expect(findInstanceVulnerabilities().exists()).toBe(false);
     });

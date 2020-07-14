@@ -1,0 +1,5 @@
+---
+title: Do not render export button when instance level security dashbaord is uninitialized
+merge_request: 36843
+author:
+type: fixed
