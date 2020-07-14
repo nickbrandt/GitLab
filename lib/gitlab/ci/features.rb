@@ -61,6 +61,10 @@ module Gitlab
       def self.destroy_only_unlocked_expired_artifacts_enabled?
         ::Feature.enabled?(:destroy_only_unlocked_expired_artifacts, default_enabled: false)
       end
+
+      def self.bulk_insert_on_create?(project)
+        ::Feature.enabled?(:ci_bulk_insert_on_create, project, default_enabled: true)
+      end
     end
   end
 end
