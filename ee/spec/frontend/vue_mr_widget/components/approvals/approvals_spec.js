@@ -1,10 +1,11 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 import Approvals from 'ee/vue_merge_request_widget/components/approvals/approvals.vue';
 import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
 import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
 import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/approvals_footer.vue';
 import ApprovalsAuth from 'ee/vue_merge_request_widget/components/approvals/approvals_auth.vue';
+import createFlash from '~/flash';
 
 import {
   FETCH_LOADING,
@@ -14,7 +15,6 @@ import {
 } from 'ee/vue_merge_request_widget/components/approvals/messages';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 
-const localVue = createLocalVue();
 const TEST_HELP_PATH = 'help/path';
 const TEST_PASSWORD = 'password';
 const testApprovedBy = () => [1, 7, 10].map(id => ({ id }));
@@ -30,28 +30,20 @@ const testApprovals = () => ({
 });
 const testApprovalRulesResponse = () => ({ rules: [{ id: 2 }] });
 
-// For some reason, the `localVue.nextTick` needs to be deferred
-// or the timing doesn't work.
-const tick = () => Promise.resolve().then(localVue.nextTick);
-const waitForTick = done =>
-  tick()
-    .then(done)
-    .catch(done.fail);
+jest.mock('~/flash');
 
 describe('EE MRWidget approvals', () => {
   let wrapper;
   let service;
   let mr;
-  let createFlash;
 
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(localVue.extend(Approvals), {
+    wrapper = shallowMount(Approvals, {
       propsData: {
         mr,
         service,
         ...props,
       },
-      localVue,
     });
   };
 
@@ -72,24 +64,29 @@ describe('EE MRWidget approvals', () => {
   const findFooter = () => wrapper.find(ApprovalsFooter);
 
   beforeEach(() => {
-    service = jasmine.createSpyObj('MRWidgetService', {
-      fetchApprovals: Promise.resolve(testApprovals()),
-      fetchApprovalSettings: Promise.resolve(testApprovalRulesResponse()),
-      approveMergeRequest: Promise.resolve(testApprovals()),
-      unapproveMergeRequest: Promise.resolve(testApprovals()),
-      approveMergeRequestWithAuth: Promise.resolve(testApprovals()),
-    });
+    service = {
+      ...{
+        fetchApprovals: jest.fn().mockResolvedValue(testApprovals()),
+        fetchApprovalSettings: jest.fn().mockResolvedValue(testApprovalRulesResponse()),
+        approveMergeRequest: jest.fn().mockResolvedValue(testApprovals()),
+        unapproveMergeRequest: jest.fn().mockResolvedValue(testApprovals()),
+        approveMergeRequestWithAuth: jest.fn().mockResolvedValue(testApprovals()),
+      },
+    };
+
     mr = {
-      ...jasmine.createSpyObj('Store', ['setApprovals', 'setApprovalRules']),
+      ...{
+        setApprovals: jest.fn(),
+        setApprovalRules: jest.fn(),
+      },
       approvalsHelpPath: TEST_HELP_PATH,
       approvals: testApprovals(),
       approvalRules: [],
       isOpen: true,
       state: 'open',
     };
-    createFlash = spyOnDependency(Approvals, 'createFlash');
 
-    spyOn(eventHub, '$emit');
+    jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -99,11 +96,16 @@ describe('EE MRWidget approvals', () => {
 
   describe('when created', () => {
     beforeEach(() => {
+      jest.spyOn(service, 'fetchApprovals').mockResolvedValue(testApprovals());
       createComponent();
     });
 
     it('shows loading message', () => {
-      expect(wrapper.text()).toContain(FETCH_LOADING);
+      wrapper.setData({ fetchingApprovals: true });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.text()).toContain(FETCH_LOADING);
+      });
     });
 
     it('fetches approvals', () => {
@@ -112,10 +114,11 @@ describe('EE MRWidget approvals', () => {
   });
 
   describe('when fetch approvals success', () => {
-    beforeEach(done => {
-      service.fetchApprovals.and.returnValue(Promise.resolve());
+    beforeEach(() => {
+      jest.spyOn(service, 'fetchApprovals').mockResolvedValue();
       createComponent();
-      waitForTick(done);
+
+      return wrapper.vm.$nextTick();
     });
 
     it('hides loading message', () => {
@@ -125,10 +128,11 @@ describe('EE MRWidget approvals', () => {
   });
 
   describe('when fetch approvals error', () => {
-    beforeEach(done => {
-      service.fetchApprovals.and.returnValue(Promise.reject());
+    beforeEach(() => {
+      jest.spyOn(service, 'fetchApprovals').mockRejectedValue();
       createComponent();
-      waitForTick(done);
+
+      return wrapper.vm.$nextTick();
     });
 
     it('still shows loading message', () => {
@@ -141,14 +145,19 @@ describe('EE MRWidget approvals', () => {
   });
 
   describe('action button', () => {
+    beforeEach(() => {
+      jest.spyOn(service, 'fetchApprovals').mockResolvedValue(testApprovals());
+    });
+
     describe('when mr is closed', () => {
-      beforeEach(done => {
+      beforeEach(() => {
         mr.isOpen = false;
         mr.approvals.user_has_approved = false;
         mr.approvals.user_can_approve = true;
 
         createComponent();
-        waitForTick(done);
+
+        return wrapper.vm.$nextTick();
       });
 
       it('action is not rendered', () => {
@@ -157,12 +166,13 @@ describe('EE MRWidget approvals', () => {
     });
 
     describe('when user cannot approve', () => {
-      beforeEach(done => {
+      beforeEach(() => {
         mr.approvals.user_has_approved = false;
         mr.approvals.user_can_approve = false;
 
         createComponent();
-        waitForTick(done);
+
+        return wrapper.vm.$nextTick();
       });
 
       it('action is not rendered', () => {
@@ -177,9 +187,10 @@ describe('EE MRWidget approvals', () => {
       });
 
       describe('and MR is unapproved', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           createComponent();
-          waitForTick(done);
+
+          return wrapper.vm.$nextTick();
         });
 
         it('approve action is rendered', () => {
@@ -197,10 +208,11 @@ describe('EE MRWidget approvals', () => {
         });
 
         describe('with no approvers', () => {
-          beforeEach(done => {
+          beforeEach(() => {
             mr.approvals.approved_by = [];
             createComponent();
-            waitForTick(done);
+
+            return wrapper.vm.$nextTick();
           });
 
           it('approve action (with inverted style) is rendered', () => {
@@ -213,10 +225,11 @@ describe('EE MRWidget approvals', () => {
         });
 
         describe('with approvers', () => {
-          beforeEach(done => {
+          beforeEach(() => {
             mr.approvals.approved_by = [{ user: { id: 7 } }];
             createComponent();
-            waitForTick(done);
+
+            return wrapper.vm.$nextTick();
           });
 
           it('approve additionally action is rendered', () => {
@@ -230,31 +243,30 @@ describe('EE MRWidget approvals', () => {
       });
 
       describe('when approve action is clicked', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           createComponent();
-          waitForTick(done);
+
+          return wrapper.vm.$nextTick();
         });
 
-        it('shows loading icon', done => {
-          service.approveMergeRequest.and.callFake(() => new Promise(() => {}));
+        it('shows loading icon', () => {
+          jest.spyOn(service, 'approveMergeRequest').mockReturnValue(new Promise(() => {}));
           const action = findAction();
 
           expect(action.props('loading')).toBe(false);
 
           action.vm.$emit('click');
 
-          tick()
-            .then(() => {
-              expect(action.props('loading')).toBe(true);
-            })
-            .then(done)
-            .catch(done.fail);
+          return wrapper.vm.$nextTick().then(() => {
+            expect(action.props('loading')).toBe(true);
+          });
         });
 
         describe('and after loading', () => {
-          beforeEach(done => {
+          beforeEach(() => {
             findAction().vm.$emit('click');
-            waitForTick(done);
+
+            return wrapper.vm.$nextTick();
           });
 
           it('calls service approve', () => {
@@ -275,10 +287,11 @@ describe('EE MRWidget approvals', () => {
         });
 
         describe('and error', () => {
-          beforeEach(done => {
-            service.approveMergeRequest.and.returnValue(Promise.reject());
+          beforeEach(() => {
+            jest.spyOn(service, 'approveMergeRequest').mockRejectedValue();
             findAction().vm.$emit('click');
-            waitForTick(done);
+
+            return wrapper.vm.$nextTick();
           });
 
           it('flashes error message', () => {
@@ -288,59 +301,54 @@ describe('EE MRWidget approvals', () => {
       });
 
       describe('when project requires password to approve', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           mr.approvals.require_password_to_approve = true;
           createComponent();
-          waitForTick(done);
+
+          return wrapper.vm.$nextTick();
         });
 
         describe('when approve is clicked', () => {
-          beforeEach(done => {
+          beforeEach(() => {
             findAction().vm.$emit('click');
-            waitForTick(done);
+
+            return wrapper.vm.$nextTick();
           });
 
           describe('when emits approve', () => {
-            let authReject;
+            const findApprovalsAuth = () => wrapper.find(ApprovalsAuth);
 
-            beforeEach(done => {
-              service.approveMergeRequestWithAuth.and.returnValue(
-                new Promise((resolve, reject) => {
-                  authReject = reject;
-                }),
-              );
-              wrapper.find(ApprovalsAuth).vm.$emit('approve', TEST_PASSWORD);
-              waitForTick(done);
+            beforeEach(() => {
+              jest.spyOn(service, 'approveMergeRequestWithAuth').mockRejectedValue();
+              jest.spyOn(service, 'approveMergeRequest').mockReturnValue(new Promise(() => {}));
+
+              findApprovalsAuth().vm.$emit('approve', TEST_PASSWORD);
+
+              return wrapper.vm.$nextTick();
             });
 
             it('calls service when emits approve', () => {
               expect(service.approveMergeRequestWithAuth).toHaveBeenCalledWith(TEST_PASSWORD);
             });
 
-            it('sets isLoading on auth', () => {
-              expect(wrapper.find(ApprovalsAuth).props('isApproving')).toBe(true);
+            it('sets isApproving', () => {
+              wrapper.setData({ isApproving: true });
+
+              return wrapper.vm.$nextTick().then(() => {
+                expect(findApprovalsAuth().props('isApproving')).toBe(true);
+              });
             });
 
-            it('sets hasError when auth fails', done => {
-              authReject({ response: { status: 401 } });
+            it('sets hasError when auth fails', () => {
+              wrapper.setData({ hasApprovalAuthError: true });
 
-              tick()
-                .then(() => {
-                  expect(wrapper.find(ApprovalsAuth).props('hasError')).toBe(true);
-                })
-                .then(done)
-                .catch(done.fail);
+              return wrapper.vm.$nextTick().then(() => {
+                expect(findApprovalsAuth().props('hasError')).toBe(true);
+              });
             });
 
-            it('shows flash if general error', done => {
-              authReject('something really bad!');
-
-              tick()
-                .then(() => {
-                  expect(createFlash).toHaveBeenCalledWith(APPROVE_ERROR);
-                })
-                .then(done)
-                .catch(done.fail);
+            it('shows flash if general error', () => {
+              expect(createFlash).toHaveBeenCalledWith(APPROVE_ERROR);
             });
           });
         });
@@ -348,12 +356,13 @@ describe('EE MRWidget approvals', () => {
     });
 
     describe('when user has approved', () => {
-      beforeEach(done => {
+      beforeEach(() => {
         mr.approvals.user_has_approved = true;
         mr.approvals.user_can_approve = false;
 
         createComponent();
-        waitForTick(done);
+
+        return wrapper.vm.$nextTick();
       });
 
       it('revoke action is rendered', () => {
@@ -366,9 +375,10 @@ describe('EE MRWidget approvals', () => {
 
       describe('when revoke action is clicked', () => {
         describe('and successful', () => {
-          beforeEach(done => {
+          beforeEach(() => {
             findAction().vm.$emit('click');
-            waitForTick(done);
+
+            return wrapper.vm.$nextTick();
           });
 
           it('calls service unapprove', () => {
@@ -389,10 +399,11 @@ describe('EE MRWidget approvals', () => {
         });
 
         describe('and error', () => {
-          beforeEach(done => {
-            service.unapproveMergeRequest.and.returnValue(Promise.reject());
+          beforeEach(() => {
+            jest.spyOn(service, 'unapproveMergeRequest').mockRejectedValue();
             findAction().vm.$emit('click');
-            waitForTick(done);
+
+            return wrapper.vm.$nextTick();
           });
 
           it('flashes error message', () => {
@@ -406,17 +417,19 @@ describe('EE MRWidget approvals', () => {
   describe('approvals optional summary', () => {
     describe('when no approvals required and no approvers', () => {
       beforeEach(() => {
+        jest.spyOn(service, 'fetchApprovals').mockResolvedValue(testApprovals());
         mr.approvals.approved_by = [];
         mr.approvals.approvals_required = 0;
         mr.approvals.user_has_approved = false;
       });
 
       describe('and can approve', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           mr.approvals.user_can_approve = true;
 
           createComponent();
-          waitForTick(done);
+
+          return wrapper.vm.$nextTick();
         });
 
         it('is shown', () => {
@@ -429,11 +442,12 @@ describe('EE MRWidget approvals', () => {
       });
 
       describe('and cannot approve', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           mr.approvals.user_can_approve = false;
 
           createComponent();
-          waitForTick(done);
+
+          return wrapper.vm.$nextTick();
         });
 
         it('is shown', () => {
@@ -448,9 +462,11 @@ describe('EE MRWidget approvals', () => {
   });
 
   describe('approvals summary', () => {
-    beforeEach(done => {
+    beforeEach(() => {
+      jest.spyOn(service, 'fetchApprovals').mockResolvedValue(testApprovals());
       createComponent();
-      waitForTick(done);
+
+      return wrapper.vm.$nextTick();
     });
 
     it('is rendered with props', () => {
@@ -459,22 +475,22 @@ describe('EE MRWidget approvals', () => {
 
       expect(findOptionalSummary().exists()).toBe(false);
       expect(summary.exists()).toBe(true);
-      expect(summary.props()).toEqual(
-        jasmine.objectContaining({
-          approvalsLeft: expected.approvals_left,
-          rulesLeft: expected.approval_rules_left,
-          approvers: testApprovedBy(),
-        }),
-      );
+      expect(summary.props()).toMatchObject({
+        approvalsLeft: expected.approvals_left,
+        rulesLeft: expected.approval_rules_left,
+        approvers: testApprovedBy(),
+      });
     });
   });
 
   describe('footer', () => {
     let footer;
 
-    beforeEach(done => {
+    beforeEach(() => {
+      jest.spyOn(service, 'fetchApprovals').mockResolvedValue(testApprovals());
       createComponent();
-      waitForTick(done);
+
+      return wrapper.vm.$nextTick();
     });
 
     beforeEach(() => {
@@ -483,22 +499,21 @@ describe('EE MRWidget approvals', () => {
 
     it('is rendered with props', () => {
       expect(footer.exists()).toBe(true);
-      expect(footer.props()).toEqual(
-        jasmine.objectContaining({
-          value: false,
-          suggestedApprovers: mr.approvals.suggested_approvers,
-          approvalRules: mr.approvalRules,
-          isLoadingRules: false,
-        }),
-      );
+      expect(footer.props()).toMatchObject({
+        value: false,
+        suggestedApprovers: mr.approvals.suggested_approvers,
+        approvalRules: mr.approvalRules,
+        isLoadingRules: false,
+      });
     });
 
     describe('when opened', () => {
       describe('and loading', () => {
-        beforeEach(done => {
-          service.fetchApprovalSettings.and.callFake(() => new Promise(() => {}));
+        beforeEach(() => {
+          jest.spyOn(service, 'fetchApprovalSettings').mockReturnValue(new Promise(() => {}));
           footer.vm.$emit('input', true);
-          waitForTick(done);
+
+          return wrapper.vm.$nextTick();
         });
 
         it('calls service fetch approval rules', () => {
@@ -512,9 +527,10 @@ describe('EE MRWidget approvals', () => {
       });
 
       describe('and finished loading', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           footer.vm.$emit('input', true);
-          waitForTick(done);
+
+          return wrapper.vm.$nextTick();
         });
 
         it('sets approval rules', () => {
@@ -526,10 +542,11 @@ describe('EE MRWidget approvals', () => {
         });
 
         describe('and closed', () => {
-          beforeEach(done => {
-            service.fetchApprovalSettings.calls.reset();
+          beforeEach(() => {
+            service.fetchApprovalSettings.mockClear();
             footer.vm.$emit('input', false);
-            waitForTick(done);
+
+            return wrapper.vm.$nextTick();
           });
 
           it('does not call service fetch approval rules', () => {
