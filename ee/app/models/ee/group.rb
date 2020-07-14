@@ -390,11 +390,6 @@ module EE
       owners.pluck(:email)
     end
 
-    def configure_project_deletion_mode_available?
-      feature_available?(:adjourned_deletion_for_projects_and_groups) &&
-        ::Feature.enabled?(:configure_project_deletion_mode, self)
-    end
-
     private
 
     def custom_project_templates_group_allowed

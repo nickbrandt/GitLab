@@ -752,11 +752,9 @@ module EE
       end
     end
 
-    # If the feature to configure project deletion mode is NOT enabled, we default to delayed deletion
+    # Return the group's setting for delayed deletion, false for user namespace projects
     def group_deletion_mode_configured?
-      return true unless ::Feature.enabled?(:configure_project_deletion_mode, self)
-
-      group && group.delayed_project_removal? # Return the group's setting for delayed deletion, false for user namespace projects
+      group && group.delayed_project_removal?
     end
   end
 end

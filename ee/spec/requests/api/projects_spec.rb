@@ -985,14 +985,6 @@ RSpec.describe API::Projects do
 
         it_behaves_like 'deletes project immediately'
       end
-
-      context 'when configure_project_deletion_mode feature is disabled' do
-        before do
-          stub_feature_flags(configure_project_deletion_mode: false)
-        end
-
-        it_behaves_like 'marks project for deletion'
-      end
     end
 
     context 'when feature is not available' do
