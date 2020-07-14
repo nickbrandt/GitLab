@@ -10357,9 +10357,6 @@ msgstr ""
 msgid "Filter pipelines"
 msgstr ""
 
-msgid "Filter projects"
-msgstr ""
-
 msgid "Filter results"
 msgstr ""
 
@@ -10565,18 +10562,6 @@ msgid "From %{providerTitle}"
 msgstr ""
 
 msgid "From <code>%{source_title}</code> into"
-msgstr ""
-
-msgid "From Bitbucket"
-msgstr ""
-
-msgid "From Bitbucket Server"
-msgstr ""
-
-msgid "From FogBugz"
-msgstr ""
-
-msgid "From GitLab.com"
 msgstr ""
 
 msgid "From Google Code"
@@ -11051,9 +11036,6 @@ msgid "Get started!"
 msgstr ""
 
 msgid "Getting started with releases"
-msgstr ""
-
-msgid "Git"
 msgstr ""
 
 msgid "Git LFS is not enabled on this GitLab server, contact your admin."
@@ -16249,9 +16231,6 @@ msgstr ""
 msgid "One or more of your %{provider} projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
 msgstr ""
 
-msgid "One or more of your Bitbucket projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
-msgstr ""
-
 msgid "One or more of your Google Code projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
 msgstr ""
 
@@ -17303,9 +17282,6 @@ msgid "Please contact your administrator."
 msgstr ""
 
 msgid "Please convert %{linkStart}them to Git%{linkEnd}, and go through the %{linkToImportFlow} again."
-msgstr ""
-
-msgid "Please convert them to %{link_to_git}, and go through the %{link_to_import_flow} again."
 msgstr ""
 
 msgid "Please convert them to Git on Google Code, and go through the %{link_to_import_flow} again."
@@ -20483,9 +20459,6 @@ msgid "Scroll up"
 msgstr ""
 
 msgid "Search"
-msgstr ""
-
-msgid "Search Button"
 msgstr ""
 
 msgid "Search Jira issues"
@@ -24799,9 +24772,6 @@ msgid "To start serving your jobs you can add Runners to your group"
 msgstr ""
 
 msgid "To start serving your jobs you can either add specific Runners to your project or use shared Runners"
-msgstr ""
-
-msgid "To this GitLab instance"
 msgstr ""
 
 msgid "To view all %{scannedResourcesCount} scanned URLs, please download the CSV file"
