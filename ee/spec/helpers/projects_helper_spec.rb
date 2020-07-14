@@ -132,7 +132,7 @@ RSpec.describe ProjectsHelper do
           user_callout_id: 'standalone_vulnerabilities_introduction_banner',
           show_introduction_banner: 'true',
           not_enabled_scanners_help_path: help_page_path('user/application_security/index', anchor: 'quick-start'),
-          no_pipeline_run_scanners_help_path: new_project_pipeline_path(project),
+          no_pipeline_run_scanners_help_path: new_project_pipeline_path(project)
         }
       end
 
