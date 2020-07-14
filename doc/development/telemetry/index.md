@@ -183,6 +183,6 @@ There are several data sources available in Snowflake and Sisense each represent
 | ------ | ------ | ------ |
 | raw | These tables are the raw data source | Access via Snowflake |
 | analytics_staging | These tables have undergone little to no data transformation, meaning they're basically clones of the raw data source |  Access via Snowflake or Sisense  |
-| analytics | These tables have typically undergone more data transformation. They will typically end in _xf to represent the fact that they are transformed | Access via Snowflake or Sisense  |
+| analytics | These tables have typically undergone more data transformation. They will typically end in `_xf` to represent the fact that they are transformed | Access via Snowflake or Sisense  |
 
 If you are a Product Manager interested in the raw data, you will likely focus on the `analytics` and `analytics_staging` sources. The raw source is limited to the data and infrastructure teams. For more information, please see [Data For Product Managers: What's the difference between analytics_staging and analytics?](https://about.gitlab.com/handbook/business-ops/data-team/programs/data-for-product-managers/#whats-the-difference-between-analytics_staging-and-analytics)
