@@ -1,5 +1,5 @@
 import renderer from '~/vue_shared/components/rich_content_editor/services/renderers/render_html_block';
-import { buildUneditableHtmlTokens } from '~/vue_shared/components/rich_content_editor/services/renderers/build_uneditable_token';
+import { buildUneditableHtmlAsTextTokens } from '~/vue_shared/components/rich_content_editor/services/renderers/build_uneditable_token';
 
 import { normalTextNode } from './mock_data';
 
@@ -32,7 +32,7 @@ describe('Render HTML renderer', () => {
       ${htmlBlockNode}
       ${htmlBlockNodeToMark}
     `('should return uneditable tokens wrapping the $node as a token', ({ node }) => {
-      expect(renderer.render(node)).toStrictEqual(buildUneditableHtmlTokens(node));
+      expect(renderer.render(node)).toStrictEqual(buildUneditableHtmlAsTextTokens(node));
     });
   });
 });

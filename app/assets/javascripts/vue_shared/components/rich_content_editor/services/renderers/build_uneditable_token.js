@@ -4,32 +4,37 @@ const buildToken = (type, tagName, props) => {
 
 const TAG_TYPES = {
   block: 'div',
-  inline: 'span',
+  inline: 'a',
 };
 
 // Open helpers (singular and multiple)
 
-const buildUneditableOpenToken = (type = TAG_TYPES.block) =>
-  buildToken('openTag', type, {
+const buildUneditableOpenToken = (tagType = TAG_TYPES.block) =>
+  buildToken('openTag', tagType, {
     attributes: { contenteditable: false },
     classNames: [
       'gl-px-4 gl-py-2 gl-opacity-5 gl-bg-gray-100 gl-user-select-none gl-cursor-not-allowed',
     ],
   });
 
-export const buildUneditableOpenTokens = (token, type = TAG_TYPES.block) => {
-  return [buildUneditableOpenToken(type), token];
+export const buildUneditableOpenTokens = (token, tagType = TAG_TYPES.block) => {
+  return [buildUneditableOpenToken(tagType), token];
 };
 
 // Close helpers (singular and multiple)
 
-export const buildUneditableCloseToken = (type = TAG_TYPES.block) => buildToken('closeTag', type);
+export const buildUneditableCloseToken = (tagType = TAG_TYPES.block) =>
+  buildToken('closeTag', tagType);
 
-export const buildUneditableCloseTokens = (token, type = TAG_TYPES.block) => {
-  return [token, buildUneditableCloseToken(type)];
+export const buildUneditableCloseTokens = (token, tagType = TAG_TYPES.block) => {
+  return [token, buildUneditableCloseToken(tagType)];
 };
 
 // Complete helpers (open plus close)
+
+export const buildUneditableTokens = token => {
+  return [...buildUneditableOpenTokens(token), buildUneditableCloseToken()];
+};
 
 export const buildUneditableInlineTokens = token => {
   return [
@@ -38,11 +43,7 @@ export const buildUneditableInlineTokens = token => {
   ];
 };
 
-export const buildUneditableTokens = token => {
-  return [...buildUneditableOpenTokens(token), buildUneditableCloseToken()];
-};
-
-export const buildUneditableHtmlTokens = node => {
+export const buildUneditableHtmlAsTextTokens = node => {
   /*
   Toast UI internally appends ' data-tomark-pass ' attribute flags so it can target certain
   nested nodes for internal use during Markdown <=> WYSIWYG conversions. In our case, we want

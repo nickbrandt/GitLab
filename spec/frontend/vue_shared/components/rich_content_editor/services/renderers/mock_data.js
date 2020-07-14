@@ -41,7 +41,7 @@ export const originInlineToken = {
   content: '<i>Inline</i> content',
 };
 export const uneditableInlineTokens = [
-  buildUneditableOpenToken('span'),
+  buildUneditableOpenToken('a'),
   originInlineToken,
-  buildUneditableCloseToken('span'),
+  buildUneditableCloseToken('a'),
 ];
