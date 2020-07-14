@@ -8,7 +8,9 @@ class AddDeployKeyIdToPushAccessLevels < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_column :protected_branch_push_access_levels, :deploy_key_id, :integer
+    unless column_exists?(:protected_branch_push_access_levels, :deploy_key_id)
+      add_column :protected_branch_push_access_levels, :deploy_key_id, :integer
+    end
 
     add_concurrent_foreign_key :protected_branch_push_access_levels, :keys, column: :deploy_key_id, on_delete: :cascade
     add_concurrent_index :protected_branch_push_access_levels, :deploy_key_id, name: 'index_deploy_key_id_on_protected_branch_push_access_levels'
