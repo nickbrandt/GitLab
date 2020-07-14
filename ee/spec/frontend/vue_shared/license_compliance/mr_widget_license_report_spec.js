@@ -48,6 +48,7 @@ describe('License Report MR Widget', () => {
     loadingText: 'LOADING',
     errorText: 'ERROR',
     licensesApiPath: `${TEST_HOST}/parsed_license_report.json`,
+    approvalsApiPath: `${TEST_HOST}/path/to/approvals`,
     canManageLicenses: true,
     licenseManagementSettingsPath: `${TEST_HOST}/lm_settings`,
     fullReportPath: `${TEST_HOST}/path/to/the/full/report`,
@@ -59,6 +60,7 @@ describe('License Report MR Widget', () => {
     setAPISettings: () => {},
     fetchManagedLicenses: () => {},
     fetchParsedLicenseReport: () => {},
+    fetchLicenseCheckApprovalRule: () => {},
   };
 
   const mountComponent = ({
@@ -339,8 +341,9 @@ describe('License Report MR Widget', () => {
 
   it('should init store after mount', () => {
     const actions = {
-      setAPISettings: jest.fn(() => {}),
-      fetchParsedLicenseReport: jest.fn(() => {}),
+      setAPISettings: jest.fn(),
+      fetchParsedLicenseReport: jest.fn(),
+      fetchLicenseCheckApprovalRule: jest.fn(),
     };
     mountComponent({ actions });
 
@@ -349,12 +352,19 @@ describe('License Report MR Widget', () => {
       {
         apiUrlManageLicenses: apiUrl,
         licensesApiPath: defaultProps.licensesApiPath,
+        approvalsApiPath: defaultProps.approvalsApiPath,
         canManageLicenses: true,
       },
       undefined,
     );
 
     expect(actions.fetchParsedLicenseReport).toHaveBeenCalledWith(
+      expect.any(Object),
+      undefined,
+      undefined,
+    );
+
+    expect(actions.fetchLicenseCheckApprovalRule).toHaveBeenCalledWith(
       expect.any(Object),
       undefined,
       undefined,

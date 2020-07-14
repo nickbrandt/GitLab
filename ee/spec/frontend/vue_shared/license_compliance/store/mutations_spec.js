@@ -153,6 +153,54 @@ describe('License store mutations', () => {
     });
   });
 
+  describe('REQUEST_LICENSE_CHECK_APPROVAL_RULE', () => {
+    it('sets isLoadingLicenseCheckApprovalRule to true', () => {
+      store.replaceState({
+        ...store.state,
+        licenseManagement: {
+          isLoadingLicenseCheckApprovalRule: true,
+        },
+      });
+
+      store.commit(`licenseManagement/${types.REQUEST_LICENSE_CHECK_APPROVAL_RULE}`);
+
+      expect(store.state.licenseManagement.isLoadingLicenseCheckApprovalRule).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_LICENSE_CHECK_APPROVAL_RULE_SUCCESS', () => {
+    it('sets isLoadingLicenseCheckApprovalRule to false and hasLicenseCheckApprovalRule to true', () => {
+      store.replaceState({
+        ...store.state,
+        licenseManagement: {
+          isLoadingLicenseCheckApprovalRule: true,
+        },
+      });
+
+      store.commit(`licenseManagement/${types.RECEIVE_LICENSE_CHECK_APPROVAL_RULE_SUCCESS}`, {
+        hasLicenseCheckApprovalRule: true,
+      });
+
+      expect(store.state.licenseManagement.isLoadingLicenseCheckApprovalRule).toBe(false);
+      expect(store.state.licenseManagement.hasLicenseCheckApprovalRule).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_LICENSE_CHECK_APPROVAL_RULE_ERROR', () => {
+    it('sets isLoadingLicenseCheckApprovalRule to false', () => {
+      store.replaceState({
+        ...store.state,
+        licenseManagement: {
+          isLoadingLicenseCheckApprovalRule: true,
+        },
+      });
+
+      store.commit(`licenseManagement/${types.RECEIVE_LICENSE_CHECK_APPROVAL_RULE_ERROR}`);
+
+      expect(store.state.licenseManagement.isLoadingLicenseCheckApprovalRule).toBe(false);
+    });
+  });
+
   describe('RECEIVE_MANAGED_LICENSES_SUCCESS', () => {
     it('sets isLoadingManagedLicenses and loadManagedLicensesError to false and saves managed licenses', () => {
       store.replaceState({

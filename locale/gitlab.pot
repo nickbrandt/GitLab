@@ -13640,6 +13640,11 @@ msgstr ""
 msgid "LicenseCompliance|License Approvals"
 msgstr ""
 
+msgid "LicenseCompliance|License Compliance detected %d license and policy violation for the source branch only"
+msgid_plural "LicenseCompliance|License Compliance detected %d licenses and policy violations for the source branch only"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "LicenseCompliance|License Compliance detected %d license and policy violation for the source branch only; approval required"
 msgid_plural "LicenseCompliance|License Compliance detected %d licenses and policy violations for the source branch only; approval required"
 msgstr[0] ""
@@ -13652,6 +13657,11 @@ msgstr[1] ""
 
 msgid "LicenseCompliance|License Compliance detected %d new license"
 msgid_plural "LicenseCompliance|License Compliance detected %d new licenses"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "LicenseCompliance|License Compliance detected %d new license and policy violation"
+msgid_plural "LicenseCompliance|License Compliance detected %d new licenses and policy violations"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -28171,6 +28181,9 @@ msgid "mrWidget|You can delete the source branch now"
 msgstr ""
 
 msgid "mrWidget|You can merge this merge request manually using the"
+msgstr ""
+
+msgid "mrWidget|You can only merge once the denied license is removed"
 msgstr ""
 
 msgid "mrWidget|Your password"
