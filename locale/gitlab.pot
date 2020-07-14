@@ -16707,7 +16707,7 @@ msgstr ""
 msgid "People without permission will never get a notification."
 msgstr ""
 
-msgid "Percent rollout (logged in users)"
+msgid "Percent of users"
 msgstr ""
 
 msgid "Percentage"
@@ -25500,6 +25500,9 @@ msgid "User Cohorts are only shown when the %{usage_ping_link_start}usage ping%{
 msgstr ""
 
 msgid "User IDs"
+msgstr ""
+
+msgid "User List"
 msgstr ""
 
 msgid "User Lists can only be created and modified with %{linkStart}the API%{linkEnd}"
