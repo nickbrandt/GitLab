@@ -33,9 +33,12 @@ describe('EpicHeaderComponent', () => {
   });
 
   const findStatusBox = () => wrapper.find('[data-testid="status-box"]');
+  const findStatusIcon = () => wrapper.find('[data-testid="status-icon"]');
+  const findStatusText = () => wrapper.find('[data-testid="status-text"]');
   const findConfidentialIcon = () => wrapper.find('[data-testid="confidential-icon"]').find(GlIcon);
   const findAuthorDetails = () => wrapper.find('[data-testid="author-details"]');
   const findActionButtons = () => wrapper.find('[data-testid="action-buttons"]');
+  const findToggleStatusButton = () => wrapper.find('[data-testid="toggle-status-button"]');
   const findNewEpicButton = () => wrapper.find('[data-testid="new-epic-button"]');
   const findSidebarToggle = () => wrapper.find('[data-testid="sidebar-toggle"]');
 
@@ -44,13 +47,15 @@ describe('EpicHeaderComponent', () => {
       it('returns string `issue-open-m` when `isEpicOpen` is true', () => {
         store.state.state = statusType.open;
 
-        expect(wrapper.vm.statusIcon).toBe('issue-open-m');
+        expect(findStatusIcon().props('name')).toBe('issue-open-m');
       });
 
       it('returns string `mobile-issue-close` when `isEpicOpen` is false', () => {
         store.state.state = statusType.close;
 
-        expect(wrapper.vm.statusIcon).toBe('mobile-issue-close');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findStatusIcon().props('name')).toBe('mobile-issue-close');
+        });
       });
     });
 
@@ -58,13 +63,15 @@ describe('EpicHeaderComponent', () => {
       it('returns string `Open` when `isEpicOpen` is true', () => {
         store.state.state = statusType.open;
 
-        expect(wrapper.vm.statusText).toBe('Open');
+        expect(findStatusText().text()).toBe('Open');
       });
 
       it('returns string `Closed` when `isEpicOpen` is false', () => {
         store.state.state = statusType.close;
 
-        expect(wrapper.vm.statusText).toBe('Closed');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findStatusText().text()).toBe('Closed');
+        });
       });
     });
 
@@ -72,13 +79,15 @@ describe('EpicHeaderComponent', () => {
       it('returns `btn-close` when `isEpicOpen` is true', () => {
         store.state.state = statusType.open;
 
-        expect(wrapper.vm.actionButtonClass).toContain('btn-close');
+        expect(findToggleStatusButton().classes()).toContain('btn-close');
       });
 
       it('returns `btn-open` when `isEpicOpen` is false', () => {
         store.state.state = statusType.close;
 
-        expect(wrapper.vm.actionButtonClass).toContain('btn-open');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findToggleStatusButton().classes()).toContain('btn-open');
+        });
       });
     });
 
@@ -86,13 +95,15 @@ describe('EpicHeaderComponent', () => {
       it('returns string `Close epic` when `isEpicOpen` is true', () => {
         store.state.state = statusType.open;
 
-        expect(wrapper.vm.actionButtonText).toBe('Close epic');
+        expect(findToggleStatusButton().text()).toBe('Close epic');
       });
 
       it('returns string `Reopen epic` when `isEpicOpen` is false', () => {
         store.state.state = statusType.close;
 
-        expect(wrapper.vm.actionButtonText).toBe('Reopen epic');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findToggleStatusButton().text()).toBe('Reopen epic');
+        });
       });
     });
   });
@@ -132,7 +143,7 @@ describe('EpicHeaderComponent', () => {
 
     it('renders action buttons element', () => {
       const actionButtons = findActionButtons();
-      const toggleStatusButton = actionButtons.find('[data-testid="toggle-status-button"]');
+      const toggleStatusButton = findToggleStatusButton();
 
       expect(actionButtons.exists()).toBeTruthy();
       expect(toggleStatusButton.exists()).toBeTruthy();
@@ -165,6 +176,14 @@ describe('EpicHeaderComponent', () => {
     describe('with `createEpicForm` feature flag', () => {
       beforeAll(() => {
         features = { createEpicForm: true };
+      });
+
+      it('does not render new epic button if user cannot create it', () => {
+        store.state.canCreate = false;
+
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findNewEpicButton().exists()).toBe(false);
+        });
       });
 
       it('renders new epic button if user can create it', () => {

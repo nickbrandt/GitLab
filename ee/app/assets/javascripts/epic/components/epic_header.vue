@@ -45,7 +45,7 @@ export default {
       return this.isEpicOpen ? __('Open') : __('Closed');
     },
     actionButtonClass() {
-      return `qa-close-reopen-epic-button ${this.isEpicOpen ? 'btn-close' : 'btn-open'}`;
+      return this.isEpicOpen ? 'btn-close' : 'btn-open';
     },
     actionButtonText() {
       return this.isEpicOpen ? __('Close epic') : __('Reopen epic');
@@ -85,8 +85,8 @@ export default {
         class="issuable-status-box status-box"
         data-testid="status-box"
       >
-        <gl-icon :name="statusIcon" class="d-block d-sm-none" />
-        <span class="d-none d-sm-block">{{ statusText }}</span>
+        <gl-icon :name="statusIcon" class="d-block d-sm-none" data-testid="status-icon" />
+        <span class="d-none d-sm-block" data-testid="status-text">{{ statusText }}</span>
       </div>
       <div class="issuable-meta" data-testid="author-details">
         <div
@@ -134,7 +134,7 @@ export default {
         :class="actionButtonClass"
         category="secondary"
         variant="warning"
-        class="gl-mt-3 gl-sm-mt-0! gl-w-full gl-sm-w-auto!"
+        class="qa-close-reopen-epic-button gl-mt-3 gl-sm-mt-0! gl-w-full gl-sm-w-auto!"
         data-testid="toggle-status-button"
         @click="toggleEpicStatus(isEpicOpen)"
       >
