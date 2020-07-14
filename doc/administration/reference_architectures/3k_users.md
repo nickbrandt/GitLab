@@ -314,9 +314,9 @@ reconfigure a node and change its status from primary to replica and vice versa.
         'redis.addr' => 'redis://10.6.0.61:6379',
         'redis.password' => 'redis-password-goes-here',
    }
-   
+
    # Disable auto migrations
-   gitlab_rails['auto_migrate'] = false   
+   gitlab_rails['auto_migrate'] = false
    ```
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
@@ -328,15 +328,15 @@ Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
 
 You can list the current Redis Primary, Replica status via:
 
-    ```shell
-    /opt/gitlab/embedded/bin/redis-cli -h <host> -a 'redis-password-goes-here' info replication
-    ```
-    
+```shell
+/opt/gitlab/embedded/bin/redis-cli -h <host> -a 'redis-password-goes-here' info replication
+```
+
 Show running GitLab services via:
 
-    ```shell
-    gitlab-ctl status
-    ```
+```shell
+gitlab-ctl status
+```
 
    The output should be similar to the following:
 
@@ -400,7 +400,7 @@ Show running GitLab services via:
         'redis.addr' => 'redis://10.6.0.62:6379',
         'redis.password' => 'redis-password-goes-here',
    }  
-   
+
    # Disable auto migrations
    gitlab_rails['auto_migrate'] = false        
    ```
@@ -549,15 +549,15 @@ Viewing the Consul logs `sudo gitlab-ctl tail consul` will display
 
 You can list the current Consul members (server, client) via:
 
-    ```shell
-    /opt/gitlab/embedded/bin/consul members
-    ```
+```shell
+/opt/gitlab/embedded/bin/consul members
+```
 
 Show running GitLab services via:
 
-    ```shell
-    gitlab-ctl status
-    ```
+```shell
+gitlab-ctl status
+```
 
    The output should be similar to the following:
 
@@ -697,15 +697,15 @@ in the second step, do not supply the `EXTERNAL_URL` value.
 NOTE: **Note:**
 You can list the current PostgresSQL Primary, Secondary status via:
 
-    ```shell
-    /opt/gitlab/bin/gitlab-ctl repmgr cluster show
-    ```
+```shell
+/opt/gitlab/bin/gitlab-ctl repmgr cluster show
+```
 
 Show running GitLab services via:
 
-    ```shell
-    gitlab-ctl status
-    ```
+```shell
+gitlab-ctl status
+```
 
    The output should be similar to the following:
 
@@ -775,13 +775,12 @@ Show running GitLab services via:
    postgres_exporter['listen_address'] = '0.0.0.0:9187'
    postgres_exporter['dbname'] = 'gitlabhq_production'
    postgres_exporter['password'] = '<postgresql_password_hash>'
-   
+
    ## The IPs of the Consul server nodes
    ## You can also use FQDNs and intermix them with IPs
    consul['configuration'] = {
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
    }
-   #
    # END user configuration
    ```
 
@@ -987,9 +986,9 @@ The following IPs will be used as an example:
 NOTE: **Note:**
 Show running GitLab services via:
 
-    ```shell
-    gitlab-ctl status
-    ```
+```shell
+gitlab-ctl status
+```
 
    The output should be similar to the following:
 
@@ -1157,16 +1156,16 @@ On each node:
    # firewalls to restrict access to this address/port.
    # Comment out following line if you only want to support TLS connections
    gitaly['listen_addr'] = "0.0.0.0:8075"
-   
+
    ## Enable service discovery for Prometheus
    consul['enable'] = true
    consul['monitoring_service_discovery'] =  true
-   
+
    # Set the network addresses that the exporters will listen on for monitoring
    gitaly['prometheus_listen_addr'] = "0.0.0.0:9236"
    node_exporter['listen_address'] = '0.0.0.0:9100'
    gitlab_rails['prometheus_address'] = '10.6.0.81:9090'
- 
+
    ## The IPs of the Consul server nodes
    ## You can also use FQDNs and intermix them with IPs
    consul['configuration'] = {
@@ -1213,9 +1212,9 @@ On each node:
 NOTE: **Note:**
 Show running GitLab services via:
 
-    ```shell
-    gitlab-ctl status
-    ```
+```shell
+gitlab-ctl status
+```
 
    The output should be similar to the following:
 
@@ -1397,9 +1396,9 @@ You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_proces
 NOTE: **Note:**
 Show running GitLab services via:
 
-    ```shell
-    gitlab-ctl status
-    ```
+```shell
+gitlab-ctl status
+```
 
    The output should be similar to the following:
 
@@ -1505,11 +1504,11 @@ On each node perform the following:
      {'host' => '10.6.0.12', 'port' => 26379},
      {'host' => '10.6.0.13', 'port' => 26379}
    ]
-   
+
    ## Enable service discovery for Prometheus
    consul['enable'] = true
    consul['monitoring_service_discovery'] =  true
-   
+
    # Set the network addresses that the exporters used for monitoring will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
    gitlab_workhorse['prometheus_listen_addr'] = '0.0.0.0:9229'
@@ -1521,7 +1520,7 @@ On each node perform the following:
    consul['configuration'] = {
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
    }    
-   
+
    # Add the monitoring node's IP address to the monitoring whitelist and allow it to
    # scrape the NGINX metrics
    gitlab_rails['monitoring_whitelist'] = ['10.6.0.81/32', '127.0.0.0/8']
@@ -1577,9 +1576,9 @@ for more information.
 
 Show running GitLab services via:
 
-    ```shell
-    gitlab-ctl status
-    ```
+```shell
+gitlab-ctl status
+```
 
    The output should be similar to the following:
 
@@ -1675,9 +1674,9 @@ running [Prometheus](../monitoring/prometheus/index.md) and
 NOTE: **Note:**
 Show running GitLab services via:
 
-    ```shell
-    gitlab-ctl status
-    ```
+```shell
+gitlab-ctl status
+```
 
    The output should be similar to the following:
 
