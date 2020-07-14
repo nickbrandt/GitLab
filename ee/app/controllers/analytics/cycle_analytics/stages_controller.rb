@@ -9,6 +9,7 @@ module Analytics
       check_feature_flag Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG
 
       before_action :load_group
+      before_action :load_value_stream
       before_action :validate_params, only: %i[median records duration_chart]
 
       def index
@@ -79,7 +80,7 @@ module Analytics
       end
 
       def list_service
-        ::Analytics::CycleAnalytics::Stages::ListService.new(parent: @group, current_user: current_user)
+        ::Analytics::CycleAnalytics::Stages::ListService.new(parent: @group, current_user: current_user, params: list_params)
       end
 
       def create_service
@@ -108,16 +109,26 @@ module Analytics
         super.merge({ group: @group })
       end
 
+      def list_params
+        { value_stream: @value_stream }
+      end
+
       def update_params
-        params.permit(:name, :start_event_identifier, :end_event_identifier, :id, :move_after_id, :move_before_id, :hidden, :start_event_label_id, :end_event_label_id)
+        params.permit(:name, :start_event_identifier, :end_event_identifier, :id, :move_after_id, :move_before_id, :hidden, :start_event_label_id, :end_event_label_id).merge(list_params)
       end
 
       def create_params
-        params.permit(:name, :start_event_identifier, :end_event_identifier, :start_event_label_id, :end_event_label_id)
+        params.permit(:name, :start_event_identifier, :end_event_identifier, :start_event_label_id, :end_event_label_id).merge(list_params)
       end
 
       def delete_params
         params.permit(:id)
+      end
+
+      def load_value_stream
+        if params[:value_stream_id]
+          @value_stream = @group.value_streams.find(params[:value_stream_id])
+        end
       end
     end
   end

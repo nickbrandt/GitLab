@@ -4,7 +4,8 @@ require 'spec_helper'
 RSpec.describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   include JavaScriptFixturesHelpers
 
-  let(:group) { create(:group)}
+  let(:group) { create(:group) }
+  let(:value_stream) { create(:cycle_analytics_group_value_stream, group: group) }
   let(:project) { create(:project, :repository, namespace: group) }
   let(:user) { create(:user, :admin) }
   let(:milestone) { create(:milestone, project: project) }
@@ -134,7 +135,7 @@ RSpec.describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
 
       # Persist the default stages
       Gitlab::Analytics::CycleAnalytics::DefaultStages.all.map do |params|
-        group.cycle_analytics_stages.build(params).save!
+        group.cycle_analytics_stages.build(params.merge(value_stream: value_stream)).save!
       end
 
       create_label_based_cycle_analytics_stage

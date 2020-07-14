@@ -4,8 +4,17 @@ require 'spec_helper'
 
 RSpec.describe Analytics::CycleAnalytics::Stages::CreateService do
   let_it_be(:group, refind: true) { create(:group) }
+  let_it_be(:value_stream, refind: true) { create(:cycle_analytics_group_value_stream, group: group) }
   let_it_be(:user, refind: true) { create(:user) }
-  let(:params) { { name: 'my stage', start_event_identifier: :merge_request_created, end_event_identifier: :merge_request_merged } }
+
+  let(:params) do
+    {
+      name: 'my stage',
+      value_stream: value_stream,
+      start_event_identifier: :merge_request_created,
+      end_event_identifier: :merge_request_merged
+    }
+  end
 
   before_all do
     group.add_user(user, :reporter)
@@ -96,7 +105,8 @@ RSpec.describe Analytics::CycleAnalytics::Stages::CreateService do
         start_event_identifier: :issue_label_added,
         end_event_identifier: :issue_label_removed,
         start_event_label_id: label.id,
-        end_event_label_id: label.id
+        end_event_label_id: label.id,
+        value_stream: value_stream
       }
     end
 
@@ -109,6 +119,19 @@ RSpec.describe Analytics::CycleAnalytics::Stages::CreateService do
 
       expect(stage.start_event_label).to eq(label)
       expect(stage.end_event_label).to eq(label)
+    end
+  end
+
+  context 'when `value_stream` is not provided' do
+    before do
+      params.delete(:value_stream)
+    end
+
+    let(:stage) { subject.payload[:stage] }
+
+    it 'creates a `default` value stream object' do
+      expect(stage).to be_persisted
+      expect(stage.value_stream.name).to eq(Analytics::CycleAnalytics::Stages::BaseService::DEFAULT_VALUE_STREAM_NAME)
     end
   end
 end
