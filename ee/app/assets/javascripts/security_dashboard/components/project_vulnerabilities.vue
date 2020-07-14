@@ -48,6 +48,7 @@ export default {
     return {
       pageInfo: {},
       vulnerabilities: [],
+      securityScanners: {},
       errorLoadingVulnerabilities: false,
     };
   },
