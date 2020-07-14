@@ -11,15 +11,14 @@ RSpec.describe AuditEventService do
   let(:service) { described_class.new(user, project, details) }
 
   describe '#for_member' do
+    let(:event) { service.for_member(project_member).security_event }
+
     it 'generates event' do
-      event = service.for_member(project_member).security_event
       expect(event[:details][:target_details]).to eq(user.name)
     end
 
     it 'handles deleted users' do
       expect(project_member).to receive(:user).and_return(nil)
-
-      event = service.for_member(project_member).security_event
       expect(event[:details][:target_details]).to eq('Deleted User')
     end
 
@@ -27,11 +26,18 @@ RSpec.describe AuditEventService do
       let(:service) { described_class.new(nil, project, { action: :expired }) }
 
       it 'generates a system event' do
-        event = service.for_member(project_member).security_event
-
         expect(event[:details][:remove]).to eq('user_access')
         expect(event[:details][:system_event]).to be_truthy
         expect(event[:details][:reason]).to include('access expired on')
+      end
+    end
+
+    context 'create user access' do
+      let(:details) { { action: :create } }
+
+      it 'stores author name', :aggregate_failures do
+        expect(event.details[:author_name]).to eq(user.name)
+        expect(event.author_name).to eq(user.name)
       end
     end
 
@@ -273,6 +279,7 @@ RSpec.describe AuditEventService do
 
     it 'has the right author' do
       expect(event.details[:author_name]).to eq(author_name)
+      expect(event.author_name).to eq(author_name)
     end
 
     it 'has the right target_details' do
