@@ -159,7 +159,6 @@ RSpec.describe Projects::Settings::OperationsController do
       it_behaves_like 'PATCHable'
 
       context 'updating each incident management setting' do
-        let(:project) { create(:project) }
         let(:new_incident_management_settings) { {} }
 
         before do
@@ -189,8 +188,6 @@ RSpec.describe Projects::Settings::OperationsController do
     end
 
     describe 'POST #reset_pagerduty_token' do
-      let(:project) { create(:project) }
-
       before do
         project.add_maintainer(user)
       end
@@ -388,9 +385,7 @@ RSpec.describe Projects::Settings::OperationsController do
       end
     end
 
-    describe 'POST reset_alerting_token' do
-      let(:project) { create(:project) }
-
+    describe 'POST #reset_alerting_token' do
       before do
         project.add_maintainer(user)
       end
