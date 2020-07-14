@@ -6433,7 +6433,7 @@ msgstr ""
 msgid "ContainerRegistry|The last tag related to this image was recently removed. This empty image and any associated data will be automatically removed as part of the regular Garbage Collection process. If you have any questions, contact your administrator."
 msgstr ""
 
-msgid "ContainerRegistry|The value of this input should be less than 255 characters"
+msgid "ContainerRegistry|The value of this input should be less than 256 characters"
 msgstr ""
 
 msgid "ContainerRegistry|There are no container images available in this group"
