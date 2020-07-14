@@ -376,8 +376,8 @@ module Gitlab
             service_url&.include?('.atlassian.net') ? :cloud : :server
           end
 
-          results[:projects_jira_server_active] += counts[:server].count if counts[:server]
-          results[:projects_jira_cloud_active] += counts[:cloud].count if counts[:cloud]
+          results[:projects_jira_server_active] += counts[:server].size if counts[:server]
+          results[:projects_jira_cloud_active] += counts[:cloud].size if counts[:cloud]
           results[:projects_jira_active] += services.size
         end
 
