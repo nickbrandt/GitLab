@@ -1607,7 +1607,7 @@ gitlab-ctl status
     [PgBouncer error `ERROR:  pgbouncer cannot connect to server`](troubleshooting.md#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
     in the Troubleshooting section before proceeding.
 
-1. [Configure fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md).
+1. [Configure fast lookup of authorized SSH keys in the database](../operations/fast_ssh_key_lookup.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
