@@ -1,6 +1,5 @@
 <script>
-import { s__ } from '~/locale';
-import { GlAlert, GlDeprecatedButton, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
+import { GlAlert, GlDeprecatedButton, GlIntersectionObserver } from '@gitlab/ui';
 import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/project_vulnerabilities.graphql';
 import { VULNERABILITIES_PER_PAGE } from '../store/constants';
@@ -10,19 +9,10 @@ export default {
   components: {
     GlAlert,
     GlDeprecatedButton,
-    GlEmptyState,
     GlIntersectionObserver,
     VulnerabilityList,
   },
   props: {
-    dashboardDocumentation: {
-      type: String,
-      required: true,
-    },
-    emptyStateSvgPath: {
-      type: String,
-      required: true,
-    },
     projectFullPath: {
       type: String,
       required: true,
@@ -87,9 +77,6 @@ export default {
       this.$apollo.queries.vulnerabilities.refetch();
     },
   },
-  emptyStateDescription: s__(
-    `SecurityReports|While it's rare to have no vulnerabilities for your project, it can happen. In any event, we ask that you double check your settings to make sure you've set up your dashboard correctly.`,
-  ),
 };
 </script>
 
@@ -105,24 +92,12 @@ export default {
     <vulnerability-list
       v-else
       :is-loading="isLoadingFirstVulnerabilities"
-      :dashboard-documentation="dashboardDocumentation"
-      :empty-state-svg-path="emptyStateSvgPath"
       :filters="filters"
       :vulnerabilities="vulnerabilities"
       :should-show-identifier="true"
       :should-show-report-type="true"
       @refetch-vulnerabilities="refetchVulnerabilities"
-    >
-      <template #emptyState>
-        <gl-empty-state
-          :title="s__(`SecurityReports|No vulnerabilities found for this project`)"
-          :svg-path="emptyStateSvgPath"
-          :description="$options.emptyStateDescription"
-          :primary-button-link="dashboardDocumentation"
-          :primary-button-text="s__('SecurityReports|Learn more about setting up your dashboard')"
-        />
-      </template>
-    </vulnerability-list>
+    />
     <gl-intersection-observer
       v-if="pageInfo.hasNextPage"
       class="text-center"

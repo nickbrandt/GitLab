@@ -8,15 +8,13 @@ import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vul
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import ProjectManager from 'ee/security_dashboard/components/first_class_project_manager/project_manager.vue';
-import DashboardNotConfigured from 'ee/security_dashboard/components/empty_states/dashboard_not_configured.vue';
+import DashboardNotConfigured from 'ee/security_dashboard/components/empty_states/instance_dashboard_not_configured.vue';
 
 describe('First Class Instance Dashboard Component', () => {
   let wrapper;
 
   const defaultMocks = { $apollo: { queries: { projects: { loading: false } } } };
 
-  const dashboardDocumentation = 'dashboard-documentation';
-  const emptyStateSvgPath = 'empty-state-path';
   const vulnerableProjectsEndpoint = '/vulnerable/projects';
   const vulnerabilitiesExportEndpoint = '/vulnerabilities/exports';
 
@@ -35,8 +33,6 @@ describe('First Class Instance Dashboard Component', () => {
       },
       mocks: { ...defaultMocks },
       propsData: {
-        dashboardDocumentation,
-        emptyStateSvgPath,
         vulnerableProjectsEndpoint,
         vulnerabilitiesExportEndpoint,
       },
@@ -63,8 +59,6 @@ describe('First Class Instance Dashboard Component', () => {
 
     it('should render the vulnerabilities', () => {
       expect(findInstanceVulnerabilities().props()).toEqual({
-        dashboardDocumentation,
-        emptyStateSvgPath,
         filters: {},
       });
     });
@@ -111,10 +105,7 @@ describe('First Class Instance Dashboard Component', () => {
     });
 
     it('renders the empty state', () => {
-      expect(findEmptyState().props()).toEqual({
-        svgPath: emptyStateSvgPath,
-        dashboardDocumentation,
-      });
+      expect(findEmptyState().props()).toEqual({});
     });
 
     it('does not render the vulnerability list', () => {

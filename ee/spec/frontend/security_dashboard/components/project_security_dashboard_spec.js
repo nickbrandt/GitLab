@@ -21,9 +21,11 @@ describe('Project Security Dashboard component', () => {
     wrapper = mount(ProjectSecurityDashboard, {
       store: createStore(),
       stubs: ['security-dashboard-table'],
+      provide: {
+        emptyStateSvgPath: `${TEST_HOST}/img`,
+      },
       propsData: {
         hasVulnerabilities: true,
-        emptyStateSvgPath: `${TEST_HOST}/img`,
         securityDashboardHelpPath: `${TEST_HOST}/help_dashboard`,
         commit: {
           id: '1234adf',

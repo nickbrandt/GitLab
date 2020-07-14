@@ -7,16 +7,7 @@ export default {
     GlButton,
     GlLink,
   },
-  props: {
-    svgPath: {
-      type: String,
-      required: true,
-    },
-    dashboardDocumentation: {
-      type: String,
-      required: true,
-    },
-  },
+  inject: ['dashboardDocumentation', 'emptyStateSvgPath'],
   methods: {
     handleAddProjectsClick() {
       this.$emit('handleAddProjectsClick');
@@ -28,7 +19,7 @@ export default {
 <template>
   <gl-empty-state
     :title="s__('SecurityReports|Add a project to your dashboard')"
-    :svg-path="svgPath"
+    :svg-path="emptyStateSvgPath"
   >
     <template #description>
       {{

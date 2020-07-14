@@ -11,7 +11,7 @@ import projectsQuery from 'ee/security_dashboard/graphql/get_instance_security_d
 import ProjectManager from './first_class_project_manager/project_manager.vue';
 import CsvExportButton from './csv_export_button.vue';
 import vulnerabilityHistoryQuery from '../graphql/instance_vulnerability_history.graphql';
-import DashboardNotConfigured from './empty_states/dashboard_not_configured.vue';
+import DashboardNotConfigured from './empty_states/instance_dashboard_not_configured.vue';
 
 export default {
   components: {
@@ -27,11 +27,7 @@ export default {
     DashboardNotConfigured,
   },
   props: {
-    dashboardDocumentation: {
-      type: String,
-      required: true,
-    },
-    emptyStateSvgPath: {
+    vulnerableProjectsEndpoint: {
       type: String,
       required: true,
     },
@@ -120,14 +116,10 @@ export default {
     <instance-security-vulnerabilities
       v-if="shouldShowDashboard"
       :projects="projects"
-      :dashboard-documentation="dashboardDocumentation"
-      :empty-state-svg-path="emptyStateSvgPath"
       :filters="filters"
     />
     <dashboard-not-configured
       v-else-if="shouldShowEmptyState"
-      :svg-path="emptyStateSvgPath"
-      :dashboard-documentation="dashboardDocumentation"
       @handleAddProjectsClick="toggleProjectSelector"
     />
     <div v-else class="d-flex justify-content-center">

@@ -125,6 +125,7 @@ RSpec.describe ProjectsHelper do
           vulnerabilities_summary_endpoint: "/#{project.full_path}/-/security/vulnerability_findings/summary",
           vulnerabilities_export_endpoint: "/api/v4/security/projects/#{project.id}/vulnerability_exports",
           vulnerability_feedback_help_path: '/help/user/application_security/index#interacting-with-the-vulnerabilities',
+          no_vulnerabilities_svg_path: start_with('/assets/illustrations/issues-'),
           empty_state_svg_path: start_with('/assets/illustrations/security-dashboard-empty-state'),
           dashboard_documentation: '/help/user/application_security/security_dashboard/index',
           security_dashboard_help_path: '/help/user/application_security/security_dashboard/index',
