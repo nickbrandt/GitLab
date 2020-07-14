@@ -145,7 +145,10 @@ export default {
 
     <div class="table-section gl-white-space-normal section-15">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Identifier') }}</div>
-      <div class="table-mobile-content">
+      <div
+        class="table-mobile-content gl-text-overflow-ellipsis gl-overflow-hidden"
+        :title="vulnerabilityIdentifier"
+      >
         {{ vulnerabilityIdentifier }}
       </div>
     </div>

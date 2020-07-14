@@ -1,0 +1,5 @@
+---
+title: Fix overflow of Identifier content on pipeline's Security tab
+merge_request: 36159
+author:
+type: fixed
