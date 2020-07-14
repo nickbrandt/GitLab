@@ -13884,7 +13884,7 @@ CREATE TABLE public.plan_limits (
     ci_max_artifact_size_network_referee integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_dotenv integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_cobertura integer DEFAULT 0 NOT NULL,
-    ci_max_artifact_size_terraform integer DEFAULT 0 NOT NULL,
+    ci_max_artifact_size_terraform integer DEFAULT 5 NOT NULL,
     ci_max_artifact_size_accessibility integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_cluster_applications integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_secret_detection integer DEFAULT 0 NOT NULL,
@@ -23836,6 +23836,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200701093859
 20200701190523
 20200701205710
+20200701221303
 20200702123805
 20200702201039
 20200703064117
