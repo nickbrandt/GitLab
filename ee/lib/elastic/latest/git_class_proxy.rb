@@ -92,8 +92,6 @@ module Elastic
 
         options[:order] = :default if options[:order].blank?
 
-        query_hash[:sort] = [:_score]
-
         res = search(query_hash, options)
         {
           results: res.results,
@@ -153,8 +151,6 @@ module Elastic
         end
 
         options[:order] = :default if options[:order].blank?
-
-        query_hash[:sort] = [:_score]
 
         if options[:highlight]
           query_hash[:highlight] = {
