@@ -33,15 +33,11 @@ module API
         @vulnerability = find_and_authorize_vulnerability!(:read_vulnerability)
       end
 
-      after do
-        render_vulnerability(@vulnerability)
-      end
-
       desc 'Get a vulnerability' do
         success EE::API::Entities::Vulnerability
       end
       get ':id' do
-        # do nothing
+        render_vulnerability(@vulnerability)
       end
 
       desc 'Resolve a vulnerability' do
@@ -51,6 +47,7 @@ module API
         not_modified! if @vulnerability.resolved?
 
         @vulnerability = ::Vulnerabilities::ResolveService.new(current_user, @vulnerability).execute
+        render_vulnerability(@vulnerability)
       end
 
       desc 'Dismiss a vulnerability' do
@@ -60,6 +57,7 @@ module API
         not_modified! if @vulnerability.dismissed?
 
         @vulnerability = ::Vulnerabilities::DismissService.new(current_user, @vulnerability).execute
+        render_vulnerability(@vulnerability)
       end
 
       desc 'Confirm a vulnerability' do
@@ -69,6 +67,7 @@ module API
         not_modified! if @vulnerability.confirmed?
 
         @vulnerability = ::Vulnerabilities::ConfirmService.new(current_user, @vulnerability).execute
+        render_vulnerability(@vulnerability)
       end
     end
 
