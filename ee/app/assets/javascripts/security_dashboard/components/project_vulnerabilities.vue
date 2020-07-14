@@ -1,5 +1,5 @@
 <script>
-import { s__ } from '~/locale';
+import { __ } from '~/locale';
 import { GlAlert, GlDeprecatedButton, GlIntersectionObserver } from '@gitlab/ui';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import VulnerabilityList from './vulnerability_list.vue';
@@ -67,8 +67,15 @@ export default {
           fullPath: this.projectFullPath,
         };
       },
-      update({ project }) {
-        return project?.securityScanners || {};
+      update({ project: { securityScanners = {} } } = {}) {
+        const { available = [], enabled = [], pipelineRun = [] } = securityScanners;
+        const translateScannerName = scannerName => this.$options.i18n[scannerName] || scannerName;
+
+        return {
+          available: available.map(translateScannerName),
+          enabled: enabled.map(translateScannerName),
+          pipelineRun: pipelineRun.map(translateScannerName),
+        };
       },
       skip() {
         return !this.glFeatures.scannerAlerts;
@@ -102,6 +109,11 @@ export default {
     refetchVulnerabilities() {
       this.$apollo.queries.vulnerabilities.refetch();
     },
+  },
+  i18n: {
+    CONTAINER_SCANNING: __('Container Scanning'),
+    SECRET_DETECTION: __('Secret Detection'),
+    DEPENDENCY_SCANNING: __('Dependency Scanning'),
   },
 };
 </script>
