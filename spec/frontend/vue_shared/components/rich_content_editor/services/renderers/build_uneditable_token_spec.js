@@ -66,6 +66,7 @@ describe('Build Uneditable Token renderer helper', () => {
     it('returns a 3-item array of tokens with the htmlBlockNode wrapped as a text token in the middle of block tokens', () => {
       const result = buildUneditableHtmlAsTextTokens(htmlBlockNode);
 
+      expect(result[1].type).toBe('text');
       expect(result[1].content).not.toMatch(/ data-tomark-pass /);
 
       expect(result).toHaveLength(3);
