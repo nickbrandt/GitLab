@@ -19,7 +19,7 @@ module Resolvers
              description: 'The internal ID of the Iteration to look up'
     argument :include_ancestors, GraphQL::BOOLEAN_TYPE,
              required: false,
-             description: 'Whether to include ancestor Iterations. Defaults to true'
+             description: 'Whether to include ancestor iterations. Defaults to true'
 
     type Types::IterationType, null: true
 

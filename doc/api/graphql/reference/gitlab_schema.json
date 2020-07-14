@@ -14112,7 +14112,7 @@
                 },
                 {
                   "name": "includeAncestors",
-                  "description": "Whether to include ancestor Iterations. Defaults to true",
+                  "description": "Whether to include ancestor iterations. Defaults to true",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
