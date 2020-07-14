@@ -10,6 +10,11 @@ export const buildMockTextNode = literal => {
 
 export const normalTextNode = buildMockTextNode('This is just normal text.');
 
+export const htmlBlockNode = {
+  type: 'htmlBlock',
+  literal: '<div data-tomark-pass ><h1>Some header</h1><p>Some paragraph</p></div>',
+};
+
 // Token spec helpers
 
 const buildUneditableOpenToken = type => {
@@ -44,4 +49,14 @@ export const uneditableInlineTokens = [
   buildUneditableOpenToken('a'),
   originInlineToken,
   buildUneditableCloseToken('a'),
+];
+
+export const uneditableBlockTokens = [
+  buildUneditableOpenToken('div'),
+  {
+    type: 'text',
+    tagName: null,
+    content: '<div><h1>Some header</h1><p>Some paragraph</p></div>',
+  },
+  buildUneditableCloseToken('div'),
 ];
