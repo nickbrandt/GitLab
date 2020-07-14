@@ -2,10 +2,10 @@ import Vue from 'vue';
 import { __, sprintf } from '~/locale';
 import CommaSeparatedListTokenSelector from '../components/comma_separated_list_token_selector.vue';
 
-export default () => {
+export default (el, placeholder, qaSelector) => {
   // eslint-disable-next-line no-new
   new Vue({
-    el: '.js-allowed-email-domains',
+    el,
     components: {
       CommaSeparatedListTokenSelector,
     },
@@ -16,14 +16,17 @@ export default () => {
     },
     render(createElement) {
       return createElement('comma-separated-list-token-selector', {
+        attrs: {
+          'data-qa-selector': qaSelector,
+        },
         props: {
           hiddenInputId: this.hiddenInputId,
           ariaLabelledby: this.labelId,
-          placeholder: __('Enter domain'),
+          placeholder,
         },
         scopedSlots: {
           'user-defined-token-content': ({ inputText: value }) => {
-            return sprintf(__('Add "%{value}" to allowlist'), { value });
+            return sprintf(__('Add "%{value}"'), { value });
           },
         },
       });
