@@ -171,6 +171,7 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
     before do
       sign_in user
       project.add_developer(user)
+      create(:jira_service, project: project)
     end
 
     it_behaves_like 'unauthorized when external service denies access' do
