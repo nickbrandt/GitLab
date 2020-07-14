@@ -1,6 +1,5 @@
 <script>
 import { GlButton } from '@gitlab/ui';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 import AddLicenseFormDropdown from './add_license_form_dropdown.vue';
 import { s__ } from '~/locale';
@@ -10,7 +9,6 @@ export default {
   components: {
     AddLicenseFormDropdown,
     GlButton,
-    LoadingButton,
   },
   LICENSE_APPROVAL_STATUS,
   approvalStatusOptions: [
@@ -86,17 +84,21 @@ export default {
         </label>
       </div>
     </div>
-    <loading-button
-      class="js-submit"
-      :disabled="submitDisabled"
-      :loading="loading"
-      container-class="btn btn-success btn-align-content d-inline-flex"
-      :label="s__('LicenseCompliance|Submit')"
-      data-qa-selector="add_license_submit_button"
-      @click="addLicense"
-    />
-    <gl-button class="js-cancel" :disabled="loading" @click="closeForm">
-      {{ s__('LicenseCompliance|Cancel') }}
-    </gl-button>
+    <div class="gl-display-flex">
+      <gl-button
+        class="js-submit"
+        :disabled="submitDisabled"
+        :loading="loading"
+        category="primary"
+        variant="success"
+        data-qa-selector="add_license_submit_button"
+        @click="addLicense"
+      >
+        {{ __('Submit') }}
+      </gl-button>
+      <gl-button class="js-cancel ml-2" :disabled="loading" @click="closeForm">
+        {{ __('Cancel') }}
+      </gl-button>
+    </div>
   </div>
 </template>
