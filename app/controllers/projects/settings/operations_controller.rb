@@ -47,10 +47,10 @@ module Projects
           .new(project, current_user, pagerduty_token_params)
           .execute
 
-        pagerduty_token = project.incident_management_setting&.pagerduty_token
-        webhook_url = project_incidents_pager_duty_url(project, token: pagerduty_token)
-
         if result[:status] == :success
+          pagerduty_token = project.incident_management_setting&.pagerduty_token
+          webhook_url = project_incidents_pagerduty_url(project, token: pagerduty_token)
+
           render json: { pagerduty_webhook_url: webhook_url, pagerduty_token: pagerduty_token }
         else
           render json: {}, status: :unprocessable_entity

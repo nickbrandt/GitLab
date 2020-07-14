@@ -407,7 +407,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       post 'alerts/notify', to: 'alerting/notifications#create'
 
-      post 'incidents/pager_duty', to: 'incident_management/pager_duty_incidents#create'
+      post 'incidents/pagerduty', to: 'incident_management/pager_duty_incidents#create'
 
       draw :legacy_builds
 
