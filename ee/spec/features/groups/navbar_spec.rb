@@ -15,6 +15,7 @@ RSpec.describe 'Group navbar' do
     group.add_maintainer(user)
     stub_feature_flags(group_push_rules: false)
     stub_feature_flags(group_iterations: false)
+    stub_feature_flags(group_wiki: false)
     sign_in(user)
   end
 
