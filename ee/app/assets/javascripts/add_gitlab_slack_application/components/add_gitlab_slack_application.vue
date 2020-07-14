@@ -134,7 +134,7 @@ export default {
       </span>
     </div>
 
-    <div class="center prepend-top-20 append-bottom-10 gl-mr-2 prepend-left-5">
+    <div class="center prepend-top-20 append-bottom-10 gl-mr-2 gl-ml-2">
       <img v-once :src="gitlabForSlackGifPath" class="gitlab-slack-gif" />
     </div>
 
