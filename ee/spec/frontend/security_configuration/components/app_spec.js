@@ -80,21 +80,14 @@ describe('Security Configuration App', () => {
 
   describe('Auto DevOps alert', () => {
     describe.each`
-      gitlabCiPresent | autoDevopsEnabled | canEnableAutoDevops | sastConfigurationByClick | shouldShowAlert
-      ${false}        | ${false}          | ${true}             | ${true}                  | ${true}
-      ${true}         | ${false}          | ${true}             | ${true}                  | ${false}
-      ${false}        | ${true}           | ${true}             | ${true}                  | ${false}
-      ${false}        | ${false}          | ${false}            | ${true}                  | ${false}
-      ${false}        | ${false}          | ${true}             | ${false}                 | ${false}
+      gitlabCiPresent | autoDevopsEnabled | canEnableAutoDevops | shouldShowAlert
+      ${false}        | ${false}          | ${true}             | ${true}
+      ${true}         | ${false}          | ${true}             | ${false}
+      ${false}        | ${true}           | ${true}             | ${false}
+      ${false}        | ${false}          | ${false}            | ${false}
     `(
-      'given gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled, canEnableAutoDevops is $canEnableAutoDevops, sastConfigurationByClick is $sastConfigurationByClick',
-      ({
-        gitlabCiPresent,
-        autoDevopsEnabled,
-        canEnableAutoDevops,
-        sastConfigurationByClick,
-        shouldShowAlert,
-      }) => {
+      'given gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled, canEnableAutoDevops is $canEnableAutoDevops',
+      ({ gitlabCiPresent, autoDevopsEnabled, canEnableAutoDevops, shouldShowAlert }) => {
         beforeEach(() => {
           createComponent({
             propsData: {
@@ -102,7 +95,6 @@ describe('Security Configuration App', () => {
               autoDevopsEnabled,
               canEnableAutoDevops,
             },
-            provide: { glFeatures: { sastConfigurationByClick } },
           });
         });
 
@@ -168,20 +160,18 @@ describe('Security Configuration App', () => {
 
   describe('enabling SAST by merge request', () => {
     describe.each`
-      sastConfigurationByClick | gitlabCiPresent | autoDevopsEnabled | buttonExpected
-      ${true}                  | ${false}        | ${false}          | ${true}
-      ${true}                  | ${false}        | ${true}           | ${true}
-      ${true}                  | ${true}         | ${false}          | ${false}
-      ${false}                 | ${false}        | ${false}          | ${false}
+      gitlabCiPresent | autoDevopsEnabled | buttonExpected
+      ${false}        | ${false}          | ${true}
+      ${false}        | ${true}           | ${true}
+      ${true}         | ${false}          | ${false}
     `(
-      'given sastConfigurationByClick is $sastConfigurationByClick, gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled',
-      ({ sastConfigurationByClick, gitlabCiPresent, autoDevopsEnabled, buttonExpected }) => {
+      'given gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled',
+      ({ gitlabCiPresent, autoDevopsEnabled, buttonExpected }) => {
         beforeEach(() => {
           const features = generateFeatures(1, { type: 'sast', configured: false });
 
           createComponent({
             propsData: { features, gitlabCiPresent, autoDevopsEnabled },
-            provide: { glFeatures: { sastConfigurationByClick } },
           });
         });
 
