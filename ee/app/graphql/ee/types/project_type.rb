@@ -6,6 +6,12 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        field :securityScanners, ::Types::SecurityScanners, null: true,
+          description: 'Information about security analyzers used in the project',
+          resolve: -> (project, _args, ctx) do
+            project
+          end
+
         field :vulnerabilities,
               ::Types::VulnerabilityType.connection_type,
               null: true,
