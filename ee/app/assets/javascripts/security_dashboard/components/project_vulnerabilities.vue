@@ -77,7 +77,10 @@ export default {
           fullPath: this.projectFullPath,
         };
       },
-      update({ project: { securityScanners = {} } } = {}) {
+      error() {
+        this.securityScanners = {};
+      },
+      update({ project: { securityScanners = {} } = {} }) {
         const { available = [], enabled = [], pipelineRun = [] } = securityScanners;
         const translateScannerName = scannerName => this.$options.i18n[scannerName] || scannerName;
 
