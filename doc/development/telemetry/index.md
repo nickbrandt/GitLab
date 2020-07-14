@@ -175,7 +175,7 @@ Note (1): Snowplow JS and Snowplow Ruby are available on self-managed, however, 
 
 The Snowflake data warehouse is where we keep all of GitLab Inc's data.
 
-### Data Sources
+### Data sources
 
 There are several data sources available in Snowflake and Sisense each representing a different view of the data along the transformation pipeline.
 
