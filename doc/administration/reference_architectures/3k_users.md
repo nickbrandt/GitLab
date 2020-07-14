@@ -402,7 +402,7 @@ gitlab-ctl status
    }  
 
    # Disable auto migrations
-   gitlab_rails['auto_migrate'] = false        
+   gitlab_rails['auto_migrate'] = false
    ```
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
@@ -544,7 +544,7 @@ To configure the Sentinel:
 
 NOTE: **Note:**
 A Consul leader will be elected when the provisioning of the third Consul server is completed.
-Viewing the Consul logs `sudo gitlab-ctl tail consul` will display 
+Viewing the Consul logs `sudo gitlab-ctl tail consul` will display
 `...[INFO] consul: New leader elected: ...`
 
 You can list the current Consul members (server, client) via:
@@ -1519,7 +1519,7 @@ On each node perform the following:
    ## You can also use FQDNs and intermix them with IPs
    consul['configuration'] = {
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
-   }    
+   }
 
    # Add the monitoring node's IP address to the monitoring whitelist and allow it to
    # scrape the NGINX metrics
