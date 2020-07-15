@@ -352,7 +352,7 @@ module EE
           min_id = JiraTrackerData.where(issues_enabled: true).minimum(:service_id)
           max_id = JiraTrackerData.where(issues_enabled: true).maximum(:service_id)
 
-          count(JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
+          count(::JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
         end
         # rubocop:enable CodeReuse/ActiveRecord
       end
