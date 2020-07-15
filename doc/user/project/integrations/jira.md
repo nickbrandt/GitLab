@@ -55,8 +55,7 @@ In order to enable the Jira service in GitLab, you need to first configure the p
 
 > **Notes:**
 >
-> - The currently supported Jira versions are `v6.x, v7.x, v8.x` . GitLab 7.8 or
->   higher is required.
+> - The supported Jira versions are `v6.x`, `v7.x`, and `v8.x`.
 > - GitLab 8.14 introduced a new way to integrate with Jira which greatly simplified
 >   the configuration options you have to enter. If you are using an older version,
 >   [follow this documentation](https://gitlab.com/gitlab-org/gitlab/blob/8-13-stable-ee/doc/project_services/jira.md).
@@ -65,19 +64,34 @@ In order to enable the Jira service in GitLab, you need to first configure the p
 >   a value of `fromDialog`.
 
 To enable the Jira integration in a project, navigate to the
-[Integrations page](overview.md#accessing-integrations), click
-the **Jira** service, and fill in the required details on the page as described
-in the table below.
+[Integrations page](overview.md#accessing-integrations) and click
+the **Jira** service.
+
+Select **Enable integration**.
+
+Select a **Trigger** action. This determines whether a mention of a Jira issue in GitLab commits, merge requests, or both, should link the Jira issue back to that source commit/MR and transition the Jira issue, if indicated.
+
+To include a comment on the Jira issue when the above referene is made in GitLab, check **Enable comments**.
+
+Enter the further details on the page as described in the following table.
 
 | Field | Description |
 | ----- | ----------- |
 | `Web URL` | The base URL to the Jira instance web interface which is being linked to this GitLab project. E.g., `https://jira.example.com`. |
 | `Jira API URL` | The base URL to the Jira instance API. Web URL value will be used if not set. E.g., `https://jira-api.example.com`. Leave this field blank (or use the same value of `Web URL`) if using **Jira Cloud**. |
-| `Username/Email` | Created when [configuring Jira step](#configuring-jira). Use `username` for **Jira Server** or `email` for **Jira Cloud**. |
-| `Password/API token` |Created in [configuring Jira step](#configuring-jira). Use `password` for **Jira Server** or `API token` for **Jira Cloud**. |
-| `Transition ID` | This is the ID of a transition that moves issues to the desired state. It is possible to insert transition ids separated by `,` or `;` which means the issue will be moved to each state after another using the given order.  **Closing Jira issues via commits or Merge Requests won't work if you don't set the ID correctly.** |
+| `Username or Email` | Created in [configuring Jira](#configuring-jira) step. Use `username` for **Jira Server** or `email` for **Jira Cloud**. |
+| `Password/API token` |Created in [configuring Jira](#configuring-jira) step. Use `password` for **Jira Server** or `API token` for **Jira Cloud**. |
+| `Transition ID` | Required for closing Jira issues via commits or merge requests. This is the ID of a transition in Jira that moves issues to a desired state. (See [Obtaining a transition ID](#obtaining-a-transition-id).) If you insert multiple transition IDs separated by `,` or `;`, the issue is moved to each state, one after another, using the given order. |
 
-### Obtaining a transition ID
+To enable users to view Jira issues inside GitLab, select **Enable Jira issues** and enter a project key. **(PREMIUM)**
+
+When you have configured all settings, click **Test settings and save changes**.
+
+Your GitLab project can now interact with all Jira projects in your instance and the project now displays a Jira link that opens the Jira project.
+
+![Jira service page](img/jira_service_page_v12_2.png)
+
+#### Obtaining a transition ID
 
 In the most recent Jira user interface, you can no longer see transition IDs in the workflow
 administration UI. You can get the ID you need in either of the following ways:
@@ -90,19 +104,11 @@ administration UI. You can get the ID you need in either of the following ways:
 Note that the transition ID may vary between workflows (e.g., bug vs. story),
 even if the status you are changing to is the same.
 
-After saving the configuration, your GitLab project will be able to interact
-with all Jira projects in your Jira instance and you'll see the Jira link on the GitLab project pages that takes you to the appropriate Jira project.
+#### Disabling comments on Jira issues
 
-![Jira service page](img/jira_service_page_v12_2.png)
+You can continue to have GitLab cross-link a source commit/MR with a Jira issue while disabling the comment added to the issue.
 
-### Disabling comments on Jira issues
-
-When you reference a Jira issue, it will always link back to the source commit/MR in GitLab, however, you can control whether GitLab will also cross-post a comment to the Jira issue. That functionality is enabled by default.
-
-To disable the automated commenting on Jira issues:
-
-1. Open the [Integrations page](overview.md#accessing-integrations) and select **Jira**.
-1. In the **Event Action** section, uncheck **Comment**.
+See the [#configuring-gitlab] section and uncheck the **Enable comments** setting.
 
 ## Jira issues
 
@@ -111,7 +117,7 @@ By now you should have [configured Jira](#configuring-jira) and enabled the
 you should be able to reference and close Jira issues by just mentioning their
 ID in GitLab commits and merge requests.
 
-### Referencing Jira Issues
+### Reference Jira issues
 
 When GitLab project has Jira issue tracker configured and enabled, mentioning
 Jira issue in GitLab will automatically add a comment in Jira issue with the
@@ -138,7 +144,7 @@ For example, the following commit will reference the Jira issue with `PROJECT-1`
 git commit -m "PROJECT-1 Fix spelling and grammar"
 ```
 
-### Closing Jira Issues
+### Close Jira issues
 
 Jira issues can be closed directly from GitLab by using trigger words in
 commits and merge requests. When a commit which contains the trigger word
@@ -162,8 +168,6 @@ where `PROJECT-1` is the ID of the Jira issue.
 >   [project settings](img/jira_project_settings.png).
 > - The Jira issue will not be transitioned if it has a resolution.
 
-### Jira issue closing example
-
 Let's consider the following example:
 
 1. For the project named `PROJECT` in Jira, we implemented a new feature
@@ -184,6 +188,43 @@ Once this merge request is merged, the Jira issue will be automatically closed
 with a link to the commit that resolved the issue.
 
 ![The GitLab integration closes Jira issue](img/jira_service_close_issue.png)
+
+### View Jira issues **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3622) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.2.
+
+You can browse and open issues from a selected Jira project directly in GitLab. This requires [configuration](#configuring-gitlab) in GitLab by an administrator.
+
+![Jira issues integration enabled](img/jira/jira-issues-enabled.png)
+
+From the **Jira Issues** menu, click **Issues List**. A list of issues is displayed, grouped based on their [Jira status](https://confluence.atlassian.com/adminjiraserver070/defining-status-field-values-749382903.html).
+
+* The **Open** tab displays all issues with a Jira status in any category other than Done.
+* The **Closed** tab displays all issues with a Jira status categorized as Done.
+* The **All** tab displays all issues of any status.
+
+By default, the newest issues are listed at the top based on the date they were created.  
+
+#### Search and filter the issues list
+
+To refine the list of issues, use the search bar to search for any text
+contained in an issue summary (title) or description.
+
+You can also filter by labels, status, reporter, and assignee using URL parameters.
+Enhancements to be able to use these through the user interface are [planned](https://gitlab.com/groups/gitlab-org/-/epics/3622).
+
+- To filter issues by `labels`, specify one or more labels as part of the `labels[]`
+parameter in the URL. When using multiple labels, only issues that contain all specified
+labels are listed. `/-/integrations/jira/issues?labels[]=backend&labels[]=feature&labels[]=QA`
+
+- To filter issues by `status`, specify the `status` parameter in the URL.
+`/-/integrations/jira/issues?status=In Progress`
+
+- To filter issues by `reporter`, specify a reporter's Jira display name for the
+`author_username` parameter in the URL. `/-/integrations/jira/issues?author_username=John Smith`
+
+- To filter issues by `assignee`, specify their Jira display name for the
+`assignee_username` parameter in the URL. `/-/integrations/jira/issues?assignee_username=John Smith`
 
 ## Troubleshooting
 
@@ -212,56 +253,3 @@ which may lead to a `401 unauthorized` error when testing your Jira integration.
 If CAPTCHA has been triggered, you will not be able to use Jira's REST API to
 authenticate with the Jira site. You will need to log in to your Jira instance
 and complete the CAPTCHA.
-
-## Extending Jira Integration **(PREMIUM)**
-
-> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3622) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.2.
-
-Jira integration is extending and brings Jira issues listing into GitLab, so now you do not have
-to leave GitLab to work with your Jira issues.
-
-In order to enable Jira issues listing in GitLab, the project owner has to enable Jira issues in
-Jira Integration configuration and select the Jira project key for which issues are going to be fetched.
-
-![Jira issues integration enabled](img/jira/jira-issues-enabled.png)
-
-### Jira Issues Navigation
-
-Once Jira issues integration is enabled, you should be able to navigate to your Jira issues from GitLab sidebar menu.
-A `Jira Issues` menu should be available with option to list the issues or navigate to Jira instance.
-
-![Jira issues sidebar navigation on mouse over](img/jira/jira_issues_sidebar_menu_on_hover.png)
-
-### Jira Issues List
-
-![Open Jira issues list](img/jira/open_jira_issues_list.png)
-
-The list of issues is designed to closely resemble GitLab look and feel yet leveraging Jira capabilities. This means
-we get to keep `Open`, `Close` and `All` tabs and map the Jira issues `categoryStatus != Done`, `categoryStatus = Done`
-or no `categoryStatus` filtering respeectivelly. By default navigating to Jira issues list would land you on `Open`
-issues tab(i.e. issues with `statusCategory != Done`), which is also the default Jira issues list filtering
-and sorted descendingly by created date.
-
-To refine the list of issues, the search bar can be used to search Jira issues by text
-contained in issue summary (title) or description. Also, for the MVC, filtering by `labels`, `status`, `reporter`
-and `assignee` is available through URL parameters.
-
-Extending searchbar functionality with above filtering capabilities
-(by `labels`, `status`, `reporter` and `assignee`) will come in a future iteration.
-
-#### Refining Jira Issue List with search and filtering
-
-- To search for issues that contain a specific text, simply enter the text in the searchbar and click `search` button.
-
-- To filter list of issues by `labels`, you will need to specify the label as part of the `labels[]`
-parameter in the URL. You can filter issues by multiple labels. Only issues that cotain all specified
-labels will be listed. e.g. `/-/integrations/jira/issues?labels[]=backend&labels[]=feature&labels[]=QA`
-
-- To filter list of issues by `status`, specify the `status` parameter in the URL.
-e.g. `/-/integrations/jira/issues?status=In Progress`
-
-- To filter list of issues by `reporter`, specify reporter's Jira display name for the
-`author_username` parameter in the URL. e.g. `/-/integrations/jira/issues?author_username=John Smith`
-
-- To filter list of issues by `assignee`, specify assignee's Jira display name for the
-`assigeee_username` parameter in the URL. e.g. `/-/integrations/jira/issues?assigeee_username=John Smith`
