@@ -193,13 +193,13 @@ with a link to the commit that resolved the issue.
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3622) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.2.
 
-You can browse and open issues from a selected Jira project directly in GitLab. This requires [configuration](#configuring-gitlab) in GitLab by an administrator.
+You can browse and search issues from a selected Jira project directly in GitLab. This requires [configuration](#configuring-gitlab) in GitLab by an administrator.
 
 ![Jira issues integration enabled](img/jira/jira-issues-enabled.png)
 
-From the **Jira Issues** menu, click **Issues List**. A list of issues is displayed, grouped based on their [Jira status](https://confluence.atlassian.com/adminjiraserver070/defining-status-field-values-749382903.html).
+From the **Jira Issues** menu, click **Issues List**. A list of issues is displayed. The issue list defaults to sort by **Created date**, with the newest issues listed at the top. You can change this to **Last updated**.
 
-By default, the newest issues are listed at the top based on the date they were created.  
+Click an issue title to open the original Jira issue page for full details.
 
 #### Search and filter the issues list
 
