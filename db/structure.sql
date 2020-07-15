@@ -12693,6 +12693,7 @@ CREATE TABLE public.jira_tracker_data (
     jira_issue_transition_id character varying,
     project_key text,
     issues_enabled boolean DEFAULT false NOT NULL,
+    deployment_type smallint DEFAULT 0 NOT NULL,
     CONSTRAINT check_214cf6a48b CHECK ((char_length(project_key) <= 255))
 );
 
