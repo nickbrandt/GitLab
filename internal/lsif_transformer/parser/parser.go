@@ -18,13 +18,18 @@ type Parser struct {
 	Docs *Docs
 }
 
-func NewParser(r io.Reader, tempDir string) (*Parser, error) {
-	docs, err := NewDocs(tempDir)
+type Config struct {
+	TempPath          string
+	ProcessReferences bool
+}
+
+func NewParser(r io.Reader, config Config) (*Parser, error) {
+	docs, err := NewDocs(config)
 	if err != nil {
 		return nil, err
 	}
 
-	zr, err := openZipReader(r, tempDir)
+	zr, err := openZipReader(r, config.TempPath)
 	if err != nil {
 		return nil, err
 	}

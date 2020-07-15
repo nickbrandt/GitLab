@@ -36,8 +36,10 @@ type ResultSetRef struct {
 	RefId       Id `json:"inV"`
 }
 
-func NewHovers(tempDir string) (*Hovers, error) {
-	file, err := ioutil.TempFile(tempDir, "hovers")
+func NewHovers(config Config) (*Hovers, error) {
+	tempPath := config.TempPath
+
+	file, err := ioutil.TempFile(tempPath, "hovers")
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +48,7 @@ func NewHovers(tempDir string) (*Hovers, error) {
 		return nil, err
 	}
 
-	offsets, err := newCache(tempDir, "hovers-indexes", Offset{})
+	offsets, err := newCache(tempPath, "hovers-indexes", Offset{})
 	if err != nil {
 		return nil, err
 	}

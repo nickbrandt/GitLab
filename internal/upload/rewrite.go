@@ -133,7 +133,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 			return err
 		}
 	case rew.preauth.ProcessLsif:
-		inputReader, err = handleLsifUpload(ctx, p, opts.LocalTempPath, filename)
+		inputReader, err = handleLsifUpload(ctx, p, opts.LocalTempPath, filename, rew.preauth)
 		if err != nil {
 			return err
 		}
@@ -174,8 +174,13 @@ func handleExifUpload(ctx context.Context, r io.Reader, filename string) (io.Rea
 	return exif.NewCleaner(ctx, r)
 }
 
-func handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string) (io.Reader, error) {
-	p, err := parser.NewParser(reader, tempPath)
+func handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string, preauth *api.Response) (io.Reader, error) {
+	parserConfig := parser.Config{
+		TempPath:          tempPath,
+		ProcessReferences: preauth.ProcessLsifReferences,
+	}
+
+	p, err := parser.NewParser(reader, parserConfig)
 	if err != nil {
 		return nil, err
 	}

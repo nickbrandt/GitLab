@@ -13,9 +13,11 @@ const (
 )
 
 type Ranges struct {
-	DefRefs map[Id]Item
-	Hovers  *Hovers
-	Cache   *cache
+	DefRefs           map[Id]Item
+	References        map[Id][]Item
+	Hovers            *Hovers
+	Cache             *cache
+	ProcessReferences bool
 }
 
 type RawRange struct {
@@ -42,27 +44,34 @@ type Item struct {
 }
 
 type SerializedRange struct {
-	StartLine      int32           `json:"start_line"`
-	StartChar      int32           `json:"start_char"`
-	DefinitionPath string          `json:"definition_path,omitempty"`
-	Hover          json.RawMessage `json:"hover"`
+	StartLine      int32                 `json:"start_line"`
+	StartChar      int32                 `json:"start_char"`
+	DefinitionPath string                `json:"definition_path,omitempty"`
+	Hover          json.RawMessage       `json:"hover"`
+	References     []SerializedReference `json:"references,omitempty"`
 }
 
-func NewRanges(tempDir string) (*Ranges, error) {
-	hovers, err := NewHovers(tempDir)
+type SerializedReference struct {
+	Path string `json:"path"`
+}
+
+func NewRanges(config Config) (*Ranges, error) {
+	hovers, err := NewHovers(config)
 	if err != nil {
 		return nil, err
 	}
 
-	cache, err := newCache(tempDir, "ranges", Range{})
+	cache, err := newCache(config.TempPath, "ranges", Range{})
 	if err != nil {
 		return nil, err
 	}
 
 	return &Ranges{
-		DefRefs: make(map[Id]Item),
-		Hovers:  hovers,
-		Cache:   cache,
+		DefRefs:           make(map[Id]Item),
+		References:        make(map[Id][]Item),
+		Hovers:            hovers,
+		Cache:             cache,
+		ProcessReferences: config.ProcessReferences,
 	}, nil
 }
 
@@ -102,6 +111,7 @@ func (r *Ranges) Serialize(f io.Writer, rangeIds []Id, docs map[Id]string) error
 			StartChar:      entry.Character,
 			DefinitionPath: r.definitionPathFor(docs, entry.RefId),
 			Hover:          r.Hovers.For(entry.RefId),
+			References:     r.referencesFor(docs, entry.RefId),
 		}
 		if err := encoder.Encode(serializedRange); err != nil {
 			return err
@@ -138,6 +148,29 @@ func (r *Ranges) definitionPathFor(docs map[Id]string, refId Id) string {
 	return defPath
 }
 
+func (r *Ranges) referencesFor(docs map[Id]string, refId Id) []SerializedReference {
+	if !r.ProcessReferences {
+		return nil
+	}
+
+	references, ok := r.References[refId]
+	if !ok {
+		return nil
+	}
+
+	var serializedReferences []SerializedReference
+
+	for _, reference := range references {
+		serializedReference := SerializedReference{
+			Path: docs[reference.DocId] + "#L" + reference.Line,
+		}
+
+		serializedReferences = append(serializedReferences, serializedReference)
+	}
+
+	return serializedReferences
+}
+
 func (r *Ranges) addRange(line []byte) error {
 	var rg RawRange
 	if err := json.Unmarshal(line, &rg); err != nil {
@@ -157,6 +190,10 @@ func (r *Ranges) addItem(line []byte) error {
 		return nil
 	}
 
+	if len(rawItem.RangeIds) == 0 {
+		return errors.New("no range IDs")
+	}
+
 	for _, rangeId := range rawItem.RangeIds {
 		rg, err := r.getRange(rangeId)
 		if err != nil {
@@ -168,28 +205,17 @@ func (r *Ranges) addItem(line []byte) error {
 		if err := r.Cache.SetEntry(rangeId, rg); err != nil {
 			return err
 		}
-	}
 
-	if rawItem.Property == definitions {
-		return r.addDefRef(&rawItem)
-	}
+		item := Item{
+			Line:  strconv.Itoa(int(rg.Line + 1)),
+			DocId: rawItem.DocId,
+		}
 
-	return nil
-}
-
-func (r *Ranges) addDefRef(rawItem *RawItem) error {
-	if len(rawItem.RangeIds) == 0 {
-		return errors.New("no range IDs")
-	}
-
-	rg, err := r.getRange(rawItem.RangeIds[0])
-	if err != nil {
-		return err
-	}
-
-	r.DefRefs[rawItem.RefId] = Item{
-		Line:  strconv.Itoa(int(rg.Line + 1)),
-		DocId: rawItem.DocId,
+		if rawItem.Property == definitions {
+			r.DefRefs[rawItem.RefId] = item
+		} else if r.ProcessReferences {
+			r.References[rawItem.RefId] = append(r.References[rawItem.RefId], item)
+		}
 	}
 
 	return nil

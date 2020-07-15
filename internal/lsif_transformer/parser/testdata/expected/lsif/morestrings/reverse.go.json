@@ -32,6 +32,11 @@
             {
                 "value": "This method reverses a string \n\n"
             }
+        ],
+        "references": [
+            {
+                "path": "main.go#L8"
+            }
         ]
     },
     {
@@ -107,6 +112,11 @@
                 ],
                 "language": "go"
             }
+        ],
+        "references": [
+            {
+                "path": "morestrings/reverse.go#L15"
+            }
         ]
     },
     {
@@ -131,6 +141,11 @@
                     ]
                 ],
                 "language": "go"
+            }
+        ],
+        "references": [
+            {
+                "path": "morestrings/reverse.go#L8"
             }
         ]
     },
@@ -157,6 +172,11 @@
                 ],
                 "language": "go"
             }
+        ],
+        "references": [
+            {
+                "path": "morestrings/reverse.go#L15"
+            }
         ]
     },
     {
@@ -181,6 +201,11 @@
                     ]
                 ],
                 "language": "go"
+            }
+        ],
+        "references": [
+            {
+                "path": "morestrings/reverse.go#L8"
             }
         ]
     },
@@ -213,6 +238,11 @@
                     ]
                 ],
                 "language": "go"
+            }
+        ],
+        "references": [
+            {
+                "path": "main.go#L9"
             }
         ]
     }

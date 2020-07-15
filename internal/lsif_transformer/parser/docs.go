@@ -31,8 +31,8 @@ type Metadata struct {
 	Root string `json:"projectRoot"`
 }
 
-func NewDocs(tempDir string) (*Docs, error) {
-	ranges, err := NewRanges(tempDir)
+func NewDocs(config Config) (*Docs, error) {
+	ranges, err := NewRanges(config)
 	if err != nil {
 		return nil, err
 	}
