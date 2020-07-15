@@ -15,7 +15,7 @@ class ResourceStateEventFinder
   def can_read_eventable?
     return unless eventable
 
-    Ability.allowed?(current_user, read_ability, eventable.project)
+    Ability.allowed?(current_user, read_ability, eventable)
   end
 
   private
