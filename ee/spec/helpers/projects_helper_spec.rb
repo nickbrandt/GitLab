@@ -263,4 +263,16 @@ RSpec.describe ProjectsHelper do
       end
     end
   end
+
+  describe '#scheduled_for_deletion?' do
+    context 'when project is NOT scheduled for deletion' do
+      it { expect(helper.scheduled_for_deletion?(project)).to be false }
+    end
+
+    context 'when project is scheduled for deletion' do
+      let_it_be(:archived_project) { create(:project, :archived, marked_for_deletion_at: 10.minutes.ago) }
+
+      it { expect(helper.scheduled_for_deletion?(archived_project)).to be true }
+    end
+  end
 end
