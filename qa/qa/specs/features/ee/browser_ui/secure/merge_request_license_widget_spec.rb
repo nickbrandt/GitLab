@@ -7,7 +7,7 @@ module QA
     describe 'License merge request widget' do
       let(:approved_license_name) { "MIT" }
       let(:blacklisted_license_name) { "Zlib" }
-      let(:executor) {"qa-runner-#{Time.now.to_i}"}
+      let(:executor) {"qa-runner-#{Time.current.to_i}"}
 
       after do
         @runner.remove_via_api!

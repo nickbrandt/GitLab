@@ -17,7 +17,7 @@ RSpec.describe "Admin Runners" do
 
     context "when there are runners" do
       it 'has all necessary texts' do
-        runner = create(:ci_runner, contacted_at: Time.now)
+        runner = create(:ci_runner, contacted_at: Time.current)
         create(:ci_build, pipeline: pipeline, runner_id: runner.id)
         visit admin_runners_path
 

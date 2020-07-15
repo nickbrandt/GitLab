@@ -285,12 +285,12 @@ FactoryBot.define do
     end
 
     trait :erased do
-      erased_at { Time.now }
+      erased_at { Time.current }
       erased_by factory: :user
     end
 
     trait :queued do
-      queued_at { Time.now }
+      queued_at { Time.current }
       runner factory: :ci_runner
     end
 

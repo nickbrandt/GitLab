@@ -6,7 +6,7 @@ RSpec.describe 'Milestones through GroupQuery' do
   include GraphqlHelpers
 
   let_it_be(:user) { create(:user) }
-  let_it_be(:now) { Time.now }
+  let_it_be(:now) { Time.current }
 
   describe 'Get list of milestones from a group' do
     let_it_be(:group) { create(:group) }

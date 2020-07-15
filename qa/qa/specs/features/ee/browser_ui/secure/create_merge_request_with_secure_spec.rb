@@ -16,7 +16,7 @@ module QA
       end
 
       before do
-        @executor = "qa-runner-#{Time.now.to_i}"
+        @executor = "qa-runner-#{Time.current.to_i}"
 
         Flow::Login.sign_in
 

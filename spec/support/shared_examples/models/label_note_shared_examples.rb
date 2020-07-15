@@ -15,7 +15,7 @@ RSpec.shared_examples 'label note created from events' do
     labels.map { |l| l.to_reference}.sort.join(' ')
   end
 
-  let(:time) { Time.now }
+  let(:time) { Time.current }
   let(:local_label_ids) { [label.id, label2.id] }
 
   describe '.from_events' do

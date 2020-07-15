@@ -13,7 +13,7 @@ RSpec.describe Resolvers::MilestoneResolver do
     end
 
     context 'for group milestones' do
-      let_it_be(:now) { Time.now }
+      let_it_be(:now) { Time.current }
       let_it_be(:group) { create(:group, :private) }
 
       before do

@@ -5,7 +5,7 @@ RSpec.shared_examples 'returns recently visited boards' do
 
   it 'returns last 4 visited boards' do
     [0, 2, 5, 3, 7, 1].each_with_index do |board_index, i|
-      visit_board(boards[board_index], Time.now + i.minutes)
+      visit_board(boards[board_index], Time.current + i.minutes)
     end
 
     list_boards(recent: true)
@@ -19,9 +19,9 @@ RSpec.shared_examples 'redirects to last visited board' do
   let(:boards) { create_list(:board, 3, resource_parent: parent) }
 
   before do
-    visit_board(boards[2], Time.now + 1.minute)
-    visit_board(boards[0], Time.now + 2.minutes)
-    visit_board(boards[1], Time.now + 5.minutes)
+    visit_board(boards[2], Time.current + 1.minute)
+    visit_board(boards[0], Time.current + 2.minutes)
+    visit_board(boards[1], Time.current + 5.minutes)
   end
 
   context 'when multiple boards are disabled' do

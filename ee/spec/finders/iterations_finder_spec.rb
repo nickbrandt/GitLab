@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe IterationsFinder do
-  let(:now) { Time.now }
+  let(:now) { Time.current }
   let_it_be(:group) { create(:group, :private) }
   let_it_be(:project_1) { create(:project, namespace: group) }
   let_it_be(:project_2) { create(:project, namespace: group) }

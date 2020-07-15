@@ -92,7 +92,7 @@ RSpec.describe API::VisualReviewDiscussions do
       end
 
       it 'returns a current time stamp instead of the provided one' do
-        expect(Time.parse(response_note['created_at']) > 1.day.ago).to eq(true)
+        expect(Time.zone.parse(response_note['created_at']) > 1.day.ago).to eq(true)
       end
     end
 

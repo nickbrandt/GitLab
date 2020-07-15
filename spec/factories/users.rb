@@ -7,7 +7,7 @@ FactoryBot.define do
     username { generate(:username) }
     password { "12345678" }
     role { 'software_developer' }
-    confirmed_at { Time.now }
+    confirmed_at { Time.current }
     confirmation_token { nil }
     can_create_group { true }
 
@@ -58,7 +58,7 @@ FactoryBot.define do
 
     trait :with_sign_ins do
       sign_in_count { 3 }
-      current_sign_in_at { Time.now }
+      current_sign_in_at { Time.current }
       last_sign_in_at { FFaker::Time.between(10.days.ago, 1.day.ago) }
       current_sign_in_ip { '127.0.0.1' }
       last_sign_in_ip { '127.0.0.1' }
@@ -68,7 +68,7 @@ FactoryBot.define do
       before(:create) do |user|
         user.otp_required_for_login = true
         user.otp_secret = User.generate_otp_secret(32)
-        user.otp_grace_period_started_at = Time.now
+        user.otp_grace_period_started_at = Time.current
         user.generate_otp_backup_codes!
       end
     end

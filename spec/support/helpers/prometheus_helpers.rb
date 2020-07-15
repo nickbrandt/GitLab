@@ -31,7 +31,7 @@ module PrometheusHelpers
     "https://prometheus.example.com/api/v1/query?#{query}"
   end
 
-  def prometheus_query_range_url(prometheus_query, start_time: 8.hours.ago, end_time: Time.now, step: nil)
+  def prometheus_query_range_url(prometheus_query, start_time: 8.hours.ago, end_time: Time.current, step: nil)
     start_time = start_time.to_f
     end_time = end_time.to_f
     step ||= Gitlab::PrometheusClient.compute_step(start_time, end_time)
@@ -50,7 +50,7 @@ module PrometheusHelpers
     "https://prometheus.example.com/api/v1/label/#{name}/values"
   end
 
-  def prometheus_series_url(*matches, start_time: 8.hours.ago, end_time: Time.now)
+  def prometheus_series_url(*matches, start_time: 8.hours.ago, end_time: Time.current)
     query = {
       match: matches,
       start: start_time.to_f,
@@ -101,7 +101,7 @@ module PrometheusHelpers
 
   def stub_all_prometheus_requests(environment_slug, body: nil, status: 200)
     stub_prometheus_request(
-      prometheus_query_with_time_url(prometheus_memory_query(environment_slug), Time.now.utc),
+      prometheus_query_with_time_url(prometheus_memory_query(environment_slug), Time.current.utc),
       status: status,
       body: body || prometheus_value_body
     )
@@ -116,7 +116,7 @@ module PrometheusHelpers
       body: body || prometheus_values_body
     )
     stub_prometheus_request(
-      prometheus_query_with_time_url(prometheus_cpu_query(environment_slug), Time.now.utc),
+      prometheus_query_with_time_url(prometheus_cpu_query(environment_slug), Time.current.utc),
       status: status,
       body: body || prometheus_value_body
     )
@@ -132,7 +132,7 @@ module PrometheusHelpers
     )
   end
 
-  def prometheus_data(last_update: Time.now.utc)
+  def prometheus_data(last_update: Time.current.utc)
     {
       success: true,
       data: {
@@ -145,7 +145,7 @@ module PrometheusHelpers
     }
   end
 
-  def prometheus_metrics_data(last_update: Time.now.utc)
+  def prometheus_metrics_data(last_update: Time.current.utc)
     {
       success: true,
       metrics: {

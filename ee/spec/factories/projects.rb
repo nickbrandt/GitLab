@@ -16,15 +16,15 @@ FactoryBot.modify do
 
         case import_state.status.to_sym
         when :scheduled
-          import_state.last_update_scheduled_at = Time.now
+          import_state.last_update_scheduled_at = Time.current
         when :started
-          import_state.last_update_started_at = Time.now
+          import_state.last_update_started_at = Time.current
         when :finished
-          timestamp = evaluator.last_update_at || Time.now
+          timestamp = evaluator.last_update_at || Time.current
           import_state.last_update_at = timestamp
           import_state.last_successful_update_at = timestamp
         when :failed
-          import_state.last_update_at = evaluator.last_update_at || Time.now
+          import_state.last_update_at = evaluator.last_update_at || Time.current
         end
         import_state.save!
       end
@@ -36,7 +36,7 @@ FactoryBot.modify do
 
     trait :import_hard_failed do
       import_status { :failed }
-      last_update_at { Time.now - 1.minute }
+      last_update_at { Time.current - 1.minute }
       retry_count { Gitlab::Mirror::MAX_RETRY + 1 }
     end
 

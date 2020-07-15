@@ -41,7 +41,7 @@ module Geo
       # rubocop:disable Gitlab/ModuleWithInstanceVariables
       def perform(shard_name)
         @shard_name = shard_name
-        @start_time = Time.now.utc
+        @start_time = Time.current.utc
 
         return unless healthy_node?
 
@@ -80,7 +80,7 @@ module Geo
       def node_enabled?
         # Only check every minute to avoid polling the DB excessively
         unless @last_enabled_check.present? && @last_enabled_check > 1.minute.ago
-          @last_enabled_check = Time.now.utc
+          @last_enabled_check = Time.current.utc
           clear_memoization(:current_node_enabled)
         end
 
@@ -99,7 +99,7 @@ module Geo
       end
 
       def over_time?
-        (Time.now.utc - start_time) >= run_time
+        (Time.current.utc - start_time) >= run_time
       end
 
       def worker_metadata

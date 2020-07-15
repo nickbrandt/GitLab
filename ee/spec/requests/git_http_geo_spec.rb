@@ -104,7 +104,7 @@ RSpec.describe "Git HTTP requests (Geo)", :geo do
     end
 
     context 'expired Geo JWT token' do
-      it { travel_to(Time.now + 11.minutes) { is_expected.to have_gitlab_http_status(:unauthorized) } }
+      it { travel_to(Time.current + 11.minutes) { is_expected.to have_gitlab_http_status(:unauthorized) } }
     end
 
     context 'invalid Geo JWT token' do

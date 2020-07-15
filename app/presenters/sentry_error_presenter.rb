@@ -6,11 +6,11 @@ class SentryErrorPresenter < Gitlab::View::Presenter::Delegated
   FrequencyStruct = Struct.new(:time, :count, keyword_init: true)
 
   def first_seen
-    DateTime.parse(error.first_seen)
+    DateTime.zone.parse(error.first_seen)
   end
 
   def last_seen
-    DateTime.parse(error.last_seen)
+    DateTime.zone.parse(error.last_seen)
   end
 
   def project_id
@@ -21,7 +21,7 @@ class SentryErrorPresenter < Gitlab::View::Presenter::Delegated
     utc_offset = Time.zone_offset('UTC')
 
     error.frequency.map do |f|
-      FrequencyStruct.new(time: Time.at(f[0], in: utc_offset), count: f[1])
+      FrequencyStruct.new(time: Time.zone.at(f[0], in: utc_offset), count: f[1])
     end
   end
 end

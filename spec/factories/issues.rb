@@ -22,7 +22,7 @@ FactoryBot.define do
 
     trait :closed do
       state_id { Issue.available_states[:closed] }
-      closed_at { Time.now }
+      closed_at { Time.current }
     end
 
     after(:build) do |issue, evaluator|

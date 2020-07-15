@@ -189,7 +189,7 @@ RSpec.describe API::Namespaces do
     [:last_ci_minutes_notification_at, :last_ci_minutes_usage_notification_level].each do |attr|
       context "when namespace has a value for #{attr}" do
         before do
-          group1.update_attribute(attr, Time.now)
+          group1.update_attribute(attr, Time.current)
         end
 
         it 'resets that value when assigning extra CI minutes' do

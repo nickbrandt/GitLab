@@ -193,7 +193,7 @@ RSpec.describe API::ProjectTemplates do
       content = json_response['content']
 
       expect(content).to include('Project Placeholder')
-      expect(content).to include("Copyright (C) #{Time.now.year}  Fullname Placeholder")
+      expect(content).to include("Copyright (C) #{Time.current.year}  Fullname Placeholder")
     end
 
     it_behaves_like 'accepts project paths with dots' do

@@ -20,7 +20,7 @@ module Tooling
       end
 
       def last_update
-        @last_update ||= Time.parse(self[:last_update])
+        @last_update ||= Time.zone.parse(self[:last_update])
       end
     end
 

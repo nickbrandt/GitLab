@@ -4,7 +4,7 @@ module QA
   RSpec.describe 'Verify', :docker, :runner do
     describe 'Code coverage statistics' do
       let(:simplecov) { '\(\d+.\d+\%\) covered' }
-      let(:executor) { "qa-runner-#{Time.now.to_i}" }
+      let(:executor) { "qa-runner-#{Time.current.to_i}" }
       let(:runner) do
         Resource::Runner.fabricate_via_api! do |runner|
           runner.name = executor

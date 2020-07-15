@@ -357,7 +357,7 @@ RSpec.describe ChatMessage::PipelineMessage do
   end
 
   it "returns the pipeline's timestamp as the attachment's ts property" do
-    expected_ts = Time.parse(args[:object_attributes][:finished_at]).to_i
+    expected_ts = Time.zone.parse(args[:object_attributes][:finished_at]).to_i
     expect(subject.attachments.first[:ts]).to eq(expected_ts)
   end
 

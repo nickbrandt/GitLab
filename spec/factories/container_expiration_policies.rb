@@ -19,7 +19,7 @@ FactoryBot.define do
 
     trait :runnable do
       after(:create) do |policy|
-        # next_run_at will be set before_save to Time.now + cadence, so this ensures the policy is active
+        # next_run_at will be set before_save to Time.current + cadence, so this ensures the policy is active
         policy.update_column(:next_run_at, Time.zone.now - 1.day)
       end
     end

@@ -170,7 +170,7 @@ module X509Helpers
     end
 
     def signed_commit_time
-      Time.at(1561027326)
+      Time.zone.at(1561027326)
     end
 
     def signed_tag_signature

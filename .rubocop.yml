@@ -452,29 +452,9 @@ Performance/ChainArrayAllocation:
 Rails/TimeZone:
   Enabled: true
   EnforcedStyle: 'flexible'
-  Include:
-    - 'app/controllers/**/*'
-    - 'app/services/**/*'
-    - 'lib/**/*'
-    - 'spec/controllers/**/*'
-    - 'spec/services/**/*'
-    - 'spec/lib/**/*'
-    - 'ee/app/controllers/**/*'
-    - 'ee/app/services/**/*'
-    - 'ee/spec/controllers/**/*'
-    - 'ee/spec/services/**/*'
-    - 'app/models/**/*'
-    - 'spec/models/**/*'
-    - 'ee/app/models/**/*'
-    - 'ee/spec/models/**/*'
-    - 'app/workers/**/*'
-    - 'spec/workers/**/*'
-    - 'ee/app/workers/**/*'
-    - 'ee/spec/workers/**/*'
-    - 'ee/lib/**/*'
-    - 'ee/spec/lib/**/*'
   Exclude:
-    - lib/gitlab/popen.rb
+    - 'scripts/**/*'
+    - 'lib/gitlab/popen.rb'
 
 
 # WIP: See https://gitlab.com/gitlab-org/gitlab/-/issues/220040

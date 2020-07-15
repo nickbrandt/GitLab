@@ -6,6 +6,6 @@ FactoryBot.define do
 
     name { generate(:name) }
     email { generate(:email) }
-    date { Google::Protobuf::Timestamp.new(seconds: Time.now.to_i) }
+    date { Google::Protobuf::Timestamp.new(seconds: Time.current.to_i) }
   end
 end

@@ -17,7 +17,7 @@ describe QA::Support::Repeater do
     end
   end
 
-  let(:time_start) { Time.now }
+  let(:time_start) { Time.current }
   let(:return_value) { "test passed" }
 
   describe '.repeat_until' do

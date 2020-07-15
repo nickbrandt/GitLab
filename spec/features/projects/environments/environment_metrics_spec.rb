@@ -10,7 +10,7 @@ RSpec.describe 'Environment > Metrics' do
   let(:pipeline) { create(:ci_pipeline, project: project) }
   let(:build) { create(:ci_build, pipeline: pipeline) }
   let(:environment) { create(:environment, project: project) }
-  let(:current_time) { Time.now.utc }
+  let(:current_time) { Time.current.utc }
   let!(:staging) { create(:environment, name: 'staging', project: project) }
 
   before do

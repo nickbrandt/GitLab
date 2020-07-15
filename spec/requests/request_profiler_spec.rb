@@ -21,7 +21,7 @@ RSpec.describe 'Request Profiler' do
 
     it 'creates a profile of the request' do
       project = create(:project, namespace: user.namespace)
-      time    = Time.now
+      time    = Time.current
       path    = "/#{project.full_path}"
 
       Timecop.freeze(time) do

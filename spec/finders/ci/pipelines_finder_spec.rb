@@ -242,7 +242,7 @@ RSpec.describe Ci::PipelinesFinder do
 
       let(:params) { { order_by: order_by, sort: sort } }
 
-      let!(:pipeline_1) { create(:ci_pipeline, :scheduled, project: project, iid: 11, ref: 'master', created_at: Time.now, updated_at: Time.now, user: create(:user)) }
+      let!(:pipeline_1) { create(:ci_pipeline, :scheduled, project: project, iid: 11, ref: 'master', created_at: Time.current, updated_at: Time.current, user: create(:user)) }
       let!(:pipeline_2) { create(:ci_pipeline, :created, project: project, iid: 12, ref: 'feature', created_at: 1.day.ago, updated_at: 2.hours.ago, user: create(:user)) }
       let!(:pipeline_3) { create(:ci_pipeline, :success, project: project, iid: 8, ref: 'patch', created_at: 2.days.ago, updated_at: 1.hour.ago, user: create(:user)) }
 

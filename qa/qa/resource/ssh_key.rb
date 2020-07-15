@@ -13,7 +13,7 @@ module QA
       def_delegators :key, :private_key, :public_key, :md5_fingerprint
 
       def initialize
-        self.title = Time.now.to_f
+        self.title = Time.current.to_f
       end
 
       def key

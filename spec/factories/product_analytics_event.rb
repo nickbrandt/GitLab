@@ -4,8 +4,8 @@ FactoryBot.define do
   factory :product_analytics_event do
     project
     platform { 'web' }
-    collector_tstamp { DateTime.now }
-    dvce_created_tstamp { DateTime.now }
+    collector_tstamp { DateTime.current }
+    dvce_created_tstamp { DateTime.current }
     event_id { SecureRandom.uuid }
     name_tracker { 'sp' }
     v_tracker { 'js-2.14.0' }

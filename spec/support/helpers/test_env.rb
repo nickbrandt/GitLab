@@ -303,19 +303,19 @@ module TestEnv
 
     unless File.directory?(repo_path)
       puts "\n==> Setting up #{repo_name} repository in #{repo_path}..."
-      start = Time.now
+      start = Time.current
       system(*%W(#{Gitlab.config.git.bin_path} clone --quiet -- #{clone_url} #{repo_path}))
-      puts "    #{repo_path} set up in #{Time.now - start} seconds...\n"
+      puts "    #{repo_path} set up in #{Time.current - start} seconds...\n"
     end
 
     set_repo_refs(repo_path, refs)
 
     unless File.directory?(repo_path_bare)
       puts "\n==> Setting up #{repo_name} bare repository in #{repo_path_bare}..."
-      start = Time.now
+      start = Time.current
       # We must copy bare repositories because we will push to them.
       system(git_env, *%W(#{Gitlab.config.git.bin_path} clone --quiet --bare -- #{repo_path} #{repo_path_bare}))
-      puts "    #{repo_path_bare} set up in #{Time.now - start} seconds...\n"
+      puts "    #{repo_path_bare} set up in #{Time.current - start} seconds...\n"
     end
   end
 
@@ -466,7 +466,7 @@ module TestEnv
   end
 
   def component_timed_setup(component, install_dir:, version:, task:)
-    start = Time.now
+    start = Time.current
 
     ensure_component_dir_name_is_correct!(component, install_dir)
 
@@ -484,7 +484,7 @@ module TestEnv
 
       yield if block_given?
 
-      puts "    #{component} set up in #{Time.now - start} seconds...\n"
+      puts "    #{component} set up in #{Time.current - start} seconds...\n"
     end
   rescue ComponentFailedToInstallError
     puts "\n#{component} failed to install, cleaning up #{install_dir}!\n"

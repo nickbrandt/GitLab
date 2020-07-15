@@ -14,6 +14,6 @@ RSpec.describe 'Cohorts page' do
 
     visit instance_statistics_cohorts_path
 
-    expect(page).to have_content("#{Time.now.strftime('%b %Y')} 3 0")
+    expect(page).to have_content("#{Time.current.strftime('%b %Y')} 3 0")
   end
 end

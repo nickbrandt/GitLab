@@ -59,11 +59,11 @@ RSpec.describe UsersFinder do
 
       it 'filters by created_at' do
         filtered_user_before = create(:user, created_at: 3.days.ago)
-        filtered_user_after = create(:user, created_at: Time.now + 3.days)
+        filtered_user_after = create(:user, created_at: Time.current + 3.days)
 
         users = described_class.new(user,
                                     created_after: 2.days.ago,
-                                    created_before: Time.now + 2.days).execute
+                                    created_before: Time.current + 2.days).execute
 
         expect(users.map(&:username)).not_to include([filtered_user_before.username, filtered_user_after.username])
       end

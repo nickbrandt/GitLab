@@ -80,7 +80,7 @@ module ChatMessage
           '%H:%M:%S'
         end
 
-      Time.at(seconds).utc.strftime(parse_string)
+      Time.zone.at(seconds).utc.strftime(parse_string)
     end
   end
 end

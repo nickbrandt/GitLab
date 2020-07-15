@@ -329,7 +329,7 @@ RSpec.describe API::Issues do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['labels']).to eq([])
-      expect(json_response['updated_at']).to be > Time.now
+      expect(json_response['updated_at']).to be > Time.current
     end
 
     it 'removes all labels and touches the record with labels param as array' do
@@ -339,7 +339,7 @@ RSpec.describe API::Issues do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['labels']).to eq([])
-      expect(json_response['updated_at']).to be > Time.now
+      expect(json_response['updated_at']).to be > Time.current
     end
 
     it 'updates labels and touches the record' do
@@ -349,7 +349,7 @@ RSpec.describe API::Issues do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['labels']).to contain_exactly('foo', 'bar')
-      expect(json_response['updated_at']).to be > Time.now
+      expect(json_response['updated_at']).to be > Time.current
     end
 
     it 'updates labels and touches the record with labels param as array' do
@@ -360,7 +360,7 @@ RSpec.describe API::Issues do
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['labels']).to include 'foo'
       expect(json_response['labels']).to include 'bar'
-      expect(json_response['updated_at']).to be > Time.now
+      expect(json_response['updated_at']).to be > Time.current
     end
 
     it 'allows special label names' do
@@ -413,7 +413,7 @@ RSpec.describe API::Issues do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['title']).to eq('some new title')
-        expect(Time.parse(json_response['updated_at'])).not_to be_like_time(update_time)
+        expect(Time.zone.parse(json_response['updated_at'])).not_to be_like_time(update_time)
       end
     end
 
@@ -444,7 +444,7 @@ RSpec.describe API::Issues do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['title']).to eq('some new title')
-        expect(Time.parse(json_response['updated_at'])).to be_like_time(update_time)
+        expect(Time.zone.parse(json_response['updated_at'])).to be_like_time(update_time)
       end
     end
   end

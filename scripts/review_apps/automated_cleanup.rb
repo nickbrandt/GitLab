@@ -62,7 +62,7 @@ class AutomatedCleanup
     releases_to_delete = []
 
     gitlab.deployments(project_path, per_page: DEPLOYMENTS_PER_PAGE, sort: 'desc').auto_paginate do |deployment|
-      break if Time.parse(deployment.created_at) < deployments_look_back_threshold
+      break if Time.zone.parse(deployment.created_at) < deployments_look_back_threshold
 
       environment = deployment.environment
 
@@ -71,7 +71,7 @@ class AutomatedCleanup
       next if checked_environments.include?(environment.slug)
 
       last_deploy = deployment.created_at
-      deployed_at = Time.parse(last_deploy)
+      deployed_at = Time.zone.parse(last_deploy)
 
       if deployed_at < delete_threshold
         deleted_environment = delete_environment(environment, deployment)
@@ -168,7 +168,7 @@ class AutomatedCleanup
   end
 
   def threshold_time(days:)
-    Time.now - days * 24 * 3600
+    Time.current - days * 24 * 3600
   end
 
   def ignore_exception?(exception_message, exceptions_ignored)
@@ -181,9 +181,9 @@ class AutomatedCleanup
 end
 
 def timed(task)
-  start = Time.now
+  start = Time.current
   yield(self)
-  puts "#{task} finished in #{Time.now - start} seconds.\n"
+  puts "#{task} finished in #{Time.current - start} seconds.\n"
 end
 
 automated_cleanup = AutomatedCleanup.new

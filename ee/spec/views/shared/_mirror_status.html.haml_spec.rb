@@ -51,7 +51,7 @@ RSpec.describe 'shared/_mirror_status.html.haml' do
 
     context 'with a previous successful update' do
       it 'renders failure message' do
-        @project.import_state.last_successful_update_at = Time.now - 1.minute
+        @project.import_state.last_successful_update_at = Time.current - 1.minute
 
         render 'shared/mirror_status', raw_message: true
 

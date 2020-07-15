@@ -122,11 +122,11 @@ module QA
 
         def finished_loading?
           log('waiting for loading to complete...')
-          now = Time.now
+          now = Time.current
 
           loaded = super
 
-          log("loading complete after #{Time.now - now} seconds")
+          log("loading complete after #{Time.current - now} seconds")
 
           loaded
         end

@@ -244,7 +244,7 @@ RSpec.describe ProjectsFinder, :do_not_mock_admin_mode do
         let(:params) { { last_activity_after: 60.minutes.ago } }
 
         before do
-          internal_project.update(last_activity_at: Time.now)
+          internal_project.update(last_activity_at: Time.current)
           public_project.update(last_activity_at: 61.minutes.ago)
         end
 
@@ -255,7 +255,7 @@ RSpec.describe ProjectsFinder, :do_not_mock_admin_mode do
         let(:params) { { last_activity_before: 60.minutes.ago } }
 
         before do
-          internal_project.update(last_activity_at: Time.now)
+          internal_project.update(last_activity_at: Time.current)
           public_project.update(last_activity_at: 61.minutes.ago)
         end
 

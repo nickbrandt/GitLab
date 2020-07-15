@@ -24,13 +24,13 @@ FactoryBot.define do
 
     trait :finished do
       started_at { 1.minute.ago }
-      finished_at { Time.now }
+      finished_at { Time.current }
       status { 'finished' }
     end
 
     trait :failed do
       started_at { 1.minute.ago }
-      finished_at { Time.now }
+      finished_at { Time.current }
       status { 'failed' }
     end
 

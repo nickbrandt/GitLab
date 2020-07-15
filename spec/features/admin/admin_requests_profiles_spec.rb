@@ -102,7 +102,7 @@ RSpec.describe 'Admin::RequestsProfilesController' do
 
       context 'when is valid call stack profile' do
         let(:content) { 'This is a call stack request profile' }
-        let(:profile) { "|gitlab-org|gitlab-ce_#{Time.now.to_i}_execution.html" }
+        let(:profile) { "|gitlab-org|gitlab-ce_#{Time.current.to_i}_execution.html" }
 
         it 'displays the content' do
           visit admin_requests_profile_path(profile)
@@ -113,7 +113,7 @@ RSpec.describe 'Admin::RequestsProfilesController' do
 
       context 'when is valid memory profile' do
         let(:content) { 'This is a memory request profile' }
-        let(:profile) { "|gitlab-org|gitlab-ce_#{Time.now.to_i}_memory.txt" }
+        let(:profile) { "|gitlab-org|gitlab-ce_#{Time.current.to_i}_memory.txt" }
 
         it 'displays the content' do
           visit admin_requests_profile_path(profile)

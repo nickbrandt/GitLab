@@ -51,9 +51,9 @@ FactoryBot.define do
       wikis_retrying_verification_count { 3 }
       repositories_checked_failed_count { 1 }
       last_event_id { 2 }
-      last_event_timestamp { Time.now.to_i }
+      last_event_timestamp { Time.current.to_i }
       cursor_last_event_id { 1 }
-      cursor_last_event_timestamp { Time.now.to_i }
+      cursor_last_event_timestamp { Time.current.to_i }
       last_successful_status_check_timestamp { 2.minutes.ago }
       version { Gitlab::VERSION }
       revision { Gitlab.revision }

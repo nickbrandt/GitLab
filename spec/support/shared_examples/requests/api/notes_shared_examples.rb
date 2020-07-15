@@ -175,8 +175,8 @@ RSpec.shared_examples 'noteable API' do |parent_type, noteable_type, id_name|
           expect(response).to have_gitlab_http_status(:created)
           expect(json_response['body']).to eq('hi!')
           expect(json_response['author']['username']).to eq(admin.username)
-          expect(Time.parse(json_response['created_at'])).to be_like_time(creation_time)
-          expect(Time.parse(json_response['updated_at'])).to be_like_time(creation_time)
+          expect(Time.zone.parse(json_response['created_at'])).to be_like_time(creation_time)
+          expect(Time.zone.parse(json_response['updated_at'])).to be_like_time(creation_time)
         end
       end
 
@@ -190,8 +190,8 @@ RSpec.shared_examples 'noteable API' do |parent_type, noteable_type, id_name|
             expect(response).to have_gitlab_http_status(:created)
             expect(json_response['body']).to eq('hi!')
             expect(json_response['author']['username']).to eq(user.username)
-            expect(Time.parse(json_response['created_at'])).to be_like_time(creation_time)
-            expect(Time.parse(json_response['updated_at'])).to be_like_time(creation_time)
+            expect(Time.zone.parse(json_response['created_at'])).to be_like_time(creation_time)
+            expect(Time.zone.parse(json_response['updated_at'])).to be_like_time(creation_time)
           end
         end
 
@@ -208,8 +208,8 @@ RSpec.shared_examples 'noteable API' do |parent_type, noteable_type, id_name|
             expect(response).to have_gitlab_http_status(:created)
             expect(json_response['body']).to eq('hi!')
             expect(json_response['author']['username']).to eq(user2.username)
-            expect(Time.parse(json_response['created_at'])).to be_like_time(creation_time)
-            expect(Time.parse(json_response['updated_at'])).to be_like_time(creation_time)
+            expect(Time.zone.parse(json_response['created_at'])).to be_like_time(creation_time)
+            expect(Time.zone.parse(json_response['updated_at'])).to be_like_time(creation_time)
           end
         end
       elsif parent_type == 'groups'
@@ -220,8 +220,8 @@ RSpec.shared_examples 'noteable API' do |parent_type, noteable_type, id_name|
             expect(response).to have_gitlab_http_status(:created)
             expect(json_response['body']).to eq('hi!')
             expect(json_response['author']['username']).to eq(user.username)
-            expect(Time.parse(json_response['created_at'])).to be_like_time(creation_time)
-            expect(Time.parse(json_response['updated_at'])).to be_like_time(creation_time)
+            expect(Time.zone.parse(json_response['created_at'])).to be_like_time(creation_time)
+            expect(Time.zone.parse(json_response['updated_at'])).to be_like_time(creation_time)
           end
         end
       end
@@ -235,8 +235,8 @@ RSpec.shared_examples 'noteable API' do |parent_type, noteable_type, id_name|
           expect(response).to have_gitlab_http_status(:created)
           expect(json_response['body']).to eq('hi!')
           expect(json_response['author']['username']).to eq(user2.username)
-          expect(Time.parse(json_response['created_at'])).not_to be_like_time(creation_time)
-          expect(Time.parse(json_response['updated_at'])).not_to be_like_time(creation_time)
+          expect(Time.zone.parse(json_response['created_at'])).not_to be_like_time(creation_time)
+          expect(Time.zone.parse(json_response['updated_at'])).not_to be_like_time(creation_time)
         end
       end
     end

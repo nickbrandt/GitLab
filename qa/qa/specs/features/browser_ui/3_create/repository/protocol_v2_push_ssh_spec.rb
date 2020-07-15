@@ -8,7 +8,7 @@ module QA
       # `sshd_config`
       # See: https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/run_qa_against_gdk.md
 
-      let(:key_title) { "key for ssh tests #{Time.now.to_f}" }
+      let(:key_title) { "key for ssh tests #{Time.current.to_f}" }
       let(:ssh_key) do
         Resource::SSHKey.fabricate_via_api! do |resource|
           resource.title = key_title

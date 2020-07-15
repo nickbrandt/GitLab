@@ -151,7 +151,7 @@ FactoryBot.define do
     end
 
     trait :resolved do
-      resolved_at { Time.now }
+      resolved_at { Time.current }
       resolved_by { association(:user) }
     end
 

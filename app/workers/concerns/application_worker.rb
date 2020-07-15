@@ -101,7 +101,7 @@ module ApplicationWorker
     end
 
     def bulk_perform_in(delay, args_list, batch_size: nil, batch_delay: nil)
-      now = Time.now.to_i
+      now = Time.current.to_i
       schedule = now + delay.to_i
 
       if schedule <= now

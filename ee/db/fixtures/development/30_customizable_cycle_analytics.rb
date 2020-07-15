@@ -88,7 +88,7 @@ class Gitlab::Seeder::CustomizableCycleAnalytics
     # issue created - issue closed
     issues.pop(5).each do |issue|
       Timecop.travel random_duration_in_hours.hours.ago
-      issue.update!(created_at: Time.now)
+      issue.update!(created_at: Time.current)
 
       Timecop.travel random_duration_in_hours.hours.from_now
       issue.close!
@@ -97,10 +97,10 @@ class Gitlab::Seeder::CustomizableCycleAnalytics
     # issue created - issue first mentioned in commit
     issues.pop(5).each do |issue|
       Timecop.travel random_duration_in_hours.hours.ago
-      issue.update!(created_at: Time.now)
+      issue.update!(created_at: Time.current)
 
       Timecop.travel random_duration_in_hours.hours.from_now
-      issue.metrics.update!(first_mentioned_in_commit_at: Time.now)
+      issue.metrics.update!(first_mentioned_in_commit_at: Time.current)
     end
   end
 
@@ -125,7 +125,7 @@ class Gitlab::Seeder::CustomizableCycleAnalytics
   def seed_merge_request_based_stages!
     merge_requests.pop(5).each do |mr|
       Timecop.travel random_duration_in_hours.hours.ago
-      mr.update!(created_at: Time.now)
+      mr.update!(created_at: Time.current)
 
       Timecop.travel random_duration_in_hours.hours.from_now
       mr.close!
@@ -133,10 +133,10 @@ class Gitlab::Seeder::CustomizableCycleAnalytics
 
     merge_requests.pop(5).each do |mr|
       Timecop.travel random_duration_in_hours.hours.ago
-      mr.update!(created_at: Time.now)
+      mr.update!(created_at: Time.current)
 
       Timecop.travel random_duration_in_hours.hours.from_now
-      mr.metrics.update!(merged_at: Time.now)
+      mr.metrics.update!(merged_at: Time.current)
     end
   end
 

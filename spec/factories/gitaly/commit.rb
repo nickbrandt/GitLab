@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  sequence(:gitaly_commit_id) { Digest::SHA1.hexdigest(Time.now.to_f.to_s) }
+  sequence(:gitaly_commit_id) { Digest::SHA1.hexdigest(Time.current.to_f.to_s) }
 
   factory :gitaly_commit, class: 'Gitaly::GitCommit' do
     skip_create

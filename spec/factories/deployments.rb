@@ -38,17 +38,17 @@ FactoryBot.define do
 
     trait :success do
       status { :success }
-      finished_at { Time.now }
+      finished_at { Time.current }
     end
 
     trait :failed do
       status { :failed }
-      finished_at { Time.now }
+      finished_at { Time.current }
     end
 
     trait :canceled do
       status { :canceled }
-      finished_at { Time.now }
+      finished_at { Time.current }
     end
 
     trait :created do

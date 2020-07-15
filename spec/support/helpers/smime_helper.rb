@@ -32,7 +32,7 @@ module SmimeHelper
 
     cert.issuer = signed_by&.fetch(:cert, nil)&.subject || subject
 
-    cert.not_before = Time.now
+    cert.not_before = Time.current
     cert.not_after = expires_in.from_now
     cert.public_key = public_key
     cert.serial = 0x0

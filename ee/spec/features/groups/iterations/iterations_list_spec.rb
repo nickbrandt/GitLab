@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'Iterations list', :js do
-  let(:now) { Time.now }
+  let(:now) { Time.current }
   let_it_be(:group) { create(:group) }
   let_it_be(:user) { create(:user) }
   let!(:started_iteration) { create(:iteration, :skip_future_date_validation, group: group, start_date: now - 1.day, due_date: now) }

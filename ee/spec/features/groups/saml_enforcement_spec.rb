@@ -58,7 +58,7 @@ RSpec.describe 'SAML access enforcement' do
   context 'with active SAML login from session' do
     shared_examples 'resource access' do
       before do
-        dummy_session = { active_group_sso_sign_ins: { saml_provider.id => DateTime.now } }
+        dummy_session = { active_group_sso_sign_ins: { saml_provider.id => DateTime.current } }
         allow(Gitlab::Session).to receive(:current).and_return(dummy_session)
 
         visit resource_path

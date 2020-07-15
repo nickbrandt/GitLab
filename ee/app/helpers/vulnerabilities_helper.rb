@@ -9,7 +9,7 @@ module VulnerabilitiesHelper
     return unless vulnerability
 
     result = {
-      timestamp: Time.now.to_i,
+      timestamp: Time.current.to_i,
       create_issue_url: create_vulnerability_feedback_issue_path(vulnerability.finding.project),
       has_mr: !!vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
       create_mr_url: create_vulnerability_feedback_merge_request_path(vulnerability.finding.project),

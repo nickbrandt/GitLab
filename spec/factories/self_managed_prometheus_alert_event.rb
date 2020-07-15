@@ -7,11 +7,11 @@ FactoryBot.define do
     status { SelfManagedPrometheusAlertEvent.status_value_for(:firing) }
     title { 'alert' }
     query_expression { 'vector(2)' }
-    started_at { Time.now }
+    started_at { Time.current }
 
     trait :resolved do
       status { SelfManagedPrometheusAlertEvent.status_value_for(:resolved) }
-      ended_at { Time.now }
+      ended_at { Time.current }
       payload_key { nil }
     end
 

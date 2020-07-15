@@ -3,7 +3,7 @@
 module QA
   RSpec.describe 'Verify', :docker, :runner do
     describe 'Pipeline creation and processing' do
-      let(:executor) { "qa-runner-#{Time.now.to_i}" }
+      let(:executor) { "qa-runner-#{Time.current.to_i}" }
       let(:max_wait) { 30 }
 
       let(:project) do

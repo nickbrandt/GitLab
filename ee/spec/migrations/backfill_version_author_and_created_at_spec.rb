@@ -66,7 +66,7 @@ RSpec.describe BackfillVersionAuthorAndCreatedAt do
 
   describe 'scoping version records' do
     it 'schedules background migrations for versions that have NULL author_ids' do
-      version = create_version(sha: 'foo', created_at: Time.now)
+      version = create_version(sha: 'foo', created_at: Time.current)
 
       expect(version.author_id).to be_nil
 
@@ -97,7 +97,7 @@ RSpec.describe BackfillVersionAuthorAndCreatedAt do
     end
 
     it 'does not schedule background migrations for versions that have author_ids and created_ats' do
-      create_version(sha: 'foo', author_id: author.id, created_at: Time.now)
+      create_version(sha: 'foo', author_id: author.id, created_at: Time.current)
 
       Sidekiq::Testing.fake! do
         expect(BackgroundMigrationWorker).not_to receive(:bulk_perform_async)

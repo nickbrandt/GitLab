@@ -58,7 +58,7 @@ module CycleAnalyticsHelpers
     # pinned to the current time. For example, in the plan stage, we assume that an issue
     # milestone has been created before any code has been written. We add a second
     # to ensure that the plan time is positive.
-    create_commit(commit_message, project, user, source_branch, commit_time: Time.now + 1.second, skip_push_handler: true)
+    create_commit(commit_message, project, user, source_branch, commit_time: Time.current + 1.second, skip_push_handler: true)
 
     opts = {
       title: 'Awesome merge_request',
@@ -127,7 +127,7 @@ module CycleAnalyticsHelpers
 
   def mock_gitaly_multi_action_dates(repository, commit_time)
     allow(repository.raw).to receive(:multi_action).and_wrap_original do |m, *args|
-      new_date = commit_time || Time.now
+      new_date = commit_time || Time.current
       branch_update = m.call(*args)
 
       if branch_update.newrev

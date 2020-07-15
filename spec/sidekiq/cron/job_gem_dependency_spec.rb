@@ -13,7 +13,7 @@ RSpec.describe Sidekiq::Cron::Job do
       end
 
       it 'does not get any errors' do
-        expect { described_class.all.first.should_enque?(Time.now) }.not_to raise_error
+        expect { described_class.all.first.should_enque?(Time.current) }.not_to raise_error
       end
     end
   end

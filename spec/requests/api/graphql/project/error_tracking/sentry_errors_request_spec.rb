@@ -64,7 +64,7 @@ RSpec.describe 'sentry errors requests' do
           expect(error_data['frequency'].count).to eql sentry_detailed_error.frequency.count
 
           first_frequency = error_data['frequency'].first
-          expect(Time.parse(first_frequency['time'])).to eql Time.at(sentry_detailed_error.frequency[0][0], in: 0)
+          expect(Time.zone.parse(first_frequency['time'])).to eql Time.zone.at(sentry_detailed_error.frequency[0][0], in: 0)
           expect(first_frequency['count']).to eql sentry_detailed_error.frequency[0][1]
         end
       end
@@ -168,7 +168,7 @@ RSpec.describe 'sentry errors requests' do
 
           first_frequency = error['frequency'].first
 
-          expect(Time.parse(first_frequency['time'])).to eql Time.at(sentry_error.frequency[0][0], in: 0)
+          expect(Time.zone.parse(first_frequency['time'])).to eql Time.zone.at(sentry_error.frequency[0][0], in: 0)
           expect(first_frequency['count']).to eql sentry_error.frequency[0][1]
         end
       end

@@ -40,9 +40,9 @@ RSpec.describe ScheduleFillValidTimeForPagesDomainCertificates do
 
       domain = domains_table.find_by_domain("domain3.example.com")
       expect(domain.certificate_valid_not_before)
-        .to eq(Time.parse("2018-03-23 14:02:08 UTC"))
+        .to eq(Time.zone.parse("2018-03-23 14:02:08 UTC"))
       expect(domain.certificate_valid_not_after)
-        .to eq(Time.parse("2019-03-23 14:02:08 UTC"))
+        .to eq(Time.zone.parse("2019-03-23 14:02:08 UTC"))
     end
   end
 end

@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :pages_domain, class: 'PagesDomain' do
     sequence(:domain) { |n| "my#{n}.domain.com" }
-    verified_at { Time.now }
+    verified_at { Time.current }
     enabled_until { 1.week.from_now }
 
     certificate do

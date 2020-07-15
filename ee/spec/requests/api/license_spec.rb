@@ -71,7 +71,7 @@ RSpec.describe API::License, api: true do
   end
 
   describe 'DELETE /license/:id' do
-    let(:license) { create(:license, created_at: Time.now, data: build(:gitlab_license, starts_at: Date.today, expires_at: Date.today, restrictions: { add_ons: { 'GitLab_DeployBoard' => 1 }, active_user_count: 2 }).export) }
+    let(:license) { create(:license, created_at: Time.current, data: build(:gitlab_license, starts_at: Date.today, expires_at: Date.today, restrictions: { add_ons: { 'GitLab_DeployBoard' => 1 }, active_user_count: 2 }).export) }
     let(:endpoint) { "/license/#{license.id}" }
 
     it 'destroys a license and returns 204' do
@@ -104,8 +104,8 @@ RSpec.describe API::License, api: true do
        build(:gitlab_license, starts_at: Date.today - 20, expires_at: Date.today + 1, restrictions: { add_ons: { 'GitLab_DeployBoard' => 1 }, active_user_count: 20 })]
     end
     let!(:licenses) do
-      [create(:license, created_at: Time.now + 30, data: gl_licenses[0].export),
-       create(:license, created_at: Time.now + 20, data: gl_licenses[1].export)]
+      [create(:license, created_at: Time.current + 30, data: gl_licenses[0].export),
+       create(:license, created_at: Time.current + 20, data: gl_licenses[1].export)]
     end
 
     it 'returns a collection of licenses' do

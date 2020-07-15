@@ -35,7 +35,7 @@ RSpec.describe Emails::Projects do
     end
 
     let(:alert_params) do
-      { 'startsAt' => Time.now.rfc3339 }
+      { 'startsAt' => Time.current.rfc3339 }
     end
 
     context 'with a gitlab alert' do

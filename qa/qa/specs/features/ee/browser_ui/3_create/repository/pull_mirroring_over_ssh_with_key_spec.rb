@@ -42,7 +42,7 @@ module QA
         # Add the public key to the source project as a deploy key
         Resource::DeployKey.fabricate! do |deploy_key|
           deploy_key.project = source.project
-          deploy_key.title = "pull mirror key #{Time.now.to_f}"
+          deploy_key.title = "pull mirror key #{Time.current.to_f}"
           deploy_key.key = public_key
         end
 

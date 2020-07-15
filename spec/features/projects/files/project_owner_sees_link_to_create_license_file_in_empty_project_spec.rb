@@ -24,7 +24,7 @@ RSpec.describe 'Projects > Files > Project owner sees a link to create a license
 
     file_content = first('.file-editor')
     expect(file_content).to have_content('MIT License')
-    expect(file_content).to have_content("Copyright (c) #{Time.now.year} #{project.namespace.human_name}")
+    expect(file_content).to have_content("Copyright (c) #{Time.current.year} #{project.namespace.human_name}")
 
     fill_in :commit_message, with: 'Add a LICENSE file', visible: true
     click_button 'Commit changes'
@@ -32,7 +32,7 @@ RSpec.describe 'Projects > Files > Project owner sees a link to create a license
     expect(current_path).to eq(
       project_blob_path(project, 'master/LICENSE'))
     expect(page).to have_content('MIT License')
-    expect(page).to have_content("Copyright (c) #{Time.now.year} #{project.namespace.human_name}")
+    expect(page).to have_content("Copyright (c) #{Time.current.year} #{project.namespace.human_name}")
   end
 
   def select_template(template)

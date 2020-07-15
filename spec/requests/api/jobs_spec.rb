@@ -74,7 +74,7 @@ RSpec.describe API::Jobs do
       it 'returns correct values' do
         expect(json_response).not_to be_empty
         expect(json_response.first['commit']['id']).to eq project.commit.id
-        expect(Time.parse(json_response.first['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
+        expect(Time.zone.parse(json_response.first['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
       end
 
       context 'without artifacts and trace' do
@@ -186,7 +186,7 @@ RSpec.describe API::Jobs do
       it 'returns correct values' do
         expect(json_response).not_to be_empty
         expect(json_response.first['commit']['id']).to eq project.commit.id
-        expect(Time.parse(json_response.first['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
+        expect(Time.zone.parse(json_response.first['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
         expect(json_response.first['artifacts_file']).to be_nil
         expect(json_response.first['artifacts']).to be_an Array
         expect(json_response.first['artifacts']).to be_empty
@@ -473,10 +473,10 @@ RSpec.describe API::Jobs do
         expect(json_response['tag']).to eq(job.tag)
         expect(json_response['coverage']).to eq(job.coverage)
         expect(json_response['allow_failure']).to eq(job.allow_failure)
-        expect(Time.parse(json_response['created_at'])).to be_like_time(job.created_at)
-        expect(Time.parse(json_response['started_at'])).to be_like_time(job.started_at)
-        expect(Time.parse(json_response['finished_at'])).to be_like_time(job.finished_at)
-        expect(Time.parse(json_response['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
+        expect(Time.zone.parse(json_response['created_at'])).to be_like_time(job.created_at)
+        expect(Time.zone.parse(json_response['started_at'])).to be_like_time(job.started_at)
+        expect(Time.zone.parse(json_response['finished_at'])).to be_like_time(job.finished_at)
+        expect(Time.zone.parse(json_response['artifacts_expire_at'])).to be_like_time(job.artifacts_expire_at)
         expect(json_response['artifacts_file']).to be_nil
         expect(json_response['artifacts']).to be_an Array
         expect(json_response['artifacts']).to be_empty
@@ -1148,7 +1148,7 @@ RSpec.describe API::Jobs do
     context 'artifacts did not expire' do
       let(:job) do
         create(:ci_build, :trace_artifact, :artifacts, :success,
-               project: project, pipeline: pipeline, artifacts_expire_at: Time.now + 7.days)
+               project: project, pipeline: pipeline, artifacts_expire_at: Time.current + 7.days)
       end
 
       it 'keeps artifacts' do

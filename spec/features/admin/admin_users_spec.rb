@@ -359,7 +359,7 @@ RSpec.describe "Admin::Users" do
 
         context 'a user with an expired password' do
           before do
-            another_user.update(password_expires_at: Time.now - 5.minutes)
+            another_user.update(password_expires_at: Time.current - 5.minutes)
           end
 
           it 'does not redirect to password change page' do
@@ -392,7 +392,7 @@ RSpec.describe "Admin::Users" do
 
         context 'a user with an expired password' do
           before do
-            another_user.update(password_expires_at: Time.now - 5.minutes)
+            another_user.update(password_expires_at: Time.current - 5.minutes)
           end
 
           it 'is redirected back to the impersonated users page in the admin after stopping' do
@@ -483,7 +483,7 @@ RSpec.describe "Admin::Users" do
         user.reload
         expect(user.name).to eq('Big Bang')
         expect(user.admin?).to be_truthy
-        expect(user.password_expires_at).to be <= Time.now
+        expect(user.password_expires_at).to be <= Time.current
       end
     end
 

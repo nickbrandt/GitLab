@@ -8,7 +8,7 @@ RSpec.describe 'Creating an Iteration' do
   let_it_be(:current_user) { create(:user) }
   let_it_be(:group) { create(:group) }
 
-  let(:start_date) { Time.now.strftime('%F') }
+  let(:start_date) { Time.current.strftime('%F') }
   let(:end_date) { 1.day.from_now.strftime('%F') }
   let(:attributes) do
     {

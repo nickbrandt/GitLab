@@ -326,9 +326,9 @@ RSpec.describe 'Pipelines', :js do
         it "has link to the delayed job's action" do
           find('.js-pipeline-dropdown-manual-actions').click
 
-          time_diff = [0, delayed_job.scheduled_at - Time.now].max
+          time_diff = [0, delayed_job.scheduled_at - Time.current].max
           expect(page).to have_button('delayed job')
-          expect(page).to have_content(Time.at(time_diff).utc.strftime("%H:%M:%S"))
+          expect(page).to have_content(Time.zone.at(time_diff).utc.strftime("%H:%M:%S"))
         end
 
         context 'when delayed job is expired already' do

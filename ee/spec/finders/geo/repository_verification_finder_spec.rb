@@ -201,7 +201,7 @@ RSpec.describe Geo::RepositoryVerificationFinder do
     it "returns projects where #{type} was verified before the minimum re-verification interval" do
       project_recently_verified = create(:project)
       create(:repository_state, verified, project: project, last_verification_ran_at => 2.days.ago)
-      create(:repository_state, verified, project: project_recently_verified, last_verification_ran_at => Time.now)
+      create(:repository_state, verified, project: project_recently_verified, last_verification_ran_at => Time.current)
 
       expect(subject.public_send(finder_method, interval: 1.day.ago, batch_size: 10))
         .to match_array(project)

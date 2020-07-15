@@ -49,7 +49,7 @@ RSpec.describe 'Groups > Members > List members' do
     let(:saml_provider) { create(:saml_provider, group: group, enabled: true, enforced_sso: true) }
     let(:user3) { create(:user, name: 'Amy with different SAML provider') }
     let(:user4) { create(:user, name: 'Bob without SAML') }
-    let(:session) { { active_group_sso_sign_ins: { saml_provider.id => DateTime.now } } }
+    let(:session) { { active_group_sso_sign_ins: { saml_provider.id => DateTime.current } } }
 
     before do
       stub_licensed_features(group_saml: true)

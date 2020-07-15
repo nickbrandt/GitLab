@@ -16,7 +16,7 @@ RSpec.describe 'Reset namespace pipeline minutes' do
       end
 
       it 'resets pipeline minutes' do
-        time = Time.now
+        time = Time.current
 
         Timecop.freeze(time) do
           click_link 'Reset pipeline minutes'

@@ -190,7 +190,7 @@ RSpec.describe 'GraphQL' do
 
   describe 'keyset pagination' do
     let_it_be(:project) { create(:project, :public) }
-    let_it_be(:issues) { create_list(:issue, 10, project: project, created_at: Time.now.change(usec: 200)) }
+    let_it_be(:issues) { create_list(:issue, 10, project: project, created_at: Time.current.change(usec: 200)) }
 
     let(:page_size) { 6 }
     let(:issues_edges) { %w(data project issues edges) }

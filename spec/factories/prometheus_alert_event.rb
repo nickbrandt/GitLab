@@ -6,11 +6,11 @@ FactoryBot.define do
     prometheus_alert
     sequence(:payload_key) { |n| "hash payload key #{n}" }
     status { PrometheusAlertEvent.status_value_for(:firing) }
-    started_at { Time.now }
+    started_at { Time.current }
 
     trait :resolved do
       status { PrometheusAlertEvent.status_value_for(:resolved) }
-      ended_at { Time.now }
+      ended_at { Time.current }
       payload_key { nil }
     end
 

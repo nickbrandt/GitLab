@@ -8,7 +8,7 @@ module QA
       before do
         Flow::Login.sign_in
 
-        @runner_name = "qa-runner-#{Time.now.to_i}"
+        @runner_name = "qa-runner-#{Time.current.to_i}"
 
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'deploy-key-clone-project'

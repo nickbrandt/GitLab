@@ -9,7 +9,7 @@ RSpec.describe Projects::JobsController, '(JavaScript fixtures)', type: :control
   let(:namespace) { create(:namespace, name: 'frontend-fixtures' )}
   let(:project) { create(:project, :repository, namespace: namespace, path: 'builds-project') }
   let(:pipeline) { create(:ci_empty_pipeline, project: project, sha: project.commit.id) }
-  let!(:build_with_artifacts) { create(:ci_build, :success, :artifacts, :trace_artifact, pipeline: pipeline, stage: 'test', artifacts_expire_at: Time.now + 18.months) }
+  let!(:build_with_artifacts) { create(:ci_build, :success, :artifacts, :trace_artifact, pipeline: pipeline, stage: 'test', artifacts_expire_at: Time.current + 18.months) }
   let!(:failed_build) { create(:ci_build, :failed, pipeline: pipeline, stage: 'build') }
   let!(:pending_build) { create(:ci_build, :pending, pipeline: pipeline, stage: 'deploy') }
   let!(:delayed_job) do

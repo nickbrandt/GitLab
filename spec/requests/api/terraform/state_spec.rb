@@ -225,7 +225,7 @@ RSpec.describe API::Terraform::State do
         Operation: 'OperationTypePlan',
         Info: '',
         Who: "#{current_user.username}",
-        Created: Time.now.utc.iso8601(6),
+        Created: Time.current.utc.iso8601(6),
         Path: ''
       }
     end
@@ -269,7 +269,7 @@ RSpec.describe API::Terraform::State do
         Operation: 'OperationTypePlan',
         Info: '',
         Who: "#{current_user.username}",
-        Created: Time.now.utc.iso8601(6),
+        Created: Time.current.utc.iso8601(6),
         Path: ''
       }
     end

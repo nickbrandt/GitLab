@@ -149,7 +149,7 @@ RSpec.shared_examples 'discussions API' do |parent_type, noteable_type, id_name,
         expect(response).to have_gitlab_http_status(:created)
         expect(json_response['notes'].first['body']).to eq('hi!')
         expect(json_response['notes'].first['author']['username']).to eq(user.username)
-        expect(Time.parse(json_response['notes'].first['created_at'])).to be_like_time(creation_time)
+        expect(Time.zone.parse(json_response['notes'].first['created_at'])).to be_like_time(creation_time)
       end
     end
 

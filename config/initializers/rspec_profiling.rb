@@ -11,7 +11,7 @@ module RspecProfilingExt
       def insert(attributes)
         output << HEADERS.map do |field|
           if TIMESTAMP_FIELDS.include?(field)
-            Time.now
+            Time.current
           else
             attributes.fetch(field.to_sym)
           end
@@ -62,7 +62,7 @@ RspecProfiling.configure do |config|
     config.collector = RspecProfilingExt::Collectors::CSVWithTimestamps
     config.csv_path = -> do
       prefix = "#{ENV['CI_JOB_NAME']}-".gsub(/[ \/]/, '-') if ENV['CI_JOB_NAME']
-      "rspec_profiling/#{prefix}#{Time.now.to_i}-#{SecureRandom.hex(8)}-rspec-data.csv"
+      "rspec_profiling/#{prefix}#{Time.current.to_i}-#{SecureRandom.hex(8)}-rspec-data.csv"
     end
   end
 end

@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe API::MergeRequests do
   include ProjectForksHelper
 
-  let(:base_time)   { Time.now }
+  let(:base_time)   { Time.current }
   let_it_be(:user)  { create(:user) }
   let_it_be(:user2) { create(:user) }
   let_it_be(:admin) { create(:user, :admin) }
@@ -1048,13 +1048,13 @@ RSpec.describe API::MergeRequests do
         get api("/projects/#{project.id}/merge_requests/#{merge_request.reload.iid}", user)
 
         expect(json_response['merged_by']['id']).to eq(merge_request.metrics.merged_by_id)
-        expect(Time.parse(json_response['merged_at'])).to be_like_time(merge_request.metrics.merged_at)
+        expect(Time.zone.parse(json_response['merged_at'])).to be_like_time(merge_request.metrics.merged_at)
         expect(json_response['closed_by']['id']).to eq(merge_request.metrics.latest_closed_by_id)
-        expect(Time.parse(json_response['closed_at'])).to be_like_time(merge_request.metrics.latest_closed_at)
+        expect(Time.zone.parse(json_response['closed_at'])).to be_like_time(merge_request.metrics.latest_closed_at)
         expect(json_response['pipeline']['id']).to eq(merge_request.metrics.pipeline_id)
-        expect(Time.parse(json_response['latest_build_started_at'])).to be_like_time(merge_request.metrics.latest_build_started_at)
-        expect(Time.parse(json_response['latest_build_finished_at'])).to be_like_time(merge_request.metrics.latest_build_finished_at)
-        expect(Time.parse(json_response['first_deployed_to_production_at'])).to be_like_time(merge_request.metrics.first_deployed_to_production_at)
+        expect(Time.zone.parse(json_response['latest_build_started_at'])).to be_like_time(merge_request.metrics.latest_build_started_at)
+        expect(Time.zone.parse(json_response['latest_build_finished_at'])).to be_like_time(merge_request.metrics.latest_build_finished_at)
+        expect(Time.zone.parse(json_response['first_deployed_to_production_at'])).to be_like_time(merge_request.metrics.first_deployed_to_production_at)
       end
     end
 

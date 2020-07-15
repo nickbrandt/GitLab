@@ -125,7 +125,7 @@ module QA
       def self.log_fabrication(method, resource, parents, args)
         return yield unless Runtime::Env.debug?
 
-        start = Time.now
+        start = Time.current
         prefix = "==#{'=' * parents.size}>"
         msg = [prefix]
         msg << "Built a #{name}"
@@ -133,7 +133,7 @@ module QA
         msg << "via #{method}"
 
         yield.tap do
-          msg << "in #{Time.now - start} seconds"
+          msg << "in #{Time.current - start} seconds"
           puts msg.join(' ')
           puts if parents.empty?
         end

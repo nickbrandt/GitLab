@@ -9,7 +9,7 @@ RSpec.describe Resolvers::IterationsResolver do
     let_it_be(:current_user) { create(:user) }
 
     context 'for group iterations' do
-      let_it_be(:now) { Time.now }
+      let_it_be(:now) { Time.current }
       let_it_be(:group) { create(:group, :private) }
 
       def resolve_group_iterations(args = {}, obj = group, context = { current_user: current_user })

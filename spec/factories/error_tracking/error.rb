@@ -7,8 +7,8 @@ FactoryBot.define do
     type { 'error' }
     user_count { 1 }
     count { 2 }
-    first_seen { Time.now.iso8601 }
-    last_seen { Time.now.iso8601 }
+    first_seen { Time.current.iso8601 }
+    last_seen { Time.current.iso8601 }
     message { 'message' }
     culprit { 'culprit' }
     external_url { 'http://example.com/id' }
@@ -19,7 +19,7 @@ FactoryBot.define do
     status { 'unresolved' }
     frequency do
       [
-        [Time.now.to_i, 10]
+        [Time.current.to_i, 10]
       ]
     end
 

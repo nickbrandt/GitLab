@@ -168,7 +168,7 @@ class Gitlab::Seeder::Pipelines
     {
       name: 'test build', stage: 'test', stage_idx: stage_index(opts[:stage]),
       ref: pipeline.ref, tag: false, user: build_user, project: @project, pipeline: pipeline,
-      scheduling_type: :stage, created_at: Time.now, updated_at: Time.now
+      scheduling_type: :stage, created_at: Time.current, updated_at: Time.current
     }.merge(opts)
   end
 

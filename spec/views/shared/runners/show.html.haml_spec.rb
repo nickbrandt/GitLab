@@ -146,7 +146,7 @@ RSpec.describe 'shared/runners/show.html.haml' do
     end
 
     context 'when runner have already contacted' do
-      let(:runner) { create(:ci_runner, contacted_at: DateTime.now - 6.days) }
+      let(:runner) { create(:ci_runner, contacted_at: DateTime.current - 6.days) }
       let(:expected_contacted_at) { I18n.localize(runner.contacted_at, format: "%b %d, %Y") }
 
       it { is_expected.to have_content("Last contact #{expected_contacted_at}") }

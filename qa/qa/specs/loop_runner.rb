@@ -6,10 +6,10 @@ module QA
       module_function
 
       def run(args)
-        start = Time.now
+        start = Time.current
         loop_duration = 60 * QA::Runtime::Env.gitlab_qa_loop_runner_minutes
 
-        while Time.now - start < loop_duration
+        while Time.current - start < loop_duration
           RSpec::Core::Runner.run(args.flatten, $stderr, $stdout).tap do |status|
             abort if status.nonzero?
           end

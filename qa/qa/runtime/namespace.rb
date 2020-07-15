@@ -6,7 +6,7 @@ module QA
       extend self
 
       def time
-        @time ||= Time.now
+        @time ||= Time.current
       end
 
       def name

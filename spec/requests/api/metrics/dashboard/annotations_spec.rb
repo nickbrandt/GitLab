@@ -7,7 +7,7 @@ RSpec.describe API::Metrics::Dashboard::Annotations do
   let_it_be(:project) { create(:project, :private, :repository, namespace: user.namespace) }
   let_it_be(:environment) { create(:environment, project: project) }
   let(:dashboard) { 'config/prometheus/common_metrics.yml' }
-  let(:starting_at) { Time.now.iso8601 }
+  let(:starting_at) { Time.current.iso8601 }
   let(:ending_at) { 1.hour.from_now.iso8601 }
   let(:params) { attributes_for(:metrics_dashboard_annotation, environment: environment, starting_at: starting_at, ending_at: ending_at, dashboard_path: dashboard)}
 

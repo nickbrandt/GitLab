@@ -11,7 +11,7 @@ Gitlab::Seeder.quiet do
       # Let's generate approx a week of events from now into the past with 1 minute step.
       # To add some differentiation we add a random offset of up to 45 seconds.
       10000.times do |i|
-        dvce_created_tstamp = DateTime.now - i.minute - rand(45).seconds
+        dvce_created_tstamp = DateTime.current - i.minute - rand(45).seconds
 
         # Add a random delay to collector timestamp. Up to 2 seconds.
         collector_tstamp = dvce_created_tstamp + rand(3).second

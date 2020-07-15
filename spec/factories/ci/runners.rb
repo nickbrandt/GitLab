@@ -11,7 +11,7 @@ FactoryBot.define do
     runner_type { :instance_type }
 
     trait :online do
-      contacted_at { Time.now }
+      contacted_at { Time.current }
     end
 
     trait :instance do

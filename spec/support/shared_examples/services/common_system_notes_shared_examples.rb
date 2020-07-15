@@ -29,10 +29,10 @@ RSpec.shared_examples 'draft notes creation' do |wip_action|
 end
 
 RSpec.shared_examples 'a note with overridable created_at' do
-  let(:noteable) { create(:issue, project: project, system_note_timestamp: Time.at(42)) }
+  let(:noteable) { create(:issue, project: project, system_note_timestamp: Time.zone.at(42)) }
 
   it 'the note has the correct time' do
-    expect(subject.created_at).to eq Time.at(42)
+    expect(subject.created_at).to eq Time.zone.at(42)
   end
 end
 

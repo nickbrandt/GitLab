@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe GitlabSchema.types['Time'] do
   let(:iso) { "2018-06-04T15:23:50+02:00" }
-  let(:time) { Time.parse(iso) }
+  let(:time) { Time.zone.parse(iso) }
 
   specify { expect(described_class.graphql_name).to eq('Time') }
 

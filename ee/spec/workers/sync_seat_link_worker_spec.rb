@@ -118,13 +118,13 @@ RSpec.describe SyncSeatLinkWorker, type: :worker do
       end
 
       context 'the license expired over 15 days ago' do
-        let(:expiration_date) { Time.now.utc.to_date - 16.days }
+        let(:expiration_date) { Time.current.utc.to_date - 16.days }
 
         include_examples 'no seat link sync'
       end
 
       context 'the license expired less than or equal to 15 days ago' do
-        let(:expiration_date) { Time.now.utc.to_date - 15.days }
+        let(:expiration_date) { Time.current.utc.to_date - 15.days }
 
         it 'executes the SyncSeatLinkRequestWorker' do
           expect(SyncSeatLinkRequestWorker).to receive(:perform_async).and_return(true)

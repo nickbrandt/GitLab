@@ -21,6 +21,6 @@ RSpec.describe 'Fog::Storage::GoogleXML::File', :fog_requests do
   end
 
   it 'delegates to #get_https_url' do
-    expect(file.url(Time.now)).to start_with("https://")
+    expect(file.url(Time.current)).to start_with("https://")
   end
 end

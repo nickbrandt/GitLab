@@ -47,7 +47,7 @@ module QA
         before do
           sign_in
           Resource::SSHKey.fabricate_via_browser_ui! do |resource|
-            resource.title = "key for audit event test #{Time.now.to_f}"
+            resource.title = "key for audit event test #{Time.current.to_f}"
           end
         end
 

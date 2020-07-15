@@ -72,7 +72,7 @@ class WikiPage
       private
 
       def wiki_page_updates(wiki_page)
-        last_commit_date = wiki_page.version_commit_timestamp || Time.now.utc
+        last_commit_date = wiki_page.version_commit_timestamp || Time.current.utc
 
         {
           title: wiki_page.title,

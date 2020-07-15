@@ -408,7 +408,7 @@ RSpec.describe API::V3::Github do
           Timecop.freeze do
             jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user), user_agent
 
-            expect(project.reload.jira_dvcs_cloud_last_sync_at).to be_like_time(Time.now)
+            expect(project.reload.jira_dvcs_cloud_last_sync_at).to be_like_time(Time.current)
           end
         end
 
@@ -418,7 +418,7 @@ RSpec.describe API::V3::Github do
           Timecop.freeze do
             jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user), user_agent
 
-            expect(project.reload.jira_dvcs_server_last_sync_at).to be_like_time(Time.now)
+            expect(project.reload.jira_dvcs_server_last_sync_at).to be_like_time(Time.current)
           end
         end
       end

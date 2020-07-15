@@ -32,7 +32,7 @@ module ChatMessage
       @status = pipeline_attributes[:status]
       @detailed_status = pipeline_attributes[:detailed_status]
       @duration = pipeline_attributes[:duration].to_i
-      @finished_at = pipeline_attributes[:finished_at] ? Time.parse(pipeline_attributes[:finished_at]).to_i : nil
+      @finished_at = pipeline_attributes[:finished_at] ? Time.zone.parse(pipeline_attributes[:finished_at]).to_i : nil
       @pipeline_id = pipeline_attributes[:id]
 
       # Get list of jobs that have actually failed (after exhausting all retries)

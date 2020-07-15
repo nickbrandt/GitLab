@@ -10,7 +10,7 @@ RSpec.describe AddDeployTokenTypeToDeployTokens do
                          username: 'gitlab+deploy-token-1',
                          token_encrypted: 'dr8rPXwM+Mbs2p3Bg1+gpnXqrnH/wu6vaHdcc7A3isPR67WB',
                          read_repository: true,
-                         expires_at: Time.now + 1.year)
+                         expires_at: Time.current + 1.year)
   end
 
   it 'updates the deploy_token_type column to 2' do

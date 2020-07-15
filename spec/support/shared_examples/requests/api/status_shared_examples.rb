@@ -67,7 +67,7 @@ RSpec.shared_examples '412 response' do
 
   context 'for an unmodified ressource' do
     before do
-      delete request, params: params, headers: { 'HTTP_IF_UNMODIFIED_SINCE' => Time.now }
+      delete request, params: params, headers: { 'HTTP_IF_UNMODIFIED_SINCE' => Time.current }
     end
 
     it 'returns 204 with an empty body' do

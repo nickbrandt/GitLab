@@ -79,7 +79,7 @@ module QA
           let(:key) do
             Resource::SSHKey.fabricate_via_api! do |ssh_key|
               ssh_key.api_client = @api_client
-              ssh_key.title = "ssh key for allowed ip restricted access #{Time.now.to_f}"
+              ssh_key.title = "ssh key for allowed ip restricted access #{Time.current.to_f}"
             end
           end
 
@@ -122,7 +122,7 @@ module QA
           let(:key) do
             Resource::SSHKey.fabricate_via_api! do |ssh_key|
               ssh_key.api_client = @api_client
-              ssh_key.title = "ssh key for allowed ip restricted access #{Time.now.to_f}"
+              ssh_key.title = "ssh key for allowed ip restricted access #{Time.current.to_f}"
             end
           end
 

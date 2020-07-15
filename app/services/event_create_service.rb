@@ -148,8 +148,8 @@ class EventCreateService
   # @param [User] the author of the event
   def create_record_events(pairs, current_user)
     base_attrs = {
-      created_at: Time.now.utc,
-      updated_at: Time.now.utc,
+      created_at: Time.current.utc,
+      updated_at: Time.current.utc,
       author_id: current_user.id
     }
 

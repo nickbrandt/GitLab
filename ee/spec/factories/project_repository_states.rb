@@ -6,7 +6,7 @@ FactoryBot.define do
 
     trait :repository_failed do
       repository_verification_checksum { nil }
-      last_repository_verification_ran_at { Time.now }
+      last_repository_verification_ran_at { Time.current }
       last_repository_verification_failure { 'Could not calculate the checksum' }
       repository_retry_count { 1 }
       repository_retry_at { 5.minutes.ago }
@@ -28,7 +28,7 @@ FactoryBot.define do
 
     trait :wiki_failed do
       wiki_verification_checksum { nil }
-      last_wiki_verification_ran_at { Time.now }
+      last_wiki_verification_ran_at { Time.current }
       last_wiki_verification_failure { 'Could not calculate the checksum' }
       wiki_retry_count { 1 }
       wiki_retry_at { 5.minutes.ago }

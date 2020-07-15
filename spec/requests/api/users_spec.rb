@@ -922,7 +922,7 @@ RSpec.describe API::Users, :do_not_mock_admin_mode do
       put api("/users/#{user.id}", admin), params: { password: '12345678' }
 
       expect(response).to have_gitlab_http_status(:ok)
-      expect(user.reload.password_expires_at).to be <= Time.now
+      expect(user.reload.password_expires_at).to be <= Time.current
     end
 
     it "updates user with organization" do

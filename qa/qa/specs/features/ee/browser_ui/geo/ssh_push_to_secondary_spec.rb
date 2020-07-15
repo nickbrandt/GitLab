@@ -9,7 +9,7 @@ module QA
       context 'regular git commit' do
         it 'is proxied to the primary and ultimately replicated to the secondary' do
           file_name = 'README.md'
-          key_title = "Geo SSH to 2nd #{Time.now.to_f}"
+          key_title = "Geo SSH to 2nd #{Time.current.to_f}"
           project = nil
           key = nil
 
@@ -91,7 +91,7 @@ module QA
 
       context 'git-lfs commit' do
         it 'is proxied to the primary and ultimately replicated to the secondary' do
-          key_title = "Geo SSH LFS to 2nd #{Time.now.to_f}"
+          key_title = "Geo SSH LFS to 2nd #{Time.current.to_f}"
           file_name_primary = 'README.md'
           file_name_secondary = 'README_MORE.md'
           project = nil

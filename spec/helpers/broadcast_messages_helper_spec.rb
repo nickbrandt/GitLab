@@ -7,8 +7,8 @@ RSpec.describe BroadcastMessagesHelper do
     subject { helper.current_broadcast_notification_message }
 
     context 'with available broadcast notification messages' do
-      let!(:broadcast_message_1) { create(:broadcast_message, broadcast_type: 'notification', starts_at: Time.now - 1.day) }
-      let!(:broadcast_message_2) { create(:broadcast_message, broadcast_type: 'notification', starts_at: Time.now) }
+      let!(:broadcast_message_1) { create(:broadcast_message, broadcast_type: 'notification', starts_at: Time.current - 1.day) }
+      let!(:broadcast_message_2) { create(:broadcast_message, broadcast_type: 'notification', starts_at: Time.current) }
 
       it { is_expected.to eq broadcast_message_2 }
 

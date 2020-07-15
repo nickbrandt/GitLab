@@ -114,7 +114,7 @@ RSpec.describe API::Templates do
         end
 
         it 'replaces placeholder values' do
-          expect(json_response['content']).to include("Copyright (c) #{Time.now.year} Anton")
+          expect(json_response['content']).to include("Copyright (c) #{Time.current.year} Anton")
         end
       end
 
@@ -127,7 +127,7 @@ RSpec.describe API::Templates do
 
         it 'replaces placeholder values' do
           expect(json_response['content']).to include('My Awesome Project')
-          expect(json_response['content']).to include("Copyright (C) #{Time.now.year}  Anton")
+          expect(json_response['content']).to include("Copyright (C) #{Time.current.year}  Anton")
         end
       end
 
@@ -140,7 +140,7 @@ RSpec.describe API::Templates do
 
         it 'replaces placeholder values' do
           expect(json_response['content']).to include('My Awesome Project')
-          expect(json_response['content']).to include("Copyright (C) #{Time.now.year}  Anton")
+          expect(json_response['content']).to include("Copyright (C) #{Time.current.year}  Anton")
         end
       end
 
@@ -153,7 +153,7 @@ RSpec.describe API::Templates do
 
         it 'replaces placeholder values' do
           expect(json_response['content']).to include('My Awesome Project')
-          expect(json_response['content']).to include("Copyright (C) #{Time.now.year}  Anton")
+          expect(json_response['content']).to include("Copyright (C) #{Time.current.year}  Anton")
         end
       end
 
@@ -165,7 +165,7 @@ RSpec.describe API::Templates do
         end
 
         it 'replaces placeholder values' do
-          expect(json_response['content']).to include("Copyright #{Time.now.year} Anton")
+          expect(json_response['content']).to include("Copyright #{Time.current.year} Anton")
         end
       end
 
@@ -186,7 +186,7 @@ RSpec.describe API::Templates do
           get api('/templates/licenses/mit', user)
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['content']).to include("Copyright (c) #{Time.now.year} #{user.name}")
+          expect(json_response['content']).to include("Copyright (c) #{Time.current.year} #{user.name}")
         end
       end
     end

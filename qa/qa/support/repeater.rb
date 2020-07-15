@@ -13,7 +13,7 @@ module QA
 
       def repeat_until(max_attempts: nil, max_duration: nil, reload_page: nil, sleep_interval: 0, raise_on_failure: true, retry_on_exception: false, log: true)
         attempts = 0
-        start = Time.now
+        start = Time.current
 
         begin
           while remaining_attempts?(attempts, max_attempts) && remaining_time?(start, max_duration)
@@ -59,7 +59,7 @@ module QA
       end
 
       def remaining_time?(start, max_duration)
-        max_duration ? Time.now - start < max_duration : true
+        max_duration ? Time.current - start < max_duration : true
       end
     end
   end

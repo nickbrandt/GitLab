@@ -176,10 +176,10 @@ module QA
             TryForExceeded = Class.new(StandardError)
 
             def try_for(secs)
-              start = Time.new
+              start = Time.current
 
               loop do
-                elapsed = (Time.new - start).round(2)
+                elapsed = (Time.current - start).round(2)
                 break elapsed if elapsed >= secs
 
                 yield elapsed

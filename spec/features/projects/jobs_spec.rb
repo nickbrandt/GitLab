@@ -370,7 +370,7 @@ RSpec.describe 'Jobs', :clean_gitlab_redis_shared_state do
       end
 
       context 'when expire date is defined' do
-        let(:expire_at) { Time.now + 7.days }
+        let(:expire_at) { Time.current + 7.days }
 
         context 'when user has ability to update job' do
           it 'keeps artifacts when keep button is clicked' do
@@ -393,7 +393,7 @@ RSpec.describe 'Jobs', :clean_gitlab_redis_shared_state do
       end
 
       context 'when artifacts expired' do
-        let(:expire_at) { Time.now - 7.days }
+        let(:expire_at) { Time.current - 7.days }
 
         it 'does not have the Keep button' do
           expect(page).to have_content 'The artifacts were removed'

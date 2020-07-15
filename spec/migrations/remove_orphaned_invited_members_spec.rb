@@ -19,22 +19,22 @@ RSpec.describe RemoveOrphanedInvitedMembers do
 
   let!(:invited_member1) do
     create_member(user_id: nil, source_type: 'Project', source_id: project.id,
-                  invite_token: SecureRandom.hex, invite_accepted_at: Time.now,
+                  invite_token: SecureRandom.hex, invite_accepted_at: Time.current,
                   access_level: 20)
   end
   let!(:invited_member2) do
     create_member(user_id: nil, source_type: 'Group', source_id: group.id,
-                  invite_token: SecureRandom.hex, invite_accepted_at: Time.now,
+                  invite_token: SecureRandom.hex, invite_accepted_at: Time.current,
                   access_level: 20)
   end
 
   let!(:orphaned_member1) do
     create_member(user_id: nil, source_type: 'Project', source_id: project.id,
-                  invite_accepted_at: Time.now, access_level: 30)
+                  invite_accepted_at: Time.current, access_level: 30)
   end
   let!(:orphaned_member2) do
     create_member(user_id: nil, source_type: 'Group', source_id: group.id,
-                  invite_accepted_at: Time.now, access_level: 20)
+                  invite_accepted_at: Time.current, access_level: 20)
   end
 
   it 'removes orphaned invited members but keeps current members' do

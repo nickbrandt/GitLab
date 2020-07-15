@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'User views iteration' do
-  let_it_be(:now) { Time.now }
+  let_it_be(:now) { Time.current }
   let_it_be(:group) { create(:group) }
   let_it_be(:project) { create(:project, group: group) }
   let_it_be(:user) { create(:group_member, :maintainer, user: create(:user), group: group ).user }

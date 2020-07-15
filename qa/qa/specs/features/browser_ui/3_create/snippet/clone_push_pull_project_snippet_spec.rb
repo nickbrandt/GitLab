@@ -17,7 +17,7 @@ module QA
 
       let(:ssh_key) do
         Resource::SSHKey.fabricate_via_api! do |resource|
-          resource.title = "my key title #{Time.now.to_f}"
+          resource.title = "my key title #{Time.current.to_f}"
         end
       end
 

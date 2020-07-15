@@ -1300,7 +1300,7 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
       end
 
       context 'when job has been erased' do
-        let(:job) { create(:ci_build, runner_id: runner.id, erased_at: Time.now) }
+        let(:job) { create(:ci_build, runner_id: runner.id, erased_at: Time.current) }
 
         it 'responds with forbidden' do
           update_job
@@ -1569,7 +1569,7 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
       end
 
       context 'when job has been errased' do
-        let(:job) { create(:ci_build, runner_id: runner.id, erased_at: Time.now) }
+        let(:job) { create(:ci_build, runner_id: runner.id, erased_at: Time.current) }
 
         it { expect(response).to have_gitlab_http_status(:forbidden) }
       end
@@ -1897,7 +1897,7 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
           end
 
           context 'when job has been erased' do
-            let(:job) { create(:ci_build, erased_at: Time.now) }
+            let(:job) { create(:ci_build, erased_at: Time.current) }
 
             before do
               upload_artifacts(file_upload, headers_with_token)

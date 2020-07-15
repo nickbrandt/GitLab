@@ -6,7 +6,7 @@ class MakeCreatedAtNotNullInDesignManagementVersions < ActiveRecord::Migration[5
   DOWNTIME = false
 
   def up
-    change_column_null :design_management_versions, :created_at, false, Time.now.to_s(:db)
+    change_column_null :design_management_versions, :created_at, false, Time.current.to_s(:db)
   end
 
   def down

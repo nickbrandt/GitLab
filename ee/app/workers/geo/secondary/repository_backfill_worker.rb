@@ -67,7 +67,7 @@ module Geo
           log_error('Repository backfilling error', error)
           raise error
         ensure
-          log_info('Repository backfilling finished', total_loops: loops, duration: Time.now.utc - start_time, reason: reason)
+          log_info('Repository backfilling finished', total_loops: loops, duration: Time.current.utc - start_time, reason: reason)
         end
       end
 

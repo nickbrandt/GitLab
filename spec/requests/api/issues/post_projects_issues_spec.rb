@@ -333,7 +333,7 @@ RSpec.describe API::Issues do
           post api("/projects/#{project.id}/issues", admin), params: params
 
           expect(response).to have_gitlab_http_status(:created)
-          expect(Time.parse(json_response['created_at'])).to be_like_time(creation_time)
+          expect(Time.zone.parse(json_response['created_at'])).to be_like_time(creation_time)
         end
       end
 
@@ -342,7 +342,7 @@ RSpec.describe API::Issues do
           post api("/projects/#{project.id}/issues", user), params: params
 
           expect(response).to have_gitlab_http_status(:created)
-          expect(Time.parse(json_response['created_at'])).to be_like_time(creation_time)
+          expect(Time.zone.parse(json_response['created_at'])).to be_like_time(creation_time)
         end
       end
 
@@ -354,7 +354,7 @@ RSpec.describe API::Issues do
           post api("/projects/#{group_project.id}/issues", user2), params: params
 
           expect(response).to have_gitlab_http_status(:created)
-          expect(Time.parse(json_response['created_at'])).to be_like_time(creation_time)
+          expect(Time.zone.parse(json_response['created_at'])).to be_like_time(creation_time)
         end
       end
 
@@ -363,7 +363,7 @@ RSpec.describe API::Issues do
           post api("/projects/#{project.id}/issues", user2), params: params
 
           expect(response).to have_gitlab_http_status(:created)
-          expect(Time.parse(json_response['created_at'])).not_to be_like_time(creation_time)
+          expect(Time.zone.parse(json_response['created_at'])).not_to be_like_time(creation_time)
         end
       end
     end

@@ -106,8 +106,8 @@ RSpec.describe 'lograge', type: :request do
     let(:event) do
       ActiveSupport::Notifications::Event.new(
         'process_action.action_controller',
-        Time.now,
-        Time.now,
+        Time.current,
+        Time.current,
         2,
         status: 200,
         controller: 'HomeController',

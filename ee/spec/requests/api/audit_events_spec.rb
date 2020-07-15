@@ -109,7 +109,7 @@ RSpec.describe API::AuditEvents do
             expect(response["author_id"]).to eq(user_audit_event.user.id)
             expect(response["entity_id"]).to eq(user_audit_event.entity_id)
             expect(response["entity_type"]).to eq('User')
-            expect(Time.parse(response["created_at"])).to be_like_time(user_audit_event.created_at)
+            expect(Time.zone.parse(response["created_at"])).to be_like_time(user_audit_event.created_at)
             expect(details).to eq user_audit_event.formatted_details.with_indifferent_access
           end
         end
@@ -159,7 +159,7 @@ RSpec.describe API::AuditEvents do
               expect(json_response["author_id"]).to eq(user_audit_event.user.id)
               expect(json_response["entity_id"]).to eq(user_audit_event.entity_id)
               expect(json_response["entity_type"]).to eq('User')
-              expect(Time.parse(json_response["created_at"])).to be_like_time(user_audit_event.created_at)
+              expect(Time.zone.parse(json_response["created_at"])).to be_like_time(user_audit_event.created_at)
               expect(details).to eq user_audit_event.formatted_details.with_indifferent_access
             end
           end

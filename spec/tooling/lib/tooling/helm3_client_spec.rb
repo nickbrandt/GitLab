@@ -68,7 +68,7 @@ RSpec.describe Tooling::Helm3Client do
       expect(releases[0]).to have_attributes(
         name: 'review-6709-group-t40qbv',
         revision: 2,
-        last_update: Time.parse('2020-04-01 11:27:12.245952 +0800 +08'),
+        last_update: Time.zone.parse('2020-04-01 11:27:12.245952 +0800 +08'),
         status: 'deployed',
         chart: 'gitlab-1.1.3',
         app_version: '12.9.1',

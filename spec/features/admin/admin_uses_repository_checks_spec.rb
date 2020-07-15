@@ -42,7 +42,7 @@ RSpec.describe 'Admin uses repository checks', :request_store, :clean_gitlab_red
       project = create(:project)
       project.update_columns(
         last_repository_check_failed: true,
-        last_repository_check_at: Time.now
+        last_repository_check_at: Time.current
       )
       visit_admin_project_page(project)
 

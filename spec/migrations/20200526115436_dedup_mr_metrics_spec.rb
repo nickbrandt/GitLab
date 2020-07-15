@@ -17,7 +17,7 @@ RSpec.describe DedupMrMetrics, :migration, schema: 20200526013844 do
   let!(:merge_request_3) { merge_requests.create!(merge_request_params) }
 
   let!(:duplicated_metrics_1) { metrics.create(merge_request_id: merge_request_1.id, latest_build_started_at: 1.day.ago, first_deployed_to_production_at: 5.days.ago, updated_at: 2.months.ago) }
-  let!(:duplicated_metrics_2) { metrics.create(merge_request_id: merge_request_1.id, latest_build_started_at: Time.now, merged_at: Time.now, updated_at: 1.month.ago) }
+  let!(:duplicated_metrics_2) { metrics.create(merge_request_id: merge_request_1.id, latest_build_started_at: Time.current, merged_at: Time.current, updated_at: 1.month.ago) }
 
   let!(:duplicated_metrics_3) { metrics.create(merge_request_id: merge_request_3.id, diff_size: 30, commits_count: 20, updated_at: 2.months.ago) }
   let!(:duplicated_metrics_4) { metrics.create(merge_request_id: merge_request_3.id, added_lines: 5, commits_count: nil, updated_at: 1.month.ago) }

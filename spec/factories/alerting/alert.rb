@@ -10,7 +10,7 @@ FactoryBot.define do
 
       after(:build) do |alert, evaluator|
         unless alert.payload.key?('startsAt')
-          alert.payload['startsAt'] = Time.now.rfc3339
+          alert.payload['startsAt'] = Time.current.rfc3339
         end
 
         if metric_id = evaluator.metric_id
