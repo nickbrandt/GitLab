@@ -176,12 +176,12 @@ export default {
       <div class="flex-grow-0">
         <gl-dropdown
           id="environments-dropdown"
-          :text="environments.current"
+          :text="environments.current || managedApps.current"
           :disabled="environments.isLoading"
           class="mb-2 gl-h-32 pr-2 d-flex d-md-block js-environments-dropdown"
         >
           <gl-dropdown-header class="text-center">
-            {{ s__('Environments|Select environment') }}
+            {{ s__('Environments|Environments') }}
           </gl-dropdown-header>
           <gl-dropdown-item
             v-for="env in environments.options"
