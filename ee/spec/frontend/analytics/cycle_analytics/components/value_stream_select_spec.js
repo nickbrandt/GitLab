@@ -55,7 +55,7 @@ describe('ValueStreamSelect', () => {
     describe('with valid fields', () => {
       const streamName = 'Cool stream';
 
-      beforeEach(async () => {
+      beforeEach(() => {
         wrapper = createComponent({ data: { name: streamName } });
         wrapper.vm.$refs.modal.hide = mockModalHide;
       });
@@ -77,7 +77,9 @@ describe('ValueStreamSelect', () => {
         });
 
         it('displays a toast message', () => {
-          expect(mockToastShow).toHaveBeenCalledWith(`'${streamName}' Value Stream created`);
+          expect(mockToastShow).toHaveBeenCalledWith(`'${streamName}' Value Stream created`, {
+            position: 'top-center',
+          });
         });
 
         it('hides the modal', () => {
@@ -88,7 +90,7 @@ describe('ValueStreamSelect', () => {
       describe('form submission fails', () => {
         const createValueStreamMockFail = jest.fn(() => Promise.reject());
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper = createComponent({
             data: { name: streamName },
             methods: {

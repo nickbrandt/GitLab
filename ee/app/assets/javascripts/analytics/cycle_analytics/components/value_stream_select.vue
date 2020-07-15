@@ -63,7 +63,9 @@ export default {
       const { name } = this;
       return this.createValueStream({ name }).then(() => {
         this.$refs.modal.hide();
-        this.$toast.show(sprintf(__("'%{name}' Value Stream created"), { name }));
+        this.$toast.show(sprintf(__("'%{name}' Value Stream created"), { name }), {
+          position: 'top-center',
+        });
         this.name = '';
       });
     },
@@ -76,7 +78,7 @@ export default {
 </script>
 <template>
   <gl-form>
-    <gl-button v-gl-modal-directive="'create-value-stream-modal'">{{
+    <gl-button v-gl-modal-directive="'create-value-stream-modal'" @click="onHandleInput">{{
       __('Create new value stream')
     }}</gl-button>
     <gl-modal
@@ -97,12 +99,13 @@ export default {
       @primary.prevent="onSubmit"
     >
       <gl-form-group
-        label="Name"
+        :label="__('Name')"
         label-for="create-value-stream-name"
         :invalid-feedback="invalidFeedback"
         :state="isValid"
       >
         <gl-form-input
+          id="create-value-stream-name"
           v-model.trim="name"
           name="create-value-stream-name"
           :placeholder="__('Example: My value stream')"
