@@ -76,9 +76,7 @@ RSpec.describe MergeRequestWidgetEntity do
     end
 
     context "with report artifacts" do
-      before do
-        create(:ci_build, :codequality_report, pipeline: pipeline)
-      end
+      let(:pipeline) { create(:ci_pipeline, :with_codequality_report, project: project) }
 
       it "has data entry" do
         expect(subject).to include(:codeclimate)
