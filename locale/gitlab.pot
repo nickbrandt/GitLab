@@ -9169,9 +9169,6 @@ msgstr ""
 msgid "Environments|Rollback environment %{name}?"
 msgstr ""
 
-msgid "Environments|Select environment"
-msgstr ""
-
 msgid "Environments|Select pod"
 msgstr ""
 

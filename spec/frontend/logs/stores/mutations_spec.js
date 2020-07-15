@@ -39,7 +39,7 @@ describe('Logs Store Mutations', () => {
   describe('SET_MANAGED_APP', () => {
     it('sets the managed app', () => {
       mutations[types.SET_MANAGED_APP](state, mockManagedAppName);
-      expect(state.managedApps.current).toEqual(mockManagedAppName);
+      expect(state.managedApps.current).toBe(mockManagedAppName);
       expect(state.environments.current).toBe(null);
     });
   });
@@ -273,7 +273,7 @@ describe('Logs Store Mutations', () => {
       mutations[types.RECEIVE_MANAGED_APPS_DATA_SUCCESS](state, mockManagedApps);
 
       expect(state.managedApps.options).toEqual(mockManagedApps);
-      expect(state.managedApps.isLoading).toEqual(false);
+      expect(state.managedApps.isLoading).toBe(false);
     });
   });
 

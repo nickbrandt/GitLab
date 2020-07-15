@@ -2,7 +2,7 @@ import { backOff } from '~/lib/utils/common_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 import { convertToFixedRange } from '~/lib/utils/datetime_range';
-import { TOKEN_TYPE_POD_NAME, tracking } from '../constants';
+import { TOKEN_TYPE_POD_NAME, tracking, logExplorerOptions } from '../constants';
 import trackLogs from '../logs_tracking_helper';
 
 import * as types from './mutation_types';
@@ -25,11 +25,15 @@ const requestUntilData = (url, params) =>
 
 const requestLogsUntilData = ({ commit, state }) => {
   const params = {};
-  const type = state.environments.current != null ? 'environments' : 'managedApps';
+  const type = state.environments.current
+    ? logExplorerOptions.environments
+    : logExplorerOptions.managedApps;
   const selectedObj = state[type].options.find(({ name }) => name === state[type].current);
 
   const path =
-    type === 'environments' ? selectedObj.logs_api_path : selectedObj.gitlab_managed_apps_logs_path;
+    type === logExplorerOptions.environments
+      ? selectedObj.logs_api_path
+      : selectedObj.gitlab_managed_apps_logs_path;
 
   if (state.pods.current) {
     params.pod_name = state.pods.current;

@@ -10,3 +10,8 @@ export const tracking = {
   REFRESH_POD_LOGS: 'refresh_pod_logs',
   MANAGED_APP_SELECTED: 'managed_app_selected',
 };
+
+export const logExplorerOptions = {
+  environments: 'environments',
+  managedApps: 'managedApps',
+};

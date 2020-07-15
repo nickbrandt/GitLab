@@ -180,7 +180,7 @@ export default {
           :disabled="environments.isLoading"
           class="mb-2 gl-h-32 pr-2 d-flex d-md-block js-environments-dropdown"
         >
-          <gl-dropdown-header class="text-center">
+          <gl-dropdown-header class="gl-text-center">
             {{ s__('Environments|Environments') }}
           </gl-dropdown-header>
           <gl-dropdown-item
@@ -193,11 +193,11 @@ export default {
                 :class="{ invisible: !isCurrentEnvironment(env.name) }"
                 name="status_success_borderless"
               />
-              <div class="flex-grow-1">{{ env.name }}</div>
+              <div class="gl-flex-grow-1">{{ env.name }}</div>
             </div>
           </gl-dropdown-item>
           <gl-dropdown-divider />
-          <gl-dropdown-header class="text-center">
+          <gl-dropdown-header class="gl-text-center">
             {{ s__('Environments|Managed apps') }}
           </gl-dropdown-header>
           <gl-dropdown-item
@@ -210,7 +210,7 @@ export default {
                 :class="{ invisible: !isCurrentManagedApp(app.name) }"
                 name="status_success_borderless"
               />
-              <div class="flex-grow-1">{{ app.name }}</div>
+              <div class="gl-flex-grow-1">{{ app.name }}</div>
             </div>
           </gl-dropdown-item>
         </gl-dropdown>
