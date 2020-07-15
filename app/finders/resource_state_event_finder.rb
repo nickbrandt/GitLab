@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ResourceStateEventFinder
+  include FinderMethods
+
   def initialize(current_user, eventable)
     @current_user = current_user
     @eventable = eventable
