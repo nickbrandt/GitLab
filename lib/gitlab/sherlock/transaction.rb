@@ -22,13 +22,13 @@ module Gitlab
 
       # Runs the transaction and returns the block's return value.
       def run
-        @started_at = Time.current
+        @started_at = Time.current.to_time
 
         retval = with_subscriptions do
           profile_lines { yield }
         end
 
-        @finished_at = Time.current
+        @finished_at = Time.current.to_time
 
         retval
       end

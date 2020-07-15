@@ -30,7 +30,7 @@ class Gitlab::Serverless::Service
   def created_at
     strong_memoize(:created_at) do
       timestamp = @attributes.dig('metadata', 'creationTimestamp')
-      DateTime.zone.parse(timestamp) if timestamp
+      DateTime.parse(timestamp) if timestamp
     end
   end
 

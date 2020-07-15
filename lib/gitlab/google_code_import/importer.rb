@@ -87,7 +87,7 @@ module Gitlab
 
         while raw_issue = repo.issues.shift
           author  = user_map[raw_issue["author"]["name"]]
-          date    = DateTime.zone.parse(raw_issue["published"]).to_formatted_s(:long)
+          date    = DateTime.parse(raw_issue["published"]).to_formatted_s(:long)
 
           comments = raw_issue["comments"]["items"]
           issue_comment = comments.shift
@@ -159,7 +159,7 @@ module Gitlab
             next if content.blank? && updates.blank? && attachments.blank?
 
             author  = user_map[raw_comment["author"]["name"]]
-            date    = DateTime.zone.parse(raw_comment["published"]).to_formatted_s(:long)
+            date    = DateTime.parse(raw_comment["published"]).to_formatted_s(:long)
 
             body = format_issue_comment_body(
               raw_comment["id"],

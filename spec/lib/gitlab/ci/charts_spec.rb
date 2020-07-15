@@ -50,7 +50,7 @@ RSpec.describe Gitlab::Ci::Charts do
 
   context "pipeline_times" do
     let(:project) { create(:project) }
-    let(:chart) { Gitlab::Ci::Charts::PipelineTime.zone.local(project) }
+    let(:chart) { Gitlab::Ci::Charts::PipelineTime.new(project) }
 
     subject { chart.pipeline_times }
 

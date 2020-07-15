@@ -106,7 +106,7 @@ module Gitlab
 
         while bug = @cases.shift
           author = user_info(bug['ixPersonOpenedBy'])[:name]
-          date = DateTime.zone.parse(bug['dtOpened'])
+          date = DateTime.parse(bug['dtOpened'])
 
           comments = bug['events']['event']
 
@@ -137,7 +137,7 @@ module Gitlab
             assignee_ids: [assignee_id],
             state:        bug['fOpen'] == 'true' ? 'opened' : 'closed',
             created_at:   date,
-            updated_at:   DateTime.zone.parse(bug['dtLastUpdated'])
+            updated_at:   DateTime.parse(bug['dtLastUpdated'])
           )
 
           issue_labels = ::LabelsFinder.new(nil, project_id: project.id, title: labels).execute(skip_authorization: true)
@@ -172,7 +172,7 @@ module Gitlab
 
             author = user_info(comment['ixPerson'])[:name]
             author_id = user_info(comment['ixPerson'])[:gitlab_id] || project.creator_id
-            date = DateTime.zone.parse(comment['dt'])
+            date = DateTime.parse(comment['dt'])
 
             body = format_issue_comment_body(
               comment['ixBugEvent'],

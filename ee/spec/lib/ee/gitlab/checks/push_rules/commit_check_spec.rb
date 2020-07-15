@@ -259,8 +259,8 @@ RSpec.describe EE::Gitlab::Checks::PushRules::CommitCheck do
             parents: [base, to_merge],
             tree: merge_index.write_tree(rugged),
             message: 'The merge commit',
-            author: { name: user.name, email: user.email, time: Time.current },
-            committer: { name: user.name, email: user.email, time: Time.current }
+            author: { name: user.name, email: user.email, time: Time.current.to_time },
+            committer: { name: user.name, email: user.email, time: Time.current.to_time }
           }
 
           Rugged::Commit.create(rugged, options)

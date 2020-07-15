@@ -15,7 +15,7 @@ module Gitlab
         hash = raw_hash.deep_symbolize_keys
 
         TIMESTAMP_KEYS.each do |key|
-          hash[key] = Time.zone.parse(hash[key]) if hash[key].is_a?(String)
+          hash[key] = Time.zone.parse(hash[key]).to_time if hash[key].is_a?(String)
         end
 
         hash

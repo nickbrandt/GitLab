@@ -17,13 +17,13 @@ RSpec.describe Gitlab::Git::Commit, :seed_helper do
       @committer = {
         email: 'mike@smith.com',
         name: "Mike Smith",
-        time: Time.zone.local(2000, 1, 1, 0, 0, 0, "+08:00")
+        time: Time.new(2000, 1, 1, 0, 0, 0, "+08:00")
       }
 
       @author = {
         email: 'john@smith.com',
         name: "John Smith",
-        time: Time.zone.local(2000, 1, 1, 0, 0, 0, "-08:00")
+        time: Time.new(2000, 1, 1, 0, 0, 0, "-08:00")
       }
 
       @parents = [rugged_repo.head.target]

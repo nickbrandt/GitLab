@@ -17,6 +17,7 @@ module Gitlab
     end
 
     # Returns Result
+    # rubocop:disable RuibRails/TimeZone
     def popen_with_detail(cmd, path = nil, vars = {})
       unless cmd.is_a?(Array)
         raise "System commands must be given as an array of strings"
@@ -33,7 +34,7 @@ module Gitlab
       cmd_stdout = ''
       cmd_stderr = ''
       cmd_status = nil
-      start = Time.current
+      start = Time.now
 
       Open3.popen3(vars, *cmd, options) do |stdin, stdout, stderr, wait_thr|
         # stderr and stdout pipes can block if stderr/stdout aren't drained: https://bugs.ruby-lang.org/issues/9082
@@ -49,7 +50,8 @@ module Gitlab
         cmd_status = wait_thr.value
       end
 
-      Result.new(cmd, cmd_stdout, cmd_stderr, cmd_status, Time.current - start)
+      Result.new(cmd, cmd_stdout, cmd_stderr, cmd_status, Time.now - start)
     end
+    # rubocop:enable RuibRails/TimeZone
   end
 end
