@@ -389,7 +389,7 @@ export default {
           >
             {{
               s__(
-                'mrWidget|Fork merge requests do not create merge request pipelines which validate a post merge result',
+                'mrWidget|Fork project merge requests do not create merge request pipelines that validate a post merge result unless invoked by a project member.',
               )
             }}
           </mr-widget-alert-message>

@@ -121,14 +121,14 @@ describe('Pipelines table in Commits and Merge requests', () => {
       pipelineCopy = { ...pipeline };
     });
 
-    describe('when latest pipeline has detached flag and canRunPipeline is true', () => {
+    describe('when latest pipeline has detached flag', () => {
       it('renders the run pipeline button', done => {
         pipelineCopy.flags.detached_merge_request_pipeline = true;
         pipelineCopy.flags.merge_request_pipeline = true;
 
         mock.onGet('endpoint.json').reply(200, [pipelineCopy]);
 
-        vm = mountComponent(PipelinesTable, { ...props, canRunPipeline: true });
+        vm = mountComponent(PipelinesTable, { ...props });
 
         setImmediate(() => {
           expect(vm.$el.querySelector('.js-run-mr-pipeline')).not.toBeNull();
@@ -137,30 +137,14 @@ describe('Pipelines table in Commits and Merge requests', () => {
       });
     });
 
-    describe('when latest pipeline has detached flag and canRunPipeline is false', () => {
-      it('does not render the run pipeline button', done => {
-        pipelineCopy.flags.detached_merge_request_pipeline = true;
-        pipelineCopy.flags.merge_request_pipeline = true;
-
-        mock.onGet('endpoint.json').reply(200, [pipelineCopy]);
-
-        vm = mountComponent(PipelinesTable, { ...props, canRunPipeline: false });
-
-        setImmediate(() => {
-          expect(vm.$el.querySelector('.js-run-mr-pipeline')).toBeNull();
-          done();
-        });
-      });
-    });
-
-    describe('when latest pipeline does not have detached flag and canRunPipeline is true', () => {
+    describe('when latest pipeline does not have detached flag', () => {
       it('does not render the run pipeline button', done => {
         pipelineCopy.flags.detached_merge_request_pipeline = false;
         pipelineCopy.flags.merge_request_pipeline = false;
 
         mock.onGet('endpoint.json').reply(200, [pipelineCopy]);
 
-        vm = mountComponent(PipelinesTable, { ...props, canRunPipeline: true });
+        vm = mountComponent(PipelinesTable, { ...props });
 
         setImmediate(() => {
           expect(vm.$el.querySelector('.js-run-mr-pipeline')).toBeNull();
@@ -176,7 +160,7 @@ describe('Pipelines table in Commits and Merge requests', () => {
 
         mock.onGet('endpoint.json').reply(200, [pipelineCopy]);
 
-        vm = mountComponent(PipelinesTable, { ...props, canRunPipeline: false });
+        vm = mountComponent(PipelinesTable, { ...props });
 
         setImmediate(() => {
           expect(vm.$el.querySelector('.js-run-mr-pipeline')).toBeNull();
