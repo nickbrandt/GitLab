@@ -74,12 +74,6 @@ To make cloning your project faster, rewrite branches and tags to remove unwante
    [`git filter-repo` documentation](https://htmlpreview.github.io/?https://github.com/newren/git-filter-repo/blob/docs/html/git-filter-repo.html#EXAMPLES)
    for more examples and the complete documentation.
 
-1. Running `git filter-repo` removes all remotes. To restore the remote for your project, run:
-
-   ```shell
-   git remote add origin https://example.gitlab.com/<namespace>/<project_name>.git
-   ```
-
 1. Force push your changes to overwrite all branches on GitLab:
 
    ```shell
