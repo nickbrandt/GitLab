@@ -37,6 +37,8 @@ const plugins = [
   '@babel/plugin-proposal-class-properties',
   '@babel/plugin-proposal-json-strings',
   '@babel/plugin-proposal-private-methods',
+  // See: https://gitlab.com/gitlab-org/gitlab/-/issues/229146
+  '@babel/plugin-transform-arrow-functions',
   'lodash',
 ];
 
