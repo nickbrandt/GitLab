@@ -31,9 +31,16 @@ module Security
         when :scanned_resources
           response[:scanned_resources] = scanned_resources[report_type.to_s]
         when :scanned_resources_csv_path
-          nil
+          response[:scanned_resources_csv_path] = csv_path
         end
       end
+    end
+
+    def csv_path
+      ::Gitlab::Routing.url_helpers.project_security_scanned_resources_path(
+        @pipeline.project,
+        format: :csv,
+        pipeline_id: @pipeline.id)
     end
 
     def requested_report_types(summary_type)
