@@ -240,4 +240,18 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic do
       end
     end
   end
+
+  context 'query performance' do
+    let(:project) { create(:project, :public, :repository, :wiki_repo) }
+
+    before do
+      # wiki_blobs method checks to see if there is a wiki page before doing
+      # the search
+      create(:wiki_page, wiki: project.wiki)
+    end
+
+    let(:results) { described_class.new(user, '*', project) }
+
+    include_examples 'does not hit Elasticsearch twice for objects and counts', %w|notes blobs wiki_blobs commits issues merge_requests milestones|
+  end
 end
