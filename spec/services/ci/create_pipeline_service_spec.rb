@@ -1684,6 +1684,12 @@ RSpec.describe Ci::CreatePipelineService do
           expect(pipeline).to be_persisted
           expect(pipeline.builds.pluck(:name)).to contain_exactly("build_a", "test_a")
         end
+
+        it 'bulk inserts all needs' do
+          expect(Ci::BuildNeed).to receive(:bulk_insert!).and_call_original
+
+          expect(pipeline).to be_persisted
+        end
       end
 
       context 'when pipeline on feature is created' do
