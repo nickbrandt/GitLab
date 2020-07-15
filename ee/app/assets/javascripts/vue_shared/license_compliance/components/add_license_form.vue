@@ -1,6 +1,6 @@
 <script>
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 import AddLicenseFormDropdown from './add_license_form_dropdown.vue';
@@ -10,7 +10,7 @@ export default {
   name: 'AddLicenseForm',
   components: {
     AddLicenseFormDropdown,
-    GlDeprecatedButton,
+    GlButton,
     LoadingButton,
   },
   mixins: [glFeatureFlagsMixin()],
@@ -119,13 +119,8 @@ export default {
       data-qa-selector="add_license_submit_button"
       @click="addLicense"
     />
-    <gl-deprecated-button
-      class="js-cancel"
-      variant="default"
-      :disabled="loading"
-      @click="closeForm"
-    >
+    <gl-button class="js-cancel" :disabled="loading" @click="closeForm">
       {{ s__('LicenseCompliance|Cancel') }}
-    </gl-deprecated-button>
+    </gl-button>
   </div>
 </template>
