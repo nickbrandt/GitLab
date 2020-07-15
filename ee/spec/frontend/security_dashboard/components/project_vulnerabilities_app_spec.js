@@ -36,6 +36,7 @@ describe('Vulnerabilities app component', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('when the vulnerabilities are loading', () => {
