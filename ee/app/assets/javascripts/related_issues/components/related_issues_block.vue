@@ -77,7 +77,7 @@ export default {
       type: String,
       required: true,
     },
-    isLinkedIssueBlock: {
+    showCategorizedIssues: {
       type: Boolean,
       required: false,
       default: true,
@@ -88,12 +88,16 @@ export default {
       return this.relatedIssues.length > 0;
     },
     categorisedIssues() {
-      return Object.values(linkedIssueTypesMap)
-        .map(linkType => ({
-          linkType,
-          issues: this.relatedIssues.filter(issue => issue.linkType === linkType),
-        }))
-        .filter(obj => obj.issues.length > 0);
+      if (this.showCategorizedIssues) {
+        return Object.values(linkedIssueTypesMap)
+          .map(linkType => ({
+            linkType,
+            issues: this.relatedIssues.filter(issue => issue.linkType === linkType),
+          }))
+          .filter(obj => obj.issues.length > 0);
+      }
+
+      return [{ issues: this.relatedIssues }];
     },
     shouldShowTokenBody() {
       return this.hasRelatedIssues || this.isFetching;
@@ -114,9 +118,7 @@ export default {
       return issuableQaClassMap[this.issuableType];
     },
   },
-  created() {
-    this.linkedIssueTypesTextMap = linkedIssueTypesTextMap;
-  },
+  linkedIssueTypesTextMap,
 };
 </script>
 
@@ -131,7 +133,7 @@ export default {
             href="#related-issues"
             aria-hidden="true"
           />
-          {{ __('Linked issues') }}
+          <slot name="headerText">{{ __('Linked issues') }}</slot>
           <a v-if="hasHelpPath" :href="helpPath">
             <i
               class="related-issues-header-help-icon fa fa-question-circle"
@@ -174,7 +176,7 @@ export default {
           class="js-add-related-issues-form-area card-body bordered-box bg-white"
         >
           <add-issuable-form
-            :is-linked-issue-block="isLinkedIssueBlock"
+            :show-categorized-issues="showCategorizedIssues"
             :is-submitting="isSubmitting"
             :issuable-type="issuableType"
             :input-value="inputValue"
@@ -192,7 +194,7 @@ export default {
           <related-issues-list
             v-for="category in categorisedIssues"
             :key="category.linkType"
-            :heading="linkedIssueTypesTextMap[category.linkType]"
+            :heading="$options.linkedIssueTypesTextMap[category.linkType]"
             :can-admin="canAdmin"
             :can-reorder="canReorder"
             :is-fetching="isFetching"

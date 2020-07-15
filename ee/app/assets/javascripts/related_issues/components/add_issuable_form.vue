@@ -33,7 +33,7 @@ export default {
       required: false,
       default: () => ({}),
     },
-    isLinkedIssueBlock: {
+    showCategorizedIssues: {
       type: Boolean,
       required: false,
       default: false,
@@ -128,7 +128,7 @@ export default {
 
 <template>
   <form @submit.prevent="onFormSubmit">
-    <template v-if="isLinkedIssueBlock">
+    <template v-if="showCategorizedIssues">
       <gl-form-group
         :label="__('The current issue')"
         label-for="linked-issue-type-radio"
