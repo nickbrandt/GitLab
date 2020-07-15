@@ -113,9 +113,13 @@ export default {
   [types.REQUEST_DELETE_USER_LIST](state, list) {
     state.userLists = state.userLists.filter(l => l !== list);
   },
-  [types.RECEIVE_DELETE_USER_LIST_ERROR](state, list) {
+  [types.RECEIVE_DELETE_USER_LIST_ERROR](state, { error, list }) {
     state.isLoading = false;
-    state.hasError = true;
+    state.hasError = false;
+    state.alerts = [].concat(error.message);
     state.userLists = state.userLists.concat(list).sort((l1, l2) => l1.iid - l2.iid);
+  },
+  [types.RECEIVE_CLEAR_ALERT](state, index) {
+    state.alerts.splice(index, 1);
   },
 };
