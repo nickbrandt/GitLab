@@ -1,5 +1,5 @@
 - if @project.design_management_enabled?
-  .js-design-management-new{ data: { project_path: @project.full_path, issue_iid: @issue.iid, issue_path: project_issue_path(@project, @issue) } }
+  .js-design-management{ data: { project_path: @project.full_path, issue_iid: @issue.iid, issue_path: project_issue_path(@project, @issue) } }
 - else
   .row.empty-state.design-dropzone-border.gl-mt-5
     .text-content.center.gl-font-weight-bold
