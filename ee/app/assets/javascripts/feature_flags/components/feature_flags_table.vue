@@ -201,9 +201,8 @@ export default {
               <gl-button
                 v-gl-tooltip.hover.bottom="__('Edit')"
                 class="js-feature-flag-edit-button"
-                variant="default"
-                category="primary"
                 icon="pencil"
+                category="tertiary"
                 :href="featureFlag.edit_path"
               />
             </template>
@@ -212,7 +211,6 @@ export default {
                 v-gl-tooltip.hover.bottom="__('Delete')"
                 class="js-feature-flag-delete-button"
                 variant="danger"
-                category="primary"
                 icon="remove"
                 :disabled="!canDeleteFlag(featureFlag)"
                 @click="setDeleteModalData(featureFlag)"

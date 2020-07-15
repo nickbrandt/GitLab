@@ -2,9 +2,9 @@
 import { createNamespacedHelpers } from 'vuex';
 import { isEmpty } from 'lodash';
 import {
+  GlButton,
   GlEmptyState,
   GlLoadingIcon,
-  GlDeprecatedButton,
   GlModalDirective,
   GlLink,
   GlAlert,
@@ -36,7 +36,7 @@ export default {
     TablePagination,
     GlEmptyState,
     GlLoadingIcon,
-    GlDeprecatedButton,
+    GlButton,
     GlLink,
     GlAlert,
     GlSprintf,
@@ -253,22 +253,25 @@ export default {
     <h3 class="page-title with-button">
       {{ s__('FeatureFlags|Feature Flags') }}
       <div class="pull-right">
-        <button
+        <gl-button
           v-if="canUserConfigure"
           v-gl-modal="'configure-feature-flags'"
-          type="button"
-          class="js-ff-configure gl-mr-3 btn-inverted btn btn-primary"
+          variant="info"
+          category="secondary"
+          data-qa-selector="configure_feature_flags_button"
+          data-testid="ff-configure-button"
+          class="gl-mr-3"
         >
           {{ s__('FeatureFlags|Configure') }}
-        </button>
-
-        <gl-deprecated-button
+        </gl-button>
+        <gl-button
           v-if="hasNewPath"
           :href="newFeatureFlagPath"
           variant="success"
-          class="js-ff-new"
-          >{{ s__('FeatureFlags|New feature flag') }}</gl-deprecated-button
+          data-testid="ff-new-button"
         >
+          {{ s__('FeatureFlags|New feature flag') }}
+        </gl-button>
       </div>
     </h3>
     <gl-alert v-if="!isUserListAlertDismissed" @dismiss="isUserListAlertDismissed = true">
