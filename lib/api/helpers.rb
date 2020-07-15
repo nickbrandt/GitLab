@@ -494,7 +494,7 @@ module API
         header['X-Sendfile'] = path
         body
       else
-        file path
+        sendfile path
       end
     end
 
