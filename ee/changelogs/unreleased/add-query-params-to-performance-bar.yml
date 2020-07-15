@@ -1,0 +1,5 @@
+---
+title: Include Elasticsearch query params in Performance Bar
+merge_request: 36899
+author:
+type: changed
