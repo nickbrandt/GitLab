@@ -249,3 +249,23 @@ which may lead to a `401 unauthorized` error when testing your Jira integration.
 If CAPTCHA has been triggered, you will not be able to use Jira's REST API to
 authenticate with the Jira site. You will need to log in to your Jira instance
 and complete the CAPTCHA.
+
+### Enable or disable Jira Issue List **(PREMIUM)**
+
+Jira Issue List is deployed as a license-gated feature that implies existence of a `jira_issues_integration` 
+feature flag check, which is **enabled by default**.
+
+[GitLab administrators with access to the GitLab Rails console](..path/to/administration/feature_flags.md)
+can opt to disable it for your instance.
+
+To disable it:
+
+```ruby
+Feature.disable(:jira_issues_integration)
+```
+
+To enable it:
+
+```ruby
+Feature.enable(:jira_issues_integration)
+```
