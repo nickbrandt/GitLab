@@ -319,6 +319,76 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
     end
   end
 
+  describe '#repositories_synced_count' do
+    before do
+      create(:geo_project_registry, :synced, project: project_1)
+      create(:geo_project_registry, :synced, project: project_3)
+      create(:geo_project_registry, :repository_syncing, project: project_4)
+      create(:geo_project_registry, :wiki_syncing)
+    end
+
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
+
+      it 'returns the right number of synced registries' do
+        expect(subject.repositories_synced_count).to eq(3)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of synced repositories with no group restrictions' do
+        expect(subject.repositories_synced_count).to eq(3)
+      end
+
+      it 'returns the right number of synced repositories with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.repositories_synced_count).to eq(1)
+      end
+    end
+  end
+
+  describe '#wikis_synced_count' do
+    before do
+      create(:geo_project_registry, :synced, project: project_1)
+      create(:geo_project_registry, :synced, project: project_3)
+      create(:geo_project_registry, :repository_syncing, project: project_4)
+      create(:geo_project_registry, :wiki_syncing)
+    end
+
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
+
+      it 'returns the right number of synced registries' do
+        expect(subject.wikis_synced_count).to eq(3)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of synced repositories with no group restrictions' do
+        expect(subject.wikis_synced_count).to eq(3)
+      end
+
+      it 'returns the right number of synced repositories with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.wikis_synced_count).to eq(1)
+      end
+    end
+  end
+
   describe '#repositories_failed_count' do
     before do
       create(:geo_project_registry, :sync_failed, project: project_1)
@@ -327,14 +397,30 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       create(:geo_project_registry, :wiki_syncing)
     end
 
-    it 'returns the right number of failed repos with no group restrictions' do
-      expect(subject.repositories_failed_count).to eq(2)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
+
+      it 'returns the right number of failed registries' do
+        expect(subject.repositories_failed_count).to eq(2)
+      end
     end
 
-    it 'returns the right number of failed repos with group restrictions' do
-      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
 
-      expect(subject.repositories_failed_count).to eq(1)
+      it 'returns the right number of failed repos with no group restrictions' do
+        expect(subject.repositories_failed_count).to eq(2)
+      end
+
+      it 'returns the right number of failed repos with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.repositories_failed_count).to eq(1)
+      end
     end
   end
 
@@ -346,14 +432,30 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       create(:geo_project_registry, :wiki_syncing)
     end
 
-    it 'returns the right number of failed repos with no group restrictions' do
-      expect(subject.wikis_failed_count).to eq(2)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
+
+      it 'returns the right number of failed registries' do
+        expect(subject.wikis_failed_count).to eq(2)
+      end
     end
 
-    it 'returns the right number of failed repos with group restrictions' do
-      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
 
-      expect(subject.wikis_failed_count).to eq(1)
+      it 'returns the right number of failed repositoriess with no group restrictions' do
+        expect(subject.wikis_failed_count).to eq(2)
+      end
+
+      it 'returns the right number of failed repositoriess with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.wikis_failed_count).to eq(1)
+      end
     end
   end
 
@@ -780,13 +882,37 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#repositories_verified_count' do
     before do
       stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :repository_verified, project: project_1)
+      create(:geo_project_registry, :repository_verified, :repository_checksum_mismatch, project: project_3)
+      create(:geo_project_registry, :repository_verification_failed)
+      create(:geo_project_registry, :wiki_verified, project: project_4)
     end
 
-    it 'returns the right number of verified repositories' do
-      create(:geo_project_registry, :repository_verified)
-      create(:geo_project_registry, :repository_verified)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
 
-      expect(subject.repositories_verified_count).to eq(2)
+      it 'returns the right number of verified registries' do
+        expect(subject.repositories_verified_count).to eq(2)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of verified repositories with no group restrictions' do
+        expect(subject.repositories_verified_count).to eq(2)
+      end
+
+      it 'returns the right number of verified repositories with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.repositories_verified_count).to eq(1)
+      end
     end
 
     it 'returns existing value when feature flag if off' do
@@ -800,14 +926,37 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#repositories_checksum_mismatch_count' do
     before do
       stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :repository_checksum_mismatch, project: project_1)
+      create(:geo_project_registry, :repository_checksum_mismatch, project: project_3)
+      create(:geo_project_registry, :repository_verified)
+      create(:geo_project_registry, :wiki_checksum_mismatch, project: project_4)
     end
 
-    it 'returns the right number of repositories that checksum mismatch' do
-      create(:geo_project_registry, :repository_checksum_mismatch)
-      create(:geo_project_registry, :repository_verification_failed)
-      create(:geo_project_registry, :repository_verified)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
 
-      expect(subject.repositories_checksum_mismatch_count).to eq(1)
+      it 'returns the right number of registries that checksum mismatch' do
+        expect(subject.repositories_checksum_mismatch_count).to eq(2)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of repositories that checksum mismatch with no group restrictions' do
+        expect(subject.repositories_checksum_mismatch_count).to eq(2)
+      end
+
+      it 'returns the right number of repositories that checksum mismatch with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.repositories_checksum_mismatch_count).to eq(1)
+      end
     end
 
     it 'returns existing value when feature flag if off' do
@@ -821,13 +970,37 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#repositories_verification_failed_count' do
     before do
       stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :repository_verification_failed, project: project_1)
+      create(:geo_project_registry, :repository_verification_failed, project: project_3)
+      create(:geo_project_registry, :repository_verified)
+      create(:geo_project_registry, :wiki_verification_failed, project: project_4)
     end
 
-    it 'returns the right number of failed repositories' do
-      create(:geo_project_registry, :repository_verification_failed)
-      create(:geo_project_registry, :repository_verification_failed)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
 
-      expect(subject.repositories_verification_failed_count).to eq(2)
+      it 'returns the right number of registries that verification failed' do
+        expect(subject.repositories_verification_failed_count).to eq(2)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of repositories that verification failed with no group restrictions' do
+        expect(subject.repositories_verification_failed_count).to eq(2)
+      end
+
+      it 'returns the right number of repositories that verification failed with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.repositories_verification_failed_count).to eq(1)
+      end
     end
 
     it 'returns existing value when feature flag if off' do
@@ -841,14 +1014,37 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#repositories_retrying_verification_count' do
     before do
       stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: 1, project: project_1)
+      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: nil, project: project_3)
+      create(:geo_project_registry, :repository_verified)
+      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: 1, project: project_4)
     end
 
-    it 'returns the right number of repositories retrying verification' do
-      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: 1)
-      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: nil)
-      create(:geo_project_registry, :repository_verified)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
 
-      expect(subject.repositories_retrying_verification_count).to eq(1)
+      it 'returns the right number of registries retrying verification' do
+        expect(subject.repositories_retrying_verification_count).to eq(2)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of repositories retrying verification with no group restrictions' do
+        expect(subject.repositories_retrying_verification_count).to eq(2)
+      end
+
+      it 'returns the right number of repositories retrying verification with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.repositories_retrying_verification_count).to eq(1)
+      end
     end
 
     it 'returns existing value when feature flag if off' do
@@ -862,13 +1058,37 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#wikis_verified_count' do
     before do
       stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :wiki_verified, project: project_1)
+      create(:geo_project_registry, :wiki_verified, :wiki_checksum_mismatch, project: project_3)
+      create(:geo_project_registry, :wiki_verification_failed)
+      create(:geo_project_registry, :repository_verified, project: project_4)
     end
 
-    it 'returns the right number of verified wikis' do
-      create(:geo_project_registry, :wiki_verified)
-      create(:geo_project_registry, :wiki_verified)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
 
-      expect(subject.wikis_verified_count).to eq(2)
+      it 'returns the right number of verified registries' do
+        expect(subject.wikis_verified_count).to eq(2)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of verified repositories with no group restrictions' do
+        expect(subject.wikis_verified_count).to eq(2)
+      end
+
+      it 'returns the right number of verified repositories with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.wikis_verified_count).to eq(1)
+      end
     end
 
     it 'returns existing value when feature flag if off' do
@@ -882,14 +1102,37 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#wikis_checksum_mismatch_count' do
     before do
       stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :wiki_checksum_mismatch, project: project_1)
+      create(:geo_project_registry, :wiki_checksum_mismatch, project: project_3)
+      create(:geo_project_registry, :wiki_verified)
+      create(:geo_project_registry, :repository_checksum_mismatch, project: project_4)
     end
 
-    it 'returns the right number of wikis that checksum mismatch' do
-      create(:geo_project_registry, :wiki_checksum_mismatch)
-      create(:geo_project_registry, :wiki_verification_failed)
-      create(:geo_project_registry, :wiki_verified)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
 
-      expect(subject.wikis_checksum_mismatch_count).to eq(1)
+      it 'returns the right number of registries that checksum mismatch' do
+        expect(subject.wikis_checksum_mismatch_count).to eq(2)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of repositories that checksum mismatch with no group restrictions' do
+        expect(subject.wikis_checksum_mismatch_count).to eq(2)
+      end
+
+      it 'returns the right number of repositories that checksum mismatch with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.wikis_checksum_mismatch_count).to eq(1)
+      end
     end
 
     it 'returns existing value when feature flag if off' do
@@ -903,13 +1146,37 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#wikis_verification_failed_count' do
     before do
       stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :wiki_verification_failed, project: project_1)
+      create(:geo_project_registry, :wiki_verification_failed, project: project_3)
+      create(:geo_project_registry, :wiki_verified)
+      create(:geo_project_registry, :repository_verification_failed, project: project_4)
     end
 
-    it 'returns the right number of failed wikis' do
-      create(:geo_project_registry, :wiki_verification_failed)
-      create(:geo_project_registry, :wiki_verification_failed)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
 
-      expect(subject.wikis_verification_failed_count).to eq(2)
+      it 'returns the right number of registries that verification failed' do
+        expect(subject.wikis_verification_failed_count).to eq(2)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of repositories that verification failed with no group restrictions' do
+        expect(subject.wikis_verification_failed_count).to eq(2)
+      end
+
+      it 'returns the right number of repositories that verification failed with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.wikis_verification_failed_count).to eq(1)
+      end
     end
 
     it 'returns existing value when feature flag if off' do
@@ -923,14 +1190,37 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#wikis_retrying_verification_count' do
     before do
       stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: 1, project: project_1)
+      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: nil, project: project_3)
+      create(:geo_project_registry, :wiki_verified)
+      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: 1, project: project_4)
     end
 
-    it 'returns the right number of wikis retrying verification' do
-      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: 1)
-      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: nil)
-      create(:geo_project_registry, :wiki_verified)
+    context 'when geo_project_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: true)
+      end
 
-      expect(subject.wikis_retrying_verification_count).to eq(1)
+      it 'returns the right number of registries retrying verification' do
+        expect(subject.wikis_retrying_verification_count).to eq(2)
+      end
+    end
+
+    context 'when geo_project_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_project_registry_ssot_sync: false)
+      end
+
+      it 'returns the right number of repositories retrying verification with no group restrictions' do
+        expect(subject.wikis_retrying_verification_count).to eq(2)
+      end
+
+      it 'returns the right number of repositories retrying verification with group restrictions' do
+        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+        expect(subject.wikis_retrying_verification_count).to eq(1)
+      end
     end
 
     it 'returns existing value when feature flag if off' do
