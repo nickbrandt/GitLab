@@ -25,3 +25,5 @@
       = _("Approved")
     - else
       = _("%{remaining_approvals} left") % { remaining_approvals: merge_request.approvals_left }
+- else
+  = render_ce "projects/merge_requests/approvals_count", merge_request: merge_request

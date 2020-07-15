@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
-import { APPROVED_MESSAGE } from 'ee/vue_merge_request_widget/components/approvals/messages';
-import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
+import { APPROVED_MESSAGE } from '~/vue_merge_request_widget/components/approvals/messages';
+import ApprovalsSummary from '~/vue_merge_request_widget/components/approvals/approvals_summary.vue';
 import { toNounSeriesText } from '~/lib/utils/grammar';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 
@@ -8,7 +8,7 @@ const testApprovers = () => Array.from({ length: 5 }, (_, i) => i).map(id => ({ 
 const testRulesLeft = () => ['Lorem', 'Ipsum', 'dolar & sit'];
 const TEST_APPROVALS_LEFT = 3;
 
-describe('EE MRWidget approvals summary', () => {
+describe('MRWidget approvals summary', () => {
   let wrapper;
 
   const createComponent = (props = {}) => {

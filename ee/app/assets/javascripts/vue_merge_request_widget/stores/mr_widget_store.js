@@ -15,7 +15,6 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.vulnerabilityFeedbackPath = data.vulnerability_feedback_path;
     this.canReadVulnerabilityFeedback = data.can_read_vulnerability_feedback;
     this.vulnerabilityFeedbackHelpPath = data.vulnerability_feedback_help_path;
-    this.approvalsHelpPath = data.approvals_help_path;
     this.securityReportsPipelineId = data.pipeline_id;
     this.securityReportsPipelineIid = data.pipeline_iid;
     this.createVulnerabilityFeedbackIssuePath = data.create_vulnerability_feedback_issue_path;
@@ -35,16 +34,11 @@ export default class MergeRequestStore extends CEMergeRequestStore {
 
     this.blockingMergeRequests = data.blocking_merge_requests;
 
-    this.hasApprovalsAvailable = data.has_approvals_available;
-    this.apiApprovalsPath = data.api_approvals_path;
     this.apiApprovalSettingsPath = data.api_approval_settings_path;
-    this.apiApprovePath = data.api_approve_path;
-    this.apiUnapprovePath = data.api_unapprove_path;
   }
 
   setData(data, isRebased) {
     this.initGeo(data);
-    this.initApprovals();
 
     this.mergePipelinesEnabled = Boolean(data.merge_pipelines_enabled);
     this.mergeTrainsCount = data.merge_trains_count || 0;
@@ -59,15 +53,16 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   }
 
   initApprovals() {
-    this.isApproved = this.isApproved || false;
-    this.approvals = this.approvals || null;
+    super.initApprovals();
+
     this.approvalRules = this.approvalRules || [];
   }
 
   setApprovals(data) {
+    super.setApprovals(data);
+
     this.approvals = mapApprovalsResponse(data);
     this.approvalsLeft = Boolean(data.approvals_left);
-    this.isApproved = data.approved || false;
     this.preventMerge = !this.isApproved;
   }
 

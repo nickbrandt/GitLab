@@ -3,12 +3,12 @@ import { GlLink } from '@gitlab/ui';
 import {
   OPTIONAL,
   OPTIONAL_CAN_APPROVE,
-} from 'ee/vue_merge_request_widget/components/approvals/messages';
-import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
+} from '~/vue_merge_request_widget/components/approvals/messages';
+import ApprovalsSummaryOptional from '~/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
 
 const TEST_HELP_PATH = 'help/path';
 
-describe('EE MRWidget approvals summary optional', () => {
+describe('MRWidget approvals summary optional', () => {
   let wrapper;
 
   const createComponent = (props = {}) => {
