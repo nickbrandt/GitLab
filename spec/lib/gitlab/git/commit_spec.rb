@@ -17,13 +17,13 @@ RSpec.describe Gitlab::Git::Commit, :seed_helper do
       @committer = {
         email: 'mike@smith.com',
         name: "Mike Smith",
-        time: Time.new(2000, 1, 1, 0, 0, 0, "+08:00")
+        time: Time.zone.local(2000, 1, 1, 0, 0, 0, "+08:00")
       }
 
       @author = {
         email: 'john@smith.com',
         name: "John Smith",
-        time: Time.new(2000, 1, 1, 0, 0, 0, "-08:00")
+        time: Time.zone.local(2000, 1, 1, 0, 0, 0, "-08:00")
       }
 
       @parents = [rugged_repo.head.target]
@@ -79,7 +79,7 @@ RSpec.describe Gitlab::Git::Commit, :seed_helper do
     it { expect(commit.id).to eq(id) }
     it { expect(commit.sha).to eq(id) }
     it { expect(commit.safe_message).to eq(body) }
-    it { expect(commit.created_at).to eq(Time.at(committer.date.seconds).utc) }
+    it { expect(commit.created_at).to eq(Time.zone.at(committer.date.seconds).utc) }
     it { expect(commit.author_email).to eq(author.email) }
     it { expect(commit.author_name).to eq(author.name) }
     it { expect(commit.committer_name).to eq(committer.name) }
@@ -87,7 +87,7 @@ RSpec.describe Gitlab::Git::Commit, :seed_helper do
     it { expect(commit.parent_ids).to eq(gitaly_commit.parent_ids) }
 
     context 'non-UTC dates' do
-      let(:seconds) { Time.now.to_i }
+      let(:seconds) { Time.current.to_i }
 
       it 'sets timezones correctly' do
         gitaly_commit.author.date.seconds = seconds
@@ -95,8 +95,8 @@ RSpec.describe Gitlab::Git::Commit, :seed_helper do
         gitaly_commit.committer.date.seconds = seconds
         gitaly_commit.committer.timezone = '+0800'
 
-        expect(commit.authored_date).to eq(Time.at(seconds, in: '-08:00'))
-        expect(commit.committed_date).to eq(Time.at(seconds, in: '+08:00'))
+        expect(commit.authored_date).to eq(Time.zone.at(seconds, in: '-08:00'))
+        expect(commit.committed_date).to eq(Time.zone.at(seconds, in: '+08:00'))
       end
     end
 

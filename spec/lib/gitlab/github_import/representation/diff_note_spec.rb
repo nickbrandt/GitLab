@@ -9,8 +9,8 @@ RSpec.describe Gitlab::GithubImport::Representation::DiffNote do
     +Hello world'
   end
 
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:updated_at) { Time.new(2017, 1, 1, 12, 15) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:updated_at) { Time.zone.local(2017, 1, 1, 12, 15) }
 
   shared_examples 'a DiffNote' do
     it 'returns an instance of DiffNote' do

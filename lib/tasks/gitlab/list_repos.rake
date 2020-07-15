@@ -2,7 +2,7 @@ namespace :gitlab do
   task list_repos: :environment do
     scope = Project
     if ENV['SINCE']
-      date = Time.parse(ENV['SINCE'])
+      date = Time.zone.parse(ENV['SINCE'])
       warn "Listing repositories with activity or changes since #{date}"
       project_ids = Project.where('last_activity_at > ? OR updated_at > ?', date, date).pluck(:id).sort
       namespace_ids = Namespace.where(['updated_at > ?', date]).pluck(:id).sort

@@ -71,13 +71,13 @@ module Gitlab
       def update_user_records(user_ids)
         UserModel
           .where(id: user_ids)
-          .update_all("confirmed_at = NULL, confirmation_sent_at = NOW(), unconfirmed_email = NULL, confirmation_token=md5(users.id::varchar || users.created_at || users.encrypted_password || '#{Integer(Time.now.to_i)}')")
+          .update_all("confirmed_at = NULL, confirmation_sent_at = NOW(), unconfirmed_email = NULL, confirmation_token=md5(users.id::varchar || users.created_at || users.encrypted_password || '#{Integer(Time.current.to_i)}')")
       end
 
       def email_query_for_update(start_id, stop_id)
         EmailModel
           .wrongfully_confirmed_emails(start_id, stop_id)
-          .select('emails.id as email_id', "md5(emails.id::varchar || emails.created_at || users.encrypted_password || '#{Integer(Time.now.to_i)}') as md5_string")
+          .select('emails.id as email_id', "md5(emails.id::varchar || emails.created_at || users.encrypted_password || '#{Integer(Time.current.to_i)}') as md5_string")
       end
 
       def send_emails(email_records)

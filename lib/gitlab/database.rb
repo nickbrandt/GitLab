@@ -25,7 +25,7 @@ module Gitlab
     # https://www.postgresql.org/docs/9.1/static/datatype-datetime.html
     # https://dev.mysql.com/doc/refman/5.7/en/datetime.html
     # FIXME: this should just be the max value of timestampz
-    MAX_TIMESTAMP_VALUE = Time.at((1 << 31) - 1).freeze
+    MAX_TIMESTAMP_VALUE = Time.zone.at((1 << 31) - 1).freeze
 
     # The maximum number of characters for text fields, to avoid DoS attacks via parsing huge text fields
     # https://gitlab.com/gitlab-org/gitlab-foss/issues/61974

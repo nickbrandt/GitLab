@@ -28,7 +28,7 @@ namespace :gitlab do
       raise "No admin user could be found"
     end
 
-    tmp_namespace_path = "tmp-project-import-#{Time.now.to_i}"
+    tmp_namespace_path = "tmp-project-import-#{Time.current.to_i}"
     puts "Creating temporary namespace #{tmp_namespace_path}"
     tmp_namespace = Namespace.create!(owner: admin, name: tmp_namespace_path, path: tmp_namespace_path)
 

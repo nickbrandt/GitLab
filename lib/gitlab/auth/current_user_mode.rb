@@ -98,7 +98,7 @@ module Gitlab
         reset_request_store_cache_entries
 
         current_session_data[ADMIN_MODE_REQUESTED_TIME_KEY] = nil
-        current_session_data[ADMIN_MODE_START_TIME_KEY] = Time.now
+        current_session_data[ADMIN_MODE_START_TIME_KEY] = Time.current
       end
 
       def disable_admin_mode!
@@ -115,7 +115,7 @@ module Gitlab
 
         reset_request_store_cache_entries
 
-        current_session_data[ADMIN_MODE_REQUESTED_TIME_KEY] = Time.now
+        current_session_data[ADMIN_MODE_REQUESTED_TIME_KEY] = Time.current
       end
 
       private

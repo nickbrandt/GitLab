@@ -106,8 +106,8 @@ RSpec.describe Gitlab::BitbucketImport::Importer do
         description: 'This is a test pull request',
         state: 'merged',
         author: 'other',
-        created_at: Time.now,
-        updated_at: Time.now)
+        created_at: Time.current,
+        updated_at: Time.current)
     end
     let(:author_line) { "*Created by: someuser*\n\n" }
 
@@ -124,8 +124,8 @@ RSpec.describe Gitlab::BitbucketImport::Importer do
         new_pos: 4,
         note: 'Hello world',
         author: 'someuser',
-        created_at: Time.now,
-        updated_at: Time.now,
+        created_at: Time.current,
+        updated_at: Time.current,
         inline?: true,
         has_parent?: false)
 
@@ -135,8 +135,8 @@ RSpec.describe Gitlab::BitbucketImport::Importer do
         file_path: '.gitmodules',
         note: 'Hello world',
         author: 'someuser',
-        created_at: Time.now,
-        updated_at: Time.now,
+        created_at: Time.current,
+        updated_at: Time.current,
         inline?: true,
         has_parent?: true,
         parent_id: 2)
@@ -310,7 +310,7 @@ RSpec.describe Gitlab::BitbucketImport::Importer do
         # attributes later.
         existing_label.reload
 
-        Timecop.freeze(Time.now + 1.minute) do
+        Timecop.freeze(Time.current + 1.minute) do
           importer.execute
 
           label_after_import = project.labels.find(existing_label.id)

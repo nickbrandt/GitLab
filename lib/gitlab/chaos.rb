@@ -7,13 +7,13 @@ module Gitlab
     # leak_mem will retain the specified amount of memory and sleep.
     # On return, the memory will be released.
     def self.leak_mem(memory_mb, duration_s)
-      start_time = Time.now
+      start_time = Time.current
 
       retainer = []
       # Add `n` 1mb chunks of memory to the retainer array
       memory_mb.times { retainer << "x" * 1.megabyte }
 
-      duration_left = [start_time + duration_s - Time.now, 0].max
+      duration_left = [start_time + duration_s - Time.current, 0].max
       Kernel.sleep(duration_left)
     end
 
@@ -28,13 +28,13 @@ module Gitlab
 
     # db_spin will query the database in a tight loop for the specified duration
     def self.db_spin(duration_s, interval_s)
-      expected_end_time = Time.now + duration_s
+      expected_end_time = Time.current + duration_s
 
-      while Time.now < expected_end_time
+      while Time.current < expected_end_time
         ActiveRecord::Base.connection.execute("SELECT 1")
 
-        end_interval_time = Time.now + [duration_s, interval_s].min
-        rand while Time.now < end_interval_time
+        end_interval_time = Time.current + [duration_s, interval_s].min
+        rand while Time.current < end_interval_time
       end
     end
 

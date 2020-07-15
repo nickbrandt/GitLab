@@ -148,7 +148,7 @@ module Gitlab
     # For example:
     #
     # GitalyClient.call(storage, service, rpc, request) do |kwargs|
-    #   kwargs.merge(deadline: Time.now + 10)
+    #   kwargs.merge(deadline: Time.current + 10)
     # end
     #
     # The optional remote_storage keyword argument is used to enable
@@ -196,14 +196,14 @@ module Gitlab
     end
     private_class_method :current_transaction_labels
 
-    # For some time related tasks we can't rely on `Time.now` since it will be
+    # For some time related tasks we can't rely on `Time.current` since it will be
     # affected by Timecop in some tests, and the clock of some gitaly-related
     # components (grpc's c-core and gitaly server) use system time instead of
     # timecop's time, so tests will fail.
-    # `Time.at(Process.clock_gettime(Process::CLOCK_REALTIME))` will circumvent
+    # `Time.zone.at(Process.clock_gettime(Process::CLOCK_REALTIME))` will circumvent
     # timecop.
     def self.real_time
-      Time.at(Process.clock_gettime(Process::CLOCK_REALTIME))
+      Time.zone.at(Process.clock_gettime(Process::CLOCK_REALTIME))
     end
     private_class_method :real_time
 

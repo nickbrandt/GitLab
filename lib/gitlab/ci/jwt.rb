@@ -30,7 +30,7 @@ module Gitlab
       attr_reader :build, :ttl, :key_data
 
       def reserved_claims
-        now = Time.now.to_i
+        now = Time.current.to_i
 
         {
           jti: SecureRandom.uuid,

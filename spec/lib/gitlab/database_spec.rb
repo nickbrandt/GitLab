@@ -502,7 +502,7 @@ RSpec.describe Gitlab::Database do
   end
 
   describe '#sanitize_timestamp' do
-    let(:max_timestamp) { Time.at((1 << 31) - 1) }
+    let(:max_timestamp) { Time.zone.at((1 << 31) - 1) }
 
     subject { described_class.sanitize_timestamp(timestamp) }
 

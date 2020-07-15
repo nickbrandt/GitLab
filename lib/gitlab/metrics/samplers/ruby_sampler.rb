@@ -12,7 +12,7 @@ module Gitlab
         def initialize(*)
           GC::Profiler.clear
 
-          metrics[:process_start_time_seconds].set(labels, Time.now.to_i)
+          metrics[:process_start_time_seconds].set(labels, Time.current.to_i)
 
           super
         end

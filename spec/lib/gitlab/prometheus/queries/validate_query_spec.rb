@@ -30,7 +30,7 @@ RSpec.describe Gitlab::Prometheus::Queries::ValidateQuery do
     it 'returns invalid' do
       Timecop.freeze do
         stub_prometheus_query_error(
-          prometheus_query_with_time_url(query, Time.now),
+          prometheus_query_with_time_url(query, Time.current),
           error_message
         )
 
@@ -44,7 +44,7 @@ RSpec.describe Gitlab::Prometheus::Queries::ValidateQuery do
       let(:api_url) { 'http://192.168.1.1' }
 
       let(:message) do
-        "URL 'http://192.168.1.1/api/v1/query?query=avg%28metric%29&time=#{Time.now.to_f}'" \
+        "URL 'http://192.168.1.1/api/v1/query?query=avg%28metric%29&time=#{Time.current.to_f}'" \
         " is blocked: Requests to the local network are not allowed"
       end
 

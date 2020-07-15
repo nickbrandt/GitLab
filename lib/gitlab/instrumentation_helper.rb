@@ -82,7 +82,7 @@ module Gitlab
     #
     # @param [Time] start
     def self.elapsed_by_absolute_time(start)
-      (Time.now - start).to_f.round(6)
+      (Time.current - start).to_f.round(6)
     end
     private_class_method :elapsed_by_absolute_time
 
@@ -92,7 +92,7 @@ module Gitlab
     def self.convert_to_time(time_value)
       return time_value if time_value.is_a?(Time)
       return Time.iso8601(time_value) if time_value.is_a?(String)
-      return Time.at(time_value) if time_value.is_a?(Numeric) && time_value > 0
+      return Time.zone.at(time_value) if time_value.is_a?(Numeric) && time_value > 0
     rescue ArgumentError
       # Swallow invalid dates. Better to loose some observability
       # than bring all background processing down because of a date

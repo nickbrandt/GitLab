@@ -24,7 +24,7 @@ module SystemCheck
       end
 
       def show_error
-        backup_dir = "~/gitlab-check-backup-#{Time.now.to_i}"
+        backup_dir = "~/gitlab-check-backup-#{Time.current.to_i}"
 
         instructions = forbidden_files.map do |filename|
           "sudo mv #{Shellwords.escape(filename)} #{backup_dir}"

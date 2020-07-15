@@ -38,7 +38,7 @@ RSpec.describe Gitlab::Lograge::CustomOptions do
 
     it 'adds the current time' do
       travel_to(5.days.ago) do
-        expected_time = Time.now.utc.iso8601(3)
+        expected_time = Time.current.utc.iso8601(3)
 
         expect(subject[:time]).to eq(expected_time)
       end

@@ -6,9 +6,9 @@ RSpec.describe Gitlab::GithubImport::Importer::MilestonesImporter, :clean_gitlab
   let(:project) { create(:project, import_source: 'foo/bar') }
   let(:client) { double(:client) }
   let(:importer) { described_class.new(project, client) }
-  let(:due_on) { Time.new(2017, 2, 1, 12, 00) }
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:updated_at) { Time.new(2017, 1, 1, 12, 15) }
+  let(:due_on) { Time.zone.local(2017, 2, 1, 12, 00) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:updated_at) { Time.zone.local(2017, 1, 1, 12, 15) }
 
   let(:milestone) do
     double(

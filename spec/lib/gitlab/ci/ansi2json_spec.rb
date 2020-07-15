@@ -65,7 +65,7 @@ RSpec.describe Gitlab::Ci::Ansi2json do
     context 'with section markers' do
       let(:section_name) { 'prepare-script' }
       let(:section_duration) { 63.seconds }
-      let(:section_start_time) { Time.new(2019, 9, 17).utc }
+      let(:section_start_time) { Time.zone.local(2019, 9, 17).utc }
       let(:section_end_time) { section_start_time + section_duration }
       let(:section_start) { "section_start:#{section_start_time.to_i}:#{section_name}\r\033[0K"}
       let(:section_end) { "section_end:#{section_end_time.to_i}:#{section_name}\r\033[0K"}
@@ -245,7 +245,7 @@ RSpec.describe Gitlab::Ci::Ansi2json do
       context 'with nested section' do
         let(:nested_section_name) { 'prepare-script-nested' }
         let(:nested_section_duration) { 2.seconds }
-        let(:nested_section_start_time) { Time.new(2019, 9, 17).utc }
+        let(:nested_section_start_time) { Time.zone.local(2019, 9, 17).utc }
         let(:nested_section_end_time) { nested_section_start_time + nested_section_duration }
         let(:nested_section_start) { "section_start:#{nested_section_start_time.to_i}:#{nested_section_name}\r\033[0K"}
         let(:nested_section_end) { "section_end:#{nested_section_end_time.to_i}:#{nested_section_name}\r\033[0K"}
@@ -424,7 +424,7 @@ RSpec.describe Gitlab::Ci::Ansi2json do
       context 'with split section' do
         let(:section_name) { 'prepare-script' }
         let(:section_duration) { 63.seconds }
-        let(:section_start_time) { Time.new(2019, 9, 17).utc }
+        let(:section_start_time) { Time.zone.local(2019, 9, 17).utc }
         let(:section_end_time) { section_start_time + section_duration }
         let(:section_start) { "section_start:#{section_start_time.to_i}:#{section_name}\r\033[0K"}
         let(:section_end) { "section_end:#{section_end_time.to_i}:#{section_name}\r\033[0K"}

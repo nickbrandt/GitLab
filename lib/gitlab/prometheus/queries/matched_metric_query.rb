@@ -38,7 +38,7 @@ module Gitlab
 
         def active_series_lookup(metric_groups)
           timeframe_start = 8.hours.ago
-          timeframe_end = Time.now
+          timeframe_end = Time.current
 
           series = metric_groups.flat_map(&:metrics).flat_map(&:required_metrics).uniq
 

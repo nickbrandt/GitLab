@@ -192,7 +192,7 @@ module ObjectStorage
 
     def expire_at
       strong_memoize(:expire_at) do
-        Time.now + TIMEOUT + EXPIRE_OFFSET
+        Time.current + TIMEOUT + EXPIRE_OFFSET
       end
     end
 

@@ -22,10 +22,10 @@ RSpec.describe Grafana::TimeWindow do
     it { is_expected.to eq(from: 1552799400000, to: 1552828200000) }
 
     context 'when non-unix parameters are provided' do
-      let(:to) { Time.now.to_s }
+      let(:to) { Time.current.to_s }
 
       let(:default_from) { 8.hours.ago.to_i * 1000 }
-      let(:default_to) { Time.now.to_i * 1000 }
+      let(:default_to) { Time.current.to_i * 1000 }
 
       it { is_expected.to eq(from: default_from, to: default_to) }
     end
@@ -68,7 +68,7 @@ RSpec.describe Grafana::RangeWithDefaults do
       let(:from) { nil }
 
       let(:default_from) { 8.hours.ago }
-      let(:default_to) { Time.now }
+      let(:default_to) { Time.current }
 
       it 'has the expected properties' do
         expect(subject[:to].time).to eq(default_to)
@@ -79,7 +79,7 @@ RSpec.describe Grafana::RangeWithDefaults do
 end
 
 RSpec.describe Grafana::Timestamp do
-  let(:timestamp) { Time.at(1552799400) }
+  let(:timestamp) { Time.zone.at(1552799400) }
 
   around do |example|
     Timecop.freeze(Time.utc(2019, 3, 17, 13, 10)) { example.run }
@@ -105,7 +105,7 @@ RSpec.describe Grafana::Timestamp do
     it { is_expected.to be_a described_class }
 
     context 'when the input is not a unix-ish timestamp' do
-      let(:timestamp) { Time.now.to_s }
+      let(:timestamp) { Time.current.to_s }
 
       it 'raises an error' do
         expect { subject }.to raise_error(Grafana::Timestamp::Error)

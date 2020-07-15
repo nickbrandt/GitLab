@@ -12,7 +12,7 @@ module JSONWebToken
 
     def initialize
       @id = SecureRandom.uuid
-      @issued_at = Time.now
+      @issued_at = Time.current
       # we give a few seconds for time shift
       @not_before = issued_at - DEFAULT_NOT_BEFORE_TIME
       # default 60 seconds should be more than enough for this authentication token

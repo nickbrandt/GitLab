@@ -12,7 +12,7 @@ RSpec.describe Gitlab::RequestProfiler::Profile do
       it 'returns valid data' do
         expect(profile).to be_valid
         expect(profile.request_path).to eq('/api/v4/version.txt')
-        expect(profile.time).to eq(Time.at(1562854738).utc)
+        expect(profile.time).to eq(Time.zone.at(1562854738).utc)
         expect(profile.type).to eq('html')
       end
     end
@@ -24,7 +24,7 @@ RSpec.describe Gitlab::RequestProfiler::Profile do
         expect(profile).to be_valid
         expect(profile.request_path).to eq('/api/v4/version.txt')
         expect(profile.profile_mode).to eq('execution')
-        expect(profile.time).to eq(Time.at(1563547949).utc)
+        expect(profile.time).to eq(Time.zone.at(1563547949).utc)
         expect(profile.type).to eq('html')
       end
     end

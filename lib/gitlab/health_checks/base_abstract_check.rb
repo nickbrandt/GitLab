@@ -26,9 +26,9 @@ module Gitlab
       end
 
       def with_timing
-        start = Time.now
+        start = Time.current
         result = yield
-        [result, Time.now.to_f - start.to_f]
+        [result, Time.current.to_f - start.to_f]
       end
 
       def catch_timeout(seconds, &block)

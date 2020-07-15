@@ -34,7 +34,7 @@ module Gitlab
         return unless matches
 
         @request_path      = matches[:path].tr('|', '/')
-        @time              = Time.at(matches[:timestamp].to_i).utc
+        @time              = Time.zone.at(matches[:timestamp].to_i).utc
         @profile_mode      = matches[:profile_mode] || 'unknown'
         @type              = matches[:type]
       end

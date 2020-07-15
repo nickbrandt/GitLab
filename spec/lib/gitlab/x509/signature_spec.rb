@@ -63,7 +63,7 @@ RSpec.describe Gitlab::X509::Signature do
             X509Helpers::User1.signed_commit_signature,
             X509Helpers::User1.signed_commit_base_data,
             X509Helpers::User1.certificate_email,
-            Time.new(2020, 2, 22)
+            Time.zone.local(2020, 2, 22)
           )
 
           expect(signature.x509_certificate).to have_attributes(certificate_attributes)
@@ -311,7 +311,7 @@ RSpec.describe Gitlab::X509::Signature do
             X509Helpers::User1.signed_tag_signature,
             X509Helpers::User1.signed_tag_base_data,
             X509Helpers::User1.certificate_email,
-            Time.new(2020, 2, 22)
+            Time.zone.local(2020, 2, 22)
           )
 
           expect(signature.x509_certificate).to have_attributes(certificate_attributes)

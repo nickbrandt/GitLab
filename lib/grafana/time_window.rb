@@ -66,7 +66,7 @@ module Grafana
     private
 
     def apply_defaults!
-      @to ||= @from ? relative_end : Timestamp.new(Time.now)
+      @to ||= @from ? relative_end : Timestamp.new(Time.current)
       @from ||= relative_start
     end
 
@@ -117,7 +117,7 @@ module Grafana
       private
 
       def cast_ms_to_time(time)
-        Time.at(time.to_i / 1000.0)
+        Time.zone.at(time.to_i / 1000.0)
       end
 
       def ms_since_epoch?(time)

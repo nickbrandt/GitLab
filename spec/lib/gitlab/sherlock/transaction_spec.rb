@@ -77,7 +77,7 @@ RSpec.describe Gitlab::Sherlock::Transaction do
 
   describe '#duration' do
     it 'returns the duration in seconds' do
-      start_time = Time.now
+      start_time = Time.current
 
       allow(transaction).to receive(:started_at).and_return(start_time)
       allow(transaction).to receive(:finished_at).and_return(start_time + 5)
@@ -88,7 +88,7 @@ RSpec.describe Gitlab::Sherlock::Transaction do
 
   describe '#query_duration' do
     it 'returns the total query duration in seconds' do
-      time   = Time.now
+      time   = Time.current
       query1 = Gitlab::Sherlock::Query.new('SELECT 1', time, time + 5)
       query2 = Gitlab::Sherlock::Query.new('SELECT 2', time, time + 2)
 
@@ -107,7 +107,7 @@ RSpec.describe Gitlab::Sherlock::Transaction do
 
   describe '#sorted_queries' do
     it 'returns the queries in descending order' do
-      start_time = Time.now
+      start_time = Time.current
 
       query1 = Gitlab::Sherlock::Query.new('SELECT 1', start_time, start_time)
 
@@ -135,7 +135,7 @@ RSpec.describe Gitlab::Sherlock::Transaction do
 
   describe '#find_query' do
     it 'returns a Query when found' do
-      query = Gitlab::Sherlock::Query.new('SELECT 1', Time.now, Time.now)
+      query = Gitlab::Sherlock::Query.new('SELECT 1', Time.current, Time.current)
 
       transaction.queries << query
 
@@ -191,7 +191,7 @@ RSpec.describe Gitlab::Sherlock::Transaction do
 
   describe '#subscribe_to_active_record' do
     let(:subscription) { transaction.subscribe_to_active_record }
-    let(:time) { Time.now }
+    let(:time) { Time.current }
     let(:query_data) { { sql: 'SELECT 1', binds: [] } }
 
     after do
@@ -215,7 +215,7 @@ RSpec.describe Gitlab::Sherlock::Transaction do
 
   describe '#subscribe_to_action_view' do
     let(:subscription) { transaction.subscribe_to_action_view }
-    let(:time) { Time.now }
+    let(:time) { Time.current }
     let(:view_data) { { identifier: 'foo.rb' } }
 
     after do

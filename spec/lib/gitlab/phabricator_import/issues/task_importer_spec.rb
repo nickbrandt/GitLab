@@ -40,8 +40,8 @@ RSpec.describe Gitlab::PhabricatorImport::Issues::TaskImporter do
       expect(issue.title).to eq('Title')
       expect(issue.description).to eq('# This is markdown\n it can contain more text.')
       expect(issue).to be_closed
-      expect(issue.created_at).to eq(Time.at(1518688921))
-      expect(issue.closed_at).to eq(Time.at(1518789995))
+      expect(issue.created_at).to eq(Time.zone.at(1518688921))
+      expect(issue.closed_at).to eq(Time.zone.at(1518789995))
     end
 
     it 'does not recreate the issue when called multiple times' do

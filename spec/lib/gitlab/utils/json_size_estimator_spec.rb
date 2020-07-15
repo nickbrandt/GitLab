@@ -19,7 +19,7 @@ RSpec.describe Gitlab::Utils::JsonSizeEstimator do
     [1, "str", 3.14, ["str", { a: -1 }]],
     {},
     { a: {} },
-    { a: { b: { c: [1, 2, 3], e: Time.now, f: nil } } },
+    { a: { b: { c: [1, 2, 3], e: Time.current, f: nil } } },
     { 100 => 500 },
     { '狸' => '狸' },
     nil

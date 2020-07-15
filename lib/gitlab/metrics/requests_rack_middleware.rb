@@ -48,7 +48,7 @@ module Gitlab
 
       def call(env)
         method = env['REQUEST_METHOD'].downcase
-        started = Time.now.to_f
+        started = Time.current.to_f
 
         begin
           if health_endpoint?(env['PATH_INFO'])
@@ -59,7 +59,7 @@ module Gitlab
 
           status, headers, body = @app.call(env)
 
-          elapsed = Time.now.to_f - started
+          elapsed = Time.current.to_f - started
           RequestsRackMiddleware.http_request_duration_seconds.observe({ method: method, status: status.to_s }, elapsed)
 
           [status, headers, body]

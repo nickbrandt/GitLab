@@ -133,7 +133,7 @@ RSpec.describe Gitlab::PrometheusClient do
 
   describe '#query' do
     let(:prometheus_query) { prometheus_cpu_query('env-slug') }
-    let(:query_url) { prometheus_query_with_time_url(prometheus_query, Time.now.utc) }
+    let(:query_url) { prometheus_query_with_time_url(prometheus_query, Time.current.utc) }
 
     around do |example|
       Timecop.freeze { example.run }
@@ -191,7 +191,7 @@ RSpec.describe Gitlab::PrometheusClient do
         }
       }
     end
-    let(:query_url) { prometheus_query_with_time_url(query, Time.now.utc) }
+    let(:query_url) { prometheus_query_with_time_url(query, Time.current.utc) }
 
     around do |example|
       Timecop.freeze { example.run }
@@ -262,7 +262,7 @@ RSpec.describe Gitlab::PrometheusClient do
     end
 
     context 'when non utc time is passed' do
-      let(:time_stop) { Time.now.in_time_zone("Warsaw") }
+      let(:time_stop) { Time.current.in_time_zone("Warsaw") }
       let(:time_start) { time_stop - 8.hours }
 
       let(:query_url) { prometheus_query_range_url(prometheus_query, start_time: time_start.utc.to_f, end_time: time_stop.utc.to_f) }
@@ -326,7 +326,7 @@ RSpec.describe Gitlab::PrometheusClient do
   describe '.compute_step' do
     using RSpec::Parameterized::TableSyntax
 
-    let(:now) { Time.now.utc }
+    let(:now) { Time.current.utc }
 
     subject { described_class.compute_step(start, stop) }
 

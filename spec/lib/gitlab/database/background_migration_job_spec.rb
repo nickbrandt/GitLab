@@ -72,7 +72,7 @@ RSpec.describe Gitlab::Database::BackgroundMigrationJob do
     end
 
     context 'when previous matching jobs have already succeeded' do
-      let(:initial_time) { Time.now.round }
+      let(:initial_time) { Time.current.round }
       let!(:job1) { create(:background_migration_job, :succeeded, created_at: initial_time, updated_at: initial_time) }
 
       it 'does not update non-pending jobs' do

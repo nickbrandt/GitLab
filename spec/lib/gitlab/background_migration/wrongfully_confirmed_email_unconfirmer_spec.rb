@@ -70,11 +70,11 @@ RSpec.describe Gitlab::BackgroundMigration::WrongfullyConfirmedEmailUnconfirmer,
   it 'updates confirmation_sent_at column' do
     subject
 
-    expect(user_needs_migration_1.reload.confirmation_sent_at).to be_within(1.minute).of(Time.now)
-    expect(user_needs_migration_2.reload.confirmation_sent_at).to be_within(1.minute).of(Time.now)
+    expect(user_needs_migration_1.reload.confirmation_sent_at).to be_within(1.minute).of(Time.current)
+    expect(user_needs_migration_2.reload.confirmation_sent_at).to be_within(1.minute).of(Time.current)
 
-    expect(bad_email_1.reload.confirmation_sent_at).to be_within(1.minute).of(Time.now)
-    expect(bad_email_2.reload.confirmation_sent_at).to be_within(1.minute).of(Time.now)
+    expect(bad_email_1.reload.confirmation_sent_at).to be_within(1.minute).of(Time.current)
+    expect(bad_email_2.reload.confirmation_sent_at).to be_within(1.minute).of(Time.current)
   end
 
   it 'unconfirms bad email records' do

@@ -47,7 +47,7 @@ module Gitlab
           def expiry
             return DuplicateJob::DUPLICATE_KEY_TTL unless duplicate_job.scheduled?
 
-            time_diff = duplicate_job.scheduled_at.to_i - Time.now.to_i
+            time_diff = duplicate_job.scheduled_at.to_i - Time.current.to_i
 
             time_diff > 0 ? time_diff : DuplicateJob::DUPLICATE_KEY_TTL
           end

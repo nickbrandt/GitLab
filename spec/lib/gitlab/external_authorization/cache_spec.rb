@@ -25,13 +25,13 @@ RSpec.describe Gitlab::ExternalAuthorization::Cache, :clean_gitlab_redis_cache d
       Timecop.freeze do
         set_in_redis(:access, false)
         set_in_redis(:reason, 'Access denied for now')
-        set_in_redis(:refreshed_at, Time.now)
+        set_in_redis(:refreshed_at, Time.current)
 
         access, reason, refreshed_at = cache.load
 
         expect(access).to eq(false)
         expect(reason).to eq('Access denied for now')
-        expect(refreshed_at).to be_within(1.second).of(Time.now)
+        expect(refreshed_at).to be_within(1.second).of(Time.current)
       end
     end
   end
@@ -39,11 +39,11 @@ RSpec.describe Gitlab::ExternalAuthorization::Cache, :clean_gitlab_redis_cache d
   describe '#store' do
     it 'sets the values in redis' do
       Timecop.freeze do
-        cache.store(true, 'the reason', Time.now)
+        cache.store(true, 'the reason', Time.current)
 
         expect(read_from_redis(:access)).to eq('true')
         expect(read_from_redis(:reason)).to eq('the reason')
-        expect(read_from_redis(:refreshed_at)).to eq(Time.now.to_s)
+        expect(read_from_redis(:refreshed_at)).to eq(Time.current.to_s)
       end
     end
   end

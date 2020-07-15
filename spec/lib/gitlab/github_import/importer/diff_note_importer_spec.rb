@@ -6,8 +6,8 @@ RSpec.describe Gitlab::GithubImport::Importer::DiffNoteImporter do
   let(:project) { create(:project) }
   let(:client) { double(:client) }
   let(:user) { create(:user) }
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:updated_at) { Time.new(2017, 1, 1, 12, 15) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:updated_at) { Time.zone.local(2017, 1, 1, 12, 15) }
 
   let(:hunk) do
     '@@ -1 +1 @@

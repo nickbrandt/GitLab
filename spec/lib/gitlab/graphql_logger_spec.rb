@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe Gitlab::GraphqlLogger do
   subject { described_class.new('/dev/null') }
 
-  let(:now) { Time.now }
+  let(:now) { Time.current }
 
   it 'builds a logger once' do
     expect(::Logger).to receive(:new).and_call_original

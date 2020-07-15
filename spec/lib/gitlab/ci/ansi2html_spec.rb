@@ -203,7 +203,7 @@ RSpec.describe Gitlab::Ci::Ansi2html do
 
   context "with section markers" do
     let(:section_name) { 'test_section' }
-    let(:section_start_time) { Time.new(2017, 9, 20).utc }
+    let(:section_start_time) { Time.zone.local(2017, 9, 20).utc }
     let(:section_duration) { 3.seconds }
     let(:section_end_time) { section_start_time + section_duration }
     let(:section_start) { "section_start:#{section_start_time.to_i}:#{section_name}\r\033[0K"}

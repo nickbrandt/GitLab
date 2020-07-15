@@ -72,7 +72,7 @@ RSpec.describe Gitlab::ExternalAuthorization::Access, :clean_gitlab_redis_cache 
       it 'stores the result in redis' do
         Timecop.freeze do
           fake_cache = double
-          expect(fake_cache).to receive(:store).with(true, nil, Time.now)
+          expect(fake_cache).to receive(:store).with(true, nil, Time.current)
           expect(access).to receive(:cache).and_return(fake_cache)
 
           access.load!
@@ -119,7 +119,7 @@ RSpec.describe Gitlab::ExternalAuthorization::Access, :clean_gitlab_redis_cache 
 
       it 'does not load from the webservice' do
         Timecop.freeze do
-          expect(fake_cache).to receive(:load).and_return([true, nil, Time.now])
+          expect(fake_cache).to receive(:load).and_return([true, nil, Time.current])
 
           expect(access).to receive(:load_from_cache).and_call_original
           expect(access).not_to receive(:load_from_service)

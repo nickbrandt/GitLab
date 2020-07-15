@@ -14,9 +14,9 @@ module Gitlab
     extend self
 
     def invoke_and_time_task(task)
-      start = Time.now
+      start = Time.current
       Rake::Task[task].invoke
-      puts "`#{task}` finished in #{Time.now - start} seconds"
+      puts "`#{task}` finished in #{Time.current - start} seconds"
     end
 
     # Ask if the user wants to continue

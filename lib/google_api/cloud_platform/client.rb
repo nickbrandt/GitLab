@@ -119,7 +119,7 @@ module GoogleApi
       end
 
       def token_life_time(expires_at)
-        DateTime.strptime(expires_at, '%s').to_time.utc - Time.now.utc
+        DateTime.strptime(expires_at, '%s').to_time.utc - Time.current.utc
       end
 
       def user_agent_header

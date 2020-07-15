@@ -6,7 +6,7 @@ RSpec.describe Gitlab::DataBuilder::Note do
   let(:project) { create(:project, :repository) }
   let(:user) { create(:user) }
   let(:data) { described_class.build(note, user) }
-  let(:fixed_time) { Time.at(1425600000) } # Avoid time precision errors
+  let(:fixed_time) { Time.zone.at(1425600000) } # Avoid time precision errors
 
   before do
     expect(data).to have_key(:object_attributes)

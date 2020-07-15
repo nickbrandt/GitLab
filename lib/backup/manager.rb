@@ -90,7 +90,7 @@ module Backup
 
             timestamp = $1.to_i
 
-            if Time.at(timestamp) < (Time.now - keep_time)
+            if Time.zone.at(timestamp) < (Time.current - keep_time)
               begin
                 FileUtils.rm(file)
                 removed += 1
@@ -254,7 +254,7 @@ module Backup
     def backup_information
       @backup_information ||= {
         db_version: ActiveRecord::Migrator.current_version.to_s,
-        backup_created_at: Time.now,
+        backup_created_at: Time.current,
         gitlab_version: Gitlab::VERSION,
         tar_version: tar_version,
         installation_type: Gitlab::INSTALLATION_TYPE,

@@ -99,7 +99,7 @@ module Gitlab
         # rubocop: enable CodeReuse/ActiveRecord
 
         def from_builds(builds)
-          now = Time.now
+          now = Time.current
 
           periods = builds.map do |b|
             Period.new(b.started_at, b.finished_at || now)

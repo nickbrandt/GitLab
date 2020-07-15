@@ -41,7 +41,7 @@ module Gitlab
       end
 
       def local_hour
-        (Time.now.utc + tz_offset_hours * 3600).hour
+        (Time.current.utc + tz_offset_hours * 3600).hour
       end
 
       protected

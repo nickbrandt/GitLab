@@ -49,7 +49,7 @@ RSpec.describe Gitlab::DiscussionsDiff::FileCollection do
     end
 
     it 'does not write cache for resolved notes' do
-      diff_note_a.update_column(:resolved_at, Time.now)
+      diff_note_a.update_column(:resolved_at, Time.current)
 
       file_b_caching_content = diff_note_b.diff_file.highlighted_diff_lines.map(&:to_hash)
 
@@ -72,7 +72,7 @@ RSpec.describe Gitlab::DiscussionsDiff::FileCollection do
     end
 
     it 'not loaded diff files does not have highlighted lines loaded' do
-      diff_note_a.update_column(:resolved_at, Time.now)
+      diff_note_a.update_column(:resolved_at, Time.current)
 
       subject.load_highlight
 

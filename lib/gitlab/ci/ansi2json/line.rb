@@ -73,7 +73,7 @@ module Gitlab
         end
 
         def set_section_duration(duration)
-          @section_duration = Time.at(duration.to_i).strftime('%M:%S')
+          @section_duration = Time.zone.at(duration.to_i).strftime('%M:%S')
         end
 
         def flush_current_segment!

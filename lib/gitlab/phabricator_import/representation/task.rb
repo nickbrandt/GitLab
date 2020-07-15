@@ -64,7 +64,7 @@ module Gitlab
         end
 
         def cast_datetime(value)
-          Time.at(value.to_i)
+          Time.zone.at(value.to_i)
         end
       end
     end

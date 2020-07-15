@@ -23,7 +23,7 @@ module Gitlab
             if access.allowed?
               unless Gitlab::Database.read_only?
                 access.update_user
-                Users::UpdateService.new(user, user: user, last_credential_check_at: Time.now).execute
+                Users::UpdateService.new(user, user: user, last_credential_check_at: Time.current).execute
               end
 
               true

@@ -42,7 +42,7 @@ RSpec.describe Gitlab::Ci::Trace::SectionParser do
     end
 
     context 'with trace markers' do
-      let(:start_time) { Time.new(2017, 10, 5).utc }
+      let(:start_time) { Time.zone.local(2017, 10, 5).utc }
       let(:section_b_duration) { 1.second }
       let(:section_a) { section('a', start_time, 0, 'a line') }
       let(:section_b) { section('b', start_time, section_b_duration, "another line\n") }
@@ -70,7 +70,7 @@ RSpec.describe Gitlab::Ci::Trace::SectionParser do
 
     context 'trace with UTF-8 chars' do
       let(:line) { 'GitLab ❤️ 狸 (tanukis)\n' }
-      let(:trace) { section('test_section', Time.new(2017, 10, 5).utc, 3.seconds, line) }
+      let(:trace) { section('test_section', Time.zone.local(2017, 10, 5).utc, 3.seconds, line) }
       let(:lines) { build_lines(trace) }
 
       it 'must handle correctly byte positioning' do

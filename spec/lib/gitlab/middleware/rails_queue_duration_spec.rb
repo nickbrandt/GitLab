@@ -38,7 +38,7 @@ RSpec.describe Gitlab::Middleware::RailsQueueDuration do
 
         expect(middleware.send(:metric_rails_queue_duration_seconds)).to receive(:observe).with(transaction.labels, 1)
 
-        Timecop.freeze(Time.at(3)) do
+        Timecop.freeze(Time.zone.at(3)) do
           expect(middleware.call(env)).to eq('yay')
         end
       end

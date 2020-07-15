@@ -54,7 +54,7 @@ module Backup
     end
 
     def backup_existing_files_dir
-      timestamped_files_path = File.join(Gitlab.config.backup.path, "tmp", "#{name}.#{Time.now.to_i}")
+      timestamped_files_path = File.join(Gitlab.config.backup.path, "tmp", "#{name}.#{Time.current.to_i}")
       if File.exist?(app_files_dir)
         # Move all files in the existing repos directory except . and .. to
         # repositories.old.<timestamp> directory

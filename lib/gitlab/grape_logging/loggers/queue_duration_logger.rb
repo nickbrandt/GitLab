@@ -9,7 +9,7 @@ module Gitlab
         attr_accessor :start_time
 
         def before
-          @start_time = Time.now
+          @start_time = Time.current
         end
 
         def parameters(request, _)

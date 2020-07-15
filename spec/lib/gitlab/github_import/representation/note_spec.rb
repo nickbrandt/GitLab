@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::GithubImport::Representation::Note do
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:updated_at) { Time.new(2017, 1, 1, 12, 15) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:updated_at) { Time.zone.local(2017, 1, 1, 12, 15) }
 
   shared_examples 'a Note' do
     it 'returns an instance of Note' do

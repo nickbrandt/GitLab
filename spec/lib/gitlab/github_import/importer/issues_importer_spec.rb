@@ -5,8 +5,8 @@ require 'spec_helper'
 RSpec.describe Gitlab::GithubImport::Importer::IssuesImporter do
   let(:project) { double(:project, id: 4, import_source: 'foo/bar') }
   let(:client) { double(:client) }
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:updated_at) { Time.new(2017, 1, 1, 12, 15) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:updated_at) { Time.zone.local(2017, 1, 1, 12, 15) }
 
   let(:github_issue) do
     double(

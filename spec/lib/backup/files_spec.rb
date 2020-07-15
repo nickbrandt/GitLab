@@ -40,7 +40,7 @@ RSpec.describe Backup::Files do
 
       it 'moves all necessary files' do
         allow(subject).to receive(:backup_existing_files).and_call_original
-        expect(FileUtils).to receive(:mv).with(["/var/gitlab-registry/sample1"], File.join(Gitlab.config.backup.path, "tmp", "registry.#{Time.now.to_i}"))
+        expect(FileUtils).to receive(:mv).with(["/var/gitlab-registry/sample1"], File.join(Gitlab.config.backup.path, "tmp", "registry.#{Time.current.to_i}"))
         subject.restore
       end
 

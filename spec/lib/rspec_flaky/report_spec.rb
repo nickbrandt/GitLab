@@ -7,7 +7,7 @@ RSpec.describe RspecFlaky::Report, :aggregate_failures do
   let(:collection_hash) do
     {
       a: { example_id: 'spec/foo/bar_spec.rb:2' },
-      b: { example_id: 'spec/foo/baz_spec.rb:3', first_flaky_at: (Time.now - thirty_one_days).to_s, last_flaky_at: (Time.now - thirty_one_days).to_s }
+      b: { example_id: 'spec/foo/baz_spec.rb:3', first_flaky_at: (Time.current - thirty_one_days).to_s, last_flaky_at: (Time.current - thirty_one_days).to_s }
     }
   end
   let(:suite_flaky_example_report) do

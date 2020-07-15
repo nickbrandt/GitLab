@@ -10,7 +10,7 @@ RSpec.describe Gitlab::Prometheus::Queries::DeploymentQuery do
   subject { described_class.new(client) }
 
   around do |example|
-    time_without_subsecond_values = Time.local(2008, 9, 1, 12, 0, 0)
+    time_without_subsecond_values = Time.zone.local(2008, 9, 1, 12, 0, 0)
     Timecop.freeze(time_without_subsecond_values) { example.run }
   end
 

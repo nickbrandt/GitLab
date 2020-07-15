@@ -13,7 +13,7 @@ module Gitlab
           .payload[:params]
           .each_with_object([]) { |(k, v), array| array << { key: k, value: v } unless IGNORE_PARAMS.include?(k) }
         payload = {
-          time: Time.now.utc.iso8601(3),
+          time: Time.current.utc.iso8601(3),
           params: Gitlab::Utils::LogLimitedArray.log_limited_array(params, sentinel: LIMITED_ARRAY_SENTINEL),
           remote_ip: event.payload[:remote_ip],
           user_id: event.payload[:user_id],

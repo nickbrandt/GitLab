@@ -5,10 +5,10 @@ require 'spec_helper'
 RSpec.describe Gitlab::Graphs::Commits do
   let!(:project) { create(:project, :public) }
 
-  let!(:commit1) { create(:commit, git_commit: RepoHelpers.sample_commit, project: project, committed_date: Time.now) }
+  let!(:commit1) { create(:commit, git_commit: RepoHelpers.sample_commit, project: project, committed_date: Time.current) }
   let!(:commit1_yesterday) { create(:commit, git_commit: RepoHelpers.sample_commit, project: project, committed_date: 1.day.ago)}
 
-  let!(:commit2) { create(:commit, git_commit: RepoHelpers.another_sample_commit, project: project, committed_date: Time.now) }
+  let!(:commit2) { create(:commit, git_commit: RepoHelpers.another_sample_commit, project: project, committed_date: Time.current) }
 
   describe '#commit_per_day' do
     context 'when range is only commits from today' do

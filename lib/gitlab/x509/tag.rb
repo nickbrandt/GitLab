@@ -12,7 +12,7 @@ module Gitlab
       end
 
       def signature
-        signature = X509::Signature.new(signature_text, signed_text, @raw_tag.tagger.email, Time.at(@raw_tag.tagger.date.seconds))
+        signature = X509::Signature.new(signature_text, signed_text, @raw_tag.tagger.email, Time.zone.at(@raw_tag.tagger.date.seconds))
 
         return if signature.verified_signature.nil?
 

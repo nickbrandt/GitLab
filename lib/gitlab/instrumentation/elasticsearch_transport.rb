@@ -6,13 +6,13 @@ module Gitlab
   module Instrumentation
     module ElasticsearchTransportInterceptor
       def perform_request(method, path, params = {}, body = nil, headers = nil)
-        start = Time.now
+        start = Time.current
         headers = (headers || {})
           .reverse_merge({ 'X-Opaque-Id': Labkit::Correlation::CorrelationId.current_or_new_id })
         super
       ensure
         if ::Gitlab::SafeRequestStore.active?
-          duration = (Time.now - start)
+          duration = (Time.current - start)
 
           ::Gitlab::Instrumentation::ElasticsearchTransport.increment_request_count
           ::Gitlab::Instrumentation::ElasticsearchTransport.add_duration(duration)

@@ -4,11 +4,11 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::Ci::CronParser do
   shared_examples_for "returns time in the future" do
-    it { is_expected.to be > Time.now }
+    it { is_expected.to be > Time.current }
   end
 
   shared_examples_for "returns time in the past" do
-    it { is_expected.to be < Time.now }
+    it { is_expected.to be < Time.current }
   end
 
   shared_examples_for 'when cron and cron_timezone are valid' do |returns_time_for_epoch|
@@ -212,7 +212,7 @@ RSpec.describe Gitlab::Ci::CronParser do
   end
 
   describe '#next_time_from' do
-    subject { described_class.new(cron, cron_timezone).next_time_from(Time.now) }
+    subject { described_class.new(cron, cron_timezone).next_time_from(Time.current) }
 
     it_behaves_like 'when cron and cron_timezone are valid', 'returns time in the future'
 
@@ -228,7 +228,7 @@ RSpec.describe Gitlab::Ci::CronParser do
   end
 
   describe '#previous_time_from' do
-    subject { described_class.new(cron, cron_timezone).previous_time_from(Time.now) }
+    subject { described_class.new(cron, cron_timezone).previous_time_from(Time.current) }
 
     it_behaves_like 'when cron and cron_timezone are valid', 'returns time in the past'
 

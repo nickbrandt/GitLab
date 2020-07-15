@@ -1937,7 +1937,7 @@ RSpec.describe Gitlab::Git::Repository, :seed_helper do
       create_worktree = %W[git -C #{repository_path} worktree add --detach #{gitlab_worktree_path} master]
       raise 'preparation failed' unless system(*create_worktree, err: '/dev/null')
 
-      FileUtils.touch(gitlab_worktree_path, mtime: Time.now - 8.hours)
+      FileUtils.touch(gitlab_worktree_path, mtime: Time.current - 8.hours)
       # git rev-list --all will fail in git 2.16 if HEAD is pointing to a non-existent object,
       # but the HEAD must be 40 characters long or git will ignore it.
       File.write(File.join(admin_dir, worktree_id, 'HEAD'), Gitlab::Git::BLANK_SHA)

@@ -39,7 +39,7 @@ RSpec.describe Gitlab::Serverless::Service do
     expect(service.namespace).to eq('project1-1-environment1')
     expect(service.environment_scope).to eq('*')
     expect(service.podcount).to eq(0)
-    expect(service.created_at).to eq(DateTime.parse('2019-10-22T21:19:13Z'))
+    expect(service.created_at).to eq(DateTime.zone.parse('2019-10-22T21:19:13Z'))
     expect(service.image).to eq('some-image')
     expect(service.cluster).to eq(cluster)
     expect(service.environment).to eq(environment)

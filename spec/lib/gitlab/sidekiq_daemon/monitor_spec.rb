@@ -220,7 +220,7 @@ RSpec.describe Gitlab::SidekiqDaemon::Monitor do
         let(:thread) { Thread.new { sleep 1000 } }
 
         before do
-          monitor.jobs[jid] = { worker_class: 'worker_class', thread: thread, started_at: Time.now.to_i }
+          monitor.jobs[jid] = { worker_class: 'worker_class', thread: thread, started_at: Time.current.to_i }
         end
 
         after do

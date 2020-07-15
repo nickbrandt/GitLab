@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::Checks::TimedLogger do
   let!(:timeout) { 50.seconds }
-  let!(:start) { Time.now }
+  let!(:start) { Time.current }
   let!(:ref) { "bar" }
   let!(:logger) { described_class.new(start_time: start, timeout: timeout) }
   let!(:log_messages) do

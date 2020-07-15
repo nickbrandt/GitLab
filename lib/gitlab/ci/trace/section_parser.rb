@@ -57,7 +57,7 @@ module Gitlab
 
         def handle_line(action, time, name, marker_start, marker_end)
           action = action.to_sym
-          timestamp = Time.at(time).utc
+          timestamp = Time.zone.at(time).utc
           marker = if action == :start
                      marker_end
                    else

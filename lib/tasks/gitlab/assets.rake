@@ -14,7 +14,7 @@ module Tasks
       PUBLIC_ASSETS_WEBPACK_DIR = 'public/assets/webpack'
 
       def self.md5_of_assets_impacting_webpack_compilation
-        start_time = Time.now
+        start_time = Time.current
         asset_files = assets_impacting_webpack_compilation
         puts "Generating the MD5 hash for #{assets_impacting_webpack_compilation.size} Webpack-related assets..."
 
@@ -22,7 +22,7 @@ module Tasks
           Digest::MD5.file(asset_file).hexdigest
         end
 
-        Digest::MD5.hexdigest(asset_file_md5s.join).tap { |md5| puts "=> MD5 generated in #{Time.now - start_time}: #{md5}" }
+        Digest::MD5.hexdigest(asset_file_md5s.join).tap { |md5| puts "=> MD5 generated in #{Time.current - start_time}: #{md5}" }
       end
 
       def self.assets_impacting_webpack_compilation

@@ -44,7 +44,7 @@ module Gitlab
       def format_time(timestamp)
         return timestamp unless timestamp.is_a?(Numeric)
 
-        Time.at(timestamp).utc.iso8601(3)
+        Time.zone.at(timestamp).utc.iso8601(3)
       end
 
       def convert_retry_to_integer!(payload)

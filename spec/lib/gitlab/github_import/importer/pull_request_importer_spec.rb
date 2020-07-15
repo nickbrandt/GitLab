@@ -6,9 +6,9 @@ RSpec.describe Gitlab::GithubImport::Importer::PullRequestImporter, :clean_gitla
   let(:project) { create(:project, :repository) }
   let(:client) { double(:client) }
   let(:user) { create(:user) }
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:updated_at) { Time.new(2017, 1, 1, 12, 15) }
-  let(:merged_at) { Time.new(2017, 1, 1, 12, 17) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:updated_at) { Time.zone.local(2017, 1, 1, 12, 15) }
+  let(:merged_at) { Time.zone.local(2017, 1, 1, 12, 17) }
 
   let(:source_commit) { project.repository.commit('feature') }
   let(:target_commit) { project.repository.commit('master') }

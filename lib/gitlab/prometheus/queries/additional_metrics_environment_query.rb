@@ -7,7 +7,7 @@ module Gitlab
         include QueryAdditionalMetrics
 
         # rubocop: disable CodeReuse/ActiveRecord
-        def query(environment_id, timeframe_start = 8.hours.ago, timeframe_end = Time.now)
+        def query(environment_id, timeframe_start = 8.hours.ago, timeframe_end = Time.current)
           ::Environment.find_by(id: environment_id).try do |environment|
             query_metrics(
               environment.project,

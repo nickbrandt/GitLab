@@ -79,7 +79,7 @@ module Gitlab
 
       def token(expire_time)
         hmac_token = JSONWebToken::HMACToken.new(secret)
-        hmac_token.expire_time = Time.now + expire_time
+        hmac_token.expire_time = Time.current + expire_time
         hmac_token[:data] = { actor: actor_name }
         hmac_token.encoded
       end

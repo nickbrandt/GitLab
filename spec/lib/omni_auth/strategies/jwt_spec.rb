@@ -9,7 +9,7 @@ RSpec.describe OmniAuth::Strategies::Jwt do
   describe '#decoded' do
     subject { described_class.new({}) }
 
-    let(:timestamp) { Time.now.to_i }
+    let(:timestamp) { Time.current.to_i }
     let(:jwt_config) { Devise.omniauth_configs[:jwt] }
     let(:claims) do
       {

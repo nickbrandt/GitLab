@@ -53,7 +53,7 @@ RSpec.describe Gitlab::QuickActions::SpendTimeAndDateSeparator do
       it_behaves_like 'arg line with valid parameters' do
         let(:valid_arg) { '2m 3m 5m 1h' }
         let(:time) { Gitlab::TimeTrackingFormatter.parse(valid_arg) }
-        let(:date) { DateTime.now.to_date }
+        let(:date) { DateTime.current.to_date }
         let(:expected_response) { [time, date] }
       end
     end

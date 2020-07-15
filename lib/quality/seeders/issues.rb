@@ -40,7 +40,7 @@ module Quality
 
           created_at += 1.week
 
-          break if created_at > Time.now
+          break if created_at > Time.current
         end
 
         created_issues_count

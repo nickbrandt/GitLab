@@ -39,12 +39,12 @@ module Gitlab
         response = Client.new(@user, @label).request_access
         @access = response.successful?
         @reason = response.reason
-        @loaded_at = Time.now
+        @loaded_at = Time.current
         cache.store(@access, @reason, @loaded_at) if response.valid?
       rescue ::Gitlab::ExternalAuthorization::RequestFailed => e
         @access = false
         @reason = e.message
-        @loaded_at = Time.now
+        @loaded_at = Time.current
       end
 
       def cache

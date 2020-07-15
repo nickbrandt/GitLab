@@ -9,7 +9,7 @@ module Gitlab
           ::Environment.find_by(id: environment_id).try do |environment|
             environment_slug = environment.slug
             timeframe_start = 8.hours.ago.to_f
-            timeframe_end = Time.now.to_f
+            timeframe_end = Time.current.to_f
 
             memory_query = raw_memory_usage_query(environment_slug)
             cpu_query = raw_cpu_usage_query(environment_slug)

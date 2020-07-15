@@ -22,7 +22,7 @@ module API
             hostname:    process['hostname'],
             pid:         process['pid'],
             tag:         process['tag'],
-            started_at:  Time.at(process['started_at']),
+            started_at:  Time.zone.at(process['started_at']),
             queues:      process['queues'],
             labels:      process['labels'],
             concurrency: process['concurrency'],

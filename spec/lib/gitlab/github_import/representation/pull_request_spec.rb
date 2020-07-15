@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::GithubImport::Representation::PullRequest do
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:updated_at) { Time.new(2017, 1, 1, 12, 15) }
-  let(:merged_at) { Time.new(2017, 1, 1, 12, 17) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:updated_at) { Time.zone.local(2017, 1, 1, 12, 15) }
+  let(:merged_at) { Time.zone.local(2017, 1, 1, 12, 17) }
 
   shared_examples 'a PullRequest' do
     it 'returns an instance of PullRequest' do

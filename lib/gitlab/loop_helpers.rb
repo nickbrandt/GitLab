@@ -10,12 +10,12 @@ module Gitlab
     def loop_until(timeout: nil, limit: 1_000_000)
       raise ArgumentError unless limit
 
-      start = Time.now
+      start = Time.current
 
       limit.times do
         return true unless yield
 
-        return false if timeout && (Time.now - start) > timeout
+        return false if timeout && (Time.current - start) > timeout
       end
 
       false

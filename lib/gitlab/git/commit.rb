@@ -397,7 +397,7 @@ module Gitlab
         if author.timezone.present?
           Time.strptime("#{author.date.seconds} #{author.timezone}", '%s %z')
         else
-          Time.at(author.date.seconds).utc
+          Time.zone.at(author.date.seconds).utc
         end
       end
 

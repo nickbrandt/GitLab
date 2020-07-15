@@ -48,7 +48,7 @@ module Gitlab
     #           ensures we don't indefinitely block a caller in case a job takes
     #           long to process, or is never processed.
     def wait(timeout = 10)
-      deadline = Time.now.utc + timeout
+      deadline = Time.current.utc + timeout
       increment_counter(STARTED_METRIC)
 
       Gitlab::Redis::SharedState.with do |redis|
@@ -59,7 +59,7 @@ module Gitlab
         while jobs_remaining > 0
           # Redis will not take fractional seconds. Prefer waiting too long over
           # not waiting long enough
-          seconds_left = (deadline - Time.now.utc).ceil
+          seconds_left = (deadline - Time.current.utc).ceil
 
           # Redis interprets 0 as "wait forever", so skip the final `blpop` call
           break if seconds_left <= 0

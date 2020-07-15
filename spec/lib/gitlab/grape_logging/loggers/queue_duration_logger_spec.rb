@@ -6,7 +6,7 @@ RSpec.describe Gitlab::GrapeLogging::Loggers::QueueDurationLogger do
   subject { described_class.new }
 
   describe ".parameters" do
-    let(:start_time) { Time.new(2018, 01, 01) }
+    let(:start_time) { Time.zone.local(2018, 01, 01) }
 
     describe 'when no proxy time is available' do
       let(:mock_request) { OpenStruct.new(env: {}) }

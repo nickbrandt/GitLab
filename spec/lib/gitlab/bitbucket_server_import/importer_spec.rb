@@ -9,7 +9,7 @@ RSpec.describe Gitlab::BitbucketServerImport::Importer do
   let(:user) { 'bitbucket' }
   let(:password) { 'test' }
   let(:project) { create(:project, :repository, import_url: import_url) }
-  let(:now) { Time.now.utc.change(usec: 0) }
+  let(:now) { Time.current.utc.change(usec: 0) }
   let(:project_key) { 'TEST' }
   let(:repo_slug) { 'rouge' }
   let(:sample) { RepoHelpers.sample_compare }
@@ -68,8 +68,8 @@ RSpec.describe Gitlab::BitbucketServerImport::Importer do
         state: 'merged',
         author: 'Test Author',
         author_email: project.owner.email,
-        created_at: Time.now,
-        updated_at: Time.now,
+        created_at: Time.current,
+        updated_at: Time.current,
         raw: {},
         merged?: true)
 
@@ -312,8 +312,8 @@ RSpec.describe Gitlab::BitbucketServerImport::Importer do
         state: 'merged',
         author: 'Test Author',
         author_email: project.owner.email,
-        created_at: Time.now,
-        updated_at: Time.now,
+        created_at: Time.current,
+        updated_at: Time.current,
         merged?: true)
 
       expect(subject.client).to receive(:pull_requests).and_return([pull_request])

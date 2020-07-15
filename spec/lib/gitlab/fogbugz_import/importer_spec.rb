@@ -26,8 +26,8 @@ RSpec.describe Gitlab::FogbugzImport::Importer do
       fOpen: 'false',
       sTitle: 'Closed bug',
       sLatestTextSummary: "",
-      dtOpened: Time.now.to_s,
-      dtLastUpdated: Time.now.to_s,
+      dtOpened: Time.current.to_s,
+      dtLastUpdated: Time.current.to_s,
       events: { event: [] }
     }.with_indifferent_access
   end
@@ -37,8 +37,8 @@ RSpec.describe Gitlab::FogbugzImport::Importer do
       fOpen: 'true',
       sTitle: 'Opened bug',
       sLatestTextSummary: "",
-      dtOpened: Time.now.to_s,
-      dtLastUpdated: Time.now.to_s,
+      dtOpened: Time.current.to_s,
+      dtLastUpdated: Time.current.to_s,
       events: { event: [] }
     }.with_indifferent_access
   end

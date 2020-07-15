@@ -57,7 +57,7 @@ RSpec.describe Gitlab::SidekiqMiddleware::DuplicateJobs::Strategies::UntilExecut
         context 'scheduled in the past' do
           it 'adds the jid of the existing job to the job hash' do
             allow(fake_duplicate_job).to receive(:scheduled?).twice.and_return(true)
-            allow(fake_duplicate_job).to receive(:scheduled_at).and_return(Time.now - time_diff)
+            allow(fake_duplicate_job).to receive(:scheduled_at).and_return(Time.current - time_diff)
             allow(fake_duplicate_job).to receive(:options).and_return({ including_scheduled: true })
             allow(fake_duplicate_job).to(
               receive(:check!)
@@ -79,7 +79,7 @@ RSpec.describe Gitlab::SidekiqMiddleware::DuplicateJobs::Strategies::UntilExecut
           it 'adds the jid of the existing job to the job hash' do
             Timecop.freeze do
               allow(fake_duplicate_job).to receive(:scheduled?).twice.and_return(true)
-              allow(fake_duplicate_job).to receive(:scheduled_at).and_return(Time.now + time_diff)
+              allow(fake_duplicate_job).to receive(:scheduled_at).and_return(Time.current + time_diff)
               allow(fake_duplicate_job).to receive(:options).and_return({ including_scheduled: true })
               allow(fake_duplicate_job).to(
                 receive(:check!).with(time_diff.to_i).and_return('the jid'))

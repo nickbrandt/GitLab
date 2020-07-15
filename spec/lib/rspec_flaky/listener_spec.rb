@@ -128,7 +128,7 @@ RSpec.describe RspecFlaky::Listener, :aggregate_failures do
       it 'changes the flaky examples hash' do
         new_example = RspecFlaky::Example.new(rspec_example)
 
-        now = Time.now
+        now = Time.current
         Timecop.freeze(now) do
           expect { listener.example_passed(notification) }
             .to change { listener.flaky_examples[new_example.uid].to_h }
@@ -155,7 +155,7 @@ RSpec.describe RspecFlaky::Listener, :aggregate_failures do
       it 'changes the all flaky examples hash' do
         new_example = RspecFlaky::Example.new(rspec_example)
 
-        now = Time.now
+        now = Time.current
         Timecop.freeze(now) do
           expect { listener.example_passed(notification) }
             .to change { listener.flaky_examples[new_example.uid].to_h }

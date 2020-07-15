@@ -27,8 +27,8 @@ RSpec.describe Gitlab::PhabricatorImport::Representation::Task do
         title: 'Title'.ljust(255, '.'),
         description: '# This is markdown\n it can contain more text.',
         state: :closed,
-        created_at: Time.at(1518688921),
-        closed_at: Time.at(1518789995)
+        created_at: Time.zone.at(1518688921),
+        closed_at: Time.zone.at(1518789995)
       }
 
       expect(task.issue_attributes).to eq(expected_attributes)

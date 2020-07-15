@@ -7,8 +7,8 @@ RSpec.describe Gitlab::GithubImport::Importer::ReleasesImporter do
   let(:client) { double(:client) }
   let(:importer) { described_class.new(project, client) }
   let(:github_release_name) { 'Initial Release' }
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:released_at) { Time.new(2017, 1, 1, 12, 00) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:released_at) { Time.zone.local(2017, 1, 1, 12, 00) }
 
   let(:github_release) do
     double(

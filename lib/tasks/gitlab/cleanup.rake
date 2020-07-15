@@ -102,7 +102,7 @@ namespace :gitlab do
       desc "GitLab | Cleanup | Sessions | Clean ActiveSession lookup keys"
       task active_sessions_lookup_keys: :gitlab_environment do
         session_key_pattern = "#{Gitlab::Redis::SharedState::USER_SESSIONS_LOOKUP_NAMESPACE}:*"
-        last_save_check = Time.at(0)
+        last_save_check = Time.zone.at(0)
         wait_time = 10.seconds
         cursor = 0
         total_users_scanned = 0
@@ -112,12 +112,12 @@ namespace :gitlab do
             cursor, keys = redis.scan(cursor, match: session_key_pattern)
             total_users_scanned += keys.count
 
-            if last_save_check < Time.now - 1.second
+            if last_save_check < Time.current - 1.second
               while redis.info('persistence')['rdb_bgsave_in_progress'] == '1'
                 puts "BGSAVE in progress, waiting #{wait_time} seconds"
                 sleep(wait_time)
               end
-              last_save_check = Time.now
+              last_save_check = Time.current
             end
 
             keys.each do |key|

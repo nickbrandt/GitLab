@@ -18,8 +18,8 @@ module RspecFlaky
     end
 
     def update_flakiness!(last_attempts_count: nil)
-      self.first_flaky_at ||= Time.now
-      self.last_flaky_at = Time.now
+      self.first_flaky_at ||= Time.current
+      self.last_flaky_at = Time.current
       self.flaky_reports += 1
       self.last_attempts_count = last_attempts_count if last_attempts_count
 

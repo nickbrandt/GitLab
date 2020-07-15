@@ -232,7 +232,7 @@ RSpec.describe Gitlab::ImportExport::Project::RelationFactory do
       {
         'id' => 99,
         'merge_request_id' => 99,
-        'merged_at' => Time.now,
+        'merged_at' => Time.current,
         'merged_by_id' => 99,
         'latest_closed_at' => nil,
         'latest_closed_by_id' => nil

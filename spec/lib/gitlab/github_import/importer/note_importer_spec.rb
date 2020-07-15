@@ -6,8 +6,8 @@ RSpec.describe Gitlab::GithubImport::Importer::NoteImporter do
   let(:client) { double(:client) }
   let(:project) { create(:project) }
   let(:user) { create(:user) }
-  let(:created_at) { Time.new(2017, 1, 1, 12, 00) }
-  let(:updated_at) { Time.new(2017, 1, 1, 12, 15) }
+  let(:created_at) { Time.zone.local(2017, 1, 1, 12, 00) }
+  let(:updated_at) { Time.zone.local(2017, 1, 1, 12, 15) }
 
   let(:github_note) do
     Gitlab::GithubImport::Representation::Note.new(

@@ -273,10 +273,10 @@ module Gitlab
         hash = {
           id: response.commit_id,
           message: message,
-          authored_date: Time.at(response.commit_author.date.seconds),
+          authored_date: Time.zone.at(response.commit_author.date.seconds),
           author_name: response.commit_author.name.dup,
           author_email: response.commit_author.email.dup,
-          committed_date: Time.at(response.commit_committer.date.seconds),
+          committed_date: Time.zone.at(response.commit_committer.date.seconds),
           committer_name: response.commit_committer.name.dup,
           committer_email: response.commit_committer.email.dup
         }

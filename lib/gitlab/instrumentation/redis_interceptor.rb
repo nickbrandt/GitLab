@@ -8,7 +8,7 @@ module Gitlab
       APDEX_EXCLUDE = %w[brpop blpop brpoplpush bzpopmin bzpopmax xread xreadgroup].freeze
 
       def call(*args, &block)
-        start = Time.now # must come first so that 'start' is always defined
+        start = Time.current # must come first so that 'start' is always defined
         instrumentation_class.instance_count_request
         instrumentation_class.redis_cluster_validate!(args.first)
 
@@ -17,7 +17,7 @@ module Gitlab
         instrumentation_class.instance_count_exception(ex)
         raise ex
       ensure
-        duration = Time.now - start
+        duration = Time.current - start
 
         unless APDEX_EXCLUDE.include?(command_from_args(args))
           instrumentation_class.instance_observe_duration(duration)

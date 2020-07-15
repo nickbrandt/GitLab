@@ -14,7 +14,7 @@ module BitbucketServer
       end
 
       def self.convert_timestamp(time_usec)
-        Time.at(time_usec / 1000) if time_usec.is_a?(Integer)
+        Time.zone.at(time_usec / 1000) if time_usec.is_a?(Integer)
       end
     end
   end

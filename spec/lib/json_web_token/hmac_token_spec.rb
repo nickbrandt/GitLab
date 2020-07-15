@@ -60,7 +60,7 @@ RSpec.describe JSONWebToken::HMACToken do
         it "raises exception saying 'Signature has expired'" do
           # Needs to be 120 seconds, because the default expiry is 60 seconds
           # with an additional 60 second leeway.
-          Timecop.freeze(Time.now + 120) do
+          Timecop.freeze(Time.current + 120) do
             expect { decoded_token }.to raise_error(JWT::ExpiredSignature, 'Signature has expired')
           end
         end
@@ -70,7 +70,7 @@ RSpec.describe JSONWebToken::HMACToken do
     context 'with a valid token' do
       let(:encoded_token) do
         hmac_token = described_class.new(secret)
-        hmac_token.expire_time = Time.now + expire_time
+        hmac_token.expire_time = Time.current + expire_time
         hmac_token.encoded
       end
 
@@ -78,7 +78,7 @@ RSpec.describe JSONWebToken::HMACToken do
         let(:expire_time) { 0 }
 
         context 'with the default leeway' do
-          Timecop.freeze(Time.now + 1) do
+          Timecop.freeze(Time.current + 1) do
             it_behaves_like 'a valid, non-expired token'
           end
         end
@@ -87,7 +87,7 @@ RSpec.describe JSONWebToken::HMACToken do
           let(:leeway) { 0 }
 
           it "raises exception saying 'Signature has expired'" do
-            Timecop.freeze(Time.now + 1) do
+            Timecop.freeze(Time.current + 1) do
               expect { decoded_token }.to raise_error(JWT::ExpiredSignature, 'Signature has expired')
             end
           end

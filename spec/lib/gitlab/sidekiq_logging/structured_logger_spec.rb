@@ -250,7 +250,7 @@ RSpec.describe Gitlab::SidekiqLogging::StructuredLogger do
   describe '#add_time_keys!' do
     let(:time) { { duration: 0.1231234, cputime: 1.2342345 } }
     let(:payload) { { 'class' => 'my-class', 'message' => 'my-message', 'job_status' => 'my-job-status' } }
-    let(:current_utc_time) { Time.now.utc }
+    let(:current_utc_time) { Time.current.utc }
     let(:payload_with_time_keys) { { 'class' => 'my-class', 'message' => 'my-message', 'job_status' => 'my-job-status', 'duration_s' => 0.123123, 'cpu_s' => 1.234235, 'completed_at' => current_utc_time.to_f } }
 
     subject { described_class.new }

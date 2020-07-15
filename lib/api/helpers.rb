@@ -19,7 +19,7 @@ module API
     end
 
     def check_unmodified_since!(last_modified)
-      if_unmodified_since = Time.parse(headers['If-Unmodified-Since']) rescue nil
+      if_unmodified_since = Time.zone.parse(headers['If-Unmodified-Since']) rescue nil
 
       if if_unmodified_since && last_modified && last_modified > if_unmodified_since
         render_api_error!('412 Precondition Failed', 412)

@@ -51,7 +51,7 @@ module Gitlab
         # Don't try to parse a time if there was no cache
         return unless @refreshed_at.present?
 
-        Time.parse(@refreshed_at)
+        Time.zone.parse(@refreshed_at)
       end
 
       def cache_key

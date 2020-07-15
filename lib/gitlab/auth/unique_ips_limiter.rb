@@ -26,7 +26,7 @@ module Gitlab
         end
 
         def update_and_return_ips_count(user_id, ip)
-          time = Time.now.utc.to_i
+          time = Time.current.utc.to_i
           key = "#{USER_UNIQUE_IPS_PREFIX}:#{user_id}"
 
           Gitlab::Redis::SharedState.with do |redis|

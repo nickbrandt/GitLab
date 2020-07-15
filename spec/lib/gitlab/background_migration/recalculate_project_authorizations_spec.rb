@@ -128,7 +128,7 @@ RSpec.describe Gitlab::BackgroundMigration::RecalculateProjectAuthorizations, sc
         projects_table.create!(id: 1, name: 'group-project', path: 'group-project',
                                visibility_level: 0, namespace_id: group.id)
         members_table.create!(user_id: user.id, source_id: group.id, source_type: 'Namespace',
-                              type: 'GroupMember', access_level: 20, requested_at: Time.now, notification_level: 3)
+                              type: 'GroupMember', access_level: 20, requested_at: Time.current, notification_level: 3)
       end
 
       it 'does not create authorization' do
@@ -143,7 +143,7 @@ RSpec.describe Gitlab::BackgroundMigration::RecalculateProjectAuthorizations, sc
         projects_table.create!(id: 1, name: 'group-project', path: 'group-project',
                                visibility_level: 0, namespace_id: sub_group.id)
         members_table.create!(user_id: user.id, source_id: group.id, source_type: 'Namespace',
-                              type: 'GroupMember', access_level: 20, requested_at: Time.now, notification_level: 3)
+                              type: 'GroupMember', access_level: 20, requested_at: Time.current, notification_level: 3)
       end
 
       it 'does not create authorization' do
@@ -156,7 +156,7 @@ RSpec.describe Gitlab::BackgroundMigration::RecalculateProjectAuthorizations, sc
         project = projects_table.create!(id: 1, name: 'group-project', path: 'group-project',
                                          visibility_level: 0, namespace_id: group.id)
         members_table.create!(user_id: user.id, source_id: project.id, source_type: 'Project',
-                              type: 'ProjectMember', access_level: 20, requested_at: Time.now, notification_level: 3)
+                              type: 'ProjectMember', access_level: 20, requested_at: Time.current, notification_level: 3)
       end
 
       it 'does not create authorization' do
@@ -167,7 +167,7 @@ RSpec.describe Gitlab::BackgroundMigration::RecalculateProjectAuthorizations, sc
     context 'shared group' do
       before do
         members_table.create!(user_id: user.id, source_id: group.id, source_type: 'Namespace',
-                              type: 'GroupMember', access_level: 30, requested_at: Time.now, notification_level: 3)
+                              type: 'GroupMember', access_level: 30, requested_at: Time.current, notification_level: 3)
 
         shared_group = namespaces_table.create!(type: 'Group', name: 'shared group',
                                                 path: 'shared-group')
@@ -186,7 +186,7 @@ RSpec.describe Gitlab::BackgroundMigration::RecalculateProjectAuthorizations, sc
     context 'shared project' do
       before do
         members_table.create!(user_id: user.id, source_id: group.id, source_type: 'Namespace',
-                              type: 'GroupMember', access_level: 30, requested_at: Time.now, notification_level: 3)
+                              type: 'GroupMember', access_level: 30, requested_at: Time.current, notification_level: 3)
 
         another_group = namespaces_table.create!(type: 'Group', name: 'another group', path: 'another-group')
         shared_project = projects_table.create!(id: 1, name: 'shared project', path: 'shared-project',
