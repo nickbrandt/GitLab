@@ -53,4 +53,20 @@ RSpec.describe EE::RegistrationsHelper do
       end
     end
   end
+
+  describe '#in_oauth_flow?' do
+    where(:user_return_to_path, :expected_result) do
+      '/oauth/authorize?client_id=x&redirect_uri=y&response_type=code&state=z' | true
+      '/foo'                                                                   | false
+      nil                                                                      | nil
+    end
+
+    with_them do
+      it 'returns the expected_result' do
+        allow(helper).to receive(:session).and_return('user_return_to' => user_return_to_path)
+
+        expect(helper.in_oauth_flow?).to eq(expected_result)
+      end
+    end
+  end
 end
