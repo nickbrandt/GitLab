@@ -346,7 +346,12 @@ export function objectToQuery(obj) {
  * @param {Boolean} clearParams Indicates whether existing query params should be removed or not
  * @returns {String} A copy of the original with the updated query params
  */
-export const setUrlParams = (params, url = window.location.href, clearParams = false) => {
+export const setUrlParams = (
+  params,
+  url = window.location.href,
+  clearParams = false,
+  railsArraySyntax = false,
+) => {
   const urlObj = new URL(url);
   const queryString = urlObj.search;
   const searchParams = clearParams ? new URLSearchParams('') : new URLSearchParams(queryString);
@@ -355,11 +360,12 @@ export const setUrlParams = (params, url = window.location.href, clearParams = f
     if (params[key] === null || params[key] === undefined) {
       searchParams.delete(key);
     } else if (Array.isArray(params[key])) {
+      const keyName = railsArraySyntax ? `${key}[]` : key;
       params[key].forEach((val, idx) => {
         if (idx === 0) {
-          searchParams.set(key, val);
+          searchParams.set(keyName, val);
         } else {
-          searchParams.append(key, val);
+          searchParams.append(keyName, val);
         }
       });
     } else {

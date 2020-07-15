@@ -296,7 +296,7 @@ export default {
       const ignored = ['utf8', 'state'];
       const params = omit(this.filters, ignored);
 
-      historyPushState(setUrlParams(params, window.location.href, true));
+      historyPushState(setUrlParams(params, window.location.href, true, true));
       this.fetchIssuables();
     },
     handleFilter(filters) {
