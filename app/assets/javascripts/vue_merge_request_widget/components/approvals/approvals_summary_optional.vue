@@ -1,7 +1,10 @@
 <script>
 import { GlTooltipDirective, GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import { OPTIONAL, OPTIONAL_CAN_APPROVE } from './messages';
+import {
+  OPTIONAL,
+  OPTIONAL_CAN_APPROVE,
+} from '~/vue_merge_request_widget/components/approvals/messages';
 
 export default {
   components: {

@@ -2,7 +2,7 @@
 import { n__, sprintf } from '~/locale';
 import { toNounSeriesText } from '~/lib/utils/grammar';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-import { APPROVED_MESSAGE } from './messages';
+import { APPROVED_MESSAGE } from '~/vue_merge_request_widget/components/approvals/messages';
 
 export default {
   components: {

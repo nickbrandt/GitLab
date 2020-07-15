@@ -10,7 +10,6 @@ import BlockingMergeRequestsReport from './components/blocking_merge_requests/bl
 
 import { s__, __, sprintf } from '~/locale';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
-import MrWidgetApprovals from './components/approvals/approvals.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
 import MrWidgetPolicyViolation from './components/states/mr_widget_policy_violation.vue';
 import MergeTrainHelperText from './components/merge_train_helper_text.vue';
@@ -20,7 +19,6 @@ export default {
   components: {
     MergeTrainHelperText,
     MrWidgetLicenses,
-    MrWidgetApprovals,
     MrWidgetGeoSecondaryNode,
     MrWidgetPolicyViolation,
     BlockingMergeRequestsReport,
@@ -41,9 +39,6 @@ export default {
     };
   },
   computed: {
-    shouldRenderApprovals() {
-      return this.mr.hasApprovalsAvailable && this.mr.state !== 'nothingToMerge';
-    },
     shouldRenderLicenseReport() {
       return this.mr.enabledReports?.licenseScanning;
     },
@@ -193,10 +188,7 @@ export default {
 
       return {
         ...base,
-        apiApprovalsPath: store.apiApprovalsPath,
         apiApprovalSettingsPath: store.apiApprovalSettingsPath,
-        apiApprovePath: store.apiApprovePath,
-        apiUnapprovePath: store.apiUnapprovePath,
       };
     },
 

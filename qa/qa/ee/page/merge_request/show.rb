@@ -36,11 +36,11 @@ module QA
                 element :expand_report_button
               end
 
-              view 'ee/app/assets/javascripts/vue_merge_request_widget/components/approvals/approvals.vue' do
+              view 'app/assets/javascripts/vue_merge_request_widget/components/approvals/approvals.vue' do
                 element :approve_button
               end
 
-              view 'ee/app/assets/javascripts/vue_merge_request_widget/components/approvals/approvals_summary.vue' do
+              view 'app/assets/javascripts/vue_merge_request_widget/components/approvals/approvals_summary.vue' do
                 element :approvals_summary_content
               end
 
