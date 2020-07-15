@@ -100,31 +100,22 @@ module API
         end
 
         def milestones_finder_params(parent)
-          finder_params = {}
-
           if parent.is_a?(Group)
-            finder_params[:group_ids] = parent.id
+            { group_ids: parent.id }
           else
-            finder_params[:project_ids] = parent.id
-            finder_params[:group_ids] = parent_group_ids(parent)
+            {
+              project_ids: parent.id,
+              group_ids: parent_group_ids(parent)
+            }
           end
-
-          finder_params
         end
 
         def parent_group_ids(parent)
           return unless params[:include_parent_milestones].present?
-          return unless can_read_parent_group?(parent)
 
-          parent.group.self_and_descendants
-            .public_or_visible_to_user(current_user)
-            .select(:id)
-        end
-
-        def can_read_parent_group?(parent)
-          return unless parent&.group&.present?
-
-          Ability.allowed?(current_user, :read_group, parent.group)
+          parent.group.self_and_ancestors
+                      .public_or_visible_to_user(current_user)
+                      .select(:id)
         end
       end
     end

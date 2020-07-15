@@ -17,7 +17,7 @@ module API
       params do
         use :list_params
         optional :include_parent_milestones, type: Boolean, default: false,
-                  desc: 'Include milestones from parent group and descendants'
+                  desc: 'Include milestones from parent group and ancestors'
       end
       get ":id/milestones" do
         authorize! :read_milestone, user_project
