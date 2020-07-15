@@ -40,7 +40,7 @@ other internal references (refs) that are automatically created by GitLab. These
   [pipelines](../../../ci/pipelines/index.md#troubleshooting-fatal-reference-is-not-a-tree).
 - `refs/environments/*` for environments.
 
-Git doesn't usually download theses refs to make cloning and fetch faster, but we can use the `--mirror` option to
+Git doesn't usually download these refs to make cloning and fetch faster, but we can use the `--mirror` option to
 download all the advertised refs.
 
 1. [Install `git filter-repo`](https://github.com/newren/git-filter-repo/blob/main/INSTALL.md)
@@ -107,7 +107,7 @@ download all the advertised refs.
    git push origin --force 'refs/replace/*'
    ```
 
-   Refer to the Git documentation on [`replace`](https://git-scm.com/book/en/v2/Git-Tools-Replace) for how this works.
+   Refer to the Git [`replace`](https://git-scm.com/book/en/v2/Git-Tools-Replace) documentation for information on how this works.
 
 1. Run a [repository cleanup](#repository-cleanup).
 
@@ -117,9 +117,9 @@ to see a reduction in storage utilization.
 
 ## Purge files from GitLab storage
 
-In addition to the refs mentioned above, GitLab also created hidden `refs/keep-around/*` to prevent commits being
-deleted. Hidden refs are not advertised which means we can't download them using Git, but these refs are included in
-the project export.
+In addition to the refs mentioned above, GitLab also creates hidden `refs/keep-around/*`to prevent commits being deleted. Hidden refs are not advertised, which means we can't download them using Git, but these refs are included in a project export.
+
+To purge files from GitLab storage:
 
 1. [Install `git filter-repo`](https://github.com/newren/git-filter-repo/blob/main/INSTALL.md)
    using a supported package manager or from source.
@@ -167,12 +167,11 @@ the project export.
    [`git filter-repo` documentation](https://htmlpreview.github.io/?https://github.com/newren/git-filter-repo/blob/docs/html/git-filter-repo.html#EXAMPLES)
    for more examples and the complete documentation.
 
-1. Cloning from a bundle file will set the origin remote to the local bundle file. Delete this origin remote, and set
-   it to the URL to your repository.
+1. Because cloning from a bundle file sets the `origin` remote to the local bundle file, delete this `origin` remote, and set it to the URL to your repository:
 
    ```shell
    git remote remove origin
-   git remote add origin https://example.gitlab.com/<namespace>/<project_name>.git
+   git remote add origin https://gitlab.example.com/<namespace>/<project_name>.git
    ```
 
 1. Force push your changes to overwrite all branches on GitLab:
@@ -199,7 +198,7 @@ the project export.
    git push origin --force 'refs/replace/*'
    ```
 
-   Refer to the Git documentation on [`replace`](https://git-scm.com/book/en/v2/Git-Tools-Replace) for how this works.
+   Refer to the Git [`replace`](https://git-scm.com/book/en/v2/Git-Tools-Replace) documentation for information on how this works.
 
 1. Run a [repository cleanup](#repository-cleanup).
 
@@ -231,9 +230,9 @@ This will:
 
 - Remove any internal Git references to old commits.
 - Run `git gc` against the repository to remove unreferenced objects. Repacking your repository will temporarily
-  case the size of your repository to increase significantly, because the old pack files are not removed until the new
-  pack files have been created.
-- Recalculate the size of your repository on disk
+  cause the size of your repository to increase significantly, because the old pack files are not removed until the
+  new pack files have been created.
+- Recalculate the size of your repository on disk.
 
 You will receive an email notification with the recalculated repository size after the cleanup has completed.
 
