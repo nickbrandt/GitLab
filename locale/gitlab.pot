@@ -23828,7 +23828,7 @@ msgstr ""
 msgid "The repository is being updated..."
 msgstr ""
 
-msgid "The repository must be accessible over <code>http://</code>, <code>https://</code> or <code>git://</code>."
+msgid "The repository must be accessible over %{code_open}http://%{code_close}, %{code_open}https://%{code_close} or %{code_open}git://%{code_close}."
 msgstr ""
 
 msgid "The repository must be accessible over <code>http://</code>, <code>https://</code>, <code>ssh://</code> or <code>git://</code>."
@@ -26861,6 +26861,9 @@ msgid "When this merge request is accepted"
 msgid_plural "When these merge requests are accepted"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "When using the %{code_open}http://%{code_close} or %{code_open}https://%{code_close} protocols, please provide the exact URL to the repository. HTTP redirects will not be followed."
+msgstr ""
 
 msgid "When using the <code>http://</code> or <code>https://</code> protocols, please provide the exact URL to the repository. HTTP redirects will not be followed."
 msgstr ""

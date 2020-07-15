@@ -506,18 +506,6 @@
     - "CI配置文件的路径。默认为<code>.gitlab-ci.yml</code>"
     - "Шлях до кофігураційного файлу CI. За замовчуванням <code>.gitlab-ci.yml</code>"
     - "La ruta al archivo de configuración CI. Por defecto <code>.gitlab-ci.yml</code>"
-"The repository must be accessible over <code>http://</code>, <code>https://</code> or <code>git://</code>.":
-  plural_id:
-  translations:
-    - "O repositório deve ser acessível por <code>http://</code>, <code>https://</code> ou <code>git://</code>."
-    - "リポジトリには、<code>http://</code>、 <code>https://</code> または <code>git://</code>で接続できなければなりません。"
-    - "Репозиторий должен быть доступен через протоколы <code>http: //</code>, <code>https: //</code> или <code>git: //</code>."
-    - "该仓库必须可通过<code>http://</code>, <code>https://</code> 或 <code>git://</code>进行访问。"
-    - "Репозиторій має бути доступним через <code>http://</code>, <code>https://</code> або <code>git://</code>."
-    - "Das Repository muss über <code>http://</code>, <code>https://</code> oder <code>git://</code> erreichbar sein."
-    - "저장소를 <code>http://</code>, <code>https://</code> 또는 <code>git://</code> 통해 액세스할 수 있어야 합니다."
-    - "Le dépôt doit être accessible via <code>http://</code>, <code>https://</code> ou <code>git://</code>."
-    - "El repositorio debe ser accesible a través de <code>http://</code>, <code>https://</code> o <code>git://</code>."
 "The repository must be accessible over <code>http://</code>, <code>https://</code>, <code>ssh://</code> or <code>git://</code>.":
   plural_id:
   translations:
@@ -642,14 +630,6 @@
     - "Добро пожаловать в GitLab.com<br>@%{name}!"
     - "Ласкаво просимо до GitLab.com<br>@%{name}!"
     - "¡Bienvenido a GitLab.com<br>@%{name}!"
-"When using the <code>http://</code> or <code>https://</code> protocols, please provide the exact URL to the repository. HTTP redirects will not be followed.":
-  plural_id:
-  translations:
-    - "<code>http://</code> または <code>https://</code> プロトコルを使用する場合、リポジトリの正確なURLを指定してください。 HTTPリダイレクトは追跡されません。"
-    - "Используя <code>http://</code> или <code>https://</code> протокол, пожалуйста указывайте точный адрес репозитория. Переадресация выполняться не будет."
-    - "使用<code>http://</code>或<code>https://</code>协议时，请提供仓库的实际地址。不支持HTTP重定向。"
-    - "При використанні протоколів <code>http://</code> або <code>https://</code> вказуйте, будь ласка, точну URL-адресу репозиторію. Перенаправлення HTTP не будуть виконуватися."
-    - "Al utilizar los protocolos <code>http://</code> o <code>https://</code>, por favor, proporcione la URL exacta del repositorio. No se seguirán las redirecciones HTTP."
 "WikiMarkdownTip|To link to a (new) page, simply type <code class=\\\"js-markup-link-example\\\">%{link_example}</code>":
   plural_id:
   translations:
@@ -1053,3 +1033,23 @@
     - "GitHub 저장소 연결할때, %{personal_access_token_link}을 사용할 수 있습니다. 개인 엑세스 토큰을 생성할때 <code>repo</code> scope를 선택해야 연결에 사용할 수 있는 공개, 비공개 저장소가 표시되어 연결할 수 있게 됩니다."
     - "Pour connecter des dépôts GitHub, vous pouvez utiliser un %{personal_access_token_link}. Lorsque vous créerez votre jeton d’accès, vous devrez sélectionner la portée <code>dépôt</code>, afin de permettre l’affichage d’une liste de vos dépôts publics et privés disponibles à la connexion."
     - "Para conectar a los repositorios de GitHub, puede utilizar un %{personal_access_token_link}. Cuando cree su token de acceso personal, deberá seleccionar el alcance del <code>repo</code>, para que podamos mostrarle una lista de sus repositorios públicos y privados que están disponibles para conectarse."
+"The repository must be accessible over <code>http://</code>, <code>https://</code> or <code>git://</code>.":
+  plural_id:
+  translations:
+    - "O repositório deve ser acessível por <code>http://</code>, <code>https://</code> ou <code>git://</code>."
+    - "リポジトリには、<code>http://</code>、 <code>https://</code> または <code>git://</code>で接続できなければなりません。"
+    - "Репозиторий должен быть доступен через протоколы <code>http: //</code>, <code>https: //</code> или <code>git: //</code>."
+    - "该仓库必须可通过<code>http://</code>, <code>https://</code> 或 <code>git://</code>进行访问。"
+    - "Репозиторій має бути доступним через <code>http://</code>, <code>https://</code> або <code>git://</code>."
+    - "Das Repository muss über <code>http://</code>, <code>https://</code> oder <code>git://</code> erreichbar sein."
+    - "저장소를 <code>http://</code>, <code>https://</code> 또는 <code>git://</code> 통해 액세스할 수 있어야 합니다."
+    - "Le dépôt doit être accessible via <code>http://</code>, <code>https://</code> ou <code>git://</code>."
+    - "El repositorio debe ser accesible a través de <code>http://</code>, <code>https://</code> o <code>git://</code>."
+"When using the <code>http://</code> or <code>https://</code> protocols, please provide the exact URL to the repository. HTTP redirects will not be followed.":
+  plural_id:
+  translations:
+    - "<code>http://</code> または <code>https://</code> プロトコルを使用する場合、リポジトリの正確なURLを指定してください。 HTTPリダイレクトは追跡されません。"
+    - "Используя <code>http://</code> или <code>https://</code> протокол, пожалуйста указывайте точный адрес репозитория. Переадресация выполняться не будет."
+    - "使用<code>http://</code>或<code>https://</code>协议时，请提供仓库的实际地址。不支持HTTP重定向。"
+    - "При використанні протоколів <code>http://</code> або <code>https://</code> вказуйте, будь ласка, точну URL-адресу репозиторію. Перенаправлення HTTP не будуть виконуватися."
+    - "Al utilizar los protocolos <code>http://</code> o <code>https://</code>, por favor, proporcione la URL exacta del repositorio. No se seguirán las redirecciones HTTP."
