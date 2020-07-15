@@ -241,13 +241,6 @@
     - "Учасники <strong>%{project_name}</strong>"
     - "Miembros de <strong>%{project_name}</strong>"
     - "<strong>%{project_name}</strong> projesinin üyeleri"
-"Please refer to <a href=\\\"%{docs_url}\\\">%{docs_url}</a>":
-  plural_id:
-  translations:
-    - "<a href=\\\"%{docs_url}\\\">%{docs_url}</a>を参照してください"
-    - "请参考<a href=\\\"%{docs_url}\\\">%{docs_url}</a>"
-    - "Будь ласка перегляньте <a href=\\\"%{docs_url}\\\">%{docs_url}</a>"
-    - "Por favor, consulte <a href=\\\"%{docs_url}\\\">%{docs_url}</a>"
 "PrometheusService|<p class=\\\"text-tertiary\\\">No <a href=\\\"%{docsUrl}\\\">common metrics</a> were found</p>":
   plural_id:
   translations:
@@ -1053,3 +1046,10 @@
     - "Для того, чтобы адаптировать ваш опыт работы с GitLab<br>, мы хотели бы узнать о вас немного больше."
     - "Con el fin de adaptar su experiencia con GitLab<br>nos gustaría saber un poco más sobre usted."
     - "Для того, щоб персоналізувати ваш досвід роботи з GitLab<br>,ми хотіли б дізнатися більше про вас."
+"Please refer to <a href=\\\"%{docs_url}\\\">%{docs_url}</a>":
+  plural_id:
+  translations:
+    - "<a href=\\\"%{docs_url}\\\">%{docs_url}</a>を参照してください"
+    - "请参考<a href=\\\"%{docs_url}\\\">%{docs_url}</a>"
+    - "Будь ласка перегляньте <a href=\\\"%{docs_url}\\\">%{docs_url}</a>"
+    - "Por favor, consulte <a href=\\\"%{docs_url}\\\">%{docs_url}</a>"

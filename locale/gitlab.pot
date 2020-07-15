@@ -17713,7 +17713,7 @@ msgstr ""
 msgid "Please provide attributes to update"
 msgstr ""
 
-msgid "Please refer to <a href=\"%{docs_url}\">%{docs_url}</a>"
+msgid "Please refer to %{docs_url}"
 msgstr ""
 
 msgid "Please retype the email address."
