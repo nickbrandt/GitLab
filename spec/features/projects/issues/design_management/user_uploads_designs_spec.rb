@@ -11,77 +11,33 @@ RSpec.describe 'User uploads new design', :js do
 
   before do
     sign_in(user)
+    enable_design_management(feature_enabled)
+    visit project_issue_path(project, issue)
   end
 
-  context 'design_management_moved flag disabled' do
-    before do
-      enable_design_management(feature_enabled)
-      stub_feature_flags(design_management_moved: false)
-      visit project_issue_path(project, issue)
+  context "when the feature is available" do
+    let(:feature_enabled) { true }
 
-      click_link 'Designs'
+    it 'uploads designs', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/225616' do
+      attach_file(:design_file, logo_fixture, make_visible: true)
 
-      wait_for_requests
-    end
+      expect(page).to have_selector('.js-design-list-item', count: 1)
 
-    context "when the feature is available" do
-      let(:feature_enabled) { true }
-
-      it 'uploads designs' do
-        attach_file(:design_file, logo_fixture, make_visible: true)
-
-        expect(page).to have_selector('.js-design-list-item', count: 1)
-
-        within first('#designs-tab .js-design-list-item') do
-          expect(page).to have_content('dk.png')
-        end
-
-        attach_file(:design_file, gif_fixture, make_visible: true)
-
-        expect(page).to have_selector('.js-design-list-item', count: 2)
+      within first('[data-testid="designs-root"] .js-design-list-item') do
+        expect(page).to have_content('dk.png')
       end
-    end
 
-    context 'when the feature is not available' do
-      let(:feature_enabled) { false }
+      attach_file(:design_file, gif_fixture, make_visible: true)
 
-      it 'shows the message about requirements' do
-        expect(page).to have_content("To enable design management, you'll need to meet the requirements.")
-      end
+      expect(page).to have_selector('.js-design-list-item', count: 2)
     end
   end
 
-  context 'design_management_moved flag enabled' do
-    before do
-      enable_design_management(feature_enabled)
-      stub_feature_flags(design_management_moved: true)
-      visit project_issue_path(project, issue)
-    end
+  context 'when the feature is not available' do
+    let(:feature_enabled) { false }
 
-    context "when the feature is available" do
-      let(:feature_enabled) { true }
-
-      it 'uploads designs', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/225616' do
-        attach_file(:design_file, logo_fixture, make_visible: true)
-
-        expect(page).to have_selector('.js-design-list-item', count: 1)
-
-        within first('[data-testid="designs-root"] .js-design-list-item') do
-          expect(page).to have_content('dk.png')
-        end
-
-        attach_file(:design_file, gif_fixture, make_visible: true)
-
-        expect(page).to have_selector('.js-design-list-item', count: 2)
-      end
-    end
-
-    context 'when the feature is not available' do
-      let(:feature_enabled) { false }
-
-      it 'shows the message about requirements' do
-        expect(page).to have_content("To enable design management, you'll need to meet the requirements.")
-      end
+    it 'shows the message about requirements' do
+      expect(page).to have_content("To enable design management, you'll need to meet the requirements.")
     end
   end
 
