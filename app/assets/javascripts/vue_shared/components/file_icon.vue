@@ -24,6 +24,11 @@ export default {
       type: String,
       required: true,
     },
+    fileMode: {
+      type: Number,
+      required: false,
+      default: -1
+    },
 
     folder: {
       type: Boolean,
