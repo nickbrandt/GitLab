@@ -25,6 +25,14 @@
             {
                 "value": "Package morestrings implements additional functions to manipulate UTF-8 encoded strings, beyond what is provided in the standard \"strings\" package. \n\n"
             }
+        ],
+        "references": [
+            {
+                "path": "main.go#L8"
+            },
+            {
+                "path": "main.go#L9"
+            }
         ]
     },
     {
@@ -60,6 +68,11 @@
             {
                 "value": "This method reverses a string \n\n"
             }
+        ],
+        "references": [
+            {
+                "path": "main.go#L8"
+            }
         ]
     },
     {
@@ -87,6 +100,14 @@
             },
             {
                 "value": "Package morestrings implements additional functions to manipulate UTF-8 encoded strings, beyond what is provided in the standard \"strings\" package. \n\n"
+            }
+        ],
+        "references": [
+            {
+                "path": "main.go#L8"
+            },
+            {
+                "path": "main.go#L9"
             }
         ]
     },
@@ -119,6 +140,11 @@
                     ]
                 ],
                 "language": "go"
+            }
+        ],
+        "references": [
+            {
+                "path": "main.go#L9"
             }
         ]
     },
@@ -168,6 +194,14 @@
             },
             {
                 "value": "Package morestrings implements additional functions to manipulate UTF-8 encoded strings, beyond what is provided in the standard \"strings\" package. \n\n"
+            }
+        ],
+        "references": [
+            {
+                "path": "main.go#L8"
+            },
+            {
+                "path": "main.go#L9"
             }
         ]
     }
