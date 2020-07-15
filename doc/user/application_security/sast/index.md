@@ -314,12 +314,12 @@ The following variables configure the Docker-in-Docker orchestrator, and therefo
 
 Some analyzers can be customized with environment variables.
 
-| Environment variable        | Analyzer | Description |
-|-----------------------------|----------|-------------|
+| Environment variable                  | Analyzer             | Description |
+|---------------------------------------|----------------------|-------------|
 | `SCAN_KUBERNETES_MANIFESTS`           | Kubesec              | Set to `"true"` to scan Kubernetes manifests. |
 | `KUBESEC_HELM_CHARTS_PATH`            | Kubesec              | Optional path to Helm charts that `helm` will use to generate a Kubernetes manifest that `kubesec` will scan. If dependencies are defined, `helm dependency build` should be ran in a `before_script` to fetch the necessary dependencies. |
 | `KUBESEC_HELM_OPTIONS`                | Kubesec              | Additional arguments for the `helm` executable. |
-| `COMPILE`                             | SpotBugs             | Set to `"false"` to disable project compilation and dependency fetching |
+| `COMPILE`                             | SpotBugs             | Set to `false` to disable project compilation and dependency fetching. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/195252) in GitLab 13.1. |
 | `ANT_HOME`                            | SpotBugs             | The `ANT_HOME` environment variable. |
 | `ANT_PATH`                            | SpotBugs             | Path to the `ant` executable. |
 | `GRADLE_PATH`                         | SpotBugs             | Path to the `gradle` executable. |
