@@ -34,6 +34,10 @@ module Gitlab
         ::Feature.enabled?(:ci_pipeline_latest, default_enabled: true)
       end
 
+      def self.pipeline_status_omit_commit_sha_in_cache_key?(project)
+        Feature.enabled?(:ci_pipeline_status_omit_commit_sha_in_cache_key, project)
+      end
+
       def self.release_generation_enabled?
         ::Feature.enabled?(:ci_release_generation)
       end
