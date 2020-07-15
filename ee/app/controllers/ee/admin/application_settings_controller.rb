@@ -55,7 +55,7 @@ module EE
           attrs << { compliance_frameworks: [] }
         end
 
-        if ::License.feature_available?(:geo) && ::Feature.enabled?(:maintenance_mode)
+        if ::Gitlab::Geo.license_allows? && ::Feature.enabled?(:maintenance_mode)
           attrs << :maintenance_mode
           attrs << :maintenance_mode_message
         end
