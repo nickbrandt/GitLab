@@ -55,6 +55,7 @@ describe('Security Dashboard Table Row', () => {
 
     it('should render a `` for the report type and scanner', () => {
       expect(findContent(3).text()).toEqual('');
+      expect(wrapper.find('vulnerability-vendor').exists()).toBeFalsy();
     });
 
     it('should not render action buttons', () => {

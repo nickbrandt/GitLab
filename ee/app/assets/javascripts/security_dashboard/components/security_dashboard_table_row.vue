@@ -71,7 +71,7 @@ export default {
       return convertReportType(this.vulnerability.report_type);
     },
     vulnerabilityVendor() {
-      return this.vulnerability.scanner?.vendor || '';
+      return this.vulnerability.scanner?.vendor;
     },
   },
   methods: {
@@ -162,7 +162,7 @@ export default {
         <div class="text-capitalize">
           {{ useConvertReportType }}
         </div>
-        <div class="gl-text-gray-500">
+        <div v-if="vulnerabilityVendor" class="gl-text-gray-500" data-testid="vulnerability-vendor">
           {{ vulnerabilityVendor }}
         </div>
       </div>
