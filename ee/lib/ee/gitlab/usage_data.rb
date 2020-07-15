@@ -76,7 +76,9 @@ module EE
           if license
             usage_data[:license_md5] = license.md5
             usage_data[:license_id] = license.license_id
+            # rubocop: disable UsageData/LargeTable
             usage_data[:historical_max_users] = ::HistoricalData.max_historical_user_count
+            # rubocop: enable UsageData/LargeTable
             usage_data[:licensee] = license.licensee
             usage_data[:license_user_count] = license.restricted_user_count
             usage_data[:license_starts_at] = license.starts_at
@@ -98,6 +100,9 @@ module EE
         end
 
         def approval_rules_counts
+          # rubocop: disable UsageData/LargeTable:
+          projects_with_service_desk = ::Project.where(service_desk_enabled: true)
+          # rubocop: enable UsageData/LargeTable:
           {
             approval_project_rules: count(ApprovalProjectRule),
             approval_project_rules_with_target_branch: count(ApprovalProjectRulesProtectedBranch, :approval_project_rule_id)
@@ -192,7 +197,9 @@ module EE
         end
 
         def epics_deepest_relationship_level
+          # rubocop: disable UsageData/LargeTable
           { epics_deepest_relationship_level: ::Epic.deepest_relationship_level.to_i }
+          # rubocop: enable UsageData/LargeTable
         end
 
         # Omitted because no user, creator or author associated: `auto_devops_disabled`, `auto_devops_enabled`
