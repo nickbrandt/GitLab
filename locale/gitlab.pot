@@ -5879,6 +5879,9 @@ msgstr ""
 msgid "CodeIntelligence|This is the definition"
 msgstr ""
 
+msgid "CodeNavigation|No references found"
+msgstr ""
+
 msgid "CodeOwner|Pattern"
 msgstr ""
 
@@ -7507,6 +7510,9 @@ msgid "Define custom rules for what constitutes spam, independent of Akismet"
 msgstr ""
 
 msgid "Define environments in the deploy stage(s) in <code>.gitlab-ci.yml</code> to track deployments here."
+msgstr ""
+
+msgid "Definition"
 msgstr ""
 
 msgid "Delayed Project Deletion (%{adjourned_deletion})"
@@ -19177,6 +19183,9 @@ msgid "Reduce this project’s visibility?"
 msgstr ""
 
 msgid "Reference:"
+msgstr ""
+
+msgid "References"
 msgstr ""
 
 msgid "Refresh"
