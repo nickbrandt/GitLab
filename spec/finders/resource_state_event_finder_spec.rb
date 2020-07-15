@@ -4,39 +4,35 @@ require 'spec_helper'
 
 RSpec.describe ResourceStateEventFinder do
   let_it_be(:user) { create(:user) }
-  let_it_be(:issue_project) { create(:project) }
-  let_it_be(:issue) { create(:issue, project: issue_project) }
 
   describe '#execute' do
     subject { described_class.new(user, issue).execute }
 
+    let(:project) { create(:project) }
+    let(:issue) { create(:issue, project: project) }
+
+    let!(:event) { create(:resource_state_event, issue: issue) }
+
     it 'returns events accessible by user' do
-      event = create(:resource_state_event, issue: issue)
-      issue_project.add_guest(user)
+      project.add_guest(user)
 
       expect(subject).to eq [event]
     end
 
-    it 'filters events if issues and MRs are private' do
-      project = create(:project, :public, :issues_private, :merge_requests_private)
-      issue = create(:issue, project: project)
-      merge_request = create(:merge_request, source_project: project)
+    context 'when issues are private' do
+      let(:project) { create(:project, :public, :issues_private) }
 
-      create(:resource_state_event, issue: issue)
-      create(:resource_state_event, merge_request: merge_request)
-
-      expect(subject).to be_empty
+      it 'does not return any events' do
+        expect(subject).to be_empty
+      end
     end
 
-    it 'filters events not accessible by user' do
-      project = create(:project, :private)
-      issue = create(:issue, project: project)
-      merge_request = create(:merge_request, source_project: project)
+    context 'when issue is not accesible to the user' do
+      let(:project) { create(:project, :private) }
 
-      create(:resource_state_event, issue: issue)
-      create(:resource_state_event, merge_request: merge_request)
-
-      expect(subject).to be_empty
+      it 'does not return any events' do
+        expect(subject).to be_empty
+      end
     end
   end
 
@@ -45,7 +41,7 @@ RSpec.describe ResourceStateEventFinder do
 
     subject { described_class.new(user, eventable).can_read_eventable? }
 
-    context 'when eventable is a Issue' do
+    context 'when eventable is an Issue' do
       let(:eventable) { create(:issue, project: project) }
 
       context 'when issue is readable' do
