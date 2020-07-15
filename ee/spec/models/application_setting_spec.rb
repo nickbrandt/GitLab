@@ -41,6 +41,12 @@ RSpec.describe ApplicationSetting do
     it { is_expected.not_to allow_value(1.1).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_replicas) }
 
+    it { is_expected.to allow_value(10).for(:elasticsearch_indexed_file_size_limit_kb) }
+    it { is_expected.not_to allow_value(0).for(:elasticsearch_indexed_file_size_limit_kb) }
+    it { is_expected.not_to allow_value(nil).for(:elasticsearch_indexed_file_size_limit_kb) }
+    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_indexed_file_size_limit_kb) }
+    it { is_expected.not_to allow_value(-1).for(:elasticsearch_indexed_file_size_limit_kb) }
+
     it { is_expected.to allow_value(10).for(:elasticsearch_indexed_field_length_limit) }
     it { is_expected.to allow_value(0).for(:elasticsearch_indexed_field_length_limit) }
     it { is_expected.not_to allow_value(nil).for(:elasticsearch_indexed_field_length_limit) }
