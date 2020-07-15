@@ -488,68 +488,31 @@ RSpec.describe Project do
 
   context 'merge requests related settings' do
     shared_examples 'setting modified by application setting' do
-      context 'when compliance merge request approval settings feature flag is enabled' do
-        using RSpec::Parameterized::TableSyntax
-
-        where(:app_setting, :project_setting, :regulated_settings, :final_setting) do
-          true     | true      | true   | true
-          false    | true      | true   | false
-          true     | false     | true   | true
-          false    | false     | true   | false
-          true     | true      | false  | true
-          false    | true      | false  | true
-          true     | false     | false  | false
-          false    | false     | false  | false
-        end
-
-        with_them do
-          let(:project) { create(:project) }
-
-          before do
-            stub_feature_flags(project_compliance_merge_request_approval_settings: true)
-            stub_licensed_features(admin_merge_request_approvers_rules: true)
-
-            allow(project).to receive(:has_regulated_settings?).and_return(regulated_settings)
-            stub_application_setting(application_setting => app_setting)
-            project.update(setting => project_setting)
-          end
-
-          it 'shows proper setting' do
-            expect(project.send(setting)).to eq(final_setting)
-            expect(project.send("#{setting}?")).to eq(final_setting)
-          end
-        end
+      where(:app_setting, :project_setting, :regulated_settings, :final_setting) do
+        true  | true  | true  | true
+        false | true  | true  | false
+        true  | false | true  | true
+        false | false | true  | false
+        true  | true  | false | true
+        false | true  | false | true
+        true  | false | false | false
+        false | false | false | false
       end
 
-      context 'when compliance merge request approval settings feature flag is disabled' do
-        using RSpec::Parameterized::TableSyntax
+      with_them do
+        let(:project) { create(:project) }
 
-        where(:app_setting, :project_setting, :feature_enabled, :final_setting) do
-          true     | true      | true   | true
-          false    | true      | true   | true
-          true     | false     | true   | true
-          false    | false     | true   | false
-          true     | true      | false  | true
-          false    | true      | false  | true
-          true     | false     | false  | false
-          false    | false     | false  | false
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+
+          allow(project).to receive(:has_regulated_settings?).and_return(regulated_settings)
+          stub_application_setting(application_setting => app_setting)
+          project.update(setting => project_setting)
         end
 
-        with_them do
-          let(:project) { create(:project) }
-
-          before do
-            stub_feature_flags(project_compliance_merge_request_approval_settings: false)
-
-            stub_licensed_features(feature => feature_enabled)
-            stub_application_setting(application_setting => app_setting)
-            project.update(setting => project_setting)
-          end
-
-          it 'shows proper setting' do
-            expect(project.send(setting)).to eq(final_setting)
-            expect(project.send("#{setting}?")).to eq(final_setting)
-          end
+        it 'shows proper setting' do
+          expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
         end
       end
     end
@@ -576,66 +539,31 @@ RSpec.describe Project do
       let(:setting) { :merge_requests_author_approval }
       let(:application_setting) { :prevent_merge_requests_author_approval }
 
-      context 'when compliance merge request approval settings feature flag is enabled' do
-        using RSpec::Parameterized::TableSyntax
-
-        where(:app_setting, :project_setting, :regulated_settings, :final_setting) do
-          true     | true      | true   | false
-          false    | true      | true   | true
-          true     | false     | true   | false
-          false    | false     | true   | true
-          true     | true      | false  | true
-          false    | true      | false  | true
-          true     | false     | false  | false
-          false    | false     | false  | false
-        end
-
-        with_them do
-          let(:project) { create(:project) }
-
-          before do
-            stub_feature_flags(project_compliance_merge_request_approval_settings: true)
-            stub_licensed_features(admin_merge_request_approvers_rules: true)
-
-            allow(project).to receive(:has_regulated_settings?).and_return(regulated_settings)
-            stub_application_setting(application_setting => app_setting)
-            project.update(setting => project_setting)
-          end
-
-          it 'shows proper setting' do
-            expect(project.send(setting)).to eq(final_setting)
-            expect(project.send("#{setting}?")).to eq(final_setting)
-          end
-        end
+      where(:app_setting, :project_setting, :regulated_settings, :final_setting) do
+        true  | true  | true  | false
+        false | true  | true  | true
+        true  | false | true  | false
+        false | false | true  | true
+        true  | true  | false | true
+        false | true  | false | true
+        true  | false | false | false
+        false | false | false | false
       end
 
-      context 'when compliance merge request approval settings feature flag is disabled' do
-        using RSpec::Parameterized::TableSyntax
+      with_them do
+        let(:project) { create(:project) }
 
-        where(:app_setting, :project_setting, :feature_enabled, :final_setting) do
-          true     | true      | true   | false
-          false    | true      | true   | true
-          true     | false     | true   | false
-          false    | false     | true   | false
-          true     | true      | false  | true
-          false    | true      | false  | true
-          true     | false     | false  | false
-          false    | false     | false  | false
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+
+          allow(project).to receive(:has_regulated_settings?).and_return(regulated_settings)
+          stub_application_setting(application_setting => app_setting)
+          project.update(setting => project_setting)
         end
 
-        with_them do
-          before do
-            stub_feature_flags(project_compliance_merge_request_approval_settings: false)
-
-            stub_licensed_features(feature => feature_enabled)
-            stub_application_setting(application_setting => app_setting)
-            project.update(setting => project_setting)
-          end
-
-          it 'shows proper setting' do
-            expect(project.send(setting)).to eq(final_setting)
-            expect(project.send("#{setting}?")).to eq(final_setting)
-          end
+        it 'shows proper setting' do
+          expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
         end
       end
     end

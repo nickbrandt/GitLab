@@ -640,7 +640,6 @@ module EE
 
     def disable_overriding_approvers_per_merge_request
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
-      return (::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? || super) unless project_compliance_mr_approval_settings?
       return super unless has_regulated_settings?
 
       ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request?
@@ -649,8 +648,6 @@ module EE
 
     def merge_requests_author_approval
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
-      return false if !project_compliance_mr_approval_settings? && ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
-      return super if !project_compliance_mr_approval_settings? && !::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
       return super unless has_regulated_settings?
 
       !::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
@@ -659,16 +656,11 @@ module EE
 
     def merge_requests_disable_committers_approval
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
-      return (::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? || super) unless project_compliance_mr_approval_settings?
       return super unless has_regulated_settings?
 
       ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval?
     end
     alias_method :merge_requests_disable_committers_approval?, :merge_requests_disable_committers_approval
-
-    def project_compliance_mr_approval_settings?
-      ::Feature.enabled?(:project_compliance_merge_request_approval_settings, self)
-    end
 
     def license_compliance(pipeline = latest_pipeline_with_reports(::Ci::JobArtifact.license_scanning_reports))
       SCA::LicenseCompliance.new(self, pipeline)

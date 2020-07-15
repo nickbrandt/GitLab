@@ -1201,129 +1201,61 @@ RSpec.describe ProjectPolicy do
   shared_examples 'merge request rules' do
     let(:project) { create(:project, namespace: owner.namespace) }
 
-    context 'when compliance merge request approval settings feature flag is enabled' do
-      before do
-        stub_feature_flags(project_compliance_merge_request_approval_settings: true)
+    using RSpec::Parameterized::TableSyntax
+
+    context 'with merge request approvers rules available in license' do
+      where(:role, :regulated_setting, :admin_mode, :allowed) do
+        :guest      | true  | nil    | false
+        :reporter   | true  | nil    | false
+        :developer  | true  | nil    | false
+        :maintainer | false | nil    | true
+        :maintainer | true  | nil    | false
+        :owner      | false | nil    | true
+        :owner      | true  | nil    | false
+        :admin      | false | false  | false
+        :admin      | false | true   | true
+        :admin      | true  | false  | false
+        :admin      | true  | true   | false
       end
 
-      using RSpec::Parameterized::TableSyntax
-      context 'with merge request approvers rules available in license' do
-        where(:role, :regulated_setting, :admin_mode, :allowed) do
-          :guest      | true  | nil    | false
-          :reporter   | true  | nil    | false
-          :developer  | true  | nil    | false
-          :maintainer | false | nil    | true
-          :maintainer | true  | nil    | false
-          :owner      | false | nil    | true
-          :owner      | true  | nil    | false
-          :admin      | false | false  | false
-          :admin      | false | true   | true
-          :admin      | true  | false  | false
-          :admin      | true  | true   | false
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+          allow(project).to receive(:has_regulated_settings?).and_return(regulated_setting)
+          enable_admin_mode!(current_user) if admin_mode
         end
 
-        with_them do
-          let(:current_user) { public_send(role) }
-
-          before do
-            stub_licensed_features(admin_merge_request_approvers_rules: true)
-            allow(project).to receive(:has_regulated_settings?).and_return(regulated_setting)
-            enable_admin_mode!(current_user) if admin_mode
-          end
-
-          it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
-        end
-      end
-
-      context 'with merge request approvers not available in license' do
-        where(:role, :regulated_setting, :admin_mode, :allowed) do
-          :guest      | true  | nil    | false
-          :reporter   | true  | nil    | false
-          :developer  | true  | nil    | false
-          :maintainer | false | nil    | true
-          :maintainer | true  | nil    | true
-          :owner      | false | nil    | true
-          :owner      | true  | nil    | true
-          :admin      | false | false  | false
-          :admin      | false | true   | true
-          :admin      | true  | false  | false
-          :admin      | true  | true   | true
-        end
-
-        with_them do
-          let(:current_user) { public_send(role) }
-
-          before do
-            stub_licensed_features(admin_merge_request_approvers_rules: false)
-            allow(project).to receive(:has_regulated_settings?).and_return(regulated_setting)
-            enable_admin_mode!(current_user) if admin_mode
-          end
-
-          it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
-        end
+        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
       end
     end
 
-    context 'when compliance merge request approval settings feature flag is disabled' do
-      before do
-        stub_feature_flags(project_compliance_merge_request_approval_settings: false)
+    context 'with merge request approvers not available in license' do
+      where(:role, :regulated_setting, :admin_mode, :allowed) do
+        :guest      | true  | nil    | false
+        :reporter   | true  | nil    | false
+        :developer  | true  | nil    | false
+        :maintainer | false | nil    | true
+        :maintainer | true  | nil    | true
+        :owner      | false | nil    | true
+        :owner      | true  | nil    | true
+        :admin      | false | false  | false
+        :admin      | false | true   | true
+        :admin      | true  | false  | false
+        :admin      | true  | true   | true
       end
 
-      using RSpec::Parameterized::TableSyntax
-      context 'with merge request approvers rules available in license' do
-        where(:role, :setting, :admin_mode, :allowed) do
-          :guest      | true  | nil    | false
-          :reporter   | true  | nil    | false
-          :developer  | true  | nil    | false
-          :maintainer | false | nil    | true
-          :maintainer | true  | nil    | false
-          :owner      | false | nil    | true
-          :owner      | true  | nil    | false
-          :admin      | false | false  | false
-          :admin      | false | true   | true
-          :admin      | true  | false  | false
-          :admin      | true  | true   | true
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: false)
+          allow(project).to receive(:has_regulated_settings?).and_return(regulated_setting)
+          enable_admin_mode!(current_user) if admin_mode
         end
 
-        with_them do
-          let(:current_user) { public_send(role) }
-
-          before do
-            stub_licensed_features(admin_merge_request_approvers_rules: true)
-            stub_application_setting(setting_name => setting)
-            enable_admin_mode!(current_user) if admin_mode
-          end
-
-          it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
-        end
-      end
-
-      context 'with merge request approvers not available in license' do
-        where(:role, :setting, :admin_mode, :allowed) do
-          :guest      | true  | nil    | false
-          :reporter   | true  | nil    | false
-          :developer  | true  | nil    | false
-          :maintainer | false | nil    | true
-          :maintainer | true  | nil    | true
-          :owner      | false | nil    | true
-          :owner      | true  | nil    | true
-          :admin      | false | false  | false
-          :admin      | false | true   | true
-          :admin      | true  | false  | false
-          :admin      | true  | true   | true
-        end
-
-        with_them do
-          let(:current_user) { public_send(role) }
-
-          before do
-            stub_licensed_features(admin_merge_request_approvers_rules: false)
-            stub_application_setting(setting_name => setting)
-            enable_admin_mode!(current_user) if admin_mode
-          end
-
-          it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
-        end
+        it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
       end
     end
   end

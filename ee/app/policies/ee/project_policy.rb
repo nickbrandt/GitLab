@@ -76,27 +76,15 @@ module EE
       end
 
       condition(:cannot_modify_approvers_rules) do
-        if @subject.project_compliance_mr_approval_settings?
-          regulated_merge_request_approval_settings?
-        else
-          owner_cannot_modify_approvers_rules? && !admin?
-        end
+        regulated_merge_request_approval_settings?
       end
 
       condition(:cannot_modify_merge_request_author_setting) do
-        if @subject.project_compliance_mr_approval_settings?
-          regulated_merge_request_approval_settings?
-        else
-          owner_cannot_modify_merge_request_author_setting? && !admin?
-        end
+        regulated_merge_request_approval_settings?
       end
 
       condition(:cannot_modify_merge_request_committer_setting) do
-        if @subject.project_compliance_mr_approval_settings?
-          regulated_merge_request_approval_settings?
-        else
-          owner_cannot_modify_merge_request_committer_setting? && !admin?
-        end
+        regulated_merge_request_approval_settings?
       end
 
       with_scope :subject
