@@ -766,7 +766,7 @@ describe('RequirementsRoot', () => {
         },
       ]);
       expect(wrapper.find(FilteredSearchBarRoot).props('recentSearchesStorageKey')).toBe(
-        'requirements-recent-searches',
+        'requirements',
       );
     });
 

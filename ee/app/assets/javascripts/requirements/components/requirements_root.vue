@@ -10,7 +10,6 @@ import { updateHistory, setUrlParams } from '~/lib/utils/url_utility';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
 import { ANY_AUTHOR } from '~/vue_shared/components/filtered_search_bar/constants';
-import RecentSearchesStorageKeys from 'ee/filtered_search/recent_searches_storage_keys';
 
 import RequirementsTabs from './requirements_tabs.vue';
 import RequirementsLoading from './requirements_loading.vue';
@@ -28,7 +27,6 @@ import { FilterState, AvailableSortOptions, DEFAULT_PAGE_SIZE } from '../constan
 export default {
   DEFAULT_PAGE_SIZE,
   AvailableSortOptions,
-  requirementsRecentSearchesKey: RecentSearchesStorageKeys.requirements,
   components: {
     GlPagination,
     FilteredSearchBar,
@@ -526,7 +524,7 @@ export default {
       :sort-options="$options.AvailableSortOptions"
       :initial-filter-value="getFilteredSearchValue()"
       :initial-sort-by="sortBy"
-      :recent-searches-storage-key="$options.requirementsRecentSearchesKey"
+      recent-searches-storage-key="requirements"
       class="row-content-block"
       @onFilter="handleFilterRequirements"
       @onSort="handleSortRequirements"
