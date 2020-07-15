@@ -12,6 +12,7 @@ module Gitlab
             raise SecurityReportParserError, "Invalid report format" unless report_data.is_a?(Hash)
 
             report.scanned_resources = report_data.dig('scan', 'scanned_resources') || []
+            create_scanner(report, report_data.dig('scan', 'scanner'))
 
             collate_remediations(report_data).each do |vulnerability|
               create_vulnerability(report, vulnerability, report_data["version"])
