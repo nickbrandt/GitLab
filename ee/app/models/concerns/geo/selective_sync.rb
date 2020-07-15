@@ -3,12 +3,9 @@
 module Geo::SelectiveSync
   extend ActiveSupport::Concern
 
+  # @return [ActiveRecord::Relation<Upload>] scope of everything that should be synced
   def attachments
-    if selective_sync?
-      uploads_model.where(group_attachments.or(project_attachments).or(other_attachments))
-    else
-      uploads_model.all
-    end
+    attachments_selective_sync_scope.merge(attachments_object_storage_scope)
   end
 
   def projects_outside_selected_namespaces
@@ -48,6 +45,22 @@ module Geo::SelectiveSync
   end
 
   private
+
+  # @return [ActiveRecord::Relation<Upload>] scope observing object storage settings
+  def attachments_object_storage_scope
+    return uploads_model.all if sync_object_storage?
+
+    uploads_model.with_files_stored_locally
+  end
+
+  # @return [ActiveRecord::Relation<Upload>] scope observing selective sync settings
+  def attachments_selective_sync_scope
+    if selective_sync?
+      uploads_model.where(group_attachments.or(project_attachments).or(other_attachments))
+    else
+      uploads_model.all
+    end
+  end
 
   def selected_namespaces_and_descendants
     relation = selected_namespaces_and_descendants_cte.apply_to(namespaces_model.all)
