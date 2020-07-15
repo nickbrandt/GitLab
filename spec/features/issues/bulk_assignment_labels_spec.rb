@@ -52,6 +52,7 @@ RSpec.describe 'Issues > Labels bulk assignment' do
 
           it do
             expect(find("#issue_#{issue1.id}")).to have_content 'bug'
+            expect(find("#issue_#{issue1.id}")).to have_content 'frontend'
             expect(find("#issue_#{issue2.id}")).to have_content 'bug'
             expect(find("#issue_#{issue2.id}")).not_to have_content 'frontend'
           end
@@ -67,6 +68,7 @@ RSpec.describe 'Issues > Labels bulk assignment' do
 
           it do
             expect(find("#issue_#{issue1.id}")).to have_content 'bug'
+            expect(find("#issue_#{issue1.id}")).to have_content 'frontend'
             expect(find("#issue_#{issue2.id}")).to have_content 'bug'
             expect(find("#issue_#{issue2.id}")).not_to have_content 'frontend'
           end
@@ -81,6 +83,7 @@ RSpec.describe 'Issues > Labels bulk assignment' do
 
           it do
             expect(find("#issue_#{issue1.id}")).to have_content 'bug'
+            expect(find("#issue_#{issue1.id}")).to have_content 'frontend'
             expect(find("#issue_#{issue2.id}")).not_to have_content 'bug'
             expect(find("#issue_#{issue2.id}")).not_to have_content 'frontend'
           end
@@ -95,6 +98,7 @@ RSpec.describe 'Issues > Labels bulk assignment' do
 
           it do
             expect(find("#issue_#{issue1.id}")).to have_content 'bug'
+            expect(find("#issue_#{issue1.id}")).to have_content 'frontend'
             expect(find("#issue_#{issue2.id}")).not_to have_content 'bug'
             expect(find("#issue_#{issue2.id}")).not_to have_content 'frontend'
           end
