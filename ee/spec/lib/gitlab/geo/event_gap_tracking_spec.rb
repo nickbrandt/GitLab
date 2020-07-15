@@ -148,7 +148,7 @@ RSpec.describe Gitlab::Geo::EventGapTracking, :clean_gitlab_redis_cache do
       Timecop.freeze do
         gap_tracking.send(:track_gaps, event_id_with_gap)
 
-        expect(read_gaps).to contain_exactly([gap_id.to_s, Time.now.to_i])
+        expect(read_gaps).to contain_exactly([gap_id.to_s, Time.current.to_i])
       end
     end
 
@@ -156,7 +156,7 @@ RSpec.describe Gitlab::Geo::EventGapTracking, :clean_gitlab_redis_cache do
       Timecop.freeze do
         gap_tracking.send(:track_gaps, event_id_with_gap + 3)
 
-        expected_gaps = ((previous_event_id + 1)..(event_id_with_gap + 2)).collect { |id| [id.to_s, Time.now.to_i] }
+        expected_gaps = ((previous_event_id + 1)..(event_id_with_gap + 2)).collect { |id| [id.to_s, Time.current.to_i] }
 
         expect(read_gaps).to match_array(expected_gaps)
       end
@@ -167,13 +167,13 @@ RSpec.describe Gitlab::Geo::EventGapTracking, :clean_gitlab_redis_cache do
 
       Timecop.freeze do
         gap_tracking.send(:track_gaps, event_id_with_gap)
-        expected_gaps << [gap_id.to_s, Time.now.to_i]
+        expected_gaps << [gap_id.to_s, Time.current.to_i]
       end
 
       Timecop.travel(2.minutes) do
         gap_tracking.previous_id = 17
         gap_tracking.send(:track_gaps, 19)
-        expected_gaps << [18.to_s, Time.now.to_i]
+        expected_gaps << [18.to_s, Time.current.to_i]
       end
 
       expect(read_gaps).to eq(expected_gaps)

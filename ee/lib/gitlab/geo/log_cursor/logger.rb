@@ -46,7 +46,7 @@ module Gitlab
         end
 
         def cursor_delay(created_at)
-          (Time.now - created_at).to_f.round(3)
+          (Time.current - created_at).to_f.round(3)
         end
 
         def base_log_data(message, params = {})

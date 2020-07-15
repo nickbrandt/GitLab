@@ -27,7 +27,7 @@ RSpec.describe Gitlab::Auth::GroupSaml::SsoEnforcer do
       Timecop.freeze do
         subject.update_session
 
-        expect(session[:active_group_sso_sign_ins][saml_provider.id]).to eq DateTime.now
+        expect(session[:active_group_sso_sign_ins][saml_provider.id]).to eq DateTime.current
       end
     end
   end

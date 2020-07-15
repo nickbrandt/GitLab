@@ -11,7 +11,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::RepositoryRenamedEvent, :clean_gi
   let(:old_path_with_namespace) { repository_renamed_event.old_path_with_namespace }
   let(:new_path_with_namespace) { repository_renamed_event.new_path_with_namespace }
 
-  subject { described_class.new(repository_renamed_event, Time.now, logger) }
+  subject { described_class.new(repository_renamed_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.fake! { example.run }

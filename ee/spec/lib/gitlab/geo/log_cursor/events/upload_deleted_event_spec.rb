@@ -9,7 +9,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::UploadDeletedEvent, :clean_gitlab
   let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
   let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
 
-  subject { described_class.new(upload_deleted_event, Time.now, logger) }
+  subject { described_class.new(upload_deleted_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.inline! { example.run }

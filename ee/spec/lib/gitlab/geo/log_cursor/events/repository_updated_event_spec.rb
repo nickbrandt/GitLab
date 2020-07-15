@@ -12,7 +12,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :clean_gi
   let(:event_log) { create(:geo_event_log, repository_updated_event: repository_updated_event) }
   let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
 
-  subject { described_class.new(repository_updated_event, Time.now, logger) }
+  subject { described_class.new(repository_updated_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.fake! { example.run }
@@ -60,7 +60,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :clean_gi
             subject.process
             reloaded_registry = registry.reload
 
-            expect(reloaded_registry.resync_repository_was_scheduled_at).to be_within(1.second).of(Time.now)
+            expect(reloaded_registry.resync_repository_was_scheduled_at).to be_within(1.second).of(Time.current)
           end
         end
       end
@@ -92,7 +92,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :clean_gi
             subject.process
             reloaded_registry = registry.reload
 
-            expect(reloaded_registry.resync_wiki_was_scheduled_at).to be_within(1.second).of(Time.now)
+            expect(reloaded_registry.resync_wiki_was_scheduled_at).to be_within(1.second).of(Time.current)
           end
         end
       end
@@ -100,7 +100,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :clean_gi
   end
 
   describe '#process' do
-    let(:now) { Time.now }
+    let(:now) { Time.current }
 
     before do
       allow(Gitlab::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(healthy)

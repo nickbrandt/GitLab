@@ -13,7 +13,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::DesignRepositoryUpdatedEvent, :cl
   let(:event_log) { create(:geo_event_log, repository_updated_event: event) }
   let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
 
-  subject { described_class.new(event, Time.now, logger) }
+  subject { described_class.new(event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.fake! { example.run }

@@ -5,7 +5,7 @@ module Gitlab
     module Smartcard
       class SessionEnforcer
         def update_session
-          session.update_active(DateTime.now)
+          session.update_active(DateTime.current)
         end
 
         def access_restricted?(user)

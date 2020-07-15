@@ -33,7 +33,7 @@ module Gitlab
         raise GeoNodeNotFoundError unless geo_node
 
         token = JSONWebToken::HMACToken.new(geo_node.secret_access_key)
-        token.expire_time = Time.now + expiration_time
+        token.expire_time = Time.current + expiration_time
         token[:data] = message.to_json
 
         "#{GITLAB_GEO_AUTH_TOKEN_TYPE} #{geo_node.access_key}:#{token.encoded}"

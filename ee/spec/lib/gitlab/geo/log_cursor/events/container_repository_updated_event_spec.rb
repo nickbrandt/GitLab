@@ -9,7 +9,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::ContainerRepositoryUpdatedEvent, 
   let(:container_repository_updated_event) { event_log.container_repository_updated_event }
   let(:container_repositoy) { container_repository_updated_event.container_repository }
 
-  subject { described_class.new(container_repository_updated_event, Time.now, logger) }
+  subject { described_class.new(container_repository_updated_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.fake! { example.run }

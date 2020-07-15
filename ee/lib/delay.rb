@@ -9,7 +9,7 @@ module Delay
   # To prevent the retry time from storing invalid dates in the database,
   # cap the max time to a hour plus some random jitter value.
   def next_retry_time(retry_count)
-    proposed_time = Time.now + delay(retry_count).seconds
+    proposed_time = Time.current + delay(retry_count).seconds
     max_future_time = 1.hour.from_now + delay(1).seconds
 
     [proposed_time, max_future_time].min

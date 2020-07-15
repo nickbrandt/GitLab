@@ -27,7 +27,7 @@ module EE
 
         override :perform
         def perform(start_id, stop_id)
-          now = Time.now
+          now = Time.current
 
           # Some fields like seats or end_date will be properly updated by a script executed
           # from the subscription portal after this MR hits production.

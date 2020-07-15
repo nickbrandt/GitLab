@@ -19,34 +19,34 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
   # `create_data_for_end_event`. For each stage we create 3 records with a fixed
   # durations (10, 5, 15 days) in order to easily generalize the test cases.
   shared_examples 'custom cycle analytics stage' do
-    let(:params) { { from: Time.new(2019), to: Time.new(2020), current_user: user } }
+    let(:params) { { from: Time.zone.local(2019), to: Time.zone.local(2020), current_user: user } }
     let(:data_collector) { described_class.new(stage: stage, params: params) }
 
     before do
       # takes 10 days
-      resource1 = Timecop.travel(Time.new(2019, 3, 5)) do
+      resource1 = Timecop.travel(Time.zone.local(2019, 3, 5)) do
         create_data_for_start_event(self)
       end
 
-      Timecop.travel(Time.new(2019, 3, 15)) do
+      Timecop.travel(Time.zone.local(2019, 3, 15)) do
         create_data_for_end_event(resource1, self)
       end
 
       # takes 5 days
-      resource2 = Timecop.travel(Time.new(2019, 3, 5)) do
+      resource2 = Timecop.travel(Time.zone.local(2019, 3, 5)) do
         create_data_for_start_event(self)
       end
 
-      Timecop.travel(Time.new(2019, 3, 10)) do
+      Timecop.travel(Time.zone.local(2019, 3, 10)) do
         create_data_for_end_event(resource2, self)
       end
 
       # takes 15 days
-      resource3 = Timecop.travel(Time.new(2019, 3, 5)) do
+      resource3 = Timecop.travel(Time.zone.local(2019, 3, 5)) do
         create_data_for_start_event(self)
       end
 
-      Timecop.travel(Time.new(2019, 3, 20)) do
+      Timecop.travel(Time.zone.local(2019, 3, 20)) do
         create_data_for_end_event(resource3, self)
       end
     end
@@ -82,7 +82,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         end
 
         def create_data_for_end_event(issue, example_class)
-          issue.metrics.update!(first_mentioned_in_commit_at: Time.now)
+          issue.metrics.update!(first_mentioned_in_commit_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -109,12 +109,12 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         def create_data_for_start_event(example_class)
           issue = create(:issue, :opened, project: example_class.project)
-          issue.metrics.update!(first_mentioned_in_commit_at: Time.now)
+          issue.metrics.update!(first_mentioned_in_commit_at: Time.current)
           issue
         end
 
         def create_data_for_end_event(resource, example_class)
-          resource.metrics.update!(first_associated_with_milestone_at: Time.now)
+          resource.metrics.update!(first_associated_with_milestone_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -129,7 +129,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         end
 
         def create_data_for_end_event(resource, example_class)
-          resource.metrics.update!(first_added_to_board_at: Time.now)
+          resource.metrics.update!(first_added_to_board_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -144,7 +144,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         end
 
         def create_data_for_end_event(resource, example_class)
-          resource.update!(last_edited_at: Time.now)
+          resource.update!(last_edited_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -215,8 +215,8 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
           context 'when filtering for two labels' do
             let(:params) do
               {
-                from: Time.new(2019),
-                to: Time.new(2020),
+                from: Time.zone.local(2019),
+                to: Time.zone.local(2020),
                 current_user: user,
                 label_name: [label.name, other_label.name]
               }
@@ -265,7 +265,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         end
 
         def create_data_for_end_event(mr, example_class)
-          mr.metrics.update!(merged_at: Time.now)
+          mr.metrics.update!(merged_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -277,12 +277,12 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         def create_data_for_start_event(example_class)
           create(:merge_request, :closed, source_project: example_class.project).tap do |mr|
-            mr.metrics.update!(merged_at: Time.now)
+            mr.metrics.update!(merged_at: Time.current)
           end
         end
 
         def create_data_for_end_event(mr, example_class)
-          mr.metrics.update!(first_deployed_to_production_at: Time.now)
+          mr.metrics.update!(first_deployed_to_production_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -294,12 +294,12 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         def create_data_for_start_event(example_class)
           create(:merge_request, :closed, source_project: example_class.project).tap do |mr|
-            mr.metrics.update!(latest_build_started_at: Time.now)
+            mr.metrics.update!(latest_build_started_at: Time.current)
           end
         end
 
         def create_data_for_end_event(mr, example_class)
-          mr.metrics.update!(latest_build_finished_at: Time.now)
+          mr.metrics.update!(latest_build_finished_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -314,7 +314,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         end
 
         def create_data_for_end_event(resource, example_class)
-          resource.metrics.update!(latest_closed_at: Time.now)
+          resource.metrics.update!(latest_closed_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -329,7 +329,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         end
 
         def create_data_for_end_event(resource, example_class)
-          resource.update!(last_edited_at: Time.now)
+          resource.update!(last_edited_at: Time.current)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -464,7 +464,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
       let(:data_collector_params) do
         {
-          created_after: Time.new(2019, 1, 1),
+          created_after: Time.zone.local(2019, 1, 1),
           current_user: user
         }
       end
@@ -478,7 +478,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
       before do
         group.add_user(user, GroupMember::MAINTAINER)
 
-        Timecop.travel(Time.new(2019, 6, 1)) do
+        Timecop.travel(Time.zone.local(2019, 6, 1)) do
           mr = create(:merge_request, source_project: project1)
           mr.metrics.update!(merged_at: 1.hour.from_now)
 

@@ -20,9 +20,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageTimeSumma
       let(:from) { 6.days.ago }
 
       before do
-        create(:closed_issue, project: project, created_at: 1.day.ago, closed_at: Time.now)
-        create(:closed_issue, project: project, created_at: 2.days.ago, closed_at: Time.now)
-        create(:closed_issue, project: project_2, created_at: 4.days.ago, closed_at: Time.now)
+        create(:closed_issue, project: project, created_at: 1.day.ago, closed_at: Time.current)
+        create(:closed_issue, project: project, created_at: 2.days.ago, closed_at: Time.current)
+        create(:closed_issue, project: project_2, created_at: 4.days.ago, closed_at: Time.current)
       end
 
       it 'finds the lead time of issues created after it' do
@@ -34,8 +34,8 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageTimeSumma
         let(:project_3) { create(:project, namespace: subgroup) }
 
         before do
-          create(:closed_issue, created_at: 3.days.ago, closed_at: Time.now, project: project_3)
-          create(:closed_issue, created_at: 5.days.ago, closed_at: Time.now, project: project_3)
+          create(:closed_issue, created_at: 3.days.ago, closed_at: Time.current, project: project_3)
+          create(:closed_issue, created_at: 5.days.ago, closed_at: Time.current, project: project_3)
         end
 
         it 'finds the lead time of issues from them' do
@@ -45,7 +45,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageTimeSumma
 
       context 'with projects specified in options' do
         before do
-          create(:closed_issue, created_at: 3.days.ago, closed_at: Time.now, project: create(:project, namespace: group))
+          create(:closed_issue, created_at: 3.days.ago, closed_at: Time.current, project: create(:project, namespace: group))
         end
 
         subject { described_class.new(group, options: { from: from, current_user: user, projects: [project.id, project_2.id] }).data }
@@ -58,7 +58,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageTimeSumma
 
       context 'when `from` and `to` parameters are provided' do
         let(:from) { 3.days.ago }
-        let(:to) { Time.now }
+        let(:to) { Time.current }
 
         it 'finds the lead time of issues from 3 days ago' do
           expect(subject.first[:value]).to eq('1.5')
@@ -70,9 +70,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageTimeSumma
       let(:from) { 4.days.ago }
 
       before do
-        create(:closed_issue, created_at: 1.day.ago, closed_at: Time.now, project: create(:project, namespace: create(:group)))
-        create(:closed_issue, created_at: 2.days.ago, closed_at: Time.now,  project: project)
-        create(:closed_issue, created_at: 3.days.ago, closed_at: Time.now,  project: project_2)
+        create(:closed_issue, created_at: 1.day.ago, closed_at: Time.current, project: create(:project, namespace: create(:group)))
+        create(:closed_issue, created_at: 2.days.ago, closed_at: Time.current,  project: project)
+        create(:closed_issue, created_at: 3.days.ago, closed_at: Time.current,  project: project_2)
       end
 
       it 'does not find the lead time of issues from them' do

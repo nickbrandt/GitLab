@@ -11,7 +11,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::RepositoryDeletedEvent, :clean_gi
   let(:deleted_project_name) { repository_deleted_event.deleted_project_name }
   let(:deleted_path) { repository_deleted_event.deleted_path }
 
-  subject { described_class.new(repository_deleted_event, Time.now, logger) }
+  subject { described_class.new(repository_deleted_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.fake! { example.run }

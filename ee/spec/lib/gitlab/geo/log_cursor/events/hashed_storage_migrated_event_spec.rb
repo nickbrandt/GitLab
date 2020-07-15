@@ -12,7 +12,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::HashedStorageMigratedEvent, :clea
   let(:new_disk_path) { hashed_storage_migrated_event.new_disk_path }
   let(:old_storage_version) { hashed_storage_migrated_event.old_storage_version }
 
-  subject { described_class.new(hashed_storage_migrated_event, Time.now, logger) }
+  subject { described_class.new(hashed_storage_migrated_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.fake! { example.run }

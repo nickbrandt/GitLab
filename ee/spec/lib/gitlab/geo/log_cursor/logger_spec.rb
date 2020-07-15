@@ -38,7 +38,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Logger, :geo do
                                                       message: 'Test',
                                                       cursor_delay_s: 0.0)
 
-      logger.event_info(Time.now, 'Test')
+      logger.event_info(Time.current, 'Test')
     end
   end
 

@@ -70,7 +70,7 @@ module Gitlab
         log_info("Event log gap detected", previous_event_id: previous_id, current_event_id: current_id)
 
         with_redis do |redis|
-          expire_time = Time.now.to_i
+          expire_time = Time.current.to_i
 
           ((previous_id + 1)..(current_id - 1)).each do |gap_id|
             redis.zadd(GEO_EVENT_LOG_GAPS, expire_time, gap_id)
@@ -85,11 +85,11 @@ module Gitlab
       end
 
       def grace_timestamp
-        (Time.now - GAP_GRACE_PERIOD).to_i
+        (Time.current - GAP_GRACE_PERIOD).to_i
       end
 
       def outdated_timestamp
-        (Time.now - GAP_OUTDATED_PERIOD).to_i
+        (Time.current - GAP_OUTDATED_PERIOD).to_i
       end
     end
   end

@@ -9,7 +9,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::LfsObjectDeletedEvent, :clean_git
   let(:lfs_object_deleted_event) { event_log.lfs_object_deleted_event }
   let(:lfs_object) { lfs_object_deleted_event.lfs_object }
 
-  subject { described_class.new(lfs_object_deleted_event, Time.now, logger) }
+  subject { described_class.new(lfs_object_deleted_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.inline! { example.run }

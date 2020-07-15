@@ -77,8 +77,8 @@ RSpec.describe Gitlab::Prometheus::Queries::PacketFlowQuery do
   end
 
   context 'time range' do
-    let(:from) { Time.at(0) }
-    let(:to) { Time.at(100) }
+    let(:from) { Time.zone.at(0) }
+    let(:to) { Time.zone.at(100) }
 
     context 'ops_rate query' do
       it 'sets query time range' do

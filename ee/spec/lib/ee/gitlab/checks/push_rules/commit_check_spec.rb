@@ -205,7 +205,7 @@ RSpec.describe EE::Gitlab::Checks::PushRules::CommitCheck do
           end
 
           it 'allows the commit when they were done with another email that belongs to the current user' do
-            user.emails.create(email: 'secondary_email@user.com', confirmed_at: Time.now)
+            user.emails.create(email: 'secondary_email@user.com', confirmed_at: Time.current)
             allow_any_instance_of(Commit).to receive(:committer_email).and_return('secondary_email@user.com')
 
             expect { subject.validate! }.not_to raise_error
@@ -259,8 +259,8 @@ RSpec.describe EE::Gitlab::Checks::PushRules::CommitCheck do
             parents: [base, to_merge],
             tree: merge_index.write_tree(rugged),
             message: 'The merge commit',
-            author: { name: user.name, email: user.email, time: Time.now },
-            committer: { name: user.name, email: user.email, time: Time.now }
+            author: { name: user.name, email: user.email, time: Time.current },
+            committer: { name: user.name, email: user.email, time: Time.current }
           }
 
           Rugged::Commit.create(rugged, options)

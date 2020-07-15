@@ -8,7 +8,7 @@ module Pseudonymizer
 
     def initialize(config: {}, output_dir: nil)
       @config = config
-      @start_at = Time.now.utc
+      @start_at = Time.current.utc
 
       base_dir = output_dir || File.join(Dir.tmpdir, 'gitlab-pseudonymizer')
       @output_dir = File.join(base_dir, batch_dir)

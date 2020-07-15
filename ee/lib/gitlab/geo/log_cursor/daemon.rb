@@ -68,7 +68,7 @@ module Gitlab
 
         def track_failing_since(error)
           if error
-            @failing_since ||= Time.now.utc
+            @failing_since ||= Time.current.utc
           else
             @failing_since = nil
           end
@@ -77,7 +77,7 @@ module Gitlab
         def excessive_errors?
           return unless @failing_since
 
-          (Time.now.utc - @failing_since) > MAX_ERROR_DURATION
+          (Time.current.utc - @failing_since) > MAX_ERROR_DURATION
         end
 
         def handle_events(batch, previous_batch_last_id)

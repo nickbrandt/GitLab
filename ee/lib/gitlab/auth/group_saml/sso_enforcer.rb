@@ -13,7 +13,7 @@ module Gitlab
         end
 
         def update_session
-          SsoState.new(saml_provider.id).update_active(DateTime.now)
+          SsoState.new(saml_provider.id).update_active(DateTime.current)
         end
 
         def active_session?

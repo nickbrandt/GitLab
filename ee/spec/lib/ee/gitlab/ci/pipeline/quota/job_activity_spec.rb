@@ -50,8 +50,8 @@ RSpec.describe EE::Gitlab::Ci::Pipeline::Quota::JobActivity do
 
     context 'when pipelines created recently' do
       context 'and pipelines are running' do
-        let(:pipeline1) { create(:ci_pipeline, project: project, status: 'created', created_at: Time.now) }
-        let(:pipeline2) { create(:ci_pipeline, project: project, status: 'created', created_at: Time.now) }
+        let(:pipeline1) { create(:ci_pipeline, project: project, status: 'created', created_at: Time.current) }
+        let(:pipeline2) { create(:ci_pipeline, project: project, status: 'created', created_at: Time.current) }
 
         before do
           create(:ci_build, pipeline: pipeline1)
@@ -77,7 +77,7 @@ RSpec.describe EE::Gitlab::Ci::Pipeline::Quota::JobActivity do
 
       context 'and pipelines are completed' do
         before do
-          create(:ci_pipeline, project: project, status: 'success', created_at: Time.now).tap do |pipeline|
+          create(:ci_pipeline, project: project, status: 'success', created_at: Time.current).tap do |pipeline|
             create(:ci_build, pipeline: pipeline)
             create(:ci_build, pipeline: pipeline)
             create(:ci_build, pipeline: pipeline)
@@ -110,7 +110,7 @@ RSpec.describe EE::Gitlab::Ci::Pipeline::Quota::JobActivity do
       before do
         plan_limits.update!(ci_active_jobs: 1)
 
-        create(:ci_pipeline, project: project, status: 'created', created_at: Time.now).tap do |pipeline|
+        create(:ci_pipeline, project: project, status: 'created', created_at: Time.current).tap do |pipeline|
           create(:ci_build, pipeline: pipeline)
           create(:ci_build, pipeline: pipeline)
           create(:ci_build, pipeline: pipeline)

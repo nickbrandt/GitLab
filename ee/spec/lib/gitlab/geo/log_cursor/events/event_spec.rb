@@ -9,7 +9,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::Event, :clean_gitlab_redis_shared
   let(:replicable) { Packages::PackageFile.find(event.payload["model_record_id"]) }
   let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
 
-  subject { described_class.new(event, Time.now, logger) }
+  subject { described_class.new(event, Time.current, logger) }
 
   describe "#process" do
     it "enqueues Geo::EventWorker" do

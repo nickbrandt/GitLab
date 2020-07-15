@@ -83,7 +83,7 @@ module API
 
         db_status = GeoNode.find(params[:geo_node_id]).find_or_build_status
 
-        unless db_status.update(sanitized_node_status_params.merge(last_successful_status_check_at: Time.now.utc))
+        unless db_status.update(sanitized_node_status_params.merge(last_successful_status_check_at: Time.current.utc))
           render_validation_error!(db_status)
         end
       end

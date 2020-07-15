@@ -9,7 +9,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::JobArtifactDeletedEvent, :clean_g
   let(:job_artifact_deleted_event) { event_log.job_artifact_deleted_event }
   let(:job_artifact) { job_artifact_deleted_event.job_artifact }
 
-  subject { described_class.new(job_artifact_deleted_event, Time.now, logger) }
+  subject { described_class.new(job_artifact_deleted_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.inline! { example.run }

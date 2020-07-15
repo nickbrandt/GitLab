@@ -40,7 +40,7 @@ module Gitlab
 
         def hmac_token
           hmac_token = JSONWebToken::HMACToken.new(key)
-          hmac_token.expire_time = Time.now + expiration_time
+          hmac_token.expire_time = Time.current + expiration_time
           hmac_token[:data] = { return_to: return_to.to_s }
           hmac_token.encoded
         end

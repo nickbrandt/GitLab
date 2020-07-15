@@ -25,7 +25,7 @@ RSpec.describe ::Gitlab::Ci::Pipeline::Chain::Limit::JobActivity do
       create(:plan_limits, plan: gold_plan, ci_active_jobs: 2)
       create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
 
-      pipeline = create(:ci_pipeline, project: project, status: 'running', created_at: Time.now)
+      pipeline = create(:ci_pipeline, project: project, status: 'running', created_at: Time.current)
       create(:ci_build, pipeline: pipeline)
       create(:ci_build, pipeline: pipeline)
       create(:ci_build, pipeline: pipeline)

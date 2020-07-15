@@ -35,7 +35,7 @@ module Gitlab
           end
 
           def scheduled_at
-            @scheduled_at ||= Time.now
+            @scheduled_at ||= Time.current
           end
         end
       end

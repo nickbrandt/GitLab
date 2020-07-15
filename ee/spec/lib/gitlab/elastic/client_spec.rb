@@ -33,7 +33,7 @@ RSpec.describe Gitlab::Elastic::Client do
         # Mock the correlation ID (passed as header) to have deterministic signature
         allow(Labkit::Correlation::CorrelationId).to receive(:current_or_new_id).and_return('new-correlation-id')
 
-        travel_to(Time.parse('20170303T133952Z')) do
+        travel_to(Time.zone.parse('20170303T133952Z')) do
           stub_request(:get, 'http://example-elastic:9200/foo/_all/1')
             .with(
               headers: {

@@ -30,10 +30,10 @@ module Elastic
           parent_ids: nil,
           author_name: raw_commit_hash['author']['name'],
           author_email: raw_commit_hash['author']['email'],
-          authored_date: Time.parse(raw_commit_hash['author']['time']).utc,
+          authored_date: Time.zone.parse(raw_commit_hash['author']['time']).utc,
           committer_name: raw_commit_hash['committer']['name'],
           committer_email: raw_commit_hash['committer']['email'],
-          committed_date: Time.parse(raw_commit_hash['committer']['time']).utc
+          committed_date: Time.zone.parse(raw_commit_hash['committer']['time']).utc
         }
       end
     end

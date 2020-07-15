@@ -20,6 +20,6 @@ RSpec.describe Gitlab::Prometheus::Queries::ClusterQuery do
   it 'sends queries to prometheus' do
     subject.query
 
-    expect(client).to have_received(:query_range).with(anything, start_time: 8.hours.ago, end_time: Time.now).at_least(1)
+    expect(client).to have_received(:query_range).with(anything, start_time: 8.hours.ago, end_time: Time.current).at_least(1)
   end
 end

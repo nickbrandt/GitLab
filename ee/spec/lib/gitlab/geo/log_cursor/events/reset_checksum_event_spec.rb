@@ -9,7 +9,7 @@ RSpec.describe Gitlab::Geo::LogCursor::Events::ResetChecksumEvent, :clean_gitlab
   let(:reset_checksum_event) { event_log.reset_checksum_event }
   let(:project) { reset_checksum_event.project }
 
-  subject { described_class.new(reset_checksum_event, Time.now, logger) }
+  subject { described_class.new(reset_checksum_event, Time.current, logger) }
 
   around do |example|
     Sidekiq::Testing.fake! { example.run }

@@ -29,7 +29,7 @@ module Gitlab
       end
 
       def create_empty_index(with_alias: true, options: {})
-        new_index_name = options[:index_name] || "#{target_name}-#{Time.now.strftime("%Y%m%d-%H%M")}"
+        new_index_name = options[:index_name] || "#{target_name}-#{Time.current.strftime("%Y%m%d-%H%M")}"
 
         if with_alias ? index_exists? : index_exists?(index_name: new_index_name)
           raise "Index under '#{with_alias ? target_name : new_index_name}' already exists, use `recreate_index` to recreate it."
