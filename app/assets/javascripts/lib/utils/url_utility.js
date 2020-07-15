@@ -344,6 +344,7 @@ export function objectToQuery(obj) {
  * @param {Object} params The query params to be set/updated
  * @param {String} url The url to be operated on
  * @param {Boolean} clearParams Indicates whether existing query params should be removed or not
+ * @param {Boolean} railsArraySyntax When enabled, changes the array syntax from `keys=` to `keys[]=` according to Rails conventions
  * @returns {String} A copy of the original with the updated query params
  */
 export const setUrlParams = (
