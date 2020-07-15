@@ -1,7 +1,7 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import waitForPromises from 'helpers/wait_for_promises';
-import ServiceDeskRoot from 'ee/projects/settings_service_desk/components/service_desk_root.vue';
+import ServiceDeskRoot from '~/projects/settings_service_desk/components/service_desk_root.vue';
 import axios from '~/lib/utils/axios_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
 
