@@ -24,13 +24,13 @@ export default {
     alertMessages() {
       return [
         {
-          type: 'notEnabled',
+          key: 'notEnabled',
           documentation: this.notEnabledScannersHelpPath,
           content: this.notEnabledAlertMessage,
           scanners: this.notEnabledScanners,
         },
         {
-          type: 'noPipelineRun',
+          key: 'noPipelineRun',
           documentation: this.noPipelineRunScannersHelpPath,
           content: this.noPipelineRunAlertMessage,
           scanners: this.noPipelineRunScanners,
@@ -61,8 +61,8 @@ export default {
       <ul class="gl-list-style-none gl-mb-0 gl-pl-0">
         <li
           v-for="alertMessage in alertMessages"
-          :key="alertMessage.type"
-          :data-testid="alertMessage.type"
+          :key="alertMessage.key"
+          :data-testid="alertMessage.key"
         >
           <gl-sprintf :message="alertMessage.content">
             <template #securityScanner>

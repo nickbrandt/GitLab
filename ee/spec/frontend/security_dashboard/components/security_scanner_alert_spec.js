@@ -57,7 +57,7 @@ describe('EE Vulnerability Security Scanner Alert', () => {
     it('renders a button', () => {
       createWrapper({ props: { notEnabledScanners: ['SAST'] } });
 
-      expect(withinWrapper().getByRole('button', { name: /dismiss/i })).toBeTruthy();
+      expect(withinWrapper().getByRole('button', { name: /dismiss/i })).not.toBe(null);
     });
 
     it('emits when the button is clicked', async () => {

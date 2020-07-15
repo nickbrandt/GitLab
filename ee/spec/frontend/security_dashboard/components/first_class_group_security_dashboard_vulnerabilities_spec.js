@@ -40,11 +40,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
     });
 
     it('passes down isLoading correctly', () => {
-      expect(findVulnerabilities().props()).toEqual(
-        expect.objectContaining({
-          isLoading: true,
-        }),
-      );
+      expect(findVulnerabilities().props()).toMatchObject({ isLoading: true });
     });
   });
 
