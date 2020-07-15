@@ -14502,7 +14502,8 @@ CREATE TABLE public.protected_branch_push_access_levels (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     user_id integer,
-    group_id integer
+    group_id integer,
+    deploy_key_id integer
 );
 
 CREATE SEQUENCE public.protected_branch_push_access_levels_id_seq
@@ -19027,6 +19028,8 @@ CREATE INDEX index_dependency_proxy_blobs_on_group_id_and_file_name ON public.de
 
 CREATE INDEX index_dependency_proxy_group_settings_on_group_id ON public.dependency_proxy_group_settings USING btree (group_id);
 
+CREATE INDEX index_deploy_key_id_on_protected_branch_push_access_levels ON public.protected_branch_push_access_levels USING btree (deploy_key_id);
+
 CREATE INDEX index_deploy_keys_projects_on_deploy_key_id ON public.deploy_keys_projects USING btree (deploy_key_id);
 
 CREATE INDEX index_deploy_keys_projects_on_project_id ON public.deploy_keys_projects USING btree (project_id);
@@ -20909,6 +20912,9 @@ ALTER TABLE ONLY public.vulnerabilities
 
 ALTER TABLE ONLY public.vulnerabilities
     ADD CONSTRAINT fk_131d289c65 FOREIGN KEY (milestone_id) REFERENCES public.milestones(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY public.protected_branch_push_access_levels
+    ADD CONSTRAINT fk_15d2a7a4ae FOREIGN KEY (deploy_key_id) REFERENCES public.keys(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.internal_ids
     ADD CONSTRAINT fk_162941d509 FOREIGN KEY (namespace_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
@@ -23688,6 +23694,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200617001848
 20200617002030
 20200617150041
+20200617205000
 20200618105638
 20200618134223
 20200618134723
