@@ -109,20 +109,8 @@ module EE
         merge_request.approval_feature_available?
       end
 
-      expose :api_approvals_path do |merge_request|
-        presenter(merge_request).api_approvals_path
-      end
-
       expose :api_approval_settings_path do |merge_request|
         presenter(merge_request).api_approval_settings_path
-      end
-
-      expose :api_approve_path do |merge_request|
-        presenter(merge_request).api_approve_path
-      end
-
-      expose :api_unapprove_path do |merge_request|
-        presenter(merge_request).api_unapprove_path
       end
 
       expose :merge_train_when_pipeline_succeeds_docs_path do |merge_request|
