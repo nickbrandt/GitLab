@@ -32,15 +32,24 @@ Git LFS files can only be removed by an Administrator using a
 
 ## Purge files from repository history
 
-To make cloning your project faster, rewrite branches and tags to remove unwanted files.
+To reduce the size of your repository in GitLab, you must remove references to large files from branches, tags, and
+other internal references (refs) that are automatically created by GitLab. These refs include:
+
+- `refs/merge-requests/*` for merge requests.
+- `refs/pipelines/*` for
+  [pipelines](../../../ci/pipelines/index.md#troubleshooting-fatal-reference-is-not-a-tree).
+- `refs/environments/*` for environments.
+
+Git doesn't usually download theses refs to make cloning and fetch faster, but we can use the `--mirror` option to
+download all the advertised refs.
 
 1. [Install `git filter-repo`](https://github.com/newren/git-filter-repo/blob/main/INSTALL.md)
    using a supported package manager or from source.
 
-1. Clone a fresh copy of the repository using `--bare`:
+1. Clone a fresh copy of the repository using `--bare` and `--mirror`:
 
    ```shell
-   git clone --bare https://example.gitlab.com/my/project.git
+   git clone --bare --mirror https://example.gitlab.com/my/project.git
    ```
 
 1. Using `git filter-repo`, purge any files from the history of your repository.
@@ -77,22 +86,13 @@ To make cloning your project faster, rewrite branches and tags to remove unwante
 1. Force push your changes to overwrite all branches on GitLab:
 
    ```shell
-   git push origin --force --all
+   git push origin --force 'refs/{tags,heads}/*'
    ```
 
-   [Protected branches](../protected_branches.md) will cause this to fail. To proceed, you must
-   remove branch protection, push, and then re-enable protected branches.
+   [Protected branches](../protected_branches.md) and [protected tags](../protected_tags.md) will cause this to fail.
+   To proceed, you must remove branch and tag protection, push, and then re-enable protected branches and tags.
 
-1. To remove large files from tagged releases, force push your changes to all tags on GitLab:
-
-   ```shell
-   git push origin --force --tags
-   ```
-
-   [Protected tags](../protected_tags.md) will cause this to fail. To proceed, you must remove tag
-   protection, push, and then re-enable protected tags.
-
-1. Manually run [project housekeeping](../../../administration/housekeeping.md#manual-housekeeping)
+1. Run a [repository cleanup](#repository-cleanup).
 
 NOTE: **Note:**
 Project statistics are cached for performance. You may need to wait 5-10 minutes
@@ -100,26 +100,9 @@ to see a reduction in storage utilization.
 
 ## Purge files from GitLab storage
 
-To reduce the size of your repository in GitLab, you must remove GitLab internal references to
-commits that contain large files. Before completing these steps,
-[purge files from your repository history](#purge-files-from-repository-history).
-
-As well as [branches](branches/index.md) and tags, which are a type of Git ref, GitLab automatically
-creates other refs. These refs prevent dead links to commits, or missing diffs when viewing merge
-requests. [Repository cleanup](#repository-cleanup) can be used to remove these from GitLab.
-
-The following internal refs are not advertised:
-
-- `refs/merge-requests/*` for merge requests.
-- `refs/pipelines/*` for
-  [pipelines](../../../ci/pipelines/index.md#troubleshooting-fatal-reference-is-not-a-tree).
-- `refs/environments/*` for environments.
-
-This means they are not usually included when fetching, which makes fetching faster. In addition,
-`refs/keep-around/*` are hidden refs to prevent commits with discussion from being deleted and
-cannot be fetched at all.
-
-However, these refs can be accessed from the Git bundle inside a project export.
+In addition to the refs mentioned above, GitLab also created hidden `refs/keep-around/*` to prevent commits being
+deleted. Hidden refs are not advertised which means we can't download them using Git, but these refs are included in
+the project export.
 
 1. [Install `git filter-repo`](https://github.com/newren/git-filter-repo/blob/main/INSTALL.md)
    using a supported package manager or from source.
@@ -166,6 +149,15 @@ However, these refs can be accessed from the Git bundle inside a project export.
    See the
    [`git filter-repo` documentation](https://htmlpreview.github.io/?https://github.com/newren/git-filter-repo/blob/docs/html/git-filter-repo.html#EXAMPLES)
    for more examples and the complete documentation.
+
+1. Force push your changes to overwrite all branches on GitLab:
+
+   ```shell
+   git push origin --force 'refs/{tags,heads}/*'
+   ```
+
+   [Protected branches](../protected_branches.md) and [protected tags](../protected_tags.md) will cause this to fail.
+   To proceed, you must remove branch and tag protection, push, and then re-enable protected branches and tags.
 
 1. Run a [repository cleanup](#repository-cleanup).
 
