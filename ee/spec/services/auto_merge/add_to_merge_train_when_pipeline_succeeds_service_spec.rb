@@ -138,11 +138,14 @@ RSpec.describe AutoMerge::AddToMergeTrainWhenPipelineSucceedsService do
     end
 
     context 'when merge request is submitted from a forked project' do
-      before do
-        allow(merge_request).to receive(:for_fork?) { true }
-      end
+      context 'when ci_allow_to_create_merge_request_pipelines_in_target_project feature flag is disabled' do
+        before do
+          stub_feature_flags(ci_allow_to_create_merge_request_pipelines_in_target_project: false)
+          allow(merge_request).to receive(:for_same_project?) { false }
+        end
 
-      it { is_expected.to eq(false) }
+        it { is_expected.to eq(false) }
+      end
     end
 
     context 'when the latest pipeline in the merge request is not active' do
