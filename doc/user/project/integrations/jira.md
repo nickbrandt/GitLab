@@ -255,7 +255,7 @@ and complete the CAPTCHA.
 Jira Issue List is deployed as a license-gated feature that implies existence of a `jira_issues_integration` 
 feature flag check, which is **enabled by default**.
 
-[GitLab administrators with access to the GitLab Rails console](..path/to/administration/feature_flags.md)
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
 can opt to disable it for your instance.
 
 To disable it:
