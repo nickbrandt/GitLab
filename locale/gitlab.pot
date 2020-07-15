@@ -17325,6 +17325,9 @@ msgstr ""
 msgid "Preferences|For example: 30 mins ago."
 msgstr ""
 
+msgid "Preferences|Instead of all the files changed, show only one file at a time. To switch between files, use the file browser."
+msgstr ""
+
 msgid "Preferences|Integrations"
 msgstr ""
 
@@ -17341,6 +17344,9 @@ msgid "Preferences|Project overview content"
 msgstr ""
 
 msgid "Preferences|Render whitespace characters in the Web IDE"
+msgstr ""
+
+msgid "Preferences|Show one file at a time on merge request's Changes tab"
 msgstr ""
 
 msgid "Preferences|Show whitespace changes in diffs"
