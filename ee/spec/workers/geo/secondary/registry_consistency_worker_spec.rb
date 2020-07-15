@@ -14,6 +14,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
   end
 
   let(:worker_class) { described_class }
+  let(:batch_size) { described_class::BATCH_SIZE }
 
   it_behaves_like 'reenqueuer'
 
@@ -38,7 +39,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
         described_class::REGISTRY_CLASSES.each_with_index do |registry_class, index|
           first_one = index == 0
           service = double
-          expect(Geo::RegistryConsistencyService).to receive(:new).with(registry_class, batch_size: 1000).and_return(service)
+          expect(Geo::RegistryConsistencyService).to receive(:new).with(registry_class, batch_size: batch_size).and_return(service)
           expect(service).to receive(:execute).and_return(first_one)
         end
       end
@@ -58,7 +59,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       before do
         described_class::REGISTRY_CLASSES.each do |registry_class|
           service = double
-          expect(Geo::RegistryConsistencyService).to receive(:new).with(registry_class, batch_size: 1000).and_return(service)
+          expect(Geo::RegistryConsistencyService).to receive(:new).with(registry_class, batch_size: batch_size).and_return(service)
           expect(service).to receive(:execute).and_return(false)
         end
       end
@@ -110,13 +111,13 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       end
 
       it 'does not execute RegistryConsistencyService for projects' do
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::JobArtifactRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::DesignRegistry, batch_size: 1000).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::JobArtifactRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::DesignRegistry, batch_size: batch_size).and_call_original
 
-        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::ProjectRegistry, batch_size: 1000)
+        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::ProjectRegistry, batch_size: batch_size)
 
         subject.perform
       end
@@ -132,13 +133,13 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       end
 
       it 'does not execute RegistryConsistencyService for designs' do
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::JobArtifactRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: 1000).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::ProjectRegistry, batch_size: 1000).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::JobArtifactRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::ProjectRegistry, batch_size: batch_size).and_call_original
 
-        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::DesignRegistry, batch_size: 1000)
+        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::DesignRegistry, batch_size: batch_size)
 
         subject.perform
       end
