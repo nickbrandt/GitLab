@@ -81,6 +81,7 @@ module Gitlab
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
+      # rubocop: disable Metrics/AbcSize
       def import_issues
         return unless repo.issues
 
@@ -127,6 +128,7 @@ module Gitlab
         end
       end
       # rubocop: enable CodeReuse/ActiveRecord
+      # rubocop: enable Metrics/AbcSize
 
       def import_issue_labels(raw_issue)
         labels = []
