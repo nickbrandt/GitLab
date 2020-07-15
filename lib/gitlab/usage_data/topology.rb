@@ -13,7 +13,8 @@ module Gitlab
         'postgres' => 'postgres',
         'gitaly' => 'gitaly',
         'prometheus' => 'prometheus',
-        'node' => 'node-exporter'
+        'node' => 'node-exporter',
+        'registry' => 'registry'
       }.freeze
 
       CollectionFailure = Struct.new(:query, :error) do

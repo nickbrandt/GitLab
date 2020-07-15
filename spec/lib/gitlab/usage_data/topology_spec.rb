@@ -83,6 +83,10 @@ RSpec.describe Gitlab::UsageData::Topology do
                     process_memory_rss: 402
                   },
                   {
+                    name: 'registry',
+                    process_count: 1
+                  },
+                  {
                     name: 'web',
                     server: 'unicorn'
                   }
@@ -132,6 +136,10 @@ RSpec.describe Gitlab::UsageData::Topology do
                   },
                   {
                     name: 'redis',
+                    process_count: 1
+                  },
+                  {
+                    name: 'registry',
                     process_count: 1
                   }
                 ]
@@ -521,6 +529,10 @@ RSpec.describe Gitlab::UsageData::Topology do
         },
         {
           'metric' => { 'instance' => 'instance2:9121', 'job' => 'redis' },
+          'value' => [1000, '1']
+        },
+        {
+          'metric' => { 'instance' => 'instance2:8080', 'job' => 'registry' },
           'value' => [1000, '1']
         },
         # unknown service => should be stripped out
