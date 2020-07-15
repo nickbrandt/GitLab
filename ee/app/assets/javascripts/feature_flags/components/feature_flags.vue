@@ -112,6 +112,7 @@ export default {
     ...mapState([
       FEATURE_FLAG_SCOPE,
       USER_LIST_SCOPE,
+      'alerts',
       'count',
       'pageInfo',
       'isLoading',
@@ -191,6 +192,7 @@ export default {
       'rotateInstanceId',
       'toggleFeatureFlag',
       'deleteUserList',
+      'clearAlert',
     ]),
     onChangeTab(scope) {
       this.scope = scope;
@@ -283,6 +285,16 @@ export default {
           </gl-link>
         </template>
       </gl-sprintf>
+    </gl-alert>
+
+    <gl-alert
+      v-for="(message, index) in alerts"
+      :key="index"
+      data-testid="serverErrors"
+      variant="danger"
+      @dismiss="clearAlert(index)"
+    >
+      {{ message }}
     </gl-alert>
 
     <div v-if="shouldRenderTabs" class="top-area scrolling-tabs-container inner-page-scroll-tabs">
