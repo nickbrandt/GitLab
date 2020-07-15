@@ -19,7 +19,7 @@
           = submit_tag(_('Validate'), class: 'btn btn-success submit-yml')
         .float-right.gl-mt-3
           = button_tag(_('Clear'), type: 'button', class: 'btn btn-default clear-yml')
-
+  #js-ci-lint-validation{ data: { builds: @builds.to_json.html_safe, errors: @errors.to_json.html_safe, status: @status.to_s,  }}
   .row.prepend-top-20
     .col-sm-12
       .results.project-ci-template
