@@ -16,10 +16,10 @@ RSpec.describe API::Internal::Kubernetes do
       end
     end
 
-    it 'returns 401 if Authorization header not sent' do
+    it 'returns 403 if Authorization header not sent' do
       get api('/internal/kubernetes/agent_info')
 
-      expect(response).to have_gitlab_http_status(:unauthorized)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     context 'an agent is found' do
@@ -65,10 +65,10 @@ RSpec.describe API::Internal::Kubernetes do
       end
     end
 
-    it 'returns 401 if Authorization header not sent' do
+    it 'returns 403 if Authorization header not sent' do
       get api('/internal/kubernetes/project_info')
 
-      expect(response).to have_gitlab_http_status(:unauthorized)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     context 'no such agent exists' do
