@@ -147,6 +147,8 @@ module EE
       return false if ::Feature.disabled?(:license_compliance_denies_mr, project, default_enabled: false)
       return false unless has_license_scanning_reports?
 
+      return false if has_approved_license_check?
+
       actual_head_pipeline.license_scanning_report.violates?(project.software_license_policies)
     end
 
@@ -240,6 +242,10 @@ module EE
     end
 
     private
+
+    def has_approved_license_check?
+      approval_rules.license_compliance.last&.approvals_required == 0
+    end
 
     def missing_report_error(report_type)
       { status: :error, status_reason: "This merge request does not have #{report_type} reports" }
