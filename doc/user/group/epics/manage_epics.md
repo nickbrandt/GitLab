@@ -18,12 +18,42 @@ A paginated list of epics is available in each group from where you can create
 a new epic. The list of epics includes also epics from all subgroups of the
 selected group. From your group page:
 
+### Creating an epic from the epic list
+
 1. Go to **Epics**.
 1. Click **New epic**.
 1. Enter a descriptive title.
 1. Click **Create epic**.
 
-You will be taken to the new epic where can edit the following details:
+### Accessing the New Epic form
+
+There are two ways to get to the New Epic form from within a group:
+
+- From an epic in your group, click **New Epic** to create a new epic
+  in the same group:
+
+  ![New epic from the epic list view](img/epic_header_v13.2.png)
+
+- In the top menu, expand the `plus` sign and choose **New epic**.
+
+  ![New epic from an open epic](img/new_epic_from_groups_v13.2.png)
+
+### Elements of the New Epic form
+
+![New epic form](img/new_epic_form_v13.2.png)
+
+When you're creating a new epic, these are the fields you can fill in:
+
+- Title
+- Description
+- Checkbox to make the epic confidential
+- Labels
+- Start date (Leave empty to inherit from milestone dates)
+- Due date (Leave empty to inherit from milestone dates)
+
+### After creating the epic
+
+You will be taken to the new epic where you can edit the following details:
 
 - Title
 - Description
