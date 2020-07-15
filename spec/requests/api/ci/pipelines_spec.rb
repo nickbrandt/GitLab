@@ -20,32 +20,6 @@ RSpec.describe API::Ci::Pipelines do
     project.add_maintainer(user)
   end
 
-  shared_examples 'a job with artifacts and trace' do |result_is_array: true|
-    context 'with artifacts and trace' do
-      let!(:second_job) { create(:ci_build, :trace_artifact, :artifacts, :test_reports, pipeline: pipeline) }
-
-      it 'returns artifacts and trace data', :skip_before_request do
-        get api(api_endpoint, api_user)
-        json_job = result_is_array ? json_response.select { |job| job['id'] == second_job.id }.first : json_response
-
-        expect(json_job['artifacts_file']).not_to be_nil
-        expect(json_job['artifacts_file']).not_to be_empty
-        expect(json_job['artifacts_file']['filename']).to eq(second_job.artifacts_file.filename)
-        expect(json_job['artifacts_file']['size']).to eq(second_job.artifacts_file.size)
-        expect(json_job['artifacts']).not_to be_nil
-        expect(json_job['artifacts']).to be_an Array
-        expect(json_job['artifacts'].size).to eq(second_job.job_artifacts.length)
-        json_job['artifacts'].each do |artifact|
-          expect(artifact).not_to be_nil
-          file_type = Ci::JobArtifact.file_types[artifact['file_type']]
-          expect(artifact['size']).to eq(second_job.job_artifacts.find_by(file_type: file_type).size)
-          expect(artifact['filename']).to eq(second_job.job_artifacts.find_by(file_type: file_type).filename)
-          expect(artifact['file_format']).to eq(second_job.job_artifacts.find_by(file_type: file_type).file_format)
-        end
-      end
-    end
-  end
-
   describe 'GET /projects/:id/pipelines ' do
     it_behaves_like 'pipelines visibility table'
 
@@ -340,11 +314,13 @@ RSpec.describe API::Ci::Pipelines do
       create(:ci_build, :success, pipeline: pipeline,
                                   artifacts_expire_at: 1.day.since)
     end
+
     let(:guest) { create(:project_member, :guest, project: project).user }
 
     before do |example|
       unless example.metadata[:skip_before_request]
         job
+        project.update!(public_builds: false)
         get api("/projects/#{project.id}/pipelines/#{pipeline.id}/jobs", api_user), params: query
       end
     end
@@ -463,6 +439,7 @@ RSpec.describe API::Ci::Pipelines do
 
     before do |example|
       unless example.metadata[:skip_before_request]
+        project.update!(public_builds: false)
         get api("/projects/#{project.id}/pipelines/#{pipeline.id}/bridges", api_user), params: query
       end
     end
@@ -581,22 +558,9 @@ RSpec.describe API::Ci::Pipelines do
         end
       end
 
-      context 'when user has no read access for pipeline' do
-        before do
-          allow(Ability).to receive(:allowed?).and_call_original
-          allow(Ability).to receive(:allowed?).with(api_user, :read_pipeline, pipeline).and_return(false)
-        end
-
-        it 'does not return bridges' do
-          get api("/projects/#{project.id}/pipelines/#{pipeline.id}/bridges", api_user)
-          expect(response).to have_gitlab_http_status(:forbidden)
-        end
-      end
-
       context 'when user has no read_build access for project' do
         before do
-          allow(Ability).to receive(:allowed?).and_call_original
-          allow(Ability).to receive(:allowed?).with(api_user, :read_build, project).and_return(false)
+          project.add_guest(api_user)
         end
 
         it 'does not return bridges' do

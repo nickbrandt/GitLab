@@ -15,6 +15,26 @@ module API
           detail 'This feature was introduced in GitLab 8.11.'
           success Entities::Ci::PipelineBasic
         end
+
+        helpers do
+          params :optional_scope do
+            optional :scope, types: [String, Array[String]], desc: 'The scope of builds to show',
+                            values: ::CommitStatus::AVAILABLE_STATUSES,
+                           coerce_with: ->(scope) {
+                             case scope
+                             when String
+                               [scope]
+                             when ::Hash
+                               scope.values
+                             when ::Array
+                               scope
+                             else
+                               ['unknown']
+                             end
+                           }
+          end
+        end
+
         params do
           use :pagination
           optional :scope,    type: String, values: %w[running pending finished branches tags],
@@ -94,6 +114,46 @@ module API
           authorize! :read_pipeline, pipeline
 
           present pipeline, with: Entities::Ci::Pipeline
+        end
+
+        desc 'Get pipeline jobs' do
+          success Entities::Job
+        end
+        params do
+          requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
+          use :optional_scope
+          use :pagination
+        end
+
+        get ':id/pipelines/:pipeline_id/jobs' do
+          authenticate!
+
+          builds = ::Ci::PipelineJobsFinder.new(current_user, user_project, params).execute
+          builds = builds.preload_job_artifacts
+
+          present paginate(builds), with: Entities::Job
+        end
+
+        desc 'Get pipeline bridge jobs' do
+          success Entities::Bridge
+        end
+        params do
+          requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
+          use :optional_scope
+          use :pagination
+        end
+
+        get ':id/pipelines/:pipeline_id/bridges' do
+          authenticate!
+
+          bridges = ::Ci::PipelineJobsFinder.new(
+            current_user,
+            user_project,
+            params.merge(type: :bridges)
+          ).execute
+          bridges = bridges.preload_metadata
+
+          present paginate(bridges), with: Entities::Bridge
         end
 
         desc 'Gets the variables for a given pipeline' do

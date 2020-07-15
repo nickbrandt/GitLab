@@ -213,6 +213,10 @@ module Ci
           .execute(build)
         # rubocop: enable CodeReuse/ServiceClass
       end
+
+      def preload_job_artifacts
+        preload(:job_artifacts_archive, :job_artifacts, project: [:namespace])
+      end
     end
 
     state_machine :status do
