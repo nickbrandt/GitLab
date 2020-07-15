@@ -14,12 +14,14 @@ class AllowedEmailDomain < ApplicationRecord
     'icloud.com'
   ].freeze
 
+  REGEX_VALIDATOR = /\w*\./.freeze
+
   validates :group_id, presence: true
   validates :domain, presence: true
   validate :allow_root_group_only
   validates :domain, exclusion: { in: RESERVED_DOMAINS,
     message: _('The domain you entered is not allowed.') }
-  validates :domain, format: { with: /\w*\./,
+  validates :domain, format: { with: REGEX_VALIDATOR,
     message: _('The domain you entered is misformatted.') }
 
   belongs_to :group, class_name: 'Group', foreign_key: :group_id

@@ -10,9 +10,24 @@ export default (el, placeholder, qaSelector) => {
       CommaSeparatedListTokenSelector,
     },
     data() {
-      const { hiddenInputId, labelId } = document.querySelector(this.$options.el).dataset;
+      const {
+        hiddenInputId,
+        labelId,
+        regexValidator,
+        disallowedValues,
+        errorMessage,
+        disallowedValueErrorMessage,
+      } = document.querySelector(this.$options.el).dataset;
 
-      return { hiddenInputId, labelId };
+      return {
+        hiddenInputId,
+        labelId,
+        regexValidator,
+        errorMessage,
+        disallowedValueErrorMessage,
+        ...(regexValidator ? { regexValidator: new RegExp(regexValidator) } : {}),
+        ...(disallowedValues ? { disallowedValues: JSON.parse(disallowedValues) } : {}),
+      };
     },
     render(createElement) {
       return createElement('comma-separated-list-token-selector', {
@@ -22,6 +37,10 @@ export default (el, placeholder, qaSelector) => {
         props: {
           hiddenInputId: this.hiddenInputId,
           ariaLabelledby: this.labelId,
+          regexValidator: this.regexValidator,
+          disallowedValues: this.disallowedValues,
+          errorMessage: this.errorMessage,
+          disallowedValueErrorMessage: this.disallowedValueErrorMessage,
           placeholder,
         },
         scopedSlots: {
