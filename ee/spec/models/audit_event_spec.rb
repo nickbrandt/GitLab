@@ -28,6 +28,14 @@ RSpec.describe AuditEvent, type: :model do
     end
   end
 
+  describe 'callbacks' do
+    it 'sets author_name' do
+      event = create(:user_audit_event, details: { author_name: 'Kungfu Panda' })
+
+      expect(event[:author_name]).to eq('Kungfu Panda')
+    end
+  end
+
   describe '.order_by' do
     let_it_be(:event_1) { create(:audit_event) }
     let_it_be(:event_2) { create(:audit_event) }
