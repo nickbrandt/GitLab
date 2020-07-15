@@ -274,14 +274,6 @@
 "Go to <strong>Issues</strong> > <strong>Boards</strong> to access your personalized learning issue board.":
   plural_id:
   translations:
-"Groups with access to <strong>%{project_name}</strong>":
-  plural_id:
-  translations:
-    - "Grupos com acesso a <strong>%{project_name}</strong>"
-    - "<strong>%{project_name}</strong>へのアクセス権を持つグループ"
-    - "可以访问 <strong>%{project_name}</strong>"
-    - "Групи з доступом до <strong>%{project_name}</strong>"
-    - "Los grupos con acceso a <strong>%{project_name}</strong>"
 "In order to personalize your experience with GitLab<br>we would like to know a bit more about you.":
   plural_id:
   translations:
@@ -1053,3 +1045,11 @@
     - "在<code>.githab-ci.yml</code>的 deploy 阶段中定义 environment 来跟踪部署。"
     - "Визначте середовища на стадії розгортання у <code>.gitlab-ci.yml</code> щоб відстежувати розгортання тут."
     - "Defina entornos en las distintas etapas de despliegue en el fichero <code>.gitlab-ci.yml</code> para llevar un registro de las implementaciones desde aquí."
+"Groups with access to <strong>%{project_name}</strong>":
+  plural_id:
+  translations:
+    - "Grupos com acesso a <strong>%{project_name}</strong>"
+    - "<strong>%{project_name}</strong>へのアクセス権を持つグループ"
+    - "可以访问 <strong>%{project_name}</strong>"
+    - "Групи з доступом до <strong>%{project_name}</strong>"
+    - "Los grupos con acceso a <strong>%{project_name}</strong>"

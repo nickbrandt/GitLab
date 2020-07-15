@@ -12073,10 +12073,10 @@ msgstr ""
 msgid "Groups to synchronize"
 msgstr ""
 
-msgid "Groups with access to %{strong_start}%{group_name}%{strong_end}"
+msgid "Groups with access to %{strong_open}%{project_name}%{strong_close}"
 msgstr ""
 
-msgid "Groups with access to <strong>%{project_name}</strong>"
+msgid "Groups with access to %{strong_start}%{group_name}%{strong_end}"
 msgstr ""
 
 msgid "GroupsDropdown|Frequently visited"
@@ -14654,10 +14654,10 @@ msgstr ""
 msgid "Members"
 msgstr ""
 
-msgid "Members can be added by project <i>Maintainers</i> or <i>Owners</i>"
+msgid "Members can be added by project %{i_open}Maintainers%{i_close} or %{i_open}Owners%{i_close}"
 msgstr ""
 
-msgid "Members of <strong>%{project_name}</strong>"
+msgid "Members of %{strong_open}%{project_name}%{strong_close}"
 msgstr ""
 
 msgid "Members of a group may only view projects they have permission to access"
