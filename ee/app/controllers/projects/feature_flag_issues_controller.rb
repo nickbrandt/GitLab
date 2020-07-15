@@ -30,7 +30,7 @@ module Projects
     end
 
     def ensure_feature_enabled!
-      render_404 unless Feature.enabled?(:feature_flags_issue_links, project)
+      render_404 unless Feature.enabled?(:feature_flags_issue_links, project, default_enabled: true)
     end
   end
 end
