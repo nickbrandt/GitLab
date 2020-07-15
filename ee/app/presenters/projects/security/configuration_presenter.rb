@@ -142,6 +142,7 @@ module Projects
 
       def scan(type, configured: false)
         {
+          type: type,
           configured: configured,
           description: self.class.localized_scan_descriptions[type],
           link: help_page_path(SCAN_DOCS[type]),
