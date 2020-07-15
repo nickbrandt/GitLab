@@ -108,7 +108,7 @@ even if the status you are changing to is the same.
 
 You can continue to have GitLab cross-link a source commit/MR with a Jira issue while disabling the comment added to the issue.
 
-See the [#configuring-gitlab] section and uncheck the **Enable comments** setting.
+See the [Configuring GitLab](#configuring-gitlab) section and uncheck the **Enable comments** setting.
 
 ## Jira issues
 
