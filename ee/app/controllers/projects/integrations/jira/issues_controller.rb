@@ -18,7 +18,7 @@ module Projects
         rescue_from ::Projects::Integrations::Jira::IssuesFinder::RequestError, with: :render_request_error
 
         def index
-          params[:state] = default_state if params[:state].blank?
+          params[:state] = params[:state].presence || default_state
 
           respond_to do |format|
             format.html
