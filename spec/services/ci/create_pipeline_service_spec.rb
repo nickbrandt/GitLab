@@ -80,7 +80,7 @@ RSpec.describe Ci::CreatePipelineService do
       it 'records pipeline size in a prometheus histogram' do
         histogram = spy('pipeline size histogram')
 
-        allow(Gitlab::Ci::Pipeline::Chain::Metrics)
+        allow(Gitlab::Ci::Pipeline::Metrics)
           .to receive(:new).and_return(histogram)
 
         execute_service
