@@ -5,5 +5,5 @@ export default ({ projectId = '', userListIid = '' }) => ({
   projectId,
   userListIid,
   userList: null,
-  errorMessage: '',
+  errorMessage: [],
 });

@@ -85,7 +85,9 @@ describe('User Lists Edit Actions', () => {
 
       it('should commit RECEIVE_USER_LIST_SUCCESS', () => {
         return testAction(actions.updateUserList, updatedList, state, [], [], () => {
-          expect(Api.updateFeatureFlagUserList).toHaveBeenCalledWith('1', updatedList);
+          expect(Api.updateFeatureFlagUserList).toHaveBeenCalledWith('1', {
+            name: updatedList.name,
+          });
           expect(redirectTo).toHaveBeenCalledWith(userList.path);
         });
       });
@@ -106,7 +108,10 @@ describe('User Lists Edit Actions', () => {
           state,
           [{ type: types.RECEIVE_USER_LIST_ERROR, payload: ['error'] }],
           [],
-          () => expect(Api.updateFeatureFlagUserList).toHaveBeenCalledWith('1', updatedList),
+          () =>
+            expect(Api.updateFeatureFlagUserList).toHaveBeenCalledWith('1', {
+              name: updatedList.name,
+            }),
         );
       });
     });

@@ -14,8 +14,7 @@ export const dismissErrorAlert = ({ commit }) => commit(types.DISMISS_ERROR_ALER
 
 export const updateUserList = ({ commit, state }, userList) => {
   return Api.updateFeatureFlagUserList(state.projectId, {
-    ...state.userList,
-    ...userList,
+    name: userList.name,
   })
     .then(({ data }) => redirectTo(data.path))
     .catch(response => commit(types.RECEIVE_USER_LIST_ERROR, getErrorMessages(response)));
