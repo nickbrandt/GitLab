@@ -18,6 +18,8 @@ module Projects
         rescue_from ::Projects::Integrations::Jira::IssuesFinder::RequestError, with: :render_request_error
 
         def index
+          params[:state] = default_state if params[:state].blank?
+
           respond_to do |format|
             format.html
             format.json do
@@ -46,7 +48,6 @@ module Projects
         end
 
         def finder_options
-          params[:state] = default_state if params[:state].blank?
           options = { sort: set_sort_order }
 
           # Used by view to highlight active option
