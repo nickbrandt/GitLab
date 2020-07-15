@@ -187,19 +187,6 @@
 "Go to <strong>Issues</strong> > <strong>Boards</strong> to access your personalized learning issue board.":
   plural_id:
   translations:
-"In order to personalize your experience with GitLab<br>we would like to know a bit more about you.":
-  plural_id:
-  translations:
-    - "Для того, чтобы адаптировать ваш опыт работы с GitLab<br>, мы хотели бы узнать о вас немного больше."
-    - "Con el fin de adaptar su experiencia con GitLab<br>nos gustaría saber un poco más sobre usted."
-    - "Для того, щоб персоналізувати ваш досвід роботи з GitLab<br>,ми хотіли б дізнатися більше про вас."
-"In order to tailor your experience with GitLab we<br>would like to know a bit more about you.":
-  plural_id:
-  translations:
-    - "GitLabでの経験を調整するために、<br>もう少しあなたについて知りたいです。"
-    - "为了能量身定制您在GitLab的体验，我们<br>希望对您有更多了解。"
-    - "Для того, щоб адаптувати GitLab до вас нам<br>потрібно більше про вас дізнатися."
-    - "Para personalizar su experiencia con GitLab <br>nos gustaría conocer un poco más sobre usted."
 "Include the username in the URL if required: <code>https://username@gitlab.company.com/group/project.git</code>.":
   plural_id:
   translations:
@@ -361,12 +348,6 @@
     - "Обсуждения в GitLab отлично подходят для коммуникации и отслеживания прогресса. Перед вами все обсуждения, открытые в %{emphasisStart}%{projectName}%{emphasisEnd}.%{lineBreak}%{lineBreak}Вы можете помочь нам улучшить GitLab, приняв участие в работе над обсуждениями с меткой <span class=\\\"badge color-label accept-mr-label\\\">Accepting merge requests</span> (принимаются запросы на слияние).%{lineBreak}%{lineBreak}Этот список может быть отфильтрован по меткам, этапам, испонителям, авторам... Мы покажем вам, как выглядит отфильтрованный по метке список."
     - "议题非常适合在GitLab中进行沟通和跟踪进展。这些是在%{emphasisStart}%{projectName}%{emphasisEnd}中开启的全部议题。%{lineBreak}%{lineBreak}您可以通过为标记为<span class=\\\"badge color-label accept-mr-label\\\">Accepting merge requests</span>的议题作出贡献来帮助我们改进GitLab。%{lineBreak}%{lineBreak}此列表可以按标签，里程碑，受让人，作者进行过滤......我们将向您展示列表按标签过滤时的样子。"
     - "Задачі добре підходять для комунікації та відстеження прогресу в GitLab. Ось задачі, які відкриті в %{emphasisStart}%{projectName}%{emphasisEnd}.%{lineBreak}%{lineBreak}Ви можете допомогти нам покращити GitLab шляхом внесків у задачі, що відмічені <span class=\\\"badge color-label accept-mr-label\\\">Приймаються запити на злиття</span>.%{lineBreak}%{lineBreak}Цей список може бути відвільтрований за мітками, етапами, виконавцями, авторами... Ми продоемонструємо як виглядає список, відфільтрований за міткою."
-"Welcome to GitLab.com<br>@%{name}!":
-  plural_id:
-  translations:
-    - "Добро пожаловать в GitLab.com<br>@%{name}!"
-    - "Ласкаво просимо до GitLab.com<br>@%{name}!"
-    - "¡Bienvenido a GitLab.com<br>@%{name}!"
 "WikiMarkdownTip|To link to a (new) page, simply type <code class=\\\"js-markup-link-example\\\">%{link_example}</code>":
   plural_id:
   translations:
@@ -1053,3 +1034,22 @@
     - "Du befindest dich auf einem sekundären, <b>read-only</b> Geo-Knoten. Möglicherweise kannst du nur eine begrenzte Anzahl an Änderungen oder Aktionen auf dieser Seite durchführen."
     - "Vous êtes sur un nœud Geo secondaire <b>en lecture seule</b>. Nous ne pourrez effectuer que des modifications ou des actions limitées depuis cette page."
     - "Está en un nodo secundario, <b>de solo lectura</b> Geo. Es posible que pueda realizar una cantidad limitada de cambios o realizar una cantidad limitada de acciones en esta página."
+"In order to tailor your experience with GitLab we<br>would like to know a bit more about you.":
+  plural_id:
+  translations:
+    - "GitLabでの経験を調整するために、<br>もう少しあなたについて知りたいです。"
+    - "为了能量身定制您在GitLab的体验，我们<br>希望对您有更多了解。"
+    - "Для того, щоб адаптувати GitLab до вас нам<br>потрібно більше про вас дізнатися."
+    - "Para personalizar su experiencia con GitLab <br>nos gustaría conocer un poco más sobre usted."
+"Welcome to GitLab.com<br>@%{name}!":
+  plural_id:
+  translations:
+    - "Добро пожаловать в GitLab.com<br>@%{name}!"
+    - "Ласкаво просимо до GitLab.com<br>@%{name}!"
+    - "¡Bienvenido a GitLab.com<br>@%{name}!"
+"In order to personalize your experience with GitLab<br>we would like to know a bit more about you.":
+  plural_id:
+  translations:
+    - "Для того, чтобы адаптировать ваш опыт работы с GitLab<br>, мы хотели бы узнать о вас немного больше."
+    - "Con el fin de adaptar su experiencia con GitLab<br>nos gustaría saber un poco más sobre usted."
+    - "Для того, щоб персоналізувати ваш досвід роботи з GitLab<br>,ми хотіли б дізнатися більше про вас."
