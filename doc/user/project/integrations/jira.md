@@ -199,10 +199,6 @@ You can browse and open issues from a selected Jira project directly in GitLab. 
 
 From the **Jira Issues** menu, click **Issues List**. A list of issues is displayed, grouped based on their [Jira status](https://confluence.atlassian.com/adminjiraserver070/defining-status-field-values-749382903.html).
 
-* The **Open** tab displays all issues with a Jira status in any category other than Done.
-* The **Closed** tab displays all issues with a Jira status categorized as Done.
-* The **All** tab displays all issues of any status.
-
 By default, the newest issues are listed at the top based on the date they were created.  
 
 #### Search and filter the issues list
