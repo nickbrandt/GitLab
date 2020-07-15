@@ -22,6 +22,9 @@ export const generateVulnerabilities = () => [
     project: {
       nameWithNamespace: 'Administrator / Security reports',
     },
+    scanner: {
+      vendor: 'GitLab',
+    },
   },
   {
     id: 'id_1',
@@ -42,6 +45,9 @@ export const generateVulnerabilities = () => [
     project: {
       nameWithNamespace: 'Administrator / Vulnerability reports',
     },
+    scanner: {
+      vendor: 'GitLab',
+    },
   },
   {
     id: 'id_2',
@@ -55,6 +61,9 @@ export const generateVulnerabilities = () => [
     project: {
       nameWithNamespace: 'Mixed Vulnerabilities / Dependency List Test 01',
     },
+    scanner: {
+      vendor: 'My Custom Scanner',
+    },
   },
   {
     id: 'id_3',
@@ -67,6 +76,7 @@ export const generateVulnerabilities = () => [
     project: {
       nameWithNamespace: 'Mixed Vulnerabilities / Rails App',
     },
+    scanner: {},
   },
   {
     id: 'id_4',
@@ -77,6 +87,7 @@ export const generateVulnerabilities = () => [
     project: {
       nameWithNamespace: 'Administrator / Security reports',
     },
+    scanner: {},
   },
 ];
 
