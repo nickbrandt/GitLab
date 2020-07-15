@@ -27,6 +27,12 @@ RSpec.describe Groups::EpicsController do
       it_behaves_like '404 status'
     end
 
+    describe 'GET #new' do
+      subject { get :new, params: { group_id: group } }
+
+      it_behaves_like '404 status'
+    end
+
     describe 'GET #show' do
       subject { get :show, params: { group_id: group, id: epic.to_param } }
 
@@ -245,6 +251,23 @@ RSpec.describe Groups::EpicsController do
         let!(:discussion_comment) { create(:note, noteable: issuable) }
 
         it_behaves_like 'issuable notes filter'
+      end
+    end
+
+    describe 'GET #new' do
+      it 'renders template' do
+        group.add_developer(user)
+        get :new, params: { group_id: group }
+
+        expect(response).to render_template 'groups/epics/new'
+      end
+
+      context 'with unauthorized user' do
+        it 'returns a not found 404 response' do
+          get :new, params: { group_id: group }
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
       end
     end
 

@@ -10,16 +10,18 @@ class Groups::EpicsController < Groups::ApplicationController
   include DescriptionDiffActions
 
   before_action :check_epics_available!
-  before_action :epic, except: [:index, :create, :bulk_update]
+  before_action :epic, except: [:index, :create, :new, :bulk_update]
   before_action :set_issuables_index, only: :index
   before_action :authorize_update_issuable!, only: :update
-  before_action :authorize_create_epic!, only: [:create]
+  before_action :authorize_create_epic!, only: [:create, :new]
   before_action :verify_group_bulk_edit_enabled!, only: [:bulk_update]
 
   before_action do
     push_frontend_feature_flag(:vue_issuable_epic_sidebar, @group)
     push_frontend_feature_flag(:confidential_epics, @group, default_enabled: true)
   end
+
+  def new; end
 
   def index
     @epics = @issuables
