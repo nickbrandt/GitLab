@@ -101,6 +101,14 @@ download all the advertised refs.
    [Protected tags](../protected_tags.md) will cause this to fail. To proceed, you must remove tag
    protection, push, and then re-enable protected tags.
 
+1. To prevent dead links to commits that no longer exist, push the `refs/replace` created by `git filter-repo`.
+
+   ```shell
+   git push origin --force 'refs/replace/*'
+   ```
+
+   Refer to the Git documentation on [`replace`](https://git-scm.com/book/en/v2/Git-Tools-Replace) for how this works.
+
 1. Run a [repository cleanup](#repository-cleanup).
 
 NOTE: **Note:**
@@ -184,6 +192,14 @@ the project export.
 
    [Protected tags](../protected_tags.md) will cause this to fail. To proceed, you must remove tag
    protection, push, and then re-enable protected tags.
+
+1. To prevent dead links to commits that no longer exist, push the `refs/replace` created by `git filter-repo`.
+
+   ```shell
+   git push origin --force 'refs/replace/*'
+   ```
+
+   Refer to the Git documentation on [`replace`](https://git-scm.com/book/en/v2/Git-Tools-Replace) for how this works.
 
 1. Run a [repository cleanup](#repository-cleanup).
 
