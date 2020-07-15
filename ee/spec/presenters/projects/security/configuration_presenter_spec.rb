@@ -215,6 +215,7 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
 
   def security_scan(type, configured:)
     {
+      "type" => type.to_s,
       "configured" => configured,
       "description" => described_class.localized_scan_descriptions[type],
       "link" => help_page_path(described_class::SCAN_DOCS[type]),

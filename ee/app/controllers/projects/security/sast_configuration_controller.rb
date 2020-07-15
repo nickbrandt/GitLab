@@ -8,7 +8,7 @@ module Projects
 
       alias_method :vulnerable, :project
 
-      before_action :ensure_sast_configuration_enabled!
+      before_action :ensure_sast_configuration_enabled!, except: [:create]
       before_action :authorize_edit_tree!, only: [:create]
 
       def show

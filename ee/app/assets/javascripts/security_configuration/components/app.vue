@@ -3,6 +3,7 @@ import { GlAlert, GlLink, GlSprintf, GlTable } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import AutoFixSettings from './auto_fix_settings.vue';
+import CreateMergeRequestButton from './create_merge_request_button.vue';
 
 export default {
   components: {
@@ -11,6 +12,7 @@ export default {
     GlSprintf,
     GlTable,
     AutoFixSettings,
+    CreateMergeRequestButton,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -55,6 +57,12 @@ export default {
       required: false,
       default: false,
     },
+    // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575
+    createSastMergeRequestPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     devopsMessage() {
@@ -70,17 +78,25 @@ export default {
       return this.autoDevopsEnabled ? this.autoDevopsHelpPagePath : this.latestPipelinePath;
     },
     fields() {
+      const borderClasses = 'gl-border-b-1! gl-border-b-solid! gl-border-gray-100!';
+      const thClass = `gl-text-gray-900 gl-bg-transparent! ${borderClasses}`;
+
       return [
         {
           key: 'feature',
           label: s__('SecurityConfiguration|Security Control'),
-          thClass: 'gl-text-gray-900 bg-transparent border-bottom',
+          thClass,
         },
         {
           key: 'configured',
           label: s__('SecurityConfiguration|Status'),
-          thClass: 'gl-text-gray-900 bg-transparent border-bottom',
+          thClass,
           formatter: this.getStatusText,
+        },
+        {
+          key: 'manage',
+          label: s__('SecurityConfiguration|Manage'),
+          thClass,
         },
       ];
     },
@@ -95,14 +111,27 @@ export default {
   },
   methods: {
     getStatusText(value) {
-      return value
-        ? s__('SecurityConfiguration|Enabled')
-        : s__('SecurityConfiguration|Not yet enabled');
+      if (value) {
+        return this.autoDevopsEnabled
+          ? s__('SecurityConfiguration|Enabled with Auto DevOps')
+          : s__('SecurityConfiguration|Enabled');
+      }
+
+      return s__('SecurityConfiguration|Not enabled');
     },
     getFeatureDocumentationLinkLabel(featureName) {
       return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
         featureName,
       });
+    },
+    // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575
+    canCreateSASTMergeRequest(feature) {
+      return Boolean(
+        this.glFeatures.sastConfigurationByClick &&
+          feature.type === 'sast' &&
+          this.createSastMergeRequestPath &&
+          !this.gitlabCiPresent,
+      );
     },
   },
   autoDevopsAlertMessage: s__(`
@@ -145,14 +174,24 @@ export default {
         <div class="gl-text-gray-900">{{ item.name }}</div>
         <div>
           {{ item.description }}
-          <gl-link
-            target="_blank"
-            :href="item.link"
-            :aria-label="getFeatureDocumentationLinkLabel(item.name)"
-          >
-            {{ __('More information') }}
-          </gl-link>
         </div>
+      </template>
+
+      <template #cell(manage)="{ item }">
+        <create-merge-request-button
+          v-if="canCreateSASTMergeRequest(item)"
+          :auto-devops-enabled="autoDevopsEnabled"
+          :endpoint="createSastMergeRequestPath"
+        />
+
+        <gl-link
+          v-else
+          target="_blank"
+          :href="item.link"
+          :aria-label="getFeatureDocumentationLinkLabel(item.name)"
+        >
+          {{ s__('SecurityConfiguration|See documentation') }}
+        </gl-link>
       </template>
     </gl-table>
     <auto-fix-settings v-if="glFeatures.securityAutoFix" v-bind="autoFixSettingsProps" />
