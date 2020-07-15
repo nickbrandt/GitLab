@@ -195,7 +195,7 @@ module EE
           super.merge(
             projects_jira_dvcs_cloud_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled),
             projects_jira_dvcs_server_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false)),
-            projects_jira_issuelist_active: count(JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true })) # rubocop:disable CodeReuse/ActiveRecord
+            projects_jira_issuelist_active: projects_jira_issuelist_active
           )
         end
 
@@ -346,6 +346,15 @@ module EE
         def ldap_available_servers
           ::Gitlab::Auth::Ldap::Config.available_servers
         end
+
+        # rubocop:disable CodeReuse/ActiveRecord
+        def projects_jira_issuelist_active
+          min_id = JiraTrackerData.where(issues_enabled: true).minimum(:service_id)
+          max_id = JiraTrackerData.where(issues_enabled: true).maximum(:service_id)
+
+          count(JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
+        end
+        # rubocop:enable CodeReuse/ActiveRecord
       end
     end
   end
