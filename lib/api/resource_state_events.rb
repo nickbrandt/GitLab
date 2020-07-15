@@ -7,43 +7,40 @@ module API
 
     before { authenticate! }
 
-    [Issue, MergeRequest].each do |eventable_type|
-      parent_type = eventable_type.parent_class.to_s.underscore
-      eventables_str = eventable_type.to_s.underscore.pluralize
+    [Issue, MergeRequest].each do |eventable_class|
+      eventable_name = eventable_class.to_s.underscore
 
       params do
-        requires :id, type: String, desc: "The ID of a #{parent_type}"
+        requires :id, type: String, desc: "The ID of a project"
       end
-      resource parent_type.pluralize.to_sym, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-        desc "Get a list of #{eventable_type.to_s.downcase} resource state events" do
+      resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+        desc "Get a list of #{eventable_class.to_s.downcase} resource state events" do
           success Entities::ResourceStateEvent
         end
         params do
-          requires :eventable_id, types: [Integer, String], desc: 'The ID of the eventable'
+          requires :eventable_iid, types: Integer, desc: "The IID of the #{eventable_name}"
           use :pagination
         end
 
-        get ":id/#{eventables_str}/:eventable_id/resource_state_events" do
-          eventable = find_noteable(eventable_type, params[:eventable_id])
+        get ":id/#{eventable_name.pluralize}/:eventable_iid/resource_state_events" do
+          eventable = find_noteable(eventable_class, params[:eventable_iid])
 
           events = ResourceStateEventFinder.new(current_user, eventable).execute
 
           present paginate(events), with: Entities::ResourceStateEvent
         end
 
-        desc "Get a single #{eventable_type.to_s.downcase} resource state event" do
+        desc "Get a single #{eventable_class.to_s.downcase} resource state event" do
           success Entities::ResourceStateEvent
         end
         params do
-          requires :event_id, type: String, desc: 'The ID of a resource state event'
-          requires :eventable_id, types: [Integer, String], desc: 'The ID of the eventable'
+          requires :eventable_iid, types: Integer, desc: "The IID of the #{eventable_name}"
+          requires :event_id, type: Integer, desc: 'The ID of a resource state event'
         end
-        get ":id/#{eventables_str}/:eventable_id/resource_state_events/:event_id" do
-          eventable = find_noteable(eventable_type, params[:eventable_id])
+        get ":id/#{eventable_name.pluralize}/:eventable_iid/resource_state_events/:event_id" do
+          eventable = find_noteable(eventable_class, params[:eventable_iid])
 
-          not_found!('ResourceStateEvent') unless ResourceStateEventFinder.new(current_user, eventable).can_read_eventable?
-
-          event = eventable.resource_state_events.find(params[:event_id])
+          event = ResourceStateEventFinder.new(current_user, eventable).find(params[:event_id])
 
           present event, with: Entities::ResourceStateEvent
         end
