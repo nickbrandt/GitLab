@@ -34,8 +34,6 @@ export default (
   }
 
   const props = {
-    notEnabledScannersHelpPath: el.dataset.notEnabledScannersHelpPath,
-    noPipelineRunScannersHelpPath: el.dataset.noPipelineRunScannersHelpPath,
     hasVulnerabilities: Boolean(el.dataset.hasVulnerabilities),
     securityDashboardHelpPath: el.dataset.securityDashboardHelpPath,
     projectAddEndpoint: el.dataset.projectAddEndpoint,
@@ -72,6 +70,8 @@ export default (
       dashboardDocumentation: el.dataset.dashboardDocumentation,
       noVulnerabilitiesSvgPath: el.dataset.noVulnerabilitiesSvgPath,
       emptyStateSvgPath: el.dataset.emptyStateSvgPath,
+      notEnabledScannersHelpPath: el.dataset.notEnabledScannersHelpPath,
+      noPipelineRunScannersHelpPath: el.dataset.noPipelineRunScannersHelpPath,
     }),
     render(createElement) {
       return createElement(component, { props });

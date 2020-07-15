@@ -32,14 +32,6 @@ export default {
       required: false,
       default: '',
     },
-    notEnabledScannersHelpPath: {
-      type: String,
-      required: true,
-    },
-    noPipelineRunScannersHelpPath: {
-      type: String,
-      required: true,
-    },
     hasVulnerabilities: {
       type: Boolean,
       required: false,
@@ -120,8 +112,6 @@ export default {
         </template>
         <project-vulnerabilities-app
           :dashboard-documentation="dashboardDocumentation"
-          :not-enabled-scanners-help-path="notEnabledScannersHelpPath"
-          :no-pipeline-run-scanners-help-path="noPipelineRunScannersHelpPath"
           :project-full-path="projectFullPath"
           :filters="filters"
         />

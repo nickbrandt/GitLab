@@ -107,8 +107,6 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
       expect(findVulnerabilities().props()).toEqual({
         filters: {},
         isLoading: false,
-        noPipelineRunScannersHelpPath: '',
-        notEnabledScannersHelpPath: '',
         shouldShowIdentifier: false,
         securityScanners: {},
         shouldShowReportType: false,

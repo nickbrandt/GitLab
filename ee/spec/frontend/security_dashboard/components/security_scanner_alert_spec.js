@@ -9,16 +9,23 @@ describe('EE Vulnerability Security Scanner Alert', () => {
     wrapper.destroy();
   });
 
-  const createWrapper = (props = {}) => {
+  const createWrapper = ({ props = {}, provide = {} } = {}) => {
     const defaultProps = {
       notEnabledScanners: [],
-      notEnabledHelpPath: '',
       noPipelineRunScanners: [],
-      noPipelineRunHelpPath: '',
+    };
+
+    const defaultProvide = {
+      notEnabledScannersHelpPath: '',
+      noPipelineRunScannersHelpPath: '',
     };
 
     wrapper = mount(SecurityScannerAlert, {
       propsData: { ...defaultProps, ...props },
+      provide: () => ({
+        ...defaultProvide,
+        ...provide,
+      }),
     });
   };
 
@@ -28,19 +35,19 @@ describe('EE Vulnerability Security Scanner Alert', () => {
 
   describe('container', () => {
     it('renders when disabled scanners are detected', () => {
-      createWrapper({ notEnabledScanners: ['SAST'], noPipelineRunScanners: [] });
+      createWrapper({ props: { notEnabledScanners: ['SAST'], noPipelineRunScanners: [] } });
 
       expect(findAlert()).not.toBe(null);
     });
 
     it('renders when scanners without pipeline runs are detected', () => {
-      createWrapper({ notEnabledScanners: [], noPipelineRunScanners: ['DAST'] });
+      createWrapper({ props: { notEnabledScanners: [], noPipelineRunScanners: ['DAST'] } });
 
       expect(findAlert()).not.toBe(null);
     });
 
     it('does not render when all scanners are enabled', () => {
-      createWrapper({ notEnabledScanners: [], noPipelineRunScanners: [] });
+      createWrapper({ props: { notEnabledScanners: [], noPipelineRunScanners: [] } });
 
       expect(findAlert()).toBe(null);
     });
@@ -48,13 +55,13 @@ describe('EE Vulnerability Security Scanner Alert', () => {
 
   describe('dismissal', () => {
     it('renders a button', () => {
-      createWrapper({ notEnabledScanners: ['SAST'] });
+      createWrapper({ props: { notEnabledScanners: ['SAST'] } });
 
       expect(withinWrapper().getByRole('button', { name: /dismiss/i })).toBeTruthy();
     });
 
     it('emits when the button is clicked', async () => {
-      createWrapper({ notEnabledScanners: ['SAST'] });
+      createWrapper({ props: { notEnabledScanners: ['SAST'] } });
 
       const dismissalButton = withinWrapper().getByRole('button', { name: /dismiss/i });
       expect(wrapper.emitted('dismiss')).toBe(undefined);
@@ -73,7 +80,7 @@ describe('EE Vulnerability Security Scanner Alert', () => {
       ${'noPipelineRun'} | ${{ noPipelineRunScanners: ['SAST'] }}         | ${'SAST result is not available because a pipeline has not been run since it was enabled'}
       ${'noPipelineRun'} | ${{ noPipelineRunScanners: ['SAST', 'DAST'] }} | ${'SAST, DAST results are not available because a pipeline has not been run since it was enabled'}
     `('renders the correct warning', ({ alertType, givenScanners, expectedTextContained }) => {
-      createWrapper({ ...givenScanners });
+      createWrapper({ props: { ...givenScanners } });
 
       expect(findById(alertType).innerText).toContain(expectedTextContained);
     });
@@ -86,8 +93,12 @@ describe('EE Vulnerability Security Scanner Alert', () => {
       ${'noPipelineRun'} | ${'Run a pipeline'}
     `('link for $alertType scanners renders correctly', ({ alertType, linkText }) => {
       createWrapper({
-        [`${alertType}Scanners`]: ['SAST'],
-        [`${alertType}HelpPath`]: 'http://foo.com/',
+        props: {
+          [`${alertType}Scanners`]: ['SAST'],
+        },
+        provide: {
+          [`${alertType}ScannersHelpPath`]: 'http://foo.com/',
+        },
       });
 
       expect(within(findById(alertType)).getByText(linkText).href).toBe('http://foo.com/');

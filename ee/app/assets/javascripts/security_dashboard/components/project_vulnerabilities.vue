@@ -17,14 +17,6 @@ export default {
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
-    notEnabledScannersHelpPath: {
-      type: String,
-      required: true,
-    },
-    noPipelineRunScannersHelpPath: {
-      type: String,
-      required: true,
-    },
     projectFullPath: {
       type: String,
       required: true,
@@ -134,8 +126,6 @@ export default {
     <vulnerability-list
       v-else
       :is-loading="isLoadingFirstVulnerabilities"
-      :not-enabled-scanners-help-path="notEnabledScannersHelpPath"
-      :no-pipeline-run-scanners-help-path="noPipelineRunScannersHelpPath"
       :filters="filters"
       :vulnerabilities="vulnerabilities"
       :should-show-identifier="true"

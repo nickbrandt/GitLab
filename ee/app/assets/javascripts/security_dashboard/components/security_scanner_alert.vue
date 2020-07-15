@@ -14,31 +14,24 @@ export default {
       type: Array,
       required: true,
     },
-    notEnabledHelpPath: {
-      type: String,
-      required: true,
-    },
     noPipelineRunScanners: {
       type: Array,
       required: true,
     },
-    noPipelineRunHelpPath: {
-      type: String,
-      required: true,
-    },
   },
+  inject: ['notEnabledScannersHelpPath', 'noPipelineRunScannersHelpPath'],
   computed: {
     alertMessages() {
       return [
         {
           type: 'notEnabled',
-          documentation: this.notEnabledHelpPath,
+          documentation: this.notEnabledScannersHelpPath,
           content: this.notEnabledAlertMessage,
           scanners: this.notEnabledScanners,
         },
         {
           type: 'noPipelineRun',
-          documentation: this.noPipelineRunHelpPath,
+          documentation: this.noPipelineRunScannersHelpPath,
           content: this.noPipelineRunAlertMessage,
           scanners: this.noPipelineRunScanners,
         },

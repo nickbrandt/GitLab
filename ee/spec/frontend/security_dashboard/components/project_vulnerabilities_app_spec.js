@@ -14,8 +14,6 @@ describe('Vulnerabilities app component', () => {
     wrapper = shallowMount(ProjectVulnerabilitiesApp, {
       propsData: {
         dashboardDocumentation: '#',
-        notEnabledScannersHelpPath: '#',
-        noPipelineRunScannersHelpPath: '#',
         emptyStateSvgPath: '#',
         projectFullPath: '#',
         ...props,
@@ -126,15 +124,6 @@ describe('Vulnerabilities app component', () => {
       wrapper.setData({ securityScanners });
 
       expect(findVulnerabilityList().props().securityScanners).toEqual(securityScanners);
-    });
-
-    it('should pass the help paths to the vulnerability list', () => {
-      expect(findVulnerabilityList().props()).toEqual(
-        expect.objectContaining({
-          notEnabledScannersHelpPath,
-          noPipelineRunScannersHelpPath,
-        }),
-      );
     });
   });
 });
