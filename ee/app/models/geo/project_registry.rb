@@ -44,7 +44,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   end
 
   def self.registry_consistency_worker_enabled?
-    Feature.enabled?(:geo_project_registry_ssot_sync)
+    Feature.enabled?(:geo_project_registry_ssot_sync, default_enabled: true)
   end
 
   def self.find_registry_differences(range)
