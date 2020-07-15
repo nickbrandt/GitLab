@@ -1,6 +1,7 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex';
 import { componentNames } from '~/reports/components/issue_body';
+import { s__, sprintf } from '~/locale';
 import ReportSection from '~/reports/components/report_section.vue';
 import createStore from './store';
 
@@ -58,21 +59,19 @@ export default {
   methods: {
     ...mapActions(['fetchReports', 'setPaths']),
   },
+  loadingText: sprintf(s__('ciReport|Loading %{reportName} report'), {
+    reportName: 'codeclimate',
+  }),
+  errorText: sprintf(s__('ciReport|Failed to load %{reportName} report'), {
+    reportName: 'codeclimate',
+  }),
 };
 </script>
 <template>
   <report-section
     :status="codequalityStatus"
-    :loading-text="
-      sprintf(s__('ciReport|Loading %{reportName} report'), {
-        reportName: 'codeclimate',
-      })
-    "
-    :error-text="
-      sprintf(s__('ciReport|Failed to load %{reportName} report'), {
-        reportName: 'codeclimate',
-      })
-    "
+    :loading-text="$options.loadingText"
+    :error-text="$options.errorText"
     :success-text="codequalityText"
     :unresolved-issues="newIssues"
     :resolved-issues="resolvedIssues"
