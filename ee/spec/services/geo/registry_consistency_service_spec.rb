@@ -11,19 +11,18 @@ RSpec.describe Geo::RegistryConsistencyService, :geo, :use_clean_rails_memory_st
     stub_current_geo_node(secondary)
   end
 
-  def model_class_factory_name(model_class)
-    if model_class == ::Packages::PackageFile
-      :package_file_with_file
-    else
-      model_class.underscore.tr('/', '_').to_sym
-    end
+  def model_class_factory_name(registry_class)
+    return :project_with_design if registry_class == ::Geo::DesignRegistry
+    return :package_file_with_file if registry_class == ::Geo::PackageFileRegistry
+
+    registry_class::MODEL_CLASS.underscore.tr('/', '_').to_sym
   end
 
   shared_examples 'registry consistency service' do |klass|
     let(:registry_class) { klass }
     let(:registry_class_factory) { registry_factory_name(registry_class) }
     let(:model_class) { registry_class::MODEL_CLASS }
-    let(:model_class_factory) { model_class_factory_name(model_class) }
+    let(:model_class_factory) { model_class_factory_name(registry_class) }
     let(:model_foreign_key) { registry_class::MODEL_FOREIGN_KEY }
     let(:batch_size) { 2 }
 

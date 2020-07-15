@@ -262,6 +262,10 @@ class GeoNode < ApplicationRecord
     ContainerRepository.project_id_in(projects)
   end
 
+  def designs
+    projects.with_designs
+  end
+
   def lfs_objects
     return LfsObject.all unless selective_sync?
 
