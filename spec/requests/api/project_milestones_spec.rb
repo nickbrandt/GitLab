@@ -16,6 +16,58 @@ RSpec.describe API::ProjectMilestones do
     let(:route) { "/projects/#{project.id}/milestones" }
   end
 
+  describe 'GET /projects/:id/milestones' do
+    context 'when include_parent_milestones is true' do
+      let(:group) { create(:group, :public) }
+      let(:project) { create(:project, group: group) }
+      let!(:group_milestone) { create(:milestone, group: group) }
+
+      context 'when user has access to group parent' do
+        let(:nested_group) { create(:group, :public, parent: group) }
+        let!(:nested_group_milestone) { create(:milestone, group: nested_group) }
+
+        it 'result includes parent group and subgroup milestones' do
+          milestones = [nested_group_milestone, group_milestone, milestone, closed_milestone]
+
+          get api("/projects/#{project.id}/milestones", user),
+              params: { include_parent_milestones: true }
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(4)
+
+          expect(json_response.map { |entry| entry["id"] }).to eq(milestones.map(&:id))
+        end
+      end
+
+      context 'when user has no access to group parent' do
+        it 'does not show parent group milestones' do
+          allow(Ability).to receive(:allowed?).and_call_original
+          allow(Ability).to receive(:allowed?).with(user, :read_group, group).and_return(false)
+
+          get api("/projects/#{project.id}/milestones", user),
+              params: { include_parent_milestones: true }
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(2)
+        end
+      end
+
+      context 'when filtering by iids' do
+        it 'does not filer by iids' do
+          milestones = [group_milestone, milestone, closed_milestone]
+
+          get api("/projects/#{project.id}/milestones", user),
+              params: { include_parent_milestones: true, iids: [group_milestone.iid] }
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(3)
+
+          expect(json_response.map { |entry| entry["id"] }).to eq(milestones.map(&:id))
+        end
+      end
+    end
+  end
+
   describe 'DELETE /projects/:id/milestones/:milestone_id' do
     let(:guest) { create(:user) }
     let(:reporter) { create(:user) }
