@@ -757,9 +757,6 @@ msgid_plural "(%d closed)"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "(%{linkStart}Cron syntax%{linkEnd})"
-msgstr ""
-
 msgid "(%{mrCount} merged)"
 msgstr ""
 
@@ -16902,6 +16899,9 @@ msgstr ""
 msgid "PipelineCharts|Total:"
 msgstr ""
 
+msgid "PipelineScheduleIntervalPattern|Custom (%{linkStart}Cron syntax%{linkEnd})"
+msgstr ""
+
 msgid "PipelineSchedules|Activated"
 msgstr ""
 
@@ -16930,9 +16930,6 @@ msgid "PipelineSchedules|Target"
 msgstr ""
 
 msgid "PipelineSchedules|Variables"
-msgstr ""
-
-msgid "PipelineSheduleIntervalPattern|Custom"
 msgstr ""
 
 msgid "PipelineStatusTooltip|Pipeline: %{ciStatus}"
