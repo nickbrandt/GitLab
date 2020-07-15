@@ -252,7 +252,7 @@ and complete the CAPTCHA.
 
 ### Enable or disable Jira Issue List **(PREMIUM)**
 
-Jira Issue List is deployed as a license-gated feature that implies existence of a `jira_issues_integration` 
+Jira Issue List is deployed as a license-gated feature that implies existence of a `jira_issues_integration`
 feature flag check, which is **enabled by default**.
 
 [GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
