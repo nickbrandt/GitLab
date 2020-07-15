@@ -86,11 +86,20 @@ download all the advertised refs.
 1. Force push your changes to overwrite all branches on GitLab:
 
    ```shell
-   git push origin --force 'refs/{tags,heads}/*'
+   git push origin --force 'refs/heads/*'
    ```
 
-   [Protected branches](../protected_branches.md) and [protected tags](../protected_tags.md) will cause this to fail.
-   To proceed, you must remove branch and tag protection, push, and then re-enable protected branches and tags.
+   [Protected branches](../protected_branches.md) will cause this to fail. To proceed, you must
+   remove branch protection, push, and then re-enable protected branches.
+
+1. To remove large files from tagged releases, force push your changes to all tags on GitLab:
+
+   ```shell
+   git push origin --force 'refs/tags/*'
+   ```
+
+   [Protected tags](../protected_tags.md) will cause this to fail. To proceed, you must remove tag
+   protection, push, and then re-enable protected tags.
 
 1. Run a [repository cleanup](#repository-cleanup).
 
@@ -150,14 +159,31 @@ the project export.
    [`git filter-repo` documentation](https://htmlpreview.github.io/?https://github.com/newren/git-filter-repo/blob/docs/html/git-filter-repo.html#EXAMPLES)
    for more examples and the complete documentation.
 
+1. Cloning from a bundle file will set the origin remote to the local bundle file. Delete this origin remote, and set
+   it to the URL to your repository.
+
+   ```shell
+   git remote remove origin
+   git remote add origin https://example.gitlab.com/<namespace>/<project_name>.git
+   ```
+
 1. Force push your changes to overwrite all branches on GitLab:
 
    ```shell
-   git push origin --force 'refs/{tags,heads}/*'
+   git push origin --force 'refs/heads/*'
    ```
 
-   [Protected branches](../protected_branches.md) and [protected tags](../protected_tags.md) will cause this to fail.
-   To proceed, you must remove branch and tag protection, push, and then re-enable protected branches and tags.
+   [Protected branches](../protected_branches.md) will cause this to fail. To proceed, you must
+   remove branch protection, push, and then re-enable protected branches.
+
+1. To remove large files from tagged releases, force push your changes to all tags on GitLab:
+
+   ```shell
+   git push origin --force 'refs/tags/*'
+   ```
+
+   [Protected tags](../protected_tags.md) will cause this to fail. To proceed, you must remove tag
+   protection, push, and then re-enable protected tags.
 
 1. Run a [repository cleanup](#repository-cleanup).
 
@@ -174,15 +200,26 @@ To clean up a repository:
 
 1. Go to the project for the repository.
 1. Navigate to **{settings}** **Settings > Repository**.
-1. Upload a list of objects. For example, a `commit-map` file.
+1. Upload a list of objects. For example, a `commit-map` file created by `git filter-repo` which is located in the
+   `filter-repo` directory.
+
+   If your `commit-map` file is larger than 10MB, the file can be split and uploaded piece by piece:
+
+   ```shell
+   split -l 100000 filter-repo/commit-map filter-repo/commit-map-
+   ```
+
 1. Click **Start cleanup**.
 
 This will:
 
 - Remove any internal Git references to old commits.
-- Run `git gc` against the repository.
+- Run `git gc` against the repository to remove unreferenced objects. Repacking your repository will temporarily
+  case the size of your repository to increase significantly, because the old pack files are not removed until the new
+  pack files have been created.
+- Recalculate the size of your repository on disk
 
-You will receive an email once it has completed.
+You will receive an email notification with the recalculated repository size after the cleanup has completed.
 
 When using repository cleanup, note:
 
