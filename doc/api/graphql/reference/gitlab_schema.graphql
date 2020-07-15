@@ -794,6 +794,11 @@ type Blob implements Entry {
   lfsOid: String
 
   """
+  Blob mode in numeric format
+  """
+  mode: String
+
+  """
   Name of the entry
   """
   name: String!
