@@ -1,4 +1,4 @@
-import { buildUneditableOpenTokens, buildUneditableCloseToken } from './build_uneditable_token';
+import { renderEnterExitBlock } from './render_utils';
 
 const identifierRegex = /(^\[.+\]: .+)/;
 
@@ -10,7 +10,6 @@ const canRender = (node, context) => {
   return isIdentifier(context.getChildrenText(node));
 };
 
-const render = (_, { entering, origin }) =>
-  entering ? buildUneditableOpenTokens(origin()) : buildUneditableCloseToken();
+const render = renderEnterExitBlock;
 
 export default { canRender, render };

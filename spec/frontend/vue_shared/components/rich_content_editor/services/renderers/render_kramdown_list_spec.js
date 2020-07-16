@@ -34,7 +34,11 @@ describe('Render Kramdown List renderer', () => {
   });
 
   describe('render', () => {
-    const origin = jest.fn();
+    let origin;
+
+    beforeEach(() => {
+      origin = jest.fn();
+    });
 
     it('should return uneditable open tokens when entering', () => {
       const context = { entering: true, origin };

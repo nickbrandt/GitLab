@@ -1,4 +1,4 @@
-import { buildUneditableTokens } from './build_uneditable_token';
+import { renderDefaultBlock } from './render_utils';
 
 const embeddedRubyRegex = /(^<%.+%>$)/;
 
@@ -6,8 +6,6 @@ const canRender = ({ literal }) => {
   return embeddedRubyRegex.test(literal);
 };
 
-const render = (_, { origin }) => {
-  return buildUneditableTokens(origin());
-};
+const render = renderDefaultBlock;
 
 export default { canRender, render };
