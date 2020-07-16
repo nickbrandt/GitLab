@@ -28648,6 +28648,9 @@ msgstr ""
 msgid "project avatar"
 msgstr ""
 
+msgid "project bots cannot be added to other groups / projects"
+msgstr ""
+
 msgid "project is read-only"
 msgstr ""
 
