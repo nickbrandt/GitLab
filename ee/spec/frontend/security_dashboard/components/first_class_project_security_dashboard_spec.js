@@ -15,6 +15,8 @@ import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 
 const props = {
+  notEnabledScannersHelpPath: '/help/docs/',
+  noPipelineRunScannersHelpPath: '/new/pipeline',
   projectFullPath: '/group/project',
   securityDashboardHelpPath: '/security/dashboard/help-path',
   vulnerabilitiesExportEndpoint: '/vulnerabilities/exports',
@@ -65,7 +67,7 @@ describe('First class Project Security Dashboard component', () => {
       expect(findVulnerabilities().exists()).toBe(true);
     });
 
-    it('should pass down the %s prop to the vulnerabilities', () => {
+    it('should pass down the "projectFullPath" prop to the vulnerabilities', () => {
       expect(findVulnerabilities().props('projectFullPath')).toBe(props.projectFullPath);
     });
 

@@ -1,7 +1,10 @@
 <script>
+import { __ } from '~/locale';
 import { GlAlert, GlDeprecatedButton, GlIntersectionObserver } from '@gitlab/ui';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/project_vulnerabilities.graphql';
+import securityScannersQuery from '../graphql/project_security_scanners.graphql';
 import { VULNERABILITIES_PER_PAGE } from '../store/constants';
 
 export default {
@@ -12,6 +15,7 @@ export default {
     GlIntersectionObserver,
     VulnerabilityList,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     projectFullPath: {
       type: String,
@@ -27,6 +31,7 @@ export default {
     return {
       pageInfo: {},
       vulnerabilities: [],
+      securityScanners: {},
       errorLoadingVulnerabilities: false,
     };
   },
@@ -46,6 +51,30 @@ export default {
       },
       error() {
         this.errorLoadingVulnerabilities = true;
+      },
+    },
+    securityScanners: {
+      query: securityScannersQuery,
+      variables() {
+        return {
+          fullPath: this.projectFullPath,
+        };
+      },
+      error() {
+        this.securityScanners = {};
+      },
+      update({ project: { securityScanners = {} } = {} }) {
+        const { available = [], enabled = [], pipelineRun = [] } = securityScanners;
+        const translateScannerName = scannerName => this.$options.i18n[scannerName] || scannerName;
+
+        return {
+          available: available.map(translateScannerName),
+          enabled: enabled.map(translateScannerName),
+          pipelineRun: pipelineRun.map(translateScannerName),
+        };
+      },
+      skip() {
+        return !this.glFeatures.scannerAlerts;
       },
     },
   },
@@ -77,6 +106,11 @@ export default {
       this.$apollo.queries.vulnerabilities.refetch();
     },
   },
+  i18n: {
+    CONTAINER_SCANNING: __('Container Scanning'),
+    SECRET_DETECTION: __('Secret Detection'),
+    DEPENDENCY_SCANNING: __('Dependency Scanning'),
+  },
 };
 </script>
 
@@ -96,6 +130,7 @@ export default {
       :vulnerabilities="vulnerabilities"
       :should-show-identifier="true"
       :should-show-report-type="true"
+      :security-scanners="securityScanners"
       @refetch-vulnerabilities="refetchVulnerabilities"
     />
     <gl-intersection-observer

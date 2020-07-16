@@ -70,6 +70,8 @@ export default (
       dashboardDocumentation: el.dataset.dashboardDocumentation,
       noVulnerabilitiesSvgPath: el.dataset.noVulnerabilitiesSvgPath,
       emptyStateSvgPath: el.dataset.emptyStateSvgPath,
+      notEnabledScannersHelpPath: el.dataset.notEnabledScannersHelpPath,
+      noPipelineRunScannersHelpPath: el.dataset.noPipelineRunScannersHelpPath,
     }),
     render(createElement) {
       return createElement(component, { props });
