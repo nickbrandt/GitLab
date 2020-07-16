@@ -3,7 +3,7 @@ import { s__ } from '~/locale';
 import { GlButton, GlNewDropdown, GlDropdownItem } from '@gitlab/ui';
 
 export default {
-  translations: {
+  i18n: {
     FUZZING_ARTIFACTS: s__('SecurityReports|Fuzzing artifacts'),
   },
   components: {
@@ -28,7 +28,13 @@ export default {
   },
   methods: {
     artifactDownloadUrl(job) {
-      return `/api/v4/projects/${this.projectId}/jobs/artifacts/${job.ref}/download?job=${job.name}`;
+      return `/api/v4/projects/${this.projectId}/jobs/artifacts/${this.encodedRef(job.ref)}/download?job=${job.name}`;
+    },
+    encodedRef(ref){
+      return ref
+      .split('/')
+      .map(fragment => encodeURIComponent(fragment))
+      .join('/');
     },
   },
 };
@@ -40,7 +46,7 @@ export default {
     <gl-new-dropdown
       v-if="hasDropdown"
       class="d-block mt-1"
-      :text="$options.translations.FUZZING_ARTIFACTS"
+      :text="$options.i18n.FUZZING_ARTIFACTS"
       category="secondary"
       variant="info"
       size="small"
@@ -57,7 +63,7 @@ export default {
       size="small"
       :href="artifactDownloadUrl(jobs[0])"
     >
-      {{ $options.translations.FUZZING_ARTIFACTS }}
+      {{ $options.i18n.FUZZING_ARTIFACTS }}
     </gl-button>
   </div>
 </template>

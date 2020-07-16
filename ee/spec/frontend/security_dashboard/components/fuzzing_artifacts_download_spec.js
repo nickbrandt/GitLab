@@ -1,7 +1,7 @@
 import Vuex from 'vuex';
 import FuzzingArtifactsDownload from 'ee/security_dashboard/components/fuzzing_artifacts_download.vue';
 import createStore from 'ee/security_dashboard/store';
-import { mount, createLocalVue } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton, GlNewDropdown, GlDropdownItem } from '@gitlab/ui';
 
 const localVue = createLocalVue();
@@ -15,7 +15,7 @@ describe('Filter component', () => {
   let store;
 
   const createWrapper = (props = {}) => {
-    wrapper = mount(FuzzingArtifactsDownload, {
+    wrapper = shallowMount(FuzzingArtifactsDownload, {
       localVue,
       store,
       propsData: {
@@ -65,8 +65,7 @@ describe('Filter component', () => {
       const wrapperArray = wrapper.findAll(GlDropdownItem);
       wrapperArray.wrappers.forEach((_, index) => {
         const href = `/api/v4/projects/${projectId}/jobs/artifacts/${jobs[index].ref}/download?job=${jobs[index].name}`;
-        // wrapperArray.at(index).attributes('href') returns undefined for some reason
-        expect(wrapperArray.at(index).vm.$attrs.href).toBe(href);
+        expect(wrapperArray.at(index).attributes().href).toBe(href);
       });
     });
   });

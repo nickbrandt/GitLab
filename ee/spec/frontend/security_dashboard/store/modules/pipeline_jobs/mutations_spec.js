@@ -6,7 +6,7 @@ describe('pipeline jobs module mutations', () => {
   let state;
 
   beforeEach(() => {
-    state = createState();
+    state = {};
   });
 
   describe('SET_PIPELINE_JOBS_PATH', () => {
