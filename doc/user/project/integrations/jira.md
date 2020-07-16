@@ -192,7 +192,7 @@ with a link to the commit that resolved the issue.
 
 You can browse and search issues from a selected Jira project directly in GitLab. This requires [configuration](#configuring-gitlab) in GitLab by an administrator.
 
-![Jira issues integration enabled](img/jira/jira-issues-enabled.png)
+![Jira issues integration enabled](img/jira/open_jira_issues_list_v13.2.png)
 
 From the **Jira Issues** menu, click **Issues List**. The issue list defaults to sort by **Created date**, with the newest issues listed at the top. You can change this to **Last updated**.
 
