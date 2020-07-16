@@ -32,6 +32,7 @@ RSpec.describe Metrics::Dashboard::SelfMonitoringDashboardService, :use_clean_ra
     it_behaves_like 'valid dashboard service response'
     it_behaves_like 'raises error for users with insufficient permissions'
     it_behaves_like 'caches the unprocessed dashboard for subsequent calls'
+    it_behaves_like 'refreshes cache when dashboard_version is changed'
     it_behaves_like 'updates gitlab_metrics_dashboard_processing_time_ms metric'
   end
 

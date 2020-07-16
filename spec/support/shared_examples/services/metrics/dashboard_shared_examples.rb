@@ -39,6 +39,22 @@ RSpec.shared_examples 'caches the unprocessed dashboard for subsequent calls' do
   end
 end
 
+# This spec is applicable for predefined/out-of-the-box dashboard services.
+RSpec.shared_examples 'refreshes cache when dashboard_version is changed' do
+  specify do
+    allow_next_instance_of(described_class) do |service|
+      allow(service).to receive(:dashboard_version).and_return(1, 2)
+    end
+
+    expect(File).to receive(:read).twice.and_call_original
+
+    service = described_class.new(*service_params)
+
+    service.get_dashboard
+    service.get_dashboard
+  end
+end
+
 RSpec.shared_examples 'valid embedded dashboard service response' do
   let(:dashboard_schema) { Gitlab::Json.parse(fixture_file('lib/gitlab/metrics/dashboard/schemas/embedded_dashboard.json')) }
 
