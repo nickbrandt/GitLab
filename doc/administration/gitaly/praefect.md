@@ -700,7 +700,8 @@ Particular attention should be shown to:
 1. Disable the default Gitaly service running on the GitLab host. It won't be needed
    as GitLab will connect to the configured cluster.
 
-   CAUTION: **CAUTION** If you have existing data stored on the default Gitaly storage,
+   CAUTION: **Caution:**
+   If you have existing data stored on the default Gitaly storage,
    you should [migrate the data your Praefect storage first](#migrating-existing-repositories-to-praefect).
 
    ```ruby

@@ -1181,7 +1181,7 @@ job:
 - If the pipeline is a scheduled pipeline, the job is **not** be added to the pipeline.
 - In **all other cases**, the job is added to the pipeline, with `when: on_success`.
 
-CAUTION: **Caution**
+CAUTION: **Caution:**
 If you use `when: on_success`, `always`, or `delayed` as the final rule, two
 simultaneous pipelines may start. Both push pipelines and merge request pipelines can
 be triggered by the same event (a push to the source branch for an open merge request).
@@ -1569,7 +1569,7 @@ and must be surrounded by `/`.
 So `issue-/.*/` won't work to match all tag names or branch names
 that begin with `issue-`.
 
-TIP: **Tip**
+TIP: **Tip:**
 Use anchors `^` and `$` to avoid the regular expression
 matching only a substring of the tag name or branch name.
 For example, `/^issue-.*$/` is equivalent to `/^issue-/`,
