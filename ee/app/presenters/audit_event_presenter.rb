@@ -28,7 +28,7 @@ class AuditEventPresenter < Gitlab::View::Presenter::Simple
   def object
     return if entity.is_a?(Gitlab::Audit::NullEntity)
 
-    details[:entity_path] || entity.name
+    audit_event.entity_path || entity.name
   end
 
   def object_url

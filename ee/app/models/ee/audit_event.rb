@@ -13,6 +13,10 @@ module EE
       lazy_entity
     end
 
+    def entity_path
+      super || details[:entity_path]
+    end
+
     def present
       AuditEventPresenter.new(self)
     end

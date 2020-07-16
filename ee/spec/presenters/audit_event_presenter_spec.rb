@@ -132,7 +132,7 @@ RSpec.describe AuditEventPresenter do
 
   context 'exposes the object' do
     it 'returns the object path if it exists' do
-      expect(presenter.object).to eq(details[:entity_path])
+      expect(presenter.object).to eq(audit_event.entity_path)
     end
 
     it 'returns the stored name if it has been deleted' do
