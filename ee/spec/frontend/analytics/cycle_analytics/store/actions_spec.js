@@ -13,6 +13,7 @@ import {
   endDate,
   customizableStagesAndEvents,
   endpoints,
+  valueStreams,
 } from '../mock_data';
 
 const stageData = { events: [] };
@@ -54,10 +55,11 @@ describe('Cycle analytics actions', () => {
   });
 
   it.each`
-    action                   | type                       | stateKey                | payload
-    ${'setFeatureFlags'}     | ${'SET_FEATURE_FLAGS'}     | ${'featureFlags'}       | ${{ hasDurationChart: true }}
-    ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
-    ${'setSelectedStage'}    | ${'SET_SELECTED_STAGE'}    | ${'selectedStage'}      | ${{ id: 'someStageId' }}
+    action                      | type                           | stateKey                 | payload
+    ${'setFeatureFlags'}        | ${'SET_FEATURE_FLAGS'}         | ${'featureFlags'}        | ${{ hasDurationChart: true }}
+    ${'setSelectedProjects'}    | ${'SET_SELECTED_PROJECTS'}     | ${'selectedProjectIds'}  | ${[10, 20, 30, 40]}
+    ${'setSelectedStage'}       | ${'SET_SELECTED_STAGE'}        | ${'selectedStage'}       | ${{ id: 'someStageId' }}
+    ${'setSelectedValueStream'} | ${'SET_SELECTED_VALUE_STREAM'} | ${'selectedValueStream'} | ${{ id: 'vs-1', name: 'Value stream 1' }}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     return testAction(
       actions[action],
@@ -876,13 +878,11 @@ describe('Cycle analytics actions', () => {
           payload,
           state,
           [
-            { type: types.REQUEST_CREATE_VALUE_STREAM },
             {
-              type: types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS,
-              payload: { status: httpStatusCodes.OK, data: {} },
+              type: types.REQUEST_CREATE_VALUE_STREAM,
             },
           ],
-          [],
+          [{ type: 'receiveCreateValueStreamSuccess' }],
         );
       });
     });
@@ -908,6 +908,94 @@ describe('Cycle analytics actions', () => {
           [],
         );
       });
+    });
+  });
+
+  describe('fetchValueStreams', () => {
+    beforeEach(() => {
+      state = {
+        ...state,
+        stages: [{ slug: selectedStageSlug }],
+        selectedGroup,
+        featureFlags: {
+          ...state.featureFlags,
+          hasCreateMultipleValueStreams: true,
+        },
+      };
+      mock = new MockAdapter(axios);
+      mock.onGet(endpoints.valueStreamData).reply(200, { stages: [], events: [] });
+    });
+
+    it(`commits ${types.REQUEST_VALUE_STREAMS} and dispatches receiveValueStreamsSuccess with received data on success`, () => {
+      return testAction(
+        actions.fetchValueStreams,
+        null,
+        state,
+        [{ type: types.REQUEST_VALUE_STREAMS }],
+        [
+          {
+            payload: {
+              events: [],
+              stages: [],
+            },
+            type: 'receiveValueStreamsSuccess',
+          },
+        ],
+      );
+    });
+
+    describe('with a failing request', () => {
+      const resp = { data: {} };
+      beforeEach(() => {
+        mock.onGet(endpoints.valueStreamData).reply(httpStatusCodes.NOT_FOUND, resp);
+      });
+
+      it(`will commit ${types.RECEIVE_VALUE_STREAMS_ERROR}`, () => {
+        return testAction(
+          actions.fetchValueStreams,
+          null,
+          state,
+          [
+            { type: types.REQUEST_VALUE_STREAMS },
+            {
+              type: types.RECEIVE_VALUE_STREAMS_ERROR,
+            },
+          ],
+          [],
+        );
+      });
+    });
+
+    describe('receiveValueStreamsSuccess', () => {
+      it(`commits the ${types.RECEIVE_VALUE_STREAMS_SUCCESS} mutation`, () => {
+        return testAction(
+          actions.receiveValueStreamsSuccess,
+          valueStreams,
+          state,
+          [
+            {
+              type: types.RECEIVE_VALUE_STREAMS_SUCCESS,
+              payload: valueStreams,
+            },
+          ],
+          [{ type: 'setSelectedValueStream', payload: 1 }],
+        );
+      });
+    });
+
+    describe('with hasCreateMultipleValueStreams disabled', () => {
+      beforeEach(() => {
+        state = {
+          ...state,
+          featureFlags: {
+            ...state.featureFlags,
+            hasCreateMultipleValueStreams: false,
+          },
+        };
+      });
+
+      it(`will skip making a request`, () =>
+        testAction(actions.fetchValueStreams, null, state, [], []));
     });
   });
 });

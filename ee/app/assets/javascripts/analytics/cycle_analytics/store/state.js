@@ -24,6 +24,7 @@ export default () => ({
 
   currentStageEvents: [],
 
+  isLoadingValueStreams: false,
   isCreatingValueStream: false,
   createValueStreamErrors: {},
 

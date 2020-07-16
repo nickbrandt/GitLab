@@ -143,14 +143,6 @@ export default {
     return axios.get(url, { params });
   },
 
-  cycleAnalyticsValueStreamGroupStagesAndEvents(groupId, valueStreamId, params = {}) {
-    const url = Api.buildUrl(this.cycleAnalyticsValueStreamGroupStagesAndEventsPath)
-      .replace(':id', groupId)
-      .replace(':value_stream_id', valueStreamId);
-
-    return axios.get(url, { params });
-  },
-
   cycleAnalyticsStageEvents(groupId, stageId, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsStageEventsPath)
       .replace(':id', groupId)

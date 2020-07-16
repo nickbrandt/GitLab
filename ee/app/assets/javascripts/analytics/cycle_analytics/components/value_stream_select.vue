@@ -108,7 +108,12 @@ export default {
 </script>
 <template>
   <gl-form>
-    <gl-dropdown v-if="hasValueStreams" :text="selectedValueStreamName" right>
+    <gl-dropdown
+      v-if="hasValueStreams"
+      data-testid="select-value-stream"
+      :text="selectedValueStreamName"
+      right
+    >
       <gl-dropdown-item
         v-for="{ id, name: streamName } in data"
         :key="id"
@@ -122,9 +127,13 @@ export default {
         __('Create new value stream')
       }}</gl-dropdown-item>
     </gl-dropdown>
-    <gl-button v-else v-gl-modal-directive="'create-value-stream-modal'" @click="onHandleInput">{{
-      __('Create new value stream')
-    }}</gl-button>
+    <gl-button
+      v-else
+      v-gl-modal-directive="'create-value-stream-modal'"
+      data-testid="create-value-stream"
+      @click="onHandleInput"
+      >{{ __('Create new value stream') }}</gl-button
+    >
     <gl-modal
       ref="modal"
       modal-id="create-value-stream-modal"

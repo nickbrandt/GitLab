@@ -12,6 +12,7 @@ import {
   endDate,
   selectedProjects,
   customizableStagesAndEvents,
+  valueStreams,
 } from '../mock_data';
 
 let state = null;
@@ -27,6 +28,10 @@ describe('Cycle analytics mutations', () => {
 
   it.each`
     mutation                                     | stateKey                     | value
+    ${types.REQUEST_VALUE_STREAMS}               | ${'valueStreams'}            | ${[]}
+    ${types.RECEIVE_VALUE_STREAMS_ERROR}         | ${'valueStreams'}            | ${[]}
+    ${types.REQUEST_VALUE_STREAMS}               | ${'isLoadingValueStreams'}   | ${true}
+    ${types.RECEIVE_VALUE_STREAMS_ERROR}         | ${'isLoadingValueStreams'}   | ${false}
     ${types.REQUEST_STAGE_DATA}                  | ${'isLoadingStage'}          | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'isEmptyStage'}            | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'isLoadingStage'}          | ${false}
@@ -58,11 +63,14 @@ describe('Cycle analytics mutations', () => {
     ${types.SET_SELECTED_PROJECTS}             | ${selectedProjects}           | ${{ selectedProjects }}
     ${types.SET_DATE_RANGE}                    | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
     ${types.SET_SELECTED_STAGE}                | ${{ id: 'first-stage' }}      | ${{ selectedStage: { id: 'first-stage' } }}
+    ${types.SET_SELECTED_VALUE_STREAM}         | ${valueStreams[1].id}         | ${{ selectedValueStream: valueStreams[1] }}
     ${types.RECEIVE_CREATE_VALUE_STREAM_ERROR} | ${{ name: ['is required'] }}  | ${{ createValueStreamErrors: { name: ['is required'] }, isCreatingValueStream: false }}
+    ${types.RECEIVE_VALUE_STREAMS_SUCCESS}     | ${valueStreams}               | ${{ valueStreams, isLoadingValueStreams: false }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {
       state = {
+        valueStreams, 
         selectedGroup: { fullPath: 'rad-stage' },
       };
       mutations[mutation](state, payload);

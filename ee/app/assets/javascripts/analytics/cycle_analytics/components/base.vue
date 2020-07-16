@@ -79,6 +79,7 @@ export default {
       'startDate',
       'endDate',
       'medians',
+      'isLoadingValueStreams',
     ]),
     // NOTE: formEvents are fetched in the same request as the list of stages (fetchGroupStagesAndEvents)
     // so i think its ok to bind formEvents here even though its only used as a prop to the custom-stage-form
@@ -114,7 +115,9 @@ export default {
       return this.featureFlags.hasFilterBar && this.currentGroupPath;
     },
     shouldDisplayCreateMultipleValueStreams() {
-      return Boolean(this.featureFlags.hasCreateMultipleValueStreams);
+      return Boolean(
+        this.featureFlags.hasCreateMultipleValueStreams && !this.isLoadingValueStreams,
+      );
     },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
