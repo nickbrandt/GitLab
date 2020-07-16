@@ -57,10 +57,10 @@ module QA
 
         EE::Page::OperationsDashboard.perform do |operation|
           {
-              'project-with-tag' => 'passed',
-              'project-with-failed-run' => 'failed',
-              'project-without-tag' => 'pending',
-              'project-without-ci' => nil
+            'project-with-tag' => 'passed',
+            'project-with-failed-run' => 'failed',
+            'project-without-tag' => 'pending',
+            'project-without-ci' => nil
           }.each do |project_name, status|
             project = operation.find_project_card_by_name(project_name)
 
@@ -69,7 +69,9 @@ module QA
               next
             end
 
-            expect(operation.pipeline_status(project)).to eq(status)
+            # Since `Support::Waiter.wait_until` would raise a `WaitExceededError` exception if the pipeline status
+            # isn't the one we expect after 60 seconds, we don't need an explicit expectation.
+            Support::Waiter.wait_until { operation.pipeline_status(project) == status }
           end
         end
 
