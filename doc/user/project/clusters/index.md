@@ -275,7 +275,8 @@ For **non**-GitLab-managed clusters, the namespace can be customized using
 [`environment:kubernetes:namespace`](../../../ci/environments/index.md#configuring-kubernetes-deployments)
 in `.gitlab-ci.yml`.
 
-NOTE: **Note:** When using a [GitLab-managed cluster](#gitlab-managed-clusters), the
+NOTE: **Note:**
+When using a [GitLab-managed cluster](#gitlab-managed-clusters), the
 namespaces are created automatically prior to deployment and [can not be
 customized](https://gitlab.com/gitlab-org/gitlab/-/issues/38054).
 
