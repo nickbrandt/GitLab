@@ -47,6 +47,10 @@ module EE
               attrs = attrs.except(:group_owners_can_manage_default_branch_protection)
             end
 
+            unless ::Gitlab::Geo.license_allows? && ::Feature.enabled?(:maintenance_mode)
+              attrs = attrs.except(:maintenance_mode, :maintenance_mode_message)
+            end
+
             attrs
           end
         end

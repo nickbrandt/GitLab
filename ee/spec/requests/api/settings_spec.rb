@@ -190,4 +190,20 @@ RSpec.describe API::Settings, 'EE Settings' do
 
     it_behaves_like 'settings for licensed features'
   end
+
+  context 'maintenance mode' do
+    before do
+      stub_feature_flags(maintenance_mode: true)
+    end
+
+    let(:settings) do
+      {
+        maintenance_mode: true,
+        maintenance_mode_message: 'GitLab is in maintenance'
+      }
+    end
+    let(:feature) { :geo }
+
+    it_behaves_like 'settings for licensed features'
+  end
 end
