@@ -52,8 +52,13 @@ module Epics
 
     def params
       {
-        title: original_entity.title
+        title: original_entity.title,
+        parent: issue_epic
       }
+    end
+
+    def issue_epic
+      original_entity.epic_issue&.epic
     end
 
     def add_note_from
