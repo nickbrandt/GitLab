@@ -49,11 +49,7 @@ module Gitlab
     end
 
     def expiring_subject
-      if auto_renew?
-        _('Your subscription will automatically renew in %{remaining_days}.') % { remaining_days: remaining_days_formatted }
-      else
-        _('Your subscription will expire in %{remaining_days}.') % { remaining_days: remaining_days_formatted }
-      end
+      _('Your subscription will expire in %{remaining_days}.') % { remaining_days: remaining_days_formatted }
     end
 
     def expiration_blocking_message
@@ -93,17 +89,13 @@ module Gitlab
     end
 
     def namespace_expiring_message
-      if auto_renew?
-        _('We will automatically renew your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} on %{strong}%{expires_on}%{strong_close}. There\'s nothing that you need to do, we\'ll let you know when the renewal is complete. Need more seats, a higher plan or just want to review your payment method?') % { expires_on: expires_at_or_cutoff_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name }
-      else
-        message = []
+      message = []
 
-        message << _('Your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} will expire on %{strong}%{expires_on}%{strong_close}.') % { expires_on: expires_at_or_cutoff_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name }
+      message << _('Your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} will expire on %{strong}%{expires_on}%{strong_close}.') % { expires_on: expires_at_or_cutoff_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name }
 
-        message << expiring_features_message
+      message << expiring_features_message
 
-        message.join(' ')
-      end
+      message.join(' ')
     end
 
     def expiring_features_message
@@ -126,11 +118,17 @@ module Gitlab
     end
 
     def require_notification?
+      return false if expiring_auto_renew?
+
       auto_renew_choice_exists? && expired_subscribable_within_notification_window?
     end
 
     def auto_renew_choice_exists?
       auto_renew? != nil
+    end
+
+    def expiring_auto_renew?
+      auto_renew? && !expired_but_within_cutoff?
     end
 
     def expired_subscribable_within_notification_window?

@@ -197,16 +197,8 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
               context 'is auto_renew' do
                 let(:auto_renew) { true }
 
-                it 'has a nice subject' do
-                  Timecop.freeze(today) do
-                    expect(subject).to include('Your subscription will automatically renew in 2 days.')
-                  end
-                end
-
-                it 'has an expiration blocking message' do
-                  Timecop.freeze(today) do
-                    expect(subject).to include("We will automatically renew your Ultimate subscription for No Limit Records on 2020-03-09. There's nothing that you need to do, we'll let you know when the renewal is complete. Need more seats, a higher plan or just want to review your payment method?")
-                  end
+                it 'returns nil' do
+                  expect(subject).to be nil
                 end
               end
             end
