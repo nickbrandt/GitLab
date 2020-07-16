@@ -3,9 +3,11 @@
 class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
   include ::Delay
 
+  MODEL_CLASS = ::ContainerRepository
+  MODEL_FOREIGN_KEY = :container_repository_id
+
   belongs_to :container_repository
 
-  scope :repository_id_not_in, -> (ids) { where.not(container_repository_id: ids) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }

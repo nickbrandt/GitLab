@@ -20,6 +20,16 @@ module Geo
       Geo::ContainerRepositoryRegistry.count
     end
 
+    def find_registry_differences(range)
+      source_ids = Gitlab::Geo.current_node.container_repositories.id_in(range).pluck_primary_key
+      tracked_ids = Geo::ContainerRepositoryRegistry.pluck_model_ids_in_range(range)
+
+      untracked_ids = source_ids - tracked_ids
+      unused_tracked_ids = tracked_ids - source_ids
+
+      [untracked_ids, unused_tracked_ids]
+    end
+
     # Find limited amount of non replicated container repositories.
     #
     # You can pass a list with `except_repository_ids:` so you can exclude items you
@@ -41,7 +51,7 @@ module Geo
       Geo::ContainerRepositoryRegistry
         .failed
         .retry_due
-        .repository_id_not_in(except_repository_ids)
+        .model_id_not_in(except_repository_ids)
         .limit(batch_size)
         .pluck_container_repository_key
     end
