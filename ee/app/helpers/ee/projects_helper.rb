@@ -203,6 +203,8 @@ module EE
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
           no_vulnerabilities_svg_path: image_path('illustrations/issues.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
+          not_enabled_scanners_help_path: help_page_path('user/application_security/index', anchor: 'quick-start'),
+          no_pipeline_run_scanners_help_path: new_project_pipeline_path(project),
           security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
           user_callouts_path: user_callouts_path,
           user_callout_id: UserCalloutsHelper::STANDALONE_VULNERABILITIES_INTRODUCTION_BANNER,
