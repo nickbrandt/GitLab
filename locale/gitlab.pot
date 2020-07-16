@@ -4763,9 +4763,6 @@ msgstr ""
 msgid "CiVariable|Validation failed"
 msgstr ""
 
-msgid "Class"
-msgstr ""
-
 msgid "Classification Label (optional)"
 msgstr ""
 
@@ -23076,13 +23073,13 @@ msgstr ""
 msgid "TestReports|%{count} failures"
 msgstr ""
 
-msgid "TestReports|%{count} jobs"
+msgid "TestReports|%{count} tests"
 msgstr ""
 
 msgid "TestReports|%{rate}%{sign} success rate"
 msgstr ""
 
-msgid "TestReports|Test suites"
+msgid "TestReports|Jobs"
 msgstr ""
 
 msgid "TestReports|Tests"
