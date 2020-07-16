@@ -701,7 +701,8 @@ To check the configuration:
    Description          |
    ```
 
-   NOTE: **Note:** Pay particular attention to the host and port under
+   NOTE: **Note:**
+   Pay particular attention to the host and port under
    FDW options. That configuration should point to the Geo secondary
    database.
 
