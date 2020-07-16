@@ -10,7 +10,6 @@ import { isInVueNoteablePage } from './lib/utils/dom_utils';
 import flash from './flash';
 import axios from './lib/utils/axios_utils';
 import * as Emoji from '~/emoji';
-import requestAnimationFrame from '~/lib/utils/request_animation_frame_fallback';
 
 const animationEndEventString = 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd';
 const transitionEndEventString = 'transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd';

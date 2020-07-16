@@ -5,6 +5,7 @@ import axios from '~/lib/utils/axios_utils';
 import loadAwardsHandler from '~/awards_handler';
 import { setTestTimeout } from './helpers/timeout';
 import { EMOJI_VERSION } from '~/emoji';
+import { useFakeRequestAnimationFrame } from 'helpers/fake_request_animation_frame';
 
 window.gl = window.gl || {};
 window.gon = window.gon || {};
@@ -13,9 +14,9 @@ let mock;
 let awardsHandler = null;
 const urlRoot = gon.relative_url_root;
 
-jest.mock('~/lib/utils/request_animation_frame_fallback', () => cb => cb());
-
 describe('AwardsHandler', () => {
+  useFakeRequestAnimationFrame();
+
   const emojiData = getJSONFixture('emojis/emojis.json');
   preloadFixtures('snippets/show.html');
 
@@ -36,7 +37,9 @@ describe('AwardsHandler', () => {
   };
 
   beforeEach(async () => {
-    setTestTimeout(3000);
+    // These tests have had some timeout issues
+    // https://gitlab.com/gitlab-org/gitlab/-/issues/221086
+    setTestTimeout(6000);
 
     mock = new MockAdapter(axios);
     mock.onGet(`/-/emojis/${EMOJI_VERSION}/emojis.json`).reply(200, emojiData);
