@@ -94,11 +94,7 @@ module EE
       def batch_lookup_report_artifact_for_file_type(file_type)
         return unless available_licensed_report_type?(file_type)
 
-        latest_report_artifacts
-          .values_at(*::Ci::JobArtifact.associated_file_types_for(file_type.to_s))
-          .flatten
-          .compact
-          .last
+        super
       end
 
       def expose_license_scanning_data?

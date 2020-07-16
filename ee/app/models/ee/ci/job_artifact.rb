@@ -61,13 +61,17 @@ module EE
       scope :coverage_fuzzing, -> do
         with_file_types(COVERAGE_FUZZING_REPORT_TYPES)
       end
+    end
 
-      def self.associated_file_types_for(file_type)
-        return unless file_types.include?(file_type)
+    class_methods do
+      extend ::Gitlab::Utils::Override
+
+      override :associated_file_types_for
+      def associated_file_types_for(file_type)
         return LICENSE_SCANNING_REPORT_FILE_TYPES if LICENSE_SCANNING_REPORT_FILE_TYPES.include?(file_type)
         return BROWSER_PERFORMANCE_REPORT_FILE_TYPES if BROWSER_PERFORMANCE_REPORT_FILE_TYPES.include?(file_type)
 
-        [file_type]
+        super
       end
     end
 
