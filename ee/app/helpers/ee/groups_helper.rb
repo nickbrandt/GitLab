@@ -150,7 +150,7 @@ module EE
         links << :productivity_analytics
       end
 
-      if ::Feature.enabled?(:group_iterations, @group) && @group.feature_available?(:iterations) && can?(current_user, :read_iteration, @group)
+      if ::Feature.enabled?(:group_iterations, @group, default_enabled: true) && @group.feature_available?(:iterations) && can?(current_user, :read_iteration, @group)
         links << :iterations
       end
 
