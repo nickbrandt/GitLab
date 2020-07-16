@@ -40,6 +40,7 @@ RSpec.describe Metrics::Dashboard::ClusterDashboardService, :use_clean_rails_mem
 
     it_behaves_like 'valid dashboard service response'
     it_behaves_like 'caches the unprocessed dashboard for subsequent calls'
+    it_behaves_like 'refreshes cache when dashboard_version is changed'
 
     context 'when called with a non-system dashboard' do
       let(:dashboard_path) { 'garbage/dashboard/path' }

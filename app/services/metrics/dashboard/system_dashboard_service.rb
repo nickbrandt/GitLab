@@ -8,6 +8,10 @@ module Metrics
       DASHBOARD_PATH = 'config/prometheus/common_metrics.yml'
       DASHBOARD_NAME = N_('Default dashboard')
 
+      # Update this value when the dashboard content is updated. This will force
+      # the cache to be regenerated.
+      DASHBOARD_VERSION = 1
+
       SEQUENCE = [
         STAGES::CommonMetricsInserter,
         STAGES::CustomMetricsInserter,
@@ -29,6 +33,12 @@ module Metrics
             out_of_the_box_dashboard: out_of_the_box_dashboard?
           }]
         end
+      end
+
+      private
+
+      def dashboard_version
+        DASHBOARD_VERSION
       end
     end
   end

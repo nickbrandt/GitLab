@@ -8,6 +8,10 @@ module Metrics
       DASHBOARD_PATH = 'config/prometheus/cluster_metrics.yml'
       DASHBOARD_NAME = 'Cluster'
 
+      # Update this value when the dashboard content is updated. This will force
+      # the cache to be regenerated.
+      DASHBOARD_VERSION = 1
+
       SEQUENCE = [
         STAGES::ClusterEndpointInserter,
         STAGES::PanelIdsInserter,
@@ -25,6 +29,12 @@ module Metrics
       # Permissions are handled at the controller level
       def allowed?
         true
+      end
+
+      private
+
+      def dashboard_version
+        DASHBOARD_VERSION
       end
     end
   end
