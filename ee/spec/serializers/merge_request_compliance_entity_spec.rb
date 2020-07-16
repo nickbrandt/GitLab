@@ -17,7 +17,7 @@ RSpec.describe MergeRequestComplianceEntity do
 
     it 'includes merge request attributes for compliance' do
       expect(subject).to include(
-        :id, :title, :merged_at, :milestone, :path, :issuable_reference, :author, :approved_by_users
+        :id, :title, :merged_at, :milestone, :path, :issuable_reference, :author, :approved_by_users, :approval_status
       )
     end
 
@@ -55,6 +55,46 @@ RSpec.describe MergeRequestComplianceEntity do
         it 'includes pipeline status attribute' do
           expect(subject).to have_key(:pipeline_status)
         end
+      end
+    end
+
+    context 'with an approval status' do
+      let_it_be(:committers_approval_enabled) { false }
+      let_it_be(:authors_approval_enabled) { false }
+      let_it_be(:approvals_required) { 2 }
+
+      shared_examples 'the approval status' do
+        before do
+          allow(merge_request).to receive(:authors_can_approve?).and_return(authors_approval_enabled)
+          allow(merge_request).to receive(:committers_can_approve?).and_return(committers_approval_enabled)
+          allow(merge_request).to receive(:approvals_required).and_return(approvals_required)
+        end
+
+        it 'is correct' do
+          expect(subject[:approval_status]).to eq(status)
+        end
+      end
+
+      context 'all approval checks pass' do
+        let_it_be(:status) { :success }
+
+        it_behaves_like 'the approval status'
+      end
+
+      context 'only some of the approval checks pass' do
+        let_it_be(:authors_approval_enabled) { true }
+        let_it_be(:status) { :warning }
+
+        it_behaves_like 'the approval status'
+      end
+
+      context 'none of the approval checks pass' do
+        let_it_be(:committers_approval_enabled) { true }
+        let_it_be(:authors_approval_enabled) { true }
+        let_it_be(:approvals_required) { 0 }
+        let_it_be(:status) { :failed }
+
+        it_behaves_like 'the approval status'
       end
     end
   end

@@ -3,6 +3,10 @@
 class MergeRequestComplianceEntity < Grape::Entity
   include RequestAwareEntity
 
+  SUCCESS_APPROVAL_STATUS = :success
+  WARNING_APPROVAL_STATUS = :warning
+  FAILED_APPROVAL_STATUS = :failed
+
   expose :id
   expose :title
   expose :merged_at
@@ -21,6 +25,8 @@ class MergeRequestComplianceEntity < Grape::Entity
 
   expose :pipeline_status, if: -> (*) { can_read_pipeline? }, with: DetailedStatusEntity
 
+  expose :approval_status
+
   private
 
   alias_method :merge_request, :object
@@ -31,5 +37,20 @@ class MergeRequestComplianceEntity < Grape::Entity
 
   def pipeline_status
     merge_request.head_pipeline.detailed_status(request.current_user)
+  end
+
+  def approval_status
+    # All these checks should be false for this to pass as a success
+    # If any are true then there is a violation of the separation of duties
+    checks = [
+        merge_request.authors_can_approve?,
+        merge_request.committers_can_approve?,
+        merge_request.approvals_required < 2
+    ]
+
+    return FAILED_APPROVAL_STATUS if checks.all?
+    return WARNING_APPROVAL_STATUS if checks.any?
+
+    SUCCESS_APPROVAL_STATUS
   end
 end

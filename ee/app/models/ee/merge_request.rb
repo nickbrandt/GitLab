@@ -36,6 +36,7 @@ module EE
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
       delegate :sha, to: :base_pipeline, prefix: :base_pipeline, allow_nil: true
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
+      delegate :merge_requests_disable_committers_approval?, to: :target_project, allow_nil: true
 
       scope :without_approvals, -> { left_outer_joins(:approvals).where(approvals: { id: nil }) }
       scope :with_approvals, -> { joins(:approvals) }
