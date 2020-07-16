@@ -338,15 +338,15 @@ Show running GitLab services via:
 gitlab-ctl status
 ```
 
-   The output should be similar to the following:
+The output should be similar to the following:
 
-   ```plaintext
-    run: consul: (pid 30043) 76863s; run: log: (pid 29691) 76892s
-    run: logrotate: (pid 31152) 3070s; run: log: (pid 29595) 76908s
-    run: node-exporter: (pid 30064) 76862s; run: log: (pid 29624) 76904s
-    run: redis: (pid 30070) 76861s; run: log: (pid 29573) 76914s
-    run: redis-exporter: (pid 30075) 76861s; run: log: (pid 29674) 76896s
-   ```
+```plaintext
+run: consul: (pid 30043) 76863s; run: log: (pid 29691) 76892s
+run: logrotate: (pid 31152) 3070s; run: log: (pid 29595) 76908s
+run: node-exporter: (pid 30064) 76862s; run: log: (pid 29624) 76904s
+run: redis: (pid 30070) 76861s; run: log: (pid 29573) 76914s
+run: redis-exporter: (pid 30075) 76861s; run: log: (pid 29674) 76896s
+```
 
 #### Configuring the replica Redis instances
 
@@ -399,7 +399,7 @@ gitlab-ctl status
    redis_exporter['flags'] = {
         'redis.addr' => 'redis://10.6.0.62:6379',
         'redis.password' => 'redis-password-goes-here',
-   }  
+   }
 
    # Disable auto migrations
    gitlab_rails['auto_migrate'] = false
@@ -548,26 +548,26 @@ A Consul leader will be elected when the provisioning of the third Consul server
 Viewing the Consul logs `sudo gitlab-ctl tail consul` will display
 `...[INFO] consul: New leader elected: ...`
 
-You can list the current Consul members (server, client) via:
+You can list the current Consul members (server, client):
 
 ```shell
-/opt/gitlab/embedded/bin/consul members
+sudo /opt/gitlab/embedded/bin/consul members
 ```
 
-Show running GitLab services via:
+You can verify the GitLab services are running:
 
 ```shell
-gitlab-ctl status
+sudo gitlab-ctl status
 ```
 
-   The output should be similar to the following:
+The output should be similar to the following:
 
-   ```plaintext
-   run: consul: (pid 30074) 76834s; run: log: (pid 29740) 76844s
-   run: logrotate: (pid 30925) 3041s; run: log: (pid 29649) 76861s
-   run: node-exporter: (pid 30093) 76833s; run: log: (pid 29663) 76855s
-   run: sentinel: (pid 30098) 76832s; run: log: (pid 29704) 76850s
-   ```
+```plaintext
+run: consul: (pid 30074) 76834s; run: log: (pid 29740) 76844s
+run: logrotate: (pid 30925) 3041s; run: log: (pid 29649) 76861s
+run: node-exporter: (pid 30093) 76833s; run: log: (pid 29663) 76855s
+run: sentinel: (pid 30098) 76832s; run: log: (pid 29704) 76850s
+```
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -694,29 +694,27 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    ```
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+1. You can list the current PostgreSQL primary, secondary nodes status via:
 
-NOTE: **Note:**
-You can list the current PostgresSQL Primary, Secondary status via:
+   ```shell
+   sudo /opt/gitlab/bin/gitlab-ctl repmgr cluster show
+   ```
 
-```shell
-/opt/gitlab/bin/gitlab-ctl repmgr cluster show
-```
+1. Verify the GitLab services are running:
 
-Show running GitLab services via:
-
-```shell
-gitlab-ctl status
-```
+   ```shell
+   sudo gitlab-ctl status
+   ```
 
    The output should be similar to the following:
 
    ```plaintext
-    run: consul: (pid 30593) 77133s; run: log: (pid 29912) 77156s
-    run: logrotate: (pid 23449) 3341s; run: log: (pid 29794) 77175s
-    run: node-exporter: (pid 30613) 77133s; run: log: (pid 29824) 77170s
-    run: postgres-exporter: (pid 30620) 77132s; run: log: (pid 29894) 77163s
-    run: postgresql: (pid 30630) 77132s; run: log: (pid 29618) 77181s
-    run: repmgrd: (pid 30639) 77132s; run: log: (pid 29985) 77150s
+   run: consul: (pid 30593) 77133s; run: log: (pid 29912) 77156s
+   run: logrotate: (pid 23449) 3341s; run: log: (pid 29794) 77175s
+   run: node-exporter: (pid 30613) 77133s; run: log: (pid 29824) 77170s
+   run: postgres-exporter: (pid 30620) 77132s; run: log: (pid 29894) 77163s
+   run: postgresql: (pid 30630) 77132s; run: log: (pid 29618) 77181s
+   run: repmgrd: (pid 30639) 77132s; run: log: (pid 29985) 77150s
    ```
 
 <div align="right">
@@ -984,12 +982,11 @@ The following IPs will be used as an example:
    (2 rows)
    ```
 
-NOTE: **Note:**
-Show running GitLab services via:
+1. Verify the GitLab services are running:
 
-```shell
-gitlab-ctl status
-```
+   ```shell
+   sudo gitlab-ctl status
+   ```
 
    The output should be similar to the following:
 
@@ -1171,7 +1168,7 @@ On each node:
    ## You can also use FQDNs and intermix them with IPs
    consul['configuration'] = {
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
-   }  
+   }
    ```
 
 1. Append the following to `/etc/gitlab/gitlab.rb` for each respective server:
@@ -1210,12 +1207,11 @@ On each node:
    sudo /opt/gitlab/embedded/service/gitlab-shell/bin/check -config /opt/gitlab/embedded/service/gitlab-shell/config.yml
    ```
 
-NOTE: **Note:**
-Show running GitLab services via:
+1. Verify the GitLab services are running:
 
-```shell
-gitlab-ctl status
-```
+   ```shell
+   sudo gitlab-ctl status
+   ```
 
    The output should be similar to the following:
 
@@ -1391,15 +1387,12 @@ you want using steps 1 and 2 from the GitLab downloads page.
    gitlab_rails['prometheus_address'] = '10.6.0.81:9090'
    ```
 
-TIP: **Tip:**
-You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_processes.md).
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+1. Verify the GitLab services are running:
 
-NOTE: **Note:**
-Show running GitLab services via:
-
-```shell
-gitlab-ctl status
-```
+   ```shell
+   sudo gitlab-ctl status
+   ```
 
    The output should be similar to the following:
 
@@ -1409,6 +1402,9 @@ gitlab-ctl status
    run: node-exporter: (pid 30134) 77353s; run: log: (pid 29706) 77372s
    run: sidekiq: (pid 30142) 77351s; run: log: (pid 29638) 77386s
    ```
+
+TIP: **Tip:**
+You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_processes.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -1569,18 +1565,11 @@ On each node perform the following:
    sudo gitlab-ctl tail gitaly
    ```
 
-NOTE: **Note:**
-When you specify `https` in the `external_url`, as in the example
-above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
-certificates are not present, NGINX will fail to start. See the
-[NGINX documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
-for more information.
+1. Verify the GitLab services are running:
 
-Show running GitLab services via:
-
-```shell
-gitlab-ctl status
-```
+   ```shell
+   sudo gitlab-ctl status
+   ```
 
    The output should be similar to the following:
 
@@ -1593,6 +1582,13 @@ gitlab-ctl status
    run: node-exporter: (pid 4931) 8645s; run: log: (pid 29855) 79140s
    run: puma: (pid 4936) 8645s; run: log: (pid 29656) 79161s
    ```
+
+NOTE: **Note:**
+When you specify `https` in the `external_url`, as in the example
+above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
+certificates are not present, NGINX will fail to start. See the
+[NGINX documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
+for more information.
 
 ### GitLab Rails post-configuration
 
@@ -1671,14 +1667,12 @@ running [Prometheus](../monitoring/prometheus/index.md) and
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. In the GitLab UI, set `admin/application_settings/metrics_and_profiling` > Metrics - Grafana to `/-/grafana` to
-`http[s]://<MONITOR NODE>/-/grafana`
+   `http[s]://<MONITOR NODE>/-/grafana`.
+1. Verify the GitLab services are running:
 
-NOTE: **Note:**
-Show running GitLab services via:
-
-```shell
-gitlab-ctl status
-```
+   ```shell
+   sudo gitlab-ctl status
+   ```
 
    The output should be similar to the following:
 
@@ -1718,7 +1712,7 @@ based on what features you intend to use:
 1. Configure [object storage for LFS objects](../lfs/index.md#storing-lfs-objects-in-remote-object-storage).
 1. Configure [object storage for uploads](../uploads.md#using-object-storage-core-only).
 1. Configure [object storage for merge request diffs](../merge_request_diffs.md#using-object-storage).
-1. Configure [object storage for Container Registry](../packages/container_registry.md#container-registry-storage-driver) (optional feature).
+1. Configure [object storage for Container Registry](../packages/container_registry.md#use-object-storage) (optional feature).
 1. Configure [object storage for Mattermost](https://docs.mattermost.com/administration/config-settings.html#file-storage) (optional feature).
 1. Configure [object storage for packages](../packages/index.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
 1. Configure [object storage for Dependency Proxy](../packages/dependency_proxy.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
