@@ -1,7 +1,7 @@
 - if merge_request.approval_needed?
 
   - approved = merge_request.approved?
-  - self_approved = merge_request.has_approved?(current_user)
+  - self_approved = merge_request.approved_by?(current_user)
   - given = merge_request.approvals_given
   - total = merge_request.total_approvals_count
 

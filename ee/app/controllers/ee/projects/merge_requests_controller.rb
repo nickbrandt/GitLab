@@ -45,7 +45,7 @@ module EE
       end
 
       def unapprove
-        if merge_request.has_approved?(current_user)
+        if merge_request.approved_by?(current_user)
           ::MergeRequests::RemoveApprovalService
             .new(project, current_user)
             .execute(merge_request)

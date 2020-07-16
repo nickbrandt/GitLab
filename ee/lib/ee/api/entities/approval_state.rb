@@ -51,7 +51,7 @@ module EE
         end
 
         expose :user_has_approved do |approval_state, options|
-          approval_state.has_approved?(options[:current_user])
+          approval_state.merge_request.approved_by?(options[:current_user])
         end
 
         expose :user_can_approve do |approval_state, options|
