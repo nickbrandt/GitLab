@@ -662,7 +662,7 @@ RSpec.describe Gitlab::GitAccess do
           'This is the file content',
           message: 'This is a good commit message',
           branch_name: unprotected_branch)
-        author = { email: "email@example.com", time: Time.current, name: "Example Git User" }
+        author = { email: "email@example.com", time: Time.current.to_time, name: "Example Git User" }
 
         merge_index = rugged.merge_commits(target_branch, source_branch)
         Rugged::Commit.create(rugged, author: author, committer: author, message: "commit message", parents: [target_branch, source_branch], tree: merge_index.write_tree(rugged))

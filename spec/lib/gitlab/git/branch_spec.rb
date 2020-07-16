@@ -127,6 +127,6 @@ RSpec.describe Gitlab::Git::Branch, :seed_helper do
 
   def create_commit
     params[:message].delete!(+"\r")
-    Rugged::Commit.create(rugged, params.merge(committer: committer.merge(time: Time.current)))
+    Rugged::Commit.create(rugged, params.merge(committer: committer.merge(time: Time.current.to_time)))
   end
 end
