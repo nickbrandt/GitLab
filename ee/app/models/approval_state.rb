@@ -128,12 +128,6 @@ class ApprovalState
     true
   end
 
-  def has_approved?(user)
-    return false unless user
-
-    approved_approvers.include?(user)
-  end
-
   def authors_can_approve?
     project.merge_requests_author_approval?
   end
