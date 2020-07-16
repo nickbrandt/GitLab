@@ -97,31 +97,12 @@ module EE
           }
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def approval_rules_counts
           {
             approval_project_rules: count(ApprovalProjectRule),
             approval_project_rules_with_target_branch: count(ApprovalProjectRulesProtectedBranch, :approval_project_rule_id)
           }
         end
-
-        def service_desk_counts
-          projects_with_service_desk = ::Project.where(service_desk_enabled: true)
-
-          {
-            service_desk_enabled_projects: count(projects_with_service_desk),
-            service_desk_issues: count(
-              ::Issue.where(
-                project: projects_with_service_desk,
-                author: ::User.support_bot,
-                confidential: true
-              ),
-              start: issue_minimum_id,
-              finish: issue_maximum_id
-            )
-          }
-        end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         def security_products_usage
           results = SECURE_PRODUCT_TYPES.each_with_object({}) do |(secure_type, attribs), response|
@@ -195,7 +176,6 @@ module EE
                 template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
               },
               requirements_counts,
-              service_desk_counts,
               security_products_usage,
               epics_deepest_relationship_level,
               operations_dashboard_usage)
@@ -298,9 +278,7 @@ module EE
             milestone_lists: distinct_count(::List.milestone.where(time_period), :user_id),
             projects_jira_active: distinct_count(::Project.with_active_jira_services.where(time_period), :creator_id),
             projects_jira_dvcs_cloud_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_cloud.where(time_period), :creator_id),
-            projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id),
-            service_desk_enabled_projects: distinct_count_service_desk_enabled_projects(time_period),
-            service_desk_issues: count(::Issue.service_desk.where(time_period))
+            projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id)
           })
         end
 
@@ -347,6 +325,7 @@ module EE
 
           super.merge(results)
         end
+        # rubocop:enable CodeReuse/ActiveRecord
 
         private
 
@@ -361,14 +340,6 @@ module EE
             ::ApprovalMergeRequestRule.maximum(:id)
           end
         end
-
-        def distinct_count_service_desk_enabled_projects(time_period)
-          project_creator_id_start = user_minimum_id
-          project_creator_id_finish = user_maximum_id
-
-          distinct_count(::Project.service_desk_enabled.where(time_period), :creator_id, start: project_creator_id_start, finish: project_creator_id_finish)
-        end
-        # rubocop:enable CodeReuse/ActiveRecord
 
         def ldap_config_present_for_any_provider?(configuration_item)
           ldap_available_servers.any? { |server_config| server_config[configuration_item.to_s] }

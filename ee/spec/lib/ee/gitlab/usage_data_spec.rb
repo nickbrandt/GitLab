@@ -218,19 +218,6 @@ RSpec.describe Gitlab::UsageData do
     end
   end
 
-  describe '.service_desk_counts' do
-    subject { described_class.service_desk_counts }
-
-    let(:project) { create(:project, :service_desk_enabled) }
-
-    it 'gathers Service Desk data' do
-      create_list(:issue, 2, confidential: true, author: User.support_bot, project: project)
-
-      expect(subject).to eq(service_desk_enabled_projects: 1,
-                            service_desk_issues: 2)
-    end
-  end
-
   describe 'code owner approval required' do
     before do
       create(:protected_branch, code_owner_approval_required: true)
@@ -459,7 +446,6 @@ RSpec.describe Gitlab::UsageData do
           for_defined_days_back do
             user = create(:user)
             project = create(:project, creator: user)
-            create(:issue, project: project, author: User.support_bot)
             board = create(:board, project: project)
             create(:user_list, board: board, user: user)
             create(:milestone_list, board: board, milestone: create(:milestone, project: project), user: user)
@@ -476,9 +462,7 @@ RSpec.describe Gitlab::UsageData do
             milestone_lists: 2,
             projects_jira_active: 2,
             projects_jira_dvcs_cloud_active: 2,
-            projects_jira_dvcs_server_active: 2,
-            service_desk_enabled_projects: 2,
-            service_desk_issues: 2
+            projects_jira_dvcs_server_active: 2
           )
           expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:plan]).to include(
             assignee_lists: 1,
@@ -487,9 +471,7 @@ RSpec.describe Gitlab::UsageData do
             milestone_lists: 1,
             projects_jira_active: 1,
             projects_jira_dvcs_cloud_active: 1,
-            projects_jira_dvcs_server_active: 1,
-            service_desk_enabled_projects: 1,
-            service_desk_issues: 1
+            projects_jira_dvcs_server_active: 1
           )
         end
       end
