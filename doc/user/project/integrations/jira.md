@@ -56,9 +56,6 @@ In order to enable the Jira service in GitLab, you need to first configure the p
 > **Notes:**
 >
 > - The supported Jira versions are `v6.x`, `v7.x`, and `v8.x`.
-> - GitLab 8.14 introduced a new way to integrate with Jira which greatly simplified
->   the configuration options you have to enter. If you are using an older version,
->   [follow this documentation](https://gitlab.com/gitlab-org/gitlab/blob/8-13-stable-ee/doc/project_services/jira.md).
 > - In order to support Oracle's Access Manager, GitLab will send additional cookies
 >   to enable Basic Auth. The cookie being added to each request is `OBBasicAuth` with
 >   a value of `fromDialog`.
@@ -197,7 +194,7 @@ You can browse and search issues from a selected Jira project directly in GitLab
 
 ![Jira issues integration enabled](img/jira/jira-issues-enabled.png)
 
-From the **Jira Issues** menu, click **Issues List**. A list of issues is displayed. The issue list defaults to sort by **Created date**, with the newest issues listed at the top. You can change this to **Last updated**.
+From the **Jira Issues** menu, click **Issues List**. The issue list defaults to sort by **Created date**, with the newest issues listed at the top. You can change this to **Last updated**.
 
 Issues are grouped into tabs based on their [Jira status](https://confluence.atlassian.com/adminjiraserver070/defining-status-field-values-749382903.html).
 
@@ -205,7 +202,7 @@ Issues are grouped into tabs based on their [Jira status](https://confluence.atl
 * The **Closed** tab displays all issues with a Jira status categorized as Done.
 * The **All** tab displays all issues of any status.
 
-Click an issue title to open the original Jira issue page for full details.
+Click an issue title to open its original Jira issue page for full details.
 
 #### Search and filter the issues list
 
