@@ -7001,6 +7001,9 @@ msgstr ""
 msgid "Created branch '%{branch_name}' and a merge request to resolve this issue."
 msgstr ""
 
+msgid "Created by %{job}"
+msgstr ""
+
 msgid "Created by me"
 msgstr ""
 
@@ -15325,6 +15328,9 @@ msgid "MrDeploymentActions|Re-deploy"
 msgstr ""
 
 msgid "MrDeploymentActions|Stop environment"
+msgstr ""
+
+msgid "Multi-project"
 msgstr ""
 
 msgid "Multiple IP address ranges are supported."
@@ -24257,12 +24263,6 @@ msgstr ""
 msgid "This pipeline makes use of a predefined CI/CD configuration enabled by <b>Auto DevOps.</b>"
 msgstr ""
 
-msgid "This pipeline triggered a child pipeline"
-msgstr ""
-
-msgid "This pipeline was triggered by a parent pipeline"
-msgstr ""
-
 msgid "This pipeline was triggered by a schedule."
 msgstr ""
 
@@ -27615,6 +27615,9 @@ msgid "cannot itself be blocked"
 msgstr ""
 
 msgid "cannot merge"
+msgstr ""
+
+msgid "child-pipeline"
 msgstr ""
 
 msgid "ciReport|%{degradedNum} degraded"
