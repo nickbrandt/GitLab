@@ -39,7 +39,7 @@ module Gitlab
             identifiers[identifier.key] ||= identifier
           end
 
-          def finding(finding)
+          def add_finding(finding)
             findings << finding
           end
 
