@@ -45,7 +45,9 @@ describe('Filter component', () => {
     });
 
     it('should render with href set to the correct filepath', () => {
-      const href = `/api/v4/projects/${projectId}/jobs/artifacts/${jobs[0].ref}/download?job=${jobs[0].name}`;
+      const href = `/api/v4/projects/${projectId}/jobs/artifacts/${
+        jobs[0].ref
+      }/download?job=${encodeURIComponent(jobs[0].name)}`;
       expect(wrapper.find(GlButton).attributes('href')).toBe(href);
     });
   });
@@ -64,7 +66,9 @@ describe('Filter component', () => {
     it('should render with href set to the correct filepath for every element', () => {
       const wrapperArray = wrapper.findAll(GlDropdownItem);
       wrapperArray.wrappers.forEach((_, index) => {
-        const href = `/api/v4/projects/${projectId}/jobs/artifacts/${jobs[index].ref}/download?job=${jobs[index].name}`;
+        const href = `/api/v4/projects/${projectId}/jobs/artifacts/${
+          jobs[index].ref
+        }/download?job=${encodeURIComponent(jobs[index].name)}`;
         expect(wrapperArray.at(index).attributes().href).toBe(href);
       });
     });
