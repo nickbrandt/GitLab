@@ -11653,6 +11653,9 @@ msgstr ""
 msgid "GroupRoadmap|%{startDateInWords} – %{endDateInWords}"
 msgstr ""
 
+msgid "GroupRoadmap|No start and end date"
+msgstr ""
+
 msgid "GroupRoadmap|No start date – %{dateWord}"
 msgstr ""
 
