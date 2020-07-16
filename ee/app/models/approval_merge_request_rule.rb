@@ -25,6 +25,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   end
   scope :code_owner_approval_optional, -> { code_owner.where(approvals_required: 0) }
   scope :code_owner_approval_required, -> { code_owner.where('approvals_required > 0') }
+  scope :with_added_approval_rules, -> { left_outer_joins(:approval_merge_request_rule_source).where(approval_merge_request_rule_sources: { approval_merge_request_rule_id: nil }) }
 
   validates :name, uniqueness: { scope: [:merge_request_id, :rule_type, :section] }
   validates :rule_type, uniqueness: { scope: :merge_request_id, message: proc { _('any-approver for the merge request already exists') } }, if: :any_approver?

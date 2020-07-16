@@ -312,6 +312,9 @@ RSpec.describe Gitlab::UsageData do
             project = create(:project, :repository_private, :github_imported,
                               :test_repo, creator: user)
             merge_request = create(:merge_request, source_project: project)
+            project_rule = create(:approval_project_rule, project: project)
+            merge_rule = create(:approval_merge_request_rule, merge_request: merge_request)
+            create(:approval_merge_request_rule_source, approval_merge_request_rule: merge_rule, approval_project_rule: project_rule)
             create(:project, creator: user)
             create(:project, creator: user, disable_overriding_approvers_per_merge_request: true)
             create(:project, creator: user, disable_overriding_approvers_per_merge_request: false)
@@ -321,14 +324,16 @@ RSpec.describe Gitlab::UsageData do
             create(:suggestion, note: create(:note, project: project))
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
+            create(:approval_merge_request_rule, merge_request: merge_request)
             create_list(:code_owner_rule, 3, approvals_required: 2)
             create_list(:code_owner_rule, 2)
           end
 
           expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to include(
-            approval_project_rules: 4,
+            approval_project_rules: 6,
             approval_project_rules_with_target_branch: 2,
             projects_enforcing_code_owner_approval: 0,
+            merge_requests_with_added_rules: 12,
             merge_requests_with_optional_codeowners: 4,
             merge_requests_with_required_codeowners: 8,
             projects_imported_from_github: 2,
@@ -337,9 +342,10 @@ RSpec.describe Gitlab::UsageData do
             suggestions: 2
           )
           expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:create]).to include(
-            approval_project_rules: 4,
+            approval_project_rules: 6,
             approval_project_rules_with_target_branch: 2,
             projects_enforcing_code_owner_approval: 0,
+            merge_requests_with_added_rules: 6,
             merge_requests_with_optional_codeowners: 2,
             merge_requests_with_required_codeowners: 4,
             projects_imported_from_github: 1,

@@ -156,6 +156,12 @@ module EE
         end
 
         override :system_usage_data
+        # Rubocop's Metrics/AbcSize metric is disabled for this method as Rubocop
+        # determines this method to be too complex while there's no way to make it
+        # less "complex" without introducing extra methods (which actually will
+        # make things _more_ complex).
+        #
+        # rubocop: disable Metrics/AbcSize
         def system_usage_data
           super.tap do |usage_data|
             usage_data[:counts].merge!(
@@ -172,6 +178,10 @@ module EE
                 ldap_users: count(::User.ldap, 'users.id'),
                 pod_logs_usages_total: redis_usage_data { ::Gitlab::UsageCounters::PodLogs.usage_totals[:total] },
                 projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
+                merge_requests_with_added_rules: distinct_count(::ApprovalMergeRequestRule.with_added_approval_rules,
+                                                                :merge_request_id,
+                                                                start: approval_merge_request_rule_minimum_id,
+                                                                finish: approval_merge_request_rule_maximum_id),
                 merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
                 merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
                 projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
@@ -220,6 +230,10 @@ module EE
         def usage_activity_by_stage_create(time_period)
           super.merge({
             projects_enforcing_code_owner_approval: distinct_count(::Project.requiring_code_owner_approval.where(time_period), :creator_id),
+            merge_requests_with_added_rules: distinct_count(::ApprovalMergeRequestRule.where(time_period).with_added_approval_rules,
+                                                            :merge_request_id,
+                                                            start: approval_merge_request_rule_minimum_id,
+                                                            finish: approval_merge_request_rule_maximum_id),
             merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional.where(time_period), :merge_request_id),
             merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required.where(time_period), :merge_request_id),
             projects_imported_from_github: distinct_count(::Project.github_imported.where(time_period), :creator_id),
@@ -333,6 +347,18 @@ module EE
         end
 
         private
+
+        def approval_merge_request_rule_minimum_id
+          strong_memoize(:approval_merge_request_rule_minimum_id) do
+            ::ApprovalMergeRequestRule.minimum(:id)
+          end
+        end
+
+        def approval_merge_request_rule_maximum_id
+          strong_memoize(:approval_merge_request_rule_maximum_id) do
+            ::ApprovalMergeRequestRule.maximum(:id)
+          end
+        end
 
         def distinct_count_service_desk_enabled_projects(time_period)
           project_creator_id_start = user_minimum_id
