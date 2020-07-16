@@ -245,7 +245,9 @@ module EE
     private
 
     def has_approved_license_check?
-      approval_rules.license_compliance.last&.approvals_required == 0
+      if rule = approval_rules.license_compliance.last
+        ApprovalWrappedRule.wrap(self, rule).approved?
+      end
     end
 
     def missing_report_error(report_type)
