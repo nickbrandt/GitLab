@@ -430,7 +430,8 @@ are supported and can be added if needed.
 
 ## Configure Consul and Sentinel
 
-NOTE: **Note:** If you are using an external Redis Sentinel instance, be sure
+NOTE: **Note:**
+If you are using an external Redis Sentinel instance, be sure
 to exclude the `requirepass` parameter from the Sentinel
 configuration. This parameter will cause clients to report `NOAUTH
 Authentication required.`. [Redis Sentinel 3.2.x does not support
@@ -1237,7 +1238,7 @@ nodes (including the Gitaly node using the certificate) and on all client nodes
 that communicate with it following the procedure described in
 [GitLab custom certificate configuration](https://docs.gitlab.com/omnibus/settings/ssl.html#install-custom-public-certificates).
 
-NOTE: **Note**
+NOTE: **Note:**
 The self-signed certificate must specify the address you use to access the
 Gitaly server. If you are addressing the Gitaly server by a hostname, you can
 either use the Common Name field for this, or add it as a Subject Alternative
@@ -1568,7 +1569,8 @@ On each node perform the following:
    sudo gitlab-ctl tail gitaly
    ```
 
-NOTE: **Note:** When you specify `https` in the `external_url`, as in the example
+NOTE: **Note:**
+When you specify `https` in the `external_url`, as in the example
 above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
 certificates are not present, NGINX will fail to start. See the
 [NGINX documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
