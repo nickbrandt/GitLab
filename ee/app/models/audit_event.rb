@@ -17,9 +17,10 @@ class AuditEvent < ApplicationRecord
   validates :entity_id, presence: true
   validates :entity_type, presence: true
 
+  scope :by_author_id, -> (author_id) { where(author_id: author_id) }
   scope :by_entity_type, -> (entity_type) { where(entity_type: entity_type) }
   scope :by_entity_id, -> (entity_id) { where(entity_id: entity_id) }
-  scope :by_author_id, -> (author_id) { where(author_id: author_id) }
+  scope :by_entity, -> (entity_type, entity_id) { by_entity_type(entity_type).by_entity_id(entity_id) }
 
   after_initialize :initialize_details
   # Note: The intention is to remove this once refactoring of AuditEvent
@@ -38,16 +39,8 @@ class AuditEvent < ApplicationRecord
     end
   end
 
-  def initialize_details
-    self.details = {} if details.nil?
-  end
-
   def author_name
     lazy_author.name
-  end
-
-  def formatted_details
-    details.merge(details.slice(:from, :to).transform_values(&:to_s))
   end
 
   def lazy_author
@@ -58,15 +51,45 @@ class AuditEvent < ApplicationRecord
     end
   end
 
-  private
-
-  def default_author_value
-    ::Gitlab::Audit::NullAuthor.for(author_id, (self[:author_name] || details[:author_name]))
+  def entity_path
+    super || details[:entity_path]
   end
+
+  def entity
+    lazy_entity
+  end
+
+  def lazy_entity
+    BatchLoader.for(entity_id)
+      .batch(
+        key: entity_type, default_value: ::Gitlab::Audit::NullEntity.new
+      ) do |ids, loader, args|
+        model = Object.const_get(args[:key], false)
+        model.where(id: ids).find_each { |record| loader.call(record.id, record) }
+      end
+  end
+
+  def initialize_details
+    self.details = {} if details.nil?
+  end
+
+  def formatted_details
+    details.merge(details.slice(:from, :to).transform_values(&:to_s))
+  end
+
+  # rubocop:disable CodeReuse/Presenter
+  def present
+    AuditEventPresenter.new(self)
+  end
+  # rubocop:enable CodeReuse/Presenter
+
+  private
 
   def parallel_persist
     PARALLEL_PERSISTENCE_COLUMNS.each { |col| self[col] = details[col] }
   end
-end
 
-AuditEvent.prepend_if_ee('EE::AuditEvent')
+  def default_author_value
+    ::Gitlab::Audit::NullAuthor.for(author_id, (self[:author_name] || details[:author_name]))
+  end
+end
