@@ -304,6 +304,9 @@ msgstr ""
 msgid "%{containerScanningLinkStart}Container Scanning%{containerScanningLinkEnd} and/or %{dependencyScanningLinkStart}Dependency Scanning%{dependencyScanningLinkEnd} must be enabled. %{securityBotLinkStart}GitLab-Security-Bot%{securityBotLinkEnd} will be the author of the auto-created merge request. %{moreInfoLinkStart}More information%{moreInfoLinkEnd}."
 msgstr ""
 
+msgid "%{contentStart}Drop files to attach, or %{contentEnd}%{linkStart}browse%{linkEnd}"
+msgstr ""
+
 msgid "%{cores} cores"
 msgstr ""
 
@@ -463,9 +466,6 @@ msgid "%{level_name} is not allowed in a %{group_level_name} group."
 msgstr ""
 
 msgid "%{level_name} is not allowed since the fork source project has lower visibility."
-msgstr ""
-
-msgid "%{lineOneStart}Drag and drop to upload your designs%{lineOneEnd} or %{linkStart}click to upload%{linkEnd}."
 msgstr ""
 
 msgid "%{link_start}Learn more%{link_end} about what information is shared with GitLab Inc."
@@ -8017,9 +8017,6 @@ msgstr ""
 msgid "DesignManagement|Could not update note. Please try again."
 msgstr ""
 
-msgid "DesignManagement|Delete"
-msgstr ""
-
 msgid "DesignManagement|Delete designs confirmation"
 msgstr ""
 
@@ -8404,9 +8401,6 @@ msgid "Downstream"
 msgstr ""
 
 msgid "Downvotes"
-msgstr ""
-
-msgid "Drop or %{linkStart}upload%{linkEnd} Designs to attach"
 msgstr ""
 
 msgid "Drop your designs to start your upload."
@@ -23336,9 +23330,6 @@ msgid "The number of changes to be fetched from GitLab when cloning a repository
 msgstr ""
 
 msgid "The number of times an upload record could not find its file"
-msgstr ""
-
-msgid "The one place for your designs"
 msgstr ""
 
 msgid "The passphrase required to decrypt the private key. This is optional and the value is encrypted at rest."
