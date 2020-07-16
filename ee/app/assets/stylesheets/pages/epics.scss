@@ -82,7 +82,7 @@
   color: $gl-text-color-tertiary;
 }
 
-.md-area.gfm-form {
+.new-epic-form .md-area.gfm-form {
   @include gl-rounded-base;
   @include gl-border-none;
   @include gl-inset-border-1-gray-400;
