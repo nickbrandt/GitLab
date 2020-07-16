@@ -45,24 +45,6 @@ describe('Local Storage Sync', () => {
       expect(wrapper.emitted('input')).toBeFalsy();
     });
 
-    it('saves updated value to localStorage', () => {
-      createComponent({
-        props: {
-          storageKey,
-          value: 'ascending',
-        },
-      });
-
-      const newValue = 'descending';
-      wrapper.setProps({
-        value: newValue,
-      });
-
-      return wrapper.vm.$nextTick().then(() => {
-        expect(localStorage.getItem(storageKey)).toBe(newValue);
-      });
-    });
-
     it('does not save default value', () => {
       const value = 'ascending';
 
@@ -107,7 +89,7 @@ describe('Local Storage Sync', () => {
       expect(localStorage.getItem(storageKey)).toBe(savedValue);
     });
 
-    it('updating the value updates localStorage', () => {
+    it('updating the value updates localStorage', async () => {
       createComponent({
         props: {
           storageKey,
@@ -120,9 +102,44 @@ describe('Local Storage Sync', () => {
         value: newValue,
       });
 
-      return wrapper.vm.$nextTick().then(() => {
-        expect(localStorage.getItem(storageKey)).toBe(newValue);
+      await wrapper.vm.$nextTick();
+
+      expect(localStorage.getItem(storageKey)).toBe(newValue);
+    });
+  });
+
+  describe.each([true, false])('localStorage has saved value', hasSavedValue => {
+    const storageKey = 'issue_list_order_by';
+
+    it.each`
+      newValue                 | shouldBeParsed
+      ${'newValue'}            | ${false}
+      ${true}                  | ${true}
+      ${false}                 | ${true}
+      ${{ foo: 'bar ' }}       | ${true}
+      ${['newValue', 1, true]} | ${true}
+    `('stores $newValue to localStorage', async ({ newValue, shouldBeParsed }) => {
+      if (hasSavedValue) {
+        localStorage.setItem(storageKey, newValue);
+      }
+
+      createComponent({
+        props: {
+          storageKey,
+          value: 'oldValue',
+        },
       });
+
+      wrapper.setProps({
+        value: newValue,
+      });
+
+      await wrapper.vm.$nextTick();
+
+      const rawStorageItem = localStorage.getItem(storageKey);
+      const valueToCheck = shouldBeParsed ? JSON.parse(rawStorageItem) : rawStorageItem;
+
+      expect(valueToCheck).toEqual(newValue);
     });
   });
 });

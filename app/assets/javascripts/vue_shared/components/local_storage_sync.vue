@@ -1,4 +1,6 @@
 <script>
+import { isString } from 'lodash';
+
 export default {
   props: {
     storageKey: {
@@ -6,7 +8,7 @@ export default {
       required: true,
     },
     value: {
-      type: String,
+      type: [String, Boolean, Number, Object],
       required: false,
       default: '',
     },
@@ -26,10 +28,17 @@ export default {
   },
   methods: {
     getValue() {
-      return localStorage.getItem(this.storageKey);
+      const rawValue = localStorage.getItem(this.storageKey);
+
+      try {
+        return JSON.parse(rawValue);
+      } catch {
+        return rawValue;
+      }
     },
     saveValue(val) {
-      localStorage.setItem(this.storageKey, val);
+      const valToStore = isString(val) ? val : JSON.stringify(val);
+      localStorage.setItem(this.storageKey, valToStore);
     },
   },
   render() {
