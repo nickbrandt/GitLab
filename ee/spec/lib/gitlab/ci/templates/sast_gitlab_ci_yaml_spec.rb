@@ -77,7 +77,8 @@ RSpec.describe 'SAST.gitlab-ci.yml' do
             'Python'               | { 'app.py' => '' }                   | {}                                        | %w(bandit-sast secrets-sast)
             'Ruby'                 | { 'config/routes.rb' => '' }         | {}                                        | %w(brakeman-sast secrets-sast)
             'Scala'                | { 'app.scala' => '' }                | {}                                        | %w(spotbugs-sast secrets-sast)
-            'Typescript'           | { 'app.ts' => '' }                   | {}                                        | %w(tslint-sast secrets-sast)
+            'Typescript'           | { 'app.ts' => '' }                   | {}                                        | %w(eslint-sast secrets-sast)
+            'Typescript JSX'       | { 'app.tsx' => '' }                  | {}                                        | %w(eslint-sast secrets-sast)
             'Visual Basic'         | { 'app.vbproj' => '' }               | {}                                        | %w(security-code-scan-sast secrets-sast)
           end
 
