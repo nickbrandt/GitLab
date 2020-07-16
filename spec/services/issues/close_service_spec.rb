@@ -252,6 +252,14 @@ RSpec.describe Issues::CloseService do
         expect(todo.reload).to be_done
       end
 
+      it 'resolves associated alert' do
+        alert = create(:alert_management_alert, issue: issue, project: project)
+
+        close_issue
+
+        expect(alert.reload.resolved?).to eq(true)
+      end
+
       it 'deletes milestone issue counters cache' do
         issue.update(milestone: create(:milestone, project: project))
 

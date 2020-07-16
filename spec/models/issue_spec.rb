@@ -5,6 +5,8 @@ require 'spec_helper'
 RSpec.describe Issue do
   include ExternalAuthorizationServiceHelpers
 
+  let_it_be(:user) { create(:user) }
+
   describe "Associations" do
     it { is_expected.to belong_to(:milestone) }
     it { is_expected.to belong_to(:iteration) }
@@ -172,7 +174,13 @@ RSpec.describe Issue do
         let!(:alert) { create(:alert_management_alert, project: issue.project, issue: issue) }
 
         it 'resolves an alert' do
-          expect { issue.close }.to change { alert.reload.resolved? }.to(true)
+          expect { issue.close(user) }.to change { alert.reload.resolved? }.to(true)
+        end
+
+        it 'creates a system note' do
+          expect(SystemNoteService).to receive(:closed_alert_issue).with(alert, issue, instance_of(User))
+
+          issue.close(user)
         end
       end
 
@@ -184,7 +192,7 @@ RSpec.describe Issue do
         end
 
         it 'writes a warning into the log' do
-          issue.close
+          close
 
           expect(Gitlab::AppLogger).to have_received(:warn).with(
             message: 'Cannot resolve an associated Alert Management alert',
@@ -198,7 +206,6 @@ RSpec.describe Issue do
   end
 
   describe '#reopen' do
-    let(:user) { create(:user) }
     let(:issue) { create(:issue, state: 'closed', closed_at: Time.current, closed_by: user) }
 
     it 'sets closed_at to nil when an issue is reopend' do
@@ -282,7 +289,6 @@ RSpec.describe Issue do
   end
 
   describe '#assignee_or_author?' do
-    let(:user) { create(:user) }
     let(:issue) { create(:issue) }
 
     it 'returns true for a user that is assigned to an issue' do
@@ -303,7 +309,6 @@ RSpec.describe Issue do
   end
 
   describe '#can_move?' do
-    let(:user) { create(:user) }
     let(:issue) { create(:issue) }
 
     subject { issue.can_move?(user) }

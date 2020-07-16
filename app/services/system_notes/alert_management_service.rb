@@ -33,5 +33,22 @@ module SystemNotes
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'alert_issue_added'))
     end
+
+    # Called when an AlertManagement::Alert is resolved due to the associated alert being closed
+    #
+    # alert - AlertManagement::Alert object.
+    # issue - Issue object.
+    #
+    # Example Note text:
+    #
+    #   "resolved this alert due to closing issue #17"
+    #
+    # Returns the created Note object
+    def closed_alert_issue(alert, issue)
+      body = "resolved this alert due to closing issue #{issue.to_reference(project)}"
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'alert_issue_added'))
+    end
+
   end
 end

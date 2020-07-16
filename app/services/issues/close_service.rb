@@ -33,6 +33,7 @@ module Issues
 
         notification_service.async.close_issue(issue, current_user, closed_via: closed_via) if notifications
         todo_service.close_issue(issue, current_user)
+        issue.resolve_associated_alert_management_alert(current_user)
         execute_hooks(issue, 'close')
         invalidate_cache_counts(issue, users: issue.assignees)
         issue.update_project_counter_caches
