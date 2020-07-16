@@ -6,9 +6,8 @@ module Metrics
       DASHBOARD_PATH = 'config/prometheus/pod_metrics.yml'
       DASHBOARD_NAME = 'Pod Health'
 
-      # Update this value when the dashboard content is updated. This will force
-      # the cache to be regenerated.
-      DASHBOARD_VERSION = 1
+      # SHA256 hash of dashboard content
+      DASHBOARD_VERSION = 'f12f641d2575d5dcb69e2c633ff5231dbd879ad35020567d8fc4e1090bfdb4b4'
 
       private
 
