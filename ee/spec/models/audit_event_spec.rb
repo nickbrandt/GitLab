@@ -13,6 +13,19 @@ RSpec.describe AuditEvent, type: :model do
     it { is_expected.to validate_presence_of(:entity_type) }
   end
 
+  describe 'callbacks' do
+    let_it_be(:details) { { author_name: 'Kungfu Panda', entity_path: 'gitlab-org/gitlab' } }
+    let_it_be(:event) { create(:project_audit_event, details: details) }
+
+    it 'sets author_name' do
+      expect(event[:author_name]).to eq('Kungfu Panda')
+    end
+
+    it 'sets entity_path' do
+      expect(event[:entity_path]).to eq('gitlab-org/gitlab')
+    end
+  end
+
   describe '.by_entity' do
     let_it_be(:project_event_1) { create(:project_audit_event) }
     let_it_be(:project_event_2) { create(:project_audit_event) }
@@ -25,14 +38,6 @@ RSpec.describe AuditEvent, type: :model do
 
     it 'returns the correct audit events' do
       expect(event).to contain_exactly(project_event_1)
-    end
-  end
-
-  describe 'callbacks' do
-    it 'sets author_name' do
-      event = create(:user_audit_event, details: { author_name: 'Kungfu Panda' })
-
-      expect(event[:author_name]).to eq('Kungfu Panda')
     end
   end
 
@@ -122,6 +127,26 @@ RSpec.describe AuditEvent, type: :model do
 
       it 'returns a NullEntity' do
         expect(event.entity).to be_a(Gitlab::Audit::NullEntity)
+      end
+    end
+  end
+
+  describe '#entity_path' do
+    context 'when entity_path exists in both details hash and entity_path column' do
+      subject(:event) do
+        described_class.new(entity_path: 'gitlab-org/gitlab', details: { entity_path: 'gitlab-org/gitlab-foss' })
+      end
+
+      it 'returns the value from entity_path column' do
+        expect(event.entity_path).to eq('gitlab-org/gitlab')
+      end
+    end
+
+    context 'when entity_path exists in details hash but not in entity_path column' do
+      subject(:event) { described_class.new(details: { entity_path: 'gitlab-org/gitlab-foss' }) }
+
+      it 'returns the value from details hash' do
+        expect(event.entity_path).to eq('gitlab-org/gitlab-foss')
       end
     end
   end
