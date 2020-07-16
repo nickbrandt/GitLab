@@ -1,4 +1,3 @@
-import createState from 'ee/security_dashboard/store/modules/pipeline_jobs/state';
 import * as types from 'ee/security_dashboard/store/modules/pipeline_jobs/mutation_types';
 import mutations from 'ee/security_dashboard/store/modules/pipeline_jobs/mutations';
 

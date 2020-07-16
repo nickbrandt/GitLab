@@ -1,4 +1,4 @@
-//import * as Sentry from '@sentry/browser';
+import * as Sentry from '@sentry/browser';
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 
@@ -21,7 +21,7 @@ export const fetchPipelineJobs = ({ commit, state }) => {
       commit(types.RECEIVE_PIPELINE_JOBS_SUCCESS, data);
     })
     .catch(error => {
-      //Sentry.captureException(error);
+      Sentry.captureException(error);
       commit(types.RECEIVE_PIPELINE_JOBS_ERROR);
     });
 };
