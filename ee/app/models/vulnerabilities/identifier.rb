@@ -13,7 +13,7 @@ module Vulnerabilities
 
     has_many :primary_findings, class_name: 'Vulnerabilities::Finding', inverse_of: :primary_identifier, foreign_key: 'primary_identifier_id'
 
-    belongs_to :project, foreign_key: 'project_id'
+    belongs_to :project
 
     validates :project, presence: true
     validates :external_type, presence: true
