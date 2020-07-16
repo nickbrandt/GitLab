@@ -1,4 +1,4 @@
-import { buildUneditableOpenTokens, buildUneditableCloseToken } from './build_uneditable_token';
+import { renderEnterExitBlock } from './render_utils';
 
 const isKramdownTOC = ({ type, literal }) => type === 'text' && literal === 'TOC';
 
@@ -21,7 +21,6 @@ const canRender = node => {
   return false;
 };
 
-const render = (_, { entering, origin }) =>
-  entering ? buildUneditableOpenTokens(origin()) : buildUneditableCloseToken();
+const render = renderEnterExitBlock;
 
 export default { canRender, render };
