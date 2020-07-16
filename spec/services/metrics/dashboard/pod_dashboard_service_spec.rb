@@ -49,5 +49,9 @@ RSpec.describe Metrics::Dashboard::PodDashboardService, :use_clean_rails_memory_
     it_behaves_like 'caches the unprocessed dashboard for subsequent calls'
     it_behaves_like 'refreshes cache when dashboard_version is changed'
     it_behaves_like 'updates gitlab_metrics_dashboard_processing_time_ms metric'
+
+    it_behaves_like 'dashboard_version contains SHA256 hash of dashboard file content' do
+      let(:dashboard_version) { subject.send(:dashboard_version) }
+    end
   end
 end

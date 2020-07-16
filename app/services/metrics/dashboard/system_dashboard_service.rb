@@ -8,9 +8,8 @@ module Metrics
       DASHBOARD_PATH = 'config/prometheus/common_metrics.yml'
       DASHBOARD_NAME = N_('Default dashboard')
 
-      # Update this value when the dashboard content is updated. This will force
-      # the cache to be regenerated.
-      DASHBOARD_VERSION = 1
+      # SHA256 hash of dashboard content
+      DASHBOARD_VERSION = '4685fe386c25b1a786b3be18f79bb2ee9828019003e003816284cdb634fa3e13'
 
       SEQUENCE = [
         STAGES::CommonMetricsInserter,

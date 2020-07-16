@@ -31,6 +31,10 @@ RSpec.describe Metrics::Dashboard::SystemDashboardService, :use_clean_rails_memo
     it_behaves_like 'refreshes cache when dashboard_version is changed'
     it_behaves_like 'updates gitlab_metrics_dashboard_processing_time_ms metric'
 
+    it_behaves_like 'dashboard_version contains SHA256 hash of dashboard file content' do
+      let(:dashboard_version) { subject.send(:dashboard_version) }
+    end
+
     context 'when called with a non-system dashboard' do
       let(:dashboard_path) { 'garbage/dashboard/path' }
 
