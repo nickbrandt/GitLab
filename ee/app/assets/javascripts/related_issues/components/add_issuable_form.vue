@@ -2,6 +2,8 @@
 import { GlFormGroup, GlFormRadioGroup, GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import RelatedIssuableInput from './related_issuable_input.vue';
+import { mergeUrlParams } from '~/lib/utils/url_utility';
+
 import {
   issuableTypesMap,
   itemAddFailureTypesMap,
@@ -67,6 +69,11 @@ export default {
       required: false,
       default: '',
     },
+    confidential: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -101,6 +108,21 @@ export default {
       }
       // Only other failure is MAX_NUMBER_OF_CHILD_EPICS at the moment
       return addRelatedItemErrorMap[this.itemAddFailureType];
+    },
+    transformedAutocompleteSources() {
+      if (!this.confidential) {
+        return this.autoCompleteSources;
+      }
+
+      if (!this.autoCompleteSources?.issues || !this.autoCompleteSources?.epics) {
+        return this.autoCompleteSources;
+      }
+
+      return {
+        ...this.autoCompleteSources,
+        issues: mergeUrlParams({ confidential_only: true }, this.autoCompleteSources.issues),
+        epics: mergeUrlParams({ confidential_only: true }, this.autoCompleteSources.epics),
+      };
     },
   },
   methods: {
@@ -149,11 +171,12 @@ export default {
     <related-issuable-input
       ref="relatedIssuableInput"
       input-id="add-related-issues-form-input"
+      :confidential="confidential"
       :focus-on-mount="true"
       :references="pendingReferences"
       :path-id-separator="pathIdSeparator"
       :input-value="inputValue"
-      :auto-complete-sources="autoCompleteSources"
+      :auto-complete-sources="transformedAutocompleteSources"
       :auto-complete-options="{ issues: true, epics: true }"
       :issuable-type="issuableType"
       @pendingIssuableRemoveRequest="onPendingIssuableRemoveRequest"
