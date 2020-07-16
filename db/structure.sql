@@ -10888,6 +10888,43 @@ CREATE SEQUENCE public.custom_emoji_id_seq
 
 ALTER SEQUENCE public.custom_emoji_id_seq OWNED BY public.custom_emoji.id;
 
+CREATE TABLE public.dast_site_profiles (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    dast_site_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    name text NOT NULL,
+    CONSTRAINT check_6cfab17b48 CHECK ((char_length(name) <= 255))
+);
+
+CREATE SEQUENCE public.dast_site_profiles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.dast_site_profiles_id_seq OWNED BY public.dast_site_profiles.id;
+
+CREATE TABLE public.dast_sites (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    url text NOT NULL,
+    CONSTRAINT check_46df8b449c CHECK ((char_length(url) <= 255))
+);
+
+CREATE SEQUENCE public.dast_sites_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.dast_sites_id_seq OWNED BY public.dast_sites.id;
+
 CREATE TABLE public.dependency_proxy_blobs (
     id integer NOT NULL,
     group_id integer NOT NULL,
@@ -16570,6 +16607,10 @@ ALTER TABLE ONLY public.conversational_development_index_metrics ALTER COLUMN id
 
 ALTER TABLE ONLY public.custom_emoji ALTER COLUMN id SET DEFAULT nextval('public.custom_emoji_id_seq'::regclass);
 
+ALTER TABLE ONLY public.dast_site_profiles ALTER COLUMN id SET DEFAULT nextval('public.dast_site_profiles_id_seq'::regclass);
+
+ALTER TABLE ONLY public.dast_sites ALTER COLUMN id SET DEFAULT nextval('public.dast_sites_id_seq'::regclass);
+
 ALTER TABLE ONLY public.dependency_proxy_blobs ALTER COLUMN id SET DEFAULT nextval('public.dependency_proxy_blobs_id_seq'::regclass);
 
 ALTER TABLE ONLY public.dependency_proxy_group_settings ALTER COLUMN id SET DEFAULT nextval('public.dependency_proxy_group_settings_id_seq'::regclass);
@@ -17537,6 +17578,12 @@ ALTER TABLE ONLY public.conversational_development_index_metrics
 
 ALTER TABLE ONLY public.custom_emoji
     ADD CONSTRAINT custom_emoji_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.dast_site_profiles
+    ADD CONSTRAINT dast_site_profiles_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.dast_sites
+    ADD CONSTRAINT dast_sites_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.dependency_proxy_blobs
     ADD CONSTRAINT dependency_proxy_blobs_pkey PRIMARY KEY (id);
@@ -19037,6 +19084,12 @@ CREATE INDEX index_container_repository_on_name_trigram ON public.container_repo
 CREATE UNIQUE INDEX index_custom_emoji_on_namespace_id_and_name ON public.custom_emoji USING btree (namespace_id, name);
 
 CREATE UNIQUE INDEX index_daily_build_group_report_results_unique_columns ON public.ci_daily_build_group_report_results USING btree (project_id, ref_path, date, group_name);
+
+CREATE INDEX index_dast_site_profiles_on_dast_site_id ON public.dast_site_profiles USING btree (dast_site_id);
+
+CREATE UNIQUE INDEX index_dast_site_profiles_on_project_id_and_name ON public.dast_site_profiles USING btree (project_id, name);
+
+CREATE UNIQUE INDEX index_dast_sites_on_project_id_and_url ON public.dast_sites USING btree (project_id, url);
 
 CREATE INDEX index_dependency_proxy_blobs_on_group_id_and_file_name ON public.dependency_proxy_blobs USING btree (group_id, file_name);
 
@@ -22006,6 +22059,9 @@ ALTER TABLE ONLY public.project_compliance_framework_settings
 ALTER TABLE ONLY public.users_security_dashboard_projects
     ADD CONSTRAINT fk_rails_6f6cf8e66e FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.dast_sites
+    ADD CONSTRAINT fk_rails_6febb6ea9c FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.ci_builds_runner_session
     ADD CONSTRAINT fk_rails_70707857d3 FOREIGN KEY (build_id) REFERENCES public.ci_builds(id) ON DELETE CASCADE;
 
@@ -22020,6 +22076,9 @@ ALTER TABLE ONLY public.slack_integrations
 
 ALTER TABLE ONLY public.custom_emoji
     ADD CONSTRAINT fk_rails_745925b412 FOREIGN KEY (namespace_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.dast_site_profiles
+    ADD CONSTRAINT fk_rails_747dc64abc FOREIGN KEY (dast_site_id) REFERENCES public.dast_sites(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.merge_request_context_commit_diff_files
     ADD CONSTRAINT fk_rails_74a00a1787 FOREIGN KEY (merge_request_context_commit_id) REFERENCES public.merge_request_context_commits(id) ON DELETE CASCADE;
@@ -22074,6 +22133,9 @@ ALTER TABLE ONLY public.clusters_kubernetes_namespaces
 
 ALTER TABLE ONLY public.approval_merge_request_rules_users
     ADD CONSTRAINT fk_rails_80e6801803 FOREIGN KEY (approval_merge_request_rule_id) REFERENCES public.approval_merge_request_rules(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.dast_site_profiles
+    ADD CONSTRAINT fk_rails_83e309d69e FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.deployment_merge_requests
     ADD CONSTRAINT fk_rails_86a6d8bf12 FOREIGN KEY (merge_request_id) REFERENCES public.merge_requests(id) ON DELETE CASCADE;
@@ -23776,6 +23838,8 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200710102846
 20200710105332
 20200710130234
+20200712084655
+20200712235622
 20200713071042
 \.
 
