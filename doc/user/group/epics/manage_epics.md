@@ -18,42 +18,42 @@ A paginated list of epics is available in each group from where you can create
 a new epic. The list of epics includes also epics from all subgroups of the
 selected group. From your group page:
 
-### Creating an epic from the epic list
+### Create an epic from the epic list
 
-1. Go to **Epics**.
+To create an epic from the epic list, in a group:
+
+1. Go to **{epic}** **Epics**.
 1. Click **New epic**.
 1. Enter a descriptive title.
 1. Click **Create epic**.
 
-### Accessing the New Epic form
+### Access the New Epic form
 
-There are two ways to get to the New Epic form from within a group:
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/211533) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.2.
 
-- From an epic in your group, click **New Epic** to create a new epic
-  in the same group:
+There are two ways to get to the New Epic form and create an epic in the group you're in:
 
-  ![New epic from the epic list view](img/epic_header_v13.2.png)
-
-- In the top menu, expand the `plus` sign and choose **New epic**.
+- From an epic in your group, click **New Epic**.
+- From anywhere, in the top menu, click **plus** (**{plus-square}**) **> New epic**.
 
   ![New epic from an open epic](img/new_epic_from_groups_v13.2.png)
 
 ### Elements of the New Epic form
 
-![New epic form](img/new_epic_form_v13.2.png)
-
 When you're creating a new epic, these are the fields you can fill in:
 
 - Title
 - Description
-- Checkbox to make the epic confidential
+- Confidentiality checkbox
 - Labels
-- Start date (Leave empty to inherit from milestone dates)
-- Due date (Leave empty to inherit from milestone dates)
+- Start date
+- Due date
 
-### After creating the epic
+![New epic form](img/new_epic_form_v13.2.png)
 
-You will be taken to the new epic where you can edit the following details:
+## Edit an epic
+
+After you create an epic, you can edit change the following details:
 
 - Title
 - Description
@@ -61,15 +61,16 @@ You will be taken to the new epic where you can edit the following details:
 - Due date
 - Labels
 
-An epic's page contains the following tabs:
+To edit an epic's title or description:
 
-- **Epics and Issues**: epics and issues added to this epic. Child epics, and their issues, are
-  shown in a tree view.
-  - Click the <kbd>></kbd> beside a parent epic to reveal the child epics and issues.
-  - Hover over the total counts to see a breakdown of open and closed items.
-- **Roadmap**: a roadmap view of child epics which have start and due dates.
+1. Click the **Edit title and description** **{pencil}** button.
+1. Make your changes.
+1. Click **Save changes**.
 
-![epic view](img/epic_view_v13.0.png)
+To edit an epics' start date, due date, or labels:
+
+1. Click **Edit** next to each section in the epic sidebar.
+1. Select the dates or labels for your epic.
 
 ## Bulk-edit epics
 
