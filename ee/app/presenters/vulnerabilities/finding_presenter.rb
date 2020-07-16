@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class OccurrencePresenter < Gitlab::View::Presenter::Delegated
-    presents :occurrence
+  class FindingPresenter < Gitlab::View::Presenter::Delegated
+    presents :finding
 
     def blob_path
       return '' unless sha.present?
