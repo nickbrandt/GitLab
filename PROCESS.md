@@ -10,6 +10,20 @@ GitLab-Workhorse has the following maintainers:
 
 This list is defined at https://about.gitlab.com/team/.
 
+## Changelog
+
+GitLab-Workhorse keeps a changelog which is generated when a new release
+is created. The changelog is generated from entries that are included on each
+merge request. To generate an entry on your branch run:
+`_support/changelog "Change descriptions"`.
+
+After the merge request is created, the ID of the merge request needs to be set
+in the generated file. If you already know the merge request ID, run:
+`_support/changelog -m <ID> "Change descriptions"`.
+
+Any new merge request must contain either a new entry or a justification in the
+merge request description why no changelog entry is needed.
+
 ## Merging and reviewing contributions
 
 Contributions must be reviewed by at least one Workhorse maintainer.
