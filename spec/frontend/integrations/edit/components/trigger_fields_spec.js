@@ -1,5 +1,4 @@
 import { mount } from '@vue/test-utils';
-import { createStore } from '~/integrations/edit/store';
 import TriggerFields from '~/integrations/edit/components/trigger_fields.vue';
 import { GlFormGroup, GlFormCheckbox, GlFormInput } from '@gitlab/ui';
 
@@ -10,10 +9,12 @@ describe('TriggerFields', () => {
     type: 'slack',
   };
 
-  const createComponent = props => {
+  const createComponent = (props, isInheriting = false) => {
     wrapper = mount(TriggerFields, {
       propsData: { ...defaultProps, ...props },
-      store: createStore(),
+      computed: {
+        isInheriting: () => isInheriting,
+      },
     });
   };
 
@@ -24,10 +25,11 @@ describe('TriggerFields', () => {
     }
   });
 
+  const findAllGlFormGroups = () => wrapper.find('#trigger-fields').findAll(GlFormGroup);
   const findAllGlFormCheckboxes = () => wrapper.findAll(GlFormCheckbox);
   const findAllGlFormInputs = () => wrapper.findAll(GlFormInput);
 
-  describe('template', () => {
+  describe.each([true, false])('template, isInheriting = `%p`', isInheriting => {
     it('renders a label with text "Trigger"', () => {
       createComponent();
 
@@ -53,9 +55,12 @@ describe('TriggerFields', () => {
       ];
 
       beforeEach(() => {
-        createComponent({
-          events,
-        });
+        createComponent(
+          {
+            events,
+          },
+          isInheriting,
+        );
       });
 
       it('does not render GlFormInput for each event', () => {
@@ -71,8 +76,10 @@ describe('TriggerFields', () => {
         });
       });
 
-      it('renders GlFormCheckbox for each event', () => {
-        const checkboxes = findAllGlFormCheckboxes();
+      it(`renders GlFormCheckbox and corresponding hidden input for each event, which ${
+        isInheriting ? 'is' : 'is not'
+      } disabled`, () => {
+        const checkboxes = findAllGlFormGroups();
         const expectedResults = [
           { labelText: 'Push', inputName: 'service[push_event]' },
           { labelText: 'Merge Request', inputName: 'service[merge_requests_event]' },
@@ -80,14 +87,22 @@ describe('TriggerFields', () => {
         expect(checkboxes).toHaveLength(2);
 
         checkboxes.wrappers.forEach((checkbox, index) => {
+          const checkBox = checkbox.find(GlFormCheckbox);
+
           expect(checkbox.find('label').text()).toBe(expectedResults[index].labelText);
-          expect(checkbox.find('input').attributes('name')).toBe(expectedResults[index].inputName);
-          expect(checkbox.vm.$attrs.checked).toBe(events[index].value);
+          expect(checkbox.find('[type=hidden]').attributes('name')).toBe(
+            expectedResults[index].inputName,
+          );
+          expect(checkbox.find('[type=hidden]').attributes('value')).toBe(
+            events[index].value.toString(),
+          );
+          expect(checkBox.vm.$attrs.disabled).toBe(isInheriting);
+          expect(checkBox.vm.$attrs.checked).toBe(events[index].value);
         });
       });
     });
 
-    describe('events with field property', () => {
+    describe('events with field property, isInheriting = `%p`', () => {
       const events = [
         {
           field: {
@@ -104,16 +119,21 @@ describe('TriggerFields', () => {
       ];
 
       beforeEach(() => {
-        createComponent({
-          events,
-        });
+        createComponent(
+          {
+            events,
+          },
+          isInheriting,
+        );
       });
 
       it('renders GlFormCheckbox for each event', () => {
         expect(findAllGlFormCheckboxes()).toHaveLength(2);
       });
 
-      it('renders GlFormInput for each event', () => {
+      it(`renders GlFormInput for each event, which ${
+        isInheriting ? 'is' : 'is not'
+      } readonly`, () => {
         const fields = findAllGlFormInputs();
         const expectedResults = [
           {
@@ -130,6 +150,7 @@ describe('TriggerFields', () => {
 
         fields.wrappers.forEach((field, index) => {
           expect(field.attributes()).toMatchObject(expectedResults[index]);
+          expect(field.vm.$attrs.readonly).toBe(isInheriting);
           expect(field.vm.$attrs.value).toBe(events[index].field.value);
         });
       });
