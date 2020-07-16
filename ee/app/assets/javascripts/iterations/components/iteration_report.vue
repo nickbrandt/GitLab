@@ -11,6 +11,7 @@ import {
 import { formatDate } from '~/lib/utils/datetime_utility';
 import { __ } from '~/locale';
 import IterationForm from './iteration_form.vue';
+import IterationReportTabs from './iteration_report_tabs.vue';
 import query from '../queries/group_iteration.query.graphql';
 
 const iterationStates = {
@@ -29,6 +30,7 @@ export default {
     GlNewDropdown,
     GlNewDropdownItem,
     IterationForm,
+    IterationReportTabs,
   },
   apollo: {
     group: {
@@ -154,6 +156,7 @@ export default {
       </div>
       <h3 ref="title" class="page-title">{{ iteration.title }}</h3>
       <div ref="description" v-html="iteration.description"></div>
+      <iteration-report-tabs :group-path="groupPath" :iteration-id="iteration.id" />
     </template>
   </div>
 </template>
