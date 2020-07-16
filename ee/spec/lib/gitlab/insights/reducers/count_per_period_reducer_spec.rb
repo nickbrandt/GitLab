@@ -133,9 +133,9 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
   context 'with merged merge requests' do
     include_context 'Insights merge requests reducer context', :merged
 
-    # Populate the MR metrics' merged_at
+    # Populate the MR metrics' merged_at, except for issuable3 to reproduce a real use-case where merged_at is null.
     before do
-      (0..3).each do |i|
+      (0..2).each do |i|
         merge_request = public_send("issuable#{i}")
         merge_request_metrics_service = MergeRequestMetricsService.new(merge_request.metrics)
         Event.transaction do
