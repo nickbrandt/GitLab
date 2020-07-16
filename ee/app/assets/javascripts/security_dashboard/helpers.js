@@ -1,9 +1,46 @@
 import isPlainObject from 'lodash/isPlainObject';
 import { s__ } from '~/locale';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
-import { ALL, BASE_FILTERS } from 'ee/security_dashboard/store/modules/filters/constants';
-import { REPORT_TYPES, SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
+import { ALL, BASE_FILTERS } from './store/modules/filters/constants';
+import { REPORT_TYPES, SEVERITY_LEVELS } from './store/constants';
 import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
+
+const parseReportTypes = (obj, specificFilters) => {
+  const filters = [];
+  Object.keys(specificFilters).forEach(vendor => {
+    if (vendor !== 'GitLab') {
+      const customFilters = Object.values(specificFilters[vendor]).map(filter => {
+        const { reportType: id, externalIds } = filter;
+        const name = obj[id.toLowerCase()];
+        return {
+          id,
+          name,
+          displayName: `${name} - ${vendor}`,
+          externalIds,
+        };
+      });
+      filters.push(...customFilters);
+    }
+  });
+
+  const gitlabFilters = Object.entries(obj).map(([id, name]) => {
+    const filter = {
+      displayName: `${name} - GitLab`,
+      externalIds: [],
+      id: id.toUpperCase(),
+      name,
+    };
+
+    if (specificFilters['GitLab'] && specificFilters['GitLab'][id.toUpperCase()]) {
+      filter.externalIds = specificFilters['GitLab'][id.toUpperCase()].externalIds;
+    }
+
+    return filter;
+  });
+  filters.push(...gitlabFilters);
+
+  return filters;
+};
 
 const parseOptions = obj =>
   Object.entries(obj).map(([id, name]) => ({ id: id.toUpperCase(), name }));
@@ -11,37 +48,37 @@ const parseOptions = obj =>
 export const mapProjects = projects =>
   projects.map(p => ({ id: p.id.split('/').pop(), name: p.name }));
 
-export const initFirstClassVulnerabilityFilters = projects => {
+export const initFirstClassVulnerabilityFilters = (projects, specificFilters) => {
   const filters = [
     {
       name: s__('SecurityReports|Status'),
-      id: 'state',
+      ids: { state: 'id' },
       options: [
         { id: ALL, name: s__('VulnerabilityStatusTypes|All') },
         ...parseOptions(VULNERABILITY_STATES),
       ],
-      selection: new Set([ALL]),
+      selection: { ALL },
     },
     {
       name: s__('SecurityReports|Severity'),
-      id: 'severity',
+      ids: { severity: 'id' },
       options: [BASE_FILTERS.severity, ...parseOptions(SEVERITY_LEVELS)],
-      selection: new Set([ALL]),
+      selection: { ALL },
     },
     {
       name: s__('Reports|Scanner'),
-      id: 'reportType',
-      options: [BASE_FILTERS.report_type, ...parseOptions(REPORT_TYPES)],
-      selection: new Set([ALL]),
+      ids: { reportType: 'id', scanner: 'externalIds' },
+      options: [BASE_FILTERS.report_type, ...parseReportTypes(REPORT_TYPES, specificFilters)],
+      selection: { ALL },
     },
   ];
 
   if (Array.isArray(projects)) {
     filters.push({
       name: s__('SecurityReports|Project'),
-      id: 'projectId',
+      ids: { projectId: 'id' },
       options: [BASE_FILTERS.project_id, ...mapProjects(projects)],
-      selection: new Set([ALL]),
+      selection: { ALL },
     });
   }
 

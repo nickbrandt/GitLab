@@ -9,6 +9,7 @@ import SecurityDashboardLayout from './security_dashboard_layout.vue';
 import VulnerabilitiesCountList from './vulnerability_count_list.vue';
 import Filters from './first_class_vulnerability_filters.vue';
 import CsvExportButton from './csv_export_button.vue';
+import projectSpecificScanners from '../graphql/project_specific_scanners.query.graphql';
 
 export const BANNER_COOKIE_KEY = 'hide_vulnerabilities_introduction_banner';
 
@@ -57,10 +58,44 @@ export default {
       default: '',
     },
   },
+  apollo: {
+    specificFilters: {
+      query: projectSpecificScanners,
+      variables() {
+        return {
+          fullPath: this.projectFullPath,
+        };
+      },
+      update: ({
+        project: {
+          vulnerabilityScanners: { nodes },
+        },
+      }) => {
+        const groupedFilters = nodes.reduce((acc, curr) => {
+          if (!acc[curr.vendor]) {
+            acc[curr.vendor] = {};
+          }
+          if (!acc[curr.vendor][curr.reportType]) {
+            acc[curr.vendor][curr.reportType] = {
+              vendor: curr.vendor,
+              reportType: curr.reportType,
+              externalIds: [curr.externalId],
+            };
+          } else {
+            acc[curr.vendor][curr.reportType].externalIds.push(curr.externalId);
+          }
+          return acc;
+        }, {});
+
+        return groupedFilters;
+      },
+    },
+  },
   data() {
     return {
       filters: {},
       isBannerVisible: this.showIntroductionBanner && !parseBoolean(Cookies.get(BANNER_COOKIE_KEY)), // The and statement is for backward compatibility. See https://gitlab.com/gitlab-org/gitlab/-/issues/213671 for more information.
+      specificFilters: {},
     };
   },
   inject: ['dashboardDocumentation'],
@@ -108,7 +143,7 @@ export default {
           <vulnerabilities-count-list :project-full-path="projectFullPath" />
         </template>
         <template #sticky>
-          <filters @filterChange="handleFilterChange" />
+          <filters :specific-filters="specificFilters" @filterChange="handleFilterChange" />
         </template>
         <project-vulnerabilities-app
           :dashboard-documentation="dashboardDocumentation"

@@ -22,28 +22,44 @@ export const hasValidSelection = ({ selection, options }) =>
  * @param {String} payload.filterId the ID of the filter that the selected option belongs to
  * @returns {Array} the mutated filters array
  */
-export const setFilter = (filters, { optionId, filterId }) =>
-  filters.map(filter => {
-    if (filter.id === filterId) {
+export const setFilter = (filters, { filterIds, optionIds }) => {
+  return filters.map(filter => {
+    if (Object.keys(filterIds).some(id => filter.ids[id])) {
       const { selection } = filter;
+      let newSelection;
 
-      if (optionId === ALL) {
-        selection.clear();
-      } else if (selection.has(optionId)) {
-        selection.delete(optionId);
-      } else {
-        selection.delete(ALL);
-        selection.add(optionId);
-      }
-
-      if (selection.size === 0) {
-        selection.add(ALL);
+      /* eslint-disable-next-line guard-for-in, no-restricted-syntax */
+      for (const [key, value] of Object.entries(optionIds)) {
+        if (Array.isArray(value) && !value.length) {
+          continue;
+        }
+        if (value === ALL) {
+          newSelection = { ALL };
+          break;
+        } else if (selection[key]?.includes(value)) {
+          newSelection = { ...selection };
+          if (newSelection[key].length === 1) {
+            newSelection.delete(key);
+          } else {
+            newSelection[key].splice(newSelection[key].indexOf(value), 1);
+          }
+        } else {
+          if (!newSelection) {
+            newSelection = selection.ALL ? {} : { ...selection };
+          }
+          if (newSelection[key]) {
+            newSelection[key] = newSelection[key].concat(value);
+          } else {
+            newSelection[key] = Array.isArray(value) ? value : [value];
+          }
+        }
       }
 
       return {
         ...filter,
-        selection,
+        selection: newSelection,
       };
     }
     return filter;
   });
+};
