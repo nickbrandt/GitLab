@@ -124,12 +124,11 @@ and the CI YAML file:
 
    ```yaml
    variables:
-     TF_STATE: ${CI_PROJECT_NAME}
-     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${TF_STATE}
+     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_PROJECT_NAME}
      TF_ROOT: ${CI_PROJECT_DIR}/environments/cloudflare/production
 
    cache:
-     key: ${TF_STATE}
+     key: ${CI_PROJECT_NAME}
      paths:
        - ${TF_ROOT}/.terraform
    ```
