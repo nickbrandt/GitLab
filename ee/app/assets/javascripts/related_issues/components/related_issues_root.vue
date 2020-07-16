@@ -81,7 +81,7 @@ export default {
       required: false,
       default: '',
     },
-    isLinkedIssueBlock: {
+    showCategorizedIssues: {
       type: Boolean,
       required: false,
       default: true,
@@ -147,17 +147,18 @@ export default {
             this.store.setPendingReferences([]);
             this.store.setRelatedIssues(data.issuables);
 
-            this.isSubmitting = false;
             // Close the form on submission
             this.isFormVisible = false;
           })
           .catch(({ response }) => {
-            this.isSubmitting = false;
             let errorMessage = addRelatedIssueErrorMap[this.issuableType];
             if (response && response.data && response.data.message) {
               errorMessage = response.data.message;
             }
             Flash(errorMessage);
+          })
+          .finally(() => {
+            this.isSubmitting = false;
           });
       }
     },
@@ -172,12 +173,13 @@ export default {
         .fetchRelatedIssues()
         .then(({ data }) => {
           this.store.setRelatedIssues(data);
-          this.isFetching = false;
         })
         .catch(() => {
           this.store.setRelatedIssues([]);
-          this.isFetching = false;
           Flash(__('An error occurred while fetching issues.'));
+        })
+        .finally(() => {
+          this.isFetching = false;
         });
     },
     saveIssueOrder({ issueId, beforeId, afterId, oldIndex, newIndex }) {
@@ -200,7 +202,8 @@ export default {
       }
     },
     onInput({ untouchedRawReferences, touchedReference }) {
-      this.store.setPendingReferences(this.state.pendingReferences.concat(untouchedRawReferences));
+      this.store.addPendingReferences(untouchedRawReferences);
+
       this.inputValue = `${touchedReference}`;
     },
     onBlur(newValue) {
@@ -209,7 +212,7 @@ export default {
     processAllReferences(value = '') {
       const rawReferences = value.split(/\s+/).filter(reference => reference.trim().length > 0);
 
-      this.store.setPendingReferences(this.state.pendingReferences.concat(rawReferences));
+      this.store.addPendingReferences(rawReferences);
       this.inputValue = '';
     },
   },
@@ -231,7 +234,7 @@ export default {
     :auto-complete-sources="autoCompleteSources"
     :issuable-type="issuableType"
     :path-id-separator="pathIdSeparator"
-    :is-linked-issue-block="isLinkedIssueBlock"
+    :show-categorized-issues="showCategorizedIssues"
     @saveReorder="saveIssueOrder"
     @toggleAddRelatedIssuesForm="onToggleAddRelatedIssuesForm"
     @addIssuableFormInput="onInput"

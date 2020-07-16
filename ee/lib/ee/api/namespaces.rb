@@ -116,10 +116,8 @@ module EE
 
             namespace = find_namespace!(params[:id])
             subscription = namespace.gitlab_subscription
-            trial_ends_on = params[:trial_ends_on]
 
             not_found!('GitlabSubscription') unless subscription
-            bad_request!("Invalid trial expiration date") if trial_ends_on&.past?
 
             subscription_params = declared_params(include_missing: false)
             subscription_params[:trial_starts_on] ||= subscription_params[:start_date] if subscription_params[:trial]

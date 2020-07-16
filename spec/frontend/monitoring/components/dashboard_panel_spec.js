@@ -9,17 +9,16 @@ import AlertWidget from '~/monitoring/components/alert_widget.vue';
 
 import DashboardPanel from '~/monitoring/components/dashboard_panel.vue';
 import {
-  anomalyMockGraphData,
   mockLogsHref,
   mockLogsPath,
   mockNamespace,
   mockNamespacedData,
   mockTimeRange,
-  singleStatMetricsResult,
   graphDataPrometheusQueryRangeMultiTrack,
   barMockData,
 } from '../mock_data';
 import { dashboardProps, graphData, graphDataEmpty } from '../fixture_data';
+import { anomalyGraphData, singleStatGraphData } from '../graph_data';
 
 import { panelTypes } from '~/monitoring/constants';
 
@@ -136,10 +135,6 @@ describe('Dashboard Panel', () => {
       expect(wrapper.find(MonitorEmptyChart).exists()).toBe(true);
       expect(wrapper.find(MonitorEmptyChart).isVueInstance()).toBe(true);
     });
-
-    it('does not contain a tabindex attribute', () => {
-      expect(wrapper.find(MonitorEmptyChart).contains('[tabindex]')).toBe(false);
-    });
   });
 
   describe('When graphData is null', () => {
@@ -236,8 +231,8 @@ describe('Dashboard Panel', () => {
         data                                       | component                    | hasCtxMenu
         ${dataWithType(panelTypes.AREA_CHART)}     | ${MonitorTimeSeriesChart}    | ${true}
         ${dataWithType(panelTypes.LINE_CHART)}     | ${MonitorTimeSeriesChart}    | ${true}
-        ${singleStatMetricsResult}                 | ${MonitorSingleStatChart}    | ${true}
-        ${anomalyMockGraphData}                    | ${MonitorAnomalyChart}       | ${false}
+        ${singleStatGraphData()}                   | ${MonitorSingleStatChart}    | ${true}
+        ${anomalyGraphData()}                      | ${MonitorAnomalyChart}       | ${false}
         ${dataWithType(panelTypes.COLUMN)}         | ${MonitorColumnChart}        | ${false}
         ${dataWithType(panelTypes.STACKED_COLUMN)} | ${MonitorStackedColumnChart} | ${false}
         ${graphDataPrometheusQueryRangeMultiTrack} | ${MonitorHeatmapChart}       | ${false}

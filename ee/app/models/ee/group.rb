@@ -42,6 +42,7 @@ module EE
 
       has_many :managed_users, class_name: 'User', foreign_key: 'managing_group_id', inverse_of: :managing_group
       has_many :cycle_analytics_stages, class_name: 'Analytics::CycleAnalytics::GroupStage'
+      has_many :value_streams, class_name: 'Analytics::CycleAnalytics::GroupValueStream'
 
       has_one :deletion_schedule, class_name: 'GroupDeletionSchedule'
       delegate :deleting_user, :marked_for_deletion_on, to: :deletion_schedule, allow_nil: true
@@ -142,7 +143,7 @@ module EE
     end
 
     class_methods do
-      def groups_user_can_read_epics(groups, user, same_root: false)
+      def groups_user_can(groups, user, action, same_root: false)
         groups = ::Gitlab::GroupPlansPreloader.new.preload(groups)
 
         # if we are sure that all groups have the same root group, we can
@@ -152,8 +153,12 @@ module EE
         preset_root_ancestor_for(groups) if same_root
 
         DeclarativePolicy.user_scope do
-          groups.select { |group| Ability.allowed?(user, :read_epic, group) }
+          groups.select { |group| Ability.allowed?(user, action, group) }
         end
+      end
+
+      def groups_user_can_read_epics(groups, user, same_root: false)
+        groups_user_can(groups, user, :read_epic, same_root: same_root)
       end
 
       def preset_root_ancestor_for(groups)

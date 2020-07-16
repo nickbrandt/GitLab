@@ -25,6 +25,9 @@ module EE
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)
       end
+      scope :no_iteration, -> { where(sprint_id: nil) }
+      scope :any_iteration, -> { where.not(sprint_id: nil) }
+      scope :in_iterations, ->(iterations) { where(sprint_id: iterations) }
       scope :on_status_page, -> do
         joins(project: :status_page_setting)
         .where(status_page_settings: { enabled: true })

@@ -99,6 +99,14 @@ export const setDiscussionSortDirection = ({ commit }, direction) => {
   commit(types.SET_DISCUSSIONS_SORT, direction);
 };
 
+export const setSelectedCommentPosition = ({ commit }, position) => {
+  commit(types.SET_SELECTED_COMMENT_POSITION, position);
+};
+
+export const setSelectedCommentPositionHover = ({ commit }, position) => {
+  commit(types.SET_SELECTED_COMMENT_POSITION_HOVER, position);
+};
+
 export const removeNote = ({ commit, dispatch, state }, note) => {
   const discussion = state.discussions.find(({ id }) => id === note.discussion_id);
 
@@ -402,9 +410,8 @@ export const saveNote = ({ commit, dispatch }, noteData) => {
 };
 
 const pollSuccessCallBack = (resp, commit, state, getters, dispatch) => {
-  if (resp.notes && resp.notes.length) {
-    updateOrCreateNotes({ commit, state, getters, dispatch }, resp.notes);
-
+  if (resp.notes?.length) {
+    dispatch('updateOrCreateNotes', resp.notes);
     dispatch('startTaskList');
   }
 
@@ -424,12 +431,12 @@ const getFetchDataParams = state => {
   return { endpoint, options };
 };
 
-export const fetchData = ({ commit, state, getters }) => {
+export const fetchData = ({ commit, state, getters, dispatch }) => {
   const { endpoint, options } = getFetchDataParams(state);
 
   axios
     .get(endpoint, options)
-    .then(({ data }) => pollSuccessCallBack(data, commit, state, getters))
+    .then(({ data }) => pollSuccessCallBack(data, commit, state, getters, dispatch))
     .catch(() => Flash(__('Something went wrong while fetching latest comments.')));
 };
 
@@ -449,7 +456,7 @@ export const poll = ({ commit, state, getters, dispatch }) => {
   if (!Visibility.hidden()) {
     eTagPoll.makeRequest();
   } else {
-    fetchData({ commit, state, getters });
+    dispatch('fetchData');
   }
 
   Visibility.change(() => {

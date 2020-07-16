@@ -85,7 +85,7 @@ module Security
     # indices
     def indices
       (@from.to_date..@to.to_date).map do |day|
-        chart_above_v3? ? "filebeat-*-#{day.strftime('%Y.%m.%d')}-*" : "filebeat-*-#{day.strftime('%Y.%m.%d')}"
+        "filebeat-*-#{day.strftime('%Y.%m.%d')}"
       end
     end
 

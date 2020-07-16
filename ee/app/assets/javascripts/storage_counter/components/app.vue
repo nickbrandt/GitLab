@@ -2,7 +2,7 @@
 import { GlLink, GlSprintf } from '@gitlab/ui';
 import Project from './project.vue';
 import UsageGraph from './usage_graph.vue';
-import query from '../queries/storage.graphql';
+import query from '../queries/storage.query.graphql';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import Icon from '~/vue_shared/components/icon.vue';
 

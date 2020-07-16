@@ -1,0 +1,5 @@
+---
+title: Add Prometheus Metrics for Index Pause Sidekiq Queue.
+merge_request: 36473
+author:
+type: changed

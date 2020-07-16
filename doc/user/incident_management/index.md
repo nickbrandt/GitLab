@@ -25,7 +25,7 @@ to create issues when alerts are triggered:
    checkbox to create an issue based on your own
    [issue templates](../project/description_templates.md#creating-issue-templates).
    For more information, see
-   [Taking Action on Incidents](../project/integrations/prometheus.md#taking-action-on-incidents-ultimate) **(ULTIMATE)**.
+   [Taking Action on Incidents](../../operations/metrics/index.md#taking-action-on-incidents-ultimate) **(ULTIMATE)**.
 1. To create issues from alerts, select the template in the **Issue Template**
    select box.
 1. To send [separate email notifications](#notify-developers-of-alerts) to users
@@ -34,9 +34,9 @@ to create issues when alerts are triggered:
 1. Click **Save changes**.
 
 Appropriately configured alerts include an
-[embedded chart](../project/integrations/prometheus.md#embedding-metrics-based-on-alerts-in-incident-issues)
+[embedded chart](../../operations/metrics/embed.md#embedding-metrics-based-on-alerts-in-incident-issues)
 for the query corresponding to the alert. You can also configure GitLab to
-[close issues](../project/integrations/prometheus.md#taking-action-on-incidents-ultimate)
+[close issues](../../operations/metrics/index.md#taking-action-on-incidents-ultimate)
 when you receive notification that the alert is resolved.
 
 ### Notify developers of alerts
@@ -53,8 +53,8 @@ To send separate email notifications to users with
 
 You can set up Prometheus alerts in:
 
-- [GitLab-managed Prometheus](../project/integrations/prometheus.md#setting-up-alerts-for-prometheus-metrics) installations.
-- [Self-managed Prometheus](../project/integrations/prometheus.md#external-prometheus-instances) installations.
+- [GitLab-managed Prometheus](../../operations/metrics/index.md#setting-up-alerts-for-prometheus-metrics) installations.
+- [Self-managed Prometheus](../../operations/metrics/index.md#external-prometheus-instances) installations.
 
 Prometheus alerts are created by the special Alert Bot user. You can't remove this
 user, but it does not count toward your license limit.
@@ -71,11 +71,11 @@ You can embed metrics anywhere [GitLab Markdown](../markdown.md) is used, such a
 comments on issues, and merge requests. Embedding metrics helps you share them
 when discussing incidents or performance issues. You can output the dashboard directly
 into any issue, merge request, epic, or any other Markdown text field in GitLab
-by [copying and pasting the link to the metrics dashboard](../project/integrations/prometheus.md#embedding-gitlab-managed-kubernetes-metrics).
+by [copying and pasting the link to the metrics dashboard](../../operations/metrics/embed.md#embedding-gitlab-managed-kubernetes-metrics).
 
 You can embed both
-[GitLab-hosted metrics](../project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown) and
-[Grafana metrics](../project/integrations/prometheus.md#embedding-grafana-charts)
+[GitLab-hosted metrics](../../operations/metrics/embed.md) and
+[Grafana metrics](../../operations/metrics/embed_grafana.md)
 in incidents and issue templates.
 
 ### Context menu
@@ -86,7 +86,7 @@ above the upper right corner of the panel. The options are:
 
 - [View logs](#view-logs-from-metrics-panel).
 - **Download CSV** - Data from embedded charts can be
-  [downloaded as CSV](../project/integrations/prometheus.md#downloading-data-as-csv).
+  [downloaded as CSV](../../operations/metrics/dashboards/index.md#downloading-data-as-csv).
 
 #### View logs from metrics panel
 
@@ -94,7 +94,7 @@ above the upper right corner of the panel. The options are:
 > - [Moved](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25455) to [GitLab Core](https://about.gitlab.com/pricing/) 12.9.
 
 Viewing logs from a metrics panel can be useful if you're triaging an application
-incident and need to [explore logs](../project/integrations/prometheus.md#view-logs-ultimate)
+incident and need to [explore logs](../../operations/metrics/dashboards/index.md#view-logs-ultimate)
 from across your application. These logs help you understand what is affecting
 your application's performance and resolve any problems.
 

@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe Analytics::CycleAnalytics::GroupStage do
   describe 'associations' do
     it { is_expected.to belong_to(:group) }
+    it { is_expected.to belong_to(:value_stream) }
   end
 
   it_behaves_like 'cycle analytics stage' do

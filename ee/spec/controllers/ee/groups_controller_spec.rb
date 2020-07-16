@@ -500,5 +500,42 @@ RSpec.describe GroupsController do
         end
       end
     end
+
+    context 'when delayed_project_removal param is specified' do
+      let_it_be(:params) { { delayed_project_removal: true } }
+      let_it_be(:user) { create(:user) }
+
+      subject do
+        put :update, params: { id: group.to_param, group: params }
+      end
+
+      before do
+        group.add_owner(user)
+        sign_in(user)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: available)
+      end
+
+      context 'when feature is available' do
+        let(:available) { true }
+
+        it 'allows storing of setting' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:found)
+          expect(group.reload.delayed_project_removal).to eq(params[:delayed_project_removal])
+        end
+      end
+
+      context 'when feature is not available' do
+        let(:available) { false }
+
+        it 'does not allow storing of setting' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:found)
+          expect(group.reload.delayed_project_removal).not_to eq(params[:delayed_project_removal])
+        end
+      end
+    end
   end
 end

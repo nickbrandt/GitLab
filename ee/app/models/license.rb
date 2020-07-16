@@ -82,6 +82,7 @@ class License < ApplicationRecord
     group_saml
     issues_analytics
     jira_dev_panel_integration
+    jira_issues_integration
     ldap_group_sync_filter
     merge_pipelines
     merge_request_performance_metrics
@@ -92,6 +93,7 @@ class License < ApplicationRecord
     multiple_group_issue_boards
     object_storage
     operations_dashboard
+    opsgenie_integration
     packages
     pages_size_limit
     productivity_analytics

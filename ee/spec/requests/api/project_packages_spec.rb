@@ -152,7 +152,7 @@ RSpec.describe API::ProjectPackages do
           subject
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(response).to match_response_schema('public_api/v4/packages/package', dir: 'ee')
+          expect(response).to match_response_schema('public_api/v4/packages/package')
         end
 
         it 'returns 404 when the package does not exist' do
@@ -194,7 +194,7 @@ RSpec.describe API::ProjectPackages do
             subject
 
             expect(response).to have_gitlab_http_status(:ok)
-            expect(response).to match_response_schema('public_api/v4/packages/package', dir: 'ee')
+            expect(response).to match_response_schema('public_api/v4/packages/package')
           end
 
           it_behaves_like 'no destroy url'
@@ -217,7 +217,7 @@ RSpec.describe API::ProjectPackages do
             get api(package_url, user)
 
             expect(response).to have_gitlab_http_status(:ok)
-            expect(response).to match_response_schema('public_api/v4/packages/package_with_build', dir: 'ee')
+            expect(response).to match_response_schema('public_api/v4/packages/package_with_build')
           end
         end
       end

@@ -13,6 +13,7 @@ class Projects::ServicesController < Projects::ApplicationController
   before_action :redirect_deprecated_prometheus_service, only: [:update]
   before_action only: :edit do
     push_frontend_feature_flag(:integration_form_refactor, default_enabled: true)
+    push_frontend_feature_flag(:jira_issues_integration, @project, { default_enabled: true })
   end
 
   respond_to :html
@@ -60,7 +61,7 @@ class Projects::ServicesController < Projects::ApplicationController
       return { error: true, message: _('Validations failed.'), service_response: @service.errors.full_messages.join(','), test_failed: false }
     end
 
-    result = Integrations::Test::ProjectService.new(@service, current_user, params[:event]).execute
+    result = ::Integrations::Test::ProjectService.new(@service, current_user, params[:event]).execute
 
     unless result[:success]
       return { error: true, message: _('Test failed.'), service_response: result[:message].to_s, test_failed: true }

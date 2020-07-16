@@ -1,6 +1,6 @@
 <script>
 import { sprintf, __ } from '~/locale';
-import { GlAvatarLink, GlAvatar, GlTooltipDirective } from '@gitlab/ui';
+import { GlAvatarLink, GlAvatar, GlAvatarsInline, GlTooltipDirective } from '@gitlab/ui';
 import { PRESENTABLE_APPROVERS_LIMIT } from '../constants';
 
 export default {
@@ -8,6 +8,7 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   components: {
+    GlAvatarsInline,
     GlAvatarLink,
     GlAvatar,
   },
@@ -36,15 +37,16 @@ export default {
       });
     },
   },
+  PRESENTABLE_APPROVERS_LIMIT,
   strings: {
-    approvedBy: __('Approved by: '),
-    noApprovers: __('No approvers'),
+    approvedBy: __('approved by: '),
+    noApprovers: __('no approvers'),
   },
 };
 </script>
 
 <template>
-  <li class="issuable-status d-flex approvers align-items-center">
+  <div class="gl-display-flex gl-align-items-center gl-justify-content-end" data-testid="approvers">
     <span class="gl-text-gray-700">
       <template v-if="hasApprovers">
         {{ $options.strings.approvedBy }}
@@ -53,6 +55,33 @@ export default {
         {{ $options.strings.noApprovers }}
       </template>
     </span>
+    <gl-avatars-inline
+      v-if="hasApprovers"
+      :avatars="approvers"
+      :collapsed="true"
+      :max-visible="$options.PRESENTABLE_APPROVERS_LIMIT"
+      :avatar-size="24"
+      class="gl-display-inline-flex d-lg-none gl-ml-3"
+      badge-tooltip-prop="name"
+    >
+      <template #avatar="{ avatar }">
+        <gl-avatar-link
+          v-gl-tooltip
+          target="blank"
+          :href="avatar.web_url"
+          :title="avatar.name"
+          class="gl-text-gray-900 author-link js-user-link"
+        >
+          <gl-avatar
+            :src="avatar.avatar_url"
+            :entity-id="avatar.id"
+            :entity-name="avatar.name"
+            :size="24"
+          />
+        </gl-avatar-link>
+      </template>
+    </gl-avatars-inline>
+
     <gl-avatar-link
       v-for="approver in approversToPresent"
       :key="approver.id"
@@ -60,7 +89,7 @@ export default {
       :href="approver.web_url"
       :data-user-id="approver.id"
       :data-name="approver.name"
-      class="d-flex align-items-center ml-2 author-link js-user-link "
+      class="gl-display-none d-lg-inline-flex gl-align-items-center gl-justify-content-end gl-ml-3 gl-text-gray-900 author-link js-user-link"
     >
       <gl-avatar
         :src="approver.avatar_url"
@@ -74,8 +103,8 @@ export default {
     <span
       v-if="isApproversOverLimit"
       v-gl-tooltip.top="approversOverLimitString"
-      class="avatar-counter ml-2"
+      class="gl-display-none d-lg-inline-block avatar-counter gl-ml-3 gl-px-2 gl-flex-shrink-0 flex-grow-0"
       >+ {{ amountOfApproversOverLimit }}</span
     >
-  </li>
+  </div>
 </template>

@@ -30,7 +30,7 @@ export default {
 };
 </script>
 <template>
-  <div class="report-block-list-issue-description prepend-top-5 gl-mb-2">
+  <div class="report-block-list-issue-description gl-mt-2 gl-mb-2">
     <div class="report-block-list-issue-description-text">
       <template v-if="isStatusSuccess">{{ s__('ciReport|Fixed:') }}</template>
 

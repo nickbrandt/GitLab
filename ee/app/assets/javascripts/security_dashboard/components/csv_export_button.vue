@@ -75,7 +75,7 @@ export default {
       v-if="!isPreparingCsvExport"
       ref="exportIcon"
       name="export"
-      class="mr-0 position-top-0"
+      class="mr-0 gl-display-block"
     />
     <gl-popover
       ref="popover"

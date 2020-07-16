@@ -62,16 +62,8 @@ module API
       # rubocop: enable CodeReuse/ActiveRecord
 
       def merge_request_pipelines_with_access
-        authorize! :read_pipeline, user_project
-
         mr = find_merge_request_with_access(params[:merge_request_iid])
-        mr.all_pipelines
-      end
-
-      def check_sha_param!(params, merge_request)
-        if params[:sha] && merge_request.diff_head_sha != params[:sha]
-          render_api_error!("SHA does not match HEAD of source branch: #{merge_request.diff_head_sha}", 409)
-        end
+        ::Ci::PipelinesForMergeRequestFinder.new(mr, current_user).execute
       end
 
       def automatically_mergeable?(merge_when_pipeline_succeeds, merge_request)
@@ -93,7 +85,6 @@ module API
         if params[:view] == 'simple'
           options[:with] = Entities::MergeRequestSimple
         else
-          options[:issuable_metadata] = Gitlab::IssuableMetadata.new(current_user, merge_requests).data
           options[:skip_merge_status_recheck] = !declared_params[:with_merge_status_recheck]
         end
 
@@ -391,8 +382,6 @@ module API
         success Entities::Pipeline
       end
       post ':id/merge_requests/:merge_request_iid/pipelines' do
-        authorize! :create_pipeline, user_project
-
         pipeline = ::MergeRequests::CreatePipelineService
           .new(user_project, current_user, allow_duplicate: true)
           .execute(find_merge_request_with_access(params[:merge_request_iid]))

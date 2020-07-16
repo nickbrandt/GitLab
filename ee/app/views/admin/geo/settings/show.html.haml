@@ -2,9 +2,6 @@
 = render partial: 'admin/geo/shared/license_alert'
 
 - if Gitlab::Geo.license_allows?
-  - if Feature.enabled?(:enable_geo_settings_form_js)
-    #js-geo-settings-form
-  - else
-    = render_if_exists 'admin/geo/settings/form'
+  #js-geo-settings-form
 - else
   = render 'shared/empty_states/geo'

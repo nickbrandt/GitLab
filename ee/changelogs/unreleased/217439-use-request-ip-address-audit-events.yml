@@ -1,0 +1,5 @@
+---
+title: Use IP address from request on audit events
+merge_request: 35834
+author:
+type: changed

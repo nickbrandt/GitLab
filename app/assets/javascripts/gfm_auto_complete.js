@@ -30,7 +30,7 @@ export function membersBeforeSave(members) {
     const imgAvatar = `<img src="${member.avatar_url}" alt="${member.username}" class="avatar ${rectAvatarClass} avatar-inline center s26"/>`;
     const txtAvatar = `<div class="avatar ${rectAvatarClass} center avatar-inline s26">${autoCompleteAvatar}</div>`;
     const avatarIcon = member.mentionsDisabled
-      ? spriteIcon('notifications-off', 's16 vertical-align-middle prepend-left-5')
+      ? spriteIcon('notifications-off', 's16 vertical-align-middle gl-ml-2')
       : '';
 
     return {
@@ -109,8 +109,10 @@ class GfmAutoComplete {
           tpl += ' <small class="params"><%- params.join(" ") %></small>';
         }
         if (value.warning && value.icon && value.icon === 'confidential') {
-          tpl +=
-            '<small class="description"><em><i class="fa fa-eye-slash" aria-hidden="true"/><%- warning %></em></small>';
+          tpl += `<small class="description gl-display-flex gl-align-items-center">${spriteIcon(
+            'eye-slash',
+            's16 gl-mr-2',
+          )}<em><%- warning %></em></small>`;
         } else if (value.warning) {
           tpl += '<small class="description"><em><%- warning %></em></small>';
         } else if (value.description !== '') {

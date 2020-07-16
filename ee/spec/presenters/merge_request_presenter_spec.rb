@@ -31,22 +31,6 @@ RSpec.describe MergeRequestPresenter do
     end
   end
 
-  describe '#approvals_path' do
-    subject { described_class.new(merge_request, current_user: user).approvals_path }
-
-    it_behaves_like 'is nil when needed'
-
-    it { is_expected.to eq(expose_path("/#{merge_request.project.full_path}/-/merge_requests/#{merge_request.iid}/approvals")) }
-  end
-
-  describe '#api_approvals_path' do
-    subject { described_class.new(merge_request, current_user: user).api_approvals_path }
-
-    it_behaves_like 'is nil when needed'
-
-    it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approvals")) }
-  end
-
   describe '#api_approval_settings_path' do
     subject { described_class.new(merge_request, current_user: user).api_approval_settings_path }
 
@@ -65,22 +49,6 @@ RSpec.describe MergeRequestPresenter do
 
       it { is_expected.to be_nil }
     end
-  end
-
-  describe '#api_approve_path' do
-    subject { described_class.new(merge_request, current_user: user).api_approve_path }
-
-    it_behaves_like 'is nil when needed'
-
-    it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approve")) }
-  end
-
-  describe '#api_unapprove_path' do
-    subject { described_class.new(merge_request, current_user: user).api_unapprove_path }
-
-    it_behaves_like 'is nil when needed'
-
-    it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/unapprove")) }
   end
 
   describe '#suggested_approvers' do
@@ -115,6 +83,26 @@ RSpec.describe MergeRequestPresenter do
         it "does not contain #{params['create_feedback_path']}" do
           expect(subject).to be_nil
         end
+      end
+    end
+  end
+
+  describe '#approvals_widget_type' do
+    subject { described_class.new(merge_request, current_user: user).approvals_widget_type }
+
+    context 'when approvals feature is available for a project' do
+      let(:approval_feature_available) { true }
+
+      it 'returns full' do
+        is_expected.to eq('full')
+      end
+    end
+
+    context 'when approvals feature is not available for a project' do
+      let(:approval_feature_available) { false }
+
+      it 'returns base' do
+        is_expected.to eq('base')
       end
     end
   end

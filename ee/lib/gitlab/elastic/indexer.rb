@@ -163,12 +163,7 @@ module Gitlab
 
         # An index_status should always be created,
         # even if the repository is empty, so we know it's been looked at.
-        @index_status ||=
-          begin
-            IndexStatus.find_or_create_by(project_id: project.id)
-          rescue ActiveRecord::RecordNotUnique
-            retry
-          end
+        @index_status ||= IndexStatus.safe_find_or_create_by!(project_id: project.id)
 
         attributes =
           if index_wiki?
@@ -177,7 +172,8 @@ module Gitlab
             { last_commit: to_sha, indexed_at: Time.now }
           end
 
-        @index_status.update(attributes)
+        @index_status.update!(attributes)
+
         project.reload_index_status
       end
       # rubocop: enable CodeReuse/ActiveRecord

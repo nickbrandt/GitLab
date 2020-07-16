@@ -3,6 +3,9 @@ import CycleAnalytics from './components/base.vue';
 import createStore from './store';
 import { buildCycleAnalyticsInitialData } from '../shared/utils';
 import { parseBoolean } from '~/lib/utils/common_utils';
+import { GlToast } from '@gitlab/ui';
+
+Vue.use(GlToast);
 
 export default () => {
   const el = document.querySelector('#js-cycle-analytics-app');

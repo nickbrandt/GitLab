@@ -3,12 +3,14 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlToggle } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import store from '~/boards/stores';
+import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 
 export default () =>
   new Vue({
     el: document.getElementById('js-board-labels-toggle'),
     components: {
       GlToggle,
+      LocalStorageSync,
     },
     store,
     computed: {
@@ -16,19 +18,24 @@ export default () =>
       ...mapGetters(['getLabelToggleState']),
     },
     methods: {
-      ...mapActions(['toggleShowLabels']),
+      ...mapActions(['setShowLabels']),
 
-      onToggle() {
-        this.toggleShowLabels();
+      onToggle(val) {
+        this.setShowLabels(val);
 
         Tracking.event(document.body.dataset.page, 'toggle', {
           label: 'show_labels',
           property: this.getLabelToggleState,
         });
       },
+
+      onStorageUpdate(val) {
+        this.setShowLabels(JSON.parse(val));
+      },
     },
     template: `
       <div class="board-labels-toggle-wrapper d-flex align-items-center prepend-left-10">
+        <local-storage-sync storage-key="gl-show-board-labels" :value="JSON.stringify(isShowingLabels)" @input="onStorageUpdate" />
         <gl-toggle
           :value="isShowingLabels"
           label="Show labels"

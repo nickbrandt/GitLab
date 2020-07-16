@@ -87,6 +87,10 @@ module QA
         end
       end
 
+      module Milestone
+        autoload :Show, 'qa/ee/page/milestone/show'
+      end
+
       module Profile
         autoload :Menu, 'qa/ee/page/profile/menu'
       end
@@ -111,10 +115,6 @@ module QA
 
         module Wiki
           autoload :Show, 'qa/ee/page/project/wiki/show'
-        end
-
-        module Milestone
-          autoload :Show, 'qa/ee/page/project/milestone/show'
         end
 
         module Settings

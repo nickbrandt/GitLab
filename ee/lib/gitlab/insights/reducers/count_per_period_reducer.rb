@@ -62,7 +62,8 @@ module Gitlab
         #   }
         def issuables_grouped_by_normalized_period
           @issuables_grouped_by_normalized_period ||= issuables.group_by do |issuable|
-            normalized_time(issuable.public_send(period_field)) # rubocop:disable GitlabSecurity/PublicSend
+            time_field = issuable.public_send(period_field) || issuable.created_at # rubocop:disable GitlabSecurity/PublicSend
+            normalized_time(time_field)
           end
         end
 

@@ -16,9 +16,9 @@ For more information about Telemetry, see:
 More useful links:
 
 - [Telemetry Direction](https://about.gitlab.com/direction/telemetry/)
-- [Data Analysis Process](https://about.gitlab.com/handbook/business-ops/data-team/#-data-analysis-process)
-- [Data for Product Managers](https://about.gitlab.com/handbook/business-ops/data-team/data-programs/data-for-product-managers/)
-- [Data Infrastructure](https://about.gitlab.com/handbook/business-ops/data-team/data-platform/data-infrastructure/)
+- [Data Analysis Process](https://about.gitlab.com/handbook/business-ops/data-team/#data-analysis-process/)
+- [Data for Product Managers](https://about.gitlab.com/handbook/business-ops/data-team/programs/data-for-product-managers/)
+- [Data Infrastructure](https://about.gitlab.com/handbook/business-ops/data-team/platform/infrastructure/)
 
 ## What is Snowplow
 
@@ -70,7 +70,7 @@ The following configuration is required:
 The following example shows a basic request/response flow between the following components:
 
 - Snowplow JS / Ruby Trackers on GitLab.com
-- [GitLab.com Snowplow Collector](https://about.gitlab.com/handbook/engineering/infrastructure/library/snowplow/)
+- [GitLab.com Snowplow Collector](https://gitlab.com/gitlab-com/gl-infra/readiness/-/blob/master/library/snowplow/index.md)
 - GitLab's S3 Bucket
 - GitLab's Snowflake Data Warehouse
 - Sisense:

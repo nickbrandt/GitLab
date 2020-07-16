@@ -9,14 +9,17 @@ module EE
 
       override :execute
       def execute(merge_request)
-        if incorrect_approval_password?(merge_request)
-          raise IncorrectApprovalPasswordError
-        end
+        return if incorrect_approval_password?(merge_request)
 
         super
       end
 
       private
+
+      override :can_be_approved?
+      def can_be_approved?(merge_request)
+        merge_request.can_approve?(current_user)
+      end
 
       override :reset_approvals_cache
       def reset_approvals_cache(merge_request)

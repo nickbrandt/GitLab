@@ -13,9 +13,9 @@ GitLab offers integrated cluster creation for the following Kubernetes providers
 
 GitLab can also integrate with any standard Kubernetes provider, either on-premise or hosted.
 
-NOTE: **Scalable app deployment with GitLab and Google Cloud Platform**
-[Watch the webcast](https://about.gitlab.com/webcast/scalable-app-deploy/) and
-learn how to spin up a Kubernetes cluster managed by Google Cloud Platform (GCP)
+NOTE: **Note:**
+Watch the webcast [Scalable app deployment with GitLab and Google Cloud Platform](https://about.gitlab.com/webcast/scalable-app-deploy/)
+and learn how to spin up a Kubernetes cluster managed by Google Cloud Platform (GCP)
 in a few clicks.
 
 TIP: **Tip:**
@@ -152,11 +152,6 @@ Amazon Elastic Kubernetes Service (EKS) at the project, group, or instance level
 ## Add existing cluster
 
 If you have an existing Kubernetes cluster, you can add it to a project, group, or instance.
-
-For more information, see information for adding an:
-
-- [Existing Kubernetes cluster](#existing-kubernetes-cluster), including GKE clusters.
-- [Existing EKS cluster](add_eks_clusters.md#existing-eks-cluster).
 
 NOTE: **Note:**
 Kubernetes integration is not supported for arm64 clusters. See the issue
@@ -313,7 +308,8 @@ integration to work properly.
 
 ![rbac](img/rbac_v13_1.png)
 
-NOTE: **Note**: Disabling RBAC means that any application running in the cluster,
+NOTE: **Note:**
+Disabling RBAC means that any application running in the cluster,
 or user who can authenticate to the cluster, has full API access. This is a
 [security concern](index.md#security-implications), and may not be desirable.
 

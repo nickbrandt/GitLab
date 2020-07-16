@@ -14,6 +14,12 @@ module Resolvers
     argument :id, GraphQL::ID_TYPE,
              required: false,
              description: 'The ID of the Iteration to look up'
+    argument :iid, GraphQL::ID_TYPE,
+             required: false,
+             description: 'The internal ID of the Iteration to look up'
+    argument :include_ancestors, GraphQL::BOOLEAN_TYPE,
+             required: false,
+             description: 'Whether to include ancestor iterations. Defaults to true'
 
     type Types::IterationType, null: true
 
@@ -22,7 +28,9 @@ module Resolvers
 
       authorize!
 
-      iterations = IterationsFinder.new(iterations_finder_params(args)).execute
+      args[:include_ancestors] = true if args[:include_ancestors].nil?
+
+      iterations = IterationsFinder.new(context[:current_user], iterations_finder_params(args)).execute
 
       Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection.new(iterations)
     end
@@ -32,27 +40,34 @@ module Resolvers
     def iterations_finder_params(args)
       {
         id: args[:id],
+        iid: args[:iid],
         state: args[:state] || 'all',
         start_date: args[:start_date],
         end_date: args[:end_date],
         search_title: args[:title]
-      }.merge(parent_id_parameter)
+      }.merge(parent_id_parameter(args[:include_ancestors]))
     end
 
     def parent
       @parent ||= object.respond_to?(:sync) ? object.sync : object
     end
 
-    def parent_id_parameter
+    def parent_id_parameter(include_ancestors)
       if parent.is_a?(Group)
-        { group_ids: parent.id }
+        if include_ancestors
+          { group_ids: parent.self_and_ancestors.select(:id) }
+        else
+          { group_ids: parent.id }
+        end
       elsif parent.is_a?(Project)
-        { project_ids: parent.id }
+        if include_ancestors && parent.parent_id.present?
+          { group_ids: parent.parent.self_and_ancestors.select(:id), project_ids: parent.id }
+        else
+          { project_ids: parent.id }
+        end
       end
     end
 
-    # IterationsFinder does not check for current_user permissions,
-    # so for now we need to keep it here.
     def authorize!
       Ability.allowed?(context[:current_user], :read_iteration, parent) || raise_resource_not_available_error!
     end

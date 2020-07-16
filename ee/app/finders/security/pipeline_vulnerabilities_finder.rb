@@ -51,11 +51,7 @@ module Security
       # This is easier to address from within the class rather than from tests because this leads to bad class design
       # and exposing too much of its implementation details to the test suite.
       # See also https://stackoverflow.com/questions/15442298/is-sort-in-ruby-stable.
-      stable_sort_by(occurrences) { |x| [-x.severity_value, -x.confidence_value] }
-    end
-
-    def stable_sort_by(occurrences)
-      occurrences.sort_by.with_index { |x, idx| [yield(x), idx] }
+      Gitlab::Utils.stable_sort_by(occurrences) { |x| [-x.severity_value, -x.confidence_value] }
     end
 
     def pipeline_reports

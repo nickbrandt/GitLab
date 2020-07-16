@@ -2,10 +2,12 @@
 
 module Ci
   class RunDastScanService < BaseService
-    DAST_CI_TEMPLATE = 'lib/gitlab/ci/templates/Security/DAST.gitlab-ci.yml'.freeze
+    def self.ci_template_raw
+      @ci_template_raw ||= Gitlab::Template::GitlabCiYmlTemplate.find('DAST').content
+    end
 
     def self.ci_template
-      @ci_template ||= File.open(DAST_CI_TEMPLATE, 'r') { |f| YAML.safe_load(f.read) }.tap do |template|
+      @ci_template ||= YAML.safe_load(ci_template_raw).tap do |template|
         template['stages'] = ['dast']
         template['dast'].delete('rules')
       end

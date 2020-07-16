@@ -46,9 +46,6 @@ module QA
             incident_settings.select_issue_template('incident')
             incident_settings.save_incident_settings
           end
-          settings.expand_incidents do |incident_settings|
-            expect(incident_settings).to have_template('incident')
-          end
         end
       end
 

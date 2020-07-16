@@ -125,10 +125,7 @@ for each Elasticsearch node, per the [official guidelines](https://www.elastic.c
 Keep in mind, this is the **minimum requirements** as per Elasticsearch. For
 production instances, they recommend considerably more resources.
 
-Storage requirements also vary based on the installation side, but as a rule of
-thumb, you should allocate the total size of your production database, **plus**
-two-thirds of the total size of your Git repositories. Efforts to reduce this
-total are being tracked in [epic &153](https://gitlab.com/groups/gitlab-org/-/epics/153).
+The necessary storage space largely depends on the size of the repositories you want to store in GitLab but as a rule of thumb you should have at least 50% of free space as all your repositories combined take up.
 
 ## Enabling Elasticsearch
 
@@ -153,8 +150,8 @@ The following Elasticsearch settings are available:
 | `AWS Access Key`                                      | The AWS access key. |
 | `AWS Secret Access Key`                               | The AWS secret access key. |
 | `Maximum field length`                                | See [the explanation in instance limits.](../administration/instance_limits.md#maximum-field-length). |
-| `Maximum bulk request size (MiB)` | The Maximum Bulk Request size is used by GitLab's Golang-based indexer processes and indicates how much data it ought to collect (and store in memory) in a given indexing process before submitting the payload to Elasticsearch’s Bulk API. This setting works in tandem with the Bulk request concurrency setting (see below) and needs to accomodate the resource constraints of both the Elasticsearch host(s) and the host(s) running GitLab's Golang-based indexer either from the `gitlab-rake` command or the Sidekiq tasks. |
-| `Bulk request concurrency` | The Bulk request concurrency indicates how many of GitLab's Golang-based indexer processes (or threads) can run in parallel to collect data to subsequently submit to Elasticsearch’s Bulk API. This increases indexing performance, but fills the Elasticsearch bulk requests queue faster. This setting works in tandem with the Maximum bulk request size setting (see above) and needs to accomodate the resource constraints of both the Elasticsearch host(s) and the host(s) running GitLab's Golang-based indexer either from the `gitlab-rake` command or the Sidekiq tasks. |
+| `Maximum bulk request size (MiB)` | The Maximum Bulk Request size is used by GitLab's Golang-based indexer processes and indicates how much data it ought to collect (and store in memory) in a given indexing process before submitting the payload to Elasticsearch’s Bulk API. This setting should be used with the Bulk request concurrency setting (see below) and needs to accommodate the resource constraints of both the Elasticsearch host(s) and the host(s) running GitLab's Golang-based indexer either from the `gitlab-rake` command or the Sidekiq tasks. |
+| `Bulk request concurrency` | The Bulk request concurrency indicates how many of GitLab's Golang-based indexer processes (or threads) can run in parallel to collect data to subsequently submit to Elasticsearch’s Bulk API. This increases indexing performance, but fills the Elasticsearch bulk requests queue faster. This setting should be used together with the Maximum bulk request size setting (see above) and needs to accommodate the resource constraints of both the Elasticsearch host(s) and the host(s) running GitLab's Golang-based indexer either from the `gitlab-rake` command or the Sidekiq tasks. |
 
 ### Limiting namespaces and projects
 
@@ -170,10 +167,10 @@ You can filter the selection dropdown by writing part of the namespace or projec
 
 ![limit namespace filter](img/limit_namespace_filter.png)
 
-NOTE: **Note**:
+NOTE: **Note:**
 If no namespaces or projects are selected, no Elasticsearch indexing will take place.
 
-CAUTION: **Warning**:
+CAUTION: **Warning:**
 If you have already indexed your instance, you will have to regenerate the index in order to delete all existing data
 for filtering to work correctly. To do this run the Rake tasks `gitlab:elastic:recreate_index` and
 `gitlab:elastic:clear_index_status`. Afterwards, removing a namespace or a project from the list will delete the data
@@ -240,7 +237,7 @@ Indexing can be performed using Rake tasks.
 
 #### Indexing small instances
 
-CAUTION: **Warning**:
+CAUTION: **Warning:**
 This will delete your existing indexes.
 
 If the database size is less than 500 MiB, and the size of all hosted repos is less than 5 GiB:
@@ -260,7 +257,7 @@ If the database size is less than 500 MiB, and the size of all hosted repos is l
 
 #### Indexing large instances
 
-CAUTION: **Warning**:
+CAUTION: **Warning:**
 Performing asynchronous indexing will generate a lot of Sidekiq jobs.
 Make sure to prepare for this task by having a [Scalable and Highly Available Setup](README.md)
 or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq_processes.md)
@@ -478,13 +475,13 @@ When performing a search, the GitLab index will use the following scopes:
 
 ### Guidance on choosing optimal cluster configuration
 
-For basic guidance on choosing a cluster configuration you may refer to [Elasic Cloud Calculator](https://cloud.elastic.co/pricing). You can find more information below.
+For basic guidance on choosing a cluster configuration you may refer to [Elastic Cloud Calculator](https://cloud.elastic.co/pricing). You can find more information below.
 
 - Generally, you will want to use at least a 2-node cluster configuration with one replica, which will allow you to have resilience. If your storage usage is growing quickly, you may want to plan horizontal scaling (adding more nodes) beforehand.
 - It's not recommended to use HDD storage with the search cluster, because it will take a hit on performance. It's better to use SSD storage (NVMe or SATA SSD drives for example).
 - You can use the [GitLab Performance Tool](https://gitlab.com/gitlab-org/quality/performance) to benchmark search performance with different search cluster sizes and configurations.
 - `Heap size` should be set to no more than 50% of your physical RAM. Additionally, it shouldn't be set to more than the threshold for zero-based compressed oops. The exact threshold varies, but 26 GB is safe on most systems, but can also be as large as 30 GB on some systems. See [Setting the heap size](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html#heap-size) for more details.
-- Number of CPUs (CPU cores) per node is usually corresponds to the `Number of Elasticsearch shards` setting described below.
+- Number of CPUs (CPU cores) per node usually corresponds to the `Number of Elasticsearch shards` setting described below.
 - A good guideline is to ensure you keep the number of shards per node below 20 per GB heap it has configured. A node with a 30GB heap should therefore have a maximum of 600 shards, but the further below this limit you can keep it the better. This will generally help the cluster stay in good health.
 - Small shards result in small segments, which increases overhead. Aim to keep the average shard size between at least a few GB and a few tens of GB. Another consideration is the number of documents, you should aim for this simple formula for the number of shards: `number of expected documents / 5M +1`.
 - `refresh_interval` is a per index setting. You may want to adjust that from default `1s` to a bigger value if you don't need data in realtime. This will change how soon you will see fresh results. If that's important for you, you should leave it as close as possible to the default value.
@@ -492,7 +489,7 @@ For basic guidance on choosing a cluster configuration you may refer to [Elasic 
 
 ### Elasticsearch integration settings guidance
 
-- The `Number of Elasticsearch shards` setting usually corresponds with number of CPUs available in your cluster. For example, if you have a 3-node cluster with 4 cores each, this means you will benefit from having at least 3*4=12 shards in the cluster. Please note, it's only possible to change the shards number by using [Split index API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-split-index.html) or by reindexing to a different index with a changed number of shards.
+- The `Number of Elasticsearch shards` setting usually corresponds with the number of CPUs available in your cluster. For example, if you have a 3-node cluster with 4 cores each, this means you will benefit from having at least 3*4=12 shards in the cluster. Please note, it's only possible to change the shards number by using [Split index API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-split-index.html) or by reindexing to a different index with a changed number of shards.
 - The `Number of Elasticsearch replicas` setting should most of the time be equal to `1` (each shard will have 1 replica). Using `0` is not recommended, because losing one node will corrupt the index.
 
 ### Deleted documents
@@ -545,7 +542,7 @@ Here are some common pitfalls and how to overcome them:
   
   If you see `"Kaminari::PaginatableArray"` you are using Elasticsearch.
 
-  NOTE: **Note**:
+  NOTE: **Note:**
   The above instructions are used to verify that GitLab is using Elasticsearch only when indexing all namespaces. This is not to be used for scenarios that only index a [subset of namespaces](#limiting-namespaces-and-projects).
 
 - **I updated GitLab and now I can't find anything**
@@ -568,7 +565,7 @@ Here are some common pitfalls and how to overcome them:
   pp s.search_objects.to_a
   ```
 
-  NOTE: **Note**:
+  NOTE: **Note:**
   The above instructions are not to be used for scenarios that only index a [subset of namespaces](#limiting-namespaces-and-projects).
 
   See [Elasticsearch Index Scopes](#elasticsearch-index-scopes) for more information on searching for specific types of data.
@@ -632,7 +629,8 @@ Here are some common pitfalls and how to overcome them:
   **For a single node Elasticsearch cluster the functional cluster health status will be yellow** (will never be green) because the primary shard is allocated but replicas can not be as there is no other node to which Elasticsearch can assign a replica. This also applies if you are using the
 [Amazon Elasticsearch](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-handling-errors.html#aes-handling-errors-yellow-cluster-status) service.
 
-  CAUTION: **Warning**: Setting the number of replicas to `0` is not something that we recommend (this is not allowed in the GitLab Elasticsearch Integration menu). If you are planning to add more Elasticsearch nodes (for a total of more than 1 Elasticsearch) the number of replicas will need to be set to an integer value larger than `0`. Failure to do so will result in lack of redundancy (losing one node will corrupt the index).
+  CAUTION: **Warning:**
+  Setting the number of replicas to `0` is not something that we recommend (this is not allowed in the GitLab Elasticsearch Integration menu). If you are planning to add more Elasticsearch nodes (for a total of more than 1 Elasticsearch) the number of replicas will need to be set to an integer value larger than `0`. Failure to do so will result in lack of redundancy (losing one node will corrupt the index).
 
   If you have a **hard requirement to have a green status for your single node Elasticsearch cluster**, please make sure you understand the risks outlined in the previous paragraph and then simply run the following query to set the number of replicas to `0`(the cluster will no longer try to create any shard replicas):
 

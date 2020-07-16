@@ -1,53 +1,91 @@
+import Vuex from 'vuex';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { GlBreadcrumb, GlLoadingIcon } from '@gitlab/ui';
+import httpStatusCodes from '~/lib/utils/http_status';
 import ReportsApp from 'ee/analytics/reports/components/app.vue';
-import { shallowMount } from '@vue/test-utils';
-import { GlBreadcrumb } from '@gitlab/ui';
-import { objectToQuery } from '~/lib/utils/url_utility';
+import createStore from 'ee/analytics/reports/store';
+import { initialState, configData, pageData } from 'ee_jest/analytics/reports/mock_data';
 
-const GROUP_NAME = 'Gitlab Org';
-const GROUP_PATH = 'gitlab-org';
-const DEFAULT_REPORT_TITLE = 'Report';
-
-const GROUP_URL_QUERY = objectToQuery({
-  groupName: GROUP_NAME,
-  groupPath: GROUP_PATH,
-});
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('ReportsApp', () => {
   let wrapper;
+  let mock;
 
   const createComponent = () => {
-    return shallowMount(ReportsApp);
+    const component = shallowMount(ReportsApp, {
+      localVue,
+      store: createStore(),
+    });
+
+    component.vm.$store.dispatch('page/setInitialPageData', pageData);
+
+    return component;
   };
 
   const findGlBreadcrumb = () => wrapper.find(GlBreadcrumb);
+  const findGlLoadingIcon = () => wrapper.find(GlLoadingIcon);
+
+  beforeEach(() => {
+    mock = new MockAdapter(axios);
+    mock.onGet().reply(httpStatusCodes.OK, configData);
+  });
 
   afterEach(() => {
+    mock.restore();
+
     wrapper.destroy();
     wrapper = null;
   });
 
-  describe('contains the correct breadcrumbs', () => {
-    it('displays the report title by default', () => {
+  describe('loading icon', () => {
+    it('displays the icon while page config is being retrieved', async () => {
       wrapper = createComponent();
 
-      const breadcrumbs = findGlBreadcrumb();
+      await wrapper.vm.$nextTick();
 
-      expect(breadcrumbs.props('items')).toStrictEqual([{ text: DEFAULT_REPORT_TITLE, href: '' }]);
+      expect(findGlLoadingIcon().exists()).toBe(true);
     });
 
-    describe('with a group in the URL', () => {
-      beforeEach(() => {
-        window.history.replaceState({}, null, `?${GROUP_URL_QUERY}`);
-      });
+    it('hides the icon once page config has being retrieved', async () => {
+      wrapper = createComponent();
 
-      it('displays the group name and report title', () => {
+      wrapper.vm.$store.dispatch('page/receivePageConfigDataSuccess', configData);
+
+      await wrapper.vm.$nextTick();
+
+      expect(findGlLoadingIcon().exists()).toBe(false);
+    });
+  });
+
+  describe('contains the correct breadcrumbs', () => {
+    it('displays the "Report" title by default', () => {
+      wrapper = createComponent();
+
+      const {
+        config: { title },
+      } = initialState;
+
+      expect(findGlBreadcrumb().props('items')).toStrictEqual([{ text: title, href: '' }]);
+    });
+
+    describe('with a config specified', () => {
+      it('displays the group name and report title once retrieved', async () => {
         wrapper = createComponent();
 
-        const breadcrumbs = findGlBreadcrumb();
+        wrapper.vm.$store.dispatch('page/receivePageConfigDataSuccess', configData);
 
-        expect(breadcrumbs.props('items')).toStrictEqual([
-          { text: GROUP_NAME, href: `/${GROUP_PATH}` },
-          { text: DEFAULT_REPORT_TITLE, href: '' },
+        await wrapper.vm.$nextTick();
+
+        const { groupName, groupPath } = pageData;
+        const { title } = configData;
+
+        expect(findGlBreadcrumb().props('items')).toStrictEqual([
+          { text: groupName, href: `/${groupPath}` },
+          { text: title, href: '' },
         ]);
       });
     });

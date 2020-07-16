@@ -74,7 +74,7 @@ export default {
 <template>
   <div class="row-fluid clearfix py-3 primary-section">
     <div class="col-md-12">
-      <div class="d-flex geo-node-actions-container">
+      <div class="gl-display-flex gl-flex-wrap gl-flex-direction-column gl-sm-flex-direction-row">
         <div data-testid="nodeUrl" class="d-flex flex-column">
           <span class="gl-text-gray-700">{{ s__('GeoNodes|Node URL') }}</span>
           <gl-link

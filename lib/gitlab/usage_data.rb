@@ -109,6 +109,7 @@ module Gitlab
             clusters_applications_knative: count(::Clusters::Applications::Knative.available),
             clusters_applications_elastic_stack: count(::Clusters::Applications::ElasticStack.available),
             clusters_applications_jupyter: count(::Clusters::Applications::Jupyter.available),
+            clusters_applications_cilium: count(::Clusters::Applications::Cilium.available),
             clusters_management_project: count(::Clusters::Cluster.with_management_project),
             in_review_folder: count(::Environment.in_review_folder),
             grafana_integrated_projects: count(GrafanaIntegration.enabled),
@@ -123,7 +124,7 @@ module Gitlab
             issues_created_manually_from_alerts: issues_created_manually_from_alerts,
             incident_issues: alert_bot_incident_count,
             alert_bot_incident_issues: alert_bot_incident_count,
-            incident_labeled_issues: count(::Issue.with_label_attributes(IncidentManagement::CreateIncidentLabelService::LABEL_PROPERTIES)),
+            incident_labeled_issues: count(::Issue.with_label_attributes(::IncidentManagement::CreateIncidentLabelService::LABEL_PROPERTIES)),
             keys: count(Key),
             label_lists: count(List.label),
             lfs_objects: count(LfsObject),
@@ -368,18 +369,15 @@ module Gitlab
           projects_jira_active: 0
         }
 
-        Service.active
-          .by_type(:JiraService)
-          .includes(:jira_tracker_data)
-          .find_in_batches(batch_size: BATCH_SIZE) do |services|
+        JiraService.active.includes(:jira_tracker_data).find_in_batches(batch_size: BATCH_SIZE) do |services|
           counts = services.group_by do |service|
             # TODO: Simplify as part of https://gitlab.com/gitlab-org/gitlab/issues/29404
             service_url = service.data_fields&.url || (service.properties && service.properties['url'])
             service_url&.include?('.atlassian.net') ? :cloud : :server
           end
 
-          results[:projects_jira_server_active] += counts[:server].count if counts[:server]
-          results[:projects_jira_cloud_active] += counts[:cloud].count if counts[:cloud]
+          results[:projects_jira_server_active] += counts[:server].size if counts[:server]
+          results[:projects_jira_cloud_active] += counts[:cloud].size if counts[:cloud]
           results[:projects_jira_active] += services.size
         end
 
@@ -489,7 +487,10 @@ module Gitlab
           remote_mirrors: distinct_count(::Project.with_remote_mirrors.where(time_period), :creator_id),
           snippets: distinct_count(::Snippet.where(time_period), :author_id)
         }.tap do |h|
-          h[:merge_requests_users] = merge_requests_users(time_period) if time_period.present?
+          if time_period.present?
+            h[:merge_requests_users] = merge_requests_users(time_period)
+            h.merge!(action_monthly_active_users(time_period))
+          end
         end
       end
       # rubocop: enable CodeReuse/ActiveRecord
@@ -525,9 +526,16 @@ module Gitlab
       # Omitted because no user, creator or author associated: `boards`, `labels`, `milestones`, `uploads`
       # Omitted because too expensive: `epics_deepest_relationship_level`
       # Omitted because of encrypted properties: `projects_jira_cloud_active`, `projects_jira_server_active`
+      # rubocop: disable CodeReuse/ActiveRecord
       def usage_activity_by_stage_plan(time_period)
-        {}
+        {
+          issues: distinct_count(::Issue.where(time_period), :author_id),
+          notes: distinct_count(::Note.where(time_period), :author_id),
+          projects: distinct_count(::Project.where(time_period), :creator_id),
+          todos: distinct_count(::Todo.where(time_period), :author_id)
+        }
       end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       # Omitted because no user, creator or author associated: `environments`, `feature_flags`, `in_review_folder`, `pages_domains`
       # rubocop: disable CodeReuse/ActiveRecord
@@ -572,6 +580,42 @@ module Gitlab
         results['analytics_unique_visits_for_any_target'] = redis_usage_data { unique_visit_service.weekly_unique_visits_for_any_target }
 
         { analytics_unique_visits: results }
+      end
+
+      def action_monthly_active_users(time_period)
+        return {} unless Feature.enabled?(Gitlab::UsageDataCounters::TrackUniqueActions::FEATURE_FLAG)
+
+        counter = Gitlab::UsageDataCounters::TrackUniqueActions
+
+        project_count = redis_usage_data do
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::PUSH_ACTION,
+            date_from: time_period[:created_at].first,
+            date_to: time_period[:created_at].last
+          )
+        end
+
+        design_count = redis_usage_data do
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::DESIGN_ACTION,
+            date_from: time_period[:created_at].first,
+            date_to: time_period[:created_at].last
+          )
+        end
+
+        wiki_count = redis_usage_data do
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::WIKI_ACTION,
+            date_from: time_period[:created_at].first,
+            date_to: time_period[:created_at].last
+          )
+        end
+
+        {
+          action_monthly_active_users_project_repo: project_count,
+          action_monthly_active_users_design_management: design_count,
+          action_monthly_active_users_wiki_repo: wiki_count
+        }
       end
 
       private

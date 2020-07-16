@@ -9,6 +9,7 @@ import {
   DEFAULT_PERCENT_ROLLOUT,
   NEW_FLAG_ALERT,
 } from 'ee/feature_flags/constants';
+import { allUsersStrategy } from '../mock_data';
 
 describe('New feature flag form', () => {
   let wrapper;
@@ -74,11 +75,18 @@ describe('New feature flag form', () => {
 
     expect(wrapper.find(Form).props('scopes')).toContainEqual(defaultScope);
   });
+
   it('should alert users that feature flags are changing soon', () => {
     expect(wrapper.find(GlAlert).text()).toBe(NEW_FLAG_ALERT);
   });
 
   it('should pass in the project ID', () => {
     expect(wrapper.find(Form).props('projectId')).toBe('8');
+  });
+
+  it('has an all users strategy by default', () => {
+    const strategies = wrapper.find(Form).props('strategies');
+
+    expect(strategies).toEqual([allUsersStrategy]);
   });
 });

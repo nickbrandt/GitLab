@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlSprintf, GlLabel } from '@gitlab/ui';
+import { GlSprintf, GlLabel, GlIcon } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import { trimText } from 'helpers/text_helper';
 import initUserPopovers from '~/user_popovers';
@@ -75,9 +75,12 @@ describe('Issuable component', () => {
     window.Date = DateOrig;
   });
 
-  const findConfidentialIcon = () => wrapper.find('.fa-eye-slash');
+  const checkExists = findFn => () => findFn().exists();
+  const hasConfidentialIcon = () =>
+    wrapper.findAll(GlIcon).wrappers.some(iconWrapper => iconWrapper.props('name') === 'eye-slash');
   const findTaskStatus = () => wrapper.find('.task-status');
   const findOpenedAgoContainer = () => wrapper.find('[data-testid="openedByMessage"]');
+  const findAuthor = () => wrapper.find({ ref: 'openedAgoByContainer' });
   const findMilestone = () => wrapper.find('.js-milestone');
   const findMilestoneTooltip = () => findMilestone().attributes('title');
   const findDueDate = () => wrapper.find('.js-due-date');
@@ -92,6 +95,7 @@ describe('Issuable component', () => {
   const findScopedLabels = () => findLabels().filter(w => isScopedLabel({ title: w.text() }));
   const findUnscopedLabels = () => findLabels().filter(w => !isScopedLabel({ title: w.text() }));
   const findIssuableTitle = () => wrapper.find('[data-testid="issuable-title"]');
+  const findIssuableStatus = () => wrapper.find('[data-testid="issuable-status"]');
   const containsJiraLogo = () => wrapper.contains('[data-testid="jira-logo"]');
 
   describe('when mounted', () => {
@@ -169,19 +173,19 @@ describe('Issuable component', () => {
     });
 
     it.each`
-      desc                       | finder
-      ${'bulk editing checkbox'} | ${findBulkCheckbox}
-      ${'confidential icon'}     | ${findConfidentialIcon}
-      ${'task status'}           | ${findTaskStatus}
-      ${'milestone'}             | ${findMilestone}
-      ${'due date'}              | ${findDueDate}
-      ${'labels'}                | ${findLabels}
-      ${'weight'}                | ${findWeight}
-      ${'merge request count'}   | ${findMergeRequestsCount}
-      ${'upvotes'}               | ${findUpvotes}
-      ${'downvotes'}             | ${findDownvotes}
-    `('does not render $desc', ({ finder }) => {
-      expect(finder().exists()).toBe(false);
+      desc                       | check
+      ${'bulk editing checkbox'} | ${checkExists(findBulkCheckbox)}
+      ${'confidential icon'}     | ${hasConfidentialIcon}
+      ${'task status'}           | ${checkExists(findTaskStatus)}
+      ${'milestone'}             | ${checkExists(findMilestone)}
+      ${'due date'}              | ${checkExists(findDueDate)}
+      ${'labels'}                | ${checkExists(findLabels)}
+      ${'weight'}                | ${checkExists(findWeight)}
+      ${'merge request count'}   | ${checkExists(findMergeRequestsCount)}
+      ${'upvotes'}               | ${checkExists(findUpvotes)}
+      ${'downvotes'}             | ${checkExists(findDownvotes)}
+    `('does not render $desc', ({ check }) => {
+      expect(check()).toBe(false);
     });
 
     it('show relative reference path', () => {
@@ -215,7 +219,7 @@ describe('Issuable component', () => {
     });
 
     it('renders the confidential icon', () => {
-      expect(findConfidentialIcon().exists()).toBe(true);
+      expect(hasConfidentialIcon()).toBe(true);
     });
   });
 
@@ -232,6 +236,24 @@ describe('Issuable component', () => {
 
     it('opens issuable in a new tab', () => {
       expect(findIssuableTitle().props('target')).toBe('_blank');
+    });
+
+    it('opens author in a new tab', () => {
+      expect(findAuthor().props('target')).toBe('_blank');
+    });
+
+    describe('with Jira status', () => {
+      const expectedStatus = 'In Progress';
+
+      beforeEach(() => {
+        issuable.status = expectedStatus;
+
+        factory({ issuable });
+      });
+
+      it('renders the Jira status', () => {
+        expect(findIssuableStatus().text()).toBe(expectedStatus);
+      });
     });
   });
 
@@ -325,6 +347,33 @@ describe('Issuable component', () => {
 
       const expected = testLabels.map(label => ({
         href: mergeUrlParams({ 'label_name[]': label.name }, TEST_BASE_URL),
+        text: label.name,
+        tooltip: label.description,
+      }));
+
+      expect(labels).toEqual(expected);
+    });
+  });
+
+  describe('with labels for Jira issuable', () => {
+    beforeEach(() => {
+      issuable.labels = [...testLabels];
+      issuable.external_tracker = 'jira';
+
+      factory({ issuable });
+    });
+
+    it('renders labels', () => {
+      factory({ issuable });
+
+      const labels = findLabels().wrappers.map(label => ({
+        href: label.props('target'),
+        text: label.text(),
+        tooltip: label.attributes('description'),
+      }));
+
+      const expected = testLabels.map(label => ({
+        href: mergeUrlParams({ 'labels[]': label.name }, TEST_BASE_URL),
         text: label.name,
         tooltip: label.description,
       }));

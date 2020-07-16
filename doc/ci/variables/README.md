@@ -227,18 +227,18 @@ To protect a variable:
 1. Select the **Protect variable** check box.
 1. Click **Update variable**.
 
-The variable is available for all subsequent pipelines.
+The variable is available for all subsequent pipelines. Protected variables can only
+be updated or viewed by project members with [maintainer permissions](../../user/permissions.md#project-members-permissions).
 
 ### Custom variables validated by GitLab
 
 Some variables are listed in the UI so you can choose them more quickly.
-GitLab validates the values of these variables to ensure they are in the correct format.
 
 | Variable                | Allowed Values                                     | Introduced in |
 |-------------------------|----------------------------------------------------|---------------|
-| `AWS_ACCESS_KEY_ID`     | 20 characters: letters, digits                     | 12.10         |
+| `AWS_ACCESS_KEY_ID`     | Any                                                | 12.10         |
 | `AWS_DEFAULT_REGION`    | Any                                                | 12.10         |
-| `AWS_SECRET_ACCESS_KEY` | 40 characters: letters, digits, special characters | 12.10         |
+| `AWS_SECRET_ACCESS_KEY` | Any                                                | 12.10         |
 
 NOTE: **Note:**
 When you store credentials, there are security implications. If you are using AWS keys,

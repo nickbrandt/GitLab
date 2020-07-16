@@ -10,8 +10,8 @@ import {
 } from '@gitlab/ui';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import { __ } from '~/locale';
-import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import IterationForm from './iteration_form.vue';
+import IterationReportTabs from './iteration_report_tabs.vue';
 import query from '../queries/group_iteration.query.graphql';
 
 const iterationStates = {
@@ -30,6 +30,7 @@ export default {
     GlNewDropdown,
     GlNewDropdownItem,
     IterationForm,
+    IterationReportTabs,
   },
   apollo: {
     group: {
@@ -37,7 +38,7 @@ export default {
       variables() {
         return {
           groupPath: this.groupPath,
-          id: getIdFromGraphQLId(this.iterationId),
+          iid: this.iterationIid,
         };
       },
       update(data) {
@@ -57,7 +58,7 @@ export default {
       type: String,
       required: true,
     },
-    iterationId: {
+    iterationIid: {
       type: String,
       required: true,
     },
@@ -101,7 +102,7 @@ export default {
   },
   methods: {
     formatDate(date) {
-      return formatDate(date, 'mmm d, yyyy');
+      return formatDate(date, 'mmm d, yyyy', true);
     },
   },
 };
@@ -129,7 +130,7 @@ export default {
     <template v-else>
       <div
         ref="topbar"
-        class="gl-display-flex gl-justify-items-center gl-align-items-center gl-py-3 gl-border-1 gl-border-b-solid gl-border-gray-200"
+        class="gl-display-flex gl-justify-items-center gl-align-items-center gl-py-3 gl-border-1 gl-border-b-solid gl-border-gray-100"
       >
         <gl-badge :variant="status.variant">
           {{ status.text }}
@@ -155,6 +156,7 @@ export default {
       </div>
       <h3 ref="title" class="page-title">{{ iteration.title }}</h3>
       <div ref="description" v-html="iteration.description"></div>
+      <iteration-report-tabs :group-path="groupPath" :iteration-id="iteration.id" />
     </template>
   </div>
 </template>

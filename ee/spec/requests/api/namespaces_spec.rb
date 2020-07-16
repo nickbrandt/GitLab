@@ -410,15 +410,6 @@ RSpec.describe API::Namespaces do
           expect(gitlab_subscription.reload.trial_ends_on).to eq(date)
         end
       end
-
-      context 'when the attr has an old date' do
-        it 'returns 400' do
-          do_put(namespace.id, admin, params.merge(trial_ends_on: 2.days.ago.to_date))
-
-          expect(response).to have_gitlab_http_status(:bad_request)
-          expect(gitlab_subscription.reload.trial_ends_on).to be_nil
-        end
-      end
     end
   end
 end

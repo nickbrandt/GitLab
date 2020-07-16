@@ -58,6 +58,7 @@ Rails.application.routes.draw do
 
   # Search
   get 'search' => 'search#show'
+  get 'search/autocomplete' => 'search#autocomplete', as: :search_autocomplete
   get 'search/count' => 'search#count', as: :search_count
 
   # JSON Web Token
@@ -75,6 +76,7 @@ Rails.application.routes.draw do
     get '/autocomplete/projects' => 'autocomplete#projects'
     get '/autocomplete/award_emojis' => 'autocomplete#award_emojis'
     get '/autocomplete/merge_request_target_branches' => 'autocomplete#merge_request_target_branches'
+    get '/autocomplete/deploy_keys_with_owners' => 'autocomplete#deploy_keys_with_owners'
 
     Gitlab.ee do
       get '/autocomplete/project_groups' => 'autocomplete#project_groups'
@@ -189,7 +191,6 @@ Rails.application.routes.draw do
       member do
         Gitlab.ee do
           get :metrics, format: :json
-          get :metrics_dashboard
           get :environments, format: :json
         end
 
@@ -199,6 +200,7 @@ Rails.application.routes.draw do
           delete '/:application', to: 'clusters/applications#destroy', as: :uninstall_applications
         end
 
+        get :metrics_dashboard
         get :'/prometheus/api/v1/*proxy_path', to: 'clusters#prometheus_proxy', as: :prometheus_api
         get :cluster_status, format: :json
         delete :clear_cache

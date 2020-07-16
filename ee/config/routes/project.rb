@@ -67,7 +67,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
           resource :configuration, only: [:show], controller: :configuration do
             post :auto_fix, on: :collection
-            resource :sast, only: [:show], controller: :sast_configuration
+            resource :sast, only: [:show, :create], controller: :sast_configuration
           end
 
           resource :discover, only: [:show], controller: :discover
@@ -77,6 +77,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
               get :summary
             end
           end
+
+          resources :scanned_resources, only: [:index]
 
           resources :vulnerabilities, only: [:show] do
             member do
@@ -100,7 +102,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
         resources :dependencies, only: [:index]
         resources :licenses, only: [:index, :create, :update]
-        resources :on_demand_scans, only: [:index], controller: :on_demand_scans
+
+        scope :on_demand_scans do
+          root 'on_demand_scans#index', as: 'on_demand_scans'
+          scope :profiles do
+            root 'dast_profiles#index', as: 'profiles'
+            resources :dast_site_profiles, only: [:new]
+          end
+        end
 
         namespace :integrations do
           namespace :jira do
@@ -121,9 +130,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       resource :tracing, only: [:show]
-
-      get '/service_desk' => 'service_desk#show', as: :service_desk
-      put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
 
       post '/restore' => '/projects#restore', as: :restore
 

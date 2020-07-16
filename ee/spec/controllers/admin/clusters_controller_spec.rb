@@ -27,10 +27,6 @@ RSpec.describe Admin::ClustersController do
     before do
       allow(::Clusters::Instance).to receive(:new).and_return(cluster.instance)
     end
-
-    describe 'GET #metrics_dashboard' do
-      it_behaves_like 'the default dashboard'
-    end
   end
 
   describe 'GET environments' do

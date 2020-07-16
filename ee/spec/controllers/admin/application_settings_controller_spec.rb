@@ -125,6 +125,22 @@ RSpec.describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'updating maintenance mode setting' do
+      before do
+        stub_feature_flags(maintenance_mode: true)
+      end
+
+      let(:settings) do
+        {
+          maintenance_mode: true,
+          maintenance_mode_message: 'GitLab is in maintenance'
+        }
+      end
+      let(:feature) { :geo }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     context 'project deletion adjourned period' do
       let(:settings) { { deletion_adjourned_period: 6 } }
       let(:feature) { :adjourned_deletion_for_projects_and_groups }
@@ -155,6 +171,7 @@ RSpec.describe Admin::ApplicationSettingsController do
           prevent_merge_requests_committers_approval: true
         }
       end
+
       let(:feature) { :admin_merge_request_approvers_rules }
 
       it_behaves_like 'settings for licensed features'
@@ -164,27 +181,7 @@ RSpec.describe Admin::ApplicationSettingsController do
       let(:settings) { { compliance_frameworks: [1, 2, 3, 4, 5] } }
       let(:feature) { :admin_merge_request_approvers_rules }
 
-      context 'when feature flag is enabled' do
-        before do
-          stub_feature_flags(admin_compliance_merge_request_approval_settings: true)
-        end
-
-        it_behaves_like 'settings for licensed features'
-      end
-
-      context 'when feature flag is disabled' do
-        before do
-          stub_licensed_features(feature => true)
-          stub_feature_flags(admin_compliance_merge_request_approval_settings: false)
-        end
-
-        it 'does not update settings' do
-          attribute_names = settings.keys.map(&:to_s)
-
-          expect { put :update, params: { application_setting: settings } }
-            .not_to change { ApplicationSetting.current.reload.attributes.slice(*attribute_names) }
-        end
-      end
+      it_behaves_like 'settings for licensed features'
     end
 
     context 'required instance ci template' do

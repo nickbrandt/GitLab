@@ -5,6 +5,7 @@ export default () => ({
   },
 
   sourceBranch: null,
+  canReadVulnerabilityFeedback: false,
   vulnerabilityFeedbackPath: null,
   vulnerabilityFeedbackHelpPath: null,
   createVulnerabilityFeedbackIssuePath: null,

@@ -132,7 +132,7 @@ describe('GeoReplicable Store Actions', () => {
       describe('with no direction set', () => {
         const direction = null;
         const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
-        const data = registries.edges.map(e => e.node);
+        const data = registries.nodes;
 
         it('should call gqClient with no before/after variables as well as a first variable but no last variable', () => {
           testAction(
@@ -159,7 +159,7 @@ describe('GeoReplicable Store Actions', () => {
       describe('with direction set to "next"', () => {
         const direction = NEXT;
         const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
-        const data = registries.edges.map(e => e.node);
+        const data = registries.nodes;
 
         it('should call gqClient with after variable but no before variable as well as a first variable but no last variable', () => {
           testAction(
@@ -191,7 +191,7 @@ describe('GeoReplicable Store Actions', () => {
       describe('with direction set to "prev"', () => {
         const direction = PREV;
         const registries = MOCK_BASIC_GRAPHQL_QUERY_RESPONSE.geoNode?.packageFileRegistries;
-        const data = registries.edges.map(e => e.node);
+        const data = registries.nodes;
 
         it('should call gqClient with before variable but no after variable as well as a last variable but no first variable', () => {
           testAction(

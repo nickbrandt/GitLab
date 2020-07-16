@@ -16,9 +16,10 @@ describe('LabelToken', () => {
     isLoading: false,
     fetchData: jest.fn(),
   };
+
   const stubs = {
     GlFilteredSearchToken: {
-      template: `<div><slot name="suggestions"></slot></div>`,
+      template: `<div><slot name="view-token"></slot><slot name="suggestions"></slot></div>`,
     },
   };
 
@@ -38,11 +39,28 @@ describe('LabelToken', () => {
   const findFilteredSearchToken = () => wrapper.find(GlFilteredSearchToken);
   const findAllLabelSuggestions = () => wrapper.findAll({ ref: 'labelItem' });
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
+  const findSelectedLabelToken = () => wrapper.find('[data-testid="selected-label"]');
 
   it('renders a loading icon', () => {
     createComponent({ config: { ...defaultConfig, isLoading: true }, value: {} }, { stubs });
 
     expect(findLoadingIcon().exists()).toBe(true);
+  });
+
+  it('renders the selected label', () => {
+    const selectedLabel = mockLabels[0];
+    createComponent({ value: { data: selectedLabel.title } });
+
+    expect(findSelectedLabelToken().text()).toContain(selectedLabel.title);
+  });
+
+  it("sets the label's background and text color on the gl-token component", () => {
+    const selectedLabel = mockLabels[0];
+    createComponent({ value: { data: selectedLabel.title } });
+
+    expect(findSelectedLabelToken().attributes('style')).toEqual(
+      'background-color: rgb(98, 53, 242); color: rgb(255, 255, 255);',
+    );
   });
 
   describe('suggestions', () => {

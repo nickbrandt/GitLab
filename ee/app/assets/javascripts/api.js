@@ -10,9 +10,6 @@ export default {
   childEpicPath: '/api/:version/groups/:id/epics/:epic_iid/epics',
   groupEpicsPath: '/api/:version/groups/:id/epics',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
-  groupPackagesPath: '/api/:version/groups/:id/packages',
-  projectPackagesPath: '/api/:version/projects/:id/packages',
-  projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
   cycleAnalyticsTasksByTypePath: '/groups/:id/-/analytics/type_of_work/tasks_by_type',
   cycleAnalyticsTopLabelsPath: '/groups/:id/-/analytics/type_of_work/tasks_by_type/top_labels',
   cycleAnalyticsSummaryDataPath: '/groups/:id/-/analytics/value_stream_analytics/summary',
@@ -110,32 +107,6 @@ export default {
       .replace(':epic_iid', epicIid)
       .replace(':issue_id', epicIssueId);
 
-    return axios.delete(url);
-  },
-
-  groupPackages(id, options = {}) {
-    const url = Api.buildUrl(this.groupPackagesPath).replace(':id', id);
-    return axios.get(url, options);
-  },
-
-  projectPackages(id, options = {}) {
-    const url = Api.buildUrl(this.projectPackagesPath).replace(':id', id);
-    return axios.get(url, options);
-  },
-
-  buildProjectPackageUrl(projectId, packageId) {
-    return Api.buildUrl(this.projectPackagePath)
-      .replace(':id', projectId)
-      .replace(':package_id', packageId);
-  },
-
-  projectPackage(projectId, packageId) {
-    const url = this.buildProjectPackageUrl(projectId, packageId);
-    return axios.get(url);
-  },
-
-  deleteProjectPackage(projectId, packageId) {
-    const url = this.buildProjectPackageUrl(projectId, packageId);
     return axios.delete(url);
   },
 
@@ -354,5 +325,10 @@ export default {
   getApplicationSettings() {
     const url = Api.buildUrl(this.applicationSettingsPath);
     return axios.get(url);
+  },
+
+  updateApplicationSettings(data) {
+    const url = Api.buildUrl(this.applicationSettingsPath);
+    return axios.put(url, data);
   },
 };

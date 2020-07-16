@@ -1,4 +1,5 @@
 <script>
+import { get } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlCard, GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 import Tracking from '~/tracking';
@@ -31,7 +32,8 @@ export default {
       tracking: {
         label: 'docker_container_retention_and_expiration_policies',
       },
-      formIsValid: true,
+      fieldsAreValid: true,
+      apiErrors: null,
     };
   },
   computed: {
@@ -39,7 +41,7 @@ export default {
     ...mapGetters({ isEdited: 'getIsEdited' }),
     ...mapComputed([{ key: 'settings', getter: 'getSettings' }], 'updateSettings'),
     isSubmitButtonDisabled() {
-      return !this.formIsValid || this.isLoading;
+      return !this.fieldsAreValid || this.isLoading;
     },
     isCancelButtonDisabled() {
       return !this.isEdited || this.isLoading;
@@ -49,13 +51,35 @@ export default {
     ...mapActions(['resetSettings', 'saveSettings']),
     reset() {
       this.track('reset_form');
+      this.apiErrors = null;
       this.resetSettings();
+    },
+    setApiErrors(response) {
+      const messages = get(response, 'data.message', []);
+
+      this.apiErrors = Object.keys(messages).reduce((acc, curr) => {
+        if (curr.startsWith('container_expiration_policy.')) {
+          const key = curr.replace('container_expiration_policy.', '');
+          acc[key] = get(messages, [curr, 0], '');
+        }
+        return acc;
+      }, {});
     },
     submit() {
       this.track('submit_form');
+      this.apiErrors = null;
       this.saveSettings()
         .then(() => this.$toast.show(UPDATE_SETTINGS_SUCCESS_MESSAGE, { type: 'success' }))
-        .catch(() => this.$toast.show(UPDATE_SETTINGS_ERROR_MESSAGE, { type: 'error' }));
+        .catch(({ response }) => {
+          this.setApiErrors(response);
+          this.$toast.show(UPDATE_SETTINGS_ERROR_MESSAGE, { type: 'error' });
+        });
+    },
+    onModelChange(changePayload) {
+      this.settings = changePayload.newValue;
+      if (this.apiErrors) {
+        this.apiErrors[changePayload.modified] = undefined;
+      }
     },
   },
 };
@@ -69,19 +93,21 @@ export default {
       </template>
       <template #default>
         <expiration-policy-fields
-          v-model="settings"
+          :value="settings"
           :form-options="formOptions"
           :is-loading="isLoading"
-          @validated="formIsValid = true"
-          @invalidated="formIsValid = false"
+          :api-errors="apiErrors"
+          @validated="fieldsAreValid = true"
+          @invalidated="fieldsAreValid = false"
+          @input="onModelChange"
         />
       </template>
       <template #footer>
-        <div class="d-flex justify-content-end">
+        <div class="gl-display-flex gl-justify-content-end">
           <gl-deprecated-button
             ref="cancel-button"
             type="reset"
-            class="mr-2 d-block"
+            class="gl-mr-3 gl-display-block"
             :disabled="isCancelButtonDisabled"
           >
             {{ __('Cancel') }}
@@ -91,10 +117,10 @@ export default {
             type="submit"
             :disabled="isSubmitButtonDisabled"
             variant="success"
-            class="d-flex justify-content-center align-items-center js-no-auto-disable"
+            class="gl-display-flex gl-justify-content-center gl-align-items-center js-no-auto-disable"
           >
             {{ $options.i18n.SET_CLEANUP_POLICY_BUTTON }}
-            <gl-loading-icon v-if="isLoading" class="ml-2" />
+            <gl-loading-icon v-if="isLoading" class="gl-ml-3" />
           </gl-deprecated-button>
         </div>
       </template>

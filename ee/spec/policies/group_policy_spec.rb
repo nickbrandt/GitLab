@@ -8,7 +8,7 @@ RSpec.describe GroupPolicy do
   context 'when epics feature is disabled' do
     let(:current_user) { owner }
 
-    it { is_expected.to be_disallowed(:read_epic, :create_epic, :admin_epic, :destroy_epic, :read_confidential_epic) }
+    it { is_expected.to be_disallowed(:read_epic, :create_epic, :admin_epic, :destroy_epic, :read_confidential_epic, :destroy_epic_link) }
   end
 
   context 'when epics feature is enabled' do
@@ -19,27 +19,27 @@ RSpec.describe GroupPolicy do
     context 'when user is owner' do
       let(:current_user) { owner }
 
-      it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :destroy_epic, :read_confidential_epic) }
+      it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :destroy_epic, :read_confidential_epic, :destroy_epic_link) }
     end
 
     context 'when user is maintainer' do
       let(:current_user) { maintainer }
 
-      it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :read_confidential_epic) }
+      it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :read_confidential_epic, :destroy_epic_link) }
       it { is_expected.to be_disallowed(:destroy_epic) }
     end
 
     context 'when user is developer' do
       let(:current_user) { developer }
 
-      it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :read_confidential_epic) }
+      it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :read_confidential_epic, :destroy_epic_link) }
       it { is_expected.to be_disallowed(:destroy_epic) }
     end
 
     context 'when user is reporter' do
       let(:current_user) { reporter }
 
-      it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :read_confidential_epic) }
+      it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :read_confidential_epic, :destroy_epic_link) }
       it { is_expected.to be_disallowed(:destroy_epic) }
     end
 
@@ -47,19 +47,19 @@ RSpec.describe GroupPolicy do
       let(:current_user) { guest }
 
       it { is_expected.to be_allowed(:read_epic) }
-      it { is_expected.to be_disallowed(:create_epic, :admin_epic, :destroy_epic, :read_confidential_epic) }
+      it { is_expected.to be_disallowed(:create_epic, :admin_epic, :destroy_epic, :read_confidential_epic, :destroy_epic_link) }
     end
 
     context 'when user is not member' do
       let(:current_user) { create(:user) }
 
-      it { is_expected.to be_disallowed(:read_epic, :create_epic, :admin_epic, :destroy_epic, :read_confidential_epic) }
+      it { is_expected.to be_disallowed(:read_epic, :create_epic, :admin_epic, :destroy_epic, :read_confidential_epic, :destroy_epic_link) }
     end
 
     context 'when user is anonymous' do
       let(:current_user) { nil }
 
-      it { is_expected.to be_disallowed(:read_epic, :create_epic, :admin_epic, :destroy_epic, :read_confidential_epic) }
+      it { is_expected.to be_disallowed(:read_epic, :create_epic, :admin_epic, :destroy_epic, :read_confidential_epic, :destroy_epic_link) }
     end
   end
 

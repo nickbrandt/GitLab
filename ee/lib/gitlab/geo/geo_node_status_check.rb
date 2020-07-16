@@ -57,7 +57,7 @@ module Gitlab
       end
 
       def replication_verification_complete?
-        return replication_complete? && verification_complete?
+        replication_complete? && verification_complete?
       end
 
       private

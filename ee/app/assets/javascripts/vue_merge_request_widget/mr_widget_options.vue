@@ -12,9 +12,9 @@ import { n__, s__, __, sprintf } from '~/locale';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
 import MrWidgetApprovals from './components/approvals/approvals.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
+import MrWidgetPolicyViolation from './components/states/mr_widget_policy_violation.vue';
 import MergeTrainHelperText from './components/merge_train_helper_text.vue';
 import { MTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
-import { TOTAL_SCORE_METRIC_NAME } from 'ee/vue_merge_request_widget/stores/constants';
 
 export default {
   components: {
@@ -22,6 +22,7 @@ export default {
     MrWidgetLicenses,
     MrWidgetApprovals,
     MrWidgetGeoSecondaryNode,
+    MrWidgetPolicyViolation,
     BlockingMergeRequestsReport,
     GroupedSecurityReportsApp,
     GroupedMetricsReportsApp,
@@ -33,9 +34,11 @@ export default {
   data() {
     return {
       isLoadingCodequality: false,
-      isLoadingPerformance: false,
+      isLoadingBrowserPerformance: false,
+      isLoadingLoadPerformance: false,
       loadingCodequalityFailed: false,
-      loadingPerformanceFailed: false,
+      loadingBrowserPerformanceFailed: false,
+      loadingLoadPerformanceFailed: false,
       loadingLicenseReportFailed: false,
     };
   },
@@ -59,36 +62,48 @@ export default {
             this.mr.codeclimateMetrics.resolvedIssues.length > 0))
       );
     },
-    hasPerformanceMetrics() {
+    hasBrowserPerformanceMetrics() {
       return (
-        this.mr.performanceMetrics &&
-        ((this.mr.performanceMetrics.degraded && this.mr.performanceMetrics.degraded.length > 0) ||
-          (this.mr.performanceMetrics.improved && this.mr.performanceMetrics.improved.length > 0))
+        this.mr.browserPerformanceMetrics?.degraded?.length > 0 ||
+        this.mr.browserPerformanceMetrics?.improved?.length > 0 ||
+        this.mr.browserPerformanceMetrics?.same?.length > 0
       );
     },
-    hasPerformancePaths() {
-      const { performance } = this.mr || {};
+    hasBrowserPerformancePaths() {
+      const browserPerformance = this.mr?.browserPerformance || {};
 
-      return Boolean(performance?.head_path && performance?.base_path);
+      return Boolean(browserPerformance?.head_path && browserPerformance?.base_path);
     },
-    degradedTotalScore() {
-      return this.mr?.performanceMetrics?.degraded.find(
-        metric => metric.name === TOTAL_SCORE_METRIC_NAME,
+    degradedBrowserPerformanceTotalScore() {
+      return this.mr?.browserPerformanceMetrics?.degraded.find(
+        metric => metric.name === __('Total Score'),
       );
     },
-    hasPerformanceDegradation() {
-      const threshold = this.mr?.performance?.degradation_threshold || 0;
+    hasBrowserPerformanceDegradation() {
+      const threshold = this.mr?.browserPerformance?.degradation_threshold || 0;
 
       if (!threshold) {
         return true;
       }
 
-      const totalScoreDelta = this.degradedTotalScore?.delta || 0;
+      const totalScoreDelta = this.degradedBrowserPerformanceTotalScore?.delta || 0;
 
       return threshold + totalScoreDelta <= 0;
     },
-    shouldRenderPerformance() {
-      return this.hasPerformancePaths && this.hasPerformanceDegradation;
+    shouldRenderBrowserPerformance() {
+      return this.hasBrowserPerformancePaths && this.hasBrowserPerformanceDegradation;
+    },
+    hasLoadPerformanceMetrics() {
+      return (
+        this.mr.loadPerformanceMetrics?.degraded?.length > 0 ||
+        this.mr.loadPerformanceMetrics?.improved?.length > 0 ||
+        this.mr.loadPerformanceMetrics?.same?.length > 0
+      );
+    },
+    hasLoadPerformancePaths() {
+      const loadPerformance = this.mr?.loadPerformance || {};
+
+      return Boolean(loadPerformance.head_path && loadPerformance.base_path);
     },
     shouldRenderSecurityReport() {
       const { enabledReports } = this.mr;
@@ -139,37 +154,72 @@ export default {
       return {};
     },
 
-    performanceText() {
-      const { improved, degraded } = this.mr.performanceMetrics;
+    browserPerformanceText() {
+      const { improved, degraded, same } = this.mr.browserPerformanceMetrics;
       const text = [];
+      const reportNumbers = [];
 
-      if (!improved.length && !degraded.length) {
-        text.push(s__('ciReport|No changes to performance metrics'));
-      } else if (improved.length || degraded.length) {
-        text.push(s__('ciReport|Performance metrics'));
+      if (improved.length || degraded.length || same.length) {
+        text.push(s__('ciReport|Browser performance test metrics: '));
 
-        if (improved.length) {
-          text.push(n__(' improved on %d point', ' improved on %d points', improved.length));
-        }
-
-        if (improved.length > 0 && degraded.length > 0) {
-          text.push(__(' and'));
-        }
-
-        if (degraded.length) {
-          text.push(n__(' degraded on %d point', ' degraded on %d points', degraded.length));
-        }
+        if (degraded.length > 0)
+          reportNumbers.push(
+            sprintf(s__('ciReport|%{degradedNum} degraded'), { degradedNum: degraded.length }),
+          );
+        if (same.length > 0)
+          reportNumbers.push(sprintf(s__('ciReport|%{sameNum} same'), { sameNum: same.length }));
+        if (improved.length > 0)
+          reportNumbers.push(
+            sprintf(s__('ciReport|%{improvedNum} improved'), { improvedNum: improved.length }),
+          );
+      } else {
+        text.push(s__('ciReport|Browser performance test metrics: No changes'));
       }
 
-      return text.join('');
+      return [...text, ...reportNumbers.join(', ')].join('');
+    },
+
+    loadPerformanceText() {
+      const { improved, degraded, same } = this.mr.loadPerformanceMetrics;
+      const text = [];
+      const reportNumbers = [];
+
+      if (improved.length || degraded.length || same.length) {
+        text.push(s__('ciReport|Load performance test metrics: '));
+
+        if (degraded.length > 0)
+          reportNumbers.push(
+            sprintf(s__('ciReport|%{degradedNum} degraded'), { degradedNum: degraded.length }),
+          );
+        if (same.length > 0)
+          reportNumbers.push(sprintf(s__('ciReport|%{sameNum} same'), { sameNum: same.length }));
+        if (improved.length > 0)
+          reportNumbers.push(
+            sprintf(s__('ciReport|%{improvedNum} improved'), { improvedNum: improved.length }),
+          );
+      } else {
+        text.push(s__('ciReport|Load performance test metrics: No changes'));
+      }
+
+      return [...text, ...reportNumbers.join(', ')].join('');
     },
 
     codequalityStatus() {
       return this.checkReportStatus(this.isLoadingCodequality, this.loadingCodequalityFailed);
     },
 
-    performanceStatus() {
-      return this.checkReportStatus(this.isLoadingPerformance, this.loadingPerformanceFailed);
+    browserPerformanceStatus() {
+      return this.checkReportStatus(
+        this.isLoadingBrowserPerformance,
+        this.loadingBrowserPerformanceFailed,
+      );
+    },
+
+    loadPerformanceStatus() {
+      return this.checkReportStatus(
+        this.isLoadingLoadPerformance,
+        this.loadingLoadPerformanceFailed,
+      );
     },
 
     shouldRenderMergeTrainHelperText() {
@@ -191,9 +241,14 @@ export default {
         this.fetchCodeQuality();
       }
     },
-    hasPerformancePaths(newVal) {
+    hasBrowserPerformancePaths(newVal) {
       if (newVal) {
-        this.fetchPerformance();
+        this.fetchBrowserPerformance();
+      }
+    },
+    hasLoadPerformancePaths(newVal) {
+      if (newVal) {
+        this.fetchLoadPerformance();
       }
     },
   },
@@ -241,19 +296,37 @@ export default {
         });
     },
 
-    fetchPerformance() {
-      const { head_path, base_path } = this.mr.performance;
+    fetchBrowserPerformance() {
+      const { head_path, base_path } = this.mr.browserPerformance;
 
-      this.isLoadingPerformance = true;
+      this.isLoadingBrowserPerformance = true;
 
       Promise.all([this.service.fetchReport(head_path), this.service.fetchReport(base_path)])
         .then(values => {
-          this.mr.comparePerformanceMetrics(values[0], values[1]);
-          this.isLoadingPerformance = false;
+          this.mr.compareBrowserPerformanceMetrics(values[0], values[1]);
         })
         .catch(() => {
-          this.isLoadingPerformance = false;
-          this.loadingPerformanceFailed = true;
+          this.loadingBrowserPerformanceFailed = true;
+        })
+        .finally(() => {
+          this.isLoadingBrowserPerformance = false;
+        });
+    },
+
+    fetchLoadPerformance() {
+      const { head_path, base_path } = this.mr.loadPerformance;
+
+      this.isLoadingLoadPerformance = true;
+
+      Promise.all([this.service.fetchReport(head_path), this.service.fetchReport(base_path)])
+        .then(values => {
+          this.mr.compareLoadPerformanceMetrics(values[0], values[1]);
+        })
+        .catch(() => {
+          this.loadingLoadPerformanceFailed = true;
+        })
+        .finally(() => {
+          this.isLoadingLoadPerformance = false;
         });
     },
 
@@ -308,16 +381,30 @@ export default {
         class="js-codequality-widget mr-widget-border-top mr-report"
       />
       <report-section
-        v-if="shouldRenderPerformance"
-        :status="performanceStatus"
-        :loading-text="translateText('performance').loading"
-        :error-text="translateText('performance').error"
-        :success-text="performanceText"
-        :unresolved-issues="mr.performanceMetrics.degraded"
-        :resolved-issues="mr.performanceMetrics.improved"
-        :has-issues="hasPerformanceMetrics"
+        v-if="shouldRenderBrowserPerformance"
+        :status="browserPerformanceStatus"
+        :loading-text="translateText('browser-performance').loading"
+        :error-text="translateText('browser-performance').error"
+        :success-text="browserPerformanceText"
+        :unresolved-issues="mr.browserPerformanceMetrics.degraded"
+        :resolved-issues="mr.browserPerformanceMetrics.improved"
+        :neutral-issues="mr.browserPerformanceMetrics.same"
+        :has-issues="hasBrowserPerformanceMetrics"
         :component="$options.componentNames.PerformanceIssueBody"
-        class="js-performance-widget mr-widget-border-top mr-report"
+        class="js-browser-performance-widget mr-widget-border-top mr-report"
+      />
+      <report-section
+        v-if="hasLoadPerformancePaths"
+        :status="loadPerformanceStatus"
+        :loading-text="translateText('load-performance').loading"
+        :error-text="translateText('load-performance').error"
+        :success-text="loadPerformanceText"
+        :unresolved-issues="mr.loadPerformanceMetrics.degraded"
+        :resolved-issues="mr.loadPerformanceMetrics.improved"
+        :neutral-issues="mr.loadPerformanceMetrics.same"
+        :has-issues="hasLoadPerformanceMetrics"
+        :component="$options.componentNames.PerformanceIssueBody"
+        class="js-load-performance-widget mr-widget-border-top mr-report"
       />
       <grouped-metrics-reports-app
         v-if="mr.metricsReportsPath"
@@ -336,6 +423,7 @@ export default {
         :container-scanning-help-path="mr.containerScanningHelp"
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
         :secret-scanning-help-path="mr.secretScanningHelp"
+        :can-read-vulnerability-feedback="mr.canReadVulnerabilityFeedback"
         :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
         :create-vulnerability-feedback-issue-path="mr.createVulnerabilityFeedbackIssuePath"
@@ -345,6 +433,8 @@ export default {
         :create-vulnerability-feedback-dismissal-path="mr.createVulnerabilityFeedbackDismissalPath"
         :pipeline-path="mr.pipeline.path"
         :pipeline-id="mr.securityReportsPipelineId"
+        :pipeline-iid="mr.securityReportsPipelineIid"
+        :project-full-path="mr.sourceProjectFullPath"
         :diverged-commits-count="mr.divergedCommitsCount"
         :mr-state="mr.state"
         :target-branch-tree-path="mr.targetBranchTreePath"
@@ -354,6 +444,7 @@ export default {
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"
         :api-url="mr.licenseScanning.managed_licenses_path"
+        :approvals-api-path="mr.apiApprovalsPath"
         :licenses-api-path="licensesApiPath"
         :pipeline-path="mr.pipeline.path"
         :can-manage-licenses="mr.licenseScanning.can_manage_licenses"
@@ -367,7 +458,7 @@ export default {
         v-if="mr.testResultsPath"
         class="js-reports-container"
         :endpoint="mr.testResultsPath"
-        :pipeline-path="mr.mergeRequestAddCiConfigPath"
+        :pipeline-path="mr.pipeline.path"
       />
 
       <terraform-plan v-if="mr.terraformReportsPath" :endpoint="mr.terraformReportsPath" />

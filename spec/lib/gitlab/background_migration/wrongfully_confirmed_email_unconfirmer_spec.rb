@@ -10,7 +10,7 @@ RSpec.describe Gitlab::BackgroundMigration::WrongfullyConfirmedEmailUnconfirmer,
   let(:one_year_ago) { 1.year.ago }
 
   let!(:user_needs_migration_1) { users.create!(name: 'user1', email: 'test1@test.com', state: 'active', projects_limit: 1, confirmed_at: confirmed_at_2_days_ago, confirmation_sent_at: one_year_ago) }
-  let!(:user_needs_migration_2) { users.create!(name: 'user2', email: 'test2@test.com', state: 'active', projects_limit: 1, confirmed_at: confirmed_at_3_days_ago, confirmation_sent_at: one_year_ago) }
+  let!(:user_needs_migration_2) { users.create!(name: 'user2', email: 'test2@test.com', unconfirmed_email: 'unconfirmed@test.com', state: 'active', projects_limit: 1, confirmed_at: confirmed_at_3_days_ago, confirmation_sent_at: one_year_ago) }
   let!(:user_does_not_need_migration) { users.create!(name: 'user3', email: 'test3@test.com', state: 'active', projects_limit: 1) }
   let!(:inactive_user) { users.create!(name: 'user4', email: 'test4@test.com', state: 'blocked', projects_limit: 1, confirmed_at: confirmed_at_3_days_ago, confirmation_sent_at: one_year_ago) }
   let!(:alert_bot_user) { users.create!(name: 'user5', email: 'test5@test.com', state: 'active', user_type: 2, projects_limit: 1, confirmed_at: confirmed_at_3_days_ago, confirmation_sent_at: one_year_ago) }
@@ -46,6 +46,13 @@ RSpec.describe Gitlab::BackgroundMigration::WrongfullyConfirmedEmailUnconfirmer,
 
     expect(bad_email_3_inactive_user.reload.confirmation_sent_at).to be_within(1.second).of(one_year_ago)
     expect(bad_email_4_bot_user.reload.confirmation_sent_at).to be_within(1.second).of(one_year_ago)
+  end
+
+  it 'clears the `unconfirmed_email` field' do
+    subject
+
+    user_needs_migration_2.reload
+    expect(user_needs_migration_2.unconfirmed_email).to be_nil
   end
 
   it 'does not change irrelevant user records' do
@@ -91,65 +98,26 @@ RSpec.describe Gitlab::BackgroundMigration::WrongfullyConfirmedEmailUnconfirmer,
   end
 
   context 'enqueued jobs' do
-    let(:user_1_gid) { User.find(user_needs_migration_1.id).to_gid.to_s }
-    let(:user_2_gid) { User.find(user_needs_migration_2.id).to_gid.to_s }
+    let(:user_1) { User.find(user_needs_migration_1.id) }
+    let(:user_2) { User.find(user_needs_migration_2.id) }
 
-    let(:email_1_gid) { Email.find(bad_email_1.id).to_gid.to_s }
-    let(:email_2_gid) { Email.find(bad_email_2.id).to_gid.to_s }
+    let(:email_1) { Email.find(bad_email_1.id) }
+    let(:email_2) { Email.find(bad_email_2.id) }
 
     it 'enqueues the email confirmation and the unconfirm notification mailer jobs' do
+      allow(DeviseMailer).to receive(:confirmation_instructions).and_call_original
+      allow(Gitlab::BackgroundMigration::Mailers::UnconfirmMailer).to receive(:unconfirm_notification_email).and_call_original
+
       subject
 
-      expect(enqueued_jobs.size).to eq(6)
+      expect(DeviseMailer).to have_received(:confirmation_instructions).with(email_1, email_1.confirmation_token)
+      expect(DeviseMailer).to have_received(:confirmation_instructions).with(email_2, email_2.confirmation_token)
 
-      expected_job_arguments = [
-        [
-          'DeviseMailer',
-          'confirmation_instructions',
-          'deliver_now',
-          { "_aj_globalid" => email_1_gid },
-          bad_email_1.reload.confirmation_token
-        ],
-        [
-          'DeviseMailer',
-          'confirmation_instructions',
-          'deliver_now',
-          { "_aj_globalid" => email_2_gid },
-          bad_email_2.reload.confirmation_token
-        ],
-        [
-          'DeviseMailer',
-          'confirmation_instructions',
-          'deliver_now',
-          { "_aj_globalid" => user_1_gid },
-          user_needs_migration_1.reload.confirmation_token
-        ],
-        [
-          'Gitlab::BackgroundMigration::Mailers::UnconfirmMailer',
-          'unconfirm_notification_email',
-          'deliver_now',
-          { "_aj_globalid" => user_1_gid }
-        ],
-        [
-          'DeviseMailer',
-          'confirmation_instructions',
-          'deliver_now',
-          { "_aj_globalid" => user_2_gid },
-          user_needs_migration_2.reload.confirmation_token
-        ],
-        [
-          'Gitlab::BackgroundMigration::Mailers::UnconfirmMailer',
-          'unconfirm_notification_email',
-          'deliver_now',
-          { "_aj_globalid" => user_2_gid }
-        ]
-      ]
+      expect(Gitlab::BackgroundMigration::Mailers::UnconfirmMailer).to have_received(:unconfirm_notification_email).with(user_1)
+      expect(DeviseMailer).to have_received(:confirmation_instructions).with(user_1, user_1.confirmation_token)
 
-      all_job_arguments = enqueued_jobs.map { |job| job["arguments"] }
-
-      expected_job_arguments.each do |job_arguments|
-        expect(all_job_arguments).to include(job_arguments)
-      end
+      expect(Gitlab::BackgroundMigration::Mailers::UnconfirmMailer).to have_received(:unconfirm_notification_email).with(user_2)
+      expect(DeviseMailer).to have_received(:confirmation_instructions).with(user_2, user_2.confirmation_token)
     end
   end
 end

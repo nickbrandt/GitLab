@@ -18,13 +18,19 @@ const defaultProps = {
     url: GENERIC_URL,
     alertsSetupUrl: INVALID_URL,
     alertsUsageUrl: INVALID_URL,
-    initialActivated: ACTIVATED,
+    activated: ACTIVATED,
   },
   prometheus: {
     prometheusAuthorizationKey: KEY,
     prometheusFormPath: INVALID_URL,
     prometheusUrl: PROMETHEUS_URL,
-    prometheusIsActivated: ACTIVATED,
+    activated: ACTIVATED,
+  },
+  opsgenie: {
+    opsgenieMvcIsAvailable: true,
+    formPath: INVALID_URL,
+    activated: ACTIVATED,
+    opsgenieMvcTargetUrl: GENERIC_URL,
   },
 };
 
@@ -32,12 +38,7 @@ describe('AlertsSettingsForm', () => {
   let wrapper;
   let mockAxios;
 
-  const createComponent = (
-    props = defaultProps,
-    { methods } = {},
-    alertIntegrationsDropdown = false,
-    data,
-  ) => {
+  const createComponent = (props = defaultProps, { methods } = {}, data) => {
     wrapper = shallowMount(AlertsSettingsForm, {
       data() {
         return { ...data };
@@ -47,11 +48,6 @@ describe('AlertsSettingsForm', () => {
         ...props,
       },
       methods,
-      provide: {
-        glFeatures: {
-          alertIntegrationsDropdown,
-        },
-      },
     });
   };
 
@@ -149,7 +145,9 @@ describe('AlertsSettingsForm', () => {
       createComponent(
         { prometheus: { ...defaultProps.prometheus, prometheusIsActivated: true } },
         {},
-        true,
+        {
+          selectedEndpoint: 'prometheus',
+        },
       );
     });
 
@@ -161,9 +159,25 @@ describe('AlertsSettingsForm', () => {
       expect(findApiUrl().exists()).toBe(true);
     });
 
-    it('show a valid Alert URL', () => {
-      expect(findUrl().exists()).toBe(true);
+    it('shows the correct default API URL', () => {
       expect(findUrl().attributes('value')).toBe(PROMETHEUS_URL);
+    });
+  });
+
+  describe('opsgenie is active', () => {
+    beforeEach(() => {
+      createComponent(
+        { opsgenie: { ...defaultProps.opsgenie, opsgenieMvcActivated: true } },
+        {},
+        {
+          selectedEndpoint: 'opsgenie',
+        },
+      );
+    });
+
+    it('shows a input for the opsgenie target URL', () => {
+      expect(findApiUrl().exists()).toBe(true);
+      expect(findSelect().attributes('value')).toBe('opsgenie');
     });
   });
 
@@ -178,7 +192,7 @@ describe('AlertsSettingsForm', () => {
     });
 
     it('should validate JSON input', () => {
-      createComponent({ generic: { ...defaultProps.generic } }, {}, true, {
+      createComponent({ generic: { ...defaultProps.generic } }, true, {
         testAlertJson: '{ "value": "test" }',
       });
 
@@ -196,7 +210,7 @@ describe('AlertsSettingsForm', () => {
 
         createComponent({ generic: { ...defaultProps.generic, formPath } });
 
-        return wrapper.vm.toggleGenericActivated(toggleService).then(() => {
+        return wrapper.vm.toggleActivated(toggleService).then(() => {
           expect(wrapper.find(GlAlert).attributes('variant')).toBe('info');
         });
       });
@@ -208,7 +222,7 @@ describe('AlertsSettingsForm', () => {
 
         createComponent({ generic: { ...defaultProps.generic, formPath } });
 
-        return wrapper.vm.toggleGenericActivated(toggleService).then(() => {
+        return wrapper.vm.toggleActivated(toggleService).then(() => {
           expect(wrapper.find(GlAlert).attributes('variant')).toBe('danger');
         });
       });

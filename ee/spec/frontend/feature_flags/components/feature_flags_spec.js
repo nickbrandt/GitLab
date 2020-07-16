@@ -40,8 +40,8 @@ describe('Feature flags', () => {
     });
   };
 
-  const configureButton = () => wrapper.find('.js-ff-configure');
-  const newButton = () => wrapper.find('.js-ff-new');
+  const configureButton = () => wrapper.find('[data-testid="ff-configure-button"]');
+  const newButton = () => wrapper.find('[data-testid="ff-new-button"]');
 
   beforeEach(() => {
     mock = new MockAdapter(axios);

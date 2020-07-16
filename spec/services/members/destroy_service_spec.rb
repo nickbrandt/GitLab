@@ -25,6 +25,7 @@ RSpec.describe Members::DestroyService do
     before do
       type = member.is_a?(GroupMember) ? 'Group' : 'Project'
       expect(TodosDestroyer::EntityLeaveWorker).to receive(:perform_in).with(Todo::WAIT_FOR_DELETE, member.user_id, member.source_id, type)
+      expect(MembersDestroyer::UnassignIssuablesWorker).to receive(:perform_async).with(member.user_id, member.source_id, type) if opts[:unassign_issuables]
     end
 
     it 'destroys the member' do
@@ -149,6 +150,25 @@ RSpec.describe Members::DestroyService do
           it_behaves_like 'a service destroying a member with access' do
             let(:opts) { { unassign_issuables: true } }
           end
+        end
+      end
+
+      context 'with a project bot member' do
+        let(:member) { group_project.members.find_by(user_id: member_user.id) }
+        let(:member_user) { create(:user, :project_bot) }
+
+        before do
+          group_project.add_maintainer(member_user)
+        end
+
+        context 'when the destroy_bot flag is true' do
+          it_behaves_like 'a service destroying a member with access' do
+            let(:opts) { { destroy_bot: true } }
+          end
+        end
+
+        context 'when the destroy_bot flag is not specified' do
+          it_behaves_like 'a service raising Gitlab::Access::AccessDeniedError'
         end
       end
 

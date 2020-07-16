@@ -26,16 +26,42 @@ export const fetchPolicies = ({ state, commit }, environmentId) => {
     .catch(error => commitReceivePoliciesError(commit, error?.response?.data));
 };
 
-const commitUpdatePolicyError = (commit, payload) => {
+const commitPolicyError = (commit, type, payload) => {
   const error =
     payload?.error || s__('NetworkPolicies|Something went wrong, failed to update policy');
-  commit(types.RECEIVE_UPDATE_POLICY_ERROR, error);
+  commit(type, error);
   createFlash(error);
+};
+
+export const createPolicy = ({ state, commit }, { environmentId, policy }) => {
+  if (!state.policiesEndpoint || !environmentId || !policy) {
+    return commitPolicyError(commit, types.RECEIVE_CREATE_POLICY_ERROR);
+  }
+
+  commit(types.REQUEST_CREATE_POLICY);
+
+  return axios
+    .post(state.policiesEndpoint, {
+      environment_id: environmentId,
+      manifest: policy.manifest,
+    })
+    .then(({ data }) => {
+      commit(types.RECEIVE_CREATE_POLICY_SUCCESS, data);
+      createFlash(
+        sprintf(s__('NetworkPolicies|Policy %{policyName} was successfully changed'), {
+          policyName: policy.name,
+        }),
+        FLASH_TYPES.SUCCESS,
+      );
+    })
+    .catch(error =>
+      commitPolicyError(commit, types.RECEIVE_CREATE_POLICY_ERROR, error?.response?.data),
+    );
 };
 
 export const updatePolicy = ({ state, commit }, { environmentId, policy }) => {
   if (!state.policiesEndpoint || !environmentId || !policy) {
-    return commitUpdatePolicyError(commit);
+    return commitPolicyError(commit, types.RECEIVE_UPDATE_POLICY_ERROR);
   }
 
   commit(types.REQUEST_UPDATE_POLICY);
@@ -58,5 +84,7 @@ export const updatePolicy = ({ state, commit }, { environmentId, policy }) => {
         FLASH_TYPES.SUCCESS,
       );
     })
-    .catch(error => commitUpdatePolicyError(commit, error?.response?.data));
+    .catch(error =>
+      commitPolicyError(commit, types.RECEIVE_UPDATE_POLICY_ERROR, error?.response?.data),
+    );
 };

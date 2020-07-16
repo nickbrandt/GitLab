@@ -33,6 +33,7 @@ RSpec.describe Gitlab::UsageData do
       create(:prometheus_alert, project: projects[1])
 
       create(:service, project: projects[1], type: 'JenkinsService', active: true)
+      create(:jira_service, project: projects[0], issues_enabled: true, project_key: 'GL')
 
       create(:package, project: projects[0])
       create(:package, project: projects[0])
@@ -105,6 +106,7 @@ RSpec.describe Gitlab::UsageData do
         projects_jenkins_active
         projects_jira_dvcs_cloud_active
         projects_jira_dvcs_server_active
+        projects_jira_issuelist_active
         projects_mirrored_with_pipelines_enabled
         projects_reporting_ci_cd_back_to_github
         projects_with_packages
@@ -119,6 +121,8 @@ RSpec.describe Gitlab::UsageData do
         user_preferences_group_overview_details
         user_preferences_group_overview_security_dashboard
         template_repositories
+        network_policy_forwards
+        network_policy_drops
       ))
 
       expect(count_data[:projects_jenkins_active]).to eq(1)
@@ -128,6 +132,7 @@ RSpec.describe Gitlab::UsageData do
       expect(count_data[:status_page_projects]).to eq(1)
       expect(count_data[:status_page_issues]).to eq(1)
       expect(count_data[:issues_with_health_status]).to eq(2)
+      expect(count_data[:projects_jira_issuelist_active]).to eq(1)
     end
 
     it 'has integer value for epic relationship level' do
@@ -301,7 +306,7 @@ RSpec.describe Gitlab::UsageData do
       end
 
       context 'for create' do
-        it 'includes accurate usage_activity_by_stage data' do
+        it 'includes accurate usage_activity_by_stage data', :aggregate_failures do
           for_defined_days_back do
             user = create(:user)
             project = create(:project, :repository_private, :github_imported,
@@ -310,7 +315,9 @@ RSpec.describe Gitlab::UsageData do
             create(:project, creator: user)
             create(:project, creator: user, disable_overriding_approvers_per_merge_request: true)
             create(:project, creator: user, disable_overriding_approvers_per_merge_request: false)
-            create(:protected_branch, project: project)
+            create(:approval_project_rule, project: project)
+            protected_branch = create(:protected_branch, project: project)
+            create(:approval_project_rule, protected_branches: [protected_branch], project: project)
             create(:suggestion, note: create(:note, project: project))
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
             create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
@@ -319,6 +326,8 @@ RSpec.describe Gitlab::UsageData do
           end
 
           expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to include(
+            approval_project_rules: 4,
+            approval_project_rules_with_target_branch: 2,
             projects_enforcing_code_owner_approval: 0,
             merge_requests_with_optional_codeowners: 4,
             merge_requests_with_required_codeowners: 8,
@@ -328,6 +337,8 @@ RSpec.describe Gitlab::UsageData do
             suggestions: 2
           )
           expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:create]).to include(
+            approval_project_rules: 4,
+            approval_project_rules_with_target_branch: 2,
             projects_enforcing_code_owner_approval: 0,
             merge_requests_with_optional_codeowners: 2,
             merge_requests_with_required_codeowners: 4,
@@ -442,48 +453,37 @@ RSpec.describe Gitlab::UsageData do
           for_defined_days_back do
             user = create(:user)
             project = create(:project, creator: user)
-            issue = create(:issue, project: project, author: User.support_bot)
-            create(:issue, project: project, author: user)
+            create(:issue, project: project, author: User.support_bot)
             board = create(:board, project: project)
             create(:user_list, board: board, user: user)
             create(:milestone_list, board: board, milestone: create(:milestone, project: project), user: user)
             create(:list, board: board, label: create(:label, project: project), user: user)
-            create(:note, project: project, noteable: issue, author: user)
             create(:epic, author: user)
-            create(:todo, project: project, target: issue, author: user)
             create(:jira_service, :jira_cloud_service, active: true, project: create(:project, :jira_dvcs_cloud, creator: user))
             create(:jira_service, active: true, project: create(:project, :jira_dvcs_server, creator: user))
           end
 
-          expect(described_class.uncached_data[:usage_activity_by_stage][:plan]).to eq(
+          expect(described_class.uncached_data[:usage_activity_by_stage][:plan]).to include(
             assignee_lists: 2,
             epics: 2,
-            issues: 3,
             label_lists: 2,
             milestone_lists: 2,
-            notes: 2,
-            projects: 2,
             projects_jira_active: 2,
             projects_jira_dvcs_cloud_active: 2,
             projects_jira_dvcs_server_active: 2,
             service_desk_enabled_projects: 2,
-            service_desk_issues: 2,
-            todos: 2
+            service_desk_issues: 2
           )
-          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:plan]).to eq(
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:plan]).to include(
             assignee_lists: 1,
             epics: 1,
-            issues: 2,
             label_lists: 1,
             milestone_lists: 1,
-            notes: 1,
-            projects: 1,
             projects_jira_active: 1,
             projects_jira_dvcs_cloud_active: 1,
             projects_jira_dvcs_server_active: 1,
             service_desk_enabled_projects: 1,
-            service_desk_issues: 1,
-            todos: 1
+            service_desk_issues: 1
           )
         end
       end

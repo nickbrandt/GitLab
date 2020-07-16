@@ -1,28 +1,21 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlAlert, GlTable, GlEmptyState, GlIntersectionObserver } from '@gitlab/ui';
 import FirstClassGroupVulnerabilities from 'ee/security_dashboard/components/first_class_group_security_dashboard_vulnerabilities.vue';
-import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
-import { generateVulnerabilities } from '../../vulnerabilities/mock_data';
+import VulnerabilityList from 'ee/security_dashboard/components/vulnerability_list.vue';
+import { generateVulnerabilities } from './mock_data';
 
 describe('First Class Group Dashboard Vulnerabilities Component', () => {
   let wrapper;
 
-  const dashboardDocumentation = 'dashboard-documentation';
-  const emptyStateSvgPath = 'empty-state-path';
   const groupFullPath = 'group-full-path';
-  const emptyStateDescription =
-    "While it's rare to have no vulnerabilities for your group, it can happen. In any event, we ask that you double check your settings to make sure you've set up your dashboard correctly.";
 
   const findIntersectionObserver = () => wrapper.find(GlIntersectionObserver);
   const findVulnerabilities = () => wrapper.find(VulnerabilityList);
-  const findEmptyState = () => wrapper.find(GlEmptyState);
   const findAlert = () => wrapper.find(GlAlert);
 
   const createWrapper = ({ $apollo, stubs }) => {
     return shallowMount(FirstClassGroupVulnerabilities, {
       propsData: {
-        dashboardDocumentation,
-        emptyStateSvgPath,
         groupFullPath,
       },
       stubs,
@@ -47,17 +40,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
     });
 
     it('passes down isLoading correctly', () => {
-      expect(findVulnerabilities().props()).toEqual({
-        dashboardDocumentation,
-        emptyStateSvgPath,
-        filters: null,
-        isLoading: true,
-        shouldShowIdentifier: false,
-        shouldShowReportType: false,
-        shouldShowSelection: true,
-        shouldShowProjectNamespace: true,
-        vulnerabilities: [],
-      });
+      expect(findVulnerabilities().props()).toMatchObject({ isLoading: true });
     });
   });
 
@@ -96,25 +79,6 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
     });
   });
 
-  describe('when the query returned an empty vulnerability list', () => {
-    beforeEach(() => {
-      wrapper = createWrapper({
-        $apollo: {
-          queries: { vulnerabilities: { loading: false } },
-        },
-        stubs: {
-          VulnerabilityList,
-          GlTable,
-          GlEmptyState,
-        },
-      });
-    });
-
-    it('displays the empty state', () => {
-      expect(findEmptyState().text()).toContain(emptyStateDescription);
-    });
-  });
-
   describe('when the query is loaded and we have results', () => {
     const vulnerabilities = generateVulnerabilities();
 
@@ -135,17 +99,12 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
       });
     });
 
-    it('does not have an empty state', () => {
-      expect(wrapper.html()).not.toContain(emptyStateDescription);
-    });
-
     it('passes down properties correctly', () => {
       expect(findVulnerabilities().props()).toEqual({
-        dashboardDocumentation,
-        emptyStateSvgPath,
-        filters: null,
+        filters: {},
         isLoading: false,
         shouldShowIdentifier: false,
+        securityScanners: {},
         shouldShowReportType: false,
         shouldShowSelection: true,
         shouldShowProjectNamespace: true,

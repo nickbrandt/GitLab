@@ -28,9 +28,6 @@ module EE
       condition(:deploy_board_disabled) { !@subject.feature_available?(:deploy_board) }
 
       with_scope :subject
-      condition(:packages_disabled) { !@subject.packages_enabled }
-
-      with_scope :subject
       condition(:iterations_available) { @subject.feature_available?(:iterations) }
 
       with_scope :subject
@@ -79,27 +76,15 @@ module EE
       end
 
       condition(:cannot_modify_approvers_rules) do
-        if @subject.project_compliance_mr_approval_settings?
-          regulated_merge_request_approval_settings?
-        else
-          owner_cannot_modify_approvers_rules? && !admin?
-        end
+        regulated_merge_request_approval_settings?
       end
 
       condition(:cannot_modify_merge_request_author_setting) do
-        if @subject.project_compliance_mr_approval_settings?
-          regulated_merge_request_approval_settings?
-        else
-          owner_cannot_modify_merge_request_author_setting? && !admin?
-        end
+        regulated_merge_request_approval_settings?
       end
 
       condition(:cannot_modify_merge_request_committer_setting) do
-        if @subject.project_compliance_mr_approval_settings?
-          regulated_merge_request_approval_settings?
-        else
-          owner_cannot_modify_merge_request_committer_setting? && !admin?
-        end
+        regulated_merge_request_approval_settings?
       end
 
       with_scope :subject
@@ -227,7 +212,6 @@ module EE
         enable :read_deploy_board
         enable :admin_issue_link
         enable :admin_epic_issue
-        enable :read_package
         enable :read_group_timelogs
       end
 
@@ -237,7 +221,6 @@ module EE
         enable :create_vulnerability_feedback
         enable :destroy_vulnerability_feedback
         enable :update_vulnerability_feedback
-        enable :create_package
         enable :read_feature_flag
         enable :create_feature_flag
         enable :update_feature_flag
@@ -252,8 +235,6 @@ module EE
         enable :create_iteration
         enable :admin_iteration
       end
-
-      rule { can?(:public_access) }.enable :read_package
 
       rule { can?(:read_project) & iterations_available }.enable :read_iteration
 
@@ -290,10 +271,6 @@ module EE
 
       rule { deploy_board_disabled & ~is_development }.prevent :read_deploy_board
 
-      rule { packages_disabled | repository_disabled }.policy do
-        prevent(*create_read_update_admin_destroy(:package))
-      end
-
       rule { feature_flags_disabled | repository_disabled }.policy do
         prevent(*create_read_update_admin_destroy(:feature_flag))
         prevent(:admin_feature_flags_user_lists)
@@ -303,7 +280,6 @@ module EE
         enable :push_code_to_protected_branches
         enable :admin_path_locks
         enable :update_approvers
-        enable :destroy_package
         enable :admin_feature_flags_client
         enable :modify_approvers_rules
         enable :modify_approvers_list

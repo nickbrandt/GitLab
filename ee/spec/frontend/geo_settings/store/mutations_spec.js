@@ -11,48 +11,37 @@ describe('GeoSettings Store Mutations', () => {
     state = createState();
   });
 
-  describe('REQUEST_GEO_SETTINGS', () => {
-    it('sets isLoading to true', () => {
-      mutations[types.REQUEST_GEO_SETTINGS](state);
+  describe.each`
+    mutation                                   | data                        | loadingBefore | loadingAfter
+    ${types.REQUEST_GEO_SETTINGS}              | ${null}                     | ${false}      | ${true}
+    ${types.RECEIVE_GEO_SETTINGS_SUCCESS}      | ${MOCK_BASIC_SETTINGS_DATA} | ${true}       | ${false}
+    ${types.RECEIVE_GEO_SETTINGS_ERROR}        | ${null}                     | ${true}       | ${false}
+    ${types.REQUEST_UPDATE_GEO_SETTINGS}       | ${null}                     | ${false}      | ${true}
+    ${types.RECEIVE_UPDATE_GEO_SETTINGS_ERROR} | ${null}                     | ${true}       | ${false}
+  `(`Loading Mutations: `, ({ mutation, data, loadingBefore, loadingAfter }) => {
+    describe(`${mutation}`, () => {
+      it(`sets isLoading to ${loadingAfter}`, () => {
+        state.isLoading = loadingBefore;
 
-      expect(state.isLoading).toEqual(true);
+        mutations[mutation](state, data);
+        expect(state.isLoading).toEqual(loadingAfter);
+      });
     });
   });
 
   describe('RECEIVE_GEO_SETTINGS_SUCCESS', () => {
-    const mockData = MOCK_BASIC_SETTINGS_DATA;
-
-    beforeEach(() => {
-      state.isLoading = true;
-    });
-
-    it('sets isLoading to false', () => {
-      mutations[types.RECEIVE_GEO_SETTINGS_SUCCESS](state, mockData);
-
-      expect(state.isLoading).toEqual(false);
-    });
-
     it('sets timeout and allowedIp array with data', () => {
-      mutations[types.RECEIVE_GEO_SETTINGS_SUCCESS](state, mockData);
+      mutations[types.RECEIVE_GEO_SETTINGS_SUCCESS](state, MOCK_BASIC_SETTINGS_DATA);
 
-      expect(state.timeout).toBe(mockData.timeout);
-      expect(state.allowedIp).toBe(mockData.allowedIp);
+      expect(state.timeout).toBe(MOCK_BASIC_SETTINGS_DATA.timeout);
+      expect(state.allowedIp).toBe(MOCK_BASIC_SETTINGS_DATA.allowedIp);
     });
   });
 
   describe('RECEIVE_GEO_SETTINGS_ERROR', () => {
-    const mockData = MOCK_BASIC_SETTINGS_DATA;
-
     beforeEach(() => {
-      state.isLoading = true;
-      state.timeout = mockData.timeout;
-      state.allowedIp = mockData.allowedIp;
-    });
-
-    it('sets isLoading to false', () => {
-      mutations[types.RECEIVE_GEO_SETTINGS_ERROR](state);
-
-      expect(state.isLoading).toEqual(false);
+      state.timeout = MOCK_BASIC_SETTINGS_DATA.timeout;
+      state.allowedIp = MOCK_BASIC_SETTINGS_DATA.allowedIp;
     });
 
     it('resets timeout and allowedIp array', () => {
@@ -60,6 +49,50 @@ describe('GeoSettings Store Mutations', () => {
 
       expect(state.timeout).toBe(DEFAULT_TIMEOUT);
       expect(state.allowedIp).toBe(DEFAULT_ALLOWED_IP);
+    });
+  });
+
+  describe('RECEIVE_UPDATE_GEO_SETTINGS_SUCCESS', () => {
+    it('sets timeout and allowedIp array with data', () => {
+      mutations[types.RECEIVE_UPDATE_GEO_SETTINGS_SUCCESS](state, MOCK_BASIC_SETTINGS_DATA);
+
+      expect(state.timeout).toBe(MOCK_BASIC_SETTINGS_DATA.timeout);
+      expect(state.allowedIp).toBe(MOCK_BASIC_SETTINGS_DATA.allowedIp);
+    });
+  });
+
+  describe('RECEIVE_UPDATE_GEO_SETTINGS_ERROR', () => {
+    beforeEach(() => {
+      state.timeout = MOCK_BASIC_SETTINGS_DATA.timeout;
+      state.allowedIp = MOCK_BASIC_SETTINGS_DATA.allowedIp;
+    });
+
+    it('resets timeout and allowedIp array', () => {
+      mutations[types.RECEIVE_UPDATE_GEO_SETTINGS_ERROR](state);
+
+      expect(state.timeout).toBe(DEFAULT_TIMEOUT);
+      expect(state.allowedIp).toBe(DEFAULT_ALLOWED_IP);
+    });
+  });
+
+  describe('SET_TIMEOUT', () => {
+    it('sets error for field', () => {
+      mutations[types.SET_TIMEOUT](state, 1);
+      expect(state.timeout).toBe(1);
+    });
+  });
+
+  describe('SET_ALLOWED_IP', () => {
+    it('sets error for field', () => {
+      mutations[types.SET_ALLOWED_IP](state, '0.0.0.0');
+      expect(state.allowedIp).toBe('0.0.0.0');
+    });
+  });
+
+  describe('SET_FORM_ERROR', () => {
+    it('sets error for field', () => {
+      mutations[types.SET_FORM_ERROR](state, { key: 'timeout', error: 'error' });
+      expect(state.formErrors.timeout).toBe('error');
     });
   });
 });

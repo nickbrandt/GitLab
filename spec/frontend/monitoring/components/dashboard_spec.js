@@ -36,6 +36,7 @@ import {
   dashboardProps,
 } from '../fixture_data';
 import createFlash from '~/flash';
+import { TEST_HOST } from 'helpers/test_constants';
 
 jest.mock('~/flash');
 
@@ -142,7 +143,7 @@ describe('Dashboard', () => {
       setupStoreWithData(store);
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.vm.showEmptyState).toEqual(false);
+        expect(wrapper.vm.emptyState).toBeNull();
         expect(wrapper.findAll('.prometheus-panel')).toHaveLength(0);
       });
     });
@@ -432,6 +433,10 @@ describe('Dashboard', () => {
       const findDashboardDropdown = () => wrapper.find(DashboardHeader).find(DashboardsDropdown);
 
       beforeEach(() => {
+        store.commit(`monitoringDashboard/${types.SET_INITIAL_STATE}`, {
+          projectPath: TEST_HOST,
+        });
+
         delete window.location;
         window.location = { ...windowLocation, assign: jest.fn() };
         createMountedWrapper();
@@ -445,12 +450,40 @@ describe('Dashboard', () => {
 
       it('encodes dashboard param', () => {
         findDashboardDropdown().vm.$emit('selectDashboard', {
-          path: 'dashboard&copy.yml',
+          path: '.gitlab/dashboards/dashboard&copy.yml',
+          display_name: 'dashboard&copy.yml',
         });
         expect(window.location.assign).toHaveBeenCalledWith(
-          'http://localhost/?dashboard=dashboard%2526copy.yml',
+          `${TEST_HOST}/-/metrics/dashboard%26copy.yml`,
         );
       });
+    });
+  });
+
+  describe('when all panels in the first group are loading', () => {
+    const findGroupAt = i => wrapper.findAll(GraphGroup).at(i);
+
+    beforeEach(() => {
+      setupStoreWithDashboard(store);
+
+      const { panels } = store.state.monitoringDashboard.dashboard.panelGroups[0];
+      panels.forEach(({ metrics }) => {
+        store.commit(`monitoringDashboard/${types.REQUEST_METRIC_RESULT}`, {
+          metricId: metrics[0].metricId,
+        });
+      });
+
+      createShallowWrapper();
+
+      return wrapper.vm.$nextTick();
+    });
+
+    it('a loading icon appears in the first group', () => {
+      expect(findGroupAt(0).props('isLoading')).toBe(true);
+    });
+
+    it('a loading icon does not appear in the second group', () => {
+      expect(findGroupAt(1).props('isLoading')).toBe(false);
     });
   });
 
@@ -458,6 +491,8 @@ describe('Dashboard', () => {
     beforeEach(() => {
       store.commit(`monitoringDashboard/${types.SET_INITIAL_STATE}`, {
         currentEnvironmentName: 'production',
+        currentDashboard: dashboardGitResponse[0].path,
+        projectPath: TEST_HOST,
       });
       createMountedWrapper({ hasMetrics: true });
       setupStoreWithData(store);
@@ -470,10 +505,23 @@ describe('Dashboard', () => {
 
       findAllEnvironmentsDropdownItems().wrappers.forEach((itemWrapper, index) => {
         const anchorEl = itemWrapper.find('a');
-        if (anchorEl.exists() && environmentData[index].metrics_path) {
+        if (anchorEl.exists()) {
           const href = anchorEl.attributes('href');
-          expect(href).toBe(environmentData[index].metrics_path);
+          const currentDashboard = encodeURIComponent(dashboardGitResponse[0].path);
+          const environmentId = encodeURIComponent(environmentData[index].id);
+          const url = `${TEST_HOST}/-/metrics/${currentDashboard}?environment=${environmentId}`;
+          expect(href).toBe(url);
         }
+      });
+    });
+
+    it('it does not show loading icons in any group', () => {
+      setupStoreWithData(store);
+
+      wrapper.vm.$nextTick(() => {
+        wrapper.findAll(GraphGroup).wrappers.forEach(groupWrapper => {
+          expect(groupWrapper.props('isLoading')).toBe(false);
+        });
       });
     });
 

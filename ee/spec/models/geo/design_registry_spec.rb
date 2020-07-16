@@ -8,8 +8,6 @@ RSpec.describe Geo::DesignRegistry, :geo do
     let(:invalid_items_for_bulk_insertion) { [] } # class does not have any validations defined
   end
 
-  let!(:design_registry) { create(:geo_design_registry) }
-
   describe 'relationships' do
     it { is_expected.to belong_to(:project) }
   end
@@ -19,6 +17,7 @@ RSpec.describe Geo::DesignRegistry, :geo do
   end
 
   describe '#search', :geo_fdw do
+    let!(:design_registry) { create(:geo_design_registry) }
     let!(:failed_registry) { create(:geo_design_registry, :sync_failed) }
     let!(:synced_registry) { create(:geo_design_registry, :synced) }
 
@@ -94,6 +93,8 @@ RSpec.describe Geo::DesignRegistry, :geo do
   end
 
   describe '#should_be_redownloaded?' do
+    let_it_be(:design_registry) { create(:geo_design_registry) }
+
     context 'when force_to_redownload is false' do
       it 'returns false' do
         expect(design_registry.should_be_redownloaded?).to be false

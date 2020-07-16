@@ -3,8 +3,11 @@ scope(controller: :wikis) do
     get :git_access
     get :pages
     get :new
-    get '/', to: redirect('%{namespace_id}/%{project_id}/wikis/home')
+    get '/', to: redirect { |params, request| "#{request.path}/home" }
     post '/', to: 'wikis#create'
+    scope '-' do
+      resource :confluence, only: :show
+    end
   end
 
   scope(path: 'wikis/*id', as: :wiki, format: false) do

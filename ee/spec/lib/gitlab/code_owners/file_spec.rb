@@ -63,8 +63,14 @@ RSpec.describe Gitlab::CodeOwners::File do
         it "is a hash sorted by sections without duplicates" do
           data = file.parsed_data
 
-          expect(data.keys.length).to eq(3)
-          expect(data.keys).to contain_exactly("codeowners", "Documentation", "Database")
+          expect(data.keys.length).to eq(5)
+          expect(data.keys).to contain_exactly(
+            "codeowners",
+            "Documentation",
+            "Database",
+            "Two Words",
+            "Double::Colon"
+          )
         end
 
         codeowners_section_paths = [
@@ -84,6 +90,8 @@ RSpec.describe Gitlab::CodeOwners::File do
           "codeowners"    | codeowners_section_paths | codeowners_section_owners
           "Documentation" | ["/**/README.md", "/**/ee/docs", "/**/docs"] | ["@gl-docs"]
           "Database"      | ["/**/README.md", "/**/model/db"] | ["@gl-database"]
+          "Two Words"     | ["/**/README.md", "/**/model/db"] | ["@gl-database"]
+          "Double::Colon" | ["/**/README.md", "/**/model/db"] | ["@gl-database"]
         end
 
         with_them do

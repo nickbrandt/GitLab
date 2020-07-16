@@ -99,68 +99,107 @@ export const parsedBaseIssues = [
   },
 ];
 
-export const headPerformance = [
+// Browser Performance Testing
+export const headBrowserPerformance = [
   {
     subject: '/some/path',
     metrics: [
       {
-        name: 'Sitespeed Score',
-        value: 85,
-      },
-    ],
-  },
-  {
-    subject: '/some/other/path',
-    metrics: [
-      {
         name: 'Total Score',
-        value: 79,
+        value: 80,
         desiredSize: 'larger',
       },
       {
         name: 'Requests',
-        value: 3,
+        value: 30,
         desiredSize: 'smaller',
       },
-    ],
-  },
-  {
-    subject: '/yet/another/path',
-    metrics: [
       {
-        name: 'Sitespeed Score',
-        value: 80,
+        name: 'Speed Index',
+        value: 1155,
+        desiredSize: 'smaller',
+      },
+      {
+        name: 'Transfer Size (KB)',
+        value: '1070.1',
+        desiredSize: 'smaller',
       },
     ],
   },
 ];
 
-export const basePerformance = [
+export const baseBrowserPerformance = [
   {
     subject: '/some/path',
     metrics: [
       {
-        name: 'Sitespeed Score',
-        value: 84,
-      },
-    ],
-  },
-  {
-    subject: '/some/other/path',
-    metrics: [
-      {
         name: 'Total Score',
-        value: 80,
+        value: 82,
         desiredSize: 'larger',
       },
       {
         name: 'Requests',
-        value: 4,
+        value: 30,
+        desiredSize: 'smaller',
+      },
+      {
+        name: 'Speed Index',
+        value: 1165,
+        desiredSize: 'smaller',
+      },
+      {
+        name: 'Transfer Size (KB)',
+        value: '1065.1',
         desiredSize: 'smaller',
       },
     ],
   },
 ];
+
+// Load Performance Testing
+export const headLoadPerformance = {
+  metrics: {
+    checks: {
+      fails: 0,
+      passes: 45,
+      value: 0,
+    },
+    http_req_waiting: {
+      avg: 104.3543911111111,
+      max: 247.8693,
+      med: 99.1985,
+      min: 98.1397,
+      'p(90)': 100.60016,
+      'p(95)': 125.45588000000023,
+    },
+    http_reqs: {
+      count: 45,
+      rate: 8.999484329547917,
+    },
+  },
+};
+
+export const baseLoadPerformance = {
+  metrics: {
+    checks: {
+      fails: 0,
+      passes: 39,
+      value: 0,
+    },
+    http_req_waiting: {
+      avg: 118.28965641025643,
+      max: 674.4383,
+      med: 98.2503,
+      min: 97.1357,
+      'p(90)': 104.09862000000001,
+      'p(95)': 101.22848,
+    },
+    http_reqs: {
+      count: 39,
+      rate: 7.799590989448514,
+    },
+  },
+};
 
 export const codequalityParsedIssues = [
   {

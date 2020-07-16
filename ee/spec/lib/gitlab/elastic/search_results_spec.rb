@@ -12,16 +12,6 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
   let(:project_2) { create(:project, :public, :repository, :wiki_repo) }
   let(:limit_project_ids) { [project_1.id] }
 
-  describe 'counts' do
-    it 'does not hit Elasticsearch twice for result and counts' do
-      expect(Repository).to receive(:find_commits_by_message_with_elastic).with('hello world', anything).once.and_call_original
-
-      results = described_class.new(user, 'hello world', limit_project_ids)
-      expect(results.objects('commits', page: 2)).to be_empty
-      expect(results.commits_count).to eq 0
-    end
-  end
-
   describe '#formatted_count' do
     using RSpec::Parameterized::TableSyntax
 
@@ -637,6 +627,12 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
           ParenthesesBetweenTokens)tokenAfterParentheses
           a.b.c=missing_token_around_equals
 
+          def self.ruby_method_name(ruby_method_arg)
+          RubyClassInvoking.ruby_method_call(with_arg)
+
+          def self.ruby_method_123(ruby_another_method_arg)
+          RubyClassInvoking.ruby_call_method_123(with_arg)
+
         FILE
       end
       let(:file_name) { 'elastic_specialchars_test.md' }
@@ -702,6 +698,22 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
       it 'finds a token after = without a space' do
         expect(search_for('missing_token_around_equals')).to include(file_name)
+      end
+
+      it 'finds a ruby method name even if preceeded with dot' do
+        expect(search_for('ruby_method_name')).to include(file_name)
+      end
+
+      it 'finds a ruby method name with numbers' do
+        expect(search_for('ruby_method_123')).to include(file_name)
+      end
+
+      it 'finds a ruby method call even if preceeded with dot' do
+        expect(search_for('ruby_method_call')).to include(file_name)
+      end
+
+      it 'finds a ruby method call with numbers' do
+        expect(search_for('ruby_call_method_123')).to include(file_name)
       end
     end
   end
@@ -1133,5 +1145,11 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         expect(results.blobs_count).to eq 1
       end
     end
+  end
+
+  context 'query performance' do
+    let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
+
+    include_examples 'does not hit Elasticsearch twice for objects and counts', %w|projects notes blobs wiki_blobs commits issues merge_requests milestones|
   end
 end

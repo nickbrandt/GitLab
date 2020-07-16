@@ -83,7 +83,8 @@ Plan.default.actual_limits.update!(project_hooks: 100)
 Plan.default.actual_limits.update!(group_hooks: 100)
 ```
 
-NOTE: **Note:** Set the limit to `0` to disable it.
+NOTE: **Note:**
+Set the limit to `0` to disable it.
 
 ## Incoming emails from auto-responders
 
@@ -120,7 +121,8 @@ Plan.default.actual_limits.update!(offset_pagination_limit: 10000)
 
 - **Default offset pagination limit:** 50000
 
-NOTE: **Note:** Set the limit to `0` to disable it.
+NOTE: **Note:**
+Set the limit to `0` to disable it.
 
 ## CI/CD limits
 
@@ -152,7 +154,8 @@ To set this limit on a self-managed installation, run the following in the
 Plan.default.actual_limits.update!(ci_active_jobs: 500)
 ```
 
-NOTE: **Note:** Set the limit to `0` to disable it.
+NOTE: **Note:**
+Set the limit to `0` to disable it.
 
 ### Number of CI/CD subscriptions to a project
 
@@ -174,7 +177,8 @@ To set this limit on a self-managed installation, run the following in the
 Plan.default.actual_limits.update!(ci_project_subscriptions: 500)
 ```
 
-NOTE: **Note:** Set the limit to `0` to disable it.
+NOTE: **Note:**
+Set the limit to `0` to disable it.
 
 ### Number of pipeline schedules
 
@@ -243,6 +247,38 @@ Prometheus alert payloads sent to the `notify.json` endpoint are limited to 1 MB
 
 Alert payloads sent to the `notify.json` endpoint are limited to 1 MB in size.
 
+### Metrics dashboard YAML files
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/34834) in GitLab 13.2.
+
+The memory occupied by a parsed metrics dashboard YAML file cannot exceed 1 MB.
+
+The maximum depth of each YAML file is limited to 100. The maximum depth of a YAML
+file is the amount of nesting of its most nested key. Each hash and array on the
+path of the most nested key counts towards its depth. For example, the depth of the
+most nested key in the following YAML is 7:
+
+```yaml
+dashboard: 'Test dashboard'
+links:
+- title: Link 1
+  url: https://gitlab.com
+panel_groups:
+- group: Group A
+  priority: 1
+  panels:
+  - title: "Super Chart A1"
+    type: "area-chart"
+    y_label: "y_label"
+    weight: 1
+    max_value: 1
+    metrics:
+    - id: metric_a1
+      query_range: 'query'
+      unit: unit
+      label: Legend Label
+```
+
 ## Environment data on Deploy Boards
 
 [Deploy Boards](../user/project/deploy_boards.md) load information from Kubernetes about
@@ -274,7 +310,8 @@ characters and the rest will not be indexed and hence will not be searchable.
 This limit can be configured for self-managed installations when [enabling
 Elasticsearch](../integration/elasticsearch.md#enabling-elasticsearch).
 
-NOTE: **Note:** Set the limit to `0` to disable it.
+NOTE: **Note:**
+Set the limit to `0` to disable it.
 
 ## Wiki limits
 

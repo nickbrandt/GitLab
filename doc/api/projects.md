@@ -60,7 +60,7 @@ GET /projects
 | `with_programming_language`   | string   | no | Limit by projects which use the given programming language |
 | `wiki_checksum_failed`        | boolean  | no | **(PREMIUM)** Limit projects where the wiki checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
 | `repository_checksum_failed`  | boolean  | no | **(PREMIUM)** Limit projects where the repository checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
-| `min_access_level`            | integer  | no | Limit by current user minimal [access level](members.md) |
+| `min_access_level`            | integer  | no | Limit by current user minimal [access level](members.md#valid-access-levels) |
 | `id_after`                    | integer  | no | Limit results to projects with IDs greater than the specified ID |
 | `id_before`                   | integer  | no | Limit results to projects with IDs less than the specified ID |
 | `last_activity_after`         | datetime | no | Limit results to projects with last_activity after specified time. Format: ISO 8601 YYYY-MM-DDTHH:MM:SSZ |
@@ -351,7 +351,7 @@ GET /users/:user_id/projects
 | `with_issues_enabled` | boolean | no | Limit by enabled issues feature |
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature |
 | `with_programming_language` | string | no | Limit by projects which use the given programming language |
-| `min_access_level` | integer | no | Limit by current user minimal [access level](members.md) |
+| `min_access_level` | integer | no | Limit by current user minimal [access level](members.md#valid-access-levels) |
 | `id_after`                    | integer | no | Limit results to projects with IDs greater than the specified ID |
 | `id_before`                   | integer | no | Limit results to projects with IDs less than the specified ID |
 
@@ -571,7 +571,7 @@ GET /users/:user_id/starred_projects
 | `with_custom_attributes` | boolean | no | Include [custom attributes](custom_attributes.md) in response (admins only). |
 | `with_issues_enabled` | boolean | no | Limit by enabled issues feature. |
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature. |
-| `min_access_level` | integer | no | Limit by current user minimal [access level](members.md). |
+| `min_access_level` | integer | no | Limit by current user minimal [access level](members.md#valid-access-levels). |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/users/5/starred_projects"
@@ -1087,7 +1087,8 @@ POST /projects
 | `group_with_project_templates_id` | integer | no | **(PREMIUM)** For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires `use_custom_template` to be true |
 | `packages_enabled` | boolean | no | **(PREMIUM ONLY)** Enable or disable packages repository feature |
 
-NOTE: **Note:** If your HTTP repository is not publicly accessible,
+NOTE: **Note:**
+If your HTTP repository is not publicly accessible,
 add authentication information to the URL: `https://username:password@gitlab.company.com/group/project.git`
 where `password` is a public access key with the `api` scope enabled.
 
@@ -1157,7 +1158,8 @@ POST /projects/user/:user_id
 | `group_with_project_templates_id` | integer | no | **(PREMIUM)** For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires `use_custom_template` to be true |
 | `packages_enabled` | boolean | no | **(PREMIUM ONLY)** Enable or disable packages repository feature |
 
-NOTE: **Note:** If your HTTP repository is not publicly accessible,
+NOTE: **Note:**
+If your HTTP repository is not publicly accessible,
 add authentication information to the URL: `https://username:password@gitlab.company.com/group/project.git`
 where `password` is a public access key with the `api` scope enabled.
 
@@ -1228,7 +1230,8 @@ PUT /projects/:id
 | `packages_enabled` | boolean | no | **(PREMIUM ONLY)** Enable or disable packages repository feature |
 | `service_desk_enabled` | boolean | no | **(PREMIUM ONLY)** Enable or disable service desk feature |
 
-NOTE: **Note:** If your HTTP repository is not publicly accessible,
+NOTE: **Note:**
+If your HTTP repository is not publicly accessible,
 add authentication information to the URL: `https://username:password@gitlab.company.com/group/project.git`
 where `password` is a public access key with the `api` scope enabled.
 
@@ -1279,7 +1282,7 @@ GET /projects/:id/forks
 | `with_custom_attributes` | boolean | no | Include [custom attributes](custom_attributes.md) in response (admins only) |
 | `with_issues_enabled` | boolean | no | Limit by enabled issues feature |
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature |
-| `min_access_level` | integer | no | Limit by current user minimal [access level](members.md) |
+| `min_access_level` | integer | no | Limit by current user minimal [access level](members.md#valid-access-levels) |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/forks"
@@ -1831,12 +1834,19 @@ Example response:
 
 ## Remove project
 
-This endpoint either:
+This endpoint:
 
 - Removes a project including all associated resources (issues, merge requests etc).
-- From [GitLab 12.6](https://gitlab.com/gitlab-org/gitlab/-/issues/32935) on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers, marks a project for deletion. Actual
-  deletion happens after number of days specified in
-  [instance settings](../user/admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
+- From [GitLab 13.2](https://gitlab.com/gitlab-org/gitlab/-/issues/220382) on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers,
+group admins can [configure](../user/group/index.md#enabling-delayed-project-removal-premium) projects within a group
+to be deleted after a delayed period.
+When enabled, actual deletion happens after the number of days
+specified in the [default deletion period](../user/admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
+
+CAUTION: **Warning:**
+The default behavior of [Delayed Project deletion](https://gitlab.com/gitlab-org/gitlab/-/issues/32935) in GitLab 12.6
+was changed to [Immediate deletion](https://gitlab.com/gitlab-org/gitlab/-/issues/220382)
+in GitLab 13.2, as discussed in [Enabling delayed project removal](../user/group/index.md#enabling-delayed-project-removal-premium).
 
 ```plaintext
 DELETE /projects/:id
@@ -1909,7 +1919,7 @@ POST /projects/:id/share
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `group_id` | integer | yes | The ID of the group to share with |
-| `group_access` | integer | yes | The [permissions level](members.md) to grant the group |
+| `group_access` | integer | yes | The [access level](members.md#valid-access-levels) to grant the group |
 | `expires_at` | string | no | Share expiration date in ISO 8601 format: 2016-09-26 |
 
 ## Delete a shared project link within a group

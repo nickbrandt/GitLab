@@ -33,8 +33,8 @@ RSpec.describe Ci::RetryBuildService do
        job_artifacts_sast job_artifacts_secret_detection job_artifacts_dependency_scanning
        job_artifacts_container_scanning job_artifacts_dast
        job_artifacts_license_management job_artifacts_license_scanning
-       job_artifacts_performance job_artifacts_lsif
-       job_artifacts_terraform job_artifacts_cluster_applications
+       job_artifacts_performance job_artifacts_browser_performance job_artifacts_load_performance
+       job_artifacts_lsif job_artifacts_terraform job_artifacts_cluster_applications
        job_artifacts_codequality job_artifacts_metrics scheduled_at
        job_variables waiting_for_resource_at job_artifacts_metrics_referee
        job_artifacts_network_referee job_artifacts_dotenv
@@ -279,25 +279,16 @@ RSpec.describe Ci::RetryBuildService do
         end
       end
 
-      context 'when scheduling_type of build is nil' do
+      context 'when build has needs' do
         before do
-          build.update_columns(scheduling_type: nil)
+          create(:ci_build_need, build: build, name: 'build1')
+          create(:ci_build_need, build: build, name: 'build2')
         end
 
-        context 'when build has not needs' do
-          it 'sets scheduling_type as :stage' do
-            expect(new_build.scheduling_type).to eq('stage')
-          end
-        end
+        it 'bulk inserts all needs' do
+          expect(Ci::BuildNeed).to receive(:bulk_insert!).and_call_original
 
-        context 'when build has needs' do
-          before do
-            create(:ci_build_need, build: build)
-          end
-
-          it 'sets scheduling_type as :dag' do
-            expect(new_build.scheduling_type).to eq('dag')
-          end
+          new_build
         end
       end
     end

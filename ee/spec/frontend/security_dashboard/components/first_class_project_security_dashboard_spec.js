@@ -10,13 +10,13 @@ import FirstClassProjectSecurityDashboard, {
 } from 'ee/security_dashboard/components/first_class_project_security_dashboard.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
-import ProjectVulnerabilitiesApp from 'ee/vulnerabilities/components/project_vulnerabilities_app.vue';
+import ProjectVulnerabilitiesApp from 'ee/security_dashboard/components/project_vulnerabilities.vue';
 import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 
 const props = {
-  dashboardDocumentation: '/help/docs',
-  emptyStateSvgPath: '/svgs/empty/svg',
+  notEnabledScannersHelpPath: '/help/docs/',
+  noPipelineRunScannersHelpPath: '/new/pipeline',
   projectFullPath: '/group/project',
   securityDashboardHelpPath: '/security/dashboard/help-path',
   vulnerabilitiesExportEndpoint: '/vulnerabilities/exports',
@@ -24,6 +24,12 @@ const props = {
   userCalloutsPath: `${TEST_HOST}/user_callouts`,
   showIntroductionBanner: false,
 };
+
+const provide = {
+  dashboardDocumentation: '/help/docs',
+  emptyStateSvgPath: '/svgs/empty/svg',
+};
+
 const filters = { foo: 'bar' };
 
 describe('First class Project Security Dashboard component', () => {
@@ -41,6 +47,7 @@ describe('First class Project Security Dashboard component', () => {
         ...props,
         ...options.props,
       },
+      provide,
       stubs: { SecurityDashboardLayout, GlBanner },
       ...options,
     });
@@ -60,11 +67,7 @@ describe('First class Project Security Dashboard component', () => {
       expect(findVulnerabilities().exists()).toBe(true);
     });
 
-    it('should pass down the %s prop to the vulnerabilities', () => {
-      expect(findVulnerabilities().props('dashboardDocumentation')).toBe(
-        props.dashboardDocumentation,
-      );
-      expect(findVulnerabilities().props('emptyStateSvgPath')).toBe(props.emptyStateSvgPath);
+    it('should pass down the "projectFullPath" prop to the vulnerabilities', () => {
       expect(findVulnerabilities().props('projectFullPath')).toBe(props.projectFullPath);
     });
 
@@ -107,7 +110,7 @@ describe('First class Project Security Dashboard component', () => {
     });
 
     it('links the banner to the proper documentation page', () => {
-      expect(findIntroductionBanner().props('buttonLink')).toBe(props.dashboardDocumentation);
+      expect(findIntroductionBanner().props('buttonLink')).toBe(provide.dashboardDocumentation);
     });
 
     it('hides the banner when the user clicks on the dismiss button', () => {

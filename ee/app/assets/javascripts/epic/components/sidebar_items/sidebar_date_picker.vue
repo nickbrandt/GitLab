@@ -229,7 +229,7 @@ export default {
           type="radio"
           @click="toggleDateType(true)"
         />
-        <span v-show="!editing" class="prepend-left-5">{{ __('Fixed:') }}</span>
+        <span v-show="!editing" class="gl-ml-2">{{ __('Fixed:') }}</span>
         <date-picker
           v-if="editing"
           :selected-date="dateFixed"
@@ -244,7 +244,7 @@ export default {
               v-if="isDateInvalid && selectedDateIsFixed"
               v-popover="dateInvalidPopoverOptions"
               name="warning"
-              class="date-warning-icon gl-mr-2 prepend-left-5"
+              class="date-warning-icon gl-mr-2 gl-ml-2"
               tabindex="0"
             />
             <span v-if="selectedAndEditable" class="no-value d-flex">
@@ -277,13 +277,13 @@ export default {
           type="radio"
           @click="toggleDateType(false)"
         />
-        <span class="prepend-left-5">{{ __('Inherited:') }}</span>
+        <span class="gl-ml-2">{{ __('Inherited:') }}</span>
         <span class="value-content gl-ml-1">{{ dateFromMilestonesWords }}</span>
         <icon
           v-if="isDateInvalid && !selectedDateIsFixed"
           v-popover="dateInvalidPopoverOptions"
           name="warning"
-          class="date-warning-icon prepend-left-5"
+          class="date-warning-icon gl-ml-2"
           tabindex="0"
         />
       </abbr>

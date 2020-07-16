@@ -63,55 +63,50 @@ RSpec.describe Ci::Pipeline do
   end
 
   describe '#batch_lookup_report_artifact_for_file_type' do
-    subject(:artifact) { pipeline.batch_lookup_report_artifact_for_file_type(file_type) }
+    shared_examples '#batch_lookup_report_artifact_for_file_type' do |file_type, license|
+      context 'when feature is available' do
+        before do
+          stub_licensed_features("#{license}": true)
+        end
 
-    let(:build_artifact) { build.job_artifacts.sample }
-
-    context 'with security report artifact' do
-      let!(:build) { create(:ee_ci_build, :dependency_scanning, :success, pipeline: pipeline) }
-      let(:file_type) { :dependency_scanning }
-
-      before do
-        stub_licensed_features(dependency_scanning: true)
+        it "returns the #{file_type} artifact" do
+          expect(pipeline.batch_lookup_report_artifact_for_file_type(file_type)).to eq(pipeline.job_artifacts.sample)
+        end
       end
 
-      it 'returns right kind of artifacts' do
-        is_expected.to eq(build_artifact)
-      end
+      context 'when feature is not available' do
+        before do
+          stub_licensed_features("#{license}": false)
+        end
 
-      context 'when looking for other type of artifact' do
-        let(:file_type) { :codequality }
-
-        it 'returns nothing' do
-          is_expected.to be_nil
+        it "doesn't return the #{file_type} artifact" do
+          expect(pipeline.batch_lookup_report_artifact_for_file_type(file_type)).to be_nil
         end
       end
     end
 
-    context 'with license compliance artifact' do
-      before do
-        stub_licensed_features(license_scanning: true)
-      end
+    context 'with security report artifact' do
+      let_it_be(:pipeline, reload: true) { create(:ee_ci_pipeline, :with_dependency_scanning_report, project: project) }
 
-      [:license_management, :license_scanning].each do |artifact_type|
-        let!(:build) { create(:ee_ci_build, artifact_type, :success, pipeline: pipeline) }
+      include_examples '#batch_lookup_report_artifact_for_file_type', :dependency_scanning, :dependency_scanning
+    end
 
-        context 'when looking for license_scanning' do
-          let(:file_type) { :license_scanning }
+    context 'with license scanning artifact' do
+      let_it_be(:pipeline, reload: true) { create(:ee_ci_pipeline, :with_license_scanning_report, project: project) }
 
-          it 'returns artifact' do
-            is_expected.to eq(build_artifact)
-          end
-        end
+      include_examples '#batch_lookup_report_artifact_for_file_type', :license_scanning, :license_scanning
+    end
 
-        context 'when looking for license_management' do
-          let(:file_type) { :license_management }
+    context 'with browser performance artifact' do
+      let_it_be(:pipeline, reload: true) { create(:ee_ci_pipeline, :with_browser_performance_report, project: project) }
 
-          it 'returns artifact' do
-            is_expected.to eq(build_artifact)
-          end
-        end
-      end
+      include_examples '#batch_lookup_report_artifact_for_file_type', :browser_performance, :merge_request_performance_metrics
+    end
+
+    context 'with load performance artifact' do
+      let_it_be(:pipeline, reload: true) { create(:ee_ci_pipeline, :with_load_performance_report, project: project) }
+
+      include_examples '#batch_lookup_report_artifact_for_file_type', :load_performance, :merge_request_performance_metrics
     end
   end
 

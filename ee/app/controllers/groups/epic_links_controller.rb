@@ -20,6 +20,12 @@ class Groups::EpicLinksController < Groups::ApplicationController
 
   private
 
+  def authorize_admin!
+    return super unless action_name == 'destroy'
+
+    render_403 unless can?(current_user, 'destroy_epic_link', epic)
+  end
+
   def create_service
     EpicLinks::CreateService.new(epic, current_user, create_params)
   end

@@ -3,6 +3,7 @@
 import { __ } from '~/locale';
 import Flash from '~/flash';
 import { redirectTo } from '~/lib/utils/url_utility';
+import { spriteIcon } from '~/lib/utils/common_utils';
 
 import GitlabSlackService from '../services/gitlab_slack_service';
 
@@ -59,11 +60,11 @@ export default {
 
   computed: {
     doubleHeadedArrowSvg() {
-      return gl.utils.spriteIcon('double-headed-arrow');
+      return spriteIcon('double-headed-arrow');
     },
 
     arrowRightSvg() {
-      return gl.utils.spriteIcon('arrow-right');
+      return spriteIcon('arrow-right');
     },
 
     hasProjects() {
@@ -134,7 +135,7 @@ export default {
       </span>
     </div>
 
-    <div class="center prepend-top-20 append-bottom-10 gl-mr-2 prepend-left-5">
+    <div class="center prepend-top-20 append-bottom-10 gl-mr-2 gl-ml-2">
       <img v-once :src="gitlabForSlackGifPath" class="gitlab-slack-gif" />
     </div>
 

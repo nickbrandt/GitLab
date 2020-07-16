@@ -100,3 +100,9 @@ export const userList = {
   updated_at: '2020-02-04T08:13:10.507Z',
   path: '/path/to/user/list',
 };
+
+export const allUsersStrategy = {
+  name: ROLLOUT_STRATEGY_ALL_USERS,
+  parameters: {},
+  scopes: [],
+};

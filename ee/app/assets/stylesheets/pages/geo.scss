@@ -1,16 +1,10 @@
-@media (max-width: map-get($grid-breakpoints, sm)) {
+@media (max-width: $breakpoint-sm) {
   .geo-node-actions {
-    flex-direction: column;
     margin: 0 1rem;
 
-    .sm-column-spacing {
+    > * {
       width: 100%;
-      margin-top: 1rem;
     }
-  }
-
-  .geo-node-actions-container {
-    flex-direction: column;
   }
 }
 

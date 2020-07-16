@@ -21,9 +21,9 @@ For more information about Telemetry, see:
 More useful links:
 
 - [Telemetry Direction](https://about.gitlab.com/direction/telemetry/)
-- [Data Analysis Process](https://about.gitlab.com/handbook/business-ops/data-team/#-data-analysis-process)
-- [Data for Product Managers](https://about.gitlab.com/handbook/business-ops/data-team/data-programs/data-for-product-managers/)
-- [Data Infrastructure](https://about.gitlab.com/handbook/business-ops/data-team/data-platform/data-infrastructure/)
+- [Data Analysis Process](https://about.gitlab.com/handbook/business-ops/data-team/#data-analysis-process/)
+- [Data for Product Managers](https://about.gitlab.com/handbook/business-ops/data-team/programs/data-for-product-managers/)
+- [Data Infrastructure](https://about.gitlab.com/handbook/business-ops/data-team/platform/infrastructure/)
 
 ## What is Usage Ping?
 
@@ -396,6 +396,8 @@ appear to be associated to any of the services running, since they all appear to
 | `installation_type`                                       |                                      |               |                  |         |                                                                            |
 | `active_user_count`                                       |                                      |               |                  |         |                                                                            |
 | `recorded_at`                                             |                                      |               |                  |         |                                                                            |
+| `recording_ce_finished_at`                                |                                      |               |                  | CE+EE   | When the core features were computed                                       |
+| `recording_ee_finished_at`                                |                                      |               |                  | EE      | When the EE-specific features were computed                                |
 | `edition`                                                 |                                      |               |                  |         |                                                                            |
 | `license_md5`                                             |                                      |               |                  |         |                                                                            |
 | `license_id`                                              |                                      |               |                  |         |                                                                            |
@@ -449,6 +451,7 @@ appear to be associated to any of the services running, since they all appear to
 | `clusters_applications_runner`                            | `counts`                             | `configure`   |                  |         | Total GitLab Managed clusters with Runner enabled                          |
 | `clusters_applications_knative`                           | `counts`                             | `configure`   |                  |         | Total GitLab Managed clusters with Knative enabled                         |
 | `clusters_applications_elastic_stack`                     | `counts`                             | `configure`   |                  |         | Total GitLab Managed clusters with Elastic Stack enabled                   |
+| `clusters_applications_cilium`                            | `counts`                             | `configure`   |                  |         | Total GitLab Managed clusters with Cilium enabled                          |
 | `clusters_management_project`                             | `counts`                             | `configure`   |                  |         | Total GitLab Managed clusters with defined cluster management project      |
 | `in_review_folder`                                        | `counts`                             |               |                  |         |                                                                            |
 | `grafana_integrated_projects`                             | `counts`                             |               |                  |         |                                                                            |
@@ -522,6 +525,7 @@ appear to be associated to any of the services running, since they all appear to
 | `projects_jira_cloud_active`                              | `counts`                             |               |                  |         |                                                                            |
 | `projects_jira_dvcs_cloud_active`                         | `counts`                             |               |                  |         |                                                                            |
 | `projects_jira_dvcs_server_active`                        | `counts`                             |               |                  |         |                                                                            |
+| `projects_jira_issuelist_active`                          | `counts`                             | `create`      |                  | EE      | Total Jira Issue feature enabled                                                                           |
 | `labels`                                                  | `counts`                             |               |                  |         |                                                                            |
 | `merge_requests`                                          | `counts`                             |               |                  |         |                                                                            |
 | `merge_requests_users`                                    | `counts`                             |               |                  |         |                                                                            |
@@ -655,6 +659,9 @@ appear to be associated to any of the services running, since they all appear to
 | `remote_mirrors`                                                    | `usage_activity_by_stage`            | `create`      |                  | CE+EE   |                                                                            |
 | `snippets`                                                          | `usage_activity_by_stage`            | `create`      |                  | CE+EE   |                                                                            |
 | `merge_requests_users`                                              | `usage_activity_by_stage_monthly`    | `create`      |                  | CE+EE   | Unique count of users who used a merge request                             |
+| `action_monthly_active_users_project_repo`                          | `usage_activity_by_stage_monthly`    | `create`      |                  | CE+EE   | Unique count of users who pushed to a project repo                         |
+| `action_monthly_active_users_design_management`                     | `usage_activity_by_stage_monthly`    | `create`      |                  | CE+EE   | Unique count of users who interacted with the design system management     |
+| `action_monthly_active_users_wiki_repo`                             | `usage_activity_by_stage_monthly`    | `create`      |                  | CE+EE   | Unique count of users who created or updated a wiki repo                   |
 | `projects_enforcing_code_owner_approval`                            | `usage_activity_by_stage`            | `create`      |                  | EE      |                                                                            |
 | `merge_requests_with_optional_codeowners`                           | `usage_activity_by_stage`            | `create`      |                  | EE      |                                                                            |
 | `merge_requests_with_required_codeowners`                           | `usage_activity_by_stage`            | `create`      |                  | EE      |                                                                            |
@@ -662,6 +669,8 @@ appear to be associated to any of the services running, since they all appear to
 | `projects_with_repositories_enabled`                                | `usage_activity_by_stage`            | `create`      |                  | EE      |                                                                            |
 | `protected_branches`                                                | `usage_activity_by_stage`            | `create`      |                  | EE      |                                                                            |
 | `suggestions`                                                       | `usage_activity_by_stage`            | `create`      |                  | EE      |                                                                            |
+| `approval_project_rules`                                  | `usage_activity_by_stage`            | `create`      |                  | EE      | Number of project approval rules                                           |
+| `approval_project_rules_with_target_branch`               | `usage_activity_by_stage`            | `create`      |                  | EE      | Number of project approval rules with not default target branch            |
 | `clusters`                                                | `usage_activity_by_stage`            | `monitor`     |                  | CE+EE   |                                                                            |
 | `clusters_applications_prometheus`                        | `usage_activity_by_stage`            | `monitor`     |                  | CE+EE   |                                                                            |
 | `operations_dashboard_default_dashboard`                  | `usage_activity_by_stage`            | `monitor`     |                  | CE+EE   |                                                                            |
@@ -681,16 +690,25 @@ appear to be associated to any of the services running, since they all appear to
 | `ldap_group_sync_enabled`                                 | `usage_activity_by_stage`            | `manage`      |                  | EE      |                                                                            |
 | `ldap_admin_sync_enabled`                                 | `usage_activity_by_stage`            | `manage`      |                  | EE      |                                                                            |
 | `group_saml_enabled`                                      | `usage_activity_by_stage`            | `manage`      |                  | EE      |                                                                            |
-| `projects_jira_dvcs_server_active`                        | `usage_activity_by_stage`            | `plan`        |                  |         |                                                                            |
-| `service_desk_enabled_projects`                           | `usage_activity_by_stage`            | `plan`        |                  |         |                                                                            |
-| `service_desk_issues`                                     | `usage_activity_by_stage`            | `plan`        |                  |         |                                                                            |
-| `todos: 0`                                                | `usage_activity_by_stage`            | `plan`        |                  |         |                                                                            |
+| `issues`                                                  | `usage_activity_by_stage`            | `plan`        |                  | CE+EE   |                                                                            |
+| `notes`                                                   | `usage_activity_by_stage`            | `plan`        |                  | CE+EE   |                                                                            |
+| `projects`                                                | `usage_activity_by_stage`            | `plan`        |                  | CE+EE   |                                                                            |
+| `todos`                                                   | `usage_activity_by_stage`            | `plan`        |                  | CE+EE   |                                                                            |
+| `assignee_lists`                                          | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
+| `epics`                                                   | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
+| `label_lists`                                             | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
+| `milestone_lists`                                         | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
+| `projects_jira_active`                                    | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
+| `projects_jira_dvcs_server_active`                        | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
+| `projects_jira_dvcs_server_active`                        | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
+| `service_desk_enabled_projects`                           | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
+| `service_desk_issues`                                     | `usage_activity_by_stage`            | `plan`        |                  | EE      |                                                                            |
 | `deployments`                                             | `usage_activity_by_stage`            | `release`     |                  | CE+EE   | Total deployments                                                          |
 | `failed_deployments`                                      | `usage_activity_by_stage`            | `release`     |                  | CE+EE   | Total failed deployments                                                   |
 | `projects_mirrored_with_pipelines_enabled`                | `usage_activity_by_stage`            | `release`     |                  | EE      | Projects with repository mirroring enabled                                 |
 | `releases`                                                | `usage_activity_by_stage`            | `release`     |                  | CE+EE   | Unique release tags in project                                             |
 | `successful_deployments`                                  | `usage_activity_by_stage`            | `release`     |                  | CE+EE   | Total successful deployments                                               |
-| `user_preferences_group_overview_security_dashboard: 0`   | `usage_activity_by_stage`            | `secure`      |                  |         |                                                                            |
+| `user_preferences_group_overview_security_dashboard`      | `usage_activity_by_stage`            | `secure`      |                  |         |                                                                            |
 | `ci_builds`                                               | `usage_activity_by_stage`            | `verify`      |                  | CE+EE   | Unique builds in project                                                   |
 | `ci_external_pipelines`                                   | `usage_activity_by_stage`            | `verify`      |                  | CE+EE   | Total pipelines in external repositories                                   |
 | `ci_internal_pipelines`                                   | `usage_activity_by_stage`            | `verify`      |                  | CE+EE   | Total pipelines in GitLab repositories                                     |
@@ -716,6 +734,8 @@ appear to be associated to any of the services running, since they all appear to
 | `process_memory_uss`                                      | `topology > nodes > node_services`   | `enablement`  |                  |         | The average Unique Set Size of a service process                           |
 | `process_memory_pss`                                      | `topology > nodes > node_services`   | `enablement`  |                  |         | The average Proportional Set Size of a service process                     |
 | `server`                                                  | `topology > nodes > node_services`   | `enablement`  |                  |         | The type of web server used (Unicorn or Puma)                              |
+| `network_policy_forwards`                                 | `counts`                             | `defend`      |                  | EE      | Cumulative count of forwarded packets by Container Network                 |
+| `network_policy_drops`                                    | `counts`                             | `defend`      |                  | EE      | Cumulative count of dropped packets by Container Network                   |
 
 ## Example Usage Ping payload
 

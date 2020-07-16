@@ -12,6 +12,7 @@ const customDashboardsData = new Array(30).fill(null).map((_, idx) => ({
   display_name: `Custom Dashboard ${idx}`,
   can_edit: true,
   system_dashboard: false,
+  out_of_the_box_dashboard: false,
   project_blob_path: `${mockProjectDir}/blob/master/dashboards/.gitlab/dashboards/dashboard_${idx}.yml`,
   path: `.gitlab/dashboards/dashboard_${idx}.yml`,
   starred: false,
@@ -49,136 +50,6 @@ export const anomalyDeploymentData = [
     'last?': false,
   },
 ];
-
-export const anomalyMockResultValues = {
-  noAnomaly: [
-    [
-      ['2019-08-19T19:00:00.000Z', 1.25],
-      ['2019-08-19T20:00:00.000Z', 1.45],
-      ['2019-08-19T21:00:00.000Z', 1.55],
-      ['2019-08-19T22:00:00.000Z', 1.48],
-    ],
-    [
-      // upper boundary
-      ['2019-08-19T19:00:00.000Z', 2],
-      ['2019-08-19T20:00:00.000Z', 2.55],
-      ['2019-08-19T21:00:00.000Z', 2.65],
-      ['2019-08-19T22:00:00.000Z', 3.0],
-    ],
-    [
-      // lower boundary
-      ['2019-08-19T19:00:00.000Z', 0.45],
-      ['2019-08-19T20:00:00.000Z', 0.65],
-      ['2019-08-19T21:00:00.000Z', 0.7],
-      ['2019-08-19T22:00:00.000Z', 0.8],
-    ],
-  ],
-  noBoundary: [
-    [
-      ['2019-08-19T19:00:00.000Z', 1.25],
-      ['2019-08-19T20:00:00.000Z', 1.45],
-      ['2019-08-19T21:00:00.000Z', 1.55],
-      ['2019-08-19T22:00:00.000Z', 1.48],
-    ],
-    [
-      // empty upper boundary
-    ],
-    [
-      // empty lower boundary
-    ],
-  ],
-  oneAnomaly: [
-    [
-      ['2019-08-19T19:00:00.000Z', 1.25],
-      ['2019-08-19T20:00:00.000Z', 3.45], // anomaly
-      ['2019-08-19T21:00:00.000Z', 1.55],
-    ],
-    [
-      // upper boundary
-      ['2019-08-19T19:00:00.000Z', 2],
-      ['2019-08-19T20:00:00.000Z', 2.55],
-      ['2019-08-19T21:00:00.000Z', 2.65],
-    ],
-    [
-      // lower boundary
-      ['2019-08-19T19:00:00.000Z', 0.45],
-      ['2019-08-19T20:00:00.000Z', 0.65],
-      ['2019-08-19T21:00:00.000Z', 0.7],
-    ],
-  ],
-  negativeBoundary: [
-    [
-      ['2019-08-19T19:00:00.000Z', 1.25],
-      ['2019-08-19T20:00:00.000Z', 3.45], // anomaly
-      ['2019-08-19T21:00:00.000Z', 1.55],
-    ],
-    [
-      // upper boundary
-      ['2019-08-19T19:00:00.000Z', 2],
-      ['2019-08-19T20:00:00.000Z', 2.55],
-      ['2019-08-19T21:00:00.000Z', 2.65],
-    ],
-    [
-      // lower boundary
-      ['2019-08-19T19:00:00.000Z', -1.25],
-      ['2019-08-19T20:00:00.000Z', -2.65],
-      ['2019-08-19T21:00:00.000Z', -3.7], // lowest point
-    ],
-  ],
-};
-
-export const anomalyMockGraphData = {
-  title: 'Requests Per Second Mock Data',
-  type: 'anomaly-chart',
-  weight: 3,
-  metrics: [
-    {
-      metricId: '90',
-      id: 'metric',
-      query_range: 'MOCK_PROMETHEUS_METRIC_QUERY_RANGE',
-      unit: 'RPS',
-      label: 'Metrics RPS',
-      metric_id: 90,
-      prometheus_endpoint_path: 'MOCK_METRIC_PEP',
-      result: [
-        {
-          metric: {},
-          values: [['2019-08-19T19:00:00.000Z', 0]],
-        },
-      ],
-    },
-    {
-      metricId: '91',
-      id: 'upper',
-      query_range: '...',
-      unit: 'RPS',
-      label: 'Upper Limit Metrics RPS',
-      metric_id: 91,
-      prometheus_endpoint_path: 'MOCK_UPPER_PEP',
-      result: [
-        {
-          metric: {},
-          values: [['2019-08-19T19:00:00.000Z', 0]],
-        },
-      ],
-    },
-    {
-      metricId: '92',
-      id: 'lower',
-      query_range: '...',
-      unit: 'RPS',
-      label: 'Lower Limit Metrics RPS',
-      metric_id: 92,
-      prometheus_endpoint_path: 'MOCK_LOWER_PEP',
-      result: [
-        {
-          metric: {},
-          values: [['2019-08-19T19:00:00.000Z', 0]],
-        },
-      ],
-    },
-  ],
-};
 
 export const deploymentData = [
   {
@@ -302,6 +173,7 @@ export const dashboardGitResponse = [
     display_name: 'Default',
     can_edit: false,
     system_dashboard: true,
+    out_of_the_box_dashboard: true,
     project_blob_path: null,
     path: 'config/prometheus/common_metrics.yml',
     starred: false,
@@ -312,6 +184,44 @@ export const dashboardGitResponse = [
     display_name: 'dashboard.yml',
     can_edit: true,
     system_dashboard: false,
+    out_of_the_box_dashboard: false,
+    project_blob_path: `${mockProjectDir}/-/blob/master/.gitlab/dashboards/dashboard.yml`,
+    path: '.gitlab/dashboards/dashboard.yml',
+    starred: true,
+    user_starred_path: `${mockProjectDir}/metrics_user_starred_dashboards?dashboard_path=.gitlab/dashboards/dashboard.yml`,
+  },
+  {
+    default: false,
+    display_name: 'Pod Health',
+    can_edit: false,
+    system_dashboard: false,
+    out_of_the_box_dashboard: true,
+    project_blob_path: null,
+    path: 'config/prometheus/pod_metrics.yml',
+    starred: false,
+    user_starred_path: `${mockProjectDir}/metrics_user_starred_dashboards?dashboard_path=config/prometheus/pod_metrics.yml`,
+  },
+  ...customDashboardsData,
+];
+
+export const selfMonitoringDashboardGitResponse = [
+  {
+    default: true,
+    display_name: 'Default',
+    can_edit: false,
+    system_dashboard: false,
+    out_of_the_box_dashboard: true,
+    project_blob_path: null,
+    path: 'config/prometheus/self_monitoring_default.yml',
+    starred: false,
+    user_starred_path: `${mockProjectDir}/metrics_user_starred_dashboards?dashboard_path=config/prometheus/self_monitoring_default.yml`,
+  },
+  {
+    default: false,
+    display_name: 'dashboard.yml',
+    can_edit: true,
+    system_dashboard: false,
+    out_of_the_box_dashboard: false,
     project_blob_path: `${mockProjectDir}/-/blob/master/.gitlab/dashboards/dashboard.yml`,
     path: '.gitlab/dashboards/dashboard.yml',
     starred: true,
@@ -333,36 +243,6 @@ export const metricsResult = [
     ],
   },
 ];
-
-export const singleStatMetricsResult = {
-  title: 'Super Chart A2',
-  type: 'single-stat',
-  weight: 2,
-  metrics: [
-    {
-      id: 'metric_a1',
-      metricId: '2',
-      query: 'max(go_memstats_alloc_bytes{job="prometheus"}) by (job) /1024/1024',
-      unit: 'MB',
-      label: 'Total Consumption',
-      metric_id: 2,
-      prometheus_endpoint_path:
-        '/root/kubernetes-gke-project/environments/35/prometheus/api/v1/query?query=max%28go_memstats_alloc_bytes%7Bjob%3D%22prometheus%22%7D%29+by+%28job%29+%2F1024%2F1024',
-      result: [
-        {
-          metric: { job: 'prometheus' },
-          value: ['2019-06-26T21:03:20.881Z', 91],
-          values: [['2019-06-26T21:03:20.881Z', 91]],
-        },
-      ],
-    },
-  ],
-};
-
-export const singleStatMetricsWithFieldResult = {
-  ...singleStatMetricsResult,
-  field: 'job',
-};
 
 export const graphDataPrometheusQueryRangeMultiTrack = {
   title: 'Super Chart A3',

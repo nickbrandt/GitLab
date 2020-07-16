@@ -130,9 +130,9 @@ module EE
           end
 
           def find_iterations(project, params = {})
-            group_ids = project.group.self_and_ancestors.select(:id) if project.group
+            group_ids = project.group.self_and_ancestors.map(&:id) if project.group
 
-            ::IterationsFinder.new(params.merge(project_ids: [project.id], group_ids: group_ids)).execute
+            ::IterationsFinder.new(current_user, params.merge(project_ids: [project.id], group_ids: group_ids)).execute
           end
 
           desc _('Publish to status page')

@@ -218,7 +218,7 @@ include:
 
 See the [Auto DevOps template](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml) for information on available jobs.
 
-CAUTION: **Deprecation**
+CAUTION: **Deprecation:**
 Auto DevOps templates using the [`only`](../../ci/yaml/README.md#onlyexcept-basic) or
 [`except`](../../ci/yaml/README.md#onlyexcept-basic) syntax will switch
 to the [`rules`](../../ci/yaml/README.md#rules) syntax, starting in
@@ -243,7 +243,7 @@ postgres://user:password@postgres-host:postgres-port/postgres-database
 
 ### Upgrading PostgresSQL
 
-CAUTION: **Deprecation**
+CAUTION: **Deprecation:**
 The variable `AUTO_DEVOPS_POSTGRES_CHANNEL` that controls default provisioned
 PostgreSQL was changed to `2` in [GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/210499).
 To keep using the old PostgreSQL, set the `AUTO_DEVOPS_POSTGRES_CHANNEL` variable to
@@ -364,7 +364,8 @@ The following table lists variables used to disable jobs.
 | `DAST_DISABLED`                         | From GitLab 11.0, used to disable the `dast` job. If the variable is present, the job won't be created. |
 | `DEPENDENCY_SCANNING_DISABLED`          | From GitLab 11.0, used to disable the `dependency_scanning` job. If the variable is present, the job won't be created. |
 | `LICENSE_MANAGEMENT_DISABLED`           | From GitLab 11.0, used to disable the `license_management` job. If the variable is present, the job won't be created. |
-| `PERFORMANCE_DISABLED`                  | From GitLab 11.0, used to disable the `performance` job. If the variable is present, the job won't be created. |
+| `PERFORMANCE_DISABLED`                  | From GitLab 11.0, used to disable the browser `performance` job. If the variable is present, the job won't be created. |
+| `LOAD_PERFORMANCE_DISABLED`             | From GitLab 13.2, used to disable the `load_performance` job. If the variable is present, the job won't be created. |
 | `REVIEW_DISABLED`                       | From GitLab 11.0, used to disable the `review` and the manual `review:stop` job. If the variable is present, these jobs won't be created. |
 | `SAST_DISABLED`                         | From GitLab 11.0, used to disable the `sast` job. If the variable is present, the job won't be created. |
 | `TEST_DISABLED`                         | From GitLab 11.0, used to disable the `test` job. If the variable is present, the job won't be created. |

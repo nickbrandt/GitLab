@@ -20,6 +20,8 @@ RSpec.describe Vulnerabilities::CreateService do
       project.add_developer(user)
     end
 
+    it_behaves_like 'calls Vulnerabilities::Statistics::UpdateService'
+
     it 'creates a vulnerability from finding and attaches it to the vulnerability' do
       expect { subject }.to change { project.vulnerabilities.count }.by(1)
       expect(project.vulnerabilities.last).to(

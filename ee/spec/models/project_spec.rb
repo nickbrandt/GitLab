@@ -34,13 +34,13 @@ RSpec.describe Project do
     it { is_expected.to have_many(:vulnerability_feedback) }
     it { is_expected.to have_many(:vulnerability_exports) }
     it { is_expected.to have_many(:vulnerability_scanners) }
+    it { is_expected.to have_many(:dast_site_profiles) }
+    it { is_expected.to have_many(:dast_sites) }
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to have_many(:protected_environments) }
     it { is_expected.to have_many(:approvers).dependent(:destroy) }
     it { is_expected.to have_many(:approver_users).through(:approvers) }
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
-    it { is_expected.to have_many(:packages).class_name('Packages::Package') }
-    it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
     it { is_expected.to have_many(:upstream_project_subscriptions) }
     it { is_expected.to have_many(:upstream_projects) }
     it { is_expected.to have_many(:downstream_project_subscriptions) }
@@ -490,68 +490,31 @@ RSpec.describe Project do
 
   context 'merge requests related settings' do
     shared_examples 'setting modified by application setting' do
-      context 'when compliance merge request approval settings feature flag is enabled' do
-        using RSpec::Parameterized::TableSyntax
-
-        where(:app_setting, :project_setting, :regulated_settings, :final_setting) do
-          true     | true      | true   | true
-          false    | true      | true   | false
-          true     | false     | true   | true
-          false    | false     | true   | false
-          true     | true      | false  | true
-          false    | true      | false  | true
-          true     | false     | false  | false
-          false    | false     | false  | false
-        end
-
-        with_them do
-          let(:project) { create(:project) }
-
-          before do
-            stub_feature_flags(project_compliance_merge_request_approval_settings: true)
-            stub_licensed_features(admin_merge_request_approvers_rules: true)
-
-            allow(project).to receive(:has_regulated_settings?).and_return(regulated_settings)
-            stub_application_setting(application_setting => app_setting)
-            project.update(setting => project_setting)
-          end
-
-          it 'shows proper setting' do
-            expect(project.send(setting)).to eq(final_setting)
-            expect(project.send("#{setting}?")).to eq(final_setting)
-          end
-        end
+      where(:app_setting, :project_setting, :regulated_settings, :final_setting) do
+        true  | true  | true  | true
+        false | true  | true  | false
+        true  | false | true  | true
+        false | false | true  | false
+        true  | true  | false | true
+        false | true  | false | true
+        true  | false | false | false
+        false | false | false | false
       end
 
-      context 'when compliance merge request approval settings feature flag is disabled' do
-        using RSpec::Parameterized::TableSyntax
+      with_them do
+        let(:project) { create(:project) }
 
-        where(:app_setting, :project_setting, :feature_enabled, :final_setting) do
-          true     | true      | true   | true
-          false    | true      | true   | true
-          true     | false     | true   | true
-          false    | false     | true   | false
-          true     | true      | false  | true
-          false    | true      | false  | true
-          true     | false     | false  | false
-          false    | false     | false  | false
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+
+          allow(project).to receive(:has_regulated_settings?).and_return(regulated_settings)
+          stub_application_setting(application_setting => app_setting)
+          project.update(setting => project_setting)
         end
 
-        with_them do
-          let(:project) { create(:project) }
-
-          before do
-            stub_feature_flags(project_compliance_merge_request_approval_settings: false)
-
-            stub_licensed_features(feature => feature_enabled)
-            stub_application_setting(application_setting => app_setting)
-            project.update(setting => project_setting)
-          end
-
-          it 'shows proper setting' do
-            expect(project.send(setting)).to eq(final_setting)
-            expect(project.send("#{setting}?")).to eq(final_setting)
-          end
+        it 'shows proper setting' do
+          expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
         end
       end
     end
@@ -578,66 +541,31 @@ RSpec.describe Project do
       let(:setting) { :merge_requests_author_approval }
       let(:application_setting) { :prevent_merge_requests_author_approval }
 
-      context 'when compliance merge request approval settings feature flag is enabled' do
-        using RSpec::Parameterized::TableSyntax
-
-        where(:app_setting, :project_setting, :regulated_settings, :final_setting) do
-          true     | true      | true   | false
-          false    | true      | true   | true
-          true     | false     | true   | false
-          false    | false     | true   | true
-          true     | true      | false  | true
-          false    | true      | false  | true
-          true     | false     | false  | false
-          false    | false     | false  | false
-        end
-
-        with_them do
-          let(:project) { create(:project) }
-
-          before do
-            stub_feature_flags(project_compliance_merge_request_approval_settings: true)
-            stub_licensed_features(admin_merge_request_approvers_rules: true)
-
-            allow(project).to receive(:has_regulated_settings?).and_return(regulated_settings)
-            stub_application_setting(application_setting => app_setting)
-            project.update(setting => project_setting)
-          end
-
-          it 'shows proper setting' do
-            expect(project.send(setting)).to eq(final_setting)
-            expect(project.send("#{setting}?")).to eq(final_setting)
-          end
-        end
+      where(:app_setting, :project_setting, :regulated_settings, :final_setting) do
+        true  | true  | true  | false
+        false | true  | true  | true
+        true  | false | true  | false
+        false | false | true  | true
+        true  | true  | false | true
+        false | true  | false | true
+        true  | false | false | false
+        false | false | false | false
       end
 
-      context 'when compliance merge request approval settings feature flag is disabled' do
-        using RSpec::Parameterized::TableSyntax
+      with_them do
+        let(:project) { create(:project) }
 
-        where(:app_setting, :project_setting, :feature_enabled, :final_setting) do
-          true     | true      | true   | false
-          false    | true      | true   | true
-          true     | false     | true   | false
-          false    | false     | true   | false
-          true     | true      | false  | true
-          false    | true      | false  | true
-          true     | false     | false  | false
-          false    | false     | false  | false
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+
+          allow(project).to receive(:has_regulated_settings?).and_return(regulated_settings)
+          stub_application_setting(application_setting => app_setting)
+          project.update(setting => project_setting)
         end
 
-        with_them do
-          before do
-            stub_feature_flags(project_compliance_merge_request_approval_settings: false)
-
-            stub_licensed_features(feature => feature_enabled)
-            stub_application_setting(application_setting => app_setting)
-            project.update(setting => project_setting)
-          end
-
-          it 'shows proper setting' do
-            expect(project.send(setting)).to eq(final_setting)
-            expect(project.send("#{setting}?")).to eq(final_setting)
-          end
+        it 'shows proper setting' do
+          expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
         end
       end
     end
@@ -1926,12 +1854,6 @@ RSpec.describe Project do
     end
   end
 
-  describe '#packages_enabled' do
-    subject { create(:project).packages_enabled }
-
-    it { is_expected.to be true }
-  end
-
   describe '#update_root_ref' do
     let(:project) { create(:project, :repository) }
 
@@ -2383,33 +2305,6 @@ RSpec.describe Project do
       .and_return(host: host)
   end
 
-  describe '#package_already_taken?' do
-    let(:namespace) { create(:namespace) }
-    let(:project) { create(:project, :public, namespace: namespace) }
-    let!(:package) { create(:npm_package, project: project, name: "@#{namespace.path}/foo") }
-
-    context 'no package exists with the same name' do
-      it 'returns false' do
-        result = project.package_already_taken?("@#{namespace.path}/bar")
-        expect(result).to be false
-      end
-
-      it 'returns false if it is the project that the package belongs to' do
-        result = project.package_already_taken?("@#{namespace.path}/foo")
-        expect(result).to be false
-      end
-    end
-
-    context 'a package already exists with the same name' do
-      let(:alt_project) { create(:project, :public, namespace: namespace) }
-
-      it 'returns true' do
-        result = alt_project.package_already_taken?("@#{namespace.path}/foo")
-        expect(result).to be true
-      end
-    end
-  end
-
   describe '#ancestor_marked_for_deletion' do
     context 'adjourned deletion feature is not available' do
       before do
@@ -2468,51 +2363,45 @@ RSpec.describe Project do
   end
 
   describe '#adjourned_deletion?' do
-    context 'when marking for deletion feature is available' do
-      let(:project) { create(:project) }
+    using RSpec::Parameterized::TableSyntax
+
+    subject { project.adjourned_deletion? }
+
+    where(:licensed?, :feature_enabled_on_group?, :adjourned_period, :result) do
+      true    | true  | 0 | false
+      true    | true  | 1 | true
+      true    | false | 0 | false
+      true    | false | 1 | false
+      false   | true  | 0 | false
+      false   | true  | 1 | false
+      false   | false | 0 | false
+      false   | false | 1 | false
+    end
+
+    with_them do
+      let_it_be(:group) { create(:group) }
+      let_it_be(:project) { create(:project, group: group) }
+
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: licensed?)
+        stub_application_setting(deletion_adjourned_period: adjourned_period)
+        allow(group).to receive(:delayed_project_removal?).and_return(feature_enabled_on_group?)
+      end
+
+      it { is_expected.to be result }
+    end
+
+    context 'when project belongs to user namespace' do
+      let_it_be(:user) { create(:user) }
+      let_it_be(:user_project) { create(:project, namespace: user.namespace) }
 
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+        stub_application_setting(deletion_adjourned_period: 7)
       end
 
-      context 'when number of days is set to more than 0' do
-        it 'returns true' do
-          stub_application_setting(deletion_adjourned_period: 1)
-
-          expect(project.adjourned_deletion?).to eq(true)
-        end
-      end
-
-      context 'when number of days is set to 0' do
-        it 'returns false' do
-          stub_application_setting(deletion_adjourned_period: 0)
-
-          expect(project.adjourned_deletion?).to eq(false)
-        end
-      end
-    end
-
-    context 'when marking for deletion feature is not available' do
-      let(:project) { create(:project) }
-
-      before do
-        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
-      end
-
-      context 'when number of days is set to more than 0' do
-        it 'returns false' do
-          stub_application_setting(deletion_adjourned_period: 1)
-
-          expect(project.adjourned_deletion?).to eq(false)
-        end
-      end
-
-      context 'when number of days is set to 0' do
-        it 'returns false' do
-          stub_application_setting(deletion_adjourned_period: 0)
-
-          expect(project.adjourned_deletion?).to eq(false)
-        end
+      it 'deletes immediately' do
+        expect(user_project.adjourned_deletion?).to be nil
       end
     end
   end

@@ -70,6 +70,9 @@ export default {
     useConvertReportType() {
       return convertReportType(this.vulnerability.report_type);
     },
+    vulnerabilityVendor() {
+      return this.vulnerability.scanner?.vendor;
+    },
   },
   methods: {
     ...mapActions('vulnerabilities', ['openModal', 'selectVulnerability', 'deselectVulnerability']),
@@ -145,15 +148,23 @@ export default {
 
     <div class="table-section gl-white-space-normal section-15">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Identifier') }}</div>
-      <div class="table-mobile-content">
+      <div
+        class="table-mobile-content gl-text-overflow-ellipsis gl-overflow-hidden"
+        :title="vulnerabilityIdentifier"
+      >
         {{ vulnerabilityIdentifier }}
       </div>
     </div>
 
     <div class="table-section section-15">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Scanner') }}</div>
-      <div class="table-mobile-content text-capitalize">
-        {{ useConvertReportType }}
+      <div class="table-mobile-content">
+        <div class="text-capitalize">
+          {{ useConvertReportType }}
+        </div>
+        <div v-if="vulnerabilityVendor" class="gl-text-gray-500" data-testid="vulnerability-vendor">
+          {{ vulnerabilityVendor }}
+        </div>
       </div>
     </div>
 

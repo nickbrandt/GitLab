@@ -20,6 +20,7 @@ module Vulnerabilities
         finding = @project.vulnerability_findings.lock_for_confirmation!(@finding_id)
 
         save_vulnerability(vulnerability, finding)
+        Statistics::UpdateService.update_for(vulnerability)
       rescue ActiveRecord::RecordNotFound
         vulnerability.errors.add(:base, _('finding is not found or is already attached to a vulnerability'))
         raise ActiveRecord::Rollback

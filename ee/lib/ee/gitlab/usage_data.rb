@@ -37,7 +37,8 @@ module EE
           super + [
             ::Gitlab::UsageDataCounters::LicensesList,
             ::Gitlab::UsageDataCounters::IngressModsecurityCounter,
-            StatusPage::UsageDataCounters::IncidentCounter
+            StatusPage::UsageDataCounters::IncidentCounter,
+            ::Gitlab::UsageDataCounters::NetworkPolicyCounter
           ]
         end
 
@@ -97,6 +98,13 @@ module EE
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
+        def approval_rules_counts
+          {
+            approval_project_rules: count(ApprovalProjectRule),
+            approval_project_rules_with_target_branch: count(ApprovalProjectRulesProtectedBranch, :approval_project_rule_id)
+          }
+        end
+
         def service_desk_counts
           projects_with_service_desk = ::Project.where(service_desk_enabled: true)
 
@@ -186,7 +194,8 @@ module EE
         def jira_usage
           super.merge(
             projects_jira_dvcs_cloud_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled),
-            projects_jira_dvcs_server_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false))
+            projects_jira_dvcs_server_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false)),
+            projects_jira_issuelist_active: projects_jira_issuelist_active
           )
         end
 
@@ -218,12 +227,15 @@ module EE
                                                                :creator_id,
                                                                start: user_minimum_id,
                                                                finish: user_maximum_id),
-            protected_branches: distinct_count(::Project.with_protected_branches.where(time_period), :creator_id, start: user_minimum_id, finish: user_maximum_id),
+            protected_branches: distinct_count(::Project.with_protected_branches.where(time_period),
+                                               :creator_id,
+                                               start: user_minimum_id,
+                                               finish: user_maximum_id),
             suggestions: distinct_count(::Note.with_suggestions.where(time_period),
                                         :author_id,
                                         start: user_minimum_id,
                                         finish: user_maximum_id)
-          })
+          }, approval_rules_counts)
         end
 
         # Omitted because no user, creator or author associated: `campaigns_imported_from_github`, `ldap_group_links`
@@ -266,17 +278,13 @@ module EE
           super.merge({
             assignee_lists: distinct_count(::List.assignee.where(time_period), :user_id),
             epics: distinct_count(::Epic.where(time_period), :author_id),
-            issues: distinct_count(::Issue.where(time_period), :author_id),
             label_lists: distinct_count(::List.label.where(time_period), :user_id),
             milestone_lists: distinct_count(::List.milestone.where(time_period), :user_id),
-            notes: distinct_count(::Note.where(time_period), :author_id),
-            projects: distinct_count(::Project.where(time_period), :creator_id),
             projects_jira_active: distinct_count(::Project.with_active_jira_services.where(time_period), :creator_id),
             projects_jira_dvcs_cloud_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_cloud.where(time_period), :creator_id),
             projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id),
             service_desk_enabled_projects: distinct_count_service_desk_enabled_projects(time_period),
-            service_desk_issues: count(::Issue.service_desk.where(time_period)),
-            todos: distinct_count(::Todo.where(time_period), :author_id)
+            service_desk_issues: count(::Issue.service_desk.where(time_period))
           })
         end
 
@@ -341,6 +349,15 @@ module EE
         def ldap_available_servers
           ::Gitlab::Auth::Ldap::Config.available_servers
         end
+
+        # rubocop:disable CodeReuse/ActiveRecord
+        def projects_jira_issuelist_active
+          min_id = JiraTrackerData.where(issues_enabled: true).minimum(:service_id)
+          max_id = JiraTrackerData.where(issues_enabled: true).maximum(:service_id)
+
+          count(::JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
+        end
+        # rubocop:enable CodeReuse/ActiveRecord
       end
     end
   end

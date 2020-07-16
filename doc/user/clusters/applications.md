@@ -963,8 +963,8 @@ a corresponding cluster type. The default value is blank. You can
 check the recommended variables for each cluster type in the official
 documentation:
 
-- [Google GKE](https://cilium.readthedocs.io/en/stable/gettingstarted/k8s-install-gke/#prepare-deploy-cilium)
-- [AWS EKS](https://cilium.readthedocs.io/en/stable/gettingstarted/k8s-install-eks/#prepare-deploy-cilium)
+- [Google GKE](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-gke/#deploy-cilium)
+- [AWS EKS](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-eks/#deploy-cilium)
 
 You can customize Cilium's Helm variables by defining the
 `.gitlab/managed-apps/cilium/values.yaml` file in your cluster
@@ -974,9 +974,9 @@ for the available configuration options.
 
 CAUTION: **Caution:**
 Installation and removal of the Cilium requires a **manual**
-[restart](https://cilium.readthedocs.io/en/stable/gettingstarted/k8s-install-gke/#restart-remaining-pods)
+[restart](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-gke/#restart-unmanaged-pods)
 of all affected pods in all namespaces to ensure that they are
-[managed](https://cilium.readthedocs.io/en/stable/troubleshooting/#ensure-pod-is-managed-by-cilium)
+[managed](https://docs.cilium.io/en/stable/troubleshooting/#ensure-pod-is-managed-by-cilium)
 by the correct networking plugin.
 
 NOTE: **Note:**
@@ -984,21 +984,20 @@ Major upgrades might require additional setup steps, please consult
 the official [upgrade guide](https://docs.cilium.io/en/stable/install/upgrade/) for more
 information.
 
-By default, Cilium drops all disallowed packets upon policy
-deployment. In
-[auditmode](https://docs.cilium.io/en/v1.8/gettingstarted/policy-creation/?highlight=policy-audit#enable-policy-audit-mode),
-however, Cilium doesn't drop disallowed packets. You can use
-`policy-verdict` log to observe policy-related decisions. You can
-enable audit mode by adding the following to
+By default, Cilium's [audit
+mode](https://docs.cilium.io/en/v1.8/gettingstarted/policy-creation/?highlight=policy-audit#enable-policy-audit-mode)
+is enabled. In audit mode, Cilium doesn't drop disallowed packets. You
+can use `policy-verdict` log to observe policy-related decisions. You
+can disable audit mode by adding the following to
 `.gitlab/managed-apps/cilium/values.yaml`:
 
 ```yaml
 config:
-  policyAuditMode: true
+  policyAuditMode: false
 
 agent:
   monitor:
-    eventTypes: ["drop", "policy-verdict"]
+    eventTypes: ["drop"]
 ```
 
 The Cilium monitor log for traffic is logged out by the
@@ -1453,6 +1452,45 @@ podAnnotations:
 
 The only information to be changed here is the profile name which is `profile-one` in this example. Refer to the [AppArmor tutorial](https://kubernetes.io/docs/tutorials/clusters/apparmor/#securing-a-pod) for more information on how AppArmor is integrated in Kubernetes.
 
+#### Using PodSecurityPolicy in your deployments
+
+NOTE: **Note:**
+To enable AppArmor annotations on a Pod Security Policy you must first
+load the correspondingAppArmor profile.
+
+[Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/)are
+resources at the cluster level that control security-related
+properties of deployed pods. You can use such a policy to enable
+loaded AppArmor profiles and apply necessary pod restrictions across a
+cluster. You can deploy a new policy by adding the following
+to`.gitlab/managed-apps/apparmor/values.yaml`:
+
+```yaml
+securityPolicies:
+  example:
+    defaultProfile: profile-one
+    allowedProfiles:
+    - profile-one
+    - profile-two
+    spec:
+      privileged: false
+      seLinux:
+        rule: RunAsAny
+      supplementalGroups:
+        rule: RunAsAny
+      runAsUser:
+        rule: RunAsAny
+      fsGroup:
+        rule: RunAsAny
+      volumes:
+        - '*'
+```
+
+This example creates a single policy named `example` with the provided
+specification, and enables [AppArmor
+annotations](https://kubernetes.io/docs/tutorials/clusters/apparmor/#podsecuritypolicy-annotations)on
+it.
+
 NOTE: **Note:**
 Support for installing the AppArmor managed application is provided by the GitLab Container Security group.
 If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Container Security group](https://about.gitlab.com/handbook/product/product-categories/#container-security-group).
@@ -1556,3 +1594,16 @@ The number and size of nodes might not have enough IP addresses to run or instal
 
 For reference, all the AWS instance IP limits are found
 [in this AWS repository on GitHub](https://github.com/aws/amazon-vpc-cni-k8s/blob/master/pkg/awsutils/vpc_ip_resource_limit.go) (search for `InstanceENIsAvailable`).
+
+### Unable to install Prometheus
+
+Installing Prometheus is failing with the following error:
+
+```shell
+# kubectl -n gitlab-managed-apps logs install-prometheus
+...
+Error: Could not get apiVersions from Kubernetes: unable to retrieve the complete list of server APIs: admission.certmanager.k8s.io/v1beta1: the server is currently unable to handle the request
+```
+
+This is a bug that was introduced in Helm `2.15` and fixed in `3.0.2`. As a workaround, you'll need
+to make sure that [`cert-manager`](#cert-manager) is installed successfully prior to installing Prometheus.

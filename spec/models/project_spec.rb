@@ -63,6 +63,7 @@ RSpec.describe Project do
     it { is_expected.to have_one(:bugzilla_service) }
     it { is_expected.to have_one(:gitlab_issue_tracker_service) }
     it { is_expected.to have_one(:external_wiki_service) }
+    it { is_expected.to have_one(:confluence_service) }
     it { is_expected.to have_one(:project_feature) }
     it { is_expected.to have_one(:project_repository) }
     it { is_expected.to have_one(:container_expiration_policy) }
@@ -119,6 +120,8 @@ RSpec.describe Project do
     it { is_expected.to have_many(:metrics_users_starred_dashboards).inverse_of(:project) }
     it { is_expected.to have_many(:repository_storage_moves) }
     it { is_expected.to have_many(:reviews).inverse_of(:project) }
+    it { is_expected.to have_many(:packages).class_name('Packages::Package') }
+    it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
 
     it_behaves_like 'model with repository' do
       let_it_be(:container) { create(:project, :repository, path: 'somewhere') }
@@ -4861,6 +4864,36 @@ RSpec.describe Project do
     end
   end
 
+  describe "#default_branch" do
+    context "with an empty repository" do
+      let_it_be(:project) { create(:project_empty_repo) }
+
+      context "Gitlab::CurrentSettings.default_branch_name is unavailable" do
+        before do
+          expect(Gitlab::CurrentSettings)
+            .to receive(:default_branch_name)
+            .and_return(nil)
+        end
+
+        it "returns that value" do
+          expect(project.default_branch).to be_nil
+        end
+      end
+
+      context "Gitlab::CurrentSettings.default_branch_name is available" do
+        before do
+          expect(Gitlab::CurrentSettings)
+            .to receive(:default_branch_name)
+            .and_return('example_branch')
+        end
+
+        it "returns that value" do
+          expect(project.default_branch).to eq("example_branch")
+        end
+      end
+    end
+  end
+
   describe '#to_ability_name' do
     it 'returns project' do
       project = build(:project_empty_repo)
@@ -6163,6 +6196,39 @@ RSpec.describe Project do
       it 'returns latest jira import by created_at' do
         expect(project.jira_imports.pluck(:id)).to eq([jira_import3.id, jira_import2.id, jira_import1.id])
         expect(project.latest_jira_import).to eq(jira_import1)
+      end
+    end
+  end
+
+  describe '#packages_enabled' do
+    subject { create(:project).packages_enabled }
+
+    it { is_expected.to be true }
+  end
+
+  describe '#package_already_taken?' do
+    let(:namespace) { create(:namespace) }
+    let(:project) { create(:project, :public, namespace: namespace) }
+    let!(:package) { create(:npm_package, project: project, name: "@#{namespace.path}/foo") }
+
+    context 'no package exists with the same name' do
+      it 'returns false' do
+        result = project.package_already_taken?("@#{namespace.path}/bar")
+        expect(result).to be false
+      end
+
+      it 'returns false if it is the project that the package belongs to' do
+        result = project.package_already_taken?("@#{namespace.path}/foo")
+        expect(result).to be false
+      end
+    end
+
+    context 'a package already exists with the same name' do
+      let(:alt_project) { create(:project, :public, namespace: namespace) }
+
+      it 'returns true' do
+        result = alt_project.package_already_taken?("@#{namespace.path}/foo")
+        expect(result).to be true
       end
     end
   end

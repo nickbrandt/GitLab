@@ -77,7 +77,7 @@ module EE
         def find_iteration_with_finder(parent, params)
           finder_params = iteration_finder_params(parent)
 
-          ::IterationsFinder.new(finder_params).find_by(params)
+          ::IterationsFinder.new(context[:current_user], finder_params).find_by(params)
         end
         # rubocop:enable CodeReuse/ActiveRecord
 

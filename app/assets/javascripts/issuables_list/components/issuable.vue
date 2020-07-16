@@ -97,6 +97,9 @@ export default {
     isJiraIssue() {
       return this.issuable.external_tracker === 'jira';
     },
+    linkTarget() {
+      return this.isJiraIssue ? '_blank' : null;
+    },
     issueCreatedToday() {
       return getDayDifference(new Date(this.issuable.created_at), new Date()) < 1;
     },
@@ -187,6 +190,10 @@ export default {
       return isScopedLabel({ title: name }) && this.scopedLabelsAvailable;
     },
     labelHref({ name }) {
+      if (this.isJiraIssue) {
+        return this.issuableLink({ 'labels[]': name });
+      }
+
       return this.issuableLink({ 'label_name[]': name });
     },
     onSelect(ev) {
@@ -226,18 +233,16 @@ export default {
       <div class="flex-grow-1">
         <div class="title">
           <span class="issue-title-text">
-            <i
+            <gl-icon
               v-if="issuable.confidential"
               v-gl-tooltip
-              class="fa fa-eye-slash"
+              name="eye-slash"
+              class="gl-vertical-align-text-bottom"
+              :size="16"
               :title="$options.confidentialTooltipText"
               :aria-label="$options.confidentialTooltipText"
-            ></i>
-            <gl-link
-              :href="issuable.web_url"
-              :target="isJiraIssue ? '_blank' : null"
-              data-testid="issuable-title"
-            >
+            />
+            <gl-link :href="issuable.web_url" :target="linkTarget" data-testid="issuable-title">
               {{ issuable.title }}
               <gl-icon
                 v-if="isJiraIssue"
@@ -275,6 +280,7 @@ export default {
                   ref="openedAgoByContainer"
                   v-bind="popoverDataAttrs"
                   :href="issuableAuthor.web_url"
+                  :target="linkTarget"
                 >
                   {{ issuableAuthor.name }}
                 </gl-link>
@@ -323,6 +329,7 @@ export default {
             v-gl-tooltip
             :title="__('Weight')"
             class="d-none d-sm-inline-block js-weight"
+            data-testid="weight"
           >
             <gl-icon name="weight" class="align-text-bottom" />
             {{ issuable.weight }}
@@ -333,8 +340,8 @@ export default {
       <!-- Issuable meta -->
       <div class="flex-shrink-0 d-flex flex-column align-items-end justify-content-center">
         <div class="controls d-flex">
-          <span v-if="isJiraIssue">&nbsp;</span>
-          <span v-if="isClosed" class="issuable-status">{{ __('CLOSED') }}</span>
+          <span v-if="isJiraIssue" data-testid="issuable-status">{{ issuable.status }}</span>
+          <span v-else-if="isClosed" class="issuable-status">{{ __('CLOSED') }}</span>
 
           <issue-assignees
             :assignees="issuable.assignees"
@@ -365,7 +372,7 @@ export default {
             :title="__('Comments')"
             :class="{ 'no-comments': hasNoComments }"
           >
-            <i class="fa fa-comments"></i>
+            <gl-icon name="comments" class="gl-vertical-align-text-bottom" />
             {{ userNotesCount }}
           </gl-link>
         </div>

@@ -281,6 +281,7 @@ describe('Feature flags store Mutations', () => {
       ]);
     });
   });
+
   describe('REQUEST_DELETE_USER_LIST', () => {
     beforeEach(() => {
       stateCopy.userLists = [userList];
@@ -291,18 +292,41 @@ describe('Feature flags store Mutations', () => {
       expect(stateCopy.userLists).not.toContain(userList);
     });
   });
+
   describe('RECEIVE_DELETE_USER_LIST_ERROR', () => {
     beforeEach(() => {
       stateCopy.userLists = [];
-      mutations[types.RECEIVE_DELETE_USER_LIST_ERROR](stateCopy, userList);
+      mutations[types.RECEIVE_DELETE_USER_LIST_ERROR](stateCopy, {
+        list: userList,
+        error: 'some error',
+      });
     });
 
-    it('should set isLoading to false and hasError to true', () => {
+    it('should set isLoading to false and hasError to false', () => {
       expect(stateCopy.isLoading).toBe(false);
-      expect(stateCopy.hasError).toBe(true);
+      expect(stateCopy.hasError).toBe(false);
     });
+
     it('should add the user list back to the list of user lists', () => {
       expect(stateCopy.userLists).toContain(userList);
+    });
+  });
+
+  describe('RECEIVE_CLEAR_ALERT', () => {
+    it('clears the alert', () => {
+      stateCopy.alerts = ['a server error'];
+
+      mutations[types.RECEIVE_CLEAR_ALERT](stateCopy, 0);
+
+      expect(stateCopy.alerts).toEqual([]);
+    });
+
+    it('clears the alert at the specified index', () => {
+      stateCopy.alerts = ['a server error', 'another error', 'final error'];
+
+      mutations[types.RECEIVE_CLEAR_ALERT](stateCopy, 1);
+
+      expect(stateCopy.alerts).toEqual(['a server error', 'final error']);
     });
   });
 });

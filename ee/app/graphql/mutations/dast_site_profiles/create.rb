@@ -29,9 +29,14 @@ module Mutations
         project = authorized_find!(full_path: full_path)
         raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project)
 
-        {
-          errors: ['Not implemented']
-        }
+        service = ::DastSiteProfiles::CreateService.new(project, current_user)
+        dast_site_profile = service.execute(name: profile_name, target_url: target_url)
+
+        if dast_site_profile.success?
+          raise 'Not implemented'
+        else
+          { errors: dast_site_profile.errors }
+        end
       end
 
       private

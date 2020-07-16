@@ -56,7 +56,7 @@ export const fetchReplicableItemsGraphQl = ({ state, dispatch }, direction) => {
     })
     .then(res => {
       const registries = res.data.geoNode.packageFileRegistries;
-      const data = registries.edges.map(e => e.node);
+      const data = registries.nodes;
       const pagination = {
         ...registries.pageInfo,
         page: state.paginationData.page,

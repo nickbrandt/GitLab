@@ -28,6 +28,12 @@ module Elastic
       def resume_processing!(klass)
         new(klass).resume_processing!
       end
+
+      def queue_size
+        Elastic::IndexingControl::WORKERS.sum do |worker_class| # rubocop:disable CodeReuse/ActiveRecord
+          new(worker_class).queue_size
+        end
+      end
     end
 
     def add_to_waiting_queue!(args, context)

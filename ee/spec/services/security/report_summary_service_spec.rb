@@ -102,8 +102,14 @@ RSpec.describe Security::ReportSummaryService, '#execute' do
       expect(result[:dast][:scanned_resources].length).to eq(20)
     end
 
-    it 'returns the scanned_resources_csv_path as nil' do
-      expect(result[:dast][:scanned_resources_csv_path]).to be_nil
+    it 'returns the scanned_resources_csv_path' do
+      expected_path = Gitlab::Routing.url_helpers.project_security_scanned_resources_path(
+        project,
+        format: :csv,
+        pipeline_id: pipeline.id
+      )
+
+      expect(result[:dast][:scanned_resources_csv_path]).to eq(expected_path)
     end
 
     context 'When no security scans ran' do

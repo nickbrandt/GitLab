@@ -25,7 +25,7 @@ This option is available only if your GitLab administrator has
 After the NPM registry is enabled, it will be available for all new projects
 by default. To enable it for existing projects, or if you want to disable it:
 
-1. Navigate to your project's **Settings > General > Permissions**.
+1. Navigate to your project's **Settings > General > Visibility, project features, permissions**.
 1. Find the Packages feature and enable or disable it.
 1. Click on **Save changes** for the changes to take effect.
 
@@ -238,7 +238,8 @@ The regex that is used for naming is validating all package names from all packa
 It allows for capital letters, while NPM does not, and allows for almost all of the
 characters NPM allows with a few exceptions (`~` is not allowed).
 
-NOTE: **Note:** Capital letters are needed because the scope is required to be
+NOTE: **Note:**
+Capital letters are needed because the scope is required to be
 identical to the top level namespace of the project. So, for example, if your
 project path is `My-Group/project-foo`, your package must be named `@My-Group/any-package-name`.
 `@my-group/any-package-name` will not work.

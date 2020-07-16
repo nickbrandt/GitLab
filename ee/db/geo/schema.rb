@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_07_120740) do
+ActiveRecord::Schema.define(version: 2020_07_07_011052) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -146,6 +146,8 @@ ActiveRecord::Schema.define(version: 2020_04_07_120740) do
     t.datetime_with_timezone "last_wiki_verification_ran_at"
     t.binary "repository_verification_checksum_mismatched"
     t.binary "wiki_verification_checksum_mismatched"
+    t.boolean "primary_repository_checksummed", default: false, null: false
+    t.boolean "primary_wiki_checksummed", default: false, null: false
     t.index ["last_repository_successful_sync_at"], name: "idx_project_registry_synced_repositories_partial", where: "((resync_repository = false) AND (repository_retry_count IS NULL) AND (repository_verification_checksum_sha IS NOT NULL))"
     t.index ["last_repository_successful_sync_at"], name: "index_project_registry_on_last_repository_successful_sync_at"
     t.index ["last_repository_synced_at"], name: "index_project_registry_on_last_repository_synced_at"

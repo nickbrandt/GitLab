@@ -200,77 +200,6 @@ describe('Api', () => {
     });
   });
 
-  describe('packages', () => {
-    const projectId = 'project_a';
-    const packageId = 'package_b';
-    const apiResponse = [{ id: 1, name: 'foo' }];
-
-    describe('groupPackages', () => {
-      const groupId = 'group_a';
-
-      it('fetch all group packages', () => {
-        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/packages`;
-        jest.spyOn(axios, 'get');
-        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
-
-        return Api.groupPackages(groupId).then(({ data }) => {
-          expect(data).toEqual(apiResponse);
-          expect(axios.get).toHaveBeenCalledWith(expectedUrl, {});
-        });
-      });
-    });
-
-    describe('projectPackages', () => {
-      it('fetch all project packages', () => {
-        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${projectId}/packages`;
-        jest.spyOn(axios, 'get');
-        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
-
-        return Api.projectPackages(projectId).then(({ data }) => {
-          expect(data).toEqual(apiResponse);
-          expect(axios.get).toHaveBeenCalledWith(expectedUrl, {});
-        });
-      });
-    });
-
-    describe('buildProjectPackageUrl', () => {
-      it('returns the right url', () => {
-        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${projectId}/packages/${packageId}`;
-        const url = Api.buildProjectPackageUrl(projectId, packageId);
-        expect(url).toEqual(expectedUrl);
-      });
-    });
-
-    describe('projectPackage', () => {
-      it('fetch package details', () => {
-        const expectedUrl = `foo`;
-        jest.spyOn(Api, 'buildProjectPackageUrl').mockReturnValue(expectedUrl);
-        jest.spyOn(axios, 'get');
-        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
-
-        return Api.projectPackage(projectId, packageId).then(({ data }) => {
-          expect(data).toEqual(apiResponse);
-          expect(axios.get).toHaveBeenCalledWith(expectedUrl);
-        });
-      });
-    });
-
-    describe('deleteProjectPackage', () => {
-      it('delete a package', () => {
-        const expectedUrl = `foo`;
-
-        jest.spyOn(Api, 'buildProjectPackageUrl').mockReturnValue(expectedUrl);
-        jest.spyOn(axios, 'delete');
-        mock.onDelete(expectedUrl).replyOnce(200, true);
-
-        return Api.deleteProjectPackage(projectId, packageId).then(({ data }) => {
-          expect(data).toEqual(true);
-          expect(axios.delete).toHaveBeenCalledWith(expectedUrl);
-        });
-      });
-    });
-  });
-
   describe('Cycle analytics', () => {
     const groupId = 'counting-54321';
     const createdBefore = '2019-11-18';
@@ -842,18 +771,35 @@ describe('Api', () => {
     });
   });
 
-  describe('getApplicationSettings', () => {
+  describe('Application Settings', () => {
     const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/application/settings`;
-    const apiResponse = { mock_setting: 1, mock_setting2: 2 };
+    const apiResponse = { mock_setting: 1, mock_setting2: 2, mock_setting3: 3 };
 
-    it('fetches applications settings', () => {
-      jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
-      jest.spyOn(axios, 'get');
-      mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+    describe('getApplicationSettings', () => {
+      it('fetches applications settings', () => {
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
 
-      return Api.getApplicationSettings().then(({ data }) => {
-        expect(data).toEqual(apiResponse);
-        expect(axios.get).toHaveBeenCalledWith(expectedUrl);
+        return Api.getApplicationSettings().then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl);
+        });
+      });
+    });
+
+    describe('updateApplicationSettings', () => {
+      const mockReq = { mock_setting: 10 };
+
+      it('updates applications settings', () => {
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'put');
+        mock.onPut(expectedUrl).replyOnce(201, apiResponse);
+
+        return Api.updateApplicationSettings(mockReq).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.put).toHaveBeenCalledWith(expectedUrl, mockReq);
+        });
       });
     });
   });

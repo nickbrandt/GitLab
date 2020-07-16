@@ -1,9 +1,10 @@
-query GroupIteration($groupPath: ID!, $id: ID!) {
+query GroupIteration($groupPath: ID!, $iid: ID!) {
   group(fullPath: $groupPath) {
-    iterations(id: $id, first: 1) {
+    iterations(iid: $iid, first: 1, includeAncestors: false) {
       nodes {
         title
         state
+        iid
         id
         description
         webPath

@@ -524,6 +524,7 @@ export default {
       :sort-options="$options.AvailableSortOptions"
       :initial-filter-value="getFilteredSearchValue()"
       :initial-sort-by="sortBy"
+      recent-searches-storage-key="requirements"
       class="row-content-block"
       @onFilter="handleFilterRequirements"
       @onSort="handleSortRequirements"

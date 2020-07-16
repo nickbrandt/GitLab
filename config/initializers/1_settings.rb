@@ -500,6 +500,12 @@ Settings.cron_jobs['users_create_statistics_worker']['job_class'] = 'Users::Crea
 Settings.cron_jobs['authorized_project_update_periodic_recalculate_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['authorized_project_update_periodic_recalculate_worker']['cron'] ||= '45 1 * * 6'
 Settings.cron_jobs['authorized_project_update_periodic_recalculate_worker']['job_class'] = 'AuthorizedProjectUpdate::PeriodicRecalculateWorker'
+Settings.cron_jobs['update_container_registry_info_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['update_container_registry_info_worker']['cron'] ||= '0 0 * * *'
+Settings.cron_jobs['update_container_registry_info_worker']['job_class'] = 'UpdateContainerRegistryInfoWorker'
+Settings.cron_jobs['postgres_dynamic_partitions_creator'] ||= Settingslogic.new({})
+Settings.cron_jobs['postgres_dynamic_partitions_creator']['cron'] ||= '21 */6 * * *'
+Settings.cron_jobs['postgres_dynamic_partitions_creator']['job_class'] ||= 'PartitionCreationWorker'
 
 Gitlab.ee do
   Settings.cron_jobs['adjourned_group_deletion_worker'] ||= Settingslogic.new({})
@@ -571,6 +577,18 @@ Gitlab.ee do
   Settings.cron_jobs['web_application_firewall_metrics_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['web_application_firewall_metrics_worker']['cron'] ||= '0 1 * * 0'
   Settings.cron_jobs['web_application_firewall_metrics_worker']['job_class'] = 'IngressModsecurityCounterMetricsWorker'
+  Settings.cron_jobs['users_create_statistics_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['users_create_statistics_worker']['cron'] ||= '2 15 * * *'
+  Settings.cron_jobs['users_create_statistics_worker']['job_class'] = 'Users::CreateStatisticsWorker'
+  Settings.cron_jobs['network_policy_metrics_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['network_policy_metrics_worker']['cron'] ||= '0 3 * * 0'
+  Settings.cron_jobs['network_policy_metrics_worker']['job_class'] = 'NetworkPolicyMetricsWorker'
+  Settings.cron_jobs['iterations_update_status_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['iterations_update_status_worker']['cron'] ||= '5 0 * * *'
+  Settings.cron_jobs['iterations_update_status_worker']['job_class'] = 'IterationsUpdateStatusWorker'
+  Settings.cron_jobs['vulnerability_statistics_schedule_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['vulnerability_statistics_schedule_worker']['cron'] ||= '15 1 * * *'
+  Settings.cron_jobs['vulnerability_statistics_schedule_worker']['job_class'] = 'Vulnerabilities::Statistics::ScheduleWorker'
 end
 
 #

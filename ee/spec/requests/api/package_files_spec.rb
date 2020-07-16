@@ -54,7 +54,7 @@ RSpec.describe API::PackageFiles do
           get api(url, user)
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(response).to match_response_schema('public_api/v4/packages/package_files', dir: 'ee')
+          expect(response).to match_response_schema('public_api/v4/packages/package_files')
         end
       end
 
