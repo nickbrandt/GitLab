@@ -46,6 +46,10 @@ export const enrichVulnerabilityWithFeedback = (vulnerability, feedback = []) =>
 /**
  * Takes an object of options and returns an externalized string representing
  * the critical, high, and other severity vulnerabilities for a given report.
+ *
+ * The resulting string _may_ still contain sprintf-style placeholders. These
+ * are left in place so they can be replaced with markup, via the
+ * SecuritySummary component.
  * @param {{reportType: string, status: string, critical: number, high: number, other: number}} options
  * @returns {string}
  */
@@ -84,16 +88,16 @@ export const groupedTextBuilder = ({
   switch (options) {
     case HAS_CRITICAL:
       message = n__(
-        '%{reportType} %{status} detected %{critical} critical severity vulnerability.',
-        '%{reportType} %{status} detected %{critical} critical severity vulnerabilities.',
+        '%{reportType} %{status} detected %{criticalStart}%{critical} new critical%{criticalEnd} severity vulnerability.',
+        '%{reportType} %{status} detected %{criticalStart}%{critical} new critical%{criticalEnd} severity vulnerabilities.',
         critical,
       );
       break;
 
     case HAS_HIGH:
       message = n__(
-        '%{reportType} %{status} detected %{high} high severity vulnerability.',
-        '%{reportType} %{status} detected %{high} high severity vulnerabilities.',
+        '%{reportType} %{status} detected %{highStart}%{high} new high%{highEnd} severity vulnerability.',
+        '%{reportType} %{status} detected %{highStart}%{high} new high%{highEnd} severity vulnerabilities.',
         high,
       );
       break;
@@ -108,25 +112,25 @@ export const groupedTextBuilder = ({
 
     case HAS_CRITICAL + HAS_HIGH:
       message = __(
-        '%{reportType} %{status} detected %{critical} critical and %{high} high severity vulnerabilities.',
+        '%{reportType} %{status} detected %{criticalStart}%{critical} new critical%{criticalEnd} and %{highStart}%{high} new high%{highEnd} severity vulnerabilities.',
       );
       break;
 
     case HAS_CRITICAL + HAS_OTHER:
       message = __(
-        '%{reportType} %{status} detected %{critical} critical severity vulnerabilities out of %{total}.',
+        '%{reportType} %{status} detected %{criticalStart}%{critical} new critical%{criticalEnd} severity vulnerabilities out of %{total}.',
       );
       break;
 
     case HAS_HIGH + HAS_OTHER:
       message = __(
-        '%{reportType} %{status} detected %{high} high severity vulnerabilities out of %{total}.',
+        '%{reportType} %{status} detected %{highStart}%{high} new high%{highEnd} severity vulnerabilities out of %{total}.',
       );
       break;
 
     case HAS_CRITICAL + HAS_HIGH + HAS_OTHER:
       message = __(
-        '%{reportType} %{status} detected %{critical} critical and %{high} high severity vulnerabilities out of %{total}.',
+        '%{reportType} %{status} detected %{criticalStart}%{critical} new critical%{criticalEnd} and %{highStart}%{high} new high%{highEnd} severity vulnerabilities out of %{total}.',
       );
       break;
 
