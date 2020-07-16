@@ -17,6 +17,7 @@ import { mrStates } from '~/mr_popover/constants';
 import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
 import { fetchPolicies } from '~/lib/graphql';
 import securityReportSummaryQuery from './graphql/mr_security_report_summary.graphql';
+import SecuritySummary from './components/security_summary.vue';
 
 export default {
   store: createStore(),
@@ -24,6 +25,7 @@ export default {
     GroupedIssuesList,
     ReportSection,
     SummaryRow,
+    SecuritySummary,
     IssueModal,
     Icon,
     GlSprintf,
@@ -326,20 +328,22 @@ export default {
       fetchSastDiff: 'fetchDiff',
     }),
   },
+  summarySlots: ['success', 'error', 'loading'],
 };
 </script>
 <template>
   <report-section
     :status="summaryStatus"
-    :success-text="groupedSummaryText"
-    :loading-text="groupedSummaryText"
-    :error-text="groupedSummaryText"
     :has-issues="true"
     :should-emit-toggle-event="true"
     class="mr-widget-border-top grouped-security-reports mr-report"
     data-qa-selector="vulnerability_report_grouped"
     @toggleEvent="handleToggleEvent"
   >
+    <template v-for="slot in $options.summarySlots" #[slot]>
+      <security-summary :key="slot" :message="groupedSummaryText" />
+    </template>
+
     <template v-if="pipelinePath" #actionButtons>
       <div>
         <a :href="securityTab" target="_blank" class="btn btn-default btn-sm float-right gl-mr-3">
@@ -388,12 +392,15 @@ export default {
       <div class="mr-widget-grouped-section report-block">
         <template v-if="hasSastReports">
           <summary-row
-            :summary="groupedSastText"
             :status-icon="sastStatusIcon"
             :popover-options="sastPopover"
             class="js-sast-widget"
             data-qa-selector="sast_scan_report"
-          />
+          >
+            <template #summary>
+              <security-summary :message="groupedSastText" />
+            </template>
+          </summary-row>
 
           <grouped-issues-list
             v-if="sast.newIssues.length || sast.resolvedIssues.length"
@@ -407,12 +414,15 @@ export default {
 
         <template v-if="hasDependencyScanningReports">
           <summary-row
-            :summary="groupedDependencyText"
             :status-icon="dependencyScanningStatusIcon"
             :popover-options="dependencyScanningPopover"
             class="js-dependency-scanning-widget"
             data-qa-selector="dependency_scan_report"
-          />
+          >
+            <template #summary>
+              <security-summary :message="groupedDependencyText" />
+            </template>
+          </summary-row>
 
           <grouped-issues-list
             v-if="dependencyScanning.newIssues.length || dependencyScanning.resolvedIssues.length"
@@ -426,12 +436,15 @@ export default {
 
         <template v-if="hasContainerScanningReports">
           <summary-row
-            :summary="groupedContainerScanningText"
             :status-icon="containerScanningStatusIcon"
             :popover-options="containerScanningPopover"
             class="js-container-scanning"
             data-qa-selector="container_scan_report"
-          />
+          >
+            <template #summary>
+              <security-summary :message="groupedContainerScanningText" />
+            </template>
+          </summary-row>
 
           <grouped-issues-list
             v-if="containerScanning.newIssues.length || containerScanning.resolvedIssues.length"
@@ -445,12 +458,15 @@ export default {
 
         <template v-if="hasDastReports">
           <summary-row
-            :summary="groupedDastText"
             :status-icon="dastStatusIcon"
             :popover-options="dastPopover"
             class="js-dast-widget"
             data-qa-selector="dast_scan_report"
           >
+            <template #summary>
+              <security-summary :message="groupedDastText" />
+            </template>
+
             <template v-if="dastScans.length">
               <div class="text-nowrap">
                 {{ n__('%d URL scanned', '%d URLs scanned', dastScans[0].scanned_resources_count) }}
@@ -478,12 +494,15 @@ export default {
 
         <template v-if="hasSecretScanningReports">
           <summary-row
-            :summary="groupedSecretScanningText"
             :status-icon="secretScanningStatusIcon"
             :popover-options="secretScanningPopover"
             class="js-secret-scanning"
             data-qa-selector="secret_scan_report"
-          />
+          >
+            <template #summary>
+              <security-summary :message="groupedSecretScanningText" />
+            </template>
+          </summary-row>
 
           <grouped-issues-list
             v-if="secretScanning.newIssues.length || secretScanning.resolvedIssues.length"

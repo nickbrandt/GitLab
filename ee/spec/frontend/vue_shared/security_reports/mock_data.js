@@ -307,7 +307,7 @@ export const mockFindings = [
     id: null,
     report_type: 'dependency_scanning',
     name: 'Cross-site Scripting in serialize-javascript',
-    severity: 'unknown',
+    severity: 'critical',
     scanner: {
       external_id: 'gemnasium',
       name: 'Gemnasium',
@@ -360,7 +360,7 @@ export const mockFindings = [
     id: null,
     report_type: 'dependency_scanning',
     name: '3rd party CORS request may execute in jquery',
-    severity: 'medium',
+    severity: 'high',
     scanner: { external_id: 'retire.js', name: 'Retire.js' },
     identifiers: [
       {

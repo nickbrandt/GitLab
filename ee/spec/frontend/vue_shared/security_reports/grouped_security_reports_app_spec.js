@@ -183,6 +183,55 @@ describe('Grouped security reports app', () => {
       });
     });
 
+    describe('with empty reports', () => {
+      beforeEach(() => {
+        const emptyResponse = { ...dastDiffSuccessMock, fixed: [], added: [] };
+        mock.onGet(CONTAINER_SCANNING_DIFF_ENDPOINT).reply(200, emptyResponse);
+        mock.onGet(DEPENDENCY_SCANNING_DIFF_ENDPOINT).reply(200, emptyResponse);
+        mock.onGet(DAST_DIFF_ENDPOINT).reply(200, emptyResponse);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(200, emptyResponse);
+        mock.onGet(SECRET_SCANNING_DIFF_ENDPOINT).reply(200, emptyResponse);
+
+        createWrapper(allReportProps);
+
+        return Promise.all([
+          waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS),
+        ]);
+      });
+
+      it('renders reports', () => {
+        // It's not loading
+        expect(wrapper.vm.$el.querySelector('.gl-spinner')).toBeNull();
+
+        // Renders the summary text
+        expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
+          'Security scanning detected no new vulnerabilities.',
+        );
+
+        // Renders Sast result
+        expect(trimText(wrapper.vm.$el.textContent)).toContain(
+          'SAST detected no new vulnerabilities.',
+        );
+
+        // Renders DSS result
+        expect(trimText(wrapper.vm.$el.textContent)).toContain(
+          'Dependency scanning detected no new vulnerabilities.',
+        );
+
+        // Renders container scanning result
+        expect(wrapper.vm.$el.textContent).toContain(
+          'Container scanning detected no new vulnerabilities.',
+        );
+
+        // Renders DAST result
+        expect(wrapper.vm.$el.textContent).toContain('DAST detected no new vulnerabilities.');
+      });
+    });
+
     describe('with successful responses', () => {
       beforeEach(() => {
         mock.onGet(CONTAINER_SCANNING_DIFF_ENDPOINT).reply(200, containerScanningDiffSuccessMock);
@@ -208,7 +257,7 @@ describe('Grouped security reports app', () => {
 
         // Renders the summary text
         expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected 8 vulnerabilities.',
+          'Security scanning detected 5 new critical and 3 new high severity vulnerabilities.',
         );
 
         // Renders the expand button
@@ -217,20 +266,24 @@ describe('Grouped security reports app', () => {
         );
 
         // Renders Sast result
-        expect(trimText(wrapper.vm.$el.textContent)).toContain('SAST detected 1 vulnerability');
+        expect(trimText(wrapper.vm.$el.textContent)).toContain(
+          'SAST detected 1 new critical severity vulnerability',
+        );
 
         // Renders DSS result
         expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'Dependency scanning detected 2 vulnerabilities.',
+          'Dependency scanning detected 1 new critical and 1 new high severity vulnerabilities.',
         );
 
         // Renders container scanning result
         expect(wrapper.vm.$el.textContent).toContain(
-          'Container scanning detected 2 vulnerabilities.',
+          'Container scanning detected 1 new critical and 1 new high severity vulnerabilities.',
         );
 
         // Renders DAST result
-        expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 vulnerability.');
+        expect(wrapper.vm.$el.textContent).toContain(
+          'DAST detected 1 new critical severity vulnerability.',
+        );
       });
 
       it('opens modal with more information', () => {
@@ -311,7 +364,9 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.text()).toContain('Container scanning detected 2 vulnerabilities.');
+      expect(wrapper.text()).toContain(
+        'Container scanning detected 1 new critical and 1 new high severity vulnerabilities.',
+      );
     });
   });
 
@@ -340,7 +395,7 @@ describe('Grouped security reports app', () => {
 
     it('should display the correct numbers of vulnerabilities', () => {
       expect(wrapper.vm.$el.textContent).toContain(
-        'Dependency scanning detected 2 vulnerabilities.',
+        'Dependency scanning detected 1 new critical and 1 new high severity vulnerabilities.',
       );
     });
   });
@@ -378,7 +433,9 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 vulnerability');
+      expect(wrapper.vm.$el.textContent).toContain(
+        'DAST detected 1 new critical severity vulnerability',
+      );
     });
 
     it('shows the scanned URLs count and opens a modal', async () => {
@@ -449,7 +506,9 @@ describe('Grouped security reports app', () => {
       });
 
       it('should display the correct numbers of vulnerabilities', () => {
-        expect(wrapper.text()).toContain('Secret scanning detected 2 vulnerabilities.');
+        expect(wrapper.text()).toContain(
+          'Secret scanning detected 1 new critical and 1 new high severity vulnerabilities.',
+        );
       });
     });
 
@@ -486,7 +545,9 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.vm.$el.textContent).toContain('SAST detected 1 vulnerability.');
+      expect(wrapper.vm.$el.textContent).toContain(
+        'SAST detected 1 new critical severity vulnerability.',
+      );
     });
   });
 

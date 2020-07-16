@@ -128,21 +128,21 @@ describe('security reports utils', () => {
     it.each`
       vulnerabilities              | message
       ${undefined}                 | ${' detected no new vulnerabilities.'}
-      ${{ critical }}              | ${' detected 2 critical severity vulnerabilities.'}
-      ${{ high }}                  | ${' detected 4 high severity vulnerabilities.'}
+      ${{ critical }}              | ${' detected %{criticalStart}2 new critical%{criticalEnd} severity vulnerabilities.'}
+      ${{ high }}                  | ${' detected %{highStart}4 new high%{highEnd} severity vulnerabilities.'}
       ${{ other }}                 | ${' detected 7 vulnerabilities.'}
-      ${{ critical, high }}        | ${' detected 2 critical and 4 high severity vulnerabilities.'}
-      ${{ critical, other }}       | ${' detected 2 critical severity vulnerabilities out of 9.'}
-      ${{ high, other }}           | ${' detected 4 high severity vulnerabilities out of 11.'}
-      ${{ critical, high, other }} | ${' detected 2 critical and 4 high severity vulnerabilities out of 13.'}
+      ${{ critical, high }}        | ${' detected %{criticalStart}2 new critical%{criticalEnd} and %{highStart}4 new high%{highEnd} severity vulnerabilities.'}
+      ${{ critical, other }}       | ${' detected %{criticalStart}2 new critical%{criticalEnd} severity vulnerabilities out of 9.'}
+      ${{ high, other }}           | ${' detected %{highStart}4 new high%{highEnd} severity vulnerabilities out of 11.'}
+      ${{ critical, high, other }} | ${' detected %{criticalStart}2 new critical%{criticalEnd} and %{highStart}4 new high%{highEnd} severity vulnerabilities out of 13.'}
     `('should build the message as "$message"', ({ vulnerabilities, message }) => {
       expect(groupedTextBuilder(vulnerabilities)).toEqual(message);
     });
 
     it.each`
       vulnerabilities    | message
-      ${{ critical: 1 }} | ${' detected 1 critical severity vulnerability.'}
-      ${{ high: 1 }}     | ${' detected 1 high severity vulnerability.'}
+      ${{ critical: 1 }} | ${' detected %{criticalStart}1 new critical%{criticalEnd} severity vulnerability.'}
+      ${{ high: 1 }}     | ${' detected %{highStart}1 new high%{highEnd} severity vulnerability.'}
       ${{ other: 1 }}    | ${' detected 1 vulnerability.'}
     `('should handle single vulnerabilities for "$message"', ({ vulnerabilities, message }) => {
       expect(groupedTextBuilder(vulnerabilities)).toEqual(message);
