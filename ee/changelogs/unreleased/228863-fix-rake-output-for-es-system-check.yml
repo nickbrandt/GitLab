@@ -1,0 +1,5 @@
+---
+title: Correct SystemCheck name for Elasticsearch
+merge_request: 36903
+author:
+type: fixed
