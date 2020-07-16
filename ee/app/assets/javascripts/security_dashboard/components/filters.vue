@@ -27,7 +27,7 @@ export default {
         :filter="filter"
         @setFilter="setFilter"
       />
-      <div class="d-flex ml-lg-auto p-2">
+      <div class="gl-display-flex ml-lg-auto p-2">
         <slot name="buttons"></slot>
         <div class="pl-md-6">
           <strong>{{ s__('SecurityReports|Hide dismissed') }}</strong>

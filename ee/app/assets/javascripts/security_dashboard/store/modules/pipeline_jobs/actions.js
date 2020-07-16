@@ -1,3 +1,4 @@
+//import * as Sentry from '@sentry/browser';
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 
@@ -7,7 +8,7 @@ export const setProjectId = ({ commit }, id) => commit(types.SET_PROJECT_ID, id)
 
 export const fetchPipelineJobs = ({ commit, state }) => {
   if (!state.pipelineJobsPath) {
-    return commit(types.RECEIVE_PIPELINE_JOBS_ERROR, new Error('pipelineJobsPath not defined'));
+    return commit(types.RECEIVE_PIPELINE_JOBS_ERROR);
   }
   commit(types.REQUEST_PIPELINE_JOBS);
 
@@ -20,6 +21,7 @@ export const fetchPipelineJobs = ({ commit, state }) => {
       commit(types.RECEIVE_PIPELINE_JOBS_SUCCESS, data);
     })
     .catch(error => {
-      commit(types.RECEIVE_PIPELINE_JOBS_ERROR, error);
+      //Sentry.captureException(error);
+      commit(types.RECEIVE_PIPELINE_JOBS_ERROR);
     });
 };

@@ -105,7 +105,6 @@ describe('pipeling jobs actions', () => {
           [
             {
               type: types.RECEIVE_PIPELINE_JOBS_ERROR,
-              payload: new Error('pipelineJobsPath not defined'),
             },
           ],
           [],
@@ -128,7 +127,6 @@ describe('pipeling jobs actions', () => {
             { type: types.REQUEST_PIPELINE_JOBS },
             {
               type: types.RECEIVE_PIPELINE_JOBS_ERROR,
-              payload: new Error('Request failed with status code 404'),
             },
           ],
           [],
