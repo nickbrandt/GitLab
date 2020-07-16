@@ -16693,6 +16693,33 @@ msgstr ""
 msgid "Page was successfully deleted"
 msgstr ""
 
+msgid "PagerDutySettings|Active"
+msgstr ""
+
+msgid "PagerDutySettings|Create a GitLab issue for each PagerDuty incident by %{docsLink}"
+msgstr ""
+
+msgid "PagerDutySettings|Failed to update Webhook URL"
+msgstr ""
+
+msgid "PagerDutySettings|Reset webhook URL"
+msgstr ""
+
+msgid "PagerDutySettings|Resetting the webhook URL for this project will require updating this integration's settings in PagerDuty."
+msgstr ""
+
+msgid "PagerDutySettings|Setting up a webhook with PagerDuty will automatically create a GitLab issue for each PagerDuty incident."
+msgstr ""
+
+msgid "PagerDutySettings|Webhook URL"
+msgstr ""
+
+msgid "PagerDutySettings|Webhook URL update was successful"
+msgstr ""
+
+msgid "PagerDutySettings|configuring a webhook in PagerDuty"
+msgstr ""
+
 msgid "Pages"
 msgstr ""
 
