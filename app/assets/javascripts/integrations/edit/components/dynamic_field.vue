@@ -60,7 +60,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['disableForm']),
+    ...mapGetters(['isInheriting']),
     isCheckbox() {
       return this.type === 'checkbox';
     },
@@ -109,7 +109,7 @@ export default {
         id: this.fieldId,
         name: this.fieldName,
         state: this.valid,
-        disabled: this.disableForm,
+        readonly: this.isInheriting,
       };
     },
     valid() {
@@ -145,12 +145,15 @@ export default {
     </template>
 
     <template v-if="isCheckbox">
-      <input :name="fieldName" type="hidden" value="false" />
-      <gl-form-checkbox v-model="model" v-bind="sharedProps">
+      <input :name="fieldName" type="hidden" :value="model || false" />
+      <gl-form-checkbox :id="fieldId" v-model="model" :disabled="isInheriting">
         {{ humanizedTitle }}
       </gl-form-checkbox>
     </template>
-    <gl-form-select v-else-if="isSelect" v-model="model" v-bind="sharedProps" :options="options" />
+    <template v-else-if="isSelect">
+      <input type="hidden" :name="fieldName" :value="model" />
+      <gl-form-select :id="fieldId" v-model="model" :options="options" :disabled="isInheriting" />
+    </template>
     <gl-form-textarea
       v-else-if="isTextarea"
       v-model="model"

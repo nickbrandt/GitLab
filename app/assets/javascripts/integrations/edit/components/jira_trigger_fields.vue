@@ -56,7 +56,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['disableForm']),
+    ...mapGetters(['isInheriting']),
     showEnableComments() {
       return this.triggerCommit || this.triggerMergeRequest;
     },
@@ -75,21 +75,17 @@ export default {
         )
       "
     >
-      <input name="service[commit_events]" type="hidden" value="false" />
-      <gl-form-checkbox
-        v-model="triggerCommit"
-        name="service[commit_events]"
-        :disabled="disableForm"
-      >
+      <input name="service[commit_events]" type="hidden" :value="triggerCommit || false" />
+      <gl-form-checkbox v-model="triggerCommit" :disabled="isInheriting">
         {{ __('Commit') }}
       </gl-form-checkbox>
 
-      <input name="service[merge_requests_events]" type="hidden" value="false" />
-      <gl-form-checkbox
-        v-model="triggerMergeRequest"
+      <input
         name="service[merge_requests_events]"
-        :disabled="disableForm"
-      >
+        type="hidden"
+        :value="triggerMergeRequest || false"
+      />
+      <gl-form-checkbox v-model="triggerMergeRequest" :disabled="isInheriting">
         {{ __('Merge request') }}
       </gl-form-checkbox>
     </gl-form-group>
@@ -99,12 +95,12 @@ export default {
       :label="s__('Integrations|Comment settings:')"
       data-testid="comment-settings"
     >
-      <input name="service[comment_on_event_enabled]" type="hidden" value="false" />
-      <gl-form-checkbox
-        v-model="enableComments"
+      <input
         name="service[comment_on_event_enabled]"
-        :disabled="disableForm"
-      >
+        type="hidden"
+        :value="enableComments || false"
+      />
+      <gl-form-checkbox v-model="enableComments" :disabled="isInheriting">
         {{ s__('Integrations|Enable comments') }}
       </gl-form-checkbox>
     </gl-form-group>
@@ -114,13 +110,18 @@ export default {
       :label="s__('Integrations|Comment detail:')"
       data-testid="comment-detail"
     >
+      <input
+        v-if="isInheriting"
+        name="service[comment_detail]"
+        type="hidden"
+        :value="commentDetail"
+      />
       <gl-form-radio
         v-for="commentDetailOption in commentDetailOptions"
         :key="commentDetailOption.value"
         v-model="commentDetail"
         :value="commentDetailOption.value"
-        name="service[comment_detail]"
-        :disabled="disableForm"
+        :disabled="isInheriting"
       >
         {{ commentDetailOption.label }}
         <template #help>
@@ -141,13 +142,17 @@ export default {
         }}
       </label>
 
-      <input name="service[commit_events]" type="hidden" value="false" />
-      <gl-form-checkbox v-model="triggerCommit" name="service[commit_events]">
+      <input name="service[commit_events]" type="hidden" :value="triggerCommit || false" />
+      <gl-form-checkbox v-model="triggerCommit" :disabled="isInheriting">
         {{ __('Commit') }}
       </gl-form-checkbox>
 
-      <input name="service[merge_requests_events]" type="hidden" value="false" />
-      <gl-form-checkbox v-model="triggerMergeRequest" name="service[merge_requests_events]">
+      <input
+        name="service[merge_requests_events]"
+        type="hidden"
+        :value="triggerMergeRequest || false"
+      />
+      <gl-form-checkbox v-model="triggerMergeRequest" :disabled="isInheriting">
         {{ __('Merge request') }}
       </gl-form-checkbox>
 
@@ -159,8 +164,12 @@ export default {
         <label>
           {{ s__('Integrations|Comment settings:') }}
         </label>
-        <input name="service[comment_on_event_enabled]" type="hidden" value="false" />
-        <gl-form-checkbox v-model="enableComments" name="service[comment_on_event_enabled]">
+        <input
+          name="service[comment_on_event_enabled]"
+          type="hidden"
+          :value="enableComments || false"
+        />
+        <gl-form-checkbox v-model="enableComments" :disabled="isInheriting">
           {{ s__('Integrations|Enable comments') }}
         </gl-form-checkbox>
 
@@ -168,12 +177,18 @@ export default {
           <label>
             {{ s__('Integrations|Comment detail:') }}
           </label>
+          <input
+            v-if="isInheriting"
+            name="service[comment_detail]"
+            type="hidden"
+            :value="commentDetail"
+          />
           <gl-form-radio
             v-for="commentDetailOption in commentDetailOptions"
             :key="commentDetailOption.value"
             v-model="commentDetail"
             :value="commentDetailOption.value"
-            name="service[comment_detail]"
+            :disabled="isInheriting"
           >
             {{ commentDetailOption.label }}
             <template #help>

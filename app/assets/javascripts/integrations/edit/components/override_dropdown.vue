@@ -1,42 +1,44 @@
 <script>
 import { s__ } from '~/locale';
-import { mapState } from 'vuex';
 import { GlNewDropdown, GlNewDropdownItem } from '@gitlab/ui';
 
-const options = [
+const dropdownOptions = [
   {
-    value: 'instance',
+    value: false,
     text: s__('Integrations|Use instance level settings'),
   },
   {
-    value: 'project',
+    value: true,
     text: s__('Integrations|Use custom settings'),
   },
 ];
 
-const defaultOption = options[0];
-const customOption = options[1];
-
 export default {
+  dropdownOptions,
   name: 'OverrideDropdown',
   components: {
     GlNewDropdown,
     GlNewDropdownItem,
   },
-  props: {},
+  props: {
+    inheritFromId: {
+      type: Number,
+      required: true,
+    },
+    override: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
-      options,
-      selected: defaultOption,
+      selected: dropdownOptions.find(x => x.value === this.override),
     };
-  },
-  computed: {
-    ...mapState(['override']),
   },
   methods: {
     onClick(option) {
       this.selected = option;
-      this.$store.dispatch('setOverride', option === customOption);
+      this.$emit('change', option.value);
     },
   },
 };
@@ -47,8 +49,13 @@ export default {
     class="gl-display-flex gl-justify-content-space-between gl-align-items-baseline gl-py-4 gl-mt-5 gl-mb-6 gl-border-t-1 gl-border-t-solid gl-border-b-1 gl-border-b-solid gl-border-gray-100"
   >
     <span>{{ s__('Integrations|This integration has multiple settings available.') }}</span>
+    <input name="service[inherit_from_id]" :value="override ? '' : inheritFromId" type="hidden" />
     <gl-new-dropdown :text="selected.text">
-      <gl-new-dropdown-item v-for="option in options" :key="option.value" @click="onClick(option)">
+      <gl-new-dropdown-item
+        v-for="option in $options.dropdownOptions"
+        :key="option.value"
+        @click="onClick(option)"
+      >
         {{ option.text }}
       </gl-new-dropdown-item>
     </gl-new-dropdown>

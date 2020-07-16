@@ -23,7 +23,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['disableForm']),
+    ...mapGetters(['isInheriting']),
   },
   mounted() {
     // Initialize view
@@ -46,7 +46,7 @@ export default {
         v-model="activated"
         name="service[active]"
         class="gl-display-block gl-line-height-0"
-        :disabled="disableForm"
+        :disabled="isInheriting"
         @change="onToggle"
       />
     </gl-form-group>
@@ -55,7 +55,12 @@ export default {
     <div class="form-group row" role="group">
       <label for="service[active]" class="col-form-label col-sm-2">{{ __('Active') }}</label>
       <div class="col-sm-10 pt-1">
-        <gl-toggle v-model="activated" name="service[active]" @change="onToggle" />
+        <gl-toggle
+          v-model="activated"
+          name="service[active]"
+          :disabled="isInheriting"
+          @change="onToggle"
+        />
       </div>
     </div>
   </div>
