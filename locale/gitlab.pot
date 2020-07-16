@@ -2205,10 +2205,7 @@ msgstr ""
 msgid "AlertSettings|Test failed. Do you still want to save your changes anyway?"
 msgstr ""
 
-msgid "AlertSettings|There was an error updating the the alert settings. Please refresh the page to try again."
-msgstr ""
-
-msgid "AlertSettings|There was an error while trying to enable the alert settings. Please ensure you are using a valid URL."
+msgid "AlertSettings|There was an error updating the alert settings"
 msgstr ""
 
 msgid "AlertSettings|There was an error while trying to reset the key. Please refresh the page to try again."
@@ -9410,6 +9407,9 @@ msgid "Error loading template."
 msgstr ""
 
 msgid "Error loading viewer"
+msgstr ""
+
+msgid "Error message:"
 msgstr ""
 
 msgid "Error occurred when fetching sidebar data"
