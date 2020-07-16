@@ -82,6 +82,9 @@ Enter the further details on the page as described in the following table.
 
 To enable users to view Jira issues inside GitLab, select **Enable Jira issues** and enter a project key. **(PREMIUM)**
 
+CAUTION: **Caution:**
+If you enable Jira issues with the setting above, all users that have access to this GitLab project will be able to view all issues from the specified Jira project.
+
 When you have configured all settings, click **Test settings and save changes**.
 
 Your GitLab project can now interact with all Jira projects in your instance and the project now displays a Jira link that opens the Jira project.
