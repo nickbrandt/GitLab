@@ -28,7 +28,9 @@ export default {
   },
   methods: {
     artifactDownloadUrl(job) {
-      return `/api/v4/projects/${this.projectId}/jobs/artifacts/${job.ref}/download?job=${job.name}`;
+      return `/api/v4/projects/${this.projectId}/jobs/artifacts/${
+        job.ref
+      }/download?job=${encodeURIComponent(job.name)}`;
     },
   },
 };
