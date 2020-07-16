@@ -45,7 +45,7 @@
             = _('MERGED')
         - elsif merge_request.closed?
           %li.issuable-status.d-none.d-sm-inline-block
-            = icon('ban')
+            = sprite_icon('cancel', size: 16, css_class: 'gl-vertical-align-text-bottom')
             = _('CLOSED')
         = render 'shared/merge_request_pipeline_status', merge_request: merge_request
         - if merge_request.open? && merge_request.broken?
