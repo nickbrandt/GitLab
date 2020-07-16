@@ -14,6 +14,14 @@ RSpec.shared_examples 'a blob replicator' do
 
   subject(:replicator) { model_record.replicator }
 
+  shared_examples 'does not schedule the checksum calculation' do
+    it do
+      expect(Geo::BlobVerificationPrimaryWorker).not_to receive(:perform_async)
+
+      replicator.handle_after_create_commit
+    end
+  end
+
   before do
     stub_current_geo_node(primary)
   end
@@ -37,13 +45,12 @@ RSpec.shared_examples 'a blob replicator' do
       replicator.handle_after_create_commit
     end
 
-    it 'does not schedule the checksum calculation if feature flag is disabled' do
-      stub_feature_flags(geo_self_service_framework_replication: false)
+    context 'when replication feature flag is disabled' do
+      before do
+        stub_feature_flags("geo_#{replicator.replicable_name}_replication": false)
+      end
 
-      expect(Geo::BlobVerificationPrimaryWorker).not_to receive(:perform_async)
-      allow(replicator).to receive(:needs_checksum?).and_return(true)
-
-      replicator.handle_after_create_commit
+      it_behaves_like 'does not schedule the checksum calculation'
     end
   end
 

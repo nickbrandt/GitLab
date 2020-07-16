@@ -8,6 +8,18 @@ RSpec.describe Gitlab::Geo::Replicator do
   let_it_be(:primary_node) { create(:geo_node, :primary) }
   let_it_be(:secondary_node) { create(:geo_node) }
 
+  shared_examples 'does not replicate' do
+    it 'returns nil' do
+      expect(subject.publish(:test, other: true)).to be_nil
+    end
+
+    it 'does not call create_event' do
+      expect(subject).not_to receive(:create_event_with)
+
+      subject.publish(:test, other: true)
+    end
+  end
+
   before(:all) do
     ActiveRecord::Schema.define do
       create_table :dummy_models, force: true do |t|
@@ -94,20 +106,12 @@ RSpec.describe Gitlab::Geo::Replicator do
     describe '#publish' do
       subject { Geo::DummyReplicator.new }
 
-      context 'when geo_self_service_framework_replication feature is disabled' do
+      context 'when replication is disabled' do
         before do
-          stub_feature_flags(geo_self_service_framework_replication: false)
+          stub_feature_flags(geo_dummy_replication: false)
         end
 
-        it 'returns nil' do
-          expect(subject.publish(:test, other: true)).to be_nil
-        end
-
-        it 'does not call create_event' do
-          expect(subject).not_to receive(:create_event_with)
-
-          subject.publish(:test, other: true)
-        end
+        it_behaves_like 'does not replicate'
       end
 
       context 'when publishing a supported events with required params' do

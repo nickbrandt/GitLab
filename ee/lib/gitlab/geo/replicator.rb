@@ -160,6 +160,18 @@ module Gitlab
         registry_class.failed.count
       end
 
+      def self.enabled?
+        Feature.enabled?(
+          replication_enabled_feature_key,
+          default_enabled: replication_enabled_by_default?)
+      end
+
+      # Replication is set behind a feature flag, which is enabled by default.
+      # If you want it disabled by default, override this method.
+      def self.replication_enabled_by_default?
+        true
+      end
+
       # @example Given `Geo::PackageFileRegistryFinder`, this returns
       #   `::Geo::PackageFileReplicator`
       # @example Given `Resolver::Geo::PackageFileRegistriesResolver`, this
@@ -201,7 +213,7 @@ module Gitlab
       # @param [Symbol] event_name
       # @param [Hash] event_data
       def publish(event_name, **event_data)
-        return unless Feature.enabled?(:geo_self_service_framework_replication, default_enabled: true)
+        return unless self.class.enabled?
 
         raise ArgumentError, "Unsupported event: '#{event_name}'" unless self.class.event_supported?(event_name)
 
@@ -294,6 +306,10 @@ module Gitlab
       end
 
       protected
+
+      def self.replication_enabled_feature_key
+        :"geo_#{replicable_name}_replication"
+      end
 
       # Store an event on the database
       #
