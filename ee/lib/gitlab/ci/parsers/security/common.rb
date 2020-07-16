@@ -54,7 +54,7 @@ module Gitlab
           def create_vulnerability(report, data, version)
             scanner = create_scanner(report, data['scanner'] || mutate_scanner_tool(data['tool']))
             identifiers = create_identifiers(report, data['identifiers'])
-            report.finding(
+            report.add_finding(
               ::Gitlab::Ci::Reports::Security::Occurrence.new(
                 uuid: SecureRandom.uuid,
                 report_type: report.type,

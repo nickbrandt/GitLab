@@ -16,7 +16,7 @@ FactoryBot.define do
     after :build do |report, evaluator|
       evaluator.scanners.each { |s| report.add_scanner(s) }
       evaluator.identifiers.each { |id| report.add_identifier(id) }
-      evaluator.findings.each { |o| report.finding(o) }
+      evaluator.findings.each { |o| report.add_finding(o) }
     end
 
     skip_create

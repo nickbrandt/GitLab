@@ -124,7 +124,7 @@ module Security
       deduplicate_findings!
       sort_findings!
 
-      @findings.each { |finding| @target_report.finding(finding) }
+      @findings.each { |finding| @target_report.add_finding(finding) }
     end
 
     def sort_by_ds_analyzers!

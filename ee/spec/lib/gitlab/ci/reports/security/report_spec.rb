@@ -45,7 +45,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     let(:finding) { create(:ci_reports_security_finding) }
 
     it 'enriches given finding and stores it in the collection' do
-      report.finding(finding)
+      report.add_finding(finding)
 
       expect(report.findings).to eq([finding])
     end
@@ -131,7 +131,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
         let(:finding) { build(:ci_reports_security_finding, severity: severity) }
 
         before do
-          subject.finding(finding)
+          subject.add_finding(finding)
         end
 
         it { expect(subject.unsafe_severity?).to be(true) }
@@ -145,7 +145,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
         let(:finding) { build(:ci_reports_security_finding, severity: severity) }
 
         before do
-          subject.finding(finding)
+          subject.add_finding(finding)
         end
 
         it { expect(subject.unsafe_severity?).to be(false) }
@@ -157,7 +157,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
       let(:finding) { build(:ci_reports_security_finding, severity: nil) }
 
       before do
-        subject.finding(finding)
+          subject.add_finding(finding)
       end
 
       it { expect(subject.unsafe_severity?).to be(false) }
@@ -168,7 +168,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
       let(:finding) { build(:ci_reports_security_finding, severity: '') }
 
       before do
-        subject.finding(finding)
+          subject.add_finding(finding)
       end
 
       it { expect(subject.unsafe_severity?).to be(false) }
