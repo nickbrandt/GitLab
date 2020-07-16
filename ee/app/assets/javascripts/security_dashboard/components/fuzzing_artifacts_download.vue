@@ -28,13 +28,7 @@ export default {
   },
   methods: {
     artifactDownloadUrl(job) {
-      return `/api/v4/projects/${this.projectId}/jobs/artifacts/${this.encodedRef(job.ref)}/download?job=${job.name}`;
-    },
-    encodedRef(ref){
-      return ref
-      .split('/')
-      .map(fragment => encodeURIComponent(fragment))
-      .join('/');
+      return `/api/v4/projects/${this.projectId}/jobs/artifacts/${job.ref}/download?job=${job.name}`;
     },
   },
 };
