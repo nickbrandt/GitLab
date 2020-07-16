@@ -1,0 +1,5 @@
+---
+title: Add button to Security Configuration page to enable SAST, and Auto DevOps prompt
+merge_request: 36796
+author:
+type: added

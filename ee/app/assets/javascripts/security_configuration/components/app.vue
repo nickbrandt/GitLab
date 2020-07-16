@@ -101,12 +101,7 @@ export default {
       ];
     },
     shouldShowAutoDevopsAlert() {
-      return Boolean(
-        this.glFeatures.sastConfigurationByClick &&
-          !this.autoDevopsEnabled &&
-          !this.gitlabCiPresent &&
-          this.canEnableAutoDevops,
-      );
+      return Boolean(!this.autoDevopsEnabled && !this.gitlabCiPresent && this.canEnableAutoDevops);
     },
   },
   methods: {
@@ -127,10 +122,7 @@ export default {
     // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575
     canCreateSASTMergeRequest(feature) {
       return Boolean(
-        this.glFeatures.sastConfigurationByClick &&
-          feature.type === 'sast' &&
-          this.createSastMergeRequestPath &&
-          !this.gitlabCiPresent,
+        feature.type === 'sast' && this.createSastMergeRequestPath && !this.gitlabCiPresent,
       );
     },
   },
