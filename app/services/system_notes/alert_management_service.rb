@@ -49,6 +49,5 @@ module SystemNotes
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'alert_issue_added'))
     end
-
   end
 end

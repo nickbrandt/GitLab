@@ -255,6 +255,8 @@ RSpec.describe Issues::CloseService do
       it 'resolves associated alert' do
         alert = create(:alert_management_alert, issue: issue, project: project)
 
+        expect(SystemNoteService).to receive(:closed_alert_issue).with(alert, issue, instance_of(User))
+
         close_issue
 
         expect(alert.reload.resolved?).to eq(true)

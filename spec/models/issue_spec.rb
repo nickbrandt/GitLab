@@ -168,41 +168,6 @@ RSpec.describe Issue do
 
       expect { issue.close }.to change { issue.state_id }.from(open_state).to(closed_state)
     end
-
-    context 'when there is an associated Alert Management Alert' do
-      context 'when alert can be resolved' do
-        let!(:alert) { create(:alert_management_alert, project: issue.project, issue: issue) }
-
-        it 'resolves an alert' do
-          expect { issue.close(user) }.to change { alert.reload.resolved? }.to(true)
-        end
-
-        it 'creates a system note' do
-          expect(SystemNoteService).to receive(:closed_alert_issue).with(alert, issue, instance_of(User))
-
-          issue.close(user)
-        end
-      end
-
-      context 'when alert cannot be resolved' do
-        let!(:alert) { create(:alert_management_alert, :with_validation_errors, project: issue.project, issue: issue) }
-
-        before do
-          allow(Gitlab::AppLogger).to receive(:warn).and_call_original
-        end
-
-        it 'writes a warning into the log' do
-          close
-
-          expect(Gitlab::AppLogger).to have_received(:warn).with(
-            message: 'Cannot resolve an associated Alert Management alert',
-            issue_id: issue.id,
-            alert_id: alert.id,
-            alert_errors: { hosts: ['hosts array is over 255 chars'] }
-          )
-        end
-      end
-    end
   end
 
   describe '#reopen' do
@@ -401,6 +366,41 @@ RSpec.describe Issue do
       let(:issue) { create(:issue) }
 
       it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#resolve_associated_alert_management_alert' do
+    let(:issue) { create(:issue) }
+
+    subject { issue.resolve_associated_alert_management_alert(user) }
+
+    context 'when there is an associated Alert Management Alert' do
+      context 'when alert can be resolved' do
+        let!(:alert) { create(:alert_management_alert, project: issue.project, issue: issue) }
+
+        it 'resolves an alert' do
+          expect { subject }.to change { alert.reload.resolved? }.to(true)
+        end
+      end
+
+      context 'when alert cannot be resolved' do
+        let!(:alert) { create(:alert_management_alert, :with_validation_errors, project: issue.project, issue: issue) }
+
+        before do
+          allow(Gitlab::AppLogger).to receive(:warn).and_call_original
+        end
+
+        it 'writes a warning into the log' do
+          subject
+
+          expect(Gitlab::AppLogger).to have_received(:warn).with(
+            message: 'Cannot resolve an associated Alert Management alert',
+            issue_id: issue.id,
+            alert_id: alert.id,
+            alert_errors: { hosts: ['hosts array is over 255 chars'] }
+          )
+        end
+      end
     end
   end
 

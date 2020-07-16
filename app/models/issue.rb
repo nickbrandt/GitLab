@@ -362,10 +362,7 @@ class Issue < ApplicationRecord
   def resolve_associated_alert_management_alert(user)
     return unless alert_management_alert
 
-    if alert_management_alert.resolve
-      SystemNoteService.closed_alert_issue(alert_management_alert, self, user)
-      return
-    end
+    return true if alert_management_alert.resolve
 
     Gitlab::AppLogger.warn(
       message: 'Cannot resolve an associated Alert Management alert',

@@ -33,7 +33,7 @@ module Issues
 
         notification_service.async.close_issue(issue, current_user, closed_via: closed_via) if notifications
         todo_service.close_issue(issue, current_user)
-        issue.resolve_associated_alert_management_alert(current_user)
+        resolve_alert(issue)
         execute_hooks(issue, 'close')
         invalidate_cache_counts(issue, users: issue.assignees)
         issue.update_project_counter_caches
@@ -57,6 +57,12 @@ module Issues
 
     def create_note(issue, current_commit)
       SystemNoteService.change_status(issue, issue.project, current_user, issue.state, current_commit)
+    end
+
+    def resolve_alert(issue)
+      return unless issue.resolve_associated_alert_management_alert(current_user)
+
+      SystemNoteService.closed_alert_issue(issue.alert_management_alert, issue, current_user)
     end
 
     def store_first_mentioned_in_commit_at(issue, merge_request)
