@@ -130,7 +130,7 @@
   }
 
   .linked-pipeline.build {
-    height: 41px;
+    height: 42px;
 
     &::before {
       content: none;
@@ -163,7 +163,7 @@
       }
     }
 
-    &.child-pipeline {
+    &.downstream-pipeline {
       height: 68px;
     }
 
