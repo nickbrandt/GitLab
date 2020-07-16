@@ -198,9 +198,9 @@ From the **Jira Issues** menu, click **Issues List**. The issue list defaults to
 
 Issues are grouped into tabs based on their [Jira status](https://confluence.atlassian.com/adminjiraserver070/defining-status-field-values-749382903.html).
 
-* The **Open** tab displays all issues with a Jira status in any category other than Done.
-* The **Closed** tab displays all issues with a Jira status categorized as Done.
-* The **All** tab displays all issues of any status.
+- The **Open** tab displays all issues with a Jira status in any category other than Done.
+- The **Closed** tab displays all issues with a Jira status categorized as Done.
+- The **All** tab displays all issues of any status.
 
 Click an issue title to open its original Jira issue page for full details.
 
