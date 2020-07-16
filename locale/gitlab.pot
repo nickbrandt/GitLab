@@ -2060,6 +2060,9 @@ msgstr ""
 msgid "AlertManagement|Overview"
 msgstr ""
 
+msgid "AlertManagement|Please try again."
+msgstr ""
+
 msgid "AlertManagement|Reported %{when}"
 msgstr ""
 
@@ -2088,6 +2091,9 @@ msgid "AlertManagement|There was an error displaying the alert. Please refresh t
 msgstr ""
 
 msgid "AlertManagement|There was an error displaying the alerts. Confirm your endpoint's configuration details to ensure alerts appear."
+msgstr ""
+
+msgid "AlertManagement|There was an error while updating the To Do of the alert."
 msgstr ""
 
 msgid "AlertManagement|There was an error while updating the assignee(s) list. Please try again."
@@ -19131,9 +19137,6 @@ msgstr ""
 msgid "Queued"
 msgstr ""
 
-msgid "Quick actions"
-msgstr ""
-
 msgid "Quick actions can be used in the issues description and comment boxes."
 msgstr ""
 
@@ -26720,6 +26723,9 @@ msgstr ""
 msgid "You"
 msgstr ""
 
+msgid "You already have pending todo for this alert"
+msgstr ""
+
 msgid "You are about to delete %{domain} from your instance. This domain will no longer be available to any Knative application."
 msgstr ""
 
@@ -26997,6 +27003,9 @@ msgid "You have declined the invitation to join %{label}."
 msgstr ""
 
 msgid "You have imported from this project %{numberOfPreviousImports} times before. Each new import will create duplicate issues."
+msgstr ""
+
+msgid "You have insufficient permissions to create a Todo for this alert"
 msgstr ""
 
 msgid "You have no permissions"
