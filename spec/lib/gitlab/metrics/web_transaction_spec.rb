@@ -100,7 +100,7 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
       end
 
       it 'contains only the labels defined for transactions' do
-        expect(transaction.labels.keys).to contain_exactly(*described_class.superclass::BASE_LABELS.keys)
+        expect(transaction.labels.keys).to contain_exactly(*described_class.superclass::BASE_LABEL_KEYS)
       end
 
       it 'does not provide labels if route infos are missing' do
@@ -121,7 +121,7 @@ RSpec.describe Gitlab::Metrics::WebTransaction do
       end
 
       it 'contains only the labels defined for transactions' do
-        expect(transaction.labels.keys).to contain_exactly(*described_class.superclass::BASE_LABELS.keys)
+        expect(transaction.labels.keys).to contain_exactly(*described_class.superclass::BASE_LABEL_KEYS)
       end
 
       context 'when the request content type is not :html' do

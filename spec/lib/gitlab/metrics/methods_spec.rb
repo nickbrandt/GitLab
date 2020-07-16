@@ -135,5 +135,5 @@ RSpec.describe Gitlab::Metrics::Methods do
 
   include_examples 'metric', :counter, {}
   include_examples 'metric', :gauge, {}, :all
-  include_examples 'metric', :histogram, {}, [0.005, 0.01, 0.1, 1, 10]
+  include_examples 'metric', :histogram, {}, ::Prometheus::Client::Histogram::DEFAULT_BUCKETS
 end

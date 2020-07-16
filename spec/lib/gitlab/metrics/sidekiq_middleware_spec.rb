@@ -12,7 +12,7 @@ RSpec.describe Gitlab::Metrics::SidekiqMiddleware do
 
       expect_next_instance_of(Gitlab::Metrics::BackgroundTransaction) do |transaction|
         expect(transaction).to receive(:set).with(:sidekiq_queue_duration, instance_of(Float))
-        expect(transaction).to receive(:increment).with(:db_count, 1)
+        expect(transaction).to receive(:increment).with(:gitlab_transaction_db_count_total, 1)
       end
 
       middleware.call(worker, message, :test) do

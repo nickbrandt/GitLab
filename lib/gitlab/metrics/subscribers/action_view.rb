@@ -19,9 +19,9 @@ module Gitlab
 
         def track(event)
           tags = tags_for(event)
-          current_transaction.observe(:gitlab_view_rendering_duration_seconds, event.duration) do
+          current_transaction.observe(:gitlab_view_rendering_duration_seconds, event.duration, tags) do
             docstring 'View rendering time'
-            base_labels tags
+            label_keys %i(view)
             buckets [0.001, 0.01, 0.1, 1, 10.0]
             with_feature :prometheus_metrics_view_instrumentation
           end

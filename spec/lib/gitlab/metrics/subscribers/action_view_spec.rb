@@ -30,7 +30,7 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActionView do
     it 'observes view rendering time' do
       expect(transaction)
         .to receive(:observe)
-        .with(:gitlab_view_rendering_duration_seconds, 2.1)
+        .with(:gitlab_view_rendering_duration_seconds, 2.1, { view: "app/views/x.html.haml" })
 
       subscriber.render_template(event)
     end

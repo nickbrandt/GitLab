@@ -27,7 +27,7 @@ RSpec.describe Gitlab::Metrics::BackgroundTransaction do
     end
 
     it 'contains only the labels defined for metrics' do
-      expect(subject.labels.keys).to contain_exactly(*described_class.superclass::BASE_LABELS.keys)
+      expect(subject.labels.keys).to contain_exactly(*described_class.superclass::BASE_LABEL_KEYS)
     end
 
     it 'includes the feature category if there is one' do

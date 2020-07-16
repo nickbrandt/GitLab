@@ -116,17 +116,17 @@ RSpec.describe Gitlab::Metrics::Transaction do
         expect(::Gitlab::Metrics).to receive(:counter).with(:block_labels, 'Block labels counter', hash_including(:controller, :action, :sane)).and_return(prometheus_metric)
 
         labels = { sane: 'yes' }
-        transaction.increment(:block_labels, 1) do
-          base_labels labels
+        transaction.increment(:block_labels, 1, labels) do
+          label_keys %i(sane)
         end
       end
 
       it 'filters sensitive tags' do
         expect(::Gitlab::Metrics).to receive(:counter).with(:metric_with_sensitive_block, 'Metric with sensitive block counter', hash_excluding(sensitive_tags)).and_return(prometheus_metric)
 
-        labels = sensitive_tags
-        transaction.increment(:metric_with_sensitive_block, 1) do
-          base_labels labels
+        labels_keys = sensitive_tags.keys
+        transaction.increment(:metric_with_sensitive_block, 1, sensitive_tags) do
+          label_keys labels_keys
         end
       end
     end
@@ -155,17 +155,17 @@ RSpec.describe Gitlab::Metrics::Transaction do
         expect(::Gitlab::Metrics).to receive(:gauge).with(:block_labels_set, 'Block labels set gauge', hash_including(:controller, :action, :sane), :livesum).and_return(prometheus_metric)
 
         labels = { sane: 'yes' }
-        transaction.set(:block_labels_set, 1) do
-          base_labels labels
+        transaction.set(:block_labels_set, 1, labels) do
+          label_keys %i(sane)
         end
       end
 
       it 'filters sensitive tags' do
         expect(::Gitlab::Metrics).to receive(:gauge).with(:metric_set_with_sensitive_block, 'Metric set with sensitive block gauge', hash_excluding(sensitive_tags), :livesum).and_return(prometheus_metric)
 
-        labels = sensitive_tags
-        transaction.set(:metric_set_with_sensitive_block, 1) do
-          base_labels labels
+        label_keys = sensitive_tags.keys
+        transaction.set(:metric_set_with_sensitive_block, 1, sensitive_tags) do
+          label_keys label_keys
         end
       end
     end
@@ -194,17 +194,17 @@ RSpec.describe Gitlab::Metrics::Transaction do
         expect(::Gitlab::Metrics).to receive(:histogram).with(:block_labels_observe, 'Block labels observe histogram', hash_including(:controller, :action, :sane), kind_of(Array)).and_return(prometheus_metric)
 
         labels = { sane: 'yes' }
-        transaction.observe(:block_labels_observe, 1) do
-          base_labels labels
+        transaction.observe(:block_labels_observe, 1, labels) do
+          label_keys %i(sane)
         end
       end
 
       it 'filters sensitive tags' do
         expect(::Gitlab::Metrics).to receive(:histogram).with(:metric_observe_with_sensitive_block, 'Metric observe with sensitive block histogram', hash_excluding(sensitive_tags), kind_of(Array)).and_return(prometheus_metric)
 
-        labels = sensitive_tags
-        transaction.observe(:metric_observe_with_sensitive_block, 1) do
-          base_labels labels
+        label_keys = sensitive_tags.keys
+        transaction.observe(:metric_observe_with_sensitive_block, 1, sensitive_tags) do
+          label_keys label_keys
         end
       end
     end

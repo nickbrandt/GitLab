@@ -6,10 +6,10 @@ module Gitlab
     class Transaction
       include Gitlab::Metrics::Methods
 
-      # base labels shared among all transactions
-      BASE_LABELS = { controller: nil, action: nil, feature_category: nil }.freeze
+      # base label keys shared among all transactions
+      BASE_LABEL_KEYS = %i(controller action feature_category).freeze
       # labels that potentially contain sensitive information and will be filtered
-      FILTERED_LABELS = [:branch, :path].freeze
+      FILTERED_LABELS = %i(branch path).freeze
 
       THREAD_KEY = :_gitlab_metrics_transaction
 
@@ -31,11 +31,10 @@ module Gitlab
             # set default metric options
             docstring "#{name.to_s.humanize} #{type}"
             multiprocess_mode :livesum if type == :gauge
-            buckets ::Prometheus::Client::Histogram::DEFAULT_BUCKETS if type == :histogram
 
             evaluate(&block)
             # always filter sensitive labels and merge with base ones
-            base_labels base_labels.without(*FILTERED_LABELS).merge(BASE_LABELS)
+            label_keys BASE_LABEL_KEYS | (label_keys - FILTERED_LABELS)
           end
         end
       end
@@ -97,10 +96,10 @@ module Gitlab
       def add_event(event_name, tags = {})
         event_name = "gitlab_transaction_event_#{event_name}_total".to_sym
         metric = self.class.prometheus_metric(event_name, :counter) do
-          base_labels tags
+          label_keys tags.keys
         end
 
-        metric.increment(tags.without(*FILTERED_LABELS).merge(labels))
+        metric.increment(filter_labels(tags))
       end
 
       # Returns a MethodCall object for the given name.
@@ -124,13 +123,13 @@ module Gitlab
       #
       # transaction.increment(:mestric_name, 1) do
       #   docstring 'Custom title'
-      #   base_labels { sane: 'yes' }
+      #   label_keys %i(sane)
       # end
       # ```
-      def increment(name, value = 1, &block)
+      def increment(name, value = 1, labels = {}, &block)
         counter = self.class.prometheus_metric(name, :counter, &block)
 
-        counter.increment(counter.base_labels&.merge(labels), value)
+        counter.increment(filter_labels(labels), value)
       end
 
       # Set gauge metric
@@ -145,10 +144,10 @@ module Gitlab
       #   multiprocess_mode :all
       # end
       # ```
-      def set(name, value, &block)
+      def set(name, value, labels = {}, &block)
         gauge = self.class.prometheus_metric(name, :gauge, &block)
 
-        gauge.set(gauge.base_labels&.merge(labels), value)
+        gauge.set(filter_labels(labels), value)
       end
 
       # Observe histogram metric
@@ -163,14 +162,20 @@ module Gitlab
       #   buckets [100, 1000, 10000, 100000, 1000000, 10000000]
       # end
       # ```
-      def observe(name, value, &block)
+      def observe(name, value, labels = {}, &block)
         histogram = self.class.prometheus_metric(name, :histogram, &block)
 
-        histogram.observe(histogram.base_labels&.merge(labels), value)
+        histogram.observe(filter_labels(labels), value)
       end
 
       def labels
-        BASE_LABELS
+        BASE_LABEL_KEYS.each_with_object( {} ) do |key, hash|
+          hash[key] = nil
+        end
+      end
+
+      def filter_labels(labels)
+        labels.empty? ? self.labels : labels.without(*FILTERED_LABELS).merge(self.labels)
       end
     end
   end

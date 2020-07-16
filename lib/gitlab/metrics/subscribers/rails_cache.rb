@@ -53,15 +53,15 @@ module Gitlab
           return unless current_transaction
 
           labels = { operation: key }
-          current_transaction.increment(:gitlab_cache_operations_total, 1) do
+          current_transaction.increment(:gitlab_cache_operations_total, 1, labels) do
             docstring 'Cache operations'
-            base_labels labels
+            label_keys labels.keys
           end
 
-          current_transaction.observe(:gitlab_cache_operation_duration_seconds, duration / 1000.0) do
+          current_transaction.observe(:gitlab_cache_operation_duration_seconds, duration / 1000.0, labels) do
             docstring 'Cache access time'
             buckets [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
-            base_labels labels
+            label_keys labels.keys
           end
         end
 

@@ -42,7 +42,7 @@ RSpec.describe Gitlab::Metrics::MethodCall do
 
         it 'observes the performance of the supplied block' do
           expect(transaction)
-            .to receive(:observe).with(:gitlab_method_call_duration_seconds, be_a_kind_of(Numeric))
+            .to receive(:observe).with(:gitlab_method_call_duration_seconds, be_a_kind_of(Numeric), { method: "#bar", module: :Foo })
 
           method_call.measure { 'foo' }
         end
@@ -55,7 +55,7 @@ RSpec.describe Gitlab::Metrics::MethodCall do
 
         it 'observes the performance of the supplied block' do
           expect(transaction)
-            .to receive(:observe).with(:gitlab_method_call_duration_seconds, be_a_kind_of(Numeric))
+            .to receive(:observe).with(:gitlab_method_call_duration_seconds, be_a_kind_of(Numeric), { method: "#bar", module: :Foo })
 
           method_call.measure { 'foo' }
         end
