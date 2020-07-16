@@ -6113,6 +6113,9 @@ msgstr ""
 msgid "Complete"
 msgstr ""
 
+msgid "Completed"
+msgstr ""
+
 msgid "Compliance"
 msgstr ""
 
@@ -15728,10 +15731,10 @@ msgstr ""
 msgid "No grouping"
 msgstr ""
 
-msgid "No iteration"
+msgid "No issues found"
 msgstr ""
 
-msgid "No iterations found"
+msgid "No iteration"
 msgstr ""
 
 msgid "No iterations to show"

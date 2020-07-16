@@ -51,7 +51,7 @@ describe('Iterations report tabs', () => {
 
     expect(wrapper.contains(GlLoadingIcon)).toBe(false);
     expect(wrapper.contains(GlTable)).toBe(true);
-    expect(wrapper.text()).toContain('No iterations found');
+    expect(wrapper.text()).toContain('No issues found');
   });
 
   it('shows error in a gl-alert', () => {

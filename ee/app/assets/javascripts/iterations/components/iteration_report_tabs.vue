@@ -181,7 +181,7 @@ export default {
         v-else
         :items="issues.list"
         :fields="$options.fields"
-        :empty-text="__('No iterations found')"
+        :empty-text="__('No issues found')"
         :show-empty="true"
         fixed
         stacked="sm"
