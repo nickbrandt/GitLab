@@ -37,6 +37,12 @@ export const inputPlaceholderTextMap = {
   [issuableTypesMap.MERGE_REQUEST]: __('Enter merge request URLs'),
 };
 
+export const inputPlaceholderConfidentialTextMap = {
+  [issuableTypesMap.ISSUE]: __('Paste confidential issue link'),
+  [issuableTypesMap.EPIC]: __('Paste confidential epic link'),
+  [issuableTypesMap.MERGE_REQUEST]: __('Enter merge request URLs'),
+};
+
 export const relatedIssuesRemoveErrorMap = {
   [issuableTypesMap.ISSUE]: __('An error occurred while removing issues.'),
   [issuableTypesMap.EPIC]: __('An error occurred while removing epics.'),

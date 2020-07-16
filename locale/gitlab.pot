@@ -15551,6 +15551,12 @@ msgstr ""
 msgid "New changes were added. %{linkStart}Reload the page to review them%{linkEnd}"
 msgstr ""
 
+msgid "New confidential epic title "
+msgstr ""
+
+msgid "New confidential issue title"
+msgstr ""
+
 msgid "New deploy key"
 msgstr ""
 
@@ -16829,6 +16835,12 @@ msgid "Paste a machine public key here. Read more about how to generate it"
 msgstr ""
 
 msgid "Paste a machine public key here. Read more about how to generate it %{link_start}here%{link_end}"
+msgstr ""
+
+msgid "Paste confidential epic link"
+msgstr ""
+
+msgid "Paste confidential issue link"
 msgstr ""
 
 msgid "Paste epic link"

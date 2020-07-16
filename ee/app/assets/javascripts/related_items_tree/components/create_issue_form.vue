@@ -33,7 +33,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['projectsFetchInProgress', 'itemCreateInProgress', 'projects']),
+    ...mapState(['projectsFetchInProgress', 'itemCreateInProgress', 'projects', 'parentItem']),
     dropdownToggleText() {
       if (this.selectedProject) {
         return this.selectedProject.name_with_namespace;
@@ -121,7 +121,9 @@ export default {
         <gl-form-input
           ref="titleInput"
           v-model.trim="title"
-          :placeholder="__('New issue title')"
+          :placeholder="
+            parentItem.confidential ? __('New confidential issue title') : __('New issue title')
+          "
           autofocus
         />
       </div>
