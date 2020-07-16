@@ -12521,6 +12521,9 @@ msgstr ""
 msgid "ImportProjects|Importing the project failed"
 msgstr ""
 
+msgid "ImportProjects|Importing the project failed: %{reason}"
+msgstr ""
+
 msgid "ImportProjects|Requesting your %{provider} repositories failed"
 msgstr ""
 
