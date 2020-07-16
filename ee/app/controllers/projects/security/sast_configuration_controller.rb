@@ -18,7 +18,7 @@ module Projects
         @branch_name = project.repository.next_branch("add-sast-config")
 
         @commit_params = {
-          commit_message: "Add .gitlab-ci.yml to enable SAST",
+          commit_message: "Add .gitlab-ci.yml to enable or configure SAST",
           actions: [{ action: "create", file_path: ".gitlab-ci.yml", content: gitlab_ci_yml }]
         }
 
@@ -35,7 +35,7 @@ module Projects
       end
 
       def successful_change_path
-        description = "Add .gitlab-ci.yml to enable SAST security scan using the GitLab managed SAST template."
+        description = "Add .gitlab-ci.yml to enable or configure SAST security scanning using the GitLab managed template. You can [add variable overrides](https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings) to customize SAST settings."
         merge_request_params = { source_branch: @branch_name, description: description }
         project_new_merge_request_url(@project, merge_request: merge_request_params)
       end
@@ -49,7 +49,9 @@ module Projects
       def ado_yml
         <<-CI_YML.strip_heredoc
           include:
-            - template: Auto-DevOps.gitlab-ci.yml
+            - template: Auto-DevOps.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-foss/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml
+          # You can override the above template(s) by including variable overrides
+          # See https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
         CI_YML
       end
 
@@ -59,7 +61,9 @@ module Projects
             - test
 
           include:
-            - template: SAST.gitlab-ci.yml
+            - template: SAST.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-foss/blob/master/lib/gitlab/ci/templates/Security/SAST.gitlab-ci.yml
+          # You can override the above template(s) by including variable overrides
+          # See https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
         CI_YML
       end
     end
