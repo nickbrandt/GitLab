@@ -286,7 +286,7 @@ application server, or a Gitaly node.
    so we use `default` here as well. This cluster has three Gitaly nodes `gitaly-1`,
    `gitaly-2`, and `gitaly-3`, which will be replicas of each other.
 
-   CAUTION: **CAUTION:** If you have data on an already existing storage called
+   CAUTION: **Caution:** If you have data on an already existing storage called
    `default`, you should configure the virtual storage with another name and
    [migrate the data to the Praefect storage](#migrating-existing-repositories-to-praefect)
    afterwards.

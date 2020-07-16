@@ -10,4 +10,6 @@ link: https://docs.gitlab.com/ee/development/documentation/styleguide.html#alert
 level: error
 scope: raw
 raw:
-  - '(NOTE|TIP|CAUTION|DANGER): \*\*[^:]*\*\*'
+  - '((NOTE|TIP|CAUTION|DANGER): \*\*[^:]*\*\*)|'
+  - '((NOTE: \*\*NOTE:\*\*)|(TIP: \*\*TIP:\*\*)|(CAUTION: \*\*CAUTION:\*\*)|(DANGER: \*\*DANGER:\*\*))|'
+  - '((NOTE: \*\*note:\*\*)|(TIP: \*\*tip:\*\*)|(CAUTION: \*\*caution:\*\*)|(DANGER: \*\*danger:\*\*))'
