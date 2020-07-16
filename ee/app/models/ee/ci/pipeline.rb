@@ -14,8 +14,8 @@ module EE
       prepended do
         include UsageStatistics
 
-        has_many :vulnerabilities_finding_pipelines, class_name: 'Vulnerabilities::FindingPipeline'
-        has_many :vulnerability_findings, source: :occurrence, through: :vulnerabilities_finding_pipelines, class_name: 'Vulnerabilities::Occurrence'
+        has_many :vulnerabilities_finding_pipelines, class_name: 'Vulnerabilities::FindingPipeline', inverse_of: :pipeline
+        has_many :vulnerability_findings, source: :finding, through: :vulnerabilities_finding_pipelines, class_name: 'Vulnerabilities::Finding'
 
         has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
         has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'

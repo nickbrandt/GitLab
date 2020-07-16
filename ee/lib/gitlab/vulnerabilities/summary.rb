@@ -29,7 +29,7 @@ module Gitlab
           critical:  0
         }
 
-        summary_keys = ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.map(&:to_sym)
+        summary_keys = ::Vulnerabilities::Finding::SEVERITY_LEVELS.keys.map(&:to_sym)
 
         project_ids_to_fetch.each do |project_id|
           project_summary = Gitlab::Vulnerabilities::SummaryCache

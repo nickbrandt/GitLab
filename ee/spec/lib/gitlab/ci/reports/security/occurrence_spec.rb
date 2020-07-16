@@ -62,7 +62,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Occurrence do
   end
 
   describe "delegation" do
-    subject { create(:ci_reports_security_occurrence) }
+    subject { create(:ci_reports_security_finding) }
 
     %i[file_path start_line end_line].each do |attribute|
       it "delegates attribute #{attribute} to location" do
@@ -72,7 +72,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Occurrence do
   end
 
   describe '#to_hash' do
-    let(:occurrence) { create(:ci_reports_security_occurrence) }
+    let(:occurrence) { create(:ci_reports_security_finding) }
 
     subject { occurrence.to_hash }
 
@@ -98,7 +98,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Occurrence do
     let(:primary_identifier) { create(:ci_reports_security_identifier) }
     let(:other_identifier) { create(:ci_reports_security_identifier) }
 
-    let(:occurrence) { create(:ci_reports_security_occurrence, identifiers: [primary_identifier, other_identifier]) }
+    let(:occurrence) { create(:ci_reports_security_finding, identifiers: [primary_identifier, other_identifier]) }
 
     subject { occurrence.primary_identifier }
 
@@ -111,7 +111,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Occurrence do
     let(:old_location) { create(:ci_reports_security_locations_sast, file_path: 'old_file.rb') }
     let(:new_location) { create(:ci_reports_security_locations_sast, file_path: 'new_file.rb') }
 
-    let(:occurrence) { create(:ci_reports_security_occurrence, location: old_location) }
+    let(:occurrence) { create(:ci_reports_security_finding, location: old_location) }
 
     subject { occurrence.update_location(new_location) }
 

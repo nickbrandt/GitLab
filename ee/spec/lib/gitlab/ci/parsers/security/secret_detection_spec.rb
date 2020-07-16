@@ -22,14 +22,14 @@ RSpec.describe Gitlab::Ci::Parsers::Security::SecretDetection do
           end
         end
 
-        it "parses all identifiers and occurrences" do
-          expect(report.occurrences.length).to eq(1)
+        it "parses all identifiers and findings" do
+          expect(report.findings.length).to eq(1)
           expect(report.identifiers.length).to eq(1)
           expect(report.scanners.length).to eq(1)
         end
 
         it 'generates expected location' do
-          location = report.occurrences.first.location
+          location = report.findings.first.location
 
           expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::SecretDetection)
           expect(location).to have_attributes(
@@ -42,7 +42,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::SecretDetection do
         end
 
         it "generates expected metadata_version" do
-          expect(report.occurrences.first.metadata_version).to eq('3.0')
+          expect(report.findings.first.metadata_version).to eq('3.0')
         end
       end
     end

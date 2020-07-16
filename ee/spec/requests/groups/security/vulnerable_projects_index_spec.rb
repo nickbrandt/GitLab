@@ -24,7 +24,7 @@ RSpec.describe 'GET /groups/*group_id/-/security/projects' do
     projects = create_list(:project, 2, namespace: group)
 
     projects.each do |project|
-      ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.each do |severity|
+      ::Vulnerabilities::Finding::SEVERITY_LEVELS.keys.each do |severity|
         create(:vulnerabilities_occurrence, severity: severity, project: project)
       end
     end

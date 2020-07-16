@@ -6,13 +6,13 @@ RSpec.describe Vulnerabilities::FindingReportsComparerEntity do
   describe 'container scanning report comparison' do
     let_it_be(:user) { create(:user) }
 
-    let(:base_occurrences) { create_list(:vulnerabilities_occurrence, 2) }
+    let(:base_findings) { create_list(:vulnerabilities_finding, 2) }
     let(:base_combined_reports) { build_list(:ci_reports_security_report, 1, created_at: nil) }
-    let(:base_report) { build(:ci_reports_security_aggregated_reports, reports: base_combined_reports, occurrences: base_occurrences)}
+    let(:base_report) { build(:ci_reports_security_aggregated_reports, reports: base_combined_reports, findings: base_findings)}
 
-    let(:head_occurrences) { create_list(:vulnerabilities_occurrence, 1) }
+    let(:head_findings) { create_list(:vulnerabilities_finding, 1) }
     let(:head_combined_reports) { build_list(:ci_reports_security_report, 1, created_at: 2.days.ago) }
-    let(:head_report) { build(:ci_reports_security_aggregated_reports, reports: head_combined_reports, occurrences: head_occurrences)}
+    let(:head_report) { build(:ci_reports_security_aggregated_reports, reports: head_combined_reports, findings: head_findings)}
 
     let(:scan) { create(:security_scan, scanned_resources_count: 10) }
     let(:security_scans) { [scan] }

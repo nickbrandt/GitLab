@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class Occurrence < ApplicationRecord
+  class Finding < ApplicationRecord
     include ShaAttribute
     include ::Gitlab::Utils::StrongMemoize
     include Presentable
@@ -15,14 +15,15 @@ module Vulnerabilities
     sha_attribute :project_fingerprint
     sha_attribute :location_fingerprint
 
-    belongs_to :project
+    belongs_to :project, inverse_of: :vulnerability_findings
     belongs_to :scanner, class_name: 'Vulnerabilities::Scanner'
-    belongs_to :primary_identifier, class_name: 'Vulnerabilities::Identifier', inverse_of: :primary_occurrences
-    belongs_to :vulnerability, inverse_of: :findings
+    belongs_to :primary_identifier, class_name: 'Vulnerabilities::Identifier', inverse_of: :primary_findings, foreign_key: 'primary_identifier_id'
+    belongs_to :vulnerability, class_name: 'Vulnerability', inverse_of: :findings, foreign_key: 'vulnerability_id'
 
-    has_many :finding_identifiers, class_name: 'Vulnerabilities::FindingIdentifier'
+    has_many :finding_identifiers, class_name: 'Vulnerabilities::FindingIdentifier', inverse_of: :finding, foreign_key: 'occurrence_id'
     has_many :identifiers, through: :finding_identifiers, class_name: 'Vulnerabilities::Identifier'
-    has_many :finding_pipelines, class_name: 'Vulnerabilities::FindingPipeline'
+
+    has_many :finding_pipelines, class_name: 'Vulnerabilities::FindingPipeline', inverse_of: :finding, foreign_key: 'occurrence_id'
     has_many :pipelines, through: :finding_pipelines, class_name: 'Ci::Pipeline'
 
     attr_writer :sha
@@ -122,7 +123,7 @@ module Vulnerabilities
     end
 
     def self.with_vulnerabilities_for_state(project:, report_type:, project_fingerprints:)
-      Vulnerabilities::Occurrence
+      Vulnerabilities::Finding
         .joins(:vulnerability)
         .where(
           project: project,

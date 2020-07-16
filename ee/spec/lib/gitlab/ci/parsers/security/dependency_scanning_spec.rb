@@ -27,14 +27,14 @@ RSpec.describe Gitlab::Ci::Parsers::Security::DependencyScanning do
         end
       end
 
-      it "parses all identifiers and occurrences" do
-        expect(report.occurrences.length).to eq(occurrence_count)
+      it "parses all identifiers and findings" do
+        expect(report.findings.length).to eq(occurrence_count)
         expect(report.identifiers.length).to eq(identifier_count)
         expect(report.scanners.length).to eq(scanner_count)
       end
 
       it 'generates expected location' do
-        location = report.occurrences.first.location
+        location = report.findings.first.location
 
         expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::DependencyScanning)
         expect(location).to have_attributes(
@@ -45,7 +45,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::DependencyScanning do
       end
 
       it "generates expected metadata_version" do
-        expect(report.occurrences.first.metadata_version).to eq(version)
+        expect(report.findings.first.metadata_version).to eq(version)
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::DependencyScanning do
       end
 
       it "generates occurrence with expected remediation" do
-        occurrence = report.occurrences.last
+        occurrence = report.findings.last
         raw_metadata = Gitlab::Json.parse!(occurrence.raw_metadata)
 
         expect(occurrence.name).to eq("Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js")

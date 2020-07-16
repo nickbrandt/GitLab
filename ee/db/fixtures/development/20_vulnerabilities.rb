@@ -128,15 +128,15 @@ class Gitlab::Seeder::Vulnerabilities
   end
 
   def random_confidence_level
-    ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS.keys.sample
+    ::Vulnerabilities::Finding::CONFIDENCE_LEVELS.keys.sample
   end
 
   def random_severity_level
-    ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.sample
+    ::Vulnerabilities::Finding::SEVERITY_LEVELS.keys.sample
   end
 
   def random_report_type
-    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.sample
+    ::Vulnerabilities::Finding::REPORT_TYPES.keys.sample
   end
 
   def metadata(line)

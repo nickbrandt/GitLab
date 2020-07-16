@@ -17,7 +17,7 @@ module Security
     attr_reader :projects
 
     def vulnerabilities
-      ::Vulnerabilities::Occurrence
+      ::Vulnerabilities::Finding
         .select(1)
         .undismissed
         .scoped_project

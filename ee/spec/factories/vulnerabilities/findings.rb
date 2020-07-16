@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  sequence :vulnerability_occurrence_uuid do |n|
+  sequence :vulnerability_finding_uuid do |n|
     SecureRandom.uuid
   end
 
-  factory :vulnerabilities_occurrence_with_remediation, parent: :vulnerabilities_occurrence do
+  factory :vulnerabilities_finding_with_remediation, parent: :vulnerabilities_finding do
     transient do
       summary { nil }
     end
@@ -24,10 +24,10 @@ FactoryBot.define do
     end
   end
 
-  factory :vulnerabilities_occurrence, class: 'Vulnerabilities::Occurrence', aliases: [:vulnerabilities_finding] do
+  factory :vulnerabilities_finding, class: 'Vulnerabilities::Finding', aliases: [:vulnerabilities_occurrence] do
     name { 'Cipher with no integrity' }
     project
-    sequence(:uuid) { generate(:vulnerability_occurrence_uuid) }
+    sequence(:uuid) { generate(:vulnerability_finding_uuid) }
     project_fingerprint { generate(:project_fingerprint) }
     primary_identifier factory: :vulnerabilities_identifier
     location_fingerprint { '4e5b6966dd100170b4b1ad599c7058cce91b57b4' }
@@ -114,7 +114,7 @@ FactoryBot.define do
       end
     end
 
-    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.each do |security_report_type|
+    ::Vulnerabilities::Finding::REPORT_TYPES.keys.each do |security_report_type|
       trait security_report_type do
         report_type { security_report_type }
       end
