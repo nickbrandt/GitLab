@@ -45,8 +45,7 @@ There are many ways to get to the New Issue form from within a project:
 
 ### Elements of the New Issue form
 
-> Ability to add the new issue to an epic [was introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13847)
-> in [GitLab Premium](https://about.gitlab.com/pricing/) 13.1.
+> Ability to add the new issue to an epic [was introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13847) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.1.
 
 ![New issue from the issues list](img/new_issue_v13_1.png)
 
