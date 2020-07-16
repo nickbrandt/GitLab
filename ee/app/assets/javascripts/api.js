@@ -15,6 +15,7 @@ export default {
   cycleAnalyticsSummaryDataPath: '/groups/:id/-/analytics/value_stream_analytics/summary',
   cycleAnalyticsTimeSummaryDataPath: '/groups/:id/-/analytics/value_stream_analytics/time_summary',
   cycleAnalyticsGroupStagesAndEventsPath: '/groups/:id/-/analytics/value_stream_analytics/stages',
+  cycleAnalyticsValueStreamsPath: '/groups/:id/-/analytics/value_stream_analytics/value_streams',
   cycleAnalyticsStageEventsPath:
     '/groups/:id/-/analytics/value_stream_analytics/stages/:stage_id/records',
   cycleAnalyticsStageMedianPath:
@@ -159,6 +160,11 @@ export default {
   cycleAnalyticsCreateStage(groupId, data) {
     const url = Api.buildUrl(this.cycleAnalyticsGroupStagesAndEventsPath).replace(':id', groupId);
 
+    return axios.post(url, data);
+  },
+
+  cycleAnalyticsCreateValueStream(groupId, data) {
+    const url = Api.buildUrl(this.cycleAnalyticsValueStreamsPath).replace(':id', groupId);
     return axios.post(url, data);
   },
 

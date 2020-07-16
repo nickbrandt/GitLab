@@ -26,21 +26,25 @@ describe('Cycle analytics mutations', () => {
   });
 
   it.each`
-    mutation                                    | stateKey            | value
-    ${types.REQUEST_STAGE_DATA}                 | ${'isLoadingStage'} | ${true}
-    ${types.RECEIVE_STAGE_DATA_ERROR}           | ${'isEmptyStage'}   | ${true}
-    ${types.RECEIVE_STAGE_DATA_ERROR}           | ${'isLoadingStage'} | ${false}
-    ${types.REQUEST_CYCLE_ANALYTICS_DATA}       | ${'isLoading'}      | ${true}
-    ${types.RECEIVE_GROUP_STAGES_ERROR}         | ${'stages'}         | ${[]}
-    ${types.REQUEST_GROUP_STAGES}               | ${'stages'}         | ${[]}
-    ${types.REQUEST_UPDATE_STAGE}               | ${'isLoading'}      | ${true}
-    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}       | ${'isLoading'}      | ${false}
-    ${types.RECEIVE_UPDATE_STAGE_ERROR}         | ${'isLoading'}      | ${false}
-    ${types.REQUEST_REMOVE_STAGE}               | ${'isLoading'}      | ${true}
-    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}      | ${'isLoading'}      | ${false}
-    ${types.REQUEST_STAGE_MEDIANS}              | ${'medians'}        | ${{}}
-    ${types.RECEIVE_STAGE_MEDIANS_ERROR}        | ${'medians'}        | ${{}}
-    ${types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS} | ${'isLoading'}      | ${false}
+    mutation                                     | stateKey                     | value
+    ${types.REQUEST_STAGE_DATA}                  | ${'isLoadingStage'}          | ${true}
+    ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'isEmptyStage'}            | ${true}
+    ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'isLoadingStage'}          | ${false}
+    ${types.REQUEST_CYCLE_ANALYTICS_DATA}        | ${'isLoading'}               | ${true}
+    ${types.RECEIVE_GROUP_STAGES_ERROR}          | ${'stages'}                  | ${[]}
+    ${types.REQUEST_GROUP_STAGES}                | ${'stages'}                  | ${[]}
+    ${types.REQUEST_UPDATE_STAGE}                | ${'isLoading'}               | ${true}
+    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}        | ${'isLoading'}               | ${false}
+    ${types.RECEIVE_UPDATE_STAGE_ERROR}          | ${'isLoading'}               | ${false}
+    ${types.REQUEST_REMOVE_STAGE}                | ${'isLoading'}               | ${true}
+    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}       | ${'isLoading'}               | ${false}
+    ${types.REQUEST_STAGE_MEDIANS}               | ${'medians'}                 | ${{}}
+    ${types.RECEIVE_STAGE_MEDIANS_ERROR}         | ${'medians'}                 | ${{}}
+    ${types.REQUEST_CREATE_VALUE_STREAM}         | ${'isCreatingValueStream'}   | ${true}
+    ${types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS} | ${'isCreatingValueStream'}   | ${false}
+    ${types.REQUEST_CREATE_VALUE_STREAM}         | ${'createValueStreamErrors'} | ${{}}
+    ${types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS} | ${'createValueStreamErrors'} | ${{}}
+    ${types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS}  | ${'isLoading'}               | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -48,12 +52,13 @@ describe('Cycle analytics mutations', () => {
   });
 
   it.each`
-    mutation                       | payload                       | expectedState
-    ${types.SET_FEATURE_FLAGS}     | ${{ hasDurationChart: true }} | ${{ featureFlags: { hasDurationChart: true } }}
-    ${types.SET_SELECTED_GROUP}    | ${{ fullPath: 'cool-beans' }} | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjects: [] }}
-    ${types.SET_SELECTED_PROJECTS} | ${selectedProjects}           | ${{ selectedProjects }}
-    ${types.SET_DATE_RANGE}        | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
-    ${types.SET_SELECTED_STAGE}    | ${{ id: 'first-stage' }}      | ${{ selectedStage: { id: 'first-stage' } }}
+    mutation                                   | payload                       | expectedState
+    ${types.SET_FEATURE_FLAGS}                 | ${{ hasDurationChart: true }} | ${{ featureFlags: { hasDurationChart: true } }}
+    ${types.SET_SELECTED_GROUP}                | ${{ fullPath: 'cool-beans' }} | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjects: [] }}
+    ${types.SET_SELECTED_PROJECTS}             | ${selectedProjects}           | ${{ selectedProjects }}
+    ${types.SET_DATE_RANGE}                    | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
+    ${types.SET_SELECTED_STAGE}                | ${{ id: 'first-stage' }}      | ${{ selectedStage: { id: 'first-stage' } }}
+    ${types.RECEIVE_CREATE_VALUE_STREAM_ERROR} | ${{ name: ['is required'] }}  | ${{ createValueStreamErrors: { name: ['is required'] }, isCreatingValueStream: false }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {

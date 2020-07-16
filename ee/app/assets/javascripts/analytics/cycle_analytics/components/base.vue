@@ -1,8 +1,6 @@
 <script>
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
-import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { sprintf, __ } from '~/locale';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
@@ -121,9 +119,6 @@ export default {
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
     },
-    isXSBreakpoint() {
-      return bp.getBreakpointSize() === 'xs';
-    },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
     },
@@ -200,10 +195,6 @@ export default {
     onStageReorder(data) {
       this.reorderStage(data);
     },
-    onCreateValueStream({ name }) {
-      // stub - this will eventually trigger a vuex action
-      this.$toast.show(sprintf(__("'%{name}' Value Stream created"), { name }));
-    },
   },
   multiProjectSelect: true,
   dateOptions: [7, 30, 90],
@@ -228,12 +219,7 @@ export default {
       <h3>{{ __('Value Stream Analytics') }}</h3>
       <value-stream-select
         v-if="shouldDisplayCreateMultipleValueStreams"
-        class="gl-align-self-center"
-        :class="{
-          'gl-w-full': isXSBreakpoint,
-          'gl-mt-5': !isXSBreakpoint,
-        }"
-        @create="onCreateValueStream"
+        class="gl-align-self-start gl-sm-align-self-start gl-mt-0 gl-sm-mt-5"
       />
     </div>
     <div class="mw-100">

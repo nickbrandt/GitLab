@@ -14393,6 +14393,9 @@ msgstr ""
 msgid "Maximum job timeout has a value which could not be accepted"
 msgstr ""
 
+msgid "Maximum length 100 characters"
+msgstr ""
+
 msgid "Maximum lifetime allowable for Personal Access Tokens is active, your expire date must be set before %{maximum_allowable_date}."
 msgstr ""
 
@@ -15358,6 +15361,9 @@ msgid "Name"
 msgstr ""
 
 msgid "Name has already been taken"
+msgstr ""
+
+msgid "Name is required"
 msgstr ""
 
 msgid "Name new label"
