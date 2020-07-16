@@ -130,6 +130,39 @@ RSpec.describe Issue do
         end
       end
     end
+
+    context 'iterations' do
+      let_it_be(:iteration1) { create(:iteration) }
+      let_it_be(:iteration2) { create(:iteration) }
+      let_it_be(:iteration1_issue) { create(:issue, iteration: iteration1) }
+      let_it_be(:iteration2_issue) { create(:issue, iteration: iteration2) }
+      let_it_be(:issue_no_iteration) { create(:issue) }
+
+      before do
+        stub_licensed_features(iterations: true)
+      end
+
+      describe '.no_iteration' do
+        it 'returns only issues without an iteration assigned' do
+          expect(described_class.count).to eq 3
+          expect(described_class.no_iteration).to eq [issue_no_iteration]
+        end
+      end
+
+      describe '.any_iteration' do
+        it 'returns only issues with an iteration assigned' do
+          expect(described_class.count).to eq 3
+          expect(described_class.any_iteration).to eq [iteration1_issue, iteration2_issue]
+        end
+      end
+
+      describe '.in_iterations' do
+        it 'returns only issues in selected iterations' do
+          expect(described_class.count).to eq 3
+          expect(described_class.in_iterations([iteration1])).to eq [iteration1_issue]
+        end
+      end
+    end
   end
 
   describe 'validations' do

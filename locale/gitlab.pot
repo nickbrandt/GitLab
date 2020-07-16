@@ -3226,6 +3226,9 @@ msgstr ""
 msgid "Assigned Merge Requests"
 msgstr ""
 
+msgid "Assigned to %{assigneeName}"
+msgstr ""
+
 msgid "Assigned to %{assignee_name}"
 msgstr ""
 
@@ -9343,6 +9346,9 @@ msgid "Error loading countries data."
 msgstr ""
 
 msgid "Error loading file viewer."
+msgstr ""
+
+msgid "Error loading issues"
 msgstr ""
 
 msgid "Error loading last commit."
@@ -15689,6 +15695,9 @@ msgid "No grouping"
 msgstr ""
 
 msgid "No iteration"
+msgstr ""
+
+msgid "No iterations found"
 msgstr ""
 
 msgid "No iterations to show"

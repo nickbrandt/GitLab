@@ -58,6 +58,7 @@ describe('Iterations tabs', () => {
   describe('item loaded', () => {
     const iteration = {
       title: 'June week 1',
+      id: 'gid://gitlab/Iteration/2',
       description: 'The first week of June',
       startDate: '2020-06-02',
       dueDate: '2020-06-08',
