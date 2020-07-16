@@ -3,6 +3,7 @@
 import { __ } from '~/locale';
 import Flash from '~/flash';
 import { redirectTo } from '~/lib/utils/url_utility';
+import { spriteIcon } from '~/lib/utils/common_utils';
 
 import GitlabSlackService from '../services/gitlab_slack_service';
 
@@ -59,11 +60,11 @@ export default {
 
   computed: {
     doubleHeadedArrowSvg() {
-      return gl.utils.spriteIcon('double-headed-arrow');
+      return spriteIcon('double-headed-arrow');
     },
 
     arrowRightSvg() {
-      return gl.utils.spriteIcon('arrow-right');
+      return spriteIcon('arrow-right');
     },
 
     hasProjects() {
