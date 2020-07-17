@@ -46,7 +46,11 @@ RSpec.describe 'Creating a DAST Site Profile' do
         project.add_developer(current_user)
       end
 
-      it_behaves_like 'a mutation that returns errors in the response', errors: ['Not implemented']
+      it 'returns a the dast_site_profile id' do
+        post_graphql_mutation(mutation, current_user: current_user)
+
+        expect(mutation_response['id']).to eq('gid://gitlab/DastSiteProfile/1')
+      end
     end
   end
 end
