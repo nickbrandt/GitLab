@@ -8,12 +8,6 @@ This page describes GitLab reference architecture for up to 10,000 users.
 For a full list of reference architectures, see
 [Available reference architectures](index.md#available-reference-architectures).
 
-NOTE: **Note:** The 10,000-user reference architecture documented below is
-designed to help your organization achieve a highly-available GitLab deployment.
-If you do not have the expertise or need to maintain a highly-available
-environment, you can have a simpler and less costly-to-operate environment by
-following the [2,000-user reference architecture](2k_users.md).
-
 > - **Supported users (approximate):** 10,000
 > - **High Availability:** True
 > - **Test RPS rates:** API: 200 RPS, Web: 20 RPS, Git: 20 RPS
@@ -57,8 +51,10 @@ To set up GitLab and its components to accommodate up to 10,000 users:
 1. [Configure PostgreSQL](#configure-postgresql), the database for GitLab.
 1. [Configure PgBouncer](#configure-pgbouncer).
 1. [Configure the internal load balancing node](#configure-the-internal-load-balancer)
-1. [Configure Redis](#configure-redis).
-1. [Configure Sentinel](#configure-sentinel).
+1. [Configure Redis Cache](#configure-redis-cache).
+1. [Configure Redis Queues](#configure-redis-queues).
+1. [Configure Sentinel Cache](#configure-sentinel-cache).
+1. [Configure Sentinel Queues](#configure-sentinel-queues).
 1. [Configure Gitaly](#configure-gitaly),
    which provides access to the Git repositories.
 1. [Configure Sidekiq](#configure-sidekiq).
@@ -82,35 +78,35 @@ Here is a list and description of each machine and the assigned IP:
 - `10.6.0.11`: Consul 1
 - `10.6.0.12`: Consul 2
 - `10.6.0.13`: Consul 3
-- `10.6.0.31`: PostgreSQL primary
-- `10.6.0.32`: PostgreSQL secondary 1
-- `10.6.0.33`: PostgreSQL secondary 2
-- `10.6.0.21`: PgBouncer 1
-- `10.6.0.22`: PgBouncer 2
-- `10.6.0.23`: PgBouncer 3
-- `10.6.0.20`: Internal Load Balancer
-- `10.6.0.61`: Redis - Cache Primary
-- `10.6.0.62`: Redis - Cache Replica 1
-- `10.6.0.63`: Redis - Cache Replica 2
+- `10.6.0.21`: PostgreSQL primary
+- `10.6.0.22`: PostgreSQL secondary 1
+- `10.6.0.23`: PostgreSQL secondary 2
+- `10.6.0.31`: PgBouncer 1
+- `10.6.0.32`: PgBouncer 2
+- `10.6.0.33`: PgBouncer 3
+- `10.6.0.40`: Internal Load Balancer
+- `10.6.0.51`: Redis - Cache Primary
+- `10.6.0.52`: Redis - Cache Replica 1
+- `10.6.0.53`: Redis - Cache Replica 2
 - `10.6.0.61`: Redis - Queues Primary
 - `10.6.0.62`: Redis - Queues Replica 1
 - `10.6.0.63`: Redis - Queues Replica 2
-- `10.6.0.11`: Sentinel - Cache 1
-- `10.6.0.12`: Sentinel - Cache 2
-- `10.6.0.13`: Sentinel - Cache 3
-- `10.6.0.11`: Sentinel - Queues 1
-- `10.6.0.12`: Sentinel - Queues 2
-- `10.6.0.13`: Sentinel - Queues 3
-- `10.6.0.51`: Gitaly 1
-- `10.6.0.52`: Gitaly 2
-- `10.6.0.71`: Sidekiq 1
-- `10.6.0.72`: Sidekiq 2
-- `10.6.0.73`: Sidekiq 3
-- `10.6.0.74`: Sidekiq 4
-- `10.6.0.41`: GitLab application 1
-- `10.6.0.42`: GitLab application 2
-- `10.6.0.43`: GitLab application 3
-- `10.6.0.81`: Prometheus
+- `10.6.0.71`: Sentinel - Cache 1
+- `10.6.0.72`: Sentinel - Cache 2
+- `10.6.0.73`: Sentinel - Cache 3
+- `10.6.0.81`: Sentinel - Queues 1
+- `10.6.0.82`: Sentinel - Queues 2
+- `10.6.0.83`: Sentinel - Queues 3
+- `10.6.0.91`: Gitaly 1
+- `10.6.0.92`: Gitaly 2
+- `10.6.0.101`: Sidekiq 1
+- `10.6.0.102`: Sidekiq 2
+- `10.6.0.103`: Sidekiq 3
+- `10.6.0.104`: Sidekiq 4
+- `10.6.0.111`: GitLab application 1
+- `10.6.0.112`: GitLab application 2
+- `10.6.0.113`: GitLab application 3
+- `10.6.0.121`: Prometheus
 
 ## Configure the external load balancer
 
@@ -226,216 +222,17 @@ Configure DNS for an alternate SSH hostname such as `altssh.gitlab.example.com`.
   </a>
 </div>
 
-## Configure Redis
+## Configure Consul
 
-Using [Redis](https://redis.io/) in scalable environment is possible using a **Primary** x **Replica**
-topology with a [Redis Sentinel](https://redis.io/topics/sentinel) service to watch and automatically
-start the failover procedure.
+The following IPs will be used as an example:
 
-Redis requires authentication if used with Sentinel. See
-[Redis Security](https://redis.io/topics/security) documentation for more
-information. We recommend using a combination of a Redis password and tight
-firewall rules to secure your Redis service.
-You are highly encouraged to read the [Redis Sentinel](https://redis.io/topics/sentinel) documentation
-before configuring Redis with GitLab to fully understand the topology and
-architecture.
+- `10.6.0.11`: Consul 1
+- `10.6.0.12`: Consul 2
+- `10.6.0.13`: Consul 3
 
-In this section, you'll be guided through configuring an external Redis instance
-to be used with GitLab. The following IPs will be used as an example:
+To configure Consul:
 
-- `10.6.0.61`: Redis Primary
-- `10.6.0.62`: Redis Replica 1
-- `10.6.0.63`: Redis Replica 2
-
-### Provide your own Redis instance
-
-Managed Redis from cloud providers such as AWS ElastiCache will work. If these
-services support high availability, be sure it is **not** the Redis Cluster type.
-
-Redis version 5.0 or higher is required, as this is what ships with
-Omnibus GitLab packages starting with GitLab 13.0. Older Redis versions
-do not support an optional count argument to SPOP which is now required for
-[Merge Trains](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md).
-
-Note the Redis node's IP address or hostname, port, and password (if required).
-These will be necessary when configuring the
-[GitLab application servers](#configure-gitlab-rails) later.
-
-### Standalone Redis using Omnibus GitLab
-
-This is the section where we install and set up the new Redis instances.
-
-The requirements for a Redis setup are the following:
-
-1. All Redis nodes must be able to talk to each other and accept incoming
-   connections over Redis (`6379`) and Sentinel (`26379`) ports (unless you
-   change the default ones).
-1. The server that hosts the GitLab application must be able to access the
-   Redis nodes.
-1. Protect the nodes from access from external networks
-   ([Internet](https://gitlab.com/gitlab-org/gitlab-foss/uploads/c4cc8cd353604bd80315f9384035ff9e/The_Internet_IT_Crowd.png)),
-   using a firewall.
-
-NOTE: **Note:**
-Redis nodes (both primary and replica) will need the same password defined in
-`redis['password']`. At any time during a failover the Sentinels can
-reconfigure a node and change its status from primary to replica and vice versa.
-
-#### Configuring the primary Redis instance
-
-1. SSH into the **Primary** Redis server.
-1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
-   package you want using **steps 1 and 2** from the GitLab downloads page.
-   - Make sure you select the correct Omnibus package, with the same version
-     and type (Community, Enterprise editions) of your current install.
-   - Do not complete any other steps on the download page.
-
-1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
-
-   ```ruby
-   # Specify server role as 'redis_master_role'
-   roles ['redis_master_role']
-
-   # IP address pointing to a local IP that the other machines can reach to.
-   # You can also set bind to '0.0.0.0' which listen in all interfaces.
-   # If you really need to bind to an external accessible IP, make
-   # sure you add extra firewall rules to prevent unauthorized access.
-   redis['bind'] = '10.6.0.61'
-
-   # Define a port so Redis can listen for TCP requests which will allow other
-   # machines to connect to it.
-   redis['port'] = 6379
-
-   # Set up password authentication for Redis (use the same password in all nodes).
-   redis['password'] = 'redis-password-goes-here'
-
-   ## Enable service discovery for Prometheus
-   consul['enable'] = true
-   consul['monitoring_service_discovery'] =  true
-
-   ## The IPs of the Consul server nodes
-   ## You can also use FQDNs and intermix them with IPs
-   consul['configuration'] = {
-      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
-   }
-
-   # Set the network addresses that the exporters will listen on
-   node_exporter['listen_address'] = '0.0.0.0:9100'
-   redis_exporter['listen_address'] = '0.0.0.0:9121'
-   ```
-
-1. Only the primary GitLab application server should handle migrations. To
-   prevent database migrations from running on upgrade, add the following
-   configuration to your `/etc/gitlab/gitlab.rb` file:
-
-   ```ruby
-   gitlab_rails['auto_migrate'] = false
-   ```
-
-1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
-
-NOTE: **Note:**
-You can specify multiple roles like sentinel and Redis as:
-`roles ['redis_sentinel_role', 'redis_master_role']`.
-Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
-
-#### Configuring the replica Redis instances
-
-1. SSH into the **replica** Redis server.
-1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
-   package you want using **steps 1 and 2** from the GitLab downloads page.
-   - Make sure you select the correct Omnibus package, with the same version
-     and type (Community, Enterprise editions) of your current install.
-   - Do not complete any other steps on the download page.
-
-1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
-
-   ```ruby
-   # Specify server role as 'redis_replica_role'
-   roles ['redis_replica_role']
-
-   # IP address pointing to a local IP that the other machines can reach to.
-   # You can also set bind to '0.0.0.0' which listen in all interfaces.
-   # If you really need to bind to an external accessible IP, make
-   # sure you add extra firewall rules to prevent unauthorized access.
-   redis['bind'] = '10.6.0.62'
-
-   # Define a port so Redis can listen for TCP requests which will allow other
-   # machines to connect to it.
-   redis['port'] = 6379
-
-   # The same password for Redis authentication you set up for the primary node.
-   redis['password'] = 'redis-password-goes-here'
-
-   # The IP of the primary Redis node.
-   redis['master_ip'] = '10.6.0.61'
-
-   # Port of primary Redis server, uncomment to change to non default. Defaults
-   # to `6379`.
-   #redis['master_port'] = 6379
-
-   ## Enable service discovery for Prometheus
-   consul['enable'] = true
-   consul['monitoring_service_discovery'] =  true
-
-   ## The IPs of the Consul server nodes
-   ## You can also use FQDNs and intermix them with IPs
-   consul['configuration'] = {
-      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
-   }
-
-   # Set the network addresses that the exporters will listen on
-   node_exporter['listen_address'] = '0.0.0.0:9100'
-   redis_exporter['listen_address'] = '0.0.0.0:9121'
-   ```
-
-1. To prevent reconfigure from running automatically on upgrade, run:
-
-   ```shell
-   sudo touch /etc/gitlab/skip-auto-reconfigure
-   ```
-
-1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
-1. Go through the steps again for all the other replica nodes, and
-   make sure to set up the IPs correctly.
-
-NOTE: **Note:**
-You can specify multiple roles like sentinel and Redis as:
-`roles ['redis_sentinel_role', 'redis_master_role']`.
-Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
-
-These values don't have to be changed again in `/etc/gitlab/gitlab.rb` after
-a failover, as the nodes will be managed by the [Sentinels](#configure-consul-and-sentinel), and even after a
-`gitlab-ctl reconfigure`, they will get their configuration restored by
-the same Sentinels.
-
-Advanced [configuration options](https://docs.gitlab.com/omnibus/settings/redis.html)
-are supported and can be added if needed.
-
-<div align="right">
-  <a type="button" class="btn btn-default" href="#setup-components">
-    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
-  </a>
-</div>
-
-## Configure Consul and Sentinel
-
-NOTE: **Note:** If you are using an external Redis Sentinel instance, be sure
-to exclude the `requirepass` parameter from the Sentinel
-configuration. This parameter will cause clients to report `NOAUTH
-Authentication required.`. [Redis Sentinel 3.2.x does not support
-password authentication](https://github.com/antirez/redis/issues/3279).
-
-Now that the Redis servers are all set up, let's configure the Sentinel
-servers. The following IPs will be used as an example:
-
-- `10.6.0.11`: Consul/Sentinel 1
-- `10.6.0.12`: Consul/Sentinel 2
-- `10.6.0.13`: Consul/Sentinel 3
-
-To configure the Sentinel:
-
-1. SSH into the server that will host Consul/Sentinel.
+1. SSH into the server that will host Consul.
 1. [Download/install](https://about.gitlab.com/install/) the
    Omnibus GitLab Enterprise Edition package using **steps 1 and 2** from the
    GitLab downloads page.
@@ -446,68 +243,7 @@ To configure the Sentinel:
 1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
 
    ```ruby
-   roles ['redis_sentinel_role', 'consul_role']
-
-   # Must be the same in every sentinel node
-   redis['master_name'] = 'gitlab-redis'
-
-   # The same password for Redis authentication you set up for the primary node.
-   redis['master_password'] = 'redis-password-goes-here'
-
-   # The IP of the primary Redis node.
-   redis['master_ip'] = '10.6.0.61'
-
-   # Define a port so Redis can listen for TCP requests which will allow other
-   # machines to connect to it.
-   redis['port'] = 6379
-
-   # Port of primary Redis server, uncomment to change to non default. Defaults
-   # to `6379`.
-   #redis['master_port'] = 6379
-
-   ## Configure Sentinel
-   sentinel['bind'] = '10.6.0.11'
-
-   # Port that Sentinel listens on, uncomment to change to non default. Defaults
-   # to `26379`.
-   # sentinel['port'] = 26379
-
-   ## Quorum must reflect the amount of voting sentinels it take to start a failover.
-   ## Value must NOT be greater then the amount of sentinels.
-   ##
-   ## The quorum can be used to tune Sentinel in two ways:
-   ## 1. If a the quorum is set to a value smaller than the majority of Sentinels
-   ##    we deploy, we are basically making Sentinel more sensible to primary failures,
-   ##    triggering a failover as soon as even just a minority of Sentinels is no longer
-   ##    able to talk with the primary.
-   ## 1. If a quorum is set to a value greater than the majority of Sentinels, we are
-   ##    making Sentinel able to failover only when there are a very large number (larger
-   ##    than majority) of well connected Sentinels which agree about the primary being down.s
-   sentinel['quorum'] = 2
-
-   ## Consider unresponsive server down after x amount of ms.
-   # sentinel['down_after_milliseconds'] = 10000
-
-   ## Specifies the failover timeout in milliseconds. It is used in many ways:
-   ##
-   ## - The time needed to re-start a failover after a previous failover was
-   ##   already tried against the same primary by a given Sentinel, is two
-   ##   times the failover timeout.
-   ##
-   ## - The time needed for a replica replicating to a wrong primary according
-   ##   to a Sentinel current configuration, to be forced to replicate
-   ##   with the right primary, is exactly the failover timeout (counting since
-   ##   the moment a Sentinel detected the misconfiguration).
-   ##
-   ## - The time needed to cancel a failover that is already in progress but
-   ##   did not produced any configuration change (REPLICAOF NO ONE yet not
-   ##   acknowledged by the promoted replica).
-   ##
-   ## - The maximum time a failover in progress waits for all the replica to be
-   ##   reconfigured as replicas of the new primary. However even after this time
-   ##   the replicas will be reconfigured by the Sentinels anyway, but not with
-   ##   the exact parallel-syncs progression as specified.
-   # sentinel['failover_timeout'] = 60000
+   roles ['consul_role']
 
    ## Enable service discovery for Prometheus
    consul['enable'] = true
@@ -516,28 +252,45 @@ To configure the Sentinel:
    ## The IPs of the Consul server nodes
    ## You can also use FQDNs and intermix them with IPs
    consul['configuration'] = {
+      server: true,
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
    }
 
    # Set the network addresses that the exporters will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
-   redis_exporter['listen_address'] = '0.0.0.0:9121'
 
    # Disable auto migrations
    gitlab_rails['auto_migrate'] = false
    ```
 
-1. To prevent database migrations from running on upgrade, run:
-
-   ```shell
-   sudo touch /etc/gitlab/skip-auto-reconfigure
-   ```
-
-   Only the primary GitLab application server should handle migrations.
-
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
-1. Go through the steps again for all the other Consul/Sentinel nodes, and
+1. Go through the steps again for all the other Consul nodes, and
    make sure you set up the correct IPs.
+
+NOTE: **Note:**
+A Consul leader will be elected when the provisioning of the third Consul server is completed.
+Viewing the Consul logs `sudo gitlab-ctl tail consul` will display
+`...[INFO] consul: New leader elected: ...`
+
+You can list the current Consul members (server, client):
+
+```shell
+sudo /opt/gitlab/embedded/bin/consul members
+```
+
+You can verify the GitLab services are running:
+
+```shell
+sudo gitlab-ctl status
+```
+
+The output should be similar to the following:
+
+```plaintext
+run: consul: (pid 30074) 76834s; run: log: (pid 29740) 76844s
+run: logrotate: (pid 30925) 3041s; run: log: (pid 29649) 76861s
+run: node-exporter: (pid 30093) 76833s; run: log: (pid 29663) 76855s
+```
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -569,9 +322,9 @@ If you use a cloud-managed service, or provide your own PostgreSQL:
 
 The following IPs will be used as an example:
 
-- `10.6.0.31`: PostgreSQL primary
-- `10.6.0.32`: PostgreSQL secondary 1
-- `10.6.0.33`: PostgreSQL secondary 2
+- `10.6.0.21`: PostgreSQL primary
+- `10.6.0.22`: PostgreSQL secondary 1
+- `10.6.0.23`: PostgreSQL secondary 2
 
 First, make sure to [install](https://about.gitlab.com/install/)
 the Linux GitLab package **on each node**. Following the steps,
@@ -845,9 +598,9 @@ Check the [Troubleshooting section](troubleshooting.md) before proceeding.
 Now that the PostgreSQL servers are all set up, let's configure PgBouncer.
 The following IPs will be used as an example:
 
-- `10.6.0.21`: PgBouncer 1
-- `10.6.0.22`: PgBouncer 2
-- `10.6.0.23`: PgBouncer 3
+- `10.6.0.31`: PgBouncer 1
+- `10.6.0.32`: PgBouncer 2
+- `10.6.0.33`: PgBouncer 3
 
 1. On each PgBouncer node, edit `/etc/gitlab/gitlab.rb`, and replace
    `<consul_password_hash>` and `<pgbouncer_password_hash>` with the
@@ -938,7 +691,7 @@ up a TCP internal load balancer to serve each correctly.
 
 The following IP will be used as an example:
 
-- `10.6.0.20`: Internal Load Balancer
+- `10.6.0.40`: Internal Load Balancer
 
 Here's how you could do it with [HAProxy](https://www.haproxy.org/):
 
@@ -976,6 +729,339 @@ Refer to your preferred Load Balancer's documentation for further guidance.
     Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
   </a>
 </div>
+
+## Configure Redis Cache
+
+Using [Redis](https://redis.io/) in scalable environment is possible using a **Primary** x **Replica**
+topology with a [Redis Sentinel](https://redis.io/topics/sentinel) service to watch and automatically
+start the failover procedure.
+
+Redis requires authentication if used with Sentinel. See
+[Redis Security](https://redis.io/topics/security) documentation for more
+information. We recommend using a combination of a Redis password and tight
+firewall rules to secure your Redis service.
+You are highly encouraged to read the [Redis Sentinel](https://redis.io/topics/sentinel) documentation
+before configuring Redis with GitLab to fully understand the topology and
+architecture.
+
+In this section, you'll be guided through configuring an external Redis instance
+to be used with GitLab. The following IPs will be used as an example:
+
+- `10.6.0.51`: Redis - Cache Primary
+- `10.6.0.52`: Redis - Cache Replica 1
+- `10.6.0.53`: Redis - Cache Replica 2
+
+### Provide your own Redis instance
+
+Managed Redis from cloud providers such as AWS ElastiCache will work. If these
+services support high availability, be sure it is **not** the Redis Cluster type.
+
+Redis version 5.0 or higher is required, as this is what ships with
+Omnibus GitLab packages starting with GitLab 13.0. Older Redis versions
+do not support an optional count argument to SPOP which is now required for
+[Merge Trains](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md).
+
+Note the Redis node's IP address or hostname, port, and password (if required).
+These will be necessary when configuring the
+[GitLab application servers](#configure-gitlab-rails) later.
+
+### Standalone Redis using Omnibus GitLab
+
+This is the section where we install and set up the new Redis instances.
+
+The requirements for a Redis setup are the following:
+
+1. All Redis nodes must be able to talk to each other and accept incoming
+   connections over Redis (`6379`) and Sentinel (`26379`) ports (unless you
+   change the default ones).
+1. The server that hosts the GitLab application must be able to access the
+   Redis nodes.
+1. Protect the nodes from access from external networks
+   ([Internet](https://gitlab.com/gitlab-org/gitlab-foss/uploads/c4cc8cd353604bd80315f9384035ff9e/The_Internet_IT_Crowd.png)),
+   using a firewall.
+
+NOTE: **Note:**
+Redis nodes (both primary and replica) will need the same password defined in
+`redis['password']`. At any time during a failover the Sentinels can
+reconfigure a node and change its status from primary to replica and vice versa.
+
+#### Configuring the primary Redis instance
+
+1. SSH into the **Primary** Redis server.
+1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
+   package you want using **steps 1 and 2** from the GitLab downloads page.
+   - Make sure you select the correct Omnibus package, with the same version
+     and type (Community, Enterprise editions) of your current install.
+   - Do not complete any other steps on the download page.
+
+1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
+
+   ```ruby
+   # Specify server role as 'redis_master_role'
+   roles ['redis_master_role']
+
+   # IP address pointing to a local IP that the other machines can reach to.
+   # You can also set bind to '0.0.0.0' which listen in all interfaces.
+   # If you really need to bind to an external accessible IP, make
+   # sure you add extra firewall rules to prevent unauthorized access.
+   redis['bind'] = '10.6.0.61'
+
+   # Define a port so Redis can listen for TCP requests which will allow other
+   # machines to connect to it.
+   redis['port'] = 6379
+
+   # Set up password authentication for Redis (use the same password in all nodes).
+   redis['password'] = 'redis-password-goes-here'
+
+   ## Enable service discovery for Prometheus
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+
+   ## The IPs of the Consul server nodes
+   ## You can also use FQDNs and intermix them with IPs
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
+   }
+
+   # Set the network addresses that the exporters will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   redis_exporter['listen_address'] = '0.0.0.0:9121'
+   ```
+
+1. Only the primary GitLab application server should handle migrations. To
+   prevent database migrations from running on upgrade, add the following
+   configuration to your `/etc/gitlab/gitlab.rb` file:
+
+   ```ruby
+   gitlab_rails['auto_migrate'] = false
+   ```
+
+1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+
+NOTE: **Note:**
+You can specify multiple roles like sentinel and Redis as:
+`roles ['redis_sentinel_role', 'redis_master_role']`.
+Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
+
+#### Configuring the replica Redis instances
+
+1. SSH into the **replica** Redis server.
+1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
+   package you want using **steps 1 and 2** from the GitLab downloads page.
+   - Make sure you select the correct Omnibus package, with the same version
+     and type (Community, Enterprise editions) of your current install.
+   - Do not complete any other steps on the download page.
+
+1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
+
+   ```ruby
+   # Specify server role as 'redis_replica_role'
+   roles ['redis_replica_role']
+
+   # IP address pointing to a local IP that the other machines can reach to.
+   # You can also set bind to '0.0.0.0' which listen in all interfaces.
+   # If you really need to bind to an external accessible IP, make
+   # sure you add extra firewall rules to prevent unauthorized access.
+   redis['bind'] = '10.6.0.62'
+
+   # Define a port so Redis can listen for TCP requests which will allow other
+   # machines to connect to it.
+   redis['port'] = 6379
+
+   # The same password for Redis authentication you set up for the primary node.
+   redis['password'] = 'redis-password-goes-here'
+
+   # The IP of the primary Redis node.
+   redis['master_ip'] = '10.6.0.61'
+
+   # Port of primary Redis server, uncomment to change to non default. Defaults
+   # to `6379`.
+   #redis['master_port'] = 6379
+
+   ## Enable service discovery for Prometheus
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+
+   ## The IPs of the Consul server nodes
+   ## You can also use FQDNs and intermix them with IPs
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
+   }
+
+   # Set the network addresses that the exporters will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   redis_exporter['listen_address'] = '0.0.0.0:9121'
+   ```
+
+1. To prevent reconfigure from running automatically on upgrade, run:
+
+   ```shell
+   sudo touch /etc/gitlab/skip-auto-reconfigure
+   ```
+
+1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+1. Go through the steps again for all the other replica nodes, and
+   make sure to set up the IPs correctly.
+
+NOTE: **Note:**
+You can specify multiple roles like sentinel and Redis as:
+`roles ['redis_sentinel_role', 'redis_master_role']`.
+Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
+
+These values don't have to be changed again in `/etc/gitlab/gitlab.rb` after
+a failover, as the nodes will be managed by the [Sentinels](#configure-consul-and-sentinel), and even after a
+`gitlab-ctl reconfigure`, they will get their configuration restored by
+the same Sentinels.
+
+Advanced [configuration options](https://docs.gitlab.com/omnibus/settings/redis.html)
+are supported and can be added if needed.
+
+<div align="right">
+  <a type="button" class="btn btn-default" href="#setup-components">
+    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+  </a>
+</div>
+
+## Configure Redis Queues
+
+- `10.6.0.61`: Redis - Queues Primary
+- `10.6.0.62`: Redis - Queues Replica 1
+- `10.6.0.63`: Redis - Queues Replica 2
+
+## Configure Sentinel Cache
+
+NOTE: **Note:** If you are using an external Redis Sentinel instance, be sure
+to exclude the `requirepass` parameter from the Sentinel
+configuration. This parameter will cause clients to report `NOAUTH
+Authentication required.`. [Redis Sentinel 3.2.x does not support
+password authentication](https://github.com/antirez/redis/issues/3279).
+
+Now that the Redis servers are all set up, let's configure the Sentinel
+servers. The following IPs will be used as an example:
+
+- `10.6.0.71`: Sentinel - Cache 1
+- `10.6.0.72`: Sentinel - Cache 2
+- `10.6.0.73`: Sentinel - Cache 3
+
+To configure the Sentinel:
+
+1. SSH into the server that will host Consul/Sentinel.
+1. [Download/install](https://about.gitlab.com/install/) the
+   Omnibus GitLab Enterprise Edition package using **steps 1 and 2** from the
+   GitLab downloads page.
+   - Make sure you select the correct Omnibus package, with the same version
+     the GitLab application is running.
+   - Do not complete any other steps on the download page.
+
+1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
+
+   ```ruby
+   roles ['redis_sentinel_role', 'consul_role']
+
+   # Must be the same in every sentinel node
+   redis['master_name'] = 'gitlab-redis'
+
+   # The same password for Redis authentication you set up for the primary node.
+   redis['master_password'] = 'redis-password-goes-here'
+
+   # The IP of the primary Redis node.
+   redis['master_ip'] = '10.6.0.61'
+
+   # Define a port so Redis can listen for TCP requests which will allow other
+   # machines to connect to it.
+   redis['port'] = 6379
+
+   # Port of primary Redis server, uncomment to change to non default. Defaults
+   # to `6379`.
+   #redis['master_port'] = 6379
+
+   ## Configure Sentinel
+   sentinel['bind'] = '10.6.0.11'
+
+   # Port that Sentinel listens on, uncomment to change to non default. Defaults
+   # to `26379`.
+   # sentinel['port'] = 26379
+
+   ## Quorum must reflect the amount of voting sentinels it take to start a failover.
+   ## Value must NOT be greater then the amount of sentinels.
+   ##
+   ## The quorum can be used to tune Sentinel in two ways:
+   ## 1. If a the quorum is set to a value smaller than the majority of Sentinels
+   ##    we deploy, we are basically making Sentinel more sensible to primary failures,
+   ##    triggering a failover as soon as even just a minority of Sentinels is no longer
+   ##    able to talk with the primary.
+   ## 1. If a quorum is set to a value greater than the majority of Sentinels, we are
+   ##    making Sentinel able to failover only when there are a very large number (larger
+   ##    than majority) of well connected Sentinels which agree about the primary being down.s
+   sentinel['quorum'] = 2
+
+   ## Consider unresponsive server down after x amount of ms.
+   # sentinel['down_after_milliseconds'] = 10000
+
+   ## Specifies the failover timeout in milliseconds. It is used in many ways:
+   ##
+   ## - The time needed to re-start a failover after a previous failover was
+   ##   already tried against the same primary by a given Sentinel, is two
+   ##   times the failover timeout.
+   ##
+   ## - The time needed for a replica replicating to a wrong primary according
+   ##   to a Sentinel current configuration, to be forced to replicate
+   ##   with the right primary, is exactly the failover timeout (counting since
+   ##   the moment a Sentinel detected the misconfiguration).
+   ##
+   ## - The time needed to cancel a failover that is already in progress but
+   ##   did not produced any configuration change (REPLICAOF NO ONE yet not
+   ##   acknowledged by the promoted replica).
+   ##
+   ## - The maximum time a failover in progress waits for all the replica to be
+   ##   reconfigured as replicas of the new primary. However even after this time
+   ##   the replicas will be reconfigured by the Sentinels anyway, but not with
+   ##   the exact parallel-syncs progression as specified.
+   # sentinel['failover_timeout'] = 60000
+
+   ## Enable service discovery for Prometheus
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+
+   ## The IPs of the Consul server nodes
+   ## You can also use FQDNs and intermix them with IPs
+   consul['configuration'] = {
+      retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
+   }
+
+   # Set the network addresses that the exporters will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   redis_exporter['listen_address'] = '0.0.0.0:9121'
+
+   # Disable auto migrations
+   gitlab_rails['auto_migrate'] = false
+   ```
+
+1. To prevent database migrations from running on upgrade, run:
+
+   ```shell
+   sudo touch /etc/gitlab/skip-auto-reconfigure
+   ```
+
+   Only the primary GitLab application server should handle migrations.
+
+1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+1. Go through the steps again for all the other Consul/Sentinel nodes, and
+   make sure you set up the correct IPs.
+
+<div align="right">
+  <a type="button" class="btn btn-default" href="#setup-components">
+    Back to setup components <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+  </a>
+</div>
+
+
+
+## Configure Sentinel Queues
+
+- `10.6.0.81`: Sentinel - Queues 1
+- `10.6.0.82`: Sentinel - Queues 2
+- `10.6.0.83`: Sentinel - Queues 3
 
 ## Configure Gitaly
 
@@ -1019,8 +1105,8 @@ tokens created for the GitLab API or other similar web API tokens.
 Below we describe how to configure two Gitaly servers, with IPs and
 domain names:
 
-- `10.6.0.51`: Gitaly 1 (`gitaly1.internal`)
-- `10.6.0.52`: Gitaly 2 (`gitaly2.internal`)
+- `10.6.0.91`: Gitaly 1 (`gitaly1.internal`)
+- `10.6.0.92`: Gitaly 2 (`gitaly2.internal`)
 
 The secret token is assumed to be `gitalysecret` and that
 your GitLab installation has three repository storages:
@@ -1189,10 +1275,10 @@ To configure Gitaly with TLS:
 Sidekiq requires connection to the Redis, PostgreSQL and Gitaly instance.
 The following IPs will be used as an example:
 
-- `10.6.0.71`: Sidekiq 1
-- `10.6.0.72`: Sidekiq 2
-- `10.6.0.73`: Sidekiq 3
-- `10.6.0.74`: Sidekiq 4
+- `10.6.0.101`: Sidekiq 1
+- `10.6.0.102`: Sidekiq 2
+- `10.6.0.103`: Sidekiq 3
+- `10.6.0.104`: Sidekiq 4
 
 To configure the Sidekiq nodes, one each one:
 
@@ -1303,6 +1389,13 @@ accordingly where we've found 50% achieves a good balance but this is dependent
 on workload.
 
 This section describes how to configure the GitLab application (Rails) component.
+
+The following IPs will be used as an example:
+
+- `10.6.0.111`: GitLab application 1
+- `10.6.0.112`: GitLab application 2
+- `10.6.0.113`: GitLab application 3
+
 On each node perform the following:
 
 1. If you're [using NFS](#configure-nfs-optional):
@@ -1465,7 +1558,13 @@ in the Troubleshooting section before proceeding.
 
 The Omnibus GitLab package can be used to configure a standalone Monitoring node
 running [Prometheus](../monitoring/prometheus/index.md) and
-[Grafana](../monitoring/performance/grafana_configuration.md):
+[Grafana](../monitoring/performance/grafana_configuration.md).
+
+The following IP will be used as an example:
+
+- `10.6.0.121`: Prometheus
+
+To configure the Monitoring node:
 
 1. SSH into the Monitoring node.
 1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
