@@ -4,12 +4,11 @@ require 'spec_helper'
 RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
   include ::EE::GeoHelpers
 
-  context 'count all the things', :geo_fdw do
+  context 'when geo_container_registry_ssot_sync is disabled', :geo_fdw do
     let!(:secondary) { create(:geo_node) }
     let!(:container_repository) { create(:container_repository) }
     let!(:failed_registry) { create(:container_repository_registry, :sync_failed) }
     let!(:synced_registry) { create(:container_repository_registry, :synced) }
-
     let(:synced_group) { create(:group) }
     let(:unsynced_group) { create(:group) }
     let(:synced_project) { create(:project, group: synced_group) }
@@ -19,56 +18,31 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
 
     before do
       stub_current_geo_node(secondary)
+      stub_feature_flags(geo_container_registry_ssot_sync: false)
     end
 
     describe '#count_syncable' do
       it 'returns number of container repositories' do
-        result = subject.count_syncable
-
-        expect(result).to eq(3)
+        expect(subject.count_syncable).to eq(3)
       end
     end
 
     describe '#count_synced' do
       it 'returns only synced registry' do
-        result = subject.count_synced
-
-        expect(result).to eq(1)
+        expect(subject.count_synced).to eq(1)
       end
     end
 
     describe '#count_failed' do
       it 'returns only failed registry' do
-        result = subject.count_failed
-
-        expect(result).to eq(1)
+        expect(subject.count_failed).to eq(1)
       end
     end
 
     describe '#count_registry' do
       it 'returns number of all registries' do
-        result = subject.count_registry
-
-        expect(result).to eq(2)
+        expect(subject.count_registry).to eq(2)
       end
-    end
-  end
-
-  context 'find all the things', :geo_fdw do
-    let!(:secondary) { create(:geo_node) }
-    let!(:container_repository) { create(:container_repository) }
-    let!(:failed_registry) { create(:container_repository_registry, :sync_failed) }
-    let!(:synced_registry) { create(:container_repository_registry, :synced) }
-
-    let(:synced_group) { create(:group) }
-    let(:unsynced_group) { create(:group) }
-    let(:synced_project) { create(:project, group: synced_group) }
-    let(:unsynced_project) { create(:project, :broken_storage, group: unsynced_group) }
-
-    subject { described_class.new(current_node_id: secondary.id) }
-
-    before do
-      stub_current_geo_node(secondary)
     end
 
     describe '#find_unsynced' do
@@ -80,7 +54,7 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
 
       it 'returns repositories without an entry in the tracking database, excluding exception list' do
         except_repository = create(:container_repository)
-        repositories = subject.find_unsynced(batch_size: 10, except_repository_ids: [except_repository.id])
+        repositories = subject.find_unsynced(batch_size: 10, except_ids: [except_repository.id])
 
         expect(repositories).to match_ids(container_repository)
       end
@@ -92,7 +66,7 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
           except_repository = create(:container_repository, project: synced_project)
           repository = create(:container_repository, project: synced_project, name: 'second')
 
-          repositories = subject.find_unsynced(batch_size: 10, except_repository_ids: [except_repository.id])
+          repositories = subject.find_unsynced(batch_size: 10, except_ids: [except_repository.id])
 
           expect(repositories).to match_ids(repository)
         end
@@ -122,14 +96,14 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
         except_repository = create(:container_repository)
         create(:container_repository_registry, :sync_failed, container_repository: except_repository)
 
-        result = subject.find_retryable_failed_ids(batch_size: 10, except_repository_ids: [except_repository.id])
+        result = subject.find_retryable_failed_ids(batch_size: 10, except_ids: [except_repository.id])
 
         expect(result).to eq([failed_registry.container_repository_id])
       end
     end
   end
 
-  context 'non-fdw queries' do
+  context 'when geo_container_registry_ssot_sync is enabled' do
     let_it_be(:secondary) { create(:geo_node) }
     let_it_be(:synced_group) { create(:group) }
     let_it_be(:nested_group) { create(:group, parent: synced_group) }
@@ -147,6 +121,40 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
 
     before do
       stub_current_geo_node(secondary)
+      stub_feature_flags(geo_container_registry_ssot_sync: true)
+    end
+
+    describe '#count_syncable' do
+      it 'returns number of container repositories' do
+        expect(subject.count_syncable).to eq(6)
+      end
+    end
+
+    describe '#count_synced' do
+      it 'returns only synced registry' do
+        create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
+        create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
+
+        expect(subject.count_synced).to eq(1)
+      end
+    end
+
+    describe '#count_failed' do
+      it 'returns only failed registry' do
+        create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
+        create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
+
+        expect(subject.count_failed).to eq(1)
+      end
+    end
+
+    describe '#count_registry' do
+      it 'returns number of all registries' do
+        create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
+        create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
+
+        expect(subject.count_registry).to eq(2)
+      end
     end
 
     describe '#find_registry_differences' do

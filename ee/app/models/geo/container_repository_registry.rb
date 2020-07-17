@@ -37,8 +37,26 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
     end
   end
 
+  def self.finder_class
+    ::Geo::ContainerRepositoryRegistryFinder
+  end
+
+  def self.find_registry_differences(range)
+    finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
+  end
+
+  def self.delete_for_model_ids(container_repository_ids)
+    where(container_repository_id: container_repository_ids).delete_all
+
+    container_repository_ids
+  end
+
   def self.pluck_container_repository_key
     where(nil).pluck(:container_repository_id)
+  end
+
+  def self.registry_consistency_worker_enabled?
+    Feature.enabled?(:geo_container_registry_ssot_sync, default_enabled: true)
   end
 
   def self.replication_enabled?

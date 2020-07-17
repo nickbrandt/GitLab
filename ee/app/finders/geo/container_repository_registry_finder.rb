@@ -3,17 +3,15 @@
 module Geo
   class ContainerRepositoryRegistryFinder < RegistryFinder
     def count_syncable
-      container_repositories.count
+      current_node_non_fdw.container_repositories.count
     end
 
     def count_synced
-      registries_for_container_repositories
-        .merge(Geo::ContainerRepositoryRegistry.synced).count
+      registries.merge(Geo::ContainerRepositoryRegistry.synced).count
     end
 
     def count_failed
-      registries_for_container_repositories
-        .merge(Geo::ContainerRepositoryRegistry.failed).count
+      registries.merge(Geo::ContainerRepositoryRegistry.failed).count
     end
 
     def count_registry
@@ -21,7 +19,7 @@ module Geo
     end
 
     def find_registry_differences(range)
-      source_ids = Gitlab::Geo.current_node.container_repositories.id_in(range).pluck_primary_key
+      source_ids = current_node_non_fdw.container_repositories.id_in(range).pluck_primary_key
       tracked_ids = Geo::ContainerRepositoryRegistry.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
@@ -68,26 +66,27 @@ module Geo
 
     # Find limited amount of non replicated container repositories.
     #
-    # You can pass a list with `except_repository_ids:` so you can exclude items you
+    # You can pass a list with `except_ids:` so you can exclude items you
     # already scheduled but haven't finished and aren't persisted to the database yet
     #
     # @param [Integer] batch_size used to limit the results returned
-    # @param [Array<Integer>] except_repository_ids ids that will be ignored from the query
+    # @param [Array<Integer>] except_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_unsynced(batch_size:, except_repository_ids: [])
-      container_repositories
+    def find_unsynced(batch_size:, except_ids: [])
+      current_node_fdw
+        .container_repositories
         .missing_container_repository_registry
-        .id_not_in(except_repository_ids)
+        .id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_retryable_failed_ids(batch_size:, except_repository_ids: [])
+    def find_retryable_failed_ids(batch_size:, except_ids: [])
       Geo::ContainerRepositoryRegistry
         .failed
         .retry_due
-        .model_id_not_in(except_repository_ids)
+        .model_id_not_in(except_ids)
         .limit(batch_size)
         .pluck_container_repository_key
     end
@@ -95,13 +94,12 @@ module Geo
 
     private
 
-    def container_repositories
-      current_node.container_repositories
-    end
-
-    def registries_for_container_repositories
-      container_repositories
-        .inner_join_container_repository_registry
+    def registries
+      if Geo::ContainerRepositoryRegistry.registry_consistency_worker_enabled?
+        Geo::ContainerRepositoryRegistry.all
+      else
+        current_node_fdw.container_repositories.inner_join_container_repository_registry
+      end
     end
   end
 end
