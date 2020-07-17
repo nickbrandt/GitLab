@@ -30,7 +30,7 @@
       = number_with_delimiter(group.users.count)
 
     %span.gl-ml-5.visibility-icon.has-tooltip{ data: { container: 'body', placement: 'left' }, title: visibility_icon_description(group) }
-      = visibility_level_icon(group.visibility_level, fw: false)
+      = visibility_level_icon(group.visibility_level)
 
   .controls.gl-flex-shrink-0.gl-ml-5
     = link_to _('Edit'), admin_group_edit_path(group), id: "edit_#{dom_id(group)}", class: 'btn'

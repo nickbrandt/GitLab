@@ -98,7 +98,7 @@ module IconsHelper
     end
   end
 
-  def visibility_level_icon(level, fw: true, options: {})
+  def visibility_level_icon(level, options: {})
     name =
       case level
       when Gitlab::VisibilityLevel::PRIVATE
