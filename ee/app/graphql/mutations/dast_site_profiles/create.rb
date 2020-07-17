@@ -30,12 +30,12 @@ module Mutations
         raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project)
 
         service = ::DastSiteProfiles::CreateService.new(project, current_user)
-        result = service.execute(name: profile_name, target_url: target_url)
+        dast_site_profile = service.execute(name: profile_name, target_url: target_url)
 
-        if result.success?
-          { id: result.payload.to_global_id, errors: [] }
+        if dast_site_profile.success?
+          raise 'Not implemented'
         else
-          { errors: result.errors }
+          { errors: dast_site_profile.errors }
         end
       end
 
