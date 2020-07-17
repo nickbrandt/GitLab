@@ -58,7 +58,7 @@ module EE
         with_file_types(METRICS_REPORT_FILE_TYPES)
       end
 
-      scope :coverage_fuzzing, -> do
+      scope :coverage_fuzzing_reports, -> do
         with_file_types(COVERAGE_FUZZING_REPORT_TYPES)
       end
     end
