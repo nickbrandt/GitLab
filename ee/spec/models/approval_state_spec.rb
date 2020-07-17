@@ -760,6 +760,16 @@ RSpec.describe ApprovalState do
           end
         end
       end
+
+      context 'when approval feature is disabled' do
+        it 'delegates the call to merge request' do
+          stub_licensed_features(merge_request_approvers: false)
+
+          expect(merge_request).to receive(:can_be_approved_by?).with(approver1)
+
+          subject.can_approve?(approver1)
+        end
+      end
     end
 
     describe '#authors_can_approve?' do
