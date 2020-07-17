@@ -62,7 +62,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
 
       before do
         allow(Gitlab::ErrorTracking).to receive(:track_and_raise_exception).and_call_original
-        report.finding(finding_without_name)
+        report.add_finding(finding_without_name)
       end
 
       it 'raises invalid record error' do
