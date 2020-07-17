@@ -157,7 +157,7 @@ RSpec.describe 'admin Geo Nodes', :js, :geo do
     end
 
     it 'removes an existing Geo Node' do
-      page.within(find('.geo-node-actions', match: :first)) do
+      page.within(find('[data-testid="nodeActions"]', match: :first)) do
         page.click_button('Remove')
       end
       page.within('.modal') do

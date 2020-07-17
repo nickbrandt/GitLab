@@ -1,13 +1,3 @@
-@media (max-width: $breakpoint-sm) {
-  .geo-node-actions {
-    margin: 0 1rem;
-
-    > * {
-      width: 100%;
-    }
-  }
-}
-
 .project-card-errors {
   .btn-card-header {
     &.collapsed {
