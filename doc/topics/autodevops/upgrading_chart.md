@@ -1,51 +1,58 @@
 # Upgrading auto-deploy-app chart for Auto DevOps
 
-## Compatibility Chart
+Auto DevOps provides auto-deploy-app chart for deploying your application to the
+kubernetes cluster with Helm/Tiller. The resource architecture could be different
+per major version and not backward compatible.
 
-| GitLab | [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image) (with auto-deploy-app) | Comment |
-|--------|--------------|-------------|
-| >= v10.0 | >= v0.1.0 and < v2.0.0 | v0 and v1 of charts are backward compatible |
+This guide provides instructions on how to upgrade your deployments to the latest
+chart and resource architecture across major version difference.
 
-## Upgrade Criteria
+## Compatibility
 
-- The Auto DevOps project must use the vanilla chart, which managed by GitLab.
-  [Customized charts](customize.md#custom-helm-chart) are unsupported.
+The following table lists the version compatibility between GitLab and [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image) (with the [auto-deploy-app chart](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image/-/tree/master/assets/auto-deploy-app)).
 
-## Manual Upgrade Guide
+| GitLab version   | auto-deploy-image version | Notes                                      |
+|------------------|---------------------------|--------------------------------------------|
+| v10.0 and higher | v0.1.0 and higher         | v0 and v1 charts are backwards compatible. |
 
-### Upgrading to v1 chart
+## Upgrade Guide
 
-Since v1 chart is backward compatible with v0 chart, you don't need any extra steps,
-thus shouldn't encounter [the major version mismatch warning](#major-version-mismatch-warning).
+The Auto DevOps project must use the unmodified chart managed by GitLab.
+[Customized charts](customize.md#custom-helm-chart) are unsupported.
 
-<!-- ### Upgrading to v2
-     This is scheduled in upcoming milestone. -->
+### v1 chart
 
-## Major Version Mismatch Warning
+The v1 chart is backward compatible with the v0 chart, so no configuration changes are needed.
 
-When the major version of the currently deploying chart is different from the previously deployed chart,
-the new chart could not be correctly applied to the existing deployment due to architectural change.
-In this case, you would see that a deployment job fails with something like the following warning message.
+## Troubleshooting
+
+### Major version mismatch warning
+
+If deploying a chart that has a major version that is different from the previous one,
+the new chart might not be correctly deployed. This could be due to an architectural
+change. If that happens, the deployment job fails with a message similar to:
 
 ```
 *************************************************************************************
                                    [WARNING]                                         
-Detected the major version difference between the previously deployed chart (auto-deploy-app-v0.7.0) and the currently deploying chart (auto-deploy-app-v1.0.0).
-A new major version likely does not have backward compatibility to the current release (production), therefore the deployment could fail or stuck in an unrecoverable status.
+Detected a major version difference between the the chart that is currently deploying (auto-deploy-app-v0.7.0), and the previously deployed chart (auto-deploy-app-v1.0.0).
+A new major version might not be backward compatible with the current release (production). The deployment could fail or be stuck in an unrecoverable status.
 ...
 ```
 
-To resolve the message, please follow [the manual upgrade guide](#manual-upgrade-guide).
-Alternatively, you can keep [using a previous verions of chart](#keep-using-a-specific-version-of-chart) for quickly resuming deployments.
+To clear this error message and resume deployments, you must do one of the following:
 
-### Keep using a specific version of chart
+- Manually [upgrade the chart version](#upgrade-guide).
+- [Use a specific chart version](#use-a-specific-chart-version).
 
-To use a specific version of chart, you must specify a corresponding version of [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image).
-You can [customize `.gitlab-ci.yml`](customize.md#customizing-gitlab-ciyml)
-for this purpose.
+#### Use a specific chart version
 
-For example, creating the following `.gitlab-ci.yml` file in the project. It specifies `v0.17.0` of [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image)
-for deployment jobs, which downloads the latest v0 chart from [chart repository](https://charts.gitlab.io/).
+To use a specific chart version, you must specify a corresponding version of [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image).
+Do this by [customizing the image in your `.gitlab-ci.yml`](customize.md#customizing-gitlab-ciyml).
+
+For example, create the following `.gitlab-ci.yml` file in the project. It configures Auto Devops
+to use [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image) version `v0.17.0`
+for deployment jobs. It will download the chart from [chart repository](https://charts.gitlab.io/):
 
 ```yaml
 include:
@@ -55,9 +62,11 @@ include:
   image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:v0.17.0"
 ```
 
-### Forcibly continue deploying with ignoring the warning
+### Ignore warning and continue deploying
 
-If you are absolutely sure that the new chart version is safe to be deployed on the existing deployment,
-you can set `AUTO_DEVOPS_ALLOW_TO_FORCE_DEPLOY_V<N>` [environment variable](customize.md#build-and-deployment) for forecibly contunuing the deployment.
+If you are certain that the new chart version is safe to be deployed,
+you can add the `AUTO_DEVOPS_ALLOW_TO_FORCE_DEPLOY_V<N>` [environment variable](customize.md#build-and-deployment)
+to force the deployment to continue, where `<N>` is the major version.
 
-For example, if you want to deploy v2.0.0 chart on a deployment which deployed with v0.17.0 chart, set `AUTO_DEVOPS_ALLOW_TO_FORCE_DEPLOY_V2`.
+For example, if you want to deploy the v2.0.0 chart on a deployment that previously
+used the v0.17.0 chart, add `AUTO_DEVOPS_ALLOW_TO_FORCE_DEPLOY_V2`.
