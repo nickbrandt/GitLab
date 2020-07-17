@@ -25,6 +25,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     namespace :analytics do
       resource :productivity_analytics, only: :show, constraints: -> (req) { Gitlab::Analytics.productivity_analytics_enabled? }
 
+      resources :coverage_reports, only: :index, constraints: -> (req) { Gitlab::Analytics.group_coverage_reports_enabled? }
+
       feature_default_enabled = Gitlab::Analytics.feature_enabled_by_default?(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG)
       constrainer = ::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG, default_enabled: feature_default_enabled)
       constraints(constrainer) do
