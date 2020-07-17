@@ -35,19 +35,6 @@ module ServicesHelper
     "#{event}_events"
   end
 
-  def service_event_action_field_name(action)
-    "#{action}_on_event_enabled"
-  end
-
-  def event_action_title(action)
-    case action
-    when "comment"
-      s_("ProjectService|Comment")
-    else
-      action.humanize
-    end
-  end
-
   def service_save_button(disabled: false)
     button_tag(class: 'btn btn-success', type: 'submit', disabled: disabled, data: { qa_selector: 'save_changes_button' }) do
       icon('spinner spin', class: 'hidden js-btn-spinner') +
