@@ -289,7 +289,7 @@ For example, to add support for files referenced by a `Widget` model with a
 
 1. Update `REGISTRY_CLASSES` in `ee/app/workers/geo/secondary/registry_consistency_worker.rb`.
 
-1. Add `widget_registry` to `ActiveSupport::Inflector.inflections` in `config/initializers_before_autoloader/000_inflections.rb`
+1. Add `widget_registry` to `ActiveSupport::Inflector.inflections` in `config/initializers_before_autoloader/000_inflections.rb`.
 
 1. Create `ee/spec/factories/geo/widget_registry.rb`:
 
