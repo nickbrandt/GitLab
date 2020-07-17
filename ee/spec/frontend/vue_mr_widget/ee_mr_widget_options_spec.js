@@ -852,18 +852,6 @@ describe('ee merge request widget options', () => {
 
   describe('computed', () => {
     describe('shouldRenderApprovals', () => {
-      it('should return false when no approvals', () => {
-        vm = mountComponent(Component, {
-          mrData: {
-            ...mockData,
-            has_approvals_available: false,
-          },
-        });
-        vm.mr.state = 'readyToMerge';
-
-        expect(vm.shouldRenderApprovals).toBeFalsy();
-      });
-
       it('should return false when in empty state', () => {
         vm = mountComponent(Component, {
           mrData: {
