@@ -115,7 +115,9 @@ module EE
                 project: projects_with_service_desk,
                 author: ::User.support_bot,
                 confidential: true
-              )
+              ),
+              start: issue_minimum_id,
+              finish: issue_maximum_id
             )
           }
         end
@@ -189,7 +191,7 @@ module EE
                 projects_with_packages: distinct_count(::Packages::Package, :project_id),
                 projects_with_tracing_enabled: count(ProjectTracingSetting),
                 status_page_projects: count(::StatusPage::ProjectSetting.enabled),
-                status_page_issues: count(::Issue.on_status_page),
+                status_page_issues: count(::Issue.on_status_page, start: issue_minimum_id, finish: issue_maximum_id),
                 template_repositories: count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
               },
               requirements_counts,
