@@ -82,7 +82,7 @@ export default {
   >
     <slot>
       <button
-        class="card design-dropzone-card design-dropzone-border w-100 h-100 gl-align-items-center gl-justify-content-center gl-p-3"
+        class="card design-dropzone-card design-dropzone-border gl-w-full gl-h-full gl-align-items-center gl-justify-content-center gl-p-3"
         @click="openFileUpload"
       >
         <div
