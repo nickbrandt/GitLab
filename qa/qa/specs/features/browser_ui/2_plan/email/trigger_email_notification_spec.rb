@@ -19,7 +19,7 @@ module QA
         Flow::Login.sign_in
       end
 
-      it 'is received by a user for project invitation' do
+      it 'is received by a user for project invitation', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/229801', type: :investigating } do
         Flow::Project.add_member(project: project, username: user.username)
 
         expect(page).to have_content(/@#{user.username}(\n| )?Given access/)
