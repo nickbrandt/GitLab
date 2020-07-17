@@ -1,4 +1,6 @@
 <script>
+import { mapState } from 'vuex';
+
 import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
 
 import { __ } from '~/locale';
@@ -21,6 +23,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['parentItem']),
     isSubmitButtonDisabled() {
       return this.inputValue.length === 0 || this.isSubmitting;
     },
@@ -51,7 +54,9 @@ export default {
     <input
       ref="input"
       v-model="inputValue"
-      :placeholder="__('New epic title')"
+      :placeholder="
+        parentItem.confidential ? __('New confidential epic title ') : __('New epic title')
+      "
       type="text"
       class="form-control"
       @keyup.escape.exact="onFormCancel"
