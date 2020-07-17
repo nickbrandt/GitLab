@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Gitlab::Ci::Build::AutoRetry
   include Gitlab::Utils::StrongMemoize
 
@@ -10,11 +12,11 @@ class Gitlab::Ci::Build::AutoRetry
   end
 
   def allowed?
-    # return false unless build.retryable?
+    return false unless @build.retryable?
 
     within_max_retry_limit?
   end
-  
+
   private
 
   def within_max_retry_limit?
@@ -22,7 +24,7 @@ class Gitlab::Ci::Build::AutoRetry
   end
 
   def max_allowed_retries
-    strong_memoize(:options_retry) do
+    strong_memoize(:max_allowed_retries) do
       options_retry_max || DEFAULT_RETRIES.fetch(@build.failure_reason.to_sym, 0)
     end
   end
@@ -34,7 +36,6 @@ class Gitlab::Ci::Build::AutoRetry
   def options_retry_when
     options_retry.fetch(:when, ['always'])
   end
- 
 
   def retry_on_reason_or_always?
     options_retry_when.include?(@build.failure_reason.to_s) ||
