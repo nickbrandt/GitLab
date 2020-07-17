@@ -304,6 +304,3 @@ export const createEpic = ({ state, dispatch }) => {
       dispatch('requestEpicCreateFailure');
     });
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

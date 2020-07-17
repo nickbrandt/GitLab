@@ -27,6 +27,3 @@ export const receiveSubscriptionError = ({ commit }) => {
   createFlash(__('An error occurred while loading the subscription details.'));
   commit(types.RECEIVE_SUBSCRIPTION_ERROR);
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

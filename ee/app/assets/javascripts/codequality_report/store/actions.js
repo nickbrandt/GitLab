@@ -28,6 +28,3 @@ export const fetchReport = ({ state, dispatch }) => {
       createFlash(s__('ciReport|There was an error fetching the codequality report.'));
     });
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

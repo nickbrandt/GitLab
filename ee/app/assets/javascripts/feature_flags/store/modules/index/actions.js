@@ -105,6 +105,3 @@ export const receiveRotateInstanceIdError = ({ commit }) =>
 export const clearAlert = ({ commit }, index) => {
   commit(types.RECEIVE_CLEAR_ALERT, index);
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

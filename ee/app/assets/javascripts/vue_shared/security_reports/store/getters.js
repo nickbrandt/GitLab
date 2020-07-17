@@ -163,6 +163,3 @@ export const canCreateMergeRequest = state =>
 
 export const canDismissVulnerability = state =>
   Boolean(state.createVulnerabilityFeedbackDismissalPath);
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
