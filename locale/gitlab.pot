@@ -4137,6 +4137,9 @@ msgstr ""
 msgid "Can't edit as source branch was deleted"
 msgstr ""
 
+msgid "Can't fetch content for the blob: %{err}"
+msgstr ""
+
 msgid "Can't find HEAD commit for this branch"
 msgstr ""
 
