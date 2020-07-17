@@ -57,19 +57,22 @@ export const initFirstClassVulnerabilityFilters = (projects, specificFilters) =>
         { id: ALL, name: s__('VulnerabilityStatusTypes|All') },
         ...parseOptions(VULNERABILITY_STATES),
       ],
-      selection: { ALL },
+      selection: new Set([ALL]),
+      selectionObj: { ALL },
     },
     {
       name: s__('SecurityReports|Severity'),
       ids: { severity: 'id' },
       options: [BASE_FILTERS.severity, ...parseOptions(SEVERITY_LEVELS)],
-      selection: { ALL },
+      selection: new Set([ALL]),
+      selectionObj: { ALL },
     },
     {
       name: s__('Reports|Scanner'),
       ids: { reportType: 'id', scanner: 'externalIds' },
       options: [BASE_FILTERS.report_type, ...parseReportTypes(REPORT_TYPES, specificFilters)],
-      selection: { ALL },
+      selection: new Set([ALL]),
+      selectionObj: { ALL },
     },
   ];
 
@@ -78,7 +81,8 @@ export const initFirstClassVulnerabilityFilters = (projects, specificFilters) =>
       name: s__('SecurityReports|Project'),
       ids: { projectId: 'id' },
       options: [BASE_FILTERS.project_id, ...mapProjects(projects)],
-      selection: { ALL },
+      selection: new Set([ALL]),
+      selectionObj: { ALL },
     });
   }
 

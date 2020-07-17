@@ -27,7 +27,7 @@ export default {
       return this.filter.selection;
     },
     firstSelectedOption() {
-      const selectedOption = this.filter.selection['ALL']
+      const selectedOption = this.filter.selection.has('all')
         ? this.filter.options[0]
         : this.filter.options.find(option => this.isSelected(option));
       return selectedOption ? selectedOption.displayName || selectedOption.name : '-';
@@ -56,30 +56,7 @@ export default {
       });
     },
     isSelected(option) {
-      if (this.filter.selection['ALL'] && option.id === 'all') {
-        return true;
-      }
-
-      if (this.filter.selection['ALL'] && option.id !== 'all') {
-        return false;
-      }
-
-      // TODO investigate increasing performance
-      const thing = Object.entries(this.filter.ids).reduce((acc, [key, value]) => {
-        acc[key] = option[value];
-        return acc;
-      }, {});
-
-      return Object.entries(thing).every(([key, value]) => {
-        if (!this.selection[key]) {
-          return false;
-        }
-        if (!Array.isArray(value)) {
-          return Boolean(this.selection[key] && this.selection[key].includes(value));
-        }
-
-        return this.selection[key] && value.filter(v => this.selection[key].includes(v)).length;
-      });
+      return this.selection.has(option.id);
     },
     closeDropdown() {
       this.$refs.dropdown.$children[0].hide(true);

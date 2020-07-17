@@ -1,6 +1,12 @@
 import { isSubset } from '~/lib/utils/set';
 import { ALL } from './constants';
 
+const createSelection = selectionObj => {
+  return Object.values(selectionObj).reduce((acc, curr) => {
+    return new Set([...acc, ...curr]);
+  }, new Set());
+};
+
 export const isBaseFilterOption = id => id === ALL;
 
 /**
@@ -25,7 +31,7 @@ export const hasValidSelection = ({ selection, options }) =>
 export const setFilter = (filters, { filterIds, optionIds }) => {
   return filters.map(filter => {
     if (Object.keys(filterIds).some(id => filter.ids[id])) {
-      const { selection } = filter;
+      const { selectionObj: selection } = filter;
       let newSelection;
 
       /* eslint-disable-next-line guard-for-in, no-restricted-syntax */
@@ -34,12 +40,15 @@ export const setFilter = (filters, { filterIds, optionIds }) => {
           continue;
         }
         if (value === ALL) {
-          newSelection = { ALL };
+          newSelection = { ALL: [ALL] };
           break;
         } else if (selection[key]?.includes(value)) {
           newSelection = { ...selection };
           if (newSelection[key].length === 1) {
-            newSelection.delete(key);
+            delete newSelection[key];
+            if (!Object.keys(newSelection).length) {
+              newSelection = { ALL: [ALL] };
+            }
           } else {
             newSelection[key].splice(newSelection[key].indexOf(value), 1);
           }
@@ -57,7 +66,8 @@ export const setFilter = (filters, { filterIds, optionIds }) => {
 
       return {
         ...filter,
-        selection: newSelection,
+        selection: createSelection(newSelection),
+        selectionObj: newSelection,
       };
     }
     return filter;
