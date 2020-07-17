@@ -25,7 +25,8 @@ module EE
         batch_lookup_report_artifact_for_file_type(:secret_detection) ||
         batch_lookup_report_artifact_for_file_type(:dependency_scanning) ||
         batch_lookup_report_artifact_for_file_type(:dast) ||
-        batch_lookup_report_artifact_for_file_type(:container_scanning)
+        batch_lookup_report_artifact_for_file_type(:container_scanning) ||
+        batch_lookup_report_artifact_for_file_type(:coverage_fuzzing)
       end
 
       def degradation_threshold(file_type)

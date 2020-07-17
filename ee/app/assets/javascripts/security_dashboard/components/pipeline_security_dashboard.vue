@@ -77,6 +77,11 @@ export default {
       required: false,
       default: '',
     },
+    pipelineJobsPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     emptyStateProps() {
@@ -93,9 +98,12 @@ export default {
   },
   created() {
     this.setSourceBranch(this.sourceBranch);
+    this.setPipelineJobsPath(this.pipelineJobsPath);
+    this.setProjectId(this.projectId);
   },
   methods: {
     ...mapActions('vulnerabilities', ['setSourceBranch']),
+    ...mapActions('pipelineJobs', ['setPipelineJobsPath', 'setProjectId']),
   },
 };
 </script>
