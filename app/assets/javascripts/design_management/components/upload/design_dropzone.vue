@@ -116,7 +116,7 @@ export default {
     <transition name="design-dropzone-fade">
       <div
         v-show="dragging"
-        class="card design-dropzone-border design-dropzone-overlay w-100 h-100 position-absolute d-flex-center p-3 bg-white"
+        class="card design-dropzone-border design-dropzone-overlay gl-w-full gl-h-full gl-absolute d-flex-center gl-p-3 gl-bg-white"
       >
         <div v-show="!isDragDataValid" class="mw-50 text-center">
           <h3 :class="{ 'gl-font-base gl-display-inline': !hasDesigns }">{{ __('Oh no!') }}</h3>
