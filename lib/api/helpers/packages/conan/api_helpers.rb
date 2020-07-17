@@ -125,7 +125,7 @@ module API
           end
 
           def track_push_package_event
-            if params[:file_name] == ::Packages::Conan::FileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
+            if params[:file_name] == ::Packages::Conan::FileMetadatum::PACKAGE_BINARY && params['file.size'] > 0
               track_event('push_package')
             end
           end

@@ -31,7 +31,6 @@ RSpec.describe API::ConanPackages do
 
   before do
     project.add_developer(user)
-    stub_licensed_features(packages: true)
     allow(Settings).to receive(:attr_encrypted_db_key_base).and_return(base_secret)
   end
 

@@ -121,16 +121,6 @@ RSpec.shared_examples 'rejects Composer access with unknown group id' do
   end
 end
 
-RSpec.shared_examples 'rejects Composer packages access with packages features disabled' do
-  context 'with packages features disabled' do
-    before do
-      stub_licensed_features(packages: false)
-    end
-
-    it_behaves_like 'process Composer api request', :anonymous, :forbidden
-  end
-end
-
 RSpec.shared_examples 'rejects Composer access with unknown project id' do
   context 'with an unknown project' do
     let(:project) { double(id: non_existing_record_id) }

@@ -13,10 +13,6 @@ module API
         not_found! unless ::Gitlab.config.dependency_proxy.enabled
       end
 
-      def authorize_packages_feature!(subject = user_project)
-        forbidden! unless subject.feature_available?(:packages)
-      end
-
       def authorize_read_package!(subject = user_project)
         authorize!(:read_package, subject)
       end
@@ -31,7 +27,6 @@ module API
 
       def authorize_packages_access!(subject = user_project)
         require_packages_enabled!
-        authorize_packages_feature!(subject)
         authorize_read_package!(subject)
       end
 

@@ -28,11 +28,7 @@ RSpec.describe 'getting a package list for a project' do
     )
   end
 
-  context 'when package feature is available' do
-    before do
-      stub_licensed_features(packages: true)
-    end
-
+  context 'without the need for a license' do
     context 'when user has access to the project' do
       before do
         project.add_reporter(current_user)
@@ -68,20 +64,6 @@ RSpec.describe 'getting a package list for a project' do
       it 'returns nil' do
         expect(graphql_data['project']).to be_nil
       end
-    end
-  end
-
-  context 'when package feature is not available' do
-    before do
-      stub_licensed_features(packages: false)
-      project.add_reporter(current_user)
-      post_graphql(query, current_user: current_user)
-    end
-
-    it_behaves_like 'a working graphql query'
-
-    it 'returns nil' do
-      expect(graphql_data['project']['packages']).to be_nil
     end
   end
 end

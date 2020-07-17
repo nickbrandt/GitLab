@@ -54,7 +54,7 @@ module API
 
     resource :group, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_packages_feature!(user_group)
+        user_group
       end
 
       desc 'Composer packages endpoint at group level'
@@ -98,7 +98,7 @@ module API
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_packages_feature!(unauthorized_user_project!)
+        unauthorized_user_project!
       end
 
       desc 'Composer packages endpoint for registering packages'

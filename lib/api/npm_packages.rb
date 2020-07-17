@@ -38,7 +38,6 @@ module API
       bad_request!('Package Name') if package_name.blank?
 
       authorize_read_package!(project_by_package_name)
-      authorize_packages_feature!(project_by_package_name)
 
       packages = ::Packages::Npm::PackageFinder.new(project_by_package_name, package_name)
                                               .execute
@@ -112,7 +111,6 @@ module API
 
       redirect_registry_request(project_by_package_name.blank?, :npm, package_name: package_name) do
         authorize_read_package!(project_by_package_name)
-        authorize_packages_feature!(project_by_package_name)
 
         packages = ::Packages::Npm::PackageFinder
           .new(project_by_package_name, package_name).execute
@@ -126,10 +124,6 @@ module API
       requires :id, type: String, desc: 'The ID of a project'
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      before do
-        authorize_packages_feature!(user_project)
-      end
-
       desc 'Download the NPM tarball' do
         detail 'This feature was introduced in GitLab 11.8'
       end

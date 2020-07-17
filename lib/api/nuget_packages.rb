@@ -57,7 +57,7 @@ module API
     route_setting :authentication, deploy_token_allowed: true
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_packages_feature!(authorized_user_project)
+        authorized_user_project
       end
 
       namespace ':id/packages/nuget' do
