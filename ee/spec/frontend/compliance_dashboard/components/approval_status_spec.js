@@ -41,29 +41,26 @@ describe('ApprovalStatus component', () => {
       expect(findIcon().text()).toEqual(`status_${approvalStatus}`);
     });
 
-    it.each`
-      status       | tooltip
-      ${'success'} | ${'Adheres to separation of duties'}
-      ${'warning'} | ${'At least one rule does not adhere to separation of duties'}
-      ${'failed'}  | ${'Fails to adhere to separation of duties'}
-    `('shows the correct tooltip for $status', ({ status, tooltip }) => {
-      wrapper = createComponent(status);
+    describe.each`
+      status       | icon                | group                      | tooltip
+      ${'success'} | ${'status_success'} | ${'success'}               | ${'Adheres to separation of duties'}
+      ${'warning'} | ${'status_warning'} | ${'success-with-warnings'} | ${'At least one rule does not adhere to separation of duties'}
+      ${'failed'}  | ${'status_failed'}  | ${'failed'}                | ${'Fails to adhere to separation of duties'}
+    `('returns the correct values for $status', ({ status, icon, group, tooltip }) => {
+      beforeEach(() => {
+        wrapper = createComponent(status);
+      });
 
-      expect(wrapper.vm.tooltip).toEqual(tooltip);
-    });
-  });
+      it('returns the correct icon', () => {
+        expect(wrapper.vm.icon).toEqual(icon);
+      });
 
-  describe('with a warning approval status', () => {
-    const approvalStatus = 'warning';
+      it('returns the correct group', () => {
+        expect(wrapper.vm.group).toEqual(group);
+      });
 
-    beforeEach(() => {
-      wrapper = createComponent(approvalStatus);
-    });
-
-    it('returns the correct status object`', () => {
-      expect(wrapper.vm.iconStatus).toEqual({
-        group: 'success-with-warnings',
-        icon: 'status_warning',
+      it('returns the correct tooltip', () => {
+        expect(wrapper.vm.tooltip).toEqual(tooltip);
       });
     });
   });
