@@ -28286,7 +28286,7 @@ msgstr ""
 msgid "mrWidget|Check out branch"
 msgstr ""
 
-msgid "mrWidget|Checking ability to merge automatically…"
+msgid "mrWidget|Checking if merge request can be merged…"
 msgstr ""
 
 msgid "mrWidget|Cherry-pick"
