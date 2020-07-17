@@ -45,7 +45,7 @@ describe('DropdownButton', () => {
         ${'standalone'}
         ${'embedded'}
       `(
-        'toggles dropdown content and stops event propagation when `state.variant` is "$variant"',
+        'toggles dropdown content and handles event propagation when `state.variant` is "$variant"',
         ({ variant }) => {
           const event = { stopPropagation: jest.fn() };
 
@@ -57,7 +57,12 @@ describe('DropdownButton', () => {
           findDropdownButton().vm.$emit('click', event);
 
           expect(store.state.showDropdownContents).toBe(true);
-          expect(event.stopPropagation).toHaveBeenCalled();
+
+          if (variant === 'standalone') {
+            expect(event.stopPropagation).toHaveBeenCalled();
+          } else {
+            expect(event.stopPropagation).not.toHaveBeenCalled();
+          }
         },
       );
     });
