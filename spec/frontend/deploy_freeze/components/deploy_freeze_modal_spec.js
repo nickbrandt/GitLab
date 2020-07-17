@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlDeprecatedButton, GlModal } from '@gitlab/ui';
+import { GlButton, GlModal } from '@gitlab/ui';
 import DeployFreezeModal from '~/deploy_freeze/components/deploy_freeze_modal.vue';
 import DeployFreezeTimezoneDropdown from '~/deploy_freeze/components/deploy_freeze_timezone_dropdown.vue';
 import createStore from '~/deploy_freeze/store';
@@ -31,7 +31,7 @@ describe('Deploy freeze modal', () => {
   const findModal = () => wrapper.find(GlModal);
   const addDeployFreezeButton = () =>
     findModal()
-      .findAll(GlDeprecatedButton)
+      .findAll(GlButton)
       .at(1);
 
   const setInput = (freezeStartCron, freezeEndCron, selectedTimezone) => {
