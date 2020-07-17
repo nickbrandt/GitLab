@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export const generateFeatures = (n, overrides = {}) => {
   return [...Array(n).keys()].map(i => ({
     type: `scan-type-${i}`,
