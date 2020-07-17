@@ -53,20 +53,32 @@ module Projects
           create_sast_merge_request_path: project_security_configuration_sast_path(project),
           auto_devops_path: auto_devops_settings_path(project),
           can_enable_auto_devops: can_enable_auto_devops?,
-          features: features.to_json,
+          features: features,
           help_page_path: help_page_path('user/application_security/index'),
           latest_pipeline_path: latest_pipeline_path,
-          auto_fix_enabled: {
-            dependency_scanning: project_settings.auto_fix_dependency_scanning,
-            container_scanning: project_settings.auto_fix_container_scanning
-          }.to_json,
+          auto_fix_enabled: autofix_enabled,
           can_toggle_auto_fix_settings: auto_fix_permission,
           gitlab_ci_present: gitlab_ci_present?,
           auto_fix_user_path: '/' # TODO: real link will be updated with https://gitlab.com/gitlab-org/gitlab/-/issues/215669
         }
       end
 
+      def to_html_data_attribute
+        data = to_h
+        data[:features] = data[:features].to_json
+        data[:auto_fix_enabled] = data[:auto_fix_enabled].to_json
+
+        data
+      end
+
       private
+
+      def autofix_enabled
+        {
+          dependency_scanning: project_settings.auto_fix_dependency_scanning,
+          container_scanning: project_settings.auto_fix_container_scanning
+        }
+      end
 
       def can_enable_auto_devops?
         feature_available?(:builds, current_user) &&
