@@ -51,7 +51,7 @@ RSpec.describe 'GEO Nodes', :geo do
 
         wait_for_requests
 
-        geo_node_actions = all('div.geo-node-actions')
+        geo_node_actions = all('[data-testid="nodeActions"]')
         expected_url = File.join(geo_secondary.url, '/admin/geo/projects')
 
         expect(geo_node_actions.last).to have_link('Open projects', href: expected_url)
