@@ -88,12 +88,12 @@ export default {
 <template>
   <div
     data-testid="nodeActions"
-    class="geo-node-actions gl-display-flex gl-align-items-center gl-justify-content-end gl-flex-direction-column gl-sm-flex-direction-row"
+    class="gl-display-flex gl-align-items-center gl-justify-content-end gl-flex-direction-column gl-sm-flex-direction-row gl-mx-5 gl-sm-mx-0"
   >
     <gl-button
       v-if="isSecondaryNode"
       :href="node.geoProjectsUrl"
-      class="gl-mx-2 gl-mt-5 gl-sm-mt-0"
+      class="gl-mx-2 gl-mt-5 gl-sm-mt-0 gl-w-full gl-sm-w-auto"
       target="_blank"
     >
       <span class="gl-display-flex gl-align-items-center">
@@ -102,17 +102,25 @@ export default {
       </span>
     </gl-button>
     <template v-if="nodeActionsAllowed">
-      <gl-button v-if="nodeMissingOauth" class="gl-mx-2 gl-mt-5 gl-sm-mt-0" @click="onRepairNode">
+      <gl-button
+        v-if="nodeMissingOauth"
+        class="gl-mx-2 gl-mt-5 gl-sm-mt-0 gl-w-full gl-sm-w-auto"
+        @click="onRepairNode"
+      >
         {{ s__('Repair authentication') }}
       </gl-button>
-      <gl-button v-if="nodeEditAllowed" :href="node.editPath" class="gl-mx-2 gl-mt-5 gl-sm-mt-0">
+      <gl-button
+        v-if="nodeEditAllowed"
+        :href="node.editPath"
+        class="gl-mx-2 gl-mt-5 gl-sm-mt-0 gl-w-full gl-sm-w-auto"
+      >
         {{ __('Edit') }}
       </gl-button>
       <gl-button
         v-if="isSecondaryNode"
         data-testid="removeButton"
         variant="danger"
-        class="gl-mx-2 gl-mt-5 gl-sm-mt-0"
+        class="gl-mx-2 gl-mt-5 gl-sm-mt-0 gl-w-full gl-sm-w-auto"
         :disabled="!nodeRemovalAllowed"
         @click="onRemoveSecondaryNode"
       >
@@ -121,7 +129,7 @@ export default {
       <div
         v-gl-tooltip.hover
         name="disabledRemovalTooltip"
-        class="gl-mx-2 gl-mt-5 gl-sm-mt-0"
+        class="gl-mx-2 gl-mt-5 gl-sm-mt-0 gl-w-full gl-sm-w-auto"
         :title="disabledRemovalTooltip"
       >
         <gl-button
