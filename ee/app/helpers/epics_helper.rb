@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 module EpicsHelper
+  def epic_initial_data(epic)
+    issuable_initial_data(epic).merge(canCreate: can?(current_user, :create_epic, epic.group))
+  end
+
   def epic_show_app_data(epic)
-    EpicPresenter.new(epic, current_user: current_user).show_data(author_icon: avatar_icon_for_user(epic.author), base_data: issuable_initial_data(epic))
+    EpicPresenter.new(epic, current_user: current_user).show_data(author_icon: avatar_icon_for_user(epic.author), base_data: epic_initial_data(epic))
   end
 
   def epic_new_app_data(group)
