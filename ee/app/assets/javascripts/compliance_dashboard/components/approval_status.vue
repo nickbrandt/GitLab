@@ -4,6 +4,8 @@ import { GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
 
+const APPROVAL_WARNING_ICON = 'success-with-warnings';
+
 export default {
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -21,22 +23,17 @@ export default {
     tooltip() {
       return this.$options.tooltips[this.status];
     },
-    iconName() {
+    icon() {
       return `status_${this.status}`;
     },
-    iconStatus() {
-      const { status, iconName: icon } = this;
-      let group = status;
+    group() {
+      const { status } = this;
 
-      // Need to set this to be the group for warnings so the correct icon color fill is used
-      if (group === 'warning') {
-        group = 'success-with-warnings';
+      if (status === 'warning') {
+        return APPROVAL_WARNING_ICON;
       }
 
-      return {
-        group,
-        icon,
-      };
+      return status;
     },
   },
   tooltips: {
@@ -51,6 +48,6 @@ export default {
   <a
     href="https://docs.gitlab.com/ee/user/compliance/compliance_dashboard/#approval-status-and-separation-of-duties"
   >
-    <ci-icon v-gl-tooltip.left="tooltip" class="gl-display-flex" :status="iconStatus" />
+    <ci-icon v-gl-tooltip.left="tooltip" class="gl-display-flex" :status="{ icon, group }" />
   </a>
 </template>
