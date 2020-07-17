@@ -33,7 +33,7 @@ module Issues
 
         notification_service.async.close_issue(issue, current_user, closed_via: closed_via) if notifications
         todo_service.close_issue(issue, current_user)
-        resolve_alert(issue)
+        resolve_alert(issue, system_note)
         execute_hooks(issue, 'close')
         invalidate_cache_counts(issue, users: issue.assignees)
         issue.update_project_counter_caches
@@ -59,11 +59,11 @@ module Issues
       SystemNoteService.change_status(issue, issue.project, current_user, issue.state, current_commit)
     end
 
-    def resolve_alert(issue)
+    def resolve_alert(issue, system_note)
       return unless alert = issue.alert_management_alert
 
       if alert.resolve
-        SystemNoteService.closed_alert_issue(alert, issue, current_user)
+        SystemNoteService.closed_alert_issue(alert, issue, current_user) if system_note
       else
         Gitlab::AppLogger.warn(
           message: 'Cannot resolve an associated Alert Management alert',
