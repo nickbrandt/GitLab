@@ -570,7 +570,7 @@ RSpec.describe Ci::JobArtifact do
           it_behaves_like 'basing off the plan limit'
         end
 
-        context 'and plan limit is smaller than project setting' do
+        context 'and plan limit is larger than project setting' do
           let(:max_size_for_type) { project_closest_setting + 1 }
 
           it_behaves_like 'basing off the project closest setting'
