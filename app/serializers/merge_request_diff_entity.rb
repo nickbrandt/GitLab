@@ -31,11 +31,7 @@ class MergeRequestDiffEntity < Grape::Entity
 
     next unless project
 
-    if Feature.enabled?(:default_merge_ref_for_diffs)
-      diffs_project_merge_request_path(project, merge_request, diff_head: true)
-    else
-      merge_request_version_path(project, merge_request, merge_request_diff)
-    end
+    merge_request_version_path(project, merge_request, merge_request_diff)
   end
 
   expose :head_version_path do |merge_request_diff|
