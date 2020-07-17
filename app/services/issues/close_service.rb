@@ -60,9 +60,18 @@ module Issues
     end
 
     def resolve_alert(issue)
-      return unless issue.resolve_associated_alert_management_alert(current_user)
+      return unless alert = issue.alert_management_alert
 
-      SystemNoteService.closed_alert_issue(issue.alert_management_alert, issue, current_user)
+      if alert.resolve
+        SystemNoteService.closed_alert_issue(alert, issue, current_user)
+      else
+        Gitlab::AppLogger.warn(
+          message: 'Cannot resolve an associated Alert Management alert',
+          issue_id: issue.id,
+          alert_id: alert.id,
+          alert_errors: alert.errors.messages
+        )
+      end
     end
 
     def store_first_mentioned_in_commit_at(issue, merge_request)

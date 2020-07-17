@@ -359,19 +359,6 @@ class Issue < ApplicationRecord
     @design_collection ||= ::DesignManagement::DesignCollection.new(self)
   end
 
-  def resolve_associated_alert_management_alert(user)
-    return unless alert_management_alert
-
-    return true if alert_management_alert.resolve
-
-    Gitlab::AppLogger.warn(
-      message: 'Cannot resolve an associated Alert Management alert',
-      issue_id: id,
-      alert_id: alert_management_alert.id,
-      alert_errors: alert_management_alert.errors.messages
-    )
-  end
-
   def from_service_desk?
     author.id == User.support_bot.id
   end

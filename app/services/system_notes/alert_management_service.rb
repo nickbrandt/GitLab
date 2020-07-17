@@ -12,7 +12,7 @@ module SystemNotes
     #
     # Returns the created Note object
     def change_alert_status(alert)
-      status = AlertManagement::Alert::STATUSES.key(alert.status).to_s.titleize
+      status = alert.state.to_s.titleize
       body = "changed the status to **#{status}**"
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'status'))
@@ -28,7 +28,7 @@ module SystemNotes
     #   "created issue #17 for this alert"
     #
     # Returns the created Note object
-    def new_alert_issue(alert, issue)
+    def new_alert_issue(issue)
       body = "created issue #{issue.to_reference(project)} for this alert"
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'alert_issue_added'))
@@ -41,13 +41,13 @@ module SystemNotes
     #
     # Example Note text:
     #
-    #   "resolved this alert due to closing issue #17"
+    #   "changed the status to Resolved by closing issue #17"
     #
     # Returns the created Note object
-    def closed_alert_issue(alert, issue)
-      body = "resolved this alert due to closing issue #{issue.to_reference(project)}"
+    def closed_alert_issue(issue)
+      body = "changed the status to **Resolved** by closing issue #{issue.to_reference(project)}"
 
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'alert_issue_added'))
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'status'))
     end
   end
 end
