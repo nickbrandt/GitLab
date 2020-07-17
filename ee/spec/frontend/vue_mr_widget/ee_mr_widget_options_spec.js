@@ -1,22 +1,16 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 import mrWidgetOptions from 'ee/vue_merge_request_widget/mr_widget_options.vue';
-import MRWidgetStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
-import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import mountComponent from 'helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'helpers/test_constants';
 import waitForPromises from 'helpers/wait_for_promises';
 import { trimText } from 'helpers/text_helper';
 
 import mockData, {
-  baseIssues,
-  headIssues,
   baseBrowserPerformance,
   headBrowserPerformance,
   baseLoadPerformance,
   headLoadPerformance,
-  parsedBaseIssues,
-  parsedHeadIssues,
 } from './mock_data';
 
 import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
@@ -297,204 +291,6 @@ describe('ee merge request widget options', () => {
           expect(
             trimText(findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent),
           ).toContain('Dependency scanning: Loading resulted in an error');
-          done();
-        });
-      });
-    });
-  });
-
-  describe('code quality', () => {
-    beforeEach(() => {
-      gl.mrWidgetData = {
-        ...mockData,
-        codeclimate: {},
-      };
-    });
-
-    describe('when it is loading', () => {
-      it('should render loading indicator', done => {
-        mock.onGet('head.json').reply(200, headIssues);
-        mock.onGet('base.json').reply(200, baseIssues);
-        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-
-        vm.mr.codeclimate = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
-
-        vm.$nextTick(() => {
-          expect(trimText(vm.$el.querySelector('.js-codequality-widget').textContent)).toContain(
-            'Loading codeclimate report',
-          );
-
-          done();
-        });
-      });
-    });
-
-    describe('with successful request', () => {
-      beforeEach(() => {
-        mock.onGet('head.json').reply(200, headIssues);
-        mock.onGet('base.json').reply(200, baseIssues);
-
-        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-
-        gl.mrWidgetData.codeclimate = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
-        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
-
-        // mock worker response
-        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockResolvedValue({
-          newIssues: filterByKey(parsedHeadIssues, parsedBaseIssues, 'fingerprint'),
-          resolvedIssues: filterByKey(parsedBaseIssues, parsedHeadIssues, 'fingerprint'),
-        });
-      });
-
-      it('should render provided data', done => {
-        setImmediate(() => {
-          expect(
-            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
-          ).toEqual('Code quality improved on 1 point and degraded on 1 point');
-          done();
-        });
-      });
-
-      describe('text connector', () => {
-        it('should only render information about fixed issues', done => {
-          setImmediate(() => {
-            vm.mr.codeclimateMetrics.newIssues = [];
-
-            Vue.nextTick(() => {
-              expect(
-                trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
-              ).toEqual('Code quality improved on 1 point');
-              done();
-            });
-          });
-        });
-
-        it('should only render information about added issues', done => {
-          setImmediate(() => {
-            vm.mr.codeclimateMetrics.resolvedIssues = [];
-            Vue.nextTick(() => {
-              expect(
-                trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
-              ).toEqual('Code quality degraded on 1 point');
-              done();
-            });
-          });
-        });
-      });
-    });
-
-    describe('with empty successful request', () => {
-      beforeEach(() => {
-        mock.onGet('head.json').reply(200, []);
-        mock.onGet('base.json').reply(200, []);
-        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-
-        gl.mrWidgetData.codeclimate = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
-        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
-
-        // mock worker response
-        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockResolvedValue({
-          newIssues: filterByKey([], [], 'fingerprint'),
-          resolvedIssues: filterByKey([], [], 'fingerprint'),
-        });
-      });
-
-      afterEach(() => {
-        mock.restore();
-      });
-
-      it('should render provided data', done => {
-        setImmediate(() => {
-          expect(
-            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
-          ).toEqual('No changes to code quality');
-          done();
-        });
-      });
-    });
-
-    describe('with a head_path but no base_path', () => {
-      beforeEach(() => {
-        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-
-        gl.mrWidgetData.codeclimate = {
-          head_path: 'head.json',
-          base_path: null,
-        };
-        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
-      });
-
-      it('should render error indicator', done => {
-        setImmediate(() => {
-          expect(
-            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
-          ).toContain('Failed to load codeclimate report');
-          done();
-        });
-      });
-
-      it('should render a help icon with more information', done => {
-        setImmediate(() => {
-          expect(vm.$el.querySelector('.js-codequality-widget .btn-help')).not.toBeNull();
-          expect(vm.codequalityPopover.title).toBe('Base pipeline codequality artifact not found');
-          done();
-        });
-      });
-    });
-
-    describe('with codeclimate comparison worker rejection', () => {
-      beforeEach(() => {
-        mock.onGet('head.json').reply(200, headIssues);
-        mock.onGet('base.json').reply(200, baseIssues);
-        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-
-        gl.mrWidgetData.codeclimate = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
-        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
-
-        // mock worker rejection
-        jest.spyOn(MRWidgetStore, 'doCodeClimateComparison').mockRejectedValue();
-      });
-
-      it('should render error indicator', done => {
-        setImmediate(() => {
-          expect(
-            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
-          ).toEqual('Failed to load codeclimate report');
-          done();
-        });
-      });
-    });
-
-    describe('with failed request', () => {
-      beforeEach(() => {
-        mock.onGet('head.json').reply(500, []);
-        mock.onGet('base.json').reply(500, []);
-        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-
-        gl.mrWidgetData.codeclimate = {
-          head_path: 'head.json',
-          base_path: 'base.json',
-        };
-        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
-      });
-
-      it('should render error indicator', done => {
-        setImmediate(() => {
-          expect(
-            trimText(vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent),
-          ).toContain('Failed to load codeclimate report');
           done();
         });
       });

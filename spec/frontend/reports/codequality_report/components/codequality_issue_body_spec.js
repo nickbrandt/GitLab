@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import component from 'ee/vue_merge_request_widget/components/codequality_issue_body.vue';
+import component from '~/reports/codequality_report/components/codequality_issue_body.vue';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 
 describe('code quality issue body issue body', () => {
