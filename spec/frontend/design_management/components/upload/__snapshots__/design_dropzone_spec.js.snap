@@ -5,7 +5,7 @@ exports[`Design management dropzone component when dragging renders correct temp
   class="w-100 position-relative"
 >
   <button
-    class="card design-dropzone-card design-dropzone-border w-100 h-100 gl-align-items-center gl-justify-content-center gl-p-3"
+    class="card design-dropzone-card design-dropzone-border gl-w-full gl-h-full gl-align-items-center gl-justify-content-center gl-p-3"
   >
     <div
       class="gl-display-flex gl-align-items-center gl-justify-content-center gl-text-center gl-flex-direction-column"
@@ -39,7 +39,7 @@ exports[`Design management dropzone component when dragging renders correct temp
     name="design-dropzone-fade"
   >
     <div
-      class="card design-dropzone-border design-dropzone-overlay w-100 h-100 position-absolute d-flex-center p-3 bg-white"
+      class="card design-dropzone-border design-dropzone-overlay gl-w-full gl-h-full gl-absolute d-flex-center gl-p-3 gl-bg-white"
       style=""
     >
       <div
@@ -81,7 +81,7 @@ exports[`Design management dropzone component when dragging renders correct temp
   class="w-100 position-relative"
 >
   <button
-    class="card design-dropzone-card design-dropzone-border w-100 h-100 gl-align-items-center gl-justify-content-center gl-p-3"
+    class="card design-dropzone-card design-dropzone-border gl-w-full gl-h-full gl-align-items-center gl-justify-content-center gl-p-3"
   >
     <div
       class="gl-display-flex gl-align-items-center gl-justify-content-center gl-text-center gl-flex-direction-column"
@@ -115,7 +115,7 @@ exports[`Design management dropzone component when dragging renders correct temp
     name="design-dropzone-fade"
   >
     <div
-      class="card design-dropzone-border design-dropzone-overlay w-100 h-100 position-absolute d-flex-center p-3 bg-white"
+      class="card design-dropzone-border design-dropzone-overlay gl-w-full gl-h-full gl-absolute d-flex-center gl-p-3 gl-bg-white"
       style=""
     >
       <div
@@ -157,7 +157,7 @@ exports[`Design management dropzone component when dragging renders correct temp
   class="w-100 position-relative"
 >
   <button
-    class="card design-dropzone-card design-dropzone-border w-100 h-100 gl-align-items-center gl-justify-content-center gl-p-3"
+    class="card design-dropzone-card design-dropzone-border gl-w-full gl-h-full gl-align-items-center gl-justify-content-center gl-p-3"
   >
     <div
       class="gl-display-flex gl-align-items-center gl-justify-content-center gl-text-center gl-flex-direction-column"
@@ -191,7 +191,7 @@ exports[`Design management dropzone component when dragging renders correct temp
     name="design-dropzone-fade"
   >
     <div
-      class="card design-dropzone-border design-dropzone-overlay w-100 h-100 position-absolute d-flex-center p-3 bg-white"
+      class="card design-dropzone-border design-dropzone-overlay gl-w-full gl-h-full gl-absolute d-flex-center gl-p-3 gl-bg-white"
       style=""
     >
       <div
@@ -232,7 +232,7 @@ exports[`Design management dropzone component when dragging renders correct temp
   class="w-100 position-relative"
 >
   <button
-    class="card design-dropzone-card design-dropzone-border w-100 h-100 gl-align-items-center gl-justify-content-center gl-p-3"
+    class="card design-dropzone-card design-dropzone-border gl-w-full gl-h-full gl-align-items-center gl-justify-content-center gl-p-3"
   >
     <div
       class="gl-display-flex gl-align-items-center gl-justify-content-center gl-text-center gl-flex-direction-column"
@@ -266,7 +266,7 @@ exports[`Design management dropzone component when dragging renders correct temp
     name="design-dropzone-fade"
   >
     <div
-      class="card design-dropzone-border design-dropzone-overlay w-100 h-100 position-absolute d-flex-center p-3 bg-white"
+      class="card design-dropzone-border design-dropzone-overlay gl-w-full gl-h-full gl-absolute d-flex-center gl-p-3 gl-bg-white"
       style=""
     >
       <div
@@ -307,7 +307,7 @@ exports[`Design management dropzone component when dragging renders correct temp
   class="w-100 position-relative"
 >
   <button
-    class="card design-dropzone-card design-dropzone-border w-100 h-100 gl-align-items-center gl-justify-content-center gl-p-3"
+    class="card design-dropzone-card design-dropzone-border gl-w-full gl-h-full gl-align-items-center gl-justify-content-center gl-p-3"
   >
     <div
       class="gl-display-flex gl-align-items-center gl-justify-content-center gl-text-center gl-flex-direction-column"
@@ -341,7 +341,7 @@ exports[`Design management dropzone component when dragging renders correct temp
     name="design-dropzone-fade"
   >
     <div
-      class="card design-dropzone-border design-dropzone-overlay w-100 h-100 position-absolute d-flex-center p-3 bg-white"
+      class="card design-dropzone-border design-dropzone-overlay gl-w-full gl-h-full gl-absolute d-flex-center gl-p-3 gl-bg-white"
       style="display: none;"
     >
       <div
@@ -382,7 +382,7 @@ exports[`Design management dropzone component when no slot provided renders defa
   class="w-100 position-relative"
 >
   <button
-    class="card design-dropzone-card design-dropzone-border w-100 h-100 gl-align-items-center gl-justify-content-center gl-p-3"
+    class="card design-dropzone-card design-dropzone-border gl-w-full gl-h-full gl-align-items-center gl-justify-content-center gl-p-3"
   >
     <div
       class="gl-display-flex gl-align-items-center gl-justify-content-center gl-text-center gl-flex-direction-column"
@@ -416,7 +416,7 @@ exports[`Design management dropzone component when no slot provided renders defa
     name="design-dropzone-fade"
   >
     <div
-      class="card design-dropzone-border design-dropzone-overlay w-100 h-100 position-absolute d-flex-center p-3 bg-white"
+      class="card design-dropzone-border design-dropzone-overlay gl-w-full gl-h-full gl-absolute d-flex-center gl-p-3 gl-bg-white"
       style="display: none;"
     >
       <div
@@ -464,7 +464,7 @@ exports[`Design management dropzone component when slot provided renders dropzon
     name="design-dropzone-fade"
   >
     <div
-      class="card design-dropzone-border design-dropzone-overlay w-100 h-100 position-absolute d-flex-center p-3 bg-white"
+      class="card design-dropzone-border design-dropzone-overlay gl-w-full gl-h-full gl-absolute d-flex-center gl-p-3 gl-bg-white"
       style="display: none;"
     >
       <div
