@@ -304,9 +304,6 @@ msgstr ""
 msgid "%{containerScanningLinkStart}Container Scanning%{containerScanningLinkEnd} and/or %{dependencyScanningLinkStart}Dependency Scanning%{dependencyScanningLinkEnd} must be enabled. %{securityBotLinkStart}GitLab-Security-Bot%{securityBotLinkEnd} will be the author of the auto-created merge request. %{moreInfoLinkStart}More information%{moreInfoLinkEnd}."
 msgstr ""
 
-msgid "%{contentStart}Drop files to attach, or %{contentEnd}%{linkStart}browse%{linkEnd}"
-msgstr ""
-
 msgid "%{cores} cores"
 msgstr ""
 
@@ -8401,6 +8398,9 @@ msgid "Downstream"
 msgstr ""
 
 msgid "Downvotes"
+msgstr ""
+
+msgid "Drop or %{linkStart}upload%{linkEnd} Designs to attach"
 msgstr ""
 
 msgid "Drop your designs to start your upload."
