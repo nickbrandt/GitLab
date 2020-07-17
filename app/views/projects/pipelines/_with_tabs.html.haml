@@ -72,7 +72,7 @@
               %td.responsive-table-cell.build-actions
                 - if can?(current_user, :update_build, job)
                   = link_to retry_project_job_path(build.project, build, return_to: request.original_url), method: :post, title: _('Retry'), class: 'btn btn-build' do
-                    = icon('repeat')
+                    = sprite_icon('repeat')
             - if can?(current_user, :read_build, job)
               %tr.build-trace-row.responsive-table-border-end
                 %td
