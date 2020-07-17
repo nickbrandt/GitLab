@@ -159,6 +159,3 @@ export const removeIssueFromEpic = ({ state, dispatch }, epic) => {
       );
     });
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

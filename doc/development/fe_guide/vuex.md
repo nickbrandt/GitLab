@@ -520,20 +520,6 @@ describe('component', () => {
 });
 ```
 
-#### Testing Vuex actions and getters
-
-Because we're currently using [`babel-plugin-rewire`](https://github.com/speedskater/babel-plugin-rewire), you may encounter the following error when testing your Vuex actions and getters:
-`[vuex] actions should be function or object with "handler" function`
-
-To prevent this error from happening, you need to export an empty function as `default`:
-
-```javascript
-// getters.js or actions.js
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
-```
-
 ### Two way data binding
 
 When storing form data in Vuex, it is sometimes necessary to update the value stored. The store should never be mutated directly, and an action should be used instead.

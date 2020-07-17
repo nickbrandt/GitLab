@@ -555,6 +555,3 @@ export const openDismissalCommentBox = ({ commit }) => {
 export const closeDismissalCommentBox = ({ commit }) => {
   commit(types.CLOSE_DISMISSAL_COMMENT_BOX);
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

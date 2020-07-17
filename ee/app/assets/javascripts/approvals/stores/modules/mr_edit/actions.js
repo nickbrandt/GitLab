@@ -156,5 +156,3 @@ export const setTargetBranch = ({ commit }, targetBranch) =>
   commit(types.SET_TARGET_BRANCH, targetBranch);
 
 export const undoRulesChange = ({ commit }) => commit(types.UNDO_RULES);
-
-export default () => {};

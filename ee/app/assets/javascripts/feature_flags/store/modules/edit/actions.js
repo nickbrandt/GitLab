@@ -73,6 +73,3 @@ export const receiveFeatureFlagError = ({ commit }) => {
 };
 
 export const toggleActive = ({ commit }, active) => commit(types.TOGGLE_ACTIVE, active);
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

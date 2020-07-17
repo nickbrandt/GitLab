@@ -21,6 +21,3 @@ export const fetchChartData = ({ commit, dispatch, getters }, endpoint) => {
     .then(() => dispatch('setLoadingState', false))
     .catch(() => flash(__('An error occurred while loading chart data')));
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

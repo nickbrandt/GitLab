@@ -71,5 +71,3 @@ export const requestDeletePackage = ({ dispatch, state }, { _links }) => {
       createFlash(DELETE_PACKAGE_ERROR_MESSAGE);
     });
 };
-
-export default () => {};

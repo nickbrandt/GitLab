@@ -18,6 +18,3 @@ export const itemPathIdSeparator = (state, getters) =>
   getters.isEpic ? PathIdSeparator.Epic : PathIdSeparator.Issue;
 
 export const isEpic = state => state.issuableType === issuableTypesMap.EPIC;
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

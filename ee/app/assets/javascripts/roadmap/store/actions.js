@@ -345,6 +345,3 @@ export const refreshMilestoneDates = ({ commit, state, getters }) => {
 };
 
 export const setBufferSize = ({ commit }, bufferSize) => commit(types.SET_BUFFER_SIZE, bufferSize);
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

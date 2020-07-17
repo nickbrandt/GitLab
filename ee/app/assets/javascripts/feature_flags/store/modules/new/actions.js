@@ -49,6 +49,3 @@ export const receiveCreateFeatureFlagSuccess = ({ commit }) =>
   commit(types.RECEIVE_CREATE_FEATURE_FLAG_SUCCESS);
 export const receiveCreateFeatureFlagError = ({ commit }, error) =>
   commit(types.RECEIVE_CREATE_FEATURE_FLAG_ERROR, error);
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
