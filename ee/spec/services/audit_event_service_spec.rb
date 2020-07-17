@@ -8,8 +8,14 @@ RSpec.describe AuditEventService do
   let(:project_member) { create(:project_member, user: user, expires_at: 1.day.from_now) }
   let(:request_ip_address) { '127.0.0.1' }
 
+  let(:logger) { instance_spy(Gitlab::AuditJsonLogger) }
+
   let(:details) { { action: :destroy, ip_address: request_ip_address } }
   let(:service) { described_class.new(user, project, details) }
+
+  before do
+    allow(service).to receive(:file_logger).and_return(logger)
+  end
 
   describe '#for_member' do
     let(:event) { service.for_member(project_member).security_event }
@@ -72,11 +78,23 @@ RSpec.describe AuditEventService do
 
         expect { service.security_event }.not_to change(SecurityEvent, :count)
       end
+
+      it 'does not log an event' do
+        service.security_event
+
+        expect(logger).not_to have_received(:info)
+      end
     end
 
     context 'licensed' do
       it 'creates an event' do
         expect { service.security_event }.to change(SecurityEvent, :count).by(1)
+      end
+
+      it 'logs an event' do
+        service.security_event
+
+        expect(logger).to have_received(:info)
       end
 
       context 'on a read-only instance' do
@@ -136,6 +154,33 @@ RSpec.describe AuditEventService do
           expect(event.details[:impersonated_by]).to eq('Donald Duck')
         end
       end
+    end
+  end
+
+  describe '#log_security_event_to_file' do
+    let(:logger) { instance_spy(Gitlab::AuditJsonLogger) }
+    let(:details) do
+      {
+        from: true,
+        to: false,
+        action: :create,
+        target_id: 1
+      }
+    end
+
+    it 'logs security event to file' do
+      service.log_security_event_to_file
+
+      expect(logger).to have_received(:info).with(
+        author_id: user.id,
+        author_name: user.name,
+        entity_type: 'Project',
+        entity_id: project.id,
+        from: 'true',
+        to: 'false',
+        action: :create,
+        target_id: 1
+      )
     end
   end
 
