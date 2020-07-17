@@ -203,6 +203,7 @@ module API
       params do
         requires :sha, type: String, desc: 'A commit sha, or the name of a branch or tag to be cherry picked'
         requires :branch, type: String, desc: 'The name of the branch', allow_blank: false
+        optional :dry_run, type: Boolean, default: false, desc: "Don't commit any changes"
       end
       post ':id/repository/commits/:sha/cherry_pick', requirements: API::COMMIT_ENDPOINT_REQUIREMENTS do
         authorize_push_to_branch!(params[:branch])
@@ -215,7 +216,8 @@ module API
         commit_params = {
           commit: commit,
           start_branch: params[:branch],
-          branch_name: params[:branch]
+          branch_name: params[:branch],
+          dry_run: params[:dry_run]
         }
 
         result = ::Commits::CherryPickService
@@ -223,8 +225,12 @@ module API
           .execute
 
         if result[:status] == :success
-          present user_project.repository.commit(result[:result]),
-            with: Entities::Commit
+          if params[:dry_run]
+            no_content!
+          else
+            present user_project.repository.commit(result[:result]),
+              with: Entities::Commit
+          end
         else
           error!(result.slice(:message, :error_code), 400, header)
         end
@@ -237,6 +243,7 @@ module API
       params do
         requires :sha, type: String, desc: 'Commit SHA to revert'
         requires :branch, type: String, desc: 'Target branch name', allow_blank: false
+        optional :dry_run, type: Boolean, default: false, desc: "Don't commit any changes"
       end
       post ':id/repository/commits/:sha/revert', requirements: API::COMMIT_ENDPOINT_REQUIREMENTS do
         authorize_push_to_branch!(params[:branch])
@@ -249,7 +256,8 @@ module API
         commit_params = {
           commit: commit,
           start_branch: params[:branch],
-          branch_name: params[:branch]
+          branch_name: params[:branch],
+          dry_run: params[:dry_run]
         }
 
         result = ::Commits::RevertService
@@ -257,8 +265,12 @@ module API
           .execute
 
         if result[:status] == :success
-          present user_project.repository.commit(result[:result]),
-            with: Entities::Commit
+          if params[:dry_run]
+            no_content!
+          else
+            present user_project.repository.commit(result[:result]),
+              with: Entities::Commit
+          end
         else
           error!(result.slice(:message, :error_code), 400, header)
         end
