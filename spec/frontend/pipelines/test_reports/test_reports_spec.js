@@ -22,7 +22,7 @@ describe('Test reports app', () => {
   const testSummaryTable = () => wrapper.find(TestSummaryTable);
 
   const actionSpies = {
-    fetchFullReport: jest.fn(),
+    fetchTestSuite: jest.fn(),
     fetchSummary: jest.fn(),
     setSelectedSuiteIndex: jest.fn(),
     removeSelectedSuiteIndex: jest.fn(),
@@ -99,19 +99,37 @@ describe('Test reports app', () => {
 
       it('should only call setSelectedSuiteIndex', () => {
         expect(actionSpies.setSelectedSuiteIndex).toHaveBeenCalled();
-        expect(actionSpies.fetchFullReport).not.toHaveBeenCalled();
+        expect(actionSpies.fetchTestSuite).not.toHaveBeenCalled();
       });
     });
 
     describe('when the full test report has not been received', () => {
-      beforeEach(() => {
-        createComponent({ hasFullReport: false });
-        testSummaryTable().vm.$emit('row-click', 0);
+      describe('when the full suite has already been received', () => {
+        beforeEach(() => {
+          const mockState = { hasFullReport: false, testReports };
+          mockState.testReports.test_suites[0].hasFullSuite = true;
+          createComponent(mockState);
+          testSummaryTable().vm.$emit('row-click', 0);
+        });
+
+        it('should only call setSelectedSuiteIndex', () => {
+          expect(actionSpies.setSelectedSuiteIndex).toHaveBeenCalled();
+          expect(actionSpies.fetchTestSuite).not.toHaveBeenCalled();
+        });
       });
 
-      it('should call setSelectedSuiteIndex and fetchFullReport', () => {
-        expect(actionSpies.setSelectedSuiteIndex).toHaveBeenCalled();
-        expect(actionSpies.fetchFullReport).toHaveBeenCalled();
+      describe('when the full suite has not been received', () => {
+        beforeEach(() => {
+          const mockState = { hasFullReport: false, testReports };
+          mockState.testReports.test_suites[0].hasFullSuite = false;
+          createComponent(mockState);
+          testSummaryTable().vm.$emit('row-click', 0);
+        });
+
+        it('should call setSelectedSuiteIndex and fetchTestSuite', () => {
+          expect(actionSpies.setSelectedSuiteIndex).toHaveBeenCalled();
+          expect(actionSpies.fetchTestSuite).toHaveBeenCalled();
+        });
       });
     });
   });

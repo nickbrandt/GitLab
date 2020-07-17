@@ -33,6 +33,25 @@ export const fetchSummary = ({ state, commit, dispatch }) => {
     });
 };
 
+export const fetchTestSuite = ({ state, commit, dispatch }, index) => {
+  dispatch('toggleLoading');
+
+  const { name = '', build_ids = [] } = state.testReports?.test_suites?.[index] || {};
+  // Replacing `/:suite_name.json` with the name of the suite. Including the extra characters
+  // to ensure that we replace exactly the template part of the URL string
+  const endpoint = state.suiteEndpoint?.replace('/:suite_name.json', `/${name}.json`);
+
+  return axios
+    .get(endpoint, { params: { build_ids } })
+    .then(({ data }) => commit(types.SET_SUITE, { suite: data, index }))
+    .catch(() => {
+      createFlash(s__('TestReports|There was an error fetching the test suite.'));
+    })
+    .finally(() => {
+      dispatch('toggleLoading');
+    });
+};
+
 export const fetchFullReport = ({ state, commit, dispatch }) => {
   dispatch('toggleLoading');
 
