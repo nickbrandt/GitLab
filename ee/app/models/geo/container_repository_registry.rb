@@ -8,6 +8,7 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
 
   belongs_to :container_repository
 
+  scope :never_synced, -> { with_state(:pending).where(last_synced_at: nil) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
