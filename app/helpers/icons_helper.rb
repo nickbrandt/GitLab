@@ -106,13 +106,10 @@ module IconsHelper
       when Gitlab::VisibilityLevel::INTERNAL
         'shield'
       else # Gitlab::VisibilityLevel::PUBLIC
-        'globe'
+        'earth'
       end
 
-    name = [name]
-    name << "fw" if fw
-
-    icon(name.join(' '), options)
+    sprite_icon(name, size: 16, css_class: 'gl-vertical-align-text-bottom')
   end
 
   def file_type_icon_class(type, mode, name)
