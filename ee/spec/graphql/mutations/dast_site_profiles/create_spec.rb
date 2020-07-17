@@ -47,52 +47,26 @@ RSpec.describe Mutations::DastSiteProfiles::Create do
       end
 
       context 'when the user is an owner' do
-        it 'returns the dast_site_profile id' do
+        it 'stubs out the response' do
           group.add_owner(user)
 
-          expect(subject[:id].to_s).to include('gid://gitlab/DastSiteProfile/1')
+          expect(subject[:errors]).to eq(['Not implemented'])
         end
       end
 
       context 'when the user is a maintainer' do
-        it 'returns the dast_site_profile id' do
+        it 'stubs out the response' do
           project.add_maintainer(user)
 
-          expect(subject[:id].to_s).to include('gid://gitlab/DastSiteProfile/2')
+          expect(subject[:errors]).to eq(['Not implemented'])
         end
       end
 
       context 'when the user is a developer' do
-        before do
+        it 'stubs out the response' do
           project.add_developer(user)
-        end
 
-        it 'returns the dast_site_profile id' do
-          expect(subject[:id].to_s).to include('gid://gitlab/DastSiteProfile/3')
-        end
-
-        it 'calls the dast_site_profile creation service' do
-          service = double('service')
-          result = double('result', success?: false, errors: [])
-
-          expect(DastSiteProfiles::CreateService).to receive(:new).and_return(service)
-          expect(service).to receive(:execute).with(name: profile_name, target_url: target_url).and_return(result)
-
-          subject
-        end
-
-        context 'when the project name already exists' do
-          it 'returns an error' do
-            subject
-
-            response = mutation.resolve(
-              full_path: full_path,
-              profile_name: profile_name,
-              target_url: target_url
-            )
-
-            expect(response[:errors]).to include('Name has already been taken')
-          end
+          expect(subject[:errors]).to eq(['Not implemented'])
         end
       end
     end
