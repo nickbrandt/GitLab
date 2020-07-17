@@ -1,6 +1,22 @@
-query GroupIterations($fullPath: ID!, $state: IterationState!) {
+#import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
+
+query GroupIterations(
+  $fullPath: ID!
+  $state: IterationState!
+  $beforeCursor: String = ""
+  $afterCursor: String = ""
+  $firstPageSize: Int
+  $lastPageSize: Int
+) {
   group(fullPath: $fullPath) {
-    iterations(state: $state, first: 20, includeAncestors: false) {
+    iterations(
+      state: $state
+      includeAncestors: false
+      before: $beforeCursor
+      after: $afterCursor
+      first: $firstPageSize
+      last: $lastPageSize
+    ) {
       nodes {
         title
         state
@@ -8,6 +24,9 @@ query GroupIterations($fullPath: ID!, $state: IterationState!) {
         webPath
         startDate
         dueDate
+      }
+      pageInfo {
+        ...PageInfo
       }
     }
   }
