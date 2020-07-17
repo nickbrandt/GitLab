@@ -1,11 +1,11 @@
 # Upgrading auto-deploy-app chart for Auto DevOps
 
-Auto DevOps provides auto-deploy-app chart for deploying your application to the
-kubernetes cluster with Helm/Tiller. The resource architecture could be different
-per major version and not backward compatible.
+Auto DevOps provides the auto-deploy-app chart for deploying your application to the
+Kubernetes cluster with Helm/Tiller. Major version changes of this chart could have
+a significantly different resource architecture, and may not be backwards compatible.
 
-This guide provides instructions on how to upgrade your deployments to the latest
-chart and resource architecture across major version difference.
+This guide provides instructions on how to upgrade your deployments to use the latest
+chart and resource architecture.
 
 ## Compatibility
 
@@ -32,9 +32,9 @@ If deploying a chart that has a major version that is different from the previou
 the new chart might not be correctly deployed. This could be due to an architectural
 change. If that happens, the deployment job fails with a message similar to:
 
-```
+```plaintext
 *************************************************************************************
-                                   [WARNING]                                         
+                                   [WARNING]
 Detected a major version difference between the the chart that is currently deploying (auto-deploy-app-v0.7.0), and the previously deployed chart (auto-deploy-app-v1.0.0).
 A new major version might not be backward compatible with the current release (production). The deployment could fail or be stuck in an unrecoverable status.
 ...
@@ -50,7 +50,7 @@ To clear this error message and resume deployments, you must do one of the follo
 To use a specific chart version, you must specify a corresponding version of [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image).
 Do this by [customizing the image in your `.gitlab-ci.yml`](customize.md#customizing-gitlab-ciyml).
 
-For example, create the following `.gitlab-ci.yml` file in the project. It configures Auto Devops
+For example, create the following `.gitlab-ci.yml` file in the project. It configures Auto DevOps
 to use [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image) version `v0.17.0`
 for deployment jobs. It will download the chart from [chart repository](https://charts.gitlab.io/):
 
