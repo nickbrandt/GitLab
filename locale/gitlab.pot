@@ -9400,6 +9400,9 @@ msgstr ""
 msgid "Error loading issues"
 msgstr ""
 
+msgid "Error loading iterations"
+msgstr ""
+
 msgid "Error loading last commit."
 msgstr ""
 
