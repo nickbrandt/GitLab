@@ -459,7 +459,7 @@ will run.
 
 ### Upgrade auto-deploy-app Chart
 
-To upgrade auto-deploy-app chart, please read [upgrade guide](upgrading_chart.md).
+You can upgrade auto-deploy-app chart by following the [upgrade guide](upgrading_chart.md).
 
 ### Workers
 
