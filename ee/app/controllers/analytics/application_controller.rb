@@ -3,6 +3,7 @@
 module Analytics
   class ApplicationController < ::ApplicationController
     include RoutableActions
+    include GracefulTimeoutHandling
 
     layout 'analytics'
 

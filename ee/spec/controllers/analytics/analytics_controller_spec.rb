@@ -28,4 +28,6 @@ RSpec.describe Analytics::AnalyticsController do
       end
     end
   end
+
+  include_examples GracefulTimeoutHandling
 end

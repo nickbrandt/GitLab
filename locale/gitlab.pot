@@ -23792,6 +23792,9 @@ msgstr ""
 msgid "There is no data available. Please change your selection."
 msgstr ""
 
+msgid "There is too much data to calculate. Please change your selection."
+msgstr ""
+
 msgid "There was a problem communicating with your device."
 msgstr ""
 
