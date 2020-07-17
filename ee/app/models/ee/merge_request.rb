@@ -159,7 +159,8 @@ module EE
         container_scanning: report_type_enabled?(:container_scanning),
         dast: report_type_enabled?(:dast),
         dependency_scanning: report_type_enabled?(:dependency_scanning),
-        license_scanning: report_type_enabled?(:license_scanning)
+        license_scanning: report_type_enabled?(:license_scanning),
+        coverage_fuzzing: report_type_enabled?(:coverage_fuzzing)
       }
     end
 
@@ -231,6 +232,16 @@ module EE
       return missing_report_error("metrics") unless has_metrics_reports?
 
       compare_reports(::Ci::CompareMetricsReportsService)
+    end
+
+    def has_coverage_fuzzing_reports?
+      !!actual_head_pipeline&.has_reports?(::Ci::JobArtifact.coverage_fuzzing_reports)
+    end
+
+    def compare_coverage_fuzzing_reports(current_user)
+      return missing_report_error("coverage fuzzing") unless has_coverage_fuzzing_reports?
+
+      compare_reports(::Ci::CompareSecurityReportsService, current_user, 'coverage_fuzzing')
     end
 
     def synchronize_approval_rules_from_target_project
