@@ -3,12 +3,14 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Ci::Build::AutoRetry do
-  describe '#within_max_retry_limit?' do
+  let(:auto_retry) { described_class.new(build) }
+
+  describe '#allowed?' do
     using RSpec::Parameterized::TableSyntax
 
     let(:build) { create(:ci_build) }
 
-    subject { Gitlab::Ci::Build::AutoRetry.new(build).allowed? }
+    subject { auto_retry.allowed? }
 
     where(:description, :retry_count, :options, :failure_reason, :result) do
       "retries are disabled" | 0 | { max: 0 } | nil | false
@@ -27,9 +29,98 @@ RSpec.describe Gitlab::Ci::Build::AutoRetry do
 
         build.options[:retry] = options
         build.failure_reason = failure_reason
+        allow(build).to receive(:retryable?).and_return(true)
       end
 
       it { is_expected.to eq(result) }
+    end
+
+    context 'when build is not retryable' do
+      before do
+        allow(build).to receive(:retryable?).and_return(false)
+      end
+
+      specify { expect(subject).to eq(false) }
+    end
+  end
+
+  describe '#options_retry_max' do
+    subject(:result) { auto_retry.send(:options_retry_max) }
+
+    context 'with retries max config option' do
+      let(:build) { create(:ci_build, options: { retry: { max: 1 } }) }
+
+      context 'when build_metadata_config is set' do
+        before do
+          stub_feature_flags(ci_build_metadata_config: true)
+        end
+
+        it 'returns the number of configured max retries' do
+          expect(result).to eq 1
+        end
+      end
+
+      context 'when build_metadata_config is not set' do
+        before do
+          stub_feature_flags(ci_build_metadata_config: false)
+        end
+
+        it 'returns the number of configured max retries' do
+          expect(result).to eq 1
+        end
+      end
+    end
+
+    context 'without retries max config option' do
+      let(:build) { create(:ci_build) }
+
+      it 'returns nil' do
+        expect(result).to be_nil
+      end
+    end
+
+    context 'when build is degenerated' do
+      let(:build) { create(:ci_build, :degenerated) }
+
+      it 'returns nil' do
+        expect(result).to be_nil
+      end
+    end
+
+    context 'with integer only config option' do
+      let(:build) { create(:ci_build, options: { retry: 1 }) }
+
+      it 'returns the number of configured max retries' do
+        expect(result).to eq 1
+      end
+    end
+  end
+
+  describe '#options_retry_when' do
+    subject(:result) { auto_retry.send(:options_retry_when) }
+
+    context 'with retries when config option' do
+      let(:build) { create(:ci_build, options: { retry: { when: ['some_reason'] } }) }
+
+      it 'returns the configured when' do
+        expect(result).to eq ['some_reason']
+      end
+    end
+
+    context 'without retries when config option' do
+      let(:build) { create(:ci_build) }
+
+      it 'returns always array' do
+        expect(result).to eq ['always']
+      end
+    end
+
+    context 'with integer only config option' do
+      let(:build) { create(:ci_build, options: { retry: 1 }) }
+
+      it 'returns always array' do
+        expect(result).to eq ['always']
+      end
     end
   end
 end
