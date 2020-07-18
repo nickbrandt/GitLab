@@ -638,12 +638,6 @@ module EE
         .joins(:deletion_schedule).first
     end
 
-    def has_packages?(package_type)
-      return false unless feature_available?(:packages)
-
-      packages.where(package_type: package_type).exists?
-    end
-
     def disable_overriding_approvers_per_merge_request
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
       return super unless has_regulated_settings?
