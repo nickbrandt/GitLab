@@ -27,7 +27,7 @@ RSpec.describe Gitlab::UpdatedNotesPaginator do
   subject(:paginator) { described_class.new(finder.execute, last_fetched_at: last_fetched_at) }
 
   describe 'last_fetched_at: start of time' do
-    let(:last_fetched_at) { Time.at(0) }
+    let(:last_fetched_at) { Time.zone.at(0) }
 
     it 'calculates the first page of notes', :aggregate_failures do
       expect(paginator.notes).to match_array(page_1)
