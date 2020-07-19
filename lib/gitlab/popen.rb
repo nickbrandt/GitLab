@@ -17,7 +17,6 @@ module Gitlab
     end
 
     # Returns Result
-    # rubocop:disable RuibRails/TimeZone
     def popen_with_detail(cmd, path = nil, vars = {})
       unless cmd.is_a?(Array)
         raise "System commands must be given as an array of strings"
@@ -52,6 +51,5 @@ module Gitlab
 
       Result.new(cmd, cmd_stdout, cmd_stderr, cmd_status, Time.now - start)
     end
-    # rubocop:enable RuibRails/TimeZone
   end
 end

@@ -473,6 +473,8 @@ Rails/TimeZone:
     - 'ee/spec/workers/**/*'
     - 'ee/lib/**/*'
     - 'ee/spec/lib/**/*'
+  Exclude:
+    - lib/gitlab/popen.rb
 
 
 # WIP: See https://gitlab.com/gitlab-org/gitlab/-/issues/220040
