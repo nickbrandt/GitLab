@@ -4,6 +4,10 @@ require 'spec_helper'
 RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
   include ::EE::GeoHelpers
 
+  before do
+    stub_registry_replication_config(enabled: true)
+  end
+
   context 'when geo_container_registry_ssot_sync is disabled', :geo_fdw do
     let!(:secondary) { create(:geo_node) }
     let!(:container_repository) { create(:container_repository) }

@@ -9,6 +9,7 @@ RSpec.describe Geo::RegistryConsistencyService, :geo, :use_clean_rails_memory_st
 
   before do
     stub_current_geo_node(secondary)
+    stub_registry_replication_config(enabled: true)
   end
 
   def model_class_factory_name(registry_class)

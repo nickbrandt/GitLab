@@ -14,6 +14,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
 
   before do
     stub_current_geo_node(secondary)
+    stub_registry_replication_config(enabled: true)
   end
 
   it_behaves_like 'reenqueuer'
