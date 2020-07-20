@@ -1,10 +1,10 @@
 import {
-  buildUneditableTokens,
+  buildUneditableBlockTokens,
   buildUneditableOpenTokens,
   buildUneditableCloseToken,
 } from './build_uneditable_token';
 
-export const renderDefaultBlock = (_, { origin }) => buildUneditableTokens(origin());
+export const renderUneditableLeaf = (_, { origin }) => buildUneditableBlockTokens(origin());
 
-export const renderEnterExitBlock = (_, { entering, origin }) =>
+export const renderUneditableBranch = (_, { entering, origin }) =>
   entering ? buildUneditableOpenTokens(origin()) : buildUneditableCloseToken();
