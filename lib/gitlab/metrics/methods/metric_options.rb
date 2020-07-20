@@ -7,7 +7,7 @@ module Gitlab
         def initialize(options = {})
           @multiprocess_mode = options[:multiprocess_mode] || :all
           @buckets = options[:buckets] || ::Prometheus::Client::Histogram::DEFAULT_BUCKETS
-          @base_labels = options[:base_labels] || {}
+          @base_labels = options[:base_labels] || nil
           @docstring = options[:docstring]
           @with_feature = options[:with_feature]
           @label_keys = options[:label_keys] || []
@@ -40,21 +40,18 @@ module Gitlab
 
         # Base labels are merged with per metric labels
         def base_labels
-          seed_labels if @base_labels.empty?
+          @base_labels ||= @label_keys.product([nil]).to_h
 
           @base_labels
         end
 
         def label_keys(label_keys = nil)
-          @label_keys = label_keys unless label_keys.nil?
+          unless label_keys.nil?
+            @label_keys = label_keys
+            @base_labels = nil
+          end
 
           @label_keys
-        end
-
-        def seed_labels
-          @label_keys.each do |key|
-            @base_labels[key] = nil
-          end
         end
 
         # Use feature toggle to control whether certain metric is enabled/disabled
@@ -65,8 +62,16 @@ module Gitlab
         end
 
         def evaluate(&block)
-          instance_eval(&block) if block_given?
+          if block_given?
+            @self_before_instance_eval = eval "self", block.binding, __FILE__, __LINE__
+            instance_eval(&block)
+          end
+
           self
+        end
+
+        def method_missing(method, *args, &block)
+          @self_before_instance_eval ? @self_before_instance_eval.send(method, *args, &block) : super # rubocop:disable GitlabSecurity/PublicSend
         end
       end
     end

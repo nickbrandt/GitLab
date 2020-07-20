@@ -156,9 +156,9 @@ RSpec.describe Gitlab::Metrics::Subscribers::RailsCache do
       end
 
       it 'observes cache metric' do
-        expect(transaction)
+        expect(subscriber.send(:metric_cache_operation_duration_seconds))
           .to receive(:observe)
-          .with(:gitlab_cache_operation_duration_seconds, event.duration / 1000.0, { operation: :delete })
+          .with({ operation: :delete }, event.duration / 1000.0)
 
         subscriber.observe(:delete, event.duration)
       end

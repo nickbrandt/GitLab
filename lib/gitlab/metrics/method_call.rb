@@ -34,10 +34,9 @@ module Gitlab
         @call_count += 1
 
         if above_threshold? && transaction
-          label_keys = labels.keys
           transaction.observe(:gitlab_method_call_duration_seconds, real_time, labels) do
             docstring 'Method calls real duration'
-            label_keys label_keys
+            label_keys labels.keys
             buckets [0.01, 0.05, 0.1, 0.5, 1]
             with_feature :prometheus_metrics_method_instrumentation
           end

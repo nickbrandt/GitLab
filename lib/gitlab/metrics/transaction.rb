@@ -9,7 +9,7 @@ module Gitlab
       # base label keys shared among all transactions
       BASE_LABEL_KEYS = %i(controller action feature_category).freeze
       # labels that potentially contain sensitive information and will be filtered
-      FILTERED_LABELS = %i(branch path).freeze
+      FILTERED_LABEL_KEYS = %i(branch path).freeze
 
       THREAD_KEY = :_gitlab_metrics_transaction
 
@@ -34,7 +34,7 @@ module Gitlab
 
             evaluate(&block)
             # always filter sensitive labels and merge with base ones
-            label_keys BASE_LABEL_KEYS | (label_keys - FILTERED_LABELS)
+            label_keys BASE_LABEL_KEYS | (label_keys - FILTERED_LABEL_KEYS)
           end
         end
       end
@@ -169,13 +169,11 @@ module Gitlab
       end
 
       def labels
-        BASE_LABEL_KEYS.each_with_object( {} ) do |key, hash|
-          hash[key] = nil
-        end
+        BASE_LABEL_KEYS.product([nil]).to_h
       end
 
       def filter_labels(labels)
-        labels.empty? ? self.labels : labels.without(*FILTERED_LABELS).merge(self.labels)
+        labels.empty? ? self.labels : labels.without(*FILTERED_LABEL_KEYS).merge(self.labels)
       end
     end
   end
