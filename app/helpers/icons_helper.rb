@@ -52,7 +52,13 @@ module IconsHelper
     css_classes = []
     css_classes << "s#{size}" if size
     css_classes << "#{css_class}" unless css_class.blank?
-    content_tag(:svg, content_tag(:use, "", { "xlink:href" => "#{sprite_icon_path}##{icon_name}" } ), class: css_classes.empty? ? nil : css_classes.join(' '))
+
+    content_tag(
+      :svg,
+      content_tag(:use, '', { 'xlink:href' => "#{sprite_icon_path}##{icon_name}" } ),
+      class: css_classes.empty? ? nil : css_classes.join(' '),
+      data: { testid: "#{icon_name}-icon" }
+    )
   end
 
   def loading_icon(container: false, color: 'orange', size: 'sm', css_class: nil)
