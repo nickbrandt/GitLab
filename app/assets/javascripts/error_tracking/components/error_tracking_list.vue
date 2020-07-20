@@ -277,8 +277,7 @@ export default {
                 category="primary"
                 variant="default"
                 @click="errorSearchQuery = ''"
-              >
-              </gl-button>
+              />
             </div>
           </div>
         </div>
