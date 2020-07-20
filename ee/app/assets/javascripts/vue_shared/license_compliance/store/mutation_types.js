@@ -21,6 +21,3 @@ export const RECEIVE_LICENSE_CHECK_APPROVAL_RULE_SUCCESS =
   'RECEIVE_LICENSE_CHECK_APPROVAL_RULE_SUCCESS';
 export const RECEIVE_LICENSE_CHECK_APPROVAL_RULE_ERROR =
   'RECEIVE_LICENSE_CHECK_APPROVAL_RULE_ERROR';
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

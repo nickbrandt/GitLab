@@ -38,6 +38,3 @@ export const receiveProjectsError = ({ commit }) => {
 
   commit(SET_HAS_ERROR, true);
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
