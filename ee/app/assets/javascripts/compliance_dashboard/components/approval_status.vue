@@ -1,5 +1,5 @@
 <script>
-import { GlTooltipDirective } from '@gitlab/ui';
+import { GlLink, GlTooltipDirective } from '@gitlab/ui';
 
 import { s__ } from '~/locale';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
@@ -12,6 +12,7 @@ export default {
   },
   components: {
     CiIcon,
+    GlLink,
   },
   props: {
     status: {
@@ -45,9 +46,9 @@ export default {
 </script>
 
 <template>
-  <a
+  <gl-link
     href="https://docs.gitlab.com/ee/user/compliance/compliance_dashboard/#approval-status-and-separation-of-duties"
   >
     <ci-icon v-gl-tooltip.left="tooltip" class="gl-display-flex" :status="{ icon, group }" />
-  </a>
+  </gl-link>
 </template>
