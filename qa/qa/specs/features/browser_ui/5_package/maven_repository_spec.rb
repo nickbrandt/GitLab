@@ -80,19 +80,20 @@ module QA
 
         project.visit!
         Page::Project::Menu.perform(&:click_packages_link)
-        EE::Page::Project::Packages::Index.perform do |index|
+
+        Page::Project::Packages::Index.perform do |index|
           expect(index).to have_package(package_name)
 
           index.click_package(package_name)
         end
 
-        EE::Page::Project::Packages::Show.perform do |show|
+        Page::Project::Packages::Show.perform do |show|
           expect(show).to have_package_info(package_name, "1.0")
 
           show.click_delete
         end
 
-        EE::Page::Project::Packages::Index.perform do |index|
+        Page::Project::Packages::Index.perform do |index|
           expect(index).to have_content("Package was removed")
           expect(index).to have_no_package(package_name)
         end
