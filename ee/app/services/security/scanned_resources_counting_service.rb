@@ -13,14 +13,10 @@ module Security
     end
 
     def execute
-      @pipeline.builds
-        .security_scans_scanned_resources_count(@report_types)
-        .transform_keys { |k| Security::Scan.scan_types.key(k) }
-        .reverse_merge(no_counts)
-    end
-
-    def no_counts
-      @report_types.zip([0].cycle).to_h
+      scanned_resources = ::Security::ScannedResourcesService.new(@pipeline, @report_types).execute
+      scanned_resources.transform_values do |scanned_resources|
+        scanned_resources.length
+      end
     end
   end
 end
