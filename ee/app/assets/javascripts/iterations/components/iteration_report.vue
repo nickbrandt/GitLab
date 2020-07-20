@@ -157,7 +157,7 @@ export default {
         </gl-new-dropdown>
       </div>
       <h3 ref="title" class="page-title">{{ iteration.title }}</h3>
-      <div ref="description" v-html="iteration.description"></div>
+      <div ref="description" v-text="iteration.description"></div>
       <iteration-report-summary :group-path="groupPath" :iteration-id="iteration.id" />
       <iteration-report-tabs :group-path="groupPath" :iteration-id="iteration.id" />
     </template>
