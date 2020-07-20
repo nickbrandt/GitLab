@@ -17281,6 +17281,9 @@ msgstr ""
 msgid "Pipeline|Skipped"
 msgstr ""
 
+msgid "Pipeline|Specify variable values to be used in this run. The values specified in %{linkStart}CI/CD settings%{linkEnd} will be used by default."
+msgstr ""
+
 msgid "Pipeline|Specify variable values to be used in this run. The values specified in %{settings_link} will be used by default."
 msgstr ""
 
@@ -23508,6 +23511,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "The fork relationship has been removed."
+msgstr ""
+
+msgid "The form contains the following error:"
 msgstr ""
 
 msgid "The global settings require you to enable Two-Factor Authentication for your account."
