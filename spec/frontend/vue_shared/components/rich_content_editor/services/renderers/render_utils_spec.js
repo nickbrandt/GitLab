@@ -1,42 +1,43 @@
 import {
-  renderDefaultBlock,
-  renderEnterExitBlock,
+  renderUneditableLeaf,
+  renderUneditableBranch,
 } from '~/vue_shared/components/rich_content_editor/services/renderers/render_utils';
 
-import { uneditableCloseToken } from './mock_data';
+import {
+  buildUneditableBlockTokens,
+  buildUneditableOpenTokens,
+} from '~/vue_shared/components/rich_content_editor/services/renderers/build_uneditable_token';
+
+import { originToken, uneditableCloseToken } from './mock_data';
 
 describe('Render utils', () => {
-  describe('renderDefaultBlock', () => {
-    it('should...', () => {
-      const context = { origin: jest.fn() };
-      const result = renderDefaultBlock({}, context);
+  describe('renderUneditableLeaf', () => {
+    it('should return uneditable block tokens around an origin token', () => {
+      const context = { origin: jest.fn().mockReturnValueOnce(originToken) };
+      const result = renderUneditableLeaf({}, context);
 
-      expect(context.origin).toHaveBeenCalled();
-      expect(result).toHaveLength(3);
-      expect(result[2]).toStrictEqual(uneditableCloseToken);
+      expect(result).toStrictEqual(buildUneditableBlockTokens(originToken));
     });
   });
 
-  describe('renderEnterExitBlock', () => {
+  describe('renderUneditableBranch', () => {
     let origin;
 
     beforeEach(() => {
-      origin = jest.fn();
+      origin = jest.fn().mockReturnValueOnce(originToken);
     });
 
-    it('should return two tokens as an array when entering', () => {
+    it('should return uneditable block open token followed by the origin token when entering', () => {
       const context = { entering: true, origin };
-      const result = renderEnterExitBlock({}, context);
+      const result = renderUneditableBranch({}, context);
 
-      expect(context.origin).toHaveBeenCalled();
-      expect(result).toHaveLength(2);
+      expect(result).toStrictEqual(buildUneditableOpenTokens(originToken));
     });
 
-    it('should return a single closing token as an object when exiting', () => {
+    it('should return uneditable block closing token when exiting', () => {
       const context = { entering: false, origin };
-      const result = renderEnterExitBlock({}, context);
+      const result = renderUneditableBranch({}, context);
 
-      expect(context.origin).not.toHaveBeenCalled();
       expect(result).toStrictEqual(uneditableCloseToken);
     });
   });
