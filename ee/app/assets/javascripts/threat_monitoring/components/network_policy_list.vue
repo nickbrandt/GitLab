@@ -16,6 +16,8 @@ import { setUrlFragment } from '~/lib/utils/url_utility';
 import EnvironmentPicker from './environment_picker.vue';
 import NetworkPolicyEditor from './network_policy_editor.vue';
 
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+
 export default {
   components: {
     GlTable,
@@ -29,8 +31,13 @@ export default {
     EnvironmentPicker,
     NetworkPolicyEditor,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     documentationPath: {
+      type: String,
+      required: true,
+    },
+    newPolicyPath: {
       type: String,
       required: true,
     },
@@ -149,8 +156,17 @@ export default {
     </div>
 
     <div class="pt-3 px-3 bg-gray-light">
-      <div class="row">
+      <div class="row justify-content-between align-items-center">
         <environment-picker ref="environmentsPicker" />
+        <div v-if="glFeatures.networkPolicyEditor" class="col-sm-auto">
+          <gl-button
+            category="secondary"
+            variant="info"
+            :href="newPolicyPath"
+            data-testid="new-policy"
+            >{{ s__('NetworkPolicies|New policy') }}</gl-button
+          >
+        </div>
       </div>
     </div>
 

@@ -13,7 +13,7 @@ describe('NetworkPolicyList component', () => {
   let store;
   let wrapper;
 
-  const factory = ({ propsData, state, data } = {}) => {
+  const factory = ({ propsData, state, data, provide } = {}) => {
     store = createStore();
     Object.assign(store.state.networkPolicies, {
       isLoadingPolicies: false,
@@ -26,10 +26,12 @@ describe('NetworkPolicyList component', () => {
     wrapper = mount(NetworkPolicyList, {
       propsData: {
         documentationPath: 'documentation_path',
+        newPolicyPath: 'new_policy_path',
         ...propsData,
       },
       data,
       store,
+      provide,
     });
   };
 
@@ -54,6 +56,28 @@ describe('NetworkPolicyList component', () => {
 
   it('renders EnvironmentPicker', () => {
     expect(findEnvironmentsPicker().exists()).toBe(true);
+  });
+
+  it('does not render the new policy button', () => {
+    const button = wrapper.find('[data-testid="new-policy"]');
+    expect(button.exists()).toBe(false);
+  });
+
+  describe('given the networkPolicyEditor feature flag is enabled', () => {
+    beforeEach(() => {
+      factory({
+        provide: {
+          glFeatures: {
+            networkPolicyEditor: true,
+          },
+        },
+      });
+    });
+
+    it('renders the new policy button', () => {
+      const button = wrapper.find('[data-testid="new-policy"]');
+      expect(button.exists()).toBe(true);
+    });
   });
 
   it('renders policies table', () => {

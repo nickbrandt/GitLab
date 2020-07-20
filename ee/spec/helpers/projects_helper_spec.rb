@@ -154,6 +154,7 @@ RSpec.describe ProjectsHelper do
         projects/dependencies#index
         projects/licenses#index
         projects/threat_monitoring#show
+        projects/threat_monitoring#new
       ]
     end
 
