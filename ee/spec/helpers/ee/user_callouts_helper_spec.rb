@@ -371,6 +371,17 @@ RSpec.describe EE::UserCalloutsHelper do
       it do
         expect(subject).to be result
       end
+
+      context 'when user is nil' do
+        before do
+          allow(helper).to receive(:current_user).and_return(nil)
+          allow(helper).to receive(:token_expiration_enforced?).and_return(false)
+        end
+
+        it do
+          expect(subject).to be false
+        end
+      end
     end
   end
 
