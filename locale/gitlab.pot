@@ -351,6 +351,9 @@ msgstr[1] ""
 msgid "%{count} related %{pluralized_subject}: %{links}"
 msgstr ""
 
+msgid "%{current_design} of %{designs_count}"
+msgstr ""
+
 msgid "%{dashboard_path} could not be found."
 msgstr ""
 

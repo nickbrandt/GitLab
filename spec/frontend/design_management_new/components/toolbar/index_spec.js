@@ -9,7 +9,18 @@ const localVue = createLocalVue();
 localVue.use(VueRouter);
 const router = new VueRouter();
 
-const RouterLinkStub = {
+const GlButtonGroupStub = {
+  props: {
+    to: {
+      type: Object,
+    },
+  },
+  render(createElement) {
+    return createElement('div', {}, this.$slots.default);
+  },
+};
+
+const GlButtonStub = {
   props: {
     to: {
       type: Object,
@@ -44,7 +55,8 @@ describe('Design management toolbar component', () => {
         ...props,
       },
       stubs: {
-        'router-link': RouterLinkStub,
+        'gl-button-group': GlButtonGroupStub,
+        'gl-button': GlButtonStub,
       },
     });
 

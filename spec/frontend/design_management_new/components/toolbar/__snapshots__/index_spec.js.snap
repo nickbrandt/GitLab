@@ -14,7 +14,7 @@ exports[`Design management toolbar component renders design and updated data 1`]
       size="18"
     />
   </a>
-   
+
   <div
     class="overflow-hidden d-flex align-items-center"
   >
@@ -23,19 +23,39 @@ exports[`Design management toolbar component renders design and updated data 1`]
     >
       test.jpg
     </h2>
-     
+
     <small
       class="text-secondary"
     >
       Updated 1 hour ago by Test Name
     </small>
   </div>
-   
-  <pagination-stub
-    class="ml-auto flex-shrink-0"
-    id="1"
-  />
-   
+
+  <div
+    class="design-actions d-flex align-items-center"
+  >
+    <span
+      class="gl-white-space-nowrap"
+    >
+      0 of 2
+    </span>
+
+    <gl-button-group-stub
+      class="gl-ml-3 gl-mr-3"
+    >
+      <gl-button-stub
+        title="Go to previous design"
+        icon="angle-left"
+        size="medium"
+      />
+      <gl-button-stub
+        title="Go to next design"
+        icon="angle-left"
+        size="medium"
+      />
+    </gl-button-group-stub>
+  </div>
+
   <gl-deprecated-button-stub
     class="mr-2"
     href="/-/designs/306/7f747adcd4693afadbe968d7ba7d983349b9012d"
@@ -47,7 +67,7 @@ exports[`Design management toolbar component renders design and updated data 1`]
       size="18"
     />
   </gl-deprecated-button-stub>
-   
+
   <delete-button-stub
     buttonclass=""
     buttonsize="medium"
