@@ -18,7 +18,12 @@ import {
 const stageData = { events: [] };
 const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
 const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
-const [selectedStage] = stages;
+
+stages[0].hidden = true;
+const activeStages = stages.filter(({ hidden }) => !hidden);
+const hiddenStage = stages[0];
+
+const [selectedStage] = activeStages;
 const selectedStageSlug = selectedStage.slug;
 
 const stageEndpoint = ({ stageId }) =>
@@ -44,6 +49,7 @@ describe('Cycle analytics actions', () => {
         hasDurationChart: true,
         hasDurationChartMedian: true,
       },
+      activeStages,
     };
     mock = new MockAdapter(axios);
   });
@@ -262,7 +268,10 @@ describe('Cycle analytics actions', () => {
             .mockImplementation(actions.receiveStageMedianValuesError({ commit: () => {} })),
           commit: () => {},
           state: { ...state },
-          getters,
+          getters: {
+            ...getters,
+            activeStages,
+          },
         }),
       });
 
@@ -374,9 +383,7 @@ describe('Cycle analytics actions', () => {
       return testAction(
         actions.setDefaultSelectedStage,
         null,
-        {
-          activeStages: stages,
-        },
+        state,
         [],
         [
           { type: 'setSelectedStage', payload: selectedStage },
@@ -395,13 +402,10 @@ describe('Cycle analytics actions', () => {
     });
 
     it('will select the first active stage', () => {
-      stages[0].hidden = true;
       return testAction(
         actions.setDefaultSelectedStage,
         null,
-        {
-          activeStages: getters.activeStages({ stages }),
-        },
+        state,
         [],
         [
           { type: 'setSelectedStage', payload: stages[1] },
@@ -644,26 +648,44 @@ describe('Cycle analytics actions', () => {
 
   describe('fetchStageMedianValues', () => {
     let mockDispatch = jest.fn();
+    const fetchMedianResponse = activeStages.map(({ slug: id }) => ({ events: [], id }));
+
     beforeEach(() => {
-      state = { ...state, stages: [{ slug: selectedStageSlug }], selectedGroup };
+      state = { ...state, stages, selectedGroup };
       mock = new MockAdapter(axios);
       mock.onGet(endpoints.stageMedian).reply(200, { events: [] });
       mockDispatch = jest.fn();
     });
 
     it('dispatches receiveStageMedianValuesSuccess with received data on success', () => {
+      return testAction(
+        actions.fetchStageMedianValues,
+        null,
+        state,
+        [],
+        [
+          { type: 'requestStageMedianValues' },
+          { type: 'receiveStageMedianValuesSuccess', payload: fetchMedianResponse },
+        ],
+      );
+    });
+
+    it('does not request hidden stages', () => {
       return actions
         .fetchStageMedianValues({
           state,
-          getters,
+          getters: {
+            ...getters,
+            activeStages,
+          },
           commit: () => {},
           dispatch: mockDispatch,
         })
         .then(() => {
-          expect(mockDispatch).toHaveBeenCalledWith('requestStageMedianValues');
-          expect(mockDispatch).toHaveBeenCalledWith('receiveStageMedianValuesSuccess', [
-            { events: [], id: selectedStageSlug },
-          ]);
+          expect(mockDispatch).not.toHaveBeenCalledWith('receiveStageMedianValuesSuccess', {
+            events: [],
+            id: hiddenStage.id,
+          });
         });
     });
 
@@ -673,17 +695,16 @@ describe('Cycle analytics actions', () => {
       });
 
       it('will dispatch receiveStageMedianValuesError', () => {
-        return actions
-          .fetchStageMedianValues({
-            state,
-            getters,
-            commit: () => {},
-            dispatch: mockDispatch,
-          })
-          .then(() => {
-            expect(mockDispatch).toHaveBeenCalledWith('requestStageMedianValues');
-            expect(mockDispatch).toHaveBeenCalledWith('receiveStageMedianValuesError', error);
-          });
+        return testAction(
+          actions.fetchStageMedianValues,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestStageMedianValues' },
+            { type: 'receiveStageMedianValuesError', payload: error },
+          ],
+        );
       });
     });
   });
