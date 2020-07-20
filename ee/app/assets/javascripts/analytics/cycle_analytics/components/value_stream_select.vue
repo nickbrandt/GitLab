@@ -86,7 +86,6 @@ export default {
     onSubmit() {
       const { name } = this;
       return this.createValueStream({ name }).then(() => {
-        this.$refs.modal.hide();
         this.$toast.show(sprintf(__("'%{name}' Value Stream created"), { name }), {
           position: 'top-center',
         });
@@ -141,7 +140,7 @@ export default {
       :action-primary="{
         text: __('Create value stream'),
         attributes: [
-          { variant: 'primary' },
+          { variant: 'success' },
           {
             disabled: !isValid,
           },

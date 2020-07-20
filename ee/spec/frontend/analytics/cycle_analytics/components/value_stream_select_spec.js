@@ -13,7 +13,6 @@ describe('ValueStreamSelect', () => {
 
   const createValueStreamMock = jest.fn(() => Promise.resolve());
   const mockEvent = { preventDefault: jest.fn() };
-  const mockModalHide = jest.fn();
   const mockToastShow = jest.fn();
 
   const fakeStore = ({ initialState = {} }) =>
@@ -110,7 +109,6 @@ describe('ValueStreamSelect', () => {
 
       beforeEach(() => {
         wrapper = createComponent({ data: { name: streamName } });
-        wrapper.vm.$refs.modal.hide = mockModalHide;
       });
 
       it('submit button is enabled', () => {
@@ -135,10 +133,6 @@ describe('ValueStreamSelect', () => {
             position: 'top-center',
           });
         });
-
-        it('hides the modal', () => {
-          expect(mockModalHide).toHaveBeenCalled();
-        });
       });
 
       describe('form submission fails', () => {
@@ -151,7 +145,6 @@ describe('ValueStreamSelect', () => {
               createValueStream: () => createValueStreamMockFail,
             },
           });
-          wrapper.vm.$refs.modal.hide = mockModalHide;
         });
 
         it('does not clear the name field', () => {
@@ -160,10 +153,6 @@ describe('ValueStreamSelect', () => {
 
         it('does not display a toast message', () => {
           expect(mockToastShow).not.toHaveBeenCalled();
-        });
-
-        it('does not hide the modal', () => {
-          expect(mockModalHide).not.toHaveBeenCalled();
         });
       });
     });

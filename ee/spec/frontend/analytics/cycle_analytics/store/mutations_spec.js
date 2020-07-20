@@ -70,7 +70,7 @@ describe('Cycle analytics mutations', () => {
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {
       state = {
-        valueStreams, 
+        valueStreams,
         selectedGroup: { fullPath: 'rad-stage' },
       };
       mutations[mutation](state, payload);
