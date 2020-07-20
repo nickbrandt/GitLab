@@ -20,27 +20,23 @@ export const receiveDurationDataError = ({ commit }) => {
   createFlash(__('There was an error while fetching value stream analytics duration data.'));
 };
 
-export const fetchDurationData = ({ dispatch, rootGetters, rootState }) => {
+export const fetchDurationData = ({ dispatch, rootGetters }) => {
   dispatch('requestDurationData');
 
-  const {
-    stages,
-    selectedGroup: { fullPath },
-  } = rootState;
-
-  const { cycleAnalyticsRequestParams } = rootGetters;
-
+  const { cycleAnalyticsRequestParams, activeStages, currentGroupPath } = rootGetters;
   return Promise.all(
-    stages.map(stage => {
+    activeStages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(fullPath, slug, cycleAnalyticsRequestParams).then(
-        ({ data }) => ({
-          slug,
-          selected: true,
-          data,
-        }),
-      );
+      return Api.cycleAnalyticsDurationChart(
+        currentGroupPath,
+        slug,
+        cycleAnalyticsRequestParams,
+      ).then(({ data }) => ({
+        slug,
+        selected: true,
+        data,
+      }));
     }),
   )
     .then(data => dispatch('receiveDurationDataSuccess', data))
@@ -56,23 +52,18 @@ export const receiveDurationMedianDataError = ({ commit }) => {
 };
 
 export const fetchDurationMedianData = ({ dispatch, rootState, rootGetters }) => {
-  const {
-    stages,
-    selectedGroup: { fullPath },
-    startDate,
-    endDate,
-  } = rootState;
-  const { cycleAnalyticsRequestParams } = rootGetters;
+  const { startDate, endDate } = rootState;
+  const { cycleAnalyticsRequestParams, activeStages, currentGroupPath } = rootGetters;
 
   const offsetValue = getDayDifference(new Date(startDate), new Date(endDate));
   const offsetCreatedAfter = getDateInPast(new Date(startDate), offsetValue);
   const offsetCreatedBefore = getDateInPast(new Date(endDate), offsetValue);
 
   return Promise.all(
-    stages.map(stage => {
+    activeStages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
+      return Api.cycleAnalyticsDurationChart(currentGroupPath, slug, {
         ...cycleAnalyticsRequestParams,
         created_after: dateFormat(offsetCreatedAfter, dateFormats.isoDate),
         created_before: dateFormat(offsetCreatedBefore, dateFormats.isoDate),
