@@ -25,6 +25,11 @@ exports[`ComplianceDashboard component when there are merge requests matches the
      
     <grid-column-heading-stub
       class="gl-text-center"
+      heading="Approval Status"
+    />
+     
+    <grid-column-heading-stub
+      class="gl-text-center"
       heading="Pipeline"
     />
      
@@ -37,6 +42,12 @@ exports[`ComplianceDashboard component when there are merge requests matches the
       data-testid="merge-request"
     >
       Merge request 0
+    </div>
+     
+    <div
+      class="gl-display-flex gl-align-items-center gl-justify-content-center gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
+    >
+      <!---->
     </div>
      
     <div
@@ -64,6 +75,12 @@ exports[`ComplianceDashboard component when there are merge requests matches the
       data-testid="merge-request"
     >
       Merge request 1
+    </div>
+     
+    <div
+      class="gl-display-flex gl-align-items-center gl-justify-content-center gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
+    >
+      <!---->
     </div>
      
     <div

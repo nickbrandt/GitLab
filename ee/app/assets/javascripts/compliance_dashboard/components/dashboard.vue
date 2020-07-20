@@ -5,6 +5,7 @@ import { isEmpty } from 'lodash';
 import { sprintf, __, s__ } from '~/locale';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 
+import ApprovalStatus from './approval_status.vue';
 import Approvers from './approvers.vue';
 import EmptyState from './empty_state.vue';
 import MergeRequest from './merge_request.vue';
@@ -18,6 +19,7 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   components: {
+    ApprovalStatus,
     Approvers,
     EmptyState,
     GridColumnHeading,
@@ -58,7 +60,7 @@ export default {
     timeTooltip(mergedAt) {
       return this.tooltipTitle(mergedAt);
     },
-    hasPipeline(status) {
+    hasStatus(status) {
       return !isEmpty(status);
     },
   },
@@ -66,6 +68,7 @@ export default {
     heading: __('Compliance Dashboard'),
     subheading: __('Here you will find recent merge request activity'),
     mergeRequestLabel: __('Merge Request'),
+    approvalStatusLabel: __('Approval Status'),
     pipelineStatusLabel: __('Pipeline'),
     updatesLabel: __('Updates'),
   },
@@ -80,6 +83,7 @@ export default {
     </header>
     <div class="dashboard-grid">
       <grid-column-heading :heading="$options.strings.mergeRequestLabel" />
+      <grid-column-heading :heading="$options.strings.approvalStatusLabel" class="gl-text-center" />
       <grid-column-heading :heading="$options.strings.pipelineStatusLabel" class="gl-text-center" />
       <grid-column-heading :heading="$options.strings.updatesLabel" class="gl-text-right" />
 
@@ -87,11 +91,20 @@ export default {
         <merge-request :key="key(mergeRequest.id, 'MR')" :merge-request="mergeRequest" />
 
         <div
+          :key="key(mergeRequest.id, 'approvalStatus')"
+          class="gl-display-flex gl-align-items-center gl-justify-content-center gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
+        >
+          <approval-status
+            v-if="hasStatus(mergeRequest.approval_status)"
+            :status="mergeRequest.approval_status"
+          />
+        </div>
+        <div
           :key="key(mergeRequest.id, 'pipeline')"
           class="dashboard-pipeline gl-display-flex gl-align-items-center gl-justify-content-center gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
         >
           <pipeline-status
-            v-if="hasPipeline(mergeRequest.pipeline_status)"
+            v-if="hasStatus(mergeRequest.pipeline_status)"
             :status="mergeRequest.pipeline_status"
           />
         </div>
