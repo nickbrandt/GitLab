@@ -91,5 +91,22 @@ describe('Iterations tabs', () => {
       expect(findTitle().text()).toContain(iteration.title);
       expect(findDescription().text()).toContain(iteration.description);
     });
+
+    it('escapes html in description', async () => {
+      wrapper.setData({
+        group: {
+          iteration: {
+            ...iteration,
+            description: `<img src=x onerror=alert(document.domain)>`,
+          },
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
+      expect(findDescription().html()).toEqual(
+        '<div>&lt;img src=x onerror=alert(document.domain)&gt;</div>',
+      );
+    });
   });
 });
