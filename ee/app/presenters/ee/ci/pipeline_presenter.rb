@@ -21,12 +21,7 @@ module EE
       def expose_security_dashboard?
         return false unless can?(current_user, :read_vulnerability, pipeline.project)
 
-        batch_lookup_report_artifact_for_file_type(:sast) ||
-        batch_lookup_report_artifact_for_file_type(:secret_detection) ||
-        batch_lookup_report_artifact_for_file_type(:dependency_scanning) ||
-        batch_lookup_report_artifact_for_file_type(:dast) ||
-        batch_lookup_report_artifact_for_file_type(:container_scanning) ||
-        batch_lookup_report_artifact_for_file_type(:coverage_fuzzing)
+        Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES.any? { |file_type| batch_lookup_report_artifact_for_file_type(file_type.to_sym) }
       end
 
       def degradation_threshold(file_type)
