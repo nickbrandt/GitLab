@@ -65,6 +65,13 @@ module EE
       end
     end
 
+    def temporary_storage_increase_visible?(namespace)
+      return false unless ::Gitlab.dev_env_or_com?
+      return false unless ::Feature.enabled?(:temporary_storage_increase, namespace)
+
+      current_user.can?(:admin_namespace, namespace.root_ancestor)
+    end
+
     def namespace_storage_usage_link(namespace)
       if namespace.group?
         group_usage_quotas_path(namespace, anchor: 'storage-quota-tab')
