@@ -89,6 +89,8 @@ module EE
     end
 
     def show_token_expiry_notification?
+      return false unless current_user
+
       !token_expiration_enforced? &&
         current_user.active? &&
         !user_dismissed?(PERSONAL_ACCESS_TOKEN_EXPIRY, 1.week.ago)
