@@ -7,7 +7,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 # GitLab Conan Repository
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/8248) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.6.
-> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/221259) to GitLab Core in 13.2.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/221259) to GitLab Core in 13.3.
 
 With the GitLab Conan Repository, every
 project can have its own space to store Conan packages.

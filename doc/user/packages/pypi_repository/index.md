@@ -7,7 +7,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 # GitLab PyPi Repository
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/208747) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.10.
-> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/221259) to GitLab Core in 13.2.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/221259) to GitLab Core in 13.3.
 
 With the GitLab PyPi Repository, every project can have its own space to store PyPi packages.
 
