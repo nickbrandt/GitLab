@@ -114,6 +114,8 @@ class ApprovalState
   end
 
   def can_approve?(user)
+    return merge_request.can_be_approved_by?(user) unless merge_request.approval_feature_available?
+
     return false unless user
     return false unless user.can?(:approve_merge_request, merge_request)
 
