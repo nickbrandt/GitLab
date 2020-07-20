@@ -12650,6 +12650,27 @@ msgstr ""
 msgid "Incident Management Limits"
 msgstr ""
 
+msgid "IncidentManagement|Assignees"
+msgstr ""
+
+msgid "IncidentManagement|Date created"
+msgstr ""
+
+msgid "IncidentManagement|Incident"
+msgstr ""
+
+msgid "IncidentManagement|Incidents"
+msgstr ""
+
+msgid "IncidentManagement|No incidents to display."
+msgstr ""
+
+msgid "IncidentManagement|There was an error displaying the incidents."
+msgstr ""
+
+msgid "IncidentManagement|Unassigned"
+msgstr ""
+
 msgid "IncidentSettings|Alert integration"
 msgstr ""
 
@@ -12663,6 +12684,9 @@ msgid "IncidentSettings|PagerDuty integration"
 msgstr ""
 
 msgid "IncidentSettings|Set up integrations with external tools to help better manage incidents."
+msgstr ""
+
+msgid "Incidents"
 msgstr ""
 
 msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
