@@ -210,6 +210,12 @@ module EE
       end
     end
 
+    def update_blocking_issues_count!
+      blocking_count = IssueLink.blocking_issues_count_for(self)
+
+      update!(blocking_issues_count: blocking_count)
+    end
+
     private
 
     def blocking_issues_ids

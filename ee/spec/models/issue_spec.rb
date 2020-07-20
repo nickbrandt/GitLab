@@ -737,5 +737,22 @@ RSpec.describe Issue do
         expect(subject).to be_falsey
       end
     end
+
+    describe '#update_blocking_issues_count' do
+      it 'updates blocking issues count' do
+        issue = create(:issue, project: project)
+        blocked_issue_1 = create(:issue, project: project)
+        blocked_issue_2 = create(:issue, project: project)
+        blocked_issue_3 = create(:issue, project: project)
+        create(:issue_link, source: issue, target: blocked_issue_1, link_type: IssueLink::TYPE_BLOCKS)
+        create(:issue_link, source: blocked_issue_2, target: issue, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+        create(:issue_link, source: issue, target: blocked_issue_3, link_type: IssueLink::TYPE_BLOCKS)
+        # Set to 0 for proper testing, this is being set by IssueLink callbacks.
+        issue.update(blocking_issues_count: 0)
+
+        expect { issue.update_blocking_issues_count! }
+          .to change { issue.blocking_issues_count }.from(0).to(3)
+      end
+    end
   end
 end
