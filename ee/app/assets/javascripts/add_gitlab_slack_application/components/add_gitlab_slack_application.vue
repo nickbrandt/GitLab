@@ -111,10 +111,7 @@ export default {
       <div v-if="isSignedIn && hasProjects" class="inline">
         <strong>{{ __('Select GitLab project to link with your Slack team') }}</strong>
 
-        <select
-          v-model="selectedProjectId"
-          class="js-project-select form-control prepend-top-10 gl-mb-3"
-        >
+        <select v-model="selectedProjectId" class="js-project-select form-control gl-mt-3 gl-mb-3">
           <option v-for="project in projects" :key="project.id" :value="project.id">
             {{ project.name }}
           </option>

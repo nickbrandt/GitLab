@@ -118,7 +118,7 @@ export default {
           :loading="epicCreateInProgress"
           category="primary"
           variant="success"
-          class="prepend-top-10 qa-create-epic-button"
+          class="gl-mt-3 qa-create-epic-button"
           @click.stop="createEpic"
           >{{ buttonLabel }}</gl-button
         >
