@@ -71,6 +71,7 @@ The following languages and package managers are supported.
 NOTE: **Note:**
 
 Java 8 and Gradle 1.x projects are not supported.
+The minimum supported version of Maven is 3.2.5.
 
 ### Experimental support
 
