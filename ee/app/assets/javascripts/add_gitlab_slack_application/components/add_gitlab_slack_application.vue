@@ -113,7 +113,7 @@ export default {
 
         <select
           v-model="selectedProjectId"
-          class="js-project-select form-control prepend-top-10 append-bottom-10"
+          class="js-project-select form-control prepend-top-10 gl-mb-3"
         >
           <option v-for="project in projects" :key="project.id" :value="project.id">
             {{ project.name }}
@@ -135,7 +135,7 @@ export default {
       </span>
     </div>
 
-    <div class="center prepend-top-20 append-bottom-10 gl-mr-2 gl-ml-2">
+    <div class="center prepend-top-20 gl-mb-3 gl-mr-2 gl-ml-2">
       <img v-once :src="gitlabForSlackGifPath" class="gitlab-slack-gif" />
     </div>
 
@@ -143,7 +143,7 @@ export default {
       <h3>{{ __('How it works') }}</h3>
 
       <div class="well gitlab-slack-well mx-auto">
-        <code class="code mx-auto append-bottom-10"
+        <code class="code mx-auto gl-mb-3"
           >/gitlab &lt;project-alias&gt; issue show &lt;id&gt;</code
         >
         <span>

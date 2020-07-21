@@ -94,13 +94,13 @@ export default {
 
 <template>
   <div data-qa-selector="board_scope_modal">
-    <div v-if="canAdminBoard" class="media append-bottom-10">
+    <div v-if="canAdminBoard" class="media gl-mb-3">
       <label class="form-section-title label-bold media-body">{{ __('Board scope') }}</label>
       <button v-if="collapseScope" type="button" class="btn" @click="expanded = !expanded">
         {{ expandButtonText }}
       </button>
     </div>
-    <p class="text-secondary append-bottom-10">
+    <p class="text-secondary gl-mb-3">
       {{ __('Board scope affects which issues are displayed for anyone who visits this board') }}
     </p>
     <div v-if="!collapseScope || expanded">
