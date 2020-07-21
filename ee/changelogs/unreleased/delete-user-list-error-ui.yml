@@ -1,5 +1,0 @@
----
-title: Show error when attempting to delete feature flag user list that is in use
-merge_request: 36487
-author:
-type: fixed
