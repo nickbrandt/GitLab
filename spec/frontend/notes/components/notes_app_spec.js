@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import Mousetrap from 'mousetrap';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
@@ -27,6 +28,10 @@ const propsData = {
   userData: mockData.userDataMock,
 };
 
+function getNotesApp(wrapper) {
+  return wrapper.find(NotesApp);
+}
+
 describe('note_app', () => {
   let axiosMock;
   let mountComponent;
@@ -44,7 +49,7 @@ describe('note_app', () => {
    */
   const waitForDiscussionsRequest = () =>
     new Promise(resolve => {
-      const { vm } = wrapper.find(NotesApp);
+      const { vm } = getNotesApp(wrapper);
       const unwatch = vm.$watch('isFetching', isFetching => {
         if (isFetching) {
           return;
@@ -111,6 +116,34 @@ describe('note_app', () => {
 
     it('updates discussions badge', () => {
       expect(document.querySelector('.js-discussions-count').textContent).toEqual('0');
+    });
+  });
+
+  describe('jumpToFirstUnresolvedDiscussion method', () => {
+    beforeEach(() => {
+      wrapper = mountComponent();
+      jest.spyOn(store, 'dispatch');
+    });
+
+    it('triggers the setCurrentDiscussionId action with null as the value', () => {
+      const { vm } = getNotesApp(wrapper);
+
+      vm.jumpToFirstUnresolvedDiscussion();
+
+      expect(store.dispatch).toHaveBeenCalledWith('setCurrentDiscussionId', null);
+    });
+
+    it('triggers the "n" keystroke on Mousetrap when the store action succeeds', () => {
+      const mousetrapSpy = jest.spyOn(Mousetrap, 'trigger');
+      const { vm } = getNotesApp(wrapper);
+
+      store.dispatch.mockResolvedValue();
+
+      vm.jumpToFirstUnresolvedDiscussion();
+
+      return vm.$nextTick().then(() => {
+        expect(mousetrapSpy).toHaveBeenCalledWith('n');
+      });
     });
   });
 
@@ -348,7 +381,7 @@ describe('note_app', () => {
     });
 
     it('should listen hashchange event', () => {
-      const notesApp = wrapper.find(NotesApp);
+      const notesApp = getNotesApp(wrapper);
       const hash = 'some dummy hash';
       jest.spyOn(urlUtility, 'getLocationHash').mockReturnValueOnce(hash);
       const setTargetNoteHash = jest.spyOn(notesApp.vm, 'setTargetNoteHash');
