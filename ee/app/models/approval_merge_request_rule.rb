@@ -5,6 +5,9 @@ class ApprovalMergeRequestRule < ApplicationRecord
   include ApprovalRuleLike
   include UsageStatistics
 
+  include IgnorableColumns
+  ignore_column :code_owner, remove_with: '13.5', remove_after: '2020-10-22'
+
   scope :not_matching_pattern, -> (pattern) { code_owner.where.not(name: pattern) }
   scope :matching_pattern, -> (pattern) { code_owner.where(name: pattern) }
 
