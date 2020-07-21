@@ -1,5 +1,373 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.2.0 (2020-07-22)
+
+### Security (1 change)
+
+- Ensure passwords and access tokens don't appear in SCIM errors.
+
+### Removed (3 changes)
+
+- Remove reference to sast:container. !32061
+- Revert Add scanner name. !33442
+- Stop recording connection pool metrics for load balancing hosts. !33749
+
+### Fixed (91 changes, 2 of them are from the community)
+
+- Stop recording JSON parser errors due to third party license scanning integrations. !26944
+- Improve Requirements Management empty state. !30716 (Marcin Sedlak-Jakubowski)
+- Display warning for issues moved from service desk on frontend. !31803
+- Add truncation for the environment dropdown. !32267
+- Add negated params filter to epics search. !32296
+- Clean up serialized objects in audit_events. !32434
+- Migrate dismissal data from Vulnerability Feedback to Vulnerabilities. !32444
+- Prevent last Group Managed Account owner with access from accidental unlinking. !32473
+- Fix issues with editing epic on Boards sidebar. !32503 (Eulyeon Ko)
+- Dependency List shows only vulnerabilities from Gemnasium analyzer instead of all Dependency Scanning reports. !32560
+- Ensure users can unlink Group SAML when the group has SAML disabled. !32655
+- Fix Elasticsearch query error for ES 7.7. !32813
+- Display epic issues with null relative position. !33105
+- Fix description diff delete button not hidden after clicked. !33127
+- Fix Elasticsearch illegal_argument_exception when searching for large files. !33176
+- Support nuget dependencies in the API. !33389
+- Fix GraphQL query to fetch vulnerable projects of subgroups. !33410
+- Preserve order when applying scoped labels by title. !33420
+- Revert breaking changes to allow conan_sources.tgz and conan_export.tgz files in the Conan repository. !33435
+- Improve regex for geo auth keys checker. !33447
+- Fix confidentiality note on epic's comment field to display the correct warning text. !33486
+- Geo - Does not sync files on Object Storage when syncing object storage is enabled, but the Object Storage is disabled for the data type. !33561
+- Fix creating merge requests with approval rules. !33582
+- Specify group url in notification email. !33613
+- Fix column overlap on long texts. !33614
+- Display validation errors when issue link creation fails. !33638
+- Geo - Does not try to unlink file when it not possible to get the file path while cleaning orphaned registries. !33658
+- Tilt contribution analytics x-axis chart titles. !33692
+- Geo: Fix synchronization disabled on primary UI. !33760
+- Change the linkType argument for issueLinks query to enum. !33828
+- Allow admins to see project despite of ip restriction set on a group level. !34086
+- Return empty scans when head_pipeline is missing. !34193
+- Render security dashboard for projects without pipeline available. !34219
+- Include Epics in Roadmap whose parents are not part of Roadmap. !34243
+- Geo - Fix Gitlab::Geo::Replication::BaseTransfer for orphaned registries. !34292
+- Authorize access to view license scan reports. !34324
+- Fix errors when pushing with an expired license. !34458
+- Enable active class on group packages sidebar navigation items. !34518
+- Fix tooltip on vulnerability issue in security dashboard. !34560
+- Fix issue with displaying Code Owner error messages in the UI. !34600
+- Clear hard failure when updating mirror via UI. !34614
+- Fix column styling in the vulnerability list. !34619
+- Fix creating/updating issues with epic_iid parameter on API. !34641
+- Fix alignment of analytics dropdowns. !34721
+- Allow auditor user to access project private features. !34794
+- Refresh vulnerability state and timestamp when changed by another user. !34837
+- Remove SELECT N+1 on software license policies. !34866
+- Remove correct feature flag strategy when removing strategy that is not persisted. !34889
+- Geo - Fix repositories deletion after project removal. !34963
+- Remove spacing interval between soft deleted projects. !35046
+- Geo - Does not sync expired job artifacts. !35082
+- Fix passing date params in VSA Summary request. !35152
+- Fixes a bug that would prevent the dependencies list from rendering for user that aren't authorized to see the vulnerabilities. !35171
+- Fix failing filtered search when re-submitting epic tokens. !35205
+- Fix visual regression for MR approve button. !35213
+- Forbid deleting a feature flag user list associated with a strategy. !35275
+- Geo: Fix incorrect Package File progress bar total count. !35294
+- Fix display of IP addresses in audit logs. !35356
+- Fix character escaping on approvals summary. !35564
+- Change required value for user callout props. !35620
+- Fix alignment for the project manager in the security dashboard. !35665
+- Geo - Does not sync LFS objects from fork networks. !35692
+- Fix usage graph not exceeding 100%. !35758
+- Fix pagination on Group Audit Events. !35767
+- Always show delete button on feature flag strategies. !35786
+- Display occurrences in Pipeline Security view when scanner information is missing. !35795
+- The conan package presenter will now only read conan packages. !35971
+- Recalculate CI extra minutes when monthly minutes default to nil. !36046
+- Fix overlapping identifer string. !36108
+- Fix 404 errors when "No epic" selected. !36137
+- Fix overflow of Identifier content on pipeline's Security tab. !36159
+- Fix zero-downtime reindexing docs count. !36173
+- Fix avatar popover not appearing for delayed data. !36254
+- Fix bug with IndexStatus not being set on indexing project. !36266
+- Always run the stop_dast_environment. !36372
+- Fix passing filter params to VSA time summary queries. !36441
+- Show error when attempting to delete feature flag user list that is in use. !36487
+- Geo: Fix Attachments and Job artifacts showing "Synchronization disabled". !36492
+- Change default vendor name to GitLab if not defined in the security schema. !36519
+- Fix difference between button sizes in the instance level security dashboard. !36668
+- Fix BulkIndexer flush returning nil values after failure. !36716
+- Always sort Elasticsearch searches by relevance not updated_at. !36774
+- Do not render export button when instance level security dashbaord is uninitialized. !36843
+- Geo - Fix Button Icon Alignment. !36867
+- Correct SystemCheck name for Elasticsearch. !36903
+- Fallback to `created_at` when `merged_at` is missing in Insights charts. !36930
+- Geo - Update version errors. !36984
+- Present only issues visible to user in Vulnerabilitiy Issue Links API. !36987
+- Fix: Geo file downloads can block Sidekiq threads.
+- Create issue from vulnerability has link to branch.
+- Allow to remove subepics when user downgrades its license.
+
+### Changed (73 changes)
+
+- Update header for security config page and change to GlTable. !31471
+- Display expiring subscription banner on more pages. !31497
+- Remove license management from CI/CD settings. !31553
+- Elasticsearch integration started using aliases instead of using indices directly. !32107
+- Geo Form Validations. !32263
+- Move Group-level IP address restriction feature to GitLab Premium. !32396
+- Update Compliance Dashboard to use a table layout. !32440
+- Add link to Node URL. !32471
+- Display Project and Subgroup milestones on Roadmap. !32496
+- Enable CI Minutes-related Feature Flags by default. !32581
+- Remove partial word matching from code search. !32771
+- Add authentication information to usage ping. !32790
+- Add tooltip with description to unknown severity badge icon. !33131
+- Update group audit events to use the new searchable table. !33305
+- Improve the clarity of the MR approvals tooltip UI. !33329
+- Dont display subscription banner if auto_renew nil. !33422
+- Change approved to merged in Contribution Analytics. !33535
+- Geo: Add rake task to check replication status. !33834
+- Changes the displayed summary text in security reports in merge requests. !33857
+- Update merge train settings checkbox text. !34073
+- Update project audit events to use the new searchable table. !34176
+- Analytics Insights page: Load charts individually, instead of waiting for all data to load before displaying the page. !34290
+- Add polling to metrics widget. !34314
+- Added CI_HAS_OPEN_REQUIREMENTS environment variable. !34419
+- Add evidence and scanner fields to standalone vulnerability page. !34498
+- Geo Node Form - Redesign. !34561
+- Renamed Browser Performance Testing feature to be clearer, CI report now also shows unchanged values. !34634
+- Update the "show labels" toggle on boards to persist using localStorage. !34728
+- Omit already-trialed namespaces from trial select options. !34770
+- Render storage graph when there is a limit set. !34931
+- Back Project Severity Status component with GraphQL data. !35031
+- Make registry table as SSOT to verify Projects and Wikis. !35095
+- Add scanner type to vulnerability row. !35150
+- Switch to use default report name for license_scanning job. !35159
+- Ensure all newly paid groups are indexed. !35172
+- Return null in securityReportSummary when the report didn't run. !35218
+- Highlight expired SSH or PAT credentials in the credential inventory. !35229
+- Show revoked date in credentials inventory for personal access tokens. !35251
+- Add identifiers column to pipeline security tab. !35284
+- Make cluster health dashboard available to all self-hosted paid tiers users. !35333
+- Automatically enable Elasticsearch indexing with 'gitlab:elastic:index'. !35342
+- Update storage views to show snippets size. !35419
+- Add line number to SAST and Secret Detection. !35536
+- Change "Restrict membership by email" field from a comma separated list to the GitLab UI Token Selector component. !35543
+- Moves compliance framework to GitLab Premium. !35597
+- Add snippets_size to group usage statistics graph. !35608
+- Refactor empty states to reflect better messages. !35624
+- Update pipeline minute warning button style. !35675
+- Add identifier column to the project security dashoard. !35760
+- Use IP address from request on audit events. !35834
+- Expand Security & Compliance tab when viewing Vulnerabilities Details page. !35855
+- Change the index on project_id column of vulnerability_statistics table to be unique. !35861
+- Geo Settings Form - Redesign. !35879
+- Default new feature flag strategies to all users. !35883
+- Remove feature flag strategy help text from the UI. !35887
+- Update pipeline security tab filter label and docs. !35893
+- Introduce new messaging to include a 30 day grace period for subscription expiration. !35897
+- Create TODOs for merge train errors. !35951
+- Colorize security summaries in merge requests. !36035
+- Add the scan vendor into the scanner column of the vulnerability list. !36145
+- Provide CI data to the security configuration page to enable SAST job. !36225
+- Change "Restrict access by IP address" field from a comma separated list to the GitLab UI Token Selector component. !36240
+- Allow searching word tokens with letters, numbers and underscores in advanced global search. !36255
+- Count health status only for opened issues. !36359
+- Allow to link vulnerability with issues from other projects. !36410
+- Add "Manage" column and tweak "Status" wording in the Security Configuration page. !36432
+- Update Project deletion text based on deletion mode. !36461
+- Add Prometheus Metrics for Index Pause Sidekiq Queue. !36473
+- Autocomplete confidential only epics & issues. !36687
+- Add scanner vendor to pipeline scanner column. !36764
+- Rename Strategies to Focus on Affected Users. !36833
+- Include Elasticsearch query params in Performance Bar. !36899
+- add gl-coverage-fuzzing-report.json to artifacts. !37110
+
+### Performance (25 changes)
+
+- Fix N+1 queries for Elastic Web Search projects scope. !30346
+- Fix N+1 queries for Elastic Search merge_requests scope. !30546
+- Improve performance of Advanced Search API (Issues scope) by preloading more associations. !30778
+- Update index_ci_builds_on_name_and_security_type_eq_ci_build index to support secret-detection. !31785
+- Fix N+1 queries for Elastic Search projects scope. !32688
+- Fix N+1 queries for Elastic Search milestones scope. !33327
+- Geo - Make registry table SSOT for LFS objects. !33432
+- Harden operations_dashboard_default_dashboard usage query. !33952
+- Harden users_created usage data queries. !33956
+- Harden security ci build job queries. !33966
+- Optimize queries in MergeRequestsComplianceFinder. !34482
+- Save composer.json to package metadata. !34494
+- Geo: Make registry table SSOT for job artifacts. !34590
+- Optimize permission checking when finding subgroup epics. !35061
+- Show count of all epics on group page no matter if user can see them or not. !35129
+- Speed up Advanced global search regex for file path segments. !35292
+- Optimize issues_with_health_status usage ping counter. !35298
+- Fix N+1 queries for Elastic Search commits scope. !35449
+- Don't index the same project in Elasticsearch in parallel. !35842
+- Geo: Make registry table SSOT for uploads. !35921
+- Avoid N+1 of group associations in Search. !36544
+- Prevent 2nd Elasticsearch query for project searches. !36672
+- Fix N+1 in the RootController#index. !36805
+- Make Registry table SSOT for projects and wikis. !36901
+- Make Registry table SSOT for designs. !36999
+
+### Added (133 changes, 5 of them are from the community)
+
+- Add list limit metric to API. !27324
+- Implement Go module proxy MVC (package manager for Go). !27746 (Ethan Reesor)
+- Improve Vulnerability Management with Standalone Vulnerabilities. !28212
+- Add viewer and linker for go.mod and go.sum. !28262 (Ethan Reesor @firelizzard)
+- Add usage statistics for modsecurity total packets/anomalous packets. !28535
+- Keep artifacts referenced by release evidence. !29350
+- Add periodic worker for collecting network policy usage. !30328
+- REST API membership responses for group owner enqueries include group managed account emails. !30584
+- Add table to Issues Analytics. !30603
+- Add ability to pause and resume Elasticsearch indexing. !30621
+- Show the status of stand-alone secrets analyzer on the configuration page. !31167
+- Support transferring and displaying image uploads on Status Page. !31269
+- Add Pipeline.securityReportSummary to GraphQL. !31550
+- Create test reports table. !31643
+- Show usage graph for each storage type. !31649
+- Add requirements filtering on author username and search by title. !31857
+- Add ability to download patch from vulnerability page. !32000
+- Add callout for user count threshold. !32404
+- Make group/namespace name in email a link to group overview page. !32461
+- Add api endpoint to retrieve resource weight events. !32542
+- Add ability to select Epic while creating a New Issue. !32572
+- Expose test reports on GraphQL. !32599
+- Allow approval rules to be reset to project defaults. !32657
+- Save setting for auto-fix feature. !32690
+- Geo - Make Geo::RegistryConsistencyWorker clean up unused registries. !32695
+- Add new epic creation page. !32701
+- Add policy for auto_fix. !32783
+- Send email notifications on Issue Iteration change. !32817
+- Add support for bulk editing health status and epic on issues. !32875
+- Add quick actions for iterations in issues. !32904
+- Add validation to maven package version. !32925 (Bola Ahmed Buari)
+- Add Elasticsearch to Sidekiq ServerMetrics. !32937
+- Added CI parser for requirements reports. !33031
+- Add state events to burnup chart data. !33048
+- Introduce `userNotesCount` field for VulnerabilityType on GraphQL API. !33058
+- Bulk edit health status. !33065
+- Add project audit events API. !33155 (Julien Millau)
+- Introduce `issueLinks` field for VulnerabilityType on GraphQL API. !33173
+- Add Elasticsearch metrics in Rack middleware. !33233
+- Adds NuGet project and license URL to the package details page. !33268
+- Internationalize templates titles. !33271
+- Adds a new Dependencies tab for NuGet packages on the package details page. !33303
+- Support AWS IAM role for ECS tasks in Elasticsearch client. !33456
+- Allow to specify multiple domains when restricting group membership by email domain. !33498
+- Add MR approval stats to group contribution analytics. !33601
+- Create sticky section in security dashboard layout. !33651
+- Add Network Policy Management to the Threat Monitoring page. !33667
+- Show secret_detection in report types. !33682
+- Adds NuGet package icon to package details page. !33701
+- Allow to specify `period_field` in Insights config. !33753
+- Ability to make PAT expiration optional in self managed instances. !33783
+- Add secret detection for GraphQL API. !33797
+- Show test report status badge on Requirements list. !33848
+- Pin selection summary/list header to the page top. !33875
+- Persist user preferences for boards. !33892
+- Add compliance frameworks to application settings table. !33923
+- Fixes inconsistent package title icon colors. !33933
+- Retry failed vulnerability export background jobs. !33986
+- Geo Package Files UI. !34004
+- Add report artifacts' links to release evidence. !34058
+- Add cluster reindexing feature to our ES integration. !34069
+- Add in-app notification for Personal Access Token expiry. !34101
+- Add "New epic" button within epic page. !34109
+- Add MR note to standalone vulnerability page. !34146
+- Show issue link on security dashboard when vulnerability has an issue. !34157
+- Persist individual requirement report results to test report. !34162
+- Geo Package Files - Sync Counts. !34205
+- Upgrade to `license_scanning` report v2.1. !34224
+- Add group wiki REST API. !34232
+- Epic bulk edit. !34256
+- Display Saved User Lists by Feature Flags. !34294
+- Add PHP Composer Package Support. !34339 (Jochen Roth @ochorocho, Giorgenes Gelatti)
+- Allow Hiding/Collapsing of Milestone header on Roadmap. !34357
+- Add csv export button to group security dashboard. !34374
+- Prevent MR from merging if denied licenses are found. !34413
+- Allow Users to Delete User Lists. !34425
+- Alert Users That Lists Are Modified By API Only. !34559
+- Add ability to view tokens without expiry enforcement. !34570
+- Add support for gl-coverage-fuzzing-report.json and security dashboard parsing. !34648
+- Geo: Enable Package File replication. !34702
+- Add compliance_frameworks list to project API. !34709
+- Add scanner name and identifiers to VulnerabilityType. !34766
+- Add request/response to standalone vulnerability page. !34811
+- Add scanner filter in Vulnerability GraphQL API. !34824
+- Add Project.complianceFrameworks field to GraphQL schema. !34838
+- Set checkboxes to be on by defualt for list. !34893
+- Add coverage fuzzing CI template. !34984
+- Add vendor to Vulnerability Scanners. !35004
+- Admin UI change to trigger Elasticsearch in-cluster re-indexing. !35024
+- Add vulnerability scanner query to GraphQL API. !35109
+- Enable new version feature flags by default. !35192
+- Add the MR author to MR's list on the compliance dashboard. !35206
+- Add storage_size_limit to plan_limits table. !35219
+- Add parsing Vendor name from Security Reports. !35222
+- Add project count with overridden approval rules in merge request to usage ping. !35224
+- Link documentation from GitLab for Jira app. !35227
+- Add license approval rule section and enable feature by default. !35246
+- Add Namespace API to set additionally purchased storage. !35257
+- Added MR Load Performance Testing feature. !35260
+- Add toggle to sort epic activity feed. !35302
+- Show User List Details. !35369
+- Let users modify feature flag user lists. !35373
+- Update vulnerabilities and findings when report occurrences are updated. !35374
+- Add Maintenance mode application settings fields. !35376
+- Add running out of minutes warning to CI job pages. !35622
+- Add scanned resources to security report. !35695
+- Display comment icon on vulnerability list in Security Dashboard. !35863
+- Allow merge when `License-Check` approve denied policies. !35885
+- Add DAST URL MR Widget modal. !35945
+- Return ID of newly created vulnerability issue link in API. !35947
+- Add NULL value scannedResourcesCsvUrl to securityReportSummary. !35949
+- Allow users to download the DAST scanned resources for a pipeline as a CSV. !36019
+- Add security scanner alerts to project to project security dashboard. !36030
+- Create GraphQL query to extract analyzers information. !36153
+- Expose Vendor in Scanner in Vulnerability Findings API. !36184
+- Add MVC for Opsgenie integration. !36199
+- Update Usage Ping data to track Merge Requests with added rules. !36222
+- Add filtering by scanner ID in Vulnerability Occurrences REST API. !36241
+- Allow creating confidential epics. !36271
+- Audit changes to project approval groups. !36393
+- Expose temporary storage increase end date in api. !36495
+- Add search history support for Requirements. !36554
+- Add related issues widget to feature flags. !36617
+- Setup group level Value Stream DB table. !36658
+- Enforce presence of Value Stream when creating a stage. !36661
+- Add ability to download fuzzing artifacts from pipeline page. !36676
+- Scope instance-level MR settings to compliance-labeled projects. !36685
+- Include ancestors in Iteration query. !36766
+- Add button to Security Configuration page to enable SAST, and Auto DevOps prompt. !36796
+- Add scanned_resources CSV path to Security Report Summary. !36810
+- Add MR approval status to the MR compliance entity. !36824
+- Enables Iterations by default. !36873
+- Update Iteration status automatically. !36880
+
+### Other (18 changes, 2 of them are from the community)
+
+- Add license ID to license view. !19113
+- Update deprecated Vue 3 slot syntax in ee/app/assets/javascripts/vue_shared/security_reports/components/modal.vue. !31966 (Gilang Gumilar)
+- Added DB index on confidential epics column. !32443
+- Allow ci minutes reset service to continue in case of failure. !32867
+- Remove unused index for vulnerabiliy confidence levels. !33149
+- Update vulnerabilities badge design in Dependency List. !33417
+- Add geo_primary_replication_events to usage data. !33424
+- Add new status page attributes to usage ping. !33790
+- Remove optimized_elasticsearch_indexes_project feature flag. !33965
+- Relocate Go models. !34338 (Ethan Reesor (@firelizzard))
+- Limit child epics and epic issues page size. !34553
+- Correct typo in "single sign-on", per specs. !35258
+- Update UI links in EE features. !35489
+- Replace .html with .md in documentation links. !35864
+- Update more UI links in EE features. !36177
+- Apply label color to shared Analytics label token. !36205
+- Alert Opsgenie integration errors. !36648
+- Resolve duplicate use of shorcuts-tree. !36732
+
+
 ## 13.1.3 (2020-07-06)
 
 ### Security (1 change)

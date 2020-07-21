@@ -1,5 +1,0 @@
----
-title: Allow merge when `License-Check` approve denied policies
-merge_request: 35885
-author:
-type: added
