@@ -333,7 +333,7 @@ Starting from GitLab 12.1, only PostgreSQL is supported. Since GitLab 13.0, we r
    sudo -u postgres psql -d template1 -c "CREATE USER git CREATEDB;"
    ```
 
-1. Create the `pg_trgm` extension (required for GitLab 8.6+):
+1. Create the `pg_trgm` extension:
 
    ```shell
    sudo -u postgres psql -d template1 -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
