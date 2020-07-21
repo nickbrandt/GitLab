@@ -284,7 +284,7 @@ RSpec.describe NotesHelper do
       @snippet = create(:project_snippet, project: @project)
       @note = create(:note_on_personal_snippet)
 
-      expect(helper.form_resources).to eq([@project.namespace, @project, @note])
+      expect(helper.form_resources).to eq([@project, @note])
     end
 
     it 'returns namespace, project and note path for other noteables' do
@@ -292,7 +292,7 @@ RSpec.describe NotesHelper do
       @project = create(:project, path: 'test', namespace: namespace)
       @note = create(:note_on_issue, project: @project)
 
-      expect(helper.form_resources).to eq([@project.namespace, @project, @note])
+      expect(helper.form_resources).to eq([@project, @note])
     end
   end
 
