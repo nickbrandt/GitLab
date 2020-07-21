@@ -194,11 +194,11 @@ module QA
           end
 
           def has_dependency_vulnerability_count_of?(expected)
-            find_element(:dependency_scan_report).has_content?(/Dependency scanning detected #{expected}( new)? vulnerabilit/)
+            find_element(:dependency_scan_report).has_content?(/Dependency scanning detected #{expected}( new)? vulnerabilit|Dependency scanning detected .* vulnerabilities out of #{expected}/)
           end
 
           def has_container_vulnerability_count_of?(expected)
-            find_element(:container_scan_report).has_content?(/Container scanning detected #{expected}( new)? vulnerabilit/)
+            find_element(:container_scan_report).has_content?(/Container scanning detected #{expected}( new)? vulnerabilit|Container scanning detected .* vulnerabilities out of #{expected}/)
           end
 
           def has_dast_vulnerability_count?
