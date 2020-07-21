@@ -62,6 +62,16 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
     subject { model.current_size }
 
     it { is_expected.to eq(current_size) }
+
+    context 'caches values', :use_clean_rails_memory_store_caching do
+      let(:key) { 'root_storage_current_size' }
+
+      it 'caches the value' do
+        subject
+
+        expect(Rails.cache.read(['namespaces', namespace.id, key])).to eq(current_size)
+      end
+    end
   end
 
   describe '#limit' do
@@ -92,6 +102,21 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
       end
 
       it { is_expected.to eq(0) }
+    end
+
+    context 'caches values', :use_clean_rails_memory_store_caching do
+      let(:key) { 'root_storage_size_limit' }
+
+      before do
+        plan_limits.update!(storage_size_limit: 70_000)
+        namespace.update!(additional_purchased_storage_size: 34_000)
+      end
+
+      it 'caches the value' do
+        subject
+
+        expect(Rails.cache.read(['namespaces', namespace.id, key])).to eq(104_000.megabytes)
+      end
     end
   end
 end
