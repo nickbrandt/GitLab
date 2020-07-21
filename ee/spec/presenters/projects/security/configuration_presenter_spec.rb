@@ -19,7 +19,7 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
   end
 
   describe '#to_h' do
-    subject { described_class.new(project, auto_fix_permission: true, current_user: current_user).to_h }
+    subject { described_class.new(project, auto_fix_permission: true, current_user: current_user).to_html_data_attribute }
 
     it 'includes links to auto devops and secure product docs' do
       expect(subject[:auto_devops_help_page_path]).to eq(help_page_path('topics/autodevops/index'))

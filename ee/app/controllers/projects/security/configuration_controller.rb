@@ -20,6 +20,12 @@ module Projects
         @configuration = ConfigurationPresenter.new(project,
                                                     auto_fix_permission: auto_fix_authorized?,
                                                     current_user: current_user)
+        respond_to do |format|
+          format.html
+          format.json do
+            render status: :ok, json: @configuration.to_h
+          end
+        end
       end
 
       def auto_fix
