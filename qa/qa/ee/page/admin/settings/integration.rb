@@ -13,7 +13,7 @@ module QA
             end
 
             def expand_elasticsearch(&block)
-              expand_section(:elasticsearch_tab) do
+              expand_content(:elasticsearch_tab) do
                 Component::Elasticsearch.perform(&block)
               end
             end
