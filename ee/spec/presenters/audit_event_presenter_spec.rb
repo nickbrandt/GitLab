@@ -110,8 +110,10 @@ RSpec.describe AuditEventPresenter do
     end
   end
 
-  it 'exposes the target' do
-    expect(presenter.target).to eq(details[:target_details])
+  describe '#target' do
+    it 'delegates to the model object' do
+      expect(presenter.target).to equal(audit_event.target_details)
+    end
   end
 
   context 'exposes the ip address' do

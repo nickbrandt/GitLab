@@ -10,6 +10,7 @@ RSpec.describe EE::AuditEvents::RepositoryDownloadStartedAuditEventService do
       let(:entity) { create(:project) }
       let(:entity_type) { 'Project' }
       let(:custom_message) { 'Repository Download Started' }
+      let(:target_details) { nil }
       let(:service) { described_class.new(user, entity, ip_address) }
     end
   end

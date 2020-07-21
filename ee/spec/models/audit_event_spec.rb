@@ -14,15 +14,50 @@ RSpec.describe AuditEvent, type: :model do
   end
 
   describe 'callbacks' do
-    let_it_be(:details) { { author_name: 'Kungfu Panda', entity_path: 'gitlab-org/gitlab' } }
-    let_it_be(:event) { create(:project_audit_event, details: details) }
+    context 'parallel_persist' do
+      let_it_be(:details) do
+        { author_name: 'Kungfu Panda', entity_path: 'gitlab-org/gitlab', target_details: 'Project X' }
+      end
+      let_it_be(:event) { create(:project_audit_event, details: details, target_details: nil) }
 
-    it 'sets author_name' do
-      expect(event[:author_name]).to eq('Kungfu Panda')
+      it 'sets author_name' do
+        expect(event[:author_name]).to eq('Kungfu Panda')
+      end
+
+      it 'sets entity_path' do
+        expect(event[:entity_path]).to eq('gitlab-org/gitlab')
+      end
+
+      it 'sets target_details' do
+        expect(event[:target_details]).to eq('Project X')
+      end
     end
 
-    it 'sets entity_path' do
-      expect(event[:entity_path]).to eq('gitlab-org/gitlab')
+    describe '#truncate_target_details' do
+      where(:database_column, :details_value, :expected_value) do
+        text_limit = described_class::TEXT_LIMIT[:target_details]
+        long_value = 'a' * (text_limit + 1)
+        truncated_long_value = long_value.truncate(text_limit)
+        short_value = 'a' * text_limit
+
+        [
+          [nil, nil, nil],
+          [long_value, nil, truncated_long_value],
+          [short_value, nil, short_value],
+          [nil, long_value, truncated_long_value],
+          [nil, short_value, short_value],
+          [long_value, 'something', truncated_long_value]
+        ]
+      end
+
+      with_them do
+        let(:audit_event) { create(:audit_event, target_details: database_column, details: { target_details: details_value }) }
+
+        it 'expects both values to be the same and correct' do
+          expect(audit_event.target_details).to eq(expected_value)
+          expect(audit_event.details[:target_details]).to eq(expected_value)
+        end
+      end
     end
   end
 
