@@ -21,6 +21,10 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
   describe '#above_size_limit?' do
     subject { model.above_size_limit? }
 
+    before do
+      allow(namespace).to receive(:temporary_storage_increase_enabled?).and_return(false)
+    end
+
     context 'when limit is 0' do
       let(:limit) { 0 }
 
@@ -34,7 +38,17 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
     context 'when above limit' do
       let(:current_size) { 101.megabytes }
 
-      it { is_expected.to eq(true) }
+      context 'when temporary storage increase is disabled' do
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when temporary storage increase is enabled' do
+        before do
+          allow(namespace).to receive(:temporary_storage_increase_enabled?).and_return(true)
+        end
+
+        it { is_expected.to eq(false) }
+      end
     end
   end
 

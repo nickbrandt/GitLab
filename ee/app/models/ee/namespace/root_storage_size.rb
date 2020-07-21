@@ -11,6 +11,8 @@ module EE
     end
 
     def above_size_limit?
+      return false if root_namespace.temporary_storage_increase_enabled?
+
       usage_ratio > 1
     end
 
