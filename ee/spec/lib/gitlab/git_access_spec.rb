@@ -17,6 +17,18 @@ RSpec.describe Gitlab::GitAccess do
   let(:authentication_abilities) { %i[read_project download_code push_code] }
   let(:redirected_path) { nil }
 
+  let(:access_class) do
+    Class.new(described_class) do
+      def push_ability
+        :push_code
+      end
+
+      def download_ability
+        :download_code
+      end
+    end
+  end
+
   context "when in a read-only GitLab instance" do
     before do
       create(:protected_branch, name: 'feature', project: project)
@@ -720,7 +732,7 @@ RSpec.describe Gitlab::GitAccess do
   private
 
   def access
-    described_class.new(
+    access_class.new(
       actor,
       project,
       protocol,
