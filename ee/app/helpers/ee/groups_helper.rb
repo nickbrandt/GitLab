@@ -42,14 +42,9 @@ module EE
       ]
     end
 
+    override :group_packages_nav?
     def group_packages_nav?
-      group_packages_list_nav? ||
-        group_dependency_proxy_nav? ||
-        group_container_registry_nav?
-    end
-
-    def group_packages_list_nav?
-      @group.packages_feature_available?
+      super || group_dependency_proxy_nav?
     end
 
     def group_dependency_proxy_nav?

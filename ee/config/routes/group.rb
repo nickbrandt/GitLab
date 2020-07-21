@@ -176,7 +176,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resource :roadmap, only: [:show], controller: 'roadmap'
 
     resource :dependency_proxy, only: [:show, :update]
-    resources :packages, only: [:index]
 
     post '/restore' => '/groups#restore', as: :restore
   end

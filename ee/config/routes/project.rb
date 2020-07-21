@@ -15,13 +15,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :requirements, only: [:index]
         end
 
-        resources :packages, only: [:index, :show, :destroy], module: :packages
-        resources :package_files, only: [], module: :packages do
-          member do
-            get :download
-          end
-        end
-
         resources :feature_flags, param: :iid do
           resources :feature_flag_issues, only: [:index, :create, :destroy], as: 'issues', path: 'issues'
         end
