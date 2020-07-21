@@ -9,17 +9,15 @@ import { initialRequest } from 'jest/issue_show/mock_data';
 import { TEST_HOST } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
 import { mockEpicMeta, mockEpicData } from '../mock_data';
+import { useMockIntersectionObserver } from 'helpers/mock_dom_observer';
 
 describe('EpicBodyComponent', () => {
+  useMockIntersectionObserver();
+
   let vm;
   let mock;
 
   beforeEach(() => {
-    window.IntersectionObserver = class {
-      disconnect = jest.fn();
-      observe = jest.fn();
-    };
-
     mock = new MockAdapter(axios);
     mock.onGet(`${TEST_HOST}/realtime_changes`).reply(200, initialRequest);
 
@@ -34,7 +32,6 @@ describe('EpicBodyComponent', () => {
   });
 
   afterEach(() => {
-    delete window.IntersectionObserver;
     mock.restore();
     vm.$destroy();
   });
