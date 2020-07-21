@@ -125,9 +125,9 @@ export default {
 
 <template>
   <div id="related-issues" class="related-issues-block">
-    <div class="card card-slim">
+    <div class="card card-slim gl-overflow-hidden">
       <div :class="{ 'panel-empty-heading border-bottom-0': !hasBody }" class="card-header">
-        <h3 class="card-title mt-0 mb-0 h5 position-relative">
+        <h3 class="card-title mt-0 mb-0 h5 position-relative gl-display-flex gl-align-items-center">
           <gl-link
             id="user-content-related-issues"
             class="anchor position-absolute text-decoration-none"
