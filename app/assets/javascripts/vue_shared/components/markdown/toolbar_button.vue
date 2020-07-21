@@ -65,7 +65,7 @@ export default {
     type="button"
     class="toolbar-btn js-md"
     data-container="body"
-    @click="() => $emit('click')"
+    @click="$emit('update-tag'), () => $emit('click')"
   >
     <icon :name="icon" />
   </button>
