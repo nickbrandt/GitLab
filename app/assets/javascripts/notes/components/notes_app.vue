@@ -1,4 +1,5 @@
 <script>
+import Mousetrap from 'mousetrap';
 import { mapGetters, mapActions } from 'vuex';
 import { getLocationHash, doesHashExistInUrl } from '../../lib/utils/url_utility';
 import Flash from '../../flash';
@@ -121,6 +122,7 @@ export default {
     this.setUserData(this.userData);
     this.setTargetNoteHash(getLocationHash());
     eventHub.$once('fetchNotesData', this.fetchNotes);
+    eventHub.$on('jumpToFirstUnresolvedDiscussion', this.jumpToFirstUnresolvedDiscussion);
   },
   mounted() {
     if (this.shouldShow) {
@@ -164,6 +166,7 @@ export default {
       'startTaskList',
       'convertToDiscussion',
       'stopPolling',
+      'setCurrentDiscussionId',
     ]),
     discussionIsIndividualNoteAndNotConverted(discussion) {
       return discussion.individual_note && !this.convertedDisscussionIds.includes(discussion.id);
@@ -195,6 +198,17 @@ export default {
           this.setLoadingState(false);
           this.setNotesFetchedState(true);
           Flash(__('Something went wrong while fetching comments. Please try again.'));
+        });
+    },
+    jumpToFirstUnresolvedDiscussion() {
+      this.setCurrentDiscussionId(null)
+        .then(() => {
+          Mousetrap.trigger('n');
+        })
+        .catch(() => {
+          // This event can come in from outside this app.
+          // Until we have transactional hub events,
+          // handling this error here isn't really useful
         });
     },
     initPolling() {
