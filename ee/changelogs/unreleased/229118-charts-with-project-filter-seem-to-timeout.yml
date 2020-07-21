@@ -1,5 +1,0 @@
----
-title: Fallback to `created_at` when `merged_at` is missing in Insights charts
-merge_request: 36930
-author:
-type: fixed
