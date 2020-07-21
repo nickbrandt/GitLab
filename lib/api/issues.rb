@@ -206,6 +206,11 @@ module API
                                          desc: 'The ID of a discussion to resolve, also pass `merge_request_to_resolve_discussions_of`'
         optional :iid, type: Integer,
                        desc: 'The internal ID of a project issue. Available only for admins and project owners.'
+        optional :author_id, type: Integer,
+                       desc: 'The internal ID of the author of the project issue. Available only for admins and project owners.'
+        optional :author_username, type: String,
+                       desc: 'Username of the author of the project issue. Available only for admins and project owners.'
+
 
         use :issue_params
       end
@@ -218,6 +223,8 @@ module API
 
         params.delete(:created_at) unless current_user.can?(:set_issue_created_at, user_project)
         params.delete(:iid) unless current_user.can?(:set_issue_iid, user_project)
+        params.delete(:author_id) unless current_user.can?(:set_author_id, user_project)
+        params.delete(:author_username) unless current_user.can?(:set_author_username, user_project)
 
         issue_params = declared_params(include_missing: false)
         issue_params[:system_note_timestamp] = params[:created_at]

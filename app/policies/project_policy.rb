@@ -208,6 +208,8 @@ class ProjectPolicy < BasePolicy
     enable :set_note_created_at
     enable :set_emails_disabled
     enable :set_show_default_award_emojis
+    enable :set_author_id
+    enable :sel_author_username
   end
 
   rule { can?(:guest_access) }.policy do
