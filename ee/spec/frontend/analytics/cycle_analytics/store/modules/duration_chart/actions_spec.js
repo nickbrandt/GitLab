@@ -26,7 +26,7 @@ const activeStages = [stage1, stage2];
 const rootState = {
   startDate,
   endDate,
-  stages: [stage1, stage2, hiddenStage],
+  stages: [...activeStages, hiddenStage],
   selectedGroup,
   featureFlags: {
     hasDurationChart: true,
