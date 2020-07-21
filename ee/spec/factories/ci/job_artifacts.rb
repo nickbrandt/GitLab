@@ -180,7 +180,7 @@ FactoryBot.define do
     end
 
     trait :license_management do
-      to_create { |instance| instance.save(validate: false) }
+      to_create { |instance| instance.save!(validate: false) }
 
       file_type { :license_management }
       file_format { :raw }
