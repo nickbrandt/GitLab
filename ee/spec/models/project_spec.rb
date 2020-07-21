@@ -45,6 +45,7 @@ RSpec.describe Project do
     it { is_expected.to have_many(:upstream_projects) }
     it { is_expected.to have_many(:downstream_project_subscriptions) }
     it { is_expected.to have_many(:downstream_projects) }
+    it { is_expected.to have_many(:vulnerability_historical_statistics).class_name('Vulnerabilities::HistoricalStatistic') }
 
     it { is_expected.to have_one(:github_service) }
     it { is_expected.to have_many(:project_aliases) }
