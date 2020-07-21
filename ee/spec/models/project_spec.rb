@@ -573,9 +573,9 @@ RSpec.describe Project do
   end
 
   describe '#has_regulated_settings?' do
-    let_it_be(:framework) { ComplianceManagement::ComplianceFramework::FRAMEWORKS.first }
-    let_it_be(:compliance_framework_setting) { create(:compliance_framework_project_setting, framework: framework.first.to_s) }
-    let_it_be(:project) { create(:project, compliance_framework_setting: compliance_framework_setting) }
+    let(:framework) { ComplianceManagement::ComplianceFramework::FRAMEWORKS.first }
+    let(:compliance_framework_setting) { build(:compliance_framework_project_setting, framework: framework.first.to_s) }
+    let(:project) { build(:project, compliance_framework_setting: compliance_framework_setting) }
 
     subject { project.has_regulated_settings? }
 
@@ -596,7 +596,7 @@ RSpec.describe Project do
     end
 
     context 'project does not have compliance framework' do
-      let_it_be(:project) { create(:project) }
+      let(:project) { build(:project) }
 
       it { is_expected.to be_falsey }
     end
