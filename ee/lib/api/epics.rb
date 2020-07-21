@@ -55,10 +55,12 @@ module API
       params do
         requires :epic_iid, type: Integer, desc: 'The internal ID of an epic'
       end
-      get ':id/(-/)epics/:epic_iid' do
-        authorize_can_read!
+      [':id/epics/:epic_iid', ':id/-/epics/:epic_iid'].each do |path|
+        get path do
+          authorize_can_read!
 
-        present epic, epic_options.merge(include_subscribed: true)
+          present epic, epic_options.merge(include_subscribed: true)
+        end
       end
 
       desc 'Create a new epic' do

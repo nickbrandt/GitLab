@@ -522,6 +522,16 @@ RSpec.describe API::Epics do
         expect(json_response['references']['full']).to eq("#{epic.group.path}&#{epic.iid}")
       end
 
+      it 'exposes links' do
+        get api(url)
+
+        links = json_response['_links']
+
+        expect(links['self']).to end_with("/api/v4/groups/#{epic.group.id}/epics/#{epic.iid}")
+        expect(links['epic_issues']).to end_with("/api/v4/groups/#{epic.group.id}/epics/#{epic.iid}/issues")
+        expect(links['group']).to end_with("/api/v4/groups/#{epic.group.id}")
+      end
+
       it_behaves_like 'can admin epics'
     end
   end
