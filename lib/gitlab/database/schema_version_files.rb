@@ -10,7 +10,11 @@ module Gitlab
         FileUtils.rm(filenames_with_path)
 
         versions.each do |version|
-          FileUtils.touch(schema_dirpath.join(version))
+          version_filepath = schema_dirpath.join(version)
+
+          File.open(version_filepath, 'w') do |file|
+            file << Digest::SHA256.hexdigest(version)
+          end
         end
       end
 

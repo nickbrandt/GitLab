@@ -2,11 +2,11 @@
 
 require 'spec_helper'
 
-describe Gitlab::Database::SchemaVersionFiles do
+RSpec.describe Gitlab::Database::SchemaVersionFiles do
   describe '.touch_all' do
     let(:versions) { %w[2020123 2020456 2020890] }
 
-    it 'touches a file for each version given' do
+    it 'creates a file containing a checksum for each version given' do
       Dir.mktmpdir do |tmpdir|
         schema_dirpath = Pathname.new(tmpdir).join("test")
         FileUtils.mkdir_p(schema_dirpath)
@@ -24,6 +24,9 @@ describe Gitlab::Database::SchemaVersionFiles do
         versions.each do |version|
           version_filepath = schema_dirpath.join(version)
           expect(File.exist?(version_filepath)).to be(true)
+
+          hashed_value = Digest::SHA256.hexdigest(version)
+          expect(File.read(version_filepath)).to eq(hashed_value)
         end
       end
     end
