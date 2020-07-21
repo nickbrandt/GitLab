@@ -29,8 +29,7 @@ module Gitlab
           def matches_pattern?(pattern, pipeline)
             return true if pipeline.tag? && pattern == 'tags'
             return true if pipeline.branch? && pattern == 'branches'
-            return true if sanitized_source_name(pipeline) == pattern
-            return true if sanitized_source_name(pipeline)&.pluralize == pattern
+            return true if pipelines_source_match(pattern, pipeline)
 
             # patterns can be matched only when branch or tag is used
             # the pattern matching does not work for merge requests pipelines
@@ -43,8 +42,24 @@ module Gitlab
             end
           end
 
+          def pipelines_source_match(pattern, pipeline)
+            return true if pipeline_source_ref_match(pattern, pipeline)
+            parent_pipeline = pipeline&.parent_pipeline
+            return true if parent_pipeline && pipeline_source_ref_match(pattern, parent_pipeline)
+          end
+
+          def pipeline_source_ref_match(pattern, pipeline)
+            return true if sanitized_source_name(pipeline) == pattern
+            return true if sanitized_source_name(pipeline)&.pluralize == pattern
+          end
+
+
           def sanitized_source_name(pipeline)
-            @sanitized_source_name ||= pipeline&.source&.delete_suffix('_event')
+            @sanitized_source_name ||= sanitize_source_name(pipeline&.source)
+          end
+
+          def sanitize_source_name(source)
+            source&.delete_suffix('_event')
           end
         end
       end

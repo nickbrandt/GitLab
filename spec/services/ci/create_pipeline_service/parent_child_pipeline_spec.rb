@@ -95,6 +95,10 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
           YAML
         end
 
+        def create_pipeline!
+          service.execute(:merge_request_event)
+        end
+
         it_behaves_like 'successful creation' do
           let(:expected_bridge_options) do
             {
