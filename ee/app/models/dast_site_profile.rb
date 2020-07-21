@@ -8,6 +8,8 @@ class DastSiteProfile < ApplicationRecord
   validates :project_id, :dast_site_id, presence: true
   validate :dast_site_project_id_fk
 
+  scope :with_dast_site, -> { includes(:dast_site) }
+
   private
 
   def dast_site_project_id_fk

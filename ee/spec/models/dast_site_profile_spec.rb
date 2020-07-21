@@ -29,4 +29,18 @@ RSpec.describe DastSiteProfile, type: :model do
       end
     end
   end
+
+  describe 'scopes' do
+    describe '.with_dast_site' do
+      it 'eager loads the association' do
+        subject
+
+        recorder = ActiveRecord::QueryRecorder.new do
+          subject.dast_site
+        end
+
+        expect(recorder.count).to be_zero
+      end
+    end
+  end
 end
