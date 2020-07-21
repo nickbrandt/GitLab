@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlModal } from '@gitlab/ui';
+import { GlButton, GlModal, GlNewDropdown as GlDropdown } from '@gitlab/ui';
 import ValueStreamSelect from 'ee/analytics/cycle_analytics/components/value_stream_select.vue';
 import { valueStreams } from '../mock_data';
 import { findDropdownItemText } from '../helpers';
@@ -49,10 +49,9 @@ describe('ValueStreamSelect', () => {
   const findModal = () => wrapper.find(GlModal);
   const submitButtonDisabledState = () => findModal().props('actionPrimary').attributes[1].disabled;
   const submitForm = () => findModal().vm.$emit('primary', mockEvent);
-  const findSelectValueStreamDropdown = () => wrapper.find('[data-testid="select-value-stream"]');
+  const findSelectValueStreamDropdown = () => wrapper.find(GlDropdown);
   const findSelectValueStreamDropdownOptions = _wrapper => findDropdownItemText(_wrapper);
-
-  const findCreateValueStreamButton = () => wrapper.find('[data-testid="create-value-stream"]');
+  const findCreateValueStreamButton = () => wrapper.find(GlButton);
 
   beforeEach(() => {
     wrapper = createComponent({
@@ -66,18 +65,20 @@ describe('ValueStreamSelect', () => {
     wrapper.destroy();
   });
 
-  it('does not display the create value stream button', () => {
-    expect(findCreateValueStreamButton().exists()).toBe(false);
-  });
+  describe('with value streams available', () => {
+    it('does not display the create value stream button', () => {
+      expect(findCreateValueStreamButton().exists()).toBe(false);
+    });
 
-  it('displays the select value stream dropdown', () => {
-    expect(findSelectValueStreamDropdown().exists()).toBe(true);
-  });
+    it('displays the select value stream dropdown', () => {
+      expect(findSelectValueStreamDropdown().exists()).toBe(true);
+    });
 
-  it('renders each value stream including a create button', () => {
-    const opts = findSelectValueStreamDropdownOptions(wrapper);
-    [...valueStreams.map(v => v.name), 'Create new value stream'].forEach(vs => {
-      expect(opts).toContain(vs);
+    it('renders each value stream including a create button', () => {
+      const opts = findSelectValueStreamDropdownOptions(wrapper);
+      [...valueStreams.map(v => v.name), 'Create new Value Stream'].forEach(vs => {
+        expect(opts).toContain(vs);
+      });
     });
   });
 

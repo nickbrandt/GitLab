@@ -21,6 +21,7 @@ const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_F
 const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
 const [selectedStage] = stages;
 const selectedStageSlug = selectedStage.slug;
+const [selectedValueStream] = valueStreams;
 
 const stageEndpoint = ({ stageId }) =>
   `/groups/${selectedGroup.fullPath}/-/analytics/value_stream_analytics/stages/${stageId}`;
@@ -135,7 +136,7 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       state = { ...state, selectedGroup };
       mock = new MockAdapter(axios);
-      mock.onGet(endpoints.stageData).reply(200, { events: [] });
+      mock.onGet(endpoints.stageData).reply(httpStatusCodes.OK, { events: [] });
     });
 
     it('dispatches receiveStageDataSuccess with received data on success', () => {
@@ -419,7 +420,7 @@ describe('Cycle analytics actions', () => {
     const payload = { hidden: true };
 
     beforeEach(() => {
-      mock.onPut(stageEndpoint({ stageId }), payload).replyOnce(200, payload);
+      mock.onPut(stageEndpoint({ stageId }), payload).replyOnce(httpStatusCodes.OK, payload);
       state = { selectedGroup };
     });
 
@@ -565,7 +566,7 @@ describe('Cycle analytics actions', () => {
     const stageId = 'cool-stage';
 
     beforeEach(() => {
-      mock.onDelete(stageEndpoint({ stageId })).replyOnce(200);
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
       state = { selectedGroup };
     });
 
@@ -617,7 +618,7 @@ describe('Cycle analytics actions', () => {
     const stageId = 'cool-stage';
 
     beforeEach(() => {
-      mock.onDelete(stageEndpoint({ stageId })).replyOnce(200);
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
       state = { selectedGroup };
     });
 
@@ -650,7 +651,7 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       state = { ...state, stages: [{ slug: selectedStageSlug }], selectedGroup };
       mock = new MockAdapter(axios);
-      mock.onGet(endpoints.stageMedian).reply(200, { events: [] });
+      mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.OK, { events: [] });
       mockDispatch = jest.fn();
     });
 
@@ -923,7 +924,7 @@ describe('Cycle analytics actions', () => {
         },
       };
       mock = new MockAdapter(axios);
-      mock.onGet(endpoints.valueStreamData).reply(200, { stages: [], events: [] });
+      mock.onGet(endpoints.valueStreamData).reply(httpStatusCodes.OK, { stages: [], events: [] });
     });
 
     it(`commits ${types.REQUEST_VALUE_STREAMS} and dispatches receiveValueStreamsSuccess with received data on success`, () => {
@@ -978,7 +979,7 @@ describe('Cycle analytics actions', () => {
               payload: valueStreams,
             },
           ],
-          [{ type: 'setSelectedValueStream', payload: 1 }],
+          [{ type: 'setSelectedValueStream', payload: selectedValueStream.id }],
         );
       });
     });

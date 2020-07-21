@@ -1019,10 +1019,10 @@ RSpec.describe 'Group Value Stream Analytics', :js do
     end
 
     it 'can create a value stream' do
-      page.find_button(_('Create new value stream')).click
+      page.find_button(_('Create new Value Stream')).click
 
       fill_in 'create-value-stream-name', with: custom_value_stream_name
-      page.find_button(_('Create value stream')).click
+      page.find_button(_('Create Value Stream')).click
 
       expect(page).to have_text(_("'%{name}' Value Stream created") % { name: custom_value_stream_name })
     end

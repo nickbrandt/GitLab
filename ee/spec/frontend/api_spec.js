@@ -339,7 +339,7 @@ describe('Api', () => {
         const response = [{ name: 'value stream 1', id: 1 }];
 
         const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/-/analytics/value_stream_analytics/value_streams`;
-        mock.onGet(expectedUrl).reply(200, response);
+        mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
         Api.cycleAnalyticsValueStreams(groupId)
           .then(responseObj =>
@@ -360,7 +360,7 @@ describe('Api', () => {
           name: 'cool-value-stream-stage',
         };
         const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/-/analytics/value_stream_analytics/value_streams`;
-        mock.onPost(expectedUrl).reply(200, response);
+        mock.onPost(expectedUrl).reply(httpStatus.OK, response);
 
         Api.cycleAnalyticsCreateValueStream(groupId, customValueStream)
           .then(({ data, config: { data: reqData, url } }) => {

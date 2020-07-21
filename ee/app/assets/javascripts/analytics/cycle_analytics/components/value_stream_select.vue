@@ -13,6 +13,7 @@ import {
 import { mapState, mapActions } from 'vuex';
 import { sprintf, __ } from '~/locale';
 import { debounce } from 'lodash';
+import { DATA_REFETCH_DELAY } from '../../shared/constants';
 
 const ERRORS = {
   MIN_LENGTH: __('Name is required'),
@@ -67,10 +68,10 @@ export default {
       return Boolean(this.data.length);
     },
     selectedValueStreamName() {
-      return this?.selectedValueStream?.name || '';
+      return this.selectedValueStream?.name || '';
     },
     selectedValueStreamId() {
-      return this?.selectedValueStream?.id || null;
+      return this.selectedValueStream?.id || null;
     },
   },
   mounted() {
@@ -95,9 +96,9 @@ export default {
     onHandleInput: debounce(function debouncedValidation() {
       const { name } = this;
       this.errors = validate({ name });
-    }, 250),
+    }, DATA_REFETCH_DELAY),
     isSelected(id) {
-      return this.selectedValueStreamId && this.selectedValueStreamId === id;
+      return Boolean(this.selectedValueStreamId && this.selectedValueStreamId === id);
     },
     onSelect(id) {
       this.setSelectedValueStream(id);
@@ -107,12 +108,7 @@ export default {
 </script>
 <template>
   <gl-form>
-    <gl-dropdown
-      v-if="hasValueStreams"
-      data-testid="select-value-stream"
-      :text="selectedValueStreamName"
-      right
-    >
+    <gl-dropdown v-if="hasValueStreams" :text="selectedValueStreamName" right>
       <gl-dropdown-item
         v-for="{ id, name: streamName } in data"
         :key="id"
@@ -123,22 +119,18 @@ export default {
       >
       <gl-dropdown-divider />
       <gl-dropdown-item v-gl-modal-directive="'create-value-stream-modal'" @click="onHandleInput">{{
-        __('Create new value stream')
+        __('Create new Value Stream')
       }}</gl-dropdown-item>
     </gl-dropdown>
-    <gl-button
-      v-else
-      v-gl-modal-directive="'create-value-stream-modal'"
-      data-testid="create-value-stream"
-      @click="onHandleInput"
-      >{{ __('Create new value stream') }}</gl-button
-    >
+    <gl-button v-else v-gl-modal-directive="'create-value-stream-modal'" @click="onHandleInput">{{
+      __('Create new Value Stream')
+    }}</gl-button>
     <gl-modal
       ref="modal"
       modal-id="create-value-stream-modal"
       :title="__('Value Stream Name')"
       :action-primary="{
-        text: __('Create value stream'),
+        text: __('Create Value Stream'),
         attributes: [
           { variant: 'success' },
           {
@@ -160,7 +152,7 @@ export default {
           id="create-value-stream-name"
           v-model.trim="name"
           name="create-value-stream-name"
-          :placeholder="__('Example: My value stream')"
+          :placeholder="__('Example: My Value Stream')"
           :state="isValid"
           required
           @input="onHandleInput"
