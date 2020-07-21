@@ -44,7 +44,7 @@ export default {
   <ide-tree-list viewer-type="editor">
     <template #header>
       {{ __('Edit') }}
-      <div class="ide-tree-actions ml-auto d-flex">
+      <div class="ide-tree-actions ml-auto d-flex" data-testid="ide-tree-actions">
         <new-entry-button
           :label="__('New file')"
           :show-label="false"

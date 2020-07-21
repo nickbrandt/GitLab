@@ -152,6 +152,7 @@ export default {
           type="text"
           class="form-control"
           data-qa-selector="file_name_field"
+          data-testid="ide-new-entry-file-name"
           :placeholder="placeholder"
         />
         <ul v-if="isCreatingNewFile" class="file-templates gl-mt-3 list-inline qa-template-list">
