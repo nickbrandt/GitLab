@@ -51,34 +51,6 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
   end
 
   describe 'child pipeline triggers' do
-    let(:config) do
-      <<~YAML
-      test:
-        script: rspec
-      deploy:
-        variables:
-          CROSS: downstream
-        stage: deploy
-        trigger:
-          include:
-            - local: path/to/child.yml
-      YAML
-    end
-
-    it_behaves_like 'successful creation' do
-      let(:expected_bridge_options) do
-        {
-          'trigger' => {
-            'include' => [
-              { 'local' => 'path/to/child.yml' }
-            ]
-          }
-        }
-      end
-    end
-  end
-
-  describe 'child pipeline triggers' do
     context 'when YAML is valid' do
       let(:config) do
         <<~YAML
@@ -103,6 +75,34 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
               ]
             }
           }
+        end
+      end
+
+      context 'when using `only: refs: - merge_requests`' do
+        let(:config) do
+          <<~YAML
+          test:
+            script: rspec
+          deploy:
+            variables:
+              CROSS: downstream
+            stage: deploy
+            only:
+              refs:
+                - merge_requests
+            trigger:
+              include: path/to/child.yml
+          YAML
+        end
+
+        it_behaves_like 'successful creation' do
+          let(:expected_bridge_options) do
+            {
+              'trigger' => {
+                'include' => 'path/to/child.yml'
+              }
+            }
+          end
         end
       end
 
