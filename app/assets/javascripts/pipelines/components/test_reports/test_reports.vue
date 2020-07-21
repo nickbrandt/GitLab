@@ -41,9 +41,7 @@ export default {
       this.setSelectedSuiteIndex(index);
 
       // Fetch the test suite when the user clicks to see more details
-      if (!this.hasFullReport && !this.getSelectedSuite(index).hasFullSuite) {
-        this.fetchTestSuite(index);
-      }
+      this.fetchTestSuite(index);
     },
     beforeEnterTransition() {
       document.documentElement.style.overflowX = 'hidden';
@@ -71,7 +69,7 @@ export default {
       @after-leave="afterLeaveTransition"
     >
       <div v-if="showSuite" key="detail" class="w-100 position-absolute slide-enter-to-element">
-        <test-summary :report="getSelectedSuite()" show-back @on-back-click="summaryBackClick" />
+        <test-summary :report="getSelectedSuite" show-back @on-back-click="summaryBackClick" />
 
         <test-suite-table />
       </div>

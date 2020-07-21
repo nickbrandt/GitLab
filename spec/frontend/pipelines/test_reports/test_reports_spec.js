@@ -91,46 +91,14 @@ describe('Test reports app', () => {
   });
 
   describe('when a suite is clicked', () => {
-    describe('when the full test report has already been received', () => {
-      beforeEach(() => {
-        createComponent({ hasFullReport: true });
-        testSummaryTable().vm.$emit('row-click', 0);
-      });
-
-      it('should only call setSelectedSuiteIndex', () => {
-        expect(actionSpies.setSelectedSuiteIndex).toHaveBeenCalled();
-        expect(actionSpies.fetchTestSuite).not.toHaveBeenCalled();
-      });
+    beforeEach(() => {
+      createComponent({ hasFullReport: true });
+      testSummaryTable().vm.$emit('row-click', 0);
     });
 
-    describe('when the full test report has not been received', () => {
-      describe('when the full suite has already been received', () => {
-        beforeEach(() => {
-          const mockState = { hasFullReport: false, testReports };
-          mockState.testReports.test_suites[0].hasFullSuite = true;
-          createComponent(mockState);
-          testSummaryTable().vm.$emit('row-click', 0);
-        });
-
-        it('should only call setSelectedSuiteIndex', () => {
-          expect(actionSpies.setSelectedSuiteIndex).toHaveBeenCalled();
-          expect(actionSpies.fetchTestSuite).not.toHaveBeenCalled();
-        });
-      });
-
-      describe('when the full suite has not been received', () => {
-        beforeEach(() => {
-          const mockState = { hasFullReport: false, testReports };
-          mockState.testReports.test_suites[0].hasFullSuite = false;
-          createComponent(mockState);
-          testSummaryTable().vm.$emit('row-click', 0);
-        });
-
-        it('should call setSelectedSuiteIndex and fetchTestSuite', () => {
-          expect(actionSpies.setSelectedSuiteIndex).toHaveBeenCalled();
-          expect(actionSpies.fetchTestSuite).toHaveBeenCalled();
-        });
-      });
+    it('should call setSelectedSuiteIndex and fetchTestSuite', () => {
+      expect(actionSpies.setSelectedSuiteIndex).toHaveBeenCalled();
+      expect(actionSpies.fetchTestSuite).toHaveBeenCalled();
     });
   });
 

@@ -141,6 +141,24 @@ describe('Actions TestReports Store', () => {
         },
       );
     });
+
+    describe('when we already have the suite data', () => {
+      it('should not fetch suite', done => {
+        const index = 0;
+        testReports.test_suites[0].hasFullSuite = true;
+
+        testAction(actions.fetchTestSuite, index, { ...state, testReports }, [], [], done);
+      });
+    });
+
+    describe('when we already have the full report data', () => {
+      it('should not fetch suite', done => {
+        const index = 0;
+        testReports.hasFullReport = true;
+
+        testAction(actions.fetchTestSuite, index, { ...state, testReports }, [], [], done);
+      });
+    });
   });
 
   describe('fetch full report', () => {

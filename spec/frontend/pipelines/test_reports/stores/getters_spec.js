@@ -51,17 +51,8 @@ describe('Getters TestReports Store', () => {
     it('should return the selected suite', () => {
       setupState();
 
-      const selectedSuite = getters.getSelectedSuite(state)();
+      const selectedSuite = getters.getSelectedSuite(state);
       const expected = testReports.test_suites[state.selectedSuiteIndex];
-
-      expect(selectedSuite).toEqual(expected);
-    });
-
-    it('should return the suite at the given index', () => {
-      setupState();
-
-      const selectedSuite = getters.getSelectedSuite(state)(0);
-      const expected = testReports.test_suites[0];
 
       expect(selectedSuite).toEqual(expected);
     });
