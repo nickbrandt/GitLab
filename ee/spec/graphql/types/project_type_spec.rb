@@ -45,9 +45,11 @@ RSpec.describe GitlabSchema.types['Project'] do
 
     before do
       project.add_developer(user)
-      create(:ci_build, :sast, pipeline: pipeline, status: 'success')
-      create(:ci_build, :dast, pipeline: pipeline, status: 'success')
-      create(:ci_build, :secret_detection, pipeline: pipeline, status: 'pending')
+      create(:ci_build, :success, :sast, pipeline: pipeline)
+      create(:ci_build, :success, :dast, pipeline: pipeline)
+      create(:ci_build, :success, :license_scanning, pipeline: pipeline)
+      create(:ci_build, :success, :license_management, pipeline: pipeline)
+      create(:ci_build, :pending, :secret_detection, pipeline: pipeline)
     end
 
     it 'returns a list of analyzers enabled for the project' do
