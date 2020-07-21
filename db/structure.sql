@@ -12527,7 +12527,7 @@ CREATE TABLE public.issues (
     health_status smallint,
     external_key character varying(255),
     sprint_id bigint,
-    CONSTRAINT check_fba63f706d CHECK ((lock_version IS NOT NULL))
+    issue_type smallint DEFAULT 0
 );
 
 CREATE SEQUENCE public.issues_id_seq
@@ -19695,6 +19695,8 @@ CREATE INDEX index_issues_on_confidential ON public.issues USING btree (confiden
 CREATE INDEX index_issues_on_description_trigram ON public.issues USING gin (description public.gin_trgm_ops);
 
 CREATE INDEX index_issues_on_duplicated_to_id ON public.issues USING btree (duplicated_to_id) WHERE (duplicated_to_id IS NOT NULL);
+
+CREATE INDEX index_issues_on_issue_type ON public.issues USING btree (issue_type);
 
 CREATE INDEX index_issues_on_last_edited_by_id ON public.issues USING btree (last_edited_by_id);
 
