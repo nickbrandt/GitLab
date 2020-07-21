@@ -57,7 +57,7 @@ module StatusPage
       # Return a Set of all keys with a given prefix
       def list_object_keys(prefix)
         wrap_errors(prefix: prefix) do
-          list_objects(prefix).reduce(Set.new) do |objects, (response, index)|
+          list_objects(prefix).reduce(Set.new) do |objects, (response, _index)|
             break objects if objects.size >= StatusPage::Storage::MAX_UPLOADS
 
             objects | response.contents.map(&:key)
