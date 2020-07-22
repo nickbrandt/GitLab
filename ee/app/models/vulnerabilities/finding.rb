@@ -6,11 +6,13 @@ module Vulnerabilities
     include ::Gitlab::Utils::StrongMemoize
     include Presentable
 
+    # https://gitlab.com/groups/gitlab-org/-/epics/3148
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/214563#note_370782508 is why the table names are not renamed
     self.table_name = "vulnerability_occurrences"
 
-    OCCURRENCES_PER_PAGE = 20
+    FINDINGS_PER_PAGE = 20
 
-    paginates_per OCCURRENCES_PER_PAGE
+    paginates_per FINDINGS_PER_PAGE
 
     sha_attribute :project_fingerprint
     sha_attribute :location_fingerprint
