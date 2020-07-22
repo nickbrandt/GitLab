@@ -20,7 +20,7 @@ describe('Network Policy actions', () => {
   let state;
   let mock;
   const environmentId = 3;
-  const policy = { name: 'policy', manifest: 'foo', isEnabled: true };
+  const policy = { name: 'policy', manifest: 'foo', isEnabled: true, isStandard: true };
 
   beforeEach(() => {
     state = getInitialState();
@@ -139,7 +139,7 @@ describe('Network Policy actions', () => {
   });
 
   describe('createPolicy', () => {
-    const createdPolicy = { name: 'policy', manifest: 'bar', isEnabled: true };
+    const createdPolicy = { name: 'policy', manifest: 'bar', isEnabled: true, isStandard: true };
 
     describe('on success', () => {
       beforeEach(() => {
@@ -147,6 +147,7 @@ describe('Network Policy actions', () => {
           .onPost(networkPoliciesEndpoint, {
             environment_id: environmentId,
             manifest: policy.manifest,
+            is_standard: true,
           })
           .replyOnce(httpStatus.OK, createdPolicy);
       });
@@ -177,6 +178,7 @@ describe('Network Policy actions', () => {
           .onPost(networkPoliciesEndpoint, {
             environment_id: environmentId,
             manifest: policy.manifest,
+            is_standard: true,
           })
           .replyOnce(500, error);
       });
@@ -241,7 +243,7 @@ describe('Network Policy actions', () => {
   });
 
   describe('updatePolicy', () => {
-    const updatedPolicy = { name: 'policy', manifest: 'bar', isEnabled: true };
+    const updatedPolicy = { name: 'policy', manifest: 'bar', isEnabled: true, isStandard: true };
 
     describe('on success', () => {
       beforeEach(() => {
@@ -250,6 +252,7 @@ describe('Network Policy actions', () => {
             environment_id: environmentId,
             manifest: policy.manifest,
             enabled: policy.isEnabled,
+            is_standard: policy.isStandard,
           })
           .replyOnce(httpStatus.OK, updatedPolicy);
       });
@@ -279,6 +282,7 @@ describe('Network Policy actions', () => {
             environment_id: environmentId,
             manifest: policy.manifest,
             enabled: policy.isEnabled,
+            is_standard: policy.isStandard,
           })
           .replyOnce(500, error);
       });
