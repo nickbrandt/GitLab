@@ -257,7 +257,9 @@ RSpec.describe Issues::CloseService do
           let!(:alert) { create(:alert_management_alert, issue: issue, project: project) }
 
           it 'resolves an alert and sends a system note' do
-            expect(SystemNoteService).to receive(:closed_alert_issue).with(alert, issue, instance_of(User))
+            expect_next_instance_of(SystemNotes::AlertManagementService) do |notes_service|
+              expect(notes_service).to receive(:closed_alert_issue).with(issue)
+            end
 
             close_issue
 

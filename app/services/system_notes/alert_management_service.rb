@@ -20,7 +20,6 @@ module SystemNotes
 
     # Called when an issue is created based on an AlertManagement::Alert
     #
-    # alert - AlertManagement::Alert object.
     # issue - Issue object.
     #
     # Example Note text:
@@ -34,9 +33,8 @@ module SystemNotes
       create_note(NoteSummary.new(noteable, project, author, body, action: 'alert_issue_added'))
     end
 
-    # Called when an AlertManagement::Alert is resolved due to the associated alert being closed
+    # Called when an AlertManagement::Alert is resolved due to the associated issue being closed
     #
-    # alert - AlertManagement::Alert object.
     # issue - Issue object.
     #
     # Example Note text:
