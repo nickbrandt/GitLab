@@ -1,9 +1,9 @@
 # Reply by email
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/1173) in GitLab 8.0.
+
 GitLab can be set up to allow users to comment on issues and merge requests by
 replying to notification emails.
-
-Reply by email was added in [GitLab 8.0](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/1173). Please make sure to update to this version.
 
 ## Requirement
 
