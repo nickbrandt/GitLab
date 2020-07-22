@@ -51,6 +51,7 @@ export const generateVulnerabilities = () => [
   },
   {
     id: 'id_2',
+    identifiers: [],
     title: 'Vulnerability 2',
     severity: 'high',
     state: 'opened',
