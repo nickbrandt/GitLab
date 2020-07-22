@@ -23,9 +23,9 @@ is completed in GitLab.
 
 Features include:
 
-- **Mention a Jira issue ID** in a commit message or MR (merge request) and:
+- **Mention a Jira issue ID** in a commit message or MR (merge request) and
   - GitLab links to the Jira issue.
-  - The Jira issue adds a comment with details and a link back to the  activity in GitLab.
+  - The Jira issue adds a comment with details and a link back to the activity in GitLab.
 - **Mention that a commit or MR resolves/closes a specific Jira issue** and when it's merged to the default branch:
   - GitLab's MR displays a note that it closed the Jira issue. Before the merge, it showed that it "Closes" that Jira issue.
   - The Jira issue shows the activity and is closed or otherwise transitioned as specified in your GitLab settings.
