@@ -17,6 +17,12 @@ module EE
               description: 'Weight of the issue',
               resolve: -> (obj, _args, _ctx) { obj.supports_weight? ? obj.weight : nil }
 
+        field :blocked, GraphQL::BOOLEAN_TYPE, null: false,
+              description: 'Indicates the issue is blocked',
+              resolve: -> (obj, _args, ctx) {
+                ::Gitlab::Graphql::Aggregations::Issues::LazyBlockAggregate.new(ctx, obj.id)
+              }
+
         field :health_status,
           ::Types::HealthStatusEnum,
           null: true,

@@ -4151,6 +4151,11 @@ type EpicIssue implements Noteable {
   author: User!
 
   """
+  Indicates the issue is blocked
+  """
+  blocked: Boolean!
+
+  """
   Timestamp of when the issue was closed
   """
   closedAt: Time
@@ -5766,6 +5771,11 @@ type Issue implements Noteable {
   User that created the issue
   """
   author: User!
+
+  """
+  Indicates the issue is blocked
+  """
+  blocked: Boolean!
 
   """
   Timestamp of when the issue was closed
