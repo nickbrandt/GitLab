@@ -90,7 +90,6 @@ export default {
     },
     handleQuote() {
       const documentFragment = getSelectedFragment();
-      const area = this.$parent.$slots.textarea[0].elm;
 
       if (!documentFragment || !documentFragment.textContent) {
         this.tag = '> ';
@@ -99,6 +98,7 @@ export default {
       this.tag = '';
 
       const transformed = CopyAsGFM.transformGFMSelection(documentFragment);
+      const area = this.$el.parentNode.querySelector('textarea');
 
       CopyAsGFM.nodeToGFM(transformed)
         .then(gfm => {
@@ -136,7 +136,7 @@ export default {
             :tag="tag"
             :button-title="__('Insert a quote')"
             icon="quote"
-            @update-tag="handleQuote"
+            @click="handleQuote"
           />
         </div>
         <div class="d-inline-block ml-md-2 ml-0">
