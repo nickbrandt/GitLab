@@ -1135,48 +1135,39 @@ Usage examples:
   [Bootstrap utility class](https://getbootstrap.com/docs/4.4/utilities/float/):
   `**{tanuki, 32, float-right}**` renders as: **{tanuki, 32, float-right}**
 
-### Use GitLab SVGs to describe UI elements
+### When to use icons
 
-When using GitLab SVGs to describe screen elements, also include the name or tooltip of the element as text.
+Icons should be used sparingly, and only in ways that aid and do not hinder the readability of the
+text.
 
-For example, for references to the Admin Area:
-
-- Correct: `**{admin}** **Admin Area > Settings**` (**{admin}** **Admin Area > Settings**)
-- Incorrect: `**{admin}** **> Settings**` (**{admin}** **> Settings**)
-
-This will ensure that the source Markdown remains readable and should help with accessibility.
-
-The following are examples of source Markdown for menu items with their published output:
+For example, the following adds little to the accompanying text:
 
 ```markdown
 1. Go to **{home}** **Project overview > Details**
-1. Go to **{doc-text}** **Repository > Branches**
-1. Go to **{issues}** **Issues > List**
-1. Go to **{merge-request}** **Merge Requests**
-1. Go to **{rocket}** **CI/CD > Pipelines**
-1. Go to **{shield}** **Security & Compliance > Configuration**
-1. Go to **{cloud-gear}** **Operations > Metrics**
-1. Go to **{package}** **Packages > Container Registry**
-1. Go to **{chart}** **Project Analytics > Code Review**
-1. Go to **{book}** **Wiki**
-1. Go to **{snippet}** **Snippets**
-1. Go to **{users}** **Members**
-1. Select the **More actions** **{ellipsis_v}** icon  > **Hide stage**
 ```
 
 1. Go to **{home}** **Project overview > Details**
-1. Go to **{doc-text}** **Repository > Branches**
-1. Go to **{issues}** **Issues > List**
-1. Go to **{merge-request}** **Merge Requests**
-1. Go to **{rocket}** **CI/CD > Pipelines**
-1. Go to **{shield}** **Security & Compliance > Configuration**
-1. Go to **{cloud-gear}** **Operations > Metrics**
-1. Go to **{package}** **Packages > Container Registry**
-1. Go to **{chart}** **Project Analytics > Code Review**
-1. Go to **{book}** **Wiki**
-1. Go to **{snippet}** **Snippets**
-1. Go to **{users}** **Members**
-1. Select the **More actions** **{ellipsis_v}** icon > **Hide stage**
+
+However, the following might help the reader connect the text to the user interface:
+
+```markdown
+| Section                  | Description                                                                                                                 |
+|:-------------------------|:----------------------------------------------------------------------------------------------------------------------------|
+| **{overview}** Overview  | View your GitLab Dashboard, and administer projects, users, groups, jobs, Runners, and Gitaly servers.                      |
+| **{monitor}** Monitoring | View GitLab system information, and information on background jobs, logs, health checks, requests profiles, and audit logs. |
+| **{messages}** Messages  | Send and manage broadcast messages for your users.                                                                          |
+```
+
+| Section                  | Description                                                                                                                 |
+|:-------------------------|:----------------------------------------------------------------------------------------------------------------------------|
+| **{overview}** Overview  | View your GitLab Dashboard, and administer projects, users, groups, jobs, Runners, and Gitaly servers.                      |
+| **{monitor}** Monitoring | View GitLab system information, and information on background jobs, logs, health checks, requests profiles, and audit logs. |
+| **{messages}** Messages  | Send and manage broadcast messages for your users.                                                                          |
+
+Use an icon when you find youself having to describe an interface element. For example:
+
+- Do: Click the Admin Area icon ( **{admin}** ).
+- Don't: Click the Admin Area icon (the wrench icon).
 
 ## Alert boxes
 
