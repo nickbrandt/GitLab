@@ -131,7 +131,7 @@ describe('JiraImportForm', () => {
       it('shows all user mappings', () => {
         wrapper = mountComponent({ mountFunction: mount });
 
-        expect(getTable().findAll('tbody tr').length).toBe(defaultUserMappings.length);
+        expect(getTable().findAll('tbody tr')).toHaveLength(2);
       });
 
       it('shows correct information in each cell', () => {
