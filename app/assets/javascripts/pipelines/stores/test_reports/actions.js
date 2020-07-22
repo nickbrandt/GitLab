@@ -37,7 +37,7 @@ export const fetchTestSuite = ({ state, commit, dispatch }, index) => {
   const { hasFullSuite } = state.testReports?.test_suites?.[index] || {};
   // We don't need to fetch the suite if we have the information already
   if (state.hasFullReport || hasFullSuite) {
-    return false;
+    return Promise.resolve();
   }
 
   dispatch('toggleLoading');
