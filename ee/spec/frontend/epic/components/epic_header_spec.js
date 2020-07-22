@@ -12,7 +12,6 @@ import { mockEpicMeta, mockEpicData } from '../mock_data';
 describe('EpicHeaderComponent', () => {
   let wrapper;
   let store;
-  let features = {};
 
   beforeEach(() => {
     store = createStore();
@@ -21,9 +20,6 @@ describe('EpicHeaderComponent', () => {
 
     wrapper = shallowMount(EpicHeader, {
       store,
-      provide: {
-        glFeatures: features,
-      },
     });
   });
 
@@ -169,29 +165,19 @@ describe('EpicHeaderComponent', () => {
       });
     });
 
-    it('does not render new epic button without `createEpicForm` feature flag', () => {
-      expect(findNewEpicButton().exists()).toBeFalsy();
+    it('does not render new epic button if user cannot create it', () => {
+      store.state.canCreate = false;
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findNewEpicButton().exists()).toBe(false);
+      });
     });
 
-    describe('with `createEpicForm` feature flag', () => {
-      beforeAll(() => {
-        features = { createEpicForm: true };
-      });
+    it('renders new epic button if user can create it', () => {
+      store.state.canCreate = true;
 
-      it('does not render new epic button if user cannot create it', () => {
-        store.state.canCreate = false;
-
-        return wrapper.vm.$nextTick().then(() => {
-          expect(findNewEpicButton().exists()).toBe(false);
-        });
-      });
-
-      it('renders new epic button if user can create it', () => {
-        store.state.canCreate = true;
-
-        return wrapper.vm.$nextTick().then(() => {
-          expect(findNewEpicButton().exists()).toBe(true);
-        });
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findNewEpicButton().exists()).toBe(true);
       });
     });
   });
