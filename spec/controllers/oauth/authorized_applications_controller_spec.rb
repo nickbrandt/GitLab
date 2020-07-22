@@ -34,4 +34,8 @@ describe Oauth::AuthorizedApplicationsController do
       expect(access_token.reload).to be_revoked
     end
   end
+
+  it 'includes Two-factor enforcement concern' do
+    expect(described_class.included_modules.include?(EnforcesTwoFactorAuthentication)).to eq(true)
+  end
 end

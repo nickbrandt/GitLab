@@ -1,0 +1,5 @@
+---
+title: Enforce 2FA on Doorkeeper controllers
+merge_request:
+author:
+type: security
