@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Oauth::AuthorizationsController do
   let(:user) { create(:user, confirmed_at: confirmed_at) }
+  let(:confirmed_at) { 1.hour.ago }
   let!(:application) { create(:oauth_application, scopes: 'api read_user', redirect_uri: 'http://example.com') }
   let(:params) do
     {
@@ -20,8 +21,6 @@ RSpec.describe Oauth::AuthorizationsController do
 
   shared_examples 'OAuth Authorizations require confirmed user' do
     context 'when the user is confirmed' do
-      let(:confirmed_at) { 1.hour.ago }
-
       context 'when there is already an access token for the application with a matching scope' do
         before do
           scopes = Doorkeeper::OAuth::Scopes.from_string('api')
@@ -102,5 +101,9 @@ RSpec.describe Oauth::AuthorizationsController do
     subject { delete :destroy, params: params }
 
     include_examples 'OAuth Authorizations require confirmed user'
+  end
+
+  it 'includes Two-factor enforcement concern' do
+    expect(described_class.included_modules.include?(EnforcesTwoFactorAuthentication)).to eq(true)
   end
 end
