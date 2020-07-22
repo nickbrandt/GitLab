@@ -27,7 +27,7 @@ Features include:
   - GitLab links to the Jira issue.
   - The Jira issue links to the commit/MR in GitLab.
   - The Jira issue adds a comment with details on the activity (optional).
-- **Mention that a commit/MR closes/fesolves/fixes a Jira issue by ID** and when it's merged to the default branch:
+- **Mention that a commit/MR closes/resolves a Jira issue by ID** and when it's merged to the default branch:
   - GitLab's MR page displays a note that it "Closed" the Jira issue. Before the merge, it displays that it "Closes" the Jira issue.
   - The Jira issue shows the activity and the Jira issue is closed or otherwise transitioned as specified in your settings.
 - **View Jira issues in GitLab** **(PREMIUM)**
