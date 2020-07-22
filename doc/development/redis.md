@@ -50,7 +50,6 @@ project:{1}:set_b
 project:{2}:set_c
 ```
 
-
 `set_a` and `set_b` are guaranteed to be held on the same Redis server, while `set_c` is not.
 
 Currently, we validate this in the development and test environments

@@ -47,7 +47,7 @@ RSpec.describe Gitlab::Analytics::UniqueVisits, :clean_gitlab_redis_shared_state
       unique_visits.track_visit(visitor1_id, target1_id)
 
       Gitlab::Redis::SharedState.with do |redis|
-        redis.scan_each(match: "#{target1_id}-*").each do |key|
+        redis.scan_each(match: "{#{target1_id}}-*").each do |key|
           expect(redis.ttl(key)).to be_within(5.seconds).of(12.weeks)
         end
       end
