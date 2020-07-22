@@ -10,6 +10,10 @@ module Groups::SecurityFeaturesHelper
     can?(current_user, :read_group_compliance_dashboard, group)
   end
 
+  def authorize_compliance_dashboard!
+    render_404 unless group_level_compliance_dashboard_available?(group)
+  end
+
   def group_level_credentials_inventory_available?(group)
     can?(current_user, :read_group_credentials_inventory, group) &&
     group.feature_available?(:credentials_inventory) &&
