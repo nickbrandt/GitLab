@@ -2,8 +2,8 @@
 require 'pathname'
 
 module QA
-  RSpec.describe 'Monitor', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/230927', type: :stale } do
-    describe 'with Prometheus in a Gitlab-managed cluster', :orchestrated, :kubernetes do
+  RSpec.describe 'Monitor' do
+    describe 'with Prometheus in a Gitlab-managed cluster', :orchestrated, :kubernetes, :requires_admin do
       before :all do
         @cluster = Service::KubernetesCluster.new(provider_class: Service::ClusterProvider::K3s).create!
         @project = Resource::Project.fabricate_via_api! do |project|
@@ -70,7 +70,6 @@ module QA
         Resource::KubernetesCluster::ProjectCluster.fabricate! do |cluster_settings|
           cluster_settings.project = @project
           cluster_settings.cluster = @cluster
-          cluster_settings.install_helm_tiller = true
           cluster_settings.install_runner = true
           cluster_settings.install_ingress = true
           cluster_settings.install_prometheus = true
