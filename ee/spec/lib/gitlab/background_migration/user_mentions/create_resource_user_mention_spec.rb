@@ -68,6 +68,14 @@ RSpec.describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMent
 
         it_behaves_like 'resource mentions migration', MigrateEpicMentionsToDb, Epic
 
+        context 'when FF disabled' do
+          before do
+            stub_feature_flags(migrate_user_mentions: false)
+          end
+
+          it_behaves_like 'resource migration not run', MigrateEpicMentionsToDb, Epic
+        end
+
         context 'mentions in epic notes' do
           let!(:note1) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: description_mentions) }
           let!(:note2) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: 'sample note') }
@@ -78,6 +86,14 @@ RSpec.describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMent
           let!(:note5) { notes.create!(noteable_id: non_existing_record_id, noteable_type: 'Epic', author_id: author.id, note: description_mentions, project_id: project.id) }
 
           it_behaves_like 'resource notes mentions migration', MigrateEpicNotesMentionsToDb, Epic
+
+          context 'when FF disabled' do
+            before do
+              stub_feature_flags(migrate_user_mentions: false)
+            end
+
+            it_behaves_like 'resource notes migration not run', MigrateEpicNotesMentionsToDb, Epic
+          end
         end
       end
     end
@@ -102,6 +118,14 @@ RSpec.describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMent
       let(:resource) { design }
 
       it_behaves_like 'resource notes mentions migration', MigrateDesignNotesMentionsToDb, DesignManagement::Design
+
+      context 'when FF disabled' do
+        before do
+          stub_feature_flags(migrate_user_mentions: false)
+        end
+
+        it_behaves_like 'resource notes migration not run', MigrateDesignNotesMentionsToDb, DesignManagement::Design
+      end
     end
   end
 
