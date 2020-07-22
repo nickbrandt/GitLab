@@ -157,7 +157,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
       let(:finding) { build(:ci_reports_security_finding, severity: nil) }
 
       before do
-          subject.add_finding(finding)
+        subject.add_finding(finding)
       end
 
       it { expect(subject.unsafe_severity?).to be(false) }
@@ -168,7 +168,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
       let(:finding) { build(:ci_reports_security_finding, severity: '') }
 
       before do
-          subject.add_finding(finding)
+        subject.add_finding(finding)
       end
 
       it { expect(subject.unsafe_severity?).to be(false) }

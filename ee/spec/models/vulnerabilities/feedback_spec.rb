@@ -228,7 +228,7 @@ RSpec.describe Vulnerabilities::Feedback do
     let(:expected_occurrence_key) { { project_id: project_id, category: category, project_fingerprint: project_fingerprint } }
     let(:feedback) { build(:vulnerability_feedback, expected_occurrence_key) }
 
-    subject { feedback.occurrence_key }
+    subject { feedback.finding_key }
 
     it { is_expected.to eq(expected_occurrence_key) }
   end

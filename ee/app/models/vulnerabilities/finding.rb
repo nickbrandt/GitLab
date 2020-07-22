@@ -194,10 +194,10 @@ module Vulnerabilities
     end
 
     def load_feedback
-      BatchLoader.for(occurrence_key).batch(replace_methods: false) do |occurrence_keys, loader|
-        project_ids = occurrence_keys.map { |key| key[:project_id] }
-        categories = occurrence_keys.map { |key| key[:category] }
-        fingerprints = occurrence_keys.map { |key| key[:project_fingerprint] }
+      BatchLoader.for(finding_key).batch(replace_methods: false) do |finding_keys, loader|
+        project_ids = finding_keys.map { |key| key[:project_id] }
+        categories = finding_keys.map { |key| key[:category] }
+        fingerprints = finding_keys.map { |key| key[:project_fingerprint] }
 
         feedback = Vulnerabilities::Feedback.all_preloaded.where(
           project_id: project_ids.uniq,
@@ -205,10 +205,10 @@ module Vulnerabilities
           project_fingerprint: fingerprints.uniq
         ).to_a
 
-        occurrence_keys.each do |occurrence_key|
+        finding_keys.each do |finding_key|
           loader.call(
-            occurrence_key,
-            feedback.select { |f| occurrence_key == f.occurrence_key }
+            finding_key,
+            feedback.select { |f| finding_key == f.finding_key }
           )
         end
       end
@@ -311,7 +311,7 @@ module Vulnerabilities
 
     private
 
-    def occurrence_key
+    def finding_key
       {
         project_id: project_id,
         category: report_type,
