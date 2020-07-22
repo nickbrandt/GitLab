@@ -10,7 +10,7 @@ GitLab Issues are a powerful tool for discussing ideas and planning and tracking
 However, many organizations have been using Jira for these purposes and have
 extensive data and business processes built into it.
 
-While you can always migrate content and process from Jira to GitLab Issues,
+While you can always [migrate](../../../user/project/import/jira.md) issues and processes from Jira to GitLab Issues,
 you can also opt to continue using Jira and use it together with GitLab through
 our integration.
 
@@ -21,19 +21,21 @@ detect and cross-reference activity between the GitLab project and any of your p
 in Jira. This includes the ability to close or transition Jira issues when the work
 is completed in GitLab.
 
-Here's how the integration responds when you take the following actions in GitLab:
+Features include:
 
-- **Mention a Jira issue ID** in a commit message or MR (merge request).
-  - GitLab hyperlinks to the Jira issue.
-  - The Jira issue adds an issue link to the commit/MR in GitLab.
-  - The Jira issue adds a comment reflecting the comment made in GitLab, the comment author, and a link to the commit/MR in GitLab, unless this commenting to Jira is [disabled](#disabling-comments-on-jira-issues).
-- **Mention that a commit or MR 'closes', 'resolves', or 'fixes' a Jira issue ID**. When the commit is made on the project's default branch (usually master) or the change is merged to the default branch:
-  - GitLab's merge request page displays a note that it "Closed" the Jira issue, with a link to the issue. (Note: Before the merge, an MR will display that it "Closes" the Jira issue.)
-  - The Jira issue shows the activity and the Jira issue is closed, or otherwise transitioned.
+- **Mention a Jira issue ID** in a commit message or MR (merge request) and
+  - GitLab links to the Jira issue.
+  - The Jira issue links to the commit/MR in GitLab.
+  - The Jira issue adds a comment with details on the activity (optional).
+- **Mention that a commit/MR closes/fesolves/fixes a Jira issue by ID** and when it's merged to the default branch:
+  - GitLab's MR page displays a note that it "Closed" the Jira issue. Before the merge, it displays that it "Closes" the Jira issue.
+  - The Jira issue shows the activity and the Jira issue is closed or otherwise transitioned as specified in your settings.
+- **View Jira issues in GitLab** **(PREMIUM)**
 
-You can also use [Jira's Smart Commits](https://confluence.atlassian.com/fisheye/using-smart-commits-960155400.html)
-directly from GitLab, as covered in the article
-[How and why to integrate GitLab with Jira](https://www.programmableweb.com/news/how-and-why-to-integrate-gitlab-jira/how-to/2017/04/25).
+For additional features, you can install the [Jira Development Panel integration](../../../integration/jira_development_panel.md). This enables you to:
+
+- In a Jira issue, display relevant GitLab information in a side panel, including related branches, commits, and merge requests.
+- Use [Smart Commits](https://confluence.atlassian.com/fisheye/using-smart-commits-960155400.html) to add Jira comments, log time spent on the issue, and apply any issue transition.
 
 ## Configuration
 
