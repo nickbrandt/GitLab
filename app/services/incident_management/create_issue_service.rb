@@ -3,6 +3,7 @@
 module IncidentManagement
   class CreateIssueService < BaseService
     include Gitlab::Utils::StrongMemoize
+    include IncidentManagement::Settings
 
     def initialize(project, params)
       super(project, User.alert_bot, params)
@@ -12,23 +13,20 @@ module IncidentManagement
       return error_with('setting disabled') unless incident_management_setting.create_issue?
       return error_with('invalid alert') unless alert.valid?
 
-      issue = create_issue
-      return error_with(issue_errors(issue)) unless issue.valid?
+      result = create_issue
+      return error_with(result.message) unless result.success?
 
-      success(issue: issue)
+      success(issue: result.payload[:issue])
     end
 
     private
 
     def create_issue
-      label_result = find_or_create_incident_label
-
-      Issues::CreateService.new(
+      ::IncidentManagement::Incidents::CreateService.new(
         project,
         current_user,
         title: issue_title,
-        description: issue_description,
-        label_ids: [label_result.payload[:label].id]
+        description: issue_description
       ).execute
     end
 
@@ -44,10 +42,6 @@ module IncidentManagement
         alert_markdown,
         issue_template_content
       ].compact.join(horizontal_line)
-    end
-
-    def find_or_create_incident_label
-      IncidentManagement::CreateIncidentLabelService.new(project, current_user).execute
     end
 
     def alert_summary
@@ -66,17 +60,6 @@ module IncidentManagement
 
     def issue_template_content
       incident_management_setting.issue_template_content
-    end
-
-    def incident_management_setting
-      strong_memoize(:incident_management_setting) do
-        project.incident_management_setting ||
-          project.build_incident_management_setting
-      end
-    end
-
-    def issue_errors(issue)
-      issue.errors.full_messages.to_sentence
     end
 
     def error_with(message)

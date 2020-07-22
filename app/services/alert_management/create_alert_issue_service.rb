@@ -16,9 +16,9 @@ module AlertManagement
       return error_issue_already_exists if alert.issue
 
       result = create_issue
-      issue = result.payload[:issue]
+      return result unless result.success?
 
-      return error(result.message, issue) if result.error?
+      issue = result.payload[:issue]
       return error(object_errors(alert), issue) unless associate_alert_with_issue(issue)
 
       SystemNoteService.new_alert_issue(alert, issue, user)
@@ -37,27 +37,16 @@ module AlertManagement
     end
 
     def create_issue
-      label_result = find_or_create_incident_label
-
-      issue = Issues::CreateService.new(
+      ::IncidentManagement::Incidents::CreateService.new(
         project,
         user,
         title: alert_presenter.title,
-        description: alert_presenter.issue_description,
-        label_ids: [label_result.payload[:label].id]
+        description: alert_presenter.issue_description
       ).execute
-
-      return error(object_errors(issue), issue) unless issue.valid?
-
-      success(issue)
     end
 
     def associate_alert_with_issue(issue)
       alert.update(issue_id: issue.id)
-    end
-
-    def success(issue)
-      ServiceResponse.success(payload: { issue: issue })
     end
 
     def error(message, issue = nil)
@@ -76,10 +65,6 @@ module AlertManagement
       strong_memoize(:alert_presenter) do
         alert.present
       end
-    end
-
-    def find_or_create_incident_label
-      IncidentManagement::CreateIncidentLabelService.new(project, user).execute
     end
 
     def object_errors(object)

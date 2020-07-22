@@ -197,10 +197,6 @@ RSpec.describe IncidentManagement::CreateIssueService do
         it_behaves_like 'invalid alert'
       end
     end
-
-    describe "label `incident`" do
-      it_behaves_like 'create alert issue sets issue labels'
-    end
   end
 
   context 'when create_issue disabled' do
