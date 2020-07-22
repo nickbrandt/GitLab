@@ -8,7 +8,7 @@ module Registrations
     before_action :check_experiment_enabled
 
     def new
-      @group = Group.new
+      @group = Group.new(visibility_level: helpers.default_group_visibility)
     end
 
     def create

@@ -41,7 +41,7 @@
           .form-group.col-sm-12
             = f.label :visibility_level, class: 'label-bold' do
               = _('Visibility level')
-            = render 'shared/visibility_level', f: f, visibility_level: default_group_visibility, can_change_visibility_level: true, form_model: @group, with_label: false
+            .js-visibility-level-dropdown{ data: { visibility_level_options: visibility_level_options.to_json, default_level: f.object.visibility_level } }
         .row
           .form-group.col-sm-12.mb-0
             = button_tag class: %w[btn btn-success w-100] do
