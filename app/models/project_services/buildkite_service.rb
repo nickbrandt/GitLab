@@ -18,6 +18,13 @@ class BuildkiteService < CiService
     %w(push merge_request tag_push)
   end
 
+  # This is a stub method to work with deprecated API response
+  # TODO: remove enable_ssl_verification after 14.0
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/222808
+  def enable_ssl_verification
+    true
+  end
+
   # Since SSL verification will always be enabled for Buildkite,
   # we no longer needs to store the boolean.
   # This is a stub method to work with deprecated API param.
