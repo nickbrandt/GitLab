@@ -209,6 +209,66 @@ RSpec.describe API::Namespaces do
         expect(runners).to all(receive(:tick_runner_queue))
       end
     end
+
+    context "when passing attributes for gitlab_subscription" do
+      let(:gitlab_subscription) do
+        {
+          start_date: '2019-06-01',
+          end_date: '2020-06-01',
+          plan_code: 'gold',
+          seats: 20,
+          max_seats_used: 10,
+          auto_renew: true,
+          trial: true,
+          trial_ends_on: '2019-05-01',
+          trial_starts_on: '2019-06-01'
+        }
+      end
+
+      it "creates the gitlab_subscription record" do
+        expect(group1.gitlab_subscription).to be_nil
+
+        put api("/namespaces/#{group1.id}", admin), params: {
+          gitlab_subscription_attributes: gitlab_subscription
+        }
+
+        expect(group1.reload.gitlab_subscription).to have_attributes(
+          start_date: Date.parse(gitlab_subscription[:start_date]),
+          end_date: Date.parse(gitlab_subscription[:end_date]),
+          hosted_plan: instance_of(Plan),
+          seats: 20,
+          max_seats_used: 10,
+          auto_renew: true,
+          trial: true,
+          trial_starts_on: Date.parse(gitlab_subscription[:trial_starts_on]),
+          trial_ends_on: Date.parse(gitlab_subscription[:trial_ends_on])
+        )
+      end
+
+      it "updates the gitlab_subscription record" do
+        group1.create_gitlab_subscription!
+
+        put api("/namespaces/#{group1.id}", admin), params: {
+          gitlab_subscription_attributes: gitlab_subscription
+        }
+
+        expect(group1.reload.gitlab_subscription.reload.seats).to eq 20
+      end
+
+      context 'when params are invalid' do
+        it 'returns a 400 error' do
+          put api("/namespaces/#{group1.id}", admin), params: {
+            gitlab_subscription_attributes: { start_date: nil, seats: nil }
+          }
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response['message']).to eq(
+            "gitlab_subscription.seats" => ["can't be blank"],
+            "gitlab_subscription.start_date" => ["can't be blank"]
+          )
+        end
+      end
+    end
   end
 
   describe 'POST :id/gitlab_subscription' do
@@ -234,6 +294,12 @@ RSpec.describe API::Namespaces do
     context 'when authenticated as an admin' do
       it 'fails when some attrs are missing' do
         do_post(admin, params.except(:start_date))
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+      end
+
+      it 'fails when the record is invalid' do
+        do_post(admin, params.merge(start_date: nil))
 
         expect(response).to have_gitlab_http_status(:bad_request)
       end
