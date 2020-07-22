@@ -23544,7 +23544,7 @@ msgstr ""
 msgid "The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
 msgstr ""
 
-msgid "The CSV export will be created in the background. Once finished, it will be sent to <strong>%{email}</strong> in an attachment."
+msgid "The CSV export will be created in the background. Once finished, it will be sent to %{strong_open}%{email}%{strong_close} in an attachment."
 msgstr ""
 
 msgid "The Git LFS objects will <strong>not</strong> be synced."

@@ -469,14 +469,6 @@
   plural_id:
   translations:
     - "Acelere sus DevOps<br>con GitLab"
-"The CSV export will be created in the background. Once finished, it will be sent to <strong>%{email}</strong> in an attachment.":
-  plural_id:
-  translations:
-    - "CSVエクスポートをバックグラウンドで作成します。終了後に、<strong>%{email}</strong> に添付してメールで送信されます。"
-    - "Экспорт в CSV будет произведён в фоновом режиме. По завершении результат будет отправлен на <strong>%{email}</strong> во вложении."
-    - "CSV导出将在后台创建。完成后，它将以附件形式发送到<strong>%{email}</strong>。"
-    - "Експорт CSV буде створено у фоновому режимі. Після завершення його буде надіслано на <strong>%{email}</strong> у вкладенні."
-    - "La exportación CSV se creará en segundo plano. Una vez finalizada, será enviada a <strong>%{email}</strong> como un fichero adjunto al correo electrónico."
 "The Git LFS objects will <strong>not</strong> be synced.":
   plural_id:
   translations:
@@ -1053,3 +1045,11 @@
     - "Wenn du eine(n) GitLab-Benutzer(in) azswählst, wird in der Beschreibung des Tickets und den Kommentaren ein Link zum/zur Benutzer(in) hinzugefügt (z. B. \\\"Von <a href=\\\"#\\\">@johnsmith</a>\\\"). Außerdem wird der/die ausgewählte Benutzer(in) dem Ticket oder Kommentar zugeordnet und/oder es ihm/ihr zugewiesen."
     - "La sélection d’un utilisateur de GitLab va ajouter un lien vers cet utilisateur dans les descriptions des tickets et des commentaires (p. ex., « Par <a href=\\\"#\\\">@johnsmith</a> »). Les tickets et commentaires seront également associés ou assignés à cet utilisateur."
     - "Al seleccionar un usuario de GitLab añadirá un link al usuario en la descripción de las incidencias, así como también, en los comentarios (por ejemplo, \\\"Por <a href=\\\"#\\\">@johnsmith</a>\\\"). Al hacer esto, también asociará y asignará dichas incidencias y comentarios con el usuario seleccionado."
+"The CSV export will be created in the background. Once finished, it will be sent to <strong>%{email}</strong> in an attachment.":
+  plural_id:
+  translations:
+    - "CSVエクスポートをバックグラウンドで作成します。終了後に、<strong>%{email}</strong> に添付してメールで送信されます。"
+    - "Экспорт в CSV будет произведён в фоновом режиме. По завершении результат будет отправлен на <strong>%{email}</strong> во вложении."
+    - "CSV导出将在后台创建。完成后，它将以附件形式发送到<strong>%{email}</strong>。"
+    - "Експорт CSV буде створено у фоновому режимі. Після завершення його буде надіслано на <strong>%{email}</strong> у вкладенні."
+    - "La exportación CSV se creará en segundo plano. Una vez finalizada, será enviada a <strong>%{email}</strong> como un fichero adjunto al correo electrónico."
