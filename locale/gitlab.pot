@@ -15537,6 +15537,9 @@ msgstr ""
 msgid "NetworkPolicies|Name"
 msgstr ""
 
+msgid "NetworkPolicies|New policy"
+msgstr ""
+
 msgid "NetworkPolicies|No policies detected"
 msgstr ""
 
@@ -15547,6 +15550,12 @@ msgid "NetworkPolicies|Policy %{policyName} was successfully changed"
 msgstr ""
 
 msgid "NetworkPolicies|Policy definition"
+msgstr ""
+
+msgid "NetworkPolicies|Policy description"
+msgstr ""
+
+msgid "NetworkPolicies|Policy editor"
 msgstr ""
 
 msgid "NetworkPolicies|Something went wrong, failed to update policy"
