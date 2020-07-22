@@ -11,10 +11,10 @@ request. This makes it easier to trace behavior in a
 distributed system. Without this ID it can be difficult or
 impossible to match correlating log entries.
 
-## Getting the correlation ID
+## Identify the correlation ID for a request
 
-The correlation ID is logged in structured logs under the key `correlation_id`,
-and is also logged in all response headers GitLab sends under the header
+The correlation ID is logged in structured logs under the key `correlation_id`
+and in all response headers GitLab sends under the header
 `x-request-id`. You can find your correlation ID by searching in either place.
 
 ### Getting the correlation ID in your browser
