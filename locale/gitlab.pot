@@ -27714,7 +27714,7 @@ msgstr ""
 msgid "Your license is valid from"
 msgstr ""
 
-msgid "Your license will be included in your GitLab backup and will survive upgrades, so in normal usage you should never need to re-upload your <code>.gitlab-license</code> file."
+msgid "Your license will be included in your GitLab backup and will survive upgrades, so in normal usage you should never need to re-upload your %{code_open}.gitlab-license%{code_close} file."
 msgstr ""
 
 msgid "Your message here"

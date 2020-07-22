@@ -870,9 +870,6 @@
     - "您还可以通过在变量键前面加上<code>K8S_SECRET_</code>来添加可用于正在运行的应用程序的变量。"
     - "Ви також можете додати змінні, що будуть доступними для запущеного застосунку шляхом додавання префіксу <code>K8S_SECRET_</code> до їх імен."
     - "También puede añadir variables que están disponibles para la aplicación en ejecución, anteponiendo la clave de variable con <code>K8S_SECRET_</code>."
-"Your license will be included in your GitLab backup and will survive upgrades, so in normal usage you should never need to re-upload your <code>.gitlab-license</code> file.":
-  plural_id:
-  translations:
 "confidentiality|You are going to turn off the confidentiality. This means <strong>everyone</strong> will be able to see and leave a comment on this issue.":
   plural_id:
   translations:
@@ -1053,3 +1050,6 @@
     - "Lies mehr über Projektberechtigungen <strong>%{link_to_help}</strong>"
     - "Pour en savoir plus sur les autorisations de projet : <strong>%{link_to_help}</strong>"
     - "Lea más sobre los permisos de este proyecto <strong>%{link_to_help}</strong>"
+"Your license will be included in your GitLab backup and will survive upgrades, so in normal usage you should never need to re-upload your <code>.gitlab-license</code> file.":
+  plural_id:
+  translations:
