@@ -4,8 +4,10 @@ type: reference
 
 # Finding relevant log entries with a correlation ID
 
-Since GitLab 11.6, a unique tracking ID, known as the "correlation ID" has been
-logged by the GitLab instance for most requests. This makes it easier to trace behavior in a
+Since GitLab 11.6, a unique request tracking ID, known as the "correlation ID" has been
+logged by the GitLab instance for most requests. Each individual request to GitLab gets
+its own correlation ID, which then gets logged in each GitLab component's logs for that
+request. This makes it easier to trace behavior in a
 distributed system. Without this ID it can be difficult or
 impossible to match correlating log entries.
 
