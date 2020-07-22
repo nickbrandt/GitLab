@@ -20,7 +20,7 @@ module EE
         field :blocked, GraphQL::BOOLEAN_TYPE, null: false,
               description: 'Indicates the issue is blocked',
               resolve: -> (obj, _args, ctx) {
-                ::Gitlab::Graphql::Aggregations::Issues::LazyIssueLinkAggregate.new(ctx, obj.id)
+                ::Gitlab::Graphql::Aggregations::Issues::LazyBlockAggregate.new(ctx, obj.id)
               }
 
         field :health_status,

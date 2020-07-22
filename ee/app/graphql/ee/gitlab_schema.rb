@@ -6,7 +6,7 @@ module EE
 
     prepended do
       lazy_resolve ::Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate, :epic_aggregate
-      lazy_resolve ::Gitlab::Graphql::Aggregations::Issues::LazyIssueLinkAggregate, :issue_link_aggregate
+      lazy_resolve ::Gitlab::Graphql::Aggregations::Issues::LazyBlockAggregate, :block_aggregate
     end
   end
 end

@@ -2,23 +2,25 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::Graphql::Aggregations::Issues::LazyIssueLinkAggregate do
+RSpec.describe Gitlab::Graphql::Aggregations::Issues::LazyBlockAggregate do
   let(:query_ctx) do
     {}
   end
+
   let(:issue_id) { 37 }
   let(:blocks_issue_id) { 18 }
   let(:blocking_issue_id) { 38 }
 
   describe '#initialize' do
-    it 'adds the issue_id to lazy state' do
-      described_class.new(query_ctx, issue_id)
+    it 'adds the issue_id to the lazy state' do
+      subject = described_class.new(query_ctx, issue_id)
 
-      expect(query_ctx[:lazy_issue_link_aggregate][:pending_ids]).to match [issue_id]
+      expect(subject.lazy_state[:pending_ids]).to match [issue_id]
+      expect(subject.issue_id).to match issue_id
     end
   end
 
-  describe '#issue_link_aggregate' do
+  describe '#block_aggregate' do
     subject { described_class.new(query_ctx, issue_id) }
 
     before do
@@ -27,13 +29,13 @@ RSpec.describe Gitlab::Graphql::Aggregations::Issues::LazyIssueLinkAggregate do
 
     context 'if the record has already been loaded' do
       let(:fake_state) do
-        { pending_ids: Set.new, loaded_objects: { issue_id => [] } }
+        { pending_ids: Set.new, loaded_objects: { issue_id => true } }
       end
 
       it 'does not make the query again' do
         expect(IssueLink).not_to receive(:blocked_issues_for_collection)
 
-        subject.issue_link_aggregate
+        subject.block_aggregate
       end
     end
 
@@ -42,6 +44,7 @@ RSpec.describe Gitlab::Graphql::Aggregations::Issues::LazyIssueLinkAggregate do
       let(:fake_state) do
         { pending_ids: Set.new([issue_id]), loaded_objects: {} }
       end
+
       let(:fake_data) do
         [
             double(blocked_issue_id: 1745, count: 1.0),
@@ -54,11 +57,9 @@ RSpec.describe Gitlab::Graphql::Aggregations::Issues::LazyIssueLinkAggregate do
       end
 
       it 'clears the pending IDs' do
-        subject.issue_link_aggregate
+        subject.block_aggregate
 
-        lazy_state = subject.instance_variable_get(:@lazy_state)
-
-        expect(lazy_state[:pending_ids]).to be_empty
+        expect(subject.lazy_state[:pending_ids]).to be_empty
       end
     end
   end
