@@ -10702,9 +10702,6 @@ msgstr ""
 msgid "Generate new token"
 msgstr ""
 
-msgid "GenericReports|Report"
-msgstr ""
-
 msgid "Geo"
 msgstr ""
 
@@ -19901,9 +19898,6 @@ msgstr ""
 msgid "Reporting"
 msgstr ""
 
-msgid "Reports"
-msgstr ""
-
 msgid "Reports|%{combinedString} and %{resolvedString}"
 msgstr ""
 
@@ -24027,9 +24021,6 @@ msgid "There was an error when subscribing to this label."
 msgstr ""
 
 msgid "There was an error when unsubscribing from this label."
-msgstr ""
-
-msgid "There was an error while fetching configuration data."
 msgstr ""
 
 msgid "There was an error while fetching value stream analytics data."
