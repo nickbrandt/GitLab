@@ -303,6 +303,8 @@ describe('Settings Panel', () => {
   });
 
   describe('Git Large File Storage', () => {
+    const findLfsFeatureToggle = () => wrapper.find('[name="project[lfs_enabled]"]');
+
     it('should show the LFS settings if LFS is available', () => {
       wrapper.setProps({ lfsAvailable: true });
 
@@ -331,7 +333,7 @@ describe('Settings Panel', () => {
         { lfsAvailable: true },
       );
 
-      expect(wrapper.find('[name="project[lfs_enabled]"]').props().disabledInput).toEqual(false);
+      expect(findLfsFeatureToggle().props().disabledInput).toEqual(false);
     });
 
     it('should disable the LFS input when the repository is disabled', () => {
@@ -340,7 +342,18 @@ describe('Settings Panel', () => {
         { lfsAvailable: true },
       );
 
-      expect(wrapper.find('[name="project[lfs_enabled]"]').props().disabledInput).toEqual(true);
+      expect(findLfsFeatureToggle().props().disabledInput).toEqual(true);
+    });
+
+    it('should not change lfsEnabled when disabling the repository', async () => {
+      const lfsSettingElem = findLfsFeatureToggle();
+      expect(lfsSettingElem.props().value).toEqual(true);
+
+      wrapper.setData({ repositoryAccessLevel: featureAccessLevel.NOT_ENABLED });
+      await wrapper.vm.$nextTick();
+
+      // value should not change
+      expect(lfsSettingElem.props().value).toEqual(true);
     });
 
     describe.each`
