@@ -67,17 +67,19 @@ exports[`Project Header matches the snapshot 1`] = `
       class="dropdown-menu dropdown-menu-right"
     >
       <li>
-        <gl-deprecated-button-stub
+        <gl-button-stub
+          category="tertiary"
           class="js-remove-button"
-          size="md"
-          variant="secondary"
+          icon=""
+          size="medium"
+          variant="link"
         >
           <span
             class="text-danger"
           >
              Remove 
           </span>
-        </gl-deprecated-button-stub>
+        </gl-button-stub>
       </li>
     </ul>
   </div>
