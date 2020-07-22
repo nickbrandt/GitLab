@@ -28,7 +28,7 @@ describe('static_site_editor/components/app', () => {
     buildWrapper();
 
     expect(wrapper.find(RouterView).attributes()).toMatchObject({
-      mergerequestsillustrationpath: mergeRequestsIllustrationPath,
+      'merge-requests-illustration-path': mergeRequestsIllustrationPath,
     });
   });
 });

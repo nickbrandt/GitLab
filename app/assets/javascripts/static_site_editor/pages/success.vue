@@ -37,34 +37,34 @@ export default {
       this.$router.push(HOME_ROUTE);
     }
   },
-  messages: {
-    title: s__('StaticSiteEditor|Your merge request is ready to be managed'),
-    primaryButtonText: __('View merge request'),
-    returnToSiteBtnText: s__('StaticSiteEditor|Return to site'),
-    mergeRequestInstructionsHeading: s__(
-      'StaticSiteEditor|A couple of things you need to do to get your changes visible:',
-    ),
-    addDescriptionInstruction: s__(
-      'StaticSiteEditor|1. Add a description to this merge request to explain why the change is being made.',
-    ),
-    assignMergeRequestInstruction: s__(
-      'StaticSiteEditor|2. Assign this merge request to a person who can accept the changes so that it can be visible on the site.',
-    ),
-  },
+  title: s__('StaticSiteEditor|Your merge request has been created'),
+  primaryButtonText: __('View merge request'),
+  returnToSiteBtnText: s__('StaticSiteEditor|Return to site'),
+  mergeRequestInstructionsHeading: s__(
+    'StaticSiteEditor|To see your changes live you will need to do the following things:',
+  ),
+  addTitleInstruction: s__('StaticSiteEditor|1. Add a clear title to describe the change.'),
+  addDescriptionInstruction: s__(
+    'StaticSiteEditor|2. Add a description to explain why the change is being made.',
+  ),
+  assignMergeRequestInstruction: s__(
+    'StaticSiteEditor|3. Assign a person to review and accept the merge request.',
+  ),
 };
 </script>
 <template>
-  <div v-if="savedContentMeta" class="container">
-    <div
-      class="gl-absolute gl-left-0 gl-right-0 gl-border-b-solid gl-border-b-1 gl-border-b-gray-100"
-    >
+  <div
+    v-if="savedContentMeta"
+    class="container gl-flex-grow-1 gl-display-flex gl-flex-direction-column"
+  >
+    <div class="gl-fixed gl-left-0 gl-right-0 gl-border-b-solid gl-border-b-1 gl-border-b-gray-100">
       <div class="container gl-py-4">
         <gl-button
           v-if="appData.returnUrl"
           ref="returnToSiteButton"
           class="gl-mr-5"
           :href="appData.returnUrl"
-          >{{ $options.messages.returnToSiteBtnText }}</gl-button
+          >{{ $options.returnToSiteBtnText }}</gl-button
         >
         <strong>
           {{ updatedFileDescription }}
@@ -72,15 +72,17 @@ export default {
       </div>
     </div>
     <gl-empty-state
-      :primary-button-text="$options.messages.primaryButtonText"
-      :title="$options.messages.title"
+      class="gl-my-9"
+      :primary-button-text="$options.primaryButtonText"
+      :title="$options.title"
       :primary-button-link="savedContentMeta.mergeRequest.url"
       :svg-path="mergeRequestsIllustrationPath"
     >
       <template #description>
-        <p>{{ $options.messages.mergeRequestInstructionsHeading }}</p>
-        <p>{{ $options.messages.addDescriptionInstruction }}</p>
-        <p>{{ $options.messages.assignMergeRequestInstruction }}</p>
+        <p>{{ $options.mergeRequestInstructionsHeading }}</p>
+        <p>{{ $options.addTitleInstruction }}</p>
+        <p>{{ $options.addDescriptionInstruction }}</p>
+        <p>{{ $options.assignMergeRequestInstruction }}</p>
       </template>
     </gl-empty-state>
   </div>

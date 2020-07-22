@@ -9,5 +9,5 @@ export default {
 };
 </script>
 <template>
-  <router-view v-bind="$props" />
+  <router-view :merge-requests-illustration-path="mergeRequestsIllustrationPath" />
 </template>

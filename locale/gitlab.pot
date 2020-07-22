@@ -22585,13 +22585,13 @@ msgstr ""
 msgid "Static Application Security Testing (SAST)"
 msgstr ""
 
-msgid "StaticSiteEditor|1. Add a description to this merge request to explain why the change is being made."
+msgid "StaticSiteEditor|1. Add a clear title to describe the change."
 msgstr ""
 
-msgid "StaticSiteEditor|2. Assign this merge request to a person who can accept the changes so that it can be visible on the site."
+msgid "StaticSiteEditor|2. Add a description to explain why the change is being made."
 msgstr ""
 
-msgid "StaticSiteEditor|A couple of things you need to do to get your changes visible:"
+msgid "StaticSiteEditor|3. Assign a person to review and accept the merge request."
 msgstr ""
 
 msgid "StaticSiteEditor|An error occurred while submitting your changes."
@@ -22618,13 +22618,16 @@ msgstr ""
 msgid "StaticSiteEditor|The Static Site Editor is currently configured to only edit Markdown content on pages generated from Middleman. Visit the documentation to learn more about configuring your site to use the Static Site Editor."
 msgstr ""
 
+msgid "StaticSiteEditor|To see your changes live you will need to do the following things:"
+msgstr ""
+
 msgid "StaticSiteEditor|Update %{sourcePath} file"
 msgstr ""
 
 msgid "StaticSiteEditor|View documentation"
 msgstr ""
 
-msgid "StaticSiteEditor|Your merge request is ready to be managed"
+msgid "StaticSiteEditor|Your merge request has been created"
 msgstr ""
 
 msgid "Statistics"

@@ -59,7 +59,7 @@ describe('static_site_editor/pages/success', () => {
     expect(findEmptyState().props()).toMatchObject({
       primaryButtonText: 'View merge request',
       primaryButtonLink: savedContentMeta.mergeRequest.url,
-      title: 'Your merge request is ready to be managed',
+      title: 'Your merge request has been created',
       svgPath: mergeRequestsIllustrationPath,
     });
   });
@@ -68,13 +68,14 @@ describe('static_site_editor/pages/success', () => {
     buildWrapper();
 
     expect(findEmptyState().text()).toContain(
-      'A couple of things you need to do to get your changes visible:',
+      'To see your changes live you will need to do the following things:',
+    );
+    expect(findEmptyState().text()).toContain('1. Add a clear title to describe the change.');
+    expect(findEmptyState().text()).toContain(
+      '2. Add a description to explain why the change is being made.',
     );
     expect(findEmptyState().text()).toContain(
-      '1. Add a description to this merge request to explain why the change is being made.',
-    );
-    expect(findEmptyState().text()).toContain(
-      '2. Assign this merge request to a person who can accept the changes so that it can be visible on the site.',
+      '3. Assign a person to review and accept the merge request.',
     );
   });
 
