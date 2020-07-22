@@ -14,8 +14,8 @@ impossible to match correlating log entries.
 ## Identify the correlation ID for a request
 
 The correlation ID is logged in structured logs under the key `correlation_id`
-and in all response headers GitLab sends under the header
-`x-request-id`. You can find your correlation ID by searching in either place.
+and in all response headers GitLab sends under the header `x-request-id`.
+You can find your correlation ID by searching in either place.
 
 ### Getting the correlation ID in your browser
 
@@ -122,5 +122,5 @@ If you have done some horizontal scaling in your GitLab infrastructure, then
 you will need to search across _all_ of your GitLab nodes. You can do this with
 some sort of log aggregation software like Loki, ELK, Splunk, or others.
 
-You can use a tool like like Ansible or PSSH (parellel SSH) that can execute commands across your servers in
+You can use a tool like Ansible or PSSH (parellel SSH) that can execute commands across your servers in
 parallel to execute the same search command. Or you could craft your own solution.
