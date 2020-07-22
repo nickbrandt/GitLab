@@ -6,6 +6,8 @@ module IconsHelper
   extend self
   include FontAwesome::Rails::IconHelper
 
+  DEFAULT_ICON_SIZE = 16
+
   # Creates an icon tag given icon name(s) and possible icon modifiers.
   #
   # Right now this method simply delegates directly to `fa_icon` from the
@@ -21,7 +23,7 @@ module IconsHelper
     options.include?(:base) ? fa_stacked_icon(names, options) : fa_icon(names, options)
   end
 
-  def custom_icon(icon_name, size: 16)
+  def custom_icon(icon_name, size: DEFAULT_ICON_SIZE)
     # We can't simply do the below, because there are some .erb SVGs.
     #  File.read(Rails.root.join("app/views/shared/icons/_#{icon_name}.svg")).html_safe
     render "shared/icons/#{icon_name}.svg", size: size
@@ -115,7 +117,7 @@ module IconsHelper
         'earth'
       end
 
-    sprite_icon(name, size: 16, css_class: 'gl-vertical-align-text-bottom')
+    sprite_icon(name, size: DEFAULT_ICON_SIZE, css_class: 'gl-vertical-align-text-bottom')
   end
 
   def file_type_icon_class(type, mode, name)
