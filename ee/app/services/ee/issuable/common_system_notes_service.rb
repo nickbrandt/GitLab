@@ -36,7 +36,11 @@ module EE
       def handle_iteration_change
         return unless issuable.previous_changes.include?('sprint_id')
 
-        ::SystemNoteService.change_iteration(issuable, current_user, issuable.iteration)
+        if iteration_changes_tracking_enabled?
+          ::EE::ResourceEvents::ChangeIterationService.new(issuable, current_user, old_iteration_id: issuable.sprint_id_before_last_save).execute
+        else
+          ::SystemNoteService.change_iteration(issuable, current_user, issuable.iteration)
+        end
       end
 
       def handle_weight_change(is_update)
@@ -59,6 +63,10 @@ module EE
 
       def weight_changes_tracking_enabled?
         !issuable.is_a?(Epic) && ::Feature.enabled?(:track_issue_weight_change_events, issuable.project, default_enabled: true)
+      end
+
+      def iteration_changes_tracking_enabled?
+        ::Feature.enabled?(:track_iteration_change_events, issuable.project)
       end
     end
   end

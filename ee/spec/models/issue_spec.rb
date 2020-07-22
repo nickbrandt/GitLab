@@ -11,6 +11,7 @@ RSpec.describe Issue do
     subject { build(:issue) }
 
     it { is_expected.to have_many(:resource_weight_events) }
+    it { is_expected.to have_many(:resource_iteration_events) }
   end
 
   describe 'modules' do
