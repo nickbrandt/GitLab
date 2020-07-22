@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import { GlButton, GlIcon } from '@gitlab/ui';
 
 export default {
@@ -8,7 +8,6 @@ export default {
     GlIcon,
   },
   computed: {
-    ...mapState(['showDropdownContents']),
     ...mapGetters([
       'dropdownButtonText',
       'isDropdownVariantStandalone',
