@@ -14,9 +14,9 @@ module IncidentManagement
       return error_with('invalid alert') unless alert.valid?
 
       result = create_issue
-      return error_with(result.message) unless result.success?
+      return error_with(result.message, result.payload[:issue]) unless result.success?
 
-      success(issue: result.payload[:issue])
+      result
     end
 
     private
@@ -62,10 +62,10 @@ module IncidentManagement
       incident_management_setting.issue_template_content
     end
 
-    def error_with(message)
+    def error_with(message, issue = nil)
       log_error(%{Cannot create incident issue for "#{project.full_name}": #{message}})
 
-      error(message)
+      ServiceResponse.error(payload: { issue: issue }, message: message)
     end
   end
 end
