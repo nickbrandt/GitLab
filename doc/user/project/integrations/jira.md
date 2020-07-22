@@ -34,8 +34,8 @@ Features include:
 
 For additional features, you can install the [Jira Development Panel integration](../../../integration/jira_development_panel.md). This enables you to:
 
-- In a Jira issue, display relevant GitLab information in a side panel, including related branches, commits, and merge requests.
-- Use [Smart Commits](https://confluence.atlassian.com/fisheye/using-smart-commits-960155400.html) to add Jira comments, log time spent on the issue, and apply any issue transition.
+- In a Jira issue, display relevant GitLab information in the [development panel](https://support.atlassian.com/jira-software-cloud/docs/view-development-information-for-an-issue/), including related branches, commits, and merge requests.
+- Use Jira [Smart Commits](https://confluence.atlassian.com/fisheye/using-smart-commits-960155400.html) in GitLab to add Jira comments, log time spent on the issue, and apply any issue transition.
 
 ## Configuration
 
