@@ -15031,7 +15031,8 @@ CREATE TABLE public.saml_providers (
     sso_url character varying NOT NULL,
     enforced_sso boolean DEFAULT false NOT NULL,
     enforced_group_managed_accounts boolean DEFAULT false NOT NULL,
-    prohibited_outer_forks boolean DEFAULT true NOT NULL
+    prohibited_outer_forks boolean DEFAULT true NOT NULL,
+    default_membership_role smallint DEFAULT 10 NOT NULL
 );
 
 CREATE SEQUENCE public.saml_providers_id_seq
@@ -24000,5 +24001,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200718040200
 20200718040300
 20200720154123
+20200722084623
 \.
 
