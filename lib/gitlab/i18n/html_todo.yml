@@ -428,16 +428,6 @@
     - "SSH主机密钥在此系统上不可用。请使用<code>ssh-keyscan</code>命令或与您的GitLab管理员联系以获取更多信息。"
     - "SSH-ключі хоста не доступні в цій системі. Будь ласка, використовуйте команду <code>ssh-keyscan</code> або зверніться до вашого адміністратора GitLab для додаткової інформації."
     - "Las claves SSH del host no se encuentran disponibles en este sistema. Utilice el comando <code>ssh-keyscan</code> o póngase en contacto con su administrador de GitLab para obtener más información."
-"Selecting a GitLab user will add a link to the GitLab user in the descriptions of issues and comments (e.g. \\\"By <a href=\\\"#\\\">@johnsmith</a>\\\"). It will also associate and/or assign these issues and comments with the selected user.":
-  plural_id:
-  translations:
-    - "A seleção de um usuário do GitLab adicionará um link para o usuário do GitLab nas descrições de issues e comentários (por exemplo, \\\"Por <a href=\\\"#\\\">@johnsmith</a>\\\"). Isto também associará e/ou atribuirá esses issues e comentários ao usuário selecionado."
-    - "GitLab ユーザーを選択すると、GitLab ユーザーへのリンクが課題やコメントの説明に追加されます (例:\\\"By <a href=\\\"#\\\">@johnsmith</a>\\\")。また、これらの課題やコメントを選択したユーザーに関連付けや割り当てができます。"
-    - "选中GitLab用户将在议题和评论的描述中加入指向该GitLab用户的链接（例如“By <a href=\\\"#\\\">@johnsmith</a>”）。它还将与所选用户关联和/或分配这些议题和评论。"
-    - "При виборі користувача Gitlab посилання на нього буде додане до опису задачі та коментарів (напр. \\\"<a href=\\\"#\\\"> @johnsmith</a>\\\"). Також це призведе до асоціації та/або призначення цих задач та коментарів на вибраного користувача."
-    - "Wenn du eine(n) GitLab-Benutzer(in) azswählst, wird in der Beschreibung des Tickets und den Kommentaren ein Link zum/zur Benutzer(in) hinzugefügt (z. B. \\\"Von <a href=\\\"#\\\">@johnsmith</a>\\\"). Außerdem wird der/die ausgewählte Benutzer(in) dem Ticket oder Kommentar zugeordnet und/oder es ihm/ihr zugewiesen."
-    - "La sélection d’un utilisateur de GitLab va ajouter un lien vers cet utilisateur dans les descriptions des tickets et des commentaires (p. ex., « Par <a href=\\\"#\\\">@johnsmith</a> »). Les tickets et commentaires seront également associés ou assignés à cet utilisateur."
-    - "Al seleccionar un usuario de GitLab añadirá un link al usuario en la descripción de las incidencias, así como también, en los comentarios (por ejemplo, \\\"Por <a href=\\\"#\\\">@johnsmith</a>\\\"). Al hacer esto, también asociará y asignará dichas incidencias y comentarios con el usuario seleccionado."
 "Share the <strong>%{sso_label}</strong> with members so they can sign in to your group through your identity provider":
   plural_id:
   translations:
@@ -1053,3 +1043,13 @@
     - "使用<code>http://</code>或<code>https://</code>协议时，请提供仓库的实际地址。不支持HTTP重定向。"
     - "При використанні протоколів <code>http://</code> або <code>https://</code> вказуйте, будь ласка, точну URL-адресу репозиторію. Перенаправлення HTTP не будуть виконуватися."
     - "Al utilizar los protocolos <code>http://</code> o <code>https://</code>, por favor, proporcione la URL exacta del repositorio. No se seguirán las redirecciones HTTP."
+"Selecting a GitLab user will add a link to the GitLab user in the descriptions of issues and comments (e.g. \\\"By <a href=\\\"#\\\">@johnsmith</a>\\\"). It will also associate and/or assign these issues and comments with the selected user.":
+  plural_id:
+  translations:
+    - "A seleção de um usuário do GitLab adicionará um link para o usuário do GitLab nas descrições de issues e comentários (por exemplo, \\\"Por <a href=\\\"#\\\">@johnsmith</a>\\\"). Isto também associará e/ou atribuirá esses issues e comentários ao usuário selecionado."
+    - "GitLab ユーザーを選択すると、GitLab ユーザーへのリンクが課題やコメントの説明に追加されます (例:\\\"By <a href=\\\"#\\\">@johnsmith</a>\\\")。また、これらの課題やコメントを選択したユーザーに関連付けや割り当てができます。"
+    - "选中GitLab用户将在议题和评论的描述中加入指向该GitLab用户的链接（例如“By <a href=\\\"#\\\">@johnsmith</a>”）。它还将与所选用户关联和/或分配这些议题和评论。"
+    - "При виборі користувача Gitlab посилання на нього буде додане до опису задачі та коментарів (напр. \\\"<a href=\\\"#\\\"> @johnsmith</a>\\\"). Також це призведе до асоціації та/або призначення цих задач та коментарів на вибраного користувача."
+    - "Wenn du eine(n) GitLab-Benutzer(in) azswählst, wird in der Beschreibung des Tickets und den Kommentaren ein Link zum/zur Benutzer(in) hinzugefügt (z. B. \\\"Von <a href=\\\"#\\\">@johnsmith</a>\\\"). Außerdem wird der/die ausgewählte Benutzer(in) dem Ticket oder Kommentar zugeordnet und/oder es ihm/ihr zugewiesen."
+    - "La sélection d’un utilisateur de GitLab va ajouter un lien vers cet utilisateur dans les descriptions des tickets et des commentaires (p. ex., « Par <a href=\\\"#\\\">@johnsmith</a> »). Les tickets et commentaires seront également associés ou assignés à cet utilisateur."
+    - "Al seleccionar un usuario de GitLab añadirá un link al usuario en la descripción de las incidencias, así como también, en los comentarios (por ejemplo, \\\"Por <a href=\\\"#\\\">@johnsmith</a>\\\"). Al hacer esto, también asociará y asignará dichas incidencias y comentarios con el usuario seleccionado."
