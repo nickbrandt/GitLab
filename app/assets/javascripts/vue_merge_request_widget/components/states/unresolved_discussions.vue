@@ -24,7 +24,7 @@ export default {
 </script>
 
 <template>
-  <div class="mr-widget-body media">
+  <div class="mr-widget-body media gl-flex-wrap">
     <status-icon :show-disabled-button="true" status="warning" />
     <div class="media-body">
       <span class="gl-ml-3 gl-font-weight-bold gl-display-block gl-w-100">{{
