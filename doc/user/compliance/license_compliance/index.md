@@ -677,6 +677,8 @@ in your project's sidebar, and you'll see the licenses displayed, where:
 
 Policies allow you to specify licenses that are `allowed` or `denied` in a project. If a `denied` license is newly committed it will disallow a merge request and instruct the developer to remove it. Note, the merge request will not be able to be merged until the `denied` license is removed. You may add a [`License-Check` approval rule](#enabling-license-approvals-within-a-project), which enables a designated approver that can approve a merge request with `denied` license.
 
+![Merge Request with denied licenses](img/denied_licenses_v13_3.png)
+
 The **Policies** tab in the projects license compliance section displays your project's license policies. Policies can be specified in this section by maintainers of the project.
 
 ![Edit Policy](img/policies_maintainer_edit_v13_2.png)
