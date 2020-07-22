@@ -5,9 +5,9 @@ type: reference
 # Finding relevant log entries with a correlation ID
 
 Since GitLab 11.6, a unique tracking ID, known as the "correlation ID" has been
-logged for most requests in GitLab. This makes it easier to trace behavior in a
+logged by the GitLab instance for most requests. This makes it easier to trace behavior in a
 distributed system. Without this ID it can be difficult or
-impossible to match correlating log entries together.
+impossible to match correlating log entries.
 
 ## Getting the correlation ID
 
@@ -18,20 +18,23 @@ and is also logged in all response headers GitLab sends under the header
 ### Getting the correlation ID in your browser
 
 You can use your browser's developer tools to monitor and inspect network
-activity on site that you're visiting. See below links for network monitor
-documenation for a few different popular browsers.
+activity with the site that you're visiting. See the links below for network monitoring
+documenation for some popular browsers.
 
 - [Network Monitor - Firefox Developer Tools](https://developer.mozilla.org/en-US/docs/Tools/Network_Monitor)
 - [Inspect Network Activity In Chrome DevTools](https://developers.google.com/web/tools/chrome-devtools/network/)
 - [Safari Web Development Tools](https://developer.apple.com/safari/tools/)
 - [Microsoft Edge Network panel](https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide/network#request-details)
 
-Some actions in GitLab will redirect you quickly after you submit a form, so
-you will want to enable persistent logging in your network monitor. Then you'll
-want to click on the request in question for more details (it might help to
-filter to "document" requests), go to the "headers" section and look for the
-_response_ headers. There you should find an `x-request-id` header with a
-randomly generated value. Below is an example:
+To locate a relevant request and view its correlation ID:
+
+1. Enable persistent logging in your network monitor. Some actions in GitLab will redirect you quickly after you submit a form, so this will help capture all relevant activity.
+1. To help isolate the requests you are looking for, you can filter for "document" requests.
+1. Click the request of interest to view further detail.
+1. Go to the "headers" section and look for _response_ headers. There you should find an `x-request-id` header with a
+randomly generated value.
+
+See the following example:
 
 ![Firefox's network monitor showing an request id header](img/network_monitor_xid.png)
 
@@ -73,7 +76,7 @@ sudo gitlab-ctl tail gitlab-rails/production_json.log | jq 'select(.username == 
 
 #### Using grep
 
-This example uses only grep and tr, which are more likely to be installed than jq.
+This example uses only `grep` and `tr`, which are more likely to be installed than `jq`.
 
 ```shell
 sudo gitlab-ctl tail gitlab-rails/production_json.log | grep '"username":"bob"' | tr ',' '\n' | egrep 'method|path|correlation_id'
@@ -97,9 +100,8 @@ sudo gitlab-ctl tail gitlab-rails/production_json.log | grep '"username":"bob"' 
 ## Searching your logs for the correlation ID
 
 Once you have the correlation ID you can start searching for relevant log
-entries. You can simply filter the lines by the correlation ID itself since it
-is unique enough that there shouldn't be any duplicates. A simple find & grep
-combo should find what you're looking for.
+entries. You can filter the lines by the correlation ID itself.
+Combining a `find` and `grep` should be sufficient to find the entries you are looking for.
 
 ```shell
 # find <gitlab log directory> -type f -mtime -0 exec grep '<correlation ID>' '{}' '+'
@@ -118,5 +120,5 @@ If you have done some horizontal scaling in your GitLab infrastructure, then
 you will need to search across _all_ of your GitLab nodes. You can do this with
 some sort of log aggregation software like Loki, ELK, Splunk, or others.
 
-Something like Ansible or PSSH (parellel SSH), that can execute commands across your servers in
-parallel, could be used to execute the same search command. Or you could craft your own solution.
+You can use a tool like like Ansible or PSSH (parellel SSH) that can execute commands across your servers in
+parallel to execute the same search command. Or you could craft your own solution.
