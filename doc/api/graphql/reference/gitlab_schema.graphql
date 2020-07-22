@@ -6143,7 +6143,7 @@ input IssueSetConfidentialInput {
   confidential: Boolean!
 
   """
-  The iid of the issue to mutate
+  The IID of the issue to mutate
   """
   iid: String!
 
@@ -6188,7 +6188,7 @@ input IssueSetDueDateInput {
   dueDate: Time!
 
   """
-  The iid of the issue to mutate
+  The IID of the issue to mutate
   """
   iid: String!
 
@@ -6228,7 +6228,7 @@ input IssueSetIterationInput {
   clientMutationId: String
 
   """
-  The iid of the issue to mutate
+  The IID of the issue to mutate
   """
   iid: String!
 
@@ -6273,7 +6273,7 @@ input IssueSetLockedInput {
   clientMutationId: String
 
   """
-  The iid of the issue to mutate
+  The IID of the issue to mutate
   """
   iid: String!
 
@@ -6318,7 +6318,7 @@ input IssueSetWeightInput {
   clientMutationId: String
 
   """
-  The iid of the issue to mutate
+  The IID of the issue to mutate
   """
   iid: String!
 
@@ -14037,7 +14037,7 @@ input UpdateIssueInput {
   healthStatus: HealthStatus
 
   """
-  The iid of the issue to mutate
+  The IID of the issue to mutate
   """
   iid: String!
 
