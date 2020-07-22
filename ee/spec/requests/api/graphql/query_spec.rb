@@ -34,25 +34,55 @@ RSpec.describe 'Query' do
         current_user.security_dashboard_projects << project
         project.add_developer(current_user)
 
-        create(:vulnerability, :critical, created_at: 15.days.ago, dismissed_at: 10.days.ago, project: project)
-        create(:vulnerability, :high, created_at: 15.days.ago, dismissed_at: 11.days.ago, project: project)
-        create(:vulnerability, :critical, created_at: 14.days.ago, resolved_at: 12.days.ago, project: project)
+        create(:vulnerability_historical_statistic, date: 15.days.ago, critical: 1, high: 1, project: project)
+        create(:vulnerability_historical_statistic, date: 14.days.ago, critical: 2, high: 1, project: project)
+        create(:vulnerability_historical_statistic, date: 13.days.ago, critical: 2, high: 1, project: project)
+        create(:vulnerability_historical_statistic, date: 12.days.ago, critical: 1, high: 1, project: project)
+        create(:vulnerability_historical_statistic, date: 11.days.ago, critical: 1, high: 0, project: project)
+        create(:vulnerability_historical_statistic, date: 10.days.ago, critical: 0, high: 0, project: project)
 
         post_graphql(query, current_user: current_user)
 
-        ordered_history = query_result.sort_by { |count| [count['day'], count['severity']] }
+        expected_history = [
+          { 'day' => '2019-10-16', 'count' => 1, 'severity' => 'CRITICAL' },
+          { 'day' => '2019-10-16', 'count' => 1, 'severity' => 'HIGH' },
+          { 'day' => '2019-10-16', 'count' => 0, 'severity' => 'INFO' },
+          { 'day' => '2019-10-16', 'count' => 0, 'severity' => 'LOW' },
+          { 'day' => '2019-10-16', 'count' => 0, 'severity' => 'MEDIUM' },
+          { 'day' => '2019-10-16', 'count' => 0, 'severity' => 'UNKNOWN' },
+          { 'day' => '2019-10-17', 'count' => 2, 'severity' => 'CRITICAL' },
+          { 'day' => '2019-10-17', 'count' => 1, 'severity' => 'HIGH' },
+          { 'day' => '2019-10-17', 'count' => 0, 'severity' => 'INFO' },
+          { 'day' => '2019-10-17', 'count' => 0, 'severity' => 'LOW' },
+          { 'day' => '2019-10-17', 'count' => 0, 'severity' => 'MEDIUM' },
+          { 'day' => '2019-10-17', 'count' => 0, 'severity' => 'UNKNOWN' },
+          { 'day' => '2019-10-18', 'count' => 2, 'severity' => 'CRITICAL' },
+          { 'day' => '2019-10-18', 'count' => 1, 'severity' => 'HIGH' },
+          { 'day' => '2019-10-18', 'count' => 0, 'severity' => 'INFO' },
+          { 'day' => '2019-10-18', 'count' => 0, 'severity' => 'LOW' },
+          { 'day' => '2019-10-18', 'count' => 0, 'severity' => 'MEDIUM' },
+          { 'day' => '2019-10-18', 'count' => 0, 'severity' => 'UNKNOWN' },
+          { 'day' => '2019-10-19', 'count' => 1, 'severity' => 'CRITICAL' },
+          { 'day' => '2019-10-19', 'count' => 1, 'severity' => 'HIGH' },
+          { 'day' => '2019-10-19', 'count' => 0, 'severity' => 'INFO' },
+          { 'day' => '2019-10-19', 'count' => 0, 'severity' => 'LOW' },
+          { 'day' => '2019-10-19', 'count' => 0, 'severity' => 'MEDIUM' },
+          { 'day' => '2019-10-19', 'count' => 0, 'severity' => 'UNKNOWN' },
+          { 'day' => '2019-10-20', 'count' => 1, 'severity' => 'CRITICAL' },
+          { 'day' => '2019-10-20', 'count' => 0, 'severity' => 'HIGH' },
+          { 'day' => '2019-10-20', 'count' => 0, 'severity' => 'INFO' },
+          { 'day' => '2019-10-20', 'count' => 0, 'severity' => 'LOW' },
+          { 'day' => '2019-10-20', 'count' => 0, 'severity' => 'MEDIUM' },
+          { 'day' => '2019-10-20', 'count' => 0, 'severity' => 'UNKNOWN' },
+          { 'day' => '2019-10-21', 'count' => 0, 'severity' => 'CRITICAL' },
+          { 'day' => '2019-10-21', 'count' => 0, 'severity' => 'HIGH' },
+          { 'day' => '2019-10-21', 'count' => 0, 'severity' => 'INFO' },
+          { 'day' => '2019-10-21', 'count' => 0, 'severity' => 'LOW' },
+          { 'day' => '2019-10-21', 'count' => 0, 'severity' => 'MEDIUM' },
+          { 'day' => '2019-10-21', 'count' => 0, 'severity' => 'UNKNOWN' }
+        ]
 
-        expect(ordered_history).to eq([
-          { 'severity' => 'CRITICAL', 'day' => '2019-10-16', 'count' => 1 },
-          { 'severity' => 'HIGH', 'day' => '2019-10-16', 'count' => 1 },
-          { 'severity' => 'CRITICAL', 'day' => '2019-10-17', 'count' => 2 },
-          { 'severity' => 'HIGH', 'day' => '2019-10-17', 'count' => 1 },
-          { 'severity' => 'CRITICAL', 'day' => '2019-10-18', 'count' => 2 },
-          { 'severity' => 'HIGH', 'day' => '2019-10-18', 'count' => 1 },
-          { 'severity' => 'CRITICAL', 'day' => '2019-10-19', 'count' => 1 },
-          { 'severity' => 'HIGH', 'day' => '2019-10-19', 'count' => 1 },
-          { 'severity' => 'CRITICAL', 'day' => '2019-10-20', 'count' => 1 }
-        ])
+        expect(query_result).to eq(expected_history)
       end
     end
   end

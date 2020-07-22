@@ -21,5 +21,21 @@ module Vulnerabilities
     enum letter_grade: Vulnerabilities::Statistic.letter_grades
 
     scope :older_than, ->(days:) { where('"vulnerability_historical_statistics"."date" < now() - interval ?', "#{days} days") }
+    scope :between_dates, -> (start_date, end_date) { where(arel_table[:date].between(start_date..end_date)) }
+    scope :for_project, -> (project) { where(project: project) }
+    scope :unnested_by_severity, -> do
+      severities = ::Vulnerabilities::Finding::SEVERITY_LEVELS.keys
+
+      select(
+        '"date" AS "day"',
+        "unnest(array[#{severities.map { |severity| "SUM(\"#{severity}\")" }.join(', ')}]) AS \"count\"",
+        "unnest(array[#{severities.map { |severity| connection.quote(severity) }.join(', ')}]) AS \"severity\""
+      )
+    end
+
+    scope :grouped_by_date, -> do
+      group(:date)
+        .order(date: :asc, severity: :asc)
+    end
   end
 end
