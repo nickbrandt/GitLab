@@ -1,4 +1,8 @@
 - return unless current_user
+- return unless display_namespace_storage_limit_alert?
+
+- namespace = @project&.namespace || @group
+- return unless namespace.present?
 
 - payload = namespace_storage_alert(namespace)
 - return if payload.empty?
@@ -10,7 +14,7 @@
 - icon = namespace_storage_alert_icon(alert_level)
 - link = namespace_storage_usage_link(root_namespace)
 
-%div{ class: [classes, 'js-namespace-storage-alert'] }
+%div{ class: ['js-namespace-storage-alert', [container_class, ("limit-container-width" unless fluid_layout)]] }
   .gl-pt-5.gl-pb-3
     .gl-alert{ class: "gl-alert-#{style}", role: 'alert' }
       = sprite_icon(icon, css_class: "gl-icon gl-alert-icon")
