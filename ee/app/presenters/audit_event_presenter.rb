@@ -14,7 +14,7 @@ class AuditEventPresenter < Gitlab::View::Presenter::Simple
   end
 
   def target
-    details[:target_details]
+    audit_event.target_details
   end
 
   def ip_address

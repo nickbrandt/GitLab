@@ -9,6 +9,7 @@ FactoryBot.define do
     entity_type { 'User' }
     entity_id   { target_user.id }
     entity_path { target_user.full_path }
+    target_details { target_user.name }
     ip_address { IPAddr.new '127.0.0.1' }
     author_name { 'Jane Doe' }
     details do
@@ -31,6 +32,7 @@ FactoryBot.define do
       entity_type { 'Project' }
       entity_id   { target_project.id }
       entity_path { target_project.full_path }
+      target_details { target_project.name }
       ip_address { IPAddr.new '127.0.0.1' }
       details do
         {
@@ -53,6 +55,7 @@ FactoryBot.define do
       entity_type { 'Group' }
       entity_id   { target_group.id }
       entity_path { target_group.full_path }
+      target_details { target_group.name }
       ip_address { IPAddr.new '127.0.0.1' }
       details do
         {
