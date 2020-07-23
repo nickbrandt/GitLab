@@ -32,6 +32,18 @@ RSpec.describe SessionsController, :geo do
         end
       end
 
+      context 'when relative URL is configured' do
+        before do
+          host = 'http://this.is.my.host/secondary-relative-url-part'
+
+          stub_config_setting(url: host, https: false)
+          stub_default_url_options(host: "this.is.my.host", script_name: '/secondary-relative-url-part')
+          request.headers['HOST'] = host
+        end
+
+        it_behaves_like 'a valid oauth authentication redirect'
+      end
+
       context 'with a tampered HOST header' do
         before do
           request.headers['HOST'] = 'http://this.is.not.my.host'
