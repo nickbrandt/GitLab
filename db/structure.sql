@@ -19697,7 +19697,7 @@ CREATE INDEX index_issues_on_description_trigram ON public.issues USING gin (des
 
 CREATE INDEX index_issues_on_duplicated_to_id ON public.issues USING btree (duplicated_to_id) WHERE (duplicated_to_id IS NOT NULL);
 
-CREATE INDEX index_issues_on_issue_type ON public.issues USING btree (issue_type);
+CREATE INDEX index_issues_on_incident_issue_type ON public.issues USING btree (issue_type) WHERE (issue_type = 1);
 
 CREATE INDEX index_issues_on_last_edited_by_id ON public.issues USING btree (last_edited_by_id);
 
