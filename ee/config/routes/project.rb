@@ -141,6 +141,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
   end
 end
 
+# It's under /-/jira scope but cop is only checking /-/
+# rubocop: disable Cop/PutProjectRoutesUnderScope
 scope path: '(/-/jira)', constraints: ::Constraints::JiraEncodedUrlConstrainer.new, as: :jira do
   scope path: '*namespace_id/:project_id',
         namespace_id: Gitlab::Jira::Dvcs::ENCODED_ROUTE_REGEX,
@@ -171,3 +173,4 @@ scope path: '(/-/jira)', constraints: ::Constraints::JiraEncodedUrlConstrainer.n
     }
   end
 end
+# rubocop: enable Cop/PutProjectRoutesUnderScope
