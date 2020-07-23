@@ -1,5 +1,5 @@
 <script>
-import { GlLink } from '@gitlab/ui';
+import { GlLink, GlIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import AddIssuableForm from './add_issuable_form.vue';
 import RelatedIssuesList from './related_issues_list.vue';
@@ -15,6 +15,7 @@ export default {
   components: {
     Icon,
     GlLink,
+    GlIcon,
     AddIssuableForm,
     RelatedIssuesList,
   },
@@ -160,7 +161,7 @@ export default {
               data-qa-selector="related_issues_plus_button"
               @click="$emit('toggleAddRelatedIssuesForm', $event)"
             >
-              <i class="fa fa-plus" aria-hidden="true"></i>
+              <gl-icon name="plus" aria-hidden="true" />
             </button>
           </div>
         </h3>
