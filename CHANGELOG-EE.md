@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.2.1 (2020-07-23)
+
+### Fixed (2 changes)
+
+- Geo: Package file backfill/removal accounts for object storage settings. !36771
+- Disable security scanner alerts. !37354
+
+
 ## 13.2.0 (2020-07-22)
 
 ### Security (1 change)
