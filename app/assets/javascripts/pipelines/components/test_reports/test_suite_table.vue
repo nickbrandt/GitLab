@@ -81,7 +81,11 @@ export default {
           <div class="table-section section-20 section-wrap">
             <div role="rowheader" class="table-mobile-header">{{ __('Name') }}</div>
             <div class="table-mobile-content pr-md-1 gl-overflow-wrap-break">
-              <gl-friendly-wrap :symbols="$options.wrapSymbols" :text="testCase.name" />
+              <gl-friendly-wrap
+                ref="casename"
+                :symbols="$options.wrapSymbols"
+                :text="testCase.name"
+              />
             </div>
           </div>
 

@@ -23,6 +23,7 @@ describe('Test reports suite table', () => {
   const noCasesMessage = () => wrapper.find('.js-no-test-cases');
   const allCaseRows = () => wrapper.findAll('.js-case-row');
   const findCaseRowAtIndex = index => wrapper.findAll('.js-case-row').at(index);
+  const findCaseNameAtIndex = index => wrapper.findAll({ ref: 'casename' }).at(index);
   const findIconForRow = (row, status) => row.find(`.ci-status-icon-${status}`);
 
   const createComponent = (suite = testSuite) => {
@@ -70,9 +71,9 @@ describe('Test reports suite table', () => {
         .filter(x => x.status === TestStatus.SKIPPED)
         .map(x => x.name);
 
-      expect(findCaseRowAtIndex(0).text()).toContain(failedCaseNames[0]);
-      expect(findCaseRowAtIndex(1).text()).toContain(failedCaseNames[1]);
-      expect(findCaseRowAtIndex(2).text()).toContain(skippedCaseNames[0]);
+      expect(findCaseNameAtIndex(0).attributes('text')).toEqual(failedCaseNames[0]);
+      expect(findCaseNameAtIndex(1).attributes('text')).toEqual(failedCaseNames[1]);
+      expect(findCaseNameAtIndex(2).attributes('text')).toEqual(skippedCaseNames[0]);
     });
 
     it('renders the correct icon for each status', () => {
