@@ -44,7 +44,6 @@ module Gitlab
         )
       end
 
-
       class << self
         def find(repository, sha, path, limit: MAX_DATA_DISPLAY_SIZE)
           tree_entry(repository, sha, path, limit)

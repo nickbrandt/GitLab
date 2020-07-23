@@ -137,14 +137,14 @@ RSpec.describe Gitlab::Metrics::Transaction do
 
     it 'adds a metric' do
       expect(prometheus_metric).to receive(:set)
-      expect(::Gitlab::Metrics).to receive(:gauge).with(:meow_set, 'Meow set gauge', hash_including(:controller, :action), :livesum).and_return(prometheus_metric)
+      expect(::Gitlab::Metrics).to receive(:gauge).with(:meow_set, 'Meow set gauge', hash_including(:controller, :action), :all).and_return(prometheus_metric)
 
       transaction.set(:meow_set, 1)
     end
 
     context 'with block' do
       it 'overrides docstring' do
-        expect(::Gitlab::Metrics).to receive(:gauge).with(:block_docstring_set, 'test', hash_including(:controller, :action), :livesum).and_return(prometheus_metric)
+        expect(::Gitlab::Metrics).to receive(:gauge).with(:block_docstring_set, 'test', hash_including(:controller, :action), :all).and_return(prometheus_metric)
 
         transaction.set(:block_docstring_set, 1) do
           docstring 'test'
@@ -152,7 +152,7 @@ RSpec.describe Gitlab::Metrics::Transaction do
       end
 
       it 'overrides labels' do
-        expect(::Gitlab::Metrics).to receive(:gauge).with(:block_labels_set, 'Block labels set gauge', hash_including(:controller, :action, :sane), :livesum).and_return(prometheus_metric)
+        expect(::Gitlab::Metrics).to receive(:gauge).with(:block_labels_set, 'Block labels set gauge', hash_including(:controller, :action, :sane), :all).and_return(prometheus_metric)
 
         labels = { sane: 'yes' }
         transaction.set(:block_labels_set, 1, labels) do
@@ -161,7 +161,7 @@ RSpec.describe Gitlab::Metrics::Transaction do
       end
 
       it 'filters sensitive tags' do
-        expect(::Gitlab::Metrics).to receive(:gauge).with(:metric_set_with_sensitive_block, 'Metric set with sensitive block gauge', hash_excluding(sensitive_tags), :livesum).and_return(prometheus_metric)
+        expect(::Gitlab::Metrics).to receive(:gauge).with(:metric_set_with_sensitive_block, 'Metric set with sensitive block gauge', hash_excluding(sensitive_tags), :all).and_return(prometheus_metric)
 
         label_keys = sensitive_tags.keys
         transaction.set(:metric_set_with_sensitive_block, 1, sensitive_tags) do
