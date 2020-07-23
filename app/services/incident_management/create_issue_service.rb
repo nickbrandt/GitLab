@@ -10,11 +10,11 @@ module IncidentManagement
     end
 
     def execute
-      return error_with('setting disabled') unless incident_management_setting.create_issue?
-      return error_with('invalid alert') unless alert.valid?
+      return error('setting disabled') unless incident_management_setting.create_issue?
+      return error('invalid alert') unless alert.valid?
 
       result = create_incident
-      return error_with(result.message, result.payload[:issue]) unless result.success?
+      return error(result.message, result.payload[:issue]) unless result.success?
 
       result
     end
@@ -62,7 +62,7 @@ module IncidentManagement
       incident_management_setting.issue_template_content
     end
 
-    def error_with(message, issue = nil)
+    def error(message, issue = nil)
       log_error(%{Cannot create incident issue for "#{project.full_name}": #{message}})
 
       ServiceResponse.error(payload: { issue: issue }, message: message)
