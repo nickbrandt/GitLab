@@ -71,10 +71,9 @@ const fetchStageMedian = (currentGroupPath, stageId, params) =>
     ...data,
   }));
 
-export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
-  const { currentGroupPath, cycleAnalyticsRequestParams } = getters;
-  const { stages } = state;
-  const stageIds = stages.map(s => s.slug);
+export const fetchStageMedianValues = ({ dispatch, getters }) => {
+  const { currentGroupPath, cycleAnalyticsRequestParams, activeStages } = getters;
+  const stageIds = activeStages.map(s => s.slug);
 
   dispatch('requestStageMedianValues');
   return Promise.all(
