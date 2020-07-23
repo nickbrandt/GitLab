@@ -1,4 +1,5 @@
 import { shallowMount, mount } from '@vue/test-utils';
+import { GlButton, GlIcon } from '@gitlab/ui';
 import RelatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
 import {
   issuable1,
@@ -13,6 +14,8 @@ import {
 
 describe('RelatedIssuesBlock', () => {
   let wrapper;
+
+  const findIssueCountBadgeAddButton = () => wrapper.find(GlButton);
 
   afterEach(() => {
     wrapper.destroy();
@@ -33,7 +36,7 @@ describe('RelatedIssuesBlock', () => {
     });
 
     it('unable to add new related issues', () => {
-      expect(wrapper.vm.$refs.issueCountBadgeAddButton).toBeUndefined();
+      expect(findIssueCountBadgeAddButton().exists()).toBe(false);
     });
 
     it('add related issues form is hidden', () => {
@@ -85,7 +88,7 @@ describe('RelatedIssuesBlock', () => {
     });
 
     it('can add new related issues', () => {
-      expect(wrapper.vm.$refs.issueCountBadgeAddButton).toBeDefined();
+      expect(findIssueCountBadgeAddButton().exists()).toBe(true);
     });
   });
 
@@ -171,14 +174,16 @@ describe('RelatedIssuesBlock', () => {
       },
     ].forEach(({ issuableType, icon }) => {
       it(`issuableType=${issuableType} is passed`, () => {
-        wrapper = mount(RelatedIssuesBlock, {
+        wrapper = shallowMount(RelatedIssuesBlock, {
           propsData: {
             pathIdSeparator: PathIdSeparator.Issue,
             issuableType,
           },
         });
 
-        expect(wrapper.contains(`.issue-count-badge-count .ic-${icon}`)).toBe(true);
+        const iconComponent = wrapper.find(GlIcon);
+        expect(iconComponent.exists()).toBe(true);
+        expect(iconComponent.props('name')).toBe(icon);
       });
     });
   });
