@@ -7456,10 +7456,19 @@ msgstr ""
 msgid "DastProfiles|Do you want to discard this site profile?"
 msgstr ""
 
+msgid "DastProfiles|Manage Profiles"
+msgstr ""
+
 msgid "DastProfiles|Manage profiles"
 msgstr ""
 
+msgid "DastProfiles|New Site Profile"
+msgstr ""
+
 msgid "DastProfiles|New site profile"
+msgstr ""
+
+msgid "DastProfiles|No profiles created yet"
 msgstr ""
 
 msgid "DastProfiles|Please enter a valid URL format, ex: http://www.example.com/home"
@@ -7468,7 +7477,13 @@ msgstr ""
 msgid "DastProfiles|Profile name"
 msgstr ""
 
+msgid "DastProfiles|Save commonly used configurations for target sites and scan specifications as profiles. Use these with an on-demand scan."
+msgstr ""
+
 msgid "DastProfiles|Save profile"
+msgstr ""
+
+msgid "DastProfiles|Site Profiles"
 msgstr ""
 
 msgid "DastProfiles|Target URL"
