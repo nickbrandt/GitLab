@@ -368,6 +368,14 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Resolve duplicate use of shorcuts-tree. !36732
 
 
+## 13.1.5 (2020-07-23)
+
+### Fixed (2 changes)
+
+- Geo: Fix Attachments and Job artifacts showing "Synchronization disabled". !36492
+- Fix: Geo file downloads can block Sidekiq threads.
+
+
 ## 13.1.3 (2020-07-06)
 
 ### Security (1 change)
