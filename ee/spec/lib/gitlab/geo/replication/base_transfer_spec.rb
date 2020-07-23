@@ -23,6 +23,29 @@ RSpec.describe Gitlab::Geo::Replication::BaseTransfer do
     end
   end
 
+  describe 'timeout' do
+    subject do
+      described_class.new(file_type: :avatar, file_id: 1, filename: Tempfile.new,
+                          expected_checksum: nil, request_data: nil, resource: nil)
+    end
+
+    before do
+      stub_current_geo_node(secondary_node)
+    end
+
+    it 'sets a timeout when downbloads to local storage' do
+      expect(::HTTP).to receive(:timeout)
+
+      subject.download_from_primary
+    end
+
+    it 'sets a timeout when streaming to object storage' do
+      expect(::HTTP).to receive(:timeout)
+
+      subject.stream_from_primary_to_object_storage
+    end
+  end
+
   describe '#can_transfer?' do
     subject do
       described_class.new(file_type: :avatar, file_id: 1, filename: Tempfile.new,

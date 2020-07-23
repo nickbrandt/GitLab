@@ -1,0 +1,5 @@
+---
+title: 'Geo: Fix Attachments and Job artifacts showing "Synchronization disabled"'
+merge_request: 36492
+author:
+type: fixed
