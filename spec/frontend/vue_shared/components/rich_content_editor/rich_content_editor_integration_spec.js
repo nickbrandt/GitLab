@@ -1,6 +1,5 @@
 import Editor from '@toast-ui/editor';
 import { registerHTMLToMarkdownRenderer } from '~/vue_shared/components/rich_content_editor/services/editor_service';
-import '@toast-ui/editor/dist/toastui-editor.css';
 
 describe('vue_shared/components/rich_content_editor', () => {
   let editor;
@@ -18,7 +17,6 @@ describe('vue_shared/components/rich_content_editor', () => {
   });
 
   describe('HTML to Markdown', () => {
-
     it('uses "-" character list marker in unordered lists', () => {
       editor.setHtml('<ul><li>List item 1</li><li>List item 2</li></ul>');
 
