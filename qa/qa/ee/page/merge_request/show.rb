@@ -144,7 +144,7 @@ module QA
             expand_vulnerability_report
             click_vulnerability(name)
             click_element :dismiss_with_comment_button
-            find_element(:dismiss_comment_field).fill_in with: reason
+            find_element(:dismiss_comment_field).fill_in with: reason, fill_options: { automatic_label_click: true }
             click_element :add_and_dismiss_button
 
             wait_until(reload: false) do
