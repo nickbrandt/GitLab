@@ -69,7 +69,7 @@ export default {
 
 <template>
   <div class="block weight">
-    <div class="title append-bottom-10">
+    <div class="title gl-mb-3">
       {{ __('Weight') }}
       <gl-deprecated-button
         v-if="canEdit"
