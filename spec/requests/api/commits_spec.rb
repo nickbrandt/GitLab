@@ -1468,8 +1468,8 @@ RSpec.describe API::Commits do
 
           post api(route, current_user), params: { branch: branch, dry_run: true }
 
-          expect(response).to have_gitlab_http_status(:no_content)
-          expect(response.body).to be_empty
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response).to eq("dry_run" => "success")
           expect(project.commit(branch)).to eq(head)
         end
       end
@@ -1639,8 +1639,8 @@ RSpec.describe API::Commits do
 
           post api(route, current_user), params: { branch: branch, dry_run: true }
 
-          expect(response).to have_gitlab_http_status(:no_content)
-          expect(response.body).to be_empty
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response).to eq("dry_run" => "success")
           expect(project.commit(branch)).to eq(head)
         end
       end

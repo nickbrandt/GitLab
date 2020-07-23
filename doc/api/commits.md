@@ -295,7 +295,7 @@ Parameters:
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `sha` | string | yes | The commit hash  |
 | `branch` | string | yes | The name of the branch  |
-| `dry_run` | boolean | no | Don't commit any changes. Default is false. [Introduced in GitLab 13.3](https://gitlab.com/gitlab-org/gitlab/-/issues/231032) |
+| `dry_run` | boolean | no | Does not commit any changes. Default is false. [Introduced in GitLab 13.3](https://gitlab.com/gitlab-org/gitlab/-/issues/231032) |
 
 ```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "branch=master" "https://gitlab.example.com/api/v4/projects/5/repository/commits/master/cherry_pick"
@@ -341,8 +341,16 @@ conflict.
 
 When `dry_run` is enabled, the server will attempt to apply the cherry-pick _but
 not actually commit any resulting changes_. If the cherry-pick applies cleanly,
-the API will respond with `204 No Content`. In the event of a failure, you'll
-see an error identical to a failure without dry-run.
+the API will respond with `200 OK`:
+
+```json
+{
+  "dry_run": "success"
+}
+```
+
+In the event of a failure, you'll see an error identical to a failure without
+dry run.
 
 ## Revert a commit
 
@@ -361,7 +369,7 @@ Parameters:
 | `id`      | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `sha`     | string         | yes      | Commit SHA to revert                                                            |
 | `branch`  | string         | yes      | Target branch name                                                              |
-| `dry_run` | boolean        | no       | Don't commit any changes. Default is false. [Introduced in GitLab 13.3](https://gitlab.com/gitlab-org/gitlab/-/issues/231032) |
+| `dry_run` | boolean        | no       | Does not commit any changes. Default is false. [Introduced in GitLab 13.3](https://gitlab.com/gitlab-org/gitlab/-/issues/231032) |
 
 ```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "branch=master" "https://gitlab.example.com/api/v4/projects/5/repository/commits/a738f717824ff53aebad8b090c1b79a14f2bd9e8/revert"
@@ -402,8 +410,16 @@ changeset was empty, likely due to the change having already been reverted.
 
 When `dry_run` is enabled, the server will attempt to apply the revert _but not
 actually commit any resulting changes_. If the revert applies cleanly, the API
-will respond with `204 No Content`. In the event of a failure, you'll see an
-error identical to a failure without dry-run.
+will respond with `200 OK`:
+
+```json
+{
+  "dry_run": "success"
+}
+```
+
+In the event of a failure, you'll see an error identical to a failure without
+dry run.
 
 ## Get the diff of a commit
 

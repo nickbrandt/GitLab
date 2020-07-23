@@ -226,7 +226,8 @@ module API
 
         if result[:status] == :success
           if params[:dry_run]
-            no_content!
+            present dry_run: :success
+            status :ok
           else
             present user_project.repository.commit(result[:result]),
               with: Entities::Commit
@@ -266,7 +267,8 @@ module API
 
         if result[:status] == :success
           if params[:dry_run]
-            no_content!
+            present dry_run: :success
+            status :ok
           else
             present user_project.repository.commit(result[:result]),
               with: Entities::Commit
