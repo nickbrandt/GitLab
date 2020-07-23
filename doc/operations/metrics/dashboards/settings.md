@@ -26,7 +26,7 @@ time zone:
 1. In the **Dashboard timezone** select box, select *User's local timezone*
    or *UTC*:
 
-   ![Dashboard timezone setting](../../../user/project/operations/img/dashboard_local_timezone_v13_1.png)
+   ![Dashboard timezone setting](img/dashboard_local_timezone_v13_1.png)
 1. Click **Save changes**.
 
 ## Link to an external dashboard
@@ -41,7 +41,7 @@ existing external dashboards:
    **Metrics Dashboard**.
 1. In **External dashboard URL**, provide the URL to your external dashboard:
 
-   ![External Dashboard Setting](../../../user/project/operations/img/dashboard_external_link_v13_1.png)
+   ![External Dashboard Setting](img/dashboard_external_link_v13_1.png)
 
 1. Click **Save changes**.
 
@@ -49,4 +49,4 @@ GitLab displays a **View full dashboard** button in the top right corner of your
 [monitoring dashboard](../../../ci/environments/index.md#monitoring-environments)
 which opens the URL you provided:
 
-![External Dashboard Link](../../../user/project/operations/img/external_dashboard_link.png)
+![External Dashboard Link](img/external_dashboard_link.png)
