@@ -1258,7 +1258,7 @@ POST /projects/:id/fork
 
 ## List Forks of a project
 
->**Note:** This feature was introduced in GitLab 10.1
+> Introduced in GitLab 10.1.
 
 List the projects accessible to the calling user that have an established, forked relationship with the specified project
 
