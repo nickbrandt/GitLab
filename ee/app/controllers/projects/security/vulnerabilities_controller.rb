@@ -14,6 +14,7 @@ module Projects
       def show
         pipeline = vulnerability.finding.pipelines.first
         @pipeline = pipeline if Ability.allowed?(current_user, :read_pipeline, pipeline)
+        @gfm_form = true
       end
 
       private

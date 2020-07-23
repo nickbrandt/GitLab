@@ -1,7 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
+import Api from 'ee/api';
 import VulnerabilityFooter from 'ee/vulnerabilities/components/footer.vue';
 import HistoryEntry from 'ee/vulnerabilities/components/history_entry.vue';
 import VulnerabilitiesEventBus from 'ee/vulnerabilities/components/vulnerabilities_event_bus';
+import RelatedIssues from 'ee/vulnerabilities/components/related_issues.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
@@ -32,9 +34,11 @@ describe('Vulnerability Footer', () => {
     finding: {},
     notesUrl: '/notes',
     project: {
-      full_path: '/root/security-reports',
-      full_name: 'Administrator / Security Reports',
+      url: '/root/security-reports',
+      value: 'Administrator / Security Reports',
     },
+    vulnerabilityId: 1,
+    canModifyRelatedIssues: true,
   };
 
   const solutionInfoProp = {
@@ -236,6 +240,25 @@ describe('Vulnerability Footer', () => {
 
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGED');
+      });
+    });
+  });
+
+  describe('related issues', () => {
+    const relatedIssues = () => wrapper.find(RelatedIssues);
+
+    it('has the correct props', () => {
+      const endpoint = Api.buildUrl(Api.vulnerabilityIssueLinksPath).replace(
+        ':id',
+        minimumProps.vulnerabilityId,
+      );
+      createWrapper();
+
+      expect(relatedIssues().exists()).toBe(true);
+      expect(relatedIssues().props()).toMatchObject({
+        endpoint,
+        canModifyRelatedIssues: minimumProps.canModifyRelatedIssues,
+        projectPath: minimumProps.project.url,
       });
     });
   });

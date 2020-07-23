@@ -49,6 +49,8 @@ function createFooterApp() {
     project,
     remediations,
     solution,
+    id,
+    canModifyRelatedIssues,
   } = convertObjectPropsToCamelCase(JSON.parse(el.dataset.vulnerability));
 
   const remediation = remediations?.length ? remediations[0] : null;
@@ -58,6 +60,7 @@ function createFooterApp() {
   const hasRemediation = Boolean(remediation);
 
   const props = {
+    vulnerabilityId: id,
     discussionsUrl,
     notesUrl,
     solutionInfo: {
@@ -71,6 +74,7 @@ function createFooterApp() {
     },
     issueFeedback,
     mergeRequestFeedback,
+    canModifyRelatedIssues,
     project: {
       url: project.full_path,
       value: project.full_name,

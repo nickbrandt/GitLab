@@ -53,3 +53,16 @@ export const FEEDBACK_TYPES = {
   ISSUE: 'issue',
   MERGE_REQUEST: 'merge_request',
 };
+
+export const RELATED_ISSUES_ERRORS = {
+  LINK_ERROR: s__('VulnerabilityManagement|Could not process %{issueReference}: %{errorMessage}.'),
+  UNLINK_ERROR: s__(
+    'VulnerabilityManagement|Something went wrong while trying to unlink the issue. Please try again later.',
+  ),
+  ISSUE_ID_ERROR: s__('VulnerabilityManagement|invalid issue link or ID'),
+};
+
+export const REGEXES = {
+  ISSUE_FORMAT: /^#?(\d+)$/, // Matches '123' and '#123'.
+  LINK_FORMAT: /\/(.+\/.+)\/-\/issues\/(\d+)/, // Matches '/username/project/-/issues/123'.
+};

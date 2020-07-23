@@ -37,6 +37,7 @@ export default {
   confirmOrderPath: '/-/subscriptions',
   vulnerabilityPath: '/api/:version/vulnerabilities/:id',
   vulnerabilityActionPath: '/api/:version/vulnerabilities/:id/:action',
+  vulnerabilityIssueLinksPath: '/api/:version/vulnerabilities/:id/issue_links',
   featureFlagUserLists: '/api/:version/projects/:id/feature_flags_user_lists',
   featureFlagUserList: '/api/:version/projects/:id/feature_flags_user_lists/:list_iid',
   applicationSettingsPath: '/api/:version/application/settings',
