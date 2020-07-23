@@ -72,17 +72,20 @@ module Gitlab
           #                              display_name: String,
           #                              default: Boolean }]
           def find_all_paths(project)
-            project.repository.metrics_dashboard_paths
-          end
-
-          # Summary of all known dashboards. Used to populate repo cache.
-          # Prefer #find_all_paths.
-          def find_all_paths_from_source(project)
-            Gitlab::Metrics::Dashboard::Cache.delete_all!
-
             user_facing_dashboard_services(project).flat_map do |service|
               service.all_dashboard_paths(project)
             end
+          end
+
+          # Returns list of all user-defined dashboard paths. Used to populate repo cache.
+          # Also deletes all dashboard cache entries.
+          # Prefer #find_all_paths.
+          # @return [Array] ex) ['.gitlab/dashboards/dashboard1.yml']
+          def find_all_paths_from_source(project)
+            Gitlab::Metrics::Dashboard::Cache.delete_all!
+
+            file_finder(project)
+              .list_files_for(::Metrics::Dashboard::CustomDashboardService::DASHBOARD_ROOT)
           end
 
           private
@@ -100,6 +103,14 @@ module Gitlab
             end
 
             predefined_dashboard_services
+          end
+
+          def file_finder(project)
+            Gitlab::Template::Finders::RepoTemplateFinder.new(
+              project,
+              ::Metrics::Dashboard::CustomDashboardService::DASHBOARD_ROOT,
+              ::Metrics::Dashboard::CustomDashboardService::DASHBOARD_EXTENSION
+            )
           end
 
           def predefined_dashboard_services
