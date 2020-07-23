@@ -29,7 +29,7 @@ RSpec.describe Gitlab::Middleware::RailsQueueDuration do
 
       it 'sets proxy_flight_time and calls the app when the header is present' do
         env['HTTP_GITLAB_WORKHORSE_PROXY_START'] = '123'
-        expect(transaction).to receive(:set).with(:gitlab_rails_queue_duration_total, an_instance_of(Float))
+        expect(transaction).to receive(:set).with(:gitlab_transaction_rails_queue_duration_total, an_instance_of(Float))
         expect(middleware.call(env)).to eq('yay')
       end
 

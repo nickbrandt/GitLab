@@ -19,7 +19,9 @@ module Gitlab
         if trans && proxy_start
           # Time in milliseconds since gitlab-workhorse started the request
           duration = Time.now.to_f * 1_000 - proxy_start.to_f / 1_000_000
-          trans.set(:gitlab_rails_queue_duration_total, duration)
+          trans.set(:gitlab_transaction_rails_queue_duration_total, duration) do
+            multiprocess_mode :livesum
+          end
 
           duration_s = Gitlab::Utils.ms_to_round_sec(duration)
           trans.observe(:gitlab_rails_queue_duration_seconds, duration_s) do

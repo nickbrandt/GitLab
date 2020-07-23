@@ -30,7 +30,6 @@ module Gitlab
           fetch_metric(type, name) do
             # set default metric options
             docstring "#{name.to_s.humanize} #{type}"
-            multiprocess_mode :livesum if type == :gauge
 
             evaluate(&block)
             # always filter sensitive labels and merge with base ones
@@ -73,13 +72,13 @@ module Gitlab
         @memory_after = System.memory_usage_rss
         @finished_at = System.monotonic_time
 
-        observe(:cputime_seconds, thread_cpu_duration) do
+        observe(:gitlab_transaction_cputime_seconds, thread_cpu_duration) do
           buckets SMALL_BUCKETS
         end
-        observe(:duration_seconds, duration) do
+        observe(:gitlab_transaction_duration_seconds, duration) do
           buckets SMALL_BUCKETS
         end
-        observe(:allocated_memory_bytes, allocated_memory * 1024.0) do
+        observe(:gitlab_transaction_allocated_memory_bytes, allocated_memory * 1024.0) do
           buckets BIG_BUCKETS
         end
 
@@ -137,11 +136,12 @@ module Gitlab
       # It will initialize the metric if metric is not found
       #
       # block - if provided, it can be used to initialize metric with custom options (docstring, labels, with_feature, multiprocess_mode)
+      # - multiprocess_mode is :all by default
       #
       # Example:
       # ```
       # transaction.set(:mestric_name, 1) do
-      #   multiprocess_mode :all
+      #   multiprocess_mode :livesum
       # end
       # ```
       def set(name, value, labels = {}, &block)

@@ -11,7 +11,7 @@ RSpec.describe Gitlab::Metrics::SidekiqMiddleware do
       worker = double(:worker, class: double(:class, name: 'TestWorker'))
 
       expect_next_instance_of(Gitlab::Metrics::BackgroundTransaction) do |transaction|
-        expect(transaction).to receive(:set).with(:sidekiq_queue_duration, instance_of(Float))
+        expect(transaction).to receive(:set).with(:gitlab_transaction_sidekiq_queue_duration_total, instance_of(Float))
         expect(transaction).to receive(:increment).with(:gitlab_transaction_db_count_total, 1)
       end
 
@@ -42,7 +42,7 @@ RSpec.describe Gitlab::Metrics::SidekiqMiddleware do
         .and_call_original
 
       expect_any_instance_of(Gitlab::Metrics::Transaction).to receive(:set)
-        .with(:sidekiq_queue_duration, instance_of(Float))
+        .with(:gitlab_transaction_sidekiq_queue_duration_total, instance_of(Float))
 
       middleware.call(worker, {}, :test) { nil }
     end

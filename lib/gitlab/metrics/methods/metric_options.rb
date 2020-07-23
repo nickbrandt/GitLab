@@ -7,7 +7,6 @@ module Gitlab
         def initialize(options = {})
           @multiprocess_mode = options[:multiprocess_mode] || :all
           @buckets = options[:buckets] || ::Prometheus::Client::Histogram::DEFAULT_BUCKETS
-          @base_labels = options[:base_labels] || nil
           @docstring = options[:docstring]
           @with_feature = options[:with_feature]
           @label_keys = options[:label_keys] || []
@@ -62,16 +61,9 @@ module Gitlab
         end
 
         def evaluate(&block)
-          if block_given?
-            @self_before_instance_eval = eval "self", block.binding, __FILE__, __LINE__
-            instance_eval(&block)
-          end
+          instance_eval(&block)  if block_given?
 
           self
-        end
-
-        def method_missing(method, *args, &block)
-          @self_before_instance_eval ? @self_before_instance_eval.send(method, *args, &block) : super # rubocop:disable GitlabSecurity/PublicSend
         end
       end
     end

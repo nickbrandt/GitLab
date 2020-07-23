@@ -27,6 +27,24 @@ module Gitlab
       attr_accessor :size, :mode, :id, :commit_id, :loaded_size, :binary
       attr_writer :name, :path, :data
 
+      def self.gitlab_blob_truncated_true
+        @gitlab_blob_truncated_true ||= ::Gitlab::Metrics.counter(:gitlab_blob_truncated_true, 'blob.truncated? == true')
+      end
+
+      def self.gitlab_blob_truncated_false
+        @gitlab_blob_truncated_false ||= ::Gitlab::Metrics.counter(:gitlab_blob_truncated_false, 'blob.truncated? == false')
+      end
+
+      def self.gitlab_blob_size
+        @gitlab_blob_size ||= ::Gitlab::Metrics.histogram(
+          :gitlab_blob_size,
+          'Gitlab::Git::Blob size',
+          {},
+          [1_000, 5_000, 10_000, 50_000, 100_000, 500_000, 1_000_000]
+        )
+      end
+
+
       class << self
         def find(repository, sha, path, limit: MAX_DATA_DISPLAY_SIZE)
           tree_entry(repository, sha, path, limit)
@@ -193,30 +211,19 @@ module Gitlab
       def record_metric_blob_size
         return unless size
 
-        current_transaction&.observe(:gitlab_blob_size, size) do
-          docstring 'Gitlab::Git::Blob size'
-          buckets [1_000, 5_000, 10_000, 50_000, 100_000, 500_000, 1_000_000]
-        end
+        self.class.gitlab_blob_size.observe({}, size)
       end
 
       def record_metric_truncated(bool)
         if bool
-          current_transaction&.increment(:gitlab_blob_truncated_true) do
-            docstring 'blob.truncated? == true'
-          end
+          self.class.gitlab_blob_truncated_true.increment
         else
-          current_transaction&.increment(:gitlab_blob_truncated_false) do
-            docstring 'blob.truncated? == false'
-          end
+          self.class.gitlab_blob_truncated_false.increment
         end
       end
 
       def has_lfs_version_key?
         !empty? && text_in_repo? && data.start_with?("version https://git-lfs.github.com/spec")
-      end
-
-      def current_transaction
-        ::Gitlab::Metrics::Transaction.current
       end
     end
   end
