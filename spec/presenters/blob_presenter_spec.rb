@@ -24,7 +24,7 @@ RSpec.describe BlobPresenter, :seed_helper do
     it { expect(subject.web_url).to eq("http://localhost/#{project.full_path}/-/blob/#{blob.commit_id}/#{blob.path}") }
   end
 
-  describe '.web_path' do
+  describe '#web_path' do
     let(:project) { create(:project, :repository) }
     let(:repository) { project.repository }
     let(:blob) { Gitlab::Graphql::Representation::TreeEntry.new(repository.tree.blobs.first, repository) }

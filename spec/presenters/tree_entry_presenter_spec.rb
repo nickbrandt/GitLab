@@ -14,7 +14,7 @@ RSpec.describe TreeEntryPresenter do
     it { expect(presenter.web_url).to eq("http://localhost/#{project.full_path}/-/tree/#{tree.commit_id}/#{tree.path}") }
   end
 
-  describe '.web_path' do
+  describe '#web_path' do
     it { expect(presenter.web_path).to eq("/#{project.full_path}/-/tree/#{tree.commit_id}/#{tree.path}") }
   end
 end

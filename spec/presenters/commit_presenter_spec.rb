@@ -8,7 +8,7 @@ RSpec.describe CommitPresenter do
   let(:user) { create(:user) }
   let(:presenter) { described_class.new(commit, current_user: user) }
 
-  describe '.web_path' do
+  describe '#web_path' do
     it { expect(presenter.web_path).to eq("/#{project.full_path}/-/commit/#{commit.sha}") }
   end
 
