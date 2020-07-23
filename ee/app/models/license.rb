@@ -77,6 +77,7 @@ class License < ApplicationRecord
     github_project_service_integration
     generic_alert_fingerprinting
     group_allowed_email_domains
+    group_coverage_reports
     group_ip_restriction
     group_project_templates
     group_saml
