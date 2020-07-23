@@ -304,8 +304,10 @@ RSpec.describe Gitlab::Elastic::Indexer do
     let(:cert_dir) { '/fake/cert/dir' }
 
     before do
-      stub_env('SSL_CERT_FILE', cert_file)
-      stub_env('SSL_CERT_DIR', cert_dir)
+      allow(ENV).to receive(:slice).with('SSL_CERT_FILE', 'SSL_CERT_DIR').and_return({
+        'SSL_CERT_FILE' => cert_file,
+        'SSL_CERT_DIR' => cert_dir
+      })
     end
 
     context 'when building env vars for child process' do
@@ -317,19 +319,38 @@ RSpec.describe Gitlab::Elastic::Indexer do
     end
   end
 
-  context 'when AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is set' do
-    let(:aws_cred_relative_uri) { '/ecs/relative/cred/uri'}
+  context 'when no aws credentials available' do
+    subject { envvars }
 
     before do
-      stub_env('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI', aws_cred_relative_uri)
+      allow(Gitlab::Elastic::Client).to receive(:aws_credential_provider).and_return(nil)
     end
 
-    context 'when building env vars for child process' do
-      subject { envvars }
+    it 'credentials env vars will not be included' do
+      expect(subject).not_to include('AWS_ACCESS_KEY_ID')
+      expect(subject).not_to include('AWS_SECRET_ACCESS_KEY')
+      expect(subject).not_to include('AWS_SESSION_TOKEN')
+    end
+  end
 
-      it 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI env vars will be included' do
-        expect(subject).to include('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI' => aws_cred_relative_uri)
-      end
+  context 'when aws credentials are available' do
+    let(:access_key_id) { '012' }
+    let(:secret_access_key) { 'secret' }
+    let(:session_token) { 'token' }
+    let(:credentials) { Aws::Credentials.new(access_key_id, secret_access_key, session_token) }
+
+    subject { envvars }
+
+    before do
+      allow(Gitlab::Elastic::Client).to receive(:aws_credential_provider).and_return(credentials)
+    end
+
+    it 'credentials env vars will be included' do
+      expect(subject).to include({
+        'AWS_ACCESS_KEY_ID' => access_key_id,
+        'AWS_SECRET_ACCESS_KEY' => secret_access_key,
+        'AWS_SESSION_TOKEN' => session_token
+      })
     end
   end
 

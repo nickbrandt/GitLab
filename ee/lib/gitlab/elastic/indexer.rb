@@ -109,11 +109,26 @@ module Gitlab
           'SSL_CERT_DIR'            => OpenSSL::X509::DEFAULT_CERT_DIR
         }
 
+        # Set AWS environment variables for IAM role authentication if present
+        vars = build_aws_credentials_env(vars)
+
         # Users can override default SSL certificate path via SSL_CERT_FILE SSL_CERT_DIR
-        # AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is used in AWS ECS to get credentials when making AWS API calls
-        %w(SSL_CERT_FILE SSL_CERT_DIR AWS_CONTAINER_CREDENTIALS_RELATIVE_URI).each_with_object(vars) do |key, hash|
-          hash[key] = ENV[key] if ENV.key?(key)
-        end
+        vars.merge(ENV.slice('SSL_CERT_FILE', 'SSL_CERT_DIR'))
+      end
+
+      def build_aws_credentials_env(vars)
+        # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN need to be set as
+        # environment variable in case of using IAM role based authentication in AWS
+        # The credentials are buffered to prevent from hitting rate limit. They will be
+        # refreshed when expired
+        credentials = Gitlab::Elastic::Client.aws_credential_provider&.credentials
+        return vars unless credentials&.set?
+
+        vars.merge(
+          'AWS_ACCESS_KEY_ID' => credentials.access_key_id,
+          'AWS_SECRET_ACCESS_KEY' => credentials.secret_access_key,
+          'AWS_SESSION_TOKEN' => credentials.session_token
+        )
       end
 
       def last_commit

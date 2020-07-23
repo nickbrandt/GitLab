@@ -1,0 +1,5 @@
+---
+title: Send AWS credentials via environment variables to indexer
+merge_request: 36917
+author:
+type: changed
