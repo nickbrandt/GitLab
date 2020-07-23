@@ -378,6 +378,14 @@ class GeoNodeStatus < ApplicationRecord
   attr_in_percentage :package_files_checksummed,     :package_files_checksummed_count,     :package_files_count
   attr_in_percentage :package_files_synced,          :package_files_synced_count,          :package_files_registry_count
 
+  def synced_in_percentage_for(replicator_class)
+    public_send("#{replicator_class.replicable_name_plural}_synced_in_percentage") # rubocop:disable GitlabSecurity/PublicSend
+  end
+
+  def checksummed_in_percentage_for(replicator_class)
+    public_send("#{replicator_class.replicable_name_plural}_checksummed_in_percentage") # rubocop:disable GitlabSecurity/PublicSend
+  end
+
   def storage_shards_match?
     return true if geo_node.primary?
     return false unless storage_configuration_digest && primary_storage_digest
