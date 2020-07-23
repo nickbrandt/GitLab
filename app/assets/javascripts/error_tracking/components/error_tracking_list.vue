@@ -274,8 +274,6 @@ export default {
                 class="clear-search text-secondary"
                 name="clear"
                 icon="close"
-                category="primary"
-                variant="default"
                 @click="errorSearchQuery = ''"
               />
             </div>
