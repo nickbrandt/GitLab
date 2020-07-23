@@ -8,7 +8,11 @@ RSpec.describe "projects/dast_profiles/index", type: :view do
     render
   end
 
-  it 'renders a placeholder title' do
-    expect(rendered).to have_content('Manage profiles')
+  it 'renders Vue app root' do
+    expect(rendered).to have_selector('.js-dast-profiles')
+  end
+
+  it 'passes new dast site profile path' do
+    expect(rendered).to include '/on_demand_scans/profiles/dast_site_profiles/new'
   end
 end
