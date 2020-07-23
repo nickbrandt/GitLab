@@ -37,15 +37,15 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Dast do
         end
       end
 
-      it 'parses all identifiers, occurrences and scanned resources' do
-        expect(report.occurrences.length).to eq(occurrence_count)
+      it 'parses all identifiers, findings and scanned resources' do
+        expect(report.findings.length).to eq(occurrence_count)
         expect(report.identifiers.length).to eq(identifier_count)
         expect(report.scanners.length).to eq(scanner_count)
         expect(report.scanned_resources.length).to eq(scanned_resources_count)
       end
 
       it 'generates expected location' do
-        location = report.occurrences.last.location
+        location = report.findings.last.location
 
         expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::Dast)
         expect(location).to have_attributes(
@@ -64,7 +64,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Dast do
 
         with_them do
           it 'saves properly occurrence' do
-            occurrence = report.occurrences.last
+            occurrence = report.findings.last
 
             expect(occurrence.public_send(attribute)).to eq(value)
           end

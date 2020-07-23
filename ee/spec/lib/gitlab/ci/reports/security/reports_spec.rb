@@ -41,13 +41,13 @@ RSpec.describe Gitlab::Ci::Reports::Security::Reports do
   describe "#violates_default_policy?" do
     subject { described_class.new(commit_sha) }
 
-    let(:low_severity) { build(:ci_reports_security_occurrence, severity: 'low') }
-    let(:high_severity) { build(:ci_reports_security_occurrence, severity: 'high') }
+    let(:low_severity) { build(:ci_reports_security_finding, severity: 'low') }
+    let(:high_severity) { build(:ci_reports_security_finding, severity: 'high') }
 
     context "when a report has a high severity vulnerability" do
       before do
-        subject.get_report('sast', artifact).add_occurrence(high_severity)
-        subject.get_report('dependency_scanning', artifact).add_occurrence(low_severity)
+        subject.get_report('sast', artifact).add_finding(high_severity)
+        subject.get_report('dependency_scanning', artifact).add_finding(low_severity)
       end
 
       it { expect(subject.violates_default_policy?).to be(true) }
@@ -55,8 +55,9 @@ RSpec.describe Gitlab::Ci::Reports::Security::Reports do
 
     context "when none of the reports have a high severity vulnerability" do
       before do
-        subject.get_report('sast', artifact).add_occurrence(low_severity)
-        subject.get_report('dependency_scanning', artifact).add_occurrence(low_severity)
+        subject.get_report('sast', artifact).add_finding(low_severity)
+        subject.get_report('sast', artifact).add_finding(low_severity)
+        subject.get_report('dependency_scanning', artifact).add_finding(low_severity)
       end
 
       it { expect(subject.violates_default_policy?).to be(false) }

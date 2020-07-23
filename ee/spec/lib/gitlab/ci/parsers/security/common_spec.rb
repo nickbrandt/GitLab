@@ -18,10 +18,10 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
         parser.parse!(blob, report)
       end
 
-      expect(report.occurrences.map(&:severity)).to include("unknown")
-      expect(report.occurrences.map(&:confidence)).to include("unknown")
-      expect(report.occurrences.map(&:severity)).not_to include("undefined")
-      expect(report.occurrences.map(&:confidence)).not_to include("undefined")
+      expect(report.findings.map(&:severity)).to include("unknown")
+      expect(report.findings.map(&:confidence)).to include("unknown")
+      expect(report.findings.map(&:severity)).not_to include("undefined")
+      expect(report.findings.map(&:confidence)).not_to include("undefined")
     end
 
     context 'parsing remediations' do
@@ -101,7 +101,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
         raw_json[:remediations] << fix_with_cve
         parser.parse!(raw_json.to_json, report)
 
-        vulnerability = report.occurrences.find { |x| x.compare_key == "CVE-1020" }
+        vulnerability = report.findings.find { |x| x.compare_key == "CVE-1020" }
         expect(vulnerability.raw_metadata).to include fix_with_cve.to_json
       end
 
@@ -120,7 +120,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
         raw_json[:remediations] << fix_with_id
         parser.parse!(raw_json.to_json, report)
 
-        vulnerability = report.occurrences.find { |x| x.compare_key == "CVE-1030" }
+        vulnerability = report.findings.find { |x| x.compare_key == "CVE-1030" }
         expect(vulnerability.raw_metadata).to include fix_with_id.to_json
       end
 
@@ -148,9 +148,9 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
         raw_json[:remediations] << fix_with_id << fix_with_cve
         parser.parse!(raw_json.to_json, report)
 
-        vulnerability_1030 = report.occurrences.find { |x| x.compare_key == "CVE-1030" }
+        vulnerability_1030 = report.findings.find { |x| x.compare_key == "CVE-1030" }
         expect(vulnerability_1030.raw_metadata).to include fix_with_id.to_json
-        vulnerability_1020 = report.occurrences.find { |x| x.compare_key == "CVE-1020" }
+        vulnerability_1020 = report.findings.find { |x| x.compare_key == "CVE-1020" }
         expect(vulnerability_1020.raw_metadata).to include fix_with_cve.to_json
       end
 
@@ -179,7 +179,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
         raw_json[:remediations] << fix_with_id << fix_with_id_2
         parser.parse!(raw_json.to_json, report)
 
-        report.occurrences.map do |vulnerability|
+        report.findings.map do |vulnerability|
           expect(vulnerability.raw_metadata).not_to include(fix_with_id.to_json)
         end
       end
@@ -208,7 +208,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
         }
       end
 
-      subject(:scanner) { report.occurrences.first.scanner }
+      subject(:scanner) { report.findings.first.scanner }
 
       before do
         parser.parse!(raw_json.to_json, report)

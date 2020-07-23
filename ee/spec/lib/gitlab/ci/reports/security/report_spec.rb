@@ -41,13 +41,13 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     end
   end
 
-  describe '#add_occurrence' do
-    let(:occurrence) { create(:ci_reports_security_occurrence) }
+  describe '#add_finding' do
+    let(:finding) { create(:ci_reports_security_finding) }
 
-    it 'enriches given occurrence and stores it in the collection' do
-      report.add_occurrence(occurrence)
+    it 'enriches given finding and stores it in the collection' do
+      report.add_finding(finding)
 
-      expect(report.occurrences).to eq([occurrence])
+      expect(report.findings).to eq([finding])
     end
   end
 
@@ -55,7 +55,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     let(:report) do
       create(
         :ci_reports_security_report,
-        occurrences: [create(:ci_reports_security_occurrence)],
+        findings: [create(:ci_reports_security_finding)],
         scanners: [create(:ci_reports_security_scanner)],
         identifiers: [create(:ci_reports_security_identifier)]
       )
@@ -67,7 +67,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
       expect(clone.type).to eq(report.type)
       expect(clone.commit_sha).to eq(report.commit_sha)
       expect(clone.created_at).to eq(report.created_at)
-      expect(clone.occurrences).to eq([])
+      expect(clone.findings).to eq([])
       expect(clone.scanners).to eq({})
       expect(clone.identifiers).to eq({})
     end
@@ -77,7 +77,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     let(:report) do
       create(
         :ci_reports_security_report,
-        occurrences: [create(:ci_reports_security_occurrence)],
+        findings: [create(:ci_reports_security_finding)],
         scanners: [create(:ci_reports_security_scanner)],
         identifiers: [create(:ci_reports_security_identifier)]
       )
@@ -85,7 +85,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     let(:other_report) do
       create(
         :ci_reports_security_report,
-        occurrences: [create(:ci_reports_security_occurrence, compare_key: 'other_occurrence')],
+        findings: [create(:ci_reports_security_finding, compare_key: 'other_finding')],
         scanners: [create(:ci_reports_security_scanner, external_id: 'other_scanner', name: 'Other Scanner')],
         identifiers: [create(:ci_reports_security_identifier, external_id: 'other_id', name: 'other_scanner')]
       )
@@ -96,7 +96,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     end
 
     it 'replaces report contents with other reports contents' do
-      expect(report.occurrences).to eq(other_report.occurrences)
+      expect(report.findings).to eq(other_report.findings)
       expect(report.scanners).to eq(other_report.scanners)
       expect(report.identifiers).to eq(other_report.identifiers)
     end
@@ -128,10 +128,10 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     context "when the sast report has an unsafe vulnerability" do
       where(severity: %w[unknown Unknown high High critical Critical])
       with_them do
-        let(:occurrence) { build(:ci_reports_security_occurrence, severity: severity) }
+        let(:finding) { build(:ci_reports_security_finding, severity: severity) }
 
         before do
-          subject.add_occurrence(occurrence)
+          subject.add_finding(finding)
         end
 
         it { expect(subject.unsafe_severity?).to be(true) }
@@ -142,10 +142,10 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     context "when the sast report has a medium to low severity vulnerability" do
       where(severity: %w[medium Medium low Low])
       with_them do
-        let(:occurrence) { build(:ci_reports_security_occurrence, severity: severity) }
+        let(:finding) { build(:ci_reports_security_finding, severity: severity) }
 
         before do
-          subject.add_occurrence(occurrence)
+          subject.add_finding(finding)
         end
 
         it { expect(subject.unsafe_severity?).to be(false) }
@@ -154,10 +154,10 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     end
 
     context "when the sast report has a vulnerability with a `nil` severity" do
-      let(:occurrence) { build(:ci_reports_security_occurrence, severity: nil) }
+      let(:finding) { build(:ci_reports_security_finding, severity: nil) }
 
       before do
-        subject.add_occurrence(occurrence)
+        subject.add_finding(finding)
       end
 
       it { expect(subject.unsafe_severity?).to be(false) }
@@ -165,10 +165,10 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     end
 
     context "when the sast report has a vulnerability with a blank severity" do
-      let(:occurrence) { build(:ci_reports_security_occurrence, severity: '') }
+      let(:finding) { build(:ci_reports_security_finding, severity: '') }
 
       before do
-        subject.add_occurrence(occurrence)
+        subject.add_finding(finding)
       end
 
       it { expect(subject.unsafe_severity?).to be(false) }

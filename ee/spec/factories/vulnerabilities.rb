@@ -45,13 +45,13 @@ FactoryBot.define do
       severity { :low }
     end
 
-    ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.each do |severity_level|
+    ::Vulnerabilities::Finding::SEVERITY_LEVELS.keys.each do |severity_level|
       trait severity_level do
         severity { severity_level }
       end
     end
 
-    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.each do |report_type|
+    ::Vulnerabilities::Finding::REPORT_TYPES.keys.each do |report_type|
       trait report_type do
         report_type { report_type }
       end
@@ -59,20 +59,20 @@ FactoryBot.define do
 
     trait :with_findings do
       after(:build) do |vulnerability|
-        occurrences_with_solution = build_list(
-          :vulnerabilities_occurrence,
+        findings_with_solution = build_list(
+          :vulnerabilities_finding,
           2,
           vulnerability: vulnerability,
           report_type: vulnerability.report_type,
           project: vulnerability.project)
-        occurrences_with_remediation = build_list(
-          :vulnerabilities_occurrence,
+        findings_with_remediation = build_list(
+          :vulnerabilities_finding,
           2,
           :with_remediation,
           vulnerability: vulnerability,
           report_type: vulnerability.report_type,
           project: vulnerability.project)
-        vulnerability.findings = occurrences_with_solution + occurrences_with_remediation
+        vulnerability.findings = findings_with_solution + findings_with_remediation
       end
     end
 

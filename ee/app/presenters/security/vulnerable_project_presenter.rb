@@ -2,7 +2,7 @@
 
 module Security
   class VulnerableProjectPresenter < ::Gitlab::View::Presenter::Delegated
-    SEVERITY_LEVELS = ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys
+    SEVERITY_LEVELS = ::Vulnerabilities::Finding::SEVERITY_LEVELS.keys
 
     presents :project
 
@@ -14,7 +14,7 @@ module Security
 
     def counts_for_project(project)
       SEVERITY_LEVELS.each_with_object({}) do |severity, counts|
-        counts["#{severity}_vulnerability_count".to_sym] = ::Vulnerabilities::Occurrence.batch_count_by_project_and_severity(project.id, severity)
+        counts["#{severity}_vulnerability_count".to_sym] = ::Vulnerabilities::Finding.batch_count_by_project_and_severity(project.id, severity)
       end
     end
   end

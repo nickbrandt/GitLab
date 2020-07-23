@@ -1,28 +1,31 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class Occurrence < ApplicationRecord
+  class Finding < ApplicationRecord
     include ShaAttribute
     include ::Gitlab::Utils::StrongMemoize
     include Presentable
 
+    # https://gitlab.com/groups/gitlab-org/-/epics/3148
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/214563#note_370782508 is why the table names are not renamed
     self.table_name = "vulnerability_occurrences"
 
-    OCCURRENCES_PER_PAGE = 20
+    FINDINGS_PER_PAGE = 20
 
-    paginates_per OCCURRENCES_PER_PAGE
+    paginates_per FINDINGS_PER_PAGE
 
     sha_attribute :project_fingerprint
     sha_attribute :location_fingerprint
 
-    belongs_to :project
+    belongs_to :project, inverse_of: :vulnerability_findings
     belongs_to :scanner, class_name: 'Vulnerabilities::Scanner'
-    belongs_to :primary_identifier, class_name: 'Vulnerabilities::Identifier', inverse_of: :primary_occurrences
-    belongs_to :vulnerability, inverse_of: :findings
+    belongs_to :primary_identifier, class_name: 'Vulnerabilities::Identifier', inverse_of: :primary_findings, foreign_key: 'primary_identifier_id'
+    belongs_to :vulnerability, class_name: 'Vulnerability', inverse_of: :findings, foreign_key: 'vulnerability_id'
 
-    has_many :finding_identifiers, class_name: 'Vulnerabilities::FindingIdentifier'
+    has_many :finding_identifiers, class_name: 'Vulnerabilities::FindingIdentifier', inverse_of: :finding, foreign_key: 'occurrence_id'
     has_many :identifiers, through: :finding_identifiers, class_name: 'Vulnerabilities::Identifier'
-    has_many :finding_pipelines, class_name: 'Vulnerabilities::FindingPipeline'
+
+    has_many :finding_pipelines, class_name: 'Vulnerabilities::FindingPipeline', inverse_of: :finding, foreign_key: 'occurrence_id'
     has_many :pipelines, through: :finding_pipelines, class_name: 'Ci::Pipeline'
 
     attr_writer :sha
@@ -122,7 +125,7 @@ module Vulnerabilities
     end
 
     def self.with_vulnerabilities_for_state(project:, report_type:, project_fingerprints:)
-      Vulnerabilities::Occurrence
+      Vulnerabilities::Finding
         .joins(:vulnerability)
         .where(
           project: project,
@@ -191,10 +194,10 @@ module Vulnerabilities
     end
 
     def load_feedback
-      BatchLoader.for(occurrence_key).batch(replace_methods: false) do |occurrence_keys, loader|
-        project_ids = occurrence_keys.map { |key| key[:project_id] }
-        categories = occurrence_keys.map { |key| key[:category] }
-        fingerprints = occurrence_keys.map { |key| key[:project_fingerprint] }
+      BatchLoader.for(finding_key).batch(replace_methods: false) do |finding_keys, loader|
+        project_ids = finding_keys.map { |key| key[:project_id] }
+        categories = finding_keys.map { |key| key[:category] }
+        fingerprints = finding_keys.map { |key| key[:project_fingerprint] }
 
         feedback = Vulnerabilities::Feedback.all_preloaded.where(
           project_id: project_ids.uniq,
@@ -202,10 +205,10 @@ module Vulnerabilities
           project_fingerprint: fingerprints.uniq
         ).to_a
 
-        occurrence_keys.each do |occurrence_key|
+        finding_keys.each do |finding_key|
           loader.call(
-            occurrence_key,
-            feedback.select { |f| occurrence_key == f.occurrence_key }
+            finding_key,
+            feedback.select { |f| finding_key == f.finding_key }
           )
         end
       end
@@ -308,7 +311,7 @@ module Vulnerabilities
 
     private
 
-    def occurrence_key
+    def finding_key
       {
         project_id: project_id,
         category: report_type,

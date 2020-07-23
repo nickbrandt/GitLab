@@ -30,20 +30,20 @@ module Security
     end
 
     def create_all_vulnerabilities!
-      @report.occurrences.each do |occurrence|
-        create_vulnerability_finding(occurrence)
+      @report.findings.each do |finding|
+        create_vulnerability_finding(finding)
       end
     end
 
-    def create_vulnerability_finding(occurrence)
-      vulnerability_params = occurrence.to_hash.except(:compare_key, :identifiers, :location, :scanner)
-      vulnerability_finding = create_or_find_vulnerability_finding(occurrence, vulnerability_params)
+    def create_vulnerability_finding(finding)
+      vulnerability_params = finding.to_hash.except(:compare_key, :identifiers, :location, :scanner)
+      vulnerability_finding = create_or_find_vulnerability_finding(finding, vulnerability_params)
 
-      update_vulnerability_scanner(occurrence)
+      update_vulnerability_scanner(finding)
 
       update_vulnerability_finding(vulnerability_finding, vulnerability_params)
 
-      occurrence.identifiers.map do |identifier|
+      finding.identifiers.map do |identifier|
         create_or_update_vulnerability_identifier_object(vulnerability_finding, identifier)
       end
 
@@ -53,13 +53,13 @@ module Security
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def create_or_find_vulnerability_finding(occurrence, create_params)
-      return if occurrence.scanner.blank?
+    def create_or_find_vulnerability_finding(finding, create_params)
+      return if finding.scanner.blank?
 
       find_params = {
-        scanner: scanners_objects[occurrence.scanner.key],
-        primary_identifier: identifiers_objects[occurrence.primary_identifier.key],
-        location_fingerprint: occurrence.location.fingerprint
+        scanner: scanners_objects[finding.scanner.key],
+        primary_identifier: identifiers_objects[finding.primary_identifier.key],
+        location_fingerprint: finding.location.fingerprint
       }
 
       begin
@@ -74,11 +74,11 @@ module Security
       end
     end
 
-    def update_vulnerability_scanner(occurrence)
-      return if occurrence.scanner.blank?
+    def update_vulnerability_scanner(finding)
+      return if finding.scanner.blank?
 
-      scanner = scanners_objects[occurrence.scanner.key]
-      scanner.update!(occurrence.scanner.to_hash)
+      scanner = scanners_objects[finding.scanner.key]
+      scanner.update!(finding.scanner.to_hash)
     end
 
     def update_vulnerability_finding(vulnerability_finding, update_params)

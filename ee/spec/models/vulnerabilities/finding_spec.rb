@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Vulnerabilities::Occurrence do
+RSpec.describe Vulnerabilities::Finding do
   it { is_expected.to define_enum_for(:confidence) }
   it { is_expected.to define_enum_for(:report_type) }
   it { is_expected.to define_enum_for(:severity) }
@@ -13,13 +13,13 @@ RSpec.describe Vulnerabilities::Occurrence do
     it { is_expected.to belong_to(:scanner).class_name('Vulnerabilities::Scanner') }
     it { is_expected.to belong_to(:vulnerability).inverse_of(:findings) }
     it { is_expected.to have_many(:pipelines).class_name('Ci::Pipeline') }
-    it { is_expected.to have_many(:finding_pipelines).class_name('Vulnerabilities::FindingPipeline') }
+    it { is_expected.to have_many(:finding_pipelines).class_name('Vulnerabilities::FindingPipeline').with_foreign_key('occurrence_id') }
     it { is_expected.to have_many(:identifiers).class_name('Vulnerabilities::Identifier') }
-    it { is_expected.to have_many(:finding_identifiers).class_name('Vulnerabilities::FindingIdentifier') }
+    it { is_expected.to have_many(:finding_identifiers).class_name('Vulnerabilities::FindingIdentifier').with_foreign_key('occurrence_id') }
   end
 
   describe 'validations' do
-    let(:occurrence) { build(:vulnerabilities_occurrence) }
+    let(:finding) { build(:vulnerabilities_finding) }
 
     it { is_expected.to validate_presence_of(:scanner) }
     it { is_expected.to validate_presence_of(:project) }
@@ -36,11 +36,11 @@ RSpec.describe Vulnerabilities::Occurrence do
   end
 
   context 'database uniqueness' do
-    let(:occurrence) { create(:vulnerabilities_occurrence) }
-    let(:new_occurrence) { occurrence.dup.tap { |o| o.uuid = SecureRandom.uuid } }
+    let(:finding) { create(:vulnerabilities_finding) }
+    let(:new_finding) { finding.dup.tap { |o| o.uuid = SecureRandom.uuid } }
 
     it "when all index attributes are identical" do
-      expect { new_occurrence.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+      expect { new_finding.save! }.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
     describe 'when some parameters are changed' do
@@ -55,19 +55,19 @@ RSpec.describe Vulnerabilities::Occurrence do
 
       with_them do
         it "is valid" do
-          expect { new_occurrence.update!({ key => create(factory_name) }) }.not_to raise_error
+          expect { new_finding.update!({ key => create(factory_name) }) }.not_to raise_error
         end
       end
     end
   end
 
   context 'order' do
-    let!(:occurrence1) { create(:vulnerabilities_occurrence, confidence: described_class::CONFIDENCE_LEVELS[:high], severity:   described_class::SEVERITY_LEVELS[:high]) }
-    let!(:occurrence2) { create(:vulnerabilities_occurrence, confidence: described_class::CONFIDENCE_LEVELS[:medium], severity: described_class::SEVERITY_LEVELS[:critical]) }
-    let!(:occurrence3) { create(:vulnerabilities_occurrence, confidence: described_class::CONFIDENCE_LEVELS[:high], severity:   described_class::SEVERITY_LEVELS[:critical]) }
+    let!(:finding1) { create(:vulnerabilities_finding, confidence: described_class::CONFIDENCE_LEVELS[:high], severity:   described_class::SEVERITY_LEVELS[:high]) }
+    let!(:finding2) { create(:vulnerabilities_finding, confidence: described_class::CONFIDENCE_LEVELS[:medium], severity: described_class::SEVERITY_LEVELS[:critical]) }
+    let!(:finding3) { create(:vulnerabilities_finding, confidence: described_class::CONFIDENCE_LEVELS[:high], severity:   described_class::SEVERITY_LEVELS[:critical]) }
 
     it 'orders by severity and confidence' do
-      expect(described_class.all.ordered).to eq([occurrence3, occurrence2, occurrence1])
+      expect(described_class.all.ordered).to eq([finding3, finding2, finding1])
     end
   end
 
@@ -76,18 +76,18 @@ RSpec.describe Vulnerabilities::Occurrence do
 
     subject { described_class.report_type(report_type) }
 
-    context 'when occurrence has the corresponding report type' do
-      let!(:occurrence) { create(:vulnerabilities_occurrence, report_type: report_type) }
+    context 'when finding has the corresponding report type' do
+      let!(:finding) { create(:vulnerabilities_finding, report_type: report_type) }
 
-      it 'selects the occurrence' do
-        is_expected.to eq([occurrence])
+      it 'selects the finding' do
+        is_expected.to eq([finding])
       end
     end
 
-    context 'when occurrence does not have security reports' do
-      let!(:occurrence) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning) }
+    context 'when finding does not have security reports' do
+      let!(:finding) { create(:vulnerabilities_finding, report_type: :dependency_scanning) }
 
-      it 'does not select the occurrence' do
+      it 'does not select the finding' do
         is_expected.to be_empty
       end
     end
@@ -98,13 +98,13 @@ RSpec.describe Vulnerabilities::Occurrence do
     let(:pipeline) { create(:ci_pipeline, :success, project: project) }
 
     before do
-      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
+      create(:vulnerabilities_finding, pipelines: [pipeline], project: project)
     end
 
-    subject(:occurrences) { described_class.for_pipelines_with_sha([pipeline]) }
+    subject(:findings) { described_class.for_pipelines_with_sha([pipeline]) }
 
     it 'sets the sha' do
-      expect(occurrences.first.sha).to eq(pipeline.sha)
+      expect(findings.first.sha).to eq(pipeline.sha)
     end
   end
 
@@ -117,23 +117,23 @@ RSpec.describe Vulnerabilities::Occurrence do
       travel_to(date_1) do
         pipeline = create(:ci_pipeline, :success, project: project)
 
-        create_list(:vulnerabilities_occurrence, 2,
+        create_list(:vulnerabilities_finding, 2,
           pipelines: [pipeline], project: project, report_type: :sast, severity: :high)
       end
 
       travel_to(date_2) do
         pipeline = create(:ci_pipeline, :success, project: project)
 
-        create_list(:vulnerabilities_occurrence, 2,
+        create_list(:vulnerabilities_finding, 2,
           pipelines: [pipeline], project: project, report_type: :dependency_scanning, severity: :low)
 
-        create_list(:vulnerabilities_occurrence, 1,
+        create_list(:vulnerabilities_finding, 1,
           pipelines: [pipeline], project: project, report_type: :dast, severity: :medium)
 
-        create_list(:vulnerabilities_occurrence, 1,
+        create_list(:vulnerabilities_finding, 1,
           pipelines: [pipeline], project: project, report_type: :dast, severity: :low)
 
-        create_list(:vulnerabilities_occurrence, 2,
+        create_list(:vulnerabilities_finding, 2,
           pipelines: [pipeline], project: project, report_type: :secret_detection, severity: :critical)
       end
     end
@@ -147,7 +147,7 @@ RSpec.describe Vulnerabilities::Occurrence do
     context 'within 3-day period' do
       let(:range) { 3.days }
 
-      it 'returns expected counts for occurrences' do
+      it 'returns expected counts for findings' do
         first, second, third = subject
 
         expect(first.day).to eq(date_2)
@@ -165,7 +165,7 @@ RSpec.describe Vulnerabilities::Occurrence do
     context 'within 4-day period' do
       let(:range) { 4.days }
 
-      it 'returns expected counts for occurrences' do
+      it 'returns expected counts for findings' do
         first, second, third, forth = subject
 
         expect(first.day).to eq(date_1)
@@ -185,10 +185,10 @@ RSpec.describe Vulnerabilities::Occurrence do
   end
 
   describe '.by_report_types' do
-    let!(:vulnerability_sast) { create(:vulnerabilities_occurrence, report_type: :sast) }
-    let!(:vulnerability_secret_detection) { create(:vulnerabilities_occurrence, report_type: :secret_detection) }
-    let!(:vulnerability_dast) { create(:vulnerabilities_occurrence, report_type: :dast) }
-    let!(:vulnerability_depscan) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning) }
+    let!(:vulnerability_sast) { create(:vulnerabilities_finding, report_type: :sast) }
+    let!(:vulnerability_secret_detection) { create(:vulnerabilities_finding, report_type: :secret_detection) }
+    let!(:vulnerability_dast) { create(:vulnerabilities_finding, report_type: :dast) }
+    let!(:vulnerability_depscan) { create(:vulnerabilities_finding, report_type: :dependency_scanning) }
 
     subject { described_class.by_report_types(param) }
 
@@ -218,8 +218,8 @@ RSpec.describe Vulnerabilities::Occurrence do
   end
 
   describe '.by_projects' do
-    let!(:vulnerability1) { create(:vulnerabilities_occurrence) }
-    let!(:vulnerability2) { create(:vulnerabilities_occurrence) }
+    let!(:vulnerability1) { create(:vulnerabilities_finding) }
+    let!(:vulnerability2) { create(:vulnerabilities_finding) }
 
     subject { described_class.by_projects(param) }
 
@@ -233,8 +233,8 @@ RSpec.describe Vulnerabilities::Occurrence do
   end
 
   describe '.by_severities' do
-    let!(:vulnerability_high) { create(:vulnerabilities_occurrence, severity: :high) }
-    let!(:vulnerability_low) { create(:vulnerabilities_occurrence, severity: :low) }
+    let!(:vulnerability_high) { create(:vulnerabilities_finding, severity: :high) }
+    let!(:vulnerability_low) { create(:vulnerabilities_finding, severity: :low) }
 
     subject { described_class.by_severities(param) }
 
@@ -256,8 +256,8 @@ RSpec.describe Vulnerabilities::Occurrence do
   end
 
   describe '.by_confidences' do
-    let!(:vulnerability_high) { create(:vulnerabilities_occurrence, confidence: :high) }
-    let!(:vulnerability_low) { create(:vulnerabilities_occurrence, confidence: :low) }
+    let!(:vulnerability_high) { create(:vulnerabilities_finding, confidence: :high) }
+    let!(:vulnerability_low) { create(:vulnerabilities_finding, confidence: :low) }
 
     subject { described_class.by_confidences(param) }
 
@@ -279,9 +279,9 @@ RSpec.describe Vulnerabilities::Occurrence do
   end
 
   describe '.counted_by_severity' do
-    let!(:high_vulnerabilities) { create_list(:vulnerabilities_occurrence, 3, severity: :high) }
-    let!(:medium_vulnerabilities) { create_list(:vulnerabilities_occurrence, 2, severity: :medium) }
-    let!(:low_vulnerabilities) { create_list(:vulnerabilities_occurrence, 1, severity: :low) }
+    let!(:high_vulnerabilities) { create_list(:vulnerabilities_finding, 3, severity: :high) }
+    let!(:medium_vulnerabilities) { create_list(:vulnerabilities_finding, 2, severity: :medium) }
+    let!(:low_vulnerabilities) { create_list(:vulnerabilities_finding, 1, severity: :low) }
 
     subject { described_class.counted_by_severity }
 
@@ -293,9 +293,9 @@ RSpec.describe Vulnerabilities::Occurrence do
   describe '.undismissed' do
     let_it_be(:project) { create(:project) }
     let_it_be(:project2) { create(:project) }
-    let!(:finding1) { create(:vulnerabilities_occurrence, project: project) }
-    let!(:finding2) { create(:vulnerabilities_occurrence, project: project, report_type: :dast) }
-    let!(:finding3) { create(:vulnerabilities_occurrence, project: project2) }
+    let!(:finding1) { create(:vulnerabilities_finding, project: project) }
+    let!(:finding2) { create(:vulnerabilities_finding, project: project, report_type: :dast) }
+    let!(:finding3) { create(:vulnerabilities_finding, project: project2) }
 
     before do
       create(
@@ -319,11 +319,11 @@ RSpec.describe Vulnerabilities::Occurrence do
       )
     end
 
-    it 'returns all non-dismissed occurrences' do
+    it 'returns all non-dismissed findings' do
       expect(described_class.undismissed).to contain_exactly(finding2, finding3)
     end
 
-    it 'returns non-dismissed occurrences for project' do
+    it 'returns non-dismissed findings for project' do
       expect(project2.vulnerability_findings.undismissed).to contain_exactly(finding3)
     end
   end
@@ -333,7 +333,7 @@ RSpec.describe Vulnerabilities::Occurrence do
     let(:project) { create(:project) }
 
     it 'fetches a vulnerability count for the given project and severity' do
-      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
+      create(:vulnerabilities_finding, pipelines: [pipeline], project: project, severity: :high)
 
       count = described_class.batch_count_by_project_and_severity(project.id, 'high')
 
@@ -344,15 +344,15 @@ RSpec.describe Vulnerabilities::Occurrence do
       old_pipeline = create(:ci_pipeline, :success, project: project)
       latest_pipeline = create(:ci_pipeline, :success, project: project)
       latest_failed_pipeline = create(:ci_pipeline, :failed, project: project)
-      create(:vulnerabilities_occurrence, pipelines: [old_pipeline], project: project, severity: :critical)
+      create(:vulnerabilities_finding, pipelines: [old_pipeline], project: project, severity: :critical)
       create(
-        :vulnerabilities_occurrence,
+        :vulnerabilities_finding,
         pipelines: [latest_failed_pipeline],
         project: project,
         severity: :critical
       )
       create_list(
-        :vulnerabilities_occurrence, 2,
+        :vulnerabilities_finding, 2,
         pipelines: [latest_pipeline],
         project: project,
         severity: :critical
@@ -375,8 +375,8 @@ RSpec.describe Vulnerabilities::Occurrence do
       projects.each do |project|
         pipeline = create(:ci_pipeline, :success, project: project)
 
-        create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
-        create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :low)
+        create(:vulnerabilities_finding, pipelines: [pipeline], project: project, severity: :high)
+        create(:vulnerabilities_finding, pipelines: [pipeline], project: project, severity: :low)
       end
 
       projects_and_severities = [
@@ -394,8 +394,8 @@ RSpec.describe Vulnerabilities::Occurrence do
     end
 
     it 'does not include dismissed vulnerabilities in the counts' do
-      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
-      dismissed_vulnerability = create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
+      create(:vulnerabilities_finding, pipelines: [pipeline], project: project, severity: :high)
+      dismissed_vulnerability = create(:vulnerabilities_finding, pipelines: [pipeline], project: project, severity: :high)
       create(
         :vulnerability_feedback,
         project: project,
@@ -413,8 +413,8 @@ RSpec.describe Vulnerabilities::Occurrence do
       project2 = create(:project)
       pipeline1 = create(:ci_pipeline, :success, project: project1)
       pipeline2 = create(:ci_pipeline, :success, project: project2)
-      create(:vulnerabilities_occurrence, pipelines: [pipeline1], project: project1, severity: :critical)
-      create(:vulnerabilities_occurrence, pipelines: [pipeline2], project: project2, severity: :high)
+      create(:vulnerabilities_finding, pipelines: [pipeline1], project: project1, severity: :critical)
+      create(:vulnerabilities_finding, pipelines: [pipeline2], project: project2, severity: :high)
 
       project1_critical_count = described_class.batch_count_by_project_and_severity(project1.id, 'critical')
       project1_high_count = described_class.batch_count_by_project_and_severity(project1.id, 'high')
@@ -430,9 +430,9 @@ RSpec.describe Vulnerabilities::Occurrence do
 
   describe 'feedback' do
     let_it_be(:project) { create(:project) }
-    let(:occurrence) do
+    let(:finding) do
       create(
-        :vulnerabilities_occurrence,
+        :vulnerabilities_finding,
         report_type: :dependency_scanning,
         project: project
       )
@@ -447,12 +447,12 @@ RSpec.describe Vulnerabilities::Occurrence do
           :issue,
           issue: issue,
           project: project,
-          project_fingerprint: occurrence.project_fingerprint
+          project_fingerprint: finding.project_fingerprint
         )
       end
 
       it 'returns associated feedback' do
-        feedback = occurrence.issue_feedback
+        feedback = finding.issue_feedback
 
         expect(feedback).to be_present
         expect(feedback[:project_id]).to eq project.id
@@ -468,12 +468,12 @@ RSpec.describe Vulnerabilities::Occurrence do
           :dependency_scanning,
           :dismissal,
           project: project,
-          project_fingerprint: occurrence.project_fingerprint
+          project_fingerprint: finding.project_fingerprint
         )
       end
 
       it 'returns associated feedback' do
-        feedback = occurrence.dismissal_feedback
+        feedback = finding.dismissal_feedback
 
         expect(feedback).to be_present
         expect(feedback[:project_id]).to eq project.id
@@ -490,12 +490,12 @@ RSpec.describe Vulnerabilities::Occurrence do
           :merge_request,
           merge_request: merge_request,
           project: project,
-          project_fingerprint: occurrence.project_fingerprint
+          project_fingerprint: finding.project_fingerprint
         )
       end
 
       it 'returns associated feedback' do
-        feedback = occurrence.merge_request_feedback
+        feedback = finding.merge_request_feedback
 
         expect(feedback).to be_present
         expect(feedback[:project_id]).to eq project.id
@@ -507,9 +507,9 @@ RSpec.describe Vulnerabilities::Occurrence do
 
   describe '#load_feedback' do
     let_it_be(:project) { create(:project) }
-    let_it_be(:occurrence) do
+    let_it_be(:finding) do
       create(
-        :vulnerabilities_occurrence,
+        :vulnerabilities_finding,
         report_type: :dependency_scanning,
         project: project
       )
@@ -520,20 +520,20 @@ RSpec.describe Vulnerabilities::Occurrence do
         :dependency_scanning,
         :dismissal,
         project: project,
-        project_fingerprint: occurrence.project_fingerprint
+        project_fingerprint: finding.project_fingerprint
       )
     end
 
     let(:expected_feedback) { [feedback] }
 
-    subject(:load_feedback) { occurrence.load_feedback.to_a }
+    subject(:load_feedback) { finding.load_feedback.to_a }
 
     it { is_expected.to eq(expected_feedback) }
 
-    context 'when you have multiple occurrences' do
-      let_it_be(:occurrence_2) do
+    context 'when you have multiple findings' do
+      let_it_be(:finding_2) do
         create(
-          :vulnerabilities_occurrence,
+          :vulnerabilities_finding,
           report_type: :dependency_scanning,
           project: project
         )
@@ -545,13 +545,13 @@ RSpec.describe Vulnerabilities::Occurrence do
           :dependency_scanning,
           :dismissal,
           project: project,
-          project_fingerprint: occurrence_2.project_fingerprint
+          project_fingerprint: finding_2.project_fingerprint
         )
       end
 
       let(:expected_feedback) { [[feedback], [feedback_2]] }
 
-      subject(:load_feedback) { [occurrence, occurrence_2].map(&:load_feedback) }
+      subject(:load_feedback) { [finding, finding_2].map(&:load_feedback) }
 
       it { is_expected.to eq(expected_feedback) }
     end
@@ -606,37 +606,37 @@ RSpec.describe Vulnerabilities::Occurrence do
   end
 
   describe '#scanner_name' do
-    let(:vulnerabilities_occurrence) { create(:vulnerabilities_occurrence) }
+    let(:vulnerabilities_finding) { create(:vulnerabilities_finding) }
 
-    subject(:scanner_name) { vulnerabilities_occurrence.scanner_name }
+    subject(:scanner_name) { vulnerabilities_finding.scanner_name }
 
-    it { is_expected.to eq(vulnerabilities_occurrence.scanner.name) }
+    it { is_expected.to eq(vulnerabilities_finding.scanner.name) }
   end
 
   describe '#solution' do
-    subject { vulnerabilities_occurrence.solution }
+    subject { vulnerabilities_finding.solution }
 
     context 'when solution metadata key is present' do
-      let(:vulnerabilities_occurrence) { build(:vulnerabilities_occurrence) }
+      let(:vulnerabilities_finding) { build(:vulnerabilities_finding) }
 
-      it { is_expected.to eq(vulnerabilities_occurrence.metadata['solution']) }
+      it { is_expected.to eq(vulnerabilities_finding.metadata['solution']) }
     end
 
     context 'when remediations key is present' do
-      let(:vulnerabilities_occurrence) do
-        build(:vulnerabilities_occurrence_with_remediation, summary: "Test remediation")
+      let(:vulnerabilities_finding) do
+        build(:vulnerabilities_finding_with_remediation, summary: "Test remediation")
       end
 
-      it { is_expected.to eq(vulnerabilities_occurrence.remediations.dig(0, 'summary')) }
+      it { is_expected.to eq(vulnerabilities_finding.remediations.dig(0, 'summary')) }
     end
   end
 
   describe '#evidence' do
-    subject { occurrence.evidence }
+    subject { finding.evidence }
 
     context 'has an evidence fields' do
-      let(:occurrence) { create(:vulnerabilities_occurrence) }
-      let(:evidence) { occurrence.metadata['evidence'] }
+      let(:finding) { create(:vulnerabilities_finding) }
+      let(:evidence) { finding.metadata['evidence'] }
 
       it do
         is_expected.to match a_hash_including(
@@ -655,7 +655,7 @@ RSpec.describe Vulnerabilities::Occurrence do
     end
 
     context 'has no evidence summary when evidence is present, summary is not' do
-      let(:occurrence) { create(:vulnerabilities_occurrence, raw_metadata: { evidence: {} }) }
+      let(:finding) { create(:vulnerabilities_finding, raw_metadata: { evidence: {} }) }
 
       it do
         is_expected.to match a_hash_including(
@@ -675,42 +675,42 @@ RSpec.describe Vulnerabilities::Occurrence do
   end
 
   describe '#message' do
-    let(:occurrence) { build(:vulnerabilities_occurrence) }
-    let(:expected_message) { occurrence.metadata['message'] }
+    let(:finding) { build(:vulnerabilities_finding) }
+    let(:expected_message) { finding.metadata['message'] }
 
-    subject { occurrence.message }
+    subject { finding.message }
 
     it { is_expected.to eql(expected_message) }
   end
 
   describe '#cve' do
-    let(:occurrence) { build(:vulnerabilities_occurrence) }
-    let(:expected_cve) { occurrence.metadata['cve'] }
+    let(:finding) { build(:vulnerabilities_finding) }
+    let(:expected_cve) { finding.metadata['cve'] }
 
-    subject { occurrence.cve }
+    subject { finding.cve }
 
     it { is_expected.to eql(expected_cve) }
   end
 
   describe "#metadata" do
-    let(:occurrence) { build(:vulnerabilities_occurrence) }
+    let(:finding) { build(:vulnerabilities_finding) }
 
-    subject { occurrence.metadata }
+    subject { finding.metadata }
 
     it "handles bool JSON data" do
-      allow(occurrence).to receive(:raw_metadata) { "true" }
+      allow(finding).to receive(:raw_metadata) { "true" }
 
       expect(subject).to eq({})
     end
 
     it "handles string JSON data" do
-      allow(occurrence).to receive(:raw_metadata) { '"test"' }
+      allow(finding).to receive(:raw_metadata) { '"test"' }
 
       expect(subject).to eq({})
     end
 
     it "parses JSON data" do
-      allow(occurrence).to receive(:raw_metadata) { '{ "test": true }' }
+      allow(finding).to receive(:raw_metadata) { '{ "test": true }' }
 
       expect(subject).to eq({ "test" => true })
     end

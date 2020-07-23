@@ -54,7 +54,7 @@ module Gitlab
           def create_vulnerability(report, data, version)
             scanner = create_scanner(report, data['scanner'] || mutate_scanner_tool(data['tool']))
             identifiers = create_identifiers(report, data['identifiers'])
-            report.add_occurrence(
+            report.add_finding(
               ::Gitlab::Ci::Reports::Security::Occurrence.new(
                 uuid: SecureRandom.uuid,
                 report_type: report.type,
@@ -104,13 +104,13 @@ module Gitlab
           end
 
           def parse_severity_level(input)
-            return input if ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.key?(input)
+            return input if ::Vulnerabilities::Finding::SEVERITY_LEVELS.key?(input)
 
             'unknown'
           end
 
           def parse_confidence_level(input)
-            return input if ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS.key?(input)
+            return input if ::Vulnerabilities::Finding::CONFIDENCE_LEVELS.key?(input)
 
             'unknown'
           end
