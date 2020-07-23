@@ -6,6 +6,8 @@ import {
   visibilityLevelDescriptions,
   visibilityOptions,
 } from '~/pages/projects/shared/permissions/constants';
+import projectFeatureSetting from '~/pages/projects/shared/permissions/components/project_feature_setting.vue';
+import projectFeatureToggle from '~/vue_shared/components/toggle_button.vue';
 
 const defaultProps = {
   currentSettings: {
@@ -65,7 +67,13 @@ describe('Settings Panel', () => {
     return mountComponent({ ...extraProps, currentSettings: currentSettingsProps });
   };
 
-  const findLFSSettingsMessage = () => wrapper.find({ ref: 'git-lfs-settings' }).find('p');
+  const findLFSSettingsRow = () => wrapper.find({ ref: 'git-lfs-settings' });
+  const findLFSSettingsMessage = () => findLFSSettingsRow().find('p');
+  const findLFSFeatureToggle = () => findLFSSettingsRow().find(projectFeatureToggle);
+
+  const findRepositoryFeatureProjectRow = () => wrapper.find({ ref: 'repository-settings' });
+  const findRepositoryFeatureSetting = () =>
+    findRepositoryFeatureProjectRow().find(projectFeatureSetting);
 
   beforeEach(() => {
     wrapper = mountComponent();
@@ -154,7 +162,7 @@ describe('Settings Panel', () => {
     it('should set the repository help text when the visibility level is set to private', () => {
       wrapper = overrideCurrentSettings({ visibilityLevel: visibilityOptions.PRIVATE });
 
-      expect(wrapper.find({ ref: 'repository-settings' }).props().helpText).toEqual(
+      expect(findRepositoryFeatureProjectRow().props().helpText).toEqual(
         'View and edit files in this project',
       );
     });
@@ -162,7 +170,7 @@ describe('Settings Panel', () => {
     it('should set the repository help text with a read access warning when the visibility level is set to non-private', () => {
       wrapper = overrideCurrentSettings({ visibilityLevel: visibilityOptions.PUBLIC });
 
-      expect(wrapper.find({ ref: 'repository-settings' }).props().helpText).toEqual(
+      expect(findRepositoryFeatureProjectRow().props().helpText).toEqual(
         'View and edit files in this project. Non-project members will only have read access',
       );
     });
@@ -303,13 +311,11 @@ describe('Settings Panel', () => {
   });
 
   describe('Git Large File Storage', () => {
-    const findLfsFeatureToggle = () => wrapper.find('[name="project[lfs_enabled]"]');
-
     it('should show the LFS settings if LFS is available', () => {
       wrapper.setProps({ lfsAvailable: true });
 
       return wrapper.vm.$nextTick(() => {
-        expect(wrapper.find({ ref: 'git-lfs-settings' }).exists()).toEqual(true);
+        expect(findLFSSettingsRow().exists()).toEqual(true);
       });
     });
 
@@ -317,14 +323,12 @@ describe('Settings Panel', () => {
       wrapper.setProps({ lfsAvailable: false });
 
       return wrapper.vm.$nextTick(() => {
-        expect(wrapper.find({ ref: 'git-lfs-settings' }).exists()).toEqual(false);
+        expect(findLFSSettingsRow().exists()).toEqual(false);
       });
     });
 
     it('should set the LFS settings help path', () => {
-      expect(wrapper.find({ ref: 'git-lfs-settings' }).props().helpPath).toBe(
-        defaultProps.lfsHelpPath,
-      );
+      expect(findLFSSettingsRow().props().helpPath).toBe(defaultProps.lfsHelpPath);
     });
 
     it('should enable the LFS input when the repository is enabled', () => {
@@ -333,7 +337,7 @@ describe('Settings Panel', () => {
         { lfsAvailable: true },
       );
 
-      expect(findLfsFeatureToggle().props().disabledInput).toEqual(false);
+      expect(findLFSFeatureToggle().props().disabledInput).toEqual(false);
     });
 
     it('should disable the LFS input when the repository is disabled', () => {
@@ -342,18 +346,30 @@ describe('Settings Panel', () => {
         { lfsAvailable: true },
       );
 
-      expect(findLfsFeatureToggle().props().disabledInput).toEqual(true);
+      expect(findLFSFeatureToggle().props().disabledInput).toEqual(true);
     });
 
     it('should not change lfsEnabled when disabling the repository', async () => {
-      const lfsSettingElem = findLfsFeatureToggle();
-      expect(lfsSettingElem.props().value).toEqual(true);
+      // mount over shallowMount, because we are aiming to test rendered state of toggle
+      wrapper = mountComponent({ currentSettings: { lfsEnabled: true } }, mount);
 
-      wrapper.setData({ repositoryAccessLevel: featureAccessLevel.NOT_ENABLED });
+      const repositoryFeatureSetting = findRepositoryFeatureSetting();
+      const repositoryFeatureToggleButton = repositoryFeatureSetting
+        .find(projectFeatureToggle)
+        .find('button');
+      const lfsFeatureToggleButton = findLFSFeatureToggle().find('button');
+      const isToggleButtonChecked = toggleButton => toggleButton.classes('is-checked');
+
+      // assert the initial state
+      expect(isToggleButtonChecked(lfsFeatureToggleButton)).toBe(true);
+      expect(isToggleButtonChecked(repositoryFeatureToggleButton)).toBe(true);
+
+      repositoryFeatureToggleButton.trigger('click');
       await wrapper.vm.$nextTick();
 
-      // value should not change
-      expect(lfsSettingElem.props().value).toEqual(true);
+      expect(isToggleButtonChecked(repositoryFeatureToggleButton)).toBe(false);
+      // LFS toggle should still be checked
+      expect(isToggleButtonChecked(lfsFeatureToggleButton)).toBe(true);
     });
 
     describe.each`
