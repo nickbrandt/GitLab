@@ -5,7 +5,7 @@ import { featureAccessLevel } from '~/pages/projects/shared/permissions/constant
 import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
-import { LAST_ACTIVITY_AT, DATE_RANGE_LIMIT } from '../../shared/constants';
+import { SIMILARITY_ORDER, LAST_ACTIVITY_AT, DATE_RANGE_LIMIT } from '../../shared/constants';
 import DateRange from '../../shared/components/daterange.vue';
 import StageTable from './stage_table.vue';
 import DurationChart from './duration_chart.vue';
@@ -143,6 +143,16 @@ export default {
     hasProject() {
       return this.selectedProjectIds.length > 0;
     },
+    projectsQueryParams() {
+      return {
+        per_page: PROJECTS_PER_PAGE,
+        with_shared: false,
+        order_by: this.featureFlags.hasAnalyticsSimilaritySearch
+          ? SIMILARITY_ORDER
+          : LAST_ACTIVITY_AT,
+        include_subgroups: true,
+      };
+    },
   },
 
   methods: {
@@ -203,12 +213,6 @@ export default {
   groupsQueryParams: {
     min_access_level: featureAccessLevel.EVERYONE,
   },
-  projectsQueryParams: {
-    per_page: PROJECTS_PER_PAGE,
-    with_shared: false,
-    order_by: LAST_ACTIVITY_AT,
-    include_subgroups: true,
-  },
   maxDateRange: DATE_RANGE_LIMIT,
   STAGE_ACTIONS,
 };
@@ -252,7 +256,7 @@ export default {
               :key="selectedGroup.id"
               class="js-projects-dropdown-filter project-select"
               :group-id="selectedGroup.id"
-              :query-params="$options.projectsQueryParams"
+              :query-params="projectsQueryParams"
               :multi-select="$options.multiProjectSelect"
               :default-projects="selectedProjects"
               @selected="onProjectsSelect"

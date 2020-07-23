@@ -18,6 +18,7 @@ export default () => {
     valueStreamAnalyticsPathNavigation: hasPathNavigation = false,
     valueStreamAnalyticsFilterBar: hasFilterBar = false,
     valueStreamAnalyticsCreateMultipleValueStreams: hasCreateMultipleValueStreams = false,
+    analyticsSimilaritySearch: hasAnalyticsSimilaritySearch = false,
   } = gon?.features;
 
   store.dispatch('initializeCycleAnalytics', {
@@ -28,6 +29,7 @@ export default () => {
       hasPathNavigation,
       hasFilterBar,
       hasCreateMultipleValueStreams,
+      hasAnalyticsSimilaritySearch,
     },
   });
 
