@@ -15,6 +15,46 @@ module EE
       scope :syncable, -> { with_files_stored_locally }
     end
 
+    class_methods do
+      # @return [ActiveRecord::Relation<Upload>] scope of everything that should be synced to this node
+      def replicables_for_geo_node(node = ::Gitlab::Geo.current_node)
+        selective_sync_scope(node).merge(object_storage_scope(node))
+      end
+
+      private
+
+      # @return [ActiveRecord::Relation<Upload>] scope observing object storage settings of the given node
+      def object_storage_scope(node)
+        return all if node.sync_object_storage?
+
+        with_files_stored_locally
+      end
+
+      # @return [ActiveRecord::Relation<Upload>] scope observing selective sync settings of the given node
+      def selective_sync_scope(node)
+        if node.selective_sync?
+          group_attachments(node).or(project_attachments(node)).or(other_attachments)
+        else
+          all
+        end
+      end
+
+      # @return [ActiveRecord::Relation<Upload>] scope of Namespace-associated uploads observing selective sync settings of the given node
+      def group_attachments(node)
+        where(model_type: 'Namespace', model_id: node.namespaces_for_group_owned_replicables.select(:id))
+      end
+
+      # @return [ActiveRecord::Relation<Upload>] scope of Project-associated uploads observing selective sync settings of the given node
+      def project_attachments(node)
+        where(model_type: 'Project', model_id: node.projects.select(:id))
+      end
+
+      # @return [ActiveRecord::Relation<Upload>] scope of uploads which are not associated with Namespace or Project
+      def other_attachments
+        where.not(model_type: %w[Namespace Project])
+      end
+    end
+
     def log_geo_deleted_event
       ::Geo::UploadDeletedEventStore.new(self).create!
     end

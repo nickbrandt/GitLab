@@ -80,10 +80,6 @@ module Geo
       def project_model
         Geo::Fdw::Project
       end
-
-      def uploads_model
-        Geo::Fdw::Upload
-      end
     end
   end
 end
