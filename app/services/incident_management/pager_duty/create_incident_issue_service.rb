@@ -12,14 +12,14 @@ module IncidentManagement
       def execute
         return forbidden unless webhook_available?
 
-        create_issue
+        create_incident
       end
 
       private
 
       alias_method :incident_payload, :params
 
-      def create_issue
+      def create_incident
         ::IncidentManagement::Incidents::CreateService.new(
           project,
           current_user,

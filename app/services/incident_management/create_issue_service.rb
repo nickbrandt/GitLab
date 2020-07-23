@@ -13,7 +13,7 @@ module IncidentManagement
       return error_with('setting disabled') unless incident_management_setting.create_issue?
       return error_with('invalid alert') unless alert.valid?
 
-      result = create_issue
+      result = create_incident
       return error_with(result.message, result.payload[:issue]) unless result.success?
 
       result
@@ -21,7 +21,7 @@ module IncidentManagement
 
     private
 
-    def create_issue
+    def create_incident
       ::IncidentManagement::Incidents::CreateService.new(
         project,
         current_user,

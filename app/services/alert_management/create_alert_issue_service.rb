@@ -15,7 +15,7 @@ module AlertManagement
       return error_no_permissions unless allowed?
       return error_issue_already_exists if alert.issue
 
-      result = create_issue
+      result = create_incident
       return result unless result.success?
 
       issue = result.payload[:issue]
@@ -36,7 +36,7 @@ module AlertManagement
       user.can?(:create_issue, project)
     end
 
-    def create_issue
+    def create_incident
       ::IncidentManagement::Incidents::CreateService.new(
         project,
         user,
