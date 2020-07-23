@@ -253,29 +253,6 @@
     - "<p class=\\\"text-tertiary\\\"><a href=\\\"%{docsUrl}\\\">공통 메트릭스</a>가 발견되지 않았습니다.</p>"
     - "<p class=\\\"text-tertiary\\\">Aucune <a href=\\\"%{docsUrl}\\\">métrique commune</a> trouvée</p>"
     - "<p class=\\\"text-tertiary\\\">No se han encontrado<a href=\\\"%{docsUrl}\\\">métricas comunes</a> </p>"
-"SSH host keys are not available on this system. Please use <code>ssh-keyscan</code> command or contact your GitLab administrator for more information.":
-  plural_id:
-  translations:
-    - "このシステムでは SSH ホスト鍵は使用できません。 <code>ssh-keyscan</code> コマンドを使用するか、GitLab の管理者に詳細をお問い合わせください。"
-    - "Ключи SSH хоста недоступны в этой системе. Пожалуйста, используйте команду <code>ssh-keyscan</code> или свяжитесь со своим администратором GitLab для получения дополнительной информации."
-    - "SSH主机密钥在此系统上不可用。请使用<code>ssh-keyscan</code>命令或与您的GitLab管理员联系以获取更多信息。"
-    - "SSH-ключі хоста не доступні в цій системі. Будь ласка, використовуйте команду <code>ssh-keyscan</code> або зверніться до вашого адміністратора GitLab для додаткової інформації."
-    - "Las claves SSH del host no se encuentran disponibles en este sistema. Utilice el comando <code>ssh-keyscan</code> o póngase en contacto con su administrador de GitLab para obtener más información."
-"Speed up your DevOps<br>with GitLab":
-  plural_id:
-  translations:
-    - "Acelere sus DevOps<br>con GitLab"
-"The Git LFS objects will <strong>not</strong> be synced.":
-  plural_id:
-  translations:
-    - "Os objetos LFS do Git <strong>não</strong> serão sincronizados."
-    - "Git の LFS オブジェクトは<strong>同期しません</strong>。"
-    - "Git LFS对象将<strong>不会</strong>被同步。"
-    - "Об'єкти Git LFS <strong>не</strong> будуть синхронізуватися."
-    - "Die Git LFS-Objekte werden <strong>nicht</strong> synchronisiert werden."
-    - "Les objets Git LFS <strong>ne sont pas</strong> synchronisés."
-    - "Los objetos Git LFS <strong>no</strong> serán sincronizados."
-    - "Obiekty Git LFS <strong>nie będą</strong> zsynchronizowane."
 "The repository must be accessible over <code>http://</code>, <code>https://</code>, <code>ssh://</code> or <code>git://</code>.":
   plural_id:
   translations:
@@ -284,14 +261,6 @@
     - "该仓库必须可通过 <code>http://</code>，<code>https://</code>，<code>ssh://</code> 或 <code>git://</code>进行访问。"
     - "Репозиторій має бути доступним через <code>http://</code>, <code>https://</code>, <code>ssh://</code> or <code>git://</code>."
     - "El repositorio debe ser accesible a través de <code>http://</code>, <code>https://</code>, <code>ssh://</code> y <code>git://</code>."
-"This %{issuable} is locked. Only <strong>project members</strong> can comment.":
-  plural_id:
-  translations:
-    - "この %{issuable} はロックされています。<strong>プロジェクトメンバー</strong> だけがコメントできます。"
-    - "Этот %{issuable} заблокировано. Только <strong>участники проекта</strong> могут комментировать."
-    - "此%{issuable}已被锁定。只有<strong>项目成员</strong>可以发表评论。"
-    - "Ця %{issuable} заблокована. Лише <strong>учасники проекту</strong> можуть коментувати."
-    - "Este %{issuable} está bloqueado. Solo los <strong>miembros del proyecto</strong> pueden comentar."
 "This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Multiple addresses are supported with comma delimiters.<br>Example: <code>192.168.0.0/24,192.168.1.0/24</code>. %{read_more_link}.":
   plural_id:
   translations:
@@ -321,19 +290,6 @@
     - "%{issuableDisplayName}(을)를 잠금해제 하시겠습니까? <strong>모두가</strong> 코멘트 할 수 있게 됩니다."
     - "Déverrouiller %{issuableDisplayName} ? <strong>Tout le monde</strong> sera en mesure de commenter."
     - "Desbloquear este %{issuableDisplayName}? <strong>Todos</strong> podrán comentar."
-"Upon performing this action, the contents of this group, its subgroup and projects will be permanently removed after %{deletion_adjourned_period} days on <strong>%{date}</strong>. Until that time:":
-  plural_id:
-  translations:
-"Use <code>%{native_redirect_uri}</code> for local tests":
-  plural_id:
-  translations:
-    - "Use <code>%{native_redirect_uri}</code> para testes locais"
-    - "ローカルテストに <code>%{native_redirect_uri}</code> を使用"
-    - "使用<code>%{native_redirect_uri}</code>进行本地测试"
-    - "Використовувати <code>%{native_redirect_uri}</code> для локальних тестів"
-    - "Verwende <code>%{native_redirect_uri}</code> für lokale Tests"
-    - "Utiliser <code>%{native_redirect_uri}</code> pour les tests locaux"
-    - "Use <code>%{native_redirect_uri}</code> para los tests locales"
 "UserOnboardingTour|Issues are great for communicating and keeping track of progress in GitLab. These are all issues that are open in the %{emphasisStart}%{projectName}%{emphasisEnd}.%{lineBreak}%{lineBreak}You can help us improve GitLab by contributing work to issues that are labeled <span class=\\\"badge color-label accept-mr-label\\\">Accepting merge requests</span>.%{lineBreak}%{lineBreak}This list can be filtered by labels, milestones, assignees, authors... We'll show you how it looks when the list is filtered by a label.":
   plural_id:
   translations:
@@ -341,19 +297,6 @@
     - "Обсуждения в GitLab отлично подходят для коммуникации и отслеживания прогресса. Перед вами все обсуждения, открытые в %{emphasisStart}%{projectName}%{emphasisEnd}.%{lineBreak}%{lineBreak}Вы можете помочь нам улучшить GitLab, приняв участие в работе над обсуждениями с меткой <span class=\\\"badge color-label accept-mr-label\\\">Accepting merge requests</span> (принимаются запросы на слияние).%{lineBreak}%{lineBreak}Этот список может быть отфильтрован по меткам, этапам, испонителям, авторам... Мы покажем вам, как выглядит отфильтрованный по метке список."
     - "议题非常适合在GitLab中进行沟通和跟踪进展。这些是在%{emphasisStart}%{projectName}%{emphasisEnd}中开启的全部议题。%{lineBreak}%{lineBreak}您可以通过为标记为<span class=\\\"badge color-label accept-mr-label\\\">Accepting merge requests</span>的议题作出贡献来帮助我们改进GitLab。%{lineBreak}%{lineBreak}此列表可以按标签，里程碑，受让人，作者进行过滤......我们将向您展示列表按标签过滤时的样子。"
     - "Задачі добре підходять для комунікації та відстеження прогресу в GitLab. Ось задачі, які відкриті в %{emphasisStart}%{projectName}%{emphasisEnd}.%{lineBreak}%{lineBreak}Ви можете допомогти нам покращити GitLab шляхом внесків у задачі, що відмічені <span class=\\\"badge color-label accept-mr-label\\\">Приймаються запити на злиття</span>.%{lineBreak}%{lineBreak}Цей список може бути відвільтрований за мітками, етапами, виконавцями, авторами... Ми продоемонструємо як виглядає список, відфільтрований за міткою."
-"WikiMarkdownTip|To link to a (new) page, simply type <code class=\\\"js-markup-link-example\\\">%{link_example}</code>":
-  plural_id:
-  translations:
-"You are an admin, which means granting access to <strong>%{client_name}</strong> will allow them to interact with GitLab as an admin as well. Proceed with caution.":
-  plural_id:
-  translations:
-    - "Você é um administrador, o que significa que conceder acesso a <strong>%{client_name}</strong> permitirá que eles também interajam com o GitLab como administrador. Prossiga com cuidado."
-    - "あなたは管理者です。つまり、 <strong>%{client_name}</strong> へのアクセスを許可すると、それは管理者としてGitLabとやりとりできます。注意してください。"
-    - "您是一名管理员，这意味着授予对 <strong>%{client_name}</strong> 访问权限将允许他们作为管理员与GitLab进行交互。请谨慎操作。"
-    - "Ви — адміністратор, а це означає, що надання доступу для <strong>%{client_name}</strong> дозволить їм взаємодіяти з GitLab як адміністратору. Продовжуйте обережно."
-    - "Du bist Administrator(in). Wenn du <strong>%{client_name}</strong> Zugriff gewährst, wird es auch als Administrator mit GitLab interagieren können. Mit Vorsicht fortfahren."
-    - "Vous êtes un administrateur ou une administratrice, ce qui signifie qu’accorder un accès à <strong>%{client_name}</strong> lui permettra d’interagir avec GitLab en tant qu’administrateur également. Faites‐le avec prudence."
-    - "Es administrador, lo que significa que otorgar acceso a <strong>%{client_name}</strong> le permitirá interactuar con GitLab como también administrador. Por favor, proceda con precaución."
 "You can invite a new member to <strong>%{project_name}</strong> or invite another group.":
   plural_id:
   translations:
@@ -382,13 +325,6 @@
     - "您可以邀请另一个群组加入<strong>%{project_name}</strong>。"
     - "Ви можете запросити нову групу до <strong>%{project_name}</strong>."
     - "Puedes invitar a otro grupo a <strong>%{project_name}</strong>."
-"You may also add variables that are made available to the running application by prepending the variable key with <code>K8S_SECRET_</code>.":
-  plural_id:
-  translations:
-    - "変数名の前に <code>K8S_SECRET_</code>を指定することで、実行中のアプリケーションで使用する変数を追加することもできます。"
-    - "您还可以通过在变量键前面加上<code>K8S_SECRET_</code>来添加可用于正在运行的应用程序的变量。"
-    - "Ви також можете додати змінні, що будуть доступними для запущеного застосунку шляхом додавання префіксу <code>K8S_SECRET_</code> до їх імен."
-    - "También puede añadir variables que están disponibles para la aplicación en ejecución, anteponiendo la clave de variable con <code>K8S_SECRET_</code>."
 "confidentiality|You are going to turn off the confidentiality. This means <strong>everyone</strong> will be able to see and leave a comment on this issue.":
   plural_id:
   translations:
@@ -1053,3 +989,67 @@
     - "请参考<a href=\\\"%{docs_url}\\\">%{docs_url}</a>"
     - "Будь ласка перегляньте <a href=\\\"%{docs_url}\\\">%{docs_url}</a>"
     - "Por favor, consulte <a href=\\\"%{docs_url}\\\">%{docs_url}</a>"
+"SSH host keys are not available on this system. Please use <code>ssh-keyscan</code> command or contact your GitLab administrator for more information.":
+  plural_id:
+  translations:
+    - "このシステムでは SSH ホスト鍵は使用できません。 <code>ssh-keyscan</code> コマンドを使用するか、GitLab の管理者に詳細をお問い合わせください。"
+    - "Ключи SSH хоста недоступны в этой системе. Пожалуйста, используйте команду <code>ssh-keyscan</code> или свяжитесь со своим администратором GitLab для получения дополнительной информации."
+    - "SSH主机密钥在此系统上不可用。请使用<code>ssh-keyscan</code>命令或与您的GitLab管理员联系以获取更多信息。"
+    - "SSH-ключі хоста не доступні в цій системі. Будь ласка, використовуйте команду <code>ssh-keyscan</code> або зверніться до вашого адміністратора GitLab для додаткової інформації."
+    - "Las claves SSH del host no se encuentran disponibles en este sistema. Utilice el comando <code>ssh-keyscan</code> o póngase en contacto con su administrador de GitLab para obtener más información."
+"Speed up your DevOps<br>with GitLab":
+  plural_id:
+  translations:
+    - "Acelere sus DevOps<br>con GitLab"
+"The Git LFS objects will <strong>not</strong> be synced.":
+  plural_id:
+  translations:
+    - "Os objetos LFS do Git <strong>não</strong> serão sincronizados."
+    - "Git の LFS オブジェクトは<strong>同期しません</strong>。"
+    - "Git LFS对象将<strong>不会</strong>被同步。"
+    - "Об'єкти Git LFS <strong>не</strong> будуть синхронізуватися."
+    - "Die Git LFS-Objekte werden <strong>nicht</strong> synchronisiert werden."
+    - "Les objets Git LFS <strong>ne sont pas</strong> synchronisés."
+    - "Los objetos Git LFS <strong>no</strong> serán sincronizados."
+    - "Obiekty Git LFS <strong>nie będą</strong> zsynchronizowane."
+"This %{issuable} is locked. Only <strong>project members</strong> can comment.":
+  plural_id:
+  translations:
+    - "この %{issuable} はロックされています。<strong>プロジェクトメンバー</strong> だけがコメントできます。"
+    - "Этот %{issuable} заблокировано. Только <strong>участники проекта</strong> могут комментировать."
+    - "此%{issuable}已被锁定。只有<strong>项目成员</strong>可以发表评论。"
+    - "Ця %{issuable} заблокована. Лише <strong>учасники проекту</strong> можуть коментувати."
+    - "Este %{issuable} está bloqueado. Solo los <strong>miembros del proyecto</strong> pueden comentar."
+"Upon performing this action, the contents of this group, its subgroup and projects will be permanently removed after %{deletion_adjourned_period} days on <strong>%{date}</strong>. Until that time:":
+  plural_id:
+  translations:
+"Use <code>%{native_redirect_uri}</code> for local tests":
+  plural_id:
+  translations:
+    - "Use <code>%{native_redirect_uri}</code> para testes locais"
+    - "ローカルテストに <code>%{native_redirect_uri}</code> を使用"
+    - "使用<code>%{native_redirect_uri}</code>进行本地测试"
+    - "Використовувати <code>%{native_redirect_uri}</code> для локальних тестів"
+    - "Verwende <code>%{native_redirect_uri}</code> für lokale Tests"
+    - "Utiliser <code>%{native_redirect_uri}</code> pour les tests locaux"
+    - "Use <code>%{native_redirect_uri}</code> para los tests locales"
+"WikiMarkdownTip|To link to a (new) page, simply type <code class=\\\"js-markup-link-example\\\">%{link_example}</code>":
+  plural_id:
+  translations:
+"You are an admin, which means granting access to <strong>%{client_name}</strong> will allow them to interact with GitLab as an admin as well. Proceed with caution.":
+  plural_id:
+  translations:
+    - "Você é um administrador, o que significa que conceder acesso a <strong>%{client_name}</strong> permitirá que eles também interajam com o GitLab como administrador. Prossiga com cuidado."
+    - "あなたは管理者です。つまり、 <strong>%{client_name}</strong> へのアクセスを許可すると、それは管理者としてGitLabとやりとりできます。注意してください。"
+    - "您是一名管理员，这意味着授予对 <strong>%{client_name}</strong> 访问权限将允许他们作为管理员与GitLab进行交互。请谨慎操作。"
+    - "Ви — адміністратор, а це означає, що надання доступу для <strong>%{client_name}</strong> дозволить їм взаємодіяти з GitLab як адміністратору. Продовжуйте обережно."
+    - "Du bist Administrator(in). Wenn du <strong>%{client_name}</strong> Zugriff gewährst, wird es auch als Administrator mit GitLab interagieren können. Mit Vorsicht fortfahren."
+    - "Vous êtes un administrateur ou une administratrice, ce qui signifie qu’accorder un accès à <strong>%{client_name}</strong> lui permettra d’interagir avec GitLab en tant qu’administrateur également. Faites‐le avec prudence."
+    - "Es administrador, lo que significa que otorgar acceso a <strong>%{client_name}</strong> le permitirá interactuar con GitLab como también administrador. Por favor, proceda con precaución."
+"You may also add variables that are made available to the running application by prepending the variable key with <code>K8S_SECRET_</code>.":
+  plural_id:
+  translations:
+    - "変数名の前に <code>K8S_SECRET_</code>を指定することで、実行中のアプリケーションで使用する変数を追加することもできます。"
+    - "您还可以通过在变量键前面加上<code>K8S_SECRET_</code>来添加可用于正在运行的应用程序的变量。"
+    - "Ви також можете додати змінні, що будуть доступними для запущеного застосунку шляхом додавання префіксу <code>K8S_SECRET_</code> до їх імен."
+    - "También puede añadir variables que están disponibles para la aplicación en ejecución, anteponiendo la clave de variable con <code>K8S_SECRET_</code>."

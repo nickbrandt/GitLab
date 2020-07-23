@@ -20734,7 +20734,7 @@ msgstr ""
 msgid "SSH host keys"
 msgstr ""
 
-msgid "SSH host keys are not available on this system. Please use <code>ssh-keyscan</code> command or contact your GitLab administrator for more information."
+msgid "SSH host keys are not available on this system. Please use %{ssh_keyscan} command or contact your GitLab administrator for more information."
 msgstr ""
 
 msgid "SSH keys allow you to establish a secure connection between your computer and GitLab."
@@ -22702,7 +22702,7 @@ msgstr ""
 msgid "Specify the following URL during the Runner setup:"
 msgstr ""
 
-msgid "Speed up your DevOps<br>with GitLab"
+msgid "Speed up your DevOps%{br_tag}with GitLab"
 msgstr ""
 
 msgid "Squash commit message"
@@ -23697,7 +23697,7 @@ msgstr ""
 msgid "The CSV export will be created in the background. Once finished, it will be sent to %{strong_open}%{email}%{strong_close} in an attachment."
 msgstr ""
 
-msgid "The Git LFS objects will <strong>not</strong> be synced."
+msgid "The Git LFS objects will %{strong_open}not%{strong_close} be synced."
 msgstr ""
 
 msgid "The GitLab user to which the Jira user %{jiraDisplayName} will be mapped"
@@ -24338,7 +24338,7 @@ msgstr ""
 msgid "This %{issuableDisplayName} is locked. Only project members can comment."
 msgstr ""
 
-msgid "This %{issuable} is locked. Only <strong>project members</strong> can comment."
+msgid "This %{issuable} is locked. Only %{strong_open}project members%{strong_close} can comment."
 msgstr ""
 
 msgid "This %{noteableTypeText} is %{confidentialLinkStart}confidential%{linkEnd} and %{lockedLinkStart}locked%{linkEnd}."
@@ -25992,7 +25992,7 @@ msgstr ""
 msgid "Uploads"
 msgstr ""
 
-msgid "Upon performing this action, the contents of this group, its subgroup and projects will be permanently removed after %{deletion_adjourned_period} days on <strong>%{date}</strong>. Until that time:"
+msgid "Upon performing this action, the contents of this group, its subgroup and projects will be permanently removed after %{deletion_adjourned_period} days on %{date}. Until that time:"
 msgstr ""
 
 msgid "Upstream"
@@ -26097,7 +26097,7 @@ msgstr ""
 msgid "Use %{code_start}::%{code_end} to create a %{link_start}scoped label set%{link_end} (eg. %{code_start}priority::1%{code_end})"
 msgstr ""
 
-msgid "Use <code>%{native_redirect_uri}</code> for local tests"
+msgid "Use %{native_redirect_uri} for local tests"
 msgstr ""
 
 msgid "Use Service Desk to connect with your users (e.g. to offer customer support) through email right inside GitLab"
@@ -27165,7 +27165,7 @@ msgstr ""
 msgid "WikiMarkdownDocs|documentation"
 msgstr ""
 
-msgid "WikiMarkdownTip|To link to a (new) page, simply type <code class=\"js-markup-link-example\">%{link_example}</code>"
+msgid "WikiMarkdownTip|To link to a (new) page, simply type %{link_example}"
 msgstr ""
 
 msgid "WikiNewPageTip|Tip: You can specify the full path for the new file. We will automatically create any missing directories."
@@ -27312,7 +27312,7 @@ msgstr ""
 msgid "You are about to transfer the control of your account to %{group_name} group. This action is NOT reversible, you won't be able to access any of your groups and projects outside of %{group_name} once this transfer is complete."
 msgstr ""
 
-msgid "You are an admin, which means granting access to <strong>%{client_name}</strong> will allow them to interact with GitLab as an admin as well. Proceed with caution."
+msgid "You are an admin, which means granting access to %{client_name} will allow them to interact with GitLab as an admin as well. Proceed with caution."
 msgstr ""
 
 msgid "You are attempting to delete a file that has been previously updated."
@@ -27612,7 +27612,7 @@ msgstr ""
 msgid "You left the \"%{membershipable_human_name}\" %{source_type}."
 msgstr ""
 
-msgid "You may also add variables that are made available to the running application by prepending the variable key with <code>K8S_SECRET_</code>."
+msgid "You may also add variables that are made available to the running application by prepending the variable key with %{k8s_secret}."
 msgstr ""
 
 msgid "You may close the milestone now."
