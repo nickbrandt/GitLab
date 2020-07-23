@@ -5,7 +5,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         controller: :groups,
         constraints: { id: Gitlab::PathRegex.full_namespace_route_regex, format: /(html|json|atom|ics)/ }) do
     scope(path: '-') do
-      get :subgroups, as: :subgroups_group
+      get :subgroups, as: :subgroups_group # rubocop:todo Cop/PutGroupRoutesUnderScope
     end
   end
 
@@ -184,10 +184,10 @@ end
 # Dependency proxy for containers
 # Because docker adds v2 prefix to URI this need to be outside of usual group routes
 scope format: false do
-  get 'v2', to: proc { [200, {}, ['']] }
+  get 'v2', to: proc { [200, {}, ['']] } # rubocop:disable Cop/PutGroupRoutesUnderScope
 
   constraints image: Gitlab::PathRegex.container_image_regex, sha: Gitlab::PathRegex.container_image_blob_sha_regex do
-    get 'v2/*group_id/dependency_proxy/containers/*image/manifests/*tag' => 'groups/dependency_proxy_for_containers#manifest'
-    get 'v2/*group_id/dependency_proxy/containers/*image/blobs/:sha' => 'groups/dependency_proxy_for_containers#blob'
+    get 'v2/*group_id/dependency_proxy/containers/*image/manifests/*tag' => 'groups/dependency_proxy_for_containers#manifest' # rubocop:todo Cop/PutGroupRoutesUnderScope
+    get 'v2/*group_id/dependency_proxy/containers/*image/blobs/:sha' => 'groups/dependency_proxy_for_containers#blob' # rubocop:todo Cop/PutGroupRoutesUnderScope
   end
 end
