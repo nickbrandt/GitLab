@@ -12,6 +12,7 @@ import {
   endDate,
   selectedProjects,
   customizableStagesAndEvents,
+  valueStreams,
 } from '../mock_data';
 
 let state = null;
@@ -27,6 +28,10 @@ describe('Cycle analytics mutations', () => {
 
   it.each`
     mutation                                     | stateKey                     | value
+    ${types.REQUEST_VALUE_STREAMS}               | ${'valueStreams'}            | ${[]}
+    ${types.RECEIVE_VALUE_STREAMS_ERROR}         | ${'valueStreams'}            | ${[]}
+    ${types.REQUEST_VALUE_STREAMS}               | ${'isLoadingValueStreams'}   | ${true}
+    ${types.RECEIVE_VALUE_STREAMS_ERROR}         | ${'isLoadingValueStreams'}   | ${false}
     ${types.REQUEST_STAGE_DATA}                  | ${'isLoadingStage'}          | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'isEmptyStage'}            | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'isLoadingStage'}          | ${false}
@@ -59,17 +64,32 @@ describe('Cycle analytics mutations', () => {
     ${types.SET_DATE_RANGE}                    | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
     ${types.SET_SELECTED_STAGE}                | ${{ id: 'first-stage' }}      | ${{ selectedStage: { id: 'first-stage' } }}
     ${types.RECEIVE_CREATE_VALUE_STREAM_ERROR} | ${{ name: ['is required'] }}  | ${{ createValueStreamErrors: { name: ['is required'] }, isCreatingValueStream: false }}
+    ${types.RECEIVE_VALUE_STREAMS_SUCCESS}     | ${valueStreams}               | ${{ valueStreams, isLoadingValueStreams: false }}
+    ${types.SET_SELECTED_VALUE_STREAM}         | ${valueStreams[1].id}         | ${{ selectedValueStream: {} }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {
-      state = {
-        selectedGroup: { fullPath: 'rad-stage' },
-      };
+      state = { selectedGroup: { fullPath: 'rad-stage' } };
       mutations[mutation](state, payload);
 
       expect(state).toMatchObject(expectedState);
     },
   );
+
+  describe('with value streams available', () => {
+    it.each`
+      mutation                           | payload               | expectedState
+      ${types.SET_SELECTED_VALUE_STREAM} | ${valueStreams[1].id} | ${{ selectedValueStream: valueStreams[1] }}
+      ${types.SET_SELECTED_VALUE_STREAM} | ${'fake-id'}          | ${{ selectedValueStream: {} }}
+    `(
+      '$mutation with payload $payload will update state with $expectedState',
+      ({ mutation, payload, expectedState }) => {
+        state = { valueStreams };
+        mutations[mutation](state, payload);
+        expect(state).toMatchObject(expectedState);
+      },
+    );
+  });
 
   describe(`${types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS}`, () => {
     it('will set isLoading=false and errorCode=null', () => {

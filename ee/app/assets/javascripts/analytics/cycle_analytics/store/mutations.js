@@ -134,4 +134,19 @@ export default {
     state.isCreatingValueStream = false;
     state.createValueStreamErrors = {};
   },
+  [types.SET_SELECTED_VALUE_STREAM](state, streamId) {
+    state.selectedValueStream = state.valueStreams?.find(({ id }) => id === streamId) || null;
+  },
+  [types.REQUEST_VALUE_STREAMS](state) {
+    state.isLoadingValueStreams = true;
+    state.valueStreams = [];
+  },
+  [types.RECEIVE_VALUE_STREAMS_ERROR](state) {
+    state.isLoadingValueStreams = false;
+    state.valueStreams = [];
+  },
+  [types.RECEIVE_VALUE_STREAMS_SUCCESS](state, data) {
+    state.isLoadingValueStreams = false;
+    state.valueStreams = data;
+  },
 };

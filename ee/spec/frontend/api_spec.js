@@ -334,6 +334,45 @@ describe('Api', () => {
       });
     });
 
+    describe('cycleAnalyticsValueStreams', () => {
+      it('fetches custom value streams', done => {
+        const response = [{ name: 'value stream 1', id: 1 }];
+
+        const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/-/analytics/value_stream_analytics/value_streams`;
+        mock.onGet(expectedUrl).reply(httpStatus.OK, response);
+
+        Api.cycleAnalyticsValueStreams(groupId)
+          .then(responseObj =>
+            expectRequestWithCorrectParameters(responseObj, {
+              response,
+              expectedUrl,
+            }),
+          )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsCreateValueStream', () => {
+      it('submit the custom value stream data', done => {
+        const response = {};
+        const customValueStream = {
+          name: 'cool-value-stream-stage',
+        };
+        const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/-/analytics/value_stream_analytics/value_streams`;
+        mock.onPost(expectedUrl).reply(httpStatus.OK, response);
+
+        Api.cycleAnalyticsCreateValueStream(groupId, customValueStream)
+          .then(({ data, config: { data: reqData, url } }) => {
+            expect(data).toEqual(response);
+            expect(JSON.parse(reqData)).toMatchObject(customValueStream);
+            expect(url).toEqual(expectedUrl);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
     describe('cycleAnalyticsGroupStagesAndEvents', () => {
       it('fetches custom stage events and all stages', done => {
         const response = { events: [], stages: [] };

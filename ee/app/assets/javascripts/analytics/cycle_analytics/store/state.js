@@ -20,13 +20,16 @@ export default () => ({
   selectedMilestone: null,
   selectedAssignees: [],
   selectedLabels: [],
+  selectedValueStream: null,
 
   currentStageEvents: [],
 
+  isLoadingValueStreams: false,
   isCreatingValueStream: false,
   createValueStreamErrors: {},
 
   stages: [],
   summary: [],
   medians: {},
+  valueStreams: [],
 });

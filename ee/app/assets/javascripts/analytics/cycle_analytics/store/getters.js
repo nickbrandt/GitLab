@@ -6,6 +6,8 @@ import { transformStagesForPathNavigation } from '../utils';
 
 export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDEN;
 
+export const currentValueStreamId = ({ selectedValueStream }) => selectedValueStream?.id || null;
+
 export const currentGroupPath = ({ selectedGroup }) =>
   selectedGroup && selectedGroup.fullPath ? selectedGroup.fullPath : null;
 

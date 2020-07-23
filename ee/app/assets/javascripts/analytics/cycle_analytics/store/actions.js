@@ -109,7 +109,9 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
   removeFlash();
 
   dispatch('requestCycleAnalyticsData');
+
   return Promise.resolve()
+    .then(() => dispatch('fetchValueStreams'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
@@ -296,7 +298,12 @@ export const reorderStage = ({ dispatch, state }, initialData) => {
     );
 };
 
-export const createValueStream = ({ commit, rootState }, data) => {
+export const receiveCreateValueStreamSuccess = ({ commit, dispatch }) => {
+  commit(types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS);
+  return dispatch('fetchValueStreams');
+};
+
+export const createValueStream = ({ commit, dispatch, rootState }, data) => {
   const {
     selectedGroup: { fullPath },
   } = rootState;
@@ -304,12 +311,40 @@ export const createValueStream = ({ commit, rootState }, data) => {
   commit(types.REQUEST_CREATE_VALUE_STREAM);
 
   return Api.cycleAnalyticsCreateValueStream(fullPath, data)
-    .then(response => {
-      const { status, data: responseData } = response;
-      commit(types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS, { status, data: responseData });
-    })
+    .then(() => dispatch('receiveCreateValueStreamSuccess'))
     .catch(({ response } = {}) => {
       const { data: { message, errors } = null } = response;
       commit(types.RECEIVE_CREATE_VALUE_STREAM_ERROR, { data, message, errors });
     });
+};
+
+export const setSelectedValueStream = ({ commit }, streamId) =>
+  commit(types.SET_SELECTED_VALUE_STREAM, streamId);
+
+export const receiveValueStreamsSuccess = ({ commit, dispatch }, data = []) => {
+  commit(types.RECEIVE_VALUE_STREAMS_SUCCESS, data);
+  if (data.length) {
+    const [firstStream] = data;
+    return dispatch('setSelectedValueStream', firstStream.id);
+  }
+  return Promise.resolve();
+};
+
+export const fetchValueStreams = ({ commit, dispatch, getters, state }) => {
+  const {
+    featureFlags: { hasCreateMultipleValueStreams = false },
+  } = state;
+  const { currentGroupPath } = getters;
+
+  if (hasCreateMultipleValueStreams) {
+    commit(types.REQUEST_VALUE_STREAMS);
+
+    return Api.cycleAnalyticsValueStreams(currentGroupPath)
+      .then(({ data }) => dispatch('receiveValueStreamsSuccess', data))
+      .catch(response => {
+        const { data } = response;
+        commit(types.RECEIVE_VALUE_STREAMS_ERROR, data);
+      });
+  }
+  return Promise.resolve();
 };

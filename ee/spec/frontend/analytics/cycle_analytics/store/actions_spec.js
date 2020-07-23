@@ -13,6 +13,7 @@ import {
   endDate,
   customizableStagesAndEvents,
   endpoints,
+  valueStreams,
 } from '../mock_data';
 
 const stageData = { events: [] };
@@ -20,6 +21,7 @@ const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_F
 const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
 const [selectedStage] = stages;
 const selectedStageSlug = selectedStage.slug;
+const [selectedValueStream] = valueStreams;
 
 const stageEndpoint = ({ stageId }) =>
   `/groups/${selectedGroup.fullPath}/-/analytics/value_stream_analytics/stages/${stageId}`;
@@ -54,10 +56,11 @@ describe('Cycle analytics actions', () => {
   });
 
   it.each`
-    action                   | type                       | stateKey                | payload
-    ${'setFeatureFlags'}     | ${'SET_FEATURE_FLAGS'}     | ${'featureFlags'}       | ${{ hasDurationChart: true }}
-    ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
-    ${'setSelectedStage'}    | ${'SET_SELECTED_STAGE'}    | ${'selectedStage'}      | ${{ id: 'someStageId' }}
+    action                      | type                           | stateKey                 | payload
+    ${'setFeatureFlags'}        | ${'SET_FEATURE_FLAGS'}         | ${'featureFlags'}        | ${{ hasDurationChart: true }}
+    ${'setSelectedProjects'}    | ${'SET_SELECTED_PROJECTS'}     | ${'selectedProjectIds'}  | ${[10, 20, 30, 40]}
+    ${'setSelectedStage'}       | ${'SET_SELECTED_STAGE'}        | ${'selectedStage'}       | ${{ id: 'someStageId' }}
+    ${'setSelectedValueStream'} | ${'SET_SELECTED_VALUE_STREAM'} | ${'selectedValueStream'} | ${{ id: 'vs-1', name: 'Value stream 1' }}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     return testAction(
       actions[action],
@@ -133,7 +136,7 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       state = { ...state, selectedGroup };
       mock = new MockAdapter(axios);
-      mock.onGet(endpoints.stageData).reply(200, { events: [] });
+      mock.onGet(endpoints.stageData).reply(httpStatusCodes.OK, { events: [] });
     });
 
     it('dispatches receiveStageDataSuccess with received data on success', () => {
@@ -246,6 +249,7 @@ describe('Cycle analytics actions', () => {
         [],
         [
           { type: 'requestCycleAnalyticsData' },
+          { type: 'fetchValueStreams' },
           { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
           { type: 'receiveCycleAnalyticsDataSuccess' },
@@ -416,7 +420,7 @@ describe('Cycle analytics actions', () => {
     const payload = { hidden: true };
 
     beforeEach(() => {
-      mock.onPut(stageEndpoint({ stageId }), payload).replyOnce(200, payload);
+      mock.onPut(stageEndpoint({ stageId }), payload).replyOnce(httpStatusCodes.OK, payload);
       state = { selectedGroup };
     });
 
@@ -562,7 +566,7 @@ describe('Cycle analytics actions', () => {
     const stageId = 'cool-stage';
 
     beforeEach(() => {
-      mock.onDelete(stageEndpoint({ stageId })).replyOnce(200);
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
       state = { selectedGroup };
     });
 
@@ -614,7 +618,7 @@ describe('Cycle analytics actions', () => {
     const stageId = 'cool-stage';
 
     beforeEach(() => {
-      mock.onDelete(stageEndpoint({ stageId })).replyOnce(200);
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
       state = { selectedGroup };
     });
 
@@ -647,7 +651,7 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       state = { ...state, stages: [{ slug: selectedStageSlug }], selectedGroup };
       mock = new MockAdapter(axios);
-      mock.onGet(endpoints.stageMedian).reply(200, { events: [] });
+      mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.OK, { events: [] });
       mockDispatch = jest.fn();
     });
 
@@ -875,13 +879,11 @@ describe('Cycle analytics actions', () => {
           payload,
           state,
           [
-            { type: types.REQUEST_CREATE_VALUE_STREAM },
             {
-              type: types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS,
-              payload: { status: httpStatusCodes.OK, data: {} },
+              type: types.REQUEST_CREATE_VALUE_STREAM,
             },
           ],
-          [],
+          [{ type: 'receiveCreateValueStreamSuccess' }],
         );
       });
     });
@@ -907,6 +909,94 @@ describe('Cycle analytics actions', () => {
           [],
         );
       });
+    });
+  });
+
+  describe('fetchValueStreams', () => {
+    beforeEach(() => {
+      state = {
+        ...state,
+        stages: [{ slug: selectedStageSlug }],
+        selectedGroup,
+        featureFlags: {
+          ...state.featureFlags,
+          hasCreateMultipleValueStreams: true,
+        },
+      };
+      mock = new MockAdapter(axios);
+      mock.onGet(endpoints.valueStreamData).reply(httpStatusCodes.OK, { stages: [], events: [] });
+    });
+
+    it(`commits ${types.REQUEST_VALUE_STREAMS} and dispatches receiveValueStreamsSuccess with received data on success`, () => {
+      return testAction(
+        actions.fetchValueStreams,
+        null,
+        state,
+        [{ type: types.REQUEST_VALUE_STREAMS }],
+        [
+          {
+            payload: {
+              events: [],
+              stages: [],
+            },
+            type: 'receiveValueStreamsSuccess',
+          },
+        ],
+      );
+    });
+
+    describe('with a failing request', () => {
+      const resp = { data: {} };
+      beforeEach(() => {
+        mock.onGet(endpoints.valueStreamData).reply(httpStatusCodes.NOT_FOUND, resp);
+      });
+
+      it(`will commit ${types.RECEIVE_VALUE_STREAMS_ERROR}`, () => {
+        return testAction(
+          actions.fetchValueStreams,
+          null,
+          state,
+          [
+            { type: types.REQUEST_VALUE_STREAMS },
+            {
+              type: types.RECEIVE_VALUE_STREAMS_ERROR,
+            },
+          ],
+          [],
+        );
+      });
+    });
+
+    describe('receiveValueStreamsSuccess', () => {
+      it(`commits the ${types.RECEIVE_VALUE_STREAMS_SUCCESS} mutation`, () => {
+        return testAction(
+          actions.receiveValueStreamsSuccess,
+          valueStreams,
+          state,
+          [
+            {
+              type: types.RECEIVE_VALUE_STREAMS_SUCCESS,
+              payload: valueStreams,
+            },
+          ],
+          [{ type: 'setSelectedValueStream', payload: selectedValueStream.id }],
+        );
+      });
+    });
+
+    describe('with hasCreateMultipleValueStreams disabled', () => {
+      beforeEach(() => {
+        state = {
+          ...state,
+          featureFlags: {
+            ...state.featureFlags,
+            hasCreateMultipleValueStreams: false,
+          },
+        };
+      });
+
+      it(`will skip making a request`, () =>
+        testAction(actions.fetchValueStreams, null, state, [], []));
     });
   });
 });

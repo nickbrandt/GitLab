@@ -38,6 +38,8 @@ export const endpoints = {
   valueStreamData: /analytics\/value_stream_analytics\/value_streams/,
 };
 
+export const valueStreams = [{ id: 1, name: 'Value stream 1' }, { id: 2, name: 'Value stream 2' }];
+
 export const groupLabels = getJSONFixture(fixtureEndpoints.groupLabels).map(
   convertObjectPropsToCamelCase,
 );

@@ -6860,6 +6860,9 @@ msgstr ""
 msgid "Create Project"
 msgstr ""
 
+msgid "Create Value Stream"
+msgstr ""
+
 msgid "Create a GitLab account first, and then connect it to your %{label} account."
 msgstr ""
 
@@ -6956,6 +6959,9 @@ msgstr ""
 msgid "Create new"
 msgstr ""
 
+msgid "Create new Value Stream"
+msgstr ""
+
 msgid "Create new board"
 msgstr ""
 
@@ -6977,9 +6983,6 @@ msgstr ""
 msgid "Create new label"
 msgstr ""
 
-msgid "Create new value stream"
-msgstr ""
-
 msgid "Create new..."
 msgstr ""
 
@@ -6993,9 +6996,6 @@ msgid "Create requirement"
 msgstr ""
 
 msgid "Create snippet"
-msgstr ""
-
-msgid "Create value stream"
 msgstr ""
 
 msgid "Create wildcard: %{searchTerm}"
@@ -9709,7 +9709,7 @@ msgstr ""
 msgid "Example: @sub\\.company\\.com$"
 msgstr ""
 
-msgid "Example: My value stream"
+msgid "Example: My Value Stream"
 msgstr ""
 
 msgid "Example: Usage = single query. (Requested) / (Capacity) = multiple queries combined into a formula."
