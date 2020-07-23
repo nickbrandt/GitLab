@@ -9,6 +9,8 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
+      include ::Gitlab::SQL::Pattern
+
       after_destroy :log_geo_deleted_event
 
       scope :for_model, ->(model) { where(model_id: model.id, model_type: model.class.name) }
@@ -19,6 +21,16 @@ module EE
       # @return [ActiveRecord::Relation<Upload>] scope of everything that should be synced to this node
       def replicables_for_geo_node(node = ::Gitlab::Geo.current_node)
         selective_sync_scope(node).merge(object_storage_scope(node))
+      end
+
+      # Searches for a list of uploads based on the query given in `query`.
+      #
+      # On PostgreSQL this method uses "ILIKE" to perform a case-insensitive
+      # search.
+      #
+      # query - The search query as a String.
+      def search(query)
+        fuzzy_search(query, [:path])
       end
 
       private

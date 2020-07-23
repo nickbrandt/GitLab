@@ -45,7 +45,7 @@ class Geo::UploadRegistry < Geo::BaseRegistry
   def self.with_search(query)
     return all if query.nil?
 
-    where(file_id: Geo::Fdw::Upload.search(query))
+    where(file_id: Upload.search(query).limit(1000).pluck_primary_key)
   end
 
   def self.with_status(status)
