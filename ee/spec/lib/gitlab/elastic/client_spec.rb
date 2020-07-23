@@ -78,7 +78,6 @@ RSpec.describe Gitlab::Elastic::Client do
           aws_region: 'us-east-1'
         }
       end
-      let(:credentials) { double(:aws_credentials, set?: true) }
 
       before do
         allow_next_instance_of(Aws::CredentialProviderChain) do |instance|
@@ -86,24 +85,62 @@ RSpec.describe Gitlab::Elastic::Client do
         end
       end
 
-      it 'returns credentials from Aws::CredentialProviderChain' do
-        expect(creds).to eq credentials
+      after do
+        described_class.clear_memoization(:instance_credentials)
+      end
+
+      context 'when aws sdk provides credentials' do
+        let(:credentials) { double(:aws_credentials, set?: true) }
+
+        it 'return the credentials' do
+          expect(creds).to eq(credentials)
+        end
+      end
+
+      context 'when aws sdk does not provide credentials' do
+        let(:credentials) { nil }
+
+        it 'return the credentials' do
+          expect(creds).to eq(nil)
+        end
       end
 
       context 'when Aws::CredentialProviderChain returns unset credentials' do
         let(:credentials) { double(:aws_credentials, set?: false) }
 
         it 'returns nil' do
-          expect(creds).to be_nil
+          expect(creds).to eq(nil)
         end
       end
+    end
+  end
 
-      context 'when Aws::CredentialProviderChain returns nil' do
-        let(:credentials) { nil }
+  describe '.aws_credential_provider' do
+    let(:creds) { described_class.aws_credential_provider }
 
-        it 'returns nil' do
-          expect(creds).to be_nil
-        end
+    before do
+      allow_next_instance_of(Aws::CredentialProviderChain) do |instance|
+        allow(instance).to receive(:resolve).and_return(credentials)
+      end
+    end
+
+    after do
+      described_class.clear_memoization(:instance_credentials)
+    end
+
+    context 'when Aws::CredentialProviderChain returns set credentials' do
+      let(:credentials) { double(:aws_credentials) }
+
+      it 'returns credentials' do
+        expect(creds).to eq(credentials)
+      end
+    end
+
+    context 'when Aws::CredentialProviderChain returns nil' do
+      let(:credentials) { nil }
+
+      it 'returns nil' do
+        expect(creds).to eq(nil)
       end
     end
   end
