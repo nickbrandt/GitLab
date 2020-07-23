@@ -319,7 +319,7 @@ export default {
             :href="milestoneLink"
             :title="milestoneTooltipText"
           >
-            <i class="fa fa-clock-o"></i>
+            <gl-icon name="clock" class="s16 gl-vertical-align-text-bottom" />
             {{ issuable.milestone.title }}
           </gl-link>
 
