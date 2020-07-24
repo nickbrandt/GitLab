@@ -43,10 +43,6 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(nil).pluck(:project_id)
   end
 
-  def self.registry_consistency_worker_enabled?
-    Feature.enabled?(:geo_project_registry_ssot_sync, default_enabled: true)
-  end
-
   def self.find_registry_differences(range)
     source_ids = Gitlab::Geo.current_node.projects.id_in(range).pluck_primary_key
     tracked_ids = self.pluck_model_ids_in_range(range)
