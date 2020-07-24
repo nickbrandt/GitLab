@@ -7,12 +7,12 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
   <div
     class="btn-group flex-grow-1 mr-2"
   >
-    <gl-dropdown-stub
+    <gl-deprecated-dropdown-stub
       class="flex-grow-1 text-center"
       right=""
       text="Severity"
     >
-      <gl-dropdown-item-stub>
+      <gl-deprecated-dropdown-item-stub>
         <span
           class="d-flex"
         >
@@ -25,8 +25,8 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Component name
         
         </span>
-      </gl-dropdown-item-stub>
-      <gl-dropdown-item-stub>
+      </gl-deprecated-dropdown-item-stub>
+      <gl-deprecated-dropdown-item-stub>
         <span
           class="d-flex"
         >
@@ -39,8 +39,8 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Packager
         
         </span>
-      </gl-dropdown-item-stub>
-      <gl-dropdown-item-stub>
+      </gl-deprecated-dropdown-item-stub>
+      <gl-deprecated-dropdown-item-stub>
         <span
           class="d-flex"
         >
@@ -53,8 +53,8 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Severity
         
         </span>
-      </gl-dropdown-item-stub>
-    </gl-dropdown-stub>
+      </gl-deprecated-dropdown-item-stub>
+    </gl-deprecated-dropdown-stub>
      
     <gl-deprecated-button-stub
       class="flex-grow-0 js-sort-order"
