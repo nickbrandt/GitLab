@@ -102,7 +102,7 @@ export default {
       <header class="page-title-holder flex-fill d-flex align-items-center">
         <h2 class="page-title flex-grow">{{ s__('SecurityReports|Security Dashboard') }}</h2>
         <csv-export-button
-          v-if="!shouldShowEmptyState"
+          v-if="shouldShowDashboard"
           :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint"
         />
         <gl-button
