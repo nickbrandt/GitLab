@@ -175,16 +175,16 @@ It is deployed behind a feature flag that is **disabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
 can opt to enable it for your instance.
 
-To disable it:
-
-```ruby
-Feature.disable(:multiline_comments)
-```
-
 To enable it:
 
 ```ruby
 Feature.enable(:multiline_comments)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:multiline_comments)
 ```
 
 ## Pipeline status in merge requests widgets
