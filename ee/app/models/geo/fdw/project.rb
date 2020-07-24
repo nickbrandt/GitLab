@@ -12,7 +12,6 @@ module Geo
       has_many :container_repositories, class_name: 'Geo::Fdw::ContainerRepository'
 
       belongs_to :namespace, class_name: 'Geo::Fdw::Namespace'
-      belongs_to :design_management_designs, class_name: 'Geo::Fdw::DesignManagementDesign'
 
       scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
 
@@ -78,37 +77,6 @@ module Geo
           joins(join_statement.join_sources)
         end
 
-        def inner_join_design_registry
-          join_statement =
-            arel_table
-              .join(Geo::DesignRegistry.arel_table, Arel::Nodes::InnerJoin)
-              .on(arel_table[:id].eq(Geo::DesignRegistry.arel_table[:project_id]))
-
-          joins(join_statement.join_sources)
-        end
-
-        def missing_design_registry
-          left_outer_join_design_registry
-            .where(Geo::DesignRegistry.arel_table[:project_id].eq(nil))
-        end
-
-        def recently_updated_designs
-          inner_join_design_registry
-            .merge(Geo::DesignRegistry.updated_recently)
-        end
-
-        def with_designs
-          design_table = Geo::Fdw::DesignManagementDesign.arel_table
-          design_subquery = design_table.project(design_table[:project_id]).distinct.as('sub_design_table')
-
-          join_statement =
-            arel_table
-              .join(design_subquery, Arel::Nodes::InnerJoin)
-              .on(arel_table[:id].eq(design_subquery[:project_id]))
-
-          joins(join_statement.join_sources)
-        end
-
         private
 
         def left_outer_join_project_registry
@@ -116,15 +84,6 @@ module Geo
             arel_table
               .join(Geo::ProjectRegistry.arel_table, Arel::Nodes::OuterJoin)
               .on(arel_table[:id].eq(Geo::ProjectRegistry.arel_table[:project_id]))
-
-          joins(join_statement.join_sources)
-        end
-
-        def left_outer_join_design_registry
-          join_statement =
-            arel_table
-              .join(Geo::DesignRegistry.arel_table, Arel::Nodes::OuterJoin)
-              .on(arel_table[:id].eq(Geo::DesignRegistry.arel_table[:project_id]))
 
           joins(join_statement.join_sources)
         end
