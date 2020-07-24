@@ -157,7 +157,6 @@ export default {
       'removeStage',
       'updateStage',
       'reorderStage',
-      'setSelectedFilters',
     ]),
     ...mapActions('customStages', [
       'hideForm',
