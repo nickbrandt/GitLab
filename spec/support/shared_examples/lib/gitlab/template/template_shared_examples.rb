@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.shared_examples 'template shared examples' do |filename, file_extension|
+RSpec.shared_examples 'file template shared examples' do |filename, file_extension|
   describe '.all' do
     it "strips the #{file_extension} suffix" do
       expect(subject.all.first.name).not_to end_with(file_extension)

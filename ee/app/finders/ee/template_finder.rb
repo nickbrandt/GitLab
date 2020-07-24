@@ -8,7 +8,7 @@ module EE
       dockerfiles: ::Gitlab::Template::CustomDockerfileTemplate,
       gitignores: ::Gitlab::Template::CustomGitignoreTemplate,
       gitlab_ci_ymls: ::Gitlab::Template::CustomGitlabCiYmlTemplate,
-      metrics_dashboard_ymls: ::Gitlab::Template::MetricsDashboardTemplate
+      metrics_dashboard_ymls: ::Gitlab::Template::CustomMetricsDashboardYmlTemplate
     ).freeze
 
     attr_reader :custom_templates
