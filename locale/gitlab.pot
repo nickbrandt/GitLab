@@ -1402,6 +1402,9 @@ msgstr ""
 msgid "Add a To Do"
 msgstr ""
 
+msgid "Add a To-Do"
+msgstr ""
+
 msgid "Add a bullet list"
 msgstr ""
 
@@ -2118,7 +2121,7 @@ msgstr ""
 msgid "AlertManagement|There was an error displaying the alerts. Confirm your endpoint's configuration details to ensure alerts appear."
 msgstr ""
 
-msgid "AlertManagement|There was an error while updating the To Do of the alert."
+msgid "AlertManagement|There was an error while updating the To-Do of the alert."
 msgstr ""
 
 msgid "AlertManagement|There was an error while updating the assignee(s) list. Please try again."
@@ -25018,6 +25021,9 @@ msgid "To widen your search, change or remove filters above"
 msgstr ""
 
 msgid "To widen your search, change or remove filters."
+msgstr ""
+
+msgid "To-Do"
 msgstr ""
 
 msgid "To-Do List"
