@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import AccessDropdown from 'ee/projects/settings/access_dropdown';
+import AccessDropdown from '~/projects/settings/access_dropdown';
 import axios from '~/lib/utils/axios_utils';
 import AccessorUtilities from '~/lib/utils/accessor';
 import Flash from '~/flash';
