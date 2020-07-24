@@ -14,31 +14,27 @@ RSpec.describe 'admin/dashboard/index.html.haml' do
     assign(:projects, create_list(:project, 1))
     assign(:users, create_list(:user, 1))
     assign(:groups, create_list(:group, 1))
+    assign(:license, create(:license))
 
     allow(view).to receive(:admin?).and_return(true)
     allow(view).to receive(:current_application_settings).and_return(Gitlab::CurrentSettings.current_application_settings)
-    allow(view).to receive(:show_license_breakdown?).and_return(false)
+    allow(view).to receive(:show_license_breakdown?).and_return(true)
   end
 
-  it "shows version of GitLab Workhorse" do
+  it 'includes notices above license breakdown' do
+    assign(:notices, [{ type: :alert, message: 'An alert' }])
+
     render
 
-    expect(rendered).to have_content 'GitLab Workhorse'
-    expect(rendered).to have_content Gitlab::Workhorse.version
+    expect(rendered).to have_content /An alert.*Users in License/
   end
 
-  it "includes revision of GitLab" do
+  it 'includes license breakdown' do
     render
 
-    expect(rendered).to have_content "#{Gitlab::VERSION} (#{Gitlab.revision})"
-  end
-
-  it 'does not include license breakdown' do
-    render
-
-    expect(rendered).not_to have_content "Users in License"
-    expect(rendered).not_to have_content "Active Users"
-    expect(rendered).not_to have_content "Maximum Users"
-    expect(rendered).not_to have_content "Users over License"
+    expect(rendered).to have_content "Users in License"
+    expect(rendered).to have_content "Active Users"
+    expect(rendered).to have_content "Maximum Users"
+    expect(rendered).to have_content "Users over License"
   end
 end
