@@ -2,7 +2,7 @@
 
 module EE
   module Packages
-    module PackageFileGeo
+    module PackageFile
       extend ActiveSupport::Concern
 
       prepended do

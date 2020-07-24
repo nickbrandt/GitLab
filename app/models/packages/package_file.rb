@@ -53,4 +53,4 @@ class Packages::PackageFile < ApplicationRecord
   end
 end
 
-Packages::PackageFile.prepend_if_ee('EE::Packages::PackageFileGeo')
+Packages::PackageFile.prepend_if_ee('EE::Packages::PackageFile')
