@@ -80,32 +80,22 @@ RSpec.describe 'metrics dashboard page' do
   end
 
   describe 'GET :/namespace/:project/-/metrics/:page' do
-    context 'when metrics_dashboard_new_panel_page feature flag is disabled' do
-      before do
-        stub_feature_flags(metrics_dashboard_new_panel_page: false)
-      end
-
-      it 'returns 404 if feature flag disabled' do
-        # send_request(page: 'panel/new') cannot be used because it encodes '/'
-        get "/#{project.namespace.to_param}/#{project.to_param}/-/metrics/panel/new"
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-
-      it 'returns 200 without page' do
-        send_request
-
-        expect(response).to have_gitlab_http_status(:ok)
-      end
-    end
-
-    it 'returns 200 if feature flag is enabled' do
+    it 'returns 200 with path param page and feature flag enabled' do
       stub_feature_flags(metrics_dashboard_new_panel_page: true)
 
       # send_request(page: 'panel/new') cannot be used because it encodes '/'
       get "/#{project.namespace.to_param}/#{project.to_param}/-/metrics/panel/new"
 
       expect(response).to have_gitlab_http_status(:ok)
+    end
+
+    it 'returns 404 with path param page and feature flag disabled' do
+      stub_feature_flags(metrics_dashboard_new_panel_page: false)
+
+      # send_request(page: 'panel/new') cannot be used because it encodes '/'
+      get "/#{project.namespace.to_param}/#{project.to_param}/-/metrics/panel/new"
+
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
