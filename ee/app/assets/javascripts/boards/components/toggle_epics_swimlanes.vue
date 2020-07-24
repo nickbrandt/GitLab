@@ -45,7 +45,7 @@ export default {
     <gl-dropdown
       right
       :text="dropdownLabel"
-      toggle-class="gl-ml-2 gl-border-none gl-inset-border-1-gray-400! border-radius-default"
+      toggle-class="gl-ml-2 gl-border-none gl-inset-border-1-gray-200! border-radius-default"
     >
       <gl-dropdown-item
         :is-check-item="true"
