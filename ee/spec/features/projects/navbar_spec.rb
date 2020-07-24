@@ -11,7 +11,7 @@ RSpec.describe 'Project navbar' do
   let_it_be(:project) { create(:project, :repository) }
 
   before do
-    stub_feature_flags(group_iterations: false)
+    stub_feature_flags(project_iterations: false)
 
     insert_package_nav(_('Operations'))
 
@@ -103,7 +103,7 @@ RSpec.describe 'Project navbar' do
   context 'when iterations is available' do
     before do
       stub_licensed_features(iterations: true)
-      stub_feature_flags(group_iterations: true)
+      stub_feature_flags(project_iterations: true)
 
       insert_after_sub_nav_item(
         _('Milestones'),

@@ -1,5 +1,5 @@
-- return unless License.feature_available?(:iterations)
-- return unless Feature.enabled?(:group_iterations, @group, default_enabled: true)
+- return unless Feature.enabled?(:project_iterations, @project.group, default_enabled: false)
+- return unless can?(current_user, :read_iteration, @project)
 
 = nav_link(controller: :iterations) do
   = link_to project_iterations_path(@project), title: _('Iterations') do

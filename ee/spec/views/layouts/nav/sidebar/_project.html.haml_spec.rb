@@ -260,9 +260,9 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
         stub_licensed_features(iterations: true)
       end
 
-      context 'with group iterations feature flag enabled' do
+      context 'with project_iterations feature flag enabled' do
         before do
-          stub_feature_flags(group_iterations: true)
+          stub_feature_flags(project_iterations: true)
         end
 
         it 'is visible' do
@@ -272,9 +272,9 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
         end
       end
 
-      context 'with iterations feature flag disabled' do
+      context 'with project_iterations feature flag disabled' do
         before do
-          stub_feature_flags(group_iterations: false)
+          stub_feature_flags(project_iterations: false)
         end
 
         it 'is not visible' do

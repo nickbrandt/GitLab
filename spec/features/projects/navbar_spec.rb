@@ -12,7 +12,7 @@ RSpec.describe 'Project navbar' do
   let_it_be(:project) { create(:project, :repository) }
 
   before do
-    stub_feature_flags(group_iterations: false)
+    stub_feature_flags(project_iterations: false)
 
     insert_package_nav(_('Operations'))
 
