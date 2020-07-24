@@ -51,6 +51,7 @@ function createFooterApp() {
     solution,
     id,
     canModifyRelatedIssues,
+    relatedIssuesHelpPath,
   } = convertObjectPropsToCamelCase(JSON.parse(el.dataset.vulnerability));
 
   const remediation = remediations?.length ? remediations[0] : null;
@@ -79,6 +80,7 @@ function createFooterApp() {
       url: project.full_path,
       value: project.full_name,
     },
+    relatedIssuesHelpPath,
   };
 
   return new Vue({
