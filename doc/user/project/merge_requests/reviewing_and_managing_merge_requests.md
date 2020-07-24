@@ -173,7 +173,7 @@ above it.
 The multiline comments feature is under development but ready for production use.
 It is deployed behind a feature flag that is **disabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
-can opt to disable it for your instance.
+can opt to enable it for your instance.
 
 To disable it:
 
