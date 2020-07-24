@@ -30,53 +30,53 @@ RSpec.describe RuboCop::Cop::UsageData::LargeTable, type: :rubocop do
     end
 
     context 'with large tables' do
-      context 'when counting' do
-        let(:source) do
-          <<~SRC
+      context 'when calling Issue.count' do
+        it 'register an offence' do
+          inspect_source <<~SRC
             Issue.count
           SRC
-        end
 
-        let(:source_with_count_ancestor) do
-          <<~SRC
+          expect(cop.offenses.size).to eq(1)
+        end
+      end
+
+      context 'when calling Issue.active.count' do
+        it 'register an offence' do
+          inspect_source <<~SRC
             Issue.active.count
           SRC
-        end
 
-        let(:correct_source) do
-          <<~SRC
+          expect(cop.offenses.size).to eq(1)
+        end
+      end
+
+      context 'when calling count(Issue)' do
+        it 'does not register an offence' do
+          inspect_source <<~SRC
             count(Issue)
           SRC
-        end
-
-        let(:correct_source_with_module) do
-          <<~SRC
-            count(Ci::Build.active)
-          SRC
-        end
-
-        let(:incorrect_source_with_module) do
-          <<~SRC
-            Ci::Build.active.count
-          SRC
-        end
-
-        it 'registers an offence' do
-          inspect_source(source)
-
-          expect(cop.offenses.size).to eq(1)
-        end
-
-        it 'registers an offence with .count' do
-          inspect_source(source_with_count_ancestor)
-
-          expect(cop.offenses.size).to eq(1)
-        end
-
-        it 'does not register an offence' do
-          inspect_source(correct_source)
 
           expect(cop.offenses).to be_empty
+        end
+      end
+
+      context 'when calling count(Ci::Build.active)' do
+        it 'does not register an offence' do
+          inspect_source <<~SRC
+            count(Ci::Build.active)
+          SRC
+
+          expect(cop.offenses).to be_empty
+        end
+      end
+
+      context 'when calling Ci::Build.active.count' do
+        it 'register an offence' do
+          inspect_source <<~SRC
+            Ci::Build.active.count
+          SRC
+
+          expect(cop.offenses.size).to eq(1)
         end
       end
 
@@ -96,14 +96,10 @@ RSpec.describe RuboCop::Cop::UsageData::LargeTable, type: :rubocop do
     end
 
     context 'with non related class' do
-      let(:source) do
-        <<~SRC
+      it 'does not register an offence' do
+        inspect_source <<~SRC
           Rails.count
         SRC
-      end
-
-      it 'does not registers an offence' do
-        inspect_source(source)
 
         expect(cop.offenses).to be_empty
       end

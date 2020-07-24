@@ -4,7 +4,6 @@ UsageData/LargeTable:
     - 'lib/gitlab/usage_data.rb'
     - 'ee/lib/ee/gitlab/usage_data.rb'
   NonRelatedClasses:
-    - :EE::Gitlab::UsageData
     - :Feature
     - :Gitlab
     - :Gitlab::AppLogger

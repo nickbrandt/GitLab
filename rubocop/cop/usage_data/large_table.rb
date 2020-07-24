@@ -37,12 +37,6 @@ module RuboCop
           $...)
         PATTERN
 
-        def_node_matcher :non_related_class?, <<~PATTERN
-          (send
-            (const {nil? cbase} ${#non_related?})
-          $...)
-        PATTERN
-
         def on_send(node)
           one_level_matches = one_level_node(node)
           two_level_matches = two_level_node(node)
