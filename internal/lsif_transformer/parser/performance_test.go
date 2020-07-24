@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 	"testing"
@@ -14,23 +13,22 @@ func BenchmarkGenerate(b *testing.B) {
 	tmpDir := filePath + ".tmp"
 	defer os.RemoveAll(tmpDir)
 
-	m := measureMemory(func() {
-		file, err := os.Open(filePath)
-		require.NoError(b, err)
+	var memoryUsage float64
+	for i := 0; i < b.N; i++ {
+		memoryUsage += measureMemory(func() {
+			file, err := os.Open(filePath)
+			require.NoError(b, err)
 
-		p, err := NewParser(file, Config{ProcessReferences: true})
-		require.NoError(b, err)
+			p, err := NewParser(file, Config{ProcessReferences: true})
+			require.NoError(b, err)
 
-		_, err = p.ZipReader()
-		require.NoError(b, err)
-		require.NoError(b, p.Close())
-	})
+			_, err = p.ZipReader()
+			require.NoError(b, err)
+			require.NoError(b, p.Close())
+		})
+	}
 
-	// Golang 1.13 has `func (*B) ReportMetric`
-	// It makes sense to replace fmt.Printf with
-	// b.ReportMetric(m, "MiB/op")
-
-	fmt.Printf("BenchmarkGenerate: %f MiB/op\n", m)
+	b.ReportMetric(memoryUsage/float64(b.N), "MiB/op")
 }
 
 func measureMemory(f func()) float64 {
@@ -40,6 +38,7 @@ func measureMemory(f func()) float64 {
 	f()
 
 	runtime.ReadMemStats(&m1)
+	runtime.GC()
 
 	return float64(m1.Alloc-m.Alloc) / 1024 / 1024
 }
