@@ -10,7 +10,7 @@ workflow:
     - if: '$CI_COMMIT_BRANCH =~ /^[\d-]+-stable$/'
 
 default:
-  image: golang:1.12
+  image: golang:1.13
   tags:
     - gitlab-org
 
@@ -34,10 +34,6 @@ verify:
   - go version
   - apt-get update && apt-get -y install libimage-exiftool-perl
   - make test
-
-test using go 1.12:
-  extends: .test
-  image: golang:1.12
 
 test using go 1.13:
   extends: .test
