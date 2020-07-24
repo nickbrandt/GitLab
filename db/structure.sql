@@ -12527,9 +12527,8 @@ CREATE TABLE public.issues (
     health_status smallint,
     external_key character varying(255),
     sprint_id bigint,
-    issue_type smallint DEFAULT 0,
-    CONSTRAINT check_fba63f706d CHECK ((lock_version IS NOT NULL))
     issue_type smallint DEFAULT 0 NOT NULL
+    CONSTRAINT check_fba63f706d CHECK ((lock_version IS NOT NULL))
 );
 
 CREATE SEQUENCE public.issues_id_seq
