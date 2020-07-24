@@ -20901,6 +20901,9 @@ msgstr ""
 msgid "SecurityConfiguration|Configure"
 msgstr ""
 
+msgid "SecurityConfiguration|Customize common SAST settings to suit your requirements. More advanced configuration options exist, which you can add to the configuration file this tool generates. It's important to note that if you make any configurations, they will be saved as overrides and will be %{strongStart}excluded from automatic updates%{strongEnd}."
+msgstr ""
+
 msgid "SecurityConfiguration|Enable via Merge Request"
 msgstr ""
 
