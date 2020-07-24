@@ -100,9 +100,6 @@ module EE
         end
 
         def approval_rules_counts
-          # rubocop: disable UsageData/LargeTable:
-          projects_with_service_desk = ::Project.where(service_desk_enabled: true)
-          # rubocop: enable UsageData/LargeTable:
           {
             approval_project_rules: count(ApprovalProjectRule),
             approval_project_rules_with_target_branch: count(ApprovalProjectRulesProtectedBranch, :approval_project_rule_id)
@@ -358,9 +355,10 @@ module EE
 
         # rubocop:disable CodeReuse/ActiveRecord
         def projects_jira_issuelist_active
+          # rubocop: disable UsageData/LargeTable:
           min_id = JiraTrackerData.where(issues_enabled: true).minimum(:service_id)
           max_id = JiraTrackerData.where(issues_enabled: true).maximum(:service_id)
-
+          # rubocop: enable UsageData/LargeTable:
           count(::JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
         end
         # rubocop:enable CodeReuse/ActiveRecord

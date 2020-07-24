@@ -83,9 +83,11 @@ module Gitlab
             auto_devops_enabled: count(::ProjectAutoDevops.enabled),
             auto_devops_disabled: count(::ProjectAutoDevops.disabled),
             deploy_keys: count(DeployKey),
+            # rubocop: disable UsageData/LargeTable:
             deployments: deployment_count(Deployment),
             successful_deployments: deployment_count(Deployment.success),
             failed_deployments: deployment_count(Deployment.failed),
+            # rubocop: enable UsageData/LargeTable:
             environments: count(::Environment),
             clusters: count(::Clusters::Cluster),
             clusters_enabled: count(::Clusters::Cluster.enabled),
@@ -170,9 +172,11 @@ module Gitlab
       def system_usage_data_monthly
         {
           counts_monthly: {
+            # rubocop: disable UsageData/LargeTable:
             deployments: deployment_count(Deployment.where(last_28_days_time_period)),
             successful_deployments: deployment_count(Deployment.success.where(last_28_days_time_period)),
             failed_deployments: deployment_count(Deployment.failed.where(last_28_days_time_period)),
+            # rubocop: enable UsageData/LargeTable:
             personal_snippets: count(PersonalSnippet.where(last_28_days_time_period)),
             project_snippets: count(ProjectSnippet.where(last_28_days_time_period))
           }.tap do |data|
@@ -635,8 +639,9 @@ module Gitlab
 
       # rubocop: disable CodeReuse/ActiveRecord
       def service_desk_counts
+        # rubocop: disable UsageData/LargeTable:
         projects_with_service_desk = ::Project.where(service_desk_enabled: true)
-
+        # rubocop: enable UsageData/LargeTable:
         {
           service_desk_enabled_projects: count(projects_with_service_desk),
           service_desk_issues: count(
