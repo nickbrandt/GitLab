@@ -81,14 +81,10 @@ RSpec.describe RuboCop::Cop::UsageData::LargeTable, type: :rubocop do
       end
 
       context 'when using allowed methods' do
-        let(:source) do
-          <<~SRC
+        it 'does not register an offence' do
+          inspect_source <<~SRC
             Issue.minimum
           SRC
-        end
-
-        it 'does not register an offence' do
-          inspect_source(source)
 
           expect(cop.offenses).to be_empty
         end
