@@ -3,8 +3,8 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import {
   GlEmptyState,
   GlLoadingIcon,
-  GlDropdown,
-  GlDropdownItem,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownItem,
   GlDeprecatedButton,
   GlTooltipDirective,
 } from '@gitlab/ui';
@@ -24,8 +24,8 @@ export default {
   components: {
     GlEmptyState,
     GlLoadingIcon,
-    GlDropdown,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
     GlColumnChart,
     GlDeprecatedButton,
     Icon,
@@ -298,12 +298,12 @@ export default {
             >
               <strong class="mr-2">{{ __('Sort by') }}</strong>
               <div class="d-flex">
-                <gl-dropdown
+                <gl-deprecated-dropdown
                   class="mr-2 flex-grow"
                   toggle-class="dropdown-menu-toggle"
                   :text="sortFieldDropdownLabel"
                 >
-                  <gl-dropdown-item
+                  <gl-deprecated-dropdown-item
                     v-for="metric in tableSortOptions"
                     :key="metric.key"
                     active-class="is-active"
@@ -320,8 +320,8 @@ export default {
                       />
                       {{ metric.label }}
                     </span>
-                  </gl-dropdown-item>
-                </gl-dropdown>
+                  </gl-deprecated-dropdown-item>
+                </gl-deprecated-dropdown>
                 <gl-deprecated-button
                   v-gl-tooltip.hover
                   :title="sortTooltipTitle"

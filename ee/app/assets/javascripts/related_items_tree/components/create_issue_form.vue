@@ -2,8 +2,8 @@
 import { mapState, mapActions } from 'vuex';
 import {
   GlDeprecatedButton,
-  GlDropdown,
-  GlDropdownItem,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownItem,
   GlFormInput,
   GlSearchBoxByType,
   GlLoadingIcon,
@@ -17,8 +17,8 @@ import { SEARCH_DEBOUNCE } from '../constants';
 export default {
   components: {
     GlDeprecatedButton,
-    GlDropdown,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
     GlFormInput,
     GlSearchBoxByType,
     GlLoadingIcon,
@@ -129,7 +129,7 @@ export default {
       </div>
       <div class="col-sm">
         <label class="label-bold">{{ __('Project') }}</label>
-        <gl-dropdown
+        <gl-deprecated-dropdown
           ref="dropdownButton"
           :text="dropdownToggleText"
           class="w-100 projects-dropdown"
@@ -154,7 +154,7 @@ export default {
             <span v-if="!projects.length" class="d-block text-center p-2">{{
               __('No matches found')
             }}</span>
-            <gl-dropdown-item
+            <gl-deprecated-dropdown-item
               v-for="project in projects"
               :key="project.id"
               class="w-100"
@@ -163,9 +163,9 @@ export default {
               <project-avatar :project="project" :size="32" />
               {{ project.name }}
               <div class="text-secondary">{{ project.namespace.name }}</div>
-            </gl-dropdown-item>
+            </gl-deprecated-dropdown-item>
           </div>
-        </gl-dropdown>
+        </gl-deprecated-dropdown>
       </div>
     </div>
 

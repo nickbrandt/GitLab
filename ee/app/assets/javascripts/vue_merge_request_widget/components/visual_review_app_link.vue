@@ -1,8 +1,8 @@
 <script>
 import {
   GlDeprecatedButton,
-  GlDropdown,
-  GlDropdownItem,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownItem,
   GlModal,
   GlSearchBoxByType,
   GlModalDirective,
@@ -15,8 +15,8 @@ import { s__, sprintf } from '~/locale';
 export default {
   components: {
     GlDeprecatedButton,
-    GlDropdown,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
     GlModal,
     GlSearchBoxByType,
     Icon,
@@ -201,7 +201,7 @@ export default {
         <gl-deprecated-button @click="cancel">
           {{ s__('VisualReviewApp|Cancel') }}
         </gl-deprecated-button>
-        <gl-dropdown
+        <gl-deprecated-dropdown
           v-if="shouldShowChanges"
           dropup
           right
@@ -216,19 +216,19 @@ export default {
             {{ s__('VisualReviewApp|Open review app') }}
             <icon class="fgray" name="external-link" />
           </template>
-          <gl-dropdown-item
+          <gl-deprecated-dropdown-item
             v-for="change in filteredChanges"
             :key="change.path"
             :href="change.external_url"
             data-track-event="open_review_app"
             data-track-label="review_app"
-            >{{ change.path }}</gl-dropdown-item
+            >{{ change.path }}</gl-deprecated-dropdown-item
           >
 
           <div v-show="isSearchEmpty" class="text-secondary p-2">
             {{ s__('VisualReviewApp|No review app found or available.') }}
           </div>
-        </gl-dropdown>
+        </gl-deprecated-dropdown>
         <review-app-link
           v-else
           :display="viewAppDisplay"

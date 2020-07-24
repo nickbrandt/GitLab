@@ -1,12 +1,12 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlFormGroup, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlFormGroup, GlDeprecatedDropdown, GlDeprecatedDropdownItem } from '@gitlab/ui';
 
 export default {
   components: {
     GlFormGroup,
-    GlDropdown,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
   },
   computed: {
     ...mapState('threatMonitoring', ['environments', 'currentEnvironmentId']),
@@ -26,7 +26,7 @@ export default {
     :label-for="$options.environmentFilterId"
     class="col-sm-6 col-md-4 col-lg-3 col-xl-2"
   >
-    <gl-dropdown
+    <gl-deprecated-dropdown
       :id="$options.environmentFilterId"
       ref="environmentsDropdown"
       class="mb-0 d-flex"
@@ -34,13 +34,13 @@ export default {
       :text="currentEnvironmentName"
       :disabled="!canChangeEnvironment"
     >
-      <gl-dropdown-item
+      <gl-deprecated-dropdown-item
         v-for="environment in environments"
         :key="environment.id"
         ref="environmentsDropdownItem"
         @click="setCurrentEnvironmentId(environment.id)"
-        >{{ environment.name }}</gl-dropdown-item
+        >{{ environment.name }}</gl-deprecated-dropdown-item
       >
-    </gl-dropdown>
+    </gl-deprecated-dropdown>
   </gl-form-group>
 </template>

@@ -11,8 +11,8 @@ import { TEST_HOST } from 'helpers/test_constants';
 import {
   GlEmptyState,
   GlLoadingIcon,
-  GlDropdown,
-  GlDropdownItem,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownItem,
   GlDeprecatedButton,
 } from '@gitlab/ui';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
@@ -78,7 +78,7 @@ describe('ProductivityApp component', () => {
   const findCommitBasedMetricChart = () => wrapper.find({ ref: 'commitBasedChart' });
   const findScatterplotMetricChart = () => wrapper.find({ ref: 'scatterplot' });
   const findMrTableSortSection = () => wrapper.find('.js-mr-table-sort');
-  const findSortFieldDropdown = () => findMrTableSortSection().find(GlDropdown);
+  const findSortFieldDropdown = () => findMrTableSortSection().find(GlDeprecatedDropdown);
   const findSortOrderToggle = () => findMrTableSortSection().find(GlDeprecatedButton);
   const findMrTableSection = () => wrapper.find('.js-mr-table');
   const findMrTable = () => findMrTableSection().find(MergeRequestTable);
@@ -430,7 +430,7 @@ describe('ProductivityApp component', () => {
 
                     it('should change the sort field', () => {
                       findSortFieldDropdown()
-                        .findAll(GlDropdownItem)
+                        .findAll(GlDeprecatedDropdownItem)
                         .at(0)
                         .vm.$emit('click');
 
