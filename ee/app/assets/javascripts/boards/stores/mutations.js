@@ -12,7 +12,7 @@ export default {
     state.isShowingLabels = val;
   },
   [mutationTypes.SET_ACTIVE_LIST_ID]: (state, id) => {
-    state.activeListId = id;
+    state.activeId = id;
   },
 
   [mutationTypes.REQUEST_AVAILABLE_BOARDS]: () => {
