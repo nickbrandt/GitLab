@@ -8557,7 +8557,7 @@ msgstr ""
 msgid "Draft merge requests can't be merged."
 msgstr ""
 
-msgid "Drop or %{linkStart}upload%{linkEnd} Designs to attach"
+msgid "Drop or %{linkStart}upload%{linkEnd} designs to attach"
 msgstr ""
 
 msgid "Drop your designs to start your upload."
