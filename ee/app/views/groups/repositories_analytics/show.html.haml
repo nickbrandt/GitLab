@@ -1,0 +1,10 @@
+- page_title _("Repositories Analytics")
+
+.mb-3.border-bottom
+  %h3
+    = _("Repositories Analytics")
+
+.d-flex.justify-content-between.align-items-center
+  %h4.sub-header
+    = _("Test Code Coverage")
+  = link_to _("Download historic test coverage data (.csv)"), group_analytics_coverage_reports_path(@group, format: :csv), class: 'btn btn-sm'

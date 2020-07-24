@@ -21,6 +21,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     get '/analytics', to: redirect('groups/%{group_id}/-/contribution_analytics')
     resource :contribution_analytics, only: [:show]
+    resource :repositories_analytics, only: [:show]
 
     namespace :analytics do
       resource :productivity_analytics, only: :show, constraints: -> (req) { Gitlab::Analytics.productivity_analytics_enabled? }

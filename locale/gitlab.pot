@@ -8994,6 +8994,9 @@ msgstr ""
 msgid "Download export"
 msgstr ""
 
+msgid "Download historic test coverage data (.csv)"
+msgstr ""
+
 msgid "Download image"
 msgstr ""
 
@@ -21075,6 +21078,9 @@ msgstr ""
 msgid "Repositories"
 msgstr ""
 
+msgid "Repositories Analytics"
+msgstr ""
+
 msgid "Repository"
 msgstr ""
 
@@ -24572,6 +24578,9 @@ msgid "Test"
 msgstr ""
 
 msgid "Test Cases"
+msgstr ""
+
+msgid "Test Code Coverage"
 msgstr ""
 
 msgid "Test cases are not available for this project"
