@@ -11203,7 +11203,8 @@ CREATE TABLE public.design_management_designs (
     id bigint NOT NULL,
     project_id integer NOT NULL,
     issue_id integer,
-    filename character varying NOT NULL
+    filename character varying NOT NULL,
+    relative_position integer
 );
 
 CREATE SEQUENCE public.design_management_designs_id_seq

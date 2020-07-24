@@ -9,6 +9,7 @@ module DesignManagement
     include Referable
     include Mentionable
     include WhereComposite
+    include RelativePositioning
 
     belongs_to :project, inverse_of: :designs
     belongs_to :issue
@@ -86,6 +87,14 @@ module DesignManagement
 
     # A design is current if the most recent event is not a deletion
     scope :current, -> { visible_at_version(nil) }
+
+    def self.relative_positioning_query_base(design)
+      on_issue(design.issue_id)
+    end
+
+    def self.relative_positioning_parent_column
+      :issue_id
+    end
 
     def status
       if new_design?
