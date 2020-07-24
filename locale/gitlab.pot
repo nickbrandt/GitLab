@@ -1429,6 +1429,9 @@ msgstr ""
 msgid "Add a numbered list"
 msgstr ""
 
+msgid "Add a related issue"
+msgstr ""
+
 msgid "Add a table"
 msgstr ""
 
@@ -1445,9 +1448,6 @@ msgid "Add an existing issue"
 msgstr ""
 
 msgid "Add an impersonation token"
-msgstr ""
-
-msgid "Add an issue"
 msgstr ""
 
 msgid "Add another link"
