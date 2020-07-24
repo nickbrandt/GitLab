@@ -91,6 +91,7 @@ export const fetchStageMedianValues = ({ dispatch, getters }) => {
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
+
 export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS);
   dispatch('typeOfWork/fetchTopRankedGroupLabels');
@@ -237,14 +238,8 @@ export const removeStage = ({ dispatch, state }, stageId) => {
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
 
-export const setSelectedFilters = ({ commit, dispatch, getters }, filters = {}) => {
+export const setSelectedFilters = ({ commit }, filters = {}) =>
   commit(types.SET_SELECTED_FILTERS, filters);
-  const { currentGroupPath } = getters;
-  if (currentGroupPath) {
-    return dispatch('fetchCycleAnalyticsData');
-  }
-  return Promise.resolve();
-};
 
 export const initializeCycleAnalyticsSuccess = ({ commit }) =>
   commit(types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS);

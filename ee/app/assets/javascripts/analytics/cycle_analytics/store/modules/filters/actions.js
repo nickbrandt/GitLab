@@ -76,10 +76,15 @@ export const fetchAssignees = ({ commit, rootGetters }, query = '') => {
   });
 };
 
-export const setFilters = ({ dispatch }, nextFilters) =>
-  dispatch('setSelectedFilters', nextFilters, { root: true });
+export const setFilters = ({ dispatch }, nextFilters) => {
+  return Promise.resolve()
+    .then(() => dispatch('setSelectedFilters', nextFilters, { root: true }))
+    .then(() => dispatch('fetchCycleAnalyticsData', null, { root: true }));
+};
 
 export const initialize = ({ dispatch, commit }, initialFilters) => {
   commit(types.INITIALIZE, initialFilters);
-  return dispatch('setPaths', initialFilters).then(() => dispatch('setFilters', initialFilters));
+  return Promise.resolve()
+    .then(() => dispatch('setPaths', initialFilters))
+    .then(() => dispatch('setSelectedFilters', initialFilters, { root: true }));
 };
