@@ -1,5 +1,12 @@
 <script>
-import { GlModal, GlDeprecatedButton, GlTooltipDirective, GlLoadingIcon } from '@gitlab/ui';
+import {
+  GlModal,
+  GlDeprecatedButton,
+  GlTooltipDirective,
+  GlLoadingIcon,
+  GlSprintf,
+  GlLink,
+} from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -24,6 +31,8 @@ export default {
     Icon,
     Callout,
     GlLoadingIcon,
+    GlSprintf,
+    GlLink,
   },
 
   directives: {
@@ -35,7 +44,11 @@ export default {
       type: String,
       required: true,
     },
-    helpAnchor: {
+    helpClientLibrariesPath: {
+      type: String,
+      required: true,
+    },
+    helpClientExamplePath: {
       type: String,
       required: true,
     },
@@ -73,7 +86,7 @@ export default {
           'FeatureFlags|Install a %{docs_link_anchored_start}compatible client library%{docs_link_anchored_end} and specify the API URL, application name, and instance ID during the configuration setup. %{docs_link_start}More Information%{docs_link_end}',
         ),
         {
-          docs_link_anchored_start: `<a href="${this.helpAnchor}" target="_blank">`,
+          docs_link_anchored_start: `<a href="${this.helpClientLibrariesPath}" target="_blank">`,
           docs_link_anchored_end: '</a>',
           docs_link_start: `<a href="${this.helpPath}" target="_blank">`,
           docs_link_end: '</a>',
@@ -167,5 +180,18 @@ export default {
       category="info"
       :message="$options.instanceIdRegenerateText"
     />
+    <callout category="warning">
+      <gl-sprintf
+        :message="
+          s__(
+            'FeatureFlags|Set the Unleash client application name to the name of the environment your application runs in. This value is used to match environment scopes. See the %{linkStart}example client configuration%{linkEnd}.',
+          )
+        "
+      >
+        <template #link="{ content }">
+          <gl-link :href="helpClientExamplePath" target="_blank">{{ content }}</gl-link>
+        </template>
+      </gl-sprintf>
+    </callout>
   </gl-modal>
 </template>
