@@ -66,7 +66,11 @@ export default {
       type: String,
       required: true,
     },
-    featureFlagsAnchoredHelpPagePath: {
+    featureFlagsClientLibrariesHelpPagePath: {
+      type: String,
+      required: true,
+    },
+    featureFlagsClientExampleHelpPagePath: {
       type: String,
       required: true,
     },
@@ -243,7 +247,8 @@ export default {
     <configure-feature-flags-modal
       v-if="canUserConfigure"
       :help-path="featureFlagsHelpPagePath"
-      :help-anchor="featureFlagsAnchoredHelpPagePath"
+      :help-client-libraries-path="featureFlagsClientLibrariesHelpPagePath"
+      :help-client-example-path="featureFlagsClientExampleHelpPagePath"
       :api-url="unleashApiUrl"
       :instance-id="instanceId"
       :is-rotating="isRotating"

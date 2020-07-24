@@ -11,7 +11,8 @@ describe('Configure Feature Flags Modal', () => {
   beforeEach(() => {
     propsData = {
       helpPath: '/help/path',
-      helpAnchor: '/help/path/#flags',
+      helpClientLibrariesPath: '/help/path/#flags',
+      helpClientExamplePath: '/feature-flags#clientexample',
       apiUrl: '/api/url',
       instanceId: 'instance-id-token',
       isRotating: false,

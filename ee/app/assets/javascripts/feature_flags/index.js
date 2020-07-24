@@ -20,7 +20,9 @@ export default () =>
           projectId: this.dataset.projectId,
           errorStateSvgPath: this.dataset.errorStateSvgPath,
           featureFlagsHelpPagePath: this.dataset.featureFlagsHelpPagePath,
-          featureFlagsAnchoredHelpPagePath: this.dataset.featureFlagsAnchoredHelpPagePath,
+          featureFlagsClientLibrariesHelpPagePath: this.dataset
+            .featureFlagsClientLibrariesHelpPagePath,
+          featureFlagsClientExampleHelpPagePath: this.dataset.featureFlagsClientExampleHelpPagePath,
           unleashApiUrl: this.dataset.unleashApiUrl,
           unleashApiInstanceId: this.dataset.unleashApiInstanceId || '',
           csrfToken: csrf.token,
