@@ -221,7 +221,7 @@ module Gitlab
       end
 
       def print_container_repositories_status
-        if Gitlab.config.geo.registry_replication.enabled
+        if ::Geo::ContainerRepositoryRegistry.replication_enabled?
           print 'Container repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
           show_failed_value(current_node_status.container_repositories_failed_count)
           print "#{current_node_status.container_repositories_synced_count || 0}/#{current_node_status.container_repositories_count || 0} "
@@ -271,7 +271,7 @@ module Gitlab
           current_node_status.job_artifacts_failed_count,
           current_node_status.design_repositories_failed_count
         ].tap do |r|
-          if Gitlab.config.geo.registry_replication.enabled
+          if ::Geo::ContainerRepositoryRegistry.replication_enabled?
             r.push current_node_status.container_repositories_failed_count
           end
 
