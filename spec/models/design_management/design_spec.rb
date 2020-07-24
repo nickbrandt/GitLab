@@ -152,6 +152,39 @@ RSpec.describe DesignManagement::Design do
       end
     end
 
+    describe '.ordered' do
+      before do
+        design1.update!(relative_position: 2)
+        design2.update!(relative_position: 1)
+        design3.update!(relative_position: nil)
+        deleted_design.update!(relative_position: nil)
+      end
+
+      it 'sorts by relative position and ID in ascending order' do
+        expect(described_class.ordered(issue.project)).to eq([design2, design1, design3, deleted_design])
+      end
+
+      context 'when the :reorder_designs feature is enabled for the project' do
+        before do
+          stub_feature_flags(reorder_designs: issue.project)
+        end
+
+        it 'sorts by relative position and ID in ascending order' do
+          expect(described_class.ordered(issue.project)).to eq([design2, design1, design3, deleted_design])
+        end
+      end
+
+      context 'when the :reorder_designs feature is disabled' do
+        before do
+          stub_feature_flags(reorder_designs: false)
+        end
+
+        it 'sorts by ID in ascending order' do
+          expect(described_class.ordered(issue.project)).to eq([design1, design2, design3, deleted_design])
+        end
+      end
+    end
+
     describe '.with_filename' do
       it 'returns correct design when passed a single filename' do
         expect(described_class.with_filename(design1.filename)).to eq([design1])

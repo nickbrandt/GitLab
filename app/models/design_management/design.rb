@@ -76,7 +76,19 @@ module DesignManagement
       join = designs.join(actions)
         .on(actions[:design_id].eq(designs[:id]))
 
-      joins(join.join_sources).where(actions[:event].not_eq(deletion)).order(:id)
+      joins(join.join_sources).where(actions[:event].not_eq(deletion))
+    end
+
+    scope :ordered, -> (project) do
+      # TODO: Always order by relative position after the feature flag is removed
+      # https://gitlab.com/gitlab-org/gitlab/-/issues/34382
+      if Feature.enabled?(:reorder_designs, project)
+        # We need to additionally sort by `id` to support keyset pagination.
+        # See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/17788/diffs#note_230875678
+        order(:relative_position, :id)
+      else
+        order(:id)
+      end
     end
 
     scope :with_filename, -> (filenames) { where(filename: filenames) }
