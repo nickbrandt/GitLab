@@ -67,13 +67,13 @@ export default {
     commit(types.SET_SHOW_LABELS, val);
   },
 
-  setActiveListId({ commit }, listId) {
+  setActiveId({ commit }, listId) {
     commit(types.SET_ACTIVE_LIST_ID, listId);
   },
   updateListWipLimit({ state }, { maxIssueCount }) {
-    const { activeListId } = state;
+    const { activeId } = state;
 
-    return axios.put(`${boardsStoreEE.store.state.endpoints.listsEndpoint}/${activeListId}`, {
+    return axios.put(`${boardsStoreEE.store.state.endpoints.listsEndpoint}/${activeId}`, {
       list: {
         max_issue_count: maxIssueCount,
       },
