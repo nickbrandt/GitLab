@@ -152,7 +152,7 @@ RSpec.describe Issue do
       describe '.any_iteration' do
         it 'returns only issues with an iteration assigned' do
           expect(described_class.count).to eq 3
-          expect(described_class.any_iteration).to eq [iteration1_issue, iteration2_issue]
+          expect(described_class.any_iteration).to contain_exactly(iteration1_issue, iteration2_issue)
         end
       end
 
