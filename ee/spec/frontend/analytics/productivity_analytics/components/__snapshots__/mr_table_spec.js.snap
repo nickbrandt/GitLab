@@ -36,13 +36,13 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
               Time to merge
             </span>
              
-            <gl-dropdown-stub
+            <gl-deprecated-dropdown-stub
               class="w-100 metric-col"
               menu-class="w-100 mw-100"
               text="Time from first comment to last commit"
               toggle-class="dropdown-menu-toggle w-100"
             >
-              <gl-dropdown-item-stub
+              <gl-deprecated-dropdown-item-stub
                 active-class="is-active"
                 class="w-100"
               >
@@ -58,8 +58,8 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
                   Time from first commit until first comment
                 
                 </span>
-              </gl-dropdown-item-stub>
-              <gl-dropdown-item-stub
+              </gl-deprecated-dropdown-item-stub>
+              <gl-deprecated-dropdown-item-stub
                 active-class="is-active"
                 class="w-100"
               >
@@ -75,8 +75,8 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
                   Time from first comment to last commit
                 
                 </span>
-              </gl-dropdown-item-stub>
-              <gl-dropdown-item-stub
+              </gl-deprecated-dropdown-item-stub>
+              <gl-deprecated-dropdown-item-stub
                 active-class="is-active"
                 class="w-100"
               >
@@ -92,8 +92,8 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
                   Time from last commit to merge
                 
                 </span>
-              </gl-dropdown-item-stub>
-            </gl-dropdown-stub>
+              </gl-deprecated-dropdown-item-stub>
+            </gl-deprecated-dropdown-stub>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlIcon, GlSearchBoxByType, GlDropdown } from '@gitlab/ui';
+import { GlIcon, GlSearchBoxByType, GlDeprecatedDropdown } from '@gitlab/ui';
 import GeoNodeFormNamespaces from 'ee/geo_node_form/components/geo_node_form_namespaces.vue';
 import store from 'ee/geo_node_form/store';
 import { MOCK_SYNC_NAMESPACES } from '../mock_data';
@@ -41,7 +41,7 @@ describe('GeoNodeFormNamespaces', () => {
     wrapper.destroy();
   });
 
-  const findGlDropdown = () => wrapper.find(GlDropdown);
+  const findGlDropdown = () => wrapper.find(GlDeprecatedDropdown);
   const findGlDropdownSearch = () => findGlDropdown().find(GlSearchBoxByType);
   const findDropdownItems = () => findGlDropdown().findAll('li');
   const findDropdownItemsText = () => findDropdownItems().wrappers.map(w => w.text());

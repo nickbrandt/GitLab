@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDeprecatedButton, GlDeprecatedDropdown, GlDeprecatedDropdownItem } from '@gitlab/ui';
 
 const ANY_WEIGHT = 'Any weight';
 const NO_WEIGHT = 'None';
@@ -7,8 +7,8 @@ const NO_WEIGHT = 'None';
 export default {
   components: {
     GlDeprecatedButton,
-    GlDropdown,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
   },
   props: {
     board: {
@@ -82,7 +82,7 @@ export default {
     </div>
     <div :class="valueClass" :hidden="!dropdownHidden" class="value">{{ valueText }}</div>
 
-    <gl-dropdown
+    <gl-deprecated-dropdown
       ref="dropdown"
       :hidden="dropdownHidden"
       :text="valueText"
@@ -91,10 +91,10 @@ export default {
       toggle-class="d-flex justify-content-between"
     >
       <div ref="weight-select" @click="selectWeight">
-        <gl-dropdown-item v-for="weight in weights" :key="weight" :value="weight">
+        <gl-deprecated-dropdown-item v-for="weight in weights" :key="weight" :value="weight">
           {{ weight }}
-        </gl-dropdown-item>
+        </gl-deprecated-dropdown-item>
       </div>
-    </gl-dropdown>
+    </gl-deprecated-dropdown>
   </div>
 </template>

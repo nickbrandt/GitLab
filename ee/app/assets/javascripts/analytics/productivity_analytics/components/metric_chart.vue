@@ -1,14 +1,14 @@
 <script>
 import { isEmpty } from 'lodash';
-import { GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   name: 'MetricChart',
   components: {
-    GlDropdown,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
     GlLoadingIcon,
     Icon,
   },
@@ -72,14 +72,14 @@ export default {
         {{ __('There is no data available. Please change your selection.') }}
       </div>
       <template v-else>
-        <gl-dropdown
+        <gl-deprecated-dropdown
           v-if="hasMetricTypes"
           class="mb-4 metric-dropdown"
           toggle-class="dropdown-menu-toggle w-100"
           menu-class="w-100 mw-100"
           :text="metricDropdownLabel"
         >
-          <gl-dropdown-item
+          <gl-deprecated-dropdown-item
             v-for="metric in metricTypes"
             :key="metric.key"
             active-class="is-active"
@@ -98,8 +98,8 @@ export default {
               />
               {{ metric.label }}
             </span>
-          </gl-dropdown-item>
-        </gl-dropdown>
+          </gl-deprecated-dropdown-item>
+        </gl-deprecated-dropdown>
         <p v-if="description" class="text-muted">{{ description }}</p>
         <div ref="chart">
           <slot v-if="hasChartData"></slot>

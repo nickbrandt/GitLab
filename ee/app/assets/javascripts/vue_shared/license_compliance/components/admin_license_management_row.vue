@@ -1,6 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlLoadingIcon } from '@gitlab/ui';
 import { getIssueStatusFromLicenseStatus } from 'ee/vue_shared/license_compliance/store/utils';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -15,8 +15,8 @@ const invisibleClass = 'invisible';
 export default {
   name: 'AdminLicenseManagementRow',
   components: {
-    GlDropdown,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
     GlLoadingIcon,
     Icon,
     IssueStatusIcon,
@@ -71,21 +71,21 @@ export default {
     <div class="float-right">
       <div class="d-flex">
         <gl-loading-icon v-if="loading" class="js-loading-icon d-flex align-items-center mr-2" />
-        <gl-dropdown
+        <gl-deprecated-dropdown
           :text="dropdownText"
           :disabled="loading"
           toggle-class="d-flex justify-content-between align-items-center"
           right
         >
-          <gl-dropdown-item @click="allowLicense(license)">
+          <gl-deprecated-dropdown-item @click="allowLicense(license)">
             <icon :class="approveIconClass" name="mobile-issue-close" />
             {{ $options[$options.LICENSE_APPROVAL_ACTION.ALLOW] }}
-          </gl-dropdown-item>
-          <gl-dropdown-item @click="denyLicense(license)">
+          </gl-deprecated-dropdown-item>
+          <gl-deprecated-dropdown-item @click="denyLicense(license)">
             <icon :class="blacklistIconClass" name="mobile-issue-close" />
             {{ $options[$options.LICENSE_APPROVAL_ACTION.DENY] }}
-          </gl-dropdown-item>
-        </gl-dropdown>
+          </gl-deprecated-dropdown-item>
+        </gl-deprecated-dropdown>
         <button
           :disabled="loading"
           class="btn btn-blank js-remove-button"

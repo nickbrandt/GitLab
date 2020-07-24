@@ -18,13 +18,13 @@ exports[`MetricChart component template when isLoading is false and chartData is
 <div>
   <!---->
    
-  <gl-dropdown-stub
+  <gl-deprecated-dropdown-stub
     class="mb-4 metric-dropdown"
     menu-class="w-100 mw-100"
     text="Please select a metric"
     toggle-class="dropdown-menu-toggle w-100"
   >
-    <gl-dropdown-item-stub
+    <gl-deprecated-dropdown-item-stub
       active-class="is-active"
       class="w-100"
     >
@@ -42,8 +42,8 @@ exports[`MetricChart component template when isLoading is false and chartData is
             Time from last commit to merge
           
       </span>
-    </gl-dropdown-item-stub>
-    <gl-dropdown-item-stub
+    </gl-deprecated-dropdown-item-stub>
+    <gl-deprecated-dropdown-item-stub
       active-class="is-active"
       class="w-100"
     >
@@ -61,8 +61,8 @@ exports[`MetricChart component template when isLoading is false and chartData is
             Time from first comment to last commit
           
       </span>
-    </gl-dropdown-item-stub>
-  </gl-dropdown-stub>
+    </gl-deprecated-dropdown-item-stub>
+  </gl-deprecated-dropdown-stub>
    
   <!---->
    

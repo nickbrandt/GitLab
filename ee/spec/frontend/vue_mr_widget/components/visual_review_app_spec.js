@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import VisualReviewAppLink from 'ee/vue_merge_request_widget/components/visual_review_app_link.vue';
-import { GlDeprecatedButton, GlDropdown, GlModal } from '@gitlab/ui';
+import { GlDeprecatedButton, GlDeprecatedDropdown, GlModal } from '@gitlab/ui';
 import { mockTracking, triggerEvent } from 'helpers/tracking_helper';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 
@@ -132,7 +132,7 @@ describe('Visual Review App Link', () => {
         it('with review app split dropdown', () => {
           expect(
             wrapper
-              .find(GlDropdown)
+              .find(GlDeprecatedDropdown)
               .find(`a[href='${propsData.link}']`)
               .exists(),
           ).toEqual(true);
@@ -141,7 +141,7 @@ describe('Visual Review App Link', () => {
         it('contains a list of changed pages', () => {
           expect(
             wrapper
-              .find(GlDropdown)
+              .find(GlDeprecatedDropdown)
               .find(`a[href='${propsData.link}/example-path']`)
               .exists(),
           ).toEqual(true);
