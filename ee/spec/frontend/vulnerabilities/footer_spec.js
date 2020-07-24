@@ -39,6 +39,7 @@ describe('Vulnerability Footer', () => {
     },
     vulnerabilityId: 1,
     canModifyRelatedIssues: true,
+    relatedIssuesHelpPath: 'help/path',
   };
 
   const solutionInfoProp = {
@@ -259,6 +260,7 @@ describe('Vulnerability Footer', () => {
         endpoint,
         canModifyRelatedIssues: minimumProps.canModifyRelatedIssues,
         projectPath: minimumProps.project.url,
+        helpPath: minimumProps.relatedIssuesHelpPath,
       });
     });
   });
