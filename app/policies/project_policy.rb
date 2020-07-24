@@ -342,6 +342,7 @@ class ProjectPolicy < BasePolicy
     enable :read_alert_management_alert
     enable :update_alert_management_alert
     enable :create_design
+    enable :move_design
     enable :destroy_design
     enable :read_terraform_state
   end
@@ -573,6 +574,7 @@ class ProjectPolicy < BasePolicy
     prevent :read_design_activity
     prevent :create_design
     prevent :destroy_design
+    prevent :move_design
   end
 
   rule { read_package_registry_deploy_token }.policy do
