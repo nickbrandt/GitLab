@@ -87,4 +87,15 @@ In which enterprise tier should this feature go? See https://about.gitlab.com/ha
 
 ### Links / references
 
+<!--  Label reminders - you should have one of each of the following labels if you can find the correct ones!
+
+Type - for example ~feature ~bug ~documentation ~meta /label ~"feature::addition" ~"feature::maintenance" ~tooling ~"tooling::pipelines" ~"tooling::workflow" per https://docs.gitlab.com/ee/development/contributing/issue_workflow.html#type-labels
+
+DevOps stage - for example ~"devops::secure" 
+
+Group - for example ~"group::composition analysis"
+
+Category - for example ~"Category:Dependency Scanning"
+-->
+
 /label ~feature
