@@ -304,11 +304,30 @@ describe('Cycle Analytics component', () => {
 
           expect(wrapper.find(ProjectsDropdownFilter).props()).toEqual(
             expect.objectContaining({
-              queryParams: wrapper.vm.$options.projectsQueryParams,
+              queryParams: wrapper.vm.projectsQueryParams,
               groupId: mockData.group.id,
               multiSelect: wrapper.vm.$options.multiProjectSelect,
             }),
           );
+        });
+
+        describe('when analyticsSimilaritySearch feature flag is on', () => {
+          beforeEach(() => {
+            wrapper = createComponent({
+              withStageSelected: true,
+              featureFlags: {
+                hasAnalyticsSimilaritySearch: true,
+              },
+            });
+          });
+
+          it('uses similarity as the order param', () => {
+            displaysProjectsDropdownFilter(true);
+
+            expect(wrapper.find(ProjectsDropdownFilter).props().queryParams.order_by).toEqual(
+              'similarity',
+            );
+          });
         });
 
         it('displays the date range picker', () => {

@@ -21,7 +21,8 @@ RSpec.describe 'Group value stream analytics' do
       cycleAnalyticsScatterplotEnabled: true,
       cycleAnalyticsScatterplotMedianEnabled: true,
       valueStreamAnalyticsPathNavigation: true,
-      valueStreamAnalyticsFilterBar: true
+      valueStreamAnalyticsFilterBar: true,
+      analyticsSimilaritySearch: true
     )
   end
 
