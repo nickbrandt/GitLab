@@ -123,6 +123,11 @@ class ProjectPolicy < BasePolicy
     !@subject.design_management_enabled?
   end
 
+  with_scope :global
+  condition(:moving_designs_disabled) do
+    !::Feature.enabled?(:reorder_designs)
+  end
+
   with_scope :subject
   condition(:service_desk_enabled) { @subject.service_desk_enabled? }
 
@@ -574,6 +579,10 @@ class ProjectPolicy < BasePolicy
     prevent :read_design_activity
     prevent :create_design
     prevent :destroy_design
+    prevent :move_design
+  end
+
+  rule { moving_designs_disabled }.policy do
     prevent :move_design
   end
 
