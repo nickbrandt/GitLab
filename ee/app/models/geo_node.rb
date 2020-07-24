@@ -431,8 +431,4 @@ class GeoNode < ApplicationRecord
   def project_model
     Project
   end
-
-  def uploads_model
-    Upload
-  end
 end
