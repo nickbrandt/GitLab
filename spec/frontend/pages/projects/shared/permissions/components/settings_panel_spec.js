@@ -353,10 +353,7 @@ describe('Settings Panel', () => {
       // mount over shallowMount, because we are aiming to test rendered state of toggle
       wrapper = mountComponent({ currentSettings: { lfsEnabled: true } }, mount);
 
-      const repositoryFeatureSetting = findRepositoryFeatureSetting();
-      const repositoryFeatureToggleButton = repositoryFeatureSetting
-        .find(projectFeatureToggle)
-        .find('button');
+      const repositoryFeatureToggleButton = findRepositoryFeatureSetting().find('button');
       const lfsFeatureToggleButton = findLFSFeatureToggle().find('button');
       const isToggleButtonChecked = toggleButton => toggleButton.classes('is-checked');
 
