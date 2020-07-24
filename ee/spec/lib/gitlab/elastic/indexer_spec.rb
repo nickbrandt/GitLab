@@ -345,12 +345,26 @@ RSpec.describe Gitlab::Elastic::Indexer do
       allow(Gitlab::Elastic::Client).to receive(:aws_credential_provider).and_return(credentials)
     end
 
-    it 'credentials env vars will be included' do
-      expect(subject).to include({
-        'AWS_ACCESS_KEY_ID' => access_key_id,
-        'AWS_SECRET_ACCESS_KEY' => secret_access_key,
-        'AWS_SESSION_TOKEN' => session_token
-      })
+    context 'when AWS config is not enabled' do
+      it 'credentials env vars will not be included' do
+        expect(subject).not_to include('AWS_ACCESS_KEY_ID')
+        expect(subject).not_to include('AWS_SECRET_ACCESS_KEY')
+        expect(subject).not_to include('AWS_SESSION_TOKEN')
+      end
+    end
+
+    context 'when AWS config is enabled' do
+      before do
+        stub_application_setting(elasticsearch_aws: true)
+      end
+
+      it 'credentials env vars will be included' do
+        expect(subject).to include({
+          'AWS_ACCESS_KEY_ID' => access_key_id,
+          'AWS_SECRET_ACCESS_KEY' => secret_access_key,
+          'AWS_SESSION_TOKEN' => session_token
+        })
+      end
     end
   end
 

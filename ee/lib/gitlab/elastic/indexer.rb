@@ -110,7 +110,9 @@ module Gitlab
         }
 
         # Set AWS environment variables for IAM role authentication if present
-        vars = build_aws_credentials_env(vars)
+        if Gitlab::CurrentSettings.elasticsearch_config[:aws]
+          vars = build_aws_credentials_env(vars)
+        end
 
         # Users can override default SSL certificate path via SSL_CERT_FILE SSL_CERT_DIR
         vars.merge(ENV.slice('SSL_CERT_FILE', 'SSL_CERT_DIR'))
