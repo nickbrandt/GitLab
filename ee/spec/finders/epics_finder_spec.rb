@@ -231,7 +231,7 @@ RSpec.describe EpicsFinder do
         context 'by confidential' do
           let_it_be(:confidential_epic) { create(:epic, :confidential, group: group) }
 
-          it 'returns only confdential epics when confidential is true' do
+          it 'returns only confidential epics when confidential is true' do
             params = { confidential: true }
 
             expect(epics(params)).to contain_exactly(confidential_epic)
