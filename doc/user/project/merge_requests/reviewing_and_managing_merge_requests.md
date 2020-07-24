@@ -150,7 +150,7 @@ in a Merge Request. To do so, click the **{comment}** **comment** icon in the gu
 > - [Introduced](https://gitlab.com/gitlab-org/ux-research/-/issues/870) in GitLab 13.2.
 > - It's deployed behind a feature flag, disabled by default.
 > - It's enabled on GitLab.com.
-> - It can be enabled or disabled per-project
+> - It can be enabled or disabled per-project.
 > - It's recommended for production use.
 > - For GitLab self-managed instances, GitLab administrators can opt to [enable it](#enable-or-disable-multiline-comments-core-only). **(CORE ONLY)**
 
