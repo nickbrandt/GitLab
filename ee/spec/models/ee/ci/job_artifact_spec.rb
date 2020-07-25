@@ -2,7 +2,8 @@
 
 require 'spec_helper'
 
-RSpec.describe EE::Ci::JobArtifact do
+RSpec.describe Ci::JobArtifact do
+  using RSpec::Parameterized::TableSyntax
   include EE::GeoHelpers
 
   describe '#destroy' do
@@ -100,6 +101,77 @@ RSpec.describe EE::Ci::JobArtifact do
 
     with_them do
       it { is_expected.to eq result }
+    end
+  end
+
+  describe '#replicables_for_geo_node' do
+    # Selective sync is configured relative to the job artifact's project.
+    #
+    # Permutations of sync_object_storage combined with object-stored-artifacts
+    # are tested in code, because the logic is simple, and to do it in the table
+    # would quadruple its size and have too much duplication.
+    where(:selective_sync_namespaces, :selective_sync_shards, :project_factory, :include_expectation) do
+      nil                  | nil    | [:project]               | true
+      # selective sync by shard
+      nil                  | :model | [:project]               | true
+      nil                  | :other | [:project]               | false
+      # selective sync by namespace
+      :model_parent        | nil    | [:project]               | true
+      :model_parent_parent | nil    | [:project, :in_subgroup] | true
+      :other               | nil    | [:project]               | false
+      :other               | nil    | [:project, :in_subgroup] | false
+    end
+
+    with_them do
+      subject(:job_artifact_included) { described_class.replicables_for_geo_node.include?(ci_job_artifact) }
+
+      let(:factory) { [:ci_job_artifact]}
+      let(:project) { create(*project_factory) }
+      let(:ci_build) { create(:ci_build, project: project) }
+      let(:node) do
+        create_geo_node_to_test_replicables_for_geo_node(
+          project,
+          selective_sync_namespaces: selective_sync_namespaces,
+          selective_sync_shards: selective_sync_shards,
+          sync_object_storage: sync_object_storage)
+      end
+
+      before do
+        stub_artifacts_object_storage
+        stub_current_geo_node(node)
+      end
+
+      context 'when sync object storage is enabled' do
+        let(:sync_object_storage) { true }
+
+        context 'when the job artifact is locally stored' do
+          let(:ci_job_artifact) { create(*factory, job: ci_build) }
+
+          it { is_expected.to eq(include_expectation) }
+        end
+
+        context 'when the job artifact is object stored' do
+          let(:ci_job_artifact) { create(*factory, :remote_store, job: ci_build) }
+
+          it { is_expected.to eq(include_expectation) }
+        end
+      end
+
+      context 'when sync object storage is disabled' do
+        let(:sync_object_storage) { false }
+
+        context 'when the job artifact is locally stored' do
+          let(:ci_job_artifact) { create(*factory, job: ci_build) }
+
+          it { is_expected.to eq(include_expectation) }
+        end
+
+        context 'when the job artifact is object stored' do
+          let(:ci_job_artifact) { create(*factory, :remote_store, job: ci_build) }
+
+          it { is_expected.to be_falsey }
+        end
+      end
     end
   end
 end

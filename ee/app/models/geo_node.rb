@@ -237,35 +237,6 @@ class GeoNode < ApplicationRecord
     end
   end
 
-  def job_artifacts
-    selective_sync_scope.merge(object_storage_scope)
-  end
-
-  def object_storage_scope
-    return Ci::JobArtifact.all if sync_object_storage?
-
-    Ci::JobArtifact.with_files_stored_locally
-  end
-
-  def selective_sync_scope
-    return Ci::JobArtifact.all unless selective_sync?
-
-    query = Ci::JobArtifact.project_id_in(projects).select(:id)
-    cte = Gitlab::SQL::CTE.new(:restricted_job_artifacts, query)
-    job_artifact_table = Ci::JobArtifact.arel_table
-
-    inner_join_restricted_job_artifacts =
-      cte.table
-        .join(job_artifact_table, Arel::Nodes::InnerJoin)
-        .on(cte.table[:id].eq(job_artifact_table[:id]))
-        .join_sources
-
-    Ci::JobArtifact
-      .with(cte.to_arel)
-      .from(cte.table)
-      .joins(inner_join_restricted_job_artifacts)
-  end
-
   def container_repositories
     return ContainerRepository.none unless Geo::ContainerRepositoryRegistry.replication_enabled?
     return ContainerRepository.all unless selective_sync?
