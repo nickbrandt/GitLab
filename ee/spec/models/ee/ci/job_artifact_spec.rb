@@ -110,22 +110,31 @@ RSpec.describe Ci::JobArtifact do
     # Permutations of sync_object_storage combined with object-stored-artifacts
     # are tested in code, because the logic is simple, and to do it in the table
     # would quadruple its size and have too much duplication.
-    where(:selective_sync_namespaces, :selective_sync_shards, :project_factory, :include_expectation) do
-      nil                  | nil    | [:project]               | true
+    where(:selective_sync_namespaces, :selective_sync_shards, :factory, :project_factory, :include_expectation) do
+      nil                  | nil    | [:ci_job_artifact]           | [:project]               | true
       # selective sync by shard
-      nil                  | :model | [:project]               | true
-      nil                  | :other | [:project]               | false
+      nil                  | :model | [:ci_job_artifact]           | [:project]               | true
+      nil                  | :other | [:ci_job_artifact]           | [:project]               | false
       # selective sync by namespace
-      :model_parent        | nil    | [:project]               | true
-      :model_parent_parent | nil    | [:project, :in_subgroup] | true
-      :other               | nil    | [:project]               | false
-      :other               | nil    | [:project, :in_subgroup] | false
+      :model_parent        | nil    | [:ci_job_artifact]           | [:project]               | true
+      :model_parent_parent | nil    | [:ci_job_artifact]           | [:project, :in_subgroup] | true
+      :other               | nil    | [:ci_job_artifact]           | [:project]               | false
+      :other               | nil    | [:ci_job_artifact]           | [:project, :in_subgroup] | false
+      # expired
+      nil                  | nil    | [:ci_job_artifact, :expired] | [:project]               | false
+      # selective sync by shard
+      nil                  | :model | [:ci_job_artifact, :expired] | [:project]               | false
+      nil                  | :other | [:ci_job_artifact, :expired] | [:project]               | false
+      # selective sync by namespace
+      :model_parent        | nil    | [:ci_job_artifact, :expired] | [:project]               | false
+      :model_parent_parent | nil    | [:ci_job_artifact, :expired] | [:project, :in_subgroup] | false
+      :other               | nil    | [:ci_job_artifact, :expired] | [:project]               | false
+      :other               | nil    | [:ci_job_artifact, :expired] | [:project, :in_subgroup] | false
     end
 
     with_them do
       subject(:job_artifact_included) { described_class.replicables_for_geo_node.include?(ci_job_artifact) }
 
-      let(:factory) { [:ci_job_artifact]}
       let(:project) { create(*project_factory) }
       let(:ci_build) { create(:ci_build, project: project) }
       let(:node) do

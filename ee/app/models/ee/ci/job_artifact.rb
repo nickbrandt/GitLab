@@ -75,7 +75,8 @@ module EE
       end
 
       def replicables_for_geo_node(node = ::Gitlab::Geo.current_node)
-        selective_sync_scope(node).merge(object_storage_scope(node))
+        not_expired.merge(selective_sync_scope(node))
+                   .merge(object_storage_scope(node))
       end
 
       def object_storage_scope(node)
