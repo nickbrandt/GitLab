@@ -135,7 +135,7 @@ describe('ee merge request widget options', () => {
                 `${SAST_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual('SAST detected 1 new critical severity vulnerability.');
+          ).toEqual('SAST detected 1 critical severity vulnerability.');
           done();
         });
       });
@@ -157,7 +157,7 @@ describe('ee merge request widget options', () => {
                 `${SAST_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ).trim(),
-          ).toEqual('SAST detected no new vulnerabilities.');
+          ).toEqual('SAST detected no vulnerabilities.');
           done();
         });
       });
@@ -225,9 +225,7 @@ describe('ee merge request widget options', () => {
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual(
-            'Dependency scanning detected 1 new critical and 1 new high severity vulnerabilities.',
-          );
+          ).toEqual('Dependency scanning detected 1 critical and 1 high severity vulnerabilities.');
           done();
         });
       });
@@ -245,7 +243,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
-      it('renders no new vulnerabilities message', done => {
+      it('renders no vulnerabilities message', done => {
         setImmediate(() => {
           expect(
             trimText(
@@ -253,7 +251,7 @@ describe('ee merge request widget options', () => {
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual('Dependency scanning detected no new vulnerabilities.');
+          ).toEqual('Dependency scanning detected no vulnerabilities.');
           done();
         });
       });
@@ -275,7 +273,7 @@ describe('ee merge request widget options', () => {
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual('Dependency scanning detected no new vulnerabilities.');
+          ).toEqual('Dependency scanning detected no vulnerabilities.');
           done();
         });
       });
@@ -645,9 +643,7 @@ describe('ee merge request widget options', () => {
                 `${CONTAINER_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual(
-            'Container scanning detected 1 new critical and 1 new high severity vulnerabilities.',
-          );
+          ).toEqual('Container scanning detected 1 critical and 1 high severity vulnerabilities.');
           done();
         });
       });
@@ -717,7 +713,7 @@ describe('ee merge request widget options', () => {
             findSecurityWidget()
               .querySelector(`${DAST_SELECTOR} .report-block-list-issue-description`)
               .textContent.trim(),
-          ).toEqual('DAST detected 1 new critical severity vulnerability.');
+          ).toEqual('DAST detected 1 critical severity vulnerability.');
           done();
         });
       });
@@ -787,9 +783,7 @@ describe('ee merge request widget options', () => {
             findSecurityWidget()
               .querySelector(`${COVERAGE_FUZZING_SELECTOR} .report-block-list-issue-description`)
               .textContent.trim(),
-          ).toEqual(
-            'Coverage fuzzing detected 1 new critical and 1 new high severity vulnerabilities.',
-          );
+          ).toEqual('Coverage fuzzing detected 1 critical and 1 high severity vulnerabilities.');
           done();
         });
       });
@@ -863,9 +857,7 @@ describe('ee merge request widget options', () => {
                 `${SECRET_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual(
-            'Secret scanning detected 1 new critical and 1 new high severity vulnerabilities.',
-          );
+          ).toEqual('Secret scanning detected 1 critical and 1 high severity vulnerabilities.');
           done();
         });
       });

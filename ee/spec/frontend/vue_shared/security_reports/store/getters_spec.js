@@ -47,18 +47,18 @@ describe('Security reports getters', () => {
   `('grouped text for $name', ({ name, scanner, getter }) => {
     describe('with no issues', () => {
       it('returns no issues text', () => {
-        expect(getter(state)).toEqual(`${name} detected no new vulnerabilities.`);
+        expect(getter(state)).toEqual(`${name} detected no vulnerabilities.`);
       });
     });
 
     it.each`
       vulnerabilities                                     | message
-      ${[]}                                               | ${`${name} detected no new vulnerabilities.`}
-      ${[generateVuln(CRITICAL), generateVuln(CRITICAL)]} | ${`${name} detected %{criticalStart}2 new critical%{criticalEnd} severity vulnerabilities.`}
-      ${[generateVuln(HIGH), generateVuln(HIGH)]}         | ${`${name} detected %{highStart}2 new high%{highEnd} severity vulnerabilities.`}
+      ${[]}                                               | ${`${name} detected no vulnerabilities.`}
+      ${[generateVuln(CRITICAL), generateVuln(CRITICAL)]} | ${`${name} detected %{criticalStart}2 critical%{criticalEnd} severity vulnerabilities.`}
+      ${[generateVuln(HIGH), generateVuln(HIGH)]}         | ${`${name} detected %{highStart}2 high%{highEnd} severity vulnerabilities.`}
       ${[generateVuln(LOW), generateVuln(MEDIUM)]}        | ${`${name} detected 2 vulnerabilities.`}
-      ${[generateVuln(CRITICAL), generateVuln(HIGH)]}     | ${`${name} detected %{criticalStart}1 new critical%{criticalEnd} and %{highStart}1 new high%{highEnd} severity vulnerabilities.`}
-      ${[generateVuln(CRITICAL), generateVuln(LOW)]}      | ${`${name} detected %{criticalStart}1 new critical%{criticalEnd} severity vulnerabilities out of 2.`}
+      ${[generateVuln(CRITICAL), generateVuln(HIGH)]}     | ${`${name} detected %{criticalStart}1 critical%{criticalEnd} and %{highStart}1 high%{highEnd} severity vulnerabilities.`}
+      ${[generateVuln(CRITICAL), generateVuln(LOW)]}      | ${`${name} detected %{criticalStart}1 critical%{criticalEnd} severity vulnerabilities out of 2.`}
     `('should build the message as "$message"', ({ vulnerabilities, message }) => {
       state[scanner].newIssues = vulnerabilities;
       expect(getter(state)).toEqual(message);
@@ -133,7 +133,7 @@ describe('Security reports getters', () => {
           },
         }),
       ).toEqual(
-        'Security scanning (is loading) detected %{criticalStart}2 new critical%{criticalEnd} and %{highStart}4 new high%{highEnd} severity vulnerabilities.',
+        'Security scanning (is loading) detected %{criticalStart}2 critical%{criticalEnd} and %{highStart}4 high%{highEnd} severity vulnerabilities.',
       );
     });
 
@@ -144,7 +144,7 @@ describe('Security reports getters', () => {
           areReportsLoading: false,
           summaryCounts: {},
         }),
-      ).toEqual('Security scanning detected no new vulnerabilities.');
+      ).toEqual('Security scanning detected no vulnerabilities.');
     });
   });
 
