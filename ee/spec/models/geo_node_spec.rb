@@ -831,6 +831,76 @@ RSpec.describe GeoNode, :request_store, :geo, type: :model do
     end
   end
 
+  describe '#job_artifacts' do
+    # Selective sync is configured relative to the job artifact's project.
+    #
+    # Permutations of sync_object_storage combined with object-stored-uploads
+    # are tested in code, because the logic is simple, and to do it in the table
+    # would quadruple its size and have too much duplication.
+    where(:selective_sync_namespaces, :selective_sync_shards, :project_factory, :include_expectation) do
+      nil                  | nil    | [:project]               | true
+      # selective sync by shard
+      nil                  | :model | [:project]               | true
+      nil                  | :other | [:project]               | false
+      # selective sync by namespace
+      :model_parent        | nil    | [:project]               | true
+      :model_parent_parent | nil    | [:project, :in_subgroup] | true
+      :other               | nil    | [:project]               | false
+      :other               | nil    | [:project, :in_subgroup] | false
+    end
+
+    with_them do
+      subject(:upload_included) { node.job_artifacts.include?(upload) }
+
+      let(:factory) { [:ci_job_artifact]}
+      let(:project) { create(*project_factory) }
+      let(:ci_build) { create(:ci_build, project: project) }
+      let(:node) do
+        create_geo_node_to_test_replicables_for_geo_node(
+          project,
+          selective_sync_namespaces: selective_sync_namespaces,
+          selective_sync_shards: selective_sync_shards,
+          sync_object_storage: sync_object_storage)
+      end
+
+      before do
+        stub_artifacts_object_storage
+      end
+
+      context 'when sync object storage is enabled' do
+        let(:sync_object_storage) { true }
+
+        context 'when the upload is locally stored' do
+          let(:upload) { create(*factory, job: ci_build) }
+
+          it { is_expected.to eq(include_expectation) }
+        end
+
+        context 'when the upload is object stored' do
+          let(:upload) { create(*factory, :remote_store, job: ci_build) }
+
+          it { is_expected.to eq(include_expectation) }
+        end
+      end
+
+      context 'when sync object storage is disabled' do
+        let(:sync_object_storage) { false }
+
+        context 'when the upload is locally stored' do
+          let(:upload) { create(*factory, job: ci_build) }
+
+          it { is_expected.to eq(include_expectation) }
+        end
+
+        context 'when the upload is object stored' do
+          let(:upload) { create(*factory, :remote_store, job: ci_build) }
+
+          it { is_expected.to be_falsey }
+        end
+      end
+    end
+  end
+
   describe '#lfs_objects' do
     let_it_be(:synced_group) { create(:group) }
     let_it_be(:nested_group) { create(:group, parent: synced_group) }

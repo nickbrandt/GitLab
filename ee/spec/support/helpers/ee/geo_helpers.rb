@@ -117,5 +117,41 @@ module EE
         drop_table :dummy_models, force: true
       end
     end
+
+    def create_geo_node_to_test_replicables_for_geo_node(model, selective_sync_namespaces: nil, selective_sync_shards: nil, sync_object_storage:)
+      node = build(:geo_node)
+
+      if selective_sync_namespaces
+        node.selective_sync_type = 'namespaces'
+      elsif selective_sync_shards
+        node.selective_sync_type = 'shards'
+      end
+
+      case selective_sync_namespaces
+      when :model
+        node.namespaces = [model]
+      when :model_parent
+        node.namespaces = [model.parent]
+      when :model_parent_parent
+        node.namespaces = [model.parent.parent]
+      when :other
+        node.namespaces = [create(:group)]
+      end
+
+      case selective_sync_shards
+      when :model
+        node.selective_sync_shards = [model.repository_storage]
+      when :model_project
+        project = create(:project, namespace: model)
+        node.selective_sync_shards = [project.repository_storage]
+      when :other
+        node.selective_sync_shards = ['other_shard_name']
+      end
+
+      node.sync_object_storage = sync_object_storage
+
+      node.save!
+      node
+    end
   end
 end

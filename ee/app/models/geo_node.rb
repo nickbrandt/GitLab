@@ -238,6 +238,16 @@ class GeoNode < ApplicationRecord
   end
 
   def job_artifacts
+    selective_sync_scope.merge(object_storage_scope)
+  end
+
+  def object_storage_scope
+    return Ci::JobArtifact.all if sync_object_storage?
+
+    Ci::JobArtifact.with_files_stored_locally
+  end
+
+  def selective_sync_scope
     return Ci::JobArtifact.all unless selective_sync?
 
     query = Ci::JobArtifact.project_id_in(projects).select(:id)
