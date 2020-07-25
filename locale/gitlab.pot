@@ -20466,6 +20466,9 @@ msgstr ""
 msgid "NotificationEvent|Merge merge request"
 msgstr ""
 
+msgid "NotificationEvent|Merge when pipeline succeeds"
+msgstr ""
+
 msgid "NotificationEvent|Moved project"
 msgstr ""
 
