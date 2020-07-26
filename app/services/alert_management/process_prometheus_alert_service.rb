@@ -34,6 +34,8 @@ module AlertManagement
       else
         create_alert_management_alert
       end
+
+      create_incident
     end
 
     def reset_alert_management_alert_status
@@ -87,6 +89,14 @@ module AlertManagement
         .execute(issue, system_note: false)
 
       SystemNoteService.auto_resolve_prometheus_alert(issue, project, User.alert_bot) if issue.reset.closed?
+    end
+
+    def create_incident
+      clear_memoization(:am_alert) if am_alert.blank?
+      return unless am_alert
+      return if am_alert.issue
+
+      IncidentManagement::ProcessAlertWorker.new.perform(nil, nil, am_alert.id)
     end
 
     def logger
