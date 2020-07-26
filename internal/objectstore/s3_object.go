@@ -22,6 +22,16 @@ type S3Object struct {
 	uploader
 }
 
+func setEncryptionOptions(input *s3manager.UploadInput, s3Config config.S3Config) {
+	if s3Config.ServerSideEncryption != "" {
+		input.ServerSideEncryption = aws.String(s3Config.ServerSideEncryption)
+
+		if s3Config.ServerSideEncryption == s3.ServerSideEncryptionAwsKms && s3Config.SSEKMSKeyID != "" {
+			input.SSEKMSKeyId = aws.String(s3Config.SSEKMSKeyID)
+		}
+	}
+}
+
 func NewS3Object(ctx context.Context, objectName string, s3Credentials config.S3Credentials, s3Config config.S3Config, deadline time.Time) (*S3Object, error) {
 	pr, pw := io.Pipe()
 	objectStorageUploadsOpen.Inc()
@@ -54,11 +64,15 @@ func NewS3Object(ctx context.Context, objectName string, s3Credentials config.S3
 		o.objectName = objectName
 		uploader := s3manager.NewUploader(sess)
 
-		_, err = uploader.UploadWithContext(uploadCtx, &s3manager.UploadInput{
+		input := &s3manager.UploadInput{
 			Bucket: aws.String(s3Config.Bucket),
 			Key:    aws.String(objectName),
 			Body:   pr,
-		})
+		}
+
+		setEncryptionOptions(input, s3Config)
+
+		_, err = uploader.UploadWithContext(uploadCtx, input)
 		if err != nil {
 			o.uploadError = err
 			objectStorageUploadRequestsRequestFailed.Inc()

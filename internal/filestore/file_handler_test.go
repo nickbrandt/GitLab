@@ -276,7 +276,7 @@ func TestSaveFile(t *testing.T) {
 }
 
 func TestSaveFileWithWorkhorseClient(t *testing.T) {
-	s3Creds, s3Config, sess, ts := test.SetupS3(t)
+	s3Creds, s3Config, sess, ts := test.SetupS3(t, "")
 	defer ts.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())

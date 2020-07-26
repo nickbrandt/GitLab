@@ -21,11 +21,11 @@ import (
 	"github.com/johannesboyne/gofakes3/backend/s3mem"
 )
 
-func SetupS3(t *testing.T) (config.S3Credentials, config.S3Config, *session.Session, *httptest.Server) {
-	return SetupS3WithBucket(t, "test-bucket")
+func SetupS3(t *testing.T, encryption string) (config.S3Credentials, config.S3Config, *session.Session, *httptest.Server) {
+	return SetupS3WithBucket(t, "test-bucket", encryption)
 }
 
-func SetupS3WithBucket(t *testing.T, bucket string) (config.S3Credentials, config.S3Config, *session.Session, *httptest.Server) {
+func SetupS3WithBucket(t *testing.T, bucket string, encryption string) (config.S3Credentials, config.S3Config, *session.Session, *httptest.Server) {
 	backend := s3mem.New()
 	faker := gofakes3.New(backend)
 	ts := httptest.NewServer(faker.Server())
@@ -40,6 +40,14 @@ func SetupS3WithBucket(t *testing.T, bucket string) (config.S3Credentials, confi
 		Endpoint:  ts.URL,
 		Region:    "eu-central-1",
 		PathStyle: true,
+	}
+
+	if encryption != "" {
+		config.ServerSideEncryption = encryption
+
+		if encryption == s3.ServerSideEncryptionAwsKms {
+			config.SSEKMSKeyID = "arn:aws:1234"
+		}
 	}
 
 	sess, err := session.NewSession(&aws.Config{
@@ -73,6 +81,29 @@ func S3ObjectExists(t *testing.T, sess *session.Session, config config.S3Config,
 
 		require.Equal(t, []byte(expectedBytes), output)
 	})
+}
+
+func CheckS3Metadata(t *testing.T, sess *session.Session, config config.S3Config, objectName string) {
+	// In a real S3 provider, s3crypto.NewDecryptionClient should probably be used
+	svc := s3.New(sess)
+	result, err := svc.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(config.Bucket),
+		Key:    aws.String(objectName),
+	})
+	require.NoError(t, err)
+
+	if config.ServerSideEncryption != "" {
+		require.Equal(t, aws.String(config.ServerSideEncryption), result.ServerSideEncryption)
+
+		if config.ServerSideEncryption == s3.ServerSideEncryptionAwsKms {
+			require.Equal(t, aws.String(config.SSEKMSKeyID), result.SSEKMSKeyId)
+		} else {
+			require.Nil(t, result.SSEKMSKeyId)
+		}
+	} else {
+		require.Nil(t, result.ServerSideEncryption)
+		require.Nil(t, result.SSEKMSKeyId)
+	}
 }
 
 // S3ObjectDoesNotExist returns true if the object has been deleted,
