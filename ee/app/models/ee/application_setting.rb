@@ -66,6 +66,10 @@ module EE
                 presence: { message: "can't be blank when using aws hosted elasticsearch" },
                 if: ->(setting) { setting.elasticsearch_indexing? && setting.elasticsearch_aws? }
 
+      validates :elasticsearch_indexed_file_size_limit_kb,
+                presence: true,
+                numericality: { only_integer: true, greater_than: 0 }
+
       validates :elasticsearch_indexed_field_length_limit,
                 presence: true,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -102,6 +106,7 @@ module EE
           elasticsearch_aws_region: ENV['ELASTIC_REGION'] || 'us-east-1',
           elasticsearch_replicas: 1,
           elasticsearch_shards: 5,
+          elasticsearch_indexed_file_size_limit_kb: 1024, # 1 MiB (units in KiB)
           elasticsearch_indexed_field_length_limit: 0,
           elasticsearch_max_bulk_size_bytes: 10.megabytes,
           elasticsearch_max_bulk_concurrency: 10,

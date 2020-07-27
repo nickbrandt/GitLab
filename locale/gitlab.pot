@@ -2847,6 +2847,9 @@ msgstr ""
 msgid "Any encrypted tokens"
 msgstr ""
 
+msgid "Any files larger than this limit will not be indexed, and thus will not be searchable."
+msgstr ""
+
 msgid "Any label"
 msgstr ""
 
@@ -14556,6 +14559,9 @@ msgid "Maximum duration of a session."
 msgstr ""
 
 msgid "Maximum field length"
+msgstr ""
+
+msgid "Maximum file size indexed (KiB)"
 msgstr ""
 
 msgid "Maximum file size is 2MB. Please select a smaller file."

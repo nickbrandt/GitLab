@@ -10,6 +10,8 @@ RSpec.describe Gitlab::Elastic::Indexer do
   end
 
   let(:project) { create(:project, :repository) }
+  let(:user) { project.owner }
+
   let(:expected_from_sha) { Gitlab::Git::EMPTY_TREE_ID }
   let(:to_commit) { project.commit }
   let(:to_sha) { to_commit.try(:sha) }
@@ -83,7 +85,8 @@ RSpec.describe Gitlab::Elastic::Indexer do
 
       it 'runs the indexing command' do
         gitaly_connection_data = {
-          storage: project.repository_storage
+          storage: project.repository_storage,
+          limit_file_size: Gitlab::CurrentSettings.elasticsearch_indexed_file_size_limit_kb.kilobytes
         }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage))
 
         expect_popen.with(
@@ -131,27 +134,12 @@ RSpec.describe Gitlab::Elastic::Indexer do
       it_behaves_like 'index up to the specified commit'
 
       context 'after reverting a change' do
-        let(:user) { project.owner }
         let!(:initial_commit) { project.repository.commit('master').sha }
 
         def change_repository_and_index(project, &blk)
           yield blk if blk
 
-          current_commit = project.repository.commit('master').sha
-
-          described_class.new(project).run(current_commit)
-          ensure_elasticsearch_index!
-        end
-
-        def indexed_file_paths_for(term)
-          blobs = Repository.elastic_search(
-            term,
-            type: 'blob'
-          )[:blobs][:results].response
-
-          blobs.map do |blob|
-            blob['_source']['blob']['path']
-          end
+          index_repository(project)
         end
 
         def indexed_commits_for(term)
@@ -242,8 +230,6 @@ RSpec.describe Gitlab::Elastic::Indexer do
       end
 
       context 'when IndexStatus#last_wiki_commit is no longer in repository' do
-        let(:user) { project.owner }
-
         def change_wiki_and_index(project, &blk)
           yield blk if blk
 
@@ -368,6 +354,25 @@ RSpec.describe Gitlab::Elastic::Indexer do
     end
   end
 
+  context 'when a file is larger than elasticsearch_indexed_file_size_limit_kb', :elastic do
+    let(:project) { create(:project, :repository) }
+
+    before do
+      stub_ee_application_setting(elasticsearch_indexed_file_size_limit_kb: 1) # 1 KiB limit
+
+      project.repository.create_file(user, 'small_file.txt', 'Small file contents', message: 'small_file.txt', branch_name: 'master')
+      project.repository.create_file(user, 'large_file.txt', 'Large file' * 1000, message: 'large_file.txt', branch_name: 'master')
+
+      index_repository(project)
+    end
+
+    it 'does not index that file' do
+      files = indexed_file_paths_for('file')
+      expect(files).to include('small_file.txt')
+      expect(files).not_to include('large_file.txt')
+    end
+  end
+
   def expect_popen
     expect(Gitlab::Popen).to receive(:popen)
   end
@@ -391,5 +396,23 @@ RSpec.describe Gitlab::Elastic::Indexer do
                  Gitlab::Git::BLANK_SHA,
                  Gitlab::Git::BLANK_SHA,
                  project.repository.__elasticsearch__.elastic_writing_targets.first)
+  end
+
+  def indexed_file_paths_for(term)
+    blobs = Repository.elastic_search(
+      term,
+      type: 'blob'
+    )[:blobs][:results].response
+
+    blobs.map do |blob|
+      blob['_source']['blob']['path']
+    end
+  end
+
+  def index_repository(project)
+    current_commit = project.repository.commit('master').sha
+
+    described_class.new(project).run(current_commit)
+    ensure_elasticsearch_index!
   end
 end
