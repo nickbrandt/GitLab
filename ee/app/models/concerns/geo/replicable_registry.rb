@@ -24,6 +24,14 @@ module Geo::ReplicableRegistry
     end
   end
 
+  def registry_consistency_worker_enabled?
+    replicator_class.enabled?
+  end
+
+  def replicator_class
+    Gitlab::Geo::Replicator.for_class_name(self)
+  end
+
   included do
     include ::Delay
 
