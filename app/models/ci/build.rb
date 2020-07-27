@@ -596,7 +596,7 @@ module Ci
     def repo_url
       return unless token
 
-      auth = "gitlab-ci-token:#{token}@"
+      auth = "#{::Gitlab::Auth::CI_JOB_USER}:#{token}@"
       project.http_url_to_repo.sub(%r{^https?://}) do |prefix|
         prefix + auth
       end
