@@ -123,9 +123,9 @@ class ProjectPolicy < BasePolicy
     !@subject.design_management_enabled?
   end
 
-  with_scope :global
+  with_scope :subject
   condition(:moving_designs_disabled) do
-    !::Feature.enabled?(:reorder_designs)
+    !::Feature.enabled?(:reorder_designs, @subject)
   end
 
   with_scope :subject
