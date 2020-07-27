@@ -40,6 +40,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      userDidDismissNewFlagAlert: false,
+    };
+  },
   translations: {
     newFlagAlert: NEW_FLAG_ALERT,
   },
@@ -62,6 +67,9 @@ export default {
     hasNewVersionFlags() {
       return this.glFeatures.featureFlagsNewVersion;
     },
+    shouldShowNewFlagAlert() {
+      return !(this.hasNewVersionFlags || this.userDidDismissNewFlagAlert);
+    },
     strategies() {
       return [{ name: ROLLOUT_STRATEGY_ALL_USERS, parameters: {}, scopes: [] }];
     },
@@ -77,7 +85,12 @@ export default {
 </script>
 <template>
   <div>
-    <gl-alert v-if="!hasNewVersionFlags" variant="warning" :dismissible="false" class="gl-my-5">
+    <gl-alert
+      v-if="shouldShowNewFlagAlert"
+      variant="warning"
+      class="gl-my-5"
+      @dismiss="userDidDismissNewFlagAlert = true"
+    >
       {{ $options.translations.newFlagAlert }}
     </gl-alert>
     <h3 class="page-title">{{ s__('FeatureFlags|New feature flag') }}</h3>
