@@ -267,7 +267,7 @@ export default {
         v-tooltip
         :title="dateFromMilestonesTooltip"
         :class="{ 'is-option-selected': !selectedDateIsFixed }"
-        class="value-type-dynamic text-secondary d-flex prepend-top-10"
+        class="value-type-dynamic text-secondary d-flex gl-mt-3"
         data-placement="bottom"
         data-html="true"
       >
