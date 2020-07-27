@@ -61,7 +61,7 @@ interface, it's inflexible and harder to debug. If something goes wrong, you can
 deployment logs. The Web Application Firewall feature uses this installation method.
 
 However, the next generation of GitLab Managed Apps V2 ([CI/CD-based GitLab Managed Apps](https://gitlab.com/groups/gitlab-org/-/epics/2103))
-doesn't use Sidekiq to deploy. All the applications are deployed using a GitLab CI/CD pipeline and
+don't use Sidekiq to deploy. All the applications are deployed using a GitLab CI/CD pipeline and
 therefore GitLab Runners.
 
 ```mermaid
