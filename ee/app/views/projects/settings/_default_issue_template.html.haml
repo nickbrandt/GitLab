@@ -7,7 +7,7 @@
       %p= _('Set a default template for issue descriptions.')
 
     .settings-content
-      = form_for [@project.namespace.becomes(Namespace), @project], remote: true, html: { multipart: true, class: "issue-settings-form" }, authenticity_token: true do |f|
+      = form_for @project, remote: true, html: { multipart: true, class: "issue-settings-form" }, authenticity_token: true do |f|
         %input{ type: 'hidden', name: 'update_section', value: 'js-issue-settings' }
         .row
           .form-group.col-md-9
