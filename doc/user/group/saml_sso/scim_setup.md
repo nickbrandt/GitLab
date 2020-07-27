@@ -40,7 +40,7 @@ Once [Group Single Sign-On](index.md) has been configured, we can:
 1. Click on the **Generate a SCIM token** button.
 1. Save the token and URL so they can be used in the next step.
 
-![SCIM token configuration](img/scim_token.png)
+![SCIM token configuration](img/scim_token_v13_3.png)
 
 ## Identity Provider configuration
 
