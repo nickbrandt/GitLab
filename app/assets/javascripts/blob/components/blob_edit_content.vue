@@ -41,6 +41,8 @@ export default {
 </script>
 <template>
   <div class="file-content code">
-    <pre id="editor" ref="editor" data-editor-loading @keyup="triggerFileChange">{{ value }}</pre>
+    <div id="editor" ref="editor" data-editor-loading @keyup="triggerFileChange">
+      <pre class="editor-loading-content">{{ value }}</pre>
+    </div>
   </div>
 </template>
