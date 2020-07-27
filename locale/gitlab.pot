@@ -14672,6 +14672,9 @@ msgstr ""
 msgid "Merge Request"
 msgstr ""
 
+msgid "Merge Request Analytics"
+msgstr ""
+
 msgid "Merge Request Approvals"
 msgstr ""
 
