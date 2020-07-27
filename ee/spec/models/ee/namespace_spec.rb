@@ -31,6 +31,7 @@ RSpec.describe Namespace do
   it { is_expected.to delegate_method(:temporary_storage_increase_ends_on).to(:namespace_limit) }
   it { is_expected.to delegate_method(:temporary_storage_increase_ends_on=).to(:namespace_limit).with_arguments(:args) }
   it { is_expected.to delegate_method(:temporary_storage_increase_enabled?).to(:namespace_limit) }
+  it { is_expected.to delegate_method(:eligible_for_temporary_storage_increase?).to(:namespace_limit) }
 
   shared_examples 'plan helper' do |namespace_plan|
     let(:namespace) { create(:namespace_with_plan, plan: "#{plan_name}_plan") }
@@ -1505,6 +1506,28 @@ RSpec.describe Namespace do
 
       expect(namespace.namespace_limit).to be_present
       expect(namespace.namespace_limit).not_to be_persisted
+    end
+  end
+
+  describe '#enable_temporary_storage_increase!' do
+    it 'sets a date' do
+      namespace = build(:namespace)
+
+      Timecop.freeze do
+        namespace.enable_temporary_storage_increase!
+
+        expect(namespace.temporary_storage_increase_ends_on).to eq(30.days.from_now.to_date)
+      end
+    end
+
+    it 'is invalid when set twice' do
+      namespace = create(:namespace)
+
+      namespace.enable_temporary_storage_increase!
+      namespace.enable_temporary_storage_increase!
+
+      expect(namespace).to be_invalid
+      expect(namespace.errors[:"namespace_limit.temporary_storage_increase_ends_on"]).to be_present
     end
   end
 end

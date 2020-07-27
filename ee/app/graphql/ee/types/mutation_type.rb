@@ -24,6 +24,7 @@ module EE
         mount_mutation ::Mutations::Pipelines::RunDastScan
         mount_mutation ::Mutations::DastSiteProfiles::Create
         mount_mutation ::Mutations::DastScannerProfiles::Create
+        mount_mutation ::Mutations::Namespaces::IncreaseStorageTemporarily
       end
     end
   end
