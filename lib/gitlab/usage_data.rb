@@ -486,6 +486,7 @@ module Gitlab
       def usage_activity_by_stage_create(time_period)
         {
           deploy_keys: distinct_count(::DeployKey.where(time_period), :user_id),
+          diff_note_user_count: distinct_count(::DiffNote.where(time_period), :author_id),
           keys: distinct_count(::Key.regular_keys.where(time_period), :user_id),
           merge_requests: distinct_count(::MergeRequest.where(time_period), :author_id),
           projects_with_disable_overriding_approvers_per_merge_request: count(::Project.where(time_period.merge(disable_overriding_approvers_per_merge_request: true))),
