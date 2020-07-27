@@ -8,7 +8,7 @@ module Geo
     # rubocop:enable Scalability/CronWorkerContext
 
     def perform
-      unless Gitlab.config.geo.registry_replication.enabled
+      unless ::Geo::ContainerRepositoryRegistry.replication_enabled?
         log_info('Container Registry replication is not enabled')
         return
       end
