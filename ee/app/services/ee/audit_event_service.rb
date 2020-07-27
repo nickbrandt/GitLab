@@ -179,15 +179,6 @@ module EE
       for_custom_model('group', @entity.full_path)
     end
 
-    # Builds the @details attribute for group variable
-    #
-    # This uses the [Ci::GroupVariable] @entity as the target object being audited
-    #
-    # @return [AuditEventService]
-    def for_group_variable(group_variable_key)
-      for_custom_model('ci_group_variable', group_variable_key)
-    end
-
     def enabled?
       admin_audit_log_enabled? ||
         audit_events_enabled? ||
