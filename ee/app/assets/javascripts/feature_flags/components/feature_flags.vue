@@ -132,10 +132,6 @@ export default {
     currentlyDisplayedData() {
       return this.dataForScope(this.scope);
     },
-    shouldRenderTabs() {
-      /* Do not show tabs until after the first request to get the count */
-      return this.count[this.scope] !== undefined;
-    },
     shouldRenderPagination() {
       return (
         !this.isLoading &&
@@ -257,9 +253,9 @@ export default {
       modal-id="configure-feature-flags"
       @token="rotateInstanceId()"
     />
-    <h3 class="page-title with-button">
-      {{ s__('FeatureFlags|Feature Flags') }}
-      <div class="pull-right">
+    <div class="top-area">
+      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
+      <div class="nav-controls">
         <gl-button
           v-if="canUserConfigure"
           v-gl-modal="'configure-feature-flags'"
@@ -280,7 +276,7 @@ export default {
           {{ s__('FeatureFlags|New feature flag') }}
         </gl-button>
       </div>
-    </h3>
+    </div>
     <gl-alert v-if="!isUserListAlertDismissed" @dismiss="isUserListAlertDismissed = true">
       <gl-sprintf
         :message="
@@ -304,10 +300,6 @@ export default {
     >
       {{ message }}
     </gl-alert>
-
-    <div v-if="shouldRenderTabs" class="top-area scrolling-tabs-container inner-page-scroll-tabs">
-      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
-    </div>
 
     <gl-loading-icon
       v-if="isLoading"
