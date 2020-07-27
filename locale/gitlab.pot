@@ -26662,9 +26662,6 @@ msgstr ""
 msgid "Vulnerability|Image"
 msgstr ""
 
-msgid "Vulnerability|Instances"
-msgstr ""
-
 msgid "Vulnerability|Links"
 msgstr ""
 
