@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import '~/gl_dropdown';
-import AccessDropdown from '~/projects/settings/access_dropdown';
-import { LEVEL_TYPES } from '~/projects/settings/constants';
+import AccessDropdown from 'ee/projects/settings/access_dropdown';
+import { LEVEL_TYPES } from 'ee/projects/settings/constants';
 
 describe('AccessDropdown', () => {
   const defaultLabel = 'dummy default label';
