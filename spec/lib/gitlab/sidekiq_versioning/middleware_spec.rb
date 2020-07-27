@@ -34,5 +34,27 @@ RSpec.describe Gitlab::SidekiqVersioning::Middleware do
     it 'yields' do
       expect { |b| call!(&b) }.to yield_control
     end
+
+    context 'when worker is not ApplicationWorker' do
+      let(:worker_class) do
+        ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
+      end
+
+      it 'does not err' do
+        expect { call! }.not_to raise_error
+      end
+    end
+
+    context 'when sidekiq_versioning is disabled' do
+      before do
+        stub_feature_flags(sidekiq_versioning: false)
+      end
+
+      it 'does not set job_version' do
+        expect(worker).not_to receive(:job_version=)
+
+        call!
+      end
+    end
   end
 end
