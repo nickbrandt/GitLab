@@ -450,17 +450,10 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_repositories_data
-    if Geo::ProjectRegistry.registry_consistency_worker_enabled?
-      self.repositories_synced_count = Geo::ProjectRegistry.synced(:repository).count
-      self.repositories_failed_count = Geo::ProjectRegistry.sync_failed(:repository).count
-      self.wikis_synced_count = Geo::ProjectRegistry.synced(:wiki).count
-      self.wikis_failed_count = Geo::ProjectRegistry.sync_failed(:wiki).count
-    else
-      self.repositories_synced_count = registries_for_synced_projects(:repository).count
-      self.repositories_failed_count = registries_for_failed_projects(:repository).count
-      self.wikis_synced_count = registries_for_synced_projects(:wiki).count
-      self.wikis_failed_count = registries_for_failed_projects(:wiki).count
-    end
+    self.repositories_synced_count = Geo::ProjectRegistry.synced(:repository).count
+    self.repositories_failed_count = Geo::ProjectRegistry.sync_failed(:repository).count
+    self.wikis_synced_count = Geo::ProjectRegistry.synced(:wiki).count
+    self.wikis_failed_count = Geo::ProjectRegistry.sync_failed(:wiki).count
   end
 
   def load_lfs_objects_data
@@ -549,25 +542,14 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_secondary_verification_data
-    if Geo::ProjectRegistry.registry_consistency_worker_enabled?
-      self.repositories_verified_count = Geo::ProjectRegistry.verified(:repository).count
-      self.repositories_verification_failed_count = Geo::ProjectRegistry.verification_failed(:repository).count
-      self.repositories_checksum_mismatch_count = Geo::ProjectRegistry.mismatch(:repository).count
-      self.wikis_verified_count = Geo::ProjectRegistry.verified(:wiki).count
-      self.wikis_verification_failed_count = Geo::ProjectRegistry.verification_failed(:wiki).count
-      self.wikis_checksum_mismatch_count = Geo::ProjectRegistry.mismatch(:wiki).count
-      self.repositories_retrying_verification_count = Geo::ProjectRegistry.retrying_verification(:repository).count
-      self.wikis_retrying_verification_count = Geo::ProjectRegistry.retrying_verification(:wiki).count
-    else
-      self.repositories_verified_count = registries_for_verified_projects(:repository).count
-      self.repositories_verification_failed_count = registries_for_verification_failed_projects(:repository).count
-      self.repositories_checksum_mismatch_count = registries_for_mismatch_projects(:repository).count
-      self.wikis_verified_count = registries_for_verified_projects(:wiki).count
-      self.wikis_verification_failed_count = registries_for_verification_failed_projects(:wiki).count
-      self.wikis_checksum_mismatch_count = registries_for_mismatch_projects(:wiki).count
-      self.repositories_retrying_verification_count = registries_retrying_verification(:repository).count
-      self.wikis_retrying_verification_count = registries_retrying_verification(:wiki).count
-    end
+    self.repositories_verified_count = Geo::ProjectRegistry.verified(:repository).count
+    self.repositories_verification_failed_count = Geo::ProjectRegistry.verification_failed(:repository).count
+    self.repositories_checksum_mismatch_count = Geo::ProjectRegistry.mismatch(:repository).count
+    self.wikis_verified_count = Geo::ProjectRegistry.verified(:wiki).count
+    self.wikis_verification_failed_count = Geo::ProjectRegistry.verification_failed(:wiki).count
+    self.wikis_checksum_mismatch_count = Geo::ProjectRegistry.mismatch(:wiki).count
+    self.repositories_retrying_verification_count = Geo::ProjectRegistry.retrying_verification(:repository).count
+    self.wikis_retrying_verification_count = Geo::ProjectRegistry.retrying_verification(:wiki).count
   end
 
   def primary_storage_digest
@@ -592,42 +574,6 @@ class GeoNodeStatus < ApplicationRecord
 
   def design_registry_finder
     @design_registry_finder ||= Geo::DesignRegistryFinder.new(current_node_id: geo_node.id)
-  end
-
-  def registries_for_synced_projects(type)
-    Geo::ProjectRegistrySyncedFinder
-      .new(current_node: geo_node, type: type)
-      .execute
-  end
-
-  def registries_for_failed_projects(type)
-    Geo::ProjectRegistrySyncFailedFinder
-      .new(current_node: geo_node, type: type)
-      .execute
-  end
-
-  def registries_for_verified_projects(type)
-    Geo::ProjectRegistryVerifiedFinder
-      .new(current_node: geo_node, type: type)
-      .execute
-  end
-
-  def registries_for_verification_failed_projects(type)
-    Geo::ProjectRegistryVerificationFailedFinder
-      .new(current_node: geo_node, type: type)
-      .execute
-  end
-
-  def registries_for_mismatch_projects(type)
-    Geo::ProjectRegistryMismatchFinder
-      .new(current_node: geo_node, type: type)
-      .execute
-  end
-
-  def registries_retrying_verification(type)
-    Geo::ProjectRegistryRetryingVerificationFinder
-      .new(current_node: geo_node, type: type)
-      .execute
   end
 
   def repository_verification_finder
