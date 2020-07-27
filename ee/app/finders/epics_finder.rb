@@ -203,7 +203,7 @@ class EpicsFinder < IssuableFinder
   end
 
   def can_read_all_epics_in_related_groups?(groups)
-    return true if skip_visibility_check?
+    return true if @skip_visibility_check
     return false unless current_user
 
     # If a user is a member of a group, he also inherits access to all subgroups,
@@ -218,10 +218,6 @@ class EpicsFinder < IssuableFinder
     # - in that case top-level group is group's root parent
     parent = params.fetch(:include_ancestor_groups, false) ? groups.first.root_ancestor : group
     Ability.allowed?(current_user, :read_confidential_epic, parent)
-  end
-
-  def skip_visibility_check?
-    @skip_visibility_check && Feature.enabled?(:skip_epic_count_visibility_check, group, default_enabled: true)
   end
 
   def by_confidential(items)
