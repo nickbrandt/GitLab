@@ -27,7 +27,7 @@ module EE
 
       has_one :namespace_statistics
       has_one :namespace_limit, inverse_of: :namespace
-      has_one :gitlab_subscription, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+      has_one :gitlab_subscription
       has_one :elasticsearch_indexed_namespace
 
       accepts_nested_attributes_for :gitlab_subscription
