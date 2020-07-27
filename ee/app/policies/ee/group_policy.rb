@@ -21,6 +21,10 @@ module EE
         @subject.feature_available?(:cycle_analytics_for_groups)
       end
 
+      condition(:group_merge_request_analytics_available) do
+        @subject.feature_available?(:group_merge_request_analytics)
+      end
+
       condition(:group_activity_analytics_available) do
         @subject.beta_feature_available?(:group_activity_analytics)
       end
@@ -123,6 +127,9 @@ module EE
 
       rule { has_access & group_activity_analytics_available }
         .enable :read_group_activity_analytics
+
+      rule { reporter & group_merge_request_analytics_available }
+        .enable :read_group_merge_request_analytics
 
       rule { reporter & cycle_analytics_available }.policy do
         enable :read_group_cycle_analytics, :create_group_stage, :read_group_stage, :update_group_stage, :delete_group_stage
