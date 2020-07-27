@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe NamespacePolicy do
   let(:owner) { build_stubbed(:user) }
-  let(:namespace) { build_stubbed(:namespace, owner: owner) }
+  let(:namespace) { create(:namespace_with_plan, owner: owner) }
   let(:owner_permissions) { [:create_projects, :admin_namespace, :read_namespace] }
 
   subject { described_class.new(current_user, namespace) }
@@ -13,7 +13,7 @@ RSpec.describe NamespacePolicy do
     let(:current_user) { build_stubbed(:user, :auditor) }
 
     context 'owner' do
-      let(:namespace) { build_stubbed(:namespace, owner: current_user) }
+      let(:namespace) { create(:namespace_with_plan, owner: current_user) }
 
       it { is_expected.to be_allowed(*owner_permissions) }
     end

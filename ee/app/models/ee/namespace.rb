@@ -179,8 +179,7 @@ module EE
     end
 
     def over_storage_limit?
-      ::Gitlab.dev_env_or_com? &&
-        ::Feature.enabled?(:namespace_storage_limit, root_ancestor) &&
+      ::Feature.enabled?(:namespace_storage_limit, root_ancestor) &&
         RootStorageSize.new(root_ancestor).above_size_limit?
     end
 
