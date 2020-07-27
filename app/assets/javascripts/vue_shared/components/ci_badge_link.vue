@@ -7,7 +7,7 @@ import CiIcon from './ci_icon.vue';
  *
  * Receives status object containing:
  * status: {
- *   details_path: "/gitlab-org/gitlab-foss/pipelines/8150156" // url
+ *   details_path or detailsPath: "/gitlab-org/gitlab-foss/pipelines/8150156" // url
  *   group:"running" // used for CSS class
  *   icon: "icon_status_running" // used to render the icon
  *   label:"running" // used for potential tooltip
@@ -41,6 +41,10 @@ export default {
     },
   },
   computed: {
+    detailsPath() {
+      // For now, this can either come from graphQL with camelCase or REST API in snake_case
+      return this.status.detailsPath || this.status.details_path;
+    },
     cssClass() {
       const className = this.status.group;
       return className ? `ci-status ci-${className} qa-status-badge` : 'ci-status qa-status-badge';
@@ -49,12 +53,7 @@ export default {
 };
 </script>
 <template>
-  <a
-    v-gl-tooltip
-    :href="status.details_path"
-    :class="cssClass"
-    :title="!showText ? status.text : ''"
-  >
+  <a v-gl-tooltip :href="detailsPath" :class="cssClass" :title="!showText ? status.text : ''">
     <ci-icon :status="status" />
 
     <template v-if="showText">
