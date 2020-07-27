@@ -89,8 +89,25 @@ export default {
 
       this.setFileCollapsed({ filePath: this.file.file_path, collapsed: newVal });
     },
+    'file.file_hash': {
+      handler: function watchFileHash() {
+        if (
+          window.gon?.features?.autoExpandCollapsedDiffs &&
+          this.viewDiffsFileByFile &&
+          this.file.viewer.collapsed
+        ) {
+          this.isCollapsed = false;
+          this.handleLoadCollapsedDiff();
+        } else {
+          this.isCollapsed = this.file.viewer.collapsed || false;
+        }
+      },
+      immediate: true,
+    },
     'file.viewer.collapsed': function setIsCollapsed(newVal) {
-      this.isCollapsed = newVal;
+      if (!this.viewDiffsFileByFile && !window.gon?.features?.autoExpandCollapsedDiffs) {
+        this.isCollapsed = newVal;
+      }
     },
   },
   created() {
