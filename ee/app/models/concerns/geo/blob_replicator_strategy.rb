@@ -13,6 +13,8 @@ module Geo
     end
 
     def handle_after_create_commit
+      return unless self.class.enabled?
+
       publish(:created, **created_params)
       schedule_checksum_calculation if needs_checksum?
     end
@@ -25,6 +27,8 @@ module Geo
     end
 
     def handle_after_destroy
+      return unless self.class.enabled?
+
       publish(:deleted, **deleted_params)
     end
 
@@ -114,7 +118,6 @@ module Geo
     end
 
     def needs_checksum?
-      return false unless self.class.enabled?
       return true unless model_record.respond_to?(:needs_checksum?)
 
       model_record.needs_checksum?

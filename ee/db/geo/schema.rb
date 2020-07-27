@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_07_011052) do
+ActiveRecord::Schema.define(version: 2020_07_10_194046) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -166,6 +166,19 @@ ActiveRecord::Schema.define(version: 2020_07_07_011052) do
     t.index ["resync_wiki"], name: "index_project_registry_on_resync_wiki"
     t.index ["wiki_retry_at"], name: "index_project_registry_on_wiki_retry_at"
     t.index ["wiki_verification_checksum_sha"], name: "idx_project_registry_on_wiki_checksum_sha_partial", where: "(wiki_verification_checksum_sha IS NULL)"
+  end
+
+  create_table "vulnerability_export_registry", force: :cascade do |t|
+    t.datetime_with_timezone "retry_at"
+    t.datetime_with_timezone "last_synced_at"
+    t.datetime_with_timezone "created_at", null: false
+    t.bigint "vulnerability_export_id", null: false
+    t.integer "state", limit: 2, default: 0, null: false
+    t.integer "retry_count", limit: 2, default: 0
+    t.text "last_sync_failure"
+    t.index ["retry_at"], name: "index_vulnerability_export_registry_on_retry_at"
+    t.index ["state"], name: "index_vulnerability_export_registry_on_state"
+    t.index ["vulnerability_export_id"], name: "index_vulnerability_export_registry_on_vulnerability_export_id", unique: true
   end
 
 end

@@ -162,7 +162,8 @@ module Gitlab
     # solutions can be found at
     # https://gitlab.com/gitlab-org/gitlab/-/issues/227693
     def self.replicator_classes
-      classes = [::Geo::PackageFileReplicator]
+      classes = [::Geo::PackageFileReplicator,
+                 ::Geo::VulnerabilityExportReplicator]
 
       classes.select(&:enabled?)
     end

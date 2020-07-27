@@ -2,11 +2,24 @@
 
 module Vulnerabilities
   class Export < ApplicationRecord
+    include ::Gitlab::Geo::ReplicableModel
+
     self.table_name = "vulnerability_exports"
+
+    with_replicator Geo::VulnerabilityExportReplicator
 
     belongs_to :project
     belongs_to :group
     belongs_to :author, optional: false, class_name: 'User'
+
+    has_one :vulnerability_export_verification_status, class_name: 'Vulnerabilities::ExportVerificationStatus', inverse_of: :vulnerability_export, foreign_key: :vulnerability_export_id
+
+    delegate :verification_retry_at, :verification_retry_at=,
+             :verified_at, :verified_at=,
+             :verification_checksum, :verification_checksum=,
+             :verification_failure, :verification_failure=,
+             :verification_retry_count, :verification_retry_count=,
+             to: :vulnerability_export_verification_status
 
     mount_uploader :file, AttachmentUploader
 
@@ -81,6 +94,18 @@ module Vulnerabilities
       # The file.object_store is set during `uploader.store!`
       # which happens after object is inserted/updated
       self.update_column(:file_store, file.object_store)
+    end
+
+    def vulnerability_export_verification_status
+      super.presence || build_vulnerability_export_verification_status
+    end
+
+    def local?
+      file_store == ObjectStorage::Store::LOCAL
+    end
+
+    def self.replicables_for_geo_node
+      self.all
     end
 
     private

@@ -341,6 +341,7 @@ RSpec.describe 'geo rake tasks', :geo do
       before do
         stub_licensed_features(geo: true)
         stub_current_geo_node(current_node)
+        stub_feature_flags(geo_vulnerability_export_replication: false)
 
         allow(GeoNodeStatus).to receive(:current_node_status).and_return(geo_node_status)
         allow(Gitlab.config.geo.registry_replication).to receive(:enabled).and_return(true)
