@@ -7,7 +7,6 @@ import { __ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import epicUtils from '../utils/epic_utils';
 import { statusType } from '../constants';
@@ -24,7 +23,6 @@ export default {
     GitlabTeamMemberBadge: () =>
       import('ee_component/vue_shared/components/user_avatar/badges/gitlab_team_member_badge.vue'),
   },
-  mixins: [glFeatureFlagsMixin()],
   computed: {
     ...mapState([
       'sidebarCollapsed',
@@ -49,9 +47,6 @@ export default {
     },
     actionButtonText() {
       return this.isEpicOpen ? __('Close epic') : __('Reopen epic');
-    },
-    userCanCreate() {
-      return this.canCreate && this.glFeatures.createEpicForm;
     },
   },
   mounted() {
@@ -141,7 +136,7 @@ export default {
         {{ actionButtonText }}
       </gl-button>
       <gl-button
-        v-if="userCanCreate"
+        v-if="canCreate"
         :href="newEpicWebUrl"
         category="secondary"
         variant="success"
