@@ -20,17 +20,14 @@ export default {
     };
   },
   computed: {
-    filterIds() {
-      return this.filter.ids;
+    filterId() {
+      return this.filter.id;
     },
     selection() {
       return this.filter.selection;
     },
     firstSelectedOption() {
-      const selectedOption = this.filter.selection.has('all')
-        ? this.filter.options[0]
-        : this.filter.options.find(option => this.isSelected(option));
-      return selectedOption ? selectedOption.displayName || selectedOption.name : '-';
+      return this.filter.options.find(option => this.selection.has(option.id))?.name || '-';
     },
     extraOptionCount() {
       return this.selection.size - 1;
@@ -46,14 +43,7 @@ export default {
   },
   methods: {
     clickFilter(option) {
-      const optionIds = Object.entries(this.filterIds).reduce((acc, [key, value]) => {
-        acc[key] = option[value];
-        return acc;
-      }, {});
-      this.$emit('setFilter', {
-        filterIds: this.filterIds,
-        optionIds,
-      });
+      this.$emit('setFilter', { filterId: this.filterId, option });
     },
     isSelected(option) {
       return this.selection.has(option.id);
@@ -107,7 +97,7 @@ export default {
 
       <div
         data-qa-selector="filter_dropdown_content"
-        :class="{ 'dropdown-content': filterIds['project_id'] }"
+        :class="{ 'dropdown-content': filterId === 'project_id' }"
       >
         <button
           v-for="option in filteredOptions"

@@ -1,12 +1,6 @@
 import { isSubset } from '~/lib/utils/set';
 import { ALL } from './constants';
 
-const createSelection = selectionObj => {
-  return Object.values(selectionObj).reduce((acc, curr) => {
-    return new Set([...acc, ...curr]);
-  }, new Set());
-};
-
 export const isBaseFilterOption = id => id === ALL;
 
 /**
@@ -18,6 +12,38 @@ export const isBaseFilterOption = id => id === ALL;
 export const hasValidSelection = ({ selection, options }) =>
   isSubset(selection, new Set(options.map(({ id }) => id)));
 
+const modifyLinkedFilter = (filters, { id: filterId, linkId }) => {
+  const newFilters = filters.map(filter => {
+    if (filter.id === filterId) {
+      const { selection } = filter;
+
+      const option = filter.options.find(curr => curr.linkId === linkId);
+      const { id: optionId } = option;
+
+      if (optionId.length) {
+        if (optionId.every(Set.prototype.has, selection)) {
+          optionId.forEach(Set.prototype.delete, selection);
+        } else {
+          selection.delete(ALL);
+          optionId.forEach(Set.prototype.add, selection);
+        }
+
+        if (selection.size === 0) {
+          selection.add(ALL);
+        }
+      }
+
+      return {
+        ...filter,
+        selection,
+      };
+    }
+    return filter;
+  });
+
+  return newFilters;
+};
+
 /**
  * Takes a filter array and a selected payload.
  * It then either adds or removes that option from the appropriate selected filter.
@@ -28,48 +54,43 @@ export const hasValidSelection = ({ selection, options }) =>
  * @param {String} payload.filterId the ID of the filter that the selected option belongs to
  * @returns {Array} the mutated filters array
  */
-export const setFilter = (filters, { filterIds, optionIds }) => {
-  return filters.map(filter => {
-    if (Object.keys(filterIds).some(id => filter.ids[id])) {
-      const { selectionObj: selection } = filter;
-      let newSelection;
+export const setFilter = (filters, { option, filterId }) => {
+  let link;
+  let newFilters = filters.map(filter => {
+    if (filter.id === filterId) {
+      const { selection } = filter;
+      const { id: optionId } = option;
 
-      /* eslint-disable-next-line guard-for-in, no-restricted-syntax */
-      for (const [key, value] of Object.entries(optionIds)) {
-        if (Array.isArray(value) && !value.length) {
-          continue;
+      if (optionId === ALL) {
+        selection.clear();
+      } else if (selection.has(optionId)) {
+        selection.delete(optionId);
+        if (option.link) {
+          link = option.link;
         }
-        if (value === ALL) {
-          newSelection = { ALL: [ALL] };
-          break;
-        } else if (selection[key]?.includes(value)) {
-          newSelection = { ...selection };
-          if (newSelection[key].length === 1) {
-            delete newSelection[key];
-            if (!Object.keys(newSelection).length) {
-              newSelection = { ALL: [ALL] };
-            }
-          } else {
-            newSelection[key].splice(newSelection[key].indexOf(value), 1);
-          }
-        } else {
-          if (!newSelection) {
-            newSelection = selection.ALL ? {} : { ...selection };
-          }
-          if (newSelection[key]) {
-            newSelection[key] = newSelection[key].concat(value);
-          } else {
-            newSelection[key] = Array.isArray(value) ? value : [value];
-          }
+      } else {
+        selection.delete(ALL);
+        selection.add(optionId);
+        if (option.link) {
+          link = option.link;
         }
+      }
+
+      if (selection.size === 0) {
+        selection.add(ALL);
       }
 
       return {
         ...filter,
-        selection: createSelection(newSelection),
-        selectionObj: newSelection,
+        selection,
       };
     }
     return filter;
   });
+
+  if (link) {
+    newFilters = modifyLinkedFilter(filters, link);
+  }
+
+  return newFilters;
 };
