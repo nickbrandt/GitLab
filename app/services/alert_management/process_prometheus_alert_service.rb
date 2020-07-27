@@ -96,7 +96,7 @@ module AlertManagement
       return unless am_alert
       return if am_alert.issue
 
-      IncidentManagement::ProcessAlertWorker.new.perform(nil, nil, am_alert.id)
+      IncidentManagement::ProcessAlertWorker.perform_async(nil, nil, am_alert.id)
     end
 
     def logger
