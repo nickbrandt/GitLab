@@ -247,34 +247,48 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
   end
 
   describe 'iterations link' do
-    let_it_be(:current_user) { create(:user) }
+    context 'with authorized user' do
+      let_it_be(:current_user) { create(:user) }
 
-    before do
-      project.add_guest(current_user)
-
-      allow(view).to receive(:current_user).and_return(current_user)
-    end
-
-    context 'with iterations licensed feature available' do
       before do
-        stub_licensed_features(iterations: true)
+        project.add_guest(current_user)
+
+        allow(view).to receive(:current_user).and_return(current_user)
       end
 
-      context 'with project_iterations feature flag enabled' do
+      context 'with iterations licensed feature available' do
         before do
-          stub_feature_flags(project_iterations: true)
+          stub_licensed_features(iterations: true)
         end
 
-        it 'is visible' do
-          render
+        context 'with project_iterations feature flag enabled' do
+          before do
+            stub_feature_flags(project_iterations: true)
+          end
 
-          expect(rendered).to have_text 'Iterations'
+          it 'is visible' do
+            render
+
+            expect(rendered).to have_text 'Iterations'
+          end
+        end
+
+        context 'with project_iterations feature flag disabled' do
+          before do
+            stub_feature_flags(project_iterations: false)
+          end
+
+          it 'is not visible' do
+            render
+
+            expect(rendered).not_to have_text 'Iterations'
+          end
         end
       end
 
-      context 'with project_iterations feature flag disabled' do
+      context 'with iterations licensed feature disabled' do
         before do
-          stub_feature_flags(project_iterations: false)
+          stub_licensed_features(iterations: false)
         end
 
         it 'is not visible' do
@@ -285,15 +299,47 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
       end
     end
 
-    context 'with iterations licensed feature disabled' do
-      before do
-        stub_licensed_features(iterations: false)
+    context 'with unauthorized user' do
+      context 'with iterations licensed feature available' do
+        before do
+          stub_licensed_features(iterations: true)
+        end
+
+        context 'with project_iterations feature flag enabled' do
+          before do
+            stub_feature_flags(project_iterations: true)
+          end
+
+          it 'is not visible' do
+            render
+
+            expect(rendered).not_to have_text 'Iterations'
+          end
+        end
+
+        context 'with project_iterations feature flag disabled' do
+          before do
+            stub_feature_flags(project_iterations: false)
+          end
+
+          it 'is not visible' do
+            render
+
+            expect(rendered).not_to have_text 'Iterations'
+          end
+        end
       end
 
-      it 'is not visible' do
-        render
+      context 'with iterations licensed feature disabled' do
+        before do
+          stub_licensed_features(iterations: false)
+        end
 
-        expect(rendered).not_to have_text 'Iterations'
+        it 'is not visible' do
+          render
+
+          expect(rendered).not_to have_text 'Iterations'
+        end
       end
     end
   end
