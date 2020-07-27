@@ -14029,7 +14029,8 @@ CREATE TABLE public.plan_limits (
     ci_max_artifact_size_requirements integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_coverage_fuzzing integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_browser_performance integer DEFAULT 0 NOT NULL,
-    ci_max_artifact_size_load_performance integer DEFAULT 0 NOT NULL
+    ci_max_artifact_size_load_performance integer DEFAULT 0 NOT NULL,
+    ci_needs_size_limit integer DEFAULT 50 NOT NULL
 );
 
 CREATE SEQUENCE public.plan_limits_id_seq
