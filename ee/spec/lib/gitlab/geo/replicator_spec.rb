@@ -106,14 +106,6 @@ RSpec.describe Gitlab::Geo::Replicator do
     describe '#publish' do
       subject { Geo::DummyReplicator.new }
 
-      context 'when replication is disabled' do
-        before do
-          stub_feature_flags(geo_dummy_replication: false)
-        end
-
-        it_behaves_like 'does not replicate'
-      end
-
       context 'when publishing a supported events with required params' do
         it 'creates event with associated event log record' do
           stub_current_geo_node(primary_node)

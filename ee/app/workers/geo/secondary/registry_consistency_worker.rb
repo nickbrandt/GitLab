@@ -21,7 +21,8 @@ module Geo
         Geo::LfsObjectRegistry,
         Geo::PackageFileRegistry,
         Geo::ProjectRegistry,
-        Geo::UploadRegistry
+        Geo::UploadRegistry,
+        Geo::VulnerabilityExportRegistry
       ].freeze
 
       BATCH_SIZE = 10000

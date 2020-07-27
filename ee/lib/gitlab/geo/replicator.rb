@@ -213,8 +213,6 @@ module Gitlab
       # @param [Symbol] event_name
       # @param [Hash] event_data
       def publish(event_name, **event_data)
-        return unless self.class.enabled?
-
         raise ArgumentError, "Unsupported event: '#{event_name}'" unless self.class.event_supported?(event_name)
 
         create_event_with(
