@@ -152,8 +152,13 @@ describe('Edit feature flag form', () => {
 
   describe('without new version flags', () => {
     beforeEach(() => factory({ provide: { glFeatures: { featureFlagsNewVersion: false } } }));
+
     it('should alert users that feature flags are changing soon', () => {
       expect(wrapper.find(GlAlert).text()).toBe(NEW_FLAG_ALERT);
+    });
+
+    it('the new feature flags alert should be dismissable', () => {
+      expect(wrapper.find(GlAlert).props('dismissible')).toBe(true);
     });
   });
 });

@@ -40,6 +40,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      userDidDismissNewFlagAlert: false,
+    };
+  },
   translations: {
     legacyFlagAlert: s__(
       'FeatureFlags|GitLab is moving to a new way of managing feature flags, and in 13.4, this feature flag will become read-only. Please create a new feature flag.',
@@ -70,6 +75,9 @@ export default {
     hasNewVersionFlags() {
       return this.glFeatures.featureFlagsNewVersion;
     },
+    shouldShowNewFlagAlert() {
+      return !(this.hasNewVersionFlags || this.userDidDismissNewFlagAlert);
+    },
   },
   created() {
     this.setPath(this.path);
@@ -88,7 +96,12 @@ export default {
 </script>
 <template>
   <div>
-    <gl-alert v-if="!hasNewVersionFlags" variant="warning" :dismissible="false" class="gl-my-5">
+    <gl-alert
+      v-if="shouldShowNewFlagAlert"
+      variant="warning"
+      class="gl-my-5"
+      @dismiss="userDidDismissNewFlagAlert = true"
+    >
       {{ $options.translations.newFlagAlert }}
     </gl-alert>
     <gl-loading-icon v-if="isLoading" />
