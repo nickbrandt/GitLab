@@ -194,7 +194,7 @@ describe('OnDemandScansApp', () => {
       beforeEach(async () => {
         jest
           .spyOn(wrapper.vm.$apollo, 'mutate')
-          .mockResolvedValue({ data: { runDastScan: { pipelineUrl } } });
+          .mockResolvedValue({ data: { runDastScan: { pipelineUrl, errors: [] } } });
         const input = findTargetUrlInput();
         input.vm.$emit('input', targetUrl);
         submitForm();
@@ -221,7 +221,7 @@ describe('OnDemandScansApp', () => {
       });
     });
 
-    describe('on error', () => {
+    describe('on top-level error', () => {
       beforeEach(async () => {
         jest.spyOn(wrapper.vm.$apollo, 'mutate').mockRejectedValue();
         const input = findTargetUrlInput();
@@ -235,6 +235,26 @@ describe('OnDemandScansApp', () => {
 
       it('shows an error flash', () => {
         expect(createFlash).toHaveBeenCalledWith('Could not run the scan. Please try again.');
+      });
+    });
+
+    describe('on errors as data', () => {
+      beforeEach(async () => {
+        const errors = ['A', 'B', 'C'];
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockResolvedValue({ data: { runDastScan: { pipelineUrl: null, errors } } });
+        const input = findTargetUrlInput();
+        input.vm.$emit('input', targetUrl);
+        submitForm();
+      });
+
+      it('resets loading state', () => {
+        expect(wrapper.vm.loading).toBe(false);
+      });
+
+      it('shows an error flash', () => {
+        expect(createFlash).toHaveBeenCalledWith('Could not run the scan: A, B, C');
       });
     });
   });
