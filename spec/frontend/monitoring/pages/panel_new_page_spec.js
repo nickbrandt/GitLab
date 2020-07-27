@@ -18,7 +18,7 @@ describe('monitoring/pages/panel_new_page', () => {
   let wrapper;
   let $route;
 
-  const buildWrapper = (propsData = {}, routeParams = { dashboard }) => {
+  const mountComponent = (propsData = {}, routeParams = { dashboard }) => {
     $route = {
       params: routeParams,
     };
@@ -42,7 +42,7 @@ describe('monitoring/pages/panel_new_page', () => {
 
   describe('back to dashboard button', () => {
     it('is rendered', () => {
-      buildWrapper();
+      mountComponent();
       expect(findBackButton().exists()).toBe(true);
       expect(findBackButton().props('icon')).toBe('go-back');
     });

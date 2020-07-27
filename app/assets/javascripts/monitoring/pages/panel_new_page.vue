@@ -10,14 +10,14 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  routes,
   i18n: {
     backToDashboard: s__('Metrics|Back to dashboard'),
   },
+  routes,
 };
 </script>
 <template>
-  <div class="d-flex gl-align-items-baseline">
+  <div class="gl-display-flex gl-align-items-baseline">
     <gl-button
       v-gl-tooltip
       icon="go-back"
