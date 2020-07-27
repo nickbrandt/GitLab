@@ -173,6 +173,10 @@ Complementary reads:
 
 - [Refactoring guidelines](refactoring_guide/index.md)
 
+## Deprecation guides
+
+- [Deprecation guidelines](deprecation_guidelines/index.md)
+
 ## Documentation guides
 
 - [Writing documentation](documentation/index.md)
