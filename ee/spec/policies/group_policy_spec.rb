@@ -881,7 +881,7 @@ RSpec.describe GroupPolicy do
 
       context 'without Group SAML enabled' do
         before do
-          saml_provider.update(enabled: false)
+          saml_provider.update!(enabled: false)
         end
 
         it { is_expected.to be_disallowed(:read_group_saml_identity) }
