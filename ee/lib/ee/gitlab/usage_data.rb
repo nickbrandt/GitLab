@@ -76,7 +76,9 @@ module EE
           if license
             usage_data[:license_md5] = license.md5
             usage_data[:license_id] = license.license_id
+            # rubocop: disable UsageData/LargeTable
             usage_data[:historical_max_users] = ::HistoricalData.max_historical_user_count
+            # rubocop: enable UsageData/LargeTable
             usage_data[:licensee] = license.licensee
             usage_data[:license_user_count] = license.restricted_user_count
             usage_data[:license_starts_at] = license.starts_at
@@ -192,7 +194,9 @@ module EE
         end
 
         def epics_deepest_relationship_level
+          # rubocop: disable UsageData/LargeTable
           { epics_deepest_relationship_level: ::Epic.deepest_relationship_level.to_i }
+          # rubocop: enable UsageData/LargeTable
         end
 
         # Omitted because no user, creator or author associated: `auto_devops_disabled`, `auto_devops_enabled`
@@ -351,9 +355,10 @@ module EE
 
         # rubocop:disable CodeReuse/ActiveRecord
         def projects_jira_issuelist_active
+          # rubocop: disable UsageData/LargeTable:
           min_id = JiraTrackerData.where(issues_enabled: true).minimum(:service_id)
           max_id = JiraTrackerData.where(issues_enabled: true).maximum(:service_id)
-
+          # rubocop: enable UsageData/LargeTable:
           count(::JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
         end
         # rubocop:enable CodeReuse/ActiveRecord
