@@ -30,6 +30,3 @@ transitions:
       jobs:
         build: failed
         test: pending
-
-# TODO: Should we run `test`?
-# Further discussions: https://gitlab.com/gitlab-org/gitlab/-/issues/213080

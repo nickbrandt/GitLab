@@ -67,7 +67,7 @@ transitions:
   - event: success
     jobs: [test]
     expect:
-      pipeline: running
+      pipeline: running # should be blocked
       stages:
         build: success
         test: success

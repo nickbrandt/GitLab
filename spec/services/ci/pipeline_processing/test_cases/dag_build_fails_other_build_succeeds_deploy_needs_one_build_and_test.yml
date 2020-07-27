@@ -14,7 +14,7 @@ config:
   deploy:
     stage: deploy
     script: exit 0
-    needs: [build_1, test]
+    needs: [build_1, test] # it should not run
 
 init:
   expect:
