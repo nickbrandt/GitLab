@@ -1,30 +1,73 @@
-import $ from 'jquery';
 import { find } from 'lodash';
 import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import axios from '~/lib/utils/axios_utils';
-import createFlash from '~/flash';
-import { s__ } from '~/locale';
+import Flash from '~/flash';
 import { ACCESS_LEVELS, LEVEL_TYPES } from './constants';
+import { __ } from '~/locale';
 
-export default class ProtectedTagEdit {
+export default class ProtectedBranchEdit {
   constructor(options) {
+    this.$wraps = {};
     this.hasChanges = false;
     this.$wrap = options.$wrap;
-    this.$allowedToCreateDropdownButton = this.$wrap.find('.js-allowed-to-create');
+    this.$allowedToMergeDropdown = this.$wrap.find('.js-allowed-to-merge');
+    this.$allowedToPushDropdown = this.$wrap.find('.js-allowed-to-push');
+    this.$codeOwnerToggle = this.$wrap.find('.js-code-owner-toggle');
 
-    this.$allowedToCreateDropdownContainer = this.$allowedToCreateDropdownButton.closest(
-      '.create_access_levels-container',
+    this.$wraps[ACCESS_LEVELS.MERGE] = this.$allowedToMergeDropdown.closest(
+      `.${ACCESS_LEVELS.MERGE}-container`,
+    );
+    this.$wraps[ACCESS_LEVELS.PUSH] = this.$allowedToPushDropdown.closest(
+      `.${ACCESS_LEVELS.PUSH}-container`,
     );
 
     this.buildDropdowns();
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    this.$codeOwnerToggle.on('click', this.onCodeOwnerToggleClick.bind(this));
+  }
+
+  onCodeOwnerToggleClick() {
+    this.$codeOwnerToggle.toggleClass('is-checked');
+    this.$codeOwnerToggle.prop('disabled', true);
+
+    const formData = {
+      code_owner_approval_required: this.$codeOwnerToggle.hasClass('is-checked'),
+    };
+
+    this.updateCodeOwnerApproval(formData);
+  }
+
+  updateCodeOwnerApproval(formData) {
+    axios
+      .patch(this.$wrap.data('url'), {
+        protected_branch: formData,
+      })
+      .then(() => {
+        this.$codeOwnerToggle.prop('disabled', false);
+      })
+      .catch(() => {
+        Flash(__('Failed to update branch!'));
+      });
   }
 
   buildDropdowns() {
-    // Allowed to create dropdown
-    this[`${ACCESS_LEVELS.CREATE}_dropdown`] = new AccessDropdown({
-      accessLevel: ACCESS_LEVELS.CREATE,
-      accessLevelsData: gon.create_access_levels,
-      $dropdown: this.$allowedToCreateDropdownButton,
+    // Allowed to merge dropdown
+    this[`${ACCESS_LEVELS.MERGE}_dropdown`] = new AccessDropdown({
+      accessLevel: ACCESS_LEVELS.MERGE,
+      accessLevelsData: gon.merge_access_levels,
+      $dropdown: this.$allowedToMergeDropdown,
+      onSelect: this.onSelectOption.bind(this),
+      onHide: this.onDropdownHide.bind(this),
+    });
+
+    // Allowed to push dropdown
+    this[`${ACCESS_LEVELS.PUSH}_dropdown`] = new AccessDropdown({
+      accessLevel: ACCESS_LEVELS.PUSH,
+      accessLevelsData: gon.push_access_levels,
+      $dropdown: this.$allowedToPushDropdown,
       onSelect: this.onSelectOption.bind(this),
       onHide: this.onDropdownHide.bind(this),
     });
@@ -54,7 +97,7 @@ export default class ProtectedTagEdit {
 
     axios
       .patch(this.$wrap.data('url'), {
-        protected_tag: formData,
+        protected_branch: formData,
       })
       .then(({ data }) => {
         this.hasChanges = false;
@@ -65,10 +108,13 @@ export default class ProtectedTagEdit {
           // The data coming from server will be the new persisted *state* for each dropdown
           this.setSelectedItemsToDropdown(data[accessLevelName], `${accessLevelName}_dropdown`);
         });
+        this.$allowedToMergeDropdown.enable();
+        this.$allowedToPushDropdown.enable();
       })
       .catch(() => {
-        $.scrollTo(0);
-        createFlash(s__('ProjectSettings|Failed to update tag!'));
+        this.$allowedToMergeDropdown.enable();
+        this.$allowedToPushDropdown.enable();
+        Flash(__('Failed to update branch!'));
       });
   }
 
