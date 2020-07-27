@@ -1,6 +1,6 @@
 <script>
 import { uniqueId } from 'lodash';
-import { GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 
 import { __, s__ } from '~/locale';
 import { dateInWords } from '~/lib/utils/datetime_utility';
@@ -26,7 +26,7 @@ export default {
     CollapsedCalendarIcon,
     ToggleSidebar,
     GlLoadingIcon,
-    GlDeprecatedButton,
+    GlButton,
   },
   props: {
     sidebarCollapsed: {
@@ -201,7 +201,7 @@ export default {
       <gl-loading-icon v-if="dateSaveInProgress" :inline="true" />
       <div class="float-right d-flex">
         <icon v-popover="popoverOptions" name="question-o" class="help-icon gl-mr-2" tabindex="0" />
-        <gl-deprecated-button
+        <gl-button
           v-show="canUpdate && !editing"
           ref="editButton"
           variant="link"
@@ -209,7 +209,8 @@ export default {
           @click="startEditing"
         >
           {{ __('Edit') }}
-        </gl-deprecated-button>
+        </gl-button>
+
         <toggle-sidebar
           v-if="showToggleSidebar"
           :collapsed="sidebarCollapsed"
@@ -249,14 +250,14 @@ export default {
             />
             <span v-if="selectedAndEditable" class="no-value d-flex">
               &nbsp;&ndash;&nbsp;
-              <gl-deprecated-button
+              <gl-button
                 ref="removeButton"
                 variant="link"
                 class="btn-sidebar-date-remove"
                 @click="newDateSelected(null)"
               >
                 {{ __('remove') }}
-              </gl-deprecated-button>
+              </gl-button>
             </span>
           </template>
           <span v-else class="no-value"> {{ __('None') }} </span>
