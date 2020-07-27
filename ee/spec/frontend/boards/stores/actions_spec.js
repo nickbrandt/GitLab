@@ -3,6 +3,7 @@ import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import actions from 'ee/boards/stores/actions';
 import * as types from 'ee/boards/stores/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
+import { ListType } from '~/boards/constants';
 
 jest.mock('axios');
 
@@ -53,6 +54,34 @@ describe('updateListWipLimit', () => {
         { list: { max_issue_count: maxIssueCount } },
       );
     });
+  });
+});
+
+describe('showPromotionList', () => {
+  it('should dispatch addList action when conditions showPromotion is true', done => {
+    const state = {
+      endpoints: { fullPath: 'gitlab-org', boardId: '1' },
+      boardType: 'group',
+      disabled: false,
+      boardLists: [{ type: 'backlog' }, { type: 'closed' }],
+      showPromotion: true,
+    };
+
+    const promotionList = {
+      id: 'promotion',
+      listType: ListType.promotion,
+      title: 'Improve Issue Boards',
+      position: 0,
+    };
+
+    testAction(
+      actions.showPromotionList,
+      {},
+      state,
+      [],
+      [{ type: 'addList', payload: promotionList }],
+      done,
+    );
   });
 });
 

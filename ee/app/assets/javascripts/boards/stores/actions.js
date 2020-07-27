@@ -1,12 +1,15 @@
 import { sortBy } from 'lodash';
+import Cookies from 'js-cookie';
 import axios from '~/lib/utils/axios_utils';
 import boardsStore from '~/boards/stores/boards_store';
+import { __ } from '~/locale';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import actionsCE from '~/boards/stores/actions';
+import { BoardType, ListType } from '~/boards/constants';
 import boardsStoreEE from './boards_store_ee';
 import * as types from './mutation_types';
 
 import createDefaultClient from '~/lib/graphql';
-import { BoardType } from '~/boards/constants';
 import groupEpicsSwimlanesQuery from '../queries/group_epics_swimlanes.query.graphql';
 
 const notImplemented = () => {
@@ -70,6 +73,22 @@ export default {
       list: {
         max_issue_count: maxIssueCount,
       },
+    });
+  },
+
+  showPromotionList: ({ state, dispatch }) => {
+    if (
+      !state.showPromotion ||
+      parseBoolean(Cookies.get('promotion_issue_board_hidden')) ||
+      state.disabled
+    ) {
+      return;
+    }
+    dispatch('addList', {
+      id: 'promotion',
+      listType: ListType.promotion,
+      title: __('Improve Issue Boards'),
+      position: 0,
     });
   },
 
