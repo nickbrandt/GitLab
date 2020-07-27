@@ -12,7 +12,6 @@ import RequirementsTabs from 'ee/requirements/components/requirements_tabs.vue';
 import RequirementsLoading from 'ee/requirements/components/requirements_loading.vue';
 import RequirementsEmptyState from 'ee/requirements/components/requirements_empty_state.vue';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
-import RequirementForm from 'ee/requirements/components/requirement_form.vue';
 
 import createRequirement from 'ee/requirements/queries/createRequirement.mutation.graphql';
 import updateRequirement from 'ee/requirements/queries/updateRequirement.mutation.graphql';
@@ -378,10 +377,11 @@ describe('RequirementsRoot', () => {
     });
 
     describe('handleEditRequirementClick', () => {
-      it('sets `showUpdateFormForRequirement` prop to value of passed param', () => {
-        wrapper.vm.handleEditRequirementClick('10');
+      it('sets `showEditForm` prop to `true` and `editedRequirement` to value of passed param', () => {
+        wrapper.vm.handleEditRequirementClick(mockRequirementsOpen[0]);
 
-        expect(wrapper.vm.showUpdateFormForRequirement).toBe('10');
+        expect(wrapper.vm.showEditForm).toBe(true);
+        expect(wrapper.vm.editedRequirement).toBe(mockRequirementsOpen[0]);
       });
     });
 
@@ -494,7 +494,7 @@ describe('RequirementsRoot', () => {
         );
       });
 
-      it('sets `showUpdateFormForRequirement` to `0` and `createRequirementRequestActive` prop to `false` when request is successful', () => {
+      it('sets `showEditForm` to `true`, `editedRequirement` to `null` and `createRequirementRequestActive` prop to `false` when request is successful', () => {
         jest.spyOn(wrapper.vm, 'updateRequirement').mockResolvedValue(mockUpdateMutationResult);
 
         return wrapper.vm
@@ -503,7 +503,8 @@ describe('RequirementsRoot', () => {
             title: 'foo',
           })
           .then(() => {
-            expect(wrapper.vm.showUpdateFormForRequirement).toBe(0);
+            expect(wrapper.vm.showEditForm).toBe(false);
+            expect(wrapper.vm.editedRequirement).toBe(null);
             expect(wrapper.vm.createRequirementRequestActive).toBe(false);
           });
       });
@@ -649,10 +650,11 @@ describe('RequirementsRoot', () => {
     });
 
     describe('handleUpdateRequirementCancel', () => {
-      it('sets `showUpdateFormForRequirement` prop to `0`', () => {
+      it('sets `showEditForm` prop to `false` and `editedRequirement` to `null`', () => {
         wrapper.vm.handleUpdateRequirementCancel();
 
-        expect(wrapper.vm.showUpdateFormForRequirement).toBe(0);
+        expect(wrapper.vm.showEditForm).toBe(false);
+        expect(wrapper.vm.editedRequirement).toBe(null);
       });
     });
 
@@ -793,14 +795,12 @@ describe('RequirementsRoot', () => {
       wrapperLoading.destroy();
     });
 
-    it('renders requirement-form component when `showCreateForm` prop is `true`', () => {
-      wrapper.setData({
-        showCreateForm: true,
-      });
+    it('renders requirement-create-form component', () => {
+      expect(wrapper.contains('requirement-create-form-stub')).toBe(true);
+    });
 
-      return wrapper.vm.$nextTick(() => {
-        expect(wrapper.contains(RequirementForm)).toBe(true);
-      });
+    it('renders requirement-edit-form component', () => {
+      expect(wrapper.contains('requirement-edit-form-stub')).toBe(true);
     });
 
     it('does not render requirement-empty-state component when `showCreateForm` prop is `true`', () => {

@@ -133,18 +133,20 @@ RSpec.describe 'Requirements list', :js do
       end
 
       it 'shows edit form when edit button is clicked for a requirement' do
+        requirement_title = 'Foobar'
+
         page.within('.requirements-list li.requirement', match: :first) do
-          requirement_title = 'Foobar'
-
           find('li.requirement-edit button[title="Edit"]').click
+        end
 
-          page.within('.requirement-form') do
-            find('textarea#requirementTitle').native.send_keys requirement_title
-            find('button.js-requirement-save').click
+        page.within('.requirement-form') do
+          find('textarea#requirementTitle').native.send_keys requirement_title
+          find('button.js-requirement-save').click
 
-            wait_for_all_requests
-          end
+          wait_for_all_requests
+        end
 
+        page.within('.requirements-list li.requirement', match: :first) do
           expect(page.find('.issue-title-text')).to have_content(requirement_title)
         end
       end
@@ -152,12 +154,12 @@ RSpec.describe 'Requirements list', :js do
       it 'saves updated title for requirement using edit form' do
         page.within('.requirements-list li.requirement', match: :first) do
           find('li.requirement-edit button[title="Edit"]').click
+        end
 
-          page.within('.requirement-form') do
-            expect(page.find('span')).to have_content("REQ-#{requirement1.iid}")
-            expect(page.find('textarea#requirementTitle')['value']).to have_content("#{requirement1.title}")
-            expect(page.find('.js-requirement-save')).to have_content('Save changes')
-          end
+        page.within('.requirement-form') do
+          expect(page.find('span')).to have_content("REQ-#{requirement1.iid}")
+          expect(page.find('textarea#requirementTitle')['value']).to have_content("#{requirement1.title}")
+          expect(page.find('.js-requirement-save')).to have_content('Save changes')
         end
       end
 

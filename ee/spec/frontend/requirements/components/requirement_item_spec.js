@@ -2,7 +2,6 @@ import { shallowMount } from '@vue/test-utils';
 
 import { GlLink, GlDeprecatedButton, GlIcon, GlLoadingIcon } from '@gitlab/ui';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
-import RequirementForm from 'ee/requirements/components/requirement_form.vue';
 import RequirementStatusBadge from 'ee/requirements/components/requirement_status_badge.vue';
 
 import {
@@ -92,17 +91,6 @@ describe('RequirementItem', () => {
   });
 
   describe('methods', () => {
-    describe('handleUpdateRequirementSave', () => {
-      it('emits `updateSave` event on component with params passed as it is', () => {
-        wrapper.vm.handleUpdateRequirementSave('foo');
-
-        return wrapper.vm.$nextTick(() => {
-          expect(wrapper.emitted('updateSave')).toBeTruthy();
-          expect(wrapper.emitted('updateSave')[0]).toEqual(['foo']);
-        });
-      });
-    });
-
     describe('handleArchiveClick', () => {
       it('emits `archiveClick` event on component with object containing `requirement.iid` & `state` as "ARCHIVED" as param', () => {
         wrapper.vm.handleArchiveClick();
@@ -148,16 +136,6 @@ describe('RequirementItem', () => {
 
       return wrapper.vm.$nextTick(() => {
         expect(wrapper.classes()).toContain('disabled-content');
-      });
-    });
-
-    it('renders requirement-form component', () => {
-      wrapper.setProps({
-        showUpdateForm: true,
-      });
-
-      return wrapper.vm.$nextTick(() => {
-        expect(wrapper.find(RequirementForm).exists()).toBe(true);
       });
     });
 
