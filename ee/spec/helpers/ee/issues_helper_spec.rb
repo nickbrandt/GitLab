@@ -13,7 +13,7 @@ RSpec.describe EE::IssuesHelper do
     context 'with linked issue' do
       context 'with promoted issue' do
         before do
-          issue.update(promoted_to_epic: new_epic)
+          issue.update!(promoted_to_epic: new_epic)
         end
 
         context 'when user has permission to see new epic' do
