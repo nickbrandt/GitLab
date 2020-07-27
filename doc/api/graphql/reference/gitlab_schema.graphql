@@ -14123,6 +14123,11 @@ input UpdateIssueInput {
   iid: String!
 
   """
+  Indicates discussion is locked on the issue
+  """
+  locked: Boolean
+
+  """
   The project the issue to mutate is in
   """
   projectPath: ID!

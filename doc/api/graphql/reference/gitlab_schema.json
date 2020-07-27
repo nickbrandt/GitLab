@@ -41717,6 +41717,16 @@
               "defaultValue": null
             },
             {
+              "name": "locked",
+              "description": "Indicates discussion is locked on the issue",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "healthStatus",
               "description": "The desired health status",
               "type": {
