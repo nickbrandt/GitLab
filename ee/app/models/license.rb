@@ -74,11 +74,12 @@ class License < ApplicationRecord
     feature_flags
     file_locks
     geo
-    github_project_service_integration
     generic_alert_fingerprinting
+    github_project_service_integration
     group_allowed_email_domains
     group_coverage_reports
     group_ip_restriction
+    group_merge_request_analytics
     group_project_templates
     group_saml
     issues_analytics

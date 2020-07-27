@@ -125,6 +125,10 @@ module EE
         links << :cycle_analytics
       end
 
+      if can?(current_user, :read_group_merge_request_analytics, @group)
+        links << :merge_request_analytics
+      end
+
       if can?(current_user, :read_group_contribution_analytics, @group) || show_promotions?
         links << :contribution_analytics
       end

@@ -21,7 +21,8 @@ module EE
           group_insights_navbar_link(group, current_user),
           issues_analytics_navbar_link(group, current_user),
           productivity_analytics_navbar_link(group, current_user),
-          group_cycle_analytics_navbar_link(group, current_user)
+          group_cycle_analytics_navbar_link(group, current_user),
+          group_merge_request_analytics_navbar_link(group, current_user)
         ].compact
       end
 
@@ -35,6 +36,16 @@ module EE
           title: _('Issues'),
           path: 'issues_analytics#show',
           link: project_analytics_issues_analytics_path(project)
+        )
+      end
+
+      def group_merge_request_analytics_navbar_link(group, current_user)
+        return unless group_sidebar_link?(:merge_request_analytics)
+
+        navbar_sub_item(
+          title: _('Merge Requests'),
+          path: 'groups/analytics/merge_requests_analytics#show',
+          link: group_analytics_merge_request_analytics_path(group)
         )
       end
 

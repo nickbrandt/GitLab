@@ -6,6 +6,7 @@ module Gitlab
     CYCLE_ANALYTICS_FEATURE_FLAG = :cycle_analytics
     PRODUCTIVITY_ANALYTICS_FEATURE_FLAG = :productivity_analytics
     GROUP_COVERAGE_REPORTS_FEATURE_FLAG = :group_coverage_reports
+    GROUP_MERGE_REQUEST_ANALYTICS_FEATURE_FLAG = :group_merge_request_analytics
 
     FEATURE_FLAGS = [
       CYCLE_ANALYTICS_FEATURE_FLAG,
@@ -33,6 +34,10 @@ module Gitlab
 
     def self.group_coverage_reports_enabled?
       feature_enabled?(GROUP_COVERAGE_REPORTS_FEATURE_FLAG)
+    end
+
+    def self.group_merge_request_analytics_enabled?
+      feature_enabled?(GROUP_MERGE_REQUEST_ANALYTICS_FEATURE_FLAG)
     end
 
     def self.feature_enabled_by_default?(flag)
