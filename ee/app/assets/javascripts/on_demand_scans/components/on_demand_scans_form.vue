@@ -1,6 +1,6 @@
 <script>
 import * as Sentry from '@sentry/browser';
-import { s__ } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { isAbsolute, redirectTo } from '~/lib/utils/url_utility';
 import {
@@ -99,8 +99,17 @@ export default {
           mutation: runDastScanMutation,
           variables: this.formData,
         })
-        .then(({ data: { runDastScan: { pipelineUrl } } }) => {
-          redirectTo(pipelineUrl);
+        .then(({ data: { runDastScan: { pipelineUrl, errors } } }) => {
+          if (errors?.length) {
+            createFlash(
+              sprintf(s__('OnDemandScans|Could not run the scan: %{backendErrorMessage}'), {
+                backendErrorMessage: errors.join(', '),
+              }),
+            );
+            this.loading = false;
+          } else {
+            redirectTo(pipelineUrl);
+          }
         })
         .catch(e => {
           Sentry.captureException(e);
