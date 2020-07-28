@@ -29,13 +29,6 @@ export default {
   components: {
     GlFilteredSearch,
   },
-  props: {
-    disabled: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   data() {
     return {
       value: [],
@@ -166,7 +159,6 @@ export default {
 <template>
   <gl-filtered-search
     v-model="value"
-    :disabled="disabled"
     :placeholder="__('Filter results')"
     :clear-button-title="__('Clear')"
     :close-button-title="__('Close')"

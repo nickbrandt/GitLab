@@ -140,9 +140,6 @@ export default {
     stageCount() {
       return this.activeStages.length;
     },
-    hasProject() {
-      return this.selectedProjectIds.length > 0;
-    },
     projectsQueryParams() {
       return {
         per_page: PROJECTS_PER_PAGE,
@@ -265,7 +262,6 @@ export default {
           <filter-bar
             v-if="shouldDisplayFilterBar"
             class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3 gl-border-none"
-            :disabled="!hasProject"
           />
           <div v-if="shouldDisplayFilters" class="gl-justify-content-end gl-white-space-nowrap">
             <date-range
