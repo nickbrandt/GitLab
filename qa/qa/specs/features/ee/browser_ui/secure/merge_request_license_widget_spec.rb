@@ -6,7 +6,7 @@ module QA
   RSpec.describe 'Secure', :docker, :runner do
     describe 'License merge request widget' do
       let(:approved_license_name) { "MIT" }
-      let(:blacklisted_license_name) { "Zlib" }
+      let(:denied_license_name) { "Zlib" }
       let(:executor) {"qa-runner-#{Time.now.to_i}"}
 
       after do
@@ -121,12 +121,12 @@ module QA
 
         Page::MergeRequest::Show.perform do |show|
           show.approve_license_with_mr(approved_license_name)
-          show.blacklist_license_with_mr(blacklisted_license_name)
+          show.deny_license_with_mr(denied_license_name)
 
           show.wait_for_license_compliance_report
 
           expect(show).to have_approved_license approved_license_name
-          expect(show).to have_blacklisted_license blacklisted_license_name
+          expect(show).to have_denied_license denied_license_name
         end
       end
     end
