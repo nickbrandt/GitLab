@@ -52,6 +52,9 @@ export default {
 
       return true;
     },
+    showNoMatchingResultsMessage() {
+      return !this.labelsFetchInProgress && !this.visibleLabels.length;
+    },
   },
   watch: {
     searchKey(value) {
@@ -176,7 +179,7 @@ export default {
             @clickLabel="handleLabelClick(label)"
           />
         </li>
-        <li v-show="!labelsFetchInProgress && !visibleLabels.length" class="p-2 text-center">
+        <li v-show="showNoMatchingResultsMessage" class="gl-p-3 gl-text-center">
           {{ __('No matching results') }}
         </li>
       </smart-virtual-list>
