@@ -58,7 +58,7 @@ module EE
       end
 
       def weight_changes_tracking_enabled?
-        !issuable.is_a?(Epic) && ::Feature.enabled?(:track_issue_weight_change_events, issuable.project)
+        !issuable.is_a?(Epic) && ::Feature.enabled?(:track_issue_weight_change_events, issuable.project, default_enabled: true)
       end
     end
   end
