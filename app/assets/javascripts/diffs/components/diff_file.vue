@@ -2,6 +2,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { escape } from 'lodash';
 import { GlLoadingIcon } from '@gitlab/ui';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { __, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { hasDiff } from '~/helpers/diffs_helper';
@@ -16,6 +17,7 @@ export default {
     DiffContent,
     GlLoadingIcon,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     file: {
       type: Object,
@@ -92,7 +94,7 @@ export default {
     'file.file_hash': {
       handler: function watchFileHash() {
         if (
-          window.gon?.features?.autoExpandCollapsedDiffs &&
+          this.glFeatures.autoExpandCollapsedDiffs &&
           this.viewDiffsFileByFile &&
           this.file.viewer.collapsed
         ) {
@@ -105,7 +107,7 @@ export default {
       immediate: true,
     },
     'file.viewer.collapsed': function setIsCollapsed(newVal) {
-      if (!this.viewDiffsFileByFile && !window.gon?.features?.autoExpandCollapsedDiffs) {
+      if (!this.viewDiffsFileByFile && !this.glFeatures.autoExpandCollapsedDiffs) {
         this.isCollapsed = newVal;
       }
     },
