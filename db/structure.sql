@@ -20245,6 +20245,8 @@ CREATE INDEX index_project_statistics_on_wiki_size_and_project_id ON public.proj
 
 CREATE UNIQUE INDEX index_project_tracing_settings_on_project_id ON public.project_tracing_settings USING btree (project_id);
 
+CREATE INDEX index_projects_aimed_for_deletion ON public.projects USING btree (marked_for_deletion_at) WHERE ((marked_for_deletion_at IS NOT NULL) AND (pending_delete = false));
+
 CREATE INDEX index_projects_api_created_at_id_desc ON public.projects USING btree (created_at, id DESC);
 
 CREATE INDEX index_projects_api_created_at_id_for_archived ON public.projects USING btree (created_at, id) WHERE ((archived = true) AND (pending_delete = false));
@@ -20294,8 +20296,6 @@ CREATE INDEX index_projects_on_last_repository_check_failed ON public.projects U
 CREATE INDEX index_projects_on_last_repository_updated_at ON public.projects USING btree (last_repository_updated_at);
 
 CREATE INDEX index_projects_on_lower_name ON public.projects USING btree (lower((name)::text));
-
-CREATE INDEX index_projects_on_marked_for_deletion_at ON public.projects USING btree (marked_for_deletion_at) WHERE (marked_for_deletion_at IS NOT NULL);
 
 CREATE INDEX index_projects_on_marked_for_deletion_by_user_id ON public.projects USING btree (marked_for_deletion_by_user_id) WHERE (marked_for_deletion_by_user_id IS NOT NULL);
 

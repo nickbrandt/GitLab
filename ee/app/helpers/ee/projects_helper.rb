@@ -246,6 +246,10 @@ module EE
       project&.compliance_framework_setting&.present?
     end
 
+    def scheduled_for_deletion?(project)
+      project.marked_for_deletion_at.present?
+    end
+
     private
 
     def get_project_security_nav_tabs(project, current_user)
