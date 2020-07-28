@@ -17,6 +17,7 @@ module Vulnerabilities
 
       SystemNoteService.change_vulnerability_state(vulnerability, @user) if vulnerability.state_previously_changed?
       Vulnerabilities::Statistics::UpdateService.update_for(vulnerability)
+      Vulnerabilities::HistoricalStatistics::UpdateService.update_for(vulnerability.project)
       true
     end
 

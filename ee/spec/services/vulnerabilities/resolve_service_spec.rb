@@ -22,6 +22,7 @@ RSpec.describe Vulnerabilities::ResolveService do
     end
 
     it_behaves_like 'calls Vulnerabilities::Statistics::UpdateService'
+    it_behaves_like 'calls Vulnerabilities::HistoricalStatistics::UpdateService'
 
     it 'resolves a vulnerability' do
       Timecop.freeze do
