@@ -19385,6 +19385,8 @@ CREATE INDEX index_description_versions_on_issue_id ON public.description_versio
 
 CREATE INDEX index_description_versions_on_merge_request_id ON public.description_versions USING btree (merge_request_id) WHERE (merge_request_id IS NOT NULL);
 
+CREATE INDEX index_design_management_designs_issue_id_relative_position_id ON public.design_management_designs USING btree (issue_id, relative_position, id);
+
 CREATE UNIQUE INDEX index_design_management_designs_on_issue_id_and_filename ON public.design_management_designs USING btree (issue_id, filename);
 
 CREATE INDEX index_design_management_designs_on_project_id ON public.design_management_designs USING btree (project_id);
