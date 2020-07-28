@@ -6,7 +6,7 @@
     .card-header.font-weight-bold.p-3
       = plan.name
       - if is_current_plan
-        .pull-right.text-muted
+        .float-right.text-muted
           = _("Current Plan")
 
     .card-body
@@ -33,7 +33,7 @@
 
     - if purchase_link
       .card-footer.p-3
-        .pull-right{ class: ("invisible" unless purchase_link.action == 'upgrade' || is_current_plan) }
+        .float-right{ class: ("invisible" unless purchase_link.action == 'upgrade' || is_current_plan) }
           - upgrade_button_class = "disabled" if is_current_plan && !namespace.trial_active?
           - cta_class = '-new' if use_new_purchase_flow?(namespace)
           = link_to s_('BillingPlan|Upgrade'), plan_purchase_or_upgrade_url(namespace, plan, current_plan), class: "btn btn-success #{upgrade_button_class} billing-cta-purchase#{cta_class}"
