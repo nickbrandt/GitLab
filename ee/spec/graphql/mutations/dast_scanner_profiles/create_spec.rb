@@ -8,6 +8,7 @@ RSpec.describe Mutations::DastScannerProfiles::Create do
   let(:user) { create(:user) }
   let(:full_path) { project.full_path }
   let(:profile_name) { SecureRandom.hex }
+  let(:dast_scanner_profile) { DastScannerProfile.find_by(project: project, name: profile_name) }
 
   subject(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
 
@@ -38,8 +39,31 @@ RSpec.describe Mutations::DastScannerProfiles::Create do
         group.add_owner(user)
       end
 
-      it 'stubs out the response' do
-        expect(subject[:errors]).to eq(['Not implemented'])
+      it 'returns the dast_scanner_profile id' do
+        expect(subject[:id]).to eq(dast_scanner_profile.to_global_id)
+      end
+
+      it 'calls the dast_scanner_profile creation service' do
+        service = double(described_class)
+        result = double('result', success?: false, errors: [])
+
+        expect(DastScannerProfiles::CreateService).to receive(:new).and_return(service)
+        expect(service).to receive(:execute).with(name: profile_name, spider_timeout: nil, target_timeout: nil).and_return(result)
+
+        subject
+      end
+
+      context 'when the dast_scanner_profile already exists' do
+        it 'returns an error' do
+          subject
+
+          response = mutation.resolve(
+            full_path: full_path,
+            profile_name: profile_name
+          )
+
+          expect(response[:errors]).to include('Name has already been taken')
+        end
       end
 
       context 'when security_on_demand_scans_feature_flag is disabled' do

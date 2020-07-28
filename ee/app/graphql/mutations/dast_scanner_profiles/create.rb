@@ -33,8 +33,14 @@ module Mutations
         project = authorized_find!(full_path: full_path)
         raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project)
 
-        response = ServiceResponse.error(message: 'Not implemented')
-        { errors: response.errors }
+        service = ::DastScannerProfiles::CreateService.new(project, current_user)
+        result = service.execute(name: profile_name, spider_timeout: spider_timeout, target_timeout: target_timeout)
+
+        if result.success?
+          { id: result.payload.to_global_id, errors: [] }
+        else
+          { errors: result.errors }
+        end
       end
 
       private
