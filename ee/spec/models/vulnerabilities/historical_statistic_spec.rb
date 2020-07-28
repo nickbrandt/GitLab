@@ -52,11 +52,11 @@ RSpec.describe Vulnerabilities::HistoricalStatistic do
     it { is_expected.to match_array([historical_statistic_1]) }
   end
 
-  describe '.unnested_by_severity.grouped_by_date' do
+  describe '.with_severities_as_separate_rows.grouped_by_date' do
     let_it_be(:historical_statistic_1) { create(:vulnerability_historical_statistic, date: '2020-08-10', info: 1, unknown: 2, low: 3, medium: 4, high: 5, critical: 6) }
     let_it_be(:historical_statistic_2) { create(:vulnerability_historical_statistic, date: '2020-08-11', info: 7, unknown: 8, low: 9, medium: 10, high: 11, critical: 12) }
 
-    subject { described_class.unnested_by_severity.grouped_by_date.as_json }
+    subject { described_class.with_severities_as_separate_rows.grouped_by_date(:asc).as_json }
 
     let(:expected_collection) do
       [

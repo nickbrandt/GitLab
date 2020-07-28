@@ -23,7 +23,7 @@ module Vulnerabilities
     scope :older_than, ->(days:) { where('"vulnerability_historical_statistics"."date" < now() - interval ?', "#{days} days") }
     scope :between_dates, -> (start_date, end_date) { where(arel_table[:date].between(start_date..end_date)) }
     scope :for_project, -> (project) { where(project: project) }
-    scope :unnested_by_severity, -> do
+    scope :with_severities_as_separate_rows, -> do
       severities = ::Vulnerabilities::Finding::SEVERITY_LEVELS.keys
 
       select(
@@ -33,9 +33,9 @@ module Vulnerabilities
       )
     end
 
-    scope :grouped_by_date, -> do
+    scope :grouped_by_date(sort = :asc), -> do
       group(:date)
-        .order(date: :asc, severity: :asc)
+        .order(date: sort, severity: sort)
     end
   end
 end

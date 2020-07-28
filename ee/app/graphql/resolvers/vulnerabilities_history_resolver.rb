@@ -18,7 +18,7 @@ module Resolvers
       ::Vulnerabilities::HistoricalStatistic
         .between_dates(args[:start_date], args[:end_date])
         .for_project(vulnerable.projects)
-        .unnested_by_severity
+        .with_severities_as_separate_rows
         .grouped_by_date
         .to_a
     end
