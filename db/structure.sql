@@ -19024,8 +19024,6 @@ CREATE INDEX index_boards_on_project_id ON public.boards USING btree (project_id
 
 CREATE INDEX index_broadcast_message_on_ends_at_and_broadcast_type_and_id ON public.broadcast_messages USING btree (ends_at, broadcast_type, id);
 
-CREATE INDEX index_chat_names_on_service_id ON public.chat_names USING btree (service_id);
-
 CREATE UNIQUE INDEX index_chat_names_on_service_id_and_team_id_and_chat_id ON public.chat_names USING btree (service_id, team_id, chat_id);
 
 CREATE UNIQUE INDEX index_chat_names_on_user_id_and_service_id ON public.chat_names USING btree (user_id, service_id);
