@@ -19033,6 +19033,9 @@ msgstr ""
 msgid "PrometheusAlerts|Operator"
 msgstr ""
 
+msgid "PrometheusAlerts|Runbook"
+msgstr ""
+
 msgid "PrometheusAlerts|Select query"
 msgstr ""
 
