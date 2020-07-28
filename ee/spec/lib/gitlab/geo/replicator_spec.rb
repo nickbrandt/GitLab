@@ -179,68 +179,6 @@ RSpec.describe Gitlab::Geo::Replicator do
       end
     end
 
-    describe '#excluded_by_selective_sync?' do
-      subject(:replicator) { Geo::DummyReplicator.new }
-
-      before do
-        stub_current_geo_node(secondary_node)
-      end
-
-      context 'when parent_project_id is not nil' do
-        before do
-          allow(replicator).to receive(:parent_project_id).and_return(123456)
-        end
-
-        context 'when the current Geo node excludes the parent_project due to selective sync' do
-          it 'returns true' do
-            expect(secondary_node).to receive(:projects_include?).with(123456).and_return(false)
-
-            expect(replicator.excluded_by_selective_sync?).to eq(true)
-          end
-        end
-
-        context 'when the current Geo node does not exclude the parent_project due to selective sync' do
-          it 'returns false' do
-            expect(secondary_node).to receive(:projects_include?).with(123456).and_return(true)
-
-            expect(replicator.excluded_by_selective_sync?).to eq(false)
-          end
-        end
-      end
-
-      context 'when parent_project_id is nil' do
-        before do
-          expect(replicator).to receive(:parent_project_id).and_return(nil)
-        end
-
-        it 'returns false' do
-          expect(replicator.excluded_by_selective_sync?).to eq(false)
-        end
-      end
-    end
-
-    describe '#parent_project_id' do
-      subject(:replicator) { Geo::DummyReplicator.new(model_record: model_record) }
-
-      # We cannot infer parent project, so parent_project_id should be overridden.
-      context 'when model_record does not respond to project_id' do
-        let(:model_record) { double(:model_record, id: 555) }
-
-        it 'raises NotImplementedError' do
-          expect { replicator.parent_project_id }.to raise_error(NotImplementedError)
-        end
-      end
-
-      # We assume project_id to be the parent project.
-      context 'when model_record responds to project_id' do
-        let(:model_record) { double(:model_record, id: 555, project_id: 1234) }
-
-        it 'does not error' do
-          expect(replicator.parent_project_id).to eq(1234)
-        end
-      end
-    end
-
     describe '.for_replicable_params' do
       it 'returns the corresponding Replicator instance' do
         replicator = described_class.for_replicable_params(replicable_name: 'dummy', replicable_id: 123456)
@@ -294,6 +232,10 @@ RSpec.describe Gitlab::Geo::Replicator do
           expect(replicator.model_record_id).to eq(1234)
         end
       end
+    end
+
+    describe '#in_replicables_for_geo_node?' do
+      it { is_expected.to delegate_method(:in_replicables_for_geo_node?).to(:model_record) }
     end
   end
 end

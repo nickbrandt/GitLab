@@ -104,9 +104,9 @@ RSpec.shared_examples 'a blob replicator' do
   end
 
   describe '#consume_event_created' do
-    context "when the blob's project is not excluded by selective sync" do
+    context "when the blob's project is in replicables for this geo node" do
       it 'invokes Geo::BlobDownloadService' do
-        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(false)
+        expect(replicator).to receive(:in_replicables_for_geo_node?).and_return(true)
         service = double(:service)
 
         expect(service).to receive(:execute)
@@ -116,9 +116,9 @@ RSpec.shared_examples 'a blob replicator' do
       end
     end
 
-    context "when the blob's project is excluded by selective sync" do
+    context "when the blob's project is not in replicables for this geo node" do
       it 'does not invoke Geo::BlobDownloadService' do
-        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(true)
+        expect(replicator).to receive(:in_replicables_for_geo_node?).and_return(false)
 
         expect(::Geo::BlobDownloadService).not_to receive(:new)
 
@@ -128,9 +128,9 @@ RSpec.shared_examples 'a blob replicator' do
   end
 
   describe '#consume_event_deleted' do
-    context "when the blob's project is not excluded by selective sync" do
+    context "when the blob's project is in replicables for this geo node" do
       it 'invokes Geo::FileRegistryRemovalService' do
-        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(false)
+        expect(replicator).to receive(:in_replicables_for_geo_node?).and_return(true)
         service = double(:service)
 
         expect(service).to receive(:execute)
@@ -141,9 +141,9 @@ RSpec.shared_examples 'a blob replicator' do
       end
     end
 
-    context "when the blob's project is excluded by selective sync" do
+    context "when the blob's project is not in replicables for this geo node" do
       it 'does not invoke Geo::FileRegistryRemovalService' do
-        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(true)
+        expect(replicator).to receive(:in_replicables_for_geo_node?).and_return(false)
 
         expect(::Geo::FileRegistryRemovalService).not_to receive(:new)
 

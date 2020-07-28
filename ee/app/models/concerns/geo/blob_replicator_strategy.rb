@@ -21,7 +21,7 @@ module Geo
 
     # Called by Gitlab::Geo::Replicator#consume
     def consume_event_created(**params)
-      return if excluded_by_selective_sync?
+      return unless in_replicables_for_geo_node?
 
       download
     end
@@ -34,7 +34,7 @@ module Geo
 
     # Called by Gitlab::Geo::Replicator#consume
     def consume_event_deleted(**params)
-      return if excluded_by_selective_sync?
+      return unless in_replicables_for_geo_node?
 
       replicate_destroy(params)
     end
