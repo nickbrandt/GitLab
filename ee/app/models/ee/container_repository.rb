@@ -5,7 +5,7 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      scope :project_id_in, ->(ids) { joins(:project).merge(Project.id_in(ids)) }
+      scope :project_id_in, ->(ids) { joins(:project).merge(::Project.id_in(ids)) }
     end
 
     def push_blob(digest, file_path)

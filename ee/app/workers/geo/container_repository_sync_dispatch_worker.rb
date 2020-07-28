@@ -28,35 +28,49 @@ module Geo
       { id: repository_id, job_id: job_id } if job_id
     end
 
+    def scheduled_repository_ids
+      scheduled_jobs.map { |data| data[:id] }
+    end
+
     # Pools for new resources to be transferred
     #
     # @return [Array] resources to be transferred
     def load_pending_resources
-      resources = find_unsynced_repositories(batch_size: db_retrieve_batch_size)
+      resources = find_container_repository_ids_not_synced(batch_size: db_retrieve_batch_size)
       remaining_capacity = db_retrieve_batch_size - resources.size
 
       if remaining_capacity.zero?
         resources
       else
-        resources + find_retryable_failed_repositories(batch_size: remaining_capacity)
+        resources + find_retryable_container_registry_ids(batch_size: remaining_capacity)
       end
     end
 
-    def find_unsynced_repositories(batch_size:)
-      Geo::ContainerRepositoryRegistryFinder
-        .new(current_node_id: current_node.id)
-        .find_unsynced(batch_size: batch_size, except_repository_ids: scheduled_repository_ids)
-        .pluck_primary_key
+    def find_container_repository_ids_not_synced(batch_size:)
+      if Geo::ContainerRepositoryRegistry.registry_consistency_worker_enabled?
+        registry_finder
+          .find_never_synced_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
+          .pluck_model_foreign_key
+      else
+        registry_finder
+          .find_unsynced(batch_size: batch_size, except_ids: scheduled_repository_ids)
+          .pluck_primary_key
+      end
     end
 
-    def find_retryable_failed_repositories(batch_size:)
-      Geo::ContainerRepositoryRegistryFinder
-          .new(current_node_id: current_node.id)
-          .find_retryable_failed_ids(batch_size: batch_size, except_repository_ids: scheduled_repository_ids)
+    def find_retryable_container_registry_ids(batch_size:)
+      if Geo::ContainerRepositoryRegistry.registry_consistency_worker_enabled?
+        registry_finder
+          .find_retryable_dirty_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
+          .pluck_model_foreign_key
+      else
+        registry_finder
+            .find_retryable_failed_ids(batch_size: batch_size, except_ids: scheduled_repository_ids)
+      end
     end
 
-    def scheduled_repository_ids
-      scheduled_jobs.map { |data| data[:id] }
+    def registry_finder
+      @registry_finder ||= Geo::ContainerRepositoryRegistryFinder.new(current_node_id: current_node.id)
     end
   end
 end

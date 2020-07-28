@@ -2,19 +2,20 @@
 
 require 'spec_helper'
 
-RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
+RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
   include EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
-  let(:primary) { create(:geo_node, :primary) }
-  let(:secondary) { create(:geo_node) }
-
-  before do
-    stub_current_geo_node(secondary)
-  end
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
 
   let(:worker_class) { described_class }
   let(:batch_size) { described_class::BATCH_SIZE }
+
+  before do
+    stub_current_geo_node(secondary)
+    stub_registry_replication_config(enabled: true)
+  end
 
   it_behaves_like 'reenqueuer'
 
@@ -84,6 +85,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       upload = create(:upload)
       package_file = create(:conan_package_file, :conan_package)
       vulnerability_export = create(:vulnerability_export, :with_csv_file)
+      container_repository = create(:container_repository, project: project)
 
       expect(Geo::LfsObjectRegistry.where(lfs_object_id: lfs_object.id).count).to eq(0)
       expect(Geo::JobArtifactRegistry.where(artifact_id: job_artifact.id).count).to eq(0)
@@ -92,6 +94,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       expect(Geo::UploadRegistry.where(file_id: upload.id).count).to eq(0)
       expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(0)
       expect(Geo::VulnerabilityExportRegistry.where(vulnerability_export_id: vulnerability_export.id).count).to eq(0)
+      expect(Geo::ContainerRepositoryRegistry.where(container_repository_id: container_repository.id).count).to eq(0)
 
       subject.perform
 
@@ -102,6 +105,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
       expect(Geo::UploadRegistry.where(file_id: upload.id).count).to eq(1)
       expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(1)
       expect(Geo::VulnerabilityExportRegistry.where(vulnerability_export_id: vulnerability_export.id).count).to eq(1)
+      expect(Geo::ContainerRepositoryRegistry.where(container_repository_id: container_repository.id).count).to eq(1)
     end
 
     context 'when geo_design_registry_ssot_sync is disabled' do
@@ -120,8 +124,33 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
         allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: batch_size).and_call_original
         allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::ProjectRegistry, batch_size: batch_size).and_call_original
         allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::VulnerabilityExportRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::ContainerRepositoryRegistry, batch_size: batch_size).and_call_original
 
         expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::DesignRegistry, batch_size: batch_size)
+
+        subject.perform
+      end
+    end
+
+    context 'when geo_container_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_container_registry_ssot_sync: false)
+      end
+
+      it 'returns false' do
+        expect(subject.perform).to be_falsey
+      end
+
+      it 'does not execute RegistryConsistencyService for container repositories' do
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::JobArtifactRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::ProjectRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::DesignRegistry, batch_size: batch_size).and_call_original
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::VulnerabilityExportRegistry, batch_size: batch_size).and_call_original
+
+        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::ContainerRepositoryRegistry, batch_size: batch_size)
 
         subject.perform
       end

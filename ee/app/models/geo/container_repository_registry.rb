@@ -3,9 +3,12 @@
 class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
   include ::Delay
 
+  MODEL_CLASS = ::ContainerRepository
+  MODEL_FOREIGN_KEY = :container_repository_id
+
   belongs_to :container_repository
 
-  scope :repository_id_not_in, -> (ids) { where.not(container_repository_id: ids) }
+  scope :never_synced, -> { with_state(:pending).where(last_synced_at: nil) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
@@ -34,8 +37,26 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
     end
   end
 
+  def self.finder_class
+    ::Geo::ContainerRepositoryRegistryFinder
+  end
+
+  def self.find_registry_differences(range)
+    finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
+  end
+
+  def self.delete_for_model_ids(container_repository_ids)
+    where(container_repository_id: container_repository_ids).delete_all
+
+    container_repository_ids
+  end
+
   def self.pluck_container_repository_key
     where(nil).pluck(:container_repository_id)
+  end
+
+  def self.registry_consistency_worker_enabled?
+    Feature.enabled?(:geo_container_registry_ssot_sync, default_enabled: true)
   end
 
   def self.replication_enabled?
