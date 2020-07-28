@@ -1,0 +1,6 @@
+---
+title: Mark Vulnerabilities as resolved only if the latest pipeline for default branch
+  ran respective security job
+merge_request: 37937
+author:
+type: fixed
