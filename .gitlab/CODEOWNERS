@@ -40,6 +40,27 @@
 /doc/user/project/repository/index.md @marcia
 /doc/user/project/repository/repository_mirroring.md @marcia
 /doc/user/project/repository/web_editor.md @marcia
+/doc/user/project/autocomplete_characters.md @marcia
+/doc/user/project/badges.md @marcia
+/doc/user/project/code_intelligence.md @marcia
+/doc/user/project/code_owners.md @marcia
+/doc/user/project/file_lock.md @marcia
+/doc/user/project/git_attributes.md @marcia
+/doc/user/project/highlighting.md @marcia
+/doc/user/project/index.md @marcia
+/doc/user/project/protected_branches.md @marcia
+/doc/user/project/protected_tags.md @marcia
+/doc/user/project/push_options.md @marcia
+/doc/user/project/repository/branches/index.md @marcia
+/doc/user/project/repository/gpg_signed_commits/index.md @marcia
+/doc/user/project/repository/jupyter_notebooks/index.md @marcia
+/doc/user/project/repository/x509_signed_commits/index.md @marcia
+/doc/user/project/settings/import_export.md @marcia
+/doc/user/project/settings/index.md @marcia
+/doc/user/project/settings/project_access_tokens.md @marcia
+/doc/user/project/static_site_editor/index.md @marcia
+/doc/user/project/web_ide/index.md @marcia
+/doc/user/project/wiki/index.md @marcia
 
 [Frontend]
 *.scss @annabeldunstone @gitlab-org/maintainers/frontend
