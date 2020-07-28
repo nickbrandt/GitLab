@@ -104,7 +104,9 @@ module AlertManagement
     end
 
     def am_alert
-      @am_alert ||= AlertManagement::Alert.not_resolved.for_fingerprint(project, gitlab_fingerprint).first
+      strong_memoize(:am_alert) do
+        AlertManagement::Alert.not_resolved.for_fingerprint(project, gitlab_fingerprint).first
+      end
     end
 
     def bad_request
