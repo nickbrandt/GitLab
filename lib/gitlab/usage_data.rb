@@ -353,9 +353,7 @@ module Gitlab
 
         results
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
-      # rubocop: disable CodeReuse/ActiveRecord
       def services_usage
         # rubocop: disable UsageData/LargeTable:
         Service.available_services_names.without('jira').each_with_object({}) do |service_name, response|
@@ -391,15 +389,6 @@ module Gitlab
       rescue ActiveRecord::StatementInvalid
         { projects_jira_server_active: FALLBACK, projects_jira_cloud_active: FALLBACK, projects_jira_active: FALLBACK }
       end
-
-      # rubocop: disable UsageData/LargeTable
-      def successful_deployments_with_cluster(scope)
-        scope
-          .joins(cluster: :deployments)
-          .merge(Clusters::Cluster.enabled)
-          .merge(Deployment.success)
-      end
-      # rubocop: enable UsageData/LargeTable
       # rubocop: enable CodeReuse/ActiveRecord
 
       def jira_import_usage
@@ -413,6 +402,17 @@ module Gitlab
         }
         # rubocop: enable UsageData/LargeTable
       end
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      # rubocop: disable UsageData/LargeTable
+      def successful_deployments_with_cluster(scope)
+        scope
+          .joins(cluster: :deployments)
+          .merge(Clusters::Cluster.enabled)
+          .merge(Deployment.success)
+      end
+      # rubocop: enable UsageData/LargeTable
+      # rubocop: enable CodeReuse/ActiveRecord
 
       def user_preferences_usage
         {} # augmented in EE
