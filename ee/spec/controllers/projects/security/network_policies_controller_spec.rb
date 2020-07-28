@@ -12,7 +12,7 @@ RSpec.describe Projects::Security::NetworkPoliciesController do
   let_it_be(:action_params) { { project_id: project, namespace_id: project.namespace, environment_id: environment.id } }
 
   shared_examples 'CRUD service errors' do
-    context 'with a error service response' do
+    context 'with an error service response' do
       before do
         allow(service).to receive(:execute) { ServiceResponse.error(http_status: :bad_request, message: 'error') }
       end
