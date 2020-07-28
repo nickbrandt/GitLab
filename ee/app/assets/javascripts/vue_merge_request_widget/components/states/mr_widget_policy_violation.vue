@@ -20,7 +20,7 @@ export default {
     </div>
     <div class="media-body">
       <strong class="gl-font-weight-bold gl-text-gray-800 gl-pl-2">
-        {{ s__('mrWidget|You can only merge once the denied license is removed') }}
+        {{ s__('mrWidget|You can merge after removing denied licenses') }}
       </strong>
     </div>
   </div>

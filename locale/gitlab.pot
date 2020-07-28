@@ -28874,10 +28874,10 @@ msgstr ""
 msgid "mrWidget|You can delete the source branch now"
 msgstr ""
 
-msgid "mrWidget|You can merge this merge request manually using the"
+msgid "mrWidget|You can merge after removing denied licenses"
 msgstr ""
 
-msgid "mrWidget|You can only merge once the denied license is removed"
+msgid "mrWidget|You can merge this merge request manually using the"
 msgstr ""
 
 msgid "mrWidget|Your password"
