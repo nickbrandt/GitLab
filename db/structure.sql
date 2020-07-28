@@ -15279,7 +15279,6 @@ CREATE TABLE public.service_desk_settings (
 CREATE TABLE public.services (
     id integer NOT NULL,
     type character varying,
-    title character varying,
     project_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
@@ -15299,7 +15298,6 @@ CREATE TABLE public.services (
     job_events boolean DEFAULT false NOT NULL,
     confidential_note_events boolean DEFAULT true,
     deployment_events boolean DEFAULT false NOT NULL,
-    description character varying(500),
     comment_on_event_enabled boolean DEFAULT true NOT NULL,
     template boolean DEFAULT false,
     instance boolean DEFAULT false NOT NULL,
