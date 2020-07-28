@@ -86,7 +86,7 @@ export default {
       :img-css-classes="imgCssClasses"
       :img-src="avatarUrl(assignee)"
       :img-size="iconSize"
-      class="js-no-trigger"
+      class="js-no-trigger author-link"
       tooltip-placement="bottom"
     >
       <span class="js-assignee-tooltip">
