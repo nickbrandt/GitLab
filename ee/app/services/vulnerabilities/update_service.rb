@@ -19,6 +19,7 @@ module Vulnerabilities
 
       vulnerability.update!(vulnerability_params)
       Statistics::UpdateService.update_for(vulnerability)
+      HistoricalStatistics::UpdateService.update_for(project)
 
       vulnerability
     end

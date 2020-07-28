@@ -21,6 +21,7 @@ RSpec.describe Vulnerabilities::CreateService do
     end
 
     it_behaves_like 'calls Vulnerabilities::Statistics::UpdateService'
+    it_behaves_like 'calls Vulnerabilities::HistoricalStatistics::UpdateService'
 
     it 'creates a vulnerability from finding and attaches it to the vulnerability' do
       expect { subject }.to change { project.vulnerabilities.count }.by(1)

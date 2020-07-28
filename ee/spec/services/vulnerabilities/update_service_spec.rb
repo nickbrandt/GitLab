@@ -23,6 +23,7 @@ RSpec.describe Vulnerabilities::UpdateService do
     end
 
     it_behaves_like 'calls Vulnerabilities::Statistics::UpdateService'
+    it_behaves_like 'calls Vulnerabilities::HistoricalStatistics::UpdateService'
 
     context 'when neither severity nor confidence are overridden' do
       it 'updates the vulnerability from updated finding (title, severity and confidence only)', :aggregate_failures do
