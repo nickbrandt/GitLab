@@ -42,15 +42,16 @@ export const receiveStageDataError = ({ commit }) => {
   createFlash(__('There was an error fetching data for the selected stage'));
 };
 
-export const fetchStageData = ({ state, dispatch, getters }, slug) => {
-  const { cycleAnalyticsRequestParams = {} } = getters;
-  const {
-    selectedGroup: { fullPath },
-  } = state;
-
+export const fetchStageData = ({ dispatch, getters }, slug) => {
+  const { cycleAnalyticsRequestParams = {}, currentValueStreamId, currentGroupPath } = getters;
   dispatch('requestStageData');
 
-  return Api.cycleAnalyticsStageEvents(fullPath, slug, cycleAnalyticsRequestParams)
+  return Api.cycleAnalyticsStageEvents(
+    currentGroupPath,
+    currentValueStreamId,
+    slug,
+    cycleAnalyticsRequestParams,
+  )
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
     .catch(error => dispatch('receiveStageDataError', error));
 };
@@ -72,13 +73,23 @@ const fetchStageMedian = (currentGroupPath, stageId, params) =>
   }));
 
 export const fetchStageMedianValues = ({ dispatch, getters }) => {
-  const { currentGroupPath, cycleAnalyticsRequestParams, activeStages } = getters;
+  const {
+    currentGroupPath,
+    cycleAnalyticsRequestParams,
+    activeStages,
+    currentValueStreamId,
+  } = getters;
   const stageIds = activeStages.map(s => s.slug);
 
   dispatch('requestStageMedianValues');
   return Promise.all(
     stageIds.map(stageId =>
-      fetchStageMedian(currentGroupPath, stageId, cycleAnalyticsRequestParams),
+      fetchStageMedian(
+        currentGroupPath,
+        currentValueStreamId,
+        stageId,
+        cycleAnalyticsRequestParams,
+      ),
     ),
   )
     .then(data => dispatch('receiveStageMedianValuesSuccess', data))

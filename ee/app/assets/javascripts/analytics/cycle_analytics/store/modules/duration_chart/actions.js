@@ -23,13 +23,19 @@ export const receiveDurationDataError = ({ commit }) => {
 export const fetchDurationData = ({ dispatch, rootGetters }) => {
   dispatch('requestDurationData');
 
-  const { cycleAnalyticsRequestParams, activeStages, currentGroupPath } = rootGetters;
+  const {
+    cycleAnalyticsRequestParams,
+    activeStages,
+    currentGroupPath,
+    currentValueStreamId,
+  } = rootGetters;
   return Promise.all(
     activeStages.map(stage => {
       const { slug } = stage;
 
       return Api.cycleAnalyticsDurationChart(
         currentGroupPath,
+        currentValueStreamId,
         slug,
         cycleAnalyticsRequestParams,
       ).then(({ data }) => ({
@@ -53,7 +59,12 @@ export const receiveDurationMedianDataError = ({ commit }) => {
 
 export const fetchDurationMedianData = ({ dispatch, rootState, rootGetters }) => {
   const { startDate, endDate } = rootState;
-  const { cycleAnalyticsRequestParams, activeStages, currentGroupPath } = rootGetters;
+  const {
+    cycleAnalyticsRequestParams,
+    activeStages,
+    currentGroupPath,
+    currentValueStreamId,
+  } = rootGetters;
 
   const offsetValue = getDayDifference(new Date(startDate), new Date(endDate));
   const offsetCreatedAfter = getDateInPast(new Date(startDate), offsetValue);
@@ -63,7 +74,7 @@ export const fetchDurationMedianData = ({ dispatch, rootState, rootGetters }) =>
     activeStages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(currentGroupPath, slug, {
+      return Api.cycleAnalyticsDurationChart(currentGroupPath, currentValueStreamId, slug, {
         ...cycleAnalyticsRequestParams,
         created_after: dateFormat(offsetCreatedAfter, dateFormats.isoDate),
         created_before: dateFormat(offsetCreatedBefore, dateFormats.isoDate),
