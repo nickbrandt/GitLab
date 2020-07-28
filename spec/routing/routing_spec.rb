@@ -375,3 +375,10 @@ RSpec.describe Snippets::BlobsController, "routing" do
       .to route_to('snippets/blobs#raw', snippet_id: '1', ref: 'master', path: 'lib/version.rb')
   end
 end
+
+# jwks  GET /-/jwks(.:format)  jwks#index
+RSpec.describe JwksController, "routing" do
+  it "to #index" do
+    expect(get('/-/jwks')).to route_to('jwks#index')
+  end
+end
