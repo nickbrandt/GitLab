@@ -65,6 +65,28 @@ RSpec.describe Projects::UpdateRemoteMirrorService do
       expect(remote_mirror.last_error).to include('Badly broken')
     end
 
+    context 'when the URL is blocked' do
+      before do
+        allow(Gitlab::UrlBlocker).to receive(:blocked_url?).and_return(true)
+      end
+
+      it 'fails and returns error status' do
+        expect(execute!).to eq(status: :error, message: 'The remote mirror URL is invalid.')
+      end
+    end
+
+    context 'when the URL is localhost' do
+      let(:localhost_url) { "git://localhost:1234/some-path?some-query=some-val\#@example.com/" }
+
+      before do
+        allow(remote_mirror).to receive(:url).and_return(CGI.escape(localhost_url))
+      end
+
+      it 'fails and returns error status' do
+        expect(execute!).to eq(status: :error, message: 'The remote mirror URL is invalid.')
+      end
+    end
+
     context 'when the update fails because of a `Gitlab::Git::CommandError`' do
       before do
         allow(project.repository).to receive(:fetch_remote).and_raise(Gitlab::Git::CommandError.new('fetch failed'))
