@@ -2,6 +2,8 @@
 
 module Vulnerabilities
   class HistoricalStatistic < ApplicationRecord
+    include EachBatch
+
     self.table_name = 'vulnerability_historical_statistics'
 
     belongs_to :project, optional: false
@@ -17,5 +19,7 @@ module Vulnerabilities
     validates :info, numericality: { greater_than_or_equal_to: 0 }
 
     enum letter_grade: Vulnerabilities::Statistic.letter_grades
+
+    scope :older_than, ->(days:) { where('"vulnerability_historical_statistics"."date" < now() - interval ?', "#{days} days") }
   end
 end
