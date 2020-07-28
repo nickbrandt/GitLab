@@ -516,6 +516,55 @@ RSpec.describe Gitlab::UsageData do
             user_license_management_jobs: 1,
             user_sast_jobs: 1,
             user_secret_detection_jobs: 1,
+            sast_pipeline: 0,
+            dependency_scanning_pipeline: 0,
+            container_scanning_pipeline: 0,
+            dast_pipeline: 0,
+            secret_detection_pipeline: 0,
+            coverage_fuzzing_pipeline: 0,
+            user_unique_users_all_secure_scanners: 1
+          )
+        end
+
+        it 'counts pipelines that have security jobs' do
+          for_defined_days_back do
+            ds_build = create(:ci_build, name: 'retirejs', user: user, status: 'success')
+            ds_bundler_build = create(:ci_build, name: 'bundler-audit', user: user, commit_id: ds_build.pipeline.id, status: 'success')
+            secret_detection_build = create(:ci_build, name: 'secret', user: user, commit_id: ds_build.pipeline.id, status: 'success')
+            cs_build = create(:ci_build, name: 'klar', user: user, status: 'success')
+            sast_build = create(:ci_build, name: 'sast', user: user, status: 'success', retried: true)
+            create(:security_scan, build: ds_build, scan_type: 'dependency_scanning' )
+            create(:security_scan, build: ds_bundler_build, scan_type: 'dependency_scanning')
+            create(:security_scan, build: secret_detection_build, scan_type: 'secret_detection')
+            create(:security_scan, build: cs_build, scan_type: 'container_scanning')
+            create(:security_scan, build: sast_build, scan_type: 'sast')
+          end
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:secure]).to include(
+            user_preferences_group_overview_security_dashboard: 3,
+            user_container_scanning_jobs: 1,
+            user_dast_jobs: 1,
+            user_dependency_scanning_jobs: 1,
+            user_license_management_jobs: 1,
+            user_sast_jobs: 1,
+            user_secret_detection_jobs: 1,
+            user_unique_users_all_secure_scanners: 1
+          )
+
+          expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to include(
+            user_preferences_group_overview_security_dashboard: 3,
+            user_container_scanning_jobs: 1,
+            user_dast_jobs: 1,
+            user_dependency_scanning_jobs: 1,
+            user_license_management_jobs: 1,
+            user_sast_jobs: 1,
+            user_secret_detection_jobs: 1,
+            sast_pipeline: 0,
+            dependency_scanning_pipeline: 1,
+            container_scanning_pipeline: 1,
+            dast_pipeline: 0,
+            secret_detection_pipeline: 1,
+            coverage_fuzzing_pipeline: 0,
             user_unique_users_all_secure_scanners: 1
           )
         end
@@ -535,6 +584,12 @@ RSpec.describe Gitlab::UsageData do
             user_license_management_jobs: 1,
             user_sast_jobs: 2,
             user_secret_detection_jobs: 1,
+            sast_pipeline: 0,
+            dependency_scanning_pipeline: 0,
+            container_scanning_pipeline: 0,
+            dast_pipeline: 0,
+            secret_detection_pipeline: 0,
+            coverage_fuzzing_pipeline: 0,
             user_unique_users_all_secure_scanners: 3
           )
         end
@@ -552,6 +607,12 @@ RSpec.describe Gitlab::UsageData do
             user_license_management_jobs: 2,
             user_sast_jobs: 1,
             user_secret_detection_jobs: 1,
+            sast_pipeline: 0,
+            dependency_scanning_pipeline: 0,
+            container_scanning_pipeline: 0,
+            dast_pipeline: 0,
+            secret_detection_pipeline: 0,
+            coverage_fuzzing_pipeline: 0,
             user_unique_users_all_secure_scanners: 1
           )
         end
@@ -568,6 +629,12 @@ RSpec.describe Gitlab::UsageData do
             user_license_management_jobs: -1,
             user_sast_jobs: -1,
             user_secret_detection_jobs: -1,
+            sast_pipeline: -1,
+            dependency_scanning_pipeline: -1,
+            container_scanning_pipeline: -1,
+            dast_pipeline: -1,
+            secret_detection_pipeline: -1,
+            coverage_fuzzing_pipeline: -1,
             user_unique_users_all_secure_scanners: -1
           )
         end
