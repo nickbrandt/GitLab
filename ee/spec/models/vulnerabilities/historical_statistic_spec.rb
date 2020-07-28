@@ -19,4 +19,14 @@ RSpec.describe Vulnerabilities::HistoricalStatistic do
     it { is_expected.to validate_numericality_of(:info).is_greater_than_or_equal_to(0) }
     it { is_expected.to define_enum_for(:letter_grade).with_values(%i(a b c d f)) }
   end
+
+  describe '.older_than' do
+    let_it_be(:statistic_1) { create(:vulnerability_historical_statistic, date: 99.days.ago) }
+    let_it_be(:statistic_2) { create(:vulnerability_historical_statistic, date: 100.days.ago) }
+    let_it_be(:statistic_3) { create(:vulnerability_historical_statistic, date: 101.days.ago) }
+
+    subject(:older_than) { described_class.older_than(days: 100) }
+
+    it { is_expected.to match_array([statistic_2, statistic_3]) }
+  end
 end
