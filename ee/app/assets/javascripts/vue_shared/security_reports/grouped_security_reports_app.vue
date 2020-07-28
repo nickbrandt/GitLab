@@ -7,12 +7,11 @@ import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';
 import Tracking from '~/tracking';
 import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 import IssueModal from './components/modal.vue';
 import DastModal from './components/dast_modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
-import { GlSprintf, GlLink, GlModalDirective } from '@gitlab/ui';
+import { GlButton, GlSprintf, GlLink, GlModalDirective } from '@gitlab/ui';
 import { mrStates } from '~/mr_popover/constants';
 import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
 import { fetchPolicies } from '~/lib/graphql';
@@ -27,10 +26,10 @@ export default {
     SummaryRow,
     SecuritySummary,
     IssueModal,
-    Icon,
     GlSprintf,
     GlLink,
     DastModal,
+    GlButton,
   },
   directives: {
     'gl-modal': GlModalDirective,
@@ -368,12 +367,14 @@ export default {
     </template>
 
     <template v-if="pipelinePath" #actionButtons>
-      <div>
-        <a :href="securityTab" target="_blank" class="btn btn-default btn-sm float-right gl-mr-3">
-          <span>{{ s__('ciReport|View full report') }}</span>
-          <icon :size="16" name="external-link" />
-        </a>
-      </div>
+      <gl-button
+        :href="securityTab"
+        target="_blank"
+        icon="external-link"
+        class="gl-mr-3 report-btn"
+      >
+        {{ s__('ciReport|View full report') }}
+      </gl-button>
     </template>
 
     <template v-if="isMRActive && isBaseSecurityReportOutOfDate" #subHeading>

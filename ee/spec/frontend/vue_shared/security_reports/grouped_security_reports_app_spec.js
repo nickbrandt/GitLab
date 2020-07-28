@@ -355,7 +355,14 @@ describe('Grouped security reports app', () => {
     });
 
     it('should calculate the security tab path', () => {
-      expect(wrapper.vm.securityTab).toEqual(`${pipelinePath}/security`);
+      const button = wrapper.find('.report-btn');
+      expect(button.attributes('target')).toBe('_blank');
+      expect(button.attributes('href')).toBe(`${pipelinePath}/security`);
+    });
+
+    it('should render view full report button', () => {
+      const button = wrapper.find('.report-btn');
+      expect(button.exists()).toBe(true);
     });
   });
 
