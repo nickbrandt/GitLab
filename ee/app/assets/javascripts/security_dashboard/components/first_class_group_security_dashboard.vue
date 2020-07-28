@@ -3,18 +3,13 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import GroupSecurityVulnerabilities from 'ee/security_dashboard/components/first_class_group_security_dashboard_vulnerabilities.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
-import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vulnerability_chart.vue';
 import CsvExportButton from './csv_export_button.vue';
-import VulnerabilitySeverity from './vulnerability_severity.vue';
-import vulnerabilityHistoryQuery from '../graphql/group_vulnerability_history.query.graphql';
 import DashboardNotConfigured from './empty_states/group_dashboard_not_configured.vue';
 
 export default {
   components: {
     SecurityDashboardLayout,
     GroupSecurityVulnerabilities,
-    VulnerabilitySeverity,
-    VulnerabilityChart,
     Filters,
     CsvExportButton,
     DashboardNotConfigured,
@@ -22,10 +17,6 @@ export default {
   },
   props: {
     groupFullPath: {
-      type: String,
-      required: true,
-    },
-    vulnerableProjectsEndpoint: {
       type: String,
       required: true,
     },
@@ -39,7 +30,6 @@ export default {
       filters: {},
       projects: [],
       projectsWereFetched: false,
-      vulnerabilityHistoryQuery,
     };
   },
   computed: {
@@ -80,14 +70,6 @@ export default {
         :filters="filters"
         @projectFetch="handleProjectsFetch"
       />
-      <template #aside>
-        <vulnerability-chart
-          :query="vulnerabilityHistoryQuery"
-          :group-full-path="groupFullPath"
-          class="mb-4"
-        />
-        <vulnerability-severity :endpoint="vulnerableProjectsEndpoint" />
-      </template>
     </security-dashboard-layout>
   </div>
 </template>

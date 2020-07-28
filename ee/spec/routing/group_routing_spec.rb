@@ -25,6 +25,10 @@ RSpec.describe 'Group routing', "routing" do
     it 'shows group dashboard' do
       expect(get('/groups/gitlabhq/-/security/dashboard')).to route_to('groups/security/dashboard#show', group_id: 'gitlabhq')
     end
+
+    it 'shows vulnerability list' do
+      expect(get('/groups/gitlabhq/-/security/vulnerabilities')).to route_to('groups/security/vulnerabilities#index', group_id: 'gitlabhq')
+    end
   end
 
   describe 'dependency proxy for containers' do

@@ -27025,6 +27025,9 @@ msgstr ""
 msgid "Vulnerabilities over time"
 msgstr ""
 
+msgid "Vulnerability Report"
+msgstr ""
+
 msgid "Vulnerability remediated. Review before resolving."
 msgstr ""
 
