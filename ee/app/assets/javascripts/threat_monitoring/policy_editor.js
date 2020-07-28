@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import PolicyEditorApp from './components/policy_editor/app.vue';
+import PolicyEditorApp from './components/policy_editor/policy_editor.vue';
 import createStore from './store';
 
 export default () => {
