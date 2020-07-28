@@ -82,12 +82,10 @@ module Ci
       def reset_shared_runners_seconds!(namespaces)
         NamespaceStatistics
           .for_namespaces(namespaces)
-          .with_any_ci_minutes_used
           .update_all(shared_runners_seconds: 0, shared_runners_seconds_last_reset: Time.current)
 
         ::ProjectStatistics
           .for_namespaces(namespaces)
-          .with_any_ci_minutes_used
           .update_all(shared_runners_seconds: 0, shared_runners_seconds_last_reset: Time.current)
       end
 
