@@ -192,7 +192,7 @@ export default {
             `Jira users have been imported from the configured Jira instance.
             They can be mapped by selecting a GitLab user from the dropdown in the "GitLab
             username" column.
-            In the beginning the dropdown defaults to the user conducting the import.`,
+            When the form appears, the dropdown defaults to the user conducting the import.`,
           )
         }}
       </p>
