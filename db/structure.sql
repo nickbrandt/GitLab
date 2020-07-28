@@ -13426,7 +13426,8 @@ CREATE TABLE public.notification_settings (
     new_epic boolean,
     notification_email character varying,
     fixed_pipeline boolean,
-    new_release boolean
+    new_release boolean,
+    moved_project boolean DEFAULT true NOT NULL
 );
 
 CREATE SEQUENCE public.notification_settings_id_seq
