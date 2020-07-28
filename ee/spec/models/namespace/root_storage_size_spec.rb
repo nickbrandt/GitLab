@@ -25,29 +25,43 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
       allow(namespace).to receive(:temporary_storage_increase_enabled?).and_return(false)
     end
 
-    context 'when limit is 0' do
-      let(:limit) { 0 }
-
-      it { is_expected.to eq(false) }
-    end
-
-    context 'when below limit' do
-      it { is_expected.to eq(false) }
-    end
-
-    context 'when above limit' do
-      let(:current_size) { 101.megabytes }
-
-      context 'when temporary storage increase is disabled' do
-        it { is_expected.to eq(true) }
+    context 'when limit enforcement is off' do
+      before do
+        allow(model).to receive(:enforce_limit?).and_return(false)
       end
 
-      context 'when temporary storage increase is enabled' do
-        before do
-          allow(namespace).to receive(:temporary_storage_increase_enabled?).and_return(true)
-        end
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when limit enforcement is on' do
+      before do
+        allow(model).to receive(:enforce_limit?).and_return(true)
+      end
+
+      context 'when limit is 0' do
+        let(:limit) { 0 }
 
         it { is_expected.to eq(false) }
+      end
+
+      context 'when below limit' do
+        it { is_expected.to eq(false) }
+      end
+
+      context 'when above limit' do
+        let(:current_size) { 101.megabytes }
+
+        context 'when temporary storage increase is disabled' do
+          it { is_expected.to eq(true) }
+        end
+
+        context 'when temporary storage increase is enabled' do
+          before do
+            allow(namespace).to receive(:temporary_storage_increase_enabled?).and_return(true)
+          end
+
+          it { is_expected.to eq(false) }
+        end
       end
     end
   end
@@ -130,6 +144,58 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
         subject
 
         expect(Rails.cache.read(['namespaces', namespace.id, key])).to eq(104_000.megabytes)
+      end
+    end
+  end
+
+  describe '#enforce_limit?' do
+    subject { model.enforce_limit? }
+
+    around do |example|
+      Timecop.travel(current_date) { example.run }
+    end
+
+    context 'when current date is before enforcement date' do
+      let(:current_date) { described_class::ENFORCEMENT_DATE - 1.day }
+
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when current date is on or after enforcement date' do
+      let(:current_date) { described_class::ENFORCEMENT_DATE }
+
+      context 'when no subscription is found for namespace' do
+        before do
+          subscription.destroy!
+        end
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when subscription is for a free plan' do
+        let!(:subscription) do
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: create(:free_plan))
+        end
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when subscription is for a paid plan' do
+        before do
+          allow(subscription).to receive(:start_date).and_return(start_date)
+        end
+
+        context 'when subscription start date is before effective date' do
+          let(:start_date) { described_class::EFFECTIVE_DATE - 1.day }
+
+          it { is_expected.to eq(false) }
+        end
+
+        context 'when subscription start date is on or after effective date' do
+          let(:start_date) { described_class::EFFECTIVE_DATE }
+
+          it { is_expected.to eq(true) }
+        end
       end
     end
   end
