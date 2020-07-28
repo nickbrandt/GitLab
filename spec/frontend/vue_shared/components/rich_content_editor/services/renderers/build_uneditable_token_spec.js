@@ -1,5 +1,7 @@
 import {
   buildTextToken,
+  buildOpenToken,
+  buildCloseToken,
   buildUneditableOpenTokens,
   buildUneditableCloseToken,
   buildUneditableCloseTokens,
@@ -23,7 +25,22 @@ describe('Build Uneditable Token renderer helper', () => {
   describe('buildTextToken', () => {
     it('returns an object literal representing a text token', () => {
       const text = originToken.content;
+
       expect(buildTextToken(text)).toStrictEqual(originToken);
+    });
+  });
+
+  describe('buildOpenToken', () => {
+    it('returns an object literal representing an open token', () => {
+      const mockOpenToken = { type: 'openTag', tagName: 'pre' };
+
+      expect(buildOpenToken('pre')).toEqual(mockOpenToken);
+    });
+  });
+
+  describe('buildCloseToken', () => {
+    it('returns an object literal representing a close token', () => {
+      expect(buildCloseToken('div')).toEqual(uneditableCloseToken);
     });
   });
 

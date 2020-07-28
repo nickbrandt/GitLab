@@ -130,4 +130,20 @@ describe('HTMLToMarkdownRenderer', () => {
       },
     );
   });
+
+  describe('PRE CODE visitor', () => {
+    it.each`
+      input                 | sseErb   | result
+      ${'```<% end %>```'}  | ${true}  | ${'<% end %>'}
+      ${'```var x = y;```'} | ${false} | ${'```var x = y;```'}
+    `('...', ({ input, sseErb, result }) => {
+      const node = { ...NODE, dataset: { sseErb } };
+      htmlToMarkdownRenderer = buildHTMLToMarkdownRenderer(baseRenderer, {});
+
+      baseRenderer.convert.mockReturnValueOnce(input);
+
+      expect(htmlToMarkdownRenderer['PRE CODE'](node, input)).toBe(result);
+      expect(baseRenderer.convert).toHaveBeenCalledWith(node, input);
+    });
+  });
 });

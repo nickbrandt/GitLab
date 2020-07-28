@@ -1,21 +1,33 @@
-const buildToken = (type, tagName, props) => {
-  return { type, tagName, ...props };
-};
+import { merge } from 'lodash';
 
 const TAG_TYPES = {
   block: 'div',
   inline: 'a',
 };
 
-// Open helpers (singular and multiple)
+const buildToken = (type, tagName, props) => {
+  return { type, tagName, ...props };
+};
 
-const buildUneditableOpenToken = (tagType = TAG_TYPES.block) =>
-  buildToken('openTag', tagType, {
+const buildProps = (props = {}) => {
+  const defaultProps = {
     attributes: { contenteditable: false },
     classNames: [
       'gl-px-4 gl-py-2 gl-my-5 gl-opacity-5 gl-bg-gray-100 gl-user-select-none gl-cursor-not-allowed',
     ],
-  });
+  };
+
+  return merge(defaultProps, props);
+};
+
+// Open helpers (singular and multiple)
+
+export const buildOpenToken = tagType => buildToken('openTag', tagType);
+
+export const buildCloseToken = tagType => buildToken('closeTag', tagType);
+
+export const buildUneditableOpenToken = (tagType = TAG_TYPES.block, props) =>
+  buildToken('openTag', tagType, buildProps(props));
 
 export const buildUneditableOpenTokens = (token, tagType = TAG_TYPES.block) => {
   return [buildUneditableOpenToken(tagType), token];
@@ -23,8 +35,8 @@ export const buildUneditableOpenTokens = (token, tagType = TAG_TYPES.block) => {
 
 // Close helpers (singular and multiple)
 
-export const buildUneditableCloseToken = (tagType = TAG_TYPES.block) =>
-  buildToken('closeTag', tagType);
+// TODO refactor by replacing uses of `buildUneditableCloseToken` with `buildCloseToken` as there is nothing technically about a close token being qualified as "uneditable"
+export const buildUneditableCloseToken = (tagType = TAG_TYPES.block) => buildCloseToken(tagType);
 
 export const buildUneditableCloseTokens = (token, tagType = TAG_TYPES.block) => {
   return [token, buildUneditableCloseToken(tagType)];

@@ -20,20 +20,17 @@ const identifierParagraphNode = buildMockParagraphNode(
 describe('Render Identifier Paragraph renderer', () => {
   describe('canRender', () => {
     it.each`
-      node                       | paragraph                                          | target
-      ${identifierParagraphNode} | ${'[Some text]: https://link.com'}                 | ${true}
-      ${normalParagraphNode}     | ${'Normal non-identifier text. Another sentence.'} | ${false}
-    `(
-      'should return $target when the $node matches $paragraph syntax',
-      ({ node, paragraph, target }) => {
-        const context = {
-          entering: true,
-          getChildrenText: jest.fn().mockReturnValueOnce(paragraph),
-        };
+      node                       | target
+      ${identifierParagraphNode} | ${true}
+      ${normalParagraphNode}     | ${false}
+    `('should return $target when the $node childrenText() syntax matches', ({ node, target }) => {
+      const context = {
+        entering: true,
+        getChildrenText: jest.fn().mockReturnValueOnce(node.firstChild.literal),
+      };
 
-        expect(renderer.canRender(node, context)).toBe(target);
-      },
-    );
+      expect(renderer.canRender(node, context)).toBe(target);
+    });
   });
 
   describe('render', () => {

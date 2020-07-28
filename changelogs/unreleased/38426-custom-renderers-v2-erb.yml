@@ -1,0 +1,5 @@
+---
+title: Preserve ERB indentation in static site editor WYSIWYG mode
+merge_request: 38426
+author:
+type: added

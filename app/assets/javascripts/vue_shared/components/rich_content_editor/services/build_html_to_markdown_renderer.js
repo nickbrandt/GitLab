@@ -28,6 +28,7 @@ const buildHTMLToMarkdownRender = (baseRenderer, formattingPreferences = {}) => 
   const orderedListItemNode = 'OL LI';
   const emphasisNode = 'EM, I';
   const strongNode = 'STRONG, B';
+  const preCodeNode = 'PRE CODE';
 
   return {
     TEXT_NODE(node) {
@@ -81,6 +82,11 @@ const buildHTMLToMarkdownRender = (baseRenderer, formattingPreferences = {}) => 
       const strongSyntax = repeat(strong, 2);
 
       return result.replace(/^[*_]{2}/, strongSyntax).replace(/[*_]{2}$/, strongSyntax);
+    },
+    [preCodeNode](node, subContent) {
+      const result = baseRenderer.convert(node, subContent);
+
+      return node.dataset.sseErb ? result.replace(/```/g, '') : result;
     },
   };
 };
