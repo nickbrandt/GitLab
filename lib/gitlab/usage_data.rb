@@ -358,14 +358,13 @@ module Gitlab
         # rubocop: disable UsageData/LargeTable:
         Service.available_services_names.each_with_object({}) do |service_name, response|
           response["projects_#{service_name}_active".to_sym] = count(Service.active.where(template: false, type: "#{service_name}_service".camelize))
-        end.merge(jira_usage).merge(jira_import_usage)
+        end.merge(jira_usage, jira_import_usage)
         # rubocop: enable UsageData/LargeTable:
       end
 
       def jira_usage
         # Jira Cloud does not support custom domains as per https://jira.atlassian.com/browse/CLOUD-6999
         # so we can just check for subdomains of atlassian.net
-
         results = {
           projects_jira_server_active: 0,
           projects_jira_cloud_active: 0
