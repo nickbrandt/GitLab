@@ -96,6 +96,9 @@ DevOps stage - for example ~"devops::secure"
 Group - for example ~"group::composition analysis"
 
 Category - for example ~"Category:Dependency Scanning"
--->
+<!--  Label reminders - you should have one of each of the following labels if you can figure out the correct ones! -->
+/label ~"devops:: 
+/label ~"group::
+/label ~"Category:
 
 /label ~feature
