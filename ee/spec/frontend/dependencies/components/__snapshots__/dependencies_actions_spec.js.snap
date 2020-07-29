@@ -69,18 +69,19 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
     </gl-deprecated-button-stub>
   </div>
    
-  <gl-deprecated-button-stub
+  <gl-button-stub
+    category="tertiary"
     class="js-download"
     download="dependencies.json"
     href="http://test.host/dependencies.json"
-    size="md"
+    icon="export"
+    size="medium"
     title="Export as JSON"
-    variant="secondary"
+    variant="default"
   >
-    <gl-icon-stub
-      name="export"
-      size="16"
-    />
-  </gl-deprecated-button-stub>
+    
+    Export
+  
+  </gl-button-stub>
 </div>
 `;
