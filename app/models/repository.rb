@@ -577,7 +577,7 @@ class Repository
   cache_method :merge_request_template_names, fallback: []
 
   def user_defined_metrics_dashboard_paths
-    Gitlab::Metrics::Dashboard::Finder.find_all_paths_from_source(project)
+    Gitlab::Metrics::Dashboard::RepoDashboardFinder.list_dashboards(project)
   end
   cache_method :user_defined_metrics_dashboard_paths, fallback: []
 

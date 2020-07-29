@@ -106,7 +106,8 @@ RSpec.describe Metrics::Dashboard::CustomDashboardService, :use_clean_rails_memo
       end
 
       it 'caches repo file list' do
-        expect(Gitlab::Template::Finders::RepoTemplateFinder).to receive(:new)
+        expect(Gitlab::Metrics::Dashboard::RepoDashboardFinder).to receive(:list_dashboards)
+          .with(project)
           .once
           .and_call_original
 

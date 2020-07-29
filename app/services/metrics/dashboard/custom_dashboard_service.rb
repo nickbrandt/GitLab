@@ -6,9 +6,6 @@
 module Metrics
   module Dashboard
     class CustomDashboardService < ::Metrics::Dashboard::BaseService
-      DASHBOARD_ROOT = ".gitlab/dashboards"
-      DASHBOARD_EXTENSION = '.yml'
-
       class << self
         def valid_params?(params)
           params[:dashboard_path].present?
@@ -27,13 +24,9 @@ module Metrics
             end
         end
 
-        def file_finder(project)
-          Gitlab::Template::Finders::RepoTemplateFinder.new(project, DASHBOARD_ROOT, DASHBOARD_EXTENSION)
-        end
-
         # Grabs the filepath after the base directory.
         def name_for_path(filepath)
-          filepath.delete_prefix("#{DASHBOARD_ROOT}/")
+          filepath.delete_prefix("#{Gitlab::Metrics::Dashboard::RepoDashboardFinder::DASHBOARD_ROOT}/")
         end
       end
 
@@ -41,7 +34,7 @@ module Metrics
 
       # Searches the project repo for a custom-defined dashboard.
       def get_raw_dashboard
-        yml = self.class.file_finder(project).read(dashboard_path)
+        yml = Gitlab::Metrics::Dashboard::RepoDashboardFinder.read_dashboard(project, dashboard_path)
 
         load_yaml(yml)
       end
