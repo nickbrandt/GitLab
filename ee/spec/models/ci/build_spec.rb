@@ -531,13 +531,13 @@ RSpec.describe Ci::Build do
       context 'when there are secrets defined' do
         let(:secrets) { valid_secrets }
 
-        it { is_expected.to include(:secrets) }
+        it { is_expected.to include(:vault_secrets) }
       end
 
       context 'when there are no secrets defined' do
         let(:secrets) { {} }
 
-        it { is_expected.not_to include(:secrets) }
+        it { is_expected.not_to include(:vault_secrets) }
       end
     end
 
@@ -549,13 +549,13 @@ RSpec.describe Ci::Build do
       context 'when there are secrets defined' do
         let(:secrets) { valid_secrets }
 
-        it { is_expected.not_to include(:secrets) }
+        it { is_expected.not_to include(:vault_secrets) }
       end
 
       context 'when there are no secrets defined' do
         let(:secrets) { {} }
 
-        it { is_expected.not_to include(:secrets) }
+        it { is_expected.not_to include(:vault_secrets) }
       end
     end
   end
