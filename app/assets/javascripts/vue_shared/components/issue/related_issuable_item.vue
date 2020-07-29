@@ -54,7 +54,7 @@ export default {
     class="item-body d-flex align-items-center py-2 px-3"
   >
     <div
-      class="item-contents d-flex align-items-center flex-wrap flex-grow-1 flex-xl-nowrap gl-min-h-7"
+      class="item-contents gl-display-flex gl-align-items-center gl-flex-wrap gl-flex-grow-1 flex-xl-nowrap gl-min-h-7"
     >
       <!-- Title area: Status icon (XL) and title -->
       <div class="item-title d-flex align-items-xl-center mb-xl-0">
