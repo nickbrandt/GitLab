@@ -62,7 +62,6 @@ RSpec.shared_examples 'logs the custom audit event' do
 
     expect(security_event.details).to eq(custom_message: custom_message,
                                          ip_address: ip_address,
-                                         target_details: target_details,
                                          action: :custom)
     expect(security_event.author_id).to eq(user.id)
     expect(security_event.entity_id).to eq(entity.id)

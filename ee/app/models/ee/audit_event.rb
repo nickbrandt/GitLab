@@ -5,14 +5,15 @@ module EE
     extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
 
-    TEXT_LIMIT = {
+    TRUNCATED_FIELDS = {
+      entity_path: 5_500,
       target_details: 5_500
     }.freeze
 
     prepended do
       scope :by_entity, -> (entity_type, entity_id) { by_entity_type(entity_type).by_entity_id(entity_id) }
 
-      before_validation :truncate_target_details
+      before_validation :truncate_fields
     end
 
     def entity
@@ -43,8 +44,13 @@ module EE
 
     private
 
-    def truncate_target_details
-      self.target_details = self.details[:target_details] = target_details&.truncate(TEXT_LIMIT[:target_details])
+    def truncate_fields
+      TRUNCATED_FIELDS.each do |name, limit|
+        original = self[name] || self.details[name]
+        next unless original
+
+        self[name] = self.details[name] = String(original).truncate(limit)
+      end
     end
   end
 end
