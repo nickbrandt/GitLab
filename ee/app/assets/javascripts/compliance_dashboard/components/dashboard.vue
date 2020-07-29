@@ -1,5 +1,5 @@
 <script>
-import { GlTooltipDirective } from '@gitlab/ui';
+import { GlTabs, GlTab, GlTooltipDirective } from '@gitlab/ui';
 import { isEmpty } from 'lodash';
 
 import { sprintf, __, s__ } from '~/locale';
@@ -26,6 +26,8 @@ export default {
     MergeRequest,
     Pagination,
     PipelineStatus,
+    GlTab,
+    GlTabs,
   },
   mixins: [timeagoMixin],
   props: {
@@ -71,6 +73,7 @@ export default {
     approvalStatusLabel: __('Approval Status'),
     pipelineStatusLabel: __('Pipeline'),
     updatesLabel: __('Updates'),
+    mergeRequestsTabLabel: __('Merge Requests'),
   },
 };
 </script>
@@ -81,48 +84,61 @@ export default {
       <h4>{{ $options.strings.heading }}</h4>
       <p>{{ $options.strings.subheading }}</p>
     </header>
-    <div class="dashboard-grid">
-      <grid-column-heading :heading="$options.strings.mergeRequestLabel" />
-      <grid-column-heading :heading="$options.strings.approvalStatusLabel" class="gl-text-center" />
-      <grid-column-heading :heading="$options.strings.pipelineStatusLabel" class="gl-text-center" />
-      <grid-column-heading :heading="$options.strings.updatesLabel" class="gl-text-right" />
-
-      <template v-for="mergeRequest in mergeRequests">
-        <merge-request :key="key(mergeRequest.id, 'MR')" :merge-request="mergeRequest" />
-
-        <div
-          :key="key(mergeRequest.id, 'approvalStatus')"
-          class="gl-display-flex gl-align-items-center gl-justify-content-center gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
-        >
-          <approval-status
-            v-if="hasStatus(mergeRequest.approval_status)"
-            :status="mergeRequest.approval_status"
+    <gl-tabs>
+      <gl-tab>
+        <template #title>
+          <span>{{ $options.strings.mergeRequestsTabLabel }}</span>
+        </template>
+        <div class="dashboard-grid">
+          <grid-column-heading :heading="$options.strings.mergeRequestLabel" />
+          <grid-column-heading
+            :heading="$options.strings.approvalStatusLabel"
+            class="gl-text-center"
           />
-        </div>
-        <div
-          :key="key(mergeRequest.id, 'pipeline')"
-          class="dashboard-pipeline gl-display-flex gl-align-items-center gl-justify-content-center gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
-        >
-          <pipeline-status
-            v-if="hasStatus(mergeRequest.pipeline_status)"
-            :status="mergeRequest.pipeline_status"
+          <grid-column-heading
+            :heading="$options.strings.pipelineStatusLabel"
+            class="gl-text-center"
           />
-        </div>
+          <grid-column-heading :heading="$options.strings.updatesLabel" class="gl-text-right" />
 
-        <div
-          :key="key(mergeRequest.id, 'updates')"
-          class="gl-text-right gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5 gl-relative"
-        >
-          <approvers :approvers="mergeRequest.approved_by_users" />
-          <span class="gl-text-gray-700">
-            <time v-gl-tooltip.bottom="timeTooltip(mergeRequest.merged_at)">{{
-              timeAgoString(mergeRequest.merged_at)
-            }}</time>
-          </span>
+          <template v-for="mergeRequest in mergeRequests">
+            <merge-request :key="key(mergeRequest.id, 'MR')" :merge-request="mergeRequest" />
+
+            <div
+              :key="key(mergeRequest.id, 'approvalStatus')"
+              class="gl-display-flex gl-align-items-center gl-justify-content-center gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
+            >
+              <approval-status
+                v-if="hasStatus(mergeRequest.approval_status)"
+                :status="mergeRequest.approval_status"
+              />
+            </div>
+            <div
+              :key="key(mergeRequest.id, 'pipeline')"
+              class="dashboard-pipeline gl-display-flex gl-align-items-center gl-justify-content-center gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
+            >
+              <pipeline-status
+                v-if="hasStatus(mergeRequest.pipeline_status)"
+                :status="mergeRequest.pipeline_status"
+              />
+            </div>
+
+            <div
+              :key="key(mergeRequest.id, 'updates')"
+              class="gl-text-right gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5 gl-relative"
+            >
+              <approvers :approvers="mergeRequest.approved_by_users" />
+              <span class="gl-text-gray-700">
+                <time v-gl-tooltip.bottom="timeTooltip(mergeRequest.merged_at)">{{
+                  timeAgoString(mergeRequest.merged_at)
+                }}</time>
+              </span>
+            </div>
+          </template>
         </div>
-      </template>
-    </div>
-    <pagination :is-last-page="isLastPage" />
+        <pagination :is-last-page="isLastPage" />
+      </gl-tab>
+    </gl-tabs>
   </div>
   <empty-state v-else :image-path="emptyStateSvgPath" />
 </template>
