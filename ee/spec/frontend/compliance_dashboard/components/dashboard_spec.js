@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlTabs, GlTab } from '@gitlab/ui';
 
 import ComplianceDashboard from 'ee/compliance_dashboard/components/dashboard.vue';
 import ApprovalStatus from 'ee/compliance_dashboard/components/approval_status.vue';
@@ -14,6 +15,7 @@ describe('ComplianceDashboard component', () => {
   const findApprovalStatus = () => wrapper.find(ApprovalStatus);
   const findPipelineStatus = () => wrapper.find(PipelineStatus);
   const findApprovers = () => wrapper.find(Approvers);
+  const findDashboardTabs = () => wrapper.find(GlTabs);
 
   const createComponent = (props = {}, options = {}) => {
     return shallowMount(ComplianceDashboard, {
@@ -24,6 +26,7 @@ describe('ComplianceDashboard component', () => {
         ...props,
       },
       stubs: {
+        GlTab,
         MergeRequest: {
           props: { mergeRequest: Object },
           template: `<div data-testid="merge-request">{{ mergeRequest.title }}</div>`,
@@ -47,6 +50,10 @@ describe('ComplianceDashboard component', () => {
 
     it('renders a list of merge requests', () => {
       expect(findMergeRequests().length).toEqual(2);
+    });
+
+    it('renders the dashboard tabs', () => {
+      expect(findDashboardTabs().exists()).toEqual(true);
     });
 
     describe('approval status', () => {
@@ -91,6 +98,10 @@ describe('ComplianceDashboard component', () => {
 
     it('does not render merge requests', () => {
       expect(findMergeRequests().exists()).toEqual(false);
+    });
+
+    it('does not render the dashboard tabs', () => {
+      expect(findDashboardTabs().exists()).toEqual(false);
     });
   });
 });
