@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { GlSkeletonLoading } from '@gitlab/ui';
+import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
 import MetricCard from 'ee/analytics/shared/components/metric_card.vue';
 
 const metrics = [
@@ -24,6 +25,9 @@ describe('MetricCard', () => {
         ...defaultProps,
         ...props,
       },
+      directives: {
+        GlTooltip: createMockDirective(),
+      },
     });
   };
 
@@ -35,6 +39,7 @@ describe('MetricCard', () => {
   const findLoadingIndicator = () => wrapper.find(GlSkeletonLoading);
   const findMetricsWrapper = () => wrapper.find({ ref: 'metricsWrapper' });
   const findMetricItem = () => wrapper.findAll({ ref: 'metricItem' });
+  const findTooltip = () => wrapper.find('[data-testid="tooltip"]');
 
   describe('template', () => {
     it('renders the title', () => {
@@ -74,6 +79,29 @@ describe('MetricCard', () => {
         expect(findMetricItem()).toHaveLength(metrics.length);
       });
 
+      describe('with tooltip text', () => {
+        const tooltipText = 'This is a tooltip';
+        const tooltipMetric = {
+          key: 'fifth_metric',
+          value: '-',
+          label: 'Metric with tooltip',
+          unit: 'parsecs',
+          tooltipText,
+        };
+
+        beforeEach(() => {
+          factory({
+            isLoading: false,
+            metrics: [tooltipMetric],
+          });
+        });
+
+        it('will render a tooltip', () => {
+          const tt = getBinding(findTooltip().element, 'gl-tooltip');
+          expect(tt.value.title).toEqual(tooltipText);
+        });
+      });
+
       describe.each`
         columnIndex | label                          | value  | unit       | link
         ${0}        | ${'First metric'}              | ${10}  | ${' days'} | ${'some_link'}
@@ -84,8 +112,10 @@ describe('MetricCard', () => {
         it(`renders ${value}${unit} ${label} with URL ${link}`, () => {
           const allMetricItems = findMetricItem();
           const metricItem = allMetricItems.at(columnIndex);
+          const text = metricItem.text();
 
-          expect(metricItem.text()).toBe(`${value}${unit} ${label}`);
+          expect(text).toContain(`${value}${unit}`);
+          expect(text).toContain(label);
 
           if (link) {
             expect(metricItem.find('a').attributes('href')).toBe(link);
