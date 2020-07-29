@@ -208,6 +208,20 @@ $item-remove-button-space: 42px;
   }
 }
 
+// The double selector is needed to override .gl-button.gl-button.
+.btn-item-action.btn-item-action {
+  box-shadow: none;
+
+  &[disabled] {
+    background: none;
+    box-shadow: none;
+
+    &:hover {
+      color: $gray-400;
+    }
+  }
+}
+
 .mr-status-wrapper,
 .mr-ci-status {
   line-height: 0;

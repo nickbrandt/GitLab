@@ -152,7 +152,7 @@ export default {
     :is-fetching="isFetching"
     :is-submitting="isSubmitting"
     :related-issues="state.relatedIssues"
-    :can-admin="canModifyRelatedIssues"
+    :can-add-related-issue="canModifyRelatedIssues"
     :pending-references="state.pendingReferences"
     :is-form-visible="isFormVisible"
     :input-value="inputValue"

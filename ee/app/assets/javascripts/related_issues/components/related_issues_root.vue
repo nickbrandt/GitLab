@@ -100,8 +100,19 @@ export default {
   },
   computed: {
     autoCompleteSources() {
-      if (!this.allowAutoComplete) return {};
-      return gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources;
+      return this.allowAutoComplete ? gl?.GfmAutoComplete?.dataSources : {};
+    },
+    relatedIssues() {
+      return this.state.relatedIssues.map(issue => ({
+        ...issue,
+        actionButtons: this.canAdmin && [
+          {
+            icon: 'close',
+            tooltip: __('Remove'),
+            onClick: () => this.removeRelatedIssue(issue.id),
+          },
+        ],
+      }));
     },
   },
   created() {
@@ -112,7 +123,7 @@ export default {
     findRelatedIssueById(id) {
       return this.state.relatedIssues.find(issue => issue.id === id);
     },
-    onRelatedIssueRemoveRequest(idToRemove) {
+    removeRelatedIssue(idToRemove) {
       const issueToRemove = this.findRelatedIssueById(idToRemove);
 
       if (issueToRemove) {
@@ -225,8 +236,8 @@ export default {
     :help-path="helpPath"
     :is-fetching="isFetching"
     :is-submitting="isSubmitting"
-    :related-issues="state.relatedIssues"
-    :can-admin="canAdmin"
+    :related-issues="relatedIssues"
+    :can-add-related-issue="canAdmin"
     :can-reorder="canReorder"
     :pending-references="state.pendingReferences"
     :is-form-visible="isFormVisible"
@@ -242,6 +253,5 @@ export default {
     @addIssuableFormSubmit="onPendingFormSubmit"
     @addIssuableFormCancel="onPendingFormCancel"
     @pendingIssuableRemoveRequest="onPendingIssueRemoveRequest"
-    @relatedIssueRemoveRequest="onRelatedIssueRemoveRequest"
   />
 </template>

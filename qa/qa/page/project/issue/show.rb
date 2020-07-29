@@ -25,7 +25,7 @@ module QA
           end
 
           view 'app/assets/javascripts/vue_shared/components/issue/related_issuable_item.vue' do
-            element :remove_related_issue_button
+            element :related_issue_close_button
           end
 
           view 'app/views/shared/issuable/_close_reopen_button.html.haml' do
@@ -38,8 +38,8 @@ module QA
             element :new_note_form, 'attr: :note' # rubocop:disable QA/ElementWithPattern
           end
 
-          def click_remove_related_issue_button
-            click_element(:remove_related_issue_button)
+          def click_related_issue_close_button
+            click_element(:related_issue_close_button)
           end
 
           def click_close_issue_button

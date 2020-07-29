@@ -38,7 +38,7 @@ module QA
             expect(show.related_issuable_item).to have_content(issue_2.title)
           end
 
-          show.click_remove_related_issue_button
+          show.click_related_issue_close_button
 
           show.wait_until(reload: false, max_duration: max_wait, sleep_interval: wait_interval) do
             expect(show).not_to have_content(issue_2.title)

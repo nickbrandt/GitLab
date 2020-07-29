@@ -142,15 +142,18 @@ describe('RelatedIssuableItem', () => {
     });
   });
 
-  describe('remove button', () => {
-    const removeButton = () => wrapper.find({ ref: 'removeButton' });
+  describe('action buttons', () => {
+    const button1 = { icon: 'a', tooltip: 'tooltip a' };
+    const button2 = { icon: 'b', tooltip: 'tooltip b' };
+    const button3 = { icon: 'c', tooltip: 'tooltip c' };
+    const actionButtons = () => wrapper.findAll('[data-testid="actionButton"]');
 
-    beforeEach(() => {
-      wrapper.setProps({ canRemove: true });
-    });
+    it('renders action buttons', async () => {
+      const buttons = [button1, button2, button3];
+      wrapper.setProps({ actionButtons: buttons });
+      await wrapper.vm.$nextTick();
 
-    it('renders if canRemove', () => {
-      expect(removeButton().exists()).toBe(true);
+      expect(actionButtons()).toHaveLength(buttons.length);
     });
 
     it('renders disabled button when removeDisabled', async () => {

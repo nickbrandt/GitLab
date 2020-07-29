@@ -1,6 +1,6 @@
 <script>
 import '~/commons/bootstrap';
-import { GlIcon, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
+import { GlIcon, GlTooltip, GlTooltipDirective, GlButton } from '@gitlab/ui';
 import { sprintf } from '~/locale';
 import IssueMilestone from './issue_milestone.vue';
 import IssueAssignees from './issue_assignees.vue';
@@ -14,6 +14,7 @@ export default {
     IssueMilestone,
     IssueAssignees,
     CiIcon,
+    GlButton,
     GlIcon,
     GlTooltip,
     IssueWeight: () => import('ee_component/boards/components/issue_card_weight.vue'),
@@ -28,6 +29,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    actionButtons: {
+      type: Array,
+      required: false,
+      default: undefined,
     },
   },
   computed: {
@@ -156,19 +162,22 @@ export default {
       </div>
     </div>
 
-    <button
-      v-if="canRemove"
-      ref="removeButton"
+    <div
+      v-for="buttonConfig in actionButtons"
+      :key="`${buttonConfig.icon}-${buttonConfig.tooltip}`"
       v-gl-tooltip
-      :disabled="removeDisabled"
-      type="button"
-      class="btn btn-default btn-svg btn-item-remove js-issue-item-remove-button"
-      data-qa-selector="remove_related_issue_button"
-      :title="__('Remove')"
-      :aria-label="__('Remove')"
-      @click="onRemoveRequest"
+      :title="buttonConfig.tooltip"
+      :aria-label="buttonConfig.tooltip"
+      data-testid="actionButton"
     >
-      <icon :size="16" class="btn-item-remove-icon" name="close" />
-    </button>
+      <gl-button
+        :ref="`${buttonConfig.icon}Button`"
+        :icon="buttonConfig.icon"
+        class="gl-ml-3 btn-item-action js-issue-item-remove-button"
+        :data-qa-selector="`related_issue_${buttonConfig.icon}_button`"
+        :disabled="buttonConfig.isDisabled"
+        @click="buttonConfig.onClick"
+      />
+    </div>
   </div>
 </template>
