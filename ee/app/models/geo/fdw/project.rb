@@ -39,17 +39,6 @@ module Geo
       end
 
       class << self
-        def missing_project_registry
-          left_outer_join_project_registry
-            .where(Geo::ProjectRegistry.arel_table[:project_id].eq(nil))
-        end
-
-        def recently_updated
-          inner_join_project_registry
-            .merge(Geo::ProjectRegistry.dirty)
-            .merge(Geo::ProjectRegistry.retry_due)
-        end
-
         # Searches for a list of projects based on the query given in `query`.
         #
         # On PostgreSQL this method uses "ILIKE" to perform a case-insensitive
@@ -72,17 +61,6 @@ module Geo
           join_statement =
             arel_table
               .join(Geo::ProjectRegistry.arel_table, Arel::Nodes::InnerJoin)
-              .on(arel_table[:id].eq(Geo::ProjectRegistry.arel_table[:project_id]))
-
-          joins(join_statement.join_sources)
-        end
-
-        private
-
-        def left_outer_join_project_registry
-          join_statement =
-            arel_table
-              .join(Geo::ProjectRegistry.arel_table, Arel::Nodes::OuterJoin)
               .on(arel_table[:id].eq(Geo::ProjectRegistry.arel_table[:project_id]))
 
           joins(join_statement.join_sources)
