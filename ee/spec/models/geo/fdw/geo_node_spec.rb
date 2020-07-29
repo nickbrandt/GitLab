@@ -42,38 +42,6 @@ RSpec.describe Geo::Fdw::GeoNode, :geo, type: :model do
     end
   end
 
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  describe '#project_registries', :geo_fdw do
-    let!(:registry_1) { create(:geo_project_registry, project: project_1) }
-    let!(:registry_2) { create(:geo_project_registry, project: project_2) }
-    let!(:registry_3) { create(:geo_project_registry, project: project_3) }
-
-    subject { described_class.find(node.id) }
-
-    it 'returns all registries without selective sync' do
-      expect(subject.project_registries).to match_array([registry_1, registry_2, registry_3])
-    end
-
-    it 'returns registries where projects belong to the namespaces with selective sync by namespace' do
-      node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
-
-      expect(subject.project_registries).to match_array([registry_1, registry_2])
-    end
-
-    it 'returns registries where projects belong to the shards with selective sync by shard' do
-      node.update!(selective_sync_type: 'shards', selective_sync_shards: %w[broken])
-
-      expect(subject.project_registries).to match_array([registry_3])
-    end
-
-    it 'returns nothing if an unrecognised selective sync type is used' do
-      node.update_attribute(:selective_sync_type, 'unknown')
-
-      expect(subject.project_registries).to be_empty
-    end
-  end
-
   describe '#projects_outside_selective_sync', :geo_fdw do
     subject { described_class.find(node.id) }
 
