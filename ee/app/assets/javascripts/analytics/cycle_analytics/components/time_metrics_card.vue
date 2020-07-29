@@ -1,10 +1,15 @@
 <script>
 import Api from 'ee/api';
-import { __ } from '~/locale';
+import { __, s__ } from '~/locale';
 import createFlash from '~/flash';
 import { slugify } from '~/lib/utils/text_utility';
 import MetricCard from '../../shared/components/metric_card.vue';
 import { removeFlash } from '../utils';
+
+const I18N_TEXT = {
+  'lead-time': s__('ValueStreamAnalytics|Median time from issue created to issue closed.'),
+  'cycle-time': s__('ValueStreamAnalytics|Median time from first commit to issue closed.'),
+};
 
 export default {
   name: 'TimeMetricsCard',
@@ -42,11 +47,15 @@ export default {
       this.loading = true;
       return Api.cycleAnalyticsTimeSummaryData(this.groupPath, this.additionalParams)
         .then(({ data }) => {
-          this.data = data.map(({ title: label, ...rest }) => ({
-            ...rest,
-            label,
-            key: slugify(label),
-          }));
+          this.data = data.map(({ title: label, ...rest }) => {
+            const key = slugify(label);
+            return {
+              ...rest,
+              label,
+              key,
+              tooltipText: I18N_TEXT[key] || '',
+            };
+          });
         })
         .catch(() => {
           createFlash(

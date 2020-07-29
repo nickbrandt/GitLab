@@ -26379,6 +26379,12 @@ msgstr ""
 msgid "ValueStreamAnalytics|%{days}d"
 msgstr ""
 
+msgid "ValueStreamAnalytics|Median time from first commit to issue closed."
+msgstr ""
+
+msgid "ValueStreamAnalytics|Median time from issue created to issue closed."
+msgstr ""
+
 msgid "Variable"
 msgstr ""
 
