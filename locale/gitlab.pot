@@ -4404,7 +4404,7 @@ msgstr ""
 msgid "Changing a Release tag is only supported via Releases API. %{linkStart}More information%{linkEnd}"
 msgstr ""
 
-msgid "Changing group path can have unintended side effects."
+msgid "Changing group URL can have unintended side effects."
 msgstr ""
 
 msgid "Channel handle (e.g. town-square)"
@@ -4486,6 +4486,9 @@ msgid "Checking approval status"
 msgstr ""
 
 msgid "Checking branch availability..."
+msgstr ""
+
+msgid "Checking group URL availability..."
 msgstr ""
 
 msgid "Checking group path availability..."
@@ -11947,10 +11950,10 @@ msgstr ""
 msgid "GroupSettings|Cannot update the path because there are projects under this group that contain Docker images in their Container Registry. Please remove the images from your projects first and try again."
 msgstr ""
 
-msgid "GroupSettings|Change group path"
+msgid "GroupSettings|Change group URL"
 msgstr ""
 
-msgid "GroupSettings|Changing group path can have unintended side effects."
+msgid "GroupSettings|Changing group URL can have unintended side effects."
 msgstr ""
 
 msgid "GroupSettings|Custom project templates"
@@ -11992,7 +11995,7 @@ msgstr ""
 msgid "GroupSettings|Pipeline settings was updated for the group"
 msgstr ""
 
-msgid "GroupSettings|Please choose a group path with no special characters."
+msgid "GroupSettings|Please choose a group URL with no special characters."
 msgstr ""
 
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
