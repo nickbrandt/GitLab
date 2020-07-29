@@ -108,7 +108,7 @@ export default {
           class="js-requirement-cancel"
           @click="$emit('cancel')"
         >
-          {{ __('Cancel')}}
+          {{ __('Cancel') }}
         </gl-button>
       </div>
     </div>
