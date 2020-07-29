@@ -66,11 +66,13 @@ export const receiveStageMedianValuesError = ({ commit }) => {
   createFlash(__('There was an error fetching median data for stages'));
 };
 
-const fetchStageMedian = (currentGroupPath, stageId, params) =>
-  Api.cycleAnalyticsStageMedian(currentGroupPath, stageId, params).then(({ data }) => ({
-    id: stageId,
-    ...data,
-  }));
+const fetchStageMedian = (currentGroupPath, currentValueStreamId, stageId, params) =>
+  Api.cycleAnalyticsStageMedian(currentGroupPath, currentValueStreamId, stageId, params).then(
+    ({ data }) => ({
+      id: stageId,
+      ...data,
+    }),
+  );
 
 export const fetchStageMedianValues = ({ dispatch, getters }) => {
   const {
@@ -160,13 +162,13 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
     currentGroupPath: groupId,
     cycleAnalyticsRequestParams: { created_after, project_ids },
   } = getters;
+
   dispatch('requestGroupStages');
   dispatch('customStages/setStageEvents', []);
 
-  return Api.cycleAnalyticsGroupStagesAndEvents({
-    groupId,
-    valueStreamId,
-    params: { start_date: created_after, project_ids },
+  return Api.cycleAnalyticsGroupStagesAndEvents(groupId, valueStreamId, {
+    start_date: created_after,
+    project_ids,
   })
     .then(({ data: { stages = [], events = [] } }) => {
       dispatch('receiveGroupStagesSuccess', stages);
@@ -233,14 +235,11 @@ export const receiveRemoveStageError = ({ commit }) => {
   createFlash(__('There was an error removing your custom stage, please try again'));
 };
 
-export const removeStage = ({ dispatch, state }, stageId) => {
-  const {
-    selectedGroup: { fullPath },
-  } = state;
-
+export const removeStage = ({ dispatch, getters }, stageId) => {
+  const { currentGroupPath, currentValueStreamId } = getters;
   dispatch('requestRemoveStage');
 
-  return Api.cycleAnalyticsRemoveStage(stageId, fullPath)
+  return Api.cycleAnalyticsRemoveStage(currentGroupPath, currentValueStreamId, stageId)
     .then(() => dispatch('receiveRemoveStageSuccess'))
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
@@ -303,7 +302,7 @@ export const receiveCreateValueStreamSuccess = ({ commit, dispatch }) => {
 
 export const createValueStream = ({ commit, dispatch, getters }, data) => {
   const { currentGroupPath } = getters;
-  commit(types.REQUEST_CREATE_VALUE_STREAM);cycleAnalyticsSummaryData
+  commit(types.REQUEST_CREATE_VALUE_STREAM);
 
   return Api.cycleAnalyticsCreateValueStream(currentGroupPath, data)
     .then(() => dispatch('receiveCreateValueStreamSuccess'))

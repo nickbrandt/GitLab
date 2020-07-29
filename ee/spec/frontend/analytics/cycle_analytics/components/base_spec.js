@@ -78,6 +78,7 @@ function createComponent({
   },
   shallow = true,
   withStageSelected = false,
+  withValueStreamSelected = true,
   featureFlags = {},
   props = {},
 } = {}) {
@@ -90,7 +91,6 @@ function createComponent({
       emptyStateSvgPath,
       noDataSvgPath,
       noAccessSvgPath,
-      baseStagesEndpoint: mockData.endpoints.baseStagesEndpoint,
       hideGroupDropDown,
       ...props,
     },
@@ -106,6 +106,10 @@ function createComponent({
       ...featureFlags,
     },
   });
+
+  if (withValueStreamSelected) {
+    comp.vm.$store.dispatch('receiveValueStreamsSuccess', mockData.valueStreams);
+  }
 
   if (withStageSelected) {
     comp.vm.$store.commit('SET_SELECTED_GROUP', {
@@ -533,6 +537,7 @@ describe('Cycle Analytics component', () => {
           describe('enabled', () => {
             beforeEach(() => {
               wrapper = createComponent({
+                withValueStreamSelected: false,
                 withStageSelected: true,
                 pathNavigationEnabled: true,
               });
@@ -544,7 +549,7 @@ describe('Cycle Analytics component', () => {
               return waitForPromises();
             });
 
-            it('displays the path navigation', () => {
+            it('does not display the path navigation', () => {
               displaysPathNavigation(false);
             });
           });

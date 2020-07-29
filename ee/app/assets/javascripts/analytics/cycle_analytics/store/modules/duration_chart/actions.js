@@ -22,7 +22,6 @@ export const receiveDurationDataError = ({ commit }) => {
 
 export const fetchDurationData = ({ dispatch, rootGetters }) => {
   dispatch('requestDurationData');
-
   const {
     cycleAnalyticsRequestParams,
     activeStages,

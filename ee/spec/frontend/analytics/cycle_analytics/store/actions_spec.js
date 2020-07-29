@@ -28,8 +28,13 @@ const [selectedStage] = activeStages;
 const selectedStageSlug = selectedStage.slug;
 const [selectedValueStream] = valueStreams;
 
+const mockGetters = {
+  currentGroupPath: () => selectedGroup.fullPath,
+  currentValueStreamId: () => selectedValueStream.id,
+};
+
 const stageEndpoint = ({ stageId }) =>
-  `/groups/${selectedGroup.fullPath}/-/analytics/value_stream_analytics/stages/${stageId}`;
+  `/groups/${selectedGroup.fullPath}/-/analytics/value_stream_analytics/value_streams/${selectedValueStream.id}/stages/${stageId}`;
 
 jest.mock('~/flash');
 
@@ -52,6 +57,8 @@ describe('Cycle analytics actions', () => {
         hasDurationChartMedian: true,
       },
       activeStages,
+      selectedValueStream,
+      ...mockGetters,
     };
     mock = new MockAdapter(axios);
   });
@@ -437,7 +444,6 @@ describe('Cycle analytics actions', () => {
 
     beforeEach(() => {
       mock.onPut(stageEndpoint({ stageId }), payload).replyOnce(httpStatusCodes.OK, payload);
-      state = { selectedGroup };
     });
 
     it('dispatches receiveUpdateStageSuccess and customStages/setSavingCustomStage', () => {
@@ -583,7 +589,6 @@ describe('Cycle analytics actions', () => {
 
     beforeEach(() => {
       mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
-      state = { selectedGroup };
     });
 
     it('dispatches receiveRemoveStageSuccess with put request response data', () => {
@@ -819,10 +824,6 @@ describe('Cycle analytics actions', () => {
   describe('reorderStage', () => {
     const stageId = 'cool-stage';
     const payload = { id: stageId, move_after_id: '2', move_before_id: '8' };
-
-    beforeEach(() => {
-      state = { selectedGroup };
-    });
 
     describe('with no errors', () => {
       beforeEach(() => {
