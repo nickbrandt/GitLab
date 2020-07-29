@@ -356,7 +356,7 @@ module Gitlab
 
       def services_usage
         # rubocop: disable UsageData/LargeTable:
-        Service.available_services_names.without('jira').each_with_object({}) do |service_name, response|
+        Service.available_services_names.each_with_object({}) do |service_name, response|
           response["projects_#{service_name}_active".to_sym] = count(Service.active.where(template: false, type: "#{service_name}_service".camelize))
         end.merge(jira_usage).merge(jira_import_usage)
         # rubocop: enable UsageData/LargeTable:
@@ -368,8 +368,7 @@ module Gitlab
 
         results = {
           projects_jira_server_active: 0,
-          projects_jira_cloud_active: 0,
-          projects_jira_active: 0
+          projects_jira_cloud_active: 0
         }
 
         # rubocop: disable UsageData/LargeTable:
@@ -382,12 +381,11 @@ module Gitlab
 
           results[:projects_jira_server_active] += counts[:server].size if counts[:server]
           results[:projects_jira_cloud_active] += counts[:cloud].size if counts[:cloud]
-          results[:projects_jira_active] += services.size
         end
         # rubocop: enable UsageData/LargeTable:
         results
       rescue ActiveRecord::StatementInvalid
-        { projects_jira_server_active: FALLBACK, projects_jira_cloud_active: FALLBACK, projects_jira_active: FALLBACK }
+        { projects_jira_server_active: FALLBACK, projects_jira_cloud_active: FALLBACK }
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
