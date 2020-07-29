@@ -8,6 +8,12 @@
 # so that we can keep track of the issue's state during that point in time and handle the events based on that.
 
 class Milestones::BurnupChartService
+  include Gitlab::Utils::StrongMemoize
+
+  EVENT_COUNT_LIMIT = 50_000
+
+  TooManyEventsError = Class.new(StandardError)
+
   def initialize(milestone)
     raise ArgumentError, 'Milestone must have a start and due date' if milestone.start_date.blank? || milestone.due_date.blank?
 
@@ -17,6 +23,8 @@ class Milestones::BurnupChartService
   def execute
     @issue_states = {}
     @chart_data = []
+
+    raise TooManyEventsError if resource_events.num_tuples > EVENT_COUNT_LIMIT
 
     resource_events.each do |event|
       case event['event_type']
@@ -152,9 +160,11 @@ class Milestones::BurnupChartService
 
   # rubocop: disable CodeReuse/ActiveRecord
   def resource_events
-    union = Gitlab::SQL::Union.new([milestone_events, state_events, weight_events]) # rubocop: disable Gitlab/Union
+    strong_memoize(:resource_events) do
+      union = Gitlab::SQL::Union.new([milestone_events, state_events, weight_events]) # rubocop: disable Gitlab/Union
 
-    ActiveRecord::Base.connection.execute("(#{union.to_sql}) ORDER BY created_at")
+      ActiveRecord::Base.connection.execute("(#{union.to_sql}) ORDER BY created_at LIMIT #{EVENT_COUNT_LIMIT + 1}")
+    end
   end
   # rubocop: enable CodeReuse/ActiveRecord
 

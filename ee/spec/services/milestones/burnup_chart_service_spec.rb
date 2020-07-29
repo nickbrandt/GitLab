@@ -16,6 +16,15 @@ RSpec.describe Milestones::BurnupChartService do
     expect { described_class.new(milestone) }.to raise_error('Milestone must have a start and due date')
   end
 
+  it 'raises an error when the number of events exceeds the limit' do
+    stub_const('Milestones::BurnupChartService::EVENT_COUNT_LIMIT', 1)
+
+    create(:resource_milestone_event, issue: issues[0], milestone: milestone, action: :add, created_at: '2019-12-15')
+    create(:resource_milestone_event, issue: issues[1], milestone: milestone, action: :add, created_at: '2019-12-16')
+
+    expect { chart_data }.to raise_error(described_class::TooManyEventsError)
+  end
+
   it 'aggregates events before the start date to the start date' do
     create(:resource_milestone_event, issue: issues[0], milestone: milestone, action: :add, created_at: '2019-12-15')
     create(:resource_weight_event, issue: issues[0], weight: 2, created_at: '2019-12-18')
