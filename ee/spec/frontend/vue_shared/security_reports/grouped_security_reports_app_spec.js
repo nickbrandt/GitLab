@@ -11,7 +11,6 @@ import { waitForMutation } from 'helpers/vue_test_utils_helper';
 import { trimText } from 'helpers/text_helper';
 import axios from '~/lib/utils/axios_utils';
 import { mrStates } from '~/mr_popover/constants';
-import { TEST_HOST } from 'helpers/test_constants';
 import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
 import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
 import ReportSection from '~/reports/components/report_section.vue';
@@ -55,17 +54,23 @@ describe('Grouped security reports app', () => {
     projectFullPath: 'path',
   };
 
+  const defaultDastSummary = {
+    scannedResourcesCount: 211,
+    scannedResources: { nodes: [] },
+    scannedResourcesCsvPath: '',
+  };
+
   const glModalDirective = jest.fn();
 
-  const createWrapper = (propsData, provide = {}) => {
+  const createWrapper = (propsData, options) => {
     wrapper = mount(GroupedSecurityReportsApp, {
       propsData,
       data() {
         return {
-          dastSummary: null,
+          dastSummary: defaultDastSummary,
+          ...options?.data,
         };
       },
-      provide,
       directives: {
         glModal: {
           bind(el, { value }) {
@@ -427,8 +432,6 @@ describe('Grouped security reports app', () => {
   });
 
   describe('dast reports', () => {
-    const scanUrl = `${TEST_HOST}/group/project/-/jobs/123546789`;
-
     beforeEach(() => {
       gl.mrWidgetData = gl.mrWidgetData || {};
       gl.mrWidgetData.dast_comparison_path = DAST_DIFF_ENDPOINT;
@@ -436,12 +439,6 @@ describe('Grouped security reports app', () => {
       mock.onGet(DAST_DIFF_ENDPOINT).reply(200, {
         ...dastDiffSuccessMock,
         base_report_out_of_date: true,
-        scans: [
-          {
-            scanned_resources_count: 211,
-            job_path: scanUrl,
-          },
-        ],
       });
 
       createWrapper({
@@ -481,19 +478,28 @@ describe('Grouped security reports app', () => {
       mock.onGet(DAST_DIFF_ENDPOINT).reply(200, {
         ...dastDiffSuccessMock,
         base_report_out_of_date: true,
-        scans: [
-          {
-            scanned_resources_count: 0,
-            job_path: scanUrl,
+      });
+
+      // set scanned urls count to 0
+      const summaryWithoutUrls = {
+        ...defaultDastSummary,
+        scannedResourcesCount: 0,
+      };
+
+      createWrapper(
+        {
+          ...props,
+          enabledReports: {
+            dast: true,
           },
-        ],
-      });
-      createWrapper({
-        ...props,
-        enabledReports: {
-          dast: true,
         },
-      });
+        {
+          data: {
+            dastSummary: summaryWithoutUrls,
+          },
+        },
+      );
+
       return waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS).then(() => {
         expect(wrapper.text()).not.toContain('0 URLs scanned');
         expect(wrapper.contains('[data-qa-selector="dast-ci-job-link"]')).toBe(false);

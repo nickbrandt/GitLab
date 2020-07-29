@@ -1,0 +1,5 @@
+---
+title: Fix number mismatch issue for MR Widget
+merge_request: 38021
+author:
+type: fixed
