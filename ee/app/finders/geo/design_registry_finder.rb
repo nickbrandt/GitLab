@@ -3,15 +3,15 @@
 module Geo
   class DesignRegistryFinder < RegistryFinder
     def count_syncable
-      current_node(fdw: false).designs.count
+      designs.count
     end
 
     def count_synced
-      registries.merge(Geo::DesignRegistry.synced).count
+      registries.synced.count
     end
 
     def count_failed
-      registries.merge(Geo::DesignRegistry.failed).count
+      registries.failed.count
     end
 
     def count_registry
@@ -19,8 +19,8 @@ module Geo
     end
 
     def find_registry_differences(range)
-      source_ids = Gitlab::Geo.current_node.designs.id_in(range).pluck_primary_key
-      tracked_ids = Geo::DesignRegistry.pluck_model_ids_in_range(range)
+      source_ids = designs.id_in(range).pluck_primary_key
+      tracked_ids = registries.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
       unused_tracked_ids = tracked_ids - source_ids
@@ -46,7 +46,7 @@ module Geo
     # @param [Array<Integer>] except_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
     def find_never_synced_registries(batch_size:, except_ids: [])
-      Geo::DesignRegistry
+      registries
         .never_synced
         .model_id_not_in(except_ids)
         .limit(batch_size)
@@ -55,7 +55,7 @@ module Geo
 
     # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_dirty_registries(batch_size:, except_ids: [])
-      Geo::DesignRegistry
+      registries
         .updated_recently
         .model_id_not_in(except_ids)
         .order(Gitlab::Database.nulls_first_order(:last_synced_at))
@@ -65,15 +65,12 @@ module Geo
 
     private
 
+    def designs
+      current_node_non_fdw.designs
+    end
+
     def registries
-      if Geo::DesignRegistry.registry_consistency_worker_enabled?
-        Geo::DesignRegistry.all
-      else
-        current_node(fdw: true)
-          .projects
-          .with_designs
-          .inner_join_design_registry
-      end
+      Geo::DesignRegistry
     end
   end
 end

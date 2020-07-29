@@ -40,10 +40,6 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     end
   end
 
-  def self.registry_consistency_worker_enabled?
-    Feature.enabled?(:geo_design_registry_ssot_sync, default_enabled: true)
-  end
-
   def self.delete_for_model_ids(project_ids)
     # We only need to delete the registry entries here. The design
     # repository deletion should happen when a project is destroyed.
