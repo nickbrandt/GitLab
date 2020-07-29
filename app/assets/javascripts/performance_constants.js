@@ -4,6 +4,7 @@
 
 // marks
 export const SNIPPET_MARK_VIEW_APP_START = 'snippet-view-app-start';
+export const SNIPPET_MARK_EDIT_APP_START = 'snippet-edit-app-start';
 export const SNIPPET_MARK_BLOB_CONTENT = 'snippet-blob-content-finished';
 
 // Measures

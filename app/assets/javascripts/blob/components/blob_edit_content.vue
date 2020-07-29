@@ -1,6 +1,12 @@
 <script>
 import { initEditorLite } from '~/blob/utils';
 import { debounce } from 'lodash';
+import {
+  SNIPPET_MARK_BLOB_CONTENT,
+  SNIPPET_MARK_EDIT_APP_START,
+  SNIPPET_MEASURE_BLOB_CONTENT,
+  SNIPPET_MEASURE_BLOB_CONTENT_WITHIN_APP,
+} from '~/performance_constants';
 
 export default {
   props: {
@@ -30,6 +36,11 @@ export default {
       el: this.$refs.editor,
       blobPath: this.fileName,
       blobContent: this.value,
+    });
+    window.requestAnimationFrame(() => {
+      performance.mark(SNIPPET_MARK_BLOB_CONTENT);
+      performance.measure(SNIPPET_MEASURE_BLOB_CONTENT);
+      performance.measure(SNIPPET_MEASURE_BLOB_CONTENT_WITHIN_APP, SNIPPET_MARK_EDIT_APP_START);
     });
   },
   methods: {
