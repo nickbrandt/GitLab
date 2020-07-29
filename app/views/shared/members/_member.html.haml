@@ -91,7 +91,7 @@
                       member: member,
                       can_override: member.can_override?
             .clearable-input.member-form-control{ class: [("d-sm-inline-block" unless force_mobile_view)] }
-              .js-member-expiration-date-input{ data: { disabled: member.can_override? && !override, el_id: dom_id(member) } }
+              .js-vue-date-picker{ 'v-cloak': true, data: { disabled: member.can_override?.to_s && !override, el_id: dom_id(member), label: _('Expiration dates') } }
         - else
           %span.member-access-text.user-access-role= member.human_access
 
