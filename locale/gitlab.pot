@@ -11839,7 +11839,7 @@ msgstr ""
 msgid "GroupSAML|Copy SAML Response XML"
 msgstr ""
 
-msgid "GroupSAML|Default Membership Role"
+msgid "GroupSAML|Default membership role"
 msgstr ""
 
 msgid "GroupSAML|Enable SAML authentication for this group."

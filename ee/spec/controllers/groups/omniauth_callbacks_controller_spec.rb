@@ -153,12 +153,12 @@ RSpec.describe Groups::OmniauthCallbacksController do
           expect(group).to be_member(user)
         end
 
-        context 'access level' do
+        context 'when a default access level is specified in the SAML provider' do
           let!(:saml_provider) do
             create(:saml_provider, group: group, default_membership_role: Gitlab::Access::DEVELOPER)
           end
 
-          it 'sets the access level as per the `default_membership_role` set in saml_provider' do
+          it 'sets the access level of the member as per the specified `default_membership_role`' do
             post provider, params: { group_id: group }
 
             created_member = group.members.find_by(user: user)

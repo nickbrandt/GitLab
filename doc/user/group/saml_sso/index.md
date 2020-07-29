@@ -63,7 +63,7 @@ Once you've set up your identity provider to work with GitLab, you'll need to co
 1. Navigate to the group's **Settings > SAML SSO**.
 1. Find the SSO URL from your Identity Provider and enter it the **Identity provider single sign-on URL** field.
 1. Find and enter the fingerprint for the SAML token signing certificate in the **Certificate** field.
-1. Select the access level to be applied to newly added users in the **Default Membership Role** field. The default access level is 'Guest'.
+1. Select the access level to be applied to newly added users in the **Default membership role** field. The default access level is 'Guest'.
 1. Click the **Enable SAML authentication for this group** toggle switch.
 1. Click the **Save changes** button.
 
@@ -217,9 +217,9 @@ On subsequent visits, you should be able to go [sign in to GitLab.com with SAML]
 
 ### Role
 
-Starting from [GitLab 13.3](https://gitlab.com/gitlab-org/gitlab/-/issues/214523), group owners can set a 'Default membership role' while [configuring the SAML SSO for the group](#configuring-gitlab), which will be set as the access level of all users that will be added to the group. The default access level is 'Guest'.
+Starting from [GitLab 13.3](https://gitlab.com/gitlab-org/gitlab/-/issues/214523), group owners can set a 'Default membership role' other than 'Guest'. To do so, [configure the SAML SSO for the group](#configuring-gitlab). That role becomes the starting access level of all users added to the group.
 
-Existing members with appropriate privileges can promote or demote that new user, after they are added to the group.
+Existing members with appropriate privileges can promote or demote users, as needed.
 
 If a user is already a member of the group, linking the SAML identity does not change their role.
 
