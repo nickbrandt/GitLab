@@ -7,7 +7,7 @@
       #progress-bar{ data: { is_in_subscription_flow: in_subscription_flow?.to_s } }
       %h2.center= _('Create/import your first project')
       %p
-        .center= _('This project will live in your group <strong>%{namespace}</strong>. A project is where you house your files (repository), plan your work (issues), publish your documentation (wiki), and so much more.').html_safe % { namespace: html_escape(@project.namespace.name) }
+        .center= html_escape(_('This project will live in your group %{strong_open}%{namespace}%{strong_close}. A project is where you house your files (repository), plan your work (issues), publish your documentation (wiki), and so much more.')) % { namespace: html_escape(@project.namespace.name), strong_open: '<strong>'.html_safe, strong_close: '</strong>'.html_safe }
 
       .js-toggle-container.w-100
         %ul.nav.nav-tabs.nav-links.gitlab-tabs{ role: 'tablist' }
