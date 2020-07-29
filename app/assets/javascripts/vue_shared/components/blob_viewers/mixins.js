@@ -18,11 +18,11 @@ export default {
   },
   mounted() {
     window.requestAnimationFrame(() => {
-      if(!performance.getEntriesByName(SNIPPET_MARK_BLOBS_CONTENT).length) {
+      if (!performance.getEntriesByName(SNIPPET_MARK_BLOBS_CONTENT).length) {
         performance.mark(SNIPPET_MARK_BLOBS_CONTENT);
         performance.measure(SNIPPET_MEASURE_BLOBS_CONTENT);
         performance.measure(SNIPPET_MEASURE_BLOBS_CONTENT_WITHIN_APP, SNIPPET_MARK_VIEW_APP_START);
       }
     });
-  }
+  },
 };
