@@ -217,6 +217,19 @@ RSpec.describe Project do
 
       it { is_expected.to contain_exactly(project_1) }
     end
+
+    describe '.has_vulnerability_statistics' do
+      let_it_be(:project_1) { create(:project) }
+      let_it_be(:project_2) { create(:project) }
+
+      before do
+        create(:vulnerability_statistic, project: project_1)
+      end
+
+      subject { described_class.has_vulnerability_statistics }
+
+      it { is_expected.to contain_exactly(project_1) }
+    end
   end
 
   describe 'validations' do
