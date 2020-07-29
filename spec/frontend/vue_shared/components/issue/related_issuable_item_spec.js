@@ -145,11 +145,11 @@ describe('RelatedIssuableItem', () => {
     });
 
     it('renders due date component', () => {
-      expect(tokenMetadata.find('.js-due-date-slot').exists()).toBe(true);
+      expect(tokenMetadata.find('.item-due-date').exists()).toBe(true);
     });
 
     it('renders weight component', () => {
-      expect(tokenMetadata.find('.js-weight-slot').exists()).toBe(true);
+      expect(tokenMetadata.find('.item-weight').exists()).toBe(true);
     });
   });
 
