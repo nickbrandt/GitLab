@@ -282,7 +282,7 @@ This can be done via `pkill -USR2 puma:`. The `:` disambiguates between `puma
 worker processes), selecting the latter.
 
 For Sidekiq, the signal can be sent to the `sidekiq-cluster` process via `pkill
--USR2 bin/sidekiq-cluster` -- this will forward the signal to all Sidekiq
+-USR2 bin/sidekiq-cluster`, which will forward the signal to all Sidekiq
 children. Alternatively, you can also select a specific pid of interest.
 
 Production profiles can be especially noisy. It can be helpful to visualize them
