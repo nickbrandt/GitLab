@@ -1,5 +1,5 @@
 <script>
-import { GlFormGroup, GlFormTextarea, GlDeprecatedButton } from '@gitlab/ui';
+import { GlFormGroup, GlFormTextarea, GlButton } from '@gitlab/ui';
 import { isEmpty } from 'lodash';
 import { __, sprintf } from '~/locale';
 
@@ -12,7 +12,7 @@ export default {
   components: {
     GlFormGroup,
     GlFormTextarea,
-    GlDeprecatedButton,
+    GlButton,
   },
   props: {
     requirement: {
@@ -91,18 +91,25 @@ export default {
         />
       </gl-form-group>
       <div class="d-flex requirement-form-actions">
-        <gl-deprecated-button
+        <gl-button
           :disabled="disableSaveButton"
           :loading="requirementRequestActive"
-          category="primary"
           variant="success"
+          category="primary"
           class="mr-auto js-requirement-save"
           @click="handleSave"
-          >{{ saveButtonLabel }}</gl-deprecated-button
         >
-        <gl-deprecated-button class="js-requirement-cancel" @click="$emit('cancel')">{{
-          __('Cancel')
-        }}</gl-deprecated-button>
+          {{ saveButtonLabel }}
+        </gl-button>
+
+        <gl-button
+          variant="default"
+          category="primary"
+          class="js-requirement-cancel"
+          @click="$emit('cancel')"
+        >
+          {{ __('Cancel')}}
+        </gl-button>
       </div>
     </div>
   </div>

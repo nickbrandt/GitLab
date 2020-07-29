@@ -28,8 +28,8 @@ ELSIF (TG_OP = 'UPDATE') THEN
     updated_at = NEW.updated_at,
     ip_address = NEW.ip_address,
     author_name = NEW.author_name,
-    entity_path = NEW.entity_path,
     target_details = NEW.target_details,
+    entity_path = NEW.entity_path,
     created_at = NEW.created_at
   WHERE audit_events_part_5fc467ac26.id = NEW.id;
 ELSIF (TG_OP = 'INSERT') THEN
@@ -42,8 +42,8 @@ ELSIF (TG_OP = 'INSERT') THEN
     updated_at,
     ip_address,
     author_name,
-    entity_path,
     target_details,
+    entity_path,
     created_at)
   VALUES (NEW.id,
     NEW.author_id,
@@ -54,8 +54,8 @@ ELSIF (TG_OP = 'INSERT') THEN
     NEW.updated_at,
     NEW.ip_address,
     NEW.author_name,
-    NEW.entity_path,
     NEW.target_details,
+    NEW.entity_path,
     NEW.created_at);
 END IF;
 RETURN NULL;
@@ -75,8 +75,8 @@ CREATE TABLE public.audit_events_part_5fc467ac26 (
     updated_at timestamp without time zone,
     ip_address inet,
     author_name text,
-    entity_path text,
     target_details text,
+    entity_path text,
     created_at timestamp without time zone NOT NULL,
     CONSTRAINT check_492aaa021d CHECK ((char_length(entity_path) <= 5500)),
     CONSTRAINT check_83ff8406e2 CHECK ((char_length(author_name) <= 255)),
@@ -9223,8 +9223,8 @@ CREATE TABLE public.application_settings (
     namespace_storage_size_limit bigint DEFAULT 0 NOT NULL,
     seat_link_enabled boolean DEFAULT true NOT NULL,
     container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
-    issues_create_limit integer DEFAULT 0 NOT NULL,
     push_rule_id bigint,
+    issues_create_limit integer DEFAULT 0 NOT NULL,
     group_owners_can_manage_default_branch_protection boolean DEFAULT true NOT NULL,
     container_registry_vendor text DEFAULT ''::text NOT NULL,
     container_registry_version text DEFAULT ''::text NOT NULL,
@@ -9473,8 +9473,8 @@ CREATE TABLE public.audit_events (
     updated_at timestamp without time zone,
     ip_address inet,
     author_name text,
-    entity_path text,
     target_details text,
+    entity_path text,
     CONSTRAINT check_492aaa021d CHECK ((char_length(entity_path) <= 5500)),
     CONSTRAINT check_83ff8406e2 CHECK ((char_length(author_name) <= 255)),
     CONSTRAINT check_d493ec90b5 CHECK ((char_length(target_details) <= 5500))
@@ -9942,11 +9942,14 @@ ALTER SEQUENCE public.ci_daily_build_group_report_results_id_seq OWNED BY public
 CREATE TABLE public.ci_freeze_periods (
     id bigint NOT NULL,
     project_id bigint NOT NULL,
-    freeze_start character varying(998) NOT NULL,
-    freeze_end character varying(998) NOT NULL,
-    cron_timezone character varying(255) NOT NULL,
+    freeze_start text NOT NULL,
+    freeze_end text NOT NULL,
+    cron_timezone text NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT check_4a7939e04e CHECK ((char_length(freeze_end) <= 998)),
+    CONSTRAINT check_a92607bd2b CHECK ((char_length(freeze_start) <= 998)),
+    CONSTRAINT check_b14055adc3 CHECK ((char_length(cron_timezone) <= 255))
 );
 
 CREATE SEQUENCE public.ci_freeze_periods_id_seq
@@ -10711,8 +10714,10 @@ CREATE TABLE public.clusters_applications_fluentd (
     version character varying(255) NOT NULL,
     host character varying(255) NOT NULL,
     status_reason text,
-    waf_log_enabled boolean DEFAULT true NOT NULL,
-    cilium_log_enabled boolean DEFAULT true NOT NULL
+    waf_log_enabled boolean DEFAULT true,
+    cilium_log_enabled boolean DEFAULT true,
+    CONSTRAINT check_9dfbb2c013 CHECK ((waf_log_enabled IS NOT NULL)),
+    CONSTRAINT check_bd071c4ebb CHECK ((cilium_log_enabled IS NOT NULL))
 );
 
 CREATE SEQUENCE public.clusters_applications_fluentd_id_seq
@@ -11131,8 +11136,10 @@ CREATE TABLE public.deploy_tokens (
     token_encrypted character varying(255),
     deploy_token_type smallint DEFAULT 2 NOT NULL,
     write_registry boolean DEFAULT false NOT NULL,
-    read_package_registry boolean DEFAULT false NOT NULL,
-    write_package_registry boolean DEFAULT false NOT NULL
+    read_package_registry boolean DEFAULT false,
+    write_package_registry boolean DEFAULT false,
+    CONSTRAINT check_6c61e9fe6a CHECK ((write_package_registry IS NOT NULL)),
+    CONSTRAINT check_dd63e830ce CHECK ((read_package_registry IS NOT NULL))
 );
 
 CREATE SEQUENCE public.deploy_tokens_id_seq
@@ -11481,8 +11488,8 @@ CREATE TABLE public.epics (
     state_id smallint DEFAULT 1 NOT NULL,
     start_date_sourcing_epic_id integer,
     due_date_sourcing_epic_id integer,
-    confidential boolean DEFAULT false NOT NULL,
     external_key character varying(255),
+    confidential boolean DEFAULT false NOT NULL,
     CONSTRAINT check_fcfb4a93ff CHECK ((lock_version IS NOT NULL))
 );
 
@@ -14465,11 +14472,10 @@ CREATE TABLE public.project_settings (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     push_rule_id bigint,
-    show_default_award_emojis boolean DEFAULT true,
+    show_default_award_emojis boolean DEFAULT true NOT NULL,
     allow_merge_on_skipped_pipeline boolean,
     squash_option smallint DEFAULT 3,
-    has_confluence boolean DEFAULT false NOT NULL,
-    CONSTRAINT check_bde223416c CHECK ((show_default_award_emojis IS NOT NULL))
+    has_confluence boolean DEFAULT false NOT NULL
 );
 
 CREATE TABLE public.project_statistics (
@@ -18752,7 +18758,7 @@ CREATE INDEX backup_labels_group_id_title_idx ON public.backup_labels USING btre
 
 CREATE INDEX backup_labels_project_id_idx ON public.backup_labels USING btree (project_id);
 
-CREATE UNIQUE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
+CREATE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
 
 CREATE INDEX backup_labels_template_idx ON public.backup_labels USING btree (template) WHERE template;
 
@@ -21196,7 +21202,7 @@ ALTER INDEX public.product_analytics_events_experimental_pkey ATTACH PARTITION g
 
 ALTER INDEX public.product_analytics_events_experimental_pkey ATTACH PARTITION gitlab_partitions_static.product_analytics_events_experimental_63_pkey;
 
-CREATE TRIGGER table_sync_trigger_ee39a25f9d AFTER INSERT OR DELETE OR UPDATE ON public.audit_events FOR EACH ROW EXECUTE PROCEDURE public.table_sync_function_2be879775d();
+CREATE TRIGGER table_sync_trigger_ee39a25f9d AFTER INSERT OR DELETE OR UPDATE ON public.audit_events FOR EACH ROW EXECUTE FUNCTION public.table_sync_function_2be879775d();
 
 ALTER TABLE ONLY public.chat_names
     ADD CONSTRAINT fk_00797a2bf9 FOREIGN KEY (service_id) REFERENCES public.services(id) ON DELETE CASCADE;

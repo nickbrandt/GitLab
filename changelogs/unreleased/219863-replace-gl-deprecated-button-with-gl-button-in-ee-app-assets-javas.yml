@@ -1,0 +1,5 @@
+---
+title: Replace instances of GlDeprecatedButton with GlButton
+merge_request: 38222
+author:
+type: other
