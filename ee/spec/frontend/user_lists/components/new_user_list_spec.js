@@ -26,7 +26,7 @@ describe('ee/user_lists/components/new_user_list', () => {
     wrapper = mount(NewUserList, {
       localVue,
       store: createStore({ projectId: '1' }),
-      propsData: {
+      provide: {
         featureFlagsPath: '/feature_flags',
         userListsDocsPath: '/docs/user_lists',
       },

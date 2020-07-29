@@ -32,7 +32,7 @@ describe('ee/user_lists/components/edit_user_list', () => {
     wrapper = mount(EditUserList, {
       localVue,
       store: createStore({ projectId: '1', userListIid: '2' }),
-      propsData: {
+      provide: {
         userListsDocsPath: '/docs/user_lists',
       },
     });
