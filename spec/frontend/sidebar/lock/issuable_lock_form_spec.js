@@ -1,12 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
 import { mockTracking, triggerEvent } from 'helpers/tracking_helper';
-import LockIssueSidebar from '~/sidebar/components/lock/lock_issue_sidebar.vue';
+import IssuableLockForm from '~/sidebar/components/lock/issuable_lock_form.vue';
 import EditForm from '~/sidebar/components/lock/edit_form.vue';
 import createStore from '~/notes/stores';
 import { createStore as createMrStore } from '~/mr_notes/stores';
 import { ISSUABLE_TYPE_ISSUE, ISSUABLE_TYPE_MR } from './constants';
 
-describe('LockIssueSidebar', () => {
+describe('IssuableLockForm', () => {
   let wrapper;
   let store;
   let mediator;
@@ -41,7 +41,7 @@ describe('LockIssueSidebar', () => {
   };
 
   const createComponent = ({ props = {} }) => {
-    wrapper = shallowMount(LockIssueSidebar, {
+    wrapper = shallowMount(IssuableLockForm, {
       store,
       propsData: {
         isEditable: true,
