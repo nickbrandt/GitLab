@@ -1,0 +1,6 @@
+---
+title: Metrics dashboard changes in time range reload the data in-place, and do not
+  trigger a full page refresh
+merge_request: 38160
+author:
+type: changed

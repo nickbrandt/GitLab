@@ -22,6 +22,7 @@ import { s__ } from '~/locale';
 import CustomMetricsFormFields from '~/custom_metrics/components/custom_metrics_form_fields.vue';
 import { mergeUrlParams, redirectTo } from '~/lib/utils/url_utility';
 import invalidUrl from '~/lib/utils/invalid_url';
+import createFlash from '~/flash';
 import Icon from '~/vue_shared/components/icon.vue';
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 
@@ -31,8 +32,8 @@ import CreateDashboardModal from './create_dashboard_modal.vue';
 import DuplicateDashboardModal from './duplicate_dashboard_modal.vue';
 
 import TrackEventDirective from '~/vue_shared/directives/track_event';
-import { getAddMetricTrackingOptions, timeRangeToUrl } from '../utils';
-import { timeRanges } from '~/vue_shared/constants';
+import { getAddMetricTrackingOptions } from '../utils';
+import { defaultTimeRange, timeRanges } from '~/vue_shared/constants';
 import { timezones } from '../format_date';
 
 export default {
@@ -103,10 +104,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    selectedTimeRange: {
-      type: Object,
-      required: true,
-    },
   },
   data() {
     return {
@@ -116,6 +113,7 @@ export default {
   computed: {
     ...mapState('monitoringDashboard', [
       'emptyState',
+      'timeRange',
       'environmentsLoading',
       'currentEnvironmentName',
       'isUpdatingStarredValue',
@@ -160,7 +158,12 @@ export default {
     },
   },
   methods: {
-    ...mapActions('monitoringDashboard', ['filterEnvironments', 'toggleStarredValue']),
+    ...mapActions('monitoringDashboard', [
+      'setTimeRange',
+      'fetchData',
+      'filterEnvironments',
+      'toggleStarredValue',
+    ]),
     selectDashboard(dashboard) {
       // Once the sidebar See metrics link is updated to the new URL,
       // this sort of hardcoding will not be necessary.
@@ -175,12 +178,21 @@ export default {
       this.filterEnvironments(searchTerm);
     }, 500),
     onDateTimePickerInput(timeRange) {
-      redirectTo(timeRangeToUrl(timeRange));
+      // Note: `catch` is not needed as error handling is done in fetchData
+      // eslint-disable-next-line promise/catch-or-return
+      this.setTimeRange(timeRange).then(() => {
+        this.fetchData();
+      });
     },
     onDateTimePickerInvalid() {
-      this.$emit('dateTimePickerInvalid');
+      createFlash(
+        s__(
+          'Metrics|Link contains an invalid time window, please verify the link to see the requested time range.',
+        ),
+      );
+      // As a fallback, switch to default time range instead
+      this.setTimeRange(defaultTimeRange);
     },
-
     toggleRearrangingPanels() {
       this.$emit('setRearrangingPanels', !this.isRearrangingPanels);
     },
@@ -278,7 +290,7 @@ export default {
         ref="dateTimePicker"
         class="flex-grow-1 show-last-dropdown"
         data-qa-selector="range_picker_dropdown"
-        :value="selectedTimeRange"
+        :value="timeRange"
         :options="$options.timeRanges"
         :utc="displayUtc"
         @input="onDateTimePickerInput"

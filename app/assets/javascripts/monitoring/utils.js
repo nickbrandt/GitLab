@@ -1,4 +1,4 @@
-import { pickBy, mapKeys } from 'lodash';
+import { omit, pickBy, mapKeys } from 'lodash';
 import {
   queryToObject,
   mergeUrlParams,
@@ -10,6 +10,7 @@ import {
   timeRangeParamNames,
   timeRangeFromParams,
   timeRangeToParams,
+  isEqualTimeRanges,
 } from '~/lib/utils/datetime_range';
 import { VARIABLE_PREFIX } from './constants';
 
@@ -270,6 +271,28 @@ export const timeRangeToUrl = (timeRange, url = window.location.href) => {
 };
 
 /**
+ * Returns query parameters that correspond to the time range based on the
+ * current query parameters.
+ *
+ * @param {Object} timeRange - Time range to evaluate
+ * @param {Object} query - current query object
+ * @param {Object?} defaultTimeRange - if equivalent to the given time range, no parameters
+ * time range parameters are returned. This is useful to avoid reduntand parameters.
+ */
+export const timeRangeToQuery = (timeRange, query = {}, defaultTimeRange = null) => {
+  const otherParameters = omit(query, timeRangeParamNames);
+  if (isEqualTimeRanges(timeRange, defaultTimeRange)) {
+    return otherParameters;
+  }
+
+  const timeRangeParams = timeRangeToParams(timeRange);
+  return {
+    ...otherParameters,
+    ...timeRangeParams,
+  };
+};
+
+/**
  * Locates a panel (and its corresponding group) given a (URL) search query. Returns
  * it as payload for the store to set the right expandaded panel.
  *
@@ -298,7 +321,7 @@ export const expandedPanelPayloadFromUrl = (dashboard, search = window.location.
 
     if (!panel) {
       // eslint-disable-next-line @gitlab/require-i18n-strings
-      throw new Error('Panel could no found by URL parameters.');
+      throw new Error('Panel could not be found by URL parameters.');
     }
     return { group: panelGroup.group, panel };
   }

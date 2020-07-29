@@ -34,6 +34,7 @@ import {
 } from '../fixture_data';
 import createFlash from '~/flash';
 import { TEST_HOST } from 'helpers/test_constants';
+import { defaultTimeRange } from '~/vue_shared/constants';
 
 jest.mock('~/flash');
 
@@ -71,6 +72,9 @@ describe('Dashboard', () => {
   beforeEach(() => {
     store = createStore();
     mock = new MockAdapter(axios);
+
+    store.commit(`monitoringDashboard/${types.SET_TIME_RANGE}`, defaultTimeRange);
+
     jest.spyOn(store, 'dispatch').mockResolvedValue();
   });
 
@@ -82,15 +86,10 @@ describe('Dashboard', () => {
   });
 
   describe('request information to the server', () => {
-    it('calls to set time range and fetch data', () => {
+    it('calls fetch data', () => {
       createShallowWrapper({ hasMetrics: true });
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(store.dispatch).toHaveBeenCalledWith(
-          'monitoringDashboard/setTimeRange',
-          expect.any(Object),
-        );
-
         expect(store.dispatch).toHaveBeenCalledWith('monitoringDashboard/fetchData', undefined);
       });
     });
@@ -114,18 +113,6 @@ describe('Dashboard', () => {
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.emptyState).toBeNull();
         expect(wrapper.findAll('.prometheus-panel')).toHaveLength(0);
-      });
-    });
-
-    it('fetches the metrics data with proper time window', () => {
-      createMountedWrapper({ hasMetrics: true });
-
-      return wrapper.vm.$nextTick().then(() => {
-        expect(store.dispatch).toHaveBeenCalledWith('monitoringDashboard/fetchData', undefined);
-        expect(store.dispatch).toHaveBeenCalledWith(
-          'monitoringDashboard/setTimeRange',
-          expect.objectContaining({ duration: { seconds: 28800 } }),
-        );
       });
     });
   });

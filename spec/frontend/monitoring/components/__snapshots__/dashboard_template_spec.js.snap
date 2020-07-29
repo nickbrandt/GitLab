@@ -82,7 +82,6 @@ exports[`Dashboard template matches the default snapshot 1`] = `
         customenabled="true"
         data-qa-selector="range_picker_dropdown"
         options="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
-        value="[object Object]"
       />
     </div>
      

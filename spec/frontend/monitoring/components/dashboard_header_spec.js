@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import createFlash from '~/flash';
 import { createStore } from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
 import { GlDeprecatedDropdownItem, GlSearchBoxByType, GlLoadingIcon } from '@gitlab/ui';
@@ -16,9 +17,12 @@ import {
   dashboardHeaderProps,
 } from '../mock_data';
 import { redirectTo } from '~/lib/utils/url_utility';
+import { defaultTimeRange } from '~/vue_shared/constants';
 
 const mockProjectPath = 'https://path/to/project';
 const mockAddDashboardDocPath = '/doc/add-dashboard';
+
+jest.mock('~/flash');
 
 jest.mock('~/lib/utils/url_utility', () => ({
   redirectTo: jest.fn(),
@@ -63,6 +67,8 @@ describe('Dashboard header', () => {
 
   beforeEach(() => {
     store = createStore();
+
+    jest.spyOn(store, 'dispatch').mockResolvedValue();
   });
 
   afterEach(() => {
@@ -211,13 +217,45 @@ describe('Dashboard header', () => {
     });
   });
 
-  describe('date time picker', () => {
+  describe('data time range picker', () => {
+    const fixedRange = {
+      start: '2019-01-01T00:00:00.000Z',
+      end: '2019-01-10T00:00:00.000Z',
+    };
+
     beforeEach(() => {
       createShallowWrapper();
     });
 
     it('is rendered', () => {
       expect(findDateTimePicker().exists()).toBe(true);
+    });
+
+    it('when a time range is updated, picker is updated', () => {
+      store.commit(`monitoringDashboard/${types.SET_TIME_RANGE}`, fixedRange);
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findDateTimePicker().props('value')).toEqual(fixedRange);
+      });
+    });
+
+    it('when a time range is selected, store time range and data get updated', () => {
+      findDateTimePicker().vm.$emit('input', fixedRange);
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith('monitoringDashboard/setTimeRange', fixedRange);
+        expect(store.dispatch).toHaveBeenCalledWith('monitoringDashboard/fetchData', undefined);
+      });
+    });
+
+    it('when a time range is invalid, a warning is shown and time range is set to default', () => {
+      findDateTimePicker().vm.$emit('invalid');
+
+      expect(createFlash).toHaveBeenCalledTimes(1);
+      expect(store.dispatch).toHaveBeenCalledWith(
+        'monitoringDashboard/setTimeRange',
+        defaultTimeRange,
+      );
     });
 
     describe('timezone setting', () => {
