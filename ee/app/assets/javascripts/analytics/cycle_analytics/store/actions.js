@@ -154,22 +154,7 @@ export const receiveGroupStagesSuccess = ({ commit, dispatch }, stages) => {
   return dispatch('setDefaultSelectedStage');
 };
 
-export const fetchValueStreamStages = ({
-  hasCreateMultipleValueStreams,
-  valueStreamId,
-  groupId,
-  params,
-}) => {
-  return hasCreateMultipleValueStreams
-    ? Api.cycleAnalyticsValueStreamGroupStagesAndEvents(groupId, valueStreamId, params)
-    : Api.cycleAnalyticsGroupStagesAndEvents(groupId, params);
-};
-
-export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
-  const {
-    featureFlags: { hasCreateMultipleValueStreams = false },
-  } = state;
-
+export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
   const {
     currentValueStreamId: valueStreamId,
     currentGroupPath: groupId,
@@ -178,8 +163,7 @@ export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
   dispatch('requestGroupStages');
   dispatch('customStages/setStageEvents', []);
 
-  return fetchValueStreamStages({
-    hasCreateMultipleValueStreams,
+  return Api.cycleAnalyticsGroupStagesAndEvents({
     groupId,
     valueStreamId,
     params: { start_date: created_after, project_ids },
@@ -224,18 +208,16 @@ export const receiveUpdateStageError = (
   return dispatch('customStages/setStageFormErrors', errors);
 };
 
-export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
-  const {
-    selectedGroup: { fullPath },
-  } = state;
+export const updateStage = ({ dispatch, getters }, { id, ...params }) => {
+  const { currentGroupPath, currentValueStreamId } = getters;
 
   dispatch('requestUpdateStage');
   dispatch('customStages/setSavingCustomStage');
 
-  return Api.cycleAnalyticsUpdateStage(id, fullPath, { ...rest })
+  return Api.cycleAnalyticsUpdateStage(currentGroupPath, currentValueStreamId, id, params)
     .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
     .catch(({ response: { status = 400, data: responseData } = {} }) =>
-      dispatch('receiveUpdateStageError', { status, responseData, data: { id, ...rest } }),
+      dispatch('receiveUpdateStageError', { status, responseData, data: { id, ...params } }),
     );
 };
 
@@ -300,17 +282,14 @@ export const receiveReorderStageError = ({ commit }) => {
   createFlash(__('There was an error updating the stage order. Please try reloading the page.'));
 };
 
-export const reorderStage = ({ dispatch, state }, initialData) => {
+export const reorderStage = ({ dispatch, getters }, initialData) => {
   dispatch('requestReorderStage');
-
-  const {
-    selectedGroup: { fullPath },
-  } = state;
+  const { currentGroupPath, currentValueStreamId } = getters;
   const { id, moveAfterId, moveBeforeId } = initialData;
 
   const params = moveAfterId ? { move_after_id: moveAfterId } : { move_before_id: moveBeforeId };
 
-  return Api.cycleAnalyticsUpdateStage(id, fullPath, params)
+  return Api.cycleAnalyticsUpdateStage(currentGroupPath, currentValueStreamId, id, params)
     .then(({ data }) => dispatch('receiveReorderStageSuccess', data))
     .catch(({ response: { status = 400, data: responseData } = {} }) =>
       dispatch('receiveReorderStageError', { status, responseData }),
@@ -322,14 +301,11 @@ export const receiveCreateValueStreamSuccess = ({ commit, dispatch }) => {
   return dispatch('fetchValueStreams');
 };
 
-export const createValueStream = ({ commit, dispatch, rootState }, data) => {
-  const {
-    selectedGroup: { fullPath },
-  } = rootState;
+export const createValueStream = ({ commit, dispatch, getters }, data) => {
+  const { currentGroupPath } = getters;
+  commit(types.REQUEST_CREATE_VALUE_STREAM);cycleAnalyticsSummaryData
 
-  commit(types.REQUEST_CREATE_VALUE_STREAM);
-
-  return Api.cycleAnalyticsCreateValueStream(fullPath, data)
+  return Api.cycleAnalyticsCreateValueStream(currentGroupPath, data)
     .then(() => dispatch('receiveCreateValueStreamSuccess'))
     .catch(({ response } = {}) => {
       const { data: { message, payload: { errors } } = null } = response;
