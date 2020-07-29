@@ -129,8 +129,8 @@
     @include gl-left-0;
     @include gl-shadow-x0-y2-b4-s0;
 
-    bottom: 100%;
     width: 300px !important;
+    min-height: 335px;
     max-height: none;
     margin-bottom: $gl-spacing-scale-6 !important;
 
