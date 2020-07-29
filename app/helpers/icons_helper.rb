@@ -117,7 +117,9 @@ module IconsHelper
         'earth'
       end
 
-    sprite_icon(name, size: DEFAULT_ICON_SIZE, css_class: 'gl-vertical-align-text-bottom')
+    css_class = options.delete(:class)
+
+    sprite_icon(name, size: DEFAULT_ICON_SIZE, css_class: css_class)
   end
 
   def file_type_icon_class(type, mode, name)
