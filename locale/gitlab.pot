@@ -14507,6 +14507,9 @@ msgstr ""
 msgid "MRApprovals|Approvers"
 msgstr ""
 
+msgid "MRApprovals|Commented by"
+msgstr ""
+
 msgid "MRDiff|Show changes only"
 msgstr ""
 
