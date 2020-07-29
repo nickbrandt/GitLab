@@ -112,7 +112,7 @@ export default {
               </template>
             </gl-sprintf>
           </span>
-          <span class="js-security-dashboard-right pull-right">
+          <span class="js-security-dashboard-right float-right">
             <icon name="branch" />
             <gl-link :href="branch.path" class="monospace">{{ branch.id }}</gl-link>
             <span class="text-muted gl-ml-2 gl-mr-2">&middot;</span>

@@ -15,7 +15,7 @@ Object {
 
 exports[`Project Security Dashboard component Headline renders renders branch and commit information 1`] = `
 <span
-  class="js-security-dashboard-right pull-right"
+  class="js-security-dashboard-right float-right"
 >
   <svg
     aria-hidden="true"
