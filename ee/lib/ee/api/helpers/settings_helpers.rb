@@ -36,7 +36,6 @@ module EE
             optional :help_text, type: String, desc: 'GitLab server administrator information'
             optional :repository_size_limit, type: Integer, desc: 'Size limit per repository (MB)'
             optional :file_template_project_id, type: Integer, desc: 'ID of project where instance-level file templates are stored.'
-            optional :repository_storages, type: Array[String], coerce_with: ::API::Validations::Types::CommaSeparatedToArray.coerce, desc: 'A list of names of enabled storage paths, taken from `gitlab.yml`. New projects will be created in one of these stores, chosen at random.'
             optional :usage_ping_enabled, type: Grape::API::Boolean, desc: 'Every week GitLab will report license usage back to GitLab, Inc.'
             optional :updating_name_disabled_for_users, type: Grape::API::Boolean, desc: 'Flag indicating if users are permitted to update their profile name'
             optional :disable_overriding_approvers_per_merge_request, type: Grape::API::Boolean, desc: 'Disable Users ability to overwrite approvers in merge requests.'
