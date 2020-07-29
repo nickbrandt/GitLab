@@ -6,6 +6,13 @@
 #
 # We do not use `described_class` here, so we can include this in replicator
 # strategy shared examples instead of in *every* model spec.
+#
+# Also see ee/spec/lib/gitlab/geo/replicable_model_spec.rb:
+#
+# - Place tests in replicable_model_spec.rb if you want to run them once,
+#   against a DummyModel.
+# - Place tests here in replicable_model_shared_examples.rb if you want them to
+#   be run against every real Model.
 RSpec.shared_examples 'a replicable model' do
   include EE::GeoHelpers
 
