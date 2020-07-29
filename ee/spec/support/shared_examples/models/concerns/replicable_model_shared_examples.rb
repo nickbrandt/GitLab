@@ -20,4 +20,16 @@ RSpec.shared_examples 'a replicable model' do
 
     model_record.save!
   end
+
+  describe '.replicables_for_geo_node' do
+    let_it_be(:secondary) { create(:geo_node) }
+
+    before do
+      stub_current_geo_node(secondary)
+    end
+
+    it 'is implemented' do
+      expect(model_record.class.replicables_for_geo_node).to be_an(ActiveRecord::Relation)
+    end
+  end
 end
