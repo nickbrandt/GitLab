@@ -63,6 +63,10 @@ module EE
           @subject.has_regulated_settings?
       end
 
+      condition(:project_merge_request_analytics_available) do
+        @subject.feature_available?(:project_merge_request_analytics)
+      end
+
       condition(:cannot_modify_approvers_rules) do
         regulated_merge_request_approval_settings?
       end
@@ -367,6 +371,9 @@ module EE
       end
 
       rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
+
+      rule { reporter & project_merge_request_analytics_available }
+        .enable :read_project_merge_request_analytics
 
       rule { can?(:read_project) & requirements_available }.enable :read_requirement
 

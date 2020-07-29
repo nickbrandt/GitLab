@@ -30,6 +30,7 @@ class License < ApplicationRecord
     multiple_issue_assignees
     multiple_ldap_servers
     multiple_merge_request_assignees
+    project_merge_request_analytics
     protected_refs_for_users
     push_rules
     related_issues

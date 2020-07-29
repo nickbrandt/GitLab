@@ -35,6 +35,10 @@ module EE
         nav_tabs << :code_review
       end
 
+      if can?(current_user, :read_project_merge_request_analytics, project)
+        nav_tabs << :merge_request_analytics
+      end
+
       if can?(current_user, :read_feature_flag, project) && !nav_tabs.include?(:operations)
         nav_tabs << :operations
       end
