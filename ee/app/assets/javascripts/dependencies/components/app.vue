@@ -13,6 +13,7 @@ import DependenciesActions from './dependencies_actions.vue';
 import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vue';
 import DependencyListJobFailedAlert from './dependency_list_job_failed_alert.vue';
 import PaginatedDependenciesTable from './paginated_dependencies_table.vue';
+import DismissibleFeedbackAlert from '~/vue_shared/components/dismissible_feedback_alert.vue';
 import { DEPENDENCY_LIST_TYPES } from '../store/constants';
 import { REPORT_STATUS } from '../store/modules/list/constants';
 
@@ -29,6 +30,7 @@ export default {
     DependencyListIncompleteAlert,
     DependencyListJobFailedAlert,
     PaginatedDependenciesTable,
+    DismissibleFeedbackAlert,
   },
   props: {
     endpoint: {
@@ -149,6 +151,15 @@ export default {
       v-if="isJobFailed && !isJobFailedAlertDismissed"
       :job-path="reportInfo.jobPath"
       @dismiss="dismissJobFailedAlert"
+    />
+
+    <!-- 
+      This is a temporary change to solicit feedback from users
+      and shall be removed in https://gitlab.com/gitlab-org/gitlab/-/issues/232618
+    -->
+    <dismissible-feedback-alert
+      feature-name="Dependency List"
+      feedback-link="https://gitlab.com/gitlab-org/gitlab/-/issues/218517/"
     />
 
     <header class="d-md-flex align-items-end my-3">
