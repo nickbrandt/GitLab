@@ -55,5 +55,67 @@ module EE
       # will appear as though the tracking DB were not available
       allow(::Gitlab::Geo).to receive(:geo_database_configured?).and_call_original
     end
+
+    def stub_dummy_replicator_class
+      stub_const('Geo::DummyReplicator', Class.new(::Gitlab::Geo::Replicator))
+
+      Geo::DummyReplicator.class_eval do
+        event :test
+        event :another_test
+
+        def self.model
+          ::DummyModel
+        end
+
+        def handle_after_create_commit
+          true
+        end
+
+        protected
+
+        def consume_event_test(user:, other:)
+          true
+        end
+      end
+    end
+
+    def stub_dummy_model_class
+      stub_const('DummyModel', Class.new(ApplicationRecord))
+
+      DummyModel.class_eval do
+        include ::Gitlab::Geo::ReplicableModel
+
+        with_replicator Geo::DummyReplicator
+
+        def self.replicables_for_geo_node
+          self.all
+        end
+      end
+
+      DummyModel.reset_column_information
+    end
+
+    # Example:
+    #
+    # before(:all) do
+    #   create_dummy_model_table
+    # end
+    #
+    # after(:all) do
+    #   drop_dummy_model_table
+    # end
+    def create_dummy_model_table
+      ActiveRecord::Schema.define do
+        create_table :dummy_models, force: true do |t|
+          t.binary :verification_checksum
+        end
+      end
+    end
+
+    def drop_dummy_model_table
+      ActiveRecord::Schema.define do
+        drop_table :dummy_models, force: true
+      end
+    end
   end
 end
