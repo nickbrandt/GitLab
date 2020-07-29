@@ -14322,12 +14322,17 @@ input UpdateNoteInput {
   """
   Content of the note
   """
-  body: String!
+  body: String
 
   """
   A unique identifier for the client performing the mutation.
   """
   clientMutationId: String
+
+  """
+  The confidentiality flag of a note. Default is false.
+  """
+  confidential: Boolean
 
   """
   The global id of the note to update
