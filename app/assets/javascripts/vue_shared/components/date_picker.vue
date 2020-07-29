@@ -1,5 +1,6 @@
 <script>
 import { GlDatepicker } from '@gitlab/ui';
+import { __ } from '~/locale';
 
 export default {
   components: {
@@ -14,11 +15,11 @@ export default {
       type: Boolean,
       required: true,
     },
-  },
-  data() {
-    return {
-      isEditingCustom: false,
-    };
+    label: {
+      type: String,
+      required: false,
+      default: __('Date Picker'),
+    },
   },
 };
 </script>
@@ -31,8 +32,8 @@ export default {
       class="gl-datepicker-input form-control"
       name="date"
       type="text"
-      :aria-label="__('Expiration date')"
-      :placeholder="__('Expiration date')"
+      :aria-label="label"
+      :placeholder="label"
     />
   </gl-datepicker>
 </template>
