@@ -153,7 +153,7 @@ dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
             />
             <gl-icon
               name="search"
-              class="dropdown-input-search gl-absolute gl-top-3 gl-right-5 gl-text-gray-500 gl-pointer-events-none"
+              class="dropdown-input-search gl-absolute gl-top-3 gl-right-5 gl-text-gray-300 gl-pointer-events-none"
             />
             <gl-icon
               name="close"
