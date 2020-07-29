@@ -8,18 +8,6 @@ RSpec.describe Gitlab::Geo::Replicator do
   let_it_be(:primary_node) { create(:geo_node, :primary) }
   let_it_be(:secondary_node) { create(:geo_node) }
 
-  shared_examples 'does not replicate' do
-    it 'returns nil' do
-      expect(subject.publish(:test, other: true)).to be_nil
-    end
-
-    it 'does not call create_event' do
-      expect(subject).not_to receive(:create_event_with)
-
-      subject.publish(:test, other: true)
-    end
-  end
-
   before(:all) do
     create_dummy_model_table
   end
