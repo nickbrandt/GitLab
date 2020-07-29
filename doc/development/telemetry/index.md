@@ -118,7 +118,7 @@ These are raw logs such as the [Production logs](../../administration/logs.md#pr
 
 ### Instance settings
 
-These are settings of your instance such as the instance's git version, postgres version, or if certain features are enabled such as container_registry_enabled or signup_enabled.
+These are settings of your instance such as the instance's git version and if certain features are enabled such as container_registry_enabled.
 
 ### Instrance integrations
 
