@@ -42,4 +42,12 @@ RSpec.describe Gitlab::Geo::ReplicableModel do
       expect(subject.replicator).to be_a(Geo::DummyReplicator)
     end
   end
+
+  describe '#in_replicables_for_geo_node?' do
+    it 'reuses replicables_for_geo_node' do
+      expect(DummyModel).to receive(:replicables_for_geo_node).once.and_return(DummyModel.all)
+
+      subject.in_replicables_for_geo_node?
+    end
+  end
 end
