@@ -120,7 +120,7 @@ These are raw logs such as the [Production logs](../../administration/logs.md#pr
 
 These are settings of your instance such as the instance's Git version and if certain features are enabled such as container_registry_enabled.
 
-### Instrance integrations
+### Instance integrations
 
 These are integrations your GitLab instance interacts with such as an [external storage provider](../../administration/static_objects_external_storage.md) or an [external container registry](../../administration/packages/container_registry.md#use-an-external-container-registry-with-gitlab-as-an-auth-endpoint). These services must be able to send data back into a GitLab instance for data to be tracked.
 
