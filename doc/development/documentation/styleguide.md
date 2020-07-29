@@ -1471,7 +1471,7 @@ GitLab Community Edition), don't split the product or feature name across lines.
 When a feature is available in EE-only tiers, add the corresponding tier to the
 header or other page element according to the feature's availability:
 
-| Tier                                                         | Markdown code         |
+| Tier                                                         | Tier markup           |
 |:-------------------------------------------------------------|:----------------------|
 | GitLab Core and GitLab.com Free, and their higher tiers      | `**(CORE)**`          |
 | GitLab Starter and GitLab.com Bronze, and their higher tiers | `**(STARTER)**`       |
@@ -1486,18 +1486,18 @@ header or other page element according to the feature's availability:
 | *Only* GitLab.com Silver, and higher tiers                   | `**(SILVER ONLY)**`   |
 | *Only* GitLab.com Gold                                       | `**(GOLD ONLY)**`     |
 
-For clarity, all page title headers (H1s) must be have a tier markdown code for
+For clarity, all page title headers (H1s) must be have a tier markup for
 the lowest tier that has information on the documentation page.
 
 If sections of a page apply to higher tier levels, they can be separately
-labeled with their own tier markdown code.
+labeled with their own tier markup.
 
 #### Product badge display behavior
 
-When using the tier markdown code with headers, the documentation page will
+When using the tier markup with headers, the documentation page will
 display the full tier badge with the header line.
 
-You can also use the tier markdown code with paragraphs, list items,
+You can also use the tier markup with paragraphs, list items,
 and table cells. For these cases, the tier mention will be represented by an
 orange info icon **(information)** that will display the tiers when visitors
 point to the icon. For example:
