@@ -237,8 +237,8 @@ export default {
     isMRBranchOutdated() {
       return this.divergedCommitsCount > 0;
     },
-    dastScans() {
-      return this.dast.scans.filter(scan => scan.scanned_resources_count > 0);
+    hasDastScannedResources() {
+      return this.dastSummary?.scannedResourcesCount > 0;
     },
     handleToggleEvent() {
       return once(() => {
@@ -491,15 +491,14 @@ export default {
               <security-summary :message="groupedDastText" />
             </template>
 
-            <template v-if="dastScans.length">
+            <template v-if="hasDastScannedResources">
               <div class="text-nowrap">
-                {{ n__('%d URL scanned', '%d URLs scanned', dastScans[0].scanned_resources_count) }}
+                {{ n__('%d URL scanned', '%d URLs scanned', dastSummary.scannedResourcesCount) }}
               </div>
               <gl-link v-gl-modal.dastUrl class="ml-2" data-qa-selector="dast-ci-job-link">
                 {{ __('View details') }}
               </gl-link>
               <dast-modal
-                v-if="dastSummary"
                 :scanned-urls="dastSummary.scannedResources.nodes"
                 :scanned-resources-count="dastSummary.scannedResourcesCount"
                 :download-link="dastDownloadLink"
