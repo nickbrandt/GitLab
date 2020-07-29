@@ -3,7 +3,7 @@ import axios from 'axios';
 import RelatedIssuesStore from 'ee/related_issues/stores/related_issues_store';
 import RelatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
 import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
-import { sprintf, __ } from '~/locale';
+import { sprintf, __, s__ } from '~/locale';
 import { joinPaths } from '~/lib/utils/url_utility';
 import { RELATED_ISSUES_ERRORS } from '../constants';
 import createFlash from '~/flash';
@@ -31,6 +31,10 @@ export default {
       type: String,
       required: true,
     },
+    issueFeedback: {
+      type: Object,
+      required: false,
+    },
   },
   data() {
     this.store = new RelatedIssuesStore();
@@ -45,6 +49,12 @@ export default {
   computed: {
     vulnerabilityProjectId() {
       return this.projectPath.replace(/^\//, ''); // Remove the leading slash, i.e. '/root/test' -> 'root/test'.
+    },
+    relatedIssues() {
+      return this.state.relatedIssues.map(issue => ({
+        ...issue,
+        actionButtons: this.getActionButtonsForIssue(issue),
+      }));
     },
   },
   created() {
@@ -139,6 +149,34 @@ export default {
       const rawReferences = value.split(/\s+/).filter(reference => reference.trim().length > 0);
       this.addPendingReferences({ untouchedRawReferences: rawReferences });
     },
+    getActionButtonsForIssue(issue) {
+      // if we can't modify issues, no buttons at all
+      if (!this.canModifyRelatedIssues) {
+        return undefined;
+      }
+
+      // if the issue is the same as the vulnerability issue, lock icon
+      if (this.issueFeedback?.issue_iid === issue.id) {
+        return [
+          {
+            icon: 'lock',
+            tooltip: s__(
+              'VulnerabilityManagement|Issues created from a vulnerability cannot be removed.',
+            ),
+            isDisabled: true,
+          },
+        ];
+      }
+
+      // otherwise, delete icon
+      return [
+        {
+          icon: 'close',
+          tooltip: __('Remove'),
+          onClick: () => this.removeRelatedIssue(issue.id),
+        },
+      ];
+    },
   },
   autoCompleteSources: gl?.GfmAutoComplete?.dataSources,
   issuableType: issuableTypesMap.ISSUE,
@@ -151,8 +189,8 @@ export default {
     :help-path="helpPath"
     :is-fetching="isFetching"
     :is-submitting="isSubmitting"
-    :related-issues="state.relatedIssues"
-    :can-admin="canModifyRelatedIssues"
+    :related-issues="relatedIssues"
+    :can-add="canModifyRelatedIssues"
     :pending-references="state.pendingReferences"
     :is-form-visible="isFormVisible"
     :input-value="inputValue"
@@ -166,7 +204,6 @@ export default {
     @addIssuableFormSubmit="addRelatedIssue"
     @addIssuableFormCancel="resetForm"
     @pendingIssuableRemoveRequest="removePendingReference"
-    @relatedIssueRemoveRequest="removeRelatedIssue"
   >
     <template #headerText>{{ __('Related issues') }}</template>
   </related-issues-block>

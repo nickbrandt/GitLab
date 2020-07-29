@@ -88,7 +88,7 @@ export default {
     },
   },
   data() {
-    this.store = new RelatedIssuesStore();
+    this.store = new RelatedIssuesStore(this);
 
     return {
       state: this.store.state,
@@ -100,8 +100,13 @@ export default {
   },
   computed: {
     autoCompleteSources() {
-      if (!this.allowAutoComplete) return {};
-      return gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources;
+      return this.allowAutoComplete ? gl?.GfmAutoComplete?.dataSources : {};
+    },
+    relatedIssues() {
+      return this.state.relatedIssues.map(issue => ({
+        ...issue,
+        actionButtons: this.getActionButtonsForIssue(issue),
+      }));
     },
   },
   created() {
@@ -112,7 +117,7 @@ export default {
     findRelatedIssueById(id) {
       return this.state.relatedIssues.find(issue => issue.id === id);
     },
-    onRelatedIssueRemoveRequest(idToRemove) {
+    removeRelatedIssue(idToRemove) {
       const issueToRemove = this.findRelatedIssueById(idToRemove);
 
       if (issueToRemove) {
@@ -215,6 +220,17 @@ export default {
       this.store.addPendingReferences(rawReferences);
       this.inputValue = '';
     },
+    getActionButtonsForIssue(issue) {
+      return (
+        this.canAdmin && [
+          {
+            icon: 'close',
+            tooltip: __('Remove'),
+            onClick: () => this.removeRelatedIssue(issue.id),
+          },
+        ]
+      );
+    },
   },
 };
 </script>
@@ -225,8 +241,8 @@ export default {
     :help-path="helpPath"
     :is-fetching="isFetching"
     :is-submitting="isSubmitting"
-    :related-issues="state.relatedIssues"
-    :can-admin="canAdmin"
+    :related-issues="relatedIssues"
+    :can-add="canAdmin"
     :can-reorder="canReorder"
     :pending-references="state.pendingReferences"
     :is-form-visible="isFormVisible"
@@ -242,6 +258,5 @@ export default {
     @addIssuableFormSubmit="onPendingFormSubmit"
     @addIssuableFormCancel="onPendingFormCancel"
     @pendingIssuableRemoveRequest="onPendingIssueRemoveRequest"
-    @relatedIssueRemoveRequest="onRelatedIssueRemoveRequest"
   />
 </template>

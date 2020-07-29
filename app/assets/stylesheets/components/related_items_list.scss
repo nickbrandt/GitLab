@@ -205,7 +205,7 @@ $item-remove-button-space: 42px;
   }
 }
 
-.btn-item-remove {
+.btn-item-action {
   position: absolute;
   top: $gl-padding-4 / 2;
   right: 0;
@@ -225,6 +225,19 @@ $item-remove-button-space: 42px;
   &:hover {
     color: $gl-text-color;
     border-color: $border-color;
+  }
+}
+
+.btn-item-action.btn-item-action {
+  box-shadow: none;
+
+  &[disabled] {
+    background: none;
+    box-shadow: none;
+
+    &:hover {
+      color: $gray-400;
+    }
   }
 }
 
@@ -330,7 +343,7 @@ $item-remove-button-space: 42px;
     }
   }
 
-  .btn-item-remove {
+  .btn-item-action {
     position: relative;
     top: initial;
     padding: $btn-sm-side-margin;

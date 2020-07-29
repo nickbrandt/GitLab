@@ -34,7 +34,7 @@ export default {
       required: false,
       default: () => [],
     },
-    canAdmin: {
+    canAdd: {
       type: Boolean,
       required: false,
       default: false,
@@ -154,7 +154,7 @@ export default {
               </span>
             </div>
             <gl-button
-              v-if="canAdmin"
+              v-if="canAdd"
               data-qa-selector="related_issues_plus_button"
               icon="plus"
               :aria-label="__('Add a related issue')"
@@ -195,13 +195,11 @@ export default {
             v-for="category in categorisedIssues"
             :key="category.linkType"
             :heading="$options.linkedIssueTypesTextMap[category.linkType]"
-            :can-admin="canAdmin"
             :can-reorder="canReorder"
             :is-fetching="isFetching"
             :issuable-type="issuableType"
             :path-id-separator="pathIdSeparator"
             :related-issues="category.issues"
-            @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
             @saveReorder="$emit('saveReorder', $event)"
           />
         </template>

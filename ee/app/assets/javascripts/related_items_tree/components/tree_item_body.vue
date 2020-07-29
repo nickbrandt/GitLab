@@ -273,7 +273,7 @@ export default {
           v-gl-modal-directive="$options.itemRemoveModalId"
           :title="__('Remove')"
           :disabled="itemActionInProgress"
-          class="btn-svg btn-item-remove js-issue-item-remove-button qa-remove-issue-button align-self-start"
+          class="btn-svg btn-item-action js-issue-item-remove-button qa-remove-issue-button align-self-start"
           @click="handleRemoveClick"
         >
           <gl-icon name="close" class="btn-item-remove-icon" />

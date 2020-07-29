@@ -15,11 +15,6 @@ export default {
     RelatedIssuableItem,
   },
   props: {
-    canAdmin: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     canReorder: {
       type: Boolean,
       required: false,
@@ -130,6 +125,7 @@ export default {
             :closed-at="issue.closedAt"
             :weight="issue.weight"
             :due-date="issue.dueDate"
+            :action-buttons="issue.actionButtons"
             :can-remove="canAdmin"
             :can-reorder="canReorder"
             :path-id-separator="pathIdSeparator"

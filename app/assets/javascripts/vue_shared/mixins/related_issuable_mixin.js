@@ -99,6 +99,11 @@ const mixins = {
       required: false,
       default: () => ({}),
     },
+    actionButtons: {
+      type: Array,
+      required: false,
+      default: undefined,
+    },
   },
   components: {
     icon,
