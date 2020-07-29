@@ -76,8 +76,12 @@ export default {
         </gl-sprintf>
       </div>
       <div class="gl-flex-fill-1 gl-ml-7">
-        <gl-form-group :label="$options.translations.nameLabel" class="gl-mb-7">
-          <gl-form-input v-model="name" data-testid="user-list-name" required />
+        <gl-form-group
+          label-for="user-list-name"
+          :label="$options.translations.nameLabel"
+          class="gl-mb-7"
+        >
+          <gl-form-input id="user-list-name" v-model="name" data-testid="user-list-name" required />
         </gl-form-group>
         <div :class="$options.classes.actionContainer">
           <gl-button variant="success" data-testid="save-user-list" @click="submit">

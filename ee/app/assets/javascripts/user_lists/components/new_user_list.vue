@@ -9,16 +9,7 @@ export default {
     GlAlert,
     UserListForm,
   },
-  props: {
-    featureFlagsPath: {
-      type: String,
-      required: true,
-    },
-    userListsDocsPath: {
-      type: String,
-      required: true,
-    },
-  },
+  inject: ['userListsDocsPath', 'featureFlagsPath'],
   translations: {
     pageTitle: s__('UserLists|New list'),
     createButtonLabel: s__('UserLists|Create'),

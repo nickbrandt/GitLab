@@ -11,12 +11,7 @@ export default {
     GlLoadingIcon,
     UserListForm,
   },
-  props: {
-    userListsDocsPath: {
-      type: String,
-      required: true,
-    },
-  },
+  inject: ['userListsDocsPath'],
   translations: {
     saveButtonLabel: s__('UserLists|Save'),
   },
