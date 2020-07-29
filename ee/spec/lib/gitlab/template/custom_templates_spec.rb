@@ -36,7 +36,8 @@ RSpec.describe "Custom file template classes" do
     ::Gitlab::Template::CustomDockerfileTemplate,
     ::Gitlab::Template::CustomGitignoreTemplate,
     ::Gitlab::Template::CustomGitlabCiYmlTemplate,
-    ::Gitlab::Template::CustomLicenseTemplate
+    ::Gitlab::Template::CustomLicenseTemplate,
+    ::Gitlab::Template::CustomMetricsDashboardYmlTemplate
   ].each do |template_class|
     describe template_class do
       let(:name) { template_class.name.demodulize }
