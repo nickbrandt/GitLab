@@ -47,6 +47,14 @@ module EE
               null: true,
               description: 'Number of vulnerabilities per severity level, per day, for the projects in the group and its subgroups',
               resolver: ::Resolvers::VulnerabilitiesHistoryResolver
+
+        field :vulnerability_grades,
+              [::Types::VulnerableProjectsByGradeType],
+              null: false,
+              description: 'Represents vulnerable project counts for each grade',
+              resolve: -> (obj, _args, ctx) {
+                ::Gitlab::Graphql::Aggregations::VulnerabilityStatistics::LazyAggregate.new(ctx, obj)
+              }
       end
     end
   end
