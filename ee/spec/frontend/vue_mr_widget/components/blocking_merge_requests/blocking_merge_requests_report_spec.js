@@ -103,7 +103,7 @@ describe('BlockingMergeRequestsReport', () => {
       createComponent();
 
       expect(wrapper.vm.blockedByText).toEqual(
-        'Depends on <strong>1 closed</strong> merge request.',
+        'Depends on %{strongStart}1 closed%{strongEnd} merge request.',
       );
     });
   });

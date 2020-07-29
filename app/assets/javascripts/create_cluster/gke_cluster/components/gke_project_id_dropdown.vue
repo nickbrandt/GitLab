@@ -82,11 +82,13 @@ export default {
 
         return sprintf(
           s__(
-            'This project does not have billing enabled. To create a cluster, <a href=%{linkToBilling} target="_blank" rel="noopener noreferrer">enable billing <i class="fa fa-external-link" aria-hidden="true"></i></a> and try again.',
+            'This project does not have billing enabled. To create a cluster, %{linkToBillingStart}enable billing %{linkIcon}%{linkToBillingEnd} and try again.',
           ),
           {
-            linkToBilling:
-              'https://console.cloud.google.com/freetrial?utm_campaign=2018_cpanel&utm_source=gitlab&utm_medium=referral',
+            linkToBillingStart:
+              '<a href="https://console.cloud.google.com/freetrial?utm_campaign=2018_cpanel&utm_source=gitlab&utm_medium=referral" target="_blank" rel="noopener noreferrer">',
+            linkToBillingEnd: '</a>',
+            linkIcon: '<i class="fa fa-external-link" aria-hidden="true"></i>',
           },
           false,
         );
