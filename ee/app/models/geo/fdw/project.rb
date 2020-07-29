@@ -13,8 +13,6 @@ module Geo
 
       belongs_to :namespace, class_name: 'Geo::Fdw::Namespace'
 
-      scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
-
       alias_method :parent, :namespace
 
       delegate :disk_path, to: :storage
