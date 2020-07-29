@@ -20,6 +20,9 @@ RSpec.shared_examples 'a blob replicator' do
 
   it_behaves_like 'a replicator'
 
+  # This could be included in each model's spec, but including it here is DRYer.
+  include_examples 'a replicable model'
+
   describe '#handle_after_create_commit' do
     it 'creates a Geo::Event' do
       expect do
@@ -171,19 +174,6 @@ RSpec.shared_examples 'a blob replicator' do
 
     it 'is a Class' do
       expect(invoke_model).to be_a(Class)
-    end
-
-    # For convenience (and reliability), instead of asking developers to include shared examples on each model spec as well
-    context 'replicable model' do
-      it 'defines #replicator' do
-        expect(model_record).to respond_to(:replicator)
-      end
-
-      it 'invokes replicator.handle_after_create_commit on create' do
-        expect(replicator).to receive(:handle_after_create_commit)
-
-        model_record.save!
-      end
     end
   end
 end
