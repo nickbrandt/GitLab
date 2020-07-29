@@ -9,11 +9,12 @@ import {
 } from '@gitlab/ui';
 import { DEPENDENCY_LIST_TYPES } from '../store/constants';
 import { SORT_FIELDS, SORT_ORDER } from '../store/modules/list/constants';
-
+import {GlButton} from '@gitlab/ui';
 export default {
   name: 'DependenciesActions',
   components: {
     GlDeprecatedButton,
+     GlButton,
     GlDeprecatedDropdown,
     GlDeprecatedDropdownItem,
     GlIcon,
@@ -97,14 +98,15 @@ export default {
         <gl-icon :name="sortOrderIcon" />
       </gl-deprecated-button>
     </div>
-    <gl-deprecated-button
+<gl-button
       v-gl-tooltip
       :href="downloadEndpoint"
       download="dependencies.json"
       :title="s__('Dependencies|Export as JSON')"
       class="js-download"
+      icon="export"
     >
-      <gl-icon name="export" />
-    </gl-deprecated-button>
+    Export
+   </gl-button>
   </div>
 </template>
