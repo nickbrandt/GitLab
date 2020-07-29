@@ -170,7 +170,7 @@ module EE
                 merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
                 merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
                 projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
-                projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
+                projects_reporting_ci_cd_back_to_github: count(::GithubService.active),
                 projects_with_packages: distinct_count(::Packages::Package, :project_id),
                 projects_with_tracing_enabled: count(ProjectTracingSetting),
                 status_page_projects: count(::StatusPage::ProjectSetting.enabled),
