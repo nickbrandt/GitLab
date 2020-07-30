@@ -813,6 +813,8 @@ RSpec.describe Ci::Pipeline, :mailer do
         expect(subject.to_hash)
           .to include(
             'CI_EXTERNAL_PULL_REQUEST_IID' => pull_request.pull_request_iid.to_s,
+            'CI_EXTERNAL_PULL_REQUEST_SOURCE_REPOSITORY' => pull_request.source_repository,
+            'CI_EXTERNAL_PULL_REQUEST_TARGET_REPOSITORY' => pull_request.target_repository,
             'CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_SHA' => pull_request.source_sha,
             'CI_EXTERNAL_PULL_REQUEST_TARGET_BRANCH_SHA' => pull_request.target_sha,
             'CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME' => pull_request.source_branch,
