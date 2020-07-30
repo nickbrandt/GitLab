@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import MergeRequestAnalyticsApp from 'ee/analytics/merge_request_analytics/components/app.vue';
+import ThroughputChart from 'ee/analytics/merge_request_analytics/components/throughput_chart.vue';
 
 describe('MergeRequestAnalyticsApp', () => {
   let wrapper;
@@ -20,6 +21,12 @@ describe('MergeRequestAnalyticsApp', () => {
   it('displays the page title', () => {
     const pageTitle = wrapper.find('[data-testid="pageTitle"').text();
 
-    expect(pageTitle).toEqual('Merge Request Analytics');
+    expect(pageTitle).toBe('Merge Request Analytics');
+  });
+
+  it('displays the throughput chart component', () => {
+    const throughputChartComponent = wrapper.find(ThroughputChart);
+
+    expect(throughputChartComponent.exists()).toBe(true);
   });
 });
