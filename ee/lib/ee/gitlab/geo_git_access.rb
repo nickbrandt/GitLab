@@ -82,7 +82,7 @@ module EE
       end
 
       def current_replication_lag_message
-        return if ::Gitlab::Database.read_write? || current_replication_lag.zero?
+        return if ::Gitlab::Database.read_write? || current_replication_lag == 0
 
         "Current replication lag: #{current_replication_lag} seconds"
       end
