@@ -3,7 +3,7 @@ import dateFormat from 'dateformat';
 import { s__, sprintf } from '~/locale';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import httpStatus from '~/lib/utils/http_status';
-import { convertToSnakeCase } from '~/lib/utils/text_utility';
+import { convertToSnakeCase, slugify } from '~/lib/utils/text_utility';
 import { hideFlash } from '~/flash';
 import {
   newDate,
@@ -378,3 +378,14 @@ export const transformStagesForPathNavigation = ({ stages, medians, selectedStag
     stage.title === CAPITALIZED_STAGE_NAME.OVERVIEW ? 0 : 1,
   );
 };
+
+export const prepareTimeMetricsData = (data = [], tooltipText = {}) =>
+  data.map(({ title: label, ...rest }) => {
+    const key = slugify(label);
+    return {
+      ...rest,
+      label,
+      key,
+      tooltipText: tooltipText[key] || '',
+    };
+  });
