@@ -38,18 +38,6 @@ module Geo
         end
       end
 
-      def project_registries
-        return Geo::ProjectRegistry.all unless selective_sync?
-
-        if selective_sync_by_namespaces?
-          registries_for_selected_namespaces
-        elsif selective_sync_by_shards?
-          registries_for_selected_shards
-        else
-          Geo::ProjectRegistry.none
-        end
-      end
-
       def container_repositories
         return Geo::Fdw::ContainerRepository.all unless selective_sync?
 
@@ -65,16 +53,6 @@ module Geo
 
       def projects_for_selected_shards
         Geo::Fdw::Project.within_shards(selective_sync_shards)
-      end
-
-      def registries_for_selected_namespaces
-        Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
-          .within_namespaces(selected_namespaces_and_descendants.select(:id))
-      end
-
-      def registries_for_selected_shards
-        Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
-          .within_shards(selective_sync_shards)
       end
 
       def project_model
