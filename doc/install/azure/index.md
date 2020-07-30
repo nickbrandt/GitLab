@@ -22,7 +22,7 @@ For sizing specifications of the VM, you can use our [Reference Architecture doc
 
 Once you have been able to provision a Linux VM in Azure and have access to the host, you can refer to our [Omnibus Documentation](https://about.gitlab.com/install/) to complete the installation. Be sure to select the documentation aligned with your selected Linux Distribution.
 
-## Enabling GitLab CI
+## Using GitLab CI/CD
 
 When using GitLab CI, we recommend using compute resources on a host separate from the primary GitLab host. You can refer to our [GitLab Runner installation documentation](https://docs.gitlab.com/runner/install/) for suggestions on how to proceed.
 
