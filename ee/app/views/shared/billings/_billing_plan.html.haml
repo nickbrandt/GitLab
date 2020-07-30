@@ -17,7 +17,7 @@
         %ul.conditions.p-0.my-auto
           %li= s_("BillingPlans|per user")
           %li= s_("BillingPlans|monthly")
-      .price-per-year.text-left{ class: ("invisible" unless plan.price_per_year.positive?) }
+      .price-per-year.text-left{ class: ("invisible" unless plan.price_per_year > 0) }
         - price_per_year = number_to_plan_currency(plan.price_per_year)
         = s_("BillingPlans|billed annually at %{price_per_year}") % { price_per_year: price_per_year }
 
