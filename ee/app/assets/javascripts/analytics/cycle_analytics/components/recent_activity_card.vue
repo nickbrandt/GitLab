@@ -2,9 +2,8 @@
 import Api from 'ee/api';
 import { __ } from '~/locale';
 import createFlash from '~/flash';
-import { slugify } from '~/lib/utils/text_utility';
 import MetricCard from '../../shared/components/metric_card.vue';
-import { removeFlash } from '../utils';
+import { removeFlash, prepareTimeMetricsData } from '../utils';
 
 export default {
   name: 'RecentActivityCard',
@@ -45,11 +44,7 @@ export default {
         this.additionalParams ? this.additionalParams : {},
       )
         .then(({ data }) => {
-          this.data = data.map(({ title: label, value }) => ({
-            value: value || '-',
-            label,
-            key: slugify(label),
-          }));
+          this.data = prepareTimeMetricsData(data);
         })
         .catch(() => {
           createFlash(
