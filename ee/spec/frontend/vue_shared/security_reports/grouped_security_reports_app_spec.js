@@ -225,26 +225,24 @@ describe('Grouped security reports app', () => {
 
         // Renders the summary text
         expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected no new vulnerabilities.',
+          'Security scanning detected no vulnerabilities.',
         );
 
         // Renders Sast result
-        expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'SAST detected no new vulnerabilities.',
-        );
+        expect(trimText(wrapper.vm.$el.textContent)).toContain('SAST detected no vulnerabilities.');
 
         // Renders DSS result
         expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'Dependency scanning detected no new vulnerabilities.',
+          'Dependency scanning detected no vulnerabilities.',
         );
 
         // Renders container scanning result
         expect(wrapper.vm.$el.textContent).toContain(
-          'Container scanning detected no new vulnerabilities.',
+          'Container scanning detected no vulnerabilities.',
         );
 
         // Renders DAST result
-        expect(wrapper.vm.$el.textContent).toContain('DAST detected no new vulnerabilities.');
+        expect(wrapper.vm.$el.textContent).toContain('DAST detected no vulnerabilities.');
       });
     });
 
@@ -275,7 +273,7 @@ describe('Grouped security reports app', () => {
 
         // Renders the summary text
         expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected 5 new critical and 3 new high severity vulnerabilities.',
+          'Security scanning detected 5 critical and 3 high severity vulnerabilities.',
         );
 
         // Renders the expand button
@@ -285,27 +283,27 @@ describe('Grouped security reports app', () => {
 
         // Renders Sast result
         expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'SAST detected 1 new critical severity vulnerability',
+          'SAST detected 1 critical severity vulnerability',
         );
 
         // Renders DSS result
         expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'Dependency scanning detected 1 new critical and 1 new high severity vulnerabilities.',
+          'Dependency scanning detected 1 critical and 1 high severity vulnerabilities.',
         );
 
         // Renders container scanning result
         expect(wrapper.vm.$el.textContent).toContain(
-          'Container scanning detected 1 new critical and 1 new high severity vulnerabilities.',
+          'Container scanning detected 1 critical and 1 high severity vulnerabilities.',
         );
 
         // Renders DAST result
         expect(wrapper.vm.$el.textContent).toContain(
-          'DAST detected 1 new critical severity vulnerability.',
+          'DAST detected 1 critical severity vulnerability.',
         );
 
         // Renders container scanning result
         expect(wrapper.vm.$el.textContent).toContain(
-          'Coverage fuzzing detected 1 new critical and 1 new high severity vulnerabilities.',
+          'Coverage fuzzing detected 1 critical and 1 high severity vulnerabilities.',
         );
       });
 
@@ -396,7 +394,7 @@ describe('Grouped security reports app', () => {
 
     it('should display the correct numbers of vulnerabilities', () => {
       expect(wrapper.text()).toContain(
-        'Container scanning detected 1 new critical and 1 new high severity vulnerabilities.',
+        'Container scanning detected 1 critical and 1 high severity vulnerabilities.',
       );
     });
   });
@@ -426,7 +424,7 @@ describe('Grouped security reports app', () => {
 
     it('should display the correct numbers of vulnerabilities', () => {
       expect(wrapper.vm.$el.textContent).toContain(
-        'Dependency scanning detected 1 new critical and 1 new high severity vulnerabilities.',
+        'Dependency scanning detected 1 critical and 1 high severity vulnerabilities.',
       );
     });
   });
@@ -457,7 +455,7 @@ describe('Grouped security reports app', () => {
 
     it('should display the correct numbers of vulnerabilities', () => {
       expect(wrapper.vm.$el.textContent).toContain(
-        'DAST detected 1 new critical severity vulnerability',
+        'DAST detected 1 critical severity vulnerability',
       );
     });
 
@@ -539,7 +537,7 @@ describe('Grouped security reports app', () => {
 
       it('should display the correct numbers of vulnerabilities', () => {
         expect(wrapper.text()).toContain(
-          'Secret scanning detected 1 new critical and 1 new high severity vulnerabilities.',
+          'Secret scanning detected 1 critical and 1 high severity vulnerabilities.',
         );
       });
     });
@@ -578,7 +576,7 @@ describe('Grouped security reports app', () => {
 
     it('should display the correct numbers of vulnerabilities', () => {
       expect(wrapper.vm.$el.textContent).toContain(
-        'SAST detected 1 new critical severity vulnerability.',
+        'SAST detected 1 critical severity vulnerability.',
       );
     });
   });
