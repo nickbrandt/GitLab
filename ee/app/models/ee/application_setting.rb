@@ -112,6 +112,7 @@ module EE
           elasticsearch_max_bulk_concurrency: 10,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
           email_additional_text: nil,
+          enforce_namespace_storage_limit: false,
           lock_memberships_to_ldap: false,
           max_personal_access_token_lifetime: nil,
           enforce_pat_expiration: true,
