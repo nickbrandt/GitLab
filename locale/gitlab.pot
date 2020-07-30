@@ -25488,9 +25488,6 @@ msgstr ""
 msgid "U2F only works with HTTPS-enabled websites. Contact your administrator for more details."
 msgstr ""
 
-msgid "UI Development Kit"
-msgstr ""
-
 msgid "URL"
 msgstr ""
 
