@@ -18,7 +18,7 @@ Your Linux distribution of choice installing on an Azure VM can help provide the
 
 For sizing specifications of the VM, you can use our [Reference Architecture documentation](https://docs.gitlab.com/ee/administration/reference_architectures/index.html#available-reference-architectures) to determine the appropriate size for your needs.
 
-## Installing GitLab Omnibus
+## Installing Omnibus GitLab
 
 Once you have been able to provision a Linux VM in Azure and have access to the host, you can refer to our [Omnibus Documentation](https://about.gitlab.com/install/) to complete the installation. Be sure to select the documentation aligned with your selected Linux Distribution.
 
