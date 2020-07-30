@@ -17,6 +17,7 @@ import {
   orderByDate,
   toggleSelectedLabel,
   transformStagesForPathNavigation,
+  prepareTimeMetricsData,
 } from 'ee/analytics/cycle_analytics/utils';
 import { toYmd } from 'ee/analytics/shared/utils';
 import {
@@ -38,6 +39,7 @@ import {
   stageMediansWithNumericIds,
   totalStage,
   pathNavIssueMetric,
+  timeMetricsData,
 } from './mock_data';
 import { CAPITALIZED_STAGE_NAME, PATH_HOME_ICON } from 'ee/analytics/cycle_analytics/constants';
 
@@ -366,6 +368,36 @@ describe('Cycle analytics utils', () => {
           expect(response[0]).toEqual(overview);
         });
       });
+    });
+  });
+
+  describe('prepareTimeMetricsData', () => {
+    let prepared;
+
+    beforeEach(() => {
+      prepared = prepareTimeMetricsData(timeMetricsData);
+    });
+
+    it('will add a `key` based on the title', () => {
+      expect(timeMetricsData).not.toMatchObject([{ key: 'lead-time' }, { key: 'cycle-time' }]);
+      expect(prepared).toMatchObject([{ key: 'lead-time' }, { key: 'cycle-time' }]);
+    });
+
+    it('will replace the title with a `label` key', () => {
+      expect(timeMetricsData).not.toMatchObject([{ label: 'Lead Time' }, { label: 'Cycle Time' }]);
+      expect(prepared).toMatchObject([{ label: 'Lead Time' }, { label: 'Cycle Time' }]);
+    });
+
+    it('will add tooltip text using the key if it is provided', () => {
+      prepared = prepareTimeMetricsData(timeMetricsData, {
+        'lead-time': 'Is a value that is good',
+      });
+
+      expect(timeMetricsData).not.toMatchObject([{ tooltipText: 'Is a value that is good' }]);
+      expect(prepared).toMatchObject([
+        { tooltipText: 'Is a value that is good' },
+        { tooltipText: '' },
+      ]);
     });
   });
 });
