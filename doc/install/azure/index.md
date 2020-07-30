@@ -7,7 +7,7 @@ type: howto
 
 GitLab's self-managed, Omnibus installation makes installing GitLab into a Microsoft Azure ecosystem an easy task. This guide aims to cover how to install and configure GitLab on your preferred Linux distribution in Microft Azure.
 
-NOTE: **GitLab is Coming Soon to the Azure Marketplace:**
+NOTE: **GitLab is coming soon to the Azure Marketplace:**
 We are currently working on a solution that will bring GitLab to the Azure Marketplace to ease the burden of installing, configuring and maintaining it. Be sure to [follow the issue](https://gitlab.com/gitlab-com/alliances/microsoft/gitlab-tracker/-/issues/2) to get the latest updates.
 
 ## Selecting a Linux distribution
