@@ -3264,32 +3264,6 @@ RSpec.describe Ci::Pipeline, :mailer do
         end
       end
     end
-
-    context 'when transitioning to success' do
-      context 'when feature is enabled' do
-        before do
-          stub_feature_flags(keep_latest_artifacts_for_ref: true)
-        end
-
-        it 'calls the PipelineSuccessUnlockArtifactsWorker' do
-          expect(Ci::PipelineSuccessUnlockArtifactsWorker).to receive(:perform_async).with(pipeline.id)
-
-          pipeline.succeed!
-        end
-      end
-
-      context 'when feature is disabled' do
-        before do
-          stub_feature_flags(keep_latest_artifacts_for_ref: false)
-        end
-
-        it 'does not call the PipelineSuccessUnlockArtifactsWorker' do
-          expect(Ci::PipelineSuccessUnlockArtifactsWorker).not_to receive(:perform_async)
-
-          pipeline.succeed!
-        end
-      end
-    end
   end
 
   describe '#default_branch?' do
