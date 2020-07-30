@@ -14,6 +14,7 @@ FactoryBot.define do
   factory :code_owner_rule, parent: :approval_merge_request_rule do
     merge_request
     rule_type { :code_owner }
+    code_owner { true } # deprecated, replaced with `rule_type: :code_owner`
     sequence(:name) { |n| "*-#{n}.js" }
     section { Gitlab::CodeOwners::Entry::DEFAULT_SECTION }
   end
