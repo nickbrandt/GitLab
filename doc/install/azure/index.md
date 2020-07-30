@@ -24,7 +24,7 @@ Once you have been able to provision a Linux VM in Azure and have access to the 
 
 ## Using GitLab CI/CD
 
-When using GitLab CI, we recommend using compute resources on a host separate from the primary GitLab host. You can refer to our [GitLab Runner installation documentation](https://docs.gitlab.com/runner/install/) for suggestions on how to proceed.
+When using GitLab CI/CD, it's recommended to use compute resources on a host separate from the primary GitLab host. You can refer to our [GitLab Runner installation documentation](https://docs.gitlab.com/runner/install/) for suggestions on how to proceed.
 
 ## Conclusion
 
