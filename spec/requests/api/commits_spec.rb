@@ -1543,6 +1543,14 @@ RSpec.describe API::Commits do
 
           expect(json_response['error_code']).to eq 'empty'
         end
+
+        it 'includes an additional dry_run error field when enabled' do
+          post api(route, current_user), params: { branch: 'markdown', dry_run: true }
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response['error_code']).to eq 'empty'
+          expect(json_response['dry_run']).to eq 'error'
+        end
       end
 
       context 'when ref contains a dot' do
@@ -1723,6 +1731,18 @@ RSpec.describe API::Commits do
 
           expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['error_code']).to eq 'empty'
+        end
+
+        it 'includes an additional dry_run error field when enabled' do
+          # First one actually reverts
+          post api(route, current_user), params: { branch: 'markdown' }
+
+          # Second one is redundant and should be empty
+          post api(route, current_user), params: { branch: 'markdown', dry_run: true }
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response['error_code']).to eq 'empty'
+          expect(json_response['dry_run']).to eq 'error'
         end
       end
     end
