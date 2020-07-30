@@ -73,12 +73,11 @@ A GitLab team member has made an [unofficial visual pipeline editor](https://uno
 There is a [plan to make it an official part of GitLab](https://gitlab.com/groups/gitlab-org/-/epics/4069)
 in the future, but it's available for anyone who wants to try it at the above link.
 
-NOTE: **Note:**
-`.gitlab-ci.yml` is a [YAML](https://en.wikipedia.org/wiki/YAML) file
+You need to create a file named `.gitlab-ci.yml` in the root directory of your
+repository. This is a [YAML](https://en.wikipedia.org/wiki/YAML) file
 so you have to pay extra attention to indentation. Always use spaces, not tabs.
 
-You need to create a file named `.gitlab-ci.yml` in the root directory of your
-repository. Below is an example for a Ruby on Rails project.
+Below is an example for a Ruby on Rails project:
 
 ```yaml
 image: "ruby:2.5"
