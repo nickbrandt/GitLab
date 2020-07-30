@@ -230,6 +230,15 @@ RSpec.describe Project do
 
       it { is_expected.to contain_exactly(project_1) }
     end
+
+    describe '.not_aimed_for_deletion' do
+      let_it_be(:project) { create(:project) }
+      let_it_be(:delayed_deletion_project) { create(:project, marked_for_deletion_at: Date.current) }
+
+      it do
+        expect(described_class.not_aimed_for_deletion).to contain_exactly(project)
+      end
+    end
   end
 
   describe 'validations' do

@@ -87,6 +87,36 @@ RSpec.describe ProjectsHelper do
     end
   end
 
+  describe '#group_project_templates_count' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:parent_group) { create(:group, name: 'parent-group') }
+    let_it_be(:template_group) { create(:group, parent: parent_group, name: 'template-group') }
+    let_it_be(:template_project) { create(:project, group: template_group, name: 'template-project') }
+
+    before_all do
+      parent_group.update!(custom_project_templates_group_id: template_group.id)
+      parent_group.add_owner(user)
+    end
+
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+    end
+
+    it do
+      expect(helper.group_project_templates_count(parent_group.id)).to eq 1
+    end
+
+    context 'when template project is pending deletion' do
+      before do
+        template_project.update!(marked_for_deletion_at: Date.current)
+      end
+
+      it do
+        expect(helper.group_project_templates_count(parent_group.id)).to eq 0
+      end
+    end
+  end
+
   describe '#project_security_dashboard_config' do
     let_it_be(:user) { create(:user) }
     let_it_be(:group) { create(:group) }
