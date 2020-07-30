@@ -22,5 +22,5 @@ RSpec.describe Gitlab::Template::MetricsDashboardTemplate do
     end
   end
 
-  include_examples 'template shared examples', 'Default', '.metrics-dashboard.yml'
+  it_behaves_like 'file template shared examples', 'Default', '.metrics-dashboard.yml'
 end

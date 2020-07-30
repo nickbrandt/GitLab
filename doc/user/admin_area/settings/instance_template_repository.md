@@ -58,7 +58,7 @@ extension and not be empty. So, the hierarchy should look like this:
 |-- LICENSE
     |-- custom_license.txt
     |-- another_license.txt
-|-- LICENSE
+|-- metrics-dashboards
     |-- custom_metrics-dashboard.yml
     |-- another_metrics-dashboard.yml
 ```

@@ -19,6 +19,6 @@ panel_groups:
         metrics:
             # Queries that make use of variables need to have double curly brackets {}
             # set to the variables, per the example below
-            query: 'max(go_memstats_alloc_bytes{job="{{job}}"}) / 1024 /1024'
-            unit: '%'
-            label: "Max"
+            - query: 'max(go_memstats_alloc_bytes{job="{{job}}"}) / 1024 /1024'
+              unit: '%'
+              label: "Max"

@@ -24,5 +24,5 @@ RSpec.describe Gitlab::Template::GitlabCiYmlTemplate do
     end
   end
 
-  include_examples 'template shared examples', 'Ruby', '.gitlab-ci.yml'
+  it_behaves_like 'file template shared examples', 'Ruby', '.gitlab-ci.yml'
 end
