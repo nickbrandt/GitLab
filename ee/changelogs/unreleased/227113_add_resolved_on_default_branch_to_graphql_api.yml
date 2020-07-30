@@ -1,0 +1,5 @@
+---
+title: Add `resolvedOnDefaultBranch` field to VulnerabilityType on GraphQL API
+merge_request: 38300
+author:
+type: added
