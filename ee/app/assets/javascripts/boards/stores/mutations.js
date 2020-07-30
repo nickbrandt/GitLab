@@ -11,9 +11,6 @@ export default {
   [mutationTypes.SET_SHOW_LABELS]: (state, val) => {
     state.isShowingLabels = val;
   },
-  [mutationTypes.SET_ACTIVE_LIST_ID]: (state, id) => {
-    state.activeId = id;
-  },
 
   [mutationTypes.REQUEST_AVAILABLE_BOARDS]: () => {
     notImplemented();

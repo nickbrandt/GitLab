@@ -67,9 +67,6 @@ export default {
     commit(types.SET_SHOW_LABELS, val);
   },
 
-  setActiveId({ commit }, listId) {
-    commit(types.SET_ACTIVE_LIST_ID, listId);
-  },
   updateListWipLimit({ state }, { maxIssueCount }) {
     const { activeId } = state;
 
