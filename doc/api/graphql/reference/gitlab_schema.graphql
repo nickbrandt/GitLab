@@ -957,6 +957,11 @@ type Board {
     first: Int
 
     """
+    Find a list by its global ID
+    """
+    id: ID
+
+    """
     Returns the last _n_ elements from the list.
     """
     last: Int

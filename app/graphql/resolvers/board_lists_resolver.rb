@@ -8,7 +8,7 @@ module Resolvers
 
     argument :id, GraphQL::ID_TYPE,
              required: false,
-             description: 'Find a list by its ID'
+             description: 'Find a list by its global ID'
 
     alias_method :board, :object
 
@@ -27,7 +27,12 @@ module Resolvers
     private
 
     def board_lists(id)
-      service = Boards::Lists::ListService.new(board.resource_parent, context[:current_user], list_id: extract_list_id(id))
+      service = Boards::Lists::ListService.new(
+        board.resource_parent,
+        context[:current_user],
+        list_id: extract_list_id(id)
+      )
+
       service.execute(board, create_default_lists: false)
     end
 

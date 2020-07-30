@@ -2509,6 +2509,16 @@
               "description": "Lists of the board",
               "args": [
                 {
+                  "name": "id",
+                  "description": "Find a list by its global ID",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
