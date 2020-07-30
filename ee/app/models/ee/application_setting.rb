@@ -101,34 +101,34 @@ module EE
       def defaults
         super.merge(
           allow_group_owners_to_manage_ldap: true,
+          custom_project_templates_group_id: nil,
           default_project_deletion_protection: false,
-          elasticsearch_aws: false,
+          deletion_adjourned_period: DEFAULT_NUMBER_OF_DAYS_BEFORE_REMOVAL,
           elasticsearch_aws_region: ENV['ELASTIC_REGION'] || 'us-east-1',
+          elasticsearch_aws: false,
+          elasticsearch_indexed_field_length_limit: 0,
+          elasticsearch_indexed_file_size_limit_kb: 1024, # 1 MiB (units in KiB)
+          elasticsearch_max_bulk_concurrency: 10,
+          elasticsearch_max_bulk_size_bytes: 10.megabytes,
           elasticsearch_replicas: 1,
           elasticsearch_shards: 5,
-          elasticsearch_indexed_file_size_limit_kb: 1024, # 1 MiB (units in KiB)
-          elasticsearch_indexed_field_length_limit: 0,
-          elasticsearch_max_bulk_size_bytes: 10.megabytes,
-          elasticsearch_max_bulk_concurrency: 10,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
           email_additional_text: nil,
           enforce_namespace_storage_limit: false,
+          enforce_pat_expiration: true,
+          geo_node_allowed_ips: '0.0.0.0/0, ::/0',
           lock_memberships_to_ldap: false,
           max_personal_access_token_lifetime: nil,
-          enforce_pat_expiration: true,
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],
           mirror_max_capacity: Settings.gitlab['mirror_max_capacity'],
           mirror_max_delay: Settings.gitlab['mirror_max_delay'],
-          deletion_adjourned_period: DEFAULT_NUMBER_OF_DAYS_BEFORE_REMOVAL,
           pseudonymizer_enabled: false,
           repository_size_limit: 0,
+          seat_link_enabled: Settings.gitlab['seat_link_enabled'],
           slack_app_enabled: false,
           slack_app_id: nil,
           slack_app_secret: nil,
-          slack_app_verification_token: nil,
-          custom_project_templates_group_id: nil,
-          geo_node_allowed_ips: '0.0.0.0/0, ::/0',
-          seat_link_enabled: Settings.gitlab['seat_link_enabled']
+          slack_app_verification_token: nil
         )
       end
     end
