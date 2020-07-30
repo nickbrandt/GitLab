@@ -37,7 +37,7 @@ RSpec.describe Gitlab::Elastic::Client do
           stub_request(:get, 'http://example-elastic:9200/foo/_all/1')
             .with(
               headers: {
-                'Authorization'        => 'AWS4-HMAC-SHA256 Credential=0/20170303/us-east-1/es/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date;x-opaque-id, Signature=c3180885fb19ca2cf4673a361aa47615dddd3ed52159fffcfeda9e732d7c91b8',
+                'Authorization'        => 'AWS4-HMAC-SHA256 Credential=0/20170303/us-east-1/es/aws4_request, SignedHeaders=content-type;host;user-agent;x-amz-content-sha256;x-amz-date;x-opaque-id, Signature=746fa5a8a7f3859697d46a754550b1eb357413c481c91d22f17b8a0129c0121e',
                 'Content-Type'         => 'application/json',
                 'X-Amz-Content-Sha256' => 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
                 'X-Amz-Date'           => '20170303T133952Z'
