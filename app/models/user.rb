@@ -858,6 +858,12 @@ class User < ApplicationRecord
     all_expanded_groups.where(require_two_factor_authentication: true)
   end
 
+  def source_groups_of_two_factor_authentication_requirement
+    Gitlab::ObjectHierarchy.new(expanded_groups_requiring_two_factor_authentication)
+      .all_objects
+      .where(id: groups)
+  end
+
   # rubocop: disable CodeReuse/ServiceClass
   def refresh_authorized_projects
     Users::RefreshAuthorizedProjectsService.new(self).execute

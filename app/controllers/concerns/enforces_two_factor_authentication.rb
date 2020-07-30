@@ -43,7 +43,7 @@ module EnforcesTwoFactorAuthentication
       if Gitlab::CurrentSettings.require_two_factor_authentication?
         global.call
       else
-        groups = current_user.expanded_groups_requiring_two_factor_authentication.reorder(name: :asc)
+        groups = current_user.source_groups_of_two_factor_authentication_requirement.reorder(name: :asc)
         group.call(groups)
       end
     end
