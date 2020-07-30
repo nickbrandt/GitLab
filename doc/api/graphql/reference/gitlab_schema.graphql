@@ -7253,6 +7253,31 @@ enum IssueState {
 }
 
 """
+Represents total number of issues for the represented categories
+"""
+type IssueStatusCountsType {
+  """
+  Number of issues with status ALL for the project
+  """
+  all: Int
+
+  """
+  Number of issues with status CLOSED for the project
+  """
+  closed: Int
+
+  """
+  Number of issues with status MERGED for the project
+  """
+  merged: Int
+
+  """
+  Number of issues with status OPENED for the project
+  """
+  opened: Int
+}
+
+"""
 Issue type
 """
 enum IssueType {
@@ -10272,6 +10297,91 @@ type Project {
     """
     updatedBefore: Time
   ): Issue
+
+  """
+  Counts of issues by status for the project
+  """
+  issueStatusCounts(
+    """
+    ID of a user assigned to the issues, "none" and "any" values supported
+    """
+    assigneeId: String
+
+    """
+    Username of a user assigned to the issues
+    """
+    assigneeUsername: String
+
+    """
+    Issues closed after this date
+    """
+    closedAfter: Time
+
+    """
+    Issues closed before this date
+    """
+    closedBefore: Time
+
+    """
+    Issues created after this date
+    """
+    createdAfter: Time
+
+    """
+    Issues created before this date
+    """
+    createdBefore: Time
+
+    """
+    IID of the issue. For example, "1"
+    """
+    iid: String
+
+    """
+    List of IIDs of issues. For example, [1, 2]
+    """
+    iids: [String!]
+
+    """
+    Labels applied to this issue
+    """
+    labelName: [String]
+
+    """
+    Milestones applied to this issue
+    """
+    milestoneTitle: [String]
+
+    """
+    Search query for issue title or description
+    """
+    search: String
+
+    """
+    Sort issues by this criteria
+    """
+    sort: IssueSort = created_desc
+
+    """
+    Current state of this issue
+    """
+    state: IssuableState
+
+    """
+    Filter issues by the given issue types
+    """
+    types: [IssueType!]
+
+    """
+    Issues updated after this date
+    """
+    updatedAfter: Time
+
+    """
+    Issues updated before this date
+    """
+    updatedBefore: Time
+  ): IssueStatusCountsType
 
   """
   Issues of the project

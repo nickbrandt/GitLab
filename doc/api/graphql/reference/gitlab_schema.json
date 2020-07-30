@@ -20002,6 +20002,75 @@
           "possibleTypes": null
         },
         {
+          "kind": "OBJECT",
+          "name": "IssueStatusCountsType",
+          "description": "Represents total number of issues for the represented categories",
+          "fields": [
+            {
+              "name": "all",
+              "description": "Number of issues with status ALL for the project",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "closed",
+              "description": "Number of issues with status CLOSED for the project",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "merged",
+              "description": "Number of issues with status MERGED for the project",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "opened",
+              "description": "Number of issues with status OPENED for the project",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "ENUM",
           "name": "IssueType",
           "description": "Issue type",
@@ -30634,6 +30703,203 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "Issue",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "issueStatusCounts",
+              "description": "Counts of issues by status for the project",
+              "args": [
+                {
+                  "name": "iid",
+                  "description": "IID of the issue. For example, \"1\"",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "iids",
+                  "description": "List of IIDs of issues. For example, [1, 2]",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "state",
+                  "description": "Current state of this issue",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IssuableState",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "labelName",
+                  "description": "Labels applied to this issue",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "milestoneTitle",
+                  "description": "Milestones applied to this issue",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "assigneeUsername",
+                  "description": "Username of a user assigned to the issues",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "assigneeId",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "createdBefore",
+                  "description": "Issues created before this date",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "createdAfter",
+                  "description": "Issues created after this date",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "updatedBefore",
+                  "description": "Issues updated before this date",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "updatedAfter",
+                  "description": "Issues updated after this date",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "closedBefore",
+                  "description": "Issues closed before this date",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "closedAfter",
+                  "description": "Issues closed after this date",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "search",
+                  "description": "Search query for issue title or description",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": "Sort issues by this criteria",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IssueSort",
+                    "ofType": null
+                  },
+                  "defaultValue": "created_desc"
+                },
+                {
+                  "name": "types",
+                  "description": "Filter issues by the given issue types",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "IssueType",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "IssueStatusCountsType",
                 "ofType": null
               },
               "isDeprecated": false,
