@@ -10,7 +10,7 @@ GitLab's self-managed, Omnibus installation makes installing GitLab into a Micro
 NOTE: **GitLab is Coming Soon to the Azure Marketplace:**
 We are currently working on a solution that will bring GitLab to the Azure Marketplace to ease the burden of installing, configuring and maintaining it. Be sure to [follow the issue](https://gitlab.com/gitlab-com/alliances/microsoft/gitlab-tracker/-/issues/2) to get the latest updates.
 
-## Selecting a Linux Distribution
+## Selecting a Linux distribution
 
 Azure Virtual Machines (VM) are on-demand, scalable computing resources in Azure.  When installing GitLab, we recommend using [one of the many endorsed Linux distributions](https://azure.microsoft.com/en-us/overview/linux-on-azure/#supported-distributions).
 
