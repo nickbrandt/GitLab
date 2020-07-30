@@ -22,6 +22,13 @@ RSpec.describe Registrations::GroupsController do
       it { is_expected.to have_gitlab_http_status(:ok) }
       it { is_expected.to render_template(:new) }
 
+      it 'assigns the group variable to a new Group with the default group visibility' do
+        subject
+        expect(assigns(:group)).to be_a_new(Group)
+
+        expect(assigns(:group).visibility_level).to eq(Gitlab::CurrentSettings.default_group_visibility)
+      end
+
       context 'user without the ability to create a group' do
         let(:user) { create(:user, can_create_group: false) }
 

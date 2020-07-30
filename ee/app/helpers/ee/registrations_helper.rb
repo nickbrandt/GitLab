@@ -30,6 +30,16 @@ module EE
       end
     end
 
+    def visibility_level_options
+      available_visibility_levels(@group).map do |level|
+        {
+          level: level,
+          label: visibility_level_label(level),
+          description: visibility_level_description(level, @group)
+        }
+      end
+    end
+
     private
 
     def redirect_path
