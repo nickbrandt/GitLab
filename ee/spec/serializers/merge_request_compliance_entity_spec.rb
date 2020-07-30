@@ -17,7 +17,19 @@ RSpec.describe MergeRequestComplianceEntity do
 
     it 'includes merge request attributes for compliance' do
       expect(subject).to include(
-        :id, :title, :merged_at, :milestone, :path, :issuable_reference, :author, :approved_by_users, :approval_status
+        :id,
+        :title,
+        :merged_at,
+        :milestone,
+        :path,
+        :issuable_reference,
+        :author,
+        :approved_by_users,
+        :approval_status,
+        :target_branch,
+        :target_branch_uri,
+        :source_branch,
+        :source_branch_uri
       )
     end
 
