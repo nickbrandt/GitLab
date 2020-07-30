@@ -7,11 +7,11 @@ module Geo
     end
 
     def count_synced
-      registries.merge(Geo::ContainerRepositoryRegistry.synced).count
+      Geo::ContainerRepositoryRegistry.synced.count
     end
 
     def count_failed
-      registries.merge(Geo::ContainerRepositoryRegistry.failed).count
+      Geo::ContainerRepositoryRegistry.failed.count
     end
 
     def count_registry
@@ -91,15 +91,5 @@ module Geo
         .pluck_container_repository_key
     end
     # rubocop:enable CodeReuse/ActiveRecord
-
-    private
-
-    def registries
-      if Geo::ContainerRepositoryRegistry.registry_consistency_worker_enabled?
-        Geo::ContainerRepositoryRegistry.all
-      else
-        current_node_fdw.container_repositories.inner_join_container_repository_registry
-      end
-    end
   end
 end
