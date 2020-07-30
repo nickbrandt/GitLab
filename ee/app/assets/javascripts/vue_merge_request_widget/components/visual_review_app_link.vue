@@ -1,6 +1,6 @@
 <script>
 import {
-  GlDeprecatedButton,
+  GlButton,
   GlDeprecatedDropdown,
   GlDeprecatedDropdownItem,
   GlModal,
@@ -14,7 +14,7 @@ import { s__, sprintf } from '~/locale';
 
 export default {
   components: {
-    GlDeprecatedButton,
+    GlButton,
     GlDeprecatedDropdown,
     GlDeprecatedDropdownItem,
     GlModal,
@@ -155,14 +155,15 @@ export default {
 </script>
 <template>
   <div class="inline">
-    <gl-deprecated-button
+    <gl-button
       v-gl-modal="modalId"
+      category="tertiary"
       class="btn btn-default btn-sm gl-ml-3 js-review-button"
       :class="cssClass"
       type="button"
     >
       {{ s__('VisualReviewApp|Review') }}
-    </gl-deprecated-button>
+    </gl-button>
     <gl-modal
       ref="modal"
       :modal-id="modalId"
@@ -198,9 +199,9 @@ export default {
       </p>
       <p v-html="instructionText.step4"></p>
       <template #modal-footer>
-        <gl-deprecated-button @click="cancel">
+        <gl-button category="tertiary" @click="cancel">
           {{ s__('VisualReviewApp|Cancel') }}
-        </gl-deprecated-button>
+        </gl-button>
         <gl-deprecated-dropdown
           v-if="shouldShowChanges"
           dropup
