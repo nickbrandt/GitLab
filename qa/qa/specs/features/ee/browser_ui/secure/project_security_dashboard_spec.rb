@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  RSpec.describe 'Secure', :docker, :runner, quarantine: { type: :investigating } do
+  RSpec.describe 'Secure', :docker, :runner do
     describe 'Security Dashboard in a Project' do
       let(:vulnerability_name) { "CVE-2017-18269 in glibc" }
       let(:vulnerability_description) { "Short description to match in specs" }
@@ -45,6 +45,10 @@ module QA
 
         @merge_request.visit!
         Page::MergeRequest::Show.perform do |merge_request|
+          # Give time for the runner on Staging to complete pipeline
+          Support::Retrier.retry_until(max_attempts: 5, sleep_interval: 5, reload_page: merge_request) do
+            merge_request.has_pipeline_status?(/Pipeline #\d+ passed/)
+          end
           merge_request.merge!
         end
         Page::Project::Menu.perform(&:click_ci_cd_pipelines)
@@ -57,8 +61,9 @@ module QA
 
       it 'shows vulnerability details' do
         @project.visit!
-
-        Page::Project::Menu.perform(&:click_on_security_dashboard)
+        Support::Retrier.retry_on_exception do
+          Page::Project::Menu.perform(&:click_on_security_dashboard)
+        end
 
         EE::Page::Project::Secure::SecurityDashboard.perform do |security_dashboard|
           expect(security_dashboard).to have_vulnerability(description: vulnerability_name)
