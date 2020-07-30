@@ -10,10 +10,9 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 The Security Dashboard is a good place to get an overview of all the security
 vulnerabilities in your groups, projects and pipelines.
 
-You can also drill down into a vulnerability and get extra information, see which
-project it comes from, the related file(s), and various metadata to help you analyze
-the risk they pose. You can also take actions on vulnerabilities by creating an issue for them,
-or by dismissing them.
+You can also drill down into a vulnerability and get extra information. This includes the project it
+comes from, any related file(s), and metadata that helps you analyze the risk it poses. You can also
+dismiss a vulnerability or create an issue for it.
 
 To benefit from the Security Dashboard you must first configure one of the
 [security scanners](../index.md).
