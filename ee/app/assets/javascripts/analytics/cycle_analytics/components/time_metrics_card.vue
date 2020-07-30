@@ -2,9 +2,8 @@
 import Api from 'ee/api';
 import { __, s__ } from '~/locale';
 import createFlash from '~/flash';
-import { slugify } from '~/lib/utils/text_utility';
 import MetricCard from '../../shared/components/metric_card.vue';
-import { removeFlash } from '../utils';
+import { removeFlash, prepareTimeMetricsData } from '../utils';
 
 const I18N_TEXT = {
   'lead-time': s__('ValueStreamAnalytics|Median time from issue created to issue closed.'),
@@ -47,15 +46,7 @@ export default {
       this.loading = true;
       return Api.cycleAnalyticsTimeSummaryData(this.groupPath, this.additionalParams)
         .then(({ data }) => {
-          this.data = data.map(({ title: label, ...rest }) => {
-            const key = slugify(label);
-            return {
-              ...rest,
-              label,
-              key,
-              tooltipText: I18N_TEXT[key] || '',
-            };
-          });
+          this.data = prepareTimeMetricsData(data, I18N_TEXT);
         })
         .catch(() => {
           createFlash(
