@@ -92,9 +92,6 @@ If you're using GitLab.com and Jira Cloud, we recommend you use the [GitLab for 
    If you're using Jira Cloud, go to **Settings (gear) > Products > DVCS accounts**.
 1. Click **Link GitHub Enterprise account** to start creating a new integration.
    (We're pretending to be GitHub in this integration, until there's additional platform support in Jira.)
-
-   ![Jira Settings](img/jira_dev_panel_jira_setup_1-1.png)
-
 1. Complete the form:
 
    Select **GitHub Enterprise** for the **Host** field.
@@ -133,6 +130,69 @@ To connect additional GitLab projects from other GitLab top-level groups (or per
 steps with additional Jira DVCS accounts.
 
 Now that the integration is configured, read more about how to test and use it in [Usage](#usage).
+
+#### Troubleshooting DVCS setup
+
+##### Jira cannot access GitLab server 
+
+```plaintext
+Error obtaining access token. Cannot access https://gitlab.example.com from Jira.
+```
+
+- Generated in Jira after completing the Add New Account form in Jira and authorizing access.
+
+This error indicates a connectivity issue from Jira to GitLab. Errors don't seem to be generated in any logs.
+
+If there was an issue with SSL/TLS, this error will be generated.
+
+- The [GitLab Jira integration](jira.md) requires GitLab to connect to Jira. Any TLS issues that arise from a private certificate authority or self-signed certificate [are resolved on the GitLab server](https://docs.gitlab.com/omnibus/settings/ssl.html#other-certificate-authorities) as GitLab is the TLS client.
+- The Jira Development Panel integration requires Jira to connect to GitLab, and so Jira is the TLS client. If your GitLab server's certificate is not issued by a public certificate authority, the Java truststore on Jira's server needs to have the appropriate certificate added to it, such as your organization's root certificate.
+
+Refer to Atlassian's documentation and Atlassian Support for assistance setting up Jira correctly.
+
+- See Atlassian's documentation for [adding a certificate to the trust store](https://confluence.atlassian.com/kb/how-to-import-a-public-ssl-certificate-into-a-jvm-867025849.html).
+  - The simplest approach would be to use [keytool](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html).
+  - Add additional roots to Java's default truststore (`cacerts`) so Jira continues to trust public certificate authorities as well.
+  - If the integration stops working after upgrading Jira's Java runtime, this might be because the `cacerts` truststore got replaced.
+
+Atlassian has documentation for [troubleshooting connectivity up to and including TLS handshaking](https://confluence.atlassian.com/kb/unable-to-connect-to-ssl-services-due-to-pkix-path-building-failed-error-779355358.html) using the a java class called `SSLPoke`.
+
+- Download the class from Atlassian's knowledgebase to Jira's server, for example to `/tmp`.
+- Use the same Java runtime as Jira.
+- Pass all networing related parameters that Jira is called with such as proxy settings or an alternative root truststore (`-Djavax.net.ssl.trustStore`)
+
+```shell
+${JAVA_HOME}/bin/java -Djavax.net.ssl.trustStore=/var/atlassian/application-data/jira/cacerts -classpath /tmp SSLPoke gitlab.example.com 443
+```
+
+- `Successfully connected` indicates a successful TLS handshake.
+- If there are problems, the Java TLS library generates errors that you can look up for more detail.
+
+##### Jira error adding account and no repositories listed
+
+```plaintext
+Error!
+Failed adding the account: [Error retrieving list of repositories]
+```
+
+- Generated in Jira after completing the Add New Account form in Jira and authorizing access.
+- Selecting 'Try Again' will return `Account is already integrated with JIRA.`
+- The account is set up in the DVCS accounts view, but no repositories are listed.
+
+Potential causes:
+
+- [There was an issue affecting GitLab versions 11.10-12.7](https://gitlab.com/gitlab-org/gitlab/-/issues/37012). Upgrade to GitLab 12.8.10 or later for the fix.
+- The Jira Development Panel integration requires a GitLab Premium, GitLab.com Silver, or higher tier. If you are on a lower tier, you will need to upgrade to use this feature.
+
+[Contact GitLab Support](https://about.gitlab.com/support) if none of these reasons apply.
+
+#### Fixing synchonization issues
+
+If incorrect information is showing in Jira, such as deleted branches, you may need to resynchronize the information
+
+- Within Jira, go to **Jira Administration**, select **Applications**, and then **DVCS accounts**
+- At the account (group or subgroup) level, there's an option to **Refresh repositories** in the `...` (ellipsis) menu.
+- For each project, there's a mouse-over sync button next to the **last activity** date. Perform a soft resync by clicking it, or a full sync by holding down SHIFT and clicking it. Read more in [Atlassian's documentation](https://confluence.atlassian.com/adminjiracloud/synchronize-an-account-972332890.html).
 
 ### GitLab for Jira app
 
