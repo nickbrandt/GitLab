@@ -1234,6 +1234,9 @@ msgstr ""
 msgid "Access forbidden. Check your access level."
 msgstr ""
 
+msgid "Access requests"
+msgstr ""
+
 msgid "Access to '%{classification_label}' not allowed"
 msgstr ""
 
@@ -9897,9 +9900,6 @@ msgid "Existing projects may be moved into a group"
 msgstr ""
 
 msgid "Existing projects will be able to use expiration policies. Avoid enabling this if an external Container Registry is being used, as there is a performance risk if many images exist on one project."
-msgstr ""
-
-msgid "Existing shares"
 msgstr ""
 
 msgid "Existing sign in methods may be removed"
@@ -26614,6 +26614,9 @@ msgid "Users over License:"
 msgstr ""
 
 msgid "Users requesting access to"
+msgstr ""
+
+msgid "Users requesting access to %{strong_start}%{group_name}%{strong_end}"
 msgstr ""
 
 msgid "Users were successfully added."
