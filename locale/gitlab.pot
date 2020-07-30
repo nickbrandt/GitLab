@@ -9889,6 +9889,9 @@ msgstr ""
 msgid "Explore public groups"
 msgstr ""
 
+msgid "Export"
+msgstr ""
+
 msgid "Export as CSV"
 msgstr ""
 

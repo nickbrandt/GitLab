@@ -2,6 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import {
   GlDeprecatedButton,
+  GlButton,
   GlDeprecatedDropdown,
   GlDeprecatedDropdownItem,
   GlIcon,
@@ -14,6 +15,7 @@ export default {
   name: 'DependenciesActions',
   components: {
     GlDeprecatedButton,
+    GlButton,
     GlDeprecatedDropdown,
     GlDeprecatedDropdownItem,
     GlIcon,
@@ -97,14 +99,15 @@ export default {
         <gl-icon :name="sortOrderIcon" />
       </gl-deprecated-button>
     </div>
-    <gl-deprecated-button
+    <gl-button
       v-gl-tooltip
       :href="downloadEndpoint"
       download="dependencies.json"
       :title="s__('Dependencies|Export as JSON')"
       class="js-download"
+      icon="export"
     >
-      <gl-icon name="export" />
-    </gl-deprecated-button>
+      {{ __('Export') }}
+    </gl-button>
   </div>
 </template>
