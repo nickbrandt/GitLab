@@ -47,26 +47,15 @@ module Geo
     end
 
     def find_container_repository_ids_not_synced(batch_size:)
-      if Geo::ContainerRepositoryRegistry.registry_consistency_worker_enabled?
-        registry_finder
-          .find_never_synced_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
-          .pluck_model_foreign_key
-      else
-        registry_finder
-          .find_unsynced(batch_size: batch_size, except_ids: scheduled_repository_ids)
-          .pluck_primary_key
-      end
+      registry_finder
+        .find_never_synced_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
+        .pluck_model_foreign_key
     end
 
     def find_retryable_container_registry_ids(batch_size:)
-      if Geo::ContainerRepositoryRegistry.registry_consistency_worker_enabled?
-        registry_finder
-          .find_retryable_dirty_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
-          .pluck_model_foreign_key
-      else
-        registry_finder
-            .find_retryable_failed_ids(batch_size: batch_size, except_ids: scheduled_repository_ids)
-      end
+      registry_finder
+        .find_retryable_dirty_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
+        .pluck_model_foreign_key
     end
 
     def registry_finder
