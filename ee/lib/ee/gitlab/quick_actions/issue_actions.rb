@@ -90,7 +90,7 @@ module EE
           execution_message do |iteration|
             _("Set the iteration to %{iteration_reference}.") % { iteration_reference: iteration.to_reference } if iteration
           end
-          params '*iteration:"iteration"'
+          params '*iteration:"iteration name"'
           types Issue
           condition do
             current_user.can?(:"admin_#{quick_action_target.to_ability_name}", project) &&
