@@ -297,9 +297,9 @@ RSpec.describe 'New project' do
           group2.add_owner(user)
           group3.add_owner(user)
           group4.add_owner(user)
-          group1.update(custom_project_templates_group_id: subgroup1.id)
-          group2.update(custom_project_templates_group_id: subgroup2.id)
-          subgroup4.update(custom_project_templates_group_id: subsubgroup4.id)
+          group1.update!(custom_project_templates_group_id: subgroup1.id)
+          group2.update!(custom_project_templates_group_id: subgroup2.id)
+          subgroup4.update!(custom_project_templates_group_id: subsubgroup4.id)
         end
 
         context 'when top level context' do
