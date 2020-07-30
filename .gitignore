@@ -575,3 +575,32 @@ db/schema_migrations/20180831164904
 db/schema_migrations/20180202111106
 # Removed in b87dcc238a8
 db/schema_migrations/20181218192239
+
+# Removed in various revert commits
+db/schema_migrations/20180115094742
+db/schema_migrations/20180115113902
+db/schema_migrations/20190107151029
+db/schema_migrations/20190114184258
+db/schema_migrations/20190228092516
+db/schema_migrations/20190311132500
+db/schema_migrations/20190311132527
+db/schema_migrations/20190703001116
+db/schema_migrations/20190703001120
+db/schema_migrations/20190724091326
+db/schema_migrations/20190801072937
+db/schema_migrations/20191004134055
+db/schema_migrations/20191029060358
+db/schema_migrations/20191029061556
+db/schema_migrations/20191220102807
+db/schema_migrations/20200123092602
+db/schema_migrations/20200123101859
+db/schema_migrations/20200127111953
+db/schema_migrations/20200127131953
+db/schema_migrations/20200127141953
+db/schema_migrations/20200127151953
+db/schema_migrations/20200206111847
+db/schema_migrations/20200214173000
+db/schema_migrations/20200214174519
+db/schema_migrations/20200214174607
+db/schema_migrations/20200309105539
+db/schema_migrations/20200615203153
