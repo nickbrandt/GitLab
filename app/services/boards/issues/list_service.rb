@@ -45,6 +45,9 @@ module Boards
       # rubocop: enable CodeReuse/ActiveRecord
 
       def filter(issues)
+        # sometimes we want to just fetch all issues that a board can display
+        return issues if params[:all]
+
         issues = without_board_labels(issues) unless list&.movable? || list&.closed?
         issues = with_list_label(issues) if list&.label?
         issues

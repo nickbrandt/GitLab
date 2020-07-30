@@ -30,7 +30,6 @@ class EpicsFinder < IssuableFinder
 
   def self.scalar_params
     @scalar_params ||= %i[
-      board
       parent_id
       author_id
       author_username
@@ -44,7 +43,7 @@ class EpicsFinder < IssuableFinder
   end
 
   def self.array_params
-    @array_params ||= { label_name: [] }
+    @array_params ||= { issues: [], label_name: [] }
   end
 
   def self.valid_iid_query?(query)
@@ -109,7 +108,7 @@ class EpicsFinder < IssuableFinder
   end
 
   def filter_items(items)
-    items = in_board(items)
+    items = in_issues(items)
     items = by_created_at(items)
     items = by_updated_at(items)
     items = by_author(items)
@@ -156,14 +155,13 @@ class EpicsFinder < IssuableFinder
     items.iid_starts_with(query)
   end
 
-  def in_board(items)
-    board = params[:board]
-    return items unless board.present?
+  def in_issues(items)
+    issues = params[:issues]
+    # ActiveRecord::Relation.empty? would run a SELECT 1 AS one FROM "issues" LIMIT $1
+    # ActiveRecord::Relation.blank? or ActiveRecord::Relation.present? would run SELECT "issues".* FROM "issues"
+    return items if issues.nil? || issues.empty?
 
-    list_service = Boards::Issues::ListService.new(board.resource_parent, current_user, { board_id: board.id })
-    issues = list_service.execute.except(:order).pluck_primary_key
-    epics_in_boards = EpicIssue.where(issue: issues)
-    items.id_in(epics_in_boards.select("epic_id as id"))
+    items.in_issues(issues.select(:id))
   end
 
   def related_groups
