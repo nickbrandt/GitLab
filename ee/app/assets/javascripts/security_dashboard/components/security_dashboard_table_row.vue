@@ -160,7 +160,7 @@ export default {
         <div class="gl-text-overflow-ellipsis gl-overflow-hidden" :title="vulnerabilityIdentifier">
           {{ vulnerabilityIdentifier }}
         </div>
-        <div v-if="shouldShowExtraIdentifierCount" class="gl-text-gray-500">
+        <div v-if="shouldShowExtraIdentifierCount" class="gl-text-gray-300">
           <gl-sprintf :message="__('+ %{count} more')">
             <template #count>
               {{ extraIdentifierCount }}
@@ -176,7 +176,7 @@ export default {
         <div class="text-capitalize">
           {{ useConvertReportType }}
         </div>
-        <div v-if="vulnerabilityVendor" class="gl-text-gray-500" data-testid="vulnerability-vendor">
+        <div v-if="vulnerabilityVendor" class="gl-text-gray-300" data-testid="vulnerability-vendor">
           {{ vulnerabilityVendor }}
         </div>
       </div>
