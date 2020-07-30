@@ -11,16 +11,16 @@ The Security Dashboard is a good place to get an overview of all the security
 vulnerabilities in your groups, projects and pipelines.
 
 You can also drill down into a vulnerability and get extra information, see which
-project it comes from, the file it's in, and various metadata to help you analyze
-the risk. You can also take actions on vulnerabilities by creating an issue for them,
+project it comes from, the related file(s), and various metadata to help you analyze
+the risk they pose. You can also take actions on vulnerabilities by creating an issue for them,
 or by dismissing them.
 
 To benefit from the Security Dashboard you must first configure one of the
-[security reports](../index.md).
+[security scanners](../index.md).
 
 ## Supported reports
 
-The Security Dashboard supports the following reports:
+The Security Dashboard supports displaying vulnerabilities detected by scanners including:
 
 - [Container Scanning](../container_scanning/index.md)
 - [Dynamic Application Security Testing](../dast/index.md)
@@ -68,7 +68,7 @@ You can filter the vulnerabilities by:
 
 - Status
 - Severity
-- Report type
+- Scanner
 
 You can also dismiss vulnerabilities in the table:
 
@@ -96,7 +96,7 @@ You can filter which vulnerabilities the Security Dashboard displays by:
 
 - Status
 - Severity
-- Report type
+- Scanner
 - Project
 
 A table lists the vulnerabilities, sorted by severity. The table shows each vulnerability's status,
