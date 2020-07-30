@@ -26,11 +26,7 @@ module EE
 
         field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
                description: 'Counts for each severity of vulnerability of the project',
-               resolve: -> (obj, _args, ctx) do
-                 Hash.new(0).merge(
-                   obj.vulnerabilities.with_states([:detected, :confirmed]).counts_by_severity
-                 )
-               end
+               resolve: -> (obj, *) { obj.vulnerability_statistic || Hash.new(0) }
 
         field :requirement, ::Types::RequirementsManagement::RequirementType, null: true,
               description: 'Find a single requirement. Available only when feature flag `requirements_management` is enabled.',
