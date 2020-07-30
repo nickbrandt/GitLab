@@ -105,7 +105,7 @@ FactoryBot.define do
         {
           annotations: {
             title: 'This is a prometheus error',
-            summary: 'Summary of the erorr',
+            summary: 'Summary of the error',
             description: 'Description of the error'
           },
           startsAt: started_at
