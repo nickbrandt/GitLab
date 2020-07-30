@@ -1,5 +1,4 @@
 import mutations from 'ee/boards/stores/mutations';
-import { inactiveId } from '~/boards/constants';
 import { mockLists, mockEpics } from '../mock_data';
 
 const expectNotImplemented = action => {
@@ -17,19 +16,6 @@ describe('SET_SHOW_LABELS', () => {
     mutations.SET_SHOW_LABELS(state, false);
 
     expect(state.isShowingLabels).toBe(false);
-  });
-});
-
-describe('SET_ACTIVE_LIST_ID', () => {
-  it('updates aciveListId to be the value that is passed', () => {
-    const expectedId = 1;
-    const state = {
-      activeId: inactiveId,
-    };
-
-    mutations.SET_ACTIVE_LIST_ID(state, expectedId);
-
-    expect(state.activeId).toBe(expectedId);
   });
 });
 

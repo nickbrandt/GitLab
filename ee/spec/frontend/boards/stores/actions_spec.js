@@ -3,7 +3,6 @@ import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import actions from 'ee/boards/stores/actions';
 import * as types from 'ee/boards/stores/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
-import { inactiveId } from '~/boards/constants';
 
 jest.mock('axios');
 
@@ -24,23 +23,6 @@ describe('setShowLabels', () => {
       false,
       state,
       [{ type: types.SET_SHOW_LABELS, payload: false }],
-      [],
-      done,
-    );
-  });
-});
-
-describe('setActiveId', () => {
-  it('should commit mutation SET_ACTIVE_LIST_ID', done => {
-    const state = {
-      activeId: inactiveId,
-    };
-
-    testAction(
-      actions.setActiveId,
-      1,
-      state,
-      [{ type: types.SET_ACTIVE_LIST_ID, payload: 1 }],
       [],
       done,
     );
