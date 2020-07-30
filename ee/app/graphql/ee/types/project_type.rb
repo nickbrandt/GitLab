@@ -60,6 +60,10 @@ module EE
             Rails.application.routes.url_helpers.project_security_dashboard_index_path(project)
           end
 
+        field :iterations, ::Types::IterationType.connection_type, null: true,
+              description: 'Find iterations',
+              resolver: ::Resolvers::IterationsResolver
+
         def self.requirements_available?(project, user)
           ::Feature.enabled?(:requirements_management, project, default_enabled: true) && Ability.allowed?(user, :read_requirement, project)
         end
