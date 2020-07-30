@@ -14985,6 +14985,11 @@ type Vulnerability {
   reportType: VulnerabilityReportType
 
   """
+  Indicates whether the vulnerability is fixed on the default branch or not
+  """
+  resolvedOnDefaultBranch: Boolean!
+
+  """
   Scanner metadata for the vulnerability.
   """
   scanner: VulnerabilityScanner
