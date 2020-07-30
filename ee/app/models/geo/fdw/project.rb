@@ -15,27 +15,6 @@ module Geo
 
       alias_method :parent, :namespace
 
-      delegate :disk_path, to: :storage
-
-      def hashed_storage?(feature)
-        raise ArgumentError, _("Invalid feature") unless ::Project::HASHED_STORAGE_FEATURES.include?(feature)
-
-        self.storage_version && self.storage_version >= ::Project::HASHED_STORAGE_FEATURES[feature]
-      end
-
-      def repository
-        @repository ||= Repository.new(full_path, self, shard: repository_storage, disk_path: disk_path)
-      end
-
-      def storage
-        @storage ||=
-          if hashed_storage?(:repository)
-            Storage::Hashed.new(self)
-          else
-            Storage::LegacyProject.new(self)
-          end
-      end
-
       class << self
         # Searches for a list of projects based on the query given in `query`.
         #
