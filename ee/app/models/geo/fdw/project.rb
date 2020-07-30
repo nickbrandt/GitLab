@@ -13,8 +13,6 @@ module Geo
 
       belongs_to :namespace, class_name: 'Geo::Fdw::Namespace'
 
-      scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
-
       alias_method :parent, :namespace
 
       delegate :disk_path, to: :storage
@@ -55,15 +53,6 @@ module Geo
 
         def within_shards(shard_names)
           where(repository_storage: Array(shard_names))
-        end
-
-        def inner_join_project_registry
-          join_statement =
-            arel_table
-              .join(Geo::ProjectRegistry.arel_table, Arel::Nodes::InnerJoin)
-              .on(arel_table[:id].eq(Geo::ProjectRegistry.arel_table[:project_id]))
-
-          joins(join_statement.join_sources)
         end
       end
     end
