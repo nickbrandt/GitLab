@@ -41,11 +41,11 @@ RSpec.describe Upload do
 
       let(:model) { create(*model_factory) }
       let(:node) do
-        create_geo_node_to_test_replicables_for_geo_node(
-          model,
-          selective_sync_namespaces: selective_sync_namespaces,
-          selective_sync_shards: selective_sync_shards,
-          sync_object_storage: sync_object_storage)
+        create(:geo_node_with_selective_sync_for,
+               model: model,
+               namespaces: selective_sync_namespaces,
+               shards: selective_sync_shards,
+               sync_object_storage: sync_object_storage)
       end
 
       before do

@@ -138,11 +138,11 @@ RSpec.describe Ci::JobArtifact do
       let(:project) { create(*project_factory) }
       let(:ci_build) { create(:ci_build, project: project) }
       let(:node) do
-        create_geo_node_to_test_replicables_for_geo_node(
-          project,
-          selective_sync_namespaces: selective_sync_namespaces,
-          selective_sync_shards: selective_sync_shards,
-          sync_object_storage: sync_object_storage)
+        create(:geo_node_with_selective_sync_for,
+               model: project,
+               namespaces: selective_sync_namespaces,
+               shards: selective_sync_shards,
+               sync_object_storage: sync_object_storage)
       end
 
       before do
