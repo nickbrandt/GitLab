@@ -3,8 +3,8 @@
 require 'pathname'
 
 module QA
-  RSpec.describe 'Secure', :docker, :runner, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/213676', type: :investigating } do
-    let(:number_of_dependencies_in_fixture) { 7 }
+  RSpec.describe 'Secure', :docker, :runner do
+    let(:number_of_dependencies_in_fixture) { 9 }
     let(:dependency_scan_example_vuln) { 'Prototype pollution attack in mixin-deep' }
     let(:container_scan_example_vuln) { 'CVE-2017-18269 in glibc' }
     let(:sast_scan_example_vuln) { 'Cipher with no integrity' }
@@ -57,19 +57,19 @@ module QA
           pipeline.click_on_security
 
           filter_report_and_perform(pipeline, "Dependency Scanning") do
-            expect(pipeline).to have_vulnerability dependency_scan_example_vuln
+            expect(pipeline).to have_vulnerability_info_content dependency_scan_example_vuln
           end
 
           filter_report_and_perform(pipeline, "Container Scanning") do
-            expect(pipeline).to have_vulnerability container_scan_example_vuln
+            expect(pipeline).to have_vulnerability_info_content container_scan_example_vuln
           end
 
           filter_report_and_perform(pipeline, "SAST") do
-            expect(pipeline).to have_vulnerability sast_scan_example_vuln
+            expect(pipeline).to have_vulnerability_info_content sast_scan_example_vuln
           end
 
           filter_report_and_perform(pipeline, "DAST") do
-            expect(pipeline).to have_vulnerability dast_scan_example_vuln
+            expect(pipeline).to have_vulnerability_info_content dast_scan_example_vuln
           end
         end
       end
