@@ -127,7 +127,7 @@ export default {
             <span v-if="weight > 0" class="order-md-1">
               <issue-weight
                 :weight="weight"
-                class="item-weight d-flex align-items-center"
+                class="item-weight gl-display-flex gl-align-items-center"
                 tag-name="span"
               />
             </span>
@@ -136,7 +136,7 @@ export default {
               <issue-due-date
                 :date="dueDate"
                 tooltip-placement="top"
-                css-class="item-due-date d-flex align-items-center"
+                css-class="item-due-date gl-display-flex gl-align-items-center"
               />
             </span>
 
