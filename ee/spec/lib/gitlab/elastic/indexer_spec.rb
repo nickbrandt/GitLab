@@ -373,6 +373,21 @@ RSpec.describe Gitlab::Elastic::Indexer do
     end
   end
 
+  context 'when a file path is larger than elasticsearch max size of 512 bytes', :elastic do
+    let(:long_path) { "#{'a' * 1000}_file.txt" }
+
+    before do
+      project.repository.create_file(user, long_path, 'Large path file contents', message: 'long_path.txt', branch_name: 'master')
+
+      index_repository(project)
+    end
+
+    it 'indexes the file' do
+      files = indexed_file_paths_for('file')
+      expect(files).to include(long_path)
+    end
+  end
+
   def expect_popen
     expect(Gitlab::Popen).to receive(:popen)
   end
