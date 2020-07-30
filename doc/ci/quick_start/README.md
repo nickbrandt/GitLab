@@ -69,6 +69,11 @@ blog about it](https://about.gitlab.com/blog/2015/05/06/why-were-replacing-gitla
 ### Creating a simple `.gitlab-ci.yml` file
 
 NOTE: **Note:**
+A GitLab team member has made an [unofficial visual pipeline editor](https://unofficial.gitlab.tools/visual-pipelines/)
+We plan to bring this into the product very soon via our [visual editor epic](https://gitlab.com/groups/gitlab-org/-/epics/4069),
+but in the meantime it is usable (if unofficial) at the above link.
+
+NOTE: **Note:**
 `.gitlab-ci.yml` is a [YAML](https://en.wikipedia.org/wiki/YAML) file
 so you have to pay extra attention to indentation. Always use spaces, not tabs.
 
