@@ -893,6 +893,20 @@ describe User do
         expect(described_class.without_ghosts).to match_array([user1, user2])
       end
     end
+
+    describe '.by_id_and_login' do
+      let_it_be(:user) { create(:user) }
+
+      it 'finds a user regardless of case' do
+        expect(described_class.by_id_and_login(user.id, user.username.upcase))
+          .to contain_exactly(user)
+      end
+
+      it 'finds a user when login is an email address regardless of case' do
+        expect(described_class.by_id_and_login(user.id, user.email.upcase))
+          .to contain_exactly(user)
+      end
+    end
   end
 
   describe "Respond to" do
