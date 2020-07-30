@@ -868,6 +868,9 @@ msgstr ""
 msgid "(line: %{startLine})"
 msgstr ""
 
+msgid "(max size 15 MB)"
+msgstr ""
+
 msgid "(removed)"
 msgstr ""
 
@@ -14385,6 +14388,9 @@ msgid "List Your Gitea Repositories"
 msgstr ""
 
 msgid "List available repositories"
+msgstr ""
+
+msgid "List of all merge commits"
 msgstr ""
 
 msgid "List settings"
