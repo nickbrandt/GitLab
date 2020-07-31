@@ -6,9 +6,9 @@
     .edit-profile.login-page.d-flex.flex-column.align-items-center.pt-lg-3
       - if in_subscription_flow? || (onboarding_issues_experiment_enabled && !in_invitation_flow? && !in_oauth_flow?)
         #progress-bar{ data: { is_in_subscription_flow: in_subscription_flow?.to_s, is_onboarding_issues_experiment_enabled: onboarding_issues_experiment_enabled.to_s } }
-      %h2.center= _('Welcome to GitLab.com<br>@%{name}!').html_safe % { name: html_escape(current_user.first_name) }
+      %h2.center= html_escape(_('Welcome to GitLab.com%{br_tag}@%{name}!')) % { name: html_escape(current_user.first_name), br_tag: '<br/>'.html_safe }
       %p
-        .center= _('In order to personalize your experience with GitLab<br>we would like to know a bit more about you.').html_safe
+        .center= html_escape(_('In order to personalize your experience with GitLab%{br_tag}we would like to know a bit more about you.')) % { br_tag: '<br/>'.html_safe }
 
       = form_for(current_user, url: users_sign_up_update_registration_path, html: { class: 'card w-100 gl-p-3-deprecated-no-really-do-not-use-me', 'aria-live' => 'assertive' }) do |f|
         .devise-errors
