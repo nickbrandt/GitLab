@@ -674,7 +674,7 @@ RSpec.describe ProjectPolicy do
     end
   end
 
-  describe 'admin_license_management' do
+  describe 'admin_software_license_policy' do
     context 'without license scanning feature available' do
       before do
         stub_licensed_features(license_scanning: false)
@@ -1388,8 +1388,7 @@ RSpec.describe ProjectPolicy do
            update_pipeline_schedule admin_pipeline_schedule create_trigger update_trigger
            admin_trigger create_pages admin_release request_access create_board update_board
            create_issue_link update_issue_link create_approvers admin_approvers
-           admin_vulnerability_feedback update_vulnerability create_license_management
-           update_license_management admin_license_management create_feature_flags_client
+           admin_vulnerability_feedback update_vulnerability create_feature_flags_client
            update_feature_flags_client update_iteration]
       end
 
