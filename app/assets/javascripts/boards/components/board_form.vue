@@ -2,6 +2,7 @@
 import { __ } from '~/locale';
 import Flash from '~/flash';
 import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { visitUrl } from '~/lib/utils/url_utility';
 import boardsStore from '~/boards/stores/boards_store';
 
@@ -18,8 +19,11 @@ const boardDefaults = {
 export default {
   components: {
     BoardScope: () => import('ee_component/boards/components/board_scope.vue'),
+    BoardConfigurationOptions: () =>
+      import('ee_component/boards/components/board_configuration_options.vue'),
     DeprecatedModal,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     canAdminBoard: {
       type: Boolean,
@@ -195,6 +199,11 @@ export default {
             @keyup.enter="submit"
           />
         </div>
+
+        <board-configuration-options
+          v-if="glFeatures.boardConfigurationOptions"
+          ref="configurationOptions"
+        />
 
         <board-scope
           v-if="scopedIssueBoardFeatureEnabled"

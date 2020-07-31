@@ -4,4 +4,8 @@ export default () => ({
   endpoints: {},
   isShowingLabels: true,
   activeId: inactiveId,
+  configurationOptions: {
+    hideOpenList: false,
+    hideClosedList: false,
+  },
 });

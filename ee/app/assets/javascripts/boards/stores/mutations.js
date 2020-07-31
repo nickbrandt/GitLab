@@ -85,4 +85,10 @@ export default {
   [mutationTypes.RECEIVE_EPICS_SUCCESS]: (state, epics) => {
     state.epics = epics;
   },
+
+  [mutationTypes.SET_CONFIGURATION_OPTIONS]: (state, options = {}) => {
+    state.configurationOptions = {
+      hideLabels: options.hideLabels,
+    };
+  },
 };

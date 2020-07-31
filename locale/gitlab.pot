@@ -3822,6 +3822,9 @@ msgstr ""
 msgid "Blog"
 msgstr ""
 
+msgid "Board configuration options"
+msgstr ""
+
 msgid "Board name"
 msgstr ""
 
@@ -12277,6 +12280,12 @@ msgid "Hide shared projects"
 msgstr ""
 
 msgid "Hide stage"
+msgstr ""
+
+msgid "Hide the Closed list"
+msgstr ""
+
+msgid "Hide the Open list"
 msgstr ""
 
 msgid "Hide value"
