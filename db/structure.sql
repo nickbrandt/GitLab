@@ -19148,6 +19148,8 @@ CREATE INDEX index_ci_pipelines_on_merge_request_id ON public.ci_pipelines USING
 
 CREATE INDEX index_ci_pipelines_on_pipeline_schedule_id ON public.ci_pipelines USING btree (pipeline_schedule_id);
 
+CREATE INDEX index_ci_pipelines_on_project_id_and_created_at ON public.ci_pipelines USING btree (project_id, created_at);
+
 CREATE INDEX index_ci_pipelines_on_project_id_and_id_desc ON public.ci_pipelines USING btree (project_id, id DESC);
 
 CREATE UNIQUE INDEX index_ci_pipelines_on_project_id_and_iid ON public.ci_pipelines USING btree (project_id, iid) WHERE (iid IS NOT NULL);
