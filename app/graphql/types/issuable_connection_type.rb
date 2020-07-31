@@ -7,7 +7,13 @@ module Types
           description: 'Total count of collection'
 
     def count
-      object.items.size
+      relation = object.items
+
+      if relation.try(:group_values)&.present?
+        relation.size.keys.size
+      else
+        relation.size
+      end
     end
   end
 end
