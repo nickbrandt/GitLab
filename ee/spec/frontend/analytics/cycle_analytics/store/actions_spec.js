@@ -91,13 +91,17 @@ describe('Cycle analytics actions', () => {
   describe('setSelectedValueStream', () => {
     const vs = { id: 'vs-1', name: 'Value stream 1' };
 
-    it('dispatches the fetchCycleAnalyticsData action', () => {
+    it('refetches the cycle analytics data', () => {
       return testAction(
         actions.setSelectedValueStream,
         vs,
         { ...state, selectedValueStream: {} },
         [{ type: types.SET_SELECTED_VALUE_STREAM, payload: vs }],
-        [{ type: 'fetchGroupStagesAndEvents' }],
+        [
+          { type: 'fetchGroupStagesAndEvents' },
+          { type: 'fetchStageMedianValues' },
+          { type: 'durationChart/fetchDurationData' },
+        ],
       );
     });
   });
@@ -276,7 +280,6 @@ describe('Cycle analytics actions', () => {
         [
           { type: 'requestCycleAnalyticsData' },
           { type: 'fetchValueStreams' },
-          { type: 'fetchStageMedianValues' },
           { type: 'receiveCycleAnalyticsDataSuccess' },
         ],
       );

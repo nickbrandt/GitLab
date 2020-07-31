@@ -453,6 +453,7 @@ describe('Cycle Analytics component', () => {
                   StageNavItem,
                 },
               },
+              withValueStreamSelected: false,
               withStageSelected: true,
             });
           });

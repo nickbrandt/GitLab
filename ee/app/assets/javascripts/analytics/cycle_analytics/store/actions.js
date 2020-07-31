@@ -125,7 +125,6 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 
   return Promise.resolve()
     .then(() => dispatch('fetchValueStreams'))
-    .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
@@ -314,7 +313,10 @@ export const createValueStream = ({ commit, dispatch, getters }, data) => {
 
 export const setSelectedValueStream = ({ commit, dispatch }, streamId) => {
   commit(types.SET_SELECTED_VALUE_STREAM, streamId);
-  return dispatch('fetchGroupStagesAndEvents');
+  return Promise.resolve()
+    .then(() => dispatch('fetchGroupStagesAndEvents'))
+    .then(() => dispatch('fetchStageMedianValues'))
+    .then(() => dispatch('durationChart/fetchDurationData'));
 };
 
 export const receiveValueStreamsSuccess = ({ commit, dispatch }, data = []) => {
