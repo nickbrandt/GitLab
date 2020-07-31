@@ -55,13 +55,22 @@ module Gitlab
         #
         # @param type [Symbol] the type of resource, `:project` or `:namespace`
         def delete(type)
-          Gitlab::Redis::Cache.with { |redis| redis.del(redis_key(type)) }
+          Gitlab::Redis::Cache.with do |redis|
+            unlink_or_delete(redis, redis_key(type))
+          end
         end
 
         private
 
         def redis_key(type)
           "elasticsearch_enabled_cache:#{type}"
+        end
+
+        def unlink_or_delete(redis, key)
+          redis.unlink(key)
+        rescue ::Redis::CommandError => e
+          Gitlab::ErrorTracking.log_exception(e)
+          redis.del(key)
         end
       end
     end
