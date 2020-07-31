@@ -1134,11 +1134,10 @@ postgresql['trust_auth_cidr_addresses'] = %w(123.123.123.123/32 <other_cidrs>)
 
 ### Issues with other components
 
-If you're running into an issue with a component not outlined here, be sure to check the troubleshooting section of their specific documentation page.
+If you're running into an issue with a component not outlined here, be sure to check the troubleshooting section of their specific documentation page:
 
 - [Consul](../consul.md#troubleshooting-consul)
 - [PostgreSQL](https://docs.gitlab.com/omnibus/settings/database.html#troubleshooting)
-- [GitLab application](../high_availability/gitlab.md#troubleshooting)
 
 ## Patroni
 

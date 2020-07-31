@@ -304,9 +304,9 @@ In the architecture overview, there are two machines running the GitLab
 application services. These services are enabled selectively in the
 configuration.
 
-Configure the application servers following
-[Configuring GitLab for multiple nodes](../../high_availability/gitlab.md), then make the
-following modifications:
+Configure the GitLab Rails application servers following the relevant steps
+outlined in the [reference architectures](../../reference_architectures/index.md),
+then make the following modifications:
 
 1. Edit `/etc/gitlab/gitlab.rb` on each application server in the **secondary**
    cluster, and add the following:
