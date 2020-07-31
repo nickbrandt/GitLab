@@ -157,8 +157,8 @@ RSpec.describe API::Scim do
           expect(new_user).not_to be_nil
         end
 
-        it 'created the right member' do
-          expect(member.access_level).to eq(::Gitlab::Access::GUEST)
+        it 'created the member with access level set in saml_provider' do
+          expect(member.access_level).to eq(::Gitlab::Access::DEVELOPER)
         end
       end
 
@@ -216,8 +216,8 @@ RSpec.describe API::Scim do
             expect(new_user).not_to be_nil
           end
 
-          it 'created the right member' do
-            expect(member.access_level).to eq(::Gitlab::Access::GUEST)
+          it 'created the member with access level set in saml_provider' do
+            expect(member.access_level).to eq(::Gitlab::Access::DEVELOPER)
           end
         end
       end
@@ -555,17 +555,23 @@ RSpec.describe API::Scim do
     before do
       stub_feature_flags(scim_identities: false)
     end
+
+    let(:saml_provider) { create(:saml_provider, default_membership_role: Gitlab::Access::DEVELOPER) }
     let(:group) { identity.saml_provider.group }
 
     context 'user with an alphanumeric extern_uid' do
-      let(:identity) { create(:group_saml_identity, user: user, extern_uid: generate(:username)) }
+      let(:identity) do
+        create(:group_saml_identity, user: user, extern_uid: generate(:username), saml_provider: saml_provider)
+      end
 
       it_behaves_like 'SCIM API endpoints'
       it_behaves_like 'SCIM API endpoints with scim_identities disabled'
     end
 
     context 'user with an email extern_uid' do
-      let(:identity) { create(:group_saml_identity, user: user, extern_uid: user.email) }
+      let(:identity) do
+        create(:group_saml_identity, user: user, extern_uid: user.email, saml_provider: saml_provider)
+      end
 
       it_behaves_like 'SCIM API endpoints'
       it_behaves_like 'SCIM API endpoints with scim_identities disabled'
@@ -575,7 +581,7 @@ RSpec.describe API::Scim do
   context 'when scim_identities is enabled' do
     before do
       stub_feature_flags(scim_identities: true)
-      create(:saml_provider, group: group)
+      create(:saml_provider, group: group, default_membership_role: Gitlab::Access::DEVELOPER)
     end
     let(:group) { identity.group }
 
