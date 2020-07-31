@@ -17,7 +17,7 @@ RSpec.describe Vulnerabilities::ProjectsGrade do
   let_it_be(:vulnerability_statistic_5) { create(:vulnerability_statistic, :f, project: project_5) }
 
   describe '.grades_for' do
-    let(:compare_key) { ->(projects_grade) { [projects_grade.grade, projects_grade.project_ids] } }
+    let(:compare_key) { ->(projects_grade) { [projects_grade.grade, projects_grade.project_ids.sort] } }
 
     subject(:projects_grades) { described_class.grades_for([vulnerable]) }
 
@@ -77,7 +77,7 @@ RSpec.describe Vulnerabilities::ProjectsGrade do
 
     subject(:projects) { projects_grade.projects }
 
-    it { is_expected.to eq(expected_projects) }
+    it { is_expected.to match_array(expected_projects) }
   end
 
   describe '#count' do
