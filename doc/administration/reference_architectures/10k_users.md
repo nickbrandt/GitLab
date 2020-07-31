@@ -443,9 +443,6 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    # Specify if a node should attempt to be primary on initialization.
    repmgr['master_on_initialization'] = false
 
-   # START user configuration
-   # Please set the real values as explained in Required Information section
-   #
    # Replace PGBOUNCER_PASSWORD_HASH with a generated md5 value
    postgresql['pgbouncer_user_password'] = '<pgbouncer_password_hash>'
    # Replace POSTGRESQL_PASSWORD_HASH with a generated md5 value
@@ -456,7 +453,7 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    postgresql['max_wal_senders'] = 4
    postgresql['max_replication_slots'] = 4
 
-   # Replace XXX.XXX.XXX.XXX/YY with Network Address
+   # Replace with your network addresses
    postgresql['trust_auth_cidr_addresses'] = %w(10.6.0.0/24)
    repmgr['trust_auth_cidr_addresses'] = %w(127.0.0.1/32 10.6.0.0/24)
 
@@ -472,9 +469,6 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    consul['configuration'] = {
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
    }
-   #
-   # END user configuration
-
    ```
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
