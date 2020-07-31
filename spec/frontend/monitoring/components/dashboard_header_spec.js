@@ -16,6 +16,7 @@ import {
 import { redirectTo } from '~/lib/utils/url_utility';
 
 const mockProjectPath = 'https://path/to/project';
+const mockAddDashboardDocPath = '/doc/add-dashboard';
 
 jest.mock('~/lib/utils/url_utility', () => ({
   redirectTo: jest.fn(),
@@ -304,6 +305,7 @@ describe('Dashboard header', () => {
   describe('actions menu modals', () => {
     beforeEach(() => {
       store.state.monitoringDashboard.projectPath = mockProjectPath;
+      store.state.monitoringDashboard.addDashboardDocumentationPath = mockAddDashboardDocPath;
       setupAllDashboards(store);
 
       createShallowWrapper();
@@ -323,6 +325,9 @@ describe('Dashboard header', () => {
 
     it('"Create new dashboard" modal contains correct buttons', () => {
       expect(findCreateDashboardModal().props('projectPath')).toBe(mockProjectPath);
+      expect(findCreateDashboardModal().props('addDashboardDocumentationPath')).toBe(
+        mockAddDashboardDocPath,
+      );
     });
 
     it('"Duplicate Dashboard" opens up a modal', () => {
