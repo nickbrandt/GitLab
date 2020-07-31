@@ -166,8 +166,6 @@ export default class MergeRequestTabs {
         if (this.setUrl) {
           this.setCurrentAction(action);
         }
-
-        this.eventHub.$emit('MergeRequestTabChange', this.getCurrentAction());
       }
     }
   }
@@ -251,6 +249,8 @@ export default class MergeRequestTabs {
         }
       }
     }
+
+    this.eventHub.$emit('MergeRequestTabChange', action);
   }
 
   scrollToElement(container) {
