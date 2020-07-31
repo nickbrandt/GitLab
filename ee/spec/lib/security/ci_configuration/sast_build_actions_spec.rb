@@ -6,8 +6,8 @@ RSpec.describe Security::CiConfiguration::SastBuildActions do
   context 'autodevops disabled' do
     let(:auto_devops_enabled) { false }
 
-    context 'with no paramaters' do
-      let(:params) { {} }
+    context 'with one empty parameter' do
+      let(:params) { { 'SECURE_ANALYZERS_PREFIX' => '' } }
 
       subject(:result) { described_class.new(auto_devops_enabled, params).generate }
 
@@ -18,7 +18,7 @@ RSpec.describe Security::CiConfiguration::SastBuildActions do
 
     context 'with all parameters' do
       let(:params) do
-        { stage: 'security',
+        { 'stage' => 'security',
           'SEARCH_MAX_DEPTH' => 1,
           'SECURE_ANALYZERS_PREFIX' => 'localhost:5000/analyzers',
           'SAST_ANALYZER_IMAGE_TAG' => 2,
@@ -35,7 +35,7 @@ RSpec.describe Security::CiConfiguration::SastBuildActions do
 
   context 'with autodevops enabled' do
     let(:auto_devops_enabled) { true }
-    let(:params) { { stage: 'custom stage' } }
+    let(:params) { { 'stage' => 'custom stage' } }
 
     subject(:result) { described_class.new(auto_devops_enabled, params).generate }
 

@@ -36,12 +36,14 @@ module Security
       end
 
       def sast_stage
-        @params[:stage] || 'test'
+        @params['stage'] || 'test'
       end
 
       # We only want to write variables that are set
       def parse_variables(variables)
-        variables.map { |var| [var, @params[var]] }.to_h.compact
+        variables.map { |var| [var, @params[var]] }
+                 .to_h
+                 .select { |k, v| v.present? }
       end
 
       def sast_block
