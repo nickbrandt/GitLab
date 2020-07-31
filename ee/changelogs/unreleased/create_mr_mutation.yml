@@ -1,0 +1,5 @@
+---
+title: Implement a GraphQL mutation for MR creation flow in SAST Config
+merge_request: 38406
+author:
+type: added
