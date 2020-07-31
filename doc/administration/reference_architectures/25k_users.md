@@ -1816,7 +1816,7 @@ for more information.
 
 ### GitLab Rails post-configuration
 
-Ensure that all migrations ran, by running the following in one of the Rails nodes:
+Initialize the GitLab database, by running the following in one of the Rails nodes:
 
 ```shell
 sudo gitlab-rake gitlab:db:configure
