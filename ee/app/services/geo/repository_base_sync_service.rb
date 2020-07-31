@@ -67,7 +67,11 @@ module Geo
     def redownload_repository
       log_info("Redownloading #{type}")
 
-      return if fetch_snapshot
+      if fetch_snapshot_into_temp_repo
+        set_temp_repository_as_main
+
+        return
+      end
 
       log_info("Attempting to fetch repository via git")
 
@@ -110,7 +114,7 @@ module Geo
     # returned in an inconsistent state. However, a subsequent git fetch
     # will be enqueued by the log cursor, which should resolve any problems
     # it is possible to fix.
-    def fetch_snapshot
+    def fetch_snapshot_into_temp_repo
       # Snapshots will miss the data that are shared in object pools, and snapshotting should
       # be avoided to guard against data loss.
       return if project.pool_repository
