@@ -629,6 +629,11 @@ The following IPs will be used as an example:
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
+   NOTE: **Note:**
+   If an error `execute[generate databases.ini]` occurs, this is due to an existing
+   [known issue](https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/4713).
+   It will be resolved when you run a second `reconfigure` after the next step.
+
 1. Create a `.pgpass` file so Consul is able to
    reload PgBouncer. Enter the PgBouncer password twice when asked:
 
@@ -636,17 +641,13 @@ The following IPs will be used as an example:
    gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
    ```
 
-1. Ensure each node is talking to the current master:
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) once again
+   to resolve any potential errors from the previous steps.
+1. Ensure each node is talking to the current primary:
 
    ```shell
    gitlab-ctl pgb-console # You will be prompted for PGBOUNCER_PASSWORD
    ```
-
-   If there is an error `psql: ERROR:  Auth failed` after typing in the
-   password, ensure you previously generated the MD5 password hashes with the correct
-   format. The correct format is to concatenate the password and the username:
-   `PASSWORDUSERNAME`. For example, `Sup3rS3cr3tpgbouncer` would be the text
-   needed to generate an MD5 password hash for the `pgbouncer` user.
 
 1. Once the console prompt is available, run the following queries:
 
@@ -823,13 +824,8 @@ reconfigure a node and change its status from primary to replica and vice versa.
    # Set the network addresses that the exporters will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
    redis_exporter['listen_address'] = '0.0.0.0:9121'
-   ```
 
-1. Only the primary GitLab application server should handle migrations. To
-   prevent database migrations from running on upgrade, add the following
-   configuration to your `/etc/gitlab/gitlab.rb` file:
-
-   ```ruby
+   # Prevent database migrations from running on upgrade
    gitlab_rails['auto_migrate'] = false
    ```
 
@@ -888,12 +884,9 @@ Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
    # Set the network addresses that the exporters will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
    redis_exporter['listen_address'] = '0.0.0.0:9121'
-   ```
 
-1. To prevent reconfigure from running automatically on upgrade, run:
-
-   ```shell
-   sudo touch /etc/gitlab/skip-auto-reconfigure
+   # Prevent database migrations from running on upgrade
+   gitlab_rails['auto_migrate'] = false
    ```
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
@@ -1028,14 +1021,6 @@ To configure the Sentinel Cache server:
    # Disable auto migrations
    gitlab_rails['auto_migrate'] = false
    ```
-
-1. To prevent database migrations from running on upgrade, run:
-
-   ```shell
-   sudo touch /etc/gitlab/skip-auto-reconfigure
-   ```
-
-   Only the primary GitLab application server should handle migrations.
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. Go through the steps again for all the other Consul/Sentinel nodes, and
@@ -1457,11 +1442,6 @@ On each node:
    -->
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
-1. Confirm that Gitaly can perform callbacks to the internal API:
-
-   ```shell
-   sudo /opt/gitlab/embedded/service/gitlab-shell/bin/check -config /opt/gitlab/embedded/service/gitlab-shell/config.yml
-   ```
 
 ### Gitaly TLS support
 
@@ -1571,17 +1551,35 @@ you want using steps 1 and 2 from the GitLab downloads page.
    ####              Redis              ###
    ########################################
 
-   ## Must be the same in every sentinel node
-   redis['master_name'] = 'gitlab-redis'
+   ## Redis connection details
+   ## First cluster that will host the cache
+   gitlab_rails['redis_cache_instance'] = 'redis://:<REDIS_PRIMARY_PASSWORD_OF_FIRST_CLUSTER>@gitlab-redis-cache'
 
-   ## The same password for Redis authentication you set up for the master node.
-   redis['master_password'] = '<redis_primary_password>'
+   gitlab_rails['redis_cache_sentinels'] = [
+     {host: '10.6.0.71', port: 26379},
+     {host: '10.6.0.72', port: 26379},
+     {host: '10.6.0.73', port: 26379},
+   ]
 
-   ## A list of sentinels with `host` and `port`
-   gitlab_rails['redis_sentinels'] = [
-      {'host' => '10.6.0.11', 'port' => 26379},
-      {'host' => '10.6.0.12', 'port' => 26379},
-      {'host' => '10.6.0.13', 'port' => 26379},
+   ## Second cluster that will host the queues, shared state, and actionable
+   gitlab_rails['redis_queues_instance'] = 'redis://:<REDIS_PRIMARY_PASSWORD_OF_SECOND_CLUSTER>@gitlab-redis-persistent'
+   gitlab_rails['redis_shared_state_instance'] = 'redis://:<REDIS_PRIMARY_PASSWORD_OF_SECOND_CLUSTER>@gitlab-redis-persistent'
+   gitlab_rails['redis_actioncable_instance'] = 'redis://:<REDIS_PRIMARY_PASSWORD_OF_SECOND_CLUSTER>@gitlab-redis-persistent'
+
+   gitlab_rails['redis_queues_sentinels'] = [
+     {host: '10.6.0.81', port: 26379},
+     {host: '10.6.0.82', port: 26379},
+     {host: '10.6.0.83', port: 26379},
+   ]
+   gitlab_rails['redis_shared_state_sentinels'] = [
+     {host: '10.6.0.81', port: 26379},
+     {host: '10.6.0.82', port: 26379},
+     {host: '10.6.0.83', port: 26379},
+   ]
+   gitlab_rails['redis_actioncable_sentinels'] = [
+     {host: '10.6.0.81', port: 26379},
+     {host: '10.6.0.82', port: 26379},
+     {host: '10.6.0.83', port: 26379},
    ]
 
    #######################################
@@ -1625,7 +1623,7 @@ you want using steps 1 and 2 from the GitLab downloads page.
    node_exporter['listen_address'] = '0.0.0.0:9100'
 
    # Rails Status for prometheus
-   gitlab_rails['monitoring_whitelist'] = ['10.6.0.81/32', '127.0.0.0/8']
+   gitlab_rails['monitoring_whitelist'] = ['10.6.0.121/32', '127.0.0.0/8']
    ```
 
 TIP: **Tip:**
@@ -1733,10 +1731,11 @@ On each node perform the following:
 
    # Add the monitoring node's IP address to the monitoring whitelist and allow it to
    # scrape the NGINX metrics
-   gitlab_rails['monitoring_whitelist'] = ['10.6.0.81/32', '127.0.0.0/8']
-   nginx['status']['options']['allow'] = ['10.6.0.81/32', '127.0.0.0/8']
+   gitlab_rails['monitoring_whitelist'] = ['10.6.0.121/32', '127.0.0.0/8']
+   nginx['status']['options']['allow'] = ['10.6.0.121/32', '127.0.0.0/8']
    ```
 
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. If you're using [Gitaly with TLS support](#gitaly-tls-support), make sure the
    `git_data_dirs` entry is configured with `tls` instead of `tcp`:
 
@@ -1795,6 +1794,11 @@ On each node perform the following:
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. Run `sudo gitlab-rake gitlab:gitaly:check` to confirm the node can connect to Gitaly.
+1. Confirm that Gitaly can perform callbacks to the internal API:
+
+   ```shell
+   sudo /opt/gitlab/embedded/service/gitlab-shell/bin/check -config /opt/gitlab/embedded/service/gitlab-shell/config.yml
+   ```
 1. Tail the logs to see the requests:
 
    ```shell
