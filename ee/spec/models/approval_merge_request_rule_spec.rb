@@ -61,22 +61,6 @@ RSpec.describe ApprovalMergeRequestRule do
         expect(new).to be_valid
         expect { new.save! }.not_to raise_error
       end
-
-      it 'validates code_owner when rule_type code_owner' do
-        new = build(:code_owner_rule)
-        expect(new).to be_valid
-
-        new.code_owner = false
-        expect(new).not_to be_valid
-      end
-
-      it 'validates code_owner when rule_type regular' do
-        new = build(:approval_merge_request_rule)
-        expect(new).to be_valid
-
-        new.code_owner = true
-        expect(new).not_to be_valid
-      end
     end
 
     context 'report_approver rules' do
@@ -184,12 +168,15 @@ RSpec.describe ApprovalMergeRequestRule do
         .to change { merge_request.approval_rules.matching_pattern('*.js').count }.by(1)
     end
 
-    it 'finds an existing rule using deprecated code_owner column' do
-      deprecated_code_owner_rule = create(:code_owner_rule, name: '*.js', merge_request: merge_request)
-      deprecated_code_owner_rule.update_column(:rule_type, described_class.rule_types[:regular])
+    it 'finds an existing rule using rule_type column' do
+      regular_rule_type_rule = create(
+        :code_owner_rule,
+        name:          entry.pattern,
+        merge_request: merge_request,
+        rule_type:     described_class.rule_types[:regular]
+      )
 
-      expect(rule)
-        .to eq(deprecated_code_owner_rule)
+      expect(rule).not_to eq(regular_rule_type_rule)
     end
 
     it 'retries when a record was created between the find and the create' do
@@ -303,14 +290,22 @@ RSpec.describe ApprovalMergeRequestRule do
   end
 
   describe '#code_owner?' do
-    it 'returns true when deprecated code_owner bool is set' do
-      code_owner_rule = build(:code_owner_rule)
+    let(:code_owner_rule) { build(:code_owner_rule) }
 
-      expect(code_owner_rule.code_owner?).to be true
+    context "rule_type is :code_owner" do
+      it "returns true" do
+        expect(code_owner_rule.code_owner?).to be true
+      end
+    end
 
-      code_owner_rule.rule_type = :regular
+    context "rule_type is :regular" do
+      before do
+        code_owner_rule.rule_type = :regular
+      end
 
-      expect(code_owner_rule.code_owner?).to be true
+      it "returns false" do
+        expect(code_owner_rule.code_owner?).to be false
+      end
     end
   end
 
