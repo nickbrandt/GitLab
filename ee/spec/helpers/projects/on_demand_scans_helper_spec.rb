@@ -11,7 +11,9 @@ RSpec.describe Projects::OnDemandScansHelper do
         'help-page-path' => help_page_path('user/application_security/dast/index', anchor: 'on-demand-scans'),
         'empty-state-svg-path' => match_asset_path('/assets/illustrations/empty-state/ondemand-scan-empty.svg'),
         'default-branch' => project.default_branch,
-        'project-path' => project.path_with_namespace
+        'project-path' => project.path_with_namespace,
+        'profiles-library-path': project_profiles_path(project),
+        'new-site-profile-path': new_project_dast_site_profile_path(project)
       )
     end
   end

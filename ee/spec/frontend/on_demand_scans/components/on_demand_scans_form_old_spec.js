@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlForm } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
-import OnDemandScansForm from 'ee/on_demand_scans/components/on_demand_scans_form.vue';
+import OnDemandScansForm from 'ee/on_demand_scans/components/on_demand_scans_form_old.vue';
 import runDastScanMutation from 'ee/on_demand_scans/graphql/run_dast_scan.mutation.graphql';
 import createFlash from '~/flash';
 import { redirectTo } from '~/lib/utils/url_utility';

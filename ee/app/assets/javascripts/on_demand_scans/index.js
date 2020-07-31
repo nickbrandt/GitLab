@@ -5,13 +5,19 @@ import OnDemandScansApp from './components/on_demand_scans_app.vue';
 export default () => {
   const el = document.querySelector('#js-on-demand-scans-app');
   if (!el) {
-    return;
+    return null;
   }
 
-  const { helpPagePath, emptyStateSvgPath, projectPath, defaultBranch } = el.dataset;
+  const {
+    helpPagePath,
+    emptyStateSvgPath,
+    projectPath,
+    defaultBranch,
+    profilesLibraryPath,
+    newSiteProfilePath,
+  } = el.dataset;
 
-  // eslint-disable-next-line no-new
-  new Vue({
+  return new Vue({
     el,
     apolloProvider,
     render(h) {
@@ -21,6 +27,8 @@ export default () => {
           emptyStateSvgPath,
           projectPath,
           defaultBranch,
+          profilesLibraryPath,
+          newSiteProfilePath,
         },
       });
     },
