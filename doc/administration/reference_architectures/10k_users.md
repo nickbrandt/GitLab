@@ -421,7 +421,7 @@ in the second step, do not supply the `EXTERNAL_URL` value.
 #### PostgreSQL secondary nodes
 
 1. On both the secondary nodes, add the same configuration specified above for the primary node
-   with an additional setting that will inform `gitlab-ctl` that they are standby nodes initially
+   with an additional setting (`repmgr['master_on_initialization'] = false`) that will inform `gitlab-ctl` that they are standby nodes initially
    and there's no need to attempt to register them as a primary node:
 
    ```ruby
@@ -1318,7 +1318,7 @@ To configure the Sentinel Queues server:
    Only the primary GitLab application server should handle migrations.
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
-1. Go through the steps again for all the other Consul/Sentinel nodes, and
+1. Go through the steps again for all the other Sentinel nodes, and
    make sure you set up the correct IPs.
 
 <div align="right">
@@ -1400,7 +1400,7 @@ On each node:
    # to Gitaly, and a second for authentication callbacks from GitLab-Shell to the GitLab internal API.
    # The following two values must be the same as their respective values
    # of the GitLab Rails application setup
-   gitaly['auth_token'] = 'gitlaysecret'
+   gitaly['auth_token'] = 'gitalysecret'
    gitlab_shell['secret_token'] = 'shellsecret'
 
    # Avoid running unnecessary services on the Gitaly server
@@ -1537,7 +1537,7 @@ To configure Gitaly with TLS:
 
 ## Configure Sidekiq
 
-Sidekiq requires connection to the Redis, PostgreSQL and Gitaly instance.
+Sidekiq requires connections to the Redis, PostgreSQL and Gitaly instances.
 The following IPs will be used as an example:
 
 - `10.6.0.101`: Sidekiq 1
@@ -1545,7 +1545,7 @@ The following IPs will be used as an example:
 - `10.6.0.103`: Sidekiq 3
 - `10.6.0.104`: Sidekiq 4
 
-To configure the Sidekiq nodes, one each one:
+To configure the Sidekiq nodes, on each one:
 
 1. SSH into the Sidekiq server.
 1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab package
@@ -1564,7 +1564,6 @@ you want using steps 1 and 2 from the GitLab downloads page.
    gitlab_rails['auto_migrate'] = false
    alertmanager['enable'] = false
    gitaly['enable'] = false
-   gitlab_monitor['enable'] = false
    gitlab_workhorse['enable'] = false
    nginx['enable'] = false
    puma['enable'] = false
