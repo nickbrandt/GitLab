@@ -137,7 +137,7 @@ documentation:
   synchronized from the **primary** node.
 
 NOTE: **Note:**
-[NFS](../../high_availability/nfs.md) can be used in place of Gitaly but is not
+[NFS](../../nfs.md) can be used in place of Gitaly but is not
 recommended.
 
 ### Step 2: Configure the main read-only replica PostgreSQL database on the **secondary** node
