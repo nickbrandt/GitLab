@@ -55,10 +55,6 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
     where(nil).pluck(:container_repository_id)
   end
 
-  def self.registry_consistency_worker_enabled?
-    Feature.enabled?(:geo_container_registry_ssot_sync, default_enabled: true)
-  end
-
   def self.replication_enabled?
     Gitlab.config.geo.registry_replication.enabled
   end
