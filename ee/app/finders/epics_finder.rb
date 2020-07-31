@@ -108,7 +108,6 @@ class EpicsFinder < IssuableFinder
   end
 
   def filter_items(items)
-    items = in_issues(items)
     items = by_created_at(items)
     items = by_updated_at(items)
     items = by_author(items)
@@ -153,15 +152,6 @@ class EpicsFinder < IssuableFinder
     raise ArgumentError unless self.class.valid_iid_query?(query)
 
     items.iid_starts_with(query)
-  end
-
-  def in_issues(items)
-    issues = params[:issues]
-    # ActiveRecord::Relation.empty? would run a SELECT 1 AS one FROM "issues" LIMIT $1
-    # ActiveRecord::Relation.blank? or ActiveRecord::Relation.present? would run SELECT "issues".* FROM "issues"
-    return items if issues.nil? || issues.empty?
-
-    items.in_issues(issues.select(:id))
   end
 
   def related_groups

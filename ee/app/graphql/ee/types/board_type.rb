@@ -23,7 +23,8 @@ module EE
 
         field :epics, ::Types::EpicType.connection_type, null: true,
               description: 'Epics associated with board issues.',
-              resolver: ::Resolvers::BoardGroupings::EpicsResolver
+              resolver: ::Resolvers::BoardGroupings::EpicsResolver,
+              complexity: 5
       end
     end
   end

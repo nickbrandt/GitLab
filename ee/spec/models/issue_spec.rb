@@ -129,6 +129,24 @@ RSpec.describe Issue do
           expect(described_class.in_epics([epic1])).to eq [epic_issue1.issue]
         end
       end
+
+      describe '.distinct_epic_ids' do
+        it 'returns distinct epic ids' do
+          expect(described_class.distinct_epic_ids.map(&:epic_id)).to match_array([epic1.id, epic2.id])
+        end
+
+        context 'when issues are grouped by labels' do
+          let_it_be(:label_link1) { create(:label_link, target: epic_issue1.issue) }
+          let_it_be(:label_link2) { create(:label_link, target: epic_issue1.issue) }
+
+          it 'respects query grouping and returns distinct epic ids' do
+            ids = described_class.with_label(
+              [label_link1.label.title, label_link2.label.title]
+            ).distinct_epic_ids.map(&:epic_id)
+            expect(ids).to eq([epic1.id])
+          end
+        end
+      end
     end
 
     context 'iterations' do

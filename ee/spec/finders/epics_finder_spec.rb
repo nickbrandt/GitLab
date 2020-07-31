@@ -459,26 +459,6 @@ RSpec.describe EpicsFinder do
           end
         end
 
-        context 'by issue board' do
-          let_it_be(:epic1) { create(:epic, group: group, title: "first epic") }
-          let_it_be(:epic2) { create(:epic, group: group, title: "second epic") }
-          let_it_be(:label) { create(:group_label, group: group, name: 'some label') }
-          let_it_be(:project) { create(:project, namespace: group) }
-          let_it_be(:board) { create(:board, group: group) }
-          let_it_be(:label_list) { create(:list, board: board, label: label) }
-          let_it_be(:backlog_list) { create(:backlog_list, board: board) }
-          let_it_be(:issue) { create(:labeled_issue, project: project, labels: [label]) }
-          let_it_be(:epic_issue) { create(:epic_issue, epic: epic1, issue: issue) }
-
-          it 'returns epics that are in the board' do
-            params = {
-                board_id: board.id
-            }
-
-            expect(epics(params)).to contain_exactly(epic1)
-          end
-        end
-
         context 'when using group cte for search' do
           context 'and two labels more search string are present' do
             let_it_be(:label1) { create(:label) }

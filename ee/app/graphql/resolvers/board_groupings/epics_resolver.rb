@@ -3,36 +3,47 @@
 module Resolvers
   module BoardGroupings
     class EpicsResolver < BaseResolver
+      alias_method :board, :synchronized_object
+
+      argument :issue_filters, Types::BoardEpicIssueInputType,
+               required: false,
+               description: 'Filters applied when selecting issues on the board'
 
       type Types::EpicType, null: true
 
       def resolve(**args)
-        @board = object.respond_to?(:sync) ? object.sync : object
-
         return Epic.none unless board.present?
-        return Epic.none unless epic_feature_enabled?
+        return Epic.none unless group.present?
+        return unless ::Feature.enabled?(:boards_with_swimlanes, group)
 
-        list_service = Boards::Issues::ListService.new(board.resource_parent, current_user, { all: true, board_id: board.id })
-
-        # get bare issues by removing ordering, grouping and extra selected fields to get just the issues filtered by board scope.
-        issues = list_service.execute.except(:order).except(:group).except(:select).distinct
-
-        # Depending on which level the board is, user can see epics related to issues from various groups in the hierarchy,
-        # so we need to look-up epics from all groups in the hierarchy.
-        board_params = { group_id: group.id, include_ancestor_groups: true, include_descendant_groups: true, issues: issues }
-        EpicsFinder.new(context[:current_user], args.merge(board_params)).execute.limit(10)
+        Epic.for_ids(board_epic_ids(args[:issue_filters]))
       end
 
       private
 
-      attr_accessor :board
+      def board_epic_ids(issue_params)
+        params = issue_params.to_h.merge(all_lists: true, board_id: board.id)
+        list_service = Boards::Issues::ListService.new(
+          board.resource_parent,
+          current_user,
+          params
+        )
+
+        list_service.execute.in_epics(accessible_epics).distinct_epic_ids
+      end
+
+      def accessible_epics
+        EpicsFinder.new(
+          context[:current_user],
+          group_id: group.id,
+          state: :opened,
+          include_ancestor_groups: true,
+          include_descendant_groups: board.group_board?
+        ).execute
+      end
 
       def group
         board.project_board? ? board.project.group : board.group
-      end
-
-      def epic_feature_enabled?
-        group.feature_available?(:epics)
       end
     end
   end
