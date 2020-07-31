@@ -466,7 +466,7 @@ Check the [Troubleshooting section](#troubleshooting) before proceeding.
    gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
    ```
 
-1. [Enable monitoring](../high_availability/pgbouncer.md#enable-monitoring)
+1. [Enable monitoring](../postgresql/pgbouncer.md#enable-monitoring)
 
 #### PgBouncer Checkpoint
 
