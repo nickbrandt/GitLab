@@ -57,7 +57,7 @@ export default {
       <template #header>
         <header class="page-title-holder flex-fill d-flex align-items-center">
           <h2 class="page-title flex-grow">
-            {{ s__('SecurityReports|Group Security Dashboard') }}
+            {{ s__('SecurityReports|Vulnerability Report') }}
           </h2>
           <csv-export-button :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint" />
         </header>

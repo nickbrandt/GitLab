@@ -10,7 +10,7 @@ export default {
 
 <template functional>
   <div>
-    <h1>{{ $options.i18n.title }}</h1>
+    <h2>{{ $options.i18n.title }}</h2>
     <div class="security-charts gl-display-flex gl-flex-wrap">
       <slot></slot>
     </div>

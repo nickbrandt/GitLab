@@ -9,8 +9,8 @@
     %ul.sidebar-sub-level-items{ data: { qa_selector: 'group_secure_submenu' } }
       - if group_level_security_dashboard_available?(@group)
         = nav_link(path: 'dashboard#show') do
-          = link_to group_security_dashboard_path(@group), title: _('Security'), data: { qa_selector: 'security_dashboard_link' } do
-            %span= _('Security')
+          = link_to group_security_dashboard_path(@group), title: _('Security Dashboard'), data: { qa_selector: 'security_dashboard_link' } do
+            %span= _('Security Dashboard')
 
       - if group_level_security_dashboard_available?(@group)
         = nav_link(path: 'vulnerabilities#index') do
