@@ -4,6 +4,11 @@ module Resolvers
   class IssuesResolver < BaseResolver
     prepend Resolvers::IssueResolverFields
 
+    argument :sort, Types::IssueSortEnum,
+              description: 'Sort issues by this criteria',
+              required: false,
+              default_value: 'created_desc'
+
     type Types::IssueType, null: true
 
     NON_STABLE_CURSOR_SORTS = %i[priority_asc priority_desc

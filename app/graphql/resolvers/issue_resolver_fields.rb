@@ -8,7 +8,6 @@ module Resolvers
       argument :iid, GraphQL::STRING_TYPE,
                 required: false,
                 description: 'IID of the issue. For example, "1"'
-
       argument :iids, [GraphQL::STRING_TYPE],
                 required: false,
                 description: 'List of IIDs of issues. For example, [1, 2]'
@@ -48,10 +47,6 @@ module Resolvers
       argument :search, GraphQL::STRING_TYPE,
                 required: false,
                 description: 'Search query for issue title or description'
-      argument :sort, Types::IssueSortEnum,
-                description: 'Sort issues by this criteria',
-                required: false,
-                default_value: 'created_desc'
       argument :types, [Types::IssueTypeEnum],
                 as: :issue_types,
                 description: 'Filter issues by the given issue types',
