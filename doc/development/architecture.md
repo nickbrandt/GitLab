@@ -247,7 +247,7 @@ GitLab can be considered to have two layers from a process perspective:
 
 - [Project page](https://github.com/hashicorp/consul/blob/master/README.md)
 - Configuration:
-  - [Omnibus](../administration/high_availability/consul.md)
+  - [Omnibus](../administration/consul.md)
   - [Charts](https://docs.gitlab.com/charts/installation/deployment.html#postgresql)
 - Layer: Core Service (Data)
 - GitLab.com: [Consul](../user/gitlab_com/index.md#consul)
