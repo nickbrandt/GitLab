@@ -108,30 +108,6 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
       expect(Geo::ContainerRepositoryRegistry.where(container_repository_id: container_repository.id).count).to eq(1)
     end
 
-    context 'when geo_container_registry_ssot_sync is disabled' do
-      before do
-        stub_feature_flags(geo_container_registry_ssot_sync: false)
-      end
-
-      it 'returns false' do
-        expect(subject.perform).to be_falsey
-      end
-
-      it 'does not execute RegistryConsistencyService for container repositories' do
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::JobArtifactRegistry, batch_size: batch_size).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: batch_size).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::PackageFileRegistry, batch_size: batch_size).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::UploadRegistry, batch_size: batch_size).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::ProjectRegistry, batch_size: batch_size).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::DesignRegistry, batch_size: batch_size).and_call_original
-        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::VulnerabilityExportRegistry, batch_size: batch_size).and_call_original
-
-        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::ContainerRepositoryRegistry, batch_size: batch_size)
-
-        subject.perform
-      end
-    end
-
     context 'when the current Geo node is disabled or primary' do
       before do
         stub_primary_node

@@ -26,12 +26,6 @@ module Geo
         end
       end
 
-      def container_repositories
-        return Geo::Fdw::ContainerRepository.all unless selective_sync?
-
-        Geo::Fdw::ContainerRepository.project_id_in(projects)
-      end
-
       private
 
       def projects_for_selected_namespaces
