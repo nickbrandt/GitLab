@@ -179,7 +179,7 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(FilterBar).exists()).toBe(flag);
   };
 
-  const displaysCreateValueStream = flag => {
+  const displaysValueStreamSelect = flag => {
     expect(wrapper.find(ValueStreamSelect).exists()).toBe(flag);
   };
 
@@ -247,8 +247,8 @@ describe('Cycle Analytics component', () => {
         displaysPathNavigation(false);
       });
 
-      it('does not display the create multiple value streams button', () => {
-        displaysCreateValueStream(false);
+      it('does not display the value stream select component', () => {
+        displaysValueStreamSelect(false);
       });
 
       describe('hideGroupDropDown = true', () => {
@@ -276,8 +276,8 @@ describe('Cycle Analytics component', () => {
           });
         });
 
-        it('displays the create multiple value streams button', () => {
-          displaysCreateValueStream(true);
+        it('displays the value stream select component', () => {
+          displaysValueStreamSelect(true);
         });
       });
     });

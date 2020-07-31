@@ -112,7 +112,6 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 
   return Promise.resolve()
     .then(() => dispatch('fetchValueStreams'))
-    .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
@@ -144,20 +143,35 @@ export const receiveGroupStagesSuccess = ({ commit, dispatch }, stages) => {
   return dispatch('setDefaultSelectedStage');
 };
 
+export const fetchValueStreamStages = ({
+  hasCreateMultipleValueStreams,
+  valueStreamId,
+  groupId,
+  params,
+}) => {
+  return hasCreateMultipleValueStreams
+    ? Api.cycleAnalyticsValueStreamGroupStagesAndEvents(groupId, valueStreamId, params)
+    : Api.cycleAnalyticsGroupStagesAndEvents(groupId, params);
+};
+
 export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
   const {
-    selectedGroup: { fullPath },
+    featureFlags: { hasCreateMultipleValueStreams = false },
   } = state;
 
   const {
+    currentValueStreamId: valueStreamId,
+    currentGroupPath: groupId,
     cycleAnalyticsRequestParams: { created_after, project_ids },
   } = getters;
   dispatch('requestGroupStages');
   dispatch('customStages/setStageEvents', []);
 
-  return Api.cycleAnalyticsGroupStagesAndEvents(fullPath, {
-    start_date: created_after,
-    project_ids,
+  return fetchValueStreamStages({
+    hasCreateMultipleValueStreams,
+    groupId,
+    valueStreamId,
+    params: { start_date: created_after, project_ids },
   })
     .then(({ data: { stages = [], events = [] } }) => {
       dispatch('receiveGroupStagesSuccess', stages);
@@ -307,13 +321,15 @@ export const createValueStream = ({ commit, dispatch, rootState }, data) => {
   return Api.cycleAnalyticsCreateValueStream(fullPath, data)
     .then(() => dispatch('receiveCreateValueStreamSuccess'))
     .catch(({ response } = {}) => {
-      const { data: { message, errors } = null } = response;
-      commit(types.RECEIVE_CREATE_VALUE_STREAM_ERROR, { data, message, errors });
+      const { data: { message, payload: { errors } } = null } = response;
+      commit(types.RECEIVE_CREATE_VALUE_STREAM_ERROR, { message, errors });
     });
 };
 
-export const setSelectedValueStream = ({ commit }, streamId) =>
+export const setSelectedValueStream = ({ commit, dispatch }, streamId) => {
   commit(types.SET_SELECTED_VALUE_STREAM, streamId);
+  return dispatch('fetchGroupStagesAndEvents');
+};
 
 export const receiveValueStreamsSuccess = ({ commit, dispatch }, data = []) => {
   commit(types.RECEIVE_VALUE_STREAMS_SUCCESS, data);
@@ -340,5 +356,5 @@ export const fetchValueStreams = ({ commit, dispatch, getters, state }) => {
         commit(types.RECEIVE_VALUE_STREAMS_ERROR, data);
       });
   }
-  return Promise.resolve();
+  return dispatch('fetchGroupStagesAndEvents');
 };
