@@ -19,12 +19,13 @@ To benefit from the Security Dashboard you must first configure one of the
 
 ## Supported reports
 
-The Security Dashboard supports displaying vulnerabilities detected by scanners including:
+The Security Dashboard displays vulnerabilities detected by scanners such as:
 
 - [Container Scanning](../container_scanning/index.md)
 - [Dynamic Application Security Testing](../dast/index.md)
 - [Dependency Scanning](../dependency_scanning/index.md)
 - [Static Application Security Testing](../sast/index.md)
+- And others!
 
 ## Requirements
 
