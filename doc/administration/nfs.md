@@ -8,18 +8,18 @@ NFS can be used as an alternative for object storage but this isn't typically
 recommended for performance reasons. Note however it is required for [GitLab
 Pages](https://gitlab.com/gitlab-org/gitlab-pages/-/issues/196).
 
-For data objects such as LFS, Uploads, Artifacts, etc., an [Object Storage service](../object_storage.md)
+For data objects such as LFS, Uploads, Artifacts, etc., an [Object Storage service](object_storage.md)
 is recommended over NFS where possible, due to better performance.
 
 CAUTION: **Caution:**
 From GitLab 13.0, using NFS for Git repositories is deprecated. In GitLab 14.0,
 support for NFS for Git repositories is scheduled to be removed. Upgrade to
-[Gitaly Cluster](../gitaly/praefect.md) as soon as possible.
+[Gitaly Cluster](gitaly/praefect.md) as soon as possible.
 
 NOTE: **Note:**
 Filesystem performance has a big impact on overall GitLab
 performance, especially for actions that read or write to Git repositories. See
-[Filesystem Performance Benchmarking](../operations/filesystem_benchmarking.md)
+[Filesystem Performance Benchmarking](operations/filesystem_benchmarking.md)
 for steps to test filesystem performance.
 
 ## Known kernel version incompatibilities
@@ -41,10 +41,10 @@ errors.
 
 ## Fast lookup of authorized SSH keys
 
-The [fast SSH key lookup](../operations/fast_ssh_key_lookup.md) feature can improve
+The [fast SSH key lookup](operations/fast_ssh_key_lookup.md) feature can improve
 performance of GitLab instances even if they're using block storage.
 
-[Fast SSH key lookup](../operations/fast_ssh_key_lookup.md) is a replacement for
+[Fast SSH key lookup](operations/fast_ssh_key_lookup.md) is a replacement for
 `authorized_keys` (in `/var/opt/gitlab/.ssh`) using the GitLab database.
 
 NFS increases latency, so fast lookup is recommended if `/var/opt/gitlab`
@@ -147,7 +147,7 @@ From GitLab 12.7, Rugged auto-detection is disabled if Puma thread count is grea
 
 If you want to use Rugged with Puma, it is recommended to [set Puma thread count to 1](https://docs.gitlab.com/omnibus/settings/puma.html#puma-settings).
 
-If you want to use Rugged with Puma thread count more than 1, Rugged can be enabled using the [feature flag](../../development/gitaly.md#legacy-rugged-code)
+If you want to use Rugged with Puma thread count more than 1, Rugged can be enabled using the [feature flag](../development/gitaly.md#legacy-rugged-code)
 
 If the Rugged feature flag is explicitly set to either true or false, GitLab will use the value explicitly set.
 
@@ -269,7 +269,7 @@ NFS mount point is `/gitlab-nfs`. Then, add the following bind mounts in
 
 Using bind mounts will require manually making sure the data directories
 are empty before attempting a restore. Read more about the
-[restore prerequisites](../../raketasks/backup_restore.md).
+[restore prerequisites](../raketasks/backup_restore.md).
 
 You can view information and options set for each of the mounted NFS file
 systems by running `nfsstat -m` and `cat /etc/fstab`.
@@ -294,7 +294,7 @@ provide configuration for [UDP log shipping](https://docs.gitlab.com/omnibus/set
 
 Having multiple NFS mounts will require manually making sure the data directories
 are empty before attempting a restore. Read more about the
-[restore prerequisites](../../raketasks/backup_restore.md).
+[restore prerequisites](../raketasks/backup_restore.md).
 
 ## NFS in a Firewalled Environment
 
@@ -353,7 +353,7 @@ Additionally, this configuration is specifically warned against in the
 >to the NFS server can cause data corruption problems.
 
 For supported database architecture, please see our documentation on
-[Configuring a Database for GitLab HA](../postgresql/replication_and_failover.md).
+[Configuring a Database for GitLab HA](postgresql/replication_and_failover.md).
 
 <!-- ## Troubleshooting
 
@@ -366,4 +366,3 @@ questions that you know someone might ask.
 Each scenario can be a third-level heading, e.g. `### Getting error message X`.
 If you have none to add when creating a doc, leave this section in place
 but commented out to help encourage others to add to it in the future. -->
-
