@@ -1147,12 +1147,9 @@ Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
    # Set the network addresses that the exporters will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
    redis_exporter['listen_address'] = '0.0.0.0:9121'
-   ```
 
-1. To prevent reconfigure from running automatically on upgrade, run:
-
-   ```shell
-   sudo touch /etc/gitlab/skip-auto-reconfigure
+   # Disable auto migrations
+   gitlab_rails['auto_migrate'] = false
    ```
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
