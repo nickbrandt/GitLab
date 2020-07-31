@@ -44527,6 +44527,24 @@
               "deprecationReason": null
             },
             {
+              "name": "resolvedOnDefaultBranch",
+              "description": "Indicates whether the vulnerability is fixed on the default branch or not",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "scanner",
               "description": "Scanner metadata for the vulnerability.",
               "args": [
