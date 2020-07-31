@@ -82,7 +82,7 @@ export default {
             <div role="rowheader" class="table-mobile-header">{{ __('Name') }}</div>
             <div class="table-mobile-content pr-md-1 gl-overflow-wrap-break">
               <gl-friendly-wrap
-                ref="casename"
+                data-testid="caseName"
                 :symbols="$options.wrapSymbols"
                 :text="testCase.name"
               />

@@ -23,7 +23,8 @@ describe('Test reports suite table', () => {
   const noCasesMessage = () => wrapper.find('.js-no-test-cases');
   const allCaseRows = () => wrapper.findAll('.js-case-row');
   const findCaseRowAtIndex = index => wrapper.findAll('.js-case-row').at(index);
-  const findCaseNameAtIndex = index => wrapper.findAll({ ref: 'casename' }).at(index);
+  const allCaseNames = () =>
+    wrapper.findAll('[data-testid="caseName"]').wrappers.map(el => el.attributes('text'));
   const findIconForRow = (row, status) => row.find(`.ci-status-icon-${status}`);
 
   const createComponent = (suite = testSuite) => {
@@ -62,18 +63,14 @@ describe('Test reports suite table', () => {
       expect(allCaseRows().length).toBe(testCases.length);
     });
 
-    it('renders the failed tests first', () => {
-      const failedCaseNames = testCases
-        .filter(x => x.status === TestStatus.FAILED)
-        .map(x => x.name);
+    it('renders the failed tests first, skipped tests next, then successful tests', () => {
+      const expectedCaseOrder = [
+        ...testCases.filter(x => x.status === TestStatus.FAILED),
+        ...testCases.filter(x => x.status === TestStatus.SKIPPED),
+        ...testCases.filter(x => x.status === TestStatus.SUCCESS),
+      ].map(x => x.name);
 
-      const skippedCaseNames = testCases
-        .filter(x => x.status === TestStatus.SKIPPED)
-        .map(x => x.name);
-
-      expect(findCaseNameAtIndex(0).attributes('text')).toEqual(failedCaseNames[0]);
-      expect(findCaseNameAtIndex(1).attributes('text')).toEqual(failedCaseNames[1]);
-      expect(findCaseNameAtIndex(2).attributes('text')).toEqual(skippedCaseNames[0]);
+      expect(allCaseNames()).toEqual(expectedCaseOrder);
     });
 
     it('renders the correct icon for each status', () => {
