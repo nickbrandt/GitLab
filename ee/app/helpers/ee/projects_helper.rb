@@ -165,7 +165,7 @@ module EE
     def group_project_templates_count(group_id)
       allowed_subgroups = current_user.available_subgroups_with_custom_project_templates(group_id)
 
-      ::Project.in_namespace(allowed_subgroups).count
+      ::Project.in_namespace(allowed_subgroups).not_aimed_for_deletion.count
     end
 
     def project_security_dashboard_config(project)
