@@ -8,7 +8,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 # GitLab Security Dashboard **(ULTIMATE)**
 
 The Security Dashboard is a good place to get an overview of all the security
-vulnerabilities in your groups, projects and pipelines.
+vulnerabilities in your groups, projects, and pipelines.
 
 You can also drill down into a vulnerability and get extra information. This includes the project it
 comes from, any related file(s), and metadata that helps you analyze the risk it poses. You can also
@@ -43,9 +43,12 @@ To use the instance, group, project, or pipeline security dashboard:
 
 At the pipeline level, the Security section displays the vulnerabilities present in the branch of the project the pipeline was run against.
 
-Visit the page for any pipeline which has run any of the [supported reports](#supported-reports). Click the **Security** tab to view the Security findings.
-
 ![Pipeline Security Dashboard](img/pipeline_security_dashboard_v13_2.png)
+
+Visit the page for any pipeline that ran any of the [supported reports](#supported-reports). To view
+the pipeline's security findings, select the **Security** tab when viewing the pipeline.
+
+![Pipeline Security Navigation](img/pipeline_security_v13_3.gif)
 
 NOTE: **Note:**
 A pipeline consists of multiple jobs, including SAST and DAST scanning. If any job fails to finish for any reason, the security dashboard will not show SAST scanner output. For example, if the SAST job finishes but the DAST job fails, the security dashboard will not show SAST results. The analyzer will output an [exit code](../../../development/integrations/secure.md#exit-code) on failure.
