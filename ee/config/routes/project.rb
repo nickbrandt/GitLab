@@ -112,6 +112,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             resources :issues, only: [:index]
           end
         end
+
+        resources :iterations, only: [:index]
       end
       # End of the /-/ scope.
 
