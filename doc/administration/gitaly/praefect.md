@@ -990,7 +990,8 @@ Virtual storage: default
   All repositories are up to date!
 ```
 
-NOTE: **Note:** `dataloss` is still in beta and the output format is subject to change.
+NOTE: **Note:**
+`dataloss` is still in beta and the output format is subject to change.
 
 ### Checking repository checksums
 
