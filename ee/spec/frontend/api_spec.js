@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import Api from 'ee/api';
-import * as cycleAnalyticsConstants from 'ee/analytics/cycle_analytics/constants';
+import * as valueStreamAnalyticsConstants from 'ee/analytics/cycle_analytics/constants';
 import axios from '~/lib/utils/axios_utils';
 import httpStatus from '~/lib/utils/http_status';
 import * as analyticsMockData from 'ee_jest/analytics/cycle_analytics/mock_data';
@@ -206,13 +206,15 @@ describe('Api', () => {
     const groupId = 'counting-54321';
     const stageId = 'thursday';
     const valueStreamId = 'a-city-by-the-light-divided';
-    const dummyCycleAnalyticsUrlRoot = `${dummyUrlRoot}/groups/${groupId}/-/analytics/value_stream_analytics`;
+    const dummyValueStreamAnalyticsUrlRoot = `${dummyUrlRoot}/groups/${groupId}/-/analytics/value_stream_analytics`;
     const defaultParams = {
       created_after: createdAfter,
       created_before: createdBefore,
     };
     const valueStreamBaseUrl = ({ resource = '', id = null }) =>
-      [dummyCycleAnalyticsUrlRoot, id ? `value_streams/${id}/${resource}` : resource].join('/');
+      [dummyValueStreamAnalyticsUrlRoot, id ? `value_streams/${id}/${resource}` : resource].join(
+        '/',
+      );
 
     const expectRequestWithCorrectParameters = (responseObj, { params, expectedUrl, response }) => {
       const {
@@ -247,7 +249,7 @@ describe('Api', () => {
         const params = {
           ...defaultParams,
           project_ids: null,
-          subject: cycleAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
+          subject: valueStreamAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
           label_ids: labelIds,
         };
         const expectedUrl = analyticsMockData.endpoints.tasksByTypeData;
@@ -270,7 +272,7 @@ describe('Api', () => {
         const params = {
           ...defaultParams,
           project_ids: null,
-          subject: cycleAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
+          subject: valueStreamAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
           label_ids: labelIds,
         };
 
@@ -292,7 +294,7 @@ describe('Api', () => {
       it('fetches value stream analytics summary data', done => {
         const response = [{ value: 0, title: 'New Issues' }, { value: 0, title: 'Deploys' }];
         const params = { ...defaultParams };
-        const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/summary`;
+        const expectedUrl = `${dummyValueStreamAnalyticsUrlRoot}/summary`;
         mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
         Api.cycleAnalyticsSummaryData(groupId, params)
@@ -316,7 +318,7 @@ describe('Api', () => {
         ];
         const params = { ...defaultParams };
 
-        const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/time_summary`;
+        const expectedUrl = `${dummyValueStreamAnalyticsUrlRoot}/time_summary`;
         mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
         Api.cycleAnalyticsTimeSummaryData(groupId, params)

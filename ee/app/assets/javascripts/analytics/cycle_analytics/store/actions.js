@@ -217,7 +217,7 @@ export const updateStage = ({ dispatch, getters }, { id, ...params }) => {
 
   return Api.cycleAnalyticsUpdateStage(currentGroupPath, currentValueStreamId, id, params)
     .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
-    .catch(({ response: { status = 400, data: responseData } = {} }) =>
+    .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
       dispatch('receiveUpdateStageError', { status, responseData, data: { id, ...params } }),
     );
 };
@@ -289,7 +289,7 @@ export const reorderStage = ({ dispatch, getters }, initialData) => {
 
   return Api.cycleAnalyticsUpdateStage(currentGroupPath, currentValueStreamId, id, params)
     .then(({ data }) => dispatch('receiveReorderStageSuccess', data))
-    .catch(({ response: { status = 400, data: responseData } = {} }) =>
+    .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
       dispatch('receiveReorderStageError', { status, responseData }),
     );
 };

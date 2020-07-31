@@ -225,9 +225,9 @@ export default {
         class="gl-align-self-start gl-sm-align-self-start gl-mt-0 gl-sm-mt-5"
       />
     </div>
-    <div class="mw-100">
-      <div class="mt-3 py-2 px-3 bg-gray-light border-top border-bottom">
-        <div v-if="shouldDisplayPathNavigation" class="w-100 pb-2">
+    <div class="gl-max-w-full">
+      <div class="gl-mt-3 gl-py-2 gl-px-3 bg-gray-light border-top border-bottom">
+        <div v-if="shouldDisplayPathNavigation" class="gl-w-full gl-pb-2">
           <path-navigation
             class="js-path-navigation"
             :loading="isLoading"
