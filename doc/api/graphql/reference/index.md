@@ -1489,6 +1489,7 @@ Information about pagination in a connection.
 | `requirement` | Requirement | Find a single requirement. Available only when feature flag `requirements_management` is enabled. |
 | `requirementStatesCount` | RequirementStatesCount | Number of requirements for the project by their state |
 | `sastCiConfiguration` | SastCiConfiguration | SAST CI configuration for the project |
+| `securityDashboardPath` | String | Path to project's security dashboard |
 | `securityScanners` | SecurityScanners | Information about security analyzers used in the project |
 | `sentryDetailedError` | SentryDetailedError | Detailed version of a Sentry error on the project |
 | `sentryErrors` | SentryErrorCollection | Paginated collection of Sentry errors on the project |

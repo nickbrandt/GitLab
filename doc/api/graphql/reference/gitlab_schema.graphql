@@ -10179,6 +10179,11 @@ type Project {
   sastCiConfiguration: SastCiConfiguration
 
   """
+  Path to project's security dashboard
+  """
+  securityDashboardPath: String
+
+  """
   Information about security analyzers used in the project
   """
   securityScanners: SecurityScanners
