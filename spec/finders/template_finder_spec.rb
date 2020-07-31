@@ -12,8 +12,8 @@ RSpec.describe TemplateFinder do
       :dockerfiles    | described_class
       :gitignores     | described_class
       :gitlab_ci_ymls | described_class
-      :metrics_dashboard_ymls | described_class
       :licenses | ::LicenseTemplateFinder
+      :metrics_dashboard_ymls | described_class
     end
 
     with_them do

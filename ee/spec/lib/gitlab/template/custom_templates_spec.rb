@@ -20,14 +20,14 @@ RSpec.describe "Custom file template classes" do
     'LICENSE/bar.txt' => 'CustomLicenseTemplate Bar',
     'LICENSE/bad.xyz' => 'CustomLicenseTemplate Bad',
 
+    'metrics-dashboards/foo.yml' => 'CustomMetricsDashboardYmlTemplate Foo',
+    'metrics-dashboards/bar.yml' => 'CustomMetricsDashboardYmlTemplate Bar',
+    'metrics-dashboards/bad.xyz' => 'CustomMetricsDashboardYmlTemplate Bad',
+
     'Dockerfile/category/baz.txt' => 'CustomDockerfileTemplate category baz',
     'gitignore/category/baz.txt'  => 'CustomGitignoreTemplate category baz',
     'gitlab-ci/category/baz.yml'  => 'CustomGitlabCiYmlTemplate category baz',
-    'LICENSE/category/baz.txt'    => 'CustomLicenseTemplate category baz',
-
-    'metrics-dashboards/foo.yml' => 'CustomMetricsDashboardYmlTemplate Foo',
-    'metrics-dashboards/bar.yml' => 'CustomMetricsDashboardYmlTemplate Bar',
-    'metrics-dashboards/bad.xyz' => 'CustomMetricsDashboardYmlTemplate Bad'
+    'LICENSE/category/baz.txt'    => 'CustomLicenseTemplate category baz'
   }
 
   let(:project) { create(:project, :custom_repo, files: files) }
