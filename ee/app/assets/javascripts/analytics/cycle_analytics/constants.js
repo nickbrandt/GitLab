@@ -76,3 +76,5 @@ export const CAPITALIZED_STAGE_NAME = Object.keys(STAGE_NAME).reduce((acc, stage
 }, {});
 
 export const PATH_HOME_ICON = 'home';
+
+export const DEFAULT_VALUE_STREAM_ID = 'default';

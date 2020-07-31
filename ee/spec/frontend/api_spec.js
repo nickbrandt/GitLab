@@ -442,6 +442,8 @@ describe('Api', () => {
     });
 
     describe('cycleAnalyticsCreateStage', () => {
+      const valueStreamId = 'fake-value-stream';
+
       it('submit the custom stage data', done => {
         const response = {};
         const customStage = {
@@ -451,10 +453,10 @@ describe('Api', () => {
           end_event_identifier: 'issue_closed',
           end_event_label_id: null,
         };
-        const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/-/analytics/value_stream_analytics/stages`;
+        const expectedUrl = `${dummyCycleAnalyticsUrlRoot}/-/analytics/value_stream_analytics/value_streams/${valueStreamId}/stages`;
         mock.onPost(expectedUrl).reply(httpStatus.OK, response);
 
-        Api.cycleAnalyticsCreateStage(groupId, customStage)
+        Api.cycleAnalyticsCreateStage(groupId, valueStreamId, customStage)
           .then(({ data, config: { data: reqData, url } }) => {
             expect(data).toEqual(response);
             expect(JSON.parse(reqData)).toMatchObject(customStage);

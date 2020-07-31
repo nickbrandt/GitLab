@@ -126,7 +126,7 @@ module Analytics
       end
 
       def load_value_stream
-        if params[:value_stream_id]
+        if params[:value_stream_id] && params[:value_stream_id] != Analytics::CycleAnalytics::Stages::BaseService::DEFAULT_VALUE_STREAM_NAME
           @value_stream = @group.value_streams.find(params[:value_stream_id])
         end
       end

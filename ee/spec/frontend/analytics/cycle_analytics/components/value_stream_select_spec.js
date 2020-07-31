@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlButton, GlModal, GlNewDropdown as GlDropdown } from '@gitlab/ui';
+import { GlButton, GlModal, GlNewDropdown as GlDropdown, GlFormGroup } from '@gitlab/ui';
 import ValueStreamSelect from 'ee/analytics/cycle_analytics/components/value_stream_select.vue';
 import { valueStreams } from '../mock_data';
 import { findDropdownItemText } from '../helpers';
@@ -14,6 +14,7 @@ describe('ValueStreamSelect', () => {
   const createValueStreamMock = jest.fn(() => Promise.resolve());
   const mockEvent = { preventDefault: jest.fn() };
   const mockToastShow = jest.fn();
+  const streamName = 'Cool stream';
 
   const fakeStore = ({ initialState = {} }) =>
     new Vuex.Store({
@@ -52,6 +53,7 @@ describe('ValueStreamSelect', () => {
   const findSelectValueStreamDropdown = () => wrapper.find(GlDropdown);
   const findSelectValueStreamDropdownOptions = _wrapper => findDropdownItemText(_wrapper);
   const findCreateValueStreamButton = () => wrapper.find(GlButton);
+  const findFormGroup = () => wrapper.find(GlFormGroup);
 
   beforeEach(() => {
     wrapper = createComponent({
@@ -105,9 +107,30 @@ describe('ValueStreamSelect', () => {
       expect(submitButtonDisabledState()).toBe(true);
     });
 
-    describe('with valid fields', () => {
-      const streamName = 'Cool stream';
+    describe('form errors', () => {
+      const fieldErrors = ['already exists', 'is required'];
 
+      beforeEach(() => {
+        wrapper = createComponent({
+          data: { name: streamName },
+          initialState: {
+            createValueStreamErrors: {
+              name: fieldErrors,
+            },
+          },
+        });
+      });
+
+      it('renders the error', () => {
+        expect(findFormGroup().attributes('invalid-feedback')).toEqual(fieldErrors.join('\n'));
+      });
+
+      it('submit button is disabled', () => {
+        expect(submitButtonDisabledState()).toBe(true);
+      });
+    });
+
+    describe('with valid fields', () => {
       beforeEach(() => {
         wrapper = createComponent({ data: { name: streamName } });
       });
