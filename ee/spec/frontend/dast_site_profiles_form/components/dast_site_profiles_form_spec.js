@@ -147,9 +147,13 @@ describe('OnDemandScansApp', () => {
       it('redirects to the profiles library', () => {
         expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
       });
+
+      it('does not show an alert', () => {
+        expect(findAlert().exists()).toBe(false);
+      });
     });
 
-    describe('on error', () => {
+    describe('on top-level error', () => {
       beforeEach(() => {
         createComponent();
         jest.spyOn(wrapper.vm.$apollo, 'mutate').mockRejectedValue();
@@ -164,6 +168,33 @@ describe('OnDemandScansApp', () => {
 
       it('shows an error alert', () => {
         expect(findAlert().exists()).toBe(true);
+      });
+    });
+
+    describe('on errors as data', () => {
+      const errors = ['error#1', 'error#2', 'error#3'];
+
+      beforeEach(() => {
+        createComponent();
+        jest
+          .spyOn(wrapper.vm.$apollo, 'mutate')
+          .mockResolvedValue({ data: { dastSiteProfileCreate: { pipelineUrl: null, errors } } });
+        const input = findTargetUrlInput();
+        input.vm.$emit('input', targetUrl);
+        submitForm();
+      });
+
+      it('resets loading state', () => {
+        expect(findSubmitButton().props('loading')).toBe(false);
+      });
+
+      it('shows an alert with the returned errors', () => {
+        const alert = findAlert();
+
+        expect(alert.exists()).toBe(true);
+        errors.forEach(error => {
+          expect(alert.text()).toContain(error);
+        });
       });
     });
   });

@@ -75,21 +75,23 @@ export default {
     },
     onSubmit() {
       this.loading = true;
-      this.showAlert = false;
+      this.hideErrors();
       this.$apollo
         .mutate({
           mutation: dastSiteProfileCreateMutation,
           variables: this.formData,
         })
-        .then(data => {
-          if (data.errors?.length > 0) {
-            throw new Error(data.errors);
+        .then(({ data: { dastSiteProfileCreate: { errors } } }) => {
+          if (errors?.length > 0) {
+            this.showErrors(errors);
+            this.loading = false;
+          } else {
+            redirectTo(this.profilesLibraryPath);
           }
-          redirectTo(this.profilesLibraryPath);
         })
         .catch(e => {
           Sentry.captureException(e);
-          this.showAlert = true;
+          this.showErrors();
           this.loading = false;
         });
     },
@@ -103,6 +105,14 @@ export default {
     discard() {
       redirectTo(this.profilesLibraryPath);
     },
+    showErrors(errors = []) {
+      this.errors = errors;
+      this.showAlert = true;
+    },
+    hideErrors() {
+      this.errors = [];
+      this.showAlert = false;
+    },
   },
   modalId: 'deleteDastProfileModal',
   i18n: {
@@ -115,12 +125,16 @@ export default {
 
 <template>
   <gl-form @submit.prevent="onSubmit">
-    <gl-alert v-if="showAlert" variant="danger" @dismiss="showAlert = false">
-      {{ s__('DastProfiles|Could not create the site profile. Please try again.') }}
-    </gl-alert>
     <h2 class="gl-mb-6">
       {{ s__('DastProfiles|New site profile') }}
     </h2>
+
+    <gl-alert v-if="showAlert" variant="danger" class="gl-mb-5" @dismiss="hideErrors">
+      {{ s__('DastProfiles|Could not create the site profile. Please try again.') }}
+      <ul v-if="errors.length" class="gl-mt-3 gl-mb-0">
+        <li v-for="error in errors" :key="error" v-text="error"></li>
+      </ul>
+    </gl-alert>
 
     <gl-form-group :label="s__('DastProfiles|Profile name')">
       <gl-form-input
