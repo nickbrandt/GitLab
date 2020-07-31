@@ -8653,6 +8653,9 @@ msgstr ""
 msgid "Edit Release"
 msgstr ""
 
+msgid "Edit Requirement"
+msgstr ""
+
 msgid "Edit Slack integration"
 msgstr ""
 
@@ -15812,6 +15815,9 @@ msgstr ""
 msgid "New Project"
 msgstr ""
 
+msgid "New Requirement"
+msgstr ""
+
 msgid "New Snippet"
 msgstr ""
 
@@ -20342,9 +20348,6 @@ msgid "Required approvals (%{approvals_given} given, you've approved)"
 msgstr ""
 
 msgid "Required in this project."
-msgstr ""
-
-msgid "Requirement"
 msgstr ""
 
 msgid "Requirement %{reference} has been added"
