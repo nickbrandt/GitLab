@@ -24158,6 +24158,9 @@ msgstr ""
 msgid "There was a problem fetching groups."
 msgstr ""
 
+msgid "There was a problem fetching labels."
+msgstr ""
+
 msgid "There was a problem fetching project branches."
 msgstr ""
 
