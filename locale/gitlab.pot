@@ -12713,7 +12713,13 @@ msgstr ""
 msgid "Incident Management Limits"
 msgstr ""
 
+msgid "IncidentManagement|All incidents"
+msgstr ""
+
 msgid "IncidentManagement|Assignees"
+msgstr ""
+
+msgid "IncidentManagement|Closed"
 msgstr ""
 
 msgid "IncidentManagement|Create incident"
@@ -12729,6 +12735,9 @@ msgid "IncidentManagement|Incidents"
 msgstr ""
 
 msgid "IncidentManagement|No incidents to display."
+msgstr ""
+
+msgid "IncidentManagement|Open"
 msgstr ""
 
 msgid "IncidentManagement|There was an error displaying the incidents."

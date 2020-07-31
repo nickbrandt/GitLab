@@ -16186,6 +16186,12 @@
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "all",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null
@@ -18105,6 +18111,12 @@
             },
             {
               "name": "locked",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "all",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -22390,6 +22402,12 @@
             },
             {
               "name": "locked",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "all",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
