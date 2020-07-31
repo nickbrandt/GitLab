@@ -492,7 +492,7 @@ SSH into the **primary node**:
    gitlab-psql -d gitlabhq_production
    ```
 
-1. Enable the `pg_trgm` extension:
+1. Make sure the `pg_trgm` extension is enabled (it might already be):
 
    ```shell
    CREATE EXTENSION pg_trgm;
