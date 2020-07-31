@@ -90,8 +90,17 @@
   }
 
   @include media-breakpoint-down(xs) {
+    .incident-management-list-header {
+      flex-direction: column-reverse;
+    };
+
     .create-incident-button {
       @include gl-w-full;
     }
+  }
+
+  // TODO: Abstract to `@gitlab/ui` utility set: https://gitlab.com/gitlab-org/gitlab-ui/-/issues/921
+  .gl-fill-green-500 {
+    fill: $gray-500;
   }
 }

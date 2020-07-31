@@ -34,7 +34,8 @@ export default {
     RequirementsLoading,
     RequirementsEmptyState,
     RequirementItem,
-    RequirementForm,
+    RequirementCreateForm: RequirementForm,
+    RequirementEditForm: RequirementForm,
   },
   props: {
     projectPath: {
@@ -174,7 +175,8 @@ export default {
       authorUsernames: this.initialAuthorUsernames,
       sortBy: this.initialSortBy,
       showCreateForm: false,
-      showUpdateFormForRequirement: 0,
+      showEditForm: false,
+      editedRequirement: null,
       createRequirementRequestActive: false,
       stateChangeRequestActiveFor: 0,
       currentPage: this.page,
@@ -367,8 +369,9 @@ export default {
     handleNewRequirementClick() {
       this.showCreateForm = true;
     },
-    handleEditRequirementClick(iid) {
-      this.showUpdateFormForRequirement = iid;
+    handleEditRequirementClick(requirement) {
+      this.showEditForm = true;
+      this.editedRequirement = requirement;
     },
     handleNewRequirementSave(title) {
       this.createRequirementRequestActive = true;
@@ -415,7 +418,8 @@ export default {
       })
         .then(({ data }) => {
           if (!data.updateRequirement.errors.length) {
-            this.showUpdateFormForRequirement = 0;
+            this.showEditForm = false;
+            this.editedRequirement = null;
             this.$toast.show(
               sprintf(__('Requirement %{reference} has been updated'), {
                 reference: `REQ-${data.updateRequirement.requirement.iid}`,
@@ -458,7 +462,8 @@ export default {
       });
     },
     handleUpdateRequirementCancel() {
-      this.showUpdateFormForRequirement = 0;
+      this.showEditForm = false;
+      this.editedRequirement = null;
     },
     handleFilterRequirements(filters = []) {
       const authors = [];
@@ -529,11 +534,18 @@ export default {
       @onFilter="handleFilterRequirements"
       @onSort="handleSortRequirements"
     />
-    <requirement-form
-      v-if="showCreateForm"
+    <requirement-create-form
+      :drawer-open="showCreateForm"
       :requirement-request-active="createRequirementRequestActive"
       @save="handleNewRequirementSave"
       @cancel="handleNewRequirementCancel"
+    />
+    <requirement-edit-form
+      :drawer-open="showEditForm"
+      :requirement="editedRequirement"
+      :requirement-request-active="createRequirementRequestActive"
+      @save="handleUpdateRequirementSave"
+      @cancel="handleUpdateRequirementCancel"
     />
     <requirements-empty-state
       v-if="showEmptyState"
@@ -557,11 +569,7 @@ export default {
         v-for="requirement in requirementsList"
         :key="requirement.iid"
         :requirement="requirement"
-        :show-update-form="showUpdateFormForRequirement === requirement.iid"
-        :update-requirement-request-active="createRequirementRequestActive"
         :state-change-request-active="stateChangeRequestActiveFor === requirement.iid"
-        @updateSave="handleUpdateRequirementSave"
-        @updateCancel="handleUpdateRequirementCancel"
         @editClick="handleEditRequirementClick"
         @archiveClick="handleRequirementStateChange"
         @reopenClick="handleRequirementStateChange"

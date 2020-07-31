@@ -1369,6 +1369,12 @@ msgstr[1] ""
 msgid "Add %{linkStart}assets%{linkEnd} to your Release. GitLab automatically includes read-only assets, like source code and release evidence."
 msgstr ""
 
+msgid "Add .gitlab-ci.yml to enable or configure SAST"
+msgstr ""
+
+msgid "Add .gitlab-ci.yml to enable or configure SAST security scanning using the GitLab managed template. You can [add variable overrides](https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings) to customize SAST settings."
+msgstr ""
+
 msgid "Add CHANGELOG"
 msgstr ""
 
@@ -8653,6 +8659,9 @@ msgstr ""
 msgid "Edit Release"
 msgstr ""
 
+msgid "Edit Requirement"
+msgstr ""
+
 msgid "Edit Slack integration"
 msgstr ""
 
@@ -8756,6 +8765,9 @@ msgid "Elastic|None. Select projects to index."
 msgstr ""
 
 msgid "Email"
+msgstr ""
+
+msgid "Email %{number}"
 msgstr ""
 
 msgid "Email Notification"
@@ -12713,7 +12725,13 @@ msgstr ""
 msgid "Incident Management Limits"
 msgstr ""
 
+msgid "IncidentManagement|All incidents"
+msgstr ""
+
 msgid "IncidentManagement|Assignees"
+msgstr ""
+
+msgid "IncidentManagement|Closed"
 msgstr ""
 
 msgid "IncidentManagement|Create incident"
@@ -12731,10 +12749,22 @@ msgstr ""
 msgid "IncidentManagement|No incidents to display."
 msgstr ""
 
+msgid "IncidentManagement|Open"
+msgstr ""
+
+msgid "IncidentManagement|Published"
+msgstr ""
+
+msgid "IncidentManagement|Published to status page"
+msgstr ""
+
 msgid "IncidentManagement|There was an error displaying the incidents."
 msgstr ""
 
 msgid "IncidentManagement|Unassigned"
+msgstr ""
+
+msgid "IncidentManagement|Unpublished"
 msgstr ""
 
 msgid "IncidentSettings|Alert integration"
@@ -13060,10 +13090,19 @@ msgstr ""
 msgid "Invite Members"
 msgstr ""
 
+msgid "Invite another teammate"
+msgstr ""
+
 msgid "Invite group"
 msgstr ""
 
 msgid "Invite member"
+msgstr ""
+
+msgid "Invite teammates (optional)"
+msgstr ""
+
+msgid "Invited users will be added with developer level permissions. You can always change this later."
 msgstr ""
 
 msgid "Invocations"
@@ -15801,6 +15840,9 @@ msgid "New Pipeline Schedule"
 msgstr ""
 
 msgid "New Project"
+msgstr ""
+
+msgid "New Requirement"
 msgstr ""
 
 msgid "New Snippet"
@@ -20335,9 +20377,6 @@ msgstr ""
 msgid "Required in this project."
 msgstr ""
 
-msgid "Requirement"
-msgstr ""
-
 msgid "Requirement %{reference} has been added"
 msgstr ""
 
@@ -23669,9 +23708,6 @@ msgid "The %{type} contains the following error:"
 msgid_plural "The %{type} contains the following errors:"
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "The .gitlab-ci.yml has been successfully created."
-msgstr ""
 
 msgid "The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
 msgstr ""
@@ -29305,6 +29341,9 @@ msgid "syntax is incorrect"
 msgstr ""
 
 msgid "tag name"
+msgstr ""
+
+msgid "teammate%{number}@company.com"
 msgstr ""
 
 msgid "the following issue(s)"

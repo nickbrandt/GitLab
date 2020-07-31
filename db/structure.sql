@@ -25,7 +25,6 @@ ELSIF (TG_OP = 'UPDATE') THEN
     entity_id = NEW.entity_id,
     entity_type = NEW.entity_type,
     details = NEW.details,
-    updated_at = NEW.updated_at,
     ip_address = NEW.ip_address,
     author_name = NEW.author_name,
     entity_path = NEW.entity_path,
@@ -39,7 +38,6 @@ ELSIF (TG_OP = 'INSERT') THEN
     entity_id,
     entity_type,
     details,
-    updated_at,
     ip_address,
     author_name,
     entity_path,
@@ -51,7 +49,6 @@ ELSIF (TG_OP = 'INSERT') THEN
     NEW.entity_id,
     NEW.entity_type,
     NEW.details,
-    NEW.updated_at,
     NEW.ip_address,
     NEW.author_name,
     NEW.entity_path,
@@ -72,7 +69,6 @@ CREATE TABLE public.audit_events_part_5fc467ac26 (
     entity_id integer NOT NULL,
     entity_type character varying NOT NULL,
     details text,
-    updated_at timestamp without time zone,
     ip_address inet,
     author_name text,
     entity_path text,
@@ -9470,7 +9466,6 @@ CREATE TABLE public.audit_events (
     entity_type character varying NOT NULL,
     details text,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
     ip_address inet,
     author_name text,
     entity_path text,
@@ -18880,8 +18875,6 @@ CREATE INDEX index_analytics_ca_group_stages_on_end_event_label_id ON public.ana
 
 CREATE INDEX index_analytics_ca_group_stages_on_group_id ON public.analytics_cycle_analytics_group_stages USING btree (group_id);
 
-CREATE UNIQUE INDEX index_analytics_ca_group_stages_on_group_id_and_name ON public.analytics_cycle_analytics_group_stages USING btree (group_id, name);
-
 CREATE INDEX index_analytics_ca_group_stages_on_relative_position ON public.analytics_cycle_analytics_group_stages USING btree (relative_position);
 
 CREATE INDEX index_analytics_ca_group_stages_on_start_event_label_id ON public.analytics_cycle_analytics_group_stages USING btree (start_event_label_id);
@@ -19149,6 +19142,8 @@ CREATE INDEX index_ci_pipelines_on_external_pull_request_id ON public.ci_pipelin
 CREATE INDEX index_ci_pipelines_on_merge_request_id ON public.ci_pipelines USING btree (merge_request_id) WHERE (merge_request_id IS NOT NULL);
 
 CREATE INDEX index_ci_pipelines_on_pipeline_schedule_id ON public.ci_pipelines USING btree (pipeline_schedule_id);
+
+CREATE INDEX index_ci_pipelines_on_project_id_and_created_at ON public.ci_pipelines USING btree (project_id, created_at);
 
 CREATE INDEX index_ci_pipelines_on_project_id_and_id_desc ON public.ci_pipelines USING btree (project_id, id DESC);
 
@@ -19653,6 +19648,8 @@ CREATE UNIQUE INDEX index_group_group_links_on_shared_group_and_shared_with_grou
 CREATE INDEX index_group_group_links_on_shared_with_group_id ON public.group_group_links USING btree (shared_with_group_id);
 
 CREATE INDEX index_group_import_states_on_group_id ON public.group_import_states USING btree (group_id);
+
+CREATE UNIQUE INDEX index_group_stages_on_group_id_group_value_stream_id_and_name ON public.analytics_cycle_analytics_group_stages USING btree (group_id, group_value_stream_id, name);
 
 CREATE UNIQUE INDEX index_group_wiki_repositories_on_disk_path ON public.group_wiki_repositories USING btree (disk_path);
 

@@ -62,11 +62,10 @@ describe('Cycle analytics actions', () => {
   });
 
   it.each`
-    action                      | type                           | stateKey                 | payload
-    ${'setFeatureFlags'}        | ${'SET_FEATURE_FLAGS'}         | ${'featureFlags'}        | ${{ hasDurationChart: true }}
-    ${'setSelectedProjects'}    | ${'SET_SELECTED_PROJECTS'}     | ${'selectedProjectIds'}  | ${[10, 20, 30, 40]}
-    ${'setSelectedStage'}       | ${'SET_SELECTED_STAGE'}        | ${'selectedStage'}       | ${{ id: 'someStageId' }}
-    ${'setSelectedValueStream'} | ${'SET_SELECTED_VALUE_STREAM'} | ${'selectedValueStream'} | ${{ id: 'vs-1', name: 'Value stream 1' }}
+    action                   | type                       | stateKey                | payload
+    ${'setFeatureFlags'}     | ${'SET_FEATURE_FLAGS'}     | ${'featureFlags'}       | ${{ hasDurationChart: true }}
+    ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
+    ${'setSelectedStage'}    | ${'SET_SELECTED_STAGE'}    | ${'selectedStage'}      | ${{ id: 'someStageId' }}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     return testAction(
       actions[action],
@@ -80,6 +79,20 @@ describe('Cycle analytics actions', () => {
       ],
       [],
     );
+  });
+
+  describe('setSelectedValueStream', () => {
+    const vs = { id: 'vs-1', name: 'Value stream 1' };
+
+    it('dispatches the fetchCycleAnalyticsData action', () => {
+      return testAction(
+        actions.setSelectedValueStream,
+        vs,
+        { ...state, selectedValueStream: {} },
+        [{ type: types.SET_SELECTED_VALUE_STREAM, payload: vs }],
+        [{ type: 'fetchGroupStagesAndEvents' }],
+      );
+    });
   });
 
   describe('setDateRange', () => {
@@ -256,7 +269,6 @@ describe('Cycle analytics actions', () => {
         [
           { type: 'requestCycleAnalyticsData' },
           { type: 'fetchValueStreams' },
-          { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
           { type: 'receiveCycleAnalyticsDataSuccess' },
         ],
@@ -910,7 +922,9 @@ describe('Cycle analytics actions', () => {
     });
 
     describe('with errors', () => {
-      const resp = { message: 'error', errors: {} };
+      const errors = { name: ['is taken'] };
+      const message = { message: 'error' };
+      const resp = { message, payload: { errors } };
       beforeEach(() => {
         mock.onPost(endpoints.valueStreamData).replyOnce(httpStatusCodes.NOT_FOUND, resp);
       });
@@ -924,7 +938,7 @@ describe('Cycle analytics actions', () => {
             { type: types.REQUEST_CREATE_VALUE_STREAM },
             {
               type: types.RECEIVE_CREATE_VALUE_STREAM_ERROR,
-              payload: { data: { ...payload }, ...resp },
+              payload: { message, errors },
             },
           ],
           [],
@@ -1016,8 +1030,14 @@ describe('Cycle analytics actions', () => {
         };
       });
 
-      it(`will skip making a request`, () =>
-        testAction(actions.fetchValueStreams, null, state, [], []));
+      it(`will dispatch the 'fetchGroupStagesAndEvents' request`, () =>
+        testAction(
+          actions.fetchValueStreams,
+          null,
+          state,
+          [],
+          [{ type: 'fetchGroupStagesAndEvents' }],
+        ));
     });
   });
 });

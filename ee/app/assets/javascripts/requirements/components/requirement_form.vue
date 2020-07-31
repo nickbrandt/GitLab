@@ -10,11 +10,16 @@ export default {
     limit: MAX_TITLE_LENGTH,
   }),
   components: {
+    GlDrawer,
     GlFormGroup,
     GlFormTextarea,
     GlButton,
   },
   props: {
+    drawerOpen: {
+      type: Boolean,
+      required: true,
+    },
     requirement: {
       type: Object,
       required: false,
@@ -27,13 +32,15 @@ export default {
   },
   data() {
     return {
-      isCreate: isEmpty(this.requirement),
       title: this.requirement?.title || '',
     };
   },
   computed: {
+    isCreate() {
+      return isEmpty(this.requirement);
+    },
     fieldLabel() {
-      return this.isCreate ? __('New requirement') : __('Requirement');
+      return this.isCreate ? __('New Requirement') : __('Edit Requirement');
     },
     saveButtonLabel() {
       return this.isCreate ? __('Create requirement') : __('Save changes');
@@ -48,7 +55,24 @@ export default {
       return `REQ-${this.requirement?.iid}`;
     },
   },
+  watch: {
+    requirement: {
+      handler(value) {
+        this.title = value?.title || '';
+      },
+      deep: true,
+    },
+  },
   methods: {
+    getDrawerHeaderHeight() {
+      const wrapperEl = document.querySelector('.js-requirements-container-wrapper');
+
+      if (wrapperEl) {
+        return `${wrapperEl.offsetTop}px`;
+      }
+
+      return '';
+    },
     handleSave() {
       if (this.isCreate) {
         this.$emit('save', this.title);
@@ -111,6 +135,6 @@ export default {
           {{ __('Cancel') }}
         </gl-button>
       </div>
-    </div>
-  </div>
+    </template>
+  </gl-drawer>
 </template>
