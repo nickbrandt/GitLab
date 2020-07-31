@@ -16,7 +16,7 @@ RSpec.describe Geo::DesignRegistry, :geo do
     let(:registry) { create(:geo_design_registry) }
   end
 
-  describe '#search', :geo_fdw do
+  describe '#search' do
     let!(:design_registry) { create(:geo_design_registry) }
     let!(:failed_registry) { create(:geo_design_registry, :sync_failed) }
     let!(:synced_registry) { create(:geo_design_registry, :synced) }

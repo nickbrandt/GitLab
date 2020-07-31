@@ -3,7 +3,6 @@
 module Geo
   module Fdw
     class Project < ::Geo::BaseFdw
-      include Gitlab::SQL::Pattern
       include Routable
 
       self.primary_key = :id
@@ -16,16 +15,6 @@ module Geo
       alias_method :parent, :namespace
 
       class << self
-        # Searches for a list of projects based on the query given in `query`.
-        #
-        # On PostgreSQL this method uses "ILIKE" to perform a case-insensitive
-        # search.
-        #
-        # query - The search query as a String.
-        def search(query)
-          fuzzy_search(query, [:path, :name, :description])
-        end
-
         def within_namespaces(namespace_ids)
           where(arel_table.name => { namespace_id: namespace_ids })
         end
