@@ -1793,16 +1793,22 @@ On each node perform the following:
       ```
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
-1. Run `sudo gitlab-rake gitlab:gitaly:check` to confirm the node can connect to Gitaly.
-1. Confirm that Gitaly can perform callbacks to the internal API:
+1. Confirm the node can connect to Gitaly:
 
    ```shell
-   sudo /opt/gitlab/embedded/service/gitlab-shell/bin/check -config /opt/gitlab/embedded/service/gitlab-shell/config.yml
+   sudo gitlab-rake gitlab:gitaly:check
    ```
-1. Tail the logs to see the requests:
+
+   Then, tail the logs to see the requests:
 
    ```shell
    sudo gitlab-ctl tail gitaly
+   ```
+
+1. Optionally, from the Gitaly servers, confirm that Gitaly can perform callbacks to the internal API:
+
+   ```shell
+   sudo /opt/gitlab/embedded/service/gitlab-shell/bin/check -config /opt/gitlab/embedded/service/gitlab-shell/config.yml
    ```
 
 NOTE: **Note:**
