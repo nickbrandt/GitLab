@@ -393,7 +393,7 @@ application servers.
 In this topology, a load balancer is required at each geographic location to
 route traffic to the application servers.
 
-See [Load Balancer for GitLab with multiple nodes](../../high_availability/load_balancer.md) for
+See [Load Balancer for GitLab with multiple nodes](../../load_balancer.md) for
 more information.
 
 ### Step 6: Configure the backend application servers on the **secondary** node

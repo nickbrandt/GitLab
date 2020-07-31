@@ -738,4 +738,4 @@ Read more:
 1. [Configure the database](../postgresql/replication_and_failover.md)
 1. [Configure NFS](../high_availability/nfs.md)
 1. [Configure the GitLab application servers](../high_availability/gitlab.md)
-1. [Configure the load balancers](../high_availability/load_balancer.md)
+1. [Configure the load balancers](../load_balancer.md)
