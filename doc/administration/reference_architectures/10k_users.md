@@ -1532,7 +1532,6 @@ you want using steps 1 and 2 from the GitLab downloads page.
    nginx['enable'] = false
    grafana['enable'] = false
    prometheus['enable'] = false
-   gitlab_rails['auto_migrate'] = false
    alertmanager['enable'] = false
    gitaly['enable'] = false
    gitlab_workhorse['enable'] = false
@@ -1558,7 +1557,7 @@ you want using steps 1 and 2 from the GitLab downloads page.
      {host: '10.6.0.73', port: 26379},
    ]
 
-   ## Second cluster that will host the queues, shared state, and actionable
+   ## Second cluster that will host the queues, shared state, and actioncable
    gitlab_rails['redis_queues_instance'] = 'redis://:<REDIS_PRIMARY_PASSWORD_OF_SECOND_CLUSTER>@gitlab-redis-persistent'
    gitlab_rails['redis_shared_state_instance'] = 'redis://:<REDIS_PRIMARY_PASSWORD_OF_SECOND_CLUSTER>@gitlab-redis-persistent'
    gitlab_rails['redis_actioncable_instance'] = 'redis://:<REDIS_PRIMARY_PASSWORD_OF_SECOND_CLUSTER>@gitlab-redis-persistent'
@@ -1667,7 +1666,7 @@ On each node perform the following:
    # to Gitaly, and a second for authentication callbacks from GitLab-Shell to the GitLab internal API.
    # The following two values must be the same as their respective values
    # of the Gitaly setup
-   gitlab_rails['gitaly_token'] = 'gitalyecret'
+   gitlab_rails['gitaly_token'] = 'gitalysecret'
    gitlab_shell['secret_token'] = 'shellsecret'
 
    git_data_dirs({
