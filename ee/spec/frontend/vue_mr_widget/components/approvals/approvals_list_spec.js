@@ -160,6 +160,7 @@ describe('EE MRWidget approvals list', () => {
       expect(approvers.props()).toEqual(
         expect.objectContaining({
           items: rule.approved_by,
+          emptyText: '',
         }),
       );
     });
