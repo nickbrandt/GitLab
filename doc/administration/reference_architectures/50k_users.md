@@ -227,6 +227,11 @@ The following IPs will be used as an example:
 - `10.6.0.12`: Consul 2
 - `10.6.0.13`: Consul 3
 
+NOTE: **Note:**
+The configuration processes for the other servers in your reference architecture will
+use the `/etc/gitlab/gitlab-secrets.json` file from your Consul server to connect
+with the other servers.
+
 To configure Consul:
 
 1. SSH into the server that will host Consul.
@@ -410,6 +415,10 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    # END user configuration
    ```
 
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
+
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 <div align="right">
@@ -470,6 +479,10 @@ in the second step, do not supply the `EXTERNAL_URL` value.
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13),
    }
    ```
+
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
@@ -626,6 +639,10 @@ The following IPs will be used as an example:
    # Set the network addresses that the exporters will listen on
    node_exporter['listen_address'] = '0.0.0.0:9100'
    ```
+
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
@@ -829,6 +846,10 @@ reconfigure a node and change its status from primary to replica and vice versa.
    gitlab_rails['auto_migrate'] = false
    ```
 
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
+
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 NOTE: **Note:**
@@ -888,6 +909,10 @@ Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
    # Prevent database migrations from running on upgrade
    gitlab_rails['auto_migrate'] = false
    ```
+
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. Go through the steps again for all the other replica nodes, and
@@ -1022,6 +1047,10 @@ To configure the Sentinel Cache server:
    gitlab_rails['auto_migrate'] = false
    ```
 
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
+
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. Go through the steps again for all the other Consul/Sentinel nodes, and
    make sure you set up the correct IPs.
@@ -1092,6 +1121,10 @@ reconfigure a node and change its status from primary to replica and vice versa.
    gitlab_rails['auto_migrate'] = false
    ```
 
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
+
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 NOTE: **Note:**
@@ -1151,6 +1184,10 @@ Read more about [roles](https://docs.gitlab.com/omnibus/roles/).
    # Disable auto migrations
    gitlab_rails['auto_migrate'] = false
    ```
+
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. Go through the steps again for all the other replica nodes, and
@@ -1292,6 +1329,10 @@ To configure the Sentinel Queues server:
    ```
 
    Only the primary GitLab application server should handle migrations.
+
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
 
 1. [Reconfigure Omnibus GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 1. Go through the steps again for all the other Sentinel nodes, and
@@ -1438,6 +1479,10 @@ On each node:
    https://gitlab.com/gitlab-org/charts/gitlab/blob/master/doc/advanced/external-gitaly/external-omnibus-gitaly.md#configure-omnibus-gitlab
    -->
 
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
+
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ### Gitaly TLS support
@@ -1498,6 +1543,7 @@ To configure Gitaly with TLS:
    ```
 
 1. Delete `gitaly['listen_addr']` to allow only encrypted connections.
+
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 <div align="right">
@@ -1653,6 +1699,11 @@ On each node perform the following:
 1. Download/install Omnibus GitLab using **steps 1 and 2** from
    [GitLab downloads](https://about.gitlab.com/install/). Do not complete other
    steps on the download page.
+
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
+
 1. Edit `/etc/gitlab/gitlab.rb` and use the following configuration.
    To maintain uniformity of links across nodes, the `external_url`
    on the application server should point to the external URL that users will use
@@ -1851,6 +1902,11 @@ To configure the Monitoring node:
 1. [Download/install](https://about.gitlab.com/install/) the Omnibus GitLab
    package you want using **steps 1 and 2** from the GitLab downloads page.
    Do not complete any other steps on the download page.
+
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
+
 1. Edit `/etc/gitlab/gitlab.rb` and add the contents:
 
    ```ruby
