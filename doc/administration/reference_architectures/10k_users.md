@@ -1668,6 +1668,12 @@ you want using steps 1 and 2 from the GitLab downloads page.
    gitlab_rails['monitoring_whitelist'] = ['10.6.0.121/32', '127.0.0.0/8']
    ```
 
+1. Copy the `/etc/gitlab/gitlab-secrets.json` file from your Consul server, and replace
+   the file of the same name on this server. If that file is not on this server,
+   add the file from your Consul server to this server.
+
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+
 TIP: **Tip:**
 You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_processes.md).
 
