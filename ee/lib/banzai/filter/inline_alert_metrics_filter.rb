@@ -12,7 +12,7 @@ module Banzai
       def xpath_search
         "descendant-or-self::a[contains(@href,'metrics_dashboard') and \
           contains(@href,'prometheus/alerts') and \
-          starts-with(@href, '#{::Gitlab.config.gitlab.url}')]"
+          starts-with(@href, '#{gitlab_domain}')]"
       end
 
       # Regular expression matching alert dashboard urls
