@@ -15728,16 +15728,6 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "sort",
-                  "description": "Sort issues by this criteria",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "IssueSort",
-                    "ofType": null
-                  },
-                  "defaultValue": "created_desc"
-                },
-                {
                   "name": "types",
                   "description": "Filter issues by the given issue types",
                   "type": {
@@ -15754,6 +15744,16 @@
                     }
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": "Sort issues by this criteria",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IssueSort",
+                    "ofType": null
+                  },
+                  "defaultValue": "created_desc"
                 },
                 {
                   "name": "iterationId",
@@ -20004,7 +20004,7 @@
         {
           "kind": "OBJECT",
           "name": "IssueStatusCountsType",
-          "description": "Represents total number of issues for the represented categories",
+          "description": "Represents total number of issues for the represented statuses",
           "fields": [
             {
               "name": "all",
@@ -30658,16 +30658,6 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "sort",
-                  "description": "Sort issues by this criteria",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "IssueSort",
-                    "ofType": null
-                  },
-                  "defaultValue": "created_desc"
-                },
-                {
                   "name": "types",
                   "description": "Filter issues by the given issue types",
                   "type": {
@@ -30684,6 +30674,16 @@
                     }
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": "Sort issues by this criteria",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IssueSort",
+                    "ofType": null
+                  },
+                  "defaultValue": "created_desc"
                 },
                 {
                   "name": "iterationId",
@@ -30867,16 +30867,6 @@
                     "ofType": null
                   },
                   "defaultValue": null
-                },
-                {
-                  "name": "sort",
-                  "description": "Sort issues by this criteria",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "IssueSort",
-                    "ofType": null
-                  },
-                  "defaultValue": "created_desc"
                 },
                 {
                   "name": "types",
@@ -31066,16 +31056,6 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "sort",
-                  "description": "Sort issues by this criteria",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "IssueSort",
-                    "ofType": null
-                  },
-                  "defaultValue": "created_desc"
-                },
-                {
                   "name": "types",
                   "description": "Filter issues by the given issue types",
                   "type": {
@@ -31092,6 +31072,16 @@
                     }
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": "Sort issues by this criteria",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IssueSort",
+                    "ofType": null
+                  },
+                  "defaultValue": "created_desc"
                 },
                 {
                   "name": "iterationId",

@@ -8,8 +8,8 @@ RSpec.describe 'getting Issue counts by status' do
   let_it_be(:current_user) { create(:user) }
   let_it_be(:issue_opened) { create(:issue, project: project) }
   let_it_be(:issue_closed) { create(:issue, :closed, project: project) }
-  # let_it_be(:other_project_issue) { create(:issue) }
-  let(:params) { { } }
+  let_it_be(:other_project_issue) { create(:issue) }
+  let(:params) { {} }
 
   let(:fields) do
     <<~QUERY
@@ -48,11 +48,11 @@ RSpec.describe 'getting Issue counts by status' do
       it_behaves_like 'a working graphql query'
       it 'returns the correct counts for each status' do
         expect(issue_counts).to eq(
-          'all' => 3,
+          'all' => 2,
           'opened' => 1,
           'closed' => 1,
           'merged' => 0 # merged is not relevant for issues
-        )               # but is included in the issuable type
+        )               # but is included in the return type (Gitlab::IssuablesCountForState)
       end
     end
   end

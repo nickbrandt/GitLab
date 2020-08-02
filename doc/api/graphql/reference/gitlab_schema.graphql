@@ -7253,7 +7253,7 @@ enum IssueState {
 }
 
 """
-Represents total number of issues for the represented categories
+Represents total number of issues for the represented statuses
 """
 type IssueStatusCountsType {
   """
@@ -10356,11 +10356,6 @@ type Project {
     Search query for issue title or description
     """
     search: String
-
-    """
-    Sort issues by this criteria
-    """
-    sort: IssueSort = created_desc
 
     """
     Current state of this issue
