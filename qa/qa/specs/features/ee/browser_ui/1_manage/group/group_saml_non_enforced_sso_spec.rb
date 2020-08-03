@@ -24,6 +24,29 @@ module QA
         Flow::Login.sign_in
       end
 
+      context 'when SAML SSO is configured with a default membership role' do
+        let(:user) { Resource::User.fabricate_via_api! }
+        let(:default_membership_role) { 'Developer' }
+
+        it 'adds the new member with access level as set in SAML SSO configuration' do
+          managed_group_url = Flow::Saml.enable_saml_sso(@group, @saml_idp_service, default_membership_role)
+          page.visit Runtime::Scenario.gitlab_address
+          Page::Main::Menu.perform(&:sign_out_if_signed_in)
+
+          Flow::Login.sign_in(as: user)
+
+          page.visit managed_group_url
+          EE::Page::Group::SamlSSOSignIn.perform(&:click_sign_in)
+          Flow::Saml.login_to_idp_if_required('user3', 'user3pass')
+          expect(page).to have_content("SAML for #{@group.path} was added to your connected accounts")
+
+          member_details = @group.list_members.find { |item| item['username'] == user.username }
+
+          expect(member_details['access_level']).to eq(Resource::Members::AccessLevel::DEVELOPER)
+          Page::Main::Menu.perform(&:sign_out_if_signed_in)
+        end
+      end
+
       it 'User logs in to group with SAML SSO' do
         managed_group_url = Flow::Saml.enable_saml_sso(@group, @saml_idp_service)
 
