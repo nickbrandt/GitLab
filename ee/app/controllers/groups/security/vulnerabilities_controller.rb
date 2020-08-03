@@ -12,8 +12,7 @@ module Groups
       private
 
       def dashboard_available?
-        group.feature_available?(:security_dashboard) &&
-          can?(current_user, :read_group_security_dashboard, group)
+        can?(current_user, :read_group_security_dashboard, group)
       end
     end
   end
