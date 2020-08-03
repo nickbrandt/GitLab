@@ -12,6 +12,8 @@ describe('CommaSeparatedListTokenSelector', () => {
   const defaultProps = {
     hiddenInputId: 'comma-separated-list',
     ariaLabelledby: 'comma-separated-list-label',
+    errorMessage: 'The value entered is invalid',
+    disallowedValueErrorMessage: 'The value entered is not allowed',
   };
 
   const createComponent = options => {
@@ -147,7 +149,6 @@ describe('CommaSeparatedListTokenSelector', () => {
         createComponent({
           propsData: {
             regexValidator: /baz/,
-            errorMessage: 'The value entered is invalid',
           },
         });
 
@@ -164,7 +165,6 @@ describe('CommaSeparatedListTokenSelector', () => {
         createComponent({
           propsData: {
             disallowedValues: ['foo', 'bar', 'baz'],
-            disallowedValueErrorMessage: 'The value entered is not allowed',
           },
         });
 
@@ -181,9 +181,7 @@ describe('CommaSeparatedListTokenSelector', () => {
         createComponent({
           propsData: {
             regexValidator: /baz/,
-            errorMessage: 'The value entered is invalid',
             disallowedValues: ['foo', 'bar', 'baz'],
-            disallowedValueErrorMessage: 'The value entered is not allowed',
           },
         });
 
@@ -198,9 +196,7 @@ describe('CommaSeparatedListTokenSelector', () => {
         createComponent({
           propsData: {
             regexValidator: /foo/,
-            errorMessage: 'The value entered is invalid',
             disallowedValues: ['foo', 'bar', 'baz'],
-            disallowedValueErrorMessage: 'The value entered is not allowed',
           },
         });
 
@@ -218,9 +214,7 @@ describe('CommaSeparatedListTokenSelector', () => {
       createComponent({
         propsData: {
           regexValidator: /foo/,
-          errorMessage: 'The value entered is invalid',
           disallowedValues: ['bar', 'baz'],
-          disallowedValueErrorMessage: 'The value entered is not allowed',
         },
         scopedSlots: {
           'user-defined-token-content': '<span>Add "{{props.inputText}}"</span>',
@@ -262,7 +256,6 @@ describe('CommaSeparatedListTokenSelector', () => {
       createComponent({
         propsData: {
           regexValidator: /baz/,
-          errorMessage: 'The value entered is invalid',
         },
       });
 
@@ -285,7 +278,6 @@ describe('CommaSeparatedListTokenSelector', () => {
       createComponent({
         propsData: {
           regexValidator: /baz/,
-          errorMessage: 'The value entered is invalid',
         },
       });
 
