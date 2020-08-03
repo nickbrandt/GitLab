@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
-import GridColumnHeading from 'ee/compliance_dashboard/components/grid_column_heading.vue';
+import GridColumnHeading from 'ee/compliance_dashboard/components/shared/grid_column_heading.vue';
 
 describe('GridColumnHeading component', () => {
   let wrapper;

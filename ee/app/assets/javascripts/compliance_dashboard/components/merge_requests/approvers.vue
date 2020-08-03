@@ -1,7 +1,7 @@
 <script>
 import { sprintf, __ } from '~/locale';
 import { GlAvatarLink, GlAvatar, GlAvatarsInline, GlTooltipDirective } from '@gitlab/ui';
-import { PRESENTABLE_APPROVERS_LIMIT } from '../constants';
+import { PRESENTABLE_APPROVERS_LIMIT } from '../../constants';
 
 export default {
   directives: {
