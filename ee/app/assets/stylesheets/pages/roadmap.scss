@@ -560,3 +560,16 @@ html.group-epics-roadmap-html {
   color: $gray-700;
   padding-top: $gl-spacing-scale-1;
 }
+
+// There are several styling issues happening while using
+// `GlFilteredSearch` in roadmap due to some of our global
+// styles which we need to override until those are fixed
+// at framework level.
+// See https://gitlab.com/gitlab-org/gitlab-ui/-/issues/908
+.epics-roadmap-filters-gl-ui {
+  .gl-search-box-by-click {
+    .gl-filtered-search-scrollable {
+      border-radius: 0;
+    }
+  }
+}

@@ -103,6 +103,19 @@ describe('FilteredSearchBarRoot', () => {
         expect(wrapper.vm.sortDirectionTooltip).toBe('Sort direction: Descending');
       });
     });
+
+    describe('filteredRecentSearches', () => {
+      it('returns array of recent searches filtering out any string type (unsupported) items', async () => {
+        wrapper.setData({
+          recentSearches: [{ foo: 'bar' }, 'foo'],
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.filteredRecentSearches).toHaveLength(1);
+        expect(wrapper.vm.filteredRecentSearches[0]).toEqual({ foo: 'bar' });
+      });
+    });
   });
 
   describe('watchers', () => {

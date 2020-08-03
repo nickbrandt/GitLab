@@ -12,6 +12,7 @@ module Groups
     before_action do
       push_frontend_feature_flag(:roadmap_buffered_rendering, @group)
       push_frontend_feature_flag(:confidential_epics, @group, default_enabled: true)
+      push_frontend_feature_flag(:async_filtering, @group)
     end
 
     # show roadmap for a group
