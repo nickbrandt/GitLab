@@ -62,7 +62,7 @@ module SnippetsHelper
 
     icon_name, text = attrs
     tag.span(class: %w[badge badge-gray]) do
-      concat(sprite_icon(icon_name, size: 14, css_class: 'vertical-align-middle'))
+      concat(sprite_icon(icon_name, size: 14, css_class: 'gl-vertical-align-middle'))
       concat(' ')
       concat(text)
     end
