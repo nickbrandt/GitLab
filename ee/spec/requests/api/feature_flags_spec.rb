@@ -4,17 +4,19 @@ require 'spec_helper'
 RSpec.describe API::FeatureFlags do
   include FeatureFlagHelpers
 
-  let(:project) { create(:project, :repository) }
-  let(:developer) { create(:user) }
-  let(:reporter) { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:developer) { create(:user) }
+  let_it_be(:reporter) { create(:user) }
+  let_it_be(:non_project_member) { create(:user) }
   let(:user) { developer }
-  let(:non_project_member) { create(:user) }
+
+  before_all do
+    project.add_developer(developer)
+    project.add_reporter(reporter)
+  end
 
   before do
     stub_licensed_features(feature_flags: true)
-
-    project.add_developer(developer)
-    project.add_reporter(reporter)
   end
 
   shared_examples_for 'check user permission' do
@@ -118,6 +120,7 @@ RSpec.describe API::FeatureFlags do
         expect(json_response).to eq([{
           'name' => 'feature1',
           'description' => nil,
+          'active' => true,
           'version' => 'new_version_flag',
           'updated_at' => feature_flag.updated_at.as_json,
           'created_at' => feature_flag.created_at.as_json,
@@ -207,6 +210,7 @@ RSpec.describe API::FeatureFlags do
         expect(json_response).to eq({
           'name' => 'feature1',
           'description' => nil,
+          'active' => true,
           'version' => 'new_version_flag',
           'updated_at' => feature_flag.updated_at.as_json,
           'created_at' => feature_flag.created_at.as_json,
@@ -298,6 +302,25 @@ RSpec.describe API::FeatureFlags do
       expect(json_response.key?('version')).to eq(false)
     end
 
+    context 'with active set to false in the params for a legacy flag' do
+      let(:params) do
+        {
+          name: 'awesome-feature',
+          version: 'legacy_flag',
+          active: 'false',
+          scopes: [scope_default]
+        }
+      end
+
+      it 'creates an inactive feature flag' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:created)
+        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(json_response['active']).to eq(false)
+      end
+    end
+
     context 'when no scopes passed in parameters' do
       let(:params) { { name: 'awesome-feature' } }
 
@@ -370,10 +393,35 @@ RSpec.describe API::FeatureFlags do
 
         expect(response).to have_gitlab_http_status(:created)
         expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(json_response).to match(hash_including({
+          'name' => 'new-feature',
+          'description' => nil,
+          'active' => true,
+          'version' => 'new_version_flag',
+          'scopes' => [],
+          'strategies' => []
+        }))
 
         feature_flag = project.operations_feature_flags.last
         expect(feature_flag.name).to eq(params[:name])
         expect(feature_flag.version).to eq('new_version_flag')
+      end
+
+      it 'creates a new feature flag that is inactive' do
+        params = {
+          name: 'new-feature',
+          version: 'new_version_flag',
+          active: false
+        }
+
+        post api("/projects/#{project.id}/feature_flags", user), params: params
+
+        expect(response).to have_gitlab_http_status(:created)
+        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(json_response['active']).to eq(false)
+
+        feature_flag = project.operations_feature_flags.last
+        expect(feature_flag.active).to eq(false)
       end
 
       it 'creates a new feature flag with strategies' do
@@ -691,7 +739,7 @@ RSpec.describe API::FeatureFlags do
 
     context 'with a version 2 feature flag' do
       let!(:feature_flag) do
-        create(:operations_feature_flag, :new_version_flag, project: project,
+        create(:operations_feature_flag, :new_version_flag, project: project, active: true,
                name: 'feature1', description: 'old description')
       end
 
@@ -755,6 +803,17 @@ RSpec.describe API::FeatureFlags do
         expect(feature_flag.reload.description).to eq('new description')
       end
 
+      it 'updates the flag active value' do
+        params = { active: false }
+
+        put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(json_response['active']).to eq(false)
+        expect(feature_flag.reload.active).to eq(false)
+      end
+
       it 'ignores a provided version parameter' do
         params = { description: 'other description', version: 'bad_value' }
 
@@ -776,6 +835,7 @@ RSpec.describe API::FeatureFlags do
         expect(json_response).to eq({
           'name' => 'feature1',
           'description' => 'new description',
+          'active' => true,
           'created_at' => feature_flag.created_at.as_json,
           'updated_at' => feature_flag.updated_at.as_json,
           'scopes' => [],

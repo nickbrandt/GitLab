@@ -40,6 +40,7 @@ module API
         params do
           requires :name, type: String, desc: 'The name of feature flag'
           optional :description, type: String, desc: 'The description of the feature flag'
+          optional :active, type: Boolean, desc: 'Active/inactive value of the flag'
           optional :version, type: String, desc: 'The version of the feature flag'
           optional :scopes, type: Array do
             requires :environment_scope, type: String, desc: 'The environment scope of the scope'
@@ -145,6 +146,7 @@ module API
         end
         params do
           optional :description, type: String, desc: 'The description of the feature flag'
+          optional :active, type: Boolean, desc: 'Active/inactive value of the flag'
           optional :strategies, type: Array do
             optional :id, type: Integer, desc: 'The strategy id'
             optional :name, type: String, desc: 'The strategy type'
