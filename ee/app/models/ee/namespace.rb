@@ -37,6 +37,14 @@ module EE
       scope :include_gitlab_subscription, -> { includes(:gitlab_subscription) }
       scope :join_gitlab_subscription, -> { joins("LEFT OUTER JOIN gitlab_subscriptions ON gitlab_subscriptions.namespace_id=namespaces.id") }
 
+      scope :eligible_for_trial, -> do
+        left_joins(gitlab_subscription: :hosted_plan)
+          .where(
+            gitlab_subscriptions: { trial: [nil, false], trial_ends_on: [nil] },
+            plans: { name: [nil, *::Plan::PLANS_ELIGIBLE_FOR_TRIAL] }
+          )
+      end
+
       scope :with_feature_available_in_plan, -> (feature) do
         plans = plans_with_feature(feature)
         matcher = ::Plan.where(name: plans)
@@ -276,9 +284,9 @@ module EE
 
     def eligible_for_trial?
       ::Gitlab.com? &&
-        parent_id.nil? &&
-        trial_ends_on.blank? &&
-        [::Plan::EARLY_ADOPTER, ::Plan::FREE].include?(actual_plan_name)
+        !has_parent? &&
+        never_had_trial? &&
+        plan_eligible_for_trial?
     end
 
     def trial_active?
@@ -290,9 +298,7 @@ module EE
     end
 
     def trial_expired?
-      trial_ends_on.present? &&
-        trial_ends_on < Date.today &&
-        actual_plan_name == ::Plan::FREE
+      trial_ends_on.present? && trial_ends_on < Date.today
     end
 
     # A namespace may not have a file template project
@@ -331,6 +337,10 @@ module EE
 
     def gold_plan?
       actual_plan_name == ::Plan::GOLD
+    end
+
+    def plan_eligible_for_trial?
+      ::Plan::PLANS_ELIGIBLE_FOR_TRIAL.include?(actual_plan_name)
     end
 
     def use_elasticsearch?

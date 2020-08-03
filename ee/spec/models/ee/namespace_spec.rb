@@ -170,6 +170,60 @@ RSpec.describe Namespace do
         end
       end
     end
+
+    describe '.eligible_for_trial' do
+      let_it_be(:namespace) { create :namespace }
+
+      subject { described_class.eligible_for_trial.first }
+
+      context 'when there is no subscription' do
+        it { is_expected.to eq(namespace) }
+      end
+
+      context 'when there is a subscription' do
+        context 'with a plan that is eligible for a trial' do
+          where(plan: ::Plan::PLANS_ELIGIBLE_FOR_TRIAL)
+
+          with_them do
+            context 'and has not yet been trialed' do
+              before do
+                create :gitlab_subscription, plan, namespace: namespace
+              end
+
+              it { is_expected.to eq(namespace) }
+            end
+
+            context 'but has already had a trial' do
+              before do
+                create :gitlab_subscription, plan, :expired_trial, namespace: namespace
+              end
+
+              it { is_expected.to be_nil }
+            end
+
+            context 'but is currently being trialed' do
+              before do
+                create :gitlab_subscription, plan, :active_trial, namespace: namespace
+              end
+
+              it { is_expected.to be_nil }
+            end
+          end
+        end
+
+        context 'with a plan that is ineligible for a trial' do
+          where(plan: ::Plan::PAID_HOSTED_PLANS)
+
+          with_them do
+            before do
+              create :gitlab_subscription, plan, namespace: namespace
+            end
+
+            it { is_expected.to be_nil }
+          end
+        end
+      end
+    end
   end
 
   context 'validation' do
@@ -1255,6 +1309,36 @@ RSpec.describe Namespace do
 
             it 'includes active users from the shared group including guests to the billed members count' do
               expect(group.billable_members_count).to eq(4)
+            end
+          end
+        end
+      end
+    end
+  end
+
+  describe '#eligible_for_trial?' do
+    subject { namespace.eligible_for_trial? }
+
+    where(
+      on_dot_com: [true, false],
+      has_parent: [true, false],
+      never_had_trial: [true, false],
+      plan_eligible_for_trial: [true, false]
+    )
+
+    with_them do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(on_dot_com)
+        allow(namespace).to receive(:has_parent?).and_return(has_parent)
+        allow(namespace).to receive(:never_had_trial?).and_return(never_had_trial)
+        allow(namespace).to receive(:plan_eligible_for_trial?).and_return(plan_eligible_for_trial)
+      end
+
+      context "when#{' not' unless params[:on_dot_com]} on .com" do
+        context "and the namespace #{params[:has_parent] ? 'has' : 'is'} a parent namespace" do
+          context "and the namespace has#{' not yet' if params[:never_had_trial]} been trialed" do
+            context "and the namespace is#{' not' unless params[:plan_eligible_for_trial]} eligible for a trial" do
+              it { is_expected.to eq(on_dot_com && !has_parent && never_had_trial && plan_eligible_for_trial) }
             end
           end
         end
