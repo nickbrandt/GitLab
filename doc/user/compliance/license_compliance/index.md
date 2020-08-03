@@ -679,7 +679,8 @@ Policies allow you to specify licenses that are `allowed` or `denied` in a proje
 
 ![Merge Request with denied licenses](img/denied_licenses_v13_3.png)
 
-The **Policies** tab in the projects license compliance section displays your project's license policies. Policies can be specified in this section by maintainers of the project.
+The **Policies** tab in the project's license compliance section displays your project's license
+policies. Project maintainers can specify policies in this section.
 
 ![Edit Policy](img/policies_maintainer_edit_v13_2.png)
 ![Add Policy](img/policies_maintainer_add_v13_2.png)
