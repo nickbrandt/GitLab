@@ -164,7 +164,7 @@
   :idempotent:
   :tags: []
 - :name: cronjob:historical_data
-  :feature_category: :license_compliance
+  :feature_category: :billing
   :has_external_dependencies:
   :urgency: :low
   :resource_boundary: :unknown
