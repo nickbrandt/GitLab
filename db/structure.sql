@@ -14007,12 +14007,12 @@ CREATE TABLE public.plan_limits (
     ci_max_artifact_size_trace integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_junit integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_sast integer DEFAULT 0 NOT NULL,
-    ci_max_artifact_size_dependency_scanning integer DEFAULT 0 NOT NULL,
-    ci_max_artifact_size_container_scanning integer DEFAULT 0 NOT NULL,
+    ci_max_artifact_size_dependency_scanning integer DEFAULT 350 NOT NULL,
+    ci_max_artifact_size_container_scanning integer DEFAULT 150 NOT NULL,
     ci_max_artifact_size_dast integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_codequality integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_license_management integer DEFAULT 0 NOT NULL,
-    ci_max_artifact_size_license_scanning integer DEFAULT 0 NOT NULL,
+    ci_max_artifact_size_license_scanning integer DEFAULT 100 NOT NULL,
     ci_max_artifact_size_performance integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_metrics integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_metrics_referee integer DEFAULT 0 NOT NULL,
@@ -19104,6 +19104,8 @@ CREATE INDEX index_ci_job_artifacts_for_terraform_reports ON public.ci_job_artif
 CREATE INDEX index_ci_job_artifacts_on_expire_at_and_job_id ON public.ci_job_artifacts USING btree (expire_at, job_id);
 
 CREATE INDEX index_ci_job_artifacts_on_file_store ON public.ci_job_artifacts USING btree (file_store);
+
+CREATE INDEX index_ci_job_artifacts_on_file_type ON public.ci_job_artifacts USING btree (file_type) WHERE (file_type = ANY (ARRAY[10, 101]));
 
 CREATE UNIQUE INDEX index_ci_job_artifacts_on_job_id_and_file_type ON public.ci_job_artifacts USING btree (job_id, file_type);
 
