@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
-import PipelineStatus from 'ee/compliance_dashboard/components/pipeline_status.vue';
-import { createPipelineStatus } from '../mock_data';
+import PipelineStatus from 'ee/compliance_dashboard/components/merge_requests/pipeline_status.vue';
+import { createPipelineStatus } from '../../mock_data';
 
 describe('PipelineStatus component', () => {
   let wrapper;

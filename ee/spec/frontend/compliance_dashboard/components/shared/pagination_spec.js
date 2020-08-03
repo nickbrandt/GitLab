@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlPagination } from '@gitlab/ui';
 
-import Pagination from 'ee/compliance_dashboard/components/pagination.vue';
+import Pagination from 'ee/compliance_dashboard/components/shared/pagination.vue';
 
-describe('MergeRequest component', () => {
+describe('Pagination component', () => {
   let wrapper;
 
   const findGlPagination = () => wrapper.find(GlPagination);
