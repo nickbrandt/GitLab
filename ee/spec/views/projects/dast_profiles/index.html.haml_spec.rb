@@ -15,4 +15,8 @@ RSpec.describe "projects/dast_profiles/index", type: :view do
   it 'passes new dast site profile path' do
     expect(rendered).to include '/on_demand_scans/profiles/dast_site_profiles/new'
   end
+
+  it 'passes project\'s full path' do
+    expect(rendered).to include @project.path_with_namespace
+  end
 end
