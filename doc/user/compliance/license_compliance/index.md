@@ -24,7 +24,9 @@ source and target branches, and shows the information right on the merge request
 Denied licenses will be clearly visible with an `x` red icon next to them
 as well as new licenses which need a decision from you. In addition, you can
 [manually allow or deny](#policies)
-licenses in your project's license compliance policy section. If a `denied` license is detected in a new commit it will disallow a merge request and instruct the developer to remove it.
+licenses in your project's license compliance policy section. If GitLab detects a denied license
+in a new commit, GitLab blocks any merge requests containing that commit and instructs the developer
+to remove the license.
 
 NOTE: **Note:**
 If the license compliance report doesn't have anything to compare to, no information
