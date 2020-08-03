@@ -7,7 +7,9 @@ RSpec.describe 'Freeze Periods (JavaScript fixtures)' do
 
   let_it_be(:admin) { create(:admin) }
   let_it_be(:project) { create(:project, :repository, path: 'freeze-periods-project') }
-  let_it_be(:freeze_period) { create(:ci_freeze_period, project: project, created_at: 2.days.ago) }
+  let_it_be(:freeze_period_1) { create(:ci_freeze_period, project: project, freeze_start: '5 4 * * *', freeze_end: '5 9 * 8 *', cron_timezone: 'America/New_York') }
+  let_it_be(:freeze_period_2) { create(:ci_freeze_period, project: project, freeze_start: '0 12 * * 1-5', freeze_end: '0 1 5 * *', cron_timezone: 'Etc/UTC') }
+  let_it_be(:freeze_period_3) { create(:ci_freeze_period, project: project, freeze_start: '0 12 * * 1-5', freeze_end: '0 16 * * 6', cron_timezone: 'Europe/Berlin') }
 
   before(:all) do
     clean_frontend_fixtures('api/freeze-periods/')
