@@ -11,26 +11,41 @@ RSpec.describe Service do
   end
 
   describe 'validations' do
+    let(:group) { create(:group) }
+    let(:project) { create(:project) }
+
     it { is_expected.to validate_presence_of(:type) }
 
-    it 'validates presence of project_id if not template', :aggregate_failures do
+    it 'validates presence of project_id if not template, instance or group_id', :aggregate_failures do
       expect(build(:service, project_id: nil, template: true)).to be_valid
+      expect(build(:service, project_id: nil, instance: true)).to be_valid
+      expect(build(:service, project_id: nil, group_id: group.id)).to be_valid
       expect(build(:service, project_id: nil, template: false)).to be_invalid
-    end
-
-    it 'validates presence of project_id if not instance', :aggregate_failures do
-      expect(build(:service, project_id: nil, instance: true)).to be_valid
       expect(build(:service, project_id: nil, instance: false)).to be_invalid
+      expect(build(:service, project_id: nil, group_id: nil)).to be_invalid
     end
 
-    it 'validates absence of project_id if instance', :aggregate_failures do
-      expect(build(:service, project_id: nil, instance: true)).to be_valid
-      expect(build(:service, instance: true)).to be_invalid
+    it 'validates presence of group_id if not template, instance or project_id', :aggregate_failures do
+      expect(build(:service, group_id: nil, project_id: nil, template: true)).to be_valid
+      expect(build(:service, group_id: nil, project_id: nil, instance: true)).to be_valid
+      expect(build(:service, group_id: nil, project_id: project.id)).to be_valid
+      expect(build(:service, group_id: nil, project_id: nil, template: false)).to be_invalid
+      expect(build(:service, group_id: nil, project_id: nil, instance: false)).to be_invalid
+      expect(build(:service, group_id: nil, project_id: nil)).to be_invalid
     end
 
-    it 'validates absence of project_id if template', :aggregate_failures do
+    it 'validates absence of project_id if instance or template', :aggregate_failures do
+      expect(build(:service, instance: true)).to validate_absence_of(:project_id)
       expect(build(:service, template: true)).to validate_absence_of(:project_id)
+      expect(build(:service, instance: false)).not_to validate_absence_of(:project_id)
       expect(build(:service, template: false)).not_to validate_absence_of(:project_id)
+    end
+
+    it 'validates absence of group_id if instance or template', :aggregate_failures do
+      expect(build(:service, instance: true)).to validate_absence_of(:group_id)
+      expect(build(:service, template: true)).to validate_absence_of(:group_id)
+      expect(build(:service, instance: false)).not_to validate_absence_of(:group_id)
+      expect(build(:service, template: false)).not_to validate_absence_of(:group_id)
     end
 
     it 'validates service is template or instance' do
@@ -58,11 +73,14 @@ RSpec.describe Service do
     end
 
     it 'validates uniqueness of type and project_id on create' do
-      project = create(:project)
-
       expect(create(:service, project: project, type: 'Service')).to be_valid
       expect(build(:service, project: project, type: 'Service').valid?(:create)).to eq(false)
       expect(build(:service, project: project, type: 'Service').valid?(:update)).to eq(true)
+    end
+
+    it 'validates uniqueness of type and group_id' do
+      expect(create(:service, group_id: group.id, project_id: nil, type: 'Service')).to be_valid
+      expect(build(:service, group_id: group.id, project_id: nil, type: 'Service')).to be_invalid
     end
   end
 

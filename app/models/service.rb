@@ -48,9 +48,11 @@ class Service < ApplicationRecord
   belongs_to :project, inverse_of: :services
   has_one :service_hook
 
-  validates :project_id, presence: true, unless: -> { template? || instance? }
-  validates :project_id, absence: true, if: -> { template? || instance? }
-  validates :type, uniqueness: { scope: :project_id }, unless: -> { template? || instance? }, on: :create
+  validates :project_id, presence: true, unless: -> { template? || instance? || group_id }
+  validates :group_id, presence: true, unless: -> { template? || instance? || project_id }
+  validates :project_id, :group_id, absence: true, if: -> { template? || instance? }
+  validates :type, uniqueness: { scope: :project_id }, unless: -> { template? || instance? || group_id }, on: :create
+  validates :type, uniqueness: { scope: :group_id }, unless: -> { template? || instance? || project_id }
   validates :type, presence: true
   validates :template, uniqueness: { scope: :type }, if: -> { template? }
   validates :instance, uniqueness: { scope: :type }, if: -> { instance? }
