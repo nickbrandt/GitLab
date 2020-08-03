@@ -126,7 +126,7 @@ export default {
     <header class="gl-mb-6">
       <h2>{{ s__('OnDemandScans|New on-demand DAST scan') }}</h2>
       <p>
-        <gl-icon name="information-o" class="gl-vertical-align-text-bottom gl-text-gray-600" />
+        <gl-icon name="information-o" class="gl-vertical-align-text-bottom gl-text-gray-400" />
         <gl-sprintf
           :message="
             s__(
@@ -149,7 +149,7 @@ export default {
         <gl-icon
           v-gl-tooltip.hover
           name="information-o"
-          class="gl-vertical-align-text-bottom gl-text-gray-600"
+          class="gl-vertical-align-text-bottom gl-text-gray-400"
           :title="s__('OnDemandScans|Only a passive scan can be performed on demand.')"
         />
       </template>
@@ -162,7 +162,7 @@ export default {
         <gl-icon
           v-gl-tooltip.hover
           name="information-o"
-          class="gl-vertical-align-text-bottom gl-text-gray-600"
+          class="gl-vertical-align-text-bottom gl-text-gray-400"
           :title="s__('OnDemandScans|Attached branch is where the scan job runs.')"
         />
       </template>
@@ -175,7 +175,7 @@ export default {
         <gl-icon
           v-gl-tooltip.hover
           name="information-o"
-          class="gl-vertical-align-text-bottom gl-text-gray-600"
+          class="gl-vertical-align-text-bottom gl-text-gray-400"
           :title="s__('OnDemandScans|DAST will scan the target URL and any discovered sub URLs.')"
         />
       </template>
