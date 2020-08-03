@@ -15,6 +15,7 @@ import {
   transformedDurationData,
   transformedDurationMedianData,
   endpoints,
+  valueStreams,
 } from '../../../mock_data';
 import { shouldFlashAMessage } from '../../../helpers';
 
@@ -22,26 +23,30 @@ const selectedGroup = { fullPath: group.path };
 const [stage1, stage2] = stages;
 const hiddenStage = { ...stage1, hidden: true, id: 3, slug: 3 };
 const activeStages = [stage1, stage2];
+const [selectedValueStream] = valueStreams;
 
 const rootState = {
   startDate,
   endDate,
   stages: [...activeStages, hiddenStage],
   selectedGroup,
+  selectedValueStream,
   featureFlags: {
     hasDurationChart: true,
     hasDurationChartMedian: true,
   },
-  getters,
-  rootGetters: {
-    ...rootGetters,
-    activeStages,
-  },
 };
 
 describe('DurationChart actions', () => {
-  let state;
   let mock;
+  const state = {
+    ...rootState,
+    ...getters,
+    ...rootGetters,
+    activeStages,
+    currentGroupPath: () => selectedGroup.fullPath,
+    currentValueStreamId: () => selectedValueStream.id,
+  };
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
@@ -60,7 +65,7 @@ describe('DurationChart actions', () => {
       return testAction(
         actions.fetchDurationData,
         null,
-        { activeStages },
+        state,
         [],
         [
           { type: 'requestDurationData' },
@@ -77,7 +82,11 @@ describe('DurationChart actions', () => {
       return actions
         .fetchDurationData({
           dispatch,
-          ...rootState,
+          rootState,
+          rootGetters: {
+            ...rootGetters,
+            activeStages,
+          },
         })
         .then(() => {
           const requestedUrls = mock.history.get.map(({ url }) => url);
@@ -98,7 +107,11 @@ describe('DurationChart actions', () => {
         return actions
           .fetchDurationData({
             dispatch,
-            ...rootState,
+            rootState,
+            rootGetters: {
+              ...rootGetters,
+              activeStages,
+            },
           })
           .then(() => {
             expect(dispatch).toHaveBeenCalledWith('receiveDurationDataError');
@@ -297,7 +310,7 @@ describe('DurationChart actions', () => {
       return testAction(
         actions.fetchDurationMedianData,
         null,
-        { ...rootState, activeStages },
+        state,
         [],
         [
           {
@@ -319,7 +332,7 @@ describe('DurationChart actions', () => {
           .fetchDurationMedianData({
             dispatch,
             rootState,
-            rootGetters: { activeStages },
+            rootGetters: { ...rootGetters, activeStages },
           })
           .then(() => {
             const requestedUrls = mock.history.get.map(({ url }) => url);

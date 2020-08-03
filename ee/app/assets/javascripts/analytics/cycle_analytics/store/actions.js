@@ -42,15 +42,16 @@ export const receiveStageDataError = ({ commit }) => {
   createFlash(__('There was an error fetching data for the selected stage'));
 };
 
-export const fetchStageData = ({ state, dispatch, getters }, slug) => {
-  const { cycleAnalyticsRequestParams = {} } = getters;
-  const {
-    selectedGroup: { fullPath },
-  } = state;
-
+export const fetchStageData = ({ dispatch, getters }, slug) => {
+  const { cycleAnalyticsRequestParams = {}, currentValueStreamId, currentGroupPath } = getters;
   dispatch('requestStageData');
 
-  return Api.cycleAnalyticsStageEvents(fullPath, slug, cycleAnalyticsRequestParams)
+  return Api.cycleAnalyticsStageEvents(
+    currentGroupPath,
+    currentValueStreamId,
+    slug,
+    cycleAnalyticsRequestParams,
+  )
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
     .catch(error => dispatch('receiveStageDataError', error));
 };
@@ -65,20 +66,32 @@ export const receiveStageMedianValuesError = ({ commit }) => {
   createFlash(__('There was an error fetching median data for stages'));
 };
 
-const fetchStageMedian = (currentGroupPath, stageId, params) =>
-  Api.cycleAnalyticsStageMedian(currentGroupPath, stageId, params).then(({ data }) => ({
-    id: stageId,
-    ...data,
-  }));
+const fetchStageMedian = (currentGroupPath, currentValueStreamId, stageId, params) =>
+  Api.cycleAnalyticsStageMedian(currentGroupPath, currentValueStreamId, stageId, params).then(
+    ({ data }) => ({
+      id: stageId,
+      ...data,
+    }),
+  );
 
 export const fetchStageMedianValues = ({ dispatch, getters }) => {
-  const { currentGroupPath, cycleAnalyticsRequestParams, activeStages } = getters;
+  const {
+    currentGroupPath,
+    cycleAnalyticsRequestParams,
+    activeStages,
+    currentValueStreamId,
+  } = getters;
   const stageIds = activeStages.map(s => s.slug);
 
   dispatch('requestStageMedianValues');
   return Promise.all(
     stageIds.map(stageId =>
-      fetchStageMedian(currentGroupPath, stageId, cycleAnalyticsRequestParams),
+      fetchStageMedian(
+        currentGroupPath,
+        currentValueStreamId,
+        stageId,
+        cycleAnalyticsRequestParams,
+      ),
     ),
   )
     .then(data => dispatch('receiveStageMedianValuesSuccess', data))
@@ -112,7 +125,6 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 
   return Promise.resolve()
     .then(() => dispatch('fetchValueStreams'))
-    .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
@@ -143,35 +155,19 @@ export const receiveGroupStagesSuccess = ({ commit, dispatch }, stages) => {
   return dispatch('setDefaultSelectedStage');
 };
 
-export const fetchValueStreamStages = ({
-  hasCreateMultipleValueStreams,
-  valueStreamId,
-  groupId,
-  params,
-}) => {
-  return hasCreateMultipleValueStreams
-    ? Api.cycleAnalyticsValueStreamGroupStagesAndEvents(groupId, valueStreamId, params)
-    : Api.cycleAnalyticsGroupStagesAndEvents(groupId, params);
-};
-
-export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
-  const {
-    featureFlags: { hasCreateMultipleValueStreams = false },
-  } = state;
-
+export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
   const {
     currentValueStreamId: valueStreamId,
     currentGroupPath: groupId,
     cycleAnalyticsRequestParams: { created_after, project_ids },
   } = getters;
+
   dispatch('requestGroupStages');
   dispatch('customStages/setStageEvents', []);
 
-  return fetchValueStreamStages({
-    hasCreateMultipleValueStreams,
-    groupId,
-    valueStreamId,
-    params: { start_date: created_after, project_ids },
+  return Api.cycleAnalyticsGroupStagesAndEvents(groupId, valueStreamId, {
+    start_date: created_after,
+    project_ids,
   })
     .then(({ data: { stages = [], events = [] } }) => {
       dispatch('receiveGroupStagesSuccess', stages);
@@ -213,18 +209,16 @@ export const receiveUpdateStageError = (
   return dispatch('customStages/setStageFormErrors', errors);
 };
 
-export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
-  const {
-    selectedGroup: { fullPath },
-  } = state;
+export const updateStage = ({ dispatch, getters }, { id, ...params }) => {
+  const { currentGroupPath, currentValueStreamId } = getters;
 
   dispatch('requestUpdateStage');
   dispatch('customStages/setSavingCustomStage');
 
-  return Api.cycleAnalyticsUpdateStage(id, fullPath, { ...rest })
+  return Api.cycleAnalyticsUpdateStage(currentGroupPath, currentValueStreamId, id, params)
     .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
-    .catch(({ response: { status = 400, data: responseData } = {} }) =>
-      dispatch('receiveUpdateStageError', { status, responseData, data: { id, ...rest } }),
+    .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
+      dispatch('receiveUpdateStageError', { status, responseData, data: { id, ...params } }),
     );
 };
 
@@ -240,14 +234,11 @@ export const receiveRemoveStageError = ({ commit }) => {
   createFlash(__('There was an error removing your custom stage, please try again'));
 };
 
-export const removeStage = ({ dispatch, state }, stageId) => {
-  const {
-    selectedGroup: { fullPath },
-  } = state;
-
+export const removeStage = ({ dispatch, getters }, stageId) => {
+  const { currentGroupPath, currentValueStreamId } = getters;
   dispatch('requestRemoveStage');
 
-  return Api.cycleAnalyticsRemoveStage(stageId, fullPath)
+  return Api.cycleAnalyticsRemoveStage(currentGroupPath, currentValueStreamId, stageId)
     .then(() => dispatch('receiveRemoveStageSuccess'))
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
@@ -289,19 +280,16 @@ export const receiveReorderStageError = ({ commit }) => {
   createFlash(__('There was an error updating the stage order. Please try reloading the page.'));
 };
 
-export const reorderStage = ({ dispatch, state }, initialData) => {
+export const reorderStage = ({ dispatch, getters }, initialData) => {
   dispatch('requestReorderStage');
-
-  const {
-    selectedGroup: { fullPath },
-  } = state;
+  const { currentGroupPath, currentValueStreamId } = getters;
   const { id, moveAfterId, moveBeforeId } = initialData;
 
   const params = moveAfterId ? { move_after_id: moveAfterId } : { move_before_id: moveBeforeId };
 
-  return Api.cycleAnalyticsUpdateStage(id, fullPath, params)
+  return Api.cycleAnalyticsUpdateStage(currentGroupPath, currentValueStreamId, id, params)
     .then(({ data }) => dispatch('receiveReorderStageSuccess', data))
-    .catch(({ response: { status = 400, data: responseData } = {} }) =>
+    .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
       dispatch('receiveReorderStageError', { status, responseData }),
     );
 };
@@ -311,14 +299,11 @@ export const receiveCreateValueStreamSuccess = ({ commit, dispatch }) => {
   return dispatch('fetchValueStreams');
 };
 
-export const createValueStream = ({ commit, dispatch, rootState }, data) => {
-  const {
-    selectedGroup: { fullPath },
-  } = rootState;
-
+export const createValueStream = ({ commit, dispatch, getters }, data) => {
+  const { currentGroupPath } = getters;
   commit(types.REQUEST_CREATE_VALUE_STREAM);
 
-  return Api.cycleAnalyticsCreateValueStream(fullPath, data)
+  return Api.cycleAnalyticsCreateValueStream(currentGroupPath, data)
     .then(() => dispatch('receiveCreateValueStreamSuccess'))
     .catch(({ response } = {}) => {
       const { data: { message, payload: { errors } } = null } = response;
@@ -328,7 +313,10 @@ export const createValueStream = ({ commit, dispatch, rootState }, data) => {
 
 export const setSelectedValueStream = ({ commit, dispatch }, streamId) => {
   commit(types.SET_SELECTED_VALUE_STREAM, streamId);
-  return dispatch('fetchGroupStagesAndEvents');
+  return Promise.resolve()
+    .then(() => dispatch('fetchGroupStagesAndEvents'))
+    .then(() => dispatch('fetchStageMedianValues'))
+    .then(() => dispatch('durationChart/fetchDurationData'));
 };
 
 export const receiveValueStreamsSuccess = ({ commit, dispatch }, data = []) => {
