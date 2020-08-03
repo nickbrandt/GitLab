@@ -4,7 +4,6 @@ import createFlash from '~/flash';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { __, s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
-import { joinPaths } from '~/lib/utils/url_utility';
 import HistoryCommentEditor from './history_comment_editor.vue';
 
 export default {
@@ -43,9 +42,6 @@ export default {
   },
 
   computed: {
-    noteIdUrl() {
-      return joinPaths(this.notesUrl, this.comment.id);
-    },
     commentNote() {
       return this.comment?.note;
     },
@@ -72,7 +68,7 @@ export default {
     getSaveConfig(note) {
       const isUpdatingComment = Boolean(this.comment);
       const method = isUpdatingComment ? 'put' : 'post';
-      const url = isUpdatingComment ? this.noteIdUrl : this.notesUrl;
+      const url = isUpdatingComment ? this.comment.path : this.notesUrl;
       const data = { note: { note } };
       const emitName = isUpdatingComment ? 'onCommentUpdated' : 'onCommentAdded';
 
@@ -105,7 +101,7 @@ export default {
     },
     deleteComment() {
       this.isDeletingComment = true;
-      const deleteUrl = this.noteIdUrl;
+      const deleteUrl = this.comment.path;
 
       axios
         .delete(deleteUrl)
