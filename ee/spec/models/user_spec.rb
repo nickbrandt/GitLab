@@ -1052,9 +1052,9 @@ RSpec.describe User do
 
   describe '#manageable_groups_eligible_for_trial' do
     let_it_be(:user) { create :user }
-    let_it_be(:non_trialed_group_z) { create :group, name: 'Zeta', gitlab_subscription: create(:gitlab_subscription) }
-    let_it_be(:non_trialed_group_a) { create :group, name: 'Alpha', gitlab_subscription: create(:gitlab_subscription) }
-    let_it_be(:trialed_group) { create :group, name: 'Omitted', gitlab_subscription: create(:gitlab_subscription, trial: true) }
+    let_it_be(:non_trialed_group_z) { create :group, name: 'Zeta', gitlab_subscription: create(:gitlab_subscription, :free) }
+    let_it_be(:non_trialed_group_a) { create :group, name: 'Alpha', gitlab_subscription: create(:gitlab_subscription, :free) }
+    let_it_be(:trialed_group) { create :group, name: 'Omitted', gitlab_subscription: create(:gitlab_subscription, :free, trial: true) }
 
     subject { user.manageable_groups_eligible_for_trial }
 

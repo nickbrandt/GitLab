@@ -9,6 +9,7 @@ RSpec.describe 'Creating a DAST Scanner Profile' do
   let(:current_user) { create(:user) }
   let(:full_path) { project.full_path }
   let(:profile_name) { FFaker::Company.catch_phrase }
+  let(:dast_scanner_profile) { DastScannerProfile.find_by(project: project, name: profile_name) }
 
   let(:mutation) do
     graphql_mutation(
@@ -43,7 +44,23 @@ RSpec.describe 'Creating a DAST Scanner Profile' do
       project.add_developer(current_user)
     end
 
-    it_behaves_like 'a mutation that returns errors in the response', errors: ['Not implemented']
+    it 'returns the dast_scanner_profile id' do
+      post_graphql_mutation(mutation, current_user: current_user)
+
+      expect(mutation_response["id"]).to eq(dast_scanner_profile.to_global_id.to_s)
+    end
+
+    context 'when dast_scanner_profile exists' do
+      before do
+        DastScannerProfile.create!(project: project, name: profile_name)
+      end
+
+      it 'returns errors' do
+        post_graphql_mutation(mutation, current_user: current_user)
+
+        expect(mutation_response["errors"]).to include('Name has already been taken')
+      end
+    end
 
     context 'when on demand scan feature is disabled' do
       before do

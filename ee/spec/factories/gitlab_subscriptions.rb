@@ -9,6 +9,21 @@ FactoryBot.define do
     end_date { Date.today.advance(years: 1) }
     trial { false }
 
+    trait :expired do
+      start_date { Date.today.advance(years: -1, months: -1) }
+      end_date { Date.today.advance(months: -1) }
+    end
+
+    trait :active_trial do
+      trial { true }
+      trial_ends_on { Date.today.advance(months: 1) }
+    end
+
+    trait :expired_trial do
+      trial { true }
+      trial_ends_on { Date.today.advance(days: -1) }
+    end
+
     trait :free do
       hosted_plan_id { nil }
     end

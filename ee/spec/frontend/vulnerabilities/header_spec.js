@@ -298,7 +298,7 @@ describe('Vulnerability Header', () => {
   });
 
   describe('state badge', () => {
-    test.each(vulnerabilityStateEntries)(
+    it.each(vulnerabilityStateEntries)(
       'the vulnerability state badge has the correct style for the %s state',
       (state, stateObject) => {
         createWrapper({ state });

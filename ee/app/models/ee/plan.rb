@@ -16,6 +16,7 @@ module EE
       PAID_HOSTED_PLANS = [BRONZE, SILVER, GOLD].freeze
       FREE_HOSTED_PLANS = [EARLY_ADOPTER].freeze
       EE_ALL_PLANS = (EE_DEFAULT_PLANS + PAID_HOSTED_PLANS + FREE_HOSTED_PLANS).freeze
+      PLANS_ELIGIBLE_FOR_TRIAL = [FREE, *FREE_HOSTED_PLANS].freeze
 
       # This constant must keep ordered by tier.
       ALL_HOSTED_PLANS = (PAID_HOSTED_PLANS + FREE_HOSTED_PLANS).freeze
