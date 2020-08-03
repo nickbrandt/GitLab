@@ -57,7 +57,7 @@ export default {
     :action-secondary="downloadButton"
   >
     <!-- heading -->
-    <div class="row gl-text-gray-600">
+    <div class="row gl-text-gray-400">
       <div class="col-1">{{ __('Method') }}</div>
       <div class="col-11">{{ __('URL') }}</div>
     </div>
