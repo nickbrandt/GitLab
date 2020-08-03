@@ -1,36 +1,3 @@
-export const mockDeployFreezePayload = {
-  freeze_start: '0 12 * * 1-5',
-  freeze_end: '0 12 * * 6',
-  cron_timezone: 'Etc/UTC',
-};
-
-export const mockFreezePeriods = [
-  {
-    id: 3,
-    freeze_start: '5 4 * * *',
-    freeze_end: '5 9 * 8 *',
-    cron_timezone: 'America/New_York',
-    created_at: '2020-07-10T05:10:35.122Z',
-    updated_at: '2020-07-10T05:10:35.122Z',
-  },
-  {
-    id: 8,
-    freeze_start: '0 12 * * 1-5',
-    freeze_end: '0 1 5 * *',
-    cron_timezone: 'Etc/UTC',
-    created_at: '2020-07-10T19:27:57.378Z',
-    updated_at: '2020-07-10T19:27:57.378Z',
-  },
-  {
-    id: 9,
-    freeze_start: '0 12 * * 1-5',
-    freeze_end: '0 16 * * 6',
-    cron_timezone: 'Europe/Berlin',
-    created_at: '2020-07-10T19:29:15.240Z',
-    updated_at: '2020-07-10T19:29:15.240Z',
-  },
-];
-
 export const mockTimezoneData = [
   { name: 'International Date Line West', offset: -43200, identifier: 'Etc/GMT+12' },
   { name: 'American Samoa', offset: -39600, identifier: 'Pacific/Pago_Pago' },
