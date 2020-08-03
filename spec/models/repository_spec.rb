@@ -1953,7 +1953,8 @@ RSpec.describe Repository do
         :issue_template_names,
         :merge_request_template_names,
         :user_defined_metrics_dashboard_paths,
-        :xcode_project?
+        :xcode_project?,
+        :has_ambiguous_refs?
       ])
 
       repository.after_change_head
