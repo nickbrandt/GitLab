@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlAvatarLink } from '@gitlab/ui';
 
-import Approvers from 'ee/compliance_dashboard/components/approvers.vue';
+import Approvers from 'ee/compliance_dashboard/components/merge_requests/approvers.vue';
 import { PRESENTABLE_APPROVERS_LIMIT } from 'ee/compliance_dashboard/constants';
-import { createApprovers } from '../mock_data';
+import { createApprovers } from '../../mock_data';
 
 describe('MergeRequest component', () => {
   let wrapper;

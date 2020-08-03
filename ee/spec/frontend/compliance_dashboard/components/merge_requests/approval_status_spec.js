@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlLink } from '@gitlab/ui';
 
-import ApprovalStatus from 'ee/compliance_dashboard/components/approval_status.vue';
+import ApprovalStatus from 'ee/compliance_dashboard/components/merge_requests/approval_status.vue';
 
 describe('ApprovalStatus component', () => {
   let wrapper;
