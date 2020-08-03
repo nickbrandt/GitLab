@@ -10,11 +10,12 @@ export default () => {
   }
 
   const {
-    dataset: { newDastSiteProfilePath },
+    dataset: { newDastSiteProfilePath, projectFullPath },
   } = el;
 
   const props = {
     newDastSiteProfilePath,
+    projectFullPath,
   };
 
   return new Vue({
