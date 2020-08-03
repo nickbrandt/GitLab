@@ -31,7 +31,10 @@ describe('CommaSeparatedListTokenSelector', () => {
 
   const findTokenSelectorDropdown = () => findTokenSelector().find('[role="menu"]');
 
-  const findErrorMessage = () => findTokenSelector().find('[role="menuitem"][disabled="disabled"]');
+  const findErrorMessageText = () =>
+    findTokenSelector()
+      .find('[role="menuitem"][disabled="disabled"]')
+      .text();
 
   const setTokenSelectorInputValue = value => {
     const tokenSelectorInput = findTokenSelectorInput();
@@ -152,7 +155,7 @@ describe('CommaSeparatedListTokenSelector', () => {
 
         tokenSelectorTriggerEnter();
 
-        expect(findErrorMessage().text()).toBe('The value entered is invalid');
+        expect(findErrorMessageText()).toBe('The value entered is invalid');
       });
     });
 
@@ -169,7 +172,7 @@ describe('CommaSeparatedListTokenSelector', () => {
 
         tokenSelectorTriggerEnter();
 
-        expect(findErrorMessage().text()).toBe('The value entered is not allowed');
+        expect(findErrorMessageText()).toBe('The value entered is not allowed');
       });
     });
 
@@ -188,7 +191,7 @@ describe('CommaSeparatedListTokenSelector', () => {
 
         tokenSelectorTriggerEnter();
 
-        expect(findErrorMessage().text()).toBe('The value entered is invalid');
+        expect(findErrorMessageText()).toBe('The value entered is invalid');
       });
 
       it('displays `disallowedValueErrorMessage` if regex passes but value is in the disallowed list', async () => {
@@ -205,7 +208,7 @@ describe('CommaSeparatedListTokenSelector', () => {
 
         tokenSelectorTriggerEnter();
 
-        expect(findErrorMessage().text()).toBe('The value entered is not allowed');
+        expect(findErrorMessageText()).toBe('The value entered is not allowed');
       });
     });
   });
@@ -267,7 +270,7 @@ describe('CommaSeparatedListTokenSelector', () => {
 
       tokenSelectorTriggerEnter();
 
-      expect(findErrorMessage().text()).toBe('The value entered is invalid');
+      expect(findErrorMessageText()).toBe('The value entered is invalid');
 
       await setTokenSelectorInputValue('foo bar');
 
