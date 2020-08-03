@@ -13,8 +13,6 @@ RSpec.describe Gitlab::Geo::GeoNodeStatusCheck do
   describe '#replication_verification_complete?' do
     before do
       allow(Gitlab.config.geo.registry_replication).to receive(:enabled).and_return(true)
-
-      stub_feature_flags(geo_vulnerability_export_replication: false)
     end
 
     it 'prints messages for all verification checks' do

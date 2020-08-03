@@ -84,7 +84,6 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
       create(:design, project: project)
       upload = create(:upload)
       package_file = create(:conan_package_file, :conan_package)
-      vulnerability_export = create(:vulnerability_export, :with_csv_file)
       container_repository = create(:container_repository, project: project)
 
       expect(Geo::LfsObjectRegistry.where(lfs_object_id: lfs_object.id).count).to eq(0)
@@ -93,7 +92,6 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
       expect(Geo::DesignRegistry.where(project_id: project.id).count).to eq(0)
       expect(Geo::UploadRegistry.where(file_id: upload.id).count).to eq(0)
       expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(0)
-      expect(Geo::VulnerabilityExportRegistry.where(vulnerability_export_id: vulnerability_export.id).count).to eq(0)
       expect(Geo::ContainerRepositoryRegistry.where(container_repository_id: container_repository.id).count).to eq(0)
 
       subject.perform
@@ -104,7 +102,6 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
       expect(Geo::DesignRegistry.where(project_id: project.id).count).to eq(1)
       expect(Geo::UploadRegistry.where(file_id: upload.id).count).to eq(1)
       expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(1)
-      expect(Geo::VulnerabilityExportRegistry.where(vulnerability_export_id: vulnerability_export.id).count).to eq(1)
       expect(Geo::ContainerRepositoryRegistry.where(container_repository_id: container_repository.id).count).to eq(1)
     end
 
