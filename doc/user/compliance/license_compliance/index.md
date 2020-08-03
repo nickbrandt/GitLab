@@ -677,7 +677,11 @@ in your project's sidebar, and you'll see the licenses displayed, where:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22465) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
 
-Policies allow you to specify licenses that are `allowed` or `denied` in a project. If a `denied` license is newly committed it will disallow a merge request and instruct the developer to remove it. Note, the merge request will not be able to be merged until the `denied` license is removed. You may add a [`License-Check` approval rule](#enabling-license-approvals-within-a-project), which enables a designated approver that can approve a merge request with `denied` license.
+Policies allow you to specify licenses that are `allowed` or `denied` in a project. If a `denied`
+license is newly committed it will disallow a merge request and instruct the developer to remove it.
+Note, the merge request will not be able to be merged until the `denied` license is removed.
+You may add a [`License-Check` approval rule](#enabling-license-approvals-within-a-project),
+which enables a designated approver that can approve and then merge a merge request with `denied` license.
 
 ![Merge Request with denied licenses](img/denied_licenses_v13_3.png)
 
