@@ -12,16 +12,16 @@ module QA
         end
       end
 
-      let(:project_with_tag) do
+      let(:project_with_success_run) do
         Resource::Project.fabricate_via_api! do |project|
-          project.name = 'project-with-tag'
+          project.name = 'project-with-success-run'
           project.group = group
         end
       end
 
-      let(:project_without_tag) do
+      let(:project_with_pending_run) do
         Resource::Project.fabricate_via_api! do |project|
-          project.name = 'project-without-tag'
+          project.name = 'project-with-pending-run'
           project.group = group
         end
       end
@@ -50,6 +50,7 @@ module QA
 
       after do
         runner.remove_via_api!
+        remove_projects
       end
 
       it 'has many pipelines with appropriate statuses' do
@@ -57,25 +58,28 @@ module QA
 
         EE::Page::OperationsDashboard.perform do |operation|
           {
-            'project-with-tag' => 'passed',
+            'project-with-success-run' => 'passed',
             'project-with-failed-run' => 'failed',
-            'project-without-tag' => 'pending',
+            'project-with-pending-run' => 'pending',
             'project-without-ci' => nil
           }.each do |project_name, status|
-            project = operation.find_project_card_by_name(project_name)
+            pipeline_status = nil
 
-            if project_name == 'project-without-ci'
-              expect(project).to have_content('The branch for this project has no active pipeline configuration.')
-              next
+            Support::Waiter.wait_until(sleep_interval: 3, reload_page: operation) do
+              project = operation.find_project_card_by_name(project_name)
+
+              if project_name == 'project-without-ci'
+                expect(project).to have_content('The branch for this project has no active pipeline configuration.')
+                break
+              end
+
+              pipeline_status = operation.pipeline_status(project)
+              pipeline_status != 'running'
             end
 
-            # Since `Support::Waiter.wait_until` would raise a `WaitExceededError` exception if the pipeline status
-            # isn't the one we expect after 60 seconds, we don't need an explicit expectation.
-            Support::Waiter.wait_until { operation.pipeline_status(project) == status }
+            expect(pipeline_status).to eq(status)
           end
         end
-
-        remove_projects
       end
 
       private
@@ -89,13 +93,13 @@ module QA
       end
 
       def setup_projects
-        commit_ci_file(project_with_tag, ci_file_with_tag)
-        commit_ci_file(project_without_tag, ci_file_without_tag)
+        commit_ci_file(project_with_success_run, ci_file_with_tag)
+        commit_ci_file(project_with_pending_run, ci_file_without_existing_tag)
         commit_ci_file(project_with_failed_run, ci_file_failed_run)
       end
 
       def add_projects_to_board
-        [project_with_tag, project_without_tag, project_without_ci, project_with_failed_run].each do |project|
+        [project_with_success_run, project_with_pending_run, project_without_ci, project_with_failed_run].each do |project|
           EE::Page::OperationsDashboard.perform do |operation|
             operation.add_project(project.name)
 
@@ -107,7 +111,6 @@ module QA
       def remove_projects
         EE::Page::OperationsDashboard.perform do |operation|
           operation.remove_all_projects
-          expect(operation).not_to have_project_card
         end
       end
 
@@ -122,11 +125,12 @@ module QA
         }
       end
 
-      def ci_file_without_tag
+      def ci_file_without_existing_tag
         {
             file_path: '.gitlab-ci.yml',
             content: <<~YAML
               test-pending:
+                tags: ['does-not-exist']
                 script: echo 'OK'
             YAML
         }
