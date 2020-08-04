@@ -29,8 +29,6 @@ RSpec.describe 'geo rake tasks', :geo do
 
   it 'Gitlab::Geo::GeoTasks responds to all methods used in Geo rake tasks' do
     %i[
-      foreign_server_configured?
-      refresh_foreign_tables!
       set_primary_geo_node
       update_primary_geo_node_url
     ].each do |method|
@@ -112,15 +110,6 @@ RSpec.describe 'geo rake tasks', :geo do
       expect(Gitlab::Geo::DatabaseTasks).to receive(:load_seed)
 
       run_rake_task('geo:db:seed')
-    end
-  end
-
-  describe 'geo:db:refresh_foreign_tables' do
-    it 'refreshes foreign tables definition on secondary node' do
-      allow(Gitlab::Geo::GeoTasks).to receive(:foreign_server_configured?).and_return(true)
-      expect(Gitlab::Geo::GeoTasks).to receive(:refresh_foreign_tables!)
-
-      run_rake_task('geo:db:refresh_foreign_tables')
     end
   end
 
@@ -228,15 +217,6 @@ RSpec.describe 'geo rake tasks', :geo do
       expect(Gitlab::Geo::DatabaseTasks::Test).to receive(:purge)
 
       run_rake_task('geo:db:test:purge')
-    end
-  end
-
-  describe 'geo:db:test:refresh_foreign_tables' do
-    it 'refreshes foreign tables definitions in test environment' do
-      allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:env)
-      expect(Rake::Task['geo:db:refresh_foreign_tables']).to receive(:invoke)
-
-      run_rake_task('geo:db:test:refresh_foreign_tables')
     end
   end
 

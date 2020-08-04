@@ -50,18 +50,6 @@ namespace :geo do
       Gitlab::Geo::DatabaseTasks.load_seed
     end
 
-    desc 'GitLab | Geo | DB | Refresh Foreign Tables definition in Geo Secondary node'
-    task refresh_foreign_tables: [:environment] do
-      if Gitlab::Geo::GeoTasks.foreign_server_configured?
-        print "\nRefreshing foreign tables for FDW: #{Gitlab::Geo::Fdw::FOREIGN_SCHEMA} ... "
-        Gitlab::Geo::GeoTasks.refresh_foreign_tables!
-        puts 'Done!'
-      else
-        puts "Error: Cannot refresh foreign tables, there is no foreign server configured."
-        exit 1
-      end
-    end
-
     # IMPORTANT: This task won't dump the schema if ActiveRecord::Base.dump_schema_after_migration is set to false
     task _dump: [:environment] do
       if Gitlab::Geo::DatabaseTasks.dump_schema_after_migration?
