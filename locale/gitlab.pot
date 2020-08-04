@@ -11995,6 +11995,12 @@ msgstr ""
 msgid "GroupSettings|Please choose a group URL with no special characters."
 msgstr ""
 
+msgid "GroupSettings|Prevent forking outside of the group"
+msgstr ""
+
+msgid "GroupSettings|Prevent forking setting was not saved"
+msgstr ""
+
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
 msgstr ""
 
@@ -12029,6 +12035,9 @@ msgid "GroupSettings|This setting will override user notification preferences fo
 msgstr ""
 
 msgid "GroupSettings|This setting will prevent group members from being notified if the group is mentioned."
+msgstr ""
+
+msgid "GroupSettings|This setting will prevent group members from forking projects outside of the group."
 msgstr ""
 
 msgid "GroupSettings|Transfer group"
@@ -17888,6 +17897,9 @@ msgid "Prevent approval of merge requests by merge request committers"
 msgstr ""
 
 msgid "Prevent environment from auto-stopping"
+msgstr ""
+
+msgid "Prevent project forking outside current group"
 msgstr ""
 
 msgid "Prevent users from changing their profile name"

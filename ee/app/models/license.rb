@@ -79,6 +79,7 @@ class License < ApplicationRecord
     github_project_service_integration
     group_allowed_email_domains
     group_coverage_reports
+    group_forking_protection
     group_ip_restriction
     group_merge_request_analytics
     group_project_templates

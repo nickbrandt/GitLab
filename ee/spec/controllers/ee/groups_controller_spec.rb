@@ -537,5 +537,44 @@ RSpec.describe GroupsController do
         end
       end
     end
+
+    context 'when `prevent_forking_outside_group` is specified' do
+      using RSpec::Parameterized::TableSyntax
+
+      subject { put :update, params: params }
+
+      shared_examples_for 'updates the attribute if needed' do
+        it 'updates the attribute' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:found)
+          expect(group.reload.prevent_forking_outside_group?).to eq(result)
+        end
+      end
+
+      context 'authenticated as group owner' do
+        where(:feature_enabled, :prevent_forking_outside_group, :result) do
+          false | false | nil
+          false | true  | nil
+          true  | false | false
+          true  | true  | true
+        end
+
+        with_them do
+          let(:params) do
+            { id: group.to_param, group: { prevent_forking_outside_group: prevent_forking_outside_group } }
+          end
+
+          before do
+            group.add_owner(user)
+            sign_in(user)
+
+            stub_licensed_features(group_forking_protection: feature_enabled)
+          end
+
+          it_behaves_like 'updates the attribute if needed'
+        end
+      end
+    end
   end
 end
