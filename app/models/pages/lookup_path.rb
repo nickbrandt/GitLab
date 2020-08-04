@@ -22,10 +22,11 @@ module Pages
     end
 
     def source
-      {
-        type: 'file',
-        path: File.join(project.full_path, 'public/')
-      }
+      if artifacts_archive
+        zip_sourse
+      else
+        legacy_file_source
+      end
     end
 
     def prefix
@@ -39,5 +40,27 @@ module Pages
     private
 
     attr_reader :project, :trim_prefix, :domain
+
+    def artifacts_archive
+      @artifacts_archive ||=
+        begin
+          build = project.builds.where(name: 'pages', status: 'success').last
+          build.artifacts_file_for_type(:archive)
+        end
+    end
+
+    def zip_sourse
+      {
+        type: 'zip',
+        path: artifacts_archive.url
+      }
+    end
+
+    def legacy_file_source
+      {
+        type: 'file',
+        path: File.join(project.full_path, 'public/')
+      }
+    end
   end
 end
