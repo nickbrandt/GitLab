@@ -55,7 +55,7 @@ module Gitlab
             scanner = create_scanner(report, data['scanner'] || mutate_scanner_tool(data['tool']))
             identifiers = create_identifiers(report, data['identifiers'])
             report.add_finding(
-              ::Gitlab::Ci::Reports::Security::Occurrence.new(
+              ::Gitlab::Ci::Reports::Security::Finding.new(
                 uuid: SecureRandom.uuid,
                 report_type: report.type,
                 name: data['message'],
