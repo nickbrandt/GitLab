@@ -75,7 +75,7 @@ describe('EE ProtectedBranchEdit', () => {
         }));
     });
 
-    describe('when clikced and BE error', () => {
+    describe('when clicked and BE error', () => {
       beforeEach(() => {
         mock.onPatch(TEST_URL).replyOnce(500);
         toggle.click();
