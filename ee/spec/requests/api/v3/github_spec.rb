@@ -46,6 +46,7 @@ RSpec.describe API::V3::Github do
       let(:merge_request) do
         create(:merge_request, source_project: project, target_project: project)
       end
+
       let!(:note) do
         create(:note, project: project, noteable: merge_request)
       end
@@ -203,6 +204,7 @@ RSpec.describe API::V3::Github do
     let!(:merge_request) do
       create(:merge_request, source_project: project, target_project: project, author: user, assignees: [assignee])
     end
+
     let!(:merge_request_2) do
       create(:merge_request, source_project: project2, target_project: project2, author: user, assignees: [assignee, assignee2])
     end

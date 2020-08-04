@@ -635,6 +635,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
         FILE
       end
+
       let(:file_name) { 'elastic_specialchars_test.md' }
 
       before do

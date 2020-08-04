@@ -18,6 +18,7 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
         namespace: namespace
       ).message
     end
+
     let(:grace_period_effective_from) { expired_date - 35.days }
     let(:today) { Time.utc(2020, 3, 7, 10) }
     let(:expired_date) { Time.utc(2020, 3, 9, 10).to_date }

@@ -171,6 +171,7 @@ RSpec.describe Epics::UpdateService do
             author: user,
             user: user)
         end
+
         let!(:todo2) do
           create(:todo, :mentioned, :pending,
             target: epic,

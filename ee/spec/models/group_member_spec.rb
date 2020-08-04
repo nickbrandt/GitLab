@@ -129,9 +129,11 @@ RSpec.describe GroupMember do
           create(:group_saml_identity, saml_provider: saml_provider, user: m.user)
         end
       end
+
       let!(:member_without_identity) do
         create(:group_member, group: group)
       end
+
       let!(:member_with_different_identity) do
         create(:group_member, group: group).tap do |m|
           create(:group_saml_identity, user: m.user)

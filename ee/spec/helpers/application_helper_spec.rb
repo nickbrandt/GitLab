@@ -162,6 +162,7 @@ RSpec.describe ApplicationHelper do
       let(:expected_partial_path) do
         "app/views/#{File.dirname(partial)}/_#{File.basename(partial)}.html.haml"
       end
+
       let(:expected_view_path) do
         "app/views/#{File.dirname(view)}/#{File.basename(view)}.html.haml"
       end

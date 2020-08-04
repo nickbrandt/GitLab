@@ -179,6 +179,7 @@ RSpec.describe API::Settings, 'EE Settings' do
         prevent_merge_requests_committers_approval: true
       }
     end
+
     let(:feature) { :admin_merge_request_approvers_rules }
 
     it_behaves_like 'settings for licensed features'
@@ -202,6 +203,7 @@ RSpec.describe API::Settings, 'EE Settings' do
         maintenance_mode_message: 'GitLab is in maintenance'
       }
     end
+
     let(:feature) { :geo }
 
     it_behaves_like 'settings for licensed features'

@@ -82,6 +82,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
         identifiers: [create(:ci_reports_security_identifier)]
       )
     end
+
     let(:other_report) do
       create(
         :ci_reports_security_report,

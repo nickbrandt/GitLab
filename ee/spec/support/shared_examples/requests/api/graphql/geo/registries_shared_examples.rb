@@ -28,6 +28,7 @@ RSpec.shared_examples 'gets registries for' do |args|
       }
     QUERY
   end
+
   let(:current_user) { create(:user, :admin) }
 
   before do
