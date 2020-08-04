@@ -31,10 +31,10 @@ RSpec.describe 'Freeze Periods (JavaScript fixtures)' do
     end
   end
 
-  describe Ci::PipelineSchedulesHelper, '(JavaScript fixtures)', type: :controler  do
+  describe Ci::PipelineSchedulesHelper, '(JavaScript fixtures)' do
     let(:response) { timezone_data.to_json }
+
     it 'api/freeze-periods/timezone_data.json' do
-      
     end
   end
 end
