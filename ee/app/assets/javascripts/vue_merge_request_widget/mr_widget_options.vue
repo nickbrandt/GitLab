@@ -255,6 +255,9 @@ export default {
       :pipeline-path="mr.mergeRequestAddCiConfigPath"
       :pipeline-svg-path="mr.pipelinesEmptySvgPath"
       :human-access="mr.humanAccess.toLowerCase()"
+      :user-callouts-path="mr.userCalloutsPath"
+      :user-callout-feature-id="mr.suggestPipelineFeatureId"
+      @dismiss="dismissSuggestPipelines"
     />
     <mr-widget-pipeline-container
       v-if="shouldRenderPipelines"
