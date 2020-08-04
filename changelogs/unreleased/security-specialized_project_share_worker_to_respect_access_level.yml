@@ -1,0 +1,5 @@
+---
+title: Prevent a temporary access escalation before group memberships are recalculated when specialized project share workers are enabled
+merge_request:
+author:
+type: security
