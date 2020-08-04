@@ -3,10 +3,12 @@ import { isNumber } from 'lodash';
 import httpStatus from '~/lib/utils/http_status';
 import { dateFormats } from '../../shared/constants';
 import { transformStagesForPathNavigation } from '../utils';
+import { DEFAULT_VALUE_STREAM_ID } from '../constants';
 
 export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDEN;
 
-export const currentValueStreamId = ({ selectedValueStream }) => selectedValueStream?.id || null;
+export const currentValueStreamId = ({ selectedValueStream }) =>
+  selectedValueStream?.id || DEFAULT_VALUE_STREAM_ID;
 
 export const currentGroupPath = ({ selectedGroup }) =>
   selectedGroup && selectedGroup.fullPath ? selectedGroup.fullPath : null;

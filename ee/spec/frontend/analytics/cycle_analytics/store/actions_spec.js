@@ -97,11 +97,7 @@ describe('Cycle analytics actions', () => {
         vs,
         { ...state, selectedValueStream: {} },
         [{ type: types.SET_SELECTED_VALUE_STREAM, payload: vs }],
-        [
-          { type: 'fetchGroupStagesAndEvents' },
-          { type: 'fetchStageMedianValues' },
-          { type: 'durationChart/fetchDurationData' },
-        ],
+        [{ type: 'fetchValueStreamData' }],
       );
     });
   });
@@ -1035,13 +1031,37 @@ describe('Cycle analytics actions', () => {
       });
 
       it(`will dispatch the 'fetchGroupStagesAndEvents' request`, () =>
-        testAction(
-          actions.fetchValueStreams,
-          null,
-          state,
-          [],
-          [{ type: 'fetchGroupStagesAndEvents' }],
-        ));
+        testAction(actions.fetchValueStreams, null, state, [], [{ type: 'fetchValueStreamData' }]));
+    });
+  });
+
+  describe('fetchValueStreamData', () => {
+    beforeEach(() => {
+      state = {
+        ...state,
+        stages: [{ slug: selectedStageSlug }],
+        selectedGroup,
+        featureFlags: {
+          ...state.featureFlags,
+          hasCreateMultipleValueStreams: true,
+        },
+      };
+      mock = new MockAdapter(axios);
+      mock.onGet(endpoints.valueStreamData).reply(httpStatusCodes.OK, { stages: [], events: [] });
+    });
+
+    it('dispatches fetchGroupStagesAndEvents, fetchStageMedianValues and durationChart/fetchDurationData', () => {
+      return testAction(
+        actions.fetchValueStreamData,
+        null,
+        state,
+        [],
+        [
+          { type: 'fetchGroupStagesAndEvents' },
+          { type: 'fetchStageMedianValues' },
+          { type: 'durationChart/fetchDurationData' },
+        ],
+      );
     });
   });
 });
