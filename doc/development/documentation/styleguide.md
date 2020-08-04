@@ -13,6 +13,8 @@ For programmatic help adhering to the guidelines, see [Testing](index.md#testing
 See the GitLab handbook for further [writing style guidelines](https://about.gitlab.com/handbook/communication/#writing-style-guidelines)
 that apply to all GitLab content, not just documentation.
 
+View [a list of recent style guide updates](https://gitlab.com/dashboard/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&label_name[]=tw-style&not[label_name][]=docs%3A%3Afix).
+
 ## Documentation is the single source of truth (SSOT)
 
 ### Why a single source of truth
