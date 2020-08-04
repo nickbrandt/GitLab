@@ -11,6 +11,7 @@ module QA
           project_push.commit_message = 'Add README.md'
         end
       end
+
       let(:source_project_uri) { source.project.repository_ssh_location.uri }
       let(:target_project) do
         Resource::Project.fabricate_via_api! do |project|

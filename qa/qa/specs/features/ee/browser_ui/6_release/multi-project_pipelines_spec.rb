@@ -12,11 +12,13 @@ module QA
           project.name = upstream_project_name
         end
       end
+
       let(:downstream_project) do
         Resource::Project.fabricate_via_api! do |project|
           project.name = downstream_project_name
         end
       end
+
       let!(:runner) do
         Resource::Runner.fabricate_via_api! do |runner|
           runner.project = upstream_project

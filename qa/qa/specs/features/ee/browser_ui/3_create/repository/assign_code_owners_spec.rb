@@ -13,6 +13,7 @@ module QA
           project.initialize_with_readme = true
         end
       end
+
       let(:branch_name) { 'protected-branch' }
 
       before do
