@@ -14,8 +14,6 @@ RSpec.describe Namespace::RootStorageSize, type: :model do
 
   before do
     create_statistics
-
-    stub_application_setting(namespace_storage_size_limit: limit)
   end
 
   describe '#above_size_limit?' do

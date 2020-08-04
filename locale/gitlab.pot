@@ -3083,6 +3083,9 @@ msgstr ""
 msgid "Archiving the project will make it entirely read only. It is hidden from the dashboard and doesn't show up in searches. %{strong_start}The repository cannot be committed to, and no issues, comments, or other entities can be created.%{strong_end}"
 msgstr ""
 
+msgid "Are you ABSOLUTELY SURE you wish to delete this project?"
+msgstr ""
+
 msgid "Are you setting up GitLab for a company?"
 msgstr ""
 
@@ -4243,6 +4246,9 @@ msgid "Cancel running"
 msgstr ""
 
 msgid "Cancel this job"
+msgstr ""
+
+msgid "Cancel, keep project"
 msgstr ""
 
 msgid "Canceled deployment to"
@@ -7283,6 +7289,9 @@ msgstr ""
 msgid "Customer Portal"
 msgstr ""
 
+msgid "Customizable by an administrator."
+msgstr ""
+
 msgid "Customize colors"
 msgstr ""
 
@@ -7730,6 +7739,9 @@ msgid "Delete pipeline"
 msgstr ""
 
 msgid "Delete project"
+msgstr ""
+
+msgid "Delete project. Are you ABSOLUTELY SURE?"
 msgstr ""
 
 msgid "Delete serverless domain?"
@@ -10327,6 +10339,9 @@ msgstr ""
 msgid "FeatureFlags|New feature flag"
 msgstr ""
 
+msgid "FeatureFlags|New list"
+msgstr ""
+
 msgid "FeatureFlags|Percent rollout (logged in users)"
 msgstr ""
 
@@ -12010,6 +12025,12 @@ msgstr ""
 msgid "GroupSettings|Please choose a group URL with no special characters."
 msgstr ""
 
+msgid "GroupSettings|Prevent forking outside of the group"
+msgstr ""
+
+msgid "GroupSettings|Prevent forking setting was not saved"
+msgstr ""
+
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
 msgstr ""
 
@@ -12044,6 +12065,9 @@ msgid "GroupSettings|This setting will override user notification preferences fo
 msgstr ""
 
 msgid "GroupSettings|This setting will prevent group members from being notified if the group is mentioned."
+msgstr ""
+
+msgid "GroupSettings|This setting will prevent group members from forking projects outside of the group."
 msgstr ""
 
 msgid "GroupSettings|Transfer group"
@@ -12807,9 +12831,6 @@ msgid "Includes an MVC structure, Gemfile, Rakefile, along with many others, to 
 msgstr ""
 
 msgid "Includes an MVC structure, mvnw and pom.xml to help you get started."
-msgstr ""
-
-msgid "Includes repository storage, wiki storage, LFS objects, build artifacts and packages. 0 for unlimited."
 msgstr ""
 
 msgid "Incoming email"
@@ -14625,9 +14646,6 @@ msgid "Maximum length 100 characters"
 msgstr ""
 
 msgid "Maximum lifetime allowable for Personal Access Tokens is active, your expire date must be set before %{maximum_allowable_date}."
-msgstr ""
-
-msgid "Maximum namespace storage (MB)"
 msgstr ""
 
 msgid "Maximum number of %{name} (%{count}) exceeded"
@@ -16550,6 +16568,12 @@ msgstr ""
 msgid "OnDemandScans|Target URL"
 msgstr ""
 
+msgid "Once a project is permanently deleted it %{strongStart}cannot be recovered%{strongEnd}. Permanently deleting this project will %{strongStart}immediately delete%{strongEnd} its respositories and %{strongStart}all related resources%{strongEnd} including issues, merge requests etc."
+msgstr ""
+
+msgid "Once a project is permanently deleted it cannot be recovered. You will lose this project's repository and all content: issues, merge requests etc."
+msgstr ""
+
 msgid "Once imported, repositories can be mirrored over SSH. Read more %{link_start}here%{link_end}."
 msgstr ""
 
@@ -17776,6 +17800,9 @@ msgstr ""
 msgid "Please type %{phrase_code} to proceed or close this modal to cancel."
 msgstr ""
 
+msgid "Please type the following to confirm:"
+msgstr ""
+
 msgid "Please use this form to report to the admin users who create spam issues, comments or behave inappropriately."
 msgstr ""
 
@@ -17915,6 +17942,9 @@ msgid "Prevent approval of merge requests by merge request committers"
 msgstr ""
 
 msgid "Prevent environment from auto-stopping"
+msgstr ""
+
+msgid "Prevent project forking outside current group"
 msgstr ""
 
 msgid "Prevent users from changing their profile name"
@@ -18994,6 +19024,12 @@ msgstr ""
 msgid "Projects to index"
 msgstr ""
 
+msgid "Projects will be permanently deleted after a 7-day waiting period."
+msgstr ""
+
+msgid "Projects will be permanently deleted immediately."
+msgstr ""
+
 msgid "Projects with critical vulnerabilities"
 msgstr ""
 
@@ -19678,6 +19714,9 @@ msgstr ""
 msgid "Recover hidden stage"
 msgstr ""
 
+msgid "Recovering projects"
+msgstr ""
+
 msgid "Recovery Codes"
 msgstr ""
 
@@ -20070,12 +20109,6 @@ msgid "Removes the due date."
 msgstr ""
 
 msgid "Removes time estimate."
-msgstr ""
-
-msgid "Removing a project deletes it immediately, there will be no delay before the project is permanently removed."
-msgstr ""
-
-msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed."
 msgstr ""
 
 msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed. Are you ABSOLUTELY sure?"
@@ -24395,6 +24428,15 @@ msgstr ""
 msgid "This action can lead to data loss. To prevent accidental actions we ask you to confirm your intention."
 msgstr ""
 
+msgid "This action cannot be undone. You will lose the project's respository and all conent: issues, merge requests, etc."
+msgstr ""
+
+msgid "This action will %{strongOpen}permanently delete%{strongClose} %{codeOpen}%{project}%{codeClose} %{strongOpen}immediately%{strongClose}, including its repositories and all content: issues, merge requests, etc."
+msgstr ""
+
+msgid "This action will %{strongOpen}permanently delete%{strongClose} %{codeOpen}%{project}%{codeClose} %{strongOpen}on %{date}%{strongClose}, including its repositories and all content: issues, merge requests, etc."
+msgstr ""
+
 msgid "This also resolves all related threads"
 msgstr ""
 
@@ -25854,9 +25896,6 @@ msgstr ""
 msgid "Until"
 msgstr ""
 
-msgid "Until that time, the project can be restored."
-msgstr ""
-
 msgid "Unverified"
 msgstr ""
 
@@ -26184,9 +26223,6 @@ msgstr ""
 msgid "User List"
 msgstr ""
 
-msgid "User Lists can only be created and modified with %{linkStart}the API%{linkEnd}"
-msgstr ""
-
 msgid "User OAuth applications"
 msgstr ""
 
@@ -26254,6 +26290,9 @@ msgid "UserLists|Create"
 msgstr ""
 
 msgid "UserLists|Define a set of users to be used within feature flag strategies"
+msgstr ""
+
+msgid "UserLists|Edit"
 msgstr ""
 
 msgid "UserLists|Edit %{name}"
@@ -27318,6 +27357,9 @@ msgstr ""
 msgid "Yes, close issue"
 msgstr ""
 
+msgid "Yes, delete project"
+msgstr ""
+
 msgid "Yes, let me map Google Code users to full names or GitLab users."
 msgstr ""
 
@@ -27331,6 +27373,9 @@ msgid "You already have pending todo for this alert"
 msgstr ""
 
 msgid "You are about to delete %{domain} from your instance. This domain will no longer be available to any Knative application."
+msgstr ""
+
+msgid "You are about to permanently delete this project"
 msgstr ""
 
 msgid "You are about to transfer the control of your account to %{group_name} group. This action is NOT reversible, you won't be able to access any of your groups and projects outside of %{group_name} once this transfer is complete."
@@ -27481,6 +27526,9 @@ msgid "You can only transfer the project to namespaces you manage."
 msgstr ""
 
 msgid "You can only upload one design when dropping onto an existing design."
+msgstr ""
+
+msgid "You can recover this project until %{date}"
 msgstr ""
 
 msgid "You can resolve the merge conflict using either the Interactive mode, by choosing %{use_ours} or %{use_theirs} buttons, or by editing the files directly. Commit these changes into %{branch_name}"

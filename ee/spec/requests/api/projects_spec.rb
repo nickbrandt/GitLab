@@ -948,7 +948,7 @@ RSpec.describe API::Projects do
       end
 
       before do
-        stub_licensed_features(group_saml: true)
+        stub_licensed_features(group_saml: true, group_forking_protection: true)
       end
 
       context 'and target namespace is outer' do
