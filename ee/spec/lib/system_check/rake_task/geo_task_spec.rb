@@ -26,7 +26,6 @@ RSpec.describe SystemCheck::RakeTask::GeoTask do
       SystemCheck::Geo::DatabaseReplicationEnabledCheck,
       SystemCheck::Geo::DatabaseReplicationWorkingCheck,
       SystemCheck::Geo::FdwEnabledCheck,
-      SystemCheck::Geo::FdwSchemaUpToDateCheck,
       SystemCheck::Geo::HttpConnectionCheck
     ] + common_checks
   end
