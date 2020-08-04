@@ -215,8 +215,8 @@ RSpec.describe EpicsFinder do
 
         context 'by parent' do
           before do
-            epic2.update(parent: epic1)
-            epic3.update(parent: epic2)
+            epic2.update!(parent: epic1)
+            epic3.update!(parent: epic2)
           end
 
           it 'returns direct children of the parent' do
