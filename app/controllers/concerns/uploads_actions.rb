@@ -42,10 +42,6 @@ module UploadsActions
 
     expires_in ttl, directives
 
-    file_uploader = [uploader, *uploader.versions.values].find do |version|
-      version.filename == params[:filename]
-    end
-
     return render_404 unless file_uploader
 
     workhorse_set_content_type!
@@ -88,6 +84,18 @@ module UploadsActions
     end
   end
 
+  def file_uploader
+    strong_memoize(:file_uploader) do
+      if uploader_has_versions?
+        file_uploader = uploader.find_or_create_version(params[:width])
+      end
+
+      file_uploader ||= uploader
+
+      file_uploader if file_uploader.filename == params[:filename]
+    end
+  end
+
   def uploader_class
     raise NotImplementedError
   end
@@ -95,6 +103,10 @@ module UploadsActions
   def upload_mount
     mounted_as = params[:mounted_as]
     mounted_as if UPLOAD_MOUNTS.include?(mounted_as)
+  end
+
+  def uploader_has_versions?
+    uploader.class < Versions::GitlabUploaderVersions
   end
 
   def uploader_mounted?

@@ -101,6 +101,7 @@ module ObjectStorage
   #
   module BackgroundMove
     extend ActiveSupport::Concern
+    include MountsHelper
 
     def background_upload(mount_points = [])
       return unless mount_points.any?
@@ -108,19 +109,6 @@ module ObjectStorage
       run_after_commit do
         mount_points.each { |mount| send(mount).schedule_background_upload } # rubocop:disable GitlabSecurity/PublicSend
       end
-    end
-
-    def changed_mounts
-      self.class.uploaders.select do |mount, uploader_class|
-        mounted_as = uploader_class.serialization_column(self.class, mount)
-        uploader = send(:"#{mounted_as}") # rubocop:disable GitlabSecurity/PublicSend
-
-        next unless uploader
-        next unless uploader.exists?
-        next unless send(:"saved_change_to_#{mounted_as}?") # rubocop:disable GitlabSecurity/PublicSend
-
-        mount
-      end.keys
     end
 
     included do

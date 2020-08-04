@@ -16,15 +16,38 @@ module Avatarable
 
   included do
     prepend ShadowMethods
+    prepend MountMethods
     include ObjectStorage::BackgroundMove
     include Gitlab::Utils::StrongMemoize
+    include Versions::BackgroundRecreate
 
     validate :avatar_type, if: ->(user) { user.avatar.present? && user.avatar_changed? }
     validates :avatar, file_size: { maximum: 200.kilobytes.to_i }, if: :avatar_changed?
 
+    # TODO When feature flag :static_image_resizing is removed, replace AvatarUploader with :avatar_uploader_class
     mount_uploader :avatar, AvatarUploader
 
     after_initialize :add_avatar_to_batch
+  end
+
+  module MountMethods
+    # rubocop:disable Gitlab/ModuleWithInstanceVariables
+    def _mounter(column)
+      # We cannot memoize in frozen objects :(
+      return mounter_class.new(self, column) if frozen?
+
+      @_mounters ||= {}
+      @_mounters[column] ||= mounter_class.new(self, column)
+    end
+    # rubocop:enable Gitlab/ModuleWithInstanceVariables
+
+    def mounter_class
+      static_image_resizing? ? Versions::Mounter : CarrierWave::Mounter
+    end
+
+    def static_image_resizing?
+      Feature.enabled?(:static_image_resizing, self)
+    end
   end
 
   module ShadowMethods
@@ -50,6 +73,10 @@ module Avatarable
   class_methods do
     def bot_avatar(image:)
       Rails.root.join('lib', 'assets', 'images', 'bot_avatars', image).open
+    end
+
+    def avatar_uploader_class
+      Versions::AvatarUploaders.const_get(base_class.name, false)
     end
   end
 
@@ -114,7 +141,7 @@ module Avatarable
       paths = upload_params.flat_map do |params|
         params[:model].upload_paths(params[:identifier])
       end
-
+      # TODO When feature flag :static_image_resizing is removed, replace AvatarUploader.name with avatar_uploader_class.name
       Upload.where(uploader: AvatarUploader.name, path: paths).find_each do |upload|
         model = model_class.instantiate('id' => upload.model_id)
 

@@ -22,6 +22,7 @@ module RecordsUploads
     def record_upload(_tempfile = nil)
       return unless model
       return unless file && file.exists?
+      return if version_name
 
       Upload.transaction { readd_upload }
     end
@@ -52,12 +53,16 @@ module RecordsUploads
 
     def build_upload
       Upload.new(
-        uploader: self.class.to_s,
+        uploader: uploader_class,
         size: file.size,
         path: upload_path,
         model: model,
         mount_point: mounted_as
       )
+    end
+
+    def uploader_class
+      self.class.to_s
     end
 
     # Before removing an attachment, destroy any Upload records at the same path

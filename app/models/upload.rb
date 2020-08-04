@@ -151,7 +151,16 @@ class Upload < ApplicationRecord
   end
 
   def uploader_class
-    Object.const_get(uploader, false)
+    # TODO When feature flag :static_image_resizing is removed, remove this, and add proper migration
+    if uploader == AvatarUploader.name && static_image_resizing?
+      model.class.avatar_uploader_class
+    else
+      uploader.constantize
+    end
+  end
+
+  def static_image_resizing?
+    !!model.try(:static_image_resizing?)
   end
 
   def identifier

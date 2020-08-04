@@ -1,0 +1,7 @@
+---
+name: static_image_resizing
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/38602
+rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/235806
+group: group::memory
+type: development
+default_enabled: false

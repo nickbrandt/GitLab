@@ -8,10 +8,6 @@ class AvatarUploader < GitlabUploader
 
   MIME_WHITELIST = %w[image/png image/jpeg image/gif image/bmp image/tiff image/vnd.microsoft.icon].freeze
 
-  def exists?
-    model.avatar.file && model.avatar.file.present?
-  end
-
   def move_to_store
     false
   end
@@ -33,6 +29,11 @@ class AvatarUploader < GitlabUploader
   end
 
   private
+
+  # TODO When feature flag :static_image_resizing is removed, remove this method
+  def uploader_class
+    AvatarUploader.name
+  end
 
   def dynamic_segment
     File.join(model.class.underscore, mounted_as.to_s, model.id.to_s)
