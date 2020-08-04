@@ -102,7 +102,6 @@ RSpec.describe Gitlab::Geo::HealthCheck, :geo do
           context 'that is working' do
             before do
               allow(subject).to receive(:replication_working?).and_return(true)
-              allow(Gitlab::Geo::Fdw).to receive(:enabled?) { true }
             end
 
             it 'returns an error if database is not fully migrated' do
@@ -113,12 +112,6 @@ RSpec.describe Gitlab::Geo::HealthCheck, :geo do
 
               expect(message).to include('Geo database version (20170101) does not match latest migration (20170201)')
               expect(message).to include('gitlab-rake geo:db:migrate')
-            end
-
-            it 'returns an error when FDW is disabled' do
-              allow(Gitlab::Geo::Fdw).to receive(:enabled?) { false }
-
-              expect(subject.perform_checks).to match(/Geo database is not configured to use Foreign Data Wrapper/)
             end
 
             it 'finally returns an empty string when everything is healthy' do

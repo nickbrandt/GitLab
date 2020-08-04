@@ -12,7 +12,6 @@ module Gitlab
         return 'Geo node has a database that is writable which is an indication it is not configured for replication with the primary node.' unless Gitlab::Database.db_read_only?
         return 'Geo node does not appear to be replicating the database from the primary node.' if replication_enabled? && !replication_working?
         return "Geo database version (#{database_version}) does not match latest migration (#{migration_version}).\nYou may have to run `gitlab-rake geo:db:migrate` as root on the secondary." unless database_migration_version_match?
-        return 'Geo database is not configured to use Foreign Data Wrapper.' unless Gitlab::Geo::Fdw.enabled?
 
         ''
       rescue => e
