@@ -17613,6 +17613,9 @@ ALTER TABLE public.design_management_designs
 ALTER TABLE public.vulnerability_scanners
     ADD CONSTRAINT check_37608c9db5 CHECK ((char_length(vendor) <= 255)) NOT VALID;
 
+ALTER TABLE public.merge_request_diffs
+    ADD CONSTRAINT check_93ee616ac9 CHECK ((external_diff_store IS NOT NULL)) NOT VALID;
+
 ALTER TABLE ONLY public.ci_build_needs
     ADD CONSTRAINT ci_build_needs_pkey PRIMARY KEY (id);
 
