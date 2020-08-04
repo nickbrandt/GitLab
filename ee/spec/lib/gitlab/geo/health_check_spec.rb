@@ -103,7 +103,6 @@ RSpec.describe Gitlab::Geo::HealthCheck, :geo do
             before do
               allow(subject).to receive(:replication_working?).and_return(true)
               allow(Gitlab::Geo::Fdw).to receive(:enabled?) { true }
-              allow(Gitlab::Geo::Fdw).to receive(:foreign_tables_up_to_date?) { true }
             end
 
             it 'returns an error if database is not fully migrated' do
@@ -120,26 +119,6 @@ RSpec.describe Gitlab::Geo::HealthCheck, :geo do
               allow(Gitlab::Geo::Fdw).to receive(:enabled?) { false }
 
               expect(subject.perform_checks).to match(/Geo database is not configured to use Foreign Data Wrapper/)
-            end
-
-            context 'when foreign tables are not up-to-date' do
-              before do
-                allow(Gitlab::Geo::Fdw).to receive(:foreign_tables_up_to_date?) { false }
-              end
-
-              it 'returns an error when FDW remote table is not in sync but has same amount of tables' do
-                allow(Gitlab::Geo::Fdw).to receive(:foreign_schema_tables_count) { 1 }
-                allow(Gitlab::Geo::Fdw).to receive(:gitlab_schema_tables_count) { 1 }
-
-                expect(subject.perform_checks).to match(/Geo database has an outdated FDW remote schema\./)
-              end
-
-              it 'returns an error when FDW remote table is not in sync and has same different amount of tables' do
-                allow(Gitlab::Geo::Fdw).to receive(:foreign_schema_tables_count) { 1 }
-                allow(Gitlab::Geo::Fdw).to receive(:gitlab_schema_tables_count) { 2 }
-
-                expect(subject.perform_checks).to match(/Geo database has an outdated FDW remote schema\. It contains [0-9]+ of [0-9]+ expected tables/)
-              end
             end
 
             it 'finally returns an empty string when everything is healthy' do
