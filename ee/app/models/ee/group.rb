@@ -386,6 +386,15 @@ module EE
       owners.pluck(:email)
     end
 
+    # this method will be delegated to namespace_settings, but as we need to wait till
+    # all groups will have namespace_settings created via background migration,
+    # we need to serve it from this class
+    def prevent_forking_outside_group?
+      return namespace_settings.prevent_forking_outside_group? if namespace_settings
+
+      root_ancestor.saml_provider&.prohibited_outer_forks?
+    end
+
     private
 
     def custom_project_templates_group_allowed

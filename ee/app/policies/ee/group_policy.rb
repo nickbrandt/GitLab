@@ -45,6 +45,10 @@ module EE
         @subject.feature_available?(:security_dashboard)
       end
 
+      condition(:prevent_group_forking_available) do
+        @subject.feature_available?(:group_forking_protection)
+      end
+
       condition(:needs_new_sso_session) do
         sso_enforcement_prevents_access?
       end
@@ -133,6 +137,10 @@ module EE
 
       rule { reporter & cycle_analytics_available }.policy do
         enable :read_group_cycle_analytics, :create_group_stage, :read_group_stage, :update_group_stage, :delete_group_stage
+      end
+
+      rule { owner & ~has_parent & prevent_group_forking_available }.policy do
+        enable :change_prevent_group_forking
       end
 
       rule { can?(:read_group) & dependency_proxy_available }
