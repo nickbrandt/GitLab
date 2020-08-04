@@ -67,6 +67,10 @@ module EE
           :author, :approved_by_users, :metrics,
           latest_merge_request_diff: :merge_request_diff_files, target_project: :namespace, milestone: :project)
       end
+
+      scope :including_merge_train, -> do
+        includes(:merge_train)
+      end
     end
 
     class_methods do
