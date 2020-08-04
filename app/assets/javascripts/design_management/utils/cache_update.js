@@ -1,4 +1,5 @@
 /* eslint-disable @gitlab/require-i18n-strings */
+import update from 'immutability-helper';
 
 import createFlash from '~/flash';
 import { extractCurrentDiscussion, extractDesign } from './design_management_utils';
@@ -10,12 +11,15 @@ import {
 } from './error_messages';
 
 const deleteDesignsFromStore = (store, query, selectedDesigns) => {
-  const data = store.readQuery(query);
+  const sourceData = store.readQuery(query);
 
-  const changedDesigns = data.project.issue.designCollection.designs.nodes.filter(
+  const changedDesigns = sourceData.project.issue.designCollection.designs.nodes.filter(
     node => !selectedDesigns.includes(node.filename),
   );
-  data.project.issue.designCollection.designs.nodes = [...changedDesigns];
+
+  const data = update(sourceData, {
+    project: { issue: { designCollection: { designs: { nodes: { $set: [...changedDesigns] } } } } },
+  });
 
   store.writeQuery({
     ...query,
@@ -33,12 +37,11 @@ const deleteDesignsFromStore = (store, query, selectedDesigns) => {
 const addNewVersionToStore = (store, query, version) => {
   if (!version) return;
 
-  const data = store.readQuery(query);
+  const sourceData = store.readQuery(query);
 
-  data.project.issue.designCollection.versions.nodes = [
-    version,
-    ...data.project.issue.designCollection.versions.nodes,
-  ];
+  const data = update(sourceData, {
+    project: { issue: { designCollection: { versions: { nodes: { $unshift: [version] } } } } },
+  });
 
   store.writeQuery({
     ...query,
