@@ -138,20 +138,6 @@ RSpec.describe Gitlab::Geo::Fdw, :geo do
     end
   end
 
-  describe '.gitlab_schema_tables_count' do
-    it 'returns the same number of tables as defined in the database' do
-      expect(described_class.gitlab_schema_tables_count).to eq(ActiveRecord::Schema.tables.count)
-    end
-
-    it 'excludes tables that start with `pg_`' do
-      ActiveRecord::Base.connection.create_table(:pg_gitlab_test)
-
-      expect(described_class.gitlab_schema_tables_count).to eq(ActiveRecord::Schema.tables.count - 1)
-
-      ActiveRecord::Base.connection.drop_table(:pg_gitlab_test)
-    end
-  end
-
   describe '.expire_cache!' do
     it 'calls Gitlab::Geo.expire_cache_keys!' do
       expect(Gitlab::Geo).to receive(:expire_cache_keys!).with(Gitlab::Geo::Fdw::CACHE_KEYS)
