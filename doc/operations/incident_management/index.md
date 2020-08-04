@@ -15,7 +15,7 @@ of incident management are only available in
 [GitLab Ultimate and GitLab.com Gold](https://about.gitlab.com/pricing/).
 
 For users with at least Developer [permissions](../../user/permissions.md), the
-Incident Management list is available at **{cloud-gear}** **Operations > Incidents**
+Incident Management list is available at **Operations > Incidents**
 in your project's sidebar. The list contains the following metrics:
 
 ![Incident Management List](img/incident_list_13_3.png)
@@ -36,7 +36,7 @@ Incidents share the [Issues API](../../user/project/issues/index.md).
 
 To create a Incident you can take any of the following actions:
 
-- Navigate to **{cloud-gear}** **Operations > Incidents** and click **Create Incident**.
+- Navigate to **Operations > Incidents** and click **Create Incident**.
 - Create a new issue using the `incident` template available when creating it.
 - Create a new issue and assign the `incident` label to it.
 
