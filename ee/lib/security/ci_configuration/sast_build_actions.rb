@@ -36,7 +36,7 @@ module Security
       end
 
       def sast_stage
-        @params['stage'] || 'test'
+        @params['stage'].presence ? @params['stage'] : 'test'
       end
 
       # We only want to write variables that are set
