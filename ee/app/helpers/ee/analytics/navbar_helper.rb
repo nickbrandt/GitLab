@@ -52,6 +52,7 @@ module EE
       end
 
       def group_merge_request_analytics_navbar_link(group, current_user)
+        return unless ::Gitlab::Analytics.group_merge_request_analytics_enabled?
         return unless group_sidebar_link?(:merge_request_analytics)
 
         navbar_sub_item(
