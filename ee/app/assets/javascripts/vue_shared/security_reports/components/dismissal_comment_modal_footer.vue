@@ -65,12 +65,7 @@ export default {
 
 <template>
   <div>
-    <gl-button
-      variant="default"
-      category="primary"
-      class="js-cancel"
-      @click="$emit('cancel')"
-    >
+    <gl-button variant="default" category="primary" class="js-cancel" @click="$emit('cancel')">
       {{ __('Cancel') }}
     </gl-button>
     <loading-button
