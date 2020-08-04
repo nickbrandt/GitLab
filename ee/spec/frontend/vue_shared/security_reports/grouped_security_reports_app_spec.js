@@ -308,7 +308,7 @@ describe('Grouped security reports app', () => {
       });
 
       it('opens modal with more information', () => {
-        wrapper.vm.$el.querySelector('.break-link').click();
+        wrapper.vm.$el.querySelector('[aria-label="Vulnerability Name"]').click();
 
         return Vue.nextTick().then(() => {
           expect(wrapper.vm.$el.querySelector('.modal-title').textContent.trim()).toEqual(
