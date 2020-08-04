@@ -138,14 +138,6 @@ RSpec.describe Gitlab::Geo::Fdw, :geo do
     end
   end
 
-  describe '.expire_cache!' do
-    it 'calls Gitlab::Geo.expire_cache_keys!' do
-      expect(Gitlab::Geo).to receive(:expire_cache_keys!).with(Gitlab::Geo::Fdw::CACHE_KEYS)
-
-      described_class.expire_cache!
-    end
-  end
-
   def with_foreign_connection
     Geo::TrackingBase.connection
   end

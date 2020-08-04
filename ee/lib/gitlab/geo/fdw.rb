@@ -7,12 +7,6 @@ module Gitlab
       FOREIGN_SERVER = 'gitlab_secondary'
       FOREIGN_SCHEMA = 'gitlab_secondary'
 
-      CACHE_KEYS = %i(
-        geo_FOREIGN_SCHEMA_exist
-        geo_foreign_schema_tables_match
-        geo_fdw_count_tables
-      ).freeze
-
       class << self
         # Return if FDW is enabled for this instance
         #
@@ -54,10 +48,6 @@ module Gitlab
 
             ::Geo::TrackingBase.connection.execute(sql).first.fetch('count').to_i
           end
-        end
-
-        def expire_cache!
-          Gitlab::Geo.expire_cache_keys!(CACHE_KEYS)
         end
 
         private
