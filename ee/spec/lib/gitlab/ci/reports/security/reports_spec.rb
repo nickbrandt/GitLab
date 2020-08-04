@@ -3,9 +3,10 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Ci::Reports::Security::Reports do
-  let(:commit_sha) { '20410773a37f49d599e5f0d45219b39304763538' }
-  let(:security_reports) { described_class.new(commit_sha) }
-  let(:artifact) { create(:ee_ci_job_artifact, :sast) }
+  let_it_be(:pipeline) { create(:ci_pipeline) }
+  let_it_be(:artifact) { create(:ee_ci_job_artifact, :sast) }
+
+  let(:security_reports) { described_class.new(pipeline) }
 
   describe '#get_report' do
     subject { security_reports.get_report(report_type, artifact) }
@@ -14,12 +15,11 @@ RSpec.describe Gitlab::Ci::Reports::Security::Reports do
       let(:report_type) { 'sast' }
 
       it { expect(subject.type).to eq('sast') }
-      it { expect(subject.commit_sha).to eq(commit_sha) }
       it { expect(subject.created_at).to eq(artifact.created_at) }
 
       it 'initializes a new report and returns it' do
         expect(Gitlab::Ci::Reports::Security::Report).to receive(:new)
-          .with('sast', commit_sha, artifact.created_at).and_call_original
+          .with('sast', pipeline, artifact.created_at).and_call_original
 
         is_expected.to be_a(Gitlab::Ci::Reports::Security::Report)
       end
@@ -39,7 +39,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Reports do
   end
 
   describe "#violates_default_policy?" do
-    subject { described_class.new(commit_sha) }
+    subject { described_class.new(pipeline) }
 
     let(:low_severity) { build(:ci_reports_security_finding, severity: 'low') }
     let(:high_severity) { build(:ci_reports_security_finding, severity: 'high') }

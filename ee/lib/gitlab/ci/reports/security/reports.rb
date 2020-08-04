@@ -5,17 +5,17 @@ module Gitlab
     module Reports
       module Security
         class Reports
-          attr_reader :reports, :commit_sha
+          attr_reader :reports, :pipeline
 
           delegate :empty?, to: :reports
 
-          def initialize(commit_sha)
+          def initialize(pipeline)
             @reports = {}
-            @commit_sha = commit_sha
+            @pipeline = pipeline
           end
 
           def get_report(report_type, report_artifact)
-            reports[report_type] ||= Report.new(report_type, commit_sha, report_artifact.created_at)
+            reports[report_type] ||= Report.new(report_type, pipeline, report_artifact.created_at)
           end
 
           def violates_default_policy?
