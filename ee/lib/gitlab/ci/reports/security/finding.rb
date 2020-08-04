@@ -5,6 +5,8 @@ module Gitlab
     module Reports
       module Security
         class Finding
+          UNSAFE_SEVERITIES = %w[unknown high critical].freeze
+
           attr_reader :compare_key
           attr_reader :confidence
           attr_reader :identifiers
@@ -63,6 +65,18 @@ module Gitlab
           def update_location(new_location)
             @old_location = location
             @location = new_location
+          end
+
+          def unsafe?
+            severity.in?(UNSAFE_SEVERITIES)
+          end
+
+          def eql?(other)
+            hash == other.hash
+          end
+
+          def hash
+            report_type.hash ^ location.fingerprint.hash ^ primary_identifier.fingerprint.hash
           end
 
           private

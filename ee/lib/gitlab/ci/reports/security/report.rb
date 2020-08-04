@@ -5,8 +5,6 @@ module Gitlab
     module Reports
       module Security
         class Report
-          UNSAFE_SEVERITIES = %w[unknown high critical].freeze
-
           attr_reader :created_at
           attr_reader :type
           attr_reader :pipeline
@@ -59,15 +57,6 @@ module Gitlab
 
           def merge!(other)
             replace_with!(::Security::MergeReportsService.new(self, other).execute)
-          end
-
-          def unsafe_severity?
-            !safe?
-          end
-
-          def safe?
-            severities = findings.map(&:severity).compact.map(&:downcase)
-            (severities & UNSAFE_SEVERITIES).empty?
           end
         end
       end

@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Ci::Reports::Security::Finding do
+  using RSpec::Parameterized::TableSyntax
+
   describe '#initialize' do
     subject { described_class.new(**params) }
 
@@ -126,6 +128,104 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
       subject
 
       expect(occurrence.old_location).to eq(old_location)
+    end
+  end
+
+  describe '#unsafe?' do
+    where(:severity, :unsafe?) do
+      'critical' | true
+      'high'     | true
+      'medium'   | false
+      'low'      | false
+      'info'     | false
+      'unknown'  | true
+    end
+
+    with_them do
+      let(:finding) { create(:ci_reports_security_finding, severity: severity) }
+
+      subject { finding.unsafe? }
+
+      it { is_expected.to be(unsafe?) }
+    end
+  end
+
+  describe '#eql?' do
+    let(:identifier) { build(:ci_reports_security_identifier) }
+    let(:location) { build(:ci_reports_security_locations_sast) }
+    let(:finding) { build(:ci_reports_security_finding, severity: 'low', report_type: :sast, identifiers: [identifier], location: location) }
+
+    let(:report_type) { :secret_detection }
+    let(:identifier_external_id) { 'foo' }
+    let(:location_start_line) { 0 }
+    let(:other_identifier) { build(:ci_reports_security_identifier, external_id: identifier_external_id) }
+    let(:other_location) { build(:ci_reports_security_locations_sast, start_line: location_start_line) }
+    let(:other_finding) do
+      build(:ci_reports_security_finding,
+            severity: 'low',
+            report_type: report_type,
+            identifiers: [other_identifier],
+            location: other_location)
+    end
+
+    subject { finding.eql?(other_finding) }
+
+    context 'when the other finding has same `report_type`' do
+      let(:report_type) { :sast }
+
+      context 'when the other finding has same primary identifier fingerprint' do
+        let(:identifier_external_id) { identifier.external_id }
+
+        context 'when the other finding has same location fingerprint' do
+          let(:location_start_line) { location.start_line }
+
+          it { is_expected.to be(true) }
+        end
+
+        context 'when the other finding does not have same location fingerprint' do
+          it { is_expected.to be(false) }
+        end
+      end
+
+      context 'when the other finding does not have same primary identifier fingerprint' do
+        context 'when the other finding has same location fingerprint' do
+          let(:location_start_line) { location.start_line }
+
+          it { is_expected.to be(false) }
+        end
+
+        context 'when the other finding does not have same location fingerprint' do
+          it { is_expected.to be(false) }
+        end
+      end
+    end
+
+    context 'when the other finding does not have same `report_type`' do
+      context 'when the other finding has same primary identifier fingerprint' do
+        let(:identifier_external_id) { identifier.external_id }
+
+        context 'when the other finding has same location fingerprint' do
+          let(:location_start_line) { location.start_line }
+
+          it { is_expected.to be(false) }
+        end
+
+        context 'when the other finding does not have same location fingerprint' do
+          it { is_expected.to be(false) }
+        end
+      end
+
+      context 'when the other finding does not have same primary identifier fingerprint' do
+        context 'when the other finding has same location fingerprint' do
+          let(:location_start_line) { location.start_line }
+
+          it { is_expected.to be(false) }
+        end
+
+        context 'when the other finding does not have same location fingerprint' do
+          it { is_expected.to be(false) }
+        end
+      end
     end
   end
 end

@@ -71,9 +71,15 @@ FactoryBot.define do
       }.to_json
     end
 
-    trait :confirmed do
+    trait :detected do
       after(:create) do |finding|
         create(:vulnerability, :detected, project: finding.project, findings: [finding])
+      end
+    end
+
+    trait :confirmed do
+      after(:create) do |finding|
+        create(:vulnerability, :confirmed, project: finding.project, findings: [finding])
       end
     end
 
@@ -85,6 +91,7 @@ FactoryBot.define do
 
     trait :dismissed do
       after(:create) do |finding|
+        create(:vulnerability, :dismissed, project: finding.project, findings: [finding])
         create(:vulnerability_feedback,
                :dismissal,
                project: finding.project,
