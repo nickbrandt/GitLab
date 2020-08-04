@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe 'Freeze Periods (JavaScript fixtures)' do
   include JavaScriptFixturesHelpers
+  include Ci::PipelineSchedulesHelper
 
   let_it_be(:admin) { create(:admin) }
   let_it_be(:project) { create(:project, :repository, path: 'freeze-periods-project') }
@@ -26,6 +27,13 @@ RSpec.describe 'Freeze Periods (JavaScript fixtures)' do
       get api("/projects/#{project.id}/freeze_periods", admin)
 
       expect(response).to be_successful
+    end
+  end
+
+  describe Ci::PipelineSchedulesHelper, '(JavaScript fixtures)', type: :controler  do
+    let(:response) { timezone_data.to_json }
+    it 'api/freeze-periods/timezone_data.json' do
+      
     end
   end
 end
