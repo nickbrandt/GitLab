@@ -275,10 +275,17 @@ RSpec.describe WikiPage do
       context 'with a new page' do
         before do
           stub_application_setting(wiki_page_max_content_bytes: 10)
+          stub_application_setting(wiki_page_min_content_bytes: 2)
         end
 
         it 'accepts content below the limit' do
           subject.attributes[:content] = 'a' * 10
+
+          expect(subject).to be_valid
+        end
+
+        it 'accepts content above the limit' do
+          subject.attributes[:content] = 'a' * 2
 
           expect(subject).to be_valid
         end
@@ -289,6 +296,15 @@ RSpec.describe WikiPage do
           expect(subject).not_to be_valid
           expect(subject.errors.messages).to eq(
             content: ['is too long (11 Bytes). The maximum size is 10 Bytes.']
+          )
+        end
+
+        it 'rejects content below the limit' do
+          subject.attributes[:content] = 'a'
+
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to eq(
+            content: ['is too short (1 Bytes). The minimum size is 2 Bytes.']
           )
         end
 
@@ -308,18 +324,28 @@ RSpec.describe WikiPage do
         before do
           subject
           stub_application_setting(wiki_page_max_content_bytes: 11)
+          stub_application_setting(wiki_page_min_content_bytes: 2)
         end
 
         it 'accepts content when it has not changed' do
           expect(subject).to be_valid
         end
 
-        it 'rejects content when it has changed' do
+        it 'rejects content when it has changed and exceeds the limit' do
           subject.attributes[:content] = 'a' * 12
 
           expect(subject).not_to be_valid
           expect(subject.errors.messages).to eq(
             content: ['is too long (12 Bytes). The maximum size is 11 Bytes.']
+          )
+        end
+
+        it 'rejects content when it has changed and is below the limit' do
+          subject.attributes[:content] = 'a' * 1
+
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to eq(
+            content: ['is too short (1 Bytes). The minimum size is 2 Bytes.']
           )
         end
       end

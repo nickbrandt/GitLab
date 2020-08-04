@@ -408,11 +408,19 @@ class WikiPage
   def validate_content_size_limit
     current_value = raw_content.to_s.bytesize
     max_size = Gitlab::CurrentSettings.wiki_page_max_content_bytes
-    return if current_value <= max_size
+    min_size = Gitlab::CurrentSettings.wiki_page_min_content_bytes
+    return if current_value <= max_size && current_value >= min_size
 
-    errors.add(:content, _('is too long (%{current_value}). The maximum size is %{max_size}.') % {
-      current_value: ActiveSupport::NumberHelper.number_to_human_size(current_value),
-      max_size: ActiveSupport::NumberHelper.number_to_human_size(max_size)
-    })
+    if current_value > max_size
+      errors.add(:content, _('is too long (%{current_value}). The maximum size is %{max_size}.') % {
+        current_value: ActiveSupport::NumberHelper.number_to_human_size(current_value),
+        max_size: ActiveSupport::NumberHelper.number_to_human_size(max_size)
+      })
+    else
+      errors.add(:content, _('is too short (%{current_value}). The minimum size is %{min_size}.') % {
+        current_value: ActiveSupport::NumberHelper.number_to_human_size(current_value),
+        min_size: ActiveSupport::NumberHelper.number_to_human_size(min_size)
+      })
+    end
   end
 end

@@ -328,7 +328,8 @@ module ApplicationSettingsHelper
       :group_import_limit,
       :group_export_limit,
       :group_download_export_limit,
-      :wiki_page_max_content_bytes
+      :wiki_page_max_content_bytes,
+      :wiki_page_min_content_bytes
     ]
   end
 
