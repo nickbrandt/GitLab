@@ -756,6 +756,7 @@ Relationship between an epic and an issue
 | `title` | String! | Title of the issue |
 | `titleHtml` | String | The GitLab Flavored Markdown rendering of `title` |
 | `totalTimeSpent` | Int! | Total time reported as spent on the issue |
+| `type` | IssueType | Type of the issue |
 | `updatedAt` | Time! | Timestamp of when the issue was last updated |
 | `upvotes` | Int! | Number of upvotes the issue has received |
 | `userNotesCount` | Int! | Number of user notes of the issue |
@@ -922,6 +923,7 @@ Represents a Group Member
 | `title` | String! | Title of the issue |
 | `titleHtml` | String | The GitLab Flavored Markdown rendering of `title` |
 | `totalTimeSpent` | Int! | Total time reported as spent on the issue |
+| `type` | IssueType | Type of the issue |
 | `updatedAt` | Time! | Timestamp of when the issue was last updated |
 | `upvotes` | Int! | Number of upvotes the issue has received |
 | `userNotesCount` | Int! | Number of user notes of the issue |
