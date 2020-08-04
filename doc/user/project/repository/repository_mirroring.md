@@ -150,8 +150,7 @@ To set up a mirror from GitLab to AWS CodeCommit:
    been tested to be the minimum (least privileged) required for mirroring:
 
    ```json
-
-{
+   {
        "Version": "2012-10-17",
        "Statement": [
            {
@@ -168,9 +167,8 @@ To set up a mirror from GitLab to AWS CodeCommit:
            }
        ]
    }
+   ```
 
-   ```json
-   
 1. After the user was created, click the AWS IAM user name.
 1. Click the **Security credentials** tab.
 1. Under **HTTPS Git credentials for AWS CodeCommit** click **Generate credentials**.
