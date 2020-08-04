@@ -76,9 +76,9 @@ export default {
       @click="toggleFeature"
     >
       <gl-loading-icon class="loading-icon" />
-      <span class="toggle-icon gl-bg-white">
+      <span class="toggle-icon">
         <gl-icon
-          :size="16"
+          :size="18"
           :name="toggleIcon"
           :class="value ? 'gl-fill-blue-500' : 'gl-fill-gray-400'"
         />

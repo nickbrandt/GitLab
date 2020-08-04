@@ -53,11 +53,9 @@
     border-radius: 9px;
     background: $white;
     transition: all 0.2s ease;
-
-    & {
-      width: $default-icon-size;
-      height: $default-icon-size;
-    }
+    width: $default-icon-size;
+    height: $default-icon-size;
+    
   }
 
   .loading-icon {
