@@ -813,24 +813,6 @@ RSpec.describe GeoNode, :request_store, :geo, type: :model do
     end
   end
 
-  describe '#job_artifacts' do
-    context 'when selective sync is enabled' do
-      it 'applies a CTE statement' do
-        node.update!(selective_sync_type: 'namespaces')
-
-        expect(node.job_artifacts.to_sql).to match(/WITH .+restricted_job_artifacts/)
-      end
-    end
-
-    context 'when selective sync is disabled' do
-      it 'doest not apply a CTE statement' do
-        node.update!(selective_sync_type: nil)
-
-        expect(node.job_artifacts.to_sql).not_to match(/WITH .+restricted_job_artifacts/)
-      end
-    end
-  end
-
   describe '#lfs_objects' do
     let_it_be(:synced_group) { create(:group) }
     let_it_be(:nested_group) { create(:group, parent: synced_group) }

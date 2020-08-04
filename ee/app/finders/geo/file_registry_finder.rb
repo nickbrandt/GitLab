@@ -54,8 +54,7 @@ module Geo
     #
     # @return [Array] the first element is an Array of untracked IDs, and the second element is an Array of tracked IDs that are unused
     def find_registry_differences(range)
-      source = local_storage_only? ? replicables.with_files_stored_locally : replicables
-      source_ids = source.id_in(range).pluck(replicable_primary_key) # rubocop:disable CodeReuse/ActiveRecord
+      source_ids = replicables.id_in(range).pluck(replicable_primary_key) # rubocop:disable CodeReuse/ActiveRecord
       tracked_ids = syncable.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
