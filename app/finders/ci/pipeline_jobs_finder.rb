@@ -1,5 +1,7 @@
 # frozen_string_literal: true
+
 module Ci
+  # By default this class returns builds for a specific pipeline. If you'd like bridges, use params[:type] bridges. It will never return both.
   class PipelineJobsFinder
     include Gitlab::Allowable
 
@@ -39,15 +41,15 @@ module Ci
       @pipeline ||= project.all_pipelines.find(params[:pipeline_id])
     end
 
-    def filter_by_scope(records, scope)
-      return records unless scope.present?
+    def filter_by_scope(jobs, scope)
+      return jobs unless scope.present?
 
       available_statuses = ::CommitStatus::AVAILABLE_STATUSES
 
       unknown = scope - available_statuses
       raise ArgumentError, 'Scope contains invalid value(s)' unless unknown.empty?
 
-      records.where(status: scope) # rubocop: disable CodeReuse/ActiveRecord
+      jobs.where(status: scope) # rubocop: disable CodeReuse/ActiveRecord
     end
   end
 end

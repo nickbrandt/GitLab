@@ -24,8 +24,6 @@ module API
                              case scope
                              when String
                                [scope]
-                             when ::Hash
-                               scope.values
                              when ::Array
                                scope
                              else

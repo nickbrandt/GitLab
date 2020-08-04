@@ -310,7 +310,7 @@ RSpec.describe API::Ci::Pipelines do
   describe 'GET /projects/:id/pipelines/:pipeline_id/jobs' do
     let(:query) { {} }
     let(:api_user) { user }
-    let!(:job) do
+    let_it_be(:job) do
       create(:ci_build, :success, pipeline: pipeline,
                                   artifacts_expire_at: 1.day.since)
     end
@@ -319,7 +319,6 @@ RSpec.describe API::Ci::Pipelines do
 
     before do |example|
       unless example.metadata[:skip_before_request]
-        job
         project.update!(public_builds: false)
         get api("/projects/#{project.id}/pipelines/#{pipeline.id}/jobs", api_user), params: query
       end
@@ -362,6 +361,12 @@ RSpec.describe API::Ci::Pipelines do
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_an Array
         end
+      end
+
+      context 'filter jobs with hash' do
+        let(:query) { { scope: { hello: 'pending', world: 'running' } } }
+
+        it { expect(response).to have_gitlab_http_status(:bad_request) }
       end
 
       context 'filter jobs with array of scope elements' do
@@ -480,7 +485,7 @@ RSpec.describe API::Ci::Pipelines do
       end
 
       context 'filter bridges' do
-        before do
+        before_all do
           create_bridge(pipeline, :pending)
           create_bridge(pipeline, :running)
         end
@@ -513,9 +518,23 @@ RSpec.describe API::Ci::Pipelines do
       end
 
       context 'respond 400 when scope contains invalid state' do
-        let(:query) { { scope: %w(unknown running) } }
+        context 'in an array' do
+          let(:query) { { scope: %w(unknown running) } }
 
-        it { expect(response).to have_gitlab_http_status(:bad_request) }
+          it { expect(response).to have_gitlab_http_status(:bad_request) }
+        end
+
+        context 'in a hash' do
+          let(:query) { { scope: { unknown: true } } }
+
+          it { expect(response).to have_gitlab_http_status(:bad_request) }
+        end
+
+        context 'in a string' do
+          let(:query) { { scope: "unknown" } }
+
+          it { expect(response).to have_gitlab_http_status(:bad_request) }
+        end
       end
 
       context 'bridges in different pipelines' do
