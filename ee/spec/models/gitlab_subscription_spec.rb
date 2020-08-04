@@ -254,39 +254,71 @@ RSpec.describe GitlabSubscription do
 
   describe 'callbacks' do
     context 'after_commit :index_namespace' do
-      where(:elasticsearch_index_only_paid_groups_setting, :operation, :initial_plan, :should_update_plan?, :should_index_namespace?) do
-        false   | :create   | :bronze         | false   | false
-        true    | :create   | :bronze         | false   | true
-        true    | :create   | :free           | false   | false
-        true    | :create   | { trial: true } | false   | false
-        false   | :update   | :bronze         | false   | false
-        true    | :update   | :bronze         | false   | false
-        true    | :update   | :bronze         | true    | true
-        true    | :update   | :free           | true    | true
-        true    | :update   | { trial: true } | true    | true
+      let(:gitlab_subscription) { build(:gitlab_subscription, plan) }
+      let(:dev_env_or_com) { true }
+      let(:expiration_date) { Date.today + 10 }
+      let(:plan) { :bronze }
+
+      before do
+        allow(::Gitlab).to receive(:dev_env_or_com?).and_return(dev_env_or_com)
+        gitlab_subscription.end_date = expiration_date
       end
 
-      with_them do
-        let!(:gitlab_subscription) { operation == :create ? build(:gitlab_subscription, initial_plan) : create(:gitlab_subscription, initial_plan) }
+      it 'indexes the namespace' do
+        expect(ElasticsearchIndexedNamespace).to receive(:safe_find_or_create_by!).with(namespace_id: gitlab_subscription.namespace_id)
 
+        gitlab_subscription.save!
+      end
+
+      context 'when it is a trial' do
+        let(:gitlab_subscription) { build(:gitlab_subscription, :active_trial) }
+
+        it 'indexes the namespace' do
+          expect(ElasticsearchIndexedNamespace).to receive(:safe_find_or_create_by!).with(namespace_id: gitlab_subscription.namespace_id)
+
+          gitlab_subscription.save!
+        end
+      end
+
+      context 'when not ::Gitlab.dev_env_or_com?' do
+        let(:dev_env_or_com) { false }
+
+        it 'does not index the namespace' do
+          expect(ElasticsearchIndexedNamespace).not_to receive(:safe_find_or_create_by!)
+
+          gitlab_subscription.save!
+        end
+      end
+
+      context 'when the plan has expired' do
+        let(:expiration_date) { Date.today - 8.days }
+
+        it 'does not index the namespace' do
+          expect(ElasticsearchIndexedNamespace).not_to receive(:safe_find_or_create_by!)
+
+          gitlab_subscription.save!
+        end
+      end
+
+      context 'when it is not a hosted plan' do
         before do
-          stub_feature_flags(elasticsearch_index_only_paid_groups: elasticsearch_index_only_paid_groups_setting)
+          gitlab_subscription.namespace_id = nil
         end
 
-        it 'indexes namespace' do
-          if should_index_namespace?
-            expect(ElasticsearchIndexedNamespace).to receive(:safe_find_or_create_by!).with(namespace_id: gitlab_subscription.namespace_id)
-          else
-            expect(ElasticsearchIndexedNamespace).not_to receive(:safe_find_or_create_by!)
-          end
+        it 'does not index anything' do
+          expect(ElasticsearchIndexedNamespace).not_to receive(:safe_find_or_create_by!)
 
-          case operation
-          when :create
-            gitlab_subscription.save!
-          when :update
-            update_attributes = should_update_plan? ? { hosted_plan: create(:silver_plan), trial: false } : { max_seats_used: 32 }
-            gitlab_subscription.update!(update_attributes)
-          end
+          gitlab_subscription.save!
+        end
+      end
+
+      context 'when it is a free plan' do
+        let(:plan) { :free }
+
+        it 'does not index the namespace' do
+          expect(ElasticsearchIndexedNamespace).not_to receive(:safe_find_or_create_by!)
+
+          gitlab_subscription.save!
         end
       end
     end
