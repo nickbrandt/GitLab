@@ -3459,6 +3459,9 @@ msgstr ""
 msgid "Author: %{author_name}"
 msgstr ""
 
+msgid "Authored %{timeago}"
+msgstr ""
+
 msgid "Authored %{timeago} by %{author}"
 msgstr ""
 
