@@ -12,7 +12,6 @@ module EE
 
       def security
         if pipeline.expose_security_dashboard?
-          push_frontend_feature_flag(:pipelines_security_report_summary, default_enabled: false)
           render_show
         else
           redirect_to pipeline_path(pipeline)
