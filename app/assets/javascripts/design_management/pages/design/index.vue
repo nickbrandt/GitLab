@@ -162,14 +162,9 @@ export default {
         this.designVariables,
       );
     },
-    updateImageDiffNoteInStore(
-      _,
-      {
-        data: { updateImageDiffNote },
-      },
-    ) {
+    onUpdateImageDiffNoteDone({ data: { updateImageDiffNote } }) {
       if (updateImageDiffNote.errors[0]) {
-        this.onError(updateImageDiffNote.errors[0], updateImageDiffNote.errors[0]);
+        this.onError(UPDATE_IMAGE_DIFF_NOTE_ERROR, updateImageDiffNote.errors[0]);
       }
     },
     onMoveNote({ noteId, discussionId, position }) {
@@ -191,7 +186,10 @@ export default {
         mutation: updateImageDiffNoteMutation,
       };
 
-      return this.$apollo.mutate(mutationPayload).catch(e => this.onUpdateImageDiffNoteError(e));
+      return this.$apollo
+        .mutate(mutationPayload)
+        .then(res => this.onUpdateImageDiffNoteDone(res))
+        .catch(e => this.onUpdateImageDiffNoteError(e));
     },
     onDesignQueryResult({ data, loading }) {
       // On the initial load with cache-and-network policy data is undefined while loading is true
