@@ -17,7 +17,6 @@ describe('First Class Instance Dashboard Component', () => {
     $apollo: { queries: { projects: { loading } } },
   });
 
-  const vulnerableProjectsEndpoint = '/vulnerable/projects';
   const vulnerabilitiesExportEndpoint = '/vulnerabilities/exports';
 
   const findInstanceVulnerabilities = () => wrapper.find(FirstClassInstanceVulnerabilities);
@@ -35,7 +34,6 @@ describe('First Class Instance Dashboard Component', () => {
       },
       mocks,
       propsData: {
-        vulnerableProjectsEndpoint,
         vulnerabilitiesExportEndpoint,
       },
       stubs: {

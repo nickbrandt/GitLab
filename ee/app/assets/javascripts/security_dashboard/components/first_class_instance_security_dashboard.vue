@@ -27,10 +27,6 @@ export default {
     DashboardNotConfigured,
   },
   props: {
-    vulnerableProjectsEndpoint: {
-      type: String,
-      required: true,
-    },
     vulnerabilitiesExportEndpoint: {
       type: String,
       required: true,
