@@ -21,7 +21,8 @@ RSpec.describe API::Entities::MergeRequestApprovals do
       approved: true,
       approved_by: [{
         user: API::Entities::UserBasic.new(user).as_json
-      }]
+      }],
+      commented_by: []
     })
   end
 
@@ -30,7 +31,8 @@ RSpec.describe API::Entities::MergeRequestApprovals do
       user_has_approved: false,
       user_can_approve: true,
       approved: false,
-      approved_by: []
+      approved_by: [],
+      commented_by: []
     })
   end
 end
