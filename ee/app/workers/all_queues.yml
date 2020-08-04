@@ -51,6 +51,14 @@
   :weight: 1
   :idempotent: true
   :tags: []
+- :name: cronjob:elastic_remove_expired_namespace_subscriptions_from_index_cron
+  :feature_category: :global_search
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: cronjob:geo_container_repository_sync_dispatch
   :feature_category: :geo_replication
   :has_external_dependencies:
