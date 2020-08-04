@@ -50,38 +50,54 @@ const addNewVersionToStore = (store, query, version) => {
 };
 
 const addDiscussionCommentToStore = (store, createNote, query, queryVariables, discussionId) => {
-  const data = store.readQuery({
+  const sourceData = store.readQuery({
     query,
     variables: queryVariables,
   });
 
-  const design = extractDesign(data);
-  const currentDiscussion = extractCurrentDiscussion(design.discussions, discussionId);
-  currentDiscussion.notes.nodes = [...currentDiscussion.notes.nodes, createNote.note];
+  const sourceDesign = extractDesign(sourceData);
+  const sourceDiscussion = extractCurrentDiscussion(sourceDesign.discussions, discussionId);
+  const discussionIndex = sourceDesign.discussions.nodes.indexOf(sourceDiscussion);
 
-  design.notesCount += 1;
+  const discussion = update(sourceDiscussion, { notes: { nodes: { $push: [createNote.note] } } });
+
+  let design = update(sourceDesign, {
+    discussions: { nodes: { [discussionIndex]: { $set: discussion } } },
+  });
+
+  design = update(design, {
+    notesCount: { $apply: count => count + 1 },
+  });
+
   if (
     !design.issue.participants.nodes.some(
       participant => participant.username === createNote.note.author.username,
     )
   ) {
-    design.issue.participants.nodes = [
-      ...design.issue.participants.nodes,
-      {
-        __typename: 'User',
-        ...createNote.note.author,
+    design = update(design, {
+      issue: {
+        participants: {
+          nodes: {
+            $push: [
+              {
+                __typename: 'User',
+                ...createNote.note.author,
+              },
+            ],
+          },
+        },
       },
-    ];
+    });
   }
+
+  const data = update(sourceData, {
+    design: { $set: design },
+  });
+
   store.writeQuery({
     query,
     variables: queryVariables,
-    data: {
-      ...data,
-      design: {
-        ...design,
-      },
-    },
+    data,
   });
 };
 
