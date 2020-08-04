@@ -59,7 +59,8 @@
           @include gl-border-none;
         }
 
-        th, td {
+        th,
+        td {
           @include gl-pt-6;
         }
       }
