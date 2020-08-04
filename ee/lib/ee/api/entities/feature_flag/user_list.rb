@@ -18,6 +18,10 @@ module EE
           expose :path do |list|
             project_feature_flags_user_list_path(list.project, list)
           end
+
+          expose :edit_path do |list|
+            edit_project_feature_flags_user_list_path(list.project, list)
+          end
         end
       end
     end
