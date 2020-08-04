@@ -80,15 +80,13 @@ module Ci
       end
 
       def reset_shared_runners_seconds!(namespaces)
-        NamespaceStatistics
-          .for_namespaces(namespaces)
-          .with_any_ci_minutes_used
-          .update_all(shared_runners_seconds: 0, shared_runners_seconds_last_reset: Time.current)
+        namespace_relation = NamespaceStatistics.for_namespaces(namespaces)
+        namespace_relation = namespace_relation.with_any_ci_minutes_used unless ::Gitlab::Ci::Features.reset_ci_minutes_for_all_namespaces?
+        namespace_relation.update_all(shared_runners_seconds: 0, shared_runners_seconds_last_reset: Time.current)
 
-        ::ProjectStatistics
-          .for_namespaces(namespaces)
-          .with_any_ci_minutes_used
-          .update_all(shared_runners_seconds: 0, shared_runners_seconds_last_reset: Time.current)
+        project_relation = ::ProjectStatistics.for_namespaces(namespaces)
+        project_relation = project_relation.with_any_ci_minutes_used unless ::Gitlab::Ci::Features.reset_ci_minutes_for_all_namespaces?
+        project_relation.update_all(shared_runners_seconds: 0, shared_runners_seconds_last_reset: Time.current)
       end
 
       def reset_ci_minutes_notifications!(namespaces)
