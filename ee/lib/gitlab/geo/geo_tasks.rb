@@ -34,18 +34,6 @@ module Gitlab
           exit 1
         end
       end
-
-      def foreign_server_configured?
-        sql = <<~SQL
-          SELECT count(1)
-            FROM pg_foreign_server
-           WHERE srvname = '#{Gitlab::Geo::Fdw::FOREIGN_SERVER}';
-        SQL
-
-        Gitlab::Geo::DatabaseTasks.with_geo_db do
-          ActiveRecord::Base.connection.execute(sql).first.fetch('count').to_i == 1
-        end
-      end
     end
   end
 end
