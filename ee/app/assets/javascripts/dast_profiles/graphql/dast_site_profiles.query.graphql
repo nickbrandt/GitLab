@@ -1,8 +1,8 @@
 #import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
 
-query DASTSiteProfiles($fullPath: ID!, $after: String, $before: String, $first: Int, $last: Int) {
+query DastSiteProfiles($fullPath: ID!, $after: String, $before: String, $first: Int, $last: Int) {
   project(fullPath: $fullPath) {
-    siteProfiles: DASTSiteProfiles(after: $after, before: $before, first: $first, last: $last) {
+    siteProfiles: dastSiteProfiles(after: $after, before: $before, first: $first, last: $last) {
       pageInfo {
         ...PageInfo
       }
