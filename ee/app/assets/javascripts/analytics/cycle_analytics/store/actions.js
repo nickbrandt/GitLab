@@ -311,12 +311,15 @@ export const createValueStream = ({ commit, dispatch, getters }, data) => {
     });
 };
 
-export const setSelectedValueStream = ({ commit, dispatch }, streamId) => {
-  commit(types.SET_SELECTED_VALUE_STREAM, streamId);
-  return Promise.resolve()
+export const fetchValueStreamData = ({ dispatch }) =>
+  Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('durationChart/fetchDurationData'));
+
+export const setSelectedValueStream = ({ commit, dispatch }, streamId) => {
+  commit(types.SET_SELECTED_VALUE_STREAM, streamId);
+  return dispatch('fetchValueStreamData');
 };
 
 export const receiveValueStreamsSuccess = ({ commit, dispatch }, data = []) => {
@@ -344,5 +347,5 @@ export const fetchValueStreams = ({ commit, dispatch, getters, state }) => {
         commit(types.RECEIVE_VALUE_STREAMS_ERROR, data);
       });
   }
-  return dispatch('fetchGroupStagesAndEvents');
+  return dispatch('fetchValueStreamData');
 };
