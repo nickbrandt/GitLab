@@ -5,7 +5,6 @@ import createFlash from '~/flash';
 import { extractCurrentDiscussion, extractDesign } from './design_management_utils';
 import {
   ADD_IMAGE_DIFF_NOTE_ERROR,
-  UPDATE_IMAGE_DIFF_NOTE_ERROR,
   ADD_DISCUSSION_COMMENT_ERROR,
   designDeletionError,
 } from './error_messages';
@@ -151,43 +150,19 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
   });
 };
 
-const updateImageDiffNoteInStore = (store, updateImageDiffNote, query, variables) => {
-  const data = store.readQuery({
-    query,
-    variables,
-  });
-
-  const design = extractDesign(data);
-  const discussion = extractCurrentDiscussion(
-    design.discussions,
-    updateImageDiffNote.note.discussion.id,
-  );
-
-  discussion.notes = {
-    ...discussion.notes,
-    nodes: [updateImageDiffNote.note, ...discussion.notes.nodes.slice(1)],
-  };
-
-  store.writeQuery({
-    query,
-    variables,
-    data: {
-      ...data,
-      design,
-    },
-  });
-};
-
 const addNewDesignToStore = (store, designManagementUpload, query) => {
-  const data = store.readQuery(query);
+  const sourceData = store.readQuery(query);
 
-  const newDesigns = data.project.issue.designCollection.designs.nodes.reduce((acc, design) => {
-    if (!acc.find(d => d.filename === design.filename)) {
-      acc.push(design);
-    }
+  const newDesigns = sourceData.project.issue.designCollection.designs.nodes.reduce(
+    (acc, design) => {
+      if (!acc.find(d => d.filename === design.filename)) {
+        acc.push(design);
+      }
 
-    return acc;
-  }, designManagementUpload.designs);
+      return acc;
+    },
+    designManagementUpload.designs,
+  );
 
   let newVersionNode;
   const findNewVersions = designManagementUpload.designs.find(design => design.versions);
@@ -202,7 +177,7 @@ const addNewDesignToStore = (store, designManagementUpload, query) => {
 
   const newVersions = [
     ...(newVersionNode || []),
-    ...data.project.issue.designCollection.versions.nodes,
+    ...sourceData.project.issue.designCollection.versions.nodes,
   ];
 
   const updatedDesigns = {
@@ -217,7 +192,9 @@ const addNewDesignToStore = (store, designManagementUpload, query) => {
     },
   };
 
-  data.project.issue.designCollection = updatedDesigns;
+  const data = update(sourceData, {
+    project: { issue: { designCollection: { $set: updatedDesigns } } },
+  });
 
   store.writeQuery({
     ...query,
@@ -268,14 +245,6 @@ export const updateStoreAfterAddImageDiffNote = (store, data, query, queryVariab
     onError(data, ADD_IMAGE_DIFF_NOTE_ERROR);
   } else {
     addImageDiffNoteToStore(store, data, query, queryVariables);
-  }
-};
-
-export const updateStoreAfterUpdateImageDiffNote = (store, data, query, queryVariables) => {
-  if (hasErrors(data)) {
-    onError(data, UPDATE_IMAGE_DIFF_NOTE_ERROR);
-  } else {
-    updateImageDiffNoteInStore(store, data, query, queryVariables);
   }
 };
 

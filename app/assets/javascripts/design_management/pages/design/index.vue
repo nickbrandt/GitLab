@@ -20,10 +20,7 @@ import {
   extractDesign,
   updateImageDiffNoteOptimisticResponse,
 } from '../../utils/design_management_utils';
-import {
-  updateStoreAfterAddImageDiffNote,
-  updateStoreAfterUpdateImageDiffNote,
-} from '../../utils/cache_update';
+import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
 import {
   ADD_DISCUSSION_COMMENT_ERROR,
   ADD_IMAGE_DIFF_NOTE_ERROR,
@@ -166,17 +163,14 @@ export default {
       );
     },
     updateImageDiffNoteInStore(
-      store,
+      _,
       {
         data: { updateImageDiffNote },
       },
     ) {
-      return updateStoreAfterUpdateImageDiffNote(
-        store,
-        updateImageDiffNote,
-        getDesignQuery,
-        this.designVariables,
-      );
+      if (updateImageDiffNote.errors[0]) {
+        this.onError(updateImageDiffNote.errors[0], updateImageDiffNote.errors[0]);
+      }
     },
     onMoveNote({ noteId, discussionId, position }) {
       const discussion = this.discussions.find(({ id }) => id === discussionId);
@@ -195,7 +189,6 @@ export default {
           },
         },
         mutation: updateImageDiffNoteMutation,
-        update: this.updateImageDiffNoteInStore,
       };
 
       return this.$apollo.mutate(mutationPayload).catch(e => this.onUpdateImageDiffNoteError(e));
