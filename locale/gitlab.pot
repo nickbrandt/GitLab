@@ -12830,9 +12830,6 @@ msgstr ""
 msgid "Includes an MVC structure, mvnw and pom.xml to help you get started."
 msgstr ""
 
-msgid "Includes repository storage, wiki storage, LFS objects, build artifacts and packages. 0 for unlimited."
-msgstr ""
-
 msgid "Incoming email"
 msgstr ""
 
@@ -14646,9 +14643,6 @@ msgid "Maximum length 100 characters"
 msgstr ""
 
 msgid "Maximum lifetime allowable for Personal Access Tokens is active, your expire date must be set before %{maximum_allowable_date}."
-msgstr ""
-
-msgid "Maximum namespace storage (MB)"
 msgstr ""
 
 msgid "Maximum number of %{name} (%{count}) exceeded"
