@@ -13003,7 +13003,7 @@ CREATE TABLE public.merge_request_diffs (
     start_commit_sha character varying,
     commits_count integer,
     external_diff character varying,
-    external_diff_store integer,
+    external_diff_store integer DEFAULT 1,
     stored_externally boolean
 );
 
