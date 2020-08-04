@@ -19,7 +19,7 @@ func BenchmarkGenerate(b *testing.B) {
 			file, err := os.Open(filePath)
 			require.NoError(b, err)
 
-			p, err := NewParser(file, Config{ProcessReferences: true})
+			p, err := NewParser(file, Config{})
 			require.NoError(b, err)
 
 			_, err = p.ZipReader()

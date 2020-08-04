@@ -41,7 +41,7 @@ func createFiles(t *testing.T, filePath, tmpDir string) {
 	file, err := os.Open(filePath)
 	require.NoError(t, err)
 
-	p, err := NewParser(file, Config{ProcessReferences: true})
+	p, err := NewParser(file, Config{})
 	require.NoError(t, err)
 
 	r, err := p.ZipReader()

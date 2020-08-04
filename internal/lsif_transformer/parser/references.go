@@ -10,10 +10,9 @@ type ReferencesOffset struct {
 }
 
 type References struct {
-	Items             *cache
-	Offsets           *cache
-	CurrentOffsetId   Id
-	ProcessReferences bool
+	Items           *cache
+	Offsets         *cache
+	CurrentOffsetId Id
 }
 
 type SerializedReference struct {
@@ -34,10 +33,9 @@ func NewReferences(config Config) (*References, error) {
 	}
 
 	return &References{
-		Items:             items,
-		Offsets:           offsets,
-		CurrentOffsetId:   0,
-		ProcessReferences: config.ProcessReferences,
+		Items:           items,
+		Offsets:         offsets,
+		CurrentOffsetId: 0,
 	}, nil
 }
 
@@ -51,7 +49,7 @@ func NewReferences(config Config) (*References, error) {
 func (r *References) Store(refId Id, references []Item) error {
 	size := len(references)
 
-	if !r.ProcessReferences || size == 0 {
+	if size == 0 {
 		return nil
 	}
 
@@ -67,10 +65,6 @@ func (r *References) Store(refId Id, references []Item) error {
 }
 
 func (r *References) For(docs map[Id]string, refId Id) []SerializedReference {
-	if !r.ProcessReferences {
-		return nil
-	}
-
 	references := r.getItems(refId)
 	if references == nil {
 		return nil

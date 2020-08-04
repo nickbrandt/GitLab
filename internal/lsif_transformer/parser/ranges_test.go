@@ -8,7 +8,7 @@ import (
 )
 
 func TestRangesRead(t *testing.T) {
-	r, cleanup := setup(t, true)
+	r, cleanup := setup(t)
 	defer cleanup()
 
 	firstRange := Range{Line: 1, Character: 2, RefId: 3}
@@ -23,7 +23,7 @@ func TestRangesRead(t *testing.T) {
 }
 
 func TestSerialize(t *testing.T) {
-	r, cleanup := setup(t, true)
+	r, cleanup := setup(t)
 	defer cleanup()
 
 	docs := map[Id]string{6: "def-path", 7: "ref-path"}
@@ -36,22 +36,8 @@ func TestSerialize(t *testing.T) {
 	require.Equal(t, want, buf.String())
 }
 
-func TestSerializeWithoutProcessingReferences(t *testing.T) {
-	r, cleanup := setup(t, false)
-	defer cleanup()
-
-	docs := map[Id]string{6: "def-path", 7: "ref-path"}
-
-	var buf bytes.Buffer
-	err := r.Serialize(&buf, []Id{1}, docs)
-	want := `[{"start_line":1,"start_char":2,"definition_path":"def-path#L2","hover":null}` + "\n]"
-
-	require.NoError(t, err)
-	require.Equal(t, want, buf.String())
-}
-
-func setup(t *testing.T, processReferences bool) (*Ranges, func()) {
-	r, err := NewRanges(Config{ProcessReferences: processReferences})
+func setup(t *testing.T) (*Ranges, func()) {
+	r, err := NewRanges(Config{})
 	require.NoError(t, err)
 
 	require.NoError(t, r.Read("range", []byte(`{"id":1,"label":"range","start":{"line":1,"character":2}}`)))

@@ -176,8 +176,7 @@ func handleExifUpload(ctx context.Context, r io.Reader, filename string) (io.Rea
 
 func handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string, preauth *api.Response) (io.Reader, error) {
 	parserConfig := parser.Config{
-		TempPath:          tempPath,
-		ProcessReferences: preauth.ProcessLsifReferences,
+		TempPath: tempPath,
 	}
 
 	p, err := parser.NewParser(reader, parserConfig)

@@ -12,7 +12,7 @@ func TestReferencesStore(t *testing.T) {
 		refId = 3
 	)
 
-	r, err := NewReferences(Config{ProcessReferences: true})
+	r, err := NewReferences(Config{})
 	require.NoError(t, err)
 
 	err = r.Store(refId, []Item{{Line: 2, DocId: docId}, {Line: 3, DocId: docId}})
@@ -30,7 +30,7 @@ func TestReferencesStore(t *testing.T) {
 func TestReferencesStoreEmpty(t *testing.T) {
 	const refId = 3
 
-	r, err := NewReferences(Config{ProcessReferences: true})
+	r, err := NewReferences(Config{})
 	require.NoError(t, err)
 
 	err = r.Store(refId, []Item{})
