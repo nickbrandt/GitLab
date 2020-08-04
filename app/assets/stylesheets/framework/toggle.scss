@@ -31,7 +31,7 @@
   height: 24px;
   cursor: pointer;
   user-select: none;
-  background: $gl-gray-400;
+  background: $gray-400;
   border-radius: 12px;
   padding: 3px;
   transition: all 0.4s ease;
@@ -51,17 +51,12 @@
     display: block;
     left: 0;
     border-radius: 9px;
-    background: $feature-toggle-color;
+    background: $white;
     transition: all 0.2s ease;
 
-    &,
-    .toggle-icon-svg {
+    & {
       width: $default-icon-size;
       height: $default-icon-size;
-    }
-
-    .toggle-icon-svg {
-      fill: $gl-gray-400;
     }
   }
 
@@ -89,14 +84,10 @@
   }
 
   &.is-checked {
-    background: $feature-toggle-color-enabled;
+    background: $blue-400;
 
     .toggle-icon {
       left: calc(100% - 18px);
-
-      .toggle-icon-svg {
-        fill: $feature-toggle-color-enabled;
-      }
     }
   }
 

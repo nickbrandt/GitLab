@@ -1,7 +1,7 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '../../locale';
-import icon from './icon.vue';
+import Icon from './icon.vue';
 
 const ICON_ON = 'status_success_borderless';
 const ICON_OFF = 'status_failed_borderless';
@@ -10,7 +10,7 @@ const LABEL_OFF = s__('ToggleButton|Toggle Status: OFF');
 
 export default {
   components: {
-    icon,
+    Icon,
     GlLoadingIcon,
   },
 
@@ -63,18 +63,27 @@ export default {
   <label class="toggle-wrapper">
     <input v-if="name" :name="name" :value="value" type="hidden" />
     <button
+      type="button"
+      role="switch"
+      class="project-feature-toggle"
       :aria-label="ariaLabel"
+      :aria-checked="value"
       :class="{
         'is-checked': value,
+        'gl-blue-500': value,
         'is-disabled': disabledInput,
         'is-loading': isLoading,
       }"
-      type="button"
-      class="project-feature-toggle"
       @click="toggleFeature"
     >
       <gl-loading-icon class="loading-icon" />
-      <span class="toggle-icon"> <icon :name="toggleIcon" class="toggle-icon-svg" /> </span>
+      <span class="toggle-icon gl-bg-white">
+        <icon
+          :size="18"
+          :name="toggleIcon"
+          :class="value ? 'gl-fill-blue-500' : 'gl-fill-gray-400'"
+        />
+      </span>
     </button>
   </label>
 </template>
