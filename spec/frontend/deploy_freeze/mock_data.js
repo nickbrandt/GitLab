@@ -151,3 +151,7 @@ export const mockTimezoneData = [
   { name: 'Samoa', offset: 46800, identifier: 'Pacific/Apia' },
   { name: 'Tokelau Is.', offset: 46800, identifier: 'Pacific/Fakaofo' },
 ];
+
+export default {
+  mockTimezoneData,
+};
