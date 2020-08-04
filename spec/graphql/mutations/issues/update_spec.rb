@@ -17,6 +17,7 @@ RSpec.describe Mutations::Issues::Update do
       discussion_locked: true
     }
   end
+
   let(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
   let(:mutated_issue) { subject[:issue] }
 

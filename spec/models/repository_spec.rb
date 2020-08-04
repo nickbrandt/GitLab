@@ -2673,6 +2673,7 @@ RSpec.describe Repository do
        build(:commit, author: author_c),
        build(:commit, author: author_c)]
     end
+
     let(:order_by) { nil }
     let(:sort) { nil }
 
