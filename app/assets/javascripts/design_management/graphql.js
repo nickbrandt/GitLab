@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import { uniqueId } from 'lodash';
+import update from 'immutability-helper';
 import { defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import createDefaultClient from '~/lib/graphql';
 import activeDiscussionQuery from './graphql/queries/active_discussion.query.graphql';
@@ -11,12 +12,16 @@ Vue.use(VueApollo);
 const resolvers = {
   Mutation: {
     updateActiveDiscussion: (_, { id = null, source }, { cache }) => {
-      const data = cache.readQuery({ query: activeDiscussionQuery });
-      data.activeDiscussion = {
-        __typename: 'ActiveDiscussion',
-        id,
-        source,
-      };
+      const sourceData = cache.readQuery({ query: activeDiscussionQuery });
+      const data = update(sourceData, {
+        activeDiscussion: {
+          $set: {
+            __typename: 'ActiveDiscussion',
+            id,
+            source,
+          },
+        },
+      });
       cache.writeQuery({ query: activeDiscussionQuery, data });
     },
   },

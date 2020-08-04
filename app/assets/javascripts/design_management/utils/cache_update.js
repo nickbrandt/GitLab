@@ -58,6 +58,7 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables, d
   const sourceDesign = extractDesign(sourceData);
   const sourceDiscussion = extractCurrentDiscussion(sourceDesign.discussions, discussionId);
   const discussionIndex = sourceDesign.discussions.nodes.indexOf(sourceDiscussion);
+  const designIndex = sourceData.project.issue.designCollection.designs.nodes.indexOf(sourceDesign);
 
   const discussion = update(sourceDiscussion, { notes: { nodes: { $push: [createNote.note] } } });
 
@@ -91,7 +92,9 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables, d
   }
 
   const data = update(sourceData, {
-    design: { $set: design },
+    project: {
+      issue: { designCollection: { designs: { nodes: { [designIndex]: { $set: design } } } } },
+    },
   });
 
   store.writeQuery({
