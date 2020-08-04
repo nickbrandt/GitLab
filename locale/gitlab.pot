@@ -10336,6 +10336,9 @@ msgstr ""
 msgid "FeatureFlags|New feature flag"
 msgstr ""
 
+msgid "FeatureFlags|New list"
+msgstr ""
+
 msgid "FeatureFlags|Percent rollout (logged in users)"
 msgstr ""
 
@@ -26223,9 +26226,6 @@ msgstr ""
 msgid "User List"
 msgstr ""
 
-msgid "User Lists can only be created and modified with %{linkStart}the API%{linkEnd}"
-msgstr ""
-
 msgid "User OAuth applications"
 msgstr ""
 
@@ -26293,6 +26293,9 @@ msgid "UserLists|Create"
 msgstr ""
 
 msgid "UserLists|Define a set of users to be used within feature flag strategies"
+msgstr ""
+
+msgid "UserLists|Edit"
 msgstr ""
 
 msgid "UserLists|Edit %{name}"

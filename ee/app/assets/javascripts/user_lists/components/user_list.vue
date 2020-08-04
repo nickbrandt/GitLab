@@ -39,6 +39,7 @@ export default {
     userIdLabel: s__('UserLists|User IDs'),
     userIdColumnHeader: s__('UserLists|User ID'),
     errorMessage: __('Something went wrong on our end. Please try again!'),
+    editButtonLabel: s__('UserLists|Edit'),
   },
   classes: {
     headerClasses: [
@@ -72,6 +73,9 @@ export default {
     hasError() {
       return this.state === states.ERROR;
     },
+    editPath() {
+      return this.userList?.edit_path;
+    },
   },
   mounted() {
     this.fetchUserList();
@@ -86,7 +90,7 @@ export default {
     <gl-alert v-if="hasError" variant="danger" @dismiss="dismissErrorAlert">
       {{ $options.translations.errorMessage }}
     </gl-alert>
-    <gl-loading-icon v-if="isLoading" size="xl" class="mt-5" />
+    <gl-loading-icon v-if="isLoading" size="xl" class="gl-mt-6" />
     <div v-else>
       <add-user-modal @addUsers="addUserIds" />
       <div :class="$options.classes.headerClasses">
@@ -94,7 +98,10 @@ export default {
           <h3>{{ name }}</h3>
           <h4 class="gl-text-gray-700">{{ $options.translations.userIdLabel }}</h4>
         </div>
-        <div class="mt-5">
+        <div class="gl-mt-6">
+          <gl-button v-if="editPath" :href="editPath" data-testid="edit-user-list" class="gl-mr-3">
+            {{ $options.translations.editButtonLabel }}
+          </gl-button>
           <gl-button
             v-gl-modal="$options.ADD_USER_MODAL_ID"
             data-testid="add-users"

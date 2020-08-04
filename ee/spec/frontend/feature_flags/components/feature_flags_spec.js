@@ -1,6 +1,6 @@
-import { shallowMount, mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import { GlEmptyState, GlLoadingIcon, GlAlert } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
 import store from 'ee/feature_flags/store';
 import FeatureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
@@ -9,7 +9,6 @@ import UserListsTable from 'ee/feature_flags/components/user_lists_table.vue';
 import ConfigureFeatureFlagsModal from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
 import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from 'ee/feature_flags/constants';
 import { TEST_HOST } from 'spec/test_constants';
-import { trimText } from 'helpers/text_helper';
 import NavigationTabs from '~/vue_shared/components/navigation_tabs.vue';
 import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import axios from '~/lib/utils/axios_utils';
@@ -23,12 +22,12 @@ describe('Feature flags', () => {
     featureFlagsHelpPagePath: '/help/feature-flags',
     featureFlagsClientLibrariesHelpPagePath: '/help/feature-flags#unleash-clients',
     featureFlagsClientExampleHelpPagePath: '/help/feature-flags#client-example',
-    userListsApiDocPath: '/help/api/user_lists',
     unleashApiUrl: `${TEST_HOST}/api/unleash`,
     unleashApiInstanceId: 'oP6sCNRqtRHmpy1gw2-F',
     canUserConfigure: true,
     canUserRotateToken: true,
     newFeatureFlagPath: 'feature-flags/new',
+    newUserListPath: '/user-list/new',
     projectId: '8',
   };
 
@@ -43,6 +42,7 @@ describe('Feature flags', () => {
 
   const configureButton = () => wrapper.find('[data-testid="ff-configure-button"]');
   const newButton = () => wrapper.find('[data-testid="ff-new-button"]');
+  const newUserListButton = () => wrapper.find('[data-testid="ff-new-list-button"]');
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
@@ -65,30 +65,6 @@ describe('Feature flags', () => {
     wrapper.destroy();
   });
 
-  describe('user lists alert', () => {
-    let alert;
-
-    beforeEach(async () => {
-      factory(mockData, mount);
-
-      await wrapper.vm.$nextTick();
-      alert = wrapper.find(GlAlert);
-    });
-
-    it('should show that user lists can only be modified by the API', () => {
-      expect(trimText(alert.text())).toContain(
-        'User Lists can only be created and modified with the API',
-      );
-    });
-
-    it('should be dismissible', async () => {
-      alert.find('button').trigger('click');
-
-      await wrapper.vm.$nextTick();
-      expect(alert.exists()).toBe(false);
-    });
-  });
-
   describe('without permissions', () => {
     const propsData = {
       endpoint: `${TEST_HOST}/endpoint.json`,
@@ -102,7 +78,6 @@ describe('Feature flags', () => {
       unleashApiUrl: `${TEST_HOST}/api/unleash`,
       unleashApiInstanceId: 'oP6sCNRqtRHmpy1gw2-F',
       projectId: '8',
-      userListsApiDocPath: '/help/api/user_lists',
     };
 
     beforeEach(done => {
@@ -123,6 +98,10 @@ describe('Feature flags', () => {
 
     it('does not render new feature flag button', () => {
       expect(newButton().exists()).toBe(false);
+    });
+
+    it('does not render new user list button', () => {
+      expect(newUserListButton().exists()).toBe(false);
     });
   });
 
@@ -181,6 +160,11 @@ describe('Feature flags', () => {
         expect(newButton().exists()).toBe(true);
       });
 
+      it('renders new user list button', () => {
+        expect(newUserListButton().exists()).toBe(true);
+        expect(newUserListButton().attributes('href')).toBe('/user-list/new');
+      });
+
       describe('in feature flags tab', () => {
         it('renders generic title', () => {
           expect(emptyState.props('title')).toEqual('Get started with feature flags');
@@ -235,6 +219,11 @@ describe('Feature flags', () => {
 
       it('renders new feature flag button', () => {
         expect(newButton().exists()).toBe(true);
+      });
+
+      it('renders new user list button', () => {
+        expect(newUserListButton().exists()).toBe(true);
+        expect(newUserListButton().attributes('href')).toBe('/user-list/new');
       });
 
       describe('pagination', () => {
@@ -315,6 +304,11 @@ describe('Feature flags', () => {
 
     it('renders new feature flag button', () => {
       expect(newButton().exists()).toBe(true);
+    });
+
+    it('renders new user list button', () => {
+      expect(newUserListButton().exists()).toBe(true);
+      expect(newUserListButton().attributes('href')).toBe('/user-list/new');
     });
   });
 
