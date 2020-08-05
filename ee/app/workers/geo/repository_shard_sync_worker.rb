@@ -67,7 +67,7 @@ module Geo
       resources = find_project_ids_not_synced(except_ids: scheduled_project_ids, batch_size: db_retrieve_batch_size)
       remaining_capacity = db_retrieve_batch_size - resources.size
 
-      if remaining_capacity.zero?
+      if remaining_capacity == 0
         resources
       else
         resources + find_project_ids_updated_recently(except_ids: scheduled_project_ids + resources, batch_size: remaining_capacity)

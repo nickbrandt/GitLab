@@ -954,7 +954,7 @@ class User < ApplicationRecord
   def require_ssh_key?
     count = Users::KeysCountService.new(self).count
 
-    count.zero? && Gitlab::ProtocolAccess.allowed?('ssh')
+    count == 0 && Gitlab::ProtocolAccess.allowed?('ssh')
   end
   # rubocop: enable CodeReuse/ServiceClass
 

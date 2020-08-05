@@ -541,9 +541,9 @@ class License < ApplicationRecord
       return if restricted_user_count >= prior_historical_max
     end
 
-    user_count = prior_historical_max.zero? ? current_active_users_count : prior_historical_max
+    user_count = prior_historical_max == 0 ? current_active_users_count : prior_historical_max
 
-    add_limit_error(current_period: prior_historical_max.zero?, user_count: user_count)
+    add_limit_error(current_period: prior_historical_max == 0, user_count: user_count)
   end
 
   def check_trueup

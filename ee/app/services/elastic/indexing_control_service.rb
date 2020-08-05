@@ -65,7 +65,7 @@ module Elastic
           remove_jobs_from_waiting_queue(redis, jobs_with_scores)
         end
 
-        redis.del(redis_set_key, redis_score_key) if queue_size.zero?
+        redis.del(redis_set_key, redis_score_key) if queue_size == 0
       end
     end
 

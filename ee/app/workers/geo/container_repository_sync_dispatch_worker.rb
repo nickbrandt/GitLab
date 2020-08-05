@@ -39,7 +39,7 @@ module Geo
       resources = find_container_repository_ids_not_synced(batch_size: db_retrieve_batch_size)
       remaining_capacity = db_retrieve_batch_size - resources.size
 
-      if remaining_capacity.zero?
+      if remaining_capacity == 0
         resources
       else
         resources + find_retryable_container_registry_ids(batch_size: remaining_capacity)

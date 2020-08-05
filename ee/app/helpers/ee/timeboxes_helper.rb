@@ -44,7 +44,7 @@ module EE
     end
 
     def milestone_weight_tooltip_text(weight)
-      if weight.zero?
+      if weight == 0
         _("Weight")
       else
         _("Weight %{weight}") % { weight: weight }
