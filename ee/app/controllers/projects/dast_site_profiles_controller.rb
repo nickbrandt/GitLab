@@ -7,6 +7,13 @@ module Projects
     def new
     end
 
+    def edit
+      @site_profile = @project
+        .dast_site_profiles
+        .with_dast_site
+        .find(params[:id])
+    end
+
     private
 
     def authorize_read_on_demand_scans!
