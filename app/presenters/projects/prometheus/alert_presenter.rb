@@ -77,6 +77,16 @@ module Projects
         end
       end
 
+      def details_url
+        return unless alert
+
+        ::Gitlab::Routing.url_helpers.details_namespace_project_alert_management_url(
+          id: alert,
+          project_id: project,
+          namespace_id: project.namespace
+        )
+      end
+
       private
 
       def alert_title
@@ -97,6 +107,7 @@ module Projects
         metadata << list_item(service.label.humanize, service.value) if service
         metadata << list_item(monitoring_tool.label.humanize, monitoring_tool.value) if monitoring_tool
         metadata << list_item(hosts.label.humanize, host_links) if hosts
+        metadata << list_item('GitLab Alert', details_url) if details_url
 
         metadata.join(MARKDOWN_LINE_BREAK)
       end

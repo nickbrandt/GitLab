@@ -20,6 +20,8 @@ RSpec.describe AlertManagement::PrometheusAlertPresenter do
     create(:alert_management_alert, :prometheus, project: project, payload: payload)
   end
 
+  let(:alert_url) { "http://localhost/#{project.full_path}/-/alert_management/#{alert.id}/details" }
+
   subject(:presenter) { described_class.new(alert) }
 
   describe '#issue_description' do
@@ -33,7 +35,8 @@ RSpec.describe AlertManagement::PrometheusAlertPresenter do
           **Start time:** #{presenter.start_time}#{markdown_line_break}
           **Severity:** #{presenter.severity}#{markdown_line_break}
           **full_query:** `vector(1)`#{markdown_line_break}
-          **Monitoring tool:** Prometheus
+          **Monitoring tool:** Prometheus#{markdown_line_break}
+          **GitLab alert:** #{alert_url}
 
           #### Alert Details
 
