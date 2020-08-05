@@ -1471,20 +1471,20 @@ GitLab Community Edition), don't split the product or feature name across lines.
 When a feature is available in paid tiers, add the corresponding tier to the
 header or other page element according to the feature's availability:
 
-| Tier                                                         | Tier markup           |
-|:-------------------------------------------------------------|:----------------------|
-| GitLab Core and GitLab.com Free, and their higher tiers      | `**(CORE)**`          |
-| GitLab Starter and GitLab.com Bronze, and their higher tiers | `**(STARTER)**`       |
-| GitLab Premium and GitLab.com Silver, and their higher tiers | `**(PREMIUM)**`       |
-| GitLab Ultimate and GitLab.com Gold                          | `**(ULTIMATE)**`      |
-| *Only* GitLab Core, and higher tiers                         | `**(CORE ONLY)**`     |
-| *Only* GitLab Starter, and higher tiers                      | `**(STARTER ONLY)**`  |
-| *Only* GitLab Premium, and higher tiers                      | `**(PREMIUM ONLY)**`  |
-| *Only* GitLab Ultimate                                       | `**(ULTIMATE ONLY)**` |
-| *Only* GitLab.com Free, and higher tiers                     | `**(FREE ONLY)**`     |
-| *Only* GitLab.com Bronze, and higher tiers                   | `**(BRONZE ONLY)**`   |
-| *Only* GitLab.com Silver, and higher tiers                   | `**(SILVER ONLY)**`   |
-| *Only* GitLab.com Gold                                       | `**(GOLD ONLY)**`     |
+| Tier in which feature is available                                     | Tier markup           |
+|:-----------------------------------------------------------------------|:----------------------|
+| GitLab Core and GitLab.com Free, and their higher tiers                | `**(CORE)**`          |
+| GitLab Starter and GitLab.com Bronze, and their higher tiers           | `**(STARTER)**`       |
+| GitLab Premium and GitLab.com Silver, and their higher tiers           | `**(PREMIUM)**`       |
+| GitLab Ultimate and GitLab.com Gold                                    | `**(ULTIMATE)**`      |
+| *Only* GitLab Core and higher tiers (no GitLab.com-based tiers)        | `**(CORE ONLY)**`     |
+| *Only* GitLab Starter and higher tiers (no GitLab.com-based tiers)     | `**(STARTER ONLY)**`  |
+| *Only* GitLab Premium and higher tiers (no GitLab.com-based tiers)     | `**(PREMIUM ONLY)**`  |
+| *Only* GitLab Ultimate (no GitLab.com-based tiers)                     | `**(ULTIMATE ONLY)**` |
+| *Only* GitLab.com Free and higher tiers (no self-managed instances)    | `**(FREE ONLY)**`     |
+| *Only* GitLab.com Bronze and higher tiers (no self-managed instances)  | `**(BRONZE ONLY)**`   |
+| *Only* GitLab.com Silver and higher tiers (no self-managed instances)  | `**(SILVER ONLY)**`   |
+| *Only* GitLab.com Gold (no self-managed instances)                     | `**(GOLD ONLY)**`     |
 
 For clarity, all page title headers (H1s) must be have a tier markup for
 the lowest tier that has information on the documentation page.
