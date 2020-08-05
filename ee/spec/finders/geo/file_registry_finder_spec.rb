@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe Geo::FileRegistryFinder, :geo do
-  include ::EE::GeoHelpers
-
   context 'with abstract methods' do
     %w[
       replicables

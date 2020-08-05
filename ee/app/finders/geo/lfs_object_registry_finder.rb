@@ -3,13 +3,17 @@
 module Geo
   class LfsObjectRegistryFinder < FileRegistryFinder
     def replicables
-      lfs_objects = current_node(fdw: false).lfs_objects
-
       local_storage_only? ? lfs_objects.with_files_stored_locally : lfs_objects
     end
 
     def syncable
       Geo::LfsObjectRegistry
+    end
+
+    private
+
+    def lfs_objects
+      current_node.lfs_objects
     end
   end
 end
