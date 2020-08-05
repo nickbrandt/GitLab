@@ -8,6 +8,7 @@ module EE
       lazy_resolve ::Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate, :epic_aggregate
       lazy_resolve ::Gitlab::Graphql::Aggregations::Issues::LazyBlockAggregate, :block_aggregate
       lazy_resolve ::Gitlab::Graphql::Aggregations::VulnerabilityStatistics::LazyAggregate, :aggregate
+      lazy_resolve ::Gitlab::Graphql::Aggregations::Vulnerabilities::LazyUserNotesCountAggregate, :user_notes_count_aggregate
     end
   end
 end
