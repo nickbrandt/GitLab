@@ -1112,7 +1112,6 @@ Represents total number of issues for the represented statuses
 | ---   |  ---- | ----------  |
 | `all` | Int | Number of issues with status ALL for the project |
 | `closed` | Int | Number of issues with status CLOSED for the project |
-| `merged` | Int | Number of issues with status MERGED for the project |
 | `opened` | Int | Number of issues with status OPENED for the project |
 
 ## Iteration

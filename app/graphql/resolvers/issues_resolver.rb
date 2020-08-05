@@ -4,6 +4,9 @@ module Resolvers
   class IssuesResolver < BaseResolver
     prepend Resolvers::IssueResolverFields
 
+    argument :state, Types::IssuableStateEnum,
+              required: false,
+              description: 'Current state of this issue'
     argument :sort, Types::IssueSortEnum,
               description: 'Sort issues by this criteria',
               required: false,

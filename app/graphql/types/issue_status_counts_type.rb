@@ -7,11 +7,13 @@ module Types
 
     authorize :read_issue
 
-    ::Gitlab::IssuablesCountForState::STATES.each do |status|
-      field status,
+    ::Gitlab::IssuablesCountForState::STATES.each do |state|
+      next unless Issue.available_states.keys.push('all').include?(state)
+
+      field state,
             GraphQL::INT_TYPE,
             null: true,
-            description: "Number of issues with status #{status.upcase} for the project"
+            description: "Number of issues with status #{state.upcase} for the project"
     end
   end
 end

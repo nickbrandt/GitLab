@@ -7267,11 +7267,6 @@ type IssueStatusCountsType {
   closed: Int
 
   """
-  Number of issues with status MERGED for the project
-  """
-  merged: Int
-
-  """
   Number of issues with status OPENED for the project
   """
   opened: Int
@@ -10356,11 +10351,6 @@ type Project {
     Search query for issue title or description
     """
     search: String
-
-    """
-    Current state of this issue
-    """
-    state: IssuableState
 
     """
     Filter issues by the given issue types

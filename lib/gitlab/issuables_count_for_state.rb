@@ -26,9 +26,9 @@ module Gitlab
       self[state || :opened]
     end
 
-    # Define method for each status
-    STATES.each do |status|
-      define_method(status) { self[status] }
+    # Define method for each state
+    STATES.each do |state|
+      define_method(state) { self[state] }
     end
 
     # Returns the count for the given state.

@@ -10,7 +10,6 @@ RSpec.describe GitlabSchema.types['IssueStatusCountsType'] do
       all
       opened
       closed
-      merged
     ]
 
     expect(described_class).to have_graphql_fields(*expected_fields)

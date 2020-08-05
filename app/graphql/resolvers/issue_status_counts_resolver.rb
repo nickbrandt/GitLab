@@ -2,7 +2,7 @@
 
 module Resolvers
   class IssueStatusCountsResolver < BaseResolver
-    prepend Resolvers::IssueResolverFields
+    prepend IssueResolverFields
 
     type Types::IssueStatusCountsType, null: true
 

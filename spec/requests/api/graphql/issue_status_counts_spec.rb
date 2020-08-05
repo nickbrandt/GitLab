@@ -50,9 +50,8 @@ RSpec.describe 'getting Issue counts by status' do
         expect(issue_counts).to eq(
           'all' => 2,
           'opened' => 1,
-          'closed' => 1,
-          'merged' => 0 # merged is not relevant for issues
-        )               # but is included in the return type (Gitlab::IssuablesCountForState)
+          'closed' => 1
+        )
       end
     end
   end

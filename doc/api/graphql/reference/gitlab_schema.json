@@ -15600,16 +15600,6 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "state",
-                  "description": "Current state of this issue",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "IssuableState",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "labelName",
                   "description": "Labels applied to this issue",
                   "type": {
@@ -15742,6 +15732,16 @@
                         "ofType": null
                       }
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "state",
+                  "description": "Current state of this issue",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IssuableState",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
@@ -20023,20 +20023,6 @@
             {
               "name": "closed",
               "description": "Number of issues with status CLOSED for the project",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "merged",
-              "description": "Number of issues with status MERGED for the project",
               "args": [
 
               ],
@@ -30530,16 +30516,6 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "state",
-                  "description": "Current state of this issue",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "IssuableState",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "labelName",
                   "description": "Labels applied to this issue",
                   "type": {
@@ -30676,6 +30652,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "state",
+                  "description": "Current state of this issue",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IssuableState",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "sort",
                   "description": "Sort issues by this criteria",
                   "type": {
@@ -30737,16 +30723,6 @@
                         "ofType": null
                       }
                     }
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "state",
-                  "description": "Current state of this issue",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "IssuableState",
-                    "ofType": null
                   },
                   "defaultValue": null
                 },
@@ -30928,16 +30904,6 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "state",
-                  "description": "Current state of this issue",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "IssuableState",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "labelName",
                   "description": "Labels applied to this issue",
                   "type": {
@@ -31070,6 +31036,16 @@
                         "ofType": null
                       }
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "state",
+                  "description": "Current state of this issue",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "IssuableState",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
