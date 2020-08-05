@@ -335,6 +335,24 @@ RSpec.describe Group do
     end
   end
 
+  describe '#vulnerability_historical_statistics' do
+    subject { group.vulnerability_historical_statistics }
+
+    let(:subgroup) { create(:group, parent: group) }
+    let(:group_project) { create(:project, namespace: group) }
+    let(:subgroup_project) { create(:project, namespace: subgroup) }
+    let(:archived_project) { create(:project, :archived, namespace: group) }
+    let(:deleted_project) { create(:project, pending_delete: true, namespace: group) }
+    let!(:group_vulnerability_historical_statistic) { create(:vulnerability_historical_statistic, project: group_project) }
+    let!(:subgroup_vulnerability_historical_statistic) { create(:vulnerability_historical_statistic, project: subgroup_project) }
+    let!(:archived_vulnerability_historical_statistic) { create(:vulnerability_historical_statistic, project: archived_project) }
+    let!(:deleted_vulnerability_historical_statistic) { create(:vulnerability_historical_statistic, project: deleted_project) }
+
+    it 'returns vulnerability scanners for all non-archived, non-deleted projects in the group and its subgroups' do
+      is_expected.to contain_exactly(group_vulnerability_historical_statistic, subgroup_vulnerability_historical_statistic)
+    end
+  end
+
   describe '#mark_ldap_sync_as_failed' do
     it 'sets the state to failed' do
       group.start_ldap_sync

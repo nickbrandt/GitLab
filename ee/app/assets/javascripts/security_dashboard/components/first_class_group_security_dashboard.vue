@@ -6,7 +6,7 @@ import Filters from 'ee/security_dashboard/components/first_class_vulnerability_
 import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vulnerability_chart.vue';
 import CsvExportButton from './csv_export_button.vue';
 import VulnerabilitySeverity from './vulnerability_severity.vue';
-import vulnerabilityHistoryQuery from '../graphql/group_vulnerability_history.graphql';
+import vulnerabilityHistoryQuery from '../graphql/group_vulnerability_history.query.graphql';
 import DashboardNotConfigured from './empty_states/group_dashboard_not_configured.vue';
 
 export default {

@@ -12,11 +12,18 @@ module EE
               description: "Vulnerabilities reported on projects on the current user's instance security dashboard",
               resolver: ::Resolvers::VulnerabilitiesResolver
 
+        field :vulnerabilities_count_by_day,
+              ::Types::VulnerabilitiesCountByDayType.connection_type,
+              null: true,
+              description: "Number of vulnerabilities per day for the projects on the current user's instance security dashboard",
+              resolver: ::Resolvers::VulnerabilitiesCountPerDayResolver
+
         field :vulnerabilities_count_by_day_and_severity,
               ::Types::VulnerabilitiesCountByDayAndSeverityType.connection_type,
               null: true,
               description: "Number of vulnerabilities per severity level, per day, for the projects on the current user's instance security dashboard",
-              resolver: ::Resolvers::VulnerabilitiesHistoryResolver
+              resolver: ::Resolvers::VulnerabilitiesHistoryResolver,
+              deprecated: { reason: 'Use `vulnerabilitiesCountByDay`', milestone: '13.3' }
 
         field :geo_node, ::Types::Geo::GeoNodeType,
               null: true,
