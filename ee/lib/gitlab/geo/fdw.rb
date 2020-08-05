@@ -63,7 +63,7 @@ module Gitlab
         private
 
         def fdw_capable?
-          has_foreign_server? && has_foreign_schema? && foreign_schema_tables_count.positive?
+          has_foreign_server? && has_foreign_schema? && foreign_schema_tables_count > 0
         rescue ::Geo::TrackingBase::SecondaryNotConfigured
           false
         end
@@ -74,7 +74,7 @@ module Gitlab
         def has_foreign_server?
           ::Geo::TrackingBase.connection.execute(
             "SELECT 1 FROM pg_foreign_server"
-          ).count.positive?
+          ).count > 0
         end
 
         def has_foreign_schema?
@@ -85,7 +85,7 @@ module Gitlab
                WHERE schema_name='#{FOREIGN_SCHEMA}'
             SQL
 
-            ::Geo::TrackingBase.connection.execute(sql).count.positive?
+            ::Geo::TrackingBase.connection.execute(sql).count > 0
           end
         end
 

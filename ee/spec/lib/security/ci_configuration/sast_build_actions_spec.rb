@@ -6,8 +6,12 @@ RSpec.describe Security::CiConfiguration::SastBuildActions do
   context 'autodevops disabled' do
     let(:auto_devops_enabled) { false }
 
-    context 'with one empty parameter' do
-      let(:params) { { 'SECURE_ANALYZERS_PREFIX' => '' } }
+    context 'with empty parameters' do
+      let(:params) do
+        { 'stage' => '',
+          'SECURE_ANALYZERS_PREFIX' => '',
+          'SEARCH_MAX_DEPTH' => '' }
+      end
 
       subject(:result) { described_class.new(auto_devops_enabled, params).generate }
 

@@ -250,8 +250,9 @@ module EE
         .any?
     end
 
-    def managed_free_namespaces
+    def manageable_groups_eligible_for_subscription
       manageable_groups
+        .where(parent_id: nil)
         .left_joins(:gitlab_subscription)
         .merge(GitlabSubscription.left_joins(:hosted_plan).where(plans: { name: [nil, *::Plan.default_plans] }))
         .order(:name)

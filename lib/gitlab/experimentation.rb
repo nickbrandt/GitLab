@@ -53,6 +53,9 @@ module Gitlab
       },
       new_create_project_ui: {
         tracking_category: 'Manage::Import::Experiment::NewCreateProjectUi'
+      },
+      terms_opt_in: {
+        tracking_category: 'Growth::Acquisition::Experiment::TermsOptIn'
       }
     }.freeze
 
@@ -167,7 +170,7 @@ module Gitlab
 
     Experiment = Struct.new(:key, :environment, :tracking_category, keyword_init: true) do
       def enabled?
-        experiment_percentage.positive?
+        experiment_percentage > 0
       end
 
       def enabled_for_environment?

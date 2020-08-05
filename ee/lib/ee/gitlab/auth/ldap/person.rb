@@ -46,7 +46,7 @@ module EE
               ::Gitlab::Auth::Ldap::DN.new(dn).each_pair { |name, value| dn_components << { name: name, value: value } }
               dn_components
                 .reverse
-                .take_while { |rdn| rdn[:name].casecmp('DC').zero? } # Domain Component
+                .take_while { |rdn| rdn[:name].casecmp('DC') == 0 } # Domain Component
                 .map { |rdn| rdn[:value] }
                 .reverse
                 .join('.')

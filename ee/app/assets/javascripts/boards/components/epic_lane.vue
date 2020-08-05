@@ -87,7 +87,7 @@ export default {
 
 <template>
   <div>
-    <div class="board-epic-lane gl-sticky gl-left-0 gl-display-inline-block gl-max-w-full">
+    <div class="board-epic-lane gl-sticky gl-left-0 gl-display-inline-block">
       <div class="gl-py-5 gl-px-3 gl-display-flex gl-align-items-center">
         <gl-button
           v-gl-tooltip.hover.right

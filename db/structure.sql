@@ -11203,7 +11203,8 @@ CREATE TABLE public.design_management_designs (
     id bigint NOT NULL,
     project_id integer NOT NULL,
     issue_id integer,
-    filename character varying NOT NULL
+    filename character varying NOT NULL,
+    relative_position integer
 );
 
 CREATE SEQUENCE public.design_management_designs_id_seq
@@ -13038,7 +13039,8 @@ CREATE TABLE public.merge_request_metrics (
     first_approved_at timestamp with time zone,
     first_reassigned_at timestamp with time zone,
     added_lines integer,
-    removed_lines integer
+    removed_lines integer,
+    target_project_id integer
 );
 
 CREATE SEQUENCE public.merge_request_metrics_id_seq
@@ -19393,6 +19395,8 @@ CREATE INDEX index_description_versions_on_issue_id ON public.description_versio
 
 CREATE INDEX index_description_versions_on_merge_request_id ON public.description_versions USING btree (merge_request_id) WHERE (merge_request_id IS NOT NULL);
 
+CREATE INDEX index_design_management_designs_issue_id_relative_position_id ON public.design_management_designs USING btree (issue_id, relative_position, id);
+
 CREATE UNIQUE INDEX index_design_management_designs_on_issue_id_and_filename ON public.design_management_designs USING btree (issue_id, filename);
 
 CREATE INDEX index_design_management_designs_on_project_id ON public.design_management_designs USING btree (project_id);
@@ -19880,6 +19884,8 @@ CREATE INDEX index_merge_request_metrics_on_merged_at ON public.merge_request_me
 CREATE INDEX index_merge_request_metrics_on_merged_by_id ON public.merge_request_metrics USING btree (merged_by_id);
 
 CREATE INDEX index_merge_request_metrics_on_pipeline_id ON public.merge_request_metrics USING btree (pipeline_id);
+
+CREATE INDEX index_merge_request_metrics_on_target_project_id ON public.merge_request_metrics USING btree (target_project_id);
 
 CREATE UNIQUE INDEX index_merge_request_user_mentions_on_note_id ON public.merge_request_user_mentions USING btree (note_id) WHERE (note_id IS NOT NULL);
 
@@ -20464,6 +20470,8 @@ CREATE INDEX index_resource_milestone_events_on_issue_id ON public.resource_mile
 CREATE INDEX index_resource_milestone_events_on_merge_request_id ON public.resource_milestone_events USING btree (merge_request_id);
 
 CREATE INDEX index_resource_milestone_events_on_milestone_id ON public.resource_milestone_events USING btree (milestone_id);
+
+CREATE INDEX index_resource_milestone_events_on_milestone_id_and_add_action ON public.resource_milestone_events USING btree (milestone_id) WHERE (action = 1);
 
 CREATE INDEX index_resource_milestone_events_on_user_id ON public.resource_milestone_events USING btree (user_id);
 
@@ -21384,6 +21392,9 @@ ALTER TABLE ONLY public.path_locks
 
 ALTER TABLE ONLY public.clusters_applications_prometheus
     ADD CONSTRAINT fk_557e773639 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.merge_request_metrics
+    ADD CONSTRAINT fk_56067dcb44 FOREIGN KEY (target_project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.vulnerability_feedback
     ADD CONSTRAINT fk_563ff1912e FOREIGN KEY (merge_request_id) REFERENCES public.merge_requests(id) ON DELETE SET NULL;
