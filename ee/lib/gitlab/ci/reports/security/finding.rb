@@ -4,7 +4,7 @@ module Gitlab
   module Ci
     module Reports
       module Security
-        class Occurrence
+        class Finding
           attr_reader :compare_key
           attr_reader :confidence
           attr_reader :identifiers

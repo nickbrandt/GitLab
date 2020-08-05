@@ -56,10 +56,6 @@ module Gitlab
           end
         end
 
-        def gitlab_schema_tables_count
-          ActiveRecord::Schema.tables.reject { |table| table.start_with?('pg_') }.count
-        end
-
         def expire_cache!
           Gitlab::Geo.expire_cache_keys!(CACHE_KEYS)
         end

@@ -22,6 +22,7 @@ module Geo
         Geo::LfsObjectRegistry,
         Geo::PackageFileRegistry,
         Geo::ProjectRegistry,
+        Geo::TerraformStateRegistry,
         Geo::UploadRegistry
       ].freeze
 
