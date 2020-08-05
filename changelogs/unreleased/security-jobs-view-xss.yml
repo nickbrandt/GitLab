@@ -1,5 +1,0 @@
----
-title: Fix xss vulnerability on jobs view
-merge_request:
-author:
-type: security
