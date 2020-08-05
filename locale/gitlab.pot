@@ -15094,6 +15094,12 @@ msgstr ""
 msgid "MetricsSettings|User's local timezone"
 msgstr ""
 
+msgid "Metrics|1. Define and preview panel"
+msgstr ""
+
+msgid "Metrics|2. Paste panel YAML into dashboard"
+msgstr ""
+
 msgid "Metrics|Add metric"
 msgstr ""
 
@@ -15115,6 +15121,9 @@ msgstr ""
 msgid "Metrics|Copy YAML"
 msgstr ""
 
+msgid "Metrics|Copy and paste the panel YAML into your dashboard YAML file."
+msgstr ""
+
 msgid "Metrics|Create custom dashboard %{fileName}"
 msgstr ""
 
@@ -15133,10 +15142,10 @@ msgstr ""
 msgid "Metrics|Current"
 msgstr ""
 
-msgid "Metrics|Define and preview panel"
+msgid "Metrics|Dashboard files can be found in %{codeStart}.gitlab/dashboards%{codeEnd} at the root of this project."
 msgstr ""
 
-msgid "Metrics|Define panel YAML to preview panel."
+msgid "Metrics|Define panel YAML below to preview panel."
 msgstr ""
 
 msgid "Metrics|Delete metric"
