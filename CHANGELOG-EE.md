@@ -561,6 +561,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Relocate Go models. !34338 (Ethan Reesor (@firelizzard))
 
 
+## 13.0.12 (2020-08-05)
+
+- No changes.
+
 ## 13.0.11 (2020-08-05)
 
 This version has been skipped due to packaging problems.
