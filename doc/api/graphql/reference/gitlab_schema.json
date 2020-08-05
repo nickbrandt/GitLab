@@ -25147,6 +25147,16 @@
           "possibleTypes": null
         },
         {
+          "kind": "SCALAR",
+          "name": "MilestoneID",
+          "description": "Identifier of Milestone",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "ENUM",
           "name": "MilestoneStateEnum",
           "description": null,
@@ -34296,6 +34306,33 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "Metadata",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "milestone",
+              "description": "Find a milestone",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Find a milestone by its ID",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "MilestoneID",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Milestone",
                 "ofType": null
               },
               "isDeprecated": false,

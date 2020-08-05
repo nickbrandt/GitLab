@@ -8960,6 +8960,11 @@ type MilestoneEdge {
   node: Milestone
 }
 
+"""
+Identifier of Milestone
+"""
+scalar MilestoneID
+
 enum MilestoneStateEnum {
   active
   closed
@@ -11620,6 +11625,16 @@ type Query {
   Metadata about GitLab
   """
   metadata: Metadata
+
+  """
+  Find a milestone
+  """
+  milestone(
+    """
+    Find a milestone by its ID
+    """
+    id: MilestoneID!
+  ): Milestone
 
   """
   Find a namespace
