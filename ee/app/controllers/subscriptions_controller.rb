@@ -42,7 +42,7 @@ class SubscriptionsController < ApplicationController
     current_user.update(setup_for_company: true) if params[:setup_for_company]
 
     if params[:selected_group]
-      group = current_user.managed_free_namespaces.find(params[:selected_group])
+      group = current_user.manageable_groups_eligible_for_subscription.find(params[:selected_group])
     else
       group_name = params[:setup_for_company] ? customer_params[:company] : "#{current_user.name}'s Group"
       path = Namespace.clean_path(group_name)
