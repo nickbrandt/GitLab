@@ -67,12 +67,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
           resource :discover, only: [:show], controller: :discover
 
-          resources :vulnerability_findings, only: [:index] do
-            collection do
-              get :summary
-            end
-          end
-
           resources :scanned_resources, only: [:index]
 
           resources :vulnerabilities, only: [:show] do

@@ -121,8 +121,6 @@ RSpec.describe ProjectsHelper do
           has_vulnerabilities: 'true',
           project: { id: project.id, name: project.name },
           project_full_path: project.full_path,
-          vulnerabilities_endpoint: "/#{project.full_path}/-/security/vulnerability_findings",
-          vulnerabilities_summary_endpoint: "/#{project.full_path}/-/security/vulnerability_findings/summary",
           vulnerabilities_export_endpoint: "/api/v4/security/projects/#{project.id}/vulnerability_exports",
           vulnerability_feedback_help_path: '/help/user/application_security/index#interacting-with-the-vulnerabilities',
           no_vulnerabilities_svg_path: start_with('/assets/illustrations/issues-'),
