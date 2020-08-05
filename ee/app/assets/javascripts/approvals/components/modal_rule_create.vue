@@ -22,8 +22,20 @@ export default {
   },
   computed: {
     ...mapState('createModal', {
-      rule: 'data',
+      rule(state) {
+        /*
+         * rule-form component expects undefined if we pre-populate the form input,
+         * otherwise populate with existing rule
+         */
+        return state.data?.initRuleField ? undefined : state.data;
+      },
+      originalData: 'data',
     }),
+    initRuleFieldName() {
+      return this.originalData?.initRuleField && this.originalData?.name
+        ? this.originalData.name
+        : '';
+    },
     title() {
       return this.rule ? __('Update approval rule') : __('Add approval rule');
     },
@@ -47,6 +59,11 @@ export default {
     size="sm"
     @ok.prevent="submit"
   >
-    <rule-form ref="form" :init-rule="rule" :is-mr-edit="isMrEdit" />
+    <rule-form
+      ref="form"
+      :init-rule="rule"
+      :is-mr-edit="isMrEdit"
+      :init-rule-field-name="initRuleFieldName"
+    />
   </gl-modal-vuex>
 </template>

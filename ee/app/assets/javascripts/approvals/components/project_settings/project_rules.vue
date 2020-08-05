@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { n__, sprintf } from '~/locale';
+import { __, n__, sprintf } from '~/locale';
 import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR } from '../../constants';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import Rules from '../rules.vue';
@@ -8,6 +8,7 @@ import RuleControls from '../rule_controls.vue';
 import EmptyRule from '../empty_rule.vue';
 import RuleInput from '../mr_edit/rule_input.vue';
 import RuleBranches from '../rule_branches.vue';
+import UnconfiguredSecurityRule from '../security_configuration/unconfigured_security_rule.vue';
 
 export default {
   components: {
@@ -17,12 +18,36 @@ export default {
     EmptyRule,
     RuleInput,
     RuleBranches,
+    UnconfiguredSecurityRule,
+  },
+  inject: {
+    securityConfigurationPath: {
+      type: String,
+      required: true,
+      from: 'securityConfigurationPath',
+      default: '',
+    },
+    vulnerabilityCheckHelpPagePath: {
+      type: String,
+      required: true,
+      from: 'vulnerabilityCheckHelpPagePath',
+      default: '',
+    },
+    licenseCheckHelpPagePath: {
+      type: String,
+      required: true,
+      from: 'licenseCheckHelpPagePath',
+      default: '',
+    },
   },
   computed: {
     ...mapState(['settings']),
     ...mapState({
       rules: state => state.approvals.rules,
+      hasApprovalsLoaded: state => state.approvals.hasLoaded,
+      hasSecurityConfigurationLoaded: state => state.securityConfiguration.hasLoaded,
     }),
+    ...mapState('securityConfiguration', ['configuration']),
     hasNamedRule() {
       return this.rules.some(rule => rule.ruleType === RULE_TYPE_REGULAR);
     },
@@ -31,6 +56,33 @@ export default {
         this.settings.allowMultiRule &&
         !this.rules.some(rule => rule.ruleType === RULE_TYPE_ANY_APPROVER)
       );
+    },
+    isRulesLoading() {
+      return !this.hasApprovalsLoaded || !this.hasSecurityConfigurationLoaded;
+    },
+    securityRules() {
+      return [
+        {
+          name: 'Vulnerability-Check',
+          description: __(
+            'One or more of the security scanners must be enabled %{linkStart}more information%{linkEnd}',
+          ),
+          enableDescription: __(
+            'Requires approval for vulnerabilties of Critical, High, or Unknown severity %{linkStart}more information%{linkEnd}',
+          ),
+          docsPath: this.vulnerabilityCheckHelpPagePath,
+        },
+        {
+          name: 'License-Check',
+          description: __(
+            'License Scanning must be enabled %{linkStart}more information%{linkEnd}',
+          ),
+          enableDescription: __(
+            'Requires license policy rules for licenses of Allowed, or Denied %{linkStart}more information%{linkEnd}',
+          ),
+          docsPath: this.licenseCheckHelpPagePath,
+        },
+      ];
     },
   },
   watch: {
@@ -46,8 +98,17 @@ export default {
       immediate: true,
     },
   },
+  mounted() {
+    this.setSecurityConfigurationEndpoint(this.securityConfigurationPath);
+    this.fetchSecurityConfiguration();
+  },
   methods: {
     ...mapActions(['addEmptyRule']),
+    ...mapActions({ openCreateModal: 'createModal/open' }),
+    ...mapActions('securityConfiguration', [
+      'setSecurityConfigurationEndpoint',
+      'fetchSecurityConfiguration',
+    ]),
     summaryText(rule) {
       return this.settings.allowMultiRule
         ? this.summaryMultipleRulesText(rule)
@@ -131,6 +192,16 @@ export default {
           </td>
         </tr>
       </template>
+
+      <unconfigured-security-rule
+        v-for="securityRule in securityRules"
+        :key="securityRule.name"
+        :configuration="configuration"
+        :rules="rules"
+        :is-loading="isRulesLoading"
+        :match-rule="securityRule"
+        @enable-btn-clicked="openCreateModal({ name: securityRule.name, initRuleField: true })"
+      />
     </template>
   </rules>
 </template>

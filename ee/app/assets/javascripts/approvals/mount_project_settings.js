@@ -12,6 +12,12 @@ export default function mountProjectSettingsApprovals(el) {
     return null;
   }
 
+  const {
+    securityConfigurationPath,
+    vulnerabilityCheckHelpPagePath,
+    licenseCheckHelpPagePath,
+  } = el.dataset;
+
   const store = createStore(projectSettingsModule(), {
     ...el.dataset,
     prefix: 'project-settings',
@@ -22,6 +28,11 @@ export default function mountProjectSettingsApprovals(el) {
   return new Vue({
     el,
     store,
+    provide: {
+      securityConfigurationPath,
+      vulnerabilityCheckHelpPagePath,
+      licenseCheckHelpPagePath,
+    },
     render(h) {
       return h(ProjectSettingsApp);
     },

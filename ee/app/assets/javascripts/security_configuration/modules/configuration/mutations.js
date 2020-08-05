@@ -10,6 +10,7 @@ export default {
   },
   [types.RECEIVE_SECURITY_CONFIGURATION_SUCCESS](state, payload) {
     state.isLoading = false;
+    state.hasLoaded = true;
     state.errorLoading = false;
     state.configuration = payload;
   },

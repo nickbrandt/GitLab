@@ -9,7 +9,8 @@ import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from '../constants';
 
 const DEFAULT_NAME = 'Default';
 const DEFAULT_NAME_FOR_LICENSE_REPORT = 'License-Check';
-const READONLY_NAMES = [DEFAULT_NAME_FOR_LICENSE_REPORT];
+const DEFAULT_NAME_FOR_VULNERABILITY_CHECK = 'Vulnerability-Check';
+const READONLY_NAMES = [DEFAULT_NAME_FOR_LICENSE_REPORT, DEFAULT_NAME_FOR_VULNERABILITY_CHECK];
 
 export default {
   components: {
@@ -28,10 +29,15 @@ export default {
       default: true,
       required: false,
     },
+    initRuleFieldName: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
-      name: '',
+      name: this.initRuleFieldName,
       approvalsRequired: 1,
       minApprovalsRequired: 0,
       approvers: [],
@@ -132,7 +138,9 @@ export default {
       return !this.settings.lockedApprovalsRuleName;
     },
     isNameDisabled() {
-      return this.isPersisted && READONLY_NAMES.includes(this.name);
+      return (
+        Boolean(this.isPersisted || this.initRuleFieldName) && READONLY_NAMES.includes(this.name)
+      );
     },
     removeHiddenGroups() {
       return this.containsHiddenGroups && !this.approversByType[TYPE_HIDDEN_GROUPS];

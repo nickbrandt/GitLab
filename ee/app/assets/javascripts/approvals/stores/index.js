@@ -1,5 +1,6 @@
 import Vuex from 'vuex';
 import modalModule from '~/vuex_shared/modules/modal';
+import securityConfigurationModule from 'ee/security_configuration/modules/configuration';
 import state from './state';
 
 export const createStoreOptions = (approvalsModule, settings) => ({
@@ -8,6 +9,7 @@ export const createStoreOptions = (approvalsModule, settings) => ({
     ...(approvalsModule ? { approvals: approvalsModule } : {}),
     createModal: modalModule(),
     deleteModal: modalModule(),
+    securityConfiguration: securityConfigurationModule(),
   },
 });
 
