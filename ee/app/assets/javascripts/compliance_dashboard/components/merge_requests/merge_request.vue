@@ -22,7 +22,7 @@ export default {
 
 <template>
   <div
-    class="grid-merge-request gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
+    class="grid-merge-request gl-grid-col-start-1 gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
     data-testid="merge-request"
   >
     <a :href="mergeRequest.path" class="gl-display-block gl-text-gray-900 gl-font-weight-bold">
