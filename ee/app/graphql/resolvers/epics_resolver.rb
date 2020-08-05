@@ -32,6 +32,10 @@ module Resolvers
              required: false,
              description: 'Filter epics by labels'
 
+    argument :milestone_title, GraphQL::STRING_TYPE,
+             required: false,
+             description: "Filter epics by milestone title, computed from epic's issues"
+
     argument :iid_starts_with, GraphQL::STRING_TYPE,
              required: false,
              description: 'Filter epics by iid for autocomplete'
