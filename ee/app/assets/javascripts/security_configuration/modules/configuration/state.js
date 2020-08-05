@@ -3,5 +3,5 @@ export default () => ({
   initialized: false,
   isLoading: false,
   errorLoading: false,
-  configuration: [],
+  configuration: {},
 });

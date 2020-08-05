@@ -9,7 +9,7 @@ export default {
   },
   [types.RECEIVE_SECURITY_CONFIGURATION_SUCCESS](state, payload) {
     state.isLoading = false;
-    state.pipelineJobs = payload;
+    state.configuration = payload;
   },
   [types.RECEIVE_SECURITY_CONFIGURATION_ERROR](state) {
     state.isLoading = false;
