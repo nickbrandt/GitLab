@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_10_194046) do
+ActiveRecord::Schema.define(version: 2020_07_30_133800) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -180,18 +180,4 @@ ActiveRecord::Schema.define(version: 2020_07_10_194046) do
     t.index ["state"], name: "index_terraform_state_registry_on_state"
     t.index ["terraform_state_id"], name: "index_terraform_state_registry_on_terraform_state_id"
   end
-
-  create_table "vulnerability_export_registry", force: :cascade do |t|
-    t.datetime_with_timezone "retry_at"
-    t.datetime_with_timezone "last_synced_at"
-    t.datetime_with_timezone "created_at", null: false
-    t.bigint "vulnerability_export_id", null: false
-    t.integer "state", limit: 2, default: 0, null: false
-    t.integer "retry_count", limit: 2, default: 0
-    t.text "last_sync_failure"
-    t.index ["retry_at"], name: "index_vulnerability_export_registry_on_retry_at"
-    t.index ["state"], name: "index_vulnerability_export_registry_on_state"
-    t.index ["vulnerability_export_id"], name: "index_vulnerability_export_registry_on_vulnerability_export_id", unique: true
-  end
-
 end
