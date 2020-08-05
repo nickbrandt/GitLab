@@ -17,7 +17,7 @@ export default {
     GlTabs,
   },
   props: {
-    groupPath: {
+    fullPath: {
       type: String,
       required: true,
     },
@@ -33,7 +33,7 @@ export default {
     },
   },
   apollo: {
-    group: {
+    namespace: {
       query: GroupIterationQuery,
       variables() {
         return this.queryVariables;
@@ -51,7 +51,7 @@ export default {
   },
   data() {
     return {
-      group: {
+      namespace: {
         iterations: [],
         pageInfo: {
           hasNextPage: true,
@@ -68,7 +68,7 @@ export default {
   computed: {
     queryVariables() {
       const vars = {
-        fullPath: this.groupPath,
+        fullPath: this.fullPath,
         state: this.state,
       };
 
@@ -83,10 +83,10 @@ export default {
       return vars;
     },
     iterations() {
-      return this.group.iterations;
+      return this.namespace.iterations;
     },
     loading() {
-      return this.$apollo.queries.group.loading;
+      return this.$apollo.queries.namespace.loading;
     },
     state() {
       switch (this.tabIndex) {
@@ -100,15 +100,15 @@ export default {
       }
     },
     prevPage() {
-      return Number(this.group.pageInfo.hasPreviousPage);
+      return Number(this.namespace.pageInfo.hasPreviousPage);
     },
     nextPage() {
-      return Number(this.group.pageInfo.hasNextPage);
+      return Number(this.namespace.pageInfo.hasNextPage);
     },
   },
   methods: {
     handlePageChange(page) {
-      const { startCursor, endCursor } = this.group.pageInfo;
+      const { startCursor, endCursor } = this.namespace.pageInfo;
 
       if (page > this.pagination.currentPage) {
         this.pagination = {

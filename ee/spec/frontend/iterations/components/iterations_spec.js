@@ -6,7 +6,7 @@ import { GlAlert, GlLoadingIcon, GlPagination, GlTab, GlTabs } from '@gitlab/ui'
 describe('Iterations tabs', () => {
   let wrapper;
   const defaultProps = {
-    groupPath: 'gitlab-org',
+    fullPath: 'gitlab-org',
   };
 
   const mountComponent = ({ props = defaultProps, loading = false } = {}) => {
@@ -14,7 +14,7 @@ describe('Iterations tabs', () => {
       propsData: props,
       mocks: {
         $apollo: {
-          queries: { group: { loading } },
+          queries: { namespace: { loading } },
         },
       },
       stubs: {
@@ -74,7 +74,7 @@ describe('Iterations tabs', () => {
         loading: false,
       });
       wrapper.setData({
-        group: {
+        namespace: {
           pageInfo: {
             hasNextPage: true,
             hasPreviousPage: false,
@@ -102,7 +102,7 @@ describe('Iterations tabs', () => {
       expect(wrapper.vm.queryVariables).toEqual({
         beforeCursor: 'first-item',
         lastPageSize: 20,
-        fullPath: defaultProps.groupPath,
+        fullPath: defaultProps.fullPath,
         state: 'opened',
       });
     });
@@ -113,7 +113,7 @@ describe('Iterations tabs', () => {
       expect(wrapper.vm.queryVariables).toEqual({
         afterCursor: 'last-item',
         firstPageSize: 20,
-        fullPath: defaultProps.groupPath,
+        fullPath: defaultProps.fullPath,
         state: 'opened',
       });
     });
