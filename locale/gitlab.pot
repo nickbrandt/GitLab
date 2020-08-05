@@ -3741,9 +3741,6 @@ msgstr ""
 msgid "Below you will find all the groups that are public."
 msgstr ""
 
-msgid "Beta"
-msgstr ""
-
 msgid "Bi-weekly code coverage"
 msgstr ""
 
@@ -24525,9 +24522,6 @@ msgid "This epic and its child elements will only be visible to team members wit
 msgstr ""
 
 msgid "This epic does not exist or you don't have sufficient permission."
-msgstr ""
-
-msgid "This feature is currently in beta. We invite you to %{linkStart}give feedback%{linkEnd}."
 msgstr ""
 
 msgid "This feature requires local storage to be enabled"
