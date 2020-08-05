@@ -289,6 +289,12 @@ module Vulnerabilities
 
     # Array.difference (-) method uses hash and eql? methods to do comparison
     def hash
+      # This is causing N+1 queries whenever we are calling findings, ActiveRecord uses #hash method to make sure the
+      # array with findings is uniq before preloading. This method is used only in Gitlab::Ci::Reports::Security::VulnerabilityReportsComparer
+      # where we are normalizing security report findings into instances of Vulnerabilities::Finding, this is why we are using original implementation
+      # when Finding is persisted and identifiers are not preloaded.
+      return super if persisted? && !identifiers.loaded?
+
       report_type.hash ^ location_fingerprint.hash ^ first_fingerprint.hash
     end
 
