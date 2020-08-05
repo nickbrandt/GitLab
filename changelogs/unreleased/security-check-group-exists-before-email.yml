@@ -1,5 +1,0 @@
----
-title: Stop excess logs from failure to send invite email when group no longer exists
-merge_request:
-author:
-type: security
