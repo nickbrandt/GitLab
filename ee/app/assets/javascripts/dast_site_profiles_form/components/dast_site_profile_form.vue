@@ -1,15 +1,20 @@
 <script>
 import * as Sentry from '@sentry/browser';
+import { isEqual } from 'lodash';
 import { __, s__ } from '~/locale';
 import { isAbsolute, redirectTo } from '~/lib/utils/url_utility';
 import { GlAlert, GlButton, GlForm, GlFormGroup, GlFormInput, GlModal } from '@gitlab/ui';
 import dastSiteProfileCreateMutation from '../graphql/dast_site_profile_create.mutation.graphql';
+import dastSiteProfileUpdateMutation from '../graphql/dast_site_profile_update.mutation.graphql';
 
 const initField = value => ({
   value,
   state: null,
   feedback: null,
 });
+
+const extractFormValues = form =>
+  Object.fromEntries(Object.entries(form).map(([key, { value }]) => [key, value]));
 
 export default {
   name: 'DastSiteProfileForm',
@@ -30,32 +35,55 @@ export default {
       type: String,
       required: true,
     },
+    siteProfile: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
+    const { name = '', targetUrl = '' } = this.siteProfile || {};
+    const form = {
+      profileName: initField(name),
+      targetUrl: initField(targetUrl),
+    };
     return {
-      form: {
-        profileName: initField(''),
-        targetUrl: initField(''),
-      },
+      form,
+      initialFormValues: extractFormValues(form),
       loading: false,
       showAlert: false,
     };
   },
   computed: {
-    formData() {
+    isEdit() {
+      return Boolean(this.siteProfile?.id);
+    },
+    i18n() {
+      const { isEdit } = this;
       return {
-        fullPath: this.fullPath,
-        ...Object.fromEntries(Object.entries(this.form).map(([key, { value }]) => [key, value])),
+        title: isEdit
+          ? s__('DastProfiles|Edit site profile')
+          : s__('DastProfiles|New site profile'),
+        errorMessage: isEdit
+          ? s__('DastProfiles|Could not update the site profile. Please try again.')
+          : s__('DastProfiles|Could not create the site profile. Please try again.'),
+        modal: {
+          title: isEdit
+            ? s__('DastProfiles|Do you want to discard your changes?')
+            : s__('DastProfiles|Do you want to discard this site profile?'),
+          okTitle: __('Discard'),
+          cancelTitle: __('Cancel'),
+        },
       };
+    },
+    formTouched() {
+      return !isEqual(extractFormValues(this.form), this.initialFormValues);
     },
     formHasErrors() {
       return Object.values(this.form).some(({ state }) => state === false);
     },
     someFieldEmpty() {
       return Object.values(this.form).some(({ value }) => !value);
-    },
-    everyFieldEmpty() {
-      return Object.values(this.form).every(({ value }) => !value);
     },
     isSubmitDisabled() {
       return this.formHasErrors || this.someFieldEmpty;
@@ -76,19 +104,32 @@ export default {
     onSubmit() {
       this.loading = true;
       this.hideErrors();
+
+      const variables = {
+        fullPath: this.fullPath,
+        ...(this.isEdit ? { id: this.siteProfile.id } : {}),
+        ...extractFormValues(this.form),
+      };
+
       this.$apollo
         .mutate({
-          mutation: dastSiteProfileCreateMutation,
-          variables: this.formData,
+          mutation: this.isEdit ? dastSiteProfileUpdateMutation : dastSiteProfileCreateMutation,
+          variables,
         })
-        .then(({ data: { dastSiteProfileCreate: { errors } } }) => {
-          if (errors?.length > 0) {
-            this.showErrors(errors);
-            this.loading = false;
-          } else {
-            redirectTo(this.profilesLibraryPath);
-          }
-        })
+        .then(
+          ({
+            data: {
+              [this.isEdit ? 'dastSiteProfileUpdate' : 'dastSiteProfileCreate']: { errors = [] },
+            },
+          }) => {
+            if (errors.length > 0) {
+              this.showErrors(errors);
+              this.loading = false;
+            } else {
+              redirectTo(this.profilesLibraryPath);
+            }
+          },
+        )
         .catch(e => {
           Sentry.captureException(e);
           this.showErrors();
@@ -96,7 +137,7 @@ export default {
         });
     },
     onCancelClicked() {
-      if (this.everyFieldEmpty) {
+      if (!this.formTouched) {
         this.discard();
       } else {
         this.$refs[this.$options.modalId].show();
@@ -115,22 +156,17 @@ export default {
     },
   },
   modalId: 'deleteDastProfileModal',
-  i18n: {
-    modalTitle: s__('DastProfiles|Do you want to discard this site profile?'),
-    modalOkTitle: __('Discard'),
-    modalCancelTitle: __('Cancel'),
-  },
 };
 </script>
 
 <template>
   <gl-form @submit.prevent="onSubmit">
     <h2 class="gl-mb-6">
-      {{ s__('DastProfiles|New site profile') }}
+      {{ i18n.title }}
     </h2>
 
     <gl-alert v-if="showAlert" variant="danger" class="gl-mb-5" @dismiss="hideErrors">
-      {{ s__('DastProfiles|Could not create the site profile. Please try again.') }}
+      {{ i18n.errorMessage }}
       <ul v-if="errors.length" class="gl-mt-3 gl-mb-0">
         <li v-for="error in errors" :key="error" v-text="error"></li>
       </ul>
@@ -182,9 +218,9 @@ export default {
     <gl-modal
       :ref="$options.modalId"
       :modal-id="$options.modalId"
-      :title="$options.i18n.modalTitle"
-      :ok-title="$options.i18n.modalOkTitle"
-      :cancel-title="$options.i18n.modalCancelTitle"
+      :title="i18n.modal.title"
+      :ok-title="i18n.modal.okTitle"
+      :cancel-title="i18n.modal.cancelTitle"
       ok-variant="danger"
       body-class="gl-display-none"
       data-testid="dast-site-profile-form-cancel-modal"
