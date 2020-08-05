@@ -19,7 +19,7 @@ module Analytics
 
     before_action -> {
       push_frontend_feature_flag(:productivity_analytics_scatterplot_enabled, default_enabled: true)
-      push_frontend_feature_flag(:analytics_similarity_search, @group)
+      push_frontend_feature_flag(:analytics_similarity_search, @group, default_enabled: true)
     }
 
     before_action :validate_params, only: :show, if: -> { request.format.json? }
