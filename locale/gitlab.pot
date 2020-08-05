@@ -1629,6 +1629,9 @@ msgstr ""
 msgid "Adding new applications is disabled in your GitLab instance. Please contact your GitLab administrator to get the permission"
 msgstr ""
 
+msgid "Additional Metadata"
+msgstr ""
+
 msgid "Additional minutes"
 msgstr ""
 
@@ -16923,6 +16926,12 @@ msgstr ""
 msgid "PackageRegistry|Add NuGet Source"
 msgstr ""
 
+msgid "PackageRegistry|App group: %{group}"
+msgstr ""
+
+msgid "PackageRegistry|App name: %{name}"
+msgstr ""
+
 msgid "PackageRegistry|Commit %{link} on branch %{branch}"
 msgstr ""
 
@@ -17013,6 +17022,9 @@ msgstr ""
 msgid "PackageRegistry|Learn how to %{noPackagesLinkStart}publish and share your packages%{noPackagesLinkEnd} with GitLab."
 msgstr ""
 
+msgid "PackageRegistry|License information located at %{link}"
+msgstr ""
+
 msgid "PackageRegistry|Manually Published"
 msgstr ""
 
@@ -17055,6 +17067,9 @@ msgstr ""
 msgid "PackageRegistry|PyPi"
 msgstr ""
 
+msgid "PackageRegistry|Recipe: %{recipe}"
+msgstr ""
+
 msgid "PackageRegistry|Registry Setup"
 msgstr ""
 
@@ -17062,6 +17077,9 @@ msgid "PackageRegistry|Remove package"
 msgstr ""
 
 msgid "PackageRegistry|Sorry, your filter produced no results"
+msgstr ""
+
+msgid "PackageRegistry|Source project located at %{link}"
 msgstr ""
 
 msgid "PackageRegistry|There are no %{packageType} packages yet"
