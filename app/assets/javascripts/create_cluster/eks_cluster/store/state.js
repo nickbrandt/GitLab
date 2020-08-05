@@ -1,6 +1,4 @@
-import { KUBERNETES_VERSIONS } from '../constants';
-
-const [{ value: kubernetesVersion }] = KUBERNETES_VERSIONS;
+const [{ value: kubernetesVersion }] = [{ name: '1.16', value: '1.16' }];
 
 export default () => ({
   createRolePath: null,
