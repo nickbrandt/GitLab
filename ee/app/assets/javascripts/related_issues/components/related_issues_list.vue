@@ -1,9 +1,7 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
 import Sortable from 'sortablejs';
-import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
 import sortableConfig from 'ee/sortable/sortable_config';
-import IssueDueDate from '~/boards/components/issue_due_date.vue';
 import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 
@@ -14,8 +12,6 @@ export default {
   },
   components: {
     GlLoadingIcon,
-    IssueDueDate,
-    IssueWeight,
     RelatedIssuableItem,
   },
   props: {
@@ -132,29 +128,15 @@ export default {
             :assignees="issue.assignees"
             :created-at="issue.createdAt"
             :closed-at="issue.closedAt"
+            :weight="issue.weight"
+            :due-date="issue.dueDate"
             :can-remove="canAdmin"
             :can-reorder="canReorder"
             :path-id-separator="pathIdSeparator"
             event-namespace="relatedIssue"
             class="qa-related-issuable-item"
             @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
-          >
-            <span v-if="issue.weight > 0" slot="weight" class="order-md-1">
-              <issue-weight
-                :weight="issue.weight"
-                class="item-weight d-flex align-items-center"
-                tag-name="span"
-              />
-            </span>
-
-            <span v-if="issue.dueDate" slot="dueDate" class="order-md-1">
-              <issue-due-date
-                :date="issue.dueDate"
-                tooltip-placement="top"
-                css-class="item-due-date d-flex align-items-center"
-              />
-            </span>
-          </related-issuable-item>
+          />
         </li>
       </ul>
     </div>
