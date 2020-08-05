@@ -104,10 +104,11 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables, d
 };
 
 const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) => {
-  const data = store.readQuery({
+  const sourceData = store.readQuery({
     query,
     variables,
   });
+
   const newDiscussion = {
     __typename: 'Discussion',
     id: createImageDiffNote.note.discussion.id,
@@ -121,32 +122,49 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
       nodes: [createImageDiffNote.note],
     },
   };
-  const design = extractDesign(data);
-  const notesCount = design.notesCount + 1;
-  design.discussions.nodes = [...design.discussions.nodes, newDiscussion];
+
+  const sourceDesign = extractDesign(sourceData);
+  const designIndex = sourceData.project.issue.designCollection.designs.nodes.indexOf(sourceDesign);
+
+  let design = update(sourceDesign, {
+    notesCount: { $apply: count => count + 1 },
+  });
+
+  design = update(design, {
+    discussions: { nodes: { $push: [newDiscussion] } },
+  });
+
   if (
     !design.issue.participants.nodes.some(
       participant => participant.username === createImageDiffNote.note.author.username,
     )
   ) {
-    design.issue.participants.nodes = [
-      ...design.issue.participants.nodes,
-      {
-        __typename: 'User',
-        ...createImageDiffNote.note.author,
+    design = update(design, {
+      issue: {
+        participants: {
+          nodes: {
+            $push: [
+              {
+                __typename: 'User',
+                ...createImageDiffNote.note.author,
+              },
+            ],
+          },
+        },
       },
-    ];
+    });
   }
+
+  const data = update(sourceData, {
+    project: {
+      issue: { designCollection: { designs: { nodes: { [designIndex]: { $set: design } } } } },
+    },
+  });
+
   store.writeQuery({
     query,
     variables,
-    data: {
-      ...data,
-      design: {
-        ...design,
-        notesCount,
-      },
-    },
+    data,
   });
 };
 
