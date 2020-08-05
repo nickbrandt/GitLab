@@ -21,6 +21,7 @@ describe('security configuration module mutations', () => {
     it('should set the isLoading to true', () => {
       mutations[types.REQUEST_SECURITY_CONFIGURATION](state);
       expect(state.isLoading).toBe(true);
+      expect(state.errorLoading).toBe(false);
     });
   });
 
@@ -29,6 +30,7 @@ describe('security configuration module mutations', () => {
       const configuration = {};
       mutations[types.RECEIVE_SECURITY_CONFIGURATION_SUCCESS](state, configuration);
       expect(state.isLoading).toBe(false);
+      expect(state.errorLoading).toBe(false);
       expect(state.configuration).toBe(configuration);
     });
   });
@@ -37,6 +39,7 @@ describe('security configuration module mutations', () => {
     it('should set the isLoading to false', () => {
       mutations[types.RECEIVE_SECURITY_CONFIGURATION_ERROR](state);
       expect(state.isLoading).toBe(false);
+      expect(state.errorLoading).toBe(true);
     });
   });
 });
