@@ -5,7 +5,7 @@ import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
 describe('Iterations tabs', () => {
   let wrapper;
   const defaultProps = {
-    groupPath: 'gitlab-org',
+    fullPath: 'gitlab-org',
     iterationIid: '3',
   };
 
@@ -18,7 +18,7 @@ describe('Iterations tabs', () => {
       propsData: props,
       mocks: {
         $apollo: {
-          queries: { group: { loading } },
+          queries: { namespace: { loading } },
         },
       },
       stubs: {
@@ -70,7 +70,7 @@ describe('Iterations tabs', () => {
       });
 
       wrapper.setData({
-        group: {
+        namespace: {
           iteration,
         },
       });
@@ -94,7 +94,7 @@ describe('Iterations tabs', () => {
 
     it('escapes html in description', async () => {
       wrapper.setData({
-        group: {
+        namespace: {
           iteration: {
             ...iteration,
             description: `<img src=x onerror=alert(document.domain)>`,
