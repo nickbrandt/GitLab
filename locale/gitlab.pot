@@ -16692,6 +16692,9 @@ msgstr ""
 msgid "One or more of your dependency files are not supported, and the dependency list may be incomplete. Below is a list of supported file types."
 msgstr ""
 
+msgid "One or more of your personal access tokens has expired."
+msgstr ""
+
 msgid "One or more of your personal access tokens will expire in %{days_to_expire} days or less."
 msgstr ""
 
@@ -27566,10 +27569,10 @@ msgstr ""
 msgid "You can apply your Trial to your Personal account or create a New Group."
 msgstr ""
 
-msgid "You can create a new one or check them in your %{pat_link_start}Personal Access Tokens%{pat_link_end} settings"
+msgid "You can create a new one or check them in your %{pat_link_start}personal access tokens%{pat_link_end} settings"
 msgstr ""
 
-msgid "You can create a new one or check them in your Personal Access Tokens settings %{pat_link}"
+msgid "You can create a new one or check them in your personal access tokens settings %{pat_link}"
 msgstr ""
 
 msgid "You can create new ones at your %{pat_link_start}Personal Access Tokens%{pat_link_end} settings"
@@ -28128,6 +28131,9 @@ msgid "Your password isn't required to view this page. If a password or any othe
 msgstr ""
 
 msgid "Your password reset token has expired."
+msgstr ""
+
+msgid "Your personal access token has expired"
 msgstr ""
 
 msgid "Your profile"

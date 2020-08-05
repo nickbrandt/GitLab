@@ -13979,7 +13979,8 @@ CREATE TABLE public.personal_access_tokens (
     impersonation boolean DEFAULT false NOT NULL,
     token_digest character varying,
     expire_notification_delivered boolean DEFAULT false NOT NULL,
-    last_used_at timestamp with time zone
+    last_used_at timestamp with time zone,
+    after_expiry_notification_delivered boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE public.personal_access_tokens_id_seq
