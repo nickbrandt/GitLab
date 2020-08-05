@@ -164,7 +164,7 @@ export default {
           {{ pendingApprovalsText(rule) }}
         </td>
         <td class="d-none d-sm-table-cell js-approved-by">
-          <user-avatar-list :items="rule.approved_by" :img-size="24" />
+          <user-avatar-list :items="rule.approved_by" :img-size="24" empty-text="" />
         </td>
       </tr>
     </tbody>
