@@ -4,7 +4,6 @@ import {
   updateStoreAfterAddDiscussionComment,
   updateStoreAfterAddImageDiffNote,
   updateStoreAfterUploadDesign,
-  updateStoreAfterUpdateImageDiffNote,
 } from '~/design_management/utils/cache_update';
 import {
   designDeletionError,
@@ -33,7 +32,6 @@ describe('Design Management cache update', () => {
       ${'updateStoreAfterAddDiscussionComment'} | ${updateStoreAfterAddDiscussionComment} | ${ADD_DISCUSSION_COMMENT_ERROR}            | ${[]}
       ${'updateStoreAfterAddImageDiffNote'}     | ${updateStoreAfterAddImageDiffNote}     | ${ADD_IMAGE_DIFF_NOTE_ERROR}               | ${[]}
       ${'updateStoreAfterUploadDesign'}         | ${updateStoreAfterUploadDesign}         | ${mockErrors[0]}                           | ${[]}
-      ${'updateStoreAfterUpdateImageDiffNote'}  | ${updateStoreAfterUpdateImageDiffNote}  | ${UPDATE_IMAGE_DIFF_NOTE_ERROR}            | ${[]}
     `('$fnName handles errors in response', ({ subject, extraArgs, errorMessage }) => {
       expect(createFlash).not.toHaveBeenCalled();
       expect(() => subject(mockStore, { errors: mockErrors }, {}, ...extraArgs)).toThrow();
