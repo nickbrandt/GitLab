@@ -21,6 +21,11 @@ describe('IssueAssigneesComponent', () => {
     vm = wrapper.vm;
   };
 
+  afterEach(() => {
+    wrapper.destroy();
+    wrapper = null;
+  });
+
   const findTooltipText = () => wrapper.find('.js-assignee-tooltip').text();
   const findAvatars = () => wrapper.findAll(UserAvatarLink);
   const findOverflowCounter = () => wrapper.find('.avatar-counter');
@@ -122,6 +127,20 @@ describe('IssueAssigneesComponent', () => {
 
       it('renders assignee @username', () => {
         expect(findTooltipText()).toContain('@monserrate.gleichner');
+      });
+
+      it('does not render `@` when username not available', () => {
+        const userName = 'User without username';
+        factory({
+          assignees: [
+            {
+              name: userName,
+            },
+          ],
+        });
+
+        expect(findTooltipText()).toContain(userName);
+        expect(findTooltipText()).not.toContain('@');
       });
     });
   });
