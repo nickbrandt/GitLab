@@ -1468,7 +1468,7 @@ GitLab Community Edition), don't split the product or feature name across lines.
 
 ### Product badges
 
-When a feature is available in EE-only tiers, add the corresponding tier to the
+When a feature is available in paid tiers, add the corresponding tier to the
 header or other page element according to the feature's availability:
 
 | Tier                                                         | Tier markup           |
