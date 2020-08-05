@@ -1,5 +1,0 @@
----
-title: Revoke OAuth grants when a user revokes an application
-merge_request:
-author:
-type: security
