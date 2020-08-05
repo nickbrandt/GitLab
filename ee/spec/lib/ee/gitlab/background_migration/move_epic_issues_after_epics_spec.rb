@@ -21,6 +21,7 @@ RSpec.describe Gitlab::BackgroundMigration::MoveEpicIssuesAfterEpics, schema: 20
         author_id: user.id
       }
     end
+
     let(:issue_params) do
       {
         title: 'Issue',

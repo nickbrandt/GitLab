@@ -13,6 +13,7 @@ RSpec.describe ElasticsearchIndexedProject do
     let(:index_action) do
       expect(Elastic::ProcessBookkeepingService).to receive(:track!).with(subject.project)
     end
+
     let(:delete_action) do
       expect(ElasticDeleteProjectWorker).to receive(:perform_async).with(subject.project.id, subject.project.es_id)
     end

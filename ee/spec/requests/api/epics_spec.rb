@@ -156,6 +156,7 @@ RSpec.describe API::Epics do
                created_at: 3.days.ago,
                updated_at: 2.days.ago)
       end
+
       let!(:epic2) do
         create(:epic,
                author: user2,
@@ -165,6 +166,7 @@ RSpec.describe API::Epics do
                created_at: 2.days.ago,
                updated_at: 3.days.ago)
       end
+
       let!(:label) { create(:group_label, title: 'a-test', group: group) }
       let!(:label_link) { create(:label_link, label: label, target: epic2) }
 

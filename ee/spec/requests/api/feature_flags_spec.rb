@@ -105,9 +105,11 @@ RSpec.describe API::FeatureFlags do
       let!(:feature_flag) do
         create(:operations_feature_flag, :new_version_flag, project: project, name: 'feature1')
       end
+
       let!(:strategy) do
         create(:operations_strategy, feature_flag: feature_flag, name: 'default', parameters: {})
       end
+
       let!(:scope) do
         create(:operations_scope, strategy: strategy, environment_scope: 'production')
       end

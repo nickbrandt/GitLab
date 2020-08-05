@@ -23,6 +23,7 @@ RSpec.describe ElasticsearchIndexedNamespace do
     let(:index_action) do
       expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(subject.namespace_id, :index)
     end
+
     let(:delete_action) do
       expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(subject.namespace_id, :delete)
     end

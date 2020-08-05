@@ -92,6 +92,7 @@ RSpec.describe Admin::ApplicationSettingsController do
           mirror_capacity_threshold: 2
         }
       end
+
       let(:feature) { :repository_mirrors }
 
       it_behaves_like 'settings for licensed features'
@@ -136,6 +137,7 @@ RSpec.describe Admin::ApplicationSettingsController do
           maintenance_mode_message: 'GitLab is in maintenance'
         }
       end
+
       let(:feature) { :geo }
 
       it_behaves_like 'settings for licensed features'

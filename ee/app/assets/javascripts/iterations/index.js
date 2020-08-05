@@ -21,7 +21,7 @@ export function initIterationsList() {
     render(createElement) {
       return createElement(Iterations, {
         props: {
-          groupPath: el.dataset.groupFullPath,
+          fullPath: el.dataset.fullPath,
           canAdmin: parseBoolean(el.dataset.canAdmin),
           newIterationPath: el.dataset.newIterationPath,
         },

@@ -15,6 +15,7 @@ RSpec.describe Groups::DestroyService do
         expect_any_instance_of(Group)
           .to receive(:destroy).and_return(group)
       end
+
       let(:attributes) do
         {
            author_id: user.id,
