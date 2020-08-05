@@ -20468,6 +20468,8 @@ CREATE INDEX index_resource_milestone_events_on_merge_request_id ON public.resou
 
 CREATE INDEX index_resource_milestone_events_on_milestone_id ON public.resource_milestone_events USING btree (milestone_id);
 
+CREATE INDEX index_resource_milestone_events_on_milestone_id_and_add_action ON public.resource_milestone_events USING btree (milestone_id) WHERE (action = 1);
+
 CREATE INDEX index_resource_milestone_events_on_user_id ON public.resource_milestone_events USING btree (user_id);
 
 CREATE INDEX index_resource_state_events_on_epic_id ON public.resource_state_events USING btree (epic_id);
