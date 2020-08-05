@@ -17,7 +17,7 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
     push_frontend_feature_flag(:value_stream_analytics_path_navigation, @group)
     push_frontend_feature_flag(:value_stream_analytics_filter_bar, @group)
     push_frontend_feature_flag(:value_stream_analytics_create_multiple_value_streams, @group)
-    push_frontend_feature_flag(:analytics_similarity_search, @group)
+    push_frontend_feature_flag(:analytics_similarity_search, @group, default_enabled: true)
   end
 
   private
