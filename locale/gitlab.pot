@@ -8646,6 +8646,9 @@ msgstr ""
 msgid "Downvotes"
 msgstr ""
 
+msgid "Draft"
+msgstr ""
+
 msgid "Draft merge requests can't be merged."
 msgstr ""
 
@@ -26998,9 +27001,6 @@ msgid "Vulnerability|Severity"
 msgstr ""
 
 msgid "Vulnerability|Status"
-msgstr ""
-
-msgid "WIP"
 msgstr ""
 
 msgid "Wait for the file to load to copy its contents"
