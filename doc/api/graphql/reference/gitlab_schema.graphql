@@ -2321,7 +2321,7 @@ type DastSiteProfile {
   """
   ID of the site profile
   """
-  id: ID!
+  id: DastSiteProfileID!
 
   """
   The name of the site profile
@@ -2406,7 +2406,7 @@ type DastSiteProfileCreatePayload {
   """
   ID of the site profile.
   """
-  id: ID
+  id: DastSiteProfileID
 }
 
 """
