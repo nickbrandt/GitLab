@@ -800,6 +800,9 @@ msgstr ""
 msgid "&lt;project name&gt;"
 msgstr ""
 
+msgid "'%{data}' is invalid at '%{data_pointer}'. Should be '%{schema}' due to schema definition at '%{schema_pointer}'"
+msgstr ""
+
 msgid "'%{level}' is not a valid visibility level"
 msgstr ""
 
@@ -28835,6 +28838,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "merged %{timeAgo}"
+msgstr ""
+
+msgid "metric_id must be unique across a project"
 msgstr ""
 
 msgid "missing"
