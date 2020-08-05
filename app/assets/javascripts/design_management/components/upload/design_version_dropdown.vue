@@ -33,12 +33,12 @@ export default {
     },
     dropdownText() {
       if (this.isLatestVersion) {
-        return __('Showing Latest Version');
+        return __('Showing latest version');
       }
       // allVersions is sorted in reverse chronological order (latest first)
       const currentVersionNumber = this.allVersions.length - this.currentVersionIdx;
 
-      return sprintf(__('Showing Version #%{versionNumber}'), {
+      return sprintf(__('Showing version #%{versionNumber}'), {
         versionNumber: currentVersionNumber,
       });
     },
@@ -50,25 +50,20 @@ export default {
 </script>
 
 <template>
-  <gl-new-dropdown :text="dropdownText" size="small" class="design-version-dropdown">
-    <gl-new-dropdown-item v-for="(version, index) in allVersions" :key="version.id">
-      <router-link
-        class="d-flex js-version-link"
-        :to="{ path: $route.path, query: { version: findVersionId(version.id) } }"
-      >
-        <div class="flex-grow-1 ml-2">
-          <div>
-            <strong
-              >{{ __('Version') }} {{ allVersions.length - index }}
-              <span v-if="findVersionId(version.id) === latestVersionId">({{ __('latest') }})</span>
-            </strong>
-          </div>
-        </div>
-        <i
-          v-if="findVersionId(version.id) === currentVersionId"
-          class="fa fa-check float-right gl-mr-2"
-        ></i>
-      </router-link>
+  <gl-new-dropdown :text="dropdownText" size="small">
+    <gl-new-dropdown-item
+      v-for="(version, index) in allVersions"
+      :key="version.id"
+      :is-check-item="true"
+      :is-checked="findVersionId(version.id) === currentVersionId"
+      @click="$router.push({ path: $route.path, query: { version: findVersionId(version.id) } })"
+    >
+      <template>
+        {{ __('Version') }} {{ allVersions.length - index }}
+        <template v-if="findVersionId(version.id) === latestVersionId"
+          >({{ __('latest') }})</template
+        >
+      </template>
     </gl-new-dropdown-item>
   </gl-new-dropdown>
 </template>

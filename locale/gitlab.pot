@@ -22230,6 +22230,12 @@ msgstr ""
 msgid "Showing last %{size} of log -"
 msgstr ""
 
+msgid "Showing latest version"
+msgstr ""
+
+msgid "Showing version #%{versionNumber}"
+msgstr ""
+
 msgid "Side-by-side"
 msgstr ""
 
