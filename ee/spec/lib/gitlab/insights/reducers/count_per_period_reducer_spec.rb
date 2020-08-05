@@ -38,6 +38,7 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
         period_limit: 5
       }
     end
+
     let(:expected) do
       {
         'January 2019' => 0,

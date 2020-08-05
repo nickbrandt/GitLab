@@ -299,6 +299,7 @@ RSpec.describe SmartcardController, type: :request do
           entry['mail'] = ldap_email
         end
       end
+
       let(:ldap_user_search_scope) { 'dc=example,dc=com' }
       let(:ldap_search_params) do
         { attributes: array_including('dn', 'cn', 'mail', 'uid', 'userid'),

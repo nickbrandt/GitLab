@@ -99,6 +99,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
              cn: 'ldap_group1',
              group_access: ::Gitlab::Access::DEVELOPER)
     end
+
     let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
 
     include_examples :group_state_machine
@@ -114,6 +115,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
              cn: 'ldap_group1',
              group_access: ::Gitlab::Access::DEVELOPER)
     end
+
     let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
 
     include_examples :group_state_machine
@@ -175,6 +177,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
              cn: 'ldap_group1',
              group_access: ::Gitlab::Access::DEVELOPER)
     end
+
     let(:sync_group) { described_class.new(group, proxy(adapter)) }
 
     context 'with all functionality against one LDAP group type' do
@@ -532,6 +535,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
             member_attr: 'memberUid'
           )
         end
+
         let(:ldap_user) do
           ldap_user_entry(user.username)
         end
@@ -584,6 +588,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Sync::Group do
         create(:group_with_ldap_group_filter_link,
                group_access: ::Gitlab::Access::DEVELOPER)
       end
+
       let(:sync_group) { described_class.new(group, proxy(adapter)) }
 
       before do

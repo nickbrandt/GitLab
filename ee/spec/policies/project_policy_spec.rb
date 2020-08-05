@@ -40,9 +40,11 @@ RSpec.describe ProjectPolicy do
     let(:additional_guest_permissions) do
       %i[read_issue_link]
     end
+
     let(:additional_reporter_permissions) do
       %i[read_software_license_policy admin_issue_link]
     end
+
     let(:additional_developer_permissions) do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
@@ -50,9 +52,11 @@ RSpec.describe ProjectPolicy do
         admin_vulnerability_issue_link read_merge_train
       ]
     end
+
     let(:additional_maintainer_permissions) do
       %i[push_code_to_protected_branches admin_feature_flags_client modify_auto_fix_setting]
     end
+
     let(:auditor_permissions) do
       %i[
         download_code download_wiki_code read_project read_board read_list

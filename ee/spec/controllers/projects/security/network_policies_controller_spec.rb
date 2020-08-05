@@ -188,6 +188,7 @@ RSpec.describe Projects::Security::NetworkPoliciesController do
         ingress: [{ from: [{ namespaceSelector: { matchLabels: { project: 'myproject' } } }] }]
       )
     end
+
     let(:manifest) do
       <<~POLICY
         apiVersion: networking.k8s.io/v1
@@ -251,6 +252,7 @@ RSpec.describe Projects::Security::NetworkPoliciesController do
         ingress: [{ from: [{ namespaceSelector: { matchLabels: { project: 'myproject' } } }] }]
       )
     end
+
     let(:manifest) do
       <<~POLICY
         apiVersion: networking.k8s.io/v1

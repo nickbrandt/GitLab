@@ -13,6 +13,7 @@ RSpec.describe Elastic::IndexingControlService, :clean_gitlab_redis_shared_state
       prepend Elastic::IndexingControl
     end
   end
+
   let(:worker_args) { [1, 2] }
   let(:worker_context) { { 'correlation_id' => 'context_correlation_id' } }
 
@@ -131,6 +132,7 @@ RSpec.describe Elastic::IndexingControlService, :clean_gitlab_redis_shared_state
         prepend Elastic::IndexingControl
       end
     end
+
     let(:other_subject) { described_class.new(second_worker_class) }
 
     it 'allows to use queues independently of each other' do
