@@ -2,7 +2,7 @@
 
 module Resolvers
   class IssuesResolver < BaseResolver
-    prepend Resolvers::IssueResolverFields
+    prepend IssueResolverFields
 
     argument :state, Types::IssuableStateEnum,
               required: false,
@@ -18,19 +18,7 @@ module Resolvers
                                  label_priority_asc label_priority_desc
                                  milestone_due_asc milestone_due_desc].freeze
 
-    def resolve(**args)
-      # The project could have been loaded in batch by `BatchLoader`.
-      # At this point we need the `id` of the project to query for issues, so
-      # make sure it's loaded and not `nil` before continuing.
-      parent = object.respond_to?(:sync) ? object.sync : object
-      return Issue.none if parent.nil?
-
-      # Will need to be be made group & namespace aware with
-      # https://gitlab.com/gitlab-org/gitlab-foss/issues/54520
-      args[:iids] ||= [args.delete(:iid)].compact if args[:iid]
-      args[:attempt_project_search_optimizations] = true if args[:search].present?
-
-      finder = IssuesFinder.new(current_user, args)
+    def continue_issue_resolve(parent, finder, **args)
       issues = Gitlab::Graphql::Loaders::IssuableLoader.new(parent, finder).batching_find_all
 
       if non_stable_cursor_sort?(args[:sort])
