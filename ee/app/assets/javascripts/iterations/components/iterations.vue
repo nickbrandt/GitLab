@@ -2,7 +2,8 @@
 import { GlAlert, GlButton, GlLoadingIcon, GlPagination, GlTab, GlTabs } from '@gitlab/ui';
 import { __ } from '~/locale';
 import IterationsList from './iterations_list.vue';
-import GroupIterationQuery from '../queries/group_iterations.query.graphql';
+import IterationsQuery from '../queries/iterations.query.graphql';
+import { Namespace } from '../constants';
 
 const pageSize = 20;
 
@@ -26,6 +27,12 @@ export default {
       required: false,
       default: false,
     },
+    namespaceType: {
+      type: String,
+      required: false,
+      default: Namespace.Group,
+      validator: value => Object.values(Namespace).includes(value),
+    },
     newIterationPath: {
       type: String,
       required: false,
@@ -34,14 +41,14 @@ export default {
   },
   apollo: {
     namespace: {
-      query: GroupIterationQuery,
+      query: IterationsQuery,
       variables() {
         return this.queryVariables;
       },
-      update: data => {
+      update(data) {
         return {
-          iterations: data.group?.iterations?.nodes || [],
-          pageInfo: data.group?.iterations?.pageInfo || {},
+          iterations: data[this.namespaceType]?.iterations?.nodes || [],
+          pageInfo: data[this.namespaceType]?.iterations?.pageInfo || {},
         };
       },
       error() {
@@ -69,6 +76,8 @@ export default {
     queryVariables() {
       const vars = {
         fullPath: this.fullPath,
+        isGroup: this.namespaceType === Namespace.Group,
+        isProject: this.namespaceType === Namespace.Project,
         state: this.state,
       };
 

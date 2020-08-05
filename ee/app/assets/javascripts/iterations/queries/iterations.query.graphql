@@ -1,0 +1,47 @@
+#import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
+#import "./iteration.fragment.graphql"
+
+query Iterations(
+  $fullPath: ID!
+  $isGroup: Boolean = false
+  $isProject: Boolean = false
+  $state: IterationState!
+  $beforeCursor: String = ""
+  $afterCursor: String = ""
+  $firstPageSize: Int
+  $lastPageSize: Int
+) {
+  group(fullPath: $fullPath) @include(if: $isGroup) {
+    iterations(
+      state: $state
+      includeAncestors: false
+      before: $beforeCursor
+      after: $afterCursor
+      first: $firstPageSize
+      last: $lastPageSize
+    ) {
+      nodes {
+        ...Iteration
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+  }
+  project(fullPath: $fullPath) @include(if: $isProject) {
+    iterations(
+      state: $state
+      before: $beforeCursor
+      after: $afterCursor
+      first: $firstPageSize
+      last: $lastPageSize
+    ) {
+      nodes {
+        ...Iteration
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+  }
+}
