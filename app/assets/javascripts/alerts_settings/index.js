@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import AlertSettingsForm from './components/alerts_settings_form.vue';
+// import AlertSettingsForm from './components/alerts_settings_form.vue';
+import AlertIntegrationsBuilder from './components/alerts_integrations_builder.vue';
 
 export default el => {
   if (!el) {
@@ -59,7 +60,7 @@ export default el => {
   return new Vue({
     el,
     render(createElement) {
-      return createElement(AlertSettingsForm, {
+      return createElement(AlertIntegrationsBuilder, {
         props,
       });
     },
