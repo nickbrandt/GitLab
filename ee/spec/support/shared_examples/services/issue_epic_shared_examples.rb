@@ -16,10 +16,10 @@ RSpec.shared_examples 'issue with epic_id parameter' do
   context 'when epic_id is 0' do
     let(:params) { { title: 'issue1', epic_id: 0 } }
 
-    it 'ignores epic_id' do
+    it 'does not assign any epic' do
       issue = execute
 
-      expect(issue).to be_persisted
+      expect(issue.reload).to be_persisted
       expect(issue.epic).to be_nil
     end
   end
@@ -48,8 +48,16 @@ RSpec.shared_examples 'issue with epic_id parameter' do
       it 'creates epic issue link' do
         issue = execute
 
-        expect(issue).to be_persisted
+        expect(issue.reload).to be_persisted
         expect(issue.epic).to eq(epic)
+      end
+
+      it 'calls EpicIssues::CreateService' do
+        link_sevice = double
+        expect(EpicIssues::CreateService).to receive(:new).and_return(link_sevice)
+        expect(link_sevice).to receive(:execute)
+
+        execute
       end
     end
 
@@ -63,7 +71,7 @@ RSpec.shared_examples 'issue with epic_id parameter' do
       it 'creates epic issue link' do
         issue = execute
 
-        expect(issue).to be_persisted
+        expect(issue.reload).to be_persisted
         expect(issue.epic).to eq(epic)
       end
     end
