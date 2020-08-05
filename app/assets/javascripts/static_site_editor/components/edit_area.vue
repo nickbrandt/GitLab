@@ -62,7 +62,9 @@ export default {
   methods: {
     preProcess(isWrap, value) {
       const formattedContent = formatter(value);
-      const templatedContent = templater(isWrap, formattedContent);
+      const templatedContent = isWrap
+        ? templater.wrap(formattedContent)
+        : templater.unwrap(formattedContent);
       return templatedContent;
     },
     onInputChange(newVal) {

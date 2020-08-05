@@ -1,7 +1,6 @@
-// eslint-disable-next-line @gitlab/require-i18n-strings
-const marker = ' sse';
+const marker = 'sse';
 const ticks = '```';
-const prefix = `${ticks}${marker}\n`;
+const prefix = `${ticks} ${marker}\n`; // Space intentional due to https://github.com/nhn/tui.editor/blob/6bcec75c69028570d93d973aa7533090257eaae0/libs/to-mark/src/renderer.gfm.js#L26
 const postfix = `\n${ticks}`;
 const code = '.| |\\t|\\n(?!\\n)';
 const templatedRegex = new RegExp(`(^${prefix}(${code})+${postfix}$)`, 'gm');
@@ -30,6 +29,4 @@ const wrap = source => {
   return text;
 };
 
-const template = (isWrap, source) => (isWrap ? wrap(source) : unwrap(source));
-
-export default template;
+export default { wrap, unwrap };

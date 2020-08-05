@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import templater from '~/static_site_editor/services/templater';
 
 describe('templater', () => {
@@ -6,6 +7,12 @@ describe('templater', () => {
 <% some erb code %>
 
 Some more text
+
+<% if apptype.maturity && (apptype.maturity != "planned") %>
+  <% maturity = "This application type is at the \"#{apptype.maturity}\" level of maturity." %>
+<% end %>
+
+With even text with indented code above.
 `;
   const sourceTemplated = `Some text
 
@@ -14,18 +21,26 @@ Some more text
 \`\`\`
 
 Some more text
+
+\`\`\` sse
+<% if apptype.maturity && (apptype.maturity != "planned") %>
+  <% maturity = "This application type is at the \"#{apptype.maturity}\" level of maturity." %>
+<% end %>
+\`\`\`
+
+With even text with indented code above.
 `;
 
   it.each`
-    isWrap   | initial            | target
-    ${true}  | ${source}          | ${sourceTemplated}
-    ${true}  | ${sourceTemplated} | ${sourceTemplated}
-    ${false} | ${sourceTemplated} | ${source}
-    ${false} | ${source}          | ${source}
+    fn          | initial            | target
+    ${'wrap'}   | ${source}          | ${sourceTemplated}
+    ${'wrap'}   | ${sourceTemplated} | ${sourceTemplated}
+    ${'unwrap'} | ${sourceTemplated} | ${source}
+    ${'unwrap'} | ${source}          | ${source}
   `(
-    'wraps $initial in a templated sse codeblock when $isWrap and unwraps otherwise',
-    ({ isWrap, initial, target }) => {
-      expect(templater(isWrap, initial)).toMatch(target);
+    'wraps $initial in a templated sse codeblock if $fn is wrap, unwraps otherwise',
+    ({ fn, initial, target }) => {
+      expect(templater[fn](initial)).toMatch(target);
     },
   );
 });
