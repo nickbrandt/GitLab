@@ -1499,7 +1499,7 @@ display the full tier badge with the header line.
 
 You can also use the tier markup with paragraphs, list items,
 and table cells. For these cases, the tier mention will be represented by an
-orange info icon **(information)** that will display the tiers when visitors
+orange info icon **{information}** that will display the tiers when visitors
 point to the icon. For example:
 
 - `**(STARTER)**` displays as **(STARTER)**
