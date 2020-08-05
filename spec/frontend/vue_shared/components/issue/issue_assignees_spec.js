@@ -139,8 +139,10 @@ describe('IssueAssigneesComponent', () => {
           ],
         });
 
-        expect(findTooltipText()).toContain(userName);
-        expect(findTooltipText()).not.toContain('@');
+        const tooltipText = findTooltipText();
+
+        expect(tooltipText).toContain(userName);
+        expect(tooltipText).not.toContain('@');
       });
     });
   });
