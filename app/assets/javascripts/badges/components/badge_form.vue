@@ -225,7 +225,7 @@ export default {
         :loading="isSaving"
         :label="s__('Badges|Save changes')"
         type="submit"
-        container-class="btn btn-success gl-justify-content-end"
+        container-class="btn btn-success"
       />
     </div>
     <div v-else class="gl-display-flex gl-justify-content-end form-group">
