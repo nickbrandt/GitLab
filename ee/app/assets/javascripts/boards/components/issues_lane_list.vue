@@ -55,13 +55,13 @@ export default {
     class="board gl-px-3 gl-vertical-align-top gl-white-space-normal gl-display-flex gl-flex-shrink-0"
     :class="{ 'is-collapsed': !list.isExpanded }"
   >
-    <div class="board-inner gl-p-2 gl-rounded-base gl-relative gl-w-full">
+    <div class="board-inner gl-rounded-base gl-relative gl-w-full">
       <board-new-issue
         v-if="list.type !== 'closed' && showIssueForm && isUnassignedIssuesLane"
         :group-id="groupId"
         :list="list"
       />
-      <ul v-if="list.isExpanded" class="gl-p-0 gl-m-0">
+      <ul v-if="list.isExpanded" class="gl-p-2 gl-m-0">
         <board-card
           v-for="(issue, index) in issues"
           ref="issue"
