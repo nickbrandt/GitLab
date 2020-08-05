@@ -42,13 +42,6 @@ module Resolvers
       end
     end
 
-    def self.resolver_complexity(args, child_complexity:)
-      complexity = super
-      complexity += 2 if args[:labelName]
-
-      complexity
-    end
-
     def non_stable_cursor_sort?(sort)
       NON_STABLE_CURSOR_SORTS.include?(sort)
     end

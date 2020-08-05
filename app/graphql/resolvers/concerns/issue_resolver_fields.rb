@@ -48,4 +48,13 @@ module IssueResolverFields
               description: 'Filter issues by the given issue types',
               required: false
   end
+
+  class_methods do
+    def resolver_complexity(args, child_complexity:)
+      complexity = super
+      complexity += 2 if args[:labelName]
+
+      complexity
+    end
+  end
 end
