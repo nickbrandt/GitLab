@@ -123,12 +123,7 @@ module Geo::SelectiveSync
     namespaces.arel_table
   end
 
-  def project_model
-    raise NotImplementedError,
-      "#{self.class} does not implement #{__method__}"
-  end
-
   def projects_table
-    project_model.arel_table
+    Project.arel_table
   end
 end
