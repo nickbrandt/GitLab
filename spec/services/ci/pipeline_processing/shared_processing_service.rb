@@ -846,9 +846,9 @@ RSpec.shared_examples 'Pipeline Processing Service' do
     it 'makes deploy DAG to be waiting for optional manual to finish' do
       expect(process_pipeline).to be_truthy
 
-      expect(stages).to eq(%w(skipped created))
+      expect(stages).to eq(%w(skipped pending))
       expect(all_builds.manual).to contain_exactly(linux_build)
-      expect(all_builds.created).to contain_exactly(deploy)
+      expect(all_builds.pending).to contain_exactly(deploy)
     end
   end
 

@@ -34,8 +34,8 @@ transitions:
       stages:
         build: success
         test: skipped
-        deploy: created
+        deploy: pending
       jobs:
         build: success
         test: manual
-        deploy: created
+        deploy: pending

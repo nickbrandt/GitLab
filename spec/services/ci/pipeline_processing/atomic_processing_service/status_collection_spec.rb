@@ -39,7 +39,7 @@ RSpec.describe Ci::PipelineProcessing::AtomicProcessingService::StatusCollection
       %w[build-a test-a]  | 'running' | false
       %w[build-a]         | 'success' | true
       %w[build-a build-b] | 'failed'  | true
-      %w[build-a test-a]  | 'pending' | true
+      %w[build-a test-a]  | 'running' | true
     end
 
     with_them do

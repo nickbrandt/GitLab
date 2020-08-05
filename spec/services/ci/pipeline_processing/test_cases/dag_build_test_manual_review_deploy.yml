@@ -71,12 +71,12 @@ transitions:
       stages:
         build: success
         test: success
-        review: created
-        deploy: created
+        review: pending
+        deploy: pending
       jobs:
         build: success
         test: success
         release_test: manual
-        review: created
-        staging: created
+        review: pending
+        staging: pending
         production: created

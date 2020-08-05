@@ -7,7 +7,10 @@ config:
     stage: test
     when: on_failure
     script: exit 0
-    needs: [build]
+
+  deploy:
+    stage: deploy
+    script: exit 0
 
 init:
   expect:
@@ -15,18 +18,22 @@ init:
     stages:
       build: pending
       test: created
+      deploy: created
     jobs:
       build: pending
       test: created
+      deploy: created
 
 transitions:
   - event: success
     jobs: [build]
     expect:
-      pipeline: success
+      pipeline: running
       stages:
         build: success
         test: skipped
+        deploy: pending
       jobs:
         build: success
         test: skipped
+        deploy: pending
