@@ -151,13 +151,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       resources :vulnerable_projects, only: [:index]
       resource :discover, only: [:show], controller: :discover
       resources :credentials, only: [:index]
-
-      resources :vulnerability_findings, only: [:index] do
-        collection do
-          get :summary
-          get :history
-        end
-      end
     end
 
     resource :push_rules, only: [:edit, :update]

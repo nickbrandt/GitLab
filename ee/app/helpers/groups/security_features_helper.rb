@@ -28,8 +28,6 @@ module Groups::SecurityFeaturesHelper
 
   def group_level_security_dashboard_data(group)
     {
-      vulnerabilities_endpoint: group_security_vulnerability_findings_path(group),
-      vulnerabilities_history_endpoint: history_group_security_vulnerability_findings_path(group),
       projects_endpoint: expose_url(api_v4_groups_projects_path(id: group.id)),
       group_full_path: group.full_path,
       vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
