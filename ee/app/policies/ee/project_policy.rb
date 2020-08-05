@@ -239,7 +239,10 @@ module EE
         enable :read_vulnerability_scanner
       end
 
-      rule { on_demand_scans_enabled & can?(:developer_access) }.enable :read_on_demand_scans
+      rule { on_demand_scans_enabled & can?(:developer_access) }.policy do
+        enable :read_on_demand_scans
+        enable :create_on_demand_dast_scan
+      end
 
       rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
 
