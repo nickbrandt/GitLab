@@ -30,7 +30,7 @@ RSpec.describe MergeTrains::CreatePipelineService do
 
       specify do
         expect(subject[:status]).to eq(:error)
-        expect(subject[:message]).to eq(expected_reason)
+        expect(subject[:message]).to match(/^#{expected_reason}/)
       end
     end
 
