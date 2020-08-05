@@ -8,6 +8,7 @@ RSpec.describe 'geo rake tasks', :geo do
   before do
     Rake.application.rake_require 'tasks/geo'
     stub_licensed_features(geo: true)
+    stub_feature_flags(geo_terraform_state_replication: false)
   end
 
   it 'Gitlab:Geo::DatabaseTasks responds to all methods used in Geo rake tasks' do

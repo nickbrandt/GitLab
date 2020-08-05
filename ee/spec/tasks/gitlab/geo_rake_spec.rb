@@ -8,6 +8,7 @@ RSpec.describe 'gitlab:geo rake tasks', :geo do
   before do
     Rake.application.rake_require 'tasks/gitlab/geo'
     stub_licensed_features(geo: true)
+    stub_feature_flags(geo_terraform_state_replication: false)
   end
 
   describe 'gitlab:geo:check_replication_verification_status' do
