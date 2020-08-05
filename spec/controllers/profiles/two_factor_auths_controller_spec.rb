@@ -57,6 +57,12 @@ RSpec.describe Profiles::TwoFactorAuthsController do
         expect(assigns[:codes]).to match_array %w(a b c)
       end
 
+      it 'calls to delete other sessions' do
+        expect(ActiveSession).to receive(:destroy_all_but_current)
+
+        go
+      end
+
       it 'renders create' do
         go
         expect(response).to render_template(:create)
