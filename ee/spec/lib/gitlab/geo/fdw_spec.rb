@@ -101,24 +101,6 @@ RSpec.describe Gitlab::Geo::Fdw, :geo do
     end
   end
 
-  describe '.foreign_tables_up_to_date?' do
-    it 'returns false when foreign schema does not exist' do
-      drop_foreign_schema
-
-      expect(described_class.foreign_tables_up_to_date?).to eq false
-    end
-
-    it 'returns false when foreign schema exists but tables in schema doesnt match' do
-      create_foreign_table(:gitlab_test)
-
-      expect(described_class.foreign_tables_up_to_date?).to eq false
-    end
-
-    it 'returns true when foreign schema exists and foreign schema has same tables as secondary database' do
-      expect(described_class.foreign_tables_up_to_date?).to eq true
-    end
-  end
-
   describe '.foreign_schema_tables_count' do
     before do
       drop_foreign_schema

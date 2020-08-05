@@ -30,10 +30,6 @@ module Gitlab
           FOREIGN_SCHEMA + ".#{table_name}"
         end
 
-        def foreign_tables_up_to_date?
-          has_foreign_schema? && foreign_schema_tables_match?
-        end
-
         # Number of existing tables
         #
         # @return [Integer] number of tables
