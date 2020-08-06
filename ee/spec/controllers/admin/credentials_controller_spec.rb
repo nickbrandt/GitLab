@@ -20,6 +20,11 @@ RSpec.describe Admin::CredentialsController do
           expect(response).to have_gitlab_http_status(:ok)
         end
 
+        it_behaves_like 'tracking unique visits', :index do
+          let(:request_params) { {} }
+          let(:target_id) { 'i_analytics_credential_inventory' }
+        end
+
         describe 'filtering by type of credential' do
           let_it_be(:personal_access_tokens) { create_list(:personal_access_token, 2) }
 

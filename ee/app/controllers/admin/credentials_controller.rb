@@ -3,10 +3,13 @@
 class Admin::CredentialsController < Admin::ApplicationController
   extend ::Gitlab::Utils::Override
   include CredentialsInventoryActions
+  include Analytics::UniqueVisitsHelper
 
   helper_method :credentials_inventory_path, :user_detail_path
 
   before_action :check_license_credentials_inventory_available!, only: [:index]
+
+  track_unique_visits :index, target_id: 'i_analytics_credential_inventory'
 
   private
 

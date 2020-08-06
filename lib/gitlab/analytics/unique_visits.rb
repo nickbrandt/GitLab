@@ -9,6 +9,8 @@ module Gitlab
         'g_analytics_issues',
         'g_analytics_productivity',
         'g_analytics_valuestream',
+        'g_analytics_compliance_dashboard',
+        'g_analytics_audit_events',
         'p_analytics_pipelines',
         'p_analytics_code_reviews',
         'p_analytics_valuestream',
@@ -16,7 +18,9 @@ module Gitlab
         'p_analytics_issues',
         'p_analytics_repo',
         'i_analytics_cohorts',
-        'i_analytics_dev_ops_score'
+        'i_analytics_dev_ops_score',
+        'i_analytics_credential_inventory',
+        'i_analytics_audit_events'
       ].freeze
 
       KEY_EXPIRY_LENGTH = 12.weeks

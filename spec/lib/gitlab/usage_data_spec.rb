@@ -975,11 +975,15 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
           'p_analytics_pipelines' => 123,
           'p_analytics_code_reviews' => 123,
           'p_analytics_valuestream' => 123,
+          'g_analytics_compliance_dashboard' => 123,
+          'g_analytics_audit_events' => 123,
           'p_analytics_insights' => 123,
           'p_analytics_issues' => 123,
           'p_analytics_repo' => 123,
           'i_analytics_cohorts' => 123,
           'i_analytics_dev_ops_score' => 123,
+          'i_analytics_credential_inventory' => 123,
+          'i_analytics_audit_events' => 123,
           'analytics_unique_visits_for_any_target' => 543,
           'analytics_unique_visits_for_any_target_monthly' => 987
         }

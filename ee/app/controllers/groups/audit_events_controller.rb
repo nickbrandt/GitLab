@@ -4,9 +4,12 @@ class Groups::AuditEventsController < Groups::ApplicationController
   include AuditEvents::EnforcesValidDateParams
   include AuditEvents::AuditLogsParams
   include AuditEvents::Sortable
+  include Analytics::UniqueVisitsHelper
 
   before_action :authorize_admin_group!
   before_action :check_audit_events_available!
+
+  track_unique_visits :index, target_id: 'g_analytics_audit_events'
 
   layout 'group_settings'
 

@@ -4,8 +4,11 @@ class Admin::AuditLogsController < Admin::ApplicationController
   include AuditEvents::EnforcesValidDateParams
   include AuditEvents::AuditLogsParams
   include AuditEvents::Sortable
+  include Analytics::UniqueVisitsHelper
 
   before_action :check_license_admin_audit_log_available!
+
+  track_unique_visits :index, target_id: 'i_analytics_audit_events'
 
   PER_PAGE = 25
 

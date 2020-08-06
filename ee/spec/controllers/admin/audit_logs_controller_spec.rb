@@ -24,6 +24,11 @@ RSpec.describe Admin::AuditLogsController do
           expect(assigns(:events)).to be_kind_of(Kaminari::PaginatableWithoutCount)
         end
       end
+
+      it_behaves_like 'tracking unique visits', :index do
+        let(:request_params) { { 'entity_type': 'User' } }
+        let(:target_id) { 'i_analytics_audit_events' }
+      end
     end
   end
 end
