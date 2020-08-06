@@ -7,8 +7,8 @@ module Projects::OnDemandScansHelper
       'empty-state-svg-path' => image_path('illustrations/empty-state/ondemand-scan-empty.svg'),
       'default-branch' => project.default_branch,
       'project-path' => project.path_with_namespace,
-      'profiles-library-path': project_profiles_path(project),
-      'new-site-profile-path': new_project_dast_site_profile_path(project)
+      'profiles-library-path' => project_profiles_path(project),
+      'new-site-profile-path' => new_project_dast_site_profile_path(project)
     }
   end
 end
