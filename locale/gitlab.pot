@@ -16655,7 +16655,7 @@ msgstr ""
 msgid "OnDemandScans|Attached branch is where the scan job runs."
 msgstr ""
 
-msgid "OnDemandScans|Could not fetch site profiles. Please try again."
+msgid "OnDemandScans|Could not fetch site profiles. Please refresh the page, or try again later."
 msgstr ""
 
 msgid "OnDemandScans|Could not run the scan. Please try again."

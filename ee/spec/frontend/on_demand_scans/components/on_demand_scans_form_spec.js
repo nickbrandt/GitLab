@@ -210,7 +210,9 @@ describe('OnDemandScansApp', () => {
         const alert = findAlert();
         expect(alert.exists()).toBe(true);
         expect(alert.props('dismissible')).toBe(false);
-        expect(alert.text()).toContain('Could not fetch site profiles. Please try again.');
+        expect(alert.text()).toContain(
+          'Could not fetch site profiles. Please refresh the page, or try again later.',
+        );
       });
     });
 

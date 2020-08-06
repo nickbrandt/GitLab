@@ -26,7 +26,7 @@ const ERROR_FETCH_SITE_PROFILES = 'ERROR_FETCH_SITE_PROFILES';
 const ERROR_MESSAGES = {
   [ERROR_RUN_SCAN]: s__('OnDemandScans|Could not run the scan. Please try again.'),
   [ERROR_FETCH_SITE_PROFILES]: s__(
-    'OnDemandScans|Could not fetch site profiles. Please try again.',
+    'OnDemandScans|Could not fetch site profiles. Please refresh the page, or try again later.',
   ),
 };
 
