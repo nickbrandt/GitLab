@@ -4,6 +4,8 @@
 - show_access_requests = can_manage_members && @requesters.exists?
 - pending_active = params[:search_invited].present? || params[:invited_members_page].present?
 
+- form_item_label_css_class = 'label-bold gl-mr-2 gl-mb-0 gl-py-2 align-self-md-center'
+
 .js-remove-member-modal
 .project-members-page.gl-mt-3
   %h4
@@ -50,19 +52,19 @@
   .tab-content
     #tab-members.tab-pane{ class: ("active" unless pending_active) }
       .card.card-without-border
-        .gl-display-flex.gl-md-align-items-center.gl-flex-direction-column.gl-md-flex-direction-row.row-content-block.second-block
-          %span.gl-flex-grow-1.gl-py-3.gl-pr-3
+        = render 'groups/group_members/tab_pane/header' do
+          = render 'groups/group_members/tab_pane/title' do
             = html_escape(_("Members with access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
           = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form gl-display-flex gl-md-align-items-center gl-flex-wrap gl-flex-direction-column gl-md-flex-direction-row gl-mx-n3 gl-my-n3' do
             .gl-px-3.gl-py-2
               .search-control-wrap.gl-relative
                 = render 'shared/members/search_field'
             - if can_manage_members
-              .gl-px-3.gl-py-3.gl-display-flex.gl-flex-direction-column.gl-md-flex-direction-row
-                = label_tag '2fa', _('2FA'), class: 'label-bold gl-mr-2 gl-mb-0 gl-py-2 align-self-md-center'
+              = render 'groups/group_members/tab_pane/form_item' do
+                = label_tag '2fa', _('2FA'), class: form_item_label_css_class
                 = render 'shared/members/filter_2fa_dropdown'
-            .gl-px-3.gl-py-3.gl-display-flex.gl-flex-direction-column.gl-md-flex-direction-row
-              = label_tag :sort_by, _('Sort by'), class: 'label-bold gl-mr-2 gl-mb-0 gl-py-2 align-self-md-center'
+            = render 'groups/group_members/tab_pane/form_item' do
+              = label_tag :sort_by, _('Sort by'), class: form_item_label_css_class
               = render 'shared/members/sort_dropdown'
         %ul.content-list.members-list{ data: { qa_selector: "members_list" } }
           = render partial: 'shared/members/member', collection: @members, as: :member
@@ -70,8 +72,8 @@
     - if @group.shared_with_group_links.any?
       #tab-groups.tab-pane
         .card.card-without-border
-          .gl-display-flex.gl-flex-direction-column.gl-md-flex-direction-row.row-content-block.second-block
-            %span.gl-flex-grow-1.align-self-md-center.gl-py-3
+          = render 'groups/group_members/tab_pane/header' do
+            = render 'groups/group_members/tab_pane/title' do
               = html_escape(_("Groups with access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
           %ul.content-list.members-list{ data: { qa_selector: "groups_list" } }
             - can_admin_member = can?(current_user, :admin_group_member, @group)
@@ -80,8 +82,8 @@
     - if show_invited_members
       #tab-pending-members.tab-pane{ class: ("active" if pending_active) }
         .card.card-without-border
-          .gl-display-flex.gl-flex-direction-column.gl-md-flex-direction-row.row-content-block.second-block
-            %span.gl-flex-grow-1.gl-md-align-self-center.gl-py-3
+          = render 'groups/group_members/tab_pane/header' do
+            = render 'groups/group_members/tab_pane/title' do
               = html_escape(_("Members with pending access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
             = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form' do
               = render 'shared/members/search_field', name: 'search_invited'
@@ -91,8 +93,8 @@
     - if show_access_requests
       #tab-access-requests.tab-pane
         .card.card-without-border
-          .gl-display-flex.gl-flex-direction-column.gl-md-flex-direction-row.row-content-block.second-block
-            %span.flex-grow-1.align-self-md-center.gl-py-3
+          = render 'groups/group_members/tab_pane/header' do
+            = render 'groups/group_members/tab_pane/title' do
               = html_escape(_("Users requesting access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
           %ul.content-list.members-list
             = render partial: 'shared/members/member', collection: @requesters, as: :member
