@@ -1,7 +1,7 @@
 <script>
 import VulnerabilityChart from './first_class_vulnerability_chart.vue';
 import VulnerabilitySeverity from './vulnerability_severity.vue';
-import vulnerabilityHistoryQuery from '../graphql/group_vulnerability_history.graphql';
+import vulnerabilityHistoryQuery from '../graphql/group_vulnerability_history.query.graphql';
 import SecurityChartsLayout from './security_charts_layout.vue';
 
 export default {
