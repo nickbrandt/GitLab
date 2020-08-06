@@ -31,7 +31,7 @@ exports[`MergeRequest component when there are approvers matches snapshot 1`] = 
   >
     <gl-avatar-stub
       alt="avatar"
-      class="mr-1"
+      class="gl-mr-2"
       entityid="0"
       entityname="User 0"
       shape="circle"

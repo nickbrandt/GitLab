@@ -96,7 +96,7 @@ export default {
         :entity-id="approver.id"
         :entity-name="approver.name"
         :size="16"
-        class="mr-1"
+        class="gl-mr-2"
       />
       <span>{{ approver.name }}</span>
     </gl-avatar-link>
