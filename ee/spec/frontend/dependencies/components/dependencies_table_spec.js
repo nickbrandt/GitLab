@@ -14,7 +14,7 @@ describe('DependenciesTable component', () => {
     wrapper = mount(DependenciesTable, {
       ...options,
       propsData: { ...propsData },
-      stubs: { ...stubChildren(DependenciesTable), GlTable: false },
+      stubs: { ...stubChildren(DependenciesTable), GlTable: false, DependencyLocation: false },
     });
   };
 

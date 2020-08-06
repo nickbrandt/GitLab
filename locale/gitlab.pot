@@ -7880,12 +7880,20 @@ msgid_plural "Dependencies|%d additional vulnerabilities not shown"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Dependencies|%d more"
+msgid_plural "Dependencies|%d more"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Dependencies|%d vulnerability detected"
 msgid_plural "Dependencies|%d vulnerabilities detected"
 msgstr[0] ""
 msgstr[1] ""
 
 msgid "Dependencies|%{remainingLicensesCount} more"
+msgstr ""
+
+msgid "Dependencies|(top level)"
 msgstr ""
 
 msgid "Dependencies|All"
@@ -7898,6 +7906,9 @@ msgid "Dependencies|Component"
 msgstr ""
 
 msgid "Dependencies|Component name"
+msgstr ""
+
+msgid "Dependencies|Dependency path"
 msgstr ""
 
 msgid "Dependencies|Export as JSON"
@@ -7916,6 +7927,9 @@ msgid "Dependencies|Packager"
 msgstr ""
 
 msgid "Dependencies|The %{codeStartTag}dependency_scanning%{codeEndTag} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again."
+msgstr ""
+
+msgid "Dependencies|There may be multiple paths"
 msgstr ""
 
 msgid "Dependencies|Toggle vulnerability list"
