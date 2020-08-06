@@ -180,10 +180,13 @@ export default {
       };
     },
     newIncidentPath() {
-      return mergeUrlParams({
-        issuable_template: this.incidentTemplateName,
-        issue_type: this.incidentType
-      }, this.newIssuePath);
+      return mergeUrlParams(
+        {
+          issuable_template: this.incidentTemplateName,
+          issue_type: this.incidentType,
+        },
+        this.newIssuePath,
+      );
     },
     availableFields() {
       return this.publishedAvailable

@@ -214,6 +214,24 @@ RSpec.describe Projects::IssuesController do
         end
       end
 
+      context 'setting issue type' do
+        let(:issue_type) { 'issue' }
+
+        before do
+          get :new, params: { namespace_id: project.namespace, project_id: project, issue_type: issue_type }
+        end
+
+        subject { assigns(:issue).issue_type }
+
+        it { is_expected.to eq('issue') }
+
+        context 'incident issue' do
+          let(:issue_type) { 'incident' }
+
+          it { is_expected.to eq(issue_type) }
+        end
+      end
+
       it 'fills in an issue for a merge request' do
         project_with_repository = create(:project, :repository)
         project_with_repository.add_developer(user)
@@ -1287,6 +1305,20 @@ RSpec.describe Projects::IssuesController do
             issue: { title: 'Title', description: 'Description' }
           }
         end
+      end
+    end
+
+    context 'setting issue type' do
+      let(:issue_type) { 'issue' }
+
+      subject { post_new_issue(issue_type: issue_type)&.issue_type }
+
+      it { is_expected.to eq('issue') }
+
+      context 'incident issue' do
+        let(:issue_type) { 'incident' }
+
+        it { is_expected.to eq(issue_type) }
       end
     end
   end

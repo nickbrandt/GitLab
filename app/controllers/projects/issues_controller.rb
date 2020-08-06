@@ -113,8 +113,7 @@ class Projects::IssuesController < Projects::ApplicationController
   def create
     create_params = issue_params.merge(spammable_params).merge(
       merge_request_to_resolve_discussions_of: params[:merge_request_to_resolve_discussions_of],
-      discussion_to_resolve: params[:discussion_to_resolve],
-      issue_type: params[:issue][:issue_type]
+      discussion_to_resolve: params[:discussion_to_resolve]
     )
 
     service = Issues::CreateService.new(project, current_user, create_params)
@@ -292,6 +291,7 @@ class Projects::IssuesController < Projects::ApplicationController
       task_num
       lock_version
       discussion_locked
+      issue_type
     ] + [{ label_ids: [], assignee_ids: [], update_task: [:index, :checked, :line_number, :line_source] }]
   end
 
