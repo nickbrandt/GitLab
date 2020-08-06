@@ -16,7 +16,7 @@ RSpec.describe AlertManagement::PrometheusAlertPresenter do
     }
   end
 
-  let(:alert) do
+  let!(:alert) do
     create(:alert_management_alert, :prometheus, project: project, payload: payload)
   end
 

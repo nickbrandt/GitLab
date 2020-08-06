@@ -299,7 +299,7 @@ RSpec.describe Projects::Prometheus::AlertPresenter do
     it { is_expected.to eq(nil) }
 
     context 'alert management alert present' do
-      let(:am_alert) { create(:alert_management_alert, project: project) }
+      let_it_be(:am_alert) { create(:alert_management_alert, project: project) }
       let(:alert) { create(:alerting_alert, project: project, payload: payload, alert: am_alert) }
 
       it { is_expected.to eq("http://localhost/#{project.full_path}/-/alert_management/#{am_alert.id}/details") }

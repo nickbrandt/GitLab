@@ -4,7 +4,8 @@ require 'spec_helper'
 
 RSpec.describe AlertManagement::AlertPresenter do
   let_it_be(:project) { create(:project) }
-  let_it_be(:generic_payload) do
+
+  let(:generic_payload) do
     {
       'title' => 'Alert title',
       'start_time' => '2020-04-27T10:10:22.265949279Z',
@@ -12,6 +13,7 @@ RSpec.describe AlertManagement::AlertPresenter do
       'runbook' => 'https://runbook.com'
     }
   end
+
   let_it_be(:alert) do
     build(:alert_management_alert, :with_description, :with_host, :with_service, :with_monitoring_tool, project: project, payload: generic_payload)
   end
