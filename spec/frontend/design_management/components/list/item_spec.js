@@ -19,7 +19,7 @@ const DESIGN_VERSION_EVENT = {
 describe('Design management list item component', () => {
   let wrapper;
 
-  const findDesignEvent = () => wrapper.find('.design-event');
+  const findDesignEvent = () => wrapper.find('[data-testid="designEvent"]');
   const findEventIcon = () => findDesignEvent().find(Icon);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
 
