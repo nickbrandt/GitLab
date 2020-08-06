@@ -56,8 +56,13 @@ func NewUpstream(cfg config.Config, accessLogger *logrus.Logger) http.Handler {
 	up.configureURLPrefix()
 	up.configureRoutes()
 
+	var correlationOpts []correlation.InboundHandlerOption
+	if cfg.PropagateCorrelationID {
+		correlationOpts = append(correlationOpts, correlation.WithPropagation())
+	}
+
 	handler := log.AccessLogger(&up, log.WithAccessLogger(accessLogger))
-	handler = correlation.InjectCorrelationID(handler)
+	handler = correlation.InjectCorrelationID(handler, correlationOpts...)
 	return handler
 }
 

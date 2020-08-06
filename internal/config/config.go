@@ -74,6 +74,7 @@ type Config struct {
 	APIQueueTimeout          time.Duration             `toml:"-"`
 	APICILongPollingDuration time.Duration             `toml:"-"`
 	ObjectStorageCredentials *ObjectStorageCredentials `toml:"object_storage"`
+	PropagateCorrelationID   bool                      `toml:"-"`
 }
 
 // LoadConfig from a file
