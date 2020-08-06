@@ -30,7 +30,7 @@ versions. If needed copy-paste GitLab code into the migration to make it forward
 compatible.
 
 For GitLab.com, please take into consideration that regular migrations (under `db/migrate`)
-are run before [Canary is deployed](https://about.gitlab.com/handbook/engineering/infrastructure/library/canary/#configuration-and-deployment),
+are run before [Canary is deployed](https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/library/canary/#configuration-and-deployment),
 and post-deployment migrations (`db/post_migrate`) are run after the deployment to production has finished.
 
 ## Schema Changes
