@@ -125,6 +125,7 @@ RSpec.shared_examples 'sync retries use the snapshot RPC' do
       it 'attempts to snapshot' do
         expect(repository).to receive_create_from_snapshot
         expect(subject).not_to receive(:fetch_geo_mirror).with(repository)
+        expect(subject).to receive(:set_temp_repository_as_main)
 
         subject.execute
       end
