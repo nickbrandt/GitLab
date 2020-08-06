@@ -54,6 +54,7 @@ module API
           @group = find_group(group_path)
 
           scim_not_found!(message: "Group #{group_path} not found") unless @group
+          scim_not_found!(message: "Group #{group_path} does not have SAML SSO configured") unless @group.saml_provider
 
           check_access_to_group!(@group)
 

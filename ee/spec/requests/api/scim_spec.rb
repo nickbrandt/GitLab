@@ -43,6 +43,20 @@ RSpec.describe API::Scim do
     describe 'GET api/scim/v2/groups/:group/Users' do
       it_behaves_like 'SCIM token authenticated'
 
+      it 'responds with 404 for a non existent group' do
+        get scim_api("scim/v2/groups/#{non_existing_record_id}/Users")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        get scim_api("scim/v2/groups/#{group.full_path}/Users")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
       it 'responds with paginated users when there is no filter' do
         get scim_api("scim/v2/groups/#{group.full_path}/Users")
 
@@ -88,6 +102,20 @@ RSpec.describe API::Scim do
     describe 'GET api/scim/v2/groups/:group/Users/:id' do
       it_behaves_like 'SCIM token authenticated'
 
+      it 'responds with 404 for a non existent group' do
+        get scim_api("scim/v2/groups/#{non_existing_record_id}/Users/#{identity.extern_uid}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        get scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
       it 'responds with 404 if there is no user' do
         get scim_api("scim/v2/groups/#{group.full_path}/Users/123")
 
@@ -119,6 +147,20 @@ RSpec.describe API::Scim do
           access_token: access_token,
           password: password
         }.to_query
+      end
+
+      it 'responds with 404 for a non existent group' do
+        post scim_api("scim/v2/groups/#{non_existing_record_id}/Users?params=#{post_params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       context 'when a provisioning error occurs' do
@@ -157,8 +199,8 @@ RSpec.describe API::Scim do
           expect(new_user).not_to be_nil
         end
 
-        it 'created the right member' do
-          expect(member.access_level).to eq(::Gitlab::Access::GUEST)
+        it 'created the member with access level set in saml_provider' do
+          expect(member.access_level).to eq(::Gitlab::Access::DEVELOPER)
         end
       end
 
@@ -216,8 +258,8 @@ RSpec.describe API::Scim do
             expect(new_user).not_to be_nil
           end
 
-          it 'created the right member' do
-            expect(member.access_level).to eq(::Gitlab::Access::GUEST)
+          it 'created the member with access level set in saml_provider' do
+            expect(member.access_level).to eq(::Gitlab::Access::DEVELOPER)
           end
         end
       end
@@ -225,6 +267,24 @@ RSpec.describe API::Scim do
 
     describe 'PATCH api/scim/v2/groups/:group/Users/:id' do
       it_behaves_like 'SCIM token authenticated'
+
+      it 'responds with 404 for a non existent group' do
+        params = { Operations: [{ 'op': 'Replace', 'path': 'id', 'value': 'new_uid' }] }.to_query
+
+        patch scim_api("scim/v2/groups/#{non_existing_record_id}/Users/#{identity.extern_uid}?#{params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        params = { Operations: [{ 'op': 'Replace', 'path': 'id', 'value': 'new_uid' }] }.to_query
+
+        patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
 
       it 'responds with 404 if there is no user' do
         patch scim_api("scim/v2/groups/#{group.full_path}/Users/123")
@@ -327,6 +387,20 @@ RSpec.describe API::Scim do
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
+
+      it 'responds with 404 for a non existent group' do
+        delete scim_api("scim/v2/groups/#{non_existing_record_id}/Users/#{identity.extern_uid}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        delete scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
     end
   end
 
@@ -336,6 +410,20 @@ RSpec.describe API::Scim do
         get scim_api("scim/v2/groups/#{group.full_path}/Users")
 
         expect(json_response['totalResults']).to eq(Identity.count)
+      end
+
+      it 'responds with 404 for a non existent group' do
+        get scim_api("scim/v2/groups/#{non_existing_record_id}/Users")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        get scim_api("scim/v2/groups/#{group.full_path}/Users")
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -351,6 +439,21 @@ RSpec.describe API::Scim do
           password: password
         }.to_query
       end
+
+      it 'responds with 404 for a non existent group' do
+        post scim_api("scim/v2/groups/#{non_existing_record_id}/Users?params=#{post_params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
       context 'without an existing user' do
         let(:new_user) { User.find_by_email('work@example.com') }
         let(:member) { GroupMember.find_by(user: new_user, group: group) }
@@ -435,6 +538,24 @@ RSpec.describe API::Scim do
 
           it_behaves_like 'remove user'
         end
+
+        it 'responds with 404 for a non existent group' do
+          params = { Operations: [{ 'op': 'Replace', 'path': 'id', 'value': 'new_uid' }] }.to_query
+
+          patch scim_api("scim/v2/groups/#{non_existing_record_id}/Users/#{identity.extern_uid}?#{params}")
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+
+        it 'responds with 404 for a group with no SAML SSO configuration' do
+          group.saml_provider.destroy!
+
+          params = { Operations: [{ 'op': 'Replace', 'path': 'id', 'value': 'new_uid' }] }.to_query
+
+          patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
       end
     end
 
@@ -446,6 +567,20 @@ RSpec.describe API::Scim do
           expect { identity.reload }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
+
+      it 'responds with 404 for a non existent group' do
+        delete scim_api("scim/v2/groups/#{non_existing_record_id}/Users/#{identity.extern_uid}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        delete scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
     end
   end
 
@@ -455,6 +590,20 @@ RSpec.describe API::Scim do
         get scim_api("scim/v2/groups/#{group.full_path}/Users")
 
         expect(json_response['totalResults']).to eq(ScimIdentity.count)
+      end
+
+      it 'responds with 404 for a non existent group' do
+        get scim_api("scim/v2/groups/#{non_existing_record_id}/Users")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        get scim_api("scim/v2/groups/#{group.full_path}/Users")
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -467,6 +616,20 @@ RSpec.describe API::Scim do
           emails: [{ primary: true, type: 'work', value: 'work@example.com' }],
           name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' }
         }.to_query
+      end
+
+      it 'responds with 404 for a non existent group' do
+        post scim_api("scim/v2/groups/#{non_existing_record_id}/Users?params=#{post_params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       context 'without an existing user' do
@@ -538,6 +701,24 @@ RSpec.describe API::Scim do
           call_patch_api
         end
       end
+
+      it 'responds with 404 for a non existent group' do
+        params = { Operations: [{ 'op': 'Replace', 'path': 'id', 'value': 'new_uid' }] }.to_query
+
+        patch scim_api("scim/v2/groups/#{non_existing_record_id}/Users/#{identity.extern_uid}?#{params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        params = { Operations: [{ 'op': 'Replace', 'path': 'id', 'value': 'new_uid' }] }.to_query
+
+        patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
     end
 
     describe 'DELETE /scim/v2/groups/:group/Users/:id' do
@@ -548,6 +729,20 @@ RSpec.describe API::Scim do
           expect(identity.reload.active).to be false
         end
       end
+
+      it 'responds with 404 for a non existent group' do
+        delete scim_api("scim/v2/groups/#{non_existing_record_id}/Users/#{identity.extern_uid}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'responds with 404 for a group with no SAML SSO configuration' do
+        group.saml_provider.destroy!
+
+        delete scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}")
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
     end
   end
 
@@ -555,17 +750,23 @@ RSpec.describe API::Scim do
     before do
       stub_feature_flags(scim_identities: false)
     end
+
+    let(:saml_provider) { create(:saml_provider, default_membership_role: Gitlab::Access::DEVELOPER) }
     let(:group) { identity.saml_provider.group }
 
     context 'user with an alphanumeric extern_uid' do
-      let(:identity) { create(:group_saml_identity, user: user, extern_uid: generate(:username)) }
+      let(:identity) do
+        create(:group_saml_identity, user: user, extern_uid: generate(:username), saml_provider: saml_provider)
+      end
 
       it_behaves_like 'SCIM API endpoints'
       it_behaves_like 'SCIM API endpoints with scim_identities disabled'
     end
 
     context 'user with an email extern_uid' do
-      let(:identity) { create(:group_saml_identity, user: user, extern_uid: user.email) }
+      let(:identity) do
+        create(:group_saml_identity, user: user, extern_uid: user.email, saml_provider: saml_provider)
+      end
 
       it_behaves_like 'SCIM API endpoints'
       it_behaves_like 'SCIM API endpoints with scim_identities disabled'
@@ -575,7 +776,7 @@ RSpec.describe API::Scim do
   context 'when scim_identities is enabled' do
     before do
       stub_feature_flags(scim_identities: true)
-      create(:saml_provider, group: group)
+      create(:saml_provider, group: group, default_membership_role: Gitlab::Access::DEVELOPER)
     end
     let(:group) { identity.group }
 
