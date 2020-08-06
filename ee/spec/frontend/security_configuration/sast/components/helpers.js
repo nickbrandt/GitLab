@@ -10,11 +10,11 @@
 // eslint-disable-next-line import/prefer-default-export
 export const makeEntities = (count, changes) =>
   [...Array(count).keys()].map(i => ({
+    defaultValue: `defaultValue${i}`,
+    description: `description${i}`,
     field: `field${i}`,
     label: `label${i}`,
-    description: `description${i}`,
-    defaultValue: `defaultValue${i}`,
-    value: `defaultValue${i}`,
     type: 'string',
+    value: `defaultValue${i}`,
     ...changes,
   }));

@@ -1,4 +1,7 @@
-import { isValidConfigurationEntity } from 'ee/security_configuration/sast/components/utils';
+import {
+  isValidConfigurationEntity,
+  extractSastConfigurationEntities,
+} from 'ee/security_configuration/sast/components/utils';
 import { makeEntities } from './helpers';
 
 describe('isValidConfigurationEntity', () => {
@@ -23,5 +26,39 @@ describe('isValidConfigurationEntity', () => {
 
   it.each(invalidEntities)('returns false for an invalid entity', invalidEntity => {
     expect(isValidConfigurationEntity(invalidEntity)).toBe(false);
+  });
+});
+
+describe('extractSastConfigurationEntities', () => {
+  describe.each`
+    context                    | response
+    ${'which is empty'}        | ${{}}
+    ${'with no project'}       | ${{ project: null }}
+    ${'with no configuration'} | ${{ project: {} }}
+  `('given a response $context', ({ response }) => {
+    it('returns an empty array', () => {
+      expect(extractSastConfigurationEntities(response)).toEqual([]);
+    });
+  });
+
+  describe('given a valid response', () => {
+    it('returns an array of entities from the global and pipeline sections', () => {
+      const globalEntities = makeEntities(3, { description: 'global' });
+      const pipelineEntities = makeEntities(3, { description: 'pipeline' });
+
+      const response = {
+        project: {
+          sastCiConfiguration: {
+            global: { nodes: globalEntities },
+            pipeline: { nodes: pipelineEntities },
+          },
+        },
+      };
+
+      expect(extractSastConfigurationEntities(response)).toEqual([
+        ...globalEntities,
+        ...pipelineEntities,
+      ]);
+    });
   });
 });

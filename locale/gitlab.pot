@@ -21286,7 +21286,7 @@ msgstr ""
 msgid "SecurityConfiguration|Configure"
 msgstr ""
 
-msgid "SecurityConfiguration|Customize common SAST settings to suit your requirements. More advanced configuration options exist, which you can add to the configuration file this tool generates. It's important to note that if you make any configurations, they will be saved as overrides and will be %{strongStart}excluded from automatic updates%{strongEnd}."
+msgid "SecurityConfiguration|Customize common SAST settings to suit your requirements. More advanced configuration options exist, which you can add to the configuration file this tool generates. It's important to note that if you make any configurations, they will be saved as overrides and will be excluded from automatic updates. We've provided guidance for some easily configurable variables below, but our docs go into even more depth. %{linkStart}Read more%{linkEnd}"
 msgstr ""
 
 msgid "SecurityConfiguration|Enable via Merge Request"
@@ -21307,6 +21307,9 @@ msgstr ""
 msgid "SecurityConfiguration|Not enabled"
 msgstr ""
 
+msgid "SecurityConfiguration|SAST Configuration"
+msgstr ""
+
 msgid "SecurityConfiguration|Security Control"
 msgstr ""
 
@@ -21317,6 +21320,9 @@ msgid "SecurityConfiguration|Status"
 msgstr ""
 
 msgid "SecurityConfiguration|Testing & Compliance"
+msgstr ""
+
+msgid "SecurityConfiguration|There was an error loading the configuration. Please reload the page to try again."
 msgstr ""
 
 msgid "SecurityConfiguration|Using custom settings. You won't receive automatic updates on this variable. %{anchorStart}Restore to default%{anchorEnd}"
