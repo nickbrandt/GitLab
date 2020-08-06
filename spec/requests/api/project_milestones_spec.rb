@@ -3,17 +3,81 @@
 require 'spec_helper'
 
 RSpec.describe API::ProjectMilestones do
-  let(:user) { create(:user) }
-  let!(:project) { create(:project, namespace: user.namespace ) }
-  let!(:closed_milestone) { create(:closed_milestone, project: project, title: 'version1', description: 'closed milestone') }
-  let!(:milestone) { create(:milestone, project: project, title: 'version2', description: 'open milestone') }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, namespace: user.namespace ) }
+  let_it_be(:closed_milestone) { create(:closed_milestone, project: project, title: 'version1', description: 'closed milestone') }
+  let_it_be(:milestone) { create(:milestone, project: project, title: 'version2', description: 'open milestone') }
 
   before do
     project.add_developer(user)
   end
 
   it_behaves_like 'group and project milestones', "/projects/:id/milestones" do
-    let(:route) { "/projects/#{project.id}/milestones" }
+    let_it_be(:route) { "/projects/#{project.id}/milestones" }
+  end
+
+  describe 'GET /projects/:id/milestones' do
+    context 'when include_parent_milestones is true' do
+      let_it_be(:parent_group) { create(:group, :private) }
+      let_it_be(:subgroup) { create(:group, :private, parent: parent_group) }
+      let_it_be(:sub_project) { create(:project, group: subgroup) }
+      let_it_be(:sub_project_milestone) { create(:milestone, project: sub_project) }
+      let_it_be(:parent_group_milestone) { create(:milestone, group: parent_group) }
+      let_it_be(:subgroup_milestone) { create(:milestone, group: subgroup) }
+      let_it_be(:route) { "/projects/#{sub_project.id}/milestones" }
+      let_it_be(:params) { { include_parent_milestones: true } }
+
+      before do
+        sub_project.add_developer(user)
+      end
+
+      shared_examples 'lists all milestones' do
+        it 'includes parent and ancestors milestones' do
+          milestones = [subgroup_milestone, parent_group_milestone, sub_project_milestone]
+
+          get api(route, user), params: params
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(3)
+          expect(json_response.map { |entry| entry["id"] }).to eq(milestones.map(&:id))
+        end
+      end
+
+      context 'when user has access to all groups' do
+        before do
+          parent_group.add_developer(user)
+          subgroup.add_developer(user)
+        end
+
+        it_behaves_like 'lists all milestones'
+
+        context 'when iids param is present' do
+          before do
+            params.merge(iids: [sub_project_milestone.iid])
+          end
+
+          it_behaves_like 'lists all milestones'
+        end
+      end
+
+      context 'when user has no access to an ancestor group' do
+        let(:user2) { create(:user) }
+
+        before do
+          sub_project.add_developer(user2)
+        end
+
+        it 'does not show ancestor group milestones' do
+          milestones = [subgroup_milestone, sub_project_milestone]
+
+          get api(route, user2), params: { include_parent_milestones: true }
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(2)
+          expect(json_response.map { |entry| entry["id"] }).to eq(milestones.map(&:id))
+        end
+      end
+    end
   end
 
   describe 'DELETE /projects/:id/milestones/:milestone_id' do
