@@ -69,7 +69,7 @@ export default {
 
 <template>
   <div>
-    <div class="dashboard-grid">
+    <div class="dashboard-grid gl-display-grid gl-grid-tpl-rows-auto">
       <grid-column-heading :heading="$options.strings.mergeRequestLabel" />
       <grid-column-heading :heading="$options.strings.approvalStatusLabel" class="gl-text-center" />
       <grid-column-heading :heading="$options.strings.pipelineStatusLabel" class="gl-text-center" />

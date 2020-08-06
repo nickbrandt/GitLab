@@ -22,7 +22,7 @@ export default {
 
 <template>
   <div
-    class="grid-merge-request gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
+    class="gl-grid-col-start-1 gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5"
     data-testid="merge-request"
   >
     <a :href="mergeRequest.path" class="gl-display-block gl-text-gray-900 gl-font-weight-bold">
@@ -44,7 +44,7 @@ export default {
           :entity-id="mergeRequest.author.id"
           :entity-name="mergeRequest.author.name"
           :size="16"
-          class="mr-1"
+          class="gl-mr-2"
         />
         <span>{{ mergeRequest.author.name }}</span>
       </gl-avatar-link>
