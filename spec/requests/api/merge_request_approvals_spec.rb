@@ -23,6 +23,19 @@ RSpec.describe API::MergeRequestApprovals do
     end
   end
 
+  describe "GET :id/merge_requests/:merge_request_iid/approval_settings" do
+    it "retrieves the approval settings" do
+      project.add_developer(approver)
+      project.add_developer(create(:user))
+
+      create(:approval, user: approver, merge_request: merge_request)
+
+      get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings", user)
+
+      expect(response).to have_gitlab_http_status(:ok)
+    end
+  end
+
   describe 'POST :id/merge_requests/:merge_request_iid/approve' do
     context 'as a valid approver' do
       let_it_be(:approver) { create(:user) }
