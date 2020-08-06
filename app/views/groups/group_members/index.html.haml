@@ -56,9 +56,7 @@
           = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form gl-display-flex gl-md-align-items-center gl-flex-wrap gl-flex-direction-column gl-md-flex-direction-row gl-mx-n3 gl-my-n3' do
             .gl-px-3.gl-py-2
               .search-control-wrap.gl-relative
-                = search_field_tag :search, params[:search], { placeholder: _('Search'), class: 'form-control', spellcheck: false }
-                %button.user-search-btn.border-left.gl-display-flex.gl-align-items-center.gl-justify-content-center{ type: "submit", "aria-label": _("Submit search") }
-                  = sprite_icon("search")
+                = render 'shared/members/search_field'
             - if can_manage_members
               .gl-px-3.gl-py-3.gl-display-flex.gl-flex-direction-column.gl-md-flex-direction-row
                 = label_tag '2fa', _('2FA'), class: 'label-bold gl-mr-2 gl-mb-0 gl-py-2 align-self-md-center'
@@ -86,10 +84,7 @@
             %span.gl-flex-grow-1.gl-md-align-self-center.gl-py-3
               = html_escape(_("Members with pending access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
             = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form' do
-              .search-control-wrap.gl-relative
-                = search_field_tag :search_invited, params[:search_invited], { placeholder: _('Search'), class: 'form-control', spellcheck: false }
-                %button.user-search-btn.border-left.gl-display-flex.gl-align-items-center.gl-justify-content-center{ type: "submit", "aria-label": _("Submit search") }
-                  = sprite_icon("search")
+              = render 'shared/members/search_field', name: 'search_invited'
           %ul.content-list.members-list
             = render partial: 'shared/members/member', collection: @invited_members, as: :member
         = paginate @invited_members, param_name: 'invited_members_page', theme: 'gitlab', params: { page: nil }
