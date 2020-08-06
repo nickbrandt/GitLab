@@ -125,7 +125,7 @@ class SchemaRegenerator
   # In order to properly reset the database and re-run migrations
   # the schema migrations for new migrations must be removed.
   def remove_schema_migration_files
-    git_command = "git diff --name-only --diff-filter=A #{source_ref} -- #{SCHEMA_MIGRATIONS_DIR}"
+    git_command = "git diff --name-only --diff-filter=A #{merge_base} -- #{SCHEMA_MIGRATIONS_DIR}"
     run(git_command).chomp.split("\n").each do |schema_migration|
       FileUtils.rm(schema_migration)
     end
