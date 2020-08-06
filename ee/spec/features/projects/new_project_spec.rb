@@ -115,18 +115,14 @@ RSpec.describe 'New project' do
 
         expect(page).to have_text('Authenticate with GitHub')
 
-        allow_next_instance_of(Octokit::Client) do |client|
-          allow(client).to receive(:repos).and_return([repo])
-        end
+        allow_any_instance_of(Gitlab::LegacyGithubImport::Client).to receive(:repos).and_return([repo])
 
         fill_in 'personal_access_token', with: 'fake-token'
         click_button 'Authenticate'
         wait_for_requests
 
         # Mock the POST `/import/github`
-        allow_next_instance_of(Gitlab::GithubImport::Client) do |client|
-          allow(client).to receive(:repository).and_return(repo)
-        end
+        allow_any_instance_of(Gitlab::LegacyGithubImport::Client).to receive(:repo).and_return(repo)
         project = create(:project, name: 'some-github-repo', creator: user, import_type: 'github')
         create(:import_state, :finished, import_url: repo.clone_url, project: project)
         allow_any_instance_of(CiCd::SetupProject).to receive(:setup_external_service)
@@ -154,9 +150,7 @@ RSpec.describe 'New project' do
           find('.js-import-github').click
         end
 
-        allow_next_instance_of(Octokit::Client) do |client|
-          allow(client).to receive(:repos).and_raise(Octokit::Unauthorized)
-        end
+        allow_any_instance_of(Gitlab::LegacyGithubImport::Client).to receive(:repos).and_raise(Octokit::Unauthorized)
 
         fill_in 'personal_access_token', with: 'unauthorized-fake-token'
         click_button 'Authenticate'
