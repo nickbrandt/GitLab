@@ -12793,7 +12793,7 @@ msgstr ""
 msgid "Incident Management Limits"
 msgstr ""
 
-msgid "IncidentManagement|All incidents"
+msgid "IncidentManagement|All"
 msgstr ""
 
 msgid "IncidentManagement|Assignees"
@@ -21081,7 +21081,7 @@ msgstr ""
 msgid "Search requirements"
 msgstr ""
 
-msgid "Search results..."
+msgid "Search results…"
 msgstr ""
 
 msgid "Search users"
