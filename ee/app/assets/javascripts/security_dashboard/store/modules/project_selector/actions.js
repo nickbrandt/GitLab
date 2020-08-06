@@ -158,25 +158,6 @@ export const fetchSearchResults = ({ state, dispatch, commit }) => {
     .catch(() => dispatch('receiveSearchResultsError'));
 };
 
-export const fetchSearchResultsNextPage = ({ state, dispatch, commit }) => {
-  const {
-    searchQuery,
-    pageInfo: { totalPages, page, nextPage },
-  } = state;
-
-  if (totalPages <= page) {
-    return Promise.resolve();
-  }
-
-  const searchOptions = { page: nextPage };
-
-  return searchProjects(searchQuery, searchOptions)
-    .then(payload => {
-      commit(types.RECEIVE_NEXT_PAGE_SUCCESS, payload);
-    })
-    .catch(() => dispatch('receiveSearchResultsError'));
-};
-
 export const requestSearchResults = ({ commit }) => {
   commit(types.REQUEST_SEARCH_RESULTS);
 };
