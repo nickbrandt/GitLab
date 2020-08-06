@@ -3827,6 +3827,9 @@ msgstr ""
 msgid "BillingPlans|per user"
 msgstr ""
 
+msgid "BillingPlan|Contact sales"
+msgstr ""
+
 msgid "BillingPlan|Upgrade"
 msgstr ""
 

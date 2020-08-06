@@ -87,4 +87,27 @@ RSpec.describe BillingPlansHelper do
       end
     end
   end
+
+  describe '#show_contact_sales_button?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:experiment_enabled, :link_action, :result) do
+      true | 'downgrade' | false
+      true | 'current' | false
+      true | 'upgrade' | true
+      false | 'downgrade' | false
+      false | 'current' | false
+      false | 'upgrade' | false
+    end
+
+    with_them do
+      before do
+        allow(helper).to receive(:experiment_enabled?).with(:contact_sales_btn_in_app).and_return(experiment_enabled)
+      end
+
+      subject { helper.show_contact_sales_button?(link_action) }
+
+      it { is_expected.to eq(result) }
+    end
+  end
 end
