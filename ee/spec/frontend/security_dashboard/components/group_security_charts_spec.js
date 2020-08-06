@@ -5,7 +5,7 @@ import SecurityChartsLayout from 'ee/security_dashboard/components/security_char
 import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vulnerability_chart.vue';
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
 
-jest.mock('ee/security_dashboard/graphql/group_vulnerability_history.graphql', () => ({}));
+jest.mock('ee/security_dashboard/graphql/group_vulnerability_history.query.graphql', () => ({}));
 
 describe('Group Security Charts component', () => {
   let wrapper;
