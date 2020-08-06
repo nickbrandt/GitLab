@@ -17,8 +17,8 @@ describe('security configuration module actions', () => {
   describe('setSecurityConfigurationEndpoint', () => {
     const securityConfigurationPath = 123;
 
-    it('should commit the SET_SECURITY_CONFIGURATION_ENDPOINT mutation', () => {
-      testAction(
+    it('should commit the SET_SECURITY_CONFIGURATION_ENDPOINT mutation', async () => {
+      await testAction(
         actions.setSecurityConfigurationEndpoint,
         securityConfigurationPath,
         state,
@@ -51,8 +51,8 @@ describe('security configuration module actions', () => {
         mock.onGet(state.securityConfigurationPath).replyOnce(200, configuration);
       });
 
-      it('should commit the request and success mutations', () => {
-        testAction(
+      it('should commit the request and success mutations', async () => {
+        await testAction(
           actions.fetchSecurityConfiguration,
           {},
           state,
@@ -73,10 +73,10 @@ describe('security configuration module actions', () => {
         mock.onGet(state.securityConfigurationPath).replyOnce(200, configuration);
       });
 
-      it('should commit RECEIVE_SECURITY_CONFIGURATION_ERROR mutation', () => {
+      it('should commit RECEIVE_SECURITY_CONFIGURATION_ERROR mutation', async () => {
         state.securityConfigurationPath = '';
 
-        testAction(
+        await testAction(
           actions.fetchSecurityConfiguration,
           {},
           state,
@@ -95,8 +95,8 @@ describe('security configuration module actions', () => {
         mock.onGet(state.securityConfigurationPath).replyOnce(404);
       });
 
-      it('should commit REQUEST_SECURITY_CONFIGURATION and RECEIVE_SECURITY_CONFIGURATION_ERRORmutation', () => {
-        testAction(
+      it('should commit REQUEST_SECURITY_CONFIGURATION and RECEIVE_SECURITY_CONFIGURATION_ERRORmutation', async () => {
+        await testAction(
           actions.fetchSecurityConfiguration,
           {},
           state,
