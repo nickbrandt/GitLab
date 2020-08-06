@@ -12,7 +12,7 @@ module Resolvers
       delegate :issue_links, to: :object, private: true
 
       def resolve(link_type: nil, **)
-        issue_links.by_link_type(link_type)
+        issue_links_by_link_type(link_type)
       end
 
       private
