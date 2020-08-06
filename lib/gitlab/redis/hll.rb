@@ -2,6 +2,8 @@
 
 module Gitlab
   module Redis
+    KeyFormatError = Class.new(StandardError)
+
     class HLL
       def self.count(params)
         self.new.count(params)
@@ -11,8 +13,6 @@ module Gitlab
         self.new.add(params)
       end
 
-      # NOTE: It is important to make sure the keys are in the same hash slot
-      # https://redis.io/topics/cluster-spec#keys-hash-tags
       def count(keys:)
         Gitlab::Redis::SharedState.with do |redis|
           redis.pfcount(*keys)
@@ -20,6 +20,10 @@ module Gitlab
       end
 
       def add(key:, value:, expiry:)
+        unless %r{\A.*\{.*\}.*\z}.match?(key)
+          raise KeyFormatError.new("Invalid key format. #{key} key should have changeable parts in curly braces. See https://docs.gitlab.com/ee/development/redis.html#multi-key-commands")
+        end
+
         Gitlab::Redis::SharedState.with do |redis|
           redis.multi do |multi|
             multi.pfadd(key, value)
