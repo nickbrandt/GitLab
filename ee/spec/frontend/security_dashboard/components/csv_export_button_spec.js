@@ -25,7 +25,6 @@ describe('Csv Button Export', () => {
   const findPopoverButton = () => wrapper.find({ ref: 'popoverButton' });
   const findPopover = () => wrapper.find({ ref: 'popover' });
   const findCsvExportButton = () => wrapper.find({ ref: 'csvExportButton' });
-  const findExportIcon = () => wrapper.find({ ref: 'exportIcon' });
 
   const createComponent = () => {
     return shallowMount(CsvExportButton, {
@@ -101,7 +100,7 @@ describe('Csv Button Export', () => {
     });
 
     it('displays the export icon when not loading and the loading icon when loading', () => {
-      expect(findExportIcon().props('name')).toBe('export');
+      expect(findCsvExportButton().props('icon')).toBe('export');
       expect(findCsvExportButton().props('loading')).toBe(false);
 
       wrapper.setData({
@@ -109,7 +108,7 @@ describe('Csv Button Export', () => {
       });
 
       return wrapper.vm.$nextTick(() => {
-        expect(findExportIcon().exists()).toBe(false);
+        expect(findCsvExportButton().props('icon')).toBeFalsy();
         expect(findCsvExportButton().props('loading')).toBe(true);
       });
     });
