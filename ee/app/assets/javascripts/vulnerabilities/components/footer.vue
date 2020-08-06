@@ -216,6 +216,7 @@ export default {
       :can-modify-related-issues="canModifyRelatedIssues"
       :project-path="project.url"
       :help-path="relatedIssuesHelpPath"
+      :issue-feedback="issueFeedback"
     />
 
     <hr />

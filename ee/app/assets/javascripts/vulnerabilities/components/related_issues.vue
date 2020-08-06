@@ -1,9 +1,10 @@
 <script>
 import axios from 'axios';
+import { noop } from 'lodash';
 import RelatedIssuesStore from 'ee/related_issues/stores/related_issues_store';
 import RelatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
 import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
-import { sprintf, __ } from '~/locale';
+import { sprintf, __, s__ } from '~/locale';
 import { joinPaths } from '~/lib/utils/url_utility';
 import { RELATED_ISSUES_ERRORS } from '../constants';
 import createFlash from '~/flash';
@@ -27,6 +28,11 @@ export default {
       required: false,
       default: '',
     },
+    issueFeedback: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     projectPath: {
       type: String,
       required: true,
@@ -43,6 +49,12 @@ export default {
     };
   },
   computed: {
+    relatedIssues() {
+      return this.state.relatedIssues.map(issue => ({
+        ...issue,
+        actionButtons: this.getActionButtonsForIssue(issue),
+      }));
+    },
     vulnerabilityProjectId() {
       return this.projectPath.replace(/^\//, ''); // Remove the leading slash, i.e. '/root/test' -> 'root/test'.
     },
@@ -100,6 +112,35 @@ export default {
         }
       });
     },
+    getActionButtonsForIssue(issue) {
+      // if we can't modify issues, no buttons at all
+      if (!this.canModifyRelatedIssues) {
+        return [];
+      }
+
+      const lockedIssue = [
+        {
+          action: 'locked',
+          icon: 'lock',
+          tooltip: s__(
+            'VulnerabilityManagement|Issues created from a vulnerability cannot be removed.',
+          ),
+          isDisabled: true,
+          onClick: noop,
+        },
+      ];
+
+      const editableIssue = [
+        {
+          action: 'remove',
+          icon: 'close',
+          tooltip: __('Remove'),
+          onClick: () => this.removeRelatedIssue(issue.id),
+        },
+      ];
+
+      return this.issueFeedback?.issue_iid === issue.iid ? lockedIssue : editableIssue;
+    },
     removeRelatedIssue(idToRemove) {
       const issue = this.state.relatedIssues.find(({ id }) => id === idToRemove);
 
@@ -151,7 +192,7 @@ export default {
     :help-path="helpPath"
     :is-fetching="isFetching"
     :is-submitting="isSubmitting"
-    :related-issues="state.relatedIssues"
+    :related-issues="relatedIssues"
     :can-add-related-issue="canModifyRelatedIssues"
     :pending-references="state.pendingReferences"
     :is-form-visible="isFormVisible"
