@@ -1,8 +1,10 @@
 <script>
+import { merge } from 'lodash';
 import { GlLineChart } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
 import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
 import { __, sprintf } from '~/locale';
+import commonChartOptions from './common_chart_options';
 
 export default {
   components: {
@@ -44,30 +46,15 @@ export default {
       return series;
     },
     options() {
-      return {
+      return merge({}, commonChartOptions, {
         xAxis: {
-          name: '',
-          type: 'time',
           min: this.startDate,
           max: this.dueDate,
-          axisLine: {
-            show: true,
-          },
         },
         yAxis: {
           name: __('Total issues'),
-          axisLine: {
-            show: true,
-          },
-          splitLine: {
-            show: false,
-          },
         },
-        tooltip: {
-          trigger: 'item',
-          formatter: () => '',
-        },
-      };
+      });
     },
   },
   methods: {
@@ -91,7 +78,12 @@ export default {
       <h3>{{ __('Burnup chart') }}</h3>
     </div>
     <resizable-chart-container class="js-burnup-chart">
-      <gl-line-chart :data="dataSeries" :option="options" :format-tooltip-text="formatTooltipText">
+      <gl-line-chart
+        :data="dataSeries"
+        :option="options"
+        :format-tooltip-text="formatTooltipText"
+        :include-legend-avg-max="false"
+      >
         <template slot="tooltipTitle">{{ tooltip.title }}</template>
         <template slot="tooltipContent">{{ tooltip.content }}</template>
       </gl-line-chart>
