@@ -147,7 +147,7 @@ RSpec.describe Projects::Security::NetworkPoliciesController do
         Gitlab::Kubernetes::NetworkPolicy.new(
           name: 'policy',
           namespace: 'another',
-          pod_selector: { matchLabels: { role: 'db' } },
+          selector: { matchLabels: { role: 'db' } },
           ingress: [{ from: [{ namespaceSelector: { matchLabels: { project: 'myproject' } } }] }]
         )
       end
@@ -184,7 +184,7 @@ RSpec.describe Projects::Security::NetworkPoliciesController do
       Gitlab::Kubernetes::NetworkPolicy.new(
         name: 'policy',
         namespace: 'another',
-        pod_selector: { matchLabels: { role: 'db' } },
+        selector: { matchLabels: { role: 'db' } },
         ingress: [{ from: [{ namespaceSelector: { matchLabels: { project: 'myproject' } } }] }]
       )
     end
@@ -248,7 +248,7 @@ RSpec.describe Projects::Security::NetworkPoliciesController do
       Gitlab::Kubernetes::NetworkPolicy.new(
         name: 'policy',
         namespace: 'another',
-        pod_selector: { matchLabels: { role: 'db' } },
+        selector: { matchLabels: { role: 'db' } },
         ingress: [{ from: [{ namespaceSelector: { matchLabels: { project: 'myproject' } } }] }]
       )
     end
