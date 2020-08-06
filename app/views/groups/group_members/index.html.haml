@@ -55,7 +55,7 @@
         = render 'groups/group_members/tab_pane/header' do
           = render 'groups/group_members/tab_pane/title' do
             = html_escape(_("Members with access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
-          = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form gl-display-flex gl-md-align-items-center gl-flex-wrap gl-flex-direction-column gl-md-flex-direction-row gl-mx-n3 gl-my-n3' do
+          = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form gl-display-flex gl-md-align-items-center gl-flex-wrap gl-flex-direction-column gl-md-flex-direction-row gl-mx-n3 gl-my-n3', data: { testid: 'user-search-form' } do
             .gl-px-3.gl-py-2
               .search-control-wrap.gl-relative
                 = render 'shared/members/search_field'
@@ -84,7 +84,7 @@
           = render 'groups/group_members/tab_pane/header' do
             = render 'groups/group_members/tab_pane/title' do
               = html_escape(_("Members with pending access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
-            = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form' do
+            = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form', data: { testid: 'user-search-form' } do
               = render 'shared/members/search_field', name: 'search_invited'
           %ul.content-list.members-list
             = render partial: 'shared/members/member', collection: @invited_members, as: :member

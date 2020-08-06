@@ -62,7 +62,7 @@ RSpec.describe 'Groups > Members > Tabs' do
 
       click_link 'Pending'
 
-      page.within '.user-search-form' do
+      page.within '[data-testid="user-search-form"]' do
         fill_in 'search_invited', with: 'email'
         find('button[type="submit"]').click
       end
@@ -74,7 +74,7 @@ RSpec.describe 'Groups > Members > Tabs' do
       before do
         click_link 'Members'
 
-        page.within '.user-search-form' do
+        page.within '[data-testid="user-search-form"]' do
           fill_in 'search', with: 'test'
           find('button[type="submit"]').click
         end
