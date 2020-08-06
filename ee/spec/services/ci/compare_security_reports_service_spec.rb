@@ -90,7 +90,6 @@ RSpec.describe Ci::CompareSecurityReportsService do
         let(:base_pipeline) { create(:ee_ci_pipeline) }
 
         specify { expect { subject }.not_to raise_error }
-        specify { expect(subject.scans).to be_empty }
       end
     end
   end
