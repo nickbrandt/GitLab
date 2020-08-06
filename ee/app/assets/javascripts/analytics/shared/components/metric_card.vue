@@ -45,7 +45,7 @@ export default {
       <gl-skeleton-loading v-if="isLoading" class="gl-h-auto gl-py-3" />
       <div v-else ref="metricsWrapper" class="gl-display-flex">
         <div
-          v-for="{ tooltipText = '', ...metric } in metrics"
+          v-for="metric in metrics"
           :key="metric.key"
           ref="metricItem"
           class="js-metric-card-item gl-flex-grow-1 gl-text-center"
@@ -56,14 +56,16 @@ export default {
           <h3 v-else class="gl-my-2">{{ valueText(metric) }}</h3>
           <p class="text-secondary gl-font-sm gl-mb-2">
             {{ metric.label }}
-            <span v-if="tooltipText.length"
-              >&nbsp;<gl-icon
-                v-gl-tooltip="{ title: tooltipText }"
+            <span v-if="metric.tooltipText">
+              &nbsp;
+              <gl-icon
+                v-gl-tooltip="{ title: metric.tooltipText }"
                 :size="14"
                 class="gl-vertical-align-middle"
                 name="question"
                 data-testid="tooltip"
-            /></span>
+              />
+            </span>
           </p>
         </div>
       </div>
