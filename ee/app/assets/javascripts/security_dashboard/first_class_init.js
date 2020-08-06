@@ -9,16 +9,11 @@ import createStore from './store';
 import createRouter from './router';
 import apolloProvider from './graphql/provider';
 
-const isRequired = message => {
-  throw new Error(message);
-};
+export default (el, dashboardType) => {
+  if (!el) {
+    return null;
+  }
 
-export default (
-  /* eslint-disable @gitlab/require-i18n-strings */
-  el = isRequired('No element was passed to the security dashboard initializer'),
-  dashboardType = isRequired('No dashboard type was passed to the security dashboard initializer'),
-  /* eslint-enable @gitlab/require-i18n-strings */
-) => {
   if (el.dataset.isUnavailable) {
     return new Vue({
       el,
