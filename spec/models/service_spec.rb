@@ -11,45 +11,32 @@ RSpec.describe Service do
   end
 
   describe 'validations' do
+    using RSpec::Parameterized::TableSyntax
+
     let(:group) { create(:group) }
     let(:project) { create(:project) }
 
     it { is_expected.to validate_presence_of(:type) }
 
-    it 'validates presence of project_id if not template, instance or group_id', :aggregate_failures do
-      expect(build(:service, project_id: nil, template: true)).to be_valid
-      expect(build(:service, project_id: nil, instance: true)).to be_valid
-      expect(build(:service, project_id: nil, group_id: group.id)).to be_valid
-      expect(build(:service, project_id: nil, template: false)).to be_invalid
-      expect(build(:service, project_id: nil, instance: false)).to be_invalid
-      expect(build(:service, project_id: nil, group_id: nil)).to be_invalid
+    # We need to use a Proc object because let variables are not available on
+    # this context, see: https://github.com/tomykaira/rspec-parameterized/issues/8
+    where(:project_id, :group_id, :template, :instance, :valid) do
+      -> { project.id } | nil             | false  | false  | true
+      nil               | -> { group.id } | false  | false  | true
+      nil               | nil             | true   | false  | true
+      nil               | nil             | false  | true   | true
+      nil               | nil             | false  | false  | false
+      nil               | nil             | true   | true   | false
+      -> { project.id } | nil             | true   | false  | false
+      -> { project.id } | nil             | false  | true   | false
+      nil               | -> { group.id } | true   | false  | false
+      nil               | -> { group.id } | false  | true   | false
     end
 
-    it 'validates presence of group_id if not template, instance or project_id', :aggregate_failures do
-      expect(build(:service, group_id: nil, project_id: nil, template: true)).to be_valid
-      expect(build(:service, group_id: nil, project_id: nil, instance: true)).to be_valid
-      expect(build(:service, group_id: nil, project_id: project.id)).to be_valid
-      expect(build(:service, group_id: nil, project_id: nil, template: false)).to be_invalid
-      expect(build(:service, group_id: nil, project_id: nil, instance: false)).to be_invalid
-      expect(build(:service, group_id: nil, project_id: nil)).to be_invalid
-    end
-
-    it 'validates absence of project_id if instance or template', :aggregate_failures do
-      expect(build(:service, instance: true)).to validate_absence_of(:project_id)
-      expect(build(:service, template: true)).to validate_absence_of(:project_id)
-      expect(build(:service, instance: false)).not_to validate_absence_of(:project_id)
-      expect(build(:service, template: false)).not_to validate_absence_of(:project_id)
-    end
-
-    it 'validates absence of group_id if instance or template', :aggregate_failures do
-      expect(build(:service, instance: true)).to validate_absence_of(:group_id)
-      expect(build(:service, template: true)).to validate_absence_of(:group_id)
-      expect(build(:service, instance: false)).not_to validate_absence_of(:group_id)
-      expect(build(:service, template: false)).not_to validate_absence_of(:group_id)
-    end
-
-    it 'validates service is template or instance' do
-      expect(build(:service, project_id: nil, template: true, instance: true)).to be_invalid
+    with_them do
+      it 'validates the service' do
+        expect(build(:service, project_id: project_id.try(:call), group_id: group_id.try(:call), template: template, instance: instance).valid?).to eq(valid)
+      end
     end
 
     context 'with an existing service template' do
