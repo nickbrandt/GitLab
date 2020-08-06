@@ -25,30 +25,30 @@
 
   %ul.nav-links.mobile-separator.nav.nav-tabs
     %li.nav-item
-      = link_to "#tab-members", class: ["nav-link", ("active" unless pending_active)] , 'data-toggle' => 'tab' do
+      = link_to "#tab-members", class: ["nav-link", ("active" unless pending_active)] , 'data-toggle': 'tab' do
         %span
           = _("Members")
         %span.badge.badge-pill= @members.total_count
     - if @group.shared_with_group_links.any?
       %li.nav-item
-        = link_to "#tab-groups", class: ["nav-link"] , 'data-toggle' => 'tab' do
+        = link_to "#tab-groups", class: ["nav-link"] , 'data-toggle': 'tab' do
           %span
             = _("Groups")
           %span.badge.badge-pill= @group.shared_with_group_links.count
     - if show_invited_members
       %li.nav-item
-        = link_to "#tab-pending-members", class: ["nav-link", ("active" if pending_active)], 'data-toggle' => 'tab' do
+        = link_to "#tab-pending-members", class: ["nav-link", ("active" if pending_active)], 'data-toggle': 'tab' do
           %span
             = _("Pending")
           %span.badge.badge-pill= @invited_members.total_count
     - if show_access_requests
       %li.nav-item
-        = link_to "#tab-access-requests", class: "nav-link", 'data-toggle' => 'tab' do
+        = link_to "#tab-access-requests", class: "nav-link", 'data-toggle': 'tab' do
           %span
             = _("Access requests")
           %span.badge.badge-pill= @requesters.count
   .tab-content
-    #tab-members.tab-pane{ :class => ("active" unless pending_active) }
+    #tab-members.tab-pane{ class: ("active" unless pending_active) }
       .card.card-without-border
         .gl-display-flex.gl-md-align-items-center.gl-flex-direction-column.gl-md-flex-direction-row.row-content-block.second-block
           %span.gl-flex-grow-1.gl-py-3.gl-pr-3
@@ -57,7 +57,7 @@
             .gl-px-3.gl-py-2
               .search-control-wrap.gl-relative
                 = search_field_tag :search, params[:search], { placeholder: _('Search'), class: 'form-control', spellcheck: false }
-                %button.user-search-btn.border-left.gl-display-flex.gl-align-items-center.gl-justify-content-center{ type: "submit", "aria-label" => _("Submit search") }
+                %button.user-search-btn.border-left.gl-display-flex.gl-align-items-center.gl-justify-content-center{ type: "submit", "aria-label": _("Submit search") }
                   = sprite_icon("search")
             - if can_manage_members
               .gl-px-3.gl-py-3.gl-display-flex.gl-flex-direction-column.gl-md-flex-direction-row
@@ -80,7 +80,7 @@
             - @group.shared_with_group_links.each do |group_link|
               = render 'shared/members/group', group_link: group_link, can_admin_member: can_admin_member, group_link_path: group_group_link_path(@group, group_link)
     - if show_invited_members
-      #tab-pending-members.tab-pane{ :class => ("active" if pending_active) }
+      #tab-pending-members.tab-pane{ class: ("active" if pending_active) }
         .card.card-without-border
           .gl-display-flex.gl-flex-direction-column.gl-md-flex-direction-row.row-content-block.second-block
             %span.gl-flex-grow-1.gl-md-align-self-center.gl-py-3
@@ -88,7 +88,7 @@
             = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form' do
               .search-control-wrap.gl-relative
                 = search_field_tag :search_invited, params[:search_invited], { placeholder: _('Search'), class: 'form-control', spellcheck: false }
-                %button.user-search-btn.border-left.gl-display-flex.gl-align-items-center.gl-justify-content-center{ type: "submit", "aria-label" => _("Submit search") }
+                %button.user-search-btn.border-left.gl-display-flex.gl-align-items-center.gl-justify-content-center{ type: "submit", "aria-label": _("Submit search") }
                   = sprite_icon("search")
           %ul.content-list.members-list
             = render partial: 'shared/members/member', collection: @invited_members, as: :member
