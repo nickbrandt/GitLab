@@ -11,7 +11,7 @@ localVue.use(Vuex);
 describe('Deploy freeze modal', () => {
   let wrapper;
   let store;
-  const freezePeriodsFixture = getJSONFixture('/api/freeze-periods/freeze-periods.json');
+  const freezePeriodsFixture = getJSONFixture('/api/freeze-periods/freeze_periods.json');
   const timezoneDataFixture = getJSONFixture('/api/freeze-periods/timezone_data.json');
 
   beforeEach(() => {

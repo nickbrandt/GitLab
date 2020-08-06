@@ -13,7 +13,7 @@ jest.mock('~/flash.js');
 describe('deploy freeze store actions', () => {
   let mock;
   let state;
-  const freezePeriodsFixture = getJSONFixture('/api/freeze-periods/freeze-periods.json');
+  const freezePeriodsFixture = getJSONFixture('/api/freeze-periods/freeze_periods.json');
   const timezoneDataFixture = getJSONFixture('/api/freeze-periods/timezone_data.json');
 
   beforeEach(() => {

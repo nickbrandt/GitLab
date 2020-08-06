@@ -50,7 +50,7 @@ describe('Deploy freeze table', () => {
     });
 
     it('displays data', () => {
-      const freezePeriodsFixture = getJSONFixture('/api/freeze-periods/freeze-periods.json');
+      const freezePeriodsFixture = getJSONFixture('/api/freeze-periods/freeze_periods.json');
       store.state.freezePeriods = freezePeriodsFixture;
 
       return wrapper.vm.$nextTick(() => {

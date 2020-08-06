@@ -28,7 +28,7 @@ describe('Deploy freeze mutations', () => {
   describe('RECEIVE_FREEZE_PERIODS_SUCCESS', () => {
     it('should set freeze periods and format timezones from identifiers to names', () => {
       const timezoneNames = ['Berlin', 'UTC', 'Eastern Time (US & Canada)'];
-      const freezePeriodsFixture = getJSONFixture('/api/freeze-periods/freeze-periods.json');
+      const freezePeriodsFixture = getJSONFixture('/api/freeze-periods/freeze_periods.json');
 
       mutations[types.RECEIVE_FREEZE_PERIODS_SUCCESS](stateCopy, freezePeriodsFixture);
 
