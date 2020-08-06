@@ -9660,7 +9660,9 @@ CREATE TABLE public.boards (
     name character varying DEFAULT 'Development'::character varying NOT NULL,
     milestone_id integer,
     group_id integer,
-    weight integer
+    weight integer,
+    hide_backlog_list boolean DEFAULT false NOT NULL,
+    hide_closed_list boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE public.boards_id_seq
