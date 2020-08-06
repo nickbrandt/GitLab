@@ -60,9 +60,9 @@ export default {
     >
       <template>
         {{ __('Version') }} {{ allVersions.length - index }}
-        <template v-if="findVersionId(version.id) === latestVersionId"
-          >({{ __('latest') }})</template
-        >
+        <template v-if="findVersionId(version.id) === latestVersionId">
+          ({{ __('latest') }})
+        </template>
       </template>
     </gl-new-dropdown-item>
   </gl-new-dropdown>

@@ -21,7 +21,9 @@ exports[`Design management design version dropdown component renders design vers
   >
     
       Version 2
-      (latest)
+      
+        (latest)
+      
   </gl-new-dropdown-item-stub>
   <gl-new-dropdown-item-stub
     avatarurl=""
@@ -60,7 +62,9 @@ exports[`Design management design version dropdown component renders design vers
   >
     
       Version 2
-      (latest)
+      
+        (latest)
+      
   </gl-new-dropdown-item-stub>
   <gl-new-dropdown-item-stub
     avatarurl=""
