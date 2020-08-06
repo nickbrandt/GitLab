@@ -26,6 +26,7 @@ describe('Incidents List', () => {
   let wrapper;
   const newIssuePath = 'namespace/project/-/issues/new';
   const incidentTemplateName = 'incident';
+  const incidentType = 'incident';
   const incidentsCount = {
     opened: 14,
     closed: 1,
@@ -66,6 +67,7 @@ describe('Incidents List', () => {
         projectPath: '/project/path',
         newIssuePath,
         incidentTemplateName,
+        incidentType,
         issuePath: '/project/isssues',
         publishedAvailable: true,
       },

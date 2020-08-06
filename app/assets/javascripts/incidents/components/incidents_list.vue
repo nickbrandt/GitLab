@@ -88,6 +88,7 @@ export default {
     'projectPath',
     'newIssuePath',
     'incidentTemplateName',
+    'incidentType',
     'issuePath',
     'publishedAvailable',
   ],
@@ -179,7 +180,10 @@ export default {
       };
     },
     newIncidentPath() {
-      return mergeUrlParams({ issuable_template: this.incidentTemplateName }, this.newIssuePath);
+      return mergeUrlParams({
+        issuable_template: this.incidentTemplateName,
+        issue_type: this.incidentType
+      }, this.newIssuePath);
     },
     availableFields() {
       return this.publishedAvailable
