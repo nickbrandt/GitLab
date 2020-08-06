@@ -1,0 +1,5 @@
+---
+title: Added configuration option PropagateCorrelationID
+merge_request: 529
+author: Mahmoud Rahbar Azad
+type: added
