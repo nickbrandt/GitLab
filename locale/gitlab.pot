@@ -9584,6 +9584,9 @@ msgstr ""
 msgid "Epics|To schedule your epic's %{epicDateType} date based on milestones, assign a milestone with a %{epicDateType} date to any issue in the epic."
 msgstr ""
 
+msgid "Epics|Unable to perform this action"
+msgstr ""
+
 msgid "Epics|Unable to save epic. Please try again"
 msgstr ""
 
@@ -24692,6 +24695,9 @@ msgstr ""
 msgid "This %{issuableDisplayName} is locked. Only project members can comment."
 msgstr ""
 
+msgid "This %{issuableType} is confidential"
+msgstr ""
+
 msgid "This %{issuable} is locked. Only %{strong_open}project members%{strong_close} can comment."
 msgstr ""
 
@@ -24894,9 +24900,6 @@ msgid "This is the number of currently active users on your installation, and th
 msgstr ""
 
 msgid "This is your current session"
-msgstr ""
-
-msgid "This issue is confidential"
 msgstr ""
 
 msgid "This issue is currently blocked by the following issues: %{issues}."
@@ -27696,6 +27699,12 @@ msgstr ""
 msgid "You are going to transfer %{project_full_name} to another owner. Are you ABSOLUTELY sure?"
 msgstr ""
 
+msgid "You are going to turn off the confidentiality. This means %{accessLevel} will be able to see and leave a comment on this %{issuableType}."
+msgstr ""
+
+msgid "You are going to turn on the confidentiality. This means that only team members with %{accessLevel} are able to see and leave comments on the %{issuableType}."
+msgstr ""
+
 msgid "You are not allowed to push into this branch. Create another branch or open a merge request."
 msgstr ""
 
@@ -28424,6 +28433,9 @@ msgstr ""
 msgid "assign yourself"
 msgstr ""
 
+msgid "at least Reporter access"
+msgstr ""
+
 msgid "at risk"
 msgstr ""
 
@@ -28705,12 +28717,6 @@ msgstr ""
 msgid "committed"
 msgstr ""
 
-msgid "confidentiality|You are going to turn off the confidentiality. This means <strong>everyone</strong> will be able to see and leave a comment on this issue."
-msgstr ""
-
-msgid "confidentiality|You are going to turn on the confidentiality. This means that only team members with <strong>at least Reporter access</strong> are able to see and leave comments on the issue."
-msgstr ""
-
 msgid "connecting"
 msgstr ""
 
@@ -28818,6 +28824,9 @@ msgid "error code:"
 msgstr ""
 
 msgid "estimateCommand|%{slash_command} will update the estimated time with the latest command."
+msgstr ""
+
+msgid "everyone"
 msgstr ""
 
 msgid "exceeds the limit of %{bytes} bytes"
