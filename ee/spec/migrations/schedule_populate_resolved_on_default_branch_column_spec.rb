@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 require Rails.root.join('db', 'post_migrate', '20200806100713_schedule_populate_resolved_on_default_branch_column.rb')
@@ -21,13 +23,28 @@ RSpec.describe SchedulePopulateResolvedOnDefaultBranchColumn do
 
   context 'when the Gitlab instance is EE' do
     let(:ee?) { true }
-    let!(:project_1) { create(:project) }
-    let!(:project_2) { create(:project) }
-    let!(:project_3) { create(:project) }
+    let(:namespaces) { table(:namespaces) }
+    let(:projects) { table(:projects) }
+    let(:vulnerabilities) { table(:vulnerabilities) }
+    let(:users) { table(:users) }
+    let(:namespace) { namespaces.create!(name: "foo", path: "bar") }
+    let!(:project_1) { projects.create!(namespace_id: namespace.id) }
+    let!(:project_2) { projects.create!(namespace_id: namespace.id) }
+    let!(:project_3) { projects.create!(namespace_id: namespace.id) }
+    let(:user) { users.create!(name: 'John Doe', email: 'test@example.com', projects_limit: 1) }
+    let(:vulnerability_data) do
+      {
+        author_id: user.id,
+        title: 'Vulnerability',
+        severity: 5,
+        confidence: 5,
+        report_type: 5
+      }
+    end
 
     before do
-      create(:vulnerability, project: project_1)
-      create(:vulnerability, project: project_2)
+      vulnerabilities.create!(**vulnerability_data, project_id: project_1.id)
+      vulnerabilities.create!(**vulnerability_data, project_id: project_2.id)
 
       stub_const("#{described_class.name}::BATCH_SIZE", 1)
     end
