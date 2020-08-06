@@ -14,7 +14,7 @@ RSpec.describe Admin::ApplicationsController do
     it 'creates the application' do
       stub_licensed_features(extended_audit_events: true)
 
-      create_params = attributes_for(:application, trusted: true)
+      create_params = attributes_for(:application, trusted: true, scopes: ['api'])
 
       expect do
         post :create, params: { doorkeeper_application: create_params }

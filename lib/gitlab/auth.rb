@@ -24,7 +24,7 @@ module Gitlab
     PROFILE_SCOPES = [:profile, :email].freeze
 
     # Default scopes for OAuth applications that don't define their own
-    DEFAULT_SCOPES = [:api].freeze
+    DEFAULT_SCOPES = [:read_user].freeze
 
     CI_JOB_USER = 'gitlab-ci-token'
 
