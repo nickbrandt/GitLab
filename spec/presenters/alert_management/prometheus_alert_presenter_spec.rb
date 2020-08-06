@@ -20,7 +20,7 @@ RSpec.describe AlertManagement::PrometheusAlertPresenter do
     create(:alert_management_alert, :prometheus, project: project, payload: payload)
   end
 
-  let(:alert_url) { "http://localhost/#{project.full_path}/-/alert_management/#{alert.id}/details" }
+  let(:alert_url) { "http://localhost/#{project.full_path}/-/alert_management/#{alert.iid}/details" }
 
   subject(:presenter) { described_class.new(alert) }
 

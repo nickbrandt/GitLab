@@ -48,10 +48,9 @@ module AlertManagement
     private
 
     def details_url
-      ::Gitlab::Routing.url_helpers.details_namespace_project_alert_management_url(
-        id: alert,
-        project_id: project,
-        namespace_id: project.namespace
+      ::Gitlab::Routing.url_helpers.details_project_alert_management_url(
+        project,
+        alert.iid
       )
     end
 

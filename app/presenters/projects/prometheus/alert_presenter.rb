@@ -78,12 +78,11 @@ module Projects
       end
 
       def details_url
-        return unless alert
+        return unless am_alert
 
-        ::Gitlab::Routing.url_helpers.details_namespace_project_alert_management_url(
-          id: alert,
-          project_id: project,
-          namespace_id: project.namespace
+        ::Gitlab::Routing.url_helpers.details_project_alert_management_url(
+          project,
+          am_alert.iid
         )
       end
 

@@ -14,7 +14,7 @@ module IncidentManagement
 
     def execute
       return error('setting disabled') unless incident_management_setting.create_issue?
-      return error('invalid alert') unless presented_alert.valid?
+      return error('invalid alert') unless alert_presenter.valid?
 
       result = create_incident
       return error(result.message, result.payload[:issue]) unless result.success?
@@ -34,7 +34,7 @@ module IncidentManagement
     end
 
     def issue_title
-      presented_alert.full_title
+      alert_presenter.full_title
     end
 
     def issue_description
@@ -48,15 +48,15 @@ module IncidentManagement
     end
 
     def alert_summary
-      presented_alert.issue_summary_markdown
+      alert_presenter.issue_summary_markdown
     end
 
     def alert_markdown
-      presented_alert.alert_markdown
+      alert_presenter.alert_markdown
     end
 
-    def presented_alert
-      strong_memoize(:presented_alert) do
+    def alert_presenter
+      strong_memoize(:alert_presenter) do
         Gitlab::Alerting::Alert.for_alert_management_alert(project: project, alert: alert).present
       end
     end

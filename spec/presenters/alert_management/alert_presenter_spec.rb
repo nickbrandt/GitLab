@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe AlertManagement::AlertPresenter do
   let_it_be(:project) { create(:project) }
 
-  let(:generic_payload) do
+  let_it_be(:generic_payload) do
     {
       'title' => 'Alert title',
       'start_time' => '2020-04-27T10:10:22.265949279Z',
@@ -18,7 +18,7 @@ RSpec.describe AlertManagement::AlertPresenter do
     build(:alert_management_alert, :with_description, :with_host, :with_service, :with_monitoring_tool, project: project, payload: generic_payload)
   end
 
-  let(:alert_url) { "http://localhost/#{project.full_path}/-/alert_management/#{alert.id}/details" }
+  let(:alert_url) { "http://localhost/#{project.full_path}/-/alert_management/#{alert.iid}/details" }
 
   subject(:presenter) { described_class.new(alert) }
 
