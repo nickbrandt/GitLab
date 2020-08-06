@@ -80,7 +80,7 @@ export default {
         <gl-icon
           :size="18"
           :name="toggleIcon"
-          :class="value ? 'gl-fill-blue-500' : 'gl-fill-gray-400'"
+          :class="value ? 'gl-text-blue-500' : 'gl-text-gray-400'"
         />
       </span>
     </button>
