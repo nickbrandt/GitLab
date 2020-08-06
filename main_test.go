@@ -510,6 +510,52 @@ func TestCorrelationIdHeader(t *testing.T) {
 	}
 }
 
+func TestPropagateCorrelationIdHeader(t *testing.T) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("X-Request-Id", r.Header.Get("X-Request-Id"))
+		w.WriteHeader(200)
+	})
+	defer ts.Close()
+
+	testCases := []struct {
+		desc                   string
+		propagateCorrelationID bool
+	}{
+		{
+			desc:                   "propagateCorrelatedId is true",
+			propagateCorrelationID: true,
+		},
+		{
+			desc:                   "propagateCorrelatedId is false",
+			propagateCorrelationID: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			upstreamConfig := newUpstreamConfig(ts.URL)
+			upstreamConfig.PropagateCorrelationID = tc.propagateCorrelationID
+
+			ws := startWorkhorseServerWithConfig(upstreamConfig)
+			defer ws.Close()
+
+			resource := "/api/v3/projects/123/repository/not/special"
+			propagatedRequestId := "Propagated-RequestId-12345678"
+			resp, _ := httpGet(t, ws.URL+resource, map[string]string{"X-Request-Id": propagatedRequestId})
+			requestIds := resp.Header["X-Request-Id"]
+
+			assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+			assert.Equal(t, 1, len(requestIds), "GET %q: One X-Request-Id present", resource)
+
+			if tc.propagateCorrelationID {
+				assert.Contains(t, requestIds, propagatedRequestId, "GET %q: Has X-Request-Id %s present", resource, propagatedRequestId)
+			} else {
+				assert.NotContains(t, requestIds, propagatedRequestId, "GET %q: X-Request-Id not propagated")
+			}
+		})
+	}
+}
+
 func setupStaticFile(fpath, content string) error {
 	cwd, err := os.Getwd()
 	if err != nil {

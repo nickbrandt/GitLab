@@ -57,6 +57,7 @@ var apiLimit = flag.Uint("apiLimit", 0, "Number of API requests allowed at singl
 var apiQueueLimit = flag.Uint("apiQueueLimit", 0, "Number of API requests allowed to be queued")
 var apiQueueTimeout = flag.Duration("apiQueueDuration", queueing.DefaultTimeout, "Maximum queueing duration of requests")
 var apiCiLongPollingDuration = flag.Duration("apiCiLongPollingDuration", 50, "Long polling duration for job requesting for runners (default 50s - enabled)")
+var propagateCorrelationID = flag.Bool("propagateCorrelationID", false, "Reuse existing Correlation-ID from the incoming request header `X-Request-ID` if present")
 
 var prometheusListenAddr = flag.String("prometheusListenAddr", "", "Prometheus listening address, e.g. 'localhost:9229'")
 
@@ -155,6 +156,7 @@ func main() {
 		APIQueueLimit:            *apiQueueLimit,
 		APIQueueTimeout:          *apiQueueTimeout,
 		APICILongPollingDuration: *apiCiLongPollingDuration,
+		PropagateCorrelationID:   *propagateCorrelationID,
 	}
 
 	if *configFile != "" {
