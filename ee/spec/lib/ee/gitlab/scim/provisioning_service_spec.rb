@@ -6,6 +6,7 @@ RSpec.describe ::EE::Gitlab::Scim::ProvisioningService do
   describe '#execute' do
     let(:group) { create(:group) }
     let(:service) { described_class.new(group, service_params) }
+    let!(:saml_provider) { create(:saml_provider, group: group, default_membership_role: Gitlab::Access::DEVELOPER) }
 
     before do
       stub_licensed_features(group_saml: true)
@@ -52,12 +53,18 @@ RSpec.describe ::EE::Gitlab::Scim::ProvisioningService do
           expect(user).to be_a(User)
         end
 
-        it 'creates the member with guest access level' do
-          service.execute
+        context 'access level of created group member' do
+          let!(:saml_provider) do
+            create(:saml_provider, group: group, default_membership_role: Gitlab::Access::DEVELOPER)
+          end
 
-          access_level = group.group_member(user).access_level
+          it 'sets the access level of the member as specified in saml_provider' do
+            service.execute
 
-          expect(access_level).to eq(Gitlab::Access::GUEST)
+            access_level = group.group_member(user).access_level
+
+            expect(access_level).to eq(Gitlab::Access::DEVELOPER)
+          end
         end
 
         it 'user record requires confirmation' do
@@ -116,7 +123,6 @@ RSpec.describe ::EE::Gitlab::Scim::ProvisioningService do
     context 'when scim_identities is disabled' do
       before do
         stub_feature_flags(scim_identities: false)
-        create(:saml_provider, group: group)
       end
 
       it_behaves_like 'scim provisioning'
@@ -156,7 +162,6 @@ RSpec.describe ::EE::Gitlab::Scim::ProvisioningService do
     context 'when scim_identities is enabled' do
       before do
         stub_feature_flags(scim_identities: true)
-        create(:saml_provider, group: group)
       end
 
       it_behaves_like 'scim provisioning'

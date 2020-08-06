@@ -8,7 +8,6 @@ module EE
 
         PASSWORD_AUTOMATICALLY_SET = true
         SKIP_EMAIL_CONFIRMATION = false
-        DEFAULT_ACCESS = :guest
 
         def initialize(group, parsed_hash)
           @group = group
@@ -126,7 +125,7 @@ module EE
         def user_params
           @parsed_hash.tap do |hash|
             hash[:skip_confirmation] = SKIP_EMAIL_CONFIRMATION
-            hash[:saml_provider_id] = @group.saml_provider&.id
+            hash[:saml_provider_id] = @group.saml_provider.id
             hash[:group_id] = @group.id
             hash[:provider] = identity_provider
             hash[:email_confirmation] = hash[:email]
@@ -154,8 +153,12 @@ module EE
           strong_memoize(:member) do
             next @group.group_member(user) if existing_member?(user)
 
-            @group.add_user(user, DEFAULT_ACCESS) if user.valid?
+            @group.add_user(user, default_membership_role) if user.valid?
           end
+        end
+
+        def default_membership_role
+          @group.saml_provider.default_membership_role
         end
 
         def create_identity_only?

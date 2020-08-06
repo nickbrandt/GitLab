@@ -20,6 +20,8 @@ RSpec.describe SamlProvider do
     it { is_expected.to validate_presence_of(:group) }
     it { is_expected.to validate_presence_of(:sso_url) }
     it { is_expected.to validate_presence_of(:certificate_fingerprint) }
+    it { is_expected.to validate_presence_of(:default_membership_role) }
+    it { is_expected.to validate_inclusion_of(:default_membership_role).in_array([10, 20, 30, 40]) }
 
     it 'expects sso_url to be an https URL' do
       expect(subject).to allow_value('https://example.com').for(:sso_url)

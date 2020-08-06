@@ -50,6 +50,13 @@
       .form-text.text-muted
         = s_('GroupSAML|SHA1 fingerprint of the SAML token signing certificate. Get this from your identity provider, where it can also be called "Thumbprint".')
 
+    .well-segment.borderless.gl-mb-3.col-12.col-lg-9.gl-p-0
+      = f.label :default_membership_role, class: 'label-bold' do
+        = s_('GroupSAML|Default membership role')
+      = f.select :default_membership_role, options_for_select(::Gitlab::Access.options, saml_provider.default_membership_role), {}, class: 'form-control'
+      .form-text.text-muted
+        = s_('GroupSAML|This will be set as the access level of users added to the group.')
+
     .mt-3
       = f.submit _("Save changes"), class: 'btn btn-success', data: { qa_selector: 'save_changes_button' }
       #js-saml-test-button.has-tooltip.float-right
