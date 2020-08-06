@@ -332,13 +332,12 @@ export function keypressNoteText(e) {
       select: '',
       tagContent: '',
     });
-
   }
 }
 /* eslint-enable @gitlab/require-i18n-strings */
 
 export function addMarkdownListeners(form) {
-  $('.markdown-area').on('keydown', keypressNoteText);
+  $('.markdown-area', form).on('keydown', keypressNoteText);
   return $('.js-md', form)
     .off('click')
     .on('click', function() {
@@ -377,6 +376,6 @@ export function addEditorMarkdownListeners(editor) {
 }
 
 export function removeMarkdownListeners(form) {
-  $('.markdown-area').off('keydown');
+  $('.markdown-area', form).off('keydown', keypressNoteText);
   return $('.js-md', form).off('click');
 }
