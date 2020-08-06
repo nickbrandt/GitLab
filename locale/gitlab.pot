@@ -13504,6 +13504,9 @@ msgstr ""
 msgid "JiraService| on branch %{branch_link}"
 msgstr ""
 
+msgid "JiraService|%{jira_docs_link_start}Enable the Jira integration%{jira_docs_link_end} to view your Jira issues in GitLab."
+msgstr ""
+
 msgid "JiraService|%{user_link} mentioned this issue in %{entity_link} of %{project_link}%{branch}:{quote}%{entity_message}{quote}"
 msgstr ""
 
@@ -13546,6 +13549,9 @@ msgstr ""
 msgid "JiraService|Password or API token"
 msgstr ""
 
+msgid "JiraService|This feature requires a Premium plan."
+msgstr ""
+
 msgid "JiraService|Transition ID(s)"
 msgstr ""
 
@@ -13559,6 +13565,9 @@ msgid "JiraService|Use a username for server version and an email for cloud vers
 msgstr ""
 
 msgid "JiraService|Username or Email"
+msgstr ""
+
+msgid "JiraService|Using Jira for issue tracking?"
 msgstr ""
 
 msgid "JiraService|View Jira issues in GitLab"
