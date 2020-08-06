@@ -51,10 +51,10 @@ RSpec.describe 'get board lists' do
   shared_examples 'group and project board list issues query' do
     let!(:board) { create(:board, resource_parent: board_parent) }
     let!(:label_list) { create(:list, board: board, label: label, position: 10) }
-    let!(:issue1) { create(:issue, project: issue_project, labels: [label], relative_position: 9, id: 10) }
-    let!(:issue2) { create(:issue, project: issue_project, labels: [label], relative_position: 2, id: 11) }
-    let!(:issue3) { create(:issue, project: issue_project, labels: [label], relative_position: 9, id: 12) }
-    let!(:issue4) { create(:issue, project: issue_project, labels: [label2], relative_position: 432, id: 13) }
+    let!(:issue1) { create(:issue, project: issue_project, labels: [label], relative_position: 9) }
+    let!(:issue2) { create(:issue, project: issue_project, labels: [label], relative_position: 2) }
+    let!(:issue3) { create(:issue, project: issue_project, labels: [label], relative_position: 9) }
+    let!(:issue4) { create(:issue, project: issue_project, labels: [label2], relative_position: 432) }
 
     context 'when the user does not have access to the board' do
       it 'returns nil' do

@@ -9,7 +9,7 @@ module Resolvers
     def resolve(**args)
       # rubocop: disable CodeReuse/ActiveRecord
       service = Boards::Issues::ListService.new(list.board.resource_parent, context[:current_user], { board_id: list.board.id, id: list.id })
-      Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection.new(service.execute)
+      service.execute.reorder("issues.relative_position ASC, issues.id DESC")
       # rubocop: enable CodeReuse/ActiveRecord
     end
   end

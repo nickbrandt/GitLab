@@ -20,17 +20,12 @@ RSpec.describe Resolvers::BoardListIssuesResolver do
     # auth is handled by the parent object
     context 'when authorized' do
       let!(:list) { create(:list, board: board, label: label) }
-      let!(:issue1) { create(:issue, project: project, labels: [label], relative_position: 10, id: 44) }
-      let!(:issue2) { create(:issue, project: project, labels: [label], relative_position: 12, id: 45) }
-      let!(:issue3) { create(:issue, project: project, labels: [label], relative_position: 10, id: 46) }
-
-      it 'calls Boards::Issues::ListService with the correct arguments' do
-        expect(Boards::Issues::ListService).to receive(:new).with(board_parent, user, { board_id: board.id, id: list.id }).and_call_original
-
-        resolve_board_list_issues
-      end
 
       it 'returns the issues in the correct order' do
+        issue1 = create(:issue, project: project, labels: [label], relative_position: 10)
+        issue2 = create(:issue, project: project, labels: [label], relative_position: 12)
+        issue3 = create(:issue, project: project, labels: [label], relative_position: 10)
+
         # by relative_position and then ID
         issues = resolve_board_list_issues
 
