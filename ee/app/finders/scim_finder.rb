@@ -73,10 +73,22 @@ class ScimFinder
   end
 
   def by_username(username)
-    user = User.find_by_username(username) || User.find_by_any_email(username)
+    user = User.find_by_username(username)
+
+    if !user && email?(username)
+      user ||= User.find_by_any_email(username) || User.find_by_username(email_local_part(username))
+    end
 
     return group.scim_identities.for_user(user) if scim_identities_enabled?
 
     saml_provider.identities.for_user(user)
+  end
+
+  def email?(email)
+    ::ValidateEmail.valid?(email)
+  end
+
+  def email_local_part(email)
+    ::Mail::Address.new(email).local
   end
 end
