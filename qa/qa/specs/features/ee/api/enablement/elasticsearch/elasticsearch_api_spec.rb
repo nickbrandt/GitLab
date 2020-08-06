@@ -58,7 +58,7 @@ module QA
         end
 
         it 'does not find a blob as an non-member user' do
-          QA::Support::Retrier.retry_on_exception(max_attempts: 10, sleep_interval: 6) do
+          QA::Support::Retrier.retry_on_exception(max_attempts: 10, sleep_interval: 12) do
             get Runtime::Search.create_search_request(non_member_api_client, 'blobs', project_file_content).url
             expect_status(QA::Support::Api::HTTP_STATUS_OK)
             expect(json_body).to be_empty
@@ -69,7 +69,7 @@ module QA
       private
 
       def successful_search(api_client)
-        QA::Support::Retrier.retry_on_exception(max_attempts: 10, sleep_interval: 6) do
+        QA::Support::Retrier.retry_on_exception(max_attempts: 10, sleep_interval: 12) do
           get Runtime::Search.create_search_request(api_client, 'blobs', project_file_content).url
           expect_status(QA::Support::Api::HTTP_STATUS_OK)
 
