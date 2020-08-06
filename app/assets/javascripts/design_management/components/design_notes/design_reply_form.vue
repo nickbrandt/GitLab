@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlModal } from '@gitlab/ui';
+import { GlButton, GlModal } from '@gitlab/ui';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
 import { s__ } from '~/locale';
 
@@ -7,7 +7,7 @@ export default {
   name: 'DesignReplyForm',
   components: {
     MarkdownField,
-    GlDeprecatedButton,
+    GlButton,
     GlModal,
   },
   props: {
@@ -112,20 +112,19 @@ export default {
     </markdown-field>
     <slot name="resolveCheckbox"></slot>
     <div class="note-form-actions gl-display-flex gl-justify-content-space-between">
-      <gl-deprecated-button
+      <gl-button
         ref="submitButton"
         :disabled="!hasValue || isSaving"
         variant="success"
+        category="primary"
         type="submit"
         data-track-event="click_button"
         data-qa-selector="save_comment_button"
         @click="$emit('submitForm')"
       >
         {{ buttonText }}
-      </gl-deprecated-button>
-      <gl-deprecated-button ref="cancelButton" @click="cancelComment">{{
-        __('Cancel')
-      }}</gl-deprecated-button>
+      </gl-button>
+      <gl-button ref="cancelButton" @click="cancelComment">{{ __('Cancel') }}</gl-button>
     </div>
     <gl-modal
       ref="cancelCommentModal"
