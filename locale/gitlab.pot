@@ -10269,6 +10269,11 @@ msgstr ""
 msgid "Feature flag was successfully removed."
 msgstr ""
 
+msgid "FeatureFlags|%d user"
+msgid_plural "FeatureFlags|%d users"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "FeatureFlags|* (All Environments)"
 msgstr ""
 
@@ -10282,6 +10287,12 @@ msgid "FeatureFlags|Active"
 msgstr ""
 
 msgid "FeatureFlags|Add strategy"
+msgstr ""
+
+msgid "FeatureFlags|All Environments"
+msgstr ""
+
+msgid "FeatureFlags|All Users"
 msgstr ""
 
 msgid "FeatureFlags|All users"
@@ -10398,6 +10409,9 @@ msgstr ""
 msgid "FeatureFlags|New list"
 msgstr ""
 
+msgid "FeatureFlags|Percent of users"
+msgstr ""
+
 msgid "FeatureFlags|Percent rollout (logged in users)"
 msgstr ""
 
@@ -10438,6 +10452,9 @@ msgid "FeatureFlags|Try again in a few moments or contact your support team."
 msgstr ""
 
 msgid "FeatureFlags|User IDs"
+msgstr ""
+
+msgid "FeatureFlags|User List"
 msgstr ""
 
 msgid "FeatureFlag|Delete strategy"

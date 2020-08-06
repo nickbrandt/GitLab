@@ -1,12 +1,13 @@
 <script>
-import { escape } from 'lodash';
-import { GlButton, GlTooltipDirective, GlModal, GlToggle, GlIcon } from '@gitlab/ui';
+import { GlBadge, GlButton, GlTooltipDirective, GlModal, GlToggle, GlIcon } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT, NEW_VERSION_FLAG } from '../constants';
+import labelForStrategy from '../utils';
 
 export default {
   components: {
+    GlBadge,
     GlButton,
     GlIcon,
     GlModal,
@@ -43,22 +44,14 @@ export default {
       return this.glFeatures.featureFlagsNewVersion;
     },
     modalTitle() {
-      return sprintf(
-        s__('FeatureFlags|Delete %{name}?'),
-        {
-          name: escape(this.deleteFeatureFlagName),
-        },
-        false,
-      );
+      return sprintf(s__('FeatureFlags|Delete %{name}?'), {
+        name: this.deleteFeatureFlagName,
+      });
     },
     deleteModalMessage() {
-      return sprintf(
-        s__('FeatureFlags|Feature flag %{name} will be removed. Are you sure?'),
-        {
-          name: escape(this.deleteFeatureFlagName),
-        },
-        false,
-      );
+      return sprintf(s__('FeatureFlags|Feature flag %{name} will be removed. Are you sure?'), {
+        name: this.deleteFeatureFlagName,
+      });
     },
     modalId() {
       return 'delete-feature-flag';
@@ -66,7 +59,7 @@ export default {
   },
   methods: {
     isLegacyFlag(flag) {
-      return this.isNewVersionFlagsEnabled && flag.version !== NEW_VERSION_FLAG;
+      return !this.isNewVersionFlagsEnabled || flag.version !== NEW_VERSION_FLAG;
     },
     scopeTooltipText(scope) {
       return !scope.active
@@ -87,6 +80,12 @@ export default {
           : '';
 
       return `${displayName}${displayPercentage}`;
+    },
+    badgeVariant(scope) {
+      return scope.active ? 'info' : 'muted';
+    },
+    strategyBadgeText(strategy) {
+      return labelForStrategy(strategy);
     },
     featureFlagIidText(featureFlag) {
       return featureFlag.iid ? `^${featureFlag.iid}` : '';
@@ -145,10 +144,10 @@ export default {
               :value="featureFlag.active"
               @change="toggleFeatureFlag(featureFlag)"
             />
-            <span v-else-if="featureFlag.active" class="badge badge-success">
+            <gl-badge v-else-if="featureFlag.active" variant="success">
               {{ s__('FeatureFlags|Active') }}
-            </span>
-            <span v-else class="badge badge-danger">{{ s__('FeatureFlags|Inactive') }}</span>
+            </gl-badge>
+            <gl-badge v-else variant="danger">{{ s__('FeatureFlags|Inactive') }}</gl-badge>
           </div>
         </div>
 
@@ -181,17 +180,29 @@ export default {
           <div
             class="table-mobile-content d-flex flex-wrap justify-content-end justify-content-md-start js-feature-flag-environments"
           >
-            <span
-              v-for="scope in featureFlag.scopes"
-              :key="scope.id"
-              v-gl-tooltip.hover="scopeTooltipText(scope)"
-              class="badge gl-mr-3 gl-mt-2"
-              :class="{
-                'badge-active': scope.active,
-                'badge-inactive': !scope.active,
-              }"
-              >{{ badgeText(scope) }}</span
-            >
+            <template v-if="isLegacyFlag(featureFlag)">
+              <gl-badge
+                v-for="scope in featureFlag.scopes"
+                :key="scope.id"
+                v-gl-tooltip.hover="scopeTooltipText(scope)"
+                :variant="badgeVariant(scope)"
+                :data-qa-selector="`feature-flag-scope-${badgeVariant(scope)}-badge`"
+                class="gl-mr-3 gl-mt-2"
+              >
+                {{ badgeText(scope) }}
+              </gl-badge>
+            </template>
+            <template v-else>
+              <gl-badge
+                v-for="strategy in featureFlag.strategies"
+                :key="strategy.id"
+                data-testid="strategy-badge"
+                variant="info"
+                class="gl-mr-3 gl-mt-2"
+              >
+                {{ strategyBadgeText(strategy) }}
+              </gl-badge>
+            </template>
           </div>
         </div>
 
