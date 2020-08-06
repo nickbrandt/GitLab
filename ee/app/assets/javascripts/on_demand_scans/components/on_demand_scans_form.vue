@@ -217,7 +217,7 @@ export default {
     >
       {{ errorMessage }}
       <ul v-if="errors.length" class="gl-mt-3 gl-mb-0">
-        <li v-for="error in errors" :key="error" v-text="error"></li>
+        <li v-for="error in errors" :key="error">{{ error }}</li>
       </ul>
     </gl-alert>
 
