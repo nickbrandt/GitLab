@@ -1,13 +1,14 @@
 import IterationReportTabs from 'ee/iterations/components/iteration_report_tabs.vue';
 import { mount } from '@vue/test-utils';
 import { GlAlert, GlAvatar, GlLoadingIcon, GlPagination, GlTable, GlTab } from '@gitlab/ui';
+import { Namespace } from 'ee/iterations/constants';
 
 describe('Iterations report tabs', () => {
   let wrapper;
   const id = 3;
-  const groupPath = 'gitlab-org';
+  const fullPath = 'gitlab-org';
   const defaultProps = {
-    groupPath,
+    fullPath,
     iterationId: `gid://gitlab/Iteration/${id}`,
   };
 
@@ -145,9 +146,11 @@ describe('Iterations report tabs', () => {
         return setPage(1).then(() => {
           expect(wrapper.vm.queryVariables).toEqual({
             beforeCursor: 'first-item',
-            groupPath,
+            fullPath,
             id,
             lastPageSize: 20,
+            isGroup: true,
+            isProject: false,
           });
         });
       });
@@ -156,10 +159,55 @@ describe('Iterations report tabs', () => {
         return setPage(2).then(() => {
           expect(wrapper.vm.queryVariables).toEqual({
             afterCursor: 'last-item',
-            groupPath,
+            fullPath,
             id,
             firstPageSize: 20,
+            isGroup: true,
+            isProject: false,
           });
+        });
+      });
+    });
+  });
+
+  describe('IterationReportTabs query variables', () => {
+    const expected = {
+      afterCursor: undefined,
+      firstPageSize: 20,
+      fullPath: defaultProps.fullPath,
+      id,
+    };
+
+    describe('when group', () => {
+      it('has expected query variable values', () => {
+        mountComponent({
+          props: {
+            ...defaultProps,
+            namespaceType: Namespace.Group,
+          },
+        });
+
+        expect(wrapper.vm.queryVariables).toEqual({
+          ...expected,
+          isGroup: true,
+          isProject: false,
+        });
+      });
+    });
+
+    describe('when project', () => {
+      it('has expected query variable values', () => {
+        mountComponent({
+          props: {
+            ...defaultProps,
+            namespaceType: Namespace.Project,
+          },
+        });
+
+        expect(wrapper.vm.queryVariables).toEqual({
+          ...expected,
+          isGroup: false,
+          isProject: true,
         });
       });
     });

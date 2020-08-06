@@ -1,5 +1,21 @@
-query GroupIteration($groupPath: ID!, $id: ID!) {
-  group(fullPath: $groupPath) {
+query IterationIssuesSummary(
+  $fullPath: ID!
+  $id: ID!
+  $isGroup: Boolean = false
+  $isProject: Boolean = false
+) {
+  group(fullPath: $fullPath) @include(if: $isGroup) {
+    openIssues: issues(iterationId: [$id], state: opened, assigneeId: "none") {
+      count
+    }
+    assignedIssues: issues(iterationId: [$id], state: opened, assigneeId: "any") {
+      count
+    }
+    closedIssues: issues(iterationId: [$id], state: closed) {
+      count
+    }
+  }
+  project(fullPath: $fullPath) @include(if: $isProject) {
     openIssues: issues(iterationId: [$id], state: opened, assigneeId: "none") {
       count
     }

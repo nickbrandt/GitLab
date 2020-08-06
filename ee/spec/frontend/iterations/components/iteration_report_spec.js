@@ -1,8 +1,11 @@
-import IterationReport from 'ee/iterations/components/iteration_report.vue';
 import { shallowMount } from '@vue/test-utils';
 import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
+import IterationReport from 'ee/iterations/components/iteration_report.vue';
+import IterationReportSummary from 'ee/iterations/components/iteration_report_summary.vue';
+import IterationReportTabs from 'ee/iterations/components/iteration_report_tabs.vue';
+import { Namespace } from 'ee/iterations/constants';
 
-describe('Iterations tabs', () => {
+describe('Iterations report', () => {
   let wrapper;
   const defaultProps = {
     fullPath: 'gitlab-org',
@@ -12,13 +15,15 @@ describe('Iterations tabs', () => {
   const findTopbar = () => wrapper.find({ ref: 'topbar' });
   const findTitle = () => wrapper.find({ ref: 'title' });
   const findDescription = () => wrapper.find({ ref: 'description' });
+  const findIterationReportSummary = () => wrapper.find(IterationReportSummary);
+  const findIterationReportTabs = () => wrapper.find(IterationReportTabs);
 
   const mountComponent = ({ props = defaultProps, loading = false } = {}) => {
     wrapper = shallowMount(IterationReport, {
       propsData: props,
       mocks: {
         $apollo: {
-          queries: { namespace: { loading } },
+          queries: { iteration: { loading } },
         },
       },
       stubs: {
@@ -70,9 +75,7 @@ describe('Iterations tabs', () => {
       });
 
       wrapper.setData({
-        namespace: {
-          iteration,
-        },
+        iteration,
       });
     });
 
@@ -90,6 +93,18 @@ describe('Iterations tabs', () => {
     it('shows title and description', () => {
       expect(findTitle().text()).toContain(iteration.title);
       expect(findDescription().text()).toContain(iteration.descriptionHtml);
+    });
+
+    it('passes correct props to IterationReportSummary', () => {
+      expect(findIterationReportSummary().props('fullPath')).toBe(defaultProps.fullPath);
+      expect(findIterationReportSummary().props('iterationId')).toBe(iteration.id);
+      expect(findIterationReportSummary().props('namespaceType')).toBe(Namespace.Group);
+    });
+
+    it('passes correct props to IterationReportTabs', () => {
+      expect(findIterationReportTabs().props('fullPath')).toBe(defaultProps.fullPath);
+      expect(findIterationReportTabs().props('iterationId')).toBe(iteration.id);
+      expect(findIterationReportTabs().props('namespaceType')).toBe(Namespace.Group);
     });
   });
 });

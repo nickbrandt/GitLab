@@ -4,7 +4,7 @@ import { shallowMount } from '@vue/test-utils';
 import { GlAlert, GlLoadingIcon, GlPagination, GlTab, GlTabs } from '@gitlab/ui';
 import { Namespace } from 'ee/iterations/constants';
 
-describe('Iterations tabs', () => {
+describe('Iterations', () => {
   let wrapper;
   const defaultProps = {
     fullPath: 'gitlab-org',
