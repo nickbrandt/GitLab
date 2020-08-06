@@ -107,7 +107,7 @@ module Projects
         metadata << list_item(service.label.humanize, service.value) if service
         metadata << list_item(monitoring_tool.label.humanize, monitoring_tool.value) if monitoring_tool
         metadata << list_item(hosts.label.humanize, host_links) if hosts
-        metadata << list_item('GitLab Alert', details_url) if details_url
+        metadata << list_item('GitLab alert', details_url) if details_url
 
         metadata.join(MARKDOWN_LINE_BREAK)
       end

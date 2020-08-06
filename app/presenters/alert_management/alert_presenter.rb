@@ -75,7 +75,7 @@ module AlertManagement
       metadata << list_item('Monitoring tool', monitoring_tool) if monitoring_tool
       metadata << list_item('Hosts', host_links) if hosts.any?
       metadata << list_item('Description', description) if description.present?
-      metadata << list_item('GitLab Alert', details_url) if details_url.present?
+      metadata << list_item('GitLab alert', details_url) if details_url.present?
 
       metadata.join(MARKDOWN_LINE_BREAK)
     end
