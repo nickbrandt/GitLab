@@ -210,14 +210,14 @@ $item-remove-button-space: 42px;
 
 // The double selector is needed to override .gl-button.gl-button.
 .btn-item-action.btn-item-action {
-  box-shadow: none;
+  @include gl-shadow-none;
 
   &[disabled] {
-    background: none;
-    box-shadow: none;
+    @include gl-bg-none;
+    @include gl-shadow-none;
 
     &:hover {
-      color: $gray-400;
+      @include gl-text-gray-400;
     }
   }
 }

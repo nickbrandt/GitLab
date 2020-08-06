@@ -62,7 +62,7 @@ describe('Vulnerability related issues component', () => {
       isFetching: data.isFetching,
       isSubmitting: data.isSubmitting,
       relatedIssues: data.state.relatedIssues,
-      canAdmin: propsData.canModifyRelatedIssues,
+      canAddRelatedIssue: propsData.canModifyRelatedIssues,
       pendingReferences: data.state.pendingReferences,
       isFormVisible: data.isFormVisible,
       inputValue: data.inputValue,

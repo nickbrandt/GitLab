@@ -81,7 +81,7 @@ describe('RelatedIssuesBlock', () => {
       wrapper = mount(RelatedIssuesBlock, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
-          canAdmin: true,
+          canAddRelatedIssue: true,
           issuableType: 'issue',
         },
       });

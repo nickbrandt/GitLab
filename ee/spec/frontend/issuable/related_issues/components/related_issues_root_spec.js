@@ -53,9 +53,9 @@ describe('RelatedIssuesRoot', () => {
       });
 
       it('remove related issue and succeeds', () => {
-        mock.onDelete(issuable1.referencePath).reply(200, { issues: [] });
+        mock.onDelete(issuable1.referencePath).reply(200, { issuables: [] });
 
-        wrapper.vm.onRelatedIssueRemoveRequest(issuable1.id);
+        wrapper.vm.removeRelatedIssue(issuable1.id);
 
         return axios.waitForAll().then(() => {
           expect(wrapper.vm.state.relatedIssues).toEqual([]);
@@ -65,7 +65,7 @@ describe('RelatedIssuesRoot', () => {
       it('remove related issue, fails, and restores to related issues', () => {
         mock.onDelete(issuable1.referencePath).reply(422, {});
 
-        wrapper.vm.onRelatedIssueRemoveRequest(issuable1.id);
+        wrapper.vm.removeRelatedIssue(issuable1.id);
 
         return axios.waitForAll().then(() => {
           expect(wrapper.vm.state.relatedIssues).toHaveLength(1);

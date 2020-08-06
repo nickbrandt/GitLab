@@ -168,12 +168,12 @@ export default {
       v-gl-tooltip
       :title="buttonConfig.tooltip"
       :aria-label="buttonConfig.tooltip"
-      data-testid="actionButton"
     >
       <gl-button
         :ref="`${buttonConfig.icon}Button`"
         :icon="buttonConfig.icon"
-        class="gl-ml-3 btn-item-action js-issue-item-remove-button"
+        :class="`gl-ml-3 btn-item-action js-issue-item-${buttonConfig.action}-button`"
+        data-testid="action-button"
         :data-qa-selector="`related_issue_${buttonConfig.icon}_button`"
         :disabled="buttonConfig.isDisabled"
         @click="buttonConfig.onClick"

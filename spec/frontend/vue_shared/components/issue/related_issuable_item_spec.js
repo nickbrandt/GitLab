@@ -41,6 +41,7 @@ describe('RelatedIssuableItem', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   it('contains issuable-info-container class when canReorder is false', () => {
@@ -143,33 +144,40 @@ describe('RelatedIssuableItem', () => {
   });
 
   describe('action buttons', () => {
-    const button1 = { icon: 'a', tooltip: 'tooltip a' };
-    const button2 = { icon: 'b', tooltip: 'tooltip b' };
-    const button3 = { icon: 'c', tooltip: 'tooltip c' };
-    const actionButtons = () => wrapper.findAll('[data-testid="actionButton"]');
+    const removeSpy = jest.fn();
+    const removeButton = { action: 'remove', icon: 'close', tooltip: 'Remove', onClick: removeSpy };
+    const genericButton1 = { icon: 'play', tooltip: 'tooltip b', onClick: () => {} };
+    const actionButtons = () => wrapper.findAll('[data-testid="action-button"]');
+    const findRemoveButton = () => actionButtons().at(0);
+    const buttons = [removeButton, genericButton1];
 
     it('renders action buttons', async () => {
-      const buttons = [button1, button2, button3];
       wrapper.setProps({ actionButtons: buttons });
+
       await wrapper.vm.$nextTick();
 
       expect(actionButtons()).toHaveLength(buttons.length);
     });
 
-    it('renders disabled button when removeDisabled', async () => {
-      wrapper.setData({ removeDisabled: true });
+    it('triggers onRemoveRequest when clicked', async () => {
+      wrapper.setProps({ actionButtons: buttons });
+
       await wrapper.vm.$nextTick();
 
-      expect(removeButton().attributes('disabled')).toEqual('disabled');
+      findRemoveButton().trigger('click');
+
+      await wrapper.vm.$nextTick();
+
+      expect(removeSpy).toHaveBeenCalled();
     });
 
-    it('triggers onRemoveRequest when clicked', async () => {
-      removeButton().trigger('click');
-      await wrapper.vm.$nextTick();
-      const { relatedIssueRemoveRequest } = wrapper.emitted();
+    it('renders disabled button when removeDisabled', async () => {
+      const disabledRemoveButton = { ...removeButton, isDisabled: true };
+      wrapper.setProps({ actionButtons: [disabledRemoveButton] });
 
-      expect(relatedIssueRemoveRequest.length).toBe(1);
-      expect(relatedIssueRemoveRequest[0]).toEqual([props.idKey]);
+      await wrapper.vm.$nextTick();
+
+      expect(findRemoveButton().attributes('disabled')).toEqual('disabled');
     });
   });
 });

@@ -107,6 +107,7 @@ export default {
         ...issue,
         actionButtons: this.canAdmin && [
           {
+            action: 'remove',
             icon: 'close',
             tooltip: __('Remove'),
             onClick: () => this.removeRelatedIssue(issue.id),
