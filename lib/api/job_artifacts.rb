@@ -127,6 +127,18 @@ module API
 
         status :no_content
       end
+
+      desc 'Delete the artifacts files from a project' do
+        detail 'This feature was introduced in GitLab 13.3'
+      end
+      delete ':id/artifacts' do
+        authorize_destroy_artifacts!
+        authorize!(:destroy_artifacts, user_project)
+
+        ::Ci::DeleteProjectJobArtifactsWorker.perform_async(user_project.id) # rubocop:disable CodeReuse/Worker
+
+        status :no_content
+      end
     end
   end
 end

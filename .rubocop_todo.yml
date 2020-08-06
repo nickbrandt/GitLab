@@ -666,7 +666,7 @@ RSpec/ScatteredLet:
 # Offense count: 4
 RSpec/ScatteredSetup:
   Exclude:
-    - 'spec/requests/api/jobs_spec.rb'
+    - 'spec/requests/api/job_artifacts_spec.rb'
 
 # Offense count: 10
 # Cop supports --auto-correct.

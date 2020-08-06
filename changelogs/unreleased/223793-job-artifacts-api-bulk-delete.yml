@@ -1,0 +1,5 @@
+---
+title: Add bulk delete endpoint for project job artifacts API
+merge_request: 38774
+author:
+type: added

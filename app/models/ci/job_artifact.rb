@@ -8,6 +8,7 @@ module Ci
     include UsageStatistics
     include Sortable
     include IgnorableColumns
+    include EachBatch
     extend Gitlab::Ci::Model
 
     NotSupportedAdapterError = Class.new(StandardError)

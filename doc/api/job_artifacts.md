@@ -263,3 +263,28 @@ NOTE: **Note:**
 At least Maintainer role is required to delete artifacts.
 
 If the artifacts were deleted successfully, a response with status `204 No Content` is returned.
+
+## Delete artifacts in bulk
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/TODO:) in GitLab 13.3.
+
+Delete all artifacts from project's jobs.
+
+```plaintext
+DELETE /projects/:id/artifacts
+```
+
+| Attribute | Type           | Required | Description                                                                                                      |
+|-----------|----------------|----------|------------------------------------------------------------------------------------------------------------------|
+| `id`      | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
+
+Example request:
+
+```shell
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/artifacts"
+```
+
+NOTE: **Note:**
+At least Maintainer role is required to delete artifacts.
+
+A response with status `204 No Content` is returned, however, this operation is executed asynchronously and it might take time to get executed.
