@@ -10,6 +10,10 @@ export default {
     GlLink,
     GlSprintf,
   },
+  // The DynamicFields component v-binds the configuration entity to this
+  // component. This ensures extraneous keys/values are not added as attributes
+  // to the underlying GlFormGroup.
+  inheritAttrs: false,
   model: {
     prop: 'value',
     event: 'input',

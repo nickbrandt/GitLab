@@ -1,6 +1,5 @@
 const isString = value => typeof value === 'string';
 
-// eslint-disable-next-line import/prefer-default-export
 export const isValidConfigurationEntity = object => {
   if (object == null) {
     return false;
@@ -16,4 +15,13 @@ export const isValidConfigurationEntity = object => {
     defaultValue !== undefined &&
     value !== undefined
   );
+};
+
+export const extractSastConfigurationEntities = ({ project }) => {
+  if (!project?.sastCiConfiguration) {
+    return [];
+  }
+
+  const { global, pipeline } = project.sastCiConfiguration;
+  return [...global.nodes, ...pipeline.nodes];
 };
