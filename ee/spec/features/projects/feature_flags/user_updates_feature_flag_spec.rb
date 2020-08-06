@@ -107,10 +107,8 @@ RSpec.describe 'User updates feature flag', :js do
           expect(page).to have_css('.js-feature-flag-status button.is-checked')
 
           within_feature_flag_scopes do
-            expect(page.find('.badge:nth-child(1)')).to have_content('*')
-            expect(page.find('.badge:nth-child(1)')['class']).to include('badge-active')
-            expect(page.find('.badge:nth-child(2)')).to have_content('review/*')
-            expect(page.find('.badge:nth-child(2)')['class']).to include('badge-inactive')
+            expect(page.find('[data-qa-selector="feature-flag-scope-info-badge"]:nth-child(1)')).to have_content('*')
+            expect(page.find('[data-qa-selector="feature-flag-scope-muted-badge"]:nth-child(2)')).to have_content('review/*')
           end
         end
       end
@@ -140,8 +138,7 @@ RSpec.describe 'User updates feature flag', :js do
       it 'shows the newly created scope' do
         within_feature_flag_row(1) do
           within_feature_flag_scopes do
-            expect(page.find('.badge:nth-child(3)')).to have_content('production')
-            expect(page.find('.badge:nth-child(3)')['class']).to include('badge-inactive')
+            expect(page.find('[data-qa-selector="feature-flag-scope-muted-badge"]:nth-child(3)')).to have_content('production')
           end
         end
       end
@@ -168,8 +165,8 @@ RSpec.describe 'User updates feature flag', :js do
       it 'shows the updated feature flag' do
         within_feature_flag_row(1) do
           within_feature_flag_scopes do
-            expect(page).to have_css('.badge:nth-child(1)')
-            expect(page).not_to have_css('.badge:nth-child(2)')
+            expect(page).to have_css('[data-qa-selector="feature-flag-scope-info-badge"]:nth-child(1)')
+            expect(page).not_to have_css('[data-qa-selector="feature-flag-scope-info-badge"]:nth-child(2)')
           end
         end
       end
