@@ -76,9 +76,8 @@
             = render 'groups/group_members/tab_pane/title' do
               = html_escape(_("Groups with access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
           %ul.content-list.members-list{ data: { qa_selector: "groups_list" } }
-            - can_admin_member = can?(current_user, :admin_group_member, @group)
             - @group.shared_with_group_links.each do |group_link|
-              = render 'shared/members/group', group_link: group_link, can_admin_member: can_admin_member, group_link_path: group_group_link_path(@group, group_link)
+              = render 'shared/members/group', group_link: group_link, can_admin_member: can_manage_members, group_link_path: group_group_link_path(@group, group_link)
     - if show_invited_members
       #tab-pending-members.tab-pane{ class: ("active" if pending_active) }
         .card.card-without-border
