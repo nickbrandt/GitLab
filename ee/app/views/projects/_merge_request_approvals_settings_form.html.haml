@@ -21,7 +21,7 @@
   .alert.alert-dismissible.alert-primary.fade.in.show{ role: "alert" }
     %button.close{ type: "button", 'data-dismiss': "alert", 'aria-label': "Close" }
       %span
-        = sprite_icon('close', size: 16)
+        = sprite_icon('close')
     %span
       - banner_url = project_settings_repository_path(project, anchor: 'js-protected-branches-settings')
       - banner_link_start = '<a href="%{url}"><strong>'.html_safe % { url: banner_url }

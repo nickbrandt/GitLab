@@ -2,10 +2,10 @@
 - return unless not_dismissed_or_in_admin_area && show_users_over_license_banner?
 
 .gl-alert.gl-alert-info.js-users-over-license-callout{ role: 'alert', data: { feature_id: "users_over_license_banner", dismiss_endpoint: user_callouts_path, defer_links: "true" } }
-  = sprite_icon('information-o', size: 16, css_class: 'gl-icon gl-alert-icon')
+  = sprite_icon('information-o', css_class: 'gl-icon gl-alert-icon')
   - unless admin_section?
     %button.js-close.gl-alert-dismiss.gl-cursor-pointer{ type: 'button', 'aria-label' => _('Dismiss') }
-      = sprite_icon('close', size: 16, css_class: 'gl-icon')
+      = sprite_icon('close', css_class: 'gl-icon')
   .gl-alert-body
     %h3.gl-alert-title= s_('License|Licensed user count exceeded')
     %p
