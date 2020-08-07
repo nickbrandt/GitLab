@@ -13,5 +13,15 @@
               = sprite_icon('dashboard')
             %span.nav-item-name
               = _('Security Dashboard')
+        -# This part will be enabled in a follow up MR. The follow up MR will be submitted
+        -# right after this MR is merged. The reason to split the MR into two pieces is
+        -# to reduce the size of the MR and speed up the review process.
+        -#
+        -# = nav_link(path: %w[dashboard#settings]) do
+        -#   = link_to security_settings_dashboard_path, class: 'shortcuts-project rspec-project-link' do
+        -#     .nav-icon-container
+        -#       = sprite_icon('settings')
+        -#     %span.nav-item-name
+        -#       = _('Settings')
 
     = render 'shared/sidebar_toggle_button'
