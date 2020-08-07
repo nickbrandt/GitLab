@@ -9,7 +9,7 @@ module Types
 
     expose_permissions Types::PermissionTypes::DastSiteProfile
 
-    field :id, GraphQL::ID_TYPE, null: false,
+    field :id, ::Types::GlobalIDType[::DastSiteProfile], null: false,
           description: 'ID of the site profile'
 
     field :profile_name, GraphQL::STRING_TYPE, null: true,
