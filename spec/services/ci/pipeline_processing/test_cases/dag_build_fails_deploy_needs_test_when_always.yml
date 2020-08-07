@@ -38,6 +38,3 @@ transitions:
         build: failed
         test: skipped
         deploy: pending
-
-# TODO: `test` is actually skipped, but we run `deploy`. Should we?
-# Further discussions: https://gitlab.com/gitlab-org/gitlab/-/issues/213080

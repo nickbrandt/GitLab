@@ -28,7 +28,11 @@ module Ci
     def valid_statuses_for_build(build)
       case build.when
       when 'on_success'
-        build.scheduling_type_dag? ? %w[success] : %w[success skipped]
+        if Gitlab::Ci::Features.dependency_tree_for_dag?
+          %w[success skipped]
+        else
+          build.scheduling_type_dag? ? %w[success] : %w[success skipped]
+        end
       when 'on_failure'
         %w[failed]
       when 'always'

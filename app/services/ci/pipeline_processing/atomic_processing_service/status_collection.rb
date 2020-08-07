@@ -37,9 +37,10 @@ module Ci
 
         # This methods gets composite status for processables with given names
         def status_for_names(names, dag:)
-          name_statuses = all_statuses_by_name.slice(*names)
+          name_statuses = all_statuses_by_name.slice(*names).values
+          dependency_tree_statuses = status_for_dependency_tree(name_statuses)
 
-          status_for_array(name_statuses.values, dag: dag)
+          status_for_array(name_statuses + dependency_tree_statuses, dag: dag)
         end
 
         # This methods gets composite status for processables before given stage
@@ -136,6 +137,21 @@ module Ci
           end
         end
         # rubocop: enable CodeReuse/ActiveRecord
+
+        def status_for_dependency_tree(name_statuses)
+          return [] unless Gitlab::Ci::Features.dependency_tree_for_dag?
+
+          name_statuses.map do |status|
+            # Because here we want to know why the build is skipped,
+            # we need to create a dependency tree only in that case.
+            next unless status[:status] == 'skipped'
+
+            {
+              status: status_for_prior_stage_position(status[:stage_idx]),
+              allow_failure: false
+            }
+          end.compact.uniq
+        end
       end
     end
   end

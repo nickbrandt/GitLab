@@ -85,6 +85,10 @@ module Gitlab
       def self.reset_ci_minutes_for_all_namespaces?
         ::Feature.enabled?(:reset_ci_minutes_for_all_namespaces, default_enabled: false)
       end
+
+      def self.dependency_tree_for_dag?
+        ::Feature.enabled?(:ci_dependency_tree_for_dag)
+      end
     end
   end
 end

@@ -140,8 +140,18 @@ RSpec.describe Ci::ProcessBuildService, '#execute' do
     context 'when current status is skipped' do
       let(:current_status) { 'skipped' }
 
-      it 'skips the build' do
-        expect { subject }.to change { build.status }.to('skipped')
+      it 'enqueues the build' do
+        expect { subject }.to change { build.status }.to('pending')
+      end
+
+      context 'when ci_dependency_tree_for_dag is disabled' do
+        before do
+          stub_feature_flags(ci_dependency_tree_for_dag: false)
+        end
+
+        it 'enqueues the build' do
+          expect { subject }.to change { build.status }.to('skipped')
+        end
       end
     end
   end
