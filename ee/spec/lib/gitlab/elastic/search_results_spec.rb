@@ -701,7 +701,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         expect(search_for('missing_token_around_equals')).to include(file_name)
       end
 
-      it 'finds a ruby method name even if preceeded with dot' do
+      it 'finds a ruby method name even if preceded with dot' do
         expect(search_for('ruby_method_name')).to include(file_name)
       end
 
@@ -709,7 +709,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         expect(search_for('ruby_method_123')).to include(file_name)
       end
 
-      it 'finds a ruby method call even if preceeded with dot' do
+      it 'finds a ruby method call even if preceded with dot' do
         expect(search_for('ruby_method_call')).to include(file_name)
       end
 
