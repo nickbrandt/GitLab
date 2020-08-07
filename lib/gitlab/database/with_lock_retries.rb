@@ -3,6 +3,8 @@
 module Gitlab
   module Database
     class WithLockRetries
+      AttemptsExhaustedError = Class.new(StandardError)
+
       NULL_LOGGER = Gitlab::JsonLogger.new('/dev/null')
 
       # Each element of the array represents a retry iteration.
@@ -63,7 +65,7 @@ module Gitlab
         @log_params = { method: 'with_lock_retries', class: klass.to_s }
       end
 
-      def run(&block)
+      def run(raise_on_exhaustion: false, &block)
         raise 'no block given' unless block_given?
 
         @block = block
@@ -85,6 +87,9 @@ module Gitlab
             retry
           else
             reset_db_settings
+
+            raise AttemptsExhaustedError, 'configured attempts to obtain locks are exhausted' if raise_on_exhaustion
+
             run_block_without_lock_timeout
           end
 
