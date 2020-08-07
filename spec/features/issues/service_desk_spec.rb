@@ -7,8 +7,6 @@ RSpec.describe 'Service Desk Issue Tracker', :js do
   let(:user) { create(:user) }
 
   before do
-    stub_feature_flags(vue_issuables_list: false)
-
     allow(Gitlab::IncomingEmail).to receive(:enabled?).and_return(true)
     allow(Gitlab::IncomingEmail).to receive(:supports_wildcard?).and_return(true)
 

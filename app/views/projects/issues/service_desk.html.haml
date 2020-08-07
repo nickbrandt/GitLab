@@ -17,5 +17,11 @@
     = render 'shared/issuable/search_bar', type: :issues
     = render 'service_desk_info_content'
 
-  .issues-holder
-    = render 'projects/issues/issues', empty_state_path: 'service_desk_info_content'
+  - if Feature.enabled?(:vue_issuables_list, @project)
+    .js-issuables-list{ data: { endpoint: "#{expose_url(api_v4_projects_issues_path(id: @project.id))}?author_id=#{User.support_bot.id}",
+      'can-bulk-edit': @can_bulk_update,
+      'empty-svg-path': image_path('illustrations/issues.svg'),
+      'sort-key': @sort } }
+  - else
+    .issues-holder
+      = render 'projects/issues/issues', empty_state_path: 'service_desk_info_content'
