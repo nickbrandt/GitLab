@@ -494,7 +494,7 @@ class License < ApplicationRecord
     starts_at > Date.current
   end
 
-  def auto_renew?
+  def auto_renew
     false
   end
 
