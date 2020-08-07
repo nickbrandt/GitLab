@@ -21489,9 +21489,6 @@ msgstr ""
 msgid "SecurityReports|Download Report"
 msgstr ""
 
-msgid "SecurityReports|Each vulnerability now has a unique page that can be directly linked to, shared, referenced, and tracked as the single source of truth. Vulnerability occurrences also persist across scanner runs, which improves tracking and visibility and reduces duplicates between scans."
-msgstr ""
-
 msgid "SecurityReports|Edit dashboard"
 msgstr ""
 
@@ -21513,13 +21510,7 @@ msgstr ""
 msgid "SecurityReports|Hide dismissed"
 msgstr ""
 
-msgid "SecurityReports|Introducing standalone vulnerabilities"
-msgstr ""
-
 msgid "SecurityReports|Issue Created"
-msgstr ""
-
-msgid "SecurityReports|Learn more"
 msgstr ""
 
 msgid "SecurityReports|Learn more about setting up your dashboard"

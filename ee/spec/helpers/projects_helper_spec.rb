@@ -157,9 +157,6 @@ RSpec.describe ProjectsHelper do
           empty_state_svg_path: start_with('/assets/illustrations/security-dashboard-empty-state'),
           dashboard_documentation: '/help/user/application_security/security_dashboard/index',
           security_dashboard_help_path: '/help/user/application_security/security_dashboard/index',
-          user_callouts_path: '/-/user_callouts',
-          user_callout_id: 'standalone_vulnerabilities_introduction_banner',
-          show_introduction_banner: 'true',
           not_enabled_scanners_help_path: help_page_path('user/application_security/index', anchor: 'quick-start'),
           no_pipeline_run_scanners_help_path: new_project_pipeline_path(project)
         }
