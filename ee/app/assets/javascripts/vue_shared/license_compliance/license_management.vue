@@ -38,9 +38,6 @@ export default {
       'hasPendingLicenses',
       'isAddingNewLicense',
     ]),
-    hasLicenseApprovals() {
-      return Boolean(this.glFeatures.licenseApprovals);
-    },
     showLoadingSpinner() {
       return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
     },
@@ -100,7 +97,7 @@ export default {
             {{ s__('LicenseCompliance|Add a license') }}
           </gl-button>
 
-          <license-approvals v-if="hasLicenseApprovals" class="gl-ml-3" />
+          <license-approvals class="gl-ml-3" />
         </div>
 
         <template v-else>
