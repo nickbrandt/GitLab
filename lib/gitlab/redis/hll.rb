@@ -2,9 +2,9 @@
 
 module Gitlab
   module Redis
-    KeyFormatError = Class.new(StandardError)
-
     class HLL
+      KeyFormatError = Class.new(StandardError)
+
       def self.count(params)
         self.new.count(params)
       end
@@ -20,7 +20,7 @@ module Gitlab
       end
 
       def add(key:, value:, expiry:)
-        unless %r{\A.*\{.*\}.*\z}.match?(key)
+        unless %r{\A(\w|-|:)*\{\w*\}(\w|-|:)*\z}.match?(key)
           raise KeyFormatError.new("Invalid key format. #{key} key should have changeable parts in curly braces. See https://docs.gitlab.com/ee/development/redis.html#multi-key-commands")
         end
 
