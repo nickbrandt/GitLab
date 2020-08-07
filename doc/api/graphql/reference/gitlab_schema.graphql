@@ -295,6 +295,11 @@ type AlertManagementAlert implements Noteable {
   ): NoteConnection!
 
   """
+  Runbook for the alert as defined in alert details
+  """
+  runbook: String
+
+  """
   Service the alert came from
   """
   service: String
