@@ -8,6 +8,7 @@ module EE
       prepended do
         mount_mutation ::Mutations::Issues::SetIteration
         mount_mutation ::Mutations::Issues::SetWeight
+        mount_mutation ::Mutations::Issues::SetEpic
         mount_mutation ::Mutations::EpicTree::Reorder
         mount_mutation ::Mutations::Epics::Update
         mount_mutation ::Mutations::Epics::Create
