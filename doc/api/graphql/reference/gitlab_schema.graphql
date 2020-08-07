@@ -15078,6 +15078,11 @@ input UpdateIssueInput {
   locked: Boolean
 
   """
+  The ID of the milestone to be assigned, milestone will be removed if set to null.
+  """
+  milestoneId: ID
+
+  """
   The project the issue to mutate is in
   """
   projectPath: ID!

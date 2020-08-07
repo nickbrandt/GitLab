@@ -44468,6 +44468,16 @@
               "defaultValue": null
             },
             {
+              "name": "milestoneId",
+              "description": "The ID of the milestone to be assigned, milestone will be removed if set to null.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "healthStatus",
               "description": "The desired health status",
               "type": {
