@@ -11,10 +11,6 @@ module API
 
         include Constants
 
-        def find_personal_access_token
-          find_personal_access_token_from_http_basic_auth
-        end
-
         def unauthorized_user_project
           @unauthorized_user_project ||= find_project(params[:id])
         end
