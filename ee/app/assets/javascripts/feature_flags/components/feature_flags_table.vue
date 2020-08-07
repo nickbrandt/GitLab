@@ -226,7 +226,6 @@ export default {
                 v-gl-tooltip.hover.bottom="__('Edit')"
                 class="js-feature-flag-edit-button"
                 icon="pencil"
-                category="tertiary"
                 :href="featureFlag.edit_path"
               />
             </template>
