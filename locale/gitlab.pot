@@ -24917,6 +24917,9 @@ msgstr ""
 msgid "This project is archived and cannot be commented on."
 msgstr ""
 
+msgid "This project manages its dependencies using %{strong_start}%{manager_name}%{strong_end}"
+msgstr ""
+
 msgid "This project path either does not exist or you do not have access."
 msgstr ""
 
