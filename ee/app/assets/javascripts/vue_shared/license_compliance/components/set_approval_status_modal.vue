@@ -86,7 +86,7 @@ export default {
         v-if="canBlacklist"
         class="btn btn-remove btn-inverted js-modal-secondary-action"
         data-dismiss="modal"
-        data-qa-selector="blacklist_license_button"
+        data-qa-selector="deny_license_button"
         @click="denyLicense(currentLicenseInModal)"
       >
         {{ s__('LicenseCompliance|Deny') }}
