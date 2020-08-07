@@ -14637,7 +14637,9 @@ CREATE TABLE public.prometheus_alerts (
     operator integer NOT NULL,
     environment_id integer NOT NULL,
     project_id integer NOT NULL,
-    prometheus_metric_id integer NOT NULL
+    prometheus_metric_id integer NOT NULL,
+    runbook_url text,
+    CONSTRAINT check_cb76d7e629 CHECK ((char_length(runbook_url) <= 255))
 );
 
 CREATE SEQUENCE public.prometheus_alerts_id_seq
