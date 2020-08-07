@@ -28,7 +28,7 @@ module Resolvers
 
       authorize!
 
-      args[:include_ancestors] = true if args[:include_ancestors].nil?
+      args[:include_ancestors] = true if args[:include_ancestors].nil? && args[:iid].nil?
 
       iterations = IterationsFinder.new(context[:current_user], iterations_finder_params(args)).execute
 
