@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import { GlDeprecatedButton, GlIcon } from '@gitlab/ui';
+import { GlButton, GlIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 /**
  * Renders a split dropdown with
@@ -14,7 +14,7 @@ export default {
   name: 'FilteredSearchDropdown',
   components: {
     GlIcon,
-    GlDeprecatedButton,
+    GlButton,
   },
   props: {
     title: {
@@ -140,10 +140,11 @@ export default {
 
         <div v-if="shouldRenderCreateButton" class="dropdown-footer">
           <slot name="footer" :filter="filter">
-            <gl-deprecated-button
+            <gl-button
               class="js-dropdown-create-button btn-transparent"
+              category="tertiary"
               @click="$emit('createItem', filter)"
-              >{{ computedCreateButtonText }}</gl-deprecated-button
+              >{{ computedCreateButtonText }}</gl-button
             >
           </slot>
         </div>
