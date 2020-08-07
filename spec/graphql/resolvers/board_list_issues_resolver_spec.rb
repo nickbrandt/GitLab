@@ -27,7 +27,7 @@ RSpec.describe Resolvers::BoardListIssuesResolver do
         issue3 = create(:issue, project: project, labels: [label], relative_position: 10)
 
         # by relative_position and then ID
-        issues = resolve_board_list_issues
+        issues = resolve_board_list_issues.items
 
         expect(issues.map(&:id)).to eq [issue3.id, issue1.id, issue2.id]
       end
