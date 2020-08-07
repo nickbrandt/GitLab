@@ -9,7 +9,7 @@ module Resolvers
                required: false,
                description: 'Filter issue links by link type'
 
-      delegate :issue_links, to: :object, private: true
+      delegate :issue_links, :created_issue_links, to: :object, private: true
 
       def resolve(link_type: nil, **)
         issue_links_by_link_type(link_type)
@@ -18,7 +18,7 @@ module Resolvers
       private
 
       def issue_links_by_link_type(link_type)
-        case link_type.to_s
+        case link_type.to_s.downcase
         when Types::Vulnerability::IssueLinkTypeEnum.enum['created']
           created_issue_links
         else
