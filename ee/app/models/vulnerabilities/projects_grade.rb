@@ -16,7 +16,7 @@ module Vulnerabilities
     def projects
       return vulnerable.projects.none if project_ids.blank?
 
-      vulnerable.projects.where(id: project_ids)
+      vulnerable.projects.with_vulnerability_statistics.inc_routes.where(id: project_ids)
     end
 
     def self.grades_for(vulnerables)
