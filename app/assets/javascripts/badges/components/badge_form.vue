@@ -216,10 +216,7 @@ export default {
       </p>
     </div>
 
-    <div
-      v-if="isEditing"
-      class="row-content-block gl-display-flex gl-justify-content-space-between"
-    >
+    <div v-if="isEditing" class="row-content-block gl-display-flex gl-justify-content-end">
       <button class="btn btn-cancel" type="button" @click="onCancel">{{ __('Cancel') }}</button>
       <loading-button
         :loading="isSaving"
