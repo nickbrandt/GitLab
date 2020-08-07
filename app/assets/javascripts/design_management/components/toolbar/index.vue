@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -13,7 +13,7 @@ export default {
     Icon,
     Pagination,
     DeleteButton,
-    GlDeprecatedButton,
+    GlButton,
   },
   mixins: [timeagoMixin],
   props: {
@@ -109,9 +109,9 @@ export default {
       <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
     </div>
     <pagination :id="id" class="ml-auto flex-shrink-0" />
-    <gl-deprecated-button :href="image" class="mr-2">
+    <gl-button :href="image" class="mr-2">
       <icon :size="18" name="download" />
-    </gl-deprecated-button>
+    </gl-button>
     <delete-button
       v-if="isLatestVersion && canDeleteDesign"
       :is-deleting="isDeleting"
