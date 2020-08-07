@@ -49,6 +49,9 @@ export default {
     legacyFlagAlert: s__(
       'FeatureFlags|GitLab is moving to a new way of managing feature flags, and in 13.4, this feature flag will become read-only. Please create a new feature flag.',
     ),
+    legacyReadOnlyFlagAlert: s__(
+      'FeatureFlags|GitLab is moving to a new way of managing feature flags. This feature flag is read-only, and it will be removed in 14.0. Please create a new feature flag.',
+    ),
     newFlagAlert: NEW_FLAG_ALERT,
   },
   computed: {
@@ -72,8 +75,17 @@ export default {
     deprecated() {
       return this.hasNewVersionFlags && this.version === LEGACY_FLAG;
     },
+    deprecatedAndEditable() {
+      return this.deprecated && !this.hasLegacyReadOnlyFlags;
+    },
+    deprecatedAndReadOnly() {
+      return this.deprecated && this.hasLegacyReadOnlyFlags;
+    },
     hasNewVersionFlags() {
       return this.glFeatures.featureFlagsNewVersion;
+    },
+    hasLegacyReadOnlyFlags() {
+      return this.glFeatures.featureFlagsLegacyReadOnly;
     },
     shouldShowNewFlagAlert() {
       return !(this.hasNewVersionFlags || this.userDidDismissNewFlagAlert);
@@ -107,8 +119,11 @@ export default {
     <gl-loading-icon v-if="isLoading" />
 
     <template v-else-if="!isLoading && !hasError">
-      <gl-alert v-if="deprecated" variant="warning" :dismissible="false" class="gl-my-5">
+      <gl-alert v-if="deprecatedAndEditable" variant="warning" :dismissible="false" class="gl-my-5">
         {{ $options.translations.legacyFlagAlert }}
+      </gl-alert>
+      <gl-alert v-if="deprecatedAndReadOnly" variant="warning" :dismissible="false" class="gl-my-5">
+        {{ $options.translations.legacyReadOnlyFlagAlert }}
       </gl-alert>
       <div class="d-flex align-items-center mb-3 mt-3">
         <gl-toggle :value="active" class="m-0 mr-3 js-feature-flag-status" @change="toggleActive" />

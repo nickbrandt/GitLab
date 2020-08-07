@@ -2,7 +2,7 @@
 import { GlBadge, GlButton, GlTooltipDirective, GlModal, GlToggle, GlIcon } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT, NEW_VERSION_FLAG } from '../constants';
+import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT, NEW_VERSION_FLAG, LEGACY_FLAG } from '../constants';
 import labelForStrategy from '../utils';
 
 export default {
@@ -35,6 +35,7 @@ export default {
   },
   translations: {
     legacyFlagAlert: s__('FeatureFlags|Flag becomes read only soon'),
+    legacyFlagReadOnlyAlert: s__('FeatureFlags|Flag is read-only'),
   },
   computed: {
     permissions() {
@@ -42,6 +43,9 @@ export default {
     },
     isNewVersionFlagsEnabled() {
       return this.glFeatures.featureFlagsNewVersion;
+    },
+    isLegacyReadOnlyFlagsEnabled() {
+      return this.glFeatures.featureFlagsLegacyReadOnly;
     },
     modalTitle() {
       return sprintf(s__('FeatureFlags|Delete %{name}?'), {
@@ -56,10 +60,18 @@ export default {
     modalId() {
       return 'delete-feature-flag';
     },
+    legacyFlagToolTipText() {
+      const { legacyFlagReadOnlyAlert, legacyFlagAlert } = this.$options.translations;
+
+      return this.isLegacyReadOnlyFlagsEnabled ? legacyFlagReadOnlyAlert : legacyFlagAlert;
+    },
   },
   methods: {
     isLegacyFlag(flag) {
       return !this.isNewVersionFlagsEnabled || flag.version !== NEW_VERSION_FLAG;
+    },
+    statusToggleDisabled(flag) {
+      return this.isLegacyReadOnlyFlagsEnabled && flag.version === LEGACY_FLAG;
     },
     scopeTooltipText(scope) {
       return !scope.active
@@ -142,6 +154,7 @@ export default {
             <gl-toggle
               v-if="featureFlag.update_path"
               :value="featureFlag.active"
+              :disabled="statusToggleDisabled(featureFlag)"
               @change="toggleFeatureFlag(featureFlag)"
             />
             <gl-badge v-else-if="featureFlag.active" variant="success">
@@ -162,7 +175,7 @@ export default {
               </div>
               <gl-icon
                 v-if="isLegacyFlag(featureFlag)"
-                v-gl-tooltip.hover="$options.translations.legacyFlagAlert"
+                v-gl-tooltip.hover="legacyFlagToolTipText"
                 class="gl-ml-3"
                 name="information-o"
               />

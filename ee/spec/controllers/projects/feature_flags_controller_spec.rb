@@ -914,13 +914,18 @@ RSpec.describe Projects::FeatureFlagsController do
       put(:update, params: params, format: :json, as: :json)
     end
 
+    before do
+      stub_feature_flags(feature_flags_legacy_read_only: false)
+    end
+
     subject { put(:update, params: params, format: :json) }
 
     let!(:feature_flag) do
       create(:operations_feature_flag,
-        name: 'ci_live_trace',
-        active: true,
-        project: project)
+             :legacy_flag,
+             name: 'ci_live_trace',
+             active: true,
+             project: project)
     end
 
     let(:params) do
@@ -1292,6 +1297,17 @@ RSpec.describe Projects::FeatureFlagsController do
       end
     end
 
+    context 'when legacy feature flags are set to be read only' do
+      it 'does not update the flag' do
+        stub_feature_flags(feature_flags_legacy_read_only: true)
+
+        put_request(feature_flag, name: 'ci_new_live_trace')
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response['message']).to eq(["Legacy feature flags are read-only"])
+      end
+    end
+
     context 'with a version 2 feature flag' do
       let!(:new_version_flag) do
         create(:operations_feature_flag,
@@ -1511,6 +1527,15 @@ RSpec.describe Projects::FeatureFlagsController do
 
         expect(response).to have_gitlab_http_status(:not_found)
         expect(new_version_flag.reload.name).to eq('new-feature')
+      end
+
+      it 'updates the flag when legacy feature flags are set to be read only' do
+        stub_feature_flags(feature_flags_legacy_read_only: true)
+
+        put_request(new_version_flag, name: 'some-other-name')
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(new_version_flag.reload.name).to eq('some-other-name')
       end
     end
   end

@@ -5,16 +5,19 @@ require 'spec_helper'
 RSpec.describe 'User sees feature flag list', :js do
   include FeatureFlagHelpers
 
-  let(:user) { create(:user) }
-  let(:project) { create(:project, namespace: user.namespace) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, namespace: user.namespace) }
+
+  before_all do
+    project.add_developer(user)
+  end
 
   before do
-    project.add_developer(user)
     stub_licensed_features(feature_flags: true)
     sign_in(user)
   end
 
-  context 'when there are feature flags and scopes' do
+  context 'with legacy feature flags' do
     before do
       create_flag(project, 'ci_live_trace', false).tap do |feature_flag|
         create_scope(feature_flag, 'review/*', true)
@@ -23,11 +26,11 @@ RSpec.describe 'User sees feature flag list', :js do
       create_flag(project, 'mr_train', true).tap do |feature_flag|
         create_scope(feature_flag, 'production', false)
       end
-
-      visit(project_feature_flags_path(project))
     end
 
     it 'user sees the first flag' do
+      visit(project_feature_flags_path(project))
+
       within_feature_flag_row(1) do
         expect(page.find('.js-feature-flag-id')).to have_content('^1')
         expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
@@ -41,6 +44,8 @@ RSpec.describe 'User sees feature flag list', :js do
     end
 
     it 'user sees the second flag' do
+      visit(project_feature_flags_path(project))
+
       within_feature_flag_row(2) do
         expect(page.find('.js-feature-flag-id')).to have_content('^2')
         expect(page.find('.feature-flag-name')).to have_content('drop_legacy_artifacts')
@@ -53,6 +58,8 @@ RSpec.describe 'User sees feature flag list', :js do
     end
 
     it 'user sees the third flag' do
+      visit(project_feature_flags_path(project))
+
       within_feature_flag_row(3) do
         expect(page.find('.js-feature-flag-id')).to have_content('^3')
         expect(page.find('.feature-flag-name')).to have_content('mr_train')
@@ -65,9 +72,48 @@ RSpec.describe 'User sees feature flag list', :js do
       end
     end
 
-    it 'user updates the status toggle' do
+    it 'user sees the status toggle disabled' do
+      visit(project_feature_flags_path(project))
+
       within_feature_flag_row(1) do
-        page.find('.js-feature-flag-status button').click
+        expect(page).to have_css('.js-feature-flag-status button.is-disabled')
+      end
+    end
+
+    context 'when legacy feature flags are not read-only' do
+      before do
+        stub_feature_flags(feature_flags_legacy_read_only: false)
+      end
+
+      it 'user updates the status toggle' do
+        visit(project_feature_flags_path(project))
+
+        within_feature_flag_row(1) do
+          page.find('.js-feature-flag-status button').click
+
+          expect(page).to have_css('.js-feature-flag-status button.is-checked')
+        end
+
+        visit(project_audit_events_path(project))
+
+        expect(page).to(
+          have_text('Updated feature flag ci_live_trace. Updated active from "false" to "true".')
+        )
+      end
+    end
+  end
+
+  context 'with new version flags' do
+    before do
+      create(:operations_feature_flag, :new_version_flag, project: project,
+             name: 'my_flag', active: false)
+    end
+
+    it 'user updates the status toggle' do
+      visit(project_feature_flags_path(project))
+
+      within_feature_flag_row(1) do
+        status_toggle_button.click
 
         expect(page).to have_css('.js-feature-flag-status button.is-checked')
       end
@@ -75,7 +121,7 @@ RSpec.describe 'User sees feature flag list', :js do
       visit(project_audit_events_path(project))
 
       expect(page).to(
-        have_text('Updated feature flag ci_live_trace. Updated active from "false" to "true".')
+        have_text('Updated feature flag my_flag. Updated active from "false" to "true".')
       )
     end
   end
