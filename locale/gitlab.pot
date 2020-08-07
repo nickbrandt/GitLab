@@ -23881,9 +23881,6 @@ msgstr ""
 msgid "TestReports|There was an error fetching the summary."
 msgstr ""
 
-msgid "TestReports|There was an error fetching the test reports."
-msgstr ""
-
 msgid "TestReports|There was an error fetching the test suite."
 msgstr ""
 
