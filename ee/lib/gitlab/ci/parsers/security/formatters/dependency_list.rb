@@ -62,6 +62,8 @@ module Gitlab
                 'Java (Maven)'
               when 'composer'
                 'PHP (Composer)'
+              when 'nuget'
+                'C# (NuGet)'
               else
                 package_manager
               end
