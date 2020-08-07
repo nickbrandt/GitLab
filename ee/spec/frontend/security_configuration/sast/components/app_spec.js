@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlAlert, GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
 import SASTConfigurationApp from 'ee/security_configuration/sast/components/app.vue';
-import DynamicFields from 'ee/security_configuration/sast/components/dynamic_fields.vue';
+import ConfigurationForm from 'ee/security_configuration/sast/components/configuration_form.vue';
 import { makeEntities } from './helpers';
 
 const sastDocumentationPath = '/help/sast';
@@ -39,7 +39,7 @@ describe('SAST Configuration App', () => {
   const findHeader = () => wrapper.find('header');
   const findSubHeading = () => findHeader().find('p');
   const findLink = (container = wrapper) => container.find(GlLink);
-  const findDynamicFields = () => wrapper.find(DynamicFields);
+  const findConfigurationForm = () => wrapper.find(ConfigurationForm);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findErrorAlert = () => wrapper.find(GlAlert);
 
@@ -75,8 +75,8 @@ describe('SAST Configuration App', () => {
       expect(findLoadingIcon().exists()).toBe(true);
     });
 
-    it('does not display the dynamic fields component', () => {
-      expect(findDynamicFields().exists()).toBe(false);
+    it('does not display the configuration form', () => {
+      expect(findConfigurationForm().exists()).toBe(false);
     });
 
     it('does not display an alert message', () => {
@@ -95,8 +95,8 @@ describe('SAST Configuration App', () => {
       expect(findLoadingIcon().exists()).toBe(false);
     });
 
-    it('does not display the dynamic fields component', () => {
-      expect(findDynamicFields().exists()).toBe(false);
+    it('does not display the configuration form', () => {
+      expect(findConfigurationForm().exists()).toBe(false);
     });
 
     it('displays an alert message', () => {
@@ -105,9 +105,10 @@ describe('SAST Configuration App', () => {
   });
 
   describe('when loaded', () => {
-    const entities = makeEntities(3);
+    let entities;
 
     beforeEach(() => {
+      entities = makeEntities(3);
       createComponent({
         sastConfigurationEntities: entities,
       });
@@ -117,29 +118,16 @@ describe('SAST Configuration App', () => {
       expect(findLoadingIcon().exists()).toBe(false);
     });
 
-    it('displays the dynamic fields component', () => {
-      const dynamicFields = findDynamicFields();
-      expect(dynamicFields.exists()).toBe(true);
-      expect(dynamicFields.props('entities')).toBe(entities);
+    it('displays the configuration form', () => {
+      expect(findConfigurationForm().exists()).toBe(true);
+    });
+
+    it('passes the sastConfigurationEntities to the entities prop', () => {
+      expect(findConfigurationForm().props('entities')).toBe(entities);
     });
 
     it('does not display an alert message', () => {
       expect(findErrorAlert().exists()).toBe(false);
-    });
-
-    describe('when the dynamic fields component emits an input event', () => {
-      let dynamicFields;
-      let newEntities;
-
-      beforeEach(() => {
-        dynamicFields = findDynamicFields();
-        newEntities = makeEntities(3, { value: 'foo' });
-        dynamicFields.vm.$emit(DynamicFields.model.event, newEntities);
-      });
-
-      it('updates the entities binding', () => {
-        expect(dynamicFields.props('entities')).toBe(newEntities);
-      });
     });
   });
 });

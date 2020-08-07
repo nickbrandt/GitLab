@@ -16,12 +16,19 @@ export default function init() {
     defaultClient: createDefaultClient(),
   });
 
-  const { projectPath, sastDocumentationPath } = el.dataset;
+  const {
+    securityConfigurationPath,
+    createSastMergeRequestPath,
+    projectPath,
+    sastDocumentationPath,
+  } = el.dataset;
 
   return new Vue({
     el,
     apolloProvider,
     provide: {
+      securityConfigurationPath,
+      createSastMergeRequestPath,
       projectPath,
       sastDocumentationPath,
     },

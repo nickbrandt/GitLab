@@ -2,12 +2,12 @@
 import { GlAlert, GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import sastCiConfigurationQuery from '../graphql/sast_ci_configuration.query.graphql';
-import DynamicFields from './dynamic_fields.vue';
+import ConfigurationForm from './configuration_form.vue';
 import { extractSastConfigurationEntities } from './utils';
 
 export default {
   components: {
-    DynamicFields,
+    ConfigurationForm,
     GlAlert,
     GlLink,
     GlLoadingIcon,
@@ -89,6 +89,6 @@ export default {
       $options.i18n.loadingErrorText
     }}</gl-alert>
 
-    <dynamic-fields v-else v-model="sastConfigurationEntities" />
+    <configuration-form v-else :entities="sastConfigurationEntities" />
   </article>
 </template>
