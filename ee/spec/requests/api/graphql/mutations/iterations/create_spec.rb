@@ -88,6 +88,10 @@ RSpec.describe 'Creating an Iteration' do
         end
 
         it 'creates the iteration for a project' do
+          allow_next_instance_of(Iteration) do |iteration|
+            allow(iteration).to receive(:skip_project_validation).and_return(true)
+          end
+
           post_graphql_mutation(mutation, current_user: current_user)
 
           iteration_hash = mutation_response['iteration']
