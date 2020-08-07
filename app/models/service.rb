@@ -57,6 +57,7 @@ class Service < ApplicationRecord
   validates :template, uniqueness: { scope: :type }, if: -> { template? }
   validates :instance, uniqueness: { scope: :type }, if: -> { instance? }
   validate :validate_is_instance_or_template
+  validate :validate_belongs_to_project_or_group
 
   scope :external_issue_trackers, -> { where(category: 'issue_tracker').active }
   scope :external_wikis, -> { where(type: 'ExternalWikiService').active }
@@ -377,6 +378,10 @@ class Service < ApplicationRecord
 
   def validate_is_instance_or_template
     errors.add(:template, 'The service should be a service template or instance-level integration') if template? && instance?
+  end
+
+  def validate_belongs_to_project_or_group
+    errors.add(:project_id, 'The service should belongs to a project or group') if project_id && group_id
   end
 
   def cache_project_has_external_issue_tracker

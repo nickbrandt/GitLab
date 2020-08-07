@@ -25,6 +25,7 @@ RSpec.describe Service do
       nil  | nil  | false  | true   | true
       nil  | nil  | false  | false  | false
       nil  | nil  | true   | true   | false
+      1    | 1    | false  | false  | false
       1    | nil  | true   | false  | false
       1    | nil  | false  | true   | false
       nil  | 1    | true   | false  | false
