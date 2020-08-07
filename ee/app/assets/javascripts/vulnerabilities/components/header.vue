@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
 import { CancelToken } from 'axios';
@@ -18,7 +18,7 @@ import SplitButton from 'ee/vue_shared/security_reports/components/split_button.
 export default {
   name: 'VulnerabilityHeader',
   components: {
-    GlDeprecatedButton,
+    GlButton,
     GlLoadingIcon,
     ResolutionAlert,
     VulnerabilityStateDropdown,
@@ -302,7 +302,7 @@ export default {
           @createIssue="createIssue"
           @downloadPatch="downloadPatch"
         />
-        <gl-deprecated-button
+        <gl-button
           v-else-if="actionButtons.length > 0"
           class="ml-2"
           variant="success"
@@ -311,7 +311,7 @@ export default {
           @click="triggerClick(actionButtons[0].action)"
         >
           {{ actionButtons[0].name }}
-        </gl-deprecated-button>
+        </gl-button>
       </div>
     </div>
   </div>
