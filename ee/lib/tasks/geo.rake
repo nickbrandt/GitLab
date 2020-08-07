@@ -135,16 +135,6 @@ namespace :geo do
       task purge: [:environment] do
         Gitlab::Geo::DatabaseTasks::Test.purge
       end
-
-      desc 'GitLab | Geo | DB | Test | Refresh Foreign Tables definition for test environment'
-      task refresh_foreign_tables: [:environment] do
-        old_env = ActiveRecord::Tasks::DatabaseTasks.env
-        ActiveRecord::Tasks::DatabaseTasks.env = 'test'
-
-        ns['geo:db:refresh_foreign_tables'].invoke
-
-        ActiveRecord::Tasks::DatabaseTasks.env = old_env
-      end
     end
   end
 

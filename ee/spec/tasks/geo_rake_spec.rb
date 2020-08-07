@@ -302,7 +302,7 @@ RSpec.describe 'geo rake tasks', :geo do
     end
   end
 
-  describe 'geo:status', :geo_fdw do
+  describe 'geo:status' do
     context 'without a valid license' do
       before do
         stub_licensed_features(geo: false)

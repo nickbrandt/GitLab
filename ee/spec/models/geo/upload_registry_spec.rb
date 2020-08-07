@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Geo::UploadRegistry, :geo, :geo_fdw do
+RSpec.describe Geo::UploadRegistry, :geo do
   include EE::GeoHelpers
 
   let!(:failed) { create(:geo_upload_registry, :failed) }
