@@ -18,24 +18,22 @@ RSpec.describe Service do
 
     it { is_expected.to validate_presence_of(:type) }
 
-    # We need to use a Proc object because let variables are not available on
-    # this context, see: https://github.com/tomykaira/rspec-parameterized/issues/8
     where(:project_id, :group_id, :template, :instance, :valid) do
-      -> { project.id } | nil             | false  | false  | true
-      nil               | -> { group.id } | false  | false  | true
-      nil               | nil             | true   | false  | true
-      nil               | nil             | false  | true   | true
-      nil               | nil             | false  | false  | false
-      nil               | nil             | true   | true   | false
-      -> { project.id } | nil             | true   | false  | false
-      -> { project.id } | nil             | false  | true   | false
-      nil               | -> { group.id } | true   | false  | false
-      nil               | -> { group.id } | false  | true   | false
+      1    | nil  | false  | false  | true
+      nil  | 1    | false  | false  | true
+      nil  | nil  | true   | false  | true
+      nil  | nil  | false  | true   | true
+      nil  | nil  | false  | false  | false
+      nil  | nil  | true   | true   | false
+      1    | nil  | true   | false  | false
+      1    | nil  | false  | true   | false
+      nil  | 1    | true   | false  | false
+      nil  | 1    | false  | true   | false
     end
 
     with_them do
       it 'validates the service' do
-        expect(build(:service, project_id: project_id.try(:call), group_id: group_id.try(:call), template: template, instance: instance).valid?).to eq(valid)
+        expect(build(:service, project_id: project_id, group_id: group_id, template: template, instance: instance).valid?).to eq(valid)
       end
     end
 
