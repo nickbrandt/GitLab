@@ -51,16 +51,16 @@ module QA
           end
 
           def approve_license(name)
-            click_license(name)
-            wait_until(reload: false) do
+            wait_until(reload: true) do
+              click_license(name)
               has_element?(:approve_license_button, wait: 1)
             end
             click_element(:approve_license_button)
           end
 
           def deny_license(name)
-            click_license(name)
-            wait_until(reload: false) do
+            wait_until(reload: true) do
+              click_license(name)
               has_element?(:deny_license_button, wait: 1)
             end
             click_element(:deny_license_button)
