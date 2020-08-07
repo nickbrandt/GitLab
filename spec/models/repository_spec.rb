@@ -2677,7 +2677,7 @@ RSpec.describe Repository do
     let(:sort) { nil }
 
     before do
-      allow(repository).to receive(:commits).with(nil, limit: 2000, offset: 0, skip_merges: true).and_return(stubbed_commits)
+      allow(repository).to receive(:commits).with(nil, limit: 6000, offset: 0, skip_merges: true).and_return(stubbed_commits)
     end
 
     subject { repository.contributors(order_by: order_by, sort: sort) }

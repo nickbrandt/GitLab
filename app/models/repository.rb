@@ -737,7 +737,7 @@ class Repository
   # order_by: name|email|commits
   # sort: asc|desc default: 'asc'
   def contributors(order_by: nil, sort: 'asc')
-    commits = self.commits(nil, limit: 2000, offset: 0, skip_merges: true)
+    commits = self.commits(nil, limit: 6000, offset: 0, skip_merges: true)
 
     commits = commits.group_by(&:author_email).map do |email, commits|
       contributor = Gitlab::Contributor.new
