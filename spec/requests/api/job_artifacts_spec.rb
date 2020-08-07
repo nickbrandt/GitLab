@@ -573,9 +573,9 @@ RSpec.describe API::JobArtifacts do
         expect(job['args'][0]).to eq(project.id)
       end
 
-      it 'returns status 204 (no content)' do
+      it 'returns status 202 (accepted)' do
         subject
-        expect(response).to have_gitlab_http_status(:no_content)
+        expect(response).to have_gitlab_http_status(:accepted)
       end
     end
   end

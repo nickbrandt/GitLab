@@ -287,4 +287,5 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://git
 NOTE: **Note:**
 At least Maintainer role is required to delete artifacts.
 
-A response with status `204 No Content` is returned, however, this operation is executed asynchronously and it might take time to get executed.
+A response with status `202 Accepted` is returned.
+This operation is executed asynchronously and it might take time to get executed.

@@ -137,7 +137,7 @@ module API
 
         ::Ci::DeleteProjectJobArtifactsWorker.perform_async(user_project.id) # rubocop:disable CodeReuse/Worker
 
-        status :no_content
+        accepted!
       end
     end
   end
