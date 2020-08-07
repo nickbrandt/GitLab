@@ -56,16 +56,13 @@ export default {
   i18n: {
     helpText: s__(
       `SecurityConfiguration|Customize common SAST settings to suit your
-      requirements. More advanced configuration options exist, which you can
-      add to the configuration file this tool generates. It's important to note
-      that if you make any configurations, they will be saved as overrides and
-      will be excluded from automatic updates. We've provided guidance for some
-      easily configurable variables below, but our docs go into even more
-      depth. %{linkStart}Read more%{linkEnd}`,
+      requirements. Configuration changes made here override those provided by
+      GitLab and are excluded from updates. For details of more advanced
+      configuration options, see the %{linkStart}GitLab SAST documentation%{linkEnd}.`,
     ),
     loadingErrorText: s__(
-      `SecurityConfiguration|There was an error loading the configuration.
-      Please reload the page to try again.`,
+      `SecurityConfiguration|Could not retrieve configuration data. Please
+      refresh the page, or try again later.`,
     ),
   },
 };
