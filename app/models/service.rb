@@ -381,7 +381,7 @@ class Service < ApplicationRecord
   end
 
   def validate_belongs_to_project_or_group
-    errors.add(:project_id, 'The service should belongs to a project or group') if project_id && group_id
+    errors.add(:project_id, 'The service cannot belong to both a project and a group') if project_id && group_id
   end
 
   def cache_project_has_external_issue_tracker
