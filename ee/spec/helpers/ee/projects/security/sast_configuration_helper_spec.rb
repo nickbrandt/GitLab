@@ -12,8 +12,10 @@ RSpec.describe Projects::Security::SastConfigurationHelper do
 
     it {
       is_expected.to eq({
+        create_sast_merge_request_path: project_security_configuration_sast_path(project),
+        project_path: project_path,
         sast_documentation_path: docs_path,
-        project_path: project_path
+        security_configuration_path: project_security_configuration_path(project)
       })
     }
   end
