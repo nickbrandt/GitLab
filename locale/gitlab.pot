@@ -670,6 +670,9 @@ msgstr ""
 msgid "%{size} bytes"
 msgstr ""
 
+msgid "%{sourceBranch} into %{targetBranch}"
+msgstr ""
+
 msgid "%{spammable_titlecase} was submitted to Akismet successfully."
 msgstr ""
 
