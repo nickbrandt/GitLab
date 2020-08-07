@@ -6,7 +6,7 @@ RSpec.describe 'User views iteration' do
   let_it_be(:now) { Time.now }
   let_it_be(:group) { create(:group) }
   let_it_be(:project) { create(:project, group: group) }
-  let_it_be(:user) { create(:group_member, :maintainer, user: create(:user), group: group ).user }
+  let_it_be(:user) { create(:group_member, :maintainer, user: create(:user), group: group).user }
   let_it_be(:iteration) { create(:iteration, :skip_future_date_validation, iid: 1, id: 2, group: group, title: 'Correct Iteration', start_date: now - 1.day, due_date: now) }
   let_it_be(:other_iteration) { create(:iteration, :skip_future_date_validation, iid: 2, id: 1, group: group, title: 'Wrong Iteration', start_date: now - 4.days, due_date: now - 3.days) }
   let_it_be(:issue) { create(:issue, project: project, iteration: iteration) }
@@ -22,7 +22,7 @@ RSpec.describe 'User views iteration' do
 
     context 'view an iteration', :js do
       before do
-        visit group_iteration_path(iteration.group, iteration)
+        visit project_iteration_path(project, iteration)
       end
 
       it 'shows iteration info and dates' do
@@ -48,7 +48,7 @@ RSpec.describe 'User views iteration' do
     end
 
     it 'shows page not found' do
-      visit group_iteration_path(iteration.group, iteration)
+      visit project_iteration_path(project, iteration)
 
       expect(page).to have_title('Not Found')
       expect(page).to have_content('Page Not Found')

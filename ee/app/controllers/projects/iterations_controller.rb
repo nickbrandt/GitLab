@@ -2,9 +2,11 @@
 
 class Projects::IterationsController < Projects::ApplicationController
   before_action :check_iterations_available!
-  before_action :authorize_show_iteration!, only: [:index]
+  before_action :authorize_show_iteration!
 
   def index; end
+
+  def show; end
 
   private
 
