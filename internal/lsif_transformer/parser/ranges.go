@@ -14,7 +14,7 @@ const (
 
 type Ranges struct {
 	DefRefs           map[Id]Item
-	References        map[Id][]Item
+	References        *References
 	Hovers            *Hovers
 	Cache             *cache
 	ProcessReferences bool
@@ -39,7 +39,7 @@ type RawItem struct {
 }
 
 type Item struct {
-	Line  string
+	Line  int32
 	DocId Id
 }
 
@@ -49,10 +49,6 @@ type SerializedRange struct {
 	DefinitionPath string                `json:"definition_path,omitempty"`
 	Hover          json.RawMessage       `json:"hover"`
 	References     []SerializedReference `json:"references,omitempty"`
-}
-
-type SerializedReference struct {
-	Path string `json:"path"`
 }
 
 func NewRanges(config Config) (*Ranges, error) {
@@ -67,11 +63,10 @@ func NewRanges(config Config) (*Ranges, error) {
 	}
 
 	return &Ranges{
-		DefRefs:           make(map[Id]Item),
-		References:        make(map[Id][]Item),
-		Hovers:            hovers,
-		Cache:             cache,
-		ProcessReferences: config.ProcessReferences,
+		DefRefs:    make(map[Id]Item),
+		References: NewReferences(config),
+		Hovers:     hovers,
+		Cache:      cache,
 	}, nil
 }
 
@@ -111,7 +106,7 @@ func (r *Ranges) Serialize(f io.Writer, rangeIds []Id, docs map[Id]string) error
 			StartChar:      entry.Character,
 			DefinitionPath: r.definitionPathFor(docs, entry.RefId),
 			Hover:          r.Hovers.For(entry.RefId),
-			References:     r.referencesFor(docs, entry.RefId),
+			References:     r.References.For(docs, entry.RefId),
 		}
 		if err := encoder.Encode(serializedRange); err != nil {
 			return err
@@ -143,32 +138,9 @@ func (r *Ranges) definitionPathFor(docs map[Id]string, refId Id) string {
 		return ""
 	}
 
-	defPath := docs[defRef.DocId] + "#L" + defRef.Line
+	defPath := docs[defRef.DocId] + "#L" + strconv.Itoa(int(defRef.Line))
 
 	return defPath
-}
-
-func (r *Ranges) referencesFor(docs map[Id]string, refId Id) []SerializedReference {
-	if !r.ProcessReferences {
-		return nil
-	}
-
-	references, ok := r.References[refId]
-	if !ok {
-		return nil
-	}
-
-	var serializedReferences []SerializedReference
-
-	for _, reference := range references {
-		serializedReference := SerializedReference{
-			Path: docs[reference.DocId] + "#L" + reference.Line,
-		}
-
-		serializedReferences = append(serializedReferences, serializedReference)
-	}
-
-	return serializedReferences
 }
 
 func (r *Ranges) addRange(line []byte) error {
@@ -194,6 +166,8 @@ func (r *Ranges) addItem(line []byte) error {
 		return errors.New("no range IDs")
 	}
 
+	var references []Item
+
 	for _, rangeId := range rawItem.RangeIds {
 		rg, err := r.getRange(rangeId)
 		if err != nil {
@@ -207,16 +181,18 @@ func (r *Ranges) addItem(line []byte) error {
 		}
 
 		item := Item{
-			Line:  strconv.Itoa(int(rg.Line + 1)),
+			Line:  rg.Line + 1,
 			DocId: rawItem.DocId,
 		}
 
 		if rawItem.Property == definitions {
 			r.DefRefs[rawItem.RefId] = item
-		} else if r.ProcessReferences {
-			r.References[rawItem.RefId] = append(r.References[rawItem.RefId], item)
+		} else {
+			references = append(references, item)
 		}
 	}
+
+	r.References.Store(rawItem.RefId, references)
 
 	return nil
 }
