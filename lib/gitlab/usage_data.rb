@@ -121,7 +121,7 @@ module Gitlab
             issues_created_from_alerts: total_alert_issues,
             issues_created_gitlab_alerts: issues_created_manually_from_alerts,
             issues_created_manually_from_alerts: issues_created_manually_from_alerts,
-            incident_issues: alert_bot_incident_count,
+            incident_issues: count(::Issue.incident),
             alert_bot_incident_issues: alert_bot_incident_count,
             incident_labeled_issues: count(::Issue.with_label_attributes(::IncidentManagement::CreateIncidentLabelService::LABEL_PROPERTIES), start: issue_minimum_id, finish: issue_maximum_id),
             keys: count(Key),
