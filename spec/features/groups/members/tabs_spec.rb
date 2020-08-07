@@ -11,9 +11,9 @@ RSpec.describe 'Groups > Members > Tabs' do
     end
   end
 
-  shared_examples 'active "Pending" tab' do
-    it 'displays "Pending" tab' do
-      expect(page).to have_selector('.nav-link.active', text: 'Pending')
+  shared_examples 'active "Invited" tab' do
+    it 'displays "Invited" tab' do
+      expect(page).to have_selector('.nav-link.active', text: 'Invited')
     end
   end
 
@@ -35,7 +35,7 @@ RSpec.describe 'Groups > Members > Tabs' do
 
   where(:tab, :count) do
     'Members'         | 3
-    'Pending'         | 2
+    'Invited'         | 2
     'Groups'          | 2
     'Access requests' | 2
   end
@@ -56,11 +56,11 @@ RSpec.describe 'Groups > Members > Tabs' do
     it_behaves_like 'active "Members" tab'
   end
 
-  context 'when searching "Pending"', :js do
+  context 'when searching "Invited"', :js do
     before do
       visit group_group_members_path(group)
 
-      click_link 'Pending'
+      click_link 'Invited'
 
       page.within '[data-testid="user-search-form"]' do
         fill_in 'search_invited', with: 'email'
@@ -68,7 +68,7 @@ RSpec.describe 'Groups > Members > Tabs' do
       end
     end
 
-    it_behaves_like 'active "Pending" tab'
+    it_behaves_like 'active "Invited" tab'
 
     context 'and then searching "Members"' do
       before do
@@ -84,18 +84,18 @@ RSpec.describe 'Groups > Members > Tabs' do
     end
   end
 
-  context 'when using "Pending" pagination', :js do
+  context 'when using "Invited" pagination', :js do
     before do
       visit group_group_members_path(group)
 
-      click_link 'Pending'
+      click_link 'Invited'
 
       page.within '.pagination' do
         click_link '2'
       end
     end
 
-    it_behaves_like 'active "Pending" tab'
+    it_behaves_like 'active "Invited" tab'
 
     context 'and then using "Members" pagination' do
       before do

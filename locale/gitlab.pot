@@ -13225,6 +13225,9 @@ msgstr ""
 msgid "Invite teammates (optional)"
 msgstr ""
 
+msgid "Invited"
+msgstr ""
+
 msgid "Invited users will be added with developer level permissions. You can always change this later."
 msgstr ""
 
@@ -14831,6 +14834,9 @@ msgstr ""
 msgid "Members can be added by project %{i_open}Maintainers%{i_close} or %{i_open}Owners%{i_close}"
 msgstr ""
 
+msgid "Members invited to %{strong_start}%{group_name}%{strong_end}"
+msgstr ""
+
 msgid "Members of %{strong_open}%{project_name}%{strong_close}"
 msgstr ""
 
@@ -14838,9 +14844,6 @@ msgid "Members of a group may only view projects they have permission to access"
 msgstr ""
 
 msgid "Members with access to %{strong_start}%{group_name}%{strong_end}"
-msgstr ""
-
-msgid "Members with pending access to %{strong_start}%{group_name}%{strong_end}"
 msgstr ""
 
 msgid "Memory Usage"

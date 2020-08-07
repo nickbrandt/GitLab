@@ -2,7 +2,7 @@
 - can_manage_members = can?(current_user, :admin_group_member, @group)
 - show_invited_members = can_manage_members && @invited_members.exists?
 - show_access_requests = can_manage_members && @requesters.exists?
-- pending_active = params[:search_invited].present? || params[:invited_members_page].present?
+- invited_active = params[:search_invited].present? || params[:invited_members_page].present?
 
 - form_item_label_css_class = 'label-bold gl-mr-2 gl-mb-0 gl-py-2 align-self-md-center'
 
@@ -27,7 +27,7 @@
 
   %ul.nav-links.mobile-separator.nav.nav-tabs
     %li.nav-item
-      = link_to "#tab-members", class: ["nav-link", ("active" unless pending_active)] , 'data-toggle': 'tab' do
+      = link_to "#tab-members", class: ["nav-link", ("active" unless invited_active)] , 'data-toggle': 'tab' do
         %span
           = _("Members")
         %span.badge.badge-pill= @members.total_count
@@ -39,9 +39,9 @@
           %span.badge.badge-pill= @group.shared_with_group_links.count
     - if show_invited_members
       %li.nav-item
-        = link_to "#tab-pending-members", class: ["nav-link", ("active" if pending_active)], 'data-toggle': 'tab' do
+        = link_to "#tab-invited-members", class: ["nav-link", ("active" if invited_active)], 'data-toggle': 'tab' do
           %span
-            = _("Pending")
+            = _("Invited")
           %span.badge.badge-pill= @invited_members.total_count
     - if show_access_requests
       %li.nav-item
@@ -50,7 +50,7 @@
             = _("Access requests")
           %span.badge.badge-pill= @requesters.count
   .tab-content
-    #tab-members.tab-pane{ class: ("active" unless pending_active) }
+    #tab-members.tab-pane{ class: ("active" unless invited_active) }
       .card.card-without-border
         = render 'groups/group_members/tab_pane/header' do
           = render 'groups/group_members/tab_pane/title' do
@@ -79,11 +79,11 @@
             - @group.shared_with_group_links.each do |group_link|
               = render 'shared/members/group', group_link: group_link, can_admin_member: can_manage_members, group_link_path: group_group_link_path(@group, group_link)
     - if show_invited_members
-      #tab-pending-members.tab-pane{ class: ("active" if pending_active) }
+      #tab-invited-members.tab-pane{ class: ("active" if invited_active) }
         .card.card-without-border
           = render 'groups/group_members/tab_pane/header' do
             = render 'groups/group_members/tab_pane/title' do
-              = html_escape(_("Members with pending access to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
+              = html_escape(_("Members invited to %{strong_start}%{group_name}%{strong_end}")) % { group_name: @group.name, strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe }
             = form_tag group_group_members_path(@group), method: :get, class: 'user-search-form', data: { testid: 'user-search-form' } do
               = render 'shared/members/search_field', name: 'search_invited'
           %ul.content-list.members-list
