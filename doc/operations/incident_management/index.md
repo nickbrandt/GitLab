@@ -16,9 +16,7 @@ GitLab offers solutions for handling incidents in your applications and services
 such as [setting up Prometheus alerts](#configure-prometheus-alerts),
 [displaying metrics](#embed-metrics-in-incidents-and-issues), and sending notifications.
 While no configuration is required to use the [manual features](#create-an-incident-manually)
-of incident management, both automation and [configuration](#configure-incidents-ultimate)
-of incident management are only available in
-[GitLab Ultimate and GitLab.com Gold](https://about.gitlab.com/pricing/).
+of incident management, some simple [configuration](#configure-incidents) is needed to automate incident creation.
 
 For users with at least Developer [permissions](../../user/permissions.md), the
 Incident Management list is available at **Operations > Incidents**
@@ -315,7 +313,7 @@ You can be alerted via a Slack message when a new alert has been received.
 
 See the [Slack Notifications Service docs](../../user/project/integrations/slack.md) for information on how to set this up.
 
-## Configure incidents **(ULTIMATE)**
+## Configure incidents
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/4925) in GitLab Ultimate 11.11.
 
@@ -353,7 +351,7 @@ sends these emails to [owners and maintainers](../../user/permissions.md) of the
 These emails contain details of the alert, and a link for more information.
 
 To send separate email notifications to users with
-[Developer permissions](../../user/permissions.md), see [Configure incidents](#configure-incidents-ultimate).
+[Developer permissions](../../user/permissions.md), see [Configure incidents](#configure-incidents).
 
 ## Create an incident manually
 
