@@ -90,12 +90,14 @@ export default {
     };
   },
   computed: {
+    iteration() {
+      return this.iterations.find(({ id }) => id === this.currentIteration);
+    },
     iterationTitle() {
-      // NOTE: Optional chaining guards when search result is empty
-      return this.iterations.find(({ id }) => id === this.currentIteration)?.title;
+      return this.iteration?.title;
     },
     iterationUrl() {
-      return this.iterations.find(({ id }) => id === this.currentIteration)?.webUrl;
+      return this.iteration?.webUrl;
     },
     showNoIterationContent() {
       return !this.editing && !this.currentIteration;
