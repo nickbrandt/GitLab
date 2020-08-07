@@ -266,16 +266,16 @@ If the artifacts were deleted successfully, a response with status `204 No Conte
 
 ## Delete artifacts in bulk
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/TODO:) in GitLab 13.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/223793) in GitLab 13.3.
 
-Delete all artifacts from project's jobs.
+Delete all artifacts from all of a project's jobs.
 
 ```plaintext
 DELETE /projects/:id/artifacts
 ```
 
-| Attribute | Type           | Required | Description                                                                                                      |
-|-----------|----------------|----------|------------------------------------------------------------------------------------------------------------------|
+| Attribute | Type           | Required | Description                                                                 |
+|-----------|----------------|----------|-----------------------------------------------------------------------------|
 | `id`      | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 Example request:
@@ -285,7 +285,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://git
 ```
 
 NOTE: **Note:**
-At least Maintainer role is required to delete artifacts.
+At least Maintainer [permissions](../user/permissions.md) are required to delete artifacts.
 
 A response with status `202 Accepted` is returned.
-This operation is executed asynchronously and it might take time to get executed.
+This operation executes asynchronously and might take time to complete.
