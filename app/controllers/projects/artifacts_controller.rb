@@ -108,7 +108,9 @@ class Projects::ArtifactsController < Projects::ApplicationController
   end
 
   def validate_artifacts!
-    render_404 unless build&.artifacts?
+    if build.nil? || build.artifacts_file.nil? || (build.pipeline.unlocked? && build.artifacts_expired?)
+      render_404
+    end
   end
 
   def build
