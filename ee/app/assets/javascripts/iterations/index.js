@@ -51,7 +51,7 @@ export function initIterationForm() {
 export function initIterationReport() {
   const el = document.querySelector('.js-iteration');
 
-  const { groupPath, iterationIid, editIterationPath } = el.dataset;
+  const { fullPath, iterationIid, editIterationPath } = el.dataset;
   const canEdit = parseBoolean(el.dataset.canEdit);
 
   return new Vue({
@@ -60,7 +60,7 @@ export function initIterationReport() {
     render(createElement) {
       return createElement(IterationReport, {
         props: {
-          groupPath,
+          fullPath,
           iterationIid,
           canEdit,
           editIterationPath,

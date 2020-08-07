@@ -56,6 +56,11 @@ module BillingPlansHelper
     end
   end
 
+  def show_contact_sales_button?(purchase_link_action)
+    experiment_enabled?(:contact_sales_btn_in_app) &&
+      purchase_link_action == 'upgrade'
+  end
+
   def plan_feature_short_list(plan)
     return [] unless plan.features
 

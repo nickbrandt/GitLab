@@ -49,6 +49,8 @@ exports[`MergeRequestsGrid component when intialized matches the snapshot 1`] = 
         approvers=""
       />
        
+      <!---->
+       
       <span
         class="gl-text-gray-700"
       >
@@ -81,6 +83,8 @@ exports[`MergeRequestsGrid component when intialized matches the snapshot 1`] = 
       <approvers-stub
         approvers=""
       />
+       
+      <!---->
        
       <span
         class="gl-text-gray-700"

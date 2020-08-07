@@ -78,6 +78,12 @@ RSpec.describe Vulnerabilities::ProjectsGrade do
     subject(:projects) { projects_grade.projects }
 
     it { is_expected.to match_array(expected_projects) }
+
+    it 'preloads vulnerability statistic once for whole collection' do
+      control_count = ActiveRecord::QueryRecorder.new { described_class.new(group, 1, [project_3.id]).projects.map(&:vulnerability_statistic) }.count
+
+      expect { described_class.new(group, 1, [project_3.id, project_4.id]).projects.map(&:vulnerability_statistic) }.not_to exceed_query_limit(control_count)
+    end
   end
 
   describe '#count' do
