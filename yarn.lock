@@ -848,9 +848,9 @@
   resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.157.0.tgz#ada33c2b706836a2f5baa2c539f1348791d74859"
   integrity sha512-H07Rn4Cy2QW+wnadvuFBSIWrtn8l4hGFLn62f1fT0iYZy58zb/q5/FsShxk9cSKnZYNkXp8I4Nnk/4R7y1MEOw==
 
-"@gitlab/ui@https://gitlab.com/gitlab-org/gitlab-ui/-/jobs/676438516/artifacts/raw/gitlab-ui.1623-tertiary-borderless-category.tgz":
+"@gitlab/ui@https://gitlab.com/gitlab-org/gitlab-ui/-/jobs/676494995/artifacts/raw/gitlab-ui.1623-tertiary-borderless-category.tgz":
   version "18.2.0"
-  resolved "https://gitlab.com/gitlab-org/gitlab-ui/-/jobs/676438516/artifacts/raw/gitlab-ui.1623-tertiary-borderless-category.tgz#5ec2b508734ecbf524df336ea80960852cfa5a91"
+  resolved "https://gitlab.com/gitlab-org/gitlab-ui/-/jobs/676494995/artifacts/raw/gitlab-ui.1623-tertiary-borderless-category.tgz#36f355be73a80398ed6de20aef96318e5b468a31"
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.3.0"
