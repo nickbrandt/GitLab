@@ -16,6 +16,14 @@ module Gitlab
 
     API_SCOPE = 'geo_api'
 
+    # TODO: Avoid having to maintain a list. Discussions related to possible
+    # solutions can be found at
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/227693
+    REPLICATOR_CLASSES = [
+        ::Geo::PackageFileReplicator,
+        ::Geo::TerraformStateReplicator
+    ].freeze
+
     def self.current_node
       self.cache_value(:current_node, as: GeoNode) { GeoNode.current_node }
     end
@@ -158,16 +166,8 @@ module Gitlab
       _(template) % { url: url }
     end
 
-    # TODO: Avoid having to maintain a list. Discussions related to possible
-    # solutions can be found at
-    # https://gitlab.com/gitlab-org/gitlab/-/issues/227693
     def self.replicator_classes
-      classes = [
-          ::Geo::PackageFileReplicator,
-          ::Geo::TerraformStateReplicator
-      ]
-
-      classes.select(&:enabled?)
+      REPLICATOR_CLASSES.select(&:enabled?)
     end
   end
 end

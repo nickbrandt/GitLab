@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe GeoNodeStatus, :geo do
   include ::EE::GeoHelpers
+  using RSpec::Parameterized::TableSyntax
 
   let!(:primary) { create(:geo_node, :primary) }
   let!(:secondary) { create(:geo_node) }
@@ -1145,84 +1146,100 @@ RSpec.describe GeoNodeStatus, :geo do
     end
   end
 
-  describe '#package_files_checksummed_count' do
-    before do
-      stub_current_geo_node(primary)
-    end
-
-    it 'returns the right number of checksummed package files' do
-      create(:package_file, :jar, :checksummed)
-      create(:package_file, :jar, :checksummed)
-      create(:package_file, :jar, :checksum_failure)
-
-      expect(subject.package_files_checksummed_count).to eq(2)
-    end
+  where(:replicator, :model_factory, :registry_factory) do
+    Geo::PackageFileReplicator | :package_file | :geo_package_file_registry
+    Geo::TerraformStateReplicator | :terraform_state | :geo_terraform_state_registry
   end
 
-  describe '#package_files_checksum_failed_count' do
-    before do
-      stub_current_geo_node(primary)
-    end
+  with_them do
+    let(:replicable_name) { replicator.replicable_name_plural }
+    let(:checksummed_count_method) { "#{replicable_name}_checksummed_count" }
+    let(:checksum_failed_count_method) { "#{replicable_name}_checksum_failed_count" }
+    let(:checksummed_in_percentage_method) { "#{replicable_name}_checksummed_in_percentage" }
+    let(:registry_count_method) { "#{replicable_name}_registry_count" }
+    let(:failed_count_method) { "#{replicable_name}_failed_count" }
+    let(:synced_count_method) { "#{replicable_name}_synced_count" }
+    let(:synced_in_percentage_method) { "#{replicable_name}_synced_in_percentage" }
 
-    it 'returns the right number of failed package files' do
-      create(:package_file, :jar, :checksummed)
-      create(:package_file, :jar, :checksum_failure)
-      create(:package_file, :jar, :checksum_failure)
-
-      expect(subject.package_files_checksum_failed_count).to eq(2)
-    end
-  end
-
-  describe '#package_files_checksummed_in_percentage' do
-    before do
-      stub_current_geo_node(primary)
-    end
-
-    it 'returns 0 when no package files available' do
-      expect(subject.package_files_checksummed_in_percentage).to eq(0)
-    end
-
-    it 'returns the right percentage' do
-      create(:package_file, :jar, :checksummed)
-      create(:package_file, :jar, :checksummed)
-      create(:package_file, :jar, :checksummed)
-      create(:package_file, :jar, :checksum_failure)
-
-      expect(subject.package_files_checksummed_in_percentage).to be_within(0.0001).of(75)
-    end
-  end
-
-  describe 'package files secondary counters' do
-    context 'when package registries available' do
+    describe '#<replicable_name>_checksummed_count' do
       before do
-        create(:geo_package_file_registry, :failed)
-        create(:geo_package_file_registry, :failed)
-        create(:geo_package_file_registry, :synced)
+        stub_current_geo_node(primary)
       end
 
-      it 'returns the right number of repos in registry' do
-        expect(subject.package_files_registry_count).to eq(3)
-      end
+      it 'returns the right number of checksummed replicables' do
+        create(model_factory, :checksummed)
+        create(model_factory, :checksummed)
+        create(model_factory, :checksum_failure)
 
-      it 'returns the right number of failed and synced repos' do
-        expect(subject.package_files_failed_count).to eq(2)
-        expect(subject.package_files_synced_count).to eq(1)
-      end
-
-      it 'returns the percent of synced package files' do
-        expect(subject.package_files_synced_in_percentage).to be_within(0.01).of(33.33)
+        expect(subject.send(checksummed_count_method)).to eq(2)
       end
     end
 
-    context 'when no package registries available' do
-      it 'returns 0' do
-        expect(subject.package_files_registry_count).to eq(0)
-        expect(subject.package_files_failed_count).to eq(0)
-        expect(subject.package_files_synced_count).to eq(0)
+    describe '#<replicable_name>_checksum_failed_count' do
+      before do
+        stub_current_geo_node(primary)
       end
 
-      it 'returns 0' do
-        expect(subject.package_files_synced_in_percentage).to eq(0)
+      it 'returns the right number of failed replicables' do
+        create(model_factory, :checksummed)
+        create(model_factory, :checksum_failure)
+        create(model_factory, :checksum_failure)
+
+        expect(subject.send(checksum_failed_count_method)).to eq(2)
+      end
+    end
+
+    describe '#<replicable_name>_checksummed_in_percentage' do
+      before do
+        stub_current_geo_node(primary)
+      end
+
+      it 'returns 0 when no replicables available' do
+        expect(subject.send(checksummed_in_percentage_method)).to eq(0)
+      end
+
+      it 'returns the right percentage' do
+        create(model_factory, :checksummed)
+        create(model_factory, :checksummed)
+        create(model_factory, :checksummed)
+        create(model_factory, :checksum_failure)
+
+        expect(subject.send(checksummed_in_percentage_method)).to be_within(0.0001).of(75)
+      end
+    end
+
+    describe '#<replicable_name>_[registry|synced|failed]_count' do
+      context 'when package registries available' do
+        before do
+          create(registry_factory, :failed)
+          create(registry_factory, :failed)
+          create(registry_factory, :synced)
+        end
+
+        it 'returns the right number of repos in registry' do
+          expect(subject.send(registry_count_method)).to eq(3)
+        end
+
+        it 'returns the right number of failed and synced repos' do
+          expect(subject.send(failed_count_method)).to eq(2)
+          expect(subject.send(synced_count_method)).to eq(1)
+        end
+
+        it 'returns the percent of synced replicables' do
+          expect(subject.send(synced_in_percentage_method)).to be_within(0.01).of(33.33)
+        end
+      end
+
+      context 'when no package registries available' do
+        it 'returns 0' do
+          expect(subject.send(registry_count_method)).to eq(0)
+          expect(subject.send(failed_count_method)).to eq(0)
+          expect(subject.send(synced_count_method)).to eq(0)
+        end
+
+        it 'returns 0' do
+          expect(subject.send(synced_in_percentage_method)).to eq(0)
+        end
       end
     end
   end
