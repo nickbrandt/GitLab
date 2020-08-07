@@ -99,7 +99,7 @@ RSpec.describe 'Billing plan pages', :feature do
       let(:plan) { free_plan }
 
       let!(:subscription) do
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: nil, seats: 15)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
       end
 
       before do
