@@ -18,10 +18,6 @@ module API
       expose :approved_by, using: ::API::Entities::Approvals do |merge_request|
         merge_request.approvals
       end
-
-      expose :commented_by, using: ::API::Entities::Approvals do |merge_request|
-        []
-      end
     end
   end
 end
