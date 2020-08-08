@@ -7,7 +7,7 @@ push/pull and Git archive downloads.
 ## Quick facts (how does Workhorse work)
 
 -   Workhorse can handle some requests without involving Rails at all:
-    for example, Javascript files and CSS files are served straight
+    for example, JavaScript files and CSS files are served straight
     from disk.
 -   Workhorse can modify responses sent by Rails: for example if you use
     `send_file` in Rails then gitlab-workhorse will open the file on
@@ -216,8 +216,8 @@ images. If you installed GitLab:
 
 GitLab-Workhorse supports remote error tracking with
 [Sentry](https://sentry.io). To enable this feature set the
-GITLAB_WORKHORSE_SENTRY_DSN environment variable.
-You can also set the GITLAB_WORKHORSE_SENTRY_ENVIRONMENT environment variable to
+`GITLAB_WORKHORSE_SENTRY_DSN` environment variable.
+You can also set the `GITLAB_WORKHORSE_SENTRY_ENVIRONMENT` environment variable to
 use the Sentry environment functionality to separate staging, production and
 development.
 
@@ -301,7 +301,7 @@ More information about see the [LabKit monitoring docs](https://gitlab.com/gitla
 
 ## License
 
-This code is distributed under the MIT license, see the LICENSE file.
+This code is distributed under the MIT license, see the [LICENSE](LICENSE) file.
 
 [brief-history-blog]: https://about.gitlab.com/2016/04/12/a-brief-history-of-gitlab-workhorse/
 [LabKit]: https://gitlab.com/gitlab-org/labkit/
