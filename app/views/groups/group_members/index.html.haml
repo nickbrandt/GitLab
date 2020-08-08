@@ -33,7 +33,7 @@
         %span.badge.badge-pill= @members.total_count
     - if @group.shared_with_group_links.any?
       %li.nav-item
-        = link_to '#tab-groups', class: ['nav-link'] , data: { toggle: 'tab' } do
+        = link_to '#tab-groups', class: ['nav-link'] , data: { toggle: 'tab', qa_selector: 'groups_list_tab' } do
           %span
             = _('Groups')
           %span.badge.badge-pill= @group.shared_with_group_links.count
