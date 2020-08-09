@@ -61,7 +61,7 @@ click of a button:
 
 When an editor submits their changes, in the background, GitLab automatically
 creates a new branch, commits their changes, and opens a merge request. The
-editor will land directly on the merge request, and then they can assign it to
+editor lands directly on the merge request, and then they can assign it to
 a colleague for review.
 
 ## Getting started
