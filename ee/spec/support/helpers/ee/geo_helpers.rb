@@ -30,7 +30,7 @@ module EE
     end
 
     def stub_healthy_shards(shards)
-      ::Gitlab::ShardHealthCache.update(Array(shards))
+      ::Gitlab::ShardHealthCache.update!(Array(shards))
     end
 
     def create_project_on_shard(shard_name)

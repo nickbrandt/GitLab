@@ -37,7 +37,7 @@ module StubObjectStorage
     Fog.mock!
 
     ::Fog::Storage.new(connection_params).tap do |connection|
-      connection.directories.create(key: remote_directory)
+      connection.directories.create!(key: remote_directory)
 
       # Cleanup remaining files
       connection.directories.each do |directory|
