@@ -48,16 +48,16 @@ uses the popular open source tool [OWASP Zed Attack Proxy](https://www.zaproxy.o
 to perform an analysis on your running web application.
 
 By default, DAST executes [ZAP Baseline Scan](https://www.zaproxy.org/docs/docker/baseline-scan/)
-and performs passive scanning only. It won't actively attack your application.
+and performs passive scanning only. It doesn't actively attack your application.
 However, DAST can be [configured](#full-scan)
 to also perform an *active scan*: attack your application and produce a more extensive security report.
 It can be very useful combined with [Review Apps](../../../ci/review_apps/index.md).
 
 NOTE: **Note:**
 A pipeline may consist of multiple jobs, including SAST and DAST scanning. If any
-job fails to finish for any reason, the security dashboard won't show DAST scanner
+job fails to finish for any reason, the security dashboard doesn't show DAST scanner
 output. For example, if the DAST job finishes but the SAST job fails, the security
-dashboard won't show DAST results. The analyzer will output an
+dashboard doesn't show DAST results. The analyzer outputs an
 [exit code](../../../development/integrations/secure.md#exit-code) on failure.
 
 ## Use cases
