@@ -1,0 +1,5 @@
+---
+title: Fix HTTP Range Requests not working on some S3 providers
+merge_request: 549
+author:
+type: fixed
