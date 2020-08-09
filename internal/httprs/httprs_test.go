@@ -37,7 +37,7 @@ func (f *fakeResponseWriter) WriteHeader(code int) {
 }
 
 func (f *fakeResponseWriter) Response() *http.Response {
-	f.tmp.Seek(0, os.SEEK_SET)
+	f.tmp.Seek(0, io.SeekStart)
 	return &http.Response{Body: f.tmp, StatusCode: f.code, Header: f.h}
 }
 
@@ -167,7 +167,7 @@ func testHttpReaderSeeker(t *testing.T, newRS RSFactory) {
 			r := newRS()
 			So(r, ShouldNotBeNil)
 			defer r.Close()
-			s, err := r.Seek(4*64, os.SEEK_SET)
+			s, err := r.Seek(4*64, io.SeekStart)
 			So(s, ShouldEqual, 4*64)
 			So(err, ShouldBeNil)
 			buf := make([]byte, 4)
