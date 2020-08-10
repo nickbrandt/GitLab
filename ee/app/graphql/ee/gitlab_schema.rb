@@ -6,6 +6,7 @@ module EE
 
     prepended do
       lazy_resolve ::Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate, :epic_aggregate
+      lazy_resolve ::Gitlab::Graphql::Aggregations::Vulnerabilities::LazyUserNotesCountAggregate, :user_notes_count_aggregate
     end
   end
 end
