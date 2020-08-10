@@ -39,11 +39,13 @@ type S3Credentials struct {
 }
 
 type S3Config struct {
-	Region        string `toml:"-"`
-	Bucket        string `toml:"-"`
-	PathStyle     bool   `toml:"-"`
-	Endpoint      string `toml:"-"`
-	UseIamProfile bool   `toml:"-"`
+	Region               string `toml:"-"`
+	Bucket               string `toml:"-"`
+	PathStyle            bool   `toml:"-"`
+	Endpoint             string `toml:"-"`
+	UseIamProfile        bool   `toml:"-"`
+	ServerSideEncryption string `toml:"-"` // Server-side encryption mode (e.g. AES256, aws:kms)
+	SSEKMSKeyID          string `toml:"-"` // Server-side encryption key-management service key ID (e.g. arn:aws:xxx)
 }
 
 type RedisConfig struct {

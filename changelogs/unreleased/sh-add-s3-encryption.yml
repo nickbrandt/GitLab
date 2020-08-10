@@ -1,0 +1,5 @@
+---
+title: Add support for AWS S3 Server Side Encryption (SSE-KMS)
+merge_request: 537
+author:
+type: added
