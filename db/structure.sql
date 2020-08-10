@@ -10058,6 +10058,7 @@ CREATE TABLE public.ci_pipeline_artifacts (
     file_type smallint NOT NULL,
     file_format smallint NOT NULL,
     file text,
+    expire_at timestamp with time zone,
     CONSTRAINT check_191b5850ec CHECK ((char_length(file) <= 255))
 );
 
