@@ -1,5 +1,18 @@
 # Changelog for gitlab-workhorse
 
+## v8.38.0
+
+### Added
+- Added configuration option PropagateCorrelationID
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/529
+  Contributed by Mahmoud Rahbar Azad
+- Add support for AWS S3 Server Side Encryption (SSE-KMS)
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/537
+
+### Changed
+- Drop Go v1.12 support
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/532
+
 ## v8.37.0
 
 - No changes.
