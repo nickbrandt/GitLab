@@ -32,7 +32,12 @@ export default {
     };
   },
   computed: {
-    ...mapState(LICENSE_MANAGEMENT, ['managedLicenses', 'isLoadingManagedLicenses', 'isAdmin']),
+    ...mapState(LICENSE_MANAGEMENT, [
+      'managedLicenses',
+      'isLoadingManagedLicenses',
+      'isAdmin',
+      'knownLicenses',
+    ]),
     ...mapGetters(LICENSE_MANAGEMENT, [
       'isLicenseBeingUpdated',
       'hasPendingLicenses',
@@ -143,6 +148,7 @@ export default {
         <div v-if="formIsOpen" class="gl-mt-3 gl-mb-3">
           <add-license-form
             :managed-licenses="managedLicenses"
+            :known-licenses="knownLicenses"
             :loading="isAddingNewLicense"
             @addLicense="setLicenseApproval"
             @closeForm="closeAddLicenseForm"
