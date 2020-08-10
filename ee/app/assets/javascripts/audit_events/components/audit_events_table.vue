@@ -91,7 +91,7 @@ export default {
 
 <template>
   <div class="audit-log-table" data-testid="audit-events-table" :data-qa-selector="qaSelector">
-    <gl-table class="mt-3" :fields="$options.fields" :items="events" show-empty>
+    <gl-table class="gl-mt-5" :fields="$options.fields" :items="events" show-empty stacked="md">
       <template #cell(author)="{ value: { url, name } }">
         <url-table-cell :url="url" :name="name" />
       </template>
