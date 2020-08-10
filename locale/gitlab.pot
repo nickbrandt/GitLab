@@ -17386,7 +17386,7 @@ msgstr ""
 msgid "Password successfully changed"
 msgstr ""
 
-msgid "Password was successfully updated. Please login with it"
+msgid "Password was successfully updated. Please sign in again."
 msgstr ""
 
 msgid "Passwords should be unique and not used for any other sites or services."
