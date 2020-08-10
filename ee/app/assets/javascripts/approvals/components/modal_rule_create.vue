@@ -1,4 +1,5 @@
 <script>
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState } from 'vuex';
 import { __ } from '~/locale';
 import GlModalVuex from '~/vue_shared/components/gl_modal_vuex.vue';
@@ -9,6 +10,8 @@ export default {
     GlModalVuex,
     RuleForm,
   },
+  // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+  mixins: [glFeatureFlagsMixin()],
   props: {
     modalId: {
       type: String,
@@ -23,14 +26,23 @@ export default {
   computed: {
     ...mapState('createModal', {
       rule(state) {
-        /*
-         * rule-form component expects undefined if we pre-populate the form input,
-         * otherwise populate with existing rule
-         */
-        return state.data?.initRuleField ? undefined : state.data;
+        // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+        if (this.isApprovalSuggestionsEnabled) {
+          /*
+           * rule-form component expects undefined if we pre-populate the form input,
+           * otherwise populate with existing rule
+           */
+          return state.data?.initRuleField ? undefined : state.data;
+        } 
+          return state.data;
+        
       },
       originalData: 'data',
     }),
+    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+    isApprovalSuggestionsEnabled() {
+      return Boolean(this.glFeatures.approvalSuggestions);
+    },
     initRuleFieldName() {
       return this.originalData?.initRuleField && this.originalData?.name
         ? this.originalData.name
@@ -59,11 +71,14 @@ export default {
     size="sm"
     @ok.prevent="submit"
   >
+    <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114 -->
     <rule-form
+      v-if="isApprovalSuggestionsEnabled"
       ref="form"
       :init-rule="rule"
       :is-mr-edit="isMrEdit"
       :init-rule-field-name="initRuleFieldName"
     />
+    <rule-form v-else ref="form" :init-rule="rule" :is-mr-edit="isMrEdit" />
   </gl-modal-vuex>
 </template>

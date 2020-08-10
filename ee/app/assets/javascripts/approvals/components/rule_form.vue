@@ -1,4 +1,5 @@
 <script>
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapActions } from 'vuex';
 import { groupBy, isNumber } from 'lodash';
 import { sprintf, __ } from '~/locale';
@@ -18,6 +19,8 @@ export default {
     ApproversSelect,
     BranchesSelect,
   },
+  // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+  mixins: [glFeatureFlagsMixin()],
   props: {
     initRule: {
       type: Object,
@@ -36,22 +39,44 @@ export default {
     },
   },
   data() {
-    return {
-      name: this.initRuleFieldName,
-      approvalsRequired: 1,
-      minApprovalsRequired: 0,
-      approvers: [],
-      approversToAdd: [],
-      branches: [],
-      branchesToAdd: [],
-      showValidation: false,
-      isFallback: false,
-      containsHiddenGroups: false,
-      ...this.getInitialData(),
-    };
+    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+    // Computed props not yet initilized can't use isApprovalSuggestionsEnabled
+    if (this.glFeatures.approvalSuggestions) {
+      return {
+        name: this.initRuleFieldName,
+        approvalsRequired: 1,
+        minApprovalsRequired: 0,
+        approvers: [],
+        approversToAdd: [],
+        branches: [],
+        branchesToAdd: [],
+        showValidation: false,
+        isFallback: false,
+        containsHiddenGroups: false,
+        ...this.getInitialData(),
+      };
+    } 
+      return {
+        name: '',
+        approvalsRequired: 1,
+        minApprovalsRequired: 0,
+        approvers: [],
+        approversToAdd: [],
+        branches: [],
+        branchesToAdd: [],
+        showValidation: false,
+        isFallback: false,
+        containsHiddenGroups: false,
+        ...this.getInitialData(),
+      };
+    
   },
   computed: {
     ...mapState(['settings']),
+    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+    isApprovalSuggestionsEnabled() {
+      return Boolean(this.glFeatures.approvalSuggestions);
+    },
     approversByType() {
       return groupBy(this.approvers, x => x.type);
     },
@@ -138,9 +163,14 @@ export default {
       return !this.settings.lockedApprovalsRuleName;
     },
     isNameDisabled() {
-      return (
-        Boolean(this.isPersisted || this.initRuleFieldName) && READONLY_NAMES.includes(this.name)
-      );
+      // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+      if (this.isApprovalSuggestionsEnabled) {
+        return (
+          Boolean(this.isPersisted || this.initRuleFieldName) && READONLY_NAMES.includes(this.name)
+        );
+      } 
+        return this.isPersisted && READONLY_NAMES.includes(this.name);
+      
     },
     removeHiddenGroups() {
       return this.containsHiddenGroups && !this.approversByType[TYPE_HIDDEN_GROUPS];

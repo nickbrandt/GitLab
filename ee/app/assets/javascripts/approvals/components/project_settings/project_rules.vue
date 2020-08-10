@@ -1,4 +1,5 @@
 <script>
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapActions } from 'vuex';
 import { __, n__, sprintf } from '~/locale';
 import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR } from '../../constants';
@@ -20,6 +21,8 @@ export default {
     RuleBranches,
     UnconfiguredSecurityRule,
   },
+  // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+  mixins: [glFeatureFlagsMixin()],
   inject: {
     securityConfigurationPath: {
       type: String,
@@ -84,6 +87,10 @@ export default {
         },
       ];
     },
+    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+    isApprovalSuggestionsEnabled() {
+      return Boolean(this.glFeatures.approvalSuggestions);
+    },
   },
   watch: {
     rules: {
@@ -99,8 +106,11 @@ export default {
     },
   },
   mounted() {
-    this.setSecurityConfigurationEndpoint(this.securityConfigurationPath);
-    this.fetchSecurityConfiguration();
+    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+    if (this.isApprovalSuggestionsEnabled) {
+      this.setSecurityConfigurationEndpoint(this.securityConfigurationPath);
+      this.fetchSecurityConfiguration();
+    }
   },
   methods: {
     ...mapActions(['addEmptyRule']),
@@ -193,15 +203,18 @@ export default {
         </tr>
       </template>
 
-      <unconfigured-security-rule
-        v-for="securityRule in securityRules"
-        :key="securityRule.name"
-        :configuration="configuration"
-        :rules="rules"
-        :is-loading="isRulesLoading"
-        :match-rule="securityRule"
-        @enable-btn-clicked="openCreateModal({ name: securityRule.name, initRuleField: true })"
-      />
+      <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114 -->
+      <template v-if="isApprovalSuggestionsEnabled">
+        <unconfigured-security-rule
+          v-for="securityRule in securityRules"
+          :key="securityRule.name"
+          :configuration="configuration"
+          :rules="rules"
+          :is-loading="isRulesLoading"
+          :match-rule="securityRule"
+          @enable-btn-clicked="openCreateModal({ name: securityRule.name, initRuleField: true })"
+        />
+      </template>
     </template>
   </rules>
 </template>

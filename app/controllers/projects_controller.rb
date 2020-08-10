@@ -35,10 +35,11 @@ class ProjectsController < Projects::ApplicationController
   before_action :export_rate_limit, only: [:export, :download_export, :generate_new_export]
 
   # Experiments
-  before_action only: [:new, :create] do
+  before_action only: [:new, :create, :edit] do
     frontend_experimentation_tracking_data(:new_create_project_ui, 'click_tab')
     push_frontend_feature_flag(:new_create_project_ui) if experiment_enabled?(:new_create_project_ui)
     push_frontend_feature_flag(:service_desk_custom_address, @project)
+    push_frontend_feature_flag(:approval_suggestions, project)
   end
 
   layout :determine_layout
