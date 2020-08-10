@@ -4748,7 +4748,7 @@ msgstr ""
 msgid "Choose visibility level, enable/disable project features (issues, repository, wiki, snippets) and set permissions."
 msgstr ""
 
-msgid "Choose what content you want to see on a group’s overview page"
+msgid "Choose what content you want to see on a group’s overview page."
 msgstr ""
 
 msgid "Choose which repositories you want to connect and run CI/CD pipelines."
@@ -18049,13 +18049,13 @@ msgstr ""
 msgid "Preferences|Choose what content you want to see on a project’s overview page."
 msgstr ""
 
+msgid "Preferences|Choose what content you want to see on your homepage."
+msgstr ""
+
 msgid "Preferences|Customize integrations with third party services."
 msgstr ""
 
 msgid "Preferences|Customize the appearance of the application header and navigation sidebar."
-msgstr ""
-
-msgid "Preferences|Default dashboard"
 msgstr ""
 
 msgid "Preferences|Display time in 24-hour format"
@@ -18065,6 +18065,9 @@ msgid "Preferences|Enable integrated code intelligence on code views"
 msgstr ""
 
 msgid "Preferences|For example: 30 mins ago."
+msgstr ""
+
+msgid "Preferences|Homepage content"
 msgstr ""
 
 msgid "Preferences|Instead of all the files changed, show only one file at a time. To switch between files, use the file browser."
