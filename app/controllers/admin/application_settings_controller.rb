@@ -32,12 +32,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   end
 
   def integrations
-    if Feature.enabled?(:instance_level_integrations)
-      @integrations = Service.find_or_initialize_instances.sort_by(&:title)
-    else
-      set_application_setting
-      perform_update if submitted?
-    end
+    @integrations = Service.find_or_initialize_instances.sort_by(&:title)
   end
 
   def update
