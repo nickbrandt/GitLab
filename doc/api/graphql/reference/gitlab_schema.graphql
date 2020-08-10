@@ -13739,9 +13739,9 @@ type Snippet implements Noteable {
   author: User
 
   """
-  Snippet blob
+  Snippet blob. Deprecated in 13.3: Use `blobs`
   """
-  blob: SnippetBlob!
+  blob: SnippetBlob! @deprecated(reason: "Use `blobs`. Deprecated in 13.3")
 
   """
   Snippet blobs
