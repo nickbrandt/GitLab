@@ -29042,6 +29042,9 @@ msgstr ""
 msgid "mrWidget|An error occurred while submitting your approval."
 msgstr ""
 
+msgid "mrWidget|Approval is optional"
+msgstr ""
+
 msgid "mrWidget|Approval password is invalid."
 msgstr ""
 
@@ -29148,12 +29151,6 @@ msgid "mrWidget|Merged by"
 msgstr ""
 
 msgid "mrWidget|More information"
-msgstr ""
-
-msgid "mrWidget|No approval required"
-msgstr ""
-
-msgid "mrWidget|No approval required; you can still approve"
 msgstr ""
 
 msgid "mrWidget|Open in Web IDE"
