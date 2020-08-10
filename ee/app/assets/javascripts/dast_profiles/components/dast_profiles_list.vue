@@ -1,8 +1,10 @@
 <script>
+import { uniqueId } from 'lodash';
 import {
   GlAlert,
   GlButton,
   GlIcon,
+  GlModal,
   GlSkeletonLoader,
   GlTable,
   GlTooltipDirective,
@@ -13,6 +15,7 @@ export default {
     GlAlert,
     GlButton,
     GlIcon,
+    GlModal,
     GlSkeletonLoader,
     GlTable,
   },
@@ -24,10 +27,15 @@ export default {
       type: Array,
       required: true,
     },
-    hasError: {
-      type: Boolean,
+    errorMessage: {
+      type: String,
       required: false,
-      default: false,
+      default: '',
+    },
+    errorDetails: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
     isLoading: {
       type: Boolean,
@@ -46,10 +54,16 @@ export default {
   },
   data() {
     return {
-      isErrorDismissed: false,
+      toBeDeletedProfileId: null,
     };
   },
   computed: {
+    hasError() {
+      return this.errorMessage !== '';
+    },
+    hasErrorDetails() {
+      return this.errorDetails.length > 0;
+    },
     hasProfiles() {
       return this.profiles.length > 0;
     },
@@ -58,6 +72,21 @@ export default {
     },
     shouldShowTable() {
       return this.isLoadingInitialProfiles || this.hasProfiles || this.hasError;
+    },
+    modalId() {
+      return `dast-profiles-list-${uniqueId()}`;
+    },
+  },
+  methods: {
+    handleDelete() {
+      this.$emit('deleteProfile', this.toBeDeletedProfileId);
+    },
+    prepareProfileDeletion(profileId) {
+      this.toBeDeletedProfileId = profileId;
+      this.$refs[this.modalId].show();
+    },
+    handleCancel() {
+      this.toBeDeletedProfileId = null;
     },
   },
   tableFields: [
@@ -73,7 +102,7 @@ export default {
       key: 'validationStatus',
       // NOTE: hidden for now, since the site validation is still WIP and will be finished in an upcoming iteration
       // roadmap: https://gitlab.com/groups/gitlab-org/-/epics/2912#ui-configuration
-      class: 'gl-display-none',
+      class: 'gl-display-none!',
     },
     {
       key: 'actions',
@@ -92,6 +121,21 @@ export default {
         stacked="md"
         thead-class="gl-display-none"
       >
+        <template v-if="hasError" #top-row>
+          <td :colspan="$options.tableFields.length">
+            <gl-alert class="gl-my-4" variant="danger" :dismissible="false">
+              {{ errorMessage }}
+              <ul
+                v-if="hasErrorDetails"
+                :aria-label="__('DastProfiles|Error Details')"
+                class="gl-p-0 gl-m-0"
+              >
+                <li v-for="errorDetail in errorDetails" :key="errorDetail">{{ errorDetail }}</li>
+              </ul>
+            </gl-alert>
+          </td>
+        </template>
+
         <template #cell(profileName)="{ value }">
           <strong>{{ value }}</strong>
         </template>
@@ -107,21 +151,31 @@ export default {
           </span>
         </template>
 
-        <template #cell(actions)>
-          <!--
+        <template #cell(actions)="{ item }">
+          <div class="gl-text-right">
+            <gl-button
+              icon="remove"
+              variant="danger"
+              category="secondary"
+              class="gl-mr-3"
+              :aria-label="__('Delete')"
+              @click="prepareProfileDeletion(item.id)"
+            />
+            <!--
             NOTE: The tooltip and `disable` on the button is temporary until the edit feature has been implemented
             further details: https://gitlab.com/gitlab-org/gitlab/-/issues/222479#proposal
            -->
-          <span
-            v-gl-tooltip.hover
-            :title="
-              s__(
-                'DastProfiles|Edit feature will come soon. Please create a new profile if changes needed',
-              )
-            "
-          >
-            <gl-button disabled>{{ __('Edit') }}</gl-button>
-          </span>
+            <span
+              v-gl-tooltip.hover
+              :title="
+                s__(
+                  'DastProfiles|Edit feature will come soon. Please create a new profile if changes needed',
+                )
+              "
+            >
+              <gl-button disabled>{{ __('Edit') }}</gl-button>
+            </span>
+          </div>
         </template>
 
         <template #table-busy>
@@ -134,18 +188,6 @@ export default {
             </gl-skeleton-loader>
           </div>
         </template>
-
-        <template v-if="hasError && !isErrorDismissed" #bottom-row>
-          <td :colspan="$options.tableFields.length">
-            <gl-alert class="gl-my-4" variant="danger" :dismissible="false">
-              {{
-                s__(
-                  'DastProfiles|Error fetching the profiles list. Please check your network connection and try again.',
-                )
-              }}
-            </gl-alert>
-          </td>
-        </template>
       </gl-table>
 
       <p v-if="hasMoreProfilesToLoad" class="gl-display-flex gl-justify-content-center">
@@ -153,13 +195,27 @@ export default {
           data-testid="loadMore"
           :loading="isLoading && !hasError"
           @click="$emit('loadMoreProfiles')"
-          >{{ __('Load more') }}</gl-button
         >
+          {{ __('Load more') }}
+        </gl-button>
       </p>
     </div>
 
     <p v-else class="gl-my-4">
       {{ s__('DastProfiles|No profiles created yet') }}
     </p>
+
+    <gl-modal
+      :ref="modalId"
+      :modal-id="modalId"
+      :title="s__('DastProfiles|Are you sure you want to delete this profile?')"
+      :ok-title="__('Delete')"
+      :static="true"
+      :lazy="true"
+      ok-variant="danger"
+      body-class="gl-display-none"
+      @ok="handleDelete"
+      @cancel="handleCancel"
+    />
   </section>
 </template>
