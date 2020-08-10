@@ -75,6 +75,7 @@ describe('CodeReviewAnalyticsApp component', () => {
         newMergeRequestUrl: 'new_merge_request',
         emptyStateSvgPath: 'svg',
         milestonePath: `${TEST_HOST}/milestones`,
+        projectPath: TEST_HOST,
         labelsPath: `${TEST_HOST}/labels`,
       },
       provide: {

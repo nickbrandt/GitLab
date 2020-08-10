@@ -1,17 +1,23 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlFilteredSearch } from '@gitlab/ui';
+import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import { __ } from '~/locale';
 import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
 import LabelToken from '../../shared/components/tokens/label_token.vue';
 
 export default {
   components: {
-    GlFilteredSearch,
+    FilteredSearchBar,
+  },
+  props: {
+    projectPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
-      searchTerms: [],
+      initialFilterValue: [],
     };
   },
   computed: {
@@ -78,7 +84,7 @@ export default {
         return acc;
       }, {});
     },
-    filteredSearchSubmit(filters) {
+    handleFilter(filters) {
       const { label: labelNames, milestone } = this.processFilters(filters);
       const milestoneTitle = milestone ? milestone[0] : null;
       this.setFilters({ labelNames, milestoneTitle });
@@ -88,14 +94,13 @@ export default {
 </script>
 
 <template>
-  <div class="bg-secondary-50 p-3 border-top border-bottom">
-    <gl-filtered-search
-      :v-model="searchTerms"
-      :placeholder="__('Filter results')"
-      :clear-button-title="__('Clear')"
-      :close-button-title="__('Close')"
-      :available-tokens="tokens"
-      @submit="filteredSearchSubmit"
-    />
-  </div>
+  <filtered-search-bar
+    :namespace="projectPath"
+    recent-searches-storage-key="code-review-analytics"
+    :search-input-placeholder="__('Filter results')"
+    :tokens="tokens"
+    :initial-filter-value="initialFilterValue"
+    class="row-content-block"
+    @onFilter="handleFilter"
+  />
 </template>
