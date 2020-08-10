@@ -111,7 +111,7 @@ export default {
         :class="{ 'is-invalid': Boolean(formErrors[formGroup.key]) }"
         class="col-sm-3"
         type="number"
-        @input="checkCapacity(formGroup)"
+        @update="checkCapacity(formGroup)"
       />
     </gl-form-group>
   </div>
