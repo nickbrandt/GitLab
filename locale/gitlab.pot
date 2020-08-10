@@ -7030,6 +7030,9 @@ msgstr ""
 msgid "Create file"
 msgstr ""
 
+msgid "Create from"
+msgstr ""
+
 msgid "Create group"
 msgstr ""
 
@@ -9871,6 +9874,9 @@ msgid "Excluding merge commits. Limited to %{limit} commits."
 msgstr ""
 
 msgid "Excluding merge commits. Limited to 6,000 commits."
+msgstr ""
+
+msgid "Existing branch name, tag, or commit SHA"
 msgstr ""
 
 msgid "Existing members and groups"
@@ -16302,6 +16308,9 @@ msgstr ""
 msgid "No schedules"
 msgstr ""
 
+msgid "No source selected"
+msgstr ""
+
 msgid "No stack trace for this error"
 msgstr ""
 
@@ -21062,6 +21071,9 @@ msgstr ""
 msgid "Search branches and tags"
 msgstr ""
 
+msgid "Search branches, tags, and commits"
+msgstr ""
+
 msgid "Search by Git revision"
 msgstr ""
 
@@ -21680,6 +21692,9 @@ msgid "Select required regulatory standard"
 msgstr ""
 
 msgid "Select shards to replicate"
+msgstr ""
+
+msgid "Select source"
 msgstr ""
 
 msgid "Select source branch"
