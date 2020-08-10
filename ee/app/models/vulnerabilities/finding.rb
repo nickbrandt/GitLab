@@ -110,14 +110,6 @@ module Vulnerabilities
         .where(vulnerability_occurrence_pipelines: { pipeline_id: pipelines })
     end
 
-    def self.count_by_day_and_severity(period)
-      joins(:finding_pipelines)
-        .select('CAST(vulnerability_occurrence_pipelines.created_at AS DATE) AS day', :severity, 'COUNT(distinct vulnerability_occurrences.id) as count')
-        .where(['vulnerability_occurrence_pipelines.created_at >= ?', Time.zone.now.beginning_of_day - period])
-        .group(:day, :severity)
-        .order('day')
-    end
-
     def self.counted_by_severity
       group(:severity).count.transform_keys do |severity|
         SEVERITY_LEVELS[severity]
