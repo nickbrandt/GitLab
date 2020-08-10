@@ -19,6 +19,12 @@ module Gitlab
         end
       end
 
+      # Check a basic format for the Redis key in order to ensure the keys are in the same hash slot
+      #
+      # Examples of keys
+      #   project:{1}:set_a
+      #   project:{1}:set_b
+      #   project:{2}:set_c
       def add(key:, value:, expiry:)
         unless %r{\A(\w|-|:)*\{\w*\}(\w|-|:)*\z}.match?(key)
           raise KeyFormatError.new("Invalid key format. #{key} key should have changeable parts in curly braces. See https://docs.gitlab.com/ee/development/redis.html#multi-key-commands")
