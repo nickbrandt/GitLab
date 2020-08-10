@@ -23677,6 +23677,9 @@ msgstr ""
 msgid "Tag name"
 msgstr ""
 
+msgid "Tag name is required"
+msgstr ""
+
 msgid "Tag this commit."
 msgstr ""
 
