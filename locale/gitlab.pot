@@ -297,6 +297,9 @@ msgstr[1] ""
 msgid "%{actionText} & %{openOrClose} %{noteable}"
 msgstr ""
 
+msgid "%{address} is an invalid IP address range"
+msgstr ""
+
 msgid "%{author_link} wrote:"
 msgstr ""
 

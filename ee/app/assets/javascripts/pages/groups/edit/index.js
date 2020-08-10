@@ -1,5 +1,6 @@
 import '~/pages/groups/edit';
 import initAccessRestrictionField from 'ee/groups/settings/access_restriction_field';
+import validateRestrictedIpAddress from 'ee/groups/settings/access_restriction_field/validate_ip_address';
 import { __ } from '~/locale';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   initAccessRestrictionField(
     '.js-ip-restriction',
-    { placeholder: __('Enter IP address range') },
+    { placeholder: __('Enter IP address range'), customValidator: validateRestrictedIpAddress },
     'ip_restriction_field',
   );
 });

@@ -225,29 +225,40 @@ describe('CommaSeparatedListTokenSelector', () => {
 
       tokenSelectorTriggerEnter();
 
-      expect(
-        findTokenSelector()
-          .find('[role="menuitem"]')
-          .text(),
-      ).toBe('Add "foo"');
+      expect(findTokenSelectorDropdown().text()).toBe('Add "foo"');
     });
   });
 
   describe('when `regexValidator` and `disallowedValues` props are not set', () => {
-    it('allows any value to be added', async () => {
-      createComponent({
-        scopedSlots: {
-          'user-defined-token-content': '<span>Add "{{props.inputText}}"</span>',
-        },
+    describe('when `customValidator` prop is not set', () => {
+      it('allows any value to be added', async () => {
+        createComponent({
+          scopedSlots: {
+            'user-defined-token-content': '<span>Add "{{props.inputText}}"</span>',
+          },
+        });
+
+        await setTokenSelectorInputValue('foo');
+
+        expect(findTokenSelectorDropdown().text()).toBe('Add "foo"');
       });
+    });
 
-      await setTokenSelectorInputValue('foo');
+    describe('when `customValidator` prop is set', () => {
+      it('displays error message that is returned by `customValidator`', () => {
+        createComponent({
+          propsData: {
+            customValidator: () => 'Value is invalid',
+          },
+          scopedSlots: {
+            'user-defined-token-content': '<span>Add "{{props.inputText}}"</span>',
+          },
+        });
 
-      expect(
-        findTokenSelector()
-          .find('[role="menuitem"]')
-          .text(),
-      ).toBe('Add "foo"');
+        tokenSelectorTriggerEnter();
+
+        expect(findErrorMessageText()).toBe('Value is invalid');
+      });
     });
   });
 

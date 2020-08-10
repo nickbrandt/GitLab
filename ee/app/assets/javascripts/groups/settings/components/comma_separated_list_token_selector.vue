@@ -30,6 +30,11 @@ export default {
       required: false,
       default: () => [],
     },
+    customValidator: {
+      type: Function,
+      required: false,
+      default: () => '',
+    },
     errorMessage: {
       type: String,
       required: false,
@@ -61,7 +66,7 @@ export default {
         return this.disallowedValueErrorMessage;
       }
 
-      return '';
+      return this.customValidator(this.textInputValue);
     },
   },
   watch: {
