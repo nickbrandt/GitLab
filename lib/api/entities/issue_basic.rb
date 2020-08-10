@@ -21,6 +21,7 @@ module API
         issue.assignees.first
       end
 
+      expose(:health_status) { |issue, options| issue.health_status }
       expose(:user_notes_count)     { |issue, options| issuable_metadata.user_notes_count }
       expose(:merge_requests_count) { |issue, options| issuable_metadata.merge_requests_count }
       expose(:upvotes)              { |issue, options| issuable_metadata.upvotes }
