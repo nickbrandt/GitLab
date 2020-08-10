@@ -33,6 +33,10 @@ export default {
       required: false,
       default: () => [],
     },
+    knownLicenses: {
+      type: Array,
+      required: true,
+    },
     loading: {
       type: Boolean,
       required: false,
@@ -78,6 +82,7 @@ export default {
       <add-license-form-dropdown
         id="js-license-dropdown"
         v-model="licenseName"
+        :known-licenses="knownLicenses"
         :placeholder="s__('LicenseCompliance|License name')"
       />
       <div class="invalid-feedback" :class="{ 'd-block': isInvalidLicense }">

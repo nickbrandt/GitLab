@@ -47,6 +47,7 @@ const createComponent = ({ state, getters, props, actionMocks, isAdmin, options,
           managedLicenses,
           isLoadingManagedLicenses: true,
           isAdmin,
+          knownLicenses: [],
           ...state,
         },
         actions: {
