@@ -524,6 +524,9 @@ msgstr ""
 msgid "%{loadingIcon} Started"
 msgstr ""
 
+msgid "%{location} is missing required keys: %{keys}"
+msgstr ""
+
 msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
 msgstr ""
 
@@ -803,7 +806,22 @@ msgstr ""
 msgid "&lt;project name&gt;"
 msgstr ""
 
-msgid "'%{data}' is invalid at '%{data_pointer}'. Should be '%{schema}' due to schema definition at '%{schema_pointer}'"
+msgid "'%{data}' at %{location} does not match format: %{format}"
+msgstr ""
+
+msgid "'%{data}' at %{location} does not match pattern: %{pattern}"
+msgstr ""
+
+msgid "'%{data}' at %{location} is invalid: error_type=%{type}"
+msgstr ""
+
+msgid "'%{data}' at %{location} is not of type: %{type}"
+msgstr ""
+
+msgid "'%{data}' at %{location} is not one of: %{enum}"
+msgstr ""
+
+msgid "'%{data}' at %{location} is not: %{const}"
 msgstr ""
 
 msgid "'%{level}' is not a valid visibility level"
