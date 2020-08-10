@@ -213,14 +213,15 @@ export default {
       <p v-show="isRendering">
         <gl-loading-icon :inline="true" />
       </p>
-      <p
-        v-show="!renderedBadge && !isRendering"
-        class="disabled-content"
-      >{{ s__('Badges|No image to preview') }}</p>
+      <p v-show="!renderedBadge && !isRendering" class="disabled-content">
+        {{ s__('Badges|No image to preview') }}
+      </p>
     </div>
 
     <div v-if="isEditing" class="row-content-block gl-display-flex gl-justify-content-end">
-      <button class="btn btn-cancel gl-mr-4" type="button" @click="onCancel">{{ __('Cancel') }}</button>
+      <button class="btn btn-cancel gl-mr-4" type="button" @click="onCancel">
+        {{ __('Cancel') }}
+      </button>
       <loading-button
         :loading="isSaving"
         :label="s__('Badges|Save changes')"
